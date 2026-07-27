@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.base.json",
+  "_comment": "Root-level TypeScript that belongs to no workspace: the boundary proof in test/ and the root Vitest config. Without this, those files would be the only .ts in the repo that npm run typecheck never sees.",
+  "include": ["test", "vitest.config.ts"]
+}

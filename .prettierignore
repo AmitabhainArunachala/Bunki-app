@@ -1,0 +1,18 @@
+node_modules/
+dist/
+build/
+coverage/
+.expo/
+package-lock.json
+apps/app/assets/
+
+# Frozen inputs — controller §0.3 forbids editing these, and reformatting is
+# editing. Their bytes are hash-verified against
+# docs/specs/BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt.
+docs/specs/
+docs/convergence/
+docs/handoffs/
+
+# Append-only multi-agent evidence (orchestration spec §2.6). Format churn here
+# would collide across agents working in parallel.
+docs/build-evidence/
