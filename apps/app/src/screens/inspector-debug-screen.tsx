@@ -20,15 +20,19 @@
  * carries that label, so a screenshot of this page cannot be read as a
  * performance claim (REQ-GATE-03).
  *
- * **The AI channel is empty here and says why.** `@bunki/ai` is not wired into
- * this build of the app — B7's coordination request 2 hands over
- * `AiTelemetrySink`, and the ring already implements it. An empty section that
- * explained nothing would read as "no AI calls happened", which is a different
- * and unearned claim.
+ * **Empty channels say why.** An empty section that explained nothing would read
+ * as "nothing happened on this channel", which is a different and unearned
+ * claim. The AI channel is wired as of WP-10 (the runtime is built in
+ * `AppProvider` with the route ring as its sink, closing B7's coordination
+ * request 2), so an empty AI channel now means no candidate was requested this
+ * session rather than that the path does not exist.
  *
- * **The persistence channel is empty and says why.** `@bunki/persistence` is a
- * W4/WP-10 swap-in; this build keeps the log in memory, so there are no
- * persistence timings to record and none are invented.
+ * **Where the bytes are is its own section.** `StorageSection` renders the
+ * adapter's own label and its own disclosure sentence verbatim (REQ-ARCH-05,
+ * P0-CAP-15) — this is the "about screen" controller §7 requires the provisional
+ * web adapter to be labelled on. It reports three facts that fail separately:
+ * which adapter is running, whether it really has storage, and whether the last
+ * durable write landed.
  *
  * **Its four states are mutually exclusive.** The records region resolves
  * through `useLookup`, the same state machine the other screens use, so
@@ -53,7 +57,13 @@ import {
   type ObservabilityChannel,
   type RingEntry,
 } from '../observability/index.ts';
-import { useAppSnapshot, useDebugFlags, useObservabilityRing } from '../state/app-context.tsx';
+import {
+  useAppSnapshot,
+  useDebugFlags,
+  useObservabilityRing,
+  useStorageFacts,
+  useWriteState,
+} from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -169,6 +179,8 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
           {String(snapshot.revision)}
         </Text>
       </Section>
+
+      <StorageSection />
 
       {/* Exactly one of these four branches renders. `state.kind` is a closed
           union, so there is no arrangement of flags that shows two at once. */}
@@ -286,6 +298,82 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
         />
       </View>
     </ScreenShell>
+  );
+}
+
+/**
+ * Where this build keeps the learner's data (WP-10; REQ-ARCH-05, P0-CAP-15).
+ *
+ * Controller §7 requires the provisional web adapter to be "labelled provisional
+ * in code, UI (about screen), and README". This is the about surface, and it
+ * renders `@bunki/persistence`'s own sentence verbatim rather than a paraphrase
+ * — a screen that restated the guarantee in its own words is a screen that can
+ * restate it more strongly than the adapter earns.
+ *
+ * Three separate facts, because they fail separately: which adapter is running,
+ * whether that adapter actually has storage, and whether the last write reached
+ * it. A build reporting "web-provisional" while the browser refused
+ * `localStorage` looks durable and is not, which is why the second line exists.
+ */
+function StorageSection(): ReactNode {
+  const theme = useTheme();
+  const storage = useStorageFacts();
+  const writeState = useWriteState();
+
+  if (storage === null) {
+    return (
+      <Section
+        note="This screen is running against an injected store, so there is no adapter to describe."
+        testID="debug-storage"
+        title="Where this build keeps your data"
+      >
+        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+          No durable adapter is attached to this render. Nothing here is a durability claim.
+        </Text>
+      </Section>
+    );
+  }
+
+  return (
+    <Section testID="debug-storage" title="Where this build keeps your data">
+      <Text
+        style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+        testID="debug-storage-runtime"
+      >
+        Adapter: {storage.runtimeLabel}
+      </Text>
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        {storage.disclosure}
+      </Text>
+      {storage.provisionalNotice === null ? null : (
+        <Text
+          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+          testID="debug-storage-provisional"
+        >
+          {storage.provisionalNotice}
+        </Text>
+      )}
+      <Text
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+        testID="debug-storage-snapshot"
+      >
+        {storage.snapshotAvailable
+          ? 'Browser storage is available, so what you save survives a reload.'
+          : 'This browser refused persistent storage, so this session is in memory only and a reload will clear it.'}
+      </Text>
+      <Text
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+        testID="debug-storage-writes"
+      >
+        {writeState === null
+          ? 'Durable writes: not applicable.'
+          : writeState.kind === 'settled'
+            ? 'Durable writes: every accepted command has reached the store.'
+            : writeState.kind === 'writing'
+              ? 'Durable writes: one or more appends are in flight.'
+              : `Durable writes: the last append was rejected — ${writeState.message}`}
+      </Text>
+    </Section>
   );
 }
 

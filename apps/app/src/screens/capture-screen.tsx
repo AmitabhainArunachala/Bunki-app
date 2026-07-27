@@ -374,6 +374,7 @@ export function CaptureScreen({
             >
               {uncertaintyLogNote(activeThread?.uncertainty ?? null, {
                 kept: acknowledgment !== null,
+                markRecordedInLog: activeThread?.markRecordedInLog ?? false,
               })}
             </Text>
           </View>
@@ -504,7 +505,9 @@ export function CaptureScreen({
               }
               accessibilityLabel={`${thread.displayText}, ${thread.state.promotion}${
                 thread.uncertainty === null
-                  ? ''
+                  ? thread.markRecordedInLog
+                    ? ', marked uncertain; which part was not stored'
+                    : ''
                   : `, uncertain about ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`
               }`}
               key={thread.state.threadId}
@@ -525,7 +528,12 @@ export function CaptureScreen({
               >
                 {thread.state.promotion}
                 {thread.uncertainty === null
-                  ? ''
+                  ? // The log kept the *fact* of the mark and never held the
+                    // dimension (WP05-D2), so a reloaded thread says that rather
+                    // than reading as though nothing was marked.
+                    thread.markRecordedInLog
+                    ? ' · marked uncertain (which part was not stored)'
+                    : ''
                   : ` · uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`}
                 {` · ${String(thread.state.encounterIds.length)} encounter(s)`}
               </Text>

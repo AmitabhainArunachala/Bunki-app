@@ -154,9 +154,14 @@ export function KanjiScreen({
       )
       .find((lexeme) => lexeme !== null) ?? null;
 
+  // A thread counts as marked when *either* the app still holds the dimension
+  // or the log records that a mark was made. After a reload only the second is
+  // true (WP05-D2), and dropping such a thread here would report "nothing marked"
+  // about a character the learner did mark.
   const markedThread = snapshot.threads.find(
     (thread) =>
-      thread.uncertainty !== null && compounds.some((lexeme) => lexeme.id === thread.lexemeId),
+      (thread.uncertainty !== null || thread.markRecordedInLog) &&
+      compounds.some((lexeme) => lexeme.id === thread.lexemeId),
   );
 
   // "One useful contrast" (Layer 1): another seed kanji sharing a component.
@@ -367,9 +372,11 @@ export function KanjiScreen({
           Your weakest dimension here
         </Text>
         <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-          {markedThread === undefined || markedThread.uncertainty === null
+          {markedThread === undefined
             ? 'Nothing marked uncertain on a thread that uses this character.'
-            : `You marked ${UNCERTAINTY_LABELS[markedThread.uncertainty.dimension]} on ${markedThread.displayText}.`}
+            : markedThread.uncertainty === null
+              ? `You marked ${markedThread.displayText} as uncertain. Which part was never stored, so it did not survive the reload.`
+              : `You marked ${UNCERTAINTY_LABELS[markedThread.uncertainty.dimension]} on ${markedThread.displayText}.`}
         </Text>
 
         <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>

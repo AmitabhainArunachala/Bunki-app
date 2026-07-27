@@ -147,6 +147,7 @@ export function EvidenceInspectorScreen({
         thread.uncertainty === null ? null : UNCERTAINTY_LABELS[thread.uncertainty.dimension],
       uncertaintyLogNote: uncertaintyLogNote(thread.uncertainty, {
         kept: thread.state.promotion !== 'captured',
+        markRecordedInLog: thread.markRecordedInLog,
       }),
     });
     // `snapshot.revision` is the store's change token; the log is not a value
