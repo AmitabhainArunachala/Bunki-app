@@ -717,3 +717,175 @@ credentials; every URL in the fetch script is public and unauthenticated.
 - D-1 / D-2 / D-3 above — the only WP-04 items not closed.
 - Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
 - Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
+
+---
+
+## Appendix — WP-05 re-verification (Verifier V5, round 2): both P1s confirmed closed
+
+**Agent:** V5 (Verifier, WP-05) · **Wave:** W3 · **Date:** 2026-07-27
+**Subject under verification:** `agent/bunki-phase0-closed-loop-wp05` @ `55a2fdda7541b51bdb945a8454864ef9102d48bc`
+**This branch:** `agent/bunki-phase0-wp05-v5` · **Verdict: PASS — no open P0/P1.**
+
+Scope of this round, per the re-verification mandate: confirm that each
+P1 found in V5 round 1 is actually resolved, and that the §17.5 check set still
+passes from a clean checkout. This is **not** a fresh full verification of the
+WP-05 closure predicate; round 1 covered that and is not re-litigated here.
+
+### Integrity re-verified first, from `origin/main` (launcher step 1)
+
+Verified before reading the controller, and computed from `git show origin/main:…`
+rather than from a working tree that any agent could have edited.
+
+| File | SHA-256 observed | Matches `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` |
+| --- | --- | --- |
+| `…CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` (controller) | `de7b6fcc…859b47` | yes |
+| `…V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477…1b0c55` | yes |
+| `…MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `41631840…155a71` | yes |
+| `…PHASE0_DEFINITION_OF_DONE_2026-07-27.md` | `92e575e1…c75155e` | yes |
+| `…MASTER_DEFINITION_OF_DONE_2026-07-27.md` | `d5fb46c7…20cab43` | yes |
+
+### Stacking (controller §3 rule 1)
+
+This verifier branch was cut from `origin/agent/bunki-phase0-integration` at
+**`755c090`**, where WP-01/02/04 are verified. Re-checked this session: the
+integration branch has since advanced to **`f9f4d0e`** ("refresh from main,
+PRs #5/#6/#7 merged"), and `git diff --stat 755c090 f9f4d0e` is **empty** —
+merge commits only, identical tree. The subject branch stacks on the same
+`755c090`, so builder and verifier ran against the same content, and that
+content is what the integration branch holds today.
+
+### A caveat this report will not paper over
+
+**V5 round 1 was never filed as `docs/build-evidence/VERIFY_WP05.md`.** No
+independent record of round 1's findings exists on any branch (`git log --all`
+for that path returns nothing; `VERIFY_WP01/02/04.md` were filed by CON at
+`755c090`, and no WP-05 record was among them). The only surviving statement of
+what round 1 found is the **builder's own restatement** inside its repair
+appendix.
+
+So the honest scope of this round is: *the two defects as the builder
+characterised them are independently reproduced against the pre-repair source
+and independently confirmed absent from the repaired source.* If round 1 raised
+anything the builder did not restate, this round could not have caught it, and
+nothing here should be read as saying otherwise. Filing the round-1 record
+remains open for CON (item V5-O1 below).
+
+### Finding 1 (P1) — ruby pieces exposed in the accessibility tree · **RESOLVED**
+
+Not taken from the builder's log. Reproduced, then re-closed:
+
+1. `git show ef689ba:apps/app/src/ui/ruby.tsx` restored over the repaired file —
+   the pre-repair source does carry `importantForAccessibility="no"` (twice) and
+   a container `accessibilityLabel`, exactly as described.
+2. `npx expo export --platform web` rebuilt, harness re-run against that build:
+   **1/8 accessibility checks passed**, and Chrome reported the interleaved node
+   list verbatim:
+   `分かれる（わかれる） | わ | 分 | 　 | かれる` — five exposed named nodes,
+   including the ideographic-space placeholder. The defect is real and the audit
+   sees it.
+3. Harness true exit status on that run: **`1`**. A failing accessibility
+   assertion fails the run; it does not print a warning and exit 0.
+4. `npx vitest run apps/app/test/ruby-accessibility.test.ts` against the
+   pre-repair source: **5 of 6 tests fail**. The guard has teeth.
+5. Repaired source restored, re-exported, harness re-run: **27/27 screenshots,
+   8/8 accessibility checks**, exactly one exposed node named
+   `分かれる（わかれる）` and one named `分岐（ぶんき）`.
+6. The regenerated `accessibility-audit.json` is **byte-identical** to the one
+   committed at `55a2fdd`. The committed evidence is reproducible, not narrated.
+
+The deliberate deviation from the prescribed fix (`accessibilityRole="text"`
+kept for native meaning, but the label carried as real clipped text content
+because `propsToAriaRole` maps `text → null` on the installed react-native-web)
+was checked and is sound: the audit passes because of the text node, and the
+code comment says so rather than claiming the role does the work.
+
+### Finding 2 (P1) — screens stated a falsehood about the event log · **RESOLVED**
+
+1. `applyMarkUncertainty` in `src/state/memory-store.ts` returns `events: []`.
+   The premise of the claim — that a post-Keep mark writes nothing — holds in the
+   code, not just in the comment.
+2. Both screens call `uncertaintyLogNote`; neither contains the old literal.
+   `test/screen-contract.test.ts` fails if either regresses to stating it.
+3. The four branches were checked against the state each describes, including the
+   fourth one the finding did not name: clearing a mark after Keep leaves
+   `marksInLog === 1`, and the sentence correctly declines to claim the log is
+   now free of a mark.
+4. **Photographed in the real exported app, not asserted.** Shot
+   `27-capture-mark-after-keep.png` shows the corrected sentence under a selected
+   `reading` chip — "This mark was applied after Keep, so it is on this device
+   only — it is not in the event log and will not be exported (deferred item
+   WP05-D2)" — beside an acknowledgment reading
+   `2 event(s): EncounterCaptured, ThreadPromotionChanged`. Screen and log agree.
+5. `WP05-D2` in `src/state/deferred.ts` carries the widened scope.
+
+### Check set re-run from a clean checkout (controller §17.5), verbatim
+
+`npm ci` in a fresh worktree at `55a2fdd`: 717 packages, 724 audited.
+
+| Command | Result | Matches builder's claim |
+| --- | --- | --- |
+| `npm run lint` | clean, exit 0 | yes |
+| `npm run format:check` | "All matched files use Prettier code style!" | yes |
+| `npm run typecheck` | clean across root + all 6 workspaces | yes |
+| `npm run test` | **31 files, 529 tests, 529 passed** | yes (exact) |
+| `npm run test:replay` | 2 files, 43 tests passed | yes (exact) |
+| `npm run test:e2e` | placeholder, exits 0, prints "NOT A PASSING TEST SUITE" (WP-10) | n/a |
+| `npm run verify:export` | placeholder, exits 0, same disclaimer (WP-03) | n/a |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 5 static routes | yes |
+| `node apps/app/scripts/capture-evidence.mjs` | **27/27 screenshots, 8/8 accessibility checks**, exit 0 | yes (exact) |
+| same harness, pre-repair `ruby.tsx` | **27/27 screenshots, 1/8 accessibility checks**, exit **1** | yes (exact) |
+| `npx vitest run apps/app/test/ruby-accessibility.test.ts`, pre-repair source | **5 failed, 1 passed** | yes (exact) |
+
+Chromium used: `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`.
+
+Regenerating all 27 screenshots reproduced **18 byte-identical** PNGs; the 9 that
+differ are the timing-sensitive states (loading, enriching, double-tap,
+mark-after-keep). The two shots the accessibility claim rests on —
+`11-word-layers-0-1.png` and `12-word-layers-2-3.png` — are byte-identical, and
+so is `accessibility-audit.json`.
+
+### Surface audit (`git diff` against base `755c090`)
+
+- Nothing outside `apps/app/`, `docs/build-evidence/screenshots-wp05/`,
+  `docs/build-evidence/CAPSULE.md` and `package-lock.json`.
+- **Zero** files under `docs/specs/`, `docs/convergence/`, `docs/handoffs/`,
+  `docs/adr/`, `.github/`, and no change to `eslint.config.mjs` or
+  `package.json`.
+- No other lane's W3 surface touched: no `packages/domain/`,
+  `packages/persistence/`, `packages/export/`, `packages/seed/`.
+- `package-lock.json` (+160) is from WP-05 round 1, not the repair round;
+  `git diff ef689ba 55a2fdd` does not touch it, so the repair round added no
+  dependency, as claimed.
+- `CAPSULE.md` over the repair round: **214 insertions, 0 deletions** — strictly
+  append-only, verified by `--numstat`, not by reading.
+- REQ-GATE-03 grep over `apps/app/src` for durability/authority claims
+  (`saved permanently|saved forever|never lose|guaranteed|100% accurate|verified translation|official dictionary`):
+  **0 matches**.
+
+### Observations — P2 only, nothing blocking
+
+| Id | Observation |
+| --- | --- |
+| V5-O1 | **For CON.** The round-1 V5 findings have no filed record. `docs/build-evidence/VERIFY_WP05.md` should be written at W3 close covering both rounds, so WP-05's verification history does not live only inside the builder's own appendix. |
+| V5-O2 | The repair appendix says "13 re-captured PNGs, 1 new PNG". The actual count is **11** modified PNGs plus 1 new; 13 is the number of modified *files* in that directory (11 PNGs + `README.md` + `index.json`). Same count-wording class as the W2 carried P2, and it does not touch a predicate. |
+| V5-O3 | The evidence harness is not CI-wired, so the 8/8 audit is a local gate today. That is correct for now — WP-10 owns extending CI to the full §17.5 set — but the accessibility regression this repair closed is exactly what an un-wired gate lets back in. Worth naming in the WP-10 handoff. |
+
+### Verdict
+
+**PASS.** Both round-1 P1s are resolved, each reproduced against the pre-repair
+source and confirmed absent from the repaired source by commands this verifier
+ran. The §17.5 check set passes from a clean checkout with counts matching the
+builder's log exactly. No new P0 or P1. Three P2 observations above.
+
+### Next safe command
+
+- CON: mark the WP-05 exit item on `ORCHESTRATION_LOG.md`, and file
+  `VERIFY_WP05.md` covering rounds 1 and 2 (V5-O1).
+- INT: `agent/bunki-phase0-closed-loop-wp05` @ `55a2fdd` is mergeable onto the
+  integration branch as-is — it stacks on `755c090`, whose tree equals `f9f4d0e`,
+  so no rebase is required.
+- To falsify this report rather than trust it, from a clean checkout of
+  `55a2fdd`: `git show ef689ba:apps/app/src/ui/ruby.tsx > apps/app/src/ui/ruby.tsx`,
+  `(cd apps/app && npx expo export --platform web)`,
+  `node apps/app/scripts/capture-evidence.mjs` → must drop to 1/8 and exit 1.
+  Restore with `git checkout -- apps/app/src/ui/ruby.tsx`.
