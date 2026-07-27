@@ -25,17 +25,43 @@
  * (a promotion for a thread with no capture, a purge with no tombstone) throws
  * rather than being passed over — a projection that skips what it does not
  * understand is a projection nobody can audit.
+ *
+ * **Scheduling enters here and only here (WP-06).** Every evidence-class
+ * observation is put to the gate (`src/evidence/`), its verdict is recorded in
+ * `gateDecisions`, and only an admitted tier-A review reaches the FSRS reducer
+ * (`src/reducers/memory-state.ts`). A *rejection* is not an error: a review of
+ * an unpromoted contract, a lookup, an exposure, and an unconfirmed `easy` are
+ * all things that legitimately happened and legitimately changed no schedule.
+ * They stay in the ledger with a named reason, because "why did that not count"
+ * is a question the evidence inspector has to be able to answer (REQ-UI-06).
  */
 
+import {
+  activatesSkill,
+  emptyTargetThreadIndex,
+  indexEncounter,
+  resolveComponentThread,
+  retrievalContractFromEvent,
+  type MutableTargetThreadIndex,
+  type RetrievalContract,
+} from '../contracts/index.ts';
 import {
   DuplicateEventIdError,
   IdempotencyConflictError,
   ReducerInvariantError,
 } from '../errors.ts';
-import type { DomainEvent } from '../events/catalog.ts';
+import { admitToScheduler, type EvidenceGateContext } from '../evidence/index.ts';
+import { isEvidenceClassEvent, type DomainEvent } from '../events/catalog.ts';
 import { parseEventLog } from '../events/parse.ts';
+import type { PromotionState } from '../events/shared.ts';
+import {
+  applyAdmittedReview,
+  initialMemoryState,
+  setMemoryStateActive,
+  type MemoryState,
+} from '../reducers/memory-state.ts';
 import { initialThreadState, threadReducer, type ThreadState } from '../reducers/thread.ts';
-import type { EventId } from '../primitives.ts';
+import type { ContractId, EventId, IsoInstant, ThreadId } from '../primitives.ts';
 import { canonicalJson } from './canonical-json.ts';
 import {
   compareIds,
@@ -43,6 +69,7 @@ import {
   type ContractRecord,
   type DerivedState,
   type ExportRecord,
+  type GateDecisionRecord,
   type ObservationRecord,
   type PurgeRecord,
   type SessionState,
@@ -70,6 +97,17 @@ interface Accumulator {
   readonly candidateOwner: Map<string, string>;
   /** tombstone eventId → threadId, so `ContentPurged` can find its thread. */
   readonly tombstoneOwner: Map<EventId, string>;
+  // --- WP-06: contracts, the gate, and the scheduler ---
+  /** Scorable contract entities, by id (REQ-DM-05). */
+  readonly contractEntities: Map<ContractId, RetrievalContract>;
+  /** Contracts whose `ContractCreated` was well-formed but not scorable. */
+  readonly invalidContractIds: Set<ContractId>;
+  /** The target→thread projection, folded forward with the log. */
+  readonly componentIndex: MutableTargetThreadIndex;
+  readonly promotionByThread: Map<ThreadId, PromotionState>;
+  readonly deletedThreadIds: Set<ThreadId>;
+  readonly memoryStates: Map<ContractId, MemoryState>;
+  readonly gateDecisions: GateDecisionRecord[];
   appliedEventCount: number;
   skippedDuplicateCount: number;
   lastEventId: EventId | null;
@@ -87,11 +125,92 @@ function emptyAccumulator(): Accumulator {
     purges: [],
     candidateOwner: new Map(),
     tombstoneOwner: new Map(),
+    contractEntities: new Map(),
+    invalidContractIds: new Set(),
+    componentIndex: emptyTargetThreadIndex(),
+    promotionByThread: new Map(),
+    deletedThreadIds: new Set(),
+    memoryStates: new Map(),
+    gateDecisions: [],
     appliedEventCount: 0,
     skippedDuplicateCount: 0,
     lastEventId: null,
     lastOccurredAt: null,
   };
+}
+
+/**
+ * Which observations a later correction retracted (REQ-DM-04.2).
+ *
+ * The only backward-looking step in replay, and it is a pre-pass rather than a
+ * second fold because a correction is *about* an earlier event by definition.
+ * Without it, `EvidenceSuperseded` would move a marker in the ledger while the
+ * misgraded review carried on driving the learner's intervals — a correction
+ * affordance that corrects nothing (REQ-UI-06).
+ */
+function collectSupersededEventIds(events: readonly DomainEvent[]): ReadonlySet<EventId> {
+  const superseded = new Set<EventId>();
+  events.forEach((event) => {
+    if (event.type === 'EvidenceSuperseded') superseded.add(event.supersededEventId);
+  });
+  return superseded;
+}
+
+function gateContext(
+  accumulator: Accumulator,
+  supersededEventIds: ReadonlySet<EventId>,
+): EvidenceGateContext {
+  return {
+    contracts: accumulator.contractEntities,
+    invalidContractIds: accumulator.invalidContractIds,
+    threadIndex: accumulator.componentIndex,
+    promotionByThread: accumulator.promotionByThread,
+    deletedThreadIds: accumulator.deletedThreadIds,
+    supersededEventIds,
+  };
+}
+
+/**
+ * Is this contract schedulable right now?
+ *
+ * The same three conditions the gate applies to a review — linked to a thread,
+ * that thread not deleted, that thread's promotion state activating this
+ * skill — so activation and admission can never drift apart into two rules that
+ * disagree about the same contract.
+ */
+function isContractActive(accumulator: Accumulator, contract: RetrievalContract): boolean {
+  const link = resolveComponentThread(accumulator.componentIndex, contract.targetComponentId);
+  if (!link.linked) return false;
+  if (accumulator.deletedThreadIds.has(link.threadId)) return false;
+  const promotion = accumulator.promotionByThread.get(link.threadId);
+  if (promotion === undefined) return false;
+  return activatesSkill(promotion, contract.skill);
+}
+
+/**
+ * Bring every contract's activation in line with the log so far.
+ *
+ * Run after each applied event. Promotion activates contracts (REQ-DM-09), and
+ * three different events can change the answer: a promotion change, a contract
+ * arriving on an already-promoted thread, and a capture that binds — or newly
+ * makes ambiguous — a component. Recomputing all of them once per event is the
+ * version of this that cannot get out of step; the alternative is three partial
+ * update paths and a bug in whichever one nobody exercised.
+ *
+ * A deactivated contract keeps its `MemoryState`. Demotion is reversible
+ * (WP-02's promotion ladder allows it on purpose), and discarding the schedule
+ * would silently destroy the learner's review history for it.
+ */
+function recomputeActivation(accumulator: Accumulator, at: IsoInstant): void {
+  accumulator.contractEntities.forEach((contract, contractId) => {
+    const active = isContractActive(accumulator, contract);
+    const existing = accumulator.memoryStates.get(contractId);
+    if (existing === undefined) {
+      if (active) accumulator.memoryStates.set(contractId, initialMemoryState(contractId, at));
+      return;
+    }
+    accumulator.memoryStates.set(contractId, setMemoryStateActive(existing, active));
+  });
 }
 
 function requireThread(
@@ -116,20 +235,83 @@ function recordObservation(accumulator: Accumulator, observation: MutableObserva
   accumulator.observationIndex.set(observation.eventId, observation);
 }
 
-function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
+/**
+ * Run the gate on one observation and apply what it admits (WP-06).
+ *
+ * Every evidence-class observation gets a recorded verdict, admitted or not.
+ * Nothing is skipped and nothing throws: a review naming a contract this log
+ * never created is a *rejection* with a reason, not a corrupt log — a single
+ * bad producer event must not make the whole ledger unreadable, which is the
+ * opposite of an auditable evidence trail.
+ */
+function judge(
+  accumulator: Accumulator,
+  event: DomainEvent,
+  supersededEventIds: ReadonlySet<EventId>,
+): void {
+  if (!isEvidenceClassEvent(event)) return;
+
+  const decision = admitToScheduler(event, gateContext(accumulator, supersededEventIds));
+
+  accumulator.gateDecisions.push({
+    eventId: event.eventId,
+    type: event.type,
+    contractId: decision.contractId,
+    admitted: decision.admitted,
+    reason: decision.admitted ? null : decision.reason,
+    effectiveGrade: decision.admitted ? decision.effectiveGrade : null,
+    forcedByReveal: decision.admitted ? decision.forcedByReveal : false,
+    at: event.occurredAt,
+  });
+
+  if (!decision.admitted) return;
+
+  const state = accumulator.memoryStates.get(decision.contractId);
+  if (state === undefined) {
+    // Unreachable while `isContractActive` and the gate share their conditions;
+    // kept because "unreachable" is a claim about today's code, and a silent
+    // no-op here would look exactly like a review that simply did not count.
+    throw new ReducerInvariantError(
+      'replay.admitted-review-has-memory-state',
+      event.eventId,
+      event.type,
+      `the gate admitted a review for contract ${decision.contractId} but no MemoryState was activated for it`,
+    );
+  }
+
+  accumulator.memoryStates.set(
+    decision.contractId,
+    applyAdmittedReview(state, {
+      contractId: decision.contractId,
+      effectiveGrade: decision.effectiveGrade,
+      reviewedAt: event.occurredAt,
+    }),
+  );
+}
+
+function applyEvent(
+  accumulator: Accumulator,
+  event: DomainEvent,
+  supersededEventIds: ReadonlySet<EventId>,
+): void {
   switch (event.type) {
     case 'EncounterCaptured': {
       const existing = accumulator.threads.get(event.threadId);
-      accumulator.threads.set(
-        event.threadId,
-        existing === undefined ? initialThreadState(event) : threadReducer(existing, event),
-      );
+      const next =
+        existing === undefined ? initialThreadState(event) : threadReducer(existing, event);
+      accumulator.threads.set(event.threadId, next);
+      accumulator.promotionByThread.set(event.threadId, next.promotion);
+      // The contract→thread projection (WP-06): a capture instantiates the
+      // KnowledgeComponent for its target and binds it to this thread.
+      indexEncounter(accumulator.componentIndex, event);
       break;
     }
 
     case 'ThreadPromotionChanged': {
       const thread = requireThread(accumulator, event.threadId, event);
-      accumulator.threads.set(event.threadId, threadReducer(thread, event));
+      const next = threadReducer(thread, event);
+      accumulator.threads.set(event.threadId, next);
+      accumulator.promotionByThread.set(event.threadId, next.promotion);
       break;
     }
 
@@ -151,6 +333,14 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         createdAt: event.occurredAt,
         createdByEventId: event.eventId,
       });
+      // The entity, separately: a well-formed record of an unscorable contract
+      // is folded into the registry and refused by the gate (REQ-DM-05).
+      const entity = retrievalContractFromEvent(event);
+      if (entity.valid) {
+        accumulator.contractEntities.set(event.contractId, entity.contract);
+      } else {
+        accumulator.invalidContractIds.add(event.contractId);
+      }
       break;
     }
 
@@ -164,6 +354,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         superseded: false,
         supersededByEventId: null,
       });
+      judge(accumulator, event, supersededEventIds);
       break;
     }
 
@@ -177,6 +368,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         superseded: false,
         supersededByEventId: null,
       });
+      judge(accumulator, event, supersededEventIds);
       break;
     }
 
@@ -190,6 +382,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         superseded: false,
         supersededByEventId: null,
       });
+      judge(accumulator, event, supersededEventIds);
       break;
     }
 
@@ -207,6 +400,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         superseded: false,
         supersededByEventId: null,
       });
+      judge(accumulator, event, supersededEventIds);
       break;
     }
 
@@ -239,6 +433,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
         superseded: false,
         supersededByEventId: null,
       });
+      judge(accumulator, event, supersededEventIds);
       break;
     }
 
@@ -335,6 +530,7 @@ function applyEvent(accumulator: Accumulator, event: DomainEvent): void {
       const thread = requireThread(accumulator, event.threadId, event);
       accumulator.threads.set(event.threadId, threadReducer(thread, event));
       accumulator.tombstoneOwner.set(event.eventId, event.threadId);
+      accumulator.deletedThreadIds.add(event.threadId);
       break;
     }
 
@@ -376,6 +572,9 @@ function finalise(accumulator: Accumulator): DerivedState {
   const sessions = [...accumulator.sessions.values()].sort((left, right) =>
     compareIds(left.sessionId, right.sessionId),
   );
+  const memoryStates = [...accumulator.memoryStates.values()].sort((left, right) =>
+    compareIds(left.contractId, right.contractId),
+  );
 
   return freezeDerivedState({
     schemaVersion: 1,
@@ -386,6 +585,8 @@ function finalise(accumulator: Accumulator): DerivedState {
     threads,
     contracts,
     observations: accumulator.observations.map((observation) => ({ ...observation })),
+    gateDecisions: accumulator.gateDecisions,
+    memoryStates,
     sessions,
     exports: accumulator.exports,
     purges: accumulator.purges,
@@ -400,6 +601,7 @@ function finalise(accumulator: Accumulator): DerivedState {
  */
 export function replay(events: readonly DomainEvent[]): DerivedState {
   const accumulator = emptyAccumulator();
+  const supersededEventIds = collectSupersededEventIds(events);
   const seenEventIds = new Map<EventId, string>();
   /** key → the eventId that claimed it, and the exact bytes it claimed it with. */
   const seenIdempotencyKeys = new Map<string, { eventId: EventId; canonical: string }>();
@@ -437,7 +639,12 @@ export function replay(events: readonly DomainEvent[]): DerivedState {
       throw new DuplicateEventIdError(event.eventId, index);
     }
 
-    applyEvent(accumulator, event);
+    applyEvent(accumulator, event, supersededEventIds);
+    // Promotion activates contracts (REQ-DM-09). Three families can change the
+    // answer — promotion, contract creation, capture — and a tombstone can
+    // withdraw it, so activation is settled once per event rather than in four
+    // partial update paths.
+    recomputeActivation(accumulator, event.occurredAt);
 
     seenEventIds.set(event.eventId, event.idempotencyKey);
     seenIdempotencyKeys.set(event.idempotencyKey, {

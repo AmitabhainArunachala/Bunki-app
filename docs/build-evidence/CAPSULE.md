@@ -934,3 +934,150 @@ credentials, no network calls in either package.
 - `appVersions.fsrs` stays `null` until WP-06 pins the scheduler.
 - Repository license remains **pending operator decision** (OD-09); recorded in
   both package READMEs.
+
+## WP-06 / Builder B5 — W3 (appended 2026-07-27)
+
+### Stacking and provenance (controller §3.1)
+
+- **Branch:** `agent/bunki-phase0-closed-loop-wp06`, cut from `origin/agent/bunki-phase0-integration` @ **755c090** — _not_ from `origin/main`. WP-01/02/04 are verified but unmerged, and WP-06 consumes the WP-02 kernel directly (event catalog, replay, purity harness), so building on `main` would have meant reimplementing them. The stack is therefore `main (bbaf0b3) ← WP-01 ← WP-02 ← WP-04 ← WP-06`, and this branch must land after its predecessors.
+- **Integrity re-verified this session** before any edit: `sha256sum docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` → `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` (matches the launcher's expected hash); v2 spec → `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55`. Both match `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`.
+- **Surface lock honoured:** the W3 lock table assigns `packages/domain/` to B5 as sole domain writer. Nothing outside `packages/domain/**` was modified except root `package-lock.json` (mechanical, see deviations) and this capsule section. `packages/domain/src/session/` is untouched and still empty (WP-08's).
+
+### WP-00 carry-over check — does `ts-fsrs@5.4.1` implement FSRS-6?
+
+**Verdict: YES.** Verified from primary sources inside the published tarball (`npm pack ts-fsrs@5.4.1`); nothing taken from a summary or from memory.
+
+| Evidence               | Source                                     | Finding                                                                                                                                                             |
+| ---------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Changelog, 5.0.0       | `package/CHANGELOG.md`                     | "1. Upgraded to FSRS-6 algorithm" — PR #174 "Feat/FSRS-6"                                                                                                            |
+| Changelog, 5.2.0       | `package/CHANGELOG.md`                     | "Fix/FSRS-6 default parameters" (PR #196)                                                                                                                            |
+| Changelog, 5.0.0→5.4.1 | `package/CHANGELOG.md`                     | No entry reverts or re-generations the algorithm; 5.4.1 is a clip-range patch on `w[17]/w[18]`                                                                        |
+| README badge           | `package/README.md`                        | `FSRS-v6`, linking the fsrs4anki wiki's FSRS-6 section                                                                                                                |
+| Runtime self-report    | `dist/index.mjs`, executed                 | `FSRSVersion === 'v5.4.1 using FSRS-6.0'`                                                                                                                            |
+| Structural check       | `dist/index.mjs`                           | `default_w` has **21** weights ending in `FSRS6_DEFAULT_DECAY = 0.1542`. FSRS-5 has 19 weights and fixed decay 0.5, which the library exports separately as `FSRS5_DEFAULT_DECAY` for migration only |
+| Licence                | `npm view ts-fsrs@5.4.1 license` + `LICENSE` | **MIT** — compatible with the operator's pending licence choice (controller §4)                                                                                     |
+
+Recorded in code at `packages/domain/src/reducers/fsrs-pin.ts` (header) and enforced at runtime by `verifyFsrsPin()`, which compares the installed library's self-reported version and all 21 default weights against the values written out by hand in that file. `test/reducers/fsrs-pin.test.ts` fails the build on any drift. No stop condition triggered.
+
+### FSRS pin (controller §23 requires this in the capsule)
+
+```
+package            ts-fsrs
+version            5.4.1            (exact, no caret/tilde, in packages/domain/package.json)
+algorithm          FSRS-6           (self-report: "v5.4.1 using FSRS-6.0")
+parameterSetId     bunki-fsrs6-r090-defaults-v1
+request_retention  0.90             (DL-13, REQ-SCH-02; no user slider exists)
+maximum_interval   36500 days
+enable_fuzz        false            (randomness would break T-03 replay determinism)
+enable_short_term  true
+learning_steps     ["1m", "10m"]
+relearning_steps   ["10m"]
+w[0..20]           0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001,
+                   1.8722, 0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014,
+                   1.8729, 0.5425, 0.0912, 0.0658, 0.1542
+statePrecision     8 decimals on stability/difficulty (cross-engine drift guard)
+```
+
+### Closure predicate status (controller §18 WP-06)
+
+| Predicate                                     | Status | Evidence                                                                                                                     |
+| --------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| §6.2 gate complete                            | met    | `src/evidence/gate.ts` + `mint.ts`; `test/evidence/gate.test.ts` reaches **every** entry in `GATE_REJECTION_REASONS` and asserts that coverage |
+| Contracts per REQ-DM-05                       | met    | `src/contracts/retrieval-contract.ts`; `test/contracts/retrieval-contract.test.ts`                                            |
+| FSRS pin per §6.3 with recorded version/params | met    | `src/reducers/fsrs-pin.ts`, table above, `test/reducers/fsrs-pin.test.ts`                                                     |
+| Promotion flow per REQ-DM-09                  | met    | `src/contracts/promotion-activation.ts`; `test/contracts/promotion-activation.test.ts`; `test/evidence/t02-*.test.ts`         |
+| T-02, T-05, T-06, T-07, T-08 passing          | met    | one named file each under `packages/domain/test/evidence/`                                                                   |
+| Meaning/reading as separate contracts in fixtures | met | `golden-002` (same component, two skills, one memory state moved) and `golden-004`                                            |
+| Contract→thread link (CON W2 disposition)     | met    | projection from `EncounterCaptured`, no ADR-002 change — see below                                                            |
+| Golden replay extended with a scheduling fixture | met | `test/fixtures/golden-004-contracts-gate-and-fsrs-scheduling.json`, 19 events                                                 |
+| Rate-limit seam recorded                      | met    | `PROMOTION_RATE_LIMIT_SEAM` + typed `PromotionRateLimitPolicy`, unimplemented on purpose                                      |
+| `src/session/` left empty                     | met    | `test/purity/seams-left-empty.test.ts`                                                                                       |
+
+### The contract→thread link, resolved without touching ADR-002
+
+WP-02 raised it (`WP06_CONTRACT_THREAD_LINK_OPEN_QUESTION`): `ContractCreated` names a `targetComponentId`, `EncounterCaptured` names a `threadId`, and no v1 event joins them — so the gate's "promotion-active contract" test had nothing to stand on. The Conductor's W2 disposition chose a projection from `EncounterCaptured` with no schema change. Implemented as:
+
+```
+targetKey   = span ? text.slice(span.start, span.end) : text
+componentId = "kc:" + targetKey
+```
+
+Soundness: REQ-LM-01/A12 (sparse instantiation) says a KnowledgeComponent is instantiated only on evidence or need, and in Phase 0 the sole instantiator is capture — so a component is not an independent row with an arbitrary key, and its identity can be canonical. The thread edge then comes free (REQ-DM-02: thread BEGAN_WITH / REENCOUNTERED_IN encounter). **No new field, no new event, no version bump**; the constraint lands on the _value_ of an existing field, which is validation, and validation is WP-06's own surface.
+
+What it costs, stated rather than hidden: a contract naming a component that no capture instantiated can never be scheduled. That is the intended fail-closed behaviour and the gate says so by name (`component_never_captured`). Ambiguity — one target captured on two threads — also fails closed (`component_ambiguous`) rather than picking a thread. If a later phase needs components that outlive a single captured surface form, that is an ADR-002 amendment, i.e. an escalation, exactly as WP-02 asked.
+
+`WP06_CONTRACT_THREAD_LINK_OPEN_QUESTION` is replaced by `WP06_CONTRACT_THREAD_LINK_RESOLUTION`, which names the mechanism and the constraint. The projection is folded **forward** with the log, so a capture arriving after a review does not retroactively make that review schedulable.
+
+### What the evidence gate now guarantees
+
+Sole factory (`src/evidence/mint.ts`) and sole judge (`src/evidence/gate.ts`). `createDomainEvent` still refuses evidence families at the type level and throws `EvidenceFactoryBoundaryError` through `any`. Admission rules, each with a named rejection reason recorded in `DerivedState.gateDecisions`:
+
+- only `ReviewGraded` with `tier: "A"`, on a valid contract, linked to a non-deleted thread whose promotion state activates that contract's skill;
+- `revealedBeforeRecall` forces `again` **at both doors** — written into the minted event (ADR-002's wording) _and_ re-applied at admission, so an event that entered the log by another route (fixture, import, future adapter) is corrected too;
+- `LookupFrictionLogged` → `lookup_is_friction_not_a_grade` (T-07);
+- `ExposureLogged`, tier D → `exposure_is_never_retrieval` (T-08);
+- `ProductionObserved`, tier B/C → `production_is_not_tier_a`;
+- `easy` without `userConfirmedEasy === true` → refused, **not** silently downgraded to `good`; a downgrade would be the system making a claim the learner did not make;
+- a superseded observation stops scheduling (`evidence_superseded`), so the REQ-UI-06 correction affordance corrects something instead of merely annotating it;
+- `Candidate*` cannot enter: `@ts-expect-error` assertions in `test/evidence/gate.test.ts` are checked by `tsc -p tsconfig.test.json`, and `assertNotCandidate` throws `CandidateEvidenceBoundaryError` on candidate markers that survived a JSON round trip (T-09 unit half).
+
+Promotion: capture → `captured` (no scheduling); `keep` still none (REQ-DM-09.1, "no mandatory SRS"); `learn` activates recognition/reading/sense skills; `master` adds production/discrimination. Activation creates a `new` MemoryState due at the activation instant with **no FSRS call** — activation is not a review. Demotion sets `active: false` and keeps the history.
+
+### Finding: latent span defect in a WP-02 fixture (found, fixed, reported)
+
+`golden-002`'s capture of 憮然 carried `span {start: 3, end: 5}`, which slices `然と`, not `憮然` (0-indexed: 彼=0, は=1, 憮=2, 然=3). Latent while nothing read the span; load-bearing the moment the contract→thread projection did. Corrected to `{2, 4}`, consistent with the fixture's own `lexeme-buzen` / `component-buzen` naming. `thread-0102` gained the span `{0, 3}` it always meant (`案の定`). **Severity P2** — fixture data only, no production code path affected, no prior assertion depended on the value.
+
+### Tests: 328 → 468, none weakened
+
+`npm run test` was **328 passed** at the branch point and is **468 passed** now (+140). Six pre-existing assertions changed; all six were WP-02 statements about work that had not happened yet, and each was retargeted rather than deleted:
+
+| Assertion                                                              | Was            | Now                                                                       | Why                                                                                            |
+| ---------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `seams-left-empty`: `src/contracts`, `src/evidence` empty               | absence        | those are populated; `src/session` **still** asserted empty                | filling them is WP-06's closure predicate; WP-08's surface claim is intact                     |
+| `seams-left-empty`: no `ts-fsrs` dependency                            | absent         | present, exactly `5.4.1`, in `dependencies` only                           | controller §6.3/§14 require it in this package                                                 |
+| `seams-left-empty`: derived state has no `memoryState`/`stability`/`dueAt` | absent      | asserts no `sessionPlan`/`dueContracts` (WP-08's)                          | the words it banned are now the deliverable                                                    |
+| `no-ambient-nondeterminism`: bare imports `['zod']`                    | one            | `['ts-fsrs', 'zod']`, plus a **new** assertion that `ts-fsrs` is imported by exactly two files | still exhaustive; a third bare import still fails                              |
+| `no-ambient-nondeterminism`: one envelope minter                       | `factories.ts` | exactly `['events/factories.ts', 'evidence/mint.ts']`                      | two named files is a stronger claim than one file plus a convention; the split _is_ the evidence boundary |
+| `determinism`: exhaustive `DerivedState` key list                      | 11 keys        | 13 keys, still exhaustive, still rejects `sessionPlan`/`dueContracts`      | `gateDecisions` + `memoryStates` added                                                          |
+
+Golden snapshots for `golden-001/002/003` were regenerated because `DerivedState` grew two keys. Only `golden-002`'s **event log** changed (the span fix and the canonical component ids); `golden-001` and `golden-003` event logs are byte-identical and gained `"gateDecisions": []`, `"memoryStates": []`.
+
+### Commands run (verbatim results)
+
+```
+npm run lint                → clean (0 problems)
+npm run format:check        → All matched files use Prettier code style!
+npm run typecheck           → clean (root + all 6 workspaces, incl. domain src and test projects)
+npm run test                → Test Files 33 passed (33) | Tests 468 passed (468)
+npm run test:replay         → Test Files  2 passed  (2) | Tests  47 passed  (47)
+npm run test:e2e            → PLACEHOLDER, exits 0 (WP-10 owns it; not evidence of anything)
+npm run verify:export       → PLACEHOLDER, exits 0 (WP-03 owns it; not evidence of anything)
+(cd apps/app && npx expo export --platform web) → Exported: dist (web bundle 1.1MB, 3 static routes)
+```
+
+Branch-point baseline for comparison: `npm run test` → 328 passed (328).
+
+### Deviations and coordination requests (for CON)
+
+1. **Root `package-lock.json` modified** (+10 lines): `npm install ts-fsrs@5.4.1 --save-exact --workspace @bunki/domain`. Mechanically unavoidable with npm workspaces; the diff is that one package. Same class as WP-02/WP-04's accepted lockfile note.
+2. **Not a register deviation:** `ts-fsrs@5.4.1` (MIT) was already in the WP-00 dependency register; this is only its first installation.
+3. **P2, no action needed:** the `golden-002` span defect above is fixed in place; recorded because it is a change to a WP-02 artefact made by a different builder.
+4. **For WP-08 (B8):** `src/session/` is untouched. The session planner will want `DerivedState.memoryStates` (sorted by `contractId`, with `active` and `dueAt` as a canonical instant) as its due-queue input, and must not compute intervals itself (REQ-SCH-01).
+5. **For WP-03 (B4):** export `appVersions` can take `FSRS_PIN` directly; it is frozen plain data. `DerivedState` gained `gateDecisions` and `memoryStates`, both JSON-representable and canonically ordered — the export round trip (T-14) must carry them.
+
+### Residual risk, stated rather than papered over
+
+FSRS is transcendental arithmetic (`exp`, `log`, `pow`) and ECMAScript does not require bit-identical results across engines. Mitigation: intervals are integer days or fixed step minutes; stability and difficulty are rounded to 8 decimals on the way out **and the rounded values are fed back in on the next review**, so a last-bit difference is absorbed at each step instead of compounding across a review history. This is a real mitigation, not a proof — two engines could still straddle a rounding boundary. `golden-004` is the fixture that would catch it when WP-03's adapters and WP-11's device replay the same log. **No cross-runtime FSRS determinism claim is made here**; the in-memory reference is all this WP verified.
+
+### Secrets check (controller §15)
+
+Staged diff scanned for `api[_-]?key|secret|bearer|password|token`, excluding the lockfile: **2 matches, both this paragraph** — the heading above and the sentence you are reading, which contain the pattern because they describe it. **0 matches in code, tests, or fixtures.** No `.env`, no credentials, no network calls anywhere under `src/`. Recorded this way rather than as a bare "0" because a scan that reports zero while the file it lives in matches is a scan someone has already learned to disbelieve.
+
+### REQ-GATE-03 claim check
+
+No efficacy, burden-reduction, retention, or "scientifically optimized" claim appears in the code, the comments, or this section. FSRS is described as an engineering scheduler choice. The gate's rejection reasons state what did not count and why; nothing asserts what a learner knows.
+
+### Next safe command
+
+- V2 verifies WP-06 from a clean checkout of this branch: `git checkout agent/bunki-phase0-closed-loop-wp06 && npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay`, then `git diff --stat 755c090..HEAD` to confirm no surface outside `packages/domain/**` (plus the lockfile and this capsule) was touched, then walk the controller §6.2 bullet list against `packages/domain/test/evidence/`.
+- INT may stack this branch onto the integration branch after WP-01/02/04.

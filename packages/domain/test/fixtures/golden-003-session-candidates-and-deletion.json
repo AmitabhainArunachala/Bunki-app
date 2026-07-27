@@ -170,6 +170,8 @@
     ],
     "contracts": [],
     "observations": [],
+    "gateDecisions": [],
+    "memoryStates": [],
     "sessions": [
       {
         "sessionId": "session-0201",
