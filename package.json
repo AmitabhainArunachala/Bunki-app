@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "test": "vitest run",
     "test:replay": "node scripts/not-implemented.mjs test:replay WP-02",
     "test:e2e": "node scripts/not-implemented.mjs test:e2e WP-10",

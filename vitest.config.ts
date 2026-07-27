@@ -9,7 +9,7 @@ import { defineConfig } from 'vitest/config';
  */
 export default defineConfig({
   test: {
-    include: ['packages/*/test/**/*.test.ts', 'apps/app/test/**/*.test.ts'],
+    include: ['test/**/*.test.ts', 'packages/*/test/**/*.test.ts', 'apps/app/test/**/*.test.ts'],
     exclude: ['**/node_modules/**', '**/dist/**', 'apps/app/e2e/**'],
     reporters: ['default'],
   },
