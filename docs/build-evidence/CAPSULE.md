@@ -3418,3 +3418,322 @@ round advances the ladder.
 4. **Check the empty state is reachable rather than theoretical.** Clear
    `localStorage`, open `/session`, `/canvas` and `/repair` directly; each must
    render its own empty panel, and none may write a byte.
+
+---
+
+## Appendix — WP-10, adversarial lanes T3 + T4 (controller §17.2)
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-adv-b`
+**Base:** `agent/bunki-phase0-closed-loop-wp10-integrate` @ `3fd08e856321e8090d0e471307e210032b142264`
+**Role:** orchestration §4 lanes T3 (offline / timeout / kill-restart storms) and
+T4 (accessibility + truth-label audit). **Tests only** — no product code was
+changed. Defects are reported below and pinned in
+`apps/app/e2e/adv-known-defects.spec.ts`; fixing them belongs to the owning
+builders.
+
+### Integrity, verified before obeying anything
+
+`sha256sum` over every file in `docs/specs/` matches
+`BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` exactly, including the controller at
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` — the hash the
+launcher requires before any build action.
+
+### The environment claim, checked rather than inherited
+
+`npm ci` was run in this worktree before any check result was trusted. Its
+`node_modules` is a real directory in the worktree, not an inherited symlink;
+`readlink -f node_modules` resolves inside `.claude/worktrees/wf_8e9d9309-84e-6/`.
+This is the hazard a prior wave was misled by, so it was checked first rather
+than assumed.
+
+### What was built
+
+| File | Lane | What it establishes |
+|---|---|---|
+| `apps/app/e2e/support/adv-harness.ts` | — | static host over `apps/app/dist`, app drivers, `localStorage` readers, and the two hostile-network fixtures |
+| `apps/app/e2e/playwright.config.ts` | — | one config, `testMatch **/*.spec.ts`, `retries: 0`, Chromium only |
+| `apps/app/e2e/adv-offline-storm.spec.ts` | T3 | T-10 at app level |
+| `apps/app/e2e/adv-ai-timeout-storm.spec.ts` | T3 | T-11 at app level |
+| `apps/app/e2e/adv-restart-storm.spec.ts` | T3 | T-16 at the web runtime |
+| `apps/app/e2e/adv-a11y-audit.spec.ts` | T4 | axe WCAG A/AA, focus, labels, ruby |
+| `apps/app/e2e/adv-claim-audit.spec.ts` | T4 | REQ-GATE-03 forbidden-claim grep + truth labels |
+| `apps/app/e2e/adv-known-defects.spec.ts` | T3/T4 | the four findings, as `test.fail()` |
+
+Everything runs against the **shipped bundle** — the actual output of
+`expo export --platform web`, served over loopback by the harness. Nothing in
+these lanes builds, transpiles, mocks or reconstructs the app. That is
+definition-of-done §2 item 1 ("tests pass but the app doesn't") turned into a
+fixture.
+
+### T-10 — offline, and stronger than offline
+
+Every off-origin request is aborted at the browser boundary while the origin
+stays reachable (`context.setOffline(true)` was rejected as the primary
+mechanism: it also severs the loopback host, so the test would only prove that a
+blank tab cannot lose data). Under that condition the whole of the operator
+acceptance script §3.1–§3.9 runs: capture → word page → kanji page → promote →
+sitting to its end screen → export with `Replay check passed` → evidence chain
+opened and showing the promotion.
+
+The assertion is not "it degraded well" but **the list of blocked URLs is
+empty**. On this target `ambientEnv()` finds no `process`, so `@bunki/ai` takes
+the labelled fallback before reaching a transport. The exported bundle attempts
+no network at all, and that is now a check a reviewer can watch fail if REQ-AI-03
+ever stops holding.
+
+### T-11 — a real timeout, in the shipped code
+
+The web bundle normally never calls out, so the timeout path would be
+unreachable and a lane that stopped there would be testing the *absence* of a
+call. `ambientEnv()` reads `globalThis.process?.env` behind a guard, so
+`page.addInitScript` setting that global takes the shipped code down its live
+branch: `createAnthropicProvider` finds a key, builds the request, and calls
+`fetch` to `https://api.anthropic.com/v1/messages`. Every off-origin request is
+then held open and never settled, so the runtime's own `DEFAULT_TIMEOUT_MS`
+fires, aborts, and serves the labelled fallback. Measured settle time
+**~10.4 s** against a 10 000 ms budget, asserted `>= 9 s` so a test that
+accidentally took the short circuit fails instead of passing quietly.
+
+Nothing is stubbed — the timer, the `AbortController`, the fallback selection and
+the labels are the ones a release runs. The key is the literal
+`fixture-not-a-real-key`; the request carrying it is intercepted inside the
+browser and never continued, so no byte reaches a provider (controller §15).
+
+**This is not live-AI evidence.** OD-08 remains an open gate and
+definition-of-done §2 item 3 still applies: the *success* path of the live route
+is unexercised. Only the failure path was driven.
+
+### T-16-web — kill/restart storms
+
+- 12 reload cycles with no writes between them: event count, event-type sequence
+  and thread count identical every cycle — neither loss nor duplication on
+  rehydrate.
+- 6 captures with a reload between each: each adds events and exactly one thread;
+  export still replays afterwards.
+- 5 force-quit cycles (a new `BrowserContext` per run, storage carried across
+  explicitly, nothing in memory surviving): every earlier capture present in
+  every later run.
+- A kill at the instant the acknowledgment appears: the capture survives.
+- The snapshot is **one** parseable record and every event in it carries `v: 1`.
+
+Scope: Chromium/Expo Web. Controller §13's zero-lost-captures-in-100-trials and
+the background/kill measurements are **native** and belong to WP-11. Nothing here
+is evidence for them, and these counts are deliberately smaller and differently
+shaped so they cannot be misread as that trial.
+
+### T4 — accessibility (Chromium + axe-core 4.12.1, automated rules only)
+
+Nine routes × light and dark = 18 scans, `wcag2a wcag2aa wcag21a wcag21aa`.
+
+**Exactly one violation across all 18 scans:** `document-title` (serious) —
+finding T4-1 below. AA contrast is clean on every route in both schemes. Beyond
+axe: focus order follows reading order top-to-bottom with no upward jump, the
+ring closes rather than trapping, no element suppresses its focus outline, every
+focusable target is ≥ 44 pt on its smaller dimension (measured 44–46 px), and no
+interactive element on any route lacks an accessible name.
+
+Ruby is read once. Over CDP `Accessibility.queryAXTree`, the subtree under
+`word-headword` exposes exactly one named node — `分岐（ぶんき）` on
+`/word/lex-bunki` and `分かれる（わかれる）` on `/word/lex-wakareru` — with no
+written form, no reading and no ideographic-space placeholder anywhere in the
+tree, ignored or not.
+
+**What this does not establish:** that a screen-reader user can complete the
+loop. No VoiceOver, NVDA, TalkBack or Orca ran; no human tested it; no mobile
+browser was involved. Automated rules catch a minority of real barriers. This is
+a floor, not a verdict (REQ-GATE-03).
+
+### T4 — claim audit over the shipped bundle
+
+Nine patterns for the definition-of-done forbidden list — "scientifically
+optimized", "you will understand", mastery/comprehension percentages, global
+level, JLPT level claims, "reduced review burden", FSRS-as-efficacy,
+AI-grade-as-fact — run over every `.js`, `.html`, `.json` and `.css` file in
+`apps/app/dist`. Source maps are excluded because they embed this repository's
+sources verbatim, including the phrases quoted in order to forbid them.
+
+**Result: clean.** The grep is itself guarded two ways: each pattern is asserted
+to match an example of the claim it exists to catch, and each is asserted *not*
+to match seven honest sentences the app must stay free to say.
+
+One pattern was corrected during this work rather than the build being reported:
+the first `jlpt-level-claim` pattern matched the acronym and flagged the kanji
+page for *disclosing* that "school grade, frequency and JLPT/Kanken mappings need
+a licensed source". That is an honest statement of absence. A rule that punishes
+a build for naming a gap teaches the build to stop naming gaps, which inverts
+REQ-GATE-03; the pattern now matches the level claim (`JLPT N3`, `N3 kanji`) and
+the negative-control test pins the distinction.
+
+Truth labels asserted where generated or unreviewed content renders: the seed
+entry disclosure verbatim on both word pages and the kanji page; the coverage
+disclosure on an unmatched search; both candidate badges as **text** (`AI
+candidate / generated` + `offline-fallback`) before and after accepting; the
+durability notice beside the capture acknowledgment; and the export badge's
+qualifier *"This checks the export, not durability or storage."* The candidate
+check also reads the **durable log**, not just the screen: every
+`CandidateAttached` must carry `provider: offline-fallback` and
+`status: generated`, which is the half a screen-level assertion cannot reach.
+
+### Findings (severities are this lane's assessment, offered to CON for triage)
+
+**T3-1 (P1) — a completed sitting is recorded and displayed as `abandoned`.**
+`completed` is unreachable through the UI. `resolveCompletionState`
+(`packages/domain/src/session/runtime.ts`) returns `abandoned` while any step
+outcome is `pending`, and the closure step is a step; the only control the
+closure step offers is "Finish the session", which dispatches `close` — so the
+closure step's own outcome is always `pending` when the state is resolved. The
+`step === null` branch (testID `session-finish`) is dead code for the same
+reason. Reproduced: keep 分岐, take it up for study, answer the item, read the
+passage, press Finish → *"abandoned — Ended early. Some steps were left, and
+nothing was added because of it"*, and `SessionClosed.completionState:
+"abandoned"` in the durable log, the export and the inspector. The domain's own
+comment warns that inferring this "would turn 'I stopped early because I was done
+enough' into 'abandoned', which is a claim about the learner that the learner did
+not make"; the app makes exactly that claim, in the direction that is always
+wrong. Definition-of-done §3 step 6 is met in form while the screen misdescribes
+what happened. Suggested owner: WP-08, with WP-09 for the wording. `closeSession`
+already takes the completion state as a parameter precisely so the caller can say
+which of the three happened.
+
+**T3-2 (P1) — the nav shell stacks screens without bound.** `NavShell`'s
+`NavLink` calls `router.push(destination.href)` (`apps/app/src/ui/nav-shell.tsx`).
+A persistent shell is a switch between destinations, not a stack push, so every
+press mounts another screen and pops nothing. Measured: five Evidence↔Capture
+round trips leave **8** mounted capture screens and **5** mounted evidence
+screens, one of each visible; the count never falls. Each mounted capture screen
+is a live component subscribed to the store, so every store write re-renders all
+of them — work grows with navigation for no reason the learner can see, which is
+the shape definition-of-done §2 item 5 names for the review queue, here in the
+shell. It also puts §13's latency budgets quietly out of reach over a long
+sitting and makes Back walk a history the learner never built. Already ruled out
+and pinned so a fix cannot regress them: the stale screens are **not**
+keyboard-reachable and carry **no** axe violations. Suggested owner: WP-10.
+`router.navigate`/`replace` collapses an existing entry instead of adding one.
+
+**T3-3 (P2) — an abandoned AI request still attaches a candidate.** Tearing the
+document down mid-request makes the cancellation resolve as a *fallback*, and the
+resulting `CandidateAttached` is written during unload. On the next load the
+panel says "Nothing has been requested yet" while the log — and therefore the
+inspector and any export — holds a candidate generated by the act of leaving.
+Mechanism: navigation aborts the fetch; `fallbackReasonOf` maps
+`AiCancelledError` like any other failure (`packages/ai/src/runtime.ts`), so the
+runtime resolves with a scripted candidate; `useCandidate`'s `.then()` still sees
+`active.current === true` because React never unmounts on a document teardown.
+Reproduced 3/3; treated as a race. P2 rather than higher because nothing is lost,
+no memory state changes, the candidate is correctly `offline-fallback` and
+correctly `generated` rather than accepted, and candidate *text* is deliberately
+not durable (`memory-store.ts` rehydrate note — that part is by design, not a
+defect). The defect is the divergence: a record exists for something the learner
+never saw, and the screen afterwards denies it. Suggested owner: WP-07 — a
+cancellation is not a fallback.
+
+**T4-1 (P1) — every exported page ships an empty `<title>`.** `dist/index.html`
+and all twelve other pre-rendered pages contain `<title data-rh="true"></title>`:
+the element exists and is empty. No route sets one. Every browser tab, bookmark,
+history entry and window-switcher entry for this app is blank, and a
+screen-reader user announcing the page hears nothing. WCAG 2.4.2, Level A — the
+only axe violation in 18 scans. Suggested owner: WP-10 or WP-05; expo-router sets
+it per route via `Stack.Screen` options.
+
+### How the findings are pinned without weakening anything
+
+Each finding is a test asserting **the behaviour that ought to hold**, annotated
+`test.fail()`. No assertion was weakened and no wrong behaviour was written down
+as a requirement — controller §18a forbids that, and it would also leave the fix
+nothing to aim at. Playwright fails a test that was expected to fail and then
+passed, so the moment a defect is fixed this suite turns red and forces whoever
+fixed it to delete the annotation in the same change. The axe known-finding list
+works the same way: one test allows exactly the recorded rule ids so any *other*
+violation turns it red, and a second `test.fail()` test asserts the goal state of
+zero violations.
+
+### §17.5 check set — run in this worktree after `npm ci`, recorded verbatim
+
+| Command | Result |
+|---|---|
+| `npm run lint` | pass, 0 problems |
+| `npm run format:check` | pass, "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, all 6 workspaces |
+| `npm run test` | **77 files, 1248 tests, all passed** (13.41 s) |
+| `npm run test:replay` (T-03) | 2 files, 47 tests passed |
+| `npm run verify:export` (T-14) | 1 file, 10 tests passed |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist` — 1 web bundle, 13 static routes |
+| `npm run test:e2e` | **33 tests, 33 passed** (1.2 min), exit 0; 5 of them are the recorded `test.fail()` defects |
+
+The export was deleted and rebuilt from clean before the final E2E run, so the
+bundle under test is the one this branch produces.
+
+### Dependencies added (controller §14 — exact pins)
+
+| Package | Version | Licence | Why |
+|---|---|---|---|
+| `@playwright/test` | 1.56.0 | Apache-2.0 | E2E runner. **Same pin the WP-10 E2E lane chose**, so the two branches' `package.json` lines are byte-identical. |
+| `@axe-core/playwright` | 4.12.1 | MPL-2.0 | the axe scan §17.5 names |
+| `playwright-core` | 1.56.0 | Apache-2.0 | `@axe-core/playwright`'s peer resolved to 1.62.0 and hoisted, giving two incompatible `Page` types; pinning it to the version `@playwright/test` uses is what makes `npm run typecheck` pass |
+
+**Browser.** The config points `launchOptions.executablePath` at
+`/opt/pw-browsers/chromium` **only when that path exists**, and omits the key
+otherwise (omits, rather than setting `undefined` — the repository compiles with
+`exactOptionalPropertyTypes`). This environment ships Chromium 141 (revision
+1194) while `@playwright/test@1.56.0` would fetch revision 1234; using the
+pre-installed binary keeps these lanes runnable here without pinning a different
+Playwright version from the E2E lane's. CI runs
+`npx playwright install --with-deps chromium` first, so the path does not exist
+there and CI always drives the version-matched build. `BUNKI_E2E_CHROMIUM`
+overrides both.
+
+### Integration seam for INT (please read before merging)
+
+This branch was based on `…-wp10-integrate` @ `3fd08e8`, which does not carry the
+WP-10 E2E lane (`…-wp10-e2e`). Both branches therefore add a Playwright harness,
+and both extend CI the same way. They were written to merge cheaply:
+
+- **`package.json`** — `test:e2e` and `test:e2e:build` are spelled **identically**
+  on both branches, and `@playwright/test` is pinned to the same `1.56.0`. Only
+  this branch adds `@axe-core/playwright` and `playwright-core`, additively.
+- **`apps/app/e2e/playwright.config.ts`** — both branches add this path. The two
+  configs are equivalent (`testDir: '.'`, `testMatch: '**/*.spec.ts'`,
+  `retries: 0`, Chromium only); this one additionally sets `executablePath` from
+  the harness and a longer `timeout` for the storms. **Keeping either resolves the
+  conflict**; keeping this one loses nothing from the other, while keeping the
+  other's means the storms run on the default 90 s timeout, which the restart
+  storm may exceed. Recommendation: keep this one.
+- **Spec files and `support/`** — disjoint filenames (`adv-*.spec.ts`,
+  `support/adv-harness.ts` vs the E2E lane's `support/app.ts`,
+  `support/export-server.ts`). Purely additive; **whichever config survives
+  discovers both lanes' specs**, which is exactly what the E2E lane's own CI
+  comment anticipated.
+- **`.github/workflows/ci.yml`** — both add the same `e2e` job with the same
+  steps. One mechanical hunk; either side may be kept.
+
+### What a verifier should try to break
+
+1. **Break the offline claim.** Add any `fetch` to a screen and confirm
+   `T-10: the whole loop runs with every off-origin request severed` goes red on
+   the blocked-URL list. If it stays green, the strongest claim in this lane is
+   decorative.
+2. **Neuter the timeout.** Set `DEFAULT_TIMEOUT_MS` to 100 and confirm
+   `T-11: a hung AI call…` fails its `>= 9 s` floor rather than passing faster.
+   That floor is what stops the test from silently measuring the no-key short
+   circuit.
+3. **Fix a pinned defect.** Change `router.push` to `router.navigate` in
+   `nav-shell.tsx` and confirm the suite goes **red** with "expected to fail but
+   passed" on T3-2. An exemption that survives its own fix is worthless.
+4. **Corrupt the storage between kills.** Truncate the `localStorage` value
+   mid-JSON before a force-quit cycle and confirm `expectDurableStoreFound`
+   reports it rather than the count assertions passing vacuously on zero.
+5. **Widen the browser matrix.** Add a `firefox` project and confirm the worker
+   fixture refuses to run rather than letting the "Chromium on Expo Web" scope
+   statements go quietly stale.
+6. **Weaken the claim grep.** Delete a pattern and confirm
+   `the audit itself can fail` goes red; add `/level/i` and confirm the
+   negative-control sentences catch the over-broad rule.
+
+### Ladder position — unchanged by this round
+
+These lanes close the §17.2 slices they own and add the axe scan §17.5 names, but
+they are tests: they advance no closure predicate that was not already the
+integration line's. Four findings are open (three P1, one P2), so **no rung is
+claimable from this branch**. The status line remains
+`ENGINEERING-DONE (web) not yet claimable`. Nothing here is evidence about
+native, about a live model, or about any efficacy claim.
