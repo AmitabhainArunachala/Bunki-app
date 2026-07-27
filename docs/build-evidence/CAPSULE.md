@@ -226,3 +226,137 @@ diff adds no credential-shaped string; the PNGs are generated output.
 - `test:replay`, `verify:export`, `test:e2e` remain placeholders.
 - Native verification remains **UNVERIFIED** — WP-11 only.
 - **New, for whoever owns identity:** the app mark is a deliberate placeholder. It is not a designed identity and makes no claim to be one.
+
+## WP-04 / Builder B3 — W2 (appended 2026-07-27)
+
+### Integrity (re-verified this session, not trusted from documents)
+
+- Controller sha256 observed `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` — matches the launcher's expected value.
+- Also re-hashed and matched against `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`: v2 spec `5ee28477…`, orchestration spec `41631840…`, launcher `b0a6811d…`.
+- Read in full before the first edit: controller §3, §4, §5, §8, §14, §15, §16, §17, §18 (WP-04), §21, §23; orchestration spec §0–§5; v2 REQ-SRC-01/02, DL-33, OD-02, P0-CAP-04; the `ORCHESTRATION_LOG.md` surface lock (W2: `packages/seed/` → B3).
+
+### Branch stacking (deviation from controller §3.1, deliberate and recorded)
+
+- Branch `agent/bunki-phase0-closed-loop-wp04` is cut from **`origin/agent/bunki-phase0-integration` @ `f53ce4bd91dccd4cf7587b8b1bd2f5fff6fe6ca4`**, not from `origin/main` (`bbaf0b31a0f469d6e7f26b4a0855bf8f3b787c78`).
+- Reason: WP-01's scaffold is not yet merged to main, and WP-04 cannot exist without `packages/seed/`, the workspace root, the lint/typecheck/test scripts, or `vitest.config.ts`. Controller §3.1 provides for exactly this: "if unmerged predecessors block you, stack explicitly and say so".
+- Consequence for review: this branch's diff against main includes WP-01's scaffold. Review WP-04 as the diff against `f53ce4b`.
+
+### State
+
+- Branch: `agent/bunki-phase0-closed-loop-wp04` @ `e6fd31d2ae999b1b645d6b4b76780e060d26f323` (the commit before this capsule section).
+- Toolchain: node v22.22.2, npm 10.9.7.
+- Wave W2. The WP-04 predicate is met except the two deferred source items below, which are recorded rather than papered over.
+
+### WP-04 closure predicate status (controller §18)
+
+| Predicate item | Status | Evidence |
+| --- | --- | --- |
+| §8 dataset committed | met | 16 lexemes, 10 kanji (incl. 分 + 岐), 3 constructions, 8 sentences, 1 passage (160 chars, embeds 分岐), 10 KanjiVG SVGs — `packages/seed/data/` |
+| Every field carries provenance (REQ-SRC-01) | met | 199 field→provenance pairs; enforced by the type system, the loader, and two independent test walks |
+| Provenance-completeness test walking all records (feeds T-15) | met | `packages/seed/test/provenance.test.ts`, wired into `npm run test` |
+| Schema-checked with zod | met | `packages/seed/test/schema.test.ts`, zod 4.4.3 |
+| `LICENSES.md` complete with verbatim attributions + URLs + retrieval dates | **partial — honestly** | KanjiVG **verified**; EDRDG and Tatoeba **deferred (D-1, D-2)**: hosts unreachable, and **no content from them ships** |
+| Real KanjiVG SVGs, not hand-drawn | met | verbatim bytes at pinned commit `61e39cf`; `scripts/fetch-kanjivg.mjs --check` → 10/10 `MATCH` against upstream |
+| Source entry ids recorded where available | met | KanjiVG: `source_entry_id: "kanji/XXXXX.svg"` per field. JMdict `ent_seq`: **none obtainable** — recorded as `null`, not invented |
+
+### The one judgement call, stated plainly
+
+Controller §8 names JMdict/KANJIDIC2 and Tatoeba as the intended sources. Every
+EDRDG- and Tatoeba-controlled host returned `403 CONNECT` from this session's
+egress proxy (reproduced with both `curl` and `WebFetch`; the proxy's own status
+endpoint logged `connect_rejected … www.edrdg.org:443`). Per `/root/.ccr/README.md`,
+a proxy 403 is an organisation policy denial to be reported, not routed around.
+
+Two options existed. **Ship the content anyway** from a third-party
+redistribution (`kanjidic2-json` and `kotobako-data` were both located on npm,
+and one was downloaded and inspected), labelled EDRDG with licence text written
+from memory. Or **ship nothing from those sources** and label the lexical content
+as this project's own work. The first manufactures exactly the audit trail this
+work package exists to make trustworthy. Took the second.
+
+So: readings, senses, parts of speech and kanji meanings are `bunki-editorial`,
+`review_status: "unreviewed"`, `confidence: "medium"`, `source_entry_id: null`.
+Sentences, grammar explanations and the passage are `bunki-authored-text` —
+original compositions carrying no third-party attribution obligation.
+`test/dataset.test.ts` fails if any field's `source` or `attribution` so much as
+mentions JMdict, KANJIDIC2, EDRDG or Tatoeba.
+
+**Controller §21.3(3) is NOT triggered.** That trigger is unresolved source
+licensing _entering fixtures or product data_. No EDRDG or Tatoeba asset is
+present to be unresolved. What is open is content verification, not licence
+exposure — a scoped deferral with a precise operator action, not a stop.
+
+### Deferred items (full detail in `packages/seed/LICENSES.md` §6)
+
+| Id | Item | Smallest operator action |
+| --- | --- | --- |
+| D-1 | JMdict/KANJIDIC2 subsets + verbatim EDRDG attribution text | allow `www.edrdg.org` + `ftp.edrdg.org` through the session egress policy, then re-run WP-04's source pass |
+| D-2 | Tatoeba sentence subset with per-sentence attribution | allow `tatoeba.org` + `downloads.tatoeba.org`, then add a sourced subset |
+| D-3 | CC BY-SA 4.0 / CC BY 2.0 FR legal code from `creativecommons.org` | closes with D-1/D-2 |
+
+Closing D-1 is a small change by construction: the provenance registry plus
+per-field `source_entry_id` overrides, both of which already exist and are
+exercised by the KanjiVG fields.
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `npm ci` | clean install from lockfile |
+| `npm run lint` | **pass**, 0 problems |
+| `npm run format:check` | **pass**, "All matched files use Prettier code style!" |
+| `npm run typecheck` | **pass**, root + 6/6 workspaces, 0 errors |
+| `npm run test` | **pass**, 11 test files, **124/124 tests** (was 7 files / 40; +87 in `packages/seed`) |
+| `npm run test:replay` / `verify:export` / `test:e2e` | placeholders, exit 0, unchanged (WP-02/03/10) |
+| `(cd apps/app && npx expo export --platform web)` | **pass** — 3 static routes, bundle 1.1MB, `Exported: dist` |
+| `node packages/seed/scripts/fetch-kanjivg.mjs --check` | **pass** — 10/10 `MATCH` against pinned upstream `61e39cf` |
+
+### Predicate probed, not asserted
+
+Three mutations, each reverted and re-verified green afterwards:
+
+| Mutation | Result |
+| --- | --- |
+| removed `lex-bunki.senses` from `fieldProvenance` | all 5 seed test files failed at import (`SeedDataError: … every field carries provenance`) |
+| changed 分's `strokeCount` 4 → 5 | `strokes.test.ts` failed 1/26 — re-derivation from the SVG bytes disagreed |
+| edited one path coordinate in `05206.svg` | `strokes.test.ts` failed 1/26 on the recorded digest |
+
+A fourth was found by the suite rather than planted: `gram-koto-ni-suru` was
+documented with no sentence attesting it. Fixed in the data (`sen-02`).
+
+### Deviations from the WP-00 pinned register (surfaced, not silent)
+
+1. **`@types/node@26.1.1` added** (MIT, verified from the registry this session) as a devDependency of `packages/seed`, with `types: ["node"]` in its tsconfig. Not in the §14 register. It is needed because the stroke-integrity test reads files and hashes them — the check that distinguishes a fetched KanjiVG file from a hand-drawn one. It was already present transitively; declaring it exactly stops a dependency bump elsewhere from silently breaking this typecheck. Type-only, no runtime footprint.
+2. **`zod@4.4.3`** added as a devDependency of `packages/seed` — exactly the version and licence the WP-00 register records. Kept out of `dependencies` so `@bunki/seed` stays runtime-dependency-free.
+3. **Root `package-lock.json` modified.** Mechanically unavoidable: npm workspaces keep one lockfile, so a devDependency declared in `packages/seed/package.json` must land there. The diff is those two entries and nothing else. Flagged as a coordination note rather than treated as an ordinary in-surface edit.
+
+### Coordination requests (for CON)
+
+1. **`eslint.config.mjs` Node-globals glob is root-only.** `files: ['scripts/**/*.mjs', …]` does not reach `packages/*/scripts/*.mjs`, so `packages/seed/scripts/fetch-kanjivg.mjs` needed a local `/* global … */` declaration. Widening that glob is WP-01's surface, so it is requested rather than edited. Severity P2.
+2. **Lockfile touch acknowledged** (deviation 3) — WP-01 owns the root lockfile; this change is the projection of an in-surface manifest edit.
+
+### Surfaces touched (WP-04 ownership only)
+
+`packages/seed/**` — `data/` (7 JSON + 10 SVG), `licenses/KanjiVG-COPYING.txt`,
+`scripts/fetch-kanjivg.mjs`, `src/{index,types,validate}.ts`,
+`test/{provenance,schema,strokes,dataset}.test.ts`, `LICENSES.md`, `README.md`,
+`package.json`, `tsconfig.json` — plus root `package-lock.json` (mechanical) and
+this capsule section. **No frozen doc touched**; no other package, no `apps/app`,
+no CI, no `eslint.config.mjs`.
+
+### Secrets check (controller §15)
+
+Staged diff scanned for `api[_-]?key|secret|bearer|password|token`, excluding the
+lockfile: **0 matches**. Including `licenses/`: **0 matches**. No `.env`, no
+credentials; every URL in the fetch script is public and unauthenticated.
+
+### Next safe command
+
+- V3 verifies WP-04 from a clean checkout of this branch: `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`, then `node packages/seed/scripts/fetch-kanjivg.mjs --check` (needs network), then walks `LICENSES.md` against `packages/seed/data/` — in particular confirming that no shipped field claims a source whose licence this session could not verify.
+- WP-05 may consume `@bunki/seed` (`seedDataset`, `findKanji`, `findLexeme`, `SEED_COVERAGE_DISCLOSURE`, `SEED_ENTRY_DISCLOSURE`) without modifying it.
+
+### Open items carried forward
+
+- D-1 / D-2 / D-3 above — the only WP-04 items not closed.
+- Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
+- Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
