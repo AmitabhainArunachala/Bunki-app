@@ -51,7 +51,8 @@ Each package README names its owner WP.
 
 ### 2. Three boundaries are lint-enforced, not documented
 
-Implemented in `eslint.config.mjs` with the core `no-restricted-imports` rule.
+Implemented in `eslint.config.mjs`, and enforced against **every import form** —
+see §2a for why that qualifier is the whole point.
 
 **B1 — `@bunki/domain` is pure.** `packages/domain/src/**` may not import React,
 React DOM, React Native (or any `react-native-*`), Expo (or any `expo-*` /
@@ -89,6 +90,67 @@ review timing rather than as an obvious bug.
 
 An inline `eslint-disable` on any of the three is an ADR-level decision. If one
 of these rules is genuinely wrong, amend this ADR; do not silence it locally.
+
+### 2a. A boundary is worth only what its weakest import form is worth
+
+The first WP-01 build enforced all three boundaries with the core
+`no-restricted-imports` rule alone. Verification (V1) showed that rule sees only
+**bare specifiers in static syntax**, which left three ways through a boundary
+that the ADR claimed was closed:
+
+| Bypass                | Example                                                                  | Why the core rule missed it                        |
+| --------------------- | ------------------------------------------------------------------------ | -------------------------------------------------- |
+| Deep relative path    | `import '../../../../packages/persistence/src/index.ts'` from `apps/app` | pattern list held package specifiers only          |
+| Sibling-relative path | `import '../../persistence/src/index.ts'` from `packages/domain/src`     | same, and no glob expresses this shape safely      |
+| Dynamic `import()`    | `() => import('@bunki/persistence')`                                     | ESLint's core rule never visits `ImportExpression` |
+
+The first two mattered most: `tsconfig.base.json` sets
+`allowImportingTsExtensions` and `apps/app/metro.config.js` watches the
+workspace root, so those imports typechecked _and_ bundled. A screen could hold
+an `EventStorePort` and append a `ReviewGraded` that never met the evidence
+gate — precisely the hole B2 exists to close.
+
+**Decision: enforce each boundary twice, with two mechanisms that fail
+differently.**
+
+1. `no-restricted-imports` — bare specifiers, plus deep paths of the shape
+   `<globstar>/packages/<pkg>`.
+2. `bunki/package-boundaries` — a local rule (no new dependency) that _resolves_
+   each specifier against the importing file and asks which package it lands in.
+   Being resolver-based rather than glob-based, it is exact, and it visits
+   `ImportDeclaration`, `ExportNamedDeclaration`, `ExportAllDeclaration`,
+   `ImportExpression`, and `require()` calls.
+
+Both read the same module and package lists, so a package added to one cannot be
+silently un-enforced in the other. Boundary rules apply to `.js`/`.cjs`/`.mjs`
+as well as `.ts`/`.tsx`: the TypeScript `require` ban is off in plain JS, which
+would otherwise be a fourth way through.
+
+**Patterns are anchored (`/react`, not `react`).** Import patterns match with
+gitignore semantics, so the unanchored pattern `events` matches `./events/index.ts`
+as readily as the Node builtin — and controller §5 _mandates_
+`packages/domain/src/events/`. Unanchored, the purity rule would have rejected
+WP-02's first intra-package import. Anchoring confines the match to the start of
+the specifier, which `./` and `../` can never reach.
+
+**The probe set is a test, not a transcript.** `test/boundaries.test.ts` runs
+this exact config over all ten bypass forms plus negative controls (26 cases),
+so a future edit that reopens a boundary fails CI instead of waiting for a
+verifier. Negative controls are load-bearing: a rule that rejects everything
+proves nothing, so the suite also asserts that `ts-fsrs` stays legal inside
+`@bunki/domain`, that `apps/app` may still import `@bunki/domain`, and that
+intra-package relative paths are untouched.
+
+Verified at repair time — every row previously passed lint at `3879866`:
+
+| Probe                                                         | Before    | After                  |
+| ------------------------------------------------------------- | --------- | ---------------------- |
+| `apps/app` → `../../../../packages/persistence/src/index.ts`  | clean     | **error** (both rules) |
+| `packages/domain/src` → `../../persistence/src/index.ts`      | clean     | **error**              |
+| `packages/domain/src` → `() => import('react-native')`        | clean     | **error**              |
+| `packages/domain/src` → `() => import('@bunki/persistence')`  | clean     | **error**              |
+| negative control: `packages/domain/src` → `ts-fsrs`           | clean     | clean                  |
+| negative control: `packages/domain/src` → `./events/index.ts` | **error** | clean                  |
 
 ### 3. Strict TypeScript everywhere, from one base
 
@@ -132,6 +194,26 @@ the linter and the Expo SDK. This is a recoverable toolchain conflict with a saf
 alternative (controller §3.6), not a §21.3 stop condition: no license changed, no
 integrity check failed. Recorded here and in the capsule so it is not mistaken
 for drift. Revisit when `typescript-eslint` ships TS 7 support.
+
+**App icons are generated, not inherited.**
+
+The Expo template ships Expo's own chevron artwork as `icon.png`, the three
+Android adaptive-icon layers, and `favicon.png`. The first WP-01 build deleted
+the template's MIT `LICENSE` file on OD-09 grounds but committed those five PNGs
+anyway and wired them into `app.json` — so the product shipped another project's
+brand mark as its own identity, while the commit message and the capsule both
+claimed the Expo-branded images had been removed.
+
+That is the same pre-emption the `LICENSE` deletion was meant to avoid, and
+worse: a brand mark constrains the operator's pending identity decision more
+directly than a code license does, and it made the evidence record untrue.
+
+Resolved by generating the icon set from geometry defined in
+`scripts/generate-app-icons.mjs` — a stem forking into two terminating nodes,
+for 分岐 "branching". No third-party asset input, so the PNGs carry no upstream
+license and pre-empt nothing. The mark is an explicit placeholder; the operator
+or WP-13 may replace it, and nothing depends on its appearance. Re-generate with
+`node scripts/generate-app-icons.mjs`.
 
 **Not decided here.** The repository license remains a pending operator decision
 (OD-09); every package README says so. Until it is made, no dependency or data
