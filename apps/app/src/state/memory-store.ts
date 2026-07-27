@@ -31,6 +31,8 @@ import {
   createDomainEvent,
   initialThreadState,
   threadReducer,
+  type CandidateAcceptedAsNoteEvent,
+  type CandidateAttachedEvent,
   type DomainContext,
   type DomainEvent,
   type EncounterCapturedEvent,
@@ -43,6 +45,7 @@ import {
   type AppCommand,
   type AppSnapshot,
   type AppStore,
+  type CandidateView,
   type CommandAck,
   type DurabilityLevel,
   type ThreadView,
@@ -78,6 +81,22 @@ function captureIdempotencyKey(command: Extract<AppCommand, { kind: 'capture' }>
 function promoteIdempotencyKey(threadId: string, from: string, to: string): string {
   return `promote:${threadId}:${from}->${to}`;
 }
+
+/**
+ * A candidate is identified by its own id, which `@bunki/ai` mints once per
+ * exchange. Two attachments of the same candidate are the same fact arriving
+ * twice — a re-render, a double dispatch — not two candidates.
+ */
+const attachCandidateIdempotencyKey = (candidateId: string): string =>
+  `candidate-attached:${candidateId}`;
+
+/**
+ * Accepting is keyed by the candidate too, so a double-tapped Accept produces
+ * exactly one `CandidateAcceptedAsNote`. A second event would read, in the
+ * evidence inspector, as the learner having accepted the same note twice.
+ */
+const acceptCandidateIdempotencyKey = (candidateId: string): string =>
+  `candidate-accepted:${candidateId}`;
 
 interface StoredThread {
   readonly state: ThreadState;
@@ -115,10 +134,20 @@ export function createMemoryAppStore({
   const threads = new Map<string, StoredThread>();
   /** Insertion order, newest first, for the snapshot's thread list. */
   const threadOrder: string[] = [];
+  const candidates = new Map<string, CandidateView>();
+  /** Newest first, like `threadOrder`. */
+  const candidateOrder: string[] = [];
   const appliedKeys = new Map<string, CommandAck>();
   const listeners = new Set<() => void>();
   let revision = 0;
-  let snapshot: AppSnapshot = { revision: 0, threads: [], threadsById: {}, eventCount: 0 };
+  let snapshot: AppSnapshot = {
+    revision: 0,
+    threads: [],
+    threadsById: {},
+    candidates: [],
+    candidatesByThread: {},
+    eventCount: 0,
+  };
 
   function rebuildSnapshot(): void {
     revision += 1;
@@ -128,10 +157,21 @@ export function createMemoryAppStore({
       .map(toView);
     const byId: Record<string, ThreadView> = {};
     for (const view of views) byId[view.state.threadId] = view;
+
+    const candidateViews = candidateOrder
+      .map((id) => candidates.get(id))
+      .filter((candidate): candidate is CandidateView => candidate !== undefined);
+    const candidatesByThread: Record<string, CandidateView[]> = {};
+    for (const candidate of candidateViews) {
+      (candidatesByThread[candidate.threadId] ??= []).push(candidate);
+    }
+
     snapshot = {
       revision,
       threads: views,
       threadsById: byId,
+      candidates: candidateViews,
+      candidatesByThread,
       eventCount: events.length,
     };
   }
@@ -299,6 +339,129 @@ export function createMemoryAppStore({
     };
   }
 
+  /**
+   * Attach an AI candidate (WP-07).
+   *
+   * The event carries envelope *metadata* only — the text stays in
+   * `candidates`, beside the log. That split is the privacy design (see
+   * `CandidateView`), and it is why this function passes `command.envelope`
+   * through untouched rather than assembling one: the metadata was built and
+   * validated in `@bunki/ai`, and re-deriving it here would create a second
+   * definition of what a candidate envelope is.
+   */
+  function applyAttachCandidate(
+    command: Extract<AppCommand, { kind: 'attachCandidate' }>,
+  ): CommandAck {
+    const thread = threads.get(command.threadId);
+    if (thread === undefined) {
+      throw new Error(`cannot attach a candidate to unknown thread ${command.threadId}`);
+    }
+
+    const idempotencyKey = attachCandidateIdempotencyKey(command.candidateId);
+    const previous = appliedKeys.get(idempotencyKey);
+    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+
+    const event: CandidateAttachedEvent = createDomainEvent(
+      context,
+      'CandidateAttached',
+      {
+        threadId: command.threadId,
+        candidateId: command.candidateId,
+        envelope: command.envelope,
+        status: 'generated',
+      },
+      { idempotencyKey },
+    );
+
+    events.push(event);
+    candidates.set(command.candidateId, {
+      candidateId: command.candidateId,
+      threadId: command.threadId,
+      status: 'generated',
+      envelope: command.envelope,
+      text: command.text,
+      acceptedAt: null,
+    });
+    candidateOrder.unshift(command.candidateId);
+
+    const ack: CommandAck = {
+      threadId: command.threadId,
+      acknowledgedAt: event.occurredAt,
+      events: [event],
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(idempotencyKey, ack);
+    return ack;
+  }
+
+  /**
+   * Accept a candidate as a note — an explicit user action, always.
+   *
+   * `userAction: true` is a literal in the frozen schema, so there is no
+   * representable automatic acceptance; this function is the only place in the
+   * app that can produce the event, and it is reachable only from a press
+   * handler (`apps/app/test/candidate-command-flow.test.ts` pins that).
+   */
+  function applyAcceptCandidate(
+    command: Extract<AppCommand, { kind: 'acceptCandidate' }>,
+  ): CommandAck {
+    const candidate = candidates.get(command.candidateId);
+    if (candidate === undefined) {
+      throw new Error(`cannot accept unknown candidate ${command.candidateId}`);
+    }
+
+    const idempotencyKey = acceptCandidateIdempotencyKey(command.candidateId);
+    const previous = appliedKeys.get(idempotencyKey);
+    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+
+    const event: CandidateAcceptedAsNoteEvent = createDomainEvent(
+      context,
+      'CandidateAcceptedAsNote',
+      { candidateId: command.candidateId, userAction: true },
+      { idempotencyKey },
+    );
+
+    events.push(event);
+    candidates.set(command.candidateId, {
+      ...candidate,
+      status: 'accepted',
+      acceptedAt: event.occurredAt,
+    });
+
+    const ack: CommandAck = {
+      threadId: candidate.threadId,
+      acknowledgedAt: event.occurredAt,
+      events: [event],
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(idempotencyKey, ack);
+    return ack;
+  }
+
+  /**
+   * Dispatch, exhaustively.
+   *
+   * A `switch` over the closed union rather than a chain of ternaries, so that
+   * adding a command kind without handling it is a type error here instead of a
+   * silent fall-through to the last branch.
+   */
+  function applyCommand(command: AppCommand): CommandAck {
+    switch (command.kind) {
+      case 'capture':
+        return applyCapture(command);
+      case 'promote':
+        return applyPromote(command);
+      case 'markUncertainty':
+        return applyMarkUncertainty(command);
+      case 'attachCandidate':
+        return applyAttachCandidate(command);
+      case 'acceptCandidate':
+        return applyAcceptCandidate(command);
+    }
+  }
+
   return {
     durability,
     getSnapshot: () => snapshot,
@@ -309,12 +472,7 @@ export function createMemoryAppStore({
       };
     },
     execute(command) {
-      const ack =
-        command.kind === 'capture'
-          ? applyCapture(command)
-          : command.kind === 'promote'
-            ? applyPromote(command)
-            : applyMarkUncertainty(command);
+      const ack = applyCommand(command);
       rebuildSnapshot();
       notify();
       return ack;

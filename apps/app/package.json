@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
+    "@bunki/ai": "*",
     "@bunki/domain": "*",
     "@bunki/seed": "*",
     "expo": "57.0.8",
