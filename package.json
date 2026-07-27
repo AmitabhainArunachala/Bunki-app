@@ -18,7 +18,7 @@
     "test": "vitest run",
     "test:replay": "vitest run packages/domain/test/replay",
     "test:e2e": "node scripts/not-implemented.mjs test:e2e WP-10",
-    "verify:export": "node scripts/not-implemented.mjs verify:export WP-03"
+    "verify:export": "vitest run packages/export/test/verify-export.test.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

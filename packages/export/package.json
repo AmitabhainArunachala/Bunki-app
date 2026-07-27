@@ -11,5 +11,13 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bunki/domain": "*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@bunki/persistence": "*",
+    "@types/node": "26.1.1"
   }
 }
