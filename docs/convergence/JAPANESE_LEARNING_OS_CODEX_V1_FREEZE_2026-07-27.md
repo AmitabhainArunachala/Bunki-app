@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 20064)
-Total output lines: 1896
-
 # Personal Japanese Learning OS — Codex v1 Design Freeze
 
 **Date:** 2026-07-27  
@@ -902,7 +899,16 @@ Free conversation alone is insufficient. The AI can insert lightweight probes:
 
 - ask the learner to choose between two near-synonyms;
 - request a paraphrase with a target expression;
-- remove enough context to requir…64 tokens truncated…L | GUARDRAIL]**
+- remove enough context to require retrieval;
+- ask for a reading;
+- return later with a changed context.
+
+Each probe declares in advance what component it measures and how it will be
+scored. Free-form judgments remain Tier C until corroborated.
+
+### 8.4 Calibration loop
+
+**[MY-PROPOSAL | GUARDRAIL]**
 
 1. Store AI prediction and confidence.
 2. Later administer a constrained reference probe.
