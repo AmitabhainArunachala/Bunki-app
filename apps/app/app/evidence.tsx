@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { EvidenceInspectorScreen } from '@/screens/evidence-inspector-screen';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/evidence` — the evidence inspector (controller §10 screen 6).
@@ -15,10 +16,13 @@ export default function EvidenceRoute(): ReactNode {
   const { thread } = useLocalSearchParams<{ thread?: string }>();
 
   return (
-    <EvidenceInspectorScreen
-      onBack={() => router.push('/')}
-      onOpenDebug={() => router.push('/debug')}
-      threadId={typeof thread === 'string' && thread !== '' ? thread : undefined}
-    />
+    <>
+      <RouteTitle href="/evidence" />
+      <EvidenceInspectorScreen
+        onBack={() => router.push('/')}
+        onOpenDebug={() => router.push('/debug')}
+        threadId={typeof thread === 'string' && thread !== '' ? thread : undefined}
+      />
+    </>
   );
 }

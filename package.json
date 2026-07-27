@@ -22,9 +22,11 @@
     "verify:export": "vitest run packages/export/test/verify-export.test.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.56.0",
     "eslint": "10.8.0",
+    "playwright-core": "1.56.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0",

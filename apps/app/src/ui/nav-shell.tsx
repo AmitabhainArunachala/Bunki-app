@@ -110,7 +110,24 @@ function NavLink({ destination, current }: NavLinkProps): ReactNode {
       accessibilityState={{ selected: current }}
       onBlur={() => setFocused(false)}
       onFocus={() => setFocused(true)}
-      onPress={() => router.push(destination.href)}
+      // `replace`, not `push` (W5 P1-3). A persistent shell is a *switch*
+      // between destinations, not a stack of them: `push` added an entry and
+      // popped nothing, so five Evidence↔Capture round trips left six mounted
+      // capture screens, each still subscribed to the store and therefore
+      // re-rendered on every write. Work grew with navigation for no reason the
+      // learner could see, and the browser's Back button walked backwards
+      // through a history they never built.
+      //
+      // `navigate` was tried first and measured: on expo-router 57 it still left
+      // six mounted capture screens after the same five round trips, because it
+      // only collapses onto an entry for the *same* path rather than switching
+      // between sibling destinations. `replace` swaps the current entry, so the
+      // count stays flat — `adv-known-defects.spec.ts` (T3-2) pins it.
+      //
+      // Only the shell's four destinations are replaced. Every other link in the
+      // app still pushes, because those *are* stack moves: a word page opened
+      // from a search should come back to that search.
+      onPress={() => router.replace(destination.href)}
       style={({ pressed }) => [
         styles.link,
         {

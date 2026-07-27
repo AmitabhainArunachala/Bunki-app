@@ -270,15 +270,40 @@ export function closeSession(
 /**
  * The completion state a finished plan suggests.
  *
- * `completed` when every step was settled and at least one was answered;
- * `abandoned` when the learner left steps pending; `budget_exhausted` when the
- * plan itself had no room for work (a budget too small for anything but
- * closure). The caller decides whether to use it.
+ * `completed` when every step that carried work was settled; `abandoned` when
+ * the learner left work pending; `budget_exhausted` when the plan itself had no
+ * room for work (a budget too small for anything but closure). The caller
+ * decides whether to use it.
+ *
+ * ## Why the closure step is excluded (W5 P1-2)
+ *
+ * It used to ask whether *any* outcome was still `pending`, closure included —
+ * and the closure step is the one whose only control is "Finish the session",
+ * which dispatches `close`. So at the instant this function ran, the closure
+ * step was always pending, `abandoned` was always the answer, and `completed`
+ * was unreachable through the UI: 16 of 16 recorded sittings were stamped
+ * `abandoned`, including every sitting the learner finished properly. That
+ * reached the durable log as `SessionClosed.completionState`, so it was in the
+ * export and the evidence inspector too, and it falsified the finite-session
+ * promise (REQ-SCH-04 / T-13) at the surface the operator actually sees.
+ *
+ * Excluding closure is the honest reading rather than a convenient one: the
+ * closure step carries no work to leave undone, and it is *settled by the act of
+ * closing*. Asking whether the learner left work pending is the question this
+ * function was always meant to answer. `abandoned` stays fully reachable —
+ * closing while a real step is still pending still returns it, which is what the
+ * companion test pins.
+ *
+ * This remains a suggestion. `closeSession` takes the state as a parameter, and
+ * a caller that knows better — the learner said they were done, or the budget
+ * ran out — passes its own.
  */
 export function resolveCompletionState(runtime: SessionRuntime): SessionCompletionState {
   const workSteps = runtime.plan.steps.filter((step) => step.kind !== 'closure');
   if (workSteps.length === 0) return 'budget_exhausted';
-  const pending = runtime.outcomes.some((outcome) => outcome === 'pending');
+  const pending = runtime.plan.steps.some(
+    (step, index) => step.kind !== 'closure' && runtime.outcomes[index] === 'pending',
+  );
   return pending ? 'abandoned' : 'completed';
 }
 
