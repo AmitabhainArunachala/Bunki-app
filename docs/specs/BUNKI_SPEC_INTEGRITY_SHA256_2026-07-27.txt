@@ -1,0 +1,31 @@
+# Bunki specification integrity record — 2026-07-27
+# SHA-256 of every frozen input and every specification-pass output.
+# Verify any file with: sha256sum <path>
+# This file's own hash is recorded in the publishing PR body.
+
+# Frozen convergence inputs (immutable; never edit)
+94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b  docs/convergence/JAPANESE_LEARNING_OS_CODEX_V1_FREEZE_2026-07-27.md
+77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68  docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md
+a6066f6972f58dff213bbdddcec5447bd7d01ea22745c26a15d7d455e6dd756d  docs/convergence/BUNKI_CONVERGENCE_ROUND1_2026-07-27.md
+9542fbaa89456b2bb226a415f37a3360104539e290242545c542a2aee6f07a54  docs/convergence/BUNKI_CONVERGENCE_ROUND1_CODEX_RESPONSE_2026-07-27.md
+c002f6c4d8c007d0acdac1a66b7295d287f98d206f610c3131d73218dc19909c  docs/handoffs/BUNKI_CLAUDE_FRESH_CONTEXT_BUILD_SPEC_HANDOFF_2026-07-27.md
+
+# Superseded transport artifact (recorded for provenance; do not use)
+# ba5ab3725d754198631dbdeea3ae4a3a4e17f2867ed409e048e3d63577059932  (clipped first upload of the Codex v1 freeze; repaired at commit 8dfa24b)
+
+# Specification-pass outputs (frozen at publication)
+5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55  docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md
+de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47  docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
+a32e6be17c5cdbb4e88b5e3674a735db41886f82e66234b792bc303084ec942c  docs/specs/BUNKI_V2_PHASE0_TRACEABILITY_MATRIX_2026-07-27.md
+3279cf0cf90b58cc17e8f05dbafb71aaeae3f311bbaceeb09dca2700d9af16e7  docs/specs/BUNKI_PHASE0_RISK_AND_FALSIFICATION_REGISTER_2026-07-27.md
+7d9912992607c890f47a85e9d7adaea04b33bed2a4e79b03b6318bb80bf0e550  docs/specs/BUNKI_OPERATOR_DECISIONS_2026-07-27.md
+b0a6811d8e8fda6c2d5f1c7c1743cdb2355eae58b58e834787b79629e378fce7  docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md
+
+# Orchestration layer (added 2026-07-27, same pass; sits above the controller, supremacy rule inside)
+4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71  docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md
+
+# Acceptance layer (added 2026-07-27, same pass; additive to controller §21.1)
+92e575e14e5cd61556794e681c9804a0e156873ec60c9ae94eb936682c75155e  docs/specs/BUNKI_PHASE0_DEFINITION_OF_DONE_2026-07-27.md
+
+# Master definition of done (operator-authored, added 2026-07-27; supersedes the Phase-0 DoD ladder top)
+d5fb46c7d9ec224542486e631eb2ed00414699ca24ae2d758b9a42dfa20cab43  docs/specs/BUNKI_MASTER_DEFINITION_OF_DONE_2026-07-27.md
