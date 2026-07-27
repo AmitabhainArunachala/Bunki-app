@@ -52,8 +52,12 @@ See ADR-001. The short version, all lint-enforced in `eslint.config.mjs`:
 - `@bunki/domain` imports no React, React Native, Expo, Node builtin, or sibling
   package — clock/ID/randomness are injected, which is what makes deterministic
   replay possible.
-- `apps/app` never imports `@bunki/persistence`; appends flow through the domain
-  command handler so evidence-class events pass the evidence gate.
+- `apps/app` reaches `@bunki/persistence` from exactly one directory,
+  `apps/app/src/state/persistence/`; no screen, route, or test can obtain an
+  `EventStorePort`, so every append still flows through the domain command
+  handler and evidence-class events still pass the evidence gate (WP-10 narrowed
+  WP-05's blanket ban rather than dropping it; `test/boundaries.test.ts` proves
+  the seam is that one directory).
 - Only `@bunki/domain` imports `ts-fsrs` — one scheduler, nothing else computes
   intervals.
 

@@ -18,6 +18,9 @@ import tseslint from 'typescript-eslint';
  *   2. `apps/app` cannot reach the persistence write path. Every append must
  *      flow through the domain command handler so evidence-class events pass
  *      the evidence gate. This closes the gate-bypass hole (controller §5).
+ *      WP-10 gave the app a durable store, so the ban is now scoped rather than
+ *      total: `apps/app/src/state/persistence/` — and nothing else in the app,
+ *      tests included — may import the package. See `PERSISTENCE_SEAM_DIR`.
  *   3. Only `@bunki/domain` may import `ts-fsrs`. There is exactly one
  *      scheduler implementation and nothing else computes intervals
  *      (REQ-SCH-01).
@@ -135,6 +138,30 @@ const DOMAIN_FORBIDDEN_PACKAGES = [
 
 // The single package apps/app may not import (controller §5 gate-bypass rule).
 const APP_FORBIDDEN_PACKAGES = [WORKSPACE_PACKAGES.persistence];
+
+/**
+ * The one directory in `apps/app` allowed to import `@bunki/persistence` (WP-10).
+ *
+ * Controller §5's rule is about *appends*: "apps/app never calls
+ * `EventStorePort.append` directly: every append flows through the domain
+ * command handler, which routes evidence-class events through the evidence
+ * gate." A blanket package ban was the right implementation while the app had no
+ * durable store to reach; once WP-10 has to give it one, the same property is
+ * kept by narrowing the ban to a single seam instead of removing it.
+ *
+ * Why this is still the rule and not a hole: no screen, route, hook or test can
+ * obtain an `EventStorePort`, because nothing outside this directory can name
+ * the package. The only code that appends is `src/state/durable-store.ts`, and
+ * the only events it appends are the ones `memory-store.ts` already minted
+ * through `@bunki/domain`'s factories and its evidence gate. The bypass the rule
+ * exists to stop — a UI reaching past the command handler — is still
+ * unexpressible.
+ *
+ * Kept as a directory rather than a file so the platform-split driver modules
+ * (`sqlite-driver.ts`, `sqlite-driver.native.ts`) sit inside the same seam.
+ * Widening it further is a controller §5 decision, not a convenience.
+ */
+const PERSISTENCE_SEAM_DIR = 'apps/app/src/state/persistence';
 
 /** Bare-specifier globs for `no-restricted-imports`. */
 const packageSpecifierGlobs = (packages) => anchored(packages.map(({ specifier }) => specifier));
@@ -393,9 +420,14 @@ export default tseslint.config(
   // ---------------------------------------------------------------------
   // Boundary 2: apps/app cannot reach the persistence write path
   //             (controller §5 — closes the evidence-gate bypass).
+  //
+  // `ignores` exempts the one seam directory and nothing else; the FSRS half of
+  // the rule is re-applied to it in the block that follows, so the exemption
+  // buys exactly one package and no other freedom.
   // ---------------------------------------------------------------------
   {
     files: [`apps/app/${SOURCE_FILES}`],
+    ignores: [`${PERSISTENCE_SEAM_DIR}/${SOURCE_FILES}`],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -419,6 +451,29 @@ export default tseslint.config(
           packages: APP_FORBIDDEN_PACKAGES,
           message: PERSISTENCE_WRITE_PATH_MESSAGE,
         },
+      ],
+    },
+  },
+
+  // ---------------------------------------------------------------------
+  // Boundary 2a: the persistence seam itself (WP-10).
+  //
+  // It may name `@bunki/persistence` — that is the entire point of it existing
+  // as a named directory — and it may name nothing else the rest of the app may
+  // not. The single-scheduler rule is re-stated here rather than inherited,
+  // because a config block that exempts a directory from one rule must not
+  // silently exempt it from the others in the same block.
+  // ---------------------------------------------------------------------
+  {
+    files: [`${PERSISTENCE_SEAM_DIR}/${SOURCE_FILES}`],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { patterns: [{ group: anchored(FSRS_GROUP), message: SINGLE_SCHEDULER_MESSAGE }] },
+      ],
+      'bunki/package-boundaries': [
+        'error',
+        { modules: FSRS_GROUP, packages: [], message: SINGLE_SCHEDULER_MESSAGE },
       ],
     },
   },

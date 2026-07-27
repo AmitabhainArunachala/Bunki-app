@@ -8,6 +8,19 @@
  * correct in the kernel and unreachable from `apps/app` would satisfy every
  * domain test and ship a canvas that quietly counted taps as reviews.
  *
+ * ## The gestures are made here, because the app no longer makes them
+ *
+ * Every harness below *captures and promotes first*, through the same two
+ * commands the capture screen's Keep and "Take it up for study" buttons
+ * dispatch, and only then bootstraps a workspace. That is not setup ceremony: it
+ * is the defect this file failed to catch. `bootstrapSessionWorkspace` used to
+ * run those two commands itself, from a React state initialiser, so opening the
+ * Session route fabricated an encounter and a promotion in the learner's durable
+ * log with no gesture behind either — definition-of-done §2 item 6, and the ruin
+ * of §3 step 3. Every test here supplied a store the bootstrap then wrote to, so
+ * all 1236 of them passed with the defect present. `a session is planned, never
+ * manufactured` below is the assertion that would have failed.
+ *
  * WP-08's two named proofs live here as well as in the kernel, deliberately:
  *
  *   - a canvas reveal-before-recall grades `Again`;
@@ -45,14 +58,18 @@ import {
   type ClozeTarget,
 } from '../src/screens/canvas-cloze.ts';
 import { segmentPassage, targetSegments } from '../src/screens/canvas-passage.ts';
+import { DEFAULT_CANONICAL_TARGET, findLexemeByHeadword } from '../src/data/catalog.ts';
 import {
   bootstrapSessionWorkspace,
+  NO_PROMOTED_TARGET_NOTE,
   passageMarks,
   probeOfferFor,
   type SessionTarget,
 } from '../src/screens/session-loop.ts';
 import { elapsedMs } from '../src/screens/session-timing.ts';
+import { createDurableAppStore } from '../src/state/durable-store.ts';
 import { createMemoryAppStore } from '../src/state/memory-store.ts';
+import type { AppStore } from '../src/state/store.ts';
 
 const ASOF = '2026-07-27T10:00:00.000Z';
 
@@ -60,8 +77,47 @@ function newContext(prefix = 'app-wp08-'): DomainContext {
   return createDeterministicContext({ instants: ASOF, idPrefix: prefix });
 }
 
+/** Exactly what the capture screen records for a typed query (REQ-SRC-01). */
+const MANUAL_SOURCE = {
+  sourceId: 'manual-entry',
+  kind: 'manual',
+  locator: 'capture-screen',
+} as const;
+
+const MANUAL_PROVENANCE = {
+  source: 'user_encounter',
+  license: 'user_owned',
+  modificationStatus: 'unmodified',
+  reviewStatus: 'unreviewed',
+} as const;
+
+/**
+ * The learner's own two gestures: Keep, then "Take it up for study".
+ *
+ * These are the exact commands `capture-screen.tsx` dispatches from its two
+ * press handlers. Nothing else in the app produces either one — which is the
+ * property the P0 fix installed and the reason this helper lives in the test
+ * rather than in the bootstrap.
+ */
+function takeUpForStudy(store: AppStore, headword: string = DEFAULT_CANONICAL_TARGET): string {
+  const lexeme = findLexemeByHeadword(headword);
+  if (lexeme === null) throw new Error(`the seed has no lexeme for ${headword}`);
+  const kept = store.execute({
+    kind: 'capture',
+    text: lexeme.headword,
+    sourceRef: MANUAL_SOURCE,
+    provenance: MANUAL_PROVENANCE,
+    uncertainty: null,
+    lexemeId: lexeme.id,
+  });
+  store.execute({ kind: 'promote', threadId: kept.threadId, to: 'keep' });
+  store.execute({ kind: 'promote', threadId: kept.threadId, to: 'learn' });
+  return kept.threadId;
+}
+
 interface Harness {
   readonly context: DomainContext;
+  readonly store: AppStore;
   readonly target: SessionTarget;
   readonly offer: CanvasProbeOffer | null;
   readonly state: SessionWorkspaceState;
@@ -70,10 +126,12 @@ interface Harness {
 function harness(prefix?: string): Harness {
   const context = newContext(prefix);
   const store = createMemoryAppStore({ context });
+  takeUpForStudy(store);
   const boot = bootstrapSessionWorkspace(store, context);
   if (boot.target === null) throw new Error(boot.error ?? 'the seed could not bootstrap a session');
   return {
     context,
+    store,
     target: boot.target,
     offer: probeOfferFor(boot.workspace, boot.target),
     state: boot.workspace,
@@ -82,8 +140,136 @@ function harness(prefix?: string): Harness {
 
 // ---------------------------------------------------------------------------
 
+/**
+ * The WP-10 repair round's P0, as executable assertions.
+ *
+ * Each of these fails against the bootstrap that shipped: it captured the seeded
+ * headword and promoted it to `learn` on the way to building a workspace, so a
+ * fresh store came out of `bootstrapSessionWorkspace` holding an
+ * `EncounterCaptured` (a seed passage stamped `user_encounter` / `user_owned`)
+ * and a `ThreadPromotionChanged` stamped `origin: "user"` — both durable, both
+ * exportable, neither caused by a person.
+ */
+describe('a session is planned, never manufactured (definition-of-done §2.6, §3.3)', () => {
+  it('appends nothing to a durable store, however many times it is built', async () => {
+    // A durable store, because that is what makes the defect permanent: the
+    // fabricated events survived a reload and travelled in the export.
+    const context = newContext('app-wp10-durable-');
+    const map = new Map<string, string>();
+    const durable = await createDurableAppStore({
+      appVersions: { domain: '@bunki/domain@0.0.0', fsrs: null },
+      clock: context.clock,
+      context,
+      snapshotKey: 'session-bootstrap-test',
+      snapshotStore: {
+        getItem: (key) => map.get(key) ?? null,
+        setItem: (key, value) => {
+          map.set(key, value);
+        },
+        removeItem: (key) => {
+          map.delete(key);
+        },
+      },
+    });
+
+    expect(durable.store.readAll()).toHaveLength(0);
+
+    // The mount of `(session)/_layout` — and then a re-render, and then a
+    // screen rendered outside the provider, which is three bootstraps.
+    for (let build = 0; build < 3; build += 1) {
+      const boot = bootstrapSessionWorkspace(durable.store, context);
+      expect(boot.target).toBeNull();
+      expect(boot.error).toBe(NO_PROMOTED_TARGET_NOTE);
+    }
+
+    await durable.flush();
+    expect(durable.store.readAll()).toEqual([]);
+    expect(durable.store.getSnapshot().threads).toEqual([]);
+    expect(durable.store.getSnapshot().eventCount).toBe(0);
+
+    // …and the same store, after the learner's own two gestures, does have a
+    // sitting. The empty state is the honest answer, not a broken one.
+    takeUpForStudy(durable.store);
+    const after = bootstrapSessionWorkspace(durable.store, context);
+    expect(after.target?.lexeme.headword).toBe(DEFAULT_CANONICAL_TARGET);
+  });
+
+  it('leaves a capture that was never taken up for study out of the sitting', () => {
+    // `keep` activates no contracts (REQ-DM-09), so a session over it would be a
+    // session whose every observation the gate refuses. Capture is not card
+    // creation (DL-05), and this is that rule where a learner can feel it.
+    const context = newContext('app-wp10-keep-only-');
+    const store = createMemoryAppStore({ context });
+    const lexeme = findLexemeByHeadword(DEFAULT_CANONICAL_TARGET);
+    const kept = store.execute({
+      kind: 'capture',
+      text: lexeme!.headword,
+      sourceRef: MANUAL_SOURCE,
+      provenance: MANUAL_PROVENANCE,
+      uncertainty: null,
+      lexemeId: lexeme!.id,
+    });
+    store.execute({ kind: 'promote', threadId: kept.threadId, to: 'keep' });
+    const before = store.readAll().length;
+
+    const boot = bootstrapSessionWorkspace(store, context);
+    expect(boot.target).toBeNull();
+    expect(store.readAll()).toHaveLength(before);
+  });
+
+  it('records no promotion the learner did not make', () => {
+    const { state, target } = harness('app-wp10-origin-');
+    const promotions = state.log.filter((event) => event.type === 'ThreadPromotionChanged');
+    expect(promotions.length).toBeGreaterThan(0);
+    promotions.forEach((event) => {
+      expect(event.type === 'ThreadPromotionChanged' && event.threadId).toBe(target.threadId);
+    });
+    // Every one of them came from `takeUpForStudy` above — a press handler's
+    // command. The bootstrap contributed none: it appends only contracts.
+    const minted = state.log.filter((event) => event.type === 'ContractCreated');
+    expect(minted).toHaveLength(2);
+  });
+
+  it('never stamps a seed passage as an encounter the learner had', () => {
+    const { state } = harness('app-wp10-provenance-');
+    const captures = state.log.filter((event) => event.type === 'EncounterCaptured');
+    expect(captures).toHaveLength(1);
+    captures.forEach((event) => {
+      if (event.type !== 'EncounterCaptured') throw new Error('unreachable');
+      // The one capture in the log is the learner's typed query, and it says so.
+      // The old bootstrap wrote `sourceId: 'seed-passage'` with
+      // `provenance.source: 'user_encounter'` — a hand-written project passage
+      // recorded as something the learner met and owns (§2 item 7).
+      expect(event.sourceRef.sourceId).toBe('manual-entry');
+      expect(event.sourceRef.sourceId).not.toBe('seed-passage');
+    });
+  });
+
+  it('takes the contract answers from the seed entry rather than from a literal', () => {
+    // The contracts used to hard-code 分岐's reading and glosses, which was
+    // invisible while the bootstrap also hard-coded 分岐 as the target. Now the
+    // target is whatever the learner promoted, so an answer set typed here would
+    // grade one word against another word's answers.
+    const { state, target } = harness('app-wp10-answers-');
+    const contracts = state.log.filter((event) => event.type === 'ContractCreated');
+    expect(contracts).toHaveLength(2);
+
+    const answersFor = (skill: string): readonly string[] | null => {
+      const event = contracts.find(
+        (candidate) => candidate.type === 'ContractCreated' && candidate.skill === skill,
+      );
+      if (event === undefined || event.type !== 'ContractCreated') return null;
+      return event.acceptedAnswers ?? null;
+    };
+
+    expect(answersFor('orthography_to_reading')).toEqual([target.lexeme.reading]);
+    expect(answersFor('form_to_meaning')).toEqual([...target.lexeme.senses]);
+    expect(target.lexeme.headword).toBe(DEFAULT_CANONICAL_TARGET);
+  });
+});
+
 describe('the app bootstraps a real closed loop, not a fixture', () => {
-  it('captures and promotes through the same store the capture screen uses', () => {
+  it('plans over the thread the learner captured and promoted', () => {
     const { state, target } = harness();
     const types = state.log.map((event) => event.type);
     expect(types).toContain('EncounterCaptured');
@@ -112,11 +298,16 @@ describe('the app bootstraps a real closed loop, not a fixture', () => {
   it('is idempotent, so a re-render bootstraps nothing twice', () => {
     const context = newContext('app-wp08-idem-');
     const store = createMemoryAppStore({ context });
+    takeUpForStudy(store);
+    const eventsBefore = store.readAll().length;
+
     const first = bootstrapSessionWorkspace(store, context);
     const second = bootstrapSessionWorkspace(store, context);
     expect(second.workspace.log.map((event) => event.eventId)).toEqual(
       first.workspace.log.map((event) => event.eventId),
     );
+    // …and neither build touched the store, which is the stronger property.
+    expect(store.readAll()).toHaveLength(eventsBefore);
   });
 });
 
