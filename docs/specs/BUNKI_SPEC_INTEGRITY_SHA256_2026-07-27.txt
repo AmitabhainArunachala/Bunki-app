@@ -1,0 +1,22 @@
+# Bunki specification integrity record — 2026-07-27
+# SHA-256 of every frozen input and every specification-pass output.
+# Verify any file with: sha256sum <path>
+# This file's own hash is recorded in the publishing PR and commit message.
+
+# Frozen convergence inputs (immutable; never edit)
+94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b  docs/convergence/JAPANESE_LEARNING_OS_CODEX_V1_FREEZE_2026-07-27.md
+77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68  docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md
+a6066f6972f58dff213bbdddcec5447bd7d01ea22745c26a15d7d455e6dd756d  docs/convergence/BUNKI_CONVERGENCE_ROUND1_2026-07-27.md
+9542fbaa89456b2bb226a415f37a3360104539e290242545c542a2aee6f07a54  docs/convergence/BUNKI_CONVERGENCE_ROUND1_CODEX_RESPONSE_2026-07-27.md
+c002f6c4d8c007d0acdac1a66b7295d287f98d206f610c3131d73218dc19909c  docs/handoffs/BUNKI_CLAUDE_FRESH_CONTEXT_BUILD_SPEC_HANDOFF_2026-07-27.md
+
+# Superseded transport artifact (recorded for provenance; do not use)
+# ba5ab3725d754198631dbdeea3ae4a3a4e17f2867ed409e048e3d63577059932  (clipped first upload of the Codex v1 freeze; repaired at commit 8dfa24b)
+
+# Specification-pass outputs (frozen at publication)
+5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55  docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md
+6bdac9103e47c5abcab4a633c0be2e446e686034f305901114a649cd3c430deb  docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
+12977158880f6fc9e17cfe0db2db348d2b019aa93515c6ad9c4cab7e8ce6111c  docs/specs/BUNKI_V2_PHASE0_TRACEABILITY_MATRIX_2026-07-27.md
+0d273edc14e701803fe24d45e550d2c471487fd786d0ba19c840ecbdeaa86296  docs/specs/BUNKI_PHASE0_RISK_AND_FALSIFICATION_REGISTER_2026-07-27.md
+7d9912992607c890f47a85e9d7adaea04b33bed2a4e79b03b6318bb80bf0e550  docs/specs/BUNKI_OPERATOR_DECISIONS_2026-07-27.md
+8cb5b77aad2531ce83f55116a4ffc7b9680a35d7955cca152c902d0a68688867  docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md
