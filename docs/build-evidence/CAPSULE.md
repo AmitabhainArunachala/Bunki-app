@@ -1516,3 +1516,239 @@ host, no credential, no path outside the repo.
   interleaved node list. Restore with `git checkout apps/app/src/ui/ruby.tsx`.
 - `git diff --stat 755c090` to confirm no surface outside `apps/app/` and
   `docs/build-evidence/screenshots-wp05/` (plus this capsule section) was touched.
+
+## Appendix — WP-08 (Builder B8): session orchestrator, integration canvas, repair branch
+
+**Agent:** B8 (Builder, WP-08) · **Wave:** W4 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp08`
+**Surfaces touched:** `packages/domain/src/session/` (new), `packages/domain/test/session/`
+(new), `apps/app/src/screens/{session*,canvas*}` (new), `apps/app/test/session-*.test.ts`
+(new), and this appendix. Three files outside those were touched and each is
+justified below under "Edits outside the new surfaces".
+
+### Integrity (launcher step 1, controller §0)
+
+Verified on `origin/main` before any edit, by piping the blob through `sha256sum`
+rather than trusting a checked-out copy:
+
+| File | SHA-256 observed | Matches `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` | yes |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` | yes |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71` | yes |
+
+### Stacking (controller §3 rule 1)
+
+Cut from `origin/agent/bunki-phase0-integration` at
+**`c30560b6dae7beaa09fdccaf4157ba0740e3e38f`** ("WP03+05+06(CON): close wave W3,
+open W4 locks"), which carries verified WP-01..WP-06 plus the WP-05 UI. WP-08
+depends on WP-05 (screens/shell), WP-06 (contracts, evidence gate, FSRS) and
+WP-04 (`@bunki/seed` passage), none of which were on `origin/main` at `e02b8b2`
+when this work started, so `origin/main` was not a possible base.
+
+Re-fetched at the end of the session: `origin/agent/bunki-phase0-integration` is
+still `c30560b` (unchanged); `origin/main` has advanced to `c87a2ee`. No rebase
+was needed and none was performed.
+
+**Cross-lane rule observed:** `apps/app/src/state` (AppStore) is untouched and
+`@bunki/persistence` is not imported from `apps/app` — the swap-in remains WP-10
+integration work. `apps/app/app/` (navigation) is untouched; see COORD-B8-3.
+
+### Closure predicate status (controller §19 WP-08)
+
+| Predicate | Status | Evidence |
+| --- | --- | --- |
+| 1. Session orchestrator is a **pure planner**: `{timeBudgetMin, dueContracts, newBudget, canvasId?}` → finite plan | met | `packages/domain/src/session/plan.ts`; `test/session/plan.test.ts` (31 tests) incl. 400 randomised inputs asserting `estimatedMinutes ≤ timeBudgetMin` |
+| 1a. Plan shape: reactivation/precision → one bounded new item → one canvas visit → closure | met | `SESSION_STEP_KINDS`; `plan.test.ts` "the §6.4 running order" asserts the exact sequence; `PHASE0_MAX_NEW_ITEMS = 1`, `PHASE0_MAX_CANVAS_VISITS = 1` |
+| 1b. Emits `SessionStarted` / `SessionClosed` | met | `runtime.ts` `startSession`/`closeSession` via `createDomainEvent`; `test/session/commands.test.ts` asserts the events, their budget, and a terminal `completionState` |
+| 1c. **The plan cannot grow during a session** (T-13 unit half, property test) | met | `test/session/t13-plan-cannot-grow.test.ts`: 300 random interleavings of every v1 event family × 30 moves asserting plan **identity** (`toBe`), plus 60 random command sequences over a real replayed log, plus a case where new evidence makes another contract due |
+| 1d. Session reaches a finite completion state | met | same file, "the session reaches a finite completion state" (5 tests) |
+| 2. Session screen (REQ-UI-05): finite plan visible, progress, explicit completion | met (component + behaviour); **not yet routed** | `apps/app/src/screens/session-screen.tsx`; `apps/app/test/session-screens.test.ts` (plan/recipe/progress/completion/backlog-ordering); `apps/app/test/session-canvas.test.ts` drives the same functions the screen calls. Route wiring is COORD-B8-3 |
+| 2a. loading / error / empty / offline on all three new screens | met | all three go through `useLookup` + `ScreenShell`; asserted in `session-screens.test.ts` "every WP-08 screen defines all four REQ-UI-09 states" |
+| 3. Integration canvas renders the seed's thematic passage (分岐) | met | `canvas-screen.tsx` renders `pas-bunki-01` through `canvas-passage.ts`; `session-canvas.test.ts` asserts the segmentation reproduces the body byte-for-byte and finds the target |
+| 3a. Inline interactions classified per REQ-SCH-06 (declared probe vs exposure) | met | `packages/domain/src/session/canvas.ts`; `test/session/canvas-req-sch-06.test.ts` (21 tests) covers **every** closed-list exposure reason |
+| 3b. **A reveal-before-recall grades `Again`; a passive tap logs exposure only** | met | asserted twice: in the kernel (`canvas-req-sch-06.test.ts`) and from the app end against the real store, seed, contracts and gate (`apps/app/test/session-canvas.test.ts`) |
+| 4. Minimal repair branch: one hard-coded diagnostic → branch → rejoin | met | `packages/domain/src/session/repair.ts` + `apps/app/src/screens/session-repair-screen.tsx`; `test/session/repair.test.ts` (28 tests) |
+| 4a. **Rejoin declared by an evidence criterion, not step count** | met | `REJOIN_CRITERION` + `satisfiesRejoin`; the test drives 50 non-qualifying attempts (branch stays open) then one qualifying success (closes); `session-screens.test.ts` asserts no comparison on the attempt count exists in the screen |
+| 4b. No generalized routing | met | `JourneyCompiler` declared and deliberately unimplemented; `JOURNEY_COMPILER_SEAM` records what is missing |
+| 5. All prior tests stay green | met | `npm run test` → **60 files, 939 tests, 0 failed** |
+| 5a. Grading/evidence logic stays in the domain gate; screens submit commands only | met | every evidence event is minted by `src/evidence/mint.ts` and judged by `admitToScheduler` inside `replay`; `commands.test.ts` asserts every evidence-class event this handler emits has a gate decision; `session-screens.test.ts` asserts no screen calls `applySessionCommand` or `createDomainEvent` directly |
+
+### Commands run (controller §17.5), verbatim results
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | pass (no output) |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | pass — all five workspaces, no diagnostics |
+| `npm run test` | `Test Files 60 passed (60)` · `Tests 939 passed (939)` |
+| `npm run test:replay` | `Test Files 2 passed (2)` · `Tests 47 passed (47)` |
+| `npm run verify:export` | `Test Files 1 passed (1)` · `Tests 10 passed (10)` |
+| `npm run test:e2e` | placeholder, exits 0, prints "not yet implemented (WP-10)" — **not** evidence of anything |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` · 1 web bundle (1.5 MB) · **5 static routes** (`/`, `/_sitemap`, `/+not-found`, `/word/[lexemeId]`, `/kanji/[character]`) |
+
+WP-08's own suites: **145 tests** across 7 files (`packages/domain/test/session/*`
+= 103, `apps/app/test/session-canvas.test.ts` = 21,
+`apps/app/test/session-screens.test.ts` = 21).
+
+### Edits outside the new surfaces (three files, each justified)
+
+1. **`packages/domain/src/index.ts`** — one line,
+   `export * from './session/index.ts';`. The package's `exports` map is
+   `{".": "./src/index.ts"}`, so without it the session module is unreachable
+   from `apps/app` at all. The header note claiming `src/session/` stays empty
+   was updated in the same edit because it had become false.
+2. **`packages/domain/test/purity/seams-left-empty.test.ts`** — retargeted the
+   assertion that `src/session/` is empty, exactly as WP-06 retargeted the same
+   file for `src/contracts/` and `src/evidence/`. Nothing was weakened: the
+   emptiness claim is replaced by a **stronger** one (the directory is populated
+   *and* contains no scheduler import and no interval arithmetic), and replay is
+   still asserted to derive no plan and no due queue.
+3. **`apps/app/test/screen-contract.test.ts`** — the `src/screens/` listing was an
+   exhaustive `toEqual` of WP-05's three files and would fail for any W4 builder.
+   It is now an exhaustive `toEqual` over a `SCREEN_OWNERS` table naming the
+   owning WP of each file, so it stays exhaustive and documents the §4 file-level
+   split. **B7 will need to add its `candidate*` entries to the same table** —
+   flagged here because it is a predictable merge conflict.
+
+### Coordination requests (orchestration spec §2.4 / §5)
+
+**COORD-B8-1 — flip the WP-08 seam status.** `PHASE0_SEAMS` in
+`packages/domain/src/reducers/seams.ts` still reads `status: 'open'` for the
+session planner, which is now false. `src/reducers/` is outside B8's W4 write
+lock, so this is a request rather than an edit. The mismatch is **pinned as an
+assertion** in `test/purity/seams-left-empty.test.ts` ("WP-08's entry is stale
+pending COORD-B8-1") so that closing it forces the test and its comment to be
+updated together. Requested change: `status: 'closed'`, with the rationale
+updated to point at `src/session/`.
+
+**COORD-B8-2 — join the session log to the AppStore.** `apps/app/src/state/`
+(AppStore) is B6's and stays in-memory this wave by the cross-lane rule, so the
+session's own events (`SessionStarted`, embedded/standalone `ReviewGraded`,
+`ExposureLogged`, `SessionClosed`, the two `ContractCreated`) live in the
+screen's workspace beside the store's log rather than inside it. Consequence,
+stated on screen and in `SESSION_INTEGRATION_NOTE`: the evidence inspector
+(WP-09) will not see session events until they are joined. `useSessionLoop`
+already takes an `onEvents` callback that emits exactly the new events, so the
+WP-10 integration is: give `AppStore` a way to accept them (an `append(events)`,
+or route the session through the same command handler `memory-store.ts` uses),
+pass `onEvents`, and delete `SESSION_INTEGRATION_NOTE`.
+
+**COORD-B8-3 — three route files.** `apps/app/app/` is navigation and B6's. The
+three screens are complete and take navigation callbacks, so wiring them is three
+new files and no change to any existing one. The gap is pinned by an assertion in
+`screen-contract.test.ts` ("leaves WP-08's screens unrouted pending COORD-B8-3").
+Exact contents requested:
+
+```tsx
+// apps/app/app/session.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { SessionScreen } from '@/screens/session-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function SessionRoute(): ReactNode {
+  const router = useRouter();
+  return (
+    <SessionScreen
+      context={context}
+      onBack={() => router.push('/')}
+      onOpenCanvas={() => router.push('/canvas')}
+      onOpenRepair={() => router.push('/repair')}
+    />
+  );
+}
+```
+
+```tsx
+// apps/app/app/canvas.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { CanvasScreen } from '@/screens/canvas-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function CanvasRoute(): ReactNode {
+  const router = useRouter();
+  return <CanvasScreen context={context} onBack={() => router.push('/session')} />;
+}
+```
+
+```tsx
+// apps/app/app/repair.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { SessionRepairScreen } from '@/screens/session-repair-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function RepairRoute(): ReactNode {
+  const router = useRouter();
+  return <SessionRepairScreen context={context} onBack={() => router.push('/session')} />;
+}
+```
+
+Note for whoever wires these: a per-route `DomainContext` means each route
+bootstraps its own workspace, so the three screens do **not** share session state
+across navigation. Sharing it is the same change as COORD-B8-2 (one workspace
+above the navigator), and doing them together is cheaper than doing either alone.
+
+### Honest limitations of this work package
+
+- **Not verified in a browser.** `expo export --platform web` is green but the
+  three new screens are not in the bundle, because nothing routes to them
+  (COORD-B8-3). Their behaviour is verified against the exact functions they
+  call, and their rendering by source assertions; neither is a substitute for a
+  screenshot, and none is claimed to be.
+- **No render tests.** This project installs no React Native test renderer, so
+  every behavioural assertion runs against `bootstrapSessionWorkspace` and
+  `applySessionCommand` directly. `bootstrapSessionWorkspace` is exported for
+  exactly that reason and is the same function the hook calls.
+- **`STEP_COST_MINUTES` is a budgeting convention, not a measurement.** No timing
+  study produced it and none is claimed (REQ-GATE-03). It is exported so a later
+  WP can replace it with measured values.
+- **REQ-SCH-04 part (5), transfer, is not implemented.** Recorded in
+  `SESSION_PHASE0_COLLAPSE.notImplemented` rather than left as an absence: it
+  needs REQ-JRN-04 contrast gating and a second context, and a step that
+  resembled transfer while being a second review would misreport what the learner
+  did.
+- **The repair diagnostic writes no event.** The v1 catalog has no family for a
+  diagnostic answer and inventing one would be an ADR-002 change made in the
+  wrong package, so the answer lives on the repair state. Same shape as WP-05's
+  uncertainty-dimension deferral (WP05-D2).
+- **The seed passage embeds 分岐 only inside 分岐点.** The segmenter therefore
+  prefers the promoted target over a longer word containing it; under a plain
+  longest-first rule the canvas would have offered no probe at all while looking
+  like a working page. The rule and its reason are asserted in
+  `apps/app/test/session-canvas.test.ts`.
+
+### Environment note (not a repo defect — recorded so nobody re-chases it)
+
+This branch was built in a git worktree with no `node_modules` of its own. Module
+resolution fell back to the parent checkout, where the root hoists `zod@3.25.76`
+(a transitive dependency) while the lockfile places `zod@4.4.3` under
+`packages/{domain,export,seed}/node_modules`. Until per-package `node_modules`
+were linked into the worktree, two `packages/domain/test/events/catalog.test.ts`
+cases and the `@bunki/seed` typecheck failed against zod v3 semantics
+(`.refine()` has no `.shape`; no `z.prettifyError`). **After linking, all 939
+tests and every typecheck pass.** Nothing in the repository was changed for this,
+and a normal `npm install`/`npm ci` at the repo root does not reproduce it.
+
+### Next safe command
+
+```bash
+git fetch origin && git log --oneline -3 origin/agent/bunki-phase0-integration
+npm run lint && npm run format:check && npm run typecheck && npm run test
+```
+
+V-role verifier: re-run the above from a clean checkout of
+`agent/bunki-phase0-closed-loop-wp08`, then
+`git diff --stat c30560b..HEAD` to confirm no surface outside the list at the top
+of this appendix was touched.

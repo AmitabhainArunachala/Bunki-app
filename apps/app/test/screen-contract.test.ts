@@ -62,16 +62,57 @@ const captureSource = screen('capture-screen.tsx');
 const wordSource = screen('word-screen.tsx');
 const kanjiSource = screen('kanji-screen.tsx');
 
-describe('the app has three screens and they are wired to routes', () => {
-  it('ships exactly the screens WP-05 owns', () => {
+/**
+ * `src/screens/` is shared between builders in W4 under the orchestration
+ * spec's file-level split (§4: B6 owns `inspector*`/`evidence*`, B8 owns
+ * `session*`/`canvas*`, B7 owns `candidate*`). The list below is that split, as
+ * data, and it stays an exhaustive `toEqual` so a file appearing with no owner
+ * is a failure rather than a silent addition.
+ */
+const SCREEN_OWNERS: Readonly<Record<string, string>> = {
+  'capture-screen.tsx': 'WP-05',
+  'kanji-screen.tsx': 'WP-05',
+  'word-screen.tsx': 'WP-05',
+  'canvas-passage.ts': 'WP-08',
+  'canvas-screen.tsx': 'WP-08',
+  'session-loop.ts': 'WP-08',
+  'session-repair-screen.tsx': 'WP-08',
+  'session-screen.tsx': 'WP-08',
+};
+
+describe('every screen file has a named owning work package', () => {
+  it('ships exactly the screens the W4 split assigns', () => {
     const screens = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
-    expect(screens).toEqual(['capture-screen.tsx', 'kanji-screen.tsx', 'word-screen.tsx']);
+    expect(screens).toEqual(Object.keys(SCREEN_OWNERS).sort());
   });
 
-  it('routes each one', () => {
+  it('routes each of WP-05’s three', () => {
     expect(read(resolve(APP_ROOT, 'app/index.tsx'))).toContain('CaptureScreen');
     expect(read(resolve(APP_ROOT, 'app/word/[lexemeId].tsx'))).toContain('WordScreen');
     expect(read(resolve(APP_ROOT, 'app/kanji/[character].tsx'))).toContain('KanjiScreen');
+  });
+
+  /**
+   * WP-08's screens are deliberately unrouted on this branch, and that is
+   * pinned rather than left to be noticed.
+   *
+   * `apps/app/app/` is navigation, which the W4 surface lock assigns to B6;
+   * B7 and B8 file coordination requests instead of editing it (orchestration
+   * spec §4, §5). The three route files WP-08 needs are specified in
+   * **COORD-B8-3** in the capsule. When they land, this assertion fails and is
+   * replaced by the positive one above — which is the only way a temporary gap
+   * reliably stops being permanent.
+   */
+  it('leaves WP-08’s screens unrouted pending COORD-B8-3', () => {
+    const routes = readdirSync(resolve(APP_ROOT, 'app')).sort();
+    expect(routes).not.toContain('session.tsx');
+    expect(routes).not.toContain('canvas.tsx');
+    expect(routes).not.toContain('repair.tsx');
+    // The screens themselves are complete and take navigation callbacks, so
+    // wiring them is a route file each and no change to this directory.
+    ['session-screen.tsx', 'canvas-screen.tsx', 'session-repair-screen.tsx'].forEach((name) => {
+      expect(screen(name)).toMatch(/onBack: \(\) => void/);
+    });
   });
 });
 
