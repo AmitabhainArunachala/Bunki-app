@@ -19,9 +19,18 @@
  * reaches the scheduler), and the pinned FSRS-6 reducer behind this kernel's
  * own `MemoryState`.
  *
- * What it still deliberately does not: session planning (WP-08). That remains
- * recorded as data in `PHASE0_SEAMS` (`src/reducers/seams.ts`) rather than left
- * as a silent gap, and `src/session/` stays empty.
+ * What WP-08 adds: the session orchestrator in `src/session/` — a pure planner
+ * that composes a finite sitting from a time budget and the contracts the
+ * scheduler already made due, the runtime that walks it to an explicit
+ * `SessionClosed`, the REQ-SCH-06 classification that decides whether a canvas
+ * interaction was a declared probe or exposure, and the one hard-coded repair
+ * branch whose rejoin is declared by evidence rather than by a step count.
+ *
+ * Note for a reader of `PHASE0_SEAMS` (`src/reducers/seams.ts`): its WP-08 entry
+ * still reads `status: 'open'`. That is a surface-lock artefact, not a statement
+ * about this tree — `src/reducers/` is outside WP-08's W4 write lock, so
+ * flipping the status is filed as a coordination request (COORD-B8-1) rather
+ * than edited here. The directory below is the authority on what exists.
  */
 
 /** Stable package identifier, used by export `appVersions` from WP-03 onward. */
@@ -35,3 +44,4 @@ export * from './contracts/index.ts';
 export * from './evidence/index.ts';
 export * from './reducers/index.ts';
 export * from './replay/index.ts';
+export * from './session/index.ts';
