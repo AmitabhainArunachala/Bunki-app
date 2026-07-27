@@ -23,7 +23,7 @@
  * about the plan, not about the learner (REQ-LM-03: no global scalar).
  */
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -182,10 +182,14 @@ function SessionBody({
   const runtime = loop.state.runtime;
   const step = runtime === null ? null : currentStep(runtime);
 
-  const labels = useMemo(
-    () => new Map([[target.probeContractId, target.lexeme.headword]]),
-    [target.probeContractId, target.lexeme.headword],
-  );
+  // Every contract the target minted, not only the one the canvas probes. The
+  // planner draws from all of them — and because reading and meaning are minted
+  // on the same tick, `compareDueContracts` falls through to its id tiebreak and
+  // routinely draws the *meaning* contract first. A map holding only the reading
+  // contract left that step to the planner's `?? memory.contractId` fallback,
+  // which put a raw `contract-meaning-…` in front of the learner as the thing
+  // they were being asked to recall.
+  const labels = target.contractLabels;
 
   // When the prompt now in front of the learner appeared. Re-marked whenever the
   // session moves to another step, so the latency reported for an answer is the

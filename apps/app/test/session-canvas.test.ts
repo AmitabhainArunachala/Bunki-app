@@ -623,6 +623,11 @@ describe('the session the screen shows (REQ-UI-05)', () => {
         newBudget: 1,
         canvasId: target.passage.id,
         asOf: ASOF,
+        // Exactly what `session-screen.tsx` passes. Omitting it here would make
+        // this harness a *weaker* caller than the screen, and the defect below
+        // — a raw contract id rendered as the recall prompt — is precisely what
+        // a weaker caller hides.
+        labelByContract: target.contractLabels,
       }),
     };
   };
@@ -641,6 +646,63 @@ describe('the session the screen shows (REQ-UI-05)', () => {
     const { state, target } = openSession('app-wp08-canvasstep-');
     const canvasStep = state.runtime?.plan.steps.find((step) => step.kind === 'canvas');
     expect(canvasStep?.canvasId).toBe(target.passage.id);
+  });
+
+  /**
+   * W5 P1-1, as an executable assertion.
+   *
+   * `contractsFor` mints the reading and meaning contracts back-to-back on one
+   * clock tick, so `compareDueContracts` finds equal `dueSince` values and falls
+   * through to its id tiebreak — where `contract-meaning-…` sorts before
+   * `contract-reading-…`. With `newBudget: 1` the planner therefore draws the
+   * *meaning* contract, and the screen's old one-entry label map (built from
+   * `probeContractId`, the reading contract) missed it. `selectDueContracts`
+   * then fell back to `?? memory.contractId` and the learner was shown
+   * `contract-meaning-lex-bunki` as the thing to recall.
+   *
+   * The assertion is written against the id *shape* rather than that one string,
+   * so it also catches the next internal identifier that leaks — a test that
+   * only knew about `contract-meaning-…` would go green the moment a third
+   * contract family was added without a label.
+   */
+  it('never renders an internal identifier as a prompt (W5 P1-1)', () => {
+    const { state } = openSession('app-wp08-labels-');
+    const steps = state.runtime?.plan.steps ?? [];
+    expect(steps.length).toBeGreaterThan(0);
+
+    // Anything that looks like one of this build's internal ids: a
+    // hyphen-joined lowercase slug of the families the kernel mints.
+    const INTERNAL_ID = /^(contract|thread|component|session|step|canvas|lex)-[a-z0-9-]+$/;
+
+    for (const step of steps) {
+      expect(step.label, `step ${step.stepId} (${step.kind}) shows an internal id`).not.toMatch(
+        INTERNAL_ID,
+      );
+    }
+  });
+
+  /**
+   * The half above cannot see: that the label map covers the contracts that are
+   * actually minted. Without this, a map holding two *wrong* ids would still
+   * pass — every label would be a fallback id, but so would every step, and the
+   * shape assertion would fire on all of them rather than none.
+   *
+   * Asserted as an equality between two sets that are built from different
+   * sources: the contracts in the workspace log, and the keys of the map the
+   * screen hands the planner.
+   */
+  it('labels every contract the target actually mints (W5 P1-1)', () => {
+    const { state, target } = harness('app-wp08-labelcover-');
+    const minted = state.log
+      .filter((event) => event.type === 'ContractCreated')
+      .map((event) => (event as { contractId: string }).contractId)
+      .sort();
+
+    expect(minted.length).toBeGreaterThan(1);
+    expect([...target.contractLabels.keys()].sort()).toEqual(minted);
+    for (const label of target.contractLabels.values()) {
+      expect(label).toContain(target.lexeme.headword);
+    }
   });
 
   it('reaches an explicit completion state and records SessionClosed', () => {

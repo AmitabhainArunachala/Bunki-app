@@ -116,6 +116,29 @@ export const NO_PROMOTED_TARGET_NOTE = `A sitting is planned over what you have 
 const readingContractIdFor = (lexeme: SeedLexeme): string => `contract-reading-${lexeme.id}`;
 const meaningContractIdFor = (lexeme: SeedLexeme): string => `contract-meaning-${lexeme.id}`;
 
+/**
+ * A human label for **every** contract `contractsFor` mints.
+ *
+ * Built from the same two id helpers the contracts themselves are built from,
+ * in one place, so the map cannot list a contract that is not created or omit
+ * one that is. The planner labels a step by looking its contract id up in this
+ * map and falling back to the id itself; the fallback is a last resort for an
+ * unknown contract, not a rendering strategy, and anything that reaches it is a
+ * defect — hence `session-screens.test.ts`'s assertion that no prompt string
+ * ever matches an internal id.
+ *
+ * The two labels differ because the steps ask different questions of the same
+ * word: one asks how it is read, the other what it means. Labelling both
+ * "分岐" would be honest but useless — the learner would see two identical
+ * prompts and no way to tell which contract they were answering.
+ */
+function contractLabelsFor(lexeme: SeedLexeme): ReadonlyMap<string, string> {
+  return new Map([
+    [readingContractIdFor(lexeme), `${lexeme.headword} — reading`],
+    [meaningContractIdFor(lexeme), `${lexeme.headword} — meaning`],
+  ]);
+}
+
 export interface SessionTarget {
   readonly lexeme: SeedLexeme;
   readonly passage: SeedPassage;
@@ -123,6 +146,23 @@ export interface SessionTarget {
   readonly threadId: string;
   /** The contract the canvas may probe: reading, for the seeded target. */
   readonly probeContractId: string;
+  /**
+   * Every contract this target mints, reading *and* meaning.
+   *
+   * The canvas probes exactly one of them (`probeContractId`), but the planner
+   * draws from all of them, and a caller that knows only about the probed one
+   * cannot label what the planner picked. That is not hypothetical: both
+   * contracts are minted on the same clock tick, so `compareDueContracts` falls
+   * through to its id tiebreak, and `contract-meaning-…` sorts before
+   * `contract-reading-…`. With a one-entry label map the meaning step's label
+   * fell back to `memory.contractId` and the learner was shown a raw internal
+   * id as their recall prompt.
+   *
+   * Carrying the set here — rather than letting each screen re-derive it — is
+   * what keeps the label map and the contracts that actually exist from drifting
+   * apart the next time a third contract is added.
+   */
+  readonly contractLabels: ReadonlyMap<string, string>;
 }
 
 export interface SessionLoopOptions {
@@ -335,6 +375,7 @@ export function bootstrapSessionWorkspace(
       componentId: chosen.componentId,
       threadId: chosen.thread.state.threadId,
       probeContractId: readingContractIdFor(chosen.lexeme),
+      contractLabels: contractLabelsFor(chosen.lexeme),
     },
     error: null,
   };

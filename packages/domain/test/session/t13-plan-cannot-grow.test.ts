@@ -273,6 +273,88 @@ describe('the session reaches a finite completion state', () => {
     expect(closed.runtime.completionState).toBe('completed');
   });
 
+  /**
+   * W5 P1-2: the path the learner actually walks.
+   *
+   * The test above settles *every* step, closure included, which no screen does:
+   * the closure step's only control is "Finish the session", and pressing it
+   * dispatches `close` rather than settling the step first. So the sitting
+   * arrives at `resolveCompletionState` with its closure step still `pending`.
+   * While that counted as pending work, `abandoned` was the answer every single
+   * time — `completed` was unreachable through the UI, and 16 of 16 recorded
+   * sittings said the learner had given up when they had not.
+   *
+   * Settling every step *but* closure is therefore the case worth pinning: it is
+   * the one the app produces, and it is the one the old code got wrong.
+   */
+  it('records a normally-finished sitting as completed, with closure still unsettled', () => {
+    const context = newContext('t13-uipath-');
+    const started = startSession(
+      context,
+      {
+        timeBudgetMin: 20,
+        dueContracts: manyDue(4),
+        newBudget: 1,
+        canvasId: 'pas-bunki-01',
+      },
+      { idempotencyKey: 't13:uipath' },
+    );
+
+    // Every step that carries work, and no more — exactly what the screen does.
+    let runtime = started.runtime;
+    const workStepCount = runtime.plan.steps.filter((step) => step.kind !== 'closure').length;
+    expect(workStepCount).toBeGreaterThan(0);
+    for (let move = 0; move < workStepCount; move += 1) {
+      runtime = completeCurrentStep(runtime);
+    }
+
+    // The precondition that makes this the UI's case rather than the other test's.
+    const closureIndex = runtime.plan.steps.findIndex((step) => step.kind === 'closure');
+    expect(closureIndex).toBeGreaterThanOrEqual(0);
+    expect(runtime.outcomes[closureIndex]).toBe('pending');
+
+    expect(resolveCompletionState(runtime)).toBe('completed');
+
+    const closed = closeSession(context, runtime, resolveCompletionState(runtime), {
+      idempotencyKey: 't13:uipath:close',
+    });
+    expect(closed.event?.completionState).toBe('completed');
+    expect(closed.runtime.completionState).toBe('completed');
+  });
+
+  /**
+   * The other half of the same fix: excluding closure must not make everything
+   * `completed`. A sitting closed while real work is still pending is still
+   * `abandoned`, and that is what keeps the fix from being predicate erosion.
+   */
+  it('still records an abandoned sitting as abandoned, closure excluded or not', () => {
+    const context = newContext('t13-abandon-ui-');
+    const started = startSession(
+      context,
+      {
+        timeBudgetMin: 20,
+        dueContracts: manyDue(4),
+        newBudget: 1,
+        canvasId: 'pas-bunki-01',
+      },
+      { idempotencyKey: 't13:abandon-ui' },
+    );
+
+    // One work step done, the rest left where they were.
+    const runtime = completeCurrentStep(started.runtime);
+    const stillPending = runtime.plan.steps.some(
+      (step, index) => step.kind !== 'closure' && runtime.outcomes[index] === 'pending',
+    );
+    expect(stillPending).toBe(true);
+
+    expect(resolveCompletionState(runtime)).toBe('abandoned');
+
+    const closed = closeSession(context, runtime, resolveCompletionState(runtime), {
+      idempotencyKey: 't13:abandon-ui:close',
+    });
+    expect(closed.event?.completionState).toBe('abandoned');
+  });
+
   it('reports abandonment honestly rather than calling an early exit complete', () => {
     const context = newContext('t13-abandon-');
     const started = startSession(
