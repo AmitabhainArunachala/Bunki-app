@@ -35,7 +35,7 @@ until the exact completion condition in §21 or one irreducible gate in §22.
 
 2. Requirement IDs cited here (`REQ-*`, `P0-CAP-*`, `DL-*`, `OD-*`, `H*`)
    resolve inside that v2 file. `T-xx` are this controller's mandatory tests
-   (§17). `WP-xx` are work packages (§19).
+   (§17). `WP-xx` are work packages (§18).
 3. Never edit the v2 spec, either frozen v1, the convergence documents, the
    handoff, the recovery packet, or this controller. If you find a
    contradiction, record it in the evidence capsule, choose the
@@ -88,7 +88,7 @@ REFRESH-LIVE-MAIN → REVERIFY → CLOSE`
   status && git log --oneline -10 origin/main`); read repository-local
   `AGENTS.md`, `CLAUDE.md`, onboarding, ownership, and CI rules before any
   edit; verify §0 integrity.
-- **ADMIT:** complete WP-00 (§19). No other WP may start first.
+- **ADMIT:** complete WP-00 (§18). No other WP may start first.
 - **EXECUTE:** work WPs in dependency order; small reviewable commits, each
   bound to a completed closure predicate or a coherent sub-step of one.
 - **VERIFY:** run the full check set (§17.5) and record results verbatim in
@@ -118,7 +118,7 @@ Rules (binding, from the handoff operating contract):
    replay, E2E, accessibility checks, build — and native checks when WP-11
    is executable (§17.5).
 5. Keep all provider secrets out of git, logs, fixtures, and screenshots
-   (§16).
+   (§15).
 6. Continue through recoverable failures (flaky installs, transient network,
    fixable test failures). Stop only at the completion condition or one
    precise irreducible gate after exhausting safe alternatives. Time
@@ -133,10 +133,15 @@ Rules (binding, from the handoff operating contract):
 ## 4. Admission and repository-bootstrap packet
 
 The target repository **exists** (`AmitabhainArunachala/Bunki-app`, private,
-default branch `main`) and currently contains documentation only (a README
-plus `docs/`). There is no application code, no CI, no license file. WP-00
-therefore performs admission against the live repo, and WP-01 bootstraps
-project scaffolding **inside a PR**, never by pushing scaffolding to main.
+default branch `main`). **Launch precondition (also in the launcher):** the
+specification PRs must be merged to `main` before you launch — at WP-00 time
+`main` must contain the frozen specs under `docs/` and otherwise
+documentation only (no application code, no CI, no license file). If
+`docs/specs/` is absent from `origin/main`, the precondition failed: STOP,
+report, and wait for the human merge — do not build from an unmerged
+branch. WP-00 performs admission against the live repo, and WP-01
+bootstraps project scaffolding **inside a PR**, never by pushing
+scaffolding to main.
 
 Admission facts you must re-verify (do not trust this paragraph):
 
@@ -175,7 +180,7 @@ apps/app/                    # Expo app, web + native targets (WP-05/07/08/09 UI
   src/screens/               # screen components + state machines
   src/state/                 # app-side wiring of domain commands (no logic)
   e2e/                       # Playwright web E2E (WP-10)
-packages/domain/             # @bunki/domain — PURE core (WP-02 then WP-06)
+packages/domain/             # @bunki/domain — PURE core (WP-02 then WP-06; src/session/ is WP-08's)
   src/events/                # versioned event types + schemas
   src/reducers/              # pure reducers incl. FSRS wrapper
   src/contracts/             # RetrievalContract types + validation
@@ -216,7 +221,7 @@ Boundary rules (enforced by ESLint import rules + code review):
 - One scheduler implementation: the FSRS reducer inside `@bunki/domain`
   (REQ-SCH-01). Nothing else computes intervals.
 
-## 6. Domain specification (WP-02, WP-06)
+## 6. Domain specification (WP-02, WP-06; §6.4 session module: WP-08)
 
 ### 6.1 Event families (all versioned; `v: 1`; unknown versions fail closed — REQ-DM-04)
 
@@ -225,7 +230,7 @@ Boundary rules (enforced by ESLint import rules + code review):
 | `EncounterCaptured` | `encounterId`, `threadId` (new or existing), `text`, `span?`, `sourceRef`, `provenance` (REQ-SRC-01 fields), `uncertaintyMark?` |
 | `ThreadPromotionChanged` | `threadId`, `from`, `to` (`captured\|keep\|learn\|master`), `origin` (`user\|nomination_accepted`) |
 | `ContractCreated` | full REQ-DM-05 field set |
-| `ReviewGraded` | `contractId`, `grade` (`again\|hard\|good\|easy`), `latencyMs`, `hintsUsed`, `revealedBeforeRecall`, `probeContext` (`standalone\|embedded`), `tier: "A"` |
+| `ReviewGraded` | `contractId`, `grade` (`again\|hard\|good\|easy`), `latencyMs`, `hintsUsed`, `revealedBeforeRecall`, `userConfirmedEasy?`, `probeContext` (`standalone\|embedded`), `tier: "A"` |
 | `ProductionObserved` | `contractId?`, `rubricId?`, `rubricVersion?`, `elicited: boolean`, `tier: "B"\|"C"` |
 | `ExposureLogged` | `componentIds`, `experienceId`, `tier: "D"` |
 | `LookupFrictionLogged` | `targetRef`, `context` |
@@ -234,6 +239,8 @@ Boundary rules (enforced by ESLint import rules + code review):
 | `EvidenceSuperseded` | `supersededEventId`, `reason`, `correction` |
 | `SessionStarted` / `SessionClosed` | `sessionId`, `budget` / `completionState` |
 | `DataExported` | `exportVersion`, `scope` |
+| `ThreadTombstoned` | `threadId`, `reason` (sync-safe deletion marker) |
+| `ContentPurged` | `targetIds`, `tombstoneEventId` (records that the physical purge of user content ran; the purge itself removes payload bytes from the store) |
 
 ### 6.2 Evidence gate (REQ-DM-06/07/08, REQ-SCH-06)
 
@@ -261,8 +268,10 @@ Pure function set, exhaustively unit-tested:
 - Desired retention default 0.90 (DL-13); expose no user slider in Phase 0.
 - Golden replay: `packages/domain/test/fixtures/golden-*.json` event logs +
   expected derived state snapshots; `npm run test:replay` must prove
-  identical derived state across repeated runs and across web/native
-  adapters (T-03; WP-10 extends to E2E-produced logs).
+  identical derived state across repeated runs and across all adapters
+  available at that stage — pure in-memory reference at WP-02; web and
+  ci-substitute sqlite adapters from WP-03; true native at WP-11 (T-03;
+  WP-10 extends to E2E-produced logs).
 
 ### 6.4 Session orchestrator (REQ-SCH-04; P0-CAP-11)
 
@@ -280,7 +289,11 @@ completion state; the plan cannot grow during the session (T-13).
   derived-state cache tables rebuilt from replay; WAL mode; migration
   runner with forward migrations and **verified rollback** (each migration
   ships a down-migration exercised in tests; destructive migration without
-  verified rollback = stop condition §21.3).
+  verified rollback = stop condition §21.3). **CI substitution:** CI has no
+  native runtime, so the port contract-test suite runs the same adapter
+  SQL/code against a Node SQLite driver, explicitly labeled
+  `ci-substitute` in test names and reports; a ci-substitute pass never
+  counts as native verification (that is WP-11's, and only WP-11's, claim).
 - Web adapter: IndexedDB (or in-memory + localStorage snapshot if IndexedDB
   proves unstable in CI), **labeled provisional** in code, UI (about
   screen), and README (REQ-ARCH-05). Web persistence results are never
@@ -293,7 +306,11 @@ completion state; the plan cannot grow during the session (T-13).
 - Hand-assembled fixtures in `packages/seed/data/`: approximately 12–20
   lexemes, 8–12 kanji (must include 分 and 岐 to support the default
   canonical fixture 分岐 per OD-02), 2–3 grammar constructions, 6–10 example
-  sentences, one KanjiVG-derived stroke SVG set for the seed kanji.
+  sentences, one KanjiVG-derived stroke SVG set for the seed kanji, and
+  **one hand-written thematic integration passage** (~100–200 characters)
+  embedding the default target, with its own provenance record
+  (author/source: this project, explicitly labeled — it feeds the §10
+  screen-5 canvas without any extra AI exchange).
 - Every field carries provenance per REQ-SRC-01. Sources: JMdict/KANJIDIC2
   subsets (EDRDG CC BY-SA 4.0 — attribution text verbatim in
   `LICENSES.md`), KanjiVG (CC BY-SA 3.0), Tatoeba sentences (CC BY 2.0 FR,
@@ -397,8 +414,9 @@ documentation/changelog (primary source), and record the check.
 ## 15. Privacy and secrets (all WPs)
 
 No secret in git history, logs, fixtures, screenshots, or PR bodies —
-enforced by `.gitignore`, a pre-commit scan (`git diff --cached | grep -iE
-'(api[_-]?key|secret|bearer)'` as a minimum), and review. Only seeded
+enforced by `.gitignore`, a pre-commit scan (as a minimum:
+`! git diff --cached | grep -qiE '(api[_-]?key|secret|bearer)'` — note the
+leading `!`, so the hook fails when a match IS found), and review. Only seeded
 fixture content may be sent to the AI provider in Phase 0 (OD-08 default).
 A leaked secret = immediate stop-mutation (§21.3), revoke/rotate via
 operator, scrub history before resuming.
@@ -443,6 +461,9 @@ operator, scrub history before resuming.
 T-18 (operator puts a second real encounter through the loop without
 developer intervention) is WP-12's gate, not an automated test.
 
+*(Numbering note: §17.3 and §17.4 are intentionally unused; §17.5 keeps
+its number to preserve external citations. Nothing was removed.)*
+
 ### 17.2 Adversarial additions (WP-10)
 
 Property/fuzz tests: random event interleavings preserve gate invariants;
@@ -457,7 +478,7 @@ does not corrupt scheduling.
 npm run lint && npm run format:check && npm run typecheck
 npm run test            # unit + integration + replay, all workspaces
 npm run test:e2e        # Playwright web flow incl. axe scan
-npx expo export --platform web   # build proof
+(cd apps/app && npx expo export --platform web)   # build proof (must run from apps/app)
 ```
 
 CI (`.github/workflows/ci.yml`, WP-01) runs the same set on every PR.
@@ -471,7 +492,10 @@ because their write surfaces are disjoint (per-WP ownership, §5); never
 parallelize two WPs that both write `packages/domain`.
 
 Common fields to read as defaults unless a WP overrides: branch/PR per §16;
-rollback per §16; commands per §17.5; capsule update per §3.7.
+rollback per §16; commands per §17.5; capsule update per §3.7; **stop
+conditions default to §21.3 and operator gates to §22; cost-of-wrong
+defaults to the cost-of-wrong of the WP's primary-authority ledger entry**
+(traceability matrix §3 maps each WP to it).
 
 ### WP-00 — Integrity, orientation, authority, baseline receipt
 - **Purpose/closure predicate:** v2 + integrity-file hashes verified; live
@@ -561,9 +585,10 @@ rollback per §16; commands per §17.5; capsule update per §3.7.
   math beyond logging the events.
 
 ### WP-07 — Bounded AI candidate path with offline/scripted fallback
-- **Closure predicate:** §9 adapter complete; T-09, T-10, T-11, T-12
-  passing; candidate UI labeled; env-only key handling verified; fallback
-  fixtures cover the seeded target.
+- **Closure predicate:** §9 adapter complete; T-09, T-10, T-11 passing and
+  T-12's structural/unit half passing (T-12's E2E half executes in WP-10,
+  which owns `apps/app/e2e/`); candidate UI labeled; env-only key handling
+  verified; fallback fixtures cover the seeded target.
 - **Dependencies:** WP-05, WP-06. **Surfaces:** `packages/ai/`, plus the
   candidate UI slice of `apps/app/`.
 - **Stop condition:** any path where AI output reaches canonical/memory
@@ -574,8 +599,9 @@ rollback per §16; commands per §17.5; capsule update per §3.7.
 ### WP-08 — Contextual reuse, one repair branch, evidence-defined rejoin, finite session
 - **Closure predicate:** integration canvas + session + minimal repair
   branch (§10.4/5/7) functional; embedded interactions classified per
-  REQ-SCH-06 (declared probe vs exposure) and tested; T-13 passing;
-  session completion produces `SessionClosed`.
+  REQ-SCH-06 (declared probe vs exposure) and tested; T-13's unit half
+  passing (its E2E half executes in WP-10); session completion produces
+  `SessionClosed`.
 - **Dependencies:** WP-05, WP-06, WP-07. **Surfaces:** `apps/app/`,
   session module in `packages/domain/src/session/`.
 - **Not done:** generalized journey routing; adaptive session-mixture
@@ -592,9 +618,11 @@ rollback per §16; commands per §17.5; capsule update per §3.7.
 
 ### WP-10 — Integrated web loop and adversarial test matrix
 - **Closure predicate:** T-17 E2E green in CI (full REQ-PH-01 loop on
-  Expo Web); §17.2 adversarial suite green; accessibility scan green with
-  recorded scope; full §17.5 set green on the merged integration branch;
-  performance measurements recorded per §13 (web-labeled).
+  Expo Web); the deferred E2E halves of T-12 and T-13 green; §17.2
+  adversarial suite green; accessibility scan green with recorded scope;
+  full §17.5 set green on the merged integration branch; **CI extended so
+  every PR runs the full §17.5 set** (completing WP-01's minimal
+  pipeline); performance measurements recorded per §13 (web-labeled).
 - **Dependencies:** WP-02..WP-09 merged. **Surfaces:** `apps/app/e2e/`,
   CI config, fixes anywhere with owner-WP review notes in the PR.
 - **Not done:** native measurements (WP-11); performance claims beyond
@@ -621,6 +649,13 @@ rollback per §16; commands per §17.5; capsule update per §3.7.
   `docs/build-evidence/OPERATOR_TRIAL.md`. **This WP is an operator gate:**
   your closure is delivering the runnable trial + request; the verdict
   itself is irreducibly the operator's.
+- **Trial AI-step rule (privacy consistency with §15/OD-08):** the real
+  second encounter's content may reach the AI provider only if the
+  operator explicitly extends OD-08 consent to it in the trial itself
+  (recorded verbatim in the capsule); otherwise the trial script runs the
+  AI step in labeled offline-fallback/skip mode for that encounter. Never
+  send un-consented real content; never present the fallback as a live
+  candidate.
 - **Dependencies:** WP-10 (WP-11 native if available, else web trial with
   the limitation stated).
 - **Not done:** any efficacy, retention, or burden-reduction claim from
@@ -635,7 +670,7 @@ rollback per §16; commands per §17.5; capsule update per §3.7.
   committed (`docs/build-evidence/CLOSURE_RECEIPT.md`).
 - **Dependencies:** WP-12. **Not done:** merging anything yourself.
 
-## 19a. What "improving the decomposition" permits
+## 18a. What "improving the decomposition" permits
 
 You may split a WP into sub-branches or reorder *within* dependency
 constraints. You may not: merge WPs across an operator gate, delete a
@@ -664,8 +699,8 @@ only stratum you may declare yourself.
 
 Allowed only after safe alternatives are exhausted, recording: the one
 precise irreducible blocker, evidence, impact, owner, and the smallest
-operator action. Waiting on human merge or the WP-12 verdict is WAIT, not
-BLOCKED.
+operator action. Waiting on human merge, on the §22.1/OD-09 admission
+confirmation, or on the WP-12 verdict is WAIT, not BLOCKED.
 
 ### 21.3 Immediate stop-mutation triggers
 
@@ -687,6 +722,11 @@ and record the decision — do not protect elegance (REQ-HYP-01 preamble).
 ## 22. Operator gates, ranked
 
 1. **Admission (blocks WP-01+):** confirm build-target repository (OD-09).
+   Accepted confirmation channels: an answer in the OD file's tracking
+   table, a comment on the build PR, or an operator message to the
+   executor session — record whichever arrives verbatim in the capsule.
+   Merely being launched against this repository is NOT confirmation.
+   While waiting after WP-00, you are in WAIT (§21.2), not BLOCKED.
 2. **Admission-adjacent (blocks nothing yet, constrains dependencies):**
    license choice (OD-09; §4 rule applies meanwhile).
 3. **Execution (blocks WP-07 live path only):** AI provider key + budget

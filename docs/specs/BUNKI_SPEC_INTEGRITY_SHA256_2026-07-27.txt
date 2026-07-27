@@ -1,7 +1,7 @@
 # Bunki specification integrity record — 2026-07-27
 # SHA-256 of every frozen input and every specification-pass output.
 # Verify any file with: sha256sum <path>
-# This file's own hash is recorded in the publishing PR and commit message.
+# This file's own hash is recorded in the publishing PR body.
 
 # Frozen convergence inputs (immutable; never edit)
 94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b  docs/convergence/JAPANESE_LEARNING_OS_CODEX_V1_FREEZE_2026-07-27.md
@@ -15,11 +15,11 @@ c002f6c4d8c007d0acdac1a66b7295d287f98d206f610c3131d73218dc19909c  docs/handoffs/
 
 # Specification-pass outputs (frozen at publication)
 5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55  docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md
-6bdac9103e47c5abcab4a633c0be2e446e686034f305901114a649cd3c430deb  docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
-12977158880f6fc9e17cfe0db2db348d2b019aa93515c6ad9c4cab7e8ce6111c  docs/specs/BUNKI_V2_PHASE0_TRACEABILITY_MATRIX_2026-07-27.md
-0d273edc14e701803fe24d45e550d2c471487fd786d0ba19c840ecbdeaa86296  docs/specs/BUNKI_PHASE0_RISK_AND_FALSIFICATION_REGISTER_2026-07-27.md
+de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47  docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
+a32e6be17c5cdbb4e88b5e3674a735db41886f82e66234b792bc303084ec942c  docs/specs/BUNKI_V2_PHASE0_TRACEABILITY_MATRIX_2026-07-27.md
+3279cf0cf90b58cc17e8f05dbafb71aaeae3f311bbaceeb09dca2700d9af16e7  docs/specs/BUNKI_PHASE0_RISK_AND_FALSIFICATION_REGISTER_2026-07-27.md
 7d9912992607c890f47a85e9d7adaea04b33bed2a4e79b03b6318bb80bf0e550  docs/specs/BUNKI_OPERATOR_DECISIONS_2026-07-27.md
-8cb5b77aad2531ce83f55116a4ffc7b9680a35d7955cca152c902d0a68688867  docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md
+b0a6811d8e8fda6c2d5f1c7c1743cdb2355eae58b58e834787b79629e378fce7  docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md
 
 # Orchestration layer (added 2026-07-27, same pass; sits above the controller, supremacy rule inside)
-8e5b7b39e993295ea361609ff07d0950396e6f8cfa7c0b791f355b00f10752b4  docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md
+4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71  docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md

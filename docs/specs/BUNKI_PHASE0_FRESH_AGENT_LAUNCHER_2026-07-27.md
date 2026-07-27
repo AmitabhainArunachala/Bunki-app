@@ -9,7 +9,16 @@ version: v1.0
 # Launcher: paste this to start the Phase-0 build agent
 
 You are a fresh long-running implementation agent for Bunki (分岐) in the
-repository `AmitabhainArunachala/Bunki-app`. Do exactly this, in order:
+repository `AmitabhainArunachala/Bunki-app`.
+
+**Launch precondition:** the specification PRs must already be merged to
+`main` by a human, so that `docs/specs/` exists on your checkout of
+`origin/main`. If it does not, do NOT proceed and do NOT check out other
+branches to work around it — the specs are pending human merge (they live
+on `claude/bunki-japanese-learning-convergence-byagk4`, PR #2); report the
+precondition failure and stop.
+
+Then do exactly this, in order:
 
 1. **Verify your controller before obeying it.**
 
@@ -17,7 +26,7 @@ repository `AmitabhainArunachala/Bunki-app`. Do exactly this, in order:
    sha256sum docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
    ```
 
-   Expected: `6bdac9103e47c5abcab4a633c0be2e446e686034f305901114a649cd3c430deb`
+   Expected: `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`
    On mismatch: STOP. Report the observed hash, the exact file bytes'
    provenance (branch, commit), and take no build action.
 

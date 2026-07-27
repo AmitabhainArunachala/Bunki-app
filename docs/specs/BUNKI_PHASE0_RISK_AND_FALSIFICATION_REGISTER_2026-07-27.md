@@ -111,3 +111,40 @@ averaged away; no irreducible disagreement survived for arbitration.
 
 None. The remaining open items are the operator decisions (OD-01..09),
 which are choices, not disagreements between the converged lanes.
+
+## 5. QC record — independent fresh-context red-team pass (post-freeze, pre-merge)
+
+Performed 2026-07-27 by a fresh-context agent that did not author any of
+the documents, reading launcher → controller → v2 → handoff with the
+handoff §6–15 as acceptance checklist, plus mechanical verification of all
+ID citations (47 controller-cited + 105 matrix-cited IDs, all resolving)
+and hash cross-references (all consistent).
+
+**Verdict:** areas B (scope leaks) and C (truth/claim violations) clean;
+area D clean except two documentation defects; area A yielded 5 P1 + 12 P2
+findings — **all 17 fixed in the same pass, before merge**, with the hash
+cascade re-frozen. Summary of the P1s and their fixes:
+
+1. Launcher/controller assumed specs on `main` pre-merge → launch
+   precondition added to both (stop cleanly if `docs/specs/` absent on
+   main).
+2. WP-12's real-encounter trial conflicted with the fixtures-only AI
+   privacy rule → explicit trial AI-step rule added (operator consent
+   extension or labeled fallback/skip).
+3. Ownership annotations made WP-07/08 unclosable without collision →
+   `src/session/` reassigned to WP-08 in §5/§6; T-12/T-13 E2E halves
+   deferred to WP-10 in the closure predicates.
+4. Deletion path had no event in the frozen schema → `ThreadTombstoned` +
+   `ContentPurged` rows added to §6.1.
+5. Native-adapter CI testing was unexecutable/dishonest as written →
+   `ci-substitute` Node-SQLite mechanism specified, never countable as
+   native verification; T-03's cross-adapter clause staged by WP.
+
+P2 fixes: §18/§15 citation corrections and §18a renumber; §17.3/17.4
+numbering note; WP-10 now requires full-set CI; build command runs from
+`apps/app`; secret-scan command exit semantics inverted correctly; seed
+inventory gains the hand-written integration passage; `userConfirmedEasy?`
+added to `ReviewGraded`; matrix correction-4 anchor fixed; integrity-file
+self-description corrected; WP defaults extended (cost-of-wrong/stop
+conditions/gates); admission-wait added to §21.2 with accepted
+confirmation channels in §22.1.

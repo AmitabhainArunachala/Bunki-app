@@ -9,7 +9,7 @@ operator: John Shrader
 governing_authorities:
   controller:
     file: docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md
-    sha256: 6bdac9103e47c5abcab4a633c0be2e446e686034f305901114a649cd3c430deb
+    sha256: de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47
   v2_spec:
     file: docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md
     sha256: 5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55
@@ -255,7 +255,7 @@ verdict. It performs WP-13 plus polish:
   confirms, lock table corrected.
 - **Persistent red on a predicate (>2 fix rounds):** escalate to operator
   with the precise failing predicate and options — never weaken the test
-  (controller §19a).
+  (controller §18a).
 - **Stop-mutation trigger by any agent:** propagates fleet-wide — CON
   broadcasts halt in the orchestration log; only the operator restarts.
 - **Codex pass unavailable:** W9 may not begin on schedule; the operator

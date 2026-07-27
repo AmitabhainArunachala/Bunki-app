@@ -55,7 +55,7 @@ Codex's final Round-1-response verdict.
 | Claude correction 1 (capture ≠ card creation) | accepted | REQ-DM-09, DL-05, DL-38 |
 | Claude correction 2 (review-by-use withdrawn) | accepted | REQ-SCH-06, DL-19, DL-38 |
 | Claude correction 3 (closed-loop = market hypothesis) | accepted | DL-16, DL-38 |
-| Claude correction 4 (renzo export claim corrected) | accepted | DL-16 evidence note, DL-38 |
+| Claude correction 4 (renzo export claim corrected) | accepted | DL-38 (blanket superseding entry; the correction's substance lives in frozen Round-1 §5.4) |
 | Claude correction 5 (FSRS → FSRS-6 pinned/replayable) | accepted | REQ-SCH-01, DL-38 |
 | Codex Step-3 additions (freeze integrity, conflict classes, reversibility+test, constraint order) | accepted in Round 1 §0 | §18 ledger format; §20 freeze statement |
 | Withdrawn learner-level claims (≈N2+/≈N3+) | withdrawn | REQ-EVID-02 (must not resurrect) |
