@@ -3418,3 +3418,136 @@ round advances the ladder.
 4. **Check the empty state is reachable rather than theoretical.** Clear
    `localStorage`, open `/session`, `/canvas` and `/repair` directly; each must
    render its own empty panel, and none may write a byte.
+
+---
+
+## WP-10 (B9) — T-17: the closed loop, executed by clicking
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-e2e`
+**Base:** `agent/bunki-phase0-closed-loop-wp10-integrate` @ `3fd08e856321e8090d0e471307e210032b142264`
+**Toolchain:** node v22.22.2 · npm 10.9.7 · `@playwright/test` 1.56.0 (pinned exact) ·
+Chromium build 1194 / 141.0.7390.37 (the build that version pins)
+**LICENSE:** pending operator decision (controller §4).
+
+### What this closes
+
+`npm run test:e2e` was the WP-01 placeholder that exits 0. It is now a real
+Playwright suite driving the real `expo export --platform web` output.
+
+| Test | File | State |
+|---|---|---|
+| **T-17** — the exact closed loop, one automated E2E flow (web) | `apps/app/e2e/closed-loop.spec.ts` | green |
+| **T-12** E2E half — candidate visibly + structurally labelled in the DOM | `apps/app/e2e/candidate-label.spec.ts` | green |
+| **T-13** E2E half — finite completion state, queue cannot regrow | `apps/app/e2e/finite-session.spec.ts` | green |
+
+The loop T-17 walks, in order, entirely by clicking and typing: type 分岐 into
+the capture field → tap the `reading` uncertainty chip → **Keep** →
+acknowledgment names `EncounterCaptured, ThreadPromotionChanged` and
+"Saved on this device." → **reload** → "Kept threads (1)", still on `keep`,
+storage holds exactly those two events → `/session` is *empty of it* before
+promotion (capture created no debt, DoD §3 step 3) → word page → **Ask for a
+note** → candidate card labelled `AI candidate / generated` + `offline-fallback`
+→ **Keep as my note** → **Take it up for study** → row reads `learn` →
+**Compose the session** → a scored review (`good`) → the integration canvas: one
+tap (ledger: *exposure*) and one answer on the blank (ledger: *declared review*)
+→ back → **Done reading** → **Finish the session** → explicit completion panel
+naming `SessionClosed` → **reload again** (the operator's force-quit) →
+`/evidence` → chain expanded: `captured → keep`, `keep → learn`, each with its
+cause event and `origin user` → **Export and verify** → badge *"Replay check
+passed — 6 events re-read and replayed to the same state."*, no first-difference
+line, licence line `manual-entry`.
+
+Two independent projections are then compared: the badge's own event count and
+the browser's `localStorage` snapshot, which holds exactly
+`EncounterCaptured, ThreadPromotionChanged, CandidateAttached,
+CandidateAcceptedAsNote, ThreadPromotionChanged, DataExported`.
+
+### Commands run, verbatim results
+
+| Command | Result |
+|---|---|
+| `npm ci` (this worktree, before trusting any check) | ok, exit 0 |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | clean across root + 6 workspaces |
+| `npm run test` | **77 files, 1248 tests, all passed** |
+| `npm run test:replay` | 2 files, 47 tests passed |
+| `npm run verify:export` | 1 file, 10 tests passed |
+| `npm run test:e2e:build` (`expo export --platform web`) | `Exported: dist`, 13 routes, from a deleted `dist/` |
+| `npm run test:e2e` | **3 passed (7.8s)** |
+| `npx playwright test --repeat-each=5` (stability) | **15 passed (31.8s)** |
+
+### Falsifiability, checked rather than asserted
+
+A copy of `closed-loop.spec.ts` with `localStorage.clear()` inserted before the
+first reload fails at the durability assertion
+(`toContainText('Kept threads (1)')`). The suite can fail; the copy was deleted.
+
+### Two findings, filed rather than absorbed
+
+**B9-1 (P1, WP-08's surface) — a sitting can ask you to recall an internal id,
+and which contract it probes is not deterministic.**
+`session-loop.ts:contractsFor` mints the reading and meaning contracts back to
+back, each stamped with `context.clock.now()`. `plan.ts:compareDueContracts`
+orders by `dueSince` then by contract id. When the millisecond ticks between the
+two calls the reading contract sorts first; when it does not, the id tiebreak
+puts `contract-meaning-…` before `contract-reading-…` (`m` < `r`) and the meaning
+contract becomes the sitting's one `new` step. `session-screen.tsx` builds
+`labelByContract` from `target.probeContractId` alone — the *reading* contract —
+so in the losing case `selectDueContracts` falls back to `memory.contractId` and
+`session-prompt` renders the literal string `contract-meaning-lex-bunki` as the
+thing to recall.
+*Repro:* `npx playwright test --config apps/app/e2e/playwright.config.ts closed-loop --repeat-each=6`
+against the pre-fix assertion — observed 4 failed / 2 passed, verbatim
+`Expected: "分岐" / Received: "contract-meaning-lex-bunki"`.
+*Suggested fix (not applied — `src/screens/session*` is B8's surface and has
+repair branches open):* put both contract ids in `SessionTarget` and in the
+label map. T-17 therefore asserts that a prompt and its four grades exist and
+that grading records an answer, and records the observed prompt as a test
+annotation; it deliberately does not pin either outcome.
+
+**B9-2 (P1, WP-08's surface) — a fully worked sitting is recorded as
+`abandoned`.**
+The closure step is never given an outcome: `session-screen.tsx` dispatches
+`{kind:'close'}` straight from the closure step, and
+`runtime.ts:resolveCompletionState` returns `abandoned` while any outcome is
+`pending`. So the learner answers every step, presses **Finish the session**, and
+the panel reads *"Ended early. Some steps were left"* while `SessionClosed`
+carries `completionState: "abandoned"` into their exportable log. There is no UI
+path to `completed`: the skip control is not rendered for a closure step.
+*Evidence:* both E2E annotations record
+`completionState="abandoned" after every work step was settled`.
+T-17 and T-13 assert the requirement the controller states — a finite, explicit
+completion state from the domain's own three, with `SessionClosed` named — and
+annotate the observed value rather than enshrining it.
+
+### Surfaces touched
+
+`apps/app/e2e/**` (new), `.github/workflows/ci.yml`, root `package.json`
+(`test:e2e` implemented, `test:e2e:build` added, `@playwright/test` pinned),
+`package-lock.json`, this capsule. No spec, convergence, handoff or ADR file was
+touched; no app or package source was modified.
+
+### CI
+
+A second job, `web build proof / e2e closed loop (T-17)`, installs the pinned
+browser, runs the export build, and runs the suite; failure artefacts upload for
+7 days. The `checks` job additionally names `test:replay` and `verify:export`,
+which the controller reports separately even though `npm run test` already
+covers them. `scripts/not-implemented.mjs` now has no callers.
+
+### Still open after this round
+
+- **The axe scan named in §17.5 is not implemented here**, and `test:e2e` must
+  not be cited as including it. It and the §17.2 adversarial matrix are the
+  T-lanes'; they add specs to `apps/app/e2e/` and the CI job discovers them.
+- **COORD-B8-2** is untouched: the sitting's own observations live in the
+  session workspace, not the durable log, so the scored review and the canvas
+  probe are *not* in the export. T-17 asserts that the app discloses this on the
+  session screen rather than testing around it.
+- **OD-08 live-AI evidence** stays open. Every candidate in this suite is the
+  labelled `offline-fallback`; a green run is not live-call evidence.
+- **Native** is untouched. This is `web-provisional`; nothing here may be read
+  as T-16-native or as a §13 device measurement.
+- Rung: **ENGINEERING-DONE (web) not yet claimable** — T-17 is now green, but
+  B9-1 and B9-2 are open P1s and WP-11/WP-12/WP-13 are unstarted.
