@@ -1,40 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
 
-import { SCAFFOLD_NOTICE } from '@/state/scaffold';
+import { CaptureScreen } from '@/screens/capture-screen';
 
 /**
- * WP-01 scaffold route. It exists so `expo export --platform web` has something
- * real to build and so CI proves the toolchain end to end.
+ * Route `/` — capture and search (controller §10 screen 1).
  *
- * It deliberately claims nothing about the product. The capture screen
- * (controller §10 screen 1) is WP-05's deliverable.
+ * The route owns navigation and nothing else; the screen takes callbacks so it
+ * can be rendered without a router. `?q=` seeds the query so the evidence
+ * harness can land on a state directly, and so a search is a shareable URL.
  */
-export default function Index() {
+export default function CaptureRoute(): ReactNode {
+  const router = useRouter();
+  const { q } = useLocalSearchParams<{ q?: string }>();
+
   return (
-    <View style={styles.container}>
-      <Text accessibilityRole="header" style={styles.title}>
-        分岐
-      </Text>
-      <Text style={styles.body}>{SCAFFOLD_NOTICE}</Text>
-    </View>
+    <CaptureScreen
+      initialQuery={typeof q === 'string' ? q : ''}
+      onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
+      onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    gap: 12,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: '600',
-  },
-  body: {
-    fontSize: 16,
-    maxWidth: 420,
-    textAlign: 'center',
-  },
-});

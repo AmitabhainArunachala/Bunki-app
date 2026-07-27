@@ -717,3 +717,226 @@ credentials; every URL in the fetch script is public and unauthenticated.
 - D-1 / D-2 / D-3 above — the only WP-04 items not closed.
 - Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
 - Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
+
+---
+
+## Appendix — WP-05 (Builder B6): capture/search and layered word/kanji pages
+
+**Agent:** B6 (Builder, WP-05) · **Wave:** W3 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp05`
+**Surfaces touched:** `apps/app/` only, plus `docs/build-evidence/screenshots-wp05/`
+and this appendix. Root `package-lock.json` moved mechanically (see deviations).
+
+### Integrity (launcher step 1, controller §0)
+
+Verified on this checkout before any edit:
+
+| File | SHA-256 | Matches integrity record |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` | yes |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` | yes |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71` | yes |
+| `docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md` | `b0a6811d8e8fda6c2d5f1c7c1743cdb2355eae58b58e834787b79629e378fce7` | yes |
+
+### Stacking (controller §3 rule 1)
+
+Branched from `origin/agent/bunki-phase0-integration` at **`755c090`** — WP-01,
+WP-02 and WP-04 are verified there but were not yet on `main` when this work
+started. WP-05 depends on WP-02 (`@bunki/domain` events and reducers) and WP-04
+(`@bunki/seed`), so basing on `origin/main` was not possible without them.
+
+Re-checked at the end of the session: `origin/agent/bunki-phase0-integration`
+has since advanced to `f9f4d0e` ("refresh from main, PRs #5/#6/#7 merged",
+`origin/main` = `e02b8b2`). **`git diff --stat 755c090 f9f4d0e` is empty** — the
+advance is merge commits only and the tree is identical, so this branch needs no
+rebase and its checks were run against the same content the integration branch
+now holds.
+
+WP-03 is being built in a parallel lane and is deliberately **not** consumed;
+see deferred item WP05-D1.
+
+### Closure predicate status
+
+| Predicate (controller §19 WP-05) | Status | Evidence |
+| --- | --- | --- |
+| Screens 1–3 functional on Expo Web against seed data | met | `expo export --platform web` green; 26 screenshots of the exported bundle in `docs/build-evidence/screenshots-wp05/` |
+| Capture flow meets REQ-UI-01 (ack before enrichment) | met | shots 03/04/05; `apps/app/test/capture-flow.test.ts` (18 tests) |
+| Layers render with provenance | met | shots 11/12; `apps/app/src/ui/notices.tsx`, `test/provenance-display.test.ts` |
+| loading / error / empty / offline on every screen | met | shots 01,02,07,08,09,14,15,16,17,22,23,24,25; `test/view-state.test.ts`, `test/screen-contract.test.ts` |
+| Screenshot evidence under `docs/build-evidence/` | met | `screenshots-wp05/` + `README.md` index + machine-readable `index.json` |
+| SEED_ENTRY_DISCLOSURE on word and kanji pages | met | shots 11–13, 19–21; asserted in `test/screen-contract.test.ts` |
+| Stroke-order animation from seed KanjiVG SVGs | met | shots 19/20/21; `src/data/kanjivg.ts` + `test/stroke-order.test.ts` (19 tests, parses all 10 real seed files) |
+| Dictionary indices never rendered | met | `test/screen-contract.test.ts` scans every app source file for all eleven index names |
+| Japanese typography: ruby, ink-and-paper, one vermilion accent, no rainbow | met | `src/ui/ruby.tsx`, `src/ui/furigana.ts`, `src/ui/theme.ts`; `test/furigana.test.ts`, `test/theme-contrast.test.ts` |
+| Accessibility: labels, ≥44 pt targets, AA contrast | met | `accessibilityLabel` required by type on every control; `test/touch-targets.test.ts`; `test/theme-contrast.test.ts` (39 assertions, both schemes) |
+| AppStore interface + in-memory impl, no `@bunki/persistence` | met | `src/state/store.ts`, `src/state/memory-store.ts`; lint boundary green; `test/screen-contract.test.ts` import scan |
+| Capture events flow through `@bunki/domain`; app has no scheduling/grading/evidence logic | met | only `memory-store.ts` calls `createDomainEvent`; scan test asserts screens do not; lint boundary green |
+| Expo web export still builds | met | `Exported: dist`, 869 modules, 5 static routes |
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` on the four spec files | 4/4 match the integrity record |
+| `npm install` | 704 + 13 packages added; no blocking failure |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **30 files, 515 tests, all passed** (apps/app contributes 10 files / 189 tests) |
+| `npm run test:replay` | 2 files, 43 tests passed |
+| `npm run test:e2e` | WP-10 placeholder — exits 0 with an explicit "not evidence of anything working" notice |
+| `npm run verify:export` | WP-03 placeholder — same |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 1.4 MB bundle, 5 static routes |
+| `node apps/app/scripts/capture-evidence.mjs` | **26/26 screenshots written**, exit 0 |
+
+### What was built
+
+- **`src/ui/`** — design tokens (ink-and-paper, exactly one vermilion accent),
+  a WCAG contrast module, ruby/furigana rendering with an okurigana anchor
+  walk, interactive primitives with `accessibilityLabel` required by the type
+  system, the four REQ-UI-09 state panels, the stroke-order renderer, and the
+  truth-label components.
+- **`src/data/`** — read-only views over `@bunki/seed`: search/lookup, the
+  KanjiVG stroke parser, provenance wording, and a stroke manifest cross-checked
+  against the seed.
+- **`src/state/`** — the `AppStore` seam, its in-memory implementation, the
+  production `DomainContext`, the lookup state machine, the connectivity
+  observer, and the deferred register.
+- **`src/screens/`** — the three screens.
+- **`app/`** — routes `/`, `/word/[lexemeId]`, `/kanji/[character]`.
+- **`scripts/capture-evidence.mjs`** — the CDP screenshot harness (no new
+  dependency: Node 22's global `WebSocket` plus the DevTools Protocol).
+
+Two defects found and fixed, worth a verifier's attention:
+
+1. **A real hydration bug.** `expo export` statically renders every route with
+   no colour scheme, so a client whose first render disagreed (dark OS, or
+   `?scheme=dark`) hydrated dark content onto the server's light markup — the
+   screen background stayed light under dark cards for every node that never
+   re-rendered. Reproduced in the browser (the scroll container still held the
+   server's `rgba(251,248,243,1.00)` while a card held `rgb(30,27,22)`), fixed
+   by resolving the scheme after mount in `ThemeProvider` and reading it through
+   a component *inside* the provider in `app/_layout.tsx`. This affected real
+   dark-mode users, not only the evidence harness.
+2. **A double-tapped promotion threw.** The kernel rejects `from === to`
+   (REQ-DM-09, correctly), so a second tap on the button that had just promoted
+   a thread would have surfaced a `PromotionTransitionError` to the user.
+   `memory-store.ts` now treats it as the idempotent repeat it is.
+
+### Honesty boundaries held (REQ-GATE-03, P0-CAP-15)
+
+- No screen claims durability. The store reports `in-memory-session-only` and
+  the UI renders that sentence verbatim; T-01 belongs to WP-03.
+- `SEED_ENTRY_DISCLOSURE` comes from `@bunki/seed` and is never retyped
+  (asserted). Every project-authored field renders as "Written for this
+  project · not reviewed · not from a published dictionary" — the wording is
+  driven by `review_status`, so nothing unverified can read like a citation.
+- Layer 2/3 sections the seed cannot fill say what is missing and why, rather
+  than being silently omitted or filled with something plausible.
+- No AI candidate exists on any of these screens; enrichment is a second pass
+  over the bundled seed. `@bunki/ai` is WP-07's.
+- No performance number is claimed; nothing was measured.
+- Web results are labelled web results throughout.
+
+### Deviations from the WP-00 pinned register (surfaced, not silent)
+
+1. **`react-native-svg@15.15.4` added** to `apps/app` dependencies. MIT
+   (`npm view react-native-svg license` → `MIT`, verified this session); pinned
+   exactly to the version `expo@57.0.8` bundles
+   (`expo/bundledNativeModules.json` → `15.15.4`). Not in the controller §14
+   register. It is needed because REQ-UI-03 Layer 0 requires a stroke-order
+   animation, which requires drawing individual bezier paths — nothing else in
+   the dependency set can. Cross-platform (web + native), so it does not
+   prejudge WP-11.
+2. **`@types/node@26.1.1` added** to `apps/app` devDependencies (MIT,
+   type-only). Same package and version WP-02/WP-04 already added; already
+   recorded by CON as a register deviation to re-verify at WP-10. Confined to
+   `tsconfig.test.json`; the app program compiles with **no** Node types, so a
+   Node global in shipped code is a type error.
+3. **`@bunki/domain` and `@bunki/seed` declared** as `apps/app` dependencies.
+   They resolved through workspace hoisting already; declaring them makes the
+   dependency real rather than incidental.
+4. **Root `package-lock.json` modified** — mechanically unavoidable, as with
+   WP-02/WP-04: npm workspaces keep one lockfile. Flagged, not treated as an
+   ordinary in-surface edit.
+
+### Deferred, with owners (also machine-readable in `apps/app/src/state/deferred.ts`)
+
+| Id | Item | Owner | Closes with |
+| --- | --- | --- | --- |
+| WP05-D1 | Swap the in-memory `AppStore` for `@bunki/persistence` | W4 integration | Route appends through the domain command handler to `EventStorePort`, keeping the synchronous local acknowledgment ahead of the durable write; then re-label durability `device-local` and run T-01 |
+| WP05-D2 | The uncertainty *dimension* is not in the event log | CON → ADR-002 decision | ADR-002 amendment widening `uncertaintyMark`, or an explicit ruling that the dimension stays app-local |
+| WP05-D3 | Word layers 2–3 thin; kanji layers 2–3 absent | Operator (egress), then WP-04 | Licensed source data in `packages/seed`; the sections already render from the dataset |
+| WP05-D4 | Native connectivity unobserved (`unknown`, no banner) | WP-11 | A verified network dependency, or a device-measured decision that the banner is unnecessary |
+| WP05-D5 | No Layer 0 audio | WP-04 / later phase | A licence-verified local audio set with per-field provenance |
+
+### Coordination requests (for CON)
+
+1. **ADR-002 / REQ-UI-01 tension — needs a ruling, not an edit.** REQ-UI-01
+   specifies a five-way one-gesture uncertainty mark
+   (`meaning · reading · use · kanji · not sure`). The frozen v1 schema records
+   `EncounterCaptured.uncertaintyMark` as `z.literal(true).optional()` — the
+   *fact* of a mark, not the dimension. WP-05 took the conservative reading
+   (controller §0.3): the UI offers all five, the event records `true`, and the
+   dimension is held app-locally and labelled on screen as not exported.
+   Widening the field is an ADR-002 amendment, which is an escalation. **P1** —
+   the requirement is not fully satisfiable in the log until it is decided.
+2. **`eslint.config.mjs` Node-globals glob is root-only** — the same P2 WP-04
+   raised, second instance. `files: ['scripts/**/*.mjs']` does not reach
+   `apps/app/scripts/*.mjs`. Worked around without touching WP-01's surface by
+   importing `process`, `Buffer` and the timers from `node:` modules in the
+   evidence harness. No change requested; recorded for the WP-10 sweep. **P2**
+3. **Register deviations 1–3 above** need recording in the WP-10 licence pass.
+   **P2**
+4. **`src/data/stroke-sources.ts` reaches `packages/seed/data/strokes/*.svg` by
+   relative path**, because `@bunki/seed` exports only `.` and widening its
+   `exports` map would edit WP-04's surface. No share-alike data is copied out
+   of `packages/seed` — the bundler reads the files in place (controller §4,
+   DL-33). If WP-04 later exports the stroke text, this becomes a one-line
+   change. **P2**
+
+### Surfaces touched
+
+`apps/app/**` — `app/` (3 routes + layout), `src/{ui,data,state,screens}/`,
+`test/` (10 files), `scripts/capture-evidence.mjs`, `svg-text-transformer.js`,
+`metro.config.js`, `package.json`, `tsconfig.json`, `tsconfig.test.json`,
+`README.md`; `docs/build-evidence/screenshots-wp05/` (26 PNG + README +
+`index.json`); this capsule section; root `package-lock.json` (mechanical).
+
+Removed: `src/state/scaffold.ts` and `test/scaffold.test.ts`. The scaffold notice
+read "No learning features are implemented yet", which stopped being true in this
+work package — leaving it would have been a false statement in the codebase.
+
+**No frozen doc touched.** No `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No other package. No CI. No `eslint.config.mjs`.
+Nothing pushed to `main` or to the integration branch.
+
+### Secrets check (controller §15)
+
+`apps/app/**` and the evidence README scanned for
+`api[_-]?key|secret|bearer|password|passwd|token`: **8 matches, all false
+positives** — "design token", "change token", and a loop variable named `token`
+in the palette test. No `.env`, no credentials, no network endpoint other than
+the harness's own `127.0.0.1` server. Screenshots contain seed data and
+timestamps only.
+
+### Toolchain recorded at this checkpoint
+
+`node v22.22.2` · `npm 10.9.7` · `typescript 6.0.3` · `eslint 10.8.0` ·
+`prettier 3.9.6` · `vitest 4.1.10` · `expo 57.0.8` · `react-native 0.86.0` ·
+`react-native-web 0.21.2` · `react-native-svg 15.15.4` · `zod 4.4.3` (via
+`@bunki/domain`). FSRS is not pinned by this work package — no scheduler code
+exists in `apps/app` and none may.
+
+### Next safe command
+
+- V5 verifies WP-05 from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `(cd apps/app && npx expo export --platform web)` and
+  `node apps/app/scripts/capture-evidence.mjs` (needs a Chromium binary; set
+  `CHROME_PATH` if no Playwright browser cache is present), then
+  `git diff --stat 755c090` to confirm no surface outside `apps/app/` and the
+  screenshot directory was touched.
+- W4 may consume `apps/app/src/ui/*` and `src/state/app-context.tsx`. Per
+  orchestration spec §4, `app/_layout.tsx` and the shared `src/ui` primitives
+  stay with B6; B8's session/canvas screens should request changes via CON.

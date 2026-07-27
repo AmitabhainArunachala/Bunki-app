@@ -10,9 +10,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "export:web": "expo export --platform web",
-    "typecheck": "tsc --noEmit"
+    "evidence:screenshots": "node scripts/capture-evidence.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
+    "@bunki/domain": "*",
+    "@bunki/seed": "*",
     "expo": "57.0.8",
     "expo-constants": "57.0.7",
     "expo-linking": "57.0.4",
@@ -23,9 +26,11 @@
     "react-native": "0.86.0",
     "react-native-safe-area-context": "5.7.0",
     "react-native-screens": "4.26.0",
+    "react-native-svg": "15.15.4",
     "react-native-web": "0.21.2"
   },
   "devDependencies": {
+    "@types/node": "26.1.1",
     "@types/react": "19.2.2"
   }
 }
