@@ -320,16 +320,26 @@ describe('replay refuses to skip what it cannot apply', () => {
   });
 });
 
-describe('what replay deliberately does not derive (WP-06/WP-08 seams)', () => {
-  it('projects observations without judging them: no memory state, no schedule, no grade rollup', () => {
+describe('what replay derives, and what it still deliberately does not (WP-08 seam)', () => {
+  /**
+   * WP-02 asserted this list without `gateDecisions` or `memoryStates`, because
+   * judging observations and scheduling on them were WP-06's. WP-06 has now
+   * added exactly those two keys and nothing else; the assertion is kept in the
+   * same exhaustive form so that a *third* projection appearing — a session
+   * plan, a due queue, a mastery rollup — is still a test failure rather than a
+   * quiet widening.
+   */
+  it('projects observations, the gate verdict on each, and the schedule that followed — and nothing else', () => {
     const state = replay(fullLog());
     const keys = Object.keys(state).sort();
     expect(keys).toEqual([
       'appliedEventCount',
       'contracts',
       'exports',
+      'gateDecisions',
       'lastEventId',
       'lastOccurredAt',
+      'memoryStates',
       'observations',
       'purges',
       'schemaVersion',
@@ -337,7 +347,7 @@ describe('what replay deliberately does not derive (WP-06/WP-08 seams)', () => {
       'skippedDuplicateCount',
       'threads',
     ]);
-    expect(keys).not.toContain('memoryStates');
+    // WP-08's surface, still absent.
     expect(keys).not.toContain('dueContracts');
     expect(keys).not.toContain('sessionPlan');
   });

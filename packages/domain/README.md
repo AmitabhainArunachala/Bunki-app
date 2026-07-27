@@ -65,14 +65,40 @@ database, a network, or a renderer.
 - **`test/fixtures/golden-*.json`** — three fixtures (event log + expected-state
   snapshot) run by `npm run test:replay`.
 
+## Status — WP-06 delivered (contracts, evidence gate, promotion, pinned FSRS)
+
+### What exists
+
+- **`src/contracts/`** — the `RetrievalContract` entity and its REQ-DM-05
+  validation, including the coherence rules that decide whether a contract can
+  actually score a retrieval; the promotion→skill activation table (REQ-DM-09);
+  and the **contract→thread projection**. A Phase-0 KnowledgeComponent is
+  identified canonically as `"kc:" + the captured target`, so the component→
+  thread edge is derived from `EncounterCaptured` with **no ADR-002 schema
+  change** (Conductor W2 disposition; full argument in
+  `src/contracts/component-identity.ts`).
+- **`src/evidence/`** — the gate. `mint.ts` is the sole factory for
+  evidence-class events; `gate.ts` is the sole judge of which of them may reach
+  the scheduler. Every rejection carries a reason from a closed list, so
+  "why did that review not count" is answerable from derived state.
+- **`src/reducers/fsrs-pin.ts`** — `ts-fsrs` 5.4.1 (FSRS-6), desired retention
+  0.90, fuzz off, all 21 weights written out. `verifyFsrsPin()` fails if the
+  installed library stops agreeing.
+- **`src/reducers/memory-state.ts`** — the only thing in the repository that
+  computes an interval, wrapping `ts-fsrs` behind this kernel's own
+  `MemoryState`.
+- **`test/fixtures/golden-004-*.json`** — the scheduling fixture, so
+  `npm run test:replay` covers FSRS determinism as well as projection.
+
 ### What is deliberately absent
 
-No FSRS, no evidence gate, no session planner, and no `ts-fsrs` dependency.
-`src/contracts/`, `src/evidence/`, and `src/session/` are still empty for WP-06
-and WP-08. The omissions are recorded as data in `PHASE0_SEAMS`
-(`src/reducers/seams.ts`) and asserted by
-`test/purity/seams-left-empty.test.ts`, so "we left that alone" is checkable
-rather than merely stated.
+No session planner. `src/session/` is still empty for WP-08, and
+`test/purity/seams-left-empty.test.ts` asserts it. The seam is recorded as data
+in `PHASE0_SEAMS` (`src/reducers/seams.ts`), so "we left that alone" is
+checkable rather than merely stated. Promotion **rate limiting** is also absent
+and recorded as a typed seam (`PROMOTION_RATE_LIMIT_SEAM`): Phase 0 guarantees
+promotion is explicit and never automatic, and does not implement a workload
+cap.
 
 ### Two things worth knowing before you edit
 
@@ -85,8 +111,16 @@ both projects.
 
 **Nothing calls `Date.now`, `Math.random`, or `crypto`.**
 `test/purity/no-ambient-nondeterminism.test.ts` scans every file under `src/`
-for those and for dynamic `import()`, `require`, `fetch`, and timers. A lint
-rule cannot see ambient globals, and this is what stands in for one — see the
-file header for why it lives here rather than in `eslint.config.mjs`.
+for those and for dynamic `import()`, `require`, `fetch`, and timers — including
+`new Date(...)`, which is why the FSRS wrapper passes ISO strings into `ts-fsrs`
+and serialises the `Date` it gets back rather than constructing one. A lint rule
+cannot see ambient globals, and this is what stands in for one — see the file
+header for why it lives here rather than in `eslint.config.mjs`.
+
+**Two files mint event envelopes, and the split is the evidence boundary.**
+`src/events/factories.ts` builds every non-evidence family and refuses the
+evidence ones at the type level; `src/evidence/mint.ts` is the only thing that
+can build an evidence-class event. The purity scan asserts that list is exactly
+those two.
 
 See `docs/build-evidence/TEST_PLAN.md` for which tests land in which WP.

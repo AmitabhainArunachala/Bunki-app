@@ -1,7 +1,19 @@
 {
   "name": "golden-002-promotion-ladder-and-supersession",
-  "description": "Two threads climbing the ladder at different rates, two distinct retrieval contracts on the same target (meaning and reading are separate contracts, REQ-DM-05/T-05), observations at every tier, and a correction that supersedes a misgraded review. The superseded observation stays in the ledger with a marker rather than disappearing — history is never rewritten (REQ-DM-04.2). None of it produces memory state: the gate and FSRS are WP-06's.",
-  "anchors": ["T-03", "REQ-DM-04", "REQ-DM-05", "REQ-DM-06", "REQ-DM-09", "T-05", "T-07", "T-08"],
+  "description": "Two threads climbing the ladder at different rates, two distinct retrieval contracts on the same target (meaning and reading are separate contracts, REQ-DM-05/T-05), observations at every tier, and a correction that supersedes a misgraded review. The superseded observation stays in the ledger with a marker rather than disappearing — history is never rewritten (REQ-DM-04.2) — and WP-06's gate keeps it out of the scheduler, so the correction corrects something rather than merely annotating it. The lookup, the tier-B production and the tier-D exposure are each recorded and refused by name (T-07, T-08). Only the reading contract's tier-A review reaches FSRS, which is T-05 in fixture form: the meaning contract's memory state stays untouched by a miss on the reading.",
+  "anchors": [
+    "T-03",
+    "REQ-DM-04",
+    "REQ-DM-05",
+    "REQ-DM-06",
+    "REQ-DM-09",
+    "T-05",
+    "T-07",
+    "T-08",
+    "T-02",
+    "T-06",
+    "REQ-SCH-01"
+  ],
   "events": [
     {
       "eventId": "evt-0101",
@@ -13,8 +25,8 @@
       "threadId": "thread-0101",
       "text": "彼は憮然とした表情で黙っていた。",
       "span": {
-        "start": 3,
-        "end": 5
+        "start": 2,
+        "end": 4
       },
       "sourceRef": {
         "sourceId": "source-novel-0007",
@@ -47,6 +59,10 @@
         "modificationStatus": "unmodified",
         "confidence": 0.8,
         "reviewStatus": "unreviewed"
+      },
+      "span": {
+        "start": 0,
+        "end": 3
       }
     },
     {
@@ -76,11 +92,11 @@
       "eventId": "evt-0105",
       "v": 1,
       "occurredAt": "2026-07-27T08:11:30.000Z",
-      "idempotencyKey": "contract:meaning:component-buzen",
+      "idempotencyKey": "contract:meaning:kc:憮然",
       "type": "ContractCreated",
       "contractId": "contract-buzen-meaning",
       "contractVersion": 1,
-      "targetComponentId": "component-buzen",
+      "targetComponentId": "kc:憮然",
       "skill": "form_to_meaning",
       "cueModality": "text",
       "responseModality": "choice",
@@ -99,11 +115,11 @@
       "eventId": "evt-0106",
       "v": 1,
       "occurredAt": "2026-07-27T08:11:31.000Z",
-      "idempotencyKey": "contract:reading:component-buzen",
+      "idempotencyKey": "contract:reading:kc:憮然",
       "type": "ContractCreated",
       "contractId": "contract-buzen-reading",
       "contractVersion": 1,
-      "targetComponentId": "component-buzen",
+      "targetComponentId": "kc:憮然",
       "skill": "orthography_to_reading",
       "cueModality": "text",
       "responseModality": "text",
@@ -152,7 +168,7 @@
       "occurredAt": "2026-07-28T07:34:00.000Z",
       "idempotencyKey": "exposure:experience-0009",
       "type": "ExposureLogged",
-      "componentIds": ["component-buzen", "component-annojou"],
+      "componentIds": ["kc:憮然", "kc:案の定"],
       "experienceId": "experience-0009",
       "tier": "D"
     },
@@ -279,7 +295,7 @@
       {
         "contractId": "contract-buzen-meaning",
         "contractVersion": 1,
-        "targetComponentId": "component-buzen",
+        "targetComponentId": "kc:憮然",
         "skill": "form_to_meaning",
         "scoredBy": "accepted_answers",
         "createdAt": "2026-07-27T08:11:30.000Z",
@@ -288,7 +304,7 @@
       {
         "contractId": "contract-buzen-reading",
         "contractVersion": 1,
-        "targetComponentId": "component-buzen",
+        "targetComponentId": "kc:憮然",
         "skill": "orthography_to_reading",
         "scoredBy": "accepted_answers",
         "createdAt": "2026-07-27T08:11:31.000Z",
@@ -349,6 +365,112 @@
         "contractId": null,
         "superseded": false,
         "supersededByEventId": null
+      }
+    ],
+    "gateDecisions": [
+      {
+        "eventId": "evt-0103",
+        "type": "LookupFrictionLogged",
+        "contractId": null,
+        "admitted": false,
+        "reason": "lookup_is_friction_not_a_grade",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "at": "2026-07-27T08:10:00.000Z"
+      },
+      {
+        "eventId": "evt-0107",
+        "type": "ReviewGraded",
+        "contractId": "contract-buzen-meaning",
+        "admitted": false,
+        "reason": "evidence_superseded",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "at": "2026-07-28T07:30:00.000Z"
+      },
+      {
+        "eventId": "evt-0108",
+        "type": "ReviewGraded",
+        "contractId": "contract-buzen-reading",
+        "admitted": true,
+        "reason": null,
+        "effectiveGrade": "again",
+        "forcedByReveal": false,
+        "at": "2026-07-28T07:30:40.000Z"
+      },
+      {
+        "eventId": "evt-0109",
+        "type": "ExposureLogged",
+        "contractId": null,
+        "admitted": false,
+        "reason": "exposure_is_never_retrieval",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "at": "2026-07-28T07:34:00.000Z"
+      },
+      {
+        "eventId": "evt-0110",
+        "type": "ProductionObserved",
+        "contractId": null,
+        "admitted": false,
+        "reason": "production_is_not_tier_a",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "at": "2026-07-28T07:41:00.000Z"
+      },
+      {
+        "eventId": "evt-0111",
+        "type": "EvidenceSuperseded",
+        "contractId": null,
+        "admitted": false,
+        "reason": "correction_is_not_an_observation",
+        "effectiveGrade": null,
+        "forcedByReveal": false,
+        "at": "2026-07-28T07:55:00.000Z"
+      }
+    ],
+    "memoryStates": [
+      {
+        "contractId": "contract-buzen-meaning",
+        "active": true,
+        "phase": "new",
+        "stability": 0,
+        "difficulty": 0,
+        "dueAt": "2026-07-27T08:11:30.000Z",
+        "lastReviewedAt": null,
+        "scheduledDays": 0,
+        "learningStep": 0,
+        "reps": 0,
+        "lapses": 0,
+        "admittedReviewCount": 0,
+        "activatedAt": "2026-07-27T08:11:30.000Z",
+        "scheduler": {
+          "package": "ts-fsrs",
+          "version": "5.4.1",
+          "algorithm": "FSRS-6",
+          "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+        }
+      },
+      {
+        "contractId": "contract-buzen-reading",
+        "active": true,
+        "phase": "learning",
+        "stability": 0.212,
+        "difficulty": 6.4133,
+        "dueAt": "2026-07-28T07:31:40.000Z",
+        "lastReviewedAt": "2026-07-28T07:30:40.000Z",
+        "scheduledDays": 0,
+        "learningStep": 0,
+        "reps": 1,
+        "lapses": 0,
+        "admittedReviewCount": 1,
+        "activatedAt": "2026-07-27T08:11:31.000Z",
+        "scheduler": {
+          "package": "ts-fsrs",
+          "version": "5.4.1",
+          "algorithm": "FSRS-6",
+          "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+        }
       }
     ],
     "sessions": [],

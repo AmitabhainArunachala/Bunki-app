@@ -16,14 +16,18 @@
  * same snapshot has to survive export and re-import at WP-03 (T-14) without a
  * custom codec.
  *
- * No `MemoryState` and no scheduling appear anywhere in this file. `contracts`
- * is a registry of what was created and `observations` is an ordered ledger of
- * what was observed — neither judges anything. The gate and FSRS are WP-06's
- * (see `src/reducers/seams.ts`).
+ * `contracts` is a registry of what was created and `observations` is an
+ * ordered ledger of what was observed — neither judges anything. The judging is
+ * `gateDecisions`, and its consequences are `memoryStates` (WP-06). Keeping the
+ * three separate is what lets the inspector show a review, the verdict on it,
+ * and the schedule it did or did not change, as three facts rather than one
+ * conclusion (REQ-UI-06).
  */
 
-import type { EvidenceTier, SessionCompletionState } from '../events/shared.ts';
+import type { EvidenceTier, Grade, SessionCompletionState } from '../events/shared.ts';
 import type { EventId, IsoInstant } from '../primitives.ts';
+import type { GateRejectionReason } from '../evidence/gate.ts';
+import type { MemoryState } from '../reducers/memory-state.ts';
 import type { ThreadState } from '../reducers/thread.ts';
 
 /** What a `ContractCreated` established. Registry only — no memory state. */
@@ -55,6 +59,28 @@ export interface ObservationRecord {
   readonly contractId: string | null;
   readonly superseded: boolean;
   readonly supersededByEventId: EventId | null;
+}
+
+/**
+ * What the evidence gate decided about one observation, in log order.
+ *
+ * Recorded for every evidence-class observation, admitted or not. A ledger that
+ * only showed the reviews that counted would answer "what is my schedule" and
+ * leave "why did that one not count" unanswerable — and the second question is
+ * the one a learner asks after a correction (REQ-UI-06, REQ-DM-07).
+ */
+export interface GateDecisionRecord {
+  readonly eventId: EventId;
+  readonly type: string;
+  readonly contractId: string | null;
+  readonly admitted: boolean;
+  /** `null` when admitted; the closed-list reason otherwise. */
+  readonly reason: GateRejectionReason | null;
+  /** The grade the scheduler was told about — reveal-corrected (T-06). */
+  readonly effectiveGrade: Grade | null;
+  /** True when the reveal rule overrode the submitted grade. */
+  readonly forcedByReveal: boolean;
+  readonly at: IsoInstant;
 }
 
 export interface SessionState {
@@ -96,6 +122,13 @@ export interface DerivedState {
   readonly contracts: readonly ContractRecord[];
   /** Log order — an evidence ledger's order is part of its meaning. */
   readonly observations: readonly ObservationRecord[];
+  /** Log order. One entry per evidence-class observation (WP-06). */
+  readonly gateDecisions: readonly GateDecisionRecord[];
+  /**
+   * Sorted by `contractId`. Present only for contracts an explicit promotion
+   * activated — a captured or merely kept thread schedules nothing (T-02).
+   */
+  readonly memoryStates: readonly MemoryState[];
   /** Sorted by `sessionId`. */
   readonly sessions: readonly SessionState[];
   /** Log order. */
@@ -113,6 +146,8 @@ export const EMPTY_DERIVED_STATE: DerivedState = Object.freeze({
   threads: Object.freeze([]),
   contracts: Object.freeze([]),
   observations: Object.freeze([]),
+  gateDecisions: Object.freeze([]),
+  memoryStates: Object.freeze([]),
   sessions: Object.freeze([]),
   exports: Object.freeze([]),
   purges: Object.freeze([]),
@@ -131,12 +166,18 @@ export function freezeDerivedState(state: DerivedState): DerivedState {
     Object.freeze(thread.promotionHistory);
     Object.freeze(thread);
   });
-  [state.contracts, state.observations, state.sessions, state.exports, state.purges].forEach(
-    (list) => {
-      list.forEach(Object.freeze);
-      Object.freeze(list);
-    },
-  );
+  [
+    state.contracts,
+    state.observations,
+    state.gateDecisions,
+    state.memoryStates,
+    state.sessions,
+    state.exports,
+    state.purges,
+  ].forEach((list) => {
+    list.forEach(Object.freeze);
+    Object.freeze(list);
+  });
   Object.freeze(state.threads);
   return Object.freeze(state);
 }
