@@ -1,0 +1,31 @@
+{
+  "name": "bunki",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bunki (分岐) — Phase-0 closed learning loop. Monorepo root (WP-01).",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:replay": "node scripts/not-implemented.mjs test:replay WP-02",
+    "test:e2e": "node scripts/not-implemented.mjs test:e2e WP-10",
+    "verify:export": "node scripts/not-implemented.mjs verify:export WP-03"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.8.0",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0",
+    "vitest": "4.1.10"
+  }
+}
