@@ -430,3 +430,156 @@ content.
   dependencies added here are MIT and constrain nothing.
 - `verify:export` and `test:e2e` remain placeholders (WP-03, WP-10).
 - Native verification remains **UNVERIFIED** — WP-11 only.
+
+---
+
+## WP-02 (B2) — repair round 1: two P1 findings from V2
+
+Appended, not rewritten. The sections above are the pre-repair record and stay
+as they were; where this round makes one of their claims wrong, that is said
+below in as many words.
+
+### Stacking (unchanged, restated because this round re-cut nothing)
+
+Branch `agent/bunki-phase0-closed-loop-wp02`, repaired from its own head
+`2e0bf42`. It remains stacked on `origin/agent/bunki-phase0-integration` rather
+than `origin/main`, because WP-01's scaffolding is not yet merged to main and
+this package cannot build without it. Specs were re-verified from `origin/main`
+before any edit: all nine files in
+`docs/specs/BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` hash as recorded, the
+controller at
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`.
+
+### P1-1 — `DataExported.producedAt` was a field ADR-002 never froze
+
+**Upheld in full.** `dataExportedSchema` carried `producedAt:
+isoInstantSchema.optional()`, which appears in neither ADR-002's v1 table nor
+controller §6.1, and golden-003 was already using it — so an unfrozen field was
+baked into a T-03 fixture that WP-03 must round-trip losslessly (T-14/T-15).
+
+Fixed by **option (a): the field is gone**, from
+`packages/domain/src/events/catalog.ts` and from
+`test/fixtures/golden-003-session-candidates-and-deletion.json:123`. Option (b),
+an ADR-002 amendment, was not available to B2 and was not attempted: `docs/adr/`
+is not on this WP's surface lock (W2 lock: `packages/domain/` is B2's,
+"everything else LOCKED"), and amending a frozen ADR to legalise one's own drift
+is the wrong direction of travel regardless of who holds the pen.
+
+The fixture's `expectedState` is unchanged, as the finding predicted: replay
+projects `ExportRecord` from `eventId`, `exportVersion`, `scope.kind`,
+`scope.threadIds` and `occurredAt` only, and never read `producedAt`. Nothing
+downstream lost information — `occurredAt` already answers "when did the export
+run", which is why a second timestamp was never needed and why its removal costs
+nothing.
+
+The verifier is right that this is the opposite of the discipline applied in
+coordination request #1, and the inconsistency was mine.
+
+**The suite can now see this class of drift.**
+`test/events/catalog.test.ts` gains `ADR_002_FIELDS`, ADR-002's table
+transcribed by hand, and one test per family asserting that the schema accepts
+**exactly** those keys — name *and* optionality, since an extra optional
+property is invisible to a required-fields-only check and was precisely the
+defect here. `ContractCreated` is transcribed from REQ-DM-05 (v2 spec §4.4),
+which is what ADR-002's row defers to. A `covers every family` test keeps the
+table from rotting silently if a family is added.
+
+Negative control run, not assumed: re-adding `producedAt` turns
+`DataExported accepts exactly the fields ADR-002 froze, no more` red and leaves
+the other fourteen families green. The check fails for the right reason and
+only there.
+
+### P1-2 — the capsule's idempotency claim was stronger than the code
+
+**Upheld in full**, and the finding's reproduction is accurate. Design decision
+#5 above claims "the same key claiming _different_ content is rejected". The
+check at `src/replay/replay.ts` keyed only on `eventId`: a repeated key naming
+the *same* `eventId` incremented `skippedDuplicateCount` and returned without
+ever comparing payloads, so a materially different second event was dropped in
+silence. `determinism.test.ts`'s existing conflict test mutated both `eventId`
+and `encounterId`, so it only ever exercised the differing-`eventId` branch.
+
+Fixed by **hardening the code, not by weakening the claim.** Replay now records
+`canonicalJson(event)` alongside the `eventId` that first claimed each key, and
+throws `IdempotencyConflictError` when a repeat matches the id but not the
+content. Design decision #5 is therefore now true as written and is left
+standing; the module header, which had documented only the weaker
+`eventId` rule, is corrected to state the actual guarantee.
+
+Hardening was chosen over correcting the capsule because WP-03's idempotent
+append will be built against this contract, and because the weaker rule
+contradicts this module's own stated doctrine that nothing is ignored. A
+silently discarded history is the same defect as a silently skipped event,
+wearing a quieter costume.
+
+Comparison is on **canonical** JSON, so field order cannot masquerade as a
+difference and break honest re-appends from producers that serialise keys
+differently — asserted by `still treats a re-append as identical when only key
+order differs`.
+
+`canonicalJson` moved from `src/replay/golden.ts` to a new
+`src/replay/canonical-json.ts` so that `replay.ts` can use it without a cycle
+(`golden.ts` already imports `replay.ts`). `golden.ts` re-exports it, so the
+package's public surface is byte-for-byte what it was.
+
+**Three tests added** for the branch that had none: same key + same `eventId` +
+different payload throws with both `existingEventId` and `conflictingEventId`
+reported as `ev-01`; the same case asserted as "throws at all", because the real
+failure mode was no exception rather than a wrong one; and the key-order case
+above. Negative control run: with the payload comparison disabled, exactly the
+two new conflict tests fail and the key-order test still passes — confirming
+they pin the missing branch and not merely "any difference throws".
+
+### Checks re-run (full §17.5 set, from this branch head)
+
+| Command | Result |
+| --- | --- |
+| `npm ci` | **pass** — 703 packages |
+| `npm run lint` | **pass** — eslint clean, no output |
+| `npm run format:check` | **pass** — "All matched files use Prettier code style!" |
+| `npm run typecheck` | **pass** — root + all 6 workspaces |
+| `npm run test` | **pass** — 17 files, **244 tests**, 0 failed (was 225; +19) |
+| `npm run test:replay` | **pass** — 2 files, **43 tests**, 0 failed (`golden.test.ts` 17, `determinism.test.ts` 26; was 40) |
+| `npm run test:e2e` | placeholder, exit 0 — **WP-10**; not evidence of anything |
+| `npm run verify:export` | placeholder, exit 0 — **WP-03**; not evidence of anything |
+| `(cd apps/app && npx expo export --platform web)` | **pass** — 3 static routes, `Exported: dist` |
+
+The +19 reconciles exactly: 16 in `catalog.test.ts` (15 families + the coverage
+guard) and 3 in `determinism.test.ts`.
+
+### Surface touched this round
+
+Seven files, all under `packages/domain/`, plus this capsule section:
+
+- `src/events/catalog.ts` — `producedAt` removed, now-unused
+  `isoInstantSchema` import removed, comment stating why the field is absent
+- `src/replay/replay.ts` — payload comparison on repeated keys; header corrected
+- `src/replay/canonical-json.ts` — **new**, extracted to avoid an import cycle
+- `src/replay/golden.ts` — imports and re-exports `canonicalJson`
+- `test/events/catalog.test.ts` — ADR-002 field table + per-family assertions
+- `test/replay/determinism.test.ts` — three tests for the untested branch
+- `test/fixtures/golden-003-session-candidates-and-deletion.json` —
+  `producedAt` removed; `expectedState` untouched
+
+No spec, ADR, convergence, handoff, orchestration-log, root or sibling-package
+file was modified. `git diff --name-only 2e0bf42..HEAD` is the check.
+
+### Secrets check (controller §15)
+
+`git diff 2e0bf42..HEAD | grep -icE '(api[_-]?key|secret|bearer)'` → `0`.
+
+### Still not claimed
+
+Nothing in this round changes what WP-02 does not claim. T-02 and T-05..T-08
+remain WP-06's; T-03 is green for the in-memory reference only; native remains
+**UNVERIFIED** (WP-11). The contract→thread open question and the ambient-globals
+lint item carry forward unchanged.
+
+### For the verifier
+
+The two negative controls above are the load-bearing evidence and are cheap to
+repeat: re-add `producedAt` to `dataExportedSchema` and exactly one catalog test
+should go red; replace the `canonicalJson(event) !== claim.canonical` guard in
+`replay.ts` with a no-op and exactly two determinism tests should go red. If
+either fails to fail, the corresponding fix is not actually pinned and I have
+mis-reported it.

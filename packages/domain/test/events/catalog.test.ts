@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DOMAIN_EVENT_TYPES,
   EVENT_SCHEMA_VERSION,
+  EVENT_SCHEMAS,
   EVIDENCE_EVENT_TYPES,
   isEvidenceClassEvent,
   parseEvent,
@@ -46,9 +47,124 @@ const SPEC_FAMILIES: readonly string[] = [
   'ContentPurged',
 ];
 
+/**
+ * The envelope ADR-002 puts on every event, plus the discriminator.
+ *
+ * ADR-002's table lists each family's fields "beyond `eventId`, `v`,
+ * `occurredAt`, `idempotencyKey`"; `type` is the family name itself, carried as
+ * a literal so the union stays discriminated.
+ */
+const ENVELOPE_FIELDS = ['eventId', 'v', 'occurredAt', 'idempotencyKey', 'type'] as const;
+
+/**
+ * ADR-002's frozen v1 field table, transcribed by hand.
+ *
+ * Like `SPEC_FAMILIES` above, this is written out rather than derived from the
+ * catalog — a table read out of the code under test would ratify whatever the
+ * code happens to say, which is exactly the drift this is here to catch. `?`
+ * marks the fields ADR-002 marks optional.
+ *
+ * `ContractCreated` is the one row ADR-002 does not spell out inline: it defers
+ * to "full REQ-DM-05 field set", so this row is transcribed from REQ-DM-05 in
+ * the v2 architecture spec (§4.4) instead. `CandidateAttached.envelope` is the
+ * "envelope metadata (§9)" the table names.
+ *
+ * A field that is genuinely needed later does not get appended here. ADR-002's
+ * Consequences clause is explicit: "Adding a field in Phase 0 means a schema
+ * version bump with a replay-tested migration, not an optional property quietly
+ * appended." This table is the thing that makes that sentence enforceable.
+ */
+const ADR_002_FIELDS: Readonly<Record<string, readonly string[]>> = {
+  EncounterCaptured: [
+    'encounterId',
+    'threadId',
+    'text',
+    'span?',
+    'sourceRef',
+    'provenance',
+    'uncertaintyMark?',
+  ],
+  ThreadPromotionChanged: ['threadId', 'from', 'to', 'origin'],
+  ContractCreated: [
+    'contractId',
+    'contractVersion',
+    'targetComponentId',
+    'skill',
+    'cueModality',
+    'responseModality',
+    'acceptedAnswers?',
+    'rubricId?',
+    'rubricVersion?',
+    'hintPolicy',
+    'revealPolicy',
+    'promptFamilyVersion',
+  ],
+  ReviewGraded: [
+    'contractId',
+    'grade',
+    'latencyMs',
+    'hintsUsed',
+    'revealedBeforeRecall',
+    'userConfirmedEasy?',
+    'probeContext',
+    'tier',
+  ],
+  ProductionObserved: ['contractId?', 'rubricId?', 'rubricVersion?', 'elicited', 'tier'],
+  ExposureLogged: ['componentIds', 'experienceId', 'tier'],
+  LookupFrictionLogged: ['targetRef', 'context'],
+  CandidateAttached: ['threadId', 'candidateId', 'envelope', 'status'],
+  CandidateAcceptedAsNote: ['candidateId', 'userAction'],
+  EvidenceSuperseded: ['supersededEventId', 'reason', 'correction'],
+  SessionStarted: ['sessionId', 'budget'],
+  SessionClosed: ['sessionId', 'completionState'],
+  DataExported: ['exportVersion', 'scope'],
+  ThreadTombstoned: ['threadId', 'reason'],
+  ContentPurged: ['targetIds', 'tombstoneEventId'],
+};
+
+/** `['span?', 'text']` → `['span', 'text']`, keeping the `?` as an optionality flag. */
+function splitOptionality(entries: readonly string[]): { name: string; optional: boolean }[] {
+  return entries.map((entry) =>
+    entry.endsWith('?')
+      ? { name: entry.slice(0, -1), optional: true }
+      : { name: entry, optional: false },
+  );
+}
+
+/** What a schema actually accepts, read off its shape: field name → optional?. */
+function acceptedFields(type: DomainEventType): { name: string; optional: boolean }[] {
+  const shape = (
+    EVENT_SCHEMAS[type] as unknown as { shape: Record<string, { isOptional(): boolean }> }
+  ).shape;
+  return Object.entries(shape)
+    .map(([name, field]) => ({ name, optional: field.isOptional() }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 describe('v1 catalog coverage (controller §6.1, ADR-002)', () => {
   it('implements exactly the families the spec lists — no more, no fewer', () => {
     expect([...DOMAIN_EVENT_TYPES].sort()).toEqual([...SPEC_FAMILIES].sort());
+  });
+
+  it('covers every family in the hand-written ADR-002 field table', () => {
+    // Guards the table below against rotting quietly if a family is added.
+    expect(Object.keys(ADR_002_FIELDS).sort()).toEqual([...SPEC_FAMILIES].sort());
+  });
+
+  describe('field-for-field conformance to the ADR-002 v1 table', () => {
+    SPEC_FAMILIES.forEach((family) => {
+      it(`${family} accepts exactly the fields ADR-002 froze, no more`, () => {
+        const expected = [
+          ...splitOptionality(ENVELOPE_FIELDS as unknown as readonly string[]),
+          ...splitOptionality(ADR_002_FIELDS[family] ?? []),
+        ].sort((a, b) => a.name.localeCompare(b.name));
+
+        // Name *and* optionality: an extra optional property is the exact drift
+        // ADR-002's Consequences clause forbids, and it is invisible to a
+        // required-fields-only check.
+        expect(acceptedFields(family as DomainEventType)).toEqual(expected);
+      });
+    });
   });
 
   it('parses one valid instance of every family', () => {

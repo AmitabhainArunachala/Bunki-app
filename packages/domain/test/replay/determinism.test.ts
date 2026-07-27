@@ -204,6 +204,44 @@ describe('idempotency during replay (controller §7)', () => {
     expect((thrown as IdempotencyConflictError).idempotencyKey).toBe('idem-ev-01');
   });
 
+  // The test above changes *both* the eventId and the payload, so on its own it
+  // only ever exercises the differing-eventId branch. The two below pin the case
+  // it cannot see: same key, same eventId, different content. Without them a
+  // check keyed on eventId alone passes the suite while silently dropping a
+  // materially different event.
+  it('rejects one key and event id re-used to claim different content', () => {
+    const restated = { ...capture, encounterId: 'enc-02', text: 'a different encounter entirely' };
+    let thrown: unknown;
+    try {
+      replayJson([capture, restated]);
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(IdempotencyConflictError);
+    expect((thrown as IdempotencyConflictError).idempotencyKey).toBe('idem-ev-01');
+    expect((thrown as IdempotencyConflictError).existingEventId).toBe('ev-01');
+    expect((thrown as IdempotencyConflictError).conflictingEventId).toBe('ev-01');
+  });
+
+  it('does not let a differing payload through as a skipped duplicate', () => {
+    // The failure this guards against is not an exception with the wrong type;
+    // it is no exception at all, and a second history quietly discarded.
+    const restated = { ...capture, encounterId: 'enc-02' };
+    expect(() => replayJson([capture, restated])).toThrow(IdempotencyConflictError);
+  });
+
+  it('still treats a re-append as identical when only key order differs', () => {
+    // Canonical comparison, not textual: the same event serialised with its
+    // fields in another order is the same event, and rejecting it would break
+    // honest re-appends across producers that order JSON differently.
+    const reordered = Object.fromEntries(
+      Object.entries(capture as Record<string, unknown>).reverse(),
+    );
+    const state = replayJson([capture, reordered]);
+    expect(state.appliedEventCount).toBe(1);
+    expect(state.skippedDuplicateCount).toBe(1);
+  });
+
   it('rejects one event id reused under a different key', () => {
     const collision = { ...capture, idempotencyKey: 'idem-other', encounterId: 'enc-02' };
     expect(() => replayJson([capture, collision])).toThrow(DuplicateEventIdError);

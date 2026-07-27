@@ -10,11 +10,14 @@
  * ordered result, every time, on every runtime. That is not a nice property; it
  * is the property every evidence claim in this product reduces to.
  *
- * **Idempotency.** A repeated `idempotencyKey` is skipped when it names the
- * same event, and rejected when it names a different one. Skipping identical
- * re-appends is what makes a double-tapped capture one thread; refusing
- * conflicting ones is what stops replay from silently choosing between two
- * histories.
+ * **Idempotency.** A repeated `idempotencyKey` is skipped only when it names the
+ * same `eventId` *and* carries byte-identical content; it is rejected when
+ * either differs. Skipping identical re-appends is what makes a double-tapped
+ * capture one thread; refusing conflicting ones is what stops replay from
+ * silently choosing between two histories. Note that the `eventId` check alone
+ * is not sufficient for that second guarantee — a producer that reuses an id
+ * with a changed payload would otherwise have the change dropped without a
+ * word, which is the same silent choice in a quieter costume.
  *
  * **Nothing is ignored.** Every family in the catalog is handled in the switch
  * below, with a `never` check on the default branch: adding a family without
@@ -33,6 +36,7 @@ import type { DomainEvent } from '../events/catalog.ts';
 import { parseEventLog } from '../events/parse.ts';
 import { initialThreadState, threadReducer, type ThreadState } from '../reducers/thread.ts';
 import type { EventId } from '../primitives.ts';
+import { canonicalJson } from './canonical-json.ts';
 import {
   compareIds,
   freezeDerivedState,
@@ -397,15 +401,34 @@ function finalise(accumulator: Accumulator): DerivedState {
 export function replay(events: readonly DomainEvent[]): DerivedState {
   const accumulator = emptyAccumulator();
   const seenEventIds = new Map<EventId, string>();
-  const seenIdempotencyKeys = new Map<string, EventId>();
+  /** key → the eventId that claimed it, and the exact bytes it claimed it with. */
+  const seenIdempotencyKeys = new Map<string, { eventId: EventId; canonical: string }>();
 
   events.forEach((event, index) => {
-    const claimedBy = seenIdempotencyKeys.get(event.idempotencyKey);
-    if (claimedBy !== undefined) {
-      if (claimedBy !== event.eventId) {
-        throw new IdempotencyConflictError(event.idempotencyKey, claimedBy, event.eventId, index);
+    const claim = seenIdempotencyKeys.get(event.idempotencyKey);
+    if (claim !== undefined) {
+      if (claim.eventId !== event.eventId) {
+        throw new IdempotencyConflictError(
+          event.idempotencyKey,
+          claim.eventId,
+          event.eventId,
+          index,
+        );
       }
-      // Same key, same event: an honest re-append. No-op by design (§7).
+      // Same key and same eventId is not yet enough to call this a re-append:
+      // the payload has to match too. Matching ids with differing content are
+      // two histories, and skipping the second would silently pick one — the
+      // very choice the conflict error exists to refuse. Compare canonical
+      // bytes so key order cannot disguise a real difference.
+      if (canonicalJson(event) !== claim.canonical) {
+        throw new IdempotencyConflictError(
+          event.idempotencyKey,
+          claim.eventId,
+          event.eventId,
+          index,
+        );
+      }
+      // Same key, same event, same content: an honest re-append. No-op (§7).
       accumulator.skippedDuplicateCount += 1;
       return;
     }
@@ -417,7 +440,10 @@ export function replay(events: readonly DomainEvent[]): DerivedState {
     applyEvent(accumulator, event);
 
     seenEventIds.set(event.eventId, event.idempotencyKey);
-    seenIdempotencyKeys.set(event.idempotencyKey, event.eventId);
+    seenIdempotencyKeys.set(event.idempotencyKey, {
+      eventId: event.eventId,
+      canonical: canonicalJson(event),
+    });
     accumulator.appliedEventCount += 1;
     accumulator.lastEventId = event.eventId;
     accumulator.lastOccurredAt = event.occurredAt;

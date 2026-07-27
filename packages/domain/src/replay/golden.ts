@@ -22,34 +22,11 @@ import { z } from 'zod';
 
 import type { DomainEvent } from '../events/catalog.ts';
 import { parseEventLog } from '../events/parse.ts';
+import { canonicalJson } from './canonical-json.ts';
 import type { DerivedState } from './derived-state.ts';
 import { replay } from './replay.ts';
 
-/**
- * Stable JSON: object keys sorted, arrays left in their meaningful order.
- *
- * Sorting keys means the text depends only on the *content* of the state, not
- * on the order the reducer happened to assign fields. Arrays are never sorted
- * here — `observations` is in log order and that order is part of the evidence.
- */
-export function canonicalJson(value: unknown): string {
-  return JSON.stringify(canonicalise(value), null, 2);
-}
-
-function canonicalise(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonicalise);
-  if (value !== null && typeof value === 'object') {
-    const source = value as Record<string, unknown>;
-    const sorted: Record<string, unknown> = {};
-    Object.keys(source)
-      .sort()
-      .forEach((key) => {
-        sorted[key] = canonicalise(source[key]);
-      });
-    return sorted;
-  }
-  return value;
-}
+export { canonicalJson };
 
 export const goldenFixtureSchema = z.strictObject({
   /** Stable name; also the assertion label in test output. */

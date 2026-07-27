@@ -119,8 +119,7 @@
       "scope": {
         "kind": "threads",
         "threadIds": ["thread-0201"]
-      },
-      "producedAt": "2026-07-28T06:41:59.250Z"
+      }
     },
     {
       "eventId": "evt-0208",

@@ -26,7 +26,6 @@ import {
   exportScopeSchema,
   gradeSchema,
   hintPolicySchema,
-  isoInstantSchema,
   lookupContextSchema,
   lookupTargetRefSchema,
   MODALITIES,
@@ -231,11 +230,20 @@ export const sessionClosedSchema = withEnvelope('SessionClosed', {
   completionState: sessionCompletionStateSchema,
 });
 
+/**
+ * An export ran. The field set is exactly ADR-002's: `exportVersion` and
+ * `scope`, and nothing else.
+ *
+ * There is no `producedAt`. When the export ran is `occurredAt` — the envelope
+ * already carries it, and a second timestamp would create two answers to one
+ * question with no rule for which replay should believe. If a future phase
+ * genuinely needs to distinguish "when the bytes were produced" from "when the
+ * event was recorded", ADR-002 says how that arrives: a schema version bump
+ * with a replay-tested migration, not an optional property quietly appended.
+ */
 export const dataExportedSchema = withEnvelope('DataExported', {
   exportVersion: nonEmptyString,
   scope: exportScopeSchema,
-  /** When the export ran, if that differs from when the event was recorded. */
-  producedAt: isoInstantSchema.optional(),
 });
 
 // ---------------------------------------------------------------------------
