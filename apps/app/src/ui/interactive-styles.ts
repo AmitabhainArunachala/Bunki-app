@@ -57,12 +57,29 @@ export const searchFieldStyle = {
 } as const;
 
 /**
+ * A link in the navigation shell (WP-10).
+ *
+ * Padded to the 44 pt minimum like everything else rather than being allowed to
+ * shrink because it is chrome: the shell is on every screen, so a nav link is
+ * the most-tapped control in the app and the last place to spend a touch target.
+ */
+export const navLinkStyle = {
+  ...TOUCH_TARGET,
+  alignItems: 'center',
+  borderRadius: RADIUS.sm,
+  justifyContent: 'center',
+  paddingHorizontal: SPACE.md,
+  paddingVertical: SPACE.sm,
+} as const;
+
+/**
  * Every interactive style in the app, by the name of the control that uses it.
  * A control missing from this map is a control nothing size-checked.
  */
 export const INTERACTIVE_STYLES = {
   AppButton: buttonStyle,
   ChipButton: chipStyle,
+  NavLink: navLinkStyle,
   RowButton: rowStyle,
   SearchField: searchFieldStyle,
 } as const;
