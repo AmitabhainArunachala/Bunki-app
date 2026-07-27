@@ -176,9 +176,12 @@ export function alignFurigana(written: string, reading: string): FuriganaResult 
  * The spoken form of a ruby-annotated word.
  *
  * A screen reader walking the visual segments would interleave base text and
- * furigana character by character ("ぶん 分 き 岐"), which is noise. Interactive
- * and text nodes therefore carry this single label instead, and the visual
- * pieces are hidden from the accessibility tree.
+ * furigana character by character ("ぶん 分 き 岐"), which is noise. `RubyText`
+ * therefore renders this string as the one piece of real text content in the
+ * word, and marks every visual piece `aria-hidden`. See the header of
+ * `./ruby.tsx` for why an `accessibilityLabel` on the container is not on its
+ * own sufficient on the Phase-0 web target, and where the accessibility tree is
+ * actually measured.
  */
 export function furiganaAccessibilityLabel(written: string, reading: string): string {
   if (reading === '' || reading === written) return written;

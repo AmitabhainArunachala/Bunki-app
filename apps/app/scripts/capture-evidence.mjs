@@ -1,12 +1,20 @@
 /**
- * Screenshot evidence for WP-05 (controller §19 WP-05: "screenshot evidence
- * saved under docs/build-evidence/").
+ * Screenshot and accessibility-tree evidence for WP-05 (controller §19 WP-05:
+ * "screenshot evidence saved under docs/build-evidence/").
  *
  * It serves the real `expo export --platform web` output and drives a real
  * browser over the Chrome DevTools Protocol. Nothing is mocked: the pages are
  * the exported bundle, the clicks are input events, the offline state comes
  * from the browser's own network emulation, and the two colour schemes are the
  * app's own `?scheme=` flag rather than a screenshot filter.
+ *
+ * A screenshot cannot photograph an accessibility tree, and an accessibility
+ * claim that nothing measures is how `ruby.tsx` came to say the furigana pieces
+ * were hidden while every one of them was exposed. So after the shots this
+ * script also runs an **audit** pass: it asks Chrome for the real accessibility
+ * subtree under a rendered component and asserts what a screen reader would
+ * find there. Results go to `accessibility-audit.json` beside the PNGs, and a
+ * failed assertion fails the run.
  *
  * No new dependency: Node 22 has a global `WebSocket`, and CDP is a JSON
  * protocol over one. Adding Playwright here would put a package outside WP-00's
@@ -244,7 +252,40 @@ class Page {
     await this.call('Page.enable');
     await this.call('Runtime.enable');
     await this.call('Network.enable');
+    await this.call('DOM.enable');
     await this.setViewport(VIEWPORT.height);
+  }
+
+  /**
+   * The accessibility subtree Chrome actually computes for one rendered
+   * component, as an assistive technology would see it.
+   *
+   * `Accessibility.queryAXTree` returns every node under the element, including
+   * the ones the browser ignores, each with its computed role and name — which
+   * is the only way to tell "hidden from the accessibility tree" from "the prop
+   * that was supposed to hide it was silently dropped".
+   *
+   * `InlineTextBox` nodes are dropped from the result: they are the layout
+   * fragments of a `StaticText`, so counting them would report one text node
+   * twice and turn a line wrap into a failure.
+   */
+  async axNodes(testId) {
+    await this.call('Accessibility.enable');
+    const { root } = await this.call('DOM.getDocument', { depth: -1, pierce: true });
+    const { nodeId } = await this.call('DOM.querySelector', {
+      nodeId: root.nodeId,
+      selector: `[data-testid="${testId}"]`,
+    });
+    if (nodeId === 0) throw new Error(`no element with data-testid="${testId}"`);
+
+    const { nodes } = await this.call('Accessibility.queryAXTree', { nodeId });
+    return nodes
+      .filter((node) => (node.role?.value ?? '') !== 'InlineTextBox')
+      .map((node) => ({
+        role: node.role?.value ?? '',
+        name: node.name?.value ?? '',
+        ignored: node.ignored === true,
+      }));
   }
 
   setViewport(height) {
@@ -676,6 +717,96 @@ function shotList(base) {
         await sleep(300);
       },
     },
+    {
+      name: '27-capture-mark-after-keep',
+      screen: 'capture',
+      state: 'ready (mark applied after Keep)',
+      note: 'The path that used to render a false sentence: kept with no mark, then marked. The acknowledgment lists the two events, and the note under the chips now says the mark is on this device only and not in the log.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-mark-reading');
+        await sleep(400);
+      },
+    },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// The audit list — assertions against the real accessibility tree
+// ---------------------------------------------------------------------------
+
+/**
+ * REQ-UI-09 calls screen-reader labels requirements rather than polish, and the
+ * ruby column is the one place in this app where the visual structure and the
+ * spoken structure genuinely differ. These audits state what a screen reader
+ * must find, and are written against the words in the seed rather than against
+ * whatever the component happens to produce.
+ */
+function auditList(base) {
+  const url = (path) => `${base}${path}`;
+
+  /** One RubyText: exactly one thing is said, and it is the whole word. */
+  const rubyChecks = (nodes, { label, pieces }) => {
+    const exposed = nodes.filter((node) => !node.ignored && node.name !== '');
+    const named = exposed.map((node) => node.name);
+
+    return [
+      {
+        check: 'exactly one node in the subtree is exposed with a name',
+        expected: 1,
+        actual: exposed.length,
+        ok: exposed.length === 1,
+      },
+      {
+        check: 'the one name is the whole word and its reading',
+        expected: label,
+        actual: named.join(' | '),
+        ok: named.length === 1 && named[0] === label,
+      },
+      {
+        check: 'no written form or reading is exposed on its own',
+        expected: 'none of ' + pieces.join(' / '),
+        actual: named.filter((name) => pieces.includes(name)).join(' / ') || 'none',
+        ok: named.every((name) => !pieces.includes(name)),
+      },
+      {
+        check: 'the empty-ruby placeholder is not in the tree at all',
+        expected: 'no ideographic space anywhere, exposed or ignored',
+        actual: nodes.filter((node) => node.name.includes('　')).length,
+        ok: nodes.every((node) => !node.name.includes('　')),
+      },
+    ];
+  };
+
+  return [
+    {
+      name: 'ruby-aligned-word',
+      subject: 'RubyText on /word/lex-wakareru (分かれる, reading split わ + かれる)',
+      why: 'The reported defect: わ / 分 / 　 / かれる were four exposed nodes in DOM order.',
+      run: async (page) => {
+        await page.goto(url('/word/lex-wakareru'));
+        await page.waitFor('word-headword');
+        const nodes = await page.axNodes('word-headword');
+        return rubyChecks(nodes, {
+          label: '分かれる（わかれる）',
+          pieces: ['わ', '分', 'かれる', '　'],
+        });
+      },
+    },
+    {
+      name: 'ruby-whole-word',
+      subject: 'RubyText on /word/lex-bunki (分岐, one segment)',
+      why: 'The other alignment shape: whole reading over the whole written form.',
+      run: async (page) => {
+        await page.goto(url('/word/lex-bunki'));
+        await page.waitFor('word-headword');
+        const nodes = await page.axNodes('word-headword');
+        return rubyChecks(nodes, { label: '分岐（ぶんき）', pieces: ['ぶんき', '分岐'] });
+      },
+    },
   ];
 }
 
@@ -694,33 +825,65 @@ async function main() {
   await cdp.ready;
 
   const results = [];
+  const audits = [];
   let failures = 0;
+
+  /** A fresh target per step: the store is in memory, so nothing leaks forward. */
+  const inFreshPage = async (body) => {
+    const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank' });
+    const { sessionId } = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
+    const page = new Page(cdp, sessionId);
+    try {
+      await page.setup();
+      return await body(page);
+    } finally {
+      await cdp.send('Target.closeTarget', { targetId }).catch(() => undefined);
+    }
+  };
 
   try {
     for (const shot of shotList(base)) {
-      // A fresh target per shot: the store is in memory, so a previous shot's
-      // kept thread must not leak into the next one's screenshot.
-      const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank' });
-      const { sessionId } = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
-      const page = new Page(cdp, sessionId);
-
       try {
-        await page.setup();
-        await shot.run(page);
-        await sleep(250);
-        const height = await page.shot(join(OUT, `${shot.name}.png`));
+        const height = await inFreshPage(async (page) => {
+          await shot.run(page);
+          await sleep(250);
+          return page.shot(join(OUT, `${shot.name}.png`));
+        });
         results.push({ ...shot, ok: true, height });
         process.stdout.write(`  ok  ${shot.name}\n`);
       } catch (cause) {
         failures += 1;
         results.push({ ...shot, ok: false, error: String(cause) });
         process.stdout.write(`FAIL  ${shot.name}: ${String(cause)}\n`);
-      } finally {
-        await cdp.send('Target.closeTarget', { targetId }).catch(() => undefined);
+      }
+    }
+
+    for (const audit of auditList(base)) {
+      try {
+        const checks = await inFreshPage((page) => audit.run(page));
+        const failed = checks.filter((check) => !check.ok);
+        failures += failed.length;
+        audits.push({ name: audit.name, subject: audit.subject, why: audit.why, checks });
+        for (const check of checks) {
+          process.stdout.write(
+            `${check.ok ? '  ok' : 'FAIL'}  ${audit.name}: ${check.check}` +
+              (check.ok
+                ? '\n'
+                : ` — expected ${String(check.expected)}, got ${String(check.actual)}\n`),
+          );
+        }
+      } catch (cause) {
+        failures += 1;
+        audits.push({ name: audit.name, subject: audit.subject, error: String(cause) });
+        process.stdout.write(`FAIL  ${audit.name}: ${String(cause)}\n`);
       }
     }
 
     writeFileSync(join(OUT, 'index.json'), `${JSON.stringify(manifest(results), null, 2)}\n`);
+    writeFileSync(
+      join(OUT, 'accessibility-audit.json'),
+      `${JSON.stringify(auditManifest(audits), null, 2)}\n`,
+    );
   } finally {
     cdp.close();
     chrome.child.kill('SIGKILL');
@@ -728,10 +891,22 @@ async function main() {
     server.close();
   }
 
+  const shotFailures = results.filter((result) => !result.ok).length;
+  const checks = audits.flatMap((audit) => audit.checks ?? []);
   process.stdout.write(
-    `\n${String(results.length - failures)}/${String(results.length)} screenshots written to ${OUT}\n`,
+    `\n${String(results.length - shotFailures)}/${String(results.length)} screenshots written to ${OUT}\n` +
+      `${String(checks.filter((check) => check.ok).length)}/${String(checks.length)} accessibility checks passed\n`,
   );
   if (failures > 0) process.exitCode = 1;
+}
+
+function auditManifest(audits) {
+  return {
+    workPackage: 'WP-05',
+    measuredWith: 'Chrome DevTools Protocol Accessibility.queryAXTree over the expo export output',
+    note: 'Roles and names here are Chrome’s own computation, not the app’s props. A prop the web target silently drops shows up as an exposed node.',
+    audits,
+  };
 }
 
 function manifest(results) {
