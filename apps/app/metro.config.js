@@ -26,4 +26,16 @@ config.resolver.nodeModulesPaths = [
 // stray parent-directory node_modules shadow a workspace package.
 config.resolver.disableHierarchicalLookup = true;
 
+// Resolve `.svg` as source text rather than as an image asset (WP-05).
+//
+// The kanji page needs the individual KanjiVG stroke paths to animate writing
+// order (REQ-UI-03), and an asset URI cannot give it those. `svg` must be
+// removed from `assetExts` as well as added to `sourceExts`: while it is in
+// both, Metro's asset resolution wins and the transformer below never runs.
+// See `svg-text-transformer.js` for why the data is read in place rather than
+// copied out of `packages/seed`.
+config.resolver.assetExts = config.resolver.assetExts.filter((ext) => ext !== 'svg');
+config.resolver.sourceExts = [...config.resolver.sourceExts, 'svg'];
+config.transformer.babelTransformerPath = require.resolve('./svg-text-transformer.js');
+
 module.exports = config;
