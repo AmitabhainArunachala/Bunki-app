@@ -174,6 +174,32 @@ publication workspace) and either recovers both original byte streams or
 issues the two explicit acceptance decisions above, in a reply or commit this
 session can verify.
 
+### Candidate prior workspaces (metadata-only lead, discovered post-publication)
+
+The account's repository listing (S11, names and push timestamps only — no
+repository contents were read) shows two repositories pushed on the same day
+as, and shortly before, the convergence publication to this repository
+(input branch pushed 2026-07-27T04:55:44Z; PR #1 opened 04:56:33Z):
+
+| Candidate repository | Last push (UTC) | Lead strength |
+|---|---|---|
+| `AmitabhainArunachala/dharma_swarm` | 2026-07-27T04:15:26Z | strongest — ~40 minutes before publication |
+| `AmitabhainArunachala/SAB-Syntropic-Attractor-Basin` | 2026-07-27T00:59:45Z | strong — ~4 hours before publication |
+| `AmitabhainArunachala/vibe-halt` | 2026-07-25T12:51:38Z | weaker — two days prior |
+
+The prior Claude context that froze revision `8404395` may have been working
+in one of these. The operator (or an agent the operator explicitly authorizes
+to access them) can test each candidate with:
+
+    git cat-file -t 8404395          # inside a full clone of the candidate
+    git log --all --oneline | grep -i bunki
+    git rev-list --all | xargs -I{} git ls-tree -r {} 2>/dev/null | grep BUNKI_WORKING_SPEC
+
+If revision `8404395` resolves to a commit, recover the file and verify
+`sha256 == 77e52f3a…feb68` before publication. This session has not read any
+of these repositories; they are outside its authorized scope pending explicit
+operator authorization.
+
 ## 6. Resumption protocol
 
 When the operator supplies bytes or decisions:
