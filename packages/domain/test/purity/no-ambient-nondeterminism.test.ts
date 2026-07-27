@@ -116,10 +116,15 @@ describe('@bunki/domain reaches for nothing ambient', () => {
     },
   );
 
-  it('imports only zod and its own relative modules', () => {
+  it('imports only zod, ts-fsrs, and its own relative modules', () => {
     // The import boundary is lint-enforced (ADR-001); this asserts the positive
     // form, which is easier to read in a review than a list of what is banned:
-    // one third-party dependency, everything else local.
+    // two third-party dependencies, everything else local.
+    //
+    // WP-02 asserted `['zod']`. WP-06 added `ts-fsrs`, which the controller
+    // requires (§6.3, §14) and which ADR-001's boundary 3 permits in this
+    // package and nowhere else. The list stays exhaustive so a third bare
+    // import is still a failure.
     const specifiers = new Set<string>();
     files.forEach((path) => {
       const source = code(path);
@@ -132,28 +137,56 @@ describe('@bunki/domain reaches for nothing ambient', () => {
     });
 
     const bare = [...specifiers].filter((specifier) => !specifier.startsWith('.')).sort();
-    expect(bare).toEqual(['zod']);
+    expect(bare).toEqual(['ts-fsrs', 'zod']);
   });
 
-  it('declares zod as an exact pinned dependency', () => {
+  it('imports ts-fsrs from the scheduler wrapper and nowhere else (REQ-SCH-01)', () => {
+    // One scheduler implementation. The lint rule stops other *packages* from
+    // importing it; this stops a second call site appearing inside the kernel,
+    // where the lint rule deliberately allows it.
+    const importers = files
+      .filter((path) => /from\s+['"]ts-fsrs['"]/.test(code(path)))
+      .map((path) => relative(PACKAGE_ROOT, path))
+      .sort();
+    expect(importers).toEqual(['src/reducers/fsrs-pin.ts', 'src/reducers/memory-state.ts']);
+  });
+
+  it('declares zod and ts-fsrs as exact pinned dependencies', () => {
     const manifest = JSON.parse(readFileSync(join(PACKAGE_ROOT, 'package.json'), 'utf8')) as {
       dependencies?: Record<string, string>;
     };
     expect(manifest.dependencies?.['zod']).toMatch(/^\d+\.\d+\.\d+$/);
+    // No caret, no tilde: controller §6.3 pins the scheduler exactly, because a
+    // patch bump that changed an interval would change recorded evidence.
+    expect(manifest.dependencies?.['ts-fsrs']).toBe('5.4.1');
   });
 });
 
 describe('the injection seam is the only way time and identity enter', () => {
   it('routes every envelope stamp through DomainContext', () => {
-    // The factory is the one place that mints eventId/occurredAt. If a second
-    // place appears, this assertion is where the review conversation starts.
     const factories = code(join(SRC_ROOT, 'events', 'factories.ts'));
     expect(factories).toMatch(/context\.ids\.nextId\('event'\)/);
     expect(factories).toMatch(/context\.clock\.now\(\)/);
+  });
 
-    const minters = files.filter((path) => /\bclock\s*\.\s*now\s*\(/.test(code(path)));
-    expect(minters.map((path) => relative(PACKAGE_ROOT, path))).toEqual([
-      'src/events/factories.ts',
-    ]);
+  /**
+   * There are exactly two minters, and the split is the evidence boundary
+   * itself (REQ-ARCH-04).
+   *
+   * `events/factories.ts` builds every non-evidence family and refuses the
+   * evidence ones at the type level; `evidence/mint.ts` is the only thing that
+   * can build an evidence-class event, because whether an observation counts is
+   * the gate's judgement and a generic constructor would route around it.
+   *
+   * WP-02 asserted this list had one entry. Two is not a relaxation: an
+   * exhaustive list of two named files is a stronger claim than one file plus
+   * an unenforced convention about where the second one may appear.
+   */
+  it('mints envelopes in exactly two places: the generic factory and the evidence gate', () => {
+    const minters = files
+      .filter((path) => /\bclock\s*\.\s*now\s*\(/.test(code(path)))
+      .map((path) => relative(PACKAGE_ROOT, path))
+      .sort();
+    expect(minters).toEqual(['src/events/factories.ts', 'src/evidence/mint.ts']);
   });
 });

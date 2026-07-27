@@ -95,6 +95,8 @@
     ],
     "contracts": [],
     "observations": [],
+    "gateDecisions": [],
+    "memoryStates": [],
     "sessions": [],
     "exports": [],
     "purges": []

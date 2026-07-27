@@ -22,6 +22,8 @@ export const DOMAIN_ERROR_CODES = [
   'ILLEGAL_PROMOTION_TRANSITION',
   'REDUCER_INVARIANT',
   'EVIDENCE_FACTORY_BOUNDARY',
+  'CONTRACT_VALIDATION_FAILED',
+  'CANDIDATE_NOT_EVIDENCE',
 ] as const;
 
 export type DomainErrorCode = (typeof DOMAIN_ERROR_CODES)[number];
@@ -247,5 +249,46 @@ export class EvidenceFactoryBoundaryError extends DomainError {
       `${eventType} is an evidence-class event; only @bunki/domain/src/evidence (the evidence gate, WP-06) may construct one (REQ-ARCH-04). The generic event factory deliberately cannot.`,
     );
     this.eventType = eventType;
+  }
+}
+
+/** A `RetrievalContract` that is well-formed as a record but not scorable (WP-06). */
+export class ContractValidationError extends DomainError {
+  readonly contractId: string;
+  readonly issues: readonly EventValidationIssue[];
+
+  constructor(contractId: string, issues: readonly EventValidationIssue[]) {
+    const detail = issues
+      .map((issue) => `${issue.path === '' ? '<root>' : issue.path}: ${issue.message}`)
+      .join('; ');
+    super(
+      'CONTRACT_VALIDATION_FAILED',
+      `RetrievalContract ${contractId} does not satisfy REQ-DM-05 — ${detail}`,
+    );
+    this.contractId = contractId;
+    this.issues = issues;
+  }
+}
+
+/**
+ * REQ-ARCH-04 / T-09 runtime backstop: an AI candidate was offered to the
+ * evidence gate.
+ *
+ * The type system already makes `Candidate*` unassignable to the gate's inputs
+ * (`CandidateAttached` and `CandidateAcceptedAsNote` are deliberately outside
+ * `EVIDENCE_EVENT_TYPES`, WP-02). This error is what catches the same attempt
+ * arriving through `any`, `JSON.parse`, or a provider response that a caller
+ * forwarded without looking. AI may nominate and propose; it may never produce
+ * an observation of what a learner did (REQ-SCH-03).
+ */
+export class CandidateEvidenceBoundaryError extends DomainError {
+  readonly marker: string;
+
+  constructor(marker: string) {
+    super(
+      'CANDIDATE_NOT_EVIDENCE',
+      `Refused: the value offered to the evidence gate carries the AI-candidate marker ${JSON.stringify(marker)}. AI output is never evidence and can never reach memory state (REQ-ARCH-04, REQ-SCH-03, T-09).`,
+    );
+    this.marker = marker;
   }
 }
