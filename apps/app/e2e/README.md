@@ -45,18 +45,18 @@ hold one at once and neither lane can collide with the other.
 
 ## What is in here
 
-| File                           | Lane  | Test                | Asserts                                                                                                                                                                                                                                                                      |
-| ------------------------------ | ----- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File                           | Lane  | Test                | Asserts                                                                                                                                                                                                                                                                        |
+| ------------------------------ | ----- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `closed-loop.spec.ts`          | E2E   | **T-17**            | the whole REQ-PH-01 loop, walked by clicking: capture → durable thread (reload) → bounded AI candidate → explicit promotion → retrieval contract → scored review → contextual reuse in the canvas → finite session end → reload → inspect the chain → export → replay equality |
-| `candidate-label.spec.ts`      | E2E   | **T-12** (E2E half) | generated text never reaches the DOM without its label, visually and structurally, before and after acceptance                                                                                                                                                                |
-| `finite-session.spec.ts`       | E2E   | **T-13** (E2E half) | the plan is the same size after every interaction as it was when composed, and the sitting reaches an explicit `SessionClosed` state — including a normally-finished sitting recorded as `completed`                                                                          |
-| `adv-offline-storm.spec.ts`    | T3    | **T-10**            | the whole loop with every off-origin request severed, and the assertion that the bundle attempts no network at all                                                                                                                                                            |
-| `adv-ai-timeout-storm.spec.ts` | T3    | **T-11**            | a genuine 10 s runtime timeout, driven through the shipped code, that neither blocks nor loses a capture                                                                                                                                                                      |
-| `adv-restart-storm.spec.ts`    | T3    | **T-16-web**        | twelve reload cycles, five force-quit cycles, a kill on the acknowledgment                                                                                                                                                                                                    |
-| `adv-a11y-audit.spec.ts`       | T4    | —                   | axe WCAG A/AA on every route in light and dark, focus order and visibility, touch targets, accessible names, ruby read once, per-route document titles (WCAG 2.4.2), bounded mounted-screen count across repeated navigation                                                   |
-| `adv-claim-audit.spec.ts`      | T4    | —                   | REQ-GATE-03 forbidden-claim grep over the shipped bundle; seed disclosure and AI-candidate labels wherever generated or unreviewed content renders                                                                                                                            |
-| `adv-known-defects.spec.ts`    | T3/T4 | —                   | the defects these lanes found, asserted as the behaviour that _ought_ to hold, annotated `test.fail()` while they stand                                                                                                                                                       |
-| `support/*`                    | —     | —                   | the two drivers described above                                                                                                                                                                                                                                              |
+| `candidate-label.spec.ts`      | E2E   | **T-12** (E2E half) | generated text never reaches the DOM without its label, visually and structurally, before and after acceptance                                                                                                                                                                 |
+| `finite-session.spec.ts`       | E2E   | **T-13** (E2E half) | the plan is the same size after every interaction as it was when composed, and the sitting reaches an explicit `SessionClosed` state (one of the three; _which_ of the three is pinned by `adv-known-defects.spec.ts` T3-1)                                                    |
+| `adv-offline-storm.spec.ts`    | T3    | **T-10**            | the whole loop with every off-origin request severed, and the assertion that the bundle attempts no network at all                                                                                                                                                             |
+| `adv-ai-timeout-storm.spec.ts` | T3    | **T-11**            | a genuine 10 s runtime timeout, driven through the shipped code, that neither blocks nor loses a capture                                                                                                                                                                       |
+| `adv-restart-storm.spec.ts`    | T3    | **T-16-web**        | twelve reload cycles, five force-quit cycles, a kill on the acknowledgment                                                                                                                                                                                                     |
+| `adv-a11y-audit.spec.ts`       | T4    | —                   | axe WCAG A/AA on every route in light and dark, focus order and visibility, touch targets, accessible names, ruby read once, and a distinct non-empty document title per route (WCAG 2.4.2)                                                                                    |
+| `adv-claim-audit.spec.ts`      | T4    | —                   | REQ-GATE-03 forbidden-claim grep over the shipped bundle; seed disclosure and AI-candidate labels wherever generated or unreviewed content renders                                                                                                                             |
+| `adv-known-defects.spec.ts`    | T3/T4 | —                   | the defects these lanes found, asserted as the behaviour that _ought_ to hold: annotated `test.fail()` while open, kept as regression pins once fixed — including the bounded mounted-screen count (T3-2) and `completed` reaching the end screen (T3-1)                       |
+| `support/*`                    | —     | —                   | the two drivers described above                                                                                                                                                                                                                                                |
 
 T-12's and T-13's other halves are unit tests owned by WP-07 and WP-08
 (`apps/app/test/candidate-labeling.test.ts`,
@@ -84,10 +84,14 @@ mounted, collapsed and `aria-hidden`, so a plain test id can resolve to a stack
 of same-id nodes with exactly one on screen. Both drivers filter to the visible
 one (`live()` in `support/app.ts`, `visibleTestId` in `support/adv-harness.ts`).
 `.first()` is wrong here — it sometimes picks a hidden ancestor screen and
-asserts against a stale render. As of the WP-10 closeout the nav shell navigates
-rather than pushes, so the stack no longer grows without bound
-(`adv-a11y-audit.spec.ts` pins that); the helpers remain because the router still
-keeps the screen behind you mounted.
+asserts against a stale render.
+
+As of the WP-10 closeout the nav shell uses `router.replace`, so switching
+between its four destinations unmounts the screen you left instead of stacking
+it (`adv-known-defects.spec.ts` T3-2 pins the bound). The helpers stay, and are
+still the right default: every other link in the app pushes, because those are
+genuine stack moves — a word page opened from a search comes back to that
+search, and the search screen is still mounted underneath it.
 
 **`test.fail()` for known defects, never a weakened assertion.** A defect these
 lanes find is written down as the _correct_ expectation and annotated. Playwright

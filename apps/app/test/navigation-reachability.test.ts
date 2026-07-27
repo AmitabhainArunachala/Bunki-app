@@ -49,10 +49,24 @@ function walk(dir: string): string[] {
 
 const read = (file: string): string => readFileSync(file, 'utf8');
 
-/** Route files, relative to `apps/app/app/`, excluding expo-router layouts. */
+/**
+ * Route files, relative to `apps/app/app/`.
+ *
+ * Two kinds of file live in `app/` without being routes, and both are excluded
+ * by name rather than by a pattern loose enough to hide a real screen:
+ *
+ *   - `_layout.tsx` — expo-router layouts. They wrap routes; they are not
+ *     destinations and have no href.
+ *   - `+html.tsx` — the static-export HTML shell (the `+` prefix is
+ *     expo-router's own marker for a file that is not a route). It renders
+ *     `<html>`, not a screen, and exists only to carry the export's `<head>`.
+ *
+ * Anything else new in `app/` must appear in `DESTINATIONS`, which is the point
+ * of this test: a screen with no door fails here rather than in someone's hands.
+ */
 const routeFiles = walk(ROUTES_ROOT)
   .map((file) => relative(ROUTES_ROOT, file))
-  .filter((file) => !file.endsWith('_layout.tsx'))
+  .filter((file) => !file.endsWith('_layout.tsx') && !file.endsWith('+html.tsx'))
   .sort();
 
 describe('every route is on the map', () => {

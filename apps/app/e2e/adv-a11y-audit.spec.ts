@@ -22,15 +22,26 @@
  *
  * Two tests cover the axe scan, deliberately:
  *
- *   - **"no new violation"** passes today. It allows exactly the rule ids in
+ *   - **"no new violation"** allows exactly the rule ids in
  *     {@link KNOWN_AXE_FINDINGS} and nothing else, so any *other* violation
  *     introduced later turns this red.
- *   - **"no violation at all"** is annotated `test.fail()`. It is the goal
- *     state, it is currently failing on a real defect, and Playwright reports a
- *     surprise pass as a failure — so when the defect is fixed, this suite
- *     forces someone to delete the annotation and the exemption together.
+ *   - **"no violation at all"** is the goal state. It carried a `test.fail()`
+ *     while T4-1 was open; Playwright reports a surprise pass as a failure, so
+ *     fixing the defect forced the annotation and the exemption to be deleted
+ *     in the same change. That is what happened in the W5 closeout, and
+ *     {@link KNOWN_AXE_FINDINGS} is now empty.
  *
- * That shape is why the exemption cannot rot into a permanent excuse.
+ * That shape is why the exemption could not rot into a permanent excuse.
+ *
+ * ## What the axe scan measures, and what it therefore does not cover
+ *
+ * These scans run on the **hydrated** page, which is what a person interacts
+ * with and what axe is defined against. It is not the same thing as the bytes
+ * `expo export` writes: the static export still ships an empty `<title>`,
+ * because expo-router's `Head` is focus-gated and does not render during static
+ * pre-rendering. That residual is pinned separately, as its own annotated
+ * expectation, in `adv-known-defects.spec.ts` (T4-1b). Nothing here should be
+ * read as a claim about pre-hydration markup.
  */
 
 import AxeBuilder from '@axe-core/playwright';
@@ -60,14 +71,14 @@ const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;
  * to it is how a lane stops being adversarial, so each entry names the finding
  * that has to be closed to remove it.
  *
- *   - `document-title` — **finding T4-1**. Every exported page ships
- *     `<title data-rh="true"></title>`: an element that exists and is empty. No
- *     route sets one, so every tab, bookmark and window-switcher entry for this
- *     app is blank. WCAG 2.4.2 (Level A).
+ * **It is empty, and that is the point.** Its one entry was `document-title`
+ * (finding T4-1: every page shipped `<title data-rh="true"></title>`, WCAG 2.4.2
+ * Level A, the only axe violation across eighteen scans). The W5 closeout gave
+ * every route a real title through `src/ui/route-title.tsx`, so the entry and
+ * the `test.fail()` that guarded it were both deleted here. A future defect adds
+ * a line back; nothing is grandfathered.
  */
-const KNOWN_AXE_FINDINGS: Readonly<Record<string, string>> = {
-  'document-title': 'T4-1: every exported page has an empty <title> element (WCAG 2.4.2, Level A)',
-};
+const KNOWN_AXE_FINDINGS: Readonly<Record<string, string>> = {};
 
 interface AxeSummary {
   readonly route: string;
@@ -131,19 +142,56 @@ for (const scheme of ['light', 'dark'] as const) {
   });
 }
 
-test('axe: no violation at all (the goal state — currently failing on T4-1)', async ({
-  page,
-  app,
-}) => {
-  // Expected to fail. When this starts passing, Playwright reports it as a
-  // failure, and whoever fixed T4-1 removes this annotation and the entry in
-  // KNOWN_AXE_FINDINGS in the same change.
-  test.fail(true, 'T4-1: every exported page ships an empty <title> element (WCAG 2.4.2, Level A)');
+test('axe: no violation at all, on any route, in either scheme', async ({ page, app }) => {
   const violations = [
     ...(await scanEveryRoute(page, app.origin, 'light')),
     ...(await scanEveryRoute(page, app.origin, 'dark')),
   ];
   expect(violations, `WCAG A/AA violations:\n${render(violations)}`).toEqual([]);
+});
+
+/* ------------------------------------------------------------------ *
+ * Document titles (WCAG 2.4.2) — the closed T4-1, asserted positively
+ * ------------------------------------------------------------------ */
+
+/**
+ * axe's `document-title` rule only asks whether a non-empty title exists. That
+ * is a low bar and it is not the whole of what T4-1 was about: the harm was
+ * blank tabs, blank bookmarks and blank history entries, which a single shared
+ * title would technically satisfy while leaving a learner unable to tell two
+ * saved pages apart.
+ *
+ * So this asserts the properties the rule does not: every route has a title,
+ * every title names its route, and no two routes share one. Written against
+ * `ROUTES` rather than a fixed list, so a new route with no title fails here
+ * instead of being discovered by a person with thirteen identical tabs open.
+ */
+test('every route has its own non-empty document title (WCAG 2.4.2)', async ({ page, app }) => {
+  const seen = new Map<string, string>();
+
+  for (const route of ROUTES) {
+    await openApp(page, app.origin, route);
+    await hydrated(page);
+    // The title is set by `RouteTitle` on mount, so it settles with hydration
+    // rather than with load; `toHaveTitle` retries, a bare read would race it.
+    await expect(page, `route ${route} has no usable document title`).not.toHaveTitle('');
+    const title = await page.title();
+
+    expect(title.trim(), `route ${route} has a blank title`).not.toBe('');
+    expect(title, `route ${route} leaks an internal id into its title`).not.toMatch(
+      /\b(contract|thread|component|session|step|canvas|lex)-[a-z0-9-]+/,
+    );
+
+    const collision = seen.get(title);
+    expect(
+      collision,
+      `routes ${String(collision)} and ${route} share the title "${title}", so their tabs, ` +
+        'bookmarks and history entries are indistinguishable',
+    ).toBeUndefined();
+    seen.set(title, route);
+  }
+
+  expect(seen.size, 'every route should have contributed a distinct title').toBe(ROUTES.length);
 });
 
 /* ------------------------------------------------------------------ *

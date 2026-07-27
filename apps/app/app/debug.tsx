@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { InspectorDebugScreen } from '@/screens/inspector-debug-screen';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/debug` — the local diagnostic buffer (controller §12).
@@ -12,5 +13,10 @@ import { InspectorDebugScreen } from '@/screens/inspector-debug-screen';
  */
 export default function DebugRoute(): ReactNode {
   const router = useRouter();
-  return <InspectorDebugScreen onBack={() => router.push('/evidence')} />;
+  return (
+    <>
+      <RouteTitle href="/debug" />
+      <InspectorDebugScreen onBack={() => router.push('/evidence')} />
+    </>
+  );
 }

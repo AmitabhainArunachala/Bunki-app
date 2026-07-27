@@ -3,6 +3,7 @@ import { type ReactNode } from 'react';
 
 import { SessionScreen } from '@/screens/session-screen';
 import { createRuntimeContext } from '@/state/runtime';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/session` — the finite sitting (controller §10 screen 4).
@@ -19,11 +20,14 @@ export default function SessionRoute(): ReactNode {
   const router = useRouter();
 
   return (
-    <SessionScreen
-      context={context}
-      onBack={() => router.push('/')}
-      onOpenCanvas={() => router.push('/canvas')}
-      onOpenRepair={() => router.push('/repair')}
-    />
+    <>
+      <RouteTitle href="/session" />
+      <SessionScreen
+        context={context}
+        onBack={() => router.push('/')}
+        onOpenCanvas={() => router.push('/canvas')}
+        onOpenRepair={() => router.push('/repair')}
+      />
+    </>
   );
 }

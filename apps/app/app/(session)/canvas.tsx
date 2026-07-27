@@ -3,6 +3,7 @@ import { type ReactNode } from 'react';
 
 import { CanvasScreen } from '@/screens/canvas-screen';
 import { createRuntimeContext } from '@/state/runtime';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/canvas` — the integration canvas (controller §10 screen 5).
@@ -14,5 +15,10 @@ const context = createRuntimeContext();
 
 export default function CanvasRoute(): ReactNode {
   const router = useRouter();
-  return <CanvasScreen context={context} onBack={() => router.push('/session')} />;
+  return (
+    <>
+      <RouteTitle href="/canvas" />
+      <CanvasScreen context={context} onBack={() => router.push('/session')} />
+    </>
+  );
 }
