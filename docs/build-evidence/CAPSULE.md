@@ -718,6 +718,223 @@ credentials; every URL in the fetch script is public and unauthenticated.
 - Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
 - Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
 
+## WP-03 / Builder B4 — W3 (appended 2026-07-27)
+
+### Integrity (re-verified this session, before the first edit)
+
+- Controller sha256 observed: `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` — matches the launcher's expected value.
+- v2 design authority sha256 observed: `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` — matches the controller header.
+- Read in full before the first edit: launcher, controller (§7 persistence and §11 export in full, plus §0/§3/§5/§6/§16/§17/§18/§21), orchestration spec §2 ground rules + §4 role cards, `ORCHESTRATION_LOG.md` (W3 surface lock, W2 dispositions), ADR-001, ADR-002, VERIFY_WP01/02/04, and the WP-02 domain surface this WP consumes.
+
+### Stacking (recorded per instruction)
+
+This branch is **stacked**, not cut from `main`. Base:
+`origin/agent/bunki-phase0-integration` @ `755c090557cffbe0f316445b77c74a0a909d9a46`
+("WP02+WP04(CON): close wave W2"), because WP-01/02/04 are verified but not yet
+merged to `main` and WP-03 depends on WP-02's event catalog and replay harness
+(controller §3.1 permits explicit stacking; it must be stated in the PR body).
+Branch: `agent/bunki-phase0-closed-loop-wp03`.
+
+### Surfaces touched
+
+`packages/persistence/**`, `packages/export/**`, this capsule section, and two
+root files:
+
+- `package.json` — **the `verify:export` script line only**, which the WP-03 role
+  explicitly authorises and which controller §18 WP-01 requires be replaced by its
+  owning WP (leaving a placeholder past its owner is a closure-predicate failure).
+  `node scripts/not-implemented.mjs verify:export WP-03` →
+  `vitest run packages/export/test/verify-export.test.ts`.
+- `package-lock.json` — mechanical consequence of `packages/*/package.json`
+  declaring their own dependencies (`@bunki/domain`, `@bunki/export`,
+  `@types/node@26.1.1`, `zod@4.4.3`). Same class of touch W2 recorded and CON
+  accepted. **Coordination note to CON:** npm nests `zod@4.4.3` under
+  `packages/export/node_modules` because the hoisted root `zod` is `3.25.76`
+  (pulled in by the Expo tree); this is correct resolution, not drift.
+
+No frozen doc touched (`docs/specs/`, `docs/convergence/`, `docs/handoffs/`,
+`docs/adr/` all untouched). No other lane's surface touched: `packages/domain/`
+(B5), `apps/app/` (B6), `packages/seed/` (locked read-only) are unmodified —
+`git diff --stat` against the base confirms it.
+
+### WP-03 closure predicate status (controller §18)
+
+| Predicate item                                                                                     | Status                                | Evidence                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ports per §7 — `append(events,{idempotencyKey})`, `readAll`, `readStream`, `snapshot`, `exportJson` + `QueryPort` | met                                   | `packages/persistence/src/port.ts` (exactly the five §7 methods; everything else on the read-only `QueryPort`)                                                  |
+| A shared port contract-test suite any adapter must pass                                             | met                                   | `packages/persistence/src/contract/suite.ts` — 20 cases, framework-free, in `src/` so WP-11 can run the identical list on a device                              |
+| sqlite adapter (native authority) with the §7 CI-substitute mechanism                               | met                                   | one adapter `src/sqlite/adapter.ts`; drivers `expo-driver.ts` (native) / `node-driver.ts` (`node:sqlite`); every substitute test name carries `ci-substitute`   |
+| Provisional web adapter, labeled provisional in code and README                                     | met                                   | `src/web/adapter.ts` (`ProvisionalWebEventStore`, `runtimeLabel: 'web-provisional'`, `PROVISIONAL_WEB_ADAPTER_NOTICE`), README §Runtime honesty                 |
+| Migration runner: forward + **down-migrations exercised in tests**                                  | met                                   | `src/migrations/{types,runner,schema}.ts`; `test/migrations.test.ts` drives every migration up→down→up against a canonical `sqlite_master` fingerprint          |
+| Refuses destructive migration without verified rollback (§21.3(7))                                  | met                                   | `DestructiveMigrationWithoutRollbackError`; refuses a missing `down` **and** a `destructive:false` flag that disagrees with the SQL (`classifyStatements`)      |
+| Idempotent append; conflicting payload under one key = typed error, matching WP-02                  | met                                   | `src/append-plan.ts` throws `@bunki/domain`'s own `IdempotencyConflictError`/`DuplicateEventIdError`; `test/idempotency.test.ts` asserts each outcome twice — once via the store, once via `replay` |
+| Tombstone-then-purge; purge physically removes payload bytes; audit trail survives                  | met                                   | `src/purge.ts` + both adapters; `test/deletion.test.ts` scans the raw `.db`/`-wal`/`-shm` files                                                                 |
+| `packages/export` envelope `{exportVersion:1, generatedAt, events, seedRefs, appVersions}`          | met                                   | `packages/export/src/envelope.ts`; `generatedAt` from the injected clock                                                                                        |
+| `npm run verify:export` is REAL (T-14 skeleton)                                                     | met                                   | root script → `packages/export/test/verify-export.test.ts`; replays through `@bunki/domain` and asserts derived-state equality against **live stores**, both adapters, incl. a negative control |
+| T-01 (append immediate + durable across adapter reopen)                                             | met (`ci-substitute`, `web-provisional`) | contract case `append-is-immediate-and-durable-across-reopen`                                                                                                   |
+| T-16-web (restart simulation)                                                                       | met                                   | contract case `restart-preserves-the-whole-log-and-its-streams` + `test/t16-web-restart.test.ts` (full page-reload simulation)                                  |
+| Provenance survives the store round trip (feeds T-15)                                               | met                                   | contract case `provenance-survives-the-store-round-trip`; `seedRefs` surfaces licence obligations at the envelope's top level                                   |
+| Uses `@bunki/domain`'s replay harness; reduction NOT reimplemented                                  | met                                   | `replay` imported in `append-plan.ts`, `adapter.ts`, `web/adapter.ts`, `export/src/verify.ts`; no reduction logic in either package                             |
+
+### Commands run (verbatim results)
+
+| Command                                     | Result                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `npm ci` then `npm install`                 | clean; 712 packages audited; 1 package added                                        |
+| `npm run lint`                              | **pass**, 0 problems                                                                |
+| `npm run format:check`                      | **pass**, "All matched files use Prettier code style!"                              |
+| `npm run typecheck`                         | **pass**, 6/6 workspaces, 0 errors                                                  |
+| `npm run test`                              | **pass** — 31 files, **451/451 tests** (was 328 at the W2 base; +123 from WP-03)    |
+| `npm run test:replay`                       | **pass** — 2 files, 43/43                                                           |
+| `npm run verify:export`                     | **pass** — 1 file, **10/10** (no longer a placeholder)                              |
+| `npm run test:e2e`                          | still the WP-10 placeholder, exits 0 with its "not evidence of anything working" banner |
+| `(cd apps/app && npx expo export --platform web)` | **pass** — 3 static routes, bundle 1.1MB, `Exported: dist`                     |
+
+### Runtime-claim honesty (P0-CAP-15, controller §7 — read this before quoting any result above)
+
+- Every SQLite test name begins `[ci-substitute]`. That is evidence about the
+  SQL, the transactions, the invariants, and reopen durability. It is **not**
+  evidence about iOS, about `expo-sqlite`, or about a device.
+- Every web test name begins `[web-provisional]`. Web persistence is never
+  reported as native persistence.
+- **T-16 native is UNVERIFIED.** It is WP-11's claim and only WP-11's. Nothing in
+  this WP contributes to it.
+- No test in this WP emits a passing `[native]` name. The `expo-sqlite` binding is
+  tested against a recording fake and labeled "shape only — NOT native
+  verification"; running the contract suite through it would have minted a
+  `native`-labeled store in CI, which is the false assurance §7 forbids.
+
+### Driver choice, verified from the registry and recorded (controller §14)
+
+- **Chosen: `node:sqlite`** (`DatabaseSync`), built into Node. Verified working on
+  the pinned toolchain **node v22.22.2** (the major CI selects via
+  `actions/setup-node@v4`, `node-version: '22'`). Available since Node 22.5.0;
+  experimental in Node 22 (emits `ExperimentalWarning`). **No npm dependency
+  added** — nothing new constrains OD-09; it ships under Node's own MIT licence.
+  Pinned by the Node major, and guarded at runtime by `DriverUnavailableError`
+  so a runtime without it fails loudly instead of silently substituting.
+- **Rejected: `better-sqlite3`**, verified from the npm registry as version
+  **13.0.1**, licence **MIT** (`npm view better-sqlite3 version license`,
+  2026-07-27). Compatible and acceptable; not taken because it is a native addon
+  needing `node-gyp` in every CI run, and adding a dependency to support a
+  _substitute_ for a runtime we explicitly do not claim to have verified is cost
+  without evidence.
+- `expo-sqlite` re-verified from the registry: **57.0.1, MIT** (matches the WP-00
+  register). **Deliberately not installed** — see the WP-11 obligation below.
+
+### Two defects found by this WP's own tests, and fixed
+
+1. **The idempotency table retained purged content.** The batch fingerprint was
+   the canonical JSON of the batch, stored verbatim, so `bunki_append_batches`
+   held a copy of every event ever appended. Emptying `bunki_events` left the
+   learner's encounter text intact one table over — the store would have reported
+   a completed deletion while the bytes were on disk. Fixed by storing a SHA-256
+   digest (`src/hash.ts`, no platform API, cross-checked against `node:crypto` in
+   `test/hash.test.ts` over 14 inputs incl. block boundaries and surrogate pairs)
+   **and** by dropping batch rows that reference purged events. Found only
+   because the contract suite's purge case reads raw storage bytes rather than
+   asking the port; that is why `AdapterHarness.rawStorageDump()` exists.
+2. **SQLite retained purged bytes at the file level.** `UPDATE` frees the old cell
+   without erasing it, and WAL keeps pre-update page images. Fixed with
+   `PRAGMA secure_delete = ON` at open, plus `PRAGMA wal_checkpoint(TRUNCATE)` and
+   `VACUUM` after any batch that purged — run _after_ the commit, so a crash in
+   between leaves a purge that is recorded and re-runnable rather than neither.
+
+### Interpretation choices recorded (controller §0.3 — conservative reading, surfaced not silent)
+
+1. **`seedRefs` (controller §11 names the field, does not define its shape).**
+   Read as a _derived_ index of the source/licence references the exported events
+   actually cite, collected from each `EncounterCaptured`'s `sourceRef` and
+   `provenance`, deduplicated and sorted. It asserts nothing the events do not
+   already contain, so it cannot drift from them, and it makes T-15 answerable by
+   inspection. The alternative reading — an injected `@bunki/seed` manifest —
+   would let an export _claim_ provenance its events do not carry. **CON: flag to
+   WP-09 in case the inspector expects the other reading.**
+2. **`appVersions.fsrs` is `null` in this build.** No scheduler is pinned yet; the
+   pin is WP-06's (controller §6.3). A plausible-looking version string would be a
+   claim about a component that does not exist. The field is wired end to end —
+   WP-06/WP-05 pass the real pin through `EventStoreConfig.appVersions`.
+3. **`readStream` takes a discriminated selector** (`{threadId}` | `{contractId}`)
+   rather than a bare string, because §7's `readStream(threadId|contractId)` is
+   ambiguous for two opaque id spaces that can collide.
+4. **The derived-state cache never answers `snapshot()`.** §7 asks for cache
+   tables "rebuilt from replay"; they exist and are written on append, but
+   `snapshot()` always replays and the cache is read only by
+   `derivedStateCacheMeta()`. Conservative reading of §21.4: a cache that can
+   answer is a second source of truth.
+5. **No destructive migration ships in Phase 0.** All three forward migrations are
+   additive; the §21.3(7) guard is exercised with fixture migrations that really
+   are destructive, rather than putting a demonstration one-way door in a real
+   user's upgrade path.
+
+### Coordination requests to CON (not acted on — outside WP-03's surface)
+
+1. **P1 — architectural gap, blocks WP-05/WP-09 wiring.** ADR-001 B2 forbids
+   `apps/app` from importing `@bunki/persistence` _at all_, and controller §5
+   makes `@bunki/domain` pure (no sibling packages). No package may therefore
+   both construct a store and be reachable from the app. Someone must own the
+   composition seam before the UI can persist anything. Options, cheapest first:
+   (a) a thin `@bunki/composition` package that the app may import; (b) a single
+   named wiring module under `apps/app` with an ADR-level lint exception;
+   (c) inject a store instance at the app entry point from a non-app module.
+   **This is an ADR-001 amendment path, which is an escalation, not an edit** —
+   WP-03 has not touched it.
+2. **P2 — `docs/build-evidence/TEST_PLAN.md` (CON-owned) is now stale**: the
+   script-status table still lists `verify:export` as "placeholder, exits 0", and
+   the T-01/T-14/T-16 rows should record their WP-03 halves as met. Not edited —
+   not WP-03's surface.
+3. **P2 — `.github/workflows/ci.yml` (WP-01/WP-10) does not run `verify:export`.**
+   It is real now, so CI omitting it means T-14 is unguarded between PRs. WP-10
+   owns the CI extension per its closure predicate; flagging so it is not lost.
+4. **P2 — no §15 pre-commit secret hook is installed** (`.git/hooks` is empty, no
+   husky). WP-01 recorded the requirement; nothing enforces it. Related: this WP
+   renamed its purge canary from `SECRET_ENCOUNTER_TEXT` to `PURGE_CANARY_TEXT`
+   so the fixture will not trip that hook once it exists.
+
+### WP-11 obligations inherited from this WP (record in the native checkpoint doc)
+
+1. Install `expo-sqlite@57.0.1` on the device build and compile
+   `src/sqlite/expo-driver.ts` against its **own** typings. This package declares
+   the four-method subset rather than importing it, so upstream signature drift is
+   invisible to CI by construction.
+2. Run `runPortContractSuite(deviceHarness)` — the identical 20-case list, no
+   framework needed — and report the results as native evidence. A device harness
+   needs `open()`, `rawStorageDump()`, `reset()`, `dispose()`.
+3. Confirm on device what CI cannot: WAL behaviour under backgrounding, and that
+   `secure_delete` + `VACUUM` remove purged bytes from the real filesystem.
+
+### Secrets check (controller §15)
+
+Staged diff scanned for
+`api[_-]?key|secret|bearer|password|passwd|token|private[_-]?key`, excluding
+`package-lock.json`: **0 matches** after the canary rename. No `.env`, no
+credentials, no network calls in either package.
+
+### Next safe command
+
+- V4 verifies WP-03 from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay && npm run verify:export`,
+  then `git diff --stat 755c090` to confirm no surface outside
+  `packages/persistence/`, `packages/export/`, the `verify:export` script line,
+  the lockfile, and this capsule section was touched.
+- Paraphrase-audit target for V4: the contract suite's purge case
+  (`tombstone-then-purge-removes-content-bytes-and-keeps-the-audit-trail`) — it
+  must assert against **raw storage bytes**, not against what the port reports, or
+  it does not assert what the controller says it asserts.
+- WP-05/WP-09 may consume `@bunki/export` freely; they may consume
+  `@bunki/persistence` only once coordination request 1 above is resolved.
+
+### Open items carried forward
+
+- T-16 **native**: UNVERIFIED. WP-11 only.
+- T-14 full (export button in the inspector, round trip driven from the UI):
+  WP-09. This WP delivered the skeleton the controller asked for.
+- T-15 full: WP-09. This WP proves provenance survives the store round trip and
+  surfaces licence obligations in `seedRefs`.
+- `appVersions.fsrs` stays `null` until WP-06 pins the scheduler.
+- Repository license remains **pending operator decision** (OD-09); recorded in
+  both package READMEs.
+
 ## WP-06 / Builder B5 — W3 (appended 2026-07-27)
 
 ### Stacking and provenance (controller §3.1)
@@ -864,3 +1081,438 @@ No efficacy, burden-reduction, retention, or "scientifically optimized" claim ap
 
 - V2 verifies WP-06 from a clean checkout of this branch: `git checkout agent/bunki-phase0-closed-loop-wp06 && npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay`, then `git diff --stat 755c090..HEAD` to confirm no surface outside `packages/domain/**` (plus the lockfile and this capsule) was touched, then walk the controller §6.2 bullet list against `packages/domain/test/evidence/`.
 - INT may stack this branch onto the integration branch after WP-01/02/04.
+
+## Appendix — WP-05 (Builder B6): capture/search and layered word/kanji pages
+
+**Agent:** B6 (Builder, WP-05) · **Wave:** W3 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp05`
+**Surfaces touched:** `apps/app/` only, plus `docs/build-evidence/screenshots-wp05/`
+and this appendix. Root `package-lock.json` moved mechanically (see deviations).
+
+### Integrity (launcher step 1, controller §0)
+
+Verified on this checkout before any edit:
+
+| File | SHA-256 | Matches integrity record |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` | yes |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` | yes |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71` | yes |
+| `docs/specs/BUNKI_PHASE0_FRESH_AGENT_LAUNCHER_2026-07-27.md` | `b0a6811d8e8fda6c2d5f1c7c1743cdb2355eae58b58e834787b79629e378fce7` | yes |
+
+### Stacking (controller §3 rule 1)
+
+Branched from `origin/agent/bunki-phase0-integration` at **`755c090`** — WP-01,
+WP-02 and WP-04 are verified there but were not yet on `main` when this work
+started. WP-05 depends on WP-02 (`@bunki/domain` events and reducers) and WP-04
+(`@bunki/seed`), so basing on `origin/main` was not possible without them.
+
+Re-checked at the end of the session: `origin/agent/bunki-phase0-integration`
+has since advanced to `f9f4d0e` ("refresh from main, PRs #5/#6/#7 merged",
+`origin/main` = `e02b8b2`). **`git diff --stat 755c090 f9f4d0e` is empty** — the
+advance is merge commits only and the tree is identical, so this branch needs no
+rebase and its checks were run against the same content the integration branch
+now holds.
+
+WP-03 is being built in a parallel lane and is deliberately **not** consumed;
+see deferred item WP05-D1.
+
+### Closure predicate status
+
+| Predicate (controller §19 WP-05) | Status | Evidence |
+| --- | --- | --- |
+| Screens 1–3 functional on Expo Web against seed data | met | `expo export --platform web` green; 26 screenshots of the exported bundle in `docs/build-evidence/screenshots-wp05/` |
+| Capture flow meets REQ-UI-01 (ack before enrichment) | met | shots 03/04/05; `apps/app/test/capture-flow.test.ts` (18 tests) |
+| Layers render with provenance | met | shots 11/12; `apps/app/src/ui/notices.tsx`, `test/provenance-display.test.ts` |
+| loading / error / empty / offline on every screen | met | shots 01,02,07,08,09,14,15,16,17,22,23,24,25; `test/view-state.test.ts`, `test/screen-contract.test.ts` |
+| Screenshot evidence under `docs/build-evidence/` | met | `screenshots-wp05/` + `README.md` index + machine-readable `index.json` |
+| SEED_ENTRY_DISCLOSURE on word and kanji pages | met | shots 11–13, 19–21; asserted in `test/screen-contract.test.ts` |
+| Stroke-order animation from seed KanjiVG SVGs | met | shots 19/20/21; `src/data/kanjivg.ts` + `test/stroke-order.test.ts` (19 tests, parses all 10 real seed files) |
+| Dictionary indices never rendered | met | `test/screen-contract.test.ts` scans every app source file for all eleven index names |
+| Japanese typography: ruby, ink-and-paper, one vermilion accent, no rainbow | met | `src/ui/ruby.tsx`, `src/ui/furigana.ts`, `src/ui/theme.ts`; `test/furigana.test.ts`, `test/theme-contrast.test.ts` |
+| Accessibility: labels, ≥44 pt targets, AA contrast | met | `accessibilityLabel` required by type on every control; `test/touch-targets.test.ts`; `test/theme-contrast.test.ts` (39 assertions, both schemes) |
+| AppStore interface + in-memory impl, no `@bunki/persistence` | met | `src/state/store.ts`, `src/state/memory-store.ts`; lint boundary green; `test/screen-contract.test.ts` import scan |
+| Capture events flow through `@bunki/domain`; app has no scheduling/grading/evidence logic | met | only `memory-store.ts` calls `createDomainEvent`; scan test asserts screens do not; lint boundary green |
+| Expo web export still builds | met | `Exported: dist`, 869 modules, 5 static routes |
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` on the four spec files | 4/4 match the integrity record |
+| `npm install` | 704 + 13 packages added; no blocking failure |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **30 files, 515 tests, all passed** (apps/app contributes 10 files / 189 tests) |
+| `npm run test:replay` | 2 files, 43 tests passed |
+| `npm run test:e2e` | WP-10 placeholder — exits 0 with an explicit "not evidence of anything working" notice |
+| `npm run verify:export` | WP-03 placeholder — same |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 1.4 MB bundle, 5 static routes |
+| `node apps/app/scripts/capture-evidence.mjs` | **26/26 screenshots written**, exit 0 |
+
+### What was built
+
+- **`src/ui/`** — design tokens (ink-and-paper, exactly one vermilion accent),
+  a WCAG contrast module, ruby/furigana rendering with an okurigana anchor
+  walk, interactive primitives with `accessibilityLabel` required by the type
+  system, the four REQ-UI-09 state panels, the stroke-order renderer, and the
+  truth-label components.
+- **`src/data/`** — read-only views over `@bunki/seed`: search/lookup, the
+  KanjiVG stroke parser, provenance wording, and a stroke manifest cross-checked
+  against the seed.
+- **`src/state/`** — the `AppStore` seam, its in-memory implementation, the
+  production `DomainContext`, the lookup state machine, the connectivity
+  observer, and the deferred register.
+- **`src/screens/`** — the three screens.
+- **`app/`** — routes `/`, `/word/[lexemeId]`, `/kanji/[character]`.
+- **`scripts/capture-evidence.mjs`** — the CDP screenshot harness (no new
+  dependency: Node 22's global `WebSocket` plus the DevTools Protocol).
+
+Two defects found and fixed, worth a verifier's attention:
+
+1. **A real hydration bug.** `expo export` statically renders every route with
+   no colour scheme, so a client whose first render disagreed (dark OS, or
+   `?scheme=dark`) hydrated dark content onto the server's light markup — the
+   screen background stayed light under dark cards for every node that never
+   re-rendered. Reproduced in the browser (the scroll container still held the
+   server's `rgba(251,248,243,1.00)` while a card held `rgb(30,27,22)`), fixed
+   by resolving the scheme after mount in `ThemeProvider` and reading it through
+   a component *inside* the provider in `app/_layout.tsx`. This affected real
+   dark-mode users, not only the evidence harness.
+2. **A double-tapped promotion threw.** The kernel rejects `from === to`
+   (REQ-DM-09, correctly), so a second tap on the button that had just promoted
+   a thread would have surfaced a `PromotionTransitionError` to the user.
+   `memory-store.ts` now treats it as the idempotent repeat it is.
+
+### Honesty boundaries held (REQ-GATE-03, P0-CAP-15)
+
+- No screen claims durability. The store reports `in-memory-session-only` and
+  the UI renders that sentence verbatim; T-01 belongs to WP-03.
+- `SEED_ENTRY_DISCLOSURE` comes from `@bunki/seed` and is never retyped
+  (asserted). Every project-authored field renders as "Written for this
+  project · not reviewed · not from a published dictionary" — the wording is
+  driven by `review_status`, so nothing unverified can read like a citation.
+- Layer 2/3 sections the seed cannot fill say what is missing and why, rather
+  than being silently omitted or filled with something plausible.
+- No AI candidate exists on any of these screens; enrichment is a second pass
+  over the bundled seed. `@bunki/ai` is WP-07's.
+- No performance number is claimed; nothing was measured.
+- Web results are labelled web results throughout.
+
+### Deviations from the WP-00 pinned register (surfaced, not silent)
+
+1. **`react-native-svg@15.15.4` added** to `apps/app` dependencies. MIT
+   (`npm view react-native-svg license` → `MIT`, verified this session); pinned
+   exactly to the version `expo@57.0.8` bundles
+   (`expo/bundledNativeModules.json` → `15.15.4`). Not in the controller §14
+   register. It is needed because REQ-UI-03 Layer 0 requires a stroke-order
+   animation, which requires drawing individual bezier paths — nothing else in
+   the dependency set can. Cross-platform (web + native), so it does not
+   prejudge WP-11.
+2. **`@types/node@26.1.1` added** to `apps/app` devDependencies (MIT,
+   type-only). Same package and version WP-02/WP-04 already added; already
+   recorded by CON as a register deviation to re-verify at WP-10. Confined to
+   `tsconfig.test.json`; the app program compiles with **no** Node types, so a
+   Node global in shipped code is a type error.
+3. **`@bunki/domain` and `@bunki/seed` declared** as `apps/app` dependencies.
+   They resolved through workspace hoisting already; declaring them makes the
+   dependency real rather than incidental.
+4. **Root `package-lock.json` modified** — mechanically unavoidable, as with
+   WP-02/WP-04: npm workspaces keep one lockfile. Flagged, not treated as an
+   ordinary in-surface edit.
+
+### Deferred, with owners (also machine-readable in `apps/app/src/state/deferred.ts`)
+
+| Id | Item | Owner | Closes with |
+| --- | --- | --- | --- |
+| WP05-D1 | Swap the in-memory `AppStore` for `@bunki/persistence` | W4 integration | Route appends through the domain command handler to `EventStorePort`, keeping the synchronous local acknowledgment ahead of the durable write; then re-label durability `device-local` and run T-01 |
+| WP05-D2 | The uncertainty *dimension* is not in the event log | CON → ADR-002 decision | ADR-002 amendment widening `uncertaintyMark`, or an explicit ruling that the dimension stays app-local |
+| WP05-D3 | Word layers 2–3 thin; kanji layers 2–3 absent | Operator (egress), then WP-04 | Licensed source data in `packages/seed`; the sections already render from the dataset |
+| WP05-D4 | Native connectivity unobserved (`unknown`, no banner) | WP-11 | A verified network dependency, or a device-measured decision that the banner is unnecessary |
+| WP05-D5 | No Layer 0 audio | WP-04 / later phase | A licence-verified local audio set with per-field provenance |
+
+### Coordination requests (for CON)
+
+1. **ADR-002 / REQ-UI-01 tension — needs a ruling, not an edit.** REQ-UI-01
+   specifies a five-way one-gesture uncertainty mark
+   (`meaning · reading · use · kanji · not sure`). The frozen v1 schema records
+   `EncounterCaptured.uncertaintyMark` as `z.literal(true).optional()` — the
+   *fact* of a mark, not the dimension. WP-05 took the conservative reading
+   (controller §0.3): the UI offers all five, the event records `true`, and the
+   dimension is held app-locally and labelled on screen as not exported.
+   Widening the field is an ADR-002 amendment, which is an escalation. **P1** —
+   the requirement is not fully satisfiable in the log until it is decided.
+2. **`eslint.config.mjs` Node-globals glob is root-only** — the same P2 WP-04
+   raised, second instance. `files: ['scripts/**/*.mjs']` does not reach
+   `apps/app/scripts/*.mjs`. Worked around without touching WP-01's surface by
+   importing `process`, `Buffer` and the timers from `node:` modules in the
+   evidence harness. No change requested; recorded for the WP-10 sweep. **P2**
+3. **Register deviations 1–3 above** need recording in the WP-10 licence pass.
+   **P2**
+4. **`src/data/stroke-sources.ts` reaches `packages/seed/data/strokes/*.svg` by
+   relative path**, because `@bunki/seed` exports only `.` and widening its
+   `exports` map would edit WP-04's surface. No share-alike data is copied out
+   of `packages/seed` — the bundler reads the files in place (controller §4,
+   DL-33). If WP-04 later exports the stroke text, this becomes a one-line
+   change. **P2**
+
+### Surfaces touched
+
+`apps/app/**` — `app/` (3 routes + layout), `src/{ui,data,state,screens}/`,
+`test/` (10 files), `scripts/capture-evidence.mjs`, `svg-text-transformer.js`,
+`metro.config.js`, `package.json`, `tsconfig.json`, `tsconfig.test.json`,
+`README.md`; `docs/build-evidence/screenshots-wp05/` (26 PNG + README +
+`index.json`); this capsule section; root `package-lock.json` (mechanical).
+
+Removed: `src/state/scaffold.ts` and `test/scaffold.test.ts`. The scaffold notice
+read "No learning features are implemented yet", which stopped being true in this
+work package — leaving it would have been a false statement in the codebase.
+
+**No frozen doc touched.** No `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No other package. No CI. No `eslint.config.mjs`.
+Nothing pushed to `main` or to the integration branch.
+
+### Secrets check (controller §15)
+
+`apps/app/**` and the evidence README scanned for
+`api[_-]?key|secret|bearer|password|passwd|token`: **8 matches, all false
+positives** — "design token", "change token", and a loop variable named `token`
+in the palette test. No `.env`, no credentials, no network endpoint other than
+the harness's own `127.0.0.1` server. Screenshots contain seed data and
+timestamps only.
+
+### Toolchain recorded at this checkpoint
+
+`node v22.22.2` · `npm 10.9.7` · `typescript 6.0.3` · `eslint 10.8.0` ·
+`prettier 3.9.6` · `vitest 4.1.10` · `expo 57.0.8` · `react-native 0.86.0` ·
+`react-native-web 0.21.2` · `react-native-svg 15.15.4` · `zod 4.4.3` (via
+`@bunki/domain`). FSRS is not pinned by this work package — no scheduler code
+exists in `apps/app` and none may.
+
+### Next safe command
+
+- V5 verifies WP-05 from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `(cd apps/app && npx expo export --platform web)` and
+  `node apps/app/scripts/capture-evidence.mjs` (needs a Chromium binary; set
+  `CHROME_PATH` if no Playwright browser cache is present), then
+  `git diff --stat 755c090` to confirm no surface outside `apps/app/` and the
+  screenshot directory was touched.
+- W4 may consume `apps/app/src/ui/*` and `src/state/app-context.tsx`. Per
+  orchestration spec §4, `app/_layout.tsx` and the shared `src/ui` primitives
+  stay with B6; B8's session/canvas screens should request changes via CON.
+
+---
+
+## Appendix — WP-05 (Builder B6, repair round): two P1 honesty defects closed
+
+**Agent:** B6 (Builder, WP-05) · **Wave:** W3 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp05` · **Repair base:** `ef689ba`
+**Surfaces touched:** `apps/app/` and `docs/build-evidence/screenshots-wp05/`,
+plus this appendix. Nothing else.
+
+This section is **appended, not a rewrite**. Where it contradicts the earlier
+WP-05 appendix, this one supersedes it, and it says so explicitly below — the
+earlier text is left standing because a capsule that quietly edits its own past
+claims is exactly the failure mode both of these defects were.
+
+### Integrity re-verified before any edit (launcher step 1)
+
+| File | SHA-256 | Matches `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` |
+| --- | --- | --- |
+| `…CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc…859b47` | yes |
+| `…V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477…1b0c55` | yes |
+| `…MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `41631840…155a71` | yes |
+| `…FRESH_AGENT_LAUNCHER_2026-07-27.md` | `b0a6811d…78fce7` | yes |
+
+### Stacking (controller §3 rule 1)
+
+This repair round continues the existing WP-05 branch at **`ef689ba`**, which was
+itself cut from `origin/agent/bunki-phase0-integration` at **`755c090`**
+(WP-01/02/04 verified there, not yet on `main`). Re-checked this session:
+integration has advanced to **`f9f4d0e`** and `git diff --stat 755c090 f9f4d0e`
+is still empty — merge commits only, identical tree — so no rebase is needed and
+these checks ran against the content the integration branch holds today.
+
+### Finding 1 (P1) — ruby pieces were *not* hidden from the accessibility tree
+
+**What was actually wrong.** `ruby.tsx` hid its furigana pieces with
+`importantForAccessibility="no"`. That prop is Android/iOS-only.
+`react-native-web@0.21.2` forwards only the props in `modules/forwardedProps` —
+`aria-hidden` is in that table, `importantForAccessibility` is not — so on Expo
+Web, the Phase-0 target runtime (REQ-ARCH-01), the prop was dropped and every
+piece stayed exposed. The header comment and the predicate row both said the
+opposite. Two aggravating details were real as well: the `opacity: 0`
+ideographic-space placeholder was an exposed text node of its own, and the
+intended single label sat as `aria-label` on a `role=generic` container, where
+ARIA prohibits naming.
+
+**Reproduced, not taken on trust.** The pre-repair bundle was rebuilt and audited
+over CDP. Chrome reported five exposed named nodes under the headword:
+
+```
+分かれる（わかれる） | わ | 分 | 　 | かれる
+```
+
+**What was done.**
+
+- Both pieces now carry **`aria-hidden`**. React Native ≥0.71 maps it onto
+  `accessibilityElementsHidden` (iOS) and
+  `importantForAccessibility: 'no-hide-descendants'` (Android), so the modern
+  spelling is strictly more portable than the one it replaces rather than a
+  web-only concession.
+- The empty ruby slot is a **sized spacer `View`**, not transparent text. An
+  empty text node is content: it reached the accessibility tree and a copied
+  selection alike.
+- The single spoken label is carried as **real text content** in a clipped 1×1
+  node, not only as an `accessibilityLabel`.
+
+**A deliberate deviation from the prescribed fix, with the measurement behind
+it.** The finding proposed `accessibilityRole="text"` on the container so the
+name would sit on a leaf rather than a generic. Measured against the installed
+react-native-web, that does not work: `AccessibilityUtil/propsToAriaRole` maps
+`text → null`, so the role is dropped and the element stays `role=generic`. The
+prop is kept for its native meaning, but it is *not* what makes the label
+reachable — the text content is. Adopting the prescription alone would have
+re-shipped an unverified accessibility claim, which is the defect class being
+repaired.
+
+**Guards added.**
+
+- `apps/app/test/ruby-accessibility.test.ts` (renderer-free, 6 tests). Its
+  load-bearing assertion reads the **installed** react-native-web and checks that
+  the prop the component relies on is one that version actually forwards — the
+  check whose absence let this ship. Run against the pre-repair source, 5 of its
+  6 tests fail.
+- An `Accessibility.queryAXTree` audit in `scripts/capture-evidence.mjs`, run
+  against the real `expo export` output, asserting one exposed named node whose
+  name is the whole word. Results in
+  `docs/build-evidence/screenshots-wp05/accessibility-audit.json`.
+
+**Falsified before trusted.** Against the pre-repair build the audit fails 7 of 8
+checks and reprints the interleaving above; against the repaired build it passes
+8 of 8, reporting exactly one exposed node named `分かれる（わかれる）` and one
+named `分岐（ぶんき）`.
+
+**No visual change.** Shots `11-word-layers-0-1.png` and
+`12-word-layers-2-3.png` are byte-identical before and after, which is the
+intended outcome: the ruby column looks the same and only the accessibility tree
+changed.
+
+### Finding 2 (P1) — the screens stated a falsehood about the event log
+
+**What was actually wrong.** Both screens said unconditionally that the log
+records the *fact* of an uncertainty mark. That is true only for a mark chosen
+**before** Keep, which rides on `EncounterCaptured.uncertaintyMark`. A mark
+applied **after** Keep writes nothing at all: `applyMarkUncertainty` emits no
+event by design. On that path the learner saw a selected chip, a thread row
+reading `keep · uncertain: reading`, an acknowledgment listing
+`EncounterCaptured, ThreadPromotionChanged` with no mark anywhere in it, and a
+sentence telling them the fact of their mark was durable and exportable. It was
+not — fact and dimension were both lost. This is the REQ-GATE-03 / P0-CAP-15
+class the work package is judged on.
+
+**What was done.** The sentence is now derived from the thread rather than
+asserted, by `uncertaintyLogNote` in `src/state/store.ts`, which both screens
+call. Four branches, each true of the state it describes:
+
+| State | What the screen now says |
+| --- | --- |
+| not kept yet | "Keeping this with a mark records in the event log that a mark exists; which dimension you chose is kept on this device only…" |
+| kept, mark was on the captured event | "The event log records that a mark exists; which dimension you chose is kept on this device only…" |
+| kept, mark applied after Keep | "This mark was applied after Keep, so it is on this device only — it is not in the event log and will not be exported…" |
+| kept, no mark now | "A mark added now stays on this device only — the log records a mark only on the captured event…" |
+
+The fourth branch exists for a case the finding did not name and a naïve fix
+would have got wrong: **clearing** a mark after Keep cannot retract the
+`uncertaintyMark` already on the captured event, so the screen must not claim the
+log is now free of one. `test/capture-flow.test.ts` asserts that asymmetry
+directly.
+
+**Guards added.** `test/capture-flow.test.ts` gains the case the finding asked
+for — a capture with `uncertainty: null` followed by `markUncertainty` leaves no
+`uncertaintyMark` in `readAll()` — plus five cases that derive the sentence from
+a real store run, so the wording cannot drift from the behaviour. A scan in
+`test/screen-contract.test.ts` fails if either screen states the claim as a
+literal again. Screenshot `27-capture-mark-after-keep.png` photographs the
+corrected path.
+
+**Deferred item widened.** `WP05-D2` said only that the *dimension* was missing,
+which understated the loss. It now records that a post-capture mark reaches the
+log in no form at all, and that clearing one cannot retract it. See the corrected
+row below.
+
+### Corrected predicate rows (supersede the rows in the WP-05 appendix above)
+
+| Predicate | Earlier status | Corrected status | Evidence |
+| --- | --- | --- | --- |
+| Accessibility: labels, ≥44 pt targets, AA contrast | met | **met** — but the ruby half of it was *unverified* when first claimed, and was false on the web target | `accessibility-audit.json` (8/8 measured on the export); `test/ruby-accessibility.test.ts`; `test/touch-targets.test.ts`; `test/theme-contrast.test.ts` |
+| Japanese typography: ruby, ink-and-paper, one vermilion accent | met | met (unchanged visually — shots 11/12 byte-identical) | `src/ui/ruby.tsx`, `test/furigana.test.ts` |
+| No screen makes a claim it cannot support (REQ-GATE-03) | implied by "Honesty boundaries held" | **was not met** on the mark-after-Keep path; now met and guarded | `test/capture-flow.test.ts`, `test/screen-contract.test.ts`, shot 27 |
+| Screenshot evidence under `docs/build-evidence/` | met (26 shots) | met — **27 shots plus a measured accessibility audit** | `screenshots-wp05/` + `README.md` + `index.json` + `accessibility-audit.json` |
+
+### Corrected deferred row (supersedes the `WP05-D2` row above)
+
+| Id | Item | Owner | Closes with |
+| --- | --- | --- | --- |
+| WP05-D2 | A mark made **before** Keep loses only its dimension; a mark made **after** Keep reaches the event log in no form at all, and clearing one cannot retract the `uncertaintyMark` already on the captured event | CON → ADR-002 decision | An ADR-002 decision covering both halves: an amendment widening `uncertaintyMark`, and an amendment giving a post-capture mark an event family — or an explicit ruling that a mark is a capture-time-only fact and everything after it stays app-local |
+
+Coordination request 1 in the WP-05 appendix above should be read with this wider
+scope: the tension is not only "the dimension is not in the log", it is
+"REQ-UI-01 requires the mark to remain editable and the v1 schema cannot record
+an edit". Still **P1**, still a ruling rather than an app edit.
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` on the four spec files | 4/4 match the integrity record |
+| `npm ci` | clean install in a fresh worktree |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **31 files, 529 tests, all passed** (was 30/515; +1 file, +14 tests) |
+| `npm run test:replay` | 2 files, 43 tests passed |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 5 static routes |
+| `node apps/app/scripts/capture-evidence.mjs` | **27/27 screenshots, 8/8 accessibility checks**, exit 0 |
+| same harness against the **pre-repair** build | 27/27 screenshots, **1/8** accessibility checks — the defect reproduced |
+| `npx vitest run apps/app/test/ruby-accessibility.test.ts` against pre-repair source | **5 of 6 fail** — the guard has teeth |
+
+### Surfaces touched
+
+`apps/app/src/ui/{ruby.tsx,furigana.ts}`,
+`apps/app/src/state/{store.ts,deferred.ts}`,
+`apps/app/src/screens/{capture-screen.tsx,word-screen.tsx}`,
+`apps/app/scripts/capture-evidence.mjs`,
+`apps/app/test/{ruby-accessibility.test.ts (new),capture-flow.test.ts,deferred.test.ts,screen-contract.test.ts}`,
+`docs/build-evidence/screenshots-wp05/` (13 re-captured PNGs, 1 new PNG,
+`README.md`, `index.json`, new `accessibility-audit.json`), and this appendix.
+
+**No frozen doc touched.** No `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No other package, no other lane's surface, no CI,
+no `eslint.config.mjs`, no dependency added or changed (`package.json` and
+`package-lock.json` are untouched this round). Nothing pushed to `main` or to the
+integration branch.
+
+### Secrets check (controller §15)
+
+Changed files scanned for `api[_-]?key|secret|bearer|password|passwd|token`:
+matches are the pre-existing "design token" / "change token" prose only. The new
+`accessibility-audit.json` contains seed vocabulary and Chrome-computed roles; no
+host, no credential, no path outside the repo.
+
+### Next safe command
+
+- V5 re-verifies from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `(cd apps/app && npx expo export --platform web)` and
+  `node apps/app/scripts/capture-evidence.mjs` (needs Chromium; set `CHROME_PATH`
+  if no Playwright cache is present) — the run must report **8/8 accessibility
+  checks**, not merely "screenshots written".
+- To falsify the audit rather than trust it:
+  `git show ef689ba:apps/app/src/ui/ruby.tsx > apps/app/src/ui/ruby.tsx`,
+  re-export, re-run the harness, and confirm it drops to 1/8 and prints the
+  interleaved node list. Restore with `git checkout apps/app/src/ui/ruby.tsx`.
+- `git diff --stat 755c090` to confirm no surface outside `apps/app/` and
+  `docs/build-evidence/screenshots-wp05/` (plus this capsule section) was touched.
