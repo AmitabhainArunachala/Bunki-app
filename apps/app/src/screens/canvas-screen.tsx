@@ -63,6 +63,7 @@ import {
 } from './canvas-cloze.ts';
 import { segmentKey, segmentPassage, type PassageSegment } from './canvas-passage.ts';
 import {
+  NO_PROMOTED_TARGET_NOTE,
   passageMarks,
   useSessionLoop,
   type SessionLoop,
@@ -84,10 +85,8 @@ export function CanvasScreen({ context, onBack }: CanvasScreenProps): ReactNode 
   const resolve = useCallback(() => loop.target, [loop.target]);
   const { state: view, retry } = useLookup<SessionTarget>(resolve, {
     flags,
-    emptyMessage: 'The Phase-0 seed has no integration passage.',
-    emptyDetail:
-      loop.error ??
-      'The canvas renders the one hand-written passage the seed ships. Without it there is nothing to read.',
+    emptyMessage: 'No passage is open yet.',
+    emptyDetail: loop.error ?? NO_PROMOTED_TARGET_NOTE,
   });
 
   if (view.kind === 'loading') {

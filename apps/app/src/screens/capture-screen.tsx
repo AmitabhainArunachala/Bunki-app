@@ -32,12 +32,21 @@
  * from the thread by `uncertaintyLogNote` rather than stated once and left to go
  * stale (REQ-GATE-03).
  *
+ * **Taking a thread up for study is a separate press.** Keep stops at the `keep`
+ * rung, which activates no contracts; `learn` is what does (REQ-DM-09), and the
+ * only thing in this app that reaches it is the per-thread button below the kept
+ * list. That separation is definition-of-done §3 step 3 — "promote it Captured →
+ * Learn; confirm the review queue was empty of it *before* promotion" — and it
+ * is the reason the session screen no longer promotes anything on mount.
+ *
  * What this screen does *not* claim: that a saved thread survives a reload. It
  * renders the store's own durability sentence instead (P0-CAP-15).
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { isPromotionActive } from '@bunki/domain';
 
 import {
   constituentKanji,
@@ -201,6 +210,27 @@ export function CaptureScreen({
       setEnriching(false);
     });
   }, [capturedText, flags.lagMs, pendingMark, store, topLexeme]);
+
+  /**
+   * Take a kept thread up for study — the learner's own hand on the ladder
+   * (REQ-DM-09, definition-of-done §3 step 3).
+   *
+   * This is the only thing in the app that moves a thread to `learn`, and it is
+   * only ever a press handler. Until the WP-10 repair round the session screen
+   * did it silently on mount, which put a promotion the learner never made into
+   * their exportable log; the fix was to delete that and give them the gesture
+   * here instead, beside the thread it is about.
+   *
+   * `keep` and `captured` activate no contracts, so nothing in the loop can
+   * observe a thread until this is pressed — which is the whole of DL-05's
+   * "capture is not card creation", made a thing you can see happen.
+   */
+  const takeUpForStudy = useCallback(
+    (threadId: string) => {
+      store.execute({ kind: 'promote', threadId, to: 'learn' });
+    },
+    [store],
+  );
 
   const markUncertainty = useCallback(
     (dimension: UncertaintyDimension) => {
@@ -497,47 +527,71 @@ export function CaptureScreen({
           </Text>
         ) : (
           snapshot.threads.map((thread) => (
-            <RowButton
-              accessibilityHint={
-                thread.lexemeId === null
-                  ? 'This capture did not match a seed word, so it has no word page yet.'
-                  : 'Opens the word page for this thread.'
-              }
-              accessibilityLabel={`${thread.displayText}, ${thread.state.promotion}${
-                thread.uncertainty === null
-                  ? thread.markRecordedInLog
-                    ? ', marked uncertain; which part was not stored'
-                    : ''
-                  : `, uncertain about ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`
-              }`}
-              key={thread.state.threadId}
-              onPress={() => {
-                if (thread.lexemeId !== null) onOpenWord(thread.lexemeId);
-              }}
-            >
-              <Text
-                style={[
-                  styles.threadText,
-                  { color: theme.color.ink, fontFamily: theme.font.mincho },
-                ]}
+            <View key={thread.state.threadId} style={styles.threadBlock}>
+              <RowButton
+                accessibilityHint={
+                  thread.lexemeId === null
+                    ? 'This capture did not match a seed word, so it has no word page yet.'
+                    : 'Opens the word page for this thread.'
+                }
+                accessibilityLabel={`${thread.displayText}, ${thread.state.promotion}${
+                  thread.uncertainty === null
+                    ? thread.markRecordedInLog
+                      ? ', marked uncertain; which part was not stored'
+                      : ''
+                    : `, uncertain about ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`
+                }`}
+                onPress={() => {
+                  if (thread.lexemeId !== null) onOpenWord(thread.lexemeId);
+                }}
               >
-                {thread.displayText}
-              </Text>
-              <Text
-                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              >
-                {thread.state.promotion}
-                {thread.uncertainty === null
-                  ? // The log kept the *fact* of the mark and never held the
-                    // dimension (WP05-D2), so a reloaded thread says that rather
-                    // than reading as though nothing was marked.
-                    thread.markRecordedInLog
-                    ? ' · marked uncertain (which part was not stored)'
-                    : ''
-                  : ` · uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`}
-                {` · ${String(thread.state.encounterIds.length)} encounter(s)`}
-              </Text>
-            </RowButton>
+                <Text
+                  style={[
+                    styles.threadText,
+                    { color: theme.color.ink, fontFamily: theme.font.mincho },
+                  ]}
+                >
+                  {thread.displayText}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {thread.state.promotion}
+                  {thread.uncertainty === null
+                    ? // The log kept the *fact* of the mark and never held the
+                      // dimension (WP05-D2), so a reloaded thread says that rather
+                      // than reading as though nothing was marked.
+                      thread.markRecordedInLog
+                      ? ' · marked uncertain (which part was not stored)'
+                      : ''
+                    : ` · uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}`}
+                  {` · ${String(thread.state.encounterIds.length)} encounter(s)`}
+                </Text>
+              </RowButton>
+              {isPromotionActive(thread.state.promotion) ? (
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                  testID={`capture-promoted-${thread.state.threadId}`}
+                >
+                  Taken up for study — a sitting can now be planned over it, and the evidence
+                  inspector will show the promotion with your name on it.
+                </Text>
+              ) : (
+                <AppButton
+                  accessibilityHint="Moves this thread to Learn. That rung is what activates its retrieval contracts; keeping alone activates none."
+                  accessibilityLabel={`Take ${thread.displayText} up for study`}
+                  label="Take it up for study"
+                  onPress={() => takeUpForStudy(thread.state.threadId)}
+                  testID={`capture-promote-${thread.state.threadId}`}
+                />
+              )}
+            </View>
           ))
         )}
         {snapshot.threads.length === 0 ? null : (
@@ -639,6 +693,9 @@ const styles = StyleSheet.create({
   ackTitle: {
     fontSize: TYPE.body,
     fontWeight: '700',
+  },
+  threadBlock: {
+    gap: SPACE.xs,
   },
   threadText: {
     fontSize: TYPE.body,

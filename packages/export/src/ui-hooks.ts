@@ -26,6 +26,14 @@
  * failure to a pass, and a screen cannot invent a stronger sentence than the
  * one this module is willing to defend.
  *
+ * One entry in `notChecked` is about the *store* rather than about the check,
+ * and this package has no store: whether a log survives a reload depends on the
+ * adapter the caller opened. It is therefore a parameter
+ * ({@link StorageDurabilityClaim}) and not a constant. It was a constant until
+ * WP-10's repair round, and the constant went stale the moment the app gained a
+ * durable adapter — leaving the export screen and the diagnostics screen of one
+ * build asserting opposite storage facts.
+ *
  * ## The byte round trip is not decoration
  *
  * `verifyExportRoundTrip` alone accepts an in-memory object. An export leaves
@@ -155,6 +163,15 @@ export interface PrepareExportArgs {
    * this constraint is documented at the call site rather than discovered.
    */
   readonly liveState: DerivedState;
+  /**
+   * What the caller's store guarantees about surviving a reload.
+   *
+   * Optional, and omitting it asserts nothing — see
+   * {@link StorageDurabilityClaim}. A caller that has an adapter should pass its
+   * real answer, because the alternative is the export surface stating a storage
+   * fact it did not learn here.
+   */
+  readonly storageDurability?: StorageDurabilityClaim | undefined;
 }
 
 /**
@@ -203,16 +220,72 @@ function checkedClaims(result: ExportRoundTripResult): readonly string[] {
     'The export was serialised to text and parsed back, so nothing was lost that JSON cannot carry.',
     'Every event in it passed the same fail-closed parser the app uses to read its own log.',
     result.equal
-      ? 'Replaying the parsed events reproduced this session’s derived state exactly, compared as canonical bytes.'
-      : 'Replaying the parsed events did NOT reproduce this session’s derived state.',
+      ? // "The state this export was taken from", not "this session's state":
+        // the log the caller handed in may have been rehydrated from storage
+        // and predate this session entirely. Naming the session was harmless
+        // while the app was in-memory and became a second small falsehood the
+        // moment WP-10 made the log durable.
+        'Replaying the parsed events reproduced the derived state this export was taken from, exactly, compared as canonical bytes.'
+      : 'Replaying the parsed events did NOT reproduce the derived state this export was taken from.',
   ]);
 }
 
-const NOT_CHECKED: readonly string[] = Object.freeze([
-  'Durability. This build keeps the log in memory for one session; a reload loses it, and no export check can change that.',
-  `Agreement between two independent projections. This compares a replay against a replay of the same log. ${WIDER_VERIFICATION_COMMAND} adds the stronger check, replaying an export against a store snapshot that was folded event by event.`,
-  'Anything about a future build. An export that replays here is not a promise that a later schema version reads it — that is what the version field and its migration are for.',
-]);
+/**
+ * What the caller's store guarantees about surviving a reload.
+ *
+ * This package holds no store and opens no adapter, so it cannot find this out —
+ * and it must not guess. Until WP-10 it did guess: `NOT_CHECKED` carried the
+ * frozen sentence "this build keeps the log in memory for one session; a reload
+ * loses it", which was true when WP-09 wrote it and false the moment WP-10 put a
+ * durable adapter behind `AppStore`. The export surface then contradicted the
+ * diagnostics surface in the same build, and the one the operator reads at
+ * acceptance-script step 8 was the wrong one (REQ-GATE-03, P0-CAP-15).
+ *
+ * So the fact is a parameter. The caller knows its adapter; this module knows
+ * what an export check does and does not establish, which is the *other* half of
+ * the sentence and the half that never changes.
+ */
+export type StorageDurabilityClaim =
+  /** The caller's store survives a reload — e.g. a granted device-local adapter. */
+  | 'survives-reload'
+  /** The caller's store does not — in memory for this session only. */
+  | 'session-only'
+  /** The caller did not say. The default, and never an assertion either way. */
+  | 'unknown';
+
+/**
+ * The durability line, which is about the *store* and never about the check.
+ *
+ * Every branch ends in the same clause for the same reason: whatever the storage
+ * does, running an export check is not how anyone learned it. A reader who takes
+ * a passing badge as evidence of durability has been misled by the badge, and
+ * that is what this bullet exists to prevent — in both directions.
+ */
+const DURABILITY_NOT_CHECKED: Readonly<Record<StorageDurabilityClaim, string>> = Object.freeze({
+  'survives-reload':
+    'Durability. The store this export was taken from keeps your log where a reload finds it again — but that is a fact about the store, not something this check established. An export check reads bytes; it never touches storage.',
+  'session-only':
+    'Durability. The store this export was taken from keeps the log in memory for this session only, so a reload loses it — and no export check can change that. Keep the file if you want the record.',
+  unknown:
+    'Durability. Whether the log survives a reload is a property of the store this export came from, and this check establishes it neither way. Ask the surface that knows the adapter — the diagnostics screen names it.',
+});
+
+/**
+ * What an export round trip does not establish.
+ *
+ * @param durability what the caller's store guarantees; see
+ *   {@link StorageDurabilityClaim}. Omitted means `unknown`, which asserts
+ *   nothing — the honest answer for a caller that has no adapter to describe.
+ */
+export function notCheckedClaims(
+  durability: StorageDurabilityClaim = 'unknown',
+): readonly string[] {
+  return Object.freeze([
+    DURABILITY_NOT_CHECKED[durability],
+    `Agreement between two independent projections. This compares a replay against a replay of the same log. ${WIDER_VERIFICATION_COMMAND} adds the stronger check, replaying an export against a store snapshot that was folded event by event.`,
+    'Anything about a future build. An export that replays here is not a promise that a later schema version reads it — that is what the version field and its migration are for.',
+  ]);
+}
 
 /**
  * Verify already-serialised export bytes against a live derived state.
@@ -220,20 +293,27 @@ const NOT_CHECKED: readonly string[] = Object.freeze([
  * Separated from {@link prepareExport} so a caller holding bytes from anywhere
  * — a file the user re-imported, a fixture — can run the identical check.
  *
- * @param json      the export, as text.
- * @param liveState derived state to compare the replay against.
+ * @param json       the export, as text.
+ * @param liveState  derived state to compare the replay against.
+ * @param durability what the caller's store guarantees about a reload. Defaults
+ *   to `unknown`, which states the limits of the check without claiming anything
+ *   about storage in either direction.
  * @throws ExportEnvelopeError when the text is not a valid envelope of a
  *   version this build implements. A malformed export is not a failed
  *   comparison; reporting it as `equal: false` would hide a parse error behind
  *   a mismatch and send the reader looking for a divergence that is not there.
  */
-export function verifyExportBytes(json: string, liveState: DerivedState): ExportVerification {
+export function verifyExportBytes(
+  json: string,
+  liveState: DerivedState,
+  durability: StorageDurabilityClaim = 'unknown',
+): ExportVerification {
   const result = verifyExportRoundTrip(JSON.parse(json), liveState);
   return {
     equal: result.equal,
     badge: badgeFor(result),
     checked: checkedClaims(result),
-    notChecked: NOT_CHECKED,
+    notChecked: notCheckedClaims(durability),
     firstDifference: result.firstDifference,
     eventCount: result.eventCount,
   };
@@ -258,7 +338,7 @@ export function prepareExport(args: PrepareExportArgs): PreparedExport {
     envelope,
     json,
     byteLength: utf8ByteLength(json),
-    verification: verifyExportBytes(json, args.liveState),
+    verification: verifyExportBytes(json, args.liveState, args.storageDurability ?? 'unknown'),
   };
 }
 

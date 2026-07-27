@@ -43,6 +43,7 @@ import { ScreenShell } from '../ui/screen-shell.tsx';
 import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import {
+  NO_PROMOTED_TARGET_NOTE,
   SESSION_INTEGRATION_NOTE,
   useSessionLoop,
   type SessionLoop,
@@ -95,10 +96,8 @@ export function SessionScreen({
   const resolve = useCallback(() => loop.target, [loop.target]);
   const { state: view, retry } = useLookup<SessionTarget>(resolve, {
     flags,
-    emptyMessage: 'No session can be composed from the Phase-0 seed.',
-    emptyDetail:
-      loop.error ??
-      'A session needs a promoted target with a retrieval contract. The seed provides one; if this is empty, the dataset changed.',
+    emptyMessage: 'Nothing is taken up for study yet.',
+    emptyDetail: loop.error ?? NO_PROMOTED_TARGET_NOTE,
   });
 
   if (view.kind === 'loading') {

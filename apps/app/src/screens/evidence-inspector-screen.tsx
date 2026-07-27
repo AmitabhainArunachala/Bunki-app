@@ -54,6 +54,7 @@ import {
   prepareExport,
   WIDER_VERIFICATION_COMMAND,
   type PreparedExport,
+  type StorageDurabilityClaim,
 } from '@bunki/export';
 
 import { findLexemeById } from '../data/catalog.ts';
@@ -62,8 +63,10 @@ import { useLookup } from '../state/use-lookup.ts';
 import {
   CorrectionRefusedError,
   DEMONSTRATION_CHAIN_NOTE,
+  DURABILITY_NOTES,
   UNCERTAINTY_LABELS,
   uncertaintyLogNote,
+  type DurabilityLevel,
   type SupersessionReason,
   type ThreadView,
 } from '../state/store.ts';
@@ -83,6 +86,23 @@ import {
 
 /** `DataExported.exportVersion` is a string in the v1 schema (ADR-002). */
 const EXPORT_EVENT_VERSION = '1';
+
+/**
+ * The store's durability label, in `@bunki/export`'s vocabulary.
+ *
+ * A total map over `DurabilityLevel` rather than a conditional, so adding a
+ * rung to the label without deciding what the export surface should say about it
+ * stops compiling here instead of silently falling into a default.
+ *
+ * The two vocabularies are deliberately different words for deliberately
+ * different things: `DurabilityLevel` says where the app's bytes live, and
+ * `StorageDurabilityClaim` says what an export screen is entitled to tell a
+ * reader about that. This map is the only place they meet.
+ */
+const STORAGE_DURABILITY_CLAIM: Readonly<Record<DurabilityLevel, StorageDurabilityClaim>> = {
+  'in-memory-session-only': 'session-only',
+  'device-local': 'survives-reload',
+};
 
 export interface EvidenceInspectorScreenProps {
   /** Which thread to inspect; the newest one when absent. */
@@ -208,6 +228,14 @@ export function EvidenceInspectorScreen({
         // screen that built this object would be doing exactly that.
         appVersions: appVersionsForBuild(),
         liveState: store.readDerived(),
+        // The store's own label, not a guess and not a constant. `@bunki/export`
+        // has no adapter and must not assert a storage fact; this screen has the
+        // `AppStore` whose `durability` is exactly what `durabilityFor()`
+        // computed from the runtime and whether storage was granted. Before
+        // WP-10's repair round the export surface carried a frozen "this build
+        // keeps the log in memory for one session" while /debug in the same
+        // build said the opposite — see `STORAGE_DURABILITY_CLAIM`.
+        storageDurability: STORAGE_DURABILITY_CLAIM[store.durability],
       });
       setExported(result);
       setExportError(null);
@@ -469,8 +497,13 @@ export function EvidenceInspectorScreen({
       <Hairline />
 
       {/* ------------------------------------------------------------- export */}
+      {/* The scope sentence is "your log", not "this session": WP-10 made the
+          log durable, so a session is no longer the boundary of what an export
+          contains. The storage half comes from the store's own note rather than
+          from a literal here, which is the same rule the capture screen follows
+          (P0-CAP-15) and the reason this line cannot drift away from /debug. */}
       <Section
-        note="Complete, versioned, lossless JSON of every event in this session — the same bytes the verification below was run against."
+        note={`Complete, versioned, lossless JSON of every event in your log — the same bytes the verification below was run against. ${DURABILITY_NOTES[store.durability]}`}
         testID="evidence-export"
         title="Take your data"
       >

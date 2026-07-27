@@ -14,10 +14,15 @@ import { createRuntimeContext } from '@/state/runtime';
  * session of its own. B8 caught that themselves and shipped
  * `SessionWorkspaceProvider` to fix it; this layout is the other half.
  *
- * It is deliberately *not* in `app/_layout.tsx`. Bootstrapping a session
- * captures the seeded target through the same store the capture screen writes
- * to, on purpose, so the sitting runs over a real thread — at the app root that
- * would put an encounter nobody captured into the capture list on every launch.
+ * It is deliberately *not* in `app/_layout.tsx`, and since the WP-10 repair round
+ * that is a scoping choice rather than a safety one. Bootstrapping a session used
+ * to *write* a capture and a promotion through the store, which made mounting
+ * this provider at the root — or reaching the Session link at all — enough to
+ * fabricate evidence in the learner's durable log. It now only reads: the sitting
+ * is planned over threads the learner promoted themselves, and there is no target
+ * until they have. Keeping the provider scoped to the three session routes stays
+ * right anyway, because a workspace mounted above the capture screen would hold a
+ * plan composed before the learner had done anything to plan over.
  */
 const context = createRuntimeContext();
 

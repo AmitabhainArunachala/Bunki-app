@@ -26,6 +26,7 @@ import {
   ExportEnvelopeError,
   exportLicenceLines,
   exportSummaryLine,
+  notCheckedClaims,
   prepareExport,
   serializeExportEnvelope,
   verifyExportBytes,
@@ -178,6 +179,93 @@ describe('the verification badge says exactly what was checked', () => {
   it('states the preconditions a caller must satisfy for any of this to mean something', () => {
     expect(EXPORT_VERIFICATION_PRECONDITIONS.join(' ')).toContain('DataExported');
     expect(EXPORT_VERIFICATION_PRECONDITIONS.join(' ')).toContain('injected clock');
+  });
+});
+
+/**
+ * The storage sentence follows the caller's store (WP-10 repair round, P1).
+ *
+ * It used to be a frozen literal — "This build keeps the log in memory for one
+ * session; a reload loses it" — which was true when WP-09 wrote it and false
+ * from the moment WP-10 put a durable adapter behind `AppStore`. The export
+ * screen and the diagnostics screen of one build then stated opposite storage
+ * facts, and the operator reads the export one at acceptance-script step 8.
+ *
+ * A constant cannot be right about something it does not know, so the fix is
+ * that this package stops claiming to know it.
+ */
+describe('the durability line is a function of the caller’s store, not a constant', () => {
+  const durabilityLineOf = (claim: Parameters<typeof notCheckedClaims>[0]): string => {
+    const line = notCheckedClaims(claim).find((entry) => entry.startsWith('Durability.'));
+    expect(line, 'every claim set must carry exactly one durability line').toBeDefined();
+    return line ?? '';
+  };
+
+  it('says a reload loses the log only when the caller says it does', () => {
+    expect(durabilityLineOf('session-only')).toMatch(/in memory for this session only/);
+    expect(durabilityLineOf('session-only')).toMatch(/a reload loses it/);
+  });
+
+  it('does not say a reload loses the log when the store survives one', () => {
+    const line = durabilityLineOf('survives-reload');
+    expect(line).toMatch(/where a reload finds it again/);
+    expect(line).not.toMatch(/in memory for (one|this) session/);
+    expect(line).not.toMatch(/a reload loses it/);
+  });
+
+  it('asserts nothing either way when the caller did not say', () => {
+    const line = durabilityLineOf('unknown');
+    expect(line).toMatch(/neither way/);
+    expect(line).not.toMatch(/a reload loses it/);
+    expect(line).not.toMatch(/survives a reload\./);
+  });
+
+  it('never lets any branch read as evidence the check itself produced', () => {
+    // Whatever the storage does, running an export check is not how anyone
+    // learned it. That clause is what stops a passing badge from being read as
+    // a durability guarantee — in either direction.
+    for (const claim of ['session-only', 'survives-reload', 'unknown'] as const) {
+      expect(durabilityLineOf(claim), claim).toMatch(
+        /this check|no export check|An export check|property of the store/,
+      );
+    }
+  });
+
+  it('is carried through prepareExport, so a screen cannot bypass it', () => {
+    const durable = prepareExport({
+      events: LOG,
+      generatedAt: GENERATED_AT,
+      appVersions: appVersionsForBuild(),
+      liveState: replay(LOG),
+      storageDurability: 'survives-reload',
+    });
+    expect(durable.verification.notChecked.join(' ')).not.toMatch(/a reload loses it/);
+
+    const sessionOnly = prepareExport({
+      events: LOG,
+      generatedAt: GENERATED_AT,
+      appVersions: appVersionsForBuild(),
+      liveState: replay(LOG),
+      storageDurability: 'session-only',
+    });
+    expect(sessionOnly.verification.notChecked.join(' ')).toMatch(/a reload loses it/);
+  });
+
+  it('defaults to the claim-nothing branch when a caller omits it', () => {
+    expect(prepared().verification.notChecked.join(' ')).toMatch(/neither way/);
+    expect(verifyExportBytes(prepared().json, replay(LOG)).notChecked.join(' ')).toMatch(
+      /neither way/,
+    );
+  });
+
+  it('never names a session as the scope of what an export contains', () => {
+    // The same drift, one line over: a durable log predates the session it is
+    // exported from, so "this session's derived state" was the second small
+    // falsehood in the same panel.
+    const { verification } = prepared();
+    expect([...verification.checked, ...verification.notChecked].join(' ')).not.toMatch(
+      /this session/i,
+    );
   });
 });
 

@@ -18,12 +18,15 @@
  *
  * ## Why it is not mounted at the app root
  *
- * Bootstrapping a session *captures* the seeded target through the same store
- * the capture screen writes to, deliberately, so the sitting runs over the
- * learner's own thread. At the root that would put an encounter nobody captured
- * into the capture list on every launch. It belongs around the session routes
- * and nowhere else — an `app/(session)/_layout.tsx` group, which adds a file
- * rather than changing one.
+ * Historically because it had to be: bootstrapping a session used to *write* a
+ * capture and a promotion through the store, so mounting it at the root would
+ * have put an encounter nobody captured into the capture list on every launch.
+ * The WP-10 repair round removed the writes — the bootstrap is a pure read now,
+ * and there is no target at all until the learner has promoted a thread
+ * themselves. Scoping it to `app/(session)/_layout.tsx` is still right, because
+ * a workspace mounted above the capture screen would hold a plan composed before
+ * the learner had done anything to plan over; it is no longer what stops the
+ * session from fabricating evidence.
  */
 
 import { useContext, type ReactNode } from 'react';

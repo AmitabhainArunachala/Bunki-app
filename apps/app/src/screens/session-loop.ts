@@ -13,23 +13,35 @@
  *
  * Two sources, joined once:
  *
- *   - the `AppStore`'s own log — the captured target and its promotion, written
- *     by the same capture path screen 1 uses, so the session plans over the
- *     learner's real thread rather than a fixture pretending to be one;
- *   - the retrieval contracts for that target, minted here because nothing in
- *     the loop had created one yet. `@bunki/persistence` is not wired into
+ *   - the `AppStore`'s own log, **read and never written** — the learner's own
+ *     captures and their own promotions, so the session plans over a thread they
+ *     made rather than one this file manufactured;
+ *   - the retrieval contracts for the chosen target, minted here because nothing
+ *     in the loop had created one yet. `@bunki/persistence` is not wired into
  *     `apps/app` in this wave (controller §5 lint boundary 2, and the W4
  *     cross-lane rule), so the joined log lives in this hook for now and is
  *     handed back through `onEvents` for the WP-10 integration to append. That
  *     is a recorded seam, not a hidden one — see `SESSION_INTEGRATION_NOTE`.
  *
- * ## Why bootstrapping during a state initialiser is safe here
+ * ## Why the bootstrap writes nothing (WP-10 repair round, P0)
  *
- * `AppStore.execute` is idempotent by content: the same capture and the same
- * promotion produce the same key and append nothing the second time. React may
- * invoke a `useState` initialiser twice (StrictMode does, deliberately), and
- * that is exactly the double-tap case the store's idempotency was built for. A
- * bootstrap that appended twice would be a defect the store already prevents.
+ * It used to `capture` the seeded headword and `promote` it to `learn` through
+ * the real store, from a `useState` initialiser, on the first render of the
+ * `(session)` route group. Reaching the Session link was therefore enough to put
+ * an `EncounterCaptured` and a `ThreadPromotionChanged` into the learner's
+ * durable, exportable log with no gesture behind either — the seed passage
+ * stamped `user_encounter` / `user_owned`, the promotion stamped
+ * `origin: "user"`. The definition-of-done names that exactly: "the inspector
+ * shows events but a grade, a promotion, or an AI acceptance exists with no user
+ * action behind it" (§2 item 6), and it destroyed §3 step 3, where John is asked
+ * to confirm the review queue was empty of his encounter *before* he promoted it.
+ *
+ * So the bootstrap is now a pure read. It plans the sitting over threads the
+ * learner has already promoted to a rung that activates contracts (REQ-DM-09),
+ * and when there are none it returns no target and the screens render their
+ * existing empty state with {@link NO_PROMOTED_TARGET_NOTE}. The one gesture
+ * that puts a thread there is the learner's own "Take it up for study" on the
+ * capture screen; nothing else in the app promotes anything.
  */
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
@@ -38,20 +50,24 @@ import {
   applySessionCommand,
   canvasProbeOffer,
   componentIdForTargetKey,
+  componentIdOfEncounter,
   createSessionWorkspace,
   createTargetContract,
+  isPromotionActive,
   latestStumble,
   retrievalContractFromEvent,
   type CanvasProbeOffer,
   type ContractCreatedEvent,
   type DomainContext,
   type DomainEvent,
+  type EncounterCapturedEvent,
   type SessionCommand,
   type SessionWorkspaceState,
 } from '@bunki/domain';
 
 import {
   DEFAULT_CANONICAL_TARGET,
+  findLexemeById,
   findLexemeByHeadword,
   passageForLexeme,
   seedDataset,
@@ -59,7 +75,7 @@ import {
   type SeedPassage,
 } from '../data/catalog.ts';
 import { useAppStore } from '../state/app-context.tsx';
-import type { AppStore } from '../state/store.ts';
+import type { AppStore, ThreadView } from '../state/store.ts';
 import type { PassageMark } from './canvas-passage.ts';
 
 /**
@@ -83,22 +99,22 @@ import type { PassageMark } from './canvas-passage.ts';
 export const SESSION_INTEGRATION_NOTE =
   'Session and canvas events are held in this screen’s workspace for as long as the app is open, beside the durable log rather than in it — so this sitting’s observations do not survive a reload and do not appear in an export. Joining them needs a way for the store to accept events it did not mint, which would be an evidence-gate bypass unless the kernel gains a provenance marker first; that is coordination request COORD-B8-2, still open. Nothing here claims otherwise.';
 
-/** How the seeded encounter is labelled when the session bootstraps it. */
-const SOURCE_REF = {
-  sourceId: 'seed-passage',
-  kind: 'text',
-  locator: 'packages/seed/data/passages.json',
-} as const;
+/**
+ * What the session says when the learner has promoted nothing yet.
+ *
+ * A constant rather than a literal in two screens, so the session and the canvas
+ * cannot drift into telling the learner two different things about the same
+ * empty state — and so `test/session-canvas.test.ts` can assert the empty state
+ * is reached rather than assert against a sentence typed twice.
+ *
+ * It names the gesture that fixes it. An empty state that only says "nothing
+ * here" is the failure mode this replaced: the previous bootstrap avoided the
+ * empty state by inventing an encounter, which is worse than an honest blank.
+ */
+export const NO_PROMOTED_TARGET_NOTE = `A sitting is planned over what you have taken up for study, so there is nothing to plan yet. Keep an encounter on the capture screen and then choose “Take it up for study” on it — that is the only thing in this app that promotes a thread, and it has to be you. ${DEFAULT_CANONICAL_TARGET} is the word the seed’s passage is written around, so it is the one that also opens the integration canvas.`;
 
-const PROVENANCE = {
-  source: 'user_encounter',
-  license: 'user_owned',
-  modificationStatus: 'unmodified',
-  reviewStatus: 'unreviewed',
-} as const;
-
-const READING_CONTRACT_ID = 'contract-reading-bunki';
-const MEANING_CONTRACT_ID = 'contract-meaning-bunki';
+const readingContractIdFor = (lexeme: SeedLexeme): string => `contract-reading-${lexeme.id}`;
+const meaningContractIdFor = (lexeme: SeedLexeme): string => `contract-meaning-${lexeme.id}`;
 
 export interface SessionTarget {
   readonly lexeme: SeedLexeme;
@@ -137,55 +153,139 @@ export interface SessionLoop {
 }
 
 /**
- * Build the two contracts for the seeded target.
+ * Build the two contracts for the chosen target.
  *
  * Two, not one, and that is REQ-DM-05 and T-05 rather than thoroughness:
  * meaning and reading are *distinct* contracts, so a missed reading cannot
  * erase a known meaning. The reading contract is the one the canvas probes,
  * because a cloze in a passage hides a written form and asks for its reading.
+ *
+ * Both answer sets are read off the seed entry the learner's capture resolved
+ * to, never typed here. That is the same rule the demonstration command follows
+ * (`SeedEvidenceDemonstrationCommand`): a screen may *read* the dataset, and may
+ * not assert a lexical fact of its own. It also means the contracts now follow
+ * whichever word the learner promoted instead of only ever describing 分岐.
  */
-function contractsFor(context: DomainContext, componentId: string): readonly DomainEvent[] {
+function contractsFor(
+  context: DomainContext,
+  lexeme: SeedLexeme,
+  componentId: string,
+): readonly DomainEvent[] {
+  const readingContractId = readingContractIdFor(lexeme);
+  const meaningContractId = meaningContractIdFor(lexeme);
+
   const reading: ContractCreatedEvent = createTargetContract(
     context,
     {
-      contractId: READING_CONTRACT_ID,
+      contractId: readingContractId,
       contractVersion: 1,
       targetComponentId: componentId,
       skill: 'orthography_to_reading',
       cueModality: 'text',
       responseModality: 'text',
-      acceptedAnswers: ['ぶんき'],
+      acceptedAnswers: [lexeme.reading],
       hintPolicy: { hintsAllowed: true, maxHints: 1 },
       revealPolicy: { revealAllowed: true, revealIsRecorded: true },
       promptFamilyVersion: 'pf-wp08.1',
     },
-    // The event id is pinned, not generated. Bootstrapping is idempotent by
-    // key already, but a fresh `eventId` on every call would make two
-    // bootstraps of the same store produce two events claiming one key — the
-    // `IdempotencyConflictError` shape replay exists to refuse. Pinning it also
-    // makes the whole seeded log byte-reproducible, which the screenshot
-    // evidence depends on.
-    { idempotencyKey: `contract:${READING_CONTRACT_ID}`, eventId: `ev-${READING_CONTRACT_ID}` },
+    // The event id is pinned, not generated. Two bootstraps of the same store —
+    // a re-render, a StrictMode double invocation — would otherwise produce two
+    // events claiming one key, which is the `IdempotencyConflictError` shape
+    // replay exists to refuse. Pinning it also makes the session's log
+    // byte-reproducible, which the screenshot evidence depends on.
+    { idempotencyKey: `contract:${readingContractId}`, eventId: `ev-${readingContractId}` },
   );
 
   const meaning: ContractCreatedEvent = createTargetContract(
     context,
     {
-      contractId: MEANING_CONTRACT_ID,
+      contractId: meaningContractId,
       contractVersion: 1,
       targetComponentId: componentId,
       skill: 'form_to_meaning',
       cueModality: 'text',
       responseModality: 'text',
-      acceptedAnswers: ['branching', 'fork', 'divergence'],
+      acceptedAnswers: [...lexeme.senses],
       hintPolicy: { hintsAllowed: true, maxHints: 1 },
       revealPolicy: { revealAllowed: true, revealIsRecorded: true },
       promptFamilyVersion: 'pf-wp08.1',
     },
-    { idempotencyKey: `contract:${MEANING_CONTRACT_ID}`, eventId: `ev-${MEANING_CONTRACT_ID}` },
+    { idempotencyKey: `contract:${meaningContractId}`, eventId: `ev-${meaningContractId}` },
   );
 
   return [reading, meaning];
+}
+
+/**
+ * The seed entry a thread is about, or `null`.
+ *
+ * `lexemeId` is the app-local link the capture screen recorded. A thread
+ * rehydrated from the durable log may have lost it (the event carries the
+ * learner's text, not a dictionary row), so the headword is the fallback — the
+ * exact match `app-context.tsx` uses for the same reason and with the same
+ * reservation: fuzzier matching would attach a session to a *different* word
+ * than the one the learner promoted.
+ */
+function seedEntryFor(thread: ThreadView): SeedLexeme | null {
+  if (thread.lexemeId !== null) {
+    const byId = findLexemeById(thread.lexemeId);
+    if (byId !== null) return byId;
+  }
+  return findLexemeByHeadword(thread.displayText);
+}
+
+interface ChosenTarget {
+  readonly thread: ThreadView;
+  readonly lexeme: SeedLexeme;
+  readonly passage: SeedPassage;
+  readonly componentId: string;
+  readonly capture: EncounterCapturedEvent;
+}
+
+/**
+ * Which of the learner's threads this sitting is about.
+ *
+ * Newest first, and only threads on a promotion rung that activates contracts
+ * (REQ-DM-09: `captured` and `keep` schedule nothing, so a session over one
+ * would be a session whose every observation the gate refuses). A thread with no
+ * seed entry, or one whose entry the hand-written passage does not embed, is
+ * skipped rather than made into a canvas-less session — controller §8 ships
+ * exactly one passage, and a session step that opens a passage the target is not
+ * in would be the screen asserting a relation the seed does not hold.
+ *
+ * `componentId` comes from the kernel's own derivation over the capture event,
+ * not from the headword: the gate links a contract to a thread through exactly
+ * that id, and a locally re-derived one that disagreed would produce contracts
+ * the gate refuses for a reason no screen could explain.
+ */
+function chooseSessionTarget(
+  threads: readonly ThreadView[],
+  log: readonly DomainEvent[],
+): ChosenTarget | null {
+  for (const thread of threads) {
+    if (!isPromotionActive(thread.state.promotion)) continue;
+
+    const lexeme = seedEntryFor(thread);
+    if (lexeme === null) continue;
+
+    const passage = passageForLexeme(lexeme.id);
+    if (passage === null) continue;
+
+    const capture = log.find(
+      (event): event is EncounterCapturedEvent =>
+        event.type === 'EncounterCaptured' && event.threadId === thread.state.threadId,
+    );
+    if (capture === undefined) continue;
+
+    return {
+      thread,
+      lexeme,
+      passage,
+      componentId: componentIdOfEncounter(capture),
+      capture,
+    };
+  }
+  return null;
 }
 
 export interface SessionBootstrap {
@@ -197,49 +297,44 @@ export interface SessionBootstrap {
 /**
  * Everything the session needs, built once, with no React anywhere in it.
  *
- * Exported so the whole loop — capture, promotion, contracts, plan, canvas,
- * repair — can be driven from a test without a renderer. That is not a
- * convenience: this project has no React Native test renderer installed, so a
- * behaviour that only existed inside a component would be unverifiable, and an
- * unverifiable behaviour is one that gets claimed rather than shown.
+ * Exported so the whole loop — plan, canvas, repair — can be driven from a test
+ * without a renderer. That is not a convenience: this project has no React
+ * Native test renderer installed, so a behaviour that only existed inside a
+ * component would be unverifiable, and an unverifiable behaviour is one that
+ * gets claimed rather than shown.
+ *
+ * **It appends nothing.** `store` is read through `readAll()` and
+ * `getSnapshot()` and is never `execute`d — see this file's header for the
+ * defect that rule closes. `test/session-canvas.test.ts` asserts the event count
+ * of a durable store is unchanged across a bootstrap, because the rule is the
+ * kind that a comment cannot hold.
  */
 export function bootstrapSessionWorkspace(
   store: AppStore,
   context: DomainContext,
 ): SessionBootstrap {
-  const lexeme = findLexemeByHeadword(DEFAULT_CANONICAL_TARGET);
-  const passage = lexeme === null ? null : passageForLexeme(lexeme.id);
+  const log = store.readAll();
+  const chosen = chooseSessionTarget(store.getSnapshot().threads, log);
 
-  if (lexeme === null || passage === null) {
+  if (chosen === null) {
     return {
-      workspace: createSessionWorkspace([]),
+      workspace: createSessionWorkspace(log),
       target: null,
-      error: `The Phase-0 seed has no passage for ${DEFAULT_CANONICAL_TARGET}, so there is nothing to run a session over.`,
+      error: NO_PROMOTED_TARGET_NOTE,
     };
   }
 
-  // The same capture path screen 1 uses, so this is the learner's own thread.
-  const captured = store.execute({
-    kind: 'capture',
-    text: lexeme.headword,
-    sourceRef: SOURCE_REF,
-    provenance: PROVENANCE,
-    uncertainty: null,
-    lexemeId: lexeme.id,
-  });
-  store.execute({ kind: 'promote', threadId: captured.threadId, to: 'learn' });
-
-  const componentId = componentIdForTargetKey(lexeme.headword);
-  const log = [...store.readAll(), ...contractsFor(context, componentId)];
-
   return {
-    workspace: createSessionWorkspace(log),
+    workspace: createSessionWorkspace([
+      ...log,
+      ...contractsFor(context, chosen.lexeme, chosen.componentId),
+    ]),
     target: {
-      lexeme,
-      passage,
-      componentId,
-      threadId: captured.threadId,
-      probeContractId: READING_CONTRACT_ID,
+      lexeme: chosen.lexeme,
+      passage: chosen.passage,
+      componentId: chosen.componentId,
+      threadId: chosen.thread.state.threadId,
+      probeContractId: readingContractIdFor(chosen.lexeme),
     },
     error: null,
   };
@@ -327,10 +422,9 @@ export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
  *
  * The fallback is built unconditionally rather than behind an `if`, so the hook
  * call order is the same on every render whatever is above the screen. It costs
- * one extra bootstrap when a provider is present, and that bootstrap is free of
- * side effects on the shared log: `AppStore.execute` short-circuits on the
- * command's content key before minting anything, so the second capture and the
- * second promotion append nothing. The workspace it builds is then discarded.
+ * one extra bootstrap when a provider is present, and that costs nothing:
+ * `bootstrapSessionWorkspace` is a pure read of the store, so the second one
+ * appends nothing, observes nothing, and the workspace it builds is discarded.
  */
 export function useSessionLoop(options: SessionLoopOptions): SessionLoop {
   const shared = useContext(SessionWorkspaceContext);

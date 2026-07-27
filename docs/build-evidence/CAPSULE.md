@@ -3260,3 +3260,161 @@ remains for WP-11 is the part a compiler cannot do: running it on a device.
 4. **Check the reachability test is not tautological.** Remove `onOpenCanvas`
    from `app/(session)/session.tsx` while leaving the prop on the screen —
    `navigation-reachability.test.ts` must fail.
+
+---
+
+## WP-10 (B6) — repair round: the session stops fabricating evidence
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-integrate`
+**Base:** `6577d9c90873cb409af2f15644298c9d25d38c94`
+**Scope:** the two findings filed against the WP-10 wave — one P0, one P1. No
+new capability; two false things removed and one missing gesture added because
+removing the first left the loop unwalkable without it.
+
+### P0 — clicking "Session" wrote a capture and a promotion nobody made
+
+`bootstrapSessionWorkspace` ran `store.execute({kind:'capture'})` and
+`store.execute({kind:'promote', to:'learn'})` against the real `AppStore`, from
+a `useState` initialiser, on the first render of the `(session)` route group.
+Since WP-10 commit `5b0a5e9` put a Session link in the navigation shell and
+`bdec6f8` made the store durable, reaching that link was enough to put an
+`EncounterCaptured` — a hand-written seed passage stamped
+`provenance.source: "user_encounter"`, `license: "user_owned"` — and a
+`ThreadPromotionChanged` stamped `origin: "user"` into the learner's permanent,
+exportable log. Definition-of-done §2 item 6 names that exactly ("a grade, a
+promotion … with no user action behind it"), §2 item 7 covers the provenance
+half, and it destroyed §3 step 3, which asks John to confirm the review queue
+was empty of his encounter *before* he promoted it.
+
+**Fix — option (c) of the three the finding offered.** The bootstrap is now a
+pure read: it plans the sitting over threads the learner has already promoted to
+a rung that activates contracts (REQ-DM-09), and returns no target with
+`NO_PROMOTED_TARGET_NOTE` when there are none. Consequences:
+
+- the two contracts are built for *whichever* word the learner promoted, with
+  `acceptedAnswers` read off that seed entry instead of 分岐's hard-coded
+  reading and glosses;
+- `targetComponentId` comes from `componentIdOfEncounter` over the thread's own
+  capture event, so the gate can link contract to thread for any target;
+- the empty state is reachable and is the honest answer.
+
+**The gesture that was missing.** With the fabricated promotion gone, nothing in
+the app reached `learn` — capture stops at `keep`, which activates nothing. The
+capture screen's kept-thread list now carries a per-thread **"Take it up for
+study"** button (`capture-promote-<threadId>`), which is the only thing in the
+app that promotes a thread and is only ever a press handler. That is
+definition-of-done §3 step 3 as a thing a person does.
+
+### P1 — the export surface asserted a storage fact WP-10 had made false
+
+`packages/export/src/ui-hooks.ts` held an unconditional
+`NOT_CHECKED` entry: *"This build keeps the log in memory for one session; a
+reload loses it."* True at WP-09, false from `bdec6f8` onward, and rendered on
+`/evidence` while `/debug` in the same build said "Browser storage is available,
+so what you save survives a reload".
+
+**Fix.** The durability sentence is a parameter, not a constant:
+`StorageDurabilityClaim` (`survives-reload` | `session-only` | `unknown`),
+consumed by `notCheckedClaims()`, `verifyExportBytes()` and
+`prepareExport({storageDurability})`. `@bunki/export` still holds no adapter and
+now makes no storage assertion of its own; `evidence-inspector-screen.tsx` maps
+the store's own `DurabilityLevel` through a total `STORAGE_DURABILITY_CLAIM`
+record. Two neighbouring sentences in the same panel went with it: the export
+section note ("every event in **this session**" → "every event in **your log**",
+plus the store's own `DURABILITY_NOTES` line) and the `checked` claim ("this
+session's derived state" → "the derived state this export was taken from").
+
+### Regression cover (the finding asked for it by name)
+
+The 1236-test suite passed with the P0 present because *every* session test
+supplied a store the bootstrap then wrote to. `apps/app/test/session-canvas.test.ts`
+now makes the learner's two gestures itself (`takeUpForStudy`) before every
+bootstrap, and adds `a session is planned, never manufactured`:
+
+- **appends nothing to a durable store, however many times it is built** —
+  `createDurableAppStore`, three bootstraps, `flush()`, then `readAll()` is `[]`
+  and `eventCount` is `0`; then the same store *after* the two gestures does
+  produce a target;
+- a `keep`-only capture yields no target and no appends;
+- no `ThreadPromotionChanged` in the workspace that `takeUpForStudy` did not
+  cause; the bootstrap contributes exactly two `ContractCreated`;
+- the one `EncounterCaptured` cites `manual-entry`, never `seed-passage`;
+- contract answers equal the seed entry's `reading` / `senses`.
+
+`packages/export/test/ui-hooks.test.ts` adds
+`the durability line is a function of the caller's store, not a constant` —
+seven cases including "does not say a reload loses the log when the store
+survives one", the `prepareExport` pass-through, the claim-nothing default, and
+a scan that no claim string names a session as an export's scope.
+
+### Verification (§17.5, `npm ci` first, in this worktree)
+
+| Check | Result |
+|---|---|
+| `npm ci` (own worktree; no inherited/symlinked `node_modules`) | exit 0 |
+| `npm run test` **before any edit** | 77 files, **1236** passed — the baseline the defect survived |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` **after** | 77 files, **1248 passed** (+12) |
+| `npm run verify:export` | 1 file, 10 tests passed |
+| `npm run test:e2e` | **still the WP-01 placeholder** — exits 0, prints "not yet implemented (WP-10)". **Not evidence of anything.** |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 13 static routes, unchanged |
+
+### Runtime proof, in the exported build (headless Chromium, fresh profile)
+
+The finding was proven in a browser, so the fix was too — same method, same
+build artefact (`apps/app/dist` served statically).
+
+1. **The P0 path.** Empty `localStorage`; capture screen reads "Kept threads
+   (0)"; the single action is clicking the **Session** nav link. After it:
+   `Object.keys(localStorage)` is `[]`, `localStorage.getItem('bunki-phase0')`
+   is `null`, `/session` renders *"Nothing is taken up for study yet."* with
+   `NO_PROMOTED_TARGET_NOTE`; a reload still reads "Kept threads (0)".
+   Previously this left `EncounterCaptured(分岐, seed-passage, user_encounter,
+   user_owned)` + `ThreadPromotionChanged(captured→learn, origin: "user")`.
+2. **The loop still closes.** Type 分岐 → **Keep** → "Kept threads (1)" →
+   **Take it up for study** → the row reads `learn · 1 encounter(s)` → `/session`
+   → **Compose the session** → a real plan: `new → canvas → closure`, 3 steps,
+   about 6 min of the 12 given, `canvas — pas-bunki-01`.
+3. **The P1 strings.** `/evidence` → **Export and verify** now prints
+   *"Complete, versioned, lossless JSON of every event in your log … Saved on
+   this device."*, and under "What it did not": *"Durability. The store this
+   export was taken from keeps your log where a reload finds it again — but that
+   is a fact about the store, not something this check established."* — which is
+   what `/debug` says in the same build. The licence line reads
+   `manual-entry · user_owned · 1 encounter`; the fabricated `seed-passage`
+   reference is gone.
+
+### Surfaces touched
+
+`apps/app/app/(session)/_layout.tsx`, `apps/app/app/(session)/session.tsx`,
+`apps/app/src/screens/session-loop.ts`, `session-workspace.tsx`,
+`session-screen.tsx`, `canvas-screen.tsx`, `capture-screen.tsx`,
+`evidence-inspector-screen.tsx`, `apps/app/test/session-canvas.test.ts`,
+`packages/export/src/ui-hooks.ts`, `packages/export/test/ui-hooks.test.ts`.
+No spec, convergence, handoff or ADR file was touched.
+
+### Still open, unchanged by this round
+
+COORD-B8-2 (the session workspace's own events are not in the durable log) is
+untouched and `SESSION_INTEGRATION_NOTE` still says so on `/session` and
+`/debug`. `npm run test:e2e` is still the placeholder, so T-17 remains unmet and
+the rung stays **ENGINEERING-DONE (web) not yet claimable**; nothing in this
+round advances the ladder.
+
+### What a verifier should try to break
+
+1. **Delete the two gestures from the test harness.** Remove the
+   `takeUpForStudy(store)` call in `harness()` and confirm every session test
+   goes red rather than quietly bootstrapping its own thread — that is the
+   property the old suite lacked.
+2. **Re-introduce the write.** Put `store.execute({kind:'promote', …})` back in
+   `bootstrapSessionWorkspace` and confirm *"appends nothing to a durable
+   store"* fails. If it passes, the regression test is decorative.
+3. **Lie about durability.** Flip `STORAGE_DURABILITY_CLAIM['device-local']` to
+   `'session-only'` and read `/evidence` beside `/debug`; then flip
+   `notCheckedClaims` back to a constant and confirm the export test fails.
+4. **Check the empty state is reachable rather than theoretical.** Clear
+   `localStorage`, open `/session`, `/canvas` and `/repair` directly; each must
+   render its own empty panel, and none may write a byte.
