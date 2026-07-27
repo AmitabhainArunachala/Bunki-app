@@ -3419,6 +3419,7 @@ round advances the ladder.
    `localStorage`, open `/session`, `/canvas` and `/repair` directly; each must
    render its own empty panel, and none may write a byte.
 
+<<<<<<< HEAD
 ---
 
 ## WP-10 (B9) — T-17: the closed loop, executed by clicking
@@ -3551,3 +3552,201 @@ covers them. `scripts/not-implemented.mjs` now has no callers.
   as T-16-native or as a §13 device measurement.
 - Rung: **ENGINEERING-DONE (web) not yet claimable** — T-17 is now green, but
   B9-1 and B9-2 are open P1s and WP-11/WP-12/WP-13 are unstarted.
+=======
+## Appendix — WP-10 adversarial lanes T1 + T2 (agent A, appended 2026-07-27)
+
+Branch `agent/bunki-phase0-closed-loop-wp10-adv-a`, cut from
+`origin/agent/bunki-phase0-closed-loop-wp10-integrate` at `3fd08e8`.
+**Tests only.** No product file was modified, and no spec, convergence,
+handoff or ADR file was touched. Where a test exposed a product defect it is
+recorded below with a proposed fix rather than fixed here, per the lane's brief
+and orchestration §4 (adversarial lanes are additive to test directories only).
+
+`npm ci` was run in this worktree before any check was trusted — 722 packages, a
+real tree, not an inherited symlink. The pre-change baseline on `3fd08e8` was
+**77 files / 1248 tests**, so the numbers below are the delta this lane added
+and not an inherited pass.
+
+### What the two lanes cover (controller §17.2)
+
+| §17.2 clause | Where it is now asserted |
+|---|---|
+| random event interleavings preserve gate invariants | `packages/domain/test/adversarial/t1-interleaving-properties.test.ts` |
+| double-tap / concurrent capture produces exactly one thread | `apps/app/test/adversarial/t1-concurrent-capture.test.ts`, `packages/persistence/test/adversarial/t1-concurrent-append.test.ts` |
+| clock skew does not corrupt scheduling | `packages/domain/test/adversarial/t1-clock-skew.test.ts` |
+| hostile AI responses (oversized, mislabeled, schema-violating, injection) | `packages/ai/test/adversarial/t2-hostile-responses.test.ts` |
+| hostile candidate content never renders unlabeled, never reaches canonical state | `apps/app/test/adversarial/t2-injection-inert-and-labeled.test.ts` |
+
+Generator: `packages/domain/test/adversarial/support/fuzz.ts` — a seeded
+`mulberry32` mirroring `createSeededRandom`, hand-rolled rather than
+`fast-check` because adding a dependency means editing `package.json` and the
+lockfile, which this lane does not own. Every case is addressed by
+`(seed, index)`, so the corpus is byte-reproducible across runs and runtimes.
+
+### §17.5 check set, run in this worktree after `npm ci`
+
+| Command | Result |
+|---|---|
+| `npm run lint` | clean, 0 errors 0 warnings |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | clean (root + all six workspace projects, including both `tsconfig.test.json`s) |
+| `npm run test` | **83 files / 1370 tests passed** (baseline 77 / 1248; this lane adds 6 files / 122 tests) |
+| `npm run test:replay` | 2 files / 47 tests passed |
+| `npm run test:e2e` | **still the WP-01 placeholder** — exits 0, prints "not yet implemented (WP-10)". **Not evidence of anything.** |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 13 static routes |
+
+Nothing in this lane touches the browser. The E2E halves of T-12 and T-13 and
+the whole of T-17 remain unmet and belong to the E2E lane; the rung stays
+**ENGINEERING-DONE (web) not yet claimable**.
+
+### Corpus, measured rather than asserted
+
+- 96 generated logs × 8 permutations = **768 random interleavings**. Of these
+  **314 replayed** (and satisfied every gate invariant) and **454 failed
+  closed**. Both arms are asserted to be non-empty, so the suite cannot
+  degenerate into "everything is rejected, therefore everything passes".
+- Of the 454 refusals, **442 were correctly typed `ReducerInvariantError`** and
+  **12 (1.6% of all permutations) were `FSRSValidationError`** — a `ts-fsrs`
+  error, not a `DomainError`. That is finding ADV-T1-01.
+
+### Findings (product defects — reported, not fixed)
+
+#### ADV-T1-01 — P1. A backward clock step across midnight UTC makes `replay` throw an unclassified library error, and the write gate then refuses an already-acknowledged review
+
+**Where.** `packages/domain/src/reducers/memory-state.ts`, in
+`applyAdmittedReview`: `review.reviewedAt` is handed straight to
+`scheduler.next(...)`.
+
+**Trigger.** Two admitted reviews on one contract where the second's
+`occurredAt` falls on an earlier **UTC calendar date** than the first's. This is
+*not* a 24-hour window — `ts-fsrs` computes `delta_t` as a difference of dates.
+Measured on this build, with a first review at `2026-07-27T09:03:00Z`:
+
+- second review at `2026-07-27T00:03:00Z` (nine hours back) — **tolerated**;
+- second review at `2026-07-26T23:59:00Z` (four minutes further back) —
+  **`FSRSValidationError: Invalid delta_t "-1"`**.
+
+Four minutes of wall clock separate the two. The trigger is therefore an
+ordinary NTP correction near midnight UTC, not a clock a day out of true — and a
+learner in UTC+9 reviewing at 09:30 local is at 00:30 UTC.
+
+**Why it matters.** `replay` documents its `@throws` as
+`DuplicateEventIdError | IdempotencyConflictError | ReducerInvariantError |
+PromotionTransitionError`. `FSRSValidationError` is none of them, and `replay`
+is not a leaf: it is the write gate in `packages/persistence/src/append-plan.ts`
+(which replays *stored ++ incoming* before committing a byte) and it backs
+`EventStorePort.snapshot()`. Consequences, in order of severity:
+
+1. **An acknowledged review is lost.** REQ-UI-01 acknowledges on screen
+   *before* persisting, by design. The skewed review is refused at the port
+   afterwards, the durable store moves to `WriteState.failed`, and the learner
+   has been told their review was saved. That is DoD §2 item 6 (evidence
+   theatre) arriving through the back door.
+2. **Export→replay breaks.** A log containing such a pair fails `replayJson`,
+   which is T-14 and DoD §2 item 4 ("export exists but doesn't replay").
+3. **WP-11 multi-device.** Two devices whose logs merge across a date boundary
+   produce an unreplayable log by construction.
+4. Callers that branch on `DomainError` — the store's write-state reporting
+   does — see an unclassified crash with no named reason to render.
+
+**What is *not* wrong.** No corrupt state is produced: the failure is closed,
+nothing partial is written, and the stored log stays replayable. The pinned
+persistence test confirms the store is not wedged for logs that stay ahead of
+the last review.
+
+**Proposed fix (WP-06 owner's call — `packages/domain/src/reducers/`).** Two
+options, and they are not equivalent:
+
+- *Durability-preserving.* In `applyAdmittedReview`, clamp the instant handed to
+  `ts-fsrs` to `max(review.reviewedAt, state.lastReviewedAt)` while keeping
+  `lastReviewedAt = review.reviewedAt` in the derived state, so the ledger stays
+  honest about when the learner actually reviewed and the scheduler never sees a
+  negative delta. **This changes scheduling semantics** and therefore needs a
+  golden-replay fixture update and an explicit note in the FSRS pin — an
+  ADR-002-adjacent decision, not a quiet patch.
+- *Minimum contract repair.* Wrap the `scheduler.next` call and re-throw as
+  `ReducerInvariantError('memory-state.monotonic-review', …)`. This does not
+  save the review, but it makes the failure a `DomainError` the store can
+  classify and the inspector can explain, which is the least `replay`'s own
+  documented contract requires.
+
+**Pinned by.** `packages/domain/test/adversarial/t1-clock-skew.test.ts`, in a
+block explicitly named as a characterisation test: it asserts the boundary and
+asserts that the thrown error is *not* a `DomainError`, with a failure message
+saying so. **It is expected to go red when this is fixed** — whoever fixes it
+should invert or delete that block and say so here. The three properties above
+it (no silent influence, no silent drop, no corrupt arithmetic) are written to
+survive either repair.
+
+### Observations (not defects — no reachable path admits anything)
+
+#### ADV-T2-03 — P2. `assertNotCandidate` inspects only the top level plus `envelope.taskClass`
+
+`AiCandidateOutcome` (`{envelope, request, route}`) — the runtime's own return
+value — is not recognised as candidate-shaped, because the markers sit one level
+down and `AiCandidateEnvelope` carries no `taskClass`. The gate still refuses
+it, as `not_evidence_class`, so T-09 holds; only the boundary error does not
+fire for that particular wrapper. Optional hardening: scan one level of nested
+plain-object values for the marker set. Recorded rather than
+asserted-as-requirement, and the test asserts the property that matters
+(`admitted` is never `true`) instead of a preferred error class.
+
+#### ADV-T2-04 — P2. `zod.strictObject` does not treat a JSON-parsed `__proto__` own key as an unknown key
+
+`parseAiCandidateEnvelope` accepts a payload carrying `__proto__` rather than
+rejecting it as an extra field. Nothing is written to `Object.prototype`, and
+the key does not survive into the validated value — own keys are exactly
+`targetForm` and `explanation`. So the outcome is safe; the observation is only
+that "strict means every unknown key is a rejection" has this one exception.
+Pinned by a test that asserts the safe outcomes directly.
+
+### Two controls this lane deliberately did not weaken
+
+- `packages/ai/test/telemetry-and-no-live-calls.test.ts` greps that package's
+  test tree for any URL that is not an `example` one. The first draft of the
+  injection corpus used `evil.invalid` and went red. The fixture was changed to
+  `example.invalid` and the guard left alone — an adversarial fixture is not a
+  reason to loosen the rule that no test in `@bunki/ai` can reach the network.
+- The gate-invariant helper counts verdicts over **distinct event ids**, not
+  array positions, because a re-delivered event is skipped by the idempotency
+  rule. Counting positions would have made the duplication tests pass by
+  accident.
+
+### Surfaces touched
+
+`packages/domain/test/adversarial/support/fuzz.ts`,
+`packages/domain/test/adversarial/t1-interleaving-properties.test.ts`,
+`packages/domain/test/adversarial/t1-clock-skew.test.ts`,
+`packages/persistence/test/adversarial/t1-concurrent-append.test.ts`,
+`packages/ai/test/adversarial/t2-hostile-responses.test.ts`,
+`apps/app/test/adversarial/t1-concurrent-capture.test.ts`,
+`apps/app/test/adversarial/t2-injection-inert-and-labeled.test.ts`.
+All new files. No product code, no config, no lockfile, no frozen document.
+
+### What a verifier should try to break
+
+1. **Check the corpus is not vacuous.** Force `generateCase` to always promote
+   to `keep` and confirm the "corpus is not vacuous" test goes red. A fuzz suite
+   whose logs never activate a schedule proves nothing, and that guard is the
+   only thing standing between this file and that outcome.
+2. **Break a gate rule and watch the permutations catch it.** Make
+   `effectiveGradeOf` return `event.grade` unconditionally (dropping T-06) and
+   confirm the interleaving suite goes red, not just the T-06 unit test.
+3. **Re-key the capture.** Change `captureIdempotencyKey` to include
+   `context.clock.now()` and confirm the twenty-tap burst test forks twenty
+   threads. If it still passes, the double-tap property is being proven by the
+   test's own structure rather than by the store.
+4. **Test the near-misses, not just the repeats.** Remove the NFKC fold from
+   `targetKeyOf` and confirm the "trailing space" and "full-width space" cases
+   go red — those are the cases an idempotency-key test alone cannot reach.
+5. **Confirm ADV-T1-01 reproduces.** Append a review at `2026-07-26T23:59:00Z`
+   after one at `2026-07-27T09:03:00Z` through the real port and watch the
+   append be refused; then move the second to `00:03Z` the same day and watch it
+   succeed. Four minutes.
+6. **Unbound a telemetry field.** Raise `MAX_MODEL_ID_CHARS` to a large number
+   and confirm the oversized-model case goes red — that ceiling is load-bearing
+   and was a real hole once.
+7. **Drop a label.** Make `labelsFor` return the fallback label *instead of* the
+   primary one and confirm the hostile-content suite goes red on every case, not
+   only the fallback one.
+>>>>>>> origin/agent/bunki-phase0-closed-loop-wp10-adv-a
