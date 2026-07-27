@@ -24,14 +24,26 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applySessionCommand,
+  classifyCanvasInteraction,
   createDeterministicContext,
   isEvidenceEventType,
   latestStumble,
   type CanvasProbeOffer,
   type DomainContext,
+  type Grade,
   type SessionWorkspaceState,
 } from '@bunki/domain';
 
+import {
+  answerCloze,
+  canAttempt,
+  exposeOnCanvas,
+  presentCloze,
+  revealCloze,
+  targetIsHidden,
+  type ClozePresentation,
+  type ClozeTarget,
+} from '../src/screens/canvas-cloze.ts';
 import { segmentPassage, targetSegments } from '../src/screens/canvas-passage.ts';
 import {
   bootstrapSessionWorkspace,
@@ -39,6 +51,7 @@ import {
   probeOfferFor,
   type SessionTarget,
 } from '../src/screens/session-loop.ts';
+import { elapsedMs } from '../src/screens/session-timing.ts';
 import { createMemoryAppStore } from '../src/state/memory-store.ts';
 
 const ASOF = '2026-07-27T10:00:00.000Z';
@@ -233,6 +246,177 @@ describe('a passive tap logs exposure only (T-08, REQ-SCH-06)', () => {
       componentIds.length,
     );
     expect(after.derived.memoryStates).toEqual(state.derived.memoryStates);
+  });
+});
+
+/**
+ * The canvas driven the way the screen drives it (WP-08 repair round).
+ *
+ * Everything above hands `targetWasHidden` in as an argument, and that is
+ * precisely why 145 tests could not see the P0: the screen wrote
+ * `targetWasHidden: true` as a literal on both probe paths, left the four grade
+ * buttons enabled after the blank was settled, and every test obligingly agreed
+ * that the word was hidden. These drive `canvas-cloze.ts` — the same transitions
+ * and the same interaction payloads the component dispatches — and never state
+ * the field under test.
+ */
+describe('one blank yields at most one declared probe (REQ-SCH-06, DL-19)', () => {
+  const clozeTargetOf = (target: SessionTarget): ClozeTarget => ({
+    experienceId: target.passage.id,
+    componentId: target.componentId,
+    probeContractId: target.probeContractId,
+  });
+
+  /** Press a grade the way the screen does: from the presentation it holds. */
+  const press = (
+    context: DomainContext,
+    state: SessionWorkspaceState,
+    target: SessionTarget,
+    presentation: ClozePresentation,
+    grade: Grade,
+    at = ASOF,
+  ): { state: SessionWorkspaceState; presentation: ClozePresentation } => {
+    const step = answerCloze(presentation, clozeTargetOf(target), { grade, at });
+    return {
+      state: applySessionCommand(context, state, {
+        kind: 'canvasInteraction',
+        offer: probeOfferFor(state, target),
+        interaction: step.interaction,
+      }),
+      presentation: step.next,
+    };
+  };
+
+  it('settles the blank on the first answer, and says so', () => {
+    const { context, state, target } = harness('app-wp08-settle-');
+    const first = press(context, state, target, presentCloze(ASOF), 'good');
+
+    expect(targetIsHidden(first.presentation)).toBe(false);
+    expect(canAttempt(first.presentation)).toBe(false);
+
+    const minted = first.state.log.at(-1);
+    expect(minted?.type).toBe('ReviewGraded');
+    expect(first.state.canvasLedger.at(-1)?.classification.kind).toBe('declared_probe');
+    expect(first.state.derived.gateDecisions.at(-1)?.admitted).toBe(true);
+  });
+
+  it('classifies a second press as exposure, because the word is now on the page', () => {
+    const { context, state, target } = harness('app-wp08-second-');
+    const first = press(context, state, target, presentCloze(ASOF), 'good');
+
+    // The buttons are disabled at this point, so this press has no UI to arrive
+    // through. Forcing it anyway is the belt-and-braces check: if a future
+    // change re-enables them, the kernel is told the truth and refuses.
+    const forced = answerCloze(first.presentation, clozeTargetOf(target), {
+      grade: 'good',
+      at: ASOF,
+    });
+    expect(forced.interaction.targetWasHidden).toBe(false);
+    expect(
+      classifyCanvasInteraction(forced.interaction, probeOfferFor(first.state, target)),
+    ).toEqual({
+      kind: 'exposure',
+      reason: 'target_was_already_visible',
+      detail: expect.any(String) as unknown as string,
+    });
+
+    const second = press(context, first.state, target, first.presentation, 'good');
+    expect(second.state.log.at(-1)?.type).toBe('ExposureLogged');
+    expect(second.state.derived.gateDecisions.at(-1)?.admitted).toBe(false);
+    expect(second.state.derived.memoryStates).toEqual(first.state.derived.memoryStates);
+    expect(JSON.stringify(second.state.derived.memoryStates)).toBe(
+      JSON.stringify(first.state.derived.memoryStates),
+    );
+  });
+
+  it('moves memory once for ten presses of Good on one blank', () => {
+    const { context, state, target } = harness('app-wp08-ten-');
+    let current = press(context, state, target, presentCloze(ASOF), 'good');
+    const afterFirst = current.state.derived.memoryStates;
+
+    for (let press_ = 1; press_ < 10; press_ += 1) {
+      current = press(context, current.state, target, current.presentation, 'good');
+    }
+
+    const graded = current.state.log.filter((event) => event.type === 'ReviewGraded');
+    const exposures = current.state.log.filter((event) => event.type === 'ExposureLogged');
+    expect(graded).toHaveLength(1);
+    expect(exposures).toHaveLength(9);
+    expect(current.state.derived.memoryStates).toEqual(afterFirst);
+    expect(
+      current.state.derived.gateDecisions.filter((decision) => decision.admitted),
+    ).toHaveLength(1);
+  });
+
+  it('settles the blank on a reveal too, so revealing then grading is not two probes', () => {
+    const { context, state, target } = harness('app-wp08-reveal-settle-');
+    const step = revealCloze(presentCloze(ASOF), clozeTargetOf(target), ASOF);
+    expect(step.interaction.targetWasHidden).toBe(true);
+    expect(canAttempt(step.next)).toBe(false);
+
+    const revealed = applySessionCommand(context, state, {
+      kind: 'canvasInteraction',
+      offer: probeOfferFor(state, target),
+      interaction: step.interaction,
+    });
+    const minted = revealed.log.at(-1);
+    expect(minted?.type === 'ReviewGraded' && minted.grade).toBe('again');
+
+    const after = press(context, revealed, target, step.next, 'easy');
+    expect(after.state.log.at(-1)?.type).toBe('ExposureLogged');
+    expect(after.state.derived.memoryStates).toEqual(revealed.derived.memoryStates);
+  });
+
+  it('reports the blank’s real visibility on a tap, before and after it settles', () => {
+    const { target } = harness('app-wp08-visibility-');
+    const hidden = presentCloze(ASOF);
+    expect(exposeOnCanvas(hidden, target.passage.id, 'tap', ['kc:x']).targetWasHidden).toBe(true);
+
+    const settled = answerCloze(hidden, clozeTargetOf(target), { grade: 'good', at: ASOF }).next;
+    expect(exposeOnCanvas(settled, target.passage.id, 'read', ['kc:x']).targetWasHidden).toBe(
+      false,
+    );
+  });
+});
+
+describe('a graded attempt carries a measured latency (REQ-SCH-06, REQ-SCH-05)', () => {
+  it('reports the gap between the blank appearing and the grade being pressed', () => {
+    const { context, state, target } = harness('app-wp08-latency-');
+    const step = answerCloze(
+      presentCloze('2026-07-27T10:00:00.000Z'),
+      {
+        experienceId: target.passage.id,
+        componentId: target.componentId,
+        probeContractId: target.probeContractId,
+      },
+      { grade: 'good', at: '2026-07-27T10:00:04.500Z' },
+    );
+    expect(step.interaction.attempt?.latencyMs).toBe(4500);
+
+    const after = applySessionCommand(context, state, {
+      kind: 'canvasInteraction',
+      offer: probeOfferFor(state, target),
+      interaction: step.interaction,
+    });
+    const minted = after.log.at(-1);
+    expect(minted?.type === 'ReviewGraded' && minted.latencyMs).toBe(4500);
+  });
+
+  it('reads zero only when the clock genuinely did not move', () => {
+    expect(elapsedMs(ASOF, ASOF)).toBe(0);
+    expect(elapsedMs(ASOF, '2026-07-27T10:00:00.001Z')).toBe(1);
+  });
+
+  it('clamps a clock that ran backwards instead of emitting a negative duration', () => {
+    // `latencyMs` is `int().min(0)`. A resync can hand two readings back out of
+    // order; a negative duration is not a thing that can be true of an attempt.
+    expect(elapsedMs('2026-07-27T10:00:05.000Z', ASOF)).toBe(0);
+  });
+
+  it('does not rescue an unparseable instant into a zero', () => {
+    // Turning a broken clock into `0` would rebuild the defect this replaced.
+    // NaN reaches the fail-closed event parser, which is where it should surface.
+    expect(Number.isNaN(elapsedMs('not-an-instant', ASOF))).toBe(true);
   });
 });
 

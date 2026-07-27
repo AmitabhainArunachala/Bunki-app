@@ -32,7 +32,7 @@
  * bootstrap that appended twice would be a defect the store already prevents.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import {
   applySessionCommand,
@@ -260,7 +260,23 @@ export function probeOfferFor(
   });
 }
 
-export function useSessionLoop(options: SessionLoopOptions): SessionLoop {
+/**
+ * The workspace a navigator may hand down, so several screens share one session.
+ *
+ * Declared here rather than in `session-workspace.tsx` for one reason: that file
+ * renders the provider and therefore imports this one, and putting the context
+ * object there too would make the import cycle back. The provider is the only
+ * thing that needs JSX; a context object does not.
+ */
+export const SessionWorkspaceContext = createContext<SessionLoop | null>(null);
+
+/**
+ * Build a workspace of this screen's own.
+ *
+ * Exported for the provider, which needs the un-shared version — asking for the
+ * shared one from inside the thing that provides it would be a cycle.
+ */
+export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
   const contextStore = useAppStore();
   const store = options.store ?? contextStore;
   const { context, onEvents } = options;
@@ -289,6 +305,23 @@ export function useSessionLoop(options: SessionLoopOptions): SessionLoop {
   const now = useCallback(() => context.clock.now(), [context]);
 
   return { state, target: initial.target, offer, dispatch, now, error: initial.error };
+}
+
+/**
+ * The workspace this screen should use: the shared one if a navigator provided
+ * it, otherwise one of its own.
+ *
+ * The fallback is built unconditionally rather than behind an `if`, so the hook
+ * call order is the same on every render whatever is above the screen. It costs
+ * one extra bootstrap when a provider is present, and that bootstrap is free of
+ * side effects on the shared log: `AppStore.execute` short-circuits on the
+ * command's content key before minting anything, so the second capture and the
+ * second promotion append nothing. The workspace it builds is then discarded.
+ */
+export function useSessionLoop(options: SessionLoopOptions): SessionLoop {
+  const shared = useContext(SessionWorkspaceContext);
+  const own = useOwnSessionLoop(options);
+  return shared ?? own;
 }
 
 /** The marks the canvas is willing to make interactive, from the seed alone. */

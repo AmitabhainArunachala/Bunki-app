@@ -12,19 +12,23 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  IdempotencyConflictError,
   SESSION_COMPLETION_STATES,
   applySessionCommand,
   createDeterministicContext,
   createSessionWorkspace,
   isEvidenceEventType,
+  latestStumble,
   parseEvent,
   rejoinObservations,
+  replay,
   sessionProgress,
   threadIndexByContract,
+  type CanvasInteraction,
   type DomainContext,
   type SessionWorkspaceState,
 } from '../../src/index.ts';
-import { seededLog } from './support.ts';
+import { COMPONENT, seededLog, seededLogWithReview } from './support.ts';
 
 const ASOF = '2026-07-27T10:00:00.000Z';
 
@@ -146,6 +150,101 @@ describe('what a caller can and cannot say', () => {
     expect(applySessionCommand(context, empty, { kind: 'skipStep' })).toBe(empty);
     expect(applySessionCommand(context, empty, { kind: 'close' })).toBe(empty);
     expect(applySessionCommand(context, empty, { kind: 'checkRejoin' })).toBe(empty);
+  });
+});
+
+/**
+ * The handler's idempotency note, checked rather than believed (§7, §17.2).
+ *
+ * It used to claim one rule for all three evidence paths — "content, never a
+ * counter … so a double tap produces the same key and replay collapses it into
+ * one event". That is true of `answerStep` and false of the other two, and a
+ * later reader would have relied on it. These tests pin what each path does and
+ * the reason the difference is deliberate.
+ */
+describe('idempotency keys, per path', () => {
+  const tap: CanvasInteraction = {
+    experienceId: 'pas-bunki-01',
+    kind: 'tap',
+    componentIds: [COMPONENT],
+    declaredContractId: null,
+    targetWasHidden: true,
+  };
+
+  const tapTwice = (context: DomainContext): SessionWorkspaceState => {
+    let state = createSessionWorkspace(seededLog());
+    for (let press = 0; press < 2; press += 1) {
+      state = applySessionCommand(context, state, {
+        kind: 'canvasInteraction',
+        offer: null,
+        interaction: tap,
+      });
+    }
+    return state;
+  };
+
+  it('collapses a double-tapped answerStep, because the key names the step', () => {
+    const context = newContext('cmd-key-review-');
+    const open = started(context);
+    const attempt = {
+      grade: 'good' as const,
+      latencyMs: 2000,
+      hintsUsed: 0,
+      revealedBeforeRecall: false,
+    };
+
+    // Both presses see the same prior state — that *is* the racing double tap.
+    const once = applySessionCommand(context, open, { kind: 'answerStep', attempt });
+    const twice = applySessionCommand(context, open, { kind: 'answerStep', attempt });
+
+    expect(once.log.at(-1)?.idempotencyKey).toBe(twice.log.at(-1)?.idempotencyKey);
+    expect(once.log.at(-1)?.idempotencyKey).toMatch(/^review:/);
+  });
+
+  it('gives the canvas a positional key, so a repeat is a second encounter', () => {
+    const state = tapTwice(newContext('cmd-key-canvas-'));
+    const keys = state.log.slice(-2).map((event) => event.idempotencyKey);
+    expect(keys).toEqual(['canvas:pas-bunki-01:0', 'canvas:pas-bunki-01:1']);
+    expect(state.log.filter((event) => event.type === 'ExposureLogged')).toHaveLength(2);
+  });
+
+  it('shows why: a content-derived key on that path would refuse the whole log', () => {
+    // Each mint draws a fresh `eventId` from the injected generator, and replay
+    // collapses a repeated key only on a byte-identical re-append. Give the two
+    // taps one shared "content" key and replay does not deduplicate them — it
+    // rejects the log, which is worse than the counter it would have replaced.
+    const state = tapTwice(newContext('cmd-key-content-'));
+    const contentKeyed = state.log.map((event, index) =>
+      index >= state.log.length - 2 ? { ...event, idempotencyKey: 'canvas:content' } : event,
+    );
+    expect(() => replay(contentKeyed)).toThrow(IdempotencyConflictError);
+  });
+
+  it('gives each repair probe its own ordinal, because the criterion counts them', () => {
+    const context = newContext('cmd-key-repair-');
+    let state = createSessionWorkspace(
+      seededLogWithReview({ contractId: 'contract-reading', grade: 'again' }),
+    );
+    const stumble = latestStumble(state);
+    expect(stumble).not.toBeNull();
+
+    state = applySessionCommand(context, state, { kind: 'openRepair', stumble: stumble! });
+    state = applySessionCommand(context, state, {
+      kind: 'chooseRepairBranch',
+      branch: state.repair!.recommended,
+      at: ASOF,
+    });
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      state = applySessionCommand(context, state, {
+        kind: 'repairProbe',
+        attempt: { grade: 'hard', latencyMs: 1200, hintsUsed: 0, revealedBeforeRecall: false },
+      });
+    }
+
+    expect(state.log.slice(-2).map((event) => event.idempotencyKey)).toEqual([
+      'repair:contract-reading:0',
+      'repair:contract-reading:1',
+    ]);
   });
 });
 

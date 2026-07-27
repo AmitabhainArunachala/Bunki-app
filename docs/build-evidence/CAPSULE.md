@@ -1752,3 +1752,328 @@ V-role verifier: re-run the above from a clean checkout of
 `agent/bunki-phase0-closed-loop-wp08`, then
 `git diff --stat c30560b..HEAD` to confirm no surface outside the list at the top
 of this appendix was touched.
+
+## Appendix — WP-08 (Builder B8, repair round): the canvas told the kernel what it wished were true
+
+**Agent:** B8 (Builder, WP-08 repair) · **Wave:** W4 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp08` · **Repair base:** `b3d5d06`
+**Surfaces touched:** `apps/app/src/screens/{canvas*,session*}`,
+`apps/app/test/{session-canvas,session-screens,screen-contract}.test.ts`,
+`packages/domain/src/session/commands.ts` (comment + two comments at the key
+sites), `packages/domain/test/session/commands.test.ts`, and this appendix.
+Nothing else. `apps/app/src/state/` and `apps/app/app/` are untouched, and
+`@bunki/persistence` is still not imported from `apps/app`.
+
+### Integrity (launcher step 1, re-verified this round)
+
+| File | SHA-256 observed | Matches the integrity record |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` | yes |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` | yes |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71` | yes |
+
+### Stacking, and one deliberate deviation from the wave instruction
+
+The wave instruction says to cut from the **current**
+`origin/agent/bunki-phase0-integration` head, which is now
+**`795cc8c`** (was `c30560b` when WP-08 was cut). This round did **not** rebase.
+A repair round is re-verified against the findings it answers, and rebasing would
+have made the diff a mixture of the repair and three other lanes' merges, so the
+one thing a verifier needs to read — what changed because of the findings —
+would no longer be readable. `git log --oneline c30560b..795cc8c` is four
+refresh/merge commits from `main` (PRs #8/#9/#10) and carries no lane work WP-08
+depends on, so nothing was gained by taking them. **Flagged for the Conductor:**
+integrating this branch is still a normal merge onto `795cc8c` or its successor.
+
+### Findings answered
+
+#### P0 — the screen reported `targetWasHidden: true` while showing the word
+
+Reproduced exactly as filed. `canvas-screen.tsx` held the real answer in
+`targetHidden` and then wrote the literal `true` on both probe paths
+(`answer()` and `reveal()`), and the four grade buttons carried no `disabled`
+prop while the reveal button did. So after one honest answer the word was
+printed in the passage and the grades stayed live, and each further press minted
+a tier-A `ReviewGraded` that the gate admitted. That is REQ-SCH-06's priming rule
+defeated at the one seam where the kernel has to trust its caller, and DL-19's
+"relabelled exposure → false mastery" arriving through the app rather than
+through the classifier.
+
+**What changed.** The presentation is now a state machine —
+`apps/app/src/screens/canvas-cloze.ts` — with three phases (`hidden`,
+`revealed`, `answered`) and one predicate, `targetIsHidden`, read by the cloze
+mask, the accessibility label, both `disabled` props and the `targetWasHidden`
+the kernel is told. They can no longer disagree, because there is one of them.
+`canAttempt` is false once the blank is settled, and `disabled={settled}` is on
+the reveal **and** the four grades, so one blank yields at most one declared
+probe. Revealing settles it too: a reveal already mints a complete probe graded
+`again`, and grading afterwards would be a second tier-A observation of one
+attempt.
+
+**Why it is a module rather than three corrected lines.** The reason 145 tests
+could not see this is that every app-level test *supplied* `targetWasHidden:
+true` by hand. A test that provides the field under test cannot fail for this
+class of defect. The state machine is pure and exported, so the new tests drive
+the same transitions and the same interaction payloads the component dispatches
+and never state the field themselves.
+
+**Verified by mutation, not by assertion.** Restoring the literal
+(`targetWasHidden: true` in `answerCloze`) and re-running turns four tests red —
+three behavioural in `session-canvas.test.ts` ("classifies a second press as
+exposure…", "moves memory once for ten presses of Good on one blank", "settles
+the blank on a reveal too…") and one source scan in `session-screens.test.ts`
+("never states targetWasHidden as a literal"). The mutation was then reverted;
+the file is byte-identical to the version under test.
+
+The ten-press case now reads: **1** `ReviewGraded`, **9** `ExposureLogged`, one
+admitted gate decision, and `derived.memoryStates` byte-identical after press 2
+through press 10.
+
+#### P1 — the idempotency docstring described a rule only one path follows
+
+Confirmed and corrected, and the correction is the *second* option offered in
+the finding rather than the first. The first option — deriving the canvas key
+from the interaction's content — does not do what it appears to: `replay`
+collapses a repeated `idempotencyKey` only when the second event is
+byte-identical **including its `eventId` and `occurredAt`**, and every mint draws
+a fresh id from the injected generator and a fresh instant from the injected
+clock. A content-derived key on that path therefore would not collapse a genuine
+repeat; it would raise `IdempotencyConflictError` and refuse the whole log. It is
+also the wrong model: two taps on a word are two encounters, and two repair
+probes are two attempts `REJOIN_CRITERION` has to count separately.
+
+So the docstring on `applySessionCommand` now states each path — `answerStep`
+keyed by session and step (a step settles when it is answered, so a racing double
+tap does collapse), canvas and repair keyed positionally and why — and says
+plainly what protects the probe path instead: the screen's one-attempt rule and
+the classifier's `target_was_already_visible`, neither of which is the key.
+Four tests in `packages/domain/test/session/commands.test.ts` pin it, including
+one that rewrites the two canvas keys to a shared content key and asserts
+`replay` throws.
+
+**Open §17.2 item (recorded, not implied):** canvas and repair double taps are
+**not** deduplicated by their idempotency keys. Closing that needs the handler to
+look up a prior event by content key and reuse its `eventId` and `occurredAt`
+rather than minting — a real design decision about whether a repeated exposure is
+one encounter or two, and not something to settle inside a repair round.
+
+#### P1 — `latencyMs: 0` was a constant in all three screens
+
+Now measured, in all three, from the injected clock via `loop.now()` and never
+`Date.now`. `apps/app/src/screens/session-timing.ts` holds the two pieces:
+`elapsedMs(from, to)` and `usePresentedAt(now, presentationKey)`, which marks the
+instant the thing in front of the learner became answerable and re-marks it when
+the presentation changes (a new step, the next repair attempt). The canvas marks
+at mount, which is when the blank went on screen.
+
+Three details worth a verifier's attention:
+
+- a **`0` now means the clock did not move** — which is the truth under a pinned
+  fixture clock — rather than "nobody measured". `elapsedMs` clamps a backwards
+  clock to `0` (the field is `int().min(0)`, and a negative duration is not a
+  thing that can be true of an attempt) and deliberately does **not** rescue an
+  unparseable instant into a zero: that produces `NaN` and fails at the
+  fail-closed parser, which is where a broken clock should surface;
+- the **reveal path also carries a measured latency** now. It used to fall
+  through to the kernel's default attempt, which is `latencyMs: 0` — accurate as
+  "nothing was recorded", indistinguishable from a fabricated zero once in the
+  ledger. Giving up took time and that interval is real;
+- `revealedBeforeRecall` on the answer path is **derived** from the phase rather
+  than asserted. Under the one-attempt rule it is provably always `false` today;
+  it is computed anyway so that a future change re-opening grading after a reveal
+  reports the truth instead of inheriting a literal that used to be true.
+
+#### P1 — the three screens are still unreachable in the built app
+
+**Still not met, and still not B8's to close.** `apps/app/app/` is B6's under the
+W4 surface lock; B8 left it untouched. What this round could do, and did, is make
+the coordination request *correct*, because as filed it would have shipped a
+second defect — see the revised COORD-B8-3 below.
+
+The web export was re-run in this worktree and is **not usable as evidence in
+either direction this round**: `npx expo export --platform web` exits 0, bundles
+both the client and the static-render bundle, and emits **zero** static routes —
+including `/`, `/word/[lexemeId]` and `/kanji/[character]`, which are WP-05's,
+predate this branch, and are byte-identical to the base commit. Routes that
+cannot be affected by this diff disappearing is what shows the degradation is the
+worktree's synthesized `node_modules` (see the environment note in the previous
+appendix) and not the change. The recorded 5-route baseline stands; this run
+replaces nothing.
+
+### Closure predicate status, updated (controller §19 WP-08)
+
+Only the rows this round moved are repeated; everything else stands as recorded
+in the previous appendix.
+
+| Predicate | Status | Evidence |
+| --- | --- | --- |
+| 3a. Inline interactions classified per REQ-SCH-06 (declared probe vs exposure) | **met on the app path** (was claimed met; it was not) | `canvas-cloze.ts` + `apps/app/test/session-canvas.test.ts` "one blank yields at most one declared probe" (6 tests) driving the screen's own state machine; mutation-checked (four tests go red when the literal returns) |
+| 3b. A reveal-before-recall grades `Again`; a passive tap logs exposure only | met, and now also after the blank settles | same file: revealing settles the blank, and a grade press afterwards is `ExposureLogged` with `memoryStates` unchanged |
+| 2/3/4 (latency precondition of REQ-SCH-06) | **met** (was silently unmet) | `session-timing.ts`; `session-canvas.test.ts` "a graded attempt carries a measured latency" (4 tests); `session-screens.test.ts` asserts no `latencyMs: <digit>` literal survives in any screen |
+| 4. Integration canvas + session + minimal repair branch **functional in the app** | **partial — unrouted** | unchanged; pinned by `screen-contract.test.ts` "leaves WP-08's screens unrouted pending COORD-B8-3", now scanned recursively so an `app/(session)/` group cannot pass it by accident |
+| 5. All prior tests stay green | met | `npm run test` → **60 files, 956 tests, 0 failed** (was 939; +17) |
+
+### Commands run (controller §17.5), verbatim results
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | pass (no output) |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | pass — all six workspaces, no diagnostics |
+| `npm run test` | `Test Files 60 passed (60)` · `Tests 956 passed (956)` |
+| `npm run test:replay` | `Test Files 2 passed (2)` · `Tests 47 passed (47)` |
+| `npm run verify:export` | `Test Files 1 passed (1)` · `Tests 10 passed (10)` |
+| `npm run test:e2e` | placeholder, exits 0, prints "not yet implemented (WP-10)" — **not** evidence of anything |
+| `(cd apps/app && npx expo export --platform web)` | exits 0; **0 static routes**, including WP-05's three — see the P1 note above; environment-degraded, not evidence |
+
+WP-08's own suites are now **201 tests** across 8 files (`packages/domain/test/session/*`
+= 107, `apps/app/test/session-canvas.test.ts` = 30,
+`apps/app/test/session-screens.test.ts` = 25,
+`apps/app/test/screen-contract.test.ts` = 39).
+
+### COORD-B8-3, revised — do **not** apply the version in the previous appendix
+
+The route files as originally specified each called `createRuntimeContext()` at
+module scope. Three routes, three contexts, three independent workspaces:
+pressing "Open the passage" from a session would land on a canvas that had
+started a session of its own, and the canvas's probe would never appear in the
+session the learner thought they were in. Applying that verbatim would have
+closed the routing gap by opening a state-sharing one.
+
+The mechanism to avoid it is now in place inside B8's own lock:
+`apps/app/src/screens/session-workspace.tsx` exports `SessionWorkspaceProvider`,
+and `useSessionLoop` returns a provided workspace when there is one and builds
+its own when there is not — so a screen rendered alone (a test, the screenshot
+harness) behaves exactly as before, and **no screen file changes when the routes
+land**.
+
+The provider is deliberately *not* for `app/_layout.tsx`. Bootstrapping a session
+captures the seeded target through the same store the capture screen writes to,
+on purpose, so the sitting runs over the learner's own thread — at the app root
+that would put an encounter nobody captured into the capture list on every
+launch. It belongs around the session routes only, which an expo-router group
+gives us **as four new files and no change to any existing one**:
+
+```tsx
+// apps/app/app/(session)/_layout.tsx
+import { Stack } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { SessionWorkspaceProvider } from '@/screens/session-workspace';
+import { createRuntimeContext } from '@/state/runtime';
+
+// One context and one workspace for all three routes beneath this layout.
+const context = createRuntimeContext();
+
+export default function SessionGroupLayout(): ReactNode {
+  return (
+    <SessionWorkspaceProvider context={context}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SessionWorkspaceProvider>
+  );
+}
+```
+
+```tsx
+// apps/app/app/(session)/session.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { SessionScreen } from '@/screens/session-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function SessionRoute(): ReactNode {
+  const router = useRouter();
+  return (
+    <SessionScreen
+      context={context}
+      onBack={() => router.push('/')}
+      onOpenCanvas={() => router.push('/canvas')}
+      onOpenRepair={() => router.push('/repair')}
+    />
+  );
+}
+```
+
+```tsx
+// apps/app/app/(session)/canvas.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { CanvasScreen } from '@/screens/canvas-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function CanvasRoute(): ReactNode {
+  const router = useRouter();
+  return <CanvasScreen context={context} onBack={() => router.push('/session')} />;
+}
+```
+
+```tsx
+// apps/app/app/(session)/repair.tsx
+import { useRouter } from 'expo-router';
+import { type ReactNode } from 'react';
+
+import { SessionRepairScreen } from '@/screens/session-repair-screen';
+import { createRuntimeContext } from '@/state/runtime';
+
+const context = createRuntimeContext();
+
+export default function RepairRoute(): ReactNode {
+  const router = useRouter();
+  return <SessionRepairScreen context={context} onBack={() => router.push('/session')} />;
+}
+```
+
+Two things to know before applying it:
+
+1. **The per-route `context` above is a fallback, not the live one.** With the
+   layout mounted, `useSessionLoop` returns the layout's workspace and each
+   route's own `createRuntimeContext()` is used only for the discarded fallback
+   bootstrap (which appends nothing: `AppStore.execute` short-circuits on the
+   command's content key). Routes are written this way so each is still valid on
+   its own; a reviewer who prefers one context can lift it to a shared module.
+2. **COORD-B8-2 is still open and is still the durable fix.** The provider makes
+   the three screens share *one in-session workspace*; it does not join that
+   workspace to the `AppStore`'s log, so WP-09's inspector still will not see
+   session events until they are joined. `useSessionLoop` already takes
+   `onEvents`, and the provider forwards it.
+
+### Incidental defect found while in the file (disclosed, not smuggled)
+
+`session-screen.tsx` cleared `hintsUsed` and `revealed` when a step was
+**answered** but not when it was **skipped**, so hints taken on a skipped step
+were carried into the next step's attempt and logged against it. One step's hints
+attributed to another step's answer is the same family of small lie as the
+fabricated latency, and the fix is two lines in a new `skip()` handler. Called
+out here because it was not in the findings list and a verifier should not have
+to discover it in the diff.
+
+### What a verifier should try to break
+
+1. **Re-run the mutation.** Put `targetWasHidden: true` back in `answerCloze`
+   and confirm four tests fail; put `latencyMs: 0` back in any screen and confirm
+   `session-screens.test.ts` fails. A guard that does not go red is not a guard.
+2. **Check the claim about `replay` rather than believing it.** The reason the
+   canvas key stayed positional is that a content key would throw rather than
+   collapse. `commands.test.ts` "shows why: a content-derived key on that path
+   would refuse the whole log" is that claim as an executable one.
+3. **Look for a fourth place a probe can be minted from the app.** The argument
+   that one blank yields one probe rests on `canAttempt` being the only gate; if
+   another path into `canvasInteraction` with a `declaredContractId` exists in
+   `apps/app`, the argument is incomplete.
+4. **Re-run the web export in an environment with a real `npm ci`.** Zero static
+   routes here is an artifact; if it reproduces on a clean checkout, that is a
+   finding and this appendix is wrong about it.
+
+### Next safe command
+
+```bash
+git fetch origin && git log --oneline -3 origin/agent/bunki-phase0-integration
+npm run lint && npm run format:check && npm run typecheck && npm run test
+npx vitest run apps/app/test/session-canvas.test.ts apps/app/test/session-screens.test.ts
+```

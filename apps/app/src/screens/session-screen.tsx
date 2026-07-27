@@ -48,6 +48,7 @@ import {
   type SessionLoop,
   type SessionTarget,
 } from './session-loop.ts';
+import { elapsedMs, usePresentedAt } from './session-timing.ts';
 
 /** The four grades, with the wording REQ-DM-07 makes true of each. */
 const GRADE_BUTTONS: readonly { readonly grade: Grade; readonly label: string }[] = [
@@ -180,10 +181,19 @@ function SessionBody({
   onBack,
 }: SessionBodyProps): ReactNode {
   const runtime = loop.state.runtime;
+  const step = runtime === null ? null : currentStep(runtime);
 
   const labels = useMemo(
     () => new Map([[target.probeContractId, target.lexeme.headword]]),
     [target.probeContractId, target.lexeme.headword],
+  );
+
+  // When the prompt now in front of the learner appeared. Re-marked whenever the
+  // session moves to another step, so the latency reported for an answer is the
+  // time spent on *that* step and not on the sitting so far.
+  const presentedAt = usePresentedAt(
+    loop.now,
+    `${runtime?.sessionId ?? 'unstarted'}:${step?.stepId ?? 'none'}`,
   );
 
   const start = (): void => {
@@ -229,7 +239,6 @@ function SessionBody({
 
   const plan = runtime.plan;
   const progress = sessionProgress(runtime);
-  const step = currentStep(runtime);
   const closed = runtime.status === 'closed';
 
   const answer = (grade: Grade): void => {
@@ -237,15 +246,31 @@ function SessionBody({
       kind: 'answerStep',
       attempt: {
         grade,
-        // Latency is auxiliary and confounded (REQ-SCH-05); it is recorded
-        // because the contract requires a latency, and it is never read as a
-        // mastery signal anywhere in this app.
-        latencyMs: 0,
+        // Measured, not assumed: from the instant this step's prompt appeared to
+        // the instant the grade was pressed, both read from the injected clock.
+        // REQ-SCH-06 makes a logged latency a precondition for an embedded probe
+        // to count, and REQ-SCH-05 (latency is auxiliary and confounded) licenses
+        // never *reading* it as a mastery signal — not writing one nobody took.
+        latencyMs: elapsedMs(presentedAt, loop.now()),
         hintsUsed,
         revealedBeforeRecall: revealed,
         ...(grade === 'easy' ? { userConfirmedEasy: true as const } : {}),
       },
     });
+    setRevealed(false);
+    setHintsUsed(0);
+  };
+
+  /**
+   * Move past this step without answering.
+   *
+   * The hint count and the reveal flag are cleared here as well as on an answer.
+   * They describe *this* prompt, and carrying them into the next step would
+   * attribute one step's hints to another step's attempt — a small lie of
+   * exactly the kind the measured latency above exists to stop telling.
+   */
+  const skip = (): void => {
+    loop.dispatch({ kind: 'skipStep' });
     setRevealed(false);
     setHintsUsed(0);
   };
@@ -402,7 +427,7 @@ function SessionBody({
               <AppButton
                 accessibilityHint="Moves past this step without answering. Recorded as skipped."
                 label="Skip"
-                onPress={() => loop.dispatch({ kind: 'skipStep' })}
+                onPress={skip}
                 testID="session-skip"
                 variant="quiet"
               />

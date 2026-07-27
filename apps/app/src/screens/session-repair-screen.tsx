@@ -44,6 +44,7 @@ import { ScreenShell } from '../ui/screen-shell.tsx';
 import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import { useSessionLoop, type SessionLoop, type SessionTarget } from './session-loop.ts';
+import { elapsedMs, usePresentedAt } from './session-timing.ts';
 
 export interface SessionRepairScreenProps {
   readonly context: DomainContext;
@@ -235,13 +236,24 @@ function InBranch({
 }): ReactNode {
   const theme = useTheme();
   const chosen = repair.offered.find((option) => option.id === repair.chosen);
+  const attempts = countProbes(loop);
+
+  // Each probe re-presents the same prompt, so the attempt ordinal is part of
+  // the presentation's identity: the mark is re-taken after every press and the
+  // latency reported is the time spent on that attempt alone.
+  const presentedAt = usePresentedAt(
+    loop.now,
+    `${repair.chosen ?? 'unchosen'}:${String(attempts)}`,
+  );
 
   const probe = (grade: Grade): void => {
     loop.dispatch({
       kind: 'repairProbe',
       attempt: {
         grade,
-        latencyMs: 0,
+        // Measured from the injected clock, like every other graded attempt in
+        // this app. A repair probe is a real probe against the missed contract.
+        latencyMs: elapsedMs(presentedAt, loop.now()),
         hintsUsed: 0,
         revealedBeforeRecall: false,
         ...(grade === 'easy' ? { userConfirmedEasy: true as const } : {}),
@@ -299,7 +311,7 @@ function InBranch({
         style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
         testID="repair-attempts"
       >
-        {countProbes(loop)} attempt(s) so far. The number does not decide anything.
+        {attempts} attempt(s) so far. The number does not decide anything.
       </Text>
     </Section>
   );

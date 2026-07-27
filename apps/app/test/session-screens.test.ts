@@ -35,11 +35,20 @@ const SESSION = screen('session-screen.tsx');
 const CANVAS = screen('canvas-screen.tsx');
 const REPAIR = screen('session-repair-screen.tsx');
 const LOOP = screen('session-loop.ts');
+const CLOZE = screen('canvas-cloze.ts');
+const TIMING = screen('session-timing.ts');
 
 const ALL: readonly (readonly [string, string])[] = [
   ['session', SESSION],
   ['canvas', CANVAS],
   ['repair', REPAIR],
+];
+
+/** Everything that helps build a graded attempt, screens included. */
+const ATTEMPT_BUILDERS: readonly (readonly [string, string])[] = [
+  ...ALL,
+  ['cloze', CLOZE],
+  ['timing', TIMING],
 ];
 
 describe('every WP-08 screen defines all four REQ-UI-09 states', () => {
@@ -105,25 +114,79 @@ describe('the canvas screen renders the judgement rather than making one', () =>
   });
 
   it('hides the target until it is attempted, which is the priming rule', () => {
-    const source = code(CANVAS);
-    expect(source).toContain('targetHidden');
-    expect(source).toContain('targetWasHidden');
-    expect(source).toContain('CLOZE_MASK');
+    expect(code(CANVAS)).toContain('targetHidden');
+    expect(code(CANVAS)).toContain('CLOZE_MASK');
+    // The mask, the label, the `disabled` props and the `targetWasHidden` the
+    // kernel is told all read the same predicate, so they cannot disagree.
+    expect(code(CLOZE)).toContain('targetIsHidden');
+    expect(code(CLOZE)).toContain('targetWasHidden');
   });
 
   it('declares a contract only on the target, and never on a plain tap', () => {
-    const source = code(CANVAS);
-    // Three interactions are built in this file. The two that name a contract
-    // are the cloze and the reveal; the tap and the read pass `null`.
+    const source = code(CLOZE);
+    // Four interactions are built in this file. The two that name a contract
+    // are the cloze and the reveal; the tap and the read share one builder that
+    // passes `null`.
     const declared = source.match(/declaredContractId: target\.probeContractId/g) ?? [];
     const undeclared = source.match(/declaredContractId: null/g) ?? [];
     expect(declared).toHaveLength(2);
-    expect(undeclared).toHaveLength(2);
+    expect(undeclared).toHaveLength(1);
   });
 
   it('never claims immersion reduces review burden (REQ-SCH-06 H4, REQ-GATE-03)', () => {
     expect(CANVAS).not.toMatch(/reduce[sd]?\s+(your\s+)?(standalone\s+)?review/i);
     expect(CANVAS).not.toMatch(/instead\s+of\s+reviewing|fewer\s+reviews/i);
+  });
+});
+
+/**
+ * The repair round's three source-level rules.
+ *
+ * Each of these is a defect that shipped and was invisible to a suite of 145
+ * tests, because every one of them supplied the field it was checking. A source
+ * scan cannot be fooled that way: it asks whether the literal is in the tree.
+ */
+describe('the screens report what happened, not what they wish had (WP-08 repair)', () => {
+  it('never states targetWasHidden as a literal', () => {
+    // `targetWasHidden: true` on the cloze and reveal paths is the P0: it told
+    // the kernel the word was hidden while the screen's own state said it was
+    // printed in the passage, so recognition under priming was admitted as a
+    // tier-A review (REQ-SCH-06, DL-19).
+    ATTEMPT_BUILDERS.forEach(([name, source]) => {
+      expect(code(source), name).not.toMatch(/targetWasHidden:\s*(true|false)\b/);
+    });
+    expect(code(CLOZE)).toMatch(/targetWasHidden: targetIsHidden\(presentation\)/);
+  });
+
+  it('never writes a latency nobody measured', () => {
+    // `latencyMs: 0` was a constant in all three screens. REQ-SCH-06 makes a
+    // logged latency a precondition for an embedded probe to count; REQ-SCH-05
+    // licenses never *reading* it, not writing a fabricated one.
+    ATTEMPT_BUILDERS.forEach(([name, source]) => {
+      expect(code(source), name).not.toMatch(/latencyMs:\s*\d/);
+    });
+    expect(code(CLOZE)).toContain('elapsedMs(presentation.presentedAt, answer.at)');
+    expect(code(SESSION)).toContain('elapsedMs(presentedAt, loop.now())');
+    expect(code(REPAIR)).toContain('elapsedMs(presentedAt, loop.now())');
+  });
+
+  it('measures time through the injected clock and never an ambient one', () => {
+    // REQ-ARCH-02 at the app seam: `loop.now()` is `DomainContext.clock`, so a
+    // test and the screenshot harness pin time without patching a global.
+    ATTEMPT_BUILDERS.forEach(([name, source]) => {
+      expect(code(source), name).not.toMatch(/\bDate\.now\b|new Date\(/);
+    });
+    expect(code(TIMING)).toContain('usePresentedAt');
+  });
+
+  it('lets one blank produce at most one declared probe', () => {
+    const source = code(CANVAS);
+    // The reveal button already had this; the four grade buttons did not, so a
+    // settled cloze stayed gradable with the answer printed on the page.
+    expect(source.match(/disabled=\{settled\}/g) ?? []).toHaveLength(2);
+    expect(source).toContain('canAttempt');
+    // `canAttempt` is the only thing that decides it, in one place.
+    expect(code(CLOZE)).toMatch(/export function canAttempt/);
   });
 });
 

@@ -309,9 +309,37 @@ export type SessionCommand =
  * branch with no repair) returns the state unchanged rather than throwing. A
  * screen that raced its own state should render a stale frame, not crash.
  *
- * Idempotency keys are derived from the session, the step, and the position in
- * the canvas ledger — content, never a counter the caller supplies — so a double
- * tap produces the same key and replay collapses it into one event (§7).
+ * ## Idempotency keys: what each path actually does
+ *
+ * No key here is ever supplied by the caller. Beyond that the three evidence
+ * paths differ, and an earlier version of this comment claimed one rule for all
+ * of them. It did not hold, so here is each:
+ *
+ *   - **`answerStep` → `review:${sessionId}:${stepId}`.** Positional in the
+ *     *plan*, which for this path is the same as content: a plan is fixed before
+ *     the sitting (T-13) and `observe` settles the step the answer names, so a
+ *     step can be answered exactly once. A double tap that arrives before the
+ *     state advances therefore produces the same key on the same bytes, and
+ *     replay collapses it into one event (§7).
+ *   - **`canvasInteraction` → `canvas:${experienceId}:${ordinal}`**, counted off
+ *     the canvas ledger, and **`repairProbe` → `repair:${contractId}:${ordinal}`**,
+ *     counted off the log. Both are monotonic counters, so a repeat produces a
+ *     *different* key and appends a second event. That is not an oversight:
+ *     `replay` collapses a repeated key only when the second event is
+ *     byte-identical *including its `eventId` and `occurredAt`*, and mints here
+ *     draw a fresh id from the injected generator and a fresh instant from the
+ *     injected clock. A content-derived key on these paths would therefore not
+ *     collapse a genuine repeat — it would raise `IdempotencyConflictError` and
+ *     refuse the whole log. It is also the wrong model: two taps on a word are
+ *     two encounters, and two repair probes are two attempts the rejoin
+ *     criterion has to be able to count separately.
+ *
+ * So a double-tapped canvas grade or repair probe is *not* deduplicated by the
+ * key. What stops a settled cloze from minting a second tier-A review is the
+ * screen's one-attempt-per-presentation rule and, behind it, the classifier's
+ * `target_was_already_visible` — belt and braces, neither of them this key.
+ * True double-tap idempotency for the canvas and repair paths is an open item
+ * (controller §17.2), recorded in the capsule rather than implied here.
  */
 export function applySessionCommand(
   context: DomainContext,
@@ -378,6 +406,8 @@ export function applySessionCommand(
     }
 
     case 'canvasInteraction': {
+      // Positional, and deliberately so — see the idempotency note on this
+      // function. A repeat is a new encounter here, not a duplicate.
       const ordinal = state.canvasLedger.length;
       const record = recordCanvasInteraction(context, command.interaction, command.offer, {
         idempotencyKey: `canvas:${command.interaction.experienceId}:${String(ordinal)}`,
@@ -414,6 +444,8 @@ export function applySessionCommand(
 
       const contractId = repair.stumble.contractId;
       const prefix = `repair:${contractId}:`;
+      // Positional for the same reason as the canvas: two attempts at the same
+      // contract are two observations, and the rejoin criterion counts them.
       const ordinal = state.log.filter((event) => event.idempotencyKey.startsWith(prefix)).length;
 
       const confirmation =

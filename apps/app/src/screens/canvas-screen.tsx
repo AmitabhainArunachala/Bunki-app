@@ -21,7 +21,11 @@
  *   - the **target is a cloze**: hidden until they attempt or reveal it. That is
  *     the priming rule (REQ-SCH-06: "confirmation probes are deferred so a
  *     just-seen form is not 'retrieved' under priming") made physical — you
- *     cannot declare a retrieval of a form the page is showing you;
+ *     cannot declare a retrieval of a form the page is showing you. The
+ *     presentation is a state machine in `canvas-cloze.ts`, and every
+ *     `targetWasHidden` this screen reports is read out of it rather than
+ *     asserted; one blank yields at most one declared probe, and the buttons
+ *     that could produce a second one are disabled once it is settled;
  *   - **every other word is a tap**, and a tap is exposure. Tier D, recorded,
  *     surfaced, never scheduled on (T-08);
  *   - **each interaction reports what it became**, immediately, in the ledger
@@ -48,6 +52,15 @@ import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
 import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
+import {
+  answerCloze,
+  canAttempt,
+  exposeOnCanvas,
+  presentCloze,
+  revealCloze,
+  targetIsHidden,
+  type ClozeTarget,
+} from './canvas-cloze.ts';
 import { segmentKey, segmentPassage, type PassageSegment } from './canvas-passage.ts';
 import {
   passageMarks,
@@ -116,8 +129,19 @@ function CanvasBody({
   readonly onBack: () => void;
 }): ReactNode {
   const theme = useTheme();
-  const [targetHidden, setTargetHidden] = useState(true);
-  const [revealedBeforeRecall, setRevealedBeforeRecall] = useState(false);
+
+  // The blank's whole life, in one value. `useState`'s initialiser runs once, so
+  // the mark is the instant the passage went on screen — which is what the
+  // measured latency of an answer is measured from.
+  const [cloze, setCloze] = useState(() => presentCloze(loop.now()));
+  const targetHidden = targetIsHidden(cloze);
+  const settled = !canAttempt(cloze);
+
+  const clozeTarget: ClozeTarget = {
+    experienceId: target.passage.id,
+    componentId: target.componentId,
+    probeContractId: target.probeContractId,
+  };
 
   const segments = segmentPassage(target.passage.body, passageMarks(target));
 
@@ -126,54 +150,22 @@ function CanvasBody({
     loop.dispatch({
       kind: 'canvasInteraction',
       offer: loop.offer,
-      interaction: {
-        experienceId: target.passage.id,
-        kind: 'tap',
-        componentIds: [componentId],
-        declaredContractId: null,
-        targetWasHidden: targetHidden,
-      },
+      interaction: exposeOnCanvas(cloze, target.passage.id, 'tap', [componentId]),
     });
   };
 
   /** Reveal the cloze without answering. A declared probe that grades Again. */
   const reveal = (): void => {
-    loop.dispatch({
-      kind: 'canvasInteraction',
-      offer: loop.offer,
-      interaction: {
-        experienceId: target.passage.id,
-        kind: 'reveal',
-        componentIds: [target.componentId],
-        declaredContractId: target.probeContractId,
-        targetWasHidden: true,
-      },
-    });
-    setRevealedBeforeRecall(true);
-    setTargetHidden(false);
+    const step = revealCloze(cloze, clozeTarget, loop.now());
+    loop.dispatch({ kind: 'canvasInteraction', offer: loop.offer, interaction: step.interaction });
+    setCloze(step.next);
   };
 
   /** Answer the cloze. A declared probe under the target's exact contract. */
   const answer = (grade: Grade): void => {
-    loop.dispatch({
-      kind: 'canvasInteraction',
-      offer: loop.offer,
-      interaction: {
-        experienceId: target.passage.id,
-        kind: 'cloze_attempt',
-        componentIds: [target.componentId],
-        declaredContractId: target.probeContractId,
-        targetWasHidden: true,
-        attempt: {
-          grade,
-          latencyMs: 0,
-          hintsUsed: 0,
-          revealedBeforeRecall,
-          ...(grade === 'easy' ? { userConfirmedEasy: true as const } : {}),
-        },
-      },
-    });
-    setTargetHidden(false);
+    const step = answerCloze(cloze, clozeTarget, { grade, at: loop.now() });
+    loop.dispatch({ kind: 'canvasInteraction', offer: loop.offer, interaction: step.interaction });
+    setCloze(step.next);
   };
 
   /** Reading the whole passage without stopping: exposure over everything seen. */
@@ -188,13 +180,7 @@ function CanvasBody({
     loop.dispatch({
       kind: 'canvasInteraction',
       offer: loop.offer,
-      interaction: {
-        experienceId: target.passage.id,
-        kind: 'read',
-        componentIds,
-        declaredContractId: null,
-        targetWasHidden: targetHidden,
-      },
+      interaction: exposeOnCanvas(cloze, target.passage.id, 'read', componentIds),
     });
   };
 
@@ -263,7 +249,7 @@ function CanvasBody({
         note={
           loop.offer === null
             ? 'This canvas offers no declared probe right now, so everything on it is exposure.'
-            : `The blank is the one declared probe on this canvas: ${target.lexeme.headword}, under its reading contract. Everything else you touch is exposure.`
+            : `The blank is the one declared probe on this canvas: ${target.lexeme.headword}, under its reading contract. One answer settles it, and everything else you touch is exposure.`
         }
         testID="canvas-probe"
         title="The blank"
@@ -291,7 +277,7 @@ function CanvasBody({
         <View style={styles.actions}>
           <AppButton
             accessibilityHint="Shows the answer. Recorded, and the result becomes Again."
-            disabled={!targetHidden}
+            disabled={settled}
             label="Show the answer"
             onPress={reveal}
             testID="canvas-reveal"
@@ -303,6 +289,7 @@ function CanvasBody({
             <AppButton
               accessibilityHint={`Records ${grade} for the reading contract, from inside the passage.`}
               accessibilityLabel={`${grade} for ${target.lexeme.headword}`}
+              disabled={settled}
               key={grade}
               label={grade}
               onPress={() => answer(grade)}
@@ -311,6 +298,17 @@ function CanvasBody({
             />
           ))}
         </View>
+
+        {settled ? (
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            testID="canvas-settled"
+          >
+            The word is on the page now, so this blank is finished. Anything further you do with it
+            is an encounter, not a recall — one blank, one answer.
+          </Text>
+        ) : null}
 
         <AppButton
           accessibilityHint="Records that you read the passage through. Exposure only."

@@ -73,11 +73,14 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'capture-screen.tsx': 'WP-05',
   'kanji-screen.tsx': 'WP-05',
   'word-screen.tsx': 'WP-05',
+  'canvas-cloze.ts': 'WP-08',
   'canvas-passage.ts': 'WP-08',
   'canvas-screen.tsx': 'WP-08',
   'session-loop.ts': 'WP-08',
   'session-repair-screen.tsx': 'WP-08',
   'session-screen.tsx': 'WP-08',
+  'session-timing.ts': 'WP-08',
+  'session-workspace.tsx': 'WP-08',
 };
 
 describe('every screen file has a named owning work package', () => {
@@ -104,15 +107,26 @@ describe('every screen file has a named owning work package', () => {
    * reliably stops being permanent.
    */
   it('leaves WP-08’s screens unrouted pending COORD-B8-3', () => {
-    const routes = readdirSync(resolve(APP_ROOT, 'app')).sort();
-    expect(routes).not.toContain('session.tsx');
-    expect(routes).not.toContain('canvas.tsx');
-    expect(routes).not.toContain('repair.tsx');
+    // Scanned recursively, not with one `readdirSync`: the corrected COORD-B8-3
+    // puts the routes in an `app/(session)/` group so the provider can sit above
+    // them without a change to any existing file, and a top-level listing would
+    // report "still unrouted" for a directory full of routes.
+    const routed = walk(resolve(APP_ROOT, 'app'))
+      .map((file) => file.split('/').at(-1) ?? '')
+      .filter((name) => ['session.tsx', 'canvas.tsx', 'repair.tsx'].includes(name));
+    expect(routed).toEqual([]);
+
     // The screens themselves are complete and take navigation callbacks, so
     // wiring them is a route file each and no change to this directory.
     ['session-screen.tsx', 'canvas-screen.tsx', 'session-repair-screen.tsx'].forEach((name) => {
       expect(screen(name)).toMatch(/onBack: \(\) => void/);
     });
+
+    // …and the workspace they would share is ready for whoever wires them, so
+    // applying COORD-B8-3 does not silently produce three separate sessions.
+    expect(read(resolve(APP_ROOT, 'src/screens/session-workspace.tsx'))).toContain(
+      'SessionWorkspaceProvider',
+    );
   });
 });
 
