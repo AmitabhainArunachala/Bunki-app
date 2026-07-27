@@ -339,10 +339,51 @@ export interface CommandObserver {
 export const NULL_COMMAND_OBSERVER: CommandObserver = { observe: () => undefined };
 
 /**
+ * The prompt family version stamped on the demonstration contract (WP-09).
+ *
+ * REQ-UI-06 asks the inspector to show "rubric/model version" wherever one
+ * exists, so the demonstration must carry a real one rather than leave the
+ * column blank and let the screen imply versions are never recorded. It names
+ * itself a demonstration, so a reader of an export cannot mistake it for a
+ * prompt family that was actually authored and reviewed.
+ *
+ * It lives in this module — types and constants, no store, no clock — rather
+ * than in `memory-store.ts` because it is now read from two sides: the store
+ * *stamps* it, and `screens/evidence-chain.ts` *detects* it to keep the
+ * REQ-LM-06 default surface from asserting that the learner answered something
+ * a button appended. Putting it beside `DEMONSTRATION_CHAIN_NOTE` keeps the
+ * stamp, the detection and the sentence in one place, so they cannot drift into
+ * a state where a chain is demonstration-minted but nothing says so.
+ */
+export const DEMONSTRATION_PROMPT_FAMILY_VERSION = 'demo-recognition@1';
+
+/**
+ * The `experienceId` prefix the demonstration's `ExposureLogged` carries.
+ *
+ * An exposure names no contract, so the prompt-family stamp above cannot reach
+ * it and there is no other field on the event that ties it to the button that
+ * appended it. Without this the inspector would label a demonstration exposure
+ * “meeting it in passing” — a claim about something the learner did — while
+ * correctly qualifying the three graded rows beside it, which is a worse state
+ * than qualifying none of them.
+ *
+ * It is a shared constant rather than a string built in the store and re-parsed
+ * by the screen, so the format cannot drift on one side and silently stop
+ * matching on the other.
+ */
+export const DEMONSTRATION_EXPERIENCE_PREFIX = 'demo-experience:';
+
+/**
  * Shown wherever the demonstration chain is rendered.
  *
  * Kept beside the command that creates it so the sentence and the behaviour
  * cannot drift, and so no screen can render the chain while omitting it.
+ *
+ * This is the *raw chain's* note. It is deliberately no longer the only place
+ * the demonstration is named: `evidence-chain.ts` also qualifies why-this,
+ * strength, uncertainty and the correction labels, because this note sits
+ * inside a disclosure that is closed by default and a learner who never opens
+ * it would otherwise read a ledger claiming answers they never gave.
  */
 export const DEMONSTRATION_CHAIN_NOTE =
   'These evidence events were appended by the “Add a demonstration chain” button on this screen, not by a study session. They are real events minted by the kernel’s evidence gate and they replay like any other — but they are not a record of you answering anything.';

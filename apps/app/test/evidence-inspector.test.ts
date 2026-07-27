@@ -32,6 +32,7 @@ import { prepareExport, appVersionsForBuild, exportLicenceLines } from '@bunki/e
 
 import {
   buildEvidenceChain,
+  describeCorrectable,
   explainRefusal,
   summariseStrength,
   TIER_MEANINGS,
@@ -242,15 +243,41 @@ describe('the chain shows every state change with its cause (REQ-UI-06)', () => 
       expect(observation.label).not.toContain(observation.eventId);
       expect(observation.label).toMatch(/counted$/);
     }
-    expect(correctable[0]?.label).toContain('the answer you gave');
-    expect(correctable[1]?.label).toContain('after seeing the answer');
-    expect(correctable[3]?.label).toContain('meeting it in passing');
+    // Every row on this thread was appended by the demonstration button, so no
+    // label may claim the learner did anything. The study-produced wording is
+    // asserted directly below, where a non-demonstration row can be built.
+    expect(correctable[0]?.label).toContain('a demonstration answer');
+    expect(correctable[1]?.label).toContain('recorded as revealed first');
+    expect(correctable[3]?.label).toContain('a demonstration exposure');
     expect(correctable.map((observation) => observation.counted)).toEqual([
       true,
       true,
       false,
       false,
     ]);
+  });
+
+  it('keeps the study-produced wording for a row no demonstration wrote', () => {
+    const row: ChainRow = {
+      eventId: 'event-0001',
+      type: 'ReviewGraded',
+      at: '2026-07-27T09:00:00.000Z',
+      tier: 'A',
+      contractId: 'contract-0001',
+      decision: null,
+      superseded: false,
+      supersededByEventId: null,
+      supersedesEventId: null,
+      correctionNote: null,
+      correctionReason: null,
+      revealedBeforeRecall: false,
+      fromDemonstration: false,
+    };
+
+    expect(describeCorrectable(row).label).toContain('the answer you gave');
+    expect(describeCorrectable({ ...row, type: 'ExposureLogged', tier: 'D' }).label).toContain(
+      'meeting it in passing',
+    );
   });
 });
 
@@ -481,9 +508,80 @@ describe('the default surface answers why-this without a score (REQ-LM-06)', () 
     const { store, threadId } = seededStore();
     const uncertainties = chainOf(store, threadId).uncertainties;
 
-    expect(uncertainties[0]).toContain('meaning');
+    // [0] is the demonstration disclosure — see the WP-09 repair block below.
+    // The learner's own mark follows it.
+    expect(uncertainties[1]).toContain('meaning');
     expect(uncertainties.join(' ')).toContain('not exported');
     expect(uncertainties.at(-1)).toContain('has not been measured');
+  });
+
+  /**
+   * The WP-09 repair: provenance belongs on the surface that makes the claim.
+   *
+   * `DEMONSTRATION_CHAIN_NOTE` is rendered inside the raw chain, which is
+   * behind a disclosure control that initialises closed. A learner who never
+   * opens it used to read a default surface stating they had answered
+   * retrievals a button appended — with the only correction to that statement
+   * hidden behind the very disclosure REQ-LM-06 exists to keep the raw chain
+   * behind. So each of the four default-surface elements is asserted here
+   * separately: a fix that qualified only why-this would leave three lying.
+   */
+  describe('names the demonstration on the default surface, not only in the chain', () => {
+    it('names it in why-this, strength, uncertainty and every correction label', () => {
+      const { store, threadId } = seededStore();
+      const chain = chainOf(store, threadId);
+
+      expect(chain.whyThis).toContain('demonstration');
+      expect(chain.strength.sentence).toContain('demonstration');
+      // Leading, ahead of the learner's own mark: it is the entry that says
+      // part of this ledger is not a record of them at all.
+      expect(chain.uncertainties[0]).toContain('demonstration');
+      expect(chain.correctable).not.toHaveLength(0);
+      for (const observation of chain.correctable) {
+        expect(observation.label).toContain('demonstration');
+      }
+    });
+
+    it('never claims on that surface that the learner answered anything', () => {
+      const { store, threadId } = seededStore();
+      const chain = chainOf(store, threadId);
+      const surface = [
+        chain.whyThis,
+        chain.strength.sentence,
+        ...chain.uncertainties,
+        ...chain.correctable.map((observation) => observation.label),
+      ].join(' ');
+
+      expect(surface).not.toContain('answered retrieval');
+      expect(surface).not.toContain('the answer you gave');
+      expect(surface).not.toContain('meeting it in passing');
+    });
+
+    it('counts what the button wrote and what the gate let count', () => {
+      const { store, threadId } = seededStore();
+      const { demonstration } = chainOf(store, threadId);
+
+      expect(demonstration.present).toBe(true);
+      expect(demonstration.rowCount).toBe(4);
+      expect(demonstration.admittedCount).toBe(2);
+      expect(demonstration.allAdmittedAreDemonstration).toBe(true);
+    });
+
+    it('detects the exposure too, which carries no contract to stamp', () => {
+      const { store, threadId } = seededStore();
+      const exposure = chainOf(store, threadId).rows.find((row) => row.type === 'ExposureLogged');
+
+      expect(exposure?.fromDemonstration).toBe(true);
+    });
+
+    it('says nothing about a demonstration on a chain that has none', () => {
+      const { store, threadId } = seededStore({ demonstrate: false });
+      const chain = chainOf(store, threadId);
+      const surface = [chain.whyThis, chain.strength.sentence, ...chain.uncertainties].join(' ');
+
+      expect(chain.demonstration.present).toBe(false);
+      expect(surface).not.toContain('demonstration');
+    });
   });
 
   it('describes strength by counting, and says when nothing counted', () => {

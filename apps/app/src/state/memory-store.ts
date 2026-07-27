@@ -50,6 +50,8 @@ import {
 
 import {
   CorrectionRefusedError,
+  DEMONSTRATION_EXPERIENCE_PREFIX,
+  DEMONSTRATION_PROMPT_FAMILY_VERSION,
   DURABILITY_NOTES,
   NULL_COMMAND_OBSERVER,
   type AppCommand,
@@ -74,17 +76,6 @@ import {
 export function targetKeyOf(text: string): string {
   return text.trim().normalize('NFKC').toLocaleLowerCase('en-US');
 }
-
-/**
- * The prompt family version stamped on the demonstration contract (WP-09).
- *
- * REQ-UI-06 asks the inspector to show "rubric/model version" wherever one
- * exists, so the demonstration must carry a real one rather than leave the
- * column blank and let the screen imply versions are never recorded. It names
- * itself a demonstration, so a reader of an export cannot mistake it for a
- * prompt family that was actually authored and reviewed.
- */
-export const DEMONSTRATION_PROMPT_FAMILY_VERSION = 'demo-recognition@1';
 
 function captureIdempotencyKey(command: Extract<AppCommand, { kind: 'capture' }>): string {
   const { sourceId, locator } = command.sourceRef;
@@ -506,7 +497,11 @@ export function createMemoryAppStore({
       context,
       {
         componentIds: [componentIdOfEncounter(capture)],
-        experienceId: `experience-${contractId}`,
+        // Prefixed so the inspector can tell a demonstration exposure from one
+        // the learner actually produced. An exposure carries no contract, so
+        // this is the only field that can hold the provenance (see
+        // `DEMONSTRATION_EXPERIENCE_PREFIX`).
+        experienceId: `${DEMONSTRATION_EXPERIENCE_PREFIX}${contractId}`,
       },
       { idempotencyKey: `exposure:${contractId}:1` },
     );

@@ -32,6 +32,25 @@
  * "Uncertainty" is likewise not a confidence interval. It is the list of things
  * the ledger does not settle: what the learner marked, what the log does not
  * record, and which observations have been retracted.
+ *
+ * ## Demonstration provenance, and why it is on the default surface
+ *
+ * The inspector ships a button that appends a *real* chain through the kernel's
+ * factories so the surface has something to show before WP-08's study screens
+ * land. Those events are genuine, replay like any other, and are indistinguish-
+ * able from study-produced ones by tier or verdict — which is exactly the
+ * problem. A default surface built only from tiers and verdicts would read
+ * "2 answered retrievals on it have counted", naming an act the learner never
+ * performed, while the one sentence that says otherwise sat inside a disclosure
+ * that is closed by default.
+ *
+ * So every phrase this module emits about *what the learner did* is qualified
+ * wherever the row behind it came from the demonstration. The detection is
+ * structural, not heuristic: a graded row is demonstration-minted when its
+ * contract carries `DEMONSTRATION_PROMPT_FAMILY_VERSION`, and the exposure —
+ * which names no contract — carries `DEMONSTRATION_EXPERIENCE_PREFIX` on its
+ * `experienceId`. Both constants live in `state/store.ts` beside the command
+ * that stamps them, so the stamp and the detection cannot drift apart.
  */
 
 import type {
@@ -42,6 +61,11 @@ import type {
   ObservationRecord,
   ThreadState,
 } from '@bunki/domain';
+
+import {
+  DEMONSTRATION_EXPERIENCE_PREFIX,
+  DEMONSTRATION_PROMPT_FAMILY_VERSION,
+} from '../state/store.ts';
 
 /**
  * What each tier is, in the learner's language.
@@ -142,6 +166,15 @@ export interface ChainRow {
    * `null` for families that carry no such field.
    */
   readonly revealedBeforeRecall: boolean | null;
+  /**
+   * Was this row appended by the demonstration button rather than by study?
+   *
+   * Carried on the row — rather than recomputed by each phrasing function —
+   * so that every sentence downstream derives its qualification from the same
+   * fact. A summary that had to re-derive provenance is a summary where one
+   * call site can forget to.
+   */
+  readonly fromDemonstration: boolean;
 }
 
 /** A state change and the event that caused it (REQ-UI-06's first clause). */
@@ -170,6 +203,27 @@ export interface StrengthSummary {
   readonly sentence: string;
 }
 
+/**
+ * How much of this thread's ledger a button wrote (WP-09 repair).
+ *
+ * Counted rather than flagged, because "some of this is a demonstration" and
+ * "all of the retrievals that counted are a demonstration" are different
+ * statements and only the second one makes the plain reading of why-this false.
+ */
+export interface DemonstrationFacts {
+  /** Rows appended by the demonstration button. */
+  readonly rowCount: number;
+  /** Of those, how many the gate admitted. */
+  readonly admittedCount: number;
+  /** Any demonstration row at all is present in the chain. */
+  readonly present: boolean;
+  /**
+   * There is at least one admitted row and **every** admitted row is
+   * demonstration-minted — the case in which "you answered" is simply untrue.
+   */
+  readonly allAdmittedAreDemonstration: boolean;
+}
+
 export interface EvidenceChain {
   readonly threadId: string;
   readonly displayText: string;
@@ -178,6 +232,8 @@ export interface EvidenceChain {
   readonly rows: readonly ChainRow[];
   readonly versions: readonly VersionRow[];
   readonly strength: StrengthSummary;
+  /** What of this chain the demonstration button wrote. */
+  readonly demonstration: DemonstrationFacts;
   /** Why this thread is in front of you, in one sentence (REQ-LM-06 default). */
   readonly whyThis: string;
   /** What the ledger does not settle. */
@@ -245,6 +301,39 @@ export function buildEvidenceChain(args: BuildChainArgs): EvidenceChain {
 
   const byEventId = new Map(log.map((event) => [event.eventId, event]));
 
+  /**
+   * Contracts this thread owns that the demonstration button minted.
+   *
+   * Read off the `ContractCreated` event's own `promptFamilyVersion`, which is
+   * the durable record of where the contract came from — not from a naming
+   * convention on the id, which an importer could reproduce by accident.
+   */
+  const demonstrationContractIds = new Set(
+    state.contracts
+      .filter((contract) => contractIds.has(contract.contractId))
+      .filter((contract) => {
+        const created = byEventId.get(contract.createdByEventId);
+        return (
+          created?.type === 'ContractCreated' &&
+          created.promptFamilyVersion === DEMONSTRATION_PROMPT_FAMILY_VERSION
+        );
+      })
+      .map((contract) => contract.contractId),
+  );
+
+  const isDemonstrationRow = (observation: ObservationRecord): boolean => {
+    if (observation.contractId !== null) {
+      return demonstrationContractIds.has(observation.contractId);
+    }
+    const event = byEventId.get(observation.eventId);
+    // An exposure names no contract; its `experienceId` is the only field that
+    // can carry the provenance (see `DEMONSTRATION_EXPERIENCE_PREFIX`).
+    if (event?.type === 'ExposureLogged') {
+      return event.experienceId.startsWith(DEMONSTRATION_EXPERIENCE_PREFIX);
+    }
+    return false;
+  };
+
   const belongsToThread = (observation: ObservationRecord): boolean => {
     if (observation.contractId !== null) return contractIds.has(observation.contractId);
     const event = byEventId.get(observation.eventId);
@@ -273,6 +362,7 @@ export function buildEvidenceChain(args: BuildChainArgs): EvidenceChain {
       correctionNote: isCorrection ? event.correction.note : null,
       correctionReason: isCorrection ? event.reason : null,
       revealedBeforeRecall: event?.type === 'ReviewGraded' ? event.revealedBeforeRecall : null,
+      fromDemonstration: isDemonstrationRow(observation),
     };
   });
 
@@ -333,6 +423,7 @@ export function buildEvidenceChain(args: BuildChainArgs): EvidenceChain {
     rows,
     versions,
     strength,
+    demonstration: summariseDemonstration(rows),
     whyThis: whyThisAppeared(thread, rows, args.displayText),
     uncertainties: collectUncertainties(args, rows),
     correctable: rows
@@ -351,8 +442,16 @@ export function buildEvidenceChain(args: BuildChainArgs): EvidenceChain {
  */
 export function describeCorrectable(row: ChainRow): CorrectableObservation {
   const counted = row.decision?.admitted === true;
-  const what =
-    row.type === 'ReviewGraded'
+  // Every phrase in the study-produced column is a claim about an act. The
+  // demonstration column describes the same event without asserting one, so a
+  // button-appended row cannot be labelled "the answer you gave".
+  const what = row.fromDemonstration
+    ? row.type === 'ReviewGraded'
+      ? `a demonstration answer${row.revealedBeforeRecall === true ? ' recorded as revealed first' : ''}`
+      : row.type === 'ExposureLogged'
+        ? 'a demonstration exposure'
+        : `a demonstration ${row.type} record`
+    : row.type === 'ReviewGraded'
       ? `the answer you gave${row.revealedBeforeRecall === true ? ' after seeing the answer' : ''}`
       : row.type === 'ExposureLogged'
         ? 'meeting it in passing'
@@ -366,6 +465,58 @@ export function describeCorrectable(row: ChainRow): CorrectableObservation {
     at: row.at,
     counted,
   };
+}
+
+/**
+ * How much of the chain the demonstration button wrote.
+ *
+ * `EvidenceSuperseded` rows are excluded from both counts for the same reason
+ * `summariseStrength` excludes them: a correction is not an observation, so
+ * counting one here would make correcting a demonstration row look like a
+ * second demonstration row.
+ */
+export function summariseDemonstration(rows: readonly ChainRow[]): DemonstrationFacts {
+  const observations = rows.filter((row) => row.type !== 'EvidenceSuperseded');
+  const admitted = observations.filter((row) => row.decision?.admitted === true);
+  const demonstrationAdmitted = admitted.filter((row) => row.fromDemonstration);
+
+  return {
+    rowCount: observations.filter((row) => row.fromDemonstration).length,
+    admittedCount: demonstrationAdmitted.length,
+    present: observations.some((row) => row.fromDemonstration),
+    allAdmittedAreDemonstration:
+      admitted.length > 0 && demonstrationAdmitted.length === admitted.length,
+  };
+}
+
+/**
+ * Who wrote these rows — the provenance alone, with no counts of timing.
+ *
+ * Split from the full disclosure below so a surface that has already stated how
+ * many observations changed review timing does not state it twice. Both are
+ * built from the same clause, so the two surfaces cannot describe the same
+ * button in two different ways.
+ */
+export function demonstrationProvenanceClause(facts: DemonstrationFacts): string {
+  if (!facts.present) return '';
+  const plural = facts.rowCount === 1 ? '' : 's';
+  return `${String(facts.rowCount)} of these observation${plural} ${facts.rowCount === 1 ? 'was' : 'were'} appended by the “Add a demonstration chain” button on this screen, not by you answering anything.`;
+}
+
+/**
+ * The full disclosure, for a surface that states no counts of its own.
+ *
+ * `collectUncertainties` renders bullets that stand alone, so this one carries
+ * what the gate made of the demonstration's rows as well as who wrote them.
+ */
+export function demonstrationDisclosure(facts: DemonstrationFacts): string {
+  const clause = demonstrationProvenanceClause(facts);
+  if (clause === '') return '';
+  const counted =
+    facts.admittedCount === 0
+      ? 'None of them changed review timing.'
+      : `${String(facts.admittedCount)} of them changed review timing.`;
+  return `${clause} ${counted}`;
 }
 
 /**
@@ -417,12 +568,21 @@ export function summariseStrength(rows: readonly ChainRow[]): StrengthSummary {
       ? ''
       : ` ${String(correctedCount)} ${correctedCount === 1 ? 'has' : 'have'} since been corrected by you, and the correction is appended rather than replacing anything.`;
 
+  // The disclosure rides on the strength sentence itself rather than beside it,
+  // because this sentence is what a reader quotes when they say how much
+  // evidence there is — and a count that silently includes button-appended rows
+  // is the number the whole repair exists to stop being read as the learner's.
+  // The provenance clause only: `countedClause` above has already said how many
+  // observations changed review timing, and saying it twice in one sentence is
+  // the kind of imprecision this surface cannot afford.
+  const demonstrationClause = demonstrationProvenanceClause(summariseDemonstration(rows));
+
   return {
     admittedCount,
     recordedCount,
     correctedCount,
     byTier,
-    sentence: `${String(recordedCount)} observation${recordedCount === 1 ? '' : 's'} recorded (${tierParts.join(', ')}). ${countedClause}${correctedClause}`,
+    sentence: `${String(recordedCount)} observation${recordedCount === 1 ? '' : 's'} recorded (${tierParts.join(', ')}). ${countedClause}${correctedClause}${demonstrationClause === '' ? '' : ` ${demonstrationClause}`}`,
   };
 }
 
@@ -440,17 +600,41 @@ export function whyThisAppeared(
   displayText: string,
 ): string {
   const admitted = rows.filter((row) => row.decision?.admitted === true).length;
+  const demonstration = summariseDemonstration(rows);
+
   switch (thread.promotion) {
     case 'captured':
       return `You captured ${displayText} and have not kept it yet. It is here because you met it, and for no other reason — nothing has been asked of you about it.`;
     case 'keep':
       return `You kept ${displayText}. Keeping resurfaces it when it happens to be useful; it does not put it on any review timing, and nothing here is asked of you on a fixed rhythm.`;
-    case 'learn':
-      return admitted === 0
-        ? `You took ${displayText} up for study, so recognition contracts on it are active. Nothing you have answered has counted yet.`
-        : `You took ${displayText} up for study, and ${String(admitted)} answered retrieval${admitted === 1 ? '' : 's'} on it ${admitted === 1 ? 'has' : 'have'} counted. That is the whole reason it is in front of you.`;
-    case 'master':
-      return `You took ${displayText} up at the level that also activates production and discrimination. Everything asked about it comes from a contract you activated by doing that.`;
+    case 'learn': {
+      const took = `You took ${displayText} up for study, so recognition contracts on it are active.`;
+      if (admitted === 0) {
+        return `${took} Nothing you have answered has counted yet.${
+          demonstration.present
+            ? ' The observations on this thread were appended by the demonstration button, not answered by you.'
+            : ''
+        }`;
+      }
+      // The case the repair exists for. Saying "you answered" here would name an
+      // act the learner never performed, so the counted retrievals are
+      // attributed to the button that actually produced them and the sentence
+      // states plainly that nothing of the learner's own has counted.
+      if (demonstration.allAdmittedAreDemonstration) {
+        const plural = admitted === 1 ? '' : 's';
+        return `${took} ${String(admitted)} retrieval${plural} on it ${admitted === 1 ? 'has' : 'have'} counted, and ${admitted === 1 ? 'it was' : 'all of them were'} appended by the “Add a demonstration chain” button on this screen rather than answered by you. Nothing you have answered yourself has counted yet.`;
+      }
+      const base = `You took ${displayText} up for study, and ${String(admitted)} answered retrieval${admitted === 1 ? '' : 's'} on it ${admitted === 1 ? 'has' : 'have'} counted. That is the whole reason it is in front of you.`;
+      return demonstration.admittedCount === 0
+        ? base
+        : `${base} ${String(demonstration.admittedCount)} of those came from the demonstration button rather than from you answering.`;
+    }
+    case 'master': {
+      const base = `You took ${displayText} up at the level that also activates production and discrimination. Everything asked about it comes from a contract you activated by doing that.`;
+      return demonstration.present
+        ? `${base} Some of the observations on this thread were appended by the demonstration button rather than answered by you.`
+        : base;
+    }
     default:
       return `${displayText} is on a promotion rung this build has no wording for; it is shown unexplained rather than described from a guess.`;
   }
@@ -468,6 +652,15 @@ export function collectUncertainties(
   rows: readonly ChainRow[],
 ): readonly string[] {
   const out: string[] = [];
+
+  // First, ahead of everything the learner did mark, because it changes how the
+  // whole list should be read: it is the one entry that says part of this
+  // ledger is not a record of them at all. A reader who stops after one bullet
+  // must still have been told.
+  const demonstration = summariseDemonstration(rows);
+  if (demonstration.present) {
+    out.push(demonstrationDisclosure(demonstration));
+  }
 
   if (args.uncertaintyMark !== null) {
     out.push(`You marked “${args.uncertaintyMark}” as the part you were unsure of.`);

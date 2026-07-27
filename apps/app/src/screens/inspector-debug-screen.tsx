@@ -29,6 +29,18 @@
  * **The persistence channel is empty and says why.** `@bunki/persistence` is a
  * W4/WP-10 swap-in; this build keeps the log in memory, so there are no
  * persistence timings to record and none are invented.
+ *
+ * **Its four states are mutually exclusive.** The records region resolves
+ * through `useLookup`, the same state machine the other screens use, so
+ * `resolveViewState` hands back exactly one of loading / error / empty / ready.
+ * An earlier revision of this screen rendered `LoadingPanel` and `EmptyPanel`
+ * side by side whenever the ring was empty, and carried a comment claiming a
+ * forced-lag flag gated the spinner — a flag this file never read. On `/debug`
+ * with no records that put an `accessibilityRole="progressbar"` inside a polite
+ * live region next to "Nothing recorded yet.", so a screen reader announced
+ * work permanently in progress on a screen that had already finished. The lag
+ * flag described by that comment now genuinely exists here, because the lookup
+ * this screen runs is the one that honours it.
  */
 
 import { useCallback, useState, type ReactNode } from 'react';
@@ -41,7 +53,8 @@ import {
   type ObservabilityChannel,
   type RingEntry,
 } from '../observability/index.ts';
-import { useAppSnapshot, useObservabilityRing } from '../state/app-context.tsx';
+import { useAppSnapshot, useDebugFlags, useObservabilityRing } from '../state/app-context.tsx';
+import { useLookup } from '../state/use-lookup.ts';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -77,12 +90,51 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
   // The snapshot is the app's change token; reading it here is what re-renders
   // this screen when a command elsewhere appends to the ring.
   const snapshot = useAppSnapshot();
+  const flags = useDebugFlags();
   const [serialized, setSerialized] = useState<string | null>(null);
   const [serializeError, setSerializeError] = useState<string | null>(null);
+  /**
+   * Ring mutations no command caused.
+   *
+   * "Clear the buffer" empties the ring without appending an event, so
+   * `snapshot.revision` does not move and the lookup below would keep serving
+   * the records it resolved before the clear. This counter is the change token
+   * for that one case.
+   */
+  const [localRevision, setLocalRevision] = useState(0);
 
   const entries = ring.entries();
-  const byChannel = (channel: ObservabilityChannel): readonly RingEntry[] =>
-    entries.filter((entry) => entry.record.channel === channel);
+
+  /**
+   * The records, through the same state machine every other screen uses.
+   *
+   * Reading a ring is synchronous, so `loading` lasts one frame unless `?lag=`
+   * holds it — which is the *only* reason this screen has a loading state, and
+   * the reason it is routed through `useLookup` rather than through a hand-
+   * written conditional. `resolveViewState` returns one member of a closed
+   * union, so loading, error, empty and ready are mutually exclusive by
+   * construction: this screen previously rendered a spinner *and* an empty
+   * panel together, announcing a progressbar that never resolved beside
+   * "Nothing recorded yet."
+   */
+  const resolveEntries = useCallback((): readonly RingEntry[] | null => {
+    const current = ring.entries();
+    return current.length === 0 ? null : current;
+    // `localRevision` and `snapshot.revision` are change tokens, not values the
+    // resolver reads; the ring is not something React can compare.
+  }, [ring, snapshot.revision, localRevision]);
+
+  const { state, retry } = useLookup<readonly RingEntry[]>(resolveEntries, {
+    flags,
+    emptyMessage: 'Nothing recorded yet.',
+    emptyDetail:
+      'Use the app — search for something, keep it, open the evidence inspector — and the records appear here.',
+  });
+
+  const byChannel = (
+    records: readonly RingEntry[],
+    channel: ObservabilityChannel,
+  ): readonly RingEntry[] => records.filter((entry) => entry.record.channel === channel);
 
   const showSerialized = useCallback((): void => {
     try {
@@ -118,18 +170,19 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
         </Text>
       </Section>
 
-      {entries.length === 0 ? (
-        <>
-          {/* The one honest loading state this screen has: a ring is read
-              synchronously, so there is nothing to wait for and the panel is
-              shown only while a forced-lag flag is holding the app. */}
-          <LoadingPanel label="Waiting for the first record…" />
-          <EmptyPanel
-            detail="Use the app — search for something, keep it, open the evidence inspector — and the records appear here."
-            message="Nothing recorded yet."
-            testID="debug-empty"
-          />
-        </>
+      {/* Exactly one of these four branches renders. `state.kind` is a closed
+          union, so there is no arrangement of flags that shows two at once. */}
+      {state.kind === 'loading' ? (
+        <LoadingPanel label="Reading the diagnostic buffer…" />
+      ) : state.kind === 'error' ? (
+        <ErrorPanel
+          detail={state.detail}
+          message={state.message}
+          onRetry={retry}
+          testID="debug-error"
+        />
+      ) : state.kind === 'empty' ? (
+        <EmptyPanel detail={state.detail} message={state.message} testID="debug-empty" />
       ) : (
         OBSERVABILITY_CHANNELS.map((channel) => (
           <Section
@@ -138,14 +191,14 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
             testID={`debug-${channel}`}
             title={channel}
           >
-            {byChannel(channel).length === 0 ? (
+            {byChannel(state.data, channel).length === 0 ? (
               <Text
                 style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
               >
                 No records on this channel.
               </Text>
             ) : (
-              byChannel(channel).map((entry) => (
+              byChannel(state.data, channel).map((entry) => (
                 <Text
                   key={`${channel}-${String(entry.record.seq)}`}
                   style={[styles.mono, { color: theme.color.ink, fontFamily: theme.font.sans }]}
@@ -219,6 +272,9 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
           onPress={() => {
             ring.clear();
             setSerialized(null);
+            // No event is appended, so the store's revision does not move; this
+            // is what tells the lookup the ring underneath it changed.
+            setLocalRevision((value) => value + 1);
           }}
           testID="debug-clear"
         />

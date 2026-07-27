@@ -1795,3 +1795,191 @@ approval.
   control is already in `packages/export/test/ui-hooks.test.ts`.
 - `git diff --stat 795cc8c` to confirm no surface outside `apps/app/`,
   `packages/export/`, `package-lock.json` and this capsule section was touched.
+
+## Appendix — WP-09 (Builder B6, repair round): two P1 honesty defects closed
+
+**Branch** `agent/bunki-phase0-closed-loop-wp09`. **Base SHA**
+`eaf64c8fe77e1f9dac269e13304810ede7c79a55` — the existing WP-09 head, which is
+itself stacked on `795cc8c` (`origin/agent/bunki-phase0-integration`, verified
+WP-01..06 + WP-05 UI). `git merge-base --is-ancestor 795cc8c HEAD` confirms the
+stacking. Nothing was rebased; this round appends one commit to the branch the
+review ran against.
+
+Both findings are the same failure in two places: **a surface asserted something
+the log does not support, and the correction to it was somewhere the reader was
+not.** Neither was a rendering bug.
+
+### P1-1 — the REQ-LM-06 default surface claimed the learner answered
+
+`DEMONSTRATION_CHAIN_NOTE` was rendered only inside `<View testID="evidence-chain">`,
+under the Observations section, which sits behind a disclosure whose `expanded`
+state initialises to `false`. So a learner who never opened the raw chain read a
+belief ledger stating they had given answers a button appended — with the one
+sentence that says otherwise hidden behind the very disclosure REQ-LM-06 was
+conceded to keep the raw chain behind.
+
+The fix puts the provenance where the claim is made. `buildEvidenceChain` now
+detects demonstration-minted rows **structurally**, not by heuristic:
+
+| Row family | How provenance is carried | Why not otherwise |
+| --- | --- | --- |
+| `ReviewGraded` | its contract's `promptFamilyVersion === DEMONSTRATION_PROMPT_FAMILY_VERSION` | the `ContractCreated` event is the durable record of where the contract came from; an id naming convention could be reproduced by an importer by accident |
+| `ExposureLogged` | `experienceId` starts with `DEMONSTRATION_EXPERIENCE_PREFIX` | an exposure names no contract, so this is the only field that can hold it |
+
+Both constants live in `apps/app/src/state/store.ts` — types and constants, no
+store, no clock — beside `DEMONSTRATION_CHAIN_NOTE`, so the stamp and the
+detection cannot drift apart. `memory-store.ts` now imports the version it used
+to define. The flag rides on `ChainRow.fromDemonstration` rather than being
+re-derived per phrasing function, so no call site can forget it.
+
+All four REQ-LM-06 default-surface elements are qualified. Verified strings from
+the seeded fixture (`分岐`, promotion `learn`, 3 `ReviewGraded` + 1
+`ExposureLogged`, 2 admitted):
+
+- **why-this** — "You took 分岐 up for study, so recognition contracts on it are
+  active. 2 retrievals on it have counted, and all of them were appended by the
+  “Add a demonstration chain” button on this screen rather than answered by you.
+  Nothing you have answered yourself has counted yet." The previous sentence —
+  "2 answered retrievals on it have counted. That is the whole reason it is in
+  front of you." — is replaced, not appended to, when *every* admitted row is
+  demonstration-minted; a mixed chain instead gets a qualifying clause naming
+  how many came from the button.
+- **strength** — the provenance clause is appended to the counted sentence.
+- **uncertainty** — the full disclosure is pushed **first**, ahead of the
+  learner's own mark, because it is the entry that says part of the ledger is
+  not a record of them at all.
+- **correction labels** — "the answer you gave at 16:07 — counted" becomes
+  "a demonstration answer at 16:07 — counted"; the exposure's "meeting it in
+  passing" becomes "a demonstration exposure".
+
+The disclosure is one clause reused in two lengths (`demonstrationProvenanceClause`,
+`demonstrationDisclosure`) so strength does not state the timing count twice and
+the two surfaces cannot describe the same button differently.
+
+**The alternative in the finding — gating the seed button behind `useDebugFlags`
+— was deliberately not taken.** Gating reduces reachability but does not make
+the surface honest: the operator screenshot run presses that button, and a gated
+button still produces a default surface that lies once pressed. Adding a flag
+would also mean editing `src/state/debug-flags.ts`, a WP-05 surface untouched by
+WP-09 and outside this lane's lock. Recorded here rather than done silently.
+
+### P1-2 — the diagnostics screen rendered a spinner that never resolved
+
+`inspector-debug-screen.tsx` returned a fragment holding `LoadingPanel` **and**
+`EmptyPanel` whenever `entries.length === 0`. `LoadingPanel` carries
+`accessibilityRole="progressbar"` inside a polite live region, so a screen reader
+on `/debug` with no records announced work permanently in progress beside
+"Nothing recorded yet." The accompanying comment claimed the panel was "shown
+only while a forced-lag flag is holding the app" — the file imported neither
+`useDebugFlags` nor `useLookup` and consulted no flag at all.
+
+The screen now routes its records region through `useLookup(flags)`, the state
+machine every other screen uses. `resolveViewState` returns one member of a
+closed union, so loading / error / empty / ready are mutually exclusive **by
+construction**, and the lag flag the old comment described now genuinely exists
+here. A local `localRevision` counter is the change token for "Clear the buffer",
+which empties the ring without appending an event and therefore does not move
+`snapshot.revision`. The false comment is replaced with an accurate one that
+records what the defect was.
+
+`screen-contract.test.ts`'s four-states assertion was widened from "the string is
+present" — which the defective screen passed the whole time — to two structural
+checks, applied to all five screens:
+
+1. every `<LoadingPanel` is dominated by a `state.kind === 'loading'` test
+   (count of guards >= count of panels);
+2. no JSX fragment contains two different state panels.
+
+**Both were confirmed to fail against the pre-fix file rather than assumed to.**
+Restoring `eaf64c8`'s `inspector-debug-screen.tsx` fails check 1 with
+`expected 0 to be greater than or equal to 1`; check 2 was exercised separately
+against the same source and reports the fragment containing
+`[ 'LoadingPanel', 'EmptyPanel' ]`. Neither assertion is dead code.
+
+### Checks run
+
+A worktree artefact had to be worked around and is reported rather than hidden.
+`node_modules/@bunki/*` are workspace symlinks into the **main** checkout, which
+sits on `795cc8c` and has no `packages/export/src/ui-hooks.ts`. Every run below
+labelled *(aliased)* used a throwaway vitest config resolving `@bunki/*` to this
+worktree's own `packages/`; that config was deleted before committing and is not
+in the diff. This is an environment property, not a branch property — CI and a
+clean checkout resolve correctly.
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | clean |
+| `npm run format:check` | clean (3 touched files reformatted by `prettier --write` first) |
+| `npm run typecheck` | **pre-existing failures only**, byte-identical at base — see below |
+| `npx vitest run` *(aliased)* | **874 passed / 876**, 2 failed |
+| baseline `npx vitest run` *(aliased, at `eaf64c8`)* | 862 passed / 864, **the same 2 failed** |
+| `npm run test:replay` | 47/47 |
+| `npm run verify:export` | 10/10 |
+
+**Net: +12 tests, zero new failures.** The 2 remaining failures are
+`packages/domain/test/events/catalog.test.ts` (`EncounterCaptured` /
+`ContractCreated` field conformance), which throw
+`Cannot convert undefined or null to object` because the installed `zod`
+resolves to a v3 build while the packages declare `4.4.3`. They fail identically
+at the base SHA with my changes stashed. `npm run typecheck` fails in
+`packages/seed` (`zod.prettifyError`) and `apps/app` (`@bunki/export` members)
+for the same two reasons; both were confirmed byte-identical at base with
+`git stash`. **My six touched files produce zero type errors.**
+
+### Not done, and stated rather than implied
+
+- **Screenshots 32 and 36 were not regenerated.** No Chrome or Chromium is
+  installed in this environment (`which google-chrome chromium ...` finds
+  nothing, no Playwright cache), so `apps/app/scripts/capture-evidence.mjs`
+  cannot run. The two images the finding cites are therefore **stale and still
+  show the defective surfaces**; they must be regenerated on a host with a
+  browser before this appendix's claims are treated as photographed. The strings
+  quoted above come from executing `buildEvidenceChain` against the real seeded
+  store, not from a render.
+- No render test covers the debug screen's mutual exclusion; this project
+  installs no React Native test renderer, so the guarantee is enforced by the
+  two source-level structural checks described above.
+
+### Surfaces touched
+
+`apps/app/src/screens/{evidence-chain.ts, inspector-debug-screen.tsx}`,
+`apps/app/src/state/{store.ts, memory-store.ts}`,
+`apps/app/test/{evidence-inspector.test.ts, screen-contract.test.ts}`, and this
+appendix. Six source files plus the capsule.
+
+**No frozen doc touched** — nothing in `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No CI change, no `eslint.config.mjs`, no
+`package.json`, no `package-lock.json`, no `vitest.config.ts`. No
+`packages/domain`, `packages/persistence`, `packages/ai`, `packages/seed` or
+`packages/export` change. `apps/app/src/state` remains in-memory and nothing in
+`apps/app` imports `@bunki/persistence` (the boundary test still passes). No
+shared `apps/app` navigation file (`app/_layout`, routes) was edited. Nothing
+pushed to `main` or to the integration branch; no merge, no approval.
+
+### Pre-commit scans
+
+- `git diff --cached | grep -inE '(api[_-]?key|secret|token|password|sk-ant|BEGIN .*PRIVATE KEY)'`
+  — two matches, both the prose phrase "change token" in comments explaining the
+  store revision. No value, no credential.
+- `git diff --cached | grep -nE '^\+.*(<<<<<<<|=======|>>>>>>>)'` — no conflict
+  markers.
+- `.env` remains git-ignored; no `.env` file is staged. Explicit paths staged.
+
+### Next safe command
+
+- Re-verify from a clean checkout (not a worktree sharing the parent's
+  `node_modules`): `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay && npm run verify:export`.
+  `npm ci` is what makes the `@bunki/export` and `zod` failures above disappear;
+  if they persist after a clean install, they are real and this appendix is wrong.
+- **Regenerate the stale evidence on a host with a browser:**
+  `(cd apps/app && npx expo export --platform web) && node apps/app/scripts/capture-evidence.mjs --out /tmp/wp09-repair-shots`
+  — then re-read `32-evidence-chain-expanded` (the default surface above the
+  disclosure must name the demonstration) and `36-debug-empty` (one panel, no
+  spinner).
+- To falsify P1-1 rather than trust it: in
+  `apps/app/src/state/memory-store.ts`, change the seeded contract's
+  `promptFamilyVersion` off `DEMONSTRATION_PROMPT_FAMILY_VERSION` and confirm the
+  new `names the demonstration on the default surface` tests fail — the detection
+  is doing the work, not the wording.
+- To falsify P1-2: `git checkout eaf64c8 -- apps/app/src/screens/inspector-debug-screen.tsx`
+  and confirm `inspector debug screen renders no two state panels at once` fails.

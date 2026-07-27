@@ -52,10 +52,10 @@ const rel = (file: string): string => relative(APP_ROOT, file);
  * fixed. Strings are preserved, so a forbidden word in rendered copy is still
  * caught.
  */
-const code = (file: string): string =>
-  read(file)
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const stripComments = (text: string): string =>
+  text.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+const code = (file: string): string => stripComments(read(file));
 
 const screen = (name: string): string => read(resolve(APP_ROOT, 'src/screens', name));
 const captureSource = screen('capture-screen.tsx');
@@ -214,17 +214,64 @@ describe('the seed entry disclosure reaches the pages that need it', () => {
   });
 });
 
+/** The three panels that stand for a *screen state* (REQ-UI-09). */
+const STATE_PANELS = ['LoadingPanel', 'ErrorPanel', 'EmptyPanel'] as const;
+
+const SCREEN_SOURCES: ReadonlyArray<readonly [string, string]> = [
+  ['capture', captureSource],
+  ['word', wordSource],
+  ['kanji', kanjiSource],
+  ['evidence inspector', screen('evidence-inspector-screen.tsx')],
+  ['inspector debug', screen('inspector-debug-screen.tsx')],
+];
+
 describe('every screen implements all four REQ-UI-09 states', () => {
-  it.each([
-    ['capture', captureSource],
-    ['word', wordSource],
-    ['kanji', kanjiSource],
-    ['evidence inspector', screen('evidence-inspector-screen.tsx')],
-    ['inspector debug', screen('inspector-debug-screen.tsx')],
-  ])('%s screen', (_name, source) => {
-    expect(source).toContain('LoadingPanel');
-    expect(source).toContain('ErrorPanel');
-    expect(source).toContain('EmptyPanel');
+  it.each(SCREEN_SOURCES)('%s screen defines all three panels', (_name, source) => {
+    for (const panel of STATE_PANELS) {
+      expect(source).toContain(panel);
+    }
+  });
+
+  /**
+   * Defining the states is not the requirement — *being in one of them* is.
+   *
+   * This assertion used to check only that each panel's name appeared in the
+   * file, which a screen can satisfy while rendering two of them at once. The
+   * diagnostics screen did exactly that: on the empty state it returned a
+   * fragment holding `LoadingPanel` **and** `EmptyPanel`, so `/debug` with no
+   * records put an `accessibilityRole="progressbar"` inside a polite live
+   * region beside "Nothing recorded yet." — a screen reader announcing work
+   * permanently in progress on a screen that had already finished. The name
+   * scan passed the whole time, and the screenshot filed as evidence that the
+   * four states were met is the one that shows both panels stacked.
+   *
+   * Two structural checks replace it. Neither can be satisfied by a comment.
+   */
+  it.each(SCREEN_SOURCES)('%s screen renders no two state panels at once', (_name, source) => {
+    const body = stripComments(source);
+
+    // (a) Every loading panel is dominated by a test for the loading state.
+    // `resolveViewState` returns one member of a closed union, so a panel
+    // guarded this way cannot coexist with another. A screen with more loading
+    // panels than loading guards is rendering one unconditionally — which is
+    // the defect above, where the file consulted no state at all.
+    const loadingPanels = body.match(/<LoadingPanel\b/g) ?? [];
+    const loadingGuards = body.match(/state\.kind === 'loading'/g) ?? [];
+    expect(
+      loadingGuards.length,
+      "every <LoadingPanel /> must sit behind a `state.kind === 'loading'` test",
+    ).toBeGreaterThanOrEqual(loadingPanels.length);
+
+    // (b) No JSX fragment holds two different state panels. Siblings in a
+    // fragment render together by definition, which is the exact shape the
+    // defect took: <><LoadingPanel …/><EmptyPanel …/></>.
+    for (const [, inner] of body.matchAll(/<>([\s\S]*?)<\/>/g)) {
+      const together = STATE_PANELS.filter((panel) => inner.includes(`<${panel}`));
+      expect(
+        together.length,
+        `these state panels share one JSX fragment and would render together: ${together.join(', ')}`,
+      ).toBeLessThanOrEqual(1);
+    }
   });
 
   it('puts the offline banner in the shell so no screen can omit it', () => {
