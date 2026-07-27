@@ -37,11 +37,24 @@ describe('deferred register', () => {
     expect(item?.reason).toMatch(/parallel lane|lint-forbidden/i);
   });
 
-  it('records the uncertainty-dimension gap as an ADR-002 decision, not an app edit', () => {
+  it('records the uncertainty-mark gap as an ADR-002 decision, not an app edit', () => {
     const item = DEFERRED_BY_ID['WP05-D2'];
     expect(item?.reason).toMatch(/ADR-002/);
     expect(item?.owner).toMatch(/Conductor/i);
     expect(item?.closesWith).toMatch(/amendment/i);
+  });
+
+  /**
+   * The register said only that the *dimension* was missing, which understated
+   * the loss: a mark applied after Keep reaches the log in no form at all. An
+   * entry that describes half a gap is worse than none, because the half it
+   * omits is the half nobody goes looking for.
+   */
+  it('states that a post-capture mark reaches the log in no form at all', () => {
+    const item = DEFERRED_BY_ID['WP05-D2'];
+    expect(item?.title).toMatch(/after Keep/i);
+    expect(item?.reason).toMatch(/markUncertainty emits no event/i);
+    expect(item?.reason).toMatch(/clearing a mark after keep/i);
   });
 
   it('names the licensing gate behind the thin layer 2–3 content', () => {

@@ -43,7 +43,7 @@ import {
 import { seedDataset } from '../data/catalog.ts';
 import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
 import { DEFERRED_BY_ID } from '../state/deferred.ts';
-import { UNCERTAINTY_LABELS } from '../state/store.ts';
+import { UNCERTAINTY_LABELS, uncertaintyLogNote } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import {
   ProvenanceLine,
@@ -233,7 +233,7 @@ export function WordScreen({
             >
               {thread.uncertainty === null
                 ? 'Nothing marked uncertain.'
-                : `Marked uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]} (recorded on this device only — the log records that a mark exists, not which one).`}
+                : `Marked uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}. ${uncertaintyLogNote(thread.uncertainty, { kept: true })}`}
             </Text>
           </View>
         )}

@@ -26,7 +26,11 @@
  * **One-gesture uncertainty mark.** Five chips, one tap each, in the
  * requirement's own vocabulary. Before Keep the tap arms the mark that the
  * captured event will carry; after Keep it edits the annotation, because
- * REQ-UI-01 says the mark stays editable.
+ * REQ-UI-01 says the mark stays editable. Those two paths reach the event log
+ * very differently — the first writes `uncertaintyMark` on the captured event,
+ * the second writes nothing at all — so the sentence under the chips is derived
+ * from the thread by `uncertaintyLogNote` rather than stated once and left to go
+ * stale (REQ-GATE-03).
  *
  * What this screen does *not* claim: that a saved thread survives a reload. It
  * renders the store's own durability sentence instead (P0-CAP-15).
@@ -50,6 +54,7 @@ import {
   DURABILITY_NOTES,
   UNCERTAINTY_DIMENSIONS,
   UNCERTAINTY_LABELS,
+  uncertaintyLogNote,
   type CommandAck,
   type UncertaintyDimension,
 } from '../state/store.ts';
@@ -362,9 +367,11 @@ export function CaptureScreen({
             </View>
             <Text
               style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID="capture-mark-log-note"
             >
-              The event log records that a mark exists; which dimension you chose is kept on this
-              device only and is not exported (deferred item WP05-D2).
+              {uncertaintyLogNote(activeThread?.uncertainty ?? null, {
+                kept: acknowledgment !== null,
+              })}
             </Text>
           </View>
 

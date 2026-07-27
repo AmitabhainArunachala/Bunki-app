@@ -29,6 +29,7 @@ import { createMemoryAppStore, targetKeyOf } from '../src/state/memory-store.ts'
 import {
   DURABILITY_NOTES,
   UNCERTAINTY_DIMENSIONS,
+  uncertaintyLogNote,
   type CaptureCommand,
 } from '../src/state/store.ts';
 
@@ -208,6 +209,34 @@ describe('the uncertainty mark', () => {
     expect(store.getSnapshot().threadsById[ack.threadId]?.uncertainty?.dimension).toBe('use');
   });
 
+  /**
+   * The case the screens used to lie about.
+   *
+   * Keeping with no mark and then tapping a chip leaves the learner looking at
+   * a selected chip and a thread row that says "uncertain: reading" — while the
+   * log holds no `uncertaintyMark` at all, not even the bare fact of one. The
+   * assertion is on `readAll()` rather than on the acknowledgment because the
+   * acknowledgment is what the screen already showed; the log is what would be
+   * exported.
+   */
+  it('leaves no uncertaintyMark in the log when the mark is applied after capture', () => {
+    const store = newStore();
+    const ack = store.execute(capture('分岐', { uncertainty: null }));
+    store.execute({ kind: 'markUncertainty', threadId: ack.threadId, dimension: 'reading' });
+
+    for (const event of store.readAll()) {
+      expect('uncertaintyMark' in event, `${event.type} carries a mark it never received`).toBe(
+        false,
+      );
+    }
+    expect(store.readAll().filter((event) => event.type === 'EncounterCaptured')).toHaveLength(1);
+
+    // The annotation exists on the device and knows it is not from the event.
+    const thread = store.getSnapshot().threadsById[ack.threadId];
+    expect(thread?.uncertainty?.dimension).toBe('reading');
+    expect(thread?.uncertainty?.markedAtCapture).toBe(false);
+  });
+
   it('clears the mark when the same chip is turned off', () => {
     const store = newStore();
     const ack = store.execute(capture('分岐', { uncertainty: 'kanji' }));
@@ -217,6 +246,80 @@ describe('the uncertainty mark', () => {
 
   it('offers exactly the five dimensions REQ-UI-01 names', () => {
     expect([...UNCERTAINTY_DIMENSIONS]).toEqual(['meaning', 'reading', 'use', 'kanji', 'not-sure']);
+  });
+});
+
+/**
+ * What the screens *say* about the log has to be what the log holds
+ * (REQ-GATE-03, P0-CAP-15).
+ *
+ * Each case below runs the real store path first and derives the sentence from
+ * the resulting thread, so the wording cannot drift away from the behaviour: if
+ * `markUncertainty` ever started writing an event, the third case would fail.
+ */
+describe('the sentence the screens render about the event log', () => {
+  const marksInLog = (store: ReturnType<typeof createMemoryAppStore>): number =>
+    store.readAll().filter((event) => 'uncertaintyMark' in event).length;
+
+  it('promises, before Keep, only what Keep will actually write', () => {
+    expect(uncertaintyLogNote(null, { kept: false })).toMatch(/Keeping this with a mark records/);
+  });
+
+  it('claims a logged mark exactly when the captured event carries one', () => {
+    const store = newStore();
+    const ack = store.execute(capture('分岐', { uncertainty: 'reading' }));
+    const thread = store.getSnapshot().threadsById[ack.threadId];
+
+    expect(marksInLog(store)).toBe(1);
+    const note = uncertaintyLogNote(thread?.uncertainty ?? null, { kept: true });
+    expect(note).toMatch(/The event log records that a mark exists/);
+    expect(note).toMatch(/this device only/);
+  });
+
+  it('says a post-capture mark is not in the log, because it is not', () => {
+    const store = newStore();
+    const ack = store.execute(capture('分岐'));
+    store.execute({ kind: 'markUncertainty', threadId: ack.threadId, dimension: 'reading' });
+    const thread = store.getSnapshot().threadsById[ack.threadId];
+
+    expect(marksInLog(store)).toBe(0);
+    const note = uncertaintyLogNote(thread?.uncertainty ?? null, { kept: true });
+    expect(note).toMatch(/not in the event log/);
+    expect(note).toMatch(/will not be exported/);
+    // The false claim this replaced.
+    expect(note).not.toMatch(/The event log records that a mark exists/);
+  });
+
+  it('makes no claim about the log when a kept thread has no mark', () => {
+    const store = newStore();
+    const ack = store.execute(capture('分岐', { uncertainty: 'kanji' }));
+    store.execute({ kind: 'markUncertainty', threadId: ack.threadId, dimension: null });
+    const thread = store.getSnapshot().threadsById[ack.threadId];
+
+    // Clearing cannot retract the mark already on the captured event, so the
+    // sentence must not assert that the log is now empty of one.
+    expect(marksInLog(store)).toBe(1);
+    expect(thread?.uncertainty).toBeNull();
+    const note = uncertaintyLogNote(thread?.uncertainty ?? null, { kept: true });
+    expect(note).toMatch(/A mark added now stays on this device only/);
+    expect(note).not.toMatch(/no mark is in the log|the log is empty/i);
+  });
+
+  it('names the deferred item in every branch, so the gap is always traceable', () => {
+    const branches = [
+      uncertaintyLogNote(null, { kept: false }),
+      uncertaintyLogNote(null, { kept: true }),
+      uncertaintyLogNote(
+        { dimension: 'use', editedAt: INSTANTS[0] ?? '', markedAtCapture: true },
+        { kept: true },
+      ),
+      uncertaintyLogNote(
+        { dimension: 'use', editedAt: INSTANTS[0] ?? '', markedAtCapture: false },
+        { kept: true },
+      ),
+    ];
+    for (const note of branches) expect(note).toContain('WP05-D2');
+    expect(new Set(branches).size).toBe(branches.length);
   });
 });
 

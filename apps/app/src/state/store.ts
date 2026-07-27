@@ -103,6 +103,42 @@ export interface UncertaintyAnnotation {
   readonly markedAtCapture: boolean;
 }
 
+/**
+ * What the event log actually holds about this mark, in one sentence.
+ *
+ * There are two different truths here and a screen that renders only the first
+ * one lies in the second case (REQ-GATE-03, P0-CAP-15):
+ *
+ *   - a mark chosen **before** Keep rides on `EncounterCaptured.uncertaintyMark`,
+ *     so the *fact* of a mark is in the log and only the dimension is app-local;
+ *   - a mark applied **after** Keep writes nothing at all — `markUncertainty`
+ *     emits no event, because the v1 schema has no family for amending a mark
+ *     (see `MarkUncertaintyCommand`). Fact *and* dimension are lost on export.
+ *
+ * The wording is derived from the annotation rather than written into a screen
+ * so the two screens cannot drift apart, and so the sentence cannot survive a
+ * change to what `markUncertainty` does. `test/capture-flow.test.ts` pins the
+ * store behaviour each branch describes.
+ *
+ * @param uncertainty The thread's current annotation, or `null` for no mark.
+ * @param options.kept Whether the encounter has been kept yet. Before Keep the
+ *   sentence is about what Keep *will* record; after it, about what it did.
+ */
+export function uncertaintyLogNote(
+  uncertainty: UncertaintyAnnotation | null,
+  options: { readonly kept: boolean },
+): string {
+  if (!options.kept) {
+    return 'Keeping this with a mark records in the event log that a mark exists; which dimension you chose is kept on this device only and is not exported (deferred item WP05-D2).';
+  }
+  if (uncertainty === null) {
+    return 'A mark added now stays on this device only — the log records a mark only on the captured event, so nothing about it would be exported (deferred item WP05-D2).';
+  }
+  return uncertainty.markedAtCapture
+    ? 'The event log records that a mark exists; which dimension you chose is kept on this device only and is not exported (deferred item WP05-D2).'
+    : 'This mark was applied after Keep, so it is on this device only — it is not in the event log and will not be exported (deferred item WP05-D2).';
+}
+
 /** What a screen needs to know about one thread. */
 export interface ThreadView {
   /** Straight from `@bunki/domain`'s thread reducer. Never recomputed here. */

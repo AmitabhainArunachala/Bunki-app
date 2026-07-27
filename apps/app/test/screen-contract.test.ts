@@ -240,6 +240,26 @@ describe('claim boundaries (REQ-GATE-03)', () => {
     expect(captureSource).not.toMatch(/saved\s+permanently|saved\s+forever|never\s+lose/i);
   });
 
+  /**
+   * Both screens once stated unconditionally that "the event log records that a
+   * mark exists". That is true only for a mark chosen before Keep; a mark
+   * applied afterwards writes no event at all. A sentence about the log has to
+   * come from the thread, so it cannot be true on one path and false on another.
+   */
+  it('derives what it says about the event log rather than asserting it', () => {
+    for (const [name, source] of [
+      ['capture', captureSource],
+      ['word', wordSource],
+    ] as const) {
+      expect(source, name).toContain('uncertaintyLogNote');
+      // The claim must not appear as a literal in a screen — only inside the
+      // branch of the helper that has established it.
+      expect(source, name).not.toMatch(/log records that a mark exists/);
+      expect(source, name).not.toMatch(/records that a mark exists, not which one/);
+    }
+    expect(read(resolve(APP_ROOT, 'src/state/store.ts'))).toContain('markedAtCapture');
+  });
+
   it('labels the seed as a seed wherever it could be mistaken for a dictionary', () => {
     expect(wordSource).toMatch(/seed/i);
     expect(kanjiSource).toMatch(/seed/i);

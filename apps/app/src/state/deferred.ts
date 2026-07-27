@@ -32,12 +32,13 @@ export const DEFERRED_INTEGRATION: readonly DeferredItem[] = [
   },
   {
     id: 'WP05-D2',
-    title: 'The uncertainty dimension is not in the event log',
+    title:
+      'A mark made before Keep loses only its dimension; a mark made after Keep reaches the event log in no form at all',
     reason:
-      'REQ-UI-01 specifies a five-way one-gesture mark (meaning · reading · use · kanji · not sure). The frozen v1 schema records EncounterCaptured.uncertaintyMark as `true | absent` only (controller §6.1, ADR-002), so the fact of a mark is durable and the dimension is not. Adding a field is an ADR-002 amendment, which is an escalation and not an app-side edit.',
+      'REQ-UI-01 specifies a five-way one-gesture mark (meaning · reading · use · kanji · not sure) that "remains editable". The frozen v1 schema records EncounterCaptured.uncertaintyMark as `true | absent` only (controller §6.1, ADR-002), and it records it on the *captured event* — so a mark chosen before Keep puts the fact of a mark in the log and leaves the dimension out, while a mark applied or changed after Keep writes nothing: markUncertainty emits no event, because the v1 schema has no family for amending a mark and inventing one in the app would be a schema change made in the wrong package. Clearing a mark after Keep likewise cannot retract the uncertaintyMark already on the captured event. Both halves are ADR-002 amendments, which are escalations and not app-side edits.',
     owner: 'Conductor — ADR-002 amendment decision, then WP-02/WP-06 schema owner',
     closesWith:
-      'Either an ADR-002 amendment widening uncertaintyMark to the five-value enum, or an explicit ruling that the dimension stays app-local. Until then the UI collects it, labels it as not exported, and the annotation lives beside the log in AppStore.',
+      'An ADR-002 decision covering both halves: an amendment widening uncertaintyMark to the five-value enum, and an amendment giving a post-capture mark an event family of its own — or an explicit ruling that a mark is a capture-time-only fact and everything after it stays app-local. Until then the UI collects the dimension, keeps the annotation beside the log in AppStore, and says on screen which of the two cases the learner is actually in — see uncertaintyLogNote in src/state/store.ts.',
   },
   {
     id: 'WP05-D3',
