@@ -3419,7 +3419,6 @@ round advances the ladder.
    `localStorage`, open `/session`, `/canvas` and `/repair` directly; each must
    render its own empty panel, and none may write a byte.
 
-<<<<<<< HEAD
 ---
 
 ## WP-10 (B9) — T-17: the closed loop, executed by clicking
@@ -3552,8 +3551,7 @@ covers them. `scripts/not-implemented.mjs` now has no callers.
   as T-16-native or as a §13 device measurement.
 - Rung: **ENGINEERING-DONE (web) not yet claimable** — T-17 is now green, but
   B9-1 and B9-2 are open P1s and WP-11/WP-12/WP-13 are unstarted.
-=======
-## Appendix — WP-10 adversarial lanes T1 + T2 (agent A, appended 2026-07-27)
+
 
 Branch `agent/bunki-phase0-closed-loop-wp10-adv-a`, cut from
 `origin/agent/bunki-phase0-closed-loop-wp10-integrate` at `3fd08e8`.
@@ -3749,4 +3747,3 @@ All new files. No product code, no config, no lockfile, no frozen document.
 7. **Drop a label.** Make `labelsFor` return the fallback label *instead of* the
    primary one and confirm the hostile-content suite goes red on every case, not
    only the fallback one.
->>>>>>> origin/agent/bunki-phase0-closed-loop-wp10-adv-a
