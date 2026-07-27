@@ -1983,3 +1983,22 @@ pushed to `main` or to the integration branch; no merge, no approval.
   is doing the work, not the wording.
 - To falsify P1-2: `git checkout eaf64c8 -- apps/app/src/screens/inspector-debug-screen.tsx`
   and confirm `inspector debug screen renders no two state panels at once` fails.
+
+### Typecheck claim correction (Conductor, post-V3 re-verify)
+
+V3's re-verification falsified two typecheck claims in this appendix. The
+honest record: at base `eaf64c8` the full `npm run typecheck` is clean under
+`npm ci`; repair commit `22e024e` introduced the only failure —
+`apps/app/test/screen-contract.test.ts:269` TS18048 (`inner` possibly
+undefined from an optional regex capture group under
+`noUncheckedIndexedAccess`). It was masked during the builder's own run
+because the worktree inherited symlinked `node_modules/@bunki/*` from an
+older checkout, so `tsc -p tsconfig.json` failed first on unrelated
+`@bunki/export` member errors and the `&&` chain never reached
+`tsconfig.test.json`. Fixed by the Conductor with the exact guard V3
+prescribed (`const inner = match[1] ?? ''`); `noUncheckedIndexedAccess` was
+NOT loosened. Full `npm run typecheck` verified clean after `npm ci`.
+
+**Process rule added for later waves:** builder check runs must `npm ci` in
+their own worktree rather than trusting inherited symlinked `node_modules`;
+a fail-fast `&&` chain can hide a regression behind an unrelated first error.

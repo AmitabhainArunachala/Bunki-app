@@ -265,7 +265,8 @@ describe('every screen implements all four REQ-UI-09 states', () => {
     // (b) No JSX fragment holds two different state panels. Siblings in a
     // fragment render together by definition, which is the exact shape the
     // defect took: <><LoadingPanel …/><EmptyPanel …/></>.
-    for (const [, inner] of body.matchAll(/<>([\s\S]*?)<\/>/g)) {
+    for (const match of body.matchAll(/<>([\s\S]*?)<\/>/g)) {
+      const inner = match[1] ?? '';
       const together = STATE_PANELS.filter((panel) => inner.includes(`<${panel}`));
       expect(
         together.length,
