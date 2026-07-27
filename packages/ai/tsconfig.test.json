@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "_comment": "The adapter's tests (WP-07). Node types are allowed here and only here — the T-09 boundary scan reads src/ as text and the fallback fixtures are checked against the seed's JSON on disk. Same line packages/domain draws: the platform is unavailable in src, available in test.",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src", "test"]
+}

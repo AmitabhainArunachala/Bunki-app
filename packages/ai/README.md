@@ -42,12 +42,50 @@ facts, never grades, never memory state.
 
 ## Directory map
 
-| Path              | Contents                                       |
-| ----------------- | ---------------------------------------------- |
-| `src/envelope.ts` | candidate envelope schema                      |
-| `src/provider/`   | single remote provider behind `AiProviderPort` |
-| `src/fallback/`   | scripted offline fallback fixtures             |
+| Path               | Contents                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| `src/envelope.ts`  | request/response schemas, ceilings, deterministic checks     |
+| `src/prompt.ts`    | the one prompt family, versioned                             |
+| `src/consent.ts`   | the OD-08 allowlist — fails closed                           |
+| `src/provider/`    | `AiProviderPort` + one fetch-based Anthropic Messages client |
+| `src/fallback/`    | scripted offline fixtures and how they are served            |
+| `src/runtime.ts`   | timeout, cancellation, and the never-rejects contract        |
+| `src/telemetry.ts` | route metadata sink and ring — never message content         |
+| `src/hash.ts`      | SHA-256 for `inputHash`                                      |
+| `src/platform.ts`  | the declared platform surface (`fetch`, abort, timers)       |
+
+## What a caller does
+
+```ts
+const runtime = createAiRuntime({ provider, clock, nextCandidateId });
+const { envelope, route } = await runtime.requestCandidate({ context, signal });
+```
+
+`requestCandidate` **never rejects for a runtime condition.** Missing key,
+offline, timed out, hostile answer, un-consented content — each resolves with a
+valid candidate whose `provider` is `offline-fallback` and whose `route.fallbackReason`
+names what happened. That is T-10 and T-11 expressed as a type: a caller cannot
+forget to handle a failure that cannot be thrown. It _does_ throw for a caller
+bug — an input that cannot form a valid request envelope.
+
+## Why there is no SDK dependency
+
+Controller §14 requires every dependency to be licence-verified at admission and
+pinned exactly, and §4 forbids adding anything that constrains the operator's
+open licence choice. The surface this package needs is one `POST` with three
+headers, and none of the SDK's capabilities (streaming, tools, batching,
+retries) are in Phase-0 scope. The trade is real and recorded: no typed wire
+shapes, no built-in retry, no drift protection. **P2 for a later phase** —
+revisit alongside REQ-AI-02's multi-provider shadow evaluation.
 
 ## Status
 
-WP-01 skeleton only.
+WP-07 complete: envelope, consent boundary, provider port + Anthropic client,
+timeout/cancellation, scripted fallback, telemetry.
+
+**Open (operator gate, controller §22.3 / OD-08):** no live call has been made.
+Every test drives an injected `fetch` with no transport behind it, and
+`test/telemetry-and-no-live-calls.test.ts` asserts the package never reaches an
+ambient network. Live-call evidence is recorded as OPEN in
+`docs/build-evidence/CAPSULE.md` and stays open until the operator provides a key
+and a budget cap.

@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "test"]
+  "_comment": "The adapter's own program (WP-07). `types: []` is the point, exactly as in packages/domain: with no ambient @types loaded, `process`, `Buffer`, `fetch`, `AbortController` and every other platform global are *type errors* inside src/. That is what forces the platform surface to be declared in src/platform.ts and injected rather than reached for, and it is what makes the no-live-calls guarantee structural instead of a convention. Tests read src/ as text and the seed's JSON off disk, so they compile under tsconfig.test.json instead.",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["src"]
 }

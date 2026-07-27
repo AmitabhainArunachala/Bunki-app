@@ -1516,3 +1516,223 @@ host, no credential, no path outside the repo.
   interleaved node list. Restore with `git checkout apps/app/src/ui/ruby.tsx`.
 - `git diff --stat 755c090` to confirm no surface outside `apps/app/` and
   `docs/build-evidence/screenshots-wp05/` (plus this capsule section) was touched.
+
+---
+
+## WP-07 (B7) — bounded AI candidate path with offline/scripted fallback
+
+**Wave:** W4. **Branch:** `agent/bunki-phase0-closed-loop-wp07`.
+**Stacked on** the W4 integration head, not on `main`: base
+`c30560b6dae7beaa09fdccaf4157ba0740e3e38f`
+(`origin/agent/bunki-phase0-integration`, "WP03+05+06(CON): close wave W3, open
+W4 locks"), which carries verified WP-01..06 plus the WP-05 UI.
+`origin/main` at cut time: `e02b8b2443545e817c15ddebb638492ce193d83e`.
+
+**Integrity re-verified before any edit** (launcher step 1, orchestration §2.1):
+
+| File | SHA-256 | Verdict |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc…59b47` | matches |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477…b0c55` | matches |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `41631840…55a71` | matches |
+
+### Closure predicate (controller §19 WP-07)
+
+| Predicate item | Status | Evidence |
+| --- | --- | --- |
+| §9 adapter complete — zod envelope, provider port, fallback, timeout | **met** | `packages/ai/src/{envelope,consent,runtime,telemetry,hash,platform,prompt,labels,errors}.ts`, `src/provider/`, `src/fallback/` |
+| T-09 passing, extended with an adapter-specific attempt | **met** | `packages/ai/test/t09-adapter-boundary.test.ts` (13 tests) + the domain's own T-09 still green |
+| T-10 passing | **met** | `packages/ai/test/runtime.test.ts`, `apps/app/test/candidate-offline-and-timeout.test.ts` |
+| T-11 passing | **met** | `apps/app/test/candidate-offline-and-timeout.test.ts` — capture runs *during* a hung call, then the 10 s budget fires |
+| T-12 structural/unit half passing | **met** | `apps/app/test/candidate-labeling.test.ts` (15 tests). E2E half is WP-10's and needs the mount below. |
+| candidate UI labelled | **met (unmounted)** | `apps/app/src/candidate/candidate-panel.tsx`; see coordination request 1 |
+| env-only key handling verified | **met** | `packages/ai/test/anthropic-provider.test.ts`; `packages/ai/.env.example` committed with no value |
+| fallback fixtures cover the seeded target | **met** | `packages/ai/test/fallback.test.ts` checks the fixtures against `packages/seed/data/*.json` |
+
+### What was built
+
+**`packages/ai/` (new, 13 source modules).**
+
+- **Envelope** exactly as controller §9 specifies, zod-strict on every object.
+  `taskClass` and `checks.isLabeled` are literals, so an off-route request and
+  an unlabelled candidate are unrepresentable rather than merely rejected.
+  `threadContext` has four fields — `contentClass`, `targetForm`, `excerpt`,
+  `seedRef` — and no field that could carry a thread id, an encounter, a
+  promotion state, or learner history (REQ-ARCH-07 "minimum context").
+- **One remote provider**, `createAnthropicProvider`, a fetch-based Anthropic
+  Messages client (`POST /v1/messages`, `x-api-key` + `anthropic-version:
+  2023-06-01`). **No SDK dependency** — the reasoning is in the package README
+  and is recorded as a P2 below. The key is read from `ANTHROPIC_API_KEY` at
+  request time only; construction succeeds without one, so the runtime builds
+  once and each request falls back with a named reason.
+- **10 s timeout + AbortController.** The budget aborts the in-flight request
+  rather than racing a promise; the caller's own signal is linked to the same
+  controller, so a screen unmounting cancels the call it started. A timeout and
+  a caller cancellation are reported as *different* reasons — mislabelling a
+  learner's navigation as a ten-second timeout would put a latency regression in
+  the observability ring that never happened.
+- **Scripted fallback** in `src/fallback/`: four hand-written fixtures covering
+  the seeded 分岐 target and its family (分岐 / 分岐点 / 岐路 / 分かれる), each
+  quoting a seed record verbatim. `provider` is `offline-fallback`, which flows
+  into `CandidateAttached.envelope.provider` and therefore into the export and
+  the evidence inspector — "was this live?" is answerable from the log, not only
+  from the screen at the time.
+- **`requestCandidate` never rejects for a runtime condition.** Missing key,
+  offline, timeout, cancellation, hostile answer, refusal, truncation,
+  un-consented content — each resolves with a labelled candidate and a route
+  record naming the reason. It still throws for a caller bug. This is T-10 and
+  T-11 expressed as a type rather than as a convention.
+- **OD-08 boundary, enforced before any transport call.** `consent.ts` holds an
+  allowlist policy that **fails closed**: an empty allowlist permits nothing.
+  The app supplies one derived from `@bunki/seed` itself
+  (`apps/app/src/candidate/candidate-context.ts`), so it cannot fall behind the
+  data and cannot widen without adding seed records. Refusal messages never
+  name the refused text.
+- **Telemetry** records route class, latency, token counts and fallback use, and
+  is structurally incapable of holding content: `AiRouteRecord` is a closed set
+  of scalars, `assertNoMessageContent` is the runtime backstop, and the test
+  drives a full cycle with distinctive text on both sides then asserts none of
+  it appears in the serialised ring.
+
+**`apps/app/src/candidate/` (new).** Context selection (OD-08), the label view
+model, the request hook, and the panel. All four REQ-UI-09 states plus `idle`
+(nothing asked for yet) and `unavailable` (nothing we may send). Asking is a
+button press — there is no effect that fires a request on mount.
+
+**`apps/app/src/state/` (extended, in-memory as the cross-lane rule requires).**
+Two additive commands: `attachCandidate` → `CandidateAttached` (metadata only;
+the text stays beside the log) and `acceptCandidate` → `CandidateAcceptedAsNote`
+with `userAction: true`. Both are idempotent by candidate id. The dispatcher is
+now an exhaustive `switch`, so a future command kind cannot silently fall
+through. **No `@bunki/persistence` import** was added anywhere in `apps/app`.
+
+### Boundary evidence (T-09, controller §19 stop condition)
+
+The adapter-specific attempt starts from a **real** `requestCandidate` result
+produced by the real provider client, and tries six routes into the scheduler:
+the envelope directly, the same value after a JSON round trip, the envelope
+dressed as a `ReviewGraded`, the request envelope, the `CandidateAttached` event
+it produces, and its telemetry record. All six throw
+`CandidateEvidenceBoundaryError`. Source-level scans additionally prove the
+package never calls `createDomainEvent`, never names an evidence family, and
+imports `@bunki/domain` in exactly two files — for `isoInstantSchema`,
+`CandidateEnvelopeMetadata`, and `canonicalJson`.
+
+### Coordination requests (orchestration §2.4 — filed, not edited)
+
+1. **B6 — mount the candidate panel on the word page (blocks T-12's E2E half).**
+   `apps/app/src/screens/word-screen.tsx` is not B7's surface this wave, so the
+   panel ships unmounted. The exact change, at the `word-explanation-unfilled`
+   notice in Layer 1 (whose current copy already says "the AI candidate path is
+   a later work package"):
+
+   ```tsx
+   import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
+   // …inside WordScreen, after `thread` is resolved:
+   const candidateContext = seededContextFor(lexeme);
+   const candidate = snapshot.candidatesByThread[thread?.state.threadId ?? '']?.[0] ?? null;
+   const ai = useCandidate({ runtime, threadId: thread?.state.threadId ?? null,
+                             context: candidateContext, existing: candidate });
+   <CandidatePanel headword={lexeme.headword} offline={connectivity === 'offline'}
+                   onAccept={ai.accept} onRequest={ai.request} state={ai.state} />
+   ```
+
+   The runtime comes from `createCandidateRuntime({ context })` in
+   `apps/app/src/candidate/candidate-runtime.ts` and belongs in `AppProvider`
+   alongside the store, which is also B6's file. Until this lands, the expo web
+   build does not bundle the slice — stated plainly because the build proof
+   below would otherwise be read as covering it.
+
+2. **B6 (WP-09) — consume the AI route ring in the observability surface.**
+   `AiTelemetrySink` is a one-method interface and `createCandidateRouteRing()`
+   is ready to hand over; no inspector file was touched. Records are route
+   metadata only and the sink rejects anything else, so wiring it cannot leak
+   content.
+
+3. **B6/B8/CON — `apps/app/test/screen-contract.test.ts` pins `src/screens/` to
+   exactly WP-05's three files.** The W4 lock table names `src/screens/candidate*`
+   as B7's surface, but adding a fourth entry there would have meant editing
+   another builder's test, in the same wave they are working in it, to register
+   something that is not a screen. The slice lives at `apps/app/src/candidate/`
+   instead: single-writer, zero collision, and still inside every scan that
+   matters (`screen-contract.test.ts` walks all of `src/`, so its boundary,
+   index-name and forbidden-claim checks cover these files exactly as they cover
+   the screens — 38/38 still green). **B8 will hit the same wall** with
+   `src/screens/session*` and `src/screens/canvas*`; CON may want to widen that
+   assertion once, for the wave, rather than three times.
+
+4. **CON — two shared files were edited, minimally and additively.**
+   `apps/app/package.json` gained one line (`"@bunki/ai": "*"`) because a builder
+   that cannot declare its own dependency edge cannot deliver; `package-lock.json`
+   gained the mechanical workspace entries. `apps/app/src/state/{store,memory-store}.ts`
+   were extended per this wave's cross-lane rule ("AppStore stays in-memory"),
+   additively and with no change to any existing behaviour — all 24 pre-existing
+   `capture-flow` tests still pass untouched.
+
+### Open items and gates
+
+| Item | Class | Owner | Note |
+| --- | --- | --- | --- |
+| **Live-call evidence** | **OPEN — operator gate (controller §22.3, OD-08)** | operator | No live call has been made and none can be: every test injects a `fetch` with no transport, and `packages/ai/test/telemetry-and-no-live-calls.test.ts` asserts the source never reaches an ambient network. Closing it needs a key in `ANTHROPIC_API_KEY` **and** a budget cap. Evidence path when it opens: `docs/build-evidence/WP07_LIVE_CALL_EVIDENCE.md` (does not exist yet — deliberately, rather than as an empty file that could be mistaken for a run). |
+| T-12 E2E half | deferred by design | WP-10 | Needs coordination request 1. |
+| SHA-256 duplicated in `packages/ai/src/hash.ts` and `packages/persistence/src/hash.ts` | **P2** | WP-10 | `@bunki/persistence`'s entry point binds `expo-sqlite`; importing it here would pull a native database into the AI adapter to borrow one pure function. The shared home would have to be `@bunki/domain`, whose surface belongs to another WP this wave. |
+| No provider SDK | **P2** | later phase | Recorded in the package README: the trade is no typed wire shapes, no built-in retry, no drift protection, against controller §14's dependency-verification rule. Revisit with REQ-AI-02's multi-provider shadow evaluation. |
+| `confidence` absent from the candidate envelope | recorded, not a gap | later phase | REQ-AI-03 lists it in the full architecture. A Phase-0 adapter inventing a confidence number from one unmeasured exchange would be publishing an unmeasured number (REQ-GATE-03), so the field is a documented seam rather than a faked value. |
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` on controller / v2 / orchestration spec | 3/3 match the integrity record |
+| `npm ci` | clean install in a fresh worktree |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **64 files, 944 tests, all passed** |
+| `npx vitest run packages/ai` | 8 files, **106 tests** passed |
+| `npx vitest run apps/app` | 15 files, **252 tests** passed (was 11/203; +4 files, +49 tests) |
+| `npm run test:replay` | 2 files, 47 tests passed |
+| `npm run verify:export` | 1 file, 10 tests passed |
+| `npm run test:e2e` | WP-01 placeholder, exits 0 — not evidence of anything |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 5 static routes. **Does not cover the candidate slice**, which nothing imports until coordination request 1 lands. |
+
+### Surfaces touched
+
+`packages/ai/**` (new package body, tests, `.env.example`, `tsconfig.test.json`,
+README, `package.json`), `apps/app/src/candidate/**` (new),
+`apps/app/src/state/{store.ts,memory-store.ts}` (additive),
+`apps/app/test/candidate-*.test.ts` (4 new files), `apps/app/package.json`
+(one dependency line), `package-lock.json` (mechanical), and this appendix.
+
+**No frozen doc touched** — no `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No CI change, no `eslint.config.mjs` change, no
+`packages/domain`, `packages/persistence`, `packages/export` or `packages/seed`
+change, no screen file, no route file. Nothing pushed to `main` or to the
+integration branch.
+
+### Secrets check (controller §15)
+
+Staged diff scanned for `api[_-]?key|secret|bearer|password|token`. Every match
+is an identifier (`API_KEY_ENV_VAR`, `hasApiKey`, `x-api-key`, `max_tokens`,
+`inputTokens`), prose about the rule, or the committed template line
+`ANTHROPIC_API_KEY=` with **no value**. Test fixtures use the literal
+`sk-ant-not-a-real-key`, and two tests exist specifically to assert that value
+never appears in an error message or a log record. `packages/ai/.env.example`
+is tracked (the `!.env.example` negation in `.gitignore` works at any depth);
+`.env` remains ignored. Staged diff also grepped for conflict markers — none.
+
+### Next safe command
+
+- V6 re-verifies from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `npm run test:replay`, `npm run verify:export`, and
+  `(cd apps/app && npx expo export --platform web)`.
+- To falsify the boundary rather than trust it, add a case to
+  `packages/ai/test/t09-adapter-boundary.test.ts` that constructs any new shape
+  from a real `requestCandidate` outcome and asserts `assertNotCandidate` throws;
+  and confirm the source scans by temporarily adding a `createDomainEvent` import
+  to any `packages/ai/src` file — that suite must go red.
+- To confirm the scope: `git diff --stat c30560b` should show only
+  `packages/ai/`, `apps/app/src/candidate/`, `apps/app/src/state/{store,memory-store}.ts`,
+  `apps/app/test/candidate-*.test.ts`, `apps/app/package.json`,
+  `package-lock.json`, and this capsule section.

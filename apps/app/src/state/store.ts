@@ -43,6 +43,7 @@
  */
 
 import type {
+  CandidateEnvelopeMetadata,
   DomainEvent,
   PromotionState,
   ProvenanceRecord,
@@ -153,12 +154,45 @@ export interface ThreadView {
   readonly capturedAt: string;
 }
 
+/**
+ * One AI candidate, as a screen needs it (WP-07).
+ *
+ * ## Why the text is here and not in the event log
+ *
+ * `CandidateAttached` records the envelope *metadata* — task class, input hash,
+ * model, provider, prompt version, checks — and deliberately not the payload
+ * (controller §6.1, ADR-002; the reasoning is in `@bunki/ai`'s `envelope.ts`).
+ * So the generated text lives beside the log, in this view, for as long as the
+ * learner is looking at it. It survives into the log only when they explicitly
+ * accept it, and even then as their own note rather than as a canonical field.
+ *
+ * The consequence, stated so no screen implies otherwise: **an unaccepted
+ * candidate's text is not durable and is not exported.** It is generated
+ * content of unverified standing, and keeping it out of the record is the
+ * behaviour REQ-ARCH-04 asks for, not a gap.
+ */
+export interface CandidateView {
+  readonly candidateId: string;
+  readonly threadId: string;
+  /** `generated` until an explicit user action moves it to `accepted`. */
+  readonly status: 'generated' | 'accepted';
+  /** The envelope metadata, exactly as it reached `CandidateAttached`. */
+  readonly envelope: CandidateEnvelopeMetadata;
+  /** The candidate text. App-local; see this interface's header. */
+  readonly text: string;
+  /** When the learner accepted it, from the injected clock. Null until then. */
+  readonly acceptedAt: string | null;
+}
+
 export interface AppSnapshot {
   /** Bumps on every applied command; the subscription hook's change token. */
   readonly revision: number;
   /** Newest first. */
   readonly threads: readonly ThreadView[];
   readonly threadsById: Readonly<Record<string, ThreadView>>;
+  /** Newest first, across all threads. */
+  readonly candidates: readonly CandidateView[];
+  readonly candidatesByThread: Readonly<Record<string, readonly CandidateView[]>>;
   readonly eventCount: number;
 }
 
@@ -190,7 +224,46 @@ export interface MarkUncertaintyCommand {
   readonly dimension: UncertaintyDimension | null;
 }
 
-export type AppCommand = CaptureCommand | PromoteCommand | MarkUncertaintyCommand;
+/**
+ * Attach an AI candidate to a thread (WP-07; controller §9).
+ *
+ * Emits `CandidateAttached` with `status: "generated"`. Attaching is *not* a
+ * user action — the app asks for a candidate, and one arriving is a fact about
+ * the app, not a judgement by the learner. That is why this command and
+ * {@link AcceptCandidateCommand} are separate: only the second one is a claim
+ * the learner made, and only the second one writes `userAction: true`.
+ */
+export interface AttachCandidateCommand {
+  readonly kind: 'attachCandidate';
+  readonly threadId: string;
+  readonly candidateId: string;
+  readonly envelope: CandidateEnvelopeMetadata;
+  /** The candidate text. Kept beside the log — see {@link CandidateView}. */
+  readonly text: string;
+}
+
+/**
+ * Accept a candidate as the learner's own note (controller §9, REQ-ARCH-04).
+ *
+ * Emits `CandidateAcceptedAsNote`, whose `userAction` is the literal `true` in
+ * the frozen schema — there is no representable "accepted automatically". This
+ * command exists only to be dispatched from a press handler; nothing in the app
+ * may call it on a timer, on arrival, or on any other non-human trigger.
+ *
+ * Accepting still does not make the text canonical and does not create
+ * evidence. It records that a human read a generated note and kept it.
+ */
+export interface AcceptCandidateCommand {
+  readonly kind: 'acceptCandidate';
+  readonly candidateId: string;
+}
+
+export type AppCommand =
+  | CaptureCommand
+  | PromoteCommand
+  | MarkUncertaintyCommand
+  | AttachCandidateCommand
+  | AcceptCandidateCommand;
 
 /** What `execute` returns, immediately, before any enrichment runs. */
 export interface CommandAck {
