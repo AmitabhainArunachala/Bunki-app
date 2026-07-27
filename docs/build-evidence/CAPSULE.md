@@ -4066,3 +4066,181 @@ integration line's. Four findings are open (three P1, one P2), so **no rung is
 claimable from this branch**. The status line remains
 `ENGINEERING-DONE (web) not yet claimable`. Nothing here is evidence about
 native, about a live model, or about any efficacy claim.
+
+---
+
+## Appendix — WP-10 closeout (B6, W5): lane reconciliation, the four P1s, the done ladder
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-closeout`
+**Base:** `agent/bunki-phase0-integration` @ `995a602`
+**Head at this write:** `72b4cce66ed2f9b5982d4f8b4e7ad48d56dc42a7`
+**`origin/main`:** `c87a2eeb5019ceae13eb81714c72aee0178ea416` (untouched; nothing here is merged)
+**Toolchain:** node v22.22.2 · npm 10.9.7 · `@playwright/test` 1.56.0 · Chromium
+141.0.7390.37 · expo-router 57.0.8 · FSRS pin `ts-fsrs@5.4.1` (unchanged)
+**LICENSE:** pending operator decision (controller §4).
+
+### Integrity, verified before obeying anything
+
+All nine files in `docs/specs/` hash-match
+`BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`, controller included
+(`de7b6fcc…`). No frozen document was edited: nothing under `docs/specs/`,
+`docs/convergence/`, `docs/handoffs/` or `docs/adr/` appears in this branch's
+diff.
+
+### Task A — one harness, not two that pass separately
+
+Merged `origin/agent/bunki-phase0-closed-loop-wp10-adv-b` (`163a5490`, the T3
+storm lanes and the T4 accessibility/claim audit). Four conflicts, all resolved
+toward a single harness rather than a coexistence:
+
+- `apps/app/e2e/playwright.config.ts` — one config. Kept adv-b's
+  `preinstalledChromium()` lookup and its 120 s timeout (set by the restart
+  storm, the longest honest test); kept `testMatch: '**/*.spec.ts'` so every
+  lane is discovered together.
+- `.github/workflows/ci.yml` — one `e2e` job running one `npm run test:e2e`
+  over every lane. Deliberately no per-lane job and no matrix: a lane that can
+  go red on its own is a lane that can be ignored on its own.
+- `apps/app/e2e/README.md` — merged; every spec from both lanes is in the table.
+- `docs/build-evidence/CAPSULE.md` — both appendices kept in order (append-only).
+
+Two support modules coexist because they are two different drivers, not two
+spellings of one: `support/export-server.ts` + `support/app.ts` (closed-loop)
+and `support/adv-harness.ts` (adversarial). Both bind ephemeral loopback ports,
+so workers cannot collide.
+
+**No spec dropped.** All nine execute under the one config:
+
+| Spec                           | Tests  |
+| ------------------------------ | ------ |
+| `adv-a11y-audit.spec.ts`       | 11     |
+| `adv-ai-timeout-storm.spec.ts` | 3      |
+| `adv-claim-audit.spec.ts`      | 7      |
+| `adv-known-defects.spec.ts`    | 5      |
+| `adv-offline-storm.spec.ts`    | 4      |
+| `adv-restart-storm.spec.ts`    | 5      |
+| `candidate-label.spec.ts`      | 1      |
+| `closed-loop.spec.ts`          | 1      |
+| `finite-session.spec.ts`       | 1      |
+| **total**                      | **38** |
+
+### Task B — the four W5 P1 findings, all closed
+
+**P1-1 — an internal id rendered as the recall prompt.** `contractsFor` mints
+the reading and meaning contracts on one clock tick, so `compareDueContracts`
+finds equal `dueSince` and falls through to its id tiebreak, where
+`contract-meaning-…` sorts before `contract-reading-…`. With `newBudget: 1` the
+planner drew the _meaning_ contract while `session-screen` built its label map
+from `probeContractId` (the _reading_ contract) alone, so `selectDueContracts`
+fell back to `?? memory.contractId`. Fixed by carrying `contractLabels` on
+`SessionTarget`, built from the same two id helpers the contracts are, so the
+map cannot omit a contract that exists. Two tests, both verified to fail against
+the one-entry map before the fix: no plan step's label may match an internal-id
+shape, and the map's keys must equal the `ContractCreated` ids in the log.
+
+**P1-2 — `completed` unreachable through the UI.** `resolveCompletionState`
+asked whether _any_ outcome was `pending`, closure included — and the closure
+step's only control dispatches `close`, so it was always pending when the state
+resolved. 16/16 recorded sittings said `abandoned`. It now asks whether the
+learner left _work_ pending; the closure step carries no work and is settled by
+the act of closing. `abandoned` is unchanged when real steps are outstanding,
+and both directions are pinned in `t13-plan-cannot-grow.test.ts`.
+
+Correction to the finding as filed: the `step === null` branch (testID
+`session-finish`) is **not** dead code. It is what a zero-budget plan reaches,
+where the planner emits no closure step at all (`plan.ts`: "a plan without
+closure is only reachable from a zero budget"). Left as-is.
+
+**P1-3 — the nav shell stacked screens without bound.** `router.navigate` was
+tried first and measured: still 6 mounted capture screens after five
+Evidence↔Capture round trips on expo-router 57, because it collapses onto an
+entry for the _same_ path rather than switching between siblings.
+`router.replace` holds it flat — 1 mounted screen for the destination shown, 0
+for the one left. Only the shell's four destinations replace; every other link
+still pushes, because those are genuine stack moves. The a11y properties the fix
+had to preserve (stale screens non-keyboard-reachable, axe-clean) still pass.
+
+**P1-4 — every exported page shipped an empty `<title>`.** WCAG 2.4.2 Level A,
+the only axe violation across 18 scans. `src/ui/route-title.tsx` sets one per
+route, sourced from the `DESTINATIONS` map so a new route cannot arrive untitled
+and a renamed one cannot leave a stale title; dynamic routes carry their subject
+("Word — 分岐", not the lexeme id). The `test.fail()` at `adv-a11y-audit` and the
+`document-title` entry in `KNOWN_AXE_FINDINGS` are both deleted — the map is now
+empty and "no violation at all" passes. A positive test replaces them and
+asserts more than the axe rule does: every route titled, no two sharing a title,
+no internal id in one.
+
+### Findings that came out of closing those four
+
+Recorded rather than smoothed over. All three are pinned as annotated
+expectations in `adv-known-defects.spec.ts`, so each turns CI red the moment it
+is fixed and forces its annotation to be deleted.
+
+- **T4-1b (P2)** — the _pre-hydration_ exported bytes still ship an empty
+  `<title>`: expo-router's `Head` is focus-gated and does not render during
+  static pre-rendering. Every route is correctly titled once hydrated, which is
+  what axe measures. `+html.tsx` is deliberately not the fix — helmet emits its
+  empty title first, so a title added there is second in tree order and
+  `document.title` keeps reading the empty one. Measured, not assumed.
+- **T4-2 (P2)** — no `SessionClosed` event reaches the durable log at all,
+  whatever its completion state. The sitting lives in the session workspace
+  beside the log (`SESSION_INTEGRATION_NOTE`, COORD-B8-2). Split out from T3-1
+  rather than folded into it, because "the screen lies about the sitting" and
+  "the sitting is not in the export" have different owners, and merging them
+  would let fixing one look like fixing both.
+- **T3-3 (P2)** — carried unchanged from the adversarial-B round.
+
+### Task C — the two documented gaps
+
+- **`docs/build-evidence/DONE_LADDER.md`** — definition-of-done §2 and §3
+  assembled programmatically from the frozen spec and verified byte-identical.
+  §4 asked for this at WP-00; it is made here, late, and recorded as late.
+- **`docs/build-evidence/PERF_WEB.md`** + `scripts/measure-web-latency.mjs` —
+  §13 measurements taken from the running exported build by driving real
+  gestures, not by timing a function.
+
+  | Measurement    | n   | median  | p95     | labelled            |
+  | -------------- | --- | ------- | ------- | ------------------- |
+  | local save ack | 15  | 64.2 ms | 82.5 ms | **web, not native** |
+  | warm lookup    | 15  | 41.7 ms | 56.7 ms | **web, not native** |
+
+  Stated beside the numbers: with n=15 the nearest-rank p95 _is_ the maximum
+  sample, so these are worst-observed values rather than a stable p95. The §13
+  budgets they sit under are written for the runtime the operator will use, so
+  the file does not report them as met. The native budgets are recorded as never
+  measured, and the restart storms are explicitly not the 100-trial kill test.
+
+### Ladder position after this round
+
+> **No rung is achieved. The project is below rung 1.**
+
+Rung 1 (ENGINEERING-DONE (web)) fails on four of its six evidence requirements:
+WP-11/12/13 unexecuted, nothing merged to `main`, no Codex 5.6 report, no
+Fable 5 receipt. Rung 2 (DEVICE-DONE) is **UNVERIFIED** — no device, no dev
+build, no native measurement, and WP-11 not even closed as a documented external
+gate (there is no `WP11_NATIVE_CHECKPOINT.md`). Rung 3 (operator acceptance) is
+**UNRUN**. `DONE_LADDER.md` carries the full breakdown and a builder's
+self-report against the twelve §2 items, labelled as a self-report because the
+independent Codex/Fable verdicts §2 requires have not been produced by anyone.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                        |
+| ----------------------------------------------- | --------------------------------------------- |
+| `npm run lint`                                  | pass, no output                               |
+| `npm run format:check`                          | pass — "All matched files use Prettier style" |
+| `npm run typecheck`                             | pass, 0 `error TS`                            |
+| `npm run test`                                  | **1374 passed**, 83 files                     |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                            |
+| `npm run verify:export` (T-14)                  | 10 passed, 1 file                             |
+| `cd apps/app && npx expo export --platform web` | pass — 13 static routes                       |
+| `npm run test:e2e`                              | **38 passed**, 9 spec files                   |
+
+### Next safe command, and what nobody here may do
+
+Next: open a **draft** PR from this branch into
+`agent/bunki-phase0-integration`, and have a human review the merge. Nothing on
+this branch is merged, and no agent may merge, approve, or push to `main`.
+
+Outstanding for the ladder, in order: WP-11 (needs macOS/Xcode/a device — or an
+explicit external-gate document), WP-12 (only John can run it), WP-13 (the
+Codex 5.6 report and the Fable 5 closure receipt).
