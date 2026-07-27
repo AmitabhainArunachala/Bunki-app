@@ -276,7 +276,7 @@ REFRESH-LIVE-MAIN / REVERIFY).
 | 1b  | Unknown versions FAIL CLOSED — typed error, never a silent skip (T-04)                                | **met** | `src/events/parse.ts` (version checked before payload); `test/events/fail-closed.test.ts` — 23 assertions incl. "never returns a shorter log than it was given"                                                                                                                        |
 | 2   | Pure reducers for thread state and promotion state, event-driven only                                  | **met** | `src/reducers/promotion.ts`, `src/reducers/thread.ts`; `test/reducers/*.test.ts` (38 assertions)                                                                                                                                                                                       |
 | 2b  | No FSRS, no evidence gate, no session logic; clearly-marked seams                                      | **met** | `src/reducers/seams.ts` (`PHASE0_SEAMS`, four seams with owner/directory/rationale/anchors); `test/purity/seams-left-empty.test.ts` asserts `src/contracts`, `src/evidence`, `src/session` still hold only `.gitkeep`, that `ts-fsrs` is not installed, and that derived state carries no scheduling field |
-| 3   | Injected clock/ID/randomness via a `DomainContext`; nothing calls `Date.now`/`Math.random`/`crypto`     | **met** | `src/context/index.ts` + `deterministic.ts`; `test/purity/no-ambient-nondeterminism.test.ts` scans all 17 files under `src/` for 12 ambient patterns and asserts the only bare import specifier anywhere in `src/` is `zod`. Additionally type-enforced: `tsconfig.json` compiles `src/` with `types: []` |
+| 3   | Injected clock/ID/randomness via a `DomainContext`; nothing calls `Date.now`/`Math.random`/`crypto`     | **met** | `src/context/index.ts` + `deterministic.ts`; `test/purity/no-ambient-nondeterminism.test.ts` scans all 19 files under `src/` for 12 ambient patterns and asserts the only bare import specifier anywhere in `src/` is `zod`. Additionally type-enforced: `tsconfig.json` compiles `src/` with `types: []` |
 | 4   | Deterministic golden replay harness, ≥3 fixtures with expected-state snapshots                         | **met** | `src/replay/replay.ts`, `src/replay/golden.ts`; `test/fixtures/golden-00{1,2,3}-*.json`; `test/replay/golden.test.ts` discovers fixtures from the directory rather than a hand-maintained list                                                                                          |
 | 4b  | `npm run test:replay` actually runs them (WP-01 placeholder replaced)                                  | **met** | root `package.json`: `"test:replay": "vitest run packages/domain/test/replay"`. See "Root files touched" below                                                                                                                                                                          |
 | 5   | T-03 green (same log twice → deep-equal state)                                                         | **met** | `test/replay/determinism.test.ts` + a per-fixture T-03 case in `golden.test.ts`. Compared both structurally (`toStrictEqual`) and as canonical JSON text                                                                                                                                 |
@@ -320,8 +320,8 @@ REFRESH-LIVE-MAIN / REVERIFY).
 
 No other root file, no `apps/`, no sibling package, no `docs/specs`,
 `docs/convergence`, `docs/handoffs`, and no other WP's surface was modified.
-`git diff --name-only f53ce4b..HEAD` lists 39 files: 37 under
-`packages/domain/`, plus the two above.
+`git diff --name-only f53ce4b..HEAD` lists 40 files: 37 under
+`packages/domain/`, the two root files above, and this capsule.
 
 ### Design decisions a reviewer should check rather than assume
 
