@@ -23,6 +23,11 @@ import {
   type ReactNode,
 } from 'react';
 
+import {
+  createElapsedCounter,
+  createObservabilityRing,
+  type ObservabilityRing,
+} from '../observability/index.ts';
 import { createMemoryAppStore } from './memory-store.ts';
 import {
   createRuntimeConnectivity,
@@ -37,6 +42,7 @@ interface AppContextValue {
   readonly store: AppStore;
   readonly connectivity: ConnectivityObserver;
   readonly flags: DebugFlags;
+  readonly ring: ObservabilityRing;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -47,17 +53,37 @@ export interface AppProviderProps {
   readonly store?: AppStore | undefined;
   readonly connectivity?: ConnectivityObserver | undefined;
   readonly flags?: DebugFlags | undefined;
+  readonly ring?: ObservabilityRing | undefined;
 }
 
-export function AppProvider({ children, store, connectivity, flags }: AppProviderProps): ReactNode {
-  const value = useMemo<AppContextValue>(
-    () => ({
-      store: store ?? createMemoryAppStore({ context: createRuntimeContext() }),
+export function AppProvider({
+  children,
+  store,
+  connectivity,
+  flags,
+  ring,
+}: AppProviderProps): ReactNode {
+  const value = useMemo<AppContextValue>(() => {
+    // The ring is built before the store because the store takes it as its
+    // observer. Constructing them in the other order would mean either a
+    // mutable back-reference or a store that starts unobserved — and a
+    // diagnostic buffer that misses the first commands of a session is missing
+    // exactly the ones a cold-start latency question is about (§12).
+    const resolvedRing = ring ?? createObservabilityRing();
+    const elapsedMs = createElapsedCounter();
+    return {
+      store:
+        store ??
+        createMemoryAppStore({
+          context: createRuntimeContext(),
+          observer: resolvedRing.commandObserver,
+          elapsedMs,
+        }),
       connectivity: connectivity ?? createRuntimeConnectivity(),
       flags: flags ?? readDebugFlags(),
-    }),
-    [store, connectivity, flags],
-  );
+      ring: resolvedRing,
+    };
+  }, [store, connectivity, flags, ring]);
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
@@ -77,6 +103,11 @@ export function useAppStore(): AppStore {
 
 export function useDebugFlags(): DebugFlags {
   return useAppContext().flags;
+}
+
+/** The session's diagnostic buffer (WP-09, controller §12). */
+export function useObservabilityRing(): ObservabilityRing {
+  return useAppContext().ring;
 }
 
 export function useAppSnapshot(): AppSnapshot {

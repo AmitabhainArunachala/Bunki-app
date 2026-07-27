@@ -731,6 +731,166 @@ function shotList(base) {
         await sleep(400);
       },
     },
+
+    // ------------------------------------------------ screens 6 and 7 (WP-09)
+    //
+    // The inspector's states are reached by *using* the app rather than by a
+    // flag wherever that is possible: its empty state is a genuinely empty log,
+    // and its ready state is a chain the demonstration button actually
+    // appended. Only loading and error still need `?lag=`/`?fail=1`, for the
+    // reason `debug-flags.ts` gives — a bundled seed resolves within a frame.
+    {
+      name: '28-evidence-empty',
+      screen: 'evidence inspector',
+      state: 'empty (nothing captured yet)',
+      note: 'A fresh session has no threads, so the inspector says there is nothing to read rather than rendering an empty table.',
+      run: async (page) => {
+        await page.goto(url('/evidence'));
+        await page.waitFor('state-empty');
+      },
+    },
+    {
+      name: '29-evidence-loading',
+      screen: 'evidence inspector',
+      state: 'loading',
+      note: 'Held open by ?lag=; the same state machine every other screen uses.',
+      run: async (page) => {
+        await page.goto(url('/evidence?lag=4000'));
+        await page.waitFor('state-loading');
+      },
+    },
+    {
+      name: '30-evidence-error',
+      screen: 'evidence inspector',
+      state: 'error',
+      note: 'The real error path with a retry action, forced by ?fail=1.',
+      run: async (page) => {
+        await page.goto(url('/evidence?fail=1'));
+        await page.waitFor('state-error');
+      },
+    },
+    {
+      name: '31-evidence-default-surface',
+      screen: 'evidence inspector',
+      state: 'ready (REQ-LM-06 default surface, chain collapsed)',
+      note: 'Why-this, evidence strength in words, what is unsettled, and a correction affordance. No table and no number: the chain is behind the disclosure control, closed.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+      },
+    },
+    {
+      name: '32-evidence-chain-expanded',
+      screen: 'evidence inspector',
+      state: 'ready (chain expanded, demonstration appended)',
+      note: 'Every observation with its tier and the gate’s verdict — including the two that were recorded and did not count, each with its reason.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+        await page.click('evidence-disclosure');
+        await page.waitFor('evidence-chain');
+        await page.click('evidence-seed-demonstration');
+        await sleep(400);
+      },
+    },
+    {
+      name: '33-evidence-export-badge',
+      screen: 'evidence inspector',
+      state: 'ready (export produced and checked)',
+      note: 'The verification badge with its qualifier, the list of what the check established, and the list of what it did not. The wording is `@bunki/export`’s, not the screen’s.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+        await page.click('evidence-export-button');
+        await page.waitFor('evidence-export-badge');
+      },
+    },
+    {
+      name: '34-evidence-offline',
+      screen: 'evidence inspector',
+      state: 'offline',
+      note: 'The inspector reads a local log, so being offline costs it nothing — the shell’s banner says exactly that.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+        await page.setOffline(true);
+        await page.waitFor('state-offline');
+      },
+    },
+    {
+      name: '35-evidence-dark',
+      screen: 'evidence inspector',
+      state: 'ready (dark scheme)',
+      note: 'Contrast evidence for the second scheme, from the app’s own ?scheme= flag rather than a screenshot filter.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90&scheme=dark'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+      },
+    },
+    {
+      name: '36-debug-empty',
+      screen: 'diagnostics',
+      state: 'empty (no records yet)',
+      note: 'A fresh session’s buffer, with the privacy note stating what it can hold before it holds anything.',
+      run: async (page) => {
+        await page.goto(url('/debug'));
+        await page.waitFor('debug-empty');
+      },
+    },
+    {
+      name: '37-debug-records',
+      screen: 'diagnostics',
+      state: 'ready (command latencies and event appends)',
+      note: 'Real records from real commands. Every value is a count, a duration, an identifier or an enum member — the captured text went through the store and is nowhere in the buffer.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+        await page.click('evidence-open-debug');
+        await page.waitFor('debug-command');
+        await page.click('debug-serialize-button');
+        await page.waitFor('debug-serialized-output');
+      },
+    },
+    {
+      name: '38-debug-dark',
+      screen: 'diagnostics',
+      state: 'ready (dark scheme)',
+      note: 'Contrast evidence for the second scheme.',
+      run: async (page) => {
+        await page.goto(url('/?q=%E5%88%86%E5%B2%90&scheme=dark'));
+        await page.waitFor('capture-top-answer');
+        await page.click('capture-keep');
+        await page.waitFor('capture-acknowledgment');
+        await page.click('capture-open-evidence');
+        await page.waitFor('evidence-why-this');
+        await page.click('evidence-open-debug');
+        await page.waitFor('debug-command');
+      },
+    },
   ];
 }
 

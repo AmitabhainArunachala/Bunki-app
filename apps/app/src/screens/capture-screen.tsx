@@ -100,6 +100,8 @@ export interface CaptureScreenProps {
   /** Navigate to a word page. Injected so the screen has no router dependency. */
   readonly onOpenWord: (lexemeId: string) => void;
   readonly onOpenKanji: (character: string) => void;
+  /** Opens the evidence inspector (WP-09). */
+  readonly onOpenEvidence: () => void;
   /** Seeds the query box; the evidence harness uses it to reach a state directly. */
   readonly initialQuery?: string | undefined;
 }
@@ -107,6 +109,7 @@ export interface CaptureScreenProps {
 export function CaptureScreen({
   onOpenWord,
   onOpenKanji,
+  onOpenEvidence,
   initialQuery = '',
 }: CaptureScreenProps): ReactNode {
   const theme = useTheme();
@@ -528,6 +531,14 @@ export function CaptureScreen({
               </Text>
             </RowButton>
           ))
+        )}
+        {snapshot.threads.length === 0 ? null : (
+          <AppButton
+            accessibilityHint="Opens the evidence inspector for your newest thread: why it is here, what has been observed about it, and the export."
+            label="Open the evidence inspector"
+            onPress={onOpenEvidence}
+            testID="capture-open-evidence"
+          />
         )}
       </Section>
     </ScreenShell>

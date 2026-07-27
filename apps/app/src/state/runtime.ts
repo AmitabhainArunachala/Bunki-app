@@ -3,7 +3,18 @@
  *
  * `@bunki/domain` imports no clock, no id source and no randomness — they are
  * injected (REQ-ARCH-02), and this is the app-side end of that seam. It is the
- * only place in `apps/app` that reads the ambient clock or generates an id.
+ * only place in `apps/app` that reads the ambient **wall** clock or generates
+ * an id — the only place, therefore, that an event's `occurredAt` can come
+ * from.
+ *
+ * WP-09 added a second reader of a different thing:
+ * `src/observability/index.ts` reads a **monotonic counter**
+ * (`performance.now()`) for latency figures. That is not a clock and cannot
+ * become one — it has no epoch and no timezone, so it cannot produce an
+ * `occurredAt` even by accident — and a duration has to be measured on a
+ * monotonic source or it can come out negative. The distinction is spelled out
+ * in that file's header; the sentence above is narrowed rather than left to go
+ * quietly false.
  *
  * The generators take their dependencies as arguments and default to the
  * platform ones, so a test (and the screenshot harness, which must produce

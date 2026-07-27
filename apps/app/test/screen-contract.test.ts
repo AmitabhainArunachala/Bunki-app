@@ -62,16 +62,90 @@ const captureSource = screen('capture-screen.tsx');
 const wordSource = screen('word-screen.tsx');
 const kanjiSource = screen('kanji-screen.tsx');
 
-describe('the app has three screens and they are wired to routes', () => {
-  it('ships exactly the screens WP-05 owns', () => {
-    const screens = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
-    expect(screens).toEqual(['capture-screen.tsx', 'kanji-screen.tsx', 'word-screen.tsx']);
+/**
+ * Which work package owns each file in `src/screens/`.
+ *
+ * WP-05 pinned this directory to an exact three-element list. That was right
+ * while one builder owned every screen and wrong the moment three did: B7
+ * recorded (WP-07 coordination request 3) that adding a fourth entry would mean
+ * editing another builder's test mid-wave, and moved its slice to
+ * `src/candidate/` to avoid it; B8 hit the same wall with its session and canvas
+ * screens. WP-09 owns this file, so the assertion is widened once, for the wave,
+ * rather than three times.
+ *
+ * The direction of the check is what makes the widening safe. It asserts that
+ * **every file present is registered here with its owner**, not that every
+ * registered file is present — so a screen cannot arrive unowned and
+ * undocumented, while a sibling branch's screens being absent from *this*
+ * branch is not a failure. `_helper` marks a non-screen module that lives here
+ * because the surface lock puts it here.
+ */
+const SCREEN_OWNERS: Readonly<Record<string, string>> = {
+  'capture-screen.tsx': 'WP-05',
+  'word-screen.tsx': 'WP-05',
+  'kanji-screen.tsx': 'WP-05',
+  'evidence-inspector-screen.tsx': 'WP-09',
+  'inspector-debug-screen.tsx': 'WP-09',
+  'evidence-chain.ts': 'WP-09 (_helper: pure chain projection, not a screen)',
+  // Registered ahead of their branches so the merge is a no-op rather than a
+  // test edit in the same commit that lands the screens (WP-08, B8).
+  'session-screen.tsx': 'WP-08',
+  'canvas-screen.tsx': 'WP-08',
+  'session-repair-screen.tsx': 'WP-08',
+};
+
+const screenFileNames = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
+
+describe('every screen file has a recorded owner and a route', () => {
+  it('registers every file in src/screens', () => {
+    const unregistered = screenFileNames.filter(
+      (name) => !Object.prototype.hasOwnProperty.call(SCREEN_OWNERS, name),
+    );
+    expect(
+      unregistered,
+      'add the file to SCREEN_OWNERS with the WP that owns it, or move it out of src/screens',
+    ).toEqual([]);
+  });
+
+  it('ships the screens WP-05 and WP-09 own on this branch', () => {
+    expect(screenFileNames).toEqual(
+      expect.arrayContaining([
+        'capture-screen.tsx',
+        'kanji-screen.tsx',
+        'word-screen.tsx',
+        'evidence-inspector-screen.tsx',
+        'inspector-debug-screen.tsx',
+      ]),
+    );
   });
 
   it('routes each one', () => {
     expect(read(resolve(APP_ROOT, 'app/index.tsx'))).toContain('CaptureScreen');
     expect(read(resolve(APP_ROOT, 'app/word/[lexemeId].tsx'))).toContain('WordScreen');
     expect(read(resolve(APP_ROOT, 'app/kanji/[character].tsx'))).toContain('KanjiScreen');
+    expect(read(resolve(APP_ROOT, 'app/evidence.tsx'))).toContain('EvidenceInspectorScreen');
+    expect(read(resolve(APP_ROOT, 'app/debug.tsx'))).toContain('InspectorDebugScreen');
+  });
+
+  /**
+   * WP-08's three screens are unrouted on this branch and that is a fact about
+   * the branch, not a defect: `app/session.tsx` and its siblings would import
+   * modules that live only on `agent/bunki-phase0-closed-loop-wp08`, so writing
+   * them here would break the build for everyone. B8's COORD-B8-3 supplies the
+   * exact file contents; they land with the merge. This assertion fails the
+   * moment those screens arrive without their routes, so the gap cannot be
+   * forgotten.
+   */
+  it('pins WP-08’s routing gap to the arrival of its screens (COORD-B8-3)', () => {
+    const b8Screens = ['session-screen.tsx', 'canvas-screen.tsx', 'session-repair-screen.tsx'];
+    const present = b8Screens.filter((name) => screenFileNames.includes(name));
+    if (present.length === 0) return;
+    for (const route of ['app/session.tsx', 'app/canvas.tsx', 'app/repair.tsx']) {
+      expect(
+        sourceFiles.map(rel),
+        `${route} is missing though WP-08's screens have landed — apply COORD-B8-3`,
+      ).toContain(route);
+    }
   });
 });
 
@@ -145,6 +219,8 @@ describe('every screen implements all four REQ-UI-09 states', () => {
     ['capture', captureSource],
     ['word', wordSource],
     ['kanji', kanjiSource],
+    ['evidence inspector', screen('evidence-inspector-screen.tsx')],
+    ['inspector debug', screen('inspector-debug-screen.tsx')],
   ])('%s screen', (_name, source) => {
     expect(source).toContain('LoadingPanel');
     expect(source).toContain('ErrorPanel');

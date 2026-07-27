@@ -28,22 +28,36 @@
  */
 
 import {
+  componentIdOfEncounter,
   createDomainEvent,
   initialThreadState,
+  isEvidenceClassEvent,
+  mintEvidenceSuperseded,
+  mintExposureLogged,
+  mintReviewGraded,
+  replay,
   threadReducer,
+  type ContractCreatedEvent,
+  type DataExportedEvent,
+  type DerivedState,
   type DomainContext,
   type DomainEvent,
+  type DomainEventType,
   type EncounterCapturedEvent,
   type ThreadPromotionChangedEvent,
   type ThreadState,
 } from '@bunki/domain';
 
 import {
+  CorrectionRefusedError,
   DURABILITY_NOTES,
+  NULL_COMMAND_OBSERVER,
   type AppCommand,
+  type AppCommandKind,
   type AppSnapshot,
   type AppStore,
   type CommandAck,
+  type CommandObserver,
   type DurabilityLevel,
   type ThreadView,
   type UncertaintyAnnotation,
@@ -60,6 +74,17 @@ import {
 export function targetKeyOf(text: string): string {
   return text.trim().normalize('NFKC').toLocaleLowerCase('en-US');
 }
+
+/**
+ * The prompt family version stamped on the demonstration contract (WP-09).
+ *
+ * REQ-UI-06 asks the inspector to show "rubric/model version" wherever one
+ * exists, so the demonstration must carry a real one rather than leave the
+ * column blank and let the screen imply versions are never recorded. It names
+ * itself a demonstration, so a reader of an export cannot mistake it for a
+ * prompt family that was actually authored and reviewed.
+ */
+export const DEMONSTRATION_PROMPT_FAMILY_VERSION = 'demo-recognition@1';
 
 function captureIdempotencyKey(command: Extract<AppCommand, { kind: 'capture' }>): string {
   const { sourceId, locator } = command.sourceRef;
@@ -105,11 +130,29 @@ export interface MemoryAppStoreOptions {
    * without the label lying about it.
    */
   readonly durability?: DurabilityLevel | undefined;
+  /**
+   * Receives one closed record per applied command (WP-09, controller §12).
+   * Defaults to observing nothing — a store must not acquire a logger by being
+   * constructed.
+   */
+  readonly observer?: CommandObserver | undefined;
+  /**
+   * Monotonic counter used for the latency figure, in milliseconds.
+   *
+   * Injected rather than read here for the same reason the clock is: a store
+   * that reached for `performance.now()` could not be tested for the ordering
+   * property that makes the number worth recording. It is deliberately *not*
+   * `context.clock` — a wall clock can go backwards, and a duration measured
+   * across an adjustment would be a fabricated number in a diagnostic surface.
+   */
+  readonly elapsedMs?: (() => number) | undefined;
 }
 
 export function createMemoryAppStore({
   context,
   durability = 'in-memory-session-only',
+  observer = NULL_COMMAND_OBSERVER,
+  elapsedMs = () => 0,
 }: MemoryAppStoreOptions): AppStore {
   const events: DomainEvent[] = [];
   const threads = new Map<string, StoredThread>();
@@ -299,6 +342,303 @@ export function createMemoryAppStore({
     };
   }
 
+  /**
+   * Append the demonstration evidence chain (WP-09).
+   *
+   * Every event is minted by the kernel, and each is there to make a different
+   * branch of the inspector non-empty — the point is a chain that exercises
+   * *all four* gate outcomes, because a ledger that only ever showed admitted
+   * rows could not answer "why did that one not count" (REQ-UI-06):
+   *
+   *   1. `ThreadPromotionChanged` to `learn` — without it the contract is not
+   *      activated and every observation is refused for the same reason, which
+   *      would demonstrate one branch of the gate and hide the rest.
+   *   2. `ContractCreated` — the versioned prompt family and the closed answer
+   *      set the inspector shows under "what was asked". `responseModality` is
+   *      `choice` so the contract is *scorable*; a `free` response scored
+   *      against a closed list is refused by REQ-DM-05's coherence rule.
+   *   3. `ReviewGraded` (`good`, nothing revealed) — **admitted**, the tier-A
+   *      case that changes review timing.
+   *   4. `ReviewGraded` (`easy`, revealed first) — **admitted as `again`**.
+   *      The reveal rule rewrites the grade inside the mint (T-06), so the
+   *      inspector shows a verdict whose grade is not the one submitted. This
+   *      is the row that makes the override visible instead of theoretical.
+   *   5. `ReviewGraded` (`easy`, unconfirmed) — **refused**,
+   *      `easy_requires_user_confirmation`. Recorded, and not counted.
+   *   6. `ExposureLogged` — tier D, **refused**, never admitted (T-08).
+   *
+   * The tiers are stamped by `src/evidence/`, never passed in: this file
+   * cannot label a passage sighting as a review even by mistake.
+   */
+  function applySeedEvidenceDemonstration(
+    command: Extract<AppCommand, { kind: 'seedEvidenceDemonstration' }>,
+  ): CommandAck {
+    const idempotencyKey = `demo:${command.threadId}`;
+    const previous = appliedKeys.get(idempotencyKey);
+    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+
+    const thread = threads.get(command.threadId);
+    if (thread === undefined) {
+      throw new Error(`cannot add a demonstration chain to unknown thread ${command.threadId}`);
+    }
+
+    const capture = events.find(
+      (event): event is EncounterCapturedEvent =>
+        event.type === 'EncounterCaptured' && event.threadId === command.threadId,
+    );
+    if (capture === undefined) {
+      throw new Error(`thread ${command.threadId} has no capture to derive a component id from`);
+    }
+
+    const appended: DomainEvent[] = [];
+    let state = thread.state;
+
+    // 1. Reach a promotion rung that activates recognition contracts. Stepping
+    // through the ladder rather than jumping keeps every transition in the log,
+    // which is what the inspector's "cause event" column reads.
+    //
+    // A thread already at `learn` or `master` is left alone: `indexOf` on the
+    // ladder returns -1 for `master`, and letting that fall through to
+    // `slice(0)` would re-promote from `captured` and produce transitions the
+    // kernel rejects. The remaining rungs are computed explicitly instead.
+    const LADDER = ['captured', 'keep', 'learn'] as const;
+    const startIndex = LADDER.indexOf(state.promotion as (typeof LADDER)[number]);
+    const remaining = startIndex === -1 ? [] : LADDER.slice(startIndex + 1);
+
+    let from = state.promotion;
+    for (const to of remaining) {
+      const promotion: ThreadPromotionChangedEvent = createDomainEvent(
+        context,
+        'ThreadPromotionChanged',
+        { threadId: command.threadId, from, to, origin: 'user' },
+        { idempotencyKey: promoteIdempotencyKey(command.threadId, from, to) },
+      );
+      events.push(promotion);
+      appended.push(promotion);
+      state = threadReducer(state, promotion);
+      appliedKeys.set(promoteIdempotencyKey(command.threadId, from, to), {
+        threadId: command.threadId,
+        acknowledgedAt: promotion.occurredAt,
+        events: [promotion],
+        deduplicated: false,
+        durability,
+      });
+      from = to;
+    }
+
+    // 2. The contract. `targetComponentId` is derived by the kernel's own
+    // projection from the capture event, so the app cannot mint a contract the
+    // gate would fail to link (REQ-DM-05, component-identity.ts).
+    const contractId = context.ids.nextId('contract');
+    const contract: ContractCreatedEvent = createDomainEvent(
+      context,
+      'ContractCreated',
+      {
+        contractId,
+        contractVersion: 1,
+        targetComponentId: componentIdOfEncounter(capture),
+        skill: command.skill,
+        cueModality: 'text',
+        // `choice`, not `free`. REQ-DM-05's coherence rule refuses a free
+        // response scored against a closed answer list — a correct paraphrase
+        // would be graded wrong and the resulting `again` would be an artefact
+        // of the contract rather than of the learner's memory. A demonstration
+        // that shipped an invalid contract would have shown only the gate's
+        // `contract_invalid` branch, which is not what REQ-UI-06 asks for.
+        responseModality: 'choice',
+        acceptedAnswers: [...command.acceptedAnswers],
+        hintPolicy: { hintsAllowed: true, maxHints: 1 },
+        revealPolicy: { revealAllowed: true, revealIsRecorded: true },
+        promptFamilyVersion: DEMONSTRATION_PROMPT_FAMILY_VERSION,
+      },
+      { idempotencyKey: `contract:${contractId}` },
+    );
+    events.push(contract);
+    appended.push(contract);
+
+    // 3-5. The observations. Every one goes through `src/evidence/`.
+    const graded = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'good',
+        latencyMs: 3400,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:1` },
+    );
+    events.push(graded);
+    appended.push(graded);
+
+    const revealed = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'easy',
+        latencyMs: 900,
+        hintsUsed: 1,
+        revealedBeforeRecall: true,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:2` },
+    );
+    events.push(revealed);
+    appended.push(revealed);
+
+    const unconfirmed = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'easy',
+        latencyMs: 1200,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:3` },
+    );
+    events.push(unconfirmed);
+    appended.push(unconfirmed);
+
+    const exposure = mintExposureLogged(
+      context,
+      {
+        componentIds: [componentIdOfEncounter(capture)],
+        experienceId: `experience-${contractId}`,
+      },
+      { idempotencyKey: `exposure:${contractId}:1` },
+    );
+    events.push(exposure);
+    appended.push(exposure);
+
+    threads.set(command.threadId, { ...thread, state });
+
+    const ack: CommandAck = {
+      threadId: command.threadId,
+      acknowledgedAt: exposure.occurredAt,
+      events: appended,
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(idempotencyKey, ack);
+    return ack;
+  }
+
+  /**
+   * Correct an observation (REQ-UI-06, REQ-DM-04.2).
+   *
+   * The three refusals below are not defensive padding. `replay` throws a
+   * `ReducerInvariantError` on a correction naming an unknown observation, and
+   * on a second correction of the same one — so a store that let either through
+   * would produce a log that cannot be replayed, exported, or read back. The
+   * check therefore belongs where the command arrives, and its message is the
+   * one the user sees.
+   */
+  function applyCorrectEvidence(
+    command: Extract<AppCommand, { kind: 'correctEvidence' }>,
+  ): CommandAck {
+    if (command.note.trim() === '') throw new CorrectionRefusedError('empty-note');
+
+    const target = events.find((event) => event.eventId === command.supersededEventId);
+    if (target === undefined) throw new CorrectionRefusedError('unknown-observation');
+    if (!isEvidenceClassEvent(target) || target.type === 'EvidenceSuperseded') {
+      throw new CorrectionRefusedError('not-an-observation');
+    }
+    if (
+      events.some(
+        (event) =>
+          event.type === 'EvidenceSuperseded' &&
+          event.supersededEventId === command.supersededEventId,
+      )
+    ) {
+      throw new CorrectionRefusedError('already-corrected');
+    }
+
+    const correction = mintEvidenceSuperseded(
+      context,
+      {
+        supersededEventId: command.supersededEventId,
+        reason: command.reason,
+        // `replacementEventId` is deliberately absent: a Phase-0 correction is
+        // a retraction with a stated reason, and naming a replacement that does
+        // not exist would be the app inventing a record.
+        correction: { note: command.note.trim() },
+      },
+      { idempotencyKey: `supersede:${command.supersededEventId}` },
+    );
+
+    events.push(correction);
+
+    // The corrected thread, for the acknowledgment. An observation carries a
+    // contract, not a thread, so this is a best-effort attribution for the UI
+    // and never used to decide anything.
+    const threadId = threadOrder[0] ?? '';
+
+    return {
+      threadId,
+      acknowledgedAt: correction.occurredAt,
+      events: [correction],
+      deduplicated: false,
+      durability,
+    };
+  }
+
+  /** Append the `DataExported` record. See `RecordExportCommand` on ordering. */
+  function applyRecordExport(command: Extract<AppCommand, { kind: 'recordExport' }>): CommandAck {
+    const eventId = context.ids.nextId('event');
+    const record: DataExportedEvent = createDomainEvent(
+      context,
+      'DataExported',
+      { exportVersion: command.exportVersion, scope: { kind: 'all' } },
+      { eventId, idempotencyKey: `export:${eventId}` },
+    );
+    events.push(record);
+
+    return {
+      threadId: threadOrder[0] ?? '',
+      acknowledgedAt: record.occurredAt,
+      events: [record],
+      deduplicated: false,
+      durability,
+    };
+  }
+
+  /**
+   * `replay` over the current log, memoised on log length.
+   *
+   * Length is a sound cache key here and only here: this log is append-only
+   * within one session — nothing rewrites or removes an entry — so a length
+   * that has not moved names the same array contents. A store that could
+   * mutate history in place would need a different key, and that is precisely
+   * the store this is not.
+   */
+  let derivedCache: { readonly length: number; readonly state: DerivedState } | null = null;
+  function readDerived(): DerivedState {
+    if (derivedCache !== null && derivedCache.length === events.length) return derivedCache.state;
+    const state = replay(events);
+    derivedCache = { length: events.length, state };
+    return state;
+  }
+
+  function dispatch(command: AppCommand): CommandAck {
+    switch (command.kind) {
+      case 'capture':
+        return applyCapture(command);
+      case 'promote':
+        return applyPromote(command);
+      case 'markUncertainty':
+        return applyMarkUncertainty(command);
+      case 'seedEvidenceDemonstration':
+        return applySeedEvidenceDemonstration(command);
+      case 'correctEvidence':
+        return applyCorrectEvidence(command);
+      case 'recordExport':
+        return applyRecordExport(command);
+    }
+  }
+
   return {
     durability,
     getSnapshot: () => snapshot,
@@ -309,17 +649,37 @@ export function createMemoryAppStore({
       };
     },
     execute(command) {
-      const ack =
-        command.kind === 'capture'
-          ? applyCapture(command)
-          : command.kind === 'promote'
-            ? applyPromote(command)
-            : applyMarkUncertainty(command);
+      const started = elapsedMs();
+      const kind: AppCommandKind = command.kind;
+      let ack: CommandAck;
+      try {
+        ack = dispatch(command);
+      } catch (cause) {
+        // The record notes *that* a command failed and nothing about why: a
+        // thrown message can quote a note, an answer, or captured text, and a
+        // diagnostic buffer is exactly where that must not end up (§12, §15).
+        observer.observe({
+          commandKind: kind,
+          latencyMs: Math.max(0, elapsedMs() - started),
+          appendedTypes: [],
+          deduplicated: false,
+          failed: true,
+        });
+        throw cause;
+      }
       rebuildSnapshot();
       notify();
+      observer.observe({
+        commandKind: kind,
+        latencyMs: Math.max(0, elapsedMs() - started),
+        appendedTypes: ack.events.map((event): DomainEventType => event.type),
+        deduplicated: ack.deduplicated,
+        failed: false,
+      });
       return ack;
     },
     readAll: () => events.slice(),
+    readDerived,
   };
 }
 

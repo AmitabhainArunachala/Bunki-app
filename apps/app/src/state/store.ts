@@ -42,13 +42,26 @@
  * claimed by any screen in this work package.
  */
 
+import type { SUPERSESSION_REASONS } from '@bunki/domain';
 import type {
+  DerivedState,
   DomainEvent,
+  DomainEventType,
   PromotionState,
   ProvenanceRecord,
+  RetrievalSkill,
   SourceRef,
   ThreadState,
 } from '@bunki/domain';
+
+/**
+ * Why an observation was corrected.
+ *
+ * Derived from `@bunki/domain`'s closed list rather than retyped: the app must
+ * not be able to offer a reason the event schema would reject, and a local
+ * union would drift the moment the kernel's list changed.
+ */
+export type SupersessionReason = (typeof SUPERSESSION_REASONS)[number];
 
 /**
  * How much the current implementation actually guarantees. Rendered verbatim in
@@ -190,7 +203,182 @@ export interface MarkUncertaintyCommand {
   readonly dimension: UncertaintyDimension | null;
 }
 
-export type AppCommand = CaptureCommand | PromoteCommand | MarkUncertaintyCommand;
+/**
+ * Append the demonstration evidence chain for one thread (WP-09).
+ *
+ * ## Why this command exists at all, stated before anything else
+ *
+ * REQ-UI-06 asks the inspector to show "the event chain, tier, source/probe,
+ * rubric/model version, supersession history" for a thread. In this build,
+ * nothing a learner can do produces an evidence-class event: the screens WP-05
+ * shipped emit `EncounterCaptured` and `ThreadPromotionChanged` and nothing
+ * else, and the session/canvas surfaces that produce real graded observations
+ * belong to WP-08, on a branch this one does not contain. An inspector built
+ * against an empty ledger would demonstrate nothing, and an inspector that
+ * *rendered* a plausible chain without appending one would be a mock wearing a
+ * screen's clothes.
+ *
+ * So the demonstration is real: every event below is minted by
+ * `@bunki/domain`'s own factories — the evidence-class ones by the evidence
+ * gate's sole factory in `src/evidence/`, which stamps the tier the app is
+ * therefore unable to choose — appended to the same log everything else uses,
+ * and read back by the same `replay`. The chain is genuine; only its *origin*
+ * is a button rather than a study session, and the inspector says exactly that
+ * on screen (`DEMONSTRATION_CHAIN_NOTE`) rather than letting it read as the
+ * learner's own history.
+ *
+ * It is idempotent per thread, so a double tap adds one chain.
+ */
+export interface SeedEvidenceDemonstrationCommand {
+  readonly kind: 'seedEvidenceDemonstration';
+  readonly threadId: string;
+  /**
+   * The closed answer set the contract is scored against (REQ-DM-05:
+   * `acceptedAnswers` XOR a versioned rubric). Supplied by the screen from the
+   * seed entry, because the store has no seed access and inventing answers
+   * here would be the store asserting lexical facts.
+   */
+  readonly acceptedAnswers: readonly string[];
+  /** Which retrieval direction the contract tests. */
+  readonly skill: RetrievalSkill;
+}
+
+/**
+ * A user correction (REQ-UI-06, REQ-DM-04.2, REQ-LM-06).
+ *
+ * Appends `EvidenceSuperseded`. It never edits, deletes, or rewrites the
+ * observation it corrects — the original event stays in the log exactly as it
+ * was recorded, and the correction is a new event that names it. That is not a
+ * stylistic preference: `replay` refuses a log whose correction points at an
+ * observation it has not already seen, and refuses to supersede one twice, so
+ * a store that tried to "fix" history would produce a log the kernel cannot
+ * read at all.
+ *
+ * REQ-LM-06's last clause is enforced structurally rather than by review:
+ * "user correction creates superseding evidence — it is not automatic
+ * mastery". The only event this command can produce is `EvidenceSuperseded`,
+ * which carries no grade and no tier.
+ */
+export interface CorrectEvidenceCommand {
+  readonly kind: 'correctEvidence';
+  /** The observation being corrected. Must exist in the log and be uncorrected. */
+  readonly supersededEventId: string;
+  readonly reason: SupersessionReason;
+  /** Required by the schema: a correction with no stated reason is not a record. */
+  readonly note: string;
+}
+
+/**
+ * Record that an export ran (controller §11; `DataExported`, ADR-002).
+ *
+ * The event is appended **before** the bytes are built, and that ordering is
+ * load-bearing rather than incidental: the export must contain the record of
+ * itself, or the exported log and the live log describe histories of different
+ * lengths and the T-14 equality check fails for a bookkeeping reason that has
+ * nothing to do with losslessness. `CommandAck.events` gives the caller the
+ * appended event so it can read the log afterwards and know the record is in it.
+ */
+export interface RecordExportCommand {
+  readonly kind: 'recordExport';
+  /** `exportVersion` as the *event* spells it — a string (ADR-002). */
+  readonly exportVersion: string;
+}
+
+export type AppCommand =
+  | CaptureCommand
+  | PromoteCommand
+  | MarkUncertaintyCommand
+  | SeedEvidenceDemonstrationCommand
+  | CorrectEvidenceCommand
+  | RecordExportCommand;
+
+/** Every command kind, as data, so a log record's field is a closed enum. */
+export const APP_COMMAND_KINDS = [
+  'capture',
+  'promote',
+  'markUncertainty',
+  'seedEvidenceDemonstration',
+  'correctEvidence',
+  'recordExport',
+] as const;
+
+export type AppCommandKind = (typeof APP_COMMAND_KINDS)[number];
+
+/**
+ * What the store tells an observer about a command it just applied
+ * (controller §12: "event appends, command latencies").
+ *
+ * Every field is a scalar or a member of a closed enum. There is deliberately
+ * **no** field that can hold captured text, a note, an answer, or an error
+ * message — see `src/observability/ring.ts` for why the record type is where
+ * that argument is settled rather than at each call site.
+ */
+export interface CommandObservation {
+  readonly commandKind: AppCommandKind;
+  /** Wall time the store spent inside `execute`, from an injected counter. */
+  readonly latencyMs: number;
+  /** Event families appended, in order. Types only — never payloads. */
+  readonly appendedTypes: readonly DomainEventType[];
+  readonly deduplicated: boolean;
+  /** True when the command threw; the message is deliberately not carried. */
+  readonly failed: boolean;
+}
+
+/**
+ * The store's observability seam.
+ *
+ * One method, taking a closed record. A store that took a general-purpose
+ * logger would let any caller pass anything, which is exactly the hole
+ * REQ-ARCH-07 is about.
+ */
+export interface CommandObserver {
+  readonly observe: (observation: CommandObservation) => void;
+}
+
+/** The default: observe nothing. Observability is opt-in, never ambient. */
+export const NULL_COMMAND_OBSERVER: CommandObserver = { observe: () => undefined };
+
+/**
+ * Shown wherever the demonstration chain is rendered.
+ *
+ * Kept beside the command that creates it so the sentence and the behaviour
+ * cannot drift, and so no screen can render the chain while omitting it.
+ */
+export const DEMONSTRATION_CHAIN_NOTE =
+  'These evidence events were appended by the “Add a demonstration chain” button on this screen, not by a study session. They are real events minted by the kernel’s evidence gate and they replay like any other — but they are not a record of you answering anything.';
+
+/**
+ * Why a correction cannot be applied, when it cannot.
+ *
+ * A closed set, because each one has a different honest sentence and because
+ * `replay` throws on the corresponding malformed log — the store refusing
+ * first is what keeps the app from writing a history the kernel cannot read.
+ */
+export type CorrectionRefusal =
+  'unknown-observation' | 'already-corrected' | 'not-an-observation' | 'empty-note';
+
+export const CORRECTION_REFUSAL_MESSAGES: Readonly<Record<CorrectionRefusal, string>> = {
+  'unknown-observation':
+    'That observation is not in this session’s log, so there is nothing to correct.',
+  'already-corrected':
+    'That observation has already been corrected. History is appended, never rewritten, so a second correction of the same record would leave two answers with no rule for which one replay should believe — correct the correction instead.',
+  'not-an-observation':
+    'Only recorded observations can be corrected. A capture, a promotion, or an export record is not an observation about your recall.',
+  'empty-note':
+    'A correction needs a reason in your own words; the log keeps it beside the record.',
+};
+
+/** Thrown by `execute` when a correction cannot be applied. */
+export class CorrectionRefusedError extends Error {
+  readonly refusal: CorrectionRefusal;
+
+  constructor(refusal: CorrectionRefusal) {
+    super(CORRECTION_REFUSAL_MESSAGES[refusal]);
+    this.refusal = refusal;
+    this.name = new.target.name;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
 
 /** What `execute` returns, immediately, before any enrichment runs. */
 export interface CommandAck {
@@ -219,4 +407,20 @@ export interface AppStore {
   readonly execute: (command: AppCommand) => CommandAck;
   /** The full event log, in append order. Read-only; screens never append here. */
   readonly readAll: () => readonly DomainEvent[];
+  /**
+   * The kernel's derived state for the current log (WP-09).
+   *
+   * `@bunki/domain`'s `replay`, memoised on the log length — not a projection
+   * maintained here. The evidence inspector needs observations, gate verdicts
+   * and contracts, and every one of those is a judgement the kernel makes; a
+   * second copy computed in the app would be a second opinion, and the whole
+   * point of REQ-UI-06 is that the inspector shows the ledger rather than a
+   * story about it.
+   *
+   * Stated plainly because the export badge depends on it: this is a *replay*,
+   * so comparing it with a replay of the exported bytes checks serialisation
+   * and parsing, not two independent projections. The adapters that maintain a
+   * snapshot incrementally are checked by `npm run verify:export` (WP-03).
+   */
+  readonly readDerived: () => DerivedState;
 }
