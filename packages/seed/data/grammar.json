@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Seed grammar constructions (controller §8: 2–3). Three patterns, each one the",
+    "seed sentences and the integration passage actually use — a construction with no",
+    "attested use in the dataset would be a claim the seed cannot support.",
+    "Explanations and examples are original text written for this project; they are not",
+    "quoted or adapted from any grammar reference."
+  ],
+  "records": [
+    {
+      "id": "gram-ni-wakareru",
+      "pattern": "〜に分かれる",
+      "name": "split into ~",
+      "explanation": "[Noun]に分かれる states the result of a division: what stands before に is what the subject ends up as — a count of parts (二つ), or named branches (上りと下り). The verb is intransitive, so the thing divides and no agent is named. 分ける is its transitive partner: 道を二つに分ける is someone dividing the road, 道が二つに分かれる is the road forking.",
+      "example": "線路は二つに分かれる。",
+      "exampleTranslation": "The railway line splits in two.",
+      "fieldProvenance": {
+        "pattern": "bunki-selection",
+        "name": "bunki-authored-text",
+        "explanation": "bunki-authored-text",
+        "example": "bunki-authored-text",
+        "exampleTranslation": "bunki-authored-text"
+      }
+    },
+    {
+      "id": "gram-kadouka",
+      "pattern": "〜かどうか",
+      "name": "whether or not ~",
+      "explanation": "[Plain form]かどうか embeds a yes/no question inside a larger sentence. It attaches to the plain form of verbs and i-adjectives; a noun or na-adjective drops だ before it (学生だ → 学生かどうか). Do not use かどうか when a question word is already present — どの道を行くか, not どの道を行くかどうか — because かどうか supplies the missing yes/no alternative that a question word has already filled.",
+      "example": "その道が駅まで続くかどうか分からない。",
+      "exampleTranslation": "I don't know whether that road continues as far as the station.",
+      "fieldProvenance": {
+        "pattern": "bunki-selection",
+        "name": "bunki-authored-text",
+        "explanation": "bunki-authored-text",
+        "example": "bunki-authored-text",
+        "exampleTranslation": "bunki-authored-text"
+      }
+    },
+    {
+      "id": "gram-koto-ni-suru",
+      "pattern": "〜ことにする",
+      "name": "decide to ~",
+      "explanation": "[Plain non-past verb]ことにする reports a decision the speaker made themselves. The past 〜ことにした is the ordinary way to announce a decision already taken. Contrast 〜ことになる, which reports an outcome that arrived without the speaker choosing it: 行くことにした is 'I decided to go', 行くことになった is 'it was decided that I go'.",
+      "example": "右の道を行くことにした。",
+      "exampleTranslation": "I decided to take the road on the right.",
+      "fieldProvenance": {
+        "pattern": "bunki-selection",
+        "name": "bunki-authored-text",
+        "explanation": "bunki-authored-text",
+        "example": "bunki-authored-text",
+        "exampleTranslation": "bunki-authored-text"
+      }
+    }
+  ]
+}
