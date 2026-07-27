@@ -718,7 +718,6 @@ credentials; every URL in the fetch script is public and unauthenticated.
 - Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
 - Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
 
-<<<<<<< HEAD
 ## WP-03 / Builder B4 — W3 (appended 2026-07-27)
 
 ### Integrity (re-verified this session, before the first edit)
@@ -1082,8 +1081,6 @@ No efficacy, burden-reduction, retention, or "scientifically optimized" claim ap
 
 - V2 verifies WP-06 from a clean checkout of this branch: `git checkout agent/bunki-phase0-closed-loop-wp06 && npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay`, then `git diff --stat 755c090..HEAD` to confirm no surface outside `packages/domain/**` (plus the lockfile and this capsule) was touched, then walk the controller §6.2 bullet list against `packages/domain/test/evidence/`.
 - INT may stack this branch onto the integration branch after WP-01/02/04.
-=======
----
 
 ## Appendix — WP-05 (Builder B6): capture/search and layered word/kanji pages
 
@@ -1519,4 +1516,3 @@ host, no credential, no path outside the repo.
   interleaved node list. Restore with `git checkout apps/app/src/ui/ruby.tsx`.
 - `git diff --stat 755c090` to confirm no surface outside `apps/app/` and
   `docs/build-evidence/screenshots-wp05/` (plus this capsule section) was touched.
->>>>>>> origin/agent/bunki-phase0-closed-loop-wp05
