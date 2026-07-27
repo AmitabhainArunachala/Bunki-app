@@ -3079,3 +3079,184 @@ NOT loosened. Full `npm run typecheck` verified clean after `npm ci`.
 **Process rule added for later waves:** builder check runs must `npm ci` in
 their own worktree rather than trusting inherited symlinked `node_modules`;
 a fail-fast `&&` chain can hide a regression behind an unrelated first error.
+
+---
+
+## Appendix — WP-10 part 1 (Builder B6 as Integrator): reconciliation, real persistence, reachability
+
+**Agent:** B6 (Integrator, WP-10 part 1) · **Wave:** W5 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-integrate`, cut from
+`origin/agent/bunki-phase0-integration` at `346847d`.
+Merged in: `origin/agent/bunki-phase0-closed-loop-wp09` at `2d54575`.
+
+### Integrity
+
+`sha256sum` on the controller, the definition of done, the orchestration spec
+and the launcher: 4/4 match `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`.
+Controller = `de7b6fcc9a5958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`
+(prefix `de7b6fcc…`), verified before any build action, as the launcher requires.
+
+### 1. The WP-09 reconciliation was semantic, and the naive merge was verified broken
+
+The three-way merge was run and inspected before anything was resolved. It
+conflicts in `apps/app/src/state/store.ts`,
+`apps/app/src/state/memory-store.ts` and `apps/app/test/screen-contract.test.ts`
+(plus `CAPSULE.md`), and the damage is worse than "pick a side":
+
+- in `store.ts`, `AcceptCandidateCommand`'s interface body runs straight into
+  `RecordExportCommand`'s closing brace — one interface made of two halves of
+  two different declarations;
+- in `memory-store.ts`, `applyAcceptCandidate`'s acknowledgment object is
+  spliced onto `applySeedEvidenceDemonstration`'s tail, so one function returns
+  the other's `ack` and neither is complete.
+
+Taking either side compiles and silently deletes a lane. Resolved so all three
+survive whole, and so a future drop is a build error rather than a review
+question:
+
+| Lane | What had to survive | How a regression now fails |
+| --- | --- | --- |
+| WP-07 | `attachCandidate`, `acceptCandidate` + both handlers | exhaustive `switch` over `AppCommand` |
+| WP-08 | session/canvas screens and their helpers | `SCREEN_OWNERS` exhaustive `toEqual` |
+| WP-09 | `seedEvidenceDemonstration`, `correctEvidence`, `recordExport` + handlers | same switch, plus `UnlistedAppCommandKind` |
+
+`UnlistedAppCommandKind` is new: a type whose default argument is
+`Exclude<AppCommand['kind'], AppCommandKind>`, constrained to `never`. While the
+list is complete it resolves to `never`; the moment a command joins the union
+without joining `APP_COMMAND_KINDS`, the file stops compiling. `satisfies`
+covers the other direction (a listed kind no command has).
+
+`CAPSULE.md` was reconstructed rather than hand-merged: both branches were
+verified to be pure appends of the merge base (`795cc8c`), so the result is
+`head + wp09's appendix`, byte for byte. The append-only rule was not bent.
+
+**One inherited claim was corrected rather than left to go quietly false.**
+WP-09's `SeedEvidenceDemonstrationCommand` comment said the session/canvas
+surfaces "belong to WP-08, on a branch this one does not contain". They are here
+now, so the comment describes the demonstration chain as the answer for an
+untouched ledger rather than the only answer — and says why deleting it would
+make an inspector opened before the first session look broken.
+
+### 2. Real persistence (controller §18 WP-10, §7)
+
+`apps/app/src/state/persistence/` is the one directory allowed to name
+`@bunki/persistence`. Web opens `ProvisionalWebEventStore` over `localStorage`;
+native opens `SqliteEventStore` over `expo-sqlite@57.0.1` (MIT, verified on the
+registry at install per §14, pinned exact).
+
+Three decisions worth a verifier's attention:
+
+1. **Platform choice by module resolution, not `Platform.OS`.** The first
+   version imported `Platform` from `react-native` and broke
+   `apps/app/test/session-canvas.test.ts` — the unit runner cannot parse React
+   Native's Flow sources, and the state layer is imported by that suite.
+   `platform-store.native.ts` fixes it structurally: `src/state/` imports no
+   platform API at all, and the web bundle contains no native database.
+2. **Acknowledge first, persist after (REQ-UI-01).** `execute` stays
+   synchronous; the durable append starts from the journal callback *after* the
+   snapshot rebuild and the notify. The cost is stated rather than hidden: a tab
+   killed between the acknowledgment and the resolved write loses that append.
+   Awaiting the disk before acknowledging would turn a sub-frame save into a
+   storage-latency save, which is the failure the §13 budget exists to prevent.
+   Appends are serialised onto one promise; a rejected one becomes a reported
+   `failed` write state, never a silent retry.
+3. **The lint ban was narrowed, not dropped.** Controller §5's rule is about
+   appends. No screen, route or test can obtain an `EventStorePort`; the only
+   appender is `durable-store.ts`, appending only events `memory-store.ts` minted
+   through the kernel's factories and evidence gate. `test/boundaries.test.ts`
+   gained eight cases proving the seam is exactly one directory — including that
+   `src/state/persistence-helper.ts` is still rejected, which is the substring
+   mistake a careless `files` pattern makes.
+
+**What a reload honestly cannot restore**, asserted rather than glossed:
+
+- the uncertainty *dimension* was never in the log (WP05-D2; the v1 schema has
+  `uncertaintyMark: true | absent`). A rehydrated thread carries
+  `markRecordedInLog: true` with `uncertainty: null`, and the capture, word,
+  kanji and inspector surfaces now say "you marked this; which part was not
+  stored" instead of the flat falsehood "nothing marked uncertain";
+- candidate *text* was never in the log by design, so candidates are not
+  rehydrated into the snapshot at all — an empty panel beats a panel restored
+  with an empty body. The events stay in the log and the inspector shows them.
+
+### 3. Reachability (the P2 two verifiers filed twice; blocks T-17)
+
+`src/ui/navigation.ts` is the map as data — each destination declares its route
+file, the screen it renders, and how it is reached.
+`test/navigation-reachability.test.ts` walks it against the filesystem and
+against the source of the screen said to do the linking, so three separate lies
+fail: a route nothing links to, a map entry with no route file, and an entry
+claiming a parent that does not link to it. It also checks the *route* passes
+the callback, because a screen accepting `onOpenCanvas` with a route that never
+passes it is exactly the shape of the original defect.
+
+COORD-B8-3 applied in its revised form (one `(session)` group with a shared
+`SessionWorkspaceProvider`); WP-07 coordination request 1 applied (candidate
+panel mounted on the word page, below the seed's own explanation rather than
+instead of it).
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` ×4 on controller / DoD / orchestration / launcher | 4/4 match the integrity record |
+| `npm ci` (own worktree, no inherited `node_modules`) | clean install, exit 0 |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **77 files, 1236 tests, all passed** (1112 on the integration head) |
+| `npm run verify:export` | 1 file, 10 tests passed |
+| `npm run test:e2e` | **still the WP-01 placeholder** — exits 0, prints "not yet implemented (WP-10)". **Not evidence of anything.** T-17 and the deferred T-12/T-13 E2E halves belong to WP-10's remaining lanes. |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — **13 static routes** (was 5). `/session`, `/canvas` and `/repair` are in a web bundle for the first time. |
+
+### Surfaces touched
+
+`apps/app/**` (owned this wave), plus shared files with review notes:
+`eslint.config.mjs` (boundary 2 narrowed, boundary 2a added),
+`test/boundaries.test.ts` (proves the narrowing in both directions),
+`README.md` and `apps/app/README.md` (controller §7 requires the provisional
+adapter labelled in code, UI **and** README), `apps/app/package.json` and
+`package-lock.json` (`expo-sqlite`, `@bunki/persistence`).
+
+### Open items and coordination requests
+
+**COORD-B8-2 is still open, and WP-10 deliberately did not close it.** Joining
+the session workspace's events into the durable log needs `AppStore` to accept
+events it did not mint. `@bunki/domain` carries no runtime marker separating a
+gate-minted `ReviewGraded` from an object literal shaped like one — the gate
+itself says why (a brand does not survive the JSON boundary) — so an `ingest`
+method would be the evidence-gate bypass controller §5 closes and §21.3(5)
+makes a stop condition. That is a `@bunki/domain` design decision, not an
+integration edit. `SESSION_INTEGRATION_NOTE` was rewritten to say so (it
+previously promised WP-10 would do it) and is now rendered on `/debug` as well
+as the session screen, so a reader of "device-local" cannot conclude session
+evidence is durable.
+
+> **Consequence for the operator acceptance script step 7** ("kill the app,
+> reopen; everything is still there"): captures and promotions survive; this
+> sitting's graded observations do not. Recorded here so rung-1 status is not
+> read as more than it is.
+
+**Half of a WP-11 obligation is closed early.** `expo-driver.ts` declared the
+`expo-sqlite` API itself and recorded "install the real package and compile this
+binding against its typings" as WP-11 work. `expo-sqlite@57.0.1` is installed and
+`adaptExpoDatabase` compiles the two declarations against each other. What
+remains for WP-11 is the part a compiler cannot do: running it on a device.
+
+### What a verifier should try to break
+
+1. **Re-run the naive merge.** From `346847d`,
+   `git merge origin/agent/bunki-phase0-closed-loop-wp09`, and read
+   `memory-store.ts` around `applyAcceptCandidate` — the splice is in the
+   conflict output. Then delete `'acceptCandidate'` from `APP_COMMAND_KINDS` and
+   confirm the build fails on `UnlistedAppCommandKind` rather than passing.
+2. **Attack the seam.** Add `import '@bunki/persistence'` to a screen, a route,
+   a test, and to `src/state/persistence-helper.ts`; all four must lint-error.
+   Add it to `src/state/persistence/index.ts` and confirm it does not.
+3. **Check the durability claim rather than believing it.** Delete the `journal`
+   call in `memory-store.ts` and confirm `durable-store.test.ts` goes red; delete
+   the `initialEvents` rehydration and confirm the same. A guard that does not go
+   red is not a guard.
+4. **Check the reachability test is not tautological.** Remove `onOpenCanvas`
+   from `app/(session)/session.tsx` while leaving the prop on the screen —
+   `navigation-reachability.test.ts` must fail.

@@ -65,6 +65,7 @@ import {
   useWriteState,
 } from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
+import { SESSION_INTEGRATION_NOTE } from './session-loop.ts';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -360,6 +361,12 @@ function StorageSection(): ReactNode {
         {storage.snapshotAvailable
           ? 'Browser storage is available, so what you save survives a reload.'
           : 'This browser refused persistent storage, so this session is in memory only and a reload will clear it.'}
+      </Text>
+      <Text
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+        testID="debug-storage-session-gap"
+      >
+        {SESSION_INTEGRATION_NOTE}
       </Text>
       <Text
         style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}

@@ -63,11 +63,25 @@ import type { AppStore } from '../state/store.ts';
 import type { PassageMark } from './canvas-passage.ts';
 
 /**
- * The one integration seam this work package leaves open, stated where it
- * cannot be lost.
+ * The one integration seam that is still open, stated where it cannot be lost.
+ *
+ * WP-08 wrote this expecting WP-10 to close it. WP-10 gave the app a durable
+ * store and deliberately did **not**, and the sentence is corrected rather than
+ * left pointing at a step that already happened: joining these events would
+ * mean giving `AppStore` a way to accept events it did not mint, and
+ * `@bunki/domain` carries no runtime marker distinguishing a gate-minted
+ * `ReviewGraded` from an object literal shaped like one (the gate says why —
+ * a brand does not survive the JSON boundary). An ingest method would therefore
+ * be the evidence-gate bypass controller §5 exists to close and §21.3(5) makes
+ * a stop condition, so the join belongs to whoever owns that package's design,
+ * not to an integration wave.
+ *
+ * The consequence is stated on screen instead of being smuggled: this sitting's
+ * observations are real, gate-minted and inspectable while the app is open, and
+ * they are not in the durable log.
  */
 export const SESSION_INTEGRATION_NOTE =
-  'Session and canvas events are held in this screen’s workspace for the session, alongside the AppStore’s own log. Joining the two into one durable log is the WP-10 integration step (coordination request COORD-B8-2); nothing here claims otherwise.';
+  'Session and canvas events are held in this screen’s workspace for as long as the app is open, beside the durable log rather than in it — so this sitting’s observations do not survive a reload and do not appear in an export. Joining them needs a way for the store to accept events it did not mint, which would be an evidence-gate bypass unless the kernel gains a provenance marker first; that is coordination request COORD-B8-2, still open. Nothing here claims otherwise.';
 
 /** How the seeded encounter is labelled when the session bootstraps it. */
 const SOURCE_REF = {
