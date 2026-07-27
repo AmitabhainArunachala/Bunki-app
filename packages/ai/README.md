@@ -14,9 +14,18 @@ facts, never grades, never memory state.
 - **`Candidate*` types are not assignable to evidence types.** Nothing in this
   package can construct an `EvidenceEvent`; only `@bunki/domain/src/evidence` can
   (REQ-ARCH-04). This is enforced at compile time _and_ by a runtime guard.
-- **Nothing here touches canonical fields or memory state.** Any path where AI
-  output reaches canonical or memory state is a controller §21.3 stop condition
-  (evidence-boundary bypass), not a bug to triage later.
+- **Nothing here reaches memory state**, structurally — this package imports no
+  reducer, no gate and no event factory.
+- **Nothing here reads or writes canonical field data**, as a property of the
+  shipped source rather than a capability bound. `test/t09-adapter-boundary.test.ts`
+  fails the build if any file under `src/` imports `@bunki/seed`, by specifier or
+  by relative path. Stated precisely because the stronger claim would be false:
+  `@bunki/seed`'s exports are not frozen, so a package that _did_ import them
+  could mutate a headword for every reader in the process. Two coordination
+  requests are open to close that properly — an eslint boundary rule and
+  deep-frozen seed exports — both on surfaces WP-07 does not own.
+- Any path where AI output reaches canonical or memory state is a controller
+  §21.3 stop condition (evidence-boundary bypass), not a bug to triage later.
 - **Accepting a candidate is an explicit user action** producing
   `CandidateAcceptedAsNote` with `userAction: true`. Never automatic.
 - **Candidates render with a visible "AI candidate / generated" label** (T-12).
@@ -30,7 +39,12 @@ facts, never grades, never memory state.
   offline, the scripted fallback in `src/fallback/` serves a fixture-based
   candidate labeled `offline-fallback` (T-10, T-11).
 - Log **route class, latency, token counts, and fallback use — never message
-  content** (controller §12, §15).
+  content** (controller §12, §15). Enforced as a **closed field set plus bounded
+  values**: `AiRouteRecord` admits fourteen named scalars and nothing else, and
+  `assertNoMessageContent` checks each one's type and, for strings, its ceiling.
+  Both halves are needed — `model` is copied out of the provider's answer, so a
+  closed field set alone let a provider put five kilobytes of its own text into
+  the ring without adding a field.
 - In Phase 0 only seeded fixture content may be sent to the provider (OD-08
   default). Real user content requires explicit operator consent recorded
   verbatim in the capsule (controller WP-12 trial rule).
@@ -50,7 +64,7 @@ facts, never grades, never memory state.
 | `src/provider/`    | `AiProviderPort` + one fetch-based Anthropic Messages client |
 | `src/fallback/`    | scripted offline fixtures and how they are served            |
 | `src/runtime.ts`   | timeout, cancellation, and the never-rejects contract        |
-| `src/telemetry.ts` | route metadata sink and ring — never message content         |
+| `src/telemetry.ts` | route metadata sink and ring — closed fields, bounded values |
 | `src/hash.ts`      | SHA-256 for `inputHash`                                      |
 | `src/platform.ts`  | the declared platform surface (`fetch`, abort, timers)       |
 

@@ -1736,3 +1736,299 @@ is tracked (the `!.env.example` negation in `.gitignore` works at any depth);
   `packages/ai/`, `apps/app/src/candidate/`, `apps/app/src/state/{store,memory-store}.ts`,
   `apps/app/test/candidate-*.test.ts`, `apps/app/package.json`,
   `package-lock.json`, and this capsule section.
+
+---
+
+## WP-07 (B7) — repair round 1: V6 P1-1 and P1-2
+
+**Wave:** W4. **Branch:** `agent/bunki-phase0-closed-loop-wp07` (continued, not
+re-cut). **Base for this round:** `8baa6d1b947db5588976bed25b89df5a5cbc4c87`
+("WP07(B7): bounded AI candidate path with offline/scripted fallback"), which is
+the branch head V6 verified. The branch itself remains stacked on
+`c30560b6dae7beaa09fdccaf4157ba0740e3e38f`.
+
+Live SHAs read at the start of this round, not copied from a document:
+
+| Ref | SHA |
+| --- | --- |
+| `agent/bunki-phase0-closed-loop-wp07` (base for this round) | `8baa6d1b947db5588976bed25b89df5a5cbc4c87` |
+| `origin/agent/bunki-phase0-integration` | `795cc8c8281b58c4bcca91ecf276ed2532b6c9f0` |
+| `origin/main` | `c87a2eeb5019ceae13eb81714c72aee0178ea416` |
+
+The branch is **8 commits behind** the integration head, which has moved twice
+since the cut (`f9dcf16`, `795cc8c` — refreshes from `main` after PRs #8/#9/#10).
+Nothing in those commits touches `packages/ai/`, so this round did not rebase;
+whether to rebase or merge at integration time is CON's call, not B7's.
+
+**Integrity re-verified before any edit** (launcher step 1, orchestration §2.1),
+by hashing the blobs on `origin/main` rather than a local working copy:
+
+| File | Observed SHA-256 | Verdict |
+| --- | --- | --- |
+| `docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`† | matches |
+| `docs/specs/BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` | matches |
+| `docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71` | matches |
+
+† transcribed from the integrity record it matched byte-for-byte; the command
+run was `git show origin/main:<path> | sha256sum`, 3/3 equal to
+`docs/specs/BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`.
+
+### Both findings reproduced before either was fixed
+
+Neither was taken on trust. Both were driven to the reported symptom first, on a
+green baseline, and both new guards were then **falsified** — a guard that
+cannot be made to go red is not a guard.
+
+| Finding | Probe | Observed |
+| --- | --- | --- |
+| P1-1 seed reachability | a throwaway `packages/ai/src/v7probe.ts` importing `@bunki/seed` | `npx eslint packages/ai/src/v7probe.ts` → **exit 0, no error** |
+| P1-1 seed mutability | a throwaway test mutating `findLexeme('lex-bunki')` | `Object.isFrozen(record)` → **false**; after the write, `findLexeme('lex-bunki')?.headword` and `seedDataset.lexemes[0]?.headword` both → **`V7-TAMPERED`** |
+| P1-2 telemetry ceiling | provider returns `model: 'ZZ-…-ZZ' + 'A'.repeat(5000)` | `outcome` → **`live`**; `ring.entries()[0].model.length` → **5029**; serialised ring `.includes(marker)` → **true**; `toCandidateEnvelopeMetadata(...).model.length` → **5029** |
+
+All probe files were deleted before the first commit; `git status` was confirmed
+clean of them. V6's report said 5030 characters and the probe here measured
+5029 — a one-character difference in the marker, immaterial to the finding.
+
+### An environment fact that has to be recorded
+
+The first run of `npx vitest run packages/ai` in a fresh worktree reported **36
+failures**, before any edit, with `keyValidator._parse is not a function` from
+`node_modules/zod/v3/types.js`. That is not a code defect and it is not V6's
+finding: the worktree had no `node_modules` of its own, so `zod` resolved by
+directory walk-up to the repo root's hoisted **3.25.76** (pulled in by the Expo
+tree) instead of the **4.4.3** the lockfile pins at `packages/ai/node_modules/zod`.
+`npm install` in the worktree materialised the pinned nested copy and the
+baseline went green at **106 tests** before a line was changed.
+
+It is written down because a verifier who runs `vitest` without installing first
+will see the same 36 red tests and could reasonably read them as this work
+package being broken. **`npm ci` (or `npm install`) is a precondition of the
+§17.5 set, not an optional step.**
+
+### P1-1 — "cannot touch canonical fields" was unenforced, and the claim is now restated
+
+**What was wrong.** The round-1 appendix and `packages/ai/src/index.ts` carried
+controller §9's sentence — nothing in `@bunki/ai` can construct evidence *or
+touch canonical fields* — as a single claim with a single set of enforcements.
+The enforcements listed (closed evidence union, `assertNotCandidate`, two domain
+imports only) all concern the **evidence** half. The **canonical-fields** half
+had nothing behind it at all: no eslint rule, no declared-dependency gate, no
+test, and `@bunki/seed`'s exports are live shared mutable objects. V6 was right,
+and right in the way that matters — no shipped code did it, but the claim was
+that it *could not* be done.
+
+**What changed.**
+
+- `packages/ai/test/t09-adapter-boundary.test.ts` gains two source-scan cases,
+  built to mirror the existing `imports @bunki/domain only in ['envelope.ts',
+  'hash.ts']` case:
+  - **`never imports @bunki/seed, by specifier or by relative path`** — extracts
+    every module specifier across all four import forms (`from '…'`, bare
+    `import '…'`, `import('…')`, `require('…')`) from comment-stripped source,
+    then rejects `@bunki/seed` / `@bunki/seed/*` and any relative specifier that
+    *resolves* into `packages/seed`. Path resolution rather than substring
+    matching, because `../../seed/src/index.ts` contains neither string.
+  - **`names no seed accessor`** — a second, independent layer over
+    `findLexeme` / `findKanji` / `seedDataset` / `allSeedRecords`, so a
+    re-export through some future intermediate module is caught even if the
+    specifier scan is not.
+- The describe block is renamed from "the package cannot construct evidence at
+  all" to "the package constructs no evidence and reaches no canonical data",
+  because the old title asserted only half of what the suite now checks.
+
+**Falsification (both forms, run and observed).**
+
+| Probe added to `packages/ai/src/` | Result |
+| --- | --- |
+| `import { findLexeme } from '@bunki/seed'` | **2 failed / 13 passed** — specifier scan *and* accessor scan both red |
+| `import * as seed from '../../seed/src/index.ts'` | **1 failed / 14 passed** — specifier scan red via path resolution; accessor scan correctly silent (no accessor named) |
+
+**The restated claim.** Replacing the round-1 wording, which is superseded but
+left in place above per the append-only rule:
+
+> `@bunki/ai` **cannot construct an `EvidenceEvent` or reach memory state** —
+> that half is structural (closed evidence union at compile time,
+> `assertNotCandidate` at runtime, and no factory/reducer/gate import anywhere in
+> the package). It **does not read or write canonical field data** — that half is
+> a property of the shipped source, enforced by a source scan that fails the
+> build, and it is **not** a capability bound. `@bunki/seed`'s exports are not
+> frozen; a package that did import them could rewrite a headword for every
+> reader in the process. Two controls would make it a capability bound, and both
+> live on surfaces WP-07 does not own (coordination requests 5 and 6 below).
+
+The same distinction now appears in `packages/ai/src/index.ts` and
+`packages/ai/README.md`, which both previously carried the merged claim.
+
+### P1-2 — telemetry: closed field set **plus bounded values**
+
+**What was wrong.** `aiCandidateEnvelopeSchema` bounded `payload`
+(`MAX_EXPLANATION_CHARS`, `MAX_TARGET_FORM_CHARS`) but gave `model` and
+`provider` a bare `nonEmptyString`. `model` is copied verbatim out of the
+provider's own answer — `provider/anthropic.ts` deliberately prefers the model
+the response reports over the one that was asked for — and it flows into the
+observability ring **and** into `CandidateAttached.envelope.model`, which is
+persisted and exported. `assertNoMessageContent` checked the field-*name* set
+and never looked at a value. So the one control asserted to close controller §12
+("Never log encounter text, AI payloads, or secrets") was open, and a leak
+needed no new field at all.
+
+**What changed.**
+
+- `packages/ai/src/envelope.ts`: `MAX_MODEL_ID_CHARS = 64` and
+  `MAX_PROVIDER_NAME_CHARS = 32`, applied to `model` and `provider` alongside
+  the ceilings already on `payload`. Sized to identifiers — every real Anthropic
+  model id is under forty characters, and the longest provider name this build
+  produces is `offline-fallback`. An oversized identifier now fails the envelope
+  and takes the fallback route with `invalid_response`, exactly as any other
+  oversized answer does (controller §17.2).
+- `packages/ai/src/telemetry.ts`: `ALLOWED_FIELDS` (a name set) becomes
+  `STRING_FIELD_MAX` + `NUMBER_FIELDS` + `BOOLEAN_FIELDS` + `NULLABLE_FIELDS`,
+  and `assertNoMessageContent` checks each admitted field's **type** and, for
+  strings, its **ceiling**. The two identifier ceilings are imported from
+  `envelope.ts` so the schema and the backstop cannot drift apart. Type checking
+  also closes the nested-object route: a closed field set that admitted
+  `{ model: { leak } }` would have serialised the leak into the ring.
+- `AiTelemetryContentError` gains `field` and `violation`
+  (`unknown-field` | `wrong-type` | `oversized-value`). For an oversized value
+  the message names the observed and permitted **lengths** and never the value —
+  a control that quoted the leak into its own rejection would move the leak
+  rather than stop it.
+- Two new cases in `packages/ai/test/telemetry-and-no-live-calls.test.ts`: the
+  end-to-end one (provider stuffs a marker into `model`; assert `fallback` /
+  `invalid_response`, and that the marker reaches neither the ring, nor the
+  envelope, nor `toCandidateEnvelopeMetadata`), and a direct one on
+  `assertNoMessageContent` for an over-long identifier, a nested object, and the
+  error message's own silence about the value.
+
+**Falsification.** With `.max(MAX_MODEL_ID_CHARS)` removed from `model` and
+nothing else changed, `npx vitest run packages/ai/test/telemetry-and-no-live-calls.test.ts`
+→ **1 failed / 11 passed**, the failure being the new end-to-end case. The
+ceiling was restored and the suite returned to green.
+
+**The restated sentence.** Replacing "structurally incapable of holding
+content" from the round-1 appendix:
+
+> AI telemetry is route metadata under a **closed field set plus bounded
+> values**: fourteen named scalars, each type-checked, each string bounded, with
+> the two provider-filled identifiers bounded again at the envelope so an
+> oversized one never becomes a live candidate. What that does **not** claim is
+> that a bounded field is an impossible field — sixty-four characters can hold a
+> short phrase. The honest statement is that every channel out is
+> identifier-sized and checked at both ends, not that leakage is unrepresentable.
+
+### Coordination requests (orchestration §2.4 — filed, not edited)
+
+Requests 1–4 from the round-1 appendix stand unchanged. Two more, both required
+before the P1-1 claim can be strengthened from "the source does not" to "no
+package can":
+
+5. **CON — an eslint boundary rule forbidding `packages/ai` → `@bunki/seed`.**
+   `eslint.config.mjs` is LOCKED this wave, so this is filed rather than done.
+   The machinery already exists and needs no new code: `WORKSPACE_PACKAGES.seed`
+   is already declared at `eslint.config.mjs:122`, and `packageBoundariesRule`
+   already enforces by specifier *and* by resolved relative path across static,
+   dynamic and `require` forms. The change is one more config block in the same
+   shape as `APP_FORBIDDEN_PACKAGES`:
+
+   ```js
+   // Siblings @bunki/ai may not import: the seed holds the canonical fields
+   // (controller §9 — "nothing in @bunki/ai can touch canonical fields").
+   const AI_FORBIDDEN_PACKAGES = [WORKSPACE_PACKAGES.seed];
+   // …applied to files: ['packages/ai/**/*.ts'] with a message naming §9.
+   ```
+
+   Verified today: `npx eslint` on a `packages/ai/src` file importing
+   `@bunki/seed` exits **0**. Until this lands, the source scan in
+   `t09-adapter-boundary.test.ts` is the only gate, and it is a test rather than
+   a lint rule — it fails CI on the commit that adds the import, which is enough
+   to stop a merge but does not stop an editor.
+
+6. **WP-04 owner — deep-freeze the seed exports.** `seedDataset`,
+   `allSeedRecords`, and everything `findLexeme` / `findKanji` return are live
+   shared objects: `Object.isFrozen` is `false`, `record.headword = '…'`
+   succeeds, and the write is then visible to every reader in the process — the
+   app's screens included, not only `@bunki/ai`. This is a **whole-repo**
+   integrity property that happens to have been found through the AI adapter;
+   `packages/ai` is not the interesting attacker, a stray assignment in a screen
+   is. A recursive freeze at module construction (or `readonly` types plus a
+   frozen structuredClone on the way out of the accessors) would make it a
+   capability bound. Suggested evidence: a test asserting
+   `Object.isFrozen(findLexeme(id))` and that an assignment throws in strict
+   mode.
+
+### Predicate table after this round
+
+| Predicate item | Status | Evidence |
+| --- | --- | --- |
+| §9 adapter complete — zod envelope, provider port, fallback, timeout | **met** | unchanged from round 1; `model`/`provider` now carry ceilings |
+| T-09 passing, extended with an adapter-specific attempt | **met** | `packages/ai/test/t09-adapter-boundary.test.ts` — **15 tests** (was 13) |
+| — evidence half ("cannot construct evidence") | **met — structural** | closed union, `assertNotCandidate`, no factory/reducer/gate import |
+| — canonical-fields half ("cannot reach seed data") | **met as stated — source scan, not capability bound** | the two new scan cases + the honest restatement above; requests 5 and 6 open |
+| T-10 passing | **met** | unchanged |
+| T-11 passing | **met** | unchanged |
+| T-12 structural/unit half passing | **met** | unchanged; E2E half still WP-10's, still needs request 1 |
+| candidate UI labelled | **met (unmounted)** | unchanged; still needs request 1 |
+| env-only key handling verified | **met** | unchanged |
+| fallback fixtures cover the seeded target | **met** | unchanged |
+| telemetry holds no message content | **met — closed field set plus bounded values** | `packages/ai/test/telemetry-and-no-live-calls.test.ts` — **12 tests** (was 10) |
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `git show origin/main:<spec> \| sha256sum` ×3 | 3/3 match `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` |
+| `npx vitest run packages/ai` (before install) | **36 failed / 70 passed** — zod v3/v4 resolution, see the environment note |
+| `npm install --no-audit --no-fund` | `added 720 packages in 24s` |
+| `npx vitest run packages/ai` (baseline, before any edit) | 8 files, **106 tests passed** |
+| `npx eslint packages/ai/src/v7probe.ts` (seed-import probe) | **exit 0** — the P1-1 reproduction |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" (two files reformatted first: `packages/ai/README.md`, `packages/ai/test/t09-adapter-boundary.test.ts`) |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **64 files, 948 tests, all passed** (was 944; +4) |
+| `npx vitest run packages/ai` (after fixes) | 8 files, **110 tests passed** (was 106; +4) |
+| `npm run test:replay` | 2 files, 47 tests passed |
+| `npm run verify:export` | 1 file, 10 tests passed |
+| `npm run test:e2e` | WP-01 placeholder, exits 0 — not evidence of anything |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 5 static routes. Still **does not cover the candidate slice**, which nothing imports until coordination request 1 lands. |
+
+### Surfaces touched
+
+Six files, all inside B7's W4 lock (`packages/ai/`):
+
+- `packages/ai/src/envelope.ts` — two ceiling constants, two `.max()` calls
+- `packages/ai/src/telemetry.ts` — value bounds, typed violations, honest header
+- `packages/ai/src/index.ts` — the merged boundary claim split into its two
+  halves with their real enforcements
+- `packages/ai/README.md` — same split, plus the telemetry row and rule
+- `packages/ai/test/t09-adapter-boundary.test.ts` — two source-scan cases
+- `packages/ai/test/telemetry-and-no-live-calls.test.ts` — two telemetry cases
+
+**Nothing else.** No `docs/specs/`, `docs/convergence/`, `docs/handoffs/`,
+`docs/adr/`. No `eslint.config.mjs` (locked — request 5 instead). No
+`packages/seed` (WP-04's — request 6 instead). No `apps/app` file at all this
+round, so no shared-file question arises. No `@bunki/persistence` import
+anywhere in `apps/app`. Nothing pushed to `main` or to the integration branch.
+
+### Secrets check (controller §15)
+
+Staged diff grepped for `api[_-]?key|secret|bearer|password|token`: every match
+is an identifier (`API_KEY_ENV_VAR`, `inputTokens`, `outputTokens`, `maxTokens`)
+or prose about the rule. No `.env` staged. Staged diff also grepped for conflict
+markers — none.
+
+### Next safe command
+
+- V6 re-verifies from a clean checkout of this branch. **Install first** —
+  `npm ci` — then `npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `npm run test:replay`, `npm run verify:export`, and
+  `(cd apps/app && npx expo export --platform web)`.
+- To falsify P1-1's repair rather than trust it: add
+  `import { findLexeme } from '@bunki/seed';` to any file under
+  `packages/ai/src/` — `t09-adapter-boundary.test.ts` must go red — then repeat
+  with `import * as seed from '../../seed/src/index.ts';`, which must also go
+  red through path resolution rather than substring matching.
+- To falsify P1-2's repair: delete `.max(MAX_MODEL_ID_CHARS)` from `model` in
+  `aiCandidateEnvelopeSchema` — `telemetry-and-no-live-calls.test.ts` must go
+  red on the stuffed-`model` case.
+- To confirm the scope of this round: `git diff --stat 8baa6d1` should show
+  exactly the six `packages/ai/` files above and this capsule section.

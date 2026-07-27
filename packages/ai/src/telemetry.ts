@@ -7,14 +7,31 @@
  * Those two requirements pull in opposite directions at exactly one place, the
  * record type, so the record type is where the argument is settled.
  *
- * `AiRouteRecord` is a closed object of scalars. It has no field that can hold a
- * prompt, an excerpt, an explanation, an encounter, or an error body, and the
- * error path carries a `FallbackReason` — a member of a fixed enum — rather
- * than a message. `assertNoMessageContent` is the runtime backstop for a caller
- * that built a record through `any`, and
- * `test/telemetry-and-no-live-calls.test.ts` proves the negative directly: it
- * drives a full request cycle with distinctive text on both sides and asserts
- * none of it appears anywhere in the serialised ring.
+ * `AiRouteRecord` is a closed object of scalars: **a closed field set plus
+ * bounded values**. It has no field that can hold a prompt, an excerpt, an
+ * explanation, an encounter, or an error body, and the error path carries a
+ * `FallbackReason` — a member of a fixed enum — rather than a message.
+ *
+ * Both halves of that sentence are load-bearing, and the second half was added
+ * after V6's verification pass falsified the first half on its own. Until then
+ * the closed field set was the only control here, and two of its fields —
+ * `model` and `provider` — were unbounded strings copied out of a provider's
+ * answer. A provider that returned five kilobytes in `model` put five kilobytes
+ * into the ring without adding a single field. `assertNoMessageContent` now
+ * bounds the values it admits as well as the names, and `envelope.ts` bounds
+ * the same two fields on the way in, so an oversized identifier never becomes a
+ * live candidate in the first place.
+ *
+ * `assertNoMessageContent` is the runtime backstop for a caller that built a
+ * record through `any`, and `test/telemetry-and-no-live-calls.test.ts` proves
+ * the negative directly: it drives a full request cycle with distinctive text
+ * on both sides — and a second cycle with a marker stuffed into `model` — and
+ * asserts none of it appears anywhere in the serialised ring.
+ *
+ * What this does *not* claim: that a bounded field is an impossible field. Sixty
+ * four characters can hold a short phrase. The honest statement is that every
+ * channel out of here is identifier-sized, closed by name, and checked at both
+ * the envelope and the sink — not that leakage is unrepresentable.
  *
  * `inputHash` is present and is not content: it is a one-way digest, it is
  * already on `CandidateAttached`, and without it a latency outlier could not be
@@ -30,6 +47,7 @@
  * package importing the other, and no inspector file is touched here.
  */
 
+import { MAX_MODEL_ID_CHARS, MAX_PROVIDER_NAME_CHARS } from './envelope.ts';
 import type { FallbackReason } from './errors.ts';
 
 /** How a request ended. `live` means a provider answered and validated. */
@@ -77,41 +95,125 @@ export const NULL_TELEMETRY_SINK: AiTelemetrySink = {
   },
 };
 
-/** Every field a well-formed record may have. Anything else is content. */
-const ALLOWED_FIELDS = new Set<string>([
-  'taskClass',
-  'outcome',
-  'fallbackReason',
-  'provider',
-  'model',
-  'promptFamilyId',
-  'promptVersion',
-  'inputHash',
-  'latencyMs',
-  'maxTokens',
-  'inputTokens',
-  'outputTokens',
-  'targetFormPresent',
-  'createdAt',
+/**
+ * Every field a well-formed record may have, **and what each may hold**.
+ *
+ * The field-name half was here from the start. The value half was not, and V6's
+ * verification pass was right that its absence made the module header's claim
+ * false: a closed set of *names* stops a record growing a `prompt` field, and
+ * does nothing at all about a `model` field holding five kilobytes of
+ * provider-chosen prose. A leak does not need a new field if an old one is
+ * unbounded.
+ *
+ * So each admitted field now declares its type, and each string field declares
+ * a ceiling. The two identifier ceilings come from `envelope.ts` so the schema
+ * and this backstop cannot drift apart — the envelope is the primary control
+ * (an oversized `model` never becomes a live candidate at all), and this is
+ * what still holds for a record a caller built through `any` and handed
+ * straight to a sink.
+ *
+ * The remaining ceilings are sized to what this build actually produces, with
+ * headroom: `content_not_permitted` is the longest fallback reason at 21
+ * characters, `bunki.candidate.bounded-explanation` the longest prompt family
+ * id at 35, an ISO instant is 24, and `inputHash` is a 64-character SHA-256
+ * digest.
+ */
+const STRING_FIELD_MAX = new Map<string, number>([
+  ['taskClass', 8],
+  ['outcome', 16],
+  ['fallbackReason', 32],
+  ['provider', MAX_PROVIDER_NAME_CHARS],
+  ['model', MAX_MODEL_ID_CHARS],
+  ['promptFamilyId', 64],
+  ['promptVersion', 32],
+  ['inputHash', 96],
+  ['createdAt', 32],
 ]);
 
+/** Fields that must be a number, or `null` where the type permits one. */
+const NUMBER_FIELDS = new Set<string>(['latencyMs', 'maxTokens', 'inputTokens', 'outputTokens']);
+const BOOLEAN_FIELDS = new Set<string>(['targetFormPresent']);
+/** Fields whose type admits `null` — the rest may not be null. */
+const NULLABLE_FIELDS = new Set<string>(['fallbackReason', 'inputTokens', 'outputTokens']);
+
+export type AiTelemetryViolation =
+  /** A field outside the closed set — the record grew somewhere. */
+  | 'unknown-field'
+  /** An admitted field holding something other than the scalar it declares. */
+  | 'wrong-type'
+  /** An admitted string field longer than an identifier of its kind can be. */
+  | 'oversized-value';
+
+/**
+ * A record that is not route metadata.
+ *
+ * The message names the field, the violation and — for an oversized value — the
+ * observed and permitted *lengths*. It never carries the value itself, for the
+ * same reason `AiResponseValidationError` carries zod paths and not values: a
+ * control that quoted the leak into its own rejection message would move the
+ * leak rather than stop it.
+ */
 export class AiTelemetryContentError extends Error {
-  constructor(field: string) {
+  readonly field: string;
+  readonly violation: AiTelemetryViolation;
+
+  constructor(field: string, violation: AiTelemetryViolation = 'unknown-field', detail = '') {
+    const what =
+      violation === 'unknown-field'
+        ? `carries the unexpected field ${JSON.stringify(field)}`
+        : violation === 'wrong-type'
+          ? `holds a non-scalar or wrongly-typed value in ${JSON.stringify(field)}${detail}`
+          : `holds an over-long value in ${JSON.stringify(field)}${detail}`;
     super(
-      `the route record carries the unexpected field ${JSON.stringify(field)}; AI telemetry records route metadata only, never message content (controller §12, §15)`,
+      `the route record ${what}; AI telemetry records route metadata only, never message content (controller §12, §15)`,
     );
     this.name = 'AiTelemetryContentError';
+    this.field = field;
+    this.violation = violation;
   }
 }
 
 /**
- * Runtime backstop for the content rule.
+ * Runtime backstop for the content rule: closed field set **plus** bounded
+ * values.
  *
- * @throws AiTelemetryContentError on any field outside the closed set.
+ * @throws AiTelemetryContentError on any field outside the closed set, any
+ *   admitted field holding the wrong kind of scalar, and any admitted string
+ *   longer than its ceiling.
  */
 export function assertNoMessageContent(entry: AiRouteRecord): void {
-  for (const field of Object.keys(entry)) {
-    if (!ALLOWED_FIELDS.has(field)) throw new AiTelemetryContentError(field);
+  const record = entry as unknown as Record<string, unknown>;
+
+  for (const [field, value] of Object.entries(record)) {
+    const max = STRING_FIELD_MAX.get(field);
+
+    if (max !== undefined) {
+      if (value === null && NULLABLE_FIELDS.has(field)) continue;
+      if (typeof value !== 'string') throw new AiTelemetryContentError(field, 'wrong-type');
+      if (value.length > max) {
+        throw new AiTelemetryContentError(
+          field,
+          'oversized-value',
+          ` (${String(value.length)} characters; the ceiling is ${String(max)})`,
+        );
+      }
+      continue;
+    }
+
+    if (NUMBER_FIELDS.has(field)) {
+      if (value === null && NULLABLE_FIELDS.has(field)) continue;
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        throw new AiTelemetryContentError(field, 'wrong-type');
+      }
+      continue;
+    }
+
+    if (BOOLEAN_FIELDS.has(field)) {
+      if (typeof value !== 'boolean') throw new AiTelemetryContentError(field, 'wrong-type');
+      continue;
+    }
+
+    throw new AiTelemetryContentError(field);
   }
 }
 

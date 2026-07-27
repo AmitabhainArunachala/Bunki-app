@@ -77,6 +77,36 @@ export const MAX_TARGET_FORM_CHARS = 32;
 export const MAX_CONTEXT_EXCERPT_CHARS = 400;
 
 /**
+ * Ceilings on the two *identifier* fields a provider gets to fill in.
+ *
+ * These were missing until the V6 verification pass, and their absence was a
+ * real hole rather than an untidiness. `payload` was bounded; `model` and
+ * `provider` were `nonEmptyString`. But `model` is copied verbatim out of the
+ * provider's own answer (`provider/anthropic.ts` prefers the `model` the
+ * response reports over the one we asked for), and it flows onward into the
+ * observability ring **and** into `CandidateAttached.envelope.model`, which is
+ * persisted and exported. A provider that answered with five kilobytes in that
+ * field therefore put five kilobytes of provider-chosen text into a log the
+ * controller says must never hold message content (§12, §15) — the one control
+ * asserted to close that route was open. V6's probe drove exactly that and
+ * watched a 5029-character marker land in `ring.entries()[0].model`.
+ *
+ * The values are sized to identifiers, not to prose: every real Anthropic model
+ * id is under forty characters (`claude-opus-4-5-20251101`), and the longest
+ * provider name this build can produce is `offline-fallback`. Anything longer
+ * is not an identifier, so it fails the envelope and the request takes the
+ * fallback route with `invalid_response` — the same treatment as any other
+ * oversized answer (controller §17.2).
+ *
+ * A bound is not the same as an impossibility, and the capsule says so: a
+ * sixty-four-character field can still hold a short phrase. What the ceiling
+ * buys is that the channel is identifier-sized and closed at both ends — the
+ * schema on the way in, `assertNoMessageContent` on the way to a sink.
+ */
+export const MAX_MODEL_ID_CHARS = 64;
+export const MAX_PROVIDER_NAME_CHARS = 32;
+
+/**
  * The minimum context the provider is given (REQ-ARCH-07: "the minimum context
  * for the requested operation").
  *
@@ -144,8 +174,8 @@ export const candidateChecksSchema = z.strictObject({
 export const aiCandidateEnvelopeSchema = z.strictObject({
   candidateId: nonEmptyString,
   payload: candidatePayloadSchema,
-  model: nonEmptyString,
-  provider: nonEmptyString,
+  model: nonEmptyString.max(MAX_MODEL_ID_CHARS),
+  provider: nonEmptyString.max(MAX_PROVIDER_NAME_CHARS),
   promptVersion: nonEmptyString,
   createdAt: isoInstantSchema,
   checks: candidateChecksSchema,

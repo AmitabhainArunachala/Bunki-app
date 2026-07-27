@@ -26,7 +26,9 @@ import {
   createAiRuntime,
   createAnthropicProvider,
   API_KEY_ENV_VAR,
+  MAX_MODEL_ID_CHARS,
   NULL_TELEMETRY_SINK,
+  toCandidateEnvelopeMetadata,
   type AiRouteRecord,
   type AiThreadContext,
 } from '../src/index.ts';
@@ -95,6 +97,90 @@ describe('the observability ring records route metadata and nothing else', () =>
     expect(ring.entries()[0]?.outcome).toBe('fallback');
     expect(ring.entries()[0]?.fallbackReason).toBe('offline');
     expect(ring.entries()[0]?.inputTokens).toBeNull();
+  });
+
+  it('holds no trace of a marker the provider stuffed into an identifier field', async () => {
+    // V6's probe, turned into a standing test. `model` is copied out of the
+    // provider's own answer and flows into the ring *and* into
+    // `CandidateAttached.envelope.model`, which is persisted and exported. It
+    // was `nonEmptyString` with no ceiling, so this exact response put 5029
+    // characters of provider-chosen text into a log controller §12 says must
+    // never hold message content.
+    const stuffed = `${MODEL_TEXT}${'A'.repeat(5000)}`;
+    const fake = createFakeFetch({
+      kind: 'json',
+      body: messagesResponse('分岐 marks where a line divides.', { model: stuffed }),
+    });
+    const ring = createAiRouteRing();
+    const runtime = createAiRuntime({
+      provider: createAnthropicProvider({ fetch: fake.fetch, env: { [API_KEY_ENV_VAR]: 'k' } }),
+      clock: createScriptedClock(),
+      nextCandidateId: createIdSequence(),
+      platform: createTestPlatform(fake.fetch),
+      telemetry: ring,
+      contentPolicy: { name: 'test-permit-all', assertPermitted: () => undefined },
+    });
+
+    const outcome = await runtime.requestCandidate({ context: CONTEXT });
+
+    // The envelope ceiling rejects it, so it is not a live candidate at all —
+    // the same treatment as any other oversized answer (controller §17.2).
+    expect(outcome.route.outcome).toBe('fallback');
+    expect(outcome.route.fallbackReason).toBe('invalid_response');
+
+    // Not in the ring, not in the envelope, not in the metadata that reaches
+    // the event log.
+    expect(JSON.stringify(ring.entries())).not.toContain(MODEL_TEXT);
+    expect(ring.entries()[0]?.model.length).toBeLessThanOrEqual(MAX_MODEL_ID_CHARS);
+    expect(outcome.envelope.model).not.toContain(MODEL_TEXT);
+    expect(toCandidateEnvelopeMetadata(outcome.request, outcome.envelope).model).not.toContain(
+      MODEL_TEXT,
+    );
+  });
+
+  it('refuses an over-long identifier even in a record built through `any`', () => {
+    const base = {
+      taskClass: 'T2',
+      outcome: 'live',
+      fallbackReason: null,
+      provider: 'anthropic',
+      model: 'claude-opus-5',
+      promptFamilyId: 'f',
+      promptVersion: 'v',
+      inputHash: 'h',
+      latencyMs: 1,
+      maxTokens: 1,
+      inputTokens: 1,
+      outputTokens: 1,
+      targetFormPresent: true,
+      createdAt: '2026-07-27T09:00:00.000Z',
+    };
+
+    const oversized = { ...base, model: 'x'.repeat(MAX_MODEL_ID_CHARS + 1) };
+    expect(() => assertNoMessageContent(oversized as unknown as AiRouteRecord)).toThrow(
+      AiTelemetryContentError,
+    );
+    expect(() => createAiRouteRing().record(oversized as unknown as AiRouteRecord)).toThrow(
+      AiTelemetryContentError,
+    );
+
+    // The rejection names the field and the lengths — never the value, or the
+    // control would move the leak into its own error message.
+    try {
+      assertNoMessageContent(oversized as unknown as AiRouteRecord);
+      expect.unreachable('the oversized record should have been refused');
+    } catch (error) {
+      expect(error).toBeInstanceOf(AiTelemetryContentError);
+      expect((error as AiTelemetryContentError).violation).toBe('oversized-value');
+      expect((error as Error).message).not.toContain('xxxx');
+    }
+
+    // A nested object in an identifier field is refused too: a closed field set
+    // that admitted `{ model: { leak } }` would serialise the leak into the ring.
+    const nested = { ...base, model: { leak: LEARNER_TEXT } };
+    expect(() => assertNoMessageContent(nested as unknown as AiRouteRecord)).toThrow(
+      AiTelemetryContentError,
+    );
   });
 
   it('refuses a record that grew a content field', () => {

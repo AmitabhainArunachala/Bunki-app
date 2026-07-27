@@ -195,7 +195,21 @@ const code = (file: string): string =>
 const sources = walk(SRC);
 const rel = (file: string): string => relative(SRC, file);
 
-describe('T-09 (adapter): the package cannot construct evidence at all', () => {
+/**
+ * Every module specifier in a file, across every import form.
+ *
+ * Static `from '…'`, side-effect `import '…'`, dynamic `import('…')` and
+ * `require('…')`. Comments are already stripped by `code()`, so prose that
+ * names a package cannot trip a scan built on this.
+ */
+const SPECIFIER_PATTERN =
+  /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*|\bimport\s+)['"]([^'"]+)['"]/g;
+
+function specifiersOf(file: string): string[] {
+  return [...code(file).matchAll(SPECIFIER_PATTERN)].map(([, specifier]) => specifier ?? '');
+}
+
+describe('T-09 (adapter): the package constructs no evidence and reaches no canonical data', () => {
   it('never calls the kernel event factory', () => {
     expect(sources.filter((f) => code(f).includes('createDomainEvent')).map(rel)).toEqual([]);
   });
@@ -226,6 +240,48 @@ describe('T-09 (adapter): the package cannot construct evidence at all', () => {
     expect(importers.map(rel).sort()).toEqual(['envelope.ts', 'hash.ts']);
     expect(code(resolve(SRC, 'hash.ts'))).toContain('canonicalJson');
     expect(code(resolve(SRC, 'envelope.ts'))).toContain('isoInstantSchema');
+  });
+
+  /**
+   * The other half of controller §9's sentence — "nothing in `@bunki/ai` can
+   * touch canonical fields" — which had no enforcement at all until V6's
+   * verification pass said so.
+   *
+   * `@bunki/seed` is where the canonical fields live: headwords, readings,
+   * meanings, kanji records. Its exports are live shared objects and are **not**
+   * frozen, so a single `import { findLexeme } from '@bunki/seed'` in this
+   * package would be enough to rewrite a headword for every reader in the
+   * process. V6 proved that by doing it. Nothing in the shipped code does — but
+   * "nothing does" and "nothing can" are different claims, and only the first
+   * one was ever true here.
+   *
+   * This scan makes the first claim *enforced*: adding the import turns this
+   * suite red, in CI, on the commit that adds it. It deliberately does not
+   * claim to be the second: a source scan is a build-time gate inside one
+   * package, not a capability bound. The two controls that would make it a
+   * capability bound are filed as coordination requests in the capsule — an
+   * eslint rule (CON owns `eslint.config.mjs`, locked this wave) and deep-frozen
+   * seed exports (WP-04's surface).
+   */
+  it('never imports @bunki/seed, by specifier or by relative path', () => {
+    const offenders = sources.filter((file) =>
+      specifiersOf(file).some((specifier) => {
+        if (specifier === '@bunki/seed' || specifier.startsWith('@bunki/seed/')) return true;
+        if (!/^\.\.?(\/|$)/.test(specifier)) return false;
+        const resolved = resolve(dirname(file), specifier).split(/[\\/]/).join('/');
+        return resolved.includes('/packages/seed');
+      }),
+    );
+
+    expect(offenders.map(rel)).toEqual([]);
+  });
+
+  it('names no seed accessor, so a re-export could not smuggle one in', () => {
+    for (const file of sources) {
+      expect(code(file), rel(file)).not.toMatch(
+        /\b(findLexeme|findKanji|seedDataset|allSeedRecords)\b/,
+      );
+    }
   });
 
   it('makes no claim REQ-GATE-03 forbids', () => {
