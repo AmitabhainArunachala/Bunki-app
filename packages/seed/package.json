@@ -1,0 +1,15 @@
+{
+  "name": "@bunki/seed",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hand-assembled, license-verified Phase-0 seed dataset with per-field provenance.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
