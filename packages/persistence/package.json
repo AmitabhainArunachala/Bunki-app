@@ -8,9 +8,17 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./port": "./src/port.ts"
+    "./port": "./src/port.ts",
+    "./ci-substitute": "./src/sqlite/node-driver.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bunki/domain": "*",
+    "@bunki/export": "*"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.1"
   }
 }

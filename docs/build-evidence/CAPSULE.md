@@ -717,3 +717,220 @@ credentials; every URL in the fetch script is public and unauthenticated.
 - D-1 / D-2 / D-3 above — the only WP-04 items not closed.
 - Readings and senses carry `review_status: "unreviewed"` by design. Any UI that renders them must not present them as dictionary-verified; `SEED_ENTRY_DISCLOSURE` exists for that, and WP-05 should wire it into word and kanji pages.
 - Repository license remains **pending operator decision** (OD-09); `packages/seed/README.md` records it, and every project-authored provenance record states it rather than asserting a licence.
+
+## WP-03 / Builder B4 — W3 (appended 2026-07-27)
+
+### Integrity (re-verified this session, before the first edit)
+
+- Controller sha256 observed: `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` — matches the launcher's expected value.
+- v2 design authority sha256 observed: `5ee28477054fc57f476e5e8cce8f4d35c5c309be5f21bac8adaf041ba91b0c55` — matches the controller header.
+- Read in full before the first edit: launcher, controller (§7 persistence and §11 export in full, plus §0/§3/§5/§6/§16/§17/§18/§21), orchestration spec §2 ground rules + §4 role cards, `ORCHESTRATION_LOG.md` (W3 surface lock, W2 dispositions), ADR-001, ADR-002, VERIFY_WP01/02/04, and the WP-02 domain surface this WP consumes.
+
+### Stacking (recorded per instruction)
+
+This branch is **stacked**, not cut from `main`. Base:
+`origin/agent/bunki-phase0-integration` @ `755c090557cffbe0f316445b77c74a0a909d9a46`
+("WP02+WP04(CON): close wave W2"), because WP-01/02/04 are verified but not yet
+merged to `main` and WP-03 depends on WP-02's event catalog and replay harness
+(controller §3.1 permits explicit stacking; it must be stated in the PR body).
+Branch: `agent/bunki-phase0-closed-loop-wp03`.
+
+### Surfaces touched
+
+`packages/persistence/**`, `packages/export/**`, this capsule section, and two
+root files:
+
+- `package.json` — **the `verify:export` script line only**, which the WP-03 role
+  explicitly authorises and which controller §18 WP-01 requires be replaced by its
+  owning WP (leaving a placeholder past its owner is a closure-predicate failure).
+  `node scripts/not-implemented.mjs verify:export WP-03` →
+  `vitest run packages/export/test/verify-export.test.ts`.
+- `package-lock.json` — mechanical consequence of `packages/*/package.json`
+  declaring their own dependencies (`@bunki/domain`, `@bunki/export`,
+  `@types/node@26.1.1`, `zod@4.4.3`). Same class of touch W2 recorded and CON
+  accepted. **Coordination note to CON:** npm nests `zod@4.4.3` under
+  `packages/export/node_modules` because the hoisted root `zod` is `3.25.76`
+  (pulled in by the Expo tree); this is correct resolution, not drift.
+
+No frozen doc touched (`docs/specs/`, `docs/convergence/`, `docs/handoffs/`,
+`docs/adr/` all untouched). No other lane's surface touched: `packages/domain/`
+(B5), `apps/app/` (B6), `packages/seed/` (locked read-only) are unmodified —
+`git diff --stat` against the base confirms it.
+
+### WP-03 closure predicate status (controller §18)
+
+| Predicate item                                                                                     | Status                                | Evidence                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ports per §7 — `append(events,{idempotencyKey})`, `readAll`, `readStream`, `snapshot`, `exportJson` + `QueryPort` | met                                   | `packages/persistence/src/port.ts` (exactly the five §7 methods; everything else on the read-only `QueryPort`)                                                  |
+| A shared port contract-test suite any adapter must pass                                             | met                                   | `packages/persistence/src/contract/suite.ts` — 20 cases, framework-free, in `src/` so WP-11 can run the identical list on a device                              |
+| sqlite adapter (native authority) with the §7 CI-substitute mechanism                               | met                                   | one adapter `src/sqlite/adapter.ts`; drivers `expo-driver.ts` (native) / `node-driver.ts` (`node:sqlite`); every substitute test name carries `ci-substitute`   |
+| Provisional web adapter, labeled provisional in code and README                                     | met                                   | `src/web/adapter.ts` (`ProvisionalWebEventStore`, `runtimeLabel: 'web-provisional'`, `PROVISIONAL_WEB_ADAPTER_NOTICE`), README §Runtime honesty                 |
+| Migration runner: forward + **down-migrations exercised in tests**                                  | met                                   | `src/migrations/{types,runner,schema}.ts`; `test/migrations.test.ts` drives every migration up→down→up against a canonical `sqlite_master` fingerprint          |
+| Refuses destructive migration without verified rollback (§21.3(7))                                  | met                                   | `DestructiveMigrationWithoutRollbackError`; refuses a missing `down` **and** a `destructive:false` flag that disagrees with the SQL (`classifyStatements`)      |
+| Idempotent append; conflicting payload under one key = typed error, matching WP-02                  | met                                   | `src/append-plan.ts` throws `@bunki/domain`'s own `IdempotencyConflictError`/`DuplicateEventIdError`; `test/idempotency.test.ts` asserts each outcome twice — once via the store, once via `replay` |
+| Tombstone-then-purge; purge physically removes payload bytes; audit trail survives                  | met                                   | `src/purge.ts` + both adapters; `test/deletion.test.ts` scans the raw `.db`/`-wal`/`-shm` files                                                                 |
+| `packages/export` envelope `{exportVersion:1, generatedAt, events, seedRefs, appVersions}`          | met                                   | `packages/export/src/envelope.ts`; `generatedAt` from the injected clock                                                                                        |
+| `npm run verify:export` is REAL (T-14 skeleton)                                                     | met                                   | root script → `packages/export/test/verify-export.test.ts`; replays through `@bunki/domain` and asserts derived-state equality against **live stores**, both adapters, incl. a negative control |
+| T-01 (append immediate + durable across adapter reopen)                                             | met (`ci-substitute`, `web-provisional`) | contract case `append-is-immediate-and-durable-across-reopen`                                                                                                   |
+| T-16-web (restart simulation)                                                                       | met                                   | contract case `restart-preserves-the-whole-log-and-its-streams` + `test/t16-web-restart.test.ts` (full page-reload simulation)                                  |
+| Provenance survives the store round trip (feeds T-15)                                               | met                                   | contract case `provenance-survives-the-store-round-trip`; `seedRefs` surfaces licence obligations at the envelope's top level                                   |
+| Uses `@bunki/domain`'s replay harness; reduction NOT reimplemented                                  | met                                   | `replay` imported in `append-plan.ts`, `adapter.ts`, `web/adapter.ts`, `export/src/verify.ts`; no reduction logic in either package                             |
+
+### Commands run (verbatim results)
+
+| Command                                     | Result                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `npm ci` then `npm install`                 | clean; 712 packages audited; 1 package added                                        |
+| `npm run lint`                              | **pass**, 0 problems                                                                |
+| `npm run format:check`                      | **pass**, "All matched files use Prettier code style!"                              |
+| `npm run typecheck`                         | **pass**, 6/6 workspaces, 0 errors                                                  |
+| `npm run test`                              | **pass** — 31 files, **451/451 tests** (was 328 at the W2 base; +123 from WP-03)    |
+| `npm run test:replay`                       | **pass** — 2 files, 43/43                                                           |
+| `npm run verify:export`                     | **pass** — 1 file, **10/10** (no longer a placeholder)                              |
+| `npm run test:e2e`                          | still the WP-10 placeholder, exits 0 with its "not evidence of anything working" banner |
+| `(cd apps/app && npx expo export --platform web)` | **pass** — 3 static routes, bundle 1.1MB, `Exported: dist`                     |
+
+### Runtime-claim honesty (P0-CAP-15, controller §7 — read this before quoting any result above)
+
+- Every SQLite test name begins `[ci-substitute]`. That is evidence about the
+  SQL, the transactions, the invariants, and reopen durability. It is **not**
+  evidence about iOS, about `expo-sqlite`, or about a device.
+- Every web test name begins `[web-provisional]`. Web persistence is never
+  reported as native persistence.
+- **T-16 native is UNVERIFIED.** It is WP-11's claim and only WP-11's. Nothing in
+  this WP contributes to it.
+- No test in this WP emits a passing `[native]` name. The `expo-sqlite` binding is
+  tested against a recording fake and labeled "shape only — NOT native
+  verification"; running the contract suite through it would have minted a
+  `native`-labeled store in CI, which is the false assurance §7 forbids.
+
+### Driver choice, verified from the registry and recorded (controller §14)
+
+- **Chosen: `node:sqlite`** (`DatabaseSync`), built into Node. Verified working on
+  the pinned toolchain **node v22.22.2** (the major CI selects via
+  `actions/setup-node@v4`, `node-version: '22'`). Available since Node 22.5.0;
+  experimental in Node 22 (emits `ExperimentalWarning`). **No npm dependency
+  added** — nothing new constrains OD-09; it ships under Node's own MIT licence.
+  Pinned by the Node major, and guarded at runtime by `DriverUnavailableError`
+  so a runtime without it fails loudly instead of silently substituting.
+- **Rejected: `better-sqlite3`**, verified from the npm registry as version
+  **13.0.1**, licence **MIT** (`npm view better-sqlite3 version license`,
+  2026-07-27). Compatible and acceptable; not taken because it is a native addon
+  needing `node-gyp` in every CI run, and adding a dependency to support a
+  _substitute_ for a runtime we explicitly do not claim to have verified is cost
+  without evidence.
+- `expo-sqlite` re-verified from the registry: **57.0.1, MIT** (matches the WP-00
+  register). **Deliberately not installed** — see the WP-11 obligation below.
+
+### Two defects found by this WP's own tests, and fixed
+
+1. **The idempotency table retained purged content.** The batch fingerprint was
+   the canonical JSON of the batch, stored verbatim, so `bunki_append_batches`
+   held a copy of every event ever appended. Emptying `bunki_events` left the
+   learner's encounter text intact one table over — the store would have reported
+   a completed deletion while the bytes were on disk. Fixed by storing a SHA-256
+   digest (`src/hash.ts`, no platform API, cross-checked against `node:crypto` in
+   `test/hash.test.ts` over 14 inputs incl. block boundaries and surrogate pairs)
+   **and** by dropping batch rows that reference purged events. Found only
+   because the contract suite's purge case reads raw storage bytes rather than
+   asking the port; that is why `AdapterHarness.rawStorageDump()` exists.
+2. **SQLite retained purged bytes at the file level.** `UPDATE` frees the old cell
+   without erasing it, and WAL keeps pre-update page images. Fixed with
+   `PRAGMA secure_delete = ON` at open, plus `PRAGMA wal_checkpoint(TRUNCATE)` and
+   `VACUUM` after any batch that purged — run _after_ the commit, so a crash in
+   between leaves a purge that is recorded and re-runnable rather than neither.
+
+### Interpretation choices recorded (controller §0.3 — conservative reading, surfaced not silent)
+
+1. **`seedRefs` (controller §11 names the field, does not define its shape).**
+   Read as a _derived_ index of the source/licence references the exported events
+   actually cite, collected from each `EncounterCaptured`'s `sourceRef` and
+   `provenance`, deduplicated and sorted. It asserts nothing the events do not
+   already contain, so it cannot drift from them, and it makes T-15 answerable by
+   inspection. The alternative reading — an injected `@bunki/seed` manifest —
+   would let an export _claim_ provenance its events do not carry. **CON: flag to
+   WP-09 in case the inspector expects the other reading.**
+2. **`appVersions.fsrs` is `null` in this build.** No scheduler is pinned yet; the
+   pin is WP-06's (controller §6.3). A plausible-looking version string would be a
+   claim about a component that does not exist. The field is wired end to end —
+   WP-06/WP-05 pass the real pin through `EventStoreConfig.appVersions`.
+3. **`readStream` takes a discriminated selector** (`{threadId}` | `{contractId}`)
+   rather than a bare string, because §7's `readStream(threadId|contractId)` is
+   ambiguous for two opaque id spaces that can collide.
+4. **The derived-state cache never answers `snapshot()`.** §7 asks for cache
+   tables "rebuilt from replay"; they exist and are written on append, but
+   `snapshot()` always replays and the cache is read only by
+   `derivedStateCacheMeta()`. Conservative reading of §21.4: a cache that can
+   answer is a second source of truth.
+5. **No destructive migration ships in Phase 0.** All three forward migrations are
+   additive; the §21.3(7) guard is exercised with fixture migrations that really
+   are destructive, rather than putting a demonstration one-way door in a real
+   user's upgrade path.
+
+### Coordination requests to CON (not acted on — outside WP-03's surface)
+
+1. **P1 — architectural gap, blocks WP-05/WP-09 wiring.** ADR-001 B2 forbids
+   `apps/app` from importing `@bunki/persistence` _at all_, and controller §5
+   makes `@bunki/domain` pure (no sibling packages). No package may therefore
+   both construct a store and be reachable from the app. Someone must own the
+   composition seam before the UI can persist anything. Options, cheapest first:
+   (a) a thin `@bunki/composition` package that the app may import; (b) a single
+   named wiring module under `apps/app` with an ADR-level lint exception;
+   (c) inject a store instance at the app entry point from a non-app module.
+   **This is an ADR-001 amendment path, which is an escalation, not an edit** —
+   WP-03 has not touched it.
+2. **P2 — `docs/build-evidence/TEST_PLAN.md` (CON-owned) is now stale**: the
+   script-status table still lists `verify:export` as "placeholder, exits 0", and
+   the T-01/T-14/T-16 rows should record their WP-03 halves as met. Not edited —
+   not WP-03's surface.
+3. **P2 — `.github/workflows/ci.yml` (WP-01/WP-10) does not run `verify:export`.**
+   It is real now, so CI omitting it means T-14 is unguarded between PRs. WP-10
+   owns the CI extension per its closure predicate; flagging so it is not lost.
+4. **P2 — no §15 pre-commit secret hook is installed** (`.git/hooks` is empty, no
+   husky). WP-01 recorded the requirement; nothing enforces it. Related: this WP
+   renamed its purge canary from `SECRET_ENCOUNTER_TEXT` to `PURGE_CANARY_TEXT`
+   so the fixture will not trip that hook once it exists.
+
+### WP-11 obligations inherited from this WP (record in the native checkpoint doc)
+
+1. Install `expo-sqlite@57.0.1` on the device build and compile
+   `src/sqlite/expo-driver.ts` against its **own** typings. This package declares
+   the four-method subset rather than importing it, so upstream signature drift is
+   invisible to CI by construction.
+2. Run `runPortContractSuite(deviceHarness)` — the identical 20-case list, no
+   framework needed — and report the results as native evidence. A device harness
+   needs `open()`, `rawStorageDump()`, `reset()`, `dispose()`.
+3. Confirm on device what CI cannot: WAL behaviour under backgrounding, and that
+   `secure_delete` + `VACUUM` remove purged bytes from the real filesystem.
+
+### Secrets check (controller §15)
+
+Staged diff scanned for
+`api[_-]?key|secret|bearer|password|passwd|token|private[_-]?key`, excluding
+`package-lock.json`: **0 matches** after the canary rename. No `.env`, no
+credentials, no network calls in either package.
+
+### Next safe command
+
+- V4 verifies WP-03 from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test && npm run test:replay && npm run verify:export`,
+  then `git diff --stat 755c090` to confirm no surface outside
+  `packages/persistence/`, `packages/export/`, the `verify:export` script line,
+  the lockfile, and this capsule section was touched.
+- Paraphrase-audit target for V4: the contract suite's purge case
+  (`tombstone-then-purge-removes-content-bytes-and-keeps-the-audit-trail`) — it
+  must assert against **raw storage bytes**, not against what the port reports, or
+  it does not assert what the controller says it asserts.
+- WP-05/WP-09 may consume `@bunki/export` freely; they may consume
+  `@bunki/persistence` only once coordination request 1 above is resolved.
+
+### Open items carried forward
+
+- T-16 **native**: UNVERIFIED. WP-11 only.
+- T-14 full (export button in the inspector, round trip driven from the UI):
+  WP-09. This WP delivered the skeleton the controller asked for.
+- T-15 full: WP-09. This WP proves provenance survives the store round trip and
+  surfaces licence obligations in `seedRefs`.
+- `appVersions.fsrs` stays `null` until WP-06 pins the scheduler.
+- Repository license remains **pending operator decision** (OD-09); recorded in
+  both package READMEs.
