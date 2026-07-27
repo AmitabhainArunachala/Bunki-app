@@ -10,10 +10,21 @@
  * **Dictionary indices are never rendered.** REQ-UI-03 is explicit: SKIP,
  * Henshall, NJECD, Gakken, New Nelson, KALD and Daikanwa/Morohashi are join
  * keys in a database and not page content — "a kanji page should feel like a
- * museum card, not a spreadsheet row". The Phase-0 seed carries none of them,
- * so there is nothing here to leak; `test/no-dictionary-indices.test.ts` scans
- * this file and its siblings anyway, so the rule survives the arrival of a
- * dataset that does have them.
+ * museum card, not a spreadsheet row".
+ *
+ * WP-05 shipped this file claiming "the Phase-0 seed carries none of them, so
+ * there is nothing here to leak". **That was false.** The seed's radical
+ * records carry a `kind` naming the classification scheme that assigned them,
+ * and two of the ten characters carry the one from Nelson's dictionary — which
+ * this page printed verbatim, under a subtitle promising it never would. The
+ * source scan in `test/screen-contract.test.ts` missed it because the token
+ * arrived through data, not through source text.
+ *
+ * WP-09 closed it: the components section renders elements only, via
+ * `src/data/radical-display.ts`, and no scheme label reaches the page from any
+ * value. `test/radical-display.test.ts` scans the rendered strings the seed can
+ * actually produce, so the rule now survives a dataset change as well as a
+ * source change.
  *
  * Layers 2 and 3 need reading families, sourced phonetic/semantic patterns and
  * full KANJIDIC2 fields. The seed has none of that (LICENSES.md D-1), so those
@@ -35,6 +46,7 @@ import {
   type SeedKanji,
 } from '../data/catalog.ts';
 import { parseKanjiVgStrokes, type KanjiStrokeSet } from '../data/kanjivg.ts';
+import { radicalDisplay } from '../data/radical-display.ts';
 import { useAppSnapshot, useDebugFlags } from '../state/app-context.tsx';
 import { UNCERTAINTY_LABELS } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
@@ -127,6 +139,7 @@ export function KanjiScreen({
   const kanji = state.data;
   const compounds = wordsUsingKanji(kanji.character);
   const readings = readingContextFor(kanji);
+  const radicals = radicalDisplay(kanji.radicals);
   const upstream = seedDataset.strokes.upstream;
 
   // The reading this character carries in a word the learner actually kept —
@@ -334,20 +347,20 @@ export function KanjiScreen({
         <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
           {kanji.components.join(' + ')}
         </Text>
-        {kanji.radicals.length === 0 ? (
-          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-            No component role is recorded for this character.
+        {radicals.elements.length === 0 ? null : (
+          <Text
+            style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
+            testID="kanji-radical-elements"
+          >
+            Radical: {radicals.elements.join(' · ')}
           </Text>
-        ) : (
-          kanji.radicals.map((radical) => (
-            <Text
-              key={`${radical.element}-${radical.kind}`}
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {radical.element} — radical, {radical.kind}
-            </Text>
-          ))
         )}
+        <Text
+          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+          testID="kanji-radical-note"
+        >
+          {radicals.note}
+        </Text>
         <ProvenanceLine field="components" record={kanji.provenance.components} />
 
         <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>

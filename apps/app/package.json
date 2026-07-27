@@ -16,6 +16,7 @@
   "dependencies": {
     "@bunki/ai": "*",
     "@bunki/domain": "*",
+    "@bunki/export": "*",
     "@bunki/seed": "*",
     "expo": "57.0.8",
     "expo-constants": "57.0.7",
