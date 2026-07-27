@@ -3,7 +3,7 @@ title: "Bunki — Git Publication and Integrity Manifest"
 date: 2026-07-27
 project: bunki
 artifact_type: publication_manifest
-status: published_in_draft_pr_missing_one_frozen_input
+status: published_all_frozen_inputs_verified
 ---
 
 # Bunki Git artifact manifest
@@ -18,7 +18,7 @@ and the resulting branch/commit is reported.
 | Intended repository path | SHA-256 | Local status | Notes |
 |---|---|---|---|
 | `docs/convergence/JAPANESE_LEARNING_OS_CODEX_V1_FREEZE_2026-07-27.md` | `94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b` | present and verified | Codex frozen v1 |
-| `docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md` | `77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68` | missing from this workspace | Claude frozen v1; declared frozen at Git revision `8404395`; recover exact bytes, never reconstruct |
+| `docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md` | `77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68` | present and verified in Git | Claude frozen v1; recovered exactly from `AmitabhainArunachala/dharma_swarm` revision `8404395e9ab1a34ed3b29452d883046d3cfe5268`, source path `docs/plans/BUNKI_WORKING_SPEC_2026-07-27.md` |
 | `docs/convergence/BUNKI_CONVERGENCE_ROUND1_2026-07-27.md` | `a6066f6972f58dff213bbdddcec5447bd7d01ea22745c26a15d7d455e6dd756d` | present and verified | Claude's Round-1 ADOPT / ARGUE / EVALUATE diff |
 | `docs/convergence/BUNKI_CONVERGENCE_ROUND1_CODEX_RESPONSE_2026-07-27.md` | `9542fbaa89456b2bb226a415f37a3360104539e290242545c542a2aee6f07a54` | present and verified | Codex's item-by-item resolution |
 
@@ -37,7 +37,7 @@ and the resulting branch/commit is reported.
   `agent/bunki-convergence-handoff-2026-07-27`
 - Draft PR: `#1`
 - License: deliberately undecided
-- All five available artifact blobs were fetched from GitHub as base64, decoded
+- All six required artifact blobs were fetched from GitHub as base64, decoded
   to raw bytes, and SHA-256 verified against this manifest.
 
 The first Codex-v1 upload was incomplete because its terminal transfer clipped
@@ -63,12 +63,14 @@ declared
 8. Report repository, branch, commit SHA, tree state, and draft-PR URL.
 9. Do not merge or approve the PR.
 
-## Remaining integrity gate
+## Integrity closure
 
-Claude's exact frozen v1 is not present in this repository or the Codex
-workspace. The next Claude context must recover
-`BUNKI_WORKING_SPEC_2026-07-27.md` from the prior environment or Git object
-history at revision `8404395`, verify SHA-256
-`77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68`,
-and publish those exact bytes. It must not reconstruct the file from Round-1
-summaries.
+The final missing frozen input was found in
+`AmitabhainArunachala/dharma_swarm` at full revision
+`8404395e9ab1a34ed3b29452d883046d3cfe5268`. Its source Git blob is
+`02758392a71d067848631af7f5b30682949ff93a`; the recovered file is 22,790
+bytes and verifies as
+`77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68`.
+The same blob is now published at
+`docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md` on the Bunki input branch.
+No reconstruction, waiver, or Round-1 fallback is required.
