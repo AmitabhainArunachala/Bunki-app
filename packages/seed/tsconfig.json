@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
+  "_comment": "types: [\"node\"] is required, not incidental. This package's tests read seed files off disk and hash them (test/strokes.test.ts) — a KanjiVG file that was hand-drawn rather than fetched is the failure mode WP-04 has to be able to detect, and detecting it needs node:fs and node:crypto. @types/node is declared as an exact devDependency of this package rather than borrowed from the hoisted tree, so a dependency bump elsewhere cannot silently break this typecheck.",
+  "compilerOptions": {
+    "types": ["node"]
+  },
   "include": ["src", "test"]
 }
