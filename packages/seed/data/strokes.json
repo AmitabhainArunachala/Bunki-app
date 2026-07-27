@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Manifest for the KanjiVG stroke SVGs in data/strokes/ (controller §8).",
+    "The SVG files are byte-identical, unmodified copies of upstream KanjiVG, including",
+    "their in-file CC BY-SA 3.0 copyright header. They were fetched, never hand-drawn or",
+    "generated: scripts/fetch-kanjivg.mjs downloads them from the pinned commit below and",
+    "--check re-verifies them against upstream.",
+    "test/strokes.test.ts re-hashes every file offline and re-derives strokeCount,",
+    "components and radicals from the bytes, so data/kanji.json cannot drift from the",
+    "stroke data it claims to be derived from."
+  ],
+  "upstream": {
+    "project": "KanjiVG",
+    "repository": "https://github.com/KanjiVG/kanjivg",
+    "commit": "61e39cfc29724132a6f8823b166296932985a0ff",
+    "commitResolvedBy": "git ls-remote https://github.com/KanjiVG/kanjivg.git HEAD",
+    "retrievedAt": "2026-07-27",
+    "license": "CC BY-SA 3.0",
+    "licenseTextFile": "licenses/KanjiVG-COPYING.txt",
+    "licenseTextSha256": "d255e07978fd16ddfec38bc59dc9d857b885dd44ddbf4e79baf207d30746bdcc",
+    "licenseTextUrl": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/COPYING"
+  },
+  "files": [
+    {
+      "character": "分",
+      "file": "strokes/05206.svg",
+      "upstreamPath": "kanji/05206.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/05206.svg",
+      "bytes": 2662,
+      "sha256": "7f35124e1d19f45141fa626534463505161ec1a01650f12674e91a74163e56bc"
+    },
+    {
+      "character": "岐",
+      "file": "strokes/05c90.svg",
+      "upstreamPath": "kanji/05c90.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/05c90.svg",
+      "bytes": 3420,
+      "sha256": "4a3f0b6b133dc55a6650b1c0da0072e201b1fc0985fef3ab3caa124cb4837747"
+    },
+    {
+      "character": "点",
+      "file": "strokes/070b9.svg",
+      "upstreamPath": "kanji/070b9.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/070b9.svg",
+      "bytes": 3536,
+      "sha256": "08bdd5dc492062f15d5af697a9c9e3b77f7cda3c81a956bcc22430f05d2618d1"
+    },
+    {
+      "character": "路",
+      "file": "strokes/08def.svg",
+      "upstreamPath": "kanji/08def.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08def.svg",
+      "bytes": 4553,
+      "sha256": "1470a638ff41ef992542514a23396dc3c4a3dddc261c615fd2aab71b3bbc1c87"
+    },
+    {
+      "character": "線",
+      "file": "strokes/07dda.svg",
+      "upstreamPath": "kanji/07dda.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/07dda.svg",
+      "bytes": 4984,
+      "sha256": "1c403c0ec912451fd418f6f92b40c7497b01c152bbb4d4b09d201abd39b5ed9a"
+    },
+    {
+      "character": "道",
+      "file": "strokes/09053.svg",
+      "upstreamPath": "kanji/09053.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/09053.svg",
+      "bytes": 4190,
+      "sha256": "826fd1adbf301491c5c726fedb4d3dec4089760dd40a6824c83403f0c4b86418"
+    },
+    {
+      "character": "車",
+      "file": "strokes/08eca.svg",
+      "upstreamPath": "kanji/08eca.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08eca.svg",
+      "bytes": 3042,
+      "sha256": "1b9d847cf86b897afd0bf64a73e9b7447784ef1f7a39e253dca61b0f6ad7aac5"
+    },
+    {
+      "character": "駅",
+      "file": "strokes/099c5.svg",
+      "upstreamPath": "kanji/099c5.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/099c5.svg",
+      "bytes": 4639,
+      "sha256": "a3eec84d7f07d22db7b6f81725ddb52d1a1395b8fb25d5a93d910ed83731e559"
+    },
+    {
+      "character": "自",
+      "file": "strokes/081ea.svg",
+      "upstreamPath": "kanji/081ea.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/081ea.svg",
+      "bytes": 2811,
+      "sha256": "ac161a62094277640b9dd24ec0c1f6e4d261c92708f4c81eca17651efd1774bc"
+    },
+    {
+      "character": "部",
+      "file": "strokes/090e8.svg",
+      "upstreamPath": "kanji/090e8.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/090e8.svg",
+      "bytes": 4252,
+      "sha256": "f29343890de2226fdb7d13f5f156c802f8cedffa5355180d9756fac83b0dc0e3"
+    }
+  ]
+}
