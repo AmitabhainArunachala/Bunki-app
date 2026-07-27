@@ -940,3 +940,217 @@ exists in `apps/app` and none may.
 - W4 may consume `apps/app/src/ui/*` and `src/state/app-context.tsx`. Per
   orchestration spec §4, `app/_layout.tsx` and the shared `src/ui` primitives
   stay with B6; B8's session/canvas screens should request changes via CON.
+
+---
+
+## Appendix — WP-05 (Builder B6, repair round): two P1 honesty defects closed
+
+**Agent:** B6 (Builder, WP-05) · **Wave:** W3 · **Date:** 2026-07-27
+**Branch:** `agent/bunki-phase0-closed-loop-wp05` · **Repair base:** `ef689ba`
+**Surfaces touched:** `apps/app/` and `docs/build-evidence/screenshots-wp05/`,
+plus this appendix. Nothing else.
+
+This section is **appended, not a rewrite**. Where it contradicts the earlier
+WP-05 appendix, this one supersedes it, and it says so explicitly below — the
+earlier text is left standing because a capsule that quietly edits its own past
+claims is exactly the failure mode both of these defects were.
+
+### Integrity re-verified before any edit (launcher step 1)
+
+| File | SHA-256 | Matches `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` |
+| --- | --- | --- |
+| `…CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md` | `de7b6fcc…859b47` | yes |
+| `…V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md` | `5ee28477…1b0c55` | yes |
+| `…MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | `41631840…155a71` | yes |
+| `…FRESH_AGENT_LAUNCHER_2026-07-27.md` | `b0a6811d…78fce7` | yes |
+
+### Stacking (controller §3 rule 1)
+
+This repair round continues the existing WP-05 branch at **`ef689ba`**, which was
+itself cut from `origin/agent/bunki-phase0-integration` at **`755c090`**
+(WP-01/02/04 verified there, not yet on `main`). Re-checked this session:
+integration has advanced to **`f9f4d0e`** and `git diff --stat 755c090 f9f4d0e`
+is still empty — merge commits only, identical tree — so no rebase is needed and
+these checks ran against the content the integration branch holds today.
+
+### Finding 1 (P1) — ruby pieces were *not* hidden from the accessibility tree
+
+**What was actually wrong.** `ruby.tsx` hid its furigana pieces with
+`importantForAccessibility="no"`. That prop is Android/iOS-only.
+`react-native-web@0.21.2` forwards only the props in `modules/forwardedProps` —
+`aria-hidden` is in that table, `importantForAccessibility` is not — so on Expo
+Web, the Phase-0 target runtime (REQ-ARCH-01), the prop was dropped and every
+piece stayed exposed. The header comment and the predicate row both said the
+opposite. Two aggravating details were real as well: the `opacity: 0`
+ideographic-space placeholder was an exposed text node of its own, and the
+intended single label sat as `aria-label` on a `role=generic` container, where
+ARIA prohibits naming.
+
+**Reproduced, not taken on trust.** The pre-repair bundle was rebuilt and audited
+over CDP. Chrome reported five exposed named nodes under the headword:
+
+```
+分かれる（わかれる） | わ | 分 | 　 | かれる
+```
+
+**What was done.**
+
+- Both pieces now carry **`aria-hidden`**. React Native ≥0.71 maps it onto
+  `accessibilityElementsHidden` (iOS) and
+  `importantForAccessibility: 'no-hide-descendants'` (Android), so the modern
+  spelling is strictly more portable than the one it replaces rather than a
+  web-only concession.
+- The empty ruby slot is a **sized spacer `View`**, not transparent text. An
+  empty text node is content: it reached the accessibility tree and a copied
+  selection alike.
+- The single spoken label is carried as **real text content** in a clipped 1×1
+  node, not only as an `accessibilityLabel`.
+
+**A deliberate deviation from the prescribed fix, with the measurement behind
+it.** The finding proposed `accessibilityRole="text"` on the container so the
+name would sit on a leaf rather than a generic. Measured against the installed
+react-native-web, that does not work: `AccessibilityUtil/propsToAriaRole` maps
+`text → null`, so the role is dropped and the element stays `role=generic`. The
+prop is kept for its native meaning, but it is *not* what makes the label
+reachable — the text content is. Adopting the prescription alone would have
+re-shipped an unverified accessibility claim, which is the defect class being
+repaired.
+
+**Guards added.**
+
+- `apps/app/test/ruby-accessibility.test.ts` (renderer-free, 6 tests). Its
+  load-bearing assertion reads the **installed** react-native-web and checks that
+  the prop the component relies on is one that version actually forwards — the
+  check whose absence let this ship. Run against the pre-repair source, 5 of its
+  6 tests fail.
+- An `Accessibility.queryAXTree` audit in `scripts/capture-evidence.mjs`, run
+  against the real `expo export` output, asserting one exposed named node whose
+  name is the whole word. Results in
+  `docs/build-evidence/screenshots-wp05/accessibility-audit.json`.
+
+**Falsified before trusted.** Against the pre-repair build the audit fails 7 of 8
+checks and reprints the interleaving above; against the repaired build it passes
+8 of 8, reporting exactly one exposed node named `分かれる（わかれる）` and one
+named `分岐（ぶんき）`.
+
+**No visual change.** Shots `11-word-layers-0-1.png` and
+`12-word-layers-2-3.png` are byte-identical before and after, which is the
+intended outcome: the ruby column looks the same and only the accessibility tree
+changed.
+
+### Finding 2 (P1) — the screens stated a falsehood about the event log
+
+**What was actually wrong.** Both screens said unconditionally that the log
+records the *fact* of an uncertainty mark. That is true only for a mark chosen
+**before** Keep, which rides on `EncounterCaptured.uncertaintyMark`. A mark
+applied **after** Keep writes nothing at all: `applyMarkUncertainty` emits no
+event by design. On that path the learner saw a selected chip, a thread row
+reading `keep · uncertain: reading`, an acknowledgment listing
+`EncounterCaptured, ThreadPromotionChanged` with no mark anywhere in it, and a
+sentence telling them the fact of their mark was durable and exportable. It was
+not — fact and dimension were both lost. This is the REQ-GATE-03 / P0-CAP-15
+class the work package is judged on.
+
+**What was done.** The sentence is now derived from the thread rather than
+asserted, by `uncertaintyLogNote` in `src/state/store.ts`, which both screens
+call. Four branches, each true of the state it describes:
+
+| State | What the screen now says |
+| --- | --- |
+| not kept yet | "Keeping this with a mark records in the event log that a mark exists; which dimension you chose is kept on this device only…" |
+| kept, mark was on the captured event | "The event log records that a mark exists; which dimension you chose is kept on this device only…" |
+| kept, mark applied after Keep | "This mark was applied after Keep, so it is on this device only — it is not in the event log and will not be exported…" |
+| kept, no mark now | "A mark added now stays on this device only — the log records a mark only on the captured event…" |
+
+The fourth branch exists for a case the finding did not name and a naïve fix
+would have got wrong: **clearing** a mark after Keep cannot retract the
+`uncertaintyMark` already on the captured event, so the screen must not claim the
+log is now free of one. `test/capture-flow.test.ts` asserts that asymmetry
+directly.
+
+**Guards added.** `test/capture-flow.test.ts` gains the case the finding asked
+for — a capture with `uncertainty: null` followed by `markUncertainty` leaves no
+`uncertaintyMark` in `readAll()` — plus five cases that derive the sentence from
+a real store run, so the wording cannot drift from the behaviour. A scan in
+`test/screen-contract.test.ts` fails if either screen states the claim as a
+literal again. Screenshot `27-capture-mark-after-keep.png` photographs the
+corrected path.
+
+**Deferred item widened.** `WP05-D2` said only that the *dimension* was missing,
+which understated the loss. It now records that a post-capture mark reaches the
+log in no form at all, and that clearing one cannot retract it. See the corrected
+row below.
+
+### Corrected predicate rows (supersede the rows in the WP-05 appendix above)
+
+| Predicate | Earlier status | Corrected status | Evidence |
+| --- | --- | --- | --- |
+| Accessibility: labels, ≥44 pt targets, AA contrast | met | **met** — but the ruby half of it was *unverified* when first claimed, and was false on the web target | `accessibility-audit.json` (8/8 measured on the export); `test/ruby-accessibility.test.ts`; `test/touch-targets.test.ts`; `test/theme-contrast.test.ts` |
+| Japanese typography: ruby, ink-and-paper, one vermilion accent | met | met (unchanged visually — shots 11/12 byte-identical) | `src/ui/ruby.tsx`, `test/furigana.test.ts` |
+| No screen makes a claim it cannot support (REQ-GATE-03) | implied by "Honesty boundaries held" | **was not met** on the mark-after-Keep path; now met and guarded | `test/capture-flow.test.ts`, `test/screen-contract.test.ts`, shot 27 |
+| Screenshot evidence under `docs/build-evidence/` | met (26 shots) | met — **27 shots plus a measured accessibility audit** | `screenshots-wp05/` + `README.md` + `index.json` + `accessibility-audit.json` |
+
+### Corrected deferred row (supersedes the `WP05-D2` row above)
+
+| Id | Item | Owner | Closes with |
+| --- | --- | --- | --- |
+| WP05-D2 | A mark made **before** Keep loses only its dimension; a mark made **after** Keep reaches the event log in no form at all, and clearing one cannot retract the `uncertaintyMark` already on the captured event | CON → ADR-002 decision | An ADR-002 decision covering both halves: an amendment widening `uncertaintyMark`, and an amendment giving a post-capture mark an event family — or an explicit ruling that a mark is a capture-time-only fact and everything after it stays app-local |
+
+Coordination request 1 in the WP-05 appendix above should be read with this wider
+scope: the tension is not only "the dimension is not in the log", it is
+"REQ-UI-01 requires the mark to remain editable and the v1 schema cannot record
+an edit". Still **P1**, still a ruling rather than an app edit.
+
+### Commands run (verbatim results)
+
+| Command | Result |
+| --- | --- |
+| `sha256sum` on the four spec files | 4/4 match the integrity record |
+| `npm ci` | clean install in a fresh worktree |
+| `npm run lint` | clean, exit 0 |
+| `npm run format:check` | "All matched files use Prettier code style!" |
+| `npm run typecheck` | clean across root + all 6 workspaces |
+| `npm run test` | **31 files, 529 tests, all passed** (was 30/515; +1 file, +14 tests) |
+| `npm run test:replay` | 2 files, 43 tests passed |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` — 5 static routes |
+| `node apps/app/scripts/capture-evidence.mjs` | **27/27 screenshots, 8/8 accessibility checks**, exit 0 |
+| same harness against the **pre-repair** build | 27/27 screenshots, **1/8** accessibility checks — the defect reproduced |
+| `npx vitest run apps/app/test/ruby-accessibility.test.ts` against pre-repair source | **5 of 6 fail** — the guard has teeth |
+
+### Surfaces touched
+
+`apps/app/src/ui/{ruby.tsx,furigana.ts}`,
+`apps/app/src/state/{store.ts,deferred.ts}`,
+`apps/app/src/screens/{capture-screen.tsx,word-screen.tsx}`,
+`apps/app/scripts/capture-evidence.mjs`,
+`apps/app/test/{ruby-accessibility.test.ts (new),capture-flow.test.ts,deferred.test.ts,screen-contract.test.ts}`,
+`docs/build-evidence/screenshots-wp05/` (13 re-captured PNGs, 1 new PNG,
+`README.md`, `index.json`, new `accessibility-audit.json`), and this appendix.
+
+**No frozen doc touched.** No `docs/specs/`, `docs/convergence/`,
+`docs/handoffs/`, `docs/adr/`. No other package, no other lane's surface, no CI,
+no `eslint.config.mjs`, no dependency added or changed (`package.json` and
+`package-lock.json` are untouched this round). Nothing pushed to `main` or to the
+integration branch.
+
+### Secrets check (controller §15)
+
+Changed files scanned for `api[_-]?key|secret|bearer|password|passwd|token`:
+matches are the pre-existing "design token" / "change token" prose only. The new
+`accessibility-audit.json` contains seed vocabulary and Chrome-computed roles; no
+host, no credential, no path outside the repo.
+
+### Next safe command
+
+- V5 re-verifies from a clean checkout of this branch:
+  `npm ci && npm run lint && npm run format:check && npm run typecheck && npm run test`,
+  then `(cd apps/app && npx expo export --platform web)` and
+  `node apps/app/scripts/capture-evidence.mjs` (needs Chromium; set `CHROME_PATH`
+  if no Playwright cache is present) — the run must report **8/8 accessibility
+  checks**, not merely "screenshots written".
+- To falsify the audit rather than trust it:
+  `git show ef689ba:apps/app/src/ui/ruby.tsx > apps/app/src/ui/ruby.tsx`,
+  re-export, re-run the harness, and confirm it drops to 1/8 and prints the
+  interleaved node list. Restore with `git checkout apps/app/src/ui/ruby.tsx`.
+- `git diff --stat 755c090` to confirm no surface outside `apps/app/` and
+  `docs/build-evidence/screenshots-wp05/` (plus this capsule section) was touched.

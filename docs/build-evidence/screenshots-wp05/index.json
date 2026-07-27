@@ -202,6 +202,14 @@
       "state": "ready (dark scheme)",
       "ok": true,
       "fullPageHeight": 3478
+    },
+    {
+      "file": "27-capture-mark-after-keep.png",
+      "screen": "capture",
+      "state": "ready (mark applied after Keep)",
+      "note": "The path that used to render a false sentence: kept with no mark, then marked. The acknowledgment lists the two events, and the note under the chips now says the mark is on this device only and not in the log.",
+      "ok": true,
+      "fullPageHeight": 1259
     }
   ]
 }

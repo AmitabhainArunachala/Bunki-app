@@ -1,12 +1,14 @@
 # WP-05 screenshot evidence — screens 1–3 on Expo Web
 
-Builder B6 · branch `agent/bunki-phase0-closed-loop-wp05` · captured 2026-07-27
+Builder B6 · branch `agent/bunki-phase0-closed-loop-wp05` · captured 2026-07-27,
+re-captured 2026-07-27 after the V5 repair round
 
 Controller §19 WP-05 requires "screenshot evidence saved under
 `docs/build-evidence/`", and REQ-UI-09 requires every screen to define loading,
-error, empty and offline states. This directory is both: 26 captures covering
+error, empty and offline states. This directory is both: 27 captures covering
 the three screens in every one of those states, plus the ready state in both
-colour schemes.
+colour schemes — and, since the repair round, `accessibility-audit.json`, which
+is what a screenshot cannot be.
 
 ## What these images are
 
@@ -45,9 +47,10 @@ npm install
 node apps/app/scripts/capture-evidence.mjs
 ```
 
-The harness exits non-zero if any shot fails, so "no evidence produced" cannot
-pass as success. `index.json` beside these files is written by the same run and
-records the per-shot outcome and captured page height. Chromium is found at
+The harness exits non-zero if any shot **or any accessibility check** fails, so
+"no evidence produced" cannot pass as success. `index.json` beside these files is
+written by the same run and records the per-shot outcome and captured page
+height; `accessibility-audit.json` records the audit below. Chromium is found at
 `$CHROME_PATH` or a Playwright browser directory.
 
 Two flags exist purely so two of the four required states can be photographed
@@ -87,6 +90,34 @@ frame and can never fail on its own.
 | `24-kanji-empty.png` | kanji | empty — character not in the seed | |
 | `25-kanji-offline.png` | kanji | offline | |
 | `26-kanji-dark.png` | kanji | ready — dark scheme | |
+| `27-capture-mark-after-keep.png` | capture | ready — mark applied *after* Keep | The path the screens used to describe wrongly. Kept with no mark, then marked: the acknowledgment lists `EncounterCaptured, ThreadPromotionChanged` and the note under the chips now says the mark is on this device only and is **not** in the event log. |
+
+## Accessibility audit — `accessibility-audit.json`
+
+A screenshot cannot photograph an accessibility tree, and that is precisely how
+`ruby.tsx` came to claim the furigana pieces were hidden while every one of them
+was exposed to a screen reader. The same harness therefore ends with an audit
+pass: it asks Chrome for the accessibility subtree under a rendered `RubyText`
+(`Accessibility.queryAXTree`) and asserts what an assistive technology would
+actually find — one exposed named node, whose name is the whole word and its
+reading, with no written form, reading or placeholder exposed on its own.
+
+Roles and names in that file are **Chrome's own computation**, not the app's
+props, which is the point: a prop the web target silently drops shows up here as
+an exposed node rather than as a passing test.
+
+Measured on the same bundle these screenshots come from:
+
+| Subject | Exposed named nodes | The name |
+| --- | --- | --- |
+| `RubyText` on `/word/lex-wakareru` (分かれる, split わ + かれる) | 1 | `分かれる（わかれる）` |
+| `RubyText` on `/word/lex-bunki` (分岐, one segment) | 1 | `分岐（ぶんき）` |
+
+The audit was falsified before it was trusted: re-run against the pre-repair
+build it fails 7 of its 8 checks and reports the exposed nodes
+`分かれる（わかれる） | わ | 分 | 　 | かれる` — the interleaving as reported.
+
+A failed check fails the run, so this cannot pass by producing nothing.
 
 ## Four-state coverage per screen (REQ-UI-09)
 
@@ -116,4 +147,5 @@ unreadable stroke file still renders its meanings, readings and compounds
 | REQ-UI-08 ink-and-paper palette, one vermilion accent, ruby | every shot |
 | REQ-UI-08/09 AA contrast in both schemes | 10, 18, 26 (+ the contrast test) |
 | REQ-UI-09 four states per screen | table above |
-| P0-CAP-15 durability stated honestly | 03–06, 13 |
+| REQ-UI-09 one spoken label per ruby word, pieces not exposed | `accessibility-audit.json` (measured, not photographed) |
+| P0-CAP-15 durability stated honestly | 03–06, 13, 27 |
