@@ -3,7 +3,7 @@ title: "Bunki — Git Publication and Integrity Manifest"
 date: 2026-07-27
 project: bunki
 artifact_type: publication_manifest
-status: awaiting_repository_target_and_one_frozen_input
+status: published_in_draft_pr_missing_one_frozen_input
 ---
 
 # Bunki Git artifact manifest
@@ -28,7 +28,28 @@ and the resulting branch/commit is reported.
 |---|---|---|
 | `docs/handoffs/BUNKI_CLAUDE_FRESH_CONTEXT_BUILD_SPEC_HANDOFF_2026-07-27.md` | `c002f6c4d8c007d0acdac1a66b7295d287f98d206f610c3131d73218dc19909c` | present and verified |
 
-## Intended publication protocol
+## Publication receipt
+
+- Repository: `AmitabhainArunachala/Bunki-app`
+- Visibility: private
+- Base branch: `main`
+- Publication branch:
+  `agent/bunki-convergence-handoff-2026-07-27`
+- Draft PR: `#1`
+- License: deliberately undecided
+- All five available artifact blobs were fetched from GitHub as base64, decoded
+  to raw bytes, and SHA-256 verified against this manifest.
+
+The first Codex-v1 upload was incomplete because its terminal transfer clipped
+the final 150 Unicode characters. That noncanonical blob hashed to
+`ba5ab3725d754198631dbdeea3ae4a3a4e17f2867ed409e048e3d63577059932`.
+Correction commit `8dfa24b2814dfce85c599c122c59f2a868f220bb`
+replaced it with the complete 80,253-byte frozen artifact. The corrected Git
+blob is `59e97dd4664a087887498d42c5770ebbca1e1740`, and its raw SHA-256 is the
+declared
+`94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b`.
+
+## Publication protocol
 
 1. Resolve the repository containing revision `8404395`, or receive an explicit
    operator choice of a different repository.
@@ -42,15 +63,12 @@ and the resulting branch/commit is reported.
 8. Report repository, branch, commit SHA, tree state, and draft-PR URL.
 9. Do not merge or approve the PR.
 
-## Current publication gates
+## Remaining integrity gate
 
-- This workspace is not a usable Git checkout.
-- No accessible GitHub repository named for Bunki or this Japanese-learning
-  project was found in the connected account.
-- The repository containing revision `8404395` has not been identified.
-- Claude's exact frozen v1 is not present locally.
-
-The smallest safe operator action is to identify the repository that contains
-revision `8404395`. If it is not on the connected GitHub account, provide the
-repository URL or attach the exact frozen file. If a new repository is desired,
-choose its owner, name, visibility, and license explicitly.
+Claude's exact frozen v1 is not present in this repository or the Codex
+workspace. The next Claude context must recover
+`BUNKI_WORKING_SPEC_2026-07-27.md` from the prior environment or Git object
+history at revision `8404395`, verify SHA-256
+`77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68`,
+and publish those exact bytes. It must not reconstruct the file from Round-1
+summaries.
