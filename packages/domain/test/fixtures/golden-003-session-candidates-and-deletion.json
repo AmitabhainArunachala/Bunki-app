@@ -1,0 +1,203 @@
+{
+  "name": "golden-003-session-candidates-and-deletion",
+  "description": "A bounded session that reaches an explicit completion state, an AI candidate attached and then accepted by an explicit user action, an export, and the full deletion path — tombstone first (sync-safe), then the purge that cites it. Includes a byte-identical re-append of the capture event, which replay must treat as a no-op: a double-tapped capture produces exactly one thread.",
+  "anchors": ["T-03", "REQ-DM-04", "T-12", "T-13", "controller §7", "controller §9", "ADR-002"],
+  "events": [
+    {
+      "eventId": "evt-0201",
+      "v": 1,
+      "occurredAt": "2026-07-27T21:00:00.000Z",
+      "idempotencyKey": "capture:thread-0201",
+      "type": "EncounterCaptured",
+      "encounterId": "encounter-0201",
+      "threadId": "thread-0201",
+      "text": "しめ縄の由来を調べた。",
+      "sourceRef": {
+        "sourceId": "source-web-0031",
+        "kind": "text",
+        "locator": "https://example.invalid/shimenawa"
+      },
+      "provenance": {
+        "source": "user_encounter",
+        "license": "user_owned",
+        "modificationStatus": "unmodified",
+        "reviewStatus": "unreviewed"
+      }
+    },
+    {
+      "eventId": "evt-0201",
+      "v": 1,
+      "occurredAt": "2026-07-27T21:00:00.000Z",
+      "idempotencyKey": "capture:thread-0201",
+      "type": "EncounterCaptured",
+      "encounterId": "encounter-0201",
+      "threadId": "thread-0201",
+      "text": "しめ縄の由来を調べた。",
+      "sourceRef": {
+        "sourceId": "source-web-0031",
+        "kind": "text",
+        "locator": "https://example.invalid/shimenawa"
+      },
+      "provenance": {
+        "source": "user_encounter",
+        "license": "user_owned",
+        "modificationStatus": "unmodified",
+        "reviewStatus": "unreviewed"
+      }
+    },
+    {
+      "eventId": "evt-0202",
+      "v": 1,
+      "occurredAt": "2026-07-27T21:00:12.000Z",
+      "idempotencyKey": "candidate:attach:candidate-0201",
+      "type": "CandidateAttached",
+      "threadId": "thread-0201",
+      "candidateId": "candidate-0201",
+      "envelope": {
+        "taskClass": "T2",
+        "inputHash": "sha256:9f1c6a2be3d4f5a60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e",
+        "promptFamilyId": "pf-gloss",
+        "promptVersion": "1.2.0",
+        "model": "offline-fallback",
+        "provider": "scripted-fixture",
+        "createdAt": "2026-07-27T21:00:11.500Z",
+        "checks": {
+          "targetFormPresent": true,
+          "isLabeled": true
+        }
+      },
+      "status": "generated"
+    },
+    {
+      "eventId": "evt-0203",
+      "v": 1,
+      "occurredAt": "2026-07-27T21:00:48.000Z",
+      "idempotencyKey": "candidate:accept:candidate-0201",
+      "type": "CandidateAcceptedAsNote",
+      "candidateId": "candidate-0201",
+      "userAction": true
+    },
+    {
+      "eventId": "evt-0204",
+      "v": 1,
+      "occurredAt": "2026-07-27T21:01:00.000Z",
+      "idempotencyKey": "promote:thread-0201:keep",
+      "type": "ThreadPromotionChanged",
+      "threadId": "thread-0201",
+      "from": "captured",
+      "to": "keep",
+      "origin": "user"
+    },
+    {
+      "eventId": "evt-0205",
+      "v": 1,
+      "occurredAt": "2026-07-28T06:30:00.000Z",
+      "idempotencyKey": "session:2026-07-28:open",
+      "type": "SessionStarted",
+      "sessionId": "session-0201",
+      "budget": {
+        "timeBudgetMin": 12,
+        "newBudget": 1
+      }
+    },
+    {
+      "eventId": "evt-0206",
+      "v": 1,
+      "occurredAt": "2026-07-28T06:41:20.000Z",
+      "idempotencyKey": "session:2026-07-28:close",
+      "type": "SessionClosed",
+      "sessionId": "session-0201",
+      "completionState": "budget_exhausted"
+    },
+    {
+      "eventId": "evt-0207",
+      "v": 1,
+      "occurredAt": "2026-07-28T06:42:00.000Z",
+      "idempotencyKey": "export:2026-07-28:1",
+      "type": "DataExported",
+      "exportVersion": "1",
+      "scope": {
+        "kind": "threads",
+        "threadIds": ["thread-0201"]
+      },
+      "producedAt": "2026-07-28T06:41:59.250Z"
+    },
+    {
+      "eventId": "evt-0208",
+      "v": 1,
+      "occurredAt": "2026-07-29T11:15:00.000Z",
+      "idempotencyKey": "tombstone:thread-0201",
+      "type": "ThreadTombstoned",
+      "threadId": "thread-0201",
+      "reason": "mistaken_capture"
+    },
+    {
+      "eventId": "evt-0209",
+      "v": 1,
+      "occurredAt": "2026-07-29T11:15:04.000Z",
+      "idempotencyKey": "purge:thread-0201",
+      "type": "ContentPurged",
+      "targetIds": ["thread-0201", "encounter-0201"],
+      "tombstoneEventId": "evt-0208"
+    }
+  ],
+  "expectedState": {
+    "schemaVersion": 1,
+    "appliedEventCount": 9,
+    "skippedDuplicateCount": 1,
+    "lastEventId": "evt-0209",
+    "lastOccurredAt": "2026-07-29T11:15:04.000Z",
+    "threads": [
+      {
+        "threadId": "thread-0201",
+        "promotion": "keep",
+        "promotionHistory": [
+          {
+            "eventId": "evt-0204",
+            "at": "2026-07-27T21:01:00.000Z",
+            "from": "captured",
+            "to": "keep",
+            "origin": "user"
+          }
+        ],
+        "encounterIds": ["encounter-0201"],
+        "candidateIds": ["candidate-0201"],
+        "acceptedCandidateIds": ["candidate-0201"],
+        "lifecycle": "purged",
+        "tombstoneEventId": "evt-0208",
+        "createdAt": "2026-07-27T21:00:00.000Z",
+        "lastEventAt": "2026-07-29T11:15:04.000Z"
+      }
+    ],
+    "contracts": [],
+    "observations": [],
+    "sessions": [
+      {
+        "sessionId": "session-0201",
+        "status": "closed",
+        "timeBudgetMin": 12,
+        "newBudget": 1,
+        "completionState": "budget_exhausted",
+        "startedAt": "2026-07-28T06:30:00.000Z",
+        "closedAt": "2026-07-28T06:41:20.000Z"
+      }
+    ],
+    "exports": [
+      {
+        "eventId": "evt-0207",
+        "exportVersion": "1",
+        "scopeKind": "threads",
+        "threadIds": ["thread-0201"],
+        "at": "2026-07-28T06:42:00.000Z"
+      }
+    ],
+    "purges": [
+      {
+        "eventId": "evt-0209",
+        "tombstoneEventId": "evt-0208",
+        "targetIds": ["thread-0201", "encounter-0201"],
+        "at": "2026-07-29T11:15:04.000Z"
+      }
+    ]
+  }
+}

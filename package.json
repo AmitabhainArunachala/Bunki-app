@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "test": "vitest run",
-    "test:replay": "node scripts/not-implemented.mjs test:replay WP-02",
+    "test:replay": "vitest run packages/domain/test/replay",
     "test:e2e": "node scripts/not-implemented.mjs test:e2e WP-10",
     "verify:export": "node scripts/not-implemented.mjs verify:export WP-03"
   },
