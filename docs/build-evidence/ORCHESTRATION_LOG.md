@@ -3,34 +3,31 @@
 ## Wave state
 | Wave | Status | Notes |
 |---|---|---|
-| W0 (WP-00) | CLOSED + MERGED | PR #4 merged by operator (main bbaf0b3) |
-| W1 (WP-01) | CLOSED — V1 PASS | PR #5 open (draft) |
-| W2 (WP-02 ∥ WP-04) | CLOSED — V2 PASS (round 2), V3 PASS (round 1) | wp02 @ 5a9051e, wp04 @ fdcfddd; integrated: 328 tests green; evidence VERIFY_WP02.md / VERIFY_WP04.md |
-| W3 (WP-03 ∥ WP-06 ∥ WP-05) | OPENING | B4 persistence/export, B5 contracts+FSRS (sole domain writer), B6 UI; V4/V2/V5 shadows |
-| W4+ | pending | |
+| W0-W2 | CLOSED + MERGED | PRs #4/#5/#6/#7 merged; main e02b8b2 |
+| W3 (WP-03 ∥ WP-06 ∥ WP-05) | CLOSED — V4 PASS r1, V2 PASS r1, V5 PASS r2 | wp03 @ 388996b, wp06 @ 209d113, wp05 @ 55a2fdd; integrated: 792 tests green, verify:export REAL and green; evidence VERIFY_WP03/05/06.md |
+| W4 (WP-07 ∥ WP-08 ∥ WP-09) | OPENING | B7 AI adapter, B8 session/canvas (sole domain writer: src/session/), B6 inspector screens; V6/V5 shadows |
+| W5+ | pending | |
 
-## Surface locks — W3
+## Surface locks — W4
 | Surface | Owner |
 |---|---|
-| packages/persistence/, packages/export/ | B4 (WP-03) |
-| packages/domain/ | B5 (WP-06) — sole domain writer |
-| apps/app/ | B6 (WP-05) |
-| packages/seed/ | LOCKED (read-only consumer access) |
+| packages/ai/ + apps/app candidate-UI slice (src/screens/candidate*) | B7 (WP-07) |
+| packages/domain/src/session/ + apps/app session/canvas screens (src/screens/session*, src/screens/canvas*) | B8 (WP-08) |
+| apps/app inspector/evidence screens (src/screens/inspector*, src/screens/evidence*) + packages/export UI hooks | B6 (WP-09) |
+| shared apps/app files (app/_layout etc.) | B6 owns; B7/B8 file coordination requests |
 | docs/build-evidence/ | CON |
+| everything else | LOCKED |
 
-## Coordination-request dispositions (from W2)
-1. Contract→thread link (WP06_CONTRACT_THREAD_LINK_OPEN_QUESTION): RESOLVED by CON — WP-06 builds a target→thread projection from EncounterCaptured events; NO ADR-002 schema change. If projection proves impossible, escalate before inventing an event.
-2. DataExported extra-field note: WP-03 owns export semantics; any new field = explicit ADR-002 amendment path, never silent.
-3. eslint Node-globals glob (packages/*/scripts) + ambient-globals rule migration: stays in WP-10 sweep batch.
-4. @types/node@26.1.1 (MIT, type-only) added by WP-02/WP-04 beyond WP-00 register: recorded; re-verify at WP-10 license pass.
+## W3 notable events
+- WP-03's own tests caught purged bytes surviving in the batch-idempotency table and SQLite WAL/free pages — fixed (digest storage; secure_delete + wal_checkpoint + VACUUM).
+- WP-05 round-1 P1s: ruby pieces exposed to screen readers (double reading); a false UI claim about the event log for post-Keep uncertainty marks. Both repaired; V5 round 2 PASS.
+- CON process defect (recorded honestly): the wp05 capsule merge-resolution script failed and a commit with conflict markers reached the integration branch (906c876..eed3068); repaired at 6654603. Root cause: unverified chained shell commands; mitigation: marker-grep now precedes every capsule commit.
 
-## OPERATOR ACTION REQUESTED (blocks licensed seed content only, not the build)
-Egress proxy denies (403 CONNECT, org policy): www.edrdg.org, ftp.edrdg.org, tatoeba.org, downloads.tatoeba.org, creativecommons.org.
-Consequence: seed ships with REAL KanjiVG stroke data (fetched + verbatim CC BY-SA 3.0 attribution) but lexical entries are project-authored (labeled unreviewed, UI disclosure string exported) and sentences are original compositions — no EDRDG/Tatoeba content could be licensed-verified without fabricating attribution.
-Smallest action: allow those domains in the environment's network policy, then re-run the WP-04 source pass (touches only the provenance registry + per-field source ids).
+## Carried P2 batch (WP-10 sweep unless noted)
+W1 items 1-11; W2 items; W3 additions: hand-rolled SHA-256 lone-surrogate divergence note (persistence), README wording, @bunki/persistence↔@bunki/export circular devDependency, GateDecision.forcedByReveal doc wording, retrieval-contract comment wording, seams-scan narrowing note, screenshots index metadata mismatches, "nelson" token on kanji page (REQ-UI-03 index-name leak — B6 fixes in W4 while owning those screens), stale comment references, V5-round-1 report filing gap (now filed).
 
-## Carried P2 batch
-W1 items 1-11 (unchanged) + W2: capsule field-count wording (WP-02), package-lock touch notes (accepted), SEED sources deferral D-1/D-2/D-3 (operator gate above).
-
-## Merge queue
-PR #5 (WP-01) open; wp02 + wp04 PRs opening now. Integration branch carries all, tests green.
+## Operator gates open
+- Egress allowlist for EDRDG/Tatoeba (seed upgrade)
+- WP-11 native device checkpoint (W6)
+- Codex 5.6 verification pass (W7)
+- Operator trial (W8)

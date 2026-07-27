@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
+  "_comment": "WP-03. `types: [\"node\"]` because this package is the one that is allowed platform access: src/sqlite/node-driver.ts imports node:sqlite (the ci-substitute driver) and the tests read the database file to prove the purge removed bytes. The domain kernel's opposite setting (`types: []`) is the boundary this one sits outside of, deliberately and in one direction only \u2014 nothing here is imported by @bunki/domain.",
+  "compilerOptions": {
+    "types": ["node"]
+  },
   "include": ["src", "test"]
 }
