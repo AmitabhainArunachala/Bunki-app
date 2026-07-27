@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Provenance source registry (REQ-SRC-01, controller §8).",
+    "Every data-bearing field in every seed record names one of these sources by",
+    "id, and the loader materialises the full record onto the field, so what a",
+    "consumer sees is a fully-resolved ProvenanceRecord per field — not a pointer.",
+    "The registry exists because the alternative, copying an identical 11-key",
+    "object next to ~200 fields by hand, drifts. Drifted provenance is worse than",
+    "no provenance: it is provenance that lies.",
+    "A field may override only confidence, review_status, source_entry_id and",
+    "notes. source, source_version, license, attribution and modification_status",
+    "are NOT overridable, so no field can quietly relicense itself.",
+    "test/provenance.test.ts enforces both halves of that."
+  ],
+  "sources": {
+    "kanjivg-verbatim": {
+      "source": "KanjiVG",
+      "source_version": "git 61e39cfc29724132a6f8823b166296932985a0ff (kanjivg upstream, HEAD on 2026-07-27)",
+      "license": "CC BY-SA 3.0",
+      "attribution": "KanjiVG is copyright Ulrich Apel and released under the Creative Commons Attribution-Share Alike 3.0 licence: http://creativecommons.org/licenses/by-sa/3.0/ — see https://kanjivg.tagaini.net and packages/seed/licenses/KanjiVG-COPYING.txt",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "source_url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/",
+      "retrieved_at": "2026-07-27",
+      "source_entry_id": null,
+      "notes": "Byte-identical copies of the upstream SVG files, including their in-file copyright header. Per-file URL and sha256 are in data/strokes.json; test/strokes.test.ts re-checks the digests offline and scripts/fetch-kanjivg.mjs --check re-checks them against upstream."
+    },
+    "kanjivg-derived": {
+      "source": "KanjiVG",
+      "source_version": "git 61e39cfc29724132a6f8823b166296932985a0ff (kanjivg upstream, HEAD on 2026-07-27)",
+      "license": "CC BY-SA 3.0",
+      "attribution": "Derived from KanjiVG, copyright Ulrich Apel, licensed CC BY-SA 3.0: http://creativecommons.org/licenses/by-sa/3.0/ — see https://kanjivg.tagaini.net and packages/seed/licenses/KanjiVG-COPYING.txt",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "source_url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/",
+      "retrieved_at": "2026-07-27",
+      "source_entry_id": null,
+      "notes": "Stroke counts and component/radical decompositions read out of the committed KanjiVG SVGs (kvg:element, kvg:radical, kvg:*-sN path ids). Share-alike analysis of a CC BY-SA 3.0 work; test/strokes.test.ts re-derives every value from the SVG bytes, so these fields cannot drift away from their source."
+    },
+    "bunki-editorial": {
+      "source": "Bunki Phase-0 seed (hand-assembled by this project)",
+      "source_version": "1.0.0",
+      "license": "pending operator decision (OD-09) — original work of this project, no third-party licence attaches",
+      "attribution": "Bunki Phase-0 seed dataset",
+      "modification_status": "original",
+      "confidence": "medium",
+      "review_status": "unreviewed",
+      "source_url": null,
+      "retrieved_at": null,
+      "source_entry_id": null,
+      "notes": "Lexicographic claims (readings, senses, parts of speech, kanji meanings) written from the builder's own knowledge of Japanese. They are DELIBERATELY NOT labelled as JMdict or KANJIDIC2 content: EDRDG's hosts were unreachable from this build session (see LICENSES.md, deferred item D-1), so no entry sequence number could be recorded and no dictionary cross-check could be run. Reading and sense lists are representative, not exhaustive. confidence=medium and review_status=unreviewed are the honest labels until a primary-source pass runs."
+    },
+    "bunki-authored-text": {
+      "source": "Bunki Phase-0 seed (original text written for this project)",
+      "source_version": "1.0.0",
+      "license": "pending operator decision (OD-09) — original work of this project, no third-party licence attaches",
+      "attribution": "Bunki Phase-0 seed dataset — original text",
+      "modification_status": "original",
+      "confidence": "high",
+      "review_status": "reviewed-in-project",
+      "source_url": null,
+      "retrieved_at": "2026-07-27",
+      "source_entry_id": null,
+      "notes": "Japanese sentences, the integration passage, and grammar explanations composed for this project. Not sourced from Tatoeba or any corpus: Tatoeba's hosts were unreachable from this build session (LICENSES.md, deferred item D-2), and inventing sentence ids or contributor names would have been fabrication. These are original compositions and carry no third-party attribution obligation."
+    },
+    "bunki-selection": {
+      "source": "Bunki Phase-0 seed (selection decision by this project)",
+      "source_version": "1.0.0",
+      "license": "pending operator decision (OD-09) — original work of this project, no third-party licence attaches",
+      "attribution": "Bunki Phase-0 seed dataset",
+      "modification_status": "original",
+      "confidence": "high",
+      "review_status": "reviewed-in-project",
+      "source_url": null,
+      "retrieved_at": null,
+      "source_entry_id": null,
+      "notes": "Fields that record a choice rather than a claim: which kanji and headwords the seed covers, which construction a sentence illustrates, which records the integration passage is wired to. The glyphs themselves are Unicode characters, not licensed assets; nothing here asserts anything a dictionary could contradict."
+    },
+    "bunki-computed": {
+      "source": "Bunki Phase-0 seed (mechanically computed)",
+      "source_version": "1.0.0",
+      "license": "pending operator decision (OD-09) — original work of this project, no third-party licence attaches",
+      "attribution": "Bunki Phase-0 seed dataset",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "reviewed-in-project",
+      "source_url": null,
+      "retrieved_at": null,
+      "source_entry_id": null,
+      "notes": "Values a machine derives from the field's own subject — a Unicode code point from its character, the kanji used by a headword from the headword string. The test suite recomputes each one and fails on any mismatch, so these are the only seed fields that are self-verifying."
+    }
+  }
+}
