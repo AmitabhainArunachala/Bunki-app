@@ -1,0 +1,57 @@
+# Bunki CI (WP-01, controller §17.5).
+#
+# Runs the four checks that are genuinely implemented at WP-01 on every PR.
+# WP-10 extends this to the full §17.5 set (test:replay, verify:export,
+# test:e2e incl. the axe scan, and the expo web build proof) once those suites
+# actually exist — see docs/build-evidence/TEST_PLAN.md.
+#
+# Deliberately absent: the three placeholder scripts. They exit 0 by design, so
+# running them here would paint CI green for work nobody has done yet.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: lint / format / typecheck / test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # `npm ci` (not `npm install`) so the exact pinned versions from
+      # package-lock.json are what CI verifies. Controller §14 pins every
+      # dependency exactly; a CI run that silently resolved a different
+      # version would be checking a different project.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (includes controller §5 boundary rules)
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
