@@ -23,3 +23,6 @@ b0a6811d8e8fda6c2d5f1c7c1743cdb2355eae58b58e834787b79629e378fce7  docs/specs/BUN
 
 # Orchestration layer (added 2026-07-27, same pass; sits above the controller, supremacy rule inside)
 4163184050f6797e9e1e766c68fed112b73eca4c85e29031d83635d212155a71  docs/specs/BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md
+
+# Acceptance layer (added 2026-07-27, same pass; additive to controller §21.1)
+92e575e14e5cd61556794e681c9804a0e156873ec60c9ae94eb936682c75155e  docs/specs/BUNKI_PHASE0_DEFINITION_OF_DONE_2026-07-27.md
