@@ -3,7 +3,8 @@ title: "Bunki — Frozen-Input Recovery Packet (Synthesis Stopped at Integrity G
 date: 2026-07-27
 artifact_type: integrity_recovery_packet
 project: bunki
-status: blocked_awaiting_operator_recovery
+status: resolved_all_frozen_inputs_verified
+resolution: see "Section 0 — Resolution" below; body preserved as issued
 author_agent: Claude (fresh context, specification-only pass)
 controller:
   file: docs/handoffs/BUNKI_CLAUDE_FRESH_CONTEXT_BUILD_SPEC_HANDOFF_2026-07-27.md
@@ -18,6 +19,38 @@ frozen_inputs_modified: none
 ---
 
 # Bunki frozen-input recovery packet — 2026-07-27
+
+## 0. Resolution (added after operator/Codex recovery — body below preserved as issued)
+
+Both failures were resolved on the input branch on 2026-07-27, and this
+session re-verified each from the refreshed remote ref:
+
+- **F1 resolved (recovery, not reconstruction).** The frozen
+  `BUNKI_WORKING_SPEC_2026-07-27.md` was located in
+  `AmitabhainArunachala/dharma_swarm` — the strongest candidate named in
+  Section 5 of this packet — at full revision
+  `8404395e9ab1a34ed3b29452d883046d3cfe5268` (abbreviated `8404395`), source
+  path `docs/plans/BUNKI_WORKING_SPEC_2026-07-27.md`, and published
+  byte-for-byte at `docs/convergence/BUNKI_WORKING_SPEC_2026-07-27.md`
+  (commits `dcebb0e`, `2155f0b`). Re-verified here: 22,790 bytes, blob
+  `02758392a71d067848631af7f5b30682949ff93a`, SHA-256
+  `77e52f3a93fd9ebb3cdd8c456250cb66779d87bc1582e53e0bd7e39da82feb68` —
+  exact declared hash. Hash continuity holds; no fallback or waiver was used.
+- **F2 resolved (publication repair).** The first Codex-v1 upload had its
+  final 150 Unicode characters clipped in terminal transfer, producing the
+  noncanonical `ba5ab372…` blob this packet reported. The operator directed
+  that `ba5ab372…` not be canonized; correction commit `8dfa24b` restored the
+  complete 80,253-byte artifact. Re-verified here: blob
+  `59e97dd4664a087887498d42c5770ebbca1e1740`, SHA-256
+  `94842a1c8bc423a84cbe6131a8c540c88b676d5f8e2143a107b02ec5b28da95b` —
+  exact declared hash.
+
+All five frozen inputs plus the updated manifest
+(`status: published_all_frozen_inputs_verified`) verify at input-branch head
+`2155f0bf4229bd0fe5b16638ce847f88000bc6fe`. The Section-2 stop condition is
+lifted; the specification-only synthesis pass proceeds.
+
+---
 
 This packet is issued under Section 2 of the fresh-context handoff controller,
 which requires: *"If it is unavailable, stop before synthesis and report the
