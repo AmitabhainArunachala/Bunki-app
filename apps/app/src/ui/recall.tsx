@@ -97,6 +97,17 @@ export function RecallMark({
     fragile ? ', fragile' : ''
   }`;
 
+  /*
+    A fragile mark is drawn as a *ring* with a gap in it, not as a filled disc
+    with a dashed edge. The first version did the latter and it was invisible at
+    map size: a 2 pt dashed border around a filled circle of the same value is a
+    circle. Fragility has to survive being 14 points wide with nothing beside it,
+    so it changes the shape — the fill is dropped, the edge is the mark, and the
+    dash is what makes it read as incomplete rather than merely smaller.
+  */
+  const fill = fragile || mark.shape === 'half' ? 'transparent' : color;
+  const borderWidth = fragile ? 3 : mark.shape === 'disc' ? 0 : 2;
+
   return (
     <View
       accessibilityLabel={spoken}
@@ -105,11 +116,11 @@ export function RecallMark({
       style={[
         styles.mark,
         {
-          backgroundColor: mark.shape === 'half' ? 'transparent' : color,
+          backgroundColor: fill,
           borderColor: fragile ? theme.color.fragileEdge : color,
           borderRadius: size / 2,
           borderStyle: fragile ? 'dashed' : 'solid',
-          borderWidth: mark.shape === 'disc' ? 0 : 2,
+          borderWidth,
           height: size,
           width: size,
         },
@@ -122,7 +133,7 @@ export function RecallMark({
         last step is distinguished by form. That is the same reason the whole
         memory channel has an `EDGE_PATTERNS` half.
       */}
-      {mark.shape === 'disc-ring' ? (
+      {mark.shape === 'disc-ring' && !fragile ? (
         <View
           style={[
             styles.innerRing,
@@ -130,7 +141,7 @@ export function RecallMark({
           ]}
         />
       ) : null}
-      {mark.shape === 'half' ? (
+      {mark.shape === 'half' && !fragile ? (
         <View style={[styles.half, { backgroundColor: color, borderBottomLeftRadius: size / 2 }]} />
       ) : null}
     </View>

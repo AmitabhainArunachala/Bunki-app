@@ -4674,3 +4674,187 @@ Same as the lane's: open a **draft** PR from
 `agent/bunki-phase0-closed-loop-wp10-export` into
 `agent/bunki-phase0-integration` and have a human review it. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, lane A1: the design system and visual language
+
+**Branch:** `agent/bunki-e-design`, from `origin/agent/bunki-campaign-e` (bc9ffe9,
+which is `main` cbb7f29 plus the campaign brief).
+**Surfaces:** `apps/app/src/theme/**`, `apps/app/src/ui/**`, the route
+`apps/app/app/style-guide.tsx`, four new test files, one new evidence script, one
+route added to the existing axe sweep, and this appendix. **No existing screen
+was modified.**
+
+### What this lane was for
+
+The operator opened the Phase-0 build and said it is a far cry from the vision.
+This lane is the visual foundation the surfaces will be built on: tokens, real
+Japanese type, a component vocabulary, motion primitives, and one page where all
+of it can be looked at.
+
+### The design decisions that are load-bearing, and why
+
+**Three channels, each carrying one thing.** REQ-UI-08 allows one vermilion
+accent and bans global-JLPT rainbow highlighting; REQ-UI-07 forbids collapsing
+the five capability contracts into one mastery light while still requiring
+strength, fragility, uncertainty and coverage to stay distinguishable. Those pull
+against each other only if you try to say everything with hue, so this palette
+says almost nothing with hue:
+
+- **hue** — the learner's own attention. Vermilion, and only vermilion: primary
+  action, focus ring, the frontier mark under a word on their edge.
+- **luminance** — recall strength. A five-step neutral ramp, so "node brightness
+  IS the number" is literal rather than decorative.
+- **form** — fragility and uncertainty. Dash patterns and mark shapes, no hue at
+  all, which is also what keeps WCAG 1.4.1 satisfied.
+
+**The faint end of the ramp is genuinely faint.** The operator asked for due
+items to _dim_. Two of the five steps therefore fall below 3:1, and rather than
+lift them (which deletes the effect) or ignore it (which is a false AA claim),
+`RECALL_BAND_MARKS` declares which steps may be drawn as a bare mark.
+`RecallMark` throws if given one of the other two; `theme-tokens.test.ts` scans
+every file to prove those two are named nowhere outside the meter; and
+`theme-contrast.test.ts` asserts the declaration _equals_ the arithmetic in both
+directions, so a step cannot be quietly demoted to dodge a threshold.
+
+**Real Japanese type, self-hosted, no CDN.** Shippori Mincho 400 — the face the
+frozen spec §8 names — plus Noto Sans JP 400/700, subset to a declared coverage
+contract (kana, CJK punctuation, Kangxi radicals, the jōyō set, and every
+character in the shipped seed) and carried as inline `@font-face` data URIs.
+Inline because this lane may not touch `metro.config.js`, `app.json`,
+`package.json` or the HTML shell, and because a data URI cannot 404:
+"self-hosted" becomes a property of the bundle rather than a promise about a
+server. Both families are SIL OFL 1.1; `src/theme/fonts/LICENSES.md` records the
+retrieved notices, their SHA-256 values, and the reserved-name check that says
+why the family names are unchanged.
+
+Phase 0's `theme.ts` said font binaries were not shippable because of size and
+because the repository licence is an open operator decision. Both objections are
+answered rather than overruled: the OFL exists to permit exactly this, and the
+subset is ~1.5 MB of woff2 with a ceiling asserted in `theme-fonts.test.ts`.
+
+**Mincho ships one weight.** Emphasis in a mincho setting comes from size and
+from ma; a bold mincho is the register of a supermarket flyer. The sans ships two
+because UI headings genuinely need one.
+
+**Motion has three roles and no fourth.** Draw, settle, light. No easing curve
+has a control point outside `[0,1]` — the no-overshoot rule stated as arithmetic
+and asserted rather than described — and no duration is reachable from being
+right about something. Reduced motion is a _duration of zero_ through one seam,
+`resolveDuration`, so the reduced path runs the same code as the full path;
+`theme-motion.test.ts` fails any file that starts an `Animated.timing` without
+consulting it.
+
+**Stroke drawing without `getTotalLength()`.** `stroke-order.tsx` used a discrete
+reveal because path measurement is not portable to `react-native-svg` on every
+platform. `src/ui/path-length.ts` computes the length from the path data by
+flattening, in arithmetic that runs identically in a browser, on a device and in
+the test runner, so `InkDraw` can animate `strokeDashoffset` everywhere. Arcs are
+measured as their chord and that is recorded rather than hidden; KanjiVG has none.
+
+**The density guard on reading surfaces.** Todaii's failure (frozen spec §10.4)
+is "when everything is highlighted nothing is". Past a third of a passage marked,
+`FrontierPassage` renders clean with one sentence saying why — every word still
+tappable. "Most of this is new" is better carried by the sentence than by forty
+underlines.
+
+### Two real defects the specimen route surfaced
+
+Adding `/style-guide` to the axe sweep in `adv-a11y-audit.spec.ts` failed
+immediately, in both schemes, with two **critical** violations. Both are fixed
+here and both are worth recording, because neither was findable before a page
+existed that rendered the whole vocabulary at once.
+
+1. **`aria-progressbar-name` — pre-existing, in a shared Phase-0 component.**
+   `react-native-web` renders `ActivityIndicator` as its own unnamed
+   `role="progressbar"`, so every `LoadingPanel` put _two_ progressbars in the
+   accessibility tree: one named, one anonymous. WCAG 4.1.2. It survived the
+   whole of Phase 0 because the axe sweep walks routes in their settled state and
+   no scanned route was ever mid-load. Fixed by hiding the spinner, which is
+   decoration — the panel already carries the label and the live region.
+
+2. **`aria-required-children` — introduced by this lane.** `LensRow` marked its
+   container `role="tablist"` while its chips are `role="button"`; ARIA requires a
+   tablist to contain tabs. Fixed by using `toolbar`, which is what the row
+   actually is. Renaming the chips was rejected: they are buttons everywhere else
+   in the app, and a `tab` that controls no `tabpanel` would be a second lie.
+
+The second is the more useful finding about method: a component vocabulary is
+testable in a way a set of screens is not, because every component can be put on
+one page and swept at once.
+
+### Evidence
+
+`docs/build-evidence/screenshots-e-design/` — `/style-guide` in both schemes,
+full page (1100×7100), captured by `apps/app/scripts/capture-style-guide.mjs`
+from the real `expo export --platform web` output in Chromium. The scheme comes
+from the app's own `?scheme=` flag, not from a filter. Each shot's README entry
+records the families read out of `document.fonts` **in the photographed page** —
+`Noto Sans JP 400, Noto Sans JP 700, Shippori Mincho 400` — which is evidence
+that the self-hosted faces registered, not merely that they were bundled.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                        |
+| ----------------------------------------------- | --------------------------------------------- |
+| `npm ci` (own worktree, no inherited modules)   | clean install, exit 0                         |
+| `npm run lint`                                  | pass, no output                               |
+| `npm run format:check`                          | pass — "All matched files use Prettier style" |
+| `npm run typecheck`                             | pass, root + 6 workspaces                     |
+| `npm run test`                                  | **1689 passed**, 90 files (was 1417, 86)      |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                            |
+| `npm run verify:export` (T-14)                  | 14 passed, 1 file                             |
+| `cd apps/app && npx expo export --platform web` | pass — 14 static routes (was 13)              |
+| `npm run test:e2e`                              | **38 passed**, 9 spec files, exit 0           |
+
+The two `✘` lines under the list reporter are the same pre-existing `test.fail()`
+expected failures the previous round recorded (`retries: 0`, so neither is a
+retried flake); both are counted in the 38 and neither was touched. The axe suite
+now sweeps ten routes rather than nine, in both schemes, with zero violations.
+
+### What this round does **not** claim
+
+- **That the vocabulary is proven by a renderer.** The repository still installs
+  no React Native test renderer, so the component tests are source scans plus
+  pure-data assertions. What proves the tree is the axe sweep and the screenshots,
+  over the exported bundle, in Chromium — one engine, on one platform.
+- **That native gets the self-hosted faces.** It does not, and
+  `font-face.native.ts` says so: registering a face on iOS/Android is a build-time
+  step needing files this lane does not own. Native falls back through the stack
+  to Hiragino Mincho / Noto Serif CJK, which are real mincho, so the register
+  survives; the bytes ship where they were actually needed.
+- **That vertical text is a feature.** `VerticalRun` is web-only and says so on
+  screen when it is not; vertical furigana is deliberately left undone rather
+  than done wrongly — ruby sits to the _right_ of the column in vertical setting,
+  which `RubyText`'s per-segment column cannot express.
+- **That the two sub-3:1 ramp steps are AA as bare marks.** They are not, which
+  is exactly why they may not be bare marks.
+
+### What a verifier should try to break
+
+1. Add a hex literal to any component under `src/ui/` and confirm
+   `theme-tokens.test.ts` goes red — then put the same literal in a comment and
+   confirm it does not, because a rule that cannot be explained in its own file
+   gets deleted rather than fixed.
+2. Change `RECALL_BAND_MARKS.faint.standalone` to `true` without changing the
+   colour, and confirm `theme-contrast.test.ts` fails on the arithmetic rather
+   than passing on the declaration.
+3. Give an easing curve a `y` of `1.1` and confirm `theme-motion.test.ts` calls
+   it what it is.
+4. Delete `aria-hidden` from the `ActivityIndicator` in `screen-state.tsx`,
+   rebuild the export, and confirm the axe sweep goes red on `/style-guide`. That
+   defect must stay closed by a test, not by a memory.
+5. Add a character to `packages/seed` that is outside `coverage.mjs` and confirm
+   `theme-fonts.test.ts` names it, rather than the page quietly rendering it in a
+   fallback face.
+6. Set the OS to reduced motion, reload `/style-guide`, and confirm the strokes
+   are complete on the first frame and nothing moves.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-e-design` into `agent/bunki-campaign-e` and
+have a human review it. Nothing here is merged; no agent may merge, approve, or
+push to `main`. Wave B lanes adopt this vocabulary from `@/theme` and `@/ui/*`;
+`src/ui/theme.ts` re-exports every old name, so no existing screen has to change
+in order to keep working — and each picks up real mincho as it stands.

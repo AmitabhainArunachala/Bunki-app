@@ -49,7 +49,18 @@ import type { CDPSession, Page } from '@playwright/test';
 
 import { expect, test, openApp, hydrated, keepWord, visibleTestId } from './support/adv-harness.ts';
 
-/** Every route `expo export` produced, plus the two dynamic ones with real parameters. */
+/**
+ * Every route `expo export` produced, plus the two dynamic ones with real
+ * parameters.
+ *
+ * `/style-guide` is a development surface rather than a learner destination
+ * (`src/ui/navigation.ts`, `reach: 'specimen'`), and it is scanned anyway — in
+ * fact it is the route where a scan is worth the most. It renders every
+ * component in the vocabulary at once, in both schemes, so an accessibility
+ * defect in a *component* fails here before the surface lanes have built
+ * anything on it. A page that exists to be looked at is exactly the page that
+ * should have to pass.
+ */
 const ROUTES = [
   '/',
   '/word/lex-bunki',
@@ -60,6 +71,7 @@ const ROUTES = [
   '/repair',
   '/evidence',
   '/debug',
+  '/style-guide',
 ] as const;
 
 const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;

@@ -66,7 +66,22 @@ export function LoadingPanel({ label }: { readonly label: string }): ReactNode {
       ]}
       testID="state-loading"
     >
-      <ActivityIndicator color={theme.color.vermilion} />
+      {/*
+        Hidden from the accessibility tree, and this is not cosmetic.
+
+        `react-native-web` renders `ActivityIndicator` as its own
+        `role="progressbar"` element, with no name — so a loading panel put *two*
+        progressbars in the tree, one named and one anonymous, and the anonymous
+        one is an `aria-progressbar-name` violation (WCAG 4.1.2, critical). It
+        went unseen for the whole of Phase 0 because the axe sweep walks routes
+        in their settled state and no scanned route was ever mid-load; it
+        surfaced the moment the design specimen rendered the four states side by
+        side on a route the sweep visits.
+
+        The spinner is decoration: the panel around it already carries the label
+        and the live region.
+      */}
+      <ActivityIndicator aria-hidden color={theme.color.vermilion} />
       <Text
         style={[styles.panelBody, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
       >

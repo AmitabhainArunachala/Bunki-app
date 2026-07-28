@@ -59,7 +59,23 @@ export function LensRow({
 
   return (
     <View style={styles.wrapper} testID={testID}>
-      <View accessibilityRole="tablist" style={styles.row}>
+      {/*
+        `toolbar`, not `tablist`.
+
+        A lens row *looks* like tabs, and the first version said so. axe caught
+        it on the specimen route: ARIA requires a `tablist` to contain elements
+        with `role="tab"`, and `ChipButton` is a `button` — so the markup was
+        `aria-required-children`, critical, in both schemes. Renaming the chips'
+        role was not an option worth taking (they are buttons everywhere else in
+        the app, and a `tab` that controls no `tabpanel` is a second lie), so the
+        container takes the role that actually describes it: a toolbar, which is
+        a grouping of controls and permits button children.
+
+        react-native-web passes both names through verbatim — neither is in its
+        role map — so this is a real ARIA role either way, and getting it wrong
+        was a real defect rather than a dropped prop.
+      */}
+      <View accessibilityRole="toolbar" style={styles.row}>
         {shown.map((capability) => (
           <ChipButton
             key={capability.id}

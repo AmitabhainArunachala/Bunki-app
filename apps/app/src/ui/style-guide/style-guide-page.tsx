@@ -425,9 +425,24 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
           testID="specimen-motion"
           title="Motion"
         >
+          {/*
+            A bar per duration, one point per millisecond, so the ladder can be
+            compared by eye. A column of numbers with an empty gutter beside it
+            is a table of constants; the point of a specimen is that the reader
+            can see that `lightOut` really is twice `lightIn`.
+          */}
           {(Object.keys(DURATION) as (keyof typeof DURATION)[]).map((name) => (
             <SpecimenRow key={name} label={`${name} · ${DURATION[name]}ms`}>
-              <View />
+              <View
+                aria-hidden
+                style={{
+                  backgroundColor: theme.color.recall.settled,
+                  borderRadius: RADIUS.sm,
+                  height: 8,
+                  marginTop: SPACE.xs,
+                  width: Math.max(2, DURATION[name]),
+                }}
+              />
             </SpecimenRow>
           ))}
           {(Object.keys(EASING) as (keyof typeof EASING)[]).map((name) => (
