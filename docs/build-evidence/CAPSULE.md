@@ -7180,3 +7180,273 @@ suite.
   round: no Safari, no Firefox, no device, no screen reader. The screenshots and
   the e2e suite are one engine, and the "spoken label" improvement in P1-2 is
   asserted from the DOM, not heard.
+
+---
+
+## Appendix — Campaign E, lane B1: the map
+
+**Branch** `agent/bunki-e-map`, from `agent/bunki-e-integration` (`e22d069`).
+Owns `apps/app/app/map.tsx`, `apps/app/src/screens/map-screen.tsx`,
+`apps/app/src/ui/map/**`, `apps/app/scripts/capture-map.mjs`, and their tests.
+
+### Provenance of this lane's code, stated first because it changes how to read it
+
+An earlier run of this same lane had pushed three commits to `agent/bunki-e-map`
+from a **pre-integration base** (a merge of `agent/bunki-e-ground` and
+`agent/bunki-e-era` rather than the integration line). Those commits are the
+origin of most of the modules below. This round rebased them onto
+`agent/bunki-e-integration` and then **verified them by running them**, which was
+not a formality: the branch did not typecheck, one existing rule was red, and
+behind the red was a rendering defect no unit test had photographed. Three more
+were found the same way. Everything in the "defects found" section below was
+found in this round, on this branch.
+
+### What the map is
+
+Four stacked bands over the neighbourhood the domain returned:
+
+- **古道 / 街道 / 鉄道** — each painted in its own register from
+  `apps/app/src/theme/ground.ts`, as the layered stack `groundLayers()` returns:
+  opaque base, atmospheric wash, 胡粉/墨 mat. No shadow, no glow, no gradient.
+- **Era not known** — drawn on **no era ground at all**, on a plain card, because
+  it is not a road. Defaulting it onto one is the guessed era `graph/era.ts`
+  exists to refuse.
+
+街道 and 鉄道 render **empty**, and that is the finding rather than a gap. Lane
+A2′ measured that 9.8% of the 3,000-lexeme tier can be placed and every one of
+them lands on 古道; nothing in the tier dates a 漢語 word. Both empty registers
+are still painted, at reduced height, with the reason on screen — a layer that
+vanishes when it is empty is a list, not a layer.
+
+### The route, and the sentence it exists to make true
+
+A route here is a **named, ordered, finite sequence of learning targets drawn
+from data we hold**, and nothing else. The rule, in full:
+
+> the set of kanji KANJIDIC2 assigns to one 常用漢字 school grade, ordered by
+> KANJIDIC2's own newspaper-frequency rank ascending, unranked characters last in
+> codepoint order.
+
+Both fields are real KANJIDIC2 columns carried through the importer. Six routes
+exist (grades 1–6); grade 8 and 9–10 are excluded because "Grade 8" is not a
+school year and naming a route after one would be a small lie in the route's own
+name, which `ROUTE_EXCLUSION_NOTE` says on screen.
+
+**No place names.** Shipping a list of real Tōkaidō post stations and mapping
+memory onto them would assert a correspondence between a historical road and a
+learner's recall that nothing supports — the same defect class as a guessed era.
+The roads give the _shape_: finite, named, ordered, marked at intervals. That is
+the whole borrowing, and the 一里塚 marks a real interval of the real sequence
+(every tenth station, plus the last) rather than a fraction of a bar.
+
+Position is `Station N of M`, where N is **how many members have reached a stated
+band on one named capability lens** at this instant. It requires a lens argument
+and there is no overload without one; it can go **down**; and there is no
+percentage, no total across routes, and no field dividing N by M.
+
+### The dual-reading scrubber
+
+One signed axis with a detent at zero: negative replays the learner's own history
+from the event log, positive walks the language's three eras, zero is now with
+every layer shown. **Both readings are on screen at every position** —
+`ScrubberPosition.otherDirection` is rendered under the active label — so the
+duality is legible standing still rather than discoverable by pressing a mode
+button. The asymmetry is deliberate and honest: the history arm is as long as the
+learner's log and empty for a learner with none; the era arm has exactly three
+stops for everyone.
+
+### Brightness is a number that exists
+
+`markOf` reads exactly two values off the kernel's own `LensProjection` — R(t) at
+the queried instant and the current interval in days — through a single
+four-line `readProjection`, which is the only place in `apps/app` that names
+those fields. Nothing is computed there; both values come from the pinned
+reducer. The floor is the scheduler's own `FSRS_DESIRED_RETENTION`, not a
+designer's number.
+
+### Defects this round found and fixed
+
+Three by running the inherited work, four by driving a browser.
+
+1. **The branch did not typecheck.** `era-ground.tsx` passed a signal array to a
+   `(count: number)` callback, and called it _during render_. The whole emissive
+   path is gone rather than patched: `planEmissive` throws outside 鉄道, 鉄道 has
+   no members on this map, so the prop had two reachable behaviours — draw
+   nothing, or throw. The screen states in prose why no lamp is lit.
+2. **Every map node rendered a five-segment labelled meter.** `RecallIndicator`
+   is total over the ramp by _switching to_ `RecallMeter` for the two steps
+   `RECALL_BAND_MARKS` declares meter-only. On a fresh install every node is in
+   one of those two, so it was the common case, not an edge one.
+   `theme-tokens.test.ts` was already red about the cause. Fixed as a **type**:
+   `MapMark` is three lit steps typed `StandaloneRecallBand` plus
+   `nothing-observed` and `under-the-floor` drawn as _form_ — a dotted ring in
+   `uncertainEdge`, a dashed ring in `fragileEdge`, both already checked at 3:1
+   against all six era grounds by `theme-ground.test.ts`, both spoken in words.
+   A step naming a meter-only band no longer compiles. **No test was exempted.**
+3. **The strata silently dropped real edges.** Each band paints its own ground, so
+   a held edge between nodes on two different layers is drawn in no field at all.
+   Silently not drawing a held relation is the same defect class as drawing an
+   invented one. The count is computed and printed: the photographed view says
+   "2 of 23 connections here join nodes on two different layers".
+4. **39 nodes in one square** — the domain's 120-node default is right for a query
+   and wrong for a field. The query asks for 24; the domain reports the cut and
+   the screen renders every `Truncation` verbatim, so the smaller number hides
+   nothing.
+5. **Rings collided on a sparse band** — the per-depth phase was 0.37 rad, which
+   put a one-node ring 21° from the next. It is the golden angle now.
+6. **An empty era layer rendered no ground**, so 街道 and 鉄道 vanished exactly
+   where the honest finding is that they are empty.
+7. **`alignItems` on the ground field shrank the mount**, leaving the 胡粉/墨 mat
+   a narrow strip floating in a bare register.
+
+Two defects in this lane's own **instrumentation**, both found by reading its
+output rather than its code:
+
+- the per-lens read picked the first `map-node-lexeme:` element in the document,
+  which is whichever word landed on 古道 — two hops from the centre, not the
+  origin. It now finds the node the map itself calls 0 hops away.
+- the paragraph under that table asserted the five rows differ while printing
+  five identical rows. It is computed from the rows now, and states the negative
+  case plainly.
+
+### Browser evidence
+
+`apps/app/scripts/capture-map.mjs` serves the real `expo export --platform web`
+output over HTTP, drives `/map` in Chromium in both schemes, photographs all four
+bands plus the whole page, and fails the run if the page throws or logs.
+
+It first **walks the app's own closed loop by clicking** — search 分岐, keep, take
+up for study, start the session, answer one declared probe — because a cold load
+has an empty log, and a map over an empty log is a picture in which
+brightness-is-retrievability cannot be seen at all. No store is seeded and the
+script writes no event; the evidence gate mints every one and the pinned
+scheduler produces the memory state the map draws.
+
+Read out of the loaded DOM in that photographed page:
+
+| lens       | what the origin node says          |
+| ---------- | ---------------------------------- |
+| reading    | 分岐 — Reading: Emerging, fragile   |
+| meaning    | 分岐 — Meaning: No evidence yet     |
+| listening  | 分岐 — Listening: No evidence yet   |
+| production | 分岐 — Production: No evidence yet  |
+| writing    | 分岐 — Writing: No evidence yet     |
+
+That is REQ-UI-07 in a picture rather than in a claim: one node held still, the
+lens moved five times, five different answers, and the four unmeasured ones read
+"no evidence yet" rather than reading weak.
+
+Also in that page: "1 of 2 contracts have evidence behind them", "Today added 2
+new contracts and 1 admitted review", "Station 0 of 77", six routes offered.
+
+### Measured cost
+
+Node, on this build machine (`apps/app/test/map-performance.test.ts`, printed by
+the run):
+
+| what                | measurement                                               |
+| ------------------- | --------------------------------------------------------- |
+| Atlas               | 9,245 nodes, 429–1,143 ms cold **once**, 0.0004 ms warm   |
+| view redraw         | 44 drawn nodes, 0.8–1.4 ms                                |
+| scrubber            | 366 daily frames built in 47–48 ms; one step 0.31–0.41 ms |
+| road                | 176 stations counted in 2.2–2.6 ms                        |
+| whole-corpus census | 3,016 lexemes placed in 41–71 ms, behind a button          |
+
+Chromium, in the photographed page, over the walked ledger:
+
+| scheme | cold load to interactive | lens change | scrubber step |
+| ------ | ------------------------ | ----------- | ------------- |
+| light  | 1,446 ms                 | 27.7 ms     | 19.2 ms       |
+| dark   | 1,665 ms                 | 51.7 ms     | 53.2 ms       |
+
+Cold load includes the one-off Atlas build over the whole shipped dictionary and
+is paid once per session. Lens change and scrubber step are the two interactions
+that redraw every node, and are the ones that would expose a per-frame index
+rebuild. **These are Chromium on a build machine, not a phone.** They are a floor
+on what a device will do, not a prediction of it.
+
+The backdated-state defect the earlier run's perf work found stands fixed, and is
+worth restating because every correctness test had passed over it: the screen
+built **one** index and projected it at whatever instant the scrubber stood on,
+and a static index answers from _current_ memory states — so a March frame showed
+June's stability with March's decay applied. `buildMapTimeline` folds the reviews
+the gate already admitted into per-frame histories through the kernel's own
+`buildMemoryHistories`, and the frames share one bucketing object, asserted by
+**identity** rather than equality.
+
+### Check set, this round, on this branch
+
+| Check                                           | Result                                    |
+| ----------------------------------------------- | ----------------------------------------- |
+| `npm ci`                                        | clean                                     |
+| `npm run lint`                                  | exit 0                                    |
+| `npm run format:check`                          | all files formatted                       |
+| `npm run typecheck`                             | exit 0, zero errors                       |
+| `npm run test`                                  | **2422 passed**, 1 skipped, 111 files     |
+| `npm run test:replay`                           | 47 passed                                 |
+| `npm run verify:export`                         | 14 passed                                 |
+| `cd apps/app && npx expo export --platform web` | exported, `/map` among the routes         |
+| `npm run test:e2e:build`                        | exported                                  |
+| `npm run test:e2e`                              | **48 passed**, exit 0                     |
+| `node apps/app/scripts/capture-map.mjs`         | 10 shots, no page error, README rewritten |
+
+### Two load-sensitive failures seen this round, both measured rather than waved off
+
+- **`npm run test`, three timeouts.** On a loaded machine `theme-motion.test.ts`
+  ("measures the seed's own strokes as plausible lengths") and two
+  `packages/seed/test/dictionary.test.ts` cases exceeded the 5 s per-test
+  default. All three import the whole seed dynamically and touch no file this
+  lane owns. Reproduced with this lane's uncommitted changes stashed, and green
+  on the re-run recorded above. Pre-existing, not this lane's, not fixed here.
+- **`npm run test:e2e`, one timeout.** `adv-a11y-audit.spec.ts` › "axe: no
+  violation at all, on any route, in either scheme" exceeded its 120 s cap on the
+  first full run and passed on the second (48/48). It is **not** a violation, and
+  not flakiness this lane gets to shrug at: measured single-worker, the same scan
+  takes **57.8 s on `e22d069`** and **66 s on this branch**, so this lane adds
+  about 8 s of bundle weight to a scan already sitting at half its cap, and with
+  two workers contending that is enough to cross it. `/map` is not in that spec's
+  `ROUTES` — the cost is the bigger shared bundle every route now loads. Recorded
+  for the integration lane rather than repaired here: raising the cap or
+  splitting the scan is an edit to another lane's e2e file.
+
+### Shared-file edits, declared
+
+- `apps/app/src/ui/navigation.ts` — one appended `DESTINATIONS` entry. Additive.
+- `apps/app/test/navigation-reachability.test.ts` — `'Map'` appended to two
+  expected label lists, with the reason. Additive.
+- `docs/build-evidence/CAPSULE.md` — this appendix, appended.
+- `apps/app/test/screen-contract.test.ts` — **not purely additive, and that is
+  declared rather than buried.** One appended `SCREEN_OWNERS` row, one appended
+  `it(...)`, and one existing assertion wrapped in an `if` so that
+  `src/ui/map/map-projection.ts` — and only that file — may name the two
+  scheduler fields it renders. The rule is right and stays: the app holds no
+  scheduling logic. The map is the first surface that has to _display_ a
+  projection the kernel computed, so the reads are funnelled through one
+  four-line `readProjection`, and a second test holds that it is still the only
+  reader. `theme-tokens.test.ts` was **not** edited: the meter-only-band problem
+  was solved by a type instead.
+
+### What this lane does **not** claim
+
+- **That the era layers are populated.** Two of the three are empty over the whole
+  shipped dictionary and will stay so until the importer carries something that
+  dates a 漢語 word. The map draws them, counts them, and says so.
+- **That a route corresponds to anything historical.** It borrows the shape of a
+  finite marked road and nothing else. The names are "Grade 2 kanji", not place
+  names, on purpose.
+- **That the cross-layer connections are drawn.** They are held, counted and
+  named in prose; they are not drawn, because a line cannot span two grounds.
+- **That the map shows a phone's frame budget.** Every number above is Node or
+  Chromium on a Linux build machine. No device, no Safari, no Firefox, no screen
+  reader, and no human ran any of it.
+- **That `/map` is in the automated accessibility sweep.** It is not:
+  `adv-a11y-audit.spec.ts` owns a hand-written `ROUTES` list belonging to another
+  lane, and adding to it mid-wave is the shared-file edit this lane chose not to
+  make. The map's own capture run fails on a page error or a console error, and
+  every interactive element on it carries an accessible name — but no axe scan
+  has been run against `/map`, and that gap is open.
+- **That emitted light works on this surface.** It cannot appear: the only
+  register that permits it has no members. The screen says so; nothing was
+  demonstrated.
+- **That the guide stands anywhere on this map.** The 案内人 is lane B6 and has no
+  position here.
