@@ -47,6 +47,9 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+// Namespace import so the drift test below can walk every export by value
+// rather than by a hand-written list — see 'binds every exported name…'.
+import * as groundModule from '../src/theme/ground.ts';
 import {
   AA_NON_TEXT,
   contrastRatio,
@@ -589,8 +592,17 @@ describe('the museum-card rule: no module paints a ground and renders text', () 
       const painted = paintsAGround(body);
       if (painted.length === 0) return;
       const stripped = body.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+      // Identifier-level, like the painting half above, and for the same reason.
+      //
+      // These two checks used to read `<Text` and an `import { … } from
+      // 'react-native'` brace list. Neither matches `import * as RN from
+      // 'react-native'` followed by `<RN.Text>`, so a file that IS bound by the
+      // scan could still render text straight onto an era ground and stay green —
+      // the identical escape the painting half was repaired for, left behind in
+      // the half nobody re-read. Matching the JSX tag in any namespaced form
+      // closes it, because the element has to be *written* to be rendered.
       expect(stripped, `${name} renders <Text> while painting ${painted.join(', ')}`).not.toMatch(
-        /<Text[\s/>]/,
+        /<(?:[A-Za-z_$][\w$]*\.)?Text[\s/>]/,
       );
       expect(
         stripped,
@@ -905,10 +917,50 @@ describe('emissive colour is capped and confined', () => {
   it('keeps the reader off the painting list, so a page may report the ration', () => {
     expect(GROUND_PAINTING_EXPORTS).not.toContain('emissiveTally');
     expect(GROUND_PAINTING_EXPORTS).not.toContain('EMISSIVE_MARKS');
-    // …and the names that do yield a pigment are all on it.
-    for (const name of ['EMISSIVE_LAMP', 'GROUND_FIGURE_PIGMENTS', 'UNLIT_EMISSIVE_PIGMENTS']) {
-      expect(GROUND_PAINTING_EXPORTS, `${name} yields a pigment and is not bound`).toContain(name);
-    }
+  });
+
+  /**
+   * The list may not drift again, and this is why the previous version of the
+   * test above could not stop it.
+   *
+   * That version named three exports by hand and checked those three. It was
+   * therefore vacuous against the one that was missing: `MINERAL_RAMPS` is
+   * re-exported through `src/ui/theme.ts` — the barrel every screen and every
+   * Wave B lane imports — and its grades carry full-strength `GroundColor`
+   * hexes. A verifier proved the hole by writing four lines that put text
+   * directly on 群青 `#4C6CB3` with no card under it; the museum-card scan
+   * treated the file as painting nothing, the no-hex-literal scan had nothing to
+   * find, and lint, tsc and 992 tests all passed.
+   *
+   * So this derives the obligation instead of restating it: walk every value
+   * `ground.ts` exports, and if a hex string is reachable from it, the name that
+   * yields it must be bound by the scan. A hand-maintained list guarding against
+   * hand-maintenance drift was always going to lose.
+   *
+   * Functions are unreachable this way and stay on the list explicitly — the
+   * point of this test is the *data* exports, which is where the gap was.
+   */
+  it('binds every exported name from which a pigment is reachable', () => {
+    const yieldsHex = (value: unknown, depth = 0): boolean => {
+      if (depth > 6) return false;
+      if (typeof value === 'string') return /^#[0-9a-f]{6}$/i.test(value);
+      if (Array.isArray(value)) return value.some((entry) => yieldsHex(entry, depth + 1));
+      if (value !== null && typeof value === 'object') {
+        return Object.values(value).some((entry) => yieldsHex(entry, depth + 1));
+      }
+      return false;
+    };
+
+    const unbound = Object.entries(groundModule)
+      .filter(([name, value]) => yieldsHex(value) && !GROUND_PAINTING_EXPORTS.includes(name))
+      .map(([name]) => name);
+
+    expect(
+      unbound,
+      `these exports yield a pigment but are not on GROUND_PAINTING_EXPORTS, so a file ` +
+        `using them paints an era ground while the museum-card scan sees nothing: ` +
+        unbound.join(', '),
+    ).toEqual([]);
   });
 
   it('declares emissive pigments only in the rail register, and only two', () => {

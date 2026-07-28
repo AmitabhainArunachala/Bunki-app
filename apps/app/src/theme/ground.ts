@@ -611,6 +611,14 @@ export const GROUND_PAINTING_EXPORTS: readonly string[] = [
   'EMISSIVE_LAMP',
   'GROUND_FIGURE_PIGMENTS',
   'UNLIT_EMISSIVE_PIGMENTS',
+  // Added after a verifier proved the hole: MINERAL_RAMPS is re-exported through
+  // src/ui/theme.ts — the barrel every screen imports — and each grade carries a
+  // full-strength GroundColor. Four lines putting text directly on 群青 #4C6CB3
+  // passed lint, tsc and the whole suite, because this list did not name it and
+  // so the museum-card scan never bound the file. The list is now derived-checked
+  // by theme-ground.test.ts ('binds every exported name from which a pigment is
+  // reachable'), which is what stops it drifting a second time.
+  'MINERAL_RAMPS',
 ];
 
 /* ------------------------------------------------------------------ *
