@@ -36,11 +36,39 @@ import { RADIUS, SPACE, TYPE } from './theme.ts';
 import { useTheme } from './theme-context.tsx';
 
 /**
- * The seed's own entry disclosure, verbatim (controller §8).
+ * The seed's own entry disclosure, verbatim (controller §8; EDRDG statement §3).
  *
- * Required on word and kanji pages: an entry that *is* present can still be
- * incomplete, and none of the readings or senses were checked against a
- * published dictionary.
+ * Required on every screen that displays words from the files: an entry that
+ * *is* present can still be incomplete, none of the readings or senses were
+ * checked against a published dictionary, and the licensor must be named where
+ * the words are shown.
+ *
+ * ## Why it is quiet, and how quiet is allowed to be
+ *
+ * It shipped as a boxed vermilion block — 3 pt accent border, tinted fill,
+ * label-size type — rendered *above* the content of eight screens. At 390 CSS
+ * px it occupied the top 700 px of the map: a licence notice taller than the
+ * subject of the page, in the one accent colour the whole design language
+ * reserves for "where you are". The operator's first sight of the app was a
+ * paragraph about CC BY-SA.
+ *
+ * §3 asks for the acknowledgement to be *made on the screen*. It does not ask
+ * for it to be the loudest thing on it, and REQ-UI-08's calm surface is the
+ * other requirement in the room. So:
+ *
+ *   - **Every word of it still renders, unfolded.** Not truncated, not behind a
+ *     disclosure, not a link to a licence page. `attribution.tsx` has the rule
+ *     and it is right: folding a licence condition away is not progressive
+ *     disclosure. `e2e/edrdg-acknowledgement.spec.ts` asserts the element is
+ *     *visible* and its text is the string verbatim, on every stop of the loop.
+ *   - **It is set as small print**, at the foot of the screen, in the muted ink
+ *     the rest of the app's provenance lines use, under a hairline. That is the
+ *     register the same information already has everywhere else — the per-field
+ *     `ProvenanceLine`, the `AttributionFooter` — so this stops being the one
+ *     notice with its own visual language.
+ *   - **The accent is not spent here.** Vermilion means "this is where you are"
+ *     in the shell and "this claim is weaker than it looks" on a provenance
+ *     line. A standing, permanent, always-true notice is neither.
  */
 export function SeedEntryDisclosure({
   testID = 'seed-entry-disclosure',
@@ -55,14 +83,15 @@ export function SeedEntryDisclosure({
       // itself and the container stays a plain grouping element.
       accessibilityLabel={`About this entry: ${SEED_ENTRY_DISCLOSURE}`}
       accessible
-      style={[
-        styles.disclosure,
-        { backgroundColor: theme.color.vermilionSoft, borderColor: theme.color.vermilion },
-      ]}
+      style={styles.disclosure}
       testID={testID}
     >
+      <View style={[styles.disclosureRule, { backgroundColor: theme.color.rule }]} />
       <Text
-        style={[styles.disclosureText, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+        style={[
+          styles.disclosureText,
+          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+        ]}
       >
         {SEED_ENTRY_DISCLOSURE}
       </Text>
@@ -314,15 +343,15 @@ export function UnsupportedLayer({
 
 const styles = StyleSheet.create({
   disclosure: {
-    borderLeftWidth: 3,
-    borderRadius: RADIUS.sm,
-    borderWidth: 1,
-    paddingHorizontal: SPACE.md,
-    paddingVertical: SPACE.md,
+    gap: SPACE.sm,
+  },
+  disclosureRule: {
+    height: StyleSheet.hairlineWidth,
+    width: '100%',
   },
   disclosureText: {
-    fontSize: TYPE.label,
-    lineHeight: TYPE.label * 1.55,
+    fontSize: TYPE.meta,
+    lineHeight: TYPE.meta * 1.6,
   },
   meta: {
     fontSize: TYPE.meta,

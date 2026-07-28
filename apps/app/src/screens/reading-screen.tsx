@@ -258,7 +258,8 @@ export function ReadingScreen({ onOpenWord }: ReadingScreenProps): ReactNode {
     <ScreenShell
       subtitle="One passage, set to be read. Tap a word to look it up here — the page does not move."
       testID="screen-reading"
-      title="分岐 Bunki — reading"
+      title="Reading"
+      titleJa="読む"
     >
       {state.kind === 'loading' ? <LoadingPanel label="Opening the passage…" /> : null}
 

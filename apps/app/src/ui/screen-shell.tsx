@@ -24,18 +24,43 @@ const MEASURE = 720;
 
 export interface ScreenShellProps {
   readonly title: string;
+  /**
+   * The title in Japanese, set in mincho above the English.
+   *
+   * Typography-first (frozen §8) is the whole design language, and it applies to
+   * the page's own name: 地図 above "Map" is the app teaching a word by using
+   * it, at no cost to legibility because the English is still there. Optional
+   * because a page about a particular word already has a Japanese hero — its own
+   * headword — and two competing heroes is worse than one.
+   */
+  readonly titleJa?: string | undefined;
   readonly subtitle?: string | undefined;
   /** Rendered right under the title, before the content. */
   readonly lede?: ReactNode;
   readonly children: ReactNode;
+  /**
+   * Standing notices — licence acknowledgements and the like — at the foot.
+   *
+   * A slot, rather than each screen deciding where to put one, because the
+   * placement is the point. The EDRDG acknowledgement (§3) has to be *on* the
+   * screen; it does not have to be the hero, and it shipped as a boxed vermilion
+   * block above the content of eight screens, taller than the content on some of
+   * them. Quiet and at the foot is where standing small print belongs, and
+   * giving it a named slot means no screen can put it back at the top by
+   * accident. It is never folded away — `attribution.tsx` has the rule: folding
+   * a licence condition into a disclosure is not progressive disclosure.
+   */
+  readonly notice?: ReactNode;
   readonly testID?: string | undefined;
 }
 
 export function ScreenShell({
   title,
+  titleJa,
   subtitle,
   lede,
   children,
+  notice,
   testID,
 }: ScreenShellProps): ReactNode {
   const theme = useTheme();
@@ -51,6 +76,14 @@ export function ScreenShell({
         {connectivity === 'offline' ? <OfflineBanner /> : null}
 
         <View style={styles.heading}>
+          {titleJa === undefined ? null : (
+            <Text
+              style={[styles.titleJa, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
+              testID="screen-title-ja"
+            >
+              {titleJa}
+            </Text>
+          )}
           <Text
             accessibilityRole="header"
             style={[styles.title, { color: theme.color.ink, fontFamily: theme.font.sans }]}
@@ -71,6 +104,7 @@ export function ScreenShell({
 
         {lede}
         {children}
+        {notice === undefined ? null : <View style={styles.notice}>{notice}</View>}
         <View style={styles.footerSpace} />
       </View>
     </ScrollView>
@@ -98,6 +132,14 @@ const styles = StyleSheet.create({
     fontSize: TYPE.title,
     fontWeight: '700',
     letterSpacing: 0.3,
+  },
+  titleJa: {
+    fontSize: TYPE.headwordRow,
+    letterSpacing: 6,
+    lineHeight: TYPE.headwordRow * 1.3,
+  },
+  notice: {
+    marginTop: SPACE.xl,
   },
   subtitle: {
     fontSize: TYPE.label,

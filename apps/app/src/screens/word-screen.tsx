@@ -275,7 +275,7 @@ export function WordScreen({
 
   return (
     <ScreenShell
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle="The entry, the characters it is built from, what it is confused with, and where it appears."
       testID="screen-word"
       title="Word"

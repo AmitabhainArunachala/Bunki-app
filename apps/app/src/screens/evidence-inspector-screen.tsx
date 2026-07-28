@@ -248,24 +248,75 @@ export function EvidenceInspectorScreen({
 
   if (state.kind === 'loading') {
     return (
-      <ScreenShell testID="screen-evidence" title="Evidence">
+      <ScreenShell
+        notice={<SeedEntryDisclosure />}
+        testID="screen-evidence"
+        title="Evidence"
+        titleJa="記録"
+      >
         <LoadingPanel label="Reading your event log…" />
+        {/*
+        The About & sources door, in every state of this screen.
+
+        EDRDG §3 clause 2 wants the acknowledgement on "a separate screen
+        accessed from a menu", and since Wave D that menu is 記録 rather than a
+        sixth tab. A door that only exists once the learner has a thread would
+        make the licence obligation conditional on having done some work, which
+        is not a shape a licence clause has. So it is rendered in the loading,
+        error, empty and populated branches alike.
+      */}
+        <AppButton
+          accessibilityHint="Names every source this build uses, the licence each is used under, and what the app stores locally."
+          label="About & sources · 典拠"
+          onPress={onOpenDebug}
+          testID="evidence-open-debug"
+        />
       </ScreenShell>
     );
   }
 
   if (state.kind === 'error') {
     return (
-      <ScreenShell testID="screen-evidence" title="Evidence">
+      <ScreenShell
+        notice={<SeedEntryDisclosure />}
+        testID="screen-evidence"
+        title="Evidence"
+        titleJa="記録"
+      >
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        {/*
+        The About & sources door, in every state of this screen.
+
+        EDRDG §3 clause 2 wants the acknowledgement on "a separate screen
+        accessed from a menu", and since Wave D that menu is 記録 rather than a
+        sixth tab. A door that only exists once the learner has a thread would
+        make the licence obligation conditional on having done some work, which
+        is not a shape a licence clause has. So it is rendered in the loading,
+        error, empty and populated branches alike.
+      */}
+        <AppButton
+          accessibilityHint="Names every source this build uses, the licence each is used under, and what the app stores locally."
+          label="About & sources · 典拠"
+          onPress={onOpenDebug}
+          testID="evidence-open-debug"
+        />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
 
   if (state.kind === 'empty' || thread === null || chain === null) {
     return (
-      <ScreenShell testID="screen-evidence" title="Evidence">
+      <ScreenShell
+        notice={<SeedEntryDisclosure />}
+        testID="screen-evidence"
+        title="Evidence"
+        titleJa="記録"
+      >
         <EmptyPanel
           detail={
             state.kind === 'empty'
@@ -274,7 +325,27 @@ export function EvidenceInspectorScreen({
           }
           message={state.kind === 'empty' ? state.message : 'This thread cannot be read.'}
         />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        {/*
+        The About & sources door, in every state of this screen.
+
+        EDRDG §3 clause 2 wants the acknowledgement on "a separate screen
+        accessed from a menu", and since Wave D that menu is 記録 rather than a
+        sixth tab. A door that only exists once the learner has a thread would
+        make the licence obligation conditional on having done some work, which
+        is not a shape a licence clause has. So it is rendered in the loading,
+        error, empty and populated branches alike.
+      */}
+        <AppButton
+          accessibilityHint="Names every source this build uses, the licence each is used under, and what the app stores locally."
+          label="About & sources · 典拠"
+          onPress={onOpenDebug}
+          testID="evidence-open-debug"
+        />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -287,10 +358,11 @@ export function EvidenceInspectorScreen({
       // files on a screen means §3 of the EDRDG statement applies here too — the
       // acknowledgement does not become optional because the surface is an
       // inspector rather than a dictionary page.
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle="Everything here is read from your own event log. Nothing on this page is inferred."
       testID="screen-evidence"
       title={`Evidence — ${chain.displayText}`}
+      titleJa="記録"
     >
       {/* ------------------------------------------- REQ-LM-06 default surface */}
       <Section testID="evidence-why" title="Why this is here">

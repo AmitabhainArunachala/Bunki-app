@@ -209,7 +209,12 @@ export function JourneyScreen({ context, onBack, onOpenWord }: JourneyScreenProp
 
   if (state.kind === 'loading') {
     return (
-      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-journey" title="Journeys">
+      <ScreenShell
+        notice={<SeedEntryDisclosure />}
+        testID="screen-journey"
+        title="Journeys"
+        titleJa="分岐"
+      >
         <LoadingPanel label="Reading the ledger for branch points…" />
       </ScreenShell>
     );
@@ -217,7 +222,12 @@ export function JourneyScreen({ context, onBack, onOpenWord }: JourneyScreenProp
 
   if (state.kind === 'error') {
     return (
-      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-journey" title="Journeys">
+      <ScreenShell
+        notice={<SeedEntryDisclosure />}
+        testID="screen-journey"
+        title="Journeys"
+        titleJa="分岐"
+      >
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
         <AppButton accessibilityHint="Returns to capture." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -227,10 +237,11 @@ export function JourneyScreen({ context, onBack, onOpenWord }: JourneyScreenProp
   if (state.kind === 'empty') {
     return (
       <ScreenShell
-        lede={<SeedEntryDisclosure />}
+        notice={<SeedEntryDisclosure />}
         subtitle="分岐 — a branch point. One opens when a retrieval does not come back."
         testID="screen-journey"
         title="Journeys"
+        titleJa="分岐"
       >
         <EmptyPanel detail={state.detail} message={state.message} testID="journey-empty" />
         <AppButton accessibilityHint="Returns to capture." label="Back" onPress={onBack} />
@@ -315,7 +326,7 @@ function JourneyBody({
       // The fork, the branch copy and the target line all render the JMdict
       // headword and reading, so §3 of the EDRDG statement attaches to this
       // screen as much as to the word page.
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle={
         headword === null
           ? '分岐 — a branch point, opened by the evidence gate.'
@@ -323,6 +334,7 @@ function JourneyBody({
       }
       testID="screen-journey"
       title="Journeys"
+      titleJa="分岐"
     >
       {/*
         `Surface`, not a hand-rolled box: a levelled surface is what the design

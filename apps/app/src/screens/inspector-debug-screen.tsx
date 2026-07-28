@@ -164,7 +164,12 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
   const stripped = entries.reduce((total, entry) => total + entry.strippedFields, 0);
 
   return (
-    <ScreenShell subtitle={RUNTIME_LABEL} testID="screen-inspector-debug" title="Diagnostics">
+    <ScreenShell
+      subtitle={RUNTIME_LABEL}
+      testID="screen-inspector-debug"
+      title="About & sources"
+      titleJa="典拠"
+    >
       <Section testID="debug-privacy" title="What this buffer can hold">
         <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
           {RING_PRIVACY_NOTE}

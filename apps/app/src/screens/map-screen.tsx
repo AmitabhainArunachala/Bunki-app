@@ -8,21 +8,31 @@
  * > rather than "what do I owe."** Any design decision that makes the map
  * > decorative rather than the home of that answer is a mistake.
  *
- * So the order of this page is the order of that sentence. The accumulation card
- * is first, because it is the answer. The road is second, because *"11 of 160
- * stations reached"* is the literal reply to "it never ends". The neighbourhood
- * is third, because that is where the learner walks. The era census is last,
- * because it is about the language rather than about them.
+ * ## The order of the page, and why Wave D changed it
+ *
+ * It used to open on the accumulation card, because that card is the answer to
+ * the sentence above. On a fresh browser its largest line read *"0 of 0
+ * contracts have evidence behind them"* — arithmetic, correct, and the first
+ * thing the operator would ever see of the app's emotional centre.
+ *
+ * So the country comes first now and the learner's own marks come second. Both
+ * are real; neither is invented; and the panels say in words which is which
+ * (`TERRITORY_RULE`, `LEARNER_RULE`). A map of a country you have not walked is
+ * still a map of a country, and the language's structure — the era layers, the
+ * roads, the graph — is there before a single review. The road is third,
+ * because *"11 of 160 stations reached"* is the literal reply to "it never
+ * ends". The neighbourhood is fourth, because that is where the learner walks.
  *
  * ## Local neighbourhood by default
  *
  * REQ-UI-07: the whole-state view is *"a deliberate destination, not the home
- * screen"*. The map opens on one origin's neighbourhood — bounded by the
- * domain's own `maxNodes`, which is what keeps a phone's frame budget intact —
- * and the census is a second view the learner asks for. The census does not plot
- * 9,245 nodes; it counts them, once, memoised, and says what the counts are.
- * A whole-corpus scatter is not more information, it is the same information
- * rendered unusably.
+ * screen"*. That is a rule about plotting **the learner's state over the whole
+ * corpus**, and nothing here does: the map opens on one origin's neighbourhood,
+ * bounded by the domain's own `maxNodes`, which is what keeps a phone's frame
+ * budget intact. The country panel counts the corpus and plots none of it, and
+ * every number in it is a fact about the dictionary rather than about the
+ * learner — so it is not the view REQ-UI-07 is about. A whole-corpus scatter of
+ * memory states is still unbuilt, deliberately.
  *
  * ## Both arms of the scrubber change what is drawn
  *
@@ -73,6 +83,14 @@ import {
   placeNodes,
   type BandTally,
 } from '../ui/map/map-eras.ts';
+import {
+  countLabel,
+  eraCensus,
+  territoryOf,
+  LEARNER_RULE,
+  NOTHING_BUILT_YET,
+  TERRITORY_RULE,
+} from '../ui/map/map-territory.ts';
 import { layoutNeighbourhood } from '../ui/map/map-layout.ts';
 import { Settle } from '../ui/motion.tsx';
 import {
@@ -88,7 +106,7 @@ import { lexemeNodeId, mapAtlas, nodeSubject } from '../ui/map/map-source.ts';
 import { RouteStrip } from '../ui/map/route-strip.tsx';
 import { Scrubber } from '../ui/map/scrubber.tsx';
 import { SeedEntryDisclosure } from '../ui/notices.tsx';
-import { AppButton, ChipButton, Hairline, Section } from '../ui/primitives.tsx';
+import { ChipButton, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
 import { Surface } from '../ui/surface.tsx';
@@ -150,7 +168,6 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
   const [lens, setLens] = useState<CapabilityId>('reading');
   const [scrub, setScrub] = useState(0);
   const [origin, setOrigin] = useState<GraphNodeId | null>(null);
-  const [census, setCensus] = useState(false);
 
   /**
    * The Atlas, built once for the session.
@@ -382,6 +399,17 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   const accumulation = useMemo(() => accumulationOf(derived, nowInstant), [derived, nowInstant]);
 
+  /**
+   * The country, which needs no ledger at all.
+   *
+   * Both memos take only the atlas and the routes, so neither can become a
+   * learner claim by accident: `territoryOf`'s signature has no place to put
+   * one. The census is additionally memoised at module scope inside
+   * `eraCensus`, so returning to the map costs nothing.
+   */
+  const territory = useMemo(() => territoryOf(atlas, routes), [atlas, routes]);
+  const census = useMemo(() => eraCensus(atlas), [atlas]);
+
   const openNode = useCallback(
     (nodeId: GraphNodeId) => {
       const node = atlas.graph.nodes.get(nodeId);
@@ -407,7 +435,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
   */
   if (state.kind === 'loading') {
     return (
-      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-map" title="Map">
+      <ScreenShell notice={<SeedEntryDisclosure />} testID="screen-map" title="Map" titleJa="地図">
         <LoadingPanel label="Assembling the map…" />
       </ScreenShell>
     );
@@ -415,7 +443,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   if (state.kind === 'error') {
     return (
-      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-map" title="Map">
+      <ScreenShell notice={<SeedEntryDisclosure />} testID="screen-map" title="Map" titleJa="地図">
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
       </ScreenShell>
     );
@@ -423,7 +451,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   if (state.kind === 'empty') {
     return (
-      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-map" title="Map">
+      <ScreenShell notice={<SeedEntryDisclosure />} testID="screen-map" title="Map" titleJa="地図">
         <EmptyPanel detail={state.detail} message={state.message} />
       </ScreenShell>
     );
@@ -433,22 +461,100 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   return (
     <ScreenShell
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle="What you have built, on the roads the language came in on. Every mark is one capability at one instant; nothing here is a score."
       testID="screen-map"
       title="Map"
+      titleJa="地図"
     >
-      {/* ---------------------------------------------- what you have built */}
-      <Surface level="well" testID="map-accumulation">
+      {/* ------------------------------------------------------ the country */}
+      {/*
+        The territory, first, and this ordering is the day-one fix.
+
+        The learner's panel used to be first, and on a fresh browser its largest
+        sentence was "0 of 0 contracts have evidence behind them." True, and the
+        worst possible opening for the surface the research calls the emotional
+        centre. Nothing was faked to fix it: the country below is the shipped
+        dictionary's own structure, which is real before a single review and is
+        exactly what a map of a place you have not been still shows you.
+
+        `TERRITORY_RULE` is rendered verbatim under it, because the risk of a
+        rich day-one map is that the richness reads as the learner's.
+      */}
+      <Surface level="well" testID="map-territory">
         <Text style={[styles.heading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          What you have built
+          The country · 国土
         </Text>
         <Text
           style={[styles.standing, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+          testID="map-territory-headline"
+        >
+          {countLabel(territory.words)} words and {countLabel(territory.kanji)} characters, joined
+          by {countLabel(territory.connections)} connections the dictionary holds.
+        </Text>
+        <Text
+          style={[styles.today, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+          testID="map-territory-roads"
+        >
+          {territory.routes.length === 0
+            ? 'No road in this build is long enough to name.'
+            : `${countLabel(territory.routes.length)} named roads, ${countLabel(
+                territory.stations,
+              )} stations in all: ${territory.routes
+                .map((route) => `${route.name} (${countLabel(route.stations)})`)
+                .join(' · ')}.`}
+        </Text>
+        <View style={styles.censusRow} testID="map-territory-eras">
+          {census.map((band) => (
+            <Text
+              key={band.band}
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID={`map-territory-era-${band.band}`}
+            >
+              {BAND_LABELS.find((label) => label.band === band.band)?.title ?? band.band} ·{' '}
+              {countLabel(band.nodes.length)}
+            </Text>
+          ))}
+        </View>
+        <Text
+          style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+          testID="map-territory-rule"
+        >
+          {TERRITORY_RULE}
+        </Text>
+        <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
+          {ERA_COVERAGE_DISCLOSURE}
+        </Text>
+      </Surface>
+
+      {/* ---------------------------------------------- what you have built */}
+      <Surface level="well" testID="map-accumulation">
+        <Text style={[styles.heading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+          What you have built · 足跡
+        </Text>
+        {/*
+          Two readings of the same ledger, and the first-open one is not an
+          error state. `0 of 0` is arithmetic; it is also the sentence a person
+          reads as "this app has nothing in it". Saying what is true — nothing
+          yours yet, the country is not yours, here is the act that makes the
+          first mark — costs one branch and is the difference between an honest
+          empty and a discouraging one. Neither branch invents a number.
+        */}
+        <Text
+          style={[
+            accumulation.contractsStanding === 0 ? styles.today : styles.standing,
+            {
+              color: accumulation.contractsStanding === 0 ? theme.color.inkMuted : theme.color.ink,
+              fontFamily: theme.font.sans,
+            },
+          ]}
           testID="map-standing"
         >
-          {String(accumulation.contractsAttested)} of {String(accumulation.contractsStanding)}{' '}
-          contracts have evidence behind them.
+          {accumulation.contractsStanding === 0
+            ? NOTHING_BUILT_YET
+            : `${String(accumulation.contractsAttested)} of ${String(
+                accumulation.contractsStanding,
+              )} contracts have evidence behind them.`}
         </Text>
         <Text
           accessibilityLiveRegion="polite"
@@ -462,6 +568,12 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
           testID="map-today"
         >
           {accumulation.sentence}
+        </Text>
+        <Text
+          style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+          testID="map-learner-rule"
+        >
+          {LEARNER_RULE}
         </Text>
         <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
           {ACCUMULATION_NOTE}
@@ -709,66 +821,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
           </Text>
         ))}
       </Section>
-
-      <Hairline />
-
-      {/* -------------------------------------------------- the whole state */}
-      <Section
-        note="A deliberate destination, not the home view (REQ-UI-07). It counts the corpus; it does not plot it."
-        testID="map-census-section"
-        title="The whole state"
-      >
-        <AppButton
-          accessibilityHint="Counts every word in this build by which era layer it can be placed on."
-          label={census ? 'Hide the census' : 'Count the whole dictionary'}
-          onPress={() => setCensus((open) => !open)}
-          variant="secondary"
-        />
-        {census ? <Census /> : null}
-      </Section>
     </ScreenShell>
-  );
-}
-
-/**
- * The era census over the whole corpus.
- *
- * Rendered only when asked for, and computed inside its own component so that
- * mounting it is what pays for it — a `useMemo` in the parent would run the
- * whole-corpus pass on every map open whether or not anyone opened the census.
- */
-function Census(): ReactNode {
-  const theme = useTheme();
-  const atlas = useMemo(() => mapAtlas(), []);
-  const tallies = useMemo(() => {
-    const lexemes: GraphNode[] = [];
-    atlas.graph.nodes.forEach((node) => {
-      if (node.kind === 'lexeme') lexemes.push(node);
-    });
-    return placeNodes(atlas, lexemes);
-  }, [atlas]);
-
-  const total = tallies.reduce((sum, band) => sum + band.nodes.length, 0);
-
-  return (
-    <View style={styles.census} testID="map-census">
-      <Text style={[styles.meta, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-        {String(total)} words in this build.
-      </Text>
-      {tallies.map((band) => (
-        <Text
-          key={band.band}
-          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-          testID={`map-census-${band.band}`}
-        >
-          {BAND_LABELS.find((label) => label.band === band.band)?.title ?? band.band} ·{' '}
-          {String(band.nodes.length)}
-        </Text>
-      ))}
-      <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
-        {ERA_COVERAGE_DISCLOSURE}
-      </Text>
-    </View>
   );
 }
 
@@ -806,9 +859,10 @@ const styles = StyleSheet.create({
     fontSize: TYPE.label,
     fontWeight: '600',
   },
-  census: {
-    gap: SPACE.xs,
-    marginTop: SPACE.md,
+  censusRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACE.md,
   },
   meta: {
     fontSize: TYPE.meta,

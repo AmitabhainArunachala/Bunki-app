@@ -67,7 +67,7 @@ export function SessionRepairScreen({ context, onBack }: SessionRepairScreenProp
 
   if (view.kind === 'loading') {
     return (
-      <ScreenShell testID="screen-session-repair" title="Repair branch">
+      <ScreenShell testID="screen-session-repair" title="Repair branch" titleJa="修復">
         <LoadingPanel label="Looking for the miss…" />
       </ScreenShell>
     );
@@ -75,7 +75,7 @@ export function SessionRepairScreen({ context, onBack }: SessionRepairScreenProp
 
   if (view.kind === 'error') {
     return (
-      <ScreenShell testID="screen-session-repair" title="Repair branch">
+      <ScreenShell testID="screen-session-repair" title="Repair branch" titleJa="修復">
         <ErrorPanel detail={view.detail} message={view.message} onRetry={retry} />
         <AppButton accessibilityHint="Returns to the session." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -84,7 +84,7 @@ export function SessionRepairScreen({ context, onBack }: SessionRepairScreenProp
 
   if (view.kind === 'empty') {
     return (
-      <ScreenShell testID="screen-session-repair" title="Repair branch">
+      <ScreenShell testID="screen-session-repair" title="Repair branch" titleJa="修復">
         <EmptyPanel detail={view.detail} message={view.message} />
         <AppButton accessibilityHint="Returns to the session." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -111,10 +111,11 @@ function RepairBody({
   if (repair === null) {
     return (
       <ScreenShell
-        lede={<SeedEntryDisclosure />}
+        notice={<SeedEntryDisclosure />}
         subtitle={`For ${target.lexeme.headword}. One flow, hard-coded — Phase 0 has no general routing.`}
         testID="screen-session-repair"
         title="Repair branch"
+        titleJa="修復"
       >
         {stumble === null ? (
           <EmptyPanel
@@ -151,10 +152,11 @@ function RepairBody({
       // The subtitle, the diagnosis prose and the contrast panel all render the
       // JMdict headword and the kanji it is written with — words from the files,
       // so §3 of the EDRDG statement attaches here as much as to the word page.
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle={`For ${target.lexeme.headword}. One flow, hard-coded — Phase 0 has no general routing.`}
       testID="screen-session-repair"
       title="Repair branch"
+      titleJa="修復"
     >
       <CriterionPanel />
 

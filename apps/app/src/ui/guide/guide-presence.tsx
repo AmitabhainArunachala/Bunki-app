@@ -148,7 +148,10 @@ export function GuidePresence({
   if (here) {
     return (
       <View
-        style={[styles.rail, { borderBottomColor: theme.color.rule }]}
+        style={[
+          styles.rail,
+          { backgroundColor: theme.color.paper, borderBottomColor: theme.color.rule },
+        ]}
         testID={`${testID}-here`}
       >
         {body}
@@ -164,7 +167,14 @@ export function GuidePresence({
       onPress={onOpen}
       style={({ pressed }) => [
         styles.rail,
-        { borderBottomColor: theme.color.rule, opacity: pressed ? 0.7 : 1 },
+        {
+          // Painted, never transparent. A transparent rail sits on the
+          // document's default white, and in the dark scheme axe measured its
+          // text at 2.29:1 on every route (WCAG 1.4.3).
+          backgroundColor: theme.color.paper,
+          borderBottomColor: theme.color.rule,
+          opacity: pressed ? 0.7 : 1,
+        },
       ]}
       testID={testID}
     >
@@ -175,6 +185,9 @@ export function GuidePresence({
 
 const styles = StyleSheet.create({
   name: {
+    // Never wrapped. 案内人 broken over two lines is not a name, it is damage,
+    // and at 390 CSS px it was breaking after the second character.
+    flexShrink: 0,
     fontSize: TYPE.meta,
     letterSpacing: 1,
   },

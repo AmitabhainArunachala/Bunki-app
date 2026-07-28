@@ -46,7 +46,8 @@
 
 import { DESTINATIONS } from '../src/ui/navigation.ts';
 
-import { expect, test, hydrated, openApp, visibleTestId } from './support/adv-harness.ts';
+import { expect, test, hydrated, openApp } from './support/adv-harness.ts';
+import type { Page } from '@playwright/test';
 
 /**
  * Concrete params for dynamic routes, so the sweep visits them rather than
@@ -93,7 +94,7 @@ interface Overflow {
  * test that failed on 0.4 px would be noise. One whole CSS pixel is the
  * tolerance; the defect this file was written for was 309 of them.
  */
-async function measure(page: Parameters<typeof visibleTestId>[0]): Promise<Overflow> {
+async function measure(page: Page): Promise<Overflow> {
   return page.evaluate(() => {
     const root = document.documentElement;
     const limit = root.clientWidth;
@@ -152,10 +153,9 @@ for (const width of PHONE_WIDTHS) {
       }
     }
 
-    expect(
-      failures,
-      'these routes scroll sideways on a phone:\n' + failures.join('\n'),
-    ).toEqual([]);
+    expect(failures, 'these routes scroll sideways on a phone:\n' + failures.join('\n')).toEqual(
+      [],
+    );
   });
 }
 

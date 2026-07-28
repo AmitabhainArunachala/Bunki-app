@@ -258,23 +258,31 @@ interface FocusedElement {
   readonly height: number;
   readonly outlineStyle: string;
   readonly tag: string;
+  /** True when this element comes after the previously focused one in the DOM. */
+  readonly follows: boolean;
 }
 
 /**
- * The focused element, with its position measured **in the page, not in the
- * viewport**.
+ * The focused element: its size, its focus ring, and whether it came *after* the
+ * previous one in the document.
  *
- * `getBoundingClientRect()` alone is viewport-relative, and the browser scrolls
- * to reveal each element as it is focused — so the moment a screen grows past one
- * screenful, the same element reports a smaller `top` than the one above it and a
- * reading-order assertion starts failing on content that is in perfectly good
- * order. That is a property of the measurement, not of the page.
+ * ## Why reading order is measured in the DOM rather than in pixels
  *
- * Expo Web scrolls inside a `ScrollView` container rather than the window
- * (`window.scrollY` stays 0 while the content moves), so the scroll offset of
- * every ancestor is added back, plus the window's own. What comes out is a
- * position in the scrolled content, which is what "reading order" has always
- * meant.
+ * It used to be a monotonic-`top` assertion over a scroll-corrected position.
+ * That worked while every focusable thing lived in one scrolling column, and it
+ * stopped the moment the shell put its tab bar at the *bottom of the viewport*,
+ * outside the scroller: content inside the `ScrollView` reports a position in
+ * the scrolled content (1626 px in), the tab bar reports a viewport position
+ * (1348 px down), and comparing the two says focus jumped upwards when it did
+ * not. Two coordinate systems, one comparison.
+ *
+ * Document order is what WCAG 2.4.3 is actually about — "focusable components
+ * receive focus in an order that preserves meaning" — and it is invariant to
+ * scrolling, to fixed positioning, and to a bar that is visually below the
+ * content it follows in the tree. `compareDocumentPosition` states it directly.
+ *
+ * The geometric numbers are still returned, because the ≥44 pt touch-target
+ * check below is genuinely about pixels.
  */
 async function focused(page: Page): Promise<FocusedElement | null> {
   return page.evaluate(() => {
@@ -287,7 +295,14 @@ async function focused(page: Page): Promise<FocusedElement | null> {
       top += node.scrollTop;
       left += node.scrollLeft;
     }
+    const store = window as unknown as { __bunkiLastFocused?: Element | null };
+    const previous = store.__bunkiLastFocused ?? null;
+    const follows =
+      previous === null ||
+      (previous.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    store.__bunkiLastFocused = element;
     return {
+      follows,
       testId: element.getAttribute('data-testid') ?? '',
       name: (element.getAttribute('aria-label') ?? element.textContent ?? '').trim().slice(0, 60),
       top: Math.round(top),
@@ -309,6 +324,9 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
 
   // Start from the document, not from whatever the last click left focused.
   await page.locator('body').click({ position: { x: 2, y: 2 } });
+  await page.evaluate(() => {
+    (window as unknown as { __bunkiLastFocused?: Element | null }).__bunkiLastFocused = null;
+  });
 
   const order: FocusedElement[] = [];
   const seen = new Set<string>();
@@ -355,18 +373,16 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
     'nav-reading',
   ]);
 
-  // Reading order: focus moves down the page, never back up. Compared by row
-  // (elements sharing a row differ only by `left`), because a wrapping row of
-  // chips is still one reading step.
-  const rows = order.map((element) => element.top);
-  for (let index = 1; index < rows.length; index += 1) {
-    expect(
-      rows[index] as number,
-      `focus jumped upwards from y=${String(rows[index - 1])} to y=${String(rows[index])} ` +
-        `(${order[index]?.testId ?? order[index]?.name ?? '?'}), so the tab order does not follow ` +
-        'the reading order',
-    ).toBeGreaterThanOrEqual(rows[index - 1] as number);
-  }
+  // Reading order, in the document: every stop comes after the one before it.
+  const backwards = order
+    .slice(1)
+    .filter((element) => !element.follows)
+    .map((element) => element.testId || element.name || element.tag);
+  expect(
+    backwards,
+    'focus moved backwards in the document at these stops, so the tab order does not follow the ' +
+      'reading order',
+  ).toEqual([]);
 
   for (const element of order) {
     // ≥44 pt touch targets (controller §10). Checked on the *smaller* dimension:

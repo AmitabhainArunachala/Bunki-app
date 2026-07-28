@@ -330,7 +330,7 @@ function Dive({
 
   return (
     <ScreenShell
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle={`The dive, stopped at ${SCALE_LEVEL_NAMES[centre.level].written} ${SCALE_LEVEL_NAMES[centre.level].gloss}. Moving through it records nothing. Dictionary index numbers are database join keys and are never shown here.`}
       testID="screen-kanji"
       title="Kanji"

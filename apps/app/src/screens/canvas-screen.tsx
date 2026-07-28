@@ -91,7 +91,7 @@ export function CanvasScreen({ context, onBack }: CanvasScreenProps): ReactNode 
 
   if (view.kind === 'loading') {
     return (
-      <ScreenShell testID="screen-canvas" title="Integration canvas">
+      <ScreenShell testID="screen-canvas" title="Integration canvas" titleJa="文脈">
         <LoadingPanel label="Opening the passage…" />
       </ScreenShell>
     );
@@ -99,7 +99,7 @@ export function CanvasScreen({ context, onBack }: CanvasScreenProps): ReactNode 
 
   if (view.kind === 'error') {
     return (
-      <ScreenShell testID="screen-canvas" title="Integration canvas">
+      <ScreenShell testID="screen-canvas" title="Integration canvas" titleJa="文脈">
         <ErrorPanel detail={view.detail} message={view.message} onRetry={retry} />
         <AppButton accessibilityHint="Returns to the session." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -108,7 +108,7 @@ export function CanvasScreen({ context, onBack }: CanvasScreenProps): ReactNode 
 
   if (view.kind === 'empty') {
     return (
-      <ScreenShell testID="screen-canvas" title="Integration canvas">
+      <ScreenShell testID="screen-canvas" title="Integration canvas" titleJa="文脈">
         <EmptyPanel detail={view.detail} message={view.message} />
         <AppButton accessibilityHint="Returns to the session." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -204,6 +204,7 @@ function CanvasBody({
       subtitle={`${target.passage.title} — ${target.passage.titleTranslation}`}
       testID="screen-canvas"
       title="Integration canvas"
+      titleJa="文脈"
     >
       {/* --------------------------------------------- the passage */}
       <View

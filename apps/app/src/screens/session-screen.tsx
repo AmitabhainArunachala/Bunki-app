@@ -103,7 +103,7 @@ export function SessionScreen({
 
   if (view.kind === 'loading') {
     return (
-      <ScreenShell testID="screen-session" title="Session">
+      <ScreenShell testID="screen-session" title="Session" titleJa="稽古">
         <LoadingPanel label="Composing a session for your budget…" />
       </ScreenShell>
     );
@@ -111,7 +111,7 @@ export function SessionScreen({
 
   if (view.kind === 'error') {
     return (
-      <ScreenShell testID="screen-session" title="Session">
+      <ScreenShell testID="screen-session" title="Session" titleJa="稽古">
         <ErrorPanel detail={view.detail} message={view.message} onRetry={retry} />
         <AppButton accessibilityHint="Returns to search." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -120,7 +120,7 @@ export function SessionScreen({
 
   if (view.kind === 'empty') {
     return (
-      <ScreenShell testID="screen-session" title="Session">
+      <ScreenShell testID="screen-session" title="Session" titleJa="稽古">
         <EmptyPanel detail={view.detail} message={view.message} />
         <AppButton accessibilityHint="Returns to search." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -217,10 +217,11 @@ function SessionBody({
         // The intro names the word the sitting will be built from, which is a
         // JMdict headword on a screen — the display §3 of the EDRDG statement
         // attaches the acknowledgement to.
-        lede={<SeedEntryDisclosure />}
+        notice={<SeedEntryDisclosure />}
         subtitle={`A finite sitting for the time you have. ${String(timeBudgetMin)} minutes, one new item at most.`}
         testID="screen-session"
         title="Session"
+        titleJa="稽古"
       >
         <Section
           note="The plan is composed once, before you begin, and cannot grow while you are in it."
@@ -285,10 +286,11 @@ function SessionBody({
 
   return (
     <ScreenShell
-      lede={<SeedEntryDisclosure />}
+      notice={<SeedEntryDisclosure />}
       subtitle={`${String(plan.stepCount)} steps · about ${String(plan.estimatedMinutes)} min of the ${String(plan.budget.timeBudgetMin)} you gave`}
       testID="screen-session"
       title="Session"
+      titleJa="稽古"
     >
       {/* --------------------------------------------- the finite plan */}
       <Section

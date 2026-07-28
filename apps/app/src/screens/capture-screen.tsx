@@ -310,7 +310,8 @@ export function CaptureScreen({
     <ScreenShell
       subtitle="Look something up, keep it in one tap, and mark what felt uncertain. This is an action, not a place: it hands you back where you were."
       testID="screen-capture"
-      title="分岐 Bunki — capture"
+      title="Capture"
+      titleJa="拾う"
     >
       {onDone === undefined ? null : (
         <AppButton

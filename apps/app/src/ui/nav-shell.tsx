@@ -105,7 +105,17 @@ export function NavShell({ children }: NavShellProps): ReactNode {
   const pathname = usePathname();
 
   return (
-    <View style={styles.shell} testID="nav-shell">
+    /*
+      The shell paints the paper itself.
+
+      It used to be transparent, and the masthead, the screen and the tab bar
+      each painted their own — which left the guide's rail sitting on the
+      document's default white. In the dark scheme axe measured the rail's text
+      at 2.29:1 (#b3aa9b on #ffffff) on every route in the app: a real WCAG
+      1.4.3 failure that no route-specific fix would have caught, because the
+      offending element belongs to the shell.
+    */
+    <View style={[styles.shell, { backgroundColor: theme.color.paper }]} testID="nav-shell">
       <View
         style={[
           styles.masthead,

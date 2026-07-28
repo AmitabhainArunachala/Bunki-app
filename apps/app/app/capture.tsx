@@ -16,13 +16,26 @@ import { RouteTitle } from '@/ui/route-title';
  * the previous surface exactly and is addressable — `?q=` makes a search a
  * shareable URL, and the evidence harness uses it to land on a state directly.
  *
- * ## `?from=`
+ * ## `?from=` names the way back; `router.back()` takes it
  *
- * The shell's capture action records the surface it was opened from. Capture
- * then offers the way back **in words** rather than relying on the browser's
- * Back button, which is not a thing a learner reaches for on a phone. When it is
- * absent — a typed URL, a bookmark, a share — the way back is the map, which is
- * the front door and never the wrong answer.
+ * Two halves, and they do different jobs. `?from=` is what lets the control on
+ * the screen say *"Done — back to 地図 Map"* rather than a generic "back", which
+ * matters because the browser's own Back button is not a thing a learner reaches
+ * for on a phone. The *navigation* is `router.back()`, which pops the pushed
+ * entry.
+ *
+ * That split was measured rather than chosen. `router.replace(from)` reads more
+ * directly and it left screens mounted: five capture round trips from the map
+ * grew the mounted map screens from two to six, because `replace` swaps the
+ * current entry for a *new* instance of the destination rather than returning to
+ * the one already on the stack. Each of those was a live map screen subscribed
+ * to the store and re-rendered on every write — finding T3-2's exact shape,
+ * reintroduced by the new action. `adv-known-defects.spec.ts` pins the round
+ * trip at a flat count.
+ *
+ * `canGoBack()` guards the case with no stack to pop — a typed URL, a bookmark,
+ * a share — where the way back is `?from=` if it is trustworthy and the map
+ * otherwise. The map is the front door and never the wrong answer.
  */
 export default function CaptureRoute(): ReactNode {
   const router = useRouter();
@@ -41,7 +54,10 @@ export default function CaptureRoute(): ReactNode {
       <RouteTitle href="/capture" />
       <CaptureScreen
         initialQuery={typeof q === 'string' ? q : ''}
-        onDone={() => router.replace(back)}
+        onDone={() => {
+          if (router.canGoBack()) router.back();
+          else router.replace(back);
+        }}
         onOpenEvidence={() => router.push('/evidence')}
         onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
         onOpenReading={() => router.push('/read')}

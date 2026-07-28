@@ -114,27 +114,16 @@ export function GuideScreen({ onOpenWord, declaredBranches = [] }: GuideScreenPr
     <ScreenShell
       lede={
         <View style={styles.lede}>
-          <Text
-            style={[styles.wordmark, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
-          >
-            案内人
-          </Text>
           <GuideBoundaryPanel />
           {meta(DURABILITY_NOTE, 'guide-durability-note')}
         </View>
       }
+      notice={<SeedEntryDisclosure />}
       subtitle="Somewhere on the road, ahead of you. It proposes a way and explains a fork; it never records what you know."
       testID="guide-screen"
       title="The guide"
+      titleJa="案内人"
     >
-      {/*
-        Unconditional, above everything else that could be read. This screen
-        renders JMdict headwords, readings and senses through the road and the
-        turns, and §3 of the EDRDG licence statement asks for the
-        acknowledgement on each screen that displays them.
-      */}
-      <SeedEntryDisclosure />
-
       {guide.failure === null ? null : (
         <ErrorPanel
           detail={guide.failure}
@@ -229,10 +218,6 @@ export function GuideScreen({ onOpenWord, declaredBranches = [] }: GuideScreenPr
 const styles = StyleSheet.create({
   lede: {
     gap: SPACE.md,
-  },
-  wordmark: {
-    fontSize: TYPE.headword,
-    letterSpacing: 0.4,
   },
   meta: {
     fontSize: TYPE.meta,
