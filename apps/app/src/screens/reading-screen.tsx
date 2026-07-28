@@ -56,11 +56,12 @@ import {
   type SeedLexeme,
   type SeedPassage,
 } from '../data/catalog.ts';
-import { attributionLines, distinctProvenance, provenanceSummary } from '../data/provenance.ts';
+import { distinctProvenance, provenanceSummary } from '../data/provenance.ts';
 import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
 import { DURABILITY_NOTES, type CommandAck } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { type AttributionLine } from '../ui/attribution.tsx';
+import { type FrontierSpan } from '../ui/frontier-marks.ts';
 import { SeedEntryDisclosure } from '../ui/notices.tsx';
 import { markFor, FRONTIER_MARK_BASIS } from '../ui/reading/frontier-state.ts';
 import {
@@ -204,7 +205,10 @@ export function ReadingScreen({ onOpenWord }: ReadingScreenProps): ReactNode {
       senses: lexeme.senses,
       partOfSpeech: lexeme.partOfSpeech,
       mark,
-      markBasis: FRONTIER_MARK_BASIS[mark],
+      // The clause plus its subject: "線路 — nothing in your log mentions it
+      // yet." The clause itself is shared with the passage legend, so the two
+      // cannot drift into saying different things about the same mark.
+      markBasis: `${lexeme.headword} — ${FRONTIER_MARK_BASIS[mark]}.`,
       tier: tierOf(lexeme.id) === IMPORTED_TIER ? 'imported tier' : 'fixture tier',
       examples: examplesFor(lexeme.id),
       attribution: attributionFor(lexeme),
@@ -265,37 +269,36 @@ export function ReadingScreen({ onOpenWord }: ReadingScreenProps): ReactNode {
       {state.kind === 'empty' ? <EmptyPanel detail={state.detail} message={state.message} /> : null}
 
       {passage === null ? null : (
-        <>
-          <ReadingPassage
-            furigana={furigana}
-            furiganaScopeNote={`Furigana appears over the ${String(lookupSpanCount(spans))} words in this passage that have a dictionary reading in this build. The rest carries no reading data, so none is guessed.`}
-            onOpen={setOpenLexemeId}
-            onToggleFurigana={() => setFurigana((was) => !was)}
-            spans={spans}
-            testID="reading-surface"
-            title={passage.title}
-            titleTranslation={passage.titleTranslation}
-            translation={passage.english}
-          />
-
-          {openEntry === null ? (
-            <Text
-              style={[styles.hint, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              testID="reading-lookup-hint"
-            >
-              {`Underlined and plain words alike are tappable where this build has an entry for them — ${String(lookupSpanCount(spans))} of them on this page. Everything else renders as ordinary text rather than being guessed at.`}
-            </Text>
-          ) : (
-            <InlineLookup
-              entry={openEntry}
-              keepAcknowledgement={acknowledgements[openEntry.lexemeId] ?? null}
-              onClose={() => setOpenLexemeId(null)}
-              onKeep={keep}
-              onOpenWord={() => onOpenWord(openEntry.lexemeId)}
-              testID="reading-lookup"
-            />
-          )}
-        </>
+        <ReadingPassage
+          furigana={furigana}
+          furiganaScopeNote={furiganaScopeNote(spans)}
+          lookup={
+            openEntry === null ? (
+              <Text
+                style={[styles.hint, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+                testID="reading-lookup-hint"
+              >
+                {`${String(lookupSpanCount(spans))} places on this page have an entry in this build and open a lookup where they stand. Everything else renders as ordinary text rather than being guessed at.`}
+              </Text>
+            ) : (
+              <InlineLookup
+                entry={openEntry}
+                keepAcknowledgement={acknowledgements[openEntry.lexemeId] ?? null}
+                onClose={() => setOpenLexemeId(null)}
+                onKeep={keep}
+                onOpenWord={() => onOpenWord(openEntry.lexemeId)}
+                testID="reading-lookup"
+              />
+            )
+          }
+          onOpen={setOpenLexemeId}
+          onToggleFurigana={() => setFurigana((was) => !was)}
+          spans={spans}
+          testID="reading-surface"
+          title={passage.title}
+          titleTranslation={passage.titleTranslation}
+          translation={passage.english}
+        />
       )}
 
       {/*
@@ -343,7 +346,36 @@ function examplesFor(lexemeId: string): readonly LookupExample[] {
   }));
 }
 
-/** Attribution lines for the fields the lookup actually displays. */
+/**
+ * How the surface says which words carry a reading, without over-claiming.
+ *
+ * A count of *places*, not of words: 道 is one entry and three occurrences, and
+ * "the 10 words in this passage" would be wrong about both numbers. The
+ * distinction matters because the sentence exists to stop a learner concluding
+ * the toggle is broken on the rest of the page.
+ */
+function furiganaScopeNote(spans: readonly FrontierSpan[]): string {
+  const places = lookupSpanCount(spans);
+  const entries = new Set(
+    spans.map((span) => span.lexemeId).filter((id): id is string => id !== undefined),
+  ).size;
+  return (
+    `Furigana appears at the ${String(places)} places in this passage — ${String(entries)} distinct entries — where this build ` +
+    'has a dictionary reading. The rest carries no reading data, so none is guessed.'
+  );
+}
+
+/**
+ * Attribution lines for the fields the lookup actually displays.
+ *
+ * The required attribution and where it came from, and deliberately not the
+ * provenance record's `notes`. Those notes are several hundred words of
+ * importer bookkeeping — why a modification status is `derived`, which host
+ * answered — and on a reading surface they are a wall of text under a passage
+ * that is 160 characters long. They are not dropped: the whole record is on
+ * *About & diagnostics*, which is also the screen the EDRDG statement's second
+ * clause asks for, and the last line here says so.
+ */
 function attributionFor(lexeme: SeedLexeme): readonly AttributionLine[] {
   const shown: readonly (readonly [string, keyof SeedLexeme['provenance']])[] = [
     ['Reading', 'reading'],
@@ -358,10 +390,20 @@ function attributionFor(lexeme: SeedLexeme): readonly AttributionLine[] {
   const sources = distinctProvenance(shown.map(([, field]) => lexeme.provenance[field]));
   const sourceLines = sources.map((record) => ({
     field: record.source,
-    source: attributionLines(record).join(' · '),
+    source: [record.attribution, record.source_url]
+      .filter((part): part is string => part !== null && part !== '')
+      .join(' · '),
   }));
 
-  return [...fieldLines, ...sourceLines];
+  return [
+    ...fieldLines,
+    ...sourceLines,
+    {
+      field: 'Full record',
+      source:
+        'Every field of this entry’s provenance — version, retrieval date, upstream entry id and the importer’s notes — is on About & diagnostics.',
+    },
+  ];
 }
 
 const styles = StyleSheet.create({

@@ -62,6 +62,16 @@ export interface ReadingPassageProps {
    * annotates eight words out of thirty needs to say why, or it reads as broken.
    */
   readonly furiganaScopeNote: string;
+  /**
+   * The lookup, when one is open.
+   *
+   * A slot rather than a sibling of this component, and that is the whole point
+   * of the lane: the panel has to land *directly under the passage*, above the
+   * folded translation, with the text it is about still on screen. Rendered as a
+   * sibling it drifted below the translation heading, which reads as leaving the
+   * content even though nothing navigated.
+   */
+  readonly lookup?: ReactNode;
   readonly testID?: string | undefined;
 }
 
@@ -74,6 +84,7 @@ export function ReadingPassage({
   onToggleFurigana,
   onOpen,
   furiganaScopeNote,
+  lookup,
   testID,
 }: ReadingPassageProps): ReactNode {
   const theme = useTheme();
@@ -147,6 +158,8 @@ export function ReadingPassage({
           ))}
         </View>
       )}
+
+      {lookup}
 
       <Disclosure
         note="The passage is this project's own writing, and so is this translation. Reading it is not a test and it is not recorded as one."

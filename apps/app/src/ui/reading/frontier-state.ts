@@ -57,11 +57,17 @@ export interface LearnerKnowledge {
  * the sentence a learner reads about a mark is the same sentence the rule is
  * written in. A legend written separately from the rule is the artefact that
  * goes stale first.
+ *
+ * Phrased as a clause rather than a sentence, and with no noun of its own, so
+ * the same string reads correctly in both places: "a hairline in the accent —
+ * nothing in your log mentions it yet" under the passage, and "線路 — nothing in
+ * your log mentions it yet" inside the lookup. A sentence written for one of
+ * those reads as a mistake in the other.
  */
 export const FRONTIER_MARK_BASIS: Readonly<Record<FrontierMarkKind, string>> = {
-  none: 'Kept, and you did not flag it. It renders clean.',
-  frontier: 'Nothing in your log mentions this word yet.',
-  fragile: 'You kept this word and marked it uncertain.',
+  none: 'kept, and not flagged, so it renders clean',
+  frontier: 'nothing in your log mentions it yet',
+  fragile: 'you kept it and marked it uncertain',
 };
 
 /** The mark this learner's own record puts on this word. */

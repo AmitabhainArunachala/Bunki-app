@@ -173,7 +173,7 @@ test('a kept word leaves this learner’s frontier, on the page they are reading
   // Before: the word is on the frontier, because nothing in the log mentions it.
   await wordInPassage(page, WORD).click();
   await expect(visibleTestId(page, 'reading-lookup-basis')).toContainText(
-    'Nothing in your log mentions this word yet',
+    `${WORD} — nothing in your log mentions it yet.`,
   );
   await expect(wordInPassage(page, WORD)).toHaveAttribute(
     'aria-label',
