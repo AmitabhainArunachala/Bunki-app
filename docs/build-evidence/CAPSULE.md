@@ -5281,3 +5281,163 @@ with the correction marked rather than quietly applied:
 Verify this branch from a clean checkout, re-run the check set, and run
 `--verify-reproducible` with a warm cache. Nothing here is merged; no agent may
 merge, approve, or push to `main`.
+
+---
+
+## Verifier V3 — re-verification of `agent/bunki-real-dictionary` @ `9051e8a`
+
+**Method.** Fresh `git clone` of the branch, detached at
+`9051e8afaa0e1654b773261fcae1e7e8d63de7e7`, `npm ci` (exit 0), nothing reused from
+the builder's worktree. Controller hash verified **before** reading it:
+`sha256(docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md)` =
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`, matching the
+launcher's expected value; v2 spec `5ee28477…91b0c55` and the launcher itself
+`b0a6811d…378fce7` also match `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`.
+
+### The four P1s from the previous round: all four resolved
+
+Each was re-tested against the committed bytes, not against the report.
+
+| #    | Claim                                              | V3 result                                                                                                                                                            |
+| ---- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1-1 | committed data is the committed script's output    | **RESOLVED.** 0 of 3,000 lexemes carry a duplicate gloss (was 83); `jmdict-1172910` 運動 ships "movement" once. `--verify-reproducible` returns **REPRODUCIBLE**, 1,245 files byte-identical, from archives this verifier re-downloaded independently. |
+| P1-2 | no sentence credits the MySQL NULL sentinel        | **RESOLVED.** 0 of 2,000 records credit `\N` (was 652); 0 have a blank or whitespace-only contributor on either half. 1,009 declined pairs counted in `counts` and explained in `deferred`. |
+| P1-3 | every emitted provenance id is registered          | **RESOLVED.** 7 distinct ids across the imported tier and 7 across the §8 fixture tier all resolve against the 10 sources in `provenance.json`; **0 unregistered**. The importer's own provenance gate reports the same. |
+| P1-4 | the search screen acknowledges EDRDG               | **RESOLVED on that surface.** Mounted at `apps/app/src/screens/capture-screen.tsx:536`; the e2e case asserts the acknowledgement's rendered words, not only its test id. |
+
+### Licence audit, re-run from the licensors' own hosts
+
+Every licence text and every upstream archive was re-fetched by this verifier and
+hashed independently. **Nine of nine byte-identical to what is committed and
+recorded.** Nothing here rests on the builder's cache or on a digest copied out of
+a document.
+
+| Artefact                              | Retrieved from                      | sha256 (verifier)                       | Verdict |
+| ------------------------------------- | ----------------------------------- | --------------------------------------- | ------- |
+| `licenses/EDRDG-licence-statement.html` | `www.edrdg.org/edrdg/licence.html`  | `52f60ea9…156692`                       | CLEAR   |
+| `licenses/CC-BY-SA-4.0.html`          | `creativecommons.org`               | `a7dbad04…789246`                       | CLEAR   |
+| `licenses/CC-BY-SA-3.0.txt`           | SPDX `license-list-data`            | `3f941b3b…d7f72f`                       | CLEAR   |
+| `licenses/CC-BY-2.0-FR.html`          | `creativecommons.org`               | `af0d7ada…847b71`                       | CLEAR   |
+| `licenses/KanjiVG-COPYING.txt`        | KanjiVG @ `61e39cf`                 | `d255e079…46bdcc`                       | CLEAR   |
+| `JMdict_e.gz`                         | `www.edrdg.org`                     | `bebd0d24…3956e2`, 10,523,044 bytes     | CLEAR   |
+| `kanjidic2.xml.gz`                    | `www.edrdg.org`                     | `47f16167…cbfd80`, 1,488,563 bytes      | CLEAR   |
+| `jpn`/`eng` `_sentences_detailed`     | `downloads.tatoeba.org`             | `20706c3d…710f30` / `8312d3ba…f6a4d7`   | CLEAR   |
+| `links.tar.bz2`                       | `downloads.tatoeba.org`             | `69abec53…2c88e2`                       | CLEAR   |
+
+### Fresh 20-record fidelity sample
+
+A deterministic stride sample (not cherry-picked) of **8 lexemes + 6 kanji + 6
+sentence pairs = 20 records**, checked field by field against the upstream bytes
+with a parser written for this audit — deliberately not the importer's, so a bug
+in `parseJMdict` could not be reproduced by the check meant to catch it.
+
+**132 field comparisons, 0 mismatches.** Every ent_seq resolved, every literal
+resolved, both Tatoeba halves matched text, language and contributor name, and
+every sentence really contained the headword it claims to exemplify.
+
+### Full check set, this worktree, after `npm ci`
+
+| Check                                           | Result                                                             |
+| ----------------------------------------------- | ------------------------------------------------------------------ |
+| `npm run lint`                                  | clean, no output                                                   |
+| `npm run format:check`                          | `All matched files use Prettier code style!`                       |
+| `npm run typecheck`                             | exit 0, all workspaces                                             |
+| `npm run test`                                  | **88 files, 1467 tests passed** — the count the round claimed      |
+| `npm run test:e2e`                              | **39 passed (59.6s)**                                              |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist`                                                   |
+| `import-sources.mjs --check`                    | MATCH ×4; licence gate and provenance gate satisfied               |
+| `import-sources.mjs --verify-reproducible`      | **REPRODUCIBLE** — 1,245 files byte-identical                      |
+| `import-sources.mjs --verify-fixtures`          | MATCH — all 16 fixture lexemes and 10 kanji equal current upstream |
+
+One note for the next verifier: `test:e2e` needs `npm run test:e2e:build` first.
+The harness deliberately refuses to build, so running it on a fresh checkout
+reports 39 identical "No web export" failures that are a missing precondition,
+not a regression.
+
+### Three new findings
+
+**V3-1 (P1) — `between()` cannot see an opening tag that carries an attribute, so
+3,674 JMdict glosses are invisible to the importer.**
+
+`between(xml, tag)` searches for the literal string `<gloss>`, so every
+`<gloss g_type="expl">…</gloss>` is skipped. Measured against `JMdict_e.gz` at the
+digest the manifest records: 440,978 `<gloss>` elements, of which **3,674 carry
+`g_type`** and none carry `xml:lang`.
+
+Consequences, all reproduced:
+
+- **14 of the 3,000 shipped lexemes are missing at least one English gloss** — 17
+  glosses dropped in total. `jmdict-1193420` 歌舞伎 ships exactly `["kabuki"]` and
+  drops upstream's actual explanation, "traditional form of drama and music
+  performed by male actors wearing makeup mainly in white and red". `jmdict-1382450`
+  石 ships the boat-capacity sense and drops the ordinary one, "traditional unit of
+  volume, approx. 180.4 litres". A circular gloss is a user-visible failure, not a
+  formatting nit.
+- **25 entries are dropped entirely** because every gloss they have is
+  `g_type`-attributed, so `senses.length === 0` fires the `continue`. This is why
+  `jmdictEntriesAvailable` is 218,148: the file actually holds **218,173** entries.
+  LICENSES.md §2.1 and the §5 retrieval log both state 218,148 as a fact about the
+  file, so both report the parser's yield as the licensor's content.
+- The subset's composition is **not** affected: only 2 of the 25 carry a priority
+  tag, scoring 989.5 and 989 against a cut-off of 68. Ranking is intact.
+- `if (gloss.includes('xml:lang')) continue;` is **unreachable** — `allBetween`
+  can never return a gloss whose open tag had an attribute. The comment above it
+  says the guard "keeps this correct if pointed at the multilingual JMdict"; that
+  mechanism does not exist.
+- LICENSES.md §2.5 defines `senses` as "**every** English gloss of every sense,
+  upstream order, deduplicated". That is untrue of 14 shipped records.
+
+The reason this survived the round that was built to catch exactly this shape:
+`--check`, `--verify-reproducible` and `--verify-fixtures` **all three re-use
+`parseJMdict`**. Re-running the same parser over the same bytes reproduces the same
+omission byte-for-byte, so `--verify-reproducible` prints REPRODUCIBLE — correctly,
+and uninformatively. Reproducible is not the same as faithful, and the gate set
+currently has no member that compares against upstream with independent code.
+`--verify-fixtures` comes closest and reports MATCH only because none of the 16
+fixture lexemes happens to have a `g_type` gloss; the §8 tier is clean, checked
+independently, 0 of 16 diverging.
+
+Smallest fix: match `<gloss` plus a terminator rather than `<gloss>`, regenerate,
+and add a fidelity check that parses upstream with something other than the
+importer's own reader.
+
+**V3-2 (P1) — the canvas screen displays JMdict headwords and glosses with no
+EDRDG acknowledgement anywhere on it.** This is the previous round's P1-4, one
+surface over. Driven in a browser against the exported bundle rather than argued
+from source: on `/canvas`, nine interactive marks carry accessible names that are
+JMdict headword-and-gloss pairs — `駅: railway station`, `線路: railway track`,
+`分かれる: to branch`, `岐路: forked road`, `道: road`, `自分: myself` — while the
+page contains **0** `seed-entry-disclosure` elements and the strings `EDRDG`,
+`JMdict` and `CC BY-SA` appear **nowhere** in the DOM. `/canvas` is not in the
+`adv-claim-audit` route list, which still names only `/word/…`, `/kanji/…` and `/`,
+so nothing says so. LICENSES.md §2.2 states the WWW-server obligation "is met" and
+that the disclosure "renders on every screen that displays words from the files";
+on this surface it does not. Note the surface boundary: the mount is WP-08's
+screen, so this is a coordination item, but the false compliance sentence is in
+`packages/seed/LICENSES.md`.
+
+**V3-3 (P2) — LICENSES.md §2.4 still labels the EDRDG-derived fields CC BY-SA
+3.0.** Line 346: "The EDRDG-derived fields are labelled `CC BY-SA 3.0`". They are
+labelled **4.0** — in `data/provenance.json`, `data/licences.json`,
+`data/dictionary/manifest.json` and `SEED_ENTRY_DISCLOSURE`. This is the one
+sentence the round's own headline correction missed. The file opens by promising
+"the prose below and the bytes on disk cannot drift apart without the suite going
+red"; `test/edrdg.test.ts` only checks that every licence **path and digest**
+appears in the prose, so a wrong licence **version** in the prose drifts freely.
+That is the same defect shape as P1-1, one level up: a claim with nothing that
+could falsify it.
+
+### What this verifier did not do
+
+- Did not re-read 3,000 glosses for sense appropriateness; the sample is 20.
+- Did not evaluate the two-tier sizing decision against controller §8 — it is
+  recorded as an explicit judgement call and belongs to a human reviewer.
+- Did not push to `main`, merge, approve, or edit any spec, convergence, handoff
+  or ADR document.
+
+### Next safe command
+
+Return the three findings to B3 for a repair round on
+`agent/bunki-real-dictionary`. V3-1 needs a regeneration, so it must land before
+any merge; V3-3 is a one-line correction plus the test that would have caught it.
+Nothing here is merged; no agent may merge, approve, or push to `main`.
