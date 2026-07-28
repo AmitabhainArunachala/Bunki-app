@@ -27,20 +27,22 @@
  *
  * ## State after the W5 closeout
  *
- * Two of these findings are **closed**, and their tests stayed — without their
+ * Three of these findings are **closed**, and their tests stayed — without their
  * annotations — as regression pins:
  *
  *   - **T3-1** (a finished sitting reported as `abandoned`) — fixed in
  *     `resolveCompletionState`.
  *   - **T3-2** (the nav shell stacking screens without bound) — fixed by
  *     `router.replace` in `NavShell`.
+ *   - **T4-2** (no `SessionClosed` reaching the durable log at all) — fixed by
+ *     the WP-10 export lane: `AppStore.persistMinted` takes a sealed batch of
+ *     kernel-minted events, so the store can accept the sitting without becoming
+ *     able to accept a forgery (COORD-B8-2 closed).
  *
- * Three remain open and annotated. Two of them are narrower successors rather
- * than survivors: closing a defect here has twice revealed a smaller one behind
+ * Two remain open and annotated. Both are narrower successors rather than
+ * survivors: closing a defect here has repeatedly revealed a smaller one behind
  * it, and recording that is the point of the file.
  *
- *   - **T4-2 (P2)** — no `SessionClosed` reaches the durable log at all
- *     (COORD-B8-2). Found by fixing T3-1.
  *   - **T4-1b (P2)** — the pre-hydration bytes still ship an empty `<title>`.
  *     Left by fixing T4-1.
  *   - **T3-3 (P2)** — an abandoned AI request still attaches a candidate.

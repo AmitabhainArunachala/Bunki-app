@@ -112,7 +112,9 @@ predicate erosion; this is the opposite of it.
   still open).
 - **Accessibility beyond automated rules.** Chromium, one engine, on Expo Web.
   No screen reader ran, no human tested it, no mobile browser was involved.
-- **That the sitting's own observations are exportable.** They are not: the
-  session workspace holds them beside the durable log, the session screen says
-  so, and `closed-loop.spec.ts` asserts that disclosure rather than working
-  around it. Closing that seam is coordination request COORD-B8-2.
+- **The session plan.** The sitting's _observations_ are exportable since the
+  WP-10 export lane closed COORD-B8-2, and `closed-loop.spec.ts` steps 9–11
+  assert it out of the browser's own storage. The plan is not: which steps were
+  composed and how far the cursor got stay on the device, because a plan is a
+  proposal rather than a record of what the learner did. No run here may be read
+  as evidence about the plan surviving anything.

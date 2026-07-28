@@ -4244,3 +4244,272 @@ this branch is merged, and no agent may merge, approve, or push to `main`.
 Outstanding for the ladder, in order: WP-11 (needs macOS/Xcode/a device — or an
 explicit external-gate document), WP-12 (only John can run it), WP-13 (the
 Codex 5.6 report and the Fable 5 closure receipt).
+
+---
+
+## Appendix — WP-10 export lane (Builder B8): the sitting reaches the log, and the export replays it
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-export`
+**Base:** `3016b10` (`origin/agent/bunki-phase0-integration`)
+**Scope:** definition-of-done §2 item 4 — *"Export exists but doesn't replay:
+`verify:export` green on a toy fixture but the operator's actual session data
+fails round-trip."* Disclosed by the WP-10 integrator as **COORD-B8-2**,
+deliberately not done, and marked VIOLATED by the final W5 verifier.
+
+### The defect, restated from the code rather than from the disclosure
+
+No session event of any kind reached the durable, exportable log. A learner
+could promote a thread, answer a review, meet the word in the canvas, close the
+sitting — and the export contained the capture, the two promotions, the
+candidate pair and `DataExported`, and nothing else. `closed-loop.spec.ts`'s
+exhaustive event list said so in six entries, and was *correct* about the build
+it described. The evidence inspector could not show a sitting either, which is
+why WP-09 needed a "demonstration chain" button to have anything to render.
+
+### The obstacle, and why it was a real one
+
+Joining the session workspace to `AppStore` means the store accepting events it
+did not mint. `@bunki/domain` carries no runtime marker separating a gate-minted
+`ReviewGraded` from a shaped object literal — the gate's own `CANDIDATE_MARKERS`
+comment says why it checks shape rather than a brand: *a brand does not survive
+the JSON boundary.* So an `ingest(events: DomainEvent[])` would take a
+hand-typed tier-A review with a good grade, which is REQ-ARCH-04's hole and
+controller §21.3(5)'s stop condition. Declining to open it was right.
+
+### The three options, weighed, with the reason for the choice recorded
+
+The task named three. All three were costed against the same question — *can a
+screen get a forged observation into the log through this?* — and against
+controller §18a, which forbids closing a WP by weakening a test.
+
+**(a) Dispatch session interactions through the store's own `AppCommand` path,
+so the store mints and persists in one step.** Genuinely the strongest boundary:
+no ingest path exists at all, so there is nothing to attack. Rejected on cost and
+on a second-order boundary problem. It moves ownership of `SessionWorkspaceState`
+into `AppStore`, which then holds the session cursor, the plan and the repair
+state — scheduling-adjacent state that controller §5 keeps out of `apps/app`.
+It also duplicates the eleven-member `SessionCommand` union as app commands, a
+second command vocabulary to keep in step with the first; the
+`UnlistedAppCommandKind` machinery exists precisely because that kind of drift is
+what this codebase keeps catching. And `CommandAck` (one `threadId`, one event
+list) does not model a session command that legitimately appends nothing. It is
+the right shape for a Phase-1 rewrite of the session screens, not for closing a
+defect on the last rung-1 item.
+
+**(c) Have the gate write through an injected sink.** Rejected outright. It makes
+`@bunki/domain` effectful, and `test/purity/no-ambient-nondeterminism.test.ts`
+plus the REQ-ARCH-02 injection rule would both have to be weakened to allow it —
+a §18a violation on its own. It is also weaker than it looks: a sink handed to
+the gate is a write capability any caller who constructs a `DomainContext` can
+redirect, which relocates the trust boundary rather than closing it.
+
+**(b) A persist-only entry point taking a gate-produced object only the kernel
+can construct in-process. Chosen.** The argument that unlocked it: *the brand
+does not need to survive the JSON boundary, because the persist path never
+crosses it.* The session workspace mints an event and hands that same object, in
+the same heap, to the store. The one place bytes come back across JSON is
+rehydration, which uses `parseEvent` and the adapter's own authority and does not
+touch this mechanism at all. So the question is not "was this minted by some
+kernel somewhere" — no marker can answer that — but "is this the very object my
+minter returned a moment ago", which object identity answers exactly.
+
+### What shipped
+
+- `packages/domain/src/events/mint-registry.ts` — a module-private
+  `WeakMap<object, string>` recording every object `createDomainEvent` and the
+  five `mint*` functions return, keyed on identity, valued with the event's
+  canonical JSON at mint time. Identity refuses literals, clones and JSON round
+  trips; the bytes refuse a real minted event edited in place, which is reachable
+  because the app genuinely holds minted events (`applySessionCommand` returns
+  them in the workspace log).
+- `packages/domain/src/events/provenance.ts` — `isKernelMinted`,
+  `assertKernelMinted`, and the `MintedEventBatch` seal/open pair.
+- `apps/app` — `AppStore.persistMinted(batch: MintedEventBatch): PersistAck`,
+  implemented in `memory-store.ts` over an `absorb()` step shared with
+  `rehydrate`, idempotent by each event's own key, journalled to the durable
+  adapter after the snapshot and the notify (REQ-UI-01 ordering preserved).
+- `apps/app/src/screens/session-loop.ts` — `persistWorkspaceEvents` /
+  `persistedEventIds`, called by `useOwnSessionLoop` on each dispatch.
+
+`recordKernelMint` is **not** re-exported from the events barrel, and
+`@bunki/domain`'s `exports` map publishes only `src/index.ts`, so there is no
+specifier an application can use to reach the registry's write side. That is the
+property the other guards rest on, and it is pinned by test rather than by
+comment.
+
+### An overclaim this lane made and then corrected
+
+The first draft of `provenance.ts` said the seal symbol was module-private and
+therefore that no module could build a container passing the brand check. Writing
+the falsification matrix disproved it: `Object.getOwnPropertySymbols` on a real
+batch hands the symbol over, so a holder of one genuine batch can build a
+container carrying the right key and fill it with anything. The comment now says
+plainly that the brand is a **typing device** — it makes `persistMinted(literal)`
+a compile error and makes intent legible — while `openMintedEventBatch`'s
+**member re-check** is the guarantee. Both suites now perform that exact attack.
+
+### Falsification matrix (each guard removed alone; both suites re-run)
+
+| Guard removed                         | domain suite | app suite   |
+| ------------------------------------- | ------------ | ----------- |
+| `sealMintedEvents` member check       | 4 failed     | 1 failed    |
+| `openMintedEventBatch` brand check    | 2 failed     | 2 failed    |
+| `openMintedEventBatch` member recheck | 1 failed     | 1 failed    |
+| registry byte comparison              | 1 failed     | 1 failed    |
+| registry identity lookup              | 6 failed     | 5 failed    |
+| *(baseline, restored)*                | 16 passed    | 14 passed   |
+
+The first run of this matrix showed the guards masking each other — removing one
+left both suites green because the other caught it. That is good defence and bad
+falsifiability, so isolated attacks were added until every single removal turns
+both suites red. Removing `store.persistMinted(...)` from `persistWorkspaceEvents`
+turns all five tests in `closed-loop-export.test.ts` red.
+
+### Two latent idempotency-key collisions, reachable only once events persisted
+
+- **Canvas.** The ordinal counted the *workspace* ledger, which restarts every
+  sitting, while `experienceId` is the seed passage's id — a constant. A second
+  sitting over the same passage minted `canvas:passage-…:0` again; the store
+  already held that key, so the observation was silently dropped. Counted off the
+  log now, as the repair path already did.
+- **Session start.** `session:start:${asOf}:${budget}` is content-derived but not
+  identifying. Two sittings at one instant — routine under a fixed test clock —
+  claim one key with different `sessionId`s, and a payload-comparing store raises
+  `IdempotencyConflictError` and refuses the append. Keyed on the session id now.
+
+Also: `bootstrapSessionWorkspace` no longer re-mints contracts the log already
+holds. Their `eventId` and `idempotencyKey` are pinned to the contract id, so a
+second sitting after a reload would have put two events differing only in
+`occurredAt` under one key, which `replay` refuses outright.
+
+### The ordering rule that must not be lost
+
+The bootstrap mints the sitting's two `ContractCreated` events before any
+gesture. Writing them there would put events in the learner's durable log for
+merely opening the Session tab — the fabrication the WP-10 repair round removed,
+and definition-of-done §2 item 6. `persistWorkspaceEvents` therefore carries
+*everything outstanding* rather than *what this command appended*, so the
+contracts land on the first dispatch: the learner pressing Start. Three
+bootstraps over a durable store leave the log untouched, and `ContractCreated`
+precedes `SessionStarted` once Start is pressed. Both are asserted.
+
+### Stale honesty claims corrected (REQ-GATE-03 cuts both ways)
+
+A disclosure that under-reports is as wrong as one that over-reports. Four were
+updated rather than deleted: `SESSION_INTEGRATION_NOTE` (now names what the log
+holds *and* that the plan is not in it), `apps/app/README.md`,
+`apps/app/e2e/README.md`, and the `closed-loop.spec.ts` header. The
+`session-screens.test.ts` assertion that pinned the *disclosure of an open seam*
+was replaced by one pinning the *mechanism* — strictly stronger, since "the note
+is gone" would have passed for a build that quietly stopped saying anything.
+
+`adv-known-defects.spec.ts` T4-2 was a `test.fail` pin on "no `SessionClosed`
+reaches the durable log". Un-failed and converted to a regression pin, the way
+T3-2 was after the nav-shell fix; it asserts the completion state as well as
+existence, so it goes red for either regression.
+
+### T-14 with real data, at two layers
+
+`verify:export` was green throughout the defect over hand-assembled fixtures.
+Both layers now assert that the bytes *contain a sitting*, which is what stops
+the equality check being a tautology:
+
+- `packages/export/test/verify-export.test.ts` gains a `[real sitting]` block per
+  adapter, whose log is built by **running a session** through
+  `applySessionCommand` rather than by listing events — so a change to what a
+  sitting produces changes the fixture instead of leaving it stale. It checks the
+  round trip, the five session families in the bytes, and that the gate's
+  verdicts survived both ways (declared review admitted, passage sighting
+  refused).
+- `apps/app/test/closed-loop-export.test.ts` carries the same question through
+  the app: durable store, the two capture-screen commands, the real session
+  functions, `prepareExport`, and a simulated force-quit — a second store opened
+  over the same bytes, then exported cold. Operator acceptance steps 3–8.
+
+The persist wiring was extracted out of the hook into exported functions so these
+tests drive the code the hook drives. It was a re-implementation first, and a
+re-implementation that persisted correctly while the hook did not would have been
+green over this exact defect.
+
+### E2E (controller §17.5 includes it; outcome 5)
+
+`closed-loop.spec.ts` steps 9–11 now assert the sitting rather than its absence:
+the durable snapshot before the reload, the snapshot again after it (a cold
+bundle, storage only) with **content** checked as well as families — every
+`ReviewGraded` tier A, every `ExposureLogged` tier D, exactly one `SessionClosed`
+with a real completion state — and an exhaustive thirteen-event list. The export
+badge's replayed-event count is polled against the snapshot length, so "the
+session events are in the export and it replays" follows from the three together
+without the spec reaching into the app.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                        |
+| ----------------------------------------------- | --------------------------------------------- |
+| `npm ci` (own worktree, no inherited modules)   | clean install, exit 0                         |
+| `npm run lint`                                  | pass, no output                               |
+| `npm run format:check`                          | pass — "All matched files use Prettier style" |
+| `npm run typecheck`                             | pass, root + 6 workspaces                     |
+| `npm run test`                                  | **1415 passed**, 86 files (was 1374 / 83)     |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                            |
+| `npm run verify:export` (T-14)                  | **14 passed**, 1 file (was 10)                |
+| `cd apps/app && npx expo export --platform web` | pass — 13 static routes                       |
+| `npm run test:e2e`                              | **38 passed**, 9 spec files, exit 0           |
+
+T-09 and every evidence-gate test are green; the domain suite is 486 of the
+1415.
+
+**One process finding worth recording, because it nearly cost this lane.** The
+first three commits were pushed with three live type errors in them. Per-project
+`npx tsc -p apps/app/tsconfig.json` was clean and was mistaken for the check;
+`tsconfig.json` deliberately excludes `test/`, and the root `npm run typecheck`
+is what runs each workspace's `tsconfig.test.json` too. The errors were real
+(`StorageDurabilityClaim` is `survives-reload | session-only | unknown` and does
+not accept the store's own `device-local` vocabulary — the two are separate on
+purpose, P0-CAP-15) and were found only by running the §17.5 command as written
+and reading its **exit code** rather than its tail. Fixed in the final commit.
+The general rule the controller already states and this lane re-learned: run the
+check set as specified, in your own worktree, and trust the exit status.
+
+Four spec hashes were verified against
+`BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` before any work began — the
+controller's own `de7b6fcc…` among them.
+
+### What this lane does **not** claim
+
+- **Native anything.** Provisional web adapter throughout (P0-CAP-15). The
+  force-quit here is a second store over the same snapshot bytes, not a device.
+- **That the plan is exported.** It is not, deliberately, and every surface that
+  mentions durability now says which half is which.
+- **That the seam is unattackable.** It is attackable exactly one way that was
+  found and closed — a container carrying the recovered seal symbol — and the
+  claim made is the narrow one: the member re-check refuses it. A reviewer should
+  try to find a second way rather than trust this paragraph.
+- **Independent verification.** This is a self-report. The Codex 5.6 report and
+  the Fable 5 closure receipt (§2 item 11) remain outstanding.
+
+### What a verifier should try to break
+
+1. Delete either guard in `provenance.ts`, or either check in
+   `mint-registry.ts`, and confirm both suites go red — the matrix above says how
+   many tests each removal costs, so a removal that costs fewer is a hole.
+2. Add `store.persistMinted(sealMintedEvents([literal]))` to a screen with a
+   hand-typed tier-A `ReviewGraded` and confirm it throws `ForeignEventError`
+   rather than reaching the log.
+3. Export `recordKernelMint` from `packages/domain/src/events/index.ts` and
+   confirm `provenance.test.ts` goes red. That is the one change that would make
+   every other guard bypassable.
+4. Delete the `store.persistMinted(...)` line in `persistWorkspaceEvents` and
+   confirm all five `closed-loop-export.test.ts` tests fail — a guard that does
+   not go red is not a guard.
+5. Run a session, reload, and run a second session over the same target; confirm
+   no `IdempotencyConflictError` and that the second sitting's canvas observation
+   is in the log. That is the collision pair described above.
+6. Check that navigating to `/session` and back, without pressing Start, writes
+   nothing to `localStorage`.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-phase0-closed-loop-wp10-export` into
+`agent/bunki-phase0-integration` and have a human review it. Nothing here is
+merged; no agent may merge, approve, or push to `main`.

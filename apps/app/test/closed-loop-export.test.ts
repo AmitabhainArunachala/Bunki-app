@@ -316,7 +316,10 @@ describe('T-14 over real session data, not a fixture', () => {
       generatedAt: context.clock.now(),
       appVersions: appVersionsForBuild(),
       liveState: durable.store.readDerived(),
-      storageDurability: 'device-local',
+      // `survives-reload`, not the store's own `device-local` label: the two
+      // vocabularies are deliberately different. `@bunki/export` describes what a
+      // check did not establish and must not name an adapter (P0-CAP-15).
+      storageDurability: 'survives-reload',
     });
 
     expect(prepared.verification.firstDifference).toBeNull();
@@ -365,7 +368,10 @@ describe('T-14 over real session data, not a fixture', () => {
       generatedAt: ASOF,
       appVersions: appVersionsForBuild(),
       liveState: cold.store.readDerived(),
-      storageDurability: 'device-local',
+      // `survives-reload`, not the store's own `device-local` label: the two
+      // vocabularies are deliberately different. `@bunki/export` describes what a
+      // check did not establish and must not name an adapter (P0-CAP-15).
+      storageDurability: 'survives-reload',
     });
 
     expect(prepared.verification.equal).toBe(true);

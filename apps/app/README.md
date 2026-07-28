@@ -39,9 +39,16 @@ interactions to domain commands. That is all it does.
   selected by Metro's platform resolution so the web bundle contains no native
   database. Producing the `native` label is not the same as earning it — only
   WP-11 device evidence may be reported as native verification.
-- **Session and canvas events are not durable yet.** They live in the session
-  workspace for as long as the app is open (COORD-B8-2); the session screen and
-  `/debug` both say so.
+- **Session and canvas events are durable** since the WP-10 export lane closed
+  COORD-B8-2. A sitting's start, its contracts, every graded review, every canvas
+  observation and its close reach the same log as the capture, so they survive a
+  reload, appear in an export and show up in the evidence inspector. The store
+  still mints none of them: `applySessionCommand` does, evidence-class ones
+  through the evidence gate, and `AppStore.persistMinted` accepts only a sealed
+  batch of events this kernel minted in this process (REQ-ARCH-04). What stays on
+  the device is the _plan_ — which steps were composed and how far you got —
+  because a plan is a proposal rather than a record of what the learner did; the
+  session screen and `/debug` both say so.
 - **Candidates are always labeled.** AI-generated content renders with a visible
   "AI candidate / generated" label (T-12) and is never presented as canonical.
 - **Claim discipline (REQ-GATE-03).** No comprehension percentages, no global

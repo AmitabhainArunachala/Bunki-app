@@ -265,7 +265,10 @@ describe('mint provenance — the sealed container', () => {
     const [seal] = Object.getOwnPropertySymbols(real);
     expect(seal).toBeDefined();
 
-    const forgedButBranded = { [seal as symbol]: [forgedReview], size: 1 } as MintedEventBatch;
+    const forgedButBranded = {
+      [seal as symbol]: [forgedReview],
+      size: 1,
+    } as unknown as MintedEventBatch;
 
     // The brand check passes — this really is a container carrying the real key.
     expect((seal as symbol) in forgedButBranded).toBe(true);
