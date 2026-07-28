@@ -60,10 +60,14 @@ import {
   DEFAULT_FRAGILITY_POLICY,
   FSRS_DESIRED_RETENTION,
   LENS_SKILLS,
+  buildMemoryHistories,
   buildRetrievabilityIndex,
+  buildRetrievabilityIndexTimeline,
   isFragile,
   projectNodeRetrievability,
+  type AdmittedReview,
   type CapabilityLens,
+  type ContractActivation,
   type GraphNode,
   type IsoInstant,
   type LensProjection,
@@ -321,6 +325,16 @@ export function buildMapIndex(
   // drift from it.
   memoryStates: Parameters<typeof buildRetrievabilityIndex>[1],
 ): RetrievabilityIndex {
+  return buildRetrievabilityIndex(usableContracts(contracts), memoryStates);
+}
+
+function usableContracts(
+  contracts: readonly {
+    readonly contractId: string;
+    readonly targetComponentId: string;
+    readonly skill: string;
+  }[],
+): readonly ProjectedContract[] {
   const usable: ProjectedContract[] = [];
   for (const contract of contracts) {
     if (!SCHEDULED_SKILL_NAMES.has(contract.skill)) continue;
@@ -330,5 +344,88 @@ export function buildMapIndex(
       skill: contract.skill as ProjectedContract['skill'],
     });
   }
-  return buildRetrievabilityIndex(usable, memoryStates);
+  return usable;
+}
+
+/* ------------------------------------------------------------------ *
+ * The scrubber's frames
+ * ------------------------------------------------------------------ */
+
+/**
+ * The ledger slices the timeline needs, structurally.
+ *
+ * The three fields of an admitted review are exactly the three a
+ * `GateDecisionRecord` carries — contract, effective grade, instant — which is
+ * why the history can be rebuilt from the ledger rather than from a second
+ * bookkeeping the app would have to maintain.
+ */
+export interface TimelineInput {
+  readonly contracts: readonly {
+    readonly contractId: string;
+    readonly targetComponentId: string;
+    readonly skill: string;
+  }[];
+  readonly memoryStates: readonly { readonly contractId: string; readonly activatedAt: IsoInstant }[];
+  readonly gateDecisions: readonly {
+    readonly contractId: string | null;
+    readonly admitted: boolean;
+    readonly effectiveGrade: AdmittedReview['effectiveGrade'] | null;
+    readonly at: IsoInstant;
+  }[];
+}
+
+/**
+ * One index per frame — the state **as it stood**, not today's state backdated.
+ *
+ * This is the distinction the whole scrubber turns on, and it is easy to get
+ * silently wrong. The domain says why:
+ *
+ * > The scrubber needs the state *as it stood* at each frame, not today's state
+ * > evaluated at an earlier instant — the second would draw a learner who
+ * > already knew, in March, everything they learned in June.
+ *
+ * A static `RetrievabilityIndex` answers `stateOf` from *current* states, so
+ * projecting it at a past instant produces exactly that lie: the March frame
+ * would show June's stability with March's decay applied. It looks plausible,
+ * it is smooth, and it is false. So the frames come from
+ * `buildRetrievabilityIndexTimeline`, whose per-frame `stateOf` binary-searches
+ * a version list rebuilt by folding the reviews the gate already admitted, with
+ * the same reducer replay uses.
+ *
+ * It also cannot admit anything replay would refuse: an `AdmittedReview` is by
+ * definition one the gate already accepted, and the filter below takes only
+ * decisions whose `admitted` is true and whose grade the gate actually recorded.
+ *
+ * ## Cost
+ *
+ * Built **once** for a whole scrubber run — the (component, skill) bucketing is
+ * invariant across frames and is shared, which is the repair lane A2 made after
+ * measuring 426 daily frames at ~1.2s. Per frame this is one object; per node
+ * read it is one binary search.
+ */
+export function buildMapTimeline(
+  input: TimelineInput,
+  frames: readonly IsoInstant[],
+): readonly { readonly at: IsoInstant; readonly index: RetrievabilityIndex }[] {
+  const activations: ContractActivation[] = input.memoryStates.map((state) => ({
+    contractId: state.contractId,
+    activatedAt: state.activatedAt,
+  }));
+
+  const admitted: AdmittedReview[] = [];
+  for (const decision of input.gateDecisions) {
+    if (!decision.admitted) continue;
+    if (decision.contractId === null || decision.effectiveGrade === null) continue;
+    admitted.push({
+      contractId: decision.contractId,
+      effectiveGrade: decision.effectiveGrade,
+      reviewedAt: decision.at,
+    });
+  }
+
+  return buildRetrievabilityIndexTimeline(
+    usableContracts(input.contracts),
+    buildMemoryHistories(activations, admitted),
+    frames,
+  );
 }

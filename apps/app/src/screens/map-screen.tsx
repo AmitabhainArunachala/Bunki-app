@@ -65,7 +65,13 @@ import {
   type BandTally,
 } from '../ui/map/map-eras.ts';
 import { layoutNeighbourhood } from '../ui/map/map-layout.ts';
-import { buildMapIndex, lensView, projectMapNode, RECALL_BAND_RULE } from '../ui/map/map-projection.ts';
+import {
+  buildMapIndex,
+  buildMapTimeline,
+  lensView,
+  projectMapNode,
+  RECALL_BAND_RULE,
+} from '../ui/map/map-projection.ts';
 import { buildRoutes, routePosition, ROUTE_EXCLUSION_NOTE } from '../ui/map/map-routes.ts';
 import { historyFrames, resolveScrubber } from '../ui/map/map-scrubber.ts';
 import { lexemeNodeId, mapAtlas, nodeSubject } from '../ui/map/map-source.ts';
@@ -117,11 +123,6 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   const nowInstant = now ?? new Date().toISOString();
 
-  const index = useMemo(
-    () => buildMapIndex(derived.contracts, derived.memoryStates),
-    [derived],
-  );
-
   /**
    * The scrubber's history side, from the log's own instants.
    *
@@ -141,6 +142,45 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     () => resolveScrubber(scrub, frames, nowInstant),
     [scrub, frames, nowInstant],
   );
+
+  /**
+   * One index per frame, built **once** for the whole run.
+   *
+   * Not one index reused at different instants. A static index answers from
+   * *current* memory states, so projecting it at a past instant draws a learner
+   * who already knew in March everything they learned in June — plausible,
+   * smooth, and false. The timeline rebuilds each frame's state by folding the
+   * reviews the gate admitted, which is the honest answer and is also the shape
+   * that keeps the cost off the frame: the (component, skill) bucketing is
+   * invariant and shared, and a frame is one object.
+   */
+  const timeline = useMemo(
+    () => buildMapTimeline(derived, frames),
+    [derived, frames],
+  );
+
+  /**
+   * The index for where the scrubber stands.
+   *
+   * The era side and the detent both read the present, which is the last frame.
+   * The history side steps back from it. `buildMapIndex` is the fallback for the
+   * degenerate case of an empty timeline, so the map still draws for a learner
+   * with no log at all.
+   */
+  const index = useMemo(() => {
+    // A reverse scan rather than `findLast`: the ES2023 method is not in this
+    // project's lib target, and a frame list is at most a few hundred entries
+    // walked once per scrubber move — not per node and not per frame.
+    let chosen = timeline.at(-1);
+    for (let cursor = timeline.length - 1; cursor >= 0; cursor -= 1) {
+      const frame = timeline[cursor];
+      if (frame !== undefined && frame.at <= position.at) {
+        chosen = frame;
+        break;
+      }
+    }
+    return chosen?.index ?? buildMapIndex(derived.contracts, derived.memoryStates);
+  }, [timeline, position.at, derived]);
 
   /**
    * Where the map is centred.
