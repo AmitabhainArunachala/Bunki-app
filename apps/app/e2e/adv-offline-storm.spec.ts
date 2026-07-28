@@ -88,7 +88,12 @@ test('T-10: the whole loop runs with every off-origin request severed', async ({
     .first()
     .click();
   await expect(v('screen-kanji')).toBeVisible();
-  await expect(v('kanji-layer-0')).toBeVisible();
+  // `kanji-layer-0` until lane B2: the character page's hero block was one of
+  // four numbered "layers". The page is the fractal dive stopped at the
+  // character level now, so the specimen in the middle is `dive-centre` and
+  // there are no layers to be zero of. The assertion is unchanged in substance —
+  // the character page rendered its specimen with the network severed.
+  await expect(v('dive-centre')).toBeVisible();
 
   // 3. Promote — §3.3, by hand from the capture screen, as the learner would.
   await v('nav-capture').click();

@@ -84,6 +84,7 @@ export function DiveChrome({
       >
         {SCALE_LEVELS.map((level) => {
           const here = level === centre.level;
+          const open = here || reachable.has(level);
           const name = SCALE_LEVEL_NAMES[level];
           return (
             <View
@@ -95,8 +96,18 @@ export function DiveChrome({
                   backgroundColor: here ? theme.color.vermilionSoft : 'transparent',
                   borderColor: here ? theme.color.vermilion : theme.color.rule,
                   borderRadius: RADIUS.sm,
-                  // A level with nothing to reach is dimmed, never removed.
-                  opacity: here || reachable.has(level) ? 1 : 0.45,
+                  /*
+                    A level with nothing to reach is marked by **form**, not by
+                    an opacity. Dimming the whole rung to 0.45 was the first
+                    version and axe measured its label at 2.1:1 on the exported
+                    bundle — well under AA. `MIN_UNLIT_OPACITY` is a floor for
+                    an unlit *graphic*, and a dimmed rail is not a dimmed word:
+                    text has to stay legible whatever it is saying. So a level
+                    the dive cannot reach from here keeps full opacity and gets a
+                    dashed edge, which is the same channel `EDGE_PATTERNS` uses
+                    for fragility and which survives on any ground.
+                  */
+                  borderStyle: open ? 'solid' : 'dashed',
                 },
               ]}
             >
@@ -104,7 +115,11 @@ export function DiveChrome({
                 style={[
                   styles.rungWritten,
                   {
-                    color: here ? theme.color.vermilion : theme.color.inkMuted,
+                    color: here
+                      ? theme.color.vermilion
+                      : open
+                        ? theme.color.inkMuted
+                        : theme.color.inkFaint,
                     fontFamily: theme.font.mincho,
                   },
                 ]}
@@ -114,7 +129,19 @@ export function DiveChrome({
               <Text
                 style={[
                   styles.rungGloss,
-                  { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                  {
+                    /*
+                      The active rung's background is the accent tint, and
+                      `inkFaint` on it measures 4.44:1 — under AA for 13 px
+                      body text, which axe caught on the exported bundle. The
+                      two foregrounds `CONTRAST_PAIRS` declares against
+                      `vermilionSoft` are `ink` and `vermilion`, and both are
+                      checked; this uses one of them rather than adding a
+                      fourteenth pair for a shade that does not clear.
+                    */
+                    color: here ? theme.color.ink : theme.color.inkFaint,
+                    fontFamily: theme.font.sans,
+                  },
                 ]}
               >
                 {name.gloss}
