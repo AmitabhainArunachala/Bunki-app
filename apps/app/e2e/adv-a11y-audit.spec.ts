@@ -193,6 +193,76 @@ for (const scheme of ['light', 'dark'] as const) {
   });
 }
 
+/**
+ * The same sweep, over every route **mid-load**.
+ *
+ * ## Why a second sweep exists
+ *
+ * The scans above walk routes in their *settled* state, and that is where a
+ * whole class of defect hides. `react-native-web` renders `ActivityIndicator`
+ * as its own `role="progressbar"` with no accessible name, so every loading
+ * panel put two progressbars in the tree — one named, one anonymous — and the
+ * anonymous one is `aria-progressbar-name`, WCAG 4.1.2, impact *critical*. It
+ * survived the whole of Phase 0 because no scanned route was ever mid-load. It
+ * was found by accident, when the design specimen happened to render the four
+ * states side by side on a route the sweep visits.
+ *
+ * A defect that can only be found by accident is a defect the suite does not
+ * cover. This closes that: `?lag=` holds the real loading state open — the
+ * screens' own state machine, not a stand-in — long enough for axe to scan it.
+ *
+ * ## Non-vacuity
+ *
+ * Not every route has a lookup, so not every route has a loading state. The run
+ * records which routes actually showed one and fails if that count collapses:
+ * a sweep of loading states that found no loading state is a sweep that passes
+ * for the wrong reason, which is exactly the shape being closed here.
+ */
+const LAG_MS = 5_000;
+
+for (const scheme of ['light', 'dark'] as const) {
+  test(`axe (${scheme}): no violation while a route is still loading`, async ({ page, app }) => {
+    const violations: AxeSummary[] = [];
+    const loading: string[] = [];
+
+    for (const route of ROUTES) {
+      const joiner = route.includes('?') ? '&' : '?';
+      await openApp(page, app.origin, `${route}${joiner}lag=${String(LAG_MS)}&scheme=${scheme}`);
+
+      // Scan whatever is on screen, whether or not this route has a lookup — a
+      // route with no loading state still has a shell, and the shell is scanned
+      // in that state too.
+      const panel = visibleTestId(page, 'state-loading');
+      if (await panel.isVisible().catch(() => false)) loading.push(route);
+
+      const results = await new AxeBuilder({ page }).withTags([...WCAG_AA_TAGS]).analyze();
+      for (const violation of results.violations) {
+        violations.push({
+          route,
+          scheme: `${scheme} (loading)`,
+          id: violation.id,
+          impact: violation.impact ?? 'unknown',
+          nodes: violation.nodes.length,
+          detail: violation.nodes[0]?.failureSummary ?? '(no detail)',
+        });
+      }
+    }
+
+    expect(
+      loading.length,
+      'no route showed a loading panel, so this sweep scanned nothing it was written for — ' +
+        'check that ?lag= still holds the state open',
+    ).toBeGreaterThan(2);
+
+    expect(
+      violations,
+      `WCAG A/AA violations while loading (${String(loading.length)} routes showed a loading panel):\n${render(
+        violations,
+      )}`,
+    ).toEqual([]);
+  });
+}
+
 test('axe: no violation at all, on any route, in either scheme', async ({ page, app }) => {
   const violations = [
     ...(await scanEveryRoute(page, app.origin, 'light')),
