@@ -35,6 +35,8 @@ import { describe, expect, it } from 'vitest';
 import { CANDIDATE_LABEL, OFFLINE_FALLBACK_LABEL } from '@bunki/ai';
 import { GUIDE_ACTION_KINDS, GUIDE_AUTHORITY, GUIDE_BOUNDARY_RULE } from '@bunki/domain';
 
+import { guideAttributionLines } from '../src/ui/guide/guide-content.ts';
+
 const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const GUIDE_UI = resolve(APP_ROOT, 'src/ui/guide');
 const GUIDE_SCREEN = resolve(APP_ROOT, 'src/screens/guide-screen.tsx');
@@ -237,6 +239,39 @@ describe('the guide surface makes no claim about what the learner knows', () => 
   it('says plainly that its records are not part of the learner’s record', () => {
     const screen = read(GUIDE_SCREEN);
     expect(screen).toContain('not written to your record');
+  });
+
+  /**
+   * The licence a source requires be shown is read, never retyped.
+   *
+   * A screen that restated `CC BY-SA 4.0` would be correct today and would keep
+   * saying it after the seed's provenance changed — the drift class this project
+   * has been bitten by twice on the licence check. `guideAttributionLines`
+   * derives every sourced line from `provenanceSummary`, which is the same
+   * function the word and kanji pages render.
+   */
+  it('derives its attribution from the seed rather than typing a licence', () => {
+    const lines = guideAttributionLines();
+    const sourced = lines.filter((line) => line.field.startsWith('Station words'));
+    expect(sourced.length).toBeGreaterThan(0);
+    // The real licence, arrived at by reading the seed, not by matching a string
+    // this test also typed: it has to name EDRDG because that is what the data
+    // says, and the assertion fails if the derivation stops working.
+    expect(sourced.map((line) => line.source).join(' ')).toMatch(/EDRDG/);
+
+    // Comments stripped: `guide-content.ts` has to *name* the literal it avoids
+    // in order to explain why it avoids it, and a scan that counted prose would
+    // make every explanation of the rule a violation of it.
+    const literals = guideFiles
+      .filter((file) => /CC BY-SA \d/.test(stripComments(read(file))))
+      .map(rel);
+    expect(literals, 'a guide file states a licence as a literal').toEqual([]);
+  });
+
+  it('says which lines are not sourced at all, rather than omitting them', () => {
+    const fields = guideAttributionLines().map((line) => line.field);
+    expect(fields).toContain('Era layer of each station');
+    expect(fields).toContain('The guide’s words');
   });
 
   it('acknowledges the dictionary it displays, unconditionally', () => {

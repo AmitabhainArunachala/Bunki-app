@@ -45,6 +45,7 @@ import { conversationProgress } from '@bunki/domain';
 import { AttributionFooter } from '../ui/attribution.tsx';
 import {
   GUIDE_PROMPTS,
+  guideAttributionLines,
   GuideBoundaryPanel,
   GuideConversationPanel,
   GuideEstimatePanel,
@@ -211,19 +212,13 @@ export function GuideScreen({ onOpenWord, declaredBranches = [] }: GuideScreenPr
 
       <GuideHistoryPanel ledger={guide.ledger} />
 
+      {/*
+        Derived, not typed. The licence a source requires be shown lives in the
+        seed's provenance records, and a screen that restated it would keep
+        saying the old one after it changed.
+      */}
       <AttributionFooter
-        lines={[
-          { field: 'Station words, readings and senses', source: 'JMdict (EDRDG), CC BY-SA 4.0' },
-          { field: 'Example sentences', source: 'the seed corpus shipped with this build' },
-          {
-            field: 'Era layer of each station',
-            source: 'this project’s own reading, not a dictionary field',
-          },
-          {
-            field: 'The guide’s words',
-            source: 'generated, labelled on every block that shows them',
-          },
-        ]}
+        lines={guideAttributionLines()}
         standing="Nothing on this screen was measured, and nothing on it changes what the app has stored."
         testID="guide-attribution"
       />

@@ -30,7 +30,7 @@ the first.
   ],
   "speechBlocks": 6,
   "roadRows": 8,
-  "planProvenance": "proposed by the guide, from the app’s own pre-written text at 2026-07-28T17:14:23.138Z · from 2 turns of the conversation · offline-fallback"
+  "planProvenance": "proposed by the guide, from the app’s own pre-written text at 2026-07-28T17:44:41.377Z · from 2 turns of the conversation · offline-fallback"
 }
 ```
 
@@ -51,7 +51,7 @@ the first.
   ],
   "speechBlocks": 6,
   "roadRows": 8,
-  "planProvenance": "proposed by the guide, from the app’s own pre-written text at 2026-07-28T17:14:27.254Z · from 2 turns of the conversation · offline-fallback"
+  "planProvenance": "proposed by the guide, from the app’s own pre-written text at 2026-07-28T17:44:45.515Z · from 2 turns of the conversation · offline-fallback"
 }
 ```
 

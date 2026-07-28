@@ -41,7 +41,8 @@
 import type { RouteWaypointCandidate } from '@bunki/domain';
 
 import { seededContextFor } from '../../candidate/candidate-context.ts';
-import { findLexemeById } from '../../data/catalog.ts';
+import { findLexemeById, findLexemeByHeadword } from '../../data/catalog.ts';
+import { distinctProvenance, provenanceEntries, provenanceSummary } from '../../data/provenance.ts';
 import type { GuidePromptWithId } from './guide-types.ts';
 
 /** The seed lexeme behind each station, in road order. */
@@ -185,3 +186,48 @@ export const GUIDE_PROMPTS: readonly GuidePromptWithId[] = TURN_LEXEME_IDS.flatM
 export const DEFAULT_ROUTE_TITLE = '分かれた道';
 
 export const DEFAULT_PLAN_TITLE = 'The next few stations';
+
+/**
+ * Where each thing on this screen came from, read out of the seed's own
+ * provenance rather than typed here.
+ *
+ * A hard-coded `'JMdict (EDRDG), CC BY-SA 4.0'` would be correct today and
+ * would go stale silently: the licence lives in `packages/seed/data/provenance.json`
+ * and a screen that restated it would keep saying the old one after it changed.
+ * `provenanceSummary` is the same function the word and kanji pages render, so
+ * all three surfaces say one thing.
+ *
+ * The lines for the era layer and for the guide's own words have no provenance
+ * record because they are not sourced data — one is this project's reading and
+ * the other is generated. Saying so is the point; omitting them would leave a
+ * reader to assume the whole screen is sourced.
+ */
+export function guideAttributionLines(): readonly { field: string; source: string }[] {
+  const station = ROUTE_CANDIDATES[0];
+  const lexeme = station === undefined ? null : findLexemeByHeadword(station.targetForm);
+  const lines: { field: string; source: string }[] = [];
+
+  if (lexeme !== null) {
+    const distinct = distinctProvenance(
+      provenanceEntries(lexeme.provenance).map((entry) => entry.record),
+    );
+    for (const record of distinct) {
+      lines.push({
+        field: 'Station words, readings and senses',
+        source: provenanceSummary(record),
+      });
+    }
+  }
+
+  lines.push(
+    {
+      field: 'Era layer of each station',
+      source: 'this project’s own reading of the vocabulary — the seed carries no era field',
+    },
+    {
+      field: 'The guide’s words',
+      source: 'generated, and labelled as generated on every block that shows them',
+    },
+  );
+  return lines;
+}

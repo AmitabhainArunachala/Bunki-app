@@ -40,9 +40,17 @@ export interface GuideConversationPanelProps {
   readonly testID?: string | undefined;
 }
 
-/** What is sent, said before anything is sent (OD-08, REQ-ARCH-07). */
+/**
+ * What is sent, said before anything is sent (OD-08, REQ-ARCH-07).
+ *
+ * Enumerated rather than summarised. The request carries exactly the three
+ * fields `AiThreadContext` holds — the written form, the seeded sentence, and
+ * the id of the seed record it came from — plus the envelope's own prompt
+ * metadata. "Only the sentence" would have been *nearly* true, and the whole
+ * value of a sentence like this is that a reader can check it against the type.
+ */
 const SENDING_NOTE =
-  'Asking sends only this word and this seeded sentence. Your own answers never leave the device — they are chosen from the list below rather than typed, which is what keeps that true.';
+  'Asking sends this word, the seeded sentence under it, and the id of the seed record that sentence came from. Nothing else about you goes with it. Your own answers never leave the device at all — they are chosen from the list below rather than typed, which is what keeps that true rather than promised.';
 
 export function GuideConversationPanel({
   conversation,

@@ -7,7 +7,12 @@
  * the absence rather than trusting it.
  */
 
-export { GUIDE_PROMPTS, LAYER_ATTRIBUTION_NOTE, ROUTE_CANDIDATES } from './guide-content.ts';
+export {
+  GUIDE_PROMPTS,
+  LAYER_ATTRIBUTION_NOTE,
+  ROUTE_CANDIDATES,
+  guideAttributionLines,
+} from './guide-content.ts';
 export { progressFromSnapshot, progressWord, takenUpWaypointIds } from './guide-progress.ts';
 export * from './guide-view-model.ts';
 export { GuideBoundaryPanel } from './guide-boundary.tsx';
