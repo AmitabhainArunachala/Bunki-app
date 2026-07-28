@@ -23,6 +23,15 @@
  * first declaration wins — first in the caller's own array, which is a stable
  * property of the source — and the collision is reported.
  *
+ * Duplicate *edges* are the third case, and the one with a visible consequence:
+ * a repeated `contains` edge pushes a second adjacency entry, and the kanji page
+ * then renders the same compound twice. A learner reading "this kanji appears in
+ * 分岐, 分岐, 分点" is being told something false about the dictionary by a bug in
+ * the indexer. So a second declaration of an edge already seen is dropped from
+ * the adjacency, reported as `duplicate_edge`, and not counted again in
+ * {@link KnowledgeGraph.edgeCount} — the count is edges in the index, and it
+ * would be a strange number if it disagreed with what the walk can reach.
+ *
  * ## Purity
  *
  * No clock, no randomness, no ambient anything; `test/purity` scans for all
@@ -34,15 +43,26 @@ import {
   compareAdjacency,
   isSymmetricEdgeKind,
   type Adjacency,
+  type ComponentRole,
+  type GraphEdge,
   type GraphNode,
   type GraphNodeId,
   type GraphNodeKind,
   type KnowledgeGraphSource,
 } from './model.ts';
 
+export const GRAPH_DIAGNOSTIC_KINDS = [
+  'duplicate_node',
+  'duplicate_edge',
+  'dangling_edge',
+  'self_edge',
+] as const;
+
+export type GraphDiagnosticKind = (typeof GRAPH_DIAGNOSTIC_KINDS)[number];
+
 /** One thing about the source that a reader should know. Data, not a throw. */
 export interface GraphDiagnostic {
-  readonly kind: 'duplicate_node' | 'dangling_edge' | 'self_edge';
+  readonly kind: GraphDiagnosticKind;
   readonly detail: string;
 }
 
@@ -61,6 +81,29 @@ export interface KnowledgeGraph {
   readonly nodesByComponentId: ReadonlyMap<string, readonly GraphNodeId[]>;
   readonly edgeCount: number;
   readonly diagnostics: readonly GraphDiagnostic[];
+}
+
+/**
+ * The identity of an edge, for duplicate detection.
+ *
+ * A symmetric kind is keyed on the *unordered* pair, because `末 contrasts_with
+ * 未` and `未 contrasts_with 末` are one edge — the index already reports a
+ * single declaration from both ends, so admitting both would double the contrast
+ * set. An asymmetric kind keeps its direction: `contains` from a sentence to a
+ * lexeme and from that lexeme to the sentence are two different claims, and only
+ * one of them is right, which is not this function's argument to settle.
+ *
+ * `\u0000` separates the parts because it is the one character a node id cannot
+ * contain, so two different edges can never collide on one key. Written as an
+ * escape rather than as a raw byte: a literal NUL makes the file binary to
+ * `git diff`, and a separator nobody can see in review is a separator nobody can
+ * check.
+ */
+function edgeIdentity(edge: GraphEdge): string {
+  if (isSymmetricEdgeKind(edge.kind) && edge.to < edge.from) {
+    return `${edge.kind}\u0000${edge.to}\u0000${edge.from}`;
+  }
+  return `${edge.kind}\u0000${edge.from}\u0000${edge.to}`;
 }
 
 function pushAdjacency(
@@ -99,6 +142,7 @@ export function buildKnowledgeGraph(source: KnowledgeGraphSource): KnowledgeGrap
   });
 
   const adjacency = new Map<GraphNodeId, Adjacency[]>();
+  const seenEdges = new Map<string, ComponentRole | null>();
   let edgeCount = 0;
 
   source.edges.forEach((edge) => {
@@ -120,8 +164,23 @@ export function buildKnowledgeGraph(source: KnowledgeGraphSource): KnowledgeGrap
       return;
     }
 
-    edgeCount += 1;
     const role = edge.role ?? null;
+    const identity = edgeIdentity(edge);
+    if (seenEdges.has(identity)) {
+      const firstRole = seenEdges.get(identity) ?? null;
+      const roleNote =
+        firstRole === role
+          ? 'the second declaration is dropped'
+          : `the second declaration carries role ${JSON.stringify(role)} where the first carried ${JSON.stringify(firstRole)}; the first is kept, so the source disagrees with itself and only the first answer is rendered`;
+      diagnostics.push({
+        kind: 'duplicate_edge',
+        detail: `${edge.kind} edge ${JSON.stringify(edge.from)} → ${JSON.stringify(edge.to)} was declared more than once; ${roleNote}. A repeated edge would otherwise put the same neighbour in a rendered group twice`,
+      });
+      return;
+    }
+    seenEdges.set(identity, role);
+
+    edgeCount += 1;
 
     if (isSymmetricEdgeKind(edge.kind)) {
       pushAdjacency(adjacency, edge.from, {

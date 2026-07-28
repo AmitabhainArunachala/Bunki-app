@@ -465,9 +465,43 @@ export interface MemoryStateVersion {
 }
 
 export interface MemoryHistory {
+  /**
+   * The contract this is a history of.
+   */
   readonly contractId: ContractId;
-  /** Ascending by `from`. The first entry is activation. */
+  /**
+   * The versions, oldest first. The first entry is activation.
+   *
+   * **Ascending by `from` is a precondition of {@link memoryStateAsOf}, not a
+   * property of this type.** TypeScript cannot express it, so it is established
+   * by the one producer in this package — {@link buildMemoryHistories}, which
+   * enforces it explicitly and is property-tested for it — and can be checked by
+   * anyone else with {@link isAscendingByFrom}. Nothing here enforces it on a
+   * hand-assembled value, and this comment does not claim otherwise.
+   */
   readonly versions: readonly MemoryStateVersion[];
+}
+
+/**
+ * Is this history's version list ascending by `from`?
+ *
+ * Exported because the invariant {@link memoryStateAsOf} needs is otherwise only
+ * a sentence in a comment, and this codebase has been bitten before by comments
+ * asserting properties nothing enforced. A caller assembling a `MemoryHistory`
+ * from some other source can assert this in its own tests; the suite here
+ * asserts it over generated inputs to {@link buildMemoryHistories}.
+ *
+ * O(versions), so it is a check to run in a test or at a seam, not per frame —
+ * which is exactly why the binary search cannot simply call it.
+ */
+export function isAscendingByFrom(history: MemoryHistory): boolean {
+  for (let index = 1; index < history.versions.length; index += 1) {
+    const previous = history.versions[index - 1];
+    const current = history.versions[index];
+    if (previous === undefined || current === undefined) return false;
+    if (compareInstants(previous.from, current.from) > 0) return false;
+  }
+  return true;
 }
 
 /** When promotion activated a contract. Read from the log by the caller. */
@@ -490,6 +524,21 @@ export interface ContractActivation {
  * Reviews naming a contract with no activation are ignored and are not an
  * error here: replay is where that invariant is enforced, and a projection that
  * threw would take the map down over a defect the ledger already records.
+ *
+ * ## The ascending invariant is established here
+ *
+ * {@link memoryStateAsOf} binary-searches `versions`, which is only correct on
+ * an ascending list. Sorting the reviews is not enough to guarantee that: a
+ * review whose `reviewedAt` precedes its contract's `activatedAt` would still be
+ * appended after the activation version and the list would go backwards, and the
+ * search would then return a version that is not the one current at `at`. Such a
+ * review is the same class of defect as a review with no activation at all —
+ * replay is where it is caught — so it gets the same treatment here: it is
+ * skipped, not applied, and the projection stays queryable.
+ *
+ * The invariant is asserted over generated inputs in `retrievability.test.ts`,
+ * including inputs built to violate it, and {@link isAscendingByFrom} is
+ * exported so the claim is checkable rather than merely written down.
  */
 export function buildMemoryHistories(
   activations: readonly ContractActivation[],
@@ -524,6 +573,10 @@ export function buildMemoryHistories(
       if (versions === undefined) return;
       const previous = versions[versions.length - 1];
       if (previous === undefined) return;
+      // The guard that makes `versions` ascending rather than merely usually
+      // ascending: a review dated before the version already current would push
+      // the list backwards and silently break the binary search downstream.
+      if (compareInstants(review.reviewedAt, previous.from) < 0) return;
       versions.push({
         from: review.reviewedAt,
         state: applyAdmittedReview(previous.state, review),
@@ -542,10 +595,26 @@ export function buildMemoryHistories(
  * The version current at `at`, or `null` if the contract did not exist yet.
  *
  * A binary search rather than a scan, because the scrubber asks this once per
- * frame per contract: `versions` is ascending by construction, so the answer is
- * the rightmost version whose `from` has not passed `at`. Ties keep the last
- * matching version, which is what a linear scan did and what a review landing on
- * the activation instant should mean.
+ * frame per contract: the answer is the rightmost version whose `from` has not
+ * passed `at`. Ties keep the last matching version, which is what a linear scan
+ * did and what a review landing on the activation instant should mean.
+ *
+ * ## Precondition, stated rather than assumed
+ *
+ * `history.versions` must be ascending by `from`. That is not a property of the
+ * `MemoryHistory` type — TypeScript cannot express it — so it is *established*
+ * by {@link buildMemoryHistories}, which is the only producer in this package
+ * and which skips any review that would push the list backwards. An earlier
+ * version of this comment said "ascending by construction" and pointed at a
+ * construction that did not enforce it; the enforcement is now real and
+ * property-tested, and {@link isAscendingByFrom} exists so a caller with a
+ * history from anywhere else can check rather than trust.
+ *
+ * On a list that is *not* ascending this returns some version from the list —
+ * never out of range, never a throw — but not necessarily the one current at
+ * `at`. It does not detect the violation: doing so is O(versions) and this
+ * function is called once per frame per contract, which is the entire reason it
+ * is a binary search.
  */
 export function memoryStateAsOf(history: MemoryHistory, at: IsoInstant): MemoryState | null {
   const versions = history.versions;

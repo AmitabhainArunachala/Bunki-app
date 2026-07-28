@@ -8,6 +8,7 @@
  *   - `neighbourhood.ts`  — what is near this node, bounded and deterministic.
  *   - `lenses.ts`         — the five capability lenses REQ-UI-07 names.
  *   - `retrievability.ts` — what the map may draw, with nothing collapsed.
+ *   - `era.ts`            — which era layer a node sits on, and when we do not know.
  *
  * Everything here is a **projection**. Nothing in this directory mints an
  * event, admits evidence, or writes memory state; the evidence gate
@@ -21,3 +22,4 @@ export * from './build.ts';
 export * from './neighbourhood.ts';
 export * from './lenses.ts';
 export * from './retrievability.ts';
+export * from './era.ts';
