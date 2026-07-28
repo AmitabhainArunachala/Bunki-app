@@ -40,11 +40,17 @@
  *
  * ## Motion
  *
- * There is none. The steps do not slide, ease, or animate between positions —
- * the map under them settles once when its contents change (`Settle`), and that
- * is the whole motion budget for this surface. A scrubber that animated would
- * churn continuously while dragged, which is the ambient motion the design bans
- * and the vertigo risk the fractal-dive brief names.
+ * None in this component. The steps do not slide, ease, or animate between
+ * positions. A scrubber that animated would churn continuously while dragged,
+ * which is the ambient motion the design bans and the vertigo risk the
+ * fractal-dive brief names.
+ *
+ * The motion budget for the surface is spent one level up, in `map-screen.tsx`,
+ * where each band's field is wrapped in `Settle` keyed on the origin, the lens
+ * and this control's position — so moving a step settles the map once and
+ * nothing else moves. This paragraph used to say so from here while nothing on
+ * the map imported `Settle` at all; it is true now, and it is stated where the
+ * code that makes it true can be read beside it.
  */
 
 import { type ReactNode } from 'react';

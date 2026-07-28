@@ -75,6 +75,14 @@ const INSET = 30;
  * Deterministic in the node count alone, so the same band is always the same
  * size — a field that resized on anything else would make "the map moved" and
  * "your memory changed" look alike.
+ *
+ * The count is this band's own, which it can be because each band is laid out
+ * on its own (see `layoutNeighbourhood`). There was a `spread` prop here that
+ * carried the *whole walk's* count instead, because the layout used to be one
+ * whole-walk layout filtered four ways and shrinking the frame around filtered
+ * coordinates pushed neighbours on top of each other. Laying each band out
+ * separately removed the reason for the prop, so the prop is gone rather than
+ * left as a parameter that looks like it means something.
  */
 function fieldSize(nodeCount: number): number {
   return Math.max(MIN_FIELD, Math.min(MAX_FIELD, 150 + nodeCount * 11));
@@ -87,18 +95,6 @@ export interface MapFieldProps {
   /** One lens view per node id, for the chosen lens. Missing means unmeasured. */
   readonly views: ReadonlyMap<string, MapLensView>;
   readonly onOpenNode: (nodeId: string) => void;
-  /**
-   * How many nodes the coordinates in `layout` were computed for.
-   *
-   * A band draws a *subset* of one neighbourhood's layout, and the positions are
-   * deliberately the whole neighbourhood's — so a node keeps its place whichever
-   * band it appears in, and the four bands read as four views of one map rather
-   * than four unrelated diagrams. That makes the filtered count the wrong number
-   * to size the field by: two nodes that are neighbours among 24 were drawn on
-   * top of each other when the field shrank to fit two. This is the number the
-   * geometry was built at.
-   */
-  readonly spread?: number | undefined;
   readonly testID?: string | undefined;
 }
 
@@ -107,17 +103,10 @@ function place(point: PlacedPoint, size: number): { readonly left: number; reado
   return { left: INSET + point.x * span, top: INSET + point.y * span };
 }
 
-export function MapField({
-  layout,
-  lens,
-  views,
-  onOpenNode,
-  spread,
-  testID,
-}: MapFieldProps): ReactNode {
+export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldProps): ReactNode {
   const theme = useFigureTheme();
   const capability = capabilityOf(lens);
-  const size = fieldSize(spread ?? layout.points.length);
+  const size = fieldSize(layout.points.length);
 
   return (
     <View style={[styles.field, { height: size, width: size }]} testID={testID}>

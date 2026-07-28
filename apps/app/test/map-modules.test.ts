@@ -665,6 +665,59 @@ describe('accumulation is visible and is not a streak', () => {
  * 8. The vocabulary that already exists is the vocabulary used
  * ------------------------------------------------------------------ */
 
+describe('motion serves comprehension, and the claim about it is checked', () => {
+  /**
+   * The map settles, and it settles through the vocabulary's own primitive.
+   *
+   * `scrubber.tsx` described this in prose for a whole round while nothing on
+   * the map imported `Settle` at all — a comment asserting a property the code
+   * did not have, which is the defect class this repository is caught by most
+   * often. The claim is now held here rather than by anyone remembering.
+   *
+   * The `key` is the load-bearing part: `Settle` animates on mount only (its own
+   * docblock says why — a component that re-settled on every prop change would
+   * make a live surface shiver), so it re-settles exactly when the field is
+   * about something else. Origin, lens and scrubber position are what the field
+   * is about.
+   */
+  it('settles the field through the shared primitive, keyed on what it is about', () => {
+    const screen = strip(read(resolve(APP_ROOT, 'src/screens/map-screen.tsx')));
+    expect(screen).toContain('<Settle');
+    expect(screen).toMatch(/import \{ Settle \} from '\.\.\/ui\/motion\.tsx'/);
+    const settle = screen.slice(screen.indexOf('<Settle'), screen.indexOf('<Settle') + 220);
+    for (const dependency of ['originId', 'lens', 'position.value']) {
+      expect(settle, `the settle key ignores ${dependency}`).toContain(dependency);
+    }
+  });
+
+  /**
+   * Nothing on this surface loops, pulses, spins or celebrates.
+   *
+   * The design bans ambient churn and bans anything reachable from being right
+   * about something. `Settle` and `BranchLight` are the only motion the
+   * vocabulary offers and both are one-shot; a raw `Animated.loop`, a CSS
+   * animation or a timer driving a style would be neither.
+   */
+  it('runs no loop, no timer-driven style and no celebration', () => {
+    for (const file of LANE_FILES) {
+      const source = strip(read(file));
+      expect(source, relative(APP_ROOT, file)).not.toMatch(
+        /Animated\.loop|setInterval|requestAnimationFrame|infinite/,
+      );
+      /*
+        Identifiers, not copy — the same distinction the streak check below
+        already draws, and for the same reason. `ACCUMULATION_NOTE` has to be
+        able to *say* "not a streak" to a learner, and a scan over strings would
+        make the honest disclosure a violation of the rule it discloses. What
+        must not exist is the mechanism.
+      */
+      expect(identifiers(source), relative(APP_ROOT, file)).not.toMatch(
+        /\bconfetti\b|\bcelebrat|\bstreak\b|\bbadge\b|\bXP\b/i,
+      );
+    }
+  });
+});
+
 describe('the lane extends the built vocabulary rather than forking it', () => {
   it('writes no hex literal in any component', () => {
     for (const file of LANE_FILES) {

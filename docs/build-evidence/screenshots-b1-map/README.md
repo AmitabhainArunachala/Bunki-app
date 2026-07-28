@@ -107,8 +107,8 @@ no-collapsed-light rule visible in a picture rather than asserted.
 
 | scheme | cold load to interactive | lens change | scrubber step |
 | --- | --- | --- | --- |
-| light | 1446 ms | 27.7 ms | 19.2 ms |
-| dark | 1665 ms | 51.7 ms | 53.2 ms |
+| light | 690 ms | 32.1 ms | 30.1 ms |
+| dark | 736 ms | 24.5 ms | 27.2 ms |
 
 **Cold load to interactive** is navigation start until the road has drawn,
 which includes the one-off Atlas build over the whole shipped dictionary

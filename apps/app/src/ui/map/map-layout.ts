@@ -107,13 +107,42 @@ function radiusFor(depth: number): number {
 }
 
 /**
+ * The two fields a layout is a function of. Nothing else is read.
+ *
+ * Narrowed from `Neighbourhood` on purpose: the map draws each era band on its
+ * own ground, so it lays out a *subset* of one walk — the nodes that landed on
+ * this layer and the held edges between them — and asking for the whole
+ * interface would mean a caller inventing an `origin` and a `truncated` list to
+ * satisfy a type that never reads them. A `Neighbourhood` still satisfies this,
+ * so the common call is unchanged.
+ */
+export type LayoutSource = Pick<Neighbourhood, 'nodes' | 'edges'>;
+
+/**
  * Lay a neighbourhood out on rings, and draw only the edges it carries.
  *
  * Pure and total: an empty neighbourhood lays out to an empty field rather than
  * throwing, because "you have nothing near here" is a state the map has to be
  * able to render.
+ *
+ * ## Laid out per band, and the browser is why
+ *
+ * The angular slots at each depth are shared out over the nodes *this call*
+ * receives. The map calls it once per era band rather than once for the whole
+ * walk, and the first version did the opposite — one layout, filtered four ways
+ * — on the reasoning that a node would then keep its place in every band it
+ * appeared in. The capture showed what that costs: 古道 held two of twenty-four
+ * nodes, they had been given adjacent slots on the outer ring of a
+ * twenty-four-node layout, and they landed on top of each other in the corner
+ * of an otherwise empty field.
+ *
+ * The property it bought was not perceivable anyway — the bands are stacked and
+ * separately framed, so nobody compares coordinates across them — and the
+ * property that *is* load-bearing survives the change untouched: **radius is
+ * hops from the origin, and nothing else.** Only the angle differs, and the
+ * angle has never meant anything.
  */
-export function layoutNeighbourhood(neighbourhood: Neighbourhood): MapLayout {
+export function layoutNeighbourhood(neighbourhood: LayoutSource): MapLayout {
   const byDepth = new Map<number, GraphNode[]>();
   for (const entry of neighbourhood.nodes) {
     const bucket = byDepth.get(entry.depth);

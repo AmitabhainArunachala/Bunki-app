@@ -65,6 +65,7 @@ import {
   type BandTally,
 } from '../ui/map/map-eras.ts';
 import { layoutNeighbourhood } from '../ui/map/map-layout.ts';
+import { Settle } from '../ui/motion.tsx';
 import {
   buildMapIndex,
   buildMapTimeline,
@@ -268,11 +269,6 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     [state],
   );
 
-  const layout = useMemo(
-    () => (state.kind === 'ready' ? layoutNeighbourhood(state.data) : null),
-    [state],
-  );
-
   /** Era bands over the *drawn* nodes only — a per-view cost, not a corpus walk. */
   const bands = useMemo<readonly BandTally[]>(
     () => (drawn.length === 0 ? [] : placeNodes(atlas, drawn)),
@@ -297,14 +293,15 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     for (const band of bands) {
       for (const placed of band.nodes) bandOfNode.set(placed.node.id, band.band);
     }
+    const held = state.kind === 'ready' ? state.data.edges : [];
     let crossing = 0;
-    for (const line of layout?.lines ?? []) {
-      const from = bandOfNode.get(line.from.node.id);
-      const to = bandOfNode.get(line.to.node.id);
+    for (const edge of held) {
+      const from = bandOfNode.get(edge.from);
+      const to = bandOfNode.get(edge.to);
       if (from !== undefined && to !== undefined && from !== to) crossing += 1;
     }
-    return { bandOfNode, crossing, total: layout?.lines.length ?? 0 };
-  }, [bands, layout]);
+    return { bandOfNode, crossing, total: held.length };
+  }, [bands, state]);
 
   /** One lens view per drawn node, for the chosen lens at the chosen instant. */
   const views = useMemo(() => {
@@ -531,32 +528,64 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
             );
           }
 
-          const layerLayout =
-            layout === null
-              ? null
-              : {
-                  ...layout,
-                  points: layout.points.filter((point) =>
-                    band.nodes.some((placed) => placed.node.id === point.node.id),
-                  ),
-                  lines: layout.lines.filter(
-                    (line) =>
-                      band.nodes.some((placed) => placed.node.id === line.from.node.id) &&
-                      band.nodes.some((placed) => placed.node.id === line.to.node.id),
-                  ),
-                };
+          /*
+            Laid out for *this* band, not filtered out of one whole-walk layout.
 
-          const body =
-            layerLayout === null ? null : (
+            Filtering was the first shape and the browser capture is what
+            condemned it: 古道 holds two of twenty-four nodes, they had been
+            given adjacent angular slots on a twenty-four-node ring, and they
+            landed on top of each other in the corner of an otherwise empty
+            field. Laying the band out on its own spreads its own nodes over its
+            own ring. Radius still means hops from the origin — the only thing
+            the geometry ever claimed — and only the angle differs.
+
+            The edges are the held edges *between nodes of this band*. A held
+            edge whose ends are on two different layers is drawn in no field at
+            all, because a line cannot span two grounds; the count of those is
+            computed by `strata` above and printed under the fields rather than
+            being left to be noticed.
+          */
+          const layerNeighbourhood = {
+            nodes: state.data.nodes.filter((entry) =>
+              band.nodes.some((placed) => placed.node.id === entry.node.id),
+            ),
+            edges: state.data.edges.filter(
+              (edge) =>
+                band.nodes.some((placed) => placed.node.id === edge.from) &&
+                band.nodes.some((placed) => placed.node.id === edge.to),
+            ),
+          };
+          const layerLayout = layoutNeighbourhood(layerNeighbourhood);
+
+          const body = (
+            /*
+                The map settles, and this is the whole motion budget for the
+                surface. `Settle` animates on mount only — a component that
+                re-settled on every prop change would make a live surface shiver
+                — so the `key` is what the field is *about*: the origin, the
+                lens, and where the scrubber stands. Changing any of those three
+                remounts the field and it settles once; changing anything else
+                does not touch it.
+
+                `scrubber.tsx` used to describe this in its own docblock while
+                nothing on the map imported `Settle` at all, which is a comment
+                asserting a property the code did not have. It has it now.
+
+                Under `prefers-reduced-motion` the duration `resolveDuration`
+                hands back is 0, so the field lands complete on the first frame.
+                Nothing here loops, and nothing here is reachable from being
+                right about anything.
+              */
+            <Settle key={`${originId ?? ''}|${lens}|${String(position.value)}`}>
               <MapField
                 layout={layerLayout}
                 lens={lens}
                 onOpenNode={openNode}
-                spread={layout?.points.length ?? 0}
                 testID={`map-field-${band.band}`}
                 views={views}
               />
-            );
+            </Settle>
+          );
 
           return (
             // The same `testID` a band gets when it is empty. A band has to be
