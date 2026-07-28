@@ -354,13 +354,59 @@ The existing machinery is what makes it affordable.
 2. Every era ground declares a **luminance band**, and the semantic ramp is
    resolved _against the active ground_. A token that fails 3:1 or 4.5:1 on any
    reachable ground fails the build.
-3. **Emissive/saturated colour is capped** — at most a small fixed count of
-   saturated points on screen, only in the 鉄道 register, only for real signals.
+3. **Emissive points are FIGURE, not ground** — see §5.2, which corrects an
+   earlier version of this clause.
 4. **Text never sits directly on an era ground.** It sits on a 胡粉/墨 card that
    floats over it. This is the "museum card, not a spreadsheet row" rule doing
    double duty as a contrast guarantee.
 5. **No glow, no drop shadow, no confetti.** Depth is superposition — stacked
    translucent washes — because that is what the material does.
+
+### 5.2 Correction: emissive light is figure, and always was
+
+**This clause replaces the original constraint 3**, which read: _"Emissive/
+saturated colour is capped — at most a small fixed count of saturated points on
+screen, only in the 鉄道 register, only for real signals."_ That sentence
+contradicted the table above it, and lane A1′'s verifier caught the contradiction
+in the implementation before anyone caught it in the specification:
+
+> `ground.ts` states flatly "Nothing in this file encodes learner state", and the
+> ground/figure table says the ground carries meaning **never**. The same file,
+> 600 lines later, declares emissive signals for `due-now`, `branch-open` and
+> `evidence-stale`.
+
+Those three **are** learner state. The builder implemented both halves of my
+specification faithfully and the result could not be consistent, because the
+specification was not. The fault is here, not in the lane.
+
+**The resolution, which is also the simpler idea:**
+
+> A lit point says something about the learner, so it is **figure**. The 鉄道
+> register is where emissive figure is _permitted to appear_ — a dark ground is
+> what makes a few luminous points legible — but permission to appear on a ground
+> is not membership of it.
+
+Everything else follows without a special case, because figure rules already
+cover it:
+
+- **Contrast applies.** A lit point is a meaningful graphic and must clear 3:1
+  against whatever it sits on (WCAG 1.4.11). The verifier measured 山吹 `#FFB11B`
+  at **1.578:1** against its field in the light scheme. As ground that was
+  arguably decoration; as figure it is simply a failure, and gets fixed.
+- **Hue-only encoding is already banned.** Distinguishing `branch-open` from
+  `evidence-stale` by colour alone violates WCAG 1.4.1 — and the two had been
+  given the _same_ hue, so they were not distinguished at all. Figure carries
+  form as well as colour (`EDGE_PATTERNS`, `RECALL_BAND_MARKS`), which is the
+  channel that fixes this.
+- **The cap is per screen, not per call.** "How many lit points may be on screen"
+  is a statement about a screen; a helper that slices one list cannot enforce it,
+  and two independent fields will each honour it and together break it.
+- **Never a second semantic hue.** Emissive figure may mark _where_ attention is
+  owed. It may not become a second luminance ramp, a second accent, or a
+  mastery colour. Recall strength stays in luminance, per capability lens.
+
+The 鉄道 palette in §4.3 is unchanged as a set of pigments. What changed is which
+layer three of its entries belong to, and therefore which rules they answer to.
 
 ---
 

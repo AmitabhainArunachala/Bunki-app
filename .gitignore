@@ -51,3 +51,6 @@ yarn-error.*
 .DS_Store
 .vscode/
 .idea/
+
+# Throwaway operator-preview shooter (see session notes); never committed.
+.shoot.mjs
