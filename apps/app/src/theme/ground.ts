@@ -515,6 +515,41 @@ export function figurePaletteOn(ground: EraGround): Palette {
 }
 
 /* ------------------------------------------------------------------ *
+ * The museum-card rule, as a rule about modules
+ * ------------------------------------------------------------------ */
+
+/**
+ * The exports that put an era pigment on screen.
+ *
+ * **Any module that imports one of these may not render text.** That is the
+ * museum-card rule — "a kanji page should feel like a museum card, not a
+ * spreadsheet row", and text never sits on an era ground — stated as something
+ * a scan can check across every file in the app, now and in Wave B.
+ * `test/theme-ground.test.ts` walks `src/` and `app/` and fails any file that
+ * imports one of these names *and* contains a `<Text>` tag or a `Text` import.
+ *
+ * The rule works because text does not need the exemption. A ground-painting
+ * module composes `MuseumCard` and `RubyText`, which render the text
+ * themselves and know nothing about grounds — so the words arrive on an opaque
+ * card whose contrast the ground cannot touch, which is precisely the
+ * guarantee. `src/ui/style-guide/ground-field.tsx` is the worked example.
+ *
+ * Names that only *read* the ground — `ERA_REGISTERS`, `figurePaletteOn`,
+ * `MAX_EMISSIVE_POINTS`, the types — are deliberately absent. A page that wants
+ * to name the three eras in prose is not painting anything, and binding it
+ * would make the rule an obstacle rather than a guarantee.
+ */
+export const GROUND_PAINTING_EXPORTS: readonly string[] = [
+  'GROUNDS',
+  'groundOf',
+  'groundLayers',
+  'eraPigment',
+  'ERA_PIGMENTS',
+  'planEmissive',
+  'superpose',
+];
+
+/* ------------------------------------------------------------------ *
  * What must clear on a ground
  * ------------------------------------------------------------------ */
 
