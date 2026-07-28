@@ -40,6 +40,8 @@ export interface WordSentencesProps {
   readonly worked: readonly SeedSentence[];
   /** Per-field provenance for the imported tier's sentences. */
   readonly tatoebaProvenance: ProvenanceRecord | null;
+  /** Open on first render. The page's "open every section" gesture sets it. */
+  readonly initiallyOpen: boolean;
   readonly testID?: string | undefined;
 }
 
@@ -47,6 +49,7 @@ export function WordSentences({
   tatoeba,
   worked,
   tatoebaProvenance,
+  initiallyOpen,
   testID = 'word-sentences',
 }: WordSentencesProps): ReactNode {
   const theme = useTheme();
@@ -55,7 +58,7 @@ export function WordSentences({
   return (
     <Disclosure
       count={total === 0 ? undefined : total}
-      initiallyOpen
+      initiallyOpen={initiallyOpen}
       {...(total === 0
         ? {
             empty:

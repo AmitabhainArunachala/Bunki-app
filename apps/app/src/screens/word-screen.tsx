@@ -64,7 +64,7 @@ import {
   type SeedLexeme,
 } from '../data/catalog.ts';
 import { importedExtras, importedSentenceProvenance } from '../data/imported-tier.ts';
-import { attributionLines, distinctProvenance } from '../data/provenance.ts';
+import { distinctProvenance } from '../data/provenance.ts';
 import type { ProvenanceRecord } from '@bunki/seed';
 import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
 import {
@@ -244,14 +244,25 @@ export function WordScreen({
     store.execute({ kind: 'promote', threadId: thread.state.threadId, to });
   };
 
-  const attribution = distinctProvenance([
-    lexeme.provenance.headword,
-    lexeme.provenance.reading,
-    lexeme.provenance.senses,
-    lexeme.provenance.partOfSpeech,
-  ]).map((record) => ({
-    field: `${record.source} · ${record.license}`,
-    source: attributionLines(record).join(' '),
+  /*
+    The card's own attribution: which source each displayed field came from, and
+    under what licence. One line per source, not the licensor's full statement —
+    the statement is long, it is required to be *available* rather than to be
+    the loudest thing on the card, and Layer 3 below renders it in full through
+    `ProvenanceTable`. The `<SeedEntryDisclosure />` above the card is the
+    on-screen acknowledgement EDRDG §3 asks for, and it is unconditional.
+  */
+  const HERO_FIELDS = [
+    ['Headword', lexeme.provenance.headword],
+    ['Reading', lexeme.provenance.reading],
+    ['Senses', lexeme.provenance.senses],
+    ['Part of speech', lexeme.provenance.partOfSpeech],
+  ] as const;
+  const attribution = distinctProvenance(HERO_FIELDS.map(([, record]) => record)).map((record) => ({
+    field: HERO_FIELDS.filter(([, candidate]) => candidate.source === record.source)
+      .map(([name]) => name)
+      .join(', '),
+    source: `${record.source} · ${record.license}`,
   }));
 
   const catalogue = [
@@ -278,7 +289,7 @@ export function WordScreen({
           headword={lexeme.headword}
           lenses={wordLenses}
           reading={lexeme.reading}
-          standing="Readings and senses are JMdict’s, flattened by this build’s importer. Memory state is this device’s own event log, read through the kernel’s projection — nothing on this card is a claim about how the word is used."
+          standing="Readings and senses are JMdict’s, flattened by this build’s importer. The memory state above is this device’s own event log, read through the kernel’s projection. Each source’s full statement is under “Provenance and the gaps” at the foot of this page."
         />
       </View>
 
@@ -316,15 +327,18 @@ export function WordScreen({
         />
 
         {/*
-          Keyed on the toggle so that flipping it re-mounts the sections with a
-          new initial state. `Disclosure` owns its own open/closed state, which
-          is right — a section a learner opened should stay open — and this is
-          the one gesture that is allowed to override all of them at once.
+          Keyed on the toggle so that flipping it re-mounts the three sections
+          with the new initial state. `Disclosure` owns its own open/closed
+          state, which is right — a section a learner opened should stay open —
+          so overriding all three at once means giving them a fresh mount rather
+          than reaching into their state. Each header still states its count and
+          its reason whether it is open or shut.
         */}
-        <View key={expandAll ? 'all-open' : 'as-chosen'} style={styles.depth}>
-          <WordFamily groups={family} onOpenWord={onOpenWord} />
-          <WordContrast onOpenWord={onOpenWord} set={contrasts} />
+        <View key={expandAll ? 'all-open' : 'all-shut'} style={styles.depth}>
+          <WordFamily groups={family} initiallyOpen={expandAll} onOpenWord={onOpenWord} />
+          <WordContrast initiallyOpen={expandAll} onOpenWord={onOpenWord} set={contrasts} />
           <WordSentences
+            initiallyOpen={expandAll}
             tatoeba={tatoeba}
             tatoebaProvenance={(importedSentenceProvenance['japanese'] as ProvenanceRecord) ?? null}
             worked={worked}

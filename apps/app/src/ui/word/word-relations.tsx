@@ -33,6 +33,8 @@ import { CONTRAST_STANDING, type ContrastSet, type FamilyGroup } from './neighbo
 export interface WordFamilyProps {
   readonly groups: readonly FamilyGroup[];
   readonly onOpenWord: (lexemeId: string) => void;
+  /** Open on first render. The page's "open every section" gesture sets it. */
+  readonly initiallyOpen: boolean;
   readonly testID?: string | undefined;
 }
 
@@ -65,6 +67,7 @@ function WordRow({
 export function WordFamily({
   groups,
   onOpenWord,
+  initiallyOpen,
   testID = 'word-family',
 }: WordFamilyProps): ReactNode {
   const theme = useTheme();
@@ -73,6 +76,7 @@ export function WordFamily({
   return (
     <Disclosure
       count={total === 0 ? undefined : total}
+      initiallyOpen={initiallyOpen}
       {...(total === 0
         ? {
             empty:
@@ -119,12 +123,15 @@ export function WordFamily({
 export interface WordContrastProps {
   readonly set: ContrastSet;
   readonly onOpenWord: (lexemeId: string) => void;
+  /** Open on first render. The page's "open every section" gesture sets it. */
+  readonly initiallyOpen: boolean;
   readonly testID?: string | undefined;
 }
 
 export function WordContrast({
   set,
   onOpenWord,
+  initiallyOpen,
   testID = 'word-contrast',
 }: WordContrastProps): ReactNode {
   const theme = useTheme();
@@ -133,6 +140,7 @@ export function WordContrast({
   return (
     <Disclosure
       count={set.total === 0 ? undefined : set.total}
+      initiallyOpen={initiallyOpen}
       {...(set.total === 0
         ? {
             empty:

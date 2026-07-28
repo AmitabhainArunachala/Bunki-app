@@ -109,7 +109,7 @@ export function WordLenses({ lenses, testID }: WordLensesProps): ReactNode {
           capability={lens.capability}
           fragile={lens.fragile}
           key={lens.capability}
-          testID={`word-lens-${lens.capability}`}
+          testID={`word-recall-${lens.capability}`}
         />
       ))}
 
