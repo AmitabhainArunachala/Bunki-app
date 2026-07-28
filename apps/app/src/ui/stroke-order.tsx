@@ -8,11 +8,25 @@
  * same ink at low opacity, not a second colour — REQ-UI-08 allows exactly one
  * accent and this page does not spend it twice.
  *
- * The animation is a discrete reveal (stroke N appears whole), not a path-
- * drawing tween. Path-length interpolation would need per-stroke measurement
- * that `react-native-svg` exposes only on some platforms, and a teaching
- * animation that silently degrades on one runtime is worse than one that
- * behaves identically everywhere.
+ * ## Two ways to show one stroke, and why both are here
+ *
+ * WP-05 shipped a **discrete reveal** — stroke N appears whole — and recorded
+ * the reason: path-length interpolation needs per-stroke measurement, and
+ * `SVGGeometryElement.getTotalLength()` exists in the browser and not, portably,
+ * in `react-native-svg` on every platform.
+ *
+ * That reason expired. Lane A1 built `src/ui/path-length.ts`, which computes the
+ * length from the path data in arithmetic that runs the same in a browser, on a
+ * device and in the test runner, and `InkDraw` in `src/ui/motion.tsx` animates a
+ * dash offset from it. So the brief's own first example of motion that teaches —
+ * "strokes that draw" — is now available on every target.
+ *
+ * The reveal is kept as the default rather than deleted, because it is what the
+ * existing specimen and screenshot evidence were captured against and because it
+ * is the right register for a still frame. `draw` opts into the brush, which is
+ * what the character page uses. Under reduced motion `InkDraw`'s duration is
+ * zero and the stroke lands complete on the first frame, so the two modes
+ * converge exactly where they should.
  *
  * Accessibility: the SVG is one accessible element with a spoken description of
  * how many strokes are shown; the controls are ordinary labelled buttons, so
@@ -26,6 +40,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Svg, { G, Line, Path, Rect } from 'react-native-svg';
 
 import { strokeAccessibilityLabel, type KanjiStrokeSet } from '../data/kanjivg.ts';
+import { InkDraw } from './motion.tsx';
 import { AppButton } from './primitives.tsx';
 import { SPACE, TYPE } from './theme.ts';
 import { useTheme } from './theme-context.tsx';
@@ -45,6 +60,14 @@ export interface StrokeOrderProps {
    * this so the captured frame is deterministic.
    */
   readonly startRevealed?: boolean | undefined;
+  /**
+   * Draw each stroke with the brush instead of revealing it whole.
+   *
+   * Off by default so nothing that already renders this component changes. See
+   * the header for why both modes exist and why the original reason for having
+   * only one of them no longer holds.
+   */
+  readonly draw?: boolean | undefined;
   readonly testID?: string | undefined;
 }
 
@@ -53,6 +76,7 @@ export function StrokeOrder({
   strokes,
   size = 208,
   startRevealed = false,
+  draw = false,
   testID,
 }: StrokeOrderProps): ReactNode {
   const theme = useTheme();
@@ -157,18 +181,25 @@ export function StrokeOrder({
           {strokes.strokes.map((stroke) => {
             const written = stroke.order <= revealed;
             const current = marking && stroke.order === revealed;
-            return (
-              <Path
-                d={stroke.d}
-                fill="none"
-                key={stroke.id}
-                stroke={current ? theme.color.vermilion : theme.color.ink}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeOpacity={written ? 1 : 0.12}
-                strokeWidth={current ? 4.5 : 3.5}
-              />
-            );
+            const shared = {
+              d: stroke.d,
+              fill: 'none',
+              stroke: current ? theme.color.vermilion : theme.color.ink,
+              strokeLinecap: 'round',
+              strokeLinejoin: 'round',
+              strokeWidth: current ? 4.5 : 3.5,
+            } as const;
+
+            /*
+              The ghost of a stroke not yet written is the *same* ink at low
+              opacity, in both modes: the character has to stay legible as a
+              whole while its order is being shown, and a second colour would
+              spend the one accent twice.
+            */
+            if (!draw || !written) {
+              return <Path {...shared} key={stroke.id} strokeOpacity={written ? 1 : 0.12} />;
+            }
+            return <InkDraw {...shared} drawing key={stroke.id} strokeOpacity={1} />;
           })}
         </Svg>
       </View>

@@ -1,62 +1,112 @@
 /**
- * Screen 3 — kanji page (WP-05; controller §10.3, REQ-UI-03).
+ * Screen 3 — the kanji page, rebuilt as the fractal dive (lane B2;
+ * `docs/design/BUNKI_THE_FRACTAL_DIVE_2026-07-28.md`).
  *
- * Layer 0 is the character, its meaning centre, the reading it carries in the
- * word the learner met, the stroke animation, and the personal state. Layer 1
- * is the compounds actually in the seed, the readings those compounds draw on,
- * the components with their roles where the source gives one, the dimension the
- * learner marked uncertain, and one contrast.
+ * ## The operator's decision, and what it changes
+ *
+ * The dive **replaces** the flat kanji page rather than sitting beside it. A
+ * kanji page is the dive stopped at L2 — one way to see one thing. So this file
+ * is not a page with a dive bolted on: it is the dive, and everything the frozen
+ * §5 kanji-page contract asks for is what the dive shows when the centre happens
+ * to be a character.
+ *
+ * ## What that buys, and it is the DoD clause nothing else closed
+ *
+ * The master definition of done asks for *recursively explorable*: "from any
+ * word: kanji → components → compounds → related/contrasting words → sentences →
+ * back; no dead-end screens". Screens with links satisfy that on paper. Here
+ * there is no screen to leave — zooming is changing which node is the centre —
+ * so a context loss is structurally impossible rather than merely avoided.
+ *
+ * ## Exposure is never retrieval, and it is the rule this lane exists to prove
+ *
+ * Every gesture on this surface is navigation. Nothing here submits a command,
+ * mints evidence, writes a memory state, or reaches a scheduling path — this
+ * screen does not even hold a dispatch function. Wave C3 adds probes later, and
+ * it can only do that safely because this lane proves the boundary first;
+ * `test/dive-boundary.test.ts` walks this screen's whole module graph and fails
+ * if it can reach one, and `e2e/dive-exposure.spec.ts` drives the dive in a real
+ * browser and asserts the durable event log is byte-identical afterwards.
+ *
+ * ## What is on the page at L2
+ *
+ * Readings by type, the meaning centre, the stroke order drawn with the brush,
+ * components with their roles, reading families, the characters that share a
+ * shape, the compounds ranked by the dictionary's own commonness signal, and one
+ * note that is the character explaining itself. `src/ui/dive/dive-detail.ts`
+ * derives all of it and is explicit about what each section may and may not
+ * claim.
  *
  * **Dictionary indices are never rendered.** REQ-UI-03 is explicit: SKIP,
- * Henshall, NJECD, Gakken, New Nelson, KALD and Daikanwa/Morohashi are join
- * keys in a database and not page content — "a kanji page should feel like a
- * museum card, not a spreadsheet row".
- *
- * WP-05 shipped this file claiming "the Phase-0 seed carries none of them, so
- * there is nothing here to leak". **That was false.** The seed's radical
- * records carry a `kind` naming the classification scheme that assigned them,
- * and two of the ten characters carry the one from Nelson's dictionary — which
- * this page printed verbatim, under a subtitle promising it never would. The
- * source scan in `test/screen-contract.test.ts` missed it because the token
- * arrived through data, not through source text.
- *
- * WP-09 closed it: the components section renders elements only, via
- * `src/data/radical-display.ts`, and no scheme label reaches the page from any
- * value. `test/radical-display.test.ts` scans the rendered strings the seed can
- * actually produce, so the rule now survives a dataset change as well as a
- * source change.
- *
- * Layers 2 and 3 need reading families, sourced phonetic/semantic patterns and
- * full KANJIDIC2 fields. The seed has none of that (LICENSES.md D-1), so those
- * sections state what is missing and why rather than being quietly dropped.
- *
- * Stroke data is the one genuinely third-party thing on this page: KanjiVG,
- * CC BY-SA 3.0, retrieved and licence-verified by WP-04. Its attribution is
- * rendered from the seed's own upstream record.
+ * Henshall, NJECD, Gakken, New Nelson, KALD and Daikanwa/Morohashi are join keys
+ * in a database and not page content. WP-09 closed the one leak that reached the
+ * page through *data* rather than through source text, and `radicalDisplay` is
+ * still what stands between the seed's radical records and this screen.
  */
 
-import { useCallback, useMemo, type ReactNode } from 'react';
+import { useCallback, useMemo, useReducer, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
+  SCALE_LEVELS,
+  SCALE_LEVEL_DEPTH,
+  SCALE_LEVEL_NAMES,
+  diagnoseInterior,
+  diveAt,
+  indexReadings,
+  parseStrokeNodeId,
+  scaleNodeAt,
+  sharpestMismatches,
+  viewGraphNodeIds,
+  type ScaleLevel,
+  type ScaleNode,
+} from '@bunki/domain';
+
+import {
   findKanjiByCharacter,
+  findLexemeById,
   importedDictionary,
-  readingContextFor,
   seedDataset,
-  wordsUsingKanji,
   type SeedKanji,
 } from '../data/catalog.ts';
 import { parseKanjiVgStrokes, type KanjiStrokeSet } from '../data/kanjivg.ts';
 import { radicalDisplay } from '../data/radical-display.ts';
 import { useAppSnapshot, useDebugFlags } from '../state/app-context.tsx';
-import { UNCERTAINTY_LABELS } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
+import { AttributionFooter } from '../ui/attribution.tsx';
+import { CAPABILITY_IDS, type CapabilityId } from '../ui/capability.ts';
+import { Disclosure } from '../ui/disclosure.tsx';
+import { DiveCanvas } from '../ui/dive/dive-canvas.tsx';
+import { DiveCentre } from '../ui/dive/dive-centre.tsx';
+import { DiveChrome } from '../ui/dive/dive-chrome.tsx';
+import { DiveDiagnosis } from '../ui/dive/dive-diagnosis.tsx';
 import {
-  ProvenanceLine,
-  ProvenanceTable,
-  SeedEntryDisclosure,
-  UnsupportedLayer,
-} from '../ui/notices.tsx';
+  COMPONENT_ROLE_NOTE,
+  DETAIL_DIVE_OPTIONS,
+  SELF_NOTE_STANDING,
+  SHARED_COMPONENT_NOTE,
+  buildKanjiDetail,
+  eraOfLexeme,
+} from '../ui/dive/dive-detail.ts';
+import type { NodeMark } from '../ui/dive/dive-node.tsx';
+import {
+  READING_STANDING,
+  markForNode,
+  reachOfThreads,
+  readingsForNodes,
+} from '../ui/dive/dive-readings.ts';
+import { appScaleLadder, characterOfKanjiNodeId, kanjiNodeId } from '../ui/dive/scale-source.ts';
+import {
+  beginDive,
+  centreOf,
+  canSurface,
+  diveReducer,
+  flightDirection,
+  type DiveStop,
+} from '../ui/dive/dive-state.ts';
+import { LensRow } from '../ui/lens.tsx';
+import { useReducedMotion } from '../ui/motion.tsx';
+import { ProvenanceLine, ProvenanceTable, SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
 import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -81,9 +131,6 @@ export interface KanjiScreenProps {
    * strokes from those same committed bytes and
    * `packages/seed/test/dictionary.test.ts` re-derives every one of them from
    * the originals. Same drawing, same licensor; only the parse happened earlier.
-   *
-   * `strokeSvg` wins when both are present, so nothing about the fixture tier's
-   * rendering path changes.
    */
   readonly strokes?: KanjiStrokeSet | null | undefined;
   readonly onOpenWord: (lexemeId: string) => void;
@@ -97,9 +144,7 @@ export function KanjiScreen({
   onOpenWord,
   onBack,
 }: KanjiScreenProps): ReactNode {
-  const theme = useTheme();
   const flags = useDebugFlags();
-  const snapshot = useAppSnapshot();
 
   const resolve = useCallback(() => findKanjiByCharacter(character), [character]);
   const { state, retry } = useLookup<SeedKanji>(resolve, {
@@ -151,333 +196,607 @@ export function KanjiScreen({
     );
   }
 
-  const kanji = state.data;
-  const compounds = wordsUsingKanji(kanji.character);
-  const readings = readingContextFor(kanji);
-  const radicals = radicalDisplay(kanji.radicals);
-  const upstream = seedDataset.strokes.upstream;
+  return (
+    <Dive
+      kanji={state.data}
+      onBack={onBack}
+      onOpenWord={onOpenWord}
+      strokeError={strokes.error}
+      strokeSet={strokes.set}
+      strokesRevealed={flags.strokesRevealed}
+    />
+  );
+}
 
-  // The reading this character carries in a word the learner actually kept —
-  // REQ-UI-03 Layer 0 "the actual reading in the encountered word". Only shown
-  // when such a thread exists; never inferred from the reading list.
-  const encounteredIn =
-    snapshot.threads
-      .map((thread) =>
-        thread.lexemeId === null
-          ? null
-          : (compounds.find((lexeme) => lexeme.id === thread.lexemeId) ?? null),
-      )
-      .find((lexeme) => lexeme !== null) ?? null;
+/* ------------------------------------------------------------------ *
+ * The dive
+ * ------------------------------------------------------------------ */
 
-  // A thread counts as marked when *either* the app still holds the dimension
-  // or the log records that a mark was made. After a reload only the second is
-  // true (WP05-D2), and dropping such a thread here would report "nothing marked"
-  // about a character the learner did mark.
-  const markedThread = snapshot.threads.find(
-    (thread) =>
-      (thread.uncertainty !== null || thread.markRecordedInLog) &&
-      compounds.some((lexeme) => lexeme.id === thread.lexemeId),
+/**
+ * Split from `KanjiScreen` so the hooks below run only once a character has
+ * resolved.
+ *
+ * The four REQ-UI-09 states are decided above, before any of this mounts, which
+ * is what keeps the state branches free of hooks and the "no two state panels at
+ * once" rule structural rather than reviewed.
+ */
+function Dive({
+  kanji,
+  strokeSet,
+  strokeError,
+  strokesRevealed,
+  onOpenWord,
+  onBack,
+}: {
+  readonly kanji: SeedKanji;
+  readonly strokeSet: KanjiStrokeSet | null;
+  readonly strokeError: string | null;
+  readonly strokesRevealed: boolean;
+  readonly onOpenWord: (lexemeId: string) => void;
+  readonly onBack: () => void;
+}): ReactNode {
+  const theme = useTheme();
+  const snapshot = useAppSnapshot();
+  const reduced = useReducedMotion();
+  const [capability, setCapability] = useState<CapabilityId>('meaning');
+
+  const { ladder } = useMemo(() => appScaleLadder(), []);
+
+  const origin: DiveStop = useMemo(
+    () => ({ id: kanjiNodeId(kanji.character), level: 'kanji', label: kanji.character }),
+    [kanji.character],
+  );
+  const [dive, dispatchDive] = useReducer(diveReducer, origin, beginDive);
+  /*
+    Arriving at a different character is a *different dive*, not a deeper one.
+    The route's parameter can change without this component unmounting, and a
+    path that survived that would tell the learner they had zoomed from a
+    character they never opened.
+  */
+  const state = dive.origin.id === origin.id ? dive : beginDive(origin);
+  const centre = centreOf(state);
+
+  const view = useMemo(() => diveAt(ladder, centre.id, DETAIL_DIVE_OPTIONS), [ladder, centre.id]);
+
+  /* ------------------------------------------------------ the marks */
+
+  const reach = useMemo(
+    () =>
+      reachOfThreads(
+        snapshot,
+        (written) => kanjiNodeId(written),
+        (lexemeId) => findLexemeById(lexemeId)?.kanjiUsed ?? [],
+      ),
+    [snapshot],
   );
 
-  // "One useful contrast" (Layer 1): another seed kanji sharing a component.
-  // A real relation in this dataset, or nothing.
-  const contrast =
-    seedDataset.kanji.find(
-      (other) =>
-        other.character !== kanji.character &&
-        other.components.some((component) => kanji.components.includes(component)),
-    ) ?? null;
+  const markFor = useCallback(
+    (nodeId: string): NodeMark => {
+      const derived = markForNode(reach, nodeId, capability);
+      return { band: derived.band, uncertain: derived.uncertain, basis: derived.basis };
+    },
+    [reach, capability],
+  );
+
+  /* -------------------------------------------------- the diagnosis */
+
+  const findings = useMemo(() => {
+    // Bounded by the view: only the nodes the dive already materialised get a
+    // reading, so the diagnosis never reaches a node level-of-detail culled.
+    const readings = indexReadings(readingsForNodes(viewGraphNodeIds(view), reach, capability));
+    return sharpestMismatches(diagnoseInterior(view, readings, [capability]));
+  }, [view, reach, capability]);
+
+  /* -------------------------------------------------- the L2 detail */
+
+  const detail = useMemo(
+    () => (centre.level === 'kanji' ? buildKanjiDetail(ladder, centre.label) : null),
+    [ladder, centre.level, centre.label],
+  );
+
+  /* ------------------------------------------------------ the flight */
+
+  const [previousLevel, setPreviousLevel] = useState<ScaleLevel | null>(null);
+  const direction = flightDirection(previousLevel, centre.level, SCALE_LEVEL_DEPTH);
+
+  const zoomTo = useCallback(
+    (nodeId: string) => {
+      const node: ScaleNode | null = scaleNodeAt(ladder, nodeId);
+      if (node === null) return;
+      setPreviousLevel(centre.level);
+      dispatchDive({ kind: 'zoom', to: { id: node.id, level: node.level, label: node.label } });
+    },
+    [ladder, centre.level],
+  );
+
+  const reachableLevels = useMemo<readonly ScaleLevel[]>(
+    () => [
+      centre.level,
+      ...view.rings.filter((ring) => ring.members.length > 0).map((r) => r.level),
+    ],
+    [centre.level, view.rings],
+  );
+
+  const centreNode = view.centre;
+  const era = centre.level === 'word' ? eraOfLexeme(ladder, centre.id) : null;
+  const centreLexeme = centre.level === 'word' ? findLexemeById(centre.id) : null;
+  // The character a stroke belongs to, read back out of the id this app minted
+  // through the domain's own parser rather than guessed from the ring.
+  const strokeOwner =
+    centre.level === 'stroke'
+      ? characterOfKanjiNodeId(parseStrokeNodeId(centre.id)?.kanjiNodeId ?? '')
+      : null;
 
   return (
     <ScreenShell
       lede={<SeedEntryDisclosure />}
-      subtitle="Layers 0 and 1. Dictionary index numbers are database join keys and are never shown here."
+      subtitle={`The dive, stopped at ${SCALE_LEVEL_NAMES[centre.level].written} ${SCALE_LEVEL_NAMES[centre.level].gloss}. Moving through it records nothing. Dictionary index numbers are database join keys and are never shown here.`}
       testID="screen-kanji"
       title="Kanji"
     >
-      {/* ------------------------------------------------ Layer 0 */}
-      <View
-        style={[
-          styles.hero,
-          { backgroundColor: theme.color.raised, borderColor: theme.color.ruleStrong },
-        ]}
-        testID="kanji-layer-0"
+      <DiveChrome
+        canGoBack={canSurface(state)}
+        centre={centre}
+        onBack={() => {
+          setPreviousLevel(centre.level);
+          dispatchDive({ kind: 'back' });
+        }}
+        onSurface={() => {
+          setPreviousLevel(centre.level);
+          dispatchDive({ kind: 'surface' });
+        }}
+        path={state.path}
+        reachableLevels={reachableLevels}
+        reduced={reduced}
+        testID="dive-chrome"
+      />
+
+      <LensRow active={capability} available={CAPABILITY_IDS} onChange={setCapability} />
+
+      {centreNode === null ? (
+        <EmptyPanel
+          detail="Nothing in this build sits at that node, so there is nothing to draw."
+          message="That node is not on the ladder."
+          testID="dive-centre-empty"
+        />
+      ) : (
+        <DiveCanvas
+          capability={capability}
+          centreSlot={
+            <DiveCentre
+              facts={{
+                caption: captionFor(centreNode, kanji, centreLexeme?.senses ?? []),
+                catalogue: catalogueFor(centreNode, kanji, view.cost.ladderNodes),
+                reading: centreLexeme?.reading ?? null,
+                era,
+                strokeOwner,
+                standing: era === null ? READING_STANDING : `${era.detail} ${READING_STANDING}`,
+              }}
+              node={centreNode}
+              testID="dive-centre-card"
+            />
+          }
+          direction={direction}
+          markFor={markFor}
+          onZoom={zoomTo}
+          testID="dive-canvas"
+          view={view}
+        />
+      )}
+
+      <Text
+        style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+        testID="dive-cost"
       >
-        <View style={styles.heroTop}>
-          <Text
-            accessibilityLabel={`The kanji ${kanji.character}`}
-            accessible
-            style={[styles.character, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
-            testID="kanji-character"
+        This view materialised {String(view.cost.nodesMaterialised)} nodes of the{' '}
+        {String(view.cost.ladderNodes)} this build indexes, from {String(view.cost.adjacencyReads)}{' '}
+        adjacency lists. The rest of the graph was not touched.
+      </Text>
+
+      <Hairline />
+
+      <DiveDiagnosis capability={capability} findings={findings} testID="dive-diagnosis" />
+
+      {/* ------------------------------------------------ the kanji page */}
+      {detail === null ? null : (
+        <>
+          <Hairline />
+
+          <Section
+            note="What this character is, in the fields the shipped dictionary actually carries."
+            testID="kanji-detail"
+            title={`${detail.kanji.character} — ${detail.kanji.meanings[0] ?? ''}`}
           >
-            {kanji.character}
-          </Text>
-          <View style={styles.heroMeaning}>
             <Text
-              style={[
-                styles.meaningCentre,
-                { color: theme.color.ink, fontFamily: theme.font.sans },
-              ]}
-              testID="kanji-meaning-centre"
+              style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+              testID="kanji-meanings"
             >
-              {kanji.meanings[0] ?? ''}
+              {detail.kanji.meanings.join(' · ')}
             </Text>
+            <ProvenanceLine field="meanings" record={detail.kanji.provenance.meanings} />
             <Text
               style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
             >
-              {kanji.meanings.slice(1).join(' · ')}
+              {String(detail.kanji.strokeCount)} strokes · {detail.kanji.codepoint}
             </Text>
-            <ProvenanceLine field="meanings" record={kanji.provenance.meanings} />
             <Text
               style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID="kanji-era"
             >
-              {String(kanji.strokeCount)} strokes · {kanji.codepoint}
+              {detail.era.detail}
             </Text>
-            <Text
-              style={[
-                styles.personalState,
-                {
-                  // The accent marks the learner's own frontier. "You have no
-                  // thread here" is an absence, not a frontier — spending the
-                  // one accent on it would make every unvisited character shout.
-                  color:
-                    markedThread === undefined ? theme.color.inkMuted : theme.color.frontierMark,
-                  fontFamily: theme.font.sans,
-                },
-              ]}
-              testID="kanji-personal-state"
-            >
-              {markedThread === undefined
-                ? 'No thread of yours uses this character yet.'
-                : `On your ${markedThread.state.promotion} thread ${markedThread.displayText}`}
-            </Text>
-          </View>
-        </View>
+          </Section>
 
-        {encounteredIn === null ? (
-          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-            No kept word of yours contains this character yet, so there is no “reading in the
-            encountered word” to show.
-          </Text>
-        ) : (
-          <View style={styles.encountered} testID="kanji-encountered-reading">
-            <Text
-              style={[styles.label, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+          {detail.note === null ? null : (
+            <Disclosure
+              count={detail.note.words.length}
+              initiallyOpen
+              note="One line, and it is the character explaining itself."
+              testID="kanji-self-note"
+              title="In its own words"
             >
-              In the word you kept
-            </Text>
-            <RubyText
-              reading={encounteredIn.reading}
-              size={TYPE.headwordRow}
-              written={encounteredIn.headword}
-            />
-          </View>
-        )}
-
-        {/* Stroke order — Layer 0. Its own loading/error/empty handling. */}
-        {strokes.error !== null ? (
-          <ErrorPanel
-            detail="The rest of this page is unaffected."
-            message="The stroke file for this character could not be read."
-            testID="kanji-stroke-error"
-          />
-        ) : strokes.set === null ? (
-          <EmptyPanel
-            detail="Stroke data comes from KanjiVG and the Phase-0 seed ships it for ten characters only."
-            message="No stroke order in the seed for this character."
-            testID="kanji-stroke-empty"
-          />
-        ) : (
-          <View style={styles.strokeBlock}>
-            <StrokeOrder
-              character={kanji.character}
-              startRevealed={flags.strokesRevealed}
-              strokes={strokes.set}
-              testID="kanji-stroke-order"
-            />
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {upstream.project} · {upstream.license} · retrieved {upstream.retrievedAt}
-            </Text>
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {upstream.repository}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* ------------------------------------------------ Layer 1 */}
-      <Section
-        note="Compounds are the seed words that literally contain this character; nothing is ranked by an invented relevance model."
-        testID="kanji-layer-1"
-        title="Layer 1 — how you have met it"
-      >
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          Compounds in the seed
-        </Text>
-        {compounds.length === 0 ? (
-          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-            No seed word uses this character.
-          </Text>
-        ) : (
-          compounds.map((lexeme) => (
-            <RowButton
-              accessibilityHint="Opens that word’s page."
-              accessibilityLabel={`${lexeme.headword}, read ${lexeme.reading}: ${lexeme.senses.join(', ')}`}
-              key={lexeme.id}
-              onPress={() => onOpenWord(lexeme.id)}
-              testID={`kanji-compound-${lexeme.id}`}
-            >
-              <RubyText
-                reading={lexeme.reading}
-                serif={false}
-                size={TYPE.body}
-                written={lexeme.headword}
-              />
               <Text
-                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+                style={[styles.selfNote, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
+                testID="kanji-self-note-line"
               >
-                {lexeme.senses.slice(0, 3).join(' · ')}
+                {detail.note.line}
               </Text>
-            </RowButton>
-          ))
-        )}
+              <AttributionFooter lines={[]} standing={SELF_NOTE_STANDING} />
+            </Disclosure>
+          )}
 
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          Readings
-        </Text>
-        <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
-          音 {readings.onReadings.join('・')}
-        </Text>
-        <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
-          訓 {readings.kunReadings.join('・')}
-        </Text>
-        <ProvenanceLine field="onReadings" record={kanji.provenance.onReadings} />
-        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-          Which reading each compound above uses is not recorded in the seed, so it is not asserted
-          here.
-        </Text>
-
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          Components
-        </Text>
-        <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
-          {kanji.components.join(' + ')}
-        </Text>
-        {radicals.elements.length === 0 ? null : (
-          <Text
-            style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
-            testID="kanji-radical-elements"
+          <Disclosure
+            initiallyOpen
+            note="KANJIDIC2's own lists, written as the file writes them. Which reading a given compound uses is not recorded per morpheme anywhere in the shipped data, so it is not asserted."
+            testID="kanji-readings"
+            title="Readings"
           >
-            Radical: {radicals.elements.join(' · ')}
-          </Text>
-        )}
-        <Text
-          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-          testID="kanji-radical-note"
-        >
-          {radicals.note}
-        </Text>
-        <ProvenanceLine field="components" record={kanji.provenance.components} />
+            <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
+              音 {detail.kanji.onReadings.join('・') || '—'}
+            </Text>
+            <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
+              訓 {detail.kanji.kunReadings.join('・') || '—'}
+            </Text>
+            <ProvenanceLine field="onReadings" record={detail.kanji.provenance.onReadings} />
+          </Disclosure>
 
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          Your weakest dimension here
-        </Text>
-        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-          {markedThread === undefined
-            ? 'Nothing marked uncertain on a thread that uses this character.'
-            : markedThread.uncertainty === null
-              ? `You marked ${markedThread.displayText} as uncertain. Which part was never stored, so it did not survive the reload.`
-              : `You marked ${UNCERTAINTY_LABELS[markedThread.uncertainty.dimension]} on ${markedThread.displayText}.`}
-        </Text>
+          <Disclosure
+            count={detail.components.length}
+            empty={
+              detail.components.length === 0
+                ? 'This build carries no component annotation for this character.'
+                : undefined
+            }
+            initiallyOpen
+            note={COMPONENT_ROLE_NOTE}
+            testID="kanji-components"
+            title="Components"
+          >
+            {detail.components.map((component) => (
+              <RowButton
+                accessibilityHint="Makes that shape the centre of the dive."
+                accessibilityLabel={`${component.element}, role ${component.role}, used by ${String(component.usedBy)} characters in this build`}
+                key={component.nodeId}
+                onPress={() => zoomTo(component.nodeId)}
+                testID={`kanji-component-${component.element}`}
+              >
+                <Text
+                  style={[
+                    styles.rowGlyph,
+                    { color: theme.color.ink, fontFamily: theme.font.mincho },
+                  ]}
+                >
+                  {component.element}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  role: {component.role} · used by {String(component.usedBy)} characters here
+                </Text>
+              </RowButton>
+            ))}
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID="kanji-radical-note"
+            >
+              {radicalDisplay(detail.kanji.radicals).note}
+            </Text>
+            <ProvenanceLine field="components" record={detail.kanji.provenance.components} />
+          </Disclosure>
 
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          One contrast
-        </Text>
-        {contrast === null ? (
-          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-            No other seed kanji shares a component with this one.
-          </Text>
-        ) : (
-          <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
-            {kanji.character} ({kanji.components.join('+')}) vs {contrast.character} (
-            {contrast.components.join('+')}) — {contrast.meanings.slice(0, 2).join(' · ')}
-          </Text>
-        )}
-      </Section>
+          <Disclosure
+            count={detail.readingFamily.length}
+            empty={
+              detail.readingFamily.length === 0
+                ? 'No other character in this build shares a reading with this one.'
+                : undefined
+            }
+            note="Two characters are a family here because they reach the same reading. The reading is the reason, and it is shown."
+            testID="kanji-reading-family"
+            title="Reading family"
+          >
+            {detail.readingFamily.map((entry) => (
+              <RowButton
+                accessibilityHint="Makes that character the centre of the dive."
+                accessibilityLabel={`${entry.character}, which shares the reading ${entry.via}`}
+                key={entry.nodeId}
+                onPress={() => zoomTo(entry.nodeId)}
+                testID={`kanji-family-${entry.character}`}
+              >
+                <Text
+                  style={[
+                    styles.rowGlyph,
+                    { color: theme.color.ink, fontFamily: theme.font.mincho },
+                  ]}
+                >
+                  {entry.character}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  via {entry.via}
+                </Text>
+              </RowButton>
+            ))}
+          </Disclosure>
+
+          <Disclosure
+            count={detail.sharedComponent.length}
+            empty={
+              detail.sharedComponent.length === 0
+                ? 'No other character in this build is written with a shape this one uses.'
+                : undefined
+            }
+            note={SHARED_COMPONENT_NOTE}
+            testID="kanji-shared-component"
+            title="Written with a shape this one uses"
+          >
+            {detail.sharedComponent.map((entry) => (
+              <RowButton
+                accessibilityHint="Makes that character the centre of the dive."
+                accessibilityLabel={`${entry.character}, which shares ${entry.element}, a shape ${String(entry.usedBy)} characters in this build use`}
+                key={entry.nodeId}
+                onPress={() => zoomTo(entry.nodeId)}
+                testID={`kanji-shared-${entry.character}`}
+              >
+                <Text
+                  style={[
+                    styles.rowGlyph,
+                    { color: theme.color.ink, fontFamily: theme.font.mincho },
+                  ]}
+                >
+                  {entry.character}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  shares {entry.element} · {String(entry.usedBy)} characters here use that shape
+                </Text>
+              </RowButton>
+            ))}
+          </Disclosure>
+
+          <Disclosure
+            count={detail.compoundsAvailable}
+            empty={
+              detail.compounds.length === 0
+                ? 'No word in this build is written with this character.'
+                : undefined
+            }
+            initiallyOpen
+            note={
+              detail.compoundsTruncatedUpstream
+                ? 'Ordered by JMdict’s own commonness tags — over the ones the dive kept, not over every word in the dictionary.'
+                : 'Ordered by JMdict’s own commonness tags, which is the same signal that chose which entries this build ships.'
+            }
+            testID="kanji-compounds"
+            title="Words written with it"
+          >
+            {detail.compounds.map((entry) => (
+              <RowButton
+                accessibilityHint="Opens that word’s page."
+                accessibilityLabel={`${entry.lexeme.headword}, read ${entry.lexeme.reading}: ${entry.lexeme.senses.join(', ')}`}
+                key={entry.nodeId}
+                onPress={() => onOpenWord(entry.lexeme.id)}
+                testID={`kanji-compound-${entry.lexeme.id}`}
+              >
+                <RubyText
+                  reading={entry.lexeme.reading}
+                  serif={false}
+                  size={TYPE.body}
+                  written={entry.lexeme.headword}
+                />
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {entry.lexeme.senses.slice(0, 3).join(' · ')}
+                </Text>
+              </RowButton>
+            ))}
+            {detail.compounds.length < detail.compoundsAvailable ? (
+              <Text
+                style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+              >
+                Showing {String(detail.compounds.length)} of {String(detail.compoundsAvailable)}.
+                The rest are in the graph; zoom out through the dive to reach them.
+              </Text>
+            ) : null}
+          </Disclosure>
+
+          <Disclosure
+            initiallyOpen
+            note="KanjiVG's own drawing, one stroke at a time, in writing order."
+            testID="kanji-strokes"
+            title="Stroke order"
+          >
+            <StrokeSection
+              character={detail.kanji.character}
+              revealed={strokesRevealed}
+              strokeError={strokeError}
+              strokeSet={strokeSet}
+            />
+          </Disclosure>
+
+          <Disclosure
+            note="Every field on this page, with where it came from."
+            testID="kanji-provenance"
+            title="Sources"
+          >
+            <ProvenanceTable provenance={detail.kanji.provenance} testID="kanji-provenance-table" />
+          </Disclosure>
+        </>
+      )}
 
       <Hairline />
-
-      {/* ---------------------------------------------- Layers 2–3 */}
-      <Section testID="kanji-layer-2-3" title="Layers 2 and 3">
-        <UnsupportedLayer
-          reason="Reading families and sourced phonetic/semantic patterns need a licensed character database. None could be retrieved for the Phase-0 seed."
-          testID="kanji-layer-2-unfilled"
-          title="Reading families, phonetic and semantic patterns"
-        />
-        <UnsupportedLayer
-          reason="Full character-database fields, school grade, frequency and JLPT/Kanken mappings need a licensed source. Dictionary index numbers are excluded on principle as well: REQ-UI-03 makes them join keys, never page content."
-          testID="kanji-layer-3-unfilled"
-          title="Full character-database fields, grade, frequency, JLPT"
-        />
-        <ProvenanceTable provenance={kanji.provenance} testID="kanji-provenance-table" />
-      </Section>
-
-      <Hairline />
+      <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
+        The ladder has {String(SCALE_LEVELS.length)} levels:{' '}
+        {SCALE_LEVELS.map((level) => SCALE_LEVEL_NAMES[level].gloss).join(' · ')}. Where a level is
+        empty in this build the dive says so above rather than leaving a blank.
+      </Text>
       <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
     </ScreenShell>
   );
 }
 
+/* ------------------------------------------------------------------ *
+ * Stroke order
+ * ------------------------------------------------------------------ */
+
+/**
+ * The stroke panel, and the reason it is its own component.
+ *
+ * Its three outcomes are one screen state each — unreadable file, no geometry in
+ * this build, geometry drawn — and only ever one of them renders. Keeping them
+ * in the page body put an `ErrorPanel` and an `EmptyPanel` inside one JSX
+ * fragment, which `test/screen-contract.test.ts` refuses: siblings in a fragment
+ * render together *by definition*, and the defect that rule was written against
+ * shipped a permanent `progressbar` beside "Nothing recorded yet." Extracting it
+ * makes "only one of these renders" structural rather than a promise about a
+ * ternary somebody has to read.
+ *
+ * `draw` is on, so the strokes are written with the brush rather than revealed
+ * whole. Under reduced motion `InkDraw`'s duration is zero and each stroke lands
+ * complete on the first frame — the character stays fully legible, which is the
+ * part that carries the teaching.
+ */
+function StrokeSection({
+  character,
+  strokeSet,
+  strokeError,
+  revealed,
+}: {
+  readonly character: string;
+  readonly strokeSet: KanjiStrokeSet | null;
+  readonly strokeError: string | null;
+  readonly revealed: boolean;
+}): ReactNode {
+  const upstream = seedDataset.strokes.upstream;
+
+  if (strokeError !== null) {
+    return (
+      <ErrorPanel
+        detail="The rest of this page is unaffected."
+        message="The stroke file for this character could not be read."
+        testID="kanji-stroke-error"
+      />
+    );
+  }
+  if (strokeSet === null) {
+    return (
+      <EmptyPanel
+        detail="Stroke data comes from KanjiVG and this build carries it only for the characters KANJIDIC2 and KanjiVG both cover."
+        message="No stroke order in this build for this character."
+        testID="kanji-stroke-empty"
+      />
+    );
+  }
+  return (
+    <View style={styles.strokeBlock}>
+      <StrokeOrder
+        character={character}
+        draw
+        startRevealed={revealed}
+        strokes={strokeSet}
+        testID="kanji-stroke-order"
+      />
+      {/*
+        KanjiVG is CC BY-SA 3.0 and the licence asks for the project to be named
+        and reachable, so the repository URL is rendered rather than described.
+        The commit and the licence-text URL are the seed’s own record of what
+        this build was actually checked against.
+      */}
+      <AttributionFooter
+        lines={[
+          {
+            field: 'Stroke order',
+            source: `${upstream.project}, ${upstream.license} — ${upstream.repository}`,
+          },
+        ]}
+        standing={`Retrieved ${upstream.retrievedAt} at commit ${upstream.commit.slice(0, 12)}. The licence text this build was checked against is at ${upstream.licenseTextUrl}.`}
+        testID="kanji-stroke-attribution"
+      />
+    </View>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Centre copy
+ * ------------------------------------------------------------------ */
+
+function captionFor(node: ScaleNode, kanji: SeedKanji, senses: readonly string[]): string {
+  switch (node.level) {
+    case 'kanji':
+      return node.label === kanji.character
+        ? (kanji.meanings[0] ?? 'no meaning recorded in this build')
+        : (findKanjiByCharacter(node.label)?.meanings[0] ?? 'no meaning recorded in this build');
+    case 'word':
+      return senses[0] ?? 'no sense recorded in this build';
+    case 'component':
+      return 'a shape characters are written with; this build records no meaning for it';
+    case 'stroke':
+      return `stroke ${String(node.stroke?.order ?? 0)} of ${String(node.stroke?.of ?? 0)}`;
+    case 'sentence':
+      return 'a sentence this word was met in';
+    case 'collocation':
+      return 'a phrase';
+  }
+}
+
+function catalogueFor(node: ScaleNode, kanji: SeedKanji, ladderNodes: number): readonly string[] {
+  const level = SCALE_LEVEL_NAMES[node.level];
+  const lines = [
+    `${level.written} ${level.gloss} · level ${String(SCALE_LEVEL_DEPTH[node.level])}`,
+  ];
+  if (node.level === 'kanji') {
+    const resolved = node.label === kanji.character ? kanji : findKanjiByCharacter(node.label);
+    if (resolved !== null) {
+      lines.push(`${String(resolved.strokeCount)} strokes · ${resolved.codepoint}`);
+    }
+  }
+  if (node.level === 'stroke' && node.stroke?.kind !== null && node.stroke !== null) {
+    lines.push(`KanjiVG stroke type ${node.stroke.kind ?? '—'}`);
+  }
+  lines.push(`one of ${String(ladderNodes)} nodes this build indexes`);
+  return lines;
+}
+
+/* ------------------------------------------------------------------ *
+ * Styles
+ * ------------------------------------------------------------------ */
+
 const styles = StyleSheet.create({
-  hero: {
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: SPACE.lg,
-    padding: SPACE.lg,
-  },
-  heroTop: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACE.lg,
-  },
-  character: {
-    fontSize: TYPE.kanjiHero,
-    lineHeight: TYPE.kanjiHero * 1.1,
-  },
-  heroMeaning: {
-    flexBasis: 240,
-    flexGrow: 1,
-    flexShrink: 1,
-    gap: SPACE.xs,
-  },
-  meaningCentre: {
-    fontSize: TYPE.title,
-    fontWeight: '600',
-  },
-  personalState: {
-    fontSize: TYPE.label,
-    marginTop: SPACE.xs,
-  },
-  encountered: {
-    gap: SPACE.xs,
-  },
-  strokeBlock: {
-    gap: SPACE.xs,
-  },
-  label: {
-    fontSize: TYPE.meta,
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  subheading: {
-    fontSize: TYPE.label,
-    fontWeight: '600',
-    marginTop: SPACE.md,
-  },
   body: {
     fontSize: TYPE.body,
     lineHeight: TYPE.body * 1.7,
@@ -485,5 +804,15 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: TYPE.meta,
     lineHeight: TYPE.meta * 1.6,
+  },
+  rowGlyph: {
+    fontSize: TYPE.headwordRow,
+  },
+  selfNote: {
+    fontSize: TYPE.body,
+    lineHeight: TYPE.body * 1.8,
+  },
+  strokeBlock: {
+    gap: SPACE.md,
   },
 });
