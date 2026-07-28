@@ -412,7 +412,10 @@ export function EvidenceInspectorScreen({
         accessibilityHint="Shows or hides every event on this thread, with the verdict recorded for each."
         accessibilityLabel={expanded ? 'Hide the full event chain' : 'Show the full event chain'}
         accessibilityRole="button"
-        accessibilityState={{ expanded }}
+        // `aria-expanded`, not `accessibilityState={{ expanded }}`:
+        // react-native-web forwards the first and drops the second entirely
+        // (`src/ui/primitives.tsx` has the mechanism and the measurement).
+        aria-expanded={expanded}
         onPress={() => setExpanded(!expanded)}
         style={[
           styles.disclosure,

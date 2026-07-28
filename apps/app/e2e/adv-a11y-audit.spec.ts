@@ -11,7 +11,10 @@
  *     route the export produces;
  *   - focus order, focus visibility, and the absence of a keyboard trap;
  *   - an accessible name on every interactive element;
- *   - that a ruby column is spoken once, as a word, and not as its pieces.
+ *   - that a ruby column is spoken once, as a word, and not as its pieces;
+ *   - that every toggle in the vocabulary exposes its *value* — which chip is
+ *     on, which section is open, which destination you are on — read back out
+ *     of Chrome's own accessibility tree rather than out of the source.
  *
  * What it does not establish: that a screen reader user can complete the loop.
  * No VoiceOver, NVDA, TalkBack or Orca ran here, no human tested it, and no
@@ -449,6 +452,213 @@ for (const rubyCase of RUBY_CASES) {
     await cdp.detach();
   });
 }
+
+/* ------------------------------------------------------------------ *
+ * Name, role, **value** — the third one, which was missing
+ * ------------------------------------------------------------------ */
+
+/**
+ * The accessibility properties Chrome computes for one element.
+ *
+ * The same instrument as {@link axSubtree}, one level finer: `queryAXTree`'s
+ * first node is the element itself, and its `properties` are what an assistive
+ * technology is offered as that control's *value*.
+ *
+ * These tests exist because neither the source nor the DOM could answer the
+ * question. Every chip in the app carried `accessibilityState={{ selected }}`,
+ * which react-native-web has no reader for — `modules/forwardedProps` lists the
+ * flat `aria-*` names and `pick()` removes the rest — so the prop never became
+ * an attribute and every chip shipped as an identical
+ * `<button aria-label="…" role="button">`, on and off distinguished by fill
+ * colour alone (WCAG 2.1 SC 1.4.1 Use of Color, SC 4.1.2 Name/Role/Value). axe
+ * stayed green, because axe never requires a button to expose selection, and
+ * the unit test meant to prevent it grepped the source for the prop and passed.
+ * Reading the runtime tree is the only test form in this repository that has
+ * ever caught this class of defect; the ruby double-read above was its first
+ * instance, and this is its second.
+ */
+async function axPropertiesOf(
+  cdp: CDPSession,
+  testId: string,
+): Promise<Readonly<Record<string, string>>> {
+  await cdp.send('Accessibility.enable');
+  await cdp.send('DOM.enable');
+  const { root } = await cdp.send('DOM.getDocument', { depth: -1, pierce: true });
+  const { nodeId } = await cdp.send('DOM.querySelector', {
+    nodeId: root.nodeId,
+    selector: `[data-testid="${testId}"]`,
+  });
+  if (nodeId === 0) throw new Error(`no element with data-testid="${testId}"`);
+
+  const { nodes } = await cdp.send('Accessibility.queryAXTree', { nodeId });
+  const self = nodes[0];
+  if (self === undefined) throw new Error(`no accessibility node for "${testId}"`);
+  return Object.fromEntries(
+    (self.properties ?? []).map((property) => [property.name, String(property.value.value)]),
+  );
+}
+
+/**
+ * Which of these controls tells Chrome it is pressed.
+ *
+ * Fails on a control that exposes no pressed state *at all*, separately from
+ * failing on the wrong one being pressed. Those are different defects: the
+ * first is the silent-drop failure this section was written for, and a plain
+ * "expected ['x'] to equal ['y']" would not have said so.
+ */
+async function pressedAmong(
+  cdp: CDPSession,
+  testIds: readonly string[],
+): Promise<readonly string[]> {
+  const on: string[] = [];
+  for (const testId of testIds) {
+    const properties = await axPropertiesOf(cdp, testId);
+    expect(
+      properties['pressed'],
+      `${testId} exposes no \`pressed\` state, so it is announced identically whether it is on ` +
+        'or off and only its fill says otherwise (WCAG 2.1 SC 4.1.2, SC 1.4.1)',
+    ).toBeDefined();
+    if (properties['pressed'] === 'true') on.push(testId);
+  }
+  return on;
+}
+
+/** The accessible name Chrome computes for one element. */
+async function axNameOf(cdp: CDPSession, testId: string): Promise<string> {
+  return (await axSubtree(cdp, testId))[0]?.name ?? '';
+}
+
+const LENS_CHIPS = [
+  'lens-reading',
+  'lens-meaning',
+  'lens-listening',
+  'lens-production',
+  'lens-writing',
+] as const;
+
+test('lenses: exactly one chip is exposed as the active one, and pressing another moves it', async ({
+  page,
+  app,
+}) => {
+  const cdp = await page.context().newCDPSession(page);
+  await openApp(page, app.origin, '/style-guide');
+  await expect(visibleTestId(page, 'lens-reading')).toBeVisible();
+
+  expect(
+    await pressedAmong(cdp, LENS_CHIPS),
+    'a lens row must name exactly one active lens — REQ-UI-07 forbids the blend two would be, ' +
+      'and none at all leaves a learner arriving on the page unable to tell what the surface is ' +
+      'currently about',
+  ).toEqual(['lens-reading']);
+
+  // The accessible name is *not* doing this job, and must not start to: it is
+  // the same string on and off, which is precisely why the ✓ inside the button
+  // never reached the name computation and why the state needs its own channel.
+  const restingName = await axNameOf(cdp, 'lens-production');
+
+  await visibleTestId(page, 'lens-production').click();
+
+  expect(
+    await pressedAmong(cdp, LENS_CHIPS),
+    'pressing a lens did not move the exposed active state',
+  ).toEqual(['lens-production']);
+  expect(await axNameOf(cdp, 'lens-production')).toBe(restingName);
+
+  await cdp.detach();
+});
+
+test('toggles: the furigana switch exposes on and off, not only a fill', async ({ page, app }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await openApp(page, app.origin, '/style-guide');
+  await expect(visibleTestId(page, 'specimen-furigana-toggle')).toBeVisible();
+
+  // The specimen opens with furigana on.
+  expect(await pressedAmong(cdp, ['specimen-furigana-toggle'])).toEqual([
+    'specimen-furigana-toggle',
+  ]);
+  await visibleTestId(page, 'specimen-furigana-toggle').click();
+  expect(await pressedAmong(cdp, ['specimen-furigana-toggle'])).toEqual([]);
+
+  await cdp.detach();
+});
+
+test('disclosure: a folded section says whether it is open', async ({ page, app }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await openApp(page, app.origin, '/style-guide');
+  const header = visibleTestId(page, 'specimen-disclosure-readings-toggle');
+  await expect(header).toBeVisible();
+
+  const expandedState = async (): Promise<string | undefined> =>
+    (await axPropertiesOf(cdp, 'specimen-disclosure-readings-toggle'))['expanded'];
+
+  expect(
+    await expandedState(),
+    'the disclosure header exposes no expanded state, so the chevron — which is deliberately ' +
+      'hidden from the tree — is the only thing saying whether the section is open',
+  ).toBe('true');
+
+  await header.click();
+  expect(await expandedState()).toBe('false');
+
+  await cdp.detach();
+});
+
+const UNCERTAINTY_CHIPS = [
+  'capture-mark-meaning',
+  'capture-mark-reading',
+  'capture-mark-use',
+  'capture-mark-kanji',
+  'capture-mark-not-sure',
+] as const;
+
+test('capture: the uncertainty chips expose which dimension is marked', async ({ page, app }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await openApp(page, app.origin);
+  await visibleTestId(page, 'capture-search-input').fill('分岐');
+  await expect(visibleTestId(page, 'capture-top-answer')).toBeVisible();
+  await expect(visibleTestId(page, 'capture-mark-meaning')).toBeVisible();
+
+  expect(await pressedAmong(cdp, UNCERTAINTY_CHIPS)).toEqual([]);
+  await visibleTestId(page, 'capture-mark-reading').click();
+  expect(await pressedAmong(cdp, UNCERTAINTY_CHIPS)).toEqual(['capture-mark-reading']);
+
+  // The row that holds them is a `group`, not a `radiogroup`: ARIA requires a
+  // radiogroup to own `role="radio"` children, and these are buttons. The route
+  // sweep never caught the old role because these chips only exist once a word
+  // has been searched for, and it scans the screen at rest.
+  expect(
+    await visibleTestId(page, 'capture-mark-reading').evaluate((element) =>
+      element.parentElement?.getAttribute('role'),
+    ),
+  ).toBe('group');
+
+  await cdp.detach();
+});
+
+test('shell: exactly one destination is marked as the page you are on', async ({ page, app }) => {
+  // Asserted on the attribute rather than over CDP: `aria-current` is not one
+  // of the properties `Accessibility.queryAXTree` reports. It is still the same
+  // fix under test — the defect was `accessibilityState={{ selected }}`, a prop
+  // react-native-web drops before it can become an attribute at all, so the
+  // current destination shipped indistinguishable from the other three to
+  // anything not looking at the vermilion underline.
+  const current = async (): Promise<readonly string[]> =>
+    page.evaluate(() =>
+      Array.from(document.querySelectorAll('[data-testid^="nav-"]'))
+        .filter((element) => element.getAttribute('aria-current') === 'page')
+        .map((element) => element.getAttribute('data-testid') ?? ''),
+    );
+
+  await openApp(page, app.origin);
+  expect(
+    await current(),
+    'the shell marks no destination, or more than one, as the current page',
+  ).toEqual(['nav-capture']);
+
+  await visibleTestId(page, 'nav-evidence').click();
+  await expect(visibleTestId(page, 'screen-evidence')).toBeVisible();
+  expect(await current()).toEqual(['nav-evidence']);
+});
 
 test('labels: every interactive element on every route has an accessible name', async ({
   page,

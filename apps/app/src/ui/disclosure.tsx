@@ -20,9 +20,17 @@
  *     the control into a plain line of text. The alternative is the dead list
  *     inbox from §10.1: a chevron that opens onto nothing.
  *
- * Accessibility: the header is a `button` carrying `expanded`, so a screen
+ * Accessibility: the header is a `button` carrying `aria-expanded`, so a screen
  * reader announces the state and the control, and the whole row is one target
  * of at least 44 pt.
+ *
+ * `aria-expanded` and not `accessibilityState={{ expanded }}`, which is what
+ * this component shipped with and which react-native-web drops on the floor —
+ * the same silent drop that left every chip in the app with no on/off state
+ * (see `primitives.tsx`). Here the fix costs nothing anywhere: `aria-expanded`
+ * is forwarded on the web *and* is one of the five `aria-*` names React Native
+ * maps onto native accessibility state, so it is strictly more portable than
+ * what it replaces rather than a web-only concession.
  */
 
 import { useState, type ReactNode } from 'react';
@@ -87,7 +95,7 @@ export function Disclosure({
         accessibilityHint={note}
         accessibilityLabel={summary}
         accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
+        aria-expanded={open}
         onBlur={() => setFocused(false)}
         onFocus={() => setFocused(true)}
         onPress={() => setOpen((was) => !was)}
@@ -106,8 +114,8 @@ export function Disclosure({
           {summary}
         </Text>
         {/*
-          A glyph, hidden from the tree: `accessibilityState.expanded` on the
-          button is what a screen reader reads, and a spoken "▾" is noise.
+          A glyph, hidden from the tree: `aria-expanded` on the button is what a
+          screen reader reads, and a spoken "▾" is noise.
         */}
         <Text
           aria-hidden

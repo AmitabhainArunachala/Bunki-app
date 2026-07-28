@@ -109,7 +109,7 @@ describe('no decoration reaches the accessibility tree twice', () => {
 
   it('hides the disclosure chevron, because expanded state is already announced', () => {
     const body = source('src/ui/disclosure.tsx');
-    expect(body).toMatch(/accessibilityState=\{\{ expanded: open \}\}/);
+    expect(body).toMatch(/aria-expanded=\{open\}/);
     const chevron = body.slice(
       body.indexOf('styles.chevron') - 200,
       body.indexOf('styles.chevron'),
@@ -140,13 +140,74 @@ describe('every control is labelled', () => {
     expect(source('src/ui/disclosure.tsx')).toContain('disclosureHeaderStyle');
   });
 
-  it('states the active lens in words, not only in fill', () => {
+  /**
+   * What a source scan may and may not say about the lens row.
+   *
+   * It used to say more than it could support. The assertion here was
+   * `expect(body).toMatch(/selected=\{capability\.id === active\}/)` under the
+   * name "states the active lens in words, not only in fill", and it passed for
+   * a release while the shipped web bundle exposed no selected, pressed,
+   * checked or current state on any of the five chips — react-native-web drops
+   * `accessibilityState`, which was what `selected` became. Colour was the only
+   * encoding left, which is the thing the test's name denied.
+   *
+   * A grep can prove the *shape* of the prop (one active value, not a set) and
+   * that the blurb is a live region. It cannot prove that anything reached the
+   * accessibility tree, so that half now lives in
+   * `e2e/adv-a11y-audit.spec.ts`, over CDP, against the exported bundle — the
+   * only test form in this repository that has ever caught this class of defect.
+   */
+  it('takes one active lens rather than a set, and explains it in a live region', () => {
     const body = source('src/ui/lens.tsx');
     expect(body).toContain('accessibilityLiveRegion="polite"');
-    expect(body).toMatch(/selected=\{capability\.id === active\}/);
     // Exactly one lens is active: a set-valued prop would be a blend, and a
     // blend of five capabilities is the mastery light REQ-UI-07 forbids.
     expect(body).not.toMatch(/active:\s*(?:readonly\s+)?(?:Set|CapabilityId\[\])/);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * State reaches the tree on the target that actually ships
+ * ------------------------------------------------------------------ */
+
+describe('no control carries its state on a prop the web target drops', () => {
+  /**
+   * `accessibilityState` is not a prop react-native-web has.
+   *
+   * `modules/forwardedProps` enumerates the flat `aria-*` and `accessibility*`
+   * names; `pick()` removes everything else before `createDOMProps` runs; and
+   * the only lookalike in the library is `AccessibilityUtil/isDisabled`, which
+   * reads `accessibilityStates` — plural, an array, and only for `disabled`. So
+   * `accessibilityState={{ selected }}`, `{{ expanded }}` and `{{ disabled }}`
+   * all reached nothing on the shipped bundle — every place they appeared: the
+   * lens chips, the specimen's furigana toggle, the capture screen's
+   * uncertainty chips, the evidence inspector's reason chips, the `Disclosure`
+   * header and the inspector's raw-chain disclosure, and the nav shell's
+   * current destination.
+   *
+   * This is a ban rather than a per-file assertion because the prop is never
+   * the right answer here: `aria-expanded` and `aria-selected` are forwarded on
+   * the web *and* mapped onto native accessibility state by React Native, and
+   * `disabled` on a `Pressable` becomes `aria-disabled` by itself.
+   */
+  it('uses no `accessibilityState` anywhere under src/', () => {
+    const offenders = walk(resolve(APP_ROOT, 'src'))
+      .filter((file) => stripComments(read(file)).includes('accessibilityState'))
+      .map(rel);
+    expect(
+      offenders,
+      'react-native-web forwards no `accessibilityState`, so a control setting it ships with ' +
+        'no exposed state at all. Use the `aria-*` prop for the state in question — and prove ' +
+        'it over CDP in e2e/adv-a11y-audit.spec.ts, because this scan cannot.',
+    ).toEqual([]);
+  });
+
+  it('carries chip on/off state on `aria-pressed`, which a button may have', () => {
+    const body = source('src/ui/primitives.tsx');
+    expect(body).toMatch(/aria-pressed=\{selected\}/);
+    // `aria-selected` is not permitted on `role="button"`; using it would have
+    // traded a silent defect for an `aria-allowed-attr` violation.
+    expect(body).not.toContain('aria-selected');
   });
 });
 

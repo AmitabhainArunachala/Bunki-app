@@ -13,10 +13,21 @@
  *   - **Exactly one is active.** A multi-select would be back to a blend, and a
  *     blend of five capabilities is a mastery light with extra steps. The
  *     component takes a single `active` value, not a set.
- *   - **The active lens is stated in words, not only in fill.** Selection carries
- *     `accessibilityState.selected`, a check mark, and a line under the row
- *     saying what the lens means. Colour alone would fail WCAG 1.4.1 and, more
- *     to the point, would leave a learner guessing what "reading" filters to.
+ *   - **The active lens is stated in more than fill.** Selection carries
+ *     `aria-pressed` on the chip, a check mark in it, and a line under the row
+ *     — in a polite live region — saying what the lens means. Colour alone
+ *     would fail WCAG 1.4.1 and, more to the point, would leave a learner
+ *     guessing what "reading" filters to.
+ *
+ *     That first channel was `accessibilityState.selected` until the A1 repair,
+ *     and on the web export it reached nothing: react-native-web drops the prop
+ *     before it can become an attribute, so all five chips exposed an identical
+ *     `<button aria-label="… lens" role="button">` and only the fill differed.
+ *     `ChipButton`'s own docblock has the mechanism; the reason it is repeated
+ *     here is that this file asserted the opposite for a release, and the blurb
+ *     below — which does announce — made the row *sound* fixed when pressed
+ *     while leaving a learner arriving on the page, or tabbing back through the
+ *     row, with no way to tell which lens was on.
  *
  * The chips are the one place the accent is spent on chrome, because choosing a
  * lens is the learner acting — the same category as the primary button and the

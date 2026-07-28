@@ -4858,3 +4858,156 @@ have a human review it. Nothing here is merged; no agent may merge, approve, or
 push to `main`. Wave B lanes adopt this vocabulary from `@/theme` and `@/ui/*`;
 `src/ui/theme.ts` re-exports every old name, so no existing screen has to change
 in order to keep working — and each picks up real mincho as it stands.
+
+---
+
+## Appendix — Campaign E, lane A1 (repair round): the selected state that never left the source
+
+**Branch:** `agent/bunki-e-design`, base `eaeb952`.
+**Surfaces:** `apps/app/src/ui/primitives.tsx`, `lens.tsx`, `disclosure.tsx`,
+`nav-shell.tsx`, `apps/app/src/screens/capture-screen.tsx`,
+`evidence-inspector-screen.tsx`, `apps/app/test/design-vocabulary.test.ts`,
+`apps/app/e2e/adv-a11y-audit.spec.ts`, and this appendix. No token, colour,
+font, motion curve or layout was touched.
+
+### The finding
+
+One P1, and it is the same shape as the ruby double-read that WP-05 had to
+repair: a component claimed an accessibility property, a unit test asserted the
+claim by grepping the source, and the shipped web runtime did not implement it.
+
+`ChipButton` set `accessibilityState={{ selected }}`. **react-native-web 0.21
+has no reader for that prop at all.** `modules/forwardedProps` enumerates the
+flat `aria-*` and `accessibility*` names; `pick()` removes everything else
+before `createDOMProps` runs; and the only lookalike in the library is
+`AccessibilityUtil/isDisabled`, which reads `accessibilityStates` — plural, an
+array, and only for `disabled`. Verified against the shipped export in
+Chromium before the fix: every lens chip rendered as
+
+```html
+<button aria-label="Reading lens" role="button" tabindex="0" …>
+```
+
+with no `aria-selected`, `aria-pressed`, `aria-checked` or `aria-current`,
+before and after clicking, and `Accessibility.queryAXTree` reported only
+`invalid=false, focusable=true` on all five. What was left encoding on/off was
+fill colour, border colour and border width — the colour-only encoding both
+`lens.tsx` and `primitives.tsx` said in prose they were avoiding. WCAG 2.1
+SC 4.1.2 (Name, Role, Value) and SC 1.4.1 (Use of Color).
+
+Two things kept it invisible. axe never requires a button to expose selection,
+so eighteen clean route scans said nothing about it. And the lane's own guard,
+`design-vocabulary.test.ts` — "states the active lens in words, not only in
+fill" — grepped for `selected={capability.id === active}` and passed while the
+runtime dropped it, which is precisely the failure mode that file's header says
+it exists to prevent.
+
+The same drop was in five other places, four of them pre-existing: the
+specimen's furigana toggle, the capture screen's uncertainty chips, the evidence
+inspector's reason chips and its raw-chain disclosure, the `Disclosure` header
+(so no folded section said whether it was open), and the nav shell's current
+destination — whose docblock claimed "`aria-current` follows on web", which it
+did not. `AppButton`'s `accessibilityState={{ disabled }}` was dead rather than
+harmful: `Pressable` derives `aria-disabled` from its own `disabled` prop.
+
+### What was changed
+
+| Control | Was | Now | Why that prop |
+| --- | --- | --- | --- |
+| `ChipButton` (lens, furigana, uncertainty, reason) | `accessibilityState={{ selected }}` | `aria-pressed={selected}` | Forwarded, and *permitted on a button* — `aria-selected` is not, and would have traded a silent defect for an `aria-allowed-attr` violation |
+| `Disclosure` header, inspector raw chain | `accessibilityState={{ expanded }}` | `aria-expanded={open}` | Forwarded on web **and** mapped onto native accessibility state by React Native — strictly more portable than what it replaced |
+| Nav shell current link | `accessibilityState={{ selected: current }}` | `aria-current={current ? 'page' : undefined}` | `page` is the token for a whole destination; omitted rather than `"false"`, which some screen readers announce |
+| Uncertainty chip row | `accessibilityRole="radiogroup"` | `role="group"` + label | ARIA requires a `radiogroup` to own `role="radio"` children and these are buttons — the same `aria-required-children` mistake the lens row already made once with `tablist` |
+| `AppButton` | `accessibilityState={{ disabled }}` | removed | `Pressable` already emits `aria-disabled` and `tabIndex={-1}` from `disabled` |
+
+The `✓` in the chip label stays. It is the second channel, and it is now the
+only one on native, because React Native maps `aria-busy/checked/disabled/
+expanded/selected` and has no `aria-pressed`. Nothing in this repository builds,
+exports or drives a native target, so that is recorded rather than claimed in
+either direction.
+
+Three docblocks that asserted the opposite were corrected: `lens.tsx`,
+`primitives.tsx`, and the nav shell's "aria-current follows on web".
+
+### The test that replaces the grep
+
+The source scan in `design-vocabulary.test.ts` that claimed the runtime property
+is gone. What replaced it is in two parts:
+
+1. **A structural ban, in the unit tests.** No file under `apps/app/src/` may
+   name `accessibilityState` in code — the prop is never the right answer on
+   this target, and a ban is checkable where a per-file assertion is not. Plus
+   one positive scan: chips carry `aria-pressed` and never `aria-selected`.
+2. **Five runtime assertions, in `adv-a11y-audit.spec.ts`,** over CDP against
+   the exported bundle in Chromium — the only test form in this repository that
+   has ever caught this class of defect:
+   - exactly one lens chip reports `pressed=true`, and pressing another moves
+     it, while the accessible name stays identical (proving the name is *not*
+     doing the job);
+   - the furigana toggle reports on and off;
+   - a disclosure header reports `expanded`, and it follows the press;
+   - the five uncertainty chips report `pressed`, one at a time, inside a
+     `role="group"`;
+   - exactly one nav destination carries `aria-current="page"`, and it moves
+     with navigation.
+
+   `pressedAmong` fails *separately* on "exposes no pressed state at all" and on
+   "the wrong one is pressed", because those are different defects and the first
+   is the one that shipped.
+
+### Verification after the fix, on the rebuilt export
+
+`lens-reading` → `["invalid=false","focusable=true","pressed=true"]`;
+`lens-meaning` → `pressed=false`; after clicking Production the pair swaps.
+`specimen-disclosure-readings-toggle` → `expanded=true`, then `expanded=false`.
+Capture chips render `aria-pressed="false"` inside
+`<div aria-label="What felt uncertain?" role="group">`. On `/`, `nav-capture`
+carries `aria-current="page"` and the other three carry nothing.
+
+### Checks re-run in this worktree
+
+| Check | Result |
+| --- | --- |
+| `npm ci` (own worktree) | clean install, exit 0 |
+| `npm run lint` | pass, no output |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, root + 6 workspaces |
+| `npm run test` | **1691 passed**, 90 files (was 1689) |
+| `npm run test:replay` (T-03) | 47 passed, 2 files |
+| `npm run verify:export` (T-14) | 14 passed, 1 file |
+| `npm run test:e2e:build` | pass — 14 static routes |
+| `npm run test:e2e` | **43 passed**, 9 spec files, exit 0 (was 38) |
+
+The two `✘` lines under the list reporter are the same pre-existing annotated
+`test.fail()` expectations as every previous round (T4-1b, T3-3); `retries: 0`,
+neither was touched, and both are counted in the 43. The axe sweep is still zero
+violations across ten routes in both schemes — which is the point of recording
+it here, because axe was green before this repair too.
+
+### What this round does **not** claim
+
+- **That a screen reader user can now tell which lens is on.** No VoiceOver,
+  NVDA, TalkBack or Orca ran. What is established is that Chromium's
+  accessibility tree is offered the state, in the exported bundle, which is
+  strictly more than was true before and strictly less than a user test.
+- **That native exposes chip state.** It does not, and the docblock says so:
+  React Native has no `aria-pressed` mapping, so the check mark is the only
+  channel there. No native target is built or driven by anything in this repo.
+- **That the ban catches every prop of this kind.** It catches
+  `accessibilityState`, which is the one that shipped broken. Any *new*
+  accessibility prop still has to be proven at runtime; the ban's failure
+  message says so in as many words.
+
+### What a verifier should try to break
+
+1. Change `aria-pressed={selected}` back to `accessibilityState={{ selected }}`
+   in `primitives.tsx`, rebuild the export, and confirm **both** the unit ban
+   and the five e2e assertions go red — the point of the repair is that the
+   source-only guard is no longer the thing holding this closed.
+2. Make two lens chips active at once and confirm the lens test names it as the
+   REQ-UI-07 blend rather than as an array mismatch.
+3. Put the state into `accessibilityLabel` instead ("Reading lens, active") and
+   confirm the lens test still fails — the name is asserted to be *stable*
+   across the press for exactly this reason.
+4. Restore `accessibilityRole="radiogroup"` on the uncertainty chips and confirm
+   the capture test names it, since the route sweep still will not.
