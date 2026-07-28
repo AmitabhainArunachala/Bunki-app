@@ -33,10 +33,7 @@ export type Confidence = 'high' | 'medium' | 'low';
  * digest are all recorded, and `LICENSES.md` names the redistributor.
  */
 export type ReviewStatus =
-  | 'primary-source-verified'
-  | 'licensed-redistribution'
-  | 'reviewed-in-project'
-  | 'unreviewed';
+  'primary-source-verified' | 'licensed-redistribution' | 'reviewed-in-project' | 'unreviewed';
 
 /**
  * The seven REQ-SRC-01 fields, in spec order. Exported so tests can assert

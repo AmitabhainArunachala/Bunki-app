@@ -11,9 +11,17 @@
  *
  *   - `unreviewed`      → says so, in those words;
  *   - `reviewed-in-project` → says the project wrote and checked it;
- *   - `primary-source-verified` → the only status allowed to sound like a
- *     citation, and the seed grants it only to data checked against the source
- *     project's own artefacts over HTTPS (KanjiVG, in this dataset).
+ *   - `licensed-redistribution` → real licensed dictionary content with a real
+ *     upstream entry id, but obtained from a pinned redistribution because the
+ *     licensor's own host was unreachable. It reads as a citation, because it is
+ *     one, and it says where it actually came from rather than implying the
+ *     licensor was contacted;
+ *   - `primary-source-verified` → data checked against the source project's own
+ *     artefacts over HTTPS (KanjiVG, in this dataset).
+ *
+ * The two sourced standings are deliberately distinct strings. Collapsing them
+ * would erase the one fact this build cannot demonstrate: that www.edrdg.org
+ * was never reached.
  *
  * Pure functions over the seed's own types; unit-tested against every record in
  * `test/provenance-display.test.ts`, which also asserts that no summary of an
@@ -23,12 +31,15 @@
 import type { ProvenanceRecord } from '@bunki/seed';
 
 /** How much weight a field's provenance can bear, worst first. */
-export type ProvenanceStanding = 'unreviewed' | 'project-authored' | 'source-verified';
+export type ProvenanceStanding =
+  'unreviewed' | 'project-authored' | 'source-licensed' | 'source-verified';
 
 export function standingOf(record: ProvenanceRecord): ProvenanceStanding {
   switch (record.review_status) {
     case 'primary-source-verified':
       return 'source-verified';
+    case 'licensed-redistribution':
+      return 'source-licensed';
     case 'reviewed-in-project':
       return 'project-authored';
     case 'unreviewed':
@@ -41,12 +52,20 @@ export function standingOf(record: ProvenanceRecord): ProvenanceStanding {
   }
 }
 
+/** Standings that may be presented as a citation rather than as a caveat. */
+export function isSourced(standing: ProvenanceStanding): boolean {
+  return standing === 'source-verified' || standing === 'source-licensed';
+}
+
 /** The short line rendered next to a field. */
 export function provenanceSummary(record: ProvenanceRecord): string {
   const standing = standingOf(record);
   if (standing === 'source-verified') {
     const version = record.source_version === '' ? '' : ` ${record.source_version}`;
     return `${record.source}${version} · ${record.license}`;
+  }
+  if (standing === 'source-licensed') {
+    return `${record.source} · ${record.license} · from a pinned redistribution, not the licensor's own site`;
   }
   if (standing === 'project-authored') {
     return `Written for this project · reviewed in project · not from a published dictionary`;
@@ -59,6 +78,8 @@ export function provenanceBadge(record: ProvenanceRecord): string {
   switch (standingOf(record)) {
     case 'source-verified':
       return 'sourced';
+    case 'source-licensed':
+      return 'licensed';
     case 'project-authored':
       return 'project-written';
     case 'unreviewed':

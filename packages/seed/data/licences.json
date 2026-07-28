@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Which verbatim licence text backs which provenance source.",
+    "",
+    "This file is the machine-readable half of LICENSES.md, and it exists so that",
+    "'we have the licence' is a checkable claim rather than a sentence in a",
+    "document nobody re-reads. test/edrdg.test.ts checks it three ways: every file",
+    "listed here exists and hashes to the digest recorded here; every path and",
+    "digest recorded here appears verbatim in LICENSES.md; and every provenance",
+    "source whose licence is not the project's own pending-OD-09 placeholder has an",
+    "entry here. The negative half matters more than the positive: a source that",
+    "claims a third-party licence with no text on disk fails the suite, which is",
+    "what stops the next import from shipping data whose licence was written from",
+    "memory.",
+    "",
+    "'requiresOnScreenAttribution' records the EDRDG condition that an attribution",
+    "buried in a file does not satisfy: §3 of the EDRDG licence statement demands",
+    "acknowledgement on the screen that displays words from the files. The seed's",
+    "SEED_ENTRY_DISCLOSURE is what carries it, and the tests assert that."
+  ],
+  "sources": {
+    "KanjiVG": {
+      "license": "CC BY-SA 3.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/KanjiVG-COPYING.txt"]
+    },
+    "JMdict (EDRDG)": {
+      "license": "CC BY-SA 3.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/EDRDG-licence-statement.md", "licenses/CC-BY-SA-3.0.txt"]
+    },
+    "KANJIDIC2 (EDRDG)": {
+      "license": "CC BY-SA 3.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/EDRDG-licence-statement.md", "licenses/CC-BY-SA-3.0.txt"]
+    }
+  },
+  "files": {
+    "licenses/KanjiVG-COPYING.txt": {
+      "bytes": 20595,
+      "sha256": "d255e07978fd16ddfec38bc59dc9d857b885dd44ddbf4e79baf207d30746bdcc",
+      "retrievedFrom": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/COPYING",
+      "retrievedAt": "2026-07-27"
+    },
+    "licenses/EDRDG-licence-statement.md": {
+      "bytes": 9416,
+      "sha256": "1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6",
+      "retrievedFrom": "https://raw.githubusercontent.com/neocl/jamdict_data/main/jamdict_data/LICENSE.md",
+      "retrievedAt": "2026-07-28"
+    },
+    "licenses/CC-BY-SA-3.0.txt": {
+      "bytes": 22240,
+      "sha256": "3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f",
+      "retrievedFrom": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-3.0.txt",
+      "retrievedAt": "2026-07-28"
+    }
+  }
+}

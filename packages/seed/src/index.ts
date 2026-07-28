@@ -14,12 +14,22 @@
  *
  * Honesty boundaries this package keeps (controller §8, REQ-GATE-03):
  *   - it is a seed, never a dictionary — see {@link SEED_COVERAGE_DISCLOSURE};
- *   - reading and sense lists are representative, not exhaustive;
- *   - nothing here is labelled JMdict, KANJIDIC2 or Tatoeba, because none of
- *     those sources could be reached from the build session that assembled it
- *     (LICENSES.md, deferred items D-1 and D-2). The only third-party content in
- *     the package is KanjiVG, whose licence *was* verified against the project's
- *     own repository over HTTPS.
+ *   - lexeme readings, parts of speech and senses are real JMdict entries and
+ *     kanji readings and meanings are real KANJIDIC2 entries, each carrying its
+ *     real upstream identifier, but the lists are flattened into this schema's
+ *     flat string arrays, so they are labelled `derived`, not `unmodified`;
+ *   - EDRDG content is `licensed-redistribution`, never
+ *     `primary-source-verified`: www.edrdg.org is still refused by the egress
+ *     proxy, so the bytes and the licence statement come together from one
+ *     pinned, hash-verified artefact and the licensor's host was never reached;
+ *   - **nothing here is labelled Tatoeba.** Its hosts are unreachable, its
+ *     licence text is unobtainable from any reachable host, and CC BY 2.0 FR
+ *     needs per-sentence contributor attribution nothing reachable carries
+ *     (LICENSES.md, deferred item D-2). The example sentences, the grammar
+ *     constructions and the integration passage are this project's own writing
+ *     and stay labelled as such;
+ *   - KanjiVG remains the one source verified against the project's own
+ *     repository over HTTPS.
  */
 
 import grammarJson from '../data/grammar.json';
@@ -70,11 +80,17 @@ export const SEED_COVERAGE_DISCLOSURE =
 
 /**
  * Second honesty string, for surfaces that show a word or kanji page rather than
- * a search result: an entry that *is* present can still be incomplete, and the
- * seed's readings and senses have not been checked against a published dictionary.
+ * a search result.
+ *
+ * It carries the CC BY-SA acknowledgement itself, because §3 of the EDRDG
+ * licence statement requires that a display of words from the files acknowledge
+ * the source *on the screen showing them* — an attribution that lives only in
+ * `LICENSES.md` would not satisfy the licence this data ships under. It also
+ * still says what remains project-authored, because the sentences, grammar notes
+ * and passage are exactly that and no import changed it.
  */
 export const SEED_ENTRY_DISCLOSURE =
-  'Readings and senses in this seed are representative, not exhaustive, and are not verified against a published dictionary.';
+  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 3.0. Sense and reading lists are flattened here and may not show every distinction upstream draws. Example sentences, grammar notes and the reading passage are written by this project, not taken from any corpus.';
 
 /** Assert a record's data fields are exactly the ones this loader knows about. */
 function expectDataKeys(

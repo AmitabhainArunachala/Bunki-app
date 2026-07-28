@@ -17,6 +17,7 @@ import {
   provenanceBadge,
   provenanceEntries,
   provenanceSummary,
+  isSourced,
   standingOf,
 } from '../src/data/provenance.ts';
 
@@ -33,6 +34,8 @@ describe('standing', () => {
       const standing = standingOf(record);
       if (record.review_status === 'primary-source-verified')
         expect(standing).toBe('source-verified');
+      if (record.review_status === 'licensed-redistribution')
+        expect(standing).toBe('source-licensed');
       if (record.review_status === 'reviewed-in-project') expect(standing).toBe('project-authored');
       if (record.review_status === 'unreviewed') expect(standing).toBe('unreviewed');
     }
@@ -45,14 +48,41 @@ describe('standing', () => {
 });
 
 describe('summary wording', () => {
-  it('never lets an unverified field read as a dictionary citation', () => {
+  it('never lets an unsourced field read as a dictionary citation', () => {
     for (const record of allRecords()) {
-      if (standingOf(record) === 'source-verified') continue;
+      if (isSourced(standingOf(record))) continue;
       const summary = provenanceSummary(record);
       expect(summary).toMatch(/written for this project/i);
       expect(summary).toMatch(/not from a published dictionary/i);
       expect(summary).not.toMatch(/jmdict|kanjidic|tatoeba|edrdg/i);
     }
+  });
+
+  it('says where licensed-redistribution data actually came from', () => {
+    // The whole point of the separate standing: a reader must not come away
+    // believing www.edrdg.org was reached, because it was not.
+    const licensed = allRecords().filter((r) => standingOf(r) === 'source-licensed');
+    expect(licensed.length).toBeGreaterThan(0);
+    for (const record of licensed) {
+      const summary = provenanceSummary(record);
+      expect(summary).toContain(record.source);
+      expect(summary).toContain(record.license);
+      expect(summary).toMatch(/pinned redistribution/i);
+      expect(summary).not.toMatch(/written for this project/i);
+    }
+  });
+
+  it('keeps the two sourced standings from collapsing into one string', () => {
+    const verified = allRecords().find((r) => standingOf(r) === 'source-verified');
+    const licensed = allRecords().find((r) => standingOf(r) === 'source-licensed');
+    expect(verified).toBeDefined();
+    expect(licensed).toBeDefined();
+    expect(provenanceSummary(verified as ProvenanceRecord)).not.toBe(
+      provenanceSummary(licensed as ProvenanceRecord),
+    );
+    expect(provenanceBadge(verified as ProvenanceRecord)).not.toBe(
+      provenanceBadge(licensed as ProvenanceRecord),
+    );
   });
 
   it('distinguishes reviewed-in-project from unreviewed', () => {
@@ -72,9 +102,11 @@ describe('summary wording', () => {
     }
   });
 
-  it('badges every record with one of exactly three words', () => {
+  it('badges every record with one of exactly four words', () => {
     for (const record of allRecords()) {
-      expect(['sourced', 'project-written', 'unreviewed']).toContain(provenanceBadge(record));
+      expect(['sourced', 'licensed', 'project-written', 'unreviewed']).toContain(
+        provenanceBadge(record),
+      );
     }
   });
 });

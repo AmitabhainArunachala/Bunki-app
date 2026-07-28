@@ -33,7 +33,7 @@
  * script, so the globals are declared locally rather than by editing WP-01's
  * config across a package boundary.
  */
-/* global fetch, console, process, Buffer, URL */
+/* global fetch, console, process, Buffer */
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';

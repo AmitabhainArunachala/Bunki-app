@@ -11,7 +11,9 @@
 
 ## What this package is
 
-A small, honest, hand-assembled dataset:
+A small, honest dataset: real licensed dictionary content for the lexical
+layers, this project's own writing for the text layers, each labelled as what it
+is.
 
 |                                                    | Count | Where                                         |
 | -------------------------------------------------- | ----- | --------------------------------------------- |
@@ -92,33 +94,49 @@ Completeness is enforced three independent ways, so a single mistake cannot pass
 
 ## Sources actually shipped
 
-| Source                     | Licence       | State                                                         | Covers                                                              |
-| -------------------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
-| KanjiVG                    | CC BY-SA 3.0  | **verified** against the project's own repository, 2026-07-27 | stroke SVGs; stroke counts, components, radicals                    |
-| This project               | pending OD-09 | original work                                                 | sentences, passage, grammar, readings, senses, meanings, selections |
-| JMdict / KANJIDIC2 (EDRDG) | CC BY-SA 4.0  | **deferred (D-1)** — host unreachable, **nothing shipped**    | —                                                                   |
-| Tatoeba                    | CC BY 2.0 FR  | **deferred (D-2)** — host unreachable, **nothing shipped**    | —                                                                   |
+| Source            | Licence       | State                                                                    | Covers                                                   |
+| ----------------- | ------------- | ------------------------------------------------------------------------ | -------------------------------------------------------- |
+| KanjiVG           | CC BY-SA 3.0  | **verified (primary source)** against the project's own repo, 2026-07-27 | stroke SVGs; stroke counts, components, radicals         |
+| JMdict (EDRDG)    | CC BY-SA 3.0  | **licensed redistribution**, 2026-07-28                                  | lexeme `reading`, `partOfSpeech`, `senses`               |
+| KANJIDIC2 (EDRDG) | CC BY-SA 3.0  | **licensed redistribution**, 2026-07-28                                  | kanji `onReadings`, `kunReadings`, `meanings`            |
+| This project      | pending OD-09 | original work                                                            | sentences, passage, grammar, selections, computed values |
+| Tatoeba           | CC BY 2.0 FR  | **deferred (D-2)** — unreachable, **nothing shipped**                    | —                                                        |
 
-Full detail, verbatim licence texts, per-file digests, the retrieval log and both
-deferred items: [`LICENSES.md`](LICENSES.md).
+Full detail, verbatim licence texts, per-file digests, the retrieval log and the
+open deferrals: [`LICENSES.md`](LICENSES.md). The machine-readable binding of
+source → licence text lives in `data/licences.json` and is enforced by
+`test/edrdg.test.ts`.
 
-Readings and senses are hand-assembled and carry `review_status: "unreviewed"`
-with `source_entry_id: null` — they are deliberately **not** labelled JMdict or
-KANJIDIC2, because EDRDG's hosts were unreachable and inventing entry sequence
-numbers would manufacture the audit trail this package exists to make trustworthy.
+Every EDRDG-sourced field carries its **real** upstream identifier — a JMdict
+`ent_seq`, a KANJIDIC2 literal — in `source_entry_id`. None is a placeholder.
 
-If a needed asset's license cannot be verified against its primary source, that
-is a controller §21.3 stop condition (unresolved source licensing) — not a
-judgement call. That condition is not triggered here: the unverifiable sources
-simply contribute nothing.
+`review_status` is `licensed-redistribution`, not `primary-source-verified`,
+and the difference is load-bearing: `www.edrdg.org` is still refused by the
+egress proxy, so the data and EDRDG's own licence statement were taken together
+from one pinned, sha256-verified artefact (`jamdict-data` 1.5, the `jamdict`
+project's own data package). The licensor's host was never reached, so the
+statement's currency is unverified and is recorded as unverified.
+
+Example sentences remain **project-authored**. Tatoeba's hosts are blocked, the
+pinned database contains no examples, and no reachable host carries the
+CC BY 2.0 FR text — so under "licence first, data second" nothing is shipped
+from it and nothing is labelled with it.
+
+If a needed asset's license cannot be verified, that is a controller §21.3 stop
+condition (unresolved source licensing) — not a judgement call. It is not
+triggered here: every shipped byte is either covered by a verbatim licence text
+in `licenses/` or is this project's own work under the pending OD-09 decision.
 
 ## Commands
 
 ```bash
-npm run test                                        # includes this package's 87 assertions
-node packages/seed/scripts/fetch-kanjivg.mjs --check # re-verify strokes against pinned upstream (network)
+npm run test                                         # includes this package's 103 assertions
+node packages/seed/scripts/fetch-kanjivg.mjs --check  # re-verify strokes against pinned upstream (network)
+node packages/seed/scripts/fetch-edrdg.mjs --check    # re-verify every JMdict/KANJIDIC2 value (network)
 ```
 
 ## Status
 
-WP-04 dataset complete; D-1 and D-2 open as recorded above.
+WP-04 dataset complete. D-1 (JMdict/KANJIDIC2 content and attribution text)
+**closed**. D-1a (confirm the current licence version at EDRDG itself) and D-2
+(Tatoeba) open as recorded above.

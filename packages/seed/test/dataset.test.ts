@@ -150,38 +150,81 @@ describe('the seed closes over itself', () => {
 describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () => {
   it('says it is a seed, not a dictionary', () => {
     expect(SEED_COVERAGE_DISCLOSURE).toMatch(/not a complete dictionary/);
-    expect(SEED_ENTRY_DISCLOSURE).toMatch(/not verified against a published dictionary/);
   });
 
-  it('claims no JMdict, KANJIDIC2 or Tatoeba content anywhere in the dataset', () => {
-    // Those three sources were unreachable from the build session (LICENSES.md
-    // D-1/D-2). Labelling content with them, or inventing an entry sequence
-    // number, would be fabricated provenance — the exact failure this asserts against.
-    const forbidden = /jmdict|kanjidic|tatoeba|edrdg/i;
+  it('acknowledges EDRDG and its licence in the disclosure the screens render', () => {
+    // §3 of the EDRDG licence statement requires the acknowledgement to appear
+    // on the screen displaying words from the files. A disclosure that named no
+    // source would not satisfy the licence the data now ships under.
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/JMdict/);
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/KANJIDIC2/);
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/Electronic Dictionary Research and Development Group/);
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/CC BY-SA 3\.0/);
+  });
+
+  it('still says, on the same screen, what remains this project’s own writing', () => {
+    // The import replaced lexical claims only. Claiming the sentences or the
+    // passage came from a corpus would be the mirror-image lie of the one WP-04
+    // avoided, so the disclosure has to keep disowning them.
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/written by this project/i);
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/not taken from any corpus/i);
+  });
+
+  it('claims no Tatoeba content anywhere in the dataset', () => {
+    // Unchanged from WP-04 and load-bearing: Tatoeba is still unreachable and
+    // its licence text still unobtainable, so a Tatoeba label anywhere would be
+    // fabricated provenance.
     for (const record of allSeedRecords) {
       for (const [field, provenance] of Object.entries(
         record.provenance as Record<string, { source: string; attribution: string }>,
       )) {
-        expect(provenance.source, `${record.id}.${field}`).not.toMatch(forbidden);
-        expect(provenance.attribution, `${record.id}.${field}`).not.toMatch(forbidden);
+        expect(provenance.source, `${record.id}.${field}`).not.toMatch(/tatoeba/i);
+        expect(provenance.attribution, `${record.id}.${field}`).not.toMatch(/tatoeba/i);
       }
     }
   });
 
-  it('labels hand-assembled lexical claims as unreviewed rather than verified', () => {
+  it('gives every EDRDG-sourced lexical field a real upstream identifier', () => {
     for (const lexeme of seedDataset.lexemes) {
       for (const field of ['reading', 'senses', 'partOfSpeech'] as const) {
-        expect(lexeme.provenance[field].review_status, `${lexeme.headword}.${field}`).toBe(
-          'unreviewed',
+        const provenance = lexeme.provenance[field];
+        expect(provenance.source, `${lexeme.headword}.${field}`).toBe('JMdict (EDRDG)');
+        expect(provenance.review_status, `${lexeme.headword}.${field}`).toBe(
+          'licensed-redistribution',
         );
-        expect(lexeme.provenance[field].source_entry_id, `${lexeme.headword}.${field}`).toBeNull();
+        // A JMdict ent_seq, not a placeholder and not a remembered number.
+        expect(provenance.source_entry_id, `${lexeme.headword}.${field}`).toMatch(/^\d{6,8}$/);
       }
     }
     for (const kanji of seedDataset.kanji) {
       for (const field of ['onReadings', 'kunReadings', 'meanings'] as const) {
-        expect(kanji.provenance[field].review_status, `${kanji.character}.${field}`).toBe(
-          'unreviewed',
+        const provenance = kanji.provenance[field];
+        expect(provenance.source, `${kanji.character}.${field}`).toBe('KANJIDIC2 (EDRDG)');
+        expect(provenance.review_status, `${kanji.character}.${field}`).toBe(
+          'licensed-redistribution',
         );
+        // KANJIDIC2's entry identifier is the literal itself.
+        expect(provenance.source_entry_id, `${kanji.character}.${field}`).toBe(kanji.character);
+      }
+    }
+  });
+
+  it('never lets EDRDG content claim primary-source verification', () => {
+    // www.edrdg.org is still blocked. The moment anything here says
+    // primary-source-verified, the distinction this dataset is built on is gone.
+    for (const source of Object.values(seedDataset.provenanceSources)) {
+      if (!/EDRDG/.test(source.source)) continue;
+      expect(source.review_status, source.source).toBe('licensed-redistribution');
+    }
+  });
+
+  it('keeps the sentences, grammar and passage project-authored and unsourced', () => {
+    for (const record of [...seedDataset.sentences, ...seedDataset.grammar]) {
+      for (const [field, provenance] of Object.entries(
+        record.provenance as Record<string, { source: string; source_entry_id: string | null }>,
+      )) {
+        expect(provenance.source, `${record.id}.${field}`).toMatch(/^Bunki Phase-0 seed/);
+        expect(provenance.source_entry_id, `${record.id}.${field}`).toBeNull();
       }
     }
   });
@@ -202,14 +245,22 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
     }
   });
 
-  it('confines share-alike content to KanjiVG, the one source whose licence was verified', () => {
+  it('confines share-alike content to the sources whose licence text is on disk', () => {
+    // The rule is not "KanjiVG only" any more, but it is not "anything goes"
+    // either: a share-alike source may exist here only if this package ships the
+    // licence text it is offered under, and only at a standing that matches how
+    // that text was obtained.
     const shareAlike = Object.values(seedDataset.provenanceSources).filter((source) =>
       /CC BY-SA/i.test(source.license),
     );
     expect(shareAlike.length).toBeGreaterThan(0);
     for (const source of shareAlike) {
-      expect(source.source).toBe('KanjiVG');
-      expect(source.review_status).toBe('primary-source-verified');
+      expect(['KanjiVG', 'JMdict (EDRDG)', 'KANJIDIC2 (EDRDG)']).toContain(source.source);
+      expect(['primary-source-verified', 'licensed-redistribution']).toContain(
+        source.review_status,
+      );
+      expect(source.source_url, source.source).toMatch(/^https:\/\//);
+      expect(source.retrieved_at, source.source).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
   });
 });

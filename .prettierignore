@@ -16,3 +16,9 @@ docs/handoffs/
 # Append-only multi-agent evidence (orchestration spec §2.6). Format churn here
 # would collide across agents working in parallel.
 docs/build-evidence/
+
+# Verbatim third-party licence texts. Reformatting one would change bytes this
+# repository publishes as an exact copy of a licensor's document, and would break
+# the sha256 digests recorded in packages/seed/data/licences.json and LICENSES.md.
+# A licence text is evidence, not source code.
+packages/seed/licenses/

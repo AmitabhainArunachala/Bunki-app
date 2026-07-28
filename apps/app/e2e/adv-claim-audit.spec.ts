@@ -194,7 +194,7 @@ test('claims: the audit itself can fail — every pattern matches its own exampl
   const mustPass = [
     'Full character-database fields, school grade, frequency and JLPT/Kanken mappings need a licensed source.',
     'This is a Phase-0 seed dataset, not a complete dictionary.',
-    'Readings and senses in this seed are representative, not exhaustive, and are not verified against a published dictionary.',
+    'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 3.0. Sense and reading lists are flattened here and may not show every distinction upstream draws. Example sentences, grammar notes and the reading passage are written by this project, not taken from any corpus.',
     'This checks the export, not durability or storage.',
     'Nothing here changes what the app has stored until you accept it as a note.',
     'The scheduler is FSRS with pinned parameters; its presence is not evidence that this app works.',
@@ -219,7 +219,7 @@ test('claims: the audit itself can fail — every pattern matches its own exampl
 
 /** Verbatim from `@bunki/seed` and `@bunki/ai` — the packages that own the wording. */
 const SEED_ENTRY_DISCLOSURE =
-  'Readings and senses in this seed are representative, not exhaustive, and are not verified against a published dictionary.';
+  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 3.0. Sense and reading lists are flattened here and may not show every distinction upstream draws. Example sentences, grammar notes and the reading passage are written by this project, not taken from any corpus.';
 const SEED_COVERAGE_DISCLOSURE = 'This is a Phase-0 seed dataset, not a complete dictionary.';
 const CANDIDATE_LABEL = 'AI candidate / generated';
 const OFFLINE_FALLBACK_LABEL = 'offline-fallback';
