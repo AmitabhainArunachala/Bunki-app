@@ -7383,3 +7383,228 @@ From a clean checkout of `agent/bunki-e-word`: `npm ci`, the §17.5 set, then
 `npm run export:web --workspace @bunki/app` followed by
 `node apps/app/scripts/capture-word-depth.mjs` and look at the six PNGs. Nothing
 here is merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, lane B4: the reading surface
+
+Branch `agent/bunki-e-reading`, from `agent/bunki-e-integration` (95d98fc).
+
+### What the lane was for, in one sentence
+
+Round-2 research §4 names the rule to take from Migaku exactly: **the lookup and
+the capture must happen without leaving the content**, and §5 turns it into an
+instruction — _"Measure it: if capturing costs a navigation, it is wrong."_ This
+lane built that surface and measured that claim rather than asserting it.
+
+### What shipped
+
+| File                                                             | What it is                                                                                                                    |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `apps/app/src/ui/reading/passage-spans.ts`                       | Pure segmentation: declared forms become lookup targets, everything else becomes short breakable runs.                        |
+| `apps/app/src/ui/reading/frontier-state.ts`                      | The whole mark rule, as one pure function over two booleans, plus the one line each mark is explained by.                     |
+| `apps/app/src/ui/reading/reading-passage.tsx`                    | The page: title, furigana toggle, `FrontierPassage` on a `well`, the legend, the folded translation, and a slot for the lookup. |
+| `apps/app/src/ui/reading/inline-lookup.tsx`                      | The panel: ruby headword, senses, part of speech, the keep affordance, credited examples, attribution.                        |
+| `apps/app/src/screens/reading-screen.tsx`, `apps/app/app/read.tsx` | Wiring, the four REQ-UI-09 states, the unconditional EDRDG acknowledgement.                                                   |
+| `apps/app/test/reading-surface.test.ts`                          | 45 tests: segmentation, kinsoku, density, the mark rule, and the source scans.                                               |
+| `apps/app/e2e/reading-surface.spec.ts`                           | 8 browser tests against the export, including the navigation counters and two CDP accessibility audits.                      |
+| `apps/app/scripts/capture-reading.mjs`                           | Drives the surface in Chromium and writes the measurements into the evidence README.                                          |
+
+Reached from the capture screen (`onOpenReading` → `/read`), not from the
+navigation shell: `nav-shell.tsx` argues in its own header against a fifth
+starting place, and a passage is somewhere you go from where you already are.
+
+### The measurement the lane is judged on
+
+From `docs/build-evidence/screenshots-b4-reading/README.md`, read out of the
+page rather than typed in — patched `history` methods for the counters, wall
+clock for the latency, Chrome's own accessibility tree over CDP for the rest:
+
+| Measured                                             | Light                  | Dark            |
+| ---------------------------------------------------- | ---------------------- | --------------- |
+| Navigations to open the lookup                       | 0                      | 0               |
+| Navigations to open the lookup **and** keep the word | 0                      | 0               |
+| URL before → after                                   | `/read` → `/read`      | `/read` → `/read` |
+| Keep latency, click to acknowledgement               | 75 ms                  | 80 ms           |
+| Passage as offered to a screen reader                | 46 text nodes, 10 links | 46 / 10        |
+| Words announced twice                                | 0                      | 0               |
+| Marked words before → after the keep                 | 10 → 9                 | 10 → 9          |
+
+`e2e/reading-surface.spec.ts` asserts the same counters, and the capture script
+throws rather than filing a shot if any of them moves.
+
+### Two defects the browser found that no scan could have
+
+**1. A tappable ruby word was announced twice.** Driving the surface and reading
+Chrome's tree back over CDP produced `link "線路, new to you"` _and_, inside it,
+`StaticText "線路（せんろ）"`. `link` is not a children-presentational role and
+`RubyText` carries its accessible name as real clipped text — it has to, because
+react-native-web maps `accessibilityRole="text"` onto no ARIA role. This is the
+double-read `ruby.tsx` was repaired for in WP-05, arriving by a different door
+the first time a reading surface made ruby tappable. `frontier.tsx` now hides an
+interactive span's visual column; the pressable's own label is what speaks. A
+non-interactive span is deliberately _not_ hidden — it is the prose.
+
+**2. The passage was offered as 134 separate text nodes.** One span per unmatched
+character is what lets a flex row break where Japanese breaks (a flex item does
+not wrap internally), and it also hands a screen reader 「駅」「を」「出」「る」—
+the prose taken apart into rubble. Plain text is now chunked at the places a line
+may legally break anyway: after closing punctuation, before a character that
+opens a word, capped at eight characters. 46 nodes, each a recognisable piece.
+
+Both are now assertions in the browser lane, so neither can come back quietly.
+
+### One change to a shared file, and the argument for it
+
+`markDensity` in `src/ui/frontier-marks.ts` is now weighted by **characters**
+rather than by spans. The ceiling exists to stop a page becoming wallpaper, and
+that is a fact about area; span counting measured how the caller chose to chunk
+the text instead. Under it, 分かれる — four characters, the widest thing on the
+line — weighed the same as the particle beside it, and a ceiling set at a third
+could not be reached by any real passage. Character weighting is invariant to the
+chunking, which is the property a ceiling needs. **Every single-character span
+behaves exactly as before**, which is what the specimen and
+`test/design-vocabulary.test.ts` are written against; both were green throughout.
+
+Measured on the shipped passage: 160 characters, 19 of them marked when nothing
+has been captured — a density of **0.119** against a ceiling of 0.333. So the
+guard does not trip on this page, and this capsule does not claim it does.
+
+### The honesty boundaries this surface keeps
+
+- **Reading is exposure.** The only commands reachable from this screen are
+  `capture` and `promote`-to-`keep` — the same two the front door issues.
+  `test/reading-surface.test.ts` extracts the command kinds from the source and
+  asserts the set is exactly those two, and separately bans the probe machinery
+  (the grade literals, a grade handler, a reveal, a probe, an evidence tier).
+  Nothing here reaches the evidence gate, and `keep` activates no contracts.
+- **Only the personal frontier is marked.** No capture in the log at all is the
+  frontier mark; a capture the learner flagged uncertain is the fragile mark.
+  There is no per-level colouring and no third mark.
+- **No invented memory state.** The lookup renders no `RecallMark` or
+  `RecallMeter`, because this build holds no per-capability band for a word met
+  in a passage. It states the absence with `UnsupportedLayer` instead.
+- **No guessed readings and no guessed words.** Only forms the seed passage
+  itself declares are matched. A dictionary-wide longest-substring scan would
+  light up far more of the page and would sometimes be confidently wrong —
+  「聞いていたからだ」 ends in a real headword (体) that is not the word in the
+  sentence. Round-2 research records Migaku shipping exactly that defect.
+- **The EDRDG acknowledgement is unconditional.** Every gate anyone has put on
+  that notice has gone stale; this screen has none.
+
+### §17.5 check set — all run on this branch
+
+| Command                                           | Result                                                     |
+| ------------------------------------------------- | ---------------------------------------------------------- |
+| `npm ci`                                          | 727 packages, clean                                        |
+| `npm run lint`                                    | clean, no output                                           |
+| `npm run format:check`                            | `All matched files use Prettier code style!`               |
+| `npm run typecheck`                               | clean across root + 5 workspaces                           |
+| `npm run test`                                    | **105 files, 2,041 tests, all passed** (was 104 / 1,977)   |
+| `npm run test:replay`                             | 2 files, 47 tests passed                                   |
+| `npm run verify:export`                           | 1 file, 14 tests passed                                    |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` (15 static routes, `/read` among them)    |
+| `npm run test:e2e`                                | **56 passed** (3.1 min; was 48)                            |
+| `node apps/app/scripts/capture-reading.mjs`       | 2 shots + measurements written                             |
+
+`/read` was added to the axe route sweep in `e2e/adv-a11y-audit.spec.ts` and is
+clean in both schemes; `KNOWN_AXE_FINDINGS` is still empty.
+
+**A second honest note, on the browser lane.** Four full `npm run test:e2e`
+runs were made at this HEAD. Three were 56/56. One showed a single failure in
+`edrdg-acknowledgement.spec.ts` — "the canvas cannot render a headword with no
+acknowledgement beside it" — a pre-existing spec this lane does not touch, which
+drives the whole session loop through a dozen presses. It passed in isolation
+immediately afterwards and on both subsequent full runs. The reading surface does
+not reach the canvas (`canvas-screen.tsx` does not use `FrontierPassage`), and the
+machine was running several sibling build lanes at the time, but **the cause was
+not determined**. Recorded rather than rounded to green.
+
+**One honest note on the suite.** Three intermediate full-suite runs failed with
+5-second timeouts in `screen-contract`'s seed scan and `theme-fonts`' coverage
+contract — two tests that parse the whole 3,000-entry dictionary and already sat
+near the budget. The cause was this lane's new test file importing
+`src/data/catalog.ts` and building that dictionary in one more parallel worker.
+It now reads the seed's data files directly, because it only ever resolves
+fixture-tier vocabulary; the file went from 3 s to 0.6 s and five consecutive
+full-suite runs since have been green. Recorded because "it passes now" and "it
+was always going to pass" are different claims.
+
+### What this lane does **not** claim
+
+- **Furigana over the whole passage.** Readings come from the dictionary, so the
+  toggle annotates the 10 places (7 distinct entries) that have one and nothing
+  else. Writing readings for the rest by hand would be new unprovenanced data on
+  a learner surface. The surface says this in as many words.
+- **Tap _any_ word.** Only the passage's declared vocabulary opens a lookup —
+  10 of the roughly 40 word-like units on the page. A morphological analyser over
+  the imported tier is what would close this, and it is not built.
+- **A decay estimate behind `fragile`.** That mark is the learner's own
+  uncertainty flag. The honest source is the memory model behind the evidence
+  gate, and the app may not compute a second opinion about it (controller §5).
+- **More than one passage.** The seed ships exactly one, and this screen finds it
+  by the canonical target it was written around.
+- **AI inside the reading surface.** The campaign brief lists it for B4 and it is
+  not here; `packages/ai` and the candidate panel are B7's, mounted on the word
+  page. Nothing was stubbed in its place.
+- **A screen-reader verdict.** Two CDP audits and an axe sweep in Chromium, on
+  one machine. No VoiceOver, NVDA, TalkBack or Orca ran, and no mobile browser
+  was involved.
+- **Vertical text.** `VerticalRun` exists in the vocabulary and this surface does
+  not offer it. REQ-UI-08 calls it optional; a toggle nobody tested would be
+  worse than its absence.
+- **A nihonga ground.** Lane A1′ owns the era registers and they had not landed
+  on the integration branch when this was built, so the surface uses the existing
+  ink-and-paper tokens. Nothing here hard-codes a colour, so adopting a ground is
+  a theme change rather than a rewrite.
+
+### What a verifier should try to break
+
+1. Delete the `aria-hidden` from the interactive branch of `frontier.tsx` and
+   confirm the ruby double-read test goes red — not the axe sweep, which stayed
+   green through the entire defect.
+2. Put `markDensity` back to counting spans and confirm the invariance test
+   ("does not depend on how the caller chunked the text") fails while
+   `design-vocabulary.test.ts` still passes. That asymmetry is the argument for
+   the change.
+3. Make `keep` navigate — a `router.push` in the screen — and confirm both the
+   e2e counters and the capture script fail, rather than only one of them.
+4. Feed `buildPassageSpans` the whole imported tier as `forms` and read what it
+   does to 「聞いていたからだ」 and 「立って気づく」. The lane's claim is that this
+   is why the vocabulary is declared rather than searched.
+5. Argue the reading surface belongs in the navigation shell. The counter is
+   `nav-shell.tsx`'s own header and the four-entry equality in
+   `navigation-reachability.test.ts`; if that argument wins, the shell test is
+   what has to change, visibly.
+6. Check that no screenshot in `screenshots-b4-reading/` could have been produced
+   without the page loading: the script throws on a page error, on a non-zero
+   navigation count, on a doubled ruby node, and on a keep that failed to take
+   the word off the frontier.
+
+### Shared files touched, and how
+
+Additive only, per the shared-file protocol, with one exception flagged:
+
+- `src/ui/navigation.ts` — one appended `DESTINATIONS` entry (`/read`).
+- `test/screen-contract.test.ts` — one appended `SCREEN_OWNERS` entry.
+- `test/navigation-reachability.test.ts` — **not additive**, and flagged here.
+  The `toEqual` equality on `LEARNER_DESTINATIONS` was split into a fixed
+  controller-§10 list plus a sorted `CAMPAIGN_E_SCREENS` list, so the next lane
+  appends one string instead of rewriting an equality. Both halves stay
+  exhaustive: a Phase-0 screen that went missing still fails, and a surface that
+  skipped both lists still fails.
+- `src/ui/frontier-marks.ts` — `markDensity` reweighted, argued above.
+- `src/ui/frontier.tsx` — the interactive span's content hidden from the
+  accessibility tree, argued above.
+- `src/screens/capture-screen.tsx`, `app/index.tsx` — one prop and one button,
+  the reading surface's door.
+- `e2e/adv-a11y-audit.spec.ts` — one appended route.
+
+### Next safe command
+
+```
+npm ci && npm run test && npm run test:e2e:build && npm run test:e2e
+node apps/app/scripts/capture-reading.mjs
+```
+
+Nothing here is merged; no agent may merge, approve, or push to `main`.

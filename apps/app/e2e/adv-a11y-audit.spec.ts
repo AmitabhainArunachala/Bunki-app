@@ -75,6 +75,10 @@ const ROUTES = [
   '/evidence',
   '/debug',
   '/style-guide',
+  // Campaign E, lane B4. Scanned like every other route: it is the densest
+  // interactive surface in the app — a hundred-odd spans, ten of them links —
+  // and the first one to put ruby inside a control.
+  '/read',
 ] as const;
 
 const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;

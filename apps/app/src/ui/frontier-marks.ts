@@ -94,11 +94,45 @@ export function overwhelmedNote(spans: readonly FrontierSpan[], canOpen: boolean
   return `${OVERWHELMED_NOTE} ${OVERWHELMED_NOTE_SOME_TAPPABLE}`;
 }
 
-/** The marked proportion of a passage, counting spans rather than characters. */
+/**
+ * The marked proportion of a passage, weighted by characters.
+ *
+ * ## Why characters and not spans
+ *
+ * This counted spans until lane B4 built a real reading surface on it, and span
+ * counting turned out to measure the wrong thing — it measures how the caller
+ * chose to chunk the text rather than how much of the text is new.
+ *
+ * A reading surface has to split the run between its marked words into small
+ * pieces, because a flex row breaks between items and Japanese has no word
+ * spaces to break at; `src/ui/reading/passage-spans.ts` emits one span per
+ * unmatched character for exactly that reason. Under span counting, 分かれる —
+ * four characters, the widest thing on the line — weighed the same as the
+ * particle は beside it, so a passage that is 11% new by area reported 5% and a
+ * ceiling set at a third could never be reached by any real passage.
+ *
+ * Character weighting is invariant to that choice: the same text marked the same
+ * way gives the same number whether the caller emitted one span per word, one
+ * per character, or one per sentence. That invariance is the property a ceiling
+ * needs, because the thing the ceiling is about — how much of the page is
+ * underlined — is a fact about area, not about the span list.
+ *
+ * The existing behaviour is unchanged for every single-character span, which is
+ * what the specimen and `test/design-vocabulary.test.ts` are written against.
+ */
 export function markDensity(spans: readonly FrontierSpan[]): number {
-  if (spans.length === 0) return 0;
-  const marked = spans.filter((span) => span.mark !== 'none').length;
-  return marked / spans.length;
+  let total = 0;
+  let marked = 0;
+  for (const span of spans) {
+    // `[...text]` and not `.length`: a surrogate pair is one character to a
+    // reader, and counting it as two would let a passage of rare characters
+    // report a different density from the same passage in the basic plane.
+    const width = [...span.text].length;
+    total += width;
+    if (span.mark !== 'none') marked += width;
+  }
+  if (total === 0) return 0;
+  return marked / total;
 }
 
 /**
