@@ -32,9 +32,20 @@
  * the test asserts it is *labelled as one*. Live-call evidence is OD-08's open
  * gate; this file does not close it and does not pretend to.
  *
- * **That the session's observations are in the export.** They are not, and the
- * app says why on the session screen. Step 9 asserts the seam is disclosed
- * rather than quietly asserting around it — see the note there.
+ * **The session plan.** Which steps a sitting composed, and how far the cursor
+ * got, are not events and are not exported. What round-trips is what the learner
+ * did. The session screen says so and step 9 asserts that it does.
+ *
+ * ## What changed in the WP-10 export lane
+ *
+ * This header used to carry a third disclaimer: *"that the session's
+ * observations are in the export — they are not"*. They are now. Steps 9 to 11
+ * were the weakest part of this file precisely because they were honest about a
+ * broken build: step 9 asserted the seam was *disclosed*, step 10 traced a chain
+ * containing only the capture and the promotion, and step 11's exhaustive event
+ * list ended at `DataExported` with no session family in it. All three now assert
+ * the sitting instead — and the exhaustive list is the one that would have caught
+ * this defect from the other side, which is why it stays exhaustive.
  */
 
 import { CANDIDATE_LABEL, OFFLINE_FALLBACK_LABEL } from '@bunki/ai';
@@ -190,17 +201,58 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   // The plan is the same size it was composed at, after everything above.
   expect(await planSteps.count()).toBe(plannedStepCount);
 
-  // The seam this build has not closed, asserted rather than skirted: the
-  // sitting's observations live in the session workspace and are not in the
-  // durable log, and the app says so where the learner can read it.
+  // The seam that used to be open here is closed (COORD-B8-2), and the screen
+  // says the new thing rather than the old one. Both halves are asserted: the
+  // sitting is in the durable log, and the *plan* is not — a note that claimed
+  // everything survives would be as wrong as the one that claimed nothing did.
   await app.testId('session-backlog-toggle').click();
   await expect(app.testId('session-backlog')).toContainText('Reported, never queued.');
   await expect(app.testId('session-backlog')).toContainText(
-    'do not survive a reload and do not appear in an export',
+    'the same durable log as your captures',
   );
+  await expect(app.testId('session-backlog')).toContainText('The plan itself');
+
+  // …and the log agrees with the screen. Read out of the browser's own storage,
+  // before the reload, so a screen willing to say "durable" over a workspace
+  // would fail here rather than at the export three steps later.
+  const persistedNow = await app.persistedEventTypes();
+  expect(persistedNow).toContain('SessionStarted');
+  expect(persistedNow).toContain('SessionClosed');
 
   // ------------------------- 10. reload again, then inspect what actually survived
   await app.reload();
+
+  // The force-quit, from the log's side. Definition of done §3.7 is "everything
+  // is still there", and until this lane the honest answer was "your captures
+  // are; tonight's sitting is not". These are the events a cold bundle read back
+  // out of storage, so they cannot be a live workspace wearing a durable label.
+  const survived = await app.persistedEvents();
+  const surviving = survived.map((event) => String(event['type']));
+  for (const family of [
+    'SessionStarted',
+    'ContractCreated',
+    'ReviewGraded',
+    'ExposureLogged',
+    'SessionClosed',
+  ]) {
+    expect(surviving, `${family} did not survive the reload`).toContain(family);
+  }
+
+  // Content, not just families. A graded review that came back as tier B, or a
+  // sighting that came back as tier A, would be a worse defect than a missing
+  // event and a type list would not see it (REQ-SCH-06, T-08).
+  const graded = survived.filter((event) => event['type'] === 'ReviewGraded');
+  expect(graded.length).toBeGreaterThan(0);
+  for (const review of graded) expect(review['tier']).toBe('A');
+  for (const exposure of survived.filter((event) => event['type'] === 'ExposureLogged')) {
+    expect(exposure['tier']).toBe('D');
+  }
+  const closed = survived.filter((event) => event['type'] === 'SessionClosed');
+  expect(closed).toHaveLength(1);
+  expect(['completed', 'abandoned', 'budget_exhausted']).toContain(
+    String(closed[0]?.['completionState']),
+  );
+
   await app.nav('evidence').click();
   await expect(app.testId('screen-evidence')).toBeVisible();
 
@@ -208,6 +260,10 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
 
   await app.testId('evidence-disclosure').click();
   await expect(app.testId('evidence-chain')).toBeVisible();
+
+  // The inspector shows the sitting's chain — the thing it structurally could not
+  // do before, because the events were not in the log it reads.
+  await expect(app.testId('evidence-chain')).toContainText('ReviewGraded');
 
   // The chain, traced: two state changes, each naming the event that caused it
   // and the origin that authorised it. `origin user` twice is the whole of
@@ -238,6 +294,13 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   // The two projections agree: the badge counted the events it replayed, and the
   // browser's own storage holds that many. A screen willing to say "passed" over
   // a log that is not there would fail here.
+  //
+  // This is also the join that makes the next assertion a statement about the
+  // *export*. The badge's number is `verifyExportRoundTrip`'s count over the
+  // serialised bytes; storage holds exactly that many; and the exhaustive list
+  // below says which they are. So "the session events are in the export and it
+  // replays" is established by the three together, without this file having to
+  // reach into the app to read the envelope.
   const claimedEventCount = Number(/— (\d+) events/.exec(badge)?.[1] ?? '0');
   expect(claimedEventCount).toBeGreaterThan(0);
   await expect
@@ -245,12 +308,26 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
     .toBe(claimedEventCount);
 
   // Every step of the loop, in the order it was walked, as the store kept it.
+  //
+  // Exhaustive rather than "contains", and that is the assertion that would have
+  // caught this work package's defect from the other side: the list this test
+  // shipped with ended at `DataExported` with no session family in it at all, and
+  // it was *correct* about the build it described. An export that replays a log
+  // the sitting never reached passes every equality check and proves nothing —
+  // definition of done §2 item 4.
   expect(await app.persistedEventTypes()).toEqual([
     'EncounterCaptured',
     'ThreadPromotionChanged',
     'CandidateAttached',
     'CandidateAcceptedAsNote',
     'ThreadPromotionChanged',
+    'ContractCreated',
+    'ContractCreated',
+    'SessionStarted',
+    'ReviewGraded',
+    'ExposureLogged',
+    'ReviewGraded',
+    'SessionClosed',
     'DataExported',
   ]);
 
