@@ -11,8 +11,10 @@ import {
   compareAdjacency,
   EMPTY_KNOWLEDGE_GRAPH,
   edgeKindRank,
+  GRAPH_DIAGNOSTIC_KINDS,
   GRAPH_EDGE_KINDS,
   isSymmetricEdgeKind,
+  neighbourhoodOf,
   SYMMETRIC_EDGE_KINDS,
   type GraphEdge,
   type GraphNode,
@@ -104,6 +106,108 @@ describe('buildKnowledgeGraph', () => {
     });
     expect(adjacencyOf(graph, 'a')).toEqual([]);
     expect(graph.diagnostics[0]?.kind).toBe('self_edge');
+  });
+
+  it('indexes a duplicate edge once, and says the source declared it twice', () => {
+    const graph = buildKnowledgeGraph({
+      nodes: [
+        { id: 'kanji:分', kind: 'kanji', label: '分', componentIds: [] },
+        { id: 'lex-bunki', kind: 'lexeme', label: '分岐', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'contains', from: 'lex-bunki', to: 'kanji:分' },
+        { kind: 'contains', from: 'lex-bunki', to: 'kanji:分' },
+      ],
+    });
+
+    expect(adjacencyOf(graph, 'kanji:分')).toHaveLength(1);
+    expect(adjacencyOf(graph, 'lex-bunki')).toHaveLength(1);
+    expect(graph.edgeCount).toBe(1);
+    expect(graph.diagnostics.map((entry) => entry.kind)).toEqual(['duplicate_edge']);
+    expect(graph.diagnostics[0]?.detail).toContain('more than once');
+  });
+
+  /**
+   * The visible consequence, and the reason this is a defect rather than a
+   * tidiness point: a repeated `contains` edge put the same compound in the
+   * rendered `compounds` group twice, so a kanji page told the learner that 分
+   * appears in 分岐, 分岐 — a false statement about the dictionary produced
+   * entirely by the indexer.
+   */
+  it('does not double a rendered group member', () => {
+    const doubled = buildKnowledgeGraph({
+      nodes: [
+        { id: 'kanji:分', kind: 'kanji', label: '分', componentIds: [] },
+        { id: 'lex-bunki', kind: 'lexeme', label: '分岐', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'contains', from: 'lex-bunki', to: 'kanji:分' },
+        { kind: 'contains', from: 'lex-bunki', to: 'kanji:分' },
+      ],
+    });
+    const compounds = neighbourhoodOf(doubled, 'kanji:分', { depth: 1 }).groups.compounds;
+    expect(compounds.map((member) => member.node.label)).toEqual(['分岐']);
+  });
+
+  it('treats a symmetric edge declared from both ends as one edge', () => {
+    // 末 contrasts with 未 exactly as much as the reverse, and the index already
+    // reports one declaration from both ends. Admitting both would double the
+    // contrast set.
+    const graph = buildKnowledgeGraph({
+      nodes: [
+        { id: 'a', kind: 'kanji', label: '末', componentIds: [] },
+        { id: 'b', kind: 'kanji', label: '未', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'contrasts_with', from: 'a', to: 'b' },
+        { kind: 'contrasts_with', from: 'b', to: 'a' },
+      ],
+    });
+    expect(adjacencyOf(graph, 'a')).toHaveLength(1);
+    expect(adjacencyOf(graph, 'b')).toHaveLength(1);
+    expect(graph.edgeCount).toBe(1);
+    expect(graph.diagnostics.map((entry) => entry.kind)).toEqual(['duplicate_edge']);
+  });
+
+  it('keeps an asymmetric edge and its reverse apart — they are different claims', () => {
+    const graph = buildKnowledgeGraph({
+      nodes: [
+        { id: 'a', kind: 'lexeme', label: 'a', componentIds: [] },
+        { id: 'b', kind: 'kanji', label: 'b', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'contains', from: 'a', to: 'b' },
+        { kind: 'contains', from: 'b', to: 'a' },
+      ],
+    });
+    expect(graph.edgeCount).toBe(2);
+    expect(graph.diagnostics).toEqual([]);
+  });
+
+  it('keeps the first role when two declarations of one edge disagree, and says they disagreed', () => {
+    const graph = buildKnowledgeGraph({
+      nodes: [
+        { id: 'component:八', kind: 'component', label: '八', componentIds: [] },
+        { id: 'kanji:分', kind: 'kanji', label: '分', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'component_of', from: 'component:八', to: 'kanji:分', role: 'semantic' },
+        { kind: 'component_of', from: 'component:八', to: 'kanji:分', role: 'phonetic' },
+      ],
+    });
+    expect(adjacencyOf(graph, 'kanji:分')[0]?.role).toBe('semantic');
+    expect(graph.diagnostics[0]?.kind).toBe('duplicate_edge');
+    expect(graph.diagnostics[0]?.detail).toContain('phonetic');
+    expect(graph.diagnostics[0]?.detail).toContain('semantic');
+  });
+
+  it('names every diagnostic kind it can emit', () => {
+    expect([...GRAPH_DIAGNOSTIC_KINDS].sort()).toEqual([
+      'dangling_edge',
+      'duplicate_edge',
+      'duplicate_node',
+      'self_edge',
+    ]);
   });
 
   it('indexes the Atlas→Trace join by component id', () => {

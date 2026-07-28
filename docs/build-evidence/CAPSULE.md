@@ -6446,3 +6446,461 @@ kind that can pass vacuously:
   would fail there, which is the correct outcome.
 - **That any of this ran outside Chromium on Linux.** No Safari, no Firefox, no
   device, no screen reader. The screenshots and the e2e suite are one engine.
+## Appendix — Campaign E, lane A2′ (Builder A2-prime): the era attribute, and what the corpus actually supports
+
+**Branch:** `agent/bunki-e-era`, from `agent/bunki-e-integration` (`cd04f7d`).
+**Surface owned:** `packages/domain/src/graph/**`, `packages/domain/src/journey/**`
+and their tests. `apps/app` was not touched.
+
+### The finding, first, because it is the deliverable
+
+**9.8% of the 3,000-lexeme dictionary tier can be placed on an era layer.**
+All 295 of them land on 古道 `kodo`, all by a single rule. **街道 `kaido` and
+鉄道 `tetsudo` are empty — 0 lexemes each** — and not because a rule missed:
+because no rule for them exists that would not be a guess.
+
+Measured by shipped code (`packages/domain/test/graph/era-corpus.test.ts`
+calling `attributeLexemeEra` / `summariseEraCoverage`), against the real corpus.
+Full run, digests and reproduction command:
+`docs/build-evidence/era-coverage/README.md`.
+
+```
+3,000-lexeme dictionary tier: 3000 lexemes
+  placed on a layer: 295 (9.8%)
+  kodo 295 / kaido 0 / tetsudo 0 / unknown 2705
+  native_single_morpheme     295  → kodo
+  sino_japanese_reading     2389  → unknown
+  native_compound             50  → unknown
+  mixed_reading               45  → unknown
+  reading_ambiguous            1  → unknown
+  reading_unresolved         220  → unknown
+```
+
+The axis that *is* derivable is the lexical stratum, and it reaches **2,779
+lexemes (92.6%)**. The gap between 92.6% and 9.8% is the whole finding: we can
+say what stratum a word belongs to, and we cannot say when it entered the
+language.
+
+### The one rule that places, stated exactly
+
+> A headword that is one ideograph, optionally followed by exactly the okurigana
+> KANJIDIC2 records for that reading, whose lexeme reading is exactly one of that
+> character's kun readings and not also one of its on readings, is a single
+> native morpheme (和語) and is placed on 古道.
+
+山 やま, 手 て, 話す はなす. The voyage-through-time document §2 assigns "訓読み,
+native vocabulary" to 古道, and the native lexical stratum predates every road on
+the map.
+
+**It places a stratum, not a date.** It asserts no first attestation, and there
+is nothing in the corpus that could support one. That sentence is in the source
+and in the returned `detail` string, not only here.
+
+### Why nothing else is placed — each refusal is typed, not lumped
+
+| Basis | Placement | Why |
+| --- | --- | --- |
+| `sino_japanese_reading` | `unknown` | 漢語 spans all three layers. 電話 (Meiji coinage) and 世界 (Buddhist import, a millennium older) are the same object in this data: two on-readings. A test asserts they come back identical. |
+| `native_compound` | `unknown` | Morpheme stratum does not transfer to a compound. 取締役 とりしまりやく is native throughout and is a Meiji office. |
+| `mixed_reading` | `unknown` | 重箱/湯桶読み — undated for the same reason the pure cases are. |
+| `reading_ambiguous` | `unknown` | The reading is both an on and a kun reading of the character. |
+| `foreign_script` | `unknown` | Orthography is not etymology. パン and ガラス are Edo-period Portuguese and Dutch, ドキドキ is native onomatopoeia. |
+| `reading_unresolved` | `unknown` | The reading could not be exactly reconstructed from the recorded readings. |
+| `no_reading_evidence` | `unknown` | No reading list was supplied for a character. |
+| `character_spans_eras` | `unknown` | A **kanji node is never placed at all.** 駅 is the design document's own worked example precisely because it is a 駅家 post-station, a 宿場 and a railway station at once. |
+| `not_a_lexical_node` | `unknown` | Reading, sense, sentence, encounter and component nodes have no lexical era. |
+
+`unknown` is a member of `EraPlacement`, not `EraLayer | null`, so a renderer has
+to handle it. A nullable layer invites `?? 'kodo'`, and a default layer is
+exactly the invented confidence this lane exists to refuse.
+
+### Two hypotheses from the brief, tested and false for this corpus
+
+The brief suggested katakana loanwords with an explicit source-language field
+would be identifiable as modern borrowings. They are not, for two independent
+reasons, both read out of `packages/seed/scripts/import-sources.mjs` on
+`dict-view`:
+
+1. **`parseJMdict` never reads `<lsource>` or `<misc>`.** It reads `ent_seq`,
+   `keb`, `reb`, `ke_pri`/`re_pri`, `pos`, `gloss`. The source-language field and
+   the `arch`/`obs`/`rare` markers are absent from the shipped bytes.
+2. **`selectLexemes` filters on `entry.hasKanji`**, so kana-only entries are
+   excluded by construction. Measured: **0 of 3,000 headwords are katakana.**
+
+The 34 distinct `pos` labels the tier does carry were enumerated and contain no
+era signal — they are grammatical categories.
+
+**Recommendation for the seed lane, explicitly not acted on here** (out of this
+lane's surface): parsing `<misc>` would give the 古道 layer a second,
+independent, upstream-authored population via `arch`/`obs`. Nothing the domain
+can compute substitutes for a citable marker.
+
+### Carried Wave-A defects — all three closed, each with a red-first check
+
+**P2, duplicate edge.** `GraphDiagnostic.kind` gains `duplicate_edge`; the second
+declaration is dropped from the adjacency and not counted in `edgeCount`; a
+symmetric kind is keyed on the unordered pair so 末⇄未 declared from both ends is
+one edge. Two declarations that disagree about `role` keep the first and say so
+in the diagnostic. The user-visible consequence is regression-tested directly:
+before the fix a repeated `contains` edge put 分岐 in the rendered `compounds`
+group twice.
+
+**P2, filter asymmetry.** `collectGroups` applied none of `depth`, `edgeKinds` or
+`nodeKinds`. All three now govern the groups exactly as they govern the walk,
+passed as one `GroupFilters` object so a filter cannot be wired into one half and
+forgotten in the other. `maxNodes` still bounds the walk alone — and that
+asymmetry is now argued for in a table on `NeighbourhoodOptions`: filters say
+which part of the graph the query is about, budgets each bound one thing, and a
+kanji page's "components" section must not shrink because the word happens to
+have many compounds.
+
+> **Correction, appended in the repair round below.** The last sentence of that
+> paragraph was **false when written**. The table said `maxNodes` did not reach
+> the groups; the code let it reach them, through the group members' `depth` and
+> therefore through their order and — under `perGroup` — through which member a
+> page showed. The claim is enforced now. See "Repair round" at the end of this
+> appendix.
+
+**P2, the invariant nothing enforced.** `memoryStateAsOf` binary-searched
+`versions` and justified it with "ascending by construction" while
+`buildMemoryHistories` constructed no such thing: a review dated before its
+contract's activation was appended after the activation version and the list went
+backwards. The invariant is now established where the data is built (such a
+review is skipped, the same treatment already given to a review naming a contract
+with no activation), `isAscendingByFrom` is exported so the claim is checkable,
+and the doc comment states the precondition and what happens when it is violated
+instead of pretending it cannot be.
+
+**Red-first evidence.** Each fix was reverted in place and the new tests re-run:
+5 of the build tests fail without the dedupe, 6 of the neighbourhood tests fail
+without the group filters, and 2 of the retrievability tests fail with the single
+guard line removed. All 13 pass with the fixes in.
+
+### Checks re-run in this worktree
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | clean install, exit 0 |
+| `npm run lint` | pass, no output |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, root + 5 workspaces |
+| `npm run test` | **1931 passed, 1 skipped**, 102 files (was 1868) |
+| `npm run test:replay` (T-03) | 47 passed, 2 files |
+| `npm run verify:export` (T-14) | 14 passed, 1 file |
+| `npx expo export --platform web` | pass — 14 static routes, `dist` written |
+| `npm run test:e2e` | **43 passed**, exit 0 |
+
+The one skipped test is the half of `era-corpus.test.ts` that reports "no
+dictionary tier found" — it is `skipIf`'d because a tier *is* present on this
+branch, as the 16-lexeme hand seed. The two `✘` lines under the e2e list reporter
+are the same pre-existing annotated `test.fail()` expectations as every previous
+round (T4-1b, T3-3); `retries: 0`, neither was touched, both counted in the 43.
+
+### What this lane does **not** claim
+
+- **That any word has been dated.** Nothing here asserts a century, a period, or
+  a first attestation. 古道 placement is a claim about lexical stratum, and the
+  source, the tests and the returned `detail` all say so in those words.
+- **That 9.8% is a good number.** It is a low number, honestly obtained, and it
+  is a fact about the data rather than about the rules. Loosening the rules would
+  raise it and make it worthless.
+- **That the dictionary tier is on this branch.** It is not. It lives on
+  `dict-view` (`0b3400a1`); its two files were checked out into
+  `packages/seed/data/dictionary/` for the measurement, their sha256s verified
+  against the importer's own manifest, and then removed. **No dictionary bytes
+  are committed on this branch**, which keeps the share-alike confinement in
+  `packages/seed/README.md` intact. The corpus test needs no edit when the tier
+  lands — it reads whichever tiers are present and skips, loudly, when there are
+  none.
+- **That the 3,000-lexeme figures were re-derived after the final commit.** They
+  were measured on `era.ts` as committed in `03a582c`, and that file has not
+  changed since. The 16-lexeme hand-seed figures in the test output *are*
+  produced on every run.
+- **That `packages/domain/src/journey/` was changed.** It was in this lane's
+  surface and needed nothing; the era attribute belongs to the graph projection.
+- **That the era attribute is wired into any screen.** It is a pure projection
+  with no consumer yet. Wave B's map lane is the consumer, and the numbers above
+  are what it has to design against.
+- **That a Japanese speaker reviewed the placements.** No native-speaker or
+  lexicographer review was run. The rules are exact and mechanical; whether 295
+  is the *right* 295 is a question the corpus test cannot answer.
+
+### What a verifier should try to break
+
+1. Add a rule mapping katakana headwords to `tetsudo`, and confirm the
+   `foreign_script` tests go red — パン, ガラス and ドキドキ are in them by name
+   for exactly this reason.
+2. Make `attributeNodeEra` place a `kanji` node, and confirm the 駅 test names it.
+3. Point `EraPlacement` at `EraLayer | null` and watch how quickly a `?? 'kodo'`
+   becomes tempting at the call site. That is the argument for the union.
+4. Loosen `native_single_morpheme` to accept native *compounds* and watch the
+   coverage number jump — then check 取締役 and ask whether the number improved
+   or the honesty did.
+5. Re-run the corpus measurement after checking out `dict-view`'s two data files;
+   the digests in `docs/build-evidence/era-coverage/README.md` should match, and
+   so should 295.
+
+---
+
+## Repair round — Campaign E, lane A2′ (Builder A2-prime), verifier verdict FAIL
+
+**Branch:** `agent/bunki-e-era`. **Repaired from:** `6826082`.
+**Surface touched:** `packages/domain/src/graph/neighbourhood.ts`,
+`packages/domain/test/graph/neighbourhood.test.ts`,
+`packages/domain/test/graph/era.test.ts`, this file. **No product behaviour
+outside `neighbourhood.ts` changed**; `era.ts` was not edited at all.
+
+The independent verifier returned three findings. **All three reproduced, and
+all three are repaired.** Nothing was "fixed" that was not first observed
+failing — each repro and its output is below, because the last time a repair
+round on this project fixed a defect it had not reproduced, it shipped a
+duplicate attribute.
+
+### P1 — `maxNodes` reached into the groups, and the doc table said it did not
+
+**The claim that was false.** The table added by `211d7f9` on
+`NeighbourhoodOptions` said `| maxNodes | yes | **no** |`, and the paragraph
+under it argued the asymmetry as a design principle. The previous appendix
+repeated it as this lane's argument. The code did not enforce it.
+
+**The mechanism.** `collectGroups` and `collectReadingFamily` read each member's
+depth out of `depthById` — the *walk's* depth map, which `maxNodes` bounds —
+with a constant fallback (`?? 1`, `?? 2`). `compareGroupMembers` sorts members by
+`depth` first. So the whole-walk budget changed three things it had no business
+changing: the `depth` a group member reports, the order of a group, and — under
+`perGroup` — **which member a page shows**.
+
+**Reproduced, verbatim, against `6826082` in this worktree:**
+
+```
+graph: k:origin -has_reading-> r:ブン <-has_reading- {k:zz, k:aa}
+       k:origin -contrasts_with-> k:zz          (so k:zz really is one hop away)
+
+neighbourhoodOf(g,'k:origin',{depth:2,perGroup:1,maxNodes:100}).groups.readingFamily
+  -> [["k:zz", 1]]
+neighbourhoodOf(g,'k:origin',{depth:2,perGroup:1,maxNodes:1  }).groups.readingFamily
+  -> [["k:aa", 2]]
+
+seed-shaped graph, kanji:分:
+  {depth:2,maxNodes:100} -> [["kanji:文",1],["kanji:聞",2]]
+  {depth:2,maxNodes:2}   -> [["kanji:文",2],["kanji:聞",2]]
+```
+
+Two defects in one output: the member shown flipped from `k:zz` to `k:aa`, and
+`k:zz` — one `contrasts_with` hop from the origin — was reported at depth 2. A
+surface printing `member.depth` would have stated something false about the
+graph.
+
+**The repair — structural, not a promise.** `collectGroups` is **no longer given
+`depthById` at all**; the parameter is gone from its signature and from
+`collectReadingFamily`'s, so the coupling cannot be reintroduced by accident. It
+measures distance from the origin's own adjacency, which it already reads: under
+this query's filters a group member is one hop away iff it is an admitted
+neighbour of the origin, and a reading-family sibling that is not one is two. A
+`oneHop: Set<GraphNodeId>` built in the loop that collects the one-hop groups
+carries that to the family. Cost: one set, no extra traversal.
+
+This preserves the semantics the unbounded case already had — 文 is in 分's
+reading family *and* is a declared contrast, so its honest distance is 1, and it
+still reports 1 — and takes the budget out of the answer. The output is what
+`maxNodes: 100` gave before, now at every ceiling.
+
+The doc was corrected in the same commit rather than left to be re-read as
+gospel. The table row now reads `**no** — not their membership, their order, or
+the depth each member reports`; the paragraph under it says the row is enforced
+by *not handing the collector the bounded map*, and names the three ways the old
+claim was false. `GroupMember.depth` now documents what the number means and that
+it does not move with `maxNodes`. The stale sentence in the appendix above was
+annotated with a correction rather than silently rewritten.
+
+**Red-first evidence.** Three new tests in
+`describe('the whole-walk ceiling does not reach into the groups')`:
+
+| Test | Against `6826082` | With the repair |
+| --- | --- | --- |
+| reports a member's real distance, not the one the refused walk implies | **fail** | pass |
+| shows the same member under `perGroup` whatever `maxNodes` was | **fail** | pass |
+| returns byte-identical groups across every ceiling, on the seed-shaped graph | **fail** | pass |
+
+Reproduce: restore `packages/domain/src/graph/neighbourhood.ts` from `6826082`,
+keep the new test file, run
+`npx vitest run packages/domain/test/graph/neighbourhood.test.ts` →
+`3 failed | 29 passed`. With the repair → `32 passed`.
+
+The second of those three needed care. A first draft used the real 分/文/聞 shape
+and passed against the broken code by accident: members sort by depth **then by
+id**, and `kanji:文` sorts before `kanji:聞` either way, so corrupting the depth
+was invisible. The committed test names its nodes `kanji:zz` (the near one) and
+`kanji:aa` so the id tiebreak *disagrees* with the distance, and says so in a
+comment. A test that cannot fail is the defect class this round is about.
+
+### P2 — three era property tests asserted nothing about their named subject
+
+**Repaired.** The finding is exact. `era.test.ts` drew fuzz readings as uniform
+random kana of length 0–7, which matches a KANJIDIC2 reading essentially never,
+so three properties whose subject is a **placed** attribution ran their
+assertions on almost nothing. Instrumented against the shipped code, 4,000 cases
+per seed:
+
+| Seed | Named subject | Placed / 4,000 | Multi-character placed |
+| --- | --- | --- | --- |
+| `0x9d0` | only ever places on 古道, by the single-morpheme rule | **0** | 0 |
+| `0x1a1d0` | never places a headword of more than one character | 2 | **0** |
+| `0x5713a7` | a placed attribution always carries the native stratum | **1** | 0 |
+| `0x7e75d0` | (declared placement/basis/reason — not about placement) | 1 | 0 |
+
+The basis histogram was 3,998–3,999 `reading_unresolved` plus one other. The
+verifier's deletion test is the proof: change the `kunHit` branch of `era.ts` to
+return `mixed_reading`/`mixed` so **nothing can ever be placed**, and all three
+tests still pass.
+
+**The repair.** `fuzzed` now draws four shapes rather than one: a kun form
+assembled from the character's own kun list (headword = character + okurigana,
+reading = base + okurigana), an on form via the already-exported and separately
+tested `toHiragana`, a two-or-three morpheme compound, and the original uniform
+kana noise. Every shape is then perturbed a fifth of the time with a trailing
+kana, so the near-misses that must come back `reading_unresolved` stay in the
+corpus beside the hits — the corpus reaches the placing branch without being
+stacked toward it. `splitKun` is re-derived in the test file rather than imported
+from `era.ts`, with a comment saying why: an input assembled by the parser under
+test would agree with that parser however it drifted.
+
+Measured over the repaired generator, 4,000 cases per seed:
+
+```
+seed 0x9d0:    placed=948  multi=370  reading_unresolved=1454 sino=911 mixed=566 native_compound=121
+seed 0x1a1d0:  placed=1012 multi=399  reading_unresolved=1397 sino=879 mixed=603 native_compound=109
+seed 0x5713a7: placed=995  multi=389  reading_unresolved=1421 sino=893 mixed=581 native_compound=110
+seed 0x7e75d0: placed=975  multi=375  reading_unresolved=1416 sino=912 mixed=571 native_compound=126
+```
+
+**And the tests now check their own coverage.** Each of the three counts what it
+saw and asserts a floor (`placed > 300`, `placedMultiCharacter > 100`). A guarded
+assertion that never runs is a green light wired to nothing, and the only defence
+is for the test to verify that its own subject occurred. Two tests were added
+beside them: one stating the census as an explicit guard, and one asserting the
+corpus still **refuses far more than it places** (`reading_unresolved > 500`,
+`sino_japanese_reading > 100`, `native_compound > 0`), so a later edit cannot
+quietly stack the generator toward the happy path. Floors rather than exact
+counts, so adding a character to `READINGS` is not a test edit — but far above
+the 0–2 the decorative corpus produced.
+
+**Red-first evidence.** Apply the verifier's mutation to `era.ts` — `kunHit`
+returns `attribution('mixed_reading', 'mixed', …)`, removing the only rule that
+places:
+
+| Test | Before this repair | After |
+| --- | --- | --- |
+| only ever places on 古道, and only ever by the single-morpheme rule | pass (decorative) | **fail** |
+| never places a headword of more than one character | pass (decorative) | **fail** |
+| a placed attribution always carries the native stratum | pass (decorative) | **fail** |
+| generates a corpus that actually reaches the rule that places | (did not exist) | **fail** |
+
+`npx vitest run packages/domain/test/graph/era.test.ts` under the mutation:
+`10 failed | 36 passed` — the six fixture and coverage tests that already caught
+it, plus the four above. `era.ts` was restored bit-for-bit afterwards;
+`git diff --quiet packages/domain/src/graph/era.ts` is clean, so the 9.8% / 295
+figures in the appendix above are untouched.
+
+### P2 — the second hop of the readingFamily filter had no test
+
+**Repaired.** Also exact. Deleting `if (!admits(filters, back, sibling)) continue;`
+left `28 passed, 0 failed`, so half of a claim the same file makes twice ("Both
+hops are filtered…", and the `nodeKinds` row of the options table) rested on
+nothing. The `edgeKinds` half of that check *is* redundant — both hops are
+`has_reading` — but the `nodeKinds` half is not, and that is the half nothing
+covered.
+
+New test, `filters the sibling as well as the reading a family is reached
+through`: an origin whose reading is shared by one `kanji` sibling and one
+`lexeme` sibling, queried with `nodeKinds: ['reading','lexeme']`.
+
+| | With the line | Without it |
+| --- | --- | --- |
+| `readingFamily` | `['lex:sib']` | `['kanji:sib','lex:sib']` |
+
+Deleting the line now gives `1 failed | 31 passed`. The doc comment at
+`collectReadingFamily` was extended to say *why* the second `admits()` is not
+redundant, so the next reader does not delete it as duplication.
+
+### Nothing was declined
+
+All three findings reproduced, and all three are repaired. No finding was judged
+absent, so nothing was left alone on that basis.
+
+### Full check set, re-run in this worktree after `npm ci` — every row
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | clean install, **exit 0** — added 727 packages, audited 734 |
+| `npm run lint` | **pass**, exit 0, no output |
+| `npm run format:check` | **pass** — "All matched files use Prettier code style!" |
+| `npm run typecheck` | **pass**, exit 0 — root + 5 workspaces (`@bunki/ai`, `@bunki/domain`, `@bunki/export`, `@bunki/persistence`, `@bunki/seed`) |
+| `npm run test` | **1937 passed, 1 skipped** (1938), 102 files, exit 0 — was 1931/1, so +6 tests |
+| `npm run test:replay` (T-03) | **47 passed**, 2 files, exit 0 |
+| `npm run verify:export` (T-14) | **14 passed**, 1 file, exit 0 |
+| `npx expo export --platform web` (run from `apps/app`) | **pass**, exit 0 — 14 static routes, `dist` written |
+| `npm run test:e2e` | **43 passed**, exit 0, 1.7m |
+
+Every row the round before this one recorded is recorded here, under the same
+names and in the same order, **including the expo export row** — a previous
+appendix on this project dropped that row and made its own recipe
+unreproducible.
+
+The **+6 tests** are 4 in `neighbourhood.test.ts` (3 for the `maxNodes`
+asymmetry, 1 for the second-hop filter) and 2 in `era.test.ts` (the census guard
+and the refusal-mix guard). The **1 skipped** test is unchanged from the round
+before: the half of `era-corpus.test.ts` that reports "no dictionary tier found",
+`skipIf`'d because a tier is present as the 16-lexeme hand seed. The two `✘`
+lines under the e2e list reporter are the same pre-existing annotated
+`test.fail()` expectations as every previous round (T4-1b, T3-3); `retries: 0`,
+neither was touched, both counted in the 43.
+
+### What this repair round does **not** claim
+
+- **That `era.ts` was changed.** It was not. `git diff` against `6826082` shows
+  no change to `packages/domain/src/graph/era.ts`, so the 9.8% finding, the 295
+  count and the `docs/build-evidence/era-coverage/` digests all stand exactly as
+  measured.
+- **That the 3,000-lexeme corpus was re-measured.** It was not re-run this round;
+  the dictionary tier is still not on this branch. The classifier is
+  byte-identical to the one that produced those numbers, which is the whole
+  reason they carry over.
+- **That the group-depth semantics are the only defensible ones.** A member's
+  `depth` is now "hops from the origin under this query's filters, shortest
+  path". The alternative — "hops along the relation that named this group", so
+  every reading-family member reports 2 — is coherent and *simpler*. It was
+  rejected because it discards a true fact the old code already reported
+  correctly whenever the ceiling did not bite. What is not defensible is either
+  meaning changing with `maxNodes`, and that is what was fixed.
+- **That any surface renders `GroupMember.depth` today.** None does — a grep for
+  `.depth` finds only `neighbourhood.ts` and its tests. The defect was still
+  wrong output rather than a doc slip: the value is returned by a public API, and
+  the `perGroup` half changed group *membership*, which no reader has to opt
+  into.
+- **That the era property tests now cover the placing rule better than the
+  fixtures do.** They do not, and they are not meant to. `era-corpus.test.ts` and
+  the named fixtures (山, 手, 話す, 電話, 世界, 取締役, 駅) are still where the rule
+  itself is pinned. What changed is that the property tests are no longer green
+  lights wired to nothing.
+- **That the census floors were derived from anything but this corpus.** 300 and
+  100 are round numbers under the measured 948–1012 and 370–399. They are a guard
+  against the corpus going decorative again, not a claim about the right amount
+  of coverage.
+
+### What a verifier should try to break, this round
+
+1. Re-run the P1 repro at any `maxNodes`. Every ceiling must give the same
+   `groups` — member for member, depth for depth. If one does not, the structural
+   fix leaked somewhere new.
+2. Give `collectGroups` back a `depthById` parameter and use it for anything. The
+   three ceiling tests should go red; if they do not, they are the wrong tests.
+3. Delete `if (!admits(filters, back, sibling)) continue;` again. Exactly one
+   test should fail, and it should name the kanji node it got back.
+4. Break the era *generator* rather than the classifier — force every `fuzzed`
+   case down the `noise` shape. Four tests should go red on their own census
+   floors before any classifier behaviour is in question. That is the coverage
+   check working.
+5. Raise the census floors to the measured values (948 / 370). They pass today
+   and are one `READINGS` entry away from being brittle — which is the argument
+   for floors, and worth confirming rather than taking on trust.

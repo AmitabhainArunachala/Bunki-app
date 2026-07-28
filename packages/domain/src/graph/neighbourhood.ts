@@ -43,16 +43,54 @@ import type {
 // Options
 // ---------------------------------------------------------------------------
 
+/**
+ * What a caller may ask for — and which half of the result each option governs.
+ *
+ * The result has two halves: the walk (`nodes` / `edges`) and the named groups.
+ * They are not governed identically, and the difference is stated here rather
+ * than discovered:
+ *
+ * | option | walk | groups |
+ * | --- | --- | --- |
+ * | `depth` | yes | yes — a group is a walk of fixed length, so `depth: 0` empties every group and `depth: 1` empties `readingFamily` |
+ * | `edgeKinds` | yes | yes |
+ * | `nodeKinds` | yes | yes — including the intermediate `reading` node a family is walked through |
+ * | `maxNodes` | yes | **no** — not their membership, their order, or the `depth` each member reports |
+ * | `perGroup` | no | yes |
+ *
+ * `depth`, `edgeKinds` and `nodeKinds` are *filters*: they say which parts of
+ * the graph this query is about, and a group that ignored them would answer a
+ * different question from the walk beside it. `maxNodes` and `perGroup` are
+ * *budgets*, and each has exactly one thing it is a budget for. Letting the
+ * whole-walk ceiling reach into the groups would make a kanji page's
+ * "components" section depend on how many compounds the word happens to have,
+ * which is a coupling nobody could predict from the call site; that is why
+ * `maxNodes` stops at the walk and `perGroup` — reported through
+ * {@link Truncation} whenever it bites — is what bounds a page section.
+ *
+ * The `maxNodes` row is enforced structurally rather than promised: the group
+ * collector is not given the walk's bounded depth map at all, and measures its
+ * members' distance from the origin's adjacency itself. It used to be given
+ * that map, and the promise above was false in three ways at once — a member
+ * one hop from the origin reported depth 2 whenever the ceiling had refused it,
+ * {@link GroupMember} ordering is by depth, and so under `perGroup` the member
+ * a page *showed* changed with a budget that has nothing to do with it.
+ */
 export interface NeighbourhoodOptions {
-  /** Hops from the origin. 0 returns the origin alone. */
+  /** Hops from the origin. 0 returns the origin alone, and empties every group. */
   readonly depth?: number;
-  /** Hard ceiling on returned nodes, origin included. */
+  /** Hard ceiling on returned nodes, origin included. Bounds the walk only. */
   readonly maxNodes?: number;
-  /** Ceiling per named group. */
+  /** Ceiling per named group. Bounds the groups only. */
   readonly perGroup?: number;
-  /** Restrict the walk to these edge kinds. Omit for all of them. */
+  /** Restrict to these edge kinds. Omit for all of them. Applies to walk and groups. */
   readonly edgeKinds?: readonly GraphEdgeKind[];
-  /** Restrict the walk to these node kinds. The origin is always included. */
+  /**
+   * Restrict to these node kinds. The origin is always included. Applies to walk
+   * and groups — a `readingFamily` is walked *through* a `reading` node, so
+   * excluding that kind empties the family rather than tunnelling under the
+   * restriction.
+   */
   readonly nodeKinds?: readonly GraphNodeKind[];
 }
 
@@ -112,6 +150,13 @@ export interface Truncation {
  * compound for a co-occurring kanji. It is the group's provenance: "these words
  * are related" is a claim, and `via: reading:ぶん` is the reason for it, which
  * is the difference between a map and a mood board.
+ *
+ * `depth` is how many admitted hops this member is from the origin: 1 for a
+ * direct neighbour, 2 for a reading-family sibling that is not also a direct
+ * neighbour. It is a fact about the graph under this query's *filters* and
+ * about nothing else — in particular it does not move when `maxNodes` changes,
+ * because a member's distance from the origin is not a function of how many
+ * nodes the caller was willing to receive.
  */
 export interface GroupMember {
   readonly node: GraphNode;
@@ -281,7 +326,11 @@ export function neighbourhoodOf(
 
   const included = new Set(order.map((entry) => entry.id));
   const edges = collectEdges(graph, included, edgeKinds);
-  const groups = collectGroups(graph, origin, depthById, perGroup, truncated);
+  const groups = collectGroups(graph, origin, perGroup, truncated, {
+    depthLimit,
+    edgeKinds,
+    nodeKinds,
+  });
 
   return Object.freeze({
     origin,
@@ -429,32 +478,86 @@ function matchesRule(step: Adjacency, rule: GroupRule, neighbour: GraphNode): bo
   return true;
 }
 
+/**
+ * The filter half of {@link NeighbourhoodOptions}, resolved.
+ *
+ * Passed as one object so that adding a filter to the options cannot be applied
+ * to the walk and forgotten in the groups — the compiler asks for it in both
+ * places. That asymmetry was a real defect: the groups used to read the origin's
+ * adjacency directly and applied none of `depth`, `edgeKinds` or `nodeKinds`, so
+ * a caller who restricted a query got a walk that honoured the restriction and a
+ * set of groups beside it that did not, with nothing saying so.
+ */
+interface GroupFilters {
+  readonly depthLimit: number;
+  readonly edgeKinds: ReadonlySet<GraphEdgeKind> | null;
+  readonly nodeKinds: ReadonlySet<GraphNodeKind> | null;
+}
+
+function admits(filters: GroupFilters, step: Adjacency, neighbour: GraphNode): boolean {
+  if (filters.edgeKinds !== null && !filters.edgeKinds.has(step.kind)) return false;
+  if (filters.nodeKinds !== null && !filters.nodeKinds.has(neighbour.kind)) return false;
+  return true;
+}
+
+/**
+ * The named groups, measured from the graph rather than read off the walk.
+ *
+ * This function is deliberately *not* handed the walk's `depthById`. That map is
+ * bounded by `maxNodes`, and every use of it here would have leaked the walk's
+ * budget into the groups — which is exactly what the table on
+ * {@link NeighbourhoodOptions} says does not happen. The one thing it was used
+ * for is a member's `depth`, and that is cheaper to get right: under this
+ * query's filters a group member is one hop away iff it is an admitted
+ * neighbour of the origin, and a reading-family sibling that is not is two.
+ * Both facts come out of the origin's own adjacency, which this function reads
+ * anyway.
+ */
 function collectGroups(
   graph: KnowledgeGraph,
   origin: GraphNode,
-  depthById: ReadonlyMap<GraphNodeId, number>,
   perGroup: number,
   truncated: Truncation[],
+  filters: GroupFilters,
 ): NeighbourhoodGroups {
   const collected = new Map<NeighbourhoodGroupName, GroupMember[]>();
   NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => collected.set(name, []));
 
+  // Every group is at least one hop, so `depth: 0` — "the origin alone" — leaves
+  // all of them empty rather than quietly returning a ring the walk refused.
+  if (filters.depthLimit < 1) return freezeGroups(collected, perGroup, truncated);
+
+  /** Everything exactly one admitted hop from the origin. The family needs it. */
+  const oneHop = new Set<GraphNodeId>();
+
   for (const step of adjacencyOf(graph, origin.id)) {
     const neighbour = graph.nodes.get(step.other);
     if (neighbour === undefined) continue;
+    if (!admits(filters, step, neighbour)) continue;
+    if (neighbour.id !== origin.id) oneHop.add(neighbour.id);
     ONE_HOP_GROUPS.forEach((rule) => {
       if (!matchesRule(step, rule, neighbour)) return;
       collected.get(rule.name)?.push({
         node: neighbour,
-        depth: depthById.get(neighbour.id) ?? 1,
+        depth: 1,
         via: null,
         role: step.role,
       });
     });
   }
 
-  collectReadingFamily(graph, origin, depthById, collected);
+  // The reading family is the one two-hop group, so it needs the depth for both
+  // hops before it can be walked at all.
+  if (filters.depthLimit >= 2) collectReadingFamily(graph, origin, oneHop, collected, filters);
 
+  return freezeGroups(collected, perGroup, truncated);
+}
+
+function freezeGroups(
+  collected: Map<NeighbourhoodGroupName, GroupMember[]>,
+  perGroup: number,
+  truncated: Truncation[],
+): NeighbourhoodGroups {
   const groups: Partial<Record<NeighbourhoodGroupName, readonly GroupMember[]>> = {};
   NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => {
     const members = collected.get(name) ?? [];
@@ -488,12 +591,26 @@ function collectGroups(
  * The origin itself is excluded (a node is not in its own family), and so are
  * nodes reachable by a single `has_reading` edge from the origin — those are
  * the readings, not the family.
+ *
+ * Both hops are filtered, including the intermediate `reading` node: a caller
+ * who excluded `reading` from `nodeKinds` asked for a query that does not go
+ * through readings, and a family that tunnelled under that restriction would be
+ * reporting a relation the same call said it did not want. The second
+ * {@link admits} call — the one on the sibling — is not redundant with the
+ * first: both hops are `has_reading`, so the `edgeKinds` half is already
+ * settled, but a sibling of an excluded *node* kind is rejected only there.
+ *
+ * `oneHop` is how a sibling's depth is decided. A family member is two hops
+ * *through the reading*, but a node can be in the family and also be a direct
+ * neighbour by some other admitted edge — 分 and 文 share ブン and are declared
+ * `contrasts_with` — and the honest distance is the shorter one.
  */
 function collectReadingFamily(
   graph: KnowledgeGraph,
   origin: GraphNode,
-  depthById: ReadonlyMap<GraphNodeId, number>,
+  oneHop: ReadonlySet<GraphNodeId>,
   collected: Map<NeighbourhoodGroupName, GroupMember[]>,
+  filters: GroupFilters,
 ): void {
   const family = collected.get('readingFamily');
   if (family === undefined) return;
@@ -502,16 +619,20 @@ function collectReadingFamily(
   for (const step of adjacencyOf(graph, origin.id)) {
     if (step.kind !== 'has_reading' || step.direction !== 'outgoing') continue;
     const readingId = step.other;
+    const readingNode = graph.nodes.get(readingId);
+    if (readingNode === undefined) continue;
+    if (!admits(filters, step, readingNode)) continue;
 
     for (const back of adjacencyOf(graph, readingId)) {
       if (back.kind !== 'has_reading' || back.direction !== 'incoming') continue;
       if (seen.has(back.other)) continue;
       const sibling = graph.nodes.get(back.other);
       if (sibling === undefined) continue;
+      if (!admits(filters, back, sibling)) continue;
       seen.add(back.other);
       family.push({
         node: sibling,
-        depth: depthById.get(sibling.id) ?? 2,
+        depth: oneHop.has(sibling.id) ? 1 : 2,
         via: readingId,
         role: null,
       });
