@@ -32,6 +32,7 @@
 import {
   expect,
   test,
+  hydrated,
   openApp,
   keepWord,
   takeUpForStudy,
@@ -183,4 +184,49 @@ test('the canvas cannot render a headword with no acknowledgement beside it', as
     true,
   );
   expect(body, 'the canvas shows a JMdict form with no EDRDG acknowledgement').toContain(LICENSOR);
+});
+
+test('EDRDG §3: a kept JMdict headword still names the licensor after the query is cleared and the page reloaded', async ({
+  page,
+  app,
+}) => {
+  // The third miss, and the one no gate could see.
+  //
+  // `/` used to render the acknowledgement only while a search result was on
+  // screen. But keeping a result stores the *matched entry's headword* as the
+  // thread's display text, and the kept-threads list outlives the query: clear
+  // the box, reload, and the front door is a list of JMdict headwords in an
+  // empty-search state that rendered no EDRDG string at all.
+  //
+  // The query is a **reading**, deliberately. がっこう is not the string that
+  // ends up on screen — 学校 is — so a passing assertion below cannot be
+  // satisfied by anything the learner typed. It can only have come from the
+  // files.
+  const READING = 'がっこう';
+  const HEADWORD = '学校';
+
+  await openApp(page, app.origin);
+  await keepWord(page, READING);
+
+  await visibleTestId(page, 'capture-clear').click();
+  await page.reload({ waitUntil: 'load' });
+  await hydrated(page);
+
+  // The state the old gate rendered nothing in: no query, so no result card.
+  await expect(visibleTestId(page, 'capture-search-input')).toHaveValue('');
+  await expect(page.getByTestId('capture-top-answer')).toHaveCount(0);
+
+  // Non-vacuity, stated as the licence breach itself rather than as a selector:
+  // a JMdict headword is on the reloaded page, and it is not the typed string.
+  const threads = visibleTestId(page, 'capture-threads');
+  await expect(
+    threads,
+    'the kept thread did not survive the reload, so this check proved nothing',
+  ).toContainText(HEADWORD);
+  expect(
+    await threads.innerText(),
+    'the thread shows the typed reading rather than the JMdict headword — re-point this test',
+  ).not.toContain(READING);
+
+  await expectAcknowledged(page, '/ with a kept imported word and an empty query');
 });

@@ -343,6 +343,30 @@ export const allSeedRecords = [
 ];
 
 /* ------------------------------------------------------------------ *
+ * The imported tier, beside the fixture tier and never folded into it
+ * ------------------------------------------------------------------ */
+
+/**
+ * The 3,000-entry imported dictionary (`src/imported.ts`).
+ *
+ * Built here rather than in `imported.ts` so both tiers resolve provenance
+ * against the *same* `registry` object — one parse of `data/provenance.json`,
+ * one set of records, no possibility of the two tiers disagreeing about what
+ * `edrdg-jmdict` means.
+ *
+ * Deliberately a separate export. Nothing merges it into {@link seedDataset}:
+ * the fixture tier's scope contract (`test/dataset.test.ts`) says the seed
+ * contains exactly sixteen lexemes and ten kanji, and that contract is what
+ * keeps the canonical target and the integration passage from being displaced
+ * by whichever imported record happened to sort first.
+ *
+ * It is built *above* the attribution section below because that section reads
+ * it. Two tiers ship licensed content, so the obligation has to be computed
+ * over both — see {@link FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION}.
+ */
+export const importedDictionary: ImportedDictionary = buildImportedDictionary(registry);
+
+/* ------------------------------------------------------------------ *
  * Which fields oblige a screen, and not merely a file
  * ------------------------------------------------------------------ */
 
@@ -366,7 +390,7 @@ export const ON_SCREEN_ATTRIBUTION_SOURCES: readonly string[] = Object.entries(
   .sort();
 
 /**
- * Every field name in this dataset whose value comes from such a source.
+ * Every field name in **either tier** whose value comes from such a source.
  *
  * This is the list a consumer needs to answer "does this screen owe an
  * acknowledgement?", and it is *derived from the data* rather than declared:
@@ -375,15 +399,60 @@ export const ON_SCREEN_ATTRIBUTION_SOURCES: readonly string[] = Object.entries(
  * against it (`apps/app/test/edrdg-acknowledgement.test.ts`), which is what
  * turned "the notice is on the pages we remembered" into a checkable claim after
  * `/canvas` shipped rendering JMdict headwords with no EDRDG string in the DOM.
+ *
+ * ## Why both tiers, and what it cost to learn that
+ *
+ * It walked `allSeedRecords` alone — the fixture tier — and that was a hole with
+ * a licence breach in it. In the fixture tier `headword` is `bunki-selection`:
+ * WP-04 chose which sixteen words to hand-write records for, so the written form
+ * of *those* records is this project's editorial selection. In the imported tier
+ * `headword` is `edrdg-jmdict`, straight out of the files. Deriving the list from
+ * the fixture tier alone therefore concluded that a headword owes nobody an
+ * acknowledgement — and `/` shipped a "Kept threads" list rendering JMdict
+ * headwords (時間, 学校, 友達) with no EDRDG string anywhere in the DOM, which the
+ * unit scan could not see because `headword` was not on the list it derived.
+ *
+ * Both tiers ship licensed content, so the obligation is computed over both. The
+ * imported tier records provenance once per *file* rather than once per record
+ * (`ImportedProvenance`), which is why this reads those maps rather than walking
+ * 3,000 records to learn the same four facts.
+ *
+ * Dotted keys — the sentence files write `tatoeba.japaneseContributor` — are
+ * split, so each path segment enters the list on its own. A consumer scanning
+ * source for property reads sees `sentence.tatoeba.japaneseContributor` as two
+ * accesses, and a field name containing a `.` would otherwise be spliced into a
+ * regexp where the dot matches anything.
  */
 export const FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION: readonly string[] = (() => {
   const required = new Set(ON_SCREEN_ATTRIBUTION_SOURCES);
   const fields = new Set<string>();
-  for (const record of allSeedRecords) {
-    for (const [field, provenance] of Object.entries(record.provenance)) {
-      if (required.has(provenance.source)) fields.add(field);
+
+  const add = (field: string, provenance: ProvenanceRecord): void => {
+    if (!required.has(provenance.source)) return;
+    for (const segment of field.split('.')) {
+      if (segment !== '') fields.add(segment);
     }
+  };
+
+  // Fixture tier: provenance resolved per record, because sixteen records can
+  // each be different.
+  for (const record of allSeedRecords) {
+    for (const [field, provenance] of Object.entries(record.provenance)) add(field, provenance);
   }
+
+  // Imported tier: provenance resolved per emitted file, for every record in it.
+  // Listed by name rather than by `Object.values`, so adding a fifth emitted
+  // file is a type error here instead of a silently unwalked map.
+  const perFileMaps: readonly Readonly<Record<string, ProvenanceRecord>>[] = [
+    importedDictionary.provenance.lexemes,
+    importedDictionary.provenance.kanji,
+    importedDictionary.provenance.sentences,
+    importedDictionary.provenance.strokePaths,
+  ];
+  for (const perFile of perFileMaps) {
+    for (const [field, provenance] of Object.entries(perFile)) add(field, provenance);
+  }
+
   return [...fields].sort();
 })();
 
@@ -392,26 +461,6 @@ export const findLexeme = (id: string): SeedLexeme | undefined =>
 
 export const findKanji = (character: string): SeedKanji | undefined =>
   seedDataset.kanji.find((kanji) => kanji.character === character);
-
-/* ------------------------------------------------------------------ *
- * The imported tier, beside the fixture tier and never folded into it
- * ------------------------------------------------------------------ */
-
-/**
- * The 3,000-entry imported dictionary (`src/imported.ts`).
- *
- * Built here rather than in `imported.ts` so both tiers resolve provenance
- * against the *same* `registry` object — one parse of `data/provenance.json`,
- * one set of records, no possibility of the two tiers disagreeing about what
- * `edrdg-jmdict` means.
- *
- * Deliberately a separate export. Nothing merges it into {@link seedDataset}:
- * the fixture tier's scope contract (`test/dataset.test.ts`) says the seed
- * contains exactly sixteen lexemes and ten kanji, and that contract is what
- * keeps the canonical target and the integration passage from being displaced
- * by whichever imported record happened to sort first.
- */
-export const importedDictionary: ImportedDictionary = buildImportedDictionary(registry);
 
 export {
   FIXTURE_TIER,

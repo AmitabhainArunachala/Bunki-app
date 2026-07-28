@@ -42,18 +42,25 @@
  * What this screen does *not* claim: that a saved thread survives a reload. It
  * renders the store's own durability sentence instead (P0-CAP-15).
  *
- * **The EDRDG acknowledgement belongs here too.** §3 of the EDRDG licence
- * statement is explicit: "If a WWW server is providing a dictionary function or
- * an on-screen display of words from the files, the acknowledgement must be made
- * on each screen display, e.g. in the form of a message at the foot of the screen
- * or page." A result row here is a reading, a set of senses and a part of speech —
- * JMdict fields, all of them, all carrying `edrdg-jmdict` provenance — so this
- * screen is a dictionary display in exactly that sense. It shipped without one:
- * `SeedCoverageDisclosure` renders only when *nothing* matched, which is the one
- * state where no licensed word is on screen. `SeedEntryDisclosure` now renders
- * whenever a result does, on the same terms as the word and kanji pages, and the
- * obligation is checked at the route level by `e2e/adv-claim-audit.spec.ts`
- * rather than left to whoever reads this comment.
+ * **The EDRDG acknowledgement belongs here too, and unconditionally.** §3 of the
+ * EDRDG licence statement is explicit: "If a WWW server is providing a dictionary
+ * function or an on-screen display of words from the files, the acknowledgement
+ * must be made on each screen display, e.g. in the form of a message at the foot
+ * of the screen or page." A result row here is a reading, a set of senses and a
+ * part of speech — JMdict fields, all of them — so this screen is a dictionary
+ * display in exactly that sense.
+ *
+ * The notice has been gated twice and both gates were too narrow. It first
+ * rendered on the word and kanji pages only. Then it rendered here whenever a
+ * search result did — and that still missed the **kept-threads list**, which is
+ * the part of this screen that survives the query being cleared and the page
+ * being reloaded. `capturedText` below is `topLexeme?.headword`, so keeping an
+ * imported result stores the *JMdict headword* as the thread's `displayText`:
+ * search じかん, press Keep, reload, and the front door renders 時間 — a string
+ * that came from the files and never from anything the learner typed.
+ *
+ * So there is no condition on it now. The gate is the artefact that keeps going
+ * stale, and the screens that never had one never had the bug.
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -529,12 +536,24 @@ export function CaptureScreen({
       )}
 
       {/*
-        At the foot of the results, which is where §3 of the EDRDG statement asks
-        for it. Rendered on the same condition as the results themselves: no
-        licensed word on screen, no acknowledgement to make — the empty state
-        already says the seed is not a dictionary.
+        Unconditional, which is the third and final version of this line.
+
+        It was first wired to the word and kanji pages only; then to the search
+        results here, on the reasoning that "no licensed word on screen, no
+        acknowledgement to make". That reasoning was wrong, and the way it was
+        wrong is the reason there is no condition here any more: the search
+        results are not the only licensed content on this screen. The kept-threads
+        list below outlives the query, and a thread's `displayText` is the
+        matched entry's headword — a JMdict field in the imported tier. Keep 時間,
+        がっこう and ともだち, clear the box, reload: the front door renders three
+        JMdict headwords, and under the old condition it rendered them with no
+        EDRDG string anywhere in the DOM.
+
+        A condition here has now gone stale three times, each time because the
+        set of licensed things on screen grew and the predicate did not. The
+        other seven screens carry the notice unconditionally; so does this one.
       */}
-      {state.kind === 'ready' && topResult !== undefined ? <SeedEntryDisclosure /> : null}
+      <SeedEntryDisclosure />
 
       <Hairline />
 

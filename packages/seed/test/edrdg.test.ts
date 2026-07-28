@@ -282,3 +282,80 @@ describe('a source with no verbatim licence text on file fails the suite', () =>
     ).toBeNull();
   });
 });
+
+/**
+ * The on-screen obligation is derived over **both** tiers.
+ *
+ * The fixture tier's `headword` is `bunki-selection` — WP-04 chose which sixteen
+ * words to hand-write records for — while the imported tier's `headword` is
+ * `edrdg-jmdict`, straight out of the files. A derivation that walked the
+ * fixture tier alone therefore concluded that a headword owes nobody an
+ * acknowledgement, and `/` shipped a kept-threads list rendering JMdict
+ * headwords with no EDRDG string anywhere in the DOM.
+ *
+ * These assertions are about the *shape of the derivation*, not about today's
+ * field names: each one names a field, the tier it comes from, and the licensor
+ * whose acknowledgement it drags in.
+ */
+describe('the on-screen attribution obligation covers both tiers', () => {
+  it('includes fields only the imported tier sources from a licensor', async () => {
+    const {
+      FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION,
+      importedDictionary,
+      allSeedRecords: fixture,
+    } = await import('../src/index.ts');
+
+    // The precondition, asserted rather than assumed: in the fixture tier this
+    // field is *not* licensor-sourced, so the fixture tier alone cannot produce
+    // it and a passing assertion below can only come from the imported tier.
+    for (const record of fixture) {
+      const perField = record.provenance as Readonly<Record<string, ProvenanceRecord>>;
+      const headword = perField['headword'];
+      if (headword === undefined) continue;
+      expect(headword.source).not.toMatch(/EDRDG/);
+    }
+    expect(importedDictionary.provenance.lexemes['headword']?.source).toBe('JMdict (EDRDG)');
+
+    expect(FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION).toContain('headword');
+  });
+
+  it('includes the Tatoeba sentence halves and their per-half contributor fields', async () => {
+    const { FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION } = await import('../src/index.ts');
+    for (const field of ['japanese', 'english', 'japaneseContributor', 'englishContributor']) {
+      expect(FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION, field).toContain(field);
+    }
+  });
+
+  it('includes the KANJIDIC2 fields the older Seed shapes have no room for', async () => {
+    const { FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION } = await import('../src/index.ts');
+    for (const field of ['grade', 'frequency', 'jlpt', 'priorityTags']) {
+      expect(FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION, field).toContain(field);
+    }
+  });
+
+  it('splits dotted keys, so no field name carries a regexp metacharacter', async () => {
+    const { FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION, importedDictionary } =
+      await import('../src/index.ts');
+    // The emitted file really does write dotted keys — otherwise this guards
+    // nothing.
+    expect(Object.keys(importedDictionary.provenance.sentences)).toContain(
+      'tatoeba.japaneseContributor',
+    );
+    for (const field of FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION) {
+      expect(field, `${field} would be spliced into a regexp as a wildcard`).not.toMatch(
+        /[.*+?^${}()|[\]\\]/,
+      );
+    }
+    expect(FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION).toContain('tatoeba');
+  });
+
+  it('still excludes what this project selected or computed itself', async () => {
+    const { FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION } = await import('../src/index.ts');
+    // `explanation` is the grammar notes; `codepoint` is computed from the
+    // character. Neither is a licensor's content, and a list that swept in
+    // everything would make the obligation meaningless rather than safe.
+    for (const field of ['explanation', 'codepoint', 'titleTranslation']) {
+      expect(FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION, field).not.toContain(field);
+    }
+  });
+});
