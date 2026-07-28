@@ -4674,3 +4674,145 @@ Same as the lane's: open a **draft** PR from
 `agent/bunki-phase0-closed-loop-wp10-export` into
 `agent/bunki-phase0-integration` and have a human review it. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — B3 (seed data owner): real licensed dictionary data, reconnaissance and licence acquisition
+
+Branch `agent/bunki-real-dictionary`, cut from
+`origin/agent/bunki-codex-packet-and-dictionary`. Controller hash re-verified
+before any work began: `sha256sum` of every file in `docs/specs/` matches
+`BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`, including the controller
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`.
+
+### Why this round exists
+
+WP-04 shipped project-authored lexical entries labelled `bunki-editorial /
+review_status: unreviewed` because every EDRDG and Tatoeba host was refused by
+the egress proxy. That was correct: shipping EDRDG content whose attribution
+could only be written from memory is the contamination the licence discipline
+exists to prevent. This round re-runs the source pass now that a different set
+of hosts is reachable.
+
+### Reconnaissance — every host probed, with its status code
+
+Reproduced independently in this session with `curl -o /dev/null -w '%{http_code}'`.
+`000` means the proxy refused the CONNECT tunnel; `403` means the proxy answered
+and denied; `200`/`404` mean the host answered.
+
+| Status | URL | Verdict |
+| --- | --- | --- |
+| 000 | `https://www.edrdg.org/jmdict/edict_doc.html` | blocked — primary source still unreachable |
+| 000 | `https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz` | blocked |
+| 000 | `https://tatoeba.org/en/downloads` | blocked |
+| 000 | `https://downloads.tatoeba.org/exports/sentences.tar.bz2` | blocked |
+| 000 | `https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt` | blocked |
+| 000 | `https://cdn.jsdelivr.net/gh/KanjiVG/kanjivg@master/COPYING` | blocked |
+| 000 | `https://unpkg.com/browse/` | blocked |
+| 000 | `https://data.jsdelivr.com/v1/packages/gh/scriptin/jmdict-simplified` | blocked |
+| 000 | `https://huggingface.co/` | blocked |
+| 000 | `https://archive.org/` | blocked |
+| 000 | `https://gitee.com/` | blocked |
+| 000 | `https://raw.githack.com/KanjiVG/kanjivg/master/COPYING` | blocked |
+| 000 | `https://cdn.statically.io/gh/KanjiVG/kanjivg/master/COPYING` | blocked |
+| 000 | `https://nlp.stanford.edu/` | blocked |
+| 403 | `https://api.github.com/repos/scriptin/jmdict-simplified` | denied — no GitHub REST |
+| 403 | `https://codeload.github.com/KanjiVG/kanjivg/tar.gz/master` | denied — no tarballs |
+| 403 | `https://github.com/scriptin/jmdict-simplified/raw/master/LICENSE.txt` | denied |
+| 403 | `https://sourceforge.net/` | denied |
+| 200 | `https://raw.githubusercontent.com/...` | **reachable** — arbitrary raw files, public repos |
+| 404 | `https://objects.githubusercontent.com/` | host answers, but release-asset URLs are unobtainable without the blocked API |
+| 404 | `https://media.githubusercontent.com/media/...` | host answers; LFS pointer targets not needed |
+| 200 | `https://registry.npmjs.org/` (incl. `/-/v1/search`) | **reachable** |
+| 200 | `https://pypi.org/pypi/jamdict-data/json`, `https://files.pythonhosted.org/` | **reachable** |
+| 301/200 | `https://gitlab.com/`, `https://bitbucket.org/` | reachable, nothing needed there |
+
+Net effect: EDRDG's and Tatoeba's own hosts remain blocked, so the WP-04
+verdict on *primary-source* retrieval is unchanged. What is new is that two
+package registries and `raw.githubusercontent.com` are reachable, which makes a
+**pinned, hash-verified redistribution** obtainable — data and the licensor's
+own licence statement together, from one artefact.
+
+### Sources considered and rejected
+
+- **`kotobako-data` (npm, 26.7.19)** — matched the search for
+  "JMdict/KANJIDIC2/KanjiVG-derived; CC BY-SA". Rejected. Published 2026-07-19
+  by a single unaffiliated account, no README (`"readme": "ERROR: No README data
+  found!"`), no repository field, no upstream licence file in the package
+  (`fileCount: 2`), and a description stating it exists "solely so the claude.ai
+  artifact can auto-seed". It is an anonymous repackaging with no attribution
+  chain — precisely the unvetted mirror this project's rule against
+  "verified from a mirror" is written to exclude.
+- **`scriptin/jmdict-simplified`** — the best-known JMdict/KANJIDIC2 JSON
+  conversion. Its `LICENSE.txt` *is* reachable (200, 20,131 bytes, CC BY-SA 4.0
+  legal code) but its data ships only as GitHub release assets, which require
+  `api.github.com` or `github.com` — both denied. Licence obtainable, data not.
+- **Wiktionary / CHISE / Kanjium** — not probed for data. REQ-SRC-03 places them
+  in a Phase-3 vetting queue; they are not selectable canonical sources.
+
+### Source selected: `jamdict-data` 1.5 (PyPI), the jamdict project's own data package
+
+`jamdict-data` is the precompiled database published by the `jamdict` project
+(github.com/neocl/jamdict, github.com/neocl/jamdict_data), authored by Le Tuan
+Anh. It is the project's own official distribution channel, not a third-party
+scrape, and it carries EDRDG's licence statement inside the artefact next to the
+data it governs.
+
+| | |
+| --- | --- |
+| Artefact | `jamdict_data-1.5.tar.gz` |
+| URL | `https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz` |
+| Bytes | 53,940,912 |
+| Retrieved | 2026-07-28 |
+| `jamdict.db.xz` sha256 | `124577d8f2c44841f1f4ec43ac5413be81770ce3ed60ea917bae6c5944d88d39` |
+| Contents | JMdict 191,541 entries; KANJIDIC2 13,108 characters; JMnedict; KRADFILE |
+| `meta` table | `jmdict.version=1.08`, `kanjidic2.version=1.6`, `kanjidic2.date=April 2008`, `jmnedict.date=2020-05-29` |
+| Compiled | 2021-04-17 (package metadata) |
+
+### Licence acquisition — the rule that governs this round
+
+The WP-04 rule stands: *a redistribution of a dataset is not that dataset's
+licensor*, and there is no "verified from a mirror" state. This round does not
+break that rule; it records a precisely narrower claim, and the difference is
+stated in `LICENSES.md` rather than blurred.
+
+The EDRDG **General Dictionary Licence Statement** was obtained verbatim, and
+the same bytes were retrieved twice by independent paths:
+
+| Path | sha256 |
+| --- | --- |
+| bundled inside the downloaded sdist at `jamdict_data-1.5/jamdict_data/LICENSE.md` | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` |
+| `https://raw.githubusercontent.com/neocl/jamdict_data/main/jamdict_data/LICENSE.md` | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` |
+
+`cmp` reports the two files identical. The statement names the covered files
+(JMDICT, KANJIDIC2, KRADFILE/RADKFILE among them), asserts copyright for James
+William BREEN and the EDRDG, and grants CC BY-SA **3.0** — so 3.0, not 4.0, is
+the licence recorded against the data actually shipped, because 3.0 is what the
+statement travelling with these bytes says. `www.edrdg.org` is still blocked, so
+whether EDRDG has since restated the licence at a different version is
+**unverified and is recorded as unverified**, not guessed.
+
+Licence texts now stored verbatim in `packages/seed/licenses/`:
+
+| File | Bytes | sha256 | Retrieved from |
+| --- | --- | --- | --- |
+| `EDRDG-licence-statement.md` | 9,416 | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` | the pinned sdist + `raw.githubusercontent.com/neocl/jamdict_data` |
+| `CC-BY-SA-3.0.txt` | 22,240 | `3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f` | `raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-3.0.txt` |
+| `KanjiVG-COPYING.txt` | 20,595 | `d255e07978fd16ddfec38bc59dc9d857b885dd44ddbf4e79baf207d30746bdcc` | unchanged from WP-04 |
+
+`creativecommons.org` is blocked, so the CC BY-SA 3.0 legal code comes from the
+SPDX license list (Linux Foundation), which is the canonical machine-readable
+publication of licence texts and is named as such rather than passed off as
+creativecommons.org.
+
+### Tatoeba remains DEFERRED, and the rule is why
+
+Example sentences are the one level of the operator's request this round cannot
+satisfy. Both Tatoeba hosts are blocked; the shipped `jamdict.db` contains no
+examples table (JMdict, JMnedict, KANJIDIC2, KRADFILE only); and SPDX does not
+carry `CC-BY-2.0-FR` at all — `text/CC-BY-2.0-FR.txt` is 404 and the licence
+list index contains only `CC-BY-2.0`. So neither the sentence data nor its
+licence text is obtainable, and CC BY 2.0 FR additionally requires per-sentence
+contributor attribution that no reachable artefact carries. Under the rule
+"licence first, data second", no Tatoeba content is shipped. The sentences stay
+project-authored and stay labelled as project-authored.
