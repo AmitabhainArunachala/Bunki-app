@@ -182,7 +182,30 @@ Campaign E adds surfaces. It does not get to weaken what is underneath:
   §4.3 boundary **enforced by a test**: the guide can propose and narrate, and
   cannot mint evidence, write a memory state, or override the scheduler
 
-**Wave C — integration and polish**: one coherent app, navigation that makes the
+**Wave C — the fractal dive** (added 2026-07-28; full brief in
+`docs/design/BUNKI_THE_FRACTAL_DIVE_2026-07-28.md`)
+
+Scale becomes a navigable axis: 画 → 部首 → 漢字 → 熟語 → collocation → sentence,
+inward to constituents and outward to participations, one gesture at every level.
+The map is extent; the dive is depth; same surface, two gestures.
+
+- C1: the scale-ladder projection in the domain — six levels, pure, tested,
+  `unknown` where the data is thin. No UI.
+- C2: the dive surface — continuous zoom, level-of-detail culling, the
+  reduced-motion stepped variant, always-visible position, one-gesture exit.
+  **Flight only, no probes**, so the exposure/retrieval boundary is proven before
+  anything can grade.
+- C3: constellation review and the flight review, both through the evidence gate,
+  with the boundary test written first.
+- C4: the 案内人 in the dive — depth awareness, the way back, and naming the
+  surface-bright/interior-dark diagnosis when it sees one.
+
+The hard boundary, restated because it is the one that matters: **rapid clicking
+through the structure is exposure, and exposure is never retrieval.** Flight
+navigates and may log exposure; a declared probe grades through the evidence
+gate. A test proves the split — a comment asserting it is not enough.
+
+**Wave D — integration and polish**: one coherent app, navigation that makes the
 whole thing feel woven, performance, accessibility, and an operator walkthrough.
 
 Every lane is shadow-verified as in Campaign C1, and every verifier drives a
