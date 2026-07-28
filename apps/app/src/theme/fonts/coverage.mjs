@@ -42,11 +42,12 @@ export const COVERAGE_RANGES = Object.freeze([
   // General punctuation: en/em dash, curly quotes, ellipsis, bullet, prime.
   [0x2010, 0x2027],
   [0x2030, 0x203a],
-  // Arrows (→ is the branch/derivation glyph) and the check mark.
+  // Arrows (→ is the branch/derivation glyph).
   [0x2190, 0x2193],
-  [0x2713, 0x2714],
   // Geometric marks used by the frontier/uncertainty vocabulary.
   [0x25a0, 0x25cf],
+  // The check mark.
+  [0x2713, 0x2714],
   // Kangxi radicals and their CJK-radical supplements (⻌, ⻏, ⺡ …).
   [0x2e80, 0x2ef3],
   [0x2f00, 0x2fd5],
@@ -64,9 +65,18 @@ export const COVERAGE_RANGES = Object.freeze([
  * pulling in wholesale.
  */
 export const COVERAGE_EXTRAS = Object.freeze([
-  '─', // ─ box drawing, used as a hairline glyph in the vertical specimen
-  '〓', // 〓
-  '一', // 一 — also jōyō, listed so the file is legible without the list
+  '─', // box drawing, used as a hairline glyph in the vertical specimen
+  '〓', // the "geta" mark, which is what a missing glyph is *supposed* to look like
+  '一', // also jōyō; listed so the file stays legible without opening the list
+  // Kanji components that are not themselves jōyō characters. Decomposition is
+  // a first-class fact in this product (frozen spec §2.1: which part carries
+  // the sound and which the meaning), so a component page renders characters no
+  // curriculum list contains. These three are the ones the shipped seed uses;
+  // `test/theme-fonts.test.ts` checks the seed against the whole contract, so a
+  // fourth arriving is a failing test rather than a mismatched glyph on a page.
+  '灬', // the "fire" component in its bottom form
+  '卜', // divination; a phonetic and semantic component
+  '咅', // a phonetic component
 ]);
 
 /** Expand the declared ranges and extras into a sorted, de-duplicated array. */

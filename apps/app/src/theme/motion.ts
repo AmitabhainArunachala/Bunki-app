@@ -78,6 +78,17 @@ export const EASING = {
 export type EasingName = keyof typeof EASING;
 
 /**
+ * The lowest opacity an unlit branch may be dimmed to.
+ *
+ * A token rather than a component constant because it is a promise about the
+ * product: the frozen spec §3 keeps untaken branches on the map as *dimmed
+ * rails, revisitable*. Below this floor a rail has been deleted rather than
+ * dimmed, and a journey the learner did not take becomes a journey they cannot
+ * find. `test/theme-tokens.test.ts` holds the floor.
+ */
+export const MIN_UNLIT_OPACITY = 0.38;
+
+/**
  * The duration a component should actually use.
  *
  * One function, so "respect reduced motion" is a property of the token layer

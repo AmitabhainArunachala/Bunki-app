@@ -42,6 +42,7 @@ import {
 import {
   DURATION,
   EASING,
+  MIN_UNLIT_OPACITY,
   resolveDuration,
   strokeSequenceDuration,
   type DurationName,
@@ -71,6 +72,7 @@ export {
   LEADING,
   MEASURE,
   MIN_TOUCH_TARGET,
+  MIN_UNLIT_OPACITY,
   PALETTES,
   RADIUS,
   RECALL_BANDS,

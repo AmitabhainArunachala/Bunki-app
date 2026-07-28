@@ -33,6 +33,18 @@ export type Reach =
   /** Listed in the persistent navigation shell. */
   | { readonly kind: 'shell' }
   /**
+   * A development surface, reached by typing its URL.
+   *
+   * Campaign E adds the design specimen (`/style-guide`), which is a real route
+   * and so must be on this map — a route file absent from the table fails the
+   * reachability test, and that rule is worth more than the convenience of an
+   * exemption. But it is not a place a learner goes, so it is not in the shell
+   * and it is not counted among the screens controller §10 names. `specimen`
+   * is that distinction, stated rather than implied: `LEARNER_DESTINATIONS`
+   * excludes it, and the reachability test asserts it stays out of the shell.
+   */
+  | { readonly kind: 'specimen' }
+  /**
    * Reached from another screen, which must contain the link.
    *
    * `from` is a path under `apps/app/`, and `via` names the callback prop or the
@@ -128,7 +140,31 @@ export const DESTINATIONS: readonly Destination[] = [
     blurb: 'What this build stores, and where it is honest about it.',
     reach: { kind: 'shell' },
   },
+  {
+    href: '/style-guide',
+    routeFile: 'style-guide.tsx',
+    screen: 'ui/style-guide/style-guide-page.tsx',
+    label: 'Design specimen',
+    blurb: 'Every token and component of the experience layer, in real Japanese.',
+    reach: { kind: 'specimen' },
+  },
 ];
+
+/**
+ * The screens a learner has, as controller §10 lists them.
+ *
+ * Derived by subtraction rather than maintained as a second list, so a
+ * destination cannot be a learner screen in one place and a development surface
+ * in another.
+ */
+export const LEARNER_DESTINATIONS: readonly Destination[] = DESTINATIONS.filter(
+  (destination) => destination.reach.kind !== 'specimen',
+);
+
+/** Development surfaces: real routes, no door in the shell. */
+export const SPECIMEN_DESTINATIONS: readonly Destination[] = DESTINATIONS.filter(
+  (destination) => destination.reach.kind === 'specimen',
+);
 
 /**
  * The four places the shell offers.
