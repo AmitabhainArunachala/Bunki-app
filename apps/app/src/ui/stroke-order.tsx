@@ -51,7 +51,7 @@ import Svg, { G, Line, Path, Rect } from 'react-native-svg';
 import { strokeAccessibilityLabel, type KanjiStrokeSet } from '../data/kanjivg.ts';
 import { InkDraw } from './motion.tsx';
 import { AppButton } from './primitives.tsx';
-import { SPACE, TYPE } from './theme.ts';
+import { RADIUS, SPACE, TYPE } from './theme.ts';
 import { useTheme } from './theme-context.tsx';
 
 /** Milliseconds between strokes while playing. Slow enough to follow a brush. */
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   canvas: {
     aspectRatio: 1,
-    borderRadius: 4,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
     overflow: 'hidden',
   },

@@ -90,7 +90,10 @@ export function SeedEntryDisclosure({
       <Text
         style={[
           styles.disclosureText,
-          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+          // `inkFaint`, the register `AttributionFooter` and `ProvenanceLine`
+          // already use for a source line. One notice with its own colour is
+          // one notice that reads as louder than the others.
+          { color: theme.color.inkFaint, fontFamily: theme.font.sans },
         ]}
       >
         {SEED_ENTRY_DISCLOSURE}

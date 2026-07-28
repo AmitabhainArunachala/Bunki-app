@@ -26,7 +26,7 @@ export default function JourneyRoute(): ReactNode {
       <RouteTitle href="/journey" />
       <JourneyScreen
         context={context}
-        onBack={() => router.push('/')}
+        onBack={() => router.replace('/')}
         onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
       />
     </>

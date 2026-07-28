@@ -9821,3 +9821,259 @@ Three, each restored afterwards, each the verifier's own reproduction:
 - **That the pre-existing `screen-contract.test.ts` timeout is fixed.** It is
   not; it did not recur in this round's runs, and it remains as recorded in the
   build appendix above.
+
+---
+
+# Appendix — Wave D, the weave (`agent/bunki-e-weave`, 2026-07-28)
+
+Nine Campaign E lanes landed green and could not see each other. This round is
+the thing none of them could do: make it one app rather than nine screens.
+Branch `agent/bunki-e-weave`, from `agent/bunki-e-integration`.
+
+## 0. The app was broken on a phone, and nothing in the suite could tell
+
+Measured in Chromium at 390 × 844 on the merged branch, before any change:
+
+| Route | scrollWidth | clientWidth | overflow |
+| ----- | ----------- | ----------- | -------- |
+| `/` `/map` `/guide` `/journey` `/read` `/session` `/evidence` `/debug` `/canvas` `/repair` `/style-guide` | 699 | 390 | **+309 px** |
+| the same eleven, at 360 | 699 | 360 | **+339 px** |
+
+Every route. The cause was the navigation shell: seven destinations in one
+wrapping row whose children could not shrink, so the row measured 679 pt and
+the page inherited it. `flexWrap: 'wrap'` was set and did nothing, because the
+row had no width to wrap inside.
+
+Sixty-four end-to-end cases ran at 1100 × 1400, where 699 fits. Every unit test
+in the project reads source rather than layout. **A defect invisible at the
+viewport the tests use is a defect the tests cannot have** — which is the whole
+reason seven lanes could ship it.
+
+After: **390/390 and 360/360 on all eleven routes**, measured twice — once by
+`e2e/viewport-overflow.spec.ts` and once by an independent script driving the
+same export.
+
+## 1. The information architecture
+
+`src/ui/navigation.ts` was a list. Three lanes each appended one entry to it,
+each with a defensible argument, none able to see the other two; the shell
+reached seven and the reachability test carried the open item in a comment. It
+is an architecture now, and the argument is written into the module at length —
+a nav file with no argument in it gets re-litigated by the next lane.
+
+**The map is home.** `/` renders it; capture moved to `/capture`. The reason is
+the round-2 research's own: the map is the only surface that answers *"what have
+I built"* rather than *"what do I owe"*, and a learner who opens the app to a
+search box is asked to do work before being shown anything they own.
+
+**Five destinations, grouped by verb rather than by data type:**
+
+| 地図 Map | 稽古 Session | 記録 Evidence | 分岐 Journeys | 読む Reading |
+| -------- | ------------ | ------------- | ------------- | ------------ |
+
+A data grouping — Words, Kanji, Sentences, Evidence, Settings — is renzo's
+failure mode (frozen §10.1, "a database rendered as table views") and is exactly
+how the shell grew to seven, because every new data type earned a tab. Grouping
+by verb is what stops the count from growing every time a lane lands.
+
+Three things left the shell as a consequence: the canvas and the repair branch
+are *steps of a sitting*; About & sources is *part of the record*, one tap from
+記録, which is the "menu" the EDRDG licence statement §3 clause 2 asks for.
+
+**Capture is an action, not a destination.** The shell offers it from every
+surface; `?from=` records the surface it was opened from; `router.back()` hands
+the learner back. It is a route rather than an in-place modal because a modal
+over a live surface leaves every control behind it focusable, and making them
+not-focusable means `aria-hidden` over a subtree containing the tab bar — the
+defect `aria-hidden-focus` is named for.
+
+**The 案内人 is a presence, not a tab and not a bubble.** One quiet rail on every
+surface says where the guide is standing *relative to that surface*, and is the
+door to its own screen. A tab makes the guide a room you leave; a floating chat
+bubble is the Todaii "Tomo Chat" placement the frozen spec rejects by name
+(§10.4). The rail carries no learner state — every stance is a fact about the
+surface, never about the person — and the guide's real position on a real road
+stays on the guide's own screen where it can be inspected.
+
+**Japanese names in mincho beside the English**, on the tabs and on every page
+title. Typography-first applies to the chrome: a navigation bar in English only
+teaches that Japanese is the content and English is the frame.
+
+The count is pinned as an **equality** in `test/navigation-reachability.test.ts`,
+so a sixth entry is a visible edit that has to answer §3 of the module — which
+verb is it, and which existing tab is it not a step of. That is the whole
+mechanism, and it is deliberately annoying.
+
+## 2. The empty state the operator would have hit first
+
+`/map` in a fresh browser opened on **"0 of 0 contracts have evidence behind
+them"** — correct arithmetic, largest type on the page, on the app's emotional
+centre.
+
+Nothing was seeded and nothing claims evidence it does not have. The language's
+own structure is real without any learner history, so the map opens on the
+country:
+
+> 3,016 words and 1,241 characters, joined by 18,129 connections the dictionary
+> holds. · 6 named roads, 886 stations in all: Grade 1 kanji (77) · Grade 2
+> (147) · Grade 3 (176) · Grade 4 (167) · Grade 5 (174) · Grade 6 (145). ·
+> 古道 300 · 街道 0 · 鉄道 0 · era not known 2,716
+
+`src/ui/map/map-territory.ts` imports nothing that can carry learner state, and
+`test/map-territory.test.ts` asserts that from the **import list** rather than
+from a caption. Both panels state in words which marks are which
+(`TERRITORY_RULE`, `LEARNER_RULE`), because the risk of a rich day-one map is
+that the richness reads as the learner's. On a first open the learner panel says
+what is true and what makes the first mark, rather than `0 of 0`.
+
+The whole-corpus era census moved out from behind its button because it was
+measured rather than assumed expensive: 28 ms for 3,016 lexemes, and it is
+memoised at module scope so returning to the front door costs nothing.
+
+## 3. The two DoD clauses, walked
+
+**Cross-surface trace** — `e2e/cross-surface-trace.spec.ts` drives
+`conversation → thread → kanji page → review → canvas → export` by clicking, in
+one browser context, on the exported bundle, asserting at each stop that the
+thing on screen is the same encounter. The export replays 8 events over the log
+the walk wrote, read back independently from the durable snapshot.
+
+The chain used to break at **conversation → thread**: the guide's road opens a
+word page, and a word page with no thread said *"Keep it from the capture screen
+to start a thread."* Closed properly rather than stubbed — the word page has a
+Keep of its own now, running the same `capture` + `promote → keep` pair the
+capture screen runs, through the same store, with a source record naming the
+surface it happened on. `word-depth.test.ts`'s command allowlist is an equality
+and was widened deliberately, with the reason.
+
+**Recursive exploration** — `e2e/recursive-exploration.spec.ts` walks 14 hops
+from one seed word across surfaces, choosing each hop from the links the page
+itself offers, and asserts at every landing that it landed on a named screen
+with a subject and no error panel, and that the screen offers at least one way
+onward. Plus: a route hop returns to the exact address it was taken from, a dive
+hop returns to the exact centre `dive-back` was pressed from, `dive-surface`
+exits from any depth, and a negative probe on `/debug` proves the dead-end
+detector can still find one.
+
+Two things the walk taught, both recorded in the file: the app hops **two ways**
+(a route push and a dive re-centre in place), and a test that knew only routes
+called `kanji-component-刀` a dead end when the page was not dead — the walk was
+half-sighted. And `word-family-toggle` is a disclosure header, not a link;
+matching it as a hop invented a context-loss failure that was not in the app.
+
+## 4. Accessibility, measured where it was not being measured
+
+The axe sweep walked every route in both schemes — **settled**. That is where
+`aria-progressbar-name` hid for the whole of Phase 0, and it was found by
+accident. `adv-a11y-audit.spec.ts` now also sweeps every route **mid-load** in
+both schemes, using `?lag=` to hold the screens' own state machine open, and
+fails if fewer than three routes actually showed a loading panel. Both schemes
+clean.
+
+The sweep also found a **real defect this round introduced and then fixed**: the
+shell painted no background of its own, so the guide's rail sat on the
+document's default white and axe measured its text at **2.29:1 in the dark
+scheme on every route** — WCAG 1.4.3, serious. The shell paints its own paper
+now.
+
+The reading-order check was rewritten. It compared a scroll-corrected position
+inside the `ScrollView` against a viewport position for the tab bar outside it —
+two coordinate systems, one comparison — and reported a jump that was not one.
+It compares **document order** now, which is what WCAG 2.4.3 is about and is
+invariant to scrolling and to a bar that is visually below what it follows in
+the tree.
+
+## 5. Phone numbers, and reduced motion
+
+`e2e/phone-budget.spec.ts`, **Chromium on a Linux build machine at 390 × 844,
+full 3,016-lexeme tier**. Not a device; quoting these as iPhone figures would be
+the claim this project has been burned by before.
+
+| Surface | cold to interactive | interaction |
+| ------- | ------------------- | ----------- |
+| map (`/`) | 1436 / 1530 ms across runs | lens change 141–148 ms · scrubber step 89–94 ms |
+| dive (`/kanji/分`) | 1395 / 1602 ms | zoom in 335–442 ms · back to surface 133–154 ms |
+
+"Interactive" for the map is the country panel populated, which means the atlas
+is built *and* the whole-corpus era census has run.
+
+**Reduced motion stops rather than shortens** — and the first instrument was
+wrong. The check was written against `document.getAnimations()`. Its own
+negative probe caught it: with motion *allowed*, on the dive, `getAnimations()`
+returned nothing, because React Native's `Animated` on web drives inline styles
+from `requestAnimationFrame` and authors no Web Animations object. Every
+reduced-motion assertion written on it would have been green while measuring
+nothing. It samples the dive canvas's computed `transform` and `opacity` over
+900 ms of frames instead: under `reduce`, exactly **one** distinct value —
+landed, stepped, not flying. With motion allowed, more than one. A *shortened*
+animation fails the first assertion, which is the distinction that was asked
+for.
+
+## 6. One visual register
+
+- The EDRDG acknowledgement rendered as a boxed vermilion block **above** the
+  content of eight screens; at 390 px it filled the top 700 px of the map, in
+  the one accent colour reserved for "where you are". Every word still renders,
+  unfolded and visible — it is small print under a hairline at the foot now, in
+  the same `inkFaint` register as every other provenance line, through a named
+  `notice` slot on `ScreenShell` so no screen can put it back at the top by
+  accident. `test/edrdg-acknowledgement.test.ts` and both e2e cases still pass.
+- Japanese page titles in mincho above the English on every tabbed screen.
+- `borderRadius` literals (8, 6, 4) in five files replaced with `RADIUS.md` /
+  `RADIUS.sm`. A design system with a radius token and five screens that do not
+  use it is five screens drifting.
+- The About screen's subtitle described the diagnostic buffer while the page was
+  named for the licence clause it satisfies; the runtime label moved beside the
+  durations it is about.
+- "Back to search" on two screens became "Back to 地図 Map", because search is
+  no longer a place.
+
+## 7. The full check set, on the pushed tree
+
+| Check | Result |
+| ----- | ------ |
+| `npm ci` | clean |
+| `npm run lint` | exit 0, silent |
+| `npm run format:check` | all matched files formatted |
+| `npm run typecheck` | exit 0, zero errors, all six workspaces |
+| `npm run test` | **3461 passed**, 1 skipped (3432 before this round) |
+| `npm run test:replay` | 47 passed |
+| `npm run verify:export` | 14 passed |
+| `npm run test:e2e:build` | 15 static routes exported |
+| `npm run test:e2e` | **80 passed**, exit 0 (64 before this round) |
+
+New e2e files: `viewport-overflow.spec.ts` (3), `cross-surface-trace.spec.ts`
+(2), `recursive-exploration.spec.ts` (4), `phone-budget.spec.ts` (4), plus two
+loading-state axe sweeps and one capture-action case added to existing files.
+New unit file: `test/map-territory.test.ts` (12).
+
+## 8. What this round does **not** claim
+
+- **That any of it ran on a phone.** Chromium on Linux, at a phone's CSS width.
+  No iOS, no Safari, no Firefox, no device, no screen reader. The reduced-motion
+  result is Chromium's emulated `prefers-reduced-motion`, not an operating
+  system setting.
+- **That the information architecture is right.** It is *argued*, in the module,
+  in prose a reader can disagree with. Five is a reading of the evidence, not a
+  proof. The operator may want 読む and 稽古 merged, or Journeys folded into the
+  session; the equality assertion is designed to make that a conversation rather
+  than a merge conflict.
+- **That the map is now emotionally compelling.** It is *honest* and it is no
+  longer empty: it shows the country before the learner has walked any of it.
+  Whether it produces the feeling the operator asked for is a question for the
+  operator, and the era census over this dictionary is 300 on 古道 and 2,716
+  not datable — which is the data being thin, said out loud, rather than a
+  design that would look better with better data.
+- **That the guide walks with you in any deep sense.** The rail states a stance
+  about the *surface*. It is a presence, not a companion that knows what you are
+  doing, and the difference is real.
+- **That the dive's L0/L4/L5 levels are populated.** The scale ladder's stroke,
+  collocation and sentence levels remain as the fractal-dive document's §8.5
+  risk described them.
+- **That a whole-corpus plot of learner state exists.** It never did — the
+  "whole state" view was always a count, and it is now on the front door as a
+  count of *the language*. A scatter of memory states over 9,245 nodes is
+  unbuilt, deliberately (REQ-UI-07).
+- **That `stroke-brush.spec.ts` is free of timing flake.** It failed once under
+  full parallel load and passed in isolation and in the final full run. It is a
+  timing test on a shared runner; the flake is recorded rather than papered over.

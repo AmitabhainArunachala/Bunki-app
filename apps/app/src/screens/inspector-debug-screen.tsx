@@ -71,7 +71,7 @@ import { SeedEntryDisclosure, SourcesSection } from '../ui/notices.tsx';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
-import { SPACE, TYPE } from '../ui/theme.ts';
+import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 
 /**
@@ -165,12 +165,20 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
 
   return (
     <ScreenShell
-      subtitle={RUNTIME_LABEL}
+      /*
+        The subtitle used to be `RUNTIME_LABEL` — "elapsed milliseconds measured
+        on whatever runtime you are reading this on" — which was the right line
+        when this screen was called Diagnostics and the buffer was its subject.
+        Under the name the EDRDG licence's clause 2 asks for, it read as a
+        non-sequitur. The runtime label still appears, beside the durations it
+        is about.
+      */
+      subtitle="Every source this build uses, the licence each is used under, and what this build keeps on your device."
       testID="screen-inspector-debug"
       title="About & sources"
       titleJa="典拠"
     >
-      <Section testID="debug-privacy" title="What this buffer can hold">
+      <Section note={RUNTIME_LABEL} testID="debug-privacy" title="What this buffer can hold">
         <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
           {RING_PRIVACY_NOTE}
         </Text>
@@ -442,7 +450,7 @@ const styles = StyleSheet.create({
     lineHeight: TYPE.meta * 1.7,
   },
   codeBlock: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     maxHeight: 320,
     padding: SPACE.md,

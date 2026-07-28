@@ -75,7 +75,7 @@ import { searchFieldStyle } from '../ui/interactive-styles.ts';
 import { AppButton, ChipButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
-import { SPACE, TYPE } from '../ui/theme.ts';
+import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import {
   buildEvidenceChain,
@@ -865,7 +865,7 @@ const styles = StyleSheet.create({
     marginTop: SPACE.md,
   },
   disclosure: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     marginTop: SPACE.lg,
     minHeight: 44,
@@ -895,7 +895,7 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
   },
   badge: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     gap: SPACE.xs,
     padding: SPACE.md,

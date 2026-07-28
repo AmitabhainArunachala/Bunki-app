@@ -229,7 +229,11 @@ export function JourneyScreen({ context, onBack, onOpenWord }: JourneyScreenProp
         titleJa="分岐"
       >
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
-        <AppButton accessibilityHint="Returns to capture." label="Back" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -244,7 +248,11 @@ export function JourneyScreen({ context, onBack, onOpenWord }: JourneyScreenProp
         titleJa="分岐"
       >
         <EmptyPanel detail={state.detail} message={state.message} testID="journey-empty" />
-        <AppButton accessibilityHint="Returns to capture." label="Back" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -530,7 +538,11 @@ function JourneyBody({
         {SEPARATE_SITTINGS_NOT_AVAILABLE}
       </Text>
 
-      <AppButton accessibilityHint="Returns to capture." label="Back" onPress={onBack} />
+      <AppButton
+        accessibilityHint="Returns to the map."
+        label="Back to 地図 Map"
+        onPress={onBack}
+      />
     </ScreenShell>
   );
 }

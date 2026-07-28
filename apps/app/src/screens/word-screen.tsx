@@ -88,7 +88,7 @@ import {
 import { AppButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
-import { SPACE, TYPE } from '../ui/theme.ts';
+import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import { LensRow } from '../ui/lens.tsx';
 import { CAPABILITY_IDS, type CapabilityId } from '../ui/capability.ts';
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     gap: SPACE.lg,
   },
   card: {
-    borderRadius: 6,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     gap: SPACE.xs,
     padding: SPACE.md,

@@ -97,7 +97,7 @@ import { AppButton, ChipButton, Hairline, RowButton, Section } from '../ui/primi
 import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
-import { SPACE, TYPE } from '../ui/theme.ts';
+import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 
 /**
@@ -768,7 +768,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   answer: {
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
     gap: SPACE.md,
     padding: SPACE.lg,
@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
   },
   ack: {
     borderLeftWidth: 3,
-    borderRadius: 4,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
     gap: SPACE.xs,
     padding: SPACE.md,
