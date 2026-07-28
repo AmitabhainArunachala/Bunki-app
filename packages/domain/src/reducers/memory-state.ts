@@ -245,3 +245,56 @@ export function memoryStateReducer(
   if (state === null) return null;
   return applyAdmittedReview(state, review);
 }
+
+/**
+ * Retrievability: the pinned scheduler's own estimate of the probability that
+ * this contract would be recalled at `at` (Campaign E / REQ-UI-07).
+ *
+ * ## Why this function is here and not in `src/graph/`
+ *
+ * REQ-UI-07 asks the map to draw brightness from *real* FSRS retrievability, so
+ * the map needs R(t). R(t) is scheduler arithmetic — the same forgetting curve
+ * `next()` uses internally to pick an interval — and REQ-SCH-01 says there is
+ * one scheduler. `test/purity/no-ambient-nondeterminism.test.ts` pins that as a
+ * list: `ts-fsrs` may be imported by `fsrs-pin.ts` and by this file, and by
+ * nothing else in the kernel. A projection that re-derived the curve from
+ * `FSRS_WEIGHTS` would be a second implementation of the scheduler's core
+ * function, free to drift from it on the next pin bump, and every "honest
+ * brightness" claim in the product would then rest on a copy.
+ *
+ * So the wrapper grows one read-only accessor. Nothing above it changes: no
+ * existing export is touched, no state is written, and this function cannot
+ * schedule anything — it takes a state and an instant and returns a number.
+ *
+ * ## `null` is not zero
+ *
+ * `ts-fsrs` answers `0` for a `State.New` card, which is arithmetically
+ * defensible (no stability, no curve) and, rendered, is a lie: it draws a node
+ * the learner has never been tested on identically to one they have completely
+ * forgotten. Campaign E's map must keep those apart, so this returns `null` for
+ * a state with no review behind it. "Unknown" and "fragile" are different
+ * states; only `null` can carry the first one.
+ *
+ * Rounded to {@link FSRS_STATE_PRECISION} for the same reason stability is: the
+ * curve is `Math.pow`, ECMAScript does not require that to be bit-identical
+ * across engines, and a map whose colours differ between two runtimes would make
+ * a screenshot non-reproducible.
+ */
+export function memoryStateRetrievability(state: MemoryState, at: IsoInstant): number | null {
+  if (state.lastReviewedAt === null || state.reps === 0 || state.phase === 'new') return null;
+
+  const card = {
+    due: state.dueAt,
+    stability: state.stability,
+    difficulty: state.difficulty,
+    elapsed_days: 0,
+    scheduled_days: state.scheduledDays,
+    learning_steps: state.learningStep,
+    reps: state.reps,
+    lapses: state.lapses,
+    state: FSRS_STATE_BY_PHASE[state.phase],
+    last_review: state.lastReviewedAt,
+  };
+
+  return roundState(scheduler.get_retrievability(card, at, false));
+}

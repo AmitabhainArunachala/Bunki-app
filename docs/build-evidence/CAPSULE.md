@@ -4674,3 +4674,403 @@ Same as the lane's: open a **draft** PR from
 `agent/bunki-phase0-closed-loop-wp10-export` into
 `agent/bunki-phase0-integration` and have a human review it. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, wave A2 (Builder A2): domain-side projections for the map and journeys
+
+**Branch:** `agent/bunki-e-projections`, cut from `origin/agent/bunki-campaign-e`
+(`bc9ffe9`, which sits on the verified Phase-0 `main` at `cbb7f29`).
+**Surfaces written:** `packages/domain/src/graph/**`,
+`packages/domain/src/journey/**`, their tests, one additive function in the FSRS
+wrapper, two lines in the package barrel, and this appendix. Nothing in
+`apps/`, nothing in `src/evidence/`, nothing in `src/session/`.
+
+### What this lane is
+
+Wave A2 of Campaign E: the read-side projections the map (B1) and the journey
+screens (B5) need, built and tested before any pixel exists. Pure logic. The
+whole lane is a projection — it reads state and describes it, and there is no
+path from any of it into the ledger.
+
+### 1. The graph neighbourhood projection
+
+`src/graph/` is a query layer over caller-supplied nodes and typed edges. It is
+deliberately not a dictionary: `@bunki/domain` may not import `@bunki/seed`
+(ADR-001 boundary 1), so the 3,000-lexeme tier is an _input size_ here, not a
+dependency, and the projection does not have to be rebuilt when the tier grows.
+
+- `model.ts` — the frozen v1 §2.1 vocabulary as closed lists. Nodes: kanji,
+  component, lexeme, sense, reading, grammar construction, sentence, encounter.
+  Edges: `contains`, role-tagged `component_of`, `contrasts_with`,
+  `collocates_with`, `derives_from`, `has_reading`, `has_sense`, `realises`,
+  `appeared_in`. `reading` and `sense` are nodes rather than fields because a
+  reading family is one hop through a shared node instead of a scan.
+- `build.ts` — one indexing pass, adjacency pre-sorted by a total order, so
+  every later query is proportional to what it returns. A dangling edge, a
+  duplicate node id, and a self-edge are each excluded from the walk **and
+  reported** on `diagnostics`; a map that silently dropped an edge would make
+  the word look like it has no compounds.
+- `neighbourhood.ts` — bounded BFS parameterised by `depth`, `maxNodes` and
+  `perGroup`, plus the named groups a page renders. Every bound that actually
+  bit is recorded in `truncated` with the count it cut from. The depth record
+  fires only when the frontier really has unexplored neighbours — over-reporting
+  ("there is more here" wherever a walk ends) is the same dishonesty pointed the
+  other way, and the first draft did exactly that until a test caught it.
+
+### 2. The retrievability projection
+
+REQ-UI-07 lists four values and its main verb is "never collapse". So
+`LensProjection` carries four fields — `stabilityDays`, `retrievability`,
+`uncertainty`, `coverage` — plus `dueState`, `lapses` and the contributing
+contract ids, and **no fifth field summarises them**. `NodeRetrievability` has
+exactly three keys: `nodeId`, `at`, `lenses`.
+
+- Five lenses (reading, meaning, listening, production, writing), mapped to
+  scheduled skills as data. `writing` maps to nothing, because Phase 0 has no
+  handwriting contract skill and REQ-LM-02 surfaces handwriting only when
+  activated; every node reports it `unknown`, honestly, forever, until a
+  contract exists. `discrimination` is listed in
+  `SKILLS_OUTSIDE_THE_FIVE_LENSES` rather than folded into `meaning` — folding
+  it would make a contrast contract's evidence read as meaning evidence, which
+  is REQ-UI-07's forbidden collapse one level down.
+- **Unknown is not zero.** Three presence states: `unknown` (no contract),
+  `activated_untested` (contract, no admitted review), `attested`. The first two
+  carry `null` retrievability. `isFragile` is a _policy_, parameterised and
+  reversible, and it can never return true for an unmeasured lens whatever the
+  policy asks for.
+- Uncertainty is an interpretable band over the admitted review count, not a
+  fabricated confidence interval — REQ-LM-04 names cold-start false precision as
+  the risk, and a CI computed from two reviews is exactly that. The rule is
+  exported as a sentence a surface can show.
+- A lens with several contracts takes the **weakest** retrievability, never an
+  average: averaging would let a strong contract hide a forgotten one, and the
+  map's job is to show the frontier.
+- Time scrubber: `buildMemoryHistories` folds the reviews the gate already
+  admitted through the same `initialMemoryState` / `applyAdmittedReview` pair
+  replay uses, so the last version of every history equals replay's own answer
+  by construction rather than by coincidence. Frames are sorted and walked with
+  a per-contract cursor, so fourteen months is one linear pass.
+
+**One deviation from the declared surface, stated plainly.**
+`memoryStateRetrievability` was added to
+`packages/domain/src/reducers/memory-state.ts` rather than to `src/graph/`.
+REQ-SCH-01 has one scheduler, and
+`test/purity/no-ambient-nondeterminism.test.ts` pins `ts-fsrs` to exactly two
+importers; re-deriving the forgetting curve from `FSRS_WEIGHTS` inside a
+projection would have been a second implementation of the scheduler's core
+function, free to drift on the next pin bump, and every "honest brightness"
+claim would then have rested on a copy. The change is purely additive: no
+existing export was touched, no behaviour changed, and the new function writes
+nothing. It returns `null` — not `0` — for a never-reviewed card, which is where
+the unknown/fragile distinction is actually created.
+
+### 3. The journey compiler
+
+`src/journey/` implements REQ-JRN-01's rule in full. `src/session/repair.ts` is
+untouched and its suite still passes unchanged.
+
+All six branch families, carrying the requirement's own caveat that they are
+route families and **not** an ontology. The sixth — task misunderstanding — is
+the one most systems omit and the most common; without it a mis-tap becomes
+evidence of a meaning gap and the journey repairs something that was never
+broken.
+
+**"Do not infer a cause confidently from one stumble" is structural, not
+advisory.** Four properties carry it, because a rule in a comment is a rule
+until somebody is in a hurry:
+
+1. There is no `cause`, `diagnosis` or `confidence` field on the output type.
+2. Two or more paths are always offered whenever two are structurally available;
+   ranking decides the order, never the survivors.
+3. `selectBranch` refuses with `probe_required` on a first stumble, however
+   suggestive the observations are. An "unsure" answer counts as no answer.
+4. `recommended` is a lookup on the skill that stumbled, not an inference.
+
+Probes are one-question and declare what each answer raises; `selectProbes`
+picks at most two and **declines a probe that moves every offered family
+together**, because a question that cannot change the ranking is a survey. A
+probe answer carries `producesEvidence: false` and never reaches the scheduler.
+
+Rejoin is a contract-defined evidence criterion: named contracts, a count of
+qualifying _observations_ — admitted, unaided, a success, on a named contract,
+after entry — optionally across separate sittings. Fifty unaided-but-wrong
+attempts leave the branch open; one qualifying success closes it.
+
+**"Not a new backlog" is also structural.** Decay is a projection of the instant
+you ask about rather than a stored countdown, so nothing has to run to expire an
+opportunity. There is a hard cap of 8 on what is ever returned. A repeat stumble
+_refreshes_ an existing (contract, family) entry instead of stacking a row. And
+`session/plan.ts` neither imports nor can reach any of it — asserted directly by
+reading the file. 500 stumbles yield 8 active opportunities, and 0 after 200
+days with nothing pinned.
+
+The Phase-0 `JourneyCompiler` seam is **superseded, not implemented**: its
+signature returns branches straight from a stumble, with nowhere to put the
+probes, so implementing it would be the forbidden inference.
+`JOURNEY_COMPILER_SUPERSESSION` records that as data and files the seam-text
+update as a coordination request, on the COORD-B8-1 precedent that file already
+sets. No test of `repair.ts` was weakened.
+
+### 4. Tests
+
+172 new tests across ten files. The load-bearing ones:
+
+| Claim                                      | Where                                                                                                                                                            |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Projections are deterministic and pure     | reversed-input equality in `build.test.ts` / `neighbourhood.test.ts`; a source scan for ambient clock, randomness, `fetch`, timers                                  |
+| No single collapsed mastery number         | serialisation check in `retrievability.test.ts` **and** an identifier scan over `src/graph` + `src/journey` in `no-collapsed-scalar.test.ts`                        |
+| Unknown vs fragile are distinguishable     | `presence`, `null` vs number, and `isFragile` refusing an unmeasured lens                                                                                          |
+| The compiler never fabricates a cause      | five separate attempts to make it, in `compiler.test.ts`                                                                                                           |
+| Rejoin is never a step count               | 50 attempts leave it open; one success closes it                                                                                                                   |
+| Performance over the full dictionary tier  | `dictionary-tier-performance.test.ts`: index build, 1000 bounded queries, a whole-map projection of 3,000 nodes, and a **scaling** assertion that query cost does not grow with graph size |
+
+The scaling assertion is the real claim; the wall-clock ceilings are generous on
+purpose, because a budget tight enough to be interesting on this machine is a
+flake on a shared runner.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| `npm ci` (own worktree, no inherited modules)   | clean install, exit 0                                 |
+| `npm run lint`                                  | pass, no output                                       |
+| `npm run format:check`                          | pass — "All matched files use Prettier code style!"    |
+| `npm run typecheck`                             | pass, root + 6 workspaces                             |
+| `npm run test`                                  | **1589 passed**, 96 files (was 1417 / 86 at branch point) |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                                    |
+| `npm run verify:export` (T-14)                  | 14 passed, 1 file                                     |
+| `cd apps/app && npx expo export --platform web` | pass — 13 static routes                               |
+| `npm run test:e2e`                              | **38 passed**, exit 0                                 |
+
+The two `✘` lines in the e2e output are the pre-existing `test.fail()` expected
+failures in `adv-known-defects.spec.ts`, counted in the 38 exactly as the WP-10
+appendix above records. Neither is touched by this lane.
+
+### What this lane does **not** claim
+
+- **That the graph is populated.** This is a query layer over a source the
+  caller supplies. Nothing here builds the Atlas from `@bunki/seed`, and the
+  3,000-lexeme figure in the performance suite is a synthetic tier of the right
+  shape, not the real dictionary.
+- **That the uncertainty bands are calibrated.** They are an interpretable
+  counting rule, chosen because REQ-LM-04 asks for one and because a fabricated
+  interval would be worse. Nobody has compared them against later direct probes,
+  which is REQ-LM-05's job and is not done here.
+- **That the branch families are the right six.** They are REQ-JRN-01's six, and
+  the requirement itself says they are not a complete ontology. The compiler
+  routes what it can and records why the rest were unavailable.
+- **That the probe catalogue diagnoses well.** Each probe separates the families
+  it claims to separate — that is tested. Whether the questions elicit truthful
+  answers from a real learner is an operator question, not a unit test.
+- **Anything about how this looks.** No UI was written and none is implied.
+
+### What a verifier should try to break
+
+1. Add a `masteryScore` field to `LensProjection`, computed from the four
+   values, and confirm both the serialisation test and the identifier scan go
+   red. One of them alone is not enough.
+2. Make `memoryStateRetrievability` return `0` instead of `null` for a
+   never-reviewed card and confirm the unknown/fragile tests fail. This is the
+   single line the whole honesty claim rests on.
+3. Delete the `probe_required` branch from `selectBranch` and confirm the
+   single-stumble tests go red — then check that the compiler still cannot be
+   made to emit a cause field, which is a different guard.
+4. Remove the cap in `activeQuietOpportunities` and confirm the 500-stumble test
+   fails; then remove the _decay_ instead and confirm the 200-day test fails.
+   Both, not one.
+5. Re-derive the forgetting curve inside `src/graph/` from `FSRS_WEIGHTS` and
+   confirm `test/purity/no-ambient-nondeterminism.test.ts` refuses the second
+   `ts-fsrs` importer. That test is the reason the deviation above exists.
+6. Reorder the `edges` array in any fixture and confirm every neighbourhood
+   result is byte-identical. A projection whose output depends on input order
+   cannot back a screenshot.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-e-projections` into
+`agent/bunki-campaign-e` and have a human review it. Nothing here is merged; no
+agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, wave A2 (Builder A2, repair round): the scrubber's complexity claim was false, and the cost was user-visible
+
+**Branch:** `agent/bunki-e-projections`
+**Base:** `24c66cb` (the projections lane's own head)
+**Scope:** one P1 from the verifier's pass over the A2 lane. Nothing else in the
+lane was reopened; no requirement, no test, and no honesty guard was weakened.
+
+### Retraction first
+
+The A2 appendix above, in §2 "The retrievability projection", ends its time
+scrubber bullet with:
+
+> Frames are sorted and walked with a per-contract cursor, so fourteen months is
+> one linear pass.
+
+**That sentence is withdrawn.** So is the claim it was copied from, the doc
+comment on `buildRetrievabilityIndexTimeline`, which said the cost was
+"O(frames + versions) per contract rather than O(frames x versions)" and that
+fourteen months at daily resolution over the dictionary tier was "one linear
+pass, which is what makes the scrubber a projection rather than a
+re-derivation". Both were false. The corrected statement is in the section
+"What it actually cost" below, and the doc comment in
+`packages/domain/src/graph/retrievability.ts` now carries it.
+
+### The finding, restated from the code
+
+The cursor walk was real. The line underneath it was not. Inside the per-frame
+`ordered.map(...)`, after advancing the cursors, the old function called
+
+```ts
+index: buildRetrievabilityIndex(contracts, [...current.values()]),
+```
+
+`contracts` is the *whole* contract set and does not vary by frame, so every
+frame rebuilt the entire (componentId + skill) bucketing from scratch. The
+function was therefore Theta(frames x contracts), not O(frames + versions). The
+cursor optimisation the comment described was genuine and irrelevant — it saved
+a rescan of the version lists, which was never the expensive part.
+
+### What it actually cost — measured, on this machine, before the fix
+
+Attribution on three axes, because "it is slow" is not a finding:
+
+| Held fixed | Varied | Measured |
+| --- | --- | --- |
+| frames = 200 | contracts 250 / 500 / 1000 / 2000 / 4000 | 42 / 68 / 158 / 347 / 971 ms — linear in contracts |
+| contracts = 2000 | frames 50 / 100 / 200 / 400 | 137 / 182 / 401 / 1024 ms — doubling per doubling |
+| everything | 426 frames placed entirely **after** the last review, so no cursor ever advances | 1135 ms — the cursor contributes essentially nothing |
+
+Full tier, 426 daily frames (fourteen months) over 3,000 contracts: **1357 ms**.
+One node's fourteen-month sparkline via `projectNodeRetrievabilityOverTime`:
+**1192 ms** — 0.88x the whole map's timeline. Drawing one node's history cost
+about as much as drawing every node's.
+
+That is the user-visible half. The campaign brief names the time scrubber as a
+headline feature of the map, and lane B1 consumes this API; a per-node sparkline
+that costs a whole-map render is a scrubber that stutters on the surface the
+brief calls the emotional centre of the app.
+
+### The fix
+
+**1. Split the index into its time-invariant and time-varying halves.**
+`RetrievabilityIndex` now carries `byComponentSkill:
+ReadonlyMap<string, readonly ProjectedContract[]>` — a function of the contract
+set alone — and `stateOf(contractId): MemoryState | null`, the half that depends
+on the instant. `buildRetrievabilityIndex` answers `stateOf` from a map built
+out of replay's own states, exactly as before. The internal `ContractWithState`
+pairing is gone; it was what forced state and bucketing to be built together.
+
+**2. Hoist the bucketing out of the frame loop.**
+`buildRetrievabilityIndexTimeline` builds the buckets once, indexes the
+histories by contract id once, and gives each frame its own `stateOf` closing
+over that frame's instant. Per-frame construction is one object. The one
+per-frame number that is not a lookup, `memoryStateCount`, comes from a genuine
+two-pointer merge — a contract has a state at `at` exactly when its first
+version (activation) has landed, so one ascending list of activation instants
+walked against the sorted frames answers every frame in O(frames + histories).
+`memoryStateAsOf` became a binary search, since the scrubber now asks it once
+per frame per contract read.
+
+**3. Narrow the contract set for a one-node sparkline.**
+`projectNodeRetrievabilityOverTime` filters `contracts` to those whose
+`targetComponentId` is one of the node's, and `histories` to those contracts,
+before walking frames. Only such contracts can ever land in a bucket
+`projectLens` reads for that node, so the narrowing is result-preserving — and
+that is asserted, not asserted-in-a-comment: a test projects the same node with
+and without an unrelated contract in the array and requires the two sparklines
+to be `toEqual`.
+
+**Frames stay independent.** The tempting next step after hoisting the buckets
+is to share one mutable "state as of now" map too, which would alias every frame
+onto the last one read. Nothing is shared between frames but the frozen
+bucketing and the caller's own histories.
+
+### The corrected complexity, stated plainly
+
+- setup: O(contracts + histories log histories)
+- per frame: O(1) to construct; O(log versions) per contract actually read
+- fourteen months of daily frames is therefore paid for by the nodes a surface
+  chooses to draw, not by the length of the timeline
+
+### After the fix — same machine, same fixtures
+
+| Measurement | Before | After |
+| --- | --- | --- |
+| 426 frames x 3,000 contracts | 1357 ms | **27 ms** |
+| contracts = 2000, frames 50 / 100 / 200 / 400 | 137 / 182 / 401 / 1024 ms | 2 / 3 / 2 / 2 ms |
+| 426 frames, all after the last review | 1135 ms | 6 ms |
+| one node's 14-month sparkline | 1192 ms | **5 ms** |
+
+### Tests
+
+Five new tests. The two that carry the claim are scaling assertions in
+`packages/domain/test/graph/dictionary-tier-performance.test.ts`, written to
+mirror the size-independence assertion the neighbourhood walk already had:
+
+| Claim | Assertion | Against the old code |
+| --- | --- | --- |
+| Fourteen months of frames costs about what two frames cost | `allMs < max(300, twoMs * 4 + 100)` | **FAIL** — "2 frames: 11ms, 426 frames: 1260ms" |
+| One node's sparkline costs the same over 3,000 contracts as over 300 | `largeMs < max(200, smallMs * 4 + 100)` | **FAIL** — "300 contracts: 91ms, 3000 contracts: 1049ms" |
+| A 14-month whole-tier timeline fits inside a screen transition | `< 1000 ms` (absolute ceiling) | **FAIL** — 1260 ms |
+
+All three were run against the pre-fix `retrievability.ts` with the new tests in
+place, and all three failed; that is the discriminator check, and it is the only
+reason to trust a performance test at all. The other two new tests are
+correctness guards, in `retrievability.test.ts`: frames read backwards still give
+each frame its own answer (the aliasing failure mode), and the sparkline is
+`toEqual` with and without unrelated contracts in the input (the narrowing is
+result-preserving).
+
+`test/graph/support.ts` gains `dayInstant`, the multi-year sibling of `instant`,
+because the scrubber's own claim is *fourteen* months and the existing helper
+stops at one year. Still pure calendar arithmetic, still no `Date`.
+
+### What did not change
+
+No requirement was reinterpreted. `LensProjection` still carries four separate
+values and no fifth that summarises them; `no-collapsed-scalar.test.ts` still
+passes, including the identifier scan over `src/graph`. The scrubber still folds
+only reviews the gate already admitted, through the same
+`initialMemoryState` / `applyAdmittedReview` pair replay uses — the one bullet in
+§2 above that was true stays true, and `no-collapsed-scalar.test.ts` still pins
+those two call sites to this one file. `stateOf` is a lookup with no derivation
+behind it: exposure is still never retrieval, and scrubbing a year still produces
+no event, no grade, and no scheduling change.
+
+### §17.5 check set — re-run in this worktree after `npm ci`
+
+| Command | Result |
+| --- | --- |
+| `npm ci` (own worktree, no inherited modules) | clean install, exit 0 |
+| `npm run lint` | pass, no output |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, root + 6 workspaces |
+| `npm run test` | **1594 passed**, 96 files (was 1589 / 96) |
+| `npm run test:replay` (T-03) | 47 passed, 2 files |
+| `npm run verify:export` (T-14) | 14 passed, 1 file |
+| `npm run test:e2e` | **38 passed**, exit 0 |
+
+### What a verifier should try to break
+
+1. Move `buildContractBuckets(contracts)` back inside the `ordered.map` in
+   `buildRetrievabilityIndexTimeline` and confirm **both** scaling assertions go
+   red. Either one alone would let the other kind of regression through.
+2. Delete the narrowing in `projectNodeRetrievabilityOverTime` and confirm the
+   sparkline size-independence test goes red while the equality test stays
+   green — the narrowing is an optimisation, and its correctness guard must not
+   be the thing that catches its removal.
+3. Replace the per-frame `stateOf` with one shared mutable map advanced by a
+   cursor and confirm the backwards-read test goes red. The forward-read test
+   will not catch it, which is why it reads backwards.
+4. Point `memoryStateAsOf`'s binary search at the *first* matching version
+   instead of the last and confirm the "answers with the state as it stood"
+   assertions fail on the review-on-activation-instant case.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-e-projections` into
+`agent/bunki-campaign-e` and have a human review it. Nothing here is merged; no
+agent may merge, approve, or push to `main`.
