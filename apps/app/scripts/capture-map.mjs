@@ -174,18 +174,139 @@ async function timeInteraction(page, selector) {
   })()`);
 }
 
+/**
+ * The word the loop is walked with. The seed's canonical target.
+ *
+ * Kept as a literal rather than imported from `@bunki/seed`: this is a Node
+ * script and the seed is a TypeScript package, and `DEFAULT_CANONICAL_TARGET` is
+ * asserted against this same string by the app's own suite, so the two cannot
+ * drift silently.
+ */
+const TARGET = '分岐';
+
+/**
+ * Walk the real closed loop in the browser, so the map has something to draw.
+ *
+ * ## Why this is here and not a seeded store
+ *
+ * A cold load has an empty event log, so every lens on every node is
+ * "nothing observed" and the road reads station 0. That is the *correct*
+ * rendering of an empty ledger — and it is also a picture in which the lane's
+ * central claim, that brightness is real FSRS retrievability, cannot be seen at
+ * all. Photographing only that state would be filing evidence for the one thing
+ * the pictures do not show.
+ *
+ * So the loop is walked the way a person walks it, by clicking: capture the
+ * seed's canonical target, keep it, take it up for study, sit the session the
+ * promotion planned, and answer one probe. Nothing here reaches past a rendered
+ * control, nothing seeds a store, and nothing writes an event — the app's own
+ * evidence gate mints every one of them, which is the point. What the map then
+ * draws is a memory state the pinned scheduler produced from a review the gate
+ * admitted.
+ *
+ * Returns `null` when a step is not on screen, and the caller records that in
+ * the README rather than pretending the walk happened.
+ */
+async function walkTheLoop(page, origin) {
+  const seen = async (id, timeout = 30_000) => {
+    const locator = page.locator(`[data-testid="${id}"]`).filter({ visible: true }).last();
+    await locator.waitFor({ timeout });
+    return locator;
+  };
+  try {
+    await page.goto(`${origin}/`, { waitUntil: 'load' });
+    await seen('screen-capture');
+
+    // 1. capture and keep
+    await (await seen('capture-search-input')).fill(TARGET);
+    await seen('capture-top-answer');
+    await (await seen('capture-keep')).click();
+    await seen('capture-acknowledgment');
+
+    // 2. take it up for study — the explicit promotion that activates a contract
+    const promote = page
+      .locator('[data-testid^="capture-promote-"]')
+      .filter({ visible: true })
+      .first();
+    await promote.waitFor({ timeout: 30_000 });
+    await promote.click();
+    await page.locator('[data-testid^="capture-promoted-"]').first().waitFor({ timeout: 30_000 });
+
+    // 3. sit the session and answer one declared probe
+    await page.getByTestId('nav-session').click();
+    await seen('screen-session');
+    await (await seen('session-start')).click();
+    await seen('session-prompt');
+    await (await seen('session-grade-good')).click();
+    await seen('session-progress');
+
+    return (await seen('session-progress')).innerText();
+  } catch (error) {
+    process.stderr.write(`[loop] not walked: ${String(error)}\n`);
+    return null;
+  }
+}
+
+/**
+ * One node, read through each of the five lenses in turn.
+ *
+ * This is the no-collapsed-light rule made photographable. REQ-UI-07 forbids one
+ * mastery light for a node, and the way to *show* that rather than assert it is
+ * to hold the node still, move the lens, and read what the node says about
+ * itself each time. The label is the app's own accessible name, taken out of the
+ * DOM after each chip is pressed, so it is what a screen reader would say.
+ *
+ * The origin node is used because it is the one the walked loop attached a
+ * contract to; every other node stays unmeasured on every lens, which is also
+ * part of the answer.
+ */
+async function readEveryLens(page, nodeTestId) {
+  const lenses = ['reading', 'meaning', 'listening', 'production', 'writing'];
+  const out = [];
+  for (const lens of lenses) {
+    const chip = page.locator(`[data-testid="lens-${lens}"]`).filter({ visible: true }).last();
+    if ((await chip.count()) === 0) continue;
+    await chip.click();
+    await page.waitForTimeout(250);
+    const node = page.locator(`[data-testid="${nodeTestId}"]`).filter({ visible: true }).first();
+    const label = (await node.count()) === 0 ? null : await node.getAttribute('aria-label');
+    out.push({ lens, label });
+  }
+  const back = page.locator('[data-testid="lens-reading"]').filter({ visible: true }).last();
+  if ((await back.count()) > 0) await back.click();
+  await page.waitForTimeout(250);
+  return out;
+}
+
 /** What the page says about itself, read out of the loaded DOM. */
 const OBSERVED = `(() => {
   const text = (id) => {
     const node = document.querySelector('[data-testid="' + id + '"]');
     return node === null ? '' : node.textContent;
   };
+  /*
+    The origin's own node, found by what the map says about it rather than by
+    DOM order or by the target string. The centre of a neighbourhood is the node
+    at depth 0, and every node's accessible name ends with its own hop count —
+    so "0 hops away" is the map's own statement of which node is the centre.
+
+    Taking the first map-node-lexeme element instead was wrong and the README
+    caught it: the bands are stacked oldest road first, so the first lexeme in
+    the document is whichever word landed on 古道, two hops from the centre.
+  */
+  const origin =
+    Array.from(document.querySelectorAll('[data-testid^="map-node-"]')).find((node) =>
+      (node.getAttribute('aria-label') || '').includes('0 hops away'),
+    ) || null;
+  const originId = origin === null ? '' : (origin.getAttribute('data-testid') || '');
   return {
     routes: document.querySelectorAll('[data-testid^="map-route-grade-"]').length,
     standing: text('map-standing'),
     today: text('map-today'),
     station: text('map-route-strip-sentence'),
     scrubber: text('map-scrubber-reading'),
+    originTestId: originId,
+    originLabel: origin === null ? '' : (origin.getAttribute('aria-label') || ''),
   };
 })()`;
 
@@ -203,7 +324,17 @@ async function main() {
 
   const shots = [];
   const measurements = [];
-  let observed = { routes: 0, standing: '', today: '', station: '', scrubber: '' };
+  let observed = {
+    routes: 0,
+    standing: '',
+    today: '',
+    station: '',
+    scrubber: '',
+    originTestId: '',
+    originLabel: '',
+  };
+  let loopProgress = null;
+  let perLens = [];
 
   try {
     for (const scheme of SCHEMES) {
@@ -214,6 +345,11 @@ async function main() {
       page.on('console', (message) => {
         if (message.type() === 'error') failures.push(`console: ${message.text()}`);
       });
+
+      // The map draws a ledger, so there has to be one. This is the app's own
+      // loop, clicked; see `walkTheLoop`.
+      const walked = await walkTheLoop(page, server.origin);
+      if (scheme === 'light') loopProgress = walked;
 
       const loadStarted = Date.now();
       await page.goto(`${server.origin}/map?scheme=${scheme}`, { waitUntil: 'load' });
@@ -227,6 +363,8 @@ async function main() {
       // --- what the page actually says, read back out of it -----------------
       if (scheme === 'light') {
         observed = await page.evaluate(OBSERVED);
+        perLens =
+          observed.originTestId === '' ? [] : await readEveryLens(page, observed.originTestId);
       }
 
       // --- the two interactions that would show a per-frame rebuild ---------
@@ -323,9 +461,76 @@ async function main() {
     `- position on the road: ${observed.station === '' ? '_(not found)_' : `“${observed.station}”`}`,
     `- scrubber: ${observed.scrubber === '' ? '_(not found)_' : `“${observed.scrubber}”`}`,
     '',
-    'The store is empty on a cold load, so every lens is unmeasured and the road',
-    'reads station 0. That is the correct rendering of "no evidence yet" and it is',
-    'the state the screenshots show; it is not a failure to read the ledger.',
+    '## One node, five lenses — the no-collapsed-light rule, photographed',
+    '',
+    'REQ-UI-07 forbids collapsing reading, meaning, listening, production and',
+    'writing into one mastery light. The way to *show* that rather than assert it',
+    'is to hold one node still, move the lens, and read what the node says about',
+    'itself each time. Below is the map’s own accessible name for the origin node',
+    'after each lens chip was pressed, taken out of the loaded DOM — so it is what',
+    'a screen reader would say, not what the source claims it would say.',
+    '',
+    ...(perLens.length === 0
+      ? ['_(the origin node was not found, so nothing was read)_', '']
+      : [
+          '| lens | what the node says |',
+          '| --- | --- |',
+          ...perLens.map(
+            (row) => `| ${row.lens} | ${row.label === null ? '_(no label)_' : row.label} |`,
+          ),
+          '',
+          /*
+            Derived from the table above, never asserted beside it. The first
+            version of this paragraph said "the lens that skill belongs to reads
+            differently from the other four" over a table in which all five rows
+            were identical, because the origin node had been picked by DOM order
+            and was the wrong node. A sentence about a measurement has to be
+            computed from it.
+          */
+          ...(new Set(perLens.map((row) => row.label)).size > 1
+            ? [
+                'The five rows are **not** the same, and that is the rule holding: one',
+                'review was admitted, on one contract, for one skill, and only the lens',
+                'that skill belongs to has anything to report. The others read "No',
+                'evidence yet" rather than reading weak — the unknown-is-not-zero',
+                'distinction the projection is built around. `writing` has no contract',
+                'in this build at all and can never read anything else.',
+              ]
+            : [
+                'All five rows read the same here, and that is worth stating plainly',
+                'rather than glossing: the walked loop put its review on a contract',
+                'this node does not carry, so this node is unmeasured on every lens.',
+                'The rule that the five are computed separately is held by the unit',
+                'suite; this table did not get to show it.',
+              ]),
+          '',
+        ]),
+    '## The ledger these pictures were taken over',
+    '',
+    loopProgress === null
+      ? [
+          '**The loop was not walked.** A step of the capture → keep → promote →',
+          'sit → grade path was not on screen, so these images are of a map over an',
+          'empty event log: every lens reads "nothing observed" and the road reads',
+          'station 0. That is the correct rendering of an empty ledger, and it is',
+          'also a picture in which brightness-is-retrievability cannot be seen.',
+          'Treat the lit-node claim as held by the unit suite alone.',
+        ].join('\n')
+      : [
+          'Before each capture the script walked the app’s own closed loop by',
+          `clicking: search ${TARGET}, keep it, take it up for study, start the`,
+          'session the promotion planned, and answer one declared probe. No store',
+          'was seeded and no event was written by this script — the evidence gate',
+          'minted every one of them, and the pinned scheduler produced the memory',
+          'state the map then draws. The session reported:',
+          '',
+          `> ${loopProgress.replace(/\n+/g, ' · ')}`,
+          '',
+          'So the counts and the marks below are over one real admitted review, on',
+          'one contract, for one lens. Every *other* lens on that node is still',
+          'unmeasured, and the map draws it as unmeasured — which is the',
+          'no-collapsed-light rule visible in a picture rather than asserted.',
+        ].join('\n'),
     '',
     '## Measured cost, in this browser',
     '',

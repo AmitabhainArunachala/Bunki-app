@@ -58,21 +58,57 @@ Read out of the loaded DOM rather than retyped from the source, so these are
 the strings a learner saw.
 
 - routes offered: **6**
-- standing: “0 of 0 contracts have evidence behind them.”
-- today: “Today has added nothing yet. What is below is what you had already built.”
+- standing: “1 of 2 contracts have evidence behind them.”
+- today: “Today added 2 new contracts and 1 admitted review.”
 - position on the road: “Station 0 of 77”
 - scrubber: “Now — every layer, as your memory stands today”
 
-The store is empty on a cold load, so every lens is unmeasured and the road
-reads station 0. That is the correct rendering of "no evidence yet" and it is
-the state the screenshots show; it is not a failure to read the ledger.
+## One node, five lenses — the no-collapsed-light rule, photographed
+
+REQ-UI-07 forbids collapsing reading, meaning, listening, production and
+writing into one mastery light. The way to *show* that rather than assert it
+is to hold one node still, move the lens, and read what the node says about
+itself each time. Below is the map’s own accessible name for the origin node
+after each lens chip was pressed, taken out of the loaded DOM — so it is what
+a screen reader would say, not what the source claims it would say.
+
+| lens | what the node says |
+| --- | --- |
+| reading | 分岐 — Reading: Emerging, fragile, 0 hops away |
+| meaning | 分岐 — Meaning: No evidence yet, 0 hops away |
+| listening | 分岐 — Listening: No evidence yet, 0 hops away |
+| production | 分岐 — Production: No evidence yet, 0 hops away |
+| writing | 分岐 — Writing: No evidence yet, 0 hops away |
+
+The five rows are **not** the same, and that is the rule holding: one
+review was admitted, on one contract, for one skill, and only the lens
+that skill belongs to has anything to report. The others read "No
+evidence yet" rather than reading weak — the unknown-is-not-zero
+distinction the projection is built around. `writing` has no contract
+in this build at all and can never read anything else.
+
+## The ledger these pictures were taken over
+
+Before each capture the script walked the app’s own closed loop by
+clicking: search 分岐, keep it, take it up for study, start the
+session the promotion planned, and answer one declared probe. No store
+was seeded and no event was written by this script — the evidence gate
+minted every one of them, and the pinned scheduler produced the memory
+state the map then draws. The session reported:
+
+> 1 of 3 done · 1 answered · 0 skipped · About 4 min of the plan left.
+
+So the counts and the marks below are over one real admitted review, on
+one contract, for one lens. Every *other* lens on that node is still
+unmeasured, and the map draws it as unmeasured — which is the
+no-collapsed-light rule visible in a picture rather than asserted.
 
 ## Measured cost, in this browser
 
 | scheme | cold load to interactive | lens change | scrubber step |
 | --- | --- | --- | --- |
-| light | 1164 ms | 23.5 ms | 25.1 ms |
-| dark | 1068 ms | 21.1 ms | 21.6 ms |
+| light | 1446 ms | 27.7 ms | 19.2 ms |
+| dark | 1665 ms | 51.7 ms | 53.2 ms |
 
 **Cold load to interactive** is navigation start until the road has drawn,
 which includes the one-off Atlas build over the whole shipped dictionary
