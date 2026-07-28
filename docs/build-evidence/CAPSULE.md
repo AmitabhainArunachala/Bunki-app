@@ -5409,3 +5409,877 @@ it here, because axe was green before this repair too.
    across the press for exactly this reason.
 4. Restore `accessibilityRole="radiogroup"` on the uncertainty chips and confirm
    the capture test names it, since the route sweep still will not.
+
+## Appendix — B3 (seed data owner): real licensed dictionary data, reconnaissance and licence acquisition
+
+Branch `agent/bunki-real-dictionary`, cut from
+`origin/agent/bunki-codex-packet-and-dictionary`. Controller hash re-verified
+before any work began: `sha256sum` of every file in `docs/specs/` matches
+`BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`, including the controller
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`.
+
+### Why this round exists
+
+WP-04 shipped project-authored lexical entries labelled `bunki-editorial /
+review_status: unreviewed` because every EDRDG and Tatoeba host was refused by
+the egress proxy. That was correct: shipping EDRDG content whose attribution
+could only be written from memory is the contamination the licence discipline
+exists to prevent. This round re-runs the source pass now that a different set
+of hosts is reachable.
+
+### Reconnaissance — every host probed, with its status code
+
+Reproduced independently in this session with `curl -o /dev/null -w '%{http_code}'`.
+`000` means the proxy refused the CONNECT tunnel; `403` means the proxy answered
+and denied; `200`/`404` mean the host answered.
+
+| Status | URL | Verdict |
+| --- | --- | --- |
+| 000 | `https://www.edrdg.org/jmdict/edict_doc.html` | blocked — primary source still unreachable |
+| 000 | `https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz` | blocked |
+| 000 | `https://tatoeba.org/en/downloads` | blocked |
+| 000 | `https://downloads.tatoeba.org/exports/sentences.tar.bz2` | blocked |
+| 000 | `https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt` | blocked |
+| 000 | `https://cdn.jsdelivr.net/gh/KanjiVG/kanjivg@master/COPYING` | blocked |
+| 000 | `https://unpkg.com/browse/` | blocked |
+| 000 | `https://data.jsdelivr.com/v1/packages/gh/scriptin/jmdict-simplified` | blocked |
+| 000 | `https://huggingface.co/` | blocked |
+| 000 | `https://archive.org/` | blocked |
+| 000 | `https://gitee.com/` | blocked |
+| 000 | `https://raw.githack.com/KanjiVG/kanjivg/master/COPYING` | blocked |
+| 000 | `https://cdn.statically.io/gh/KanjiVG/kanjivg/master/COPYING` | blocked |
+| 000 | `https://nlp.stanford.edu/` | blocked |
+| 403 | `https://api.github.com/repos/scriptin/jmdict-simplified` | denied — no GitHub REST |
+| 403 | `https://codeload.github.com/KanjiVG/kanjivg/tar.gz/master` | denied — no tarballs |
+| 403 | `https://github.com/scriptin/jmdict-simplified/raw/master/LICENSE.txt` | denied |
+| 403 | `https://sourceforge.net/` | denied |
+| 200 | `https://raw.githubusercontent.com/...` | **reachable** — arbitrary raw files, public repos |
+| 404 | `https://objects.githubusercontent.com/` | host answers, but release-asset URLs are unobtainable without the blocked API |
+| 404 | `https://media.githubusercontent.com/media/...` | host answers; LFS pointer targets not needed |
+| 200 | `https://registry.npmjs.org/` (incl. `/-/v1/search`) | **reachable** |
+| 200 | `https://pypi.org/pypi/jamdict-data/json`, `https://files.pythonhosted.org/` | **reachable** |
+| 301/200 | `https://gitlab.com/`, `https://bitbucket.org/` | reachable, nothing needed there |
+
+Net effect: EDRDG's and Tatoeba's own hosts remain blocked, so the WP-04
+verdict on *primary-source* retrieval is unchanged. What is new is that two
+package registries and `raw.githubusercontent.com` are reachable, which makes a
+**pinned, hash-verified redistribution** obtainable — data and the licensor's
+own licence statement together, from one artefact.
+
+### Sources considered and rejected
+
+- **`kotobako-data` (npm, 26.7.19)** — matched the search for
+  "JMdict/KANJIDIC2/KanjiVG-derived; CC BY-SA". Rejected. Published 2026-07-19
+  by a single unaffiliated account, no README (`"readme": "ERROR: No README data
+  found!"`), no repository field, no upstream licence file in the package
+  (`fileCount: 2`), and a description stating it exists "solely so the claude.ai
+  artifact can auto-seed". It is an anonymous repackaging with no attribution
+  chain — precisely the unvetted mirror this project's rule against
+  "verified from a mirror" is written to exclude.
+- **`scriptin/jmdict-simplified`** — the best-known JMdict/KANJIDIC2 JSON
+  conversion. Its `LICENSE.txt` *is* reachable (200, 20,131 bytes, CC BY-SA 4.0
+  legal code) but its data ships only as GitHub release assets, which require
+  `api.github.com` or `github.com` — both denied. Licence obtainable, data not.
+- **Wiktionary / CHISE / Kanjium** — not probed for data. REQ-SRC-03 places them
+  in a Phase-3 vetting queue; they are not selectable canonical sources.
+
+### Source selected: `jamdict-data` 1.5 (PyPI), the jamdict project's own data package
+
+`jamdict-data` is the precompiled database published by the `jamdict` project
+(github.com/neocl/jamdict, github.com/neocl/jamdict_data), authored by Le Tuan
+Anh. It is the project's own official distribution channel, not a third-party
+scrape, and it carries EDRDG's licence statement inside the artefact next to the
+data it governs.
+
+| | |
+| --- | --- |
+| Artefact | `jamdict_data-1.5.tar.gz` |
+| URL | `https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz` |
+| Bytes | 53,940,912 |
+| Retrieved | 2026-07-28 |
+| `jamdict.db.xz` sha256 | `124577d8f2c44841f1f4ec43ac5413be81770ce3ed60ea917bae6c5944d88d39` |
+| Contents | JMdict 191,541 entries; KANJIDIC2 13,108 characters; JMnedict; KRADFILE |
+| `meta` table | `jmdict.version=1.08`, `kanjidic2.version=1.6`, `kanjidic2.date=April 2008`, `jmnedict.date=2020-05-29` |
+| Compiled | 2021-04-17 (package metadata) |
+
+### Licence acquisition — the rule that governs this round
+
+The WP-04 rule stands: *a redistribution of a dataset is not that dataset's
+licensor*, and there is no "verified from a mirror" state. This round does not
+break that rule; it records a precisely narrower claim, and the difference is
+stated in `LICENSES.md` rather than blurred.
+
+The EDRDG **General Dictionary Licence Statement** was obtained verbatim, and
+the same bytes were retrieved twice by independent paths:
+
+| Path | sha256 |
+| --- | --- |
+| bundled inside the downloaded sdist at `jamdict_data-1.5/jamdict_data/LICENSE.md` | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` |
+| `https://raw.githubusercontent.com/neocl/jamdict_data/main/jamdict_data/LICENSE.md` | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` |
+
+`cmp` reports the two files identical. The statement names the covered files
+(JMDICT, KANJIDIC2, KRADFILE/RADKFILE among them), asserts copyright for James
+William BREEN and the EDRDG, and grants CC BY-SA **3.0** — so 3.0, not 4.0, is
+the licence recorded against the data actually shipped, because 3.0 is what the
+statement travelling with these bytes says. `www.edrdg.org` is still blocked, so
+whether EDRDG has since restated the licence at a different version is
+**unverified and is recorded as unverified**, not guessed.
+
+Licence texts now stored verbatim in `packages/seed/licenses/`:
+
+| File | Bytes | sha256 | Retrieved from |
+| --- | --- | --- | --- |
+| `EDRDG-licence-statement.md` | 9,416 | `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6` | the pinned sdist + `raw.githubusercontent.com/neocl/jamdict_data` |
+| `CC-BY-SA-3.0.txt` | 22,240 | `3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f` | `raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-3.0.txt` |
+| `KanjiVG-COPYING.txt` | 20,595 | `d255e07978fd16ddfec38bc59dc9d857b885dd44ddbf4e79baf207d30746bdcc` | unchanged from WP-04 |
+
+`creativecommons.org` is blocked, so the CC BY-SA 3.0 legal code comes from the
+SPDX license list (Linux Foundation), which is the canonical machine-readable
+publication of licence texts and is named as such rather than passed off as
+creativecommons.org.
+
+### Tatoeba remains DEFERRED, and the rule is why
+
+Example sentences are the one level of the operator's request this round cannot
+satisfy. Both Tatoeba hosts are blocked; the shipped `jamdict.db` contains no
+examples table (JMdict, JMnedict, KANJIDIC2, KRADFILE only); and SPDX does not
+carry `CC-BY-2.0-FR` at all — `text/CC-BY-2.0-FR.txt` is 404 and the licence
+list index contains only `CC-BY-2.0`. So neither the sentence data nor its
+licence text is obtainable, and CC BY 2.0 FR additionally requires per-sentence
+contributor attribution that no reachable artefact carries. Under the rule
+"licence first, data second", no Tatoeba content is shipped. The sentences stay
+project-authored and stay labelled as project-authored.
+
+---
+
+## Appendix — B3: what shipped, the §17.5 results, and one scope conflict reported not resolved
+
+### What is now real
+
+| Layer | Before (WP-04) | Now | Identifier carried |
+| --- | --- | --- | --- |
+| Lexeme `reading`, `partOfSpeech`, `senses` | `bunki-editorial`, `unreviewed`, id `null` | **JMdict (EDRDG)**, CC BY-SA 3.0 | real `ent_seq` (e.g. 分岐 → `1503340`) |
+| Kanji `onReadings`, `kunReadings`, `meanings` | `bunki-editorial`, `unreviewed`, id `null` | **KANJIDIC2 (EDRDG)**, CC BY-SA 3.0 | KANJIDIC2 literal |
+| Kanji `strokeCount`, `components`, `radicals`, `strokeSvg` | KanjiVG, verified | unchanged | KanjiVG file path |
+| Sentences, grammar, passage | project-authored | **unchanged, still project-authored** | none, correctly |
+
+The values changed, not merely their labels — which is the point, because it
+means the old ones were wrong:
+
+- 分岐 was hand-written as *branching / forking / divergence / bifurcation*.
+  JMdict 1503340 says *divergence / ramification / bifurcation / branching off*.
+- 分岐点 was hand-written as *branch point / junction / fork in a road or line /
+  turning point*. JMdict 1503370 says *junction / crossroads / division point /
+  parting of ways*.
+- 岐 was given the kun readings えだ and わか.れる. KANJIDIC2 gives 岐 **no**
+  `ja_kun` reading at all, so the shipped list is now honestly empty. A
+  hand-written list had invented two readings for a character that has none.
+
+KANJIDIC2's `stroke_count` agrees with the KanjiVG-derived `strokeCount` on all
+ten characters — an independent cross-check the seed had no way to run before.
+
+### Reproduction, run end-to-end against upstream
+
+`node packages/seed/scripts/fetch-edrdg.mjs --check` re-downloaded the artefact
+and re-derived every value. Exit code 0:
+
+```
+sdist bytes=53940912 sha256=a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415
+jamdict.db.xz sha256 matches pin
+EDRDG licence statement matches the committed copy byte-for-byte
+MATCH  lex-bunki ent_seq=1503340   … 16 lexemes, all MATCH
+MATCH  kanji-05206 literal=分       … 10 kanji, all MATCH
+MATCH  edrdg-upstream.json databaseMeta
+```
+
+### §17.5 check set
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | clean, no output |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **87 files, 1435 tests passed** (was 1397 before this round) |
+| `npm run test:e2e` | **38 passed (55.7s)** |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist`, 13 static routes, 1.7 MB bundle |
+
+The two `✘` lines inside the 38 remain the pre-existing `test.fail()` expected
+failures in `adv-known-defects.spec.ts`, unchanged and untouched by this round.
+`npm ci` was run in this worktree before any check was trusted.
+
+The e2e lane initially failed 38/38 with `No web export at apps/app/dist`. That
+was the harness refusing to build its own fixture, not a regression — the §17.5
+build step had not yet run in this worktree. Recorded because a reader seeing
+"38 failed" in a log needs to know which of the two it was.
+
+### The scope conflict — reported, not silently resolved
+
+My instructions asked for "on the order of a few hundred to a few thousand
+lexemes". I did not do that, and the reason is not caution:
+
+- **Controller §8**, hash-verified `de7b6fcc…`, specifies "approximately 12–20
+  lexemes, 8–12 kanji" for `packages/seed/data/`, and `test/dataset.test.ts`
+  encodes it as a scope contract with the comment that "a seed that quietly
+  grows into a half-imported dictionary is exactly the outcome §2 and WP-04's
+  'not done' list forbid".
+- **The operator's own Master Definition of Done §4** places "dictionary
+  scale-up, full kanji depth" in campaign **C2**, and states that C2–C5
+  controllers "are derived only after the preceding checkpoint … never
+  speculatively". C1 has not been declared.
+- The orchestration spec's supremacy rule and the launcher both say the
+  controller wins on conflict and the conflict is **reported, never silently
+  resolved**.
+
+Scaling the seed to thousands of entries now would have pre-empted a campaign
+the operator's own definition of done gates behind a checkpoint he has not
+declared, and would have done it by editing a test whose stated purpose is to
+prevent exactly that edit. So this round maximised **fidelity** within §8
+instead of **scale** beyond it: the count is unchanged at 16/10, and every
+lexicographic claim inside that count is now real licensed dictionary data.
+
+This is the operator's request satisfied on the axis available — "real
+dictionary … on all levels: vocab, kanji" — with the third level, example
+sentences, blocked by licence facts rather than by scope. **The scale-up he is
+asking for is C2 work, and it needs his C1 checkpoint first.** That is a
+decision for him, not for a builder, and it is the one thing in this round I
+could not do for him.
+
+### What this round does not claim
+
+- **Not primary-source verification.** `www.edrdg.org` was never reached. The
+  EDRDG statement on file could be superseded; the recorded state says CC BY-SA
+  3.0 because that is what the statement travelling with these bytes says, and
+  the possibility that current JMdict is 4.0 is logged as open item **D-1a**,
+  not resolved by assumption.
+- **Not a 2026 dictionary.** The pinned artefact was compiled 2021-04-17 and
+  KANJIDIC2 within it is dated April 2008. Entries edited upstream since then
+  are not reflected. This is recorded in `source_version`, visible on screen.
+- **Not example sentences.** Tatoeba is unreachable, the pinned database has no
+  examples table, and SPDX carries no `CC-BY-2.0-FR` text. Licence first, data
+  second — so nothing was shipped and nothing was labelled.
+- **Not a review of the glosses.** Nobody read all 16 entries for sense
+  appropriateness; they are upstream's, faithfully extracted and flattened.
+
+### What a verifier should try to break
+
+1. Change one `source_entry_id` in `data/lexemes.json` to a plausible but wrong
+   `ent_seq` and confirm `test/edrdg.test.ts` goes red. Then confirm
+   `fetch-edrdg.mjs --check` catches a wrong *value* that the offline suite
+   cannot see — the two checks have different reach, and the boundary matters.
+2. Delete `licenses/EDRDG-licence-statement.md` and confirm the suite fails
+   rather than falling back to the registry's prose. Then edit one byte of it
+   and confirm the digest check fails too.
+3. Add a registry source with `license: "CC BY-SA 4.0"` and no licence file, and
+   confirm it fails. That is the assertion the whole round rests on.
+4. Rewrite `SEED_ENTRY_DISCLOSURE` to drop "written by this project" and confirm
+   both the seed suite and the e2e claim audit go red. Understating real data
+   and overstating project text are both failures; check the tests catch both
+   directions, not just one.
+5. Ask whether `licensed-redistribution` is doing honest work or laundering a
+   mirror. The three conditions are in `LICENSES.md`; check that `kotobako-data`
+   really does fail them and that nothing in the repo quietly admits it.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-real-dictionary` into
+`agent/bunki-phase0-integration` and have a human review it — in particular the
+`licensed-redistribution` state, which is a new epistemic category and should
+not enter the vocabulary without a human agreeing it is honest. Nothing here is
+merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## B3 seed — real dictionary from primary sources (2026-07-28, second round)
+
+Branch `agent/bunki-real-dictionary`, continuing the first B3 round rather than
+restarting it: the launcher's resume rule applies, and that round's licence
+scaffolding, tests and provenance schema are what made this one cheap.
+
+**What changed underneath.** The operator widened the egress policy. Reproduced
+before relying on it, with `curl` and again with the importer:
+`www.edrdg.org` 200, `creativecommons.org` 200, `downloads.tatoeba.org` 200.
+`ftp.edrdg.org` is still refused (bad TLS, plain HTTP refused) and
+`codeload.github.com` still 403; neither is needed. Byte counts matched what the
+Conductor reported exactly — JMdict_e.gz 10,523,044 and kanjidic2.xml.gz
+1,488,563 — and KANJIDIC2 parsed to 13,108 characters, the count the Conductor
+reported independently.
+
+### The deliverable is the importer
+
+`packages/seed/scripts/import-sources.mjs`: fetch → verify licence → parse →
+subset → emit, with the size as a parameter and a machine-readable manifest of
+what was fetched (URL, retrieval date, bytes, sha256). `--check` re-derives every
+committed digest offline; `--verify-fixtures` re-derives the §8 fixtures from
+current upstream; `--licences` runs the licence stage alone.
+
+The licence gate is `assertLicensed()`, and it runs *before* a source's bytes are
+parsed. A source whose verbatim text is not on disk at the recorded digest is
+skipped and written to the manifest's `deferred` list. That ordering is the
+whole design: licence first, data second.
+
+### What shipped
+
+| Level | Count | Source |
+| --- | --- | --- |
+| Vocabulary | 3,000 lexemes | JMdict, ranked by priority tag (nfXX band, then ichi1/news1/spec1) |
+| Kanji | 1,241 | KANJIDIC2 — exactly the kanji those words use |
+| Stroke order | 1,241 | verbatim KanjiVG at a pinned commit; coverage turned out to be complete |
+| Sentences | 2,000 pairs | Tatoeba, both ids and both contributor names |
+
+218,148 JMdict entries and 13,108 KANJIDIC2 characters were available; the subset
+is ranked, not arbitrary, so it is the common core. `--lexemes=all` imports every
+priority-tagged entry with no other change.
+
+### Sizing, against the controller
+
+Controller §8 fixes the seed fixtures at 12–20 lexemes and §2 excludes a *full*
+JMdict/KANJIDIC2 import from Phase 0. Both still hold, and neither was edited:
+
+- the **§8 fixture tier** (`data/*.json`) is unchanged in size — 16 lexemes, 10
+  kanji — and `test/dataset.test.ts`'s scope contract is untouched;
+- the **imported tier** lives in `data/dictionary/`, separate precisely so that
+  growing the dictionary cannot be mistaken for growing the seed.
+
+This is the resolution of the conflict the first round reported and declined to
+resolve. It is recorded, not assumed: a reviewer who disagrees should say so,
+because the alternative reading — that any import at all is C2 work — is
+defensible and would mean reverting the imported tier.
+
+11 MB is committed (7 MB of it stroke SVGs). The ~200 MB of raw archives are not;
+they cache in the gitignored `packages/seed/.cache/` and their sha256 is in the
+manifest.
+
+### Two findings, both fixed rather than filed
+
+**1. The §8 fixtures did not match current upstream.** Before relabelling their
+provenance as "retrieved 2026-07-28 from www.edrdg.org", `--verify-fixtures`
+compared all 16 lexemes and 10 kanji against the files that claim would cite.
+Seven fields were stale from the 2021 redistribution. 分岐点 was the worst:
+committed *junction / crossroads / division point / parting of ways*, upstream
+now *fork / junction / diverging point / turning point (e.g. in one's life) /
+crossroads*. Relabelling without re-deriving would have been false provenance, so
+the values were re-derived; `--verify-fixtures` now reports MATCH on all 26.
+
+**2. `fetchStrokes` swallowed every error.** A missing `mkdir` for the cache
+subdirectory surfaced only as `0 stroke files` after 1,241 successful HTTP
+fetches. The catch now tolerates a genuine 404 only — KanjiVG really does not
+cover every literal — and everything else is raised. Uncovered characters are
+counted in the manifest instead of vanishing.
+
+### The licence-version correction
+
+The first round labelled JMdict and KANJIDIC2 **CC BY-SA 3.0**, from the copy
+bundled in the `jamdict-data` sdist, and logged the doubt as D-1a rather than
+guessing. The licensor's own statement says **V4.0**. The redistributor's bundled
+copy was a licence version behind, and nothing inside the package could have
+detected that on its own — which is the concrete argument for the "fetch the
+licence from the licensor" rule. Corrected in `data/licences.json`,
+`data/provenance.json`, `LICENSES.md`, the README and the on-screen disclosure.
+`licenses/EDRDG-licence-statement.md` (the redistributor copy) was removed so
+there is exactly one answer on disk; §2.1 records the superseded route.
+
+EDRDG provenance moves to `primary-source-verified`, and `dataset.test.ts` now
+permits that label **only** while `source_url` stays on the licensor's host, so
+it cannot drift back onto a mirror the way the 3.0 statement did.
+
+### Deferrals closed
+
+D-1, D-1a, D-2 and D-3 are all closed against the licensor's own artefacts.
+D-4 is opened in their place and is open by nature: these files change
+continuously, this is a dated snapshot, and `--verify-fixtures` is how a later
+run finds out what moved.
+
+### Disclosure and attribution
+
+`SEED_ENTRY_DISCLOSURE` now states CC BY-SA 4.0, names KanjiVG and Tatoeba with
+their licences, and still disowns the eight worked examples, grammar notes and
+passage as this project's own writing. Understating real provenance and
+overstating project text are both failures and the tests catch both directions.
+
+**Not done, deliberately: a Sources/About screen.** §3 of the EDRDG statement
+requires a smartphone or tablet app to acknowledge the files on a separate screen
+reached from a menu, not only inline. The Phase-0 surface is Expo Web, where the
+"acknowledgement on each screen display" clause governs and is satisfied. The
+dedicated screen needs `apps/app/app/_layout.tsx` and the navigation map, which
+the orchestration spec assigns to the shell owner — so this is a **coordination
+request to the Conductor**, not a gap I closed across someone else's boundary. It
+becomes binding before any native build.
+
+### Tests
+
+New `test/dictionary.test.ts` (offline, 309 lines): manifest digests re-derived
+from the files on disk; every ent_seq / literal / Tatoeba id resolves against its
+own record; a sentence must actually contain the word it claims to exemplify;
+both contributors required, because CC BY 2.0 FR cannot otherwise be complied
+with; and the negative half — a fabricated source, and a licence file whose
+digest no longer matches — both fail.
+
+`apps/app` kept the `source-licensed` standing even though no record now uses it.
+Deleting it would mean re-inventing the primary-source/redistribution distinction
+under deadline the next time only a mirror is reachable. Its tests now drive it
+with a synthetic record, and a new test asserts the dataset contains none.
+
+### §17.5 check set, run in this worktree after `npm ci`
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | clean, no output |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **88 files, 1454 tests passed** (was 1453) |
+| `npm run test:e2e` | **38 passed (55.3s)** |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist` |
+| `import-sources.mjs --check` | MATCH on all four outputs; licence gate satisfied |
+| `import-sources.mjs --verify-fixtures` | MATCH on all 16 lexemes and 10 kanji |
+
+The two `✘` inside the 38 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts`, unchanged by this round.
+
+`packages/seed/data/dictionary/` is in `.prettierignore` for the same reason
+`licenses/` is: its bytes are digest-pinned by the manifest, and reformatting
+would break the chain from a shipped gloss back to the upstream download.
+
+### What this round does not claim
+
+- **Not a full import.** 3,000 of 218,148 entries. The pipeline would do the rest
+  by changing one number; whether it *should* in Phase 0 is the operator's call.
+- **Not reviewed glosses.** Nobody read 3,000 entries for sense appropriateness.
+  They are upstream's, faithfully extracted and flattened, and the flattening is
+  disclosed on screen.
+- **Not wired into app search.** The imported tier is exported data with tests;
+  making the screens search it is WP-05's surface, and a coordination request.
+- **Not a permanent snapshot.** See D-4.
+
+### What a verifier should try to break
+
+1. Change one `sourceEntryId` in `data/dictionary/lexemes.json` and confirm
+   `test/dictionary.test.ts` goes red — then confirm `--check` catches the
+   digest change too. The two have different reach and the boundary matters.
+2. Edit one byte of `licenses/CC-BY-SA-4.0.html` and confirm both the digest
+   check and the LICENSES.md drift check fail.
+3. Point `SOURCES['edrdg-jmdict'].download.url` at any mirror and confirm the
+   `source_url` assertion in `dataset.test.ts` refuses the
+   `primary-source-verified` label.
+4. Delete a `japaneseContributor` from one sentence and confirm the suite fails
+   rather than shipping an unattributable CC BY work.
+5. Argue that the two-tier split is a dodge of controller §8. That is the one
+   judgement call in this round; §8's numbers and the imported tier are in
+   different directories precisely so the argument can be had explicitly.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-real-dictionary` into
+`agent/bunki-phase0-integration` for human review — in particular the two-tier
+sizing decision and the Sources-screen coordination request. Nothing here is
+merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## B3 repair round — the imported dictionary (branch `agent/bunki-real-dictionary`)
+
+**Base:** `ecf10a0910c2566c5348975dcae57f49293a1dbf`.
+**Controller verified before any work:**
+`sha256(docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md)`
+= `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`, matching the
+launcher's expected hash and the integrity record; the v2 spec
+(`5ee28477…`) and the launcher itself (`b0a6811d…`) also match.
+
+Four P1 findings, all of the same shape: **a claim with nothing that could
+falsify it.** Each was reproduced from the committed tree before being fixed.
+
+### What was wrong, and what was done
+
+| #    | Finding                                                                                                                                                                  | Reproduced as                                                                                                        | Fix                                                                                                                                                                                                          |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P1-1 | The committed data was not the committed script's output. 83 of 3,000 lexemes shipped duplicate glosses while `import-sources.mjs` deduplicates them.                       | 83 records where `set(senses) != senses`, e.g. `jmdict-1172910` 運動 shipping "movement" twice.                        | `data/dictionary/*` regenerated from the cached archives at the digests the manifest already recorded; new `--verify-reproducible` re-runs the pipeline into a scratch directory and diffs it byte for byte.   |
+| P1-2 | 652 of 2,000 sentences credited `\N` — MySQL's NULL sentinel, which the Tatoeba export writes for an ownerless sentence — as the contributor CC BY 2.0 FR obliges naming.   | 211 `japaneseContributor` + 591 `englishContributor` equal to `\N`; 100,087 of 248,821 jpn rows carry it upstream.     | `tatoebaCell()` maps the sentinel and whitespace-only values to null, and a pair with an unnamed half is **dropped, not shipped**. 1,009 declined, counted in the manifest and recorded in `deferred`.          |
+| P1-3 | Every imported record pointed at a provenance id registered nowhere, so the whole tier would throw `SeedDataError` on load through `src/validate.ts`.                       | `edrdg-jmdict-primary`, `edrdg-kanjidic2-primary`, `tatoeba-sentence` absent from the ten sources in `provenance.json`. | Registered ids emitted **per field**, because these records mix sources; `tatoeba-japanese` / `tatoeba-english` now referenced per sentence half. `assertProvenanceRegistered()` gates the emit.               |
+| P1-4 | The search screen rendered JMdict readings, senses and parts of speech with no EDRDG acknowledgement, which §3 of the licence requires "on each screen display".            | `capture-screen.tsx` imported only `DurabilityNotice` and `SeedCoverageDisclosure`; the coverage notice renders only when _nothing_ matched. | `SeedEntryDisclosure` mounted at the foot of the results; `/` with a populated search added to the `adv-claim-audit` route list, asserted by the acknowledgement's words as well as its test id.                |
+
+### The check that was missing
+
+`--check` compares committed bytes to digests the importer itself wrote. That is
+tamper-evidence and nothing more: a file emitted by an older version of the script
+keeps matching its own digest forever, which is exactly how P1-1 survived.
+
+`--verify-reproducible` closes it. It re-runs the whole pipeline from the cached
+archives — at the parameters **the manifest recorded**, not at whatever is typed —
+into a scratch directory, and diffs every emitted file against the committed one.
+Falsifiability was checked rather than assumed: appending one gloss to
+`lexemes.json` makes it print `DIFFER` and exit 1; restoring the file makes it
+print `REPRODUCIBLE` and exit 0.
+
+### Data changes at the committed parameters (lexemes=3000, sentences=2000, strokes=all)
+
+|                                                          | before      | after                    |
+| -------------------------------------------------------- | ----------- | ------------------------ |
+| lexemes / kanji / stroke files                           | 3,000 / 1,241 / 1,241 | unchanged      |
+| lexemes with duplicate glosses                           | 83          | **0**                    |
+| sentences crediting `\N`                                 | 652         | **0**                    |
+| sentence pairs declined for want of a named contributor  | not counted | **1,009**, in `deferred` |
+| provenance ids that resolve against the registry         | 0 of 3      | **all**, per field       |
+
+Upstream inputs are unchanged and re-verified: `JMdict_e.gz`
+`bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2`,
+`kanjidic2.xml.gz` `47f16167…`, `jpn_sentences_detailed.tsv.bz2` `20706c3d…`,
+`eng_sentences_detailed.tsv.bz2` `8312d3ba…`, `links.tar.bz2` `69abec53…` — each
+matching the digest the manifest already carried, so nothing in this round turns
+on a re-download.
+
+### One test corrected, and why it is not a softening
+
+`adv-a11y-audit`'s reading-order check measured `getBoundingClientRect().top`,
+which is viewport-relative, while the browser scrolls to reveal each element as it
+is focused. Any screen taller than one screenful therefore reports its last
+element _above_ the one before it. Adding the required EDRDG acknowledgement to
+the capture screen made that fire on content that is in perfectly good order.
+`focused()` now adds back the scroll offset of every ancestor — Expo Web scrolls
+inside a `ScrollView`, so `window.scrollY` stays 0 while the content moves —
+giving a position in the scrolled content, which is what "reading order" has
+always meant. **The assertion itself is unchanged**; only the measurement was.
+
+### §17.5 check set, run in this worktree after `npm ci`
+
+| Check                                        | Result                                                                              |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `npm run lint`                               | clean, no output                                                                     |
+| `npm run format:check`                       | `All matched files use Prettier code style!`                                         |
+| `npm run typecheck`                          | exit 0, all workspaces                                                               |
+| `npm run test`                               | **88 files, 1467 tests passed** (1466 at base; +13 new assertions this round)         |
+| `npm run test:e2e`                           | **39 passed (1.0m)**                                                                  |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist`                                                                   |
+| `import-sources.mjs --check`                 | MATCH on all four outputs; licence gate and the new provenance gate satisfied         |
+| `import-sources.mjs --verify-reproducible`   | **REPRODUCIBLE** — 1,245 emitted files byte-identical to the committed ones            |
+| `import-sources.mjs --verify-fixtures`       | MATCH on all 16 fixture lexemes and 10 kanji                                          |
+
+The two `✘` inside the 39 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this round. The 39th
+test is the new populated-search disclosure case.
+
+### Documentation corrected because it was false, not because it read badly
+
+`LICENSES.md` is the record of compliance, so an untrue sentence in it is the same
+defect one level up. Four were found while fixing P1-4 and are corrected in place,
+with the correction marked rather than quietly applied:
+
+- §2.2 claimed both EDRDG §3 obligations were met "by `SEED_ENTRY_DISCLOSURE` plus
+  the Sources screen". **There is no Sources screen.** The two are now stated
+  separately: the WWW-server clause is met, the smartphone/tablet clause is not,
+  and it is a precondition for any packaged mobile app rather than a follow-up.
+- §2.4 said the disclosure names "CC BY-SA 3.0" — it has said 4.0 since the
+  version correction — and renders "on every word and kanji page", a list that
+  omitted the one surface actually missing it.
+- §2.4 said `review_status` is "`licensed-redistribution`, never
+  `primary-source-verified` … which here means KanjiVG alone", which
+  `provenance.json` has contradicted since `www.edrdg.org` answered.
+- §3.3 claimed the suite "fails if any shipped sentence is missing either
+  contributor". It asserted `toBeTruthy()`. The section now says so in a marked
+  block, with the counts.
+
+### What this round still does not claim
+
+- **Not a full import.** 3,000 of 218,148 entries; one number changes it.
+- **Not reviewed glosses.** Nobody read 3,000 entries for sense appropriateness.
+- **Not wired into app search.** The imported tier is still exported data with
+  tests. The capture screen searches the §8 fixture tier — and those 16 lexemes are
+  real JMdict, which is what made the EDRDG acknowledgement obligatory there.
+- **`--verify-reproducible` is not in §17.5**, which must pass with no network.
+  With a warm `--cache` it needs no network either and takes about 45 seconds, but
+  it needs the ~200 MB of archives, so it is a verifier's command, not CI's.
+- **Reproducibility is not permanence.** Upstream moves (D-4). This check answers
+  "is this the script's output from _these_ bytes", which `--check` could not
+  answer at all.
+
+### What a verifier should try to break
+
+1. Revert the dedup in `parseJMdict` (`senses: [...new Set(senses)]`) and confirm
+   `--verify-reproducible` goes red while `--check` stays green. That divergence is
+   the whole of P1-1.
+2. Change `tatoebaCell` back to `parts[3] || null`, regenerate, and confirm
+   `dictionary.test.ts` now fails on the sentinel rather than passing on it.
+3. Point one `fieldProvenance` value at an unregistered id and confirm the importer
+   refuses to emit **and** the offline test fails — two independent gates,
+   deliberately.
+4. Delete the `SeedEntryDisclosure` mount from `capture-screen.tsx` and confirm
+   both the unit contract test and the e2e populated-search case go red. If only
+   one does, the other is not reaching the artefact.
+5. Argue that dropping 1,009 sentence pairs is over-strict — that a sentence with
+   no named owner is public-domain-ish enough to ship. The counter is in the
+   licence text rather than in taste: CC BY 2.0 FR's obligation is to attribute,
+   and there is nobody to attribute. The count is on the record so the argument can
+   be had with numbers.
+
+### Next safe command
+
+Verify this branch from a clean checkout, re-run the check set, and run
+`--verify-reproducible` with a warm cache. Nothing here is merged; no agent may
+merge, approve, or push to `main`.
+
+---
+
+## Appendix — B3/B6: the dictionary made reachable, and three P1s closed (2026-07-28)
+
+**Branch** `agent/bunki-real-dictionary`, continuing from `9051e8a`.
+**Role** Builder B3 (seed owner) also acting as B6 (app shell owner); the
+Conductor granted the shell surface — `apps/app/app/_layout.tsx`, the navigation
+map and every screen — because executing the Sources-screen coordination request
+B3 filed last wave requires it.
+
+V3 returned FAIL twice on this branch. Four things were outstanding. All four are
+closed below, each with the command that shows it.
+
+### 1 — The importer could not see a tag that carried an attribute (P1)
+
+`between(xml, tag)` located elements by searching for the literal string
+`<tag>`, which is not "an opening tag" but "an opening tag with no attributes".
+
+**The bug is reachable, and it left a receipt.** JMdict marks explanatory,
+literal, figurative and trademark glosses with `g_type`:
+
+| gloss form              | count in JMdict_e |
+| ----------------------- | ----------------- |
+| `<gloss>`               | 437,303           |
+| `<gloss g_type="expl">` | 2,513             |
+| `<gloss g_type="lit">`  | 1,057             |
+| `<gloss g_type="fig">`  | 65                |
+| `<gloss g_type="tm">`   | 39                |
+
+3,674 real English glosses were invisible. Worse, 25 entries whose _only_ glosses
+are typed fell out of the corpus entirely — they reached `senses.length === 0`
+and were skipped. The shipped manifest recorded `jmdictEntriesAvailable: 218148`
+against 218,173 `<entry>` elements in the file it had just hashed. Exactly the 25
+it could not parse. Nobody had read the number.
+
+**The fix** locates elements by name, keeping the two properties the literal
+search had for free — exact tag names (`<glossary>` is not `gloss`) and no false
+ends — and reports the raw attribute text, which the gloss filter needed: the old
+`xml:lang` guard was handed the element's _body_, where an attribute cannot
+appear, so it was dead code that would have waved every French gloss through the
+moment the pipeline was pointed at the multilingual JMdict.
+
+**Records changed, measured by running both parsers over the same bytes:**
+
+|                                           |                         |
+| ----------------------------------------- | ----------------------- |
+| entries parsed                            | 218,148 → **218,173** (+25) |
+| records changed in the shipped 3,000 tier | **14** (+17 senses)     |
+| records entering / leaving the selection  | 0 / 0                   |
+| whole-corpus entries whose senses differ  | 3,608                   |
+
+The answer is not zero, so no unreachability proof is owed — but the reachability
+proof is above rather than asserted. Examples of what came back: 石 gained
+"traditional unit of volume, approx. 180.4 litres"; 先生 gained "title or form of
+address for a teacher, master, doctor, lawyer, etc."; 歌舞伎 gained its
+definition. `kanji.json`, `sentences.json` and `strokes.json` were byte-identical
+after the re-import, which is the expected shape of a gloss-only fix.
+
+The stale corpus size is corrected everywhere it was asserted as a fact about
+`JMdict_e.gz`: LICENSES.md twice, `provenance.json` `source_version`,
+`edrdg-upstream.json` `entryCounts`.
+
+`test/import-parser.test.ts` (14 cases) pins the behaviour offline against XML in
+the shapes the real files use, including both regressions and the exact-tag-name
+property a careless regex would have broken.
+
+### 2 — The EDRDG acknowledgement is derived from the data, not from a list (P1)
+
+V3 drove a browser and found `/canvas` rendering JMdict headwords and glosses
+with no EDRDG acknowledgement anywhere in the DOM. That is the **second** time:
+last round it was `/`, fixed by adding one route to a hand-written list.
+
+The list was the defect both times, so the list is gone.
+
+`@bunki/seed` now exports `ON_SCREEN_ATTRIBUTION_SOURCES` and
+`FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION`, computed by walking its own records and
+asking which fields carry a source whose licence demands attribution on the
+screen (`data/licences.json` `requiresOnScreenAttribution`). A field that changes
+provenance changes the answer; a new licensed field joins it with no edit.
+
+Two tests, neither foolable the way the other is:
+
+- `apps/app/test/edrdg-acknowledgement.test.ts` — walks every destination in the
+  navigation map plus its imports and fails a screen that can reach a licensed
+  field without rendering `<SeedEntryDisclosure />`. Transitive, because
+  `session-screen` reaches the headword through `session-loop`. Carries a
+  negative control, and was **confirmed red** by deleting the canvas notice and
+  re-running before restoring it.
+- `apps/app/e2e/edrdg-acknowledgement.spec.ts` — walks the loop in Chromium and
+  asserts the licensor is in the _visible text_ at each stop, including the three
+  screens that exist only after a target is promoted and which no URL-driven
+  route list ever reached. It grades forward to the canvas step rather than
+  skipping when the door is not immediately there; an earlier draft skipped, and
+  a lane that skips its own subject is how this stayed green while `/canvas` was
+  broken.
+
+The notice now renders on capture, word, kanji, session, canvas, repair, evidence
+and About & diagnostics — every screen in the app. There are no exemptions, which
+is what removes the artefact that went stale twice.
+
+**The second EDRDG §3 clause is also closed.** It asks for acknowledgement "on a
+separate screen accessed from a menu, such as one labelled About, Sources", and
+LICENSES.md §2.2 has been recording it as unmet because no such screen existed.
+The **About & diagnostics** destination — one of the four in the persistent
+navigation shell — now carries a "Sources & licences" section listing every
+registry source with its licence and attribution. That closes the coordination
+request B3 filed against the shell last wave. It lists this project's own
+pending-OD-09 material too: a Sources screen naming only the dictionaries would
+let a reader take this project's prose for licensed lexicography.
+
+Also corrected because they were false rather than untidy: LICENSES.md §2.4's
+`CC BY-SA 3.0` label on the EDRDG-derived fields (the registry has said 4.0 since
+§2.3's correction; `test/edrdg.test.ts` now fails any line attaching a version to
+those fields that the registry does not hold, with both halves of the control);
+the `src/index.ts` docblock still claiming EDRDG content is
+"licensed-redistribution, never primary-source-verified" and that "nothing here
+is labelled Tatoeba", both contradicted by the data and by
+`SEED_ENTRY_DISCLOSURE` three lines below; and a stale copy of the disclosure
+pinned at 3.0 in `adv-claim-audit.spec.ts`.
+
+### 3 — The dictionary is reachable (the operator goal)
+
+`data/dictionary/` held 3,000 lexemes, 1,241 kanji, 1,241 stroke files and 2,000
+sentence pairs, and nothing in the product could reach any of it.
+
+- **Exported, not merged.** `packages/seed/src/imported.ts` exports
+  `importedDictionary` beside `seedDataset`. Every imported record carries
+  `tier: 'imported'`. `test/dataset.test.ts` — the fixture tier's scope
+  contract — is **unedited and passing**. Merging would make "the seed contains
+  exactly these sixteen lexemes" meaningless and let an imported 分岐 displace the
+  record the closed loop is built on.
+- **Search reaches both tiers**, fixture first at equal match quality. Typing a
+  Japanese word, a reading, or an English gloss finds an imported entry and opens
+  a word page with its real senses, readings and parts of speech.
+- **Kanji pages** show real KANJIDIC2 fields and real KanjiVG strokes for all
+  1,241.
+- **Tatoeba sentences** render on imported word pages, each naming _both_
+  contributors with their sentence ids on the card itself.
+- **The seeded target and the passage are untouched** — they resolve through the
+  fixture tier, which is why the ordering rule is a requirement and not a
+  preference. T-17's closed loop is green.
+
+**Strokes needed a decision and it is on the record.** The verbatim SVGs are
+4.7 MB, too much for a web bundle, and copying them into `apps/app` is forbidden
+outright (controller §4, DL-33 — share-alike data is admitted into
+`packages/seed` and nowhere else). The importer now extracts the geometry from
+those same committed bytes into `dictionary/stroke-paths.json`, in the exact
+shape the app's own KanjiVG parser produces, so there is one renderer and not
+two. It is labelled `kanjivg-derived` CC BY-SA 3.0; the verbatim files still ship
+and are still hashed; and `test/dictionary.test.ts` re-derives every stroke, its
+`kvg:type`, its id, and every component and radical from them. The derived view
+cannot drift from the originals or quietly become hand-drawn.
+
+**Performance, measured, web-only** (`docs/build-evidence/PERF_WEB.md`; before =
+`8775c2c` rebuilt in the same session, same machine, same script):
+
+|                                  | before (16 lexemes)      | after (3,016)                |
+| -------------------------------- | ------------------------ | ---------------------------- |
+| bundle, single JS chunk          | 1,712,482 B              | 5,851,369 B (3.4×)           |
+| cold load (n=8)                  | 253.6 ms med · 283.0 p95 | **436.4 ms med · 445.3 p95** |
+| warm lookup, fixture tier (n=15) | 41.7 ms med · 56.7 p95   | **23.3 ms med · 56.5 p95**   |
+| warm lookup, imported tier (n=15)| — unreachable            | **27.6 ms med · 41.2 p95**   |
+| local save ack (n=15)            | 64.2 ms med · 82.5 p95   | **55.4 ms med · 65.1 p95**   |
+
+Search did not get slower; it got faster, and **that took a fix that is on the
+record because it happened**. The first wiring made warm lookup 76.1 ms — worse
+than the 41.7 ms baseline — because the query normaliser was being applied to the
+_dataset_ on every keystroke, roughly 21,000 `normalize()` calls per character
+typed. Precomputing the invariant side produced the number above. The
+imported-tier samples include the English gloss `library`, which cannot use an
+exact-match index and must touch every sense of all 3,000 records.
+
+Cold load genuinely got worse: **+183 ms median, +72%**. It is not hidden in a
+warm number, and two bounds are stated beside it — localhost with no compression
+measures parse rather than transfer, so a real network would be worse by an
+unmeasured amount; and §13 sets no cold-load budget, so nothing is met or missed.
+
+### 4 — The Tatoeba contributor sentinel
+
+Round 1 found 652 of 2,000 sentences carrying the TSV NULL sentinel `\N` as a
+contributor while the UI claimed attribution. Confirmed three ways:
+
+1. **Mechanism: dropped, not resolved.** `tatoebaCell` maps the sentinel to null,
+   a pair missing either contributor does not ship, and at the committed
+   parameters that cost **1,009** candidate pairs — recorded in the manifest with
+   its reason, so "removed rather than softened" is checkable.
+2. **Shipped state: 0 of 2,000** carry a sentinel. Two offline assertions from
+   different directions: the per-record name pattern with its negative control,
+   and a scan of the raw file for the two characters, which have no legitimate
+   reason to appear in any field.
+3. **The check the offline suite cannot make.** A shape check passes a credit
+   that is simply _wrong_, and under CC BY 2.0 FR a false attribution is the
+   failure that matters. `--verify-attribution` re-reads the exports and
+   compares, per sentence id, the shipped username against the export's **and**
+   the shipped text against the export's, for both halves:
+
+   ```
+   ATTRIBUTED  all 2000 sentence pairs (4000 halves) name the contributor the
+   Tatoeba export names, over the text the export carries
+   ```
+
+   The text is compared too: crediting the right person for a sentence they did
+   not write is the same failure wearing a better name.
+
+### §17.5 check set — verbatim
+
+| Command                                            | Result                                    |
+| -------------------------------------------------- | ----------------------------------------- |
+| `npm run lint`                                     | clean, no output                          |
+| `npm run format:check`                             | `All matched files use Prettier code style!` |
+| `npm run typecheck`                                | clean across root + 5 workspaces          |
+| `npm run test`                                     | **90 files, 1,517 tests, all passed**     |
+| `npm run test:replay`                              | 2 files, 47 tests passed                  |
+| `npm run verify:export`                            | 1 file, 14 tests passed                   |
+| `npm run test:e2e`                                 | **42 passed** (1.1 min)                   |
+| `(cd apps/app && npx expo export --platform web)`  | `Exported: dist`                          |
+
+Extra checks this round owns:
+
+| Command                                              | Result                                                    |
+| ---------------------------------------------------- | --------------------------------------------------------- |
+| `import-sources.mjs --check`                         | 5/5 MATCH; licence gate green; provenance gate green      |
+| `import-sources.mjs --offline --verify-reproducible` | `REPRODUCIBLE 1246 emitted files … byte-identical`        |
+| `import-sources.mjs --offline --verify-fixtures`     | `MATCH all 16 fixture lexemes and 10 kanji`               |
+| `import-sources.mjs --offline --verify-attribution`  | `ATTRIBUTED all 2000 sentence pairs (4000 halves)`        |
+| `node scripts/measure-web-latency.mjs`               | table above                                               |
+
+The two `✘` inside the 42 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this round. Three of
+the 42 are the new EDRDG lane.
+
+### What this round still does not claim
+
+- **Not a full dictionary.** 3,000 of 218,173 JMdict entries. `--lexemes=all` is
+  the one number that changes it; nothing else in the pipeline would.
+- **Not reviewed glosses.** Nobody has read 3,000 entries for sense
+  appropriateness, and `IMPORTED_TIER_DISCLOSURE` says so in those words.
+- **Not a network measurement.** Every latency figure is localhost, Chromium,
+  this machine. The cold-load regression would be worse over a real link by an
+  amount this round did not measure.
+- **Nothing native.** No number here bears on any WP-11 budget.
+- **Not merged.** No agent may merge, approve, or push to `main`.
+
+### What a verifier should try to break
+
+1. Revert `between()` to the literal-string search, re-run
+   `test/import-parser.test.ts`, and confirm it goes red on the typed-gloss cases
+   specifically — not merely on some case.
+2. Delete `<SeedEntryDisclosure />` from any one screen and confirm **both** the
+   unit scan and the browser lane go red. If only one does, the other is not
+   reaching the artefact. (Done for `/canvas`; the other seven are untried.)
+3. Rename a licensed field in `provenance.json` and confirm the scan's field list
+   changes with it, rather than the check silently narrowing.
+4. Argue the whole-graph scan is too coarse — that About & diagnostics displays no
+   licensed word and should not carry the notice. The counter is that EDRDG §3's
+   second clause asks for exactly that screen; but if the first clause were the
+   only one, the exemption list would be back and so would the failure mode.
+5. Point `stroke-paths.json` at a hand-drawn path and confirm
+   `test/dictionary.test.ts` re-derivation fails rather than the digest check
+   passing on the doctored file.
+6. Search a gloss that matches hundreds of entries (`time`, `person`) and check
+   the 40-result display cap is not hiding a ranking bug behind a truncation.
+
+### Next safe command
+
+Verify this branch from a clean checkout, re-run the §17.5 set, and run
+`--verify-reproducible` and `--verify-attribution` with a warm cache. Nothing
+here is merged; no agent may merge, approve, or push to `main`.

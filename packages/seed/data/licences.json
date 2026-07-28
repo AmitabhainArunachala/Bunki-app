@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Which verbatim licence text backs which provenance source.",
+    "",
+    "This file is the machine-readable half of LICENSES.md, and it exists so that",
+    "'we have the licence' is a checkable claim rather than a sentence in a",
+    "document nobody re-reads. test/edrdg.test.ts checks it three ways: every file",
+    "listed here exists and hashes to the digest recorded here; every path and",
+    "digest recorded here appears verbatim in LICENSES.md; and every provenance",
+    "source whose licence is not the project's own pending-OD-09 placeholder has an",
+    "entry here. The negative half matters more than the positive: a source that",
+    "claims a third-party licence with no text on disk fails the suite, which is",
+    "what stops the next import from shipping data whose licence was written from",
+    "memory.",
+    "",
+    "'requiresOnScreenAttribution' records the EDRDG condition that an attribution",
+    "buried in a file does not satisfy: §3 of the EDRDG licence statement demands",
+    "acknowledgement on the screen that displays words from the files. The seed's",
+    "SEED_ENTRY_DISCLOSURE is what carries it, and the tests assert that."
+  ],
+  "sources": {
+    "KanjiVG": {
+      "license": "CC BY-SA 3.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/KanjiVG-COPYING.txt", "licenses/CC-BY-SA-3.0.txt"]
+    },
+    "JMdict (EDRDG)": {
+      "license": "CC BY-SA 4.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/EDRDG-licence-statement.html", "licenses/CC-BY-SA-4.0.html"]
+    },
+    "Tatoeba": {
+      "license": "CC BY 2.0 FR",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/CC-BY-2.0-FR.html"]
+    },
+    "KANJIDIC2 (EDRDG)": {
+      "license": "CC BY-SA 4.0",
+      "requiresOnScreenAttribution": true,
+      "files": ["licenses/EDRDG-licence-statement.html", "licenses/CC-BY-SA-4.0.html"]
+    }
+  },
+  "files": {
+    "licenses/KanjiVG-COPYING.txt": {
+      "bytes": 20595,
+      "sha256": "d255e07978fd16ddfec38bc59dc9d857b885dd44ddbf4e79baf207d30746bdcc",
+      "retrievedFrom": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/COPYING",
+      "retrievedAt": "2026-07-27"
+    },
+    "licenses/CC-BY-SA-3.0.txt": {
+      "bytes": 22240,
+      "sha256": "3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f",
+      "retrievedFrom": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-3.0.txt",
+      "retrievedAt": "2026-07-28"
+    },
+    "licenses/EDRDG-licence-statement.html": {
+      "bytes": 13587,
+      "sha256": "52f60ea9ca68170a2f0663d7dba381ebf1bd57c17a3347dfe21153865c156692",
+      "retrievedFrom": "https://www.edrdg.org/edrdg/licence.html",
+      "retrievedAt": "2026-07-28"
+    },
+    "licenses/CC-BY-SA-4.0.html": {
+      "bytes": 51859,
+      "sha256": "a7dbad04e9a44a69a06d2ea5f20cceccb163091550591ed41ac610f112789246",
+      "retrievedFrom": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+      "retrievedAt": "2026-07-28"
+    },
+    "licenses/CC-BY-2.0-FR.html": {
+      "bytes": 39707,
+      "sha256": "af0d7ada8b9be52a6874238f4533512d0b2568595bf7cb3427e41f7c38847b71",
+      "retrievedFrom": "https://creativecommons.org/licenses/by/2.0/fr/legalcode",
+      "retrievedAt": "2026-07-28"
+    }
+  }
+}

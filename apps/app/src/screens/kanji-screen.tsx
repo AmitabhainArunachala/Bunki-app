@@ -40,6 +40,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import {
   findKanjiByCharacter,
+  importedDictionary,
   readingContextFor,
   seedDataset,
   wordsUsingKanji,
@@ -72,6 +73,19 @@ export interface KanjiScreenProps {
    * `.svg` transformer — see `src/data/stroke-sources.ts`.
    */
   readonly strokeSvg: string | null;
+  /**
+   * Already-extracted geometry, for the imported tier.
+   *
+   * Its 1,241 verbatim SVGs are 4.7 MB and may not be copied out of
+   * `packages/seed` (controller §4, DL-33), so the importer extracts their
+   * strokes from those same committed bytes and
+   * `packages/seed/test/dictionary.test.ts` re-derives every one of them from
+   * the originals. Same drawing, same licensor; only the parse happened earlier.
+   *
+   * `strokeSvg` wins when both are present, so nothing about the fixture tier's
+   * rendering path changes.
+   */
+  readonly strokes?: KanjiStrokeSet | null | undefined;
   readonly onOpenWord: (lexemeId: string) => void;
   readonly onBack: () => void;
 }
@@ -79,6 +93,7 @@ export interface KanjiScreenProps {
 export function KanjiScreen({
   character,
   strokeSvg,
+  strokes: providedStrokes = null,
   onOpenWord,
   onBack,
 }: KanjiScreenProps): ReactNode {
@@ -89,7 +104,7 @@ export function KanjiScreen({
   const resolve = useCallback(() => findKanjiByCharacter(character), [character]);
   const { state, retry } = useLookup<SeedKanji>(resolve, {
     flags,
-    emptyMessage: `“${character}” is not one of the ${String(seedDataset.kanji.length)} kanji in the Phase-0 seed.`,
+    emptyMessage: `“${character}” is not one of the ${String(seedDataset.kanji.length + importedDictionary.kanji.length)} kanji this build carries.`,
     emptyDetail: 'This is a seed dataset, not a dictionary.',
   });
 
@@ -99,7 +114,7 @@ export function KanjiScreen({
    * unreadable stroke file still gets its meanings, readings and compounds.
    */
   const strokes = useMemo<{ set: KanjiStrokeSet | null; error: string | null }>(() => {
-    if (strokeSvg === null) return { set: null, error: null };
+    if (strokeSvg === null) return { set: providedStrokes, error: null };
     try {
       return { set: parseKanjiVgStrokes(strokeSvg), error: null };
     } catch (cause) {
@@ -108,7 +123,7 @@ export function KanjiScreen({
         error: cause instanceof Error ? cause.message : 'The stroke file could not be read.',
       };
     }
-  }, [strokeSvg]);
+  }, [strokeSvg, providedStrokes]);
 
   if (state.kind === 'loading') {
     return (

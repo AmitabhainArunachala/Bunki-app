@@ -45,7 +45,7 @@ import {
 
 import { useDebugFlags } from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
-import { ProvenanceLine } from '../ui/notices.tsx';
+import { ProvenanceLine, SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -186,9 +186,20 @@ function CanvasBody({
   return (
     <ScreenShell
       lede={
-        <Text style={[styles.promise, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          {CANVAS_IMMERSION_PROMISE}
-        </Text>
+        <>
+          <Text style={[styles.promise, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+            {CANVAS_IMMERSION_PROMISE}
+          </Text>
+          {/*
+            The passage is this project's own writing, but the target inside it
+            is a JMdict entry and the cloze is rendered from its headword and
+            reading. §3 of the EDRDG licence statement asks for the
+            acknowledgement on each screen that displays words from the files,
+            and this is one: the verifier drove `/canvas` and found the two
+            fields on screen with no EDRDG string anywhere in the DOM.
+          */}
+          <SeedEntryDisclosure />
+        </>
       }
       subtitle={`${target.passage.title} — ${target.passage.titleTranslation}`}
       testID="screen-canvas"

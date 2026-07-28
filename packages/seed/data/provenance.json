@@ -40,6 +40,32 @@
       "source_entry_id": null,
       "notes": "Stroke counts and component/radical decompositions read out of the committed KanjiVG SVGs (kvg:element, kvg:radical, kvg:*-sN path ids). Share-alike analysis of a CC BY-SA 3.0 work; test/strokes.test.ts re-derives every value from the SVG bytes, so these fields cannot drift away from their source."
     },
+    "edrdg-jmdict": {
+      "source": "JMdict (EDRDG)",
+      "source_version": "JMdict_e (English edition), retrieved from www.edrdg.org on 2026-07-28; 218,173 entries",
+      "license": "CC BY-SA 4.0",
+      "attribution": "This product uses the JMdict dictionary file. JMdict is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.html, full legal code in packages/seed/licenses/CC-BY-SA-4.0.html",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "source_url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "notes": "Real JMdict entries; each field's source_entry_id is that entry's real ent_seq. modification_status is derived, not unmodified, for one specific reason: the seed schema stores senses and parts of speech as flat string lists, so upstream sense boundaries are lost by the shape. reading is the entry's first kana element; partOfSpeech and senses are every value across every sense in upstream order, deduplicated. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
+    },
+    "edrdg-kanjidic2": {
+      "source": "KANJIDIC2 (EDRDG)",
+      "source_version": "KANJIDIC2, retrieved from www.edrdg.org on 2026-07-28; 13,108 characters",
+      "license": "CC BY-SA 4.0",
+      "attribution": "This product uses the KANJIDIC2 dictionary file. KANJIDIC2 is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.html, full legal code in packages/seed/licenses/CC-BY-SA-4.0.html",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "source_url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "notes": "Real KANJIDIC2 characters; source_entry_id is the literal, which is KANJIDIC2's own entry identifier. onReadings and kunReadings are the ja_on and ja_kun readings in upstream order; meanings are the English <meaning> elements only. In the §8 fixture tier strokeCount is NOT taken from here — that tier derives it from the KanjiVG file it ships, and KANJIDIC2's stroke_count agreeing on all ten characters is an independent cross-check that would be destroyed by copying one into the other. The imported tier under data/dictionary/ has no such per-character cross-check to protect, so its strokeCount is KANJIDIC2's own and is labelled as such. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
+    },
     "bunki-editorial": {
       "source": "Bunki Phase-0 seed (hand-assembled by this project)",
       "source_version": "1.0.0",
@@ -51,7 +77,7 @@
       "source_url": null,
       "retrieved_at": null,
       "source_entry_id": null,
-      "notes": "Lexicographic claims (readings, senses, parts of speech, kanji meanings) written from the builder's own knowledge of Japanese. They are DELIBERATELY NOT labelled as JMdict or KANJIDIC2 content: EDRDG's hosts were unreachable from this build session (see LICENSES.md, deferred item D-1), so no entry sequence number could be recorded and no dictionary cross-check could be run. Reading and sense lists are representative, not exhaustive. confidence=medium and review_status=unreviewed are the honest labels until a primary-source pass runs."
+      "notes": "Lexicographic claims written from the builder's own knowledge of Japanese, retained only where no licensed source replaced them. The lexeme readings/senses/parts of speech and the kanji on/kun readings and meanings that this source used to cover are now real JMdict and KANJIDIC2 entries (see edrdg-jmdict, edrdg-kanjidic2). What is left under this source is labelled unreviewed and carries no entry identifier, because there is none to carry."
     },
     "bunki-authored-text": {
       "source": "Bunki Phase-0 seed (original text written for this project)",
@@ -91,6 +117,32 @@
       "retrieved_at": null,
       "source_entry_id": null,
       "notes": "Values a machine derives from the field's own subject — a Unicode code point from its character, the kanji used by a headword from the headword string. The test suite recomputes each one and fails on any mismatch, so these are the only seed fields that are self-verifying."
+    },
+    "tatoeba-japanese": {
+      "source": "Tatoeba",
+      "source_version": "jpn_sentences_detailed.tsv, retrieved from downloads.tatoeba.org on 2026-07-28; 248,821 Japanese sentences",
+      "license": "CC BY 2.0 FR",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "attribution": "Sentence from the Tatoeba Project (https://tatoeba.org), used under CC BY 2.0 FR: https://creativecommons.org/licenses/by/2.0/fr/ — full legal code in packages/seed/licenses/CC-BY-2.0-FR.html. The contributing member is named per sentence in the record, because this licence attributes the individual author, not the corpus.",
+      "source_url": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences_detailed.tsv.bz2",
+      "notes": "Sentence text verbatim, never edited. The per-record tatoeba.japaneseId is the real Tatoeba sentence id and japaneseContributor the real contributing username; a sentence whose contributor could not be resolved was not shipped, because an attribution licence with no attributable author cannot be complied with."
+    },
+    "tatoeba-english": {
+      "source": "Tatoeba",
+      "source_version": "eng_sentences_detailed.tsv, paired through the links export (links.tar.bz2), both retrieved from downloads.tatoeba.org on 2026-07-28",
+      "license": "CC BY 2.0 FR",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "attribution": "English translation from the Tatoeba Project (https://tatoeba.org), used under CC BY 2.0 FR: https://creativecommons.org/licenses/by/2.0/fr/ — full legal code in packages/seed/licenses/CC-BY-2.0-FR.html. The contributing member is named per sentence in the record.",
+      "source_url": "https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_detailed.tsv.bz2",
+      "notes": "The English half of a Tatoeba pair is a separate work by a separate contributor, linked through the project's own links export. It carries its own id and its own credit rather than inheriting the Japanese sentence's, because collapsing the two would misattribute both."
     }
   }
 }

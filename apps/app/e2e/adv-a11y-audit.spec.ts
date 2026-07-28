@@ -224,16 +224,38 @@ interface FocusedElement {
   readonly tag: string;
 }
 
+/**
+ * The focused element, with its position measured **in the page, not in the
+ * viewport**.
+ *
+ * `getBoundingClientRect()` alone is viewport-relative, and the browser scrolls
+ * to reveal each element as it is focused — so the moment a screen grows past one
+ * screenful, the same element reports a smaller `top` than the one above it and a
+ * reading-order assertion starts failing on content that is in perfectly good
+ * order. That is a property of the measurement, not of the page.
+ *
+ * Expo Web scrolls inside a `ScrollView` container rather than the window
+ * (`window.scrollY` stays 0 while the content moves), so the scroll offset of
+ * every ancestor is added back, plus the window's own. What comes out is a
+ * position in the scrolled content, which is what "reading order" has always
+ * meant.
+ */
 async function focused(page: Page): Promise<FocusedElement | null> {
   return page.evaluate(() => {
     const element = document.activeElement as HTMLElement | null;
     if (element === null || element === document.body) return null;
     const box = element.getBoundingClientRect();
+    let top = box.top + window.scrollY;
+    let left = box.left + window.scrollX;
+    for (let node = element.parentElement; node !== null; node = node.parentElement) {
+      top += node.scrollTop;
+      left += node.scrollLeft;
+    }
     return {
       testId: element.getAttribute('data-testid') ?? '',
       name: (element.getAttribute('aria-label') ?? element.textContent ?? '').trim().slice(0, 60),
-      top: Math.round(box.top),
-      left: Math.round(box.left),
+      top: Math.round(top),
+      left: Math.round(left),
       width: Math.round(box.width),
       height: Math.round(box.height),
       outlineStyle: getComputedStyle(element).outlineStyle,

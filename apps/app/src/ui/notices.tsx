@@ -3,11 +3,15 @@
  *
  * These components exist because of one rule: nothing on a screen may imply a
  * standing the data does not have (REQ-GATE-03, REQ-SRC-01, controller §8).
- * The seed's lexical entries are project-authored pending licensed sources, so
- * a word page that looks like a dictionary page is a false claim regardless of
- * how careful the surrounding prose is. `SeedEntryDisclosure` is therefore not
- * decoration — the disclosure string comes from `@bunki/seed` itself, so the
- * package that knows what it is is the package that words it.
+ *
+ * That rule now cuts both ways. The seed's lexical entries *are* real licensed
+ * JMdict and KANJIDIC2 data, so understating them would be its own falsehood —
+ * but its example sentences, grammar notes and passage are still this project's
+ * own writing, and the EDRDG licence additionally requires its acknowledgement
+ * to appear on the screen displaying the words rather than in a file nobody
+ * opens. `SeedEntryDisclosure` carries all three facts at once, and it is not
+ * decoration: the string comes from `@bunki/seed` itself, so the package that
+ * knows what the data is is the package that words it.
  *
  * `DurabilityNotice` does the same job for saving: the Phase-0 store is in
  * memory, and a "Saved" acknowledgment with nothing beside it would be read as
@@ -21,6 +25,7 @@ import { SEED_COVERAGE_DISCLOSURE, SEED_ENTRY_DISCLOSURE } from '../data/catalog
 import {
   attributionLines,
   distinctProvenance,
+  isSourced,
   provenanceBadge,
   provenanceEntries,
   provenanceSummary,
@@ -61,6 +66,67 @@ export function SeedEntryDisclosure({
       >
         {SEED_ENTRY_DISCLOSURE}
       </Text>
+    </View>
+  );
+}
+
+/**
+ * The Sources screen's attribution block (EDRDG licence statement §3, clause 2).
+ *
+ * §3 has two obligations and this is the second one, which the build has been
+ * carrying as an open coordination request:
+ *
+ * > For smartphone and tablet apps, acknowledgement must be made, e.g. on a
+ * > separate screen accessed from a menu, such as one labelled "About",
+ * > "Sources", etc. It is not sufficient just to mention it on a
+ * > start-up/launch page of the app.
+ *
+ * `LICENSES.md` §2.2 recorded it as **not met** — "there is no Sources screen" —
+ * and named it a precondition for any packaged mobile app. There is one now: the
+ * shell's *About & diagnostics* destination, reached from the persistent menu on
+ * every route, which is exactly the shape the clause asks for.
+ *
+ * Every source in the registry is listed, not only the ones with an obligation.
+ * A screen that names JMdict and quietly omits the material this project wrote
+ * itself would be the mirror-image dishonesty — the reader could not tell which
+ * of the app's claims have a dictionary behind them and which do not, which is
+ * the whole distinction {@link ProvenanceLine} exists to draw.
+ */
+export function SourcesSection({
+  sources,
+  testID = 'sources-attribution',
+}: {
+  readonly sources: Readonly<Record<string, ProvenanceRecord>>;
+  readonly testID?: string;
+}): ReactNode {
+  const theme = useTheme();
+  const listed = distinctProvenance(Object.values(sources));
+
+  return (
+    <View style={styles.attributions} testID={testID}>
+      {listed.map((record) => (
+        <View
+          key={`${record.source}|${record.source_version}|${record.review_status}`}
+          style={styles.attributionBlock}
+        >
+          <Text
+            style={[
+              styles.attributionSource,
+              { color: theme.color.ink, fontFamily: theme.font.sans },
+            ]}
+          >
+            {record.source} · {record.license}
+          </Text>
+          {attributionLines(record).map((line, index) => (
+            <Text
+              key={`${index}-${line.slice(0, 24)}`}
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            >
+              {line}
+            </Text>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -118,7 +184,7 @@ export function ProvenanceLine({
       style={[
         styles.provenance,
         {
-          color: standing === 'source-verified' ? theme.color.inkMuted : theme.color.vermilion,
+          color: isSourced(standing) ? theme.color.inkMuted : theme.color.vermilion,
           fontFamily: theme.font.sans,
         },
       ]}
@@ -139,9 +205,8 @@ export function ProvenanceBadge({ record }: { readonly record: ProvenanceRecord 
       style={[
         styles.badge,
         {
-          borderColor:
-            standing === 'source-verified' ? theme.color.ruleStrong : theme.color.vermilion,
-          color: standing === 'source-verified' ? theme.color.inkMuted : theme.color.vermilion,
+          borderColor: isSourced(standing) ? theme.color.ruleStrong : theme.color.vermilion,
+          color: isSourced(standing) ? theme.color.inkMuted : theme.color.vermilion,
           fontFamily: theme.font.sans,
         },
       ]}

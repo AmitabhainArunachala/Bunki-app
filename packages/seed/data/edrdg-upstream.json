@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "Which upstream artefacts the EDRDG values in data/lexemes.json and data/kanji.json",
+    "were read out of.",
+    "",
+    "Superseded 2026-07-28: this file used to describe the jamdict-data 1.5 sdist,",
+    "because EDRDG's own hosts were refused by the egress policy. They are reachable",
+    "now, the values were re-derived from the licensor's own files, and every field was",
+    "re-checked with `import-sources.mjs --verify-fixtures` — which found seven fields",
+    "that had drifted since the 2021 redistribution and rewrote them."
+  ],
+  "upstream": {
+    "publisher": "Electronic Dictionary Research and Development Group — https://www.edrdg.org",
+    "jmdictUrl": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+    "jmdictSha256": "bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2",
+    "jmdictBytes": 10523044,
+    "kanjidic2Url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
+    "kanjidic2Sha256": "47f16167210653dc0f6cfff46278e1fb8b02e8d2cc9dc7f296be533999cbfd80",
+    "kanjidic2Bytes": 1488563,
+    "licenseFile": "licenses/EDRDG-licence-statement.html",
+    "licenseSha256": "52f60ea9ca68170a2f0663d7dba381ebf1bd57c17a3347dfe21153865c156692",
+    "licenseUrl": "https://www.edrdg.org/edrdg/licence.html",
+    "license": "CC BY-SA 4.0",
+    "retrievedAt": "2026-07-28",
+    "supersedes": "jamdict-data 1.5 sdist (sha256 a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415), whose bundled licence copy stated CC BY-SA 3.0"
+  },
+  "databaseMeta": {
+    "jmdict.version": "JMdict_e as published 2026-07-28",
+    "jmdict.url": "https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project",
+    "kanjidic2.version": "KANJIDIC2 as published 2026-07-28",
+    "kanjidic2.url": "https://www.edrdg.org/wiki/index.php/KANJIDIC_Project"
+  },
+  "entryCounts": {
+    "jmdictEntries": 218173,
+    "kanjidic2Characters": 13108
+  },
+  "lexemeEntSeq": {
+    "lex-bunki": 1503340,
+    "lex-bunkiten": 1503370,
+    "lex-kiro": 1219840,
+    "lex-wakareru": 1606600,
+    "lex-wakeru": 1503000,
+    "lex-wakaru": 1606560,
+    "lex-fun": 1502840,
+    "lex-jibun": 1318610,
+    "lex-bubun": 1499490,
+    "lex-senro": 1391880,
+    "lex-douro": 1454290,
+    "lex-shadou": 1323210,
+    "lex-kuruma": 1323080,
+    "lex-eki": 1175140,
+    "lex-ten": 1441390,
+    "lex-michi": 1454080
+  },
+  "kanjidic2Literals": ["分", "岐", "点", "路", "線", "道", "車", "駅", "自", "部"]
+}

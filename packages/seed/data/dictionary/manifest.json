@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "What this import fetched and what it produced. Written by",
+    "scripts/import-sources.mjs.",
+    "",
+    "--check re-derives every digest below from the committed files. That is a",
+    "tamper-evidence check and nothing more: it proves the bytes in data/ are the",
+    "bytes recorded here, never that they are what the script would emit today.",
+    "--verify-reproducible is the check that re-runs the pipeline from the cached",
+    "archives and diffs its output against the committed files.",
+    "",
+    "The raw downloads are NOT committed: they are ~200 MB and live in the",
+    "gitignored cache. Their sha256 is recorded here so a shipped gloss can be",
+    "traced back to the exact upstream bytes it came from."
+  ],
+  "generatedAt": "2026-07-28",
+  "parameters": {
+    "lexemes": 3000,
+    "sentences": 2000,
+    "strokes": "all"
+  },
+  "scaleNote": "This is a subset, ranked by JMdict priority tags. Re-running with --lexemes=all imports every priority-tagged entry; the pipeline is unchanged by the size.",
+  "sources": {
+    "edrdg-jmdict": {
+      "displayName": "JMdict (EDRDG)",
+      "license": "CC BY-SA 4.0",
+      "licenceFiles": [
+        "licenses/EDRDG-licence-statement.html",
+        "licenses/CC-BY-SA-4.0.html"
+      ],
+      "url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+      "retrievedAt": "2026-07-28",
+      "bytes": 10523044,
+      "sha256": "bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2"
+    },
+    "edrdg-kanjidic2": {
+      "displayName": "KANJIDIC2 (EDRDG)",
+      "license": "CC BY-SA 4.0",
+      "licenceFiles": [
+        "licenses/EDRDG-licence-statement.html",
+        "licenses/CC-BY-SA-4.0.html"
+      ],
+      "url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
+      "retrievedAt": "2026-07-28",
+      "bytes": 1488563,
+      "sha256": "47f16167210653dc0f6cfff46278e1fb8b02e8d2cc9dc7f296be533999cbfd80"
+    },
+    "tatoeba-jpn": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences_detailed.tsv.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 4460133,
+      "sha256": "20706c3dfc36d7a6b0a6ad4443acfa09e711594a9e715099394d24d06e710f30"
+    },
+    "tatoeba-links": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/links.tar.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 148936941,
+      "sha256": "69abec53fe090d0fcd3c20dd0bb441768697668346a66b14bc07d029dc2c88e2"
+    },
+    "tatoeba-eng": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_detailed.tsv.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 34779571,
+      "sha256": "8312d3ba807aac581f241be02f4c801a983c2aa98719d20c51fd38997df6a4d7"
+    }
+  },
+  "counts": {
+    "lexemes": 3000,
+    "kanji": 1241,
+    "sentences": 2000,
+    "strokeFiles": 1241,
+    "kanjiWithoutKanjiVgCoverage": 0,
+    "sentencePairsDroppedWithoutNamedContributor": 1009,
+    "jmdictEntriesAvailable": 218173,
+    "kanjidic2CharactersAvailable": 13108
+  },
+  "outputs": {
+    "dictionary/lexemes.json": {
+      "bytes": 1561668,
+      "sha256": "5d04b23b7daa78f7fd4e9035d86932da820eb4cc32c4981f7adbf80fbc1ad968"
+    },
+    "dictionary/kanji.json": {
+      "bytes": 865362,
+      "sha256": "debd46c45dcce683380df5fb47ce8f506e24186e215d1d7856726253968bb3fb"
+    },
+    "dictionary/stroke-paths.json": {
+      "bytes": 2609736,
+      "sha256": "5bc31f2115d14eb4b680ddab799c4686e52f7b90abefb4ab41c6e79c0155381a"
+    },
+    "dictionary/sentences.json": {
+      "bytes": 1102305,
+      "sha256": "21eac4b2a164ed015fc7e2dc39787227271b783abd5d23cb0760cd4c4fb20f67"
+    },
+    "dictionary/strokes.json": {
+      "bytes": 438462,
+      "sha256": "b0edb9f904e6b15b4dacdfd467493d10ce303c59b6dc3458ab4980ba953358b9"
+    }
+  },
+  "deferred": [
+    {
+      "source": "tatoeba",
+      "reason": "1009 candidate sentence pairs were not shipped: the Tatoeba export writes the MySQL NULL sentinel \\N in the username column for an ownerless sentence, and CC BY 2.0 FR cannot be complied with for a work whose author cannot be named."
+    }
+  ]
+}

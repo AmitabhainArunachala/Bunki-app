@@ -194,7 +194,11 @@ test('claims: the audit itself can fail — every pattern matches its own exampl
   const mustPass = [
     'Full character-database fields, school grade, frequency and JLPT/Kanken mappings need a licensed source.',
     'This is a Phase-0 seed dataset, not a complete dictionary.',
-    'Readings and senses in this seed are representative, not exhaustive, and are not verified against a published dictionary.',
+    // The live disclosure, verbatim. It used to be pinned here at CC BY-SA 3.0
+    // — a copy of the string left behind when the version correction landed, and
+    // the sort of stale duplicate that makes a reader wonder which of two
+    // licence claims the app actually makes.
+    'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 4.0. Stroke order comes from KanjiVG under CC BY-SA 3.0. Imported example sentences come from the Tatoeba Project under CC BY 2.0 FR and name the member who contributed each one. Sense and reading lists are flattened here and may not show every distinction upstream draws. The eight worked examples, the grammar notes and the reading passage are written by this project, not taken from any corpus.',
     'This checks the export, not durability or storage.',
     'Nothing here changes what the app has stored until you accept it as a note.',
     'The scheduler is FSRS with pinned parameters; its presence is not evidence that this app works.',
@@ -219,7 +223,7 @@ test('claims: the audit itself can fail — every pattern matches its own exampl
 
 /** Verbatim from `@bunki/seed` and `@bunki/ai` — the packages that own the wording. */
 const SEED_ENTRY_DISCLOSURE =
-  'Readings and senses in this seed are representative, not exhaustive, and are not verified against a published dictionary.';
+  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 4.0. Stroke order comes from KanjiVG under CC BY-SA 3.0. Imported example sentences come from the Tatoeba Project under CC BY 2.0 FR and name the member who contributed each one. Sense and reading lists are flattened here and may not show every distinction upstream draws. The eight worked examples, the grammar notes and the reading passage are written by this project, not taken from any corpus.';
 const SEED_COVERAGE_DISCLOSURE = 'This is a Phase-0 seed dataset, not a complete dictionary.';
 const CANDIDATE_LABEL = 'AI candidate / generated';
 const OFFLINE_FALLBACK_LABEL = 'offline-fallback';
@@ -238,6 +242,31 @@ test('labels: the seed entry disclosure is on every surface that could pass for 
     await expect(disclosure, `${route} renders seed data with no entry disclosure`).toBeVisible();
     await expect(disclosure).toHaveText(SEED_ENTRY_DISCLOSURE);
   }
+});
+
+test('labels: a populated search on / acknowledges EDRDG, because §3 says on each screen display', async ({
+  page,
+  app,
+}) => {
+  // The surface this list used to miss. A search result row on `/` is a reading,
+  // a set of senses and a part of speech — JMdict fields, all of them — and §3 of
+  // the EDRDG licence statement requires the acknowledgement "on each screen
+  // display", not only on the pages a route list happened to name. The route was
+  // untested and shipped with no EDRDG string anywhere in the DOM.
+  await openApp(page, app.origin);
+  await visibleTestId(page, 'capture-search-input').fill('分');
+  await expect(visibleTestId(page, 'capture-top-answer')).toBeVisible();
+
+  const disclosure = visibleTestId(page, 'seed-entry-disclosure');
+  await expect(disclosure, '/ renders JMdict fields with no EDRDG acknowledgement').toBeVisible();
+  await expect(disclosure).toHaveText(SEED_ENTRY_DISCLOSURE);
+
+  // Named in full on the page itself, not merely implied by a test id: the
+  // licence asks for the acknowledgement, and an element that exists but says
+  // nothing about EDRDG would satisfy the selector and not the licence.
+  await expect(page.locator('body')).toContainText(
+    'Electronic Dictionary Research and Development Group',
+  );
 });
 
 test('labels: an unmatched search says the seed is not a dictionary', async ({ page, app }) => {

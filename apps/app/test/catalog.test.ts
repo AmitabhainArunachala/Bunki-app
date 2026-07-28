@@ -66,10 +66,47 @@ describe('search', () => {
     expect(results.some((r) => r.kind === 'lexeme' && r.lexeme.headword === '分岐')).toBe(true);
   });
 
-  it('returns nothing for a word the seed does not have', () => {
-    // A real Japanese word, deliberately outside the sixteen-word seed: the
-    // empty state must mean "not in the seed", not "not a word".
-    expect(searchSeed('図書館')).toEqual([]);
+  it('finds a real word that is outside the sixteen-word fixture tier', () => {
+    // This case used to assert `[]` for 図書館, and that assertion was correct
+    // while the fixture tier was all the app could reach. The imported tier is
+    // reachable now, so the same query is the *positive* case: a word the seed
+    // never had, found, with its real reading and senses.
+    const results = searchSeed('図書館');
+    const first = results[0];
+    expect(first?.kind).toBe('lexeme');
+    if (first?.kind !== 'lexeme') throw new Error('expected a lexeme result');
+    expect(first.tier).toBe('imported');
+    expect(first.lexeme.headword).toBe('図書館');
+    expect(first.lexeme.reading).toBe('としょかん');
+    expect(first.lexeme.senses.join(' ')).toMatch(/library/i);
+  });
+
+  it('still returns nothing for something that is not a word in either tier', () => {
+    // The empty state has to keep meaning "not in this build", not "not a word",
+    // and it has to still be reachable — a search that always finds something
+    // would have quietly deleted the coverage disclosure's only trigger.
+    expect(searchSeed('ざぶんぶんきき')).toEqual([]);
+  });
+
+  it('finds a word by its English gloss, which is how a reader arrives', () => {
+    const results = searchSeed('library');
+    expect(results.length).toBeGreaterThan(0);
+    expect(
+      results.some((result) => result.kind === 'lexeme' && result.lexeme.headword === '図書館'),
+    ).toBe(true);
+  });
+
+  it('keeps the fixture tier ahead of the imported tier', () => {
+    // The canonical target, the passage and the whole closed loop resolve
+    // through the fixture tier. An imported record sorting first would move the
+    // operator's loop onto a record the E2E and the canvas are not written
+    // against — which nothing else would notice.
+    const results = searchSeed('分');
+    const tiers = results.map((result) => result.tier);
+    const lastFixture = tiers.lastIndexOf('fixture');
+    const firstImported = tiers.indexOf('imported');
+    expect(lastFixture).toBeGreaterThanOrEqual(0);
+    if (firstImported !== -1) expect(firstImported).toBeGreaterThan(lastFixture);
   });
 
   it('is deterministic — the same query twice gives the same order', () => {
@@ -93,7 +130,17 @@ describe('lookup', () => {
 
   it('returns null for an unknown id rather than throwing', () => {
     expect(findLexemeById('lex-nope')).toBeNull();
-    expect(findKanjiByCharacter('漢')).toBeNull();
+    // A CJK character no imported word uses. 漢 used to serve here and does not
+    // any more — it is in the imported tier, which is the point of this round.
+    expect(findKanjiByCharacter('鬱')).toBeNull();
+  });
+
+  it('resolves an imported kanji with its real KANJIDIC2 fields', () => {
+    const kanji = findKanjiByCharacter('漢');
+    expect(kanji, '漢 is used by an imported word and should resolve').not.toBeNull();
+    expect(kanji?.meanings.join(' ')).toMatch(/Sino|China|Chinese/i);
+    expect(kanji?.onReadings.length).toBeGreaterThan(0);
+    expect(kanji?.strokeCount).toBeGreaterThan(0);
   });
 });
 

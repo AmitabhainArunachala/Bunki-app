@@ -216,6 +216,48 @@ describe('the seed entry disclosure reaches the pages that need it', () => {
   it('shows the coverage disclosure on an empty search', () => {
     expect(captureSource).toContain('SeedCoverageDisclosure');
   });
+
+  it('renders on the search screen, which displays JMdict fields too', () => {
+    // §3 of the EDRDG licence statement asks for the acknowledgement on *each*
+    // screen display of words from the files, and a search result row is a
+    // reading, senses and a part of speech. This screen shipped with only the
+    // coverage disclosure, which renders exactly when nothing matched — the one
+    // state in which no licensed word is on screen.
+    expect(captureSource).toContain('SeedEntryDisclosure');
+  });
+
+  /**
+   * Unconditionally, on every screen.
+   *
+   * Two gates on this notice have now gone stale, both the same way: the set of
+   * licensed things on the screen grew and the predicate did not. The second one
+   * rendered it "whenever a search result does" and still missed the kept-threads
+   * list, whose `displayText` is the matched entry's JMdict headword and which
+   * outlives both the query and a reload.
+   *
+   * A gated render is not wrong in principle — it is wrong in practice here, and
+   * this is the assertion that keeps the next well-meaning narrowing from
+   * shipping. It reads the JSX rather than the DOM on purpose: the browser lane
+   * (`e2e/edrdg-acknowledgement.spec.ts`) proves the notice is *visible*, and
+   * this proves there is no state in which it is not rendered at all.
+   */
+  it.each([
+    ['capture', captureSource],
+    ['word', wordSource],
+    ['kanji', kanjiSource],
+  ])('renders the acknowledgement on the %s screen with no condition on it', (_label, source) => {
+    const rendered = [...source.matchAll(/<SeedEntryDisclosure[\s/>]/g)];
+    expect(rendered.length, 'the screen renders no acknowledgement at all').toBeGreaterThan(0);
+    for (const match of rendered) {
+      // The 24 characters before the tag, with comments and whitespace already
+      // excluded by the fact that a guard has to sit adjacent to what it guards.
+      const preceding = source.slice(Math.max(0, match.index - 24), match.index);
+      expect(
+        preceding,
+        `the acknowledgement is rendered behind a condition: …${preceding}${match[0]}`,
+      ).not.toMatch(/[?&]{1,2}\s*$/);
+    }
+  });
 });
 
 /** The three panels that stand for a *screen state* (REQ-UI-09). */

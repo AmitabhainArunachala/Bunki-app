@@ -5,22 +5,39 @@
     "over the ten seed kanji: every headword decomposes into seed kanji only, and every",
     "seed kanji is used by at least one headword. test/dataset.test.ts asserts both",
     "directions, so the seed cannot quietly grow a word whose kanji page does not exist.",
-    "readings/senses/partOfSpeech are hand-assembled by this project and are NOT labelled",
-    "JMdict — see LICENSES.md deferred item D-1. No entry sequence numbers were available."
+    "reading/partOfSpeech/senses are REAL JMdict entries and each carries that entry's real",
+    "ent_seq in source_entry_id. They are not hand-assembled any more; D-1 is closed for",
+    "content, with the licence chain recorded in LICENSES.md §2. Regenerate or re-verify",
+    "with: node packages/seed/scripts/fetch-edrdg.mjs [--check]",
+    "headword and kanjiUsed stay project-owned: which words the seed covers is a selection,",
+    "not a lexicographic claim, and kanjiUsed is recomputed from the headword by the tests."
   ],
   "records": [
     {
       "id": "lex-bunki",
       "headword": "分岐",
       "reading": "ぶんき",
-      "partOfSpeech": ["noun", "suru-verb"],
-      "senses": ["branching", "forking", "divergence", "bifurcation"],
+      "partOfSpeech": [
+        "noun (common) (futsuumeishi)",
+        "noun or participle which takes the aux. verb suru",
+        "intransitive verb"
+      ],
+      "senses": ["divergence", "ramification", "bifurcation", "branching off"],
       "kanjiUsed": ["分", "岐"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503340"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503340"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503340"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -28,14 +45,29 @@
       "id": "lex-bunkiten",
       "headword": "分岐点",
       "reading": "ぶんきてん",
-      "partOfSpeech": ["noun"],
-      "senses": ["branch point", "junction", "fork in a road or line", "turning point"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": [
+        "fork",
+        "junction",
+        "diverging point",
+        "turning point (e.g. in one's life)",
+        "crossroads"
+      ],
       "kanjiUsed": ["分", "岐", "点"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503370"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503370"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503370"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -43,14 +75,23 @@
       "id": "lex-kiro",
       "headword": "岐路",
       "reading": "きろ",
-      "partOfSpeech": ["noun"],
-      "senses": ["forked road", "crossroads", "turning point"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["forked road", "crossroads"],
       "kanjiUsed": ["岐", "路"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1219840"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1219840"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1219840"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -58,14 +99,32 @@
       "id": "lex-wakareru",
       "headword": "分かれる",
       "reading": "わかれる",
-      "partOfSpeech": ["ichidan verb", "intransitive"],
-      "senses": ["to branch off", "to diverge", "to split", "to be divided"],
+      "partOfSpeech": ["Ichidan verb", "intransitive verb"],
+      "senses": [
+        "to branch",
+        "to fork",
+        "to diverge",
+        "to separate",
+        "to split",
+        "to divide",
+        "to disperse",
+        "to scatter"
+      ],
       "kanjiUsed": ["分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606600"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606600"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606600"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -73,14 +132,45 @@
       "id": "lex-wakeru",
       "headword": "分ける",
       "reading": "わける",
-      "partOfSpeech": ["ichidan verb", "transitive"],
-      "senses": ["to divide", "to separate", "to split up", "to share out"],
+      "partOfSpeech": ["Ichidan verb", "transitive verb"],
+      "senses": [
+        "to divide (into)",
+        "to split (into)",
+        "to part",
+        "to separate",
+        "to divide up",
+        "to classify",
+        "to sort out",
+        "to divide out",
+        "to share",
+        "to distribute",
+        "to deal out",
+        "to dish out",
+        "to distinguish",
+        "to discriminate",
+        "to differentiate (between)",
+        "to break up (a fight)",
+        "to mediate",
+        "to call a draw",
+        "to tie",
+        "to push one's way through (a crowd)",
+        "to sell"
+      ],
       "kanjiUsed": ["分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503000"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503000"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1503000"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -88,14 +178,42 @@
       "id": "lex-wakaru",
       "headword": "分かる",
       "reading": "わかる",
-      "partOfSpeech": ["godan verb", "intransitive"],
-      "senses": ["to understand", "to become clear", "to be known"],
+      "partOfSpeech": [
+        "Godan verb with 'ru' ending",
+        "intransitive verb",
+        "interjection (kandoushi)"
+      ],
+      "senses": [
+        "to understand",
+        "to comprehend",
+        "to grasp",
+        "to see",
+        "to get",
+        "to follow",
+        "to become clear",
+        "to be known",
+        "to be discovered",
+        "to be realized (realised)",
+        "to be found out",
+        "to make sense",
+        "I know!",
+        "I think so too!"
+      ],
       "kanjiUsed": ["分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606560"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606560"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1606560"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -103,14 +221,23 @@
       "id": "lex-fun",
       "headword": "分",
       "reading": "ふん",
-      "partOfSpeech": ["noun", "counter"],
-      "senses": ["minute (unit of time)"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["minute (unit of time)", "fun (one tenth of a monme, 5.787 grains)"],
       "kanjiUsed": ["分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1502840"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1502840"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1502840"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -118,14 +245,23 @@
       "id": "lex-jibun",
       "headword": "自分",
       "reading": "じぶん",
-      "partOfSpeech": ["noun", "pronoun"],
-      "senses": ["oneself", "myself", "one's own"],
+      "partOfSpeech": ["pronoun"],
+      "senses": ["myself", "yourself", "oneself", "himself", "herself", "I", "me", "you"],
       "kanjiUsed": ["自", "分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1318610"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1318610"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1318610"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -133,14 +269,23 @@
       "id": "lex-bubun",
       "headword": "部分",
       "reading": "ぶぶん",
-      "partOfSpeech": ["noun"],
-      "senses": ["part", "portion", "section"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["portion", "section", "part"],
       "kanjiUsed": ["部", "分"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1499490"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1499490"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1499490"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -148,14 +293,23 @@
       "id": "lex-senro",
       "headword": "線路",
       "reading": "せんろ",
-      "partOfSpeech": ["noun"],
-      "senses": ["railway track", "railway line", "rails"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["railway track", "railway line", "railroad", "railway", "track", "line"],
       "kanjiUsed": ["線", "路"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1391880"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1391880"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1391880"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -163,14 +317,23 @@
       "id": "lex-douro",
       "headword": "道路",
       "reading": "どうろ",
-      "partOfSpeech": ["noun"],
-      "senses": ["road", "highway", "street"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["road", "highway"],
       "kanjiUsed": ["道", "路"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454290"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454290"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454290"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -178,14 +341,23 @@
       "id": "lex-shadou",
       "headword": "車道",
       "reading": "しゃどう",
-      "partOfSpeech": ["noun"],
-      "senses": ["roadway", "carriageway", "road for vehicles"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["roadway", "road", "carriageway"],
       "kanjiUsed": ["車", "道"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323210"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323210"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323210"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -193,14 +365,23 @@
       "id": "lex-kuruma",
       "headword": "車",
       "reading": "くるま",
-      "partOfSpeech": ["noun"],
-      "senses": ["car", "automobile", "vehicle", "wheel"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": ["car", "automobile", "vehicle", "wheel", "castor", "caster"],
       "kanjiUsed": ["車"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323080"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323080"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1323080"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -208,14 +389,28 @@
       "id": "lex-eki",
       "headword": "駅",
       "reading": "えき",
-      "partOfSpeech": ["noun"],
-      "senses": ["railway station", "station"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)", "counter"],
+      "senses": [
+        "railway station",
+        "train station",
+        "staging post on a highway (in pre-modern Japan)",
+        "counter for railway stations and bus stations"
+      ],
       "kanjiUsed": ["駅"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1175140"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1175140"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1175140"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -223,14 +418,47 @@
       "id": "lex-ten",
       "headword": "点",
       "reading": "てん",
-      "partOfSpeech": ["noun", "counter"],
-      "senses": ["point", "dot", "mark", "score"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)", "counter"],
+      "senses": [
+        "dot",
+        "spot",
+        "point",
+        "speck",
+        "mark",
+        "mark (in an exam, etc.)",
+        "grade",
+        "score",
+        "points",
+        "point (in a game)",
+        "goal",
+        "run",
+        "aspect",
+        "matter",
+        "detail",
+        "part",
+        "respect",
+        "way",
+        "viewpoint",
+        "(punctuation) mark (e.g. comma, period, decimal point)",
+        "\"dot\" stroke (in a Chinese character)",
+        "counter for points, marks, goals, etc.",
+        "counter for goods, items, articles of clothing, works of art, etc."
+      ],
       "kanjiUsed": ["点"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1441390"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1441390"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1441390"
+        },
         "kanjiUsed": "bunki-computed"
       }
     },
@@ -238,14 +466,44 @@
       "id": "lex-michi",
       "headword": "道",
       "reading": "みち",
-      "partOfSpeech": ["noun"],
-      "senses": ["road", "path", "street", "way"],
+      "partOfSpeech": ["noun (common) (futsuumeishi)"],
+      "senses": [
+        "road",
+        "path",
+        "street",
+        "lane",
+        "passage",
+        "route",
+        "way",
+        "distance",
+        "journey",
+        "road (e.g. to victory)",
+        "course",
+        "way (of living, proper conduct, etc.)",
+        "moral principles",
+        "teachings (esp. Confucian or Buddhist)",
+        "dogma",
+        "field (e.g. of medicine)",
+        "subject",
+        "speciality",
+        "means",
+        "method"
+      ],
       "kanjiUsed": ["道"],
       "fieldProvenance": {
         "headword": "bunki-selection",
-        "reading": "bunki-editorial",
-        "partOfSpeech": "bunki-editorial",
-        "senses": "bunki-editorial",
+        "reading": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454080"
+        },
+        "partOfSpeech": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454080"
+        },
+        "senses": {
+          "ref": "edrdg-jmdict",
+          "source_entry_id": "1454080"
+        },
         "kanjiUsed": "bunki-computed"
       }
     }

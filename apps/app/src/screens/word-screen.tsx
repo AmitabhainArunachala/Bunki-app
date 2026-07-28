@@ -35,12 +35,15 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   constituentKanji,
   findLexemeById,
+  importedSentencesFor,
   passageForLexeme,
   sentencesForLexeme,
   wordFamily,
   type SeedLexeme,
 } from '../data/catalog.ts';
-import { seedDataset } from '../data/catalog.ts';
+import { importedSentenceProvenance } from '../data/imported-tier.ts';
+import type { ProvenanceRecord } from '@bunki/seed';
+import { importedDictionary, seedDataset } from '../data/catalog.ts';
 import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
 import {
   useAiRuntime,
@@ -88,7 +91,7 @@ export function WordScreen({
   const { state, retry } = useLookup<SeedLexeme>(resolve, {
     flags,
     emptyMessage: `No seed word has the id “${lexemeId}”.`,
-    emptyDetail: `The Phase-0 seed holds ${String(seedDataset.lexemes.length)} words. This is a seed dataset, not a dictionary.`,
+    emptyDetail: `This build carries ${String(seedDataset.lexemes.length + importedDictionary.lexemes.length)} words — the Phase-0 seed plus an imported slice of JMdict. It is not the whole dictionary.`,
   });
 
   // The candidate hook is resolved *above* the early returns, because hooks
@@ -140,6 +143,9 @@ export function WordScreen({
   const family = wordFamily(lexeme);
   const examples = sentencesForLexeme(lexeme.id);
   const passage = passageForLexeme(lexeme.id);
+  // Tatoeba pairs, for an imported word. Empty for a fixture word, whose eight
+  // worked examples are this project's own writing and render above.
+  const tatoeba = importedSentencesFor(lexeme);
   // Same lookup the candidate hook above already did; reused rather than
   // repeated so the panel and the page can never disagree about which thread
   // this word belongs to.
@@ -454,7 +460,7 @@ export function WordScreen({
             >
               Examples
             </Text>
-            {examples.length === 0 ? (
+            {examples.length === 0 && tatoeba.length === 0 ? (
               <Text
                 style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
               >
@@ -489,6 +495,61 @@ export function WordScreen({
                 </View>
               ))
             )}
+
+            {/*
+              Tatoeba examples, for an imported word.
+
+              CC BY 2.0 FR attributes the individual author, not the corpus, and
+              a Japanese sentence and its English translation are two works by
+              two different people. So each half names its own contributor on the
+              card the learner is looking at — a credit that lived only in
+              LICENSES.md would not be the attribution this licence asks for, for
+              the same reason §3 of the EDRDG statement is not satisfied by a
+              file. A pair that could not name both was never imported; the count
+              that cost is in the dataset manifest.
+            */}
+            {tatoeba.map((sentence) => (
+              <View
+                key={sentence.id}
+                style={[
+                  styles.card,
+                  { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
+                ]}
+                testID={`word-tatoeba-${sentence.id}`}
+              >
+                <Text
+                  style={[
+                    styles.example,
+                    { color: theme.color.ink, fontFamily: theme.font.mincho },
+                  ]}
+                >
+                  {sentence.japanese}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {sentence.english}
+                </Text>
+                <Text
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                  testID={`word-tatoeba-credit-${sentence.id}`}
+                >
+                  Tatoeba #{sentence.tatoeba.japaneseId} by {sentence.tatoeba.japaneseContributor} ·
+                  translation #{sentence.tatoeba.englishId} by {sentence.tatoeba.englishContributor}{' '}
+                  · CC BY 2.0 FR
+                </Text>
+                <ProvenanceLine
+                  field="japanese"
+                  record={importedSentenceProvenance['japanese'] as ProvenanceRecord}
+                />
+              </View>
+            ))}
 
             {passage === null ? null : (
               <>

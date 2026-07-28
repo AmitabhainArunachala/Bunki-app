@@ -70,6 +70,7 @@ import {
   type SupersessionReason,
   type ThreadView,
 } from '../state/store.ts';
+import { SeedEntryDisclosure } from '../ui/notices.tsx';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
 import { AppButton, ChipButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -280,6 +281,13 @@ export function EvidenceInspectorScreen({
 
   return (
     <ScreenShell
+      // The chain shows what was asked and what was accepted, and for a thread
+      // that resolved to a seed entry the accepted answers *are* JMdict senses
+      // (`seedDemonstration` reads them straight off the lexeme). Words from the
+      // files on a screen means §3 of the EDRDG statement applies here too — the
+      // acknowledgement does not become optional because the surface is an
+      // inspector rather than a dictionary page.
+      lede={<SeedEntryDisclosure />}
       subtitle="Everything here is read from your own event log. Nothing on this page is inferred."
       testID="screen-evidence"
       title={`Evidence — ${chain.displayText}`}

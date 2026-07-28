@@ -45,7 +45,7 @@
 
 import { chromium } from '@playwright/test';
 import { createServer } from 'node:http';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
@@ -56,11 +56,24 @@ const DIST = join(REPO_ROOT, 'apps/app/dist');
 
 const WARMUP = Number(process.env['BUNKI_PERF_WARMUP'] ?? 3);
 const SAMPLES = Number(process.env['BUNKI_PERF_SAMPLES'] ?? 15);
+/** Cold loads are the slow measurement; fewer samples, and the count is reported. */
+const COLD_SAMPLES = Number(process.env['BUNKI_PERF_COLD_SAMPLES'] ?? 8);
 
 /** Progress to stderr, so stdout stays a single parseable JSON document. */
 const progress = (line) => {
   if (process.env['BUNKI_PERF_QUIET'] === undefined) process.stderr.write(`${line}\n`);
 };
+
+/**
+ * Words that exist **only** in the imported tier, and an English gloss.
+ *
+ * The fixture-tier list below is sixteen records; searching it says nothing
+ * about whether 3,000 makes the app slow. These queries are the ones that have
+ * to scan the imported tier to find anything: two written forms, one reading,
+ * and one gloss — the gloss deliberately, because that is the query that cannot
+ * use an exact-match index and must touch every sense of every record.
+ */
+const IMPORTED_QUERIES = ['図書館', '経済', 'せんせい', 'library'];
 
 /** Distinct seed headwords, so every capture is a new thread rather than a no-op. */
 const WORDS = [
@@ -217,6 +230,47 @@ async function measureWarmLookup(page, word) {
   return performance.now() - started;
 }
 
+/**
+ * One **cold** load: a fresh browser context, an empty cache, timed from
+ * `goto` to the capture screen being on screen.
+ *
+ * This measurement exists because the imported tier is 3,000 lexemes, 1,241
+ * kanji and 2,000 sentence pairs, and putting them in the bundle is exactly the
+ * kind of change that buys a feature with a slower first paint. Every other
+ * number in this script is explicitly *warm* — bundle parsed, indexes built —
+ * so none of them would move if the bundle doubled, and reporting only those
+ * would be a way of not answering the question.
+ *
+ * A new context per sample, not a reload: `page.reload()` keeps the HTTP cache
+ * and the compiled script, which is the opposite of cold.
+ */
+async function measureColdLoad(browser, origin) {
+  const context = await browser.newContext({ viewport: { width: 1100, height: 1400 } });
+  const page = await context.newPage();
+  try {
+    const started = performance.now();
+    await page.goto(origin, { waitUntil: 'load' });
+    await visible(page, 'screen-capture').waitFor({ state: 'visible', timeout: 60_000 });
+    return performance.now() - started;
+  } finally {
+    await context.close();
+  }
+}
+
+/** The bytes a cold visitor actually downloads, from the export on disk. */
+function bundleBytes() {
+  const dir = join(DIST, '_expo/static/js/web');
+  if (!existsSync(dir)) return null;
+  let total = 0;
+  const files = [];
+  for (const name of readdirSync(dir)) {
+    const size = statSync(join(dir, name)).size;
+    total += size;
+    files.push({ file: name, bytes: size });
+  }
+  return { totalBytes: total, files };
+}
+
 async function main() {
   const { server, origin } = await startHost();
   const executablePath = existsSync('/opt/pw-browsers/chromium')
@@ -231,6 +285,7 @@ async function main() {
 
     const lookups = [];
     const saves = [];
+    const importedLookups = [];
 
     // Warm-up: bundle parsed, seed index built, React settled. Discarded.
     progress(`warm-up (${String(WARMUP)} discarded)`);
@@ -244,12 +299,24 @@ async function main() {
       const word = WORDS[index % WORDS.length];
       const lookup = await measureWarmLookup(page, word);
       const save = await measureSaveAck(page, word);
+      const importedQuery = IMPORTED_QUERIES[index % IMPORTED_QUERIES.length];
+      const importedLookup = await measureWarmLookup(page, importedQuery);
       lookups.push(lookup);
       saves.push(save);
+      importedLookups.push(importedLookup);
       progress(
         `  ${String(index + 1).padStart(2)}/${String(SAMPLES)} ${word}` +
-          `  lookup ${lookup.toFixed(1)} ms  save ${save.toFixed(1)} ms`,
+          `  lookup ${lookup.toFixed(1)} ms  save ${save.toFixed(1)} ms` +
+          `  imported(${importedQuery}) ${importedLookup.toFixed(1)} ms`,
       );
+    }
+
+    progress('cold loads (fresh context each, no cache)');
+    const coldLoads = [];
+    for (let index = 0; index < COLD_SAMPLES; index += 1) {
+      const cold = await measureColdLoad(browser, origin);
+      coldLoads.push(cold);
+      progress(`  ${String(index + 1).padStart(2)}/${String(COLD_SAMPLES)} ${cold.toFixed(1)} ms`);
     }
 
     const results = {
@@ -259,9 +326,15 @@ async function main() {
       platform: `${process.platform} ${process.arch}`,
       measuredAt: new Date().toISOString(),
       warmupDiscarded: WARMUP,
+      bundle: bundleBytes(),
       measurements: [
         summarise('local save ack (press Keep → acknowledgment on screen)', saves),
-        summarise('warm lookup (query entered → top answer on screen)', lookups),
+        summarise('warm lookup, fixture tier (query entered → top answer on screen)', lookups),
+        summarise(
+          'warm lookup, imported tier — 3,000 lexemes, incl. an English-gloss query',
+          importedLookups,
+        ),
+        summarise('cold load (fresh context, empty cache → capture screen on screen)', coldLoads),
       ],
     };
     process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);

@@ -41,6 +41,26 @@
  *
  * What this screen does *not* claim: that a saved thread survives a reload. It
  * renders the store's own durability sentence instead (P0-CAP-15).
+ *
+ * **The EDRDG acknowledgement belongs here too, and unconditionally.** §3 of the
+ * EDRDG licence statement is explicit: "If a WWW server is providing a dictionary
+ * function or an on-screen display of words from the files, the acknowledgement
+ * must be made on each screen display, e.g. in the form of a message at the foot
+ * of the screen or page." A result row here is a reading, a set of senses and a
+ * part of speech — JMdict fields, all of them — so this screen is a dictionary
+ * display in exactly that sense.
+ *
+ * The notice has been gated twice and both gates were too narrow. It first
+ * rendered on the word and kanji pages only. Then it rendered here whenever a
+ * search result did — and that still missed the **kept-threads list**, which is
+ * the part of this screen that survives the query being cleared and the page
+ * being reloaded. `capturedText` below is `topLexeme?.headword`, so keeping an
+ * imported result stores the *JMdict headword* as the thread's `displayText`:
+ * search じかん, press Keep, reload, and the front door renders 時間 — a string
+ * that came from the files and never from anything the learner typed.
+ *
+ * So there is no condition on it now. The gate is the artefact that keeps going
+ * stale, and the screens that never had one never had the bug.
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -51,6 +71,7 @@ import { isPromotionActive } from '@bunki/domain';
 import {
   constituentKanji,
   DEFAULT_CANONICAL_TARGET,
+  importedDictionary,
   searchSeed,
   seedDataset,
   sentencesForLexeme,
@@ -69,7 +90,7 @@ import {
 } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
-import { DurabilityNotice, SeedCoverageDisclosure } from '../ui/notices.tsx';
+import { DurabilityNotice, SeedCoverageDisclosure, SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, ChipButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
 import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -529,6 +550,26 @@ export function CaptureScreen({
         </Section>
       )}
 
+      {/*
+        Unconditional, which is the third and final version of this line.
+
+        It was first wired to the word and kanji pages only; then to the search
+        results here, on the reasoning that "no licensed word on screen, no
+        acknowledgement to make". That reasoning was wrong, and the way it was
+        wrong is the reason there is no condition here any more: the search
+        results are not the only licensed content on this screen. The kept-threads
+        list below outlives the query, and a thread's `displayText` is the
+        matched entry's headword — a JMdict field in the imported tier. Keep 時間,
+        がっこう and ともだち, clear the box, reload: the front door renders three
+        JMdict headwords, and under the old condition it rendered them with no
+        EDRDG string anywhere in the DOM.
+
+        A condition here has now gone stale three times, each time because the
+        set of licensed things on screen grew and the predicate did not. The
+        other seven screens carry the notice unconditionally; so does this one.
+      */}
+      <SeedEntryDisclosure />
+
       <Hairline />
 
       <Section
@@ -651,8 +692,8 @@ function runEnrichment(
 
 /** Counted from the dataset, never typed in: a stale number here would be a false claim. */
 const seedCounts = {
-  lexemes: seedDataset.lexemes.length,
-  kanji: seedDataset.kanji.length,
+  lexemes: seedDataset.lexemes.length + importedDictionary.lexemes.length,
+  kanji: seedDataset.kanji.length + importedDictionary.kanji.length,
 } as const;
 
 const styles = StyleSheet.create({
