@@ -204,6 +204,8 @@ export const FIELD_PROVENANCE = {
     senses: 'edrdg-jmdict',
     kanjiUsed: 'bunki-computed',
     priorityTags: 'edrdg-jmdict',
+    misc: 'edrdg-jmdict',
+    loanSources: 'edrdg-jmdict',
     sourceEntryId: 'edrdg-jmdict',
   },
   'dictionary/kanji.json': {
@@ -790,10 +792,42 @@ export function parseJMdict(xml) {
 
     const senses = [];
     const pos = [];
+    // `misc` and `lsource` are read for one reason: they are the only two
+    // era-bearing signals JMdict actually carries, and the graph's era
+    // attribution had nothing else to work with.
+    //
+    // The era projection (packages/domain/src/graph/era.ts) could place 9.8% of
+    // this corpus — all of it on the ancient-road layer, from a reading-type
+    // rule — and left the Edo-highway and rail layers empty, because nothing in
+    // the imported fields distinguishes a Meiji coinage from an ancient Buddhist
+    // import. 電話 and 世界 came back identical. That is a true finding about the
+    // fields we were importing, not about the file: JMdict does mark `&arch;`,
+    // `&obs;` and `&rare;`, and it does record a source language for borrowed
+    // words, and this importer was dropping both on the floor.
+    //
+    // These are upstream's own labels, expanded from upstream's own DTD, and they
+    // are carried through unmodified. They are evidence, not inference — which is
+    // the whole point, because an era guessed from a vibe is the defect this
+    // project keeps refusing to ship.
+    const misc = [];
+    const loanSources = [];
     for (const sense of allBetween(body, 'sense')) {
       for (const p of allBetween(sense, 'pos')) {
         const label = expand(p);
         if (!pos.includes(label)) pos.push(label);
+      }
+      for (const m of allBetween(sense, 'misc')) {
+        const label = expand(m);
+        if (!misc.includes(label)) misc.push(label);
+      }
+      for (const ls of allElements(sense, 'lsource')) {
+        // A bare `<lsource xml:lang="por"/>` with no body is common and is still
+        // a statement that the word was borrowed — the language is the datum, and
+        // the absence of a body only means upstream did not record the original
+        // spelling. JMdict's DTD defaults xml:lang to "eng", so an attribute-less
+        // lsource means English.
+        const lang = /\bxml:lang\s*=\s*"([^"]+)"/.exec(ls.attributes)?.[1] ?? 'eng';
+        if (!loanSources.includes(lang)) loanSources.push(lang);
       }
       for (const gloss of allElements(sense, 'gloss')) {
         // Non-English glosses carry xml:lang; JMdict_e is English-only, but the
@@ -825,6 +859,15 @@ export function parseJMdict(xml) {
       // grouping is what SEED_ENTRY_DISCLOSURE warns the reader about.
       senses: [...new Set(senses)],
       priorityTags: tags,
+      /** Upstream `<misc>` labels, DTD-expanded. Carries `archaic`, `obsolete`, `rare`. */
+      misc,
+      /**
+       * ISO language codes from upstream `<lsource>`. Non-empty means JMdict says
+       * this word was borrowed, and from where. Empty means upstream recorded no
+       * borrowing — which is not the same as "native", and the era projection must
+       * not read it as one.
+       */
+      loanSources,
       score: priorityScore(tags),
     });
   }
@@ -1256,6 +1299,8 @@ export async function runImport(options, { dataDir = DATA_DIR, log = console.log
       senses: entry.senses,
       kanjiUsed: kanjiIn(entry.headword),
       priorityTags: entry.priorityTags,
+      misc: entry.misc,
+      loanSources: entry.loanSources,
       sourceEntryId: entry.entSeq,
     })),
   });

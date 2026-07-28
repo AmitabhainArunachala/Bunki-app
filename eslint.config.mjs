@@ -307,6 +307,15 @@ export default tseslint.config(
       '**/.expo/**',
       '**/expo-env.d.ts',
       'apps/app/assets/**',
+      // Live multi-agent worktrees. `.claude/worktrees/<run>-<n>/` is a full
+      // checkout of this repository that another agent is actively working in.
+      // Linting into it type-checks another checkout's files against *this*
+      // checkout's tsconfig, which is the entire cause of the recurring
+      // "You'll need to explicitly set tsconfigRootDir" failure this build has
+      // now rediscovered three times and diagnosed as a code defect twice. It is
+      // a stale-worktree symptom, and this is the fix rather than the workaround:
+      // another checkout's sources were never in this lint's scope.
+      '.claude/**',
     ],
   },
 

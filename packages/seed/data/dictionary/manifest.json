@@ -92,8 +92,8 @@
   },
   "outputs": {
     "dictionary/lexemes.json": {
-      "bytes": 1561668,
-      "sha256": "5d04b23b7daa78f7fd4e9035d86932da820eb4cc32c4981f7adbf80fbc1ad968"
+      "bytes": 1702841,
+      "sha256": "2f7eb1e92c2067dbf5bd708de4ffdd7f2fedced5a56d7d63765feeb44d3542eb"
     },
     "dictionary/kanji.json": {
       "bytes": 865362,
