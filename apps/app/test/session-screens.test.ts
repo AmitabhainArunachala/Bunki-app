@@ -282,11 +282,14 @@ describe('the app end of the loop stays inside controller §5', () => {
     // back: `bootstrapSessionWorkspace` still only reads, and the contracts it
     // mints are carried on the first *dispatch* instead.
     const source = code(LOOP);
-    const bootstrap = source.slice(
-      source.indexOf('export function bootstrapSessionWorkspace'),
-      source.indexOf('export function probeOfferFor'),
-    );
-    expect(bootstrap).not.toBe('');
+    const start = source.indexOf('export function bootstrapSessionWorkspace');
+    expect(start).toBeGreaterThan(-1);
+    // To the *next* export, whatever it happens to be — naming the following
+    // function would make this assertion break every time the file is reordered,
+    // and an assertion that breaks for cosmetic reasons gets loosened.
+    const next = source.indexOf('\nexport ', start + 1);
+    const bootstrap = source.slice(start, next === -1 ? undefined : next);
+    expect(bootstrap).toContain('SessionBootstrap');
     expect(bootstrap).not.toContain('persistMinted');
     expect(bootstrap).not.toContain('sealMintedEvents');
     expect(bootstrap).not.toContain('.execute(');

@@ -423,6 +423,57 @@ export function bootstrapSessionWorkspace(
 }
 
 /**
+ * Carry everything the workspace has produced but the store has not seen (WP-10).
+ *
+ * The whole of the durable-session join, in one exported function so that the
+ * hook and the tests run the *same* code. It used to live inside
+ * `useOwnSessionLoop`'s callback, which meant a test could only re-implement it
+ * — and a re-implementation that persisted correctly while the hook did not
+ * would have been green over the exact defect this lane exists to close.
+ *
+ * ## Why "not yet persisted" rather than "what this command appended"
+ *
+ * `bootstrapSessionWorkspace` mints the sitting's two `ContractCreated` events
+ * before any gesture. Writing them at bootstrap would put events in the learner's
+ * durable log for merely opening the Session tab — the fabrication the WP-10
+ * repair round removed and that definition-of-done §2 item 6 names. Carrying
+ * whatever is outstanding on the first *dispatch* means they are written by the
+ * gesture that made them true: the learner starting the sitting.
+ *
+ * ## Why the id set is load-bearing rather than an optimisation
+ *
+ * The workspace log opens as a copy of the store's, and after a reload those
+ * events came back across JSON — they are parsed, not minted, so
+ * `sealMintedEvents` refuses them (correctly: the persist path is for events this
+ * process minted, and the adapter is already the authority on its own bytes).
+ * Filtering by id is what keeps this pointed only at the new ones.
+ *
+ * @param persisted Ids already in the store. **Mutated**: every carried event's
+ *   id is added, so the caller keeps one set across a sitting.
+ * @returns the events this call carried, in log order. Empty is the normal
+ *   answer for a command that appended nothing (a skip, a repeated tap).
+ */
+export function persistWorkspaceEvents(
+  store: AppStore,
+  workspace: SessionWorkspaceState,
+  persisted: Set<string>,
+): readonly DomainEvent[] {
+  const fresh = workspace.log.filter((event) => !persisted.has(event.eventId));
+  if (fresh.length === 0) return [];
+  for (const event of fresh) persisted.add(event.eventId);
+  // `sealMintedEvents` is the kernel's check that every one of these came out of
+  // its own minters unaltered; `persistMinted` re-checks on open. Neither is a
+  // formality — see `AppStore.persistMinted`.
+  store.persistMinted(sealMintedEvents(fresh));
+  return fresh;
+}
+
+/** The store's event ids, as the set {@link persistWorkspaceEvents} expects. */
+export function persistedEventIds(store: AppStore): Set<string> {
+  return new Set(store.readAll().map((event: DomainEvent) => event.eventId));
+}
+
+/**
  * The one probe this canvas may offer, read out of the ledger.
  *
  * Rebuilt from the log on every read — including the thread's promotion state
@@ -486,43 +537,8 @@ export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
    */
   const workspace = useRef<SessionWorkspaceState>(initial.workspace);
 
-  /**
-   * Event ids the store already holds, so a dispatch persists only what is new.
-   *
-   * Seeded from the store's log — which the workspace was built over — plus any
-   * contracts the bootstrap minted. It is not an optimisation: a rehydrated event
-   * came back across JSON and is *not* kernel-minted, so offering one to
-   * `sealMintedEvents` would (correctly) throw. This set is what keeps the
-   * persist path pointed only at events this process minted.
-   */
-  const persisted = useRef<Set<string>>(
-    new Set(store.readAll().map((event: DomainEvent) => event.eventId)),
-  );
-
-  /**
-   * Carry everything the workspace has produced but the store has not seen.
-   *
-   * Deliberately "everything not yet persisted" rather than "what this command
-   * appended". The bootstrap mints the sitting's two `ContractCreated` events
-   * before any gesture, and writing them at bootstrap would put events in the
-   * learner's durable log for merely opening the Session tab — the fabrication
-   * the WP-10 repair round removed and must not reintroduce. Carrying them on the
-   * first dispatch instead means they are written by the gesture that made them
-   * true: the learner starting the sitting. Nothing is written by navigating.
-   */
-  const persist = useCallback(
-    (next: SessionWorkspaceState): void => {
-      const fresh = next.log.filter((event) => !persisted.current.has(event.eventId));
-      if (fresh.length === 0) return;
-      for (const event of fresh) persisted.current.add(event.eventId);
-      // `sealMintedEvents` is the kernel's check that every one of these came out
-      // of its own minters unaltered; the store re-checks on open. Neither is a
-      // formality — see `AppStore.persistMinted`.
-      store.persistMinted(sealMintedEvents(fresh));
-      onEvents?.(fresh);
-    },
-    [onEvents, store],
-  );
+  /** Ids the store already holds. See {@link persistWorkspaceEvents}. */
+  const persisted = useRef<Set<string>>(persistedEventIds(store));
 
   const dispatch = useCallback(
     (command: SessionCommand) => {
@@ -530,9 +546,10 @@ export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
       const next = applySessionCommand(context, previous, command);
       workspace.current = next;
       setState(next);
-      persist(next);
+      const carried = persistWorkspaceEvents(store, next, persisted.current);
+      if (carried.length > 0) onEvents?.(carried);
     },
-    [context, persist],
+    [context, onEvents, store],
   );
 
   const offer = useMemo<CanvasProbeOffer | null>(
