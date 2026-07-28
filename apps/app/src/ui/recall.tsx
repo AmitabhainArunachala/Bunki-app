@@ -26,6 +26,13 @@
  *      boundary. `RECALL_BAND_MARKS` declares this and
  *      `test/theme-tokens.test.ts` enforces it against the source.
  *
+ * Rule 3 used to be kept by a `throw` inside `RecallMark`'s render. That was a
+ * trap rather than an invariant: the five bands are declared data, a surface
+ * reading one off a projection holds a `RecallBand`, and three of the five
+ * values rendered while two of them crashed the screen. `RecallMark` now takes
+ * `StandaloneRecallBand`, so the mistake does not compile; a caller holding an
+ * unnarrowed band uses `RecallIndicator` below, which is total over all five.
+ *
  * Nothing here writes state. These render a projection; the evidence gate in
  * `packages/domain` is the only thing that can change what they render.
  */
@@ -34,7 +41,15 @@ import { type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { capabilityOf, type CapabilityId } from './capability.ts';
-import { RECALL_BANDS, RECALL_BAND_MARKS, SPACE, TYPE, type RecallBand } from './theme.ts';
+import {
+  RECALL_BANDS,
+  RECALL_BAND_MARKS,
+  SPACE,
+  TYPE,
+  isStandaloneRecallBand,
+  type RecallBand,
+  type StandaloneRecallBand,
+} from './theme.ts';
 import { useTheme } from './theme-context.tsx';
 
 /**
@@ -61,7 +76,14 @@ function bandIndex(band: RecallBand): number {
 export interface RecallMarkProps {
   /** Required: a mark with no capability is a mastery score. */
   readonly capability: CapabilityId;
-  readonly band: RecallBand;
+  /**
+   * Only the bands that clear 3:1 as a bare mark.
+   *
+   * `StandaloneRecallBand` is derived from `RECALL_BAND_MARKS`, so this prop
+   * narrows and widens with the declaration rather than with anyone's memory. A
+   * caller holding an unnarrowed `RecallBand` wants `RecallIndicator`.
+   */
+  readonly band: StandaloneRecallBand;
   /** True when the projection is stale or the evidence is thin. */
   readonly fragile?: boolean | undefined;
   /** Diameter in points. */
@@ -74,8 +96,8 @@ export interface RecallMarkProps {
  *
  * This is what a map node is made of, so it has to work at 10 points with
  * nothing beside it. Which means the two faintest bands may not use it — see
- * rule 3 in the header — and passing one is a caller error rather than a
- * silently dimmer dot.
+ * rule 3 in the header — and the type is what says so, so there is no run-time
+ * branch here at all.
  */
 export function RecallMark({
   capability,
@@ -86,12 +108,6 @@ export function RecallMark({
 }: RecallMarkProps): ReactNode {
   const theme = useTheme();
   const mark = RECALL_BAND_MARKS[band];
-  if (!mark.standalone) {
-    throw new Error(
-      `'${band}' is a meter-only band: draw it inside <RecallMeter>, which supplies a boundary and a label`,
-    );
-  }
-
   const color = theme.color.recall[band];
   const spoken = `${capabilityOf(capability).label}: ${RECALL_BAND_LABELS[band]}${
     fragile ? ', fragile' : ''
@@ -232,6 +248,57 @@ export function RecallMeter({
         </Text>
       )}
     </View>
+  );
+}
+
+export interface RecallIndicatorProps {
+  readonly capability: CapabilityId;
+  /** Any band, including the two that may not be drawn bare. */
+  readonly band: RecallBand;
+  readonly fragile?: boolean | undefined;
+  readonly basis?: string | undefined;
+  /** Diameter in points, when this resolves to a mark. */
+  readonly size?: number | undefined;
+  readonly testID?: string | undefined;
+}
+
+/**
+ * The total one: hand it any band and get something drawable.
+ *
+ * This is what a surface reading a band off a projection should reach for. It is
+ * the honest reading of rule 3 — the faint steps are not undrawable, they are
+ * undrawable *bare*, so the component that is handed one supplies the boundary
+ * and the label by switching to the meter. Nothing is hidden and nothing throws:
+ * every band renders, and the two faint ones render as the thing that is allowed
+ * to carry them.
+ */
+export function RecallIndicator({
+  capability,
+  band,
+  fragile = false,
+  basis,
+  size,
+  testID,
+}: RecallIndicatorProps): ReactNode {
+  if (isStandaloneRecallBand(band)) {
+    return (
+      <RecallMark
+        band={band}
+        capability={capability}
+        fragile={fragile}
+        size={size}
+        testID={testID}
+      />
+    );
+  }
+  return (
+    <RecallMeter
+      band={band}
+      basis={basis}
+      capability={capability}
+      fragile={fragile}
+      testID={testID}
+    />
   );
 }
 

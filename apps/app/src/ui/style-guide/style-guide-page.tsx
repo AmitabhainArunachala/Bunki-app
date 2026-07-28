@@ -18,6 +18,10 @@
  * ## What a reviewer should be able to check from it
  *
  *   - both schemes are designed, not one inverted (open it twice);
+ *   - the three era grounds are three different places, and every mark on them
+ *     still clears its contrast floor — the ground carries era and atmosphere
+ *     and says nothing at all about the learner;
+ *   - text is always on a card floating over a ground, never on the ground;
  *   - the reading register and the chrome register are visibly different faces;
  *   - furigana sits where it should and is announced once, not twice;
  *   - the frontier marks are quiet, and there are exactly two of them;
@@ -45,13 +49,28 @@ import { RubyText } from '../ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel, OfflineBanner } from '../screen-state.tsx';
 import { MuseumCard, Surface } from '../surface.tsx';
 import { contrastRatio } from '../contrast.ts';
-import { DURATION, EASING, RADIUS, RECALL_BANDS, SPACE, TYPE, paletteLeaves } from '../theme.ts';
+import {
+  DURATION,
+  EASING,
+  ERA_KEYS,
+  ERA_REGISTERS,
+  RADIUS,
+  RECALL_BANDS,
+  SPACE,
+  TYPE,
+  paletteLeaves,
+} from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 import { VerticalRun } from '../vertical.tsx';
+import { GroundField } from './ground-field.tsx';
 import {
+  ERA_CARDS,
   OVERWHELMED_SPANS,
   PASSAGE,
   PASSAGE_SPANS,
+  RAIL_RATION_NOTE,
+  RAIL_SIGNALS,
+  RAIL_SUPPRESSED_BASES,
   SPECIMEN_KANJI,
   SPECIMEN_LEXEME_ID,
   VERTICAL_SPECIMEN,
@@ -119,6 +138,77 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
               />
             ))}
           </View>
+        </SpecimenSection>
+
+        {/* ---------------------------------------------------------------- */}
+        <SpecimenSection
+          note="Three registers, three grounds, one continuous road. Each ground is a stack — an opaque mineral base, an atmospheric wash over it, and a 胡粉/墨 mat under the content — because that is what iwa-enogu does: colour is built by superposition, not mixed on a palette. The ground itself carries when and where and nothing else; no pigment below changes with anyone's memory. The marks and the signal lamps sitting on it are the only things that say how well you know something, and they say it by form — the lamps all share one pigment, so their colour is not carrying the difference."
+          testID="specimen-ground"
+          title="Era registers — the ground layer"
+        >
+          {ERA_KEYS.map((era) => (
+            <View key={era} style={styles.eraBlock} testID={`specimen-era-${era}`}>
+              <Text
+                accessibilityRole="header"
+                style={[styles.eraTitle, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
+              >
+                {ERA_REGISTERS[era].written}{' '}
+                <Text
+                  style={[
+                    styles.eraReading,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {ERA_REGISTERS[era].reading} — {ERA_REGISTERS[era].gloss},{' '}
+                  {ERA_REGISTERS[era].period}
+                </Text>
+              </Text>
+              <Text
+                style={[
+                  styles.eraNote,
+                  { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                ]}
+              >
+                {ERA_REGISTERS[era].stratum}
+              </Text>
+              <GroundField
+                cards={ERA_CARDS[era]}
+                era={era}
+                signals={era === 'tetsudo' ? RAIL_SIGNALS : []}
+                testID={`specimen-ground-${era}`}
+              />
+              {era === 'tetsudo' ? (
+                <>
+                  <Text
+                    style={[
+                      styles.eraNote,
+                      { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {RAIL_RATION_NOTE}
+                  </Text>
+                  {/*
+                    "Reported, never hidden" as the report itself. The plan hands
+                    back the signals it turned down, not a count of them, so the
+                    page can say what they were — which is the only version of
+                    that promise a reader can check.
+                  */}
+                  {RAIL_SUPPRESSED_BASES.map((basis) => (
+                    <Text
+                      key={basis}
+                      style={[
+                        styles.eraNote,
+                        { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                      ]}
+                      testID="ground-tetsudo-suppressed"
+                    >
+                      Not lit: {basis}
+                    </Text>
+                  ))}
+                </>
+              ) : null}
+            </View>
+          ))}
         </SpecimenSection>
 
         {/* ---------------------------------------------------------------- */}
@@ -666,6 +756,23 @@ const styles = StyleSheet.create({
   stack: {
     alignItems: 'flex-start',
     gap: SPACE.md,
+  },
+  eraBlock: {
+    alignSelf: 'stretch',
+    gap: SPACE.sm,
+    marginBottom: SPACE.xl,
+  },
+  eraTitle: {
+    fontSize: TYPE.headwordRow,
+    letterSpacing: 0.3,
+  },
+  eraReading: {
+    fontSize: TYPE.meta,
+    letterSpacing: 0.2,
+  },
+  eraNote: {
+    fontSize: TYPE.meta,
+    lineHeight: TYPE.meta * 1.7,
   },
   surfaces: {
     flexDirection: 'row',

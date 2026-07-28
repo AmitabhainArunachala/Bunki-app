@@ -24,6 +24,12 @@
  * the vermilion underline (`primitives.tsx` has the mechanism and the
  * measurement). `aria-current` is forwarded, and is now passed by name.
  *
+ * It is passed **once**. A later repair round added a second, platform-guarded
+ * spread of the same attribute below the props — a fix for a defect that was
+ * not present. The two never disagreed, so nothing was visibly wrong, which is
+ * exactly why it is worth removing: a reader finding an attribute set twice has
+ * to work out which one wins before they can trust either.
+ *
  * ## What it deliberately does not do
  *
  * It holds no store, reads no snapshot, and renders no domain state. It is
@@ -33,7 +39,7 @@
 
 import { usePathname, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { navLinkStyle } from './interactive-styles.ts';
 import { SHELL_DESTINATIONS, type Destination } from './navigation.ts';
@@ -149,7 +155,6 @@ function NavLink({ destination, current }: NavLinkProps): ReactNode {
         },
       ]}
       testID={`nav-${destination.label.toLowerCase().replace(/[^a-z]+/g, '-')}`}
-      {...(Platform.OS === 'web' && current ? { 'aria-current': 'page' } : {})}
     >
       <Text
         style={[
