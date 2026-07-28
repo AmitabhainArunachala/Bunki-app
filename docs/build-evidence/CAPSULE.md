@@ -6297,7 +6297,7 @@ Branch `agent/bunki-e-guide`, from `agent/bunki-e-integration` (`aa03f7e`).
 | `packages/domain/src/guide/` | position, conversation, records, proposal, and the §4.3 boundary — pure, no React, no seed |
 | `apps/app/src/ui/guide/` | the surface: content from `@bunki/seed`, view model, four components, one hook |
 | `apps/app/src/screens/guide-screen.tsx`, `apps/app/app/guide.tsx` | the screen and its route |
-| `packages/domain/test/guide/`, `apps/app/test/guide-*.test.ts` | 179 assertions across six files |
+| `packages/domain/test/guide/`, `apps/app/test/guide-*.test.ts` | 181 assertions across six files |
 | `apps/app/e2e/guide-label.spec.ts` | the browser half of the label claim and the write-nothing claim |
 | `apps/app/scripts/capture-guide.mjs` | the screenshot harness, which **drives** the page before shooting |
 
@@ -6415,6 +6415,21 @@ learner:  "You are at station 1 of 8."
 roadRows: 8
 ```
 
+### Two things this lane's own review caught, after the surface was working
+
+Both are the drift class this project keeps finding, and neither would have
+failed any check:
+
+- The attribution footer stated `JMdict (EDRDG), CC BY-SA 4.0` as a literal.
+  Correct today; silently stale the day `packages/seed/data/provenance.json`
+  changes. It is now derived through `provenanceSummary`, the same function the
+  word and kanji pages render, and an assertion fails if any guide file states a
+  licence as a literal outside a comment.
+- The conversation panel said asking sends "only this word and this seeded
+  sentence". The request also carries the seed record's id. "Only" was *nearly*
+  true, which is the worst kind: the sentence exists so a reader can check it
+  against `AiThreadContext`, and it now enumerates all three fields.
+
 ### §17.5 check set — every command run on this branch
 
 | Command | Result |
@@ -6423,15 +6438,15 @@ roadRows: 8
 | `npm run lint` | exit 0, no output |
 | `npm run format:check` | `All matched files use Prettier code style!` |
 | `npm run typecheck` | exit 0, root + 6 workspaces |
-| `npm run test` | **111 files, 2,204 tests, all passed** |
+| `npm run test` | **111 files, 2,206 tests, all passed** |
 | `npm run test:replay` | 2 files, 47 tests passed |
 | `npm run verify:export` | 1 file, 14 tests passed |
 | `(cd apps/app && npx expo export --platform web)` | `Exported: dist` (15 static routes, `/guide` among them) |
 | `npm run test:e2e` | **50 passed** (5.3 min) |
 
 Baseline on `agent/bunki-e-integration` (`aa03f7e`) before this lane: 105 files /
-1,986 tests, 48 e2e. The delta is +6 files, +218 tests and +2 e2e cases, and the
-+218 is worth decomposing because only 179 of them are this lane's own: the
+1,986 tests, 48 e2e. The delta is +6 files, +220 tests and +2 e2e cases, and the
++220 is worth decomposing because only 181 of them are this lane's own: the
 other 39 come from existing suites that enumerate source files with `it.each`
 (`theme-tokens.test.ts`'s no-hex-literal and no-command scans, and
 `edrdg-acknowledgement.test.ts`'s per-destination audit). The new modules are
