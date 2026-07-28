@@ -114,6 +114,43 @@ describe('B2 — apps/app cannot reach the persistence write path (gate-bypass h
   it('allows @bunki/domain — appends must flow through the command handler', async () => {
     expect(await boundaryErrors(APP, `import '@bunki/domain';`)).toHaveLength(0);
   });
+
+  /**
+   * WP-10 narrowed the ban instead of dropping it, so the narrowing itself has
+   * to be a tested boundary: one directory may name the package, and every
+   * neighbour of that directory still may not.
+   *
+   * The negative cases are the ones that matter. A `files`/`ignores` pattern
+   * that accidentally matched `apps/app/src/state/**` — or that matched by
+   * substring, so `.../state/persistence-helper.ts` slipped in — would leave the
+   * gate-bypass hole open while the config still *read* as narrow.
+   */
+  describe('the WP-10 seam is exactly one directory', () => {
+    it.each([
+      ['the seam index', 'apps/app/src/state/persistence/index.ts'],
+      ['its shared types', 'apps/app/src/state/persistence/shared.ts'],
+      ['the web platform store', 'apps/app/src/state/persistence/platform-store.ts'],
+      ['the native platform store', 'apps/app/src/state/persistence/platform-store.native.ts'],
+    ])('allows @bunki/persistence in %s', async (_label, path) => {
+      expect(await boundaryErrors(path, `import '@bunki/persistence';`)).toHaveLength(0);
+    });
+
+    it.each([
+      ['the store beside it', 'apps/app/src/state/durable-store.ts'],
+      ['a similarly-named sibling', 'apps/app/src/state/persistence-helper.ts'],
+      ['a screen', 'apps/app/src/screens/capture-screen.tsx'],
+      ['a route', 'apps/app/app/index.tsx'],
+      ['a test', 'apps/app/test/persistence-boundary.test.ts'],
+    ])('still rejects @bunki/persistence in %s', async (_label, path) => {
+      expect(await boundaryErrors(path, `import '@bunki/persistence';`)).not.toHaveLength(0);
+    });
+
+    it('still rejects ts-fsrs inside the seam', async () => {
+      expect(
+        await boundaryErrors('apps/app/src/state/persistence/index.ts', `import 'ts-fsrs';`),
+      ).not.toHaveLength(0);
+    });
+  });
 });
 
 describe('B3 — one scheduler implementation (REQ-SCH-01)', () => {

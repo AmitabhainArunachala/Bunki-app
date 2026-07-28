@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { AppProvider, useDebugFlags } from '@/state/app-context';
+import { NavShell } from '@/ui/nav-shell';
 import { ThemeProvider, useTheme } from '@/ui/theme-context';
 
 /**
@@ -38,14 +39,27 @@ function ThemedShell(): ReactNode {
   );
 }
 
+/**
+ * The navigator, inside the shell (WP-10).
+ *
+ * `NavShell` wraps the `Stack` rather than being a screen inside it, so the
+ * masthead is present on every route and does not re-mount on navigation. That
+ * is what makes "every screen is reachable" true of the app rather than true of
+ * one screen: wherever the learner is, the four starting places are one tap
+ * away, and everything else is reached from the surface it belongs to
+ * (`src/ui/navigation.ts` is the map; `test/navigation-reachability.test.ts`
+ * checks it against this tree).
+ */
 function ThemedStack(): ReactNode {
   const theme = useTheme();
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: theme.color.paper },
-      }}
-    />
+    <NavShell>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: theme.color.paper },
+        }}
+      />
+    </NavShell>
   );
 }

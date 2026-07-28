@@ -17,12 +17,16 @@
     "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "test": "vitest run",
     "test:replay": "vitest run packages/domain/test/replay",
-    "test:e2e": "node scripts/not-implemented.mjs test:e2e WP-10",
+    "test:e2e": "playwright test --config apps/app/e2e/playwright.config.ts",
+    "test:e2e:build": "npm run export:web --workspace @bunki/app",
     "verify:export": "vitest run packages/export/test/verify-export.test.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.0",
     "eslint": "10.8.0",
+    "playwright-core": "1.56.0",
     "prettier": "3.9.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.65.0",

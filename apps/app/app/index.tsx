@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { CaptureScreen } from '@/screens/capture-screen';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/` — capture and search (controller §10 screen 1).
@@ -15,10 +16,14 @@ export default function CaptureRoute(): ReactNode {
   const { q } = useLocalSearchParams<{ q?: string }>();
 
   return (
-    <CaptureScreen
-      initialQuery={typeof q === 'string' ? q : ''}
-      onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
-      onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
-    />
+    <>
+      <RouteTitle href="/" />
+      <CaptureScreen
+        initialQuery={typeof q === 'string' ? q : ''}
+        onOpenEvidence={() => router.push('/evidence')}
+        onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
+        onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
+      />
+    </>
   );
 }

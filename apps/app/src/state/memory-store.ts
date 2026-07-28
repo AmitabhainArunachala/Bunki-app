@@ -1,10 +1,23 @@
 /**
- * In-memory `AppStore` (WP-05).
+ * The app's command handler and projection (WP-05; durable since WP-10).
  *
- * The Phase-0 implementation of the seam described in `./store.ts`. It keeps an
- * append-only event log and a projection built by `@bunki/domain`'s reducers —
- * the same shape `@bunki/persistence` will have — so replacing it in W4 is a
- * constructor swap and not a rewrite of the screens.
+ * The implementation of the seam described in `./store.ts`. It keeps an
+ * append-only event log and a projection built by `@bunki/domain`'s reducers.
+ *
+ * ## The name is now half true, deliberately
+ *
+ * WP-05 called this the in-memory store, and the projection still is: threads,
+ * candidates and the applied-key map live in this closure. What changed in
+ * WP-10 is that the log no longer *starts* empty and no longer *ends* here —
+ * `initialEvents` rehydrates it from `@bunki/persistence` and `journal` carries
+ * each accepted command's events out to the durable adapter. The file kept its
+ * name because eight modules import `createMemoryAppStore` and a rename would
+ * have put churn in every one of them during a three-lane merge; the honest
+ * description is this paragraph, and `durability` is what any surface actually
+ * renders.
+ *
+ * The swap really was a constructor change, which is what WP-05 predicted: no
+ * screen, no command, and no test of the command flow changed shape for it.
  *
  * Three properties are worth reading closely, because they are the ones a
  * verifier should try to break:
@@ -28,26 +41,46 @@
  */
 
 import {
+  componentIdOfEncounter,
   createDomainEvent,
   initialThreadState,
+  isEvidenceClassEvent,
+  mintEvidenceSuperseded,
+  mintExposureLogged,
+  mintReviewGraded,
+  openMintedEventBatch,
+  replay,
   threadReducer,
   type CandidateAcceptedAsNoteEvent,
   type CandidateAttachedEvent,
+  type ContractCreatedEvent,
+  type DataExportedEvent,
+  type DerivedState,
   type DomainContext,
   type DomainEvent,
+  type DomainEventType,
   type EncounterCapturedEvent,
+  type MintedEventBatch,
   type ThreadPromotionChangedEvent,
   type ThreadState,
 } from '@bunki/domain';
 
 import {
+  CorrectionRefusedError,
+  DEMONSTRATION_EXPERIENCE_PREFIX,
+  DEMONSTRATION_PROMPT_FAMILY_VERSION,
   DURABILITY_NOTES,
+  NULL_COMMAND_OBSERVER,
+  PERSIST_OPERATION_KIND,
   type AppCommand,
+  type AppCommandKind,
   type AppSnapshot,
   type AppStore,
   type CandidateView,
   type CommandAck,
+  type CommandObserver,
   type DurabilityLevel,
+  type PersistAck,
   type ThreadView,
   type UncertaintyAnnotation,
 } from './store.ts';
@@ -98,12 +131,33 @@ const attachCandidateIdempotencyKey = (candidateId: string): string =>
 const acceptCandidateIdempotencyKey = (candidateId: string): string =>
   `candidate-accepted:${candidateId}`;
 
+/**
+ * The batch key for a durable append (WP-10; controller §7).
+ *
+ * `EventStorePort.append` takes a *batch* key alongside each event's own, and
+ * they answer different questions: the batch key makes a double-tapped save one
+ * write, the event key makes one event appear once however many batches contain
+ * it. This derives the batch key from the command kind and the first event's
+ * key, both of which are content-derived, so replaying the same gesture produces
+ * the same batch key and the adapter's no-op path handles it.
+ *
+ * If two different batches ever did collide here, the adapter compares payloads
+ * and throws `IdempotencyConflictError` rather than silently dropping the second
+ * — which is why this can be a derived key at all instead of a counter that
+ * would break the moment the app restarted.
+ */
+function commandIdempotencyKey(command: AppCommand, ack: CommandAck): string {
+  const first = ack.events[0];
+  return `${command.kind}:${first === undefined ? ack.acknowledgedAt : first.idempotencyKey}`;
+}
+
 interface StoredThread {
   readonly state: ThreadState;
   readonly displayText: string;
   readonly targetKey: string;
   readonly lexemeId: string | null;
   readonly uncertainty: UncertaintyAnnotation | null;
+  readonly markRecordedInLog: boolean;
   readonly capturedAt: string;
 }
 
@@ -113,6 +167,7 @@ const toView = (thread: StoredThread): ThreadView => ({
   targetKey: thread.targetKey,
   lexemeId: thread.lexemeId,
   uncertainty: thread.uncertainty,
+  markRecordedInLog: thread.markRecordedInLog,
   capturedAt: thread.capturedAt,
 });
 
@@ -124,11 +179,64 @@ export interface MemoryAppStoreOptions {
    * without the label lying about it.
    */
   readonly durability?: DurabilityLevel | undefined;
+  /**
+   * Receives one closed record per applied command (WP-09, controller §12).
+   * Defaults to observing nothing — a store must not acquire a logger by being
+   * constructed.
+   */
+  readonly observer?: CommandObserver | undefined;
+  /**
+   * Monotonic counter used for the latency figure, in milliseconds.
+   *
+   * Injected rather than read here for the same reason the clock is: a store
+   * that reached for `performance.now()` could not be tested for the ordering
+   * property that makes the number worth recording. It is deliberately *not*
+   * `context.clock` — a wall clock can go backwards, and a duration measured
+   * across an adjustment would be a fabricated number in a diagnostic surface.
+   */
+  readonly elapsedMs?: (() => number) | undefined;
+  /**
+   * A durable log to start from (WP-10).
+   *
+   * The projection is rebuilt from these before the first render, so a reload
+   * finds the learner's threads where they left them (T-01, T-16-web at the app
+   * level). Read `rehydrate` for what the log can and cannot restore — two
+   * app-local facts were never in it, and the store says so rather than guessing
+   * them back.
+   */
+  readonly initialEvents?: readonly DomainEvent[] | undefined;
+  /**
+   * Called with the events an accepted command appended, after they are applied
+   * (WP-10).
+   *
+   * The ordering is REQ-UI-01's, and it is the reason this is a callback rather
+   * than an `await`: `execute` acknowledges locally first and persists after,
+   * never the reverse. A store that awaited a durable write before returning
+   * would turn "the save feels immediate" into "the save feels like the disk",
+   * which is the requirement inverted.
+   */
+  readonly journal?: ((events: readonly DomainEvent[], idempotencyKey: string) => void) | undefined;
+  /**
+   * Re-attaches a captured thread to its seed entry after a reload.
+   *
+   * `lexemeId` is app-local — the event log records the learner's text, not
+   * which dictionary row a search happened to match — so without this a
+   * rehydrated thread would lose its link to the word page. Injected rather than
+   * looked up here because the store must not import the seed: resolving a
+   * headword is a lexical judgement, and this file is the one place that is
+   * allowed to hold no lexical judgements at all.
+   */
+  readonly resolveLexemeId?: ((text: string) => string | null) | undefined;
 }
 
 export function createMemoryAppStore({
   context,
   durability = 'in-memory-session-only',
+  observer = NULL_COMMAND_OBSERVER,
+  elapsedMs = () => 0,
+  initialEvents,
+  journal,
+  resolveLexemeId,
 }: MemoryAppStoreOptions): AppStore {
   const events: DomainEvent[] = [];
   const threads = new Map<string, StoredThread>();
@@ -180,6 +288,100 @@ export function createMemoryAppStore({
     for (const listener of listeners) listener();
   }
 
+  /**
+   * Rebuild the projection from a durable log (WP-10).
+   *
+   * ## What comes back, and what honestly cannot
+   *
+   * Threads and their promotion state come back exactly, because they are
+   * reduced from the log by the kernel's own reducers — the same call the live
+   * path makes, so a rehydrated thread and a just-captured one are the same
+   * object built the same way.
+   *
+   * Two app-local facts were never in the log and do not come back:
+   *
+   *   - **the uncertainty dimension.** `EncounterCaptured.uncertaintyMark` is
+   *     `true | absent` in the frozen v1 schema (WP05-D2), so the fact of a mark
+   *     survives and the five-way choice does not. The thread comes back with
+   *     `uncertainty: null` and `markRecordedInLog: true`; nothing here invents a
+   *     dimension, and `uncertaintyLogNote` says which of the two situations the
+   *     learner is looking at.
+   *   - **candidate text.** `CandidateAttached` carries envelope metadata and
+   *     deliberately not the payload, so an unaccepted candidate's text is not
+   *     durable by design (see `CandidateView`). Candidates are therefore not
+   *     rehydrated into the snapshot at all — a panel restored with an empty body
+   *     would be a worse lie than an empty panel. The events themselves are in
+   *     the log and the evidence inspector shows them, because the inspector
+   *     reads `readDerived()` rather than this projection.
+   *
+   * Every event's own `idempotencyKey` is replayed into `appliedKeys`, so a
+   * capture repeated after a reload is still the no-op it is within one session.
+   * That is the difference between idempotency as a UI convenience and
+   * idempotency as a property of the log.
+   */
+  /**
+   * Fold one event that arrived already-minted into the log and the projection.
+   *
+   * Shared by `rehydrate` (events read back from the durable adapter) and
+   * `persistMinted` (events the kernel minted elsewhere in this process). The two
+   * paths differ in what they trust — the adapter is the authority on its own
+   * bytes, the persist path checks provenance first — and not at all in how an
+   * event is projected, so the projection lives here once. A second copy would be
+   * a second answer to "what does this event mean for a thread", which is the
+   * disagreement `readDerived()` exists to make impossible.
+   */
+  function absorb(event: DomainEvent): void {
+    events.push(event);
+
+    if (event.type === 'EncounterCaptured') {
+      const captured = event;
+      const targetKey = targetKeyOf(captured.text);
+      const existing = threads.get(captured.threadId);
+      const marked = 'uncertaintyMark' in captured && captured.uncertaintyMark === true;
+      if (existing === undefined) {
+        threads.set(captured.threadId, {
+          state: initialThreadState(captured),
+          displayText: captured.text.trim(),
+          targetKey,
+          lexemeId: resolveLexemeId?.(captured.text) ?? null,
+          uncertainty: null,
+          markRecordedInLog: marked,
+          capturedAt: captured.occurredAt,
+        });
+        threadOrder.unshift(captured.threadId);
+      } else {
+        threads.set(captured.threadId, {
+          ...existing,
+          state: threadReducer(existing.state, captured),
+          markRecordedInLog: existing.markRecordedInLog || marked,
+        });
+      }
+    } else if (event.type === 'ThreadPromotionChanged') {
+      const thread = threads.get(event.threadId);
+      // A promotion whose thread is not in the log is a log the kernel would
+      // refuse on replay. It is skipped rather than thrown on, because the
+      // authority on a malformed log is `replay` — which `readDerived()` runs
+      // over the same events — and two components deciding that question
+      // separately is how they come to disagree.
+      if (thread !== undefined) {
+        threads.set(event.threadId, { ...thread, state: threadReducer(thread.state, event) });
+      }
+    }
+
+    appliedKeys.set(event.idempotencyKey, {
+      threadId: 'threadId' in event ? event.threadId : '',
+      acknowledgedAt: event.occurredAt,
+      events: [event],
+      deduplicated: false,
+      durability,
+    });
+  }
+
+  function rehydrate(log: readonly DomainEvent[]): void {
+    for (const event of log) absorb(event);
+    if (log.length > 0) rebuildSnapshot();
+  }
+
   function findThreadByTarget(targetKey: string): StoredThread | undefined {
     for (const id of threadOrder) {
       const thread = threads.get(id);
@@ -223,6 +425,7 @@ export function createMemoryAppStore({
         ? (existing?.uncertainty ?? null)
         : { dimension: command.uncertainty, editedAt: event.occurredAt, markedAtCapture: true };
 
+    const marked = command.uncertainty !== null;
     if (existing === undefined) {
       threads.set(threadId, {
         state: initialThreadState(event),
@@ -230,6 +433,7 @@ export function createMemoryAppStore({
         targetKey,
         lexemeId: command.lexemeId ?? null,
         uncertainty,
+        markRecordedInLog: marked,
         capturedAt: event.occurredAt,
       });
       threadOrder.unshift(threadId);
@@ -239,6 +443,10 @@ export function createMemoryAppStore({
         state: threadReducer(existing.state, event),
         lexemeId: existing.lexemeId ?? command.lexemeId ?? null,
         uncertainty,
+        // Once any capture on the thread carried a mark, the log holds one
+        // forever: appended history is not retractable, and a later unmarked
+        // re-encounter does not erase the earlier event's field.
+        markRecordedInLog: existing.markRecordedInLog || marked,
       });
     }
 
@@ -441,13 +649,300 @@ export function createMemoryAppStore({
   }
 
   /**
+   * Append the demonstration evidence chain (WP-09).
+   *
+   * Every event is minted by the kernel, and each is there to make a different
+   * branch of the inspector non-empty — the point is a chain that exercises
+   * *all four* gate outcomes, because a ledger that only ever showed admitted
+   * rows could not answer "why did that one not count" (REQ-UI-06):
+   *
+   *   1. `ThreadPromotionChanged` to `learn` — without it the contract is not
+   *      activated and every observation is refused for the same reason, which
+   *      would demonstrate one branch of the gate and hide the rest.
+   *   2. `ContractCreated` — the versioned prompt family and the closed answer
+   *      set the inspector shows under "what was asked". `responseModality` is
+   *      `choice` so the contract is *scorable*; a `free` response scored
+   *      against a closed list is refused by REQ-DM-05's coherence rule.
+   *   3. `ReviewGraded` (`good`, nothing revealed) — **admitted**, the tier-A
+   *      case that changes review timing.
+   *   4. `ReviewGraded` (`easy`, revealed first) — **admitted as `again`**.
+   *      The reveal rule rewrites the grade inside the mint (T-06), so the
+   *      inspector shows a verdict whose grade is not the one submitted. This
+   *      is the row that makes the override visible instead of theoretical.
+   *   5. `ReviewGraded` (`easy`, unconfirmed) — **refused**,
+   *      `easy_requires_user_confirmation`. Recorded, and not counted.
+   *   6. `ExposureLogged` — tier D, **refused**, never admitted (T-08).
+   *
+   * The tiers are stamped by `src/evidence/`, never passed in: this file
+   * cannot label a passage sighting as a review even by mistake.
+   */
+  function applySeedEvidenceDemonstration(
+    command: Extract<AppCommand, { kind: 'seedEvidenceDemonstration' }>,
+  ): CommandAck {
+    const idempotencyKey = `demo:${command.threadId}`;
+    const previous = appliedKeys.get(idempotencyKey);
+    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+
+    const thread = threads.get(command.threadId);
+    if (thread === undefined) {
+      throw new Error(`cannot add a demonstration chain to unknown thread ${command.threadId}`);
+    }
+
+    const capture = events.find(
+      (event): event is EncounterCapturedEvent =>
+        event.type === 'EncounterCaptured' && event.threadId === command.threadId,
+    );
+    if (capture === undefined) {
+      throw new Error(`thread ${command.threadId} has no capture to derive a component id from`);
+    }
+
+    const appended: DomainEvent[] = [];
+    let state = thread.state;
+
+    // 1. Reach a promotion rung that activates recognition contracts. Stepping
+    // through the ladder rather than jumping keeps every transition in the log,
+    // which is what the inspector's "cause event" column reads.
+    //
+    // A thread already at `learn` or `master` is left alone: `indexOf` on the
+    // ladder returns -1 for `master`, and letting that fall through to
+    // `slice(0)` would re-promote from `captured` and produce transitions the
+    // kernel rejects. The remaining rungs are computed explicitly instead.
+    const LADDER = ['captured', 'keep', 'learn'] as const;
+    const startIndex = LADDER.indexOf(state.promotion as (typeof LADDER)[number]);
+    const remaining = startIndex === -1 ? [] : LADDER.slice(startIndex + 1);
+
+    let from = state.promotion;
+    for (const to of remaining) {
+      const promotion: ThreadPromotionChangedEvent = createDomainEvent(
+        context,
+        'ThreadPromotionChanged',
+        { threadId: command.threadId, from, to, origin: 'user' },
+        { idempotencyKey: promoteIdempotencyKey(command.threadId, from, to) },
+      );
+      events.push(promotion);
+      appended.push(promotion);
+      state = threadReducer(state, promotion);
+      appliedKeys.set(promoteIdempotencyKey(command.threadId, from, to), {
+        threadId: command.threadId,
+        acknowledgedAt: promotion.occurredAt,
+        events: [promotion],
+        deduplicated: false,
+        durability,
+      });
+      from = to;
+    }
+
+    // 2. The contract. `targetComponentId` is derived by the kernel's own
+    // projection from the capture event, so the app cannot mint a contract the
+    // gate would fail to link (REQ-DM-05, component-identity.ts).
+    const contractId = context.ids.nextId('contract');
+    const contract: ContractCreatedEvent = createDomainEvent(
+      context,
+      'ContractCreated',
+      {
+        contractId,
+        contractVersion: 1,
+        targetComponentId: componentIdOfEncounter(capture),
+        skill: command.skill,
+        cueModality: 'text',
+        // `choice`, not `free`. REQ-DM-05's coherence rule refuses a free
+        // response scored against a closed answer list — a correct paraphrase
+        // would be graded wrong and the resulting `again` would be an artefact
+        // of the contract rather than of the learner's memory. A demonstration
+        // that shipped an invalid contract would have shown only the gate's
+        // `contract_invalid` branch, which is not what REQ-UI-06 asks for.
+        responseModality: 'choice',
+        acceptedAnswers: [...command.acceptedAnswers],
+        hintPolicy: { hintsAllowed: true, maxHints: 1 },
+        revealPolicy: { revealAllowed: true, revealIsRecorded: true },
+        promptFamilyVersion: DEMONSTRATION_PROMPT_FAMILY_VERSION,
+      },
+      { idempotencyKey: `contract:${contractId}` },
+    );
+    events.push(contract);
+    appended.push(contract);
+
+    // 3-5. The observations. Every one goes through `src/evidence/`.
+    const graded = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'good',
+        latencyMs: 3400,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:1` },
+    );
+    events.push(graded);
+    appended.push(graded);
+
+    const revealed = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'easy',
+        latencyMs: 900,
+        hintsUsed: 1,
+        revealedBeforeRecall: true,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:2` },
+    );
+    events.push(revealed);
+    appended.push(revealed);
+
+    const unconfirmed = mintReviewGraded(
+      context,
+      {
+        contractId,
+        grade: 'easy',
+        latencyMs: 1200,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+        probeContext: 'standalone',
+      },
+      { idempotencyKey: `review:${contractId}:3` },
+    );
+    events.push(unconfirmed);
+    appended.push(unconfirmed);
+
+    const exposure = mintExposureLogged(
+      context,
+      {
+        componentIds: [componentIdOfEncounter(capture)],
+        // Prefixed so the inspector can tell a demonstration exposure from one
+        // the learner actually produced. An exposure carries no contract, so
+        // this is the only field that can hold the provenance (see
+        // `DEMONSTRATION_EXPERIENCE_PREFIX`).
+        experienceId: `${DEMONSTRATION_EXPERIENCE_PREFIX}${contractId}`,
+      },
+      { idempotencyKey: `exposure:${contractId}:1` },
+    );
+    events.push(exposure);
+    appended.push(exposure);
+
+    threads.set(command.threadId, { ...thread, state });
+
+    const ack: CommandAck = {
+      threadId: command.threadId,
+      acknowledgedAt: exposure.occurredAt,
+      events: appended,
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(idempotencyKey, ack);
+    return ack;
+  }
+
+  /**
+   * Correct an observation (REQ-UI-06, REQ-DM-04.2).
+   *
+   * The three refusals below are not defensive padding. `replay` throws a
+   * `ReducerInvariantError` on a correction naming an unknown observation, and
+   * on a second correction of the same one — so a store that let either through
+   * would produce a log that cannot be replayed, exported, or read back. The
+   * check therefore belongs where the command arrives, and its message is the
+   * one the user sees.
+   */
+  function applyCorrectEvidence(
+    command: Extract<AppCommand, { kind: 'correctEvidence' }>,
+  ): CommandAck {
+    if (command.note.trim() === '') throw new CorrectionRefusedError('empty-note');
+
+    const target = events.find((event) => event.eventId === command.supersededEventId);
+    if (target === undefined) throw new CorrectionRefusedError('unknown-observation');
+    if (!isEvidenceClassEvent(target) || target.type === 'EvidenceSuperseded') {
+      throw new CorrectionRefusedError('not-an-observation');
+    }
+    if (
+      events.some(
+        (event) =>
+          event.type === 'EvidenceSuperseded' &&
+          event.supersededEventId === command.supersededEventId,
+      )
+    ) {
+      throw new CorrectionRefusedError('already-corrected');
+    }
+
+    const correction = mintEvidenceSuperseded(
+      context,
+      {
+        supersededEventId: command.supersededEventId,
+        reason: command.reason,
+        // `replacementEventId` is deliberately absent: a Phase-0 correction is
+        // a retraction with a stated reason, and naming a replacement that does
+        // not exist would be the app inventing a record.
+        correction: { note: command.note.trim() },
+      },
+      { idempotencyKey: `supersede:${command.supersededEventId}` },
+    );
+
+    events.push(correction);
+
+    // The corrected thread, for the acknowledgment. An observation carries a
+    // contract, not a thread, so this is a best-effort attribution for the UI
+    // and never used to decide anything.
+    const threadId = threadOrder[0] ?? '';
+
+    return {
+      threadId,
+      acknowledgedAt: correction.occurredAt,
+      events: [correction],
+      deduplicated: false,
+      durability,
+    };
+  }
+
+  /** Append the `DataExported` record. See `RecordExportCommand` on ordering. */
+  function applyRecordExport(command: Extract<AppCommand, { kind: 'recordExport' }>): CommandAck {
+    const eventId = context.ids.nextId('event');
+    const record: DataExportedEvent = createDomainEvent(
+      context,
+      'DataExported',
+      { exportVersion: command.exportVersion, scope: { kind: 'all' } },
+      { eventId, idempotencyKey: `export:${eventId}` },
+    );
+    events.push(record);
+
+    return {
+      threadId: threadOrder[0] ?? '',
+      acknowledgedAt: record.occurredAt,
+      events: [record],
+      deduplicated: false,
+      durability,
+    };
+  }
+
+  /**
+   * `replay` over the current log, memoised on log length.
+   *
+   * Length is a sound cache key here and only here: this log is append-only
+   * within one session — nothing rewrites or removes an entry — so a length
+   * that has not moved names the same array contents. A store that could
+   * mutate history in place would need a different key, and that is precisely
+   * the store this is not.
+   */
+  let derivedCache: { readonly length: number; readonly state: DerivedState } | null = null;
+  function readDerived(): DerivedState {
+    if (derivedCache !== null && derivedCache.length === events.length) return derivedCache.state;
+    const state = replay(events);
+    derivedCache = { length: events.length, state };
+    return state;
+  }
+
+  /**
    * Dispatch, exhaustively.
    *
    * A `switch` over the closed union rather than a chain of ternaries, so that
    * adding a command kind without handling it is a type error here instead of a
-   * silent fall-through to the last branch.
+   * silent fall-through to the last branch. That property is what made the
+   * three-lane WP-10 merge checkable: every command WP-07, WP-08 and WP-09 each
+   * added has to appear below or this function stops returning `CommandAck` on
+   * every path.
    */
-  function applyCommand(command: AppCommand): CommandAck {
+  function dispatch(command: AppCommand): CommandAck {
     switch (command.kind) {
       case 'capture':
         return applyCapture(command);
@@ -459,8 +954,86 @@ export function createMemoryAppStore({
         return applyAttachCandidate(command);
       case 'acceptCandidate':
         return applyAcceptCandidate(command);
+      case 'seedEvidenceDemonstration':
+        return applySeedEvidenceDemonstration(command);
+      case 'correctEvidence':
+        return applyCorrectEvidence(command);
+      case 'recordExport':
+        return applyRecordExport(command);
     }
   }
+
+  /**
+   * The batch key for a persisted batch of kernel-minted events (WP-10).
+   *
+   * Derived from the first appended event's own key, which is content-derived on
+   * every session path, so re-persisting the same gesture produces the same batch
+   * key and the adapter's no-op path handles it — the same rule
+   * `commandIdempotencyKey` follows, and for the same reason.
+   */
+  const persistBatchKey = (first: DomainEvent): string =>
+    `${PERSIST_OPERATION_KIND}:${first.idempotencyKey}`;
+
+  /**
+   * Write down events the kernel minted elsewhere in this process.
+   *
+   * The whole method is a filter and two loops. Everything that makes it safe
+   * happened before the first line: `openMintedEventBatch` throws unless the
+   * container came from `sealMintedEvents` *and* every member is an object one of
+   * the kernel's minters returned, unaltered. There is nothing here that
+   * constructs, grades, tiers, or admits.
+   *
+   * See `AppStore.persistMinted` for why this is not the `ingest` hole WP-10's
+   * closeout refused to open.
+   */
+  function persistMinted(batch: MintedEventBatch): PersistAck {
+    const started = elapsedMs();
+    const incoming = openMintedEventBatch(batch);
+
+    const appended: DomainEvent[] = [];
+    const alreadyPresent: DomainEvent[] = [];
+    for (const event of incoming) {
+      // Keyed on the event's own key, not the batch's: the session workspace
+      // holds a copy of the store's log, so a caller that re-offers its whole
+      // workspace is offering events this store already has. That is the normal
+      // case on the first dispatch of a sitting, not an error.
+      if (appliedKeys.has(event.idempotencyKey)) {
+        alreadyPresent.push(event);
+        continue;
+      }
+      absorb(event);
+      appended.push(event);
+    }
+
+    if (appended.length > 0) {
+      rebuildSnapshot();
+      notify();
+      const first = appended[0];
+      // Same ordering rule as `execute`: subscribers see it before a byte is
+      // written (REQ-UI-01), and a failed durable write becomes a reported write
+      // state rather than a lost acknowledgment (`durable-store.ts`).
+      if (journal !== undefined && first !== undefined) {
+        journal(appended, persistBatchKey(first));
+      }
+    }
+
+    observer.observe({
+      commandKind: PERSIST_OPERATION_KIND,
+      latencyMs: Math.max(0, elapsedMs() - started),
+      appendedTypes: appended.map((event): DomainEventType => event.type),
+      deduplicated: appended.length === 0 && alreadyPresent.length > 0,
+      failed: false,
+    });
+
+    return {
+      appended,
+      alreadyPresent,
+      acknowledgedAt: appended[appended.length - 1]?.occurredAt ?? context.clock.now(),
+      durability,
+    };
+  }
+
+  if (initialEvents !== undefined) rehydrate(initialEvents);
 
   return {
     durability,
@@ -472,12 +1045,46 @@ export function createMemoryAppStore({
       };
     },
     execute(command) {
-      const ack = applyCommand(command);
+      const started = elapsedMs();
+      const kind: AppCommandKind = command.kind;
+      let ack: CommandAck;
+      try {
+        ack = dispatch(command);
+      } catch (cause) {
+        // The record notes *that* a command failed and nothing about why: a
+        // thrown message can quote a note, an answer, or captured text, and a
+        // diagnostic buffer is exactly where that must not end up (§12, §15).
+        observer.observe({
+          commandKind: kind,
+          latencyMs: Math.max(0, elapsedMs() - started),
+          appendedTypes: [],
+          deduplicated: false,
+          failed: true,
+        });
+        throw cause;
+      }
       rebuildSnapshot();
       notify();
+      // After the snapshot and the notify, before the return: the learner's
+      // acknowledgment is already on screen when the durable write starts
+      // (REQ-UI-01). `journal` never throws into this path — see
+      // `durable-store.ts`, where a failed write becomes a reported state
+      // rather than a lost acknowledgment.
+      if (journal !== undefined && ack.events.length > 0) {
+        journal(ack.events, commandIdempotencyKey(command, ack));
+      }
+      observer.observe({
+        commandKind: kind,
+        latencyMs: Math.max(0, elapsedMs() - started),
+        appendedTypes: ack.events.map((event): DomainEventType => event.type),
+        deduplicated: ack.deduplicated,
+        failed: false,
+      });
       return ack;
     },
+    persistMinted,
     readAll: () => events.slice(),
+    readDerived,
   };
 }
 

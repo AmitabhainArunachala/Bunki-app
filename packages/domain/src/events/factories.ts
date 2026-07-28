@@ -32,6 +32,7 @@ import {
   type NonEvidenceEventType,
 } from './catalog.ts';
 import { EVENT_SCHEMA_VERSION } from './envelope.ts';
+import { recordKernelMint } from './mint-registry.ts';
 import { parseEvent } from './parse.ts';
 
 /** The family-specific fields — everything the envelope and discriminator do not cover. */
@@ -80,5 +81,10 @@ export function createDomainEvent<TType extends NonEvidenceEventType>(
     idempotencyKey: options.idempotencyKey,
   };
 
-  return parseEvent(candidate) as EventOfType<TType>;
+  // Registered on the way out, so the object the caller receives is the object
+  // the persist path will recognise (WP-10; `./mint-registry.ts`). It is the
+  // *parsed* value that is recorded, not `candidate` — the parser returns a
+  // fresh object, and registering the pre-parse draft would register something
+  // nobody ever holds.
+  return recordKernelMint(parseEvent(candidate)) as EventOfType<TType>;
 }

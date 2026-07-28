@@ -16,12 +16,39 @@ interactions to domain commands. That is all it does.
 - **No scheduling, grading, or evidence logic here.** Those live in
   `@bunki/domain`. If a screen needs to decide something about learning, the
   decision belongs in the domain and the screen calls it.
-- **Never import `@bunki/persistence`.** `apps/app` must not call
-  `EventStorePort.append` directly. Every append flows through the domain
-  command handler, which routes evidence-class events through the evidence gate.
-  This is enforced by `no-restricted-imports` in `eslint.config.mjs`, and it is
-  the rule that closes the gate-bypass hole — an exception request is an ADR,
-  not a lint-disable comment.
+- **Import `@bunki/persistence` only from `src/state/persistence/`.** `apps/app`
+  must not call `EventStorePort.append` directly. Every append flows through the
+  domain command handler, which routes evidence-class events through the
+  evidence gate. WP-05 kept that with a blanket package ban while the app had no
+  durable store; WP-10 gave it one, so the ban is now scoped to that single seam
+  directory — nothing else in the app, tests included, can name the package, and
+  nothing outside `src/state/` may import the seam either. This is enforced by
+  `no-restricted-imports` in `eslint.config.mjs` and proved in both directions by
+  `test/boundaries.test.ts`; widening the seam is an ADR, not a lint-disable
+  comment.
+
+### Where this build keeps data (REQ-ARCH-05, P0-CAP-15)
+
+- **Web runs the provisional web adapter.** The event log lives in memory and is
+  snapshotted to `localStorage`. Provisional is the load-bearing word: the
+  storage strategy is explicitly replaceable, and **web persistence results are
+  never reported as native persistence**. The `/debug` screen renders the
+  adapter's own disclosure verbatim, plus whether the browser actually granted
+  storage.
+- **Native runs `expo-sqlite`** through `src/state/persistence/platform-store.native.ts`,
+  selected by Metro's platform resolution so the web bundle contains no native
+  database. Producing the `native` label is not the same as earning it — only
+  WP-11 device evidence may be reported as native verification.
+- **Session and canvas events are durable** since the WP-10 export lane closed
+  COORD-B8-2. A sitting's start, its contracts, every graded review, every canvas
+  observation and its close reach the same log as the capture, so they survive a
+  reload, appear in an export and show up in the evidence inspector. The store
+  still mints none of them: `applySessionCommand` does, evidence-class ones
+  through the evidence gate, and `AppStore.persistMinted` accepts only a sealed
+  batch of events this kernel minted in this process (REQ-ARCH-04). What stays on
+  the device is the _plan_ — which steps were composed and how far you got —
+  because a plan is a proposal rather than a record of what the learner did; the
+  session screen and `/debug` both say so.
 - **Candidates are always labeled.** AI-generated content renders with a visible
   "AI candidate / generated" label (T-12) and is never presented as canonical.
 - **Claim discipline (REQ-GATE-03).** No comprehension percentages, no global

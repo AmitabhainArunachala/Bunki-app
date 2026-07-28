@@ -41,7 +41,14 @@ import {
   type SeedLexeme,
 } from '../data/catalog.ts';
 import { seedDataset } from '../data/catalog.ts';
-import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
+import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
+import {
+  useAiRuntime,
+  useAppSnapshot,
+  useAppStore,
+  useConnectivity,
+  useDebugFlags,
+} from '../state/app-context.tsx';
 import { DEFERRED_BY_ID } from '../state/deferred.ts';
 import { UNCERTAINTY_LABELS, uncertaintyLogNote } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
@@ -84,6 +91,24 @@ export function WordScreen({
     emptyDetail: `The Phase-0 seed holds ${String(seedDataset.lexemes.length)} words. This is a seed dataset, not a dictionary.`,
   });
 
+  // The candidate hook is resolved *above* the early returns, because hooks
+  // cannot be called conditionally and the loading/error/empty branches below
+  // return before the body. It tolerates every not-ready shape — a null lexeme,
+  // a null thread, a word the seed has no sentence for — by refusing to request,
+  // which is why it can be wired here rather than inside the ready branch.
+  const resolvedLexeme = state.kind === 'ready' ? state.data : null;
+  const candidateThread =
+    resolvedLexeme === null
+      ? null
+      : (snapshot.threads.find((candidate) => candidate.lexemeId === resolvedLexeme.id) ?? null);
+  const ai = useCandidate({
+    runtime: useAiRuntime(),
+    threadId: candidateThread?.state.threadId ?? null,
+    context: resolvedLexeme === null ? null : seededContextFor(resolvedLexeme),
+    existing: snapshot.candidatesByThread[candidateThread?.state.threadId ?? '']?.[0] ?? null,
+  });
+  const connectivity = useConnectivity();
+
   if (state.kind === 'loading') {
     return (
       <ScreenShell testID="screen-word" title="Word">
@@ -115,7 +140,10 @@ export function WordScreen({
   const family = wordFamily(lexeme);
   const examples = sentencesForLexeme(lexeme.id);
   const passage = passageForLexeme(lexeme.id);
-  const thread = snapshot.threads.find((candidate) => candidate.lexemeId === lexeme.id) ?? null;
+  // Same lookup the candidate hook above already did; reused rather than
+  // repeated so the panel and the page can never disagree about which thread
+  // this word belongs to.
+  const thread = candidateThread;
   const otherEncounters = snapshot.threads.filter(
     (candidate) => candidate.state.threadId !== thread?.state.threadId,
   );
@@ -232,7 +260,9 @@ export function WordScreen({
               testID="word-uncertainty"
             >
               {thread.uncertainty === null
-                ? 'Nothing marked uncertain.'
+                ? thread.markRecordedInLog
+                  ? uncertaintyLogNote(null, { kept: true, markRecordedInLog: true })
+                  : 'Nothing marked uncertain.'
                 : `Marked uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}. ${uncertaintyLogNote(thread.uncertainty, { kept: true })}`}
             </Text>
           </View>
@@ -240,7 +270,7 @@ export function WordScreen({
 
         {construction === null ? (
           <UnsupportedLayer
-            reason="No seed grammar construction is attached to this word’s example sentences, and nothing on this screen is generated — the AI candidate path is a later work package."
+            reason="No seed grammar construction is attached to this word’s example sentences. The panel below can ask for a generated one, which arrives labelled as a candidate and is never a canonical field on this page."
             testID="word-explanation-unfilled"
             title="One high-value explanation or contrast"
           />
@@ -270,6 +300,23 @@ export function WordScreen({
             <ProvenanceLine field="explanation" record={construction.provenance.explanation} />
           </View>
         )}
+
+        {/* The bounded AI exchange (WP-07, mounted in WP-10 per that package's
+            coordination request 1). It sits *below* the seed's own explanation
+            deliberately: what the seed can say with provenance comes first, and
+            the generated candidate is an addition to it rather than a
+            replacement for it. Everything the panel renders is labelled by
+            `@bunki/ai`'s own view model (T-12), and accepting one is an explicit
+            press that produces `CandidateAcceptedAsNote` — never a canonical
+            field on this page (REQ-ARCH-04, T-09). */}
+        <CandidatePanel
+          headword={lexeme.headword}
+          offline={connectivity === 'offline'}
+          onAccept={ai.accept}
+          onRequest={ai.request}
+          state={ai.state}
+          testID="word-candidate-panel"
+        />
 
         <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
           Recent related encounters

@@ -3,6 +3,7 @@ import { type ReactNode } from 'react';
 
 import { KanjiScreen } from '@/screens/kanji-screen';
 import { strokeSvgFor } from '@/data/stroke-sources';
+import { RouteTitle } from '@/ui/route-title';
 
 /**
  * Route `/kanji/:character` — the kanji page (controller §10 screen 3).
@@ -19,11 +20,15 @@ export default function KanjiRoute(): ReactNode {
   const resolved = typeof character === 'string' ? character : '';
 
   return (
-    <KanjiScreen
-      character={resolved}
-      onBack={() => router.push('/')}
-      onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
-      strokeSvg={strokeSvgFor(resolved)}
-    />
+    <>
+      {/* The character itself is the only useful thing a bookmark could say. */}
+      <RouteTitle detail={resolved} href="/kanji/[character]" />
+      <KanjiScreen
+        character={resolved}
+        onBack={() => router.push('/')}
+        onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
+        strokeSvg={strokeSvgFor(resolved)}
+      />
+    </>
   );
 }
