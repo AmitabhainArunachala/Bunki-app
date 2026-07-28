@@ -6283,3 +6283,241 @@ the 42 are the new EDRDG lane.
 Verify this branch from a clean checkout, re-run the §17.5 set, and run
 `--verify-reproducible` and `--verify-attribution` with a warm cache. Nothing
 here is merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Campaign E — Wave B, lane B5: journeys (agent/bunki-e-journey)
+
+Branch: `agent/bunki-e-journey`, from `agent/bunki-e-integration` (`aa03f7e`).
+
+### What this lane built
+
+The surface that makes 分岐 the app's central verb: you stumble, a branch opens,
+the fork shows the road that repairs it beside the roads you are not taking, you
+walk one, and the **evidence** — not a button — puts you back on the main line.
+
+New route `/journey`, one screen, eight modules under `src/ui/journey/`:
+
+| Module | What it is |
+|---|---|
+| `stumbles.ts` | Reads the ledger for misses. Every field of a `JourneyStumble` is copied from the log or the gate's decision record. |
+| `rails.ts` | All six route families as rails, in four states. |
+| `fork-geometry.ts` | The 分岐 drawing as pure, testable path data. |
+| `open-conditions.ts` | The rejoin criterion decomposed into its five clauses. |
+| `history.ts` | What opened the branch, what has been tried, what is left. |
+| `branch-fork.tsx` | The fork, drawn, with `BranchLight` doing the dimming. |
+| `open-condition-panel.tsx` | The condition, and every answer offered to it. |
+| `journey-history.tsx` | The timeline, each entry naming its record. |
+
+### The non-negotiables, and where each is enforced
+
+**The evidence gate is the sole factory for accepted evidence.** This screen
+writes nothing at all. It never calls `execute`, `persistMinted`,
+`createDomainEvent` or `sealMintedEvents` — asserted by source scan over all
+nine files, with comments stripped — and the ledger is asserted byte-unchanged
+across everything the screen does on a render, including opening a journey,
+answering a probe, taking a road, evaluating a rejoin and building the history.
+
+**Exposure is never retrieval.** A probe answer on this screen is routing. The
+domain makes it structural (`DiagnosticProbe.producesEvidence` is the literal
+`false`); the surface's only handler for a probe chip is `answerProbe`, a pure
+transition on a value in React state, and a test pins that shape.
+
+**No global mastery score.** This screen shows **no memory band at all**, so it
+makes no aggregate claim. What it does show is which single capability lens the
+stumbled contract exercises — and `discrimination` maps to `null` rather than
+being forced into one, because telling two confusables apart is not exactly
+reading and not exactly meaning.
+
+**No XP, streaks, badges or near-misses.** Eleven banned patterns and six
+failure-language patterns are scanned across all eight surface files, plus a
+scan for any percentage and for a progress bar. The only number the surface
+carries is how many answers the *condition* has looked at, which is a property
+of the evidence and not of the learner's diligence.
+
+**EDRDG.** `<SeedEntryDisclosure />` is mounted unconditionally; the derived
+module-graph test in `test/edrdg-acknowledgement.test.ts` picks the new route up
+automatically, and all six browser shots record `EDRDG acknowledgement present:
+true` read out of the photographed DOM.
+
+### Two claims this lane wrote down and its own tests falsified
+
+Both were corrected in code rather than softened in prose.
+
+**1. The reveal correction does not happen where the requirement says.**
+`stumbles.ts` originally documented the design REQ-DM-07 describes: the event
+keeps the grade the learner pressed, and the gate's `effectiveGrade` carries the
+T-06 correction. It is not what this kernel does. `evidence/mint.ts` computes
+`grade = revealedBeforeRecall ? 'again' : input.grade` **at mint**, so the
+submitted grade never reaches the log and the two values are equal on every
+event this app can produce. A consequence follows that nobody appears to have
+noticed: `GateDecisionRecord.forcedByReveal` is computed as
+`revealedBeforeRecall && grade !== 'again'` and is therefore **structurally
+unreachable** — always `false` — on any app-minted event. Recorded as
+`REVEAL_CORRECTION_HAPPENS_AT_MINT`, pinned by a test against a real sitting.
+`packages/domain/src/evidence/` is WP-06's; this lane observed it and did not
+edit it.
+
+**2. The fork called four available roads impossible.** `railsOf` had three
+states and labelled everything not offered `closed — nowhere to go for this
+word`. REQ-JRN-02 caps the offer at three paths, so a *fourth admissible* family
+is not offered and the compiler leaves its `unavailableBecause` as `null` — and
+the surface was rendering "nowhere to go" beside that blank, for routes that had
+somewhere perfectly good to go and had merely lost a ranking. Split into a
+fourth state, `held_back`, which says what is true. Visible in the evidence:
+`kanji_structure_writing: available, held back`.
+
+### A carried defect this lane's browser evidence found
+
+**Which contract a sitting probes first is a clock race.** The screenshot
+harness walks the loop once per colour scheme, and the two runs produced
+different forks. The cause is not in this lane: `session-loop.ts`'s
+`contractsFor` mints the reading and meaning contracts back to back off the wall
+clock, and `compareDueContracts` orders by due instant and falls back to the
+contract id only on a tie. Two mints inside one millisecond probe **meaning**
+first; two that straddle a millisecond boundary probe **reading** first. Both
+branches are exercised in `test/journey-surface.test.ts` under "carried defect",
+with a 0 ms and a 1 ms clock. `src/screens/session-loop.ts` is WP-08/WP-10's;
+this is reported, reproduced and pinned, not fixed from here. Its own docblock
+reasons about the tie case and treats it as the only case.
+
+### The load-bearing test
+
+The open-condition panel *explains* the rejoin criterion clause by clause, which
+creates the risk of a second definition drifting from the first. So the domain
+decides and the panel only explains: every verdict comes from
+`qualifiesForRejoin`, and 288 exhaustively crossed observations (2 contracts × 4
+grades × 2 admitted × 3 hint counts × 2 reveals × 3 instants) assert that "every
+clause met" and the kernel's own answer never disagree. A drift is a failing
+test, not a wrong sentence on a screen.
+
+### Shared files: appended to, never restructured
+
+- `src/ui/navigation.ts` — one destination appended after the specimen, with the
+  reasoning for why it is in the shell and the coordination request it leaves
+  open (below).
+- `test/screen-contract.test.ts` — one `SCREEN_OWNERS` row, one `SCREEN_SOURCES`
+  row.
+- `test/navigation-reachability.test.ts` — one entry in each of the two pinned
+  label lists, with the argument added rather than the existing comment deleted.
+
+### Coordination requests this lane leaves open
+
+1. **A second door to `/journey` from the session screen.** The right moment to
+   offer a branch is the moment of the miss, and `src/screens/session-screen.tsx`
+   is not this lane's file. `/journey` is therefore reached from the shell, which
+   is defensible on its own terms — a branch point belongs to a contract in the
+   ledger rather than to any screen, so there is no screen it could hang off —
+   but a door at the miss would be better.
+2. **`forcedByReveal` in the gate is unreachable** (see above). Either the
+   correction moves to the gate so the submitted grade survives in the log, or
+   the field goes; today it is a field that cannot be true.
+3. **Nothing in the log records which sitting an observation happened in.** The
+   rejoin criterion supports `requireSeparateSessions`, which groups on
+   `sessionId`; no evidence-class event carries one, and the domain's fallback
+   treats each `null` sitting as its own — which would make "on two different
+   days" satisfiable by two answers in one minute. This lane therefore never
+   requests that option, and says so on screen
+   (`SEPARATE_SITTINGS_NOT_AVAILABLE`).
+
+### Checks run, all of them, on this branch
+
+| Check | Result |
+|---|---|
+| `npm ci` | clean |
+| `npm run lint` | clean |
+| `npm run format:check` | clean |
+| `npm run typecheck` | clean |
+| `npm run test` | **2375 passed / 106 files** (2018 / 105 at the branch point) |
+| `npm run test:replay` | 47 passed |
+| `npm run verify:export` | 14 passed |
+| `cd apps/app && npx expo export --platform web` | 15 static routes, `/journey` among them |
+| `npm run test:e2e` | **48 passed**; the two `✘` lines are the pre-existing `test.fail()` known defects in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this lane |
+
+### Browser evidence
+
+`docs/build-evidence/screenshots-b5-journeys/`, six shots, light and dark, taken
+by `apps/app/scripts/capture-journeys.mjs` against the real
+`expo export --platform web` output in Chromium. Four of them were taken **after
+walking the loop by clicking**: capture 分岐 → take it up for study → sit the
+session → grade its first probe **Again**. That Again is the only thing in this
+app that opens a branch. The script grades nothing, seeds nothing and writes no
+storage.
+
+Each shot's README entry records, read back out of the photographed DOM: the
+phase line, the capability line, the state word beside every one of the six
+rails, the number of SVG paths in the fork drawing, the open-condition counts,
+and whether the acknowledgement is present. "Six rails are visible" is therefore
+a measurement rather than a claim.
+
+One layout defect was found by looking at the pictures and fixed: the drawing
+was an ordinary flex sibling of the row column, so the taller of the two
+stretched the other and the column reported the *drawing's* height back through
+`onLayout`. The measured height could then never shrink, and taking a road —
+which removes the "Take this road" buttons — left a growing band of empty paper
+under the fork. The canvas is now absolutely positioned, so the column measures
+only itself.
+
+### What this lane did NOT do
+
+1. **No browser shot of a rejoin.** The transition is proven over a real store
+   in `test/journey-surface.test.ts` — a hinted success leaves the branch open, a
+   subsequent unaided success closes it, with nothing tapped, and fifty
+   applications against an unchanged ledger leave it open. It is **not**
+   photographed, and the reason is item 2.
+2. **The road you took does not survive leaving the screen.** The branch is
+   durable because it is re-derived from the ledger every time; the routing —
+   probe answers and chosen road — is React state. Persisting it needs a place
+   for app-local state, and the one this app has (`AppStore`) is another lane's
+   module; writing an *event* would be worse, because taking a road is not
+   evidence of anything. Disclosed on screen as `ROUTING_IS_NOT_STORED`, with
+   both halves of the disclosure asserted by test.
+3. **No memory bands on this screen.** Deriving a recall band needs the memory
+   projection, which is another lane's, and `test/screen-contract.test.ts`
+   structurally forbids `apps/app` from naming the fields it would read. The
+   screen shows the capability lens the stumbled contract exercises and no band,
+   rather than a band this lane could not compute honestly.
+4. **The quiet-opportunity shelf is never pinned.** `setPinned` exists in the
+   domain and no control on this screen reaches it, so an untaken road decays on
+   the ten-day half-life with no way to keep it. Stated, not hidden.
+5. **Only the newest branch point gets a fork.** Older ones are listed by
+   contract, instant and event id under a disclosure that states the count. There
+   is no way to switch the fork to an older one.
+6. **`isUnaidedSuccess` and `AFFORDANCES_NOT_AVAILABLE_HERE` are exported and
+   unused by the screen.** The first is covered by its own test (hinted,
+   revealed and clean cases, over a real sitting); the second is data the screen
+   does not yet render — the compiler's per-route `unavailableBecause` is what
+   the fork shows, and this constant's "why this build cannot answer it at all"
+   framing has no home on the surface yet. Neither is load-bearing, and both are
+   named here rather than left for a reader to discover.
+7. **No native target.** As everywhere else in this repository, nothing builds,
+   exports or drives iOS or Android, so every claim here is about the web export.
+
+### What a verifier should try to break
+
+1. Delete the `admitted` check in `stumbles.ts`'s `isMiss` and confirm a review
+   the gate refused starts opening a branch — i.e. that the test is testing that
+   and not something adjacent.
+2. Change `RAIL_RESTING_OPACITY.closed` to `0.1` and confirm the test goes red
+   *and* that `BranchLight` would have silently floored it anyway. Both halves
+   matter: the second is why the table needed its own assertion.
+3. Re-implement one clause of `verdictFor` incorrectly — say, drop the
+   `hintsUsed` term from `unaided` — and confirm the 288-case cross goes red
+   rather than only the hand-written cases.
+4. Argue the fork should render only the offered roads. The counter is frozen §3
+   ("untaken branches stay visible as dimmed rails") plus the second finding
+   above: a learner shown two roads with no account of the other four cannot
+   tell whether the other four were considered.
+5. Argue `Journeys` does not belong in the shell. The lane's own answer is in
+   `src/ui/navigation.ts` and it concedes the better option it could not take.
+6. Run `capture-journeys.mjs` twice and diff the READMEs. The forks will differ,
+   and the reason is the carried defect above — check that the explanation in the
+   screenshots README matches what the pinned test actually demonstrates.
+
+### Next safe command
+
+`git checkout agent/bunki-e-journey && npm ci && npm run lint && npm run
+format:check && npm run typecheck && npm run test && npm run test:replay && npm
+run verify:export && (cd apps/app && npx expo export --platform web) && npm run
+test:e2e`, then `node apps/app/scripts/capture-journeys.mjs`. Nothing here is
+merged; no agent may merge, approve, or push to `main`.

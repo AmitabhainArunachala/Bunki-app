@@ -110,8 +110,22 @@ export function BranchFork({
 
   return (
     <View style={styles.fork} testID={testID}>
+      {/*
+        The drawing is taken out of the flow.
+
+        It used to be an ordinary sibling of the row column, and that made the
+        measurement latch: the two are laid out in a row, so the taller of them
+        stretched the other, and the row column therefore reported the *drawing's*
+        height back through `onLayout` rather than its own. Once the rows got
+        shorter — which is exactly what happens when a road is taken and the
+        "Take this road" buttons go away — the column could never report the
+        smaller height, so the fork kept a band of empty paper under it that grew
+        with every layout and never shrank. Absolutely positioning the canvas
+        gives the gutter no intrinsic height, so the row column measures only
+        itself.
+      */}
       <View aria-hidden style={styles.gutter}>
-        <Svg height={geometry.height} width={geometry.width}>
+        <Svg height={geometry.height} style={styles.canvas} width={geometry.width}>
           <Path
             d={geometry.trunkD}
             stroke={theme.color.ruleStrong}
@@ -308,7 +322,13 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
   },
   gutter: {
+    position: 'relative',
     width: 56,
+  },
+  canvas: {
+    left: 0,
+    position: 'absolute',
+    top: 0,
   },
   rows: {
     flex: 1,

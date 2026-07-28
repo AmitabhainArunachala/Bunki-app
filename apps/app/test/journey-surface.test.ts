@@ -77,6 +77,7 @@ import {
   affordancesForLexeme,
   gradedReviews,
   isMiss,
+  isUnaidedSuccess,
   journeyObservationsFrom,
   observationsFor,
   stumblesFrom,
@@ -310,6 +311,30 @@ describe('a branch is opened by the evidence gate and by nothing else', () => {
     // …and so the gate's own `forcedByReveal` can never be true here.
     expect(review?.forcedByReveal).toBe(false);
     expect(REVEAL_CORRECTION_HAPPENS_AT_MINT.where).toContain('mintReviewGraded');
+  });
+
+  /**
+   * `isUnaidedSuccess` is the mirror of `isMiss`, and it is exported and not
+   * yet consumed by the screen — so it is covered here rather than left as
+   * untested surface area somebody later trusts.
+   */
+  it('recognises an unaided success, and refuses a hinted or revealed one', () => {
+    const hinted = openLoop('b5-unaided-hint-');
+    answer(hinted, { grade: 'good', latencyMs: 2000, hintsUsed: 1, revealedBeforeRecall: false });
+    const hintedReview = gradedReviews(hinted.store.readAll(), hinted.store.readDerived())[0];
+    expect(hintedReview?.admitted).toBe(true);
+    expect(isUnaidedSuccess(hintedReview!)).toBe(false);
+
+    const revealed = openLoop('b5-unaided-reveal-');
+    answer(revealed, { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: true });
+    const revealedReview = gradedReviews(revealed.store.readAll(), revealed.store.readDerived())[0];
+    expect(isUnaidedSuccess(revealedReview!)).toBe(false);
+
+    const clean = openLoop('b5-unaided-clean-');
+    answer(clean, { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: false });
+    const cleanReview = gradedReviews(clean.store.readAll(), clean.store.readDerived())[0];
+    expect(isUnaidedSuccess(cleanReview!)).toBe(true);
+    expect(isMiss(cleanReview!)).toBe(false);
   });
 
   it('opens no branch on a review the gate refused', () => {
@@ -1077,7 +1102,93 @@ describe('the journey’s own history', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. The screen is honest about what it does not have
+// 9. A carried defect, found by this lane's browser evidence and pinned here
+// ---------------------------------------------------------------------------
+
+/**
+ * Which contract a sitting probes first is not stable across runs.
+ *
+ * ## How it was found
+ *
+ * The B5 screenshot harness walks the loop twice — once per colour scheme — and
+ * the two runs produced *different forks*: in one the branch opened on the
+ * reading contract and in the other on the meaning contract, so a different
+ * capability was implicated and a different set of routes was offered. The
+ * screenshots looked like a bug in the journey surface. They are not.
+ *
+ * ## What it actually is
+ *
+ * `session-loop.ts`'s `contractsFor` mints the reading contract and then the
+ * meaning contract, both stamped from `DomainContext.clock.now()`. Under the
+ * production runtime that is the wall clock. `compareDueContracts` orders by
+ * due instant first and falls back to the contract id only on a tie, so:
+ *
+ *   - both mints inside one millisecond → equal instants → id tiebreak →
+ *     `contract-meaning-…` sorts before `contract-reading-…`;
+ *   - the mints straddle a millisecond boundary → reading is due first.
+ *
+ * The two branches of that are exercised below with a clock that ticks 0 ms and
+ * one that ticks 1 ms, which is the whole mechanism. `session-loop.ts`'s own
+ * docblock already reasons about the tie case and describes it as *the* case;
+ * the other one is reachable in production and is not accounted for.
+ *
+ * ## Why it is pinned rather than fixed
+ *
+ * `src/screens/session-loop.ts` belongs to WP-08/WP-10, not to this lane. This
+ * test records the behaviour so the finding is reproducible and so that making
+ * the order deterministic is a *failing test* somebody has to look at, rather
+ * than a silent change that invalidates a paragraph of screenshot evidence.
+ */
+describe('carried defect (not this lane’s to fix): the first step of a sitting is clock-race dependent', () => {
+  const firstStepContract = (tickMs: number): string | undefined => {
+    let millis = Date.parse(ASOF);
+    const context: DomainContext = {
+      clock: {
+        now: () => {
+          const value = millis;
+          millis += tickMs;
+          return new Date(value).toISOString();
+        },
+      },
+      ids: createDeterministicContext({ instants: ASOF, idPrefix: 'race-' }).ids,
+      random: { nextUnitInterval: () => 0.5 },
+    };
+
+    const store = createMemoryAppStore({ context });
+    takeUpForStudy(store);
+    const boot = bootstrapSessionWorkspace(store, context);
+    if (boot.target === null) throw new Error('no target');
+    const started = applySessionCommand(context, boot.workspace, {
+      kind: 'start',
+      timeBudgetMin: 10,
+      newBudget: 2,
+      asOf: context.clock.now(),
+      canvasId: boot.target.passage.id,
+      labelByContract: boot.target.contractLabels,
+    });
+    return started.runtime?.plan.steps[0]?.contractId ?? undefined;
+  };
+
+  it('probes meaning first when both contracts land in one millisecond', () => {
+    expect(firstStepContract(0)).toBe('contract-meaning-lex-bunki');
+  });
+
+  it('probes reading first when they do not', () => {
+    expect(firstStepContract(1)).toBe('contract-reading-lex-bunki');
+  });
+
+  /**
+   * The consequence for this lane, stated as an assertion rather than a worry:
+   * the branch that opens is about whichever contract was probed, so the two
+   * orderings genuinely produce two different forks, and neither is wrong.
+   */
+  it('is why two runs of the same walk can open two different forks', () => {
+    expect(firstStepContract(0)).not.toBe(firstStepContract(1));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. The screen is honest about what it does not have
 // ---------------------------------------------------------------------------
 
 describe('what the surface says it cannot do', () => {
@@ -1093,6 +1204,52 @@ describe('what the surface says it cannot do', () => {
       const body = read(file).replace(/\/\*[\s\S]*?\*\//g, ' ');
       expect(body, file).not.toMatch(/requireSeparateSessions:\s*true/);
     }
+  });
+
+  /**
+   * The disclosure about what survives leaving the screen is checked, not
+   * merely written.
+   *
+   * Both halves: the branch is re-derivable from the ledger alone (so the
+   * "permanent" half is true), and nothing outside React state carries the road
+   * that was taken (so the "forgotten" half is true and not pessimism).
+   */
+  it('re-derives the branch from the ledger alone, as the disclosure says', () => {
+    const loop = openLoop('b5-rederive-');
+    answer(loop, { grade: 'again', latencyMs: 9000, hintsUsed: 0, revealedBeforeRecall: false });
+
+    const first = stumblesOf(loop);
+    const again = stumblesOf(loop);
+    expect(first).toHaveLength(1);
+    // Two independent derivations from the same log agree exactly, which is what
+    // "it is read back out of your ledger every time" means.
+    expect(again).toEqual(first);
+  });
+
+  it('keeps the road taken nowhere but in the journey value it was applied to', () => {
+    const loop = openLoop('b5-routing-');
+    answer(loop, { grade: 'again', latencyMs: 9000, hintsUsed: 0, revealedBeforeRecall: false });
+
+    const stumble = stumblesOf(loop)[0];
+    if (stumble === undefined) throw new Error('no branch opened');
+    const before = loop.store.readAll().length;
+
+    const journey = openJourney(stumble);
+    const first = journey.compiled.offered[0];
+    if (first === undefined) throw new Error('nothing was offered');
+    const entered = enterJourneyBranch(journey, first.family, ASOF);
+    expect(entered.chosen).toBe(first.family);
+
+    // Nothing was written, so a fresh journey opened from the same ledger has
+    // no memory of the road — which is exactly what the screen tells the
+    // learner, and the reason it has to tell them.
+    expect(loop.store.readAll()).toHaveLength(before);
+    expect(openJourney(stumble).chosen).toBeNull();
+    expect(openJourney(stumble).phase).toBe('diagnosing');
+  });
+
+  it('says so on screen rather than only in a capsule', () => {
+    expect(read('src/screens/journey-screen.tsx')).toContain('ROUTING_IS_NOT_STORED');
   });
 
   it('mounts the EDRDG acknowledgement, unconditionally', () => {

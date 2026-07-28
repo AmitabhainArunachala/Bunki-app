@@ -108,6 +108,24 @@ const LENS_OF_SKILL: Readonly<Record<string, CapabilityId | null>> = Object.free
   discrimination: null,
 });
 
+/**
+ * What survives leaving this screen, and what does not. Said on screen.
+ *
+ * The **branch** is durable, because it is not stored: it is derived from the
+ * miss in the ledger every time this screen opens, so it is still here after a
+ * reload and after a year. The **routing** — which probe answers were given and
+ * which road was taken — is React state and goes when the screen does.
+ *
+ * That is a real gap and not a design position. Persisting it needs a place to
+ * put app-local state, and the one this app has (`AppStore`) is another lane's
+ * module; writing an *event* for it would be worse, because taking a road is
+ * not evidence of anything and the log is for what the learner did, not for
+ * where a surface had got to. So the limitation is disclosed to the learner
+ * rather than hidden behind a fork that silently forgets.
+ */
+export const ROUTING_IS_NOT_STORED =
+  'The branch itself is permanent — it is read back out of your ledger every time you open this screen. Which road you took is not: it is remembered while you are on this screen and forgotten when you leave. The evidence that would end the branch is in the ledger either way.';
+
 /** What the screen is about: one miss, and the word it was about. */
 interface JourneySubject {
   readonly stumble: JourneyStumble;
@@ -482,6 +500,13 @@ function JourneyBody({
           </Text>
         ))}
       </Disclosure>
+
+      <Text
+        style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+        testID="journey-routing-note"
+      >
+        {ROUTING_IS_NOT_STORED}
+      </Text>
 
       <Text
         style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
