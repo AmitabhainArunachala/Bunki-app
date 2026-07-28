@@ -64,6 +64,7 @@ import { isPromotionActive } from '@bunki/domain';
 import {
   constituentKanji,
   DEFAULT_CANONICAL_TARGET,
+  importedDictionary,
   searchSeed,
   seedDataset,
   sentencesForLexeme,
@@ -657,8 +658,8 @@ function runEnrichment(
 
 /** Counted from the dataset, never typed in: a stale number here would be a false claim. */
 const seedCounts = {
-  lexemes: seedDataset.lexemes.length,
-  kanji: seedDataset.kanji.length,
+  lexemes: seedDataset.lexemes.length + importedDictionary.lexemes.length,
+  kanji: seedDataset.kanji.length + importedDictionary.kanji.length,
 } as const;
 
 const styles = StyleSheet.create({

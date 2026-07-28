@@ -208,7 +208,31 @@ export const FIELD_PROVENANCE = {
     kunReadings: 'edrdg-kanjidic2',
     meanings: 'edrdg-kanjidic2',
     strokeSvg: 'kanjivg-verbatim',
+    // Read out of the KanjiVG file's own `kvg:element` / `kvg:radical`
+    // annotations, exactly as the §8 fixture tier derives them. Extracted from
+    // the licensor's bytes rather than authored here, so they are KanjiVG's
+    // claims under KanjiVG's licence — `derived`, not `verbatim`, because the
+    // nesting is flattened to a list.
+    components: 'kanjivg-derived',
+    radicals: 'kanjivg-derived',
     sourceEntryId: 'edrdg-kanjidic2',
+  },
+  // The bundle-shaped view of the verbatim files.
+  //
+  // The app has to render 1,241 characters' stroke order, and the verbatim SVGs
+  // are 4.7 MB — too much to put in a web bundle, and copying them into
+  // `apps/app` is forbidden outright (controller §4, DL-33: share-alike data is
+  // admitted into this package and no other). So the geometry the renderer
+  // actually uses is extracted here, from those same bytes, and stays in this
+  // package.
+  //
+  // This does not replace the verbatim files: they are still committed, still
+  // hashed in `strokes.json`, and `test/dictionary.test.ts` re-derives every
+  // path in this file from them, so the derived view cannot drift from the
+  // originals or quietly become hand-drawn.
+  'dictionary/stroke-paths.json': {
+    viewBox: 'kanjivg-derived',
+    strokes: 'kanjivg-derived',
   },
   // Dotted keys reach inside the nested `tatoeba` object rather than labelling it
   // with one id. The object holds both halves' identifiers and both halves'
@@ -818,6 +842,64 @@ export function selectLexemes(entries, limit) {
 const KANJI_RE = /[一-鿿]/u;
 export const kanjiIn = (text) => [...new Set([...text].filter((c) => KANJI_RE.test(c)))];
 
+/**
+ * What a KanjiVG file says about itself, beyond its strokes.
+ *
+ * `kvg:element` names the component a group draws and `kvg:radical` marks which
+ * of them the file considers the radical, under which naming scheme. The
+ * outermost group is the character itself, so it is dropped: 分 is not a
+ * component of 分.
+ *
+ * Deliberately the same shape the §8 fixture tier already carries, so the
+ * imported tier can be rendered by the screens that were written for it rather
+ * than by a second code path that could disagree with the first.
+ */
+export function kanjiVgMetadata(svg, character) {
+  const components = [];
+  const radicals = [];
+  for (const group of svg.matchAll(/<g\b[^>]*>/g)) {
+    const element = /kvg:element="([^"]*)"/.exec(group[0])?.[1];
+    if (element === undefined || element === character) continue;
+    if (!components.includes(element)) components.push(element);
+    const kind = /kvg:radical="([^"]*)"/.exec(group[0])?.[1];
+    if (kind !== undefined && !radicals.some((entry) => entry.element === element)) {
+      radicals.push({ element, kind });
+    }
+  }
+  return { components, radicals };
+}
+
+/**
+ * The `viewBox` and the strokes in writing order — exactly the shape the app's
+ * own KanjiVG parser produces from the verbatim file.
+ *
+ * Emitting the parser's output shape rather than a private one means the
+ * imported tier and the fixture tier reach the renderer through the same type,
+ * so there is no second code path that could disagree with the first about what
+ * a stroke is.
+ *
+ * `type` and `id` are carried, not dropped: `id` is what lets a rendered stroke
+ * be traced to its element upstream, and the `-sN` suffix is the file format's
+ * own statement of the writing order — which the app cross-checks against
+ * document order and refuses to animate when the two disagree.
+ */
+export function kanjiVgGeometry(svg) {
+  const viewBox = /<svg\b[^>]*\bviewBox="([^"]+)"/i.exec(svg)?.[1] ?? null;
+  const strokes = [];
+  for (const path of svg.matchAll(/<path\b([^>]*)\/?>/gi)) {
+    const attributes = path[1] ?? '';
+    const d = /\bd="([^"]*)"/.exec(attributes)?.[1];
+    if (d === undefined || d === '') continue;
+    strokes.push({
+      order: strokes.length + 1,
+      d,
+      type: /kvg:type="([^"]*)"/.exec(attributes)?.[1] ?? null,
+      id: /\bid="([^"]*)"/.exec(attributes)?.[1] ?? '',
+    });
+  }
+  return { viewBox, strokes };
+}
+
 // ── stage 4: emit ───────────────────────────────────────────────────────────
 
 const writeJson = async (path, value) => {
@@ -1060,6 +1142,20 @@ export async function runImport(options, { dataDir = DATA_DIR, log = console.log
   const strokeByChar = new Map(strokes.map((s) => [s.character, s.file]));
   const outputs = {};
 
+  // Re-read the files just written, rather than keeping the bodies in memory:
+  // the derived metadata below has to describe the bytes that are *on disk*,
+  // which is what `strokes.json` hashes and what the offline test re-derives
+  // from. Deriving from a buffer that never became a file would let the two
+  // disagree without anything noticing.
+  const kanjiVgByChar = new Map();
+  for (const stroke of strokes) {
+    const svg = await readFile(join(dataDir, stroke.file), 'utf8');
+    kanjiVgByChar.set(stroke.character, {
+      ...kanjiVgMetadata(svg, stroke.character),
+      ...kanjiVgGeometry(svg),
+    });
+  }
+
   await writeJson(join(outDir, 'lexemes.json'), {
     schemaVersion: 1,
     _comment: [
@@ -1093,6 +1189,7 @@ export async function runImport(options, { dataDir = DATA_DIR, log = console.log
     fieldProvenance: FIELD_PROVENANCE['dictionary/kanji.json'],
     records: shippedKanji.map((character) => {
       const record = kanjidic.get(character);
+      const kanjiVg = kanjiVgByChar.get(character);
       return {
         id: `kanji-${character.codePointAt(0).toString(16).padStart(5, '0')}`,
         character,
@@ -1105,9 +1202,45 @@ export async function runImport(options, { dataDir = DATA_DIR, log = console.log
         kunReadings: record.kunReadings,
         meanings: record.meanings,
         strokeSvg: strokeByChar.get(character) ?? null,
+        components: kanjiVg?.components ?? [],
+        radicals: kanjiVg?.radicals ?? [],
         sourceEntryId: character,
       };
     }),
+  });
+
+  await writeJson(join(outDir, 'stroke-paths.json'), {
+    schemaVersion: 1,
+    _comment: [
+      'Stroke geometry extracted from the verbatim KanjiVG files in dictionary/strokes/.',
+      '',
+      'This exists because the app must render 1,241 characters and the verbatim',
+      'files are 4.7 MB, which is too much for a web bundle — and copying them into',
+      'apps/app is forbidden (controller §4, DL-33). So the geometry is extracted',
+      'here and the share-alike bytes stay in this package.',
+      '',
+      'It is a derived work of KanjiVG and is labelled as one: CC BY-SA 3.0, same as',
+      'the files it comes from. The verbatim files are still shipped, still hashed in',
+      'strokes.json, and test/dictionary.test.ts re-derives every path below from',
+      'them — so this file cannot drift from the originals or become hand-drawn.',
+    ],
+    fieldProvenance: FIELD_PROVENANCE['dictionary/stroke-paths.json'],
+    upstream: {
+      project: 'KanjiVG',
+      repository: 'https://github.com/KanjiVG/kanjivg',
+      commit: KANJIVG_COMMIT,
+      license: 'CC BY-SA 3.0',
+      derivedFrom: 'dictionary/strokes/*.svg',
+    },
+    characters: Object.fromEntries(
+      strokes.map((stroke) => {
+        const geometry = kanjiVgByChar.get(stroke.character);
+        return [
+          stroke.character,
+          { viewBox: geometry?.viewBox ?? null, strokes: geometry?.strokes ?? [] },
+        ];
+      }),
+    ),
   });
 
   await writeJson(join(outDir, 'sentences.json'), {

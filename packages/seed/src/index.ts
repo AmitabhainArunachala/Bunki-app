@@ -47,6 +47,7 @@ import provenanceJson from '../data/provenance.json';
 import sentencesJson from '../data/sentences.json';
 import strokesJson from '../data/strokes.json';
 
+import { buildImportedDictionary, type ImportedDictionary } from './imported.ts';
 import type {
   KanjiRadical,
   ProvenanceRecord,
@@ -391,6 +392,42 @@ export const findLexeme = (id: string): SeedLexeme | undefined =>
 
 export const findKanji = (character: string): SeedKanji | undefined =>
   seedDataset.kanji.find((kanji) => kanji.character === character);
+
+/* ------------------------------------------------------------------ *
+ * The imported tier, beside the fixture tier and never folded into it
+ * ------------------------------------------------------------------ */
+
+/**
+ * The 3,000-entry imported dictionary (`src/imported.ts`).
+ *
+ * Built here rather than in `imported.ts` so both tiers resolve provenance
+ * against the *same* `registry` object — one parse of `data/provenance.json`,
+ * one set of records, no possibility of the two tiers disagreeing about what
+ * `edrdg-jmdict` means.
+ *
+ * Deliberately a separate export. Nothing merges it into {@link seedDataset}:
+ * the fixture tier's scope contract (`test/dataset.test.ts`) says the seed
+ * contains exactly sixteen lexemes and ten kanji, and that contract is what
+ * keeps the canonical target and the integration passage from being displaced
+ * by whichever imported record happened to sort first.
+ */
+export const importedDictionary: ImportedDictionary = buildImportedDictionary(registry);
+
+export {
+  FIXTURE_TIER,
+  IMPORTED_TIER,
+  IMPORTED_TIER_DISCLOSURE,
+  buildImportedDictionary,
+} from './imported.ts';
+export type {
+  ImportedDictionary,
+  ImportedKanji,
+  ImportedLexeme,
+  ImportedProvenance,
+  ImportedSentence,
+  ImportedStrokeGeometry,
+  SeedTier,
+} from './imported.ts';
 
 export { SeedDataError } from './validate.ts';
 export type * from './types.ts';

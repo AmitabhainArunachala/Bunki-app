@@ -91,6 +91,8 @@ interface ImportedKanji {
   readonly onReadings: readonly string[];
   readonly kunReadings: readonly string[];
   readonly meanings: readonly string[];
+  readonly components: readonly string[];
+  readonly radicals: readonly { readonly element: string; readonly kind: string }[];
   readonly strokeSvg: string | null;
   readonly sourceEntryId: string;
 }
@@ -133,9 +135,9 @@ const kanjiFile = readJson<ProvenancedFile & { records: ImportedKanji[] }>(
 const sentenceFile = readJson<ProvenancedFile & { records: ImportedSentence[] }>(
   'data/dictionary/sentences.json',
 );
-const strokeFile = readJson<ProvenancedFile & { files: StrokeFile[] }>(
-  'data/dictionary/strokes.json',
-);
+const strokeFile = readJson<
+  ProvenancedFile & { files: StrokeFile[]; upstream?: { commit: string } }
+>('data/dictionary/strokes.json');
 const lexemes = lexemeFile.records;
 const kanji = kanjiFile.records;
 const sentences = sentenceFile.records;
@@ -385,6 +387,185 @@ describe('the imported tier closes over itself', () => {
       // Verbatim upstream KanjiVG, not a redrawn or minified copy.
       expect(body.toString('utf8'), file.file).toContain('kvg:');
     }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The derived KanjiVG views are views, not new drawings
+ * ------------------------------------------------------------------ */
+
+describe('everything derived from KanjiVG is re-derivable from the bytes it claims', () => {
+  // The app cannot ship 4.7 MB of verbatim SVG in a web bundle and may not copy
+  // those bytes out of this package (controller §4, DL-33), so it renders from
+  // `stroke-paths.json` and reads components and radicals out of `kanji.json`.
+  // Each of those is a *claim about* the committed SVGs. Re-deriving them here,
+  // from the files on disk, is what stops the derived view from drifting — or
+  // from being hand-drawn, which no digest would catch because the digests are
+  // of the derived file itself.
+  interface DerivedStroke {
+    readonly order: number;
+    readonly d: string;
+    readonly type: string | null;
+    readonly id: string;
+  }
+  interface StrokePaths {
+    readonly upstream: { readonly derivedFrom: string; readonly commit: string };
+    readonly characters: Readonly<
+      Record<
+        string,
+        { readonly viewBox: string | null; readonly strokes: readonly DerivedStroke[] }
+      >
+    >;
+  }
+  const strokePaths = readJson<ProvenancedFile & StrokePaths>('data/dictionary/stroke-paths.json');
+  const svgFor = (character: string): string => {
+    const file = kanji.find((record) => record.character === character)?.strokeSvg;
+    if (file === null || file === undefined) throw new Error(`${character} has no stroke file`);
+    return read(join('data', file)).toString('utf8');
+  };
+
+  it('covers exactly the characters that ship a verbatim stroke file', () => {
+    const withSvg = kanji.filter((record) => record.strokeSvg !== null).map((r) => r.character);
+    expect(Object.keys(strokePaths.characters).sort()).toEqual([...withSvg].sort());
+    expect(withSvg.length).toBeGreaterThan(1000);
+  });
+
+  it('re-derives every stroke, its type and its id from the committed SVG', () => {
+    for (const [character, geometry] of Object.entries(strokePaths.characters)) {
+      const svg = svgFor(character);
+      const derived: DerivedStroke[] = [];
+      for (const path of svg.matchAll(/<path\b([^>]*)\/?>/gi)) {
+        const attributes = path[1] ?? '';
+        const d = /\bd="([^"]*)"/.exec(attributes)?.[1];
+        if (d === undefined || d === '') continue;
+        derived.push({
+          order: derived.length + 1,
+          d,
+          type: /kvg:type="([^"]*)"/.exec(attributes)?.[1] ?? null,
+          id: /\bid="([^"]*)"/.exec(attributes)?.[1] ?? '',
+        });
+      }
+      expect(geometry.strokes, character).toEqual(derived);
+      expect(geometry.viewBox, character).toBe(
+        /<svg\b[^>]*\bviewBox="([^"]+)"/i.exec(svg)?.[1] ?? null,
+      );
+      // A character with no strokes would render as a blank diagram that looks
+      // like a styling bug rather than the missing data it is.
+      expect(geometry.strokes.length, character).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps the writing order the file states, which is what the animation shows', () => {
+    // KanjiVG encodes the stroke number in the id's `-sN` suffix, and the app's
+    // parser refuses to animate a file whose ids and document order disagree.
+    // The derived view has to preserve that or the check is bypassed for 1,241
+    // characters.
+    for (const [character, geometry] of Object.entries(strokePaths.characters)) {
+      geometry.strokes.forEach((stroke, index) => {
+        expect(stroke.order, `${character} stroke ${String(index)}`).toBe(index + 1);
+        const declared = /-s(\d+)$/.exec(stroke.id);
+        if (declared !== null) expect(Number(declared[1]), stroke.id).toBe(index + 1);
+      });
+    }
+  });
+
+  it('re-derives every component and radical from the same SVG', () => {
+    for (const record of kanji) {
+      if (record.strokeSvg === null) continue;
+      const svg = svgFor(record.character);
+      const components: string[] = [];
+      const radicals: { element: string; kind: string }[] = [];
+      for (const group of svg.matchAll(/<g\b[^>]*>/g)) {
+        const element = /kvg:element="([^"]*)"/.exec(group[0])?.[1];
+        if (element === undefined || element === record.character) continue;
+        if (!components.includes(element)) components.push(element);
+        const kind = /kvg:radical="([^"]*)"/.exec(group[0])?.[1];
+        if (kind !== undefined && !radicals.some((entry) => entry.element === element)) {
+          radicals.push({ element, kind });
+        }
+      }
+      expect(record.components, record.character).toEqual(components);
+      expect(record.radicals, record.character).toEqual(radicals);
+    }
+  });
+
+  it('fails a fabricated path, so the re-derivation is not vacuous', () => {
+    const character = Object.keys(strokePaths.characters)[0] as string;
+    const real = strokePaths.characters[character]?.strokes ?? [];
+    expect(real.map((stroke) => stroke.d)).not.toEqual(['M0,0 L109,109']);
+  });
+
+  it('says which files it was derived from, and pins the same KanjiVG commit', () => {
+    expect(strokePaths.upstream.derivedFrom).toBe('dictionary/strokes/*.svg');
+    expect(strokePaths.upstream.commit).toBe(strokeFile.upstream?.commit);
+  });
+
+  it('labels the derived geometry as KanjiVG’s, not as this project’s', () => {
+    for (const id of Object.values(strokePaths.fieldProvenance)) {
+      expect(REGISTERED_SOURCES.has(id), id).toBe(true);
+      expect(id).toBe('kanjivg-derived');
+    }
+    for (const field of ['components', 'radicals'] as const) {
+      expect(kanjiFile.fieldProvenance[field], field).toBe('kanjivg-derived');
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The tier is reachable, and is still not the fixture tier
+ * ------------------------------------------------------------------ */
+
+describe('the package exports the imported tier without merging it', () => {
+  it('exports a tier a consumer can actually reach', async () => {
+    const { importedDictionary } = await import('../src/index.ts');
+    expect(importedDictionary.lexemes.length).toBe(lexemes.length);
+    expect(importedDictionary.kanji.length).toBe(kanji.length);
+    expect(importedDictionary.sentences.length).toBe(sentences.length);
+    expect(importedDictionary.strokeGeometry.size).toBe(strokes.length);
+  });
+
+  it('leaves the §8 fixture tier exactly as it was', async () => {
+    // The scope contract in `dataset.test.ts` is the real assertion; this is the
+    // one-line version, here so a reader of *this* file can see that adding
+    // 3,000 entries did not quietly widen the sixteen.
+    const { seedDataset } = await import('../src/index.ts');
+    expect(seedDataset.lexemes).toHaveLength(16);
+    expect(seedDataset.kanji).toHaveLength(10);
+  });
+
+  it('marks every imported record so the two tiers can never be confused', async () => {
+    const { importedDictionary, IMPORTED_TIER } = await import('../src/index.ts');
+    expect(IMPORTED_TIER).toBe('imported');
+    for (const record of [
+      ...importedDictionary.lexemes.slice(0, 50),
+      ...importedDictionary.kanji.slice(0, 50),
+      ...importedDictionary.sentences.slice(0, 50),
+    ]) {
+      expect(record.tier).toBe(IMPORTED_TIER);
+    }
+  });
+
+  it('resolves every field of the tier to a registered provenance record', async () => {
+    const { importedDictionary } = await import('../src/index.ts');
+    const groups: Readonly<
+      Record<string, { source: string; license: string; attribution: string }>
+    >[] = Object.values(importedDictionary.provenance);
+    expect(groups.length).toBe(4);
+    for (const group of groups) {
+      const fields = Object.entries(group);
+      expect(fields.length).toBeGreaterThan(0);
+      for (const [field, record] of fields) {
+        expect(record.source, field).toBeTruthy();
+        expect(record.license, field).toBeTruthy();
+        expect(record.attribution, field).toBeTruthy();
+      }
+    }
+  });
+
+  it('says plainly that 3,000 entries are not a dictionary', async () => {
+    const { IMPORTED_TIER_DISCLOSURE } = await import('../src/index.ts');
+    expect(IMPORTED_TIER_DISCLOSURE).toMatch(/slice, not the whole dictionary/);
+    expect(IMPORTED_TIER_DISCLOSURE).toMatch(/no one has reviewed these entries individually/i);
   });
 });
 

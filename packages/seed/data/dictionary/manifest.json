@@ -96,8 +96,12 @@
       "sha256": "5d04b23b7daa78f7fd4e9035d86932da820eb4cc32c4981f7adbf80fbc1ad968"
     },
     "dictionary/kanji.json": {
-      "bytes": 608085,
-      "sha256": "f64439738a306a5b5db0efd56c518395060c976a458e12a2e673cc4b256e0a9f"
+      "bytes": 865362,
+      "sha256": "debd46c45dcce683380df5fb47ce8f506e24186e215d1d7856726253968bb3fb"
+    },
+    "dictionary/stroke-paths.json": {
+      "bytes": 2609736,
+      "sha256": "5bc31f2115d14eb4b680ddab799c4686e52f7b90abefb4ab41c6e79c0155381a"
     },
     "dictionary/sentences.json": {
       "bytes": 1102305,
