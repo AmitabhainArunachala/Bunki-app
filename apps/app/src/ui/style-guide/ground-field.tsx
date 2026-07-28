@@ -16,6 +16,24 @@
  * a hole through which a bare `<Text>` could reach the ground, and the museum
  * card is the whole guarantee that it never does.
  *
+ * ## The hole the header used to miss: composition
+ *
+ * "No `children` slot, and MuseumCard/RubyText are composed" is not the whole
+ * argument, and this file was the counterexample to its own header. It rendered
+ * `RecallIndicator` for every card, straight onto the mat. `RecallIndicator` is
+ * *total* over `RecallBand`: handed `faint` or `unseen` it resolves to
+ * `RecallMeter`, which renders a capability label, a band word and a basis line
+ * — three `<Text>` nodes on an era ground, with the source scan green, because
+ * the scan looks for `<Text>` in *this* file and there was none. A band read off
+ * a projection is exactly the input that would have done it, and reading a band
+ * off a projection is the stated reason `RecallIndicator` exists.
+ *
+ * The fix is a type rather than a bigger scan. `GroundCard.band` is
+ * `StandaloneRecallBand` — the three steps that clear 3:1 as a bare mark — and
+ * the marks row draws `RecallMark`, which accepts only those. The meter-only
+ * bands cannot reach a ground, and a lane that tries stops compiling. The meter
+ * still appears on this page, on the card, where it has always belonged.
+ *
  * ## What is actually painted
  *
  * Three layers, bottom-up, exactly the list `groundLayers()` returns:
@@ -35,11 +53,11 @@
  */
 
 import { type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { AttributionFooter } from '../attribution.tsx';
 import { type CapabilityId } from '../capability.ts';
-import { RecallIndicator, RecallMeter } from '../recall.tsx';
+import { RecallMark, RecallMeter } from '../recall.tsx';
 import { RubyText } from '../ruby.tsx';
 import { MuseumCard } from '../surface.tsx';
 import {
@@ -48,9 +66,11 @@ import {
   groundLayers,
   groundOf,
   planEmissive,
+  type EmissiveShape,
   type EmissiveSignal,
   type EraKey,
-  type RecallBand,
+  type GroundColor,
+  type StandaloneRecallBand,
 } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 
@@ -75,8 +95,15 @@ export interface GroundCard {
    * An illustrative band, so the specimen can show a real mark landing on a
    * real ground. Nothing here is measured and nothing here is evidence — the
    * card's own attribution says so on screen.
+   *
+   * `StandaloneRecallBand`, not `RecallBand`, and that narrowing is the museum
+   * card rule holding where a source scan could not reach. The two meter-only
+   * steps resolve to `RecallMeter`, which is three lines of text; letting one in
+   * here would put those lines on an era ground with every check green. The type
+   * is derived from `RECALL_BAND_MARKS`, so flipping a step's `standalone` flag
+   * moves it in or out of this prop without anyone remembering to.
    */
-  readonly band: RecallBand;
+  readonly band: StandaloneRecallBand;
   /** The attribution line the card carries. Never folded away. */
   readonly standing: string;
 }
@@ -148,7 +175,7 @@ export function GroundField({ era, cards, signals = [], testID }: GroundFieldPro
 
         <View style={styles.marks}>
           {cards.map((card) => (
-            <RecallIndicator
+            <RecallMark
               key={`${card.written}-mark`}
               band={card.band}
               capability={card.capability}
@@ -158,13 +185,18 @@ export function GroundField({ era, cards, signals = [], testID }: GroundFieldPro
           ))}
           {plan.lit.map((point, index) => (
             <View
-              // A lit point is a graphic that says something, so it carries the
-              // basis as its label rather than being decoration in the tree.
+              /*
+                A lit point is a graphic that says something, so it carries its
+                kind and its basis as a label rather than being decoration in the
+                tree. All three kinds share one pigment — see `EMISSIVE_LAMP` —
+                so the shape is what a sighted reader tells them apart by and the
+                label is what a screen reader hears. Neither of them is the hue.
+              */
               key={`${point.signal.kind}-${String(index)}`}
-              accessibilityLabel={point.signal.basis}
+              accessibilityLabel={`${point.mark.label}. ${point.signal.basis}`}
               accessibilityRole="image"
               accessible
-              style={[styles.lit, { backgroundColor: point.pigment.hex }]}
+              style={litStyle(point.mark.shape, point.pigment.hex)}
               testID={`ground-${era}-lit-${String(index)}`}
             />
           ))}
@@ -201,6 +233,55 @@ export function GroundField({ era, cards, signals = [], testID }: GroundFieldPro
   );
 }
 
+/**
+ * The size a lit point is drawn at, and the stroke a hollow one keeps.
+ *
+ * 12 rather than 10 because a ring needs a hole: at 10 points with a 3-point
+ * stroke the middle is 4 points across and reads as a slightly soft disc, which
+ * would put `evidence-stale` and `due-now` back to being the same graphic. The
+ * bar is wider than it is tall for the same reason — a semaphore blade has to
+ * be unmistakably not-a-circle at a glance.
+ */
+const LIT_SIZE = 12;
+const LIT_STROKE = 3;
+
+/**
+ * One lamp, three forms.
+ *
+ * A `switch` over the shape rather than a table of styles, because the three
+ * differ in which properties they set at all — a ring has no fill and a bar has
+ * no matching width and height — and a merged style object would leave the
+ * unset ones inherited from whichever entry ran last. Exhaustive over
+ * `EmissiveShape`, so adding a fourth signal form is a compile error here until
+ * someone says what it looks like.
+ */
+function litStyle(shape: EmissiveShape, lamp: GroundColor): ViewStyle {
+  switch (shape) {
+    case 'disc':
+      return {
+        backgroundColor: lamp,
+        borderRadius: LIT_SIZE / 2,
+        height: LIT_SIZE,
+        width: LIT_SIZE,
+      };
+    case 'ring':
+      return {
+        borderColor: lamp,
+        borderRadius: LIT_SIZE / 2,
+        borderWidth: LIT_STROKE,
+        height: LIT_SIZE,
+        width: LIT_SIZE,
+      };
+    case 'bar':
+      return {
+        backgroundColor: lamp,
+        borderRadius: 1,
+        height: LIT_STROKE + 1,
+        width: LIT_SIZE + LIT_STROKE,
+      };
+  }
+}
+
 const styles = StyleSheet.create({
   field: {
     overflow: 'hidden',
@@ -223,11 +304,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: SPACE.lg,
     minHeight: 24,
-  },
-  lit: {
-    borderRadius: 5,
-    height: 10,
-    width: 10,
   },
   cards: {
     gap: SPACE.lg,

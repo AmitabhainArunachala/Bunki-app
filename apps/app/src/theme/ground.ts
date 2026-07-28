@@ -13,20 +13,62 @@
  * The two layers never do each other's job, and that is the whole reconciliation
  * with the frozen §8 "one vermilion accent" rule. That rule was never a ban on
  * colour — it was the ban on **encoding learner state in hue**, which is the
- * Todaii global-JLPT-rainbow failure the frozen spec rejects by name. Nothing in
- * this file encodes learner state. A malachite hillside is not a claim about
- * anyone's recall of 山.
+ * Todaii global-JLPT-rainbow failure the frozen spec rejects by name.
  *
- * The separation is enforced by the compiler rather than by this paragraph:
+ * ## What this file says about the learner — exactly, because the earlier
+ * ## version of this paragraph said "nothing", and that was false
  *
- *   - `GroundColor` (here) and `SemanticColor` (`color.ts`) are branded, so they
- *     are both usable as CSS colour strings and mutually non-assignable. A
- *     component cannot pass a ground where a semantic token is required, or the
- *     reverse. `test/theme-ground.test.ts` proves it with `@ts-expect-error`
- *     blocks, which fail `npm run typecheck` if the mistake ever becomes legal.
- *   - `GroundContrastPair.minimum` has exactly one member, `'nonText'`. The
- *     system has no way to *declare* text sitting on an era ground, because text
- *     never does — it sits on a 胡粉/墨 card floating over it.
+ * The **ground** says nothing about anyone's memory: `ERA_REGISTERS`,
+ * `ERA_PIGMENTS`, `GROUND_SPECS`, every stack and every mat change with the era
+ * layer, the route and the hour, and with nothing else. A malachite hillside is
+ * not a claim about anyone's recall of 山.
+ *
+ * One thing here does touch learner state, and the honest move is to name it
+ * rather than to let a flat denial stand over it. `planEmissive` takes scheduler
+ * and evidence states — due now, a repair branch open after a stumble, evidence
+ * old enough to doubt — and decides which of them get a lit point. It lives in
+ * this file because the **ration** is a property of the register: only 鉄道 has
+ * lamps, and only three at a time, and a cap declared away from the register it
+ * caps is a cap nobody applies.
+ *
+ * A lit point is therefore a **figure** element drawn in a ground pigment, which
+ * is the one place in the app where the two layers touch. What it does not do is
+ * the thing §8 bans:
+ *
+ *   - **Hue encodes nothing.** All three signal kinds are painted in the same
+ *     pigment, `EMISSIVE_LAMP`. There is no state → colour table; there used to
+ *     be one and it is gone.
+ *   - **Form is what distinguishes them.** `EMISSIVE_MARKS` gives each kind its
+ *     own shape, the way `EDGE_PATTERNS` and `RECALL_BAND_MARKS` do for the
+ *     other memory semantics — the WCAG 1.4.1 obligation lane A1 accepted for
+ *     every one of them, now accepted for this one too.
+ *   - **The lamp is contrast-checked where it lands.** `GROUND_FIGURE_PIGMENTS`
+ *     is the list of ground pigments this layer paints as figure, and
+ *     `test/theme-ground.test.ts` walks it against every field of its own
+ *     register at 3:1. That is why the lamp is 銀朱 and not 山吹: 山吹 is
+ *     1.58:1 on the 鉄道 daylight field, and `UNLIT_EMISSIVE_PIGMENTS` records
+ *     that as a measurement rather than as a preference.
+ *
+ * ## What the brands do and do not bind
+ *
+ * `GroundColor` (here) and `SemanticColor` (`color.ts`) are branded, so they are
+ * both usable as CSS colour strings and mutually non-assignable.
+ * `test/theme-ground.test.ts` proves it with `@ts-expect-error` blocks, which
+ * fail `npm run typecheck` if the mistake ever becomes legal.
+ *
+ * The brand binds **at every signature that names it** — `paletteValue`,
+ * `surfaceOf`, `figurePaletteOn`, `eraPigment`, `superpose`. It does **not** bind
+ * a React Native `style` prop, which the framework types as `string`: a component
+ * really can write `backgroundColor: ERA_PIGMENTS.kodo.mist.hex` on any node it
+ * likes and the compiler will not stop it. What stops that is not the type, it is
+ * that the only names which yield a pigment are on `GROUND_PAINTING_EXPORTS`, and
+ * every file naming one of those is bound by the museum-card scan. The type is a
+ * guard on the accessors; the scan is the guard on the pixels. Neither is a
+ * substitute for the other and this file no longer claims either one is.
+ *
+ * `GroundContrastPair.minimum` has exactly one member, `'nonText'`. The system
+ * has no way to *declare* text sitting on an era ground, because text never does
+ * — it sits on a 胡粉/墨 card floating over it.
  *
  * ## Depth is superposition, because that is what the material does
  *
@@ -534,10 +576,29 @@ export function figurePaletteOn(ground: EraGround): Palette {
  * card whose contrast the ground cannot touch, which is precisely the
  * guarantee. `src/ui/style-guide/ground-field.tsx` is the worked example.
  *
+ * **A source scan cannot see through composition, and the worked example proved
+ * it.** `GroundField` renders a `RecallIndicator` for every card straight onto
+ * the mat, and `RecallIndicator` is *total* over `RecallBand` — handed one of the
+ * two meter-only bands it resolves to `RecallMeter`, which renders three `<Text>`
+ * nodes. So a band read off a projection could put a capability label, a band
+ * word and a basis line directly on an era ground with the scan green, because
+ * no `<Text>` appears in the painting file. The scan is not what closes that; a
+ * type is. `GroundCard.band` is `StandaloneRecallBand`, and `GroundField` draws
+ * `RecallMark`, which takes only that — so the meter cannot be reached from a
+ * ground at all, and the mistake is a compile error rather than a screenshot.
+ *
  * Names that only *read* the ground — `ERA_REGISTERS`, `figurePaletteOn`,
- * `MAX_EMISSIVE_POINTS`, the types — are deliberately absent. A page that wants
- * to name the three eras in prose is not painting anything, and binding it
- * would make the rule an obstacle rather than a guarantee.
+ * `MAX_EMISSIVE_POINTS`, `emissiveTally`, `EMISSIVE_MARKS`, the types — are
+ * deliberately absent. A page that wants to name the three eras in prose, or to
+ * report how many signals the ration turned down, is not painting anything, and
+ * binding it would make the rule an obstacle rather than a guarantee.
+ *
+ * The scan reads **identifiers in the file body**, not import statements. It used
+ * to read `import { … } from '…'` braces only, which meant
+ * `import * as tokens from '../theme.ts'` followed by `tokens.groundOf(...)`
+ * painted an era ground while the file was treated as painting nothing — and a
+ * dynamic `await import(...)` escaped the same way. Both are caught now: the
+ * accessor has to be *named* somewhere to be called.
  */
 export const GROUND_PAINTING_EXPORTS: readonly string[] = [
   'GROUNDS',
@@ -547,6 +608,9 @@ export const GROUND_PAINTING_EXPORTS: readonly string[] = [
   'ERA_PIGMENTS',
   'planEmissive',
   'superpose',
+  'EMISSIVE_LAMP',
+  'GROUND_FIGURE_PIGMENTS',
+  'UNLIT_EMISSIVE_PIGMENTS',
 ];
 
 /* ------------------------------------------------------------------ *
@@ -596,13 +660,22 @@ export const GROUND_CONTRAST_PAIRS: readonly GroundContrastPair[] = [
  * ------------------------------------------------------------------ */
 
 /**
- * How many emitted-light points may be on screen at once.
+ * How many emitted-light points one `planEmissive` call may light.
  *
  * "Emissive light is rationed: a handful of saturated points against a deep
  * ground, never a glowing interface" — the visual-language doc §3.3, which is
  * *Akira*'s discipline rather than its reputation. Three is the handful. Past
  * that the register stops being a night scene with signals in it and becomes a
  * dashboard.
+ *
+ * **Per plan, not per screen, and the difference is real.** This docblock used to
+ * say "on screen at once", which `planEmissive` cannot enforce: it is a pure
+ * function over one signal list, so two `GroundField`s side by side put six lit
+ * points on one screen with every check green. Making the cap per-screen would
+ * need a mount-time registry that throws or warns from render, which is exactly
+ * the trap this lane removed from `RecallMark` — so the honest thing is the
+ * narrower guarantee, stated here and disclosed in the capsule rather than
+ * asserted wider than it holds. One field, one ration.
  */
 export const MAX_EMISSIVE_POINTS = 3;
 
@@ -627,23 +700,78 @@ export interface EmissiveSignal {
   readonly basis: string;
 }
 
+/**
+ * The one pigment every lit point is painted in.
+ *
+ * A single lamp, not a lamp per state, and that is the load-bearing part. The
+ * first version of this module mapped each signal kind to a pigment — 山吹 for
+ * due-now, 銀朱 for the other two — which was a **state → hue** table, the exact
+ * shape frozen §8 bans, and which left two of the three kinds pixel-identical
+ * anyway. One lamp fixes both halves at once: hue now says only "a signal is
+ * lit here", which is presence rather than state, and `EMISSIVE_MARKS` carries
+ * which signal it is.
+ *
+ * 銀朱 rather than 山吹 for a measured reason. A lit point is drawn on the mat,
+ * so the colour it must clear WCAG 1.4.11 against is `EraGround.field`. Of the
+ * two emissive pigments in §4.3, 銀朱 clears on both fields of its own register
+ * (4.37:1 by day, 3.16:1 at night) and 山吹 does not (1.58:1 by day). See
+ * `UNLIT_EMISSIVE_PIGMENTS`.
+ */
+export const EMISSIVE_LAMP: GroundPigment = ERA_PIGMENTS.tetsudo.signal;
+
+/**
+ * The form each signal kind takes. Hue is shared; this is what tells them apart.
+ *
+ * The same obligation `EDGE_PATTERNS` and `RECALL_BAND_MARKS` discharge for the
+ * other memory semantics — WCAG 1.4.1, no meaning by colour alone — and the same
+ * shape of answer, so a reader who knows those two knows this one.
+ * `test/theme-ground.test.ts` asserts the three forms are distinct, exactly as
+ * `test/theme-tokens.test.ts` does for bands and edges.
+ *
+ * The forms are rail vocabulary rather than decoration:
+ *
+ *   - `disc` — a lamp that is simply on. Due now.
+ *   - `bar` — a semaphore blade, the arm that says the road ahead has a choice
+ *     in it. A repair branch is open.
+ *   - `ring` — a lamp with its middle out. The evidence is old enough to doubt,
+ *     which is the same "absence rather than weakness" that gives `unseen` an
+ *     open ring in `RECALL_BAND_MARKS`.
+ *
+ * `label` travels with the shape because a screen reader cannot see either the
+ * hue or the form: it is spoken before the basis, so the kind is carried in all
+ * three channels rather than in one.
+ */
+export const EMISSIVE_MARKS = {
+  'due-now': { shape: 'disc', label: 'Due now' },
+  'branch-open': { shape: 'bar', label: 'Branch open' },
+  'evidence-stale': { shape: 'ring', label: 'Evidence stale' },
+} as const satisfies Readonly<
+  Record<EmissiveSignalKind, { readonly shape: string; readonly label: string }>
+>;
+
+export type EmissiveMark = (typeof EMISSIVE_MARKS)[EmissiveSignalKind];
+export type EmissiveShape = EmissiveMark['shape'];
+
 export interface LitPoint {
   readonly signal: EmissiveSignal;
+  /** Always `EMISSIVE_LAMP`. Carried on the point so a surface cannot pick. */
   readonly pigment: GroundPigment;
+  /** The form to draw it as. The only channel that varies with the kind. */
+  readonly mark: EmissiveMark;
 }
 
 export interface EmissivePlan {
   readonly lit: readonly LitPoint[];
-  /** How many real signals were not lit because of the cap. Never hidden. */
-  readonly suppressed: number;
+  /**
+   * The real signals the ration would not light.
+   *
+   * The signals themselves rather than a count, because "reported, never hidden"
+   * is a claim a count cannot support: a surface holding the number 1 can say
+   * "and one more" but cannot say *what*. Holding the signals, it can print
+   * every basis, which is what `style-guide-page.tsx` does.
+   */
+  readonly suppressed: readonly EmissiveSignal[];
 }
-
-/** Which lamp a state lights. Declared, so a state cannot invent a new colour. */
-const EMISSIVE_ROLE: Readonly<Record<EmissiveSignalKind, 'signal' | 'platformLight'>> = {
-  'due-now': 'platformLight',
-  'branch-open': 'signal',
-  'evidence-stale': 'signal',
-};
 
 /**
  * Decide which signals get to be lit points.
@@ -651,9 +779,9 @@ const EMISSIVE_ROLE: Readonly<Record<EmissiveSignalKind, 'signal' | 'platformLig
  * Throws — rather than silently drawing nothing — when a caller asks for emitted
  * light outside the rail register, because that is a design error at the call
  * site and a silent no-op would hide it until someone looked at a screenshot.
- * Over the cap it does *not* throw: real signals past the third are reported as
- * `suppressed` so a surface can say "and 4 more" instead of pretending they are
- * not there.
+ * Over the cap it does *not* throw: real signals past the third come back in
+ * `suppressed` so a surface can name them instead of pretending they are not
+ * there.
  */
 export function planEmissive(era: EraKey, signals: readonly EmissiveSignal[]): EmissivePlan {
   if (era !== EMISSIVE_REGISTER && signals.length > 0) {
@@ -668,10 +796,88 @@ export function planEmissive(era: EraKey, signals: readonly EmissiveSignal[]): E
   }
   const lit = signals.slice(0, MAX_EMISSIVE_POINTS).map((signal) => ({
     signal,
-    pigment: ERA_PIGMENTS.tetsudo[EMISSIVE_ROLE[signal.kind]],
+    pigment: EMISSIVE_LAMP,
+    mark: EMISSIVE_MARKS[signal.kind],
   }));
-  return { lit, suppressed: Math.max(0, signals.length - lit.length) };
+  return { lit, suppressed: signals.slice(lit.length) };
 }
+
+/**
+ * What a plan came to, in numbers a surface may print.
+ *
+ * A *reader*, deliberately: it hands back counts and the caller's own signals,
+ * never a pigment, so it is not on `GROUND_PAINTING_EXPORTS` and a page that
+ * reports the ration is not thereby banned from rendering text. That seam is the
+ * whole reason this function exists — `style-guide-page.tsx` used to print
+ * `MAX_EMISSIVE_POINTS` as though it were the number of points actually lit,
+ * which is a user-visible sentence asserting a count the code never computed.
+ * With four signals and a cap of three the two agree by luck; with two signals
+ * the page said "3 are lit" over two lit points.
+ */
+export interface EmissiveTally {
+  /** How many real signals were offered. */
+  readonly offered: number;
+  /** How many were lit. Never larger than `MAX_EMISSIVE_POINTS`. */
+  readonly lit: number;
+  /** The ones the ration turned down, so a surface can report each of them. */
+  readonly suppressed: readonly EmissiveSignal[];
+}
+
+export function emissiveTally(era: EraKey, signals: readonly EmissiveSignal[]): EmissiveTally {
+  const plan = planEmissive(era, signals);
+  return { offered: signals.length, lit: plan.lit.length, suppressed: plan.suppressed };
+}
+
+/* ------------------------------------------------------------------ *
+ * Ground pigments that land on a ground as figure
+ * ------------------------------------------------------------------ */
+
+/**
+ * A ground pigment this layer paints as a **figure** element, and the register
+ * whose fields it has to clear 3:1 against.
+ *
+ * `GROUND_CONTRAST_PAIRS` walks the semantic palette, which was the whole of the
+ * obligation while the only things drawn on a ground came from `color.ts`. A lit
+ * point does not: it is a mineral pigment carrying meaning, painted straight onto
+ * a field, and nothing checked it. `test/theme-ground.test.ts` now walks this
+ * list against every field of its own register at `AA_NON_TEXT`, so a pigment
+ * that cannot be seen where it is drawn fails the build the way §5.1.2 says it
+ * should.
+ */
+export interface GroundFigurePigment {
+  readonly name: string;
+  readonly era: EraKey;
+  readonly pigment: GroundPigment;
+}
+
+export const GROUND_FIGURE_PIGMENTS: readonly GroundFigurePigment[] = [
+  { name: 'the signal lamp', era: EMISSIVE_REGISTER, pigment: EMISSIVE_LAMP },
+];
+
+/**
+ * Emissive pigments that are declared and never painted as figure, with the
+ * reason recorded as a number rather than as a preference.
+ *
+ * 山吹 stays in `ERA_PIGMENTS` because §4.3 prints it and this table is a
+ * transcription, not a use-list. It is not a lamp because it cannot be seen as
+ * one on half the register: 1.58:1 against 鉄道's daylight field. The test
+ * checks the reason as well as the entry — if a later change made 山吹 clear,
+ * this row would be wrong and the suite says so.
+ */
+export interface UnlitEmissivePigment {
+  readonly pigment: GroundPigment;
+  readonly era: EraKey;
+  readonly reason: string;
+}
+
+export const UNLIT_EMISSIVE_PIGMENTS: readonly UnlitEmissivePigment[] = [
+  {
+    pigment: ERA_PIGMENTS.tetsudo.platformLight,
+    era: 'tetsudo',
+    reason:
+      '山吹 is 1.58:1 against the 鉄道 daylight field, far below the 3:1 a meaningful graphic owes WCAG 1.4.11, so it is scenery in this register and never a signal.',
+  },
+];
 
 /* ------------------------------------------------------------------ *
  * One pigment, coarse to fine

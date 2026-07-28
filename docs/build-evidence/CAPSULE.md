@@ -5448,6 +5448,14 @@ scan. This is a layer underneath, not a replacement.
 | 6   | Depth is superposition, no shadows                           | `superpose()` composites the stack; `groundLayers()` hands out the same list it consumed; the shadow ban is extended to `src/theme/**`                                                            |
 | 7   | Ramps from one pigment                                       | `MINERAL_RAMPS`: 群青→白群 and 緑青→白緑, each coarse-to-finest-grind, tested for rising luminance, falling saturation and staying in one hue band                                                |
 
+> **Rows 2 and 5 above are overstated, and the corrected versions are in the
+> repair appendix at the end of this file.** Row 2 said "the compiler rejects the
+> crossing" without saying that the brand binds only where a signature names it,
+> which no component prop in this app does. Row 5 said the emissive cap is
+> enforced without saying it is enforced per plan rather than per screen. Both
+> are restated there rather than edited here, because what a round claimed at the
+> time is part of the record.
+
 ### Numbers, and where they came from
 
 **Transcribed, not chosen.** Every hex in `ERA_PIGMENTS` is the value printed in
@@ -5573,3 +5581,269 @@ kind that can pass vacuously:
   would fail there, which is the correct outcome.
 - **That any of this ran outside Chromium on Linux.** No Safari, no Firefox, no
   device, no screen reader. The screenshots and the e2e suite are one engine.
+
+---
+
+## Appendix — lane A1′ repair round: the lamp, the forms, and four honest scopes
+
+Branch `agent/bunki-e-ground`. The independent verifier returned **FAIL** with
+three P1s and five P2s. Every P1 is repaired. Four of the five P2s are repaired;
+the fifth is declined, with the reason below rather than in silence.
+
+Every finding was reproduced before anything was changed. None of them failed to
+reproduce, so nothing here is a fix for a defect that was not present.
+
+### P1-1 — 山吹 at 1.578:1, and the check that was missing
+
+**Reproduced.** `contrastRatio(ERA_PIGMENTS.tetsudo.platformLight.hex,
+groundOf('tetsudo','light').field)` = **1.578**, and the exported page confirmed
+it in pixels: the dot at `[data-testid="ground-tetsudo-lit-0"]` was
+`rgb(255,177,27)` on a field of `rgb(236,240,236)`. A meaningful graphic, far
+below the 3:1 WCAG 1.4.11 floor the lane is built around, shipped green.
+
+The verifier's diagnosis of _why_ is the useful part and is what the repair
+follows: `GROUND_CONTRAST_PAIRS` walks the **semantic palette**, so nothing in
+the suite looked at a mineral pigment painted straight onto a field — and a lit
+point is exactly that.
+
+- `GROUND_FIGURE_PIGMENTS` is new: the ground pigments this layer paints as
+  **figure**, each with the register whose fields it must clear. The test walks
+  it × that register's fields at `AA_NON_TEXT`. Today it has one member.
+- `EMISSIVE_LAMP` is 銀朱 ginshu, which is **4.366:1** on 鉄道's daylight field
+  and **3.157:1** at night. Both measured in the photographed export, not only in
+  arithmetic: `rgb(199,62,58)` on `rgb(236,240,236)` and on `rgb(26,34,43)`.
+- `UNLIT_EMISSIVE_PIGMENTS` records 山吹 as declared-and-not-painted **with its
+  number**, and the test asserts the recorded reason is still true — if a later
+  change made 山吹 clear 3:1 everywhere, that row would be stale and the suite
+  says so. 山吹 stays in `ERA_PIGMENTS` because §4.3 prints it and that table is a
+  transcription, not a use-list.
+- Negative probe: setting `EMISSIVE_LAMP` back to 山吹 turns
+  `the signal lamp on tetsudo/light clears the non-text floor` red. Restored.
+
+### P1-2 — three kinds, two of them pixel-identical
+
+**Reproduced.** `EMISSIVE_ROLE` mapped 'branch-open' and 'evidence-stale' to the
+same pigment and every lit point was the same 10×10 disc, so two of the three
+signals differed in **nothing at all** and the third differed only in hue. The
+`accessibilityLabel` is not a visual channel. Lane A1 accepted the WCAG 1.4.1
+non-colour rule for every other memory semantic — `EDGE_PATTERNS`,
+`RECALL_BAND_MARKS`, both with distinct-value tests — and this one had neither
+half.
+
+Both halves now exist, and they are deliberately the opposite way round from the
+obvious patch:
+
+- **Hue was removed as a channel rather than made more distinct.**
+  `EMISSIVE_ROLE` is deleted. All three kinds are painted `EMISSIVE_LAMP`. There
+  is no state → colour table left to get wrong, and the test asserts every lit
+  point comes out one colour _and_ that no `EMISSIVE_ROLE` declaration has come
+  back.
+- **Form is the channel.** `EMISSIVE_MARKS` gives each kind a shape, in rail
+  vocabulary: `disc` (a lamp that is on — due now), `bar` (a semaphore blade — a
+  branch is open), `ring` (a lamp with its middle out — evidence stale, the same
+  "absence rather than weakness" that gives `unseen` an open ring). Read out of
+  the real export: 12×12 filled disc, 15×4 bar, 12×12 ring with a 3 px stroke and
+  a transparent centre. `gives each emissive signal kind a distinct form` is the
+  same test `theme-tokens.test.ts` runs for bands and edges.
+- The spoken label now names the kind before the basis, so a screen reader gets
+  the distinction too: "Branch open. A branch is open here after a stumble."
+
+### P1-3 — "Nothing in this file encodes learner state" was false
+
+**Reproduced by reading.** `ground.ts:16-18` said it flatly; 600 lines later the
+same file declared scheduler and evidence states and handed each a pigment. This
+is the project's recurring defect class — a confident assertion the module's own
+body contradicts — and it was in the header of the lane's headline module.
+
+The repair is not to move the code somewhere the sentence stays true. It is to
+say what is true:
+
+- The **ground** — every register, every pigment table, every stack and mat —
+  changes with the era layer, the route and the hour, and with nothing else. That
+  part of the old claim survives and is worth keeping.
+- `planEmissive` **does** touch learner state, and the header now says so, and
+  says why it lives here: the ration is a property of the register. Only 鉄道 has
+  lamps and only three at a time; a cap declared away from the register it caps
+  is a cap nobody applies.
+- A lit point is therefore a **figure** element drawn in a ground pigment — the
+  one place the two layers touch — and the header names it as such rather than
+  leaving a reader to work out which side of the split it is on.
+- The §8 ban is on **state → hue**, and with `EMISSIVE_ROLE` gone there is no
+  such mapping in the file. That is the claim the module can actually support,
+  and it is the one it now makes.
+
+The user-visible prose that repeated the false version is fixed too: the era
+section's note on the specimen page no longer says "Nothing here says anything
+about the learner".
+
+### P2-1 — the branding claim, restated at its real size · **repaired (prose)**
+
+**Reproduced.** `grep -rn 'SemanticColor' apps/app/src --include=*.tsx` returns
+nothing; React Native types `backgroundColor` as `string`; `ground-field.tsx`
+paints a `GroundColor` into a style prop and always did.
+
+The `@ts-expect-error` probes are honest — re-verified this round: a directive
+over a clean line gives `TS2578` and `tsc` exits 2 — so the overclaim is about
+**scope**, and the fix is to state the scope. `color.ts` and `ground.ts` now say
+that the brand binds wherever a signature names it (`paletteValue`, `surfaceOf`,
+`figurePaletteOn`, `eraPigment`, `superpose`) and does **not** bind a style prop,
+and that what holds the line on pixels is two scans: a pigment can only be
+obtained through a `GROUND_PAINTING_EXPORTS` name, and a pigment written as a
+literal is caught by the no-hex-literal scan. The type guards the accessors, the
+scans guard the pixels, and neither file claims either is the other.
+
+**Corrected requirement row 2:** _Ground and semantic colours typed distinctly_ —
+enforced by branded strings at every named signature, proved by five
+`@ts-expect-error` directives that fail typecheck if branding weakens; **not**
+enforced at style props, which are `string` by framework.
+
+### P2-2 — the namespace-import escape · **repaired**
+
+**Reproduced.** `paintsAGround` parsed `import { … } from '…'` braces only, so
+`import * as tokens` plus `tokens.groundOf(...)` painted an era ground while the
+file was treated as painting nothing. `await import(...)` escaped identically.
+
+The scan's unit is now the **identifier in the stripped body**: an accessor has
+to be named somewhere to be called, however the name arrived. The scanner's own
+behaviour is tested against bodies rather than files —
+`catches a name however it arrived, and only when it is really there` — including
+both escapes and the two false-positive shapes (a name in a comment, a read-only
+name like `ERA_REGISTERS`).
+
+Negative probes, both run and both restored afterwards: a namespace-import probe
+file and a dynamic-import probe file, each with a `<Text>` on a ground. Before,
+green. Now, `src/ui/style-guide/ns-probe.tsx renders <Text> while painting groundOf`
+/ `… while painting ERA_PIGMENTS`. The `<Text>`-injected `ground-field.tsx` probe
+still fires too.
+
+### P2-3 — the composition escape · **repaired, with a type rather than a scan**
+
+**Reproduced.** `GroundCard.band` was `RecallBand` (all five), `GroundField`
+rendered `RecallIndicator`, and `RecallIndicator` resolves the two meter-only
+bands to `RecallMeter` — a capability label, a band word and a basis line,
+directly on the mat. The source scan cannot see through composition, and the
+literal-name scan catches only a source literal `'faint'`, which is precisely what
+a band read off a projection is not.
+
+`GroundCard.band` is now `StandaloneRecallBand` and the marks row draws
+`RecallMark`, which accepts only those. The meter cannot be reached from a ground
+at all; it still appears on the card, where it belongs. The header of
+`ground-field.tsx` no longer makes the argument that missed the component it was
+already composing — it names the hole and the type that closes it.
+
+Negative probe: the verifier's own reproduction,
+`band: RECALL_BANDS[1] as RecallBand`, now fails typecheck with
+`Type '"unseen"' is not assignable to type 'StandaloneRecallBand'`, exit 2.
+Restored.
+
+### P2-4 — the cap is per plan, not per screen · **declined, and disclosed**
+
+**Reproduced.** `planEmissive` is a pure function over one signal list. Two
+`GroundField`s put six lit points on one screen with every check green, and a
+module that reads `ERA_PIGMENTS.tetsudo.signal.hex` and draws twenty discs is
+caught by nothing but the museum-card scan, which bans text and not lamps.
+
+**Not repaired, and here is why.** A per-screen cap needs a mount-time registry
+that counts lit points across the tree and then throws or warns from render. That
+is exactly the trap this lane removed from `RecallMark` in its first round — a
+component that crashes a screen because of data it was handed — and adding it
+back one appendix later to enforce an aesthetic ration would be the wrong trade.
+So the guarantee is narrowed to the one that holds and is said in both places it
+is claimed: `MAX_EMISSIVE_POINTS`' docblock now reads "how many points one
+`planEmissive` call may light", says "per plan, not per screen", and says what
+would be needed to make it per-screen and why that was declined. The screenshot
+README says it too.
+
+**Corrected requirement row 5:** _Emissive colour capped, rail register only,
+real signals only_ — `planEmissive` throws outside 鉄道 and on an empty basis, and
+caps **one plan** at `MAX_EMISSIVE_POINTS = 3`. Two fields on one screen are six
+points and nothing prevents that.
+
+### P2-5 — a sentence asserting a count the code never computed · **repaired**
+
+**Reproduced.** The page printed `MAX_EMISSIVE_POINTS` where the number lit
+belonged — true by coincidence at four signals and a cap of three, false at two —
+and `EmissivePlan.suppressed`, whose docblock said "Never hidden", was computed
+and then dropped by every component.
+
+- `EmissivePlan.suppressed` is now the **signals**, not a count. "Reported, never
+  hidden" is a promise a count cannot keep: holding the number 1 you can say "and
+  one more", holding the signal you can print what it was.
+- `emissiveTally(era, signals)` is a **reader** — counts and the caller's own
+  signals, never a pigment — so it is deliberately off `GROUND_PAINTING_EXPORTS`
+  and a page that reports the ration is not thereby banned from rendering text.
+  That seam is the whole reason it exists.
+- `railRationNote(tally)` computes the sentence, in the same shape as
+  `overwhelmedNote` after the same class of defect, and drops the suppressed
+  clause entirely when nothing was suppressed. The page prints each suppressed
+  basis under the field.
+
+Rendered in the real export: _"4 real signals were offered, 3 are lit, 1 is not,
+and it is named below rather than dropped."_ followed by _"Not lit: Also due now —
+past the ration, so it is not lit."_ The test exercises the tally the page does
+**not** produce (two offered, two lit) because that is the case that used to lie.
+
+### Full §17.5 check set, on the repaired tree
+
+Every row, including the two a previous appendix dropped. Run in this order, in a
+worktree with its own `npm ci` install.
+
+| Check                                       | Result                                      |
+| ------------------------------------------- | ------------------------------------------- |
+| `npm ci`                                    | clean                                       |
+| `npm run lint`                              | exit 0                                      |
+| `npm run format:check`                      | all files formatted                         |
+| `npm run typecheck`                         | exit 0, zero errors                         |
+| `npm run test`                              | **2103 passed**, 102 files (was 2088 / 102) |
+| `npm run test:replay`                       | 47 passed                                   |
+| `npm run verify:export`                     | 14 passed                                   |
+| `npm run export:web --workspace @bunki/app` | 14 static routes exported                   |
+| `node apps/app/scripts/capture-ground.mjs`  | 8 shots rewritten from the new export       |
+| `npm run test:e2e`                          | **43 passed**, exit 0                       |
+
+The two `✘` lines in the e2e list reporter are the same pre-existing annotated
+`test.fail()` expectations as every previous round (T4-1b, T3-3); `retries: 0`,
+neither touched, both counted in the 43, run exits 0.
+
+`npm ci` is not decoration in this row. The shared `node_modules` this worktree
+inherited had zod 3.25.76 against a lockfile pinning 4.4.3, which made
+`npm run typecheck` fail in `@bunki/seed` on three lines this lane never touched.
+A clean install cleared it. Anyone reproducing these numbers needs the install
+step for the same reason.
+
+### Negative probes run this round
+
+Five, each restored afterwards, each the verifier's own reproduction:
+
+1. **Unused `@ts-expect-error`** — `TS2578`, exit 2. The directives in
+   `theme-ground.test.ts` are each suppressing a real error.
+2. **`<Text>` injected into `ground-field.tsx`** — museum-card scan red, naming
+   the file and `groundOf, groundLayers, planEmissive`.
+3. **Namespace-import probe** (`import * as tokens` + `tokens.groundOf`) — red
+   now, green before the scanner change.
+4. **Dynamic-import probe** (`await import('../theme.ts')` + `ERA_PIGMENTS`) —
+   red now, green before.
+5. **`EMISSIVE_LAMP` set back to 山吹** — the new contrast walk goes red on
+   `tetsudo/light` at 1.578:1.
+
+Plus the composition probe under P2-3, which fails at typecheck rather than in the
+suite.
+
+### What this repair round still does **not** claim
+
+- **That the emissive ration is enforced per screen.** It is not. See P2-4.
+- **That a component cannot paint any node with any pigment.** It can. The type
+  does not reach style props; two scans and review do. See P2-1.
+- **That the museum-card scan is now unescapable.** It is much harder to escape —
+  identifier-level, so import syntax cannot lift it — but it is still a source
+  scan over `src/` and `app/`, and it still cannot see through composition. The
+  composition hole this round found was closed by narrowing a **type**, not by
+  growing the scan, and the next one will need the same treatment rather than a
+  cleverer regex.
+- **That 山吹 has a job.** It is transcribed from §4.3 and painted nowhere. That
+  is recorded in `UNLIT_EMISSIVE_PIGMENTS` with the measurement that disqualified
+  it, so it is a documented absence rather than a dangling table row.
+- **That any of this ran outside Chromium on Linux.** Unchanged from the build
+  round: no Safari, no Firefox, no device, no screen reader. The screenshots and
+  the e2e suite are one engine, and the "spoken label" improvement in P1-2 is
+  asserted from the DOM, not heard.

@@ -53,7 +53,6 @@ import {
   EASING,
   ERA_KEYS,
   ERA_REGISTERS,
-  MAX_EMISSIVE_POINTS,
   RADIUS,
   RECALL_BANDS,
   SPACE,
@@ -68,7 +67,9 @@ import {
   OVERWHELMED_SPANS,
   PASSAGE,
   PASSAGE_SPANS,
+  RAIL_RATION_NOTE,
   RAIL_SIGNALS,
+  RAIL_SUPPRESSED_BASES,
   SPECIMEN_KANJI,
   SPECIMEN_LEXEME_ID,
   VERTICAL_SPECIMEN,
@@ -140,7 +141,7 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
 
         {/* ---------------------------------------------------------------- */}
         <SpecimenSection
-          note="Three registers, three grounds, one continuous road. Each ground is a stack — an opaque mineral base, an atmospheric wash over it, and a 胡粉/墨 mat under the content — because that is what iwa-enogu does: colour is built by superposition, not mixed on a palette. Nothing here says anything about the learner. The ground carries when and where; the marks on it are the only thing carrying how well you know something."
+          note="Three registers, three grounds, one continuous road. Each ground is a stack — an opaque mineral base, an atmospheric wash over it, and a 胡粉/墨 mat under the content — because that is what iwa-enogu does: colour is built by superposition, not mixed on a palette. The ground itself carries when and where and nothing else; no pigment below changes with anyone's memory. The marks and the signal lamps sitting on it are the only things that say how well you know something, and they say it by form — the lamps all share one pigment, so their colour is not carrying the difference."
           testID="specimen-ground"
           title="Era registers — the ground layer"
         >
@@ -176,17 +177,34 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
                 testID={`specimen-ground-${era}`}
               />
               {era === 'tetsudo' ? (
-                <Text
-                  style={[
-                    styles.eraNote,
-                    { color: theme.color.inkFaint, fontFamily: theme.font.sans },
-                  ]}
-                >
-                  Emitted light lives only here, and it is rationed: {String(RAIL_SIGNALS.length)}{' '}
-                  real signals were offered and {String(MAX_EMISSIVE_POINTS)} are lit. The rest are
-                  reported, never hidden. Asking the other two registers for a lit point throws
-                  rather than quietly drawing nothing.
-                </Text>
+                <>
+                  <Text
+                    style={[
+                      styles.eraNote,
+                      { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {RAIL_RATION_NOTE}
+                  </Text>
+                  {/*
+                    "Reported, never hidden" as the report itself. The plan hands
+                    back the signals it turned down, not a count of them, so the
+                    page can say what they were — which is the only version of
+                    that promise a reader can check.
+                  */}
+                  {RAIL_SUPPRESSED_BASES.map((basis) => (
+                    <Text
+                      key={basis}
+                      style={[
+                        styles.eraNote,
+                        { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                      ]}
+                      testID="ground-tetsudo-suppressed"
+                    >
+                      Not lit: {basis}
+                    </Text>
+                  ))}
+                </>
               ) : null}
             </View>
           ))}
