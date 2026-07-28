@@ -6305,7 +6305,7 @@ New route `/journey`, one screen, eight modules under `src/ui/journey/`:
 | `fork-geometry.ts` | The 分岐 drawing as pure, testable path data. |
 | `open-conditions.ts` | The rejoin criterion decomposed into its five clauses. |
 | `history.ts` | What opened the branch, what has been tried, what is left. |
-| `branch-fork.tsx` | The fork, drawn, with `BranchLight` doing the dimming. |
+| `branch-fork.tsx` | The fork, drawn, with `BranchLight` doing the dimming and `Surface` supplying the levelled boxes. |
 | `open-condition-panel.tsx` | The condition, and every answer offered to it. |
 | `journey-history.tsx` | The timeline, each entry naming its record. |
 
@@ -6339,6 +6339,32 @@ of the evidence and not of the learner's diligence.
 module-graph test in `test/edrdg-acknowledgement.test.ts` picks the new route up
 automatically, and all six browser shots record `EDRDG acknowledgement present:
 true` read out of the photographed DOM.
+
+### Which of the existing vocabulary this lane used, and which it did not
+
+Used: `Surface` (every levelled box on the surface — rail cards at `card`/`well`,
+the standing panel, the probe boxes and the condition panel, so the elevation→
+colour mapping is not re-derived anywhere here), `BranchLight` (with
+`MIN_UNLIT_OPACITY` as the floor), `DrawnRule`, `Disclosure` (three of them, each
+stating its count and its reason), `AppButton`, `ChipButton`, `Section`,
+`Hairline`, `ScreenShell`, `EmptyPanel`/`ErrorPanel`/`LoadingPanel`,
+`SeedEntryDisclosure`, `capabilityOf`/`CapabilityId`, and the theme throughout —
+no hex literal in any file of this lane.
+
+Not used, with the reason: `RecallMark`/`RecallMeter`/`LensRow` (this surface
+shows no memory band, see "What this lane did NOT do" item 3, and a lens *row*
+is a filter control this screen has nothing to filter); `MuseumCard` (there is no
+specimen — the subject of this screen is a branch, not a character);
+`RubyText`/`VerticalRun`/`FrontierPassage` (no running Japanese text on this
+surface); `AttributionFooter` (the acknowledgement is carried by
+`SeedEntryDisclosure` in the shell's lede, as on every other screen).
+
+The rail cards, standing panel, probe boxes and condition panel were all
+hand-rolled boxes in the first draft — `backgroundColor: theme.color.raised`,
+a radius and a border, which is precisely what `Surface` exists to be. That is
+the reinvention the brief calls a defect, and it was caught on a read-back
+rather than by a test, because the "no hex literal" rule was already satisfied.
+All four now go through `Surface`.
 
 ### Two claims this lane wrote down and its own tests falsified
 
@@ -6428,11 +6454,21 @@ test, not a wrong sentence on a screen.
 | `npm run lint` | clean |
 | `npm run format:check` | clean |
 | `npm run typecheck` | clean |
-| `npm run test` | **2375 passed / 106 files** (2018 / 105 at the branch point) |
+| `npm run test` | **2375 passed / 106 files** (2018 / 105 at the branch point). See the flake note below. |
 | `npm run test:replay` | 47 passed |
 | `npm run verify:export` | 14 passed |
 | `cd apps/app && npx expo export --platform web` | 15 static routes, `/journey` among them |
 | `npm run test:e2e` | **48 passed**; the two `✘` lines are the pre-existing `test.fail()` known defects in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this lane |
+
+**A flake observed, not caused here.** On three of six full-suite runs on this
+machine, `screen-contract.test.ts > has no index field in the seed to render in
+the first place` timed out at vitest's 5 s default while `await import(
+'@bunki/seed')` loaded the 3,000-lexeme dictionary. It passes in 4.9 s when the
+file is run alone, and it fails identically with this lane's changes stashed —
+i.e. on the branch point — so it is a load-sensitive timeout on a large import
+rather than anything this lane introduced. Reported rather than retried into
+silence; the suite has `retries: 0` on the E2E side precisely because a retry
+turns a flake into a pass.
 
 ### Browser evidence
 

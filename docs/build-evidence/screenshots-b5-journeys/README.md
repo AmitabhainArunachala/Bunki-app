@@ -34,13 +34,13 @@ which contract its branch is about instead of leaving a reader to guess.
 - EDRDG acknowledgement present: true
 - Fonts registered: Noto Sans JP, Shippori Mincho
 - Phase line: `At the fork. Nothing has been chosen, and nothing has to be.`
-- Capability line: `This branch is about one capability: Reading (読み). Seeing the written form and knowing how it sounds. It says nothing about the others.`
+- Capability line: `This branch is about one capability: Meaning (意味). Knowing what it means when you meet it. It says nothing about the others.`
 - Rails drawn (6), each with its state word:
-  - form_reading_aural: open, not taken
+  - form_reading_aural: available, held back
   - sense_meaning_contrast: open, not taken
   - usage_production_register: nowhere to go for this word
   - grammar_construction: nowhere to go for this word
-  - kanji_structure_writing: available, held back
+  - kanji_structure_writing: open, not taken
   - task_misunderstanding: open, not taken
 - SVG paths in the fork drawing: 7
 - Open condition: `0 of 1 qualifying answer so far. Nothing has been offered to this condition yet.`
@@ -76,13 +76,13 @@ which contract its branch is about instead of leaving a reader to guess.
 - EDRDG acknowledgement present: true
 - Fonts registered: Noto Sans JP, Shippori Mincho
 - Phase line: `On a road. It ends when the condition below is met.`
-- Capability line: `This branch is about one capability: Meaning (意味). Knowing what it means when you meet it. It says nothing about the others.`
+- Capability line: `This branch is about one capability: Reading (読み). Seeing the written form and knowing how it sounds. It says nothing about the others.`
 - Rails drawn (6), each with its state word:
-  - form_reading_aural: available, held back
-  - sense_meaning_contrast: taking this road
+  - form_reading_aural: taking this road
+  - sense_meaning_contrast: open, not taken
   - usage_production_register: nowhere to go for this word
   - grammar_construction: nowhere to go for this word
-  - kanji_structure_writing: open, not taken
+  - kanji_structure_writing: available, held back
   - task_misunderstanding: open, not taken
 - SVG paths in the fork drawing: 7
 - Open condition: `0 of 1 qualifying answer so far. 1 answer offered so far; 1 did not meet every clause. The condition is unchanged.`

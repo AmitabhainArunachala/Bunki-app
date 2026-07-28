@@ -28,6 +28,7 @@ import { type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Disclosure } from '../disclosure.tsx';
+import { Surface } from '../surface.tsx';
 import { RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 import { clauseOf, stillOpenLine, type OpenCondition } from './open-conditions.ts';
@@ -47,7 +48,18 @@ export function OpenConditionPanel({
   const theme = useTheme();
 
   return (
-    <View
+    /*
+      A `Surface` at card level, wearing the accent.
+
+      The levelled box comes from the vocabulary; what is layered on top through
+      `style` is the one accent, which is what marks this as the thing on the
+      screen that the branch turns on. `SeedEntryDisclosure` and the Phase-0
+      repair screen's criterion panel already wear the same tint for the same
+      reason, so this is the register those established rather than a new one.
+    */
+    <Surface
+      level="card"
+      pad="md"
       style={[
         styles.panel,
         { backgroundColor: theme.color.vermilionSoft, borderColor: theme.color.vermilion },
@@ -112,7 +124,7 @@ export function OpenConditionPanel({
         {condition.considered.map((verdict) => (
           <View
             key={verdict.eventId}
-            style={[styles.verdict, { borderColor: theme.color.rule, borderRadius: RADIUS.sm }]}
+            style={[styles.verdict, { borderColor: theme.color.rule }]}
             testID={`journey-verdict-${verdict.eventId}`}
           >
             <Text style={[styles.asks, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
@@ -141,18 +153,14 @@ export function OpenConditionPanel({
           </View>
         ))}
       </Disclosure>
-    </View>
+    </Surface>
   );
 }
 
 const styles = StyleSheet.create({
   panel: {
     borderLeftWidth: 3,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
     gap: SPACE.sm,
-    paddingHorizontal: SPACE.md,
-    paddingVertical: SPACE.md,
   },
   title: {
     fontSize: TYPE.title,
@@ -183,6 +191,7 @@ const styles = StyleSheet.create({
     lineHeight: TYPE.meta * 1.6,
   },
   verdict: {
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
     gap: SPACE.xs,
     padding: SPACE.sm,

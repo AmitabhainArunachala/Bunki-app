@@ -43,7 +43,8 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { BranchLight } from '../motion.tsx';
 import { AppButton } from '../primitives.tsx';
-import { MIN_UNLIT_OPACITY, RADIUS, SPACE, TYPE } from '../theme.ts';
+import { Surface } from '../surface.tsx';
+import { MIN_UNLIT_OPACITY, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 import { forkGeometry } from './fork-geometry.ts';
 import { HELD_BACK_BECAUSE, RAIL_RESTING_OPACITY, type Rail, type RailState } from './rails.ts';
@@ -222,21 +223,28 @@ function RailRow({
         restingOpacity={RAIL_RESTING_OPACITY[rail.state]}
         testID={`journey-rail-${rail.family}`}
       >
-        <View
+        {/*
+          `Surface`, not a hand-rolled box.
+
+          A rail card is a levelled surface, which is exactly what the design
+          vocabulary's `Surface` is for — it is the only place in the system that
+          turns an elevation name into colours, and re-deriving `raised` and
+          `sunken` here would have been a second, unversioned copy of that
+          mapping. `well` for a road that cannot be walked and `card` for one
+          that can; the accent border for the recommended default is the one
+          thing layered on top, through `style`.
+        */}
+        <Surface
+          level={rail.state === 'closed' || rail.state === 'held_back' ? 'well' : 'card'}
+          pad="md"
           style={[
             styles.card,
-            {
-              backgroundColor:
-                rail.state === 'closed' || rail.state === 'held_back'
-                  ? theme.color.sunken
-                  : theme.color.raised,
-              borderColor: rail.recommended ? theme.color.vermilion : theme.color.rule,
-              borderRadius: RADIUS.md,
-              // A recommended default is the one thing on this fork the accent
-              // is spent on. It is still only a default (REQ-JRN-03), which the
-              // row's own words say.
-              borderWidth: rail.recommended ? 2 : 1,
-            },
+            rail.recommended
+              ? // A recommended default is the one thing on this fork the accent
+                // is spent on. It is still only a default (REQ-JRN-03), which
+                // the row's own words say.
+                { borderColor: theme.color.vermilion, borderWidth: 2 }
+              : null,
           ]}
         >
           <View style={styles.head}>
@@ -310,7 +318,7 @@ function RailRow({
               variant={rail.recommended ? 'primary' : 'secondary'}
             />
           ) : null}
-        </View>
+        </Surface>
       </BranchLight>
     </View>
   );
@@ -339,7 +347,6 @@ const styles = StyleSheet.create({
   },
   card: {
     gap: SPACE.xs,
-    padding: SPACE.md,
   },
   head: {
     alignItems: 'baseline',

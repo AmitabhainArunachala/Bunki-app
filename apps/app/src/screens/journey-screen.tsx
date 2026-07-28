@@ -87,7 +87,8 @@ import { SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, ChipButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
-import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
+import { Surface } from '../ui/surface.tsx';
+import { SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 
 /**
@@ -323,13 +324,13 @@ function JourneyBody({
       testID="screen-journey"
       title="Journeys"
     >
-      <View
-        style={[
-          styles.standing,
-          { backgroundColor: theme.color.sunken, borderColor: theme.color.rule },
-        ]}
-        testID="journey-standing"
-      >
+      {/*
+        `Surface`, not a hand-rolled box: a levelled surface is what the design
+        vocabulary already owns, and `well` is its name for one set into the
+        page. Re-deriving `sunken` here would be a second copy of a mapping the
+        theme is the single source of.
+      */}
+      <Surface level="well" pad="md" style={styles.standing} testID="journey-standing">
         <Text
           accessibilityLiveRegion="polite"
           style={[styles.phase, { color: theme.color.ink, fontFamily: theme.font.sans }]}
@@ -358,7 +359,7 @@ function JourneyBody({
             variant="quiet"
           />
         ) : null}
-      </View>
+      </Surface>
 
       <Section
         note="Not a diagnosis. One miss raises several possibilities and settles none of them."
@@ -382,9 +383,11 @@ function JourneyBody({
           title="Two questions, before you choose"
         >
           {journey.compiled.probes.map((probe) => (
-            <View
+            <Surface
               key={probe.id}
-              style={[styles.probe, { borderColor: theme.color.rule, borderRadius: RADIUS.md }]}
+              level="card"
+              pad="md"
+              style={styles.probe}
               testID={`journey-probe-${probe.id}`}
             >
               <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
@@ -407,7 +410,7 @@ function JourneyBody({
                   />
                 ))}
               </View>
-            </View>
+            </Surface>
           ))}
 
           <Text
@@ -522,10 +525,7 @@ function JourneyBody({
 
 const styles = StyleSheet.create({
   standing: {
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
     gap: SPACE.sm,
-    padding: SPACE.md,
   },
   phase: {
     fontSize: TYPE.body,
@@ -540,9 +540,7 @@ const styles = StyleSheet.create({
     lineHeight: TYPE.meta * 1.65,
   },
   probe: {
-    borderWidth: 1,
     gap: SPACE.sm,
-    padding: SPACE.md,
   },
   probeAnswers: {
     flexDirection: 'row',
