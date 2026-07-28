@@ -5139,3 +5139,145 @@ Open a **draft** PR from `agent/bunki-real-dictionary` into
 `agent/bunki-phase0-integration` for human review — in particular the two-tier
 sizing decision and the Sources-screen coordination request. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## B3 repair round — the imported dictionary (branch `agent/bunki-real-dictionary`)
+
+**Base:** `ecf10a0910c2566c5348975dcae57f49293a1dbf`.
+**Controller verified before any work:**
+`sha256(docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md)`
+= `de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47`, matching the
+launcher's expected hash and the integrity record; the v2 spec
+(`5ee28477…`) and the launcher itself (`b0a6811d…`) also match.
+
+Four P1 findings, all of the same shape: **a claim with nothing that could
+falsify it.** Each was reproduced from the committed tree before being fixed.
+
+### What was wrong, and what was done
+
+| #    | Finding                                                                                                                                                                  | Reproduced as                                                                                                        | Fix                                                                                                                                                                                                          |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P1-1 | The committed data was not the committed script's output. 83 of 3,000 lexemes shipped duplicate glosses while `import-sources.mjs` deduplicates them.                       | 83 records where `set(senses) != senses`, e.g. `jmdict-1172910` 運動 shipping "movement" twice.                        | `data/dictionary/*` regenerated from the cached archives at the digests the manifest already recorded; new `--verify-reproducible` re-runs the pipeline into a scratch directory and diffs it byte for byte.   |
+| P1-2 | 652 of 2,000 sentences credited `\N` — MySQL's NULL sentinel, which the Tatoeba export writes for an ownerless sentence — as the contributor CC BY 2.0 FR obliges naming.   | 211 `japaneseContributor` + 591 `englishContributor` equal to `\N`; 100,087 of 248,821 jpn rows carry it upstream.     | `tatoebaCell()` maps the sentinel and whitespace-only values to null, and a pair with an unnamed half is **dropped, not shipped**. 1,009 declined, counted in the manifest and recorded in `deferred`.          |
+| P1-3 | Every imported record pointed at a provenance id registered nowhere, so the whole tier would throw `SeedDataError` on load through `src/validate.ts`.                       | `edrdg-jmdict-primary`, `edrdg-kanjidic2-primary`, `tatoeba-sentence` absent from the ten sources in `provenance.json`. | Registered ids emitted **per field**, because these records mix sources; `tatoeba-japanese` / `tatoeba-english` now referenced per sentence half. `assertProvenanceRegistered()` gates the emit.               |
+| P1-4 | The search screen rendered JMdict readings, senses and parts of speech with no EDRDG acknowledgement, which §3 of the licence requires "on each screen display".            | `capture-screen.tsx` imported only `DurabilityNotice` and `SeedCoverageDisclosure`; the coverage notice renders only when _nothing_ matched. | `SeedEntryDisclosure` mounted at the foot of the results; `/` with a populated search added to the `adv-claim-audit` route list, asserted by the acknowledgement's words as well as its test id.                |
+
+### The check that was missing
+
+`--check` compares committed bytes to digests the importer itself wrote. That is
+tamper-evidence and nothing more: a file emitted by an older version of the script
+keeps matching its own digest forever, which is exactly how P1-1 survived.
+
+`--verify-reproducible` closes it. It re-runs the whole pipeline from the cached
+archives — at the parameters **the manifest recorded**, not at whatever is typed —
+into a scratch directory, and diffs every emitted file against the committed one.
+Falsifiability was checked rather than assumed: appending one gloss to
+`lexemes.json` makes it print `DIFFER` and exit 1; restoring the file makes it
+print `REPRODUCIBLE` and exit 0.
+
+### Data changes at the committed parameters (lexemes=3000, sentences=2000, strokes=all)
+
+|                                                          | before      | after                    |
+| -------------------------------------------------------- | ----------- | ------------------------ |
+| lexemes / kanji / stroke files                           | 3,000 / 1,241 / 1,241 | unchanged      |
+| lexemes with duplicate glosses                           | 83          | **0**                    |
+| sentences crediting `\N`                                 | 652         | **0**                    |
+| sentence pairs declined for want of a named contributor  | not counted | **1,009**, in `deferred` |
+| provenance ids that resolve against the registry         | 0 of 3      | **all**, per field       |
+
+Upstream inputs are unchanged and re-verified: `JMdict_e.gz`
+`bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2`,
+`kanjidic2.xml.gz` `47f16167…`, `jpn_sentences_detailed.tsv.bz2` `20706c3d…`,
+`eng_sentences_detailed.tsv.bz2` `8312d3ba…`, `links.tar.bz2` `69abec53…` — each
+matching the digest the manifest already carried, so nothing in this round turns
+on a re-download.
+
+### One test corrected, and why it is not a softening
+
+`adv-a11y-audit`'s reading-order check measured `getBoundingClientRect().top`,
+which is viewport-relative, while the browser scrolls to reveal each element as it
+is focused. Any screen taller than one screenful therefore reports its last
+element _above_ the one before it. Adding the required EDRDG acknowledgement to
+the capture screen made that fire on content that is in perfectly good order.
+`focused()` now adds back the scroll offset of every ancestor — Expo Web scrolls
+inside a `ScrollView`, so `window.scrollY` stays 0 while the content moves —
+giving a position in the scrolled content, which is what "reading order" has
+always meant. **The assertion itself is unchanged**; only the measurement was.
+
+### §17.5 check set, run in this worktree after `npm ci`
+
+| Check                                        | Result                                                                              |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `npm run lint`                               | clean, no output                                                                     |
+| `npm run format:check`                       | `All matched files use Prettier code style!`                                         |
+| `npm run typecheck`                          | exit 0, all workspaces                                                               |
+| `npm run test`                               | **88 files, 1467 tests passed** (1466 at base; +13 new assertions this round)         |
+| `npm run test:e2e`                           | **39 passed (1.0m)**                                                                  |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist`                                                                   |
+| `import-sources.mjs --check`                 | MATCH on all four outputs; licence gate and the new provenance gate satisfied         |
+| `import-sources.mjs --verify-reproducible`   | **REPRODUCIBLE** — 1,245 emitted files byte-identical to the committed ones            |
+| `import-sources.mjs --verify-fixtures`       | MATCH on all 16 fixture lexemes and 10 kanji                                          |
+
+The two `✘` inside the 39 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this round. The 39th
+test is the new populated-search disclosure case.
+
+### Documentation corrected because it was false, not because it read badly
+
+`LICENSES.md` is the record of compliance, so an untrue sentence in it is the same
+defect one level up. Four were found while fixing P1-4 and are corrected in place,
+with the correction marked rather than quietly applied:
+
+- §2.2 claimed both EDRDG §3 obligations were met "by `SEED_ENTRY_DISCLOSURE` plus
+  the Sources screen". **There is no Sources screen.** The two are now stated
+  separately: the WWW-server clause is met, the smartphone/tablet clause is not,
+  and it is a precondition for any packaged mobile app rather than a follow-up.
+- §2.4 said the disclosure names "CC BY-SA 3.0" — it has said 4.0 since the
+  version correction — and renders "on every word and kanji page", a list that
+  omitted the one surface actually missing it.
+- §2.4 said `review_status` is "`licensed-redistribution`, never
+  `primary-source-verified` … which here means KanjiVG alone", which
+  `provenance.json` has contradicted since `www.edrdg.org` answered.
+- §3.3 claimed the suite "fails if any shipped sentence is missing either
+  contributor". It asserted `toBeTruthy()`. The section now says so in a marked
+  block, with the counts.
+
+### What this round still does not claim
+
+- **Not a full import.** 3,000 of 218,148 entries; one number changes it.
+- **Not reviewed glosses.** Nobody read 3,000 entries for sense appropriateness.
+- **Not wired into app search.** The imported tier is still exported data with
+  tests. The capture screen searches the §8 fixture tier — and those 16 lexemes are
+  real JMdict, which is what made the EDRDG acknowledgement obligatory there.
+- **`--verify-reproducible` is not in §17.5**, which must pass with no network.
+  With a warm `--cache` it needs no network either and takes about 45 seconds, but
+  it needs the ~200 MB of archives, so it is a verifier's command, not CI's.
+- **Reproducibility is not permanence.** Upstream moves (D-4). This check answers
+  "is this the script's output from _these_ bytes", which `--check` could not
+  answer at all.
+
+### What a verifier should try to break
+
+1. Revert the dedup in `parseJMdict` (`senses: [...new Set(senses)]`) and confirm
+   `--verify-reproducible` goes red while `--check` stays green. That divergence is
+   the whole of P1-1.
+2. Change `tatoebaCell` back to `parts[3] || null`, regenerate, and confirm
+   `dictionary.test.ts` now fails on the sentinel rather than passing on it.
+3. Point one `fieldProvenance` value at an unregistered id and confirm the importer
+   refuses to emit **and** the offline test fails — two independent gates,
+   deliberately.
+4. Delete the `SeedEntryDisclosure` mount from `capture-screen.tsx` and confirm
+   both the unit contract test and the e2e populated-search case go red. If only
+   one does, the other is not reaching the artefact.
+5. Argue that dropping 1,009 sentence pairs is over-strict — that a sentence with
+   no named owner is public-domain-ish enough to ship. The counter is in the
+   licence text rather than in taste: CC BY 2.0 FR's obligation is to attribute,
+   and there is nobody to attribute. The count is on the record so the argument can
+   be had with numbers.
+
+### Next safe command
+
+Verify this branch from a clean checkout, re-run the check set, and run
+`--verify-reproducible` with a warm cache. Nothing here is merged; no agent may
+merge, approve, or push to `main`.
