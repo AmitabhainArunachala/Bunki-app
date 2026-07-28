@@ -43,16 +43,46 @@ import type {
 // Options
 // ---------------------------------------------------------------------------
 
+/**
+ * What a caller may ask for — and which half of the result each option governs.
+ *
+ * The result has two halves: the walk (`nodes` / `edges`) and the named groups.
+ * They are not governed identically, and the difference is stated here rather
+ * than discovered:
+ *
+ * | option | walk | groups |
+ * | --- | --- | --- |
+ * | `depth` | yes | yes — a group is a walk of fixed length, so `depth: 0` empties every group and `depth: 1` empties `readingFamily` |
+ * | `edgeKinds` | yes | yes |
+ * | `nodeKinds` | yes | yes — including the intermediate `reading` node a family is walked through |
+ * | `maxNodes` | yes | **no** |
+ * | `perGroup` | no | yes |
+ *
+ * `depth`, `edgeKinds` and `nodeKinds` are *filters*: they say which parts of
+ * the graph this query is about, and a group that ignored them would answer a
+ * different question from the walk beside it. `maxNodes` and `perGroup` are
+ * *budgets*, and each has exactly one thing it is a budget for. Letting the
+ * whole-walk ceiling reach into the groups would make a kanji page's
+ * "components" section depend on how many compounds the word happens to have,
+ * which is a coupling nobody could predict from the call site; that is why
+ * `maxNodes` stops at the walk and `perGroup` — reported through
+ * {@link Truncation} whenever it bites — is what bounds a page section.
+ */
 export interface NeighbourhoodOptions {
-  /** Hops from the origin. 0 returns the origin alone. */
+  /** Hops from the origin. 0 returns the origin alone, and empties every group. */
   readonly depth?: number;
-  /** Hard ceiling on returned nodes, origin included. */
+  /** Hard ceiling on returned nodes, origin included. Bounds the walk only. */
   readonly maxNodes?: number;
-  /** Ceiling per named group. */
+  /** Ceiling per named group. Bounds the groups only. */
   readonly perGroup?: number;
-  /** Restrict the walk to these edge kinds. Omit for all of them. */
+  /** Restrict to these edge kinds. Omit for all of them. Applies to walk and groups. */
   readonly edgeKinds?: readonly GraphEdgeKind[];
-  /** Restrict the walk to these node kinds. The origin is always included. */
+  /**
+   * Restrict to these node kinds. The origin is always included. Applies to walk
+   * and groups — a `readingFamily` is walked *through* a `reading` node, so
+   * excluding that kind empties the family rather than tunnelling under the
+   * restriction.
+   */
   readonly nodeKinds?: readonly GraphNodeKind[];
 }
 
@@ -281,7 +311,11 @@ export function neighbourhoodOf(
 
   const included = new Set(order.map((entry) => entry.id));
   const edges = collectEdges(graph, included, edgeKinds);
-  const groups = collectGroups(graph, origin, depthById, perGroup, truncated);
+  const groups = collectGroups(graph, origin, depthById, perGroup, truncated, {
+    depthLimit,
+    edgeKinds,
+    nodeKinds,
+  });
 
   return Object.freeze({
     origin,
@@ -429,19 +463,47 @@ function matchesRule(step: Adjacency, rule: GroupRule, neighbour: GraphNode): bo
   return true;
 }
 
+/**
+ * The filter half of {@link NeighbourhoodOptions}, resolved.
+ *
+ * Passed as one object so that adding a filter to the options cannot be applied
+ * to the walk and forgotten in the groups — the compiler asks for it in both
+ * places. That asymmetry was a real defect: the groups used to read the origin's
+ * adjacency directly and applied none of `depth`, `edgeKinds` or `nodeKinds`, so
+ * a caller who restricted a query got a walk that honoured the restriction and a
+ * set of groups beside it that did not, with nothing saying so.
+ */
+interface GroupFilters {
+  readonly depthLimit: number;
+  readonly edgeKinds: ReadonlySet<GraphEdgeKind> | null;
+  readonly nodeKinds: ReadonlySet<GraphNodeKind> | null;
+}
+
+function admits(filters: GroupFilters, step: Adjacency, neighbour: GraphNode): boolean {
+  if (filters.edgeKinds !== null && !filters.edgeKinds.has(step.kind)) return false;
+  if (filters.nodeKinds !== null && !filters.nodeKinds.has(neighbour.kind)) return false;
+  return true;
+}
+
 function collectGroups(
   graph: KnowledgeGraph,
   origin: GraphNode,
   depthById: ReadonlyMap<GraphNodeId, number>,
   perGroup: number,
   truncated: Truncation[],
+  filters: GroupFilters,
 ): NeighbourhoodGroups {
   const collected = new Map<NeighbourhoodGroupName, GroupMember[]>();
   NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => collected.set(name, []));
 
+  // Every group is at least one hop, so `depth: 0` — "the origin alone" — leaves
+  // all of them empty rather than quietly returning a ring the walk refused.
+  if (filters.depthLimit < 1) return freezeGroups(collected, perGroup, truncated);
+
   for (const step of adjacencyOf(graph, origin.id)) {
     const neighbour = graph.nodes.get(step.other);
     if (neighbour === undefined) continue;
+    if (!admits(filters, step, neighbour)) continue;
     ONE_HOP_GROUPS.forEach((rule) => {
       if (!matchesRule(step, rule, neighbour)) return;
       collected.get(rule.name)?.push({
@@ -453,8 +515,18 @@ function collectGroups(
     });
   }
 
-  collectReadingFamily(graph, origin, depthById, collected);
+  // The reading family is the one two-hop group, so it needs the depth for both
+  // hops before it can be walked at all.
+  if (filters.depthLimit >= 2) collectReadingFamily(graph, origin, depthById, collected, filters);
 
+  return freezeGroups(collected, perGroup, truncated);
+}
+
+function freezeGroups(
+  collected: Map<NeighbourhoodGroupName, GroupMember[]>,
+  perGroup: number,
+  truncated: Truncation[],
+): NeighbourhoodGroups {
   const groups: Partial<Record<NeighbourhoodGroupName, readonly GroupMember[]>> = {};
   NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => {
     const members = collected.get(name) ?? [];
@@ -488,12 +560,18 @@ function collectGroups(
  * The origin itself is excluded (a node is not in its own family), and so are
  * nodes reachable by a single `has_reading` edge from the origin — those are
  * the readings, not the family.
+ *
+ * Both hops are filtered, including the intermediate `reading` node: a caller
+ * who excluded `reading` from `nodeKinds` asked for a query that does not go
+ * through readings, and a family that tunnelled under that restriction would be
+ * reporting a relation the same call said it did not want.
  */
 function collectReadingFamily(
   graph: KnowledgeGraph,
   origin: GraphNode,
   depthById: ReadonlyMap<GraphNodeId, number>,
   collected: Map<NeighbourhoodGroupName, GroupMember[]>,
+  filters: GroupFilters,
 ): void {
   const family = collected.get('readingFamily');
   if (family === undefined) return;
@@ -502,12 +580,16 @@ function collectReadingFamily(
   for (const step of adjacencyOf(graph, origin.id)) {
     if (step.kind !== 'has_reading' || step.direction !== 'outgoing') continue;
     const readingId = step.other;
+    const readingNode = graph.nodes.get(readingId);
+    if (readingNode === undefined) continue;
+    if (!admits(filters, step, readingNode)) continue;
 
     for (const back of adjacencyOf(graph, readingId)) {
       if (back.kind !== 'has_reading' || back.direction !== 'incoming') continue;
       if (seen.has(back.other)) continue;
       const sibling = graph.nodes.get(back.other);
       if (sibling === undefined) continue;
+      if (!admits(filters, back, sibling)) continue;
       seen.add(back.other);
       family.push({
         node: sibling,

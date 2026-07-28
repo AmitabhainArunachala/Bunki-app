@@ -130,6 +130,84 @@ describe('neighbourhoodOf', () => {
   });
 });
 
+/**
+ * The filters govern the walk and the named groups identically.
+ *
+ * They used not to: `collectGroups` read the origin's adjacency directly and
+ * applied none of `depth`, `edgeKinds` or `nodeKinds`, so a restricted query
+ * returned a walk that honoured the restriction and a set of groups beside it
+ * that did not — with nothing in the type or the doc saying so. Two halves of
+ * one options object behaving differently is a trap, and these are the tests
+ * that would have caught it.
+ */
+describe('the filters govern the groups exactly as they govern the walk', () => {
+  it('empties every group at depth 0, where the walk returns the origin alone', () => {
+    const result = neighbourhoodOf(graph, 'kanji:分', { depth: 0 });
+    expect(result.nodes).toHaveLength(1);
+    NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => {
+      expect(groupOf(result, name), name).toEqual([]);
+    });
+  });
+
+  it('keeps one-hop groups but empties the two-hop reading family at depth 1', () => {
+    const result = neighbourhoodOf(graph, 'kanji:分', { depth: 1 });
+    expect(labels(groupOf(result, 'components'))).toEqual(['八', '刀']);
+    expect(groupOf(result, 'readingFamily')).toEqual([]);
+  });
+
+  it('restricts the groups by edge kind', () => {
+    const result = neighbourhoodOf(graph, 'kanji:分', { depth: 2, edgeKinds: ['component_of'] });
+    expect(labels(groupOf(result, 'components'))).toEqual(['八', '刀']);
+    expect(groupOf(result, 'compounds')).toEqual([]);
+    expect(groupOf(result, 'contrasts')).toEqual([]);
+    expect(groupOf(result, 'readingFamily')).toEqual([]);
+  });
+
+  it('restricts the groups by node kind', () => {
+    const result = neighbourhoodOf(graph, 'kanji:分', { depth: 2, nodeKinds: ['component'] });
+    expect(labels(groupOf(result, 'components'))).toEqual(['八', '刀']);
+    expect(groupOf(result, 'compounds')).toEqual([]);
+  });
+
+  it('does not tunnel the reading family under a node-kind restriction', () => {
+    // The family is walked *through* `reading:ブン`. A caller who excluded
+    // `reading` asked for a query that does not go through readings, so the
+    // family is empty even though 文 and 聞 are themselves an admitted kind.
+    const result = neighbourhoodOf(graph, 'kanji:分', {
+      depth: 2,
+      nodeKinds: ['kanji', 'lexeme', 'component'],
+    });
+    expect(groupOf(result, 'readingFamily')).toEqual([]);
+  });
+
+  it('every group member is also a node the same walk returned', () => {
+    const options = [
+      { depth: 2 },
+      { depth: 1 },
+      { depth: 2, edgeKinds: ['component_of'] as const },
+      { depth: 2, nodeKinds: ['component'] as const },
+    ];
+    options.forEach((option) => {
+      const result = neighbourhoodOf(graph, 'kanji:分', { ...option, maxNodes: 500 });
+      const walked = new Set(result.nodes.map((entry) => entry.node.id));
+      NEIGHBOURHOOD_GROUP_NAMES.forEach((name) => {
+        groupOf(result, name).forEach((member) => {
+          expect(walked.has(member.node.id), `${name}: ${member.node.id}`).toBe(true);
+        });
+      });
+    });
+  });
+
+  it('leaves the groups alone when maxNodes bites — that budget is the walk’s', () => {
+    // Documented asymmetry, and the one the type comment argues for: a kanji
+    // page's "components" section must not shrink because the word happens to
+    // have many compounds.
+    const tight = neighbourhoodOf(graph, 'kanji:分', { depth: 2, maxNodes: 2 });
+    expect(tight.nodes.length).toBeLessThanOrEqual(2);
+    expect(labels(groupOf(tight, 'components'))).toEqual(['八', '刀']);
+  });
+});
+
 describe('the bounds, and saying when they bit', () => {
   it('says nothing was truncated when the whole neighbourhood fits', () => {
     const closed = buildKnowledgeGraph({
