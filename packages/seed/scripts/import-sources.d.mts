@@ -102,6 +102,7 @@ export function parseArgs(argv: readonly string[]): {
   readonly verifyReproducible: boolean;
   readonly verifyFixtures: boolean;
   readonly rewriteFixtures: boolean;
+  readonly verifyAttribution: boolean;
 };
 
 export function assertProvenanceRegistered(): Promise<boolean>;
@@ -125,3 +126,4 @@ export function runImport(
   readonly dataDir: string;
 }>;
 export function verifyReproducible(options: unknown): Promise<number>;
+export function verifyAttribution(options: unknown): Promise<number>;

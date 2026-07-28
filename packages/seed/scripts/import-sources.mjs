@@ -24,6 +24,14 @@
  *       from upstream. A committed file left over from an older version of this
  *       script passes --check and is still not reproducible.
  *
+ *   node packages/seed/scripts/import-sources.mjs --verify-attribution
+ *       Checks every shipped sentence credit against the Tatoeba export itself:
+ *       the contributor each record names must be the username that export
+ *       records for that sentence id, over the text that export carries. The
+ *       offline suite can only check that a credit *looks like* a name; a name
+ *       that is simply wrong passes every shape check and is exactly the failure
+ *       CC BY 2.0 FR is about. Needs the cached archives.
+ *
  *   node packages/seed/scripts/import-sources.mjs --verify-reproducible
  *       The check --check cannot make. Re-runs the whole pipeline from the cached
  *       archives into a scratch directory and diffs the result, byte for byte,
@@ -33,6 +41,7 @@
  *
  * Flags: --lexemes=N|all  --sentences=N  --strokes=N|all|none  --concurrency=N
  *        --cache=DIR  --offline  --licences  --check  --verify-reproducible
+ *        --verify-attribution  --verify-fixtures  --rewrite-fixtures
  *
  * ── The licence gate ────────────────────────────────────────────────────────
  * `assertLicensed()` runs before a source's bytes are parsed, not after. A source
@@ -311,7 +320,81 @@ export function parseArgs(argv) {
     verifyReproducible: argv.includes('--verify-reproducible'),
     verifyFixtures: argv.includes('--verify-fixtures'),
     rewriteFixtures: argv.includes('--rewrite-fixtures'),
+    verifyAttribution: argv.includes('--verify-attribution'),
   };
+}
+
+/**
+ * Check every shipped sentence credit against the Tatoeba export itself.
+ *
+ * The offline suite asserts that each contributor *looks like* a name — a
+ * positive pattern, after a round in which `toBeTruthy()` waved the MySQL NULL
+ * sentinel `\N` onto 652 of 2,000 records. That predicate catches a sentinel and
+ * a blank. It cannot catch a name that is simply **wrong**: `bunbuku` where the
+ * export says `CK` passes every shape check and is still a false attribution,
+ * which under CC BY 2.0 FR is the one thing the licence is about.
+ *
+ * So this re-reads the exports and compares, per sentence id, the shipped
+ * contributor against the username that export records. Both halves, because
+ * they are two works by two people. Needs the cached archives, so it is a
+ * verifier's command rather than part of §17.5 — which must pass with no
+ * network.
+ */
+export async function verifyAttribution(options) {
+  const shipped = JSON.parse(await readFile(join(OUT_DIR, 'sentences.json'), 'utf8')).records;
+  const wantJpn = new Set(shipped.map((record) => record.tatoeba.japaneseId));
+  const wantEng = new Set(shipped.map((record) => record.tatoeba.englishId));
+
+  const jpnGot = await download(
+    SOURCES['tatoeba-jpn'].download.url,
+    SOURCES['tatoeba-jpn'].download.cacheAs,
+    options,
+  );
+  const engGot = await download(
+    SOURCES['tatoeba-eng'].download.url,
+    SOURCES['tatoeba-eng'].download.cacheAs,
+    options,
+  );
+  const jpn = await parseTatoebaSentences(jpnGot.path, wantJpn);
+  const eng = await parseTatoebaSentences(engGot.path, wantEng);
+
+  let bad = 0;
+  let checked = 0;
+  for (const record of shipped) {
+    for (const [half, index, credited] of [
+      ['japanese', jpn, record.tatoeba.japaneseContributor],
+      ['english', eng, record.tatoeba.englishContributor],
+    ]) {
+      const id = half === 'japanese' ? record.tatoeba.japaneseId : record.tatoeba.englishId;
+      const upstream = index.get(id);
+      checked += 1;
+      if (upstream === undefined) {
+        bad += 1;
+        console.log(`MISSING  ${record.id} ${half} id=${id} is not in the current export`);
+        continue;
+      }
+      if (upstream.username !== credited) {
+        bad += 1;
+        console.log(
+          `DIFFER   ${record.id} ${half} id=${id} shipped="${String(credited)}" export="${String(upstream.username)}"`,
+        );
+      }
+      // The text has to be the author's too: crediting the right person for a
+      // sentence they did not write is the same failure wearing a better name.
+      const text = half === 'japanese' ? record.japanese : record.english;
+      if (upstream.text !== text) {
+        bad += 1;
+        console.log(`TEXT     ${record.id} ${half} id=${id} does not match the export's text`);
+      }
+    }
+  }
+
+  console.log(
+    bad === 0
+      ? `ATTRIBUTED  all ${shipped.length} sentence pairs (${checked} halves) name the contributor the Tatoeba export names, over the text the export carries`
+      : `${bad} attribution problem(s) across ${shipped.length} pairs`,
+  );
+  return bad;
 }
 
 /**
@@ -1474,6 +1557,12 @@ async function main() {
 
   if (options.verifyReproducible) {
     const bad = await verifyReproducible(options);
+    if (bad > 0) process.exitCode = 1;
+    return;
+  }
+
+  if (options.verifyAttribution) {
+    const bad = await verifyAttribution(options);
     if (bad > 0) process.exitCode = 1;
     return;
   }

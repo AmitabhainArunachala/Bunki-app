@@ -231,6 +231,37 @@ describe('every record carries a real upstream identifier', () => {
     }
   });
 
+  it('does not contain the NULL sentinel anywhere in the shipped file', () => {
+    // Independent of the per-record predicate above, and cheaper to reason
+    // about: the two characters `\N` are the Tatoeba export's MySQL NULL marker,
+    // 652 of them shipped as contributor names in round 1, and they have no
+    // legitimate reason to appear in this file in any field at all.
+    const raw = readText('data/dictionary/sentences.json');
+    expect(raw).not.toContain('\\\\N');
+    const sentinels = sentences.filter(
+      (sentence) =>
+        sentence.tatoeba.japaneseContributor === '\\N' ||
+        sentence.tatoeba.englishContributor === '\\N',
+    );
+    expect(sentinels.map((sentence) => sentence.id)).toEqual([]);
+  });
+
+  it('drops rather than softens: the count is on the record, with its reason', () => {
+    // The round-1 repair could have been done two ways — resolve the missing
+    // contributors, or drop the pairs. It dropped them, and "we removed rather
+    // than softened" is only checkable if the number is written down.
+    const dropped = manifest.counts['sentencePairsDroppedWithoutNamedContributor'];
+    expect(dropped).toBeTypeOf('number');
+    expect(dropped, 'no pairs were dropped, which for this corpus is implausible').toBeGreaterThan(
+      0,
+    );
+    const reason = manifest.deferred.find((entry) => entry.source === 'tatoeba')?.reason ?? '';
+    expect(reason).toContain(String(dropped));
+    expect(reason).toMatch(/NULL sentinel/);
+    // …and every pair that *did* ship names both people.
+    expect(sentences.length).toBe(manifest.counts['sentences']);
+  });
+
   it('rejects the sentinel and the blanks that used to pass for a name', () => {
     // The negative half. Without it the predicate above could be loosened back to
     // something a sentinel satisfies and nothing would notice.

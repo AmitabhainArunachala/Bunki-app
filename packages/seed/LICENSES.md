@@ -480,7 +480,31 @@ sentences that does ship names both of its contributors.
 > beside it, and the sentence above is true of the data rather than of the
 > intention.
 
-On screen, `SEED_ENTRY_DISCLOSURE` names the Tatoeba Project and CC BY 2.0 FR.
+**The repair was re-verified against the licensor's own export, not just against
+its own shape.** The offline suite asserts that each contributor _looks like_ a
+name — a positive pattern with the sentinel and the blanks as its negative
+case — and that is what catches a regression to `toBeTruthy()`. It cannot catch a
+credit that is simply **wrong**: `bunbuku` where the export says `CK` passes
+every shape check and is still a false attribution, which under CC BY 2.0 FR is
+the one failure that matters. So:
+
+```bash
+node packages/seed/scripts/import-sources.mjs --offline --verify-attribution
+ATTRIBUTED  all 2000 sentence pairs (4000 halves) name the contributor the
+Tatoeba export names, over the text the export carries
+```
+
+Both halves of all 2,000 pairs, checked by sentence id against
+`jpn_sentences_detailed.tsv` and `eng_sentences_detailed.tsv`: the shipped
+username equals the export's username, and the shipped text equals the export's
+text. Crediting the right person for a sentence they did not write would be the
+same failure wearing a better name, so the text is compared too. The command
+needs the cached archives and is therefore a verifier's check rather than part
+of §17.5, which must pass with no network.
+
+On screen, `SEED_ENTRY_DISCLOSURE` names the Tatoeba Project and CC BY 2.0 FR,
+and each sentence card on a word page names **both** contributors with their
+sentence ids — the credit is where the reader is, not only in this file.
 
 ### 3.4 What is _not_ Tatoeba
 
