@@ -4816,3 +4816,140 @@ licence text is obtainable, and CC BY 2.0 FR additionally requires per-sentence
 contributor attribution that no reachable artefact carries. Under the rule
 "licence first, data second", no Tatoeba content is shipped. The sentences stay
 project-authored and stay labelled as project-authored.
+
+---
+
+## Appendix — B3: what shipped, the §17.5 results, and one scope conflict reported not resolved
+
+### What is now real
+
+| Layer | Before (WP-04) | Now | Identifier carried |
+| --- | --- | --- | --- |
+| Lexeme `reading`, `partOfSpeech`, `senses` | `bunki-editorial`, `unreviewed`, id `null` | **JMdict (EDRDG)**, CC BY-SA 3.0 | real `ent_seq` (e.g. 分岐 → `1503340`) |
+| Kanji `onReadings`, `kunReadings`, `meanings` | `bunki-editorial`, `unreviewed`, id `null` | **KANJIDIC2 (EDRDG)**, CC BY-SA 3.0 | KANJIDIC2 literal |
+| Kanji `strokeCount`, `components`, `radicals`, `strokeSvg` | KanjiVG, verified | unchanged | KanjiVG file path |
+| Sentences, grammar, passage | project-authored | **unchanged, still project-authored** | none, correctly |
+
+The values changed, not merely their labels — which is the point, because it
+means the old ones were wrong:
+
+- 分岐 was hand-written as *branching / forking / divergence / bifurcation*.
+  JMdict 1503340 says *divergence / ramification / bifurcation / branching off*.
+- 分岐点 was hand-written as *branch point / junction / fork in a road or line /
+  turning point*. JMdict 1503370 says *junction / crossroads / division point /
+  parting of ways*.
+- 岐 was given the kun readings えだ and わか.れる. KANJIDIC2 gives 岐 **no**
+  `ja_kun` reading at all, so the shipped list is now honestly empty. A
+  hand-written list had invented two readings for a character that has none.
+
+KANJIDIC2's `stroke_count` agrees with the KanjiVG-derived `strokeCount` on all
+ten characters — an independent cross-check the seed had no way to run before.
+
+### Reproduction, run end-to-end against upstream
+
+`node packages/seed/scripts/fetch-edrdg.mjs --check` re-downloaded the artefact
+and re-derived every value. Exit code 0:
+
+```
+sdist bytes=53940912 sha256=a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415
+jamdict.db.xz sha256 matches pin
+EDRDG licence statement matches the committed copy byte-for-byte
+MATCH  lex-bunki ent_seq=1503340   … 16 lexemes, all MATCH
+MATCH  kanji-05206 literal=分       … 10 kanji, all MATCH
+MATCH  edrdg-upstream.json databaseMeta
+```
+
+### §17.5 check set
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | clean, no output |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **87 files, 1435 tests passed** (was 1397 before this round) |
+| `npm run test:e2e` | **38 passed (55.7s)** |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist`, 13 static routes, 1.7 MB bundle |
+
+The two `✘` lines inside the 38 remain the pre-existing `test.fail()` expected
+failures in `adv-known-defects.spec.ts`, unchanged and untouched by this round.
+`npm ci` was run in this worktree before any check was trusted.
+
+The e2e lane initially failed 38/38 with `No web export at apps/app/dist`. That
+was the harness refusing to build its own fixture, not a regression — the §17.5
+build step had not yet run in this worktree. Recorded because a reader seeing
+"38 failed" in a log needs to know which of the two it was.
+
+### The scope conflict — reported, not silently resolved
+
+My instructions asked for "on the order of a few hundred to a few thousand
+lexemes". I did not do that, and the reason is not caution:
+
+- **Controller §8**, hash-verified `de7b6fcc…`, specifies "approximately 12–20
+  lexemes, 8–12 kanji" for `packages/seed/data/`, and `test/dataset.test.ts`
+  encodes it as a scope contract with the comment that "a seed that quietly
+  grows into a half-imported dictionary is exactly the outcome §2 and WP-04's
+  'not done' list forbid".
+- **The operator's own Master Definition of Done §4** places "dictionary
+  scale-up, full kanji depth" in campaign **C2**, and states that C2–C5
+  controllers "are derived only after the preceding checkpoint … never
+  speculatively". C1 has not been declared.
+- The orchestration spec's supremacy rule and the launcher both say the
+  controller wins on conflict and the conflict is **reported, never silently
+  resolved**.
+
+Scaling the seed to thousands of entries now would have pre-empted a campaign
+the operator's own definition of done gates behind a checkpoint he has not
+declared, and would have done it by editing a test whose stated purpose is to
+prevent exactly that edit. So this round maximised **fidelity** within §8
+instead of **scale** beyond it: the count is unchanged at 16/10, and every
+lexicographic claim inside that count is now real licensed dictionary data.
+
+This is the operator's request satisfied on the axis available — "real
+dictionary … on all levels: vocab, kanji" — with the third level, example
+sentences, blocked by licence facts rather than by scope. **The scale-up he is
+asking for is C2 work, and it needs his C1 checkpoint first.** That is a
+decision for him, not for a builder, and it is the one thing in this round I
+could not do for him.
+
+### What this round does not claim
+
+- **Not primary-source verification.** `www.edrdg.org` was never reached. The
+  EDRDG statement on file could be superseded; the recorded state says CC BY-SA
+  3.0 because that is what the statement travelling with these bytes says, and
+  the possibility that current JMdict is 4.0 is logged as open item **D-1a**,
+  not resolved by assumption.
+- **Not a 2026 dictionary.** The pinned artefact was compiled 2021-04-17 and
+  KANJIDIC2 within it is dated April 2008. Entries edited upstream since then
+  are not reflected. This is recorded in `source_version`, visible on screen.
+- **Not example sentences.** Tatoeba is unreachable, the pinned database has no
+  examples table, and SPDX carries no `CC-BY-2.0-FR` text. Licence first, data
+  second — so nothing was shipped and nothing was labelled.
+- **Not a review of the glosses.** Nobody read all 16 entries for sense
+  appropriateness; they are upstream's, faithfully extracted and flattened.
+
+### What a verifier should try to break
+
+1. Change one `source_entry_id` in `data/lexemes.json` to a plausible but wrong
+   `ent_seq` and confirm `test/edrdg.test.ts` goes red. Then confirm
+   `fetch-edrdg.mjs --check` catches a wrong *value* that the offline suite
+   cannot see — the two checks have different reach, and the boundary matters.
+2. Delete `licenses/EDRDG-licence-statement.md` and confirm the suite fails
+   rather than falling back to the registry's prose. Then edit one byte of it
+   and confirm the digest check fails too.
+3. Add a registry source with `license: "CC BY-SA 4.0"` and no licence file, and
+   confirm it fails. That is the assertion the whole round rests on.
+4. Rewrite `SEED_ENTRY_DISCLOSURE` to drop "written by this project" and confirm
+   both the seed suite and the e2e claim audit go red. Understating real data
+   and overstating project text are both failures; check the tests catch both
+   directions, not just one.
+5. Ask whether `licensed-redistribution` is doing honest work or laundering a
+   mirror. The three conditions are in `LICENSES.md`; check that `kotobako-data`
+   really does fail them and that nothing in the repo quietly admits it.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-real-dictionary` into
+`agent/bunki-phase0-integration` and have a human review it — in particular the
+`licensed-redistribution` state, which is a new epistemic category and should
+not enter the vocabulary without a human agreeing it is honest. Nothing here is
+merged; no agent may merge, approve, or push to `main`.
