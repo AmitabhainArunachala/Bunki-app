@@ -4674,3 +4674,220 @@ Same as the lane's: open a **draft** PR from
 `agent/bunki-phase0-closed-loop-wp10-export` into
 `agent/bunki-phase0-integration` and have a human review it. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, wave A2 (Builder A2): domain-side projections for the map and journeys
+
+**Branch:** `agent/bunki-e-projections`, cut from `origin/agent/bunki-campaign-e`
+(`bc9ffe9`, which sits on the verified Phase-0 `main` at `cbb7f29`).
+**Surfaces written:** `packages/domain/src/graph/**`,
+`packages/domain/src/journey/**`, their tests, one additive function in the FSRS
+wrapper, two lines in the package barrel, and this appendix. Nothing in
+`apps/`, nothing in `src/evidence/`, nothing in `src/session/`.
+
+### What this lane is
+
+Wave A2 of Campaign E: the read-side projections the map (B1) and the journey
+screens (B5) need, built and tested before any pixel exists. Pure logic. The
+whole lane is a projection — it reads state and describes it, and there is no
+path from any of it into the ledger.
+
+### 1. The graph neighbourhood projection
+
+`src/graph/` is a query layer over caller-supplied nodes and typed edges. It is
+deliberately not a dictionary: `@bunki/domain` may not import `@bunki/seed`
+(ADR-001 boundary 1), so the 3,000-lexeme tier is an _input size_ here, not a
+dependency, and the projection does not have to be rebuilt when the tier grows.
+
+- `model.ts` — the frozen v1 §2.1 vocabulary as closed lists. Nodes: kanji,
+  component, lexeme, sense, reading, grammar construction, sentence, encounter.
+  Edges: `contains`, role-tagged `component_of`, `contrasts_with`,
+  `collocates_with`, `derives_from`, `has_reading`, `has_sense`, `realises`,
+  `appeared_in`. `reading` and `sense` are nodes rather than fields because a
+  reading family is one hop through a shared node instead of a scan.
+- `build.ts` — one indexing pass, adjacency pre-sorted by a total order, so
+  every later query is proportional to what it returns. A dangling edge, a
+  duplicate node id, and a self-edge are each excluded from the walk **and
+  reported** on `diagnostics`; a map that silently dropped an edge would make
+  the word look like it has no compounds.
+- `neighbourhood.ts` — bounded BFS parameterised by `depth`, `maxNodes` and
+  `perGroup`, plus the named groups a page renders. Every bound that actually
+  bit is recorded in `truncated` with the count it cut from. The depth record
+  fires only when the frontier really has unexplored neighbours — over-reporting
+  ("there is more here" wherever a walk ends) is the same dishonesty pointed the
+  other way, and the first draft did exactly that until a test caught it.
+
+### 2. The retrievability projection
+
+REQ-UI-07 lists four values and its main verb is "never collapse". So
+`LensProjection` carries four fields — `stabilityDays`, `retrievability`,
+`uncertainty`, `coverage` — plus `dueState`, `lapses` and the contributing
+contract ids, and **no fifth field summarises them**. `NodeRetrievability` has
+exactly three keys: `nodeId`, `at`, `lenses`.
+
+- Five lenses (reading, meaning, listening, production, writing), mapped to
+  scheduled skills as data. `writing` maps to nothing, because Phase 0 has no
+  handwriting contract skill and REQ-LM-02 surfaces handwriting only when
+  activated; every node reports it `unknown`, honestly, forever, until a
+  contract exists. `discrimination` is listed in
+  `SKILLS_OUTSIDE_THE_FIVE_LENSES` rather than folded into `meaning` — folding
+  it would make a contrast contract's evidence read as meaning evidence, which
+  is REQ-UI-07's forbidden collapse one level down.
+- **Unknown is not zero.** Three presence states: `unknown` (no contract),
+  `activated_untested` (contract, no admitted review), `attested`. The first two
+  carry `null` retrievability. `isFragile` is a _policy_, parameterised and
+  reversible, and it can never return true for an unmeasured lens whatever the
+  policy asks for.
+- Uncertainty is an interpretable band over the admitted review count, not a
+  fabricated confidence interval — REQ-LM-04 names cold-start false precision as
+  the risk, and a CI computed from two reviews is exactly that. The rule is
+  exported as a sentence a surface can show.
+- A lens with several contracts takes the **weakest** retrievability, never an
+  average: averaging would let a strong contract hide a forgotten one, and the
+  map's job is to show the frontier.
+- Time scrubber: `buildMemoryHistories` folds the reviews the gate already
+  admitted through the same `initialMemoryState` / `applyAdmittedReview` pair
+  replay uses, so the last version of every history equals replay's own answer
+  by construction rather than by coincidence. Frames are sorted and walked with
+  a per-contract cursor, so fourteen months is one linear pass.
+
+**One deviation from the declared surface, stated plainly.**
+`memoryStateRetrievability` was added to
+`packages/domain/src/reducers/memory-state.ts` rather than to `src/graph/`.
+REQ-SCH-01 has one scheduler, and
+`test/purity/no-ambient-nondeterminism.test.ts` pins `ts-fsrs` to exactly two
+importers; re-deriving the forgetting curve from `FSRS_WEIGHTS` inside a
+projection would have been a second implementation of the scheduler's core
+function, free to drift on the next pin bump, and every "honest brightness"
+claim would then have rested on a copy. The change is purely additive: no
+existing export was touched, no behaviour changed, and the new function writes
+nothing. It returns `null` — not `0` — for a never-reviewed card, which is where
+the unknown/fragile distinction is actually created.
+
+### 3. The journey compiler
+
+`src/journey/` implements REQ-JRN-01's rule in full. `src/session/repair.ts` is
+untouched and its suite still passes unchanged.
+
+All six branch families, carrying the requirement's own caveat that they are
+route families and **not** an ontology. The sixth — task misunderstanding — is
+the one most systems omit and the most common; without it a mis-tap becomes
+evidence of a meaning gap and the journey repairs something that was never
+broken.
+
+**"Do not infer a cause confidently from one stumble" is structural, not
+advisory.** Four properties carry it, because a rule in a comment is a rule
+until somebody is in a hurry:
+
+1. There is no `cause`, `diagnosis` or `confidence` field on the output type.
+2. Two or more paths are always offered whenever two are structurally available;
+   ranking decides the order, never the survivors.
+3. `selectBranch` refuses with `probe_required` on a first stumble, however
+   suggestive the observations are. An "unsure" answer counts as no answer.
+4. `recommended` is a lookup on the skill that stumbled, not an inference.
+
+Probes are one-question and declare what each answer raises; `selectProbes`
+picks at most two and **declines a probe that moves every offered family
+together**, because a question that cannot change the ranking is a survey. A
+probe answer carries `producesEvidence: false` and never reaches the scheduler.
+
+Rejoin is a contract-defined evidence criterion: named contracts, a count of
+qualifying _observations_ — admitted, unaided, a success, on a named contract,
+after entry — optionally across separate sittings. Fifty unaided-but-wrong
+attempts leave the branch open; one qualifying success closes it.
+
+**"Not a new backlog" is also structural.** Decay is a projection of the instant
+you ask about rather than a stored countdown, so nothing has to run to expire an
+opportunity. There is a hard cap of 8 on what is ever returned. A repeat stumble
+_refreshes_ an existing (contract, family) entry instead of stacking a row. And
+`session/plan.ts` neither imports nor can reach any of it — asserted directly by
+reading the file. 500 stumbles yield 8 active opportunities, and 0 after 200
+days with nothing pinned.
+
+The Phase-0 `JourneyCompiler` seam is **superseded, not implemented**: its
+signature returns branches straight from a stumble, with nowhere to put the
+probes, so implementing it would be the forbidden inference.
+`JOURNEY_COMPILER_SUPERSESSION` records that as data and files the seam-text
+update as a coordination request, on the COORD-B8-1 precedent that file already
+sets. No test of `repair.ts` was weakened.
+
+### 4. Tests
+
+172 new tests across ten files. The load-bearing ones:
+
+| Claim                                      | Where                                                                                                                                                            |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Projections are deterministic and pure     | reversed-input equality in `build.test.ts` / `neighbourhood.test.ts`; a source scan for ambient clock, randomness, `fetch`, timers                                  |
+| No single collapsed mastery number         | serialisation check in `retrievability.test.ts` **and** an identifier scan over `src/graph` + `src/journey` in `no-collapsed-scalar.test.ts`                        |
+| Unknown vs fragile are distinguishable     | `presence`, `null` vs number, and `isFragile` refusing an unmeasured lens                                                                                          |
+| The compiler never fabricates a cause      | five separate attempts to make it, in `compiler.test.ts`                                                                                                           |
+| Rejoin is never a step count               | 50 attempts leave it open; one success closes it                                                                                                                   |
+| Performance over the full dictionary tier  | `dictionary-tier-performance.test.ts`: index build, 1000 bounded queries, a whole-map projection of 3,000 nodes, and a **scaling** assertion that query cost does not grow with graph size |
+
+The scaling assertion is the real claim; the wall-clock ceilings are generous on
+purpose, because a budget tight enough to be interesting on this machine is a
+flake on a shared runner.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| `npm ci` (own worktree, no inherited modules)   | clean install, exit 0                                 |
+| `npm run lint`                                  | pass, no output                                       |
+| `npm run format:check`                          | pass — "All matched files use Prettier code style!"    |
+| `npm run typecheck`                             | pass, root + 6 workspaces                             |
+| `npm run test`                                  | **1589 passed**, 96 files (was 1417 / 86 at branch point) |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                                    |
+| `npm run verify:export` (T-14)                  | 14 passed, 1 file                                     |
+| `cd apps/app && npx expo export --platform web` | pass — 13 static routes                               |
+| `npm run test:e2e`                              | **38 passed**, exit 0                                 |
+
+The two `✘` lines in the e2e output are the pre-existing `test.fail()` expected
+failures in `adv-known-defects.spec.ts`, counted in the 38 exactly as the WP-10
+appendix above records. Neither is touched by this lane.
+
+### What this lane does **not** claim
+
+- **That the graph is populated.** This is a query layer over a source the
+  caller supplies. Nothing here builds the Atlas from `@bunki/seed`, and the
+  3,000-lexeme figure in the performance suite is a synthetic tier of the right
+  shape, not the real dictionary.
+- **That the uncertainty bands are calibrated.** They are an interpretable
+  counting rule, chosen because REQ-LM-04 asks for one and because a fabricated
+  interval would be worse. Nobody has compared them against later direct probes,
+  which is REQ-LM-05's job and is not done here.
+- **That the branch families are the right six.** They are REQ-JRN-01's six, and
+  the requirement itself says they are not a complete ontology. The compiler
+  routes what it can and records why the rest were unavailable.
+- **That the probe catalogue diagnoses well.** Each probe separates the families
+  it claims to separate — that is tested. Whether the questions elicit truthful
+  answers from a real learner is an operator question, not a unit test.
+- **Anything about how this looks.** No UI was written and none is implied.
+
+### What a verifier should try to break
+
+1. Add a `masteryScore` field to `LensProjection`, computed from the four
+   values, and confirm both the serialisation test and the identifier scan go
+   red. One of them alone is not enough.
+2. Make `memoryStateRetrievability` return `0` instead of `null` for a
+   never-reviewed card and confirm the unknown/fragile tests fail. This is the
+   single line the whole honesty claim rests on.
+3. Delete the `probe_required` branch from `selectBranch` and confirm the
+   single-stumble tests go red — then check that the compiler still cannot be
+   made to emit a cause field, which is a different guard.
+4. Remove the cap in `activeQuietOpportunities` and confirm the 500-stumble test
+   fails; then remove the _decay_ instead and confirm the 200-day test fails.
+   Both, not one.
+5. Re-derive the forgetting curve inside `src/graph/` from `FSRS_WEIGHTS` and
+   confirm `test/purity/no-ambient-nondeterminism.test.ts` refuses the second
+   `ts-fsrs` importer. That test is the reason the deviation above exists.
+6. Reorder the `edges` array in any fixture and confirm every neighbourhood
+   result is byte-identical. A projection whose output depends on input order
+   cannot back a screenshot.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-e-projections` into
+`agent/bunki-campaign-e` and have a human review it. Nothing here is merged; no
+agent may merge, approve, or push to `main`.
