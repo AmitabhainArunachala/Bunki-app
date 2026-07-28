@@ -57,6 +57,20 @@ import { useTheme } from '../theme-context.tsx';
 import { DiveNode, type NodeMark } from './dive-node.tsx';
 import type { FlightDirection } from './dive-state.ts';
 
+/**
+ * How many members of one ring are drawn on the canvas.
+ *
+ * Separate from the domain's own `perLevel` budget, and deliberately smaller.
+ * The dive materialises up to sixty so the page below can rank a character's
+ * *complete* set by JMdict's own commonness; the ring is a ring, and a ring of
+ * sixty is a list. Eight is what a person takes in at a glance.
+ *
+ * The cut is stated under the ring with both numbers and a pointer to where the
+ * whole ranked set is, so nothing is hidden — it is folded, which is the
+ * distinction `Disclosure`'s header draws.
+ */
+export const RING_DISPLAY_LIMIT = 8;
+
 /** How a relation reads out loud, so every drawn edge cites what produced it. */
 export const BASIS_PHRASES: Readonly<Record<string, string>> = {
   component_of: 'a component of it, from KanjiVG’s own shape annotation',
@@ -216,6 +230,7 @@ function Ring({
   readonly onZoom: (nodeId: string) => void;
 }): ReactNode {
   const theme = useTheme();
+  const drawn = ring.members.slice(0, RING_DISPLAY_LIMIT);
 
   return (
     <View style={styles.ring} testID={`dive-ring-${ring.bucket}-${ring.level}`}>
@@ -226,7 +241,7 @@ function Ring({
         {ringTitle(ring)}
       </Text>
       <View style={styles.ringRow}>
-        {ring.members.map((member) => (
+        {drawn.map((member) => (
           <DiveNode
             because={phraseForBasis(member.basis)}
             capability={capability}
@@ -240,13 +255,14 @@ function Ring({
           />
         ))}
       </View>
-      {ring.truncated ? (
+      {drawn.length < ring.available ? (
         <Text
           style={[styles.ringNote, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
           testID={`dive-ring-cut-${ring.bucket}-${ring.level}`}
         >
-          Showing {String(ring.members.length)} of {String(ring.available)}. The rest are in the
-          graph and are not drawn here.
+          {ring.truncated
+            ? `Drawing ${String(drawn.length)} of the ${String(ring.available)} the graph holds here; the dive itself kept ${String(ring.members.length)} of them. The sections below list what this page can rank.`
+            : `Drawing ${String(drawn.length)} of ${String(ring.available)}. The sections below list all of them, ranked.`}
         </Text>
       ) : null}
     </View>

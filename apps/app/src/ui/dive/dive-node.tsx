@@ -14,6 +14,24 @@
  *     a different colour. That survives on any ground and for any learner.
  *   - **Hue is attention only.** The accent marks the centre and nothing else.
  *
+ * ## The two faintest steps are drawn as outlines, not in their own colour
+ *
+ * `RECALL_BAND_MARKS` declares those two steps `standalone: false`: their colours
+ * are deliberately below 3:1 — the operator asked for dim items to be dim — so
+ * they may only be drawn inside a component that supplies its own bounded,
+ * labelled boundary, which is the meter. A ring member is not that: it is a mark
+ * the size of a full stop with a glyph beside it.
+ *
+ * `RecallIndicator` handles this by falling back to the meter, and that is the
+ * right answer on a card and the wrong one in a ring — the first version of this
+ * component did exactly that and turned a ring of twenty-five words into
+ * twenty-five labelled meters stacked down the page, which is the spreadsheet
+ * row the whole design is written against. So a ring member draws the **declared
+ * outline form** for those two steps (`ring` and `ring-thick`) in a *checked*
+ * token rather than in the sub-threshold recall colour, and the band's word
+ * travels in the accessible name where it always did. No colour below 3:1 is
+ * drawn bare; the form channel carries what the luminance channel may not.
+ *
  * ## The interior strip is the diagnosis
  *
  * Under each node is a row of small marks: the bands of what that node is *made
@@ -34,9 +52,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { ScaleNode } from '@bunki/domain';
 
-import { type CapabilityId } from '../capability.ts';
-import { RecallIndicator, RECALL_BAND_LABELS } from '../recall.tsx';
-import { RADIUS, SPACE, TYPE, type RecallBand } from '../theme.ts';
+import { capabilityOf, type CapabilityId } from '../capability.ts';
+import { RecallMark, RECALL_BAND_LABELS } from '../recall.tsx';
+import {
+  RADIUS,
+  RECALL_BAND_MARKS,
+  SPACE,
+  TYPE,
+  isStandaloneRecallBand,
+  type RecallBand,
+} from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 
 /** What the surface knows about one node's strength, for the active lens. */
@@ -106,13 +131,7 @@ export function DiveNode({
         {node.label}
       </Text>
 
-      <RecallIndicator
-        band={mark.band}
-        basis={mark.basis}
-        capability={capability}
-        fragile={mark.uncertain}
-        size={12}
-      />
+      <DiveMark capability={capability} mark={mark} size={12} />
 
       <View aria-hidden style={styles.interior}>
         {!interiorKnown ? (
@@ -135,17 +154,61 @@ export function DiveNode({
           </Text>
         ) : (
           interior.map((entry) => (
-            <RecallIndicator
-              band={entry.mark.band}
-              capability={capability}
-              fragile={entry.mark.uncertain}
-              key={entry.id}
-              size={7}
-            />
+            <DiveMark capability={capability} key={entry.id} mark={entry.mark} size={8} />
           ))
         )}
       </View>
     </Pressable>
+  );
+}
+
+/**
+ * One node's band, at ring size.
+ *
+ * A bare {@link RecallMark} for the three steps that clear 3:1, and the declared
+ * outline for the two that do not — see this file's header for why the meter is
+ * not the answer here. `accessible` on both, so the band's word reaches a screen
+ * reader in either branch and the colour is never the only channel.
+ */
+export function DiveMark({
+  mark,
+  capability,
+  size,
+}: {
+  readonly mark: NodeMark;
+  readonly capability: CapabilityId;
+  readonly size: number;
+}): ReactNode {
+  const theme = useTheme();
+
+  if (isStandaloneRecallBand(mark.band)) {
+    return (
+      <RecallMark band={mark.band} capability={capability} fragile={mark.uncertain} size={size} />
+    );
+  }
+
+  // `ring` and `ring-thick` are the shapes the design system declares for these
+  // two steps. The border colour is `ruleStrong` — a token `CONTRAST_PAIRS`
+  // checks at the 3:1 non-text minimum — rather than the step's own colour,
+  // which is the whole point: the value is carried by form and by the spoken
+  // label, and nothing sub-threshold is painted.
+  const thick = RECALL_BAND_MARKS[mark.band].shape === 'ring-thick';
+  return (
+    <View
+      accessibilityLabel={`${capabilityOf(capability).label}: ${RECALL_BAND_LABELS[mark.band]}${
+        mark.uncertain ? ', fragile' : ''
+      }`}
+      accessibilityRole="image"
+      accessible
+      style={{
+        borderColor: mark.uncertain ? theme.color.fragileEdge : theme.color.ruleStrong,
+        borderRadius: size / 2,
+        borderStyle: mark.uncertain ? 'dashed' : 'solid',
+        borderWidth: thick ? 2.5 : 1.5,
+        height: size,
+        width: size,
+      }}
+    />
   );
 }
 
