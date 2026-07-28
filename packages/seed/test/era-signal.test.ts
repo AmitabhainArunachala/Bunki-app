@@ -32,13 +32,18 @@
  *   4. **Language codes are codes.** `loanSources` holds ISO 639 codes from the
  *      `xml:lang` attribute, not glosses, not language names, not empty strings.
  *   5. **The measured population is recorded, and it is small.** 96 of 3,000
- *      records carry an era-bearing `misc` label and 1 carries a `loanSource`.
+ *      records carry an era-bearing label and 1 carries a `loanSource`.
  *      Those numbers are asserted as a floor rather than left in prose, because
  *      the honest smallness of them is the finding: the rail layer cannot be
  *      populated from this corpus, and a future change that appears to populate it
  *      should have to come past this test and explain itself.
  *
- * The last one is the important one. `loanSources` is nearly empty *because*
+ *   6. **The sense-flattening trap is pinned by name.** `miscAnySense` unions
+ *      `<misc>` across every sense, so 写真 comes back `obsolete term` — the label
+ *      belongs to 写真-as-cinema, not to "photograph". The field must NOT be used
+ *      for era placement, and the test says so with 写真, 国会 and 活動 named.
+ *
+ * The loanSource one is the other important one. `loanSources` is nearly empty *because*
  * `selectLexemes` filters on `entry.hasKanji`, and borrowed words are
  * overwhelmingly katakana without kanji. That is a real, reportable property of
  * the selection rule, not a parser bug, and the assertion below is what stops it
@@ -56,7 +61,7 @@ const readJson = <T>(relative: string): T =>
 interface LexemeRecord {
   readonly id: string;
   readonly headword: string;
-  readonly misc?: readonly string[];
+  readonly miscAnySense?: readonly string[];
   readonly loanSources?: readonly string[];
 }
 
@@ -80,22 +85,24 @@ const ERA_BEARING = [
   'rare term',
 ] as const;
 
-const withMisc = lexemes.filter((r) => (r.misc ?? []).length > 0);
+const withMisc = lexemes.filter((r) => (r.miscAnySense ?? []).length > 0);
 const withLoan = lexemes.filter((r) => (r.loanSources ?? []).length > 0);
 const eraBearing = lexemes.filter((r) =>
-  (r.misc ?? []).some((m) => (ERA_BEARING as readonly string[]).includes(m)),
+  (r.miscAnySense ?? []).some((m) => (ERA_BEARING as readonly string[]).includes(m)),
 );
 
 describe('the era-bearing fields exist on every record', () => {
   it('gives every record both fields, so absent never has to mean unknown', () => {
     for (const record of lexemes) {
-      expect(Array.isArray(record.misc), `${record.id} has no misc array`).toBe(true);
+      expect(Array.isArray(record.miscAnySense), `${record.id} has no miscAnySense array`).toBe(
+        true,
+      );
       expect(Array.isArray(record.loanSources), `${record.id} has no loanSources array`).toBe(true);
     }
   });
 
   it('attributes both fields to EDRDG, because both are upstream labels', () => {
-    expect(fieldProvenance['misc']).toBe('edrdg-jmdict');
+    expect(fieldProvenance['miscAnySense']).toBe('edrdg-jmdict');
     expect(fieldProvenance['loanSources']).toBe('edrdg-jmdict');
   });
 });
@@ -107,7 +114,7 @@ describe('the values are upstream JMdict labels, expanded', () => {
 
   it('never ships a raw XML entity, which would mean expand() did not run', () => {
     for (const record of withMisc) {
-      for (const label of record.misc ?? []) {
+      for (const label of record.miscAnySense ?? []) {
         expect(/^&.+;$/.test(label), `${record.id} ships unexpanded ${label}`).toBe(false);
         expect(label.trim(), `${record.id} ships a blank misc label`).not.toBe('');
       }
@@ -115,7 +122,7 @@ describe('the values are upstream JMdict labels, expanded', () => {
   });
 
   it('keeps all five era-bearing labels present under their upstream names', () => {
-    const seen = new Set(withMisc.flatMap((r) => r.misc ?? []));
+    const seen = new Set(withMisc.flatMap((r) => r.miscAnySense ?? []));
     for (const label of ERA_BEARING) {
       expect(seen.has(label), `upstream no longer emits "${label}" — the era layer shrank`).toBe(
         true,
@@ -146,6 +153,42 @@ describe('the measured population, recorded rather than described', () => {
     // nothing except an assertion against the data would ever have contradicted
     // it. Kept as a floor, so upstream adding labels does not turn into a failure.
     expect(eraBearing.length).toBeGreaterThanOrEqual(96);
+  });
+
+  it('pins the sense-flattening trap, by name, so it is not rediscovered', () => {
+    // The whole reason this field is called `miscAnySense` and not `misc`.
+    //
+    // JMdict attaches <misc> per sense. This import unions across all senses, so
+    // the value means "at least one sense carries this label" — which reads as a
+    // fact about the word and is not one. These three came back looking archaic:
+    //
+    //   写真  obsolete term   — the label is on 写真-as-cinema, not "photograph"
+    //   国会  historical term — the pre-1947 Imperial Diet sense
+    //   活動  obsolete term   — 活動写真, moving pictures
+    //
+    // They are among the most common words in modern Japanese. An era rule that
+    // read this field would have put the vocabulary of modern Japan on the
+    // ancient-road layer of the map, confidently and wrongly — the exact defect
+    // class this project keeps refusing to ship, reintroduced by the field added
+    // to help avoid it.
+    //
+    // Asserted rather than described: if a future import ever makes these three
+    // come back clean, the flattening has been fixed and this test should be
+    // replaced by a real per-sense one. Until then it stands as the reason the
+    // era projection must not read this field.
+    const byHeadword = new Map(lexemes.map((r) => [r.headword, r]));
+    for (const [headword, label] of [
+      ['写真', 'obsolete term'],
+      ['国会', 'historical term'],
+      ['活動', 'obsolete term'],
+    ] as const) {
+      const record = byHeadword.get(headword);
+      expect(record, `${headword} is no longer in the corpus`).toBeDefined();
+      expect(
+        record?.miscAnySense ?? [],
+        `${headword} no longer carries "${label}" — re-check whether the flattening was fixed`,
+      ).toContain(label);
+    }
   });
 
   it('finds almost no loanwords, because selectLexemes requires kanji', () => {

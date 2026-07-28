@@ -204,7 +204,7 @@ export const FIELD_PROVENANCE = {
     senses: 'edrdg-jmdict',
     kanjiUsed: 'bunki-computed',
     priorityTags: 'edrdg-jmdict',
-    misc: 'edrdg-jmdict',
+    miscAnySense: 'edrdg-jmdict',
     loanSources: 'edrdg-jmdict',
     sourceEntryId: 'edrdg-jmdict',
   },
@@ -809,7 +809,7 @@ export function parseJMdict(xml) {
     // are carried through unmodified. They are evidence, not inference — which is
     // the whole point, because an era guessed from a vibe is the defect this
     // project keeps refusing to ship.
-    const misc = [];
+    const miscAnySense = [];
     const loanSources = [];
     for (const sense of allBetween(body, 'sense')) {
       for (const p of allBetween(sense, 'pos')) {
@@ -818,7 +818,7 @@ export function parseJMdict(xml) {
       }
       for (const m of allBetween(sense, 'misc')) {
         const label = expand(m);
-        if (!misc.includes(label)) misc.push(label);
+        if (!miscAnySense.includes(label)) miscAnySense.push(label);
       }
       for (const ls of allElements(sense, 'lsource')) {
         // A bare `<lsource xml:lang="por"/>` with no body is common and is still
@@ -859,8 +859,30 @@ export function parseJMdict(xml) {
       // grouping is what SEED_ENTRY_DISCLOSURE warns the reader about.
       senses: [...new Set(senses)],
       priorityTags: tags,
-      /** Upstream `<misc>` labels, DTD-expanded. Carries `archaic`, `obsolete`, `rare`. */
-      misc,
+      /**
+       * Upstream `<misc>` labels, DTD-expanded, unioned across **all** senses.
+       *
+       * The name is `miscAnySense` and not `misc` because the union is lossy in a
+       * way that reads as a fact about the word and is not one. JMdict attaches
+       * `<misc>` per sense; flattening it says only "at least one sense carries
+       * this label", which is a much weaker claim than the shape suggests.
+       *
+       * The worked example, and the reason this field got renamed before anything
+       * consumed it: 写真 comes back `obsolete term`. 写真 is "photograph" — one of
+       * the most common modern words in the language. The label belongs to its
+       * *moving picture* sense, 写真 as an old word for cinema. 国会 comes back
+       * `historical term` for the pre-1947 Imperial Diet sense, and 活動 for
+       * 活動写真. Reading any of those three as "an archaic word" would put the
+       * vocabulary of modern Japan on the ancient-road map layer.
+       *
+       * So: **this field must not be used for era placement.** It is real upstream
+       * data and it is useful for what it actually says — a word page can honestly
+       * show "has an archaic sense" — but era attribution needs sense-level
+       * `misc`, which needs `senses` restructured from `string[]` to records.
+       * `test/era-signal.test.ts` pins 写真 by name so the trap cannot be
+       * rediscovered the expensive way.
+       */
+      miscAnySense,
       /**
        * ISO language codes from upstream `<lsource>`. Non-empty means JMdict says
        * this word was borrowed, and from where. Empty means upstream recorded no
@@ -1299,7 +1321,7 @@ export async function runImport(options, { dataDir = DATA_DIR, log = console.log
       senses: entry.senses,
       kanjiUsed: kanjiIn(entry.headword),
       priorityTags: entry.priorityTags,
-      misc: entry.misc,
+      miscAnySense: entry.miscAnySense,
       loanSources: entry.loanSources,
       sourceEntryId: entry.entSeq,
     })),
