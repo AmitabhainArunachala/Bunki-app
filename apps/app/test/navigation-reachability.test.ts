@@ -199,7 +199,7 @@ describe('the map describes the app it is in', () => {
    * destination with a real door; development surfaces are `specimen` and are
    * pinned separately, below.
    */
-  const CAMPAIGN_E_SCREENS = ['Reading'] as const;
+  const CAMPAIGN_E_SCREENS = ['Journeys', 'Reading'] as const;
 
   it('covers every screen the controller §10 list names', () => {
     const labels = LEARNER_DESTINATIONS.map((destination) => destination.label);
@@ -233,11 +233,19 @@ describe('the map describes the app it is in', () => {
     // places a learner *starts* from. A fifth entry means something that belongs
     // to a screen has been promoted to chrome, which is how a masthead becomes a
     // debug menu.
+    //
+    // Journeys is the fifth, and it is admitted against that rule rather than
+    // around it: a branch point belongs to a contract in the ledger rather than
+    // to any screen, so there is no screen it *could* be demoted to. The test
+    // stays an equality precisely so the sixth entry has to make its own
+    // argument here. `src/ui/navigation.ts` carries the full reasoning and the
+    // coordination request it leaves open.
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
       'Capture',
       'Session',
       'Evidence',
       'About & diagnostics',
+      'Journeys',
     ]);
   });
 

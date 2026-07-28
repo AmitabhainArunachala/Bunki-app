@@ -95,6 +95,7 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'session-timing.ts': 'WP-08 (_helper: latency measurement, not a screen)',
   'session-workspace.tsx': 'WP-08 (_helper: workspace provider, not a screen)',
   'reading-screen.tsx': 'Campaign E lane B4',
+  'journey-screen.tsx': 'Campaign E lane B5 (journeys)',
 };
 
 const screenFileNames = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
@@ -270,6 +271,7 @@ const SCREEN_SOURCES: ReadonlyArray<readonly [string, string]> = [
   ['kanji', kanjiSource],
   ['evidence inspector', screen('evidence-inspector-screen.tsx')],
   ['inspector debug', screen('inspector-debug-screen.tsx')],
+  ['journeys', screen('journey-screen.tsx')],
 ];
 
 describe('every screen implements all four REQ-UI-09 states', () => {
