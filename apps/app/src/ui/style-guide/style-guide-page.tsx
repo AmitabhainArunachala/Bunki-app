@@ -37,6 +37,7 @@ import { CAPABILITY_IDS, type CapabilityId } from '../capability.ts';
 import { Disclosure } from '../disclosure.tsx';
 import { FrontierPassage } from '../frontier.tsx';
 import { LensRow } from '../lens.tsx';
+import { SeedEntryDisclosure } from '../notices.tsx';
 import { BranchLight, InkDraw, Settle, useReducedMotion } from '../motion.tsx';
 import { AppButton, ChipButton } from '../primitives.tsx';
 import { RecallMark, RecallMeter } from '../recall.tsx';
@@ -612,6 +613,19 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
           <Surface level="card" pad="lg">
             <AttributionFooter lines={[]} testID="specimen-attribution-empty" />
           </Surface>
+          {/*
+            The specimen renders real JMdict headwords and senses and real
+            KANJIDIC2 readings — 分岐 and 岐 come out of `@bunki/seed`, which is
+            the whole reason the page is trustworthy as a specimen. §3 of the
+            EDRDG licence statement asks for the acknowledgement on each screen
+            that displays words from the files, and "it is a specimen, not a
+            product screen" is not an exemption the licence offers. Merging the
+            dictionary tier onto this lane is what surfaced it: the tier ships
+            `test/edrdg-acknowledgement.test.ts`, which walks each route's module
+            graph for licensed field reads, and this page was the one screen in
+            the app reading them without acknowledging them.
+          */}
+          <SeedEntryDisclosure />
         </SpecimenSection>
 
         <View style={styles.tail} />

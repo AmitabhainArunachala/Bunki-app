@@ -29,3 +29,10 @@ packages/seed/licenses/
 # manifest vouches for and break the chain from a shipped gloss back to the
 # upstream download. Regenerate with the importer instead of editing.
 packages/seed/data/dictionary/
+
+# Live multi-agent worktrees. `.claude/worktrees/<run>-<n>/` is a full checkout of
+# this repository that an agent is actively working in, so walking into it both
+# double-counts every file and reports another agent's in-flight state as this
+# checkout's. It is also the cause of the recurring eslint `tsconfigRootDir`
+# failure, which is a stale-worktree symptom rather than a code defect.
+.claude/
