@@ -29,7 +29,14 @@
  * measures the marked proportion and, past `MAX_MARK_DENSITY`, renders the
  * passage clean with one line saying why. That is not hiding information: the
  * information "most of this is new" is *better* carried by the sentence than by
- * forty underlines, and every word is still tappable.
+ * forty underlines, and nothing about the passage's behaviour changes — the
+ * words that could be opened before can still be opened.
+ *
+ * The note is built by `overwhelmedNote` from the same spans and the same
+ * `onOpen` this component was given, rather than being a fixed sentence. It said
+ * "Every word is still tappable" unconditionally, and a span is only wrapped in
+ * a `Pressable` when it has a `lexemeId` and the caller supplied `onOpen`, so on
+ * a read-only passage the sentence was false.
  */
 
 import { type ReactNode } from 'react';
@@ -38,8 +45,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   MAX_MARK_DENSITY,
   OVERWHELMED_NOTE,
+  OVERWHELMED_NOTE_ALL_TAPPABLE,
+  OVERWHELMED_NOTE_SOME_TAPPABLE,
   markDensity,
   marksAreOverwhelming,
+  overwhelmedNote,
+  spanIsOpenable,
   type FrontierMarkKind,
   type FrontierSpan,
 } from './frontier-marks.ts';
@@ -50,8 +61,12 @@ import { useTheme } from './theme-context.tsx';
 export {
   MAX_MARK_DENSITY,
   OVERWHELMED_NOTE,
+  OVERWHELMED_NOTE_ALL_TAPPABLE,
+  OVERWHELMED_NOTE_SOME_TAPPABLE,
   markDensity,
   marksAreOverwhelming,
+  overwhelmedNote,
+  spanIsOpenable,
   type FrontierMarkKind,
   type FrontierSpan,
 };
@@ -83,7 +98,7 @@ export function FrontierPassage({
         <Text
           style={[styles.overwhelmed, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
         >
-          {OVERWHELMED_NOTE}
+          {overwhelmedNote(spans, onOpen !== undefined)}
         </Text>
       ) : null}
 
@@ -175,7 +190,8 @@ function FrontierSpanView({
     </View>
   );
 
-  if (span.lexemeId === undefined || onOpen === undefined) return content;
+  // The same predicate the note uses, so "tappable" has one definition.
+  if (!spanIsOpenable(span) || onOpen === undefined) return content;
 
   const state = mark === 'frontier' ? ', new to you' : mark === 'fragile' ? ', fragile' : '';
 

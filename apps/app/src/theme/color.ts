@@ -48,10 +48,36 @@
  * than as an inverted document. Both are deliberate and both are bounded: the
  * contrast test asserts the channel spread stays inside neutral territory, so a
  * "bias" can never quietly become a second brand colour.
+ *
+ * ## The figure half of a two-layer palette (Campaign E, lane A1′)
+ *
+ * Everything above is unchanged, and `ground.ts` beside this file is the other
+ * half: the era register a surface is set in, in the full mineral range. The two
+ * layers never do each other's job — the ground says *when and where*, this file
+ * says *how well you know it* — and that separation is what reconciles the
+ * nihonga direction with the one-accent rule, which was always a rule about
+ * semantics rather than about prettiness.
+ *
+ * The separation is a type, not a naming convention. Every colour here is a
+ * `SemanticColor` and every colour there is a `GroundColor`; both are ordinary
+ * strings at runtime and neither is assignable to the other, so a component
+ * cannot paint a node with a hillside or a hillside with a focus ring.
  */
 
 export const COLOR_SCHEMES = ['light', 'dark'] as const;
 export type ColorSchemeName = (typeof COLOR_SCHEMES)[number];
+
+declare const SEMANTIC_BRAND: unique symbol;
+
+/**
+ * A colour belonging to the figure layer: state, text, controls, marks.
+ *
+ * Branded so that `GroundColor` and `SemanticColor` cannot be crossed. The brand
+ * is phantom — it costs nothing at runtime and the value goes straight into a
+ * style prop — and the only way to mint one is `semanticPalette` below, so a
+ * `SemanticColor` can only come from this module's own tables.
+ */
+export type SemanticColor = string & { readonly [SEMANTIC_BRAND]: 'figure' };
 
 /**
  * The five steps of the recall ramp.
@@ -68,53 +94,71 @@ export const RECALL_BANDS = ['unseen', 'faint', 'emerging', 'settled', 'durable'
 export type RecallBand = (typeof RECALL_BANDS)[number];
 
 export interface RecallRamp {
-  readonly unseen: string;
-  readonly faint: string;
-  readonly emerging: string;
-  readonly settled: string;
-  readonly durable: string;
+  readonly unseen: SemanticColor;
+  readonly faint: SemanticColor;
+  readonly emerging: SemanticColor;
+  readonly settled: SemanticColor;
+  readonly durable: SemanticColor;
 }
 
 export interface Palette {
   /** Page background. Paper, not white. */
-  readonly paper: string;
+  readonly paper: SemanticColor;
   /** Raised surfaces: cards, result rows, the reading surface. */
-  readonly raised: string;
+  readonly raised: SemanticColor;
   /** A surface set *into* the page rather than above it: quoted passages, wells. */
-  readonly sunken: string;
+  readonly sunken: SemanticColor;
   /** Primary text. Sumi ink, not black. */
-  readonly ink: string;
+  readonly ink: SemanticColor;
   /** Secondary text: labels, provenance, metadata. Still AA on paper. */
-  readonly inkMuted: string;
+  readonly inkMuted: SemanticColor;
   /** Tertiary text: ruby, timestamps, the quietest legible layer. AA on paper. */
-  readonly inkFaint: string;
+  readonly inkFaint: SemanticColor;
   /** Decorative hairline only. Never the boundary of an interactive control. */
-  readonly rule: string;
+  readonly rule: SemanticColor;
   /** Boundary of interactive controls and meaningful graphics (AA non-text, 3:1). */
-  readonly ruleStrong: string;
+  readonly ruleStrong: SemanticColor;
   /** The one accent (REQ-UI-08). Adding a second colour token is a spec violation. */
-  readonly vermilion: string;
+  readonly vermilion: SemanticColor;
   /** A tint of the same accent, for accent-on-tint fills. */
-  readonly vermilionSoft: string;
+  readonly vermilionSoft: SemanticColor;
   /** The quiet personal-frontier mark. A vermilion tint, never a new hue. */
-  readonly frontierMark: string;
+  readonly frontierMark: SemanticColor;
   /** Keyboard focus ring. The accent again — one accent means one ring. */
-  readonly focusRing: string;
+  readonly focusRing: SemanticColor;
   /** Recall strength as luminance. Never a second hue; never summed across capabilities. */
   readonly recall: RecallRamp;
   /** A fragile record's edge. Neutral, and always paired with a dashed pattern. */
-  readonly fragileEdge: string;
+  readonly fragileEdge: SemanticColor;
   /** An unmeasured record's edge. Neutral, and always paired with a dotted pattern. */
-  readonly uncertainEdge: string;
+  readonly uncertainEdge: SemanticColor;
   /** Wash behind an unmeasured region: presence without a claim. */
-  readonly uncertainWash: string;
+  readonly uncertainWash: SemanticColor;
+}
+
+/**
+ * The same shape, written in plain hex.
+ *
+ * A palette is declared as ordinary strings and branded on the way in, so the
+ * two schemes below stay readable as colour tables. Every field is still
+ * checked: a missing token, a typo'd name or a nested ramp step that went
+ * missing is a type error at the declaration, which is the only thing the cast
+ * inside `semanticPalette` gives up.
+ */
+type PaletteInput = { readonly [K in keyof Omit<Palette, 'recall'>]: string } & {
+  readonly recall: { readonly [B in RecallBand]: string };
+};
+
+/** The one place a `SemanticColor` is minted. */
+function semanticPalette(spec: PaletteInput): Palette {
+  return spec as Palette;
 }
 
 /**
  * Light: unbleached paper, sumi ink, a vermilion that is a seal rather than a
  * warning light.
  */
-const LIGHT: Palette = {
+const LIGHT: Palette = semanticPalette({
   paper: '#FBF8F3',
   raised: '#FFFDF8',
   sunken: '#F3EEE4',
@@ -137,7 +181,7 @@ const LIGHT: Palette = {
   fragileEdge: '#7E7466',
   uncertainEdge: '#8B8175',
   uncertainWash: '#EFEADF',
-};
+});
 
 /**
  * Dark, designed rather than inverted.
@@ -148,7 +192,7 @@ const LIGHT: Palette = {
  * vermilion lightens, because a #A6301A seal on a dark ground is a smudge, and
  * because the accent has to keep 4.5:1 against paper in both schemes.
  */
-const DARK: Palette = {
+const DARK: Palette = semanticPalette({
   paper: '#15130F',
   raised: '#1E1B16',
   sunken: '#100E0B',
@@ -171,7 +215,7 @@ const DARK: Palette = {
   fragileEdge: '#8D857A',
   uncertainEdge: '#776F61',
   uncertainWash: '#221F1A',
-};
+});
 
 export const PALETTES: Readonly<Record<ColorSchemeName, Palette>> = { light: LIGHT, dark: DARK };
 
@@ -214,16 +258,56 @@ export type EdgePatternName = keyof typeof EDGE_PATTERNS;
  * `test/theme-tokens.test.ts` checks both halves: that every `standalone: true`
  * step really does clear 3:1 everywhere it can be drawn, and that the two that
  * do not are used by no component other than the bounded, labelled meter.
+ *
+ * ## Why this is `as const satisfies` rather than an annotation
+ *
+ * An annotation widens `standalone` to `boolean`, and a widened flag can only be
+ * checked at run time — which is what `RecallMark` used to do, by throwing from
+ * inside render when it was handed one of the two meter-only bands. Those bands
+ * are *declared data*: any surface that reads a band off a projection has a
+ * `RecallBand`, and three of the five values were safe while two of them were a
+ * crash. That is a trap for the next lane, not an invariant.
+ *
+ * Keeping the literals lets `StandaloneRecallBand` below be derived from this
+ * table, so the mistake is a type error at the call site instead of a blank
+ * screen at run time, and the derivation cannot drift from the declaration
+ * because there is only one declaration.
  */
-export const RECALL_BAND_MARKS: Readonly<
-  Record<RecallBand, { readonly standalone: boolean; readonly shape: string }>
-> = {
+export const RECALL_BAND_MARKS = {
   unseen: { standalone: false, shape: 'ring' },
   faint: { standalone: false, shape: 'ring-thick' },
   emerging: { standalone: true, shape: 'half' },
   settled: { standalone: true, shape: 'disc' },
   durable: { standalone: true, shape: 'disc-ring' },
-};
+} as const satisfies Readonly<
+  Record<RecallBand, { readonly standalone: boolean; readonly shape: string }>
+>;
+
+/**
+ * The bands that may be drawn as a bare mark, derived from the table above.
+ *
+ * `RecallMark` takes this rather than `RecallBand`, so handing it a meter-only
+ * band does not compile. Nothing has to remember the rule: flipping a step's
+ * `standalone` flag moves it in or out of this type automatically, and every
+ * call site that would then be wrong stops compiling.
+ */
+export type StandaloneRecallBand = {
+  [B in RecallBand]: (typeof RECALL_BAND_MARKS)[B]['standalone'] extends true ? B : never;
+}[RecallBand];
+
+/** The complement: bands that may only appear inside the bounded, labelled meter. */
+export type MeterOnlyRecallBand = Exclude<RecallBand, StandaloneRecallBand>;
+
+/**
+ * Narrow a band read off a projection.
+ *
+ * The seam Wave B needs: a surface holding a `RecallBand` asks this and then
+ * either draws a mark or reaches for the meter. Without it, "the type prevents
+ * the mistake" would just relocate the mistake to a cast.
+ */
+export function isStandaloneRecallBand(band: RecallBand): band is StandaloneRecallBand {
+  return RECALL_BAND_MARKS[band].standalone;
+}
 
 /**
  * Foreground/background pairs the app actually renders, named so the contrast
@@ -374,7 +458,7 @@ export const CONTRAST_PAIRS: readonly {
  * is the one place that flattening happens, so nothing else has to know the
  * shape.
  */
-export function paletteValue(palette: Palette, path: string): string {
+export function paletteValue(palette: Palette, path: string): SemanticColor {
   const [head, tail] = path.split('.');
   if (head === 'recall') {
     if (tail === undefined) throw new Error(`'${path}' names the ramp, not a step`);
@@ -385,16 +469,19 @@ export function paletteValue(palette: Palette, path: string): string {
   if (tail !== undefined) throw new Error(`'${path}' is not a nested palette token`);
   const value = (palette as unknown as Record<string, unknown>)[head ?? ''];
   if (typeof value !== 'string') throw new Error(`'${path}' is not a palette colour`);
-  return value;
+  return value as SemanticColor;
 }
 
 /** Every leaf colour in a palette, flattened. Used by the "no stray hue" tests. */
-export function paletteLeaves(palette: Palette): readonly { path: string; value: string }[] {
-  const out: { path: string; value: string }[] = [];
-  for (const [key, value] of Object.entries(palette)) {
+export function paletteLeaves(palette: Palette): readonly { path: string; value: SemanticColor }[] {
+  const out: { path: string; value: SemanticColor }[] = [];
+  const entries: readonly (readonly [string, SemanticColor | RecallRamp])[] = Object.entries(
+    palette,
+  ) as readonly (readonly [string, SemanticColor | RecallRamp])[];
+  for (const [key, value] of entries) {
     if (typeof value === 'string') out.push({ path: key, value });
     else if (value !== null && typeof value === 'object') {
-      for (const [step, nested] of Object.entries(value as Record<string, string>)) {
+      for (const [step, nested] of Object.entries(value) as (readonly [string, SemanticColor])[]) {
         out.push({ path: `${key}.${step}`, value: nested });
       }
     }
