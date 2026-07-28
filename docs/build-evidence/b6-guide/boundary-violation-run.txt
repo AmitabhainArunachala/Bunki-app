@@ -1,0 +1,304 @@
+
+ RUN  v4.1.10 /home/user/Bunki-app/.claude/worktrees/wf_b23112e0-777-4
+
+ ❯ packages/domain/test/guide/boundary.test.ts (67 tests | 9 failed) 130ms
+     ✓ finds every module it claims to be guarding 3ms
+     ✓ derives a non-trivial set of guide export names 2ms
+     ✓ knows where both halves of the guide live 1ms
+     × packages/domain/src/evidence/gate.ts imports no guide module, transitively 18ms
+     × packages/domain/src/evidence/mint.ts imports no guide module, transitively 10ms
+     × packages/domain/src/evidence/index.ts imports no guide module, transitively 13ms
+     ✓ packages/domain/src/reducers/memory-state.ts imports no guide module, transitively 1ms
+     ✓ packages/domain/src/reducers/fsrs-pin.ts imports no guide module, transitively 0ms
+     ✓ packages/domain/src/reducers/promotion.ts imports no guide module, transitively 1ms
+     ✓ packages/domain/src/contracts/retrieval-contract.ts imports no guide module, transitively 1ms
+     ✓ packages/domain/src/contracts/promotion-activation.ts imports no guide module, transitively 1ms
+     × packages/domain/src/session/plan.ts imports no guide module, transitively 4ms
+     × packages/domain/src/session/runtime.ts imports no guide module, transitively 5ms
+     × packages/domain/src/session/commands.ts imports no guide module, transitively 6ms
+     × packages/domain/src/session/canvas.ts imports no guide module, transitively 12ms
+     ✓ packages/domain/src/graph/retrievability.ts imports no guide module, transitively 1ms
+     ✓ apps/app/src/state/memory-store.ts imports no guide module, transitively 0ms
+     ✓ apps/app/src/state/durable-store.ts imports no guide module, transitively 1ms
+     ✓ apps/app/src/state/store.ts imports no guide module, transitively 0ms
+     × packages/domain/src/evidence/gate.ts names no guide export 3ms
+     ✓ packages/domain/src/evidence/mint.ts names no guide export 1ms
+     ✓ packages/domain/src/evidence/index.ts names no guide export 1ms
+     ✓ packages/domain/src/reducers/memory-state.ts names no guide export 1ms
+     ✓ packages/domain/src/reducers/fsrs-pin.ts names no guide export 0ms
+     ✓ packages/domain/src/reducers/promotion.ts names no guide export 0ms
+     ✓ packages/domain/src/contracts/retrieval-contract.ts names no guide export 1ms
+     ✓ packages/domain/src/contracts/promotion-activation.ts names no guide export 0ms
+     ✓ packages/domain/src/session/plan.ts names no guide export 1ms
+     ✓ packages/domain/src/session/runtime.ts names no guide export 1ms
+     ✓ packages/domain/src/session/commands.ts names no guide export 1ms
+     ✓ packages/domain/src/session/canvas.ts names no guide export 1ms
+     ✓ packages/domain/src/graph/retrievability.ts names no guide export 1ms
+     ✓ apps/app/src/state/memory-store.ts names no guide export 1ms
+     ✓ apps/app/src/state/durable-store.ts names no guide export 0ms
+     ✓ apps/app/src/state/store.ts names no guide export 1ms
+     × finds no guide export anywhere under packages/domain/src/evidence 2ms
+     ✓ does not reach packages/domain/src/evidence/gate.ts 0ms
+     ✓ does not reach packages/domain/src/evidence/mint.ts 0ms
+     ✓ does not reach packages/domain/src/reducers/memory-state.ts 0ms
+     ✓ does not reach packages/domain/src/reducers/fsrs-pin.ts 0ms
+     ✓ imports ts-fsrs nowhere in its graph 1ms
+     ✓ mints nothing: no domain event factory is named in the guide 1ms
+     ✓ stamps every artefact with a declared kind 1ms
+     ✓ refuses a route 1ms
+     ✓ refuses a plan 0ms
+     ✓ refuses a estimate 0ms
+     ✓ refuses a position 5ms
+     ✓ refuses a turn 0ms
+     ✓ refuses a route that crossed a JSON boundary 0ms
+     ✓ refuses a plan that crossed a JSON boundary 0ms
+     ✓ refuses a estimate that crossed a JSON boundary 0ms
+     ✓ refuses a position that crossed a JSON boundary 0ms
+     ✓ refuses a turn that crossed a JSON boundary 0ms
+     ✓ refuses an artefact hidden one level down in a command-shaped object 0ms
+     ✓ lets an ordinary value through, so the guard is not just "throw" 1ms
+     ✓ is not admitted to the scheduler as a route 0ms
+     ✓ is not admitted to the scheduler as a plan 0ms
+     ✓ is not admitted to the scheduler as a estimate 0ms
+     ✓ is not admitted to the scheduler as a position 0ms
+     ✓ is not admitted to the scheduler as a turn 4ms
+     ✓ offers exactly one kind of action, and it is to go and look 0ms
+     ✓ has no guide export whose name suggests it grades, marks or reschedules 1ms
+     ✓ sees the guide export named in a decision function 0ms
+     ✓ sees nothing in a decision function that stays inside the boundary 0ms
+     ✓ sees a guide value smuggled in as a bare marker with no import 0ms
+     ✓ does not count a guide name that appears only in a comment 0ms
+     ✓ walks an import graph deeply enough to catch an indirection 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/evidence/gate.ts imports no guide module, transitively
+AssertionError: packages/domain/src/evidence/gate.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/evidence/mint.ts imports no guide module, transitively
+AssertionError: packages/domain/src/evidence/mint.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/evidence/index.ts imports no guide module, transitively
+AssertionError: packages/domain/src/evidence/index.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/session/plan.ts imports no guide module, transitively
+AssertionError: packages/domain/src/session/plan.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/session/runtime.ts imports no guide module, transitively
+AssertionError: packages/domain/src/session/runtime.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/session/commands.ts imports no guide module, transitively
+AssertionError: packages/domain/src/session/commands.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides can reach the guide > packages/domain/src/session/canvas.ts imports no guide module, transitively
+AssertionError: packages/domain/src/session/canvas.ts can reach the guide. The guide narrates and routes; it never decides (map document §4.3).: expected [ …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/guide/index.ts",
++   "packages/domain/src/guide/position.ts",
++   "packages/domain/src/guide/records.ts",
++   "packages/domain/src/guide/boundary.ts",
++   "packages/domain/src/guide/propose.ts",
++   "packages/domain/src/guide/assessment.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:252:7
+    250|       reached,
+    251|       `${file} can reach the guide. The guide narrates and routes; it …
+    252|     ).toEqual([]);
+       |       ^
+    253|   });
+    254| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides so much as names a guide value > packages/domain/src/evidence/gate.ts names no guide export
+AssertionError: packages/domain/src/evidence/gate.ts names a guide export. Even through the package barrel, wiring a guide output into an evidence or review-timing path has to name what it took — this is that assertion.: expected [ 'proposeRoute' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "proposeRoute",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:267:7
+    265|       `${file} names a guide export. Even through the package barrel, …
+    266|         'into an evidence or review-timing path has to name what it to…
+    267|     ).toEqual([]);
+       |       ^
+    268|   });
+    269|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  packages/domain/test/guide/boundary.test.ts > nothing that decides so much as names a guide value > finds no guide export anywhere under packages/domain/src/evidence
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "packages/domain/src/evidence/gate.ts",
++ ]
+
+ ❯ packages/domain/test/guide/boundary.test.ts:280:23
+    278|       .filter((file) => guideNamesIn(stripComments(read(file))).length…
+    279|       .map(rel);
+    280|     expect(offenders).toEqual([]);
+       |                       ^
+    281|   });
+    282| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 58 passed (67)
+   Start at  16:30:32
+   Duration  1.19s (transform 387ms, setup 0ms, import 567ms, tests 130ms, environment 0ms)
+

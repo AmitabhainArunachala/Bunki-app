@@ -1,0 +1,21 @@
+diff --git a/packages/domain/src/evidence/gate.ts b/packages/domain/src/evidence/gate.ts
+index 714e0df..8a8bd05 100644
+--- a/packages/domain/src/evidence/gate.ts
++++ b/packages/domain/src/evidence/gate.ts
+@@ -34,6 +34,7 @@ import {
+   type MutableTargetThreadIndex,
+ } from '../contracts/index.ts';
+ import { CandidateEvidenceBoundaryError } from '../errors.ts';
++import { proposeRoute } from '../guide/index.ts';
+ import {
+   isEvidenceClassEvent,
+   type DomainEvent,
+@@ -180,6 +181,8 @@ const reject = (
+  */
+ export function admitToScheduler(event: DomainEvent, context: EvidenceGateContext): GateDecision {
+   assertNotCandidate(event);
++  // DELIBERATE VIOLATION, for the B6 boundary demonstration only.
++  void proposeRoute;
+ 
+   if (!isEvidenceClassEvent(event)) {
+     return reject(
