@@ -152,15 +152,29 @@ export function EraGround({ era, children, testID }: EraGroundProps): ReactNode 
 
 const styles = StyleSheet.create({
   field: {
+    /*
+      No `alignItems` here. The mount below must *stretch* to the field's width,
+      because the 胡粉/墨 mat is an `absoluteFill` inside it — a mount shrunk to
+      its content leaves the mat a narrow strip, which the browser capture showed
+      as a thin dark band floating in the middle of an otherwise bare register.
+      Centring belongs on the mount, where it centres the content and not the
+      mount itself.
+    */
     overflow: 'hidden',
     /*
       The ground gets real room outside the mat. The mat is a *mount*; a mount
       that reaches the edge is a background, and the wash — which is where the
       depth the operator asked for actually lives — would never be visible.
+
+      `SPACE.xxl` rather than `SPACE.lg`, and the browser capture is why: at the
+      smaller step the 藍海松茶 base of a sparse band showed only as a hairline
+      frame around a 墨 mat, so the register was present in the markup and
+      invisible in the picture.
     */
-    padding: SPACE.lg,
+    padding: SPACE.xxl,
   },
   mount: {
+    alignItems: 'center',
     gap: SPACE.md,
     padding: SPACE.lg,
   },

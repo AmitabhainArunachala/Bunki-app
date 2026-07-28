@@ -109,6 +109,21 @@ const ROUTE_BAND: StandaloneRecallBand = 'settled';
 const NO_EMITTED_LIGHT_NOTE =
   'The visual language allows lit signal points in the 鉄道 register only, and 鉄道 has no members in this build, so no node here is lit. That is the layer being empty, not a signal being suppressed.';
 
+/**
+ * How much neighbourhood one field can honestly draw.
+ *
+ * The domain's default is 120 nodes, which is the right ceiling for a *query*
+ * and far too many for a 380-point field: the first browser capture of this
+ * screen put 39 nodes in one band and the labels were a solid block of
+ * overlapping type. A picture that dense conveys less than the count under it.
+ *
+ * 24 is what fits on two rings at a readable size. It is not a quiet trim: the
+ * domain reports the cut as a `Truncation` and this screen renders every one of
+ * them under the field, so "there is more here than is drawn" is on the page in
+ * the domain's own words rather than being hidden by a smaller number.
+ */
+const MAP_VIEW = { depth: 2, maxNodes: 24 } as const;
+
 export interface MapScreenProps {
   readonly onOpenWord: (lexemeId: string) => void;
   readonly onOpenKanji: (character: string) => void;
@@ -237,7 +252,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
    */
   const resolveNeighbourhood = useCallback(() => {
     if (originId === null) return null;
-    const found = neighbourhoodOf(atlas.graph, originId);
+    const found = neighbourhoodOf(atlas.graph, originId, MAP_VIEW);
     return found.origin === null ? null : found;
   }, [atlas, originId]);
 
@@ -495,6 +510,23 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
                 >
                   No node here sits on this layer.
                 </Text>
+                {/*
+                  An empty era layer still paints its register.
+
+                  The design asks for three era layers, and a layer that
+                  disappears when it has no members is not a layer — it is a list
+                  that happens to be empty. 街道 and 鉄道 are empty over this
+                  whole dictionary, so if emptiness hid them the map would only
+                  ever show one road and the honest finding would be invisible.
+                  So the ground is painted, at a reduced height, with nothing on
+                  it, and the line above says why. The `unknown` band is the one
+                  that paints no ground — it is not a road at all.
+                */}
+                {band.band === 'unknown' ? null : (
+                  <EraGround era={eraKeyOf(band.band)} testID={`map-ground-${band.band}`}>
+                    <View style={styles.emptyGround} />
+                  </EraGround>
+                )}
               </View>
             );
           }
@@ -520,13 +552,18 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
                 layout={layerLayout}
                 lens={lens}
                 onOpenNode={openNode}
+                spread={layout?.points.length ?? 0}
                 testID={`map-field-${band.band}`}
                 views={views}
               />
             );
 
           return (
-            <View key={band.band} style={styles.band}>
+            // The same `testID` a band gets when it is empty. A band has to be
+            // findable either way, or evidence of the four bands can only ever
+            // photograph the empty ones — which is how the capture run found
+            // this.
+            <View key={band.band} style={styles.band} testID={`map-band-${band.band}`}>
               <Text
                 style={[styles.bandTitle, { color: theme.color.ink, fontFamily: theme.font.sans }]}
               >
@@ -669,6 +706,11 @@ const styles = StyleSheet.create({
   },
   bandEmpty: {
     gap: SPACE.xs,
+  },
+  /** A painted-but-unpopulated register. Short, because there is nothing on it. */
+  emptyGround: {
+    height: 64,
+    width: '100%',
   },
   bandTitle: {
     fontSize: TYPE.label,

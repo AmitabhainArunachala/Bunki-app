@@ -87,8 +87,20 @@ export interface MapLayout {
  */
 const RING_RADII: readonly number[] = [0, 0.3, 0.46, 0.5];
 
-/** A per-depth angular offset so rings do not form spokes. Fixed, not random. */
-const RING_PHASE = 0.37;
+/**
+ * A per-depth angular offset so rings do not form spokes. Fixed, not random.
+ *
+ * The golden angle, because the first value tried (0.37 rad) was too small to
+ * do the job at the sparse end: a band with one node per ring put both of them
+ * within 21° of each other and their labels overlapped. The browser capture
+ * showed it. 2.3999 rad separates consecutive rings by 137°, which is the
+ * largest rotation that never repeats — the same property that makes it the
+ * angle a sunflower uses.
+ *
+ * Still a constant, still deterministic, and still nothing to do with the
+ * learner: it is a function of `depth` alone.
+ */
+const RING_PHASE = 2.399963;
 
 function radiusFor(depth: number): number {
   return RING_RADII[Math.min(depth, RING_RADII.length - 1)] ?? 0.5;

@@ -22,11 +22,10 @@
  * The four REQ-UI-07 values reach the mark through four separate channels, and
  * no two share one:
  *
- *   - **the recall chance** → luminance, via `NodeMark`'s lit step, and form
- *     below the lit floor;
+ *   - **the recall chance** → luminance, through `NodeMark`'s lit step, and
+ *     through form below the lit floor;
  *   - **fragility** → form, a dashed open ring rather than a filled disc;
- *   - **uncertainty** → the node's spoken label and the panel under the field,
- *     never a colour;
+ *   - **uncertainty** → the node's spoken label, never a colour;
  *   - **coverage** → the same, as a count of contracts and admitted reviews.
  *
  * ## Tappable everywhere, no dead ends
@@ -50,7 +49,7 @@ import { type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 
-import { EDGE_PATTERNS, MIN_TOUCH_TARGET, RADIUS, SPACE, TYPE } from '../theme.ts';
+import { EDGE_PATTERNS, MIN_TOUCH_TARGET, RADIUS, TYPE } from '../theme.ts';
 import { capabilityOf, type CapabilityId } from '../capability.ts';
 import { useFigureTheme } from './era-ground.tsx';
 import type { MapLayout, PlacedPoint } from './map-layout.ts';
@@ -58,10 +57,28 @@ import type { MapLensView } from './map-projection.ts';
 import { markLabel, NodeMark } from './node-mark.tsx';
 import { nodeSubject } from './map-source.ts';
 
-/** The square the field is drawn in, in points. */
-const FIELD = 300;
+/** The largest square a field is drawn in, in points. */
+const MAX_FIELD = 380;
+/** The smallest, so a two-node band is still a field rather than a line. */
+const MIN_FIELD = 220;
 /** Inset so a node at the rim is not clipped by the field's own edge. */
-const INSET = 26;
+const INSET = 30;
+
+/**
+ * How big this band's field should be.
+ *
+ * Scaled to the number of nodes rather than fixed, because a fixed square is
+ * wrong at both ends: a 22-node band needs the room, and a 2-node band drawn in
+ * the same square is a mostly-empty rectangle whose mat covers the era ground it
+ * is supposed to be showing. The browser capture showed both.
+ *
+ * Deterministic in the node count alone, so the same band is always the same
+ * size — a field that resized on anything else would make "the map moved" and
+ * "your memory changed" look alike.
+ */
+function fieldSize(nodeCount: number): number {
+  return Math.max(MIN_FIELD, Math.min(MAX_FIELD, 150 + nodeCount * 11));
+}
 
 export interface MapFieldProps {
   readonly layout: MapLayout;
@@ -70,30 +87,50 @@ export interface MapFieldProps {
   /** One lens view per node id, for the chosen lens. Missing means unmeasured. */
   readonly views: ReadonlyMap<string, MapLensView>;
   readonly onOpenNode: (nodeId: string) => void;
+  /**
+   * How many nodes the coordinates in `layout` were computed for.
+   *
+   * A band draws a *subset* of one neighbourhood's layout, and the positions are
+   * deliberately the whole neighbourhood's — so a node keeps its place whichever
+   * band it appears in, and the four bands read as four views of one map rather
+   * than four unrelated diagrams. That makes the filtered count the wrong number
+   * to size the field by: two nodes that are neighbours among 24 were drawn on
+   * top of each other when the field shrank to fit two. This is the number the
+   * geometry was built at.
+   */
+  readonly spread?: number | undefined;
   readonly testID?: string | undefined;
 }
 
-function place(point: PlacedPoint): { readonly left: number; readonly top: number } {
-  const span = FIELD - INSET * 2;
+function place(point: PlacedPoint, size: number): { readonly left: number; readonly top: number } {
+  const span = size - INSET * 2;
   return { left: INSET + point.x * span, top: INSET + point.y * span };
 }
 
-export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldProps): ReactNode {
+export function MapField({
+  layout,
+  lens,
+  views,
+  onOpenNode,
+  spread,
+  testID,
+}: MapFieldProps): ReactNode {
   const theme = useFigureTheme();
   const capability = capabilityOf(lens);
+  const size = fieldSize(spread ?? layout.points.length);
 
   return (
-    <View style={[styles.field, { height: FIELD, width: FIELD }]} testID={testID}>
+    <View style={[styles.field, { height: size, width: size }]} testID={testID}>
       {/*
         The lines, under everything, and hidden from the accessibility tree: an
         edge is already spoken by the two nodes it joins, and 40 unlabelled
         line segments would be 40 stops on a screen reader's walk. The relations
         themselves are listed in prose under the field.
       */}
-      <Svg aria-hidden height={FIELD} style={StyleSheet.absoluteFill} width={FIELD}>
+      <Svg aria-hidden height={size} style={StyleSheet.absoluteFill} width={size}>
         {layout.lines.map((line) => {
-          const from = place(line.from);
-          const to = place(line.to);
+          const from = place(line.from, size);
+          const to = place(line.to, size);
           /*
             A `component_of` edge whose role KANJIDIC2 does not classify is
             drawn `uncertain` — dotted — because that is exactly what the
@@ -128,7 +165,7 @@ export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldPr
           view === undefined
             ? `${capability.label}: not measured`
             : `${capability.label}: ${markLabel(view.mark)}${view.fragile ? ', fragile' : ''}`;
-        const position = place(point);
+        const position = place(point, size);
 
         return (
           <Pressable
@@ -155,20 +192,19 @@ export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldPr
               The mark carries the number; the chip carries the word. The chip is
               an opaque card — this is where the museum-card rule is discharged
               for text that has to sit over a ground.
-
-              A node with no projection at all and a node whose lens has never
-              been observed draw the same dotted ring, and correctly: both mean
-              "nothing has been measured here". The spoken label above carries
-              which of the two it is.
             */}
             <View aria-hidden>
               {/*
                 Hidden from the accessibility tree, and this is not a shortcut.
-                `NodeMark` and `RecallMark` under it are `accessible` with their
-                own labels, which is right when a mark stands alone on a card.
-                Here it sits inside a `Pressable` whose label already names the
-                node, the capability and the state, so leaving it exposed would
-                make one node two stops saying overlapping things.
+                `NodeMark`, and `RecallMark` under it, are `accessible` with
+                their own labels — which is right when a mark stands alone on a
+                card. Here it sits inside a `Pressable` whose label already names
+                the node, the capability and the state, so leaving it exposed
+                would make one node two stops saying overlapping things.
+
+                A node with no projection at all draws the same dotted ring as a
+                node whose lens has never been observed, and correctly: both mean
+                nothing has been measured here. The label above says which.
               */}
               <NodeMark
                 capability={lens}
@@ -217,8 +253,10 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: StyleSheet.hairlineWidth,
-    maxWidth: MIN_TOUCH_TARGET + SPACE.md,
-    paddingHorizontal: 4,
+    // Wide enough for a three-character headword: the first capture truncated
+    // 分ける and 不十分 to an ellipsis, which makes a node unidentifiable.
+    maxWidth: 64,
+    paddingHorizontal: 3,
     paddingVertical: 1,
   },
   chipText: {
