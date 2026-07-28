@@ -206,6 +206,125 @@ describe('the filters govern the groups exactly as they govern the walk', () => 
     expect(tight.nodes.length).toBeLessThanOrEqual(2);
     expect(labels(groupOf(tight, 'components'))).toEqual(['八', '刀']);
   });
+
+  it('filters the sibling as well as the reading a family is reached through', () => {
+    // Both hops of a reading family are `has_reading`, so `edgeKinds` is already
+    // settled by the check on the first hop. A sibling of an excluded *node*
+    // kind is rejected only by the second check, and this is the test for it:
+    // a query that excluded `kanji` must not get a kanji back in the family.
+    const shared = buildKnowledgeGraph({
+      nodes: [
+        { id: 'kanji:origin', kind: 'kanji', label: '分', componentIds: [] },
+        { id: 'reading:ブン', kind: 'reading', label: 'ブン', componentIds: [] },
+        { id: 'kanji:sib', kind: 'kanji', label: '文', componentIds: [] },
+        { id: 'lex:sib', kind: 'lexeme', label: '分岐', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'has_reading', from: 'kanji:origin', to: 'reading:ブン' },
+        { kind: 'has_reading', from: 'kanji:sib', to: 'reading:ブン' },
+        { kind: 'has_reading', from: 'lex:sib', to: 'reading:ブン' },
+      ],
+    });
+
+    const unrestricted = neighbourhoodOf(shared, 'kanji:origin', { depth: 2 });
+    expect(groupOf(unrestricted, 'readingFamily').map((member) => member.node.id)).toEqual([
+      'kanji:sib',
+      'lex:sib',
+    ]);
+
+    const noKanji = neighbourhoodOf(shared, 'kanji:origin', {
+      depth: 2,
+      nodeKinds: ['reading', 'lexeme'],
+    });
+    expect(groupOf(noKanji, 'readingFamily').map((member) => member.node.id)).toEqual(['lex:sib']);
+  });
+});
+
+/**
+ * `maxNodes` is the walk's budget and reaches nothing else.
+ *
+ * The table on `NeighbourhoodOptions` says so, and it was false: the groups read
+ * each member's depth out of the walk's depth map, which `maxNodes` bounds. Two
+ * things went wrong at once — a member genuinely one hop from the origin
+ * reported depth 2 whenever the ceiling had refused it, and because group
+ * members sort by depth, `perGroup` then showed a *different member*. These are
+ * the tests that pin the claim to behaviour rather than to a doc comment.
+ */
+describe('the whole-walk ceiling does not reach into the groups', () => {
+  // 文 is in 分's reading family through ブン *and* is one `contrasts_with` hop
+  // from it, so its honest distance is 1. The extra kanji are there to give the
+  // ceiling something to refuse and `perGroup` something to choose between.
+  const family = buildKnowledgeGraph({
+    nodes: [
+      { id: 'kanji:分', kind: 'kanji', label: '分', componentIds: [] },
+      { id: 'kanji:文', kind: 'kanji', label: '文', componentIds: [] },
+      { id: 'kanji:聞', kind: 'kanji', label: '聞', componentIds: [] },
+      { id: 'reading:ブン', kind: 'reading', label: 'ブン', componentIds: [] },
+    ],
+    edges: [
+      { kind: 'has_reading', from: 'kanji:分', to: 'reading:ブン' },
+      { kind: 'has_reading', from: 'kanji:文', to: 'reading:ブン' },
+      { kind: 'has_reading', from: 'kanji:聞', to: 'reading:ブン' },
+      { kind: 'contrasts_with', from: 'kanji:分', to: 'kanji:文' },
+    ],
+  });
+
+  it('reports a member’s real distance, not the one the refused walk implies', () => {
+    const roomy = neighbourhoodOf(family, 'kanji:分', { depth: 2, maxNodes: 100 });
+    const tight = neighbourhoodOf(family, 'kanji:分', { depth: 2, maxNodes: 1 });
+
+    const asPairs = (result: ReturnType<typeof neighbourhoodOf>): [string, number][] =>
+      groupOf(result, 'readingFamily').map((member) => [member.node.id, member.depth]);
+
+    // 文 is one hop away whether or not the walk had room to reach it.
+    expect(asPairs(roomy)).toEqual([
+      ['kanji:文', 1],
+      ['kanji:聞', 2],
+    ]);
+    expect(asPairs(tight)).toEqual(asPairs(roomy));
+    // And the walk really was cut, so this is not a vacuous comparison.
+    expect(tight.nodes).toHaveLength(1);
+    expect(tight.truncated.some((entry) => entry.cause === 'max_nodes')).toBe(true);
+  });
+
+  it('shows the same member under perGroup whatever maxNodes was', () => {
+    // Deliberately named so the *nearer* member sorts later by id: members are
+    // ordered by depth first and by id second, so corrupting one member's depth
+    // is only visible here when the id tiebreak disagrees with the distance.
+    // `kanji:zz` is one `contrasts_with` hop away and `kanji:aa` is two, so the
+    // one member a `perGroup: 1` page shows must be `kanji:zz`.
+    const tiebreak = buildKnowledgeGraph({
+      nodes: [
+        { id: 'kanji:分', kind: 'kanji', label: '分', componentIds: [] },
+        { id: 'kanji:zz', kind: 'kanji', label: 'zz', componentIds: [] },
+        { id: 'kanji:aa', kind: 'kanji', label: 'aa', componentIds: [] },
+        { id: 'reading:ブン', kind: 'reading', label: 'ブン', componentIds: [] },
+      ],
+      edges: [
+        { kind: 'has_reading', from: 'kanji:分', to: 'reading:ブン' },
+        { kind: 'has_reading', from: 'kanji:zz', to: 'reading:ブン' },
+        { kind: 'has_reading', from: 'kanji:aa', to: 'reading:ブン' },
+        { kind: 'contrasts_with', from: 'kanji:分', to: 'kanji:zz' },
+      ],
+    });
+
+    const shown = (maxNodes: number): string[] =>
+      groupOf(
+        neighbourhoodOf(tiebreak, 'kanji:分', { depth: 2, perGroup: 1, maxNodes }),
+        'readingFamily',
+      ).map((member) => member.node.id);
+
+    expect(shown(100)).toEqual(['kanji:zz']);
+    expect(shown(1)).toEqual(shown(100));
+  });
+
+  it('returns byte-identical groups across every ceiling, on the seed-shaped graph', () => {
+    const at = (maxNodes: number) => neighbourhoodOf(graph, 'kanji:分', { depth: 2, maxNodes });
+    const reference = at(500).groups;
+    [1, 2, 3, 5, 8, 13].forEach((maxNodes) => {
+      expect(at(maxNodes).groups, `maxNodes ${maxNodes}`).toEqual(reference);
+    });
+  });
 });
 
 describe('the bounds, and saying when they bit', () => {

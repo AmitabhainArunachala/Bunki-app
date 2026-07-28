@@ -33,7 +33,7 @@ import {
   type GraphNode,
 } from '../../src/index.ts';
 
-import { randomFrom } from '../adversarial/support/fuzz.ts';
+import { randomFrom, type Random } from '../adversarial/support/fuzz.ts';
 
 // ---------------------------------------------------------------------------
 // Real KANJIDIC2 reading lists, in KANJIDIC2 notation
@@ -361,40 +361,166 @@ describe('properties that must hold whatever is thrown at it', () => {
   ];
 
   /**
-   * Generated headwords and readings, most of them nonsense. The point is not
-   * that the classifier gets them right — most have no right answer — it is that
-   * it never *invents* one, and that its answer is always internally consistent.
+   * KANJIDIC2 kun notation split into the part the character covers and the
+   * okurigana that follows it — `はな.す` → `はな` + `す`, `ひと-` → `ひと` + ``.
+   *
+   * Re-derived here rather than imported from `era.ts`. This function builds
+   * *inputs*; an input assembled by the very parser the classifier uses would
+   * agree with that parser however it drifted, which is not a generator, it is
+   * a mirror. (`toHiragana` is imported instead of copied because it is a public
+   * export with its own direct tests further down this file.)
+   */
+  function splitKun(raw: string): { readonly base: string; readonly okurigana: string } {
+    const stripped = raw.replaceAll('-', '');
+    const stop = stripped.indexOf('.');
+    if (stop === -1) return { base: stripped, okurigana: '' };
+    return { base: stripped.slice(0, stop), okurigana: stripped.slice(stop + 1) };
+  }
+
+  const kunListOf = (character: string): readonly string[] => READINGS[character]?.kun ?? [];
+  const onListOf = (character: string): readonly string[] => READINGS[character]?.on ?? [];
+
+  const WITH_KUN = CHARACTERS.filter((character) => kunListOf(character).length > 0);
+  const WITH_ON = CHARACTERS.filter((character) => onListOf(character).length > 0);
+
+  /** The kun form of a character, headword and reading together: 話 → 話す/はなす. */
+  function kunOf(
+    character: string,
+    random: Random,
+  ): { readonly headword: string; readonly reading: string } {
+    const { base, okurigana } = splitKun(random.pick(kunListOf(character)));
+    return { headword: character + okurigana, reading: base + okurigana };
+  }
+
+  /** The on form, in the hiragana a lexeme reading is written in: 電 → でん. */
+  function onOf(character: string, random: Random): string {
+    return toHiragana(random.pick(onListOf(character)).replaceAll('-', ''));
+  }
+
+  /**
+   * One morpheme of a compound: the character's on or kun base, whichever it
+   * has. Several characters here record no kun reading at all (般, 界, 駅), so
+   * "pick a list at random" has to mean "pick from the lists that exist".
+   */
+  function morphemeOf(character: string, random: Random): string {
+    const on = onListOf(character);
+    const kun = kunListOf(character);
+    const useOn = kun.length === 0 || (on.length > 0 && random.bool());
+    return useOn ? onOf(character, random) : splitKun(random.pick(kun)).base;
+  }
+
+  /**
+   * Generated headwords and readings, most of them nonsense — but not *all* of
+   * them, and that distinction is the repair.
+   *
+   * The point of this corpus is that the classifier never *invents* an answer
+   * and that its answer is always internally consistent. But three of the
+   * properties below are about what a **placed** attribution looks like, and a
+   * generator that never produces one asserts nothing while passing. The
+   * original drew readings as uniform random kana, which matches a KANJIDIC2
+   * reading essentially never: instrumented over 4,000 cases per seed it placed
+   * 0, 2, 1 and 1 — and 0 of the multi-character headwords the second property
+   * is named after. Deleting the only rule that places left all three green.
+   *
+   * So the shapes are drawn deliberately now. `kun` and `on` assemble a reading
+   * out of the character's own recorded readings, `compound` concatenates two or
+   * three of them, and `noise` is the original uniform kana. Every shape is then
+   * *perturbed* a fifth of the time — a kana appended to the reading — so the
+   * near-misses that must come back `reading_unresolved` stay in the corpus
+   * beside the hits. What comes out is still not a claim about what the
+   * classifier should say; it is a corpus that reaches the branch under test.
    */
   function* fuzzed(seedBase: number, count: number): Generator<EraSource> {
     for (let index = 0; index < count; index += 1) {
       const random = randomFrom(seedBase + index);
-      const length = 1 + random.int(4);
-      const headword = Array.from({ length }, () => random.pick(CHARACTERS)).join('');
-      const readingLength = random.int(8);
-      const reading = Array.from({ length: readingLength }, () => random.pick(KANA)).join('');
+      const shape = random.int(10);
+      let headword: string;
+      let reading: string;
+
+      if (shape < 3) {
+        ({ headword, reading } = kunOf(random.pick(WITH_KUN), random));
+      } else if (shape < 5) {
+        headword = random.pick(WITH_ON);
+        reading = onOf(headword, random);
+      } else if (shape < 8) {
+        const characters = Array.from({ length: 2 + random.int(2) }, () => random.pick(CHARACTERS));
+        headword = characters.join('');
+        reading = characters.map((character) => morphemeOf(character, random)).join('');
+      } else {
+        const length = 1 + random.int(4);
+        headword = Array.from({ length }, () => random.pick(CHARACTERS)).join('');
+        reading = Array.from({ length: random.int(8) }, () => random.pick(KANA)).join('');
+      }
+
+      // A near miss is as much a case as a hit: it is what makes
+      // `reading_unresolved` the majority answer rather than an unreached branch.
+      if (random.bool(0.2)) reading += random.pick(KANA);
+
       yield { headword, reading, characterReadings: readingsFor(headword) };
     }
   }
 
+  /**
+   * How many of a corpus were placed, and how many of *those* were longer than
+   * one character.
+   *
+   * Every property below whose subject is a placed attribution asserts on this
+   * first. A guarded assertion that never runs is not a weak test, it is a green
+   * light wired to nothing, and the only defence is for the test to check that
+   * its own subject occurred.
+   */
+  function placementCensus(corpus: Iterable<EraSource>): {
+    readonly total: number;
+    readonly placed: number;
+    readonly placedMultiCharacter: number;
+  } {
+    let total = 0;
+    let placed = 0;
+    let placedMultiCharacter = 0;
+    for (const source of corpus) {
+      total += 1;
+      if (attributeLexemeEra(source).placement === 'unknown') continue;
+      placed += 1;
+      if ([...source.headword].length > 1) placedMultiCharacter += 1;
+    }
+    return { total, placed, placedMultiCharacter };
+  }
+
+  it('generates a corpus that actually reaches the rule that places', () => {
+    // The guard on the three properties that follow. It is stated as a floor
+    // rather than an exact count so that adding a character to READINGS is not a
+    // test edit, but it is high enough that the decorative corpus this replaced
+    // — 0 to 2 placements per 4,000 — could not satisfy it.
+    const census = placementCensus(fuzzed(0x9d0, 4000));
+    expect(census.placed).toBeGreaterThan(300);
+    expect(census.placedMultiCharacter).toBeGreaterThan(100);
+  });
+
   it('only ever places on 古道, and only ever by the single-morpheme rule', () => {
+    let placed = 0;
     for (const source of fuzzed(0x9d0, 4000)) {
       const attributed = attributeLexemeEra(source);
       if (attributed.placement === 'unknown') continue;
+      placed += 1;
       expect(attributed.placement).toBe('kodo');
       expect(attributed.basis).toBe('native_single_morpheme');
     }
+    expect(placed).toBeGreaterThan(300);
   });
 
   it('never places a headword of more than one character', () => {
+    let placedMultiCharacter = 0;
     for (const source of fuzzed(0x1a1d0, 4000)) {
       if ([...source.headword].length <= 1) continue;
       // A kun stem with okurigana is more than one *character* but one morpheme;
       // it is the single documented exception and it is still `kodo`.
       const attributed = attributeLexemeEra(source);
-      if (attributed.placement !== 'unknown') {
-        expect(attributed.basis).toBe('native_single_morpheme');
-      }
+      if (attributed.placement === 'unknown') continue;
+      placedMultiCharacter += 1;
+      expect(attributed.basis).toBe('native_single_morpheme');
+      expect([...source.headword].slice(1).join('')).not.toBe('');
     }
+    expect(placedMultiCharacter).toBeGreaterThan(100);
   });
 
   it('always returns a declared placement, a declared basis, and a non-empty reason', () => {
@@ -414,10 +540,27 @@ describe('properties that must hold whatever is thrown at it', () => {
   });
 
   it('a placed attribution always carries the native stratum', () => {
+    let placed = 0;
     for (const source of fuzzed(0x5713a7, 4000)) {
       const attributed = attributeLexemeEra(source);
-      if (attributed.placement !== 'unknown') expect(attributed.stratum).toBe('native');
+      if (attributed.placement === 'unknown') continue;
+      placed += 1;
+      expect(attributed.stratum).toBe('native');
     }
+    expect(placed).toBeGreaterThan(300);
+  });
+
+  it('still refuses far more than it places, and says why each time', () => {
+    // The corpus is not stacked: near misses and compounds are the bulk of it,
+    // so the negative branches this file is mostly about are still exercised.
+    const bases = new Map<string, number>();
+    for (const source of fuzzed(0x7e75d0, 4000)) {
+      const { basis } = attributeLexemeEra(source);
+      bases.set(basis, (bases.get(basis) ?? 0) + 1);
+    }
+    expect(bases.get('reading_unresolved') ?? 0).toBeGreaterThan(500);
+    expect(bases.get('sino_japanese_reading') ?? 0).toBeGreaterThan(100);
+    expect(bases.get('native_compound') ?? 0).toBeGreaterThan(0);
   });
 });
 
