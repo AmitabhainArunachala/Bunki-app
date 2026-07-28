@@ -5281,3 +5281,272 @@ with the correction marked rather than quietly applied:
 Verify this branch from a clean checkout, re-run the check set, and run
 `--verify-reproducible` with a warm cache. Nothing here is merged; no agent may
 merge, approve, or push to `main`.
+
+---
+
+## Appendix — B3/B6: the dictionary made reachable, and three P1s closed (2026-07-28)
+
+**Branch** `agent/bunki-real-dictionary`, continuing from `9051e8a`.
+**Role** Builder B3 (seed owner) also acting as B6 (app shell owner); the
+Conductor granted the shell surface — `apps/app/app/_layout.tsx`, the navigation
+map and every screen — because executing the Sources-screen coordination request
+B3 filed last wave requires it.
+
+V3 returned FAIL twice on this branch. Four things were outstanding. All four are
+closed below, each with the command that shows it.
+
+### 1 — The importer could not see a tag that carried an attribute (P1)
+
+`between(xml, tag)` located elements by searching for the literal string
+`<tag>`, which is not "an opening tag" but "an opening tag with no attributes".
+
+**The bug is reachable, and it left a receipt.** JMdict marks explanatory,
+literal, figurative and trademark glosses with `g_type`:
+
+| gloss form              | count in JMdict_e |
+| ----------------------- | ----------------- |
+| `<gloss>`               | 437,303           |
+| `<gloss g_type="expl">` | 2,513             |
+| `<gloss g_type="lit">`  | 1,057             |
+| `<gloss g_type="fig">`  | 65                |
+| `<gloss g_type="tm">`   | 39                |
+
+3,674 real English glosses were invisible. Worse, 25 entries whose _only_ glosses
+are typed fell out of the corpus entirely — they reached `senses.length === 0`
+and were skipped. The shipped manifest recorded `jmdictEntriesAvailable: 218148`
+against 218,173 `<entry>` elements in the file it had just hashed. Exactly the 25
+it could not parse. Nobody had read the number.
+
+**The fix** locates elements by name, keeping the two properties the literal
+search had for free — exact tag names (`<glossary>` is not `gloss`) and no false
+ends — and reports the raw attribute text, which the gloss filter needed: the old
+`xml:lang` guard was handed the element's _body_, where an attribute cannot
+appear, so it was dead code that would have waved every French gloss through the
+moment the pipeline was pointed at the multilingual JMdict.
+
+**Records changed, measured by running both parsers over the same bytes:**
+
+|                                           |                         |
+| ----------------------------------------- | ----------------------- |
+| entries parsed                            | 218,148 → **218,173** (+25) |
+| records changed in the shipped 3,000 tier | **14** (+17 senses)     |
+| records entering / leaving the selection  | 0 / 0                   |
+| whole-corpus entries whose senses differ  | 3,608                   |
+
+The answer is not zero, so no unreachability proof is owed — but the reachability
+proof is above rather than asserted. Examples of what came back: 石 gained
+"traditional unit of volume, approx. 180.4 litres"; 先生 gained "title or form of
+address for a teacher, master, doctor, lawyer, etc."; 歌舞伎 gained its
+definition. `kanji.json`, `sentences.json` and `strokes.json` were byte-identical
+after the re-import, which is the expected shape of a gloss-only fix.
+
+The stale corpus size is corrected everywhere it was asserted as a fact about
+`JMdict_e.gz`: LICENSES.md twice, `provenance.json` `source_version`,
+`edrdg-upstream.json` `entryCounts`.
+
+`test/import-parser.test.ts` (14 cases) pins the behaviour offline against XML in
+the shapes the real files use, including both regressions and the exact-tag-name
+property a careless regex would have broken.
+
+### 2 — The EDRDG acknowledgement is derived from the data, not from a list (P1)
+
+V3 drove a browser and found `/canvas` rendering JMdict headwords and glosses
+with no EDRDG acknowledgement anywhere in the DOM. That is the **second** time:
+last round it was `/`, fixed by adding one route to a hand-written list.
+
+The list was the defect both times, so the list is gone.
+
+`@bunki/seed` now exports `ON_SCREEN_ATTRIBUTION_SOURCES` and
+`FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION`, computed by walking its own records and
+asking which fields carry a source whose licence demands attribution on the
+screen (`data/licences.json` `requiresOnScreenAttribution`). A field that changes
+provenance changes the answer; a new licensed field joins it with no edit.
+
+Two tests, neither foolable the way the other is:
+
+- `apps/app/test/edrdg-acknowledgement.test.ts` — walks every destination in the
+  navigation map plus its imports and fails a screen that can reach a licensed
+  field without rendering `<SeedEntryDisclosure />`. Transitive, because
+  `session-screen` reaches the headword through `session-loop`. Carries a
+  negative control, and was **confirmed red** by deleting the canvas notice and
+  re-running before restoring it.
+- `apps/app/e2e/edrdg-acknowledgement.spec.ts` — walks the loop in Chromium and
+  asserts the licensor is in the _visible text_ at each stop, including the three
+  screens that exist only after a target is promoted and which no URL-driven
+  route list ever reached. It grades forward to the canvas step rather than
+  skipping when the door is not immediately there; an earlier draft skipped, and
+  a lane that skips its own subject is how this stayed green while `/canvas` was
+  broken.
+
+The notice now renders on capture, word, kanji, session, canvas, repair, evidence
+and About & diagnostics — every screen in the app. There are no exemptions, which
+is what removes the artefact that went stale twice.
+
+**The second EDRDG §3 clause is also closed.** It asks for acknowledgement "on a
+separate screen accessed from a menu, such as one labelled About, Sources", and
+LICENSES.md §2.2 has been recording it as unmet because no such screen existed.
+The **About & diagnostics** destination — one of the four in the persistent
+navigation shell — now carries a "Sources & licences" section listing every
+registry source with its licence and attribution. That closes the coordination
+request B3 filed against the shell last wave. It lists this project's own
+pending-OD-09 material too: a Sources screen naming only the dictionaries would
+let a reader take this project's prose for licensed lexicography.
+
+Also corrected because they were false rather than untidy: LICENSES.md §2.4's
+`CC BY-SA 3.0` label on the EDRDG-derived fields (the registry has said 4.0 since
+§2.3's correction; `test/edrdg.test.ts` now fails any line attaching a version to
+those fields that the registry does not hold, with both halves of the control);
+the `src/index.ts` docblock still claiming EDRDG content is
+"licensed-redistribution, never primary-source-verified" and that "nothing here
+is labelled Tatoeba", both contradicted by the data and by
+`SEED_ENTRY_DISCLOSURE` three lines below; and a stale copy of the disclosure
+pinned at 3.0 in `adv-claim-audit.spec.ts`.
+
+### 3 — The dictionary is reachable (the operator goal)
+
+`data/dictionary/` held 3,000 lexemes, 1,241 kanji, 1,241 stroke files and 2,000
+sentence pairs, and nothing in the product could reach any of it.
+
+- **Exported, not merged.** `packages/seed/src/imported.ts` exports
+  `importedDictionary` beside `seedDataset`. Every imported record carries
+  `tier: 'imported'`. `test/dataset.test.ts` — the fixture tier's scope
+  contract — is **unedited and passing**. Merging would make "the seed contains
+  exactly these sixteen lexemes" meaningless and let an imported 分岐 displace the
+  record the closed loop is built on.
+- **Search reaches both tiers**, fixture first at equal match quality. Typing a
+  Japanese word, a reading, or an English gloss finds an imported entry and opens
+  a word page with its real senses, readings and parts of speech.
+- **Kanji pages** show real KANJIDIC2 fields and real KanjiVG strokes for all
+  1,241.
+- **Tatoeba sentences** render on imported word pages, each naming _both_
+  contributors with their sentence ids on the card itself.
+- **The seeded target and the passage are untouched** — they resolve through the
+  fixture tier, which is why the ordering rule is a requirement and not a
+  preference. T-17's closed loop is green.
+
+**Strokes needed a decision and it is on the record.** The verbatim SVGs are
+4.7 MB, too much for a web bundle, and copying them into `apps/app` is forbidden
+outright (controller §4, DL-33 — share-alike data is admitted into
+`packages/seed` and nowhere else). The importer now extracts the geometry from
+those same committed bytes into `dictionary/stroke-paths.json`, in the exact
+shape the app's own KanjiVG parser produces, so there is one renderer and not
+two. It is labelled `kanjivg-derived` CC BY-SA 3.0; the verbatim files still ship
+and are still hashed; and `test/dictionary.test.ts` re-derives every stroke, its
+`kvg:type`, its id, and every component and radical from them. The derived view
+cannot drift from the originals or quietly become hand-drawn.
+
+**Performance, measured, web-only** (`docs/build-evidence/PERF_WEB.md`; before =
+`8775c2c` rebuilt in the same session, same machine, same script):
+
+|                                  | before (16 lexemes)      | after (3,016)                |
+| -------------------------------- | ------------------------ | ---------------------------- |
+| bundle, single JS chunk          | 1,712,482 B              | 5,851,369 B (3.4×)           |
+| cold load (n=8)                  | 253.6 ms med · 283.0 p95 | **436.4 ms med · 445.3 p95** |
+| warm lookup, fixture tier (n=15) | 41.7 ms med · 56.7 p95   | **23.3 ms med · 56.5 p95**   |
+| warm lookup, imported tier (n=15)| — unreachable            | **27.6 ms med · 41.2 p95**   |
+| local save ack (n=15)            | 64.2 ms med · 82.5 p95   | **55.4 ms med · 65.1 p95**   |
+
+Search did not get slower; it got faster, and **that took a fix that is on the
+record because it happened**. The first wiring made warm lookup 76.1 ms — worse
+than the 41.7 ms baseline — because the query normaliser was being applied to the
+_dataset_ on every keystroke, roughly 21,000 `normalize()` calls per character
+typed. Precomputing the invariant side produced the number above. The
+imported-tier samples include the English gloss `library`, which cannot use an
+exact-match index and must touch every sense of all 3,000 records.
+
+Cold load genuinely got worse: **+183 ms median, +72%**. It is not hidden in a
+warm number, and two bounds are stated beside it — localhost with no compression
+measures parse rather than transfer, so a real network would be worse by an
+unmeasured amount; and §13 sets no cold-load budget, so nothing is met or missed.
+
+### 4 — The Tatoeba contributor sentinel
+
+Round 1 found 652 of 2,000 sentences carrying the TSV NULL sentinel `\N` as a
+contributor while the UI claimed attribution. Confirmed three ways:
+
+1. **Mechanism: dropped, not resolved.** `tatoebaCell` maps the sentinel to null,
+   a pair missing either contributor does not ship, and at the committed
+   parameters that cost **1,009** candidate pairs — recorded in the manifest with
+   its reason, so "removed rather than softened" is checkable.
+2. **Shipped state: 0 of 2,000** carry a sentinel. Two offline assertions from
+   different directions: the per-record name pattern with its negative control,
+   and a scan of the raw file for the two characters, which have no legitimate
+   reason to appear in any field.
+3. **The check the offline suite cannot make.** A shape check passes a credit
+   that is simply _wrong_, and under CC BY 2.0 FR a false attribution is the
+   failure that matters. `--verify-attribution` re-reads the exports and
+   compares, per sentence id, the shipped username against the export's **and**
+   the shipped text against the export's, for both halves:
+
+   ```
+   ATTRIBUTED  all 2000 sentence pairs (4000 halves) name the contributor the
+   Tatoeba export names, over the text the export carries
+   ```
+
+   The text is compared too: crediting the right person for a sentence they did
+   not write is the same failure wearing a better name.
+
+### §17.5 check set — verbatim
+
+| Command                                            | Result                                    |
+| -------------------------------------------------- | ----------------------------------------- |
+| `npm run lint`                                     | clean, no output                          |
+| `npm run format:check`                             | `All matched files use Prettier code style!` |
+| `npm run typecheck`                                | clean across root + 5 workspaces          |
+| `npm run test`                                     | **90 files, 1,517 tests, all passed**     |
+| `npm run test:replay`                              | 2 files, 47 tests passed                  |
+| `npm run verify:export`                            | 1 file, 14 tests passed                   |
+| `npm run test:e2e`                                 | **42 passed** (1.1 min)                   |
+| `(cd apps/app && npx expo export --platform web)`  | `Exported: dist`                          |
+
+Extra checks this round owns:
+
+| Command                                              | Result                                                    |
+| ---------------------------------------------------- | --------------------------------------------------------- |
+| `import-sources.mjs --check`                         | 5/5 MATCH; licence gate green; provenance gate green      |
+| `import-sources.mjs --offline --verify-reproducible` | `REPRODUCIBLE 1246 emitted files … byte-identical`        |
+| `import-sources.mjs --offline --verify-fixtures`     | `MATCH all 16 fixture lexemes and 10 kanji`               |
+| `import-sources.mjs --offline --verify-attribution`  | `ATTRIBUTED all 2000 sentence pairs (4000 halves)`        |
+| `node scripts/measure-web-latency.mjs`               | table above                                               |
+
+The two `✘` inside the 42 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this round. Three of
+the 42 are the new EDRDG lane.
+
+### What this round still does not claim
+
+- **Not a full dictionary.** 3,000 of 218,173 JMdict entries. `--lexemes=all` is
+  the one number that changes it; nothing else in the pipeline would.
+- **Not reviewed glosses.** Nobody has read 3,000 entries for sense
+  appropriateness, and `IMPORTED_TIER_DISCLOSURE` says so in those words.
+- **Not a network measurement.** Every latency figure is localhost, Chromium,
+  this machine. The cold-load regression would be worse over a real link by an
+  amount this round did not measure.
+- **Nothing native.** No number here bears on any WP-11 budget.
+- **Not merged.** No agent may merge, approve, or push to `main`.
+
+### What a verifier should try to break
+
+1. Revert `between()` to the literal-string search, re-run
+   `test/import-parser.test.ts`, and confirm it goes red on the typed-gloss cases
+   specifically — not merely on some case.
+2. Delete `<SeedEntryDisclosure />` from any one screen and confirm **both** the
+   unit scan and the browser lane go red. If only one does, the other is not
+   reaching the artefact. (Done for `/canvas`; the other seven are untried.)
+3. Rename a licensed field in `provenance.json` and confirm the scan's field list
+   changes with it, rather than the check silently narrowing.
+4. Argue the whole-graph scan is too coarse — that About & diagnostics displays no
+   licensed word and should not carry the notice. The counter is that EDRDG §3's
+   second clause asks for exactly that screen; but if the first clause were the
+   only one, the exemption list would be back and so would the failure mode.
+5. Point `stroke-paths.json` at a hand-drawn path and confirm
+   `test/dictionary.test.ts` re-derivation fails rather than the digest check
+   passing on the doctored file.
+6. Search a gloss that matches hundreds of entries (`time`, `person`) and check
+   the 40-result display cap is not hiding a ranking bug behind a truncation.
+
+### Next safe command
+
+Verify this branch from a clean checkout, re-run the §17.5 set, and run
+`--verify-reproducible` and `--verify-attribution` with a warm cache. Nothing
+here is merged; no agent may merge, approve, or push to `main`.
