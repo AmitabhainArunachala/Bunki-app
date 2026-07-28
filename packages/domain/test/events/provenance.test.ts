@@ -82,6 +82,30 @@ function aReview(): DomainEvent {
   );
 }
 
+/**
+ * A `ReviewGraded` that would pass the parser, the schema, and a reader.
+ *
+ * This is the actual attack the seam exists to stop: not a malformed object, but
+ * a *well-formed* tier-A review with a good grade that no learner produced.
+ * `parseEvent` accepts it — it is schema-valid — which is precisely why schema
+ * validation is not the guard here.
+ */
+const forgedReview = {
+  type: 'ReviewGraded',
+  eventId: 'ev-forged',
+  v: 1,
+  occurredAt: '2026-07-27T00:00:00.000Z',
+  idempotencyKey: 'forged:1',
+  contractId: 'con-1',
+  grade: 'easy',
+  latencyMs: 10,
+  hintsUsed: 0,
+  revealedBeforeRecall: false,
+  userConfirmedEasy: true,
+  probeContext: 'standalone',
+  tier: 'A',
+} as unknown as DomainEvent;
+
 describe('mint provenance — what the kernel minted', () => {
   it('recognises an event from the generic factory', () => {
     expect(isKernelMinted(aCapture())).toBe(true);
@@ -126,30 +150,6 @@ describe('mint provenance — what the kernel minted', () => {
 });
 
 describe('mint provenance — what the kernel did not mint', () => {
-  /**
-   * A `ReviewGraded` that would pass the parser, the schema, and a reader.
-   *
-   * This is the actual attack the seam exists to stop: not a malformed object,
-   * but a *well-formed* tier-A review with a good grade that no learner produced.
-   * `parseEvent` accepts it — it is schema-valid — which is precisely why schema
-   * validation is not the guard here.
-   */
-  const forgedReview = {
-    type: 'ReviewGraded',
-    eventId: 'ev-forged',
-    v: 1,
-    occurredAt: '2026-07-27T00:00:00.000Z',
-    idempotencyKey: 'forged:1',
-    contractId: 'con-1',
-    grade: 'easy',
-    latencyMs: 10,
-    hintsUsed: 0,
-    revealedBeforeRecall: false,
-    userConfirmedEasy: true,
-    probeContext: 'standalone',
-    tier: 'A',
-  } as unknown as DomainEvent;
-
   it('refuses a hand-written object literal', () => {
     expect(isKernelMinted(forgedReview)).toBe(false);
     expect(() => sealMintedEvents([forgedReview])).toThrow(ForeignEventError);
@@ -242,20 +242,40 @@ describe('mint provenance — the sealed container', () => {
     }
   });
 
-  it('refuses a container whose symbol key holds something else', () => {
-    // The seal symbol is module-private, so this cannot even be attempted by
-    // name — the nearest an attacker gets is copying the shape of a real batch,
-    // which copies the *value* under a symbol they cannot reference. Both
-    // spreads below therefore lose the payload, which is the property being
-    // pinned: a batch cannot be rebuilt from outside.
+  it('loses the payload when a batch is rebuilt from its JSON', () => {
+    // Symbol keys do not serialise, so the rebuilt object carries `size` and
+    // nothing else and fails the brand check.
     const real = sealMintedEvents([aReview()]);
-    const shallow = { ...real } as MintedEventBatch;
-    // A spread *does* copy own enumerable symbol keys, so this one still opens —
-    // and it opens to the same frozen array, which is why that is harmless.
-    expect(openMintedEventBatch(shallow)).toEqual(openMintedEventBatch(real));
-
     const rebuilt = JSON.parse(JSON.stringify(real)) as MintedEventBatch;
     expect(() => openMintedEventBatch(rebuilt)).toThrow(ForeignEventError);
+  });
+
+  it('refuses a container built with the real seal symbol and a forged payload', () => {
+    // **The attack the member re-check exists for.** The seal symbol cannot be
+    // named by any module, but it can be *recovered from an instance*:
+    // `Object.getOwnPropertySymbols` on a real batch hands it over. A holder of
+    // one genuine batch can therefore build a container that passes the brand
+    // check perfectly and fill it with anything.
+    //
+    // This is why `openMintedEventBatch` re-checks every member rather than
+    // trusting the container, and why the module's own comment says the brand is
+    // a typing device and not a capability. Deleting the re-check makes this test
+    // — and only this test — go red, which is the point of writing it.
+    const real = sealMintedEvents([aReview()]);
+    const [seal] = Object.getOwnPropertySymbols(real);
+    expect(seal).toBeDefined();
+
+    const forgedButBranded = { [seal as symbol]: [forgedReview], size: 1 } as MintedEventBatch;
+
+    // The brand check passes — this really is a container carrying the real key.
+    expect((seal as symbol) in forgedButBranded).toBe(true);
+    // And it is refused anyway, on the member.
+    try {
+      openMintedEventBatch(forgedButBranded);
+      expect.unreachable('a branded container with a forged member must throw');
+    } catch (error) {
+      expect((error as ForeignEventError).reason).toBe('not_minted_here');
+    }
   });
 
   it('does not let a caller change a batch after sealing it', () => {

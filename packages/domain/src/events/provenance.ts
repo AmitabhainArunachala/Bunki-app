@@ -94,10 +94,24 @@ export function assertKernelMinted(value: unknown): asserts value is DomainEvent
  * The key the sealed container hides its payload under.
  *
  * A module-private `Symbol` — not `Symbol.for`, which would put it in the
- * cross-realm registry where any module could look it up by name. Nothing
- * outside this file can name this key, so nothing outside this file can build a
- * value that survives {@link openMintedEventBatch}'s brand check, and nothing
- * can reach the payload of a batch it was handed to swap it.
+ * cross-realm registry where any module could look it up by name. No module can
+ * *name* this key, and the type system will not let one try.
+ *
+ * ## What that is worth, stated exactly rather than generously
+ *
+ * It is not a capability check. A holder of a real batch can recover the symbol
+ * from the instance — `Object.getOwnPropertySymbols(batch)[0]` — and build a new
+ * object carrying that key with a payload of its own. That is a two-line attack
+ * and `test/events/provenance.test.ts` performs it, because a comment claiming
+ * otherwise would be exactly the kind of unearned assurance this codebase keeps
+ * failing builds over.
+ *
+ * So the brand is a *typing* device: it makes `persistMinted(literal)` a compile
+ * error and makes the intent legible at every call site. The thing that actually
+ * holds is {@link openMintedEventBatch}'s member re-check, which asks the mint
+ * registry about every event on the way out and therefore does not care how the
+ * container was assembled. Deleting the re-check is what opens the hole; deleting
+ * the brand only makes the mistake easier to type.
  */
 const SEALED: unique symbol = Symbol('bunki.mintedEventBatch');
 
@@ -143,7 +157,10 @@ export function sealMintedEvents(events: readonly DomainEvent[]): MintedEventBat
  * Re-checks both guards rather than trusting the type: the brand, because a
  * caller reaching this through `any` or across a boundary the compiler did not
  * see would otherwise hand in a plain object; and every member again, because
- * the type says nothing about what happened between the seal and here.
+ * the type says nothing about what happened between the seal and here — and
+ * because the brand is recoverable from an instance (see {@link SEALED}), so a
+ * container carrying the right symbol is *not* evidence that this module filled
+ * it. The member re-check is the guard that does not depend on that.
  *
  * @throws ForeignEventError with `reason: "unsealed_batch"` for a container this
  *   module did not produce, or the member's own reason for a bad member.

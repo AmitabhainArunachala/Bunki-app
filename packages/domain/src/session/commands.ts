@@ -321,9 +321,9 @@ export type SessionCommand =
  *     step can be answered exactly once. A double tap that arrives before the
  *     state advances therefore produces the same key on the same bytes, and
  *     replay collapses it into one event (§7).
- *   - **`canvasInteraction` → `canvas:${experienceId}:${ordinal}`**, counted off
- *     the canvas ledger, and **`repairProbe` → `repair:${contractId}:${ordinal}`**,
- *     counted off the log. Both are monotonic counters, so a repeat produces a
+ *   - **`canvasInteraction` → `canvas:${experienceId}:${ordinal}`** and
+ *     **`repairProbe` → `repair:${contractId}:${ordinal}`**, both counted off
+ *     the **log**. Both are monotonic counters, so a repeat produces a
  *     *different* key and appends a second event. That is not an oversight:
  *     `replay` collapses a repeated key only when the second event is
  *     byte-identical *including its `eventId` and `occurredAt`*, and mints here
@@ -340,6 +340,25 @@ export type SessionCommand =
  * `target_was_already_visible` — belt and braces, neither of them this key.
  * True double-tap idempotency for the canvas and repair paths is an open item
  * (controller §17.2), recorded in the capsule rather than implied here.
+ *
+ * ## Why the canvas ordinal moved to the log, and the start key to the session id
+ *
+ * Both changed in WP-10 when these events started reaching the durable log, and
+ * both were latent until then. The canvas ordinal used to count the *workspace's*
+ * ledger, which is empty at the start of every sitting, and `experienceId` is the
+ * seed passage's id — a constant. Two sittings over the same passage therefore
+ * minted `canvas:passage-bunki:0` twice, and once the store held the first one,
+ * the second sitting's canvas event was silently dropped as an already-applied
+ * key. Counting off the log instead makes the ordinal continue across sittings
+ * and across reloads, exactly as the repair path already did.
+ *
+ * The start key was `session:start:${asOf}:${budget}`, which is content-derived
+ * but not *identifying*: two sittings begun at the same instant with the same
+ * budget — routine under a fixed test clock — would claim one key while carrying
+ * different `sessionId`s, and a store that compares payloads (it does) would
+ * raise `IdempotencyConflictError` and refuse the whole append. Keying on the
+ * session id is both content-derived and unique, because the id generator is the
+ * injected one.
  */
 export function applySessionCommand(
   context: DomainContext,
@@ -363,8 +382,12 @@ export function applySessionCommand(
         ...(command.canvasId === undefined ? {} : { canvasId: command.canvasId }),
       };
 
+      // The id is drawn here rather than inside `startSession` so it can key the
+      // event as well as name the session — see this function's idempotency note.
+      const sessionId = context.ids.nextId('session');
       const started = startSession(context, input, {
-        idempotencyKey: `session:start:${command.asOf}:${String(command.timeBudgetMin)}`,
+        idempotencyKey: `session:start:${sessionId}`,
+        sessionId,
       });
       return withLog(state, [started.event], { runtime: started.runtime });
     }
@@ -407,10 +430,14 @@ export function applySessionCommand(
 
     case 'canvasInteraction': {
       // Positional, and deliberately so — see the idempotency note on this
-      // function. A repeat is a new encounter here, not a duplicate.
-      const ordinal = state.canvasLedger.length;
+      // function. A repeat is a new encounter here, not a duplicate. Counted off
+      // the log rather than off `canvasLedger`, because the ledger restarts with
+      // every workspace and `experienceId` is a seed constant: a second sitting
+      // over the same passage would otherwise reuse the first sitting's keys.
+      const prefix = `canvas:${command.interaction.experienceId}:`;
+      const ordinal = state.log.filter((event) => event.idempotencyKey.startsWith(prefix)).length;
       const record = recordCanvasInteraction(context, command.interaction, command.offer, {
-        idempotencyKey: `canvas:${command.interaction.experienceId}:${String(ordinal)}`,
+        idempotencyKey: `${prefix}${String(ordinal)}`,
       });
 
       const entry: CanvasLedgerEntry = {

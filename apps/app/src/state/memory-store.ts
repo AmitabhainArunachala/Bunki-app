@@ -48,6 +48,7 @@ import {
   mintEvidenceSuperseded,
   mintExposureLogged,
   mintReviewGraded,
+  openMintedEventBatch,
   replay,
   threadReducer,
   type CandidateAcceptedAsNoteEvent,
@@ -59,6 +60,7 @@ import {
   type DomainEvent,
   type DomainEventType,
   type EncounterCapturedEvent,
+  type MintedEventBatch,
   type ThreadPromotionChangedEvent,
   type ThreadState,
 } from '@bunki/domain';
@@ -69,6 +71,7 @@ import {
   DEMONSTRATION_PROMPT_FAMILY_VERSION,
   DURABILITY_NOTES,
   NULL_COMMAND_OBSERVER,
+  PERSIST_OPERATION_KIND,
   type AppCommand,
   type AppCommandKind,
   type AppSnapshot,
@@ -77,6 +80,7 @@ import {
   type CommandAck,
   type CommandObserver,
   type DurabilityLevel,
+  type PersistAck,
   type ThreadView,
   type UncertaintyAnnotation,
 } from './store.ts';
@@ -315,54 +319,66 @@ export function createMemoryAppStore({
    * That is the difference between idempotency as a UI convenience and
    * idempotency as a property of the log.
    */
-  function rehydrate(log: readonly DomainEvent[]): void {
-    for (const event of log) {
-      events.push(event);
+  /**
+   * Fold one event that arrived already-minted into the log and the projection.
+   *
+   * Shared by `rehydrate` (events read back from the durable adapter) and
+   * `persistMinted` (events the kernel minted elsewhere in this process). The two
+   * paths differ in what they trust — the adapter is the authority on its own
+   * bytes, the persist path checks provenance first — and not at all in how an
+   * event is projected, so the projection lives here once. A second copy would be
+   * a second answer to "what does this event mean for a thread", which is the
+   * disagreement `readDerived()` exists to make impossible.
+   */
+  function absorb(event: DomainEvent): void {
+    events.push(event);
 
-      if (event.type === 'EncounterCaptured') {
-        const captured = event;
-        const targetKey = targetKeyOf(captured.text);
-        const existing = threads.get(captured.threadId);
-        const marked = 'uncertaintyMark' in captured && captured.uncertaintyMark === true;
-        if (existing === undefined) {
-          threads.set(captured.threadId, {
-            state: initialThreadState(captured),
-            displayText: captured.text.trim(),
-            targetKey,
-            lexemeId: resolveLexemeId?.(captured.text) ?? null,
-            uncertainty: null,
-            markRecordedInLog: marked,
-            capturedAt: captured.occurredAt,
-          });
-          threadOrder.unshift(captured.threadId);
-        } else {
-          threads.set(captured.threadId, {
-            ...existing,
-            state: threadReducer(existing.state, captured),
-            markRecordedInLog: existing.markRecordedInLog || marked,
-          });
-        }
-      } else if (event.type === 'ThreadPromotionChanged') {
-        const thread = threads.get(event.threadId);
-        // A promotion whose thread is not in the log is a log the kernel would
-        // refuse on replay. It is skipped rather than thrown on, because the
-        // authority on a malformed log is `replay` — which `readDerived()` runs
-        // over the same events — and two components deciding that question
-        // separately is how they come to disagree.
-        if (thread !== undefined) {
-          threads.set(event.threadId, { ...thread, state: threadReducer(thread.state, event) });
-        }
+    if (event.type === 'EncounterCaptured') {
+      const captured = event;
+      const targetKey = targetKeyOf(captured.text);
+      const existing = threads.get(captured.threadId);
+      const marked = 'uncertaintyMark' in captured && captured.uncertaintyMark === true;
+      if (existing === undefined) {
+        threads.set(captured.threadId, {
+          state: initialThreadState(captured),
+          displayText: captured.text.trim(),
+          targetKey,
+          lexemeId: resolveLexemeId?.(captured.text) ?? null,
+          uncertainty: null,
+          markRecordedInLog: marked,
+          capturedAt: captured.occurredAt,
+        });
+        threadOrder.unshift(captured.threadId);
+      } else {
+        threads.set(captured.threadId, {
+          ...existing,
+          state: threadReducer(existing.state, captured),
+          markRecordedInLog: existing.markRecordedInLog || marked,
+        });
       }
-
-      appliedKeys.set(event.idempotencyKey, {
-        threadId: 'threadId' in event ? event.threadId : '',
-        acknowledgedAt: event.occurredAt,
-        events: [event],
-        deduplicated: false,
-        durability,
-      });
+    } else if (event.type === 'ThreadPromotionChanged') {
+      const thread = threads.get(event.threadId);
+      // A promotion whose thread is not in the log is a log the kernel would
+      // refuse on replay. It is skipped rather than thrown on, because the
+      // authority on a malformed log is `replay` — which `readDerived()` runs
+      // over the same events — and two components deciding that question
+      // separately is how they come to disagree.
+      if (thread !== undefined) {
+        threads.set(event.threadId, { ...thread, state: threadReducer(thread.state, event) });
+      }
     }
 
+    appliedKeys.set(event.idempotencyKey, {
+      threadId: 'threadId' in event ? event.threadId : '',
+      acknowledgedAt: event.occurredAt,
+      events: [event],
+      deduplicated: false,
+      durability,
+    });
+  }
+
+  function rehydrate(log: readonly DomainEvent[]): void {
+    for (const event of log) absorb(event);
     if (log.length > 0) rebuildSnapshot();
   }
 
@@ -947,6 +963,76 @@ export function createMemoryAppStore({
     }
   }
 
+  /**
+   * The batch key for a persisted batch of kernel-minted events (WP-10).
+   *
+   * Derived from the first appended event's own key, which is content-derived on
+   * every session path, so re-persisting the same gesture produces the same batch
+   * key and the adapter's no-op path handles it — the same rule
+   * `commandIdempotencyKey` follows, and for the same reason.
+   */
+  const persistBatchKey = (first: DomainEvent): string =>
+    `${PERSIST_OPERATION_KIND}:${first.idempotencyKey}`;
+
+  /**
+   * Write down events the kernel minted elsewhere in this process.
+   *
+   * The whole method is a filter and two loops. Everything that makes it safe
+   * happened before the first line: `openMintedEventBatch` throws unless the
+   * container came from `sealMintedEvents` *and* every member is an object one of
+   * the kernel's minters returned, unaltered. There is nothing here that
+   * constructs, grades, tiers, or admits.
+   *
+   * See `AppStore.persistMinted` for why this is not the `ingest` hole WP-10's
+   * closeout refused to open.
+   */
+  function persistMinted(batch: MintedEventBatch): PersistAck {
+    const started = elapsedMs();
+    const incoming = openMintedEventBatch(batch);
+
+    const appended: DomainEvent[] = [];
+    const alreadyPresent: DomainEvent[] = [];
+    for (const event of incoming) {
+      // Keyed on the event's own key, not the batch's: the session workspace
+      // holds a copy of the store's log, so a caller that re-offers its whole
+      // workspace is offering events this store already has. That is the normal
+      // case on the first dispatch of a sitting, not an error.
+      if (appliedKeys.has(event.idempotencyKey)) {
+        alreadyPresent.push(event);
+        continue;
+      }
+      absorb(event);
+      appended.push(event);
+    }
+
+    if (appended.length > 0) {
+      rebuildSnapshot();
+      notify();
+      const first = appended[0];
+      // Same ordering rule as `execute`: subscribers see it before a byte is
+      // written (REQ-UI-01), and a failed durable write becomes a reported write
+      // state rather than a lost acknowledgment (`durable-store.ts`).
+      if (journal !== undefined && first !== undefined) {
+        journal(appended, persistBatchKey(first));
+      }
+    }
+
+    observer.observe({
+      commandKind: PERSIST_OPERATION_KIND,
+      latencyMs: Math.max(0, elapsedMs() - started),
+      appendedTypes: appended.map((event): DomainEventType => event.type),
+      deduplicated: appended.length === 0 && alreadyPresent.length > 0,
+      failed: false,
+    });
+
+    return {
+      appended,
+      alreadyPresent,
+      acknowledgedAt: appended[appended.length - 1]?.occurredAt ?? context.clock.now(),
+      durability,
+    };
+  }
+
   if (initialEvents !== undefined) rehydrate(initialEvents);
 
   return {
@@ -996,6 +1082,7 @@ export function createMemoryAppStore({
       });
       return ack;
     },
+    persistMinted,
     readAll: () => events.slice(),
     readDerived,
   };

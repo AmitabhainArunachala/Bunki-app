@@ -44,7 +44,7 @@
  * capture screen; nothing else in the app promotes anything.
  */
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import {
   applySessionCommand,
@@ -56,6 +56,7 @@ import {
   isPromotionActive,
   latestStumble,
   retrievalContractFromEvent,
+  sealMintedEvents,
   type CanvasProbeOffer,
   type ContractCreatedEvent,
   type DomainContext,
@@ -79,25 +80,43 @@ import type { AppStore, ThreadView } from '../state/store.ts';
 import type { PassageMark } from './canvas-passage.ts';
 
 /**
- * The one integration seam that is still open, stated where it cannot be lost.
+ * What the durable log now holds for a sitting, and what it still does not.
  *
- * WP-08 wrote this expecting WP-10 to close it. WP-10 gave the app a durable
- * store and deliberately did **not**, and the sentence is corrected rather than
- * left pointing at a step that already happened: joining these events would
- * mean giving `AppStore` a way to accept events it did not mint, and
- * `@bunki/domain` carries no runtime marker distinguishing a gate-minted
- * `ReviewGraded` from an object literal shaped like one (the gate says why —
- * a brand does not survive the JSON boundary). An ingest method would therefore
- * be the evidence-gate bypass controller §5 exists to close and §21.3(5) makes
- * a stop condition, so the join belongs to whoever owns that package's design,
- * not to an integration wave.
+ * ## The seam this used to describe, and how it closed
  *
- * The consequence is stated on screen instead of being smuggled: this sitting's
- * observations are real, gate-minted and inspectable while the app is open, and
- * they are not in the durable log.
+ * WP-08 held the session's events in this hook's state and left joining them to
+ * WP-10. WP-10 declined, for a reason that was correct at the time: giving
+ * `AppStore` an `ingest(events)` would let a screen hand it an object literal
+ * shaped like a tier-A `ReviewGraded`, and `@bunki/domain` had no runtime marker
+ * separating that from a gate-minted one — a brand does not survive the JSON
+ * boundary, as the gate itself says.
+ *
+ * It closed by noticing that the persist path never crosses that boundary. The
+ * kernel now records the exact objects its minters return (`mint-registry.ts`),
+ * `sealMintedEvents` refuses anything else, and `AppStore.persistMinted` takes
+ * only a sealed batch — so the store accepts events it did not mint *and* cannot
+ * accept events the kernel did not mint. The events themselves are still minted
+ * exactly where they were: by `applySessionCommand`, evidence-class ones through
+ * the evidence gate.
+ *
+ * ## What is therefore true now
+ *
+ * A sitting's `SessionStarted`, its contracts, every graded review, every canvas
+ * observation and its `SessionClosed` are in the same durable log as the capture
+ * and the promotion. They survive a reload, they are in the export, they replay,
+ * and the evidence inspector shows them.
+ *
+ * ## What is still app-local, said in the same breath so the sentence is not read
+ * as more than it is
+ *
+ * The *plan* is not an event. Which steps were composed, which were skipped and
+ * how far the cursor got are this workspace's state and are not exported; what
+ * the log keeps is what the learner did — the observations — and the explicit
+ * `SessionClosed` completion state. That is the intended split (a plan is a
+ * proposal, not evidence), not a gap left open.
  */
 export const SESSION_INTEGRATION_NOTE =
-  'Session and canvas events are held in this screen’s workspace for as long as the app is open, beside the durable log rather than in it — so this sitting’s observations do not survive a reload and do not appear in an export. Joining them needs a way for the store to accept events it did not mint, which would be an evidence-gate bypass unless the kernel gains a provenance marker first; that is coordination request COORD-B8-2, still open. Nothing here claims otherwise.';
+  'This sitting writes to the same durable log as your captures: the session start, the contracts it asks under, every answer you give here or in the passage, and the close. They survive a reload, appear in an export, and show up in the evidence inspector. The plan itself — which steps were composed and how far you got — stays on this device, because a plan is a proposal rather than a record of what you did.';
 
 /**
  * What the session says when the learner has promoted nothing yet.
@@ -210,9 +229,19 @@ function contractsFor(
   context: DomainContext,
   lexeme: SeedLexeme,
   componentId: string,
+  established: ReadonlySet<string>,
 ): readonly DomainEvent[] {
   const readingContractId = readingContractIdFor(lexeme);
   const meaningContractId = meaningContractIdFor(lexeme);
+
+  // Both events pin their `eventId` and `idempotencyKey` to the contract id, so
+  // minting one the log already holds would put two events under one key that
+  // differ in `occurredAt` — the exact `IdempotencyConflictError` shape replay
+  // refuses. That was unreachable while sessions wrote nothing durable; now that
+  // a sitting's contracts are persisted, the second sitting after a reload finds
+  // them already there and must not mint them again (WP-10).
+  const wanted: readonly string[] = [readingContractId, meaningContractId];
+  if (wanted.every((id) => established.has(id))) return [];
 
   const reading: ContractCreatedEvent = createTargetContract(
     context,
@@ -253,7 +282,19 @@ function contractsFor(
     { idempotencyKey: `contract:${meaningContractId}`, eventId: `ev-${meaningContractId}` },
   );
 
-  return [reading, meaning];
+  // Filtered rather than short-circuited above, so a log holding one of the pair
+  // (a partial write, an interrupted first sitting) gains the missing one instead
+  // of neither.
+  return [reading, meaning].filter((event) => !established.has(event.contractId));
+}
+
+/** Contract ids a `ContractCreated` in this log has already established. */
+function establishedContractIds(log: readonly DomainEvent[]): ReadonlySet<string> {
+  return new Set(
+    log
+      .filter((event): event is ContractCreatedEvent => event.type === 'ContractCreated')
+      .map((event) => event.contractId),
+  );
 }
 
 /**
@@ -367,7 +408,7 @@ export function bootstrapSessionWorkspace(
   return {
     workspace: createSessionWorkspace([
       ...log,
-      ...contractsFor(context, chosen.lexeme, chosen.componentId),
+      ...contractsFor(context, chosen.lexeme, chosen.componentId, establishedContractIds(log)),
     ]),
     target: {
       lexeme: chosen.lexeme,
@@ -434,17 +475,64 @@ export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
   const [initial] = useState<SessionBootstrap>(() => bootstrapSessionWorkspace(store, context));
   const [state, setState] = useState<SessionWorkspaceState>(initial.workspace);
 
+  /**
+   * The current workspace, readable synchronously.
+   *
+   * The command is applied here rather than inside a `setState` updater, because
+   * the durable write is a side effect and React may invoke an updater twice
+   * (StrictMode) or discard its result. Applying once, outside, and then setting
+   * the result is the version where "the log grew by these events" is a fact
+   * rather than a hope.
+   */
+  const workspace = useRef<SessionWorkspaceState>(initial.workspace);
+
+  /**
+   * Event ids the store already holds, so a dispatch persists only what is new.
+   *
+   * Seeded from the store's log — which the workspace was built over — plus any
+   * contracts the bootstrap minted. It is not an optimisation: a rehydrated event
+   * came back across JSON and is *not* kernel-minted, so offering one to
+   * `sealMintedEvents` would (correctly) throw. This set is what keeps the
+   * persist path pointed only at events this process minted.
+   */
+  const persisted = useRef<Set<string>>(
+    new Set(store.readAll().map((event: DomainEvent) => event.eventId)),
+  );
+
+  /**
+   * Carry everything the workspace has produced but the store has not seen.
+   *
+   * Deliberately "everything not yet persisted" rather than "what this command
+   * appended". The bootstrap mints the sitting's two `ContractCreated` events
+   * before any gesture, and writing them at bootstrap would put events in the
+   * learner's durable log for merely opening the Session tab — the fabrication
+   * the WP-10 repair round removed and must not reintroduce. Carrying them on the
+   * first dispatch instead means they are written by the gesture that made them
+   * true: the learner starting the sitting. Nothing is written by navigating.
+   */
+  const persist = useCallback(
+    (next: SessionWorkspaceState): void => {
+      const fresh = next.log.filter((event) => !persisted.current.has(event.eventId));
+      if (fresh.length === 0) return;
+      for (const event of fresh) persisted.current.add(event.eventId);
+      // `sealMintedEvents` is the kernel's check that every one of these came out
+      // of its own minters unaltered; the store re-checks on open. Neither is a
+      // formality — see `AppStore.persistMinted`.
+      store.persistMinted(sealMintedEvents(fresh));
+      onEvents?.(fresh);
+    },
+    [onEvents, store],
+  );
+
   const dispatch = useCallback(
     (command: SessionCommand) => {
-      setState((previous) => {
-        const next = applySessionCommand(context, previous, command);
-        if (onEvents !== undefined && next.log.length > previous.log.length) {
-          onEvents(next.log.slice(previous.log.length));
-        }
-        return next;
-      });
+      const previous = workspace.current;
+      const next = applySessionCommand(context, previous, command);
+      workspace.current = next;
+      setState(next);
+      persist(next);
     },
-    [context, onEvents],
+    [context, persist],
   );
 
   const offer = useMemo<CanvasProbeOffer | null>(

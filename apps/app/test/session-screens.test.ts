@@ -243,9 +243,52 @@ describe('the app end of the loop stays inside controller §5', () => {
     });
   });
 
-  it('records the integration seam instead of implying the log is durable', () => {
-    expect(code(LOOP)).toContain('SESSION_INTEGRATION_NOTE');
-    expect(LOOP).toMatch(/COORD-B8-2/);
+  /**
+   * This assertion replaces, and is strictly stronger than, the one that stood
+   * here while COORD-B8-2 was open.
+   *
+   * The old version pinned that the loop *disclosed* an open seam: the note
+   * existed, it named the coordination request, and the session screen rendered
+   * it. That was the right assertion for a build in which a sitting's events did
+   * not reach the durable log — the honest thing to hold was the disclosure.
+   *
+   * WP-10's export lane closed the seam, so pinning the disclosure would now pin
+   * a sentence about a state of affairs that no longer exists. What replaces it
+   * is not "the note is gone" (that would be weaker — it would pass for a build
+   * that quietly stopped saying anything) but the mechanism itself: the loop
+   * carries its events to the store, and it does so through the sealed batch,
+   * which is the only route that cannot also carry a forged one. The note is
+   * still required to exist and still required to be rendered; what it says is
+   * asserted where the wording lives (`test/persist-minted-boundary.test.ts`).
+   */
+  it('carries the sitting to the durable store through the sealed persist seam', () => {
+    const source = code(LOOP);
+    expect(source).toContain('sealMintedEvents');
+    expect(source).toContain('store.persistMinted');
+    // Still no minting in the app: the events being persisted are the ones
+    // `applySessionCommand` produced, which is asserted above.
+    expect(source).not.toContain('createDomainEvent');
+
+    // The note survives the closure — a screen that stopped describing what it
+    // writes down would be a screen the learner cannot audit (REQ-UI-05).
+    expect(source).toContain('SESSION_INTEGRATION_NOTE');
     expect(code(SESSION)).toContain('SESSION_INTEGRATION_NOTE');
+  });
+
+  it('writes nothing at bootstrap, so opening the Session tab records no event', () => {
+    // The WP-10 repair round removed writes from the bootstrap because reaching
+    // the Session link was enough to fabricate a capture and a promotion
+    // (definition of done §2 item 6). Persisting the sitting must not put them
+    // back: `bootstrapSessionWorkspace` still only reads, and the contracts it
+    // mints are carried on the first *dispatch* instead.
+    const source = code(LOOP);
+    const bootstrap = source.slice(
+      source.indexOf('export function bootstrapSessionWorkspace'),
+      source.indexOf('export function probeOfferFor'),
+    );
+    expect(bootstrap).not.toBe('');
+    expect(bootstrap).not.toContain('persistMinted');
+    expect(bootstrap).not.toContain('sealMintedEvents');
+    expect(bootstrap).not.toContain('.execute(');
   });
 });
