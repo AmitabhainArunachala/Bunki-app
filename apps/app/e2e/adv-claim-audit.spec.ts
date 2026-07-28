@@ -219,7 +219,7 @@ test('claims: the audit itself can fail — every pattern matches its own exampl
 
 /** Verbatim from `@bunki/seed` and `@bunki/ai` — the packages that own the wording. */
 const SEED_ENTRY_DISCLOSURE =
-  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 3.0. Sense and reading lists are flattened here and may not show every distinction upstream draws. Example sentences, grammar notes and the reading passage are written by this project, not taken from any corpus.';
+  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 4.0. Stroke order comes from KanjiVG under CC BY-SA 3.0. Imported example sentences come from the Tatoeba Project under CC BY 2.0 FR and name the member who contributed each one. Sense and reading lists are flattened here and may not show every distinction upstream draws. The eight worked examples, the grammar notes and the reading passage are written by this project, not taken from any corpus.';
 const SEED_COVERAGE_DISCLOSURE = 'This is a Phase-0 seed dataset, not a complete dictionary.';
 const CANDIDATE_LABEL = 'AI candidate / generated';
 const OFFLINE_FALLBACK_LABEL = 'offline-fallback';

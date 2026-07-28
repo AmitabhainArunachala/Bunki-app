@@ -4953,3 +4953,189 @@ Open a **draft** PR from `agent/bunki-real-dictionary` into
 `licensed-redistribution` state, which is a new epistemic category and should
 not enter the vocabulary without a human agreeing it is honest. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## B3 seed — real dictionary from primary sources (2026-07-28, second round)
+
+Branch `agent/bunki-real-dictionary`, continuing the first B3 round rather than
+restarting it: the launcher's resume rule applies, and that round's licence
+scaffolding, tests and provenance schema are what made this one cheap.
+
+**What changed underneath.** The operator widened the egress policy. Reproduced
+before relying on it, with `curl` and again with the importer:
+`www.edrdg.org` 200, `creativecommons.org` 200, `downloads.tatoeba.org` 200.
+`ftp.edrdg.org` is still refused (bad TLS, plain HTTP refused) and
+`codeload.github.com` still 403; neither is needed. Byte counts matched what the
+Conductor reported exactly — JMdict_e.gz 10,523,044 and kanjidic2.xml.gz
+1,488,563 — and KANJIDIC2 parsed to 13,108 characters, the count the Conductor
+reported independently.
+
+### The deliverable is the importer
+
+`packages/seed/scripts/import-sources.mjs`: fetch → verify licence → parse →
+subset → emit, with the size as a parameter and a machine-readable manifest of
+what was fetched (URL, retrieval date, bytes, sha256). `--check` re-derives every
+committed digest offline; `--verify-fixtures` re-derives the §8 fixtures from
+current upstream; `--licences` runs the licence stage alone.
+
+The licence gate is `assertLicensed()`, and it runs *before* a source's bytes are
+parsed. A source whose verbatim text is not on disk at the recorded digest is
+skipped and written to the manifest's `deferred` list. That ordering is the
+whole design: licence first, data second.
+
+### What shipped
+
+| Level | Count | Source |
+| --- | --- | --- |
+| Vocabulary | 3,000 lexemes | JMdict, ranked by priority tag (nfXX band, then ichi1/news1/spec1) |
+| Kanji | 1,241 | KANJIDIC2 — exactly the kanji those words use |
+| Stroke order | 1,241 | verbatim KanjiVG at a pinned commit; coverage turned out to be complete |
+| Sentences | 2,000 pairs | Tatoeba, both ids and both contributor names |
+
+218,148 JMdict entries and 13,108 KANJIDIC2 characters were available; the subset
+is ranked, not arbitrary, so it is the common core. `--lexemes=all` imports every
+priority-tagged entry with no other change.
+
+### Sizing, against the controller
+
+Controller §8 fixes the seed fixtures at 12–20 lexemes and §2 excludes a *full*
+JMdict/KANJIDIC2 import from Phase 0. Both still hold, and neither was edited:
+
+- the **§8 fixture tier** (`data/*.json`) is unchanged in size — 16 lexemes, 10
+  kanji — and `test/dataset.test.ts`'s scope contract is untouched;
+- the **imported tier** lives in `data/dictionary/`, separate precisely so that
+  growing the dictionary cannot be mistaken for growing the seed.
+
+This is the resolution of the conflict the first round reported and declined to
+resolve. It is recorded, not assumed: a reviewer who disagrees should say so,
+because the alternative reading — that any import at all is C2 work — is
+defensible and would mean reverting the imported tier.
+
+11 MB is committed (7 MB of it stroke SVGs). The ~200 MB of raw archives are not;
+they cache in the gitignored `packages/seed/.cache/` and their sha256 is in the
+manifest.
+
+### Two findings, both fixed rather than filed
+
+**1. The §8 fixtures did not match current upstream.** Before relabelling their
+provenance as "retrieved 2026-07-28 from www.edrdg.org", `--verify-fixtures`
+compared all 16 lexemes and 10 kanji against the files that claim would cite.
+Seven fields were stale from the 2021 redistribution. 分岐点 was the worst:
+committed *junction / crossroads / division point / parting of ways*, upstream
+now *fork / junction / diverging point / turning point (e.g. in one's life) /
+crossroads*. Relabelling without re-deriving would have been false provenance, so
+the values were re-derived; `--verify-fixtures` now reports MATCH on all 26.
+
+**2. `fetchStrokes` swallowed every error.** A missing `mkdir` for the cache
+subdirectory surfaced only as `0 stroke files` after 1,241 successful HTTP
+fetches. The catch now tolerates a genuine 404 only — KanjiVG really does not
+cover every literal — and everything else is raised. Uncovered characters are
+counted in the manifest instead of vanishing.
+
+### The licence-version correction
+
+The first round labelled JMdict and KANJIDIC2 **CC BY-SA 3.0**, from the copy
+bundled in the `jamdict-data` sdist, and logged the doubt as D-1a rather than
+guessing. The licensor's own statement says **V4.0**. The redistributor's bundled
+copy was a licence version behind, and nothing inside the package could have
+detected that on its own — which is the concrete argument for the "fetch the
+licence from the licensor" rule. Corrected in `data/licences.json`,
+`data/provenance.json`, `LICENSES.md`, the README and the on-screen disclosure.
+`licenses/EDRDG-licence-statement.md` (the redistributor copy) was removed so
+there is exactly one answer on disk; §2.1 records the superseded route.
+
+EDRDG provenance moves to `primary-source-verified`, and `dataset.test.ts` now
+permits that label **only** while `source_url` stays on the licensor's host, so
+it cannot drift back onto a mirror the way the 3.0 statement did.
+
+### Deferrals closed
+
+D-1, D-1a, D-2 and D-3 are all closed against the licensor's own artefacts.
+D-4 is opened in their place and is open by nature: these files change
+continuously, this is a dated snapshot, and `--verify-fixtures` is how a later
+run finds out what moved.
+
+### Disclosure and attribution
+
+`SEED_ENTRY_DISCLOSURE` now states CC BY-SA 4.0, names KanjiVG and Tatoeba with
+their licences, and still disowns the eight worked examples, grammar notes and
+passage as this project's own writing. Understating real provenance and
+overstating project text are both failures and the tests catch both directions.
+
+**Not done, deliberately: a Sources/About screen.** §3 of the EDRDG statement
+requires a smartphone or tablet app to acknowledge the files on a separate screen
+reached from a menu, not only inline. The Phase-0 surface is Expo Web, where the
+"acknowledgement on each screen display" clause governs and is satisfied. The
+dedicated screen needs `apps/app/app/_layout.tsx` and the navigation map, which
+the orchestration spec assigns to the shell owner — so this is a **coordination
+request to the Conductor**, not a gap I closed across someone else's boundary. It
+becomes binding before any native build.
+
+### Tests
+
+New `test/dictionary.test.ts` (offline, 309 lines): manifest digests re-derived
+from the files on disk; every ent_seq / literal / Tatoeba id resolves against its
+own record; a sentence must actually contain the word it claims to exemplify;
+both contributors required, because CC BY 2.0 FR cannot otherwise be complied
+with; and the negative half — a fabricated source, and a licence file whose
+digest no longer matches — both fail.
+
+`apps/app` kept the `source-licensed` standing even though no record now uses it.
+Deleting it would mean re-inventing the primary-source/redistribution distinction
+under deadline the next time only a mirror is reachable. Its tests now drive it
+with a synthetic record, and a new test asserts the dataset contains none.
+
+### §17.5 check set, run in this worktree after `npm ci`
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | clean, no output |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **88 files, 1454 tests passed** (was 1453) |
+| `npm run test:e2e` | **38 passed (55.3s)** |
+| `cd apps/app && npx expo export --platform web` | `Exported: dist` |
+| `import-sources.mjs --check` | MATCH on all four outputs; licence gate satisfied |
+| `import-sources.mjs --verify-fixtures` | MATCH on all 16 lexemes and 10 kanji |
+
+The two `✘` inside the 38 remain the pre-existing `test.fail()` expected failures
+in `adv-known-defects.spec.ts`, unchanged by this round.
+
+`packages/seed/data/dictionary/` is in `.prettierignore` for the same reason
+`licenses/` is: its bytes are digest-pinned by the manifest, and reformatting
+would break the chain from a shipped gloss back to the upstream download.
+
+### What this round does not claim
+
+- **Not a full import.** 3,000 of 218,148 entries. The pipeline would do the rest
+  by changing one number; whether it *should* in Phase 0 is the operator's call.
+- **Not reviewed glosses.** Nobody read 3,000 entries for sense appropriateness.
+  They are upstream's, faithfully extracted and flattened, and the flattening is
+  disclosed on screen.
+- **Not wired into app search.** The imported tier is exported data with tests;
+  making the screens search it is WP-05's surface, and a coordination request.
+- **Not a permanent snapshot.** See D-4.
+
+### What a verifier should try to break
+
+1. Change one `sourceEntryId` in `data/dictionary/lexemes.json` and confirm
+   `test/dictionary.test.ts` goes red — then confirm `--check` catches the
+   digest change too. The two have different reach and the boundary matters.
+2. Edit one byte of `licenses/CC-BY-SA-4.0.html` and confirm both the digest
+   check and the LICENSES.md drift check fail.
+3. Point `SOURCES['edrdg-jmdict'].download.url` at any mirror and confirm the
+   `source_url` assertion in `dataset.test.ts` refuses the
+   `primary-source-verified` label.
+4. Delete a `japaneseContributor` from one sentence and confirm the suite fails
+   rather than shipping an unattributable CC BY work.
+5. Argue that the two-tier split is a dodge of controller §8. That is the one
+   judgement call in this round; §8's numbers and the imported tier are in
+   different directories precisely so the argument can be had explicitly.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-real-dictionary` into
+`agent/bunki-phase0-integration` for human review — in particular the two-tier
+sizing decision and the Sources-screen coordination request. Nothing here is
+merged; no agent may merge, approve, or push to `main`.

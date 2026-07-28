@@ -94,33 +94,70 @@ Completeness is enforced three independent ways, so a single mistake cannot pass
 
 ## Sources actually shipped
 
-| Source            | Licence       | State                                                                    | Covers                                                   |
-| ----------------- | ------------- | ------------------------------------------------------------------------ | -------------------------------------------------------- |
-| KanjiVG           | CC BY-SA 3.0  | **verified (primary source)** against the project's own repo, 2026-07-27 | stroke SVGs; stroke counts, components, radicals         |
-| JMdict (EDRDG)    | CC BY-SA 3.0  | **licensed redistribution**, 2026-07-28                                  | lexeme `reading`, `partOfSpeech`, `senses`               |
-| KANJIDIC2 (EDRDG) | CC BY-SA 3.0  | **licensed redistribution**, 2026-07-28                                  | kanji `onReadings`, `kunReadings`, `meanings`            |
-| This project      | pending OD-09 | original work                                                            | sentences, passage, grammar, selections, computed values |
-| Tatoeba           | CC BY 2.0 FR  | **deferred (D-2)** — unreachable, **nothing shipped**                    | —                                                        |
+| Source            | Licence       | State                                     | Covers                                                    |
+| ----------------- | ------------- | ----------------------------------------- | --------------------------------------------------------- |
+| JMdict (EDRDG)    | CC BY-SA 4.0  | **verified (primary source)**, 2026-07-28 | lexeme `reading`, `partOfSpeech`, `senses`                |
+| KANJIDIC2 (EDRDG) | CC BY-SA 4.0  | **verified (primary source)**, 2026-07-28 | kanji readings, meanings, grade, stroke count, freq, JLPT |
+| KanjiVG           | CC BY-SA 3.0  | **verified (primary source)**, 2026-07-27 | stroke SVGs; stroke counts, components, radicals          |
+| Tatoeba           | CC BY 2.0 FR  | **verified (primary source)**, 2026-07-28 | example sentences, with per-sentence contributor credit   |
+| This project      | pending OD-09 | original work                             | the eight worked examples, passage, grammar, selections   |
 
-Full detail, verbatim licence texts, per-file digests, the retrieval log and the
-open deferrals: [`LICENSES.md`](LICENSES.md). The machine-readable binding of
-source → licence text lives in `data/licences.json` and is enforced by
-`test/edrdg.test.ts`.
+Everything is now taken from the licensor's own host. Full detail, verbatim
+licence texts, per-file digests, the retrieval log and the closed deferrals:
+[`LICENSES.md`](LICENSES.md). The machine-readable binding of source → licence
+text lives in `data/licences.json`, enforced by `test/edrdg.test.ts` and
+`test/dictionary.test.ts`.
 
-Every EDRDG-sourced field carries its **real** upstream identifier — a JMdict
-`ent_seq`, a KANJIDIC2 literal — in `source_entry_id`. None is a placeholder.
+Every sourced field carries its **real** upstream identifier — a JMdict
+`ent_seq`, a KANJIDIC2 literal, a Tatoeba sentence id and contributor. None is a
+placeholder.
 
-`review_status` is `licensed-redistribution`, not `primary-source-verified`,
-and the difference is load-bearing: `www.edrdg.org` is still refused by the
-egress proxy, so the data and EDRDG's own licence statement were taken together
-from one pinned, sha256-verified artefact (`jamdict-data` 1.5, the `jamdict`
-project's own data package). The licensor's host was never reached, so the
-statement's currency is unverified and is recorded as unverified.
+### The licence version was wrong, and that is why this matters
 
-Example sentences remain **project-authored**. Tatoeba's hosts are blocked, the
-pinned database contains no examples, and no reachable host carries the
-CC BY 2.0 FR text — so under "licence first, data second" nothing is shipped
-from it and nothing is labelled with it.
+The previous round could not reach `www.edrdg.org` and took EDRDG's licence
+statement from a redistributor that bundled it with the data. That copy said
+**CC BY-SA 3.0**. The licensor's own statement says **V4.0**. The round recorded
+the doubt as open item D-1a instead of guessing, and reading the real statement
+settled it — the package now says 4.0 everywhere.
+
+This is the argument for the rule at the top of `LICENSES.md`: fetch the licence
+from the licensor, not from whoever is reachable. Nothing inside a package can
+detect that its licence text is a version behind.
+
+## The two tiers
+
+`data/*.json` is the **§8 fixture tier** — 16 lexemes, 10 kanji, the canonical
+分岐 target and the hand-written integration passage. Controller §8 fixes its
+size at 12–20 lexemes and `test/dataset.test.ts` enforces that; the imports below
+did not change its size, only the truth of its contents.
+
+`data/dictionary/` is the **imported tier**, written by the importer and never by
+hand. At the committed parameters it holds 3,000 lexemes, the 1,241 kanji they
+use, a verbatim KanjiVG stroke file for every one of them, and 2,000 Tatoeba
+sentence pairs. It is separate precisely so that growing the dictionary can never
+be mistaken for growing the seed fixtures.
+
+## Re-running or widening the import
+
+The importer is the deliverable; the JSON is its output. One command reproduces
+or expands everything:
+
+```bash
+# Licences first — a source with no verbatim licence text on disk cannot ship.
+NODE_USE_ENV_PROXY=1 node packages/seed/scripts/import-sources.mjs --licences
+
+# The full pipeline. Change one number to change the scale.
+NODE_USE_ENV_PROXY=1 node packages/seed/scripts/import-sources.mjs --lexemes=3000
+NODE_USE_ENV_PROXY=1 node packages/seed/scripts/import-sources.mjs --lexemes=all
+```
+
+`NODE_USE_ENV_PROXY=1` is required in this environment: Node's built-in `fetch`
+ignores `HTTPS_PROXY` without it and the downloads fail with a misleading 403.
+
+Raw archives (~200 MB) are cached in the gitignored `packages/seed/.cache/` and
+are **not** committed. Their sha256 is recorded in
+`data/dictionary/manifest.json`, so a shipped gloss can still be traced to the
+exact upstream bytes it came from.
 
 If a needed asset's license cannot be verified, that is a controller §21.3 stop
 condition (unresolved source licensing) — not a judgement call. It is not
@@ -130,13 +167,28 @@ in `licenses/` or is this project's own work under the pending OD-09 decision.
 ## Commands
 
 ```bash
-npm run test                                         # includes this package's 103 assertions
-node packages/seed/scripts/fetch-kanjivg.mjs --check  # re-verify strokes against pinned upstream (network)
-node packages/seed/scripts/fetch-edrdg.mjs --check    # re-verify every JMdict/KANJIDIC2 value (network)
+npm run test                                              # includes this package's assertions
+node packages/seed/scripts/import-sources.mjs --check      # offline: manifest vs files on disk
+node packages/seed/scripts/import-sources.mjs --verify-fixtures  # network: §8 fixtures vs current upstream
+node packages/seed/scripts/fetch-kanjivg.mjs --check        # network: strokes vs pinned upstream
 ```
+
+`--verify-fixtures` is worth running before trusting the fixture tier's
+provenance. Run against the 2026-07-28 files it found seven fields still carrying
+values from the 2021 redistribution — including 分岐点, whose senses upstream had
+rewritten entirely — and those were re-derived rather than relabelled.
 
 ## Status
 
-WP-04 dataset complete. D-1 (JMdict/KANJIDIC2 content and attribution text)
-**closed**. D-1a (confirm the current licence version at EDRDG itself) and D-2
-(Tatoeba) open as recorded above.
+WP-04 dataset complete and re-sourced from primary hosts. **D-1, D-1a, D-2 and
+D-3 all closed.** D-4 (upstream moves on; this is a dated snapshot) is open by
+nature and is what `--verify-fixtures` exists to answer.
+
+Not done, and deliberately: a **Sources / About screen**. §3 of the EDRDG licence
+requires that a smartphone or tablet app acknowledge the files on a separate
+screen reached from a menu, not only inline. The Phase-0 surface is Expo Web,
+where the "acknowledgement on each screen display" clause governs and is
+satisfied by `SEED_ENTRY_DISCLOSURE` on every word and kanji page. The dedicated
+screen needs `apps/app/app/_layout.tsx` and the navigation map, which the
+orchestration spec assigns to the shell owner — so it is raised as a coordination
+request rather than edited across that boundary.
