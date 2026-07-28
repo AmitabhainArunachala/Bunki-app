@@ -93,23 +93,12 @@ const ROUTE_PARAMS: Readonly<Record<string, readonly string[]>> = {
  * be looked at is exactly the page that should have to pass. So this takes every
  * destination, not the learner subset.
  */
-const ROUTES = [
-  '/',
-  '/word/lex-bunki',
-  '/word/lex-wakareru',
-  `/kanji/${encodeURIComponent('岐')}`,
-  '/session',
-  '/canvas',
-  '/repair',
-  '/evidence',
-  '/debug',
-  '/guide',
-  '/style-guide',
-  // Campaign E, lane B4. Scanned like every other route: it is the densest
-  // interactive surface in the app — a hundred-odd spans, ten of them links —
-  // and the first one to put ruby inside a control.
-  '/read',
-] as const;
+// Derived from DESTINATIONS rather than listed, so the sweep cannot fall behind
+// the app. Two lanes wrote this list in the same round — one appending '/read'
+// to a hard-coded array, one replacing the array with this — and the hard-coded
+// form is exactly the shape that lets a new route ship unscanned. The derivation
+// is kept and the literal dropped: a sweep whose coverage is a maintained list
+// is a sweep that silently shrinks.
 const ROUTES: readonly string[] = DESTINATIONS.flatMap((destination) => {
   if (!destination.href.includes('[')) return [destination.href];
   const params = ROUTE_PARAMS[destination.href];

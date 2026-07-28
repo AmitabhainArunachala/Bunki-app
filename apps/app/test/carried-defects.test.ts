@@ -151,9 +151,27 @@ describe('P2-2: the overwhelmed note claims only what is true', () => {
     expect(spanIsOpenable(span('を'))).toBe(false);
     // The component gates its `Pressable` on the same predicate, so the sentence
     // and the behaviour cannot drift apart again.
-    expect(source('src/ui/frontier.tsx')).toContain(
-      '!spanIsOpenable(span) || onOpen === undefined',
-    );
+    //
+    // Asserted as the *property* rather than as one expression's exact text.
+    // The original form pinned `!spanIsOpenable(span) || onOpen === undefined`,
+    // and lane B4 independently wrote the same condition as a named
+    // `interactive` local (it also needs it for the aria-hidden decision). The
+    // merge kept the shared predicate and the local name, which satisfies this
+    // test's intent exactly — and failed it, because the test was checking a
+    // string. What actually matters is the pair below: the file reaches
+    // tappability through `spanIsOpenable`, and never re-derives it inline from
+    // `span.lexemeId`, which is the drift the predicate exists to prevent.
+    // Comments stripped first, as every other source scan in this repo does:
+    // the sentence explaining why the inline form is banned would otherwise be
+    // the thing that trips the ban.
+    const frontier = source('src/ui/frontier.tsx')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(frontier).toMatch(/\bspanIsOpenable\(span\)/);
+    expect(
+      frontier,
+      'frontier.tsx re-derives tappability inline instead of using spanIsOpenable',
+    ).not.toMatch(/span\.lexemeId !== undefined/);
     expect(source('src/ui/frontier.tsx')).toContain('overwhelmedNote(spans, onOpen !== undefined)');
   });
 });
