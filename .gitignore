@@ -29,6 +29,13 @@ expo-env.d.ts
 *.jks
 *.mobileprovision
 
+# raw upstream dictionary downloads (packages/seed/scripts/import-sources.mjs).
+# ~200 MB of JMdict / KANJIDIC2 / Tatoeba archives. The emitted subset IS
+# committed; the archives are re-fetchable and their sha256 is recorded in
+# packages/seed/data/dictionary/manifest.json, so the provenance chain survives
+# without carrying them in git.
+packages/seed/.cache/
+
 # playwright (WP-10)
 playwright-report/
 test-results/

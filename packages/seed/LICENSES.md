@@ -168,29 +168,64 @@ node packages/seed/scripts/fetch-kanjivg.mjs --check
 
 ---
 
-## 2. EDRDG — JMdict / KANJIDIC2 — LICENSED REDISTRIBUTION
+## 2. EDRDG — JMdict / KANJIDIC2 — VERIFIED (primary source)
 
 **Used for:** every lexeme `reading`, `partOfSpeech` and `senses` value in
-`data/lexemes.json` (JMdict), and every kanji `onReadings`, `kunReadings` and
-`meanings` value in `data/kanji.json` (KANJIDIC2).
+`data/lexemes.json` and `data/dictionary/lexemes.json` (JMdict), and every kanji
+`onReadings`, `kunReadings`, `meanings`, `grade`, `strokeCount`, `frequency` and
+`jlpt` value in `data/kanji.json` and `data/dictionary/kanji.json` (KANJIDIC2).
 
-This replaces WP-04's deferral D-1. What has **not** changed is the reason D-1
-was opened: `www.edrdg.org` and `ftp.edrdg.org` are still refused by this
-session's egress policy, reproduced 2026-07-28.
+This closes deferral **D-1a**. The operator changed the egress policy on
+2026-07-28; `www.edrdg.org` now answers, so the licensor's own statement and the
+licensor's own data files were read directly and the redistribution route was
+abandoned. The correction that came out of it is not cosmetic — see §2.2.
 
-| Host                                           | 2026-07-27 | 2026-07-28 |
-| ---------------------------------------------- | ---------- | ---------- |
-| `www.edrdg.org`                                | refused    | refused    |
-| `ftp.edrdg.org`                                | refused    | refused    |
-| `creativecommons.org`                          | refused    | refused    |
-| `api.github.com`, `codeload.github.com`        | —          | 403        |
-| `raw.githubusercontent.com`                    | 200        | 200        |
-| `files.pythonhosted.org`, `registry.npmjs.org` | —          | 200        |
+| Host                                    | 2026-07-27 | 2026-07-28 (earlier) | 2026-07-28 (now) |
+| --------------------------------------- | ---------- | -------------------- | ---------------- |
+| `www.edrdg.org`                         | refused    | refused              | **200**          |
+| `creativecommons.org`                   | refused    | refused              | **200**          |
+| `downloads.tatoeba.org`                 | refused    | refused              | **200**          |
+| `raw.githubusercontent.com`             | 200        | 200                  | 200              |
+| `ftp.edrdg.org`                         | refused    | refused              | still refused    |
+| `codeload.github.com`                   | —          | 403                  | 403              |
 
-### 2.1 The artefact
+`ftp.edrdg.org` remains unreachable (bad TLS certificate, plain HTTP refused).
+It is not needed: `www.edrdg.org` serves the identical files, and that is where
+everything below came from.
 
-What became possible is a pinned redistribution that carries the data and the
-licensor's own statement in the same file.
+### 2.1 The artefacts
+
+Downloaded from the licensor's own host by
+`scripts/import-sources.mjs`. The archives themselves are **not** committed
+(~12 MB compressed, ~75 MB expanded); their digests are recorded in
+`data/dictionary/manifest.json`, which is committed, so any shipped gloss can be
+traced to the exact upstream bytes it was read from.
+
+|                | JMdict                                       | KANJIDIC2                                        |
+| -------------- | -------------------------------------------- | ------------------------------------------------ |
+| URL            | `https://www.edrdg.org/pub/Nihongo/JMdict_e.gz` | `https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz` |
+| Bytes          | 10,523,044                                   | 1,488,563                                        |
+| Retrieved      | 2026-07-28                                   | 2026-07-28                                       |
+| Contents       | 218,148 entries (English edition)            | 13,108 characters                                |
+
+Exact sha256 for both is in `data/dictionary/manifest.json` under `sources`.
+Re-verify the committed output against it, offline:
+
+```bash
+node packages/seed/scripts/import-sources.mjs --check
+```
+
+Re-download and re-derive everything from upstream:
+
+```bash
+NODE_USE_ENV_PROXY=1 node packages/seed/scripts/import-sources.mjs --lexemes=3000
+```
+
+The superseded route is recorded rather than erased: the previous round took
+these files from the `jamdict-data` 1.5 sdist on PyPI, because EDRDG's hosts were
+refused. That artefact carried JMdict 1.08 compiled 2021-04-17 with KANJIDIC2
+dated April 2008. It is no longer used, and `licenses/EDRDG-licence-statement.md`
+(the copy bundled with it) has been removed in favour of the licensor's own.
 
 |                 |                                                                                                                                                   |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -212,52 +247,66 @@ every digest, and re-derives every shipped value from the database:
 node packages/seed/scripts/fetch-edrdg.mjs --check
 ```
 
-### 2.2 Licence statement, verbatim
+### 2.2 Licence statement, verbatim — and a version correction
 
-The EDRDG **General Dictionary Licence Statement** is shipped verbatim at
-[`licenses/EDRDG-licence-statement.md`](licenses/EDRDG-licence-statement.md).
+The EDRDG **General Dictionary Licence Statement** is shipped verbatim, exactly
+as served, at
+[`licenses/EDRDG-licence-statement.html`](licenses/EDRDG-licence-statement.html).
 
-- 9,416 bytes, sha256 `1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6`
-- Retrieved twice, by independent paths, and `cmp` reports the two byte-identical:
-  - bundled in the pinned sdist at `jamdict_data-1.5/jamdict_data/LICENSE.md`
-  - `https://raw.githubusercontent.com/neocl/jamdict_data/main/jamdict_data/LICENSE.md`
-- The statement's own first line records its origin as
-  `https://www.edrdg.org/edrdg/licence.html`
+- 13,587 bytes, sha256 `52f60ea9ca68170a2f0663d7dba381ebf1bd57c17a3347dfe21153865c156692`
+- Retrieved from `https://www.edrdg.org/edrdg/licence.html` on 2026-07-28
+- Stored as the bytes the licensor served — no HTML stripping, no reflow.
+  `.prettierignore` covers `licenses/` so a formatter cannot rewrite a document
+  published as an exact copy.
 
-Its opening paragraphs, quoted from that file:
+Quoted from §3 of that file:
 
 ```text
-Copyright over the documents covered by this statement is held by James William
-BREEN and The Electronic Dictionary Research and Development Group.
-
 The dictionary files are made available under a Creative Commons
-Attribution-ShareAlike Licence (V3.0).
+Attribution-ShareAlike Licence (V4.0).
 ```
 
-**On the licence version.** This statement says **CC BY-SA 3.0**, and 3.0 is
-therefore what every EDRDG provenance record in this package declares, because
-3.0 is what the statement travelling with these bytes says. Several unaffiliated
-repositories describe current JMdict as CC BY-SA 4.0. That may well be right, and
-it is **not asserted here**: `www.edrdg.org` is unreachable, so the current
-statement could not be read, and guessing a licence version is the same class of
-error as guessing an attribution. If the operator opens EDRDG's hosts, this is
-the first thing to re-check.
+**The correction.** The previous round labelled this data **CC BY-SA 3.0**, and
+every EDRDG provenance record in the package said 3.0. That came from the licence
+copy bundled in the `jamdict-data` sdist, which is what could be reached at the
+time; the round recorded the discrepancy as open item D-1a rather than guessing.
+Reading the licensor's own statement settles it: **the licence is V4.0**, the
+3.0 label was wrong, and every provenance record, the machine-readable registry
+and the on-screen disclosure have been corrected to 4.0. This is the concrete
+reason the "fetch the licence from the licensor, not from whoever is reachable"
+rule is worth its cost — a redistributor's bundled copy was a licence version
+behind, and nothing inside the package could have detected that on its own.
+
+§3 also fixes how attribution must be shown, and the wording is specific:
+
+```text
+If a WWW server is providing a dictionary function or an on-screen
+display of words from the files, the acknowledgement must be made on each
+screen display, e.g. in the form of a message at the foot of the screen
+or page.
+
+For smartphone and tablet apps, acknowledgement must be made, e.g. on a
+separate screen accessed from a menu, such as one labelled "About",
+"Sources", etc. It is not sufficient just to mention it on a
+start-up/launch page of the app.
+```
+
+Both obligations are met by `SEED_ENTRY_DISCLOSURE` plus the Sources screen —
+see §2.4.
 
 ### 2.3 Full licence text
 
-The CC BY-SA 3.0 Unported legal code the statement points at is shipped verbatim
-at [`licenses/CC-BY-SA-3.0.txt`](licenses/CC-BY-SA-3.0.txt).
+The CC BY-SA 4.0 legal code the statement points at is shipped verbatim at
+[`licenses/CC-BY-SA-4.0.html`](licenses/CC-BY-SA-4.0.html).
 
-- 22,240 bytes, sha256 `3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f`
-- Retrieved from
-  `https://raw.githubusercontent.com/spdx/license-list-data/main/text/CC-BY-SA-3.0.txt`
-  on 2026-07-28
+- 51,859 bytes, sha256 `a7dbad04e9a44a69a06d2ea5f20cceccb163091550591ed41ac610f112789246`
+- Retrieved from `https://creativecommons.org/licenses/by-sa/4.0/legalcode` on
+  2026-07-28 — Creative Commons' own host, not a mirror and not SPDX.
 
-`creativecommons.org` is refused by the proxy, so this text comes from the SPDX
-license list (Linux Foundation) — the canonical machine-readable publication of
-licence texts — and is named as such rather than passed off as
-creativecommons.org. It is the same licence KanjiVG uses, whose licensor-issued
-copy is separately on file at `licenses/KanjiVG-COPYING.txt`.
+`licenses/CC-BY-SA-3.0.txt` (22,240 bytes, sha256
+`3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f`, from the SPDX
+license list on 2026-07-28) stays in the package, but it now backs **KanjiVG**,
+which really is CC BY-SA 3.0. It no longer backs any EDRDG claim.
 
 ### 2.4 How this project complies
 
