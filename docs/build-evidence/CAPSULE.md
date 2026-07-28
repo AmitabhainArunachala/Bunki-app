@@ -7298,6 +7298,28 @@ Three by running the inherited work, four by driving a browser.
    where the honest finding is that they are empty.
 7. **`alignItems` on the ground field shrank the mount**, leaving the 胡粉/墨 mat
    a narrow strip floating in a bare register.
+8. **A comment asserted a property the code did not have.** `scrubber.tsx` said
+   "the map under them settles once when its contents change (`Settle`)" and
+   nothing on the map imported `Settle` at all. Repaired by making it true rather
+   than by deleting the sentence, because the design asks for a settling map by
+   name: each band's field is wrapped in `Settle`, keyed on the origin, the lens
+   and the scrubber position — so a lens change or a scrubber step settles the
+   map once and nothing else moves. `Settle` animates on mount only, so the key
+   is what makes "settles when its contents change" true without making a live
+   surface shiver, and `resolveDuration` returns 0 under
+   `prefers-reduced-motion`. Two tests hold it now: that the settle exists with
+   all three dependencies in its key, and that nothing in the lane loops, runs a
+   timer-driven style, or celebrates.
+9. **古道 photographed as two nodes stacked in a corner of an empty field.** One
+   whole-walk layout was being filtered four ways, so a band holding 2 of 24
+   nodes got two adjacent angular slots from a 24-node ring. Each band is laid
+   out on its own now — radius still means hops from the origin, which is the
+   only thing the geometry ever claimed, and only the angle differs. The property
+   the filtering bought (a node keeps its coordinates in every band) was not
+   perceivable, because the bands are stacked and separately framed; it was
+   paying for the overlap with nothing. `MapField`'s `spread` prop existed only
+   to correct for the filtering and is gone rather than left as a parameter that
+   looks like it means something.
 
 Two defects in this lane's own **instrumentation**, both found by reading its
 output rather than its code:
@@ -7352,12 +7374,17 @@ the run):
 | road                | 176 stations counted in 2.2–2.6 ms                        |
 | whole-corpus census | 3,016 lexemes placed in 41–71 ms, behind a button          |
 
-Chromium, in the photographed page, over the walked ledger:
+Chromium, in the final photographed page, over the walked ledger:
 
 | scheme | cold load to interactive | lens change | scrubber step |
 | ------ | ------------------------ | ----------- | ------------- |
-| light  | 1,446 ms                 | 27.7 ms     | 19.2 ms       |
-| dark   | 1,665 ms                 | 51.7 ms     | 53.2 ms       |
+| light  | 690 ms                   | 32.1 ms     | 30.1 ms       |
+| dark   | 736 ms                   | 24.5 ms     | 27.2 ms       |
+
+Across five capture runs this round the same three numbers ranged 629–1,797 ms,
+18.2–51.7 ms and 18.3–109.9 ms. The spread is machine load, not the map — several
+agents were building in parallel — so the range is given rather than the best
+row.
 
 Cold load includes the one-off Atlas build over the whole shipped dictionary and
 is paid once per session. Lens change and scrubber step are the two interactions
@@ -7382,7 +7409,7 @@ the gate already admitted into per-frame histories through the kernel's own
 | `npm run lint`                                  | exit 0                                    |
 | `npm run format:check`                          | all files formatted                       |
 | `npm run typecheck`                             | exit 0, zero errors                       |
-| `npm run test`                                  | **2422 passed**, 1 skipped, 111 files     |
+| `npm run test`                                  | **2424 passed**, 1 skipped, 111 files     |
 | `npm run test:replay`                           | 47 passed                                 |
 | `npm run verify:export`                         | 14 passed                                 |
 | `cd apps/app && npx expo export --platform web` | exported, `/map` among the routes         |
@@ -7398,16 +7425,24 @@ the gate already admitted into per-frame histories through the kernel's own
   default. All three import the whole seed dynamically and touch no file this
   lane owns. Reproduced with this lane's uncommitted changes stashed, and green
   on the re-run recorded above. Pre-existing, not this lane's, not fixed here.
-- **`npm run test:e2e`, one timeout.** `adv-a11y-audit.spec.ts` › "axe: no
-  violation at all, on any route, in either scheme" exceeded its 120 s cap on the
-  first full run and passed on the second (48/48). It is **not** a violation, and
-  not flakiness this lane gets to shrug at: measured single-worker, the same scan
-  takes **57.8 s on `e22d069`** and **66 s on this branch**, so this lane adds
-  about 8 s of bundle weight to a scan already sitting at half its cap, and with
-  two workers contending that is enough to cross it. `/map` is not in that spec's
-  `ROUTES` — the cost is the bigger shared bundle every route now loads. Recorded
-  for the integration lane rather than repaired here: raising the cap or
+- **`npm run test:e2e`, two timeouts across four full runs, never the same one
+  twice, and never a failed assertion.** Runs 1 and 3 were 48/48 and exited 0.
+  Run 2 lost `adv-a11y-audit.spec.ts` › "axe: no violation at all, on any route,
+  in either scheme" to its 120 s cap; run 4 lost `finite-session.spec.ts` › T-13,
+  which then passed alone in 5.9 s.
+
+  The a11y one is **not** something this lane gets to shrug at, and it was
+  measured rather than assumed: single-worker, the same scan takes **57.8 s on
+  `e22d069`** and **66 s on this branch**. So this lane really does add about 8 s
+  of bundle weight to a scan already sitting at half its cap, and with two
+  workers contending that is enough to cross it. `/map` is **not** in that spec's
+  `ROUTES` — the cost is the larger shared bundle every route now loads. Recorded
+  for the integration lane rather than repaired here, because raising the cap or
   splitting the scan is an edit to another lane's e2e file.
+
+  The two `✘` lines the reporter prints on every run are the pre-existing
+  annotated `test.fail()` expectations (T4-1b, T3-3), counted in the 48, and the
+  run exits 0.
 
 ### Shared-file edits, declared
 
