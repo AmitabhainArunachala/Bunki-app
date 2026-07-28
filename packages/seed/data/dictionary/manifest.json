@@ -87,13 +87,13 @@
     "strokeFiles": 1241,
     "kanjiWithoutKanjiVgCoverage": 0,
     "sentencePairsDroppedWithoutNamedContributor": 1009,
-    "jmdictEntriesAvailable": 218148,
+    "jmdictEntriesAvailable": 218173,
     "kanjidic2CharactersAvailable": 13108
   },
   "outputs": {
     "dictionary/lexemes.json": {
-      "bytes": 1560385,
-      "sha256": "d840c5165fd87b1fc1d3cb991e17e0a36e0cfdbcc456dd803957135db945d59f"
+      "bytes": 1561668,
+      "sha256": "5d04b23b7daa78f7fd4e9035d86932da820eb4cc32c4981f7adbf80fbc1ad968"
     },
     "dictionary/kanji.json": {
       "bytes": 608085,

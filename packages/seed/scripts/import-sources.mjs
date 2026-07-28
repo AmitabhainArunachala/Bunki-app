@@ -495,24 +495,110 @@ export async function assertLicensed(sourceKey) {
 
 // ── stage 2: parsers ────────────────────────────────────────────────────────
 
-const between = (xml, tag, from = 0) => {
-  const open = xml.indexOf(`<${tag}>`, from);
-  if (open === -1) return null;
-  const close = xml.indexOf(`</${tag}>`, open);
-  if (close === -1) return null;
-  return { text: xml.slice(open + tag.length + 2, close), end: close + tag.length + 3 };
+/**
+ * Locate the next opening tag named exactly `tag`, whatever attributes it carries.
+ *
+ * The previous implementation searched for the literal string `<gloss>`, which is
+ * not "an opening gloss tag" — it is "an opening gloss tag with no attributes".
+ * JMdict marks explanatory, literal, figurative and trademark glosses with a
+ * `g_type` attribute, so 3,674 real English glosses were invisible to the parser,
+ * and the 25 entries whose *only* glosses are typed fell out of the import
+ * entirely (they reached `senses.length === 0` and were skipped). That is why the
+ * old manifest recorded 218,148 available JMdict entries against 218,173 in the
+ * file.
+ *
+ * Two properties this keeps that the literal search got for free, and that a
+ * careless regex would lose:
+ *
+ * - **Exact tag names.** `<glossary>` must not match `gloss`. The character after
+ *   the name has to be `>`, `/`, or whitespace.
+ * - **Attribute-aware end-of-tag.** With attributes the tag ends at the next `>`
+ *   *after* them, not at the name.
+ *
+ * Returns the offsets rather than the text so {@link between} can do the
+ * depth-aware close itself.
+ */
+const findOpenTag = (xml, tag, from) => {
+  const needle = `<${tag}`;
+  let at = from;
+  for (;;) {
+    const start = xml.indexOf(needle, at);
+    if (start === -1) return null;
+    const after = start + needle.length;
+    const next = xml[after];
+    if (next === '>') return { start, attributes: '', bodyStart: after + 1, selfClosing: false };
+    if (next === '/' && xml[after + 1] === '>') {
+      return { start, attributes: '', bodyStart: after + 2, selfClosing: true };
+    }
+    if (next === ' ' || next === '\t' || next === '\n' || next === '\r') {
+      const gt = xml.indexOf('>', after);
+      if (gt === -1) return null;
+      const selfClosing = xml[gt - 1] === '/';
+      return {
+        start,
+        attributes: xml.slice(after, selfClosing ? gt - 1 : gt).trim(),
+        bodyStart: gt + 1,
+        selfClosing,
+      };
+    }
+    // A longer tag name that merely starts with this one. Keep looking.
+    at = after;
+  }
 };
 
-const allBetween = (xml, tag) => {
+/**
+ * The first `<tag …>…</tag>` element at or after `from`.
+ *
+ * `attributes` is the raw attribute text, which callers need: the old parser
+ * could never see an attribute, so its `xml:lang` guard on glosses was dead code
+ * that would have kept silently passing on the multilingual JMdict. The close is
+ * matched depth-aware so a same-named child cannot terminate its parent early —
+ * neither JMdict nor KANJIDIC2 nests these tags today, but a parser that only
+ * works because its input happens not to is the kind of thing this round is
+ * fixing.
+ */
+export const between = (xml, tag, from = 0) => {
+  const open = findOpenTag(xml, tag, from);
+  if (open === null) return null;
+  if (open.selfClosing) return { text: '', attributes: open.attributes, end: open.bodyStart };
+  const close = `</${tag}>`;
+  let depth = 1;
+  let cursor = open.bodyStart;
+  for (;;) {
+    const closeAt = xml.indexOf(close, cursor);
+    if (closeAt === -1) return null;
+    const nested = findOpenTag(xml, tag, cursor);
+    if (nested !== null && !nested.selfClosing && nested.start < closeAt) {
+      depth += 1;
+      cursor = nested.bodyStart;
+      continue;
+    }
+    depth -= 1;
+    if (depth === 0) {
+      return {
+        text: xml.slice(open.bodyStart, closeAt),
+        attributes: open.attributes,
+        end: closeAt + close.length,
+      };
+    }
+    cursor = closeAt + close.length;
+  }
+};
+
+/** Every `<tag …>` element in document order, as `{ attributes, text }`. */
+export const allElements = (xml, tag) => {
   const out = [];
   let cursor = 0;
   for (;;) {
     const hit = between(xml, tag, cursor);
     if (!hit) return out;
-    out.push(hit.text);
+    out.push({ attributes: hit.attributes, text: hit.text });
     cursor = hit.end;
   }
 };
+
+/** The text of every `<tag …>` element, for callers with no use for attributes. */
+export const allBetween = (xml, tag) => allElements(xml, tag).map((element) => element.text);
 
 const decodeXml = (text) =>
   text
@@ -602,11 +688,19 @@ export function parseJMdict(xml) {
         const label = expand(p);
         if (!pos.includes(label)) pos.push(label);
       }
-      for (const gloss of allBetween(sense, 'gloss')) {
+      for (const gloss of allElements(sense, 'gloss')) {
         // Non-English glosses carry xml:lang; JMdict_e is English-only, but the
         // guard keeps this correct if pointed at the multilingual JMdict.
-        if (gloss.includes('xml:lang')) continue;
-        senses.push(decodeXml(gloss));
+        //
+        // It has to read the *attributes*, not the text. The old parser handed
+        // this check the element's body, where `xml:lang` can never appear, so it
+        // was dead code that would have waved every French and German gloss
+        // through the moment anyone pointed the pipeline at the multilingual
+        // file. `g_type` glosses — explanatory, literal, figurative, trademark —
+        // are English and do ship: they are upstream's own wording for the sense,
+        // and dropping them was the bug, not the policy.
+        if (/\bxml:lang\s*=/.test(gloss.attributes)) continue;
+        senses.push(decodeXml(gloss.text));
       }
     }
     if (senses.length === 0) continue;

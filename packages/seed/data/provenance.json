@@ -42,7 +42,7 @@
     },
     "edrdg-jmdict": {
       "source": "JMdict (EDRDG)",
-      "source_version": "JMdict_e (English edition), retrieved from www.edrdg.org on 2026-07-28; 218,148 entries",
+      "source_version": "JMdict_e (English edition), retrieved from www.edrdg.org on 2026-07-28; 218,173 entries",
       "license": "CC BY-SA 4.0",
       "attribution": "This product uses the JMdict dictionary file. JMdict is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.html, full legal code in packages/seed/licenses/CC-BY-SA-4.0.html",
       "modification_status": "derived",

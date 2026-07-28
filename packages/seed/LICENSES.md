@@ -206,7 +206,7 @@ traced to the exact upstream bytes it was read from.
 | URL       | `https://www.edrdg.org/pub/Nihongo/JMdict_e.gz` | `https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz` |
 | Bytes     | 10,523,044                                      | 1,488,563                                            |
 | Retrieved | 2026-07-28                                      | 2026-07-28                                           |
-| Contents  | 218,148 entries (English edition)               | 13,108 characters                                    |
+| Contents  | 218,173 entries (English edition)               | 13,108 characters                                    |
 
 Exact sha256 for both is in `data/dictionary/manifest.json` under `sources`.
 Re-verify the committed output against it, offline:
@@ -516,7 +516,7 @@ Every network retrieval, with its outcome.
 | 2026-07-28 | `pypi.org`                  | `/pypi/jamdict-data/json`                        | 200 — package metadata                                                                |
 | 2026-07-28 | `registry.npmjs.org`        | `/kotobako-data`                                 | 200 — inspected and **rejected**, see below                                           |
 | 2026-07-28 | `www.edrdg.org`             | `/edrdg/licence.html`                            | **200** — shipped at `licenses/EDRDG-licence-statement.html`; says CC BY-SA **V4.0**  |
-| 2026-07-28 | `www.edrdg.org`             | `/pub/Nihongo/JMdict_e.gz`                       | **200** — 10,523,044 bytes, 218,148 entries                                           |
+| 2026-07-28 | `www.edrdg.org`             | `/pub/Nihongo/JMdict_e.gz`                       | **200** — 10,523,044 bytes, 218,173 entries                                           |
 | 2026-07-28 | `www.edrdg.org`             | `/pub/Nihongo/kanjidic2.xml.gz`                  | **200** — 1,488,563 bytes, 13,108 characters                                          |
 | 2026-07-28 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode`                  | **200** — shipped at `licenses/CC-BY-SA-4.0.html`                                     |
 | 2026-07-28 | `creativecommons.org`       | `/licenses/by/2.0/fr/legalcode`                  | **200** — shipped at `licenses/CC-BY-2.0-FR.html`; closes D-3                         |
