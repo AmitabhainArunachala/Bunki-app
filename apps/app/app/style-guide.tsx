@@ -11,9 +11,12 @@ import { StyleGuidePage } from '@/ui/style-guide/style-guide-page';
  * A development surface rather than a learner destination: it is on the map in
  * `src/ui/navigation.ts` (every route must be, or the reachability test fails
  * and rightly so) but declares `reach: { kind: 'specimen' }`, which keeps it out
- * of the navigation shell. The shell holds the four places a learner *starts*
- * from and a fifth entry would make it a debug menu — the exact thing REQ-UI-08
- * and that file's own header argue against.
+ * of the navigation shell. The shell holds the places a learner *starts* from,
+ * and a specimen is not one of them — putting it there would make the shell a
+ * debug menu, the exact thing REQ-UI-08 and that file's own header argue
+ * against. (This comment used to name the shell's size. It went stale the day
+ * Campaign E added the map; the size is `SHELL_DESTINATIONS.length` and is not
+ * written down in prose anywhere now.)
  *
  * The KanjiVG text is looked up here, for the same reason the kanji route does
  * it: `src/data/stroke-sources.ts` is loadable only by the bundler, and keeping

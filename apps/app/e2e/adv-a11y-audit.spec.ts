@@ -50,19 +50,48 @@
 import AxeBuilder from '@axe-core/playwright';
 import type { CDPSession, Page } from '@playwright/test';
 
+import { DESTINATIONS } from '../src/ui/navigation.ts';
 import { expect, test, openApp, hydrated, keepWord, visibleTestId } from './support/adv-harness.ts';
 
 /**
- * Every route `expo export` produced, plus the two dynamic ones with real
- * parameters.
+ * Real parameters for the routes that have a dynamic segment.
+ *
+ * Keyed by the `href` in the navigation map, so a dynamic route with no entry
+ * here fails the guard below rather than being silently skipped. Two words
+ * rather than one because the title-uniqueness test needs two instances of the
+ * same route to prove titles are per-*word* and not per-route.
+ */
+const ROUTE_PARAMS: Readonly<Record<string, readonly string[]>> = {
+  '/word/[lexemeId]': ['/word/lex-bunki', '/word/lex-wakareru'],
+  '/kanji/[character]': [`/kanji/${encodeURIComponent('岐')}`],
+};
+
+/**
+ * Every route the app has, **derived from the navigation map**.
+ *
+ * This used to be a hand-written array, and the header of this file blames a
+ * hand-written list of routes for two prior EDRDG misses. It then made the same
+ * mistake one layer down: lane B1 shipped `/map` — 24 pressable nodes, 18
+ * scrubber steps, six route chips, five lens chips and four era grounds with
+ * figure-on-ground contrast — and the array was not extended, so the map was
+ * scanned by neither axe pass, neither contrast pass, nor the title-uniqueness
+ * check, in either scheme. The title test's own comment claimed it was "written
+ * against `ROUTES` rather than a fixed list, so a new route with no title fails
+ * here", which was true of the loop and false of the list it looped over.
+ *
+ * `src/ui/navigation.ts` is the one place a route is declared, and
+ * `test/navigation-reachability.test.ts` already walks it against the filesystem
+ * — a route file absent from that table fails there. Reading it here makes the
+ * two facts one fact: a destination that exists is a destination this sweep
+ * visits, with no second list to remember.
  *
  * `/style-guide` is a development surface rather than a learner destination
- * (`src/ui/navigation.ts`, `reach: 'specimen'`), and it is scanned anyway — in
- * fact it is the route where a scan is worth the most. It renders every
- * component in the vocabulary at once, in both schemes, so an accessibility
- * defect in a *component* fails here before the surface lanes have built
- * anything on it. A page that exists to be looked at is exactly the page that
- * should have to pass.
+ * (`reach: 'specimen'`), and it is scanned anyway — in fact it is the route
+ * where a scan is worth the most. It renders every component in the vocabulary
+ * at once, in both schemes, so an accessibility defect in a *component* fails
+ * here before the surface lanes have built anything on it. A page that exists to
+ * be looked at is exactly the page that should have to pass. So this takes every
+ * destination, not the learner subset.
  */
 const ROUTES = [
   '/',
@@ -81,6 +110,19 @@ const ROUTES = [
   // and the first one to put ruby inside a control.
   '/read',
 ] as const;
+const ROUTES: readonly string[] = DESTINATIONS.flatMap((destination) => {
+  if (!destination.href.includes('[')) return [destination.href];
+  const params = ROUTE_PARAMS[destination.href];
+  if (params === undefined || params.length === 0) {
+    // Thrown at module load, so the whole file goes red rather than one test
+    // quietly scanning nine routes where the app has ten.
+    throw new Error(
+      `adv-a11y-audit: dynamic route ${destination.href} has no entry in ROUTE_PARAMS; ` +
+        'add one so the sweep visits it rather than skipping it.',
+    );
+  }
+  return [...params];
+});
 
 const WCAG_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const;
 

@@ -9136,3 +9136,688 @@ the demonstration, and it is above.
 - **It did not touch React #418, the empty static `<title>`, or the two
   `test.fail` known defects.** All four are outside this lane and were reported,
   not repaired, by the second pass; that is still true.
+
+---
+
+## Appendix — Campaign E, lane B1: the map
+
+**Branch** `agent/bunki-e-map`, from `agent/bunki-e-integration` (`e22d069`).
+Owns `apps/app/app/map.tsx`, `apps/app/src/screens/map-screen.tsx`,
+`apps/app/src/ui/map/**`, `apps/app/scripts/capture-map.mjs`, and their tests.
+
+### Provenance of this lane's code, stated first because it changes how to read it
+
+An earlier run of this same lane had pushed three commits to `agent/bunki-e-map`
+from a **pre-integration base** (a merge of `agent/bunki-e-ground` and
+`agent/bunki-e-era` rather than the integration line). Those commits are the
+origin of most of the modules below. This round rebased them onto
+`agent/bunki-e-integration` and then **verified them by running them**, which was
+not a formality: the branch did not typecheck, one existing rule was red, and
+behind the red was a rendering defect no unit test had photographed. Three more
+were found the same way. Everything in the "defects found" section below was
+found in this round, on this branch.
+
+### What the map is
+
+Four stacked bands over the neighbourhood the domain returned:
+
+- **古道 / 街道 / 鉄道** — each painted in its own register from
+  `apps/app/src/theme/ground.ts`, as the layered stack `groundLayers()` returns:
+  opaque base, atmospheric wash, 胡粉/墨 mat. No shadow, no glow, no gradient.
+- **Era not known** — drawn on **no era ground at all**, on a plain card, because
+  it is not a road. Defaulting it onto one is the guessed era `graph/era.ts`
+  exists to refuse.
+
+街道 and 鉄道 render **empty**, and that is the finding rather than a gap. Lane
+A2′ measured that 9.8% of the 3,000-lexeme tier can be placed and every one of
+them lands on 古道; nothing in the tier dates a 漢語 word. Both empty registers
+are still painted, at reduced height, with the reason on screen — a layer that
+vanishes when it is empty is a list, not a layer.
+
+### The route, and the sentence it exists to make true
+
+A route here is a **named, ordered, finite sequence of learning targets drawn
+from data we hold**, and nothing else. The rule, in full:
+
+> the set of kanji KANJIDIC2 assigns to one 常用漢字 school grade, ordered by
+> KANJIDIC2's own newspaper-frequency rank ascending, unranked characters last in
+> codepoint order.
+
+Both fields are real KANJIDIC2 columns carried through the importer. Six routes
+exist (grades 1–6); grade 8 and 9–10 are excluded because "Grade 8" is not a
+school year and naming a route after one would be a small lie in the route's own
+name, which `ROUTE_EXCLUSION_NOTE` says on screen.
+
+**No place names.** Shipping a list of real Tōkaidō post stations and mapping
+memory onto them would assert a correspondence between a historical road and a
+learner's recall that nothing supports — the same defect class as a guessed era.
+The roads give the _shape_: finite, named, ordered, marked at intervals. That is
+the whole borrowing, and the 一里塚 marks a real interval of the real sequence
+(every tenth station, plus the last) rather than a fraction of a bar.
+
+Position is `Station N of M`, where N is **how many members have reached a stated
+band on one named capability lens** at this instant. It requires a lens argument
+and there is no overload without one; it can go **down**; and there is no
+percentage, no total across routes, and no field dividing N by M.
+
+### The dual-reading scrubber
+
+One signed axis with a detent at zero: negative replays the learner's own history
+from the event log, positive walks the language's three eras, zero is now with
+every layer shown. **Both readings are on screen at every position** —
+`ScrubberPosition.otherDirection` is rendered under the active label — so the
+duality is legible standing still rather than discoverable by pressing a mode
+button. The asymmetry is deliberate and honest: the history arm is as long as the
+learner's log and empty for a learner with none; the era arm has exactly three
+stops for everyone.
+
+### Brightness is a number that exists
+
+`markOf` reads exactly two values off the kernel's own `LensProjection` — R(t) at
+the queried instant and the current interval in days — through a single
+four-line `readProjection`, which is the only place in `apps/app` that names
+those fields. Nothing is computed there; both values come from the pinned
+reducer. The floor is the scheduler's own `FSRS_DESIRED_RETENTION`, not a
+designer's number.
+
+### Defects this round found and fixed
+
+Three by running the inherited work, four by driving a browser.
+
+1. **The branch did not typecheck.** `era-ground.tsx` passed a signal array to a
+   `(count: number)` callback, and called it _during render_. The whole emissive
+   path is gone rather than patched: `planEmissive` throws outside 鉄道, 鉄道 has
+   no members on this map, so the prop had two reachable behaviours — draw
+   nothing, or throw. The screen states in prose why no lamp is lit.
+2. **Every map node rendered a five-segment labelled meter.** `RecallIndicator`
+   is total over the ramp by _switching to_ `RecallMeter` for the two steps
+   `RECALL_BAND_MARKS` declares meter-only. On a fresh install every node is in
+   one of those two, so it was the common case, not an edge one.
+   `theme-tokens.test.ts` was already red about the cause. Fixed as a **type**:
+   `MapMark` is three lit steps typed `StandaloneRecallBand` plus
+   `nothing-observed` and `under-the-floor` drawn as _form_ — a dotted ring in
+   `uncertainEdge`, a dashed ring in `fragileEdge`, both already checked at 3:1
+   against all six era grounds by `theme-ground.test.ts`, both spoken in words.
+   A step naming a meter-only band no longer compiles. **No test was exempted.**
+3. **The strata silently dropped real edges.** Each band paints its own ground, so
+   a held edge between nodes on two different layers is drawn in no field at all.
+   Silently not drawing a held relation is the same defect class as drawing an
+   invented one. The count is computed and printed: the photographed view says
+   "2 of 23 connections here join nodes on two different layers".
+4. **39 nodes in one square** — the domain's 120-node default is right for a query
+   and wrong for a field. The query asks for 24; the domain reports the cut and
+   the screen renders every `Truncation` verbatim, so the smaller number hides
+   nothing.
+5. **Rings collided on a sparse band** — the per-depth phase was 0.37 rad, which
+   put a one-node ring 21° from the next. It is the golden angle now.
+6. **An empty era layer rendered no ground**, so 街道 and 鉄道 vanished exactly
+   where the honest finding is that they are empty.
+7. **`alignItems` on the ground field shrank the mount**, leaving the 胡粉/墨 mat
+   a narrow strip floating in a bare register.
+8. **A comment asserted a property the code did not have.** `scrubber.tsx` said
+   "the map under them settles once when its contents change (`Settle`)" and
+   nothing on the map imported `Settle` at all. Repaired by making it true rather
+   than by deleting the sentence, because the design asks for a settling map by
+   name: each band's field is wrapped in `Settle`, keyed on the origin, the lens
+   and the scrubber position — so a lens change or a scrubber step settles the
+   map once and nothing else moves. `Settle` animates on mount only, so the key
+   is what makes "settles when its contents change" true without making a live
+   surface shiver, and `resolveDuration` returns 0 under
+   `prefers-reduced-motion`. Two tests hold it now: that the settle exists with
+   all three dependencies in its key, and that nothing in the lane loops, runs a
+   timer-driven style, or celebrates.
+9. **古道 photographed as two nodes stacked in a corner of an empty field.** One
+   whole-walk layout was being filtered four ways, so a band holding 2 of 24
+   nodes got two adjacent angular slots from a 24-node ring. Each band is laid
+   out on its own now — radius still means hops from the origin, which is the
+   only thing the geometry ever claimed, and only the angle differs. The property
+   the filtering bought (a node keeps its coordinates in every band) was not
+   perceivable, because the bands are stacked and separately framed; it was
+   paying for the overlap with nothing. `MapField`'s `spread` prop existed only
+   to correct for the filtering and is gone rather than left as a parameter that
+   looks like it means something.
+
+Two defects in this lane's own **instrumentation**, both found by reading its
+output rather than its code:
+
+- the per-lens read picked the first `map-node-lexeme:` element in the document,
+  which is whichever word landed on 古道 — two hops from the centre, not the
+  origin. It now finds the node the map itself calls 0 hops away.
+- the paragraph under that table asserted the five rows differ while printing
+  five identical rows. It is computed from the rows now, and states the negative
+  case plainly.
+
+### Browser evidence
+
+`apps/app/scripts/capture-map.mjs` serves the real `expo export --platform web`
+output over HTTP, drives `/map` in Chromium in both schemes, photographs all four
+bands plus the whole page, and fails the run if the page throws or logs.
+
+It first **walks the app's own closed loop by clicking** — search 分岐, keep, take
+up for study, start the session, answer one declared probe — because a cold load
+has an empty log, and a map over an empty log is a picture in which
+brightness-is-retrievability cannot be seen at all. No store is seeded and the
+script writes no event; the evidence gate mints every one and the pinned
+scheduler produces the memory state the map draws.
+
+Read out of the loaded DOM in that photographed page:
+
+| lens       | what the origin node says          |
+| ---------- | ---------------------------------- |
+| reading    | 分岐 — Reading: Emerging, fragile   |
+| meaning    | 分岐 — Meaning: No evidence yet     |
+| listening  | 分岐 — Listening: No evidence yet   |
+| production | 分岐 — Production: No evidence yet  |
+| writing    | 分岐 — Writing: No evidence yet     |
+
+That is REQ-UI-07 in a picture rather than in a claim: one node held still, the
+lens moved five times, five different answers, and the four unmeasured ones read
+"no evidence yet" rather than reading weak.
+
+Also in that page: "1 of 2 contracts have evidence behind them", "Today added 2
+new contracts and 1 admitted review", "Station 0 of 77", six routes offered.
+
+### Measured cost
+
+Node, on this build machine (`apps/app/test/map-performance.test.ts`, printed by
+the run):
+
+| what                | measurement                                               |
+| ------------------- | --------------------------------------------------------- |
+| Atlas               | 9,245 nodes, 429–1,143 ms cold **once**, 0.0004 ms warm   |
+| view redraw         | 44 drawn nodes, 0.8–1.4 ms                                |
+| scrubber            | 366 daily frames built in 47–48 ms; one step 0.31–0.41 ms |
+| road                | 176 stations counted in 2.2–2.6 ms                        |
+| whole-corpus census | 3,016 lexemes placed in 41–71 ms, behind a button          |
+
+Chromium, in the final photographed page, over the walked ledger:
+
+| scheme | cold load to interactive | lens change | scrubber step |
+| ------ | ------------------------ | ----------- | ------------- |
+| light  | 690 ms                   | 32.1 ms     | 30.1 ms       |
+| dark   | 736 ms                   | 24.5 ms     | 27.2 ms       |
+
+Across five capture runs this round the same three numbers ranged 629–1,797 ms,
+18.2–51.7 ms and 18.3–109.9 ms. The spread is machine load, not the map — several
+agents were building in parallel — so the range is given rather than the best
+row.
+
+Cold load includes the one-off Atlas build over the whole shipped dictionary and
+is paid once per session. Lens change and scrubber step are the two interactions
+that redraw every node, and are the ones that would expose a per-frame index
+rebuild. **These are Chromium on a build machine, not a phone.** They are a floor
+on what a device will do, not a prediction of it.
+
+The backdated-state defect the earlier run's perf work found stands fixed, and is
+worth restating because every correctness test had passed over it: the screen
+built **one** index and projected it at whatever instant the scrubber stood on,
+and a static index answers from _current_ memory states — so a March frame showed
+June's stability with March's decay applied. `buildMapTimeline` folds the reviews
+the gate already admitted into per-frame histories through the kernel's own
+`buildMemoryHistories`, and the frames share one bucketing object, asserted by
+**identity** rather than equality.
+
+### Check set, this round, on this branch
+
+| Check                                           | Result                                    |
+| ----------------------------------------------- | ----------------------------------------- |
+| `npm ci`                                        | clean                                     |
+| `npm run lint`                                  | exit 0                                    |
+| `npm run format:check`                          | all files formatted                       |
+| `npm run typecheck`                             | exit 0, zero errors                       |
+| `npm run test`                                  | **2424 passed**, 1 skipped, 111 files     |
+| `npm run test:replay`                           | 47 passed                                 |
+| `npm run verify:export`                         | 14 passed                                 |
+| `cd apps/app && npx expo export --platform web` | exported, `/map` among the routes         |
+| `npm run test:e2e:build`                        | exported                                  |
+| `npm run test:e2e`                              | **48 passed**, exit 0                     |
+| `node apps/app/scripts/capture-map.mjs`         | 10 shots, no page error, README rewritten |
+
+### Two load-sensitive failures seen this round, both measured rather than waved off
+
+- **`npm run test`, three timeouts.** On a loaded machine `theme-motion.test.ts`
+  ("measures the seed's own strokes as plausible lengths") and two
+  `packages/seed/test/dictionary.test.ts` cases exceeded the 5 s per-test
+  default. All three import the whole seed dynamically and touch no file this
+  lane owns. Reproduced with this lane's uncommitted changes stashed, and green
+  on the re-run recorded above. Pre-existing, not this lane's, not fixed here.
+- **`npm run test:e2e`, two timeouts across four full runs, never the same one
+  twice, and never a failed assertion.** Runs 1 and 3 were 48/48 and exited 0.
+  Run 2 lost `adv-a11y-audit.spec.ts` › "axe: no violation at all, on any route,
+  in either scheme" to its 120 s cap; run 4 lost `finite-session.spec.ts` › T-13,
+  which then passed alone in 5.9 s.
+
+  The a11y one is **not** something this lane gets to shrug at, and it was
+  measured rather than assumed: single-worker, the same scan takes **57.8 s on
+  `e22d069`** and **66 s on this branch**. So this lane really does add about 8 s
+  of bundle weight to a scan already sitting at half its cap, and with two
+  workers contending that is enough to cross it. `/map` is **not** in that spec's
+  `ROUTES` — the cost is the larger shared bundle every route now loads. Recorded
+  for the integration lane rather than repaired here, because raising the cap or
+  splitting the scan is an edit to another lane's e2e file.
+
+  The two `✘` lines the reporter prints on every run are the pre-existing
+  annotated `test.fail()` expectations (T4-1b, T3-3), counted in the 48, and the
+  run exits 0.
+
+### Shared-file edits, declared
+
+- `apps/app/src/ui/navigation.ts` — one appended `DESTINATIONS` entry. Additive.
+- `apps/app/test/navigation-reachability.test.ts` — `'Map'` appended to two
+  expected label lists, with the reason. Additive.
+- `docs/build-evidence/CAPSULE.md` — this appendix, appended.
+- `apps/app/test/screen-contract.test.ts` — **not purely additive, and that is
+  declared rather than buried.** One appended `SCREEN_OWNERS` row, one appended
+  `it(...)`, and one existing assertion wrapped in an `if` so that
+  `src/ui/map/map-projection.ts` — and only that file — may name the two
+  scheduler fields it renders. The rule is right and stays: the app holds no
+  scheduling logic. The map is the first surface that has to _display_ a
+  projection the kernel computed, so the reads are funnelled through one
+  four-line `readProjection`, and a second test holds that it is still the only
+  reader. `theme-tokens.test.ts` was **not** edited: the meter-only-band problem
+  was solved by a type instead.
+
+### What this lane does **not** claim
+
+- **That the era layers are populated.** Two of the three are empty over the whole
+  shipped dictionary and will stay so until the importer carries something that
+  dates a 漢語 word. The map draws them, counts them, and says so.
+- **That a route corresponds to anything historical.** It borrows the shape of a
+  finite marked road and nothing else. The names are "Grade 2 kanji", not place
+  names, on purpose.
+- **That the cross-layer connections are drawn.** They are held, counted and
+  named in prose; they are not drawn, because a line cannot span two grounds.
+- **That the map shows a phone's frame budget.** Every number above is Node or
+  Chromium on a Linux build machine. No device, no Safari, no Firefox, no screen
+  reader, and no human ran any of it.
+- **That `/map` is in the automated accessibility sweep.** It is not:
+  `adv-a11y-audit.spec.ts` owns a hand-written `ROUTES` list belonging to another
+  lane, and adding to it mid-wave is the shared-file edit this lane chose not to
+  make. The map's own capture run fails on a page error or a console error, and
+  every interactive element on it carries an accessible name — but no axe scan
+  has been run against `/map`, and that gap is open.
+- **That emitted light works on this surface.** It cannot appear: the only
+  register that permits it has no members. The screen says so; nothing was
+  demonstrated.
+- **That the guide stands anywhere on this map.** The 案内人 is lane B6 and has no
+  position here.
+
+---
+
+## Repair round — Campaign E, lane B1 (the map), verifier verdict FAIL
+
+Branch `agent/bunki-e-map`, repaired from `da9687a` and rebased onto `e45f520`,
+which the build session pushed while this round was running. Nine findings: four
+P1, five P2. **All four P1s repaired. All five P2s repaired.** Nothing was declined,
+so the "declining with a reason" clause is unused this round; what *is* recorded
+below, in its place, is the residue each repair leaves — the part of each defect
+that is smaller now but not zero.
+
+Every finding was reproduced before it was touched. The verifier's warning about
+the previous round (a repair for a non-existent `aria-current` defect that
+introduced a duplicate attribute) was taken literally: the reproduction command
+is printed with each finding, and each one produced the verifier's own numbers
+before any edit.
+
+**Two sentences in the appendix above are superseded by this round** and are left
+standing there rather than rewritten, so the record shows what was believed when:
+
+- *"Position is `Station N of M`"* — that phrasing is the P1-3 defect. It is
+  `N of M stations reached` now.
+- *"Station 0 of 77"*, in the browser-evidence table — the same sentence, read off
+  the page. The current reading is `0 of 77 stations reached`, and the 77 now
+  carries a subset disclosure beside it (P1-2).
+
+### The four P1s
+
+#### P1-1 — the era arm of the dual-reading scrubber was inert · **repaired**
+
+**Reproduced.** `grep -n 'position.bands' apps/app/src/screens/map-screen.tsx
+apps/app/src/ui/map/*` returned nothing. `resolveScrubber` computed `bands`
+("exactly one when walking the language's strata"), `map-modules.test.ts`
+asserted it, and no component read it. The screen rendered
+`placeNodes(atlas, drawn)` unconditionally, so the three era steps rewrote the
+caption over a byte-identical field. In Chromium over a walked ledger, the
+`map-neighbourhood` text was identical at all four positions.
+
+This was half of what the design document calls "the design's best single idea",
+and the step's own `accessibilityHint` — "Walks to this layer of the language's
+history." — was a user-visible string the code did not honour.
+
+**Repair.** `map-screen.tsx` derives `shownBands` from `position.bands` and
+renders that. Walking a layer drops the other two *and* the `unknown` band:
+`unknown` is not one of the language's eras, so standing on 古道 does not include
+a word the dictionary cannot date. That is also the reading that makes the arm
+say something, because over this dictionary `unknown` is where almost every node
+is. What is withheld is counted and stated in a live region
+(`[data-testid="map-band-filter"]`), the same rule the crossing-edge count
+follows.
+
+**Measured after, in Chromium, over the walked ledger** (capture → keep →
+promote → session → grade, by clicking):
+
+| step | caption                                | bands in the DOM                        |
+| ---- | -------------------------------------- | --------------------------------------- |
+| `今` | Now — every layer, as your memory…     | kodo, kaido, tetsudo, unknown           |
+| `+1` | The language's history — layer 1 of 3  | kodo                                    |
+| `+2` | The language's history — layer 2 of 3  | kaido                                   |
+| `+3` | The language's history — layer 3 of 3  | tetsudo                                 |
+
+Distinct `map-neighbourhood` texts across the four steps: **4** (was 1). At `+3`
+the withheld line reads "Walking one layer of the language: 鉄道 — the rail era.
+0 of 24 nodes around 分岐 sit on it; the other 24 are on the other layers or on
+none, and are not drawn at this position. Return to 今 to see all of them again."
+
+**The test that let this ship, replaced.** The passing unit test exercised the
+pure function; a pure-function test cannot see a missing consumer, which is
+exactly why it gave false assurance. The new assertion is about the wiring: the
+screen must contain `position.bands`, must map over `shownBands`, and must *not*
+map over the raw `bands`. Probed by reverting the render to `{bands.map(` — red.
+
+#### P1-2 — the route rule overstated the road · **repaired**
+
+**Reproduced.** `packages/seed/data/dictionary/kanji.json`.records filtered on
+`grade === 1` → **77** characters; diffed against the 80-character 教育漢字
+grade-1 set → **貝, 糸, 田 missing**. The tier's own `_comment` says it is
+"limited to those the imported lexemes actually use". The printed rule said
+"Every kanji KANJIDIC2 assigns to this school grade … nothing is sampled".
+
+Load-bearing rather than cosmetic: the lane's thesis is a finite, complete,
+walkable road, and a learner who reached all 77 would have believed they had
+finished grade 1 having never met three of its characters.
+
+**Repair.** `ROUTE_RULE` now says the set is this build's dictionary's, that the
+order is KANJIDIC2's, and that the length counts this build's entries rather than
+the grade. `ROUTE_SUBSET_NOTE` quotes the tier's own sentence and names the
+number, and `route-strip.tsx` renders it beside the road, at
+`[data-testid="map-route-strip-subset"]`.
+
+**What the repair deliberately does not do:** assert how many characters the
+grade has upstream. The raw KANJIDIC2 is not committed — it is a ~200 MB
+gitignored download, recorded by sha256 in `manifest.json` — so this build cannot
+count it, and hard-coding "80" from memory would be the unsourced claim the lane
+refuses everywhere else. The disclosure is therefore "this is a subset and its
+count is not the grade's", which is provable from shipped bytes, rather than
+"3 are missing", which is not. The test asserts the note still quotes the tier
+verbatim, so the day the importer stops limiting the set the sentence has to be
+rewritten rather than left standing.
+
+**Measured after:** `map-route-strip-subset` present; `nothing is sampled` no
+longer anywhere in `document.body.innerText`.
+
+#### P1-3 — a count rendered as an ordinal, contradicting the line beneath it · **repaired**
+
+**Reproduced.** `routePosition(grade1Route, 'reading', 'settled', …)` with the
+stations at ordinals 3, 17, 40, 55 and 70 reached and nothing else:
+`sentence` = **"Station 5 of 77"**, `nextStation.ordinal` = **1** (so the strip
+printed "Next unreached: 日 (station 1)"), markers `[10,20,…,70,77]` with
+**zero** filled. Three user-visible statements about one position, disagreeing.
+`map-routes.ts`'s header said the number "is *not* an ordinal walk along the
+sequence"; `route-strip.tsx`'s header called it "An ordinal count on a named,
+finite road". The rendering followed the wrong one.
+
+Non-prefix reach is the normal case, not an edge case: KANJIDIC2 frequency order
+has nothing to do with which characters a learner captured.
+
+**Repair, in three parts.**
+
+1. `sentence` is `"5 of 77 stations reached"` — the count in the subject
+   position. *Station* now has exactly one meaning in the component: an ordinal
+   place on the list, which is what the "Next unreached" line uses it for.
+2. `RoutePosition` gains `reachedOrdinals: ReadonlySet<number>`, and `reached` is
+   `reachedOrdinals.size` — the count is the membership read another way rather
+   than an independent number that can drift from it.
+3. `route-strip.tsx` fills a 一里塚 when **its own station** is reached, not when
+   `ordinal <= reached`. The old rule was a left-to-right progress fill, which is
+   the discrete form of the percentage bar the same file's header says it avoids.
+
+The spoken label and both headers were rewritten to match.
+
+**Measured after** (same input): `sentence` = "5 of 77 stations reached";
+`reachedOrdinals` = {3, 17, 40, 55, 70}; marker 40 filled, marker 10 not;
+`nextStation.ordinal` = 1 and no longer contradicted. In Chromium on a
+one-session ledger: `map-route-strip-sentence` = "0 of 77 stations reached",
+`map-route-strip-next` = "Next unreached: 日 (station 1)".
+
+#### P1-4 — two guards that could not fire · **repaired**
+
+**Reproduced, both.**
+
+- The no-collapsed-light guard was
+  `expect(source).not.toMatch(/export function \w+\([^)]*NodeRetrievability/)`.
+  `map-projection.ts` imports no `NodeRetrievability`; its whole-node type is its
+  own `MapNodeView`. Adding the verifier's probe — a literal single collapsed
+  light for a whole node, computed as the mean of five lens ranks — left
+  `npx tsc --noEmit` at exit 0, eslint silent, and **all five tests in the block
+  green**.
+- The streak guard greps identifiers for `/\bstreak\b|\bdaysActive\b|\bconsecutive\b/i`.
+  Replacing `contractsStanding` with a real consecutive-day counter named
+  `runLength` left **every test in the file green**; renaming it `streak` went
+  red, which is the proof it was a name grep.
+
+Shipped code was clean on both. The guards protecting REQ-UI-07 and the streak
+ban were not, and `map-projection.ts`'s header cited the dead one as proof that
+"the missing function stays missing".
+
+**Repair — the collapsed light.** The rule is stated so it can be checked:
+**an export may hold a whole node only if it also names a lens.** Parameter lists
+are read by balancing parentheses rather than by a regex, because a lazy
+`\([^)]*\)` is fooled by a function-typed parameter (`map-routes.ts` has one).
+Two further guards sit beside it, because the signature rule alone does not stop
+an inline collapse in a surface:
+
+- `markRank` — the function that turns a mark into a number, which every
+  collapse needs — may be called from no lane file except `map-projection.ts`;
+- `.lenses` may only be followed by `.find` or `.map`, so `reduce`, `sort`,
+  `every` and friends over the five are refused;
+- and a behavioural row: a node view has exactly two keys and five lenses in
+  declaration order, so there is no summary field to grow into.
+
+**Probe:** the verifier's `nodeBand(view: MapNodeView)` now fails with
+`nodeBand takes a whole node view and no lens, which is the collapsed light
+REQ-UI-07 forbids`. Restored afterwards.
+
+**Repair — the streak.** A streak is a number that depends on how the same work
+was *distributed across days* and that a gap reduces. So the mechanism is absent
+exactly when the result is invariant to that distribution. The new test builds
+two ledgers with identical totals and the same `now`, one on five consecutive
+days and one scattered across five months, and requires every field — including
+the rendered sentence — to be identical. The name grep is kept as a cheap second
+net, and is now described as the shallow half rather than as the guard.
+
+**Probe:** the `runLength` counter that beat the name grep now fails with
+`- "runLength": 5 / + "runLength": 1`. Restored afterwards.
+
+### The five P2s
+
+#### P2-5 — `prefers-reduced-motion: reduce` did not stop the loading spinner · **repaired**
+
+**Reproduced.** Chromium with `newContext({ reducedMotion: 'reduce' })` on
+`/map?lag=4000`: `matchMedia('(prefers-reduced-motion: reduce)').matches` true,
+the `ActivityIndicator` still carrying react-native-web's keyframe
+`r-11cv4x / 0.75s / infinite`, and ten distinct rotation matrices over 800 ms —
+identical to the un-reduced run. Not shortened; unaffected.
+
+**Repaired in the shared component rather than worked around on one screen**,
+because every screen's loading state had it. `LoadingPanel` consults
+`useReducedMotion()` and omits the spinner under reduction. That costs nothing:
+the panel already carries the label, the live region and the `progressbar` role,
+and the spinner is `aria-hidden` decoration by the file's own existing comment.
+There is no still substitute drawn, because a static spinner is a shape that
+means nothing.
+
+**Measured after,** by the same method, in both modes:
+
+| context                        | matchMedia | animating elements               | distinct transforms in 800 ms |
+| ------------------------------ | ---------- | -------------------------------- | ----------------------------- |
+| `reducedMotion: 'reduce'`      | `true`     | **0**                            | 1 (there is nothing to sample) |
+| `reducedMotion: 'no-preference'` | `false`  | 1 · `r-11cv4x / 0.75s / infinite` | 10                            |
+
+**The residue.** The build appendix above says of `Settle` that "`resolveDuration`
+returns 0 under `prefers-reduced-motion`", which is true and was never the
+problem: `Settle` was never the map's only motion. The spinner was, on every
+screen, and nothing in the lane's motion reasoning covered a component it did not
+own. That is the shape of the miss worth remembering — the audit was scoped to
+the motion this lane *wrote*, and the motion a learner saw came from a component
+it merely used.
+
+#### P2-6 — a frame index labelled as days past the 480-frame cap · **repaired**
+
+**Reproduced.** `historyFrames` caps at 480 and widens the step, so on a long log
+one frame is several days. Every long history read the same number:
+
+| history | old label       | actual days back |
+| ------- | --------------- | ---------------- |
+| 479 d   | 479 days back   | 479              |
+| 480 d   | 479 days back   | 480              |
+| 1000 d  | 479 days back   | 1000             |
+| 1500 d  | 479 days back   | 1500             |
+
+The same bug in `scrubber.tsx`'s per-step `accessibilityLabel` and in
+`otherDirection` at the detent ("Pull left through 480 days" on a 1,500-day log).
+
+**Repair.** `daysBetween`, `daysBackAt` and `historySpanDays` read the frames'
+**own instants**. `resolveScrubber` forms its label from `daysBackAt`; the detent
+sentence uses `historySpanDays`. `Scrubber` now takes `frames` and `now` rather
+than `historyFrameCount`, because a count is enough to size the axis and is not
+enough to name a step. The frame count survives only as
+`ScrubberRange.historyFrames`, which is what it is called and is never printed as
+a duration.
+
+**Measured after:** at spans of 3, 479, 480, 1000 and 1500 days the label, the
+helper and the detent sentence all read the true number.
+
+#### P2-7 — a one-frame history invited a gesture nothing rendered · **repaired**
+
+**Reproduced.** `scrubberRange(1).min` is `-0`, so `scrubber.tsx` emits no
+negative step (`range.min < 0` is false) — correctly. But `resolveScrubber(0, …)`
+returned "Pull left through 1 days of your own history", with a broken plural,
+beside a control with nothing to its left. That is the state of every fresh
+install and of every learner on their first day, *including* immediately after
+capture → keep → promote → session → grade.
+
+**Repair.** The copy keys off `range.min < 0` — whether there is a history *arm*
+— rather than off `historyFrames === 0`. One control, one predicate. The plural
+is formed from the real day span. `scrubberRange` also returns `0` rather than
+`-0` for one frame: `-0` compares false against `< 0` (so the control was right)
+but `Object.is(-0, 0)` is false, so the sharp edge could only ever surface in a
+test or a serialisation.
+
+**Measured after,** in Chromium after walking the real loop: negative steps in
+the DOM **0**; "Pull left through 1 days" **not** on the page. Unit: two frames
+(one real day) gives "Pull left through 1 day of", singular, and the arm exists.
+
+#### P2-8 — `/map` shipped outside the automated WCAG gate · **repaired, and the class closed**
+
+**Reproduced.** `adv-a11y-audit.spec.ts`'s `ROUTES` was a hand-written array
+listing nine routes; `/map` was absent, so 24 pressable nodes, 18 scrubber steps,
+six route chips, five lens chips and four era grounds were scanned by neither axe
+pass, neither AA-contrast pass, nor the title-uniqueness check, in either scheme.
+The title test's own comment claimed it was "written against `ROUTES` rather than
+a fixed list", which was true of the loop and false of the list.
+
+The verifier ran axe over `/map` by hand and found it clean, so this was a gate
+gap rather than a live defect — but it is the exact mechanism the same file's
+header blames for two prior EDRDG misses.
+
+**Repair.** `ROUTES` is derived from `DESTINATIONS` in `src/ui/navigation.ts`,
+which is the one place a route is declared and which
+`test/navigation-reachability.test.ts` already walks against the filesystem. A
+dynamic route with no entry in `ROUTE_PARAMS` throws at module load, so the whole
+file goes red rather than one test quietly scanning nine routes where the app has
+ten. Adding a route to the navigation map is now the only step.
+
+**Measured after:** the full a11y spec, **16 passed**, including `/map` in both
+schemes — axe clean at `wcag2a/wcag2aa/wcag21a/wcag21aa`, AA contrast clean,
+distinct document title, an accessible name on every interactive element.
+
+#### P2-9 — stale counts in three comments · **repaired**
+
+**Reproduced.** `grep -n "four entries\|four places" apps/app/src/ui/navigation.ts
+apps/app/app/style-guide.tsx` returned three hits; `SHELL_DESTINATIONS.length` is
+5.
+
+**Repair.** The number is removed rather than corrected in all three places, and
+each says why: the count is `SHELL_DESTINATIONS.length`, the list is derived by
+filter, and a written count is what went stale. Correcting "four" to "five" would
+have set the same trap for the next lane.
+
+### Full check set, on the repaired tree
+
+Every row below was run **twice**: once on `da9687a` with every repair applied,
+and again after rebasing onto `e45f520` — the three commits the build session
+pushed mid-round, which added `Settle` to the map, laid each band out on its own
+ring, and wrote the appendix above. The numbers here are the **second** run, on
+the tree that is being pushed. Commands are the project's own scripts, in this
+order.
+
+| Check                                                | Result                                                                                                                    |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `npm ci`                                             | clean, 727 packages                                                                                                       |
+| `npm run lint`                                       | exit 0, silent                                                                                                            |
+| `npm run format:check`                               | all matched files formatted (3 files reformatted during the round)                                                        |
+| `npm run typecheck`                                  | exit 0, zero errors, all six workspaces                                                                                   |
+| `npm run test`                                       | **2432 passed**, 1 skipped, 111 files (2430 before the rebase; 2423 at the start)                                         |
+| `npm run test` — `apps/app/test/map-modules.test.ts` | **74 passed** (67 on the rebase base, 64 at the start): +8 rows this round, 2 rewritten, 1 replaced                        |
+| `npm run test:replay`                                | 47 passed                                                                                                                 |
+| `npm run verify:export`                              | 14 passed                                                                                                                 |
+| `npm run test:e2e:build`                             | 15 static routes exported, `/map` among them                                                                              |
+| `npm run test:e2e`                                   | **48 passed**, exit 0 (2 annotated known defects fail as expected)                                                        |
+| `npm run test:e2e` — `adv-a11y-audit.spec.ts`        | **16 passed**, now over 10 routes including `/map`, both schemes                                                           |
+| `node apps/app/scripts/capture-map.mjs`              | 10 shots rewritten from the new export; light 1219 ms / dark 1175 ms to interactive, lens 25.2/40.1 ms, scrub 29.1/21.8 ms |
+| `node apps/app/scripts/verify-map-repairs.mjs`       | **8/8 checks passed** — the browser re-measurement of P1-1, P1-2, P1-3, P2-5 and P2-7                                      |
+
+`verify-map-repairs.mjs` is new this round. It serves the real export, walks the
+loop by clicking, and re-measures each repaired defect the way the verifier
+measured it; it exits non-zero on any failure, so it reads as a check-set row
+rather than as a report someone has to interpret.
+
+The interactive figures moved between the two runs (1395/1227 ms → 1219/1175 ms)
+and the interaction figures moved in both directions. Nothing was optimised
+between them; that spread is what a build machine's noise looks like at this
+scale, and it is why the build appendix above declines to call these device
+numbers.
+
+### Negative probes run this round
+
+Three, each restored afterwards, each the verifier's own reproduction:
+
+1. **`nodeBand(view: MapNodeView): StandaloneRecallBand`** — the mean of five
+   lens ranks. Green under the old guard; now red with
+   `nodeBand takes a whole node view and no lens`.
+2. **`runLength`, a real consecutive-day counter** — green under the old name
+   grep; now red on `- "runLength": 5 / + "runLength": 1`.
+3. **`{shownBands.map(` reverted to `{bands.map(`** — green before the era arm
+   was wired; now red on `expected … to match /\{shownBands\.map\(/`.
+
+### What this repair round still does **not** claim
+
+- **That the era arm is the right *design*.** It is now wired and honest, and
+  walking a layer hides 22 of 24 nodes on this dictionary because that is what
+  the data supports. Whether a learner finds that useful is a question for the
+  operator, not for a test.
+- **That the route road is complete.** It is not, and now says so. The size of
+  the gap is stated only for grade 1, and only as "77 of the grade's characters",
+  because the upstream total is not in the repository.
+- **That the collapsed-light guard is unescapable.** It is much stronger — a
+  balanced-paren signature rule, plus a caller restriction on `markRank`, plus an
+  operator restriction on `.lenses` — but all three are source scans over the
+  lane, and a collapse assembled through a helper in a *non-lane* file would
+  still pass. The type-level half (`markOf` takes a `LensProjection`) is what
+  actually carries the weight; the scans are the second line.
+- **That the streak guard is unescapable.** The behavioural row catches any
+  number that varies with the distribution of work across days, which is what a
+  streak is. It would not catch a day-run counter computed and displayed without
+  passing through `accumulationOf`.
+- **That reduced motion is now handled everywhere.** One shared component was
+  repaired. `useReducedMotion` is consulted by `motion.tsx` and now by
+  `screen-state.tsx`; nothing audits the bundle for un-gated keyframes, and
+  react-native-web ships several.
+- **That any of this ran outside Chromium on Linux.** Unchanged from the build
+  round: no Safari, no Firefox, no device, no screen reader. The reduced-motion
+  measurement is Chromium's emulated `prefers-reduced-motion`, not an operating
+  system setting; the "spoken label" claims are read from the accessibility tree,
+  not heard.
+- **That the pre-existing `screen-contract.test.ts` timeout is fixed.** It is
+  not; it did not recur in this round's runs, and it remains as recorded in the
+  build appendix above.

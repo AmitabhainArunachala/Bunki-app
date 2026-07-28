@@ -97,6 +97,7 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'reading-screen.tsx': 'Campaign E lane B4',
   'journey-screen.tsx': 'Campaign E lane B5 (journeys)',
   'guide-screen.tsx': 'B6 (Campaign E — the 案内人)',
+  'map-screen.tsx': 'B1 (Campaign E)',
 };
 
 const screenFileNames = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
@@ -448,13 +449,51 @@ describe('architectural boundaries (controller §5)', () => {
     }
   });
 
+  /**
+   * The one file allowed to *name* the kernel's memory vocabulary (B1).
+   *
+   * The rule below is about the app holding no scheduling or grading logic, and
+   * scanning for the scheduler's nouns is a good proxy for it — a file that
+   * talks about stability and retrievability is usually computing them. Campaign
+   * E's map is the first surface that has to **render** a projection the kernel
+   * already computed, so it has to read `LensProjection.retrievability` and
+   * `.stabilityDays` by their real names at least once.
+   *
+   * The allowance is therefore as narrow as it can be made:
+   *
+   *   - **one file**, named here, not a directory or a pattern;
+   *   - **one exemption**, the memory-noun line only. `fsrs` and the scheduling
+   *     line below still apply to it, and so does every other assertion in this
+   *     describe block — it may not import `ts-fsrs`, mint an event, or reach
+   *     `packages/persistence`;
+   *   - the file itself funnels every such read through a single four-line
+   *     `readProjection`, and `test/map-modules.test.ts` asserts that stays the
+   *     only reader, so the seam cannot widen without a second test failing.
+   *
+   * What is *not* exempt is the thing the rule is for: no threshold here is a
+   * scheduling decision, nothing is graded, and nothing is written.
+   */
+  const PROJECTION_READER = 'src/ui/map/map-projection.ts';
+
   it('holds no scheduling, grading or evidence logic', () => {
     for (const file of sourceFiles) {
       const source = code(file);
       expect(source, rel(file)).not.toMatch(/\bfsrs\b/i);
-      expect(source, rel(file)).not.toMatch(/\bstability\b|\bretrievability\b|\bmemoryState\b/i);
+      if (rel(file) !== PROJECTION_READER) {
+        expect(source, rel(file)).not.toMatch(/\bstability\b|\bretrievability\b|\bmemoryState\b/i);
+      }
       expect(source, rel(file)).not.toMatch(/\bschedule(d|r)?\b|\bdueAt\b|\bnextReview\b/i);
     }
+  });
+
+  it('keeps the map’s projection seam to a single reader', () => {
+    // The exemption above is only safe while the file it names really does hold
+    // the reads to one place. Two separate reads would mean the vocabulary had
+    // started to spread, which is what the rule is guarding against.
+    const source = code(resolve(APP_ROOT, PROJECTION_READER));
+    const reads = source.match(/\.retrievability\b|\.stabilityDays\b/g) ?? [];
+    expect(reads.length, 'the projection seam has grown past one read site').toBeLessThanOrEqual(2);
+    expect(source).toContain('function readProjection(');
   });
 });
 

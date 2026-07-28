@@ -20,12 +20,19 @@
  * ## Why some destinations are in the shell and most are not
  *
  * REQ-UI-08 asks for calm, typographic surfaces with generous ma. A navigation
- * bar listing nine destinations is a debug menu with better fonts, and it would
+ * bar listing every destination is a debug menu with better fonts, and it would
  * also be *wrong* about the product: a word page is about a particular word, and
  * a canvas is about a particular session. Those are reached from the thing they
  * belong to. What belongs in a persistent shell is the small set of places a
- * learner starts from, which is why {@link SHELL_DESTINATIONS} has four entries
- * and the rest declare a parent.
+ * learner *starts* from, which is why most destinations declare a parent.
+ *
+ * {@link SHELL_DESTINATIONS} currently holds five — capture, session, evidence,
+ * about & diagnostics, and the map, which Campaign E added. The count is
+ * deliberately not repeated in prose here or anywhere else that renders it: the
+ * previous version of this comment said "four entries" in two places and
+ * `app/style-guide.tsx` said it in a third, and all three were still saying four
+ * after the map landed. The list is derived by filter below, so the number is
+ * `SHELL_DESTINATIONS.length` and a reader who wants it can count the table.
  */
 
 /** How a learner arrives at a destination. */
@@ -205,6 +212,24 @@ export const DESTINATIONS: readonly Destination[] = [
     blurb: 'Branch points the evidence opened, and what still has to hold to rejoin.',
     reach: { kind: 'shell' },
   },
+  /**
+   * The map (Campaign E, lane B1).
+   *
+   * In the shell rather than reached from a screen, and that placement is the
+   * point rather than a convenience. The round-2 research found that the review
+   * queue empties daily and shows nothing accumulated, so the map is *"the only
+   * surface that answers 'what have I built' rather than 'what do I owe'"*. That
+   * makes it a place a learner starts from, which is exactly what this shell is
+   * for — the same test as capture, session, evidence and about.
+   */
+  {
+    href: '/map',
+    routeFile: 'map.tsx',
+    screen: 'screens/map-screen.tsx',
+    label: 'Map',
+    blurb: 'What you have built, on the roads the language came in on.',
+    reach: { kind: 'shell' },
+  },
 ];
 
 /**
@@ -224,10 +249,12 @@ export const SPECIMEN_DESTINATIONS: readonly Destination[] = DESTINATIONS.filter
 );
 
 /**
- * The four places the shell offers.
+ * The places the shell offers — the ones a learner *starts* from.
  *
  * Derived rather than listed twice: a destination cannot be in the shell in one
- * file and reached-from-a-parent in another.
+ * file and reached-from-a-parent in another. No count is written here for the
+ * same reason it is derived: the number changed when Campaign E added the map
+ * and a written count would have gone stale, which is exactly what happened.
  */
 export const SHELL_DESTINATIONS: readonly Destination[] = DESTINATIONS.filter(
   (destination) => destination.reach.kind === 'shell',

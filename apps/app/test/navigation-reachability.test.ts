@@ -199,7 +199,7 @@ describe('the map describes the app it is in', () => {
    * destination with a real door; development surfaces are `specimen` and are
    * pinned separately, below.
    */
-  const CAMPAIGN_E_SCREENS = ['Journeys', 'Reading', 'The guide'] as const;
+  const CAMPAIGN_E_SCREENS = ['Journeys', 'Map', 'Reading', 'The guide'] as const;
 
   it('covers every screen the controller §10 list names', () => {
     const labels = LEARNER_DESTINATIONS.map((destination) => destination.label);
@@ -233,22 +233,27 @@ describe('the map describes the app it is in', () => {
     // learner *starts* from. Anything that belongs to one screen does not
     // belong here; that is how a masthead becomes a debug menu.
     //
-    // Two lanes each added a fifth entry, neither able to see the other, and
-    // each wrote a defensible argument for exactly one addition:
+    // Three lanes each added an entry, none able to see the others, and each
+    // wrote a defensible argument for exactly one addition:
     //
     //   Journeys (B5) — a branch point belongs to a contract in the ledger
     //     rather than to any screen, so there is no screen it *could* be
     //     demoted to.
     //   The guide (B6) — a starting place in the same sense, since the map
     //     document makes "constant presence" its defining property (§4.1).
+    //   Map (B1) — the round-2 research found the review queue empties daily
+    //     and shows nothing accumulated, so the map is the only surface that
+    //     answers "what have I built" rather than "what do I owe".
     //
     // Both arguments hold on their own terms and neither survives being applied
     // twice: the shell is now six, and six is a debug menu by the rule stated
-    // above. Both are kept here rather than one being dropped in a merge —
+    // above — seven, in fact, with the map. All three are kept rather than any
+    // being dropped in a merge —
     // choosing between two lanes' architecture from inside a conflict
     // resolution is precisely the call that should not be made this way — and
     // the assertion stays an equality so the count is visible rather than
-    // creeping. The information architecture is Wave D's work, and this comment
+    // creeping. Of the three the map has the strongest claim to being the
+    // home rather than a tab, which is itself a reason not to settle it here. The information architecture is Wave D's work, and this comment
     // is the open item it inherits, not a decision.
 
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
@@ -260,6 +265,7 @@ describe('the map describes the app it is in', () => {
       // appended before the journeys entry when the two lanes merged.
       'The guide',
       'Journeys',
+      'Map',
     ]);
   });
 

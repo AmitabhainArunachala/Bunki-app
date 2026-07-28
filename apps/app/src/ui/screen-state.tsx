@@ -14,6 +14,7 @@ import { type ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { OFFLINE_CAPABILITY_NOTE } from '../state/view-state.ts';
+import { useReducedMotion } from './motion.tsx';
 import { AppButton } from './primitives.tsx';
 import { RADIUS, SPACE, TYPE } from './theme.ts';
 import { useTheme } from './theme-context.tsx';
@@ -51,8 +52,32 @@ function Panel({ title, detail, children, testID }: StatePanelProps): ReactNode 
   );
 }
 
+/**
+ * The one piece of motion in the four states, and the one that ignored the ask.
+ *
+ * `ActivityIndicator` renders on `react-native-web` as a keyframe animation —
+ * `rotate(0deg) → rotate(360deg)`, 0.75s, `animation-iteration-count: infinite`,
+ * linear — and nothing in the bundle gated it on `prefers-reduced-motion`. Only
+ * `useReducedMotion` consults the query, and only the motion components used it,
+ * so a learner who had asked the operating system for stillness got an
+ * indefinitely spinning disc on every slow screen. Measured in Chromium with
+ * `reducedMotion: 'reduce'`: ten distinct rotation matrices over 800 ms,
+ * identical to the un-reduced run. Not shortened — unaffected.
+ *
+ * Under reduction the spinner is simply absent. That costs nothing, because the
+ * comment below is already true of it: the panel carries the label, the live
+ * region and the `progressbar` role, and the disc is decoration hidden from the
+ * accessibility tree. There is no still substitute to draw, because a static
+ * spinner is a shape that means nothing.
+ *
+ * This is a shared component rather than a map file. It is repaired here rather
+ * than worked around on one screen because every screen's loading state has the
+ * same defect; the map is only where it is on screen longest, at roughly 1.3 s
+ * cold while the one-off 9,245-node Atlas builds.
+ */
 export function LoadingPanel({ label }: { readonly label: string }): ReactNode {
   const theme = useTheme();
+  const reduced = useReducedMotion();
   return (
     <View
       accessibilityLabel={label}
@@ -79,9 +104,9 @@ export function LoadingPanel({ label }: { readonly label: string }): ReactNode {
         side on a route the sweep visits.
 
         The spinner is decoration: the panel around it already carries the label
-        and the live region.
+        and the live region. Which is also why reduced motion can simply drop it.
       */}
-      <ActivityIndicator aria-hidden color={theme.color.vermilion} />
+      {reduced ? null : <ActivityIndicator aria-hidden color={theme.color.vermilion} />}
       <Text
         style={[styles.panelBody, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
       >
