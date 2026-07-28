@@ -9,10 +9,10 @@
  * > decorative rather than the home of that answer is a mistake.
  *
  * So the order of this page is the order of that sentence. The accumulation card
- * is first, because it is the answer. The road is second, because *"station 11
- * of 160"* is the literal reply to "it never ends". The neighbourhood is third,
- * because that is where the learner walks. The era census is last, because it is
- * about the language rather than about them.
+ * is first, because it is the answer. The road is second, because *"11 of 160
+ * stations reached"* is the literal reply to "it never ends". The neighbourhood
+ * is third, because that is where the learner walks. The era census is last,
+ * because it is about the language rather than about them.
  *
  * ## Local neighbourhood by default
  *
@@ -23,6 +23,15 @@
  * 9,245 nodes; it counts them, once, memoised, and says what the counts are.
  * A whole-corpus scatter is not more information, it is the same information
  * rendered unusably.
+ *
+ * ## Both arms of the scrubber change what is drawn
+ *
+ * The negative arm changes the **instant** every mark is projected at; the
+ * positive arm changes **which era layer is drawn**, through `position.bands`.
+ * The second half shipped inert — `bands` was computed and unit-tested and read
+ * by nobody, so the three era steps rewrote the caption over a byte-identical
+ * field. `shownBands` below is the consumer, and `map-modules.test.ts` asserts
+ * the consumer exists rather than only that the value is correct.
  *
  * ## Exposure is never retrieval, and this screen is all exposure
  *
@@ -276,6 +285,38 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
   );
 
   /**
+   * The bands this scrubber position admits — the era arm of the control.
+   *
+   * This is the half of "one control, two times" that has to be *visible* for
+   * the duality to be real. It shipped inert: `resolveScrubber` computed
+   * `bands` ("exactly one when walking the language's strata"), a unit test
+   * asserted it, and no component read it, so pressing +1/+2/+3 changed the
+   * caption and nothing else. The field under it was byte-identical at all four
+   * positions while the step's own hint said "walks to this layer of the
+   * language's history".
+   *
+   * `unknown` is not one of the language's eras, so walking the strata drops it
+   * too. That is the honest reading of the gesture — you are standing on 古道,
+   * and a word whose era the dictionary cannot date is not on 古道 — and it is
+   * also the reading that makes the era arm *say something*, because over this
+   * dictionary `unknown` is where almost every node is. What it withholds is
+   * counted and stated under the field rather than left to be noticed, which is
+   * the same rule the crossing-edge count follows.
+   */
+  const walkingOneLayer = position.reading === 'language-eras';
+  const shownBands = useMemo<readonly BandTally[]>(() => {
+    if (!walkingOneLayer) return bands;
+    const layers = new Set<string>(position.bands);
+    return bands.filter((band) => layers.has(band.band));
+  }, [bands, position.bands, walkingOneLayer]);
+
+  /** How many drawn nodes the era arm is holding back, for the sentence below. */
+  const withheld = useMemo(() => {
+    const shown = shownBands.reduce((sum, band) => sum + band.nodes.length, 0);
+    return { shown, hidden: drawn.length - shown };
+  }, [shownBands, drawn.length]);
+
+  /**
    * Which band each drawn node landed in, and how many held edges cross bands.
    *
    * The map is *strata*: each band is painted on its own era ground, so a line
@@ -469,12 +510,13 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
       {/* -------------------------------------------------- the scrubber */}
       <Section
-        note="One control, two times. Moving it is a read of your log — it records nothing and grades nothing."
+        note="One control, two times. Pulled left it replays your own recorded history; pulled right it draws one era layer of the language at a time, and only that one. Moving it is a read of your log — it records nothing and grades nothing."
         testID="map-scrubber-section"
         title="How did this get here?"
       >
         <Scrubber
-          historyFrameCount={frames.length}
+          frames={frames}
+          now={nowInstant}
           onChange={setScrub}
           position={position}
           testID="map-scrubber"
@@ -487,7 +529,26 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
         testID="map-neighbourhood"
         title={`Around ${originNode?.label ?? ''}`}
       >
-        {bands.map((band) => {
+        {/*
+          What the era arm of the scrubber is holding back, in the same voice as
+          the crossing-edge count under it. Rendered before the bands, because a
+          learner who has just pressed +2 and sees one empty ground needs to
+          know that is the layer being empty rather than the map having broken.
+        */}
+        {walkingOneLayer ? (
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[styles.meta, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+            testID="map-band-filter"
+          >
+            Walking one layer of the language: {shownBands[0]?.label.title ?? ''}.{' '}
+            {String(withheld.shown)} of {String(drawn.length)} nodes around{' '}
+            {originNode?.label ?? 'here'} sit on it; the other {String(withheld.hidden)} are on the
+            other layers or on none, and are not drawn at this position. Return to 今 to see all of
+            them again.
+          </Text>
+        ) : null}
+        {shownBands.map((band) => {
           if (band.nodes.length === 0) {
             return (
               <View key={band.band} style={styles.bandEmpty} testID={`map-band-${band.band}`}>

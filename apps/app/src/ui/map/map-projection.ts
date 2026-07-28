@@ -10,12 +10,23 @@
  * absence is the requirement."*
  *
  * This module keeps that absence. It converts one `LensProjection` into one
- * drawable band, and there is no function here that takes a `NodeRetrievability`
- * and returns a band, a score, or a brightness — because a node does not have
- * one. A map node draws five marks, or it draws the mark for the lens the
- * learner has chosen, and either way the lens is named beside it.
- * `test/map-modules.test.ts` asserts that no export of this file accepts a whole
- * node projection, so the missing function stays missing.
+ * drawable band, and there is no function here that takes a whole node and
+ * returns a band, a score, or a brightness — because a node does not have one.
+ * A map node draws five marks, or it draws the mark for the lens the learner has
+ * chosen, and either way the lens is named beside it.
+ *
+ * The rule `test/map-modules.test.ts` actually enforces, stated precisely
+ * because the previous wording described a guard that could not fire: **an
+ * export may hold a whole node only if it also names a lens.** `lensView(view,
+ * lens)` satisfies it; `projectMapNode` builds a node view and takes no lens,
+ * which is why the rule is about parameters rather than about mentioning the
+ * type. The guard it replaced was a regex for `NodeRetrievability` in a
+ * signature — a type this file has never imported, so the pattern had nothing to
+ * match in any version of the file, and a literal `nodeBand(view: MapNodeView):
+ * StandaloneRecallBand` returning the mean of five lens ranks typechecked,
+ * linted clean and passed. Two further guards sit beside it: `markRank` may be
+ * called from no other file in the lane, and `.lenses` may only be `.find` or
+ * `.map`, so a surface cannot rank the five and combine them either.
  *
  * ## Brightness is a number that exists
  *

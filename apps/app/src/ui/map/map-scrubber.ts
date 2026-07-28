@@ -67,6 +67,21 @@
  * repaired, and the reason this module hands out instants rather than indexes:
  * a helper here that returned a fresh index per position would reintroduce it
  * one layer up.
+ *
+ * ## A frame index is not a day, and this control's whole job is to say when
+ *
+ * {@link historyFrames} caps at 480 frames and **widens the step** past the cap,
+ * so a learner with 1,500 days of history gets 480 frames three days apart. The
+ * axis position is a frame index, so `-479` on a 1,500-day log is 1,500 days
+ * back, not 479. The label used to be formed from the position — every long
+ * history read "479 days back" no matter how long it was — which is the one
+ * mistake this control cannot afford, since naming the instant is its entire
+ * function.
+ *
+ * So every day figure a learner reads comes from {@link daysBetween} over the
+ * **actual instants**: {@link daysBackAt} for a step, {@link historySpanDays}
+ * for the whole arm. The frame count survives only as `ScrubberRange.historyFrames`,
+ * which is what it is called and is never printed as a duration.
  */
 
 import { ERA_LAYERS, type EraLayer, type IsoInstant } from '@bunki/domain';
@@ -113,6 +128,42 @@ export interface ScrubberRange {
   readonly max: number;
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Whole days between two instants, never negative.
+ *
+ * Rounded rather than floored: frames past the 480 cap are a non-integer number
+ * of days apart, and flooring would print a 1,500-day history as 1,499. Rounding
+ * is the honest reading of "how many days back is this frame".
+ */
+export function daysBetween(from: IsoInstant, to: IsoInstant): number {
+  const start = Date.parse(from);
+  const end = Date.parse(to);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return 0;
+  return Math.max(0, Math.round((end - start) / DAY_MS));
+}
+
+/**
+ * How many days back the frame at `value` actually is.
+ *
+ * Reads the frame's own instant, so it is correct whether or not the step
+ * widened past the cap. Zero and the positive side are the present, which is
+ * zero days back.
+ */
+export function daysBackAt(value: number, frames: readonly IsoInstant[], now: IsoInstant): number {
+  if (value >= 0 || frames.length === 0) return 0;
+  const index = Math.max(0, frames.length - 1 + Math.trunc(value));
+  const at = frames[index];
+  return at === undefined ? 0 : daysBetween(at, now);
+}
+
+/** How long the learner's recorded history is, in days rather than in frames. */
+export function historySpanDays(frames: readonly IsoInstant[], now: IsoInstant): number {
+  const oldest = frames[0];
+  return oldest === undefined ? 0 : daysBetween(oldest, now);
+}
+
 export function scrubberRange(historyFrameCount: number): ScrubberRange {
   const frames = Math.max(0, Math.trunc(historyFrameCount));
   return {
@@ -121,7 +172,13 @@ export function scrubberRange(historyFrameCount: number): ScrubberRange {
     // The last history frame *is* the present, so it is position zero rather
     // than position -1; a range of `-(frames - 1)` avoids an off-by-one that
     // would put "now" one step from the end of its own axis.
-    min: frames === 0 ? 0 : -(frames - 1),
+    //
+    // One frame is handled with zero rather than by arithmetic, because
+    // `-(1 - 1)` is `-0`: it compares false against `< 0` (so the control was
+    // right not to draw an arm) but `Object.is(-0, 0)` is false, so the sharp
+    // edge could only ever surface in a test or a serialisation. There is no
+    // history arm for one frame; the honest spelling of that is `0`.
+    min: frames <= 1 ? 0 : -(frames - 1),
     max: ERA_LAYERS.length,
   };
 }
@@ -143,6 +200,21 @@ export function resolveScrubber(
   const range = scrubberRange(frames.length);
   const clamped = Math.min(range.max, Math.max(range.min, Math.trunc(value)));
 
+  /*
+    Whether there is a history *arm* at all, which is not the same question as
+    whether there are frames.
+
+    `scrubberRange(1).min` is 0 — one frame is the present and nothing else — so
+    a single-frame log renders no negative step, and `scrubber.tsx` is right not
+    to draw one. The copy used to key off `historyFrames === 0` instead, so every
+    fresh install, and every learner on their first day *including immediately
+    after doing real work*, read "Pull left through 1 days of your own history"
+    beside a control with nothing to its left. One control, one predicate.
+  */
+  const hasHistoryArm = range.min < 0;
+  const spanDays = historySpanDays(frames, now);
+  const spanPhrase = `${String(spanDays)} day${spanDays === 1 ? '' : 's'}`;
+
   if (clamped > 0) {
     const layer = ERA_LAYERS[clamped - 1] ?? ERA_LAYERS[0];
     return {
@@ -151,10 +223,9 @@ export function resolveScrubber(
       at: now,
       bands: layer === undefined ? [...ERA_LAYERS] : [layer],
       label: `The language’s history — layer ${String(clamped)} of ${String(ERA_LAYERS.length)}`,
-      otherDirection:
-        range.historyFrames === 0
-          ? 'Pull the other way for your own history. You have none recorded yet.'
-          : `Pull the other way for your own history — ${String(range.historyFrames)} recorded days.`,
+      otherDirection: hasHistoryArm
+        ? `Pull the other way for your own history — ${spanPhrase} of it.`
+        : 'Pull the other way for your own history. There is no earlier day recorded yet.',
     };
   }
 
@@ -165,22 +236,24 @@ export function resolveScrubber(
       at: now,
       bands: [...ERA_LAYERS],
       label: 'Now — every layer, as your memory stands today',
-      otherDirection:
-        range.historyFrames === 0
-          ? 'Pull left for your own history (none recorded yet); pull right to walk the language’s three eras.'
-          : `Pull left through ${String(range.historyFrames)} days of your own history; pull right to walk the language’s three eras.`,
+      otherDirection: hasHistoryArm
+        ? `Pull left through ${spanPhrase} of your own history; pull right to walk the language’s three eras.`
+        : 'Pull right to walk the language’s three eras. There is no earlier day recorded yet, so there is nothing to the left.',
     };
   }
 
   // Negative: step back from the end of the frame list, which is the present.
   const index = frames.length - 1 + clamped;
   const at = frames[Math.max(0, index)] ?? now;
+  // Days off the frame's own instant, never off the position: past the 480-frame
+  // cap the step widens and the two stop being the same number.
+  const back = daysBackAt(clamped, frames, now);
   return {
     value: clamped,
     reading: 'your-history',
     at,
     bands: [...ERA_LAYERS],
-    label: `Your history — ${String(-clamped)} day${clamped === -1 ? '' : 's'} back`,
+    label: `Your history — ${String(back)} day${back === 1 ? '' : 's'} back`,
     otherDirection: 'Pull the other way to walk the language’s three eras instead.',
   };
 }
@@ -188,8 +261,6 @@ export function resolveScrubber(
 /* ------------------------------------------------------------------ *
  * Frames
  * ------------------------------------------------------------------ */
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Daily instants from `from` to `to` inclusive, oldest first.

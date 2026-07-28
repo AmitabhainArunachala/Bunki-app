@@ -60,7 +60,7 @@ the strings a learner saw.
 - routes offered: **6**
 - standing: “1 of 2 contracts have evidence behind them.”
 - today: “Today added 2 new contracts and 1 admitted review.”
-- position on the road: “Station 0 of 77”
+- position on the road: “0 of 77 stations reached”
 - scrubber: “Now — every layer, as your memory stands today”
 
 ## One node, five lenses — the no-collapsed-light rule, photographed
@@ -107,8 +107,8 @@ no-collapsed-light rule visible in a picture rather than asserted.
 
 | scheme | cold load to interactive | lens change | scrubber step |
 | --- | --- | --- | --- |
-| light | 690 ms | 32.1 ms | 30.1 ms |
-| dark | 736 ms | 24.5 ms | 27.2 ms |
+| light | 1219 ms | 25.2 ms | 29.1 ms |
+| dark | 1175 ms | 40.1 ms | 21.8 ms |
 
 **Cold load to interactive** is navigation start until the road has drawn,
 which includes the one-off Atlas build over the whole shipped dictionary

@@ -31,15 +31,29 @@ import {
 import { accumulationOf, dayOf } from '../src/ui/map/map-accumulation.ts';
 import { BAND_LABELS, MAP_BANDS, bandOf, eraKeyOf, placeNodes } from '../src/ui/map/map-eras.ts';
 import { layoutNeighbourhood } from '../src/ui/map/map-layout.ts';
-import { MAP_MARK_STEPS, hasReached, markRank } from '../src/ui/map/map-projection.ts';
+import {
+  LENS_IDS,
+  MAP_MARK_STEPS,
+  buildMapIndex,
+  hasReached,
+  markRank,
+  projectMapNode,
+} from '../src/ui/map/map-projection.ts';
 import {
   MARKER_INTERVAL,
   ROUTE_GRADES,
+  ROUTE_SUBSET_NOTE,
   buildRoutes,
   routeMarkers,
   routePosition,
 } from '../src/ui/map/map-routes.ts';
-import { historyFrames, resolveScrubber, scrubberRange } from '../src/ui/map/map-scrubber.ts';
+import {
+  daysBackAt,
+  historyFrames,
+  historySpanDays,
+  resolveScrubber,
+  scrubberRange,
+} from '../src/ui/map/map-scrubber.ts';
 import {
   buildMapAtlas,
   kanjiNodeId,
@@ -71,6 +85,37 @@ const identifiers = (text: string): string =>
     .replace(/`(?:[^`\\]|\\.)*`/g, '``')
     .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
     .replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
+
+/**
+ * Every `export function` in a module, with its parameter list read by balancing
+ * parentheses rather than by a regex.
+ *
+ * A regex was what made the previous no-collapsed-light guard un-fireable, and a
+ * lazy `\([^)]*\)` would have been fragile in its own way: a parameter whose type
+ * is itself a function — `lensOf: (id, lens) => …`, which `map-routes.ts` has —
+ * closes the group early and hides everything after it. Counting depth is a few
+ * lines and cannot be fooled by either.
+ */
+const exportedSignatures = (
+  text: string,
+): readonly { readonly name: string; readonly params: string }[] => {
+  const source = strip(text);
+  const out: { name: string; params: string }[] = [];
+  for (const match of source.matchAll(/export\s+function\s+(\w+)\s*\(/g)) {
+    const name = match[1];
+    if (name === undefined) continue;
+    let depth = 1;
+    let cursor = match.index + match[0].length;
+    while (cursor < source.length && depth > 0) {
+      const char = source[cursor];
+      if (char === '(') depth += 1;
+      else if (char === ')') depth -= 1;
+      cursor += 1;
+    }
+    out.push({ name, params: source.slice(match.index + match[0].length, cursor - 1) });
+  }
+  return out;
+};
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((entry) => {
@@ -251,10 +296,53 @@ describe('the Atlas declares only edges the seed carries', () => {
  * ------------------------------------------------------------------ */
 
 describe('no function collapses the five lenses into one light', () => {
-  it('exposes no export that takes a whole node projection and returns a band', () => {
-    const source = strip(read(resolve(APP_ROOT, 'src/ui/map/map-projection.ts')));
-    // A signature over `NodeRetrievability` is the shape a collapse would take.
-    expect(source).not.toMatch(/export function \w+\([^)]*NodeRetrievability/);
+  /**
+   * This guard was a regex over a type the file does not import, so it could
+   * not fire — and `map-projection.ts`'s header cited it as proof that "the
+   * missing function stays missing".
+   *
+   * The old assertion was
+   * `expect(source).not.toMatch(/export function \w+\([^)]*NodeRetrievability/)`.
+   * `map-projection.ts` imports no `NodeRetrievability`; the only whole-node
+   * type it has is its own `MapNodeView`. So the pattern had nothing to match
+   * against in any version of the file, passing or failing. A literal collapse —
+   * `export function nodeBand(view: MapNodeView): StandaloneRecallBand` returning
+   * the mean of five lens ranks — typechecked, linted clean and passed all five
+   * tests in this block.
+   *
+   * The invariant, stated so it can actually be checked: **an export may hold a
+   * whole node only if it also names a lens.** `lensView(view, lens)` is the one
+   * legitimate shape and it satisfies this by construction; `projectMapNode`
+   * builds a node view and takes no lens, which is why the rule is about
+   * *parameters* rather than about mentioning the type at all.
+   */
+  it('lets no export take a whole node without also naming a lens', () => {
+    const file = resolve(APP_ROOT, 'src/ui/map/map-projection.ts');
+    const signatures = exportedSignatures(read(file));
+    // The guard is worthless if it is walking an empty list.
+    expect(signatures.map((signature) => signature.name)).toContain('lensView');
+
+    for (const signature of signatures) {
+      if (!/\bMapNodeView\b/.test(signature.params)) continue;
+      expect(
+        /\bCapabilityId\b/.test(signature.params),
+        `${signature.name} takes a whole node view and no lens, which is the collapsed light REQ-UI-07 forbids`,
+      ).toBe(true);
+    }
+  });
+
+  /**
+   * The same rule as behaviour rather than as source: five lenses in, five
+   * views out, in order, with nothing summarising them.
+   */
+  it('projects five separate lens views for a node and summarises none of them', () => {
+    const node = tiny.graph.nodes.get('lexeme:lx-sansen');
+    if (node === undefined) throw new Error('no node');
+    const view = projectMapNode(buildMapIndex([], []), node, '2026-07-28T00:00:00.000Z');
+    expect(view.lenses.map((lens) => lens.lens)).toEqual([...LENS_IDS]);
+    // Every extra key on the node view would be a candidate summary. There is
+    // exactly one, and it is the id.
+    expect(Object.keys(view).sort()).toEqual(['lenses', 'nodeId']);
   });
 
   it('has no averaging, summing or percentage anywhere in the lane', () => {
@@ -263,6 +351,36 @@ describe('no function collapses the five lenses into one light', () => {
       expect(source, relative(APP_ROOT, file)).not.toMatch(/\baverage\b|\bmastery\b/i);
       // A percent sign in a template literal would be a rendered percentage.
       expect(source, relative(APP_ROOT, file)).not.toMatch(/\$\{[^}]*\}\s*%/);
+      // Arithmetic *over the lens array* is the mechanism a collapse needs, and
+      // the word-level scan above cannot see it: the probe that beat the old
+      // guard was spelled `ranks.reduce((a, b) => a + b, 0) / ranks.length` and
+      // contains none of "average", "mastery" or "%". The lane reads `.lenses`
+      // exactly twice — `.find` to pick one, `.map(toLensView)` to build them —
+      // and any other operator on it is refused here.
+      for (const [, operator] of source.matchAll(/\.lenses\s*\.\s*(\w+)/g)) {
+        expect([operator, relative(APP_ROOT, file)]).toEqual([
+          expect.stringMatching(/^(find|map)$/),
+          relative(APP_ROOT, file),
+        ]);
+      }
+    }
+  });
+
+  /**
+   * The ramp position of a mark is computable in exactly one file.
+   *
+   * `markRank` turning a mark into a number is what any collapse — mean, max,
+   * sum, "best lens" — needs, and `.lenses.map(markRank)` would slip past the
+   * operator scan above. Keeping the function's *callers* inside
+   * `map-projection.ts` means a surface cannot rank five lenses at all; the only
+   * thing it can ask is `hasReached(oneLensView, band)`, which is per lens by
+   * signature. This is the tight half of the rule and the scan above is the
+   * loose half; both are here because neither alone was enough.
+   */
+  it('lets no surface turn a mark into a number', () => {
+    for (const file of LANE_FILES) {
+      if (file.endsWith('map-projection.ts')) continue;
+      expect(strip(read(file)), relative(APP_ROOT, file)).not.toMatch(/\bmarkRank\b/);
     }
   });
 
@@ -454,7 +572,7 @@ describe('routes are named, ordered, finite sequences of real data', () => {
     expect(all.reached).toBe(route.stations.length);
     expect(all.nextStation).toBeNull();
     expect(all.sentence).toBe(
-      `Station ${String(route.stations.length)} of ${String(route.stations.length)}`,
+      `${String(route.stations.length)} of ${String(route.stations.length)} stations reached`,
     );
 
     // The same road, the same lens, after decay: the count falls.
@@ -468,6 +586,82 @@ describe('routes are named, ordered, finite sequences of real data', () => {
     // A station with no projection is not reached — no evidence is not evidence.
     const none = routePosition(route, 'reading', 'settled', () => null);
     expect(none.reached).toBe(0);
+  });
+
+  /**
+   * The count is not an ordinal, and nothing on screen may read as one.
+   *
+   * This is the shape that shipped: five stations reached at ordinals 3, 17, 40,
+   * 55 and 70 printed "Station 5 of 77" above "Next unreached: 日 (station 1)"
+   * with no 一里塚 filled — three statements about one position, disagreeing,
+   * because `reached` is a count and both the sentence and the marker fill were
+   * treating it as a place. Non-prefix reach is the *normal* case: KANJIDIC2
+   * frequency order has nothing to do with which characters a learner captured.
+   */
+  it('never renders its count as an ordinal, and marks the stations it actually reached', () => {
+    const route = routes[0];
+    if (route === undefined) throw new Error('no route');
+    const reachedAt = new Set([3, 17, 40, 55, 70]);
+    const ordinalOf = new Map(route.stations.map((station) => [station.nodeId, station.ordinal]));
+    const settled: MapLensView = {
+      lens: 'reading',
+      mark: { kind: 'lit', band: 'settled' },
+      fragile: false,
+      presence: 'attested',
+      uncertainty: 'narrow',
+      coverage: 'established',
+      dueState: 'not_due',
+      intervalDays: 30,
+      chance: 0.95,
+      admittedReviewCount: 3,
+      basis: '',
+    };
+    const position = routePosition(route, 'reading', 'settled', (nodeId) => {
+      const ordinal = ordinalOf.get(nodeId);
+      return ordinal !== undefined && reachedAt.has(ordinal) ? settled : null;
+    });
+
+    expect(position.reached).toBe(5);
+    expect(position.sentence).toBe(`5 of ${String(route.stations.length)} stations reached`);
+    // The old sentence, in its exact shape, must not come back.
+    expect(position.sentence).not.toMatch(/^Station \d+ of/);
+    // The count is the membership, read another way — never an independent number.
+    expect(position.reachedOrdinals.size).toBe(position.reached);
+    expect([...position.reachedOrdinals].sort((a, b) => a - b)).toEqual([3, 17, 40, 55, 70]);
+    // Station 1 is genuinely unreached, and the sentence no longer contradicts it.
+    expect(position.nextStation?.ordinal).toBe(1);
+    // The strip fills a marker from its own station. Ordinal 40 is reached and
+    // is a marker; 10 is a marker and is not reached; a left-to-right fill would
+    // have had it the other way round.
+    expect(routeMarkers(route)).toContain(40);
+    expect(position.reachedOrdinals.has(40)).toBe(true);
+    expect(position.reachedOrdinals.has(10)).toBe(false);
+  });
+
+  /**
+   * The road is as long as this build's dictionary, and says so.
+   *
+   * The rule used to promise "every kanji KANJIDIC2 assigns to this school
+   * grade" and "nothing is sampled". The kanji tier is a sample by its own
+   * admission, and grade 1 ships 77 characters where the grade has 80, so a
+   * learner who reached all 77 would have believed they had finished grade 1.
+   */
+  it('discloses that its stations are a subset of the grade', () => {
+    const tier = JSON.parse(
+      read(resolve(APP_ROOT, '../../packages/seed/data/dictionary/kanji.json')),
+    ) as { readonly _comment: readonly string[] };
+    // The disclosure quotes the tier. If the importer stops limiting the set,
+    // this fails and the sentence has to be rewritten rather than left standing.
+    expect(tier._comment.join(' ')).toContain('limited to those the imported lexemes actually use');
+    expect(ROUTE_SUBSET_NOTE).toContain('limited to those the imported lexemes actually use');
+
+    for (const route of routes) {
+      expect(route.rule, route.id).not.toContain('nothing is sampled');
+      expect(route.rule, route.id).toContain('subset');
+    }
+    // The number the note states is the number the build actually ships.
+    const grade1 = routes.find((route) => route.id === 'grade-1');
+    expect(ROUTE_SUBSET_NOTE).toContain(`ships ${String(grade1?.stations.length ?? 0)} of`);
   });
 
   it('never reports a percentage or a ratio', () => {
@@ -539,7 +733,63 @@ describe('the scrubber reads two times from one axis', () => {
     const position = resolveScrubber(-1, [now], now);
     expect(position.at).toBe(now);
     expect(scrubberRange(0).min).toBe(0);
-    expect(resolveScrubber(0, [], now).otherDirection).toContain('none recorded yet');
+    expect(resolveScrubber(0, [], now).otherDirection).toContain('no earlier day recorded yet');
+  });
+
+  /**
+   * A one-frame history has **no arm**, and the copy must agree with the control.
+   *
+   * `scrubberRange(1).min` is 0, so `scrubber.tsx` renders no negative step —
+   * correctly. The copy keyed off `historyFrames === 0` instead, so a learner
+   * with exactly one frame read "Pull left through 1 days of your own history"
+   * beside a control with nothing to its left, with a broken plural. That is the
+   * state of every fresh install and of every learner on their first day,
+   * *including* immediately after capturing, keeping, promoting, sitting a
+   * session and answering a probe — real work, one day of it.
+   */
+  it('does not invite a gesture it renders no step for', () => {
+    for (const framesHeld of [[], [now]]) {
+      const position = resolveScrubber(0, framesHeld, now);
+      expect(scrubberRange(framesHeld.length).min).toBe(0);
+      expect(position.otherDirection, JSON.stringify(framesHeld)).not.toMatch(/Pull left/);
+      expect(position.otherDirection, JSON.stringify(framesHeld)).not.toMatch(/\b1 days\b/);
+      expect(position.otherDirection).toContain('no earlier day recorded yet');
+    }
+    // Two frames is one real day back, and the arm exists, so the invitation is
+    // honest — and singular.
+    const oneDay = historyFrames('2026-07-27T00:00:00.000Z', now);
+    expect(scrubberRange(oneDay.length).min).toBeLessThan(0);
+    expect(resolveScrubber(0, oneDay, now).otherDirection).toContain('Pull left through 1 day of');
+  });
+
+  /**
+   * A frame index is not a day once history passes the cap.
+   *
+   * `historyFrames` caps at 480 and widens the step, so on a 1,500-day log frame
+   * −479 is 1,500 days back. Every day figure the learner reads used to be formed
+   * from the *position*: a three-year history and a sixteen-month one both said
+   * "479 days back", on the one control whose entire job is to say when.
+   */
+  it('names days from the frame’s own instant, not from its index', () => {
+    const at = Date.parse(now);
+    for (const days of [3, 479, 480, 1000, 1500]) {
+      const from = new Date(at - days * 24 * 60 * 60 * 1000).toISOString();
+      const held = historyFrames(from, now);
+      const range = scrubberRange(held.length);
+      const oldest = resolveScrubber(range.min, held, now);
+      const actual = Math.round((at - Date.parse(oldest.at)) / (24 * 60 * 60 * 1000));
+
+      expect(actual, `${String(days)}d span`).toBe(days);
+      expect(oldest.label, `${String(days)}d span`).toBe(
+        `Your history — ${String(days)} days back`,
+      );
+      expect(daysBackAt(range.min, held, now), `${String(days)}d span`).toBe(days);
+      expect(historySpanDays(held, now), `${String(days)}d span`).toBe(days);
+      // And the detent's invitation is a duration, not a frame count.
+      expect(resolveScrubber(0, held, now).otherDirection).toContain(
+        `Pull left through ${String(days)} days`,
+      );
+    }
   });
 
   it('ends its frame list exactly at the present', () => {
@@ -547,6 +797,27 @@ describe('the scrubber reads two times from one axis', () => {
     expect(historyFrames('2020-01-01T00:00:00.000Z', now).at(-1)).toBe(now);
     // A very long history is capped in frames, not in reach.
     expect(historyFrames('2000-01-01T00:00:00.000Z', now).length).toBeLessThanOrEqual(480);
+  });
+
+  /**
+   * The era arm has a consumer, not just a value.
+   *
+   * `ScrubberPosition.bands` was computed, documented ("exactly one when walking
+   * the language's strata"), unit-tested three lines above — and read by nobody.
+   * The screen rendered all four bands from `placeNodes` unconditionally, so
+   * pressing +1/+2/+3 changed the caption and left the field byte-identical,
+   * while the step's own `accessibilityHint` promised it "walks to this layer".
+   *
+   * A pure-function test cannot see that, which is exactly why it gave false
+   * assurance. This one is about the wiring: the screen must read `position.bands`
+   * and the list it renders must be the filtered one.
+   */
+  it('is read by the screen, and not only computed', () => {
+    const screen = strip(read(resolve(APP_ROOT, 'src/screens/map-screen.tsx')));
+    expect(screen, 'the screen never reads the era arm').toContain('position.bands');
+    // The bands it maps over must be the filtered list, not the raw placement.
+    expect(screen).toMatch(/\{shownBands\.map\(/);
+    expect(screen, 'the raw placement is still being rendered').not.toMatch(/\{bands\.map\(/);
   });
 });
 
@@ -636,6 +907,56 @@ describe('accumulation is visible and is not a streak', () => {
     const muchLater = accumulationOf(input, '2027-06-01T00:00:00.000Z');
     expect(muchLater.contractsStanding).toBe(early.contractsStanding);
     expect(muchLater.contractsAttested).toBe(early.contractsAttested);
+  });
+
+  /**
+   * The ban is on a **mechanism**, so it is checked as behaviour first.
+   *
+   * The name scan below is real but shallow: it greps identifiers for
+   * `streak|daysActive|consecutive`, so a genuine consecutive-day counter called
+   * `runLength` passed the whole file. (Measured: swapping `contractsStanding`
+   * for a day-run counter named `runLength` left all 63 tests green; renaming it
+   * `streak` went red, which is the proof it was a name grep.)
+   *
+   * What a streak actually *is*: a number that depends on how the same work was
+   * **distributed across days**, and that a gap reduces. So the mechanism is
+   * absent exactly when the result is invariant to that distribution. Two
+   * ledgers, same totals, same `now`, nothing today: one on five consecutive
+   * days, one scattered across five months with gaps everywhere. Every field of
+   * the accumulation — including the rendered sentence — must be identical. A
+   * `runLength` under any name differs on the first of those inputs.
+   */
+  it('is invariant to how the same work was spread across days', () => {
+    const asOf = '2026-07-28T09:00:00.000Z';
+    const build = (days: readonly string[]) => ({
+      memoryStates: days.map((day, index) =>
+        state(`${day}T08:00:00.000Z`, index === 0 ? 0 : index),
+      ),
+      gateDecisions: days
+        .slice(1)
+        .map((day) => ({ admitted: true, at: `${day}T08:30:00.000Z` }) as const),
+    });
+
+    const consecutive = accumulationOf(
+      build(['2026-07-20', '2026-07-21', '2026-07-22', '2026-07-23', '2026-07-24']),
+      asOf,
+    );
+    const scattered = accumulationOf(
+      build(['2026-03-02', '2026-04-19', '2026-05-01', '2026-06-30', '2026-07-24']),
+      asOf,
+    );
+
+    expect(scattered).toEqual(consecutive);
+    // And the shape carries nothing a day-run could hide in: five fields, all
+    // named for what they count, none of them a duration.
+    expect(Object.keys(consecutive).sort()).toEqual([
+      'activatedToday',
+      'admittedToday',
+      'contractsAttested',
+      'contractsStanding',
+      'sentence',
+      'todayAddedSomething',
+    ]);
   });
 
   it('has no consecutive-day counter anywhere in the lane', () => {

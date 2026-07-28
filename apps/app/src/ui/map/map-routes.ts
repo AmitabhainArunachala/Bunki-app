@@ -29,9 +29,9 @@
  *
  * ## The one rule that builds one, stated exactly
  *
- * > A route is the set of kanji KANJIDIC2 assigns to one 常用漢字 school grade,
- * > ordered by KANJIDIC2's own newspaper-frequency rank ascending, with
- * > unranked characters last in codepoint order.
+ * > A route is the set of kanji **this build's dictionary holds** for one 常用漢字
+ * > school grade, ordered by KANJIDIC2's own newspaper-frequency rank ascending,
+ * > with unranked characters last in codepoint order.
  *
  * Both fields are real KANJIDIC2 columns carried through the importer
  * (`ImportedExtras.grade`, `ImportedExtras.frequency`). Neither is computed,
@@ -39,6 +39,34 @@
  * frequency, then codepoint — so the same build always produces the same
  * sequence, and a station's ordinal is a fact about the data rather than about
  * when it happened to be indexed.
+ *
+ * ## "This build's dictionary holds" is doing real work in that sentence
+ *
+ * The rule used to read *"every kanji KANJIDIC2 assigns to this school grade"*
+ * and end *"nothing is sampled"*. Both halves were wrong together, and the
+ * combination was worse than either: the kanji tier says of itself
+ *
+ * > Imported KANJIDIC2 characters, **limited to those the imported lexemes
+ * > actually use.**
+ *
+ * so the tier *is* a sample of KANJIDIC2, and grade 1 ships 77 characters where
+ * the grade has 80 — 貝, 糸 and 田 are in the grade and not in this build. A
+ * learner who reached all 77 and read that rule would believe they had finished
+ * grade 1 without ever having met three of its characters.
+ *
+ * That is load-bearing rather than pedantic, because the whole point of a route
+ * is the sentence *"this road has 53 stations and you are at the 11th"* — a
+ * claim of **completeness over a named set**. A road that is quietly missing
+ * stations is the one defect that destroys the claim while looking identical.
+ *
+ * So {@link ROUTE_SUBSET_NOTE} states the subset in the dictionary's own words,
+ * it is part of every route's printed rule, and the surface renders it. The
+ * number of characters the grade has upstream is deliberately **not** asserted:
+ * the raw KANJIDIC2 is not committed (it is a ~200 MB gitignored download,
+ * `packages/seed/data/dictionary/manifest.json`), so this build cannot count it,
+ * and hard-coding a total from memory would be the unsourced claim the lane
+ * refuses everywhere else. What it can say, and now does, is that its own count
+ * is a count of *its own* entries and is not the grade.
  *
  * **Why grade and not something else.** It is the only field in the tier that is
  * simultaneously (a) a real published grouping, (b) exhaustive over the
@@ -54,9 +82,9 @@
  *
  * ## Position is a count, on a named lens, at a stated band
  *
- * `station 11 of 160` is *not* an ordinal walk along the sequence and *not* a
- * percentage. It is: **how many members of this sequence have reached a stated
- * band on one named capability lens.** Three properties make it honest:
+ * `11 of 160 stations reached` is *not* an ordinal walk along the sequence and
+ * *not* a percentage. It is: **how many members of this sequence have reached a
+ * stated band on one named capability lens.** Three properties make it honest:
  *
  *   - It is a count of real things, from real FSRS, per contract.
  *   - It is **never averaged across capabilities** — a route position exists for
@@ -74,6 +102,16 @@
  * station of *this* list — and never a fraction of a bar. {@link routeMarkers}
  * emits them from the length, so a 160-station route has sixteen and a
  * 20-station route has two.
+ *
+ * A marker is drawn *passed* when **the station standing at that ordinal has
+ * itself been reached** — {@link RoutePosition.reachedOrdinals} — and never when
+ * the running count happens to have got that high. Filling the first `reached`
+ * markers left to right is the discrete form of the percentage bar this file
+ * refuses: it reads as an ordinal walk, and reach is not a prefix. Frequency
+ * order has nothing to do with which characters a learner captured, so a count
+ * of five with the reached stations at ordinals 3, 17, 40, 55 and 70 is the
+ * normal case, not an edge one. Under the old rule it lit no marker at all
+ * while the sentence beside it said "Station 5".
  *
  * ## No score anywhere
  *
@@ -130,8 +168,19 @@ export const MARKER_INTERVAL = 10;
 export const ROUTE_EXCLUSION_NOTE =
   'Only the six 常用漢字 school grades become routes. KANJIDIC2 also uses grade 8 for the secondary-school remainder and 9–10 for name characters; those are real groupings but not school years, so naming a route after one would be a claim the data does not make.';
 
+/**
+ * The subset, in the shipped dictionary's own words, rendered on screen.
+ *
+ * Quoted from `packages/seed/data/dictionary/kanji.json`'s `_comment` rather
+ * than paraphrased, so the claim and the data cannot drift: the day the importer
+ * stops limiting the tier, that sentence changes and this one has to change with
+ * it. `test/map-modules.test.ts` asserts the quote is still the tier's own.
+ */
+export const ROUTE_SUBSET_NOTE =
+  'This road is as long as this build’s dictionary, which is not as long as the grade. The kanji tier imports “KANJIDIC2 characters, limited to those the imported lexemes actually use”, so a grade’s road here is missing the characters no imported word happens to contain — grade 1 ships 77 of the grade’s characters. Reaching the last station on this road is finishing this road, not finishing the grade.';
+
 const ROUTE_RULE =
-  'Every kanji KANJIDIC2 assigns to this school grade, in its own newspaper-frequency order, unranked characters last. The length is a count of real entries; nothing is sampled, scored or ranked by this app.';
+  'Every kanji this build’s dictionary holds for this school grade, in KANJIDIC2’s own newspaper-frequency order, unranked characters last. Nothing is scored or ranked by this app, and the order is KANJIDIC2’s — but the set is a subset, and the length is a count of this build’s entries rather than of the grade.';
 
 /* ------------------------------------------------------------------ *
  * Building
@@ -207,9 +256,29 @@ export interface RoutePosition {
   readonly atLeast: StandaloneRecallBand;
   readonly reached: number;
   readonly length: number;
+  /**
+   * The ordinals of the stations that are reached.
+   *
+   * `reached` is `reachedOrdinals.size` and nothing else — the count is derived
+   * from the membership rather than the membership guessed from the count. This
+   * exists because a surface that wants to draw *which* stations are behind the
+   * learner cannot get that from a count, and the version that tried — filling
+   * the first `reached` markers — silently asserted that reach is a prefix of
+   * the sequence. It is not: frequency order is unrelated to what a learner
+   * captured.
+   */
+  readonly reachedOrdinals: ReadonlySet<number>;
   /** The next station not yet reached, so the road ahead has a first step. */
   readonly nextStation: RouteStation | null;
-  /** "Station 11 of 160" — the sentence, formed once, rendered verbatim. */
+  /**
+   * "11 of 160 stations reached" — the sentence, formed once, rendered verbatim.
+   *
+   * A count in the subject position, never `Station 11 of 160`, which reads as
+   * an ordinal and would then contradict the line beneath it: a learner with
+   * five scattered stations reached had "Station 5 of 77" printed above
+   * "Next unreached: 日 (station 1)", which is two different meanings of
+   * *station* four lines apart, one of them false.
+   */
   readonly sentence: string;
 }
 
@@ -230,13 +299,13 @@ export function routePosition(
   atLeast: StandaloneRecallBand,
   lensOf: (nodeId: GraphNodeId, lens: CapabilityId) => MapLensView | null,
 ): RoutePosition {
-  let reached = 0;
+  const reachedOrdinals = new Set<number>();
   let nextStation: RouteStation | null = null;
 
   for (const station of route.stations) {
     const projection = lensOf(station.nodeId, lens);
     if (projection !== null && hasReached(projection, atLeast)) {
-      reached += 1;
+      reachedOrdinals.add(station.ordinal);
       continue;
     }
     nextStation ??= station;
@@ -246,10 +315,13 @@ export function routePosition(
     route,
     lens,
     atLeast,
-    reached,
+    // Derived from the membership, so the count and the marks a surface draws
+    // are the same fact read two ways rather than two facts that can disagree.
+    reached: reachedOrdinals.size,
     length: route.stations.length,
+    reachedOrdinals,
     nextStation,
-    sentence: `Station ${String(reached)} of ${String(route.stations.length)}`,
+    sentence: `${String(reachedOrdinals.size)} of ${String(route.stations.length)} stations reached`,
   };
 }
 

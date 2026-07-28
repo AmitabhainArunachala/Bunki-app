@@ -31,6 +31,17 @@
  * reasoning. Rendering them as one uniform slider would mean inventing history
  * a learner does not have, or eras the language does not have.
  *
+ * ## Both arms move the map, and the era arm moves it visibly
+ *
+ * The negative arm changes **which instant** the map projects at; the positive
+ * arm changes **which era layer is drawn**. The second half shipped inert once:
+ * `ScrubberPosition.bands` was computed, unit-tested and read by nobody, so
+ * pressing +1/+2/+3 rewrote the caption and left the field byte-identical while
+ * this component's own hint promised it "walks to this layer". The screen
+ * consumes `position.bands` now, and `map-modules.test.ts` asserts the consumer
+ * exists rather than only that the field is computed — a green test over a pure
+ * function is exactly what made the inert half look finished.
+ *
  * ## Scrubbing is exposure
  *
  * Pressing a step changes which instant the map projects at. It writes nothing —
@@ -56,13 +67,25 @@
 import { type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import type { IsoInstant } from '@bunki/domain';
+
 import { MIN_TOUCH_TARGET, RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
-import { scrubberRange, type ScrubberPosition } from './map-scrubber.ts';
+import { daysBackAt, scrubberRange, type ScrubberPosition } from './map-scrubber.ts';
 
 export interface ScrubberProps {
   readonly position: ScrubberPosition;
-  readonly historyFrameCount: number;
+  /**
+   * The history frames themselves, not a count of them.
+   *
+   * A count is enough to size the axis and is *not* enough to name a step: past
+   * the 480-frame cap the frames are more than a day apart, so step −479 can be
+   * 1,500 days back. This component used to take only the count and spoke
+   * `Your history, ${-value} days back`, which was a frame index read out as a
+   * duration on the one control whose whole job is to say when.
+   */
+  readonly frames: readonly IsoInstant[];
+  readonly now: IsoInstant;
   readonly onChange: (value: number) => void;
   readonly testID?: string | undefined;
 }
@@ -70,14 +93,9 @@ export interface ScrubberProps {
 /** How many history steps get their own button. */
 const MAX_HISTORY_STEPS = 14;
 
-export function Scrubber({
-  position,
-  historyFrameCount,
-  onChange,
-  testID,
-}: ScrubberProps): ReactNode {
+export function Scrubber({ position, frames, now, onChange, testID }: ScrubberProps): ReactNode {
   const theme = useTheme();
-  const range = scrubberRange(historyFrameCount);
+  const range = scrubberRange(frames.length);
 
   /*
     The steps, oldest first. History is thinned to at most `MAX_HISTORY_STEPS`
@@ -113,6 +131,9 @@ export function Scrubber({
         {stops.map((value) => {
           const current = value === position.value;
           const isNow = value === 0;
+          // Off the frame's own instant. `-value` is a frame index and stops
+          // being a day count the moment the history is longer than the cap.
+          const back = daysBackAt(value, frames, now);
           return (
             <Pressable
               accessibilityHint={
@@ -120,11 +141,11 @@ export function Scrubber({
                   ? 'Replays your own recorded history at this point.'
                   : value === 0
                     ? 'Returns to now, with every era layer shown.'
-                    : 'Walks to this layer of the language’s history.'
+                    : 'Draws this layer of the language’s history on its own, and no other.'
               }
               accessibilityLabel={
                 value < 0
-                  ? `Your history, ${String(-value)} days back`
+                  ? `Your history, ${String(back)} day${back === 1 ? '' : 's'} back`
                   : value === 0
                     ? 'Now'
                     : `The language’s history, layer ${String(value)}`
