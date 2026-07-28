@@ -270,11 +270,13 @@ function thread(overrides: Partial<ThreadView> & { readonly targetKey: string })
       lastEventAt: AT,
     },
     displayText: overrides.targetKey,
-    targetKey: overrides.targetKey,
     lexemeId: null,
     uncertainty: null,
     markRecordedInLog: false,
     capturedAt: AT,
+    // `targetKey` comes from here rather than being written twice: spreading
+    // over a duplicate key is a TS2783 error, and the whole point of the
+    // parameter type is that this one field is required.
     ...overrides,
   } as ThreadView;
 }
