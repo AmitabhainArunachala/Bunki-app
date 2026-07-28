@@ -141,6 +141,19 @@ export const DESTINATIONS: readonly Destination[] = [
     reach: { kind: 'shell' },
   },
   {
+    // Campaign E / B6. In the shell rather than nested under a screen because
+    // the whole point of the 案内人 is that it is a constant presence: a guide
+    // you can only reach from one page is a page, not a presence. It is also
+    // the one destination that is *about* where to go next, which is what a
+    // starting place is.
+    href: '/guide',
+    routeFile: 'guide.tsx',
+    screen: 'screens/guide-screen.tsx',
+    label: 'The guide',
+    blurb: 'Where the road goes next, and where the guide is standing on it.',
+    reach: { kind: 'shell' },
+  },
+  {
     href: '/style-guide',
     routeFile: 'style-guide.tsx',
     screen: 'ui/style-guide/style-guide-page.tsx',

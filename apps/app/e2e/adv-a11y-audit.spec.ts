@@ -74,6 +74,7 @@ const ROUTES = [
   '/repair',
   '/evidence',
   '/debug',
+  '/guide',
   '/style-guide',
 ] as const;
 

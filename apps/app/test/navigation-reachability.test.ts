@@ -192,19 +192,23 @@ describe('the map describes the app it is in', () => {
       'Repair branch',
       'Evidence',
       'About & diagnostics',
+      'The guide',
     ]);
   });
 
   it('keeps the shell small enough to stay calm (REQ-UI-08)', () => {
-    // Four is not a magic number: it is capture, session, evidence, about — the
-    // places a learner *starts* from. A fifth entry means something that belongs
-    // to a screen has been promoted to chrome, which is how a masthead becomes a
-    // debug menu.
+    // Not a magic number: capture, session, evidence, about — the places a
+    // learner *starts* from — plus the guide, which Campaign E adds and which
+    // is a starting place in the same sense: it is the destination that is
+    // about where to go next, and the map document makes "constant presence"
+    // its defining property (§4.1). Anything that belongs to one screen still
+    // does not belong here; that is how a masthead becomes a debug menu.
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
       'Capture',
       'Session',
       'Evidence',
       'About & diagnostics',
+      'The guide',
     ]);
   });
 
