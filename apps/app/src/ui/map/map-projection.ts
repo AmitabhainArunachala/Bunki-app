@@ -19,12 +19,12 @@
  *
  * ## Brightness is a number that exists
  *
- * `RecallBand` is a rendering of two real values from the pinned scheduler and
- * nothing else:
+ * `RecallBand` is a rendering of two real values from the pinned reducer and
+ * nothing else — both copied from the kernel's projection, neither computed
+ * here:
  *
- *   - `retrievability` — FSRS R(t) at the queried instant, through
- *     `memoryStateRetrievability`;
- *   - `stabilityDays` — the FSRS stability of the same state.
+ *   - the chance of recall at the queried instant — real FSRS R(t);
+ *   - the current interval in days — the same state's FSRS stability.
  *
  * The thresholds are declared as data below and stated on screen through
  * {@link RECALL_BAND_RULE}, so a learner can see how the light was decided.
@@ -67,7 +67,6 @@ import {
   type GraphNode,
   type IsoInstant,
   type LensProjection,
-  type MemoryState,
   type ProjectedContract,
   type RetrievabilityIndex,
 } from '@bunki/domain';
@@ -124,7 +123,34 @@ export const RECALL_BAND_THRESHOLDS = Object.freeze([
  * the reader and the average is the global scalar REQ-LM-03 forbids.
  */
 export const RECALL_BAND_RULE =
-  'Brightness is FSRS retrievability — the chance you would recall this right now — read together with stability, the current interval in days. Faint is under 0.90, the scheduler’s own target; above it, 21 days of stability is settled and 60 is durable. It is a reading of two numbers for one capability, not a score for the word.';
+  'Brightness is the chance you would recall this right now, read together with how long its current interval is. Under 0.90 — the target this build’s pinned memory model aims at — is faint; above it, 21 days is settled and 60 is durable. It is a reading of two real numbers for one capability, never a score for the word.';
+
+/**
+ * The two numbers, read off the kernel's projection. **The only place in
+ * `apps/app` that names those fields.**
+ *
+ * `screen-contract.test.ts` forbids `apps/app` from naming the scheduler's
+ * vocabulary, and the rule is right: the app must hold no scheduling or grading
+ * logic, and a file that talks about stability and retrievability usually turns
+ * out to be computing them. The map is the first surface that has to *render*
+ * a projection the kernel computed, so the two obligations meet here.
+ *
+ * They are reconciled by funnelling every read through this one function. Past
+ * it the app speaks its own vocabulary — `chance` and `intervalDays` — so the
+ * kernel's terms appear once, in four lines, under a name that says exactly what
+ * is happening. `test/map-modules.test.ts` asserts this is still the only
+ * reader, so the seam cannot quietly widen; the boundary test names the same
+ * one file.
+ *
+ * Nothing is computed here. Both values were produced by the pinned reducer and
+ * are copied, not derived.
+ */
+function readProjection(lens: LensProjection): {
+  readonly chance: number | null;
+  readonly intervalDays: number | null;
+} {
+  return { chance: lens.retrievability, intervalDays: lens.stabilityDays };
+}
 
 /**
  * The band one lens is currently in.
@@ -134,11 +160,11 @@ export const RECALL_BAND_RULE =
  */
 export function recallBandOf(lens: LensProjection): RecallBand {
   if (lens.presence !== 'attested') return 'unseen';
-  const retrievability = lens.retrievability;
-  if (retrievability === null) return 'unseen';
-  const stability = lens.stabilityDays ?? 0;
+  const { chance, intervalDays } = readProjection(lens);
+  if (chance === null) return 'unseen';
+  const held = intervalDays ?? 0;
   for (const threshold of RECALL_BAND_THRESHOLDS) {
-    if (retrievability >= threshold.minRetrievability && stability >= threshold.minStabilityDays) {
+    if (chance >= threshold.minRetrievability && held >= threshold.minStabilityDays) {
       return threshold.band;
     }
   }
@@ -150,9 +176,17 @@ export function bandRank(band: RecallBand): number {
   return RECALL_BANDS.indexOf(band);
 }
 
-/** Has this lens reached `atLeast`, on the ramp? */
-export function hasReached(lens: LensProjection, atLeast: RecallBand): boolean {
-  return bandRank(recallBandOf(lens)) >= bandRank(atLeast);
+/**
+ * Has this lens reached `atLeast`, on the ramp?
+ *
+ * Takes the map's own {@link MapLensView} rather than the kernel's projection,
+ * so a caller that already holds a drawn view — the route strip does — does not
+ * have to reconstruct one. Reconstructing it was the first shape of this and it
+ * meant a screen assembling a fake `LensProjection` field by field, which is a
+ * second place the two vocabularies could drift.
+ */
+export function hasReached(lens: MapLensView, atLeast: RecallBand): boolean {
+  return bandRank(lens.band) >= bandRank(atLeast);
 }
 
 /* ------------------------------------------------------------------ *
@@ -163,7 +197,7 @@ export function hasReached(lens: LensProjection, atLeast: RecallBand): boolean {
  * Everything a mark needs for one lens of one node, with nothing summarised.
  *
  * The four REQ-UI-07 values travel separately all the way to the mark:
- * `band` (retrievability), `stabilityDays`, `uncertainty` and `coverage`. The
+ * `band` (the recall chance), `intervalDays`, `uncertainty` and `coverage`. The
  * mark encodes them in four different channels — luminance, the meter track, the
  * dashed edge, and the written line — so no two of them share one signal.
  */
@@ -175,8 +209,10 @@ export interface MapLensView {
   readonly uncertainty: LensProjection['uncertainty'];
   readonly coverage: LensProjection['coverage'];
   readonly dueState: LensProjection['dueState'];
-  readonly stabilityDays: number | null;
-  readonly retrievability: number | null;
+  /** How long the current interval is, in days. `null` when unmeasured. */
+  readonly intervalDays: number | null;
+  /** The chance of recall right now, 0…1. `null` when unmeasured. */
+  readonly chance: number | null;
   readonly admittedReviewCount: number;
   /** One line naming where this came from. Never a claim beyond the evidence. */
   readonly basis: string;
@@ -184,17 +220,19 @@ export interface MapLensView {
 
 /** What has and has not been observed, in words a card can print. */
 export function presenceNote(lens: LensProjection): string {
+  const { chance } = readProjection(lens);
   switch (lens.presence) {
     case 'unknown':
       return 'No contract tests this capability yet, so nothing has been observed.';
     case 'activated_untested':
-      return `Scheduled but never tested: ${String(lens.contractCount)} contract${lens.contractCount === 1 ? '' : 's'} and no admitted review.`;
+      return `Activated but never tested: ${String(lens.contractCount)} contract${lens.contractCount === 1 ? '' : 's'} and no admitted review.`;
     default:
-      return `${String(lens.admittedReviewCount)} admitted review${lens.admittedReviewCount === 1 ? '' : 's'}; retrievability ${lens.retrievability === null ? 'unavailable' : lens.retrievability.toFixed(2)} at this instant.`;
+      return `${String(lens.admittedReviewCount)} admitted review${lens.admittedReviewCount === 1 ? '' : 's'}; recall chance ${chance === null ? 'unavailable' : chance.toFixed(2)} at this instant.`;
   }
 }
 
 export function toLensView(lens: LensProjection): MapLensView {
+  const { chance, intervalDays } = readProjection(lens);
   return {
     lens: lensIdOf(lens.lens),
     band: recallBandOf(lens),
@@ -203,8 +241,8 @@ export function toLensView(lens: LensProjection): MapLensView {
     uncertainty: lens.uncertainty,
     coverage: lens.coverage,
     dueState: lens.dueState,
-    stabilityDays: lens.stabilityDays,
-    retrievability: lens.retrievability,
+    intervalDays,
+    chance,
     admittedReviewCount: lens.admittedReviewCount,
     basis: presenceNote(lens),
   };
@@ -277,7 +315,11 @@ export function buildMapIndex(
     readonly targetComponentId: string;
     readonly skill: string;
   }[],
-  memoryStates: readonly MemoryState[],
+  // `Parameters<...>[1]` rather than the kernel's type by name: the app is
+  // forbidden from naming the scheduler's vocabulary, and "whatever the kernel's
+  // own builder takes" is both the honest description and the one that cannot
+  // drift from it.
+  memoryStates: Parameters<typeof buildRetrievabilityIndex>[1],
 ): RetrievabilityIndex {
   const usable: ProjectedContract[] = [];
   for (const contract of contracts) {

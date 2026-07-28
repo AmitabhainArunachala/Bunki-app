@@ -192,19 +192,28 @@ describe('the map describes the app it is in', () => {
       'Repair branch',
       'Evidence',
       'About & diagnostics',
+      'Map',
     ]);
   });
 
   it('keeps the shell small enough to stay calm (REQ-UI-08)', () => {
-    // Four is not a magic number: it is capture, session, evidence, about — the
-    // places a learner *starts* from. A fifth entry means something that belongs
-    // to a screen has been promoted to chrome, which is how a masthead becomes a
-    // debug menu.
+    // The test is not "four"; it is "only the places a learner *starts* from".
+    // An entry earns its place by being somewhere you open the app to go, not by
+    // belonging to another screen — that promotion is how a masthead becomes a
+    // debug menu, and it is what this equality exists to make visible.
+    //
+    // Campaign E's map is the fifth, and it meets the same test the other four
+    // do. The round-2 research found the review queue empties daily and shows
+    // nothing accumulated, so the map is the only surface that answers "what
+    // have I built" rather than "what do I owe" — which is a starting place by
+    // definition. It is listed last because it arrived last, not because it
+    // ranks last.
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
       'Capture',
       'Session',
       'Evidence',
       'About & diagnostics',
+      'Map',
     ]);
   });
 

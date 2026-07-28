@@ -83,11 +83,11 @@
  * global scalar REQ-LM-03 forbids through the one door the map left open.
  */
 
-import type { GraphNodeId, LensProjection } from '@bunki/domain';
+import type { GraphNodeId } from '@bunki/domain';
 
 import type { CapabilityId } from '../capability.ts';
 import type { RecallBand } from '../theme.ts';
-import { hasReached } from './map-projection.ts';
+import { hasReached, type MapLensView } from './map-projection.ts';
 import { kanjiNodeId, type MapAtlas } from './map-source.ts';
 import { importedExtras } from '../../data/catalog.ts';
 
@@ -228,7 +228,7 @@ export function routePosition(
   route: Route,
   lens: CapabilityId,
   atLeast: RecallBand,
-  lensOf: (nodeId: GraphNodeId, lens: CapabilityId) => LensProjection | null,
+  lensOf: (nodeId: GraphNodeId, lens: CapabilityId) => MapLensView | null,
 ): RoutePosition {
   let reached = 0;
   let nextStation: RouteStation | null = null;

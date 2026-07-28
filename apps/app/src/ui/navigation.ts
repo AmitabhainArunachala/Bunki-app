@@ -148,6 +148,24 @@ export const DESTINATIONS: readonly Destination[] = [
     blurb: 'Every token and component of the experience layer, in real Japanese.',
     reach: { kind: 'specimen' },
   },
+  /**
+   * The map (Campaign E, lane B1).
+   *
+   * In the shell rather than reached from a screen, and that placement is the
+   * point rather than a convenience. The round-2 research found that the review
+   * queue empties daily and shows nothing accumulated, so the map is *"the only
+   * surface that answers 'what have I built' rather than 'what do I owe'"*. That
+   * makes it a place a learner starts from, which is exactly what this shell is
+   * for — the same test as capture, session, evidence and about.
+   */
+  {
+    href: '/map',
+    routeFile: 'map.tsx',
+    screen: 'screens/map-screen.tsx',
+    label: 'Map',
+    blurb: 'What you have built, on the roads the language came in on.',
+    reach: { kind: 'shell' },
+  },
 ];
 
 /**
