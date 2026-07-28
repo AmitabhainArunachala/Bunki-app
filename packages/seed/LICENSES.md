@@ -291,8 +291,20 @@ separate screen accessed from a menu, such as one labelled "About",
 start-up/launch page of the app.
 ```
 
-Both obligations are met by `SEED_ENTRY_DISCLOSURE` plus the Sources screen —
-see §2.4.
+The two obligations are in different states, and this file previously conflated
+them:
+
+- **The WWW-server obligation is met.** `SEED_ENTRY_DISCLOSURE` renders on every
+  screen that displays words from the files — the word page, the kanji page and,
+  since this round, the **search screen**, which had been missed. A search result
+  row is a reading, a set of senses and a part of speech; the screen displayed all
+  three with no acknowledgement anywhere on it. See §2.4.
+- **The smartphone/tablet obligation is not yet met, and no such app ships.**
+  There is no Sources/About screen. Phase 0's only surface is Expo Web, where the
+  first clause governs; the separate screen is an open coordination request
+  against the app shell (`packages/seed/README.md`, "Status"). If a packaged
+  mobile app is ever built from this tree, that screen is a precondition, not a
+  follow-up.
 
 ### 2.3 Full licence text
 
@@ -321,9 +333,14 @@ which really is CC BY-SA 3.0. It no longer backs any EDRDG claim.
   explicit that for a display of words from the files, the acknowledgement must
   appear on the display itself — an attribution living only in this file would
   not satisfy it. `SEED_ENTRY_DISCLOSURE` in `src/index.ts` therefore names
-  JMdict, KANJIDIC2, the EDRDG and CC BY-SA 3.0, and is rendered on every word
-  and kanji page. `test/dataset.test.ts` and `test/edrdg.test.ts` fail if that
-  string stops naming them.
+  JMdict, KANJIDIC2, the EDRDG and CC BY-SA 4.0, and is rendered on the word page,
+  the kanji page **and the search screen**. `test/dataset.test.ts` and
+  `test/edrdg.test.ts` fail if that string stops naming them;
+  `apps/app/e2e/adv-claim-audit.spec.ts` drives each of those three surfaces in a
+  browser and fails if the acknowledgement is absent from the rendered page.
+  The search screen was missed until this round — it displayed JMdict readings,
+  senses and parts of speech with no EDRDG string in the DOM at all, and the
+  route was not in the e2e list, so nothing said so.
 - **Documentation and licence files provided.** This file, plus the two verbatim
   texts above, shipped in the repository.
 - **Share-alike.** The EDRDG-derived fields are labelled `CC BY-SA 3.0`,
@@ -332,8 +349,11 @@ which really is CC BY-SA 3.0. It no longer backs any EDRDG claim.
   `ent_seq` in `source_entry_id`; every KANJIDIC2 field carries the literal,
   which is that file's entry identifier. Nothing is a placeholder.
 - **Nothing claims more than it is.** `review_status` is
-  `licensed-redistribution`, never `primary-source-verified` — that status is
-  reserved for sources whose own host answered, which here means KanjiVG alone.
+  `primary-source-verified` for these two sources, and only because
+  `www.edrdg.org` itself answered this round — the files, the licence statement
+  and every re-derived value came from the licensor's own host. When only the
+  `jamdict-data` redistribution was reachable the status was
+  `licensed-redistribution`, which is what that status is for.
 
 ### 2.5 What "derived" means for these fields, precisely
 
@@ -397,17 +417,36 @@ publish.
 | Translation links  | `https://downloads.tatoeba.org/exports/links.tar.bz2`                                   | 148,936,941 |
 
 The `_detailed` exports are used deliberately in place of the plain ones: they
-carry the contributing member's username. CC BY 2.0 FR attributes the individual
-author, and the plain export does not name one.
+_can_ carry the contributing member's username, which the plain export never
+does, and CC BY 2.0 FR attributes the individual author. "Can" is exact: the
+export is a MySQL dump, and an ownerless sentence carries the NULL sentinel — the
+two literal characters `\N` — in the username column. 100,087 of the 248,821
+Japanese rows are like that.
 
 ### 3.3 How this project complies
 
 Attribution is **per sentence, per half**. A Tatoeba pair is two works by two
 people, so each record carries `japaneseId` + `japaneseContributor` and
 `englishId` + `englishContributor` separately rather than one shared credit —
-collapsing them would misattribute both. `test/dictionary.test.ts` fails if any
-shipped sentence is missing either contributor, so a sentence that could not be
-attributed cannot ship at all.
+collapsing them would misattribute both, and each half also names its own
+provenance registry entry (`tatoeba-japanese`, `tatoeba-english`).
+
+**A pair with an unnamed contributor on either half is not shipped.** An
+attribution licence cannot be complied with for a work whose author cannot be
+named, so the importer drops those rather than crediting a placeholder: at the
+committed parameters 1,009 candidate pairs were declined, recorded in
+`data/dictionary/manifest.json` under `deferred` and counted as
+`counts.sentencePairsDroppedWithoutNamedContributor`. Every one of the 2,000
+sentences that does ship names both of its contributors.
+
+> **This section previously claimed a compliance the tests did not enforce.** It
+> said `test/dictionary.test.ts` "fails if any shipped sentence is missing either
+> contributor". The assertion was `toBeTruthy()`, which the non-empty sentinel
+> `\N` satisfies, and 652 of the 2,000 shipped records credited `\N` as a
+> person — 211 Japanese halves and 591 English. The importer now maps the
+> sentinel to null, the check is a positive name pattern with a negative case
+> beside it, and the sentence above is true of the data rather than of the
+> intention.
 
 On screen, `SEED_ENTRY_DISCLOSURE` names the Tatoeba Project and CC BY 2.0 FR.
 
