@@ -6410,6 +6410,16 @@ guard does not trip on this page, and this capsule does not claim it does.
 `/read` was added to the axe route sweep in `e2e/adv-a11y-audit.spec.ts` and is
 clean in both schemes; `KNOWN_AXE_FINDINGS` is still empty.
 
+**A second honest note, on the browser lane.** Four full `npm run test:e2e`
+runs were made at this HEAD. Three were 56/56. One showed a single failure in
+`edrdg-acknowledgement.spec.ts` — "the canvas cannot render a headword with no
+acknowledgement beside it" — a pre-existing spec this lane does not touch, which
+drives the whole session loop through a dozen presses. It passed in isolation
+immediately afterwards and on both subsequent full runs. The reading surface does
+not reach the canvas (`canvas-screen.tsx` does not use `FrontierPassage`), and the
+machine was running several sibling build lanes at the time, but **the cause was
+not determined**. Recorded rather than rounded to green.
+
 **One honest note on the suite.** Three intermediate full-suite runs failed with
 5-second timeouts in `screen-contract`'s seed scan and `theme-fonts`' coverage
 contract — two tests that parse the whole 3,000-entry dictionary and already sat
