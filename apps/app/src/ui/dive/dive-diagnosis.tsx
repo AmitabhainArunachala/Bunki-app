@@ -25,10 +25,25 @@ import type { ScaleMismatch } from '@bunki/domain';
 import { capabilityOf, type CapabilityId } from '../capability.ts';
 import { RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
-import { READING_STANDING } from './dive-readings.ts';
+import { READING_STANDING, noSourceNote } from './dive-readings.ts';
 
 export const NO_MISMATCH_NOTE =
   'Nothing here reads stronger on the outside than on the inside — which, with marks this coarse, mostly means there is not enough recorded yet for the comparison to say anything.';
+
+/**
+ * The empty state, chosen by *why* it is empty.
+ *
+ * {@link NO_MISMATCH_NOTE} says "not enough recorded yet", and "yet" is a
+ * promise: keep going and this will fill in. Under listening, production and
+ * writing that promise is false — nothing this build does will ever record
+ * anything for them — so those lenses get the reason instead. Reading the same
+ * "yet" under five lenses was part of the same collapse `dive-readings.ts`
+ * describes: an absence with a cause looked exactly like an absence with a
+ * backlog.
+ */
+export function emptyDiagnosisNote(capability: CapabilityId): string {
+  return noSourceNote(capability) ?? NO_MISMATCH_NOTE;
+}
 
 export interface DiveDiagnosisProps {
   readonly findings: readonly ScaleMismatch[];
@@ -62,7 +77,7 @@ export function DiveDiagnosis({
           style={[styles.detail, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
           testID="dive-diagnosis-none"
         >
-          {NO_MISMATCH_NOTE}
+          {emptyDiagnosisNote(capability)}
         </Text>
       ) : (
         shown.map((finding) => (

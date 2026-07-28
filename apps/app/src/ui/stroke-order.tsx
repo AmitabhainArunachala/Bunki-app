@@ -26,7 +26,16 @@
  * is the right register for a still frame. `draw` opts into the brush, which is
  * what the character page uses. Under reduced motion `InkDraw`'s duration is
  * zero and the stroke lands complete on the first frame, so the two modes
- * converge exactly where they should.
+ * converge exactly where they should — and *only* there.
+ *
+ * That last clause was false for the whole of this lane's first pass and is the
+ * reason the two-path shape below is commented at the length it is: `draw` was
+ * mounting `InkDraw` only once a stroke was already written, which seeds the
+ * dash offset at zero and animates zero to zero. The mode was indistinguishable
+ * from the reveal in full motion as well as under reduction, which is to say the
+ * opt-in did nothing. `e2e/stroke-brush.spec.ts` samples the live dash offsets
+ * in a browser and fails if it ever becomes true again; a docblock is not
+ * evidence that motion happened, and this one was proof of that.
  *
  * Accessibility: the SVG is one accessible element with a spoken description of
  * how many strokes are shown; the controls are ordinary labelled buttons, so
@@ -196,10 +205,36 @@ export function StrokeOrder({
               whole while its order is being shown, and a second colour would
               spend the one accent twice.
             */
-            if (!draw || !written) {
+            if (!draw) {
               return <Path {...shared} key={stroke.id} strokeOpacity={written ? 1 : 0.12} />;
             }
-            return <InkDraw {...shared} drawing key={stroke.id} strokeOpacity={1} />;
+
+            /*
+              Two paths per stroke in draw mode, and the pairing is the whole
+              mechanism rather than a flourish.
+
+              `InkDraw` animates a dash offset from the path's length down to
+              zero, so an *undrawn* stroke is dashed entirely out of sight. That
+              is exactly what a brush needs and exactly what the ghost cannot be,
+              so the ghost is a separate static path underneath at the same low
+              opacity the reveal mode uses. The legibility rule above is
+              therefore kept by construction in both modes.
+
+              `InkDraw` is mounted for *every* stroke, undrawn, and told to draw
+              by `drawing={written}` — never mounted at the moment the stroke
+              becomes written. The defect this replaces did the latter: because
+              `InkDraw` seeds its offset from `drawing` on the first render, a
+              component that mounted already-drawing started at offset zero and
+              then animated zero to zero, which is pixel-for-pixel the discrete
+              reveal it was supposed to replace. The transition has to happen to
+              a component that is already there.
+            */
+            return (
+              <G key={stroke.id}>
+                <Path {...shared} stroke={theme.color.ink} strokeOpacity={0.12} strokeWidth={3.5} />
+                <InkDraw {...shared} drawing={written} strokeOpacity={1} />
+              </G>
+            );
           })}
         </Svg>
       </View>

@@ -95,7 +95,7 @@ Two, and both were chosen against the real tier rather than picked:
 | --- | --- | --- |
 | `DEFAULT_DIVE_OPTIONS.perLevel` | 12 | The domain's default. Bites on a hub, which is where a budget should bite, and the cut is reported as `available` and `truncated`. |
 | `DETAIL_DIVE_OPTIONS.perLevel` | 60 | The character page's own. The busiest character in the shipped 3,000 lexemes is 人 with 50 words and the busiest has 12 components, so a character's rings are **complete** — which is what makes "ranked by JMdict's own commonness tags" an honest sentence rather than a ranking of an arbitrary subset. Asserted by `is complete at the page budget for the busiest character in the tier`. |
-| `RING_DISPLAY_LIMIT` | 8 | How many of a ring are drawn on the canvas. A ring of sixty is a list. The cut is stated under the ring with both numbers. |
+| `RING_DISPLAY_LIMIT` | 8 | How many of a ring are drawn on the canvas. A ring of sixty is a list. Declared in `dive-detail.ts` beside `DETAIL_SECTION_LIMIT` since the repair round: the ring takes the graph's order and the section takes JMdict's commonness, so they are not the same eight, and the only module that can honestly say how much of the set the page shows is one that can see both. For 分 the union is 11 of 25 and the page prints that number. |
 | `previewMembers` × `previewLimit` | 4 × 6 | The interior glimpse that makes the diagnosis visible. Four extra adjacency reads and twenty-four extra nodes per ring — both constant in the size of the graph, which is the property that matters. |
 
 ---

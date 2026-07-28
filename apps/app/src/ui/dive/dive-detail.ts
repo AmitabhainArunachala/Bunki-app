@@ -201,6 +201,17 @@ export interface KanjiDetail {
   readonly compoundsAvailable: number;
   /** True when the dive's own budget cut the ring before this page ranked it. */
   readonly compoundsTruncatedUpstream: boolean;
+  /**
+   * How many *distinct* compounds this page puts on screen, across both cuts.
+   *
+   * The ring draws the first {@link RING_DISPLAY_LIMIT} in the graph's own
+   * order; this section lists the top {@link DETAIL_SECTION_LIMIT} by
+   * commonness. They overlap, and neither is the whole set, so the only honest
+   * answer to "how much of this character's vocabulary can I see here" is the
+   * size of their union. Computed rather than described, because the page says
+   * the number out loud.
+   */
+  readonly compoundsShownHere: number;
   readonly readingFamily: readonly FamilyEntry[];
   readonly sharedComponent: readonly SharedComponentEntry[];
   readonly note: SelfNote | null;
@@ -210,6 +221,19 @@ export interface KanjiDetail {
 
 /** How many neighbours a section shows before it stops being a page. */
 export const DETAIL_SECTION_LIMIT = 8;
+
+/**
+ * How many members of one ring the canvas draws.
+ *
+ * Declared here beside {@link DETAIL_SECTION_LIMIT} rather than in
+ * `dive-canvas.tsx`, where it used to live, because the two cuts on this page
+ * are not independent facts. Apart, each caption could only describe itself, and
+ * the ring's caption filled the gap by *guessing* about the section — it said
+ * "the sections below list all of them, ranked" while the section printed
+ * "Showing 8 of 25" three inches lower. Two sentences on one screen contradicted
+ * each other because no module could see both numbers. Now one can.
+ */
+export const RING_DISPLAY_LIMIT = 8;
 
 /**
  * Budgets for the detail dive.
@@ -339,18 +363,60 @@ export function buildKanjiDetail(ladder: ScaleLadder, character: string): KanjiD
         }
       : attributeNodeEra(graphNode, undefined);
 
+  /* ------------------------------------------- what the page actually shows */
+
+  const shownInSection = compounds.slice(0, DETAIL_SECTION_LIMIT);
+  const shownOnRing = (wordRing?.members ?? []).slice(0, RING_DISPLAY_LIMIT);
+  const compoundsShownHere = new Set([
+    ...shownInSection.map((entry) => entry.nodeId),
+    ...shownOnRing.map((member) => member.node.id),
+  ]).size;
+
   return {
     kanji,
     nodeId,
     components,
-    compounds: compounds.slice(0, DETAIL_SECTION_LIMIT),
+    compounds: shownInSection,
     compoundsAvailable: wordRing?.available ?? 0,
     compoundsTruncatedUpstream: wordRing?.truncated ?? false,
+    compoundsShownHere,
     readingFamily,
     sharedComponent,
     note,
     era,
   };
+}
+
+/**
+ * What the compounds section says about the part of the set it is not showing.
+ *
+ * `null` when there is nothing to disclose — the page is showing all of them.
+ *
+ * A function rather than a template in the screen, because the sentence makes
+ * three arithmetic claims and every one of them was wrong in the first pass:
+ * that the section lists "all of them" (it lists eight), that the rest are
+ * reachable by zooming out (nothing on this page opens them), and implicitly
+ * that the ring and the section are the same eight (they are not — the ring
+ * takes the graph's order, the section takes JMdict's commonness, and for 分
+ * they union to eleven of twenty-five). Arithmetic that appears on screen
+ * belongs somewhere a test can call.
+ */
+export function compoundsDisclosure(detail: KanjiDetail): string | null {
+  const { compoundsAvailable: available, compoundsShownHere: union } = detail;
+  const listed = detail.compounds.length;
+  if (listed >= available) return null;
+
+  const ranked = `Showing ${String(listed)} of ${String(available)}, ranked by the dictionary's own commonness.`;
+  const ring =
+    union > listed
+      ? ` The ring above draws its own selection of the same set, in the order the graph holds it; together this page reaches ${String(union)} of ${String(available)}.`
+      : '';
+  const rest = available - union;
+  const remainder =
+    rest > 0
+      ? ` The other ${String(rest)} are in the graph and this page has no control that opens them.`
+      : '';
+  return `${ranked}${ring}${remainder}`;
 }
 
 /**

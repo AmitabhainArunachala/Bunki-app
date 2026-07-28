@@ -5,9 +5,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  RETRIEVAL_TARGET_LEVELS,
+  SCALE_LEVELS,
+  STROKE_ID_PREFIX,
   diagnoseInterior,
   diveAt,
   indexReadings,
+  isRetrievalTarget,
   readingFor,
   sharpestMismatches,
   type ScaleMismatch,
@@ -183,5 +187,65 @@ describe('sharpening', () => {
     const unseen: ScaleMismatch = { ...weaker, kind: 'interior_unseen', innerStep: null };
     expect(sharpestMismatches([weaker, unseen])).toEqual([unseen]);
     expect(sharpestMismatches([unseen, weaker])).toEqual([unseen]);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Levels a contract could exist at
+ * ------------------------------------------------------------------ */
+
+describe('a stroke is never reported as an unlearned interior', () => {
+  /*
+    At a character the inward rings are components *and* strokes, so a diagnosis
+    with no level filter reported "分 ⟶ 1/4 — 分 has meaning evidence and 1/4
+    inside it has none", which is an absence that no action closes: nothing
+    instantiates a contract on a stroke, which is why `strokeNodeOf` gives one an
+    empty `componentIds` "by rule rather than by missing data". The panel shows
+    four findings, so two of these pushed two real ones off the screen.
+  */
+  const view = diveAt(ladder, 'kanji:林');
+  // 林 is lit and its component is explicitly unseen, so there is one genuine
+  // finding for the stroke findings to have been crowding out.
+  const litKanji = indexReadings([
+    reading('kanji:林', 'meaning', 3),
+    reading('component:木', 'meaning', 0, true),
+  ]);
+
+  it('materialises strokes in the view, so there is something to filter', () => {
+    const strokeRing = view.rings.find((ring) => ring.level === 'stroke');
+    expect(strokeRing?.members.length ?? 0).toBeGreaterThan(3);
+  });
+
+  it('would report every one of them but for the filter, so this is not vacuous', () => {
+    // Each stroke of 林 has no reading at all while 林 itself is lit, which is
+    // exactly the `interior_unseen` shape.
+    const strokeRing = view.rings.find((ring) => ring.level === 'stroke');
+    for (const member of strokeRing?.members ?? []) {
+      expect(member.node.level).toBe('stroke');
+      expect(readingFor(litKanji, member.node.id, 'meaning')).toBeNull();
+    }
+  });
+
+  it('reports the component and not one stroke', () => {
+    const findings = diagnoseInterior(view, litKanji, ['meaning']);
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings.map((finding) => finding.inner)).toContain('component:木');
+    expect(findings.filter((finding) => finding.inner.startsWith(STROKE_ID_PREFIX))).toEqual([]);
+  });
+
+  it('reports nothing at all when the only dark interiors are strokes', () => {
+    const everythingElseLit = indexReadings([
+      reading('kanji:林', 'meaning', 3),
+      reading('component:木', 'meaning', 3),
+    ]);
+    expect(diagnoseInterior(view, everythingElseLit, ['meaning'])).toEqual([]);
+  });
+
+  it('names every level except the stroke as a retrieval target', () => {
+    expect([...RETRIEVAL_TARGET_LEVELS]).toEqual(
+      SCALE_LEVELS.filter((level) => level !== 'stroke'),
+    );
+    expect(isRetrievalTarget('stroke')).toBe(false);
+    expect(isRetrievalTarget('kanji')).toBe(true);
   });
 });

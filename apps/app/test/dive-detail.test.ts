@@ -55,8 +55,10 @@ import {
 import {
   DETAIL_DIVE_OPTIONS,
   DETAIL_SECTION_LIMIT,
+  RING_DISPLAY_LIMIT,
   buildKanjiDetail,
   buildSelfNote,
+  compoundsDisclosure,
   eraOfLexeme,
   jmdictPriorityRank,
 } from '../src/ui/dive/dive-detail.ts';
@@ -249,6 +251,73 @@ describe('the page sections say only what the shipped files support', () => {
     // The page's own budget covers the busiest character in the tier, so the
     // "ranked by commonness" sentence is a ranking of the whole set.
     expect(page?.compoundsTruncatedUpstream).toBe(false);
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The sentence under the compounds list
+   * ---------------------------------------------------------------- */
+
+  describe('the disclosure under the compounds list', () => {
+    /*
+      Two sentences used to sit on this page at once and contradict each other:
+      the ring said "Drawing 8 of 25. The sections below list all of them,
+      ranked" and the section said "Showing 8 of 25. The rest are in the graph;
+      zoom out through the dive to reach them." The section lists eight, not
+      twenty-five, and zooming out reaches none of the remainder. Both halves are
+      arithmetic that appears on screen, so both are asserted here.
+    */
+
+    it('counts the union of the two cuts, not either one twice', () => {
+      const page = buildKanjiDetail(ladder, '分');
+      const union = page?.compoundsShownHere ?? 0;
+      // Ring and section select differently — the graph's order against JMdict's
+      // commonness — so the union is strictly larger than one cut and no larger
+      // than both together.
+      expect(union).toBeGreaterThan(page?.compounds.length ?? 0);
+      expect(union).toBeLessThanOrEqual(DETAIL_SECTION_LIMIT + RING_DISPLAY_LIMIT);
+      expect(union).toBeLessThanOrEqual(page?.compoundsAvailable ?? 0);
+    });
+
+    it('never claims to show more than the graph holds', () => {
+      for (const character of ['人', '分', '日', '森', '山']) {
+        const page = buildKanjiDetail(ladder, character);
+        expect(page?.compoundsShownHere ?? 0, character).toBeLessThanOrEqual(
+          page?.compoundsAvailable ?? 0,
+        );
+      }
+    });
+
+    it('states the union and the true remainder', () => {
+      const page = buildKanjiDetail(ladder, '分');
+      const sentence = compoundsDisclosure(page!) ?? '';
+      const available = page?.compoundsAvailable ?? 0;
+      const union = page?.compoundsShownHere ?? 0;
+      expect(sentence).toContain(
+        `Showing ${String(page?.compounds.length ?? 0)} of ${String(available)}`,
+      );
+      expect(sentence).toContain(
+        `together this page reaches ${String(union)} of ${String(available)}`,
+      );
+      expect(sentence).toContain(`The other ${String(available - union)} are in the graph`);
+    });
+
+    it('makes no claim that zooming out reaches the remainder, because it does not', () => {
+      for (const character of ['人', '分', '日']) {
+        const sentence = compoundsDisclosure(buildKanjiDetail(ladder, character)!) ?? '';
+        expect(sentence).not.toContain('zoom out');
+        expect(sentence).not.toContain('all of them');
+      }
+    });
+
+    it('says nothing at all when the page is showing every compound there is', () => {
+      // A character with few enough compounds that no cut applies. The sentence
+      // has to be absent rather than "Showing 3 of 3".
+      const uncut = seedDataset.kanji
+        .map((kanji) => buildKanjiDetail(ladder, kanji.character))
+        .find((page) => page !== null && page.compounds.length >= page.compoundsAvailable);
+      expect(uncut, 'no character in the tier has an uncut compound list').toBeDefined();
+      expect(compoundsDisclosure(uncut!)).toBeNull();
+    });
   });
 
   it('refuses an era for a character, by rule and not for want of data', () => {

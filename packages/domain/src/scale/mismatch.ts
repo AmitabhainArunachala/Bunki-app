@@ -30,6 +30,22 @@
  * scalar. The type is what enforces it: {@link ScaleMismatch} has a required
  * `capability`, and there is no member of the union that omits it.
  *
+ * ## Only levels a contract could exist at
+ *
+ * A finding is a claim that something *can be acted on*: learn the part and the
+ * next word that uses it stops failing. That presupposes the part is a thing the
+ * learner could come to know on its own. Strokes are not — nobody captures a
+ * stroke, and `strokeNodeOf` says so where it gives one an empty `componentIds`
+ * — so a pair with a stroke at either end is skipped by
+ * {@link import('./levels.ts').isRetrievalTarget} before any reading is
+ * consulted.
+ *
+ * This was a real defect and not a hypothetical one. At a character the inward
+ * rings are components *and* strokes, so the panel rendered "分 ⟶ 1/4 — 分 has
+ * meaning evidence and 1/4 inside it has none", presented a permanent-by-rule
+ * absence as an actionable memory gap, and pushed the genuine component findings
+ * out of a list that shows four.
+ *
  * ## Ramps are not comparable across ramps
  *
  * A reading carries the size of the ramp it came from, and two readings on
@@ -40,6 +56,7 @@
 
 import type { ScaleNode, ScaleNodeId } from './ladder.ts';
 import type { ScaleView } from './dive.ts';
+import { isRetrievalTarget } from './levels.ts';
 
 /**
  * One capability's reading for one node, on the caller's own ramp.
@@ -188,6 +205,19 @@ function pushIfMismatched(
   inner: ScaleNode,
   minimumGap: number,
 ): void {
+  /*
+    Both ends have to be things a contract could exist on.
+
+    A finding says "you know the whole and not this part, and that will cost you
+    in another word". For the part, that sentence presupposes the part is
+    something you could come to know separately. Strokes are not — see
+    `RETRIEVAL_TARGET_LEVELS` — so a stroke reported as a dark interior is an
+    absence that no action closes. It is filtered here rather than by the caller
+    because the caller would have to know the rule to pass the right nodes, and a
+    rule enforced by every caller is a rule enforced by none.
+  */
+  if (!isRetrievalTarget(inner.level) || !isRetrievalTarget(outer.level)) return;
+
   const outerReading = readingFor(readings, outer.id, capability);
   // No evidence on the outside means there is no whole-word memory to contrast
   // with, so there is nothing to diagnose. Reporting it would turn "you have not

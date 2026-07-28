@@ -27,6 +27,36 @@
  * "low-effort recall producing the illusion of mastery" the round-2 research
  * documents. The absence is the honesty.
  *
+ * ## The table above is not the whole rule, and the missing half was a defect
+ *
+ * Read alone, that table answers "what band" without ever asking "for which
+ * capability", and for a whole pass of this lane the code matched it exactly.
+ * The consequence was that one tap of **Keep** rendered every character of that
+ * word at step 4 of 5 — "Settled" — under Reading, Meaning, Listening,
+ * Production *and* Writing alike, on a build that ships no audio and captures no
+ * handwriting. Five lenses drew one number. That is precisely the collapse
+ * REQ-UI-07 exists to forbid; it was simply happening one level below the map
+ * the requirement was written about. The diagnosis then said "分 has writing
+ * evidence" and "分 has listening evidence", neither of which this build could
+ * possibly know, while the app's own correction screen says "A capture, a
+ * promotion, or an export record is not an observation about your recall".
+ *
+ * So a thread is now asked what it can *bear on*, and the answer is short. A
+ * kept thread is a word the learner met **in text** and chose to keep. That is
+ * exposure to a written form together with its reading and its gloss, and it is
+ * nothing whatsoever about catching the word in speech, reaching for it
+ * unprompted, or writing it by hand. {@link THREAD_BEARS_ON} names the two, and
+ * the other three stay at the no-evidence step permanently — the same "honestly,
+ * forever, until a contract exists" that lane A2's `LensProjection` reports for
+ * `writing`.
+ *
+ * The one exception is the learner's own voice: an uncertainty mark whose
+ * dimension is `kanji` **is** a statement about writing, and `use` is one about
+ * production. A mark still lands on the capability it names, because a person
+ * saying "I am not sure I could write this" has told us something real about
+ * writing that no scheduler had to measure. That is why the check below sits
+ * *after* the mark and not before it.
+ *
  * ## What this is not
  *
  * It is not evidence, it does not become evidence, and nothing here writes.
@@ -44,7 +74,7 @@
 import type { ScaleNodeId, ScaleReading } from '@bunki/domain';
 
 import type { AppSnapshot, ThreadView, UncertaintyDimension } from '../../state/store.ts';
-import type { CapabilityId } from '../capability.ts';
+import { CAPABILITY_IDS, type CapabilityId } from '../capability.ts';
 import { RECALL_BANDS, type RecallBand } from '../theme.ts';
 
 /** The five-step ramp the surface draws. Step 0 is the no-evidence end. */
@@ -126,6 +156,50 @@ const NO_THREAD: DerivedBand = {
   uncertain: false,
 };
 
+/**
+ * Why a capability has no source in this build, in the learner's words.
+ *
+ * This table is the **single** statement of the rule; {@link THREAD_BEARS_ON} is
+ * derived from it below rather than written out a second time, so a list of
+ * capabilities and a list of reasons cannot drift apart into a lens that is dark
+ * for no stated reason or lit with no reason to be.
+ *
+ * Rendered, not commented. A learner who switches to the writing lens and finds
+ * everything unlit is owed the reason, and "this build has no way to know that"
+ * is a far better thing to read than an unexplained blank. Each entry is deleted
+ * — not edited — on the day a contract for that capability exists.
+ */
+const NO_SOURCE_FOR: Readonly<Partial<Record<CapabilityId, string>>> = Object.freeze({
+  listening:
+    'This build plays no audio and records no listening, so nothing it holds bears on catching this in speech.',
+  production:
+    'Nothing this build records is you reaching for this yourself, so it holds nothing about production.',
+  writing: 'This build captures no handwriting, so nothing it holds bears on writing this by hand.',
+});
+
+/**
+ * The sentence a lens shows when it is dark by rule rather than by accident, or
+ * `null` for a lens this build can say something about.
+ */
+export function noSourceNote(capability: CapabilityId): string | null {
+  return NO_SOURCE_FOR[capability] ?? null;
+}
+
+/**
+ * The capabilities a kept thread can carry a positive band for at all.
+ *
+ * Two, and the reasoning is in this file's header. A thread is a word met in
+ * written text and kept: exposure to a form together with its reading and its
+ * gloss, which is what `CAPABILITIES` describes `reading` and `meaning` as being
+ * about. It is not the word in speech, not the learner producing it, and not the
+ * learner writing it.
+ *
+ * Derived from {@link NO_SOURCE_FOR} so the two can never disagree.
+ */
+export const THREAD_BEARS_ON: readonly CapabilityId[] = Object.freeze(
+  CAPABILITY_IDS.filter((capability) => noSourceNote(capability) === null),
+);
+
 export function bandForThread(thread: ThreadView | null, capability: CapabilityId): DerivedBand {
   if (thread === null) return NO_THREAD;
 
@@ -141,6 +215,25 @@ export function bandForThread(thread: ThreadView | null, capability: CapabilityI
     return {
       band: bandAtStep(MARKED_UNSURE_STEP),
       basis: `You marked ${capability} unsure on ${thread.displayText}.`,
+      uncertain: false,
+    };
+  }
+
+  /*
+    After the mark, and deliberately so.
+
+    A thread says nothing about listening, production or writing — see
+    `THREAD_BEARS_ON` — but the learner's own mark does, and a mark naming
+    `kanji` or `use` has already been turned into a band above. What is left here
+    is the case where all we have is the promotion, and a promotion is not a
+    statement about any of the three. Returning the no-evidence step is not the
+    absence of an answer; it is the answer.
+  */
+  const noSource = noSourceNote(capability);
+  if (noSource !== null) {
+    return {
+      band: bandAtStep(NO_EVIDENCE_STEP),
+      basis: `${noSource} You kept ${thread.displayText}, which is a word you met in text.`,
       uncertain: false,
     };
   }
@@ -241,4 +334,4 @@ export function readingsForNodes(
  * string, and the converse obligation is that a limit the code does have must be
  * on the screen rather than in a file nobody opens.
  */
-export const READING_STANDING = `These marks come from what this build records — the threads you kept and the one-tap marks you made — and not from a review measurement. Nothing here reaches past step ${String(TAKEN_UP_STEP + 1)} of ${String(READING_STEPS)} on the ramp, because nothing this build stores could support it.`;
+export const READING_STANDING = `These marks come from what this build records — the threads you kept and the one-tap marks you made — and not from a review measurement. Nothing here reaches past step ${String(TAKEN_UP_STEP + 1)} of ${String(READING_STEPS)} on the ramp, because nothing this build stores could support it. Only ${THREAD_BEARS_ON.join(' and ')} can be lit at all: keeping a word is meeting it in text, which says nothing about ${CAPABILITY_IDS.filter((id) => noSourceNote(id) !== null).join(', ')}, and those lenses stay dark unless you marked one unsure yourself.`;

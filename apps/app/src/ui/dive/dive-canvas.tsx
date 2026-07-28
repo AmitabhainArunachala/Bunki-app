@@ -54,6 +54,7 @@ import type { CapabilityId } from '../capability.ts';
 import { useReducedMotion } from '../motion.tsx';
 import { RADIUS, SPACE, TYPE, resolveDuration } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
+import { RING_DISPLAY_LIMIT } from './dive-detail.ts';
 import { DiveNode, type NodeMark } from './dive-node.tsx';
 import type { FlightDirection } from './dive-state.ts';
 
@@ -65,11 +66,12 @@ import type { FlightDirection } from './dive-state.ts';
  * *complete* set by JMdict's own commonness; the ring is a ring, and a ring of
  * sixty is a list. Eight is what a person takes in at a glance.
  *
- * The cut is stated under the ring with both numbers and a pointer to where the
- * whole ranked set is, so nothing is hidden — it is folded, which is the
- * distinction `Disclosure`'s header draws.
+ * The number itself now lives in `dive-detail.ts`, next to the section's own
+ * cut, and is re-exported here so existing readers of this module still find it.
+ * The reason for the move is in that file's docblock and it is not tidiness: a
+ * caption can only be honest about "the rest" if one module can see both cuts.
  */
-export const RING_DISPLAY_LIMIT = 8;
+export { RING_DISPLAY_LIMIT };
 
 /** How a relation reads out loud, so every drawn edge cites what produced it. */
 export const BASIS_PHRASES: Readonly<Record<string, string>> = {
@@ -260,9 +262,21 @@ function Ring({
           style={[styles.ringNote, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
           testID={`dive-ring-cut-${ring.bucket}-${ring.level}`}
         >
+          {/*
+            The caption speaks about the ring and nothing else.
+
+            It used to end "The sections below list all of them, ranked", which
+            was false twice over: the section has its own cut of eight, and it
+            ranks by commonness while the ring takes the graph's order, so the
+            two are not even the same eight. A ring drawn by this component can
+            appear on a page that has no section at all, so it is not in a
+            position to make any claim about what is underneath it. The section
+            that *does* know both numbers says so itself — see
+            `compoundsDisclosure` in `dive-detail.ts`.
+          */}
           {ring.truncated
-            ? `Drawing ${String(drawn.length)} of the ${String(ring.available)} the graph holds here; the dive itself kept ${String(ring.members.length)} of them. The sections below list what this page can rank.`
-            : `Drawing ${String(drawn.length)} of ${String(ring.available)}. The sections below list all of them, ranked.`}
+            ? `Drawing ${String(drawn.length)} of the ${String(ring.available)} the graph holds here, in the order it holds them; the dive itself kept ${String(ring.members.length)}.`
+            : `Drawing ${String(drawn.length)} of ${String(ring.available)}, in the order the graph holds them.`}
         </Text>
       ) : null}
     </View>

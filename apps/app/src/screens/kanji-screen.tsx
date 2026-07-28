@@ -86,6 +86,7 @@ import {
   SELF_NOTE_STANDING,
   SHARED_COMPONENT_NOTE,
   buildKanjiDetail,
+  compoundsDisclosure,
   eraOfLexeme,
 } from '../ui/dive/dive-detail.ts';
 import type { NodeMark } from '../ui/dive/dive-node.tsx';
@@ -625,12 +626,12 @@ function Dive({
                 </Text>
               </RowButton>
             ))}
-            {detail.compounds.length < detail.compoundsAvailable ? (
+            {compoundsDisclosure(detail) !== null ? (
               <Text
                 style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+                testID="kanji-compounds-cut"
               >
-                Showing {String(detail.compounds.length)} of {String(detail.compoundsAvailable)}.
-                The rest are in the graph; zoom out through the dive to reach them.
+                {compoundsDisclosure(detail)}
               </Text>
             ) : null}
           </Disclosure>
@@ -687,9 +688,10 @@ function Dive({
  * ternary somebody has to read.
  *
  * `draw` is on, so the strokes are written with the brush rather than revealed
- * whole. Under reduced motion `InkDraw`'s duration is zero and each stroke lands
- * complete on the first frame — the character stays fully legible, which is the
- * part that carries the teaching.
+ * whole — a claim `e2e/stroke-brush.spec.ts` holds to by sampling the live dash
+ * offsets rather than by being written here. Under reduced motion `InkDraw`'s
+ * duration is zero and each stroke lands complete on the first frame — the
+ * character stays fully legible, which is the part that carries the teaching.
  */
 function StrokeSection({
   character,
@@ -767,8 +769,18 @@ function captionFor(node: ScaleNode, kanji: SeedKanji, senses: readonly string[]
       return 'a shape characters are written with; this build records no meaning for it';
     case 'stroke':
       return `stroke ${String(node.stroke?.order ?? 0)} of ${String(node.stroke?.of ?? 0)}`;
+    /*
+      Not "a sentence this word was met in", which is what this said and what
+      the design document's L5 is. The build has no record of any encounter:
+      these are Tatoeba examples joined to a lexeme by the JMdict `ent_seq` that
+      selected it (`scale-source.ts`), and the graph's own vocabulary for a real
+      encounter — an `encounter` node and an `appeared_in` edge — is defined and
+      never emitted. So the caption says what the join actually is. L5 becomes
+      the design document's sentence on the day something writes an encounter,
+      and not before.
+    */
     case 'sentence':
-      return 'a sentence this word was met in';
+      return 'an example sentence, paired with this word by its dictionary entry';
     case 'collocation':
       return 'a phrase';
   }

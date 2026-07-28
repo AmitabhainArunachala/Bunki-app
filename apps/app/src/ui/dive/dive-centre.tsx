@@ -74,8 +74,17 @@ export function DiveCentre({ node, facts, children, testID }: DiveCentreProps): 
       ? PLACED_ERAS[facts.era.placement]
       : undefined;
 
-  // A placed word gets its era register under it. Nothing else does, and the
-  // card that follows says why in the attribution's own words.
+  /*
+    A placed word gets its era register under it. Nothing else does, and the
+    card that follows says why in the attribution's own words.
+
+    `facts.standing` is used verbatim. This branch used to prepend
+    `facts.era?.detail` to it, which printed the 和語/古道 sentence twice
+    back-to-back on every placed word, because the caller had already composed
+    the same detail into `standing`. Composing a caller's string is this
+    component deciding what the caller meant; the caller is the one that knows
+    whether the era is already in there, and it does.
+  */
   if (placed !== undefined && facts.reading !== null) {
     return (
       <DiveGround
@@ -84,7 +93,7 @@ export function DiveCentre({ node, facts, children, testID }: DiveCentreProps): 
           reading: facts.reading,
           caption: facts.caption,
           catalogue: facts.catalogue,
-          standing: `${facts.era?.detail ?? ''} ${facts.standing}`.trim(),
+          standing: facts.standing,
         }}
         era={placed}
         testID={testID}

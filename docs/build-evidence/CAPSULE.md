@@ -7485,8 +7485,12 @@ import the whole dictionary — so it plausibly makes the contention worse. Rais
    as every other lane's statement here says.
 7. **The canvas ring order is adjacency order, not commonness.** The *sections*
    below it are ranked by JMdict's tags; the ring is in the graph's canonical
-   order and says "Drawing 8 of 25. The sections below list all of them, ranked."
-   Ranking the ring would mean ranking a set the ring itself had already cut.
+   order. Ranking the ring would mean ranking a set the ring itself had already
+   cut. *(Corrected in the repair round: this item used to quote the ring's own
+   caption, "Drawing 8 of 25. The sections below list all of them, ranked", as
+   evidence. That sentence was false — the section shows eight of the
+   twenty-five, not all of them — and quoting it here propagated the falsehood
+   into the capsule. See the repair appendix, P1-3.)*
 8. **`radicalDisplay`'s scheme-name suppression is inherited, not re-verified.**
    The components section renders elements only, through the same helper WP-09
    built after a scheme label reached the page through data. `test/radical-display.test.ts`
@@ -7752,3 +7756,414 @@ A2′'s and pre-existing; this pass did not touch it and does not vouch for it.
 - **It did not measure a phone.** Every millisecond figure above is this
   container's wall clock. The level-of-detail *shares* are hardware-independent;
   the timings are not.
+
+---
+
+## Appendix — lane B2 repair round: five P1s, four P2s, and one that was already gone
+
+Branch `agent/bunki-e-dive`, continuing from `cf2dc82`. An independent verifier
+returned **FAIL** with five P1 findings and four P2s. This appendix carries every
+one of them, what reproducing it showed, what was done, and every row of the
+§17.5 check set as it actually ran here.
+
+### The rule this round was given, and the reason it exists
+
+> Do NOT repair a defect that is not present — a previous repair round here
+> "fixed" a non-existent aria-current defect and introduced a duplicate
+> attribute. Reproduce first; if it does not reproduce, say so and change
+> nothing.
+
+So nothing below was touched on the strength of the finding text. Six of the nine
+are claims about what a browser shows, and those were reproduced by driving the
+**shipped bundle** in Chromium before a line was edited — the same instrument,
+re-run afterwards, is the evidence that they are closed. The reproduction script
+lives in the scratchpad rather than the repository: it is a probe, not a
+regression test, and the regression tests it motivated are named per finding
+below.
+
+### The verdict on each finding
+
+| # | severity | finding | reproduced? | disposition |
+| --- | --- | --- | --- | --- |
+| 1 | P1 | `npm run typecheck` fails on `packages/domain/test/scale/support.ts:74` (TS2379) | **no** | **already fixed** in `4dd3a02`, before this round began. Nothing changed. |
+| 2 | P1 | the stroke "brush" never draws | yes | fixed — `stroke-order.tsx`, plus a browser test |
+| 3 | P1 | ring and section captions contradict each other, and the section's is false | yes | fixed — one module now owns both cuts |
+| 4 | P1 | the diagnosis reports strokes as unlearned interiors | yes | fixed — `RETRIEVAL_TARGET_LEVELS` in the domain |
+| 5 | P1 | five capability lenses, one underlying value, called "evidence" | yes | fixed — `THREAD_BEARS_ON`, and the disclosure rewritten |
+| 6 | P2 | a placed word prints its era sentence twice | yes | fixed — `dive-centre.tsx` stops composing its caller's string |
+| 7 | P2 | the boundary scan cannot see `await import(...)` | yes | fixed — scanner extended, four evasion shapes pinned |
+| 8 | P2 | two UI modules untested; one cites a test that does not exist | **partly** | `dive-detail.test.ts` now exists (`4dd3a02`); `dive-readings.ts` was untested — 28 tests added |
+| 9 | P2 | the L5 caption asserts an encounter the build has no record of | yes | fixed — the caption says what the join actually is |
+
+No P2 was declined.
+
+### P1-1 — the typecheck failure that was not there
+
+`npm run typecheck` exits **0** on this branch, and did before any edit in this
+round. The finding is accurate about `df171ad`, which is where the verifier
+looked; commit `4dd3a02` ("the typecheck the lane did not run") landed the fix on
+the way to `cf2dc82`, and the branch tip already carried it. The cast is gone and
+`support.ts` now carries the reasoning:
+
+> `role` is declared on the tuple as `ComponentRole`, not as `string` cast
+> through `GraphEdge['role']`. […] The cast was the whole defect: it looked like
+> it was narrowing and was in fact the only thing that could widen.
+
+The verifier's structural point stands and is worth keeping: the failure sat in
+the middle of the workspace loop, so **the tail of the log looked clean**. Every
+typecheck in this round was therefore run with its exit code captured explicitly
+rather than read off the last twenty lines.
+
+### P1-2 — the brush that animated zero to zero
+
+**Reproduced.** 森 (12 strokes), Chromium at `reducedMotion: 'no-preference'`,
+sampling every `stroke-dashoffset` inside a `requestAnimationFrame` loop:
+
+```
+151 frames, 6 distinct dash-offset vectors,
+0 of them carrying an intermediate (non 0/absent) offset
+sample = ["0,0,-,-,-,-,-,-,-,-,-,-", "0,0,0,-,-,-,-,-,-,-,-,-", ...]
+```
+
+Every stroke goes straight from absent to complete. `DURATION.drawStroke` is
+420 ms and nothing was interpolating.
+
+**Cause.** `InkDraw` seeds its animated value from `drawing` on first render —
+`useRef(new Animated.Value(drawing ? 0 : length))`. `StrokeOrder` rendered
+`<InkDraw drawing …/>` **only for a stroke that was already `written`**, so the
+component mounted at offset 0 and then ran `Animated.timing(offset, { toValue: 0 })`.
+A transition needs a component that is already there.
+
+**Fix.** In `draw` mode every stroke is now mounted once, undrawn, and stays
+mounted: `<InkDraw drawing={written} …/>`. Because an undrawn `InkDraw` is dashed
+entirely out of sight, and the mode's legibility rule requires the whole
+character to stay readable while its order is shown, each stroke also gets a
+static ghost path underneath at the same 0.12 opacity the reveal mode uses. Two
+paths per stroke; the pairing is the mechanism.
+
+**Verified.** Same instrument, same character, after:
+
+```
+150 frames, 89 distinct dash-offset vectors,
+89 of them carrying an intermediate offset
+sample = ["-,0,-,39,-,39,-,39,-,34,-,52,-,34,-,9,-,36,-,57,-,37,-,42", …]
+```
+
+**Held by** `apps/app/e2e/stroke-brush.spec.ts`, which asserts the binary claim
+that was false — does the offset ever take an intermediate value — and
+deliberately asserts no duration, frame count or easing curve, because those are
+facts about a shared runner. A second case pins the other half of the
+convergence claim: under `reducedMotion: 'reduce'` every offset is 0.
+
+Three docblocks asserted the brush was working — `CAPSULE`, the `StrokeSection`
+docblock, and `stroke-order.tsx`'s own header. All three now say what is true and
+name the test that holds it. The header keeps the story, because a claim that was
+false for a whole pass is worth more as a warning than as a deletion.
+
+### P1-3 — two sentences on one screen, disagreeing
+
+**Reproduced,** verbatim, both on `/kanji/%E5%88%86` at once:
+
+```
+ring:    "Drawing 8 of 25. The sections below list all of them, ranked."
+section: "Showing 8 of 25. The rest are in the graph; zoom out through the dive
+          to reach them."
+```
+
+The first is false — the section lists eight. The second is false too: the ring
+draws the first eight in **adjacency order**, the section the top eight by
+**JMdict rank**, they union to 11 of 25 for 分, and zooming out reaches none of
+the remaining 14.
+
+**Cause, stated as a structural one.** `RING_DISPLAY_LIMIT` lived in
+`dive-canvas.tsx` and `DETAIL_SECTION_LIMIT` in `dive-detail.ts`. No module could
+see both numbers, so each caption described itself and the ring's filled the gap
+by guessing about the section.
+
+**Fix.** Both cuts are declared in `dive-detail.ts`; `dive-canvas.tsx` imports and
+re-exports `RING_DISPLAY_LIMIT` so existing readers still find it.
+`KanjiDetail` gains `compoundsShownHere` — the size of the **union** of the two
+cuts — and a new pure function `compoundsDisclosure(detail)` composes the
+sentence. The ring's caption now speaks only about the ring: a ring drawn by that
+component can appear on a page with no section under it at all, so it is not in a
+position to claim anything about what is underneath.
+
+**On screen now, read back from the bundle:**
+
+```
+Drawing 8 of 25, in the order the graph holds them.
+
+Showing 8 of 25, ranked by the dictionary's own commonness. The ring above draws
+its own selection of the same set, in the order the graph holds it; together this
+page reaches 11 of 25. The other 14 are in the graph and this page has no control
+that opens them.
+```
+
+11 and 14 are the verifier's own arithmetic, now computed by the page.
+
+**Held by** five cases in `dive-detail.test.ts`, including one that asserts the
+sentence contains neither `zoom out` nor `all of them`, and one that asserts it
+is **absent** rather than "Showing 3 of 3" when nothing is cut.
+
+The capsule's "What this lane did not do" item 7 quoted the false sentence as
+evidence. That item is corrected in place, above, rather than silently.
+
+### P1-4 — a permanent absence presented as an actionable gap
+
+**Reproduced.** With 分岐 kept, `[data-testid="dive-diagnosis"]` on `/kanji/%E5%88%86`
+rendered:
+
+```
+dive-finding-component:八
+dive-finding-component:刀
+dive-finding-scale-stroke:1:kanji:分
+dive-finding-scale-stroke:2:kanji:分
+```
+
+The panel shows four. Two of the four were strokes, with "2 more like this in
+view" — so the two real component findings were being crowded by findings that no
+action can close.
+
+**Cause.** `diagnoseInterior` walks every inward ring with no level filter, and at
+a character the inward rings are components *and* strokes. The build states the
+opposite rule elsewhere: `strokeNodeOf` sets `componentIds: []` with "A stroke is
+never a retrieval target on its own […] empty by rule rather than by missing
+data." The rule existed as a comment, in a different file, and nothing consulted
+it.
+
+**Fix.** `RETRIEVAL_TARGET_LEVELS` and `isRetrievalTarget` in
+`packages/domain/src/scale/levels.ts` — every level except `stroke` — and
+`pushIfMismatched` skips a pair with a non-target at either end before consulting
+any reading. Filtered in the domain rather than by the caller, because a rule
+every caller has to know is a rule no caller enforces. A level that later grows a
+capture path joins the list and the diagnosis follows with no other edit.
+
+**Verified:** the panel now renders `component:八` and `component:刀` and nothing
+else.
+
+**Held by** five cases in `packages/domain/test/scale/mismatch.test.ts`, one of
+which exists purely to keep the others honest — it asserts the view really does
+materialise stroke nodes with no readings, so "no stroke findings" is a filter
+working rather than a fixture with nothing in it.
+
+### P1-5 — five lenses, one number, and the word "evidence"
+
+**Reproduced.** One tap of Keep on 分岐, then each lens in turn on
+`/kanji/%E5%88%86`, reading the ring nodes' nested aria-labels:
+
+```
+1 distinct band vector across five lenses
+lenses claiming evidence they cannot have: ["writing","listening","production"]
+```
+
+Every lens returned the identical vector, `["No evidence yet","Settled","No
+evidence yet", …]`, and under `lens-writing` the diagnosis read "分 has writing
+evidence and 八 inside it has none" — on a build that ships no audio and captures
+no handwriting.
+
+**Why this is a P1 and not a wording problem.** `bandForThread` consulted
+`capability` only to *lower* a band for an uncertainty mark; the positive band
+came from thread promotion alone. That is REQ-UI-07's collapse — reading,
+meaning, listening, production and writing rendered as one light — happening one
+level below the map the requirement was written about. The app's own correction
+screen says "A capture, a promotion, or an export record is not an observation
+about your recall", and lane A2's `LensProjection` reports `writing` as `unknown`
+"honestly, forever, until a contract exists".
+
+**Fix.** A thread is now asked what it can *bear on*. A kept thread is a word met
+**in text** and kept: exposure to a written form with its reading and its gloss.
+`THREAD_BEARS_ON` is `['reading','meaning']`, derived from a single table
+`NO_SOURCE_FOR` that carries the reason each of the other three has no source, so
+a list of capabilities and a list of reasons cannot drift apart. Listening,
+production and writing sit at the no-evidence step permanently.
+
+The one exception is the learner's own voice, and the check is placed *after* the
+mark for exactly that reason: an uncertainty mark whose dimension is `kanji` is a
+real statement about writing, `use` is one about production, and a person saying
+"I am not sure I could write this" has told us something no scheduler had to
+measure. So a marked lens still reads at the marked-unsure step while an unmarked
+one reads unseen — which is also what finally makes the writing lens *differ*
+from the reading lens.
+
+Two disclosures follow the rule rather than being written beside it.
+`READING_STANDING` is composed from `THREAD_BEARS_ON` and now ends:
+
+> Only reading and meaning can be lit at all: keeping a word is meeting it in
+> text, which says nothing about listening, production, writing, and those lenses
+> stay dark unless you marked one unsure yourself.
+
+And the diagnosis's empty state is chosen by *why* it is empty. The generic note
+says "there is not enough recorded **yet**", and "yet" is a promise; under the
+three unsourced lenses that promise is false, so those get the reason instead.
+On screen under `lens-writing`:
+
+> This build captures no handwriting, so nothing it holds bears on writing this
+> by hand.
+
+**Verified:** 2 distinct band vectors across the five lenses; the writing lens is
+uniformly "No evidence yet"; no lens claims evidence it cannot have.
+
+**Held by** `apps/app/test/dive-readings.test.ts` (28 cases), including one that
+fails if every lens returns the same step and one that asserts the two lists
+partition the five capabilities exactly.
+
+### P2-6 — the era sentence, printed twice
+
+**Reproduced** on `/kanji/%E5%B1%B1` → 山（やま）: "does not claim a first
+attestation" appeared **2×** on the centre card, back to back.
+`kanji-screen.tsx` already composed the era detail into `standing` and
+`dive-centre.tsx` prepended `facts.era?.detail` again.
+
+**Fixed** in `dive-centre.tsx`, which now uses `facts.standing` verbatim.
+Composing a caller's string is a component deciding what the caller meant; the
+caller is the one that knows whether the era is already in there, and it does.
+**Verified: 1×.**
+
+### P2-7 — the guard that could not see a dynamic import
+
+**Reproduced** with the verifier's own probe. Adding to `dive-readings.ts`:
+
+```ts
+export async function evade(): Promise<unknown> {
+  const mod = await import('../../state/app-context.tsx');
+  return mod.useAppStore();
+}
+```
+
+`npx vitest run apps/app/test/dive-boundary.test.ts` → **23 passed (23)**, eslint
+clean. No violation was present in the tree; the hole was in the guard, and the
+capsule's claim for it ("fails if any of it can reach a command, the evidence
+gate, the scheduler or the persistence seam") was stronger than its predicate.
+This repository has closed this exact class once before.
+
+**Fixed** by matching `import('…')` alongside the static form and recording a
+binding named `the whole module, dynamically` — deliberately not a real
+identifier and deliberately not in `STATE_READS`, because a dynamic import hands
+over the entire namespace and there is no version of it that is an allowlisted
+read of one hook. Both the reachability walk and the seam check consume it.
+
+The pattern excludes TSDoc's `{@link import('./x.ts').y}`, which is a *type*
+reference in a comment and is used in `scale/levels.ts`; matching it would fail
+the scan on a docblock, which is how a guard gets switched off.
+
+**Held by** `it.each` over all four evasion shapes — static, namespace, dynamic,
+dynamic double-quoted — plus a case for a dynamic import of a forbidden module, a
+case that the module-graph walk follows one, and a case that the docblock form is
+not flagged. The suite went 23 → 30 cases. With the new pattern neutered, four
+fail.
+
+### P2-8 — modules with no test
+
+Half of this finding had already been closed by `4dd3a02`:
+`apps/app/test/dive-detail.test.ts` exists (332 lines), so the docblock that
+cited it is no longer citing a file that is not there.
+
+The other half reproduced exactly:
+
+```
+grep -rlE 'bandForThread|markForNode|READING_STANDING|readingsForNodes|reachOfThreads'
+  apps/app/test apps/app/e2e packages   →   no output
+```
+
+`dive-readings.ts` — 244 lines, and the module that decides what the surface is
+allowed to say about a learner — was untested. `apps/app/test/dive-readings.test.ts`
+now covers it in 28 cases, organised around the two claims the capsule calls
+load-bearing:
+
+- **the top band is never produced** — asserted over *every* combination of the
+  four promotion rungs, the five uncertainty dimensions, the rehydrated-mark
+  case and all five capabilities, rather than for one example;
+- **five lenses are five lenses** — the assertions described under P1-5.
+
+The verifier's sharpest point is answered directly. `READING_STANDING` is
+*derived* from `TAKEN_UP_STEP` and `READING_STEPS`, so a test that recomputed the
+sentence from those constants would follow any change silently and prove nothing.
+The ramp positions are therefore pinned as **literals** (`TAKEN_UP_STEP` is 3,
+`READING_STEPS` is 5) and the rendered sentence is asserted to contain the string
+`step 4 of 5`. The verifier's mutation — setting `TAKEN_UP_STEP = 4` — now fails.
+
+### P2-9 — a caption that claimed an encounter
+
+**Reproduced.** On a fresh browser context with nothing recorded, the L5 centre
+card read:
+
+> どこかへ逃避行したい。蒸し暑い夏はそんな気分になりがち。 **a sentence this word
+> was met in** 文 sentence · level 5
+
+There is no encounter. These are Tatoeba examples joined to a lexeme by the
+JMdict `ent_seq` that selected it; the graph has an `encounter` node kind and an
+`appeared_in` edge for a real one, and neither is emitted anywhere.
+
+**Fixed** to `an example sentence, paired with this word by its dictionary entry`,
+which is what the join is. The design document's L5 — "the sentence you actually
+met it in" — becomes reachable on the day something writes an encounter, and the
+`captionFor` case carries that note.
+
+Scoped, not fixed: `SCALE_LEVEL_NAMES.sentence.example` still holds the design
+document's phrase. It is documented as *the design document's own example at this
+level* and is rendered by nothing in this build — checked, not assumed. It is
+recorded here so that a surface which starts rendering `example` knows it is
+inheriting a claim the data does not support.
+
+### The check set, every row, as it ran in this worktree
+
+| check | result |
+| --- | --- |
+| `npm ci` | pass |
+| `npm run lint` | pass (clean, no output) |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | **pass, exit 0** — captured as an exit code, not read off the log tail |
+| `npm run test` | **117 files, 2,516 passed, 1 skipped, 0 failed** (61.1s) |
+| `npm run test:replay` | pass — 2 files, 47 tests |
+| `npm run verify:export` | pass — 14 tests |
+| `expo export --platform web` | pass |
+| `npm run test:e2e:build` | pass (the same export) |
+| `npm run test:e2e` | **54 passed (3.3m), exit 0** |
+| browser reproduction probe, before | 6 of 6 browser findings **reproduce** |
+| browser reproduction probe, after | 6 of 6 **do not reproduce** |
+| `node apps/app/scripts/capture-dive-verify.mjs` | pass — 12 shots regenerated |
+
+Counts moved from the second pass's table by exactly the tests added here:
+116 → 117 files (`dive-readings.test.ts`), 2,471 → 2,516 tests, 52 → 54 E2E
+cases (`stroke-brush.spec.ts`).
+
+**Two E2E cases print `✘` in the stream and the run still exits 0.** They are
+`T4-1b` and `T3-3` in `adv-known-defects.spec.ts`, both declared
+`test.fail(true, …)` — pre-existing, documented, owned by other lanes, and
+expected to fail. They are named here so nobody has to wonder whether a green
+tally was hiding two reds.
+
+The single skip is in `packages/domain/test/graph/era-corpus.test.ts`. It is lane
+A2′'s and pre-existing; this round did not touch it and does not vouch for it.
+
+### Every claim was demonstrated failing before it passed
+
+A test that has never failed proves nothing, so each of the three structural
+fixes was mutated back and the suite re-run:
+
+| mutation | tests that caught it |
+| --- | --- |
+| `RETRIEVAL_TARGET_LEVELS` widened to every level | 3 in `mismatch.test.ts` |
+| the unsourced-capability check disabled in `bandForThread` | 5 in `dive-readings.test.ts` |
+| `DYNAMIC_IMPORT` replaced with a never-matching pattern | 4 in `dive-boundary.test.ts` |
+
+The brush fix is held by a browser test rather than a mutation: its
+before-and-after sample — 0 intermediate offsets in 6 vectors, then 89 in 89 — is
+the demonstration, and it is above.
+
+### What this round did not do
+
+- **It did not re-verify the lane.** It reproduced nine findings, closed eight,
+  and confirmed the ninth was already closed. The lane's own claims outside those
+  findings stand on the two earlier appendices.
+- **It ran one engine.** Chromium on Linux, the same as every other B2 pass. No
+  Safari, no Firefox, no device, no screen reader.
+- **It did not close the L5 design gap**, only the false sentence. L5 is
+  dictionary-paired examples and will stay that way until something emits an
+  `encounter` node; the caption now says so and the design document's L5 remains
+  unbuilt.
+- **It did not measure a phone.** Every timing above is this container's wall
+  clock.
+- **It did not touch React #418, the empty static `<title>`, or the two
+  `test.fail` known defects.** All four are outside this lane and were reported,
+  not repaired, by the second pass; that is still true.

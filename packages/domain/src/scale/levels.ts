@@ -138,6 +138,42 @@ export const SCALE_LEVEL_NAMES: Readonly<Record<ScaleLevel, ScaleLevelName>> = O
 });
 
 /**
+ * The levels a learner can actually be asked to remember something at.
+ *
+ * Not a rendering hint and not a preference — it is the levels at which REQ-LM-01
+ * can instantiate a retrieval contract, which means the levels at which "you know
+ * this and you do not know that" is a statement with a referent. Every level is on
+ * this list except `stroke`, and the exclusion is the same rule `strokeNodeOf`
+ * states when it gives a stroke an empty `componentIds`: **nobody captures a
+ * stroke.** A stroke is how a character is drawn, not a thing held separately
+ * from it.
+ *
+ * ## Why this had to become a value rather than stay a comment
+ *
+ * The mismatch diagnosis walks a node's inward rings looking for parts that are
+ * dark inside a lit whole. At a character the inward rings are components *and*
+ * strokes, so it reported findings like "分 ⟶ 1/4 — 分 has meaning evidence and
+ * 1/4 inside it has none. That is a whole-unit memory without a memory of its
+ * part: nothing here has been checked at the smaller scale." Every clause of that
+ * is unactionable: nothing will ever check stroke 1 of 分 at the smaller scale,
+ * because there is no smaller scale and no contract to check. The panel was
+ * presenting an absence that is permanent by rule as a gap the learner could
+ * close, and — because the panel shows only four findings — it was crowding out
+ * the real ones with them.
+ *
+ * A level that later grows a capture path joins this list, and the diagnosis
+ * follows with no other edit.
+ */
+export const RETRIEVAL_TARGET_LEVELS: readonly ScaleLevel[] = Object.freeze(
+  SCALE_LEVELS.filter((level) => level !== 'stroke'),
+);
+
+/** Whether a level is one a retrieval contract can be instantiated at. */
+export function isRetrievalTarget(level: ScaleLevel): boolean {
+  return RETRIEVAL_TARGET_LEVELS.includes(level);
+}
+
+/**
  * The two scale directions, plus the same-level bucket that is not one.
  *
  * `alongside` is in this union because every relation the ladder returns has to

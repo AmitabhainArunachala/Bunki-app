@@ -176,9 +176,47 @@ interface ImportRecord {
 
 const IMPORT_STATEMENT = /import\s+(type\s+)?([^;]*?)\s*from\s+'([^']+)'/g;
 
-/** The named bindings and the specifier of every static import in a file. */
+/**
+ * A dynamic `import('…')` or `await import("…")`.
+ *
+ * The scan was static-only, and the claim made for it in the capsule was not:
+ * "walks the kanji screen's whole module graph and fails if any of it can reach
+ * a command, the evidence gate, the scheduler or the persistence seam". A dive
+ * module could take the store's entire write surface through
+ * `await import('../../state/app-context.tsx')` and both the reachability
+ * assertion and the seam assertion stayed green, as did eslint. No violation was
+ * ever present; the hole was in the guard, and this repository has already had
+ * to close this exact class once — see the commit "Fix P1: close deep-path and
+ * dynamic-import boundary bypasses".
+ *
+ * The lookbehind excludes TSDoc's `{@link import('./x.ts').y}`, which is a
+ * *type* reference in a comment and appears in this codebase (`scale/levels.ts`
+ * uses it). Matching it would fail the scan on a docblock.
+ */
+const DYNAMIC_IMPORT = /(?<!@link\s)\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+/**
+ * The binding name recorded for a dynamic import.
+ *
+ * Deliberately not a real identifier and deliberately not in `STATE_READS`: a
+ * dynamic import hands over the **whole module namespace**, so there is no
+ * version of it that is an allowlisted read of one hook. Naming it this way
+ * makes the failure message say what happened.
+ */
+const DYNAMIC_BINDING = 'the whole module, dynamically';
+
+/**
+ * The named bindings and the specifier of every import in a file, static or
+ * dynamic.
+ */
 function importsOf(source: string): readonly ImportRecord[] {
   const out: ImportRecord[] = [];
+  for (const match of source.matchAll(DYNAMIC_IMPORT)) {
+    out.push({
+      specifier: match[1] ?? '',
+      bindings: [{ name: DYNAMIC_BINDING, typeOnly: false }],
+    });
+  }
   for (const match of source.matchAll(IMPORT_STATEMENT)) {
     const wholeClauseIsType = match[1] !== undefined;
     const clause = match[2] ?? '';
@@ -553,5 +591,72 @@ describe('the scan fails the thing it is supposed to fail', () => {
       import { seedDataset } from '../../data/catalog.ts';
     `;
     expect(violationsIn('src/ui/dive/fine.ts', fine)).toEqual([]);
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The three shapes an import can take, and the one that got through
+   * ---------------------------------------------------------------- */
+
+  /**
+   * The static and namespace forms were always caught. The dynamic one was not,
+   * and this repository has closed that same class once before. All three are
+   * pinned here so the next loosening has to delete a named test.
+   */
+  const EVASIONS = [
+    {
+      shape: 'static',
+      source: "import { useAppStore } from '../../state/app-context.tsx';",
+    },
+    {
+      shape: 'namespace',
+      source: "import * as context from '../../state/app-context.tsx';",
+    },
+    {
+      shape: 'dynamic',
+      source: `
+        export async function evade(): Promise<unknown> {
+          const mod = await import('../../state/app-context.tsx');
+          return mod.useAppStore();
+        }
+      `,
+    },
+    {
+      shape: 'dynamic, double-quoted',
+      source: 'const mod = await import("../../state/app-context.tsx");',
+    },
+  ] as const;
+
+  it.each(EVASIONS)('catches the $shape reach across the state seam', ({ source }) => {
+    const found = crossingsInto('src/ui/dive/offender.ts', source);
+    expect(
+      found.map((violation) => violation.reason),
+      'a dive module reached the store this way and the scan did not notice',
+    ).not.toEqual([]);
+  });
+
+  it('catches a dynamic import of a forbidden module', () => {
+    const found = violationsIn('src/ui/dive/offender.ts', "const fsrs = await import('ts-fsrs');");
+    expect(found.length).toBeGreaterThan(0);
+  });
+
+  it('follows a dynamic import when it walks the module graph', () => {
+    // The reachability half. A module reached only dynamically was invisible to
+    // the walk, so its own violations were never scanned either.
+    const specifiers = importsOf("const m = await import('./dive-state.ts');").map(
+      (record) => record.specifier,
+    );
+    expect(specifiers).toContain('./dive-state.ts');
+  });
+
+  it('does not flag TSDoc that links to a module by import type', () => {
+    // `{@link import('./levels.ts').isRetrievalTarget}` is a *type* reference in
+    // a comment, and the domain uses exactly this form. Matching it would fail
+    // the scan on a docblock, which is how a guard gets switched off.
+    const prose = `
+      /** See {@link import('../../state/app-context.tsx').useAppStore} for the write surface. */
+      import { diveAt } from '@bunki/domain';
+    `;
+    expect(violationsIn('src/ui/dive/fine.ts', prose)).toEqual([]);
+    expect(crossingsInto('src/ui/dive/fine.ts', prose)).toEqual([]);
   });
 });
