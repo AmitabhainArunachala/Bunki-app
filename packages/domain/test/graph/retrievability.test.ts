@@ -23,6 +23,7 @@ import {
   coverageForReviewCount,
   DEFAULT_FRAGILITY_POLICY,
   initialMemoryState,
+  isAscendingByFrom,
   isFragile,
   isUnknown,
   isUntested,
@@ -38,6 +39,7 @@ import {
   type MemoryState,
   type ProjectedContract,
 } from '../../src/index.ts';
+import { randomFrom } from '../adversarial/support/fuzz.ts';
 import { activationsFor, contractsFor, instant } from './support.ts';
 
 const COMPONENT = 'kc:分岐';
@@ -360,6 +362,91 @@ describe('the time scrubber replays growth from the log, and only reads', () => 
   it('returns null before the contract existed', () => {
     const history = buildMemoryHistories(activationsFor([READING_CONTRACT], instant(50)), [])[0]!;
     expect(memoryStateAsOf(history, instant(10))).toBeNull();
+  });
+
+  /**
+   * `memoryStateAsOf` binary-searches, which is correct only on an ascending
+   * list. The doc comment used to justify that with "versions is ascending by
+   * construction" while the construction enforced nothing — sorting the reviews
+   * does not stop a review dated before its contract's activation from being
+   * appended after the activation version, and the list would then go backwards.
+   * These are the tests that make the claim true rather than asserted.
+   */
+  describe('the ascending invariant the binary search depends on', () => {
+    it('holds for the ordinary case', () => {
+      expect(isAscendingByFrom(histories[0]!)).toBe(true);
+    });
+
+    it('holds when a review predates the contract’s activation', () => {
+      const backwards = buildMemoryHistories(activationsFor([READING_CONTRACT], instant(50)), [
+        {
+          contractId: READING_CONTRACT.contractId,
+          effectiveGrade: 'good',
+          reviewedAt: instant(10),
+        },
+        {
+          contractId: READING_CONTRACT.contractId,
+          effectiveGrade: 'good',
+          reviewedAt: instant(60),
+        },
+      ]);
+      const history = backwards[0]!;
+      expect(isAscendingByFrom(history)).toBe(true);
+      // The impossible review is skipped, exactly as a review naming a contract
+      // with no activation is skipped — replay is where that defect is caught.
+      expect(history.versions).toHaveLength(2);
+      expect(history.versions.map((version) => version.from)).toEqual([instant(50), instant(60)]);
+    });
+
+    it('holds for every history over shuffled, adversarial input', () => {
+      const random = randomFrom(0xa5ce4d);
+      const contracts = [READING_CONTRACT, MEANING_CONTRACT];
+      for (let trial = 0; trial < 300; trial += 1) {
+        const activations = contracts.map((contract) => ({
+          contractId: contract.contractId,
+          activatedAt: instant(random.int(40)),
+        }));
+        const reviews: AdmittedReview[] = Array.from(
+          { length: random.int(12) },
+          (): AdmittedReview => ({
+            contractId: random.pick(contracts).contractId,
+            effectiveGrade: random.pick(['again', 'hard', 'good', 'easy'] as const),
+            // Deliberately spans instants before every activation, so the
+            // out-of-order case is generated rather than hoped for.
+            reviewedAt: instant(random.int(60)),
+          }),
+        );
+        buildMemoryHistories(activations, reviews).forEach((history) => {
+          expect(isAscendingByFrom(history), `trial ${String(trial)}`).toBe(true);
+        });
+      }
+    });
+
+    it('detects a hand-assembled history that is not ascending', () => {
+      // The predicate has to be able to say no, or asserting it proves nothing.
+      const ascending = histories[0]!;
+      const descending = {
+        contractId: ascending.contractId,
+        versions: [...ascending.versions].reverse(),
+      };
+      expect(isAscendingByFrom(ascending)).toBe(true);
+      expect(isAscendingByFrom(descending)).toBe(false);
+    });
+
+    it('agrees with a linear scan on every frame of an ascending history', () => {
+      const history = histories[0]!;
+      const scan = (at: string): MemoryState | null => {
+        let found: MemoryState | null = null;
+        for (const version of history.versions) {
+          if (version.from <= at) found = version.state;
+        }
+        return found;
+      };
+      for (let day = 0; day <= 60; day += 1) {
+        const at = instant(day);
+        expect(memoryStateAsOf(history, at), `day ${String(day)}`).toEqual(scan(at));
+      }
+    });
   });
 
   it('shows a node moving from unknown to attested across the frames', () => {
