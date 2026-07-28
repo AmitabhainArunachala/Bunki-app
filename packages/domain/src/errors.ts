@@ -24,6 +24,7 @@ export const DOMAIN_ERROR_CODES = [
   'EVIDENCE_FACTORY_BOUNDARY',
   'CONTRACT_VALIDATION_FAILED',
   'CANDIDATE_NOT_EVIDENCE',
+  'FOREIGN_EVENT_PROVENANCE',
 ] as const;
 
 export type DomainErrorCode = (typeof DOMAIN_ERROR_CODES)[number];
@@ -292,3 +293,52 @@ export class CandidateEvidenceBoundaryError extends DomainError {
     this.marker = marker;
   }
 }
+
+/**
+ * A value was offered on the persist path without this kernel having minted it
+ * (WP-10; REQ-ARCH-04).
+ *
+ * Thrown by `sealMintedEvents`/`openMintedEventBatch` in
+ * `src/events/provenance.ts`. The three things that reach it are: an object
+ * literal shaped like an event, an event that made a JSON round trip and came
+ * back as a different object, and an event this kernel *did* mint that was then
+ * mutated in place. All three are the same refusal — the persist path carries
+ * events out of the kernel, and it must not become a door for carrying foreign
+ * ones in.
+ *
+ * `reason` is a closed vocabulary rather than free text so a caller (and a test)
+ * can distinguish the three without parsing a sentence.
+ */
+export type ForeignEventReason =
+  /** Never minted in this process: a literal, a clone, or a parsed value. */
+  | 'not_minted_here'
+  /** Minted here, then mutated after minting; the recorded bytes disagree. */
+  | 'mutated_after_mint'
+  /** The batch container itself was not produced by `sealMintedEvents`. */
+  | 'unsealed_batch';
+
+export class ForeignEventError extends DomainError {
+  readonly reason: ForeignEventReason;
+  /** The event's `type` when the value had a readable one; `null` otherwise. */
+  readonly eventType: string | null;
+
+  constructor(reason: ForeignEventReason, eventType: string | null = null) {
+    super(
+      'FOREIGN_EVENT_PROVENANCE',
+      `Refused: ${FOREIGN_EVENT_REASON_MESSAGES[reason]}${
+        eventType === null ? '' : ` (offered type ${JSON.stringify(eventType)})`
+      } Only events this kernel minted in this process may be persisted; evidence-class events are minted exclusively by the evidence gate (REQ-ARCH-04).`,
+    );
+    this.reason = reason;
+    this.eventType = eventType;
+  }
+}
+
+const FOREIGN_EVENT_REASON_MESSAGES: Readonly<Record<ForeignEventReason, string>> = {
+  not_minted_here:
+    'the value offered for persistence was not minted by this kernel in this process.',
+  mutated_after_mint:
+    'the value offered for persistence was minted by this kernel and then changed; the bytes no longer match what was minted.',
+  unsealed_batch:
+    'the batch offered for persistence was not produced by sealMintedEvents; a container shaped like one is not one.',
+};

@@ -211,6 +211,24 @@ export class AppDriver {
    * that a screen is willing to say so.
    */
   async persistedEventTypes(): Promise<readonly string[]> {
+    return (await this.persistedEvents()).map((event) => String(event['type'] ?? 'unknown'));
+  }
+
+  /**
+   * The durable snapshot's events, whole (WP-10).
+   *
+   * The same read as {@link persistedEventTypes} without discarding the payload,
+   * because the export lane has claims that a type list cannot carry: that the
+   * `SessionClosed` says `completed`, that the graded review is tier A, that the
+   * canvas produced a tier-D exposure beside it. Those are the *content* of the
+   * evidence, and a suite that only counted families would pass over a log whose
+   * every event said the wrong thing.
+   *
+   * Still a read and still independent: this is the browser's own storage, which
+   * is where `prepareExport` gets the events it serialises, so asserting on it is
+   * asserting on the export's source rather than on a screen's summary of it.
+   */
+  async persistedEvents(): Promise<readonly Record<string, unknown>[]> {
     return this.page.evaluate((key) => {
       const raw = globalThis.localStorage.getItem(key);
       if (raw === null) return [];
@@ -218,10 +236,9 @@ export class AppDriver {
       if (typeof parsed !== 'object' || parsed === null) return [];
       const events = (parsed as { events?: unknown }).events;
       if (!Array.isArray(events)) return [];
-      return events.map((event: unknown) =>
-        typeof event === 'object' && event !== null && 'type' in event
-          ? String((event as { type: unknown }).type)
-          : 'unknown',
+      return events.filter(
+        (event: unknown): event is Record<string, unknown> =>
+          typeof event === 'object' && event !== null,
       );
     }, SNAPSHOT_KEY);
   }

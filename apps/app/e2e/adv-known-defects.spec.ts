@@ -27,20 +27,22 @@
  *
  * ## State after the W5 closeout
  *
- * Two of these findings are **closed**, and their tests stayed — without their
+ * Three of these findings are **closed**, and their tests stayed — without their
  * annotations — as regression pins:
  *
  *   - **T3-1** (a finished sitting reported as `abandoned`) — fixed in
  *     `resolveCompletionState`.
  *   - **T3-2** (the nav shell stacking screens without bound) — fixed by
  *     `router.replace` in `NavShell`.
+ *   - **T4-2** (no `SessionClosed` reaching the durable log at all) — fixed by
+ *     the WP-10 export lane: `AppStore.persistMinted` takes a sealed batch of
+ *     kernel-minted events, so the store can accept the sitting without becoming
+ *     able to accept a forgery (COORD-B8-2 closed).
  *
- * Three remain open and annotated. Two of them are narrower successors rather
- * than survivors: closing a defect here has twice revealed a smaller one behind
+ * Two remain open and annotated. Both are narrower successors rather than
+ * survivors: closing a defect here has repeatedly revealed a smaller one behind
  * it, and recording that is the point of the file.
  *
- *   - **T4-2 (P2)** — no `SessionClosed` reaches the durable log at all
- *     (COORD-B8-2). Found by fixing T3-1.
  *   - **T4-1b (P2)** — the pre-hydration bytes still ship an empty `<title>`.
  *     Left by fixing T4-1.
  *   - **T3-3 (P2)** — an abandoned AI request still attaches a candidate.
@@ -111,36 +113,34 @@ test('T3-1: a sitting with every step answered is recorded as completed', async 
 });
 
 /**
- * The same claim, seen from the durable log rather than the screen — and it does
- * **not** hold, for a different reason than T3-1.
+ * **T4-2 (P2) — FIXED by the WP-10 export lane. This test is now a regression pin.**
  *
- * Kept separate because the screen and the log are two different claims: one is
- * what the learner is told, the other is what the export and the evidence
- * inspector will say about this sitting forever. Fixing T3-1 fixed the first.
- * The second fails one step earlier: **no `SessionClosed` event reaches the
- * durable log at all**, whatever its completion state.
+ * The same claim as T3-1, seen from the durable log rather than the screen, and
+ * kept separate because they are two different claims: one is what the learner is
+ * told, the other is what the export and the evidence inspector will say about
+ * this sitting forever. Fixing T3-1 fixed only the first. This one used to fail
+ * one step earlier — **no `SessionClosed` event reached the durable log at all**,
+ * whatever its completion state — and it was marked `test.fail` with the reason.
  *
- * *Why.* The sitting's events live in the session screen's workspace beside the
- * durable log rather than in it. That is `SESSION_INTEGRATION_NOTE` in
- * `src/screens/session-loop.ts`, stated on screen to the learner, and it is open
- * coordination request **COORD-B8-2**: joining them needs a way for the store to
- * accept events it did not mint, which would be the evidence-gate bypass
- * controller §5 exists to close and §21.3(5) makes a stop condition. It needs a
- * provenance marker in the kernel first, so it belongs to whoever owns that
- * package's design — not to this closeout, and not to a lane that is tests only.
+ * *The defect.* The sitting's events lived in the session screen's workspace
+ * beside the durable log rather than in it (`SESSION_INTEGRATION_NOTE`,
+ * COORD-B8-2). Joining them was refused, correctly, because it looked like giving
+ * the store an `ingest(events)` — the evidence-gate bypass controller §5 exists
+ * to close and §21.3(5) makes a stop condition.
  *
- * Recorded here as its own finding (**T4-2, P2**) rather than folded into T3-1,
- * because "the screen lies about the sitting" and "the sitting is not in the
- * export" are different defects with different owners, and merging them would
- * have let fixing one look like fixing both.
+ * *The fix.* The kernel now records the exact objects its minters return
+ * (`packages/domain/src/events/mint-registry.ts`) and `AppStore.persistMinted`
+ * takes only a sealed batch, so the store accepts events it did not mint *and*
+ * cannot accept events the kernel did not mint. The events are still minted where
+ * they always were: by `applySessionCommand`, evidence-class ones through the
+ * gate. `apps/app/test/persist-minted-boundary.test.ts` attacks the new path.
+ *
+ * *What this pin asserts.* Not merely that a `SessionClosed` exists, but that it
+ * carries `completed` — so it fails again if either half regresses: the sitting
+ * dropping out of the log (T4-2), or the completion state going back to
+ * `abandoned` for a sitting the learner finished (T3-1).
  */
 test('T3-1: the SessionClosed event records the sitting as completed', async ({ page, app }) => {
-  test.fail(
-    true,
-    'T4-2 (P2): no SessionClosed event reaches the durable log — the sitting is held in the ' +
-      'session workspace, not the log (COORD-B8-2, still open).',
-  );
-
   await openApp(page, app.origin);
   await keepWord(page, '分岐');
   await takeUpForStudy(page);

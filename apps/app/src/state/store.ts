@@ -48,6 +48,7 @@ import type {
   DerivedState,
   DomainEvent,
   DomainEventType,
+  MintedEventBatch,
   PromotionState,
   ProvenanceRecord,
   RetrievalSkill,
@@ -438,8 +439,24 @@ export type UnlistedAppCommandKind<
  * message — see `src/observability/ring.ts` for why the record type is where
  * that argument is settled rather than at each call site.
  */
+/**
+ * The persist path's name in the diagnostic record (WP-10).
+ *
+ * `persistMinted` is not a command — it mints nothing and decides nothing — so
+ * it cannot join `APP_COMMAND_KINDS` without breaking the `satisfies` check that
+ * keeps that list and the `AppCommand` union in step. It still appends events,
+ * and controller §12 asks for event appends to be observable, so it gets a name
+ * of its own beside the command kinds rather than borrowing one.
+ */
+export const PERSIST_OPERATION_KIND = 'persistMinted';
+
+/** Everything the observability ring can be told about, commands and appends alike. */
+export const OBSERVED_OPERATION_KINDS = [...APP_COMMAND_KINDS, PERSIST_OPERATION_KIND] as const;
+
+export type ObservedOperationKind = (typeof OBSERVED_OPERATION_KINDS)[number];
+
 export interface CommandObservation {
-  readonly commandKind: AppCommandKind;
+  readonly commandKind: ObservedOperationKind;
   /** Wall time the store spent inside `execute`, from an injected counter. */
   readonly latencyMs: number;
   /** Event families appended, in order. Types only — never payloads. */
@@ -559,6 +576,26 @@ export interface CommandAck {
   readonly durability: DurabilityLevel;
 }
 
+/**
+ * What `persistMinted` reports (WP-10).
+ *
+ * Deliberately not a {@link CommandAck}: there is no `threadId`, because a batch
+ * can span several threads or none, and inventing one would be the store
+ * guessing. `appended` and `alreadyPresent` are separated rather than summed so
+ * a caller can tell "nothing new" from "nothing offered" — the difference
+ * between a re-persist of a workspace the store already holds and a bug.
+ */
+export interface PersistAck {
+  /** Events this call added to the log, in the order the batch listed them. */
+  readonly appended: readonly DomainEvent[];
+  /** Events skipped because their idempotency key was already applied. */
+  readonly alreadyPresent: readonly DomainEvent[];
+  /** The instant the store finished, from the injected clock. */
+  readonly acknowledgedAt: string;
+  /** What the acknowledgment is worth. Rendered, never upgraded. */
+  readonly durability: DurabilityLevel;
+}
+
 export interface AppStore {
   /** What the store guarantees about an acknowledged write. */
   readonly durability: DurabilityLevel;
@@ -571,6 +608,55 @@ export interface AppStore {
    * @throws EventValidationError when the command cannot produce a valid event.
    */
   readonly execute: (command: AppCommand) => CommandAck;
+  /**
+   * Persist events the **kernel** minted somewhere else in this process
+   * (WP-10; REQ-ARCH-04, REQ-ARCH-08, COORD-B8-2).
+   *
+   * ## What this closes
+   *
+   * The session, the integration canvas and the repair branch drive
+   * `@bunki/domain`'s own `applySessionCommand`, which mints their events —
+   * evidence-class ones through the evidence gate, which stamps the tier and
+   * forces `again` on a reveal. Those events were then held in a React screen's
+   * state and never reached the log, so a learner could complete the whole loop
+   * and find none of it in the export or the inspector. That is
+   * definition-of-done §2 item 4 ("export exists but doesn't replay") and it is
+   * what this method exists to fix.
+   *
+   * ## Why it is not an evidence-gate bypass
+   *
+   * It is **persist-only**. It has no `context`, reaches no factory and no
+   * minter, and there is no argument it accepts that names a grade, a tier, a
+   * contract or a thread. It cannot bring an event into existence; it can only
+   * write down one that already exists.
+   *
+   * And it cannot be handed a foreign one. {@link MintedEventBatch} is opaque —
+   * `@bunki/domain` builds it in `sealMintedEvents`, which refuses any member
+   * this kernel did not mint in this process and any member that was altered
+   * after minting. A screen cannot construct the container (its payload sits
+   * under a module-private symbol) and cannot forge a member (the registry is
+   * keyed on object identity plus the bytes recorded at mint time).
+   *
+   * So the invariant controller §5 states is unchanged: *every append flows
+   * through the domain command handler, which routes evidence-class events
+   * through the evidence gate.* The session's appends flow through
+   * `applySessionCommand`, which is that handler; this method is the wire from
+   * its output to the log, not a second door into it.
+   *
+   * ## What it still does not do
+   *
+   * It makes no judgement. Whether any of these observations reaches FSRS is
+   * `admitToScheduler`'s answer at replay, over the whole log, exactly as for
+   * every other event. Persisting a refused review is correct and intended — the
+   * inspector has to be able to show why something did not count.
+   *
+   * Idempotent by each event's own key: re-offering a batch the store already
+   * holds appends nothing and reports them under `alreadyPresent`.
+   *
+   * @throws ForeignEventError if the batch, or anything in it, did not come from
+   *   this kernel's minters unaltered.
+   */
+  readonly persistMinted: (batch: MintedEventBatch) => PersistAck;
   /** The full event log, in append order. Read-only; screens never append here. */
   readonly readAll: () => readonly DomainEvent[];
   /**
