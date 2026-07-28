@@ -1,49 +1,71 @@
 /**
- * Screen 2 — word page (WP-05; controller §10.2, REQ-UI-02).
+ * Screen 2 — the word page (WP-05, rebuilt for Campaign E lane B3;
+ * controller §10.2, REQ-UI-02).
  *
- * REQ-UI-02 defines four layers. This screen renders layers 0 and 1 in full,
- * and layers 2 and 3 exactly as far as the Phase-0 seed honestly reaches —
- * which is controller §19 WP-05's own boundary: "not done: any layer-2/3
- * content the seed cannot support honestly."
+ * ## What changed, and why
  *
- * What "honestly" costs here is worth being explicit about, because the
- * temptation is to fill a section with something plausible:
+ * The Phase-0 version of this screen was a correct lookup result: four labelled
+ * layers, one toggle, and a list of fields. The campaign brief's bar is the
+ * operator's own sentence — *"a kanji page should feel like a museum card, not
+ * a spreadsheet row"* — and at dictionary scale a lookup result is exactly the
+ * spreadsheet row: 取る has 63 English wordings, 気 has 76 words it can be
+ * confused with, and a flat page renders both as a wall.
  *
- *   - **pitch accent** is layer 2 "only when a licensed source is selected".
- *     None is. The section renders as an unfilled layer with the reason, not as
- *     an omission and not as a guess.
- *   - **frequency, JLPT, full JMdict fields** are layer 3. The seed carries
- *     none of them; no lexical source could be licence-verified in this build
- *     (ORCHESTRATION_LOG operator action, seed LICENSES.md D-1/D-2).
- *   - **"recent related encounters"** is layer 1 and is rendered from the
- *     learner's own threads in the store — real data, possibly empty, never
- *     padded with seed words pretending to be encounters.
- *   - **"one high-value explanation or contrast"** is rendered only when a seed
- *     grammar construction actually references this lexeme. There is no
- *     generated explanation on this screen; that is WP-07's candidate path and
- *     it does not exist yet.
+ * So this is the same four layers of REQ-UI-02, laid out as a card with depth
+ * behind it. The layer test ids are kept (`word-layer-0` … `word-layer-3`)
+ * because the layers are still the skeleton and other harnesses resolve them:
  *
- * The seed's own `SEED_ENTRY_DISCLOSURE` sits above layer 0, because everything
- * below it — readings, senses, part of speech — is project-authored pending
- * licensed sources, and a page that looks like a dictionary page while that is
- * true would be the false claim REQ-GATE-03 forbids.
+ *   - **Layer 0** is now a `MuseumCard`: the headword large in mincho with its
+ *     reading as first-class furigana, one gloss as the caption, the catalogue
+ *     small and beneath, and memory state as five meters — one per capability
+ *     lens, never one number for the word (REQ-UI-07, REQ-LM-03).
+ *   - **Layer 2** — what is around the word — is now four sections, each behind
+ *     a `Disclosure` that states how many things are inside and why: the
+ *     wordings, the characters (each with its own memory state, so a bright
+ *     word built from a dark character is visible), the family, the contrast
+ *     set, and the sentences it actually appears in.
+ *   - **Layer 1** — this encounter — is unchanged in substance: the thread, the
+ *     mark, the promotion gesture and the bounded AI candidate.
+ *   - **Layer 3** is the provenance table and the honest gaps.
+ *
+ * ## What this screen may and may not do
+ *
+ * It reads and it submits commands. It mints nothing. The memory state it draws
+ * comes from `@bunki/domain`'s own projection over the kernel's derived state
+ * (`src/ui/word/memory.ts`), which is a read: opening this page produces no
+ * event, no grade, and no change to anything scheduled — tapping through the
+ * characters is exposure, and exposure is never retrieval (REQ-DM-07, T-08).
+ * The only writes on the page are the promotion buttons and accepting a
+ * candidate, and both go through `AppStore.execute`.
+ *
+ * ## What is still honestly missing
+ *
+ *   - **Per-sense grouping and per-sense part of speech.** JMdict has both;
+ *     this build's importer flattens glosses across senses and collects parts of
+ *     speech at the entry level, and `src/ui/word/glosses.ts` refuses to fake
+ *     the structure back. The page says so where a reader would otherwise
+ *     assume it.
+ *   - **Pitch accent, conjugation tables, frequency and JLPT labels.** No
+ *     licensed source for the first, no per-entry data for the rest.
+ *   - **Audio.** None in this build.
  */
 
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
-  constituentKanji,
   findLexemeById,
+  importedDictionary,
   importedSentencesFor,
   passageForLexeme,
+  seedDataset,
   sentencesForLexeme,
-  wordFamily,
+  tierOf,
   type SeedLexeme,
 } from '../data/catalog.ts';
-import { importedSentenceProvenance } from '../data/imported-tier.ts';
+import { importedExtras, importedSentenceProvenance } from '../data/imported-tier.ts';
+import { attributionLines, distinctProvenance } from '../data/provenance.ts';
 import type { ProvenanceRecord } from '@bunki/seed';
-import { importedDictionary, seedDataset } from '../data/catalog.ts';
 import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
 import {
   useAiRuntime,
@@ -53,6 +75,7 @@ import {
   useDebugFlags,
 } from '../state/app-context.tsx';
 import { DEFERRED_BY_ID } from '../state/deferred.ts';
+import { createSystemClock } from '../state/runtime.ts';
 import { UNCERTAINTY_LABELS, uncertaintyLogNote } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import {
@@ -62,11 +85,19 @@ import {
   UnsupportedLayer,
 } from '../ui/notices.tsx';
 import { AppButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
-import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
 import { SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
+import { LensRow } from '../ui/lens.tsx';
+import { CAPABILITY_IDS, type CapabilityId } from '../ui/capability.ts';
+import { componentIdsFor, readWordMemory } from '../ui/word/memory.ts';
+import { contrastSet, familyByKanji, kanjiInWord } from '../ui/word/neighbourhood.ts';
+import { WordHero } from '../ui/word/word-hero.tsx';
+import { WordKanji } from '../ui/word/word-kanji.tsx';
+import { WordSenses } from '../ui/word/word-senses.tsx';
+import { WordContrast, WordFamily } from '../ui/word/word-relations.tsx';
+import { WordSentences } from '../ui/word/word-sentences.tsx';
 
 export interface WordScreenProps {
   readonly lexemeId: string;
@@ -74,6 +105,9 @@ export interface WordScreenProps {
   readonly onOpenWord: (lexemeId: string) => void;
   readonly onBack: () => void;
 }
+
+/** The one lens the character rows are about when the page opens. */
+const DEFAULT_LENS: CapabilityId = 'reading';
 
 export function WordScreen({
   lexemeId,
@@ -85,7 +119,8 @@ export function WordScreen({
   const flags = useDebugFlags();
   const store = useAppStore();
   const snapshot = useAppSnapshot();
-  const [showDeeper, setShowDeeper] = useState(false);
+  const [lens, setLens] = useState<CapabilityId>(DEFAULT_LENS);
+  const [expandAll, setExpandAll] = useState(false);
 
   const resolve = useCallback(() => findLexemeById(lexemeId), [lexemeId]);
   const { state, retry } = useLookup<SeedLexeme>(resolve, {
@@ -111,6 +146,27 @@ export function WordScreen({
     existing: snapshot.candidatesByThread[candidateThread?.state.threadId ?? '']?.[0] ?? null,
   });
   const connectivity = useConnectivity();
+
+  /*
+    The evidence this page draws, read once per applied command.
+
+    `readDerived` is the kernel's own replay; `readWordMemory` builds the
+    projection index over it once and answers for the word and for every
+    character from that one index. The instant comes from `createSystemClock`,
+    which is the app's single seam onto the wall clock (`src/state/runtime.ts`);
+    a screen that called `Date.now()` itself would make that file's statement
+    about being the only reader false.
+  */
+  const memory = useMemo(() => {
+    const derived = store.readDerived();
+    return readWordMemory({
+      contracts: derived.contracts,
+      memoryStates: derived.memoryStates,
+      at: createSystemClock().now(),
+    });
+    // `snapshot.revision` bumps on every applied command, which is exactly when
+    // the answer can change; `store` is stable for the app's lifetime.
+  }, [store, snapshot.revision]);
 
   if (state.kind === 'loading') {
     return (
@@ -139,13 +195,15 @@ export function WordScreen({
   }
 
   const lexeme = state.data;
-  const kanji = constituentKanji(lexeme);
-  const family = wordFamily(lexeme);
-  const examples = sentencesForLexeme(lexeme.id);
+  const characters = kanjiInWord(lexeme);
+  const family = familyByKanji(lexeme);
+  const contrasts = contrastSet(lexeme);
+  const worked = sentencesForLexeme(lexeme.id);
   const passage = passageForLexeme(lexeme.id);
   // Tatoeba pairs, for an imported word. Empty for a fixture word, whose eight
-  // worked examples are this project's own writing and render above.
+  // worked examples are this project's own writing.
   const tatoeba = importedSentencesFor(lexeme);
+  const extras = importedExtras(lexeme.id);
   // Same lookup the candidate hook above already did; reused rather than
   // repeated so the panel and the page can never disagree about which thread
   // this word belongs to.
@@ -157,42 +215,200 @@ export function WordScreen({
   // one that names this word's construction. Nothing is generated here.
   const construction =
     seedDataset.grammar.find((entry) =>
-      examples.some((sentence) => sentence.constructionIds.includes(entry.id)),
+      worked.some((sentence) => sentence.constructionIds.includes(entry.id)),
     ) ?? null;
+
+  /*
+    The node this word's evidence hangs on.
+
+    A Phase-0 KnowledgeComponent is identified by the exact text that was
+    captured, so the headword is the id when the learner searched for the word,
+    and a thread's own captured text is the id when they selected it out of
+    something longer. Both are offered; a component nothing was ever captured
+    against simply has no contracts and reads as unmeasured.
+  */
+  const wordComponentIds = componentIdsFor([
+    lexeme.headword,
+    ...snapshot.threads
+      .filter((candidate) => candidate.lexemeId === lexeme.id)
+      .map((candidate) => candidate.displayText),
+  ]);
+  const wordLenses = memory.lensViewsFor(wordComponentIds);
+  const kanjiRows = characters.map((entry) => ({
+    entry,
+    lens: memory.lensViewFor(componentIdsFor([entry.character]), lens),
+  }));
 
   const promote = (to: 'keep' | 'learn' | 'master'): void => {
     if (thread === null) return;
     store.execute({ kind: 'promote', threadId: thread.state.threadId, to });
   };
 
+  const attribution = distinctProvenance([
+    lexeme.provenance.headword,
+    lexeme.provenance.reading,
+    lexeme.provenance.senses,
+    lexeme.provenance.partOfSpeech,
+  ]).map((record) => ({
+    field: `${record.source} · ${record.license}`,
+    source: attributionLines(record).join(' '),
+  }));
+
+  const catalogue = [
+    lexeme.partOfSpeech.length === 0
+      ? 'Part of speech not recorded for this entry.'
+      : lexeme.partOfSpeech.join(' · '),
+    `Written with ${lexeme.kanjiUsed.length === 0 ? 'no kanji' : lexeme.kanjiUsed.join('・')}`,
+    `${tierOf(lexeme.id)} tier${extras === null ? '' : ` · JMdict entry ${extras.sourceEntryId}`}`,
+  ];
+
   return (
     <ScreenShell
       lede={<SeedEntryDisclosure />}
-      subtitle="Layers 0 and 1 in full; layers 2 and 3 as far as the Phase-0 seed reaches."
+      subtitle="The entry, the characters it is built from, what it is confused with, and where it appears."
       testID="screen-word"
       title="Word"
     >
       {/* ------------------------------------------------ Layer 0 */}
-      <View
-        style={[
-          styles.hero,
-          { backgroundColor: theme.color.raised, borderColor: theme.color.ruleStrong },
-        ]}
-        testID="word-layer-0"
-      >
-        <RubyText
+      <View testID="word-layer-0">
+        <WordHero
+          attribution={attribution}
+          caption={lexeme.senses[0] ?? ''}
+          catalogue={catalogue}
+          headword={lexeme.headword}
+          lenses={wordLenses}
           reading={lexeme.reading}
-          size={TYPE.headword}
-          testID="word-headword"
-          written={lexeme.headword}
+          standing="Readings and senses are JMdict’s, flattened by this build’s importer. Memory state is this device’s own event log, read through the kernel’s projection — nothing on this card is a claim about how the word is used."
         />
-        <Text style={[styles.gloss, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          {lexeme.senses[0] ?? ''}
-        </Text>
-        <ProvenanceLine field="senses" record={lexeme.provenance.senses} />
-        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-          {lexeme.partOfSpeech.join(' · ')}
-        </Text>
+      </View>
+
+      {/* ------------------------------------------------ Layer 2 */}
+      <View style={styles.depth} testID="word-layer-2">
+        <WordSenses
+          glosses={lexeme.senses}
+          partOfSpeech={lexeme.partOfSpeech}
+          priorityTags={extras?.priorityTags ?? []}
+        />
+
+        <Section
+          note="Choose the capability the character rows below are about. Exactly one at a time — five capabilities blended into one light is the mastery score this app does not have."
+          testID="word-lens-picker"
+          title="The characters it is written with"
+        >
+          <LensRow
+            active={lens}
+            available={CAPABILITY_IDS}
+            onChange={setLens}
+            testID="word-lens-row"
+          />
+          <WordKanji capability={lens} onOpenKanji={onOpenKanji} rows={kanjiRows} />
+        </Section>
+
+        <AppButton
+          accessibilityHint={
+            expandAll
+              ? 'Closes the family, contrast and sentence sections.'
+              : 'Opens the family, contrast and sentence sections at once.'
+          }
+          label={expandAll ? 'Close every section' : 'Open every section'}
+          onPress={() => setExpandAll((was) => !was)}
+          testID="word-toggle-deeper"
+        />
+
+        {/*
+          Keyed on the toggle so that flipping it re-mounts the sections with a
+          new initial state. `Disclosure` owns its own open/closed state, which
+          is right — a section a learner opened should stay open — and this is
+          the one gesture that is allowed to override all of them at once.
+        */}
+        <View key={expandAll ? 'all-open' : 'as-chosen'} style={styles.depth}>
+          <WordFamily groups={family} onOpenWord={onOpenWord} />
+          <WordContrast onOpenWord={onOpenWord} set={contrasts} />
+          <WordSentences
+            tatoeba={tatoeba}
+            tatoebaProvenance={(importedSentenceProvenance['japanese'] as ProvenanceRecord) ?? null}
+            worked={worked}
+          />
+        </View>
+
+        {passage === null ? null : (
+          <Section
+            note="The hand-written thematic passage this word appears in. The interactive reading canvas over it is the session's surface, not this page's."
+            testID="word-passage"
+            title="In the seed passage"
+          >
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.cardTitle,
+                  { color: theme.color.ink, fontFamily: theme.font.mincho },
+                ]}
+              >
+                {passage.title}
+              </Text>
+              <Text
+                style={[
+                  styles.example,
+                  {
+                    color: theme.color.ink,
+                    fontFamily: theme.font.mincho,
+                    lineHeight: TYPE.body * theme.leading.japanese,
+                  },
+                ]}
+              >
+                {passage.body}
+              </Text>
+              <ProvenanceLine field="body" record={passage.provenance.body} />
+            </View>
+          </Section>
+        )}
+      </View>
+
+      <Hairline />
+
+      {/* ------------------------------------------------ Layer 1 */}
+      <Section
+        note="The encounter that started this thread, what looked uncertain, and what to do next."
+        testID="word-layer-1"
+        title="This encounter"
+      >
+        {thread === null ? (
+          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+            No encounter recorded for this word in this session.
+          </Text>
+        ) : (
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
+            ]}
+          >
+            <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
+              {thread.displayText}
+            </Text>
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            >
+              Captured {thread.capturedAt} · source: manual entry ·{' '}
+              {String(thread.state.encounterIds.length)} encounter(s)
+            </Text>
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID="word-uncertainty"
+            >
+              {thread.uncertainty === null
+                ? thread.markRecordedInLog
+                  ? uncertaintyLogNote(null, { kept: true, markRecordedInLog: true })
+                  : 'Nothing marked uncertain.'
+                : `Marked uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}. ${uncertaintyLogNote(thread.uncertainty, { kept: true })}`}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.promotionRow}>
           <Text
@@ -228,52 +444,6 @@ export function WordScreen({
           )}
         </View>
 
-        <UnsupportedLayer
-          reason={DEFERRED_BY_ID['WP05-D5']?.reason ?? 'No local audio in the Phase-0 seed.'}
-          testID="word-audio-unfilled"
-          title="Audio (Layer 0, “when local”)"
-        />
-      </View>
-
-      {/* ------------------------------------------------ Layer 1 */}
-      <Section
-        note="The encounter that started this thread, what looked uncertain, and what to do next."
-        testID="word-layer-1"
-        title="Layer 1 — this encounter"
-      >
-        {thread === null ? (
-          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
-            No encounter recorded for this word in this session.
-          </Text>
-        ) : (
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
-            ]}
-          >
-            <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.mincho }]}>
-              {thread.displayText}
-            </Text>
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              Captured {thread.capturedAt} · source: manual entry ·{' '}
-              {String(thread.state.encounterIds.length)} encounter(s)
-            </Text>
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              testID="word-uncertainty"
-            >
-              {thread.uncertainty === null
-                ? thread.markRecordedInLog
-                  ? uncertaintyLogNote(null, { kept: true, markRecordedInLog: true })
-                  : 'Nothing marked uncertain.'
-                : `Marked uncertain: ${UNCERTAINTY_LABELS[thread.uncertainty.dimension]}. ${uncertaintyLogNote(thread.uncertainty, { kept: true })}`}
-            </Text>
-          </View>
-        )}
-
         {construction === null ? (
           <UnsupportedLayer
             reason="No seed grammar construction is attached to this word’s example sentences. The panel below can ask for a generated one, which arrives labelled as a candidate and is never a canonical field on this page."
@@ -307,10 +477,9 @@ export function WordScreen({
           </View>
         )}
 
-        {/* The bounded AI exchange (WP-07, mounted in WP-10 per that package's
-            coordination request 1). It sits *below* the seed's own explanation
-            deliberately: what the seed can say with provenance comes first, and
-            the generated candidate is an addition to it rather than a
+        {/* The bounded AI exchange (WP-07). It sits *below* the seed's own
+            explanation deliberately: what the seed can say with provenance comes
+            first, and the generated candidate is an addition to it rather than a
             replacement for it. Everything the panel renders is labelled by
             `@bunki/ai`'s own view model (T-12), and accepting one is an explicit
             press that produces `CandidateAcceptedAsNote` — never a canonical
@@ -354,278 +523,40 @@ export function WordScreen({
             </RowButton>
           ))
         )}
-
-        <Text style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-          Constituent kanji
-        </Text>
-        {kanji.map((entry) => (
-          <RowButton
-            accessibilityHint="Opens the kanji page with its stroke order."
-            accessibilityLabel={`Kanji ${entry.character}: ${entry.meanings.join(', ')}`}
-            key={entry.id}
-            onPress={() => onOpenKanji(entry.character)}
-            testID={`word-kanji-${entry.character}`}
-          >
-            <Text
-              style={[styles.rowKanji, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
-            >
-              {entry.character}
-            </Text>
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {entry.meanings.join(' · ')} · {String(entry.strokeCount)} strokes
-            </Text>
-          </RowButton>
-        ))}
       </Section>
 
       <Hairline />
 
-      <AppButton
-        accessibilityHint={
-          showDeeper
-            ? 'Hides layers 2 and 3.'
-            : 'Shows other senses, examples, and full provenance.'
-        }
-        label={showDeeper ? 'Hide layers 2 and 3' : 'Show layers 2 and 3'}
-        onPress={() => setShowDeeper((value) => !value)}
-        testID="word-toggle-deeper"
-      />
-
-      {!showDeeper ? null : (
-        <>
-          {/* ---------------------------------------------- Layer 2 */}
-          <Section
-            note="What the seed supports: other senses, the word family, and authentic-form examples written for this project."
-            testID="word-layer-2"
-            title="Layer 2 — around the word"
-          >
-            <Text
-              style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}
-            >
-              Other senses
-            </Text>
-            {lexeme.senses.length <= 1 ? (
-              <Text
-                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              >
-                The seed records one sense for this word.
-              </Text>
-            ) : (
-              <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-                {lexeme.senses.slice(1).join(' · ')}
-              </Text>
-            )}
-
-            <Text
-              style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}
-            >
-              Word family (shares a kanji)
-            </Text>
-            {family.length === 0 ? (
-              <Text
-                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              >
-                No other seed word shares a kanji with this one.
-              </Text>
-            ) : (
-              family.map((relative) => (
-                <RowButton
-                  accessibilityHint="Opens that word’s page."
-                  accessibilityLabel={`${relative.headword}, read ${relative.reading}: ${relative.senses.join(', ')}`}
-                  key={relative.id}
-                  onPress={() => onOpenWord(relative.id)}
-                >
-                  <RubyText
-                    reading={relative.reading}
-                    serif={false}
-                    size={TYPE.body}
-                    written={relative.headword}
-                  />
-                  <Text
-                    style={[
-                      styles.meta,
-                      { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                    ]}
-                  >
-                    {relative.senses.slice(0, 3).join(' · ')}
-                  </Text>
-                </RowButton>
-              ))
-            )}
-
-            <Text
-              style={[styles.subheading, { color: theme.color.ink, fontFamily: theme.font.sans }]}
-            >
-              Examples
-            </Text>
-            {examples.length === 0 && tatoeba.length === 0 ? (
-              <Text
-                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              >
-                No seed sentence references this word.
-              </Text>
-            ) : (
-              examples.map((sentence) => (
-                <View
-                  key={sentence.id}
-                  style={[
-                    styles.card,
-                    { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.example,
-                      { color: theme.color.ink, fontFamily: theme.font.mincho },
-                    ]}
-                  >
-                    {sentence.japanese}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.meta,
-                      { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                    ]}
-                  >
-                    {sentence.english}
-                  </Text>
-                  <ProvenanceLine field="japanese" record={sentence.provenance.japanese} />
-                </View>
-              ))
-            )}
-
-            {/*
-              Tatoeba examples, for an imported word.
-
-              CC BY 2.0 FR attributes the individual author, not the corpus, and
-              a Japanese sentence and its English translation are two works by
-              two different people. So each half names its own contributor on the
-              card the learner is looking at — a credit that lived only in
-              LICENSES.md would not be the attribution this licence asks for, for
-              the same reason §3 of the EDRDG statement is not satisfied by a
-              file. A pair that could not name both was never imported; the count
-              that cost is in the dataset manifest.
-            */}
-            {tatoeba.map((sentence) => (
-              <View
-                key={sentence.id}
-                style={[
-                  styles.card,
-                  { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
-                ]}
-                testID={`word-tatoeba-${sentence.id}`}
-              >
-                <Text
-                  style={[
-                    styles.example,
-                    { color: theme.color.ink, fontFamily: theme.font.mincho },
-                  ]}
-                >
-                  {sentence.japanese}
-                </Text>
-                <Text
-                  style={[
-                    styles.meta,
-                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                  ]}
-                >
-                  {sentence.english}
-                </Text>
-                <Text
-                  style={[
-                    styles.meta,
-                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                  ]}
-                  testID={`word-tatoeba-credit-${sentence.id}`}
-                >
-                  Tatoeba #{sentence.tatoeba.japaneseId} by {sentence.tatoeba.japaneseContributor} ·
-                  translation #{sentence.tatoeba.englishId} by {sentence.tatoeba.englishContributor}{' '}
-                  · CC BY 2.0 FR
-                </Text>
-                <ProvenanceLine
-                  field="japanese"
-                  record={importedSentenceProvenance['japanese'] as ProvenanceRecord}
-                />
-              </View>
-            ))}
-
-            {passage === null ? null : (
-              <>
-                <Text
-                  style={[
-                    styles.subheading,
-                    { color: theme.color.ink, fontFamily: theme.font.sans },
-                  ]}
-                >
-                  In the seed passage
-                </Text>
-                <View
-                  style={[
-                    styles.card,
-                    { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.cardTitle,
-                      { color: theme.color.ink, fontFamily: theme.font.mincho },
-                    ]}
-                  >
-                    {passage.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.example,
-                      { color: theme.color.ink, fontFamily: theme.font.mincho },
-                    ]}
-                  >
-                    {passage.body}
-                  </Text>
-                  <ProvenanceLine field="body" record={passage.provenance.body} />
-                  <Text
-                    style={[
-                      styles.meta,
-                      { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                    ]}
-                  >
-                    The interactive reading canvas over this passage is a later work package; here
-                    it is shown as text.
-                  </Text>
-                </View>
-              </>
-            )}
-
-            <UnsupportedLayer
-              reason="REQ-UI-02 places pitch accent in Layer 2 “only when a licensed source is selected”. No pitch-accent source is selected, so nothing is shown rather than guessed."
-              testID="word-pitch-unfilled"
-              title="Pitch accent"
-            />
-            <UnsupportedLayer
-              reason="Collocations, register notes and confusables need a corpus or a licensed dictionary. The Phase-0 seed has neither."
-              testID="word-collocations-unfilled"
-              title="Collocations, register, confusables"
-            />
-          </Section>
-
-          {/* ---------------------------------------------- Layer 3 */}
-          <Section
-            note="Everything the seed can say about where each field came from."
-            testID="word-layer-3"
-            title="Layer 3 — provenance and attribution"
-          >
-            <ProvenanceTable provenance={lexeme.provenance} testID="word-provenance-table" />
-            <UnsupportedLayer
-              reason={
-                DEFERRED_BY_ID['WP05-D3']?.reason ?? 'No licensed dictionary source is available.'
-              }
-              testID="word-jmdict-unfilled"
-              title="Full dictionary fields, conjugation tables, frequency and JLPT labels"
-            />
-          </Section>
-        </>
-      )}
+      {/* ------------------------------------------------ Layer 3 */}
+      <Section
+        note="Everything this build can say about where each field came from, and the fields it has no source for."
+        testID="word-layer-3"
+        title="Provenance and the gaps"
+      >
+        <ProvenanceTable provenance={lexeme.provenance} testID="word-provenance-table" />
+        <UnsupportedLayer
+          reason={DEFERRED_BY_ID['WP05-D5']?.reason ?? 'No local audio in the Phase-0 seed.'}
+          testID="word-audio-unfilled"
+          title="Audio"
+        />
+        <UnsupportedLayer
+          reason="REQ-UI-02 places pitch accent in Layer 2 “only when a licensed source is selected”. No pitch-accent source is selected, so nothing is shown rather than guessed."
+          testID="word-pitch-unfilled"
+          title="Pitch accent"
+        />
+        <UnsupportedLayer
+          reason="JMdict groups its glosses into numbered senses and tags each sense with its own part of speech. This build’s importer flattens the glosses into one list and collects the parts of speech at the entry level, so the grouping is not available to render. Restoring it is an importer change, not a screen change."
+          testID="word-sense-grouping-unfilled"
+          title="Numbered senses, each with its own part of speech"
+        />
+        <UnsupportedLayer
+          reason={
+            DEFERRED_BY_ID['WP05-D3']?.reason ?? 'No licensed dictionary source is available.'
+          }
+          testID="word-jmdict-unfilled"
+          title="Conjugation tables, frequency and JLPT labels"
+        />
+      </Section>
 
       <Hairline />
       <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
@@ -634,11 +565,8 @@ export function WordScreen({
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: SPACE.sm,
-    padding: SPACE.lg,
+  depth: {
+    gap: SPACE.lg,
   },
   card: {
     borderRadius: 6,
@@ -650,17 +578,12 @@ const styles = StyleSheet.create({
     fontSize: TYPE.body,
     fontWeight: '600',
   },
-  gloss: {
-    fontSize: TYPE.body,
-    lineHeight: TYPE.body * 1.6,
-  },
   body: {
     fontSize: TYPE.body,
     lineHeight: TYPE.body * 1.7,
   },
   example: {
     fontSize: TYPE.body,
-    lineHeight: TYPE.body * 1.9,
   },
   meta: {
     fontSize: TYPE.meta,
@@ -670,9 +593,6 @@ const styles = StyleSheet.create({
     fontSize: TYPE.label,
     fontWeight: '600',
     marginTop: SPACE.md,
-  },
-  rowKanji: {
-    fontSize: TYPE.headwordRow,
   },
   promotionRow: {
     gap: SPACE.sm,
