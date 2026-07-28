@@ -7693,7 +7693,7 @@ one wrapped row of eight, the count beside it, and the centre on screen.
 | `npm run lint` | pass |
 | `npm run format:check` | pass |
 | `npm run typecheck` | **failed; fixed above; passes now** |
-| `npm run test` | 2,466 passed / 5 timed out — see below |
+| `npm run test` | **116 files, 2,471 passed, 1 skipped, 0 failed** — see below |
 | `npm run test:replay` | pass (47) |
 | `npm run verify:export` | pass (14) |
 | `expo export --platform web` | pass |
@@ -7714,12 +7714,25 @@ keeps a word so the durable log is non-empty, flies the dive as hard as a finger
 can, and asserts the snapshot is **byte-identical** afterwards. A count would
 have passed a run that swapped one event for another; byte equality does not.
 
-**The five unit-test failures were all `Test timed out in 5000ms`**, in
-`dictionary.test.ts` (×2), `t13-plan-cannot-grow.test.ts`,
-`screen-contract.test.ts` and `boundaries.test.ts`. Two agents and two Playwright
-runs were on this box at once. Re-run in isolation, the same files give
-`Tests 107 passed (107)`. They are reported here as timeouts and not as passes,
-because that is what the run said.
+**`npm run test` was run three times and the middle run is worth recording**, not
+because it changes the verdict but because it explains a number a later reader
+would otherwise have to guess at.
+
+The first two runs each reported failures — three, then five — and **every one of
+them was `Test timed out in 5000ms`**, in `dictionary.test.ts`,
+`t13-plan-cannot-grow.test.ts`, `screen-contract.test.ts` and
+`boundaries.test.ts`. Two agents and two Playwright runs were on this container at
+once; those four files are the ones that parse the 4.7 MB stroke set or generate
+300 interleavings, so they are the ones a loaded box starves first.
+
+Re-run in isolation the same files gave `Tests 107 passed (107)`, and the third
+full run, on a quiet box, gave **116 files, 2,471 passed, 1 skipped, 0 failed**.
+That is the run in the table. The two loaded runs are recorded here rather than
+discarded, because "it passes when I run it alone" is exactly the sentence that
+should come with its evidence attached.
+
+The single skip is in `packages/domain/test/graph/era-corpus.test.ts`. It is lane
+A2′'s and pre-existing; this pass did not touch it and does not vouch for it.
 
 ### What this pass did not do
 
