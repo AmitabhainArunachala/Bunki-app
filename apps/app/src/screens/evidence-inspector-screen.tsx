@@ -463,12 +463,36 @@ export function EvidenceInspectorScreen({
             ) : (
               chain.rows.map((row) => <ChainRowView key={row.eventId} row={row} />)
             )}
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-              testID="evidence-demonstration-note"
-            >
-              {DEMONSTRATION_CHAIN_NOTE}
-            </Text>
+            {/*
+              Only when a demonstration row is actually in this chain.
+
+              The note says these observations were appended by the button below
+              it and are "not a record of you answering anything". That was true
+              of every chain the inspector could show while COORD-B8-2 was open,
+              because the session never reached the durable log and the button
+              was the only way to make the Observations list non-empty. WP-10
+              closed that seam, so the same unconditional note now tells a
+              learner who has just finished a sitting that the rows above — their
+              own graded answers — are demonstration output. That is REQ-GATE-03
+              in the second direction, and the exact inverse of definition of
+              done §2 item 6: not evidence with no gesture behind it, but a
+              gesture the app disowns.
+
+              Gated on the chain's own structural fact rather than on a flag the
+              screen sets, so the note and the rows it describes cannot disagree:
+              `demonstration.present` is derived in `evidence-chain.ts` from the
+              `promptFamilyVersion` the button stamps on its contract and the
+              `experienceId` prefix it stamps on its exposure — both read off the
+              events themselves.
+            */}
+            {chain.demonstration.present && (
+              <Text
+                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+                testID="evidence-demonstration-note"
+              >
+                {DEMONSTRATION_CHAIN_NOTE}
+              </Text>
+            )}
             <AppButton
               accessibilityHint="Appends a demonstration contract and three observations to this thread, through the kernel's own factories."
               label="Add a demonstration chain"

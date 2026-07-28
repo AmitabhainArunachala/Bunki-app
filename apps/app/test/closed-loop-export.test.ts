@@ -44,7 +44,7 @@ import {
 import { appVersionsForBuild, prepareExport } from '@bunki/export';
 
 import { DEFAULT_CANONICAL_TARGET, findLexemeByHeadword } from '../src/data/catalog.ts';
-import { buildEvidenceChain } from '../src/screens/evidence-chain.ts';
+import { buildEvidenceChain, type EvidenceChain } from '../src/screens/evidence-chain.ts';
 import {
   bootstrapSessionWorkspace,
   passageMarks,
@@ -379,6 +379,21 @@ describe('T-14 over real session data, not a fixture', () => {
   });
 });
 
+/** The inspector's own projection over a store, at the argument list the screen passes. */
+function inspect(store: AppStore, threadId: string, componentId: string): EvidenceChain {
+  const thread = store.getSnapshot().threadsById[threadId];
+  if (thread === undefined) throw new Error(`no thread ${threadId}`);
+  return buildEvidenceChain({
+    state: store.readDerived(),
+    log: store.readAll(),
+    thread: thread.state,
+    displayText: thread.displayText,
+    componentId,
+    uncertaintyMark: null,
+    uncertaintyLogNote: '',
+  });
+}
+
 describe('the evidence inspector can show the sitting it could not see before', () => {
   it('builds a chain containing the session’s own graded observations', async () => {
     const context = createDeterministicContext({ instants: ASOF, idPrefix: 'loop-inspect-' });
@@ -389,19 +404,7 @@ describe('the evidence inspector can show the sitting it could not see before', 
     const { target } = runSitting(durable.store, context);
     await durable.flush();
 
-    const snapshotView = durable.store.getSnapshot();
-    const thread = snapshotView.threadsById[threadId];
-    expect(thread).toBeDefined();
-
-    const chain = buildEvidenceChain({
-      state: durable.store.readDerived(),
-      log: durable.store.readAll(),
-      thread: thread!.state,
-      displayText: thread!.displayText,
-      componentId: target.componentId,
-      uncertaintyMark: null,
-      uncertaintyLogNote: '',
-    });
+    const chain = inspect(durable.store, threadId, target.componentId);
 
     // Rows, not an empty ledger. Before this lane the inspector had nothing to
     // show for a real sitting and the demonstration button was the only way to
@@ -418,5 +421,51 @@ describe('the evidence inspector can show the sitting it could not see before', 
       'captured→keep',
       'keep→learn',
     ]);
+  });
+
+  /**
+   * The flag the screen renders the demonstration note on, over the operator's
+   * own sitting (WP-10 repair P1).
+   *
+   * `demonstration.present` was already asserted false above, but only as one
+   * line inside a test about the chain being non-empty — and nothing said the
+   * *note* was rendered on it. The inspector rendered
+   * `DEMONSTRATION_CHAIN_NOTE` unconditionally, so a learner who had just
+   * answered two reviews was told those rows "were appended by the 'Add a
+   * demonstration chain' button … not by a study session". Both directions are
+   * pinned here on one log, because "the note is gone" is also a defect: a
+   * build that simply stopped disclosing the demonstration would satisfy the
+   * false half alone.
+   */
+  it('flips the demonstration flag only when the button has written to the chain', async () => {
+    const context = createDeterministicContext({ instants: ASOF, idPrefix: 'loop-demo-gate-' });
+    const snapshot: Snapshot = new Map();
+    const durable = await openStore(snapshot, context);
+
+    const threadId = takeUpForStudy(durable.store);
+    const { target } = runSitting(durable.store, context);
+    await durable.flush();
+
+    const afterSitting = inspect(durable.store, threadId, target.componentId);
+    // The sitting's own graded rows are in this chain…
+    expect(afterSitting.rows.some((row) => row.type === 'ReviewGraded')).toBe(true);
+    // …and the button wrote none of them, so the note must not be on screen.
+    expect(afterSitting.demonstration.present).toBe(false);
+    expect(afterSitting.demonstration.rowCount).toBe(0);
+
+    durable.store.execute({
+      kind: 'seedEvidenceDemonstration',
+      threadId,
+      acceptedAnswers: ['branching'],
+      skill: 'form_to_meaning',
+    });
+    await durable.flush();
+
+    const afterDemonstration = inspect(durable.store, threadId, target.componentId);
+    expect(afterDemonstration.demonstration.present).toBe(true);
+    expect(afterDemonstration.demonstration.rowCount).toBeGreaterThan(0);
+    // Not every admitted row: the learner's sitting is still in here, which is
+    // why the note has to name what the button wrote rather than the chain.
+    expect(afterDemonstration.demonstration.allAdmittedAreDemonstration).toBe(false);
   });
 });

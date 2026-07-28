@@ -265,6 +265,14 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   // do before, because the events were not in the log it reads.
   await expect(app.testId('evidence-chain')).toContainText('ReviewGraded');
 
+  // …and it does not disown it. The demonstration note says the rows above were
+  // appended by the button below them "not by a study session"; those rows are
+  // the sitting this test just walked, so the note being on screen here is the
+  // inverse of definition of done §2 item 6 — real gestures the app denies. It
+  // was true of every chain the inspector could render while COORD-B8-2 was
+  // open, which is exactly why the unconditional render survived until now.
+  await expect(app.testId('evidence-demonstration-note')).toHaveCount(0);
+
   // The chain, traced: two state changes, each naming the event that caused it
   // and the origin that authorised it. `origin user` twice is the whole of
   // "no state change without a gesture behind it" (DoD §2 item 6).
@@ -330,6 +338,18 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
     'SessionClosed',
     'DataExported',
   ]);
+
+  // ------------------ 12. and the note the loop must not carry, when it is true
+  //
+  // Last, after the exhaustive list above, because this is the one gesture in
+  // the file that is not part of REQ-PH-01's loop and its events must not be in
+  // the log that list describes. Step 10 asserted the note absent; on its own
+  // that would also pass for a build that stopped disclosing the demonstration
+  // altogether, which is the same honesty defect pointing the other way. So the
+  // button is pressed and the note has to come back.
+  await app.testId('evidence-seed-demonstration').click();
+  await expect(app.testId('evidence-demonstration-note')).toContainText('not by a study session');
+  await expect(app.testId('evidence-chain')).toContainText('demo-recognition@1');
 
   expect(pageErrors).toEqual([]);
 });

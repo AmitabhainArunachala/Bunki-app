@@ -18,6 +18,10 @@
  *   4. the four states resolve.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -46,6 +50,18 @@ import {
   uncertaintyLogNote,
   type AppStore,
 } from '../src/state/store.ts';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Source with comments removed, for the one source-level assertion below.
+ *
+ * Same rule as `screen-contract.test.ts`: the subject has to be nameable in
+ * prose to be documented at all, so scanning raw text would make every
+ * explanation of the guard a way of satisfying it. Strings and JSX survive.
+ */
+const stripComments = (text: string): string =>
+  text.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 const SOURCE = { sourceId: 'manual-entry', kind: 'manual', locator: 'capture-screen' } as const;
 const PROVENANCE = {
@@ -647,6 +663,52 @@ describe('the demonstration chain is real and says it is a demonstration', () =>
   it('carries a note that stops it reading as the learner’s own history', () => {
     expect(DEMONSTRATION_CHAIN_NOTE).toContain('not by a study session');
     expect(DEMONSTRATION_CHAIN_NOTE).toContain('real events');
+  });
+
+  /**
+   * Where that note is rendered, not only what it says (WP-10 repair P1).
+   *
+   * The assertion above is about the sentence. This one is about the condition,
+   * and the absence of it is what let the defect ship: the screen rendered
+   * `DEMONSTRATION_CHAIN_NOTE` unconditionally inside the Observations section.
+   * That read true for as long as the demonstration button was the only writer
+   * that could put a row there, and became false the moment WP-10 closed
+   * COORD-B8-2 and the sitting's own graded reviews arrived in the durable log —
+   * at which point the inspector told a learner who had just answered two
+   * reviews that those rows were not a record of them answering anything.
+   * REQ-GATE-03 in the second direction, and the inverse of definition of done
+   * §2 item 6.
+   *
+   * This project installs no React Native test renderer, so the render
+   * condition is asserted over the source the way `screen-contract.test.ts`
+   * asserts what a screen must never contain — comments stripped, so this
+   * file's own explanation of the guard cannot satisfy the check. The
+   * browser-side half, over the built bundle, is `apps/app/e2e/
+   * closed-loop.spec.ts` steps 10 and 12: absent after a real sitting, present
+   * after the button.
+   */
+  it('is disclosed by the screen only when a demonstration row is in the chain', () => {
+    const source = stripComments(
+      readFileSync(resolve(HERE, '../src/screens/evidence-inspector-screen.tsx'), 'utf8'),
+    );
+
+    const marker = 'testID="evidence-demonstration-note"';
+    const at = source.indexOf(marker);
+    // Still rendered somewhere, and once. Deleting the disclosure would silence
+    // the false claim by dropping the true one, and pass a test that only
+    // looked for the note's absence on a real sitting.
+    expect(at).toBeGreaterThan(-1);
+    expect(source.indexOf(marker, at + 1)).toBe(-1);
+    expect(source).toContain('{DEMONSTRATION_CHAIN_NOTE}');
+
+    const guard = '{chain.demonstration.present && (';
+    const opened = source.lastIndexOf(guard, at);
+    expect(opened, 'the note is not inside a chain.demonstration.present guard').toBeGreaterThan(
+      -1,
+    );
+    // And the guard is still open where the note is written: a `)}` between the
+    // two would mean it closed around something else on the way past.
+    expect(source.slice(opened + guard.length, at)).not.toContain(')}');
   });
 
   it('refuses a thread it cannot link to a capture', () => {
