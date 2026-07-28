@@ -21,7 +21,7 @@
  * browser; neither substitutes for the other.
  */
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,8 +30,10 @@ import { describe, expect, it } from 'vitest';
 import {
   DESTINATIONS,
   EMBEDDED_SURFACES,
+  LEARNER_DESTINATIONS,
   NESTED_DESTINATIONS,
   SHELL_DESTINATIONS,
+  SPECIMEN_DESTINATIONS,
 } from '../src/ui/navigation.ts';
 
 const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -83,13 +85,25 @@ describe('every route is on the map', () => {
   it('renders the screen each entry names', () => {
     for (const destination of DESTINATIONS) {
       const source = read(resolve(ROUTES_ROOT, destination.routeFile));
-      const component = destination.screen
-        .replace(/^screens\//, '')
+      // The component name is derived from the module's *basename*. It used to
+      // be derived from the path with a `screens/` prefix stripped, which was
+      // the same thing while every screen lived in `src/screens/` and silently
+      // wrong the moment one did not — `ui/style-guide/style-guide-page.tsx`
+      // would have produced `Ui/styleGuide/styleGuidePage`. Same assertion,
+      // stated in terms of what it was always checking.
+      const component = (destination.screen.split('/').pop() ?? '')
         .replace(/\.tsx?$/, '')
         .split('-')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join('');
       expect(source, `${destination.routeFile} does not render ${component}`).toContain(component);
+    }
+  });
+
+  it('points every map entry at a screen module that exists', () => {
+    for (const destination of DESTINATIONS) {
+      const module = resolve(APP_ROOT, 'src', destination.screen);
+      expect(existsSync(module), `${destination.href} names a missing module`).toBe(true);
     }
   });
 });
@@ -157,8 +171,18 @@ describe('every destination has a door a learner can open', () => {
 });
 
 describe('the map describes the app it is in', () => {
+  /**
+   * Written against `LEARNER_DESTINATIONS` rather than `DESTINATIONS`.
+   *
+   * Campaign E adds a development surface (`/style-guide`) which is a real
+   * route and therefore on the map, but is not one of the screens controller
+   * §10 names. Widening this list to nine would have made it a list of "routes"
+   * instead of a list of "the app's screens", and that is the property worth
+   * keeping exact. The specimen is asserted separately, below, so the exemption
+   * is one named route rather than a category anyone can grow.
+   */
   it('covers every screen the controller §10 list names', () => {
-    const labels = DESTINATIONS.map((destination) => destination.label);
+    const labels = LEARNER_DESTINATIONS.map((destination) => destination.label);
     expect(labels).toEqual([
       'Capture',
       'Word',
@@ -182,5 +206,24 @@ describe('the map describes the app it is in', () => {
       'Evidence',
       'About & diagnostics',
     ]);
+  });
+
+  /**
+   * The specimen exemption, pinned.
+   *
+   * Exactly one route may be a development surface, it may not be in the shell,
+   * and it may not be a link target from a learner screen — otherwise "not a
+   * learner destination" is a label rather than a fact. Growing this list is a
+   * visible edit here, which is the whole point of writing it as an equality.
+   */
+  it('keeps development surfaces out of the learner-facing app', () => {
+    expect(SPECIMEN_DESTINATIONS.map((destination) => destination.href)).toEqual(['/style-guide']);
+    for (const destination of SPECIMEN_DESTINATIONS) {
+      expect(SHELL_DESTINATIONS).not.toContain(destination);
+      const screens = walk(resolve(APP_ROOT, 'src/screens')).map(read).join('\n');
+      expect(screens, 'a learner screen links to a development surface').not.toContain(
+        destination.href,
+      );
+    }
   });
 });

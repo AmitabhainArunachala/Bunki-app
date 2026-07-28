@@ -1,7 +1,7 @@
 /**
  * Interactive primitives (WP-05, REQ-UI-09 accessibility).
  *
- * Two accessibility requirements are structural here rather than reviewed:
+ * Three accessibility requirements are structural here rather than reviewed:
  *
  *   1. **Labels on all interactive elements.** `accessibilityLabel` is a
  *      required prop on every control in this file, so an unlabeled control is
@@ -11,6 +11,12 @@
  *   2. **≥44 pt touch targets.** Sizes come from `interactive-styles.ts`, which
  *      `test/touch-targets.test.ts` asserts against `MIN_TOUCH_TARGET`. Callers
  *      style the *container*, never the control, so a layout cannot shrink one.
+ *   3. **A control's state travels on a prop the target actually forwards.**
+ *      `accessibilityState` is not one of them on the web export — see the note
+ *      on {@link ChipButton}, which is where that cost was paid — so nothing
+ *      under `src/` uses it, and `test/design-vocabulary.test.ts` keeps it that
+ *      way. `disabled` is passed to `Pressable` as `disabled`, which
+ *      react-native-web turns into `aria-disabled` itself.
  *
  * The focus ring is drawn by the component rather than left to the browser
  * outline: react-native-web suppresses the default outline on pressables, and a
@@ -71,7 +77,9 @@ export function AppButton({
       accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      // No `accessibilityState={{ disabled }}`: react-native-web never reads
+      // that prop (see `ChipButton`), and it does not need to — `Pressable`
+      // turns its own `disabled` into `aria-disabled` and `tabIndex={-1}`.
       disabled={disabled}
       onBlur={() => setFocused(false)}
       onFocus={() => setFocused(true)}
@@ -108,8 +116,40 @@ export interface ChipButtonProps {
  * A single-tap chip — the uncertainty gesture of REQ-UI-01 is one tap, never a
  * modal or a multi-step form.
  *
- * Selection is carried by `accessibilityState.selected` *and* by a check mark,
- * not by the fill alone: a fill alone is information conveyed by colour only.
+ * On/off is carried by `aria-pressed` *and* by a check mark, not by the fill
+ * alone: a fill alone is information conveyed by colour only.
+ *
+ * ## Why `aria-pressed`, and not the prop that was here before
+ *
+ * This chip used to say `accessibilityState={{ selected }}`, and on the shipped
+ * web target that reached nothing at all. react-native-web 0.21 has no reader
+ * for `accessibilityState`: `modules/forwardedProps` enumerates the flat
+ * `aria-*` and `accessibility*` names, `pick()` drops everything else before
+ * `createDOMProps` runs, and the only lookalike anywhere in the library is
+ * `AccessibilityUtil/isDisabled`, which reads `accessibilityStates` — plural,
+ * an array, and only for `disabled`. So every chip in the app shipped as a bare
+ * `<button aria-label="…" role="button">`, byte-identical whether it was on or
+ * off. What was left encoding the state was fill colour, border colour and
+ * border width: WCAG 2.1 SC 1.4.1 (Use of Color) and SC 4.1.2 (Name, Role,
+ * Value), and this docblock previously asserted the opposite. axe stayed green
+ * throughout, because axe never requires a button to expose selection.
+ *
+ * `aria-pressed` is the replacement because it is forwarded (`forwardedProps`,
+ * then `createDOMProps`), and because it is *permitted on a button*:
+ * `aria-selected` is not, and would have traded a silent defect for an
+ * `aria-allowed-attr` violation. On/off is also what these chips mean —
+ * furigana, an uncertainty dimension, a correction reason, a capability lens.
+ *
+ * What `aria-pressed` is not is portable. React Native maps
+ * `aria-busy/checked/disabled/expanded/selected` onto native accessibility
+ * state and has no `aria-pressed`, so on iOS/Android the check mark is the only
+ * channel. Nothing in this repository builds, exports or drives a native
+ * target, so that is recorded here rather than claimed in either direction.
+ *
+ * The claim is verified where it can be: `e2e/adv-a11y-audit.spec.ts` reads the
+ * chips' state back out of Chrome's own accessibility tree over CDP. A source
+ * scan cannot verify it — the whole defect was a prop that was present in the
+ * source and absent from the runtime.
  */
 export function ChipButton({
   label,
@@ -127,7 +167,7 @@ export function ChipButton({
       accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      aria-pressed={selected}
       onBlur={() => setFocused(false)}
       onFocus={() => setFocused(true)}
       onPress={onPress}

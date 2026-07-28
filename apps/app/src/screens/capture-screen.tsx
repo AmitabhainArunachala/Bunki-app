@@ -381,7 +381,22 @@ export function CaptureScreen({
             >
               What felt uncertain? (optional, one tap)
             </Text>
-            <View accessibilityRole="radiogroup" style={styles.chips}>
+            {/*
+              `group`, not `radiogroup`.
+
+              ARIA requires a `radiogroup` to own elements with `role="radio"`,
+              and these are `ChipButton`s — buttons, carrying `aria-pressed`
+              since the A1 repair. `radiogroup` was therefore promising children
+              that were never going to arrive, the same `aria-required-children`
+              mistake the lens row made with `tablist` (`src/ui/lens.tsx`). axe
+              never saw it because these chips only exist once a word has been
+              searched for, and the route sweep scans the screen at rest.
+
+              `role` rather than `accessibilityRole` because React Native's
+              `AccessibilityRole` union has no `group`; `Role` does, and
+              react-native-web forwards it verbatim.
+            */}
+            <View accessibilityLabel="What felt uncertain?" role="group" style={styles.chips}>
               {UNCERTAINTY_DIMENSIONS.map((dimension) => (
                 <ChipButton
                   accessibilityHint={

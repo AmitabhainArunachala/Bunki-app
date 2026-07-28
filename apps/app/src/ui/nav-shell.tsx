@@ -12,10 +12,17 @@
  *
  * ## Why the current destination is a link that does nothing
  *
- * `accessibilityState.selected` marks it, `aria-current` follows on web, and it
- * still renders as a control rather than as plain text. A shell that removed the
- * current item would move the other three every time you navigated, which is the
- * cheapest possible way to make a calm surface feel unstable.
+ * `aria-current="page"` marks it and it still renders as a control rather than
+ * as plain text. A shell that removed the current item would move the other
+ * three every time you navigated, which is the cheapest possible way to make a
+ * calm surface feel unstable.
+ *
+ * This paragraph used to say `accessibilityState.selected` marks it and
+ * "`aria-current` follows on web". Neither half was true: react-native-web has
+ * no reader for `accessibilityState` at all, so the current link shipped
+ * indistinguishable from the other three to anything that was not looking at
+ * the vermilion underline (`primitives.tsx` has the mechanism and the
+ * measurement). `aria-current` is forwarded, and is now passed by name.
  *
  * ## What it deliberately does not do
  *
@@ -107,7 +114,11 @@ function NavLink({ destination, current }: NavLinkProps): ReactNode {
       accessibilityHint={destination.blurb}
       accessibilityLabel={destination.label}
       accessibilityRole="link"
-      accessibilityState={{ selected: current }}
+      // `'page'` rather than `'true'`: these four links go to whole
+      // destinations, and `page` is the token that says so. Omitted entirely
+      // when it is not the current one — `aria-current="false"` is a value
+      // some screen readers still announce.
+      aria-current={current ? 'page' : undefined}
       onBlur={() => setFocused(false)}
       onFocus={() => setFocused(true)}
       // `replace`, not `push` (W5 P1-3). A persistent shell is a *switch*

@@ -73,12 +73,31 @@ export const navLinkStyle = {
 } as const;
 
 /**
+ * The header of a progressive-disclosure section (Campaign E, lane A1).
+ *
+ * A full-width row, so `minWidth` is never the binding constraint — but it is
+ * declared anyway, because the rule is "≥44 pt in both axes" and a style that
+ * relies on its container to be wide is a style that shrinks when the container
+ * does.
+ */
+export const disclosureHeaderStyle = {
+  ...TOUCH_TARGET,
+  alignItems: 'center',
+  borderRadius: RADIUS.sm,
+  flexDirection: 'row',
+  gap: SPACE.sm,
+  justifyContent: 'space-between',
+  paddingVertical: SPACE.sm,
+} as const;
+
+/**
  * Every interactive style in the app, by the name of the control that uses it.
  * A control missing from this map is a control nothing size-checked.
  */
 export const INTERACTIVE_STYLES = {
   AppButton: buttonStyle,
   ChipButton: chipStyle,
+  DisclosureHeader: disclosureHeaderStyle,
   NavLink: navLinkStyle,
   RowButton: rowStyle,
   SearchField: searchFieldStyle,
