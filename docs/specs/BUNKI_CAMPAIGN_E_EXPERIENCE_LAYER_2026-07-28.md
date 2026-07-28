@@ -51,9 +51,47 @@ the specification for this campaign's feel.
 | **Todaii** | Fresh dated content with synced audio and speed control; read-while-listen; furigana toggle; AI chat *inside* the reading surface. | Global-JLPT rainbow underlining — when everything is highlighted nothing is. AI as a bolt-on that remembers nothing. |
 | **類義漢字 / 訓** | Semantic-field kanji grouping with per-kanji nuance and compounds — this is the `contrasts-with` edge set rendered. Usage-boundary drills. | A pure reference silo with no learner state, no drills, no personal examples. |
 
+## Direction added 2026-07-28 (after Wave A launched)
+
+The operator gave a second, larger direction while Wave A was in flight. It is
+binding and it supersedes parts of this brief. Two companion documents carry it
+in full and **both are required reading for every lane from Wave B onward**:
+
+- `docs/design/BUNKI_VISUAL_LANGUAGE_NIHONGA_2026-07-28.md` — the real 日本画
+  palette with sourced hex values, the era registers, the Ghibli↔Akira lineage,
+  and the two-layer reconciliation with frozen §8.
+- `docs/design/BUNKI_THE_MAP_AS_VOYAGE_THROUGH_TIME_2026-07-28.md` — the three
+  route layers (古道 / 街道 / 鉄道), the cultural-weaving model, and the 案内人.
+
+The short version:
+
+1. **The map is a voyage through time.** Not one metro diagram — pilgrimage
+   routes and old walking trails *and* train lines, as three era layers you can
+   scrub between. The rail layer is the newest, not the only.
+2. **Nihonga palette, not one-hue ink-and-paper.** Ground carries era and
+   atmosphere in the full mineral-pigment range; figure keeps the disciplined
+   one-accent semantic system. Neither does the other's job.
+3. **Ghibli meets Akira, late-80s/early-90s.** Oga's method — wet atmospheric
+   ground, simple tonal design, details last — carrying Ohno's subject: density,
+   rail, night, signage. This is one lineage, not a mash-up: Hiroshi Ohno painted
+   *Akira* backgrounds and left mid-production to art-direct *Kiki's Delivery
+   Service*.
+4. **The AI is a constant-presence guide (案内人)** with a position on the map,
+   whose assessment is conversation rather than a placement test, and which
+   writes a long-term route and a short-term plan — while the **SRS alone
+   dictates where the learning bifurcates**. The guide narrates and routes; it
+   never mints evidence and never overrides the scheduler.
+
 ## The centrepiece: the map
 
 Not a diagram. A living navigation surface, and the emotional centre of the app.
+
+**Three era layers** (古道 / 街道 / 鉄道), each with its own colour register, and
+one scrubber that reads two ways: pulled one way it replays **your** memory
+history from the event log; pulled the other it walks **the language's** history
+through the eras. 駅 is the worked example — 駅家 post-station on the ancient
+road, 宿場 on the Edo highway, railway station in Meiji, and 駅伝 still carrying
+the original sense.
 
 - **Brightness is retrievability.** Real FSRS retrievability, computed from the
   real memory state — due items literally dim. Nothing decorative stands in for
@@ -80,7 +118,12 @@ words and they are the bar:
 
 - Typography-first. Real Japanese type — mincho for reading surfaces, clean
   sans for UI. First-class furigana. Optional vertical text.
-- Ink-and-paper palette, one vermilion accent, generous *ma*.
+- ~~Ink-and-paper palette, one vermilion accent~~ **→ superseded 2026-07-28.**
+  Two layers: a nihonga **ground** carrying era and atmosphere in the full
+  mineral range, and a **figure** layer that keeps the one-accent semantic
+  discipline unchanged. The one-accent rule was never about prettiness — it was
+  the ban on encoding learner state in hue, and that ban stands absolutely.
+  See the companion document §5. Generous *ma* stands.
 - Reading surfaces render clean; only Trace-unknown or fragile words carry a
   quiet mark — the personal frontier, never a global-level rainbow.
 - "A kanji page should feel like a museum card, not a spreadsheet row."
@@ -112,16 +155,32 @@ Campaign E adds surfaces. It does not get to weaken what is underneath:
   projection for the map, journey compilation from stumbles (pure, tested,
   no UI)
 
-**Wave B — the surfaces** (5 lanes, partitioned by screen directory)
-- B1: the map — constellation/metro, lenses, time scrubber, tap-through
+**Wave A′ — the redirect** (2 lanes, opened 2026-07-28 after the new direction)
+- A1′: extend the design system with the **ground layer** — era registers from
+  the sourced nihonga palette, ground/figure type separation, per-ground
+  contrast resolution, the emissive cap. A1's semantic architecture
+  (`RECALL_BANDS`, `EDGE_PATTERNS`, `RECALL_BAND_MARKS`, `CONTRAST_PAIRS`, the
+  no-hex-literal test) is **kept whole** — this is an extension, not a rewrite.
+- A2′: add the **era/route attribute** to the node projection, sourced honestly
+  from dictionary metadata where it exists and marked `unknown` where it does
+  not. Never guessed.
+
+**Wave B — the surfaces** (6 lanes, partitioned by screen directory)
+- B1: the map — **three era layers**, capability lenses, the dual-reading
+  scrubber (your history / the language's history), tap-through
 - B2: kanji depth — layered page, stroke animation, components with roles,
-  reading families, contrast sets
+  reading families, contrast sets, and the **one-line cultural note that is the
+  character explaining itself** (never an encyclopedia paragraph)
 - B3: word depth — senses, collocations, conjugation, related words, the
   sentences it appeared in
 - B4: reading surface — passage with furigana toggle, tap-to-lookup, quiet
   frontier marks, AI inside the surface
 - B5: journeys — branch from a stumble, dimmed untaken rails, evidence-defined
   rejoin
+- B6: **the 案内人** — position on the map, conversation-driven assessment, the
+  long-term route and short-term plan as provenance-carrying records, and the
+  §4.3 boundary **enforced by a test**: the guide can propose and narrate, and
+  cannot mint evidence, write a memory state, or override the scheduler
 
 **Wave C — integration and polish**: one coherent app, navigation that makes the
 whole thing feel woven, performance, accessibility, and an operator walkthrough.
