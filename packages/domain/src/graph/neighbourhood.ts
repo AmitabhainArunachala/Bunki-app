@@ -347,10 +347,15 @@ function collectEdges(
 
       const from = step.direction === 'incoming' ? step.other : id;
       const to = step.direction === 'incoming' ? id : step.other;
+      // `\u0000` as the separator because it is the one character a node id
+      // cannot contain, so two different edges can never collide on one key.
+      // Written as an escape rather than as a raw byte: a literal NUL makes the
+      // file binary to `git diff`, and a separator nobody can see in review is
+      // a separator nobody can check.
       const canonical =
         step.direction === 'symmetric' && to < from
-          ? `${step.kind} ${to} ${from}`
-          : `${step.kind} ${from} ${to}`;
+          ? `${step.kind}\u0000${to}\u0000${from}`
+          : `${step.kind}\u0000${from}\u0000${to}`;
       if (seen.has(canonical)) continue;
       seen.add(canonical);
 
