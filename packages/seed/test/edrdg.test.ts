@@ -143,12 +143,20 @@ describe('every EDRDG claim carries a real upstream identifier', () => {
     }
   });
 
-  it('records the artefact the EDRDG values were read out of', () => {
-    expect(upstream.upstream['sdistSha256']).toMatch(/^[0-9a-f]{64}$/);
-    expect(upstream.upstream['dbXzSha256']).toMatch(/^[0-9a-f]{64}$/);
+  it('records the licensor’s own artefacts the EDRDG values were read out of', () => {
+    // These are the licensor's files now, not a redistribution, so the recorded
+    // URLs must point at EDRDG's host. A digest alone would not catch a switch
+    // back to a mirror, which is how the CC BY-SA 3.0 mislabel happened.
+    expect(upstream.upstream['jmdictUrl']).toMatch(/^https:\/\/www\.edrdg\.org\//);
+    expect(upstream.upstream['kanjidic2Url']).toMatch(/^https:\/\/www\.edrdg\.org\//);
+    expect(upstream.upstream['jmdictSha256']).toMatch(/^[0-9a-f]{64}$/);
+    expect(upstream.upstream['kanjidic2Sha256']).toMatch(/^[0-9a-f]{64}$/);
+    expect(upstream.upstream['license']).toBe('CC BY-SA 4.0');
     expect(upstream.upstream['licenseSha256']).toBe(
-      binding.files['licenses/EDRDG-licence-statement.md']?.sha256,
+      binding.files['licenses/EDRDG-licence-statement.html']?.sha256,
     );
+    // The superseded route stays named, so the correction remains auditable.
+    expect(upstream.upstream['supersedes']).toMatch(/jamdict-data/);
     expect(upstream.databaseMeta['jmdict.version']).toBeTruthy();
     expect(upstream.databaseMeta['kanjidic2.version']).toBeTruthy();
   });
@@ -211,7 +219,9 @@ describe('a source with no verbatim licence text on file fails the suite', () =>
   });
 
   it('rejects a known source whose registered licence disagrees with the text on file', () => {
-    const failure = licenceBackingFailure({ source: 'JMdict (EDRDG)', license: 'CC BY-SA 4.0' });
+    // 3.0 is the wrong claim now — it is what the superseded redistributor copy
+    // said. A record still asserting it must fail rather than pass quietly.
+    const failure = licenceBackingFailure({ source: 'JMdict (EDRDG)', license: 'CC BY-SA 3.0' });
     expect(failure).toMatch(/licences\.json says/);
   });
 

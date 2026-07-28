@@ -1,38 +1,38 @@
 {
   "schemaVersion": 1,
   "_comment": [
-    "Identity of the pinned upstream artefact the EDRDG-sourced fields came from.",
-    "Mirrors the `upstream` block of strokes.json: the data files carry the values,",
-    "this file carries the provenance of the artefact they were read out of.",
-    "Re-verify with: node packages/seed/scripts/fetch-edrdg.mjs --check"
+    "Which upstream artefacts the EDRDG values in data/lexemes.json and data/kanji.json",
+    "were read out of.",
+    "",
+    "Superseded 2026-07-28: this file used to describe the jamdict-data 1.5 sdist,",
+    "because EDRDG's own hosts were refused by the egress policy. They are reachable",
+    "now, the values were re-derived from the licensor's own files, and every field was",
+    "re-checked with `import-sources.mjs --verify-fixtures` — which found seven fields",
+    "that had drifted since the 2021 redistribution and rewrote them."
   ],
   "upstream": {
-    "package": "jamdict-data",
-    "version": "1.5",
-    "publisher": "the jamdict project (Le Tuan Anh) — https://github.com/neocl/jamdict_data",
-    "sdistUrl": "https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz",
-    "sdistSha256": "a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415",
-    "dbXzSha256": "124577d8f2c44841f1f4ec43ac5413be81770ce3ed60ea917bae6c5944d88d39",
-    "licenseFile": "licenses/EDRDG-licence-statement.md",
-    "licenseSha256": "1980bff8562ca1f4e83a5b4a5646de805da61e3409d288a8dea11dd7bb3a13f6",
-    "licenseUrl": "https://raw.githubusercontent.com/neocl/jamdict_data/main/jamdict_data/LICENSE.md",
-    "retrievedAt": "2026-07-28"
+    "publisher": "Electronic Dictionary Research and Development Group — https://www.edrdg.org",
+    "jmdictUrl": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+    "jmdictSha256": "bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2",
+    "jmdictBytes": 10523044,
+    "kanjidic2Url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
+    "kanjidic2Sha256": "47f16167210653dc0f6cfff46278e1fb8b02e8d2cc9dc7f296be533999cbfd80",
+    "kanjidic2Bytes": 1488563,
+    "licenseFile": "licenses/EDRDG-licence-statement.html",
+    "licenseSha256": "52f60ea9ca68170a2f0663d7dba381ebf1bd57c17a3347dfe21153865c156692",
+    "licenseUrl": "https://www.edrdg.org/edrdg/licence.html",
+    "license": "CC BY-SA 4.0",
+    "retrievedAt": "2026-07-28",
+    "supersedes": "jamdict-data 1.5 sdist (sha256 a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415), whose bundled licence copy stated CC BY-SA 3.0"
   },
   "databaseMeta": {
-    "jmdict.version": "1.08",
-    "jmdict.url": "http://www.csse.monash.edu.au/~jwb/edict.html",
-    "generator": "jamdict",
-    "generator_version": "0.1a8",
-    "generator_url": "https://github.com/neocl/jamdict",
-    "jmnedict.version": "1.08",
-    "jmnedict.url": "https://www.edrdg.org/enamdict/enamdict_doc.html",
-    "jmnedict.date": "2020-05-29",
-    "kanjidic2.version": "1.6",
-    "kanjidic2.url": "https://www.edrdg.org/wiki/index.php/KANJIDIC_Project",
-    "kanjidic2.date": "April 2008"
+    "jmdict.version": "JMdict_e as published 2026-07-28",
+    "jmdict.url": "https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project",
+    "kanjidic2.version": "KANJIDIC2 as published 2026-07-28",
+    "kanjidic2.url": "https://www.edrdg.org/wiki/index.php/KANJIDIC_Project"
   },
   "entryCounts": {
-    "jmdictEntries": 191541,
+    "jmdictEntries": 218148,
     "kanjidic2Characters": 13108
   },
   "lexemeEntSeq": {

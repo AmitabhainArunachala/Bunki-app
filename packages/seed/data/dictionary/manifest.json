@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "_comment": [
+    "What this import fetched and what it produced. Written by",
+    "scripts/import-sources.mjs; re-checkable offline with --check, which",
+    "re-derives every digest below from the committed files.",
+    "",
+    "The raw downloads are NOT committed: they are ~200 MB and live in the",
+    "gitignored cache. Their sha256 is recorded here so a shipped gloss can be",
+    "traced back to the exact upstream bytes it came from."
+  ],
+  "generatedAt": "2026-07-28",
+  "parameters": {
+    "lexemes": 3000,
+    "sentences": 2000,
+    "strokes": "all"
+  },
+  "scaleNote": "This is a subset, ranked by JMdict priority tags. Re-running with --lexemes=all imports every priority-tagged entry; the pipeline is unchanged by the size.",
+  "sources": {
+    "edrdg-jmdict": {
+      "displayName": "JMdict (EDRDG)",
+      "license": "CC BY-SA 4.0",
+      "licenceFiles": [
+        "licenses/EDRDG-licence-statement.html",
+        "licenses/CC-BY-SA-4.0.html"
+      ],
+      "url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
+      "retrievedAt": "2026-07-28",
+      "bytes": 10523044,
+      "sha256": "bebd0d24e13a4aa55a08ca447060b0944d5fed392e88bede919c79af3f3956e2"
+    },
+    "edrdg-kanjidic2": {
+      "displayName": "KANJIDIC2 (EDRDG)",
+      "license": "CC BY-SA 4.0",
+      "licenceFiles": [
+        "licenses/EDRDG-licence-statement.html",
+        "licenses/CC-BY-SA-4.0.html"
+      ],
+      "url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
+      "retrievedAt": "2026-07-28",
+      "bytes": 1488563,
+      "sha256": "47f16167210653dc0f6cfff46278e1fb8b02e8d2cc9dc7f296be533999cbfd80"
+    },
+    "tatoeba-jpn": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences_detailed.tsv.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 4460133,
+      "sha256": "20706c3dfc36d7a6b0a6ad4443acfa09e711594a9e715099394d24d06e710f30"
+    },
+    "tatoeba-links": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/links.tar.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 148936941,
+      "sha256": "69abec53fe090d0fcd3c20dd0bb441768697668346a66b14bc07d029dc2c88e2"
+    },
+    "tatoeba-eng": {
+      "displayName": "Tatoeba",
+      "license": "CC BY 2.0 FR",
+      "licenceFiles": [
+        "licenses/CC-BY-2.0-FR.html"
+      ],
+      "url": "https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_detailed.tsv.bz2",
+      "retrievedAt": "2026-07-28",
+      "bytes": 34779571,
+      "sha256": "8312d3ba807aac581f241be02f4c801a983c2aa98719d20c51fd38997df6a4d7"
+    }
+  },
+  "counts": {
+    "lexemes": 3000,
+    "kanji": 1241,
+    "sentences": 2000,
+    "strokeFiles": 1241,
+    "kanjiWithoutKanjiVgCoverage": 0,
+    "jmdictEntriesAvailable": 218148,
+    "kanjidic2CharactersAvailable": 13108
+  },
+  "outputs": {
+    "dictionary/lexemes.json": {
+      "bytes": 1561982,
+      "sha256": "0addff5168a95fe6860cd14fcb4c46282d21703fee28e91b84e38e3a5c6ec451"
+    },
+    "dictionary/kanji.json": {
+      "bytes": 607543,
+      "sha256": "ccb49766fb5fbc0db3af17ad468a50fa34fc49922fbb64dca3aed05dda2f0d7b"
+    },
+    "dictionary/sentences.json": {
+      "bytes": 949586,
+      "sha256": "3015a23e6e0eba4a8f552d3bee108d8c9e2e46c977a9776701afd88e1ebfb9e5"
+    },
+    "dictionary/strokes.json": {
+      "bytes": 438402,
+      "sha256": "63fe5ec44f89f3b2f1bc12fbe6fe813449d27dede46c2f434d36db8faf8c121e"
+    }
+  },
+  "deferred": []
+}

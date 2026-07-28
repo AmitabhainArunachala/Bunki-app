@@ -180,14 +180,14 @@ This closes deferral **D-1a**. The operator changed the egress policy on
 licensor's own data files were read directly and the redistribution route was
 abandoned. The correction that came out of it is not cosmetic — see §2.2.
 
-| Host                                    | 2026-07-27 | 2026-07-28 (earlier) | 2026-07-28 (now) |
-| --------------------------------------- | ---------- | -------------------- | ---------------- |
-| `www.edrdg.org`                         | refused    | refused              | **200**          |
-| `creativecommons.org`                   | refused    | refused              | **200**          |
-| `downloads.tatoeba.org`                 | refused    | refused              | **200**          |
-| `raw.githubusercontent.com`             | 200        | 200                  | 200              |
-| `ftp.edrdg.org`                         | refused    | refused              | still refused    |
-| `codeload.github.com`                   | —          | 403                  | 403              |
+| Host                        | 2026-07-27 | 2026-07-28 (earlier) | 2026-07-28 (now) |
+| --------------------------- | ---------- | -------------------- | ---------------- |
+| `www.edrdg.org`             | refused    | refused              | **200**          |
+| `creativecommons.org`       | refused    | refused              | **200**          |
+| `downloads.tatoeba.org`     | refused    | refused              | **200**          |
+| `raw.githubusercontent.com` | 200        | 200                  | 200              |
+| `ftp.edrdg.org`             | refused    | refused              | still refused    |
+| `codeload.github.com`       | —          | 403                  | 403              |
 
 `ftp.edrdg.org` remains unreachable (bad TLS certificate, plain HTTP refused).
 It is not needed: `www.edrdg.org` serves the identical files, and that is where
@@ -201,12 +201,12 @@ Downloaded from the licensor's own host by
 `data/dictionary/manifest.json`, which is committed, so any shipped gloss can be
 traced to the exact upstream bytes it was read from.
 
-|                | JMdict                                       | KANJIDIC2                                        |
-| -------------- | -------------------------------------------- | ------------------------------------------------ |
-| URL            | `https://www.edrdg.org/pub/Nihongo/JMdict_e.gz` | `https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz` |
-| Bytes          | 10,523,044                                   | 1,488,563                                        |
-| Retrieved      | 2026-07-28                                   | 2026-07-28                                       |
-| Contents       | 218,148 entries (English edition)            | 13,108 characters                                |
+|           | JMdict                                          | KANJIDIC2                                            |
+| --------- | ----------------------------------------------- | ---------------------------------------------------- |
+| URL       | `https://www.edrdg.org/pub/Nihongo/JMdict_e.gz` | `https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz` |
+| Bytes     | 10,523,044                                      | 1,488,563                                            |
+| Retrieved | 2026-07-28                                      | 2026-07-28                                           |
+| Contents  | 218,148 entries (English edition)               | 13,108 characters                                    |
 
 Exact sha256 for both is in `data/dictionary/manifest.json` under `sources`.
 Re-verify the committed output against it, offline:
@@ -370,38 +370,55 @@ longer has the expected headword as its first kanji element.
 
 ---
 
-## 3. Tatoeba — DEFERRED (D-2)
+## 3. Tatoeba — VERIFIED (primary source)
 
-**Content shipped from this source: none.** Unchanged from WP-04, and re-tested
-on 2026-07-28 rather than assumed.
+**Used for:** every record in `data/dictionary/sentences.json` —
+2,000 Japanese sentences each paired with an English translation.
 
-Controller §8 names a filtered Tatoeba subset (CC BY 2.0 FR text, per-sentence
-attribution) as the intended source for example sentences. Three independent
-blockers, each sufficient on its own:
+This closes deferrals **D-2** and **D-3**. All three blockers WP-04 recorded are
+gone: `downloads.tatoeba.org` answers, the exports carry contributor usernames,
+and `creativecommons.org` serves the CC BY 2.0 FR legal code that SPDX does not
+publish.
 
-| Blocker                   | Evidence (2026-07-28)                                                                                                                                          |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Data unreachable          | `tatoeba.org` and `downloads.tatoeba.org` both refused by the egress proxy                                                                                     |
-| No data in the artefact   | the pinned `jamdict.db` has no examples table at all — JMdict, JMnedict, KANJIDIC2 and KRADFILE only                                                           |
-| Licence text unobtainable | `creativecommons.org` refused; the SPDX license list has **no** `CC-BY-2.0-FR` — `text/CC-BY-2.0-FR.txt` is 404 and the licence index carries only `CC-BY-2.0` |
+### 3.1 Licence text, verbatim
 
-CC BY 2.0 FR additionally requires per-sentence attribution naming the sentence
-id and the contributing user. No reachable artefact carries those. Under the
-rule stated at the top of this file — licence first, data second — no Tatoeba
-content is shipped, and none is labelled as such.
+[`licenses/CC-BY-2.0-FR.html`](licenses/CC-BY-2.0-FR.html)
 
-**What was done instead.** The eight sentences in `data/sentences.json`, the
-three grammar examples in `data/grammar.json`, and the integration passage in
-`data/passages.json` are **original text written for this project**, labelled
-`bunki-authored-text`. They carry no third-party attribution obligation, and
-`SEED_ENTRY_DISCLOSURE` says so on the same screen that credits EDRDG for the
-lexical data — so a reader is never left to infer that the sentences are sourced
-because the readings are.
+- 39,707 bytes, sha256 `af0d7ada8b9be52a6874238f4533512d0b2568595bf7cb3427e41f7c38847b71`
+- Retrieved from `https://creativecommons.org/licenses/by/2.0/fr/legalcode` on
+  2026-07-28, from Creative Commons' own host
 
-**Smallest operator action to close D-2:** allow `tatoeba.org` and
-`downloads.tatoeba.org` through the egress policy. Failing that, any pinned
-artefact that carries Tatoeba sentence ids, contributor names **and** the CC BY
-2.0 FR text together would satisfy the same rule EDRDG was admitted under.
+### 3.2 The artefacts
+
+| File               | URL                                                                                     | Bytes       |
+| ------------------ | --------------------------------------------------------------------------------------- | ----------- |
+| Japanese sentences | `https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences_detailed.tsv.bz2` | 4,460,133   |
+| English sentences  | `https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_detailed.tsv.bz2` | 34,779,571  |
+| Translation links  | `https://downloads.tatoeba.org/exports/links.tar.bz2`                                   | 148,936,941 |
+
+The `_detailed` exports are used deliberately in place of the plain ones: they
+carry the contributing member's username. CC BY 2.0 FR attributes the individual
+author, and the plain export does not name one.
+
+### 3.3 How this project complies
+
+Attribution is **per sentence, per half**. A Tatoeba pair is two works by two
+people, so each record carries `japaneseId` + `japaneseContributor` and
+`englishId` + `englishContributor` separately rather than one shared credit —
+collapsing them would misattribute both. `test/dictionary.test.ts` fails if any
+shipped sentence is missing either contributor, so a sentence that could not be
+attributed cannot ship at all.
+
+On screen, `SEED_ENTRY_DISCLOSURE` names the Tatoeba Project and CC BY 2.0 FR.
+
+### 3.4 What is _not_ Tatoeba
+
+The eight worked examples in `data/sentences.json`, the grammar examples in
+`data/grammar.json` and the integration passage in `data/passages.json` remain
+**original text written for this project**, labelled `bunki-authored-text`.
+Now that real corpus sentences ship alongside them, `test/dataset.test.ts`
+asserts that no §8 fixture record carries a Tatoeba label — mislabelling
+project prose as corpus text is the mirror image of the error WP-04 avoided.
 
 ---
 
@@ -433,35 +450,52 @@ anything that falls back to it, still labelled `unreviewed` with a null entry id
 
 Every network retrieval, with its outcome.
 
-| Retrieved  | Host                        | URL                                              | Result                                                                               |
-| ---------- | --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `README.md` @ `61e39cf`                  | 200 — verified                                                                       |
-| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `COPYING` @ `61e39cf`                    | 200 — verified                                                                       |
-| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `kanji/*.svg` @ `61e39cf` (10 files)     | 200 — verified                                                                       |
-| 2026-07-27 | `github.com` (git)          | `git ls-remote … HEAD`                           | ok — `61e39cfc29724132a6f8823b166296932985a0ff`                                      |
-| 2026-07-27 | `www.edrdg.org`             | `/edrdg/licence.html`                            | **403 CONNECT refused** — D-1                                                        |
-| 2026-07-27 | `www.csse.monash.edu.au`    | `/~jwb/edict.html`                               | **403 CONNECT refused** — D-1                                                        |
-| 2026-07-27 | `tatoeba.org`               | `/en/terms_of_use`                               | **403 CONNECT refused** — D-2                                                        |
-| 2026-07-27 | `downloads.tatoeba.org`     | `/exports/`                                      | **403 CONNECT refused** — D-2                                                        |
-| 2026-07-27 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode`                  | **403 CONNECT refused** — D-1                                                        |
-| 2026-07-27 | `kanjivg.tagaini.net`       | `/`                                              | **403 CONNECT refused** — not needed; the project's repository served the same texts |
-| 2026-07-28 | `www.edrdg.org`             | `/jmdict/edict_doc.html`                         | **refused** — re-tested, unchanged                                                   |
-| 2026-07-28 | `ftp.edrdg.org`             | `/pub/Nihongo/JMdict_e.gz`                       | **refused** — re-tested, unchanged                                                   |
-| 2026-07-28 | `tatoeba.org`               | `/en/downloads`                                  | **refused** — re-tested, D-2 stands                                                  |
-| 2026-07-28 | `downloads.tatoeba.org`     | `/exports/sentences.tar.bz2`                     | **refused** — re-tested, D-2 stands                                                  |
-| 2026-07-28 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode.txt`              | **refused** — re-tested                                                              |
-| 2026-07-28 | `api.github.com`            | `/repos/scriptin/jmdict-simplified`              | **403** — no REST API; release assets unreachable                                    |
-| 2026-07-28 | `codeload.github.com`       | `/KanjiVG/kanjivg/tar.gz/master`                 | **403** — no tarballs                                                                |
-| 2026-07-28 | `raw.githubusercontent.com` | `spdx/license-list-data` `text/CC-BY-SA-3.0.txt` | 200 — shipped at `licenses/CC-BY-SA-3.0.txt`                                         |
-| 2026-07-28 | `raw.githubusercontent.com` | `spdx/license-list-data` `text/CC-BY-2.0-FR.txt` | **404** — SPDX does not carry this licence; D-2 stands                               |
-| 2026-07-28 | `raw.githubusercontent.com` | `neocl/jamdict_data` `jamdict_data/LICENSE.md`   | 200 — shipped at `licenses/EDRDG-licence-statement.md`                               |
-| 2026-07-28 | `raw.githubusercontent.com` | `scriptin/jmdict-simplified` `LICENSE.txt`       | 200 — CC BY-SA 4.0 legal code; licence reachable, its data is not                    |
-| 2026-07-28 | `files.pythonhosted.org`    | `jamdict_data-1.5.tar.gz`                        | 200 — 53,940,912 bytes, sha256 verified                                              |
-| 2026-07-28 | `pypi.org`                  | `/pypi/jamdict-data/json`                        | 200 — package metadata                                                               |
-| 2026-07-28 | `registry.npmjs.org`        | `/kotobako-data`                                 | 200 — inspected and **rejected**, see below                                          |
+| Retrieved  | Host                        | URL                                              | Result                                                                                |
+| ---------- | --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `README.md` @ `61e39cf`                  | 200 — verified                                                                        |
+| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `COPYING` @ `61e39cf`                    | 200 — verified                                                                        |
+| 2026-07-27 | `raw.githubusercontent.com` | KanjiVG `kanji/*.svg` @ `61e39cf` (10 files)     | 200 — verified                                                                        |
+| 2026-07-27 | `github.com` (git)          | `git ls-remote … HEAD`                           | ok — `61e39cfc29724132a6f8823b166296932985a0ff`                                       |
+| 2026-07-27 | `www.edrdg.org`             | `/edrdg/licence.html`                            | **403 CONNECT refused** — D-1                                                         |
+| 2026-07-27 | `www.csse.monash.edu.au`    | `/~jwb/edict.html`                               | **403 CONNECT refused** — D-1                                                         |
+| 2026-07-27 | `tatoeba.org`               | `/en/terms_of_use`                               | **403 CONNECT refused** — D-2                                                         |
+| 2026-07-27 | `downloads.tatoeba.org`     | `/exports/`                                      | **403 CONNECT refused** — D-2                                                         |
+| 2026-07-27 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode`                  | **403 CONNECT refused** — D-1                                                         |
+| 2026-07-27 | `kanjivg.tagaini.net`       | `/`                                              | **403 CONNECT refused** — not needed; the project's repository served the same texts  |
+| 2026-07-28 | `www.edrdg.org`             | `/jmdict/edict_doc.html`                         | **refused** — re-tested, unchanged                                                    |
+| 2026-07-28 | `ftp.edrdg.org`             | `/pub/Nihongo/JMdict_e.gz`                       | **refused** — re-tested, unchanged                                                    |
+| 2026-07-28 | `tatoeba.org`               | `/en/downloads`                                  | **refused** — re-tested, D-2 stands                                                   |
+| 2026-07-28 | `downloads.tatoeba.org`     | `/exports/sentences.tar.bz2`                     | **refused** — re-tested, D-2 stands                                                   |
+| 2026-07-28 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode.txt`              | **refused** — re-tested                                                               |
+| 2026-07-28 | `api.github.com`            | `/repos/scriptin/jmdict-simplified`              | **403** — no REST API; release assets unreachable                                     |
+| 2026-07-28 | `codeload.github.com`       | `/KanjiVG/kanjivg/tar.gz/master`                 | **403** — no tarballs                                                                 |
+| 2026-07-28 | `raw.githubusercontent.com` | `spdx/license-list-data` `text/CC-BY-SA-3.0.txt` | 200 — shipped at `licenses/CC-BY-SA-3.0.txt`                                          |
+| 2026-07-28 | `raw.githubusercontent.com` | `spdx/license-list-data` `text/CC-BY-2.0-FR.txt` | **404** — SPDX does not carry this licence; D-2 stands                                |
+| 2026-07-28 | `raw.githubusercontent.com` | `neocl/jamdict_data` `jamdict_data/LICENSE.md`   | 200 — shipped at `licenses/EDRDG-licence-statement.md`                                |
+| 2026-07-28 | `raw.githubusercontent.com` | `scriptin/jmdict-simplified` `LICENSE.txt`       | 200 — CC BY-SA 4.0 legal code; licence reachable, its data is not                     |
+| 2026-07-28 | `files.pythonhosted.org`    | `jamdict_data-1.5.tar.gz`                        | 200 — 53,940,912 bytes, sha256 verified                                               |
+| 2026-07-28 | `pypi.org`                  | `/pypi/jamdict-data/json`                        | 200 — package metadata                                                                |
+| 2026-07-28 | `registry.npmjs.org`        | `/kotobako-data`                                 | 200 — inspected and **rejected**, see below                                           |
+| 2026-07-28 | `www.edrdg.org`             | `/edrdg/licence.html`                            | **200** — shipped at `licenses/EDRDG-licence-statement.html`; says CC BY-SA **V4.0**  |
+| 2026-07-28 | `www.edrdg.org`             | `/pub/Nihongo/JMdict_e.gz`                       | **200** — 10,523,044 bytes, 218,148 entries                                           |
+| 2026-07-28 | `www.edrdg.org`             | `/pub/Nihongo/kanjidic2.xml.gz`                  | **200** — 1,488,563 bytes, 13,108 characters                                          |
+| 2026-07-28 | `creativecommons.org`       | `/licenses/by-sa/4.0/legalcode`                  | **200** — shipped at `licenses/CC-BY-SA-4.0.html`                                     |
+| 2026-07-28 | `creativecommons.org`       | `/licenses/by/2.0/fr/legalcode`                  | **200** — shipped at `licenses/CC-BY-2.0-FR.html`; closes D-3                         |
+| 2026-07-28 | `downloads.tatoeba.org`     | `jpn_sentences_detailed.tsv.bz2`                 | **200** — 4,460,133 bytes, 248,821 sentences with contributor names                   |
+| 2026-07-28 | `downloads.tatoeba.org`     | `eng_sentences_detailed.tsv.bz2`                 | **200** — 34,779,571 bytes                                                            |
+| 2026-07-28 | `downloads.tatoeba.org`     | `links.tar.bz2`                                  | **200** — 148,936,941 bytes                                                           |
+| 2026-07-28 | `ftp.edrdg.org`             | any                                              | still refused — bad TLS certificate, plain HTTP refused; `www.edrdg.org` used instead |
 
-The 403/refusals were reproduced with `curl` in this session and match the WP-04
-record, so they are an egress-policy property, not a client misconfiguration.
+The rows above the divide were recorded before the operator widened the egress
+policy on 2026-07-28; the `www.edrdg.org`, `creativecommons.org` and
+`downloads.tatoeba.org` rows after it were reproduced with `curl` **and**
+independently by the importer, whose byte counts match. The earlier refusals are
+kept rather than deleted: they are why the superseded EDRDG statement said 3.0,
+and a reader who cannot see that history cannot audit the correction.
+
+One route stayed shut. `ftp.edrdg.org` still fails TLS and refuses plain HTTP,
+and `codeload.github.com` still returns 403, so KanjiVG is fetched file by file
+at a pinned commit rather than as a tarball.
 
 ### 5.1 Sources inspected and rejected
 
@@ -483,14 +517,23 @@ record, so they are an egress-policy property, not a client misconfiguration.
 
 ## 6. Deferred items
 
-| Id   | Item                                                          | Status                                                                    | Smallest operator action                                                          |
-| ---- | ------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| D-1  | JMdict / KANJIDIC2 with verbatim EDRDG attribution text       | **closed** — shipped under LICENSED REDISTRIBUTION (§2)                   | —                                                                                 |
-| D-1a | Confirm the current EDRDG licence **version** at the licensor | open — statement on file says CC BY-SA 3.0; 4.0 unverified, unclaimed     | allow `www.edrdg.org`, re-read `/edrdg/licence.html`, and re-record if it differs |
-| D-2  | Tatoeba sentence subset with per-sentence attribution         | open — not shipped; sentences are original                                | allow `tatoeba.org` + `downloads.tatoeba.org`, then add a sourced subset          |
-| D-3  | CC BY 2.0 FR legal code                                       | open — unobtainable; `creativecommons.org` refused, SPDX has no such text | closes with D-2                                                                   |
+| Id   | Item                                                          | Status                                                                                           | Smallest operator action                                            |
+| ---- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| D-1  | JMdict / KANJIDIC2 with verbatim EDRDG attribution text       | **closed** — shipped VERIFIED from the licensor's host (§2)                                      | —                                                                   |
+| D-1a | Confirm the current EDRDG licence **version** at the licensor | **closed** — licensor says CC BY-SA **4.0**; the 3.0 label was wrong and is corrected everywhere | —                                                                   |
+| D-2  | Tatoeba sentence subset with per-sentence attribution         | **closed** — shipped with per-half contributor attribution (§3)                                  | —                                                                   |
+| D-3  | CC BY 2.0 FR legal code                                       | **closed** — verbatim from creativecommons.org at `licenses/CC-BY-2.0-FR.html`                   | —                                                                   |
+| D-4  | Re-run against a later upstream                               | open — JMdict and KANJIDIC2 change continuously; this snapshot is 2026-07-28                     | re-run `import-sources.mjs`; `--verify-fixtures` reports what moved |
 
 No asset in this package has an unresolved licence: everything shipped is either
-covered by a verbatim licence text on disk (§1, §2) or is this project's own work
-under the pending OD-09 decision (§4). D-1a and D-3 are open **questions about
-sources**, not exposure on shipped bytes.
+covered by a verbatim licence text on disk (§1, §2, §3) or is this project's own
+work under the pending OD-09 decision (§4). Every deferral WP-04 opened is now
+closed against the licensor's own artefacts rather than a redistributor's.
+
+D-4 is not a defect. These files are living documents, and the honest position is
+that this package pins a dated snapshot and can say exactly which one:
+`data/dictionary/manifest.json` records the sha256 of every archive it read, and
+`--verify-fixtures` re-derives the §8 fixtures from current upstream and prints
+every field that has since moved. When it was first run against the 2026-07-28
+files it found seven such fields left over from the 2021 redistribution — which
+is the whole argument for keeping that command rather than trusting the label.

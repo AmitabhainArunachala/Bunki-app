@@ -23,33 +23,22 @@
     "KanjiVG": {
       "license": "CC BY-SA 3.0",
       "requiresOnScreenAttribution": true,
-      "files": [
-        "licenses/KanjiVG-COPYING.txt",
-        "licenses/CC-BY-SA-3.0.txt"
-      ]
+      "files": ["licenses/KanjiVG-COPYING.txt", "licenses/CC-BY-SA-3.0.txt"]
     },
     "JMdict (EDRDG)": {
       "license": "CC BY-SA 4.0",
       "requiresOnScreenAttribution": true,
-      "files": [
-        "licenses/EDRDG-licence-statement.html",
-        "licenses/CC-BY-SA-4.0.html"
-      ]
+      "files": ["licenses/EDRDG-licence-statement.html", "licenses/CC-BY-SA-4.0.html"]
     },
     "Tatoeba": {
       "license": "CC BY 2.0 FR",
       "requiresOnScreenAttribution": true,
-      "files": [
-        "licenses/CC-BY-2.0-FR.html"
-      ]
+      "files": ["licenses/CC-BY-2.0-FR.html"]
     },
     "KANJIDIC2 (EDRDG)": {
       "license": "CC BY-SA 4.0",
       "requiresOnScreenAttribution": true,
-      "files": [
-        "licenses/EDRDG-licence-statement.html",
-        "licenses/CC-BY-SA-4.0.html"
-      ]
+      "files": ["licenses/EDRDG-licence-statement.html", "licenses/CC-BY-SA-4.0.html"]
     }
   },
   "files": {

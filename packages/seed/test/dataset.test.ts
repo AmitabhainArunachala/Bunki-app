@@ -159,7 +159,11 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
     expect(SEED_ENTRY_DISCLOSURE).toMatch(/JMdict/);
     expect(SEED_ENTRY_DISCLOSURE).toMatch(/KANJIDIC2/);
     expect(SEED_ENTRY_DISCLOSURE).toMatch(/Electronic Dictionary Research and Development Group/);
-    expect(SEED_ENTRY_DISCLOSURE).toMatch(/CC BY-SA 3\.0/);
+    // 4.0 is what the licensor's own statement says. The 3.0 that stood here came
+    // from a redistributor's bundled copy that was a version behind; if this ever
+    // reverts, the app is telling the user the wrong licence.
+    expect(SEED_ENTRY_DISCLOSURE).toMatch(/CC BY-SA 4\.0/);
+    expect(SEED_ENTRY_DISCLOSURE).not.toMatch(/JMdict and KANJIDIC2[^.]*CC BY-SA 3\.0/);
   });
 
   it('still says, on the same screen, what remains this project’s own writing', () => {
@@ -170,10 +174,12 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
     expect(SEED_ENTRY_DISCLOSURE).toMatch(/not taken from any corpus/i);
   });
 
-  it('claims no Tatoeba content anywhere in the dataset', () => {
-    // Unchanged from WP-04 and load-bearing: Tatoeba is still unreachable and
-    // its licence text still unobtainable, so a Tatoeba label anywhere would be
-    // fabricated provenance.
+  it('keeps the §8 fixture tier free of Tatoeba labels, because none of it is Tatoeba', () => {
+    // WP-04 asserted this because Tatoeba was unreachable. It is reachable now
+    // and CC BY 2.0 FR is on file, so the reason has changed but the assertion
+    // has not: the imported dictionary carries Tatoeba sentences, the eight
+    // worked examples in this tier are still project-authored, and labelling
+    // them Tatoeba would be fabricated provenance in the other direction.
     for (const record of allSeedRecords) {
       for (const [field, provenance] of Object.entries(
         record.provenance as Record<string, { source: string; attribution: string }>,
@@ -190,7 +196,7 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
         const provenance = lexeme.provenance[field];
         expect(provenance.source, `${lexeme.headword}.${field}`).toBe('JMdict (EDRDG)');
         expect(provenance.review_status, `${lexeme.headword}.${field}`).toBe(
-          'licensed-redistribution',
+          'primary-source-verified',
         );
         // A JMdict ent_seq, not a placeholder and not a remembered number.
         expect(provenance.source_entry_id, `${lexeme.headword}.${field}`).toMatch(/^\d{6,8}$/);
@@ -201,7 +207,7 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
         const provenance = kanji.provenance[field];
         expect(provenance.source, `${kanji.character}.${field}`).toBe('KANJIDIC2 (EDRDG)');
         expect(provenance.review_status, `${kanji.character}.${field}`).toBe(
-          'licensed-redistribution',
+          'primary-source-verified',
         );
         // KANJIDIC2's entry identifier is the literal itself.
         expect(provenance.source_entry_id, `${kanji.character}.${field}`).toBe(kanji.character);
@@ -209,12 +215,19 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
     }
   });
 
-  it('never lets EDRDG content claim primary-source verification', () => {
-    // www.edrdg.org is still blocked. The moment anything here says
-    // primary-source-verified, the distinction this dataset is built on is gone.
+  it('lets EDRDG content claim primary-source verification only from the licensor’s host', () => {
+    // The inverse of the WP-04 assertion, and for a reason, not a convenience:
+    // that test existed because www.edrdg.org was blocked, so the strongest
+    // honest claim was licensed-redistribution. The host is reachable now and
+    // the bytes came from it, so the claim is available — but it stays tied to
+    // evidence. primary-source-verified is permitted here *only* when the
+    // source_url is EDRDG's own host, so the label cannot drift back onto a
+    // mirror the way the CC BY-SA 3.0 statement did.
     for (const source of Object.values(seedDataset.provenanceSources)) {
       if (!/EDRDG/.test(source.source)) continue;
-      expect(source.review_status, source.source).toBe('licensed-redistribution');
+      expect(source.review_status, source.source).toBe('primary-source-verified');
+      expect(source.source_url, source.source).toMatch(/^https:\/\/www\.edrdg\.org\//);
+      expect(source.license, source.source).toBe('CC BY-SA 4.0');
     }
   });
 

@@ -19,7 +19,8 @@
       "reading": "ぶんき",
       "partOfSpeech": [
         "noun (common) (futsuumeishi)",
-        "noun or participle which takes the aux. verb suru"
+        "noun or participle which takes the aux. verb suru",
+        "intransitive verb"
       ],
       "senses": ["divergence", "ramification", "bifurcation", "branching off"],
       "kanjiUsed": ["分", "岐"],
@@ -45,7 +46,13 @@
       "headword": "分岐点",
       "reading": "ぶんきてん",
       "partOfSpeech": ["noun (common) (futsuumeishi)"],
-      "senses": ["junction", "crossroads", "division point", "parting of ways"],
+      "senses": [
+        "fork",
+        "junction",
+        "diverging point",
+        "turning point (e.g. in one's life)",
+        "crossroads"
+      ],
       "kanjiUsed": ["分", "岐", "点"],
       "fieldProvenance": {
         "headword": "bunki-selection",
@@ -186,9 +193,9 @@
         "to become clear",
         "to be known",
         "to be discovered",
-        "to be realized",
-        "to be realised",
+        "to be realized (realised)",
         "to be found out",
+        "to make sense",
         "I know!",
         "I think so too!"
       ],
@@ -335,7 +342,7 @@
       "headword": "車道",
       "reading": "しゃどう",
       "partOfSpeech": ["noun (common) (futsuumeishi)"],
-      "senses": ["roadway"],
+      "senses": ["roadway", "road", "carriageway"],
       "kanjiUsed": ["車", "道"],
       "fieldProvenance": {
         "headword": "bunki-selection",
@@ -359,7 +366,7 @@
       "headword": "車",
       "reading": "くるま",
       "partOfSpeech": ["noun (common) (futsuumeishi)"],
-      "senses": ["car", "automobile", "vehicle", "wheel"],
+      "senses": ["car", "automobile", "vehicle", "wheel", "castor", "caster"],
       "kanjiUsed": ["車"],
       "fieldProvenance": {
         "headword": "bunki-selection",
@@ -425,7 +432,6 @@
         "point (in a game)",
         "goal",
         "run",
-        "point (in geometry)",
         "aspect",
         "matter",
         "detail",

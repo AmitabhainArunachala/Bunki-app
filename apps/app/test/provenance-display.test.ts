@@ -58,31 +58,47 @@ describe('summary wording', () => {
     }
   });
 
+  /**
+   * No record carries `licensed-redistribution` any more: EDRDG's own host became
+   * reachable, so its data is primary-source-verified and the whole dataset is
+   * sourced directly. The standing is deliberately **kept** rather than deleted —
+   * the next import that can only reach a redistribution will need it, and
+   * deleting it would mean re-inventing the distinction under deadline, which is
+   * how a mirror gets quietly labelled as a primary source.
+   *
+   * So these two tests drive it with a synthetic record. That is the honest shape:
+   * the guarantee is about the rendering functions, not about the current data,
+   * and asserting `length > 0` over the dataset would only have been a statement
+   * about today's contents that today's contents now falsify.
+   */
+  const redistributed: ProvenanceRecord = {
+    ...(allRecords().find((r) => standingOf(r) === 'source-verified') as ProvenanceRecord),
+    review_status: 'licensed-redistribution',
+  };
+
   it('says where licensed-redistribution data actually came from', () => {
     // The whole point of the separate standing: a reader must not come away
-    // believing www.edrdg.org was reached, because it was not.
-    const licensed = allRecords().filter((r) => standingOf(r) === 'source-licensed');
-    expect(licensed.length).toBeGreaterThan(0);
-    for (const record of licensed) {
-      const summary = provenanceSummary(record);
-      expect(summary).toContain(record.source);
-      expect(summary).toContain(record.license);
-      expect(summary).toMatch(/pinned redistribution/i);
-      expect(summary).not.toMatch(/written for this project/i);
-    }
+    // believing the licensor's own host was reached when it was not.
+    expect(standingOf(redistributed)).toBe('source-licensed');
+    const summary = provenanceSummary(redistributed);
+    expect(summary).toContain(redistributed.source);
+    expect(summary).toContain(redistributed.license);
+    expect(summary).toMatch(/pinned redistribution/i);
+    expect(summary).not.toMatch(/written for this project/i);
   });
 
   it('keeps the two sourced standings from collapsing into one string', () => {
     const verified = allRecords().find((r) => standingOf(r) === 'source-verified');
-    const licensed = allRecords().find((r) => standingOf(r) === 'source-licensed');
     expect(verified).toBeDefined();
-    expect(licensed).toBeDefined();
     expect(provenanceSummary(verified as ProvenanceRecord)).not.toBe(
-      provenanceSummary(licensed as ProvenanceRecord),
+      provenanceSummary(redistributed),
     );
-    expect(provenanceBadge(verified as ProvenanceRecord)).not.toBe(
-      provenanceBadge(licensed as ProvenanceRecord),
-    );
+    expect(provenanceBadge(verified as ProvenanceRecord)).not.toBe(provenanceBadge(redistributed));
+  });
+
+  it('now has nothing left standing on a redistribution', () => {
+    // The positive claim this round earns, asserted rather than described.
+    expect(allRecords().filter((r) => standingOf(r) === 'source-licensed')).toHaveLength(0);
   });
 
   it('distinguishes reviewed-in-project from unreviewed', () => {

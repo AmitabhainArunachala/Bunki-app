@@ -42,29 +42,29 @@
     },
     "edrdg-jmdict": {
       "source": "JMdict (EDRDG)",
-      "source_version": "JMdict as compiled into jamdict-data 1.5 (jamdict.db meta jmdict.version=1.08; package compiled 2021-04-17)",
-      "license": "CC BY-SA 3.0",
-      "attribution": "This product uses the JMdict dictionary file. JMdict is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.md, full legal code in packages/seed/licenses/CC-BY-SA-3.0.txt",
+      "source_version": "JMdict_e (English edition), retrieved from www.edrdg.org on 2026-07-28; 218,148 entries",
+      "license": "CC BY-SA 4.0",
+      "attribution": "This product uses the JMdict dictionary file. JMdict is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.html, full legal code in packages/seed/licenses/CC-BY-SA-4.0.html",
       "modification_status": "derived",
       "confidence": "high",
-      "review_status": "licensed-redistribution",
-      "source_url": "https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz",
+      "review_status": "primary-source-verified",
+      "source_url": "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz",
       "retrieved_at": "2026-07-28",
       "source_entry_id": null,
-      "notes": "Real JMdict entries; each field's source_entry_id is that entry's real ent_seq. www.edrdg.org and ftp.edrdg.org are refused by this session's egress proxy, so the bytes come from jamdict-data 1.5, the data package of the jamdict project, pinned by sha256 a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415 — which bundles EDRDG's own licence statement beside the data. modification_status is derived, not unmodified, for one specific reason: the seed schema stores senses and parts of speech as flat string lists, so upstream sense boundaries are lost by the shape. reading is the entry's first kana element; partOfSpeech and senses are every value across every sense in upstream order, deduplicated. Extraction rules and re-verification live in scripts/fetch-edrdg.mjs."
+      "notes": "Real JMdict entries; each field's source_entry_id is that entry's real ent_seq. modification_status is derived, not unmodified, for one specific reason: the seed schema stores senses and parts of speech as flat string lists, so upstream sense boundaries are lost by the shape. reading is the entry's first kana element; partOfSpeech and senses are every value across every sense in upstream order, deduplicated. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
     },
     "edrdg-kanjidic2": {
       "source": "KANJIDIC2 (EDRDG)",
-      "source_version": "KANJIDIC2 as compiled into jamdict-data 1.5 (jamdict.db meta kanjidic2.version=1.6, kanjidic2.date=April 2008)",
-      "license": "CC BY-SA 3.0",
-      "attribution": "This product uses the KANJIDIC2 dictionary file. KANJIDIC2 is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.md, full legal code in packages/seed/licenses/CC-BY-SA-3.0.txt",
+      "source_version": "KANJIDIC2, retrieved from www.edrdg.org on 2026-07-28; 13,108 characters",
+      "license": "CC BY-SA 4.0",
+      "attribution": "This product uses the KANJIDIC2 dictionary file. KANJIDIC2 is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.html, full legal code in packages/seed/licenses/CC-BY-SA-4.0.html",
       "modification_status": "derived",
       "confidence": "high",
-      "review_status": "licensed-redistribution",
-      "source_url": "https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz",
+      "review_status": "primary-source-verified",
+      "source_url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
       "retrieved_at": "2026-07-28",
       "source_entry_id": null,
-      "notes": "Real KANJIDIC2 characters; each field's source_entry_id is the KANJIDIC2 literal itself, which is that file's entry identifier. Same pinned artefact and same egress situation as edrdg-jmdict. derived, not unmodified, because on/kun readings and meanings are flattened across KANJIDIC2's reading-meaning groups into the flat lists this schema stores, filtered to ja_on/ja_kun and English. The special conditions in §7 of the EDRDG statement (SKIP codes, Four Corner, De Roo, Spahn/Hadamitzky descriptors and the other third-party-copyright fields) do not apply here: none of those fields are extracted or shipped."
+      "notes": "Real KANJIDIC2 characters; source_entry_id is the literal, which is KANJIDIC2's own entry identifier. onReadings and kunReadings are the ja_on and ja_kun readings in upstream order; meanings are the English <meaning> elements only. strokeCount is NOT taken from here — the seed derives it from the KanjiVG file it ships, and KANJIDIC2's stroke_count agreeing on all ten characters is an independent cross-check that would be destroyed by copying one into the other. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
     },
     "bunki-editorial": {
       "source": "Bunki Phase-0 seed (hand-assembled by this project)",
@@ -117,6 +117,32 @@
       "retrieved_at": null,
       "source_entry_id": null,
       "notes": "Values a machine derives from the field's own subject — a Unicode code point from its character, the kanji used by a headword from the headword string. The test suite recomputes each one and fails on any mismatch, so these are the only seed fields that are self-verifying."
+    },
+    "tatoeba-japanese": {
+      "source": "Tatoeba",
+      "source_version": "jpn_sentences_detailed.tsv, retrieved from downloads.tatoeba.org on 2026-07-28; 248,821 Japanese sentences",
+      "license": "CC BY 2.0 FR",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "attribution": "Sentence from the Tatoeba Project (https://tatoeba.org), used under CC BY 2.0 FR: https://creativecommons.org/licenses/by/2.0/fr/ — full legal code in packages/seed/licenses/CC-BY-2.0-FR.html. The contributing member is named per sentence in the record, because this licence attributes the individual author, not the corpus.",
+      "source_url": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences_detailed.tsv.bz2",
+      "notes": "Sentence text verbatim, never edited. The per-record tatoeba.japaneseId is the real Tatoeba sentence id and japaneseContributor the real contributing username; a sentence whose contributor could not be resolved was not shipped, because an attribution licence with no attributable author cannot be complied with."
+    },
+    "tatoeba-english": {
+      "source": "Tatoeba",
+      "source_version": "eng_sentences_detailed.tsv + links.csv, retrieved from downloads.tatoeba.org on 2026-07-28",
+      "license": "CC BY 2.0 FR",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "primary-source-verified",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "attribution": "English translation from the Tatoeba Project (https://tatoeba.org), used under CC BY 2.0 FR: https://creativecommons.org/licenses/by/2.0/fr/ — full legal code in packages/seed/licenses/CC-BY-2.0-FR.html. The contributing member is named per sentence in the record.",
+      "source_url": "https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_detailed.tsv.bz2",
+      "notes": "The English half of a Tatoeba pair is a separate work by a separate contributor, linked through the project's own links export. It carries its own id and its own credit rather than inheriting the Japanese sentence's, because collapsing the two would misattribute both."
     }
   }
 }

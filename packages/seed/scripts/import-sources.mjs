@@ -45,7 +45,7 @@
  * same constraint fetch-kanjivg.mjs documents. Globals are declared locally
  * rather than widening that glob across a work-package boundary.
  */
-/* global fetch, console, process, Buffer, URL, AbortController, setTimeout */
+/* global fetch, console, process, Buffer */
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -139,7 +139,10 @@ export const SOURCES = {
     displayName: 'Tatoeba',
     licence: 'CC BY 2.0 FR',
     licenceFiles: ['licenses/CC-BY-2.0-FR.html'],
-    download: { url: 'https://downloads.tatoeba.org/exports/links.tar.bz2', cacheAs: 'links.tar.bz2' },
+    download: {
+      url: 'https://downloads.tatoeba.org/exports/links.tar.bz2',
+      cacheAs: 'links.tar.bz2',
+    },
     projectUrl: 'https://tatoeba.org',
   },
   kanjivg: {
@@ -175,14 +178,129 @@ export function parseArgs(argv) {
     offline: argv.includes('--offline'),
     licencesOnly: argv.includes('--licences'),
     check: argv.includes('--check'),
+    verifyFixtures: argv.includes('--verify-fixtures'),
+    rewriteFixtures: argv.includes('--rewrite-fixtures'),
   };
+}
+
+/**
+ * Re-derive the §8 seed fixtures from the current upstream files and report
+ * MATCH/DIFFER per field.
+ *
+ * This exists because the fixtures' provenance is about to claim they came from
+ * JMdict/KANJIDIC2 retrieved from www.edrdg.org today. That claim is only honest
+ * if the committed values actually equal what those files say now — the values
+ * were originally derived from a 2021 redistribution, and an entry edited
+ * upstream since then would leave the data saying one thing and the provenance
+ * another. Nothing is rewritten here; disagreements are reported so a human
+ * decides.
+ */
+export async function verifyFixtures(options, { rewrite = false } = {}) {
+  const jmdictGot = await download(
+    SOURCES['edrdg-jmdict'].download.url,
+    SOURCES['edrdg-jmdict'].download.cacheAs,
+    options,
+  );
+  const kd2Got = await download(
+    SOURCES['edrdg-kanjidic2'].download.url,
+    SOURCES['edrdg-kanjidic2'].download.cacheAs,
+    options,
+  );
+  const jmdict = new Map(
+    parseJMdict(gunzipSync(jmdictGot.body).toString('utf8')).map((entry) => [entry.entSeq, entry]),
+  );
+  const kanjidic = parseKanjidic2(gunzipSync(kd2Got.body).toString('utf8'));
+
+  const lexemes = JSON.parse(await readFile(join(PACKAGE_ROOT, 'data', 'lexemes.json'), 'utf8'));
+  const kanjiData = JSON.parse(await readFile(join(PACKAGE_ROOT, 'data', 'kanji.json'), 'utf8'));
+  const upstream = JSON.parse(
+    await readFile(join(PACKAGE_ROOT, 'data', 'edrdg-upstream.json'), 'utf8'),
+  );
+
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  let differ = 0;
+
+  for (const record of lexemes.records) {
+    const entSeq = String(upstream.lexemeEntSeq[record.id] ?? '');
+    const fresh = jmdict.get(entSeq);
+    if (!fresh) {
+      console.log(`MISSING ${record.id} ent_seq=${entSeq} is not in current JMdict`);
+      differ += 1;
+      continue;
+    }
+    for (const field of ['reading', 'senses', 'partOfSpeech']) {
+      const ok = same(record[field], fresh[field]);
+      if (!ok) {
+        differ += 1;
+        console.log(`DIFFER  ${record.id}.${field} ent_seq=${entSeq}`);
+        console.log(`        committed: ${JSON.stringify(record[field])}`);
+        console.log(`        upstream : ${JSON.stringify(fresh[field])}`);
+        if (rewrite) record[field] = fresh[field];
+      }
+    }
+  }
+
+  for (const record of kanjiData.records) {
+    const fresh = kanjidic.get(record.character);
+    if (!fresh) {
+      console.log(`MISSING ${record.character} is not in current KANJIDIC2`);
+      differ += 1;
+      continue;
+    }
+    for (const [field, upstreamField] of [
+      ['onReadings', 'onReadings'],
+      ['kunReadings', 'kunReadings'],
+      ['meanings', 'meanings'],
+    ]) {
+      if (!same(record[field], fresh[upstreamField])) {
+        differ += 1;
+        console.log(`DIFFER  ${record.character}.${field}`);
+        console.log(`        committed: ${JSON.stringify(record[field])}`);
+        console.log(`        upstream : ${JSON.stringify(fresh[upstreamField])}`);
+        if (rewrite) record[field] = fresh[upstreamField];
+      }
+    }
+    // strokeCount is deliberately NOT rewritten: the seed derives it from the
+    // KanjiVG SVG it ships, and test/strokes.test.ts re-derives it from those
+    // bytes. KANJIDIC2 agreeing is a genuine independent cross-check, and
+    // overwriting one with the other would destroy exactly that.
+    if (record.strokeCount !== fresh.strokeCount) {
+      differ += 1;
+      console.log(
+        `DIFFER  ${record.character}.strokeCount committed=${record.strokeCount} upstream=${fresh.strokeCount} (cross-check, not rewritten)`,
+      );
+    }
+  }
+
+  if (rewrite) {
+    await writeFile(
+      join(PACKAGE_ROOT, 'data', 'lexemes.json'),
+      `${JSON.stringify(lexemes, null, 2)}\n`,
+      'utf8',
+    );
+    await writeFile(
+      join(PACKAGE_ROOT, 'data', 'kanji.json'),
+      `${JSON.stringify(kanjiData, null, 2)}\n`,
+      'utf8',
+    );
+    console.log('rewrote data/lexemes.json and data/kanji.json from current upstream');
+  }
+
+  console.log(
+    differ === 0
+      ? `MATCH   all ${lexemes.records.length} fixture lexemes and ${kanjiData.records.length} kanji equal current upstream`
+      : `${differ} field(s) differ from current upstream`,
+  );
+  return differ;
 }
 
 // ── stage 0: download with cache + digest ───────────────────────────────────
 
 async function download(url, cacheAs, { cache, offline }) {
-  await mkdir(cache, { recursive: true });
   const path = join(cache, cacheAs);
+  // cacheAs may name a subdirectory (kanjivg/04e00.svg); create the parent, not
+  // just the cache root, or every write below fails.
+  await mkdir(dirname(path), { recursive: true });
   let body;
   let cached = false;
   try {
@@ -392,7 +510,12 @@ export function parseJMdict(xml) {
       reading: decodeXml(reading),
       hasKanji: Boolean(headword),
       partOfSpeech: pos,
-      senses,
+      // Glosses are flattened across senses, so two senses sharing a gloss
+      // ("point" as geometry and as a score) would otherwise emit it twice and
+      // read as a bug rather than as the sense distinction it really is. First
+      // occurrence wins, so order still follows upstream. The loss of sense
+      // grouping is what SEED_ENTRY_DISCLOSURE warns the reader about.
+      senses: [...new Set(senses)],
       priorityTags: tags,
       score: priorityScore(tags),
     });
@@ -489,6 +612,7 @@ const writeJson = async (path, value) => {
 async function fetchStrokes(characters, { concurrency, cache, offline }) {
   const wanted = [...characters];
   const written = [];
+  const missing = [];
   let index = 0;
   const worker = async () => {
     for (;;) {
@@ -509,15 +633,21 @@ async function fetchStrokes(characters, { concurrency, cache, offline }) {
           bytes: got.bytes,
           sha256: got.sha256,
         });
-      } catch {
-        // KanjiVG does not cover every KANJIDIC2 literal. A missing file is
-        // recorded by absence, never by a fabricated entry.
+      } catch (error) {
+        // KanjiVG genuinely does not cover every KANJIDIC2 literal, and a missing
+        // character is recorded by absence rather than a fabricated entry. But
+        // only a 404 means that. Swallowing every error here once turned a
+        // mkdir bug into "0 stroke files" with no diagnostic, so anything that
+        // is not upstream saying "no such kanji" is raised.
+        if (!/HTTP 404/.test(String(error.message))) throw error;
+        missing.push(character);
       }
     }
   };
   await Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker));
   written.sort((a, b) => a.file.localeCompare(b.file));
-  return written;
+  missing.sort();
+  return { written, missing };
 }
 
 async function main() {
@@ -528,13 +658,20 @@ async function main() {
     let bad = 0;
     for (const [relPath, recorded] of Object.entries(manifest.outputs)) {
       const body = await readFile(join(PACKAGE_ROOT, 'data', relPath)).catch(() => null);
-      const ok = body !== null && sha256(body) === recorded.sha256 && body.length === recorded.bytes;
+      const ok =
+        body !== null && sha256(body) === recorded.sha256 && body.length === recorded.bytes;
       if (!ok) bad += 1;
       console.log(`${ok ? 'MATCH ' : 'DIFFER'} ${relPath}`);
     }
     for (const key of Object.keys(manifest.sources)) await assertLicensed(key);
     console.log(`licence gate: every shipped source has verbatim licence text at its digest`);
     if (bad > 0) process.exitCode = 1;
+    return;
+  }
+
+  if (options.verifyFixtures || options.rewriteFixtures) {
+    const differ = await verifyFixtures(options, { rewrite: options.rewriteFixtures });
+    if (differ > 0 && !options.rewriteFixtures) process.exitCode = 1;
     return;
   }
 
@@ -600,10 +737,25 @@ async function main() {
     console.log(`  Tatoeba jpn: ${jpn.size} sentences`);
 
     const headwords = new Map(chosen.map((e) => [e.headword, e.entSeq]));
+    // Scanning every headword against every sentence is |headwords| × |sentences|
+    // string searches — hundreds of millions at these sizes. Instead each
+    // sentence offers up its own 2–4 character windows and asks the headword set
+    // whether it recognises one, which is linear in the corpus.
+    const maxLen = Math.max(2, ...[...headwords.keys()].map((h) => h.length));
     const candidates = new Map();
     for (const sentence of jpn.values()) {
       if (sentence.text.length > 60) continue;
-      const hit = [...headwords.keys()].find((h) => h.length > 1 && sentence.text.includes(h));
+      const text = sentence.text;
+      let hit;
+      for (let i = 0; i < text.length && !hit; i += 1) {
+        for (let len = Math.min(maxLen, text.length - i); len >= 2; len -= 1) {
+          const window = text.slice(i, i + len);
+          if (headwords.has(window)) {
+            hit = window;
+            break;
+          }
+        }
+      }
       if (hit) candidates.set(sentence.id, { sentence, headword: hit });
     }
     console.log(`  ${candidates.size} candidate sentences contain a shipped headword`);
@@ -662,9 +814,16 @@ async function main() {
 
   console.log('stage 4: strokes');
   const strokeTargets =
-    options.strokes === Number.POSITIVE_INFINITY ? shippedKanji : shippedKanji.slice(0, options.strokes);
-  const strokes = usable.kanjivg ? await fetchStrokes(strokeTargets, options) : [];
-  console.log(`  ${strokes.length} stroke files`);
+    options.strokes === Number.POSITIVE_INFINITY
+      ? shippedKanji
+      : shippedKanji.slice(0, options.strokes);
+  const strokeResult = usable.kanjivg
+    ? await fetchStrokes(strokeTargets, options)
+    : { written: [], missing: [] };
+  const strokes = strokeResult.written;
+  console.log(
+    `  ${strokes.length} stroke files (${strokeResult.missing.length} kanji not covered by KanjiVG)`,
+  );
 
   console.log('stage 5: emit');
   const strokeByChar = new Map(strokes.map((s) => [s.character, s.file]));
@@ -797,6 +956,7 @@ async function main() {
       kanji: shippedKanji.length,
       sentences: sentences.length,
       strokeFiles: strokes.length,
+      kanjiWithoutKanjiVgCoverage: strokeResult.missing.length,
       jmdictEntriesAvailable: jmdictEntries.length,
       kanjidic2CharactersAvailable: kanjidic.size,
     },

@@ -85,12 +85,23 @@ export const SEED_COVERAGE_DISCLOSURE =
  * It carries the CC BY-SA acknowledgement itself, because §3 of the EDRDG
  * licence statement requires that a display of words from the files acknowledge
  * the source *on the screen showing them* — an attribution that lives only in
- * `LICENSES.md` would not satisfy the licence this data ships under. It also
- * still says what remains project-authored, because the sentences, grammar notes
- * and passage are exactly that and no import changed it.
+ * `LICENSES.md` would not satisfy the licence this data ships under.
+ *
+ * Three things about the wording are load-bearing:
+ *
+ * - **CC BY-SA 4.0, not 3.0.** The licensor's own statement says V4.0. The
+ *   earlier 3.0 here came from a redistributor's bundled copy that was a version
+ *   behind, and a user-facing licence claim that is wrong is worse than none.
+ * - **It no longer says the entries are project-authored** — that became false
+ *   the moment real JMdict and KANJIDIC2 data replaced the editorial placeholders,
+ *   and a disclosure that understates real provenance misleads in its own
+ *   direction.
+ * - **It still disowns what this project did write.** The grammar notes and the
+ *   integration passage are this project's, and claiming a corpus wrote them
+ *   would be the mirror-image lie of the one WP-04 avoided.
  */
 export const SEED_ENTRY_DISCLOSURE =
-  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 3.0. Sense and reading lists are flattened here and may not show every distinction upstream draws. Example sentences, grammar notes and the reading passage are written by this project, not taken from any corpus.';
+  'Word readings, senses and kanji meanings come from JMdict and KANJIDIC2, property of the Electronic Dictionary Research and Development Group, used under CC BY-SA 4.0. Stroke order comes from KanjiVG under CC BY-SA 3.0. Imported example sentences come from the Tatoeba Project under CC BY 2.0 FR and name the member who contributed each one. Sense and reading lists are flattened here and may not show every distinction upstream draws. The eight worked examples, the grammar notes and the reading passage are written by this project, not taken from any corpus.';
 
 /** Assert a record's data fields are exactly the ones this loader knows about. */
 function expectDataKeys(
