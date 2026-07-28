@@ -148,6 +148,18 @@ export const DESTINATIONS: readonly Destination[] = [
     blurb: 'Every token and component of the experience layer, in real Japanese.',
     reach: { kind: 'specimen' },
   },
+  {
+    href: '/read',
+    routeFile: 'read.tsx',
+    screen: 'screens/reading-screen.tsx',
+    label: 'Reading',
+    blurb: 'A passage, read whole. Lookups happen in place.',
+    // Reached from the front door rather than from the shell. The shell holds
+    // the four places a learner starts from and its own test pins that number;
+    // a reading passage is something you go *to* from where you already are,
+    // and the capture screen is where you already are.
+    reach: { kind: 'from', from: 'src/screens/capture-screen.tsx', via: 'onOpenReading' },
+  },
 ];
 
 /**

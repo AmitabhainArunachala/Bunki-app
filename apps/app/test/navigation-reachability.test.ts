@@ -172,27 +172,60 @@ describe('every destination has a door a learner can open', () => {
 
 describe('the map describes the app it is in', () => {
   /**
-   * Written against `LEARNER_DESTINATIONS` rather than `DESTINATIONS`.
+   * The eight screens controller §10 names, in the order the loop is walked.
    *
-   * Campaign E adds a development surface (`/style-guide`) which is a real
-   * route and therefore on the map, but is not one of the screens controller
-   * §10 names. Widening this list to nine would have made it a list of "routes"
-   * instead of a list of "the app's screens", and that is the property worth
-   * keeping exact. The specimen is asserted separately, below, so the exemption
-   * is one named route rather than a category anyone can grow.
+   * Not a list of "the app's routes" — a list of the Phase-0 screens. Keeping
+   * it separate from the Campaign E list below is what lets both assertions stay
+   * exhaustive while a wave of parallel surface lanes is landing: a lane appends
+   * one label to {@link CAMPAIGN_E_SCREENS} and touches nothing else, and a
+   * Phase-0 screen that went missing in a merge still fails here.
    */
+  const CONTROLLER_SCREENS = [
+    'Capture',
+    'Word',
+    'Kanji',
+    'Session',
+    'Integration canvas',
+    'Repair branch',
+    'Evidence',
+    'About & diagnostics',
+  ] as const;
+
+  /**
+   * Learner destinations Campaign E adds, sorted.
+   *
+   * Sorted rather than in wave order so that two lanes appending in the same
+   * round produce a mergeable diff. Every entry here is a real learner
+   * destination with a real door; development surfaces are `specimen` and are
+   * pinned separately, below.
+   */
+  const CAMPAIGN_E_SCREENS = ['Reading'] as const;
+
   it('covers every screen the controller §10 list names', () => {
     const labels = LEARNER_DESTINATIONS.map((destination) => destination.label);
-    expect(labels).toEqual([
-      'Capture',
-      'Word',
-      'Kanji',
-      'Session',
-      'Integration canvas',
-      'Repair branch',
-      'Evidence',
-      'About & diagnostics',
+    for (const name of CONTROLLER_SCREENS) {
+      expect(labels, `${name} is no longer on the map`).toContain(name);
+    }
+    // Order is part of the claim: the map is documented as being in the order
+    // the loop is walked, and a reordering would make that comment false.
+    expect(labels.filter((label) => CONTROLLER_SCREENS.includes(label as never))).toEqual([
+      ...CONTROLLER_SCREENS,
     ]);
+  });
+
+  /**
+   * …and nothing arrives unregistered.
+   *
+   * The half that keeps the assertion above from being a containment check that
+   * anything can pass: every learner destination is either one of the eight or
+   * one this campaign declared, and a new surface that skipped both lists fails
+   * here rather than shipping unowned.
+   */
+  it('registers every learner destination the campaign added', () => {
+    const added = LEARNER_DESTINATIONS.map((destination) => destination.label)
+      .filter((label) => !CONTROLLER_SCREENS.includes(label as never))
+      .sort();
+    expect(added).toEqual([...CAMPAIGN_E_SCREENS].sort());
   });
 
   it('keeps the shell small enough to stay calm (REQ-UI-08)', () => {

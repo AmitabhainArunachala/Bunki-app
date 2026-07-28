@@ -94,6 +94,7 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'session-loop.ts': 'WP-08 (_helper: workspace hook, not a screen)',
   'session-timing.ts': 'WP-08 (_helper: latency measurement, not a screen)',
   'session-workspace.tsx': 'WP-08 (_helper: workspace provider, not a screen)',
+  'reading-screen.tsx': 'Campaign E lane B4',
 };
 
 const screenFileNames = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();

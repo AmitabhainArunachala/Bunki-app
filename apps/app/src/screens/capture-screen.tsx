@@ -132,6 +132,15 @@ export interface CaptureScreenProps {
   readonly onOpenKanji: (character: string) => void;
   /** Opens the evidence inspector (WP-09). */
   readonly onOpenEvidence: () => void;
+  /**
+   * Opens the reading surface (Campaign E, lane B4).
+   *
+   * The reading passage's door is here rather than in the navigation shell: the
+   * shell holds the four places a learner *starts* from and `nav-shell.tsx`
+   * argues at length against a fifth, while a passage is somewhere you go from
+   * where you already are. This screen is where you already are.
+   */
+  readonly onOpenReading: () => void;
   /** Seeds the query box; the evidence harness uses it to reach a state directly. */
   readonly initialQuery?: string | undefined;
 }
@@ -140,6 +149,7 @@ export function CaptureScreen({
   onOpenWord,
   onOpenKanji,
   onOpenEvidence,
+  onOpenReading,
   initialQuery = '',
 }: CaptureScreenProps): ReactNode {
   const theme = useTheme();
@@ -308,6 +318,22 @@ export function CaptureScreen({
           variant="quiet"
         />
       </View>
+
+      {/*
+        The door to the reading surface (Campaign E, lane B4).
+
+        Here rather than in the navigation shell, which holds the four places a
+        learner starts from and argues in its own header against a fifth. A
+        passage is somewhere you go from where you already are, and this screen
+        is where you already are.
+      */}
+      <AppButton
+        accessibilityHint="Opens the reading passage. Looking a word up there happens on the page, without leaving it."
+        label="Read a passage"
+        onPress={onOpenReading}
+        style={styles.readingDoor}
+        testID="capture-open-reading"
+      />
 
       {state.kind === 'loading' ? <LoadingPanel label="Looking up…" /> : null}
 
@@ -701,6 +727,9 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     flexDirection: 'row',
     gap: SPACE.sm,
+  },
+  readingDoor: {
+    alignSelf: 'flex-start',
   },
   answer: {
     borderRadius: 8,
