@@ -7517,3 +7517,225 @@ import the whole dictionary — so it plausibly makes the contention worse. Rais
 7. Set `RING_DISPLAY_LIMIT` above `DETAIL_DIVE_OPTIONS.perLevel`. The ring's
    "Drawing N of M" line has two branches and only the smaller-limit one is
    exercised today.
+
+---
+
+## Appendix — lane B2, second pass: what a concurrent verifier found
+
+Branch `agent/bunki-e-dive`, continuing from `df171ad`.
+
+### The circumstance, stated first, because it changes how to read this
+
+**Two agents were given lane B2 and both ran.** This one opened its worktree
+while the other was already at `56e36e0`, and discovered the overlap by noticing
+files in a sibling worktree changing minute by minute. Racing it would have meant
+two agents pushing to one branch and two half-lanes.
+
+So this pass did not rebuild the lane. It took the other agent's pushed commits
+as its base, merged `agent/bunki-e-integration` on top, ran the whole check set
+against the result, and repaired what the checks found. Where both passes reached
+the same conclusion independently that is said below, because independent
+agreement is worth more than either finding alone — and where this pass's version
+was the weaker one it was dropped rather than merged.
+
+Everything reported here was run in this worktree. Nothing is quoted from the
+other lane's records.
+
+### P1 — `npm run typecheck` failed on the lane, and had not been run
+
+`packages/domain/test/scale/support.ts` line 74:
+
+```ts
+role: role as GraphEdge['role'],
+```
+
+Under `exactOptionalPropertyTypes: true`, the indexed access of an **optional**
+property includes `undefined`. So `GraphEdge['role']` is
+`ComponentRole | undefined`, and assigning that back into the optional property
+is an error. The cast that looked like it was narrowing was the only thing in the
+expression that could widen.
+
+```
+test/scale/support.ts(74,16): error TS2379: Argument of type
+'{ kind: "component_of"; …; role: GraphEdge["role"]; }' is not assignable to
+parameter of type 'GraphEdge' with 'exactOptionalPropertyTypes: true'.
+```
+
+The tuple now declares `role: ComponentRole` and the cast is gone. Confirmed
+against `56e36e0` that the integration merge did not cause it: neither
+`graph/model.ts` nor either `tsconfig` differs between that commit and this one,
+so the branch had shipped a domain package that did not typecheck.
+
+This is the check the honesty rules are pointed at, and it costs one command.
+
+### P2 — three docblocks cited a test that did not exist
+
+`scale-source.ts`, `dive-detail.ts` and `dive-scale-source.test.ts` all named
+`test/dive-detail.test.ts`. There was no such file, and `dive-detail.ts` — 381
+lines deriving every section of the kanji page — had no test of its own.
+
+Written rather than deleted: 27 assertions over the real 3,000-lexeme tier. What
+it pins is what the *page copy* claims, because those are the sentences a learner
+reads as fact:
+
+- "ordered by JMdict's own commonness tags" — the rank function against real
+  `nfXX` bands, and the ordering it produces down the page;
+- "every role here is unclassified" — read off the real dictionary, because the
+  moment one came back `semantic` the note beside it would be false;
+- "a shared shape and not a contrast set" — no relation in the real view may
+  carry a `contrasts_with` or a `collocates_with` basis;
+- "the reading is the reason, and it is shown" — every family entry carries a
+  non-empty `via`;
+- the note refuses to exist with fewer than two words, and never offers the
+  character itself as one of its own examples;
+- the era of a character is `unknown` **by rule**, for every character tried.
+
+**One property it declines to assert.** The untagged sentinel is `99`, so a
+hypothetical `nf99` would tie with it rather than sort above it. The tie is
+unreachable — a second assertion walks the whole shipped tier and finds no band
+anywhere near it — and it is recorded rather than asserted away, because a test
+that pretended `nf99` sorted correctly would be claiming a property the function
+does not have.
+
+### Both guards demonstrated failing before they passed
+
+A test that has never failed proves nothing, so both were reddened deliberately
+and reverted:
+
+1. `role: 'unclassified'` → `'semantic'` in `scale-source.ts`:
+   `× marks every component role unclassified, which is what the note beside it says`
+
+2. One import of the store's command surface into `src/ui/dive/dive-state.ts`.
+   Two of `dive-boundary.test.ts`'s assertions went red and named the file and
+   the binding:
+
+   ```
+   + "src/ui/dive/dive-state.ts: imports { useAppStore } from '../../state/app-context.tsx'"
+   + "src/ui/dive/dive-state.ts: takes { useAppStore } across the state seam from '../../state/app-context.tsx'"
+   ```
+
+   Reverted; `Tests 23 passed (23)`.
+
+This is a second, independent demonstration of the boundary — the other pass ran
+its own. The rule it defends is the one that matters: **flight is exposure and
+exposure is never retrieval.**
+
+### Twelve driven screenshots, and the numbers read out of the live page
+
+`apps/app/scripts/capture-dive-verify.mjs` →
+`docs/build-evidence/screenshots-b2-dive-verify/`.
+
+There is no specimen page for a dive: the only way to see L1 is to be at L1. So
+the camera **flies** — presses a ring member, waits for the path to change, then
+photographs. Four scale levels rather than three, in light, in dark, and under
+`prefers-reduced-motion`.
+
+The level-of-detail cost is the dive's own line, scraped from the photographed
+page:
+
+| centre | materialised | of | adjacency lists | share |
+| --- | --- | --- | --- | --- |
+| L2 分 | 44 | 9,025 | 9 | 0.49% |
+| L1 八 | 143 | 9,025 | 7 | 1.58% |
+| L0 1/4 | 3 | 9,025 | 1 | 0.03% |
+| L3 気分 | 15 | 9,025 | 6 | 0.17% |
+
+The reduced-motion variant reports the stepped note at every level and the
+default variant reports the flight, both read from the live chrome rather than
+inferred from the code. The durable snapshot is read before and after the flight
+and the script exits non-zero if they differ.
+
+Also measured, in `apps/app/test/dive-detail.test.ts`:
+**10 kanji pages built in 15.7 ms — 1.57 ms each — over 9,025 nodes.**
+
+### Two findings the browser produced that no scan could
+
+**A component has no strokes, and that is correct.** The first camera tried to
+reach L0 by zooming through L1 and the dive refused: KanjiVG geometry hangs off a
+**character**, and `diveAt` mints strokes only when the centre is a kanji, so 八
+as a shape has none. The camera was wrong, not the ladder. It is recorded in the
+script rather than routed around, because a driver that quietly reroutes around a
+refusal is how a finding gets lost.
+
+**A hydration mismatch on the two dynamic routes.** React 19's minified **#418**
+fires once per page load on `/kanji/:character` *and* on `/word/:lexemeId`, and
+on none of `/`, `/style-guide`, `/evidence` or `/session`. So it tracks the
+dynamic-segment route shape rather than this lane, and lane B3's page has it too.
+React recovers by discarding the server markup and rendering on the client, which
+is why every shot is a real page.
+
+**The cause was not established and it is not fixed here.** The capture gate lets
+exactly this one error through by name and fails on anything else.
+
+### Independent agreement, and the version that was dropped
+
+Both passes independently found the same landing-page defect and fixed it the
+same way, at the same number.
+
+On a build with no learner state — which is every first run — every node sits at
+the faint end of the ramp, and `RecallIndicator` renders those two bands as a
+**meter** rather than as a bare mark. That is lane A1 being right: those two fall
+under 3:1 and may not be drawn bare. But it meant every ring member became a
+full-width meter, so 分 landed with **twenty word cards stacked above the
+centre**, and the character the page is about was below the fold on arrival.
+
+Both passes capped the drawn ring at **eight**. The other's copy is the better
+one — it distinguishes "the dive's budget cut this" from "the canvas is drawing
+fewer" in two different sentences — so this pass's version was dropped and theirs
+kept. The screenshots in `screenshots-b2-dive-verify/` are of the merged result:
+one wrapped row of eight, the count beside it, and the centre on screen.
+
+### The check set, as it actually ran in this worktree
+
+| check | result |
+| --- | --- |
+| `npm ci` | pass |
+| `npm run lint` | pass |
+| `npm run format:check` | pass |
+| `npm run typecheck` | **failed; fixed above; passes now** |
+| `npm run test` | 2,466 passed / 5 timed out — see below |
+| `npm run test:replay` | pass (47) |
+| `npm run verify:export` | pass (14) |
+| `expo export --platform web` | pass |
+| `npm run test:e2e:build` | pass (the same export) |
+| `npm run test:e2e` | **52 passed (3.2m)** |
+
+The four dive cases in that run, by name:
+
+```
+✓ the dive › logs nothing when it is flown (15.5s)
+✓ the dive › always answers where you are and always offers one gesture out (4.2s)
+✓ the dive › says on screen what it materialised, and it is a small part of the graph (2.1s)
+✓ the dive › states which motion mode is running rather than changing quietly (2.3s)
+```
+
+The first of those is the boundary in a real browser rather than in a scan: it
+keeps a word so the durable log is non-empty, flies the dive as hard as a finger
+can, and asserts the snapshot is **byte-identical** afterwards. A count would
+have passed a run that swapped one event for another; byte equality does not.
+
+**The five unit-test failures were all `Test timed out in 5000ms`**, in
+`dictionary.test.ts` (×2), `t13-plan-cannot-grow.test.ts`,
+`screen-contract.test.ts` and `boundaries.test.ts`. Two agents and two Playwright
+runs were on this box at once. Re-run in isolation, the same files give
+`Tests 107 passed (107)`. They are reported here as timeouts and not as passes,
+because that is what the run said.
+
+### What this pass did not do
+
+- **It did not build the lane.** The scale ladder, the dive surface, the boundary
+  test and the first evidence set are the other B2 agent's work. This pass
+  verified them, found two defects, closed both, and added a second evidence set.
+- **It did not establish the cause of React #418**, and did not fix it. It is on
+  two routes owned by two different lanes.
+- **The exported bytes carry an empty `<title>` on every route** —
+  `<title data-rh="true"></title>` — which is the exact defect
+  `src/ui/route-title.tsx` documents as closed. The *hydrated* title is correct
+  (`Kanji — 分 · Bunki 分岐`), and the a11y e2e case checks the hydrated one, so
+  the runtime half works and the static-bytes half does not in this export mode.
+  Outside this lane; reported, not touched.
+- **It ran one engine.** Chromium on Linux. No Safari, no Firefox, no device, no
+  screen reader — the screenshots and the e2e suite are the same browser.
+- **It did not measure a phone.** Every millisecond figure above is this
+  container's wall clock. The level-of-detail *shares* are hardware-independent;
+  the timings are not.
