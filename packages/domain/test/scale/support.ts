@@ -14,6 +14,7 @@
 import {
   buildKnowledgeGraph,
   buildScaleLadder,
+  type ComponentRole,
   type GraphEdge,
   type GraphNode,
   type KnowledgeGraphSource,
@@ -38,13 +39,14 @@ const KANJI: readonly (readonly [character: string, id: string])[] = [
  * `kanji:木`, because a component is a role a shape plays inside a character and
  * the two are joined by nothing this dataset records.
  */
-const COMPONENT_OF: readonly (readonly [component: string, kanji: string, role: string])[] = [
-  ['component:木', 'kanji:林', 'semantic'],
-  ['component:木', 'kanji:森', 'semantic'],
-  ['component:木', 'kanji:木', 'semantic'],
-  ['component:辶', 'kanji:道', 'semantic'],
-  ['component:首', 'kanji:道', 'phonetic'],
-];
+const COMPONENT_OF: readonly (readonly [component: string, kanji: string, role: ComponentRole])[] =
+  [
+    ['component:木', 'kanji:林', 'semantic'],
+    ['component:木', 'kanji:森', 'semantic'],
+    ['component:木', 'kanji:木', 'semantic'],
+    ['component:辶', 'kanji:道', 'semantic'],
+    ['component:首', 'kanji:道', 'phonetic'],
+  ];
 
 const LEXEMES: readonly (readonly [headword: string, id: string, kanji: readonly string[]])[] = [
   ['森林', 'lex-shinrin', ['kanji:森', 'kanji:林']],
@@ -71,12 +73,15 @@ export const FOREST_SOURCE: KnowledgeGraphSource = (() => {
     });
   });
   COMPONENT_OF.forEach(([component, kanji, role]) => {
-    edges.push({
-      kind: 'component_of',
-      from: component,
-      to: kanji,
-      role: role as GraphEdge['role'],
-    });
+    /*
+      `role` is declared on the tuple as `ComponentRole`, not as `string` cast
+      through `GraphEdge['role']`. Under `exactOptionalPropertyTypes` that cast
+      widened the value to `ComponentRole | undefined` — the indexed access of an
+      optional property includes `undefined` — and assigning that back into the
+      optional property is an error. The cast was the whole defect: it looked
+      like it was narrowing and was in fact the only thing that could widen.
+    */
+    edges.push({ kind: 'component_of', from: component, to: kanji, role });
   });
 
   LEXEMES.forEach(([headword, id, kanji]) => {
