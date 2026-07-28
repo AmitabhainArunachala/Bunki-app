@@ -132,7 +132,7 @@ export class AppDriver {
    * Outside the stack, so exactly one of each exists and no visibility filter is
    * needed. These are the doors `src/ui/navigation.ts` calls `shell` reach.
    */
-  nav(label: 'capture' | 'session' | 'evidence' | 'about-diagnostics'): Locator {
+  nav(label: 'map' | 'session' | 'evidence' | 'journeys' | 'reading' | 'capture'): Locator {
     return this.page.getByTestId(`nav-${label}`);
   }
 
@@ -141,7 +141,14 @@ export class AppDriver {
     return this.page.getByRole('button', { name, exact: true }).filter({ visible: true }).last();
   }
 
-  async open(path = '/'): Promise<void> {
+  /**
+   * Open the app where the walked loop starts.
+   *
+   * `/capture`, not `/`: Wave D made the map the front door and capture an
+   * action offered from every surface (`src/ui/navigation.ts` §1–§2). Every
+   * loop step below begins on the capture screen, so the default lands there.
+   */
+  async open(path = '/capture'): Promise<void> {
     await this.page.goto(`${this.baseUrl}${path}`);
     await this.testId('screen-capture').waitFor({ timeout: 30_000 });
   }

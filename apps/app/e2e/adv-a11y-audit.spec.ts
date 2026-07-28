@@ -339,12 +339,20 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
       'close — either something is trapping focus or the ring is unbounded',
   ).toBe(true);
 
-  // The first four stops are the nav shell, in the shell's own order.
-  expect(order.slice(0, 4).map((element) => element.testId)).toEqual([
+  // The first two stops are the shell's masthead: the capture action, then the
+  // 案内人's rail. The five tabs are at the *end* of the tab order, because the
+  // bar is at the bottom of the page — which is what keeps the reading-order
+  // assertion below true rather than requiring an exemption for chrome.
+  expect(order.slice(0, 2).map((element) => element.testId)).toEqual([
     'nav-capture',
+    'guide-presence',
+  ]);
+  expect(order.slice(-5).map((element) => element.testId)).toEqual([
+    'nav-map',
     'nav-session',
     'nav-evidence',
-    'nav-about-diagnostics',
+    'nav-journeys',
+    'nav-reading',
   ]);
 
   // Reading order: focus moves down the page, never back up. Compared by row
@@ -707,11 +715,14 @@ test('shell: exactly one destination is marked as the page you are on', async ({
         .map((element) => element.getAttribute('data-testid') ?? ''),
     );
 
-  await openApp(page, app.origin);
+  // The map, at `/`, since Wave D — and `nav-capture` is deliberately *not*
+  // expected here: capture is an action the shell offers rather than a place
+  // the shell is at, so it carries no `aria-current` at all.
+  await openApp(page, app.origin, '/');
   expect(
     await current(),
     'the shell marks no destination, or more than one, as the current page',
-  ).toEqual(['nav-capture']);
+  ).toEqual(['nav-map']);
 
   await visibleTestId(page, 'nav-evidence').click();
   await expect(visibleTestId(page, 'screen-evidence')).toBeVisible();

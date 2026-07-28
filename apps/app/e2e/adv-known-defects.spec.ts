@@ -221,26 +221,30 @@ test('T3-2: navigating between destinations does not accumulate mounted screens'
   page,
   app,
 }) => {
+  // 地図 ↔ 記録 rather than capture ↔ evidence, because Wave D made capture an
+  // action rather than a tab and this test's subject is *the tab bar's own
+  // switching*. The capture action's push-and-return is measured separately
+  // below, because it is a different mechanism with a different failure mode.
   const roundTrip = async (): Promise<void> => {
     await visibleTestId(page, 'nav-evidence').click();
     await expect(visibleTestId(page, 'screen-evidence')).toBeVisible();
-    await visibleTestId(page, 'nav-capture').click();
-    await onCaptureScreen(page);
+    await visibleTestId(page, 'nav-map').click();
+    await expect(visibleTestId(page, 'screen-map')).toBeVisible();
   };
 
-  await openApp(page, app.origin);
-  await onCaptureScreen(page);
-  expect(await mountedScreenCount(page, 'screen-capture')).toBe(1);
+  await openApp(page, app.origin, '/');
+  await expect(visibleTestId(page, 'screen-map')).toBeVisible();
+  expect(await mountedScreenCount(page, 'screen-map')).toBe(1);
 
   await roundTrip();
   const afterOne = {
-    capture: await mountedScreenCount(page, 'screen-capture'),
+    map: await mountedScreenCount(page, 'screen-map'),
     evidence: await mountedScreenCount(page, 'screen-evidence'),
   };
 
   for (let trip = 0; trip < 4; trip += 1) await roundTrip();
   const afterFive = {
-    capture: await mountedScreenCount(page, 'screen-capture'),
+    map: await mountedScreenCount(page, 'screen-map'),
     evidence: await mountedScreenCount(page, 'screen-evidence'),
   };
 
@@ -251,8 +255,47 @@ test('T3-2: navigating between destinations does not accumulate mounted screens'
   );
 
   // The absolute state, recorded so a regression says *what* changed.
-  expect(afterFive.capture, 'mounted capture screens (the destination shown)').toBe(1);
+  expect(afterFive.map, 'mounted map screens (the destination shown)').toBe(1);
   expect(afterFive.evidence, 'mounted evidence screens (the destination left)').toBe(0);
+});
+
+/**
+ * The capture action pushes on purpose, and the push must not accumulate.
+ *
+ * The tab bar uses `replace` so the history stays one deep; the capture action
+ * uses `push` so leaving it returns the learner to the surface they opened it
+ * from (`src/ui/navigation.ts` §2). That is a deliberate asymmetry and it is
+ * exactly the shape T3-2 was about, so it gets its own measurement rather than
+ * an assumption.
+ */
+test('the capture action returns to where it was opened from and leaves nothing mounted', async ({
+  page,
+  app,
+}) => {
+  await openApp(page, app.origin, '/');
+  await expect(visibleTestId(page, 'screen-map')).toBeVisible();
+
+  const trip = async (): Promise<void> => {
+    await visibleTestId(page, 'nav-capture').click();
+    await onCaptureScreen(page);
+    await visibleTestId(page, 'capture-done').click();
+    await expect(visibleTestId(page, 'screen-map')).toBeVisible();
+  };
+
+  await trip();
+  const afterOne = {
+    capture: await mountedScreenCount(page, 'screen-capture'),
+    map: await mountedScreenCount(page, 'screen-map'),
+  };
+
+  for (let round = 0; round < 4; round += 1) await trip();
+  const afterFive = {
+    capture: await mountedScreenCount(page, 'screen-capture'),
+    map: await mountedScreenCount(page, 'screen-map'),
+  };
+
+  expect(afterFive, 'the capture action accumulated mounted screens').toEqual(afterOne);
+  expect(page.url(), 'capture did not hand the learner back to the map').toMatch(/\/$/);
 });
 
 /* ------------------------------------------------------------------ *

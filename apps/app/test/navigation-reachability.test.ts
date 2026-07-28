@@ -28,10 +28,12 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
+  ACTION_DESTINATIONS,
   DESTINATIONS,
   EMBEDDED_SURFACES,
   LEARNER_DESTINATIONS,
   NESTED_DESTINATIONS,
+  PRESENCE_DESTINATIONS,
   SHELL_DESTINATIONS,
   SPECIMEN_DESTINATIONS,
 } from '../src/ui/navigation.ts';
@@ -115,6 +117,46 @@ describe('every destination has a door a learner can open', () => {
     // the map rather than a hand-written copy of it.
     expect(shell).toContain('SHELL_DESTINATIONS');
     expect(SHELL_DESTINATIONS.length).toBeGreaterThan(0);
+  });
+
+  /**
+   * Actions and presences are carried by the shell itself — `navigation.ts` §2
+   * and §4.
+   *
+   * Both are reachable from every surface *because the shell holds them*, so the
+   * check is against `nav-shell.tsx` rather than against a screen. A `via` that
+   * named a control the shell does not render would be a door drawn on the wall,
+   * which is the same failure the `from` kind guards against one level down.
+   */
+  it('carries every action and presence in the shell, on every surface', () => {
+    const shell = read(resolve(APP_ROOT, 'src/ui/nav-shell.tsx'));
+    expect(ACTION_DESTINATIONS.length + PRESENCE_DESTINATIONS.length).toBeGreaterThan(0);
+    for (const destination of [...ACTION_DESTINATIONS, ...PRESENCE_DESTINATIONS]) {
+      const reach = destination.reach;
+      if (reach.kind !== 'action' && reach.kind !== 'presence') continue;
+      expect(shell, `the shell does not render ${reach.via}`).toContain(reach.via);
+      const staticPrefix = destination.href.split('/[')[0] ?? destination.href;
+      expect(shell, `the shell never navigates to ${staticPrefix}`).toContain(staticPrefix);
+    }
+  });
+
+  /**
+   * Capture returns the learner where they were — `navigation.ts` §2.
+   *
+   * "An action, not a destination" is only true if leaving it is not a new
+   * place. The shell records the surface in `?from=` and the route hands it to
+   * the screen; without both halves the claim in the module header is prose.
+   * The browser half — that the round trip actually lands back on the surface —
+   * is `e2e/cross-surface-trace.spec.ts`.
+   */
+  it('gives the capture action a way back to the surface it was opened from', () => {
+    const shell = read(resolve(APP_ROOT, 'src/ui/nav-shell.tsx'));
+    expect(shell, 'the capture action records no origin').toContain('from=');
+    const route = read(resolve(ROUTES_ROOT, 'capture.tsx'));
+    expect(route).toContain('onDone');
+    expect(route).toContain('returnTo');
+    const screen = read(resolve(APP_ROOT, 'src/screens/capture-screen.tsx'));
+    expect(screen, 'the capture screen offers no way back').toContain('capture-done');
   });
 
   it('mounts the shell above every route', () => {
@@ -228,45 +270,81 @@ describe('the map describes the app it is in', () => {
     expect(added).toEqual([...CAMPAIGN_E_SCREENS].sort());
   });
 
-  it('keeps the shell small enough to stay calm (REQ-UI-08)', () => {
-    // Not a magic number: capture, session, evidence, about — the places a
-    // learner *starts* from. Anything that belongs to one screen does not
-    // belong here; that is how a masthead becomes a debug menu.
+  /**
+   * The open item this file carried, closed.
+   *
+   * The comment that stood here recorded three lanes each appending one entry to
+   * the shell, each with a defensible argument, none able to see the others; the
+   * shell reached seven and the comment said the information architecture was
+   * Wave D's work. It was, and this is it. `src/ui/navigation.ts` holds the
+   * argument in full; the assertions here are what stop it being re-litigated by
+   * appending.
+   */
+  it('holds five destinations, grouped by what the learner is doing', () => {
+    // Not a magic number and not a quota. Five *verbs*: see what I have built,
+    // sit a session, close a branch, read a passage, look at the record.
+    // Anything that is a step of one of those does not belong here, which is how
+    // the canvas, the repair branch and the About screen left; anything that is
+    // not a place does not belong here either, which is how capture and the
+    // guide left.
     //
-    // Three lanes each added an entry, none able to see the others, and each
-    // wrote a defensible argument for exactly one addition:
-    //
-    //   Journeys (B5) — a branch point belongs to a contract in the ledger
-    //     rather than to any screen, so there is no screen it *could* be
-    //     demoted to.
-    //   The guide (B6) — a starting place in the same sense, since the map
-    //     document makes "constant presence" its defining property (§4.1).
-    //   Map (B1) — the round-2 research found the review queue empties daily
-    //     and shows nothing accumulated, so the map is the only surface that
-    //     answers "what have I built" rather than "what do I owe".
-    //
-    // Both arguments hold on their own terms and neither survives being applied
-    // twice: the shell is now six, and six is a debug menu by the rule stated
-    // above — seven, in fact, with the map. All three are kept rather than any
-    // being dropped in a merge —
-    // choosing between two lanes' architecture from inside a conflict
-    // resolution is precisely the call that should not be made this way — and
-    // the assertion stays an equality so the count is visible rather than
-    // creeping. Of the three the map has the strongest claim to being the
-    // home rather than a tab, which is itself a reason not to settle it here. The information architecture is Wave D's work, and this comment
-    // is the open item it inherits, not a decision.
-
+    // An equality rather than a bound, so a sixth entry is a visible edit that
+    // has to answer §3 of the module — which verb is it, and which existing tab
+    // is it not a step of — rather than a line appended in a merge.
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
-      'Capture',
+      'Map',
       'Session',
       'Evidence',
-      'About & diagnostics',
-      // Order follows src/ui/navigation.ts, where the guide's entry was
-      // appended before the journeys entry when the two lanes merged.
-      'The guide',
       'Journeys',
-      'Map',
+      'Reading',
     ]);
+  });
+
+  it('puts the map at the front door', () => {
+    // `navigation.ts` §1. The map is `/` rather than first-of-seven: the
+    // round-2 research found it is the only surface that answers "what have I
+    // built" rather than "what do I owe", and the front door is the one place
+    // that distinction is felt.
+    const home = DESTINATIONS.find((destination) => destination.href === '/');
+    expect(home?.label).toBe('Map');
+    expect(home?.screen).toBe('screens/map-screen.tsx');
+  });
+
+  it('keeps capture an action and the guide a presence, not tabs', () => {
+    // §2 and §4. Both were tabs; both are carried by the shell now. Promoting
+    // either back to the shell fails here, which is the point — it should cost
+    // an argument rather than an append.
+    expect(ACTION_DESTINATIONS.map((destination) => destination.href)).toEqual(['/capture']);
+    expect(PRESENCE_DESTINATIONS.map((destination) => destination.href)).toEqual(['/guide']);
+    const shellHrefs = SHELL_DESTINATIONS.map((destination) => destination.href);
+    expect(shellHrefs).not.toContain('/capture');
+    expect(shellHrefs).not.toContain('/guide');
+  });
+
+  it('names every learner destination in Japanese as well as English', () => {
+    // Typography-first (frozen §8) applies to the chrome. A navigation bar in
+    // English only teaches that Japanese is the content and English is the
+    // frame, in an app whose whole subject is the opposite.
+    for (const destination of LEARNER_DESTINATIONS) {
+      expect(destination.ja, `${destination.label} has no Japanese name`).not.toBe('');
+      expect(destination.yomi, `${destination.ja} has no reading`).not.toBe('');
+      // Kanji, kana, or both — never a romanised label wearing a Japanese slot.
+      expect(destination.ja, `${destination.label}'s Japanese name is not Japanese`).toMatch(
+        /^[぀-ヿ一-龯]+$/u,
+      );
+      expect(destination.yomi, `${destination.ja}'s reading is not kana`).toMatch(
+        /^[぀-ゟ゠-ヿ]+$/u,
+      );
+    }
+  });
+
+  it('sets the Japanese names in mincho, where the type scale puts them', () => {
+    // The rule is typography-first, and mincho is the reading face the frozen
+    // spec names. A Japanese label set in the UI sans is the label without the
+    // decision.
+    const shell = read(resolve(APP_ROOT, 'src/ui/nav-shell.tsx'));
+    expect(shell).toContain('theme.font.mincho');
+    expect(shell).toContain('destination.ja');
   });
 
   /**

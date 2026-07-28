@@ -90,6 +90,7 @@ import {
 } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
+import { destinationFor } from '../ui/navigation.ts';
 import { DurabilityNotice, SeedCoverageDisclosure, SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, ChipButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
 import { RubyText } from '../ui/ruby.tsx';
@@ -135,14 +136,25 @@ export interface CaptureScreenProps {
   /**
    * Opens the reading surface (Campaign E, lane B4).
    *
-   * The reading passage's door is here rather than in the navigation shell: the
-   * shell holds the four places a learner *starts* from and `nav-shell.tsx`
-   * argues at length against a fifth, while a passage is somewhere you go from
-   * where you already are. This screen is where you already are.
+   * Reading is a shell destination in its own right now (`navigation.ts` §3),
+   * so this is *circulation* rather than the passage's only door — the thing
+   * frozen §10.1 names as renzo's missing piece. A learner who has just looked a
+   * word up is one press from meeting it in a passage.
    */
   readonly onOpenReading: () => void;
   /** Seeds the query box; the evidence harness uses it to reach a state directly. */
   readonly initialQuery?: string | undefined;
+  /**
+   * Leave capture and return to the surface it was opened from.
+   *
+   * Capture is an action rather than a destination (`navigation.ts` §2): the
+   * shell offers it everywhere and it hands the learner back. Optional because
+   * the screen must still render when it is reached as a bare URL, in which case
+   * there is nowhere to hand them back to and no control is drawn.
+   */
+  readonly onDone?: (() => void) | undefined;
+  /** The path {@link onDone} returns to, so the control can name it. */
+  readonly returnTo?: string | undefined;
 }
 
 export function CaptureScreen({
@@ -151,6 +163,8 @@ export function CaptureScreen({
   onOpenEvidence,
   onOpenReading,
   initialQuery = '',
+  onDone,
+  returnTo,
 }: CaptureScreenProps): ReactNode {
   const theme = useTheme();
   const store = useAppStore();
@@ -281,12 +295,39 @@ export function CaptureScreen({
   const results = state.kind === 'ready' ? state.data : [];
   const otherResults = useMemo(() => results.slice(1), [results]);
 
+  /**
+   * The way back, named.
+   *
+   * `navigation.ts` §2 makes capture an action: you open it from wherever you
+   * are and it hands you back. The browser's Back button does that too, and on a
+   * phone nobody reaches for it, so the way back is a control on the screen with
+   * the surface's own name on it — 地図 Map, 稽古 Session — rather than a
+   * generic "back".
+   */
+  const back = returnTo === undefined ? null : destinationFor(returnTo);
+
   return (
     <ScreenShell
-      subtitle="Look something up, keep it in one tap, and mark what felt uncertain."
+      subtitle="Look something up, keep it in one tap, and mark what felt uncertain. This is an action, not a place: it hands you back where you were."
       testID="screen-capture"
       title="分岐 Bunki — capture"
     >
+      {onDone === undefined ? null : (
+        <AppButton
+          accessibilityHint="Closes capture and returns to the surface you opened it from. Nothing you kept is lost."
+          accessibilityLabel={
+            back === null ? 'Done — back to the map' : `Done — back to ${back.label}`
+          }
+          label={
+            back === null ? 'Done — back to the map' : `Done — back to ${back.ja} ${back.label}`
+          }
+          onPress={onDone}
+          style={styles.doneDoor}
+          testID="capture-done"
+          variant="quiet"
+        />
+      )}
+
       <View style={styles.searchRow}>
         <TextInput
           accessibilityHint="Results appear as you type. Nothing is sent anywhere."
@@ -322,10 +363,11 @@ export function CaptureScreen({
       {/*
         The door to the reading surface (Campaign E, lane B4).
 
-        Here rather than in the navigation shell, which holds the four places a
-        learner starts from and argues in its own header against a fifth. A
-        passage is somewhere you go from where you already are, and this screen
-        is where you already are.
+        Circulation, not the only door: 読む Reading is a shell destination of
+        its own since Wave D. Frozen §10.1's diagnosis of renzo was that the
+        five-tab shape is right and the missing piece is *circulation between
+        tabs*, so a learner who has just looked a word up is offered the passage
+        without going back to the bar to find it.
       */}
       <AppButton
         accessibilityHint="Opens the reading passage. Looking a word up there happens on the page, without leaving it."
@@ -729,6 +771,9 @@ const styles = StyleSheet.create({
     gap: SPACE.sm,
   },
   readingDoor: {
+    alignSelf: 'flex-start',
+  },
+  doneDoor: {
     alignSelf: 'flex-start',
   },
   answer: {

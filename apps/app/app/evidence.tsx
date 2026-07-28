@@ -19,7 +19,7 @@ export default function EvidenceRoute(): ReactNode {
     <>
       <RouteTitle href="/evidence" />
       <EvidenceInspectorScreen
-        onBack={() => router.push('/')}
+        onBack={() => router.replace('/')}
         onOpenDebug={() => router.push('/debug')}
         threadId={typeof thread === 'string' && thread !== '' ? thread : undefined}
       />

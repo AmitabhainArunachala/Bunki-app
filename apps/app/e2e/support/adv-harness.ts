@@ -255,8 +255,20 @@ export { expect } from '@playwright/test';
  * Driving the app
  * ------------------------------------------------------------------ */
 
+/**
+ * Where the walked loop starts.
+ *
+ * Not `/`. Wave D made `/` the map and moved capture to `/capture` as an action
+ * offered from every surface (`src/ui/navigation.ts` §1–§2). Every helper in
+ * this file below `keepWord` assumes the capture screen, so the default lands
+ * there rather than making thirty call sites say so — and it is named rather
+ * than inlined, so a reader who wonders why `openApp` is not the front door has
+ * this paragraph instead of a bare string.
+ */
+export const LOOP_START = '/capture';
+
 /** Open a route and wait until the client has rendered into the empty document. */
-export async function openApp(page: Page, origin: string, path = '/'): Promise<void> {
+export async function openApp(page: Page, origin: string, path = LOOP_START): Promise<void> {
   await page.goto(`${origin}${path}`, { waitUntil: 'load' });
   await hydrated(page);
 }
@@ -265,10 +277,15 @@ export async function openApp(page: Page, origin: string, path = '/'): Promise<v
  * Hydration, defined as something only the client can have done.
  *
  * Expo's static export ships an empty document — `dist/index.html` contains no
- * `nav-capture`, no `capture-search-input`, no app markup at all; React renders
+ * `nav-shell`, no `capture-search-input`, no app markup at all; React renders
  * the whole tree on the client. The nav shell therefore *is* the hydration
  * signal, and it is the only one that holds on every route, which matters
  * because a reload lands wherever the learner was rather than at the front door.
+ *
+ * The signal is `nav-shell` — the shell's own root — rather than one of its
+ * links. It used to be `nav-capture`, which stopped being a tab in Wave D; a
+ * hydration signal that is any one destination is a signal that breaks when the
+ * information architecture changes, which is exactly what it just did.
  *
  * `visibleTestId` rather than `getByTestId` throughout this module, and that is
  * not a convenience — see its own note. Navigating back to a screen leaves the
@@ -278,7 +295,7 @@ export async function openApp(page: Page, origin: string, path = '/'): Promise<v
  * lanes measuring durability instead of re-measuring one defect in four places.
  */
 export async function hydrated(page: Page): Promise<void> {
-  await expect(visibleTestId(page, 'nav-capture')).toBeVisible({ timeout: 30_000 });
+  await expect(visibleTestId(page, 'nav-shell')).toBeVisible({ timeout: 30_000 });
 }
 
 /** Hydrated, and showing the capture screen. */

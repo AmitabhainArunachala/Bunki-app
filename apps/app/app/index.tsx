@@ -1,28 +1,32 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
-import { CaptureScreen } from '@/screens/capture-screen';
+import { MapScreen } from '@/screens/map-screen';
 import { RouteTitle } from '@/ui/route-title';
 
 /**
- * Route `/` — capture and search (controller §10 screen 1).
+ * Route `/` — the map, and the app's front door (Wave D).
  *
- * The route owns navigation and nothing else; the screen takes callbacks so it
- * can be rendered without a router. `?q=` seeds the query so the evidence
- * harness can land on a state directly, and so a search is a shareable URL.
+ * It used to be capture. The argument for the swap is in `src/ui/navigation.ts`
+ * §1 and it is the round-2 research's own: the map is the only surface that
+ * answers "what have I built" rather than "what do I owe", and a learner who
+ * opens the app to a search box is asked to do work before being shown anything
+ * they own. Capture is at `/capture` and is offered as an action from every
+ * surface, which is what it always was in use.
+ *
+ * The route stays thin, as every route in this app does. It owns navigation —
+ * a node tap becomes a push to the word or kanji page — and nothing else; the
+ * screen is renderable without a router, which is what lets it be reasoned about
+ * and tested on its own.
  */
-export default function CaptureRoute(): ReactNode {
+export default function MapRoute(): ReactNode {
   const router = useRouter();
-  const { q } = useLocalSearchParams<{ q?: string }>();
 
   return (
     <>
       <RouteTitle href="/" />
-      <CaptureScreen
-        initialQuery={typeof q === 'string' ? q : ''}
-        onOpenEvidence={() => router.push('/evidence')}
+      <MapScreen
         onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
-        onOpenReading={() => router.push('/read')}
         onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
       />
     </>

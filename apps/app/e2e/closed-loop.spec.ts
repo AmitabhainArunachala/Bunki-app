@@ -62,7 +62,7 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   page.on('pageerror', (error) => pageErrors.push(String(error)));
 
   // ---------------------------------------------------------------- 1. capture
-  await app.open('/');
+  await app.open();
   await app.captureAndKeep(TARGET, 'reading');
 
   const acknowledgment = app.testId('capture-acknowledgment');

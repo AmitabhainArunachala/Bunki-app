@@ -128,7 +128,9 @@ const walk = (dir: string): string[] =>
 const LANE_FILES = [
   ...walk(resolve(APP_ROOT, 'src/ui/map')),
   resolve(APP_ROOT, 'src/screens/map-screen.tsx'),
-  resolve(APP_ROOT, 'app/map.tsx'),
+  // `app/index.tsx`, not `app/map.tsx`: Wave D made the map the front door
+  // (`src/ui/navigation.ts` §1), so the route that renders it is `/`.
+  resolve(APP_ROOT, 'app/index.tsx'),
 ];
 
 /* ------------------------------------------------------------------ *

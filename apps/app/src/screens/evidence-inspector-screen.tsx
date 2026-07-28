@@ -673,13 +673,28 @@ export function EvidenceInspectorScreen({
       </Section>
 
       <Hairline />
+      {/*
+        The About & sources screen, reached from the record (`navigation.ts` §3).
+
+        It used to be a sixth entry in the navigation shell. It is here now
+        because 記録 *is* the menu the EDRDG licence statement §3 clause 2 asks
+        for — "a separate screen accessed from a menu, such as one labelled
+        About, Sources" — and 記録 is a tab on every route, so the About screen is
+        one tap from anywhere. The label says About & sources rather than
+        Diagnostics because naming it for the diagnostic buffer buried the thing
+        the licence is actually about.
+      */}
       <AppButton
-        accessibilityHint="Opens the local diagnostic buffer."
-        label="Diagnostics"
+        accessibilityHint="Names every source this build uses, the licence each is used under, and what the app stores locally."
+        label="About & sources · 典拠"
         onPress={onOpenDebug}
         testID="evidence-open-debug"
       />
-      <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+      <AppButton
+        accessibilityHint="Returns to the map."
+        label="Back to 地図 Map"
+        onPress={onBack}
+      />
     </ScreenShell>
   );
 }

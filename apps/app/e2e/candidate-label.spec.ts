@@ -32,7 +32,7 @@ import { CANDIDATE_LABEL, OFFLINE_FALLBACK_LABEL, OFFLINE_FALLBACK_STANDING_NOTE
 import { expect, test, TARGET } from './support/app.ts';
 
 test('T-12: the AI candidate is labelled in the DOM before anyone can read it', async ({ app }) => {
-  await app.open('/');
+  await app.open();
   await app.captureAndKeep(TARGET, null);
   await app.openWordPageFromCapture();
 

@@ -92,7 +92,7 @@ test('EDRDG §3: every screen of the walked loop acknowledges the licensor', asy
   await openApp(page, app.origin);
   await visibleTestId(page, 'capture-search-input').fill('分');
   await expect(visibleTestId(page, 'capture-top-answer')).toBeVisible();
-  await expectAcknowledged(page, '/');
+  await expectAcknowledged(page, '/capture');
 
   // ---- word page, reached by its own door rather than by a URL.
   await keepWord(page, '分岐');
@@ -126,7 +126,10 @@ test('EDRDG §3: every screen of the walked loop acknowledges the licensor', asy
   await expect(visibleTestId(page, 'screen-evidence')).toBeVisible();
   await expectAcknowledged(page, '/evidence');
 
-  await visibleTestId(page, 'nav-about-diagnostics').click();
+  // The About & sources screen is reached from 記録 rather than from the tab
+  // bar since Wave D (`src/ui/navigation.ts` §3): 記録 is the "menu" the
+  // licence's clause 2 asks for, and it is a tab on every route.
+  await visibleTestId(page, 'evidence-open-debug').click();
   await expect(visibleTestId(page, 'screen-inspector-debug')).toBeVisible();
   await expectAcknowledged(page, '/debug');
 });
@@ -138,8 +141,11 @@ test('EDRDG §3 clause 2: the About screen names every source and its licence', 
   // The second clause, which LICENSES.md §2.2 recorded as unmet because no such
   // screen existed: "acknowledgement must be made, e.g. on a separate screen
   // accessed from a menu, such as one labelled 'About', 'Sources', etc."
+  // "A separate screen accessed from a menu" — 記録 Evidence is that menu, and
+  // it is one of the five tabs the shell carries on every route.
   await openApp(page, app.origin);
-  await visibleTestId(page, 'nav-about-diagnostics').click();
+  await visibleTestId(page, 'nav-evidence').click();
+  await visibleTestId(page, 'evidence-open-debug').click();
 
   const sources = visibleTestId(page, 'debug-sources');
   await expect(sources).toBeVisible();
@@ -228,5 +234,5 @@ test('EDRDG §3: a kept JMdict headword still names the licensor after the query
     'the thread shows the typed reading rather than the JMdict headword — re-point this test',
   ).not.toContain(READING);
 
-  await expectAcknowledged(page, '/ with a kept imported word and an empty query');
+  await expectAcknowledged(page, '/capture with a kept imported word and an empty query');
 });

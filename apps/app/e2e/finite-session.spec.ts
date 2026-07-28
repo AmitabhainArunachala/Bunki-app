@@ -28,7 +28,7 @@ import { expect, test, TARGET } from './support/app.ts';
 const COMPLETION_STATES = ['completed', 'abandoned', 'budget_exhausted'];
 
 test('T-13: the sitting ends explicitly and the plan never grows', async ({ app }) => {
-  await app.open('/');
+  await app.open();
   await app.captureAndKeep(TARGET, null);
   await app.promoteButton().click();
   await expect(app.promotedNote()).toBeVisible();
