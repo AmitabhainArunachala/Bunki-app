@@ -24,17 +24,35 @@
  * this build has an entry for are tappable, and the rest of the passage renders
  * as ordinary text.
  *
- * ## Why unmatched text is one span per character
+ * ## Why unmatched text is chunked at all, and why not per character
  *
- * `FrontierPassage` lays its spans out in a wrapping flex row, so a line can
- * only break *between* spans. Japanese has no word spaces, so a 47-character
- * unmatched run emitted as one span is a 47-character unbreakable box that
- * overflows the measure. One span per character gives the row the same break
- * opportunities a Japanese paragraph actually has.
+ * `FrontierPassage` lays its spans out in a wrapping flex row, and a flex item
+ * does not wrap internally — React Native's `flexShrink` default is 0 — so a
+ * line can only break *between* spans. Japanese has no word spaces, so a
+ * 47-character unmatched run emitted as one span is a 47-character unbreakable
+ * box that overflows the measure.
  *
- * That is also why {@link markDensity} is weighted by characters rather than by
- * spans — see its own note; a span count over this output would be a count of
- * how the text was chunked rather than of how much of it is new.
+ * The obvious answer is one span per character, and it was the first one here.
+ * It is wrong, and the reason is only visible in a browser: every span is its
+ * own `StaticText` in the accessibility tree, so the passage was offered to a
+ * screen reader as 134 separate nodes — 「駅」「を」「出」「る」「と、」— which is
+ * the prose taken apart into rubble. Measured over CDP against the export.
+ *
+ * So plain text is chunked into short runs at the places a Japanese line may
+ * break anyway: after closing punctuation, and in front of a character that
+ * starts a word rather than continues one (kanji, Latin, a digit). That gives
+ * roughly 「を」「出ると、」「は」「すぐに」「二つに」 — a third of the nodes, each
+ * of them something a reader would recognise as a piece of the sentence, and
+ * still a break opportunity every few characters.
+ *
+ * It is not morphological analysis and does not pretend to be: 「出ると、」 is a
+ * run of characters that happens to be a verb and its particle, and nothing here
+ * claims to know that. It is a typographic rule about where a line may break.
+ *
+ * That chunking freedom is also why {@link markDensity} is weighted by
+ * characters rather than by spans — see its own note; a span count over this
+ * output would be a count of how the text was chunked rather than of how much of
+ * it is new.
  *
  * ## Kinsoku (禁則処理), as far as this can honestly go
  *
@@ -88,6 +106,44 @@ function cannotStartLine(text: string): boolean {
 }
 
 /**
+ * Characters that begin a word rather than continue one.
+ *
+ * Kanji, Latin letters and digits. Kana are excluded because a kana following a
+ * kanji is usually okurigana or a particle, and breaking in front of it is the
+ * break this rule exists to avoid — 「出」「ると、」 reads worse than 「出ると、」
+ * to a screen reader and looks worse on the page.
+ *
+ * A range test rather than a Unicode property escape: the repository targets a
+ * bundler and a React Native runtime as well as Node, and a `\p{Script=Han}`
+ * class is the kind of thing that quietly costs a polyfill.
+ */
+function opensARun(character: string): boolean {
+  const code = character.codePointAt(0) ?? 0;
+  const isKanji =
+    (code >= 0x4e00 && code <= 0x9fff) || // CJK unified ideographs
+    (code >= 0x3400 && code <= 0x4dbf) || // extension A
+    (code >= 0xf900 && code <= 0xfaff); // compatibility ideographs
+  const isLatin =
+    (code >= 0x41 && code <= 0x5a) ||
+    (code >= 0x61 && code <= 0x7a) ||
+    (code >= 0xff21 && code <= 0xff5a);
+  const isDigit = (code >= 0x30 && code <= 0x39) || (code >= 0xff10 && code <= 0xff19);
+  return isKanji || isLatin || isDigit;
+}
+
+/**
+ * The longest a plain run may get, in characters.
+ *
+ * A ceiling rather than the rule: the script test above already breaks a
+ * Japanese sentence every few characters, and this only catches the case it
+ * cannot — a long unbroken kana run, of which the seed passage's
+ * 「いていたからだ。」 is the worst at eight. Eight characters of running text at
+ * `TYPE.body` is roughly 136 pt inside a measure of about 650, so a run at the
+ * ceiling still has somewhere to go.
+ */
+export const MAX_PLAIN_RUN = 8;
+
+/**
  * Split `body` into spans, making every declared form a lookup target.
  *
  * Longest form first, then by `lexemeId`, so the order is total and a rerun over
@@ -113,19 +169,38 @@ export function buildPassageSpans(
 
   const spans: FrontierSpan[] = [];
 
-  /** Append one plain character, merging it back when it may not start a line. */
+  /**
+   * Append one plain character to the run in progress, or start a new run.
+   *
+   * A new run starts when the previous character was closing punctuation (a line
+   * may break after it), when this character opens a word (a line may break
+   * before it), or when the run has reached {@link MAX_PLAIN_RUN}. Closing
+   * punctuation never starts a run, which is the kinsoku rule.
+   */
   const pushPlain = (character: string): void => {
     const previous = spans[spans.length - 1];
-    if (
-      previous !== undefined &&
-      previous.lexemeId === undefined &&
-      previous.mark === 'none' &&
-      cannotStartLine(character)
-    ) {
-      spans[spans.length - 1] = { ...previous, text: previous.text + character };
+    const openRun =
+      previous !== undefined && previous.lexemeId === undefined && previous.mark === 'none'
+        ? previous
+        : null;
+
+    if (openRun === null) {
+      spans.push({ text: character, mark: 'none' });
       return;
     }
-    spans.push({ text: character, mark: 'none' });
+
+    const characters = [...openRun.text];
+    const last = characters[characters.length - 1] ?? '';
+    const mustJoin = cannotStartLine(character);
+    const breakHere =
+      !mustJoin &&
+      (NO_LINE_START.has(last) || opensARun(character) || characters.length >= MAX_PLAIN_RUN);
+
+    if (breakHere) {
+      spans.push({ text: character, mark: 'none' });
+      return;
+    }
+    spans[spans.length - 1] = { ...openRun, text: openRun.text + character };
   };
 
   let index = 0;

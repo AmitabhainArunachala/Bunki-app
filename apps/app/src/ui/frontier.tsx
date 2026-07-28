@@ -146,8 +146,41 @@ function FrontierSpanView({
       </Text>
     );
 
+  /**
+   * Whether this span will be wrapped in a pressable below.
+   *
+   * Computed here rather than at the branch, because it decides something about
+   * the *content*: a pressable carries the whole spoken label, so its visual
+   * column must be out of the accessibility tree.
+   */
+  const interactive = span.lexemeId !== undefined && onOpen !== undefined;
+
   const content = (
-    <View style={styles.span}>
+    <View
+      /*
+        Hidden from the accessibility tree when the span is a lookup target, and
+        this is a measured fix rather than a precaution.
+
+        `RubyText` carries its own spoken label as clipped real text — it has to,
+        because react-native-web maps `accessibilityRole="text"` onto no ARIA
+        role and an `aria-label` on a generic element may be dropped (see
+        `ruby.tsx`). Inside a `Pressable` that already has an `accessibilityLabel`
+        that produced *two* named nodes for one word: Chrome's own accessibility
+        tree, queried over CDP against the export, offered
+        `link "線路, new to you"` and, inside it, `StaticText "線路（せんろ）"`.
+        `link` is not a children-presentational role, so nothing pruned the
+        second one — the double-read `ruby.tsx` was repaired for, arriving by a
+        different door the first time a reading surface made ruby tappable.
+
+        A non-interactive span is *not* hidden: it is the passage's prose, and
+        hiding it would take the text off the page for a screen-reader user.
+
+        `apps/app/e2e/reading-surface.spec.ts` reads the tree back out of Chrome
+        and fails if a reading is ever offered as a node of its own again.
+      */
+      {...(interactive ? { 'aria-hidden': true } : {})}
+      style={styles.span}
+    >
       {body}
       {underline === null ? null : (
         <View
@@ -175,7 +208,7 @@ function FrontierSpanView({
     </View>
   );
 
-  if (span.lexemeId === undefined || onOpen === undefined) return content;
+  if (!interactive) return content;
 
   const state = mark === 'frontier' ? ', new to you' : mark === 'fragile' ? ', fragile' : '';
 
