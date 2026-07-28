@@ -74,6 +74,7 @@ const ROUTES = [
   '/repair',
   '/evidence',
   '/debug',
+  '/guide',
   '/style-guide',
   // Campaign E, lane B4. Scanned like every other route: it is the densest
   // interactive surface in the app — a hundred-odd spans, ten of them links —

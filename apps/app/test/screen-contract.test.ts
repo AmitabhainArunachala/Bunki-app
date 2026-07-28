@@ -96,6 +96,7 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'session-workspace.tsx': 'WP-08 (_helper: workspace provider, not a screen)',
   'reading-screen.tsx': 'Campaign E lane B4',
   'journey-screen.tsx': 'Campaign E lane B5 (journeys)',
+  'guide-screen.tsx': 'B6 (Campaign E — the 案内人)',
 };
 
 const screenFileNames = readdirSync(resolve(APP_ROOT, 'src/screens')).sort();
@@ -185,6 +186,16 @@ describe('dictionary indices are never rendered (REQ-UI-03)', () => {
     expect(offenders.map(rel)).toEqual([]);
   });
 
+  /**
+   * Explicit timeout, because this one assertion pays for the whole dictionary.
+   *
+   * `await import('@bunki/seed')` parses and validates 3,000 lexemes and 1,241
+   * kanji, which takes about four seconds on its own — most of vitest's five
+   * second default before any other file is competing for the CPU. It began
+   * failing intermittently as the suite grew (B6 added five files) and then
+   * reproducibly, always as a timeout and never as an assertion. Twenty seconds
+   * is the load headroom; the assertion is untouched.
+   */
   it('has no index field in the seed to render in the first place', async () => {
     const { seedDataset } = await import('@bunki/seed');
     for (const kanji of seedDataset.kanji) {
@@ -193,7 +204,7 @@ describe('dictionary indices are never rendered (REQ-UI-03)', () => {
         [],
       );
     }
-  });
+  }, 20_000);
 });
 
 describe('the seed entry disclosure reaches the pages that need it', () => {

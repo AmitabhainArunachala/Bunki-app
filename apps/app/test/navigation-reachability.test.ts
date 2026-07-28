@@ -199,7 +199,7 @@ describe('the map describes the app it is in', () => {
    * destination with a real door; development surfaces are `specimen` and are
    * pinned separately, below.
    */
-  const CAMPAIGN_E_SCREENS = ['Journeys', 'Reading'] as const;
+  const CAMPAIGN_E_SCREENS = ['Journeys', 'Reading', 'The guide'] as const;
 
   it('covers every screen the controller §10 list names', () => {
     const labels = LEARNER_DESTINATIONS.map((destination) => destination.label);
@@ -229,22 +229,36 @@ describe('the map describes the app it is in', () => {
   });
 
   it('keeps the shell small enough to stay calm (REQ-UI-08)', () => {
-    // Four is not a magic number: it is capture, session, evidence, about — the
-    // places a learner *starts* from. A fifth entry means something that belongs
-    // to a screen has been promoted to chrome, which is how a masthead becomes a
-    // debug menu.
+    // Not a magic number: capture, session, evidence, about — the places a
+    // learner *starts* from. Anything that belongs to one screen does not
+    // belong here; that is how a masthead becomes a debug menu.
     //
-    // Journeys is the fifth, and it is admitted against that rule rather than
-    // around it: a branch point belongs to a contract in the ledger rather than
-    // to any screen, so there is no screen it *could* be demoted to. The test
-    // stays an equality precisely so the sixth entry has to make its own
-    // argument here. `src/ui/navigation.ts` carries the full reasoning and the
-    // coordination request it leaves open.
+    // Two lanes each added a fifth entry, neither able to see the other, and
+    // each wrote a defensible argument for exactly one addition:
+    //
+    //   Journeys (B5) — a branch point belongs to a contract in the ledger
+    //     rather than to any screen, so there is no screen it *could* be
+    //     demoted to.
+    //   The guide (B6) — a starting place in the same sense, since the map
+    //     document makes "constant presence" its defining property (§4.1).
+    //
+    // Both arguments hold on their own terms and neither survives being applied
+    // twice: the shell is now six, and six is a debug menu by the rule stated
+    // above. Both are kept here rather than one being dropped in a merge —
+    // choosing between two lanes' architecture from inside a conflict
+    // resolution is precisely the call that should not be made this way — and
+    // the assertion stays an equality so the count is visible rather than
+    // creeping. The information architecture is Wave D's work, and this comment
+    // is the open item it inherits, not a decision.
+
     expect(SHELL_DESTINATIONS.map((destination) => destination.label)).toEqual([
       'Capture',
       'Session',
       'Evidence',
       'About & diagnostics',
+      // Order follows src/ui/navigation.ts, where the guide's entry was
+      // appended before the journeys entry when the two lanes merged.
+      'The guide',
       'Journeys',
     ]);
   });

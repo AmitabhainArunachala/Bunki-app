@@ -7882,3 +7882,272 @@ format:check && npm run typecheck && npm run test && npm run test:replay && npm
 run verify:export && (cd apps/app && npx expo export --platform web) && npm run
 test:e2e`, then `node apps/app/scripts/capture-journeys.mjs`. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — B6 (Campaign E, Wave B): the 案内人
+
+Branch `agent/bunki-e-guide`, from `agent/bunki-e-integration` (`aa03f7e`).
+
+### What was built
+
+| Where | What |
+| ----- | ---- |
+| `packages/domain/src/guide/` | position, conversation, records, proposal, and the §4.3 boundary — pure, no React, no seed |
+| `apps/app/src/ui/guide/` | the surface: content from `@bunki/seed`, view model, four components, one hook |
+| `apps/app/src/screens/guide-screen.tsx`, `apps/app/app/guide.tsx` | the screen and its route |
+| `packages/domain/test/guide/`, `apps/app/test/guide-*.test.ts` | 181 assertions across six files |
+| `apps/app/e2e/guide-label.spec.ts` | the browser half of the label claim and the write-nothing claim |
+| `apps/app/scripts/capture-guide.mjs` | the screenshot harness, which **drives** the page before shooting |
+
+The operator has deliberately not defined the guide's character. Nothing in this
+lane names it, draws it, or gives it a voice. What it has is the four things map
+document §4 does decide, built so that a later character design changes nothing
+structural.
+
+### The hard boundary, and the failure that was watched first
+
+The lane's most important deliverable is §4.3 enforced by a test. It was written
+before the surface and **watched failing against a real, deliberate violation** —
+an import of `proposeRoute` into `admitToScheduler`:
+
+```
+$ npx vitest run packages/domain/test/guide/boundary.test.ts
+  Test Files  1 failed (1)
+       Tests  9 failed | 58 passed (67)
+```
+
+The nine failures, by name:
+
+```
+nothing that decides can reach the guide > packages/domain/src/evidence/gate.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/evidence/mint.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/evidence/index.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/session/plan.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/session/runtime.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/session/commands.ts imports no guide module, transitively
+nothing that decides can reach the guide > packages/domain/src/session/canvas.ts imports no guide module, transitively
+nothing that decides so much as names a guide value > packages/domain/src/evidence/gate.ts names no guide export
+nothing that decides so much as names a guide value > finds no guide export anywhere under packages/domain/src/evidence
+```
+
+The patch and the verbatim run are committed at
+`docs/build-evidence/b6-guide/boundary-violation.diff` and
+`boundary-violation-run.txt`. The edit to `gate.ts` was reverted and is in no
+commit on this branch; that file's blob is unchanged from `aa03f7e`.
+
+Four mechanisms hold the boundary, and they fail separately:
+
+1. **Wiring.** No module on the evidence path or the review-timing path reaches
+   `src/guide/` through its imports. Sixteen roots are walked transitively.
+2. **Naming.** None of them so much as names a guide export. This is the
+   assertion that survives someone reaching the guide through the `@bunki/domain`
+   barrel — an import through a barrel still has to name what it took. The export
+   list is derived from the guide's own source, not hand-maintained.
+3. **Direction.** The guide reaches neither the gate, the minter, the
+   memory-state reducer, `fsrs-pin.ts`, nor `ts-fsrs`.
+4. **Runtime.** Every guide artefact carries a `guideArtefact` marker;
+   `assertNotGuideArtefact` refuses all five kinds, including after a JSON round
+   trip and including one hidden inside a command-shaped wrapper, and it lets
+   ordinary values through, so the guard is not merely "throw".
+
+Plus the app half (`apps/app/test/guide-boundary.test.ts`): nothing on the
+surface can write. No `store.execute`, no minter, no persistence seam, and
+`useAppStore` is not imported at all — an unused capability is still a
+capability. The screen takes exactly **one** callback prop and it navigates;
+`GUIDE_ACTION_KINDS` is asserted equal to `['look_at']`.
+
+Both files carry a self-check group: the predicates are run against deliberately
+violating synthetic sources and must report them, so a predicate loosened into
+one that passes on any input fails rather than passing quietly.
+
+### The four decided things, and how each is real state
+
+- **Position.** `guidePositionOn(route, progress, branches)` is total. The guide
+  stands one station ahead of the learner; at the earliest declared fork when
+  there is one; at the last station when the road is walked; and `no_road` on an
+  empty road rather than throwing. Where the *learner* stands is derived from the
+  event log — a thread exists (met) and the learner explicitly promoted it (taken
+  up) — never from self-report. `DeclaredBranch` has exactly one constructor and
+  its parameter type is `RepairStumble` from `src/session/`, a value that exists
+  only because a graded review reached the gate, so the guide cannot manufacture
+  the thing it stands at.
+- **Conversation.** No answer key on a turn, no total on the estimate, no
+  verdict. The learner's side is a closed set of six stances — chosen, not typed
+  — which is how OD-08 holds on the first turn rather than by a policy check
+  alone: the only text that crosses the boundary is the seeded form and the
+  seeded excerpt, through the existing `@bunki/ai` envelope. `rather_not_say` is
+  a first-class answer and is counted separately from silence.
+- **Records.** `GuideProvenance` has no optional `at` and no optional `author`,
+  so a record with no time on it is not representable. `standing` is the literal
+  `'proposal'` — no other inhabitant exists. Editing supersedes rather than
+  mutates and the ledger keeps both, so "what did the guide believe, and when" is
+  answerable. Ordinals are renumbered on every revision, so "station 3 of 8" does
+  not quietly become a lie about a seven-station road.
+- **Boundary.** Above.
+
+### Labelling
+
+Everything the guide says is AI output and is labelled before it can be read.
+`GuideSpeech` is the only component that renders a turn's words (asserted), it
+takes its labels from `guideSpeechLabels`, which returns a primary label
+unconditionally, and the strings come from `@bunki/ai` rather than being retyped.
+`e2e/guide-label.spec.ts` mirrors the existing candidate-label case in a real
+browser: nothing generated on the page before the ask, the label's bounding box
+above the text's, an accessible name holding both labels, and `offline-fallback`
+present as a *second* label because a web export holds no key by construction.
+
+### Browser evidence
+
+`docs/build-evidence/screenshots-b6-guide/` — light and dark, from the real
+`expo export --platform web` output in Chromium. The page was **driven**, not
+posed: the script asks the guide about the first word, answers two turns with
+different stances, and asks for a road and a plan. The DOM is read back *after*
+each shot and the read is printed into that directory's README, so the caption is
+evidence about the picture rather than prose written beside it. Both shots
+report:
+
+```
+labels:   ["AI candidate / generated", "offline-fallback"]
+headline: "One ahead of you · station 2 of 8"
+learner:  "You are at station 1 of 8."
+roadRows: 8
+```
+
+### Two things this lane's own review caught, after the surface was working
+
+Both are the drift class this project keeps finding, and neither would have
+failed any check:
+
+- The attribution footer stated `JMdict (EDRDG), CC BY-SA 4.0` as a literal.
+  Correct today; silently stale the day `packages/seed/data/provenance.json`
+  changes. It is now derived through `provenanceSummary`, the same function the
+  word and kanji pages render, and an assertion fails if any guide file states a
+  licence as a literal outside a comment.
+- The conversation panel said asking sends "only this word and this seeded
+  sentence". The request also carries the seed record's id. "Only" was *nearly*
+  true, which is the worst kind: the sentence exists so a reader can check it
+  against `AiThreadContext`, and it now enumerates all three fields.
+
+### §17.5 check set — every command run on this branch
+
+| Command | Result |
+| ------- | ------ |
+| `npm ci` | exit 0 |
+| `npm run lint` | exit 0, no output |
+| `npm run format:check` | `All matched files use Prettier code style!` |
+| `npm run typecheck` | exit 0, root + 6 workspaces |
+| `npm run test` | **111 files, 2,206 tests, all passed** |
+| `npm run test:replay` | 2 files, 47 tests passed |
+| `npm run verify:export` | 1 file, 14 tests passed |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist` (15 static routes, `/guide` among them) |
+| `npm run test:e2e` | **50 passed** (5.3 min) |
+
+Baseline on `agent/bunki-e-integration` (`aa03f7e`) before this lane: 105 files /
+1,986 tests, 48 e2e. The delta is +6 files, +220 tests and +2 e2e cases, and the
++220 is worth decomposing because only 181 of them are this lane's own: the
+other 39 come from existing suites that enumerate source files with `it.each`
+(`theme-tokens.test.ts`'s no-hex-literal and no-command scans, and
+`edrdg-acknowledgement.test.ts`'s per-destination audit). The new modules are
+covered by those scans automatically, which is the point of writing them that
+way.
+
+The two `✘` inside the 50 are the pre-existing `test.fail()` expected failures in
+`adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this lane and counted as
+passes by Playwright.
+
+One honest note about the unit suite. Midway through this lane's build a single
+intermittent failure was observed once whose identity was not captured before the
+output scrolled; three consecutive full runs immediately afterwards were clean, as
+were the two final runs above. The only failure this lane ever identified is the
+seed-parse timeout described below.
+
+A second honest note about the check set itself. The root `tsc --noEmit` passes
+on a file that `npm run typecheck` rejects, because the app's
+`tsconfig.test.json` is stricter; a duplicate-key error in this lane's own test
+helper was caught only by the workspace pass. Run the script, not the compiler.
+
+### Shared-file edits, itemised
+
+Additive-only, one line or one entry each:
+
+- `apps/app/src/ui/navigation.ts` — one `Destination` appended before the
+  specimen entry.
+- `apps/app/test/screen-contract.test.ts` — one `SCREEN_OWNERS` entry appended.
+- `apps/app/test/navigation-reachability.test.ts` — `'The guide'` appended to
+  each of the two exact-equality label lists, and the comment above the shell
+  list updated to say why five is now right. **This is the one shared assertion
+  whose wording this lane changed**; the assertion's shape is unchanged.
+- `apps/app/e2e/adv-a11y-audit.spec.ts` — `'/guide'` appended to `ROUTES`, so the
+  new surface is axe-swept in both schemes. It passes with no violation.
+- `packages/domain/src/index.ts` — one `export *` line appended.
+
+**One non-additive edit, declared because it is not additive.**
+`apps/app/test/screen-contract.test.ts`'s "has no index field in the seed"
+assertion now carries an explicit 20 s timeout. It parses the whole 3,000-lexeme
+dictionary and takes about 4.3 s alone — most of vitest's 5 s default — and it
+began failing as a *timeout* (never as an assertion) once this lane's new files
+were competing for the CPU. Reproduced twice, then clean on three consecutive
+full runs after the change. The assertion itself is untouched.
+
+### Coordination requests
+
+1. **`assertNotGuideArtefact` is not wired into the evidence gate.**
+   `packages/domain/src/evidence/gate.ts` is outside this lane's write surface, so
+   the runtime guard is exported and tested here but not called there — the same
+   route WP-07 took for `assertNotCandidate`. The change for the gate's owner is
+   two lines: import `assertNotGuideArtefact` from `../guide/boundary.ts`, and
+   call it beside `assertNotCandidate(event)` at the top of `admitToScheduler`.
+
+   Making that change **inverts** the boundary test's wiring assertion for
+   `gate.ts`, which is why it is a request rather than an edit: that entry would
+   have to become an explicitly allow-listed inbound edge, stated as such. The
+   property that holds today with no cooperation from any other lane is
+   mechanism 2 above — nothing on the decision path can even name a guide value.
+
+2. **A fork cannot be declared at `/guide` in this build.** The only declarer
+   that exists is `latestStumble` over the session workspace state, and that
+   workspace is provided inside the `(session)` route group. Wiring it would mean
+   importing another lane's provider, so `GuideScreen` takes `declaredBranches`
+   as a prop, the route passes none, and the screen says so in its own words. The
+   at-the-fork rendering is proven in `apps/app/test/guide-view-model.test.ts`
+   and `packages/domain/test/guide/position.test.ts`, not in a screenshot.
+
+### What this lane does not claim
+
+- **The guide's records are not durable.** They live in the screen's state for as
+  long as the learner is on it, are not exported, and do not survive a reload.
+  The screen says exactly that. Making them durable needs a new event family in
+  the frozen v1 catalog, which is an ADR-level decision.
+- **No live model was called.** The web export holds no API key by construction,
+  so every exchange in every screenshot and every e2e run took the labelled
+  `offline-fallback` route. The live route is untested by this lane.
+- **The era layer of a station is this project's own reading**, not a dictionary
+  field. The seed carries no era attribute. The screen renders that sentence
+  under the road.
+- **Nothing was measured about the learner.** The estimate is an impression from
+  an exchange, typed as such, and it proposes nothing about listening, production
+  or writing because nothing in the exchange can see them.
+- **Not merged.** No agent may merge, approve, or push to `main`.
+
+### What a verifier should try to break
+
+1. Add an import of `proposeRoute` to any file in `DECISION_PATH` and confirm
+   **both** the wiring group and the naming group go red. Then import it through
+   `@bunki/domain` instead and confirm the naming group alone still catches it —
+   that is the case the wiring walk cannot see.
+2. Delete the `guideArtefact` field from one record constructor and confirm
+   "stamps every artefact with a declared kind" goes red, rather than the runtime
+   guard silently passing that artefact.
+3. Add a second `on…` prop to `GuideScreen` and confirm the one-verb assertion
+   fails. Then ask whether anything else would have noticed.
+4. Remove `<SeedEntryDisclosure />` from the guide screen and confirm the EDRDG
+   scan goes red — the screen reads JMdict headwords, readings and senses through
+   the road and the turns.
+5. Argue the shell should not have a fifth entry. The counter is that "constant
+   presence" is §4.1's defining property of the guide, and a presence reachable
+   from one page is a page; but the argument is real, and the comment in
+   `navigation-reachability.test.ts` now carries both halves.
+6. Drive `/guide` with the network severed and confirm the exchange still
+   completes with both labels. Untried by this lane; the offline storm spec does
+   not visit `/guide`.
