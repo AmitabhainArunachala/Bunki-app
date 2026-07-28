@@ -4513,3 +4513,164 @@ controller's own `de7b6fcc…` among them.
 Open a **draft** PR from `agent/bunki-phase0-closed-loop-wp10-export` into
 `agent/bunki-phase0-integration` and have a human review it. Nothing here is
 merged; no agent may merge, approve, or push to `main`.
+
+## Appendix — WP-10 export lane (Builder B8, repair round): the note that disowned the learner's own sitting
+
+**Branch:** `agent/bunki-phase0-closed-loop-wp10-export`
+**Base:** `f011ce7` (the export lane's own head)
+**Scope:** one P1 from the verifier's pass over the export lane. Nothing else in
+the lane was reopened.
+
+### The finding, restated from the code
+
+`evidence-inspector-screen.tsx` rendered `DEMONSTRATION_CHAIN_NOTE`
+unconditionally, immediately under the observation rows in the Observations
+section. The note reads: *"These evidence events were appended by the 'Add a
+demonstration chain' button on this screen, not by a study session. … they are
+not a record of you answering anything."*
+
+In the running exported web build, after a sitting driven entirely by clicking,
+the log held **zero** demonstration-minted events — both `ContractCreated`
+carried `promptFamilyVersion` `pf-wp08.1`, not `demo-recognition@1`, and no
+`ExposureLogged` carried the demonstration `experienceId` prefix. The inspector
+rendered two genuine `ReviewGraded` rows from that sitting, and told the learner
+underneath them that none of it was a record of them answering anything.
+
+### Why it is a defect of *this* work package specifically
+
+The note was **true when it was written**. While COORD-B8-2 was open the session
+never reached the durable log, so the demonstration button was the only writer
+that could put a row in the Observations list, and every chain the inspector
+could render genuinely was button output. Closing COORD-B8-2 is what made the
+sentence false — a stale honesty disclosure created by the fix, not one carried
+in.
+
+That places it on REQ-GATE-03's second axis and makes it the exact inverse of
+definition-of-done §2 item 6. Item 6 forbids showing evidence with no user
+action behind it; this showed real user-action evidence and denied the action.
+Both are the same failure of the same rule, and the surface it happened on is
+the one WP-10's Outcome 3 rests on.
+
+The lane's predicate table claimed *"stale honesty disclosures corrected
+(REQ-GATE-03 in both directions)"* and listed five swept surfaces. This was a
+sixth, and the sweep missed it.
+
+### Why no test caught it, which is the more useful half
+
+The gap was verification-shaped rather than reasoning-shaped. Two tests sat
+either side of the defect and neither could see it:
+
+- `closed-loop-export.test.ts` asserted `chain.demonstration.present === false`
+  for a real sitting — the **model** was already right;
+- `evidence-inspector.test.ts` asserted the constant's **wording** —
+  `toContain('not by a study session')`.
+
+Nothing asserted the note's **rendering condition**, so a screen that ignored
+the flag the model computed was green on both.
+
+### The fix
+
+The `<Text testID="evidence-demonstration-note">` block is wrapped in
+`{chain.demonstration.present && ( … )}`. The flag is `DemonstrationFacts.present`
+from `buildEvidenceChain` (`src/screens/evidence-chain.ts`), derived
+structurally from `DEMONSTRATION_PROMPT_FAMILY_VERSION` on the contract's own
+`ContractCreated` event and `DEMONSTRATION_EXPERIENCE_PREFIX` on the exposure's
+`experienceId` — read off the events, not off a naming convention an importer
+could reproduce by accident, and not off a flag the screen sets for itself.
+
+### Three pins, because the absent half alone is not the predicate
+
+"The note is gone" would also pass for a build that simply stopped disclosing
+the demonstration, which is the same honesty defect pointing the other way. So
+each pin asserts both directions:
+
+1. **Model, over the operator's own sitting** —
+   `apps/app/test/closed-loop-export.test.ts`, *"flips the demonstration flag
+   only when the button has written to the chain"*. Builds the log through
+   `bootstrapSessionWorkspace` + `applySessionCommand` (the pair the screens
+   call), asserts `ReviewGraded` rows are in the chain **and**
+   `demonstration.present === false` with `rowCount === 0`; then seeds the
+   demonstration on the same thread and asserts `present === true`,
+   `rowCount > 0`, and `allAdmittedAreDemonstration === false` — the mixed case,
+   which is why the note has to name what the button wrote rather than the
+   chain.
+2. **The render condition itself** — `apps/app/test/evidence-inspector.test.ts`,
+   *"is disclosed by the screen only when a demonstration row is in the chain"*.
+   This project installs no React Native test renderer (`vitest.config.ts`
+   includes `.test.ts` only, node environment, no jsdom), so the condition is
+   asserted over the screen source with comments stripped — the same technique
+   and the same justification as `screen-contract.test.ts`, so that this file's
+   own explanation of the guard cannot satisfy the check. It asserts the note is
+   present **exactly once** (deleting it fails), that it sits after a
+   `{chain.demonstration.present && (` opener, and that no `)}` intervenes — a
+   guard that closed around something else on the way past is a failure.
+   **Mutation-checked:** reverting the guard in the screen and re-running this
+   test alone produces `AssertionError: the note is not inside a
+   chain.demonstration.present guard: expected -1 to be greater than -1`.
+3. **The browser, over the built bundle** — `apps/app/e2e/closed-loop.spec.ts`.
+   Step 10 asserts `evidence-demonstration-note` has count 0 on the chain the
+   sitting produced. A new step 12 presses "Add a demonstration chain" and
+   asserts the note comes back with its own text and that `demo-recognition@1`
+   appears in the versions section. Step 12 is **last** — after step 11's
+   exhaustive thirteen-event list — precisely because it is the one gesture in
+   that file which is not part of REQ-PH-01's loop, and its events must not
+   enter the log that list describes.
+
+### §17.5 check set — run in this worktree after `npm ci`
+
+| Command                                         | Result                                        |
+| ----------------------------------------------- | --------------------------------------------- |
+| `npm ci` (own worktree, no inherited modules)   | clean install, exit 0                         |
+| `npm run lint`                                  | pass, no output                               |
+| `npm run format:check`                          | pass — "All matched files use Prettier style" |
+| `npm run typecheck`                             | pass, root + 6 workspaces                     |
+| `npm run test`                                  | **1417 passed**, 86 files (was 1415)          |
+| `npm run test:replay` (T-03)                    | 47 passed, 2 files                            |
+| `npm run verify:export` (T-14)                  | 14 passed, 1 file                             |
+| `cd apps/app && npx expo export --platform web` | pass — 13 static routes                       |
+| `npm run test:e2e`                              | **38 passed**, 9 spec files, exit 0           |
+
+Two tests in `adv-known-defects.spec.ts` print `✘` under the list reporter and
+are counted in the 38: they are `test.fail()` expected failures for defects that
+file exists to keep open (`retries: 0`, so neither is a retried flake). Both are
+pre-existing and untouched by this round.
+
+Controller hash re-verified before any work began:
+`de7b6fcc5a9958d3becda43e5dfa80928c5187fb90c1c22554d32da8fa859b47` for
+`docs/specs/BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md`,
+matching `BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt`, along with the
+definition-of-done and launcher hashes.
+
+### What this round does **not** claim
+
+- **That the honesty sweep is now complete.** One surface was found by a
+  verifier reading the running build; the correct inference is that the sweep
+  method was weak, not that the count is now six. Every disclosure in the app
+  that was written while a seam was open is a candidate for the same inversion.
+- **A render test.** Pin 2 is a source scan, and a source scan cannot prove the
+  component tree. What proves it is pin 3, in the browser, over the exported
+  bundle — and pin 3 covers exactly one thread on one route.
+- **Independent verification.** This is a self-report on a finding somebody else
+  made.
+
+### What a verifier should try to break
+
+1. Delete the `{chain.demonstration.present && (` guard and confirm pin 2 goes
+   red and the E2E step 10 goes red. Both, not one.
+2. Delete the note element entirely and confirm pin 2 goes red on the
+   `toBeGreaterThan(-1)` assertion — a fix that silences the false claim by
+   dropping the true one must not pass.
+3. Change the gate to a flag the screen sets from its own `seedDemonstration`
+   callback rather than from the chain, reload the app, and confirm the note
+   does not survive the reload while the demonstration rows do. That is the
+   version of this fix that looks right and is not.
+4. Read every remaining disclosure sentence in `src/state/store.ts` against the
+   build as it now stands, and ask of each one the question this finding
+   answers: *was this true only because something was broken?*
+
+### Next safe command
+
+Same as the lane's: open a **draft** PR from
+`agent/bunki-phase0-closed-loop-wp10-export` into
+`agent/bunki-phase0-integration` and have a human review it. Nothing here is
+merged; no agent may merge, approve, or push to `main`.
