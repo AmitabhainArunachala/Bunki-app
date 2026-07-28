@@ -46,7 +46,12 @@ import type {
   StumbleObservations,
 } from '@bunki/domain';
 
-import { constituentKanji, findLexemeById, findLexemeByHeadword, wordFamily } from '../../data/catalog.ts';
+import {
+  constituentKanji,
+  findLexemeById,
+  findLexemeByHeadword,
+  wordFamily,
+} from '../../data/catalog.ts';
 import type { SeedLexeme } from '../../data/catalog.ts';
 
 /**

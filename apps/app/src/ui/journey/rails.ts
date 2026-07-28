@@ -77,11 +77,7 @@ export function railsOf(journey: CompiledJourney, chosen: BranchFamily | null): 
   const rails = journey.hypotheses.map<Rail>((cause) => {
     const option = offered.get(cause.family);
     const isOffered = option !== undefined;
-    const state: RailState = !isOffered
-      ? 'closed'
-      : chosen === cause.family
-        ? 'taking'
-        : 'open';
+    const state: RailState = !isOffered ? 'closed' : chosen === cause.family ? 'taking' : 'open';
 
     return Object.freeze({
       family: cause.family,
@@ -100,7 +96,9 @@ export function railsOf(journey: CompiledJourney, chosen: BranchFamily | null): 
   });
 
   return Object.freeze(
-    [...rails].sort((left, right) => branchFamilyRank(left.family) - branchFamilyRank(right.family)),
+    [...rails].sort(
+      (left, right) => branchFamilyRank(left.family) - branchFamilyRank(right.family),
+    ),
   );
 }
 

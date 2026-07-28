@@ -148,6 +148,38 @@ export const DESTINATIONS: readonly Destination[] = [
     blurb: 'Every token and component of the experience layer, in real Japanese.',
     reach: { kind: 'specimen' },
   },
+  /*
+    Journeys (Campaign E, lane B5), appended rather than inserted in loop order.
+
+    ## Why it is in the shell, when the header above argues for a small one
+
+    A branch point does not belong to any one screen. It is opened by a fact
+    about a *contract* — a miss the evidence gate counted — and that fact
+    outlives the sitting it happened in, survives a reload, and is still true
+    tomorrow. So there is no screen it could hang off in the way the canvas
+    hangs off a session or a word page hangs off a search: the thing it belongs
+    to is the ledger.
+
+    That makes it a place a learner *starts* from, which is the test the four
+    existing shell entries meet — "what is open?" is one of the two or three
+    questions the app gets opened with, and the round-2 research argues it is
+    the one that answers the operator's "hard to sense progress" complaint,
+    because a branch is the only surface where something is genuinely finite and
+    in front of you.
+
+    It is honest to record the alternative that was not available: a second door
+    from the session screen, offered at the moment of the miss, would be better
+    still, and this lane does not own that screen. That is a coordination
+    request rather than an edit made from here.
+  */
+  {
+    href: '/journey',
+    routeFile: 'journey.tsx',
+    screen: 'screens/journey-screen.tsx',
+    label: 'Journeys',
+    blurb: 'Branch points the evidence opened, and what still has to hold to rejoin.',
+    reach: { kind: 'shell' },
+  },
 ];
 
 /**
