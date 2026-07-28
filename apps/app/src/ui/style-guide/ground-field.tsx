@@ -39,7 +39,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { AttributionFooter } from '../attribution.tsx';
 import { type CapabilityId } from '../capability.ts';
-import { RecallIndicator } from '../recall.tsx';
+import { RecallIndicator, RecallMeter } from '../recall.tsx';
 import { RubyText } from '../ruby.tsx';
 import { MuseumCard } from '../surface.tsx';
 import {
@@ -182,7 +182,13 @@ export function GroundField({ era, cards, signals = [], testID }: GroundFieldPro
               }
               testID={`ground-${era}-card-${card.written}`}
             >
-              <RecallIndicator
+              {/*
+                The meter rather than the indicator, deliberately. On the ground
+                a band is a bare mark, because a map node has no room for a word;
+                on the card there is room, so the band arrives with its
+                capability and its word attached. Same band, two registers.
+              */}
+              <RecallMeter
                 band={card.band}
                 basis="Illustrative only: this specimen holds no memory state."
                 capability={card.capability}
@@ -198,11 +204,18 @@ export function GroundField({ era, cards, signals = [], testID }: GroundFieldPro
 const styles = StyleSheet.create({
   field: {
     overflow: 'hidden',
-    padding: SPACE.lg,
+    /*
+      The ground gets real room. `SPACE.xxl` here is not decoration: the mat is a
+      *mount*, and a mount that reaches the edge is a background. The margin is
+      what lets the era pigment be seen at full strength — the wash is the thing
+      the operator asked for depth from, and it cannot deliver any if the mat
+      covers it.
+    */
+    padding: SPACE.xxl,
   },
   mount: {
     gap: SPACE.lg,
-    padding: SPACE.lg,
+    padding: SPACE.xl,
   },
   marks: {
     alignItems: 'center',

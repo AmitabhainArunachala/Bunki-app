@@ -145,7 +145,7 @@ export function StyleGuidePage({ strokeSvg }: StyleGuidePageProps): ReactNode {
           title="Era registers — the ground layer"
         >
           {ERA_KEYS.map((era) => (
-            <View key={era} style={styles.eraBlock}>
+            <View key={era} style={styles.eraBlock} testID={`specimen-era-${era}`}>
               <Text
                 accessibilityRole="header"
                 style={[styles.eraTitle, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
