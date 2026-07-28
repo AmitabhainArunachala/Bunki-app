@@ -7180,3 +7180,206 @@ suite.
   round: no Safari, no Firefox, no device, no screen reader. The screenshots and
   the e2e suite are one engine, and the "spoken label" improvement in P1-2 is
   asserted from the DOM, not heard.
+
+## Appendix — Campaign E, lane B3-word-depth: the word page as a museum card
+
+Branch `agent/bunki-e-word`, from `agent/bunki-e-integration` (95d98fc).
+Surface owned: `apps/app/src/screens/word-screen.tsx`, `apps/app/src/ui/word/**`,
+`apps/app/app/word/**` and their tests. No other screen, no package, and none of
+the three shared files was edited — `src/ui/navigation.ts` already carried the
+word route, and no file was added to `src/screens/`, so `SCREEN_OWNERS` needed
+no entry. This appendix is appended; nothing above it was touched.
+
+### What the page was, and what it is now
+
+It was a correct lookup result: four labelled layers, one toggle, a list of
+fields. At dictionary scale that is the spreadsheet row the frozen §8 bar
+rejects — 取る carries 63 English wordings in this tier and 気 has 76 entries it
+can be confused with, and a flat page renders both as a wall.
+
+The four REQ-UI-02 layers are unchanged as the skeleton (the `word-layer-0` …
+`word-layer-3` test ids are kept, so other harnesses still resolve them). What
+changed is the register:
+
+- **Layer 0 is a `MuseumCard`** from the existing vocabulary: the headword at
+  `TYPE.headword` in mincho with its reading as first-class furigana through
+  `RubyText`, one gloss as the caption, the catalogue small and beneath, and the
+  card's own short attribution footer. Nothing here is a new component.
+- **Memory state is five `RecallMeter`s, one per capability lens**, read from
+  `@bunki/domain`'s own `graph/retrievability` projection over the kernel's
+  derived state. There is no sixth number on the page and no function in
+  `src/ui/word/memory.ts` that produces one.
+- **The glosses** open four and fold the rest behind a `Disclosure` that states
+  the count and the reason.
+- **The characters** are each tappable to their own page and each carry their
+  own per-lens memory state, projected from that character's own component id —
+  which is what makes the fractal brief's diagnosis visible: a bright word built
+  from a dark character.
+- **The family** is grouped by the character that joins it.
+- **The contrast set** is the 類義漢字 idea from frozen §10.5, computed from
+  overlapping JMdict glosses, with the shared wording and each side's distinct
+  wording shown.
+- **The sentences** are the Tatoeba pairs, each naming both contributors.
+
+### The three honesty decisions worth arguing with
+
+**1. They are glosses, not senses.** The brief asked for "senses in upstream
+order, each with its part-of-speech". JMdict has that structure; **this build
+does not**. `packages/seed/scripts/import-sources.mjs` flattens every `<gloss>`
+of every `<sense>` into one deduped list and collects the parts of speech at the
+entry level — its own comment says so, and `SEED_ENTRY_DISCLOSURE` warns the
+reader. So the page calls them wordings, labels the part-of-speech list as
+belonging to the entry, and carries an `UnsupportedLayer` in Layer 3 saying that
+numbered senses with their own parts of speech are an importer change rather
+than a screen change. Numbering the list and captioning each line with a part of
+speech would have looked more like a dictionary and asserted a grouping the data
+lost.
+
+**2. The band policy is a display mapping, and it is printed on the page.**
+`RecallMeter` needs one of five band names. `src/ui/word/memory.ts` derives it
+from the projection's *own* published values — the unknown/activated/attested
+split, `isFragile` under the default policy, and the uncertainty band, which
+counts admitted reviews — and never from the real-valued recall estimate, because
+a band drawn from that number reads as a percentage the moment two appear side by
+side. `BAND_RULE` is rendered verbatim under the meters, so the mapping is
+checkable by a learner rather than trusted; a test asserts the rule's wording and
+the mapping together.
+
+**3. The contrast set asserts no nuance.** JMdict carries no usage note, and
+inventing one is the Migaku failure the round-2 research documents. What is shown
+instead is the boundary the data really draws: the glosses both entries carry and
+the glosses each has that the other does not. `CONTRAST_STANDING` says exactly
+that, on the page, above the list.
+
+### §17.5 check set — every command run, on this branch
+
+| Command                                           | Result                                       |
+| ------------------------------------------------- | -------------------------------------------- |
+| `npm ci`                                          | clean                                        |
+| `npm run lint`                                    | clean, no output                             |
+| `npm run format:check`                            | `All matched files use Prettier code style!` |
+| `npm run typecheck`                               | clean across root + 5 workspaces             |
+| `npm run test`                                    | **105 files, 2,044 tests, all passed**       |
+| `npm run test:replay`                             | 2 files, 47 tests passed                     |
+| `npm run verify:export`                           | 1 file, 14 tests passed                      |
+| `(cd apps/app && npx expo export --platform web)` | `Exported: dist`                             |
+| `npm run test:e2e`                                | **48 passed** (2.6 min)                      |
+
+The two `✘` inside the 48 are the pre-existing `test.fail()`-annotated known
+defects in `adv-known-defects.spec.ts` (T4-1b, T3-3), unchanged by this lane.
+
+**A flake, recorded rather than hidden.** The first `npm run test` run of the
+session reported three failures — `screen-contract.test.ts > has no index field
+in the seed`, `theme-fonts.test.ts > covers every character in the seed corpus`,
+and one other in the same family. All three were **5-second timeouts**, not
+assertion failures, in tests that import the 3,000-entry seed dataset, on a cold
+filesystem cache immediately after `npm ci`. The immediate re-run was 2,044/2,044
+green, and the two named tests read none of the files this lane touched. It is a
+pre-existing cold-import timing sensitivity; it is not fixed here and it is not
+this lane's to fix, but a verifier who sees it should know it has been seen.
+
+The test count moved 1,977 → 2,044 (+67): 40 are the new `word-depth.test.ts`,
+and 27 are the existing `it.each` suites in `theme-tokens.test.ts` and
+`design-vocabulary.test.ts` growing by the nine files added under `src/ui/word/`.
+
+### Evidence: a real browser, and one defect it caught
+
+`apps/app/scripts/capture-word-depth.mjs` serves the real
+`expo export --platform web` output and drives Chromium against it. Six shots in
+`docs/build-evidence/screenshots-b3-word-depth/`, light and dark:
+
+- `word-depth-light.png` / `word-depth-dark.png` — taken **after walking the loop
+  by clicking**: capture 分岐 → take it up for study → sit the session → grade
+  its probes. The memory state in those meters is the kernel's own, written by
+  the evidence gate during that sitting. The script grades nothing, seeds nothing
+  and writes no storage; it clicks.
+- `word-long-tail-*.png` — 取る, cold: 63 wordings, four open and 59 folded.
+- `word-contrast-*.png` — 意見, with the contrast set open: 16 partners found,
+  12 shown, each with its shared and distinct wording.
+
+The script asserts, per shot, that exactly five capability meters rendered and
+that the EDRDG acknowledgement is visible, and exits non-zero otherwise. The
+per-shot readout in that directory's `README.md` is read out of the photographed
+page's accessibility labels, so it is a measurement rather than a claim.
+
+**The browser pass found a real defect in this lane's own work.** The first run
+produced a page whose button said "Close every section" while two of the three
+sections were still shut: the expand state flipped its own label and was never
+passed to the sections. Fixed by giving the three components an `initiallyOpen`
+prop and wiring it; `word-depth.test.ts` now asserts the control reaches every
+section it names. A screenshot taken without looking at it would have shipped
+that.
+
+### Mutation checks actually run
+
+Two, both restored afterwards:
+
+1. `kanjiInWord` changed to drop characters this build has no card for → the
+   "keeps a character this build has no card for" case went red.
+2. `bandOf` changed to treat an activated-but-untested lens as attested → the
+   "leaves the other four unmeasured when one capability has a contract" case
+   went red.
+
+### notDone — plainly
+
+1. **Per-sense grouping and per-sense part of speech are not rendered**, because
+   the imported data does not carry them (see decision 1). The page states this
+   rather than approximating it. Closing it means changing
+   `packages/seed/scripts/import-sources.mjs`, which is not this lane's surface.
+2. **`apps/app/scripts/capture-evidence.mjs` shots 12 and 18 are now
+   mis-described.** That is WP-05's evidence harness and not a file this lane
+   owns. It clicks `word-toggle-deeper` and then waits for `word-layer-3`; both
+   still exist, so the script will not crash — but the two shots were written
+   against the old single "show layers 2 and 3" control and will now photograph a
+   different state than their names promise. The script is not in the §17.5 check
+   set and was not run this round. It is named here rather than quietly left.
+3. **No pitch accent, no conjugation table, no frequency or JLPT label, no
+   audio.** No licensed or per-entry source for any of them; each has an
+   `UnsupportedLayer` giving the reason.
+4. **`stabilityDays` is not surfaced.** The projection carries it and the page
+   does not render it, because no wording for it was found that was both
+   learner-legible and faithful. The band and the fragility verdict carry what
+   it contributes; the raw figure is simply absent.
+5. **The contrast set is gloss overlap only.** It is a real edge and a stated
+   one, but it is not the `contrasts_with` edge the domain's graph model defines
+   — nothing populates that edge set yet. A learner reading this page gets
+   "these are described with the same English words", not "these are confusable
+   in Japanese", and the standing line says so.
+6. **No handwriting lens, ever, in this build.** The writing meter reports the
+   kernel's own `WRITING_LENS_DISCLOSURE`: no contract exists, so nothing has
+   been observed. That is the honest answer and not a gap this lane can close.
+7. **One screenshot pair varies between runs.** The two walked shots were taken
+   in separate browser contexts, and which of the sitting's two contracts got
+   probed differed between them — so the light shot shows reading attested and
+   the dark shot shows meaning attested. Both are true records of the sitting
+   that produced them; neither was re-taken to make the pair match.
+8. **No e2e spec was added for this surface.** The existing 48 cover the word
+   page's acknowledgement, its ruby, its kanji link and its candidate panel, and
+   they all still pass; the new sections are covered by unit scans and by the
+   screenshot harness's own assertions, not by a Playwright case of their own.
+9. **Not merged, and nothing was pushed to `main`.**
+
+### What a verifier should try to break
+
+1. Delete `initiallyOpen={expandAll}` from one of the three sections and confirm
+   the new wiring test goes red — the defect the browser found must stay caught
+   by something cheaper than a browser.
+2. Make `bandOf` read the projection's real-valued recall estimate and confirm
+   nothing stops you. It should be uncomfortable: the guard is the argument in
+   `memory.ts`'s header and the printed `BAND_RULE`, not a test. Argue that a
+   test is needed.
+3. Point the contrast set at a word whose glosses are all very general and check
+   `MAX_GLOSS_BUCKET` is doing something honest rather than hiding a bad ranking.
+4. Take the walked screenshots twice and confirm the meters differ only in which
+   contract the sitting probed — if anything else moves, the projection is not a
+   pure read of the log.
+5. Open `/word/lex-bunki` on a cold browser and confirm every lens says "no
+   evidence yet" rather than "weak". The distinction is the whole evidence model
+   at one inch.
+
+### Next safe command
+
+From a clean checkout of `agent/bunki-e-word`: `npm ci`, the §17.5 set, then
+`npm run export:web --workspace @bunki/app` followed by
+`node apps/app/scripts/capture-word-depth.mjs` and look at the six PNGs. Nothing
+here is merged; no agent may merge, approve, or push to `main`.
