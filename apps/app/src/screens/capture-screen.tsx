@@ -41,6 +41,19 @@
  *
  * What this screen does *not* claim: that a saved thread survives a reload. It
  * renders the store's own durability sentence instead (P0-CAP-15).
+ *
+ * **The EDRDG acknowledgement belongs here too.** §3 of the EDRDG licence
+ * statement is explicit: "If a WWW server is providing a dictionary function or
+ * an on-screen display of words from the files, the acknowledgement must be made
+ * on each screen display, e.g. in the form of a message at the foot of the screen
+ * or page." A result row here is a reading, a set of senses and a part of speech —
+ * JMdict fields, all of them, all carrying `edrdg-jmdict` provenance — so this
+ * screen is a dictionary display in exactly that sense. It shipped without one:
+ * `SeedCoverageDisclosure` renders only when *nothing* matched, which is the one
+ * state where no licensed word is on screen. `SeedEntryDisclosure` now renders
+ * whenever a result does, on the same terms as the word and kanji pages, and the
+ * obligation is checked at the route level by `e2e/adv-claim-audit.spec.ts`
+ * rather than left to whoever reads this comment.
  */
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -69,7 +82,7 @@ import {
 } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
-import { DurabilityNotice, SeedCoverageDisclosure } from '../ui/notices.tsx';
+import { DurabilityNotice, SeedCoverageDisclosure, SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, ChipButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
 import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
@@ -513,6 +526,14 @@ export function CaptureScreen({
           ))}
         </Section>
       )}
+
+      {/*
+        At the foot of the results, which is where §3 of the EDRDG statement asks
+        for it. Rendered on the same condition as the results themselves: no
+        licensed word on screen, no acknowledgement to make — the empty state
+        already says the seed is not a dictionary.
+      */}
+      {state.kind === 'ready' && topResult !== undefined ? <SeedEntryDisclosure /> : null}
 
       <Hairline />
 

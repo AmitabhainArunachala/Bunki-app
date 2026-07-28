@@ -240,6 +240,31 @@ test('labels: the seed entry disclosure is on every surface that could pass for 
   }
 });
 
+test('labels: a populated search on / acknowledges EDRDG, because §3 says on each screen display', async ({
+  page,
+  app,
+}) => {
+  // The surface this list used to miss. A search result row on `/` is a reading,
+  // a set of senses and a part of speech — JMdict fields, all of them — and §3 of
+  // the EDRDG licence statement requires the acknowledgement "on each screen
+  // display", not only on the pages a route list happened to name. The route was
+  // untested and shipped with no EDRDG string anywhere in the DOM.
+  await openApp(page, app.origin);
+  await visibleTestId(page, 'capture-search-input').fill('分');
+  await expect(visibleTestId(page, 'capture-top-answer')).toBeVisible();
+
+  const disclosure = visibleTestId(page, 'seed-entry-disclosure');
+  await expect(disclosure, '/ renders JMdict fields with no EDRDG acknowledgement').toBeVisible();
+  await expect(disclosure).toHaveText(SEED_ENTRY_DISCLOSURE);
+
+  // Named in full on the page itself, not merely implied by a test id: the
+  // licence asks for the acknowledgement, and an element that exists but says
+  // nothing about EDRDG would satisfy the selector and not the licence.
+  await expect(page.locator('body')).toContainText(
+    'Electronic Dictionary Research and Development Group',
+  );
+});
+
 test('labels: an unmatched search says the seed is not a dictionary', async ({ page, app }) => {
   await openApp(page, app.origin);
   await visibleTestId(page, 'capture-search-input').fill('ざぶんぶんきき');

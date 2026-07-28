@@ -230,8 +230,19 @@ nature and is what `--verify-fixtures` exists to answer.
 Not done, and deliberately: a **Sources / About screen**. §3 of the EDRDG licence
 requires that a smartphone or tablet app acknowledge the files on a separate
 screen reached from a menu, not only inline. The Phase-0 surface is Expo Web,
-where the "acknowledgement on each screen display" clause governs and is
-satisfied by `SEED_ENTRY_DISCLOSURE` on every word and kanji page. The dedicated
+where the "acknowledgement on each screen display" clause governs. The dedicated
 screen needs `apps/app/app/_layout.tsx` and the navigation map, which the
 orchestration spec assigns to the shell owner — so it is raised as a coordination
 request rather than edited across that boundary.
+
+**"Each screen display" means each, and this package got that wrong once.** The
+claim used to be that the clause was satisfied by `SEED_ENTRY_DISCLOSURE` on every
+word and kanji page. The search screen also displays words from the files — a
+result row is a reading, a set of senses and a part of speech, every one of them a
+JMdict field — and it carried no acknowledgement at all, because the only notice
+it rendered was the coverage disclosure, which appears exactly when nothing
+matched. The disclosure now renders on the search screen whenever a result does,
+and `apps/app/e2e/adv-claim-audit.spec.ts` drives a populated search on `/` and
+fails if the words "Electronic Dictionary Research and Development Group" are
+absent from the page. A route list is not a proof of coverage; the routes it omits
+are where the obligation goes unmet.

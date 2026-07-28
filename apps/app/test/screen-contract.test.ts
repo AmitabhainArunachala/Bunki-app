@@ -216,6 +216,15 @@ describe('the seed entry disclosure reaches the pages that need it', () => {
   it('shows the coverage disclosure on an empty search', () => {
     expect(captureSource).toContain('SeedCoverageDisclosure');
   });
+
+  it('renders on the search screen, which displays JMdict fields too', () => {
+    // §3 of the EDRDG licence statement asks for the acknowledgement on *each*
+    // screen display of words from the files, and a search result row is a
+    // reading, senses and a part of speech. This screen shipped with only the
+    // coverage disclosure, which renders exactly when nothing matched — the one
+    // state in which no licensed word is on screen.
+    expect(captureSource).toContain('SeedEntryDisclosure');
+  });
 });
 
 /** The three panels that stand for a *screen state* (REQ-UI-09). */
