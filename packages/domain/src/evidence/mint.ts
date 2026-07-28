@@ -33,6 +33,7 @@
 
 import type { DomainContext } from '../context/index.ts';
 import type {
+  DomainEvent,
   EvidenceSupersededEvent,
   ExposureLoggedEvent,
   LookupFrictionLoggedEvent,
@@ -41,6 +42,7 @@ import type {
 } from '../events/catalog.ts';
 import type { CreateEventOptions, EventPayload } from '../events/factories.ts';
 import { EVENT_SCHEMA_VERSION } from '../events/envelope.ts';
+import { recordKernelMint } from '../events/mint-registry.ts';
 import { parseEvent } from '../events/parse.ts';
 import type { Grade } from '../events/shared.ts';
 import { assertNotCandidate } from './gate.ts';
@@ -63,6 +65,24 @@ function envelope(
     occurredAt: options.occurredAt ?? context.clock.now(),
     idempotencyKey: options.idempotencyKey,
   };
+}
+
+/**
+ * Validate an assembled evidence event and record that this gate minted it.
+ *
+ * One helper for all five families so no mint can forget the registration: a new
+ * `mint*` that returned `parseEvent(...)` directly would produce an event the
+ * persist path refuses, which is a loud failure rather than a quiet bypass —
+ * but a helper that cannot be forgotten is better than a failure that has to be
+ * noticed. `test/events/provenance.test.ts` asserts every exported `mint*`
+ * produces a registered event, so a sixth family is covered the day it is added.
+ *
+ * The registration is of the *parsed* object, which is the one the caller
+ * receives. See `src/events/mint-registry.ts` for what registration means and
+ * for why it is an in-process fact rather than a portable brand.
+ */
+function mintedEvidenceEvent<TEvent extends DomainEvent>(candidate: unknown): TEvent {
+  return recordKernelMint(parseEvent(candidate)) as TEvent;
 }
 
 /** `ReviewGraded` minus the tier the gate stamps. */
@@ -97,14 +117,14 @@ export function mintReviewGraded(
   const confirmation =
     grade === 'easy' && submittedConfirmation === true ? { userConfirmedEasy: true as const } : {};
 
-  return parseEvent({
+  return mintedEvidenceEvent<ReviewGradedEvent>({
     ...rest,
     ...confirmation,
     grade,
     tier: 'A' as const,
     type: 'ReviewGraded' as const,
     ...envelope(context, options),
-  }) as ReviewGradedEvent;
+  });
 }
 
 export type ExposureLoggedInput = Omit<EventPayload<'ExposureLogged'>, 'tier'>;
@@ -116,12 +136,12 @@ export function mintExposureLogged(
   options: CreateEventOptions,
 ): ExposureLoggedEvent {
   assertNotCandidate(input);
-  return parseEvent({
+  return mintedEvidenceEvent<ExposureLoggedEvent>({
     ...input,
     tier: 'D' as const,
     type: 'ExposureLogged' as const,
     ...envelope(context, options),
-  }) as ExposureLoggedEvent;
+  });
 }
 
 /**
@@ -137,11 +157,11 @@ export function mintLookupFrictionLogged(
   options: CreateEventOptions,
 ): LookupFrictionLoggedEvent {
   assertNotCandidate(input);
-  return parseEvent({
+  return mintedEvidenceEvent<LookupFrictionLoggedEvent>({
     ...input,
     type: 'LookupFrictionLogged' as const,
     ...envelope(context, options),
-  }) as LookupFrictionLoggedEvent;
+  });
 }
 
 /**
@@ -158,11 +178,11 @@ export function mintProductionObserved(
   options: CreateEventOptions,
 ): ProductionObservedEvent {
   assertNotCandidate(input);
-  return parseEvent({
+  return mintedEvidenceEvent<ProductionObservedEvent>({
     ...input,
     type: 'ProductionObserved' as const,
     ...envelope(context, options),
-  }) as ProductionObservedEvent;
+  });
 }
 
 /**
@@ -178,9 +198,9 @@ export function mintEvidenceSuperseded(
   options: CreateEventOptions,
 ): EvidenceSupersededEvent {
   assertNotCandidate(input);
-  return parseEvent({
+  return mintedEvidenceEvent<EvidenceSupersededEvent>({
     ...input,
     type: 'EvidenceSuperseded' as const,
     ...envelope(context, options),
-  }) as EvidenceSupersededEvent;
+  });
 }
