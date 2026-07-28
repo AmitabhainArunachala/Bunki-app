@@ -16,8 +16,15 @@
  * evidence: the spans are display data for a display page.
  */
 
-import { seedDataset, type SeedPassage } from '../../data/catalog.ts';
+import {
+  findLexemeById,
+  seedDataset,
+  type SeedLexeme,
+  type SeedPassage,
+} from '../../data/catalog.ts';
 import { type FrontierSpan } from '../frontier.tsx';
+import { type EraKey } from '../theme.ts';
+import { type GroundCard } from './ground-field.tsx';
 
 /**
  * The seed's one hand-written passage.
@@ -97,3 +104,99 @@ export const VERTICAL_SPECIMEN =
 /** The word the museum card is about, and the kanji the stroke specimen draws. */
 export const SPECIMEN_LEXEME_ID = 'lex-bunki';
 export const SPECIMEN_KANJI = '岐';
+
+/* ------------------------------------------------------------------ *
+ * The three era registers, set in real seed words
+ * ------------------------------------------------------------------ */
+
+/**
+ * The honesty note that travels on every card in the era sections.
+ *
+ * It matters more here than anywhere else on this page. The map's whole thesis
+ * is that a word's *position* is meaningful — which era it entered the language
+ * in, by what road — and the seed carries **no era metadata at all**. Sourcing
+ * that attribute honestly is lane A2′'s work, and until it exists any placement
+ * a specimen makes is the specimen's own arrangement.
+ *
+ * So the placements below are grouping by an obvious property of the words
+ * themselves (a native reading, a 漢語 compound, a rail term), stated as such,
+ * and never rendered as though the dataset said so. A specimen that quietly
+ * implied a sourced era would be teaching the reader to trust a field that does
+ * not exist yet.
+ */
+export const ERA_PLACEMENT_STANDING =
+  'Placed on this layer by the specimen, not by the data. The seed carries no era field; sourcing one honestly is a separate piece of work. Nothing on this card is measured and nothing here is evidence.';
+
+/** Pull a seed word, or say which one is missing rather than rendering a blank. */
+function requireLexeme(id: string): SeedLexeme {
+  const lexeme = findLexemeById(id);
+  if (lexeme === null) throw new Error(`the seed has no '${id}': the era specimen cannot be set`);
+  return lexeme;
+}
+
+/**
+ * Two seed words per register, and one line each about why they sit there.
+ *
+ * Every headword, reading and sense is real seed content. The one-line reasons
+ * are the specimen's own — they are the kind of sentence the design documents
+ * call "the character explaining itself", written from what the word plainly is
+ * rather than from an encyclopedia.
+ *
+ * 駅 is on the rail layer here because that is where a learner meets it today,
+ * and it is the design's own worked example precisely because it did not start
+ * there: 駅家 was a post-station on the ancient road and 宿場 was its Edo
+ * successor, and the Meiji railways took the old word back up. The map is what
+ * will eventually be able to show that; a flat specimen can only say it.
+ */
+const ERA_WORDS: Readonly<Record<EraKey, readonly { id: string; why: string }[]>> = {
+  kodo: [
+    { id: 'lex-michi', why: 'みち — a native reading, and a road you walk rather than drive.' },
+    { id: 'lex-kiro', why: '岐 the fork and 路 the road: the place a path divides.' },
+  ],
+  kaido: [
+    { id: 'lex-douro', why: '道 and 路 compounded — a 漢語 word for a made road.' },
+    { id: 'lex-shadou', why: '車 the vehicle and 道 the road: the lane the traffic takes.' },
+  ],
+  tetsudo: [
+    { id: 'lex-eki', why: '駅家 on the old road, 宿場 on the highway, and a station since Meiji.' },
+    { id: 'lex-senro', why: '線 the line and 路 the road: the rails themselves.' },
+  ],
+};
+
+function cardsFor(era: EraKey): readonly GroundCard[] {
+  return ERA_WORDS[era].map(({ id, why }, index) => {
+    const lexeme = requireLexeme(id);
+    return {
+      written: lexeme.headword,
+      reading: lexeme.reading,
+      caption: lexeme.senses.slice(0, 2).join(' · '),
+      catalogue: [why, `${lexeme.partOfSpeech.join(', ')} · seed entry ${lexeme.id}`],
+      capability: index === 0 ? 'reading' : 'meaning',
+      // Two bands per register, so each ground shows both a bare mark and the
+      // bounded meter landing on it rather than one kind of figure twice.
+      band: index === 0 ? 'settled' : 'emerging',
+      standing: ERA_PLACEMENT_STANDING,
+    } satisfies GroundCard;
+  });
+}
+
+/** The cards each era ground carries, built from the seed at module load. */
+export const ERA_CARDS: Readonly<Record<EraKey, readonly GroundCard[]>> = {
+  kodo: cardsFor('kodo'),
+  kaido: cardsFor('kaido'),
+  tetsudo: cardsFor('tetsudo'),
+};
+
+/**
+ * The signals the rail register is asked to light, and the count is deliberate.
+ *
+ * Four are passed and the cap is three, so the specimen shows the ration doing
+ * its job rather than describing it — the fourth is reported as suppressed and
+ * the page says so in prose.
+ */
+export const RAIL_SIGNALS = [
+  { kind: 'due-now', basis: 'Due now, according to the plan this surface only displays.' },
+  { kind: 'branch-open', basis: 'A branch is open here after a stumble.' },
+  { kind: 'evidence-stale', basis: 'The last direct evidence is old enough to doubt.' },
+  { kind: 'due-now', basis: 'Also due now — past the ration, so it is not lit.' },
+] as const;

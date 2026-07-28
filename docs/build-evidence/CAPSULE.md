@@ -6283,3 +6283,166 @@ the 42 are the new EDRDG lane.
 Verify this branch from a clean checkout, re-run the §17.5 set, and run
 `--verify-reproducible` and `--verify-attribution` with a warm cache. Nothing
 here is merged; no agent may merge, approve, or push to `main`.
+---
+
+## Appendix — lane A1′ (Campaign E, Wave A′): the nihonga ground layer
+
+Branch `agent/bunki-e-ground`, from `agent/bunki-e-integration` (`cd04f7d`).
+
+### What this lane was asked for, and what the answer had to reconcile
+
+The operator's 2026-07-28 direction is a voyage through time — pilgrimage routes
+and old walking trails _and_ train lines — in a real 日本画 palette, in a
+Ghibli-meets-Akira register. The frozen §8 says "ink-and-paper palette, one
+vermilion accent". On their face these conflict.
+
+They are reconciled by a **ground/figure split**, and the reconciliation is the
+whole design: the ground carries era and atmosphere in the full mineral range and
+never says anything about the learner; the figure keeps every rule lane A1 built.
+The one-accent rule was a ban on **encoding learner state in hue**, not a ban on
+colour — the Todaii global-JLPT-rainbow failure the frozen spec rejects by name —
+and nothing in the ground layer encodes learner state. A malachite hillside is
+not a claim about anyone's recall of 山.
+
+Everything lane A1 exported still exists, unchanged in name and shape:
+`RECALL_BANDS`, `EDGE_PATTERNS`, `RECALL_BAND_MARKS`, `CONTRAST_PAIRS`,
+`paletteValue`, `paletteLeaves`, the no-hex-literal scan, the no-scheme-branch
+scan. This is a layer underneath, not a replacement.
+
+### The seven requirements, and where each one is actually enforced
+
+| #   | Requirement                                                  | Enforced by                                                                                                                                                                                       |
+| --- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Three era registers with the document's exact hex values     | `src/theme/ground.ts` `ERA_PIGMENTS`; the chart is **retyped** into `test/theme-ground.test.ts` and compared, so the module cannot be self-consistently wrong                                     |
+| 2   | Ground and semantic colours typed distinctly                 | `GroundColor` / `SemanticColor` branded strings; five `@ts-expect-error` directives prove the compiler rejects the crossing, and an unused directive is itself a typecheck error                  |
+| 3   | Luminance band per ground; ramp resolves against the ground  | `EraGround.band` + `figureScheme`, both declared and both checked against measured luminance; `GROUND_CONTRAST_PAIRS` × 6 grounds                                                                 |
+| 4   | Text never on an era ground                                  | `GroundContrastPair.minimum` is the literal `'nonText'` (a text pair cannot be _declared_), plus a scan of every file in `src/` and `app/` importing a `GROUND_PAINTING_EXPORTS` name, plus `GroundField` having no `children` slot |
+| 5   | Emissive colour capped, rail register only, real signals only | `MAX_EMISSIVE_POINTS = 3`, `planEmissive` throws outside 鉄道 and on an empty basis, and the emissive _declaration_ is checked against the pigments' own S×V ordering                              |
+| 6   | Depth is superposition, no shadows                           | `superpose()` composites the stack; `groundLayers()` hands out the same list it consumed; the shadow ban is extended to `src/theme/**`                                                            |
+| 7   | Ramps from one pigment                                       | `MINERAL_RAMPS`: 群青→白群 and 緑青→白緑, each coarse-to-finest-grind, tested for rising luminance, falling saturation and staying in one hue band                                                |
+
+### Numbers, and where they came from
+
+**Transcribed, not chosen.** Every hex in `ERA_PIGMENTS` is the value printed in
+`docs/design/BUNKI_VISUAL_LANGUAGE_NIHONGA_2026-07-28.md` §4. None was adjusted.
+
+**Chosen, and said so.** The wash and mat alphas (0.30 for every wash; mats from
+0.35 to 0.86) are in no chart. They were picked by searching for values under
+which every figure token clears 3:1 on every ground in both schemes; the tightest
+margin of the six is 3.16:1 and the loosest 3.40:1. The test is what holds them.
+
+**Two roles used outside their §4 slot, recorded rather than smuggled.** §4 gives
+no dark ground for 街道 and no light ground for 鉄道 — a daytime highway and a
+night railway, which is historically apt and computationally incomplete. So
+`kaido/dark` takes 檳榔子染 (that register's own ink) as its base and
+`tetsudo/light` takes 素鼠 (its concrete). Both are values from that register's
+own table, used at the far end of its own tonal range. `GROUND_SPECS`' docblock
+says this in the source, where someone changing it will read it.
+
+**One value I would question if it were mine to change, and did not change.** The
+chart's 群青 is `#4C6CB3`, and the document already records why (the mineral
+reading rather than the dye reading, `#51A8DD`). I took the document's value and
+have no separate opinion — recorded here so a later reader knows it was checked
+rather than skimmed.
+
+### The carried defects from Wave A verification — all three, fixed properly
+
+- **P2-1 `RecallMark` threw from inside render.** The five bands are declared
+  data and Wave B's map and kanji lanes read a band off a projection, so three of
+  five values rendered and two crashed the screen. `RECALL_BAND_MARKS` now keeps
+  its literal types (`as const satisfies`), `StandaloneRecallBand` is _derived_
+  from it, and `RecallMark` takes that — the mistake no longer compiles, and
+  flipping a `standalone` flag moves the type automatically. `RecallIndicator` is
+  the total component for callers holding an unnarrowed band: every band renders,
+  and the two faint ones render as the bounded meter that is allowed to carry
+  them. The throw is gone entirely; `test/carried-defects.test.ts` asserts its
+  absence by its exact old wording.
+- **P2-2 `OVERWHELMED_NOTE` claimed "Every word is still tappable".** False
+  whenever `FrontierPassage` has no `onOpen`, or when the spans carry no
+  `lexemeId`. The claim is now computed by `overwhelmedNote(spans, canOpen)` from
+  the same spans and the same handler the component renders with, and there are
+  three outcomes: silence, "the words with entries", and "every word". The
+  component and the note share one `spanIsOpenable` predicate, so they cannot
+  drift apart again.
+- **P2-3 `nav-shell.tsx` set `aria-current` twice.** The second, platform-guarded
+  spread is removed, along with the now-unused `Platform` import. The docblock
+  records that it was a fix for a defect that was not present — the two never
+  disagreed, which is exactly why it was worth removing: a reader finding an
+  attribute set twice has to work out which one wins before trusting either.
+
+### Evidence
+
+`docs/build-evidence/screenshots-e-ground/` — eight PNGs and a README, produced
+by `apps/app/scripts/capture-ground.mjs` from the real
+`expo export --platform web` output driven in Chromium: each of 古道 / 街道 /
+鉄道 framed on its own in both schemes, plus both whole-page shots.
+
+The page content is real `@bunki/seed`: 道 and 岐路, 道路 and 車道, 駅 and 線路.
+Nothing is lorem and nothing was invented for the specimen.
+
+The README records the fonts that actually registered, read out of
+`document.fonts` in the photographed page — and then records what that does _not_
+establish. The self-hosted faces are subsets; `coverage.mjs` draws the line at
+jōyō and says outright that anything past it falls back. So rather than claiming
+full coverage, the script reads the era section's own `innerText` and computes
+which characters fell back. Two did: `ō` and `胡`, both in chrome. Every headword
+on every card is jōyō and therefore self-hosted. That is measured in the page,
+not asserted beside it.
+
+### Full §17.5 check set, on `a295f92`
+
+| Check                            | Result                                       |
+| -------------------------------- | -------------------------------------------- |
+| `npm ci`                         | clean                                        |
+| `npm run lint`                   | exit 0                                       |
+| `npm run format:check`           | all files formatted                          |
+| `npm run typecheck`              | exit 0, zero errors                          |
+| `npm run test`                   | **2088 passed**, 102 files (was 1868 / 100)  |
+| `npm run test:replay`            | 47 passed                                    |
+| `npm run verify:export`          | 14 passed                                    |
+| `expo export --platform web`     | 14 static routes exported                    |
+| `npm run test:e2e`               | **43 passed**, exit 0                        |
+
+The two `✘` lines the e2e list reporter prints are the same pre-existing
+annotated `test.fail()` expectations as every previous round (T4-1b, T3-3).
+`retries: 0`; neither was touched; both are counted in the 43 and the run exits 0.
+
+Two negative probes were run rather than assumed, because both guards are the
+kind that can pass vacuously:
+
+1. A file carrying a `@ts-expect-error` on a line with no error was added to the
+   app's test project. `tsc` reported `TS2578: Unused '@ts-expect-error'
+   directive` and exited 2. So the five directives in `theme-ground.test.ts` are
+   each suppressing a real error, which is the proof that branding rejects the
+   crossing.
+2. A `<Text>` was injected into `ground-field.tsx`. The museum-card scan went
+   red, naming the file and the three ground exports it imports. Restored, and
+   the suite is green again.
+
+### What this lane does **not** claim
+
+- **That Wave B's map will automatically be correct on a ground.** The figure
+  components read the ramp from `useTheme()`, i.e. the _app's_ scheme. That is
+  right today only because all six grounds resolve their figure to the scheme the
+  app is in. `theme-ground.test.ts` carries a deliberate **tripwire** for this:
+  the moment an era register is dark in the light scheme, the test fails and its
+  message is the instruction — thread `figurePaletteOn(ground)` into the mark
+  components. It is a tripwire, not an invariant, and it is labelled as one in
+  the test.
+- **That the museum-card scan binds a lane that avoids the accessors.** It binds
+  any module importing a `GROUND_PAINTING_EXPORTS` name. A lane that reimplemented
+  compositing from raw hex would escape it — and would also fail the
+  no-hex-literal scan lane A1 already had, which is why the two together are
+  worth more than either alone.
+- **That the era placement of any word is sourced.** It is not, and every card
+  says so on screen. The seed carries no era field; sourcing one honestly is lane
+  A2′'s work. The specimen groups by an obvious property of the words themselves
+  and labels the grouping as its own arrangement.
+- **That the emissive test can tell a lamp from a pigment.** It cannot — nothing
+  can, from a hex. The declaration is checked only for _consistency_: every
+  pigment marked as emitted light is brighter and more saturated than every one
+  that is not. The margin is thin and worth knowing: 銀朱 at 0.553 clears 縹 at
+  0.518 on S×V by 0.035. A new register whose loudest colour landed between them
+  would fail there, which is the correct outcome.
+- **That any of this ran outside Chromium on Linux.** No Safari, no Firefox, no
+  device, no screen reader. The screenshots and the e2e suite are one engine.

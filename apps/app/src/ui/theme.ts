@@ -24,6 +24,12 @@
  * name tokens by path (`'recall.settled'`) rather than by top-level key, because
  * the recall ramp is one token with five steps. `paletteValue` resolves a path;
  * `test/theme-contrast.test.ts` walks the pairs through it.
+ *
+ * Lane A1′ added the ground layer under all of it — `GROUNDS`, `ERA_REGISTERS`,
+ * `GROUND_CONTRAST_PAIRS` and the emissive cap — and it is re-exported here for
+ * the same reason: the screens already import `@/ui/theme`, and a lane that
+ * needs an era register should not have to learn a second import path to get
+ * one. Nothing that was here before changed name or shape.
  */
 
 export {
@@ -33,10 +39,23 @@ export {
   EASING,
   EDGE_PATTERNS,
   ELEVATION,
+  EMISSIVE_REGISTER,
+  EMISSIVE_SIGNAL_KINDS,
+  ERA_KEYS,
+  ERA_PIGMENTS,
+  ERA_REGISTERS,
   FONT_STACKS,
+  GROUNDS,
+  GROUND_BANDS,
+  GROUND_BAND_WINDOWS,
+  GROUND_CONTRAST_PAIRS,
+  GROUND_PAINTING_EXPORTS,
   HAIRLINE,
   LEADING,
+  MAX_EMISSIVE_POINTS,
+  MAX_MAT_ALPHA,
   MEASURE,
+  MINERAL_RAMPS,
   MIN_TOUCH_TARGET,
   MIN_UNLIT_OPACITY,
   PALETTES,
@@ -49,10 +68,17 @@ export {
   TYPE,
   VERTICAL,
   createTheme,
+  eraPigment,
+  figurePaletteOn,
+  groundLayers,
+  groundOf,
+  isStandaloneRecallBand,
   paletteLeaves,
   paletteValue,
+  planEmissive,
   resolveDuration,
   strokeSequenceDuration,
+  superpose,
   surfaceOf,
 } from '../theme/index.ts';
 
@@ -62,12 +88,29 @@ export type {
   EasingName,
   EdgePatternName,
   ElevationName,
+  EmissivePlan,
+  EmissiveSignal,
+  EmissiveSignalKind,
+  EraGround,
+  EraKey,
+  EraRegister,
+  EraRole,
+  GroundBand,
+  GroundColor,
+  GroundContrastPair,
+  GroundPigment,
+  GroundWash,
+  LitPoint,
+  MeterOnlyRecallBand,
+  MineralRamp,
   Palette,
   RadiusName,
   RecallBand,
   RecallRamp,
   SelfHostedFace,
+  SemanticColor,
   SpaceName,
+  StandaloneRecallBand,
   Theme,
   TypeSizeName,
 } from '../theme/index.ts';
