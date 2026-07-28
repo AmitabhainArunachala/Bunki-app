@@ -40,6 +40,32 @@
       "source_entry_id": null,
       "notes": "Stroke counts and component/radical decompositions read out of the committed KanjiVG SVGs (kvg:element, kvg:radical, kvg:*-sN path ids). Share-alike analysis of a CC BY-SA 3.0 work; test/strokes.test.ts re-derives every value from the SVG bytes, so these fields cannot drift away from their source."
     },
+    "edrdg-jmdict": {
+      "source": "JMdict (EDRDG)",
+      "source_version": "JMdict as compiled into jamdict-data 1.5 (jamdict.db meta jmdict.version=1.08; package compiled 2021-04-17)",
+      "license": "CC BY-SA 3.0",
+      "attribution": "This product uses the JMdict dictionary file. JMdict is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.md, full legal code in packages/seed/licenses/CC-BY-SA-3.0.txt",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "licensed-redistribution",
+      "source_url": "https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "notes": "Real JMdict entries; each field's source_entry_id is that entry's real ent_seq. www.edrdg.org and ftp.edrdg.org are refused by this session's egress proxy, so the bytes come from jamdict-data 1.5, the data package of the jamdict project, pinned by sha256 a4247dd9bb3148ab17c1b32fc56d7a7f1c35293b0d6ff2838c811f896d13f415 — which bundles EDRDG's own licence statement beside the data. modification_status is derived, not unmodified, for one specific reason: the seed schema stores senses and parts of speech as flat string lists, so upstream sense boundaries are lost by the shape. reading is the entry's first kana element; partOfSpeech and senses are every value across every sense in upstream order, deduplicated. Extraction rules and re-verification live in scripts/fetch-edrdg.mjs."
+    },
+    "edrdg-kanjidic2": {
+      "source": "KANJIDIC2 (EDRDG)",
+      "source_version": "KANJIDIC2 as compiled into jamdict-data 1.5 (jamdict.db meta kanjidic2.version=1.6, kanjidic2.date=April 2008)",
+      "license": "CC BY-SA 3.0",
+      "attribution": "This product uses the KANJIDIC2 dictionary file. KANJIDIC2 is the property of the Electronic Dictionary Research and Development Group, copyright James William BREEN and the EDRDG, and is used in conformance with the Group's licence: https://www.edrdg.org/wiki/index.php/KANJIDIC_Project — licence statement verbatim in packages/seed/licenses/EDRDG-licence-statement.md, full legal code in packages/seed/licenses/CC-BY-SA-3.0.txt",
+      "modification_status": "derived",
+      "confidence": "high",
+      "review_status": "licensed-redistribution",
+      "source_url": "https://files.pythonhosted.org/packages/97/a5/075928aed2b3b70459fc1db396397dfa6714d266c143c51af9b648551a4e/jamdict_data-1.5.tar.gz",
+      "retrieved_at": "2026-07-28",
+      "source_entry_id": null,
+      "notes": "Real KANJIDIC2 characters; each field's source_entry_id is the KANJIDIC2 literal itself, which is that file's entry identifier. Same pinned artefact and same egress situation as edrdg-jmdict. derived, not unmodified, because on/kun readings and meanings are flattened across KANJIDIC2's reading-meaning groups into the flat lists this schema stores, filtered to ja_on/ja_kun and English. The special conditions in §7 of the EDRDG statement (SKIP codes, Four Corner, De Roo, Spahn/Hadamitzky descriptors and the other third-party-copyright fields) do not apply here: none of those fields are extracted or shipped."
+    },
     "bunki-editorial": {
       "source": "Bunki Phase-0 seed (hand-assembled by this project)",
       "source_version": "1.0.0",
@@ -51,7 +77,7 @@
       "source_url": null,
       "retrieved_at": null,
       "source_entry_id": null,
-      "notes": "Lexicographic claims (readings, senses, parts of speech, kanji meanings) written from the builder's own knowledge of Japanese. They are DELIBERATELY NOT labelled as JMdict or KANJIDIC2 content: EDRDG's hosts were unreachable from this build session (see LICENSES.md, deferred item D-1), so no entry sequence number could be recorded and no dictionary cross-check could be run. Reading and sense lists are representative, not exhaustive. confidence=medium and review_status=unreviewed are the honest labels until a primary-source pass runs."
+      "notes": "Lexicographic claims written from the builder's own knowledge of Japanese, retained only where no licensed source replaced them. The lexeme readings/senses/parts of speech and the kanji on/kun readings and meanings that this source used to cover are now real JMdict and KANJIDIC2 entries (see edrdg-jmdict, edrdg-kanjidic2). What is left under this source is labelled unreviewed and carries no entry identifier, because there is none to carry."
     },
     "bunki-authored-text": {
       "source": "Bunki Phase-0 seed (original text written for this project)",

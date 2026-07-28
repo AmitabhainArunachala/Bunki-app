@@ -35,6 +35,7 @@ const MODIFICATION_STATUSES: readonly ModificationStatus[] = ['unmodified', 'der
 const CONFIDENCES: readonly Confidence[] = ['high', 'medium', 'low'];
 const REVIEW_STATUSES: readonly ReviewStatus[] = [
   'primary-source-verified',
+  'licensed-redistribution',
   'reviewed-in-project',
   'unreviewed',
 ];

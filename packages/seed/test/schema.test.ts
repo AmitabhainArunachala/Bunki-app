@@ -35,7 +35,12 @@ const provenanceRecordSchema = z.strictObject({
   attribution: nonEmpty,
   modification_status: z.enum(['unmodified', 'derived', 'original']),
   confidence: z.enum(['high', 'medium', 'low']),
-  review_status: z.enum(['primary-source-verified', 'reviewed-in-project', 'unreviewed']),
+  review_status: z.enum([
+    'primary-source-verified',
+    'licensed-redistribution',
+    'reviewed-in-project',
+    'unreviewed',
+  ]),
   source_url: z.string().url().nullable(),
   retrieved_at: z
     .string()
@@ -52,7 +57,12 @@ const provenanceRefSchema = z.union([
     ref: nonEmpty,
     confidence: z.enum(['high', 'medium', 'low']).optional(),
     review_status: z
-      .enum(['primary-source-verified', 'reviewed-in-project', 'unreviewed'])
+      .enum([
+        'primary-source-verified',
+        'licensed-redistribution',
+        'reviewed-in-project',
+        'unreviewed',
+      ])
       .optional(),
     source_entry_id: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),

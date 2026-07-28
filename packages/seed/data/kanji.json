@@ -3,10 +3,14 @@
   "_comment": [
     "Seed kanji (controller §8: 8–12, must include 分 and 岐 for the OD-02 fixture 分岐).",
     "Every record mixes sources, which is exactly the case REQ-SRC-01 (A7) is written for:",
-    "strokeCount, components, radicals and strokeSvg come from KanjiVG (CC BY-SA 3.0);",
-    "onReadings, kunReadings and meanings are hand-assembled by this project and are NOT",
-    "labelled KANJIDIC2 — see LICENSES.md deferred item D-1 for why.",
-    "Reading and meaning lists are representative, not exhaustive."
+    "strokeCount, components, radicals and strokeSvg come from KanjiVG (CC BY-SA 3.0),",
+    "re-derived from the committed SVG bytes by test/strokes.test.ts;",
+    "onReadings, kunReadings and meanings are REAL KANJIDIC2 entries (CC BY-SA 3.0) and carry",
+    "the KANJIDIC2 literal as source_entry_id. KANJIDIC2's stroke_count agrees with the",
+    "KanjiVG-derived strokeCount for all ten characters; the shipped value stays the",
+    "KanjiVG one so it remains re-derivable offline from bytes we ship.",
+    "An empty kunReadings list is upstream's answer, not a gap: 岐 genuinely has no ja_kun",
+    "reading in KANJIDIC2. The hand-assembled list this replaced claimed two."
   ],
   "records": [
     {
@@ -16,23 +20,64 @@
       "strokeCount": 4,
       "components": ["八", "刀"],
       "radicals": [
-        { "element": "八", "kind": "nelson" },
-        { "element": "刀", "kind": "tradit" }
+        {
+          "element": "八",
+          "kind": "nelson"
+        },
+        {
+          "element": "刀",
+          "kind": "tradit"
+        }
       ],
       "strokeSvg": "strokes/05206.svg",
       "onReadings": ["ブン", "フン", "ブ"],
-      "kunReadings": ["わ.ける", "わ.かれる", "わ.かる", "わ.かつ"],
-      "meanings": ["part", "divide", "separate", "minute", "understand"],
+      "kunReadings": ["わ.ける", "わ.け", "わ.かれる", "わ.かる", "わ.かつ"],
+      "meanings": [
+        "part",
+        "minute of time",
+        "segment",
+        "share",
+        "degree",
+        "one's lot",
+        "duty",
+        "understand",
+        "know",
+        "rate",
+        "1%",
+        "chances",
+        "shaku/100"
+      ],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05206.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05206.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05206.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/05206.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05206.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05206.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05206.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/05206.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "分"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "分"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "分"
+        }
       }
     },
     {
@@ -41,21 +86,47 @@
       "codepoint": "U+5C90",
       "strokeCount": 7,
       "components": ["山", "支"],
-      "radicals": [{ "element": "山", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "山",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/05c90.svg",
       "onReadings": ["キ", "ギ"],
-      "kunReadings": ["えだ", "わか.れる"],
-      "meanings": ["branch off", "fork in a road", "divergence"],
+      "kunReadings": [],
+      "meanings": ["branch off", "fork in road", "scene", "arena", "theater"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05c90.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05c90.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/05c90.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/05c90.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05c90.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05c90.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/05c90.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/05c90.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "岐"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "岐"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "岐"
+        }
       }
     },
     {
@@ -65,23 +136,50 @@
       "strokeCount": 9,
       "components": ["占", "灬"],
       "radicals": [
-        { "element": "卜", "kind": "nelson" },
-        { "element": "灬", "kind": "tradit" }
+        {
+          "element": "卜",
+          "kind": "nelson"
+        },
+        {
+          "element": "灬",
+          "kind": "tradit"
+        }
       ],
       "strokeSvg": "strokes/070b9.svg",
       "onReadings": ["テン"],
-      "kunReadings": ["つ.ける", "つ.く"],
-      "meanings": ["point", "dot", "mark", "spot", "score"],
+      "kunReadings": ["つ.ける", "つ.く", "た.てる", "さ.す", "とぼ.す", "とも.す", "ぼち"],
+      "meanings": ["spot", "point", "mark", "speck", "decimal point"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/070b9.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/070b9.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/070b9.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/070b9.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/070b9.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/070b9.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/070b9.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/070b9.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "点"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "点"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "点"
+        }
       }
     },
     {
@@ -90,21 +188,47 @@
       "codepoint": "U+8DEF",
       "strokeCount": 13,
       "components": ["足", "各"],
-      "radicals": [{ "element": "足", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "足",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/08def.svg",
       "onReadings": ["ロ", "ル"],
-      "kunReadings": ["みち", "-じ"],
-      "meanings": ["road", "path", "route", "way"],
+      "kunReadings": ["-じ", "みち"],
+      "meanings": ["path", "route", "road", "distance"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08def.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08def.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08def.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/08def.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08def.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08def.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08def.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/08def.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "路"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "路"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "路"
+        }
       }
     },
     {
@@ -113,21 +237,47 @@
       "codepoint": "U+7DDA",
       "strokeCount": 15,
       "components": ["糸", "泉"],
-      "radicals": [{ "element": "糸", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "糸",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/07dda.svg",
       "onReadings": ["セン"],
       "kunReadings": ["すじ"],
-      "meanings": ["line", "track", "wire", "ray"],
+      "meanings": ["line", "track"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/07dda.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/07dda.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/07dda.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/07dda.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/07dda.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/07dda.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/07dda.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/07dda.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "線"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "線"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "線"
+        }
       }
     },
     {
@@ -136,21 +286,47 @@
       "codepoint": "U+9053",
       "strokeCount": 12,
       "components": ["首", "⻌"],
-      "radicals": [{ "element": "⻌", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "⻌",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/09053.svg",
       "onReadings": ["ドウ", "トウ"],
-      "kunReadings": ["みち"],
-      "meanings": ["road", "way", "path", "journey", "teaching"],
+      "kunReadings": ["みち", "いう"],
+      "meanings": ["road-way", "street", "district", "journey", "course", "moral", "teachings"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/09053.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/09053.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/09053.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/09053.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/09053.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/09053.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/09053.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/09053.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "道"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "道"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "道"
+        }
       }
     },
     {
@@ -159,21 +335,47 @@
       "codepoint": "U+8ECA",
       "strokeCount": 7,
       "components": [],
-      "radicals": [{ "element": "車", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "車",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/08eca.svg",
       "onReadings": ["シャ"],
       "kunReadings": ["くるま"],
-      "meanings": ["car", "vehicle", "wheel"],
+      "meanings": ["car"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08eca.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08eca.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/08eca.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/08eca.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08eca.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08eca.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/08eca.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/08eca.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "車"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "車"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "車"
+        }
       }
     },
     {
@@ -182,21 +384,47 @@
       "codepoint": "U+99C5",
       "strokeCount": 14,
       "components": ["馬", "尺"],
-      "radicals": [{ "element": "馬", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "馬",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/099c5.svg",
       "onReadings": ["エキ"],
       "kunReadings": [],
-      "meanings": ["station", "stage on a highway"],
+      "meanings": ["station"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/099c5.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/099c5.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/099c5.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/099c5.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/099c5.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/099c5.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/099c5.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/099c5.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "駅"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "駅"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "駅"
+        }
       }
     },
     {
@@ -205,21 +433,47 @@
       "codepoint": "U+81EA",
       "strokeCount": 6,
       "components": ["目"],
-      "radicals": [{ "element": "自", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "自",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/081ea.svg",
       "onReadings": ["ジ", "シ"],
-      "kunReadings": ["みずか.ら", "おの.ずから"],
-      "meanings": ["oneself", "self", "from"],
+      "kunReadings": ["みずか.ら", "おの.ずから", "おの.ずと"],
+      "meanings": ["oneself"],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/081ea.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/081ea.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/081ea.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/081ea.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/081ea.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/081ea.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/081ea.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/081ea.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "自"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "自"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "自"
+        }
       }
     },
     {
@@ -228,21 +482,56 @@
       "codepoint": "U+90E8",
       "strokeCount": 11,
       "components": ["咅", "⻏"],
-      "radicals": [{ "element": "⻏", "kind": "general" }],
+      "radicals": [
+        {
+          "element": "⻏",
+          "kind": "general"
+        }
+      ],
       "strokeSvg": "strokes/090e8.svg",
       "onReadings": ["ブ"],
-      "kunReadings": ["べ"],
-      "meanings": ["section", "department", "part", "category"],
+      "kunReadings": ["-べ"],
+      "meanings": [
+        "section",
+        "bureau",
+        "dept",
+        "class",
+        "copy",
+        "part",
+        "portion",
+        "counter for copies of a newspaper or magazine"
+      ],
       "fieldProvenance": {
         "character": "bunki-selection",
         "codepoint": "bunki-computed",
-        "strokeCount": { "ref": "kanjivg-derived", "source_entry_id": "kanji/090e8.svg" },
-        "components": { "ref": "kanjivg-derived", "source_entry_id": "kanji/090e8.svg" },
-        "radicals": { "ref": "kanjivg-derived", "source_entry_id": "kanji/090e8.svg" },
-        "strokeSvg": { "ref": "kanjivg-verbatim", "source_entry_id": "kanji/090e8.svg" },
-        "onReadings": "bunki-editorial",
-        "kunReadings": "bunki-editorial",
-        "meanings": "bunki-editorial"
+        "strokeCount": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/090e8.svg"
+        },
+        "components": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/090e8.svg"
+        },
+        "radicals": {
+          "ref": "kanjivg-derived",
+          "source_entry_id": "kanji/090e8.svg"
+        },
+        "strokeSvg": {
+          "ref": "kanjivg-verbatim",
+          "source_entry_id": "kanji/090e8.svg"
+        },
+        "onReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "部"
+        },
+        "kunReadings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "部"
+        },
+        "meanings": {
+          "ref": "edrdg-kanjidic2",
+          "source_entry_id": "部"
+        }
       }
     }
   ]

@@ -22,8 +22,21 @@ export type Confidence = 'high' | 'medium' | 'low';
  * `primary-source-verified` means the licence and content were checked against
  * the source project's own artefacts over HTTPS in this build session — not
  * against a summary, a mirror, or memory. Nothing may claim it otherwise.
+ *
+ * `licensed-redistribution` is strictly weaker, and exists because EDRDG's own
+ * hosts are refused by this session's egress policy. It means: the content *and*
+ * the licensor's own licence statement were taken together from one pinned,
+ * sha256-verified artefact published by a named project, and the entry
+ * identifiers are the licensor's real ones — but the licensor's host was never
+ * reached, so the statement's currency is unverified. It must never be widened
+ * to mean "found on a mirror": the artefact, its digest and the licence text's
+ * digest are all recorded, and `LICENSES.md` names the redistributor.
  */
-export type ReviewStatus = 'primary-source-verified' | 'reviewed-in-project' | 'unreviewed';
+export type ReviewStatus =
+  | 'primary-source-verified'
+  | 'licensed-redistribution'
+  | 'reviewed-in-project'
+  | 'unreviewed';
 
 /**
  * The seven REQ-SRC-01 fields, in spec order. Exported so tests can assert
