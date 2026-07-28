@@ -14,15 +14,22 @@
  * `StumbleObservations` is `number | null`, and `null` is what this module
  * produces for anything the ledger does not carry.
  *
- * ## Why the gate's grade and not the event's
+ * ## Why the gate's decision and not the event alone
  *
- * `ReviewGraded.grade` is what the learner pressed. `GateDecisionRecord.
- * effectiveGrade` is what actually counted, after the reveal rule (T-06) has
- * had its say: a `good` on an answer that was revealed first is recorded as the
- * event says and *counted* as `again`. A branch that opened on the submitted
- * grade would miss exactly the misses that most need one. So the gate's word is
- * the one read here, and a review the gate refused opens nothing at all —
- * refused evidence is not evidence of a gap.
+ * The first version of this paragraph said `ReviewGraded.grade` is "what the
+ * learner pressed" and `GateDecisionRecord.effectiveGrade` is "what counted".
+ * That is the design the requirement describes and it is **not** what this
+ * kernel does, and the test for it is what found out:
+ * `evidence/mint.ts` computes `grade = revealedBeforeRecall ? 'again' :
+ * input.grade` *at mint*, so the submitted grade never reaches the log at all.
+ * A `good` on a revealed answer is stored as an `again` with
+ * `revealedBeforeRecall: true`, and the two grades agree on every event this
+ * app can produce. See {@link REVEAL_CORRECTION_HAPPENS_AT_MINT}.
+ *
+ * The gate's decision is still what is read here, for the half that is not
+ * redundant: `admitted`. A review the gate refused opens nothing at all,
+ * because refused evidence is not evidence of a gap — and that verdict exists
+ * nowhere but the decision record.
  *
  * ## What the affordances are, and are not
  *
@@ -98,13 +105,57 @@ export const AFFORDANCES_NOT_AVAILABLE_HERE: readonly {
 export const SEPARATE_SITTINGS_NOT_AVAILABLE =
   'A rejoin condition can ask for successes on different days. This build does not offer that, because no event in its log records which sitting it happened in — so “different days” could not be checked, only assumed.';
 
+/**
+ * Where the reveal correction actually happens in this kernel, measured.
+ *
+ * Recorded as data because a surface that assumed otherwise would be reading a
+ * field that cannot carry what it looks like it carries — and because the
+ * assumption is the one the requirement's own wording invites.
+ *
+ * `mintReviewGraded` applies T-06 before the event exists. Two consequences
+ * follow, and `test/journey-surface.test.ts` pins both against a real sitting:
+ *
+ *   1. `ReviewGraded.grade` and `GateDecisionRecord.effectiveGrade` are equal
+ *      on every event this app can mint. The submitted grade is not retained
+ *      anywhere; what survives is `revealedBeforeRecall: true` beside an
+ *      `again`.
+ *   2. `GateDecisionRecord.forcedByReveal` is computed as
+ *      `revealedBeforeRecall && grade !== 'again'` and is therefore **always
+ *      false** on such an event. It is not read by anything in this lane.
+ *
+ * This is an observation about `packages/domain`, which this lane does not own.
+ * It is written down rather than worked around, and rather than left as a
+ * comment somewhere claiming the behaviour the requirement describes.
+ */
+export const REVEAL_CORRECTION_HAPPENS_AT_MINT = Object.freeze({
+  where: 'packages/domain/src/evidence/mint.ts, mintReviewGraded',
+  what: "grade = revealedBeforeRecall ? 'again' : input.grade, applied before the event is parsed",
+  consequence:
+    'ReviewGraded.grade already carries the correction, so GateDecisionRecord.effectiveGrade never differs from it and forcedByReveal is never true on an app-minted event.',
+  lane: 'observed by Campaign E lane B5; the gate is WP-06’s',
+});
+
 /** A `ReviewGraded` and the gate's verdict on it, joined. */
 export interface GradedWithVerdict {
   readonly event: ReviewGradedEvent;
+  /**
+   * The gate's verdict. The one field of the decision record that is not
+   * recoverable from the event itself, and the reason this join exists.
+   */
   readonly admitted: boolean;
-  /** Reveal-corrected (T-06). `null` when the gate recorded none. */
+  /**
+   * The grade the gate counted. Equal to `event.grade` on anything this app
+   * minted — see {@link REVEAL_CORRECTION_HAPPENS_AT_MINT} — and read from the
+   * decision record anyway, because the decision record is the authority on
+   * what counted and an imported log need not have come from this minter.
+   */
   readonly effectiveGrade: Grade | null;
-  /** True when the reveal rule overrode what the learner pressed. */
+  /**
+   * The gate's `forcedByReveal`, carried verbatim. **Always false on an event
+   * this app minted**, for the reason above. Kept so the join is a faithful
+   * view of the decision record rather than a filtered one, and deliberately
+   * not used to decide anything.
+   */
   readonly forcedByReveal: boolean;
 }
 

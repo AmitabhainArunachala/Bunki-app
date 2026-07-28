@@ -46,12 +46,13 @@ import { AppButton } from '../primitives.tsx';
 import { MIN_UNLIT_OPACITY, RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 import { forkGeometry } from './fork-geometry.ts';
-import { RAIL_RESTING_OPACITY, type Rail, type RailState } from './rails.ts';
+import { HELD_BACK_BECAUSE, RAIL_RESTING_OPACITY, type Rail, type RailState } from './rails.ts';
 
 /** The word beside each rail. The non-colour channel for its state. */
 export const RAIL_STATE_WORDS: Readonly<Record<RailState, string>> = Object.freeze({
   taking: 'taking this road',
   open: 'open, not taken',
+  held_back: 'available, held back',
   closed: 'nowhere to go for this word',
 });
 
@@ -211,7 +212,10 @@ function RailRow({
           style={[
             styles.card,
             {
-              backgroundColor: rail.state === 'closed' ? theme.color.sunken : theme.color.raised,
+              backgroundColor:
+                rail.state === 'closed' || rail.state === 'held_back'
+                  ? theme.color.sunken
+                  : theme.color.raised,
               borderColor: rail.recommended ? theme.color.vermilion : theme.color.rule,
               borderRadius: RADIUS.md,
               // A recommended default is the one thing on this fork the accent
@@ -237,18 +241,32 @@ function RailRow({
             {rail.hypothesis}
           </Text>
 
-          {rail.closedBecause === null ? (
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {rail.work}
-            </Text>
-          ) : (
+          {/*
+            Three different sentences, because the three situations are
+            different and one of them used to be told as another. A road with
+            somewhere to go says what walking it involves; a road the ceiling
+            kept off the offer says so; a road with nowhere to go carries the
+            compiler's own reason.
+          */}
+          {rail.state === 'closed' && rail.closedBecause !== null ? (
             <Text
               style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
               testID={`journey-rail-closed-${rail.family}`}
             >
               Drawn and not offered — {rail.closedBecause}.
+            </Text>
+          ) : rail.state === 'held_back' ? (
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              testID={`journey-rail-held-back-${rail.family}`}
+            >
+              {HELD_BACK_BECAUSE}
+            </Text>
+          ) : (
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            >
+              {rail.work}
             </Text>
           )}
 

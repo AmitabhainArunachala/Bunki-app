@@ -5,20 +5,31 @@
  *
  * 分岐 is a railway word — a branch point — and the frozen spec §3 says what
  * happens at one: *"Untaken branches stay visible on the map as dimmed rails —
- * revisitable."* So the fork has three kinds of rail and every one of them is
+ * revisitable."* So the fork has four kinds of rail and every one of them is
  * drawn:
  *
  *   - **taking** — the road being walked. Lit.
  *   - **open** — offered and not chosen. Dimmed, and still there.
- *   - **closed** — a family the compiler could not offer at all, because the
- *     data has nowhere for it to go. Dimmed further, drawn, and carrying the
- *     reason in its own words.
+ *   - **held_back** — a route the data *can* fill, which REQ-JRN-02's ceiling
+ *     of "at most two or three relevant paths" kept off the offer. Dimmed, and
+ *     honest about why it is not a button.
+ *   - **closed** — a family with nowhere to go for this word at all. Dimmed
+ *     further, drawn, and carrying the compiler's own reason.
  *
- * The third kind is the one most systems omit, and omitting it is what makes a
- * branch feel arbitrary: a learner shown two roads with no account of the other
- * four cannot tell whether the other four were considered. `CandidateCause`
- * already carries `unavailableBecause` for exactly this, so the honest thing is
- * to render it rather than to filter it out.
+ * The last two are the ones most systems omit, and omitting them is what makes
+ * a branch feel arbitrary: a learner shown two roads with no account of the
+ * other four cannot tell whether the other four were considered.
+ *
+ * ## Why `held_back` exists, which is a repair
+ *
+ * The first version had three states and called everything not offered
+ * `closed`, "with nowhere to go". A test caught it immediately: `compileJourney`
+ * sets `unavailableBecause` to `null` for an *admissible* family, and this
+ * module was rendering "nowhere to go for this word" beside a `null` reason for
+ * routes that in fact had somewhere perfectly good to go and had simply lost a
+ * ranking. That is a false statement about the learner's own data, which is
+ * exactly the defect class this project keeps finding — so the state was split
+ * rather than the sentence softened.
  *
  * ## What this module does not do
  *
@@ -38,8 +49,8 @@ import {
   type JourneyState,
 } from '@bunki/domain';
 
-/** Whether a rail is being walked, is open and untaken, or has nowhere to go. */
-export const RAIL_STATES = ['taking', 'open', 'closed'] as const;
+/** Whether a rail is being walked, offered, held back by the ceiling, or closed. */
+export const RAIL_STATES = ['taking', 'open', 'held_back', 'closed'] as const;
 export type RailState = (typeof RAIL_STATES)[number];
 
 export interface Rail {
@@ -57,11 +68,19 @@ export interface Rail {
    * choosing another rail is not an error (REQ-JRN-03).
    */
   readonly recommended: boolean;
-  /** Why this rail has nowhere to go. `null` unless `state` is `closed`. */
+  /**
+   * Why this rail has nowhere to go, in the compiler's own words. Non-null
+   * exactly when `state` is `closed`; a `held_back` rail is available and has
+   * no such reason, which is the distinction this field used to blur.
+   */
   readonly closedBecause: string | null;
   /** True once this rail can be entered — i.e. the fork is still a fork. */
   readonly enterable: boolean;
 }
+
+/** REQ-JRN-02's ceiling, as the sentence a held-back rail carries. */
+export const HELD_BACK_BECAUSE =
+  'This route has somewhere to go for this word. It is not on the offer because at most three paths are shown at a fork, and three others ranked ahead of it.';
 
 /**
  * Every family, as a rail, in the compiler's own fixed order.
@@ -77,7 +96,19 @@ export function railsOf(journey: CompiledJourney, chosen: BranchFamily | null): 
   const rails = journey.hypotheses.map<Rail>((cause) => {
     const option = offered.get(cause.family);
     const isOffered = option !== undefined;
-    const state: RailState = !isOffered ? 'closed' : chosen === cause.family ? 'taking' : 'open';
+    /*
+      `admissible` is the compiler's word for "this route has somewhere to go",
+      and it is the only thing that separates a road that was ranked out of the
+      offer from a road that does not exist for this word. Reading `offered`
+      alone cannot tell them apart — which is the bug this branch fixes.
+    */
+    const state: RailState = isOffered
+      ? chosen === cause.family
+        ? 'taking'
+        : 'open'
+      : cause.admissible
+        ? 'held_back'
+        : 'closed';
 
     return Object.freeze({
       family: cause.family,
@@ -87,6 +118,8 @@ export function railsOf(journey: CompiledJourney, chosen: BranchFamily | null): 
       support: cause.support,
       state,
       recommended: journey.recommended === cause.family && isOffered,
+      // The compiler leaves this `null` for an admissible family, so a
+      // `held_back` rail carries the ceiling's sentence instead of a blank.
       closedBecause: state === 'closed' ? cause.unavailableBecause : null,
       // Only an offered rail may be entered, and only while nothing has been
       // entered yet. `enterJourneyBranch` enforces both; this mirrors them so a
@@ -121,6 +154,7 @@ export function railsOfState(state: JourneyState): readonly Rail[] {
 export const RAIL_RESTING_OPACITY: Readonly<Record<RailState, number>> = Object.freeze({
   taking: 1,
   open: 0.62,
+  held_back: 0.52,
   closed: 0.42,
 });
 
@@ -135,13 +169,16 @@ export const RAIL_RESTING_OPACITY: Readonly<Record<RailState, number>> = Object.
 export function railSummary(rails: readonly Rail[]): string {
   const taking = rails.filter((rail) => rail.state === 'taking').length;
   const open = rails.filter((rail) => rail.state === 'open').length;
+  const heldBack = rails.filter((rail) => rail.state === 'held_back').length;
   const closed = rails.filter((rail) => rail.state === 'closed').length;
 
   const plural = (count: number, one: string, many: string): string =>
     `${String(count)} ${count === 1 ? one : many}`;
 
+  const tail = `${plural(heldBack, 'road', 'roads')} held back by the three-path limit, ${plural(closed, 'road', 'roads')} with nowhere to go for this word.`;
+
   if (taking === 0) {
-    return `${plural(open, 'road', 'roads')} open from here, ${plural(closed, 'road', 'roads')} with nowhere to go for this word.`;
+    return `${plural(open, 'road', 'roads')} open from here, ${tail}`;
   }
-  return `On one road; ${plural(open, 'other', 'others')} still open, ${plural(closed, 'road', 'roads')} with nowhere to go for this word.`;
+  return `On one road; ${plural(open, 'other', 'others')} still open, ${tail}`;
 }
