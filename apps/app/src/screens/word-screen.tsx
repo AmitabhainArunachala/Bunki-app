@@ -315,13 +315,19 @@ export function WordScreen({
           <WordKanji capability={lens} onOpenKanji={onOpenKanji} rows={kanjiRows} />
         </Section>
 
+        {/*
+          The label names exactly the three sections below it, and not "every
+          section" — the gloss tail above has its own disclosure and this control
+          does not reach it. A label describing more than the code does is the
+          defect this page already shipped once this round.
+        */}
         <AppButton
           accessibilityHint={
             expandAll
               ? 'Closes the family, contrast and sentence sections.'
               : 'Opens the family, contrast and sentence sections at once.'
           }
-          label={expandAll ? 'Close every section' : 'Open every section'}
+          label={expandAll ? 'Close the three sections below' : 'Open the three sections below'}
           onPress={() => setExpandAll((was) => !was)}
           testID="word-toggle-deeper"
         />

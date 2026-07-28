@@ -19,8 +19,8 @@ The word page after a real sitting: 分岐 captured, taken up for study, and its
 - headword on screen: `分岐（ぶんき） ぶんき 分岐`
 - EDRDG acknowledgement visible: yes
 - capability meters (5):
-  - Reading: Faint, fragile
-  - Meaning: No evidence yet
+  - Reading: No evidence yet
+  - Meaning: Faint, fragile
   - Listening: No evidence yet
   - Production: No evidence yet
   - Writing: No evidence yet
@@ -33,8 +33,8 @@ The word page after a real sitting: 分岐 captured, taken up for study, and its
 - headword on screen: `分岐（ぶんき） ぶんき 分岐`
 - EDRDG acknowledgement visible: yes
 - capability meters (5):
-  - Reading: Faint, fragile
-  - Meaning: No evidence yet
+  - Reading: No evidence yet
+  - Meaning: Faint, fragile
   - Listening: No evidence yet
   - Production: No evidence yet
   - Writing: No evidence yet
