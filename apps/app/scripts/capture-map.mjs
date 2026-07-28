@@ -214,7 +214,9 @@ async function walkTheLoop(page, origin) {
     return locator;
   };
   try {
-    await page.goto(`${origin}/`, { waitUntil: 'load' });
+    // `/capture`, not `/`: Wave D made the map the front door and capture
+    // an action offered from every surface (`src/ui/navigation.ts` §1–§2).
+    await page.goto(`${origin}/capture`, { waitUntil: 'load' });
     await seen('screen-capture');
 
     // 1. capture and keep
@@ -352,7 +354,7 @@ async function main() {
       if (scheme === 'light') loopProgress = walked;
 
       const loadStarted = Date.now();
-      await page.goto(`${server.origin}/map?scheme=${scheme}`, { waitUntil: 'load' });
+      await page.goto(`${server.origin}/?scheme=${scheme}`, { waitUntil: 'load' });
       // The map is interactive when its own field has drawn, which is after the
       // one-off Atlas build over the whole dictionary.
       await page.waitForSelector('[data-testid="map-route-strip"]', { timeout: 60_000 });

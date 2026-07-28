@@ -180,7 +180,9 @@ async function shoot(page, file) {
  * meters read are minted by the session, through `@bunki/domain`.
  */
 async function walkToEvidence(page, origin, scheme) {
-  await page.goto(`${origin}/?scheme=${scheme}`, { waitUntil: 'load' });
+  // `/capture`, not `/`: Wave D made the map the front door and capture
+  // an action offered from every surface (`src/ui/navigation.ts` §1–§2).
+  await page.goto(`${origin}/capture?scheme=${scheme}`, { waitUntil: 'load' });
   await live(page, 'screen-capture').waitFor({ timeout: 30_000 });
 
   await live(page, 'capture-search-input').fill(TARGET);

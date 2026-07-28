@@ -98,7 +98,9 @@ async function walkTheLoop(page, origin) {
     await locator.waitFor({ timeout });
     return locator;
   };
-  await page.goto(`${origin}/`, { waitUntil: 'load' });
+  // `/capture`, not `/`: Wave D made the map the front door and capture an
+  // action offered from every surface (`src/ui/navigation.ts` §1–§2).
+  await page.goto(`${origin}/capture`, { waitUntil: 'load' });
   await seen('screen-capture');
   await (await seen('capture-search-input')).fill(TARGET);
   await seen('capture-top-answer');
@@ -120,7 +122,8 @@ async function walkTheLoop(page, origin) {
 }
 
 async function openMap(page, origin) {
-  await page.goto(`${origin}/map`, { waitUntil: 'load' });
+  // The map is `/` now, not `/map`.
+  await page.goto(`${origin}/`, { waitUntil: 'load' });
   await page.locator('[data-testid="screen-map"]').waitFor({ timeout: 60_000 });
   await page.locator('[data-testid="map-neighbourhood"]').waitFor({ timeout: 60_000 });
 }
@@ -277,7 +280,7 @@ async function main() {
         reducedMotion: mode,
       });
       const motionPage = await motionContext.newPage();
-      await motionPage.goto(`${server.origin}/map?lag=4000`, { waitUntil: 'load' });
+      await motionPage.goto(`${server.origin}/?lag=4000`, { waitUntil: 'load' });
       await motionPage.locator('[data-testid="state-loading"]').waitFor({ timeout: 30_000 });
       const query = await motionPage.evaluate(
         `window.matchMedia('(prefers-reduced-motion: reduce)').matches`,
