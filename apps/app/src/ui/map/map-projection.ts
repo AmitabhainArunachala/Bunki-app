@@ -19,19 +19,39 @@
  *
  * ## Brightness is a number that exists
  *
- * `RecallBand` is a rendering of two real values from the pinned reducer and
- * nothing else — both copied from the kernel's projection, neither computed
- * here:
+ * A mark is a rendering of two real values from the pinned reducer and nothing
+ * else — both copied from the kernel's projection, neither computed here:
  *
  *   - the chance of recall at the queried instant — real FSRS R(t);
  *   - the current interval in days — the same state's FSRS stability.
  *
- * The thresholds are declared as data below and stated on screen through
- * {@link RECALL_BAND_RULE}, so a learner can see how the light was decided.
- * `belowDesiredRetention` is the scheduler's own `FSRS_DESIRED_RETENTION`
- * (0.90) rather than a designer's number: under it, the pinned scheduler itself
- * considers the item overdue. A due item is literally dimmer than the same item
- * yesterday because R(t) genuinely fell — nothing decorative stands in for it.
+ * The steps are declared as data below and stated on screen through
+ * {@link MAP_MARK_RULE}, so a learner can see how the light was decided. The
+ * floor is the scheduler's own `FSRS_DESIRED_RETENTION` (0.90) rather than a
+ * designer's number: under it, the pinned scheduler itself considers the item
+ * overdue. A due item literally drops off the luminance ramp because R(t)
+ * genuinely fell — nothing decorative stands in for it.
+ *
+ * ## Why a map mark is not simply a `RecallBand`
+ *
+ * The design system's ramp has five steps and only three of them may be drawn
+ * as a **bare** mark: `RECALL_BAND_MARKS` declares the two dimmest ones
+ * meter-only, because they sit below 3:1 on purpose and may appear only inside a
+ * component that supplies its own labelled boundary. A map node is 12 points
+ * wide with no room for a boundary or a word, so it cannot carry them, and
+ * `RecallIndicator` handed one resolves to `RecallMeter` — three lines of text
+ * under a dot. On a fresh install every node is in one of those two steps, so
+ * that is not an edge case, it is the common one.
+ *
+ * So a map mark is its **own** three-state union: the three standalone bands
+ * where luminance carries the number, and two states below the standalone floor
+ * where **form** carries it instead — a dotted ring for nothing observed, a
+ * dashed ring for observed and under the floor. Both are drawn in the neutral
+ * edge tokens `theme-ground.test.ts` already checks at 3:1 against every era
+ * ground, and both are spoken in words by the node's own label, so neither is
+ * encoded by colour alone (WCAG 1.4.1). `test/theme-tokens.test.ts` keeps the
+ * two meter-only band names out of every surface file, and this union is how
+ * this lane satisfies that rule rather than an exemption from it.
  *
  * ## Unknown is not weak, and untested is neither
  *
@@ -41,11 +61,12 @@
  *   - **`activated_untested`** — a contract exists, no retrieval has happened.
  *   - **`attested`** — a real R(t) from a real `MemoryState`.
  *
- * The first two both render as the `unseen` band, whose label is already
- * "No evidence yet" — but they are kept apart in {@link MapLensView.presence}
- * and worded apart in {@link presenceNote}, because "you have never met this"
- * and "you have met this and never been tested on it" are different facts and
- * the second is the more actionable one.
+ * The first two both draw the same "nothing observed" mark — a map node has one
+ * form to spend and there is no third ring shape worth inventing — but they are
+ * kept apart in {@link MapLensView.presence} and worded apart in
+ * {@link presenceNote}, because "you have never met this" and "you have met this
+ * and never been tested on it" are different facts and the second is the more
+ * actionable one. The node's spoken label carries the difference.
  *
  * ## Nothing here writes
  *
@@ -76,7 +97,7 @@ import {
 } from '@bunki/domain';
 
 import type { CapabilityId } from '../capability.ts';
-import { RECALL_BANDS, type RecallBand } from '../theme.ts';
+import { RECALL_BANDS, isStandaloneRecallBand, type StandaloneRecallBand } from '../theme.ts';
 
 /* ------------------------------------------------------------------ *
  * The lens vocabularies are the same five, in two packages
@@ -101,33 +122,56 @@ export function lensIdOf(lens: CapabilityLens): CapabilityId {
  * ------------------------------------------------------------------ */
 
 /**
- * Where each band starts, in the two real numbers.
+ * What a map node's mark is. Three lit steps, and two below the lit floor.
  *
- * Read top-down: the first row a projection satisfies wins. Declared as data so
- * the legend and the arithmetic cannot disagree, and so a reviewer can check the
- * thresholds against the scheduler's own constants rather than against prose.
+ * The union is the map's own, not the design system's ramp, and the header says
+ * why: the ramp's two dimmest steps may not be drawn bare, and a map node is a
+ * bare mark. `nothing-observed` and `under-the-floor` are drawn as *form* — a
+ * dotted ring and a dashed ring — and never as a luminance step.
  */
-export const RECALL_BAND_THRESHOLDS = Object.freeze([
-  Object.freeze({ band: 'durable' as RecallBand, minRetrievability: 0.9, minStabilityDays: 60 }),
-  Object.freeze({ band: 'settled' as RecallBand, minRetrievability: 0.9, minStabilityDays: 21 }),
+export type MapMark =
+  | { readonly kind: 'lit'; readonly band: StandaloneRecallBand }
+  /** No retrieval has been observed on this lens. Unmeasured, not weak. */
+  | { readonly kind: 'nothing-observed' }
+  /** Observed, and R(t) is under the floor the pinned model aims at. */
+  | { readonly kind: 'under-the-floor' };
+
+/**
+ * Where each lit step starts, in the two real numbers.
+ *
+ * Read top-down: the first row a projection satisfies wins, and a projection
+ * that satisfies none of them is under the floor. Declared as data so the legend
+ * and the arithmetic cannot disagree, and so a reviewer can check the steps
+ * against the scheduler's own constant rather than against prose.
+ *
+ * The bands are typed `StandaloneRecallBand`, so a step naming one of the two
+ * meter-only names would not compile — the rule that keeps them off a map node
+ * is a type here rather than a promise.
+ */
+export const MAP_MARK_STEPS: readonly {
+  readonly band: StandaloneRecallBand;
+  readonly minChance: number;
+  readonly minIntervalDays: number;
+}[] = Object.freeze([
+  Object.freeze({ band: 'durable' as StandaloneRecallBand, minChance: 0.9, minIntervalDays: 60 }),
+  Object.freeze({ band: 'settled' as StandaloneRecallBand, minChance: 0.9, minIntervalDays: 21 }),
   Object.freeze({
-    band: 'emerging' as RecallBand,
-    minRetrievability: FSRS_DESIRED_RETENTION,
-    minStabilityDays: 0,
+    band: 'emerging' as StandaloneRecallBand,
+    minChance: FSRS_DESIRED_RETENTION,
+    minIntervalDays: 0,
   }),
-  Object.freeze({ band: 'faint' as RecallBand, minRetrievability: 0, minStabilityDays: 0 }),
 ]);
 
 /**
  * How the light was decided, in the learner's words.
  *
  * Rendered verbatim by the map legend. It says what the two numbers are and it
- * says what the band is *not* — a score — because the whole reason bands exist
- * rather than percentages is that two percentages on one screen get averaged by
- * the reader and the average is the global scalar REQ-LM-03 forbids.
+ * says what the mark is *not* — a score — because the whole reason there are
+ * steps rather than percentages is that two percentages on one screen get
+ * averaged by the reader and the average is the global scalar REQ-LM-03 forbids.
  */
-export const RECALL_BAND_RULE =
-  'Brightness is the chance you would recall this right now, read together with how long its current interval is. Under 0.90 — the target this build’s pinned memory model aims at — is faint; above it, 21 days is settled and 60 is durable. It is a reading of two real numbers for one capability, never a score for the word.';
+export const MAP_MARK_RULE =
+  'A lit node is the chance you would recall this right now, read together with how long its current interval is. At or above 0.90 — the target this build’s pinned memory model aims at — a node lights: 21 days is settled, 60 is durable. Below 0.90 it stops being lit and becomes a dashed ring, which is what a due item looks like. A dotted ring means nothing has been observed at all. It is a reading of two real numbers for one capability, never a score for the word.';
 
 /**
  * The two numbers, read off the kernel's projection. **The only place in
@@ -157,27 +201,34 @@ function readProjection(lens: LensProjection): {
 }
 
 /**
- * The band one lens is currently in.
+ * The mark one lens currently draws.
  *
  * Takes a `LensProjection` — one lens — and never a `NodeRetrievability`, which
  * is the type-level half of the no-collapsed-light rule.
  */
-export function recallBandOf(lens: LensProjection): RecallBand {
-  if (lens.presence !== 'attested') return 'unseen';
+export function markOf(lens: LensProjection): MapMark {
+  if (lens.presence !== 'attested') return { kind: 'nothing-observed' };
   const { chance, intervalDays } = readProjection(lens);
-  if (chance === null) return 'unseen';
+  if (chance === null) return { kind: 'nothing-observed' };
   const held = intervalDays ?? 0;
-  for (const threshold of RECALL_BAND_THRESHOLDS) {
-    if (chance >= threshold.minRetrievability && held >= threshold.minStabilityDays) {
-      return threshold.band;
+  for (const step of MAP_MARK_STEPS) {
+    if (chance >= step.minChance && held >= step.minIntervalDays) {
+      return { kind: 'lit', band: step.band };
     }
   }
-  return 'faint';
+  return { kind: 'under-the-floor' };
 }
 
-/** Rank on the band ramp, for "has this reached at least X?" questions. */
-export function bandRank(band: RecallBand): number {
-  return RECALL_BANDS.indexOf(band);
+/**
+ * Rank on the design system's ramp, for "has this reached at least X?".
+ *
+ * Read off `RECALL_BANDS`, so the order is the design system's rather than a
+ * second copy of it. The two unlit map marks rank below every lit step, which is
+ * true of both of them: unmeasured has reached nothing, and under the floor has
+ * fallen back below the first lit step.
+ */
+export function markRank(mark: MapMark): number {
+  return mark.kind === 'lit' ? RECALL_BANDS.indexOf(mark.band) : -1;
 }
 
 /**
@@ -188,9 +239,25 @@ export function bandRank(band: RecallBand): number {
  * have to reconstruct one. Reconstructing it was the first shape of this and it
  * meant a screen assembling a fake `LensProjection` field by field, which is a
  * second place the two vocabularies could drift.
+ *
+ * `atLeast` is a `StandaloneRecallBand`: a road may only count stations at a
+ * step a node can actually be *seen* to have reached, and asking for one of the
+ * meter-only steps would be asking for a threshold no map mark expresses.
  */
-export function hasReached(lens: MapLensView, atLeast: RecallBand): boolean {
-  return bandRank(lens.band) >= bandRank(atLeast);
+export function hasReached(lens: MapLensView, atLeast: StandaloneRecallBand): boolean {
+  return markRank(lens.mark) >= RECALL_BANDS.indexOf(atLeast);
+}
+
+/**
+ * Narrow a band from anywhere to one a map node may draw.
+ *
+ * Exported for the surfaces that hold a band from the design system — the route
+ * strip's "reached at" threshold arrives as one — so the narrowing happens once,
+ * here, rather than as a cast at each call site.
+ */
+export function asStandaloneBand(band: string): StandaloneRecallBand | null {
+  const found = RECALL_BANDS.find((candidate) => candidate === band);
+  return found !== undefined && isStandaloneRecallBand(found) ? found : null;
 }
 
 /* ------------------------------------------------------------------ *
@@ -201,13 +268,13 @@ export function hasReached(lens: MapLensView, atLeast: RecallBand): boolean {
  * Everything a mark needs for one lens of one node, with nothing summarised.
  *
  * The four REQ-UI-07 values travel separately all the way to the mark:
- * `band` (the recall chance), `intervalDays`, `uncertainty` and `coverage`. The
- * mark encodes them in four different channels — luminance, the meter track, the
+ * `mark` (the recall chance), `intervalDays`, `uncertainty` and `coverage`. They
+ * are drawn in four different channels — luminance, the written interval, the
  * dashed edge, and the written line — so no two of them share one signal.
  */
 export interface MapLensView {
   readonly lens: CapabilityId;
-  readonly band: RecallBand;
+  readonly mark: MapMark;
   readonly fragile: boolean;
   readonly presence: LensProjection['presence'];
   readonly uncertainty: LensProjection['uncertainty'];
@@ -239,7 +306,7 @@ export function toLensView(lens: LensProjection): MapLensView {
   const { chance, intervalDays } = readProjection(lens);
   return {
     lens: lensIdOf(lens.lens),
-    band: recallBandOf(lens),
+    mark: markOf(lens),
     fragile: isFragile(lens, DEFAULT_FRAGILITY_POLICY),
     presence: lens.presence,
     uncertainty: lens.uncertainty,
@@ -365,7 +432,10 @@ export interface TimelineInput {
     readonly targetComponentId: string;
     readonly skill: string;
   }[];
-  readonly memoryStates: readonly { readonly contractId: string; readonly activatedAt: IsoInstant }[];
+  readonly memoryStates: readonly {
+    readonly contractId: string;
+    readonly activatedAt: IsoInstant;
+  }[];
   readonly gateDecisions: readonly {
     readonly contractId: string | null;
     readonly admitted: boolean;

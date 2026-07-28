@@ -70,7 +70,7 @@ import {
   buildMapTimeline,
   lensView,
   projectMapNode,
-  RECALL_BAND_RULE,
+  MAP_MARK_RULE,
 } from '../ui/map/map-projection.ts';
 import { buildRoutes, routePosition, ROUTE_EXCLUSION_NOTE } from '../ui/map/map-routes.ts';
 import { historyFrames, resolveScrubber } from '../ui/map/map-scrubber.ts';
@@ -83,12 +83,31 @@ import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
 import { Surface } from '../ui/surface.tsx';
 import { NO_COLLAPSED_LIGHT_RULE, WRITING_LENS_DISCLOSURE } from '@bunki/domain';
-import { SPACE, TYPE, type RecallBand } from '../ui/theme.ts';
+import { SPACE, TYPE, type StandaloneRecallBand } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import type { CapabilityId } from '../ui/capability.ts';
 
-/** The band a route counts a station as reached at. Stated, never implied. */
-const ROUTE_BAND: RecallBand = 'settled';
+/**
+ * The step a route counts a station as reached at. Stated, never implied.
+ *
+ * `StandaloneRecallBand` rather than `RecallBand`: a road may only count
+ * stations at a step a node can be *seen* to have reached, and the two dimmest
+ * ramp steps are never drawn on a map node (see `node-mark.tsx`). Asking for one
+ * of them would be a threshold nothing on screen could show.
+ */
+const ROUTE_BAND: StandaloneRecallBand = 'settled';
+
+/**
+ * Why no lamp is lit anywhere on this map, said where a reader can see it.
+ *
+ * The visual language permits emitted light in the 鉄道 register alone, and on
+ * this map 鉄道 has no members — lane A2′ measured that nothing in the shipped
+ * dictionary can be placed there without guessing. So there is no node for a
+ * signal to be about. This sentence exists because the absence would otherwise
+ * read as an oversight, and because the design specimen *does* show lamps.
+ */
+const NO_EMITTED_LIGHT_NOTE =
+  'The visual language allows lit signal points in the 鉄道 register only, and 鉄道 has no members in this build, so no node here is lit. That is the layer being empty, not a signal being suppressed.';
 
 export interface MapScreenProps {
   readonly onOpenWord: (lexemeId: string) => void;
@@ -154,10 +173,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
    * that keeps the cost off the frame: the (component, skill) bucketing is
    * invariant and shared, and a frame is one object.
    */
-  const timeline = useMemo(
-    () => buildMapTimeline(derived, frames),
-    [derived, frames],
-  );
+  const timeline = useMemo(() => buildMapTimeline(derived, frames), [derived, frames]);
 
   /**
    * The index for where the scrubber stands.
@@ -248,6 +264,33 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     [atlas, drawn],
   );
 
+  /**
+   * Which band each drawn node landed in, and how many held edges cross bands.
+   *
+   * The map is *strata*: each band is painted on its own era ground, so a line
+   * can only be drawn inside one of them. That means an edge the domain really
+   * holds between a node on 古道 and a node on no layer at all is not drawn
+   * anywhere — and silently not drawing a real relation is the same class of
+   * dishonesty as drawing an invented one, pointing the other way. So the count
+   * is computed and stated under the field rather than left to be noticed.
+   *
+   * Linear in the drawn nodes and the drawn lines, both of which the domain's
+   * `maxNodes` already bounds.
+   */
+  const strata = useMemo(() => {
+    const bandOfNode = new Map<string, string>();
+    for (const band of bands) {
+      for (const placed of band.nodes) bandOfNode.set(placed.node.id, band.band);
+    }
+    let crossing = 0;
+    for (const line of layout?.lines ?? []) {
+      const from = bandOfNode.get(line.from.node.id);
+      const to = bandOfNode.get(line.to.node.id);
+      if (from !== undefined && to !== undefined && from !== to) crossing += 1;
+    }
+    return { bandOfNode, crossing, total: layout?.lines.length ?? 0 };
+  }, [bands, layout]);
+
   /** One lens view per drawn node, for the chosen lens at the chosen instant. */
   const views = useMemo(() => {
     const out = new Map<string, ReturnType<typeof lensView>>();
@@ -284,10 +327,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     });
   }, [route, lens, atlas, index, position.at]);
 
-  const accumulation = useMemo(
-    () => accumulationOf(derived, nowInstant),
-    [derived, nowInstant],
-  );
+  const accumulation = useMemo(() => accumulationOf(derived, nowInstant), [derived, nowInstant]);
 
   const openNode = useCallback(
     (nodeId: GraphNodeId) => {
@@ -304,9 +344,17 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     [atlas, onOpenWord, onOpenKanji],
   );
 
+  /*
+    The acknowledgement rides on the shell's `lede` in all four states, not only
+    in the two that draw words. EDRDG §3 asks for it on each screen display of
+    words from the files, and this screen's module graph reaches those fields; a
+    state-by-state judgement about which branch happens to show one is exactly
+    the reasoning that shipped `/` and `/canvas` without it, twice. Rendering it
+    unconditionally costs one line and removes the judgement.
+  */
   if (state.kind === 'loading') {
     return (
-      <ScreenShell testID="screen-map" title="Map">
+      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-map" title="Map">
         <LoadingPanel label="Assembling the map…" />
       </ScreenShell>
     );
@@ -314,7 +362,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
   if (state.kind === 'error') {
     return (
-      <ScreenShell testID="screen-map" title="Map">
+      <ScreenShell lede={<SeedEntryDisclosure />} testID="screen-map" title="Map">
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
       </ScreenShell>
     );
@@ -380,7 +428,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
           </Text>
         ) : null}
         <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
-          {RECALL_BAND_RULE}
+          {MAP_MARK_RULE}
         </Text>
       </Section>
 
@@ -432,12 +480,18 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
             return (
               <View key={band.band} style={styles.bandEmpty} testID={`map-band-${band.band}`}>
                 <Text
-                  style={[styles.bandTitle, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+                  style={[
+                    styles.bandTitle,
+                    { color: theme.color.ink, fontFamily: theme.font.sans },
+                  ]}
                 >
                   {band.label.title}
                 </Text>
                 <Text
-                  style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+                  style={[
+                    styles.meta,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
                 >
                   No node here sits on this layer.
                 </Text>
@@ -503,6 +557,20 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
 
         <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
           {ERA_COVERAGE_DISCLOSURE}
+        </Text>
+        {strata.crossing === 0 ? null : (
+          <Text
+            style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            testID="map-crossing-edges"
+          >
+            {String(strata.crossing)} of {String(strata.total)} connections here join nodes on two
+            different layers. Each layer is painted on its own ground, so those lines are not drawn
+            in any single field — they are held, and they are counted, and they are said here rather
+            than left to be noticed.
+          </Text>
+        )}
+        <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
+          {NO_EMITTED_LIGHT_NOTE}
         </Text>
         {state.data.truncated.map((cut) => (
           <Text

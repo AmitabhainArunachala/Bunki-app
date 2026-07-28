@@ -86,7 +86,7 @@
 import type { GraphNodeId } from '@bunki/domain';
 
 import type { CapabilityId } from '../capability.ts';
-import type { RecallBand } from '../theme.ts';
+import type { StandaloneRecallBand } from '../theme.ts';
 import { hasReached, type MapLensView } from './map-projection.ts';
 import { kanjiNodeId, type MapAtlas } from './map-source.ts';
 import { importedExtras } from '../../data/catalog.ts';
@@ -204,7 +204,7 @@ export function buildRoutes(atlas: MapAtlas): readonly Route[] {
 export interface RoutePosition {
   readonly route: Route;
   readonly lens: CapabilityId;
-  readonly atLeast: RecallBand;
+  readonly atLeast: StandaloneRecallBand;
   readonly reached: number;
   readonly length: number;
   /** The next station not yet reached, so the road ahead has a first step. */
@@ -227,7 +227,7 @@ export interface RoutePosition {
 export function routePosition(
   route: Route,
   lens: CapabilityId,
-  atLeast: RecallBand,
+  atLeast: StandaloneRecallBand,
   lensOf: (nodeId: GraphNodeId, lens: CapabilityId) => MapLensView | null,
 ): RoutePosition {
   let reached = 0;

@@ -43,6 +43,18 @@
  * No shadow, no glow, no gradient. Depth is superposition, because that is what
  * 岩絵具 in 膠 actually does.
  *
+ * ## No emitted light, and the reason is arithmetic rather than taste
+ *
+ * `planEmissive` throws outside 鉄道 — emitted light is permitted in that
+ * register alone. On this map 鉄道 is a layer with **no members**: lane A2′
+ * measured that nothing in the shipped dictionary can be placed on it without
+ * guessing, so an era ground for it renders empty and there is no node on it for
+ * a lamp to be about. A `signals` prop here would therefore be a parameter with
+ * exactly two reachable behaviours — draw nothing, or throw — and this component
+ * does not have one. `map-screen.tsx` states the same fact in prose where a
+ * reader can see it. The day 鉄道 has members is the day this gains a lamp, and
+ * `MAX_EMISSIVE_POINTS` will be waiting.
+ *
  * ## The figure resolves against the ground, not against the app
  *
  * `EraGround.figureScheme` says which semantic palette a mark should use *on
@@ -55,17 +67,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import {
-  MAX_EMISSIVE_POINTS,
-  SPACE,
-  createTheme,
-  groundLayers,
-  groundOf,
-  planEmissive,
-  type EmissiveSignal,
-  type EraKey,
-  type Theme,
-} from '../theme.ts';
+import { SPACE, createTheme, groundLayers, groundOf, type EraKey, type Theme } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
 
 /* ------------------------------------------------------------------ *
@@ -92,34 +94,14 @@ export function useFigureTheme(): Theme {
 
 export interface EraGroundProps {
   readonly era: EraKey;
-  /**
-   * Signals asking for emitted light.
-   *
-   * Handed straight to `planEmissive`, which throws outside the rail register
-   * and caps the rest at `MAX_EMISSIVE_POINTS`. This component decides nothing
-   * about what a signal is; it draws the ones the plan lit and reports the ones
-   * it suppressed through `onSuppressed`, so the surface can say "and 4 more"
-   * rather than quietly dropping them.
-   */
-  readonly signals?: readonly EmissiveSignal[] | undefined;
-  readonly onSuppressed?: ((count: number) => void) | undefined;
   readonly children: ReactNode;
   readonly testID?: string | undefined;
 }
 
-export function EraGround({
-  era,
-  signals = [],
-  onSuppressed,
-  children,
-  testID,
-}: EraGroundProps): ReactNode {
+export function EraGround({ era, children, testID }: EraGroundProps): ReactNode {
   const ambient = useTheme();
   const ground = groundOf(era, ambient.scheme);
-  const plan = planEmissive(era, signals);
   const figure = useMemo(() => createTheme(ground.figureScheme), [ground.figureScheme]);
-
-  onSuppressed?.(plan.suppressed);
 
   const stack = groundLayers(ground);
   const base = stack[0];
@@ -162,26 +144,6 @@ export function EraGround({
           ]}
         />
 
-        {/*
-          Lit points, at most `MAX_EMISSIVE_POINTS` of them, in the one register
-          that permits emitted light. Each carries its basis as its label,
-          because a lit point says something about the learner and is therefore
-          figure — a graphic with meaning, not decoration.
-        */}
-        {plan.lit.length === 0 ? null : (
-          <View style={styles.lamps} testID={`${testID ?? 'era'}-lamps`}>
-            {plan.lit.slice(0, MAX_EMISSIVE_POINTS).map((point, index) => (
-              <View
-                key={`${point.signal.kind}-${String(index)}`}
-                accessibilityLabel={point.signal.basis}
-                accessibilityRole="image"
-                accessible
-                style={[styles.lamp, { backgroundColor: point.pigment.hex }]}
-              />
-            ))}
-          </View>
-        )}
-
         <FigureThemeContext.Provider value={figure}>{children}</FigureThemeContext.Provider>
       </View>
     </View>
@@ -201,14 +163,5 @@ const styles = StyleSheet.create({
   mount: {
     gap: SPACE.md,
     padding: SPACE.lg,
-  },
-  lamps: {
-    flexDirection: 'row',
-    gap: SPACE.sm,
-  },
-  lamp: {
-    borderRadius: 5,
-    height: 10,
-    width: 10,
   },
 });

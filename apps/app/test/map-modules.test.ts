@@ -31,7 +31,7 @@ import {
 import { accumulationOf, dayOf } from '../src/ui/map/map-accumulation.ts';
 import { BAND_LABELS, MAP_BANDS, bandOf, eraKeyOf, placeNodes } from '../src/ui/map/map-eras.ts';
 import { layoutNeighbourhood } from '../src/ui/map/map-layout.ts';
-import { RECALL_BAND_THRESHOLDS, bandRank, hasReached } from '../src/ui/map/map-projection.ts';
+import { MAP_MARK_STEPS, hasReached, markRank } from '../src/ui/map/map-projection.ts';
 import {
   MARKER_INTERVAL,
   ROUTE_GRADES,
@@ -40,8 +40,13 @@ import {
   routePosition,
 } from '../src/ui/map/map-routes.ts';
 import { historyFrames, resolveScrubber, scrubberRange } from '../src/ui/map/map-scrubber.ts';
-import { buildMapAtlas, kanjiNodeId, mapAtlas, normaliseReading } from '../src/ui/map/map-source.ts';
-import { RECALL_BANDS } from '../src/ui/theme.ts';
+import {
+  buildMapAtlas,
+  kanjiNodeId,
+  mapAtlas,
+  normaliseReading,
+} from '../src/ui/map/map-source.ts';
+import { RECALL_BANDS, isStandaloneRecallBand } from '../src/ui/theme.ts';
 import type { MapLensView } from '../src/ui/map/map-projection.ts';
 
 const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -85,7 +90,13 @@ const LANE_FILES = [
  * A tiny hand-built atlas, so an extra edge cannot hide in 4,000 records
  * ------------------------------------------------------------------ */
 
-const provenance = { source: 'test', license: null, retrieved_at: null, source_entry_id: null, notes: null };
+const provenance = {
+  source: 'test',
+  license: null,
+  retrieved_at: null,
+  source_entry_id: null,
+  notes: null,
+};
 const lexemeProvenance = {
   headword: provenance,
   reading: provenance,
@@ -255,18 +266,36 @@ describe('no function collapses the five lenses into one light', () => {
     }
   });
 
-  it('bands come from two real numbers, and the thresholds are ordered', () => {
-    const ranks = RECALL_BAND_THRESHOLDS.map((t) => bandRank(t.band));
+  it('lit steps come from two real numbers, and are ordered brightest first', () => {
+    const ranks = MAP_MARK_STEPS.map((step) => markRank({ kind: 'lit', band: step.band }));
     expect([...ranks].sort((a, b) => b - a)).toEqual(ranks);
-    for (const threshold of RECALL_BAND_THRESHOLDS) {
-      expect(RECALL_BANDS).toContain(threshold.band);
+    for (const step of MAP_MARK_STEPS) {
+      expect(RECALL_BANDS).toContain(step.band);
     }
+  });
+
+  /**
+   * The map never draws one of the two meter-only ramp steps as a bare mark.
+   *
+   * `RECALL_BAND_MARKS` declares those steps meter-only because they sit below
+   * 3:1 on purpose, and `RecallIndicator` handed one resolves to `RecallMeter` —
+   * three lines of text under a 12-point dot. On a fresh install every node is
+   * in one of them, so this is the common case rather than an edge one. The lane
+   * expresses them as `MapMark` states drawn in form instead, and the step table
+   * being typed to the standalone steps is what keeps that true.
+   */
+  it('offers no lit step the design system forbids as a bare mark', () => {
+    for (const step of MAP_MARK_STEPS) {
+      expect(isStandaloneRecallBand(step.band), `${step.band} may not be drawn bare`).toBe(true);
+    }
+    expect(markRank({ kind: 'nothing-observed' })).toBeLessThan(0);
+    expect(markRank({ kind: 'under-the-floor' })).toBeLessThan(0);
   });
 
   it('treats an unmeasured lens as unseen rather than as weak', () => {
     const unmeasured: MapLensView = {
       lens: 'reading',
-      band: 'unseen',
+      mark: { kind: 'nothing-observed' },
       fragile: false,
       presence: 'unknown',
       uncertainty: 'unknown',
@@ -277,8 +306,14 @@ describe('no function collapses the five lenses into one light', () => {
       admittedReviewCount: 0,
       basis: '',
     };
-    expect(hasReached(unmeasured, 'faint')).toBe(false);
-    expect(hasReached({ ...unmeasured, band: 'durable' }, 'settled')).toBe(true);
+    expect(hasReached(unmeasured, 'emerging')).toBe(false);
+    // …and neither is a lens that was observed and has fallen under the floor.
+    expect(hasReached({ ...unmeasured, mark: { kind: 'under-the-floor' } }, 'emerging')).toBe(
+      false,
+    );
+    expect(hasReached({ ...unmeasured, mark: { kind: 'lit', band: 'durable' } }, 'settled')).toBe(
+      true,
+    );
   });
 });
 
@@ -381,9 +416,7 @@ describe('routes are named, ordered, finite sequences of real data', () => {
   });
 
   it('only ever draws from the grades it says it draws from', () => {
-    expect(routes.map((route) => route.id).sort()).toEqual(
-      routes.map((route) => route.id).sort(),
-    );
+    expect(routes.map((route) => route.id).sort()).toEqual(routes.map((route) => route.id).sort());
     for (const route of routes) {
       const grade = Number(route.id.replace('grade-', ''));
       expect(ROUTE_GRADES).toContain(grade);
@@ -405,7 +438,7 @@ describe('routes are named, ordered, finite sequences of real data', () => {
     if (route === undefined) throw new Error('no route');
     const durable: MapLensView = {
       lens: 'reading',
-      band: 'durable',
+      mark: { kind: 'lit', band: 'durable' },
       fragile: false,
       presence: 'attested',
       uncertainty: 'narrow',
@@ -420,10 +453,15 @@ describe('routes are named, ordered, finite sequences of real data', () => {
     const all = routePosition(route, 'reading', 'settled', () => durable);
     expect(all.reached).toBe(route.stations.length);
     expect(all.nextStation).toBeNull();
-    expect(all.sentence).toBe(`Station ${String(route.stations.length)} of ${String(route.stations.length)}`);
+    expect(all.sentence).toBe(
+      `Station ${String(route.stations.length)} of ${String(route.stations.length)}`,
+    );
 
     // The same road, the same lens, after decay: the count falls.
-    const faded = routePosition(route, 'reading', 'settled', () => ({ ...durable, band: 'faint' }));
+    const faded = routePosition(route, 'reading', 'settled', () => ({
+      ...durable,
+      mark: { kind: 'under-the-floor' },
+    }));
     expect(faded.reached).toBe(0);
     expect(faded.nextStation?.ordinal).toBe(1);
 
@@ -524,7 +562,9 @@ describe('nothing on the map can produce evidence', () => {
       expect(source, `${name} dispatches a command`).not.toMatch(/\.execute\s*\(/);
       expect(source, `${name} mints an event`).not.toContain('createDomainEvent');
       expect(source, `${name} persists minted events`).not.toContain('persistMinted');
-      expect(source, `${name} reaches the evidence gate`).not.toMatch(/admitToScheduler|evidenceGate/);
+      expect(source, `${name} reaches the evidence gate`).not.toMatch(
+        /admitToScheduler|evidenceGate/,
+      );
     },
   );
 
@@ -632,12 +672,45 @@ describe('the lane extends the built vocabulary rather than forking it', () => {
     }
   });
 
-  it('draws its marks with the shared recall components', () => {
+  /**
+   * The lit steps are drawn by the design system's own component.
+   *
+   * This assertion used to name `RecallIndicator`, which was the wrong component
+   * and hid a real defect: `RecallIndicator` is total over the five-step ramp by
+   * *switching to `RecallMeter`* for the two meter-only steps, so every node on a
+   * fresh install — where every node is in one of those two — rendered a
+   * capability label, a band word, a five-segment track and a basis line inside a
+   * 44-point press target. The lane draws `RecallMark` for the three steps that
+   * may be bare and its own form marks for the two that may not, which is the
+   * rule `RECALL_BAND_MARKS` states rather than an exception to it.
+   */
+  it('draws its lit marks with the shared recall component', () => {
+    // Stripped, because the file has to be able to *name* the component it
+    // deliberately does not use in order to explain why.
+    const mark = strip(read(resolve(APP_ROOT, 'src/ui/map/node-mark.tsx')));
+    expect(mark).toContain('RecallMark');
+    expect(mark, 'the meter must not be reachable from a map node').not.toContain(
+      'RecallIndicator',
+    );
     const field = read(resolve(APP_ROOT, 'src/ui/map/map-field.tsx'));
-    expect(field).toContain('RecallIndicator');
+    expect(field).toContain('<NodeMark');
     const screen = read(resolve(APP_ROOT, 'src/screens/map-screen.tsx'));
     expect(screen).toContain('<LensRow');
     expect(screen).toContain('<SeedEntryDisclosure />');
+  });
+
+  /**
+   * No file in the lane may reach the meter, by any route.
+   *
+   * The component-level assertion above is about `node-mark.tsx`; this is about
+   * the lane, because the defect it replaces was one component away from where
+   * anybody was looking.
+   */
+  it('never reaches the labelled meter from a map surface', () => {
+    for (const file of LANE_FILES) {
+      const source = strip(read(file));
+      expect(source, relative(APP_ROOT, file)).not.toMatch(/\bRecall(Indicator|Meter)\b/);
+    }
   });
 
   it('paints a ground in exactly one file, and that file renders no text', () => {

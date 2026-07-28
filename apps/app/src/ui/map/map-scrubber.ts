@@ -200,7 +200,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * stray far-future instant cannot ask for a million frames — the cap is
  * returned as fewer frames, never as a throw, because the map must still draw.
  */
-export function historyFrames(from: IsoInstant, to: IsoInstant, maxFrames = 480): readonly IsoInstant[] {
+export function historyFrames(
+  from: IsoInstant,
+  to: IsoInstant,
+  maxFrames = 480,
+): readonly IsoInstant[] {
   const start = Date.parse(from);
   const end = Date.parse(to);
   if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return [to];
@@ -209,7 +213,7 @@ export function historyFrames(from: IsoInstant, to: IsoInstant, maxFrames = 480)
   const count = Math.min(span + 1, Math.max(1, maxFrames));
   // When the span is longer than the cap the step widens, so the scrubber still
   // reaches both ends of the learner's history rather than stopping partway.
-  const step = span <= 0 ? DAY_MS : ((end - start) / Math.max(1, count - 1)) || DAY_MS;
+  const step = span <= 0 ? DAY_MS : (end - start) / Math.max(1, count - 1) || DAY_MS;
 
   const out: IsoInstant[] = [];
   for (let index = 0; index < count; index += 1) {

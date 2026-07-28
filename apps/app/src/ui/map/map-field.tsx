@@ -22,9 +22,11 @@
  * The four REQ-UI-07 values reach the mark through four separate channels, and
  * no two share one:
  *
- *   - **retrievability** → luminance, via `RecallIndicator`'s band;
+ *   - **the recall chance** → luminance, via `NodeMark`'s lit step, and form
+ *     below the lit floor;
  *   - **fragility** → form, a dashed open ring rather than a filled disc;
- *   - **uncertainty** → the written line on the chip, never a colour;
+ *   - **uncertainty** → the node's spoken label and the panel under the field,
+ *     never a colour;
  *   - **coverage** → the same, as a count of contracts and admitted reviews.
  *
  * ## Tappable everywhere, no dead ends
@@ -49,11 +51,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 
 import { EDGE_PATTERNS, MIN_TOUCH_TARGET, RADIUS, SPACE, TYPE } from '../theme.ts';
-import { RecallIndicator } from '../recall.tsx';
 import { capabilityOf, type CapabilityId } from '../capability.ts';
 import { useFigureTheme } from './era-ground.tsx';
 import type { MapLayout, PlacedPoint } from './map-layout.ts';
 import type { MapLensView } from './map-projection.ts';
+import { markLabel, NodeMark } from './node-mark.tsx';
 import { nodeSubject } from './map-source.ts';
 
 /** The square the field is drawn in, in points. */
@@ -125,7 +127,7 @@ export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldPr
         const spokenBand =
           view === undefined
             ? `${capability.label}: not measured`
-            : `${capability.label}: ${view.band}${view.fragile ? ', fragile' : ''}`;
+            : `${capability.label}: ${markLabel(view.mark)}${view.fragile ? ', fragile' : ''}`;
         const position = place(point);
 
         return (
@@ -153,23 +155,29 @@ export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldPr
               The mark carries the number; the chip carries the word. The chip is
               an opaque card — this is where the museum-card rule is discharged
               for text that has to sit over a ground.
+
+              A node with no projection at all and a node whose lens has never
+              been observed draw the same dotted ring, and correctly: both mean
+              "nothing has been measured here". The spoken label above carries
+              which of the two it is.
             */}
-            {view === undefined ? (
-              <View
-                aria-hidden
-                style={[
-                  styles.unmeasured,
-                  { borderColor: theme.color.uncertainEdge, borderRadius: RADIUS.pill },
-                ]}
-              />
-            ) : (
-              <RecallIndicator
-                band={view.band}
+            <View aria-hidden>
+              {/*
+                Hidden from the accessibility tree, and this is not a shortcut.
+                `NodeMark` and `RecallMark` under it are `accessible` with their
+                own labels, which is right when a mark stands alone on a card.
+                Here it sits inside a `Pressable` whose label already names the
+                node, the capability and the state, so leaving it exposed would
+                make one node two stops saying overlapping things.
+              */}
+              <NodeMark
                 capability={lens}
-                fragile={view.fragile}
+                fragile={view?.fragile ?? false}
+                mark={view?.mark ?? { kind: 'nothing-observed' }}
                 size={point.depth === 0 ? 18 : 12}
+                testID={`map-mark-${point.node.id}`}
               />
-            )}
+            </View>
             <View
               style={[
                 styles.chip,
@@ -182,10 +190,7 @@ export function MapField({ layout, lens, views, onOpenNode, testID }: MapFieldPr
             >
               <Text
                 numberOfLines={1}
-                style={[
-                  styles.chipText,
-                  { color: theme.color.ink, fontFamily: theme.font.mincho },
-                ]}
+                style={[styles.chipText, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
               >
                 {point.node.label}
               </Text>
@@ -209,12 +214,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     width: MIN_TOUCH_TARGET,
-  },
-  unmeasured: {
-    borderStyle: 'dotted',
-    borderWidth: 2,
-    height: 12,
-    width: 12,
   },
   chip: {
     borderWidth: StyleSheet.hairlineWidth,

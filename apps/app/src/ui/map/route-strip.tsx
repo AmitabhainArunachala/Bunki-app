@@ -38,7 +38,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { capabilityOf } from '../capability.ts';
 import { RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
-import { routeMarkers, type RoutePosition } from './map-routes.ts';
+import { MARKER_INTERVAL, routeMarkers, type RoutePosition } from './map-routes.ts';
 import { RECALL_BAND_LABELS } from '../recall.tsx';
 
 export interface RouteStripProps {
@@ -94,8 +94,17 @@ export function RouteStrip({ position, testID }: RouteStripProps): ReactNode {
       <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
         Counting members at {RECALL_BAND_LABELS[position.atLeast].toLowerCase()} or better on the{' '}
         {capability.label.toLowerCase()} lens. This is a count, not a score, and it goes down again
-        when something is forgotten. A marker stands every {String(routeMarkers(position.route)[0] ?? 0)}{' '}
-        stations.
+        when something is forgotten.{' '}
+        {/*
+          The marker sentence is derived from the same call the road is drawn
+          from, not written beside it. It used to read "a marker stands every
+          {markers[0]} stations", which is the interval only when the road is
+          longer than one — on a short road `markers[0]` is the last station, and
+          the sentence then claimed an interval nothing used.
+        */}
+        {markers.length === 1
+          ? `The only marker on this road is its last station, ${String(position.length)}.`
+          : `A marker stands every ${String(MARKER_INTERVAL)} stations, and the last station is marked too — ${String(markers.length)} markers on this road.`}
       </Text>
 
       {position.nextStation === null ? (
