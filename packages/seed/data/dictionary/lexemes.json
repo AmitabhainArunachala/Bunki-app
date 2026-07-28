@@ -3,10 +3,18 @@
   "_comment": [
     "Imported JMdict entries. Emitted by scripts/import-sources.mjs; do not hand-edit —",
     "a hand-edit would make the record disagree with the ent_seq it claims.",
-    "Provenance is by reference into data/provenance.json; every record names the",
-    "real upstream ent_seq it was read from."
+    "fieldProvenance names, per field, a source registered in data/provenance.json;",
+    "every record names the real upstream ent_seq it was read from."
   ],
-  "provenanceRef": "edrdg-jmdict-primary",
+  "fieldProvenance": {
+    "headword": "edrdg-jmdict",
+    "reading": "edrdg-jmdict",
+    "partOfSpeech": "edrdg-jmdict",
+    "senses": "edrdg-jmdict",
+    "kanjiUsed": "bunki-computed",
+    "priorityTags": "edrdg-jmdict",
+    "sourceEntryId": "edrdg-jmdict"
+  },
   "records": [
     {
       "id": "jmdict-1307850",
@@ -567,8 +575,7 @@
         "crusade",
         "movement",
         "lobbying",
-        "motion",
-        "movement"
+        "motion"
       ],
       "kanjiUsed": [
         "運",
@@ -1722,7 +1729,6 @@
         "(facial) expression",
         "countenance",
         "honor (honour)",
-        "face",
         "dignity",
         "influence",
         "notoriety",
@@ -1973,7 +1979,6 @@
         "nature",
         "disposition",
         "intention",
-        "mind",
         "will",
         "motivation",
         "mood",
@@ -1989,7 +1994,6 @@
         "ambience",
         "atmosphere (of)",
         "air (of)",
-        "mood",
         "fragrance",
         "aroma",
         "flavour",
@@ -2333,8 +2337,7 @@
         "intensifying",
         "reinforcement",
         "enhancement",
-        "solidification",
-        "reinforcement"
+        "solidification"
       ],
       "kanjiUsed": [
         "強",
@@ -2364,8 +2367,7 @@
         "teaching",
         "upbringing",
         "culture",
-        "cultivation",
-        "education"
+        "cultivation"
       ],
       "kanjiUsed": [
         "教",
@@ -2720,7 +2722,6 @@
         "visage",
         "(facial) features",
         "appearance (of a person)",
-        "figure",
         "looks",
         "form (as opposed to substance)",
         "manner (of action)",
@@ -2819,7 +2820,6 @@
         "(one's) finances",
         "financial circumstances",
         "being economical",
-        "economy",
         "thrift"
       ],
       "kanjiUsed": [
@@ -4130,8 +4130,7 @@
         "highest",
         "maximum",
         "most",
-        "uppermost",
-        "supreme"
+        "uppermost"
       ],
       "kanjiUsed": [
         "最",
@@ -4476,8 +4475,7 @@
         "task",
         "assignment",
         "occupation",
-        "employment",
-        "work"
+        "employment"
       ],
       "kanjiUsed": [
         "仕",
@@ -4558,8 +4556,7 @@
         "stance",
         "carriage (of the body)",
         "attitude",
-        "approach",
-        "stance"
+        "approach"
       ],
       "kanjiUsed": [
         "姿",
@@ -4776,8 +4773,7 @@
         "endorsement",
         "approval",
         "propping up",
-        "holding up",
-        "support"
+        "holding up"
       ],
       "kanjiUsed": [
         "支",
@@ -4902,7 +4898,6 @@
         "industry",
         "(social) project",
         "undertaking",
-        "enterprise",
         "work",
         "activity",
         "program",
@@ -5158,7 +5153,6 @@
         "adverb (fukushi)"
       ],
       "senses": [
-        "oneself",
         "oneself",
         "for oneself",
         "personally",
@@ -5545,7 +5539,6 @@
         "forepaw",
         "foreleg",
         "handle",
-        "hand",
         "worker",
         "help",
         "trouble",
@@ -5557,7 +5550,6 @@
         "move",
         "technique",
         "workmanship",
-        "hand",
         "handwriting",
         "kind",
         "type",
@@ -6858,7 +6850,6 @@
         "singing (of a bird)",
         "chirping (of an insect)",
         "hoot",
-        "voice",
         "opinion (as expressed in words)",
         "view",
         "wish",
@@ -6867,7 +6858,6 @@
         "sound",
         "sense (of something's arrival)",
         "feeling",
-        "voice",
         "voiced sound"
       ],
       "kanjiUsed": [
@@ -7652,7 +7642,6 @@
         "organization",
         "organisation",
         "association",
-        "group",
         "body",
         "society"
       ],
@@ -7713,7 +7702,6 @@
         "bloke",
         "male lover",
         "boyfriend",
-        "man",
         "manliness",
         "manly honor",
         "manly honour",
@@ -8501,7 +8489,6 @@
         "subject",
         "speciality",
         "means",
-        "way",
         "method"
       ],
       "kanjiUsed": [
@@ -8893,8 +8880,7 @@
         "decision",
         "conclusion",
         "adjudication",
-        "divination",
-        "judgement"
+        "divination"
       ],
       "kanjiUsed": [
         "判",
@@ -9171,7 +9157,6 @@
         "scene",
         "sphere (of activity)",
         "stage (e.g. political stage)",
-        "scene",
         "arena",
         "world"
       ],
@@ -9916,7 +9901,6 @@
         "public discussion",
         "controversy",
         "trouble",
-        "problem",
         "inconvenience",
         "difficulty"
       ],
@@ -10491,8 +10475,7 @@
         "for the moment",
         "temporarily",
         "a time",
-        "one time",
-        "once"
+        "one time"
       ],
       "kanjiUsed": [
         "一",
@@ -11125,7 +11108,6 @@
         "mixed",
         "integrated",
         "comprehensive",
-        "synthesis",
         "colligation"
       ],
       "kanjiUsed": [
@@ -11157,7 +11139,6 @@
         "negotiation",
         "argument",
         "rumor",
-        "talk",
         "hearsay",
         "tale",
         "story",
@@ -12912,7 +12893,6 @@
         "transplant",
         "grafting",
         "transplantation (of an organ, tissue, etc.)",
-        "transplant",
         "embryo transfer",
         "embryo transplant",
         "porting (software)"
@@ -14380,9 +14360,7 @@
         "risk",
         "danger",
         "likelihood",
-        "fear",
-        "awe",
-        "reverence"
+        "awe"
       ],
       "kanjiUsed": [
         "恐"
@@ -14432,7 +14410,6 @@
         "heart",
         "lungs",
         "stomach",
-        "heart",
         "mind",
         "feelings"
       ],
@@ -15774,8 +15751,7 @@
       ],
       "senses": [
         "difference",
-        "variation",
-        "difference"
+        "variation"
       ],
       "kanjiUsed": [
         "差"
@@ -15926,7 +15902,6 @@
         "heap",
         "pile",
         "stack",
-        "mountain",
         "protruding or high part of an object",
         "crown (of a hat)",
         "thread (of a screw)",
@@ -16201,8 +16176,7 @@
         "exam",
         "test",
         "trial",
-        "experiment",
-        "test"
+        "experiment"
       ],
       "kanjiUsed": [
         "試",
@@ -16823,8 +16797,7 @@
       ],
       "senses": [
         "demand",
-        "need",
-        "demand"
+        "need"
       ],
       "kanjiUsed": [
         "需",
@@ -17300,8 +17273,7 @@
         "focal point",
         "focus (of attention, a discussion, etc.)",
         "point at issue",
-        "central point",
-        "focus"
+        "central point"
       ],
       "kanjiUsed": [
         "焦",
@@ -21263,7 +21235,6 @@
         "plentiful",
         "rich",
         "ample",
-        "rich",
         "wealthy",
         "affluent",
         "well-off",
@@ -21272,7 +21243,6 @@
         "easy",
         "plump (e.g. breasts)",
         "full",
-        "ample",
         "(well) over",
         "(easily) in excess of"
       ],
@@ -21377,7 +21347,6 @@
         "noun (common) (futsuumeishi)"
       ],
       "senses": [
-        "dream",
         "dream",
         "hope",
         "wish",
@@ -21516,7 +21485,6 @@
         "prestige",
         "dignity",
         "reputation",
-        "honor",
         "good name",
         "honorary (e.g. president, doctorate)"
       ],
@@ -23114,7 +23082,6 @@
         "painting",
         "sketch",
         "image (TV, film, etc.)",
-        "picture",
         "footage"
       ],
       "kanjiUsed": [
@@ -25455,7 +25422,6 @@
         "prior to",
         "ago",
         "the past",
-        "before",
         "previously",
         "former times"
       ],
@@ -25743,8 +25709,7 @@
         "support",
         "reinforcement",
         "cheering",
-        "rooting (for)",
-        "support"
+        "rooting (for)"
       ],
       "kanjiUsed": [
         "応",
@@ -26719,7 +26684,6 @@
         "interval",
         "difference (e.g. in opinion)",
         "gap",
-        "distance",
         "metric"
       ],
       "kanjiUsed": [
@@ -27258,7 +27222,6 @@
         "noun (common) (futsuumeishi)"
       ],
       "senses": [
-        "blood",
         "blood",
         "ancestry",
         "lineage",
@@ -30654,7 +30617,6 @@
         "representation",
         "agency",
         "proxy",
-        "proxy",
         "agent",
         "representative",
         "deputy",
@@ -31288,7 +31250,6 @@
         "reluctance",
         "repulsion",
         "repugnance",
-        "resistance",
         "drag",
         "friction",
         "electrical resistance",
@@ -32233,7 +32194,6 @@
         "response",
         "physical reaction (to a stimulus)",
         "observable response (of an organism)",
-        "reaction",
         "effect",
         "change"
       ],
@@ -33058,7 +33018,6 @@
         "fully fledged",
         "full",
         "proper",
-        "real",
         "earnest",
         "serious"
       ],
@@ -33207,7 +33166,6 @@
         "conjecture of the current situation",
         "the way it seems",
         "model",
-        "pattern",
         "example",
         "indicates that something seems likely (e.g. rain or storm)",
         "framework",
@@ -33969,8 +33927,7 @@
         "mechanism",
         "workings",
         "plan",
-        "plot",
-        "contrivance"
+        "plot"
       ],
       "kanjiUsed": [
         "仕",
@@ -38933,7 +38890,6 @@
         "memory",
         "recollection",
         "remembrance",
-        "memory",
         "storage"
       ],
       "kanjiUsed": [
@@ -39011,8 +38967,6 @@
         "globe",
         "ball",
         "bulb",
-        "ball",
-        "sphere",
         "counter for pitches"
       ],
       "kanjiUsed": [
@@ -39307,7 +39261,6 @@
         "working out",
         "figures",
         "consideration",
-        "calculation",
         "estimation",
         "expectation"
       ],
@@ -39342,14 +39295,12 @@
         "den",
         "lair",
         "holt",
-        "hole",
         "deficit",
         "shortage",
         "(financial) hole",
         "loss",
         "gap (left by a missing employee, team member, etc.)",
         "vacancy",
-        "opening",
         "flaw",
         "fault",
         "defect",
@@ -39767,9 +39718,7 @@
         "height",
         "altitude",
         "elevation",
-        "level",
-        "altitude",
-        "height"
+        "level"
       ],
       "kanjiUsed": [
         "高"
@@ -41846,7 +41795,6 @@
         "first",
         "before (something or someone else)",
         "ahead (of)",
-        "earlier",
         "beforehand",
         "in advance",
         "ahead of time"
@@ -42625,7 +42573,6 @@
         "watching out (for)",
         "advice",
         "warning",
-        "caution",
         "reminder",
         "admonishment",
         "reprimand",
@@ -43184,7 +43131,6 @@
         "answer",
         "reply",
         "response",
-        "answer",
         "solution",
         "result"
       ],
@@ -44862,7 +44808,6 @@
         "rubbing",
         "chafing",
         "discord",
-        "friction",
         "strife",
         "conflict"
       ],
@@ -45160,7 +45105,6 @@
         "post",
         "office",
         "part (in a play, film, etc.)",
-        "role",
         "character",
         "scoring combination",
         "hand",
@@ -45904,7 +45848,6 @@
         "place",
         "position",
         "location",
-        "position",
         "standing",
         "status",
         "situation"
@@ -46396,7 +46339,6 @@
         "postal service",
         "mail",
         "post",
-        "mail",
         "postal matter",
         "postal items"
       ],
@@ -46619,7 +46561,6 @@
         "to hold in check",
         "to hold back (e.g. an enemy)",
         "to check",
-        "to curb",
         "to contain",
         "to quell",
         "to subdue",
@@ -50798,8 +50739,7 @@
         "everyone",
         "everybody",
         "all",
-        "everything",
-        "all"
+        "everything"
       ],
       "kanjiUsed": [
         "皆"
@@ -50990,7 +50930,6 @@
         "stretch",
         "period of time (during, while)",
         "duration",
-        "interval",
         "between (two parties or things)",
         "among (a group)",
         "relations (between)",
@@ -51581,8 +51520,6 @@
         "pattern",
         "mold",
         "mould",
-        "model",
-        "pattern",
         "template",
         "impression",
         "kata (set sequence of positions and movements in martial arts)",
@@ -51621,9 +51558,7 @@
         "style",
         "manner",
         "formality",
-        "form",
         "mode",
-        "form",
         "form (bilinear, quadratic, etc.)"
       ],
       "kanjiUsed": [
@@ -51847,7 +51782,6 @@
         "cause",
         "(raw) material",
         "ingredient",
-        "base",
         "mix (e.g. for a cake)",
         "(soup) stock",
         "(one's) side",
@@ -52773,7 +52707,6 @@
         "exercise",
         "service",
         "conduct",
-        "execution",
         "lead monk performing various tasks in a temple"
       ],
       "kanjiUsed": [
@@ -53425,7 +53358,6 @@
         "ruler and ruled",
         "the government and the people",
         "first and second volumes",
-        "top and bottom",
         "two-piece (outfit)"
       ],
       "kanjiUsed": [
@@ -55475,11 +55407,8 @@
         "score",
         "points",
         "point (in a game)",
-        "score",
         "goal",
         "run",
-        "point",
-        "point",
         "aspect",
         "matter",
         "detail",
@@ -55488,7 +55417,6 @@
         "way",
         "viewpoint",
         "(punctuation) mark (e.g. comma, period, decimal point)",
-        "dot",
         "\"dot\" stroke (in a Chinese character)",
         "counter for points, marks, goals, etc.",
         "counter for goods, items, articles of clothing, works of art, etc."
@@ -55847,11 +55775,9 @@
         "flesh (of a fruit)",
         "pulp",
         "the physical body (as opposed to the spirit)",
-        "flesh",
         "thickness",
         "content",
         "substance",
-        "flesh",
         "ink pad"
       ],
       "kanjiUsed": [
@@ -56294,7 +56220,6 @@
         "negation",
         "repudiation",
         "disavowal",
-        "negation",
         "NOT operation"
       ],
       "kanjiUsed": [
@@ -58060,7 +57985,6 @@
         "scar",
         "chip",
         "crack",
-        "scratch",
         "nick",
         "flaw",
         "defect",
@@ -58309,11 +58233,9 @@
         "irritation (esp. of the body, e.g. skin, eyes)",
         "impetus",
         "impulse",
-        "stimulus",
         "spur",
         "incentive",
         "encouragement",
-        "stimulation",
         "motivation",
         "provocation",
         "excitement",
@@ -58916,13 +58838,11 @@
         "ridiculous",
         "strange",
         "odd",
-        "funny",
         "peculiar",
         "weird",
         "wrong",
         "unusual",
         "eccentric",
-        "wrong",
         "unsuitable",
         "improper",
         "inappropriate",
@@ -59096,8 +59016,7 @@
         "basic theme",
         "basis",
         "keynote",
-        "trend",
-        "keynote"
+        "trend"
       ],
       "kanjiUsed": [
         "基",
@@ -62177,7 +62096,6 @@
         "(school) grade",
         "year",
         "class",
-        "class",
         "grade",
         "rank",
         "level",
@@ -62309,7 +62227,6 @@
         "counter"
       ],
       "senses": [
-        "gō",
         "gō",
         "one-tenth of the distance from the base to the summit of a mountain",
         "conjunction",
@@ -62699,7 +62616,6 @@
         "to come",
         "to go",
         "to use (a brush, chopsticks, etc.)",
-        "to move",
         "to carry out",
         "to proceed with",
         "to arrange",
@@ -62872,7 +62788,6 @@
         "military exercise",
         "manoeuvres",
         "maneuvers",
-        "drill",
         "seminar"
       ],
       "kanjiUsed": [
@@ -64682,8 +64597,7 @@
         "rationalization (of a company, industry, etc.)",
         "rationalisation",
         "streamlining",
-        "making more efficient",
-        "rationalization"
+        "making more efficient"
       ],
       "kanjiUsed": [
         "合",
@@ -65433,9 +65347,7 @@
         "to record",
         "to take down",
         "to subscribe to (e.g. a newspaper)",
-        "to take",
         "to buy",
-        "to get",
         "to order",
         "to have delivered",
         "to charge",
@@ -66631,7 +66543,6 @@
         "operation",
         "handling",
         "management (of people)",
-        "handling",
         "manipulation",
         "maneuvering"
       ],
@@ -68213,7 +68124,6 @@
         "tragedy",
         "tragic drama",
         "tragic play",
-        "tragedy",
         "calamity",
         "disaster"
       ],
@@ -68918,8 +68828,7 @@
       "senses": [
         "translation",
         "deciphering",
-        "decoding",
-        "translation"
+        "decoding"
       ],
       "kanjiUsed": [
         "翻",
@@ -75309,7 +75218,6 @@
         "turnover (of goods, funds, etc.)",
         "circulation",
         "flow (of customers)",
-        "rotation",
         "curl",
         "slalom"
       ],

@@ -3,9 +3,23 @@
   "_comment": [
     "Imported KANJIDIC2 characters, limited to those the imported lexemes actually use.",
     "strokeSvg points at a verbatim KanjiVG file under dictionary/strokes/ where one exists;",
-    "KanjiVG does not cover every literal, and a missing file is recorded as null."
+    "KanjiVG does not cover every literal, and a missing file is recorded as null. That field",
+    "is therefore attributed to KanjiVG and the rest to KANJIDIC2 — one record, two licences,",
+    "which is exactly the REQ-SRC-01 field-level case."
   ],
-  "provenanceRef": "edrdg-kanjidic2-primary",
+  "fieldProvenance": {
+    "character": "edrdg-kanjidic2",
+    "codepoint": "bunki-computed",
+    "strokeCount": "edrdg-kanjidic2",
+    "grade": "edrdg-kanjidic2",
+    "frequency": "edrdg-kanjidic2",
+    "jlpt": "edrdg-kanjidic2",
+    "onReadings": "edrdg-kanjidic2",
+    "kunReadings": "edrdg-kanjidic2",
+    "meanings": "edrdg-kanjidic2",
+    "strokeSvg": "kanjivg-verbatim",
+    "sourceEntryId": "edrdg-kanjidic2"
+  },
   "records": [
     {
       "id": "kanji-04e00",

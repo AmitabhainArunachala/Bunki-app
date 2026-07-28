@@ -3,6 +3,9 @@
   "_comment": [
     "Verbatim KanjiVG files for the imported kanji, pinned to one commit."
   ],
+  "fieldProvenance": {
+    "files": "kanjivg-verbatim"
+  },
   "upstream": {
     "project": "KanjiVG",
     "repository": "https://github.com/KanjiVG/kanjivg",

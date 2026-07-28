@@ -14,14 +14,27 @@
  *   2. every record's claimed upstream identifier is real *in shape and in
  *      relation* — a JMdict id that does not match its own record id, or a
  *      KANJIDIC2 literal that is not the character it labels, fails;
- *   3. licence metadata matches LICENSES.md and the verbatim texts on disk;
- *   4. a source claiming a licence with no verbatim text on file **fails** —
+ *   3. every field names a provenance source that **resolves** against
+ *      `data/provenance.json`, because `src/validate.ts` fails closed on an
+ *      unknown id and an unresolvable reference makes the whole tier unloadable;
+ *   4. licence metadata matches LICENSES.md and the verbatim texts on disk;
+ *   5. a source claiming a licence with no verbatim text on file **fails** —
  *      exercised against a fabricated source, so the predicate cannot pass by
  *      being vacuous.
  *
- * Offline by construction: controller §17.5 must pass with no network. Checking
- * the *values* against upstream needs the network and lives in
- * `scripts/import-sources.mjs --check`.
+ * Two of these exist because the weaker version of them passed while the data was
+ * wrong. The contributor check used to be `toBeTruthy()`, which a non-empty
+ * sentinel satisfies — 652 of 2,000 sentences shipped the two characters `\N`, the
+ * Tatoeba export's NULL marker, as the name of the member CC BY 2.0 FR obliges us
+ * to credit. And nothing checked provenance references at all, so three invented
+ * ids (`edrdg-jmdict-primary`, `edrdg-kanjidic2-primary`, `tatoeba-sentence`)
+ * registered nowhere reached every record. Both are now positive predicates with a
+ * negative case beside them, so they cannot pass by being vacuous either.
+ *
+ * Offline by construction: controller §17.5 must pass with no network. Re-deriving
+ * the *values* from upstream needs the archives and lives in
+ * `scripts/import-sources.mjs --verify-reproducible`; `--check` only compares
+ * committed bytes to recorded digests and proves tamper-evidence, not derivability.
  */
 
 import { createHash } from 'node:crypto';
@@ -91,8 +104,10 @@ interface ImportedSentence {
   readonly tatoeba: {
     readonly japaneseId: string;
     readonly japaneseContributor: string | null;
+    readonly japaneseProvenanceRef: string;
     readonly englishId: string;
     readonly englishContributor: string | null;
+    readonly englishProvenanceRef: string;
   };
 }
 
@@ -103,13 +118,42 @@ interface StrokeFile {
   readonly bytes: number;
 }
 
+/** Every emitted file carries a per-field map of registered provenance ids. */
+interface ProvenancedFile {
+  readonly fieldProvenance: Readonly<Record<string, string>>;
+}
+
 const manifest = readJson<Manifest>('data/dictionary/manifest.json');
-const lexemes = readJson<{ records: ImportedLexeme[] }>('data/dictionary/lexemes.json').records;
-const kanji = readJson<{ records: ImportedKanji[] }>('data/dictionary/kanji.json').records;
-const sentences = readJson<{ records: ImportedSentence[] }>(
+const lexemeFile = readJson<ProvenancedFile & { records: ImportedLexeme[] }>(
+  'data/dictionary/lexemes.json',
+);
+const kanjiFile = readJson<ProvenancedFile & { records: ImportedKanji[] }>(
+  'data/dictionary/kanji.json',
+);
+const sentenceFile = readJson<ProvenancedFile & { records: ImportedSentence[] }>(
   'data/dictionary/sentences.json',
-).records;
-const strokes = readJson<{ files: StrokeFile[] }>('data/dictionary/strokes.json').files;
+);
+const strokeFile = readJson<ProvenancedFile & { files: StrokeFile[] }>(
+  'data/dictionary/strokes.json',
+);
+const lexemes = lexemeFile.records;
+const kanji = kanjiFile.records;
+const sentences = sentenceFile.records;
+const strokes = strokeFile.files;
+
+const provenanceRegistry = readJson<{ sources: Record<string, unknown> }>('data/provenance.json');
+const REGISTERED_SOURCES = new Set(Object.keys(provenanceRegistry.sources));
+
+/**
+ * Is this a name a licence could be complied with?
+ *
+ * A person's Tatoeba username: at least one character, no whitespace, and not a
+ * backslash escape. `\N` is the export's MySQL NULL sentinel, not a member, and
+ * it is the exact value that a `toBeTruthy()` assertion waved through onto 652
+ * shipped records.
+ */
+const isNamedContributor = (value: string | null | undefined): boolean =>
+  typeof value === 'string' && /^[^\s\\]+$/.test(value);
 
 const licences = readJson<{
   sources: Record<string, { license: string; files: string[] }>;
@@ -176,8 +220,129 @@ describe('every record carries a real upstream identifier', () => {
       expect(sentence.tatoeba.englishId, sentence.id).toMatch(/^\d+$/);
       // CC BY 2.0 FR is an attribution licence: a sentence whose contributor was
       // dropped could not be attributed, so it must not have shipped at all.
-      expect(sentence.tatoeba.japaneseContributor, sentence.id).toBeTruthy();
-      expect(sentence.tatoeba.englishContributor, sentence.id).toBeTruthy();
+      //
+      // Stated as a *positive* pattern, not toBeTruthy(). The weaker form passed
+      // on the literal two characters `\N` — the Tatoeba export's MySQL NULL
+      // sentinel — which is non-empty and is nobody's name.
+      expect(isNamedContributor(sentence.tatoeba.japaneseContributor), sentence.id).toBe(true);
+      expect(isNamedContributor(sentence.tatoeba.englishContributor), sentence.id).toBe(true);
+    }
+  });
+
+  it('rejects the sentinel and the blanks that used to pass for a name', () => {
+    // The negative half. Without it the predicate above could be loosened back to
+    // something a sentinel satisfies and nothing would notice.
+    for (const notAName of ['\\N', '', '   ', '\t', null, undefined]) {
+      expect(isNamedContributor(notAName as string | null), JSON.stringify(notAName)).toBe(false);
+    }
+    for (const name of ['bunbuku', 'CK', 'small_snow', 'user.name', 'a-b']) {
+      expect(isNamedContributor(name), name).toBe(true);
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Provenance references resolve
+ * ------------------------------------------------------------------ */
+
+describe('every imported field names a provenance source that exists', () => {
+  const files: ReadonlyArray<readonly [string, ProvenancedFile, readonly string[]]> = [
+    [
+      'dictionary/lexemes.json',
+      lexemeFile,
+      [
+        'headword',
+        'reading',
+        'partOfSpeech',
+        'senses',
+        'kanjiUsed',
+        'priorityTags',
+        'sourceEntryId',
+      ],
+    ],
+    [
+      'dictionary/kanji.json',
+      kanjiFile,
+      [
+        'character',
+        'codepoint',
+        'strokeCount',
+        'grade',
+        'frequency',
+        'jlpt',
+        'onReadings',
+        'kunReadings',
+        'meanings',
+        'strokeSvg',
+        'sourceEntryId',
+      ],
+    ],
+    [
+      'dictionary/sentences.json',
+      sentenceFile,
+      [
+        'japanese',
+        'english',
+        'headword',
+        'entSeq',
+        'tatoeba.japaneseId',
+        'tatoeba.japaneseContributor',
+        'tatoeba.englishId',
+        'tatoeba.englishContributor',
+      ],
+    ],
+    ['dictionary/strokes.json', strokeFile, ['files']],
+  ];
+
+  it.each(files.map(([name]) => name))(
+    '%s resolves every id against data/provenance.json',
+    (name) => {
+      const entry = files.find(([file]) => file === name);
+      const map = entry?.[1].fieldProvenance ?? {};
+      expect(
+        Object.keys(map).length,
+        `${name} declares no field provenance at all`,
+      ).toBeGreaterThan(0);
+      for (const [field, id] of Object.entries(map)) {
+        expect(
+          REGISTERED_SOURCES.has(id),
+          `${name}.${field} references "${id}", which data/provenance.json does not register — src/validate.ts fails closed on it`,
+        ).toBe(true);
+      }
+    },
+  );
+
+  it.each(files.map(([name]) => name))('%s provenances every field it emits', (name) => {
+    const entry = files.find(([file]) => file === name);
+    const map = entry?.[1].fieldProvenance ?? {};
+    for (const field of entry?.[2] ?? []) {
+      expect(map[field], `${name} emits ${field} with no provenance entry (REQ-SRC-01)`).toBeTypeOf(
+        'string',
+      );
+    }
+  });
+
+  it('keeps the two halves of every sentence separately attributed', () => {
+    // The claim §5 of the review turned on: two works, two people, two credits.
+    for (const sentence of sentences) {
+      expect(sentence.tatoeba.japaneseProvenanceRef, sentence.id).toBe('tatoeba-japanese');
+      expect(sentence.tatoeba.englishProvenanceRef, sentence.id).toBe('tatoeba-english');
+      expect(REGISTERED_SOURCES.has(sentence.tatoeba.japaneseProvenanceRef)).toBe(true);
+      expect(REGISTERED_SOURCES.has(sentence.tatoeba.englishProvenanceRef)).toBe(true);
+    }
+  });
+
+  it('fails an id that is not in the registry, so the check is not vacuous', () => {
+    for (const invented of [
+      'edrdg-jmdict-primary',
+      'edrdg-kanjidic2-primary',
+      'tatoeba-sentence',
+    ]) {
+      expect(REGISTERED_SOURCES.has(invented), invented).toBe(false);
+    }
+    // …and the ids actually used are the registered ones.
+    for (const real of ['edrdg-jmdict', 'edrdg-kanjidic2', 'tatoeba-japanese', 'tatoeba-english']) {
+      expect(REGISTERED_SOURCES.has(real), real).toBe(true);
     }
   });
 });
@@ -304,6 +469,19 @@ describe('the negative half: an unlicensed source cannot ship', () => {
   it('records a reason for anything it declined to ship', () => {
     for (const entry of manifest.deferred) {
       expect(entry.reason, entry.source).toBeTruthy();
+    }
+  });
+
+  it('counts the sentence pairs it dropped for having no named contributor', () => {
+    // Dropping data silently and dropping it on the record are different acts.
+    // The count is what makes "we removed rather than softened" checkable.
+    const dropped = manifest.counts['sentencePairsDroppedWithoutNamedContributor'];
+    expect(dropped, 'the importer no longer reports what it declined to attribute').toBeTypeOf(
+      'number',
+    );
+    if ((dropped ?? 0) > 0) {
+      const reasons = manifest.deferred.map((entry) => entry.reason).join('\n');
+      expect(reasons, 'pairs were dropped but nothing says why').toContain(String(dropped));
     }
   });
 });

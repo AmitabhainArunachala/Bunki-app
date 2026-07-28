@@ -137,6 +137,26 @@ use, a verbatim KanjiVG stroke file for every one of them, and 2,000 Tatoeba
 sentence pairs. It is separate precisely so that growing the dictionary can never
 be mistaken for growing the seed fixtures.
 
+Every field of every imported record names a source **registered in
+`data/provenance.json`** — `edrdg-jmdict`, `edrdg-kanjidic2`, `kanjivg-verbatim`,
+`bunki-computed`, `bunki-selection`, and per sentence half `tatoeba-japanese` /
+`tatoeba-english`. The map is per field, not per file, because these records mix
+sources: a kanji record's readings are KANJIDIC2's and its `strokeSvg` is
+KanjiVG's, and a sentence pair is two works by two people. `src/validate.ts` fails
+closed on an id it does not know, so an unregistered reference would make the
+whole tier unloadable; `test/dictionary.test.ts` resolves every id against the
+registry offline, and the importer refuses to emit before
+`assertProvenanceRegistered()` passes.
+
+**Tatoeba attribution is a gate, not a field.** The export writes MySQL's NULL
+sentinel — the two characters `\N` — in the username column for an ownerless
+sentence, and 100,087 of the 248,821 Japanese rows are like that. CC BY 2.0 FR
+cannot be complied with for a work whose author cannot be named, so a pair with an
+unnamed contributor on either half is **not shipped**; the count is recorded in
+the manifest's `deferred` list and in
+`counts.sentencePairsDroppedWithoutNamedContributor`. Every sentence that does
+ship names both of its contributors.
+
 ## Re-running or widening the import
 
 The importer is the deliverable; the JSON is its output. One command reproduces
@@ -167,11 +187,34 @@ in `licenses/` or is this project's own work under the pending OD-09 decision.
 ## Commands
 
 ```bash
-npm run test                                              # includes this package's assertions
-node packages/seed/scripts/import-sources.mjs --check      # offline: manifest vs files on disk
+npm run test                                                     # includes this package's assertions
+node packages/seed/scripts/import-sources.mjs --check            # offline: manifest vs files on disk
+node packages/seed/scripts/import-sources.mjs --verify-reproducible  # archives: re-derive and diff
 node packages/seed/scripts/import-sources.mjs --verify-fixtures  # network: §8 fixtures vs current upstream
-node packages/seed/scripts/fetch-kanjivg.mjs --check        # network: strokes vs pinned upstream
+node packages/seed/scripts/fetch-kanjivg.mjs --check             # network: strokes vs pinned upstream
 ```
+
+### What `--check` proves, and what it does not
+
+`--check` compares the committed bytes to the digests the importer recorded and
+verifies that every shipped source still has its verbatim licence text on disk at
+its recorded digest. That is **tamper-evidence**: it detects a file edited after
+the import. It is **not** a reproducibility check, because it never re-derives
+anything from upstream — a file emitted by an older version of the importer keeps
+matching its own recorded digest forever.
+
+That gap was real, not hypothetical. The committed `data/dictionary/lexemes.json`
+once carried duplicate glosses in 83 of 3,000 records while the importer
+deduplicated them, so the shipped data was not the script's output and `--check`
+said MATCH throughout.
+
+`--verify-reproducible` is the check that closes it: it re-runs the whole
+pipeline from the cached archives — at the parameters the manifest itself
+recorded, not at whatever you type — into a scratch directory, and diffs every
+emitted file byte for byte against the committed one. It writes nothing under
+`data/` and exits 1 on any difference, so "the shipped data is this script's
+output" is a claim that can fail. It needs the archives in `--cache`; with them
+present it runs in about a minute and no network.
 
 `--verify-fixtures` is worth running before trusting the fixture tier's
 provenance. Run against the 2026-07-28 files it found seven fields still carrying

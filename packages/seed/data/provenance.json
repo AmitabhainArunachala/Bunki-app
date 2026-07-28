@@ -64,7 +64,7 @@
       "source_url": "https://www.edrdg.org/pub/Nihongo/kanjidic2.xml.gz",
       "retrieved_at": "2026-07-28",
       "source_entry_id": null,
-      "notes": "Real KANJIDIC2 characters; source_entry_id is the literal, which is KANJIDIC2's own entry identifier. onReadings and kunReadings are the ja_on and ja_kun readings in upstream order; meanings are the English <meaning> elements only. strokeCount is NOT taken from here — the seed derives it from the KanjiVG file it ships, and KANJIDIC2's stroke_count agreeing on all ten characters is an independent cross-check that would be destroyed by copying one into the other. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
+      "notes": "Real KANJIDIC2 characters; source_entry_id is the literal, which is KANJIDIC2's own entry identifier. onReadings and kunReadings are the ja_on and ja_kun readings in upstream order; meanings are the English <meaning> elements only. In the §8 fixture tier strokeCount is NOT taken from here — that tier derives it from the KanjiVG file it ships, and KANJIDIC2's stroke_count agreeing on all ten characters is an independent cross-check that would be destroyed by copying one into the other. The imported tier under data/dictionary/ has no such per-character cross-check to protect, so its strokeCount is KANJIDIC2's own and is labelled as such. Retrieved directly from the licensor's host, so this is primary-source-verified rather than licensed-redistribution: the previous round could only reach a redistribution and its bundled licence copy said CC BY-SA 3.0, which the licensor's own statement contradicts — the licence is 4.0. Every committed value was re-derived from the file named in source_url and re-checked field by field with scripts/import-sources.mjs --verify-fixtures."
     },
     "bunki-editorial": {
       "source": "Bunki Phase-0 seed (hand-assembled by this project)",
@@ -133,7 +133,7 @@
     },
     "tatoeba-english": {
       "source": "Tatoeba",
-      "source_version": "eng_sentences_detailed.tsv + links.csv, retrieved from downloads.tatoeba.org on 2026-07-28",
+      "source_version": "eng_sentences_detailed.tsv, paired through the links export (links.tar.bz2), both retrieved from downloads.tatoeba.org on 2026-07-28",
       "license": "CC BY 2.0 FR",
       "modification_status": "unmodified",
       "confidence": "high",
