@@ -80,6 +80,7 @@ import {
   type SeedLexeme,
 } from '../data/catalog.ts';
 import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
+import { MANUAL_PROVENANCE, manualSource } from '../state/encounter-source.ts';
 import {
   DURABILITY_NOTES,
   UNCERTAINTY_DIMENSIONS,
@@ -102,23 +103,12 @@ import { useTheme } from '../ui/theme-context.tsx';
 /**
  * Where a typed query comes from, in REQ-SRC-01 terms.
  *
- * The learner typed it, so the source is the learner and the licence is theirs.
- * Recording it as anything else — or leaving it blank — would make the one
- * piece of genuinely user-owned content in the log indistinguishable from
- * unattributed data (T-15).
+ * The record itself moved to `src/state/encounter-source.ts` when the word page
+ * gained a Keep of its own — see that module for why a shared record with a
+ * per-surface locator is more honest than a constant that said `capture-screen`
+ * wherever it was used.
  */
-const MANUAL_SOURCE = {
-  sourceId: 'manual-entry',
-  kind: 'manual',
-  locator: 'capture-screen',
-} as const;
-
-const MANUAL_PROVENANCE = {
-  source: 'user_encounter',
-  license: 'user_owned',
-  modificationStatus: 'unmodified',
-  reviewStatus: 'unreviewed',
-} as const;
+const MANUAL_SOURCE = manualSource('capture-screen');
 
 interface Enrichment {
   readonly finishedAt: string;

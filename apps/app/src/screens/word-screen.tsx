@@ -75,6 +75,7 @@ import {
   useDebugFlags,
 } from '../state/app-context.tsx';
 import { DEFERRED_BY_ID } from '../state/deferred.ts';
+import { MANUAL_PROVENANCE, manualSource } from '../state/encounter-source.ts';
 import { createSystemClock } from '../state/runtime.ts';
 import { UNCERTAINTY_LABELS, uncertaintyLogNote } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
@@ -242,6 +243,39 @@ export function WordScreen({
   const promote = (to: 'keep' | 'learn' | 'master'): void => {
     if (thread === null) return;
     store.execute({ kind: 'promote', threadId: thread.state.threadId, to });
+  };
+
+  /**
+   * Start a thread from the page you are already on (Wave D).
+   *
+   * The master definition-of-done asks that *"a word met anywhere shows up
+   * everywhere it should"*, and this page used to answer a word with no thread
+   * by saying "keep it from the capture screen" — sending the learner to the
+   * front door to type a word they were looking at. That is where the
+   * cross-surface trace stopped: a word reached from the guide's road, from a
+   * map node, or from a passage could not become a thread without leaving.
+   *
+   * The two commands are the same pair the capture screen executes, in the same
+   * order, through the same store: `capture` then `promote → keep`. Nothing here
+   * touches the evidence gate — keeping activates no retrieval contract, and
+   * `learn`, the rung that does, stays a separate press the learner makes
+   * (REQ-DM-09). The source record says `word-screen`, so the log records where
+   * the encounter actually happened rather than claiming the front door.
+   */
+  const keepFromHere = (): void => {
+    if (lexeme === null) return;
+    const captured = store.execute({
+      kind: 'capture',
+      text: lexeme.headword,
+      sourceRef: manualSource('word-screen'),
+      provenance: MANUAL_PROVENANCE,
+      uncertainty: null,
+      lexemeId: lexeme.id,
+    });
+    const started = store.getSnapshot().threadsById[captured.threadId];
+    if (started !== undefined && started.state.promotion === 'captured') {
+      store.execute({ kind: 'promote', threadId: captured.threadId, to: 'keep' });
+    }
   };
 
   /*
@@ -441,11 +475,16 @@ export function WordScreen({
             {thread === null ? 'not kept' : thread.state.promotion}
           </Text>
           {thread === null ? (
-            <Text
-              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              Keep it from the capture screen to start a thread.
-            </Text>
+            <View style={styles.actions}>
+              <AppButton
+                accessibilityHint="Records this encounter and starts a thread for it, without leaving this page. Keeping activates no retrieval contract; taking it up for study is a separate press."
+                accessibilityLabel={`Keep ${lexeme.headword}`}
+                label={`Keep ${lexeme.headword}`}
+                onPress={keepFromHere}
+                testID="word-keep"
+                variant="primary"
+              />
+            </View>
           ) : (
             <View style={styles.actions}>
               {(['keep', 'learn', 'master'] as const)

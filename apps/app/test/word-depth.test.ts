@@ -466,12 +466,31 @@ describe('the word surface writes nothing', () => {
     }
   });
 
-  it('submits only the two commands the page is allowed to submit', () => {
+  /**
+   * The page's whole vocabulary of consequences, as an equality.
+   *
+   * Two commands, in the order they appear: `promote` moves a thread between
+   * rungs, and `capture` starts one. Wave D added the second: the page used to
+   * answer a word with no thread by saying "keep it from the capture screen",
+   * which stopped the cross-surface trace and sent the learner to the front door
+   * to type a word they were looking at. It now runs the same `capture` +
+   * `promote → keep` pair the capture screen runs.
+   *
+   * Neither is evidence. Capture records that an encounter happened; `keep`
+   * activates no retrieval contract, and `learn` — the rung that does — is still
+   * only ever reached by a press the learner makes (REQ-DM-09). A third command
+   * appearing here is a third thing this page can cause, which is exactly the
+   * edit this equality exists to make visible.
+   */
+  it('submits only the commands the page is allowed to submit', () => {
     const body = stripComments(screenSource);
     const executes = [...body.matchAll(/store\.execute\(\s*\{\s*kind:\s*'([a-zA-Z]+)'/g)].map(
       (match) => match[1],
     );
-    expect(executes).toEqual(['promote']);
+    expect([...new Set(executes)].sort()).toEqual(['capture', 'promote']);
+    // Neither command reaches the evidence gate: the page holds no minter and
+    // names no gate call.
+    expect(body).not.toMatch(/mintEvidence|admitToScheduler|createDomainEvent/);
     // Accepting a candidate goes through the candidate hook, which owns that
     // command; the screen never constructs it.
     expect(body).toContain('ai.accept');
