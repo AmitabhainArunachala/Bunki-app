@@ -9,15 +9,36 @@
  * multiplies the pair list by the grounds rather than adding a handful of spot
  * checks, and it is more test surface than lane A1 had, which is correct.
  *
- * Five other properties are checked here because each of them is a claim the
- * module's docblocks make and none of them would otherwise be true of anything
- * but the prose:
+ * Other properties are checked here because each of them is a claim the module's
+ * docblocks make and none of them would otherwise be true of anything but the
+ * prose:
  *
  *   1. the two colour layers cannot be crossed (a compile-time proof, below);
  *   2. every hex is the value the sourced chart gives, character for character;
  *   3. the declared luminance bands match the arithmetic;
  *   4. emitted light is capped and confined to the rail register;
  *   5. a mineral ramp really is one mineral, coarse to fine.
+ *
+ * Five more arrived with the first verification round, and each of them is a
+ * check that was missing rather than a check that failed — which is the useful
+ * distinction, because a suite of 2088 green tests said nothing about any of
+ * these:
+ *
+ *   6. **a pigment painted as figure clears 3:1 where it lands.**
+ *      `GROUND_CONTRAST_PAIRS` walks the semantic palette, so 山吹 shipped at
+ *      1.578:1 on 鉄道's daylight field with everything green.
+ *      `GROUND_FIGURE_PIGMENTS` × its own register's fields is the missing walk.
+ *   7. **the three signal kinds differ by form, and not by hue.** Both halves:
+ *      distinct shapes, and one shared pigment. Two of the three used to be
+ *      pixel-identical.
+ *   8. **the museum-card scan sees a namespace or dynamic import.** It read
+ *      `import { … }` braces only, so `import * as t` plus `t.groundOf(…)`
+ *      painted a ground and was treated as painting nothing.
+ *   9. **the meter cannot reach a ground through composition.** A source scan
+ *      cannot see that `RecallIndicator` resolves to three `<Text>` nodes for two
+ *      of five bands; a narrowed prop type can.
+ *  10. **a count in a user-visible sentence is the count.** The page printed the
+ *      cap where the number lit belonged.
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -26,6 +47,9 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+// Namespace import so the drift test below can walk every export by value
+// rather than by a hand-written list — see 'binds every exported name…'.
+import * as groundModule from '../src/theme/ground.ts';
 import {
   AA_NON_TEXT,
   contrastRatio,
@@ -38,15 +62,21 @@ import {
   ERA_KEYS,
   ERA_PIGMENTS,
   ERA_REGISTERS,
+  EMISSIVE_LAMP,
+  EMISSIVE_MARKS,
   EMISSIVE_REGISTER,
+  EMISSIVE_SIGNAL_KINDS,
   GROUNDS,
   GROUND_BAND_WINDOWS,
   GROUND_CONTRAST_PAIRS,
+  GROUND_FIGURE_PIGMENTS,
   GROUND_PAINTING_EXPORTS,
   MAX_EMISSIVE_POINTS,
   MAX_MAT_ALPHA,
   MINERAL_RAMPS,
   PALETTES,
+  UNLIT_EMISSIVE_PIGMENTS,
+  emissiveTally,
   eraPigment,
   figurePaletteOn,
   groundLayers,
@@ -60,6 +90,14 @@ import {
   type GroundPigment,
   type SemanticColor,
 } from '../src/ui/theme.ts';
+import type { GroundCard } from '../src/ui/style-guide/ground-field.tsx';
+import {
+  RAIL_RATION_NOTE,
+  RAIL_SIGNALS,
+  RAIL_SUPPRESSED_BASES,
+  RAIL_TALLY,
+  railRationNote,
+} from '../src/ui/style-guide/specimen-content.ts';
 
 const APP_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -473,33 +511,68 @@ describe('the museum-card rule: no module paints a ground and renders text', () 
   );
 
   /**
-   * Which files put a pigment on screen, read from their import statements.
+   * Which files put a pigment on screen, read from the identifiers in the body.
    *
-   * A file is bound by the rule when it imports one of `GROUND_PAINTING_EXPORTS`
-   * from anywhere — the ground module, `src/theme`, or the `@/ui/theme` barrel
-   * every screen already uses. Reading the *binding names* rather than the
-   * module path is what makes the barrel a convenience instead of a loophole:
-   * `import { groundOf } from '@/ui/theme'` is caught exactly as
-   * `import { groundOf } from '../theme/ground.ts'` is.
+   * A file is bound by the rule when it *names* one of `GROUND_PAINTING_EXPORTS`
+   * anywhere outside comments — however it got hold of the name, and from
+   * whichever of the three paths that re-export it (the ground module,
+   * `src/theme`, or the `@/ui/theme` barrel every screen uses).
+   *
+   * ## Why not the import statements
+   *
+   * This scan used to parse `import { … } from '…'` braces, and that had a hole
+   * wide enough to drive the whole rule through:
+   *
+   * ```
+   * import * as tokens from '../theme.ts';
+   * <View style={{ backgroundColor: tokens.groundOf('kodo', 'light').ground }}>
+   *   <Text>text sitting directly on an era ground</Text>
+   * </View>
+   * ```
+   *
+   * No brace list, so no binding, so the file "painted nothing" and its `<Text>`
+   * was never looked at. `await import('../theme.ts')` escaped identically. A
+   * scan whose guarantee can be lifted by changing import syntax is not a
+   * guarantee, so the unit is now the identifier: an accessor has to be named
+   * somewhere to be called, whatever route the name arrived by.
+   *
+   * The cost is that a file merely *mentioning* one of these names is treated as
+   * painting. That is the right direction to be wrong in — the rule then binds a
+   * file too many rather than one too few — and today it binds exactly the four
+   * that reference a pigment accessor, three of which are token modules.
    */
   const paintsAGround = (body: string): readonly string[] => {
-    const imports = body.match(/import\s+(?:type\s+)?\{[^}]*\}\s+from\s+'[^']+'/g) ?? [];
-    const named = new Set<string>();
-    for (const statement of imports) {
-      const inner = statement.slice(statement.indexOf('{') + 1, statement.lastIndexOf('}'));
-      for (const raw of inner.split(',')) {
-        const name =
-          raw
-            .trim()
-            .replace(/^type\s+/, '')
-            .split(/\s+as\s+/)[0]
-            ?.trim() ?? '';
-        // A type-only binding is erased and paints nothing.
-        if (name !== '' && !raw.trim().startsWith('type ')) named.add(name);
-      }
-    }
-    return GROUND_PAINTING_EXPORTS.filter((name) => named.has(name));
+    const stripped = body.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    return GROUND_PAINTING_EXPORTS.filter((name) => new RegExp(`\\b${name}\\b`).test(stripped));
   };
+
+  /**
+   * The scan's own behaviour, checked against bodies rather than against files.
+   *
+   * The three escapes below are the ones that mattered: a namespace import, a
+   * dynamic import, and the two false-positive shapes that would make the rule
+   * an obstacle. Written as strings so the probe cannot itself be a file that
+   * has to be deleted afterwards and remembered about.
+   */
+  it('catches a name however it arrived, and only when it is really there', () => {
+    expect(paintsAGround(`import { groundOf } from '../theme.ts';`)).toContain('groundOf');
+    expect(
+      paintsAGround(`import * as tokens from '../theme.ts';\ntokens.groundOf('kodo', 'light');`),
+      'a namespace import painted a ground and the scan did not see it',
+    ).toContain('groundOf');
+    expect(
+      paintsAGround(`const t = await import('../theme.ts');\nt.ERA_PIGMENTS.kodo.mist.hex;`),
+      'a dynamic import painted a ground and the scan did not see it',
+    ).toContain('ERA_PIGMENTS');
+    // Comments are stripped, so a rule can be named in the docblock that keeps it…
+    expect(paintsAGround(`/* groundOf is the accessor */\n// and superpose composites`)).toEqual(
+      [],
+    );
+    // …and a name that only reads the ground does not bind the file.
+    expect(paintsAGround(`import { ERA_REGISTERS, emissiveTally } from '../theme.ts';`)).toEqual(
+      [],
+    );
+  });
 
   it('finds the module that actually paints one, so the scan is not vacuous', () => {
     const painters = APP_FILES.filter(
@@ -519,8 +592,17 @@ describe('the museum-card rule: no module paints a ground and renders text', () 
       const painted = paintsAGround(body);
       if (painted.length === 0) return;
       const stripped = body.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+      // Identifier-level, like the painting half above, and for the same reason.
+      //
+      // These two checks used to read `<Text` and an `import { … } from
+      // 'react-native'` brace list. Neither matches `import * as RN from
+      // 'react-native'` followed by `<RN.Text>`, so a file that IS bound by the
+      // scan could still render text straight onto an era ground and stay green —
+      // the identical escape the painting half was repaired for, left behind in
+      // the half nobody re-read. Matching the JSX tag in any namespaced form
+      // closes it, because the element has to be *written* to be rendered.
       expect(stripped, `${name} renders <Text> while painting ${painted.join(', ')}`).not.toMatch(
-        /<Text[\s/>]/,
+        /<(?:[A-Za-z_$][\w$]*\.)?Text[\s/>]/,
       );
       expect(
         stripped,
@@ -549,6 +631,47 @@ describe('the museum-card rule: no module paints a ground and renders text', () 
       '<MuseumCard',
     );
   });
+
+  /**
+   * The escape a source scan structurally cannot see: composition.
+   *
+   * `GroundField` renders a recall figure for every card directly on the mat. If
+   * that figure is `RecallIndicator` — which is *total* over `RecallBand` — then
+   * a `faint` or `unseen` band resolves to `RecallMeter`, three `<Text>` nodes,
+   * on an era ground, with the scan above green because no `<Text>` appears in
+   * the painting file. Reading a band off a projection is the stated reason
+   * `RecallIndicator` exists, so this was not a hypothetical input.
+   *
+   * The guard is a type, and the proof is that the wrong band does not compile.
+   * An unused `@ts-expect-error` is itself an error, so widening `GroundCard.band`
+   * back to `RecallBand` fails `npm run typecheck` rather than failing here.
+   */
+  it('cannot be handed a band that would put the meter on a ground', () => {
+    const ok: GroundCard = {
+      written: '駅',
+      reading: 'えき',
+      caption: 'a station',
+      catalogue: [],
+      capability: 'reading',
+      band: 'settled',
+      standing: 'illustrative',
+    };
+    expect(ok.band).toBe('settled');
+
+    // @ts-expect-error 'faint' resolves to the meter, which renders text
+    const meterOnly: GroundCard = { ...ok, band: 'faint' };
+    // @ts-expect-error and so does 'unseen'
+    const noEvidence: GroundCard = { ...ok, band: 'unseen' };
+    expect([meterOnly.band, noEvidence.band]).toEqual(['faint', 'unseen']);
+  });
+
+  it('draws the bare mark on the ground and keeps the meter on the card', () => {
+    const body = readFileSync(resolve(APP_ROOT, 'src/ui/style-guide/ground-field.tsx'), 'utf8');
+    const marks = body.slice(body.indexOf('styles.marks'), body.indexOf('styles.cards'));
+    expect(marks, 'the marks row can still resolve to the meter').not.toContain('<RecallIndicator');
+    expect(marks).toContain('<RecallMark');
+    expect(body.slice(body.indexOf('<MuseumCard'))).toContain('<RecallMeter');
+  });
 });
 
 /* ------------------------------------------------------------------ *
@@ -572,16 +695,272 @@ describe('emissive colour is capped and confined', () => {
     }
   });
 
-  it('lights at most the cap, and says how many it suppressed', () => {
+  it('lights at most the cap, and hands back the ones it did not light', () => {
     const many = Array.from({ length: MAX_EMISSIVE_POINTS + 4 }, () => signal('branch-open'));
     const plan = planEmissive('tetsudo', many);
     expect(plan.lit).toHaveLength(MAX_EMISSIVE_POINTS);
-    expect(plan.suppressed).toBe(4);
+    // The signals themselves, not a count: "reported, never hidden" is a promise
+    // a surface can only keep if it can say *what* was turned down.
+    expect(plan.suppressed).toHaveLength(4);
+    expect(plan.suppressed.every((entry) => entry.basis === 'the scheduler says so')).toBe(true);
     for (const point of plan.lit) expect(point.pigment.emissive).toBe(true);
   });
 
   it('refuses a lit point with nothing true to say about itself', () => {
     expect(() => planEmissive('tetsudo', [{ kind: 'due-now', basis: '   ' }])).toThrow(/basis/);
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The lamp: one pigment, three forms, checked where it lands
+   * ---------------------------------------------------------------- */
+
+  /**
+   * WCAG 1.4.1, for the one memory semantic that did not have it.
+   *
+   * `theme-tokens.test.ts` asserts a distinct dash pattern per edge state and a
+   * distinct mark shape per recall band. The three emissive kinds had neither:
+   * two of them mapped to the same pigment and every lit point was the same
+   * 10×10 disc, so 'branch-open' and 'evidence-stale' were pixel-identical and
+   * 'due-now' differed only in hue. This is that gap closed, in the same shape as
+   * the two tests it sits beside.
+   */
+  it('gives each emissive signal kind a distinct form', () => {
+    const shapes = EMISSIVE_SIGNAL_KINDS.map((kind) => EMISSIVE_MARKS[kind].shape);
+    expect(new Set(shapes).size, 'two signal kinds share a form').toBe(shapes.length);
+    for (const kind of EMISSIVE_SIGNAL_KINDS) {
+      expect(EMISSIVE_MARKS[kind].label, `${kind} has no spoken label`).not.toBe('');
+    }
+    const labels = EMISSIVE_SIGNAL_KINDS.map((kind) => EMISSIVE_MARKS[kind].label);
+    expect(new Set(labels).size, 'two signal kinds share a spoken label').toBe(labels.length);
+  });
+
+  /**
+   * And the other half: hue must *not* vary with the kind.
+   *
+   * A distinct form is only worth having if the colour is not quietly doing the
+   * same job with more authority. One lamp for every kind is what makes the
+   * frozen §8 claim true of this module — there is no state → hue table left to
+   * check, so the check is that every lit point comes out the same colour.
+   */
+  it('lights every kind in one pigment, so hue carries no state', () => {
+    const plan = planEmissive(
+      'tetsudo',
+      EMISSIVE_SIGNAL_KINDS.map((kind) => signal(kind)),
+    );
+    expect(plan.lit).toHaveLength(EMISSIVE_SIGNAL_KINDS.length);
+    expect(new Set(plan.lit.map((point) => String(point.pigment.hex))).size).toBe(1);
+    for (const point of plan.lit) {
+      expect(point.pigment).toBe(EMISSIVE_LAMP);
+      expect(point.mark).toBe(EMISSIVE_MARKS[point.signal.kind]);
+    }
+    // The mapping that used to be here is gone, not renamed.
+    const source = readFileSync(resolve(APP_ROOT, 'src/theme/ground.ts'), 'utf8');
+    expect(source, 'a state → pigment table is back').not.toMatch(/EMISSIVE_ROLE\s*[:=]/);
+  });
+
+  /**
+   * WCAG 1.4.11 for a pigment, which nothing checked before.
+   *
+   * `GROUND_CONTRAST_PAIRS` walks the semantic palette, so it says nothing about
+   * a mineral pigment painted straight onto a field — and a lit point is exactly
+   * that. 山吹 shipped at **1.578:1** on 鉄道's daylight field with the whole
+   * suite green. This is the check that was missing; the visual-language doc
+   * §5.1.2 says a token failing 3:1 on a reachable ground fails the build, and
+   * this is what makes that true of the pigments as well as of the tokens.
+   */
+  it.each(
+    GROUND_FIGURE_PIGMENTS.flatMap((entry) =>
+      COLOR_SCHEMES.map(
+        (scheme) => [`${entry.name} on ${entry.era}/${scheme}`, entry, scheme] as const,
+      ),
+    ),
+  )('%s clears the non-text floor', (name, entry, scheme) => {
+    const ground = groundOf(entry.era, scheme);
+    const ratio = contrastRatio(entry.pigment.hex, ground.field);
+    expect(ratio, `${name} is ${ratio.toFixed(3)}:1`).toBeGreaterThanOrEqual(AA_NON_TEXT);
+  });
+
+  it('draws every lit point in a pigment that list covers', () => {
+    const covered = new Set(GROUND_FIGURE_PIGMENTS.map((entry) => String(entry.pigment.hex)));
+    const plan = planEmissive(
+      'tetsudo',
+      EMISSIVE_SIGNAL_KINDS.map((kind) => signal(kind)),
+    );
+    for (const point of plan.lit) {
+      expect(covered, `${point.signal.kind} paints an unchecked pigment`).toContain(
+        String(point.pigment.hex),
+      );
+    }
+  });
+
+  /**
+   * The pigment that is declared and not painted, with its reason checked.
+   *
+   * 山吹 stays in `ERA_PIGMENTS` because §4.3 prints it and that table is a
+   * transcription. It is not a lamp for a measured reason, and a recorded reason
+   * that nothing verifies is just a comment — so the arithmetic in the reason is
+   * asserted here. Every emissive pigment is in exactly one of the two lists, so
+   * a new lamp cannot arrive unaccounted for in either direction.
+   */
+  it('accounts for every emissive pigment, painted or not', () => {
+    const emissive = ERA_KEYS.flatMap((era) =>
+      Object.values(ERA_PIGMENTS[era] as Readonly<Record<string, GroundPigment>>).filter(
+        (entry) => entry.emissive,
+      ),
+    );
+    const painted = GROUND_FIGURE_PIGMENTS.map((entry) => entry.pigment);
+    const unlit = UNLIT_EMISSIVE_PIGMENTS.map((entry) => entry.pigment);
+    expect(new Set([...painted, ...unlit]).size).toBe(emissive.length);
+    for (const pigment of emissive) {
+      const inPainted = painted.includes(pigment);
+      const inUnlit = unlit.includes(pigment);
+      expect(inPainted !== inUnlit, `${pigment.reading} is in both lists or in neither`).toBe(true);
+    }
+  });
+
+  it.each(UNLIT_EMISSIVE_PIGMENTS.map((entry) => [entry.pigment.reading, entry] as const))(
+    '%s is left unpainted for a reason that is still true',
+    (name, entry) => {
+      expect(entry.reason, `${name} is unpainted with no reason given`).not.toBe('');
+      const worst = Math.min(
+        ...COLOR_SCHEMES.map((scheme) =>
+          contrastRatio(entry.pigment.hex, groundOf(entry.era, scheme).field),
+        ),
+      );
+      // If it cleared everywhere, the reason on the entry would be false and the
+      // pigment would have no business being excluded on contrast grounds.
+      expect(worst, `${name} clears 3:1 everywhere; its recorded reason is stale`).toBeLessThan(
+        AA_NON_TEXT,
+      );
+    },
+  );
+
+  it('records 山吹 at the ratio that took it off the lamp list', () => {
+    const ratio = contrastRatio(
+      ERA_PIGMENTS.tetsudo.platformLight.hex,
+      groundOf('tetsudo', 'light').field,
+    );
+    expect(ratio).toBeCloseTo(1.578, 3);
+    expect(EMISSIVE_LAMP).toBe(ERA_PIGMENTS.tetsudo.signal);
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The tally the page prints
+   * ---------------------------------------------------------------- */
+
+  /**
+   * The count in a user-visible sentence has to be the count.
+   *
+   * The page said "{RAIL_SIGNALS.length} real signals were offered and
+   * {MAX_EMISSIVE_POINTS} are lit", which is the *cap*, not the number lit. With
+   * four signals and a cap of three the two agree by coincidence; with two
+   * signals the sentence was simply false. `emissiveTally` computes both from the
+   * same `planEmissive` the field renders from.
+   */
+  it('reports what was lit rather than what the cap is', () => {
+    const two = emissiveTally('tetsudo', [signal('due-now'), signal('branch-open')]);
+    expect(two.offered).toBe(2);
+    expect(two.lit).toBe(2);
+    expect(two.lit).not.toBe(MAX_EMISSIVE_POINTS);
+    expect(two.suppressed).toEqual([]);
+
+    const five = emissiveTally(
+      'tetsudo',
+      Array.from({ length: 5 }, () => signal('evidence-stale')),
+    );
+    expect(five.offered).toBe(5);
+    expect(five.lit).toBe(MAX_EMISSIVE_POINTS);
+    expect(five.suppressed).toHaveLength(2);
+  });
+
+  /**
+   * The sentence itself, at tallies this page does not happen to produce.
+   *
+   * The old sentence was only accidentally true — four offered, cap of three. A
+   * count in prose has to survive the inputs that would expose it, so the note is
+   * a function and this is the case that used to lie.
+   */
+  it('writes a ration sentence that survives a tally under the cap', () => {
+    const under = railRationNote(
+      emissiveTally('tetsudo', [signal('due-now'), signal('branch-open')]),
+    );
+    expect(under).toContain('2 real signals were offered');
+    expect(under).toContain('2 are lit');
+    expect(under, 'the cap leaked back into the sentence').not.toContain('3 are lit');
+    expect(under, 'nothing was suppressed but the sentence says something was').not.toMatch(
+      /not, and/,
+    );
+
+    const over = railRationNote(
+      emissiveTally(
+        'tetsudo',
+        Array.from({ length: 5 }, () => signal('evidence-stale')),
+      ),
+    );
+    expect(over).toContain('5 real signals were offered');
+    expect(over).toContain('3 are lit');
+    expect(over).toContain('2 are not');
+  });
+
+  it('prints the page from the same plan the field renders', () => {
+    expect(RAIL_TALLY.offered).toBe(RAIL_SIGNALS.length);
+    expect(RAIL_TALLY.lit).toBe(planEmissive('tetsudo', RAIL_SIGNALS).lit.length);
+    expect(RAIL_SUPPRESSED_BASES).toEqual(RAIL_TALLY.suppressed.map((entry) => entry.basis));
+    expect(RAIL_RATION_NOTE).toBe(railRationNote(RAIL_TALLY));
+    // …and every suppressed signal really does reach the page, by its own words.
+    const page = readFileSync(resolve(APP_ROOT, 'src/ui/style-guide/style-guide-page.tsx'), 'utf8');
+    expect(page).toContain('RAIL_SUPPRESSED_BASES');
+    expect(page, 'the cap is being printed as a count again').not.toContain('MAX_EMISSIVE_POINTS');
+    expect(RAIL_SUPPRESSED_BASES.length).toBeGreaterThan(0);
+  });
+
+  it('keeps the reader off the painting list, so a page may report the ration', () => {
+    expect(GROUND_PAINTING_EXPORTS).not.toContain('emissiveTally');
+    expect(GROUND_PAINTING_EXPORTS).not.toContain('EMISSIVE_MARKS');
+  });
+
+  /**
+   * The list may not drift again, and this is why the previous version of the
+   * test above could not stop it.
+   *
+   * That version named three exports by hand and checked those three. It was
+   * therefore vacuous against the one that was missing: `MINERAL_RAMPS` is
+   * re-exported through `src/ui/theme.ts` — the barrel every screen and every
+   * Wave B lane imports — and its grades carry full-strength `GroundColor`
+   * hexes. A verifier proved the hole by writing four lines that put text
+   * directly on 群青 `#4C6CB3` with no card under it; the museum-card scan
+   * treated the file as painting nothing, the no-hex-literal scan had nothing to
+   * find, and lint, tsc and 992 tests all passed.
+   *
+   * So this derives the obligation instead of restating it: walk every value
+   * `ground.ts` exports, and if a hex string is reachable from it, the name that
+   * yields it must be bound by the scan. A hand-maintained list guarding against
+   * hand-maintenance drift was always going to lose.
+   *
+   * Functions are unreachable this way and stay on the list explicitly — the
+   * point of this test is the *data* exports, which is where the gap was.
+   */
+  it('binds every exported name from which a pigment is reachable', () => {
+    const yieldsHex = (value: unknown, depth = 0): boolean => {
+      if (depth > 6) return false;
+      if (typeof value === 'string') return /^#[0-9a-f]{6}$/i.test(value);
+      if (Array.isArray(value)) return value.some((entry) => yieldsHex(entry, depth + 1));
+      if (value !== null && typeof value === 'object') {
+        return Object.values(value).some((entry) => yieldsHex(entry, depth + 1));
+      }
+      return false;
+    };
+
+    const unbound = Object.entries(groundModule)
+      .filter(([name, value]) => yieldsHex(value) && !GROUND_PAINTING_EXPORTS.includes(name))
+      .map(([name]) => name);
+
+    expect(
+      unbound,
+      `these exports yield a pigment but are not on GROUND_PAINTING_EXPORTS, so a file ` +
+        `using them paints an era ground while the museum-card scan sees nothing: ` +
+        unbound.join(', '),
+    ).toEqual([]);
   });
 
   it('declares emissive pigments only in the rail register, and only two', () => {

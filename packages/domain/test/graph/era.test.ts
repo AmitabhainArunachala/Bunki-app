@@ -13,7 +13,24 @@
  * The readings used below are the real KANJIDIC2 lists for those characters, in
  * KANJIDIC2's own notation (`ひと.つ`, `ひと-`, katakana on-readings), because the
  * normalisation of that notation is part of what is under test.
+ *
+ * That sentence used to be an assertion and is now a checked property, because it
+ * was false. Five of the seventeen entries were not KANJIDIC2's lists: 電, 校 and
+ * 岐 were each given kun readings KANJIDIC2 does not record at all, 世 gained
+ * `さんじゅう`, and 手 was missing `-て`. A verifier caught it. The suite still
+ * passed after the correction — the invented readings were not load-bearing for
+ * any assertion — which is exactly why nothing would ever have contradicted the
+ * sentence: a fixture that claims to be upstream data and is not can sit in a
+ * green suite indefinitely.
+ *
+ * `matches the shipped KANJIDIC2 tier, character for character` below now derives
+ * the obligation from the data instead of restating it. It is skipped when the
+ * imported tier is absent, since that tier arrives on its own branch.
  */
+
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
@@ -41,22 +58,22 @@ import { randomFrom, type Random } from '../adversarial/support/fuzz.ts';
 
 const READINGS: Readonly<Record<string, CharacterReadings>> = Object.freeze({
   山: { on: ['サン', 'セン'], kun: ['やま'] },
-  手: { on: ['シュ', 'ズ'], kun: ['て', 'て-', 'た-'] },
+  手: { on: ['シュ', 'ズ'], kun: ['て', 'て-', '-て', 'た-'] },
   話: { on: ['ワ'], kun: ['はな.す', 'はなし'] },
   一: { on: ['イチ', 'イツ'], kun: ['ひと-', 'ひと.つ'] },
   般: { on: ['ハン'], kun: [] },
-  電: { on: ['デン'], kun: ['いなずま'] },
-  世: { on: ['セイ', 'セ', 'ソウ'], kun: ['よ', 'さんじゅう'] },
+  電: { on: ['デン'], kun: [] },
+  世: { on: ['セイ', 'セ', 'ソウ'], kun: ['よ'] },
   界: { on: ['カイ'], kun: [] },
   学: { on: ['ガク'], kun: ['まな.ぶ'] },
-  校: { on: ['コウ', 'キョウ'], kun: ['かせ', 'とやが.う', 'かんが.える'] },
+  校: { on: ['コウ', 'キョウ'], kun: [] },
   言: { on: ['ゲン', 'ゴン'], kun: ['い.う', 'こと'] },
   葉: { on: ['ヨウ'], kun: ['は'] },
   現: { on: ['ゲン'], kun: ['あらわ.れる', 'あらわ.す', 'うつつ', 'うつ.つ'] },
   場: { on: ['ジョウ', 'チョウ'], kun: ['ば'] },
   駅: { on: ['エキ'], kun: [] },
   分: { on: ['ブン', 'フン', 'ブ'], kun: ['わ.ける', 'わ.け', 'わ.かれる', 'わ.かる', 'わ.かつ'] },
-  岐: { on: ['キ', 'ギ'], kun: ['わか.れる', 'えだ.になる', 'ちまた'] },
+  岐: { on: ['キ', 'ギ'], kun: [] },
 });
 
 function readingsFor(characters: string): ReadonlyMap<string, CharacterReadings> {
@@ -573,5 +590,67 @@ describe('toHiragana', () => {
     // The prolonged-sound mark is in the katakana block but has no hiragana
     // counterpart, so it must survive unchanged rather than shift by 0x60.
     expect(toHiragana('コーヒー')).toBe('こーひー');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The fixture is upstream's, and this is what makes that true
+ * ------------------------------------------------------------------ */
+
+/**
+ * ADR-001 boundary 1 forbids `@bunki/domain` from *importing* `@bunki/seed`, so
+ * this reads the emitted file by path — the same escape `era-corpus.test.ts`
+ * uses, and for the same reason: nothing is imported and no seed record is
+ * copied into the package.
+ */
+const SEED_KANJI = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+  '..',
+  'seed',
+  'data',
+  'dictionary',
+  'kanji.json',
+);
+
+describe('the reading fixture is KANJIDIC2, not a plausible imitation', () => {
+  it('matches the shipped KANJIDIC2 tier, character for character', () => {
+    if (!existsSync(SEED_KANJI)) {
+      // The imported tier arrives on its own branch. Absent is not a failure —
+      // but it is also not a pass, so say which happened rather than going green.
+      expect(existsSync(SEED_KANJI), 'imported tier absent; fixture unchecked this run').toBe(
+        false,
+      );
+      return;
+    }
+
+    const tier = JSON.parse(readFileSync(SEED_KANJI, 'utf8')) as {
+      records: readonly {
+        character: string;
+        onReadings?: readonly string[];
+        kunReadings?: readonly string[];
+      }[];
+    };
+    const upstream = new Map(tier.records.map((record) => [record.character, record]));
+
+    let checked = 0;
+    for (const [character, readings] of Object.entries(READINGS)) {
+      const real = upstream.get(character);
+      if (real === undefined) continue;
+      checked += 1;
+      expect([...readings.on], `${character} on-readings are not KANJIDIC2's`).toEqual([
+        ...(real.onReadings ?? []),
+      ]);
+      expect([...readings.kun], `${character} kun-readings are not KANJIDIC2's`).toEqual([
+        ...(real.kunReadings ?? []),
+      ]);
+    }
+
+    // Non-vacuity: a fixture whose characters had all fallen out of the tier
+    // would pass every comparison above by making none of them.
+    expect(checked, 'no fixture character is in the tier, so nothing was compared').toBeGreaterThan(
+      10,
+    );
   });
 });

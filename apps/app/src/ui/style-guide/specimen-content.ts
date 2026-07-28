@@ -22,9 +22,9 @@ import {
   type SeedLexeme,
   type SeedPassage,
 } from '../../data/catalog.ts';
-import { type FrontierSpan } from '../frontier.tsx';
-import { type EraKey } from '../theme.ts';
-import { type GroundCard } from './ground-field.tsx';
+import type { FrontierSpan } from '../frontier.tsx';
+import { emissiveTally, type EmissiveSignal, type EmissiveTally, type EraKey } from '../theme.ts';
+import type { GroundCard } from './ground-field.tsx';
 
 /**
  * The seed's one hand-written passage.
@@ -172,8 +172,12 @@ function cardsFor(era: EraKey): readonly GroundCard[] {
       caption: lexeme.senses.slice(0, 2).join(' · '),
       catalogue: [why, `${lexeme.partOfSpeech.join(', ')} · seed entry ${lexeme.id}`],
       capability: index === 0 ? 'reading' : 'meaning',
-      // Two bands per register, so each ground shows both a bare mark and the
-      // bounded meter landing on it rather than one kind of figure twice.
+      /*
+        Two bands per register, so each ground shows two steps of the ramp rather
+        than one twice. Both are `StandaloneRecallBand` values — which the type
+        now requires: a meter-only band here would put the meter's three lines of
+        text on the mat, and `GroundCard.band` is narrowed so it cannot.
+      */
       band: index === 0 ? 'settled' : 'emerging',
       standing: ERA_PLACEMENT_STANDING,
     } satisfies GroundCard;
@@ -191,12 +195,50 @@ export const ERA_CARDS: Readonly<Record<EraKey, readonly GroundCard[]>> = {
  * The signals the rail register is asked to light, and the count is deliberate.
  *
  * Four are passed and the cap is three, so the specimen shows the ration doing
- * its job rather than describing it — the fourth is reported as suppressed and
- * the page says so in prose.
+ * its job rather than describing it — the fourth comes back suppressed and the
+ * page prints its basis.
  */
-export const RAIL_SIGNALS = [
+export const RAIL_SIGNALS: readonly EmissiveSignal[] = [
   { kind: 'due-now', basis: 'Due now, according to the plan this surface only displays.' },
   { kind: 'branch-open', basis: 'A branch is open here after a stumble.' },
   { kind: 'evidence-stale', basis: 'The last direct evidence is old enough to doubt.' },
   { kind: 'due-now', basis: 'Also due now — past the ration, so it is not lit.' },
-] as const;
+];
+
+/**
+ * What the ration actually did, computed from the same plan the field renders.
+ *
+ * The page used to print `MAX_EMISSIVE_POINTS` in the sentence "…and 3 are lit",
+ * which is the cap rather than the count: with two signals offered it would have
+ * said three were lit over two lit points. The number is now read off
+ * `emissiveTally`, which calls the same `planEmissive` the field does, so the
+ * sentence and the pixels cannot disagree.
+ */
+export const RAIL_TALLY: EmissiveTally = emissiveTally('tetsudo', RAIL_SIGNALS);
+
+/**
+ * The sentence, as a function of the tally rather than as a fixed string.
+ *
+ * A function so it can be tested against tallies this page does not happen to
+ * produce — `overwhelmedNote` in `frontier-marks.ts` is here for the same reason
+ * and after the same defect. The suppressed clause is dropped entirely when
+ * nothing was suppressed, because "and 0 are reported below" is the kind of
+ * sentence that teaches a reader to stop reading the numbers.
+ */
+export function railRationNote(tally: EmissiveTally): string {
+  const offered = `${String(tally.offered)} real ${tally.offered === 1 ? 'signal was' : 'signals were'} offered`;
+  const lit = `${String(tally.lit)} ${tally.lit === 1 ? 'is' : 'are'} lit`;
+  if (tally.suppressed.length === 0) {
+    return `Emitted light lives only here, and it is rationed: ${offered} and ${lit}. Asking the other two registers for a lit point throws rather than quietly drawing nothing.`;
+  }
+  const rest = `${String(tally.suppressed.length)} ${tally.suppressed.length === 1 ? 'is' : 'are'} not, and ${tally.suppressed.length === 1 ? 'it is' : 'they are'} named below rather than dropped`;
+  return `Emitted light lives only here, and it is rationed: ${offered}, ${lit}, ${rest}. Asking the other two registers for a lit point throws rather than quietly drawing nothing.`;
+}
+
+/** The sentence this page actually renders. */
+export const RAIL_RATION_NOTE: string = railRationNote(RAIL_TALLY);
+
+/** The bases the ration turned down. Printed on the page, never swallowed. */
+export const RAIL_SUPPRESSED_BASES: readonly string[] = RAIL_TALLY.suppressed.map(
+  (signal) => signal.basis,
+);

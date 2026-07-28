@@ -60,8 +60,31 @@
  *
  * The separation is a type, not a naming convention. Every colour here is a
  * `SemanticColor` and every colour there is a `GroundColor`; both are ordinary
- * strings at runtime and neither is assignable to the other, so a component
- * cannot paint a node with a hillside or a hillside with a focus ring.
+ * strings at runtime and neither is assignable to the other.
+ *
+ * ## What that buys, stated at its real size
+ *
+ * The brand binds **wherever a signature names it**: `paletteValue`,
+ * `surfaceOf`, `figurePaletteOn`, `eraPigment`, `superpose`, and any prop a lane
+ * writes as `SemanticColor`. Pass a hillside to one of those and the build stops.
+ * `test/theme-ground.test.ts` proves that with `@ts-expect-error` directives, and
+ * an unused directive is itself a compile error, so weakening the brand fails
+ * `npm run typecheck`.
+ *
+ * It does **not** bind a React Native `style` prop. `backgroundColor` is typed
+ * `string` by the framework, so a component really can write
+ * `backgroundColor: ERA_PIGMENTS.kodo.mist.hex` on a semantic mark and the
+ * compiler will say nothing. An earlier version of this paragraph said a
+ * component "cannot paint a node with a hillside", full stop, which read as a
+ * guarantee the type system was not giving — and the ground layer's own
+ * `ground-field.tsx` paints a mineral pigment into a `style` prop on purpose.
+ *
+ * What actually holds that line is two scans working together, and they are
+ * named here so nobody has to infer them from a promise: a pigment can only be
+ * obtained through a `GROUND_PAINTING_EXPORTS` name, and every file naming one is
+ * bound by the museum-card scan; a pigment written out as a literal is caught by
+ * the no-hex-literal scan lane A1 already had. The type guards the accessors, the
+ * scans guard the pixels, and neither is a substitute for the other.
  */
 
 export const COLOR_SCHEMES = ['light', 'dark'] as const;
