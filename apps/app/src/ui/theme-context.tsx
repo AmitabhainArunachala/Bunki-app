@@ -18,11 +18,22 @@
  * So the first client render deliberately matches the server, and the real
  * scheme arrives in an effect. That is one frame of light before dark, and the
  * whole tree re-renders properly instead of being stitched onto stale markup.
+ *
+ * ## Why the fonts are installed here
+ *
+ * The same effect installs the self-hosted faces (`src/theme/font-face.ts`),
+ * for the same reason and at the same moment: static rendering has no
+ * `document`, so a `@font-face` stylesheet cannot be written until the client is
+ * up. Putting it in the provider rather than in a screen means every surface
+ * under the provider gets real Japanese type without asking for it — which is
+ * what a design system is for, and which keeps the one screen that forgot to ask
+ * from being a screen that renders in the wrong face.
  */
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { installSelfHostedFaces } from '../theme/font-face.ts';
 import { createTheme, type ColorSchemeName, type Theme } from './theme.ts';
 
 const ThemeContext = createContext<Theme | null>(null);
@@ -41,6 +52,7 @@ export function ThemeProvider({ children, scheme }: ThemeProviderProps): ReactNo
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    installSelfHostedFaces();
     setMounted(true);
   }, []);
 
