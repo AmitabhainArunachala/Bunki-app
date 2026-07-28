@@ -5409,3 +5409,190 @@ it here, because axe was green before this repair too.
    across the press for exactly this reason.
 4. Restore `accessibilityRole="radiogroup"` on the uncertainty chips and confirm
    the capture test names it, since the route sweep still will not.
+
+## Appendix — Campaign E, lane A2′ (Builder A2-prime): the era attribute, and what the corpus actually supports
+
+**Branch:** `agent/bunki-e-era`, from `agent/bunki-e-integration` (`cd04f7d`).
+**Surface owned:** `packages/domain/src/graph/**`, `packages/domain/src/journey/**`
+and their tests. `apps/app` was not touched.
+
+### The finding, first, because it is the deliverable
+
+**9.8% of the 3,000-lexeme dictionary tier can be placed on an era layer.**
+All 295 of them land on 古道 `kodo`, all by a single rule. **街道 `kaido` and
+鉄道 `tetsudo` are empty — 0 lexemes each** — and not because a rule missed:
+because no rule for them exists that would not be a guess.
+
+Measured by shipped code (`packages/domain/test/graph/era-corpus.test.ts`
+calling `attributeLexemeEra` / `summariseEraCoverage`), against the real corpus.
+Full run, digests and reproduction command:
+`docs/build-evidence/era-coverage/README.md`.
+
+```
+3,000-lexeme dictionary tier: 3000 lexemes
+  placed on a layer: 295 (9.8%)
+  kodo 295 / kaido 0 / tetsudo 0 / unknown 2705
+  native_single_morpheme     295  → kodo
+  sino_japanese_reading     2389  → unknown
+  native_compound             50  → unknown
+  mixed_reading               45  → unknown
+  reading_ambiguous            1  → unknown
+  reading_unresolved         220  → unknown
+```
+
+The axis that *is* derivable is the lexical stratum, and it reaches **2,779
+lexemes (92.6%)**. The gap between 92.6% and 9.8% is the whole finding: we can
+say what stratum a word belongs to, and we cannot say when it entered the
+language.
+
+### The one rule that places, stated exactly
+
+> A headword that is one ideograph, optionally followed by exactly the okurigana
+> KANJIDIC2 records for that reading, whose lexeme reading is exactly one of that
+> character's kun readings and not also one of its on readings, is a single
+> native morpheme (和語) and is placed on 古道.
+
+山 やま, 手 て, 話す はなす. The voyage-through-time document §2 assigns "訓読み,
+native vocabulary" to 古道, and the native lexical stratum predates every road on
+the map.
+
+**It places a stratum, not a date.** It asserts no first attestation, and there
+is nothing in the corpus that could support one. That sentence is in the source
+and in the returned `detail` string, not only here.
+
+### Why nothing else is placed — each refusal is typed, not lumped
+
+| Basis | Placement | Why |
+| --- | --- | --- |
+| `sino_japanese_reading` | `unknown` | 漢語 spans all three layers. 電話 (Meiji coinage) and 世界 (Buddhist import, a millennium older) are the same object in this data: two on-readings. A test asserts they come back identical. |
+| `native_compound` | `unknown` | Morpheme stratum does not transfer to a compound. 取締役 とりしまりやく is native throughout and is a Meiji office. |
+| `mixed_reading` | `unknown` | 重箱/湯桶読み — undated for the same reason the pure cases are. |
+| `reading_ambiguous` | `unknown` | The reading is both an on and a kun reading of the character. |
+| `foreign_script` | `unknown` | Orthography is not etymology. パン and ガラス are Edo-period Portuguese and Dutch, ドキドキ is native onomatopoeia. |
+| `reading_unresolved` | `unknown` | The reading could not be exactly reconstructed from the recorded readings. |
+| `no_reading_evidence` | `unknown` | No reading list was supplied for a character. |
+| `character_spans_eras` | `unknown` | A **kanji node is never placed at all.** 駅 is the design document's own worked example precisely because it is a 駅家 post-station, a 宿場 and a railway station at once. |
+| `not_a_lexical_node` | `unknown` | Reading, sense, sentence, encounter and component nodes have no lexical era. |
+
+`unknown` is a member of `EraPlacement`, not `EraLayer | null`, so a renderer has
+to handle it. A nullable layer invites `?? 'kodo'`, and a default layer is
+exactly the invented confidence this lane exists to refuse.
+
+### Two hypotheses from the brief, tested and false for this corpus
+
+The brief suggested katakana loanwords with an explicit source-language field
+would be identifiable as modern borrowings. They are not, for two independent
+reasons, both read out of `packages/seed/scripts/import-sources.mjs` on
+`dict-view`:
+
+1. **`parseJMdict` never reads `<lsource>` or `<misc>`.** It reads `ent_seq`,
+   `keb`, `reb`, `ke_pri`/`re_pri`, `pos`, `gloss`. The source-language field and
+   the `arch`/`obs`/`rare` markers are absent from the shipped bytes.
+2. **`selectLexemes` filters on `entry.hasKanji`**, so kana-only entries are
+   excluded by construction. Measured: **0 of 3,000 headwords are katakana.**
+
+The 34 distinct `pos` labels the tier does carry were enumerated and contain no
+era signal — they are grammatical categories.
+
+**Recommendation for the seed lane, explicitly not acted on here** (out of this
+lane's surface): parsing `<misc>` would give the 古道 layer a second,
+independent, upstream-authored population via `arch`/`obs`. Nothing the domain
+can compute substitutes for a citable marker.
+
+### Carried Wave-A defects — all three closed, each with a red-first check
+
+**P2, duplicate edge.** `GraphDiagnostic.kind` gains `duplicate_edge`; the second
+declaration is dropped from the adjacency and not counted in `edgeCount`; a
+symmetric kind is keyed on the unordered pair so 末⇄未 declared from both ends is
+one edge. Two declarations that disagree about `role` keep the first and say so
+in the diagnostic. The user-visible consequence is regression-tested directly:
+before the fix a repeated `contains` edge put 分岐 in the rendered `compounds`
+group twice.
+
+**P2, filter asymmetry.** `collectGroups` applied none of `depth`, `edgeKinds` or
+`nodeKinds`. All three now govern the groups exactly as they govern the walk,
+passed as one `GroupFilters` object so a filter cannot be wired into one half and
+forgotten in the other. `maxNodes` still bounds the walk alone — and that
+asymmetry is now argued for in a table on `NeighbourhoodOptions`: filters say
+which part of the graph the query is about, budgets each bound one thing, and a
+kanji page's "components" section must not shrink because the word happens to
+have many compounds.
+
+**P2, the invariant nothing enforced.** `memoryStateAsOf` binary-searched
+`versions` and justified it with "ascending by construction" while
+`buildMemoryHistories` constructed no such thing: a review dated before its
+contract's activation was appended after the activation version and the list went
+backwards. The invariant is now established where the data is built (such a
+review is skipped, the same treatment already given to a review naming a contract
+with no activation), `isAscendingByFrom` is exported so the claim is checkable,
+and the doc comment states the precondition and what happens when it is violated
+instead of pretending it cannot be.
+
+**Red-first evidence.** Each fix was reverted in place and the new tests re-run:
+5 of the build tests fail without the dedupe, 6 of the neighbourhood tests fail
+without the group filters, and 2 of the retrievability tests fail with the single
+guard line removed. All 13 pass with the fixes in.
+
+### Checks re-run in this worktree
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | clean install, exit 0 |
+| `npm run lint` | pass, no output |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, root + 5 workspaces |
+| `npm run test` | **1931 passed, 1 skipped**, 102 files (was 1868) |
+| `npm run test:replay` (T-03) | 47 passed, 2 files |
+| `npm run verify:export` (T-14) | 14 passed, 1 file |
+| `npx expo export --platform web` | pass — 14 static routes, `dist` written |
+| `npm run test:e2e` | **43 passed**, exit 0 |
+
+The one skipped test is the half of `era-corpus.test.ts` that reports "no
+dictionary tier found" — it is `skipIf`'d because a tier *is* present on this
+branch, as the 16-lexeme hand seed. The two `✘` lines under the e2e list reporter
+are the same pre-existing annotated `test.fail()` expectations as every previous
+round (T4-1b, T3-3); `retries: 0`, neither was touched, both counted in the 43.
+
+### What this lane does **not** claim
+
+- **That any word has been dated.** Nothing here asserts a century, a period, or
+  a first attestation. 古道 placement is a claim about lexical stratum, and the
+  source, the tests and the returned `detail` all say so in those words.
+- **That 9.8% is a good number.** It is a low number, honestly obtained, and it
+  is a fact about the data rather than about the rules. Loosening the rules would
+  raise it and make it worthless.
+- **That the dictionary tier is on this branch.** It is not. It lives on
+  `dict-view` (`0b3400a1`); its two files were checked out into
+  `packages/seed/data/dictionary/` for the measurement, their sha256s verified
+  against the importer's own manifest, and then removed. **No dictionary bytes
+  are committed on this branch**, which keeps the share-alike confinement in
+  `packages/seed/README.md` intact. The corpus test needs no edit when the tier
+  lands — it reads whichever tiers are present and skips, loudly, when there are
+  none.
+- **That the 3,000-lexeme figures were re-derived after the final commit.** They
+  were measured on `era.ts` as committed in `03a582c`, and that file has not
+  changed since. The 16-lexeme hand-seed figures in the test output *are*
+  produced on every run.
+- **That `packages/domain/src/journey/` was changed.** It was in this lane's
+  surface and needed nothing; the era attribute belongs to the graph projection.
+- **That the era attribute is wired into any screen.** It is a pure projection
+  with no consumer yet. Wave B's map lane is the consumer, and the numbers above
+  are what it has to design against.
+- **That a Japanese speaker reviewed the placements.** No native-speaker or
+  lexicographer review was run. The rules are exact and mechanical; whether 295
+  is the *right* 295 is a question the corpus test cannot answer.
+
+### What a verifier should try to break
+
+1. Add a rule mapping katakana headwords to `tetsudo`, and confirm the
+   `foreign_script` tests go red — パン, ガラス and ドキドキ are in them by name
+   for exactly this reason.
+2. Make `attributeNodeEra` place a `kanji` node, and confirm the 駅 test names it.
+3. Point `EraPlacement` at `EraLayer | null` and watch how quickly a `?? 'kodo'`
+   becomes tempting at the call site. That is the argument for the union.
+4. Loosen `native_single_morpheme` to accept native *compounds* and watch the
+   coverage number jump — then check 取締役 and ask whether the number improved
+   or the honesty did.
+5. Re-run the corpus measurement after checking out `dict-view`'s two data files;
+   the digests in `docs/build-evidence/era-coverage/README.md` should match, and
+   so should 295.
