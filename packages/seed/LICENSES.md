@@ -294,17 +294,43 @@ start-up/launch page of the app.
 The two obligations are in different states, and this file previously conflated
 them:
 
-- **The WWW-server obligation is met.** `SEED_ENTRY_DISCLOSURE` renders on every
-  screen that displays words from the files — the word page, the kanji page and,
-  since this round, the **search screen**, which had been missed. A search result
-  row is a reading, a set of senses and a part of speech; the screen displayed all
-  three with no acknowledgement anywhere on it. See §2.4.
-- **The smartphone/tablet obligation is not yet met, and no such app ships.**
-  There is no Sources/About screen. Phase 0's only surface is Expo Web, where the
-  first clause governs; the separate screen is an open coordination request
-  against the app shell (`packages/seed/README.md`, "Status"). If a packaged
-  mobile app is ever built from this tree, that screen is a precondition, not a
-  follow-up.
+- **The WWW-server obligation is met, and is now checked rather than listed.**
+  `SEED_ENTRY_DISCLOSURE` renders on **every screen in the app**: capture, word,
+  kanji, session, canvas, repair, evidence, and About & diagnostics.
+
+  It was previously met "on the word page, the kanji page and the search
+  screen", which is to say on the screens somebody had remembered — and that is
+  how it was wrong twice. The search screen was missed in one round; `/canvas`,
+  which renders the target's headword and reading inside the passage, was still
+  missing in the next and was found by a verifier driving a browser. Both misses
+  were a stale list, not a broken rule.
+
+  There is no list now. `apps/app/test/edrdg-acknowledgement.test.ts` derives the
+  obligation from this package's own provenance records
+  (`FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION`, computed from the fields whose source
+  carries `requiresOnScreenAttribution`), walks every destination in the app's
+  navigation map with its imports, and fails any screen that can reach a licensed
+  field without rendering the acknowledgement. `apps/app/e2e/edrdg-acknowledgement.spec.ts`
+  then walks the loop in a real browser and asserts the licensor is named in the
+  visible text at each stop — including the three screens that exist only after a
+  target is promoted, which is precisely the set a URL-driven route list skips.
+
+- **The smartphone/tablet obligation is now met too.** The clause asks for
+  acknowledgement "on a separate screen accessed from a menu, such as one
+  labelled 'About', 'Sources', etc." The app's **About & diagnostics** screen is
+  that screen: it is one of the four destinations in the persistent navigation
+  shell, reachable from every route, and its "Sources & licences" section renders
+  the entry disclosure together with every source in the provenance registry,
+  each with its licence and attribution. This closes the coordination request
+  `packages/seed/README.md` filed against the app shell.
+
+  Two qualifications, so this is not read as more than it is. Phase 0 ships no
+  packaged mobile app, so the clause is satisfied in advance rather than in
+  situ — it is a precondition met early, and a packaged build would still need
+  its own check. And the screen lists the project's own pending-OD-09 material
+  alongside the licensed sources: a Sources screen naming only the dictionaries
+  would let a reader take this project's prose for licensed lexicography, which
+  is the mirror-image of the failure §2.4 is about.
 
 ### 2.3 Full licence text
 
@@ -343,8 +369,14 @@ which really is CC BY-SA 3.0. It no longer backs any EDRDG claim.
   route was not in the e2e list, so nothing said so.
 - **Documentation and licence files provided.** This file, plus the two verbatim
   texts above, shipped in the repository.
-- **Share-alike.** The EDRDG-derived fields are labelled `CC BY-SA 3.0`,
-  `modification_status: "derived"`, and are confined to this package.
+- **Share-alike.** The EDRDG-derived fields are labelled `CC BY-SA 4.0` —
+  the version the licensor's own statement gives, and the version
+  `data/provenance.json` has recorded since §2.3's correction — with
+  `modification_status: "derived"`, and are confined to this package. The
+  `CC BY-SA 3.0` this line used to say was the redistributor's bundled copy
+  surviving in prose after the data itself had been relabelled, which is the
+  same drift §2.3 was written to record and is checked now by
+  `test/edrdg.test.ts`.
 - **Entry identifiers are real.** Every JMdict field carries that entry's real
   `ent_seq` in `source_entry_id`; every KANJIDIC2 field carries the literal,
   which is that file's entry identifier. Nothing is a placeholder.

@@ -64,8 +64,10 @@ import {
   useStorageFacts,
   useWriteState,
 } from '../state/app-context.tsx';
+import { seedDataset } from '../data/catalog.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { SESSION_INTEGRATION_NOTE } from './session-loop.ts';
+import { SeedEntryDisclosure, SourcesSection } from '../ui/notices.tsx';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -275,6 +277,26 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
         <Text style={[styles.mono, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
           eventType: {CLOSED_ENUMS.eventType.join(', ')}
         </Text>
+      </Section>
+
+      <Hairline />
+
+      {/*
+        The "About"/"Sources" screen the EDRDG licence statement §3 asks for by
+        name — the second of its two clauses, which LICENSES.md §2.2 has been
+        recording as unmet because no such screen existed. This destination is in
+        the persistent shell menu on every route, which is the "separate screen
+        accessed from a menu" the clause describes; the same section also carries
+        the entry disclosure, so the acknowledgement is here in both the form the
+        licence names and the form the other screens use.
+      */}
+      <Section
+        note="Where every value in this app comes from, and under what licence. Nothing in the app is sourced from anywhere not on this list."
+        testID="debug-sources"
+        title="Sources & licences"
+      >
+        <SeedEntryDisclosure />
+        <SourcesSection sources={seedDataset.provenanceSources} />
       </Section>
 
       <Hairline />

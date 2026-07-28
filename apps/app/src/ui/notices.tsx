@@ -70,6 +70,67 @@ export function SeedEntryDisclosure({
   );
 }
 
+/**
+ * The Sources screen's attribution block (EDRDG licence statement §3, clause 2).
+ *
+ * §3 has two obligations and this is the second one, which the build has been
+ * carrying as an open coordination request:
+ *
+ * > For smartphone and tablet apps, acknowledgement must be made, e.g. on a
+ * > separate screen accessed from a menu, such as one labelled "About",
+ * > "Sources", etc. It is not sufficient just to mention it on a
+ * > start-up/launch page of the app.
+ *
+ * `LICENSES.md` §2.2 recorded it as **not met** — "there is no Sources screen" —
+ * and named it a precondition for any packaged mobile app. There is one now: the
+ * shell's *About & diagnostics* destination, reached from the persistent menu on
+ * every route, which is exactly the shape the clause asks for.
+ *
+ * Every source in the registry is listed, not only the ones with an obligation.
+ * A screen that names JMdict and quietly omits the material this project wrote
+ * itself would be the mirror-image dishonesty — the reader could not tell which
+ * of the app's claims have a dictionary behind them and which do not, which is
+ * the whole distinction {@link ProvenanceLine} exists to draw.
+ */
+export function SourcesSection({
+  sources,
+  testID = 'sources-attribution',
+}: {
+  readonly sources: Readonly<Record<string, ProvenanceRecord>>;
+  readonly testID?: string;
+}): ReactNode {
+  const theme = useTheme();
+  const listed = distinctProvenance(Object.values(sources));
+
+  return (
+    <View style={styles.attributions} testID={testID}>
+      {listed.map((record) => (
+        <View
+          key={`${record.source}|${record.source_version}|${record.review_status}`}
+          style={styles.attributionBlock}
+        >
+          <Text
+            style={[
+              styles.attributionSource,
+              { color: theme.color.ink, fontFamily: theme.font.sans },
+            ]}
+          >
+            {record.source} · {record.license}
+          </Text>
+          {attributionLines(record).map((line, index) => (
+            <Text
+              key={`${index}-${line.slice(0, 24)}`}
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            >
+              {line}
+            </Text>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 /** The seed's coverage disclosure, for empty search results (controller §8). */
 export function SeedCoverageDisclosure({
   testID = 'seed-coverage-disclosure',

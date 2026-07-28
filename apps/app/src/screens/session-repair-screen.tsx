@@ -38,6 +38,7 @@ import {
 
 import { useDebugFlags } from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
+import { SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -110,6 +111,7 @@ function RepairBody({
   if (repair === null) {
     return (
       <ScreenShell
+        lede={<SeedEntryDisclosure />}
         subtitle={`For ${target.lexeme.headword}. One flow, hard-coded — Phase 0 has no general routing.`}
         testID="screen-session-repair"
         title="Repair branch"
@@ -146,6 +148,10 @@ function RepairBody({
 
   return (
     <ScreenShell
+      // The subtitle, the diagnosis prose and the contrast panel all render the
+      // JMdict headword and the kanji it is written with — words from the files,
+      // so §3 of the EDRDG statement attaches here as much as to the word page.
+      lede={<SeedEntryDisclosure />}
       subtitle={`For ${target.lexeme.headword}. One flow, hard-coded — Phase 0 has no general routing.`}
       testID="screen-session-repair"
       title="Repair branch"

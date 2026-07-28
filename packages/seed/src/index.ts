@@ -18,22 +18,29 @@
  *     kanji readings and meanings are real KANJIDIC2 entries, each carrying its
  *     real upstream identifier, but the lists are flattened into this schema's
  *     flat string arrays, so they are labelled `derived`, not `unmodified`;
- *   - EDRDG content is `licensed-redistribution`, never
- *     `primary-source-verified`: www.edrdg.org is still refused by the egress
- *     proxy, so the bytes and the licence statement come together from one
- *     pinned, hash-verified artefact and the licensor's host was never reached;
- *   - **nothing here is labelled Tatoeba.** Its hosts are unreachable, its
- *     licence text is unobtainable from any reachable host, and CC BY 2.0 FR
- *     needs per-sentence contributor attribution nothing reachable carries
- *     (LICENSES.md, deferred item D-2). The example sentences, the grammar
- *     constructions and the integration passage are this project's own writing
- *     and stay labelled as such;
- *   - KanjiVG remains the one source verified against the project's own
- *     repository over HTTPS.
+ *   - EDRDG content is `primary-source-verified`: www.edrdg.org answered this
+ *     round, so the files, the licence statement and every re-derived value came
+ *     from the licensor's own host. It was `licensed-redistribution` while only
+ *     a redistribution was reachable — and that redistribution's bundled licence
+ *     copy said CC BY-SA 3.0, which the licensor's own statement contradicts;
+ *   - **the imported tier does ship Tatoeba sentences**, under CC BY 2.0 FR,
+ *     each naming the member who contributed it. A pair whose contributor could
+ *     not be named does not ship at all, because an attribution licence with no
+ *     attributable author cannot be complied with; the count dropped for that
+ *     reason is in `data/dictionary/manifest.json`. The **fixture tier's** eight
+ *     worked example sentences, the grammar constructions and the integration
+ *     passage remain this project's own writing and stay labelled as such;
+ *   - KanjiVG is likewise verified against the project's own repository over
+ *     HTTPS, at a pinned commit.
+ *
+ * Sources whose licence obliges an acknowledgement on the *screen* rather than
+ * in a file are listed in {@link ON_SCREEN_ATTRIBUTION_SOURCES}, and the fields
+ * that carry them in {@link FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION}.
  */
 
 import grammarJson from '../data/grammar.json';
 import kanjiJson from '../data/kanji.json';
+import licencesJson from '../data/licences.json';
 import lexemesJson from '../data/lexemes.json';
 import passagesJson from '../data/passages.json';
 import provenanceJson from '../data/provenance.json';
@@ -333,6 +340,51 @@ export const allSeedRecords = [
   ...seedDataset.sentences,
   ...seedDataset.passages,
 ];
+
+/* ------------------------------------------------------------------ *
+ * Which fields oblige a screen, and not merely a file
+ * ------------------------------------------------------------------ */
+
+/**
+ * The sources whose licence is not satisfied by an attribution in a file.
+ *
+ * §3 of the EDRDG statement is the sharpest of them: "If a WWW server is
+ * providing a dictionary function or an on-screen display of words from the
+ * files, the acknowledgement must be made on each screen display." KanjiVG and
+ * Tatoeba carry the same kind of obligation, and `data/licences.json` records it
+ * per source as `requiresOnScreenAttribution`.
+ *
+ * Read out of that file rather than written here, because a second list is a
+ * second thing to forget to update.
+ */
+export const ON_SCREEN_ATTRIBUTION_SOURCES: readonly string[] = Object.entries(
+  (licencesJson as { sources: Record<string, { requiresOnScreenAttribution?: boolean }> }).sources,
+)
+  .filter(([, entry]) => entry.requiresOnScreenAttribution === true)
+  .map(([name]) => name)
+  .sort();
+
+/**
+ * Every field name in this dataset whose value comes from such a source.
+ *
+ * This is the list a consumer needs to answer "does this screen owe an
+ * acknowledgement?", and it is *derived from the data* rather than declared:
+ * a field that changes provenance changes this list, and a new field arrives in
+ * it the moment it carries a licensed source. `apps/app` scans its own screens
+ * against it (`apps/app/test/edrdg-acknowledgement.test.ts`), which is what
+ * turned "the notice is on the pages we remembered" into a checkable claim after
+ * `/canvas` shipped rendering JMdict headwords with no EDRDG string in the DOM.
+ */
+export const FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION: readonly string[] = (() => {
+  const required = new Set(ON_SCREEN_ATTRIBUTION_SOURCES);
+  const fields = new Set<string>();
+  for (const record of allSeedRecords) {
+    for (const [field, provenance] of Object.entries(record.provenance)) {
+      if (required.has(provenance.source)) fields.add(field);
+    }
+  }
+  return [...fields].sort();
+})();
 
 export const findLexeme = (id: string): SeedLexeme | undefined =>
   seedDataset.lexemes.find((lexeme) => lexeme.id === id);

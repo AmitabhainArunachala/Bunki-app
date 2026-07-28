@@ -192,6 +192,49 @@ describe('licence metadata matches the licence texts on disk and LICENSES.md', (
     }
   });
 
+  it('states one licence version for the EDRDG fields, in the data and in the prose', () => {
+    // The compliance section of LICENSES.md kept saying `CC BY-SA 3.0` for the
+    // EDRDG-derived fields long after §2.3 had recorded the correction and the
+    // registry had been relabelled 4.0 — the redistributor's bundled version
+    // surviving in prose after the data stopped believing it. A user-facing
+    // licence claim that is a version behind is worse than none, and a document
+    // that contradicts the registry beside it cannot be the compliance record it
+    // says it is.
+    //
+    // Line-scoped rather than document-scoped on purpose: LICENSES.md must stay
+    // free to *narrate* the wrong version (§2.3 is entirely about it) and free
+    // to state KanjiVG's genuine 3.0. What it may not do is attach a version to
+    // the EDRDG-derived fields that the registry does not hold.
+    const registered = binding.sources['JMdict (EDRDG)']?.license;
+    expect(registered, 'JMdict (EDRDG) is not registered in licences.json').toBe('CC BY-SA 4.0');
+
+    const misattributions = (document: string): readonly string[] =>
+      document
+        .split('\n')
+        .map((line, index) => ({ line, number: index + 1 }))
+        .filter(({ line }) => /EDRDG-(derived|sourced)/.test(line))
+        .flatMap(({ line, number }) =>
+          [...line.matchAll(/CC BY-SA \d+\.\d+/g)]
+            .filter((match) => match[0] !== registered)
+            .map((match) => `line ${String(number)} attaches ${match[0]} to EDRDG fields`),
+        );
+
+    const offenders = misattributions(licensesMd);
+    expect(offenders, offenders.join('\n')).toEqual([]);
+
+    // The negative half: the exact sentence this document shipped for two
+    // rounds. Without it, the predicate above could be loosened to something
+    // that passes on anything and nothing would notice.
+    expect(
+      misattributions('- **Share-alike.** The EDRDG-derived fields are labelled `CC BY-SA 3.0`,'),
+    ).toHaveLength(1);
+    // …and KanjiVG's genuine 3.0 is not an offender, because the rule is scoped
+    // to lines that attach a version to the EDRDG fields specifically.
+    expect(
+      misattributions('- **Share-alike** — the derived KanjiVG fields are `CC BY-SA 3.0`.'),
+    ).toHaveLength(0);
+  });
+
   it('requires the on-screen attribution flag to be honoured by the disclosure', async () => {
     const { SEED_ENTRY_DISCLOSURE } = await import('../src/index.ts');
     for (const [name, entry] of Object.entries(binding.sources)) {

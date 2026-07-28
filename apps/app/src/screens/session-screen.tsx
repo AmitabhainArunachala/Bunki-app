@@ -37,6 +37,7 @@ import {
 
 import { useDebugFlags } from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
+import { SeedEntryDisclosure } from '../ui/notices.tsx';
 import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -213,6 +214,10 @@ function SessionBody({
   if (runtime === null) {
     return (
       <ScreenShell
+        // The intro names the word the sitting will be built from, which is a
+        // JMdict headword on a screen — the display §3 of the EDRDG statement
+        // attaches the acknowledgement to.
+        lede={<SeedEntryDisclosure />}
         subtitle={`A finite sitting for the time you have. ${String(timeBudgetMin)} minutes, one new item at most.`}
         testID="screen-session"
         title="Session"
@@ -280,6 +285,7 @@ function SessionBody({
 
   return (
     <ScreenShell
+      lede={<SeedEntryDisclosure />}
       subtitle={`${String(plan.stepCount)} steps · about ${String(plan.estimatedMinutes)} min of the ${String(plan.budget.timeBudgetMin)} you gave`}
       testID="screen-session"
       title="Session"

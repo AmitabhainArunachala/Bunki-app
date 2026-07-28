@@ -227,22 +227,34 @@ WP-04 dataset complete and re-sourced from primary hosts. **D-1, D-1a, D-2 and
 D-3 all closed.** D-4 (upstream moves on; this is a dated snapshot) is open by
 nature and is what `--verify-fixtures` exists to answer.
 
-Not done, and deliberately: a **Sources / About screen**. §3 of the EDRDG licence
-requires that a smartphone or tablet app acknowledge the files on a separate
-screen reached from a menu, not only inline. The Phase-0 surface is Expo Web,
-where the "acknowledgement on each screen display" clause governs. The dedicated
-screen needs `apps/app/app/_layout.tsx` and the navigation map, which the
-orchestration spec assigns to the shell owner — so it is raised as a coordination
-request rather than edited across that boundary.
+**The Sources / About screen coordination request is closed.** §3 of the EDRDG
+licence requires that a smartphone or tablet app acknowledge the files on a
+separate screen reached from a menu, not only inline. That screen needed
+`apps/app/app/_layout.tsx` and the navigation map, which the orchestration spec
+assigns to the shell owner, so it was raised across the boundary rather than
+edited. The shell surface was granted for this wave and the request executed: the
+app's **About & diagnostics** destination — one of the four in the persistent
+navigation shell — now carries a "Sources & licences" section listing every
+source in the provenance registry with its licence and attribution, beside the
+entry disclosure itself.
 
-**"Each screen display" means each, and this package got that wrong once.** The
-claim used to be that the clause was satisfied by `SEED_ENTRY_DISCLOSURE` on every
-word and kanji page. The search screen also displays words from the files — a
+**"Each screen display" means each, and this package got that wrong twice.** The
+claim was once that the clause was satisfied by `SEED_ENTRY_DISCLOSURE` on every
+word and kanji page. The **search screen** also displays words from the files — a
 result row is a reading, a set of senses and a part of speech, every one of them a
 JMdict field — and it carried no acknowledgement at all, because the only notice
 it rendered was the coverage disclosure, which appears exactly when nothing
-matched. The disclosure now renders on the search screen whenever a result does,
-and `apps/app/e2e/adv-claim-audit.spec.ts` drives a populated search on `/` and
-fails if the words "Electronic Dictionary Research and Development Group" are
-absent from the page. A route list is not a proof of coverage; the routes it omits
-are where the obligation goes unmet.
+matched. That was fixed by adding one route to a list. The **canvas** renders the
+target's headword and reading inside the passage and was still missing, which a
+verifier found by driving a browser.
+
+Both misses were the list, not the rule, so the list is gone. This package now
+exports `FIELDS_REQUIRING_ON_SCREEN_ATTRIBUTION`, derived from its own records by
+asking which fields carry a source whose licence demands on-screen attribution.
+`apps/app/test/edrdg-acknowledgement.test.ts` walks every destination in the
+navigation map, follows its imports, and fails any screen that can reach one of
+those fields without rendering the acknowledgement — with a negative control, so
+it cannot pass by being vacuous. `apps/app/e2e/edrdg-acknowledgement.spec.ts`
+then walks the loop in a browser and asserts the licensor is named in the visible
+text of each screen, including the three that exist only after a target is
+promoted and which no URL-driven route list ever reached.
