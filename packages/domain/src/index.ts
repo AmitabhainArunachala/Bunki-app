@@ -46,3 +46,4 @@ export * from './reducers/index.ts';
 export * from './replay/index.ts';
 export * from './session/index.ts';
 export * from './graph/index.ts';
+export * from './journey/index.ts';

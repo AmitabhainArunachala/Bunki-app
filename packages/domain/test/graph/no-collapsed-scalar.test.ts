@@ -36,12 +36,8 @@ function code(path: string): string {
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
-/**
- * Extended as projection directories land. `src/journey/` joins the list in the
- * same commit that creates it, so the scan never quietly stops covering a
- * surface it was written for.
- */
-const PROJECTION_DIRECTORIES = ['src/graph'];
+/** Both projection surfaces. A directory added later must be added here too. */
+const PROJECTION_DIRECTORIES = ['src/graph', 'src/journey'];
 
 const files = PROJECTION_DIRECTORIES.flatMap((directory) =>
   sourceFiles(join(PACKAGE_ROOT, directory)),
