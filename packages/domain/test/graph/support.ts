@@ -276,6 +276,47 @@ export function instant(dayOffset: number, hour = 9): IsoInstant {
   return `2026-${monthText}-${day}T${hourText}:00:00.000Z`;
 }
 
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+function monthLengthsFor(year: number): readonly number[] {
+  return [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+}
+
+/**
+ * The same calendar arithmetic as {@link instant}, but allowed past the year end.
+ *
+ * `instant` stays inside 2026 so the small fixtures read as one year. The time
+ * scrubber's own claim is *fourteen months* at daily resolution, which does not
+ * fit in one, and a performance test of the scrubber that quietly shortened the
+ * span to fit its helper would be measuring a different feature. Still pure
+ * arithmetic and still no `Date`, so the frames are reproducible bytes.
+ */
+export function dayInstant(dayOffset: number, hour = 9): IsoInstant {
+  let year = 2026;
+  let remaining = dayOffset;
+  let lengths = monthLengthsFor(year);
+  let daysInYear = isLeapYear(year) ? 366 : 365;
+  while (remaining >= daysInYear) {
+    remaining -= daysInYear;
+    year += 1;
+    lengths = monthLengthsFor(year);
+    daysInYear = isLeapYear(year) ? 366 : 365;
+  }
+
+  let month = 0;
+  while (month < 11 && remaining >= (lengths[month] ?? 31)) {
+    remaining -= lengths[month] ?? 31;
+    month += 1;
+  }
+
+  const day = String(remaining + 1).padStart(2, '0');
+  const monthText = String(month + 1).padStart(2, '0');
+  const hourText = String(hour).padStart(2, '0');
+  return `${String(year)}-${monthText}-${day}T${hourText}:00:00.000Z`;
+}
+
 export function contractsFor(
   componentId: string,
   skills: readonly ProjectedContract['skill'][],

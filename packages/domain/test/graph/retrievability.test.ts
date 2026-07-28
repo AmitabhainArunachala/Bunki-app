@@ -393,6 +393,58 @@ describe('the time scrubber replays growth from the log, and only reads', () => 
     expect(JSON.stringify(histories)).toBe(before);
   });
 
+  /**
+   * The hoist that made the scrubber affordable shares one frozen bucketing
+   * across every frame, and the tempting next step — sharing one mutable "state
+   * as of now" map too — would alias every frame onto the last one. Reading the
+   * frames out of order is how that shows up, so this reads them backwards.
+   */
+  it('gives each frame its own answer, whatever order the frames are read in', () => {
+    const timeline = buildRetrievabilityIndexTimeline([READING_CONTRACT], histories, [
+      instant(1),
+      instant(12),
+      instant(25),
+      instant(60),
+    ]);
+
+    const backwards = [...timeline]
+      .reverse()
+      .map((frame) => projectNodeRetrievability(frame.index, NODE, frame.at))
+      .reverse();
+
+    expect(backwards.map((entry) => lensOf(entry, 'reading')?.admittedReviewCount)).toEqual([
+      0, 1, 2, 3,
+    ]);
+    expect(timeline.map((frame) => frame.index.memoryStateCount)).toEqual([1, 1, 1, 1]);
+  });
+
+  /**
+   * A node's sparkline narrows the contract set to the node's own components
+   * before it walks the frames. That is only legitimate if it changes no answer,
+   * so: the same node, once against its own contract and once against a contract
+   * set with an unrelated component in it.
+   */
+  it('answers identically whether or not unrelated contracts are handed over', () => {
+    const unrelated: ProjectedContract = {
+      contractId: 'contract:kc:別:orthography_to_reading',
+      targetComponentId: 'kc:別',
+      skill: 'orthography_to_reading',
+    };
+    const unrelatedHistories = buildMemoryHistories(activationsFor([unrelated], instant(2)), [
+      { contractId: unrelated.contractId, effectiveGrade: 'again', reviewedAt: instant(3) },
+    ]);
+    const frames = [instant(1), instant(12), instant(25), instant(60)];
+
+    expect(
+      projectNodeRetrievabilityOverTime(
+        [READING_CONTRACT, unrelated],
+        [...histories, ...unrelatedHistories],
+        NODE,
+        frames,
+      ),
+    ).toEqual(projectNodeRetrievabilityOverTime([READING_CONTRACT], histories, NODE, frames));
+  });
+
   it('ignores a review for a contract nothing activated, without throwing', () => {
     const orphaned = buildMemoryHistories(
       [],

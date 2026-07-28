@@ -76,19 +76,26 @@ export interface ProjectedContract {
   readonly skill: RetrievalSkill;
 }
 
-/** Per contract: what it tests, and the scheduler's state for it (or none). */
-interface ContractWithState {
-  readonly contract: ProjectedContract;
-  readonly state: MemoryState | null;
-}
-
 /**
  * The Trace, indexed for the map.
+ *
+ * Two halves, deliberately separated, because only one of them depends on time:
+ *
+ *   - `byComponentSkill` is a function of the **contract set** alone. It says
+ *     which contracts test a given (component, skill) pair, and that answer does
+ *     not change when the instant changes.
+ *   - `stateOf` is the half that does change. It answers with the pinned
+ *     scheduler's state for one contract *at this index's instant*, or `null`.
  *
  * Built once from replay output; every node query afterwards is a map lookup
  * per component id. Over the dictionary tier this is what keeps a full-map
  * render linear in the number of *drawn* nodes rather than in the number of
  * contracts.
+ *
+ * The split is also what makes the time scrubber affordable: a timeline over one
+ * contract set builds the bucketing once and gives every frame its own
+ * `stateOf`. Collapsing the two halves back together was a real defect here,
+ * with a measured cost — see {@link buildRetrievabilityIndexTimeline}.
  */
 export interface RetrievabilityIndex {
   /**
@@ -99,8 +106,22 @@ export interface RetrievabilityIndex {
    * pairs can collide on one key. Written as an escape rather than as a raw
    * byte: a literal NUL in a source file makes it binary to `git diff`, and
    * a separator nobody can see in review is a separator nobody can check.
+   *
+   * Buckets are sorted by contract id so a node with two contracts on one skill
+   * projects identically whichever order replay happened to emit them in.
    */
-  readonly byComponentSkill: ReadonlyMap<string, readonly ContractWithState[]>;
+  readonly byComponentSkill: ReadonlyMap<string, readonly ProjectedContract[]>;
+  /**
+   * The pinned scheduler's state for one contract at this index's instant, or
+   * `null` when the contract has none yet.
+   *
+   * A lookup, never a derivation. Nothing behind this function grades,
+   * schedules, or folds a review the gate has not already admitted; a static
+   * index answers from a map built out of replay's own states, and a scrubber
+   * frame answers from the version list {@link buildMemoryHistories} folded with
+   * the same reducer replay uses.
+   */
+  readonly stateOf: (contractId: ContractId) => MemoryState | null;
   readonly contractCount: number;
   readonly memoryStateCount: number;
 }
@@ -109,36 +130,47 @@ function key(componentId: string, skill: RetrievalSkill): string {
   return `${componentId}\u0000${skill}`;
 }
 
+/**
+ * The time-invariant half of an index, alone, so a timeline can build it once
+ * for a whole scrubber run instead of once per frame.
+ */
+interface ContractBuckets {
+  readonly byComponentSkill: ReadonlyMap<string, readonly ProjectedContract[]>;
+  readonly contractCount: number;
+}
+
+function buildContractBuckets(contracts: readonly ProjectedContract[]): ContractBuckets {
+  const byComponentSkill = new Map<string, ProjectedContract[]>();
+  contracts.forEach((contract) => {
+    const bucketKey = key(contract.targetComponentId, contract.skill);
+    const bucket = byComponentSkill.get(bucketKey);
+    if (bucket === undefined) byComponentSkill.set(bucketKey, [contract]);
+    else bucket.push(contract);
+  });
+
+  const frozen = new Map<string, readonly ProjectedContract[]>();
+  byComponentSkill.forEach((bucket, bucketKey) => {
+    // Sorted so a node with two contracts on one skill projects identically
+    // whichever order replay happened to emit them in.
+    bucket.sort((left, right) => (left.contractId < right.contractId ? -1 : 1));
+    frozen.set(bucketKey, Object.freeze(bucket));
+  });
+
+  return Object.freeze({ byComponentSkill: frozen, contractCount: contracts.length });
+}
+
 export function buildRetrievabilityIndex(
   contracts: readonly ProjectedContract[],
   memoryStates: readonly MemoryState[],
 ): RetrievabilityIndex {
   const stateByContract = new Map<ContractId, MemoryState>();
   memoryStates.forEach((state) => stateByContract.set(state.contractId, state));
-
-  const byComponentSkill = new Map<string, ContractWithState[]>();
-  contracts.forEach((contract) => {
-    const entry: ContractWithState = {
-      contract,
-      state: stateByContract.get(contract.contractId) ?? null,
-    };
-    const bucketKey = key(contract.targetComponentId, contract.skill);
-    const bucket = byComponentSkill.get(bucketKey);
-    if (bucket === undefined) byComponentSkill.set(bucketKey, [entry]);
-    else bucket.push(entry);
-  });
-
-  const frozen = new Map<string, readonly ContractWithState[]>();
-  byComponentSkill.forEach((bucket, bucketKey) => {
-    // Sorted so a node with two contracts on one skill projects identically
-    // whichever order replay happened to emit them in.
-    bucket.sort((left, right) => (left.contract.contractId < right.contract.contractId ? -1 : 1));
-    frozen.set(bucketKey, Object.freeze(bucket));
-  });
+  const buckets = buildContractBuckets(contracts);
 
   return Object.freeze({
-    byComponentSkill: frozen,
-    contractCount: contracts.length,
+    byComponentSkill: buckets.byComponentSkill,
+    stateOf: (contractId: ContractId) => stateByContract.get(contractId) ?? null,
+    contractCount: buckets.contractCount,
     memoryStateCount: memoryStates.length,
   });
 }
@@ -276,7 +308,7 @@ function projectLens(
   lens: CapabilityLens,
   at: IsoInstant,
 ): LensProjection {
-  const entries: ContractWithState[] = [];
+  const entries: ProjectedContract[] = [];
   LENS_SKILLS[lens].forEach((skill) => {
     componentIds.forEach((componentId) => {
       const bucket = index.byComponentSkill.get(key(componentId, skill));
@@ -295,8 +327,8 @@ function projectLens(
   const contributingContractIds: ContractId[] = [];
 
   for (const entry of entries) {
-    contributingContractIds.push(entry.contract.contractId);
-    const state = entry.state;
+    contributingContractIds.push(entry.contractId);
+    const state = index.stateOf(entry.contractId);
     if (state === null) continue;
     admittedReviewCount += state.admittedReviewCount;
     lapses += state.lapses;
@@ -506,23 +538,66 @@ export function buildMemoryHistories(
   return Object.freeze(histories);
 }
 
-/** The version current at `at`, or `null` if the contract did not exist yet. */
+/**
+ * The version current at `at`, or `null` if the contract did not exist yet.
+ *
+ * A binary search rather than a scan, because the scrubber asks this once per
+ * frame per contract: `versions` is ascending by construction, so the answer is
+ * the rightmost version whose `from` has not passed `at`. Ties keep the last
+ * matching version, which is what a linear scan did and what a review landing on
+ * the activation instant should mean.
+ */
 export function memoryStateAsOf(history: MemoryHistory, at: IsoInstant): MemoryState | null {
+  const versions = history.versions;
+  let low = 0;
+  let high = versions.length - 1;
   let found: MemoryState | null = null;
-  for (const version of history.versions) {
-    if (compareInstants(version.from, at) > 0) break;
-    found = version.state;
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    const version = versions[middle];
+    if (version === undefined) break;
+    if (compareInstants(version.from, at) <= 0) {
+      found = version.state;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
   }
   return found;
 }
 
 /**
- * A scrubber run: one index per frame, sharing one pass over the histories.
+ * A scrubber run: one index per frame, over one contract set.
  *
- * Frames are sorted ascending and each history keeps a cursor, so the cost is
- * O(frames + versions) per contract rather than O(frames x versions). Fourteen
- * months at daily resolution over the dictionary tier is one linear pass, which
- * is what makes the scrubber a projection rather than a re-derivation.
+ * ## The cost, stated correctly
+ *
+ * The first version of this function claimed O(frames + versions) and was
+ * Theta(frames x contracts): it advanced a per-history cursor — which really is
+ * linear — and then called `buildRetrievabilityIndex(contracts, ...)` *inside*
+ * the per-frame loop, rebuilding the whole (component, skill) bucketing from
+ * every contract on every frame. Measured on the 3,000-lexeme tier, 426 daily
+ * frames took ~1.2s; with the frames placed entirely after the last review, so
+ * that no cursor ever advanced, it still took ~1.1s. The cursor was not the
+ * cost. The rebuild was, and it made one node's fourteen-month sparkline cost
+ * about as much as the whole map's timeline.
+ *
+ * What is actually invariant across frames is the bucketing: it is a function of
+ * `contracts`, and `contracts` does not change. So it is built once, and a frame
+ * is that shared bucketing plus its own `stateOf`, which answers from the
+ * contract's version list by binary search. The remaining per-frame work is one
+ * object.
+ *
+ *   - setup: O(contracts + histories log histories)
+ *   - per frame: O(1) to construct, O(log versions) per contract actually read
+ *
+ * Fourteen months at daily resolution is therefore paid for by the nodes a
+ * surface chooses to draw, not by the length of the timeline — which is what
+ * makes the scrubber a projection rather than a re-derivation.
+ *
+ * Frames are independent. Nothing is shared between them but the frozen
+ * bucketing and the caller's own histories, so holding frame 3 and then reading
+ * frame 0 cannot show frame 3's state — the failure mode a shared mutable
+ * "current state" map would have introduced.
  */
 export function buildRetrievabilityIndexTimeline(
   contracts: readonly ProjectedContract[],
@@ -530,28 +605,52 @@ export function buildRetrievabilityIndexTimeline(
   frames: readonly IsoInstant[],
 ): readonly { readonly at: IsoInstant; readonly index: RetrievabilityIndex }[] {
   const ordered = [...frames].sort(compareInstants);
-  const cursors = histories.map(() => 0);
-  const current = new Map<ContractId, MemoryState>();
+  const buckets = buildContractBuckets(contracts);
+
+  const historyByContract = new Map<ContractId, MemoryHistory>();
+  histories.forEach((history) => historyByContract.set(history.contractId, history));
+
+  // `memoryStateCount` is the one per-frame number that is not a lookup. A
+  // contract has a state at `at` exactly when its *first* version — activation —
+  // has landed, so one ascending list of activation instants walked against the
+  // sorted frames answers every frame in O(frames + histories). This is the
+  // linear pass the old doc comment described; it just was not the expensive
+  // part.
+  const activatedAt = histories
+    .flatMap((history) => {
+      const first = history.versions[0];
+      return first === undefined ? [] : [first.from];
+    })
+    .sort(compareInstants);
+
+  let pending = 0;
+  let activated = 0;
+  const activatedByFrame = ordered.map((at) => {
+    while (pending < activatedAt.length) {
+      const from = activatedAt[pending];
+      if (from === undefined) break;
+      if (compareInstants(from, at) > 0) break;
+      activated += 1;
+      pending += 1;
+    }
+    return activated;
+  });
 
   return Object.freeze(
-    ordered.map((at) => {
-      histories.forEach((history, position) => {
-        let cursor = cursors[position] ?? 0;
-        while (cursor < history.versions.length) {
-          const version = history.versions[cursor];
-          if (version === undefined) break;
-          if (compareInstants(version.from, at) > 0) break;
-          current.set(history.contractId, version.state);
-          cursor += 1;
-        }
-        cursors[position] = cursor;
-      });
-
-      return Object.freeze({
+    ordered.map((at, position) =>
+      Object.freeze({
         at,
-        index: buildRetrievabilityIndex(contracts, [...current.values()]),
-      });
-    }),
+        index: Object.freeze({
+          byComponentSkill: buckets.byComponentSkill,
+          stateOf: (contractId: ContractId) => {
+            const history = historyByContract.get(contractId);
+            return history === undefined ? null : memoryStateAsOf(history, at);
+          },
+          contractCount: buckets.contractCount,
+          memoryStateCount: activatedByFrame[position] ?? 0,
+        }),
+      }),
+    ),
   );
 }
 
@@ -561,6 +660,13 @@ export function buildRetrievabilityIndexTimeline(
  * Exposure is never retrieval (REQ-DM-07, T-08). Scrubbing a year of history is
  * a read of the log and produces no event, no grade, and no scheduling change —
  * there is nothing in this function that could.
+ *
+ * The caller hands over the whole contract set because it is the same set the
+ * map holds; drawing *one* node's sparkline out of it should not be a whole-map
+ * cost. Only contracts whose `targetComponentId` is one of this node's can ever
+ * land in a bucket {@link projectLens} reads for it, so narrowing to those (and
+ * to their histories) is result-preserving and costs one linear pass instead of
+ * one per frame.
  */
 export function projectNodeRetrievabilityOverTime(
   contracts: readonly ProjectedContract[],
@@ -568,8 +674,15 @@ export function projectNodeRetrievabilityOverTime(
   node: Pick<GraphNode, 'id' | 'componentIds'>,
   frames: readonly IsoInstant[],
 ): readonly NodeRetrievability[] {
+  const componentIds = new Set(node.componentIds);
+  const nodeContracts = contracts.filter((contract) =>
+    componentIds.has(contract.targetComponentId),
+  );
+  const nodeContractIds = new Set(nodeContracts.map((contract) => contract.contractId));
+  const nodeHistories = histories.filter((history) => nodeContractIds.has(history.contractId));
+
   return Object.freeze(
-    buildRetrievabilityIndexTimeline(contracts, histories, frames).map((frame) =>
+    buildRetrievabilityIndexTimeline(nodeContracts, nodeHistories, frames).map((frame) =>
       projectNodeRetrievability(frame.index, node, frame.at),
     ),
   );

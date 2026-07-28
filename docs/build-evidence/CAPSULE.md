@@ -4891,3 +4891,186 @@ appendix above records. Neither is touched by this lane.
 Open a **draft** PR from `agent/bunki-e-projections` into
 `agent/bunki-campaign-e` and have a human review it. Nothing here is merged; no
 agent may merge, approve, or push to `main`.
+
+---
+
+## Appendix — Campaign E, wave A2 (Builder A2, repair round): the scrubber's complexity claim was false, and the cost was user-visible
+
+**Branch:** `agent/bunki-e-projections`
+**Base:** `24c66cb` (the projections lane's own head)
+**Scope:** one P1 from the verifier's pass over the A2 lane. Nothing else in the
+lane was reopened; no requirement, no test, and no honesty guard was weakened.
+
+### Retraction first
+
+The A2 appendix above, in §2 "The retrievability projection", ends its time
+scrubber bullet with:
+
+> Frames are sorted and walked with a per-contract cursor, so fourteen months is
+> one linear pass.
+
+**That sentence is withdrawn.** So is the claim it was copied from, the doc
+comment on `buildRetrievabilityIndexTimeline`, which said the cost was
+"O(frames + versions) per contract rather than O(frames x versions)" and that
+fourteen months at daily resolution over the dictionary tier was "one linear
+pass, which is what makes the scrubber a projection rather than a
+re-derivation". Both were false. The corrected statement is in the section
+"What it actually cost" below, and the doc comment in
+`packages/domain/src/graph/retrievability.ts` now carries it.
+
+### The finding, restated from the code
+
+The cursor walk was real. The line underneath it was not. Inside the per-frame
+`ordered.map(...)`, after advancing the cursors, the old function called
+
+```ts
+index: buildRetrievabilityIndex(contracts, [...current.values()]),
+```
+
+`contracts` is the *whole* contract set and does not vary by frame, so every
+frame rebuilt the entire (componentId + skill) bucketing from scratch. The
+function was therefore Theta(frames x contracts), not O(frames + versions). The
+cursor optimisation the comment described was genuine and irrelevant — it saved
+a rescan of the version lists, which was never the expensive part.
+
+### What it actually cost — measured, on this machine, before the fix
+
+Attribution on three axes, because "it is slow" is not a finding:
+
+| Held fixed | Varied | Measured |
+| --- | --- | --- |
+| frames = 200 | contracts 250 / 500 / 1000 / 2000 / 4000 | 42 / 68 / 158 / 347 / 971 ms — linear in contracts |
+| contracts = 2000 | frames 50 / 100 / 200 / 400 | 137 / 182 / 401 / 1024 ms — doubling per doubling |
+| everything | 426 frames placed entirely **after** the last review, so no cursor ever advances | 1135 ms — the cursor contributes essentially nothing |
+
+Full tier, 426 daily frames (fourteen months) over 3,000 contracts: **1357 ms**.
+One node's fourteen-month sparkline via `projectNodeRetrievabilityOverTime`:
+**1192 ms** — 0.88x the whole map's timeline. Drawing one node's history cost
+about as much as drawing every node's.
+
+That is the user-visible half. The campaign brief names the time scrubber as a
+headline feature of the map, and lane B1 consumes this API; a per-node sparkline
+that costs a whole-map render is a scrubber that stutters on the surface the
+brief calls the emotional centre of the app.
+
+### The fix
+
+**1. Split the index into its time-invariant and time-varying halves.**
+`RetrievabilityIndex` now carries `byComponentSkill:
+ReadonlyMap<string, readonly ProjectedContract[]>` — a function of the contract
+set alone — and `stateOf(contractId): MemoryState | null`, the half that depends
+on the instant. `buildRetrievabilityIndex` answers `stateOf` from a map built
+out of replay's own states, exactly as before. The internal `ContractWithState`
+pairing is gone; it was what forced state and bucketing to be built together.
+
+**2. Hoist the bucketing out of the frame loop.**
+`buildRetrievabilityIndexTimeline` builds the buckets once, indexes the
+histories by contract id once, and gives each frame its own `stateOf` closing
+over that frame's instant. Per-frame construction is one object. The one
+per-frame number that is not a lookup, `memoryStateCount`, comes from a genuine
+two-pointer merge — a contract has a state at `at` exactly when its first
+version (activation) has landed, so one ascending list of activation instants
+walked against the sorted frames answers every frame in O(frames + histories).
+`memoryStateAsOf` became a binary search, since the scrubber now asks it once
+per frame per contract read.
+
+**3. Narrow the contract set for a one-node sparkline.**
+`projectNodeRetrievabilityOverTime` filters `contracts` to those whose
+`targetComponentId` is one of the node's, and `histories` to those contracts,
+before walking frames. Only such contracts can ever land in a bucket
+`projectLens` reads for that node, so the narrowing is result-preserving — and
+that is asserted, not asserted-in-a-comment: a test projects the same node with
+and without an unrelated contract in the array and requires the two sparklines
+to be `toEqual`.
+
+**Frames stay independent.** The tempting next step after hoisting the buckets
+is to share one mutable "state as of now" map too, which would alias every frame
+onto the last one read. Nothing is shared between frames but the frozen
+bucketing and the caller's own histories.
+
+### The corrected complexity, stated plainly
+
+- setup: O(contracts + histories log histories)
+- per frame: O(1) to construct; O(log versions) per contract actually read
+- fourteen months of daily frames is therefore paid for by the nodes a surface
+  chooses to draw, not by the length of the timeline
+
+### After the fix — same machine, same fixtures
+
+| Measurement | Before | After |
+| --- | --- | --- |
+| 426 frames x 3,000 contracts | 1357 ms | **27 ms** |
+| contracts = 2000, frames 50 / 100 / 200 / 400 | 137 / 182 / 401 / 1024 ms | 2 / 3 / 2 / 2 ms |
+| 426 frames, all after the last review | 1135 ms | 6 ms |
+| one node's 14-month sparkline | 1192 ms | **5 ms** |
+
+### Tests
+
+Five new tests. The two that carry the claim are scaling assertions in
+`packages/domain/test/graph/dictionary-tier-performance.test.ts`, written to
+mirror the size-independence assertion the neighbourhood walk already had:
+
+| Claim | Assertion | Against the old code |
+| --- | --- | --- |
+| Fourteen months of frames costs about what two frames cost | `allMs < max(300, twoMs * 4 + 100)` | **FAIL** — "2 frames: 11ms, 426 frames: 1260ms" |
+| One node's sparkline costs the same over 3,000 contracts as over 300 | `largeMs < max(200, smallMs * 4 + 100)` | **FAIL** — "300 contracts: 91ms, 3000 contracts: 1049ms" |
+| A 14-month whole-tier timeline fits inside a screen transition | `< 1000 ms` (absolute ceiling) | **FAIL** — 1260 ms |
+
+All three were run against the pre-fix `retrievability.ts` with the new tests in
+place, and all three failed; that is the discriminator check, and it is the only
+reason to trust a performance test at all. The other two new tests are
+correctness guards, in `retrievability.test.ts`: frames read backwards still give
+each frame its own answer (the aliasing failure mode), and the sparkline is
+`toEqual` with and without unrelated contracts in the input (the narrowing is
+result-preserving).
+
+`test/graph/support.ts` gains `dayInstant`, the multi-year sibling of `instant`,
+because the scrubber's own claim is *fourteen* months and the existing helper
+stops at one year. Still pure calendar arithmetic, still no `Date`.
+
+### What did not change
+
+No requirement was reinterpreted. `LensProjection` still carries four separate
+values and no fifth that summarises them; `no-collapsed-scalar.test.ts` still
+passes, including the identifier scan over `src/graph`. The scrubber still folds
+only reviews the gate already admitted, through the same
+`initialMemoryState` / `applyAdmittedReview` pair replay uses — the one bullet in
+§2 above that was true stays true, and `no-collapsed-scalar.test.ts` still pins
+those two call sites to this one file. `stateOf` is a lookup with no derivation
+behind it: exposure is still never retrieval, and scrubbing a year still produces
+no event, no grade, and no scheduling change.
+
+### §17.5 check set — re-run in this worktree after `npm ci`
+
+| Command | Result |
+| --- | --- |
+| `npm ci` (own worktree, no inherited modules) | clean install, exit 0 |
+| `npm run lint` | pass, no output |
+| `npm run format:check` | pass — "All matched files use Prettier code style!" |
+| `npm run typecheck` | pass, root + 6 workspaces |
+| `npm run test` | **1594 passed**, 96 files (was 1589 / 96) |
+| `npm run test:replay` (T-03) | 47 passed, 2 files |
+| `npm run verify:export` (T-14) | 14 passed, 1 file |
+| `npm run test:e2e` | **38 passed**, exit 0 |
+
+### What a verifier should try to break
+
+1. Move `buildContractBuckets(contracts)` back inside the `ordered.map` in
+   `buildRetrievabilityIndexTimeline` and confirm **both** scaling assertions go
+   red. Either one alone would let the other kind of regression through.
+2. Delete the narrowing in `projectNodeRetrievabilityOverTime` and confirm the
+   sparkline size-independence test goes red while the equality test stays
+   green — the narrowing is an optimisation, and its correctness guard must not
+   be the thing that catches its removal.
+3. Replace the per-frame `stateOf` with one shared mutable map advanced by a
+   cursor and confirm the backwards-read test goes red. The forward-read test
+   will not catch it, which is why it reads backwards.
+4. Point `memoryStateAsOf`'s binary search at the *first* matching version
+   instead of the last and confirm the "answers with the state as it stood"
+   assertions fail on the review-on-activation-instant case.
+
+### Next safe command
+
+Open a **draft** PR from `agent/bunki-e-projections` into
+`agent/bunki-campaign-e` and have a human review it. Nothing here is merged; no
+agent may merge, approve, or push to `main`.
