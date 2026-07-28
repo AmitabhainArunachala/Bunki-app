@@ -181,7 +181,11 @@ export function WordScreen({
     return (
       <ScreenShell testID="screen-word" title="Word">
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -190,7 +194,11 @@ export function WordScreen({
     return (
       <ScreenShell testID="screen-word" title="Word">
         <EmptyPanel detail={state.detail} message={state.message} />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -618,7 +626,11 @@ export function WordScreen({
       </Section>
 
       <Hairline />
-      <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+      <AppButton
+        accessibilityHint="Returns to the map."
+        label="Back to 地図 Map"
+        onPress={onBack}
+      />
     </ScreenShell>
   );
 }

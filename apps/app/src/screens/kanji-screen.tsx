@@ -183,7 +183,11 @@ export function KanjiScreen({
     return (
       <ScreenShell testID="screen-kanji" title="Kanji">
         <ErrorPanel detail={state.detail} message={state.message} onRetry={retry} />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -192,7 +196,11 @@ export function KanjiScreen({
     return (
       <ScreenShell testID="screen-kanji" title="Kanji">
         <EmptyPanel detail={state.detail} message={state.message} />
-        <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+        <AppButton
+          accessibilityHint="Returns to the map."
+          label="Back to 地図 Map"
+          onPress={onBack}
+        />
       </ScreenShell>
     );
   }
@@ -666,7 +674,11 @@ function Dive({
         {SCALE_LEVELS.map((level) => SCALE_LEVEL_NAMES[level].gloss).join(' · ')}. Where a level is
         empty in this build the dive says so above rather than leaving a blank.
       </Text>
-      <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
+      <AppButton
+        accessibilityHint="Returns to the map."
+        label="Back to 地図 Map"
+        onPress={onBack}
+      />
     </ScreenShell>
   );
 }

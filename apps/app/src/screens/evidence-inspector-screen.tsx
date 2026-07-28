@@ -139,7 +139,7 @@ export function EvidenceInspectorScreen({
     flags,
     emptyMessage: 'Nothing to inspect yet.',
     emptyDetail:
-      'The evidence inspector reads your own event log. Capture and keep something on the search screen first, and its chain appears here.',
+      'The evidence inspector reads your own event log. Press 拾う Capture, which is offered on every screen, and keep something — its chain appears here.',
   });
 
   const thread = state.kind === 'ready' ? state.data : null;

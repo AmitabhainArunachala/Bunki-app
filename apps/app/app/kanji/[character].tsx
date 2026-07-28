@@ -43,7 +43,7 @@ export default function KanjiRoute(): ReactNode {
       <RouteTitle detail={resolved} href="/kanji/[character]" />
       <KanjiScreen
         character={resolved}
-        onBack={() => router.push('/')}
+        onBack={() => router.replace('/')}
         onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
         strokeSvg={svg}
         strokes={svg === null ? importedStrokeSet(resolved) : null}

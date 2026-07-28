@@ -130,7 +130,7 @@ export const SESSION_INTEGRATION_NOTE =
  * here" is the failure mode this replaced: the previous bootstrap avoided the
  * empty state by inventing an encounter, which is worse than an honest blank.
  */
-export const NO_PROMOTED_TARGET_NOTE = `A sitting is planned over what you have taken up for study, so there is nothing to plan yet. Keep an encounter on the capture screen and then choose “Take it up for study” on it — that is the only thing in this app that promotes a thread, and it has to be you. ${DEFAULT_CANONICAL_TARGET} is the word the seed’s passage is written around, so it is the one that also opens the integration canvas.`;
+export const NO_PROMOTED_TARGET_NOTE = `A sitting is planned over what you have taken up for study, so there is nothing to plan yet. Press 拾う Capture — it is offered on every screen — keep an encounter, and then choose “Take it up for study” on it — that is the only thing in this app that promotes a thread, and it has to be you. ${DEFAULT_CANONICAL_TARGET} is the word the seed’s passage is written around, so it is the one that also opens the integration canvas.`;
 
 const readingContractIdFor = (lexeme: SeedLexeme): string => `contract-reading-${lexeme.id}`;
 const meaningContractIdFor = (lexeme: SeedLexeme): string => `contract-meaning-${lexeme.id}`;

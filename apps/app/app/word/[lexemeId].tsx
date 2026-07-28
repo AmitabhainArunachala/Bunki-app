@@ -22,7 +22,7 @@ export default function WordRoute(): ReactNode {
       <RouteTitle detail={headword} href="/word/[lexemeId]" />
       <WordScreen
         lexemeId={resolved}
-        onBack={() => router.push('/')}
+        onBack={() => router.replace('/')}
         onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
         onOpenWord={(next) => router.push(`/word/${encodeURIComponent(next)}`)}
       />

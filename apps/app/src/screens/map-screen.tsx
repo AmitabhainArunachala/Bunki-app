@@ -287,7 +287,7 @@ export function MapScreen({ onOpenWord, onOpenKanji, now }: MapScreenProps): Rea
     flags,
     emptyMessage: 'There is nothing on the map yet.',
     emptyDetail:
-      'The map draws the dictionary this build ships and your own memory state over it. Capture and keep something on the search screen and it will have a centre.',
+      'The map draws the dictionary this build ships and your own memory state over it. Press 拾う Capture, which is offered on every screen, keep something, and it will have a centre.',
   });
 
   const drawn = useMemo<readonly GraphNode[]>(
