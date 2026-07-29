@@ -375,10 +375,10 @@ function StorageSection(): ReactNode {
         {writeState === null
           ? 'Durable writes: not applicable.'
           : writeState.kind === 'settled'
-            ? 'Durable writes: every accepted command has reached the store.'
+            ? 'All changes from this session are saved locally.'
             : writeState.kind === 'writing'
-              ? 'Durable writes: one or more appends are in flight.'
-              : `Durable writes: at least one acknowledged change could not be confirmed in storage — most recent write error: ${writeState.message}. Some changes from this session may not survive a reload.`}
+              ? 'Saving changes locally…'
+              : `Saving problem: Bunki could not confirm that one or more changes were saved. They may still appear now but disappear after you reopen the app. A newer save can succeed without resolving this earlier gap. Most recent storage message: ${writeState.message}`}
       </Text>
     </Section>
   );
