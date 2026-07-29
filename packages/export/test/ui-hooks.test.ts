@@ -308,6 +308,7 @@ describe('appVersions describes the build honestly', () => {
     expect(versions.fsrs).toContain(FSRS_PIN.algorithm);
     // The parameter set, so "same library" and "same numbers" stay distinct.
     expect(versions.fsrs).toContain(FSRS_PIN.parameterSetId);
+    expect(versions.fsrs).toContain(FSRS_PIN.reviewTimePolicyId);
   });
 
   /**
