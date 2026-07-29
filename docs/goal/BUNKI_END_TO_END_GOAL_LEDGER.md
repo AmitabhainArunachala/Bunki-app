@@ -31,7 +31,7 @@ release.
 - Repository path:
   `docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md`
 - G00 input SHA-256:
-  `457ed6b2d1582ce01249224f7c52a91868e2290862ec8ce931365b1088d3d308`
+  `6e7449149efb0fb60c8475809f451e6faecdfeb83e830e96f26f6ca04e9bcbb7`
 - Product-completeness falsifier: PASS.
 - Autonomous-controller falsifier: PASS.
 - The Product Lock and frozen specifications remain higher authority.
@@ -79,6 +79,11 @@ and exact-head verification fields null. Adding those after verification would
 change the reviewed head. The draft PR body, checks, and review threads are the
 post-freeze live overlay keyed to the exact candidate SHA.
 
+The state, this ledger, and the visual-reference manifest are deliberately
+mutable runtime evidence. Their G00 hashes are recorded as non-gating bootstrap
+receipts in ADR-000; they are schema- and semantic-validated inside each active
+child rather than frozen by the operator-lock integrity check.
+
 ## Next safe action
 
 1. Publish the seven allowed files on the G00 branch.
@@ -88,4 +93,3 @@ post-freeze live overlay keyed to the exact candidate SHA.
 5. Ask John to human-merge G00.
 6. Verify the resulting `main` content, rerun the relevant gate, record G00
    closed in the next canonical snapshot, and begin F02.
-
