@@ -10077,3 +10077,245 @@ New unit file: `test/map-territory.test.ts` (12).
 - **That `stroke-brush.spec.ts` is free of timing flake.** It failed once under
   full parallel load and passed in isolation and in the final full run. It is a
   timing test on a shared runner; the flake is recorded rather than papered over.
+
+---
+
+# Lane L1 — a learner at every stage, generated rather than faked
+
+**Branch:** `agent/bunki-lived-in`, from `agent/bunki-e-weave`.
+**Surface:** `packages/domain/src/demo/`, `apps/app/src/state/demo/`,
+`apps/app/src/ui/demo/`, plus `app/_layout.tsx` (the shell must mount the
+boundary and the strip), `packages/domain/src/index.ts` (the barrel), and two
+`package.json` scripts.
+
+## 1. The problem, stated the way the operator stated it
+
+> "app should be able to also show all stages of development of a learner at any
+> one time. And I need to see that all the elements are there… Whatever you
+> shared with the map is a lame excuse for not having wired anything together in
+> any meaningful way."
+
+The diagnosis behind it was correct and is worth writing down plainly: **there
+was no way to get a learner into this app.** The command surface was capture /
+promote / markUncertainty / attachCandidate / acceptCandidate / correctEvidence
+/ recordExport, and none of that composes into a person with a year behind them.
+So every surface rendered its empty case, the map said "0 of 0", and nobody —
+including the people who built it — could see whether any of it was wired
+together. An honest empty screen is still an undemonstrated app.
+
+## 2. What was built, and the one rule it had to keep
+
+A **scripted learner**: pure, deterministic, seeded, and driving the *real*
+command path. Not a fixture. Every event in a loaded stage is
+
+- built by `src/events/factories.ts`, or, for the five evidence-class families,
+  by `src/evidence/mint.ts` — the sole factory, which stamps the tier the
+  generator is therefore unable to choose, and which applies the reveal rule at
+  source (T-06);
+- put to the real `admitToScheduler`, whose verdict is the only thing that
+  decides whether it reaches the scheduler;
+- and, if admitted, folded by `applyAdmittedReview`, which is the one place in
+  the product that computes an interval.
+
+The generator refuses to produce a log the product forbids: every exposure,
+lookup and production observation is put to the gate and the generator **throws**
+unless the gate refuses it for the expected reason. EXPOSURE IS NEVER RETRIEVAL
+is enforced where the data is made, not only where it is read.
+
+Determinism is structural rather than careful. The `DomainContext` handed to the
+factories carries a clock that **throws** (`ScriptedClockError`), so a forgotten
+`occurredAt` fails loudly instead of quietly producing a log that cannot be
+reproduced. Calendar arithmetic is written out (`demo/calendar.ts`) because the
+kernel's purity scan forbids `Date` entirely, and it is checked against
+`Date.UTC` over four centuries in `test/demo/calendar.test.ts`.
+
+## 3. Four stages that differ in kind
+
+| Stage | Days | Threads | Contracts | The shape |
+| --- | --- | --- | --- | --- |
+| Day 3 | 3 | 8 | 9 | Nothing settled. Two sittings, one finished, one out of time. |
+| Month 2 | 62 | 251 | 301 | A habit with a backlog: 203 lapses, an abandoned sitting, 81 contracts activated and not yet answered. |
+| Month 8 | 245 | 375 | 459 | **The plateau.** Intake all but stops on day 121; the sittings continue and every review is easy; nothing is left untested because nothing new arrives. |
+| Year 2 | 730 | 991 | 906 | Three months away and the return: 1,664 lapses, 218 corrections, 426 words met once and never studied. |
+
+(Counts are from the synthetic-corpus runs in `packages/domain/test/demo/`; the
+app's own corpus produces slightly different figures, which the switcher reads
+off the log rather than reprinting from here.)
+
+The stages are **data** — a list of phases, each with its own temperament — so
+the plateau is legible in `script.ts` without running it: one phase with
+`captureDayChance: 0.05` and a grade mix whose `again` weight is `0`.
+
+Capability divergence arrives through the domain rule that causes it rather than
+through a parameter: `SKILLS_ACTIVATED_BY_PROMOTION` puts production behind the
+`master` rung, so a learner who promotes almost everything to `learn` and almost
+nothing to `master` has a bright reading lens and a dark production one. Month 8
+ships reading 247 / meaning 187 / listening 22 / production 3 / writing 0 — five
+lenses, four different pictures, and one that is honestly `unknown` forever
+because Phase 0 has no handwriting contract skill.
+
+## 4. The isolation argument
+
+A demonstration that could touch the learner's real log would be worse than no
+demonstration. The separation is **structural**, and it rests on one property of
+`AppProvider`: it opens the durable event store *exactly when it is handed no
+store*. So:
+
+1. **No `EventStorePort` exists in the process while a stage is loaded.** The
+   durable adapter is never opened. This is the absence of an object, not a rule
+   anybody has to remember.
+2. **The demo store has no journal.** `createMemoryAppStore` writes durably only
+   through its `journal` callback and `buildDemoStage` does not pass one.
+3. **`key={stageId}` remounts the provider**, so the store the previous render
+   held is dropped rather than retained.
+
+`apps/app/test/demo-stage.test.ts` drives all three, including a scan asserting
+`demo-store.ts` passes no `journal` and that nothing under `src/state/demo/`
+names the persistence seam or `createDomainEvent`.
+
+## 5. The switcher
+
+One strip, carried by the shell, on **every** route, in both states. It says
+which of the two you are looking at in words (never in colour alone), and it is
+the only door to the demonstration — which is why it is there when nothing is
+loaded. It is chrome rather than a sixth tab: `navigation.ts` §3 asks a new
+destination which verb it is, and "which data every other surface is showing" is
+not a verb; it belongs to all of them and to none.
+
+The panel's open state lives **above** the boundary. Below it, the remount that
+swaps the store snapped the panel shut at the exact moment the surface changed
+underneath the learner — found by the e2e, not by reading.
+
+## 6. What the evidence pass found
+
+Two real defects, both surfaced by looking at the pictures rather than at the
+tests:
+
+- **P1 — a marked correction that never got its event.** The decision to correct
+  a review is taken when the review is *minted*, because `replay` collects the
+  superseded set in a pre-pass and a forward-only mirror would otherwise
+  disagree with it about every corrected review. Corrections queued in the last
+  few days of a script were never emitted, so the mirror refused a review that
+  replay admitted — a byte divergence in the derived state. Fixed by flushing
+  the queue after the day loop; pinned by a test that names the cause rather
+  than the consequence.
+- **P2 — five of the six flagship frames were labelled "Your own data".** The
+  capture script reached the dive with a `page.goto`, which is a second page
+  load and drops the stage. The dive has no tab by design, so it is now reached
+  the way a learner reaches it: by tapping a kanji on the map.
+
+## 7. The check set, on the pushed tree
+
+| Check | Result |
+| ----- | ------ |
+| `npm ci` | clean (the worktree had no `node_modules`; `@bunki/*` resolved to the *main* checkout until this was run) |
+| `npm run lint` | exit 0, silent |
+| `npm run format:check` | all matched files formatted |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **3612 passed**, 1 skipped |
+| `npm run test:replay` | 140 passed (47 before; the demo suite joined this script) |
+| `npm run verify:export` | 24 passed (14 before; the scripted round trip joined this script) |
+| `npm run test:e2e:build` | 15 static routes exported |
+| `npm run test:e2e` | 88 passed |
+
+New files: `packages/domain/src/demo/{calendar,rng,script,generate,index}.ts`,
+`packages/domain/test/demo/{support,calendar,rng,generator}.ts`,
+`packages/export/test/scripted-learner-export.test.ts`,
+`apps/app/src/state/demo/{demo-corpus,demo-flags,demo-store,demo-summary,demo-context,index}`,
+`apps/app/src/ui/demo/demo-banner.tsx`, `apps/app/test/demo-stage.test.ts`,
+`apps/app/e2e/demonstration-stage.spec.ts`,
+`apps/app/scripts/capture-lived-in.mjs`.
+
+## 8. Measured, not asserted
+
+`replay` recomputes contract activation after every applied event over every
+contract — deliberate (`replay.ts` argues for one path that cannot get out of
+step) and quadratic. This lane is the first thing in the repository big enough
+to feel it. Measured on Node 22 in this container, over synthetic logs of the
+same shape:
+
+| events | contracts | replay |
+| --- | --- | --- |
+| 1,000 | 200 | 0.10 s |
+| 3,000 | 600 | 0.54 s |
+| 7,200 | 1,200 | 2.66 s |
+| 14,400 | 2,400 | 11.1 s |
+
+A stage twice the size does not take twice as long to open; it takes four times.
+The stage sizes were chosen against that table. `year-2` measures ~1.0 s to
+generate and ~3.5 s to replay here, paid **once**, inside a build state the
+strip is showing — `buildDemoStage` calls `readDerived()` itself so the fold
+happens where the progress is, not on the first render of whichever surface the
+learner is standing on. The strip then prints what it measured, on this device:
+the flagship month-8 stage reported 1,032 ms total in the browser (395 ms to
+write the events, 638 ms to replay them).
+
+## 9. What this lane does **not** claim
+
+- **That "thousands of contracts" was reached for Year 2.** It ships ~900. The
+  brief asked for thousands; the measured quadratic above is why, and the
+  trade-off is stated rather than quietly taken. A verifier who wants the stage
+  bigger should start with §10's coordination request.
+- **That any of it ran on a phone.** Chromium on Linux, at a phone's CSS width
+  for the overflow cases. No iOS, no Safari, no Firefox, no device, no screen
+  reader.
+- **That the numbers in `script.ts` describe a real learner.** They are the
+  behaviour of a character, chosen so the resulting state exercises the branches
+  the surfaces have to draw. Nothing was derived from a study or from a corpus
+  and nothing in the app presents them as if it had been (REQ-GATE-03). The
+  *events* are real; only the learner is invented, and every screen that shows
+  one says so.
+- **That `latencyMs` on a scripted review was measured.** It is drawn from the
+  same seeded stream as the grade. This project has shipped a fake `latencyMs`
+  before; this one is labelled as part of a demonstration everywhere it appears,
+  including in the export's own `seedRefs`.
+- **That a demonstration survives a reload.** It deliberately does not, and the
+  strip says so. Losing track of whether you are looking at your own data is the
+  failure mode; a demonstration that outlived a refresh is one that can be
+  forgotten about.
+- **That the era layers are populated.** 街道 and 鉄道 remain empty (open item
+  G3). A scripted learner cannot fix a dictionary that cannot date its words.
+- **That the L4/L5 dive levels are populated.** Unchanged (open items G1, G2).
+- **That the map's own centre is a considered choice under a loaded stage.** It
+  opens on the learner's most recent kept thread, which for a scripted learner
+  is whatever the last day happened to capture. That is the existing rule
+  applied to a populated log, not a decision this lane made, and it is worth an
+  operator's eye.
+
+## 10. Coordination requests
+
+- **L1-C1 — `replay`'s activation recompute is quadratic and need not be.**
+  `recomputeActivation` runs after every applied event, over every contract. The
+  only families that can change the answer are `EncounterCaptured`,
+  `ThreadPromotionChanged`, `ContractCreated` and `ThreadTombstoned`; a review,
+  an exposure, a lookup, a session boundary and an export cannot. Narrowing the
+  call to those four is behaviour-identical (the initialisation instant is the
+  triggering event's `occurredAt` either way) and removes most of the cost — for
+  the year-2 shape, roughly 70% of the events stop triggering a full sweep. Not
+  done here: `packages/domain/src/replay/replay.ts` is another lane's surface and
+  its argument for the current shape ("the version of this that cannot get out
+  of step") is explicit and deliberate. The generator's own mirror already
+  applies the narrowed rule and is byte-identical to replay across all four
+  stages, which is the evidence that the narrowing is safe.
+- **L1-C2 — the demonstration strip is a seventh thing in the shell.** It is not
+  a tab and takes no `aria-current`, but it is chrome and it costs a line on
+  every route. If the operator wants it gone once the app has real data in it,
+  the honest form is a build flag, not a quiet removal — the label has to be
+  present wherever the data is, and a strip that can be hidden is a label that
+  can be missed.
+- **L1-C3 — `absorb()` in `memory-store.ts` ignores `ThreadTombstoned`.** A
+  scripted stage contains one tombstone and one purge (a mistaken capture the
+  learner deleted). Replay handles them and the evidence inspector shows them;
+  the app's own projection does not, so the deleted thread still appears in the
+  snapshot's thread list. The scripted tombstone is deliberately on a thread that
+  never left `captured`, so nothing was ever scheduled on it and the gap is
+  cosmetic — but it is a gap, and it is in another lane's file.
+
+## 11. Screenshot evidence
+
+`docs/build-evidence/lived-in/` — twelve frames and a README written by the run
+itself, reporting what the strip said in each frame and what the map's own line
+read. The flagship set is **one stage, six surfaces, one browser session**: map,
+dive, sitting, branches, ledger, reading, walked through the shell so the frames
+are six views of one log rather than six screens that each happen to render. The
+strip is in every frame and every frame's caption quotes it.

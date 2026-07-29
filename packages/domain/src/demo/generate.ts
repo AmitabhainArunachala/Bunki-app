@@ -706,6 +706,34 @@ export function generateScriptedLearner(input: ScriptedLearnerInput): ScriptedLe
     );
   };
 
+  /**
+   * Append the correction a review was marked for when it was minted.
+   *
+   * Separate from the queue drain because it is also called **after** the day
+   * loop, and that second call site is not tidying. `replay` collects the
+   * superseded set in a pre-pass over the whole log, so a review the mirror
+   * marked but whose `EvidenceSuperseded` never reached the log would be
+   * refused by the mirror and admitted by replay — the two would disagree about
+   * that contract's whole interval history, and the disagreement would surface
+   * as a byte difference in a test rather than as anything a reader could
+   * diagnose. Every marked review therefore gets its correction, even if the
+   * script runs out of days first.
+   */
+  const emitCorrection = (pending: PendingCorrection): void => {
+    events.push(
+      mintEvidenceSuperseded(
+        context,
+        {
+          supersededEventId: pending.supersededEventId,
+          reason: 'user_correction' as const,
+          correction: { note: pending.note },
+        },
+        { idempotencyKey: key('supersede'), occurredAt: step(1, 20) },
+      ),
+    );
+    tally.correctionCount += 1;
+  };
+
   /* --- the day loop ----------------------------------------------------- */
 
   for (let day = 0; day < script.days; day += 1) {
@@ -770,21 +798,30 @@ export function generateScriptedLearner(input: ScriptedLearnerInput): ScriptedLe
     // day whose queue does not ends `budget_exhausted` — which is the whole
     // point of the two states existing.
     if (rng.chance(phase.sitDayChance)) {
-      const plan = dueContracts(mirror, cursor);
       const cap = rng.int(phase.reviewsPerSitting[0], phase.reviewsPerSitting[1]);
+      // Controller §6.4 and REQ-SCH-04: a sitting takes reactivation/precision
+      // reviews plus a **bounded** number of new items. Bounded intake is why a
+      // learner who promotes faster than they sit accumulates contracts that are
+      // activated and never tested — the third presence state the projection
+      // distinguishes, and one that nothing else in this build produces.
+      //
+      // The range is a script, not a policy. It sits a little above what this
+      // learner promotes in a day, so the untested pool is a few days deep
+      // rather than half the corpus: a demonstration in which most contracts had
+      // never been answered would be showing a backlog, not a learner.
+      const newBudget = rng.int(4, 12);
+      const timeBudgetMin = rng.int(8, 25);
+      const plan = plannedContracts(mirror, cursor, cap, newBudget);
       const abandoned = rng.chance(phase.abandonChance);
-      const taken = Math.min(plan.length, abandoned ? rng.int(0, Math.max(0, cap - 1)) : cap);
+      const taken = Math.min(plan.taken.length, abandoned ? rng.int(0, Math.max(0, cap - 1)) : cap);
 
-      if (plan.length > 0) {
+      if (plan.taken.length > 0) {
         const sessionId = context.ids.nextId('session');
         events.push(
           createDomainEvent(
             context,
             'SessionStarted',
-            {
-              sessionId,
-              budget: { timeBudgetMin: rng.int(8, 25), newBudget: rng.int(0, 3) },
-            },
+            { sessionId, budget: { timeBudgetMin, newBudget } },
             { idempotencyKey: key('session-start'), occurredAt: step(1, 45) },
           ),
         );
@@ -806,14 +843,18 @@ export function generateScriptedLearner(input: ScriptedLearnerInput): ScriptedLe
           if (index === demoteAfter && demoteDuring !== undefined && !demoteDuring.tombstoned) {
             promote(demoteDuring, 'keep', step(0, 1));
           }
-          const contractId = plan[index];
+          const contractId = plan.taken[index];
           if (contractId === undefined) break;
           review(contractId, step(1, 4), phase);
         }
 
+        // `deferred` is everything the scheduler had made due that this sitting
+        // did not reach — either because the cap ran out or because the new
+        // budget did. Reporting it as `budget_exhausted` rather than as
+        // `completed` is the difference the two states exist for.
         const completionState: SessionCompletionState = abandoned
           ? 'abandoned'
-          : plan.length > taken
+          : plan.deferred > 0 || plan.taken.length > taken
             ? 'budget_exhausted'
             : 'completed';
         tally.sessionCounts[completionState] += 1;
@@ -906,18 +947,7 @@ export function generateScriptedLearner(input: ScriptedLearnerInput): ScriptedLe
         continue;
       }
       pendingCorrections.splice(index, 1);
-      events.push(
-        mintEvidenceSuperseded(
-          context,
-          {
-            supersededEventId: pending.supersededEventId,
-            reason: 'user_correction' as const,
-            correction: { note: pending.note },
-          },
-          { idempotencyKey: key('supersede'), occurredAt: step(1, 20) },
-        ),
-      );
-      tally.correctionCount += 1;
+      emitCorrection(pending);
     }
 
     // 10. An export. The record of it is in the log it exports (controller §11).
@@ -933,6 +963,10 @@ export function generateScriptedLearner(input: ScriptedLearnerInput): ScriptedLe
       tally.exportCount += 1;
     }
   }
+
+  // Every correction the script marked, whether or not the days ran out. See
+  // `emitCorrection` for why this is a correctness step rather than a tidy-up.
+  for (const pending of pendingCorrections.splice(0)) emitCorrection(pending);
 
   // A capture the learner regretted, deleted, and purged. It is a thread that
   // never left `captured`, so nothing was ever scheduled on it and the deletion
@@ -1039,25 +1073,66 @@ function refuseOrThrow(event: DomainEvent, mirror: Mirror, expected: GateRejecti
   }
 }
 
+interface SittingPlan {
+  /** What this sitting will actually put in front of the learner, in order. */
+  readonly taken: readonly ContractId[];
+  /** How much the scheduler had made due that this plan does not reach. */
+  readonly deferred: number;
+}
+
 /**
- * Everything the scheduler has already made due, oldest first.
+ * What one sitting is made of.
  *
- * The planner's own input shape (`session/plan.ts` takes contracts "the item
- * scheduler has already decided are due"), read off the mirror rather than
- * decided here. Nothing in this function computes an interval.
+ * Two rules, both the controller's rather than this module's.
+ *
+ * **Everything the scheduler already made due, oldest first.** `session/plan.ts`
+ * takes contracts "the item scheduler has already decided are due"; this reads
+ * that off the mirror and computes no interval of its own.
+ *
+ * **New items are bounded** (controller §6.4, REQ-SCH-04: "one bounded new
+ * item"). A contract that has never been reviewed is `new`, and only
+ * `newBudget` of them may enter a sitting however many are waiting. That is
+ * what makes a learner who promotes faster than they sit accumulate contracts
+ * which are activated and untested — a real state, distinct from "never met"
+ * and from "weak", which `retrievability.ts` keeps apart and which a generator
+ * that drained the whole queue every evening would never produce.
+ *
+ * Whatever does not fit is reported as a **count**, never as a queue —
+ * REQ-SCH-04's "never an unbounded due count" — and it is what decides whether
+ * the sitting ends `completed` or `budget_exhausted`.
  */
-function dueContracts(mirror: Mirror, at: IsoInstant): readonly ContractId[] {
-  const due: { readonly contractId: ContractId; readonly since: IsoInstant }[] = [];
+function plannedContracts(
+  mirror: Mirror,
+  at: IsoInstant,
+  cap: number,
+  newBudget: number,
+): SittingPlan {
+  const fresh: { readonly contractId: ContractId; readonly since: IsoInstant }[] = [];
+  const returning: { readonly contractId: ContractId; readonly since: IsoInstant }[] = [];
   mirror.memoryStates.forEach((state, contractId) => {
     if (!state.active) return;
     if (compareInstants(state.dueAt, at) > 0) return;
-    due.push({ contractId, since: state.dueAt });
+    (state.reps === 0 ? fresh : returning).push({ contractId, since: state.dueAt });
   });
-  due.sort((left, right) => {
+
+  const oldestFirst = (
+    left: { readonly contractId: ContractId; readonly since: IsoInstant },
+    right: { readonly contractId: ContractId; readonly since: IsoInstant },
+  ): number => {
     const byTime = compareInstants(left.since, right.since);
     return byTime !== 0 ? byTime : left.contractId < right.contractId ? -1 : 1;
-  });
-  return due.map((entry) => entry.contractId);
+  };
+  fresh.sort(oldestFirst);
+  returning.sort(oldestFirst);
+
+  const admittedNew = fresh.slice(0, newBudget);
+  // Returning items first: a sitting is reactivation before intake (REQ-SCH-04),
+  // and a cap that filled up on new cards would push the reviews that are due
+  // into tomorrow, which is the over-collection signature frozen §10.3 names.
+  const ordered = [...returning, ...admittedNew].slice(0, cap);
+  const deferred = returning.length + fresh.length - ordered.length;
+
+  return { taken: ordered.map((entry) => entry.contractId), deferred: Math.max(0, deferred) };
 }
 
 /** Where a scripted encounter says it came from. Always a demonstration id. */

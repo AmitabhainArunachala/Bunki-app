@@ -239,6 +239,30 @@ describe('what the evidence gate did with the scripted observations', () => {
     }
   });
 
+  it.each(stageCases)('%s: every marked review actually gets its correction', (id) => {
+    // The defect this pins: the decision to correct a review is taken when the
+    // review is *minted*, because `replay` collects the superseded set in a
+    // pre-pass and a forward-only mirror would otherwise disagree with it about
+    // every corrected review. That makes an unemitted correction a divergence
+    // rather than an omission — the mirror refuses the review, replay admits
+    // it, and the two describe different interval histories. It shipped once,
+    // silently, on the stages whose last few days happened to queue one.
+    const log = logFor(id);
+    const corrected = new Set(
+      log.events
+        .filter((event) => event.type === 'EvidenceSuperseded')
+        .map((event) => (event.type === 'EvidenceSuperseded' ? event.supersededEventId : '')),
+    );
+    expect(corrected.size).toBe(log.summary.correctionCount);
+    for (const decision of stateOf(id).gateDecisions) {
+      if (decision.reason !== 'evidence_superseded') continue;
+      expect(
+        corrected.has(decision.eventId),
+        `${decision.eventId} was refused as superseded with no correction in the log`,
+      ).toBe(true);
+    }
+  });
+
   it('corrects observations by appending, never by rewriting (REQ-DM-04.2)', () => {
     const log = logFor('year-2');
     const state = stateOf('year-2');
