@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "controller": {
+    "id": "bunki-end-to-end-one-long-goal-2026-07-29",
+    "path": "docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md",
+    "sha256": "457ed6b2d1582ce01249224f7c52a91868e2290862ec8ce931365b1088d3d308"
+  },
+  "repository": "AmitabhainArunachala/Bunki-app",
+  "snapshot_date": "2026-07-29",
+  "controller_status": "AWAITING_HUMAN_MERGE",
+  "live_main_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+  "bootstrap": {
+    "pr_15": {
+      "state": "MERGED",
+      "base_sha": "98576a3f05871414b40860e769f8ccde478b4ad9",
+      "reviewed_head_sha": "29e2fa46020c3dd2a4d32f7acc8b6764ebb1deea",
+      "merge_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+      "merged_at": "2026-07-29T10:43:47Z",
+      "claim_boundary": "Truthful unresolved-write warning only; no retry, reconciliation, or recovery."
+    },
+    "g00": {
+      "state": "AWAITING_HUMAN_MERGE",
+      "branch": "agent/bunki-g00-end-to-end-controller",
+      "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+      "head_sha": null,
+      "pr_number": null,
+      "post_freeze_evidence_location": "GitHub draft PR body, checks, and review threads keyed to the exact head SHA."
+    }
+  },
+  "active_milestone": "G00",
+  "active_child": "G00.1",
+  "dependency_state": {
+    "PR15": "CLOSED",
+    "G00": "AWAITING_HUMAN_MERGE",
+    "F02": "BLOCKED_BY_G00"
+  },
+  "active_pr": {
+    "number": null,
+    "base_branch": "main",
+    "head_branch": "agent/bunki-g00-end-to-end-controller",
+    "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+    "candidate_head_sha": null,
+    "last_verified_head_sha": null,
+    "draft": true
+  },
+  "assignments": [
+    {
+      "agent": "Codex root",
+      "role": "Conductor and G00 Integrator",
+      "mode": "write",
+      "child": "G00.1",
+      "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+      "allowed_paths": [
+        "docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md",
+        "docs/prompts/BUNKI_CONTROLLER_SUPERSESSION_2026-07-29.md",
+        "docs/goal/BUNKI_END_TO_END_GOAL_STATE.json",
+        "docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md",
+        "docs/goal/BUNKI_OPERATOR_VISUAL_REFERENCES.json",
+        "docs/goal/decisions/ADR-000-G00-CONTROLLER-ADMISSION.md",
+        "docs/operator/BUNKI_OPERATOR_LOCK_INTEGRITY_SHA256_2026-07-29.txt"
+      ]
+    }
+  ],
+  "capability_changes": [],
+  "open_human_gate": {
+    "id": "MERGE_G00",
+    "smallest_action": "Review and human-merge the exact G00 documentation PR after exact-head checks and independent reviews pass."
+  },
+  "next_safe_action": "Freeze the G00 documentation head, run exact-head checks and independent reviews, then request human merge. After merge verification, initialize G00 as CLOSED and begin F02."
+}
