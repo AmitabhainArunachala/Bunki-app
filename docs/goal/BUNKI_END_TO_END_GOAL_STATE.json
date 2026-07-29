@@ -8,7 +8,7 @@
   "repository": "AmitabhainArunachala/Bunki-app",
   "snapshot_date": "2026-07-29",
   "controller_status": "ACTIVE",
-  "live_main_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
+  "live_main_sha": "c45af9ccd6aa54a3059200073380214a81b378bf",
   "bootstrap": {
     "pr_15": {
       "state": "MERGED",
@@ -29,19 +29,33 @@
       "post_freeze_evidence_location": "https://github.com/AmitabhainArunachala/Bunki-app/pull/16"
     }
   },
-  "active_milestone": "F02",
-  "active_child": "F02.1",
+  "milestone_receipts": {
+    "f02": {
+      "state": "MERGED",
+      "branch": "agent/bunki-f02-export-server-containment",
+      "base_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
+      "reviewed_head_sha": "f9b58c416fbd5943cc55d0a2230a1f52e321b068",
+      "pr_number": 17,
+      "merge_sha": "c45af9ccd6aa54a3059200073380214a81b378bf",
+      "merged_at": "2026-07-29T12:43:22Z",
+      "exact_tree_equivalent": true,
+      "post_freeze_evidence_location": "https://github.com/AmitabhainArunachala/Bunki-app/pull/17"
+    }
+  },
+  "active_milestone": "F03",
+  "active_child": "F03.1",
   "dependency_state": {
     "PR15": "CLOSED",
     "G00": "CLOSED",
-    "F02": "ACTIVE",
-    "F03": "BLOCKED_BY_F02"
+    "F02": "CLOSED",
+    "F03": "ACTIVE",
+    "F04": "BLOCKED_BY_F03"
   },
   "active_pr": {
     "number": null,
     "base_branch": "main",
-    "head_branch": "agent/bunki-f02-export-server-containment",
-    "base_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
+    "head_branch": "agent/bunki-f03-fsrs-clock-skew",
+    "base_sha": "c45af9ccd6aa54a3059200073380214a81b378bf",
     "candidate_head_sha": null,
     "last_verified_head_sha": null,
     "draft": true
@@ -49,13 +63,22 @@
   "assignments": [
     {
       "agent": "Codex root",
-      "role": "Conductor and F02 Integrator",
+      "role": "Conductor and F03 Integrator",
       "mode": "write",
-      "child": "F02.1",
-      "base_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
+      "child": "F03.1",
+      "base_sha": "c45af9ccd6aa54a3059200073380214a81b378bf",
       "allowed_paths": [
-        "apps/app/e2e/support/export-server.ts",
-        "apps/app/test/export-server.test.ts",
+        "packages/domain/src/reducers/fsrs-pin.ts",
+        "packages/domain/src/reducers/memory-state.ts",
+        "packages/domain/test/reducers/fsrs-pin.test.ts",
+        "packages/domain/test/reducers/memory-state.test.ts",
+        "packages/domain/test/adversarial/t1-clock-skew.test.ts",
+        "packages/domain/test/replay/clock-skew.test.ts",
+        "packages/persistence/test/adversarial/t1-concurrent-append.test.ts",
+        "packages/export/src/ui-hooks.ts",
+        "packages/export/test/ui-hooks.test.ts",
+        "packages/domain/test/fixtures/golden-002-promotion-ladder-and-supersession.json",
+        "packages/domain/test/fixtures/golden-004-contracts-gate-and-fsrs-scheduling.json",
         "docs/goal/BUNKI_END_TO_END_GOAL_STATE.json",
         "docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md"
       ]
@@ -63,5 +86,5 @@
   ],
   "capability_changes": [],
   "open_human_gate": null,
-  "next_safe_action": "Publish the bounded F02 implementation and tests from fresh main, run focused and full exact-head gates, obtain two independent reviews, and then request human merge."
+  "next_safe_action": "Publish the bounded F03 scheduler-clock migration and tests from fresh main, run focused and full exact-head gates, obtain two independent reviews, and then request human merge."
 }

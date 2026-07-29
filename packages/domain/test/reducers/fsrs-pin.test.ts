@@ -26,6 +26,7 @@ import {
   FSRS_PARAMETER_SET_ID,
   FSRS_PIN,
   FSRS_PINNED_VERSION,
+  FSRS_REVIEW_TIME_POLICY_ID,
   FSRS_SELF_REPORTED_VERSION,
   FSRS_STATE_PRECISION,
   FSRS_WEIGHTS,
@@ -81,7 +82,13 @@ describe('the parameters are the ones the specification names', () => {
       version: '5.4.1',
       algorithm: 'FSRS-6',
       parameterSetId: FSRS_PARAMETER_SET_ID,
+      reviewTimePolicyId: FSRS_REVIEW_TIME_POLICY_ID,
     });
+  });
+
+  it('pins a monotonic append-order review clock', () => {
+    expect(FSRS_REVIEW_TIME_POLICY_ID).toBe('append-order-monotonic-clamp-v1');
+    expect(FSRS_PIN.reviewTimePolicyId).toBe(FSRS_REVIEW_TIME_POLICY_ID);
   });
 
   it('fixes the state precision that guards cross-engine float drift', () => {
@@ -99,6 +106,7 @@ describe('the parameters are the ones the specification names', () => {
       'parameterSetId',
       'relearningSteps',
       'requestRetention',
+      'reviewTimePolicyId',
       'selfReportedVersion',
       'statePrecision',
       'version',
@@ -113,7 +121,9 @@ describe('drift detection actually detects drift', () => {
     // Exercised against a deliberately wrong expectation so the reporting path
     // is tested rather than only its happy branch.
     const drift = [...verifyFsrsPin().drift, { what: 'sample', expected: 'a', observed: 'b' }];
-    expect(drift[0]).toMatchObject({ what: expect.any(String) as unknown as string });
+    expect(drift[0]).toMatchObject({
+      what: expect.any(String) as unknown as string,
+    });
   });
 
   it('has no user-facing retention slider to override the pin (REQ-SCH-02)', () => {

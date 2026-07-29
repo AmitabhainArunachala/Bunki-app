@@ -618,6 +618,7 @@
         "difficulty": 1,
         "dueAt": "2026-08-17T09:00:00.000Z",
         "lastReviewedAt": "2026-07-29T09:00:00.000Z",
+        "schedulerAnchorAt": "2026-07-29T09:00:00.000Z",
         "scheduledDays": 19,
         "learningStep": 0,
         "reps": 2,
@@ -628,7 +629,8 @@
           "package": "ts-fsrs",
           "version": "5.4.1",
           "algorithm": "FSRS-6",
-          "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+          "parameterSetId": "bunki-fsrs6-r090-defaults-v1",
+          "reviewTimePolicyId": "append-order-monotonic-clamp-v1"
         }
       },
       {
@@ -639,6 +641,7 @@
         "difficulty": 2.11810397,
         "dueAt": "2026-07-30T09:15:00.000Z",
         "lastReviewedAt": "2026-07-30T09:05:00.000Z",
+        "schedulerAnchorAt": "2026-07-30T09:05:00.000Z",
         "scheduledDays": 0,
         "learningStep": 1,
         "reps": 1,
@@ -649,7 +652,8 @@
           "package": "ts-fsrs",
           "version": "5.4.1",
           "algorithm": "FSRS-6",
-          "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+          "parameterSetId": "bunki-fsrs6-r090-defaults-v1",
+          "reviewTimePolicyId": "append-order-monotonic-clamp-v1"
         }
       },
       {
@@ -660,6 +664,7 @@
         "difficulty": 6.40211507,
         "dueAt": "2026-08-01T09:10:00.000Z",
         "lastReviewedAt": "2026-08-01T09:00:00.000Z",
+        "schedulerAnchorAt": "2026-08-01T09:00:00.000Z",
         "scheduledDays": 0,
         "learningStep": 1,
         "reps": 2,
@@ -670,7 +675,8 @@
           "package": "ts-fsrs",
           "version": "5.4.1",
           "algorithm": "FSRS-6",
-          "parameterSetId": "bunki-fsrs6-r090-defaults-v1"
+          "parameterSetId": "bunki-fsrs6-r090-defaults-v1",
+          "reviewTimePolicyId": "append-order-monotonic-clamp-v1"
         }
       }
     ],

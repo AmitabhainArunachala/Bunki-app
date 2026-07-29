@@ -1,68 +1,30 @@
 /**
- * T1 — clock skew cannot corrupt scheduling (WP-10; controller §17.2:
- * "clock skew does not corrupt scheduling").
+ * T1 — clock skew cannot corrupt scheduling (WP-10; controller §17.2).
  *
- * ## The threat
+ * Event append order is authoritative even when a device clock moves backward.
+ * Raw timestamps remain in the evidence ledger, while the FSRS wrapper advances
+ * a separate monotonic scheduler anchor. These tests pin three properties:
  *
- * `occurredAt` is not monotonic by construction. The v1 envelope requires a
- * canonical UTC instant from the injected clock (REQ-DM-04.4) and says nothing
- * about ordering, and there is no mechanism in the product that could enforce
- * one: an NTP step, a timezone daemon, a user setting the date, a device that
- * lost its battery, or — from WP-11 — two devices whose logs merge, all produce
- * a log whose timestamps go backwards while its *append order* is perfectly
- * sound. FSRS is the one component that reads the difference between two
- * timestamps and turns it into a number the learner lives with, so it is where
- * skew would show up as a wrong schedule rather than as an obvious error.
+ *   **P1 — no silent influence.** Timestamps do not decide whether evidence is
+ *   admitted or which effective grade the gate assigns.
  *
- * ## What "cannot corrupt" is taken to mean here
+ *   **P2 — no silent drop.** Every schema-valid admitted review is recorded and
+ *   scheduled, including reviews whose wall-clock time crosses backward over a
+ *   UTC date boundary.
  *
- * Three properties, each written to survive any reasonable repair of the defect
- * this file documents, so that the suite keeps its meaning rather than needing
- * to be rewritten alongside a fix:
+ *   **P3 — no corrupt arithmetic.** Repeated clock regressions keep the FSRS
+ *   clock nondecreasing and every derived schedule finite and canonical.
  *
- *   **P1 — no silent influence.** Timestamps must not decide *whether* an
- *   observation counts. Admission is a function of log order, promotion state
- *   and contract validity (§6.2); moving instants around, forwards or
- *   backwards, must leave the admitted set exactly as it was.
- *
- *   **P2 — no silent drop.** A skewed review is either judged and recorded, or
- *   the whole replay is refused. What it may never be is quietly absent: a
- *   review the learner did, that produced no ledger row and no error, is the
- *   evidence-theatre failure the definition of done names in §2.6.
- *
- *   **P3 — no corrupt arithmetic.** If replay returns, every schedule is
- *   finite, non-negative and canonically dated. A `NaN` stability renders as an
- *   empty cell, not as an alarm.
- *
- * ## The defect this file pins: ADV-T1-01
- *
- * `packages/domain/src/reducers/memory-state.ts` hands `review.reviewedAt`
- * straight to `ts-fsrs`, which rejects a negative `delta_t` by throwing
- * `FSRSValidationError` — a library error, not a `DomainError`. So a review
- * dated before the previous admitted review on the same contract makes
- * `replay` throw something outside its documented `@throws` set, and `replay`
- * is the write gate for every append (`packages/persistence/src/append-plan.ts`)
- * as well as the whole of `snapshot()`.
- *
- * The cliff is **not** at twenty-four hours. `delta_t` is a difference of
- * *dates*, so what breaks is a step back across midnight UTC: nine hours of
- * backward skew inside one UTC day is tolerated and four minutes more, landing
- * on the previous date, is not. Measured on this build the boundary sits
- * between `2026-07-27T00:03:00Z` (tolerated) and `2026-07-26T23:59:00Z`
- * (refused) for a first review at `09:03Z`. That makes the trigger an ordinary
- * NTP correction near midnight rather than a clock a day out of true, which is
- * why this is filed as a durability risk.
- *
- * The characterisation test at the bottom of this file pins that boundary
- * deliberately. It is expected to go **red** when the defect is repaired, and
- * that is its job: a boundary nobody asserted is a boundary that can move
- * without anyone noticing. See the capsule appendix for the proposed fix.
+ * ADV-T1-01 previously showed that ts-fsrs rejected a negative UTC calendar-day
+ * delta with an untyped FSRSValidationError, which also made the persistence
+ * replay gate refuse an already acknowledged review. The regression block
+ * below proves both sides of that old boundary now remain durable.
  */
 
 import { describe, expect, it } from 'vitest';
 
 import {
-  DomainError,
+  compareInstants,
   isValidIsoInstant,
   parseEventLog,
   replay,
@@ -106,6 +68,14 @@ function assertSchedulesWellFormed(state: DerivedState, where: string): void {
       isValidIsoInstant(memory.dueAt),
       `${where}: dueAt "${memory.dueAt}" is not a canonical instant`,
     ).toBe(true);
+    expect(
+      isValidIsoInstant(memory.schedulerAnchorAt),
+      `${where}: schedulerAnchorAt "${memory.schedulerAnchorAt}" is not canonical`,
+    ).toBe(true);
+    expect(
+      compareInstants(memory.dueAt, memory.schedulerAnchorAt),
+      `${where}: dueAt precedes the monotonic scheduler anchor`,
+    ).toBeGreaterThanOrEqual(0);
     if (memory.lastReviewedAt !== null) {
       expect(
         isValidIsoInstant(memory.lastReviewedAt),
@@ -200,73 +170,73 @@ describe('T1 — P1: timestamps cannot decide whether an observation counts', ()
   });
 });
 
-describe('T1 — P2/P3: a skewed review is never silently dropped or silently wrong', () => {
-  it('every backward skew either fails closed or records a verdict and a sane schedule', () => {
-    // The disjunction is the property. What is forbidden is the third outcome:
-    // a replay that succeeds while the skewed review left no trace.
+describe('T1 — P2/P3: a skewed review is recorded on a sane monotonic schedule', () => {
+  it('every backward skew records a verdict and advances the review count', () => {
     const offsetsMs = [
       -1, -1_000, -60_000, -3_600_000, -86_399_999, -86_400_000, -172_800_000, -2_592_000_000,
       -31_536_000_000,
     ];
 
-    let returned = 0;
-    let refused = 0;
-
     for (const offset of offsetsMs) {
       const first = Date.parse(T.review1);
+      const skewedAt = new Date(first + offset).toISOString();
       const log: Raw[] = [
         ...learnableLog(),
-        review({ eventId: 'ev-r1', at: T.review1, contractId: 'contract-meaning' }),
+        review({
+          eventId: 'ev-r1',
+          at: T.review1,
+          contractId: 'contract-meaning',
+        }),
         review({
           eventId: 'ev-r2',
-          at: new Date(first + offset).toISOString(),
+          at: skewedAt,
           contractId: 'contract-meaning',
         }),
       ];
 
       const where = `skew ${String(offset)}ms`;
       const result = attempt(parseEventLog(log));
+      expect(result.error, `${where}: replay rejected a schema-valid review`).toBeNull();
+      expect(result.state, `${where}: replay returned no state`).not.toBeNull();
+      if (result.state === null) continue;
 
-      if (result.state === null) {
-        refused += 1;
-        expect(result.error, `${where}: replay rejected without an error`).toBeInstanceOf(Error);
-        continue;
-      }
+      const verdict = result.state.gateDecisions.find((decision) => decision.eventId === 'ev-r2');
+      expect(verdict?.admitted, `${where}: the skewed review was not admitted`).toBe(true);
+      expect(verdict?.at, `${where}: the gate rewrote the evidence timestamp`).toBe(skewedAt);
 
-      returned += 1;
-      // P2 — the observation was judged, not skipped.
-      expect(
-        verdictIdsOf(result.state),
-        `${where}: the skewed review produced no ledger verdict`,
-      ).toContain('ev-r2');
-      // P3 — and what it produced is a number, not a hole.
-      assertSchedulesWellFormed(result.state, where);
+      const observation = result.state.observations.find(
+        (candidate) => candidate.eventId === 'ev-r2',
+      );
+      expect(observation?.at, `${where}: the ledger rewrote the evidence timestamp`).toBe(skewedAt);
 
       const memory = result.state.memoryStates.find(
         (candidate) => candidate.contractId === 'contract-meaning',
       );
-      const admitted = result.state.gateDecisions.filter((decision) => decision.admitted).length;
-      expect(memory?.admittedReviewCount, `${where}: the scheduler and the ledger disagree`).toBe(
-        admitted,
-      );
+      expect(memory?.admittedReviewCount, `${where}: scheduler and ledger count disagree`).toBe(2);
+      expect(memory?.lastReviewedAt, `${where}: raw review time was lost`).toBe(skewedAt);
+      expect(memory?.schedulerAnchorAt, `${where}: scheduler clock regressed`).toBe(T.review1);
+      assertSchedulesWellFormed(result.state, where);
     }
-
-    expect(
-      returned,
-      'no skew was tolerated — the well-formedness checks never ran',
-    ).toBeGreaterThan(0);
-    expect(refused, 'no skew was refused — the fail-closed branch never ran').toBeGreaterThan(0);
   });
 
-  it('a forward-only log with identical instants still schedules', () => {
-    // The degenerate case a batch import produces: several reviews stamped at
-    // the same instant. `delta_t` is zero, which is legal, and the reviews must
-    // all count rather than all collapse.
+  it('same-instant reviews all count rather than collapse', () => {
     const log: Raw[] = [
       ...learnableLog(),
-      review({ eventId: 'ev-r1', at: T.review1, contractId: 'contract-meaning' }),
-      review({ eventId: 'ev-r2', at: T.review1, contractId: 'contract-meaning' }),
-      review({ eventId: 'ev-r3', at: T.review1, contractId: 'contract-meaning' }),
+      review({
+        eventId: 'ev-r1',
+        at: T.review1,
+        contractId: 'contract-meaning',
+      }),
+      review({
+        eventId: 'ev-r2',
+        at: T.review1,
+        contractId: 'contract-meaning',
+      }),
+      review({
+        eventId: 'ev-r3',
+        at: T.review1,
+        contractId: 'contract-meaning',
+      }),
     ];
 
     const result = attempt(parseEventLog(log));
@@ -277,78 +247,61 @@ describe('T1 — P2/P3: a skewed review is never silently dropped or silently wr
       (candidate) => candidate.contractId === 'contract-meaning',
     );
     expect(memory?.admittedReviewCount, 'same-instant reviews were collapsed').toBe(3);
+    expect(memory?.schedulerAnchorAt).toBe(T.review1);
     assertSchedulesWellFormed(result.state, 'identical instants');
   });
 });
 
-describe('T1 — ADV-T1-01: the current backward-skew failure mode, pinned', () => {
-  /**
-   * A characterisation test, and deliberately so.
-   *
-   * It records exactly where the cliff is today and what comes off it. It is
-   * expected to fail when the defect is fixed — whoever fixes it should delete
-   * or invert this block and say so in the capsule. Leaving the boundary
-   * unasserted is the alternative, and an unasserted boundary is one that moves
-   * silently.
-   */
-  /** A log whose second review sits `at` — an absolute instant, not an offset. */
+describe('T1 — ADV-T1-01 regression: UTC-boundary skew is contained', () => {
   const skewedLogAt = (at: string): Raw[] => [
     ...learnableLog(),
-    review({ eventId: 'ev-r1', at: FIRST_REVIEW, contractId: 'contract-meaning' }),
+    review({
+      eventId: 'ev-r1',
+      at: FIRST_REVIEW,
+      contractId: 'contract-meaning',
+    }),
     review({ eventId: 'ev-r2', at, contractId: 'contract-meaning' }),
   ];
 
-  it('the cliff is a UTC calendar-day boundary, not a 24-hour window', () => {
-    // This is the part that makes ADV-T1-01 reachable in ordinary use, and it
-    // is why the boundary is asserted in absolute instants rather than in
-    // elapsed milliseconds. `ts-fsrs` computes `delta_t` as a difference of
-    // *dates*, so what breaks replay is not "a day of skew" but "a step back
-    // across midnight UTC" — which a two-minute NTP correction achieves at
-    // 00:01Z. A learner reviewing late in the evening in UTC+9 is reviewing
-    // just after midnight UTC.
-    const sameDay = attempt(parseEventLog(skewedLogAt('2026-07-27T00:03:00.000Z')));
-    expect(sameDay.state, 'skew of nine hours within one UTC day was refused').not.toBeNull();
+  it('accepts both sides of the former UTC calendar-day cliff', () => {
+    const sameDayAt = '2026-07-27T00:03:00.000Z';
+    const previousDayAt = '2026-07-26T23:59:00.000Z';
+    const sameDay = attempt(parseEventLog(skewedLogAt(sameDayAt)));
+    const previousDay = attempt(parseEventLog(skewedLogAt(previousDayAt)));
 
-    const previousDay = attempt(parseEventLog(skewedLogAt('2026-07-26T23:59:00.000Z')));
-    expect(
-      previousDay.state,
-      'skew of four minutes more, across midnight UTC, was tolerated',
-    ).toBeNull();
+    expect(sameDay.error, 'same-day backward skew was refused').toBeNull();
+    expect(sameDay.state, 'same-day backward skew returned no state').not.toBeNull();
+    expect(previousDay.error, 'UTC-boundary backward skew was refused').toBeNull();
+    expect(previousDay.state, 'UTC-boundary backward skew returned no state').not.toBeNull();
 
-    // Four minutes of wall-clock difference separates the two cases above.
-    const tolerated = Date.parse('2026-07-27T00:03:00.000Z');
-    const refused = Date.parse('2026-07-26T23:59:00.000Z');
-    expect(tolerated - refused).toBe(240_000);
+    expect(Date.parse(sameDayAt) - Date.parse(previousDayAt)).toBe(240_000);
+    if (previousDay.state === null) return;
+
+    const verdict = previousDay.state.gateDecisions.find(
+      (decision) => decision.eventId === 'ev-r2',
+    );
+    const observation = previousDay.state.observations.find(
+      (candidate) => candidate.eventId === 'ev-r2',
+    );
+    const memory = previousDay.state.memoryStates.find(
+      (candidate) => candidate.contractId === 'contract-meaning',
+    );
+
+    expect(verdict).toMatchObject({ admitted: true, at: previousDayAt });
+    expect(observation?.at).toBe(previousDayAt);
+    expect(memory).toMatchObject({
+      admittedReviewCount: 2,
+      lastReviewedAt: previousDayAt,
+      schedulerAnchorAt: FIRST_REVIEW,
+    });
+    assertSchedulesWellFormed(previousDay.state, 'UTC-boundary regression');
   });
 
-  it('refuses a backward step across midnight UTC, and refuses it untyped', () => {
-    const result = attempt(parseEventLog(skewedLogAt('2026-07-26T23:59:00.000Z')));
-
-    expect(result.state, 'a backward step across midnight UTC produced state').toBeNull();
-    expect(result.error).toBeInstanceOf(Error);
-
-    // The defect, stated as an assertion rather than a comment: `replay`
-    // documents `DuplicateEventIdError | IdempotencyConflictError |
-    // ReducerInvariantError | PromotionTransitionError`, and this is none of
-    // them — it is `ts-fsrs`'s own validation error crossing two package
-    // boundaries. Callers that branch on `DomainError` (the persistence write
-    // gate does) therefore see an unclassified crash.
-    expect(
-      result.error instanceof DomainError,
-      'ADV-T1-01 appears to be fixed: the backward-skew rejection is now a DomainError. ' +
-        'Update this characterisation test and the capsule appendix.',
-    ).toBe(false);
-    expect((result.error as Error).name).toBe('FSRSValidationError');
-  });
-
-  it('the same skew reaches replay through a plain, valid, parseable log', () => {
-    // Stated separately because it is the part that makes ADV-T1-01 a product
-    // risk rather than a curiosity: nothing upstream rejects the log. Every
-    // event is schema-valid, the envelope has no ordering rule, and the parser
-    // is content with it. The crash happens in the projection, which is the
-    // component every read and every write runs through.
+  it('the same skew is a valid, parseable log and replays deterministically', () => {
     const raw = skewedLogAt('2026-07-26T23:59:00.000Z');
     expect(() => parseEventLog(raw), 'the skewed log failed to parse').not.toThrow();
-    expect(parseEventLog(raw)).toHaveLength(raw.length);
+
+    const parsed = parseEventLog(raw);
+    expect(JSON.stringify(replay(parsed))).toBe(JSON.stringify(replay(parsed)));
   });
 });

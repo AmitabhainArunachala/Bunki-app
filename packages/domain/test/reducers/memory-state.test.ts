@@ -28,7 +28,12 @@ const grade = (
   state: MemoryState,
   effectiveGrade: 'again' | 'hard' | 'good' | 'easy',
   at: string,
-) => applyAdmittedReview(state, { contractId: 'contract-1', effectiveGrade, reviewedAt: at });
+) =>
+  applyAdmittedReview(state, {
+    contractId: 'contract-1',
+    effectiveGrade,
+    reviewedAt: at,
+  });
 
 describe('an activated contract starts with a schedule and no history', () => {
   it('is due at activation, never reviewed, and carries the pin', () => {
@@ -41,6 +46,7 @@ describe('an activated contract starts with a schedule and no history', () => {
       difficulty: 0,
       dueAt: T.promote,
       lastReviewedAt: null,
+      schedulerAnchorAt: T.promote,
       reps: 0,
       lapses: 0,
       admittedReviewCount: 0,
@@ -77,6 +83,59 @@ describe('grading moves the schedule', () => {
     expect(typeof state.dueAt).toBe('string');
     expect(isValidIsoInstant(state.dueAt)).toBe(true);
     expect(compareInstants(state.dueAt, state.lastReviewedAt ?? '')).toBe(1);
+  });
+
+  it('contains a first review dated before activation without rewriting its evidence time', () => {
+    const actualAt = '2026-07-26T23:59:00.000Z';
+    const skewed = grade(fresh(), 'good', actualAt);
+    const control = grade(fresh(), 'good', T.promote);
+
+    expect(skewed.lastReviewedAt).toBe(actualAt);
+    expect(skewed.schedulerAnchorAt).toBe(T.promote);
+    expect({ ...skewed, lastReviewedAt: T.promote }).toEqual(control);
+    expect(compareInstants(skewed.dueAt, skewed.schedulerAnchorAt)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('contains repeated backward reviews with one nondecreasing scheduler clock', () => {
+    const first = grade(fresh(), 'good', T.review1);
+    const actualAt = '2026-07-26T23:59:00.000Z';
+    const skewed = grade(first, 'good', actualAt);
+    const sameInstantControl = grade(first, 'good', T.review1);
+
+    expect(skewed.lastReviewedAt).toBe(actualAt);
+    expect(skewed.schedulerAnchorAt).toBe(T.review1);
+    expect({ ...skewed, lastReviewedAt: T.review1 }).toEqual(sameInstantControl);
+
+    let descending = skewed;
+    for (const at of [
+      '2026-07-25T23:59:00.000Z',
+      '2025-07-25T23:59:00.000Z',
+      '1999-01-01T00:00:00.000Z',
+    ]) {
+      const priorAnchor = descending.schedulerAnchorAt;
+      descending = grade(descending, 'hard', at);
+      expect(descending.lastReviewedAt).toBe(at);
+      expect(compareInstants(descending.schedulerAnchorAt, priorAnchor)).toBeGreaterThanOrEqual(0);
+      expect(
+        compareInstants(descending.dueAt, descending.schedulerAnchorAt),
+      ).toBeGreaterThanOrEqual(0);
+    }
+
+    expect(descending.schedulerAnchorAt).toBe(T.review1);
+    expect(descending.admittedReviewCount).toBe(5);
+  });
+
+  it('advances the scheduler anchor only after wall time catches up', () => {
+    const first = grade(fresh(), 'good', T.review1);
+    const backward = grade(first, 'good', '2026-07-26T23:59:00.000Z');
+    const belowAnchor = grade(backward, 'good', '2026-07-27T00:03:00.000Z');
+    const atAnchor = grade(belowAnchor, 'good', T.review1);
+    const ahead = grade(atAnchor, 'good', T.review2);
+
+    expect(backward.schedulerAnchorAt).toBe(T.review1);
+    expect(belowAnchor.schedulerAnchorAt).toBe(T.review1);
+    expect(atAnchor.schedulerAnchorAt).toBe(T.review1);
+    expect(ahead.schedulerAnchorAt).toBe(T.review2);
   });
 
   it('counts a lapse when a review comes back again', () => {
