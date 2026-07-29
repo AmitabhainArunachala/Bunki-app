@@ -456,6 +456,8 @@ describe('claim boundaries (REQ-GATE-03)', () => {
     );
     expect(debugSource).toContain('disappear after you reopen the app');
     expect(debugSource).toContain('A newer save can succeed without resolving this earlier gap.');
+    expect(debugSource).toContain('only confirmed saves are expected to remain');
+    expect(debugSource).not.toContain('so what you save survives a reload');
     expect(debugSource).not.toContain('the last append was rejected');
     expect(debugSource).not.toContain('appends are in flight');
   });
