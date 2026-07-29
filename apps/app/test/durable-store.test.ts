@@ -28,10 +28,7 @@ import { describe, expect, it } from 'vitest';
 import { createDeterministicContext, type DomainContext } from '@bunki/domain';
 
 import { createDurableAppStore, durabilityFor } from '../src/state/durable-store.ts';
-import {
-  openAppEventStore,
-  type OpenedAppEventStore,
-} from '../src/state/persistence/index.ts';
+import { openAppEventStore, type OpenedAppEventStore } from '../src/state/persistence/index.ts';
 import type { CaptureCommand } from '../src/state/store.ts';
 
 const SOURCE = { sourceId: 'manual-entry', kind: 'manual', locator: 'capture-screen' } as const;
