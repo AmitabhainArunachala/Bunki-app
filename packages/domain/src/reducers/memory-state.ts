@@ -29,7 +29,7 @@
 import { createEmptyCard, fsrs, generatorParameters, Rating, State, type Grade } from 'ts-fsrs';
 
 import type { Grade as BunkiGrade } from '../events/shared.ts';
-import type { ContractId, IsoInstant } from '../primitives.ts';
+import { compareInstants, type ContractId, type IsoInstant } from '../primitives.ts';
 import {
   FSRS_ALGORITHM,
   FSRS_DESIRED_RETENTION,
@@ -41,6 +41,7 @@ import {
   FSRS_PARAMETER_SET_ID,
   FSRS_PINNED_VERSION,
   FSRS_RELEARNING_STEPS,
+  FSRS_REVIEW_TIME_POLICY_ID,
   FSRS_STATE_PRECISION,
   FSRS_WEIGHTS,
 } from './fsrs-pin.ts';
@@ -60,6 +61,7 @@ export interface SchedulerStamp {
   readonly version: string;
   readonly algorithm: string;
   readonly parameterSetId: string;
+  readonly reviewTimePolicyId: string;
 }
 
 export const SCHEDULER_STAMP: SchedulerStamp = Object.freeze({
@@ -67,6 +69,7 @@ export const SCHEDULER_STAMP: SchedulerStamp = Object.freeze({
   version: FSRS_PINNED_VERSION,
   algorithm: FSRS_ALGORITHM,
   parameterSetId: FSRS_PARAMETER_SET_ID,
+  reviewTimePolicyId: FSRS_REVIEW_TIME_POLICY_ID,
 });
 
 export interface MemoryState {
@@ -82,7 +85,16 @@ export interface MemoryState {
   readonly stability: number;
   readonly difficulty: number;
   readonly dueAt: IsoInstant;
+  /** The event timestamp of the most recent admitted review, kept verbatim. */
   readonly lastReviewedAt: IsoInstant | null;
+  /**
+   * The nondecreasing instant most recently supplied to FSRS.
+   *
+   * This is separate from `lastReviewedAt` because append order is authoritative
+   * when a device clock moves backward. Raw evidence stays honest while the
+   * scheduler clock never regresses.
+   */
+  readonly schedulerAnchorAt: IsoInstant;
   readonly scheduledDays: number;
   /** FSRS's index into the (re)learning step list. */
   readonly learningStep: number;
@@ -159,6 +171,7 @@ export function initialMemoryState(contractId: ContractId, activatedAt: IsoInsta
     difficulty: 0,
     dueAt: activatedAt,
     lastReviewedAt: null,
+    schedulerAnchorAt: activatedAt,
     scheduledDays: 0,
     learningStep: 0,
     reps: 0,
@@ -194,9 +207,17 @@ export interface AdmittedReview {
  * history — see `FSRS_STATE_PRECISION`.
  */
 export function applyAdmittedReview(state: MemoryState, review: AdmittedReview): MemoryState {
+  // Append order, not wall-clock order, is authoritative. Clamp only the
+  // scheduler input; the raw event instant remains visible in lastReviewedAt
+  // and in the replay evidence ledger.
+  const effectiveReviewAt =
+    compareInstants(review.reviewedAt, state.schedulerAnchorAt) < 0
+      ? state.schedulerAnchorAt
+      : review.reviewedAt;
+
   const card =
     state.phase === 'new' && state.reps === 0
-      ? createEmptyCard(state.activatedAt)
+      ? createEmptyCard(state.schedulerAnchorAt)
       : {
           due: state.dueAt,
           stability: state.stability,
@@ -210,10 +231,10 @@ export function applyAdmittedReview(state: MemoryState, review: AdmittedReview):
           reps: state.reps,
           lapses: state.lapses,
           state: FSRS_STATE_BY_PHASE[state.phase],
-          last_review: state.lastReviewedAt,
+          last_review: state.schedulerAnchorAt,
         };
 
-  const next = scheduler.next(card, review.reviewedAt, RATING_BY_GRADE[review.effectiveGrade]).card;
+  const next = scheduler.next(card, effectiveReviewAt, RATING_BY_GRADE[review.effectiveGrade]).card;
 
   return Object.freeze({
     ...state,
@@ -222,6 +243,7 @@ export function applyAdmittedReview(state: MemoryState, review: AdmittedReview):
     difficulty: roundState(next.difficulty),
     dueAt: next.due.toISOString(),
     lastReviewedAt: review.reviewedAt,
+    schedulerAnchorAt: effectiveReviewAt,
     scheduledDays: next.scheduled_days,
     learningStep: next.learning_steps,
     reps: next.reps,
