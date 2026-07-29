@@ -31,8 +31,8 @@
  * adapter's own label and its own disclosure sentence verbatim (REQ-ARCH-05,
  * P0-CAP-15) — this is the "about screen" controller §7 requires the provisional
  * web adapter to be labelled on. It reports three facts that fail separately:
- * which adapter is running, whether it really has storage, and whether the last
- * durable write landed.
+ * which adapter is running, whether it really has storage, and whether any
+ * acknowledged write remains unconfirmed.
  *
  * **Its four states are mutually exclusive.** The records region resolves
  * through `useLookup`, the same state machine the other screens use, so
@@ -312,8 +312,8 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
  * restate it more strongly than the adapter earns.
  *
  * Three separate facts, because they fail separately: which adapter is running,
- * whether that adapter actually has storage, and whether the last write reached
- * it. A build reporting "web-provisional" while the browser refused
+ * whether that adapter actually has storage, and whether any acknowledged write
+ * remains unconfirmed. A build reporting "web-provisional" while the browser refused
  * `localStorage` looks durable and is not, which is why the second line exists.
  */
 function StorageSection(): ReactNode {
@@ -378,7 +378,7 @@ function StorageSection(): ReactNode {
             ? 'Durable writes: every accepted command has reached the store.'
             : writeState.kind === 'writing'
               ? 'Durable writes: one or more appends are in flight.'
-              : `Durable writes: the last append was rejected — ${writeState.message}`}
+              : `Durable writes: at least one acknowledged change could not be confirmed in storage — most recent write error: ${writeState.message}. Some changes from this session may not survive a reload.`}
       </Text>
     </Section>
   );
