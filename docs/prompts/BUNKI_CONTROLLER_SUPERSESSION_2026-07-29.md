@@ -25,4 +25,3 @@ the higher authority wins.
 G00 is governance only. It does not establish application implementation,
 production data, a live provider, native iPhone proof, release readiness, or
 operator acceptance.
-
