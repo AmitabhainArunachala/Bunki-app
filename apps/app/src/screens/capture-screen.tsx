@@ -90,6 +90,7 @@ import {
   type CommandAck,
   type UncertaintyDimension,
 } from '../state/store.ts';
+import { NEAR_MISS_NOTE, nearMisses } from '../data/near-miss.ts';
 import { useLookup } from '../state/use-lookup.ts';
 import { BrowsePanel } from '../ui/dictionary/browse-panel.tsx';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
@@ -287,6 +288,18 @@ export function CaptureScreen({
   const results = state.kind === 'ready' ? state.data : [];
   const otherResults = useMemo(() => results.slice(1), [results]);
 
+  /*
+    Computed only when the search found nothing.
+
+    `nearMisses` is a bounded edit-distance pass over every entry, which is
+    affordable per keystroke and pointless when there are answers — so the
+    condition is on the state, not inside the function.
+  */
+  const nearMissRows = useMemo(
+    () => (state.kind === 'empty' && query.trim() !== '' ? nearMisses(query) : []),
+    [query, state.kind],
+  );
+
   /**
    * The way back, named.
    *
@@ -378,6 +391,57 @@ export function CaptureScreen({
 
       {state.kind === 'empty' ? (
         <EmptyPanel detail={state.detail} message={state.message}>
+          {/*
+            The way out of a dead end.
+
+            `searchSeed` has no fuzzy fallback on purpose — a wrong match in a
+            dictionary is worse than a miss. These are not results: they appear
+            only when the search returned nothing, under the sentence that says
+            so, and `NEAR_MISS_NOTE` calls them guesses about a typo rather than
+            answers. The ranking above is untouched.
+          */}
+          {nearMissRows.length === 0 ? null : (
+            <View style={styles.nearMisses} testID="capture-near-misses">
+              <Text
+                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+              >
+                {NEAR_MISS_NOTE}
+              </Text>
+              {nearMissRows.map((miss) => (
+                <RowButton
+                  accessibilityHint="Opens its word page. This entry did not match your query."
+                  accessibilityLabel={`${miss.lexeme.headword}, read ${miss.lexeme.reading}: ${miss.lexeme.senses.slice(0, 3).join(', ')}`}
+                  key={miss.lexeme.id}
+                  onPress={() => onOpenWord(miss.lexeme.id)}
+                  testID={`capture-near-miss-${miss.lexeme.id}`}
+                >
+                  <RubyText
+                    reading={miss.lexeme.reading}
+                    serif={false}
+                    size={TYPE.body}
+                    written={miss.lexeme.headword}
+                  />
+                  <Text
+                    style={[
+                      styles.meta,
+                      { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {miss.lexeme.senses.slice(0, 3).join(' · ')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.meta,
+                      { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {miss.distance === 1 ? 'one character different' : 'two characters different'} —{' '}
+                    {miss.field === 'headword' ? 'in the written form' : 'in the reading'}
+                  </Text>
+                </RowButton>
+              ))}
+            </View>
+          )}
           <SeedCoverageDisclosure />
         </EmptyPanel>
       ) : null}
@@ -859,5 +923,8 @@ const styles = StyleSheet.create({
   },
   threadText: {
     fontSize: TYPE.body,
+  },
+  nearMisses: {
+    gap: SPACE.sm,
   },
 });

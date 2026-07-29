@@ -103,6 +103,14 @@ test.describe('the dictionary, standing alone', () => {
     await expect(visibleTestId(page, 'capture-other-results')).toBeVisible();
     await shoot(page, testInfo, 'dict-02-component-search');
 
+    // --- a typo. Not a result: a labelled way out of a dead end.
+    const field = visibleTestId(page, 'capture-search-input');
+    await field.fill('');
+    await field.fill('jikna');
+    await expect(visibleTestId(page, 'capture-near-misses')).toBeVisible({ timeout: 15_000 });
+    await expect(visibleTestId(page, 'capture-near-misses')).toContainText('not answers');
+    await shoot(page, testInfo, 'dict-05-near-miss-for-a-typo');
+
     // --- browse: open an axis, open a shelf, land on a kanji page.
     await search(page, '分');
     const axis = visibleTestId(page, 'browse-axis-grade');

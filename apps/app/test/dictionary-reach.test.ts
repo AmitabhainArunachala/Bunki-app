@@ -32,6 +32,7 @@ import {
   strokeAxis,
 } from '../src/data/browse.ts';
 import { searchSeed, type SearchResult } from '../src/data/catalog.ts';
+import { allowedEdits, boundedDistance, nearMisses } from '../src/data/near-miss.ts';
 import { kanaQueryFor, looksLikeRomaji, romajiToKana } from '../src/data/romaji.ts';
 
 const headwords = (results: readonly SearchResult[]): readonly string[] =>
@@ -200,5 +201,56 @@ describe('the browse axes', () => {
     for (const axis of browseAxes()) {
       expect(axis.label.toLowerCase()).not.toContain('jlpt');
     }
+  });
+});
+
+describe('the way out of a dead end', () => {
+  it('measures a transposition as one edit, not two', () => {
+    // `jikna` for `jikan` is the commonest typing error there is, and plain
+    // Levenshtein scores it 2 — past any threshold worth having.
+    expect(boundedDistance('jikna', 'jikan', 2)).toBe(1);
+    expect(boundedDistance('abc', 'abc', 2)).toBe(0);
+    expect(boundedDistance('abc', 'abd', 2)).toBe(1);
+  });
+
+  it('abandons early rather than filling a matrix it cannot use', () => {
+    // The bound is what makes this affordable over 3,000 entries per keystroke.
+    // Anything abandoned reports limit + 1, which no caller accepts.
+    expect(boundedDistance('aaaaaaaa', 'zzzzzzzz', 1)).toBe(2);
+  });
+
+  it('offers nothing for a query too short to be near anything', () => {
+    // One edit in a two-character query is half the word. Everything would be
+    // "near", which is the same as nothing being near.
+    expect(allowedEdits(2)).toBe(0);
+    expect(nearMisses('あ')).toEqual([]);
+  });
+
+  it('finds the word behind a mistyped romaji reading', () => {
+    // 時間 / じかん, typed with the last two letters swapped.
+    const suggestions = nearMisses('jikna');
+    expect(suggestions.map((miss) => miss.lexeme.headword)).toContain('時間');
+  });
+
+  it('finds the word behind a mistyped kana reading', () => {
+    const suggestions = nearMisses('ぶんぎ');
+    expect(suggestions.map((miss) => miss.lexeme.headword)).toContain('分岐');
+  });
+
+  it('never returns more than the limit, and is deterministic', () => {
+    const first = nearMisses('jikna');
+    const second = nearMisses('jikna');
+    expect(first.length).toBeLessThanOrEqual(6);
+    expect(first.map((miss) => miss.lexeme.id)).toEqual(second.map((miss) => miss.lexeme.id));
+  });
+
+  it('is never consulted while the search has answers', () => {
+    // The rule these suggestions live under: they are not results. The proof
+    // that they cannot become one is that the ranked search is unchanged — a
+    // near miss appears in no `searchSeed` output.
+    const suggestions = nearMisses('jikna');
+    const searched = searchSeed('jikna');
+    expect(searched).toEqual([]);
+    expect(suggestions.length).toBeGreaterThan(0);
   });
 });

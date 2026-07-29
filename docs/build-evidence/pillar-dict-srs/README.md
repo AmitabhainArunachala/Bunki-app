@@ -23,6 +23,7 @@ and every layout here is this container's.
 |---|---|---|
 | `dict-01-romaji-bunki.png` | `bunki` typed, 分岐 answered | The romaji door, which did not exist before this lane. |
 | `dict-02-component-search.png` | `氵` typed, characters built from it | Component search: the query is not any of the answers, so every row is reached by decomposition. |
+| `dict-05-near-miss-for-a-typo.png` | `jikna` typed; "No seed entry matches" plus two labelled near misses | A typo is no longer a dead end — and the suggestions are labelled "guesses about a typo, not answers", under the sentence that says the search found nothing. |
 | `dict-03-browse-by-grade.png` | The grade axis open, grade 1 open, 60 of 77 characters | Browsing — reaching a word without knowing what to ask for. Each axis prints the licensor field it was read off. |
 | `dict-04-kanji-page-reached-by-browsing.png` | A kanji page arrived at from a shelf | The browse is a door, not a display. |
 

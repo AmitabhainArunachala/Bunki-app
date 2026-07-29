@@ -10227,26 +10227,28 @@ in the window.
 | `npm run lint` | clean |
 | `npm run format:check` | clean |
 | `npm run typecheck` | clean |
-| `npx vitest run` | **132 files, 3521 passed, 1 skipped** |
+| `npx vitest run` | **132 files, 3529 passed, 1 skipped** |
 | `npm run test:replay` | 47 passed |
 | `npm run verify:export` | 14 passed |
 | `npm run test:e2e:build` | 15 static routes exported |
 | `npx playwright test … viewport-overflow` | 3 passed (390 and 360 CSS px) |
 | `npx playwright test … pillars-dict-srs` | 3 passed |
-| `npx playwright test` (full) | 82 passed, 1 failed then passed — see below |
+| `npx playwright test` (full) | run 1: 82 passed, 1 flake; run 2: **83 passed, exit 0** |
 
 New files: `packages/domain/src/session/standing.ts`,
 `packages/domain/test/session/standing.test.ts` (17),
 `apps/app/test/session-many-words.test.ts` (11),
 `apps/app/test/dictionary-reach.test.ts` (18),
 `apps/app/src/data/romaji.ts`, `apps/app/src/data/browse.ts`,
+`apps/app/src/data/near-miss.ts`,
 `apps/app/src/ui/session/{srs-panel.tsx,spines.ts}`,
 `apps/app/src/ui/dictionary/browse-panel.tsx`,
 `apps/app/e2e/pillars-dict-srs.spec.ts`.
 
 **The one e2e failure** was `stroke-brush.spec.ts` "lands every stroke complete
 under reduced motion", under full parallel load. It passed in isolation
-immediately afterwards. It is the timing flake this capsule already records from
+immediately afterwards, and a second full run of the whole suite passed with
+exit 0. It is the timing flake this capsule already records from
 the Wave D round, in a file this lane does not touch; it is repeated here rather
 than left for a reader to assume the suite was clean.
 
@@ -10268,9 +10270,17 @@ than left for a reader to assume the suite was clean.
 
 ## 9. Not done, named
 
-- **Fuzzy and partial matching beyond substring.** A typo finds nothing. There is
-  no edit-distance fallback, deliberately for now — a wrong match in a dictionary
-  is worse than a miss — but "did you mean" is a real gap.
+- **Fuzzy matching *inside* the ranked search.** There is still none, and that
+  stays deliberate: a wrong match in a dictionary is worse than a miss. What was
+  added instead is `src/data/near-miss.ts` — bounded Damerau–Levenshtein over
+  written forms and readings, shown **only** when the search returned nothing,
+  under a sentence that says so, labelled as guesses about a typo rather than as
+  answers. A romaji query is compared as Latin against romanised readings rather
+  than as the kana it converts to, because `jikna` converts to `じkな` and its
+  distance to じかん is 2 for reasons that have nothing to do with how close the
+  learner was; romanising the reading instead puts them one transposition apart,
+  which is what actually happened. English glosses are not compared: a gloss
+  query that misses has usually missed by meaning, not by spelling.
 - **Browse by radical proper, and by semantic field.** The component axis is
   KanjiVG elements, which is not the same as the 214-radical index a learner
   knows; the semantic field is refused for rights reasons and stays refused.

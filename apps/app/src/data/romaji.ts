@@ -288,3 +288,91 @@ export function kanaQueryFor(query: string): string | null {
   if ([...kana].every((character) => LATIN_LETTER.test(character))) return null;
   return kana;
 }
+
+/**
+ * Kana → romaji, for comparing a *mistyped* romaji query against a reading.
+ *
+ * ## Why this direction is needed at all
+ *
+ * {@link romajiToKana} handles a correctly typed query. It cannot handle a
+ * mistyped one, and the reason is structural rather than a missing case: `jikna`
+ * — `jikan` with two letters swapped, the commonest typing error there is —
+ * converts to `じkな`, because `kn` is not a mora and the `k` survives as a
+ * literal. Edit distance between `じkな` and `じかん` is 2, and it is 2 for
+ * reasons that have nothing to do with how close the learner was.
+ *
+ * Comparing in the *other* direction fixes it: `じかん` renders as `jikan`, and
+ * `jikna` is one transposition away from that. So the readings are romanised
+ * once and the raw Latin query is compared to them.
+ *
+ * It is never rendered to the learner. Bunki shows Japanese; this exists to be
+ * compared against, which is why a single spelling per sound is enough and no
+ * romanisation standard is claimed.
+ */
+const KANA_TO_ROMAJI: ReadonlyMap<string, string> = (() => {
+  const map = new Map<string, string>();
+  // First spelling wins, and the table is Hepburn-first, so `し` maps to `shi`
+  // rather than to `si`. Either would compare correctly against a query typed
+  // the other way — one edit — but a consistent choice keeps the distances
+  // stable between two readings that share a mora.
+  for (const [romaji, kana] of ROMAJI_TO_KANA) {
+    if (!map.has(kana)) map.set(kana, romaji);
+  }
+  return map;
+})();
+
+/** The longest kana key, so the scan knows how far to look ahead. */
+const LONGEST_KANA = [...KANA_TO_ROMAJI.keys()].reduce(
+  (longest, key) => Math.max(longest, [...key].length),
+  1,
+);
+
+export function kanaToRomaji(input: string): string {
+  const characters = [...input];
+  let out = '';
+  let index = 0;
+
+  while (index < characters.length) {
+    const character = characters[index] ?? '';
+
+    if (character === 'ん') {
+      out += 'n';
+      index += 1;
+      continue;
+    }
+    if (character === 'っ') {
+      // Doubles the consonant that follows, which is what a learner types.
+      // A trailing っ has nothing to double and is dropped rather than guessed.
+      const next = characters.slice(index + 1, index + 1 + LONGEST_KANA).join('');
+      const following = romajiForKanaAt(next);
+      out += following === null ? '' : following.romaji.slice(0, 1);
+      index += 1;
+      continue;
+    }
+
+    const window = characters.slice(index, index + LONGEST_KANA).join('');
+    const match = romajiForKanaAt(window);
+    if (match === null) {
+      // Not kana — a kanji in a reading field, punctuation. Kept verbatim so the
+      // comparison degrades to "no match" rather than to a wrong one.
+      out += character;
+      index += 1;
+      continue;
+    }
+    out += match.romaji;
+    index += match.consumed;
+  }
+
+  return out;
+}
+
+/** Longest kana prefix of `window` that has a romanisation. */
+function romajiForKanaAt(window: string): { romaji: string; consumed: number } | null {
+  const characters = [...window];
+  for (let length = Math.min(LONGEST_KANA, characters.length); length >= 1; length -= 1) {
+    const candidate = characters.slice(0, length).join('');
+    const romaji = KANA_TO_ROMAJI.get(candidate);
+    if (romaji !== undefined) return { romaji, consumed: length };
+  }
+  return null;
+}
