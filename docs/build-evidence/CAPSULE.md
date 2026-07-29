@@ -10233,7 +10233,8 @@ in the window.
 | `npm run test:e2e:build` | 15 static routes exported |
 | `npx playwright test … viewport-overflow` | 3 passed (390 and 360 CSS px) |
 | `npx playwright test … pillars-dict-srs` | 3 passed |
-| `npx playwright test` (full) | run 1: 82 passed, 1 flake; run 2: **83 passed, exit 0** |
+| `npx playwright test … adv-a11y-audit` | 18 passed (sweep 1.5 min under its measured 300 s budget) |
+| `npx playwright test` (full) | **83 passed, exit 0**, after the timeout fix below |
 
 New files: `packages/domain/src/session/standing.ts`,
 `packages/domain/test/session/standing.test.ts` (17),
@@ -10245,10 +10246,43 @@ New files: `packages/domain/src/session/standing.ts`,
 `apps/app/src/ui/dictionary/browse-panel.tsx`,
 `apps/app/e2e/pillars-dict-srs.spec.ts`.
 
-**The one e2e failure** was `stroke-brush.spec.ts` "lands every stroke complete
-under reduced motion", under full parallel load. It passed in isolation
-immediately afterwards, and a second full run of the whole suite passed with
-exit 0. It is the timing flake this capsule already records from
+### The two e2e failures, both characterised rather than waved away
+
+**`stroke-brush.spec.ts`** — "lands every stroke complete under reduced motion",
+under full parallel load. It passed in isolation immediately afterwards, and a
+second full run of the whole suite passed. It is the timing flake this capsule
+already records from the Wave D round, in a file this lane does not touch.
+
+**`adv-a11y-audit.spec.ts`** — "axe: no violation at all, on any route, in either
+scheme" **timed out**. It was not a violation, and the distinction matters: an
+a11y suite that fails on a clock looks exactly like an a11y regression.
+
+It was measured rather than guessed. A temporary spec ran the identical sweep
+with a generous budget:
+
+```
+SWEEP_TOTAL_MS 159160        26 route/scheme pairs, 6.1 s mean
+slowest: /kanji 9.8s · /word 8.2s · / 7.9s · /capture 7.7s
+fastest: /evidence 3.9s · /repair 4.2s
+```
+
+**159 s of work under Playwright's default 120 s.** The test was already over
+budget before this lane and passed only when the runner was fast — it passed
+twice and failed twice in this session on the same tree. The browse index on
+`/capture` tipped it, and the per-route numbers are why the fix was not "make
+`/capture` smaller": `/capture` is mid-pack, below three routes this lane never
+touched.
+
+So that one test now sets its own timeout, 300 s, with the measurement and the
+arithmetic written into its docblock. It is deliberately not unbounded — a
+genuine 2× slowdown still fails, which is the signal the number preserves.
+**This lane edited another lane's spec to do it**, and that is recorded here
+rather than left for a reader to find in a diff.
+
+A third defect was found by review rather than by a test: `browseAxes()` folded
+and sorted 1,241 characters four times on **every render**, and `BrowsePanel`
+lives inside the capture screen, which re-renders on every keystroke. The axes
+are a pure function of build-time data and are now memoised at module scope. It is the timing flake this capsule already records from
 the Wave D round, in a file this lane does not touch; it is repeated here rather
 than left for a reader to assume the suite was clean.
 
@@ -10295,6 +10329,12 @@ than left for a reader to assume the suite was clean.
   honest fix is a kanji-level contract, which does not exist.
 - **Reordering, suspending, or burying an item.** Anki has all three; this SRS
   has none, and the only lever a learner has over the queue is the time budget.
-- **`test:e2e` was not run to completion twice on a clean tree.** It was run
-  once in full (one flake, characterised above) and the two new specs plus the
-  overflow sweep were run repeatedly.
+- **Two unit files time out under load, not from this lane.**
+  `theme-fonts.test.ts` "covers every character in the seed corpus" hit its 5 s
+  budget while a full e2e run was using the machine, and passed in isolation
+  immediately. The clean-machine run is 132 files / 3529 passed. Named because a
+  5 s budget on a test that JSON-stringifies the whole dataset is a flake waiting
+  for a slower runner, in a file this lane does not own.
+- **Nothing was measured on a phone, and `PERF_WEB.md` was not re-run.** The
+  romaji conversion and the near-miss scan are new per-keystroke work on the
+  search box and neither has a number beside it.

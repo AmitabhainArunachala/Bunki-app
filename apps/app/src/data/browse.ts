@@ -295,7 +295,22 @@ export function kanjiWithComponent(element: string): readonly SeedKanji[] {
   ).sort(byCharacter);
 }
 
-/** The four axes, built once. Each is a pure fold over the shipped data. */
+/**
+ * The four axes.
+ *
+ * Memoised at module scope, and that is a correctness-adjacent decision rather
+ * than a micro-optimisation. `BrowsePanel` renders inside the capture screen,
+ * which re-renders on **every keystroke** in the search box; an unmemoised
+ * `browseAxes()` folded and sorted 1,241 characters four times per character
+ * typed, which is work with no output — the axes are a pure function of data
+ * that is frozen at build time and cannot change while the app is running.
+ *
+ * `componentAxis` takes a parameter, so the memo is only for the default call;
+ * a caller asking for a different minimum still gets a fresh fold.
+ */
+let cachedAxes: readonly BrowseAxis[] | null = null;
+
 export function browseAxes(): readonly BrowseAxis[] {
-  return [gradeAxis(), strokeAxis(), frequencyAxis(), componentAxis()];
+  cachedAxes ??= Object.freeze([gradeAxis(), strokeAxis(), frequencyAxis(), componentAxis()]);
+  return cachedAxes;
 }

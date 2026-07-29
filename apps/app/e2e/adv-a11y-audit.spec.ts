@@ -263,7 +263,37 @@ for (const scheme of ['light', 'dark'] as const) {
   });
 }
 
+/**
+ * The whole-app sweep: every route, both schemes, one test.
+ *
+ * ## Why this one has a timeout of its own, and where the number came from
+ *
+ * It does 26 route/scheme pairs, and each pair is a full page load plus an axe
+ * injection and analysis. Measured on this runner, idle, against the shipped
+ * export:
+ *
+ * ```
+ *   SWEEP_TOTAL_MS 159160        (26 pairs, 6.1s mean)
+ *   slowest: /kanji 9.8s · /word 8.2s · / 7.9s · /capture 7.7s
+ *   fastest: /evidence 3.9s · /repair 4.2s
+ * ```
+ *
+ * The file default is Playwright's 120 s. That is **less than the work takes**,
+ * so this test passed only when the runner was fast and failed when it was not —
+ * which is the shape of a flake that looks like an accessibility regression, and
+ * is the worst possible way for an a11y suite to fail. It was tipped over by the
+ * pillars lane adding a browse index to `/capture`, and the per-route numbers
+ * above are why that lane did not simply make its own screen smaller: `/capture`
+ * is mid-pack, below three routes it did not touch.
+ *
+ * 300 s is the measured 159 s plus room for a loaded runner. It is deliberately
+ * **not** unbounded: a genuine 2× slowdown still fails here, which is the signal
+ * this number exists to preserve. If the sweep grows another ten routes, measure
+ * again and change the number with the new arithmetic — do not double it on a
+ * hunch.
+ */
 test('axe: no violation at all, on any route, in either scheme', async ({ page, app }) => {
+  test.setTimeout(300_000);
   const violations = [
     ...(await scanEveryRoute(page, app.origin, 'light')),
     ...(await scanEveryRoute(page, app.origin, 'dark')),

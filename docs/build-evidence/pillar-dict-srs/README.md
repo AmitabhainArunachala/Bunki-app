@@ -47,9 +47,10 @@ up for study yet."*
 | `srs-06-standing-after-an-answer.png` | reading now `2 never asked · 1 holding`; today's bar reads 1 | One graded answer moved one contract, through the real gate and the pinned FSRS. |
 | `srs-07-phone-390.png` | The same screen at 390 × 844 | No sideways scroll; asserted in the spec, not eyeballed. |
 
-## Two rendering defects found by looking at these images, and fixed
+## Three defects found after the code was written, and fixed
 
-Both were in this lane's own new work, and both were invisible to every test:
+The first two were found by *looking at these images*, and neither was visible to
+any test. The third was found by reading the diff back.
 
 1. **The browse axis printed its derivation twice** — once as the disclosure's
    note and once again inside the body. Visible in the first run of
@@ -60,6 +61,9 @@ Both were in this lane's own new work, and both were invisible to every test:
    words up, when everything is overdue and nothing is in the window. The window
    is now drawn only when something falls in it, and says so in a sentence when
    nothing does.
+3. **`browseAxes()` folded and sorted 1,241 characters four times per render**,
+   inside a screen that re-renders on every keystroke. The axes are a pure
+   function of build-time data; memoised at module scope.
 
 ## What these images do not show
 
