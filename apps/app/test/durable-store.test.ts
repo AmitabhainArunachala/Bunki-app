@@ -215,30 +215,9 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
       snapshotKey: 'test-store',
       snapshotStore,
       openStore: (options) => {
-        // The real web store, with its append replaced by a refusal — so the
-        // read path, the labels and the rehydration are all still the genuine
-        // ones and only the failure is injected.
+        // The real web store, with only append replaced by a refusal.
         const real = openAppEventStore(options);
-        // Explicitly bound delegation. The adapter keeps its state in `#private`
-        // fields, so neither spreading the instance nor `Object.create`-ing over
-        // it produces a working store — the methods have to be called with the
-        // original as their receiver.
-        const refusing: typeof real.store = {
-          runtimeLabel: real.store.runtimeLabel,
-          append: () => Promise.reject(new Error('storage quota exceeded')),
-          readAll: () => real.store.readAll(),
-          readStream: (selector) => real.store.readStream(selector),
-          snapshot: () => real.store.snapshot(),
-          exportJson: () => real.store.exportJson(),
-          close: () => real.store.close(),
-          countEvents: () => real.store.countEvents(),
-          listThreadIds: () => real.store.listThreadIds(),
-          threadState: (threadId) => real.store.threadState(threadId),
-          eventById: (eventId) => real.store.eventById(eventId),
-          hasIdempotencyKey: (key) => real.store.hasIdempotencyKey(key),
-          derivedStateCacheMeta: () => real.store.derivedStateCacheMeta(),
-        };
-        return { ...real, store: refusing };
+        return replaceAppend(real, () => Promise.reject(new Error('storage quota exceeded')));
       },
     });
 
@@ -249,6 +228,7 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
     expect(state.kind).toBe('failed');
     expect(state.kind === 'failed' ? state.message : '').toContain('quota');
   });
+
   it('keeps an unresolved gap visible while a later independent append succeeds', async () => {
     const snapshotStore = newSnapshotStore();
     const context = newContext('run1-');
