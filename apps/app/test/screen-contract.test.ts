@@ -449,11 +449,15 @@ describe('claim boundaries (REQ-GATE-03)', () => {
 
   it('keeps unresolved durable-write copy truthful after later activity', () => {
     const debugSource = screen('inspector-debug-screen.tsx');
+    expect(debugSource).toContain('All changes from this session are saved locally.');
+    expect(debugSource).toContain('Saving changes locally…');
     expect(debugSource).toContain(
-      'at least one acknowledged change could not be confirmed in storage',
+      'Bunki could not confirm that one or more changes were saved.',
     );
-    expect(debugSource).toContain('Some changes from this session may not survive a reload.');
+    expect(debugSource).toContain('disappear after you reopen the app');
+    expect(debugSource).toContain('A newer save can succeed without resolving this earlier gap.');
     expect(debugSource).not.toContain('the last append was rejected');
+    expect(debugSource).not.toContain('appends are in flight');
   });
 
   it('labels the seed as a seed wherever it could be mistaken for a dictionary', () => {
