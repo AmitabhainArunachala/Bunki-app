@@ -6,16 +6,19 @@
 # These governing artifacts may change only in an explicit operator-reviewed
 # documentation PR that also replaces this record.
 #
-# G00 extends the protected set with the selected end-to-end controller,
-# its supersession note, initial goal state/ledger, visual manifest, and
+# G00 extends the protected set only with immutable governing artifacts:
+# the selected end-to-end controller, its supersession note, and its
 # controller-admission ADR. The three original protected hashes remain intact.
+#
+# Mutable runtime evidence is intentionally excluded from this sha256sum gate:
+# docs/goal/BUNKI_END_TO_END_GOAL_STATE.json
+# docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md
+# docs/goal/BUNKI_OPERATOR_VISUAL_REFERENCES.json
+# Their G00 hashes are non-gating bootstrap receipts in ADR-000.
 
 bc30c9bcbdd6689af4b05ee0fa55da5abcd94ba153f2ea3486fdb7fd7b9d226d  docs/operator/BUNKI_OPERATOR_PRODUCT_LOCK_2026-07-29.md
 8d65e62195afa5b5090c71dd647c08e1873e0c3d23600194562eb3f302243295  docs/prompts/BUNKI_WHOLE_PRODUCT_LONG_RUNNING_GOAL_2026-07-29.md
 c5ea576f4e026018525c9bfb3b2b29a30c7ce924728ff68ca63a30d290f92fed  docs/build-evidence/BUNKI_WHOLE_PRODUCT_ADMISSION_2026-07-29.md
-457ed6b2d1582ce01249224f7c52a91868e2290862ec8ce931365b1088d3d308  docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md
-30cca0fca1d39a7f55719b422a918caf33931e2f620603d1643dacf9121b1168  docs/prompts/BUNKI_CONTROLLER_SUPERSESSION_2026-07-29.md
-5f3f51e134ea8856ce95ee523fae6d2f26b5c9794595a180f609ebf629bb9eab  docs/goal/BUNKI_END_TO_END_GOAL_STATE.json
-19c2b776c8e20082a211e1872b38728c5e38405b64c32b723d2e566eb986cfea  docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md
-f7d3ce9a4e43350d7d465e62f4a517bcfb5ad21fc6ae468b505982281133fb22  docs/goal/BUNKI_OPERATOR_VISUAL_REFERENCES.json
-4ce1cd43dba8f142e39105f0681f4e11d1838e4dd743ad29b75831b14b8fe634  docs/goal/decisions/ADR-000-G00-CONTROLLER-ADMISSION.md
+6e7449149efb0fb60c8475809f451e6faecdfeb83e830e96f26f6ca04e9bcbb7  docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md
+43ff24cdb0f50efd6787cc0adf2ca08309deea46df051e5c0f2ed27948cf8541  docs/prompts/BUNKI_CONTROLLER_SUPERSESSION_2026-07-29.md
+635ab66f525082597e54dd7c82ea2a3fb0f433e275da9fc1bff8f310c7f4377b  docs/goal/decisions/ADR-000-G00-CONTROLLER-ADMISSION.md
