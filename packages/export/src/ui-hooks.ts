@@ -95,9 +95,10 @@ const DOMAIN_PACKAGE_VERSION = '0.0.0';
  * pinned, which is false, and a false claim in the field a future importer uses
  * to decide whether it can reproduce a state is the worst place for one.
  *
- * The string carries the four things that determine a derived interval — the
- * package, its version, the algorithm generation, and the parameter set — so an
- * importer can tell "same numbers" from "same library, different parameters".
+ * The string carries the five things that determine a derived interval — the
+ * package, its version, the algorithm generation, the parameter set, and the
+ * review-time policy — so an importer can distinguish matching scheduling
+ * semantics from a build that only shares the same library and weights.
  * The pin is read from the kernel rather than retyped, so it cannot describe a
  * configuration the reducer is not using.
  *
@@ -108,7 +109,9 @@ const DOMAIN_PACKAGE_VERSION = '0.0.0';
 export function appVersionsForBuild(): AppVersionsInput {
   return {
     domain: `${DOMAIN_PACKAGE_NAME}@${DOMAIN_PACKAGE_VERSION}`,
-    fsrs: `${FSRS_PIN.package}@${FSRS_PIN.version} (${FSRS_PIN.algorithm}, parameters ${FSRS_PIN.parameterSetId})`,
+    fsrs:
+      `${FSRS_PIN.package}@${FSRS_PIN.version} (${FSRS_PIN.algorithm}, ` +
+      `parameters ${FSRS_PIN.parameterSetId}, review-time ${FSRS_PIN.reviewTimePolicyId})`,
   };
 }
 
