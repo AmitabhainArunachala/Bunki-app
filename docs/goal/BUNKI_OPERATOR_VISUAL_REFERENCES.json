@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-07-29",
+  "status": "EMPTY_CONFIRMED",
+  "references": [],
+  "notes": [
+    "No operator screenshot bytes were available in the G00 publication context.",
+    "Do not infer visual requirements from absent or inaccessible images.",
+    "Append future references with SHA-256, received date, local or Library identity, visible surface, actual evidence, accepted preference or constraint, supersession state, and exact build or commit when known."
+  ]
+}
