@@ -26,6 +26,13 @@
  * interaction was a declared probe or exposure, and the one hard-coded repair
  * branch whose rejoin is declared by evidence rather than by a step count.
  *
+ * What lane L1 adds: `src/demo/` — a scripted learner. Pure, deterministic and
+ * seeded, it drives the factories, the gate and the pinned reducer above to
+ * produce a populated event log, so that a surface built against a learner with
+ * two years of history can be seen working instead of rendering its empty case
+ * forever. It mints nothing itself and can grade nothing: it is a caller of this
+ * kernel, held inside it so every runtime shares one.
+ *
  * Note for a reader of `PHASE0_SEAMS` (`src/reducers/seams.ts`): its WP-08 entry
  * still reads `status: 'open'`. That is a surface-lock artefact, not a statement
  * about this tree — `src/reducers/` is outside WP-08's W4 write lock, so
@@ -49,3 +56,4 @@ export * from './graph/index.ts';
 export * from './scale/index.ts';
 export * from './journey/index.ts';
 export * from './guide/index.ts';
+export * from './demo/index.ts';
