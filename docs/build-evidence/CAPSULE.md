@@ -10319,3 +10319,84 @@ read. The flagship set is **one stage, six surfaces, one browser session**: map,
 dive, sitting, branches, ledger, reading, walked through the shell so the frames
 are six views of one log rather than six screens that each happen to render. The
 strip is in every frame and every frame's caption quotes it.
+
+## 12. L1 appendix — the numbers, corrected, and one finding about the harness
+
+This capsule is append-only, so the counts in §3 and §7 above stand as they were
+written and this section is what a reader should believe instead. Three of them
+moved after the section was written, for reasons worth naming rather than
+quietly overwriting.
+
+### The check set, on the pushed tree, run one at a time
+
+| Check | Result |
+| ----- | ------ |
+| `npm ci` | clean |
+| `npm run lint` | exit 0, silent |
+| `npm run format:check` | all matched files formatted |
+| `npm run typecheck` | exit 0, all workspaces |
+| `npm run test` | **3630 passed**, 1 skipped, 135 files, 62 s |
+| `npm run test:replay` | **141 passed**, 21 s |
+| `npm run verify:export` | **24 passed**, 6 s |
+| `npm run test:e2e:build` | 15 static routes exported |
+| `npm run test:e2e` | **88 passed**, 6.2 min |
+
+### The finding: "run one at a time" is doing work in that sentence
+
+The suite was run twice while a Playwright run was in flight on the same
+container. Both went red, and neither failure was an assertion:
+
+- `packages/seed/test/dictionary.test.ts` timed out at vitest's 5 s default,
+  inside `await import('../src/index.ts')` — the call that parses and validates
+  3,000 lexemes and 1,241 kanji;
+- three `adv-a11y-audit` cases timed out at Playwright's 120 s, inside
+  `AxeBuilder.analyze()`.
+
+Uncontended, the same tree is green on both. Two things follow and only the
+first is a fix:
+
+1. **The seed-import block now states a budget.** `apps/app`'s
+   `screen-contract.test.ts` had already hit the identical cause and recorded
+   the identical fix ("twenty seconds is the load headroom; the assertion is
+   untouched"). The dictionary block had not, so a test with a known ~4 s cost
+   was sitting under a 5 s default — a latent fragility that this lane tripped
+   and that the next lane to add weight would have tripped again. No assertion
+   changed.
+2. **The demo suite folds the largest stage once per stage rather than three
+   times.** Replay is quadratic in (events × contracts); a suite that re-ran
+   that fold for every assertion was spending a minute of CPU proving what one
+   comparison proves, and was starving everything running beside it. The claims
+   are unchanged and the shared golden harness is still exercised on a demo log.
+
+What is **not** fixed, and is reported rather than repaired: this container runs
+two Playwright workers and a vitest pool over the same cores, and nothing in the
+check set says the two must not overlap. Every timing-bounded test in the
+repository is a test that can go red for a reason that has nothing to do with
+the code. That is a property of the harness and it is now written down.
+
+### The stage figures the app actually produces
+
+§3's table is from the synthetic-corpus runs in `packages/domain/test/demo/`.
+Over the app's own corpus — real JMdict entries, passage lexemes first — the
+map's own line reads, at the pinned day the evidence harness uses:
+
+| Stage | The map's own sentence |
+| --- | --- |
+| Day 3 | 7 of 9 contracts have evidence behind them. |
+| Month 2 | 251 of 306 contracts have evidence behind them. |
+| Month 8 | 500 of 500 contracts have evidence behind them. |
+| Year 2 | 885 of 889 contracts have evidence behind them. |
+
+The month-8 line is the plateau stated as arithmetic: **every** contract has
+been answered, because nothing new has entered for four months. The month-2 line
+is the opposite state — a learner promoting faster than they can sit, with 55
+contracts activated and never yet tested. Neither number was chosen; both are
+what the ledger says.
+
+### Reproducibility, checked rather than claimed
+
+`capture-lived-in.mjs` was run twice against two separate `expo export` builds.
+All twelve PNGs came out byte-identical; the only line that moved in the
+generated README was the build timing the app measures for itself (1,032 ms then
+1,282 ms on the same machine under different load), which is a measurement and
+is supposed to move.

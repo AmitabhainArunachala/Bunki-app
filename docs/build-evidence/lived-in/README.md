@@ -44,7 +44,7 @@ not counted 87 answers
 met once, never studied 124 words
 Sittings: 36 finished · 124 out of time · 10 left.
 Contracts per capability, never averaged — reading 265, meaning 201, listening 29, production 5, writing 0.
-Generated and folded into state in 1032 ms on this device (395 ms to write the events, 638 ms to replay them).
+Generated and folded into state in 1282 ms on this device (559 ms to write the events, 723 ms to replay them).
 Day 3 · 三日目
 Two evenings and a morning. Seven or so words met, a few kept, one sitting. Nothing has an interval yet and the map is nearly dark — which is what a real third day looks like.
 Month 2 · 二ヶ月
