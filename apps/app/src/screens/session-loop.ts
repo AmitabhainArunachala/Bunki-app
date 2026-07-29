@@ -158,6 +158,47 @@ function contractLabelsFor(lexeme: SeedLexeme): ReadonlyMap<string, string> {
   ]);
 }
 
+/**
+ * One word this sitting may draw from.
+ *
+ * ## Why this type exists — the one-word ceiling, and its removal
+ *
+ * Until this change a sitting could only ever be about **one** word, and in
+ * practice only ever about 分岐. `chooseSessionTarget` walked the learner's
+ * promoted threads and `continue`d past any whose lexeme the hand-written
+ * passage does not embed — and controller §8 ships exactly one passage. So a
+ * learner could keep and promote thirty words, open 稽古, and be told there was
+ * nothing to plan, because none of the thirty was the one word with a passage.
+ *
+ * That made the SRS undemonstrable as a thing of its own: "add anything to
+ * study" is the first clause of an SRS standing alone, and it was false for
+ * 2,999 of the 3,000 entries this build ships.
+ *
+ * The passage requirement was really a requirement of **one step** — the
+ * integration canvas — and it has been moved there. A study target needs a seed
+ * entry (so its contracts can carry real accepted answers) and a capture event
+ * (so the gate can link its contracts to a thread). A passage is optional and
+ * only decides whether this sitting gets a canvas step.
+ */
+export interface StudyTarget {
+  readonly lexeme: SeedLexeme;
+  readonly threadId: string;
+  readonly componentId: string;
+  /** The hand-written integration passage that embeds it, or `null`. */
+  readonly passage: SeedPassage | null;
+  readonly readingContractId: string;
+  readonly meaningContractId: string;
+}
+
+/**
+ * The word this sitting's **integration canvas** is about.
+ *
+ * Kept as a distinct type from {@link StudyTarget} because the canvas and the
+ * repair branch genuinely need a passage and a study target does not. It is the
+ * first promoted target the seed's passages embed, or `null` when the learner
+ * has promoted nothing the passages cover — in which case the sitting still
+ * happens and simply has no canvas step.
+ */
 export interface SessionTarget {
   readonly lexeme: SeedLexeme;
   readonly passage: SeedPassage;
@@ -195,6 +236,14 @@ export interface SessionLoopOptions {
 export interface SessionLoop {
   readonly state: SessionWorkspaceState;
   readonly target: SessionTarget | null;
+  /**
+   * Every word the learner has taken up for study, newest first.
+   *
+   * This is what the sitting is planned over. `target` above is only the canvas
+   * step's subject; a sitting with `target === null` and a non-empty
+   * `studyTargets` is a perfectly ordinary sitting without an integration step.
+   */
+  readonly studyTargets: readonly StudyTarget[];
   readonly offer: CanvasProbeOffer | null;
   readonly dispatch: (command: SessionCommand) => void;
   /**
@@ -233,6 +282,7 @@ function contractsFor(
 ): readonly DomainEvent[] {
   const readingContractId = readingContractIdFor(lexeme);
   const meaningContractId = meaningContractIdFor(lexeme);
+  if (lexeme.senses.length === 0 || lexeme.reading === '') return [];
 
   // Both events pin their `eventId` and `idempotencyKey` to the contract id, so
   // minting one the log already holds would put two events under one key that
@@ -315,42 +365,42 @@ function seedEntryFor(thread: ThreadView): SeedLexeme | null {
   return findLexemeByHeadword(thread.displayText);
 }
 
-interface ChosenTarget {
-  readonly thread: ThreadView;
-  readonly lexeme: SeedLexeme;
-  readonly passage: SeedPassage;
-  readonly componentId: string;
-  readonly capture: EncounterCapturedEvent;
-}
-
 /**
- * Which of the learner's threads this sitting is about.
+ * Every word this sitting may draw from, newest first.
  *
- * Newest first, and only threads on a promotion rung that activates contracts
- * (REQ-DM-09: `captured` and `keep` schedule nothing, so a session over one
- * would be a session whose every observation the gate refuses). A thread with no
- * seed entry, or one whose entry the hand-written passage does not embed, is
- * skipped rather than made into a canvas-less session — controller §8 ships
- * exactly one passage, and a session step that opens a passage the target is not
- * in would be the screen asserting a relation the seed does not hold.
+ * Only threads on a promotion rung that activates contracts (REQ-DM-09:
+ * `captured` and `keep` schedule nothing, so a session over one would be a
+ * session whose every observation the gate refuses). A thread with no seed entry
+ * is skipped, because its contracts would have no accepted answers to be scored
+ * against and the gate would refuse every review of them — that is a real
+ * exclusion with a stated reason, not a convenience.
+ *
+ * What is **no longer** an exclusion is "the hand-written passage does not embed
+ * this word". See {@link StudyTarget} for what that cost.
  *
  * `componentId` comes from the kernel's own derivation over the capture event,
  * not from the headword: the gate links a contract to a thread through exactly
  * that id, and a locally re-derived one that disagreed would produce contracts
  * the gate refuses for a reason no screen could explain.
+ *
+ * Deduplicated on lexeme id. Two threads about the same word would mint one pair
+ * of contracts between them — the ids are derived from the lexeme — and the
+ * second thread would then own contracts the gate links to the first. Taking the
+ * newest thread for a word and skipping the rest keeps the link single-valued.
  */
-function chooseSessionTarget(
+export function chooseStudyTargets(
   threads: readonly ThreadView[],
   log: readonly DomainEvent[],
-): ChosenTarget | null {
+): readonly StudyTarget[] {
+  const out: StudyTarget[] = [];
+  const seenLexemes = new Set<string>();
+
   for (const thread of threads) {
     if (!isPromotionActive(thread.state.promotion)) continue;
 
     const lexeme = seedEntryFor(thread);
     if (lexeme === null) continue;
-
-    const passage = passageForLexeme(lexeme.id);
-    if (passage === null) continue;
+    if (seenLexemes.has(lexeme.id)) continue;
 
     const capture = log.find(
       (event): event is EncounterCapturedEvent =>
@@ -358,20 +408,30 @@ function chooseSessionTarget(
     );
     if (capture === undefined) continue;
 
-    return {
-      thread,
+    // A contract with no accepted answers is unscorable, and the gate refuses
+    // every review of one. Minting a pair anyway would fill the plan with steps
+    // whose every answer is rejected — worse than the word simply not being
+    // schedulable, because the learner would answer and see nothing move.
+    if (lexeme.senses.length === 0 || lexeme.reading === '') continue;
+
+    seenLexemes.add(lexeme.id);
+    out.push({
       lexeme,
-      passage,
+      threadId: thread.state.threadId,
       componentId: componentIdOfEncounter(capture),
-      capture,
-    };
+      passage: passageForLexeme(lexeme.id),
+      readingContractId: readingContractIdFor(lexeme),
+      meaningContractId: meaningContractIdFor(lexeme),
+    });
   }
-  return null;
+
+  return out;
 }
 
 export interface SessionBootstrap {
   readonly workspace: SessionWorkspaceState;
   readonly target: SessionTarget | null;
+  readonly studyTargets: readonly StudyTarget[];
   readonly error: string | null;
 }
 
@@ -395,31 +455,72 @@ export function bootstrapSessionWorkspace(
   context: DomainContext,
 ): SessionBootstrap {
   const log = store.readAll();
-  const chosen = chooseSessionTarget(store.getSnapshot().threads, log);
+  const studyTargets = chooseStudyTargets(store.getSnapshot().threads, log);
 
-  if (chosen === null) {
+  if (studyTargets.length === 0) {
     return {
       workspace: createSessionWorkspace(log),
       target: null,
+      studyTargets,
       error: NO_PROMOTED_TARGET_NOTE,
     };
   }
 
+  // Contracts for **every** promoted word, not only the one the canvas is about.
+  // `establishedContractIds` is read once and grown as the loop mints, so two
+  // targets that resolved to the same lexeme cannot mint one contract id twice
+  // within a single bootstrap — the `IdempotencyConflictError` shape replay
+  // refuses.
+  const established = new Set(establishedContractIds(log));
+  const contracts: DomainEvent[] = [];
+  for (const study of studyTargets) {
+    for (const event of contractsFor(context, study.lexeme, study.componentId, established)) {
+      contracts.push(event);
+      if (event.type === 'ContractCreated') established.add(event.contractId);
+    }
+  }
+
+  // The canvas step's subject: the first promoted word the seed's passages
+  // embed. `null` is an ordinary answer — the sitting then has no canvas step,
+  // which is what `planSession` does with an absent `canvasId`.
+  const canvasTarget = studyTargets.find((study) => study.passage !== null) ?? null;
+
   return {
-    workspace: createSessionWorkspace([
-      ...log,
-      ...contractsFor(context, chosen.lexeme, chosen.componentId, establishedContractIds(log)),
-    ]),
-    target: {
-      lexeme: chosen.lexeme,
-      passage: chosen.passage,
-      componentId: chosen.componentId,
-      threadId: chosen.thread.state.threadId,
-      probeContractId: readingContractIdFor(chosen.lexeme),
-      contractLabels: contractLabelsFor(chosen.lexeme),
-    },
+    workspace: createSessionWorkspace([...log, ...contracts]),
+    target:
+      canvasTarget === null || canvasTarget.passage === null
+        ? null
+        : {
+            lexeme: canvasTarget.lexeme,
+            passage: canvasTarget.passage,
+            componentId: canvasTarget.componentId,
+            threadId: canvasTarget.threadId,
+            probeContractId: canvasTarget.readingContractId,
+            contractLabels: contractLabelsForAll(studyTargets),
+          },
+    studyTargets,
     error: null,
   };
+}
+
+/**
+ * One label map covering every contract every study target minted.
+ *
+ * The planner labels a step by looking its contract id up in this map, and the
+ * fallback is the raw contract id — which is what a learner was shown as their
+ * recall prompt the last time this map was narrower than the set of contracts
+ * that exist (see {@link SessionTarget.contractLabels}). With a sitting now
+ * drawing on every promoted word, a per-target map would put a raw
+ * `contract-meaning-lex-…` in front of the learner for every word but one.
+ */
+export function contractLabelsForAll(
+  studyTargets: readonly StudyTarget[],
+): ReadonlyMap<string, string> {
+  const merged = new Map<string, string>();
+  for (const study of studyTargets) {
+    for (const [id, label] of contractLabelsFor(study.lexeme)) merged.set(id, label);
+  }
+  return merged;
 }
 
 /**
@@ -559,7 +660,15 @@ export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
 
   const now = useCallback(() => context.clock.now(), [context]);
 
-  return { state, target: initial.target, offer, dispatch, now, error: initial.error };
+  return {
+    state,
+    target: initial.target,
+    studyTargets: initial.studyTargets,
+    offer,
+    dispatch,
+    now,
+    error: initial.error,
+  };
 }
 
 /**

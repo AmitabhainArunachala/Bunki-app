@@ -8,6 +8,7 @@
  *   - `runtime.ts`  — how far into it are we, and how does it end?
  *   - `canvas.ts`   — was that a declared probe, or was it exposure?
  *   - `repair.ts`   — one stumble, two hypotheses, and an evidence-defined rejoin.
+ *   - `standing.ts` — what is held, per capability, and the load ahead.
  *
  * plus `commands.ts`, the handler a screen submits to, so that `apps/app` holds
  * no scheduling, grading or evidence logic (controller §5).
@@ -27,3 +28,4 @@ export * from './runtime.ts';
 export * from './canvas.ts';
 export * from './repair.ts';
 export * from './commands.ts';
+export * from './standing.ts';

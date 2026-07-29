@@ -53,6 +53,13 @@ describe('WP-08 filled src/session without putting a scheduler in it', () => {
       'plan.ts',
       'repair.ts',
       'runtime.ts',
+      // Added by the pillars lane: the standing/load projection REQ-SCH-04's
+      // "never an unbounded due count" needs a home for. It is in this
+      // directory because deciding what is fragile and when something returns
+      // is scheduling, and `apps/app` may hold none of it (controller §5) —
+      // and it is checked by the two assertions below like everything else
+      // here, so it imports no scheduler and computes no interval.
+      'standing.ts',
     ]);
   });
 

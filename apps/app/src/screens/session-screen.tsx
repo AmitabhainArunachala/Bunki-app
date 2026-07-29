@@ -30,25 +30,38 @@ import {
   SESSION_STEP_PURPOSE,
   currentStep,
   sessionProgress,
+  srsStanding,
   type DomainContext,
   type Grade,
   type SessionStep,
+  type SrsStanding,
 } from '@bunki/domain';
 
 import { useDebugFlags } from '../state/app-context.tsx';
 import { useLookup } from '../state/use-lookup.ts';
+import { Disclosure } from '../ui/disclosure.tsx';
 import { SeedEntryDisclosure } from '../ui/notices.tsx';
-import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
+import { AppButton, Hairline, RowButton, Section } from '../ui/primitives.tsx';
+import { RubyText } from '../ui/ruby.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
+import {
+  NAMED_DECKS_NOT_AVAILABLE,
+  SPINE_DERIVATION_NOTE,
+  spinesFrom,
+  type StudySpine,
+} from '../ui/session/spines.ts';
+import { SrsPanel } from '../ui/session/srs-panel.tsx';
 import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
 import { useTheme } from '../ui/theme-context.tsx';
 import {
+  contractLabelsForAll,
   NO_PROMOTED_TARGET_NOTE,
   SESSION_INTEGRATION_NOTE,
   useSessionLoop,
   type SessionLoop,
   type SessionTarget,
+  type StudyTarget,
 } from './session-loop.ts';
 import { elapsedMs, usePresentedAt } from './session-timing.ts';
 
@@ -75,6 +88,14 @@ export interface SessionScreenProps {
   readonly onOpenCanvas: (canvasId: string) => void;
   readonly onOpenRepair: () => void;
   readonly onBack: () => void;
+  /**
+   * Open the word page for something in the study list.
+   *
+   * Optional so the screen still renders when it is mounted without a router —
+   * the tests and the screenshot harness do that — in which case the rows are
+   * plain text rather than dead controls.
+   */
+  readonly onOpenWord?: ((lexemeId: string) => void) | undefined;
 }
 
 export function SessionScreen({
@@ -84,6 +105,7 @@ export function SessionScreen({
   onOpenCanvas,
   onOpenRepair,
   onBack,
+  onOpenWord,
 }: SessionScreenProps): ReactNode {
   const theme = useTheme();
   const flags = useDebugFlags();
@@ -92,10 +114,22 @@ export function SessionScreen({
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showBacklog, setShowBacklog] = useState(false);
 
-  // The seed resolution goes through the same state machine as every other
-  // screen, so loading and error are the real ones, not a stand-in (REQ-UI-09).
-  const resolve = useCallback(() => loop.target, [loop.target]);
-  const { state: view, retry } = useLookup<SessionTarget>(resolve, {
+  /*
+    The gate is "has the learner taken anything up for study", not "is there a
+    passage for it".
+
+    Until the one-word ceiling was removed this resolved `loop.target`, which is
+    the *canvas* target and therefore required the seed's single hand-written
+    passage to embed the word. A learner with thirty promoted words and no 分岐
+    was shown the empty state — see `StudyTarget` in `session-loop.ts` for what
+    that cost. The canvas is now one optional step of a sitting rather than its
+    precondition.
+  */
+  const resolve = useCallback(
+    () => (loop.studyTargets.length === 0 ? null : loop.studyTargets),
+    [loop.studyTargets],
+  );
+  const { state: view, retry } = useLookup<readonly StudyTarget[]>(resolve, {
     flags,
     emptyMessage: 'Nothing is taken up for study yet.',
     emptyDetail: loop.error ?? NO_PROMOTED_TARGET_NOTE,
@@ -135,12 +169,14 @@ export function SessionScreen({
       onBack={onBack}
       onOpenCanvas={onOpenCanvas}
       onOpenRepair={onOpenRepair}
+      onOpenWord={onOpenWord}
       revealed={revealed}
       setHintsUsed={setHintsUsed}
       setRevealed={setRevealed}
       setShowBacklog={setShowBacklog}
       showBacklog={showBacklog}
-      target={view.data}
+      studyTargets={view.data}
+      target={loop.target}
       theme={theme}
       timeBudgetMin={timeBudgetMin}
     />
@@ -149,7 +185,9 @@ export function SessionScreen({
 
 interface SessionBodyProps {
   readonly loop: SessionLoop;
-  readonly target: SessionTarget;
+  /** The canvas step's subject, or `null` when this sitting has no canvas step. */
+  readonly target: SessionTarget | null;
+  readonly studyTargets: readonly StudyTarget[];
   readonly theme: ReturnType<typeof useTheme>;
   readonly timeBudgetMin: number;
   readonly newBudget: number;
@@ -162,11 +200,13 @@ interface SessionBodyProps {
   readonly onOpenCanvas: (canvasId: string) => void;
   readonly onOpenRepair: () => void;
   readonly onBack: () => void;
+  readonly onOpenWord?: ((lexemeId: string) => void) | undefined;
 }
 
 function SessionBody({
   loop,
   target,
+  studyTargets,
   theme,
   timeBudgetMin,
   newBudget,
@@ -179,18 +219,29 @@ function SessionBody({
   onOpenCanvas,
   onOpenRepair,
   onBack,
+  onOpenWord,
 }: SessionBodyProps): ReactNode {
   const runtime = loop.state.runtime;
   const step = runtime === null ? null : currentStep(runtime);
 
-  // Every contract the target minted, not only the one the canvas probes. The
-  // planner draws from all of them — and because reading and meaning are minted
-  // on the same tick, `compareDueContracts` falls through to its id tiebreak and
-  // routinely draws the *meaning* contract first. A map holding only the reading
-  // contract left that step to the planner's `?? memory.contractId` fallback,
-  // which put a raw `contract-meaning-…` in front of the learner as the thing
-  // they were being asked to recall.
-  const labels = target.contractLabels;
+  // Every contract every promoted word minted, not only the ones the canvas
+  // probes. The planner draws from all of them — and because reading and meaning
+  // are minted on the same tick, `compareDueContracts` falls through to its id
+  // tiebreak and routinely draws the *meaning* contract first. A map narrower
+  // than the set of contracts that exist leaves those steps to the planner's
+  // `?? memory.contractId` fallback, which puts a raw `contract-meaning-…` in
+  // front of the learner as the thing they are being asked to recall.
+  const labels = contractLabelsForAll(studyTargets);
+
+  // Straight from the kernel's own replay of the sitting's log, at the sitting's
+  // own injected clock. Not a second projection: `loop.state.derived` is
+  // `replay(log)`, the same value an export replays to.
+  const standing: SrsStanding = srsStanding(loop.state.derived, {
+    asOf: loop.now(),
+    labelByContract: labels,
+  });
+
+  const spines: readonly StudySpine[] = spinesFrom(studyTargets, loop.state.log);
 
   // When the prompt now in front of the learner appeared. Re-marked whenever the
   // session moves to another step, so the latency reported for an answer is the
@@ -205,7 +256,10 @@ function SessionBody({
       kind: 'start',
       timeBudgetMin,
       newBudget,
-      canvasId: target.passage.id,
+      // Only when a promoted word is actually in the seed's passage. An absent
+      // `canvasId` is an ordinary input to `planSession`; it composes a sitting
+      // without an integration step rather than refusing to compose one.
+      ...(target === null ? {} : { canvasId: target.passage.id }),
       asOf: loop.now(),
       labelByContract: labels,
     });
@@ -214,8 +268,8 @@ function SessionBody({
   if (runtime === null) {
     return (
       <ScreenShell
-        // The intro names the word the sitting will be built from, which is a
-        // JMdict headword on a screen — the display §3 of the EDRDG statement
+        // The intro names the words the sitting will be built from, which are
+        // JMdict headwords on a screen — the display §3 of the EDRDG statement
         // attaches the acknowledgement to.
         notice={<SeedEntryDisclosure />}
         subtitle={`A finite sitting for the time you have. ${String(timeBudgetMin)} minutes, one new item at most.`}
@@ -229,8 +283,10 @@ function SessionBody({
           title="Ready when you are"
         >
           <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-            The sitting will be built from what is due for {target.lexeme.headword} and the passage
-            that embeds it.
+            {`The sitting will be built from what is due across the ${String(studyTargets.length)} word(s) you have taken up for study.`}{' '}
+            {target === null
+              ? 'None of them is in the seed’s hand-written passage, so this sitting has no integration step — the passage is one step, not a requirement.'
+              : `${target.lexeme.headword} is in the passage, so this sitting also has an integration step.`}
           </Text>
           <AppButton
             accessibilityHint="Composes the plan for the chosen budget and opens the session."
@@ -240,6 +296,11 @@ function SessionBody({
             variant="primary"
           />
         </Section>
+
+        <SrsPanel standing={standing} testID="session-srs-panel" />
+
+        <StudyList onOpenWord={onOpenWord} spines={spines} studyTargets={studyTargets} />
+
         <Hairline />
         <AppButton accessibilityHint="Returns to search." label="Back" onPress={onBack} />
       </ScreenShell>
@@ -356,25 +417,41 @@ function SessionBody({
           title={`Now: ${step.label}`}
         >
           {step.kind === 'canvas' ? (
-            <>
+            /*
+              A canvas step only exists when `start` passed a `canvasId`, and it
+              only does that when `target` is non-null. The narrowing is still
+              written out rather than asserted: a `!` here would be the screen
+              promising something the planner, not the screen, decides.
+            */
+            target === null ? (
               <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-                Read {target.passage.title} with {target.lexeme.headword} in it. What you do there
-                is classified when you do it — some of it is a real review, most of it is exposure.
+                This sitting has no integration passage. Nothing you have taken up for study is in
+                the seed’s hand-written passage.
               </Text>
-              <AppButton
-                accessibilityHint="Opens the integration canvas for this passage."
-                label="Open the passage"
-                onPress={() => onOpenCanvas(step.canvasId ?? target.passage.id)}
-                testID="session-open-canvas"
-                variant="primary"
-              />
-              <AppButton
-                accessibilityHint="Marks the reading done and moves to the next step."
-                label="Done reading"
-                onPress={() => loop.dispatch({ kind: 'completeStep' })}
-                testID="session-complete-canvas"
-              />
-            </>
+            ) : (
+              <>
+                <Text
+                  style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+                >
+                  Read {target.passage.title} with {target.lexeme.headword} in it. What you do there
+                  is classified when you do it — some of it is a real review, most of it is
+                  exposure.
+                </Text>
+                <AppButton
+                  accessibilityHint="Opens the integration canvas for this passage."
+                  label="Open the passage"
+                  onPress={() => onOpenCanvas(step.canvasId ?? target.passage.id)}
+                  testID="session-open-canvas"
+                  variant="primary"
+                />
+                <AppButton
+                  accessibilityHint="Marks the reading done and moves to the next step."
+                  label="Done reading"
+                  onPress={() => loop.dispatch({ kind: 'completeStep' })}
+                  testID="session-complete-canvas"
+                />
+              </>
+            )
           ) : step.kind === 'closure' ? (
             <AppButton
               accessibilityHint="Ends the session and records how it finished."
@@ -475,6 +552,22 @@ function SessionBody({
         </Section>
       )}
 
+      {/*
+        The statistics, one level deeper while a sitting is open.
+
+        Leading with them mid-sitting would put the backlog in front of the
+        learner at exactly the moment REQ-SCH-04 exists to protect — but hiding
+        them entirely would be the dishonest hiding Codex §15.6 names. A closed
+        disclosure is the shape that is neither.
+      */}
+      <Disclosure
+        note="The same figures as before the sitting, recomputed from this sitting’s own log."
+        testID="session-stats-disclosure"
+        title="What you are holding, and the load ahead"
+      >
+        <SrsPanel standing={standing} testID="session-srs-panel-open" />
+      </Disclosure>
+
       <AppButton
         accessibilityHint="Opens the repair branch for the most recent miss."
         label="Repair branch"
@@ -484,6 +577,118 @@ function SessionBody({
       />
       <AppButton accessibilityHint="Returns to search." label="Back" onPress={onBack} />
     </ScreenShell>
+  );
+}
+
+/**
+ * Everything taken up for study, and the spines it falls into.
+ *
+ * The list is the whole of it — no pagination, no "top 5" — because a learner
+ * asking "what am I studying" is asking for the set, and a truncated answer to
+ * that question is how a list becomes a graveyard (frozen §10.1).
+ */
+function StudyList({
+  studyTargets,
+  spines,
+  onOpenWord,
+}: {
+  readonly studyTargets: readonly StudyTarget[];
+  readonly spines: readonly StudySpine[];
+  readonly onOpenWord?: ((lexemeId: string) => void) | undefined;
+}): ReactNode {
+  const theme = useTheme();
+
+  return (
+    <Section
+      note={SPINE_DERIVATION_NOTE}
+      testID="session-study-list"
+      title={`Taken up for study (${String(studyTargets.length)})`}
+    >
+      {studyTargets.map((study) =>
+        onOpenWord === undefined ? (
+          <View
+            key={study.threadId}
+            style={styles.studyRow}
+            testID={`session-study-${study.lexeme.id}`}
+          >
+            <StudyRowContent study={study} theme={theme} />
+          </View>
+        ) : (
+          <RowButton
+            accessibilityHint="Opens its word page."
+            accessibilityLabel={`${study.lexeme.headword}, read ${study.lexeme.reading}: ${study.lexeme.senses.join(', ')}`}
+            key={study.threadId}
+            onPress={() => onOpenWord(study.lexeme.id)}
+            testID={`session-study-${study.lexeme.id}`}
+          >
+            <StudyRowContent study={study} theme={theme} />
+          </RowButton>
+        ),
+      )}
+
+      <Disclosure
+        count={spines.length}
+        empty={
+          spines.length === 0
+            ? 'No grouping has two members yet. A spine of one is the word itself with extra chrome.'
+            : undefined
+        }
+        note="Views over one memory state, derived from the log."
+        testID="session-spines"
+        title="Spines"
+      >
+        {spines.map((spine) => (
+          <View key={spine.id} style={styles.studyRow}>
+            <Text
+              style={[styles.planLabel, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+            >
+              {spine.label} · {String(spine.targets.length)}
+            </Text>
+            <Text
+              style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            >
+              {spine.targets.map((target) => target.lexeme.headword).join('、')}
+            </Text>
+            <Text
+              style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}
+            >
+              {spine.derivation}
+            </Text>
+          </View>
+        ))}
+      </Disclosure>
+
+      <Text
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+        testID="session-named-decks-gap"
+      >
+        {NAMED_DECKS_NOT_AVAILABLE}
+      </Text>
+    </Section>
+  );
+}
+
+/** One study-list row's content, shared by the tappable and inert variants. */
+function StudyRowContent({
+  study,
+  theme,
+}: {
+  readonly study: StudyTarget;
+  readonly theme: ReturnType<typeof useTheme>;
+}): ReactNode {
+  return (
+    <>
+      <RubyText
+        reading={study.lexeme.reading}
+        serif={false}
+        size={TYPE.body}
+        written={study.lexeme.headword}
+      />
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        {study.lexeme.senses.slice(0, 2).join(' · ')}
+        {study.passage === null ? '' : ' · in the passage'}
+      </Text>
+    </>
   );
 }
 
@@ -610,6 +815,9 @@ const styles = StyleSheet.create({
   planLabel: {
     fontSize: TYPE.label,
     fontWeight: '600',
+  },
+  studyRow: {
+    gap: 2,
   },
   progress: {
     borderRadius: RADIUS.md,

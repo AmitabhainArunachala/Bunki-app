@@ -27,6 +27,15 @@ export default function SessionRoute(): ReactNode {
         onBack={() => router.push('/')}
         onOpenCanvas={() => router.push('/canvas')}
         onOpenRepair={() => router.push('/repair')}
+        /*
+          A word in the study list is a door to its page.
+
+          The master definition-of-done's "recursively explorable" clause is
+          about not having dead ends, and a list of the words you are studying
+          that you cannot open is one — it is the renzo "vocabulary graveyard"
+          (frozen §10.1) rebuilt inside the SRS.
+        */
+        onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
       />
     </>
   );
