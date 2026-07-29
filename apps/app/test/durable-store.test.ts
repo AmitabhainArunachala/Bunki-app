@@ -229,12 +229,13 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
     expect(state.kind === 'failed' ? state.message : '').toContain('quota');
   });
 
-  it('keeps an unresolved gap visible while a later independent append succeeds', async () => {
+  it('keeps an unresolved gap visible while a queued independent append succeeds', async () => {
     const snapshotStore = newSnapshotStore();
     const context = newContext('run1-');
     let attempts = 0;
     let inFlight = 0;
     let maxInFlight = 0;
+    const adapterOrder: string[] = [];
 
     const durable = await createDurableAppStore({
       appVersions: APP_VERSIONS,
@@ -246,13 +247,17 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
         const real = openAppEventStore(options);
         return replaceAppend(real, async (events, appendOptions) => {
           attempts += 1;
+          const attempt = attempts;
+          adapterOrder.push(`start-${String(attempt)}`);
           inFlight += 1;
           maxInFlight = Math.max(maxInFlight, inFlight);
           try {
-            if (attempts === 1) throw new Error('temporary write refusal');
-            await real.store.append(events, appendOptions);
+            if (attempt === 1) throw new Error('temporary write refusal');
+            const result = await real.store.append(events, appendOptions);
+            return result;
           } finally {
             inFlight -= 1;
+            adapterOrder.push(`finish-${String(attempt)}`);
           }
         });
       },
@@ -262,15 +267,12 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
       transitions.push(durable.getWriteState().kind);
     });
 
+    // Both commands are acknowledged before either append settles. The queue
+    // must let the second continue after the first refuses without hiding the
+    // first command's unresolved durability gap.
     const first = durable.store.execute(capture('最初'));
-    await durable.flush();
-    expect(durable.getWriteState()).toEqual({
-      kind: 'failed',
-      message: 'temporary write refusal',
-    });
-
-    const failureTransition = transitions.lastIndexOf('failed');
     const second = durable.store.execute(capture('次'));
+    expect(durable.getWriteState().kind).toBe('writing');
     await durable.flush();
     unsubscribe();
 
@@ -278,14 +280,26 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
       kind: 'failed',
       message: 'temporary write refusal',
     });
+    const failureTransition = transitions.lastIndexOf('failed');
+    expect(failureTransition).toBeGreaterThanOrEqual(0);
     expect(transitions.slice(failureTransition + 1)).not.toContain('settled');
     expect(attempts).toBe(2);
     expect(maxInFlight).toBe(1);
+    expect(adapterOrder).toEqual(['start-1', 'finish-1', 'start-2', 'finish-2']);
 
     const optimisticIds = durable.store.readAll().map((event) => event.eventId);
     const durableIds = (await durable.eventStore.readAll()).map((event) => event.eventId);
+    const exportedIds = (await durable.eventStore.exportJson()).events.map(
+      (event) => event.eventId,
+    );
     expect(optimisticIds).toEqual([first.events[0]?.eventId, second.events[0]?.eventId]);
     expect(durableIds).toEqual([second.events[0]?.eventId]);
+    expect(exportedIds).toEqual([second.events[0]?.eventId]);
+
+    const reloaded = await launch(snapshotStore, 'run2-');
+    expect(reloaded.store.readAll().map((event) => event.eventId)).toEqual([
+      second.events[0]?.eventId,
+    ]);
   });
 
   it('keeps serial order and settles only after an all-success queue drains', async () => {
@@ -306,7 +320,8 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
           inFlight += 1;
           maxInFlight = Math.max(maxInFlight, inFlight);
           try {
-            await real.store.append(events, appendOptions);
+            const result = await real.store.append(events, appendOptions);
+            return result;
           } finally {
             inFlight -= 1;
           }
@@ -348,7 +363,7 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
         return replaceAppend(real, async (events, appendOptions) => {
           attempts += 1;
           if (attempts !== 2) throw new Error(`write refusal ${String(attempts)}`);
-          await real.store.append(events, appendOptions);
+          return real.store.append(events, appendOptions);
         });
       },
     });
@@ -385,8 +400,9 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
         const real = openAppEventStore(options);
         return replaceAppend(real, async (events, appendOptions) => {
           attempts += 1;
-          await real.store.append(events, appendOptions);
+          const result = await real.store.append(events, appendOptions);
           if (attempts === 1) throw new Error('append acknowledgement lost');
+          return result;
         });
       },
     });
