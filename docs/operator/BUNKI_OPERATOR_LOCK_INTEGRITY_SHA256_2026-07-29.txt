@@ -1,0 +1,11 @@
+# Bunki operator-lock integrity record — 2026-07-29
+#
+# Verify from the repository root with:
+#   sha256sum -c docs/operator/BUNKI_OPERATOR_LOCK_INTEGRITY_SHA256_2026-07-29.txt
+#
+# These governing artifacts may change only in an explicit operator-reviewed
+# documentation PR that also replaces this record.
+
+bc30c9bcbdd6689af4b05ee0fa55da5abcd94ba153f2ea3486fdb7fd7b9d226d  docs/operator/BUNKI_OPERATOR_PRODUCT_LOCK_2026-07-29.md
+8d65e62195afa5b5090c71dd647c08e1873e0c3d23600194562eb3f302243295  docs/prompts/BUNKI_WHOLE_PRODUCT_LONG_RUNNING_GOAL_2026-07-29.md
+c5ea576f4e026018525c9bfb3b2b29a30c7ce924728ff68ca63a30d290f92fed  docs/build-evidence/BUNKI_WHOLE_PRODUCT_ADMISSION_2026-07-29.md
