@@ -10077,3 +10077,214 @@ New unit file: `test/map-territory.test.ts` (12).
 - **That `stroke-brush.spec.ts` is free of timing flake.** It failed once under
   full parallel load and passed in isolation and in the final full run. It is a
   timing test on a shared runner; the flake is recorded rather than papered over.
+
+---
+
+# Appendix — L2: the dictionary and the SRS, each whole on its own
+
+**Branch:** `agent/bunki-pillars-dict-srs`, from `agent/bunki-e-weave` (f8e5f16).
+
+The operator's charge was that the app "is a standalone dictionary alone… an SRS
+app alone", and the diagnosis behind it was that nothing produced a populated
+state, so no surface could be judged. This lane took the two pillars it owns and
+asked what was actually missing when each is used *by itself*.
+
+## 1. The finding that mattered: the SRS could study exactly one word
+
+`chooseSessionTarget` walked the learner's promoted threads and `continue`d past
+any whose lexeme the hand-written passage does not embed. Controller §8 ships
+**one** passage. So the reachable behaviour was:
+
+> Keep and promote 時間, 学校 and 友達 — three of the 3,000 JMdict entries this
+> build ships. Open 稽古 Session. Be told **"Nothing is taken up for study yet."**
+
+Three words taken up; an empty state saying none were. "Add anything to study, in
+one action" — the first clause of an SRS standing alone — was false for 2,999 of
+3,000 entries. Nothing in the suite noticed because every session test promoted
+分岐, the one word with a passage.
+
+The passage requirement was really a requirement of **one step**, the integration
+canvas, and it has moved there. A `StudyTarget` needs a seed entry (so its
+contracts carry real accepted answers) and a capture event (so the gate can link
+them to a thread). `planSession` already treats an absent `canvasId` as an
+ordinary input and composes a sitting without an integration step.
+
+`apps/app/test/session-many-words.test.ts` (11 cases) fails against the old
+version at every case. It asserts up front that the three words really are
+outside the passage, so a later change to the passage cannot make it pass for the
+wrong reason.
+
+**What did not change, and is not a shortfall:** a sitting still admits at most
+one *new* item (`PHASE0_MAX_NEW_ITEMS`, controller §6.4). What changed is which
+words that one may be drawn from. A case shows several review steps across two
+words once they have history.
+
+## 2. Honest statistics — `packages/domain/src/session/standing.ts`
+
+Four named standings per capability lens — never asked, fragile, due now,
+holding — plus a fourteen-day window of scheduled load. The round-2 research
+names review-debt spike as the single most common reason people abandon SRS
+entirely; a load you can see coming is a load you can manage.
+
+Three constraints shaped where it lives and what it may say:
+
+- **It is in the kernel, not the app.** Deciding what is fragile and when
+  something returns is scheduling, and `apps/app` may hold none of it —
+  `screen-contract.test.ts` enforces that by scanning app source for the
+  scheduler's nouns. Every sentence the surface renders is a constant in that
+  file for the same reason: the copy needs the vocabulary to be true, and the app
+  is not allowed to author it. `srs-panel.tsx` imports all of it.
+- **"Fragile" is literally `classifyDueContract`**, the planner's own rule,
+  imported rather than restated, so the statistics screen's word and a plan's
+  first section cannot come to mean two different things.
+- **The day arithmetic is `days_from_civil` written out.**
+  `no-ambient-nondeterminism.test.ts` bans `Date.parse` and `new Date` under
+  `src/` and is right to; the first draft used both and the purity suite caught
+  it. Leap day, non-leap century and year boundaries are all cases.
+
+No total, no ratio, no average, no ordering by "how well you are doing". A test
+asserts the returned object has no key containing score/mastery/percent/level.
+
+`standing.ts` is registered in `seams-left-empty.test.ts`'s exhaustive listing of
+`src/session/`, which is the mechanism that makes adding a file to that directory
+a decision rather than an accident.
+
+## 3. Spines, and the deck that is not built
+
+`src/ui/session/spines.ts` derives groupings **from the log**: where an encounter
+was kept (`EncounterCaptured.sourceRef.locator`) and what a word is written with.
+They survive a reload, appear in an export and replay, because they are views
+rather than containers — frozen §10.2's "one Trace, many views".
+
+**Named personal decks are not built, and say so on screen.** The v1 event
+catalog has no field that can carry a learner-authored label on a thread, and
+both hiding places are worse than the gap: writing a deck name into
+`sourceRef.locator` would durably record a false statement about where an
+encounter came from, and a React-state list would vanish on reload and never
+reach an export — the "vocabulary graveyard" §10.1 diagnoses in renzo. It needs
+an ADR-002 amendment.
+
+## 4. The dictionary: three doors that did not exist, and a middle to open at
+
+- **Romaji** (`src/data/romaji.ts`). Before this, the only ways in were a
+  Japanese IME and an English gloss. A wāpuro transliterator, both Hepburn and
+  kunrei spellings, running once per query on all-Latin input only. `bunki` finds
+  分岐; `romaji-exact` ranks after `reading-exact` and never above a real match.
+  The ん rule is the one worth reading twice: `konnyaku` is こんにゃく, not
+  こんやく — the ん comes from the first n and the second begins にゃ. The obvious
+  implementation, which this had first, silently loses a mora on every word of
+  that shape.
+- **Component search.** 氵 finds 演, through KanjiVG's own element annotations,
+  ranked last because a character that *is* the query is always the better
+  answer.
+- **Browse** (`src/data/browse.ts`, `src/ui/dictionary/browse-panel.tsx`). Four
+  axes — school grade, stroke count, frequency band, component — each a field the
+  licensors ship, each printing the field it was read off. Tests check every
+  shelf's count against the shelf, and that grade and stroke partition the whole
+  character set exactly.
+- **Every result row says why it is a row.** With romaji and component matching
+  in the ranking a row can legitimately look nothing like what was typed, and a
+  result with no visible connection to the query is what makes a search feel like
+  it is guessing.
+
+**Two axes are absent on purpose and say so on screen.** No semantic field:
+§10.5's "arrange: 並比列陳羅揃整理" is one editor's judgement in a book this build
+has no rights to, and clustering English glosses to imitate it would look like
+scholarship and be a string match. No JLPT: KANJIDIC2 ships the field, the level
+is from the pre-2010 exam, and a shelf you can stand on is one step from a
+learner reading their own level off it. A test asserts neither axis exists.
+
+## 5. One press to study
+
+`word-take-up` on the word page runs the whole ladder — capture, keep, learn — in
+one press, beside "Just keep it". The rule the two-button ladder exists for is
+that no promotion may exist without a **user action** behind it (§2 item 6, and
+the defect the WP-10 repair round removed); this is a press, labelled with what
+it does. `keep` is still a real event on the way, because `promotionReducer`
+refuses to skip a rung. The capture screen keeps its two-rung ladder, which is
+where the capture-is-not-card-creation distinction is taught.
+
+The study list rows are doors to word pages, because a list of what you are
+studying that you cannot open is a dead end inside the SRS.
+
+## 6. Two defects this lane introduced and found by looking at its own screenshots
+
+Neither was visible to any test:
+
+1. The browse axis printed its derivation twice — the disclosure's note and an
+   explicit line in the body.
+2. An all-zero load window drew fourteen full-width grey tracks reading `0`. A
+   full-width grey rectangle is the shape of a *full* bar, so the honest picture
+   read as the alarming one, in exactly the state that follows taking words up.
+
+Both fixed; the second's fix is a sentence instead of a chart when nothing falls
+in the window.
+
+## 7. Checks run
+
+| Check | Result |
+|---|---|
+| `npm run lint` | clean |
+| `npm run format:check` | clean |
+| `npm run typecheck` | clean |
+| `npx vitest run` | **132 files, 3521 passed, 1 skipped** |
+| `npm run test:replay` | 47 passed |
+| `npm run verify:export` | 14 passed |
+| `npm run test:e2e:build` | 15 static routes exported |
+| `npx playwright test … viewport-overflow` | 3 passed (390 and 360 CSS px) |
+| `npx playwright test … pillars-dict-srs` | 3 passed |
+| `npx playwright test` (full) | 82 passed, 1 failed then passed — see below |
+
+New files: `packages/domain/src/session/standing.ts`,
+`packages/domain/test/session/standing.test.ts` (17),
+`apps/app/test/session-many-words.test.ts` (11),
+`apps/app/test/dictionary-reach.test.ts` (18),
+`apps/app/src/data/romaji.ts`, `apps/app/src/data/browse.ts`,
+`apps/app/src/ui/session/{srs-panel.tsx,spines.ts}`,
+`apps/app/src/ui/dictionary/browse-panel.tsx`,
+`apps/app/e2e/pillars-dict-srs.spec.ts`.
+
+**The one e2e failure** was `stroke-brush.spec.ts` "lands every stroke complete
+under reduced motion", under full parallel load. It passed in isolation
+immediately afterwards. It is the timing flake this capsule already records from
+the Wave D round, in a file this lane does not touch; it is repeated here rather
+than left for a reader to assume the suite was clean.
+
+## 8. What this lane does **not** claim
+
+- **That either pillar is finished.** See §9.
+- **That any of it ran on a phone.** Chromium on Linux, at a phone's CSS width.
+  No iOS, no Safari, no Firefox, no device, no screen reader.
+- **That a learner state exists to look at.** This lane produced state by
+  *pressing buttons in a browser*, which is why the screenshots are populated.
+  It built no demonstration generator and no seeded profile; a person opening the
+  app still starts empty and still has to capture something.
+- **That the search is fast at scale.** The romaji conversion is one string per
+  query and the component search is one pass over 1,241 characters, neither
+  measured. `PERF_WEB.md` was not re-run.
+- **That the browse shelves are the right shelves.** They are the fields the
+  data has. Whether a learner wants to browse by stroke count is an operator
+  question.
+
+## 9. Not done, named
+
+- **Fuzzy and partial matching beyond substring.** A typo finds nothing. There is
+  no edit-distance fallback, deliberately for now — a wrong match in a dictionary
+  is worse than a miss — but "did you mean" is a real gap.
+- **Browse by radical proper, and by semantic field.** The component axis is
+  KanjiVG elements, which is not the same as the 214-radical index a learner
+  knows; the semantic field is refused for rights reasons and stays refused.
+- **Per-sense part of speech and priority tags on the word page.** The importer
+  flattens senses; the page already says so. Untouched by this lane.
+- **Named personal decks.** §3. Needs ADR-002.
+- **A picture of a load spike.** The forecast's actual subject. Every walk in the
+  evidence produces a backlog, not a hump.
+- **The kanji page has no one-press study.** A single character does not resolve
+  to a lexeme, so promoting one would produce a thread `chooseStudyTargets`
+  silently skips. Offering the button would be worse than not having it; the
+  honest fix is a kanji-level contract, which does not exist.
+- **Reordering, suspending, or burying an item.** Anki has all three; this SRS
+  has none, and the only lever a learner has over the queue is the time budget.
+- **`test:e2e` was not run to completion twice on a clean tree.** It was run
+  once in full (one flake, characterised above) and the two new specs plus the
+  overflow sweep were run repeatedly.

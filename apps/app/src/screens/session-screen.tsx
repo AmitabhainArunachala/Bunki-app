@@ -283,9 +283,17 @@ function SessionBody({
           title="Ready when you are"
         >
           <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
-            {`The sitting will be built from what is due across the ${String(studyTargets.length)} word(s) you have taken up for study.`}{' '}
+            {/*
+              Written out for one and for many rather than left as "word(s)" and
+              "none of them". A screen that reads as though it were built for the
+              plural and is being used in the singular is the small tell that the
+              copy was never looked at on a phone with one word in it.
+            */}
+            {studyTargets.length === 1
+              ? 'The sitting will be built from what is due for the one word you have taken up for study.'
+              : `The sitting will be built from what is due across the ${String(studyTargets.length)} words you have taken up for study.`}{' '}
             {target === null
-              ? 'None of them is in the seed’s hand-written passage, so this sitting has no integration step — the passage is one step, not a requirement.'
+              ? `${studyTargets.length === 1 ? 'It is not' : 'None of them is'} in the seed’s hand-written passage, so this sitting has no integration step — the passage is one step, not a requirement.`
               : `${target.lexeme.headword} is in the passage, so this sitting also has an integration step.`}
           </Text>
           <AppButton

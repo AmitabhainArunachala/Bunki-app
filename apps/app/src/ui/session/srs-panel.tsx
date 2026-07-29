@@ -108,40 +108,67 @@ export function SrsPanel({ standing, testID }: SrsPanelProps): ReactNode {
             : `${String(standing.load.overdue)} contract(s) have come round and are waiting.`}
         </Text>
 
-        {standing.load.days.map((day) => (
-          <View key={day.date} style={styles.loadRow}>
-            <Text
-              style={[styles.loadDay, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
-            >
-              {day.offset === 0 ? 'today' : `+${String(day.offset)}d`}
-            </Text>
-            <View
-              accessibilityLabel={`${day.date}: ${String(day.count)} contract(s)`}
-              accessible
-              style={[styles.track, { backgroundColor: theme.color.rule }]}
-            >
-              <View
-                style={[
-                  styles.bar,
-                  {
-                    backgroundColor: day.count === 0 ? 'transparent' : theme.color.vermilion,
-                    // `flexGrow` on the filled part and a spacer for the rest
-                    // keeps the whole thing inside the track's own width at any
-                    // viewport, which a percentage string would not guarantee
-                    // once the track itself is `flex: 1`.
-                    flexGrow: day.count,
-                  },
-                ]}
-              />
-              <View style={{ flexGrow: Math.max(standing.load.peak - day.count, 0) }} />
-            </View>
-            <Text
-              style={[styles.loadCount, { color: theme.color.ink, fontFamily: theme.font.sans }]}
-            >
-              {String(day.count)}
-            </Text>
-          </View>
-        ))}
+        {/*
+          Fourteen empty tracks are worse than a sentence.
+
+          When nothing at all falls in the window — the ordinary state right
+          after taking words up, when everything is overdue — the bars were
+          fourteen full-width grey rows reading `0`. A full-width grey rectangle
+          is exactly the shape of a *full* bar, so the honest picture read as the
+          alarming one. The window is drawn only when something is in it.
+        */}
+        {standing.load.peak === 0 ? (
+          <Text
+            style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            testID="srs-load-empty"
+          >
+            Nothing falls in the next {String(standing.load.days.length)} days. Everything this
+            build holds for you either has already come round, or comes back after that.
+          </Text>
+        ) : null}
+
+        {standing.load.peak === 0
+          ? null
+          : standing.load.days.map((day) => (
+              <View key={day.date} style={styles.loadRow}>
+                <Text
+                  style={[
+                    styles.loadDay,
+                    { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {day.offset === 0 ? 'today' : `+${String(day.offset)}d`}
+                </Text>
+                <View
+                  accessibilityLabel={`${day.date}: ${String(day.count)} contract(s)`}
+                  accessible
+                  style={[styles.track, { backgroundColor: theme.color.rule }]}
+                >
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        backgroundColor: day.count === 0 ? 'transparent' : theme.color.vermilion,
+                        // `flexGrow` on the filled part and a spacer for the rest
+                        // keeps the whole thing inside the track's own width at any
+                        // viewport, which a percentage string would not guarantee
+                        // once the track itself is `flex: 1`.
+                        flexGrow: day.count,
+                      },
+                    ]}
+                  />
+                  <View style={{ flexGrow: Math.max(standing.load.peak - day.count, 0) }} />
+                </View>
+                <Text
+                  style={[
+                    styles.loadCount,
+                    { color: theme.color.ink, fontFamily: theme.font.sans },
+                  ]}
+                >
+                  {String(day.count)}
+                </Text>
+              </View>
+            ))}
 
         {standing.load.beyondWindow === 0 ? null : (
           <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>

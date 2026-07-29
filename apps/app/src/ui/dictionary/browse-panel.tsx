@@ -71,9 +71,13 @@ function AxisBlock({
       testID={`browse-axis-${axis.id}`}
       title={axis.label}
     >
-      <Text style={[styles.meta, { color: theme.color.inkFaint, fontFamily: theme.font.sans }]}>
-        {axis.derivation}
-      </Text>
+      {/*
+        The derivation is `Disclosure`'s own `note`, and is not repeated here.
+
+        It was, for one screenshot: the note under the header and an explicit
+        line inside the body printed the same sentence twice on every axis. Left
+        in as a comment because the fix is one a reader would otherwise re-add.
+      */}
       {axis.shelves.map((shelf) => (
         <Disclosure
           count={shelf.count}
