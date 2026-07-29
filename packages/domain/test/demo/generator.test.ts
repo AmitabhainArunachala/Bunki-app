@@ -130,18 +130,35 @@ describe('every stage produces a log this kernel recognises as its own', () => {
   );
 
   it.each(stageCases)(
-    '%s: replays twice to byte-identical state',
+    '%s: a second, independent replay produces byte-identical state',
     (id) => {
-      const result = replayTwiceAndCompare(logFor(id).events);
+      // A second replay compared with the memoised first, rather than
+      // `replayTwiceAndCompare`, which would run both passes here. The claim is
+      // the same — two folds of one log agree byte for byte — and the shared
+      // harness is exercised on a demo log once, below, plus over the whole
+      // catalog in `test/replay/determinism.test.ts`. Replay is quadratic in
+      // (events × contracts), so a suite that re-ran the largest stage's fold
+      // for every assertion would spend minutes proving what one comparison
+      // proves, and would starve the rest of the run on a shared machine.
+      expect(canonicalJson(replay(logFor(id).events))).toBe(canonicalJson(stateOf(id)));
+    },
+    HEAVY,
+  );
+
+  it(
+    'runs a demo log through the shared golden-replay harness too',
+    () => {
+      const result = replayTwiceAndCompare(logFor('month-2').events);
       expect(result.identical).toBe(true);
+      expect(result.secondJson).toBe(result.firstJson);
     },
     HEAVY,
   );
 
   it.each(stageCases)(
     '%s: is byte-identical on a second generation',
-    (_id, script) => {
-      expect(canonicalJson(run(script).events)).toBe(canonicalJson(run(script).events));
+    (id, script) => {
+      expect(canonicalJson(run(script).events)).toBe(canonicalJson(logFor(id).events));
     },
     HEAVY,
   );

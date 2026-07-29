@@ -547,57 +547,98 @@ describe('everything derived from KanjiVG is re-derivable from the bytes it clai
  * ------------------------------------------------------------------ */
 
 describe('the package exports the imported tier without merging it', () => {
-  it('exports a tier a consumer can actually reach', async () => {
-    const { importedDictionary } = await import('../src/index.ts');
-    expect(importedDictionary.lexemes.length).toBe(lexemes.length);
-    expect(importedDictionary.kanji.length).toBe(kanji.length);
-    expect(importedDictionary.sentences.length).toBe(sentences.length);
-    expect(importedDictionary.strokeGeometry.size).toBe(strokes.length);
-  });
+  /**
+   * An explicit budget, because the first assertion in this block pays for the
+   * whole dictionary.
+   *
+   * `await import('../src/index.ts')` parses and validates 3,000 lexemes and
+   * 1,241 kanji, which takes roughly four seconds on its own — most of vitest's
+   * five-second default before any other file is competing for the CPU. That
+   * default has now been crossed twice as the suite grew: `apps/app`'s
+   * `screen-contract.test.ts` hit the identical cause and recorded the identical
+   * fix ("twenty seconds is the load headroom; the assertion is untouched"),
+   * and lane L1's generated-learner suite crossed it again here.
+   *
+   * The module is memoised, so in declaration order only the first of these
+   * tests pays. The budget is stated on each of them anyway, because which one
+   * runs first is an ordering detail and a reordering must not be able to move
+   * the cost onto a test with no headroom.
+   *
+   * No assertion below is changed by this. A failure here is still a failure.
+   */
+  const SEED_IMPORT_BUDGET_MS = 20_000;
 
-  it('leaves the §8 fixture tier exactly as it was', async () => {
-    // The scope contract in `dataset.test.ts` is the real assertion; this is the
-    // one-line version, here so a reader of *this* file can see that adding
-    // 3,000 entries did not quietly widen the sixteen.
-    const { seedDataset } = await import('../src/index.ts');
-    expect(seedDataset.lexemes).toHaveLength(16);
-    expect(seedDataset.kanji).toHaveLength(10);
-  });
+  it(
+    'exports a tier a consumer can actually reach',
+    async () => {
+      const { importedDictionary } = await import('../src/index.ts');
+      expect(importedDictionary.lexemes.length).toBe(lexemes.length);
+      expect(importedDictionary.kanji.length).toBe(kanji.length);
+      expect(importedDictionary.sentences.length).toBe(sentences.length);
+      expect(importedDictionary.strokeGeometry.size).toBe(strokes.length);
+    },
+    SEED_IMPORT_BUDGET_MS,
+  );
 
-  it('marks every imported record so the two tiers can never be confused', async () => {
-    const { importedDictionary, IMPORTED_TIER } = await import('../src/index.ts');
-    expect(IMPORTED_TIER).toBe('imported');
-    for (const record of [
-      ...importedDictionary.lexemes.slice(0, 50),
-      ...importedDictionary.kanji.slice(0, 50),
-      ...importedDictionary.sentences.slice(0, 50),
-    ]) {
-      expect(record.tier).toBe(IMPORTED_TIER);
-    }
-  });
+  it(
+    'leaves the §8 fixture tier exactly as it was',
+    async () => {
+      // The scope contract in `dataset.test.ts` is the real assertion; this is the
+      // one-line version, here so a reader of *this* file can see that adding
+      // 3,000 entries did not quietly widen the sixteen.
+      const { seedDataset } = await import('../src/index.ts');
+      expect(seedDataset.lexemes).toHaveLength(16);
+      expect(seedDataset.kanji).toHaveLength(10);
+    },
+    SEED_IMPORT_BUDGET_MS,
+  );
 
-  it('resolves every field of the tier to a registered provenance record', async () => {
-    const { importedDictionary } = await import('../src/index.ts');
-    const groups: Readonly<
-      Record<string, { source: string; license: string; attribution: string }>
-    >[] = Object.values(importedDictionary.provenance);
-    expect(groups.length).toBe(4);
-    for (const group of groups) {
-      const fields = Object.entries(group);
-      expect(fields.length).toBeGreaterThan(0);
-      for (const [field, record] of fields) {
-        expect(record.source, field).toBeTruthy();
-        expect(record.license, field).toBeTruthy();
-        expect(record.attribution, field).toBeTruthy();
+  it(
+    'marks every imported record so the two tiers can never be confused',
+    async () => {
+      const { importedDictionary, IMPORTED_TIER } = await import('../src/index.ts');
+      expect(IMPORTED_TIER).toBe('imported');
+      for (const record of [
+        ...importedDictionary.lexemes.slice(0, 50),
+        ...importedDictionary.kanji.slice(0, 50),
+        ...importedDictionary.sentences.slice(0, 50),
+      ]) {
+        expect(record.tier).toBe(IMPORTED_TIER);
       }
-    }
-  });
+    },
+    SEED_IMPORT_BUDGET_MS,
+  );
 
-  it('says plainly that 3,000 entries are not a dictionary', async () => {
-    const { IMPORTED_TIER_DISCLOSURE } = await import('../src/index.ts');
-    expect(IMPORTED_TIER_DISCLOSURE).toMatch(/slice, not the whole dictionary/);
-    expect(IMPORTED_TIER_DISCLOSURE).toMatch(/no one has reviewed these entries individually/i);
-  });
+  it(
+    'resolves every field of the tier to a registered provenance record',
+    async () => {
+      const { importedDictionary } = await import('../src/index.ts');
+      const groups: Readonly<
+        Record<string, { source: string; license: string; attribution: string }>
+      >[] = Object.values(importedDictionary.provenance);
+      expect(groups.length).toBe(4);
+      for (const group of groups) {
+        const fields = Object.entries(group);
+        expect(fields.length).toBeGreaterThan(0);
+        for (const [field, record] of fields) {
+          expect(record.source, field).toBeTruthy();
+          expect(record.license, field).toBeTruthy();
+          expect(record.attribution, field).toBeTruthy();
+        }
+      }
+    },
+    SEED_IMPORT_BUDGET_MS,
+  );
+
+  it(
+    'says plainly that 3,000 entries are not a dictionary',
+    async () => {
+      const { IMPORTED_TIER_DISCLOSURE } = await import('../src/index.ts');
+      expect(IMPORTED_TIER_DISCLOSURE).toMatch(/slice, not the whole dictionary/);
+      expect(IMPORTED_TIER_DISCLOSURE).toMatch(/no one has reviewed these entries individually/i);
+    },
+    SEED_IMPORT_BUDGET_MS,
+  );
 });
 
 describe('licence metadata matches the verbatim texts on file', () => {

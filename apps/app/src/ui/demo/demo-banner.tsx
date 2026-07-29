@@ -56,28 +56,16 @@ import {
   demoLensSpread,
   demoSittings,
 } from '../../state/demo/demo-summary.ts';
+import {
+  BUILDING_LABEL,
+  DEMONSTRATION_LABEL,
+  FAILED_LABEL,
+  OWN_DATA_LABEL,
+  OWN_DATA_NOTE,
+  RELOAD_NOTE,
+} from './demo-copy.ts';
 import { MIN_TOUCH_TARGET, RADIUS, SPACE, TYPE } from '../theme.ts';
 import { useTheme } from '../theme-context.tsx';
-
-/** The strip's own words for the quiet state. Rendered, never inferred. */
-export const OWN_DATA_LABEL = 'Your own data';
-
-export const OWN_DATA_NOTE =
-  'Everything on screen is what you have captured and studied on this device. Nothing is simulated.';
-
-/**
- * Said in the loaded state, every time, in addition to the stage's name.
- *
- * Short enough to sit on one line at phone width. The full sentence — what is
- * real about the events and what is not — is `SCRIPTED_LEARNER_NOTE`, and it is
- * rendered inside the panel a tap away rather than compressed into the strip,
- * because a strip nobody can read is not a label.
- */
-export const DEMONSTRATION_LABEL = 'Demonstration data — not your history';
-
-/** What a reload does, said in the panel so it is never a surprise. */
-export const RELOAD_NOTE =
-  'A demonstration is never written to this device and never survives a reload: refreshing this page puts you back in your own data. Nothing you do inside one can reach what you have captured yourself.';
 
 export function DemoBanner(): ReactNode {
   const theme = useTheme();
@@ -89,9 +77,9 @@ export function DemoBanner(): ReactNode {
     state.kind === 'loaded'
       ? `${DEMONSTRATION_LABEL} · ${state.build.script.label}`
       : state.kind === 'building'
-        ? 'Building a demonstration learner…'
+        ? BUILDING_LABEL
         : state.kind === 'failed'
-          ? 'That demonstration could not be built.'
+          ? FAILED_LABEL
           : OWN_DATA_LABEL;
 
   return (
