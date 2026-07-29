@@ -451,9 +451,7 @@ describe('claim boundaries (REQ-GATE-03)', () => {
     const debugSource = screen('inspector-debug-screen.tsx');
     expect(debugSource).toContain('All changes from this session are saved locally.');
     expect(debugSource).toContain('Saving changes locally…');
-    expect(debugSource).toContain(
-      'Bunki could not confirm that one or more changes were saved.',
-    );
+    expect(debugSource).toContain('Bunki could not confirm that one or more changes were saved.');
     expect(debugSource).toContain('disappear after you reopen the app');
     expect(debugSource).toContain('A newer save can succeed without resolving this earlier gap.');
     expect(debugSource).toContain('only confirmed saves are expected to remain');
