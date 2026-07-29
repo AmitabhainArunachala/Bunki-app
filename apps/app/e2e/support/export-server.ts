@@ -28,10 +28,10 @@
  * and the acceptance test would make one of them change for the other's reasons.
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync, realpathSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { extname, join } from 'node:path';
+import { basename, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 /** Content types for everything `expo export` emits. */
 const MIME: Readonly<Record<string, string>> = {
@@ -62,32 +62,113 @@ const DYNAMIC_ROUTES: Readonly<Record<string, string>> = {
   kanji: 'kanji/[character].html',
 };
 
-export function resolveFile(dist: string, urlPath: string): string {
+/**
+ * Whether `candidate` is the root itself or one of its descendants.
+ *
+ * `startsWith(root)` is not sufficient: `/export-secret` starts with `/export`.
+ * `relative` also gives the right answer on Windows drives and separators.
+ */
+function isWithinRoot(root: string, candidate: string): boolean {
+  const fromRoot = relative(root, candidate);
+  return (
+    fromRoot === '' ||
+    (fromRoot !== '..' && !fromRoot.startsWith(`..${sep}`) && !isAbsolute(fromRoot))
+  );
+}
+
+/**
+ * Return an existing regular file only after resolving every symlink and
+ * proving the final target is still inside the real export root.
+ */
+type ExistingFile =
+  { readonly status: 'file'; readonly path: string } | { readonly status: 'absent' | 'unsafe' };
+
+function existingFileWithin(root: string, candidate: string): ExistingFile {
+  if (!isWithinRoot(root, candidate)) return { status: 'unsafe' };
+
+  try {
+    const actual = realpathSync(candidate);
+    if (!isWithinRoot(root, actual)) return { status: 'unsafe' };
+    return statSync(actual).isFile() ? { status: 'file', path: actual } : { status: 'absent' };
+  } catch {
+    return { status: 'absent' };
+  }
+}
+
+function realExportRoot(dist: string): string | null {
+  try {
+    const root = realpathSync(dist);
+    return statSync(root).isDirectory() ? root : null;
+  } catch {
+    return null;
+  }
+}
+
+function decodePath(urlPath: string): string | null {
   const [rawPath = '/'] = urlPath.split('?');
-  const clean = decodeURIComponent(rawPath);
 
-  if (clean === '' || clean === '/') return join(dist, 'index.html');
+  try {
+    const decoded = decodeURIComponent(rawPath);
+    // Backslash is a path separator on Windows and never a canonical URL-path
+    // separator. Reject it on every platform so the policy cannot change with
+    // the runner. NUL cannot name a filesystem path.
+    return decoded.includes('\\') || decoded.includes('\0') ? null : decoded;
+  } catch {
+    return null;
+  }
+}
 
-  const direct = join(dist, clean);
-  if (extname(direct) !== '' && existsSync(direct)) return direct;
+/**
+ * Resolve one URL path to a regular file inside `dist`.
+ *
+ * Unsafe, malformed, escaping, symlink-escaping, and genuinely absent paths
+ * return `null`. A normal unknown app route may still resolve to Expo's own
+ * `+not-found.html`, preserving the existing client-routing behavior.
+ */
+export function resolveFile(dist: string, urlPath: string): string | null {
+  const root = realExportRoot(dist);
+  const clean = decodePath(urlPath);
+  if (root === null || clean === null) return null;
 
   const segments = clean.split('/').filter((segment) => segment !== '');
+  // Reject traversal as syntax even when normalization would happen to land
+  // back inside the root. A traversal request must never alias a valid asset.
+  if (segments.some((segment) => segment === '.' || segment === '..')) return null;
+
+  if (segments.length === 0) {
+    const index = existingFileWithin(root, join(root, 'index.html'));
+    return index.status === 'file' ? index.path : null;
+  }
+
+  const direct = resolve(root, ...segments);
+  if (!isWithinRoot(root, direct)) return null;
+
+  if (extname(direct) !== '') {
+    const directFile = existingFileWithin(root, direct);
+    if (directFile.status === 'unsafe') return null;
+    if (directFile.status === 'file') return directFile.path;
+  }
+
   if (segments.length === 2) {
     const group = segments[0] ?? '';
     const parameterised = DYNAMIC_ROUTES[group];
     if (parameterised !== undefined) {
-      const file = join(dist, parameterised);
-      if (existsSync(file)) return file;
+      const file = existingFileWithin(root, resolve(root, parameterised));
+      if (file.status === 'unsafe') return null;
+      if (file.status === 'file') return file.path;
     }
   }
 
-  const asHtml = `${direct}.html`;
-  if (existsSync(asHtml)) return asHtml;
+  const asHtml = existingFileWithin(root, `${direct}.html`);
+  if (asHtml.status === 'unsafe') return null;
+  if (asHtml.status === 'file') return asHtml.path;
 
-  const asIndex = join(direct, 'index.html');
-  if (existsSync(asIndex)) return asIndex;
+  const asIndex = existingFileWithin(root, join(direct, 'index.html'));
+  if (asIndex.status === 'unsafe') return null;
+  if (asIndex.status === 'file') return asIndex.path;
 
-  return join(dist, '+not-found.html');
+  const notFound = existingFileWithin(root, join(root, '+not-found.html'));
+  return notFound.status === 'file' ? notFound.path : null;
 }
 
 export interface ExportHost {
@@ -105,7 +186,7 @@ export interface ExportHost {
  * survives — which is not the durability claim under test.
  */
 export async function startExportHost(dist: string): Promise<ExportHost> {
-  if (!existsSync(join(dist, 'index.html'))) {
+  if (resolveFile(dist, '/') === null) {
     throw new Error(
       `No web export at ${dist}. Build it first:\n` +
         `  npm run export:web --workspace @bunki/app\n` +
@@ -115,16 +196,26 @@ export async function startExportHost(dist: string): Promise<ExportHost> {
 
   const server: Server = createServer((request, response) => {
     const file = resolveFile(dist, request.url ?? '/');
+    if (file === null) {
+      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      response.end('not found');
+      return;
+    }
+
     try {
       const body = readFileSync(file);
-      response.writeHead(200, {
+      // Expo's not-found document is content, not a successful asset lookup.
+      const statusCode = basename(file) === '+not-found.html' ? 404 : 200;
+      response.writeHead(statusCode, {
         'Content-Type': MIME[extname(file)] ?? 'application/octet-stream',
         'Cache-Control': 'no-store',
       });
       response.end(body);
-    } catch (cause) {
+    } catch {
+      // Files can disappear between resolution and read. Fail closed without
+      // exposing an absolute runner path or filesystem error to the browser.
       response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end(`not found: ${file} (${String(cause)})`);
+      response.end('not found');
     }
   });
 
