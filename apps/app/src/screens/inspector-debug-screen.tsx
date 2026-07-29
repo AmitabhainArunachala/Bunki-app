@@ -359,7 +359,7 @@ function StorageSection(): ReactNode {
         testID="debug-storage-snapshot"
       >
         {storage.snapshotAvailable
-          ? 'Browser storage is available, so what you save survives a reload.'
+          ? 'Browser storage is available. Check the save status below; only confirmed saves are expected to remain after you reopen the app.'
           : 'This browser refused persistent storage, so this session is in memory only and a reload will clear it.'}
       </Text>
       <Text
