@@ -1,12 +1,15 @@
 import { Stack } from 'expo-router';
 import { type ReactNode } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-import { AppProvider, useDebugFlags } from '@/state/app-context';
+import { useDebugFlags } from '@/state/app-context';
+import { DemoBoundary, DemoProvider } from '@/state/demo/demo-context';
+import { DemoBanner } from '@/ui/demo/demo-banner';
 import { NavShell } from '@/ui/nav-shell';
 import { ThemeProvider, useTheme } from '@/ui/theme-context';
 
 /**
- * Root layout — the app shell (WP-05).
+ * Root layout — the app shell (WP-05; the demonstration layer, lane L1).
  *
  * Per orchestration spec §4 this file stays with the builder who owns the
  * shell; other builders request changes through the Conductor rather than
@@ -17,15 +20,30 @@ import { ThemeProvider, useTheme } from '@/ui/theme-context';
  * The nesting order is load-bearing. The navigator reads the theme through a
  * component *inside* `ThemeProvider` rather than computing a palette beside it,
  * so that when the scheme resolves after mount (see `theme-context.tsx`) the
- * navigator's background re-renders with everything else. Computing it here
- * would leave the screen container holding the statically rendered light colour
- * under dark content.
+ * navigator's background re-renders with everything else.
+ *
+ * ## Why the demonstration layer is the outermost thing here
+ *
+ * `DemoBoundary` decides which store the app gets, so it has to sit *above*
+ * `AppProvider` rather than beside it — and it is the only place `AppProvider`
+ * is now mounted. That is the whole isolation mechanism: `AppProvider` opens
+ * the durable event store exactly when it is handed no store, so handing it a
+ * generated one is what keeps a demonstration from ever having a durable
+ * adapter to reach (`state/demo/demo-store.ts` argues it in full).
+ *
+ * `DemoBanner` sits inside the shell, above the navigator, so it is present on
+ * every route without any screen having to render it and without any screen
+ * being able to omit it. Losing track of whether you are looking at your own
+ * data is the failure mode the whole surface guards against, and a banner one
+ * screen could forget would be no guard at all.
  */
 export default function RootLayout(): ReactNode {
   return (
-    <AppProvider>
-      <ThemedShell />
-    </AppProvider>
+    <DemoProvider>
+      <DemoBoundary>
+        <ThemedShell />
+      </DemoBoundary>
+    </DemoProvider>
   );
 }
 
@@ -54,12 +72,22 @@ function ThemedStack(): ReactNode {
   const theme = useTheme();
   return (
     <NavShell>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.color.paper },
-        }}
-      />
+      <DemoBanner />
+      {/* The navigator has to be told to fill what is left once the banner has
+          taken its line; a bare `Stack` beside a sibling takes its content
+          height and the routes end up an inch tall. */}
+      <View style={styles.stack}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.color.paper },
+          }}
+        />
+      </View>
     </NavShell>
   );
 }
+
+const styles = StyleSheet.create({
+  stack: { flex: 1, minHeight: 0 },
+});
