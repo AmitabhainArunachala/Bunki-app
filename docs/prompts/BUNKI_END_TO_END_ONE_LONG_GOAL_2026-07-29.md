@@ -12,7 +12,7 @@ human-merged pull requests
 
 ## Bootstrap outside this controller
 
-This draft cannot authorize its own installation.
+This controller cannot authorize its own installation.
 
 After John selects it, use the currently governing controller to:
 
@@ -209,6 +209,12 @@ weaken or replace the Product Lock or frozen specifications.
 Do not edit governing or frozen documents to make code look compliant. A
 governing change requires a small operator-reviewed documentation PR and an
 updated integrity record.
+
+The machine state, human ledger, and operator visual-reference manifest are
+mutable runtime evidence, not governing or frozen documents. Update them inside
+the active child, validate their schema and meaning, and exact-head review them
+with that child. Their G00 hashes are initial-snapshot receipts only; they must
+not be entries in the operator-lock `sha256sum -c` gate.
 
 ## 4. Verified starting truth
 
@@ -1106,85 +1112,85 @@ children.
 
 ### Foundation
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| F02 | Closed bootstrap receipt for PR #15 and G00 | Export test server is constrained to its root; traversal, encoded traversal, directory, and missing-file tests pass. |
-| F03 | F02 | FSRS is safe under backward wall-clock movement and UTC-boundary skew; golden replay is stable. |
-| F04 | F03 | Correct pre-hydration title without breaking route titles. |
-| F05 | F04 | Abandoned, timed-out, superseded, or unmounted AI work attaches nothing. |
-| F06 | F05 | Real idempotent durable-write reconciliation handles reject-before-commit and commit-then-reject; cold reopen/export equality passes. |
-| F07 | F06 | Long-history replay complexity and tombstoned-thread projection are reproduced, repaired, and benchmarked. |
-| F08 | F07 | README, non-frozen status, and evidence match exact truth; complete foundation gate is green. |
+| ID  | Depends on                                  | Outcome and gate                                                                                                                      |
+| --- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| F02 | Closed bootstrap receipt for PR #15 and G00 | Export test server is constrained to its root; traversal, encoded traversal, directory, and missing-file tests pass.                  |
+| F03 | F02                                         | FSRS is safe under backward wall-clock movement and UTC-boundary skew; golden replay is stable.                                       |
+| F04 | F03                                         | Correct pre-hydration title without breaking route titles.                                                                            |
+| F05 | F04                                         | Abandoned, timed-out, superseded, or unmounted AI work attaches nothing.                                                              |
+| F06 | F05                                         | Real idempotent durable-write reconciliation handles reject-before-commit and commit-then-reject; cold reopen/export equality passes. |
+| F07 | F06                                         | Long-history replay complexity and tombstoned-thread projection are reproduced, repaired, and benchmarked.                            |
+| F08 | F07                                         | README, non-frozen status, and evidence match exact truth; complete foundation gate is green.                                         |
 
 ### Shared model and production content
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| M01 | F08 | Smallest additive state spine needed by SP01: stable Source/anchor, encounter/thread, learner decision, retrieval contract/evidence, and candidate/artifact identities; migration, rollback, replay, export; no speculative import, recommendation, or sync schema and no second store. |
-| M02 | M01 | Fixtures separated from a deterministic production content-pack boundary with pinned manifests and exact hashes. |
-| D01 | M02 + content/license gate | Complete pinned JMdict/KANJIDIC2 import with exact reconciliation, restrictions, gloss attribution, senses, POS, readings, and licenses. |
-| D02 | M02 + content/license gate | Complete selected KanjiVG/component/stroke data in a verified packed representation. |
-| D03 | D01 + D02 + N02 | Production offline dictionary and deep kanji pages, recursive navigation, attribution, inflection search, and physical-device performance. |
-| D04 | M02 + content/license gate | Rights-clear beginner-through-advanced grammar inventory with coverage accounting and distinct sourced/AI content. |
-| D05 | D03 + D04 + H01 + SRC01 | Recursive ten-minute word/sense/kanji/component/compound/grammar/source walk rejoins one thread. |
-| D06 | D03 + SRS01 | Transparent Anki warm start with receipts, correction, migration, and no silent loss. |
-| KJ01 | D03 + D04 + SRS02 + N02 | Rights-clear Kanken-depth overlay proves uncommon readings/forms, component and phonetic structure, orthographic discrimination, lexical relations, yojijukugo, and handwriting/production in real threads. |
+| ID   | Depends on                 | Outcome and gate                                                                                                                                                                                                                                                                        |
+| ---- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M01  | F08                        | Smallest additive state spine needed by SP01: stable Source/anchor, encounter/thread, learner decision, retrieval contract/evidence, and candidate/artifact identities; migration, rollback, replay, export; no speculative import, recommendation, or sync schema and no second store. |
+| M02  | M01                        | Fixtures separated from a deterministic production content-pack boundary with pinned manifests and exact hashes.                                                                                                                                                                        |
+| D01  | M02 + content/license gate | Complete pinned JMdict/KANJIDIC2 import with exact reconciliation, restrictions, gloss attribution, senses, POS, readings, and licenses.                                                                                                                                                |
+| D02  | M02 + content/license gate | Complete selected KanjiVG/component/stroke data in a verified packed representation.                                                                                                                                                                                                    |
+| D03  | D01 + D02 + N02            | Production offline dictionary and deep kanji pages, recursive navigation, attribution, inflection search, and physical-device performance.                                                                                                                                              |
+| D04  | M02 + content/license gate | Rights-clear beginner-through-advanced grammar inventory with coverage accounting and distinct sourced/AI content.                                                                                                                                                                      |
+| D05  | D03 + D04 + H01 + SRC01    | Recursive ten-minute word/sense/kanji/component/compound/grammar/source walk rejoins one thread.                                                                                                                                                                                        |
+| D06  | D03 + SRS01                | Transparent Anki warm start with receipts, correction, migration, and no silent loss.                                                                                                                                                                                                   |
+| KJ01 | D03 + D04 + SRS02 + N02    | Rights-clear Kanken-depth overlay proves uncommon readings/forms, component and phonetic structure, orthographic discrimination, lexical relations, yojijukugo, and handwriting/production in real threads.                                                                             |
 
 ### Native and state continuity
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| N01 | F08 + Apple gate | Real bundle/signing path and signed development build on John’s physical iPhone; exact device/build/SHA receipt. |
-| N02 | M01 + N01 | Native SQLite, migration, backgrounding, force quit, low storage, deep-link/manual capture, and early 100-trial zero-loss proof. |
-| N03 | M01 + N02 | Provider-independent deterministic export → clean install → restore and device migration across the full current state. |
+| ID  | Depends on            | Outcome and gate                                                                                                                                                                         |
+| --- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N01 | F08 + Apple gate      | Real bundle/signing path and signed development build on John’s physical iPhone; exact device/build/SHA receipt.                                                                         |
+| N02 | M01 + N01             | Native SQLite, migration, backgrounding, force quit, low storage, deep-link/manual capture, and early 100-trial zero-loss proof.                                                         |
+| N03 | M01 + N02             | Provider-independent deterministic export → clean install → restore and device migration across the full current state.                                                                  |
 | N04 | N03 + continuity gate | Implement and prove John’s selected continuity Mode A or Mode B, including honest web behavior, interruption recovery, tombstones, and the chosen conflict or conflict-prevention rules. |
 
 ### Home and living SRS
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| H01 | M01 | Home/Guide, universal capture, and manual source inbox; one stable thread survives fallback, restart, and export. |
-| SP01 | M01 + H01 | Early fixture/rights-clear golden thread runs encounter → capture → understand → confirm → weave → retrieve → reintroduce → update → recommend through the one authoritative state. It is explicitly `FIXTURE_ONLY` and becomes a permanent regression. |
-| SRS01 | SP01 + M01 | Keep/Learn/Study deeply/Ignore and full retrieval-contract state machine over fixture/rights-clear content; capture-no-debt tests. Production content plugs into the same contracts later. |
-| SRS02 | SRS01 | Finite mixed sessions, workload controls, modality-specific evidence, transparent grading, suspend/bury/undo/delete, and replay. |
-| LM01 | SRS02 + D04 | Multidimensional learner frontier, contradictions, confidence, correction, and modality/sense separation. |
-| ONB01 | H01 + D03 + D04 + N02 | Zero-state and level-flexible entry: kana/phonology, restrained fading romaji, slow audio, support removal, learner-goal calibration, and direct N1+/Kanken bypass. |
+| ID    | Depends on            | Outcome and gate                                                                                                                                                                                                                                        |
+| ----- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H01   | M01                   | Home/Guide, universal capture, and manual source inbox; one stable thread survives fallback, restart, and export.                                                                                                                                       |
+| SP01  | M01 + H01             | Early fixture/rights-clear golden thread runs encounter → capture → understand → confirm → weave → retrieve → reintroduce → update → recommend through the one authoritative state. It is explicitly `FIXTURE_ONLY` and becomes a permanent regression. |
+| SRS01 | SP01 + M01            | Keep/Learn/Study deeply/Ignore and full retrieval-contract state machine over fixture/rights-clear content; capture-no-debt tests. Production content plugs into the same contracts later.                                                              |
+| SRS02 | SRS01                 | Finite mixed sessions, workload controls, modality-specific evidence, transparent grading, suspend/bury/undo/delete, and replay.                                                                                                                        |
+| LM01  | SRS02 + D04           | Multidimensional learner frontier, contradictions, confidence, correction, and modality/sense separation.                                                                                                                                               |
+| ONB01 | H01 + D03 + D04 + N02 | Zero-state and level-flexible entry: kana/phonology, restrained fading romaji, slow audio, support removal, learner-goal calibration, and direct N1+/Kanken bypass.                                                                                     |
 
 ### Sources and reader
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| SRC01 | M01 | Pure Source Router and machine-readable route policies, provenance, privacy, payload, SSRF/redirect, and kill-switch tests. |
-| FEED01 | SRC01 | RSS/Atom and approved publisher article-feed intake with stable source identity, rights state, fetch receipts, freshness, update/version handling, deduplication, removal, and honest failure. |
-| RDR01 | SRC01 + FEED01 + H01 + D03 | Todai-like reader for manual and feed-supplied allowed text with typography, furigana, tap lookup, context help, position, capture, offline/restart, update handling, and return. |
-| RDR02 | RDR01 + N02 | Where lawful source audio exists, synchronize text/audio with speed, seek, replay, exact-position capture, background/interruption recovery, and honest fallback when synchronization is unavailable. |
-| TR01 | SRC01 | Manual SRT/VTT, publisher/feed transcript, and one licensed/open adapter normalize segments and honest anchors. |
-| WALK01 | SRC01 + N02 | Five-item YouTube/podcast walking inbox with one-handed save, official return, progress honesty, interruption, and later processing. |
-| OCR01 | SRC01 + N02 | Screenshot/photo OCR and user-owned PDF/book/local-audio intake with correction, rights, private bytes, and region/page anchors. |
+| ID     | Depends on                 | Outcome and gate                                                                                                                                                                                      |
+| ------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SRC01  | M01                        | Pure Source Router and machine-readable route policies, provenance, privacy, payload, SSRF/redirect, and kill-switch tests.                                                                           |
+| FEED01 | SRC01                      | RSS/Atom and approved publisher article-feed intake with stable source identity, rights state, fetch receipts, freshness, update/version handling, deduplication, removal, and honest failure.        |
+| RDR01  | SRC01 + FEED01 + H01 + D03 | Todai-like reader for manual and feed-supplied allowed text with typography, furigana, tap lookup, context help, position, capture, offline/restart, update handling, and return.                     |
+| RDR02  | RDR01 + N02                | Where lawful source audio exists, synchronize text/audio with speed, seek, replay, exact-position capture, background/interruption recovery, and honest fallback when synchronization is unavailable. |
+| TR01   | SRC01                      | Manual SRT/VTT, publisher/feed transcript, and one licensed/open adapter normalize segments and honest anchors.                                                                                       |
+| WALK01 | SRC01 + N02                | Five-item YouTube/podcast walking inbox with one-handed save, official return, progress honesty, interruption, and later processing.                                                                  |
+| OCR01  | SRC01 + N02                | Screenshot/photo OCR and user-owned PDF/book/local-audio intake with correction, rights, private bytes, and region/page anchors.                                                                      |
 
 ### AI teacher, voice, and weave
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| AI01 | M01 | Secret-safe client/gateway boundary, consent classes, bounded payloads, retention, cancellation, cost receipts, and offline failure. |
-| AI02 | AI01 + AI/voice gate + D03 + RDR01 | One real approved provider and streamed recursive text teacher over live threads/source context; candidate-only authority. |
-| AI03 | AI02 + SRS02 | Conversation turns and recent lookups nominate editable candidates; only confirmations schedule; bounded journeys rejoin. |
-| WV01 | AI03 + D04 + TR01 + WALK01 + LM01 | Inspectable target-shortlist and weave pipeline with difficulty, duplication, facts, provenance, rights, edit, reject, and promotion gates. |
-| WV02 | WV01 + D02 | All required sentence, multi-sentence, dense, dialogue, cloze, reconstruction, contrast, production, and kanji forms with span lineage. |
-| WV03 | WV02 + N02 | Lawful source audio or approved TTS, 1–2 minute listening, synced position/replay, and separate listening contracts. |
-| VOI01 | WV03 + AI02 + N02 + AI/voice gate | Spoken conversation, transcription/correction, privacy/cost/latency proof, same threads, and no unconfirmed memory mutation. |
+| ID    | Depends on                         | Outcome and gate                                                                                                                            |
+| ----- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| AI01  | M01                                | Secret-safe client/gateway boundary, consent classes, bounded payloads, retention, cancellation, cost receipts, and offline failure.        |
+| AI02  | AI01 + AI/voice gate + D03 + RDR01 | One real approved provider and streamed recursive text teacher over live threads/source context; candidate-only authority.                  |
+| AI03  | AI02 + SRS02                       | Conversation turns and recent lookups nominate editable candidates; only confirmations schedule; bounded journeys rejoin.                   |
+| WV01  | AI03 + D04 + TR01 + WALK01 + LM01  | Inspectable target-shortlist and weave pipeline with difficulty, duplication, facts, provenance, rights, edit, reject, and promotion gates. |
+| WV02  | WV01 + D02                         | All required sentence, multi-sentence, dense, dialogue, cloze, reconstruction, contrast, production, and kanji forms with span lineage.     |
+| WV03  | WV02 + N02                         | Lawful source audio or approved TTS, 1–2 minute listening, synced position/replay, and separate listening contracts.                        |
+| VOI01 | WV03 + AI02 + N02 + AI/voice gate  | Spoken conversation, transcription/correction, privacy/cost/latency proof, same threads, and no unconfirmed memory mutation.                |
 
 ### Recommendations, convergence, and release
 
-| ID | Depends on | Outcome and gate |
-|---|---|---|
-| REC01 | LM01 + ONB01 + KJ01 + RDR01 + TR01 + WALK01 | Explainable rights-aware primary-source catalog, progress history, feedback, and changed follow-up recommendations for zero-state, intermediate, N1+, and Kanken-depth profiles. |
-| OBS01 | LM01 + WV01 | Secondary Map/Garden over event history and capability lenses; no second state or mastery brightness. |
-| UX01 | D05 + D06 + KJ01 + SRS02 + ONB01 + RDR02 + WALK01 + OCR01 + AI03 + WV03 + VOI01 + REC01 + OBS01 + N04 | One calm shell: Home/Guide, capture/inbox, Dictionary/Kanji/Grammar, finite Practice, Reader/Listener, Teacher, secondary Map, Settings/Why. Relevant surfaces match the accepted operator visual-reference manifest. |
-| NAT01 | UX01 + N04 + VOI01 | Physical-iPhone hardening: share sheet, one hand, offline/reconnect, background audio, interruption, force quit, performance, accessibility, privacy, export/restore; no P0/P1. |
-| Q01 | NAT01 | Clean human-merged `main` passes Product Lock Tests 1–9 and extended journeys EJ01–EJ15, plus the full repository ladder, integrity, dependency/license/SBOM/privacy/secret review, and independent exact-SHA falsification. |
-| Q02 | Q01 + release gate | Signed trial/TestFlight artifact from exact verified `main` SHA and fixed shipped configuration; build receipt archived. |
-| Q03 | Q02 | Product Lock Test 10 and EJ16: John uses the exact build for seven consecutive days and voluntarily returns on day eight. Only John declares complete. |
+| ID    | Depends on                                                                                            | Outcome and gate                                                                                                                                                                                                             |
+| ----- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REC01 | LM01 + ONB01 + KJ01 + RDR01 + TR01 + WALK01                                                           | Explainable rights-aware primary-source catalog, progress history, feedback, and changed follow-up recommendations for zero-state, intermediate, N1+, and Kanken-depth profiles.                                             |
+| OBS01 | LM01 + WV01                                                                                           | Secondary Map/Garden over event history and capability lenses; no second state or mastery brightness.                                                                                                                        |
+| UX01  | D05 + D06 + KJ01 + SRS02 + ONB01 + RDR02 + WALK01 + OCR01 + AI03 + WV03 + VOI01 + REC01 + OBS01 + N04 | One calm shell: Home/Guide, capture/inbox, Dictionary/Kanji/Grammar, finite Practice, Reader/Listener, Teacher, secondary Map, Settings/Why. Relevant surfaces match the accepted operator visual-reference manifest.        |
+| NAT01 | UX01 + N04 + VOI01                                                                                    | Physical-iPhone hardening: share sheet, one hand, offline/reconnect, background audio, interruption, force quit, performance, accessibility, privacy, export/restore; no P0/P1.                                              |
+| Q01   | NAT01                                                                                                 | Clean human-merged `main` passes Product Lock Tests 1–9 and extended journeys EJ01–EJ15, plus the full repository ladder, integrity, dependency/license/SBOM/privacy/secret review, and independent exact-SHA falsification. |
+| Q02   | Q01 + release gate                                                                                    | Signed trial/TestFlight artifact from exact verified `main` SHA and fixed shipped configuration; build receipt archived.                                                                                                     |
+| Q03   | Q02                                                                                                   | Product Lock Test 10 and EJ16: John uses the exact build for seven consecutive days and voluntarily returns on day eight. Only John declares complete.                                                                       |
 
 Independent nodes may be researched in parallel. The writer chooses the smallest
 ready critical-path child; the table does not authorize combining milestone
@@ -1326,15 +1332,15 @@ lets one kind of evidence hide another.
 
 Every capability ledger row records:
 
-| Dimension | Allowed values |
-|---|---|
-| Implementation | `ABSENT`, `CONTRACT_ONLY`, `FIXTURE_ONLY`, `WIRED` |
-| Canonical data | `NOT_APPLICABLE`, `FIXTURE`, `PINNED_RELEASE` |
-| Journey input | `NOT_APPLICABLE`, `SYNTHETIC`, `AUTHENTIC_RIGHTS_CLEAR_PROVED` |
-| External provider | `NOT_APPLICABLE`, `FAKE_OR_FALLBACK`, `REAL_APPROVED_UNPROVED`, `REAL_APPROVED_PROVED` |
-| Native | `NOT_APPLICABLE`, `UNPROVED`, `PHYSICAL_DEVICE_PROVED` |
-| Integrated journey | `UNPROVED`, `INTEGRATED_PROVED` |
-| Operator | `PENDING`, `ACCEPTED` |
+| Dimension          | Allowed values                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| Implementation     | `ABSENT`, `CONTRACT_ONLY`, `FIXTURE_ONLY`, `WIRED`                                     |
+| Canonical data     | `NOT_APPLICABLE`, `FIXTURE`, `PINNED_RELEASE`                                          |
+| Journey input      | `NOT_APPLICABLE`, `SYNTHETIC`, `AUTHENTIC_RIGHTS_CLEAR_PROVED`                         |
+| External provider  | `NOT_APPLICABLE`, `FAKE_OR_FALLBACK`, `REAL_APPROVED_UNPROVED`, `REAL_APPROVED_PROVED` |
+| Native             | `NOT_APPLICABLE`, `UNPROVED`, `PHYSICAL_DEVICE_PROVED`                                 |
+| Integrated journey | `UNPROVED`, `INTEGRATED_PROVED`                                                        |
+| Operator           | `PENDING`, `ACCEPTED`                                                                  |
 
 `NOT_APPLICABLE` requires a written reason; it is not an escape hatch.
 
