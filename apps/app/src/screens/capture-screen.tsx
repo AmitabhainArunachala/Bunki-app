@@ -72,6 +72,7 @@ import {
   constituentKanji,
   DEFAULT_CANONICAL_TARGET,
   importedDictionary,
+  MATCH_EXPLANATION,
   searchSeed,
   seedDataset,
   sentencesForLexeme,
@@ -90,6 +91,7 @@ import {
   type UncertaintyDimension,
 } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
+import { BrowsePanel } from '../ui/dictionary/browse-panel.tsx';
 import { searchFieldStyle } from '../ui/interactive-styles.ts';
 import { destinationFor } from '../ui/navigation.ts';
 import { DurabilityNotice, SeedCoverageDisclosure, SeedEntryDisclosure } from '../ui/notices.tsx';
@@ -182,7 +184,7 @@ export function CaptureScreen({
         : `No seed entry matches “${query.trim()}”.`,
     emptyDetail:
       query.trim() === ''
-        ? `The Phase-0 seed contains ${String(seedCounts.lexemes)} words and ${String(seedCounts.kanji)} kanji. Try ${DEFAULT_CANONICAL_TARGET}.`
+        ? `${String(seedCounts.lexemes)} words and ${String(seedCounts.kanji)} kanji are in this build. Search by written form, by reading, by romaji, by English meaning, or by a single component — try ${DEFAULT_CANONICAL_TARGET}, bunki, branching or 氵 — or browse the shelves below.`
         : undefined,
   });
 
@@ -326,7 +328,7 @@ export function CaptureScreen({
           autoCapitalize="none"
           autoCorrect={false}
           onChangeText={setQuery}
-          placeholder="分岐 · ぶんき · branching · 岐"
+          placeholder="分岐 · ぶんき · bunki · branching · 岐 · 氵"
           placeholderTextColor={theme.color.inkMuted}
           style={[
             searchFieldStyle,
@@ -548,7 +550,7 @@ export function CaptureScreen({
 
       {otherResults.length === 0 ? null : (
         <Section
-          note="Ordered by how the query matched: written form, then reading, then meaning."
+          note="Ordered by how the query matched: written form, then reading, then the romaji that reads as it, then a substring, then a component, then a meaning. Each row says which."
           testID="capture-other-results"
           title="Other matches"
         >
@@ -583,6 +585,22 @@ export function CaptureScreen({
                   >
                     {result.lexeme.senses.slice(0, 3).join(' · ')}
                   </Text>
+                  {/*
+                    Why this row is a row.
+
+                    A result with no visible connection to the query is what
+                    makes a search feel like it is guessing — and with romaji and
+                    component matching in the ranking, a row can now legitimately
+                    look nothing like what was typed.
+                  */}
+                  <Text
+                    style={[
+                      styles.meta,
+                      { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {MATCH_EXPLANATION[result.matchedOn]}
+                  </Text>
                 </>
               ) : (
                 <>
@@ -601,6 +619,14 @@ export function CaptureScreen({
                     ]}
                   >
                     {result.kanji.meanings.slice(0, 3).join(' · ')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.meta,
+                      { color: theme.color.inkFaint, fontFamily: theme.font.sans },
+                    ]}
+                  >
+                    {MATCH_EXPLANATION[result.matchedOn]}
                   </Text>
                 </>
               )}
@@ -628,6 +654,19 @@ export function CaptureScreen({
         other seven screens carry the notice unconditionally; so does this one.
       */}
       <SeedEntryDisclosure />
+
+      <Hairline />
+
+      {/*
+        Browse, under the search box.
+
+        Frozen §10.1 credits renzo's five-tab shape and names the missing piece
+        as circulation; §10.5 names the 類義漢字 grouping as the strongest
+        validation of the contrast dimension. Both are browsing surfaces, and
+        this app had none — a learner could only ever reach a word they had
+        already thought of.
+      */}
+      <BrowsePanel onOpenKanji={onOpenKanji} />
 
       <Hairline />
 

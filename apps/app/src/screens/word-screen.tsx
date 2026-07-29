@@ -270,8 +270,8 @@ export function WordScreen({
    * (REQ-DM-09). The source record says `word-screen`, so the log records where
    * the encounter actually happened rather than claiming the front door.
    */
-  const keepFromHere = (): void => {
-    if (lexeme === null) return;
+  const keepFromHere = (): string | null => {
+    if (lexeme === null) return null;
     const captured = store.execute({
       kind: 'capture',
       text: lexeme.headword,
@@ -283,6 +283,50 @@ export function WordScreen({
     const started = store.getSnapshot().threadsById[captured.threadId];
     if (started !== undefined && started.state.promotion === 'captured') {
       store.execute({ kind: 'promote', threadId: captured.threadId, to: 'keep' });
+    }
+    return captured.threadId;
+  };
+
+  /**
+   * The whole ladder, in one press, from the page the learner is already on.
+   *
+   * ## Why one press is allowed here and not on the capture screen
+   *
+   * The rule the capture screen's two-button ladder exists for is that *no
+   * promotion may exist without a user action behind it* — definition-of-done §2
+   * item 6, and the reason `bootstrapSessionWorkspace` was stripped of its
+   * silent bootstrap in the WP-10 repair round. This is a press. It is labelled
+   * with what it does, it emits the same three events in the same order through
+   * the same store, and every one of them carries `origin: "user"` because a
+   * human pressed it.
+   *
+   * What one press changes is *ceremony*, not consent. The first clause of an
+   * SRS that stands on its own is "add anything to study, in one action", and a
+   * learner who has read a word page and decided to study it should not have to
+   * press Keep, find the promotion row, and press learn.
+   *
+   * The distinction the ladder teaches — capture is not card creation (DL-05,
+   * T-02) — is still taught, on the capture screen, where the two rungs are two
+   * separate controls with the sentence between them. Both doors are honest;
+   * this one is the fast one.
+   *
+   * `keep` is not skipped on the way. `promotionReducer` rejects any transition
+   * that is not in the ladder, so `captured → learn` in one event would be a log
+   * `replay` refuses; the intermediate rung is a real event, in the export, with
+   * the same instant ordering a two-press path would produce.
+   */
+  const takeUpForStudy = (): void => {
+    if (lexeme === null) return;
+    const threadId = thread?.state.threadId ?? keepFromHere();
+    if (threadId === null) return;
+
+    const promotionNow = (): string =>
+      store.getSnapshot().threadsById[threadId]?.state.promotion ?? 'captured';
+    if (promotionNow() === 'captured') {
+      store.execute({ kind: 'promote', threadId, to: 'keep' });
+    }
+    if (promotionNow() === 'keep') {
+      store.execute({ kind: 'promote', threadId, to: 'learn' });
     }
   };
 
@@ -484,13 +528,24 @@ export function WordScreen({
           </Text>
           {thread === null ? (
             <View style={styles.actions}>
+              {/*
+                The one-action door, first, because it is the one a learner who
+                has decided wants — "add anything to study, in one action".
+              */}
               <AppButton
-                accessibilityHint="Records this encounter and starts a thread for it, without leaving this page. Keeping activates no retrieval contract; taking it up for study is a separate press."
-                accessibilityLabel={`Keep ${lexeme.headword}`}
-                label={`Keep ${lexeme.headword}`}
-                onPress={keepFromHere}
-                testID="word-keep"
+                accessibilityHint="Starts a thread for this word and takes it all the way up to Learn in one press. Learn is the rung that activates its reading and meaning contracts, so it will appear in your next sitting."
+                accessibilityLabel={`Take ${lexeme.headword} up for study`}
+                label="Take it up for study"
+                onPress={takeUpForStudy}
+                testID="word-take-up"
                 variant="primary"
+              />
+              <AppButton
+                accessibilityHint="Records this encounter and starts a thread for it, without taking it up. Keeping activates no retrieval contract, so nothing about it will come round for review."
+                accessibilityLabel={`Keep ${lexeme.headword} without studying it`}
+                label="Just keep it"
+                onPress={() => void keepFromHere()}
+                testID="word-keep"
               />
             </View>
           ) : (
@@ -499,10 +554,18 @@ export function WordScreen({
                 .filter((target) => target !== thread.state.promotion)
                 .map((target) => (
                   <AppButton
-                    accessibilityHint={`Moves this thread from ${thread.state.promotion} to ${target}.`}
+                    accessibilityHint={
+                      target === 'learn'
+                        ? `Moves this thread from ${thread.state.promotion} to learn. That rung is what activates its reading and meaning contracts; keeping alone activates none.`
+                        : `Moves this thread from ${thread.state.promotion} to ${target}.`
+                    }
                     accessibilityLabel={`Promote ${lexeme.headword} to ${target}`}
                     key={target}
-                    label={target}
+                    // The rung's own name plus what it does, because "learn" on
+                    // a bare chip is a word this app gives a specific meaning to
+                    // (REQ-DM-09) and a learner has no way to know it from the
+                    // chip alone.
+                    label={target === 'learn' ? 'learn — study it' : target}
                     onPress={() => promote(target)}
                     testID={`word-promote-${target}`}
                   />

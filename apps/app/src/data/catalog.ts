@@ -39,6 +39,8 @@ import {
   type SeedTier,
 } from '@bunki/seed';
 
+import { kanjiWithComponent } from './browse.ts';
+import { kanaQueryFor } from './romaji.ts';
 import {
   IMPORTED_LEXEMES,
   NORMALIZED_KANJI,
@@ -74,17 +76,47 @@ export type MatchKind =
   | 'headword-contains'
   | 'reading-contains'
   | 'sense-contains'
-  | 'kanji-in-word';
+  | 'kanji-in-word'
+  /**
+   * The query was romaji, and its kana form matched the reading exactly.
+   *
+   * Ranked immediately after an exact reading, because a learner who typed
+   * `bunki` meant ぶんき and the only reason it is not `reading-exact` is the
+   * keyboard they had. Kept as its own kind so a surface can say *why* the row
+   * is there — a result with no visible connection to the query is the thing
+   * that makes a search feel like it is guessing.
+   */
+  | 'romaji-exact'
+  | 'romaji-contains'
+  /** The query is a component or radical this character is built from. */
+  | 'component-of';
 
 /** Lower sorts first. Exact written form beats exact reading beats substring. */
 const MATCH_RANK: Readonly<Record<MatchKind, number>> = {
   'headword-exact': 0,
   'kanji-exact': 1,
   'reading-exact': 2,
-  'headword-contains': 3,
-  'reading-contains': 4,
-  'kanji-in-word': 5,
-  'sense-contains': 6,
+  'romaji-exact': 3,
+  'headword-contains': 4,
+  'reading-contains': 5,
+  'romaji-contains': 6,
+  'kanji-in-word': 7,
+  'component-of': 8,
+  'sense-contains': 9,
+};
+
+/** How each match kind reads on screen, so a row can say why it is a row. */
+export const MATCH_EXPLANATION: Readonly<Record<MatchKind, string>> = {
+  'headword-exact': 'written exactly like this',
+  'kanji-exact': 'this character',
+  'reading-exact': 'read exactly like this',
+  'romaji-exact': 'this romaji, read as kana',
+  'headword-contains': 'written form contains it',
+  'reading-contains': 'reading contains it',
+  'romaji-contains': 'reading contains this romaji as kana',
+  'kanji-in-word': 'written with that character',
+  'component-of': 'built from that component',
+  'sense-contains': 'a meaning contains it',
 };
 
 export type SearchResult =
@@ -159,10 +191,19 @@ export function searchSeed(rawQuery: string): readonly SearchResult[] {
   const query = norm(rawQuery);
   if (query === '') return [];
 
+  /*
+    The kana a romaji query also means, or `null`.
+
+    Computed once per query rather than per record: `kanaQueryFor` refuses
+    anything that is not entirely Latin letters, so a Japanese query pays one
+    regular expression for the whole search and nothing else.
+  */
+  const kana = kanaQueryFor(rawQuery);
+
   const results: SearchResult[] = [];
 
   for (const lexeme of seedDataset.lexemes) {
-    const matchedOn = matchLexeme(lexeme, query);
+    const matchedOn = matchLexeme(lexeme, query) ?? matchRomaji(lexeme, kana);
     if (matchedOn !== null) results.push({ kind: 'lexeme', lexeme, matchedOn, tier: FIXTURE_TIER });
   }
 
@@ -219,7 +260,7 @@ export function searchSeed(rawQuery: string): readonly SearchResult[] {
               ? 'reading-contains'
               : entry.senses.some((sense) => sense.includes(query))
                 ? 'sense-contains'
-                : null;
+                : matchRomaji(entry.lexeme, kana);
     if (matchedOn !== null) {
       imported.push({ kind: 'lexeme', lexeme: entry.lexeme, matchedOn, tier: IMPORTED_TIER });
     }
@@ -253,9 +294,45 @@ export function searchSeed(rawQuery: string): readonly SearchResult[] {
         imported.push({ kind: 'lexeme', lexeme, matchedOn: 'kanji-in-word', tier: IMPORTED_TIER });
       }
     }
+
+    /*
+      Component search: 氵 finds 演.
+
+      A single-character query is also asked of KanjiVG's element annotations,
+      so a learner who can see a part of a character but not the whole of it has
+      a way in. It runs last and ranks last, because a character that *is* the
+      query, or is read as it, is always the better answer — the component
+      reading is the one you fall back to.
+    */
+    const seenAll = new Set([
+      ...seenCharacters,
+      ...imported
+        .filter((result) => result.kind === 'kanji')
+        .map((result) => result.kanji.character),
+    ]);
+    for (const kanji of kanjiWithComponent(rawQuery.trim())) {
+      if (seenAll.has(kanji.character)) continue;
+      imported.push({ kind: 'kanji', kanji, matchedOn: 'component-of', tier: IMPORTED_TIER });
+    }
   }
 
   return [...results.sort(byQuality), ...imported.sort(byQuality).slice(0, IMPORTED_RESULT_LIMIT)];
+}
+
+/**
+ * Does this lexeme's reading match the kana a romaji query converted to?
+ *
+ * Separate from {@link matchLexeme} because it must run *after* every direct
+ * match has been tried: a query that is real text should never be beaten by its
+ * own transliteration. `null` in, `null` out — a Japanese query never reaches
+ * the comparison at all.
+ */
+function matchRomaji(lexeme: SeedLexeme, kana: string | null): MatchKind | null {
+  if (kana === null) return null;
+  const reading = norm(lexeme.reading);
+  if (reading === kana) return 'romaji-exact';
+  if (kana.length >= 2 && reading.includes(kana)) return 'romaji-contains';
+  return null;
 }
 
 /**
