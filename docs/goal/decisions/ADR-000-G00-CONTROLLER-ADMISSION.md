@@ -35,7 +35,20 @@ After human merge:
 
 Selected controller input SHA-256:
 
-`457ed6b2d1582ce01249224f7c52a91868e2290862ec8ce931365b1088d3d308`
+`6e7449149efb0fb60c8475809f451e6faecdfeb83e830e96f26f6ca04e9bcbb7`
+
+Initial mutable runtime-evidence bootstrap receipts:
+
+- goal state:
+  `0d1fd55d4fe9b955a8c7d605ee58474c19d9804ddbc664179a708aa91a5d73aa`
+- goal ledger:
+  `88ca56c1567c772f00fb50c893937809cf81720c4cf00d8749cb3e27b7e38d21`
+- operator visual-reference manifest:
+  `f7d3ce9a4e43350d7d465e62f4a517bcfb5ad21fc6ae468b505982281133fb22`
+
+These three receipts prove the initial G00 bytes only. They are not entries in
+the operator-lock integrity gate. The files evolve inside the active child and
+are schema-, meaning-, diff-, and exact-head-reviewed with that child.
 
 ## What this does not decide
 
@@ -61,4 +74,3 @@ Those remain the named human gates in the controller.
   `main`.
 - PR #15’s warning truth is not misreported as durable-write recovery; F06
   remains required.
-
