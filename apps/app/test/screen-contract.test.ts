@@ -447,6 +447,15 @@ describe('claim boundaries (REQ-GATE-03)', () => {
     expect(read(resolve(APP_ROOT, 'src/state/store.ts'))).toContain('markedAtCapture');
   });
 
+  it('keeps unresolved durable-write copy truthful after later activity', () => {
+    const debugSource = screen('inspector-debug-screen.tsx');
+    expect(debugSource).toContain(
+      'at least one acknowledged change could not be confirmed in storage',
+    );
+    expect(debugSource).toContain('Some changes from this session may not survive a reload.');
+    expect(debugSource).not.toContain('the last append was rejected');
+  });
+
   it('labels the seed as a seed wherever it could be mistaken for a dictionary', () => {
     expect(wordSource).toMatch(/seed/i);
     expect(kanjiSource).toMatch(/seed/i);
