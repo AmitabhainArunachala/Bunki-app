@@ -47,8 +47,8 @@
  * this screen runs is the one that honours it.
  */
 
-import { useCallback, useState, type ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useCallback, useState, type ReactNode } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   CLOSED_ENUMS,
@@ -56,21 +56,21 @@ import {
   RING_PRIVACY_NOTE,
   type ObservabilityChannel,
   type RingEntry,
-} from "../observability/index.ts";
+} from '../observability/index.ts';
 import {
   useAppSnapshot,
   useDebugFlags,
   useObservabilityRing,
   useStorageFacts,
   useWriteState,
-} from "../state/app-context.tsx";
-import { useLookup } from "../state/use-lookup.ts";
-import { SESSION_INTEGRATION_NOTE } from "./session-loop.ts";
-import { AppButton, Hairline, Section } from "../ui/primitives.tsx";
-import { EmptyPanel, ErrorPanel, LoadingPanel } from "../ui/screen-state.tsx";
-import { ScreenShell } from "../ui/screen-shell.tsx";
-import { SPACE, TYPE } from "../ui/theme.ts";
-import { useTheme } from "../ui/theme-context.tsx";
+} from '../state/app-context.tsx';
+import { useLookup } from '../state/use-lookup.ts';
+import { SESSION_INTEGRATION_NOTE } from './session-loop.ts';
+import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
+import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
+import { ScreenShell } from '../ui/screen-shell.tsx';
+import { SPACE, TYPE } from '../ui/theme.ts';
+import { useTheme } from '../ui/theme-context.tsx';
 
 /**
  * What each channel is for, and — where it is empty in this build — why.
@@ -80,25 +80,22 @@ import { useTheme } from "../ui/theme-context.tsx";
  */
 const CHANNEL_NOTES: Readonly<Record<ObservabilityChannel, string>> = {
   command:
-    "One record per command the store applied, with the milliseconds it spent inside `execute`.",
-  "event-append":
-    "One record per event appended, by family. Types only — never payloads.",
-  "ai-route":
-    "Route class, latency and fallback for AI requests. Empty in this build: the AI adapter is a separate package that nothing here imports yet, so no request has been made — not “no requests failed”.",
+    'One record per command the store applied, with the milliseconds it spent inside `execute`.',
+  'event-append': 'One record per event appended, by family. Types only — never payloads.',
+  'ai-route':
+    'Route class, latency and fallback for AI requests. Empty in this build: the AI adapter is a separate package that nothing here imports yet, so no request has been made — not “no requests failed”.',
   persistence:
-    "Storage timings. Empty in this build: the event log is in memory for this session, so there is no durable write to time.",
+    'Storage timings. Empty in this build: the event log is in memory for this session, so there is no durable write to time.',
 };
 
 const RUNTIME_LABEL =
-  "Elapsed milliseconds measured on whatever runtime you are reading this on. Web figures are demonstration data, not a performance claim; native measurement is a later work package.";
+  'Elapsed milliseconds measured on whatever runtime you are reading this on. Web figures are demonstration data, not a performance claim; native measurement is a later work package.';
 
 export interface InspectorDebugScreenProps {
   readonly onBack: () => void;
 }
 
-export function InspectorDebugScreen({
-  onBack,
-}: InspectorDebugScreenProps): ReactNode {
+export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): ReactNode {
   const theme = useTheme();
   const ring = useObservabilityRing();
   // The snapshot is the app's change token; reading it here is what re-renders
@@ -140,16 +137,15 @@ export function InspectorDebugScreen({
 
   const { state, retry } = useLookup<readonly RingEntry[]>(resolveEntries, {
     flags,
-    emptyMessage: "Nothing recorded yet.",
+    emptyMessage: 'Nothing recorded yet.',
     emptyDetail:
-      "Use the app — search for something, keep it, open the evidence inspector — and the records appear here.",
+      'Use the app — search for something, keep it, open the evidence inspector — and the records appear here.',
   });
 
   const byChannel = (
     records: readonly RingEntry[],
     channel: ObservabilityChannel,
-  ): readonly RingEntry[] =>
-    records.filter((entry) => entry.record.channel === channel);
+  ): readonly RingEntry[] => records.filter((entry) => entry.record.channel === channel);
 
   const showSerialized = useCallback((): void => {
     try {
@@ -158,52 +154,30 @@ export function InspectorDebugScreen({
     } catch (cause) {
       setSerialized(null);
       setSerializeError(
-        cause instanceof Error
-          ? cause.message
-          : "The buffer could not be serialised.",
+        cause instanceof Error ? cause.message : 'The buffer could not be serialised.',
       );
     }
   }, [ring]);
 
-  const stripped = entries.reduce(
-    (total, entry) => total + entry.strippedFields,
-    0,
-  );
+  const stripped = entries.reduce((total, entry) => total + entry.strippedFields, 0);
 
   return (
-    <ScreenShell
-      subtitle={RUNTIME_LABEL}
-      testID="screen-inspector-debug"
-      title="Diagnostics"
-    >
+    <ScreenShell subtitle={RUNTIME_LABEL} testID="screen-inspector-debug" title="Diagnostics">
       <Section testID="debug-privacy" title="What this buffer can hold">
-        <Text
-          style={[
-            styles.body,
-            { color: theme.color.ink, fontFamily: theme.font.sans },
-          ]}
-        >
+        <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
           {RING_PRIVACY_NOTE}
         </Text>
         <Text
-          style={[
-            styles.meta,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
+          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
           testID="debug-stripped-count"
         >
-          Fields removed by that rebuild so far: {String(stripped)}. Their names
-          are not kept — a key can be as revealing as a value.
+          Fields removed by that rebuild so far: {String(stripped)}. Their names are not kept — a
+          key can be as revealing as a value.
         </Text>
-        <Text
-          style={[
-            styles.meta,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
-        >
-          Buffer: {String(entries.length)} of {String(ring.capacity)} slots ·{" "}
-          {String(ring.appended())} records appended since this session started
-          · store revision {String(snapshot.revision)}
+        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+          Buffer: {String(entries.length)} of {String(ring.capacity)} slots ·{' '}
+          {String(ring.appended())} records appended since this session started · store revision{' '}
+          {String(snapshot.revision)}
         </Text>
       </Section>
 
@@ -211,21 +185,17 @@ export function InspectorDebugScreen({
 
       {/* Exactly one of these four branches renders. `state.kind` is a closed
           union, so there is no arrangement of flags that shows two at once. */}
-      {state.kind === "loading" ? (
+      {state.kind === 'loading' ? (
         <LoadingPanel label="Reading the diagnostic buffer…" />
-      ) : state.kind === "error" ? (
+      ) : state.kind === 'error' ? (
         <ErrorPanel
           detail={state.detail}
           message={state.message}
           onRetry={retry}
           testID="debug-error"
         />
-      ) : state.kind === "empty" ? (
-        <EmptyPanel
-          detail={state.detail}
-          message={state.message}
-          testID="debug-empty"
-        />
+      ) : state.kind === 'empty' ? (
+        <EmptyPanel detail={state.detail} message={state.message} testID="debug-empty" />
       ) : (
         OBSERVABILITY_CHANNELS.map((channel) => (
           <Section
@@ -236,10 +206,7 @@ export function InspectorDebugScreen({
           >
             {byChannel(state.data, channel).length === 0 ? (
               <Text
-                style={[
-                  styles.meta,
-                  { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-                ]}
+                style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
               >
                 No records on this channel.
               </Text>
@@ -247,10 +214,7 @@ export function InspectorDebugScreen({
               byChannel(state.data, channel).map((entry) => (
                 <Text
                   key={`${channel}-${String(entry.record.seq)}`}
-                  style={[
-                    styles.mono,
-                    { color: theme.color.ink, fontFamily: theme.font.sans },
-                  ]}
+                  style={[styles.mono, { color: theme.color.ink, fontFamily: theme.font.sans }]}
                   testID={`debug-record-${String(entry.record.seq)}`}
                 >
                   {formatRecord(entry)}
@@ -286,19 +250,13 @@ export function InspectorDebugScreen({
             horizontal
             style={[
               styles.codeBlock,
-              {
-                backgroundColor: theme.color.raised,
-                borderColor: theme.color.rule,
-              },
+              { backgroundColor: theme.color.raised, borderColor: theme.color.rule },
             ]}
             testID="debug-serialized-output"
           >
             <Text
               accessibilityLabel="The serialised diagnostic buffer."
-              style={[
-                styles.mono,
-                { color: theme.color.ink, fontFamily: theme.font.sans },
-              ]}
+              style={[styles.mono, { color: theme.color.ink, fontFamily: theme.font.sans }]}
             >
               {serialized}
             </Text>
@@ -311,21 +269,11 @@ export function InspectorDebugScreen({
         testID="debug-enums"
         title="Closed sets the records draw from"
       >
-        <Text
-          style={[
-            styles.mono,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
-        >
-          commandKind: {CLOSED_ENUMS.commandKind.join(", ")}
+        <Text style={[styles.mono, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+          commandKind: {CLOSED_ENUMS.commandKind.join(', ')}
         </Text>
-        <Text
-          style={[
-            styles.mono,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
-        >
-          eventType: {CLOSED_ENUMS.eventType.join(", ")}
+        <Text style={[styles.mono, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+          eventType: {CLOSED_ENUMS.eventType.join(', ')}
         </Text>
       </Section>
 
@@ -380,14 +328,8 @@ function StorageSection(): ReactNode {
         testID="debug-storage"
         title="Where this build keeps your data"
       >
-        <Text
-          style={[
-            styles.meta,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
-        >
-          No durable adapter is attached to this render. Nothing here is a
-          durability claim.
+        <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+          No durable adapter is attached to this render. Nothing here is a durability claim.
         </Text>
       </Section>
     );
@@ -396,66 +338,46 @@ function StorageSection(): ReactNode {
   return (
     <Section testID="debug-storage" title="Where this build keeps your data">
       <Text
-        style={[
-          styles.body,
-          { color: theme.color.ink, fontFamily: theme.font.sans },
-        ]}
+        style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}
         testID="debug-storage-runtime"
       >
         Adapter: {storage.runtimeLabel}
       </Text>
-      <Text
-        style={[
-          styles.meta,
-          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-        ]}
-      >
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
         {storage.disclosure}
       </Text>
       {storage.provisionalNotice === null ? null : (
         <Text
-          style={[
-            styles.meta,
-            { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-          ]}
+          style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
           testID="debug-storage-provisional"
         >
           {storage.provisionalNotice}
         </Text>
       )}
       <Text
-        style={[
-          styles.meta,
-          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-        ]}
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
         testID="debug-storage-snapshot"
       >
         {storage.snapshotAvailable
-          ? "Browser storage is available, so what you save survives a reload."
-          : "This browser refused persistent storage, so this session is in memory only and a reload will clear it."}
+          ? 'Browser storage is available, so what you save survives a reload.'
+          : 'This browser refused persistent storage, so this session is in memory only and a reload will clear it.'}
       </Text>
       <Text
-        style={[
-          styles.meta,
-          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-        ]}
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
         testID="debug-storage-session-gap"
       >
         {SESSION_INTEGRATION_NOTE}
       </Text>
       <Text
-        style={[
-          styles.meta,
-          { color: theme.color.inkMuted, fontFamily: theme.font.sans },
-        ]}
+        style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
         testID="debug-storage-writes"
       >
         {writeState === null
-          ? "Durable writes: not applicable."
-          : writeState.kind === "settled"
-            ? "All changes from this session are saved locally."
-            : writeState.kind === "writing"
-              ? "Saving changes locally…"
+          ? 'Durable writes: not applicable.'
+          : writeState.kind === 'settled'
+            ? 'All changes from this session are saved locally.'
+            : writeState.kind === 'writing'
+              ? 'Saving changes locally…'
               : `Saving problem: Bunki could not confirm that one or more changes were saved. They may still appear now but disappear after you reopen the app. A newer save can succeed without resolving this earlier gap. Most recent storage message: ${writeState.message}`}
       </Text>
     </Section>
@@ -472,14 +394,11 @@ function StorageSection(): ReactNode {
  */
 function formatRecord(entry: RingEntry): string {
   const parts = Object.keys(entry.record)
-    .filter((key) => key !== "channel")
+    .filter((key) => key !== 'channel')
     .sort()
     .map((key) => `${key}=${String(entry.record[key])}`);
-  const suffix =
-    entry.strippedFields === 0
-      ? ""
-      : ` (+${String(entry.strippedFields)} removed)`;
-  return `${parts.join(" ")}${suffix}`;
+  const suffix = entry.strippedFields === 0 ? '' : ` (+${String(entry.strippedFields)} removed)`;
+  return `${parts.join(' ')}${suffix}`;
 }
 
 const styles = StyleSheet.create({
