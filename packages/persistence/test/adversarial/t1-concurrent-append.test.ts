@@ -34,7 +34,7 @@
  *   which is controller §21.3(4)'s stop condition wearing a small disguise.
  */
 
-import { componentIdForTargetKey, DomainError, type DomainEvent } from '@bunki/domain';
+import { componentIdForTargetKey, DomainError, replay, type DomainEvent } from '@bunki/domain';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { encounterCaptured, threadPromoted, type EventStore } from '../../src/index.ts';
@@ -135,7 +135,10 @@ for (const harness of harnesses) {
       // so `replay` refuses the whole batch — including the capture in front of
       // it, which would have been perfectly valid on its own.
       const good = encounterCaptured({ eventId: 'evt-good' });
-      const orphan = threadPromoted({ eventId: 'evt-orphan', threadId: 'thread-that-never-was' });
+      const orphan = threadPromoted({
+        eventId: 'evt-orphan',
+        threadId: 'thread-that-never-was',
+      });
 
       await expect(
         store.append([good, orphan], { idempotencyKey: 'batch:mixed' }),
@@ -185,32 +188,23 @@ for (const harness of harnesses) {
 }
 
 /**
- * ADV-T1-01 at the write gate.
+ * ADV-T1-01 regression at the write gate.
  *
- * The domain suite (`packages/domain/test/adversarial/t1-clock-skew.test.ts`)
- * proves that a review dated before the previous one, across a UTC midnight,
- * makes `replay` throw a `ts-fsrs` error. This is what that costs at the port,
- * and it is the reason the finding is filed as a durability risk rather than a
- * tidiness one: `planAppend` runs `replay` over (stored ++ incoming) before it
- * writes, so the skewed review is refused — and the learner's acknowledgment
- * has already happened on screen, because REQ-UI-01 acknowledges before
- * persisting.
- *
- * The assertions below are about the *store*, and they hold either way: the
- * batch is atomic, the log stays replayable, and nothing partial is written.
- * That the rejection arrives as an unclassified error rather than a
- * `DomainError` is the defect, and it is asserted in the domain suite where the
- * cause lives.
+ * A backward-clock review must be appended exactly once, survive a fresh read,
+ * and produce the same snapshot as replaying the stored log. This is the port
+ * boundary that previously refused the learner's already acknowledged review.
  */
-describe('T1 — ADV-T1-01: a clock-skewed review at the write gate', () => {
+describe('T1 — ADV-T1-01 regression: clock-skewed reviews remain durable', () => {
   const harness = createWebProvisionalHarness();
   const TARGET = '分岐';
   const COMPONENT = componentIdForTargetKey(TARGET);
 
-  /** A capture whose span selects the target, so the component binds to a thread. */
   const boundCapture = (): DomainEvent =>
     ({
-      ...encounterCaptured({ eventId: 'evt-skew-capture', text: `${TARGET}点で道を選ぶ。` }),
+      ...encounterCaptured({
+        eventId: 'evt-skew-capture',
+        text: `${TARGET}点で道を選ぶ。`,
+      }),
       span: { start: 0, end: TARGET.length },
     }) as DomainEvent;
 
@@ -253,7 +247,7 @@ describe('T1 — ADV-T1-01: a clock-skewed review at the write gate', () => {
     await harness.dispose();
   });
 
-  it('is refused atomically, and leaves the stored log replayable', async () => {
+  it('appends once, replays after read, and still accepts later reviews', async () => {
     await harness.reset();
     const store = await harness.open();
 
@@ -268,31 +262,57 @@ describe('T1 — ADV-T1-01: a clock-skewed review at the write gate', () => {
     );
 
     const before = await store.readAll();
-    const scheduledBefore = (await store.snapshot()).memoryStates;
-    expect(scheduledBefore, 'the setup did not activate a schedule').toHaveLength(1);
+    const skewedAt = '2026-07-26T23:59:00.000Z';
+    const skewed = reviewAt('evt-skew-r2', skewedAt);
 
-    // A step back across midnight UTC — four minutes of wall clock, one
-    // calendar day to FSRS.
-    const skewed = reviewAt('evt-skew-r2', '2026-07-26T23:59:00.000Z');
-    let rejection: unknown;
-    try {
-      await store.append([skewed], { idempotencyKey: 'batch:skew' });
-    } catch (error) {
-      rejection = error;
-    }
+    await expect(
+      store.append([skewed], { idempotencyKey: 'batch:skew' }),
+      'the clock-skewed review was refused',
+    ).resolves.toMatchObject({
+      outcome: 'appended',
+      appendedEventIds: ['evt-skew-r2'],
+    });
 
-    expect(rejection, 'the clock-skewed review was accepted into the log').toBeDefined();
+    // An honest retry is a no-op at both the batch and event idempotency layers.
+    await expect(store.append([skewed], { idempotencyKey: 'batch:skew' })).resolves.toMatchObject({
+      outcome: 'duplicate-noop',
+      appendedEventIds: [],
+      skippedEventIds: ['evt-skew-r2'],
+    });
+    await expect(
+      store.append([skewed], { idempotencyKey: 'batch:skew-rekeyed' }),
+    ).resolves.toMatchObject({
+      outcome: 'duplicate-noop',
+      appendedEventIds: [],
+      skippedEventIds: ['evt-skew-r2'],
+    });
 
-    // The store held: nothing partial, and what was already there still reads.
     const after = await store.readAll();
-    expect(idsOf(after), 'a refused skewed review wrote part of itself').toEqual(idsOf(before));
-    await expect(store.snapshot(), 'the stored log stopped replaying').resolves.toBeDefined();
+    expect(idsOf(after)).toEqual([...idsOf(before), 'evt-skew-r2']);
+    const snapshot = await store.snapshot();
+    expect(snapshot).toEqual(replay(after));
 
-    // A well-dated review still lands, so the store is not wedged for logs that
-    // stay ahead of the last review.
-    await store.append([reviewAt('evt-skew-r3', '2026-07-28T09:03:00.000Z')], {
+    const memory = snapshot.memoryStates.find(
+      (candidate) => candidate.contractId === 'contract-skew',
+    );
+    expect(memory).toMatchObject({
+      admittedReviewCount: 2,
+      lastReviewedAt: skewedAt,
+      schedulerAnchorAt: '2026-07-27T09:03:00.000Z',
+    });
+    expect(snapshot.observations.find((row) => row.eventId === 'evt-skew-r2')?.at).toBe(skewedAt);
+    expect(snapshot.gateDecisions.find((row) => row.eventId === 'evt-skew-r2')).toMatchObject({
+      admitted: true,
+      at: skewedAt,
+    });
+
+    const reopened = await harness.open();
+    expect(await reopened.readAll()).toEqual(after);
+    expect(await reopened.snapshot()).toEqual(snapshot);
+
+    await reopened.append([reviewAt('evt-skew-r3', '2026-07-28T09:03:00.000Z')], {
       idempotencyKey: 'batch:skew-forward',
     });
-    expect((await store.snapshot()).memoryStates[0]?.admittedReviewCount).toBe(2);
+    expect((await reopened.snapshot()).memoryStates[0]?.admittedReviewCount).toBe(3);
   });
 });
