@@ -2,13 +2,13 @@
  * The FSRS pin (WP-06; controller §6.3, §14, REQ-SCH-01, REQ-SCH-02, DL-13).
  *
  * There is exactly one scheduler in this product and this file is its
- * nameplate: which package, which version, which algorithm generation, which
- * parameters. Every number below is written out rather than read from the
- * library, so that a version bump that silently changes a default is a **test
- * failure** (`verifyFsrsPin`), not a quiet change in everybody's review
- * intervals. That is what "version-pinned" has to mean for a scheduler whose
- * outputs are the product's evidence: replay under a later version must be an
- * explicit, replay-tested migration (controller §6.3).
+ * nameplate: package, version, algorithm generation, parameters, and review-time
+ * policy. Every value below is written out rather than read from the library, so
+ * a version bump that silently changes a default is a **test failure**
+ * (`verifyFsrsPin`), not a quiet change in everybody's review intervals. That is
+ * what "version-pinned" has to mean for a scheduler whose outputs are the
+ * product's evidence: replay under a later version must be an explicit,
+ * replay-tested migration (controller §6.3).
  *
  * ## WP-00 carry-over: does 5.4.1 implement FSRS-6?
  *
@@ -92,6 +92,17 @@ export const FSRS_ENABLE_FUZZ = false;
 /** Short-term (learning/relearning) steps are in use; see the step lists. */
 export const FSRS_ENABLE_SHORT_TERM = true;
 
+/**
+ * Stable id for the review-time policy wrapped around FSRS.
+ *
+ * Event order is authoritative even when a device clock moves backward. The
+ * scheduler therefore receives a nondecreasing instant derived from append
+ * order, while the evidence ledger keeps the event's original timestamp. This
+ * policy is part of the scheduler pin because changing it changes intervals
+ * without changing the library, weights, or desired retention.
+ */
+export const FSRS_REVIEW_TIME_POLICY_ID = 'append-order-monotonic-clamp-v1';
+
 export const FSRS_LEARNING_STEPS: readonly string[] = Object.freeze(['1m', '10m']);
 export const FSRS_RELEARNING_STEPS: readonly string[] = Object.freeze(['10m']);
 
@@ -125,6 +136,7 @@ export interface FsrsPin {
   readonly algorithm: string;
   readonly selfReportedVersion: string;
   readonly parameterSetId: string;
+  readonly reviewTimePolicyId: string;
   readonly requestRetention: number;
   readonly maximumIntervalDays: number;
   readonly enableFuzz: boolean;
@@ -142,6 +154,7 @@ export const FSRS_PIN: FsrsPin = Object.freeze({
   algorithm: FSRS_ALGORITHM,
   selfReportedVersion: FSRS_SELF_REPORTED_VERSION,
   parameterSetId: FSRS_PARAMETER_SET_ID,
+  reviewTimePolicyId: FSRS_REVIEW_TIME_POLICY_ID,
   requestRetention: FSRS_DESIRED_RETENTION,
   maximumIntervalDays: FSRS_MAXIMUM_INTERVAL_DAYS,
   enableFuzz: FSRS_ENABLE_FUZZ,
