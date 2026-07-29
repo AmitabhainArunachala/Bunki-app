@@ -33,24 +33,24 @@
  * retrying over a conflicting key is how one lost append becomes two histories.
  */
 
-import type { DomainEvent } from '@bunki/domain';
+import type { DomainEvent } from "@bunki/domain";
 
-import { createMemoryAppStore } from './memory-store.ts';
+import { createMemoryAppStore } from "./memory-store.ts";
 import {
   openAppEventStore,
   type EventStore,
   type OpenAppEventStoreOptions,
   type OpenedAppEventStore,
   type RuntimeLabel,
-} from './persistence/index.ts';
-import type { AppStore, CommandObserver, DurabilityLevel } from './store.ts';
+} from "./persistence/index.ts";
+import type { AppStore, CommandObserver, DurabilityLevel } from "./store.ts";
 
 /** What the app knows about its own durable writes. */
 export type WriteState =
   /** Every append the store accepted has reached the adapter. */
-  | { readonly kind: 'settled' }
+  | { readonly kind: "settled" }
   /** At least one append is in flight. */
-  | { readonly kind: 'writing' }
+  | { readonly kind: "writing" }
   /**
    * At least one acknowledged append could not be confirmed in the adapter.
    *
@@ -59,7 +59,7 @@ export type WriteState =
    * unresolved gap. `message` is the most recent adapter rejection, not
    * necessarily the latest append attempt; it names no encounter content.
    */
-  | { readonly kind: 'failed'; readonly message: string };
+  | { readonly kind: "failed"; readonly message: string };
 
 export interface DurableAppStore {
   readonly store: AppStore;
@@ -75,13 +75,14 @@ export interface DurableAppStore {
 }
 
 export interface CreateDurableAppStoreOptions extends OpenAppEventStoreOptions {
-  readonly context: Parameters<typeof createMemoryAppStore>[0]['context'];
+  readonly context: Parameters<typeof createMemoryAppStore>[0]["context"];
   readonly observer?: CommandObserver | undefined;
   readonly elapsedMs?: (() => number) | undefined;
   /** Re-attaches rehydrated threads to their seed entries — see `memory-store.ts`. */
   readonly resolveLexemeId?: ((text: string) => string | null) | undefined;
   /** Injected by tests so an already-open store can be reused across a "restart". */
-  readonly openStore?: ((options: OpenAppEventStoreOptions) => OpenedAppEventStore) | undefined;
+  readonly openStore?:
+    ((options: OpenAppEventStoreOptions) => OpenedAppEventStore) | undefined;
 }
 
 /**
@@ -97,8 +98,9 @@ export function durabilityFor(
   runtimeLabel: RuntimeLabel,
   snapshotAvailable: boolean,
 ): DurabilityLevel {
-  if (runtimeLabel === 'web-provisional' && !snapshotAvailable) return 'in-memory-session-only';
-  return 'device-local';
+  if (runtimeLabel === "web-provisional" && !snapshotAvailable)
+    return "in-memory-session-only";
+  return "device-local";
 }
 
 /**
@@ -113,7 +115,7 @@ export async function createDurableAppStore(
   const opened = (options.openStore ?? openAppEventStore)(options);
   const initialEvents = await opened.store.readAll();
 
-  let writeState: WriteState = { kind: 'settled' };
+  let writeState: WriteState = { kind: "settled" };
   let pending = 0;
   const listeners = new Set<() => void>();
   let queue: Promise<void> = Promise.resolve();
@@ -123,20 +125,24 @@ export async function createDurableAppStore(
     for (const listener of listeners) listener();
   };
 
-  const journal = (events: readonly DomainEvent[], idempotencyKey: string): void => {
+  const journal = (
+    events: readonly DomainEvent[],
+    idempotencyKey: string,
+  ): void => {
     pending += 1;
-    if (writeState.kind !== 'failed') setWriteState({ kind: 'writing' });
+    if (writeState.kind !== "failed") setWriteState({ kind: "writing" });
     queue = queue.then(async () => {
       try {
         await opened.store.append(events, { idempotencyKey });
       } catch (cause) {
         setWriteState({
-          kind: 'failed',
+          kind: "failed",
           message: cause instanceof Error ? cause.message : String(cause),
         });
       } finally {
         pending -= 1;
-        if (pending === 0 && writeState.kind === 'writing') setWriteState({ kind: 'settled' });
+        if (pending === 0 && writeState.kind === "writing")
+          setWriteState({ kind: "settled" });
       }
     });
   };
@@ -147,8 +153,12 @@ export async function createDurableAppStore(
     initialEvents,
     journal,
     ...(options.observer === undefined ? {} : { observer: options.observer }),
-    ...(options.elapsedMs === undefined ? {} : { elapsedMs: options.elapsedMs }),
-    ...(options.resolveLexemeId === undefined ? {} : { resolveLexemeId: options.resolveLexemeId }),
+    ...(options.elapsedMs === undefined
+      ? {}
+      : { elapsedMs: options.elapsedMs }),
+    ...(options.resolveLexemeId === undefined
+      ? {}
+      : { resolveLexemeId: options.resolveLexemeId }),
   });
 
   return {
