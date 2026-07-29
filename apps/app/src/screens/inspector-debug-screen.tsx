@@ -31,8 +31,8 @@
  * adapter's own label and its own disclosure sentence verbatim (REQ-ARCH-05,
  * P0-CAP-15) — this is the "about screen" controller §7 requires the provisional
  * web adapter to be labelled on. It reports three facts that fail separately:
- * which adapter is running, whether it really has storage, and whether the last
- * durable write landed.
+ * which adapter is running, whether it really has storage, and whether any
+ * acknowledged write remains unconfirmed.
  *
  * **Its four states are mutually exclusive.** The records region resolves
  * through `useLookup`, the same state machine the other screens use, so
@@ -312,8 +312,8 @@ export function InspectorDebugScreen({ onBack }: InspectorDebugScreenProps): Rea
  * restate it more strongly than the adapter earns.
  *
  * Three separate facts, because they fail separately: which adapter is running,
- * whether that adapter actually has storage, and whether the last write reached
- * it. A build reporting "web-provisional" while the browser refused
+ * whether that adapter actually has storage, and whether any acknowledged write
+ * remains unconfirmed. A build reporting "web-provisional" while the browser refused
  * `localStorage` looks durable and is not, which is why the second line exists.
  */
 function StorageSection(): ReactNode {
@@ -359,7 +359,7 @@ function StorageSection(): ReactNode {
         testID="debug-storage-snapshot"
       >
         {storage.snapshotAvailable
-          ? 'Browser storage is available, so what you save survives a reload.'
+          ? 'Browser storage is available. Check the save status below; only confirmed saves are expected to remain after you reopen the app.'
           : 'This browser refused persistent storage, so this session is in memory only and a reload will clear it.'}
       </Text>
       <Text
@@ -375,10 +375,10 @@ function StorageSection(): ReactNode {
         {writeState === null
           ? 'Durable writes: not applicable.'
           : writeState.kind === 'settled'
-            ? 'Durable writes: every accepted command has reached the store.'
+            ? 'All changes from this session are saved locally.'
             : writeState.kind === 'writing'
-              ? 'Durable writes: one or more appends are in flight.'
-              : `Durable writes: the last append was rejected — ${writeState.message}`}
+              ? 'Saving changes locally…'
+              : `Saving problem: Bunki could not confirm that one or more changes were saved. They may still appear now but disappear after you reopen the app. A newer save can succeed without resolving this earlier gap. Most recent storage message: ${writeState.message}`}
       </Text>
     </Section>
   );

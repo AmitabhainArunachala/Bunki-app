@@ -28,7 +28,7 @@ import { describe, expect, it } from 'vitest';
 import { createDeterministicContext, type DomainContext } from '@bunki/domain';
 
 import { createDurableAppStore, durabilityFor } from '../src/state/durable-store.ts';
-import { openAppEventStore } from '../src/state/persistence/index.ts';
+import { openAppEventStore, type OpenedAppEventStore } from '../src/state/persistence/index.ts';
 import type { CaptureCommand } from '../src/state/store.ts';
 
 const SOURCE = { sourceId: 'manual-entry', kind: 'manual', locator: 'capture-screen' } as const;
@@ -78,6 +78,34 @@ function newSnapshotStore(): {
 }
 
 const APP_VERSIONS = { domain: '@bunki/domain@0.0.0', fsrs: null } as const;
+
+/**
+ * Replace only append while keeping every other operation bound to the real
+ * adapter. Its implementation uses private fields, so spreading the instance
+ * would create methods with the wrong receiver.
+ */
+function replaceAppend(
+  opened: OpenedAppEventStore,
+  append: OpenedAppEventStore['store']['append'],
+): OpenedAppEventStore {
+  const real = opened.store;
+  const store: typeof real = {
+    runtimeLabel: real.runtimeLabel,
+    append,
+    readAll: () => real.readAll(),
+    readStream: (selector) => real.readStream(selector),
+    snapshot: () => real.snapshot(),
+    exportJson: () => real.exportJson(),
+    close: () => real.close(),
+    countEvents: () => real.countEvents(),
+    listThreadIds: () => real.listThreadIds(),
+    threadState: (threadId) => real.threadState(threadId),
+    eventById: (eventId) => real.eventById(eventId),
+    hasIdempotencyKey: (key) => real.hasIdempotencyKey(key),
+    derivedStateCacheMeta: () => real.derivedStateCacheMeta(),
+  };
+  return { ...opened, store };
+}
 
 async function launch(
   snapshotStore: ReturnType<typeof newSnapshotStore>,
@@ -184,30 +212,9 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
       snapshotKey: 'test-store',
       snapshotStore,
       openStore: (options) => {
-        // The real web store, with its append replaced by a refusal — so the
-        // read path, the labels and the rehydration are all still the genuine
-        // ones and only the failure is injected.
+        // The real web store, with only append replaced by a refusal.
         const real = openAppEventStore(options);
-        // Explicitly bound delegation. The adapter keeps its state in `#private`
-        // fields, so neither spreading the instance nor `Object.create`-ing over
-        // it produces a working store — the methods have to be called with the
-        // original as their receiver.
-        const refusing: typeof real.store = {
-          runtimeLabel: real.store.runtimeLabel,
-          append: () => Promise.reject(new Error('storage quota exceeded')),
-          readAll: () => real.store.readAll(),
-          readStream: (selector) => real.store.readStream(selector),
-          snapshot: () => real.store.snapshot(),
-          exportJson: () => real.store.exportJson(),
-          close: () => real.store.close(),
-          countEvents: () => real.store.countEvents(),
-          listThreadIds: () => real.store.listThreadIds(),
-          threadState: (threadId) => real.store.threadState(threadId),
-          eventById: (eventId) => real.store.eventById(eventId),
-          hasIdempotencyKey: (key) => real.store.hasIdempotencyKey(key),
-          derivedStateCacheMeta: () => real.store.derivedStateCacheMeta(),
-        };
-        return { ...real, store: refusing };
+        return replaceAppend(real, () => Promise.reject(new Error('storage quota exceeded')));
       },
     });
 
@@ -217,6 +224,238 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
     const state = durable.getWriteState();
     expect(state.kind).toBe('failed');
     expect(state.kind === 'failed' ? state.message : '').toContain('quota');
+  });
+
+  it('keeps an unresolved gap visible while a queued independent append succeeds', async () => {
+    const snapshotStore = newSnapshotStore();
+    const context = newContext('run1-');
+    let attempts = 0;
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const adapterOrder: string[] = [];
+
+    const durable = await createDurableAppStore({
+      appVersions: APP_VERSIONS,
+      clock: context.clock,
+      context,
+      snapshotKey: 'test-store',
+      snapshotStore,
+      openStore: (options) => {
+        const real = openAppEventStore(options);
+        return replaceAppend(real, async (events, appendOptions) => {
+          attempts += 1;
+          const attempt = attempts;
+          adapterOrder.push(`start-${String(attempt)}`);
+          inFlight += 1;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          try {
+            if (attempt === 1) throw new Error('temporary write refusal');
+            const result = await real.store.append(events, appendOptions);
+            return result;
+          } finally {
+            inFlight -= 1;
+            adapterOrder.push(`finish-${String(attempt)}`);
+          }
+        });
+      },
+    });
+    const transitions: string[] = [];
+    const unsubscribe = durable.subscribeWriteState(() => {
+      transitions.push(durable.getWriteState().kind);
+    });
+
+    // Both commands are acknowledged before either append settles. The queue
+    // must let the second continue after the first refuses without hiding the
+    // first command's unresolved durability gap.
+    const first = durable.store.execute(capture('最初'));
+    const second = durable.store.execute(capture('次'));
+    expect(durable.getWriteState().kind).toBe('writing');
+    await durable.flush();
+    unsubscribe();
+
+    expect(durable.getWriteState()).toEqual({
+      kind: 'failed',
+      message: 'temporary write refusal',
+    });
+    const failureTransition = transitions.lastIndexOf('failed');
+    expect(failureTransition).toBeGreaterThanOrEqual(0);
+    expect(transitions.slice(failureTransition + 1)).not.toContain('settled');
+    expect(attempts).toBe(2);
+    expect(maxInFlight).toBe(1);
+    expect(adapterOrder).toEqual(['start-1', 'finish-1', 'start-2', 'finish-2']);
+
+    const optimisticIds = durable.store.readAll().map((event) => event.eventId);
+    const durableIds = (await durable.eventStore.readAll()).map((event) => event.eventId);
+    const exportedIds = (await durable.eventStore.exportJson()).events.map(
+      (event) => event.eventId,
+    );
+    expect(optimisticIds).toEqual([first.events[0]?.eventId, second.events[0]?.eventId]);
+    expect(durableIds).toEqual([second.events[0]?.eventId]);
+    expect(exportedIds).toEqual([second.events[0]?.eventId]);
+
+    const reloaded = await launch(snapshotStore, 'run2-');
+    expect(reloaded.store.readAll().map((event) => event.eventId)).toEqual([
+      second.events[0]?.eventId,
+    ]);
+  });
+
+  it('keeps serial order and settles only after an all-success queue drains', async () => {
+    const snapshotStore = newSnapshotStore();
+    const context = newContext('run1-');
+    let inFlight = 0;
+    let maxInFlight = 0;
+
+    const durable = await createDurableAppStore({
+      appVersions: APP_VERSIONS,
+      clock: context.clock,
+      context,
+      snapshotKey: 'test-store',
+      snapshotStore,
+      openStore: (options) => {
+        const real = openAppEventStore(options);
+        return replaceAppend(real, async (events, appendOptions) => {
+          inFlight += 1;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          try {
+            const result = await real.store.append(events, appendOptions);
+            return result;
+          } finally {
+            inFlight -= 1;
+          }
+        });
+      },
+    });
+    const transitions: string[] = [];
+    const unsubscribe = durable.subscribeWriteState(() => {
+      transitions.push(durable.getWriteState().kind);
+    });
+
+    const acknowledgments = ['一', '二', '三'].map((text) => durable.store.execute(capture(text)));
+    expect(durable.getWriteState().kind).toBe('writing');
+    await durable.flush();
+    unsubscribe();
+
+    const acknowledgedIds = acknowledgments.map((ack) => ack.events[0]?.eventId);
+    const durableIds = (await durable.eventStore.readAll()).map((event) => event.eventId);
+    expect(maxInFlight).toBe(1);
+    expect(durableIds).toEqual(acknowledgedIds);
+    expect(durable.getWriteState().kind).toBe('settled');
+    expect(transitions.at(-1)).toBe('settled');
+    expect(transitions.slice(0, -1)).not.toContain('settled');
+  });
+
+  it('continues after multiple refusals and retains the most recent error', async () => {
+    const snapshotStore = newSnapshotStore();
+    const context = newContext('run1-');
+    let attempts = 0;
+
+    const durable = await createDurableAppStore({
+      appVersions: APP_VERSIONS,
+      clock: context.clock,
+      context,
+      snapshotKey: 'test-store',
+      snapshotStore,
+      openStore: (options) => {
+        const real = openAppEventStore(options);
+        return replaceAppend(real, async (events, appendOptions) => {
+          attempts += 1;
+          if (attempts !== 2) throw new Error(`write refusal ${String(attempts)}`);
+          return real.store.append(events, appendOptions);
+        });
+      },
+    });
+
+    const acknowledgments = [];
+    for (const text of ['一', '二', '三']) {
+      acknowledgments.push(durable.store.execute(capture(text)));
+      await durable.flush();
+    }
+
+    expect(attempts).toBe(3);
+    expect(durable.getWriteState()).toEqual({
+      kind: 'failed',
+      message: 'write refusal 3',
+    });
+    expect(durable.store.readAll()).toHaveLength(3);
+    expect((await durable.eventStore.readAll()).map((event) => event.eventId)).toEqual([
+      acknowledgments[1]?.events[0]?.eventId,
+    ]);
+  });
+
+  it('does not retry an ambiguous append that committed before rejecting', async () => {
+    const snapshotStore = newSnapshotStore();
+    const context = newContext('run1-');
+    let attempts = 0;
+
+    const durable = await createDurableAppStore({
+      appVersions: APP_VERSIONS,
+      clock: context.clock,
+      context,
+      snapshotKey: 'test-store',
+      snapshotStore,
+      openStore: (options) => {
+        const real = openAppEventStore(options);
+        return replaceAppend(real, async (events, appendOptions) => {
+          attempts += 1;
+          const result = await real.store.append(events, appendOptions);
+          if (attempts === 1) throw new Error('append acknowledgement lost');
+          return result;
+        });
+      },
+    });
+
+    const first = durable.store.execute(capture('一'));
+    await durable.flush();
+    const second = durable.store.execute(capture('二'));
+    await durable.flush();
+
+    expect(attempts).toBe(2);
+    expect(durable.getWriteState()).toEqual({
+      kind: 'failed',
+      message: 'append acknowledgement lost',
+    });
+    expect((await durable.eventStore.readAll()).map((event) => event.eventId)).toEqual([
+      first.events[0]?.eventId,
+      second.events[0]?.eventId,
+    ]);
+  });
+
+  it('does not mistake local deduplication for repair of a failed append', async () => {
+    const snapshotStore = newSnapshotStore();
+    const context = newContext('run1-');
+    let attempts = 0;
+
+    const durable = await createDurableAppStore({
+      appVersions: APP_VERSIONS,
+      clock: context.clock,
+      context,
+      snapshotKey: 'test-store',
+      snapshotStore,
+      openStore: (options) => {
+        const real = openAppEventStore(options);
+        return replaceAppend(real, () => {
+          attempts += 1;
+          return Promise.reject(new Error('storage still unavailable'));
+        });
+      },
+    });
+    const command = capture('同じ');
+
+    const first = durable.store.execute(command);
+    await durable.flush();
+    const repeat = durable.store.execute(command);
+    await durable.flush();
+
+    expect(first.events).toHaveLength(1);
+    expect(repeat.deduplicated).toBe(true);
+    expect(repeat.events).toHaveLength(0);
+    expect(attempts).toBe(1);
+    expect(durable.store.readAll()).toHaveLength(1);
+    expect(await durable.eventStore.readAll()).toEqual([]);
+    expect(durable.getWriteState()).toEqual({
+      kind: 'failed',
+      message: 'storage still unavailable',
+    });
   });
 });
 

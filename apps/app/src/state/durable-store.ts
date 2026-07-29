@@ -27,9 +27,10 @@
  *
  * Appends are chained onto one promise, so two fast commands cannot interleave
  * into the adapter and produce a log whose order differs from the order the
- * learner saw. A rejected write moves the store into a `failed` write state that
- * the about/debug surface renders; nothing retries silently, because a silent
- * retry over a conflicting key is how one lost append becomes two histories.
+ * learner saw. A rejected write records an unresolved durability gap. The queue
+ * continues, but that gap stays visible because a later independent append does
+ * not prove the rejected append reached storage. Nothing retries silently:
+ * retrying over a conflicting key is how one lost append becomes two histories.
  */
 
 import type { DomainEvent } from '@bunki/domain';
@@ -51,9 +52,12 @@ export type WriteState =
   /** At least one append is in flight. */
   | { readonly kind: 'writing' }
   /**
-   * An append was rejected. `message` is the adapter's own, which names a key or
-   * a schema version and never quotes an encounter — the same discipline the
-   * observability ring holds to (§12, §15).
+   * At least one acknowledged append could not be confirmed in the adapter.
+   *
+   * This state is sticky for the store instance because failed appends are not
+   * retried or reconciled here. A later independent success must not erase the
+   * unresolved gap. `message` is the most recent adapter rejection, not
+   * necessarily the latest append attempt; it names no encounter content.
    */
   | { readonly kind: 'failed'; readonly message: string };
 
