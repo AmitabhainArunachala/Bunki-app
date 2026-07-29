@@ -135,6 +135,18 @@ Run a small coordinated team, not a branch swarm.
 With limited concurrency, combine compatible read-only roles. Never combine
 Integrator and Adversarial Verifier for the same slice.
 
+### Verifier identities
+
+- **V-CODEX:** a fresh-context, read-only `gpt-5.6-sol` agent inspecting the
+  exact candidate SHA before reading the builder’s report.
+- **V-FABLE:** an actual, separately dispatched Fable 5 instance inspecting the
+  exact candidate SHA and running experience proof.
+
+Wave 0 must confirm both dispatch paths. Fable 5 is not callable in every
+environment. If it is unavailable, stop for an operator-named substitute; no
+agent may self-label another model “Fable-class” or silently waive the review.
+The same rule applies if `gpt-5.6-sol` is unavailable.
+
 ### One writer
 
 Only the Integrator writes within a wave. All writes go to the one active draft
@@ -173,15 +185,14 @@ receipts.
 1. Protect `main`.
 2. Publish this controller and the product lock in a small draft documentation
    PR based on the exact current `main`.
-3. Complete Wave 0 before naming a canonical code branch.
+3. Complete Wave 0 before proposing an implementation reconciliation base.
 4. The Wave 0 receipt proposes an exact implementation base and branch
    disposition; the operator ratifies it.
 5. Create the active draft-PR head from the exact current `main` target and
-   reconcile the operator-ratified candidate inputs into it. Any explicitly
-   authorized stacked integration flow records both the main target SHA and
-   candidate parent SHA and exposes the full main-to-head diff.
-6. Integrate one reviewed slice at a time through human merge, then refresh from
-   the newly merged `main` before the next slice.
+   reconcile the operator-ratified candidate inputs into it. Expose the full
+   main-to-head diff; do not use an unmerged candidate as a hidden parent.
+6. Integrate one small reviewed PRlet at a time through human merge, then refresh
+   from the newly merged `main` before the next PRlet.
 7. Keep every pull request draft until its evidence, review threads, and checks
    are complete.
 8. Do not self-approve or merge. Only the human operator merges.
@@ -234,6 +245,15 @@ This wave is mandatory and initially read-only.
    - an exact proposed implementation reconciliation base and input SHAs;
    - an ordered cherry-pick/reimplementation plan;
    - explicit reasons for every excluded branch head.
+8. Verify implementation readiness before scheduling dependent work:
+   - physical supported-iPhone access plus signing/distribution path;
+   - exact dictionary, kanji, grammar, and Kanken data licenses and acquisition
+     routes;
+   - AI provider, privacy boundary, budget, and secret-storage approval;
+   - at least one lawful transcript route;
+   - working V-CODEX and V-FABLE dispatch identities.
+9. Put unresolved readiness items in an operator-decision register with the
+   exact smallest decision and the first PRlet they block.
 
 ### Wave 0 gate
 
@@ -246,7 +266,9 @@ No code wave starts until:
 - parser/license and learner-state risks are visible;
 - one Integrator and one independent Verifier accept the plan;
 - the plan is placed in a reviewable draft PR;
-- the operator ratifies the exact implementation base and branch dispositions.
+- the operator ratifies the exact implementation base and branch dispositions;
+- every external readiness dependency is either proved or placed behind a
+  scheduled operator checkpoint before its dependent PRlet.
 
 The current audit may seed this receipt, but every SHA and conclusion is
 reverified immediately before ratification.
@@ -256,6 +278,11 @@ reverified immediately before ratification.
 Do not build isolated pillars and hope they connect later. Land thin but real
 end-to-end slices in the order below. A slice may share foundation work with the
 next slice, but it must prove one learner loop.
+
+A slice is an outcome track, not permission for one giant PR. Break it into the
+smallest sequential PRlets with one learner-visible outcome, one active writer
+lease, and one draft PR. Each PRlet starts from newly human-merged `main`.
+Transfer the Integrator lease only after merge or explicit abandonment.
 
 ### Slice 1 — Repair the trusted foundation
 
@@ -278,14 +305,20 @@ SHA being tested.
 and end-to-end suites pass; confirmed P0/P1 defects in this scope are closed or
 explicitly block progress.
 
-### Slice 2 — One real encounter everywhere
+### Slice 2 — First holistic learning spine
 
-Use one real phrase to prove:
+Before deepening any pillar, use one real phrase to connect a minimal honest
+version of every major surface:
 
-source/capture → dictionary sense → kanji/components → grammar → learner thread
-→ Keep/Learn/Ignore → finite retrieval → export.
+Home/Guide capture → source inbox/manual transcript → dictionary sense →
+kanji/components → grammar → contextual teacher → learner thread →
+Keep/Learn/Ignore → generated full-sentence candidate → explicit promotion →
+finite retrieval → exact source return → export.
 
 There must be one identity and provenance chain, not copied demo objects.
+Seed/reference fixtures and deterministic teacher fallback are acceptable only
+when visibly labeled as the thin spine; later slices replace or deepen them
+without creating a second state path.
 
 **Gate:** the one-thread identity, no-automatic-debt rule, recursive return
 anchor, retrieval contract, restart durability, and export are proved across
@@ -581,8 +614,9 @@ For each pull request:
 3. run focused tests, then the full relevant gate;
 4. resolve review threads or document a real blocker;
 5. compare claims to executable behavior;
-6. have an independent Codex-class verifier try to falsify it;
-7. have a final Fable-class whole-product review check experience and drift;
+6. have V-CODEX try to falsify it from a fresh context;
+7. have V-FABLE check whole-product experience and drift from a separate
+   context;
 8. leave the PR draft for the human operator to merge.
 
 No agent may waive a failing test by rewriting the claim.
@@ -641,10 +675,16 @@ when:
 - no unresolved P0/P1 defect, security finding, license ambiguity, or false
   product claim remains;
 - an independent whole-product review finds no drift;
-- the human operator has a reviewable draft PR and exact build.
+- every implementation PR is human-merged;
+- a fresh clean `main` at one exact SHA passes the full ladder;
+- the signed seven-day build is created from that exact clean `main` SHA.
 
 Only the operator can declare **Bunki complete**, after the seven-day
 deep-engagement test and voluntary use on day eight.
+
+Any behavior, schema, provider, model, source-data, or shipped configuration
+change during the seven-day trial invalidates the trial evidence and restarts
+the seven-day clock from the new human-merged `main` SHA.
 
 Until then, keep the status precise:
 
