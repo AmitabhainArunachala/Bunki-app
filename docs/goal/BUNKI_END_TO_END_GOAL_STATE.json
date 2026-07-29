@@ -7,8 +7,8 @@
   },
   "repository": "AmitabhainArunachala/Bunki-app",
   "snapshot_date": "2026-07-29",
-  "controller_status": "AWAITING_HUMAN_MERGE",
-  "live_main_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+  "controller_status": "ACTIVE",
+  "live_main_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
   "bootstrap": {
     "pr_15": {
       "state": "MERGED",
@@ -19,26 +19,29 @@
       "claim_boundary": "Truthful unresolved-write warning only; no retry, reconciliation, or recovery."
     },
     "g00": {
-      "state": "AWAITING_HUMAN_MERGE",
+      "state": "MERGED",
       "branch": "agent/bunki-g00-end-to-end-controller",
       "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
-      "head_sha": null,
-      "pr_number": null,
-      "post_freeze_evidence_location": "GitHub draft PR body, checks, and review threads keyed to the exact head SHA."
+      "head_sha": "6387917e37096fe9ebde816d0b42b950187ca135",
+      "pr_number": 16,
+      "merge_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
+      "merged_at": "2026-07-29T11:17:14Z",
+      "post_freeze_evidence_location": "https://github.com/AmitabhainArunachala/Bunki-app/pull/16"
     }
   },
-  "active_milestone": "G00",
-  "active_child": "G00.1",
+  "active_milestone": "F02",
+  "active_child": "F02.1",
   "dependency_state": {
     "PR15": "CLOSED",
-    "G00": "AWAITING_HUMAN_MERGE",
-    "F02": "BLOCKED_BY_G00"
+    "G00": "CLOSED",
+    "F02": "ACTIVE",
+    "F03": "BLOCKED_BY_F02"
   },
   "active_pr": {
     "number": null,
     "base_branch": "main",
-    "head_branch": "agent/bunki-g00-end-to-end-controller",
-    "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+    "head_branch": "agent/bunki-f02-export-server-containment",
+    "base_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
     "candidate_head_sha": null,
     "last_verified_head_sha": null,
     "draft": true
@@ -46,25 +49,19 @@
   "assignments": [
     {
       "agent": "Codex root",
-      "role": "Conductor and G00 Integrator",
+      "role": "Conductor and F02 Integrator",
       "mode": "write",
-      "child": "G00.1",
-      "base_sha": "307ddc222ee63e2b8a9b66627a2591f55493a847",
+      "child": "F02.1",
+      "base_sha": "c4e1662dfffae362462e6cf42e53e9647c9c80f4",
       "allowed_paths": [
-        "docs/prompts/BUNKI_END_TO_END_ONE_LONG_GOAL_2026-07-29.md",
-        "docs/prompts/BUNKI_CONTROLLER_SUPERSESSION_2026-07-29.md",
+        "apps/app/e2e/support/export-server.ts",
+        "apps/app/test/export-server.test.ts",
         "docs/goal/BUNKI_END_TO_END_GOAL_STATE.json",
-        "docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md",
-        "docs/goal/BUNKI_OPERATOR_VISUAL_REFERENCES.json",
-        "docs/goal/decisions/ADR-000-G00-CONTROLLER-ADMISSION.md",
-        "docs/operator/BUNKI_OPERATOR_LOCK_INTEGRITY_SHA256_2026-07-29.txt"
+        "docs/goal/BUNKI_END_TO_END_GOAL_LEDGER.md"
       ]
     }
   ],
   "capability_changes": [],
-  "open_human_gate": {
-    "id": "MERGE_G00",
-    "smallest_action": "Review and human-merge the exact G00 documentation PR after exact-head checks and independent reviews pass."
-  },
-  "next_safe_action": "Freeze the G00 documentation head, run exact-head checks and independent reviews, then request human merge. After merge verification, initialize G00 as CLOSED and begin F02."
+  "open_human_gate": null,
+  "next_safe_action": "Publish the bounded F02 implementation and tests from fresh main, run focused and full exact-head gates, obtain two independent reviews, and then request human merge."
 }
