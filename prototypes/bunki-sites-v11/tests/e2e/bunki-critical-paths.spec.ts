@@ -81,6 +81,20 @@ const finishOnboarding = async (page: Page): Promise<void> => {
   await expect(dialog).toBeHidden();
 };
 
+const openImmersionShelf = async (page: Page): Promise<void> => {
+  const mobileButton = page
+    .locator(".p2-mobile-nav button")
+    .filter({ hasText: "Immerse" });
+  if (await mobileButton.isVisible()) {
+    await mobileButton.click();
+    return;
+  }
+  await page
+    .locator(".p2-sidebar nav")
+    .getByRole("button", { name: /Immerse/ })
+    .click();
+};
+
 test.beforeEach(async ({ page }) => {
   await mockLocalState(page);
   await page.goto("/");
@@ -91,7 +105,7 @@ test.beforeEach(async ({ page }) => {
 test("built-in card opens a centered Zen reader and Back restores the shelf", async ({
   page,
 }) => {
-  await page.locator(".p2-mobile-nav button").filter({ hasText: "Immerse" }).click();
+  await openImmersionShelf(page);
   await page.getByRole("button", { name: /Read 山を歩きながら考えたこと/ }).click();
 
   await expect(page.locator(".p2-reader")).toContainText("山道を長く歩いていると");
@@ -116,7 +130,7 @@ test("built-in card opens a centered Zen reader and Back restores the shelf", as
 test("a live card imports a non-empty body and its explicit Back works", async ({
   page,
 }) => {
-  await page.locator(".p2-mobile-nav button").filter({ hasText: "Immerse" }).click();
+  await openImmersionShelf(page);
   await page.getByRole("button", { name: /Read テスト用の読みやすい記事/ }).click();
   await expect(page.locator(".p2-reader")).toContainText("山道を歩いていると");
   await expect(page.locator(".p2-reader").getByText("テスト用の読みやすい記事")).toHaveCount(0);
@@ -127,7 +141,7 @@ test("a live card imports a non-empty body and its explicit Back works", async (
 test("Zen appearance opens and collapses without moving the article", async ({
   page,
 }) => {
-  await page.locator(".p2-mobile-nav button").filter({ hasText: "Immerse" }).click();
+  await openImmersionShelf(page);
   await page.getByRole("button", { name: /Read 山を歩きながら考えたこと/ }).click();
   await page.locator(".p2-zen-dock").click();
   await expect(page.getByRole("complementary", { name: "Reading appearance" })).toBeVisible();
@@ -139,7 +153,7 @@ test("Zen appearance opens and collapses without moving the article", async ({
 test("browser Back returns from reader instead of leaving Bunki", async ({
   page,
 }) => {
-  await page.locator(".p2-mobile-nav button").filter({ hasText: "Immerse" }).click();
+  await openImmersionShelf(page);
   await page.getByRole("button", { name: /Read 山を歩きながら考えたこと/ }).click();
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Pick up where you left off" })).toBeVisible();
