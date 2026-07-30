@@ -4,14 +4,14 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
   expect: { timeout: 8_000 },
-  fullyParallel: true,
+  // Each page initializes a large Japanese morphology dictionary. Running
+  // several cold browsers against one dev Worker at once can close the shared
+  // session before a click completes, so CI exercises the same journeys
+  // sequentially. Assertions and browser coverage remain unchanged.
+  fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  // One worker in CI: all three browser projects share a single on-demand
-  // dev server, and parallel cold hits starve each other past the expect
-  // timeouts (reader never mounts on chromium, app-ready misses on webkit).
   workers: process.env.CI ? 1 : undefined,
-  globalSetup: "./tests/e2e/global-setup.ts",
   reporter: process.env.CI
     ? [["html", { open: "never" }], ["github"]]
     : [["list"]],
