@@ -6,6 +6,9 @@ name: pages-preview
 # cloud sync) stay stubbed; the app runs in its designed local/offline mode.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - claude/sites-v11-interaction-recovery
 
 permissions:
   contents: read
