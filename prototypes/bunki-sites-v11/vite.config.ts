@@ -6,14 +6,16 @@ import vinext from "vinext";
 import { defineConfig, type Plugin } from "vite";
 import { sites } from "./build/sites-vite-plugin";
 
-// kuromoji downloads its .dat.gz dictionaries with XHR and inflates them
-// itself. The dev static server marks .gz files with Content-Encoding: gzip,
-// so the browser pre-inflates the bytes and kuromoji's own gunzip fails with
-// "invalid file signature". Serve them as opaque binary, like production does.
+// Kuromoji downloads and inflates its own .dat.gz dictionaries. Vite's dev
+// static server otherwise labels them with Content-Encoding: gzip, causing the
+// browser to inflate them first and Kuromoji to receive invalid bytes.
 const rawGzipDictionaries = (): Plugin => ({
   name: "bunki-raw-gzip-dictionaries",
   configureServer(server) {
-    const publicDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "public");
+    const publicDir = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "public",
+    );
     server.middlewares.use((req, res, next) => {
       const match = req.url?.match(/^\/(kuromoji\/[\w.-]+\.gz)(?:\?.*)?$/);
       if (!match) {
