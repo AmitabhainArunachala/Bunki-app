@@ -4671,6 +4671,7 @@ export function BunkiPhase2(): ReactNode {
                       return (
                         <section
                           key={sentence.id}
+                          data-sentence-index={sentence.index}
                           className={`p2-sentence ${active ? "active" : ""}`}
                           onClick={() => markSentence(sentence.index)}
                         >
