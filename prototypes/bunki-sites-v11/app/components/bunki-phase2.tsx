@@ -65,7 +65,6 @@ import {
   type DictionaryIndex,
 } from "../lib/dictionary";
 import { GRAMMAR_PATTERNS, searchGrammar } from "../lib/grammar";
-import { useBackStack } from "../lib/history-layers";
 import { phase2CardsToAnkiTsv } from "../lib/export-format";
 import {
   bestNextAction,
@@ -158,6 +157,7 @@ type KanjiReturnContext =
       readonly sourceId: string;
       readonly sentenceIndex: number;
       readonly word: string;
+      readonly token: ReaderToken;
     }
   | {
       readonly kind: "dictionary";
@@ -431,7 +431,14 @@ export function BunkiPhase2(): ReactNode {
   const [liveReadingError, setLiveReadingError] = useState<string | null>(
     null,
   );
-  const [articleBusyId, setArticleBusyId] = useState<string | null>(null);
+  const [articleBusyIds, setArticleBusyIds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const [articleErrors, setArticleErrors] = useState<
+    Readonly<Record<string, string>>
+  >({});
+  const [savedReviewCount, setSavedReviewCount] = useState<number | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
   const [generationTopic, setGenerationTopic] = useState(
     "日本の山岳信仰と現代の旅",
   );
@@ -492,6 +499,7 @@ export function BunkiPhase2(): ReactNode {
   const saveTimer = useRef<number | null>(null);
   const skipNextSave = useRef(false);
   const localWriteChain = useRef<Promise<void>>(Promise.resolve());
+  const readingShelfScroll = useRef(0);
 
   const update = useCallback((updater: (previous: Phase2State) => Phase2State) => {
     setState((previous) => {
@@ -520,17 +528,6 @@ export function BunkiPhase2(): ReactNode {
     },
     [],
   );
-
-  useEffect(() => {
-    // The deployed head does not reliably carry a mobile viewport tag; without
-    // it iPhones render the app at desktop width. Belt-and-suspenders guard.
-    if (document.querySelector('meta[name="viewport"]') === null) {
-      const meta = document.createElement("meta");
-      meta.name = "viewport";
-      meta.content = "width=device-width, initial-scale=1, viewport-fit=cover";
-      document.head.append(meta);
-    }
-  }, []);
 
   const drainSaveQueue = useCallback(async (): Promise<void> => {
     if (saveInFlight.current || syncConflictRef.current !== null) return;
@@ -1617,6 +1614,13 @@ export function BunkiPhase2(): ReactNode {
             .includes(needle)),
     );
   }, [liveDomain, liveReadings, liveSearch, readingLevel]);
+  const feedTextReadyCount = useMemo(
+    () =>
+      liveReadings.filter(
+        (item) => item.readerStatus === "publisher-feed-text",
+      ).length,
+    [liveReadings],
+  );
   const availableLiveSources = useMemo(
     () => liveSources.filter((source) => source.available),
     [liveSources],
@@ -1826,6 +1830,7 @@ export function BunkiPhase2(): ReactNode {
       return;
     }
     if (nextAction.sourceId) {
+      rememberReaderOrigin();
       update((previous) => ({ ...previous, activeSourceId: nextAction.sourceId }));
       setView("immerse");
       setImmerseMode("reader");
@@ -1836,6 +1841,7 @@ export function BunkiPhase2(): ReactNode {
     }
     if (nextAction.kind === "lesson") {
       const starter = state.sources.find((source) => source.id === "bunki-starter-zero");
+      rememberReaderOrigin();
       if (starter) update((previous) => ({ ...previous, activeSourceId: starter.id }));
       setView("immerse");
       setImmerseMode("reader");
@@ -1925,7 +1931,7 @@ export function BunkiPhase2(): ReactNode {
         activity: [
           createActivity(
             "source-analyzed",
-            `Ranked ${String(packet.proposals.length)} learning edges from “${current.title}”`,
+            `Found ${String(packet.proposals.length)} useful learning items in “${current.title}”`,
             packet.proposals.map((proposal) => proposal.conceptId),
             sourceId,
           ),
@@ -1994,13 +2000,26 @@ export function BunkiPhase2(): ReactNode {
     setCaptureSegments([]);
     setCaptureAdvanced(false);
     if (text !== "") {
+      rememberReaderOrigin();
       setView("immerse");
       setImmerseMode("reader");
       setZenMode(true);
     }
   };
 
+  const rememberReaderOrigin = (): void => {
+    readingShelfScroll.current =
+      view === "immerse" && immerseMode === "discover" ? window.scrollY : 0;
+    if (window.history.state?.bunkiSurface !== "reader")
+      window.history.pushState(
+        { ...(window.history.state ?? {}), bunkiSurface: "reader" },
+        "",
+        window.location.href,
+      );
+  };
+
   const enterReader = (sourceId: string): void => {
+    rememberReaderOrigin();
     update((previous) => ({ ...previous, activeSourceId: sourceId }));
     setReaderToken(null);
     setReaderWordDepth(0);
@@ -2020,6 +2039,7 @@ export function BunkiPhase2(): ReactNode {
       enterReader(existing.id);
       return;
     }
+    rememberReaderOrigin();
     const text = textForReadingLength(item.text, readingLength);
     const source: SourceItem = {
       id: sourceId,
@@ -2062,7 +2082,7 @@ export function BunkiPhase2(): ReactNode {
   };
 
   const importLiveReading = async (item: LiveReadingItem): Promise<void> => {
-    if (articleBusyId !== null) return;
+    if (articleBusyIds.has(item.id)) return;
     const sourceId = `live:${item.id}:${readingLength}`;
     const existing = currentStateRef.current.sources.find(
       (source) => source.id === sourceId,
@@ -2071,13 +2091,19 @@ export function BunkiPhase2(): ReactNode {
       enterReader(existing.id);
       return;
     }
-    setArticleBusyId(item.id);
+    setArticleBusyIds((current) => new Set(current).add(item.id));
+    setArticleErrors((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      return next;
+    });
     setLiveReadingError(null);
     try {
       const response = await fetch("/api/article-import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: item.url }),
+        signal: AbortSignal.timeout(15_000),
       });
       const payload = (await response.json()) as {
         title?: string;
@@ -2122,6 +2148,7 @@ export function BunkiPhase2(): ReactNode {
           ...previous.activity,
         ].slice(0, 500),
       }));
+      rememberReaderOrigin();
       setReaderToken(null);
       setReaderWordDepth(0);
       setReaderSentence(0);
@@ -2131,7 +2158,7 @@ export function BunkiPhase2(): ReactNode {
     } catch (error) {
       const summary = item.summary.trim();
       if (
-        summary.length >= 24 &&
+        summary.length >= 80 &&
         /[\u3040-\u30ff\u3400-\u9fff]/u.test(summary)
       ) {
         const source: SourceItem = {
@@ -2140,14 +2167,17 @@ export function BunkiPhase2(): ReactNode {
           status: "ready",
           title: item.title,
           url: item.url,
-          text: summary,
+          text: textForReadingLength(summary, readingLength),
           addedAt: iso(),
           updatedAt: iso(),
           progress: 0,
           readingSentence: 0,
           provenance: "user-supplied",
           capturedConceptIds: [],
-          notes: `${item.sourceName} · publisher summary (the full page could not be extracted)`,
+          notes:
+            item.readerStatus === "publisher-feed-text"
+              ? `${item.sourceName} · PUBLISHER FEED TEXT · the full page could not be extracted`
+              : `${item.sourceName} · PUBLISHER SUMMARY ONLY · the full page could not be extracted`,
           segments: [],
           analysis: null,
         };
@@ -2163,13 +2193,14 @@ export function BunkiPhase2(): ReactNode {
           activity: [
             createActivity(
               "source-added",
-              `Opened publisher summary “${source.title}”`,
+              `Opened publisher-supplied feed text “${source.title}”`,
               [],
               source.id,
             ),
             ...previous.activity,
           ].slice(0, 500),
         }));
+        rememberReaderOrigin();
         setReaderToken(null);
         setReaderWordDepth(0);
         setReaderSentence(0);
@@ -2177,14 +2208,18 @@ export function BunkiPhase2(): ReactNode {
         setZenMode(true);
         void ensureLanguageTools();
       } else {
-        setLiveReadingError(
+        const message =
           error instanceof Error
-            ? `${error.message} Use “Original” to open the publisher page.`
-            : "This publisher page could not be opened in Bunki. Use “Original” to open it at the source.",
-        );
+            ? `${error.message} Try again or open the publisher page.`
+            : "This publisher page could not be opened in Bunki. Try again or open it at the source.";
+        setArticleErrors((current) => ({ ...current, [item.id]: message }));
       }
     } finally {
-      setArticleBusyId(null);
+      setArticleBusyIds((current) => {
+        const next = new Set(current);
+        next.delete(item.id);
+        return next;
+      });
     }
   };
 
@@ -2247,6 +2282,7 @@ export function BunkiPhase2(): ReactNode {
           ...previous.activity,
         ].slice(0, 500),
       }));
+      rememberReaderOrigin();
       setReaderToken(null);
       setReaderWordDepth(0);
       setReaderSentence(0);
@@ -2650,7 +2686,7 @@ export function BunkiPhase2(): ReactNode {
         activity: [
           createActivity(
             "packet-admitted",
-            `Admitted ${String(cards.length)} edited card${cards.length === 1 ? "" : "s"}`,
+            `Saved ${String(cards.length)} card${cards.length === 1 ? "" : "s"} for review`,
             selected.map((proposal) => proposal.conceptId),
             previous.stagedPacket?.sourceId ?? null,
           ),
@@ -2658,7 +2694,7 @@ export function BunkiPhase2(): ReactNode {
         ].slice(0, 500),
       };
     });
-    setView("review");
+    setSavedReviewCount(cards.length);
   };
 
   async function rateReview(rating: 1 | 2 | 3 | 4): Promise<void> {
@@ -3153,17 +3189,45 @@ export function BunkiPhase2(): ReactNode {
     setReaderToken(token);
     setReaderSentence(sentenceIndex);
     setReaderWordDepth(nextDepth);
-    if (nextDepth === 4 && token.entry && !token.ambiguous) {
-      void stageDictionaryEntry(token.entry, token);
-      setReaderToken(null);
-      setReaderWordDepth(0);
-    }
   };
 
   const closeReaderWord = (): void => {
     setReaderToken(null);
     setReaderWordDepth(0);
   };
+
+  const restoreReadingShelfScroll = (): void => {
+    window.requestAnimationFrame(() =>
+      window.scrollTo({ top: readingShelfScroll.current, behavior: "auto" }),
+    );
+  };
+
+  const returnToReadingShelf = (consumeHistory = true): void => {
+    const shouldPopHistory =
+      consumeHistory && window.history.state?.bunkiSurface === "reader";
+    closeReaderWord();
+    setReaderPanelOpen(false);
+    setSavedReviewCount(null);
+    setZenMode(false);
+    setImmerseMode("discover");
+    setView("immerse");
+    restoreReadingShelfScroll();
+    if (shouldPopHistory) window.history.back();
+  };
+
+  useEffect(() => {
+    const onPopState = (): void => {
+      if (view !== "immerse" || immerseMode !== "reader") return;
+      closeReaderWord();
+      setReaderPanelOpen(false);
+      setSavedReviewCount(null);
+      setZenMode(false);
+      setImmerseMode("discover");
+      restoreReadingShelfScroll();
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [immerseMode, view]);
 
   const openReaderKanji = (entry: KanjiEntry): void => {
     if (!activeSource || !readerToken?.entry) return;
@@ -3172,6 +3236,7 @@ export function BunkiPhase2(): ReactNode {
       sourceId: activeSource.id,
       sentenceIndex: readerAnchor,
       word: readerToken.entry.word,
+      token: readerToken,
     });
     setKanjiQuery(entry.char);
     setLibraryTab("kanji");
@@ -3182,71 +3247,6 @@ export function BunkiPhase2(): ReactNode {
     setStrokeReplayKey((current) => current + 1);
     setView("library");
   };
-
-  const returnFromKanjiContext = (): void => {
-    if (!kanjiReturnContext) return;
-    if (kanjiReturnContext.kind === "reader") {
-      const returnSource = state.sources.find(
-        (source) => source.id === kanjiReturnContext.sourceId,
-      );
-      if (returnSource) {
-        update((previous) => ({
-          ...previous,
-          activeSourceId: returnSource.id,
-        }));
-        setReaderSentence(kanjiReturnContext.sentenceIndex);
-        setImmerseMode("reader");
-        setView("immerse");
-        setZenMode(true);
-      }
-    } else {
-      setLibraryQuery(kanjiReturnContext.word);
-      setSelectedWordId(kanjiReturnContext.wordId);
-      setLibraryTab("dictionary");
-    }
-    setKanjiFocusMode(false);
-    setKanjiReturnContext(null);
-  };
-
-  // Hardware/browser Back (and the iOS edge swipe) closes the topmost open
-  // layer instead of exiting the app (interaction-recovery handoff, journey
-  // C). Layers are ordered shallowest -> deepest; the deepest open one closes
-  // first. Reader and kanji-drill are mutually exclusive views, so ordering
-  // among the rest is what matters.
-  useBackStack([
-    { key: "menu", isOpen: mobileMenu, close: () => setMobileMenu(false) },
-    {
-      key: "capture",
-      isOpen: captureOpen,
-      close: () => setCaptureOpen(false),
-    },
-    {
-      key: "packet",
-      isOpen: state.stagedPacket !== null,
-      close: () =>
-        update((previous) => ({ ...previous, stagedPacket: null })),
-    },
-    {
-      key: "reader",
-      isOpen: view === "immerse" && immerseMode === "reader",
-      close: () => {
-        closeReaderWord();
-        setReaderPanelOpen(false);
-        setZenMode(false);
-        setImmerseMode("discover");
-      },
-    },
-    {
-      key: "kanji-drill",
-      isOpen: kanjiReturnContext !== null,
-      close: returnFromKanjiContext,
-    },
-    {
-      key: "reader-word",
-      isOpen: readerToken !== null,
-      close: closeReaderWord,
-    },
-  ]);
 
   const addUncertainty = (entry: VocabEntry, uncertainty: string): void => {
     const existing =
@@ -3278,6 +3278,39 @@ export function BunkiPhase2(): ReactNode {
       `bunki-export-${new Date().toISOString().slice(0, 10)}.json`,
       JSON.stringify(state, null, 2),
     );
+  };
+
+  const restoreState = async (file: File | undefined): Promise<void> => {
+    setRestoreError(null);
+    if (!file) return;
+    if (file.size > 25_000_000) {
+      setRestoreError("That export is larger than Bunki’s 25 MB restore limit.");
+      return;
+    }
+    try {
+      const decoded = JSON.parse(await file.text()) as unknown;
+      if (
+        decoded === null ||
+        typeof decoded !== "object" ||
+        !("version" in decoded) ||
+        (decoded as { version?: unknown }).version !== 2
+      )
+        throw new Error("This is not a Bunki v2 JSON export.");
+      const restored = migrateToPhase2(decoded);
+      update(() => restored);
+      setSelectedWordId(null);
+      setLibraryQuery("");
+      setKanjiReturnContext(null);
+      setRestoreError(
+        `Restored ${restored.sources.length} source${restored.sources.length === 1 ? "" : "s"} and ${restored.cards.length} review card${restored.cards.length === 1 ? "" : "s"} on this device.`,
+      );
+    } catch (error) {
+      setRestoreError(
+        error instanceof Error
+          ? error.message
+          : "Bunki could not read that JSON export.",
+      );
+    }
   };
 
   const exportTsv = (): void => {
@@ -3343,7 +3376,7 @@ export function BunkiPhase2(): ReactNode {
           <p>Bunki chooses the next action from your encounters, reviews, and current source—not a decorative score.</p>
         </div>
         <button className="p2-button subtle" onClick={() => setOnboardingStep(1)}>
-          <Settings2 size={17} /> Learning edge
+          <Settings2 size={17} /> Learning preferences
         </button>
       </header>
 
@@ -3444,7 +3477,10 @@ export function BunkiPhase2(): ReactNode {
                 <span>{activeSource.status}</span>
                 <span>{Math.round(activeSource.progress)}% read</span>
               </div>
-              <button className="p2-text-link" onClick={() => setView("immerse")}>
+              <button
+                className="p2-text-link"
+                onClick={() => enterReader(activeSource.id)}
+              >
                 Open the thread <ArrowRight size={15} />
               </button>
             </>
@@ -3498,7 +3534,20 @@ export function BunkiPhase2(): ReactNode {
               readingLength,
             );
             return (
-              <article key={suggestion.id}>
+              <article
+                key={suggestion.id}
+                className="p2-openable-reading"
+                role="button"
+                tabIndex={0}
+                aria-label={`Read ${suggestion.title} in Bunki Reader`}
+                onClick={() => openCatalogReading(suggestion)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openCatalogReading(suggestion);
+                  }
+                }}
+              >
                 <span>
                   {suggestion.real ? "REAL TEXT" : "GRADED ORIGINAL"} ·{" "}
                   {suggestion.level} · {readingMinutes(excerpt)} min
@@ -3508,9 +3557,9 @@ export function BunkiPhase2(): ReactNode {
                 <blockquote lang="ja">{excerpt.slice(0, 120)}…</blockquote>
                 <footer>
                   <small>{suggestion.sourceName}</small>
-                  <button onClick={() => openCatalogReading(suggestion)}>
+                  <span className="p2-read-here">
                     Read in Zen <ArrowRight size={13} />
-                  </button>
+                  </span>
                 </footer>
               </article>
             );
@@ -3545,11 +3594,7 @@ export function BunkiPhase2(): ReactNode {
           {immerseMode === "reader" ? (
             <button
               className="p2-button"
-              onClick={() => {
-                closeReaderWord();
-                setZenMode(false);
-                setImmerseMode("discover");
-              }}
+              onClick={() => returnToReadingShelf()}
             >
               <ArrowLeft size={17} /> Reading shelf
             </button>
@@ -3576,7 +3621,6 @@ export function BunkiPhase2(): ReactNode {
                   <button
                     key={source.id}
                     onClick={() => enterReader(source.id)}
-                    disabled={source.text.trim() === ""}
                   >
                     <span className={`p2-source-state ${source.status}`} />
                     <div>
@@ -3619,9 +3663,9 @@ export function BunkiPhase2(): ReactNode {
                 <legend>Length</legend>
                 <div>
                   {([
-                    ["short", "Short", "2–4 min"],
-                    ["medium", "Medium", "7–12 min"],
-                    ["full", "Full", "original length"],
+                    ["short", "Short", "about 500 characters"],
+                    ["medium", "Medium", "about 1,650 characters"],
+                    ["full", "Full", "all available text"],
                   ] as const).map(([length, label, hint]) => (
                     <button
                       type="button"
@@ -3769,7 +3813,7 @@ export function BunkiPhase2(): ReactNode {
                 <div>
                   <span className="p2-eyebrow">Live library · original publishers</span>
                   <h2>
-                    {liveReadings.length.toLocaleString()} articles from{" "}
+                    {liveReadings.length.toLocaleString()} current links from{" "}
                     {availableLiveDomains.length.toLocaleString()} active domains
                   </h2>
                 </div>
@@ -3778,25 +3822,25 @@ export function BunkiPhase2(): ReactNode {
               {!liveReadingBusy ? (
                 <div
                   className={`p2-library-gate ${
-                    liveReadings.length >= 300 &&
+                    feedTextReadyCount >= 300 &&
                     availableLiveDomains.length >= 24
                       ? "ready"
                       : "partial"
                   }`}
                 >
                   <div>
-                    <strong>{liveReadings.length.toLocaleString()}</strong>
-                    <span>indexed articles</span>
+                    <strong>{feedTextReadyCount.toLocaleString()}</strong>
+                    <span>include substantial publisher feed text</span>
                   </div>
                   <div>
                     <strong>{availableLiveDomains.length.toLocaleString()}</strong>
                     <span>active domains</span>
                   </div>
                   <p>
-                    {liveReadings.length >= 300 &&
+                    {feedTextReadyCount >= 300 &&
                     availableLiveDomains.length >= 24
-                      ? "Coverage gate met: 300+ articles across 24+ active domains."
-                      : "Coverage gate not yet met. Bunki is showing the live count honestly; unavailable feeds are not counted."}
+                      ? "Publisher-text gate met: 300+ readable feed bodies across 24+ active domains."
+                      : "This is an honest live index, not a claim that every publisher page has been verified. Bunki checks the full body when you open it."}
                   </p>
                 </div>
               ) : null}
@@ -3848,49 +3892,52 @@ export function BunkiPhase2(): ReactNode {
                       <article
                         key={item.id}
                         className="p2-openable-reading"
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`Read ${item.title} in Bunki Reader`}
-                        aria-busy={articleBusyId === item.id}
-                        aria-disabled={
-                          articleBusyId !== null && articleBusyId !== item.id
-                        }
-                        onClick={() => void importLiveReading(item)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            void importLiveReading(item);
-                          }
-                        }}
+                        aria-busy={articleBusyIds.has(item.id)}
                       >
-                        <div>
-                          <span>{item.sourceName}</span>
-                          <span>{item.level}</span>
-                          <span>{item.lane}</span>
-                        </div>
-                        <h3>{item.title}</h3>
-                        <p>{item.summary || "Open the original article or import its readable Japanese text."}</p>
+                        <button
+                          className="p2-live-card-main"
+                          aria-label={`Read ${item.title} in Bunki Reader`}
+                          onClick={() => void importLiveReading(item)}
+                        >
+                          <div>
+                            <span>{item.sourceName}</span>
+                            <span>{item.level}</span>
+                            <span>
+                              {item.readerStatus === "publisher-feed-text"
+                                ? "feed text ready"
+                                : item.lane}
+                            </span>
+                          </div>
+                          <h3>{item.title}</h3>
+                          <p>{item.summary || "Open the original article or import its readable Japanese text."}</p>
+                        </button>
                         <footer>
                           <a
                             href={item.url}
                             target="_blank"
                             rel="noreferrer"
-                            onClick={(event) => event.stopPropagation()}
                           >
                             Original <ExternalLink size={13} />
                           </a>
-                          <span
+                          <button
                             className="p2-read-here"
                             data-testid={`read-live-${item.id}`}
+                            onClick={() => void importLiveReading(item)}
                           >
-                            {articleBusyId === item.id ? (
+                            {articleBusyIds.has(item.id) ? (
                               <LoaderCircle className="spin" size={14} />
                             ) : (
                               <Newspaper size={14} />
                             )}
-                            Read in Bunki
-                          </span>
+                            {articleErrors[item.id] ? "Try again" : "Read in Bunki"}
+                          </button>
                         </footer>
+                        {articleErrors[item.id] ? (
+                          <aside className="p2-article-card-error" role="status">
+                            <CircleAlert size={14} />
+                            <span>{articleErrors[item.id]}</span>
+                          </aside>
+                        ) : null}
                       </article>
                       ))}
                   </div>
@@ -3931,47 +3978,24 @@ export function BunkiPhase2(): ReactNode {
           ) : null}
 
           {state.sources.length === 0 ? (
-          <section className="p2-reading-section p2-my-threads">
-            <header>
-              <div>
-                <span className="p2-eyebrow">Your source memory</span>
-                <h2>Continue a thread</h2>
-              </div>
-              <span>{state.sources.length} saved</span>
-            </header>
-            {state.sources.length === 0 ? (
+            <section className="p2-reading-section p2-my-threads">
+              <header>
+                <div>
+                  <span className="p2-eyebrow">Your source memory</span>
+                  <h2>Add your first source</h2>
+                </div>
+              </header>
               <div className="p2-empty compact">
                 <Link2 size={22} />
                 <p>Add an article, transcript, screenshot text, or URL.</p>
+                <button
+                  className="p2-button"
+                  onClick={() => setCaptureOpen(true)}
+                >
+                  <Plus size={15} /> Add my own
+                </button>
               </div>
-            ) : (
-              <div>
-                {state.sources.slice(0, 12).map((source) => (
-                  <button
-                    key={source.id}
-                    onClick={() =>
-                      source.text.trim() === ""
-                        ? (() => {
-                            update((previous) => ({
-                              ...previous,
-                              activeSourceId: source.id,
-                            }));
-                            setImmerseMode("reader");
-                          })()
-                        : enterReader(source.id)
-                    }
-                  >
-                    <span className={`p2-source-state ${source.status}`} />
-                    <div>
-                      <strong>{source.title}</strong>
-                      <small>{source.kind} · {source.status}</small>
-                    </div>
-                    <span>{Math.round(source.progress)}%</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </section>
+            </section>
           ) : null}
         </div>
       ) : (
@@ -4014,7 +4038,7 @@ export function BunkiPhase2(): ReactNode {
           )}
         </aside>
 
-        <main className="p2-reader-shell">
+        <section className="p2-reader-shell" aria-label="Bunki reader">
           {activeSource === null ? (
             <div className="p2-empty hero">
               <BookOpen size={35} />
@@ -4071,11 +4095,7 @@ export function BunkiPhase2(): ReactNode {
                 </div>
                 <div className="p2-reader-controls">
                   <button
-                    onClick={() => {
-                      closeReaderWord();
-                      setZenMode(false);
-                      setImmerseMode("discover");
-                    }}
+                    onClick={() => returnToReadingShelf()}
                     aria-label="Return to reading shelf"
                   >
                     <ArrowLeft size={16} />
@@ -4236,12 +4256,7 @@ export function BunkiPhase2(): ReactNode {
                       <Sparkles size={14} /> {zenMode ? "Show app" : "Pure Zen"}
                     </button>
                     <button
-                      onClick={() => {
-                        closeReaderWord();
-                        setReaderPanelOpen(false);
-                        setZenMode(false);
-                        setImmerseMode("discover");
-                      }}
+                      onClick={() => returnToReadingShelf()}
                     >
                       <ArrowLeft size={14} /> Reading shelf
                     </button>
@@ -4249,17 +4264,43 @@ export function BunkiPhase2(): ReactNode {
                 </aside>
               ) : null}
 
+              {activeSource.notes.includes("PUBLISHER SUMMARY ONLY") ||
+              activeSource.notes.includes("PUBLISHER FEED TEXT") ? (
+                <div className="p2-reader-source-notice" role="status">
+                  <CircleAlert size={16} />
+                  <div>
+                    <strong>
+                      {activeSource.notes.includes("PUBLISHER FEED TEXT")
+                        ? "Publisher feed text—not the extracted page"
+                        : "Publisher summary—not the full article"}
+                    </strong>
+                    <span>
+                      The publisher blocked full-page extraction. You can still
+                      read and mine the text it supplied in its feed, or open
+                      the original.
+                    </span>
+                  </div>
+                  {safeExternalUrl(activeSource.url) ? (
+                    <a
+                      href={safeExternalUrl(activeSource.url) ?? undefined}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Original <ExternalLink size={14} />
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+
               <div className="p2-reader-progress">
                 <span style={{ width: `${String(activeSource.progress)}%` }} />
               </div>
 
               {languageBusy && readerTokens.length === 0 ? (
-                <div className="p2-language-loading" role="status"><LoaderCircle className="spin" /><span>Preparing tap-to-look-up — the text is already readable.</span></div>
-              ) : null}
-              {!languageBusy && languageError ? (
+                <div className="p2-language-loading"><LoaderCircle className="spin" /><span>Preparing morphology-aware reading…</span></div>
+              ) : languageError ? (
                 <div className="p2-inline-error"><CircleAlert size={17} />{languageError}<button onClick={() => void ensureLanguageTools()}>Retry</button></div>
-              ) : null}
-              {(
+              ) : (
                 <>
                   {sentences.length > READER_WINDOW_SIZE ? (
                     <nav className="p2-reader-window" aria-label="Transcript pages">
@@ -4478,12 +4519,35 @@ export function BunkiPhase2(): ReactNode {
                 </div>
                 <button className="p2-button primary" onClick={() => void analyzeActiveSource()}>
                   {languageBusy ? <LoaderCircle className="spin" size={16} /> : <WandSparkles size={16} />}
-                  {activeSource.analysis ? "Recalculate edge" : "Choose my edge"}
+                  {activeSource.analysis
+                    ? "Find useful words again"
+                    : "Find useful words"}
                 </button>
               </div>
+              {savedReviewCount !== null ? (
+                <div className="p2-reader-saved-confirmation" role="status">
+                  <Check size={17} />
+                  <span>
+                    Saved {savedReviewCount} item
+                    {savedReviewCount === 1 ? "" : "s"} for later.
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSavedReviewCount(null);
+                      setZenMode(false);
+                      setView("review");
+                    }}
+                  >
+                    Review now
+                  </button>
+                  <button onClick={() => setSavedReviewCount(null)}>
+                    Keep reading
+                  </button>
+                </div>
+              ) : null}
             </>
           )}
-        </main>
+        </section>
 
         {readerToken?.entry && readerWordDepth >= 3 ? (
           <aside
@@ -4496,8 +4560,12 @@ export function BunkiPhase2(): ReactNode {
             <div className="p2-word-depth-guide" aria-label="Four word depths">
               <span className="done">1 · reading</span>
               <span className="done">2 · meaning</span>
-              <span className="active">3 · dictionary</span>
-              <span>4 · memorize</span>
+              <span className={readerWordDepth === 3 ? "active" : "done"}>
+                3 · dictionary
+              </span>
+              <span className={readerWordDepth === 4 ? "active" : ""}>
+                4 · memorize
+              </span>
             </div>
             <span className="p2-eyebrow">Full dictionary · exact source occurrence</span>
             <div className="p2-sheet-word">
@@ -4604,11 +4672,20 @@ export function BunkiPhase2(): ReactNode {
                   closeReaderWord();
                 }}
               >
-                <Star size={15} /> 4 · Memorize
+                <Star size={15} />
+                {readerWordDepth === 4
+                  ? "Choose this for review"
+                  : "4 · Memorize"}
               </button>
               <button disabled={readerToken.ambiguous} onClick={() => { setSelectedWordId(readerToken.entry!.id); setLibraryQuery(readerToken.entry!.word); setLibraryTab("dictionary"); setView("library"); closeReaderWord(); }}><Languages size={15} /> Dictionary workspace</button>
               <button onClick={() => { setTeacherInput(`「${readerToken.surface}」のこの文での意味とニュアンスを説明してください。`); closeReaderWord(); setView("coach"); }}><Bot size={15} /> Ask coach</button>
             </div>
+            {readerWordDepth === 4 && !readerToken.ambiguous ? (
+              <p className="p2-memorize-confirm">
+                Save this word with the exact sentence you are reading. You
+                will still approve the card before it enters review.
+              </p>
+            ) : null}
           </aside>
         ) : null}
       </div>
@@ -4667,6 +4744,16 @@ export function BunkiPhase2(): ReactNode {
         </Surface>
       ) : (
         <div className="p2-review-stage">
+          <button
+            className="p2-review-exit"
+            onClick={() => {
+              setReviewRevealed(false);
+              setZenMode(false);
+              setView("today");
+            }}
+          >
+            <ArrowLeft size={15} /> Exit review
+          </button>
           <div className="p2-session-progress">
             <span>{reviewProgress.completed}/{reviewProgress.total}</span>
             <div><i style={{ width: `${String(reviewProgress.percent)}%` }} /></div>
@@ -5188,7 +5275,26 @@ export function BunkiPhase2(): ReactNode {
         {kanjiReturnContext ? (
           <button
             className="p2-kanji-reader-return"
-            onClick={returnFromKanjiContext}
+            onClick={() => {
+              if (kanjiReturnContext.kind === "reader" && returnSource) {
+                update((previous) => ({
+                  ...previous,
+                  activeSourceId: returnSource.id,
+                }));
+                setReaderSentence(kanjiReturnContext.sentenceIndex);
+                setReaderToken(kanjiReturnContext.token);
+                setReaderWordDepth(3);
+                setImmerseMode("reader");
+                setView("immerse");
+                setZenMode(true);
+              } else if (kanjiReturnContext.kind === "dictionary") {
+                setLibraryQuery(kanjiReturnContext.word);
+                setSelectedWordId(kanjiReturnContext.wordId);
+                setLibraryTab("dictionary");
+              }
+              setKanjiFocusMode(false);
+              setKanjiReturnContext(null);
+            }}
           >
             <ArrowLeft size={16} />
             <span>
@@ -5319,6 +5425,7 @@ export function BunkiPhase2(): ReactNode {
                         </button>
                         <button
                           onClick={() => {
+                            rememberReaderOrigin();
                             update((previous) => ({
                               ...previous,
                               activeSourceId: source.id,
@@ -5381,8 +5488,24 @@ export function BunkiPhase2(): ReactNode {
       <div className="p2-export-row">
         <div><span className="p2-eyebrow">Your data</span><h2>Portable, inspectable, yours.</h2></div>
         <button className="p2-button" onClick={exportState}><Download size={16} /> JSON</button>
+        <label className="p2-button p2-restore-button">
+          <Upload size={16} /> Restore JSON
+          <input
+            type="file"
+            accept="application/json,.json"
+            onChange={(event) => {
+              void restoreState(event.target.files?.[0]);
+              event.currentTarget.value = "";
+            }}
+          />
+        </label>
         <button className="p2-button" onClick={exportTsv}><Download size={16} /> Anki TSV</button>
       </div>
+      {restoreError ? (
+        <div className="p2-restore-status" role="status">
+          {restoreError}
+        </div>
+      ) : null}
       <Surface className="p2-memory-table">
         <header><span>Concept</span><span>Evidence</span><span>Lineage</span><span>State</span></header>
         {Object.values(state.memories)
@@ -5594,6 +5717,17 @@ export function BunkiPhase2(): ReactNode {
           <p>JMdict/KANJIDIC2 © EDRDG, CC BY-SA 4.0 · KanjiVG CC BY-SA 3.0 · Kuromoji Apache 2.0. JLPT levels are editorial estimates. Generated material is marked.</p>
         </footer>
       </section>
+
+      {zenMode && view === "immerse" && immerseMode === "reader" ? (
+        <button
+          className="p2-zen-back"
+          onClick={() => returnToReadingShelf()}
+          aria-label="Back to reading shelf"
+        >
+          <ArrowLeft size={17} />
+          <span>Back</span>
+        </button>
+      ) : null}
 
       {zenMode ? (
         <button
@@ -5814,29 +5948,67 @@ function PacketDrawer({
   readonly onAdmit: () => void;
   readonly duplicate: (proposal: CardProposal) => boolean;
 }) {
+  const [advanced, setAdvanced] = useState(false);
   const selected = packet.proposals.filter((proposal) => proposal.selected && !duplicate(proposal)).length;
   return (
     <div className="p2-drawer-backdrop" onMouseDown={onClose}>
       <aside className="p2-packet-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="packet-title">
-        <header><div><span className="p2-eyebrow">Staged learning packet</span><h2 id="packet-title">{packet.title}</h2><p>Nothing enters review until you select and approve it.</p></div><button onClick={onClose} aria-label="Close packet"><X size={20} /></button></header>
+        <header>
+          <div>
+            <span className="p2-eyebrow">Choose what is worth remembering</span>
+            <h2 id="packet-title">{packet.title}</h2>
+            <p>
+              Bunki found {packet.proposals.length} useful item
+              {packet.proposals.length === 1 ? "" : "s"}. Three or fewer are
+              selected by default. Nothing is saved until you confirm.
+            </p>
+          </div>
+          <button onClick={onClose} aria-label="Close suggestions"><X size={20} /></button>
+        </header>
+        <button
+          className="p2-packet-advanced-toggle"
+          onClick={() => setAdvanced((current) => !current)}
+          aria-expanded={advanced}
+        >
+          <SlidersHorizontal size={15} />
+          {advanced ? "Hide card editing" : "Advanced · edit card wording"}
+        </button>
         <div className="p2-proposal-list">
           {packet.proposals.map((proposal) => {
             const isDuplicate = duplicate(proposal);
             return (
               <article key={proposal.id} className={`${proposal.selected ? "selected" : ""} ${isDuplicate ? "duplicate" : ""}`}>
-                <button className="p2-proposal-check" onClick={() => onToggle(proposal.id)} disabled={isDuplicate} aria-label={proposal.selected ? "Exclude proposal" : "Include proposal"}>{proposal.selected && !isDuplicate ? <Check size={16} /> : null}</button>
+                <button className="p2-proposal-check" onClick={() => onToggle(proposal.id)} disabled={isDuplicate} aria-label={proposal.selected ? "Do not save this item" : "Save this item"}>{proposal.selected && !isDuplicate ? <Check size={16} /> : null}</button>
                 <div className="p2-proposal-main">
-                  <header><StatusPill state={proposal.tags.includes("fragile") ? "fragile" : proposal.tags.includes("learning") ? "learning" : "unseen"} /><span>{proposal.kind} · {proposal.generated ? "generated proposal" : "exact source"}</span></header>
-                  <label><span>Prompt</span><textarea rows={3} value={proposal.front} onChange={(event) => onEdit(proposal.id, "front", event.target.value)} /></label>
-                  <label><span>Answer</span><textarea rows={4} value={proposal.back} onChange={(event) => onEdit(proposal.id, "back", event.target.value)} /></label>
-                  <label><span>Connection note</span><textarea rows={2} value={proposal.note} onChange={(event) => onEdit(proposal.id, "note", event.target.value)} placeholder="Optional mnemonic, nuance, or second-source connection…" /></label>
-                  <small><Brain size={13} />{isDuplicate ? "An equivalent active card already exists." : proposal.rationale}</small>
+                  <header>
+                    <StatusPill state={proposal.tags.includes("fragile") ? "fragile" : proposal.tags.includes("learning") ? "learning" : "unseen"} />
+                    <span>{proposal.kind === "grammar" ? "grammar" : proposal.kind === "kanji" ? "kanji" : "word in context"}</span>
+                  </header>
+                  <strong className="p2-proposal-answer">
+                    {proposal.back.split("\n")[0]}
+                  </strong>
+                  <p className="p2-proposal-source" lang="ja">
+                    {proposal.sourceSentence}
+                  </p>
+                  {advanced ? (
+                    <div className="p2-proposal-advanced">
+                      <label><span>Front</span><textarea rows={3} value={proposal.front} onChange={(event) => onEdit(proposal.id, "front", event.target.value)} /></label>
+                      <label><span>Back</span><textarea rows={4} value={proposal.back} onChange={(event) => onEdit(proposal.id, "back", event.target.value)} /></label>
+                      <label><span>Connection note</span><textarea rows={2} value={proposal.note} onChange={(event) => onEdit(proposal.id, "note", event.target.value)} placeholder="Optional mnemonic, nuance, or earlier-source connection…" /></label>
+                    </div>
+                  ) : null}
+                  <small><Brain size={13} />{isDuplicate ? "This is already in your review list." : proposal.rationale}</small>
                 </div>
               </article>
             );
           })}
         </div>
-        <footer><span>{selected} selected · {packet.proposals.length} proposed</span><button className="p2-button primary" disabled={selected === 0} onClick={onAdmit}>Admit {selected} to review <ArrowRight size={16} /></button></footer>
+        <footer>
+          <span>{selected} selected · you can change this</span>
+          <button className="p2-button primary" disabled={selected === 0} onClick={onAdmit}>
+            Save {selected} for later <ArrowRight size={16} />
+          </button>
+        </footer>
       </aside>
     </div>
   );
