@@ -2261,6 +2261,7 @@
   background: transparent;
   cursor: pointer;
   line-height: inherit;
+  touch-action: manipulation;
 }
 
 .p2-reader-token.depth-1,
@@ -2436,7 +2437,7 @@
 
 .p2-reader-sheet {
   position: fixed;
-  z-index: 60;
+  z-index: 96;
   right: 0;
   bottom: 0;
   left: 248px;
@@ -2683,6 +2684,73 @@
   font-family: var(--font-serif-jp), serif;
   font-size: 28px;
   font-weight: 500;
+}
+
+.p2-linked-word-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.p2-linked-word-title button,
+.p2-linked-word-title > span {
+  display: inline-grid;
+  min-width: 0.86em;
+  min-height: 44px;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+}
+
+.p2-linked-word-title button {
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(227, 191, 114, 0.22);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+.p2-linked-word-title button:hover,
+.p2-linked-word-title button:focus-visible {
+  background: rgba(227, 191, 114, 0.16);
+  color: var(--p2-gold-bright);
+  outline: 1px solid rgba(227, 191, 114, 0.45);
+}
+
+.p2-dictionary-detail .p2-linked-word-title button:hover,
+.p2-dictionary-detail .p2-linked-word-title button:focus-visible {
+  background: var(--p2-gold-wash);
+  color: var(--p2-gold-deep);
+}
+
+.p2-open-full-word {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(227, 191, 114, 0.28);
+  border-radius: 9px;
+  margin-top: 8px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.84);
+  cursor: pointer;
+  font-family: var(--font-sans-jp), sans-serif;
+  font-size: 10px;
+  touch-action: manipulation;
+}
+
+.p2-open-full-word:hover,
+.p2-open-full-word:focus-visible {
+  border-color: rgba(227, 191, 114, 0.58);
+  background: rgba(227, 191, 114, 0.13);
+  color: white;
 }
 
 .p2-sheet-word > span,
@@ -5086,7 +5154,10 @@
     gap: 10px;
     max-height: min(58dvh, 520px);
     overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 20px 20px 18px;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
   }
 
   .p2-reader-sheet > .p2-eyebrow,
