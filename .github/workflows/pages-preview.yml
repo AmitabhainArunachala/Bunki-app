@@ -1,0 +1,46 @@
+name: pages-preview
+
+# Publishes the client-only static build of the Sites v11 prototype (local
+# harness entry) to GitHub Pages so the operator can interact with the
+# repaired app on a real phone. Server-backed flows (live feeds, teacher,
+# cloud sync) stay stubbed; the app runs in its designed local/offline mode.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install prototype dependencies
+        working-directory: prototypes/bunki-sites-v11
+        run: npm ci
+      - name: Repair binary public assets from npm sources
+        working-directory: prototypes/bunki-sites-v11
+        run: node scripts/repair-binary-assets.mjs
+      - name: Build static client bundle
+        working-directory: prototypes/bunki-sites-v11
+        run: ./node_modules/.bin/vite build --config vite.config.harness.mts
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: prototypes/bunki-sites-v11/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

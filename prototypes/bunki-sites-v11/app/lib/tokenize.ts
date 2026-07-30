@@ -71,7 +71,7 @@ function loadKuromojiRuntime(): Promise<KuromojiBrowserApi> {
       { once: true },
     );
     if (existing === null) {
-      script.src = "/kuromoji/kuromoji.js";
+      script.src = "./kuromoji/kuromoji.js";
       script.async = true;
       script.dataset.bunkiKuromoji = "true";
       document.head.append(script);
@@ -83,7 +83,7 @@ export function loadJapaneseTokenizer(): Promise<JapaneseTokenizer> {
   tokenizerPromise ??= loadKuromojiRuntime().then(
     (kuromoji) =>
       new Promise((resolve, reject) => {
-        kuromoji.builder({ dicPath: "/kuromoji/" }).build((error, tokenizer) => {
+        kuromoji.builder({ dicPath: "./kuromoji/" }).build((error, tokenizer) => {
           if (error) {
             reject(error);
             return;

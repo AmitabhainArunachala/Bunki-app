@@ -12,6 +12,8 @@ import react from "@vitejs/plugin-react";
 // article import, teacher, cloud sync) are exercised separately.
 export default defineConfig({
   root: "harness",
+  base: "./",
+  build: { outDir: "../dist", emptyOutDir: true },
   publicDir: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "public"),
   plugins: [
     react(),
