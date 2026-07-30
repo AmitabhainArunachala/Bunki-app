@@ -20,6 +20,12 @@ export WRANGLER_WRITE_LOGS=false
 export WRANGLER_LOG_PATH="${runtime_root}/wrangler/logs"
 export MINIFLARE_REGISTRY_PATH="${runtime_root}/wrangler/registry"
 
+# vinext dev responses carry a >16 KiB Link preload header (one entry per
+# Noto Sans JP font subset). undici caps response headers at Node's
+# http.maxHeaderSize, so without this the Vite plugin's hop to workerd
+# rejects every response with HeadersOverflowError.
+export NODE_OPTIONS="${NODE_OPTIONS:+${NODE_OPTIONS} }--max-http-header-size=262144"
+
 # The runtime may provide a global npm cache. Keep the image's read-only Sites
 # seed separate and make this project's writable cache authoritative.
 unset NPM_CONFIG_CACHE npm_config_cache || true
