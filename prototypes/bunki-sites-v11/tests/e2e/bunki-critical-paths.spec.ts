@@ -183,10 +183,10 @@ test("a reader word opens its full entry and each kanji one layer deeper", async
     .getByRole("button", { name: /Read 山を歩きながら考えたこと/ })
     .click();
 
-  const occurrence = page
-    .locator(".p2-sentence")
-    .filter({ hasText: sentence })
-    .first();
+  const occurrence = page.locator(
+    '.p2-sentence[data-sentence-index="0"]',
+  );
+  await expect(occurrence).toContainText(sentence);
   const word = occurrence.getByRole("button", {
     name: /^言葉\. Tap one:/,
   });
