@@ -16,6 +16,7 @@ export interface LiveReadingItem {
     | "university"
     | "travel";
   readonly domain: string;
+  readonly readerStatus: "publisher-feed-text" | "summary-only";
 }
 
 export interface ReadingFeedSource {
@@ -412,21 +413,26 @@ export function parseReadingFeed(
         published === null || Number.isNaN(Date.parse(published))
           ? null
           : new Date(published).toISOString();
+      const summary = tagValue(block, [
+        "description",
+        "summary",
+        "content:encoded",
+        "content",
+      ]).slice(0, 20_000);
       return {
         id: stableId(source.name, url, title),
         title,
         url,
-        summary: tagValue(block, [
-          "description",
-          "summary",
-          "content:encoded",
-          "content",
-        ]).slice(0, 1_200),
+        summary,
         publishedAt: parsedDate,
         sourceName: source.name,
         level: source.level,
         lane: source.lane,
         domain: new URL(url).hostname,
+        readerStatus:
+          summary.length >= 600
+            ? "publisher-feed-text"
+            : "summary-only",
       };
     })
     .filter((item): item is LiveReadingItem => item !== null);
