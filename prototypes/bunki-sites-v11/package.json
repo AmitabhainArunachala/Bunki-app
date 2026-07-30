@@ -11,7 +11,7 @@
     "build": "bash scripts/build-verified.sh",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run test:unit",
-    "test:unit": "npm run build && node --test tests/*.test.mjs",
+    "test:unit": "npm run build && node --experimental-strip-types --test tests/*.test.mjs",
     "test:e2e": "playwright test",
     "deploy:worker": "vinext deploy",
     "deploy:worker:built": "vinext deploy --skip-build",
