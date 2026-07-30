@@ -10,9 +10,6 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
   main: "./worker/index.ts",
-  // compatibility_flags live in wrangler.jsonc only: the Cloudflare plugin
-  // concatenates this overlay with the file config, and workerd refuses to
-  // start when a flag appears twice.
   d1_databases: [
     {
       binding: "DB",
