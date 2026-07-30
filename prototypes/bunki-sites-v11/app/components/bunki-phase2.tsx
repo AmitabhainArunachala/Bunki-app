@@ -151,14 +151,15 @@ type View = "today" | "immerse" | "review" | "coach" | "library";
 type LibraryTab = "dictionary" | "kanji" | "grammar" | "memory";
 type ImmerseMode = "discover" | "reader";
 type ReadingFilter = "all" | "graded" | "real" | "historical" | "live";
+type ReaderLexicalReturnContext = {
+  readonly sourceId: string;
+  readonly sentenceIndex: number;
+  readonly word: string;
+  readonly token: ReaderToken;
+  readonly scrollY: number;
+};
 type KanjiReturnContext =
-  | {
-      readonly kind: "reader";
-      readonly sourceId: string;
-      readonly sentenceIndex: number;
-      readonly word: string;
-      readonly token: ReaderToken;
-    }
+  | ({ readonly kind: "reader" } & ReaderLexicalReturnContext)
   | {
       readonly kind: "dictionary";
       readonly word: string;
@@ -492,6 +493,8 @@ export function BunkiPhase2(): ReactNode {
   const [kanjiQuery, setKanjiQuery] = useState("学");
   const [kanjiReturnContext, setKanjiReturnContext] =
     useState<KanjiReturnContext | null>(null);
+  const [dictionaryReturnContext, setDictionaryReturnContext] =
+    useState<ReaderLexicalReturnContext | null>(null);
   const [strokeReplayKey, setStrokeReplayKey] = useState(0);
   const [grammarQuery, setGrammarQuery] = useState("");
   const [drawing, setDrawing] = useState(false);
@@ -3293,15 +3296,69 @@ export function BunkiPhase2(): ReactNode {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  const openReaderKanji = (entry: KanjiEntry): void => {
-    if (!activeSource || !readerToken?.entry) return;
-    setKanjiReturnContext({
-      kind: "reader",
-      sourceId: activeSource.id,
+  const scrollDocumentTo = (top: number): void => {
+    window.requestAnimationFrame(() =>
+      window.requestAnimationFrame(() =>
+        window.scrollTo({ top, behavior: "auto" }),
+      ),
+    );
+  };
+
+  const captureReaderLexicalReturn = (
+    token: ReaderToken,
+  ): ReaderLexicalReturnContext | null => {
+    const sourceId = activeSource?.id ?? state.activeSourceId;
+    if (!sourceId || !token.entry) return null;
+    return {
+      sourceId,
       sentenceIndex: readerAnchor,
-      word: readerToken.entry.word,
-      token: readerToken,
-    });
+      word: token.entry.word,
+      token,
+      scrollY: window.scrollY,
+    };
+  };
+
+  const restoreReaderLexicalReturn = (
+    context: ReaderLexicalReturnContext,
+  ): void => {
+    update((previous) => ({
+      ...previous,
+      activeSourceId: context.sourceId,
+    }));
+    setReaderSentence(context.sentenceIndex);
+    setReaderToken(context.token);
+    setReaderWordDepth(3);
+    setReaderPanelOpen(false);
+    setImmerseMode("reader");
+    setView("immerse");
+    setZenMode(true);
+    setKanjiFocusMode(false);
+    readerOpenRef.current = true;
+    scrollDocumentTo(context.scrollY);
+  };
+
+  const openReaderDictionary = (token: ReaderToken): void => {
+    const context = captureReaderLexicalReturn(token);
+    setDictionaryReturnContext(context);
+    if (!token.entry) return;
+    setSelectedWordId(token.entry.id);
+    setLibraryQuery(token.entry.word);
+    setLibraryTab("dictionary");
+    closeReaderWord();
+    setReaderPanelOpen(false);
+    setZenMode(false);
+    setView("library");
+    scrollDocumentTo(0);
+  };
+
+  const openReaderKanji = (
+    entry: KanjiEntry,
+    token: ReaderToken,
+  ): void => {
+    const context = captureReaderLexicalReturn(token);
+    setKanjiReturnContext(
+      context === null ? null : { kind: "reader", ...context },
+    );
     setKanjiQuery(entry.char);
     setLibraryTab("kanji");
     closeReaderWord();
@@ -3310,6 +3367,7 @@ export function BunkiPhase2(): ReactNode {
     setKanjiFocusMode(true);
     setStrokeReplayKey((current) => current + 1);
     setView("library");
+    scrollDocumentTo(0);
   };
 
   const addUncertainty = (entry: VocabEntry, uncertainty: string): void => {
@@ -3367,6 +3425,7 @@ export function BunkiPhase2(): ReactNode {
       setSelectedWordId(null);
       setLibraryQuery("");
       setKanjiReturnContext(null);
+      setDictionaryReturnContext(null);
       setRestoreError(
         `Restored ${restored.sources.length} source${restored.sources.length === 1 ? "" : "s"} and ${restored.cards.length} review card${restored.cards.length === 1 ? "" : "s"} on this device.`,
       );
@@ -4845,7 +4904,33 @@ export function BunkiPhase2(): ReactNode {
                     ? "ambiguous kana reading"
                     : readerToken.entry.reading}
                 </small>
-                <h2>{readerToken.surface}</h2>
+                <h2
+                  className="p2-linked-word-title"
+                  aria-label={readerToken.surface}
+                >
+                  {Array.from(readerToken.surface).map((character, index) => {
+                    const kanjiEntry =
+                      dictionary?.kanjiByChar.get(character) ?? null;
+                    return kanjiEntry ? (
+                      <button
+                        type="button"
+                        key={`${character}-${String(index)}`}
+                        aria-label={`Open ${character} kanji from ${readerToken.surface}`}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          openReaderKanji(kanjiEntry, readerToken);
+                        }}
+                      >
+                        {character}
+                      </button>
+                    ) : (
+                      <span key={`${character}-${String(index)}`}>
+                        {character}
+                      </span>
+                    );
+                  })}
+                </h2>
                 {readerToken.ambiguous ? (
                   <span>
                     Choose the intended word below. Bunki will not learn a
@@ -4853,6 +4938,18 @@ export function BunkiPhase2(): ReactNode {
                   </span>
                 ) : readerToken.surface !== readerToken.entry.word ? (
                   <span>dictionary form · {readerToken.entry.word}</span>
+                ) : null}
+                {!readerToken.ambiguous ? (
+                  <button
+                    type="button"
+                    className="p2-open-full-word"
+                    aria-label={`Open full word entry for ${readerToken.entry.word}`}
+                    onClick={() => openReaderDictionary(readerToken)}
+                  >
+                    <Languages size={14} />
+                    Open the complete word entry
+                    <ChevronRight size={15} />
+                  </button>
                 ) : null}
               </div>
               {readerToken.ambiguous ? (
@@ -4892,7 +4989,7 @@ export function BunkiPhase2(): ReactNode {
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          openReaderKanji(entry);
+                          openReaderKanji(entry, readerToken);
                         }}
                       >
                         <strong>{entry.char}</strong>
@@ -4980,13 +5077,7 @@ export function BunkiPhase2(): ReactNode {
                 </button>
                 <button
                   disabled={readerToken.ambiguous}
-                  onClick={() => {
-                    setSelectedWordId(readerToken.entry!.id);
-                    setLibraryQuery(readerToken.entry!.word);
-                    setLibraryTab("dictionary");
-                    setView("library");
-                    closeReaderWord();
-                  }}
+                  onClick={() => openReaderDictionary(readerToken)}
                 >
                   <Languages size={15} /> Dictionary workspace
                 </button>
@@ -5451,6 +5542,22 @@ export function BunkiPhase2(): ReactNode {
 
   const renderDictionary = (): ReactNode => (
     <div className="p2-library-content">
+      {dictionaryReturnContext ? (
+        <button
+          type="button"
+          className="p2-kanji-reader-return p2-dictionary-reader-return"
+          onClick={() => {
+            restoreReaderLexicalReturn(dictionaryReturnContext);
+            setDictionaryReturnContext(null);
+          }}
+        >
+          <ArrowLeft size={16} />
+          <span>
+            <small>Back to source word</small>
+            <strong>{dictionaryReturnContext.word}</strong>
+          </span>
+        </button>
+      ) : null}
       <div className="p2-library-search">
         <Search size={19} />
         <input
@@ -5520,6 +5627,7 @@ export function BunkiPhase2(): ReactNode {
               setLibraryTab("kanji");
               setKanjiFocusMode(true);
               setStrokeReplayKey((current) => current + 1);
+              scrollDocumentTo(0);
             }}
             onAsk={(entry) => {
               setTeacherInput(
@@ -5759,21 +5867,13 @@ export function BunkiPhase2(): ReactNode {
           <button
             className="p2-kanji-reader-return"
             onClick={() => {
-              if (kanjiReturnContext.kind === "reader" && returnSource) {
-                update((previous) => ({
-                  ...previous,
-                  activeSourceId: returnSource.id,
-                }));
-                setReaderSentence(kanjiReturnContext.sentenceIndex);
-                setReaderToken(kanjiReturnContext.token);
-                setReaderWordDepth(3);
-                setImmerseMode("reader");
-                setView("immerse");
-                setZenMode(true);
+              if (kanjiReturnContext.kind === "reader") {
+                restoreReaderLexicalReturn(kanjiReturnContext);
               } else if (kanjiReturnContext.kind === "dictionary") {
                 setLibraryQuery(kanjiReturnContext.word);
                 setSelectedWordId(kanjiReturnContext.wordId);
                 setLibraryTab("dictionary");
+                scrollDocumentTo(0);
               }
               setKanjiFocusMode(false);
               setKanjiReturnContext(null);
@@ -5783,7 +5883,7 @@ export function BunkiPhase2(): ReactNode {
             <span>
               <small>
                 {kanjiReturnContext.kind === "reader"
-                  ? "Back to source sentence"
+                  ? "Back to source word"
                   : "Back to word"}
               </small>
               <strong>
@@ -5918,11 +6018,15 @@ export function BunkiPhase2(): ReactNode {
                   <button
                     key={entry.id}
                     onClick={() => {
+                      if (kanjiReturnContext?.kind === "reader") {
+                        setDictionaryReturnContext(kanjiReturnContext);
+                      }
                       setLibraryQuery(entry.word);
                       setSelectedWordId(entry.id);
                       setLibraryTab("dictionary");
                       setKanjiFocusMode(false);
                       setKanjiReturnContext(null);
+                      scrollDocumentTo(0);
                     }}
                   >
                     <strong>{entry.word}</strong>
@@ -7231,7 +7335,22 @@ function DictionaryDetail({
       <div className="p2-word-heading">
         <div>
           <span>{entry.reading}</span>
-          <h2>{entry.word}</h2>
+          <h2 className="p2-linked-word-title" aria-label={entry.word}>
+            {Array.from(entry.word).map((character, index) =>
+              entry.containsKanji.includes(character) ? (
+                <button
+                  type="button"
+                  key={`${character}-${String(index)}`}
+                  aria-label={`Open ${character} kanji from ${entry.word}`}
+                  onClick={() => onKanji(character)}
+                >
+                  {character}
+                </button>
+              ) : (
+                <span key={`${character}-${String(index)}`}>{character}</span>
+              ),
+            )}
+          </h2>
           {entry.altWord ? <small>{entry.altWord}</small> : null}
         </div>
         <button
@@ -7255,7 +7374,12 @@ function DictionaryDetail({
         <div className="p2-kanji-links">
           <span>Kanji</span>
           {entry.containsKanji.map((character) => (
-            <button key={character} onClick={() => onKanji(character)}>
+            <button
+              type="button"
+              key={character}
+              aria-label={`Open ${character} kanji page`}
+              onClick={() => onKanji(character)}
+            >
               {character}
             </button>
           ))}
