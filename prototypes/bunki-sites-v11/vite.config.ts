@@ -1,6 +1,36 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import vinext from "vinext";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { sites } from "./build/sites-vite-plugin";
+
+// kuromoji downloads its .dat.gz dictionaries with XHR and inflates them
+// itself. The dev static server marks .gz files with Content-Encoding: gzip,
+// so the browser pre-inflates the bytes and kuromoji's own gunzip fails with
+// "invalid file signature". Serve them as opaque binary, like production does.
+const rawGzipDictionaries = (): Plugin => ({
+  name: "bunki-raw-gzip-dictionaries",
+  configureServer(server) {
+    const publicDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "public");
+    server.middlewares.use((req, res, next) => {
+      const match = req.url?.match(/^\/(kuromoji\/[\w.-]+\.gz)(?:\?.*)?$/);
+      if (!match) {
+        next();
+        return;
+      }
+      const file = path.join(publicDir, match[1]);
+      if (!fs.existsSync(file)) {
+        next();
+        return;
+      }
+      res.setHeader("content-type", "application/octet-stream");
+      res.removeHeader("content-encoding");
+      fs.createReadStream(file).pipe(res);
+    });
+  },
+});
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -39,6 +69,7 @@ export default defineConfig(async () => {
         : {}),
     },
     plugins: [
+      rawGzipDictionaries(),
       vinext(),
       sites(),
       cloudflare({
