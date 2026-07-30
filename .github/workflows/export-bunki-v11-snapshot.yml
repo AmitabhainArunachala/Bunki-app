@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   export:
@@ -27,3 +29,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           compression-level: 6
+
+      - name: Publish artifact run locator
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment 19 --body "Source export ready from workflow run \`${{ github.run_id }}\` at commit \`${{ github.sha }}\`."
