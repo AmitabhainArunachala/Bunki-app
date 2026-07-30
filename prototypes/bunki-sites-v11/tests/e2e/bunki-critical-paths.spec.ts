@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const mockLocalState = async (page: Page): Promise<void> => {
   await page.route("**/api/state**", async (route) => {
@@ -161,4 +161,115 @@ test("browser Back returns from reader instead of leaving Bunki", async ({
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Pick up where you left off" })).toBeVisible();
   await expect(page.locator(".p2-app.ready")).toBeVisible();
+});
+
+test("a reader word opens its full entry and each kanji one layer deeper", async (
+  { page },
+  testInfo,
+) => {
+  test.setTimeout(60_000);
+  const sentence =
+    "山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。";
+  const activate = async (target: Locator): Promise<void> => {
+    if (testInfo.project.name.startsWith("mobile-")) {
+      await target.tap();
+    } else {
+      await target.click();
+    }
+  };
+
+  await openImmersionShelf(page);
+  await page
+    .getByRole("button", { name: /Read 山を歩きながら考えたこと/ })
+    .click();
+
+  const occurrence = page
+    .locator(".p2-sentence")
+    .filter({ hasText: sentence })
+    .first();
+  const word = occurrence.getByRole("button", {
+    name: /^言葉\. Tap one:/,
+  });
+  await expect(word).toBeVisible({ timeout: 20_000 });
+
+  await activate(word);
+  await expect(word).toHaveClass(/\bdepth-1\b/);
+  await expect(word.locator("rt")).toHaveText("ことば");
+  await activate(word);
+  await expect(word).toHaveClass(/\bdepth-2\b/);
+  await expect(word.locator(".p2-word-peek")).toContainText("language");
+  await activate(word);
+
+  const detail = page.getByRole("dialog", {
+    name: "Word detail for 言葉",
+  });
+  await expect(detail).toBeVisible();
+  await expect(
+    detail.getByRole("heading", { name: "言葉", exact: true }),
+  ).toBeVisible();
+  await expect(detail.locator(".p2-sheet-context")).toContainText(sentence);
+  await expect(
+    detail.getByRole("button", { name: "Open 言 kanji from 言葉" }),
+  ).toBeVisible();
+  await expect(
+    detail.getByRole("button", { name: "Open 葉 kanji from 言葉" }),
+  ).toBeVisible();
+
+  await activate(
+    detail.getByRole("button", {
+      name: "Open full word entry for 言葉",
+    }),
+  );
+  await expect(
+    page.getByRole("heading", { name: "言葉", exact: true }),
+  ).toBeVisible();
+  const dictionaryBack = page
+    .getByRole("button")
+    .filter({ hasText: "Back to source word" })
+    .filter({ hasText: "言葉" });
+  await expect(dictionaryBack).toBeVisible();
+  await activate(dictionaryBack);
+
+  const restoredFromDictionary = page.getByRole("dialog", {
+    name: "Word detail for 言葉",
+  });
+  await expect(restoredFromDictionary).toBeVisible();
+  await activate(
+    restoredFromDictionary.getByRole("button", {
+      name: "Open 言 kanji from 言葉",
+    }),
+  );
+
+  await expect(restoredFromDictionary).toBeHidden();
+  await expect(page.locator(".p2-app")).toHaveClass(/\bkanji-focus\b/);
+  const kanji = page.locator(".p2-kanji-main");
+  await expect(
+    kanji.getByRole("heading", { name: "言", exact: true }),
+  ).toBeVisible();
+  await expect(kanji.getByText("say · word", { exact: true })).toBeVisible();
+  await expect(kanji.getByText("ゲン、ゴン", { exact: true })).toBeVisible();
+  await expect(
+    kanji.getByRole("button", { name: "Replay stroke order for 言" }),
+  ).toBeVisible();
+
+  const kanjiBack = page.locator(".p2-kanji-reader-return");
+  await expect(kanjiBack).toContainText("Back to source word");
+  await expect(kanjiBack).toContainText("言葉");
+  await activate(kanjiBack);
+
+  const restoredFromKanji = page.getByRole("dialog", {
+    name: "Word detail for 言葉",
+  });
+  await expect(restoredFromKanji).toBeVisible();
+  await expect(word).toHaveClass(/\bdepth-3\b/);
+  await expect(restoredFromKanji.locator(".p2-sheet-context")).toContainText(
+    sentence,
+  );
+  await activate(
+    restoredFromKanji.getByRole("button", {
+      name: "Close word detail",
+    }),
+  );
+  await expect(restoredFromKanji).toBeHidden();
+  await expect(page.getByTestId("reader-article")).toContainText(sentence);
 });
