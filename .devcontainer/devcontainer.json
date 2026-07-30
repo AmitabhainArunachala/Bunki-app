@@ -1,0 +1,21 @@
+{
+  "name": "Bunki Living Japanese",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "postCreateCommand": "cd prototypes/bunki-sites-v11 && npm ci",
+  "postStartCommand": "cd prototypes/bunki-sites-v11 && nohup npm run dev -- --host 0.0.0.0 >/tmp/bunki-v11.log 2>&1 &",
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": {
+      "label": "Bunki app",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "ms-playwright.playwright"
+      ]
+    }
+  }
+}
