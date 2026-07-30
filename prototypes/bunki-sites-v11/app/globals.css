@@ -1,4 +1,8 @@
 :root {
+  --font-sans-jp: "Hiragino Sans", "Yu Gothic", "YuGothic", "Meiryo",
+    "Noto Sans CJK JP", system-ui, sans-serif;
+  --font-serif-jp: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho",
+    "Noto Serif CJK JP", serif;
   --ink: #172338;
   --ink-soft: #526077;
   --navy: #071421;
