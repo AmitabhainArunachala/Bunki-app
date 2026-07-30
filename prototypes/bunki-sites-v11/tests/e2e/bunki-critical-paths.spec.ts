@@ -135,9 +135,10 @@ test("a live card imports a non-empty body and its explicit Back works", async (
   await expect(page.locator(".p2-reader")).toContainText("山道を歩いていると");
   await expect(page.locator(".p2-reader").getByText("テスト用の読みやすい記事")).toHaveCount(0);
   await page.locator(".p2-zen-back").click();
-  // "Live library" is an eyebrow label, not a heading, since the v12 shelf
-  // rework — assert the shelf section itself via its stable test id.
   await expect(page.getByTestId("live-library")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Read テスト用の読みやすい記事/ }),
+  ).toBeVisible();
 });
 
 test("Zen appearance opens and collapses without moving the article", async ({
