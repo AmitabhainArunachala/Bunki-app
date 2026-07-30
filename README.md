@@ -9,11 +9,37 @@ finite session → inspect and export the evidence.
 the operator chooses, no dependency or data may constrain that choice beyond the
 share-alike seed data confined to `packages/seed/`.
 
+## Run the complete web app
+
+The current interactive product lives in `prototypes/bunki-sites-v11/`. It is the
+same Bunki reader, dictionary, kanji drill-down, sentence mining, SRS, and coach
+source used by the polished public checkpoint—not a screenshot or a reduced mock.
+
+- [Open this PR branch in GitHub Codespaces](https://codespaces.new/AmitabhainArunachala/Bunki-app?quickstart=1&ref=claude/sites-v11-interaction-recovery)
+- [Open the current public checkpoint](https://bunki-living-japanese.amitabha1982.chatgpt.site)
+- [Review the source and verification PR](https://github.com/AmitabhainArunachala/Bunki-app/pull/20)
+
+Codespaces installs the nested app, starts it, forwards port 5173, and opens the
+preview. From a normal clone:
+
+```bash
+npm run bunki:web:dev
+```
+
+Every PR runs the production build, unit suite, and the real browser acceptance
+suite in mobile Chromium, mobile WebKit, and desktop Chromium. After human merge,
+GitHub Actions can deploy the full Vinext/Cloudflare Worker when the repository
+contains `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets. GitHub Pages
+is retained only as a client-only preview because it cannot run Bunki's article,
+RSS, transcript, AI, or sync routes.
+
 ## Status
 
-Early scaffold (WP-01). No learning features are implemented yet. Nothing in this
-repository should be read as a claim about efficacy, retention, or review burden
-(REQ-GATE-03).
+The repository now preserves two complementary build tracks: the runnable Bunki
+web product under `prototypes/bunki-sites-v11/`, and the deterministic Phase-0
+core under `apps/` and `packages/`. Product features are real and interactive;
+claims about efficacy, retention, or review burden remain outside the evidence
+currently collected (REQ-GATE-03).
 
 ## Governing documents
 
