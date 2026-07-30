@@ -6998,3 +6998,344 @@ function Onboarding({
                 </strong>
               </div>
               <div>
+                <span>New concepts</span>
+                <strong>
+                  {profile.currentLevel === "zero" ||
+                  profile.currentLevel === "N5"
+                    ? "Maximum 3 per packet"
+                    : profile.currentLevel === "N4" ||
+                        profile.currentLevel === "N3"
+                      ? "Maximum 5 per packet"
+                      : "Maximum 7 per packet"}
+                </strong>
+              </div>
+              <div>
+                <span>Daily time</span>
+                <strong>{profile.dailyMinutes} minutes</strong>
+              </div>
+              <div>
+                <span>Target</span>
+                <strong>{profile.targetLevel}</strong>
+              </div>
+            </div>
+            <p className="p2-honesty-note">
+              <ShieldCheck size={14} /> This is provisional. Bunki will change
+              it from actual encounters and reviews—not a fake percentage.
+            </p>
+            <div className="p2-onboarding-nav">
+              <button className="p2-button subtle" onClick={() => onStep(3)}>
+                <ArrowLeft size={16} /> Back
+              </button>
+              <button className="p2-button primary" onClick={onFinish}>
+                Enter Bunki <Sparkles size={17} />
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function PacketDrawer({
+  packet,
+  onToggle,
+  onEdit,
+  onClose,
+  onAdmit,
+  duplicate,
+}: {
+  readonly packet: NonNullable<Phase2State["stagedPacket"]>;
+  readonly onToggle: (id: string) => void;
+  readonly onEdit: (
+    id: string,
+    field: "front" | "back" | "note",
+    value: string,
+  ) => void;
+  readonly onClose: () => void;
+  readonly onAdmit: () => void;
+  readonly duplicate: (proposal: CardProposal) => boolean;
+}) {
+  const [advanced, setAdvanced] = useState(false);
+  const selected = packet.proposals.filter(
+    (proposal) => proposal.selected && !duplicate(proposal),
+  ).length;
+  return (
+    <div className="p2-drawer-backdrop" onMouseDown={onClose}>
+      <aside
+        className="p2-packet-drawer"
+        onMouseDown={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="packet-title"
+      >
+        <header>
+          <div>
+            <span className="p2-eyebrow">Choose what is worth remembering</span>
+            <h2 id="packet-title">{packet.title}</h2>
+            <p>
+              Bunki found {packet.proposals.length} useful item
+              {packet.proposals.length === 1 ? "" : "s"}. Three or fewer are
+              selected by default. Nothing is saved until you confirm.
+            </p>
+          </div>
+          <button onClick={onClose} aria-label="Close suggestions">
+            <X size={20} />
+          </button>
+        </header>
+        <button
+          className="p2-packet-advanced-toggle"
+          onClick={() => setAdvanced((current) => !current)}
+          aria-expanded={advanced}
+        >
+          <SlidersHorizontal size={15} />
+          {advanced ? "Hide card editing" : "Advanced · edit card wording"}
+        </button>
+        <div className="p2-proposal-list">
+          {packet.proposals.map((proposal) => {
+            const isDuplicate = duplicate(proposal);
+            return (
+              <article
+                key={proposal.id}
+                className={`${proposal.selected ? "selected" : ""} ${isDuplicate ? "duplicate" : ""}`}
+              >
+                <button
+                  className="p2-proposal-check"
+                  onClick={() => onToggle(proposal.id)}
+                  disabled={isDuplicate}
+                  aria-label={
+                    proposal.selected
+                      ? "Do not save this item"
+                      : "Save this item"
+                  }
+                >
+                  {proposal.selected && !isDuplicate ? (
+                    <Check size={16} />
+                  ) : null}
+                </button>
+                <div className="p2-proposal-main">
+                  <header>
+                    <StatusPill
+                      state={
+                        proposal.tags.includes("fragile")
+                          ? "fragile"
+                          : proposal.tags.includes("learning")
+                            ? "learning"
+                            : "unseen"
+                      }
+                    />
+                    <span>
+                      {proposal.kind === "grammar"
+                        ? "grammar"
+                        : proposal.kind === "kanji"
+                          ? "kanji"
+                          : "word in context"}
+                    </span>
+                  </header>
+                  <strong className="p2-proposal-answer">
+                    {proposal.back.split("\n")[0]}
+                  </strong>
+                  <p className="p2-proposal-source" lang="ja">
+                    {proposal.sourceSentence}
+                  </p>
+                  {advanced ? (
+                    <div className="p2-proposal-advanced">
+                      <label>
+                        <span>Front</span>
+                        <textarea
+                          rows={3}
+                          value={proposal.front}
+                          onChange={(event) =>
+                            onEdit(proposal.id, "front", event.target.value)
+                          }
+                        />
+                      </label>
+                      <label>
+                        <span>Back</span>
+                        <textarea
+                          rows={4}
+                          value={proposal.back}
+                          onChange={(event) =>
+                            onEdit(proposal.id, "back", event.target.value)
+                          }
+                        />
+                      </label>
+                      <label>
+                        <span>Connection note</span>
+                        <textarea
+                          rows={2}
+                          value={proposal.note}
+                          onChange={(event) =>
+                            onEdit(proposal.id, "note", event.target.value)
+                          }
+                          placeholder="Optional mnemonic, nuance, or earlier-source connection…"
+                        />
+                      </label>
+                    </div>
+                  ) : null}
+                  <small>
+                    <Brain size={13} />
+                    {isDuplicate
+                      ? "This is already in your review list."
+                      : proposal.rationale}
+                  </small>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <footer>
+          <span>{selected} selected · you can change this</span>
+          <button
+            className="p2-button primary"
+            disabled={selected === 0}
+            onClick={onAdmit}
+          >
+            Save {selected} for later <ArrowRight size={16} />
+          </button>
+        </footer>
+      </aside>
+    </div>
+  );
+}
+
+function DictionaryDetail({
+  entry,
+  state,
+  onUncertainty,
+  onStage,
+  onKanji,
+  onAsk,
+}: {
+  readonly entry: VocabEntry | null;
+  readonly state: Phase2State;
+  readonly onUncertainty: (entry: VocabEntry, uncertainty: string) => void;
+  readonly onStage: (entry: VocabEntry) => void | Promise<void>;
+  readonly onKanji: (character: string) => void;
+  readonly onAsk: (entry: VocabEntry) => void;
+}) {
+  if (entry === null)
+    return (
+      <div className="p2-empty compact p2-dictionary-empty">
+        <BookMarked size={27} />
+        <p>
+          Select an entry to see senses, memory, source occurrences, and
+          learning actions.
+        </p>
+      </div>
+    );
+  const memory = state.memories[entry.id];
+  const occurrences = contextsForConcept(state, entry.id, 5);
+  return (
+    <Surface className="p2-dictionary-detail">
+      <div className="p2-word-heading">
+        <div>
+          <span>{entry.reading}</span>
+          <h2>{entry.word}</h2>
+          {entry.altWord ? <small>{entry.altWord}</small> : null}
+        </div>
+        <button
+          onClick={() => speakJapanese(entry.word)}
+          aria-label={`Play ${entry.word}`}
+        >
+          <Volume2 size={20} />
+        </button>
+      </div>
+      <div className="p2-word-meta">
+        <span>{entry.pos}</span>
+        {entry.jlpt ? <span>{entry.jlpt} estimate</span> : null}
+        <StatusPill state={memoryState(memory)} />
+      </div>
+      <ol className="p2-senses">
+        {entry.meanings.slice(0, 10).map((meaning) => (
+          <li key={meaning}>{meaning}</li>
+        ))}
+      </ol>
+      {entry.containsKanji.length > 0 ? (
+        <div className="p2-kanji-links">
+          <span>Kanji</span>
+          {entry.containsKanji.map((character) => (
+            <button key={character} onClick={() => onKanji(character)}>
+              {character}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <div className="p2-uncertainties">
+        <span>What is uncertain?</span>
+        {[
+          "meaning",
+          "reading",
+          "usage",
+          "nuance",
+          "kanji",
+          "pronunciation",
+        ].map((item) => (
+          <button
+            key={item}
+            className={memory?.uncertainties.includes(item) ? "active" : ""}
+            onClick={() => onUncertainty(entry, item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      <div className="p2-source-occurrences">
+        <span>Seen in your sources</span>
+        {occurrences.length > 0 ? (
+          occurrences.slice(0, 5).map(({ source, sentence }) => (
+            <blockquote key={source.id}>
+              <strong>{source.title}</strong>
+              <p>{sentence}</p>
+            </blockquote>
+          ))
+        ) : (
+          <p>Not yet encountered in an imported source.</p>
+        )}
+      </div>
+      <div className="p2-detail-actions">
+        <button
+          className="p2-button primary"
+          onClick={() => void onStage(entry)}
+        >
+          <Star size={16} /> Stage a card
+        </button>
+        <button className="p2-button" onClick={() => onAsk(entry)}>
+          <Bot size={16} /> Ask coach
+        </button>
+      </div>
+      <p className="p2-honesty-note">
+        <ShieldCheck size={13} /> Sense ranking uses available spelling,
+        reading, English-match, and level evidence. This packaged corpus does
+        not include full JMdict priority, pitch accent, or licensed native
+        audio.
+      </p>
+    </Surface>
+  );
+}
+
+function KanjiStrokeGlyph({ entry }: { readonly entry: KanjiEntry }) {
+  return (
+    <svg
+      className="p2-kanji-glyph"
+      viewBox="0 0 109 109"
+      role="img"
+      aria-label={`${entry.char}, ${String(entry.strokeCount)} indexed strokes${entry.strokes.length === entry.strokeCount ? "" : `, ${String(entry.strokes.length)} SVG paths in the drawing dataset`}`}
+    >
+      <g className="p2-kanji-guide">
+        <rect x="5" y="5" width="99" height="99" />
+        <line x1="54.5" y1="5" x2="54.5" y2="104" />
+        <line x1="5" y1="54.5" x2="104" y2="54.5" />
+      </g>
+      <g className="p2-kanji-strokes">
+        {entry.strokes.map((path, index) => (
+          <path
+            key={`${entry.id}-${String(index)}`}
+            d={path}
+            style={{ animationDelay: `${String(index * 0.1)}s` }}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
