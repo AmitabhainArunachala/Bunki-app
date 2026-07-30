@@ -302,6 +302,10 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      // Preserved Sites v11 snapshot: a separate app with its own toolchain
+      // (eslint-config-next etc.). Linting it from the monorepo root pulls in
+      // devDependencies that are not installed here (PR #20 CI failure).
+      'prototypes/**',
       '**/build/**',
       '**/coverage/**',
       '**/.expo/**',
