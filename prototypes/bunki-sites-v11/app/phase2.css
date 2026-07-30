@@ -4902,6 +4902,12 @@
     backdrop-filter: blur(18px);
   }
 
+  .p2-page {
+    /* Content must clear the 68px fixed nav + safe area (handoff: nothing
+       may hide beneath the bottom navigation). */
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
   .p2-mobile-capture {
     position: fixed;
     right: 13px;

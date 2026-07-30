@@ -65,6 +65,7 @@ import {
   type DictionaryIndex,
 } from "../lib/dictionary";
 import { GRAMMAR_PATTERNS, searchGrammar } from "../lib/grammar";
+import { useBackStack } from "../lib/history-layers";
 import { phase2CardsToAnkiTsv } from "../lib/export-format";
 import {
   bestNextAction,
@@ -519,6 +520,17 @@ export function BunkiPhase2(): ReactNode {
     },
     [],
   );
+
+  useEffect(() => {
+    // The deployed head does not reliably carry a mobile viewport tag; without
+    // it iPhones render the app at desktop width. Belt-and-suspenders guard.
+    if (document.querySelector('meta[name="viewport"]') === null) {
+      const meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content = "width=device-width, initial-scale=1, viewport-fit=cover";
+      document.head.append(meta);
+    }
+  }, []);
 
   const drainSaveQueue = useCallback(async (): Promise<void> => {
     if (saveInFlight.current || syncConflictRef.current !== null) return;
@@ -3171,6 +3183,71 @@ export function BunkiPhase2(): ReactNode {
     setView("library");
   };
 
+  const returnFromKanjiContext = (): void => {
+    if (!kanjiReturnContext) return;
+    if (kanjiReturnContext.kind === "reader") {
+      const returnSource = state.sources.find(
+        (source) => source.id === kanjiReturnContext.sourceId,
+      );
+      if (returnSource) {
+        update((previous) => ({
+          ...previous,
+          activeSourceId: returnSource.id,
+        }));
+        setReaderSentence(kanjiReturnContext.sentenceIndex);
+        setImmerseMode("reader");
+        setView("immerse");
+        setZenMode(true);
+      }
+    } else {
+      setLibraryQuery(kanjiReturnContext.word);
+      setSelectedWordId(kanjiReturnContext.wordId);
+      setLibraryTab("dictionary");
+    }
+    setKanjiFocusMode(false);
+    setKanjiReturnContext(null);
+  };
+
+  // Hardware/browser Back (and the iOS edge swipe) closes the topmost open
+  // layer instead of exiting the app (interaction-recovery handoff, journey
+  // C). Layers are ordered shallowest -> deepest; the deepest open one closes
+  // first. Reader and kanji-drill are mutually exclusive views, so ordering
+  // among the rest is what matters.
+  useBackStack([
+    { key: "menu", isOpen: mobileMenu, close: () => setMobileMenu(false) },
+    {
+      key: "capture",
+      isOpen: captureOpen,
+      close: () => setCaptureOpen(false),
+    },
+    {
+      key: "packet",
+      isOpen: state.stagedPacket !== null,
+      close: () =>
+        update((previous) => ({ ...previous, stagedPacket: null })),
+    },
+    {
+      key: "reader",
+      isOpen: view === "immerse" && immerseMode === "reader",
+      close: () => {
+        closeReaderWord();
+        setReaderPanelOpen(false);
+        setZenMode(false);
+        setImmerseMode("discover");
+      },
+    },
+    {
+      key: "kanji-drill",
+      isOpen: kanjiReturnContext !== null,
+      close: returnFromKanjiContext,
+    },
+    {
+      key: "reader-word",
+      isOpen: readerToken !== null,
+      close: closeReaderWord,
+    },
+  ]);
+
   const addUncertainty = (entry: VocabEntry, uncertainty: string): void => {
     const existing =
       state.memories[entry.id] ??
@@ -4177,10 +4254,12 @@ export function BunkiPhase2(): ReactNode {
               </div>
 
               {languageBusy && readerTokens.length === 0 ? (
-                <div className="p2-language-loading"><LoaderCircle className="spin" /><span>Preparing morphology-aware reading…</span></div>
-              ) : languageError ? (
+                <div className="p2-language-loading" role="status"><LoaderCircle className="spin" /><span>Preparing tap-to-look-up — the text is already readable.</span></div>
+              ) : null}
+              {!languageBusy && languageError ? (
                 <div className="p2-inline-error"><CircleAlert size={17} />{languageError}<button onClick={() => void ensureLanguageTools()}>Retry</button></div>
-              ) : (
+              ) : null}
+              {(
                 <>
                   {sentences.length > READER_WINDOW_SIZE ? (
                     <nav className="p2-reader-window" aria-label="Transcript pages">
@@ -5109,24 +5188,7 @@ export function BunkiPhase2(): ReactNode {
         {kanjiReturnContext ? (
           <button
             className="p2-kanji-reader-return"
-            onClick={() => {
-              if (kanjiReturnContext.kind === "reader" && returnSource) {
-                update((previous) => ({
-                  ...previous,
-                  activeSourceId: returnSource.id,
-                }));
-                setReaderSentence(kanjiReturnContext.sentenceIndex);
-                setImmerseMode("reader");
-                setView("immerse");
-                setZenMode(true);
-              } else if (kanjiReturnContext.kind === "dictionary") {
-                setLibraryQuery(kanjiReturnContext.word);
-                setSelectedWordId(kanjiReturnContext.wordId);
-                setLibraryTab("dictionary");
-              }
-              setKanjiFocusMode(false);
-              setKanjiReturnContext(null);
-            }}
+            onClick={returnFromKanjiContext}
           >
             <ArrowLeft size={16} />
             <span>

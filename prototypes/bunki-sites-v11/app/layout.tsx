@@ -15,6 +15,12 @@ const serif = Noto_Serif_JP({
   weight: ["400", "500", "600", "700"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Bunki 分岐 — Living Japanese",
   description:
