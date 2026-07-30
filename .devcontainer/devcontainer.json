@@ -12,10 +12,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "ms-playwright.playwright"
-      ]
+      "extensions": ["dbaeumer.vscode-eslint", "ms-playwright.playwright"]
     }
   }
 }
