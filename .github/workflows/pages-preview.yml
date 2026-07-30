@@ -39,11 +39,34 @@ jobs:
       - name: Build static client bundle
         working-directory: prototypes/bunki-sites-v11
         run: ./node_modules/.bin/vite build --config vite.config.harness.mts
-      - uses: actions/configure-pages@v5
+      - name: Upload build as downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-sites-v11-static
+          path: prototypes/bunki-sites-v11/dist
+      # Pages cannot be enabled by the workflow token on this private repo
+      # (configure-pages: "Resource not accessible by integration"). Attempt
+      # it, but treat unavailability as a skip, not a failure — the build
+      # above is the verified deliverable either way. Once Pages is enabled
+      # in Settings → Pages (source: GitHub Actions), this deploys for real.
+      - id: cfg
+        continue-on-error: true
+        uses: actions/configure-pages@v5
         with:
           enablement: true
-      - uses: actions/upload-pages-artifact@v3
+      - if: steps.cfg.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: prototypes/bunki-sites-v11/dist
       - id: deployment
+        if: steps.cfg.outcome == 'success'
         uses: actions/deploy-pages@v4
+      - name: Report Pages availability
+        run: |
+          if [ "${{ steps.cfg.outcome }}" = "success" ]; then
+            echo "### Pages deployed: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Pages unavailable on this repository" >> "$GITHUB_STEP_SUMMARY"
+            echo "Build succeeded and is attached as the *bunki-sites-v11-static* artifact." >> "$GITHUB_STEP_SUMMARY"
+            echo "To get a live URL: Settings → Pages → Source: GitHub Actions (requires a public repo or a plan with private Pages), then re-run this workflow." >> "$GITHUB_STEP_SUMMARY"
+          fi
