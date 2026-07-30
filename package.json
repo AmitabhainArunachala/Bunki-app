@@ -19,7 +19,12 @@
     "test:replay": "vitest run packages/domain/test/replay",
     "test:e2e": "playwright test --config apps/app/e2e/playwright.config.ts",
     "test:e2e:build": "npm run export:web --workspace @bunki/app",
-    "verify:export": "vitest run packages/export/test/verify-export.test.ts"
+    "verify:export": "vitest run packages/export/test/verify-export.test.ts",
+    "bunki:web:dev": "npm --prefix prototypes/bunki-sites-v11 run dev -- --host 0.0.0.0",
+    "bunki:web:build": "npm --prefix prototypes/bunki-sites-v11 run build",
+    "bunki:web:test": "npm --prefix prototypes/bunki-sites-v11 run test:unit",
+    "bunki:web:e2e": "npm --prefix prototypes/bunki-sites-v11 run test:e2e",
+    "bunki:web:deploy": "npm --prefix prototypes/bunki-sites-v11 run deploy:worker"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",
