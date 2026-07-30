@@ -113,7 +113,9 @@ test("immersion cards and titles share one obvious Bunki Reader action", async (
   assert.match(component, /Tap anywhere on a card—including its title—to open Bunki Reader/);
   assert.match(component, /aria-label=\{`Read \$\{item\.title\} in Bunki Reader`\}/);
   assert.match(component, /onClick=\{\(\) => void importLiveReading\(item\)\}/);
-  assert.match(component, /publisher summary \(the full page could not be extracted\)/);
+  assert.match(component, /PUBLISHER SUMMARY ONLY/);
+  assert.match(component, /PUBLISHER FEED TEXT/);
+  assert.match(component, /AbortSignal\.timeout\(15_000\)/);
   assert.match(component, /Pick up where you left off/);
   assert.match(component, /For you · \{readingLevel\}/);
 });
