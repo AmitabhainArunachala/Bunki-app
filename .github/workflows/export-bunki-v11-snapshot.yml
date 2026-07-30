@@ -1,0 +1,29 @@
+name: Export Bunki v11 snapshot
+
+on:
+  push:
+    branches:
+      - agent/bunki-sites-v11-interaction-handoff
+    paths:
+      - .github/workflows/export-bunki-v11-snapshot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact branch
+        uses: actions/checkout@v4
+
+      - name: Upload complete portable v11 source
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-v11-source
+          path: prototypes/bunki-sites-v11
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 6
