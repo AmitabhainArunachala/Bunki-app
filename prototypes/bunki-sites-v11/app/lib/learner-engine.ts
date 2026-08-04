@@ -232,7 +232,7 @@ export function learningSummary(state: Phase2State): {
 }
 
 export interface NextAction {
-  readonly kind: "onboard" | "review" | "continue-source" | "analyze-source" | "capture" | "lesson" | "coach";
+  readonly kind: "onboard" | "review" | "continue-source" | "analyze-source" | "capture" | "read-shelf" | "lesson" | "coach";
   readonly title: string;
   readonly detail: string;
   readonly reason: string;
@@ -311,20 +311,15 @@ export function bestNextAction(state: Phase2State, at = new Date()): NextAction 
 
   const interest = state.profile.interests[0];
   return {
-    kind: "capture",
-    title:
-      interest === undefined
-        ? "Bring in what you met today"
-        : `Find one Japanese source about ${interest}`,
+    kind: "read-shelf",
+    title: "Pick one real thing to read",
     detail:
-      interest === undefined
-        ? "Paste a URL now; add text or captions later."
-        : "A creator video, university talk, article, or podcast is enough. Save the URL now and add text later.",
+      "Live publisher articles and graded originals are ready on the shelf. Open one and Bunki reads it with you.",
     reason:
       interest === undefined
-        ? "Bunki needs a real encounter before it can choose a personal n+1 edge."
-        : `Your interest in ${interest} is the starting lane; actual encounters will decide the vocabulary edge.`,
-    minutes: 1,
+        ? "A real encounter gives Bunki evidence to choose your edge."
+        : `Your interest in ${interest} shapes the shelf; a real encounter decides the vocabulary edge.`,
+    minutes: Math.min(20, state.profile.dailyMinutes),
     sourceId: null,
   };
 }

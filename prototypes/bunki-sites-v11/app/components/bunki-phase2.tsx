@@ -207,41 +207,6 @@ const SOURCE_KINDS: readonly {
   { id: "manual", label: "Note" },
 ] as const;
 
-const PLACEMENT: readonly {
-  readonly level: Level;
-  readonly sentence: string;
-  readonly meaning: string;
-}[] = [
-  {
-    level: "N5",
-    sentence: "毎朝、日本語を勉強します。",
-    meaning: "I study Japanese every morning.",
-  },
-  {
-    level: "N4",
-    sentence: "歩きながら、昨日の動画をもう一度聞いてみた。",
-    meaning: "While walking, I tried listening to yesterday’s video again.",
-  },
-  {
-    level: "N3",
-    sentence: "文脈ごと覚えることで、自然に使えるようになる。",
-    meaning: "Learning the whole context helps it become naturally usable.",
-  },
-  {
-    level: "N2",
-    sentence:
-      "内容は理解できたものの、細かなニュアンスまでは捉えきれなかった。",
-    meaning:
-      "Although I understood the content, I could not fully grasp the finer nuances.",
-  },
-  {
-    level: "N1",
-    sentence: "知識の蓄積は、必ずしも運用能力の向上を意味するわけではない。",
-    meaning:
-      "Accumulating knowledge does not necessarily mean improving usable ability.",
-  },
-] as const;
-
 const INTERESTS = [
   "Japanese philosophy",
   "AI and machine learning",
@@ -1813,24 +1778,6 @@ export function BunkiPhase2(): ReactNode {
     }));
   };
 
-  const choosePlacement = (level: Level): void => {
-    if (level !== "zero") setReadingLevel(level);
-    update((previous) => ({
-      ...previous,
-      profile: {
-        ...previous.profile,
-        currentLevel: level,
-        placementAnswers: [
-          {
-            itemId: "comfortable-reading-edge",
-            level,
-            correct: true,
-          },
-        ],
-      },
-    }));
-  };
-
   const performNextAction = (): void => {
     if (nextAction.kind === "onboard") {
       setOnboardingStep(1);
@@ -1841,8 +1788,10 @@ export function BunkiPhase2(): ReactNode {
       setView("review");
       return;
     }
-    if (nextAction.kind === "capture") {
-      setCaptureOpen(true);
+    if (nextAction.kind === "capture" || nextAction.kind === "read-shelf") {
+      setView("immerse");
+      setImmerseMode("discover");
+      window.scrollTo({ top: 0, behavior: "auto" });
       return;
     }
     if (nextAction.sourceId) {
@@ -6692,7 +6641,6 @@ export function BunkiPhase2(): ReactNode {
           profile={state.profile}
           onStep={setOnboardingStep}
           onLevel={chooseLevel}
-          onPlacement={choosePlacement}
           onInterest={toggleInterest}
           onProfile={(profile) =>
             update((previous) => ({ ...previous, profile }))
@@ -6994,7 +6942,6 @@ function Onboarding({
   profile,
   onStep,
   onLevel,
-  onPlacement,
   onInterest,
   onProfile,
   onFinish,
@@ -7005,7 +6952,6 @@ function Onboarding({
   readonly profile: LearnerProfile;
   readonly onStep: (step: number) => void;
   readonly onLevel: (level: Level) => void;
-  readonly onPlacement: (level: Level) => void;
   readonly onInterest: (interest: string) => void;
   readonly onProfile: (profile: LearnerProfile) => void;
   readonly onFinish: () => void;
@@ -7023,7 +6969,7 @@ function Onboarding({
         <header>
           <Phase2Brand />
           <div className="p2-step-dots">
-            {[1, 2, 3, 4].map((value) => (
+            {[1, 2, 3].map((value) => (
               <span key={value} className={value <= step ? "active" : ""} />
             ))}
           </div>
@@ -7068,43 +7014,11 @@ function Onboarding({
           </div>
         ) : step === 2 ? (
           <div className="p2-onboarding-page">
-            <span className="p2-eyebrow">2 · Provisional placement</span>
-            <h1>Choose the hardest sentence you understand comfortably.</h1>
+            <span className="p2-eyebrow">2 · Your Japanese world</span>
+            <h1>What do you care about?</h1>
             <p>
-              You may also keep “from zero.” This five-sentence check changes
-              scaffolding and packet size.
-            </p>
-            <div className="p2-placement-list">
-              {PLACEMENT.map((item) => (
-                <button
-                  key={item.level}
-                  className={
-                    profile.currentLevel === item.level ? "active" : ""
-                  }
-                  onClick={() => onPlacement(item.level)}
-                >
-                  <span>{item.level}</span>
-                  <strong lang="ja">{item.sentence}</strong>
-                  <small>{item.meaning}</small>
-                </button>
-              ))}
-            </div>
-            <div className="p2-onboarding-nav">
-              <button className="p2-button subtle" onClick={() => onStep(1)}>
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button className="p2-button primary" onClick={() => onStep(3)}>
-                Continue <ArrowRight size={16} />
-              </button>
-            </div>
-          </div>
-        ) : step === 3 ? (
-          <div className="p2-onboarding-page">
-            <span className="p2-eyebrow">3 · Your Japanese world</span>
-            <h1>What should the language attach itself to?</h1>
-            <p>
-              These interests help Bunki choose examples and immersion starting
-              points.
+              Bunki picks readings, examples, and immersion starting points
+              from these.
             </p>
             <div className="p2-interest-grid">
               {INTERESTS.map((interest) => (
@@ -7139,17 +7053,17 @@ function Onboarding({
               />
             </label>
             <div className="p2-onboarding-nav">
-              <button className="p2-button subtle" onClick={() => onStep(2)}>
+              <button className="p2-button subtle" onClick={() => onStep(1)}>
                 <ArrowLeft size={16} /> Back
               </button>
-              <button className="p2-button primary" onClick={() => onStep(4)}>
+              <button className="p2-button primary" onClick={() => onStep(3)}>
                 Build my path <ArrowRight size={16} />
               </button>
             </div>
           </div>
         ) : (
           <div className="p2-onboarding-page p2-plan-preview">
-            <span className="p2-eyebrow">4 · Your first plan</span>
+            <span className="p2-eyebrow">3 · Your first plan</span>
             <h1>One thread, calibrated to {profile.currentLevel}.</h1>
             <div className="p2-plan-card">
               <div>

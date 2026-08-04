@@ -69,12 +69,6 @@ const finishOnboarding = async (page: Page): Promise<void> => {
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: /^N2/ }).click();
   await dialog.getByRole("button", { name: "Continue" }).click();
-  await dialog
-    .getByRole("button", {
-      name: /N2.*内容は理解できたものの/,
-    })
-    .click();
-  await dialog.getByRole("button", { name: "Continue" }).click();
   await dialog.getByRole("button", { name: "News" }).click();
   await dialog.getByRole("button", { name: "Build my path" }).click();
   await dialog.getByRole("button", { name: "Enter Bunki" }).click();
