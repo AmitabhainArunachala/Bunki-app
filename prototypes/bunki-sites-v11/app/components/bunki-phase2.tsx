@@ -495,6 +495,10 @@ export function BunkiPhase2(): ReactNode {
     useState<KanjiReturnContext | null>(null);
   const [dictionaryReturnContext, setDictionaryReturnContext] =
     useState<ReaderLexicalReturnContext | null>(null);
+  const deepSurfaceStackRef = useRef<
+    Array<{ surface: "word-entry" | "kanji"; restore: () => void }>
+  >([]);
+  const suppressNextPopRef = useRef(0);
   const [strokeReplayKey, setStrokeReplayKey] = useState(0);
   const [grammarQuery, setGrammarQuery] = useState("");
   const [drawing, setDrawing] = useState(false);
@@ -1667,10 +1671,10 @@ export function BunkiPhase2(): ReactNode {
     : reviewSessionLimit(state.profile, due.length);
   const todayReviewMinutes = Math.max(0, Math.ceil(todayReviewCount * 0.42));
   const reviewCard = state.reviewSession
-    ? state.reviewSession.queue
+    ? (state.reviewSession.queue
         .filter((id) => !state.reviewSession?.completedCardIds.includes(id))
         .map((id) => state.cards.find((card) => card.id === id))
-        .find((card): card is LearningCard => card !== undefined)
+        .find((card): card is LearningCard => card !== undefined) ?? null)
     : null;
   const intervalPreviews = useMemo(
     () => (reviewCard === null ? null : ratingPreviews(reviewCard)),
@@ -2040,6 +2044,31 @@ export function BunkiPhase2(): ReactNode {
       setView("immerse");
       setImmerseMode("reader");
       setZenMode(true);
+    }
+  };
+
+  const pushDeepSurface = (
+    surface: "word-entry" | "kanji",
+    restore: () => void,
+  ): void => {
+    deepSurfaceStackRef.current.push({ surface, restore });
+    window.history.pushState(
+      { ...(window.history.state ?? {}), bunkiSurface: surface },
+      "",
+      window.location.href,
+    );
+  };
+
+  const consumeDeepSurface = (surface: "word-entry" | "kanji"): void => {
+    const stack = deepSurfaceStackRef.current;
+    if (
+      stack.length > 0 &&
+      stack[stack.length - 1].surface === surface &&
+      window.history.state?.bunkiSurface === surface
+    ) {
+      stack.pop();
+      suppressNextPopRef.current += 1;
+      window.history.back();
     }
   };
 
@@ -3283,6 +3312,15 @@ export function BunkiPhase2(): ReactNode {
 
   useEffect(() => {
     const onPopState = (): void => {
+      if (suppressNextPopRef.current > 0) {
+        suppressNextPopRef.current -= 1;
+        return;
+      }
+      const deepTop = deepSurfaceStackRef.current.pop();
+      if (deepTop !== undefined) {
+        deepTop.restore();
+        return;
+      }
       if (!readerOpenRef.current) return;
       readerOpenRef.current = false;
       closeReaderWord();
@@ -3349,6 +3387,11 @@ export function BunkiPhase2(): ReactNode {
     setZenMode(false);
     setView("library");
     scrollDocumentTo(0);
+    if (context !== null)
+      pushDeepSurface("word-entry", () => {
+        restoreReaderLexicalReturn(context);
+        setDictionaryReturnContext(null);
+      });
   };
 
   const openReaderKanji = (
@@ -3368,6 +3411,12 @@ export function BunkiPhase2(): ReactNode {
     setStrokeReplayKey((current) => current + 1);
     setView("library");
     scrollDocumentTo(0);
+    if (context !== null)
+      pushDeepSurface("kanji", () => {
+        restoreReaderLexicalReturn(context);
+        setKanjiFocusMode(false);
+        setKanjiReturnContext(null);
+      });
   };
 
   const addUncertainty = (entry: VocabEntry, uncertainty: string): void => {
@@ -5550,6 +5599,7 @@ export function BunkiPhase2(): ReactNode {
           onClick={() => {
             restoreReaderLexicalReturn(dictionaryReturnContext);
             setDictionaryReturnContext(null);
+            consumeDeepSurface("word-entry");
           }}
         >
           <ArrowLeft size={16} />
@@ -5629,6 +5679,18 @@ export function BunkiPhase2(): ReactNode {
               setKanjiFocusMode(true);
               setStrokeReplayKey((current) => current + 1);
               scrollDocumentTo(0);
+              if (selectedWord) {
+                const word = selectedWord.word;
+                const wordId = selectedWord.id;
+                pushDeepSurface("kanji", () => {
+                  setLibraryQuery(word);
+                  setSelectedWordId(wordId);
+                  setLibraryTab("dictionary");
+                  scrollDocumentTo(0);
+                  setKanjiFocusMode(false);
+                  setKanjiReturnContext(null);
+                });
+              }
             }}
             onAsk={(entry) => {
               setTeacherInput(
@@ -5878,6 +5940,7 @@ export function BunkiPhase2(): ReactNode {
               }
               setKanjiFocusMode(false);
               setKanjiReturnContext(null);
+              consumeDeepSurface("kanji");
             }}
           >
             <ArrowLeft size={16} />
