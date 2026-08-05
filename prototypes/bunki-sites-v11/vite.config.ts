@@ -1,36 +1,55 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import vinext from "vinext";
-import { defineConfig } from "vite";
-import hostingConfig from "./.openai/hosting.json";
+import { defineConfig, type Plugin } from "vite";
 import { sites } from "./build/sites-vite-plugin";
+
+// Kuromoji downloads and inflates its own .dat.gz dictionaries. Vite's dev
+// static server otherwise labels them with Content-Encoding: gzip, causing the
+// browser to inflate them first and Kuromoji to receive invalid bytes.
+const rawGzipDictionaries = (): Plugin => ({
+  name: "bunki-raw-gzip-dictionaries",
+  configureServer(server) {
+    const publicDir = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "public",
+    );
+    server.middlewares.use((req, res, next) => {
+      const match = req.url?.match(/^\/(kuromoji\/[\w.-]+\.gz)(?:\?.*)?$/);
+      if (!match) {
+        next();
+        return;
+      }
+      const file = path.join(publicDir, match[1]);
+      if (!fs.existsSync(file)) {
+        next();
+        return;
+      }
+      res.setHeader("content-type", "application/octet-stream");
+      res.removeHeader("content-encoding");
+      fs.createReadStream(file).pipe(res);
+    });
+  },
+});
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
-
-const { d1, r2 } = hostingConfig;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
   main: "./worker/index.ts",
-  compatibility_flags: ["nodejs_compat"],
-  d1_databases: d1
-    ? [
-        {
-          binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
-        },
-      ]
-    : [],
-  r2_buckets: r2
-    ? [
-        {
-          binding: r2,
-          bucket_name: "site-creator-r2",
-        },
-      ]
-    : [],
+  d1_databases: [
+    {
+      binding: "DB",
+      database_name: "bunki-local",
+      database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+    },
+  ],
+  r2_buckets: [],
 };
 
 export default defineConfig(async () => {
@@ -52,6 +71,7 @@ export default defineConfig(async () => {
         : {}),
     },
     plugins: [
+      rawGzipDictionaries(),
       vinext(),
       sites(),
       cloudflare({

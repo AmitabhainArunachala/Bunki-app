@@ -16,3 +16,7 @@ docs/handoffs/
 # Append-only multi-agent evidence (orchestration spec §2.6). Format churn here
 # would collide across agents working in parallel.
 docs/build-evidence/
+
+# Preserved Sites v11 prototype snapshot — reformatting is editing; its bytes
+# are the historical baseline (docs/handoffs/BUNKI_SITES_V11_...HANDOFF).
+prototypes/

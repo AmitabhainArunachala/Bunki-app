@@ -1,108 +1,90 @@
-# vinext-starter
+# Bunki Living Japanese
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Bunki is an offline-first Japanese learning app that joins reading, dictionary
+lookup, kanji, sentence mining, SRS review, and an AI conversation coach around
+the learner’s real encounters.
 
-## Prerequisites
+This directory contains the complete v11 web application. It is ordinary source
+code: it can be cloned, tested, run in GitHub Codespaces, and deployed from
+GitHub Actions. It is no longer dependent on a private Codex workspace snapshot.
 
-- Node.js `>=22.13.0`
-- Linux with `flock`, `curl`, and GNU `timeout`
+## Open from GitHub
 
-## Sites Lifecycle
+[Open Bunki in GitHub Codespaces](https://codespaces.new/AmitabhainArunachala/Bunki-app?quickstart=1)
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+The repository’s dev container installs this app, starts it, forwards port
+`5173`, and opens the preview. In a normal clone:
 
-This starter does not use `wrangler.jsonc`.
-
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout and then validates the Sites artifact. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
-
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
-
-## Included Shape
-
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+cd prototypes/bunki-sites-v11
+npm ci
+npm run dev
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Requirements: Node.js `>=22.13.0` and Linux/macOS with `bash`.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+## Verified commands
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+npm run lint
+npm run test:unit
+npx playwright install chromium webkit
+npm run test:e2e
+npm run build
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+`test:unit` includes a production Vinext build and the deterministic engine,
+persistence, reading, and rendering tests. `test:e2e` runs the real hydrated app
+in mobile Chromium, mobile WebKit, and desktop Chromium. The critical paths
+cover onboarding, article-card opening, non-empty reader bodies, centered mobile
+geometry, Zen appearance, explicit Back, and browser Back.
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+## GitHub-driven public deployment
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+The repository workflow `.github/workflows/bunki-v11.yml` verifies every pull
+request. A verified push to `main` deploys this same Vinext Worker to Cloudflare
+when these GitHub repository secrets are present:
 
-## Diagnostic Commands
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
 
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build and validate the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build, validate, and verify the rendered development-preview metadata
-- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+The first deploy creates a public `*.workers.dev` URL and records it in the
+GitHub deployment. No source is copied from an unpublished site during this
+process; GitHub is the source of truth.
 
-Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
+GitHub Pages is intentionally not used for the primary app. Pages is a static
+host and cannot run Bunki’s server-side RSS/article import, AI, transcript, or
+sync routes. Presenting a reduced static shell as the full app would be
+misleading.
 
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
+## Runtime modes
 
-## Learn More
+- Anonymous public use stores learning state in IndexedDB on the current device.
+- RSS discovery and publisher article import run through server routes.
+- AI teacher/generation, automatic YouTube transcript import, and cross-device
+  cloud sync require a production identity layer and server configuration.
+- Export JSON before changing domains. Use Library → Memory → Restore JSON on
+  the new domain to migrate the device’s sources, cards, and review history.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+`OPENAI_API_KEY` belongs only in the Worker’s secret store. Never put it in
+GitHub, client code, or a public environment variable.
+
+## Main source map
+
+- `app/components/bunki-phase2.tsx` — product interaction surface
+- `app/phase2.css` — responsive and Zen presentation
+- `app/lib/reading-catalog.ts` — packaged graded and public-domain readings
+- `app/lib/reading-feeds.ts` — reviewed live publisher feeds and extraction
+- `app/lib/mining-engine.ts` — source analysis and contextual card proposals
+- `app/lib/phase2-scheduler.ts` — FSRS review behavior
+- `app/api/` — state, reader import, teacher, generation, and transcript routes
+- `tests/e2e/` — browser acceptance paths
+- `wrangler.jsonc` — standalone Cloudflare Worker deployment
+
+## Data and attribution
+
+JMdict/KANJIDIC2 © EDRDG, CC BY-SA 4.0. KanjiVG is CC BY-SA 3.0. Kuromoji is
+Apache 2.0. JLPT labels are editorial estimates; JLPT does not publish a
+canonical vocabulary or grammar inventory. AI-generated text is marked as
+generated, and publisher summaries are explicitly distinguished from imported
+full pages.

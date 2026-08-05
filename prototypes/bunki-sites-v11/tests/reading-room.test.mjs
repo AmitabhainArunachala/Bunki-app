@@ -113,7 +113,9 @@ test("immersion cards and titles share one obvious Bunki Reader action", async (
   assert.match(component, /Tap anywhere on a card—including its title—to open Bunki Reader/);
   assert.match(component, /aria-label=\{`Read \$\{item\.title\} in Bunki Reader`\}/);
   assert.match(component, /onClick=\{\(\) => void importLiveReading\(item\)\}/);
-  assert.match(component, /publisher summary \(the full page could not be extracted\)/);
+  assert.match(component, /PUBLISHER SUMMARY ONLY/);
+  assert.match(component, /PUBLISHER FEED TEXT/);
+  assert.match(component, /AbortSignal\.timeout\(15_000\)/);
   assert.match(component, /Pick up where you left off/);
   assert.match(component, /For you · \{readingLevel\}/);
 });
@@ -190,14 +192,20 @@ test("reader dictionary kanji drill into full pages and preserve the source retu
     readFile(new URL("../app/phase2.css", import.meta.url), "utf8"),
   ]);
   assert.match(component, /aria-label=\{`Open \$\{entry\.char\} kanji page`\}/);
+  assert.match(
+    component,
+    /aria-label=\{`Open \$\{character\} kanji from \$\{readerToken\.surface\}`\}/,
+  );
+  assert.match(component, /Open full word entry for/);
   assert.match(component, /data-kanji-character=\{entry\.char\}/);
-  assert.match(component, /openReaderKanji\(entry\)/);
+  assert.match(component, /openReaderKanji\(entry, readerToken\)/);
   assert.match(component, /setKanjiReturnContext\(\{/);
+  assert.match(component, /setDictionaryReturnContext\(context\)/);
   assert.match(component, /setZenMode\(false\)/);
   assert.match(component, /setKanjiFocusMode\(true\)/);
   assert.match(component, /setView\("library"\)/);
-  assert.match(component, /Back to source sentence/);
-  assert.match(component, /setReaderSentence\(kanjiReturnContext\.sentenceIndex\)/);
+  assert.match(component, /Back to source word/);
+  assert.match(component, /restoreReaderLexicalReturn\(kanjiReturnContext\)/);
   assert.match(component, /setImmerseMode\("reader"\)/);
   assert.match(component, /Examples from your immersion/);
   assert.match(component, /Replay stroke order/);

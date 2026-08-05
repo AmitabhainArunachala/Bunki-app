@@ -154,7 +154,7 @@ export function readablePartOfSpeech(value: string): string {
 let dictionaryPromise: Promise<DictionaryIndex> | null = null;
 
 export function loadDictionary(): Promise<DictionaryIndex> {
-  dictionaryPromise ??= fetch("/kotobako-static.json")
+  dictionaryPromise ??= fetch("./kotobako-static.json")
     .then((response) => {
       if (!response.ok) throw new Error("The Japanese dictionary could not be loaded.");
       return response.json() as Promise<DictionaryPayload>;

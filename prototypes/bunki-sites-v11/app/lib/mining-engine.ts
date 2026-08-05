@@ -403,7 +403,7 @@ export function stageSourcePacket(
           ) === candidate.surface),
     )
     .slice(0, limit)
-    .map((candidate) => {
+    .map((candidate, proposalIndex) => {
     const previous = previousContext(
       state,
       candidate.conceptId,
@@ -479,13 +479,15 @@ export function stageSourcePacket(
           : "recognition",
       origin: "source",
       generated: false,
-      selected: true,
+      // Keep the default light. Learners can add more, but Bunki never
+      // silently turns every unknown item into review debt.
+      selected: proposalIndex < 3,
     };
     });
   return {
     id: `packet-${crypto.randomUUID()}`,
     sourceId: source.id,
-    title: `Learning edge · ${source.title}`,
+    title: `Useful words from ${source.title}`,
     createdAt: new Date().toISOString(),
     proposals,
   };

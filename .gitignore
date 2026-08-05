@@ -44,3 +44,8 @@ yarn-error.*
 .DS_Store
 .vscode/
 .idea/
+
+# Sites v11 prototype build/runtime outputs
+prototypes/bunki-sites-v11/dist/
+prototypes/bunki-sites-v11/.vinext/
+prototypes/bunki-sites-v11/.sites-runtime/
