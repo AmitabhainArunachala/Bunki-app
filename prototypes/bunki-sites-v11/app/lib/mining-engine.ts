@@ -117,14 +117,14 @@ function candidateReason(
   },
 ): string {
   if (candidate.memoryState === "fragile")
-    return "Reinforce: previous review evidence is fragile, so Bunki chose a fresh source sentence.";
+    return "You have missed this before — here it is in a new sentence.";
   if (candidate.sourceRecurrence > 1)
-    return `Acquire: it appeared in ${String(candidate.sourceRecurrence)} different sources and is not established.`;
+    return `Appears in ${String(candidate.sourceRecurrence)} of your sources.`;
   if (candidate.recurrence > 1)
-    return `Acquire: it recurs ${String(candidate.recurrence)} times in this source.`;
+    return `Appears ${String(candidate.recurrence)} times in this text.`;
   if (candidate.level)
-    return `Acquire: ${candidate.level} is close to the learner’s provisional edge and the sentence remains useful.`;
-  return "Acquire: a content word in a useful sentence, ranked below stronger evidence.";
+    return `${candidate.level} — about your level, in a sentence worth keeping.`;
+  return "A content word in a sentence worth keeping.";
 }
 
 export function analyzeSource(
@@ -219,7 +219,7 @@ export function analyzeSource(
       reason:
         readerConfidence(memory) >= 0.72 &&
         (memory?.axes.production.confidence ?? 0) < 0.42
-          ? "Activate: this word is readable, but production is still at the edge. Use the source sentence as a model."
+          ? "You can read it, but not use it yet — this sentence is a model."
           : candidateReason({
               recurrence: count,
               sourceRecurrence,
@@ -274,7 +274,7 @@ export function analyzeSource(
         levelScore(pattern.level, state),
       reason:
         derived === "fragile"
-          ? "Reinforce: this grammar previously caused difficulty and appears in a real sentence."
+          ? "This grammar tripped you before, and here it is in a real sentence."
           : `${pattern.level} grammar detected in the source; level labels are editorial estimates.`,
       memoryState: derived,
     });

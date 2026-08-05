@@ -244,9 +244,9 @@ export function bestNextAction(state: Phase2State, at = new Date()): NextAction 
   if (!state.profile.onboardingComplete) {
     return {
       kind: "onboard",
-      title: "Find your starting edge",
-      detail: "A short setup creates your first real learning path.",
-      reason: "Bunki has no evidence about you yet.",
+      title: "Set up your first path",
+      detail: "Two minutes: your level and what you like reading.",
+      reason: "Bunki does not know you yet — two minutes of setup fixes that.",
       minutes: 2,
       sourceId: null,
     };
@@ -258,12 +258,12 @@ export function bestNextAction(state: Phase2State, at = new Date()): NextAction 
     const estimate = Math.max(1, Math.ceil(sessionSize * 0.42));
     return {
       kind: "review",
-      title: `Review ${String(sessionSize)} due thread${sessionSize === 1 ? "" : "s"}`,
-      detail: `About ${String(estimate)} minute${estimate === 1 ? "" : "s"} · source context preserved`,
+      title: `Review ${String(sessionSize)} card${sessionSize === 1 ? "" : "s"}`,
+      detail: `About ${String(estimate)} minute${estimate === 1 ? "" : "s"}`,
       reason:
         fragileMemories(state).length > 0
-          ? "A fragile concept is due before new material."
-          : "These memories are at their scheduled retrieval edge.",
+          ? "Something shaky is due before anything new."
+          : "These are about to fade.",
       minutes: estimate,
       sourceId: null,
     };
@@ -278,9 +278,9 @@ export function bestNextAction(state: Phase2State, at = new Date()): NextAction 
     if (active.analysis === null && active.text.trim() !== "") {
       return {
         kind: "analyze-source",
-        title: `Find the edge in “${active.title}”`,
-        detail: "Preview a small, ranked packet before anything enters SRS.",
-        reason: "This source has text but Bunki has not compared it with your memory.",
+        title: `See the new words in “${active.title}”`,
+        detail: "Preview suggested cards — nothing is saved until you approve.",
+        reason: "Bunki has not looked for new words here yet.",
         minutes: 4,
         sourceId: active.id,
       };
@@ -291,8 +291,8 @@ export function bestNextAction(state: Phase2State, at = new Date()): NextAction 
       detail: `${String(Math.round(active.progress))}% read · resume at sentence ${String(active.readingSentence + 1)}`,
       reason:
         active.analysis?.unknownCount
-          ? `${String(active.analysis.unknownCount)} possible learning edges remain; Bunki will keep the packet small.`
-          : "Continuing one thread creates better evidence than opening another dashboard.",
+          ? `${String(active.analysis.unknownCount)} words here you have not met yet.`
+          : "Finishing this beats starting something new.",
       minutes: Math.min(20, state.profile.dailyMinutes),
       sourceId: active.id,
     };

@@ -1953,7 +1953,7 @@ export function BunkiPhase2(): ReactNode {
       status: text === "" ? "inbox" : "ready",
       title:
         captureTitle.trim() ||
-        (kind === "youtube" ? "YouTube saved while walking" : "Saved source"),
+        (kind === "youtube" ? "Saved YouTube video" : "Saved source"),
       url,
       text,
       addedAt: iso(),
@@ -1974,7 +1974,7 @@ export function BunkiPhase2(): ReactNode {
         createActivity(
           "source-added",
           text === ""
-            ? `Saved “${source.title}” to the walking inbox`
+            ? `Saved “${source.title}” to your inbox`
             : `Added “${source.title}” for analysis`,
           [],
           source.id,
@@ -2427,7 +2427,7 @@ export function BunkiPhase2(): ReactNode {
             ? {
                 ...item,
                 title:
-                  item.title === "YouTube saved while walking" && payload.title
+                  item.title === "Saved YouTube video" && payload.title
                     ? payload.title
                     : item.title,
                 text: payload.text ?? "",
@@ -2768,7 +2768,7 @@ export function BunkiPhase2(): ReactNode {
       activity: [
         createActivity(
           "review",
-          `${rating === 1 ? "Missed" : rating === 2 ? "Hard" : rating === 3 ? "Recalled" : "Easy"} · ${reviewCard.conceptId}`,
+          `${rating === 1 ? "Again" : rating === 2 ? "Hard" : rating === 3 ? "Good" : "Easy"} · ${reviewCard.conceptId}`,
           [reviewCard.conceptId],
           reviewCard.sourceId,
         ),
@@ -2836,7 +2836,7 @@ export function BunkiPhase2(): ReactNode {
   const deleteCard = (card: LearningCard): void => {
     if (
       !window.confirm(
-        "Delete this card? Its review history will remain in the activity record.",
+        "Delete this card?",
       )
     )
       return;
@@ -3503,8 +3503,7 @@ export function BunkiPhase2(): ReactNode {
               : "Start with one clear thread."}
           </h1>
           <p>
-            Bunki chooses the next action from your encounters, reviews, and
-            current source—not a decorative score.
+            Picked from what you have been reading and what is due.
           </p>
         </div>
         <button
@@ -3545,8 +3544,8 @@ export function BunkiPhase2(): ReactNode {
         <Surface className="p2-noticed">
           <div className="p2-section-title">
             <div>
-              <span className="p2-eyebrow">Bunki noticed</span>
-              <h2>The weave is changing here</h2>
+              <span className="p2-eyebrow">Needs attention</span>
+              <h2>Words slipping or almost yours</h2>
             </div>
             <Gauge size={21} />
           </div>
@@ -3580,8 +3579,7 @@ export function BunkiPhase2(): ReactNode {
             <div className="p2-empty compact">
               <Sparkles size={24} />
               <p>
-                Your first lookup, source, or review will give Bunki something
-                real to notice.
+                Read something and the words you look up will show up here.
               </p>
             </div>
           )}
@@ -3590,7 +3588,7 @@ export function BunkiPhase2(): ReactNode {
         <Surface className="p2-workload">
           <div className="p2-section-title">
             <div>
-              <span className="p2-eyebrow">Today’s load</span>
+              <span className="p2-eyebrow">Today’s reviews</span>
               <h2>
                 {hasActiveReviewSession
                   ? `${String(todayReviewCount)} left in this session`
@@ -3662,7 +3660,7 @@ export function BunkiPhase2(): ReactNode {
               className="p2-button primary"
               onClick={() => setCaptureOpen(true)}
             >
-              <Plus size={17} /> Capture what you met
+              <Plus size={17} /> Add something to read
             </button>
           )}
         </Surface>
@@ -3674,7 +3672,7 @@ export function BunkiPhase2(): ReactNode {
             <Mic2 size={20} />
           </span>
           <div>
-            <strong>Walking capture</strong>
+            <strong>Quick capture</strong>
             <small>Paste a URL now. Process it later.</small>
           </div>
           <Plus size={19} />
@@ -3685,7 +3683,7 @@ export function BunkiPhase2(): ReactNode {
         <div className="p2-section-title">
           <div>
             <span className="p2-eyebrow">Ready to read · text included</span>
-            <h2>Open a real article, not an empty link.</h2>
+            <h2>Ready to read now</h2>
           </div>
           <BookOpen size={20} />
         </div>
@@ -3748,11 +3746,6 @@ export function BunkiPhase2(): ReactNode {
             );
           })}
         </div>
-        <small>
-          Every card above contains Japanese text now. Live publisher articles
-          stay in Immerse, where “Read here” imports the original page before
-          opening the reader.
-        </small>
       </Surface>
     </div>
   );
@@ -3825,7 +3818,7 @@ export function BunkiPhase2(): ReactNode {
             <div className="p2-reading-chooser-title">
               <div>
                 <span className="p2-eyebrow">Reading shelf</span>
-                <h2>Set the edge. Then the interface disappears.</h2>
+                <h2>Pick a level and a length.</h2>
               </div>
               <SlidersHorizontal size={21} />
             </div>
@@ -3899,7 +3892,7 @@ export function BunkiPhase2(): ReactNode {
               <span>
                 <WandSparkles size={17} /> Personal reading
               </span>
-              <h2>Generate at your exact edge</h2>
+              <h2>Generate an article at your level</h2>
               <p>
                 Bunki asks for a natural {readingLevel}, {readingLength}{" "}
                 article. Generated writing is always marked and never presented
@@ -4044,10 +4037,8 @@ export function BunkiPhase2(): ReactNode {
                     <span>active domains</span>
                   </div>
                   <p>
-                    {feedTextReadyCount >= 300 &&
-                    availableLiveDomains.length >= 24
-                      ? "Publisher-text gate met: 300+ readable feed bodies across 24+ active domains."
-                      : "This is an honest live index, not a claim that every publisher page has been verified. Bunki checks the full body when you open it."}
+                    Bunki loads the full article when you open it. Some
+                    publishers only allow their summary.
                   </p>
                 </div>
               ) : null}
@@ -4088,7 +4079,7 @@ export function BunkiPhase2(): ReactNode {
               {liveReadingBusy && liveReadings.length === 0 ? (
                 <div className="p2-language-loading">
                   <LoaderCircle className="spin" />
-                  <span>Opening dozens of publisher feeds…</span>
+                  <span>Loading articles…</span>
                 </div>
               ) : filteredLiveReadings.length > 0 ? (
                 <>
@@ -4265,7 +4256,7 @@ export function BunkiPhase2(): ReactNode {
             {activeSource === null ? (
               <div className="p2-empty hero">
                 <BookOpen size={35} />
-                <h2>Your first real source starts the weave.</h2>
+                <h2>Nothing to read yet.</h2>
                 <p>
                   Save only a URL while walking, or paste an article or
                   transcript now.
@@ -4816,14 +4807,14 @@ export function BunkiPhase2(): ReactNode {
                         <span>
                           {activeSource.analysis.knownCount} established ·{" "}
                           {activeSource.analysis.learningCount} learning ·{" "}
-                          {activeSource.analysis.unknownCount} unmeasured
+                          {activeSource.analysis.unknownCount} new
                         </span>
                       </>
                     ) : (
                       <>
                         <strong>Not analyzed against your memory yet</strong>
                         <span>
-                          Analysis creates proposals, never hidden review debt.
+                          Nothing is added to review without your approval.
                         </span>
                       </>
                     )}
@@ -5110,10 +5101,9 @@ export function BunkiPhase2(): ReactNode {
       <header className="p2-page-head">
         <div>
           <span className="p2-eyebrow">Review · 復習</span>
-          <h1>Retrieve the thread, not a floating fact.</h1>
+          <h1>Review</h1>
           <p>
-            FSRS schedules each card; Bunki keeps the source, skill, and reason
-            visible.
+            Each card keeps the sentence you met it in.
           </p>
         </div>
         <div className="p2-review-head-actions">
@@ -5134,8 +5124,7 @@ export function BunkiPhase2(): ReactNode {
               <ListChecks size={36} />
               <h2>{due.length} cards are at their retrieval edge.</h2>
               <p>
-                A frozen session prevents the target from moving while you
-                review.
+                The set is fixed once you start.
               </p>
               <button className="p2-button primary" onClick={startSession}>
                 Start · about{" "}
@@ -5148,10 +5137,9 @@ export function BunkiPhase2(): ReactNode {
           ) : (
             <>
               <Check size={36} />
-              <h2>Nothing is due.</h2>
+              <h2>Nothing to review right now.</h2>
               <p>
-                Read a source, admit a staged packet, or continue a
-                conversation.
+                New cards come from what you read — go find something.
               </p>
               <button className="p2-button" onClick={() => setView("immerse")}>
                 Continue immersion
@@ -5163,11 +5151,8 @@ export function BunkiPhase2(): ReactNode {
         <Surface className="p2-review-finished">
           <Sparkles size={38} />
           <span className="p2-eyebrow">Session complete</span>
-          <h2>{reviewProgress.completed} threads retrieved.</h2>
-          <p>
-            Bunki updated skill evidence separately; one Easy answer did not
-            magically make every dimension “known.”
-          </p>
+          <h2>{reviewProgress.completed} done.</h2>
+          <p>Next reviews are scheduled.</p>
           <button
             className="p2-button primary"
             onClick={() => {
@@ -5236,9 +5221,9 @@ export function BunkiPhase2(): ReactNode {
                 <div className="p2-ratings">
                   {(
                     [
-                      [1, "Soon"],
+                      [1, "Again"],
                       [2, "Hard"],
-                      [3, "Medium"],
+                      [3, "Good"],
                       [4, "Easy"],
                     ] as const
                   ).map(([rating, label]) => (
@@ -5261,7 +5246,7 @@ export function BunkiPhase2(): ReactNode {
         <header>
           <div>
             <span className="p2-eyebrow">Card manager</span>
-            <h2>Every learning object stays reachable.</h2>
+            <h2>All your cards</h2>
           </div>
           <span>{state.cards.length} total</span>
         </header>
@@ -5346,10 +5331,9 @@ export function BunkiPhase2(): ReactNode {
       <header className="p2-page-head">
         <div>
           <span className="p2-eyebrow">Coach · 会話</span>
-          <h1>Conversation should change the learning model.</h1>
+          <h1>Practice conversation</h1>
           <p>
-            Live AI uses a bounded learner snapshot; every card remains an
-            editable proposal.
+            Bunki sees the words you are working on. Any card it suggests is yours to edit.
           </p>
         </div>
         <div className={`p2-ai-status ${teacherConnection}`}>
@@ -5359,7 +5343,7 @@ export function BunkiPhase2(): ReactNode {
             : teacherConnection === "signin"
               ? "Sign in required"
               : teacherConnection === "not-connected"
-                ? "AI server secret not connected"
+                ? "Practice mode"
                 : teacherConnection === "offline"
                   ? "Local practice coach"
                   : "Live AI when connected"}
@@ -5387,8 +5371,7 @@ export function BunkiPhase2(): ReactNode {
                 <Bot size={31} />
                 <h2>何について話しましょうか。</h2>
                 <p>
-                  Talk about today’s walk, a source, philosophy, AI, or a phrase
-                  you could not quite use.
+                  Ask about anything you have been reading, or a phrase you could not quite use.
                 </p>
                 <div>
                   {[
@@ -5466,8 +5449,7 @@ export function BunkiPhase2(): ReactNode {
             )}
             {teacherBusy ? (
               <div className="p2-teacher-thinking">
-                <LoaderCircle className="spin" /> Bunki is listening to the
-                thread…
+                <LoaderCircle className="spin" /> Thinking…
               </div>
             ) : null}
             <div ref={messagesEndRef} aria-hidden="true" />
@@ -5482,8 +5464,7 @@ export function BunkiPhase2(): ReactNode {
             </a>
           ) : teacherConnection === "not-connected" ? (
             <div className="p2-signin-note">
-              The live route is implemented, but no production OpenAI secret is
-              configured. Replies below are clearly labelled local practice—not
+              Live AI is not set up on this server yet. Replies below are clearly labelled local practice—not
               AI evaluation.
             </div>
           ) : null}
@@ -5522,7 +5503,7 @@ export function BunkiPhase2(): ReactNode {
             </p>
           </Surface>
           <Surface>
-            <span className="p2-eyebrow">Adaptive edge</span>
+            <span className="p2-eyebrow">Words in play</span>
             {frontier.slice(0, 5).map((item) => (
               <div className="p2-context-item" key={item.conceptId}>
                 <StatusPill state={item.state} />
@@ -5532,7 +5513,7 @@ export function BunkiPhase2(): ReactNode {
                 </strong>
               </div>
             ))}
-            {frontier.length === 0 ? <p>No measured frontier yet.</p> : null}
+            {frontier.length === 0 ? <p>Nothing yet — words appear as you read and review.</p> : null}
           </Surface>
         </aside>
       </div>
@@ -5576,10 +5557,9 @@ export function BunkiPhase2(): ReactNode {
       {libraryQuery.trim() === "" ? (
         <div className="p2-empty hero">
           <Languages size={34} />
-          <h2>Look up a word without losing its history.</h2>
+          <h2>Look up any word</h2>
           <p>
-            Search channels keep English, acronyms, romaji, kana, and Japanese
-            spelling distinct.
+            Search in Japanese, kana, romaji, or English.
           </p>
         </div>
       ) : (
@@ -5919,7 +5899,7 @@ export function BunkiPhase2(): ReactNode {
         {selectedKanji ? (
           <div className="p2-kanji-grid">
             <Surface className="p2-kanji-main">
-              <span className="p2-eyebrow">Jōyō kanji thread</span>
+              <span className="p2-eyebrow">Jōyō kanji</span>
               <div className="p2-kanji-heading">
                 <button
                   type="button"
@@ -5938,9 +5918,9 @@ export function BunkiPhase2(): ReactNode {
                 <div>
                   <h2>{selectedKanji.char}</h2>
                   <span>
-                    {selectedKanji.strokeCount} indexed strokes
+                    {selectedKanji.strokeCount} strokes
                     {selectedKanji.strokes.length !== selectedKanji.strokeCount
-                      ? ` · ${String(selectedKanji.strokes.length)} SVG paths`
+                      ? ""
                       : ""}
                     {" · "}grade {selectedKanji.grade ?? "—"} ·{" "}
                     {selectedKanji.jlpt ?? "unmapped"}
@@ -6178,19 +6158,19 @@ export function BunkiPhase2(): ReactNode {
       <div className="p2-memory-overview">
         <Surface>
           <strong>{Object.keys(state.memories).length}</strong>
-          <span>measured concepts</span>
+          <span>words tracked</span>
         </Surface>
         <Surface>
           <strong>{summary.established}</strong>
-          <span>established across evidence</span>
+          <span>solid</span>
         </Surface>
         <Surface>
           <strong>{summary.fragile}</strong>
-          <span>fragile threads</span>
+          <span>shaky</span>
         </Surface>
         <Surface>
           <strong>{state.sources.length}</strong>
-          <span>source lineages</span>
+          <span>sources</span>
         </Surface>
       </div>
       <div className="p2-export-row">
@@ -6284,8 +6264,7 @@ export function BunkiPhase2(): ReactNode {
           <span className="p2-eyebrow">Library · 辞典</span>
           <h1>Look up, connect, and deliberately learn.</h1>
           <p>
-            Dictionary volume is infrastructure. Bunki adds ranking, memory,
-            lineage, kanji, grammar, and staged study.
+            Dictionary, kanji, and grammar — connected to what you have actually read.
           </p>
         </div>
       </header>
@@ -6555,7 +6534,7 @@ export function BunkiPhase2(): ReactNode {
           renderView()
         )}
         <footer className="p2-footer">
-          <span>Bunki Phase 2 · source-driven adaptive alpha</span>
+          <span>Bunki alpha</span>
           <p>
             JMdict/KANJIDIC2 © EDRDG, CC BY-SA 4.0 · KanjiVG CC BY-SA 3.0 ·
             Kuromoji Apache 2.0. JLPT levels are editorial estimates. Generated
@@ -6666,7 +6645,7 @@ export function BunkiPhase2(): ReactNode {
           >
             <header>
               <div>
-                <span className="p2-eyebrow">Walking capture</span>
+                <span className="p2-eyebrow">Quick capture</span>
                 <h2 id="capture-title">Save now. Process later.</h2>
               </div>
               <button
@@ -6699,7 +6678,7 @@ export function BunkiPhase2(): ReactNode {
               <input
                 value={captureTitle}
                 onChange={(event) => setCaptureTitle(event.target.value)}
-                placeholder="Today’s walk · AI philosophy video"
+                placeholder="Optional title"
               />
             </label>
             <button
@@ -6773,7 +6752,7 @@ export function BunkiPhase2(): ReactNode {
                 <small className="p2-honesty-note">
                   <ShieldCheck size={14} /> Public captions depend on YouTube
                   availability. Automatic OCR, protected-media scraping, and
-                  audio transcription are not silently simulated.
+                  audio transcription need a connected service.
                 </small>
               </div>
             ) : null}
@@ -6827,8 +6806,8 @@ export function BunkiPhase2(): ReactNode {
           >
             <header>
               <div>
-                <span className="p2-eyebrow">Card lifecycle</span>
-                <h2 id="edit-card-title">Repair the learning object</h2>
+                <span className="p2-eyebrow">Edit</span>
+                <h2 id="edit-card-title">Edit card</h2>
               </div>
               <button
                 type="button"
@@ -6974,7 +6953,7 @@ function Onboarding({
             ))}
           </div>
           {canClose ? (
-            <button onClick={onClose} aria-label="Close learning edge">
+            <button onClick={onClose} aria-label="Close setup">
               <X size={20} />
             </button>
           ) : null}
@@ -7422,7 +7401,7 @@ function KanjiStrokeGlyph({ entry }: { readonly entry: KanjiEntry }) {
       className="p2-kanji-glyph"
       viewBox="0 0 109 109"
       role="img"
-      aria-label={`${entry.char}, ${String(entry.strokeCount)} indexed strokes${entry.strokes.length === entry.strokeCount ? "" : `, ${String(entry.strokes.length)} SVG paths in the drawing dataset`}`}
+      aria-label={`${entry.char}, ${String(entry.strokeCount)} strokes`}
     >
       <g className="p2-kanji-guide">
         <rect x="5" y="5" width="99" height="99" />

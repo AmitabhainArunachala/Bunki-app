@@ -169,9 +169,9 @@ test("reader and review focus surfaces stay intentionally minimal", async () => 
   assert.doesNotMatch(component, /className="p2-sentence-play"/);
   assert.doesNotMatch(component, /Read current sentence aloud/);
   assert.match(component, /Reading atmosphere/);
-  assert.match(component, /\[1, "Soon"\]/);
+  assert.match(component, /\[1, "Again"\]/);
   assert.match(component, /\[2, "Hard"\]/);
-  assert.match(component, /\[3, "Medium"\]/);
+  assert.match(component, /\[3, "Good"\]/);
   assert.match(component, /\[4, "Easy"\]/);
   assert.match(
     styles,

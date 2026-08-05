@@ -421,7 +421,7 @@ export function localCoachResponse(
     cardProposals: [],
     nextMove: "Write one Japanese sentence; Bunki will keep it in this conversation.",
     whyThisFits:
-      "No live model is connected, so Bunki is offering a transparent level-aware practice frame without pretending to evaluate your Japanese.",
+      "Offline practice — fixed prompts, no AI feedback on your sentence.",
     mode: "local-coach",
     model: null,
   };
