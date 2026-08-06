@@ -10,7 +10,7 @@
 # NOTE: the Wayfinder #41 sketch listed 分かち書き as one of the rules.
 # The string 分かち書き does not appear anywhere in the 本編 text layer
 # (verified 2026-08-07); the document's spacing guidance is limited to
-# 「漢字とふりがな、行と行の間を空けるなどして、見やすくします」 (rule 15).
+# 「ふりがなの大きさ、漢字とふりがな、行と行の間を空けるなどして、見やすくします。」 (rule 15).
 
 source:
   name: 在留支援のためのやさしい日本語ガイドライン（本編）
