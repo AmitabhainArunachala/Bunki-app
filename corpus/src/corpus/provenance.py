@@ -46,9 +46,21 @@ _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _KNOWN_SAFE_TOKENS = {"CC0", "PD", "PDM", "PDL", "MIT", "BSD", "UNICODE"}
 _FORBIDDEN_TOKENS = {"NC", "ND"}
 
+# Government open-terms strings from #41 ("recognise both").
+_GOV_TERMS = ("政府標準利用規約", "公共データ利用規約")
+
 
 def _tokens(licence: str) -> set[str]:
     return {t.upper() for t in re.split(r"[^A-Za-z0-9.]+", licence) if t}
+
+
+def _normalized(licence: str) -> str:
+    """Upper-cased with separators removed, so spelled-out CC forms are
+    detectable ("Attribution-NonCommercial" → ATTRIBUTIONNONCOMMERCIAL).
+    Japanese licence wordings are NOT auto-classified (非営利 appears in both
+    permissive and restrictive sentences) — they fall to the notes requirement.
+    """
+    return re.sub(r"[^A-Za-z0-9]+", "", licence).upper()
 
 
 @dataclass(frozen=True)
@@ -85,33 +97,53 @@ def _validate(raw: dict, origin: str) -> Provenance:
 
     licence = str(raw["licence"])
     toks = _tokens(licence)
+    norm = _normalized(licence)
 
-    if forbidden := toks & _FORBIDDEN_TOKENS:
+    forbidden = sorted(toks & _FORBIDDEN_TOKENS)
+    for marker in ("NONCOMMERCIAL", "NODERIV"):
+        if marker in norm:
+            forbidden.append(marker)
+    if forbidden:
         raise ProvenanceError(
-            f"{origin}: licence {licence!r} carries {sorted(forbidden)} — "
+            f"{origin}: licence {licence!r} carries {forbidden} — "
             "NC/ND assets may not enter the corpus (Wayfinder #41)"
         )
     if "RESEARCH" in toks or "研究" in licence:
         raise ProvenanceError(f"{origin}: research-only terms may not enter the corpus")
 
-    if "SA" in toks and pool is not Pool.SHARE_ALIKE:
+    is_sa = "SA" in toks or "SHAREALIKE" in norm
+    if is_sa and pool is not Pool.SHARE_ALIKE:
         raise ProvenanceError(
             f"{origin}: licence {licence!r} is ShareAlike but pool is {pool.value} — "
             "copyleft must live in the share_alike pool"
         )
 
+    is_gov = any(g in licence for g in _GOV_TERMS)
+    if is_gov:
+        residue = licence
+        for g in _GOV_TERMS:
+            residue = residue.replace(g, "")
+        residue = re.sub(r"(?i)[（）()第版\d\s.\-+]|ver(sion)?", "", residue)
+        if residue and not str(raw.get("notes") or ""):
+            raise ProvenanceError(
+                f"{origin}: extra terms around government licence string in {licence!r} — "
+                "state the legal basis in 'notes'"
+            )
+    is_by = "BY" in toks or "ATTRIBUTION" in norm or is_gov
     attribution = str(raw.get("attribution") or "")
-    if "BY" in toks and not attribution:
+    if is_by and not attribution:
         raise ProvenanceError(
             f"{origin}: licence {licence!r} requires attribution text in 'attribution'"
         )
 
-    if pool is Pool.PROPRIETARY_SAFE and not (toks & _KNOWN_SAFE_TOKENS or "BY" in toks):
-        if not str(raw.get("notes") or ""):
-            raise ProvenanceError(
-                f"{origin}: unrecognised licence {licence!r} in proprietary_safe pool — "
-                "state the legal basis in 'notes'"
-            )
+    recognised = bool(
+        toks & _KNOWN_SAFE_TOKENS or is_by or is_sa or "PUBLICDOMAIN" in norm
+    )
+    if not recognised and not str(raw.get("notes") or ""):
+        raise ProvenanceError(
+            f"{origin}: unrecognised licence {licence!r} in {pool.value} pool — "
+            "state the legal basis in 'notes'"
+        )
 
     upstream = raw["upstream"]
     if isinstance(upstream, str):

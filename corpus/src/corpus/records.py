@@ -37,7 +37,7 @@ class CorpusRecord:
         if not self.text:
             raise RecordError(f"{self.id}: text must be non-empty")
         try:
-            json.dumps(self.meta, ensure_ascii=False)
+            json.dumps(self.meta, ensure_ascii=False, allow_nan=False)
         except (TypeError, ValueError) as e:
             raise RecordError(f"{self.id}: meta is not JSON-serialisable: {e}") from None
 
@@ -52,13 +52,14 @@ def write_jsonl(records: Iterable[CorpusRecord], path: str | Path) -> int:
             if rec.id in seen:
                 raise RecordError(f"duplicate record id in one file: {rec.id}")
             seen.add(rec.id)
-            f.write(json.dumps(asdict(rec), ensure_ascii=False) + "\n")
+            f.write(json.dumps(asdict(rec), ensure_ascii=False, allow_nan=False) + "\n")
             n += 1
     return n
 
 
 def read_jsonl(path: str | Path) -> Iterator[CorpusRecord]:
-    with Path(path).open("r", encoding="utf-8") as f:
+    # utf-8-sig: BOM-bearing inputs are expected in this estate (Wayfinder #41).
+    with Path(path).open("r", encoding="utf-8-sig") as f:
         for i, line in enumerate(f, 1):
             line = line.strip()
             if not line:
@@ -67,4 +68,7 @@ def read_jsonl(path: str | Path) -> Iterator[CorpusRecord]:
                 raw = json.loads(line)
             except json.JSONDecodeError as e:
                 raise RecordError(f"{path}:{i}: invalid JSON: {e}") from None
-            yield CorpusRecord(**raw)
+            try:
+                yield CorpusRecord(**raw)
+            except TypeError as e:
+                raise RecordError(f"{path}:{i}: bad record shape: {e}") from None
