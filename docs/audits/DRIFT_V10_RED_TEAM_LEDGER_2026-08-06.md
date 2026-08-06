@@ -96,3 +96,38 @@ an intentional design choice (aesthetics). Each carries enough to resume.
   cluster (each fix re-tested with the exact attack payload that caught it). The
   _deferred_ findings were not driven to a fix, so their convergence loop is open
   by design, not by omission.
+
+---
+
+## Resolution — kanji-data rebuild (2026-08-06)
+
+`prototypes/drift/tools/rebuild_kanji_data.py` regenerates KINFO/KRAD from
+KanjiVG (strokes + components, canonical) and the KANJIDIC2-derived
+`kanji.json` (readings + meanings). Landed:
+
+- **Nav dead-ends closed.** Every one of the 1,974 kanji in the lexicon now
+  has KINFO (was 149 with neither KINFO nor KRAD); KRAD covers all but the 63
+  atomic Kangxi radicals, which correctly have no decomposition. KanjiVG was
+  fetched for the 149 uncovered glyphs (+ 綺, which had readings but no cached
+  glyph).
+- **Wrong readings fixed.** Readings now carry the full on (katakana) and kun
+  (with okurigana) sets rather than one collapsed, often-archaic kun. Curated
+  corrections for the named cases: 旺 → on オウ, no common kun (was かがや.き);
+  頑 → かたく.な (was かたく); 頒 → on ハン, no common kun (was わか.つ).
+- **Stroke counts fixed** from KanjiVG stroke-path counts: 稽 16 → 15,
+  衷 10 → 9, and every other glyph now matches its KanjiVG.
+- **Radical vs component honesty.** The card claims 部首 (radical) with its
+  Kangxi number only when the character actually has one (`RNUM`); for a
+  component with no classical radical number it now reads
+  「この字を含む漢字」 (kanji containing this character), not 「この部首の漢字」.
+
+Still deferred (needs KANJIDIC2 itself, blocked by the proxy in this
+environment): an authoritative per-kanji *classical* radical field
+(`RADICAL_OF`) distinct from the component families in `RADK`, and
+frequency-ranked reading ordering. `RADK` remains a component-family index
+("contains this component"), which is now what the UI says it is.
+
+Verification: `KINFO` 2,582 entries, 0 lexicon kanji missing KINFO; in-page
+smoke confirmed the corrected readings/strokes and that formerly-dead-end
+kanji (梢, 嘘, 蝶, …) resolve with readings and components; zero page errors.
+Republished to the same artifact URL as v10.2.
