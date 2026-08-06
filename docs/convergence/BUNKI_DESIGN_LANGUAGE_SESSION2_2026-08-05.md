@@ -805,3 +805,31 @@ artifact URL" step is NOT done here — that URL belongs to the original Claude
 Code session that minted it and cannot be republished from this environment.
 The patched file + this ledger ship as a PR; republish is left to the operator
 or the originating session.
+
+## 8.14 Staged reveal + radical explainer (2026-08-06)
+
+Operator, on the deployed one-app: two refinements to the Drift surface.
+
+**Staged reveal — English is earned, not shown.** In the resting universe no
+English appears under any word. The word carries three states now, not two:
+
+1. rest — the word alone.
+2. one tap — furigana (振り仮名) only rises; the tap-bloom of relatives still
+   swims in.
+3. two taps — the English gloss/equivalent appears beneath.
+
+A third tap (or the magnification dive) then carries you in; the dived,
+front-and-centre word shows both readings and English, because committing to a
+word is the third act. Implemented as `.unfolded` (furigana) → `.glossed`
+(English) classes; `tapNode` walks folded → unfolded → glossed → dive, and
+every collapse/restore/regrade site clears both. Floating kanji glyphs hide
+their English the same way until engaged.
+
+**Radicals, made legible.** The kanji/radical dictionary pane's family header
+was terse. It now reads plainly ("部首 149：この部首をもつ 70字") and carries a
+「部首とは？」 button that opens a radical explainer overlay — what a 部首 is (the
+classical component a kanji is filed under; 214 Kangxi radicals), the
+radical-vs-component distinction this build is careful about (§8.13), how to
+read the family list, and worked examples (氵 water → 海・泳・池; 木 tree →
+森・林・柱). The overlay is self-contained, so it works in the standalone
+artifact and on the deployed app alike.
