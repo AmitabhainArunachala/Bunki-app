@@ -1,0 +1,25 @@
+name: corpus-tests
+
+on:
+  pull_request:
+    paths:
+      - 'corpus/**'
+      - '.github/workflows/corpus-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: corpus
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.12'
+      - run: uv venv
+      - run: uv pip install -e ".[dev,wikinews,aozora,snow,grading]"
+      - run: uv run pytest tests -q -m "not realdata"

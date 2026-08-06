@@ -24,3 +24,7 @@ prototypes/
 # Generated Drift-tier data — the generator's compact output IS the format;
 # reformatting a 6,692-row lexicon into one-element-per-line helps nobody.
 apps/app/src/data/generated/
+
+# Python corpus subtree — its own toolchain; format/test discipline lives in
+# corpus CI (pytest), and committed samples are generated data.
+corpus/
