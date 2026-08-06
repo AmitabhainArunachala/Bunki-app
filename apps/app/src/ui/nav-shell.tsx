@@ -28,6 +28,21 @@ import { usePathname, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+/**
+ * Where the universe is, when there is one (the Pages build serves the study
+ * app under <site>/app/ with Drift at the site root —
+ * BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md §4). Null on native, on
+ * root-served web (the e2e harness), and anywhere the /app/ segment is absent,
+ * which is exactly where the link would be a lie.
+ */
+function universeHref(): string | null {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  const path = window.location.pathname;
+  const i = path.indexOf('/app/');
+  if (i === -1) return null;
+  return path.slice(0, i + 1);
+}
+
 import { navLinkStyle, themeSealStyle } from './interactive-styles.ts';
 import { SHELL_DESTINATIONS, type Destination } from './navigation.ts';
 import { useTheme, useThemeControl } from './theme-context.tsx';
@@ -86,7 +101,10 @@ export function NavShell({ children }: NavShellProps): ReactNode {
             />
           ))}
         </View>
-        <ThemeSeal />
+        <View style={styles.tail}>
+          <UniverseLink />
+          <ThemeSeal />
+        </View>
       </View>
       <View style={styles.body}>{children}</View>
     </View>
@@ -157,6 +175,45 @@ function NavLink({ destination, current }: NavLinkProps): ReactNode {
 }
 
 /**
+ * The way back into the universe (one-app convergence §4): a quiet link that
+ * renders only when the app is actually mounted beneath a Drift root. A full
+ * page navigation on purpose — the universe is a different document, and
+ * pretending it is a router destination would break the Back button.
+ */
+function UniverseLink(): ReactNode {
+  const theme = useTheme();
+  const [focused, setFocused] = useState(false);
+  const href = universeHref();
+  if (href === null) return null;
+
+  return (
+    <Pressable
+      accessibilityHint="Returns to the floating word universe"
+      accessibilityLabel="墨流し — the word universe"
+      accessibilityRole="link"
+      onBlur={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onPress={() => {
+        window.location.assign(href);
+      }}
+      style={({ pressed }) => [
+        styles.link,
+        {
+          borderColor: focused ? theme.color.focusRing : 'transparent',
+          borderWidth: focused ? 2 : 0,
+          opacity: pressed ? 0.7 : 1,
+        },
+      ]}
+      testID="nav-universe"
+    >
+      <Text style={[styles.linkLabel, { color: theme.color.pig2, fontFamily: theme.font.mincho }]}>
+        墨流し
+      </Text>
+    </Pressable>
+  );
+}
+
+/**
  * The theme seal (Drift fusion §3): a round 印 stamped with the current
  * theme's character. One tap advances to the next of the five nihonga
  * themes, in the prototype's cycle order. It sits at the far edge of the
@@ -208,8 +265,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  seal: { ...themeSealStyle, marginLeft: 'auto' },
+  seal: { ...themeSealStyle },
   sealGlyph: { fontSize: 17 },
   shell: { flex: 1 },
+  tail: { alignItems: 'center', flexDirection: 'row', gap: 8, marginLeft: 'auto' },
   wordmark: { fontSize: 22, letterSpacing: 4 },
 });

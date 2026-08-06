@@ -116,6 +116,9 @@
   #lvl.hot #lvlInfo{opacity:1}
   #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  #card .study{display:block;margin-top:13px;text-align:center;font-size:13px;
+    letter-spacing:.14em;color:var(--pig2);text-decoration:none;border:1px solid var(--line);
+    border-radius:999px;padding:9px 14px}
 </style>
 <canvas id="ink"></canvas>
 <div id="grain"></div>
@@ -1441,13 +1444,23 @@ function strokeSheet(ch){
 }
 
 // ---- card ----
+// When Drift is the opening surface of the deployed app, the wrapper sets
+// window.__BUNKI_APP_BASE and every card gains a real door into the study
+// screens. Standalone (the claude.ai artifact) the base is absent and the
+// card keeps its honest placeholder note instead of a link that would 404.
+function studyHtml(kind,key,fallback){
+  const base=typeof window!=="undefined"&&window.__BUNKI_APP_BASE;
+  if(!base) return '<div class="note">'+fallback+'</div>';
+  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">この'+
+    (kind==='word'?'語':'字')+'を学ぶ →</a>';
+}
 function openCard(n){
   if(n.kind==="word"){
     const ks=[...new Set(n.w)].filter(isKanji);
     card.innerHTML='<div class="yomi">'+esc(n.r)+'</div><h1>'+esc(n.w)+'</h1>'+
       '<div class="gloss">'+esc(n.g)+'</div><div class="row">'+
       ks.map(c=>'<div><div class="k">'+esc(c)+'</div><div class="kg">'+esc(glossOf(c))+'</div></div>').join("")+
-      '</div><div class="note">実物では、ここから完全な辞書へ — in the real app this opens the full entry.</div>';
+      '</div>'+studyHtml('word',n.w,'実物では、ここから完全な辞書へ — in the real app this opens the full entry.');
   } else if(n.kind==="part"){
     const d=PDEF[n.ch]||["","",""];
     const words=W.filter(e=>(e[4]||"").includes(n.ch));
@@ -1481,7 +1494,7 @@ function openCard(n){
       '<div class="gloss">'+(words.length?("appears in "+words.length+" words here"):
         (fam?("builds "+fam.length+" kanji"):("builds "+kin.length+" kanji here")))+'</div>'+
       (row?('<div class="row">'+row+'</div>'):"")+famHtml+
-      '<div class="note">実物では、ここから漢字ページへ — opens the full kanji page.</div>';
+      studyHtml('kanji',n.ch,'実物では、ここから漢字ページへ — opens the full kanji page.');
     const rl=card.querySelector(".rlist");
     if(rl) rl.addEventListener("click",e=>{
       const rr=e.target.closest?e.target.closest(".rrow"):null;

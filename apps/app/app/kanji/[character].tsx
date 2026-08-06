@@ -1,6 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
+import { findKanjiByCharacter } from '@/data/catalog';
+import { driftKanjiInfo } from '@/data/drift-lexicon';
+import { DriftKanjiScreen } from '@/screens/drift-kanji-screen';
 import { KanjiScreen } from '@/screens/kanji-screen';
 import { strokeSvgFor } from '@/data/stroke-sources';
 import { RouteTitle } from '@/ui/route-title';
@@ -18,6 +21,23 @@ export default function KanjiRoute(): ReactNode {
   const router = useRouter();
   const { character } = useLocalSearchParams<{ character: string }>();
   const resolved = typeof character === 'string' ? character : '';
+
+  // Seed first (ten curated kanji, stroke-order animation); any other
+  // character the Drift tier can render falls through to its page
+  // (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md §2).
+  if (findKanjiByCharacter(resolved) === null && driftKanjiInfo(resolved) !== null) {
+    return (
+      <>
+        <RouteTitle detail={resolved} href="/kanji/[character]" />
+        <DriftKanjiScreen
+          character={resolved}
+          onBack={() => router.push('/')}
+          onOpenKanji={(next) => router.push(`/kanji/${encodeURIComponent(next)}`)}
+          onOpenWord={(headword) => router.push(`/word/${encodeURIComponent(headword)}`)}
+        />
+      </>
+    );
+  }
 
   return (
     <>
