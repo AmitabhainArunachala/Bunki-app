@@ -36,7 +36,21 @@ from corpus.grading.lexical import lexical_signal
 from corpus.grading.tmr import tmr_signal
 
 SNOW_URL = "https://www.jnlp.org/cgi-priv/download.cgi?id=SNOW/T15"
+SNOW_SHA256 = "46f6e788e744876b08ca432c585e2942ac6a8a35c8c9ab6687ed7e371a0bc0ac"
 REFERENCE_VERSION = "v1"
+
+
+def verify_snow_file(path: str | Path) -> Path:
+    """sha256-verify the SNOW T15 xlsx against the recorded pin (same
+    discipline as ninjal.ensure_downloaded); raise on mismatch."""
+    path = Path(path)
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    if digest != SNOW_SHA256:
+        raise RuntimeError(
+            f"{path}: sha256 {digest} != pinned {SNOW_SHA256} — SNOW T15 "
+            "upstream changed or download corrupted; re-verify provenance"
+        )
+    return path
 
 
 def load_snow_pairs(xlsx_path: str | Path) -> list[tuple[str, str]]:

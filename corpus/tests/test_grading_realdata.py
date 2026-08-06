@@ -20,7 +20,12 @@ from pathlib import Path
 import pytest
 
 from corpus.grading.grade import grade, load_reference, ordinal
-from corpus.grading.reference import SNOW_URL, load_snow_pairs, sample_pairs
+from corpus.grading.reference import (
+    SNOW_URL,
+    load_snow_pairs,
+    sample_pairs,
+    verify_snow_file,
+)
 from corpus.records import CorpusRecord, read_jsonl, write_jsonl
 
 pytestmark = pytest.mark.realdata
@@ -39,13 +44,13 @@ SEED = 42
 
 def _ensure_snow() -> Path:
     if SNOW_XLSX.exists():
-        return SNOW_XLSX
+        return verify_snow_file(SNOW_XLSX)
     SNOW_XLSX.parent.mkdir(parents=True, exist_ok=True)
     page = urllib.request.urlopen(SNOW_URL).read().decode("utf-8", "replace")
     m = re.search(r'URL=(\S+?)"', page)
     assert m, "could not resolve SNOW T15 redirect from the jnlp.org download CGI"
     urllib.request.urlretrieve(m.group(1), SNOW_XLSX)
-    return SNOW_XLSX
+    return verify_snow_file(SNOW_XLSX)
 
 
 def _ensure_rashomon() -> str:

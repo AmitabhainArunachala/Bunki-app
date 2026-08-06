@@ -181,6 +181,17 @@ def test_custom_substrate_marks_mismatch():
     assert d["detail"]["substrate_mismatch"] is True
 
 
+def test_snow_pin_mismatch_raises(tmp_path):
+    from corpus.grading.reference import SNOW_SHA256, verify_snow_file
+
+    bad = tmp_path / "T15.xlsx"
+    bad.write_bytes(b"not the real corpus")
+    with pytest.raises(RuntimeError, match="sha256"):
+        verify_snow_file(bad)
+    # the pin and the committed reference must agree on the artifact
+    assert load_reference()["source"]["file_sha256"] == SNOW_SHA256
+
+
 def test_committed_reference_shape():
     assert REFERENCE_PATH.exists(), "reference_snow_t15.json must ship with the package"
     ref = load_reference()
