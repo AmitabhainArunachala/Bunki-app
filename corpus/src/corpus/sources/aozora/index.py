@@ -18,6 +18,7 @@ The usable filter is STRICT equality: 作品著作権フラグ == 'なし' AND
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import urllib.request
 import zipfile
@@ -25,10 +26,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Iterator
 
-INDEX_URL = (
-    "https://github.com/aozorabunko/aozorabunko/raw/master/"
-    "index_pages/list_person_all_extended_utf8.zip"
-)
+import yaml
+
+from corpus.provenance import ProvenanceError
+
+INDEX_ZIP = "list_person_all_extended_utf8.zip"
 CSV_NAME = "list_person_all_extended_utf8.csv"
 
 WORK_ID_COL = "作品ID"
@@ -52,16 +54,50 @@ TRANSLATOR_ROLE = "翻訳者"
 AOZORA_HOST_PREFIX = "https://www.aozora.gr.jp/"
 
 
-def fetch_index(dest_dir: str | Path, url: str = INDEX_URL, timeout: int = 120) -> Path:
-    """Download and extract the index CSV; returns the CSV path (cached)."""
+def _provenance() -> dict:
+    path = Path(__file__).resolve().parent / "PROVENANCE.yml"
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def pinned_index_url(pin: str) -> str:
+    return (
+        f"https://github.com/aozorabunko/aozorabunko/raw/{pin}/index_pages/{INDEX_ZIP}"
+    )
+
+
+def fetch_index(
+    dest_dir: str | Path,
+    url: str | None = None,
+    expected_sha256: str | None = None,
+    timeout: int = 120,
+) -> Path:
+    """Download and extract the index CSV; returns the CSV path (cached).
+
+    By default the zip is fetched at the ``upstream_pin`` commit recorded in
+    PROVENANCE.yml (never a moving branch) and its sha256 is verified against
+    the recorded ``artifact_sha256`` — a drifted or corrupted download raises
+    ``ProvenanceError`` instead of silently entering the pipeline.
+    """
     dest_dir = Path(dest_dir)
     dest_dir.mkdir(parents=True, exist_ok=True)
     csv_path = dest_dir / CSV_NAME
     if csv_path.exists():
         return csv_path
+    if url is None or expected_sha256 is None:
+        prov = _provenance()
+        if url is None:
+            url = pinned_index_url(prov["upstream_pin"])
+        if expected_sha256 is None:
+            expected_sha256 = prov["artifact_sha256"][INDEX_ZIP]
     with urllib.request.urlopen(url, timeout=timeout) as resp:
         payload = resp.read()
-    (dest_dir / Path(url).name).write_bytes(payload)
+    digest = hashlib.sha256(payload).hexdigest()
+    if digest != expected_sha256:
+        raise ProvenanceError(
+            f"{url}: downloaded sha256 {digest} does not match the recorded "
+            f"artifact_sha256 {expected_sha256} — index drifted from the pin"
+        )
+    (dest_dir / INDEX_ZIP).write_bytes(payload)
     with zipfile.ZipFile(io.BytesIO(payload)) as zf:
         csv_path.write_bytes(zf.read(CSV_NAME))
     return csv_path

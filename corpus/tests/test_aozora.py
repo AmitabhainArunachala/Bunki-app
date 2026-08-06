@@ -94,6 +94,71 @@ def test_collect_works_dedupes_and_gathers_roles():
     assert set(usable) == {"010"}, "新字旧仮名 work must not survive the filter"
 
 
+class _FakeResponse:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def read(self):
+        return self._payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def _mock_download(monkeypatch, payload):
+    import corpus.sources.aozora.index as index_module
+
+    monkeypatch.setattr(
+        index_module.urllib.request,
+        "urlopen",
+        lambda url, timeout=0: _FakeResponse(payload),
+    )
+
+
+def test_fetch_index_sha_mismatch_raises(tmp_path, monkeypatch):
+    # Default path: pin + expected sha come from PROVENANCE.yml; a drifted
+    # download must raise, and nothing may be extracted.
+    from corpus.provenance import ProvenanceError
+    from corpus.sources.aozora.index import CSV_NAME, fetch_index
+
+    _mock_download(monkeypatch, b"drifted index bytes")
+    with pytest.raises(ProvenanceError, match="sha256"):
+        fetch_index(tmp_path)
+    assert not (tmp_path / CSV_NAME).exists()
+
+
+def test_fetch_index_verifies_and_extracts(tmp_path, monkeypatch):
+    import hashlib
+    import io as _io
+    import zipfile
+
+    from corpus.sources.aozora.index import CSV_NAME, fetch_index
+
+    buf = _io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr(CSV_NAME, "\ufeff作品ID\r\n001\r\n")
+    payload = buf.getvalue()
+    _mock_download(monkeypatch, payload)
+    csv_path = fetch_index(
+        tmp_path, expected_sha256=hashlib.sha256(payload).hexdigest()
+    )
+    assert csv_path == tmp_path / CSV_NAME
+    assert "作品ID" in csv_path.read_text(encoding="utf-8-sig")
+
+
+def test_pinned_index_url():
+    from corpus.sources.aozora.index import pinned_index_url
+
+    assert pinned_index_url("abc123") == (
+        "https://github.com/aozorabunko/aozorabunko/raw/abc123/"
+        "index_pages/list_person_all_extended_utf8.zip"
+    )
+    assert "master" not in pinned_index_url("abc123")
+
+
 def test_github_raw_url_maps_onto_pin():
     url = github_raw_url(
         "https://www.aozora.gr.jp/cards/001475/files/51034_ruby_47929.zip", "abc123"
