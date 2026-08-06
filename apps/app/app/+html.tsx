@@ -42,6 +42,20 @@ export default function Root({ children }: PropsWithChildren): ReactNode {
         */}
         <ScrollViewStyleReset />
         {/*
+          Deep links on a static host (one-app convergence §5). GitHub Pages
+          serves ONE site-root 404 for every miss; it cannot serve this app's
+          own fallback. So the site 404 stores the requested path in
+          sessionStorage and replaces to /app/, and this script — running
+          before the bundle boots — puts the real path back with
+          `history.replaceState`, so expo-router wakes up on the deep route
+          the learner actually asked for. A no-op everywhere the key is absent.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k="bunki-deep-link",p=sessionStorage.getItem(k);if(p){sessionStorage.removeItem(k);history.replaceState(null,"",p);}}catch(e){}})();`,
+          }}
+        />
+        {/*
           The washi ground (Drift fusion §4). The body carries the theme's
           paper colour — set statically to the 北斎 prerender ground here and
           kept in sync by ThemeProvider once hydrated — and a laid-line

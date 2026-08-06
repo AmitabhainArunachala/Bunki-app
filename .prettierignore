@@ -20,3 +20,7 @@ docs/build-evidence/
 # Preserved Sites v11 prototype snapshot — reformatting is editing; its bytes
 # are the historical baseline (docs/handoffs/BUNKI_SITES_V11_...HANDOFF).
 prototypes/
+
+# Generated Drift-tier data — the generator's compact output IS the format;
+# reformatting a 6,692-row lexicon into one-element-per-line helps nobody.
+apps/app/src/data/generated/

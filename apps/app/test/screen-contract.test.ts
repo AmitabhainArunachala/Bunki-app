@@ -83,6 +83,8 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'capture-screen.tsx': 'WP-05',
   'word-screen.tsx': 'WP-05',
   'kanji-screen.tsx': 'WP-05',
+  'drift-word-screen.tsx': 'one-app convergence (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md)',
+  'drift-kanji-screen.tsx': 'one-app convergence (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md)',
   'evidence-inspector-screen.tsx': 'WP-09',
   'inspector-debug-screen.tsx': 'WP-09',
   'evidence-chain.ts': 'WP-09 (_helper: pure chain projection, not a screen)',

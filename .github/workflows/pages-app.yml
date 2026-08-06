@@ -78,7 +78,7 @@ jobs:
           # wrapped into a full document with one quiet link into the study app.
           DRIFT_LINK='<a href="app/" id="to-study" style="position:fixed;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9;font:13px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;letter-spacing:.12em;color:var(--pig2,#165e83);text-decoration:none;border:1px solid var(--line,rgba(0,0,0,.2));border-radius:999px;padding:7px 13px;background:var(--plaque,rgba(255,255,255,.9))">辞書へ →</a>'
           {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"></head><body>'
+            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";</script></head><body>'
             cat prototypes/drift/drift-artifact.html
             printf '%s' "$DRIFT_LINK"
             printf '%s' '</body></html>'
@@ -90,7 +90,7 @@ jobs:
           # universe. The redirect runs in <head> before the Drift body loads,
           # so Drift never initialises on an app-bound miss.
           {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>(function(){var p=location.pathname,i=p.indexOf("/app/");if(i>-1)location.replace(p.slice(0,i)+"/app/"+location.search+location.hash);})();</script></head><body>'
+            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";(function(){var p=location.pathname,i=p.indexOf("/app/");if(i>-1){try{sessionStorage.setItem("bunki-deep-link",p+location.search+location.hash)}catch(e){}location.replace(p.slice(0,i)+"/app/")}})();</script></head><body>'
             cat prototypes/drift/drift-artifact.html
             printf '%s' "$DRIFT_LINK"
             printf '%s' '</body></html>'

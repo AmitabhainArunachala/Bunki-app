@@ -18,6 +18,7 @@ import { type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { SEED_COVERAGE_DISCLOSURE, SEED_ENTRY_DISCLOSURE } from '../data/catalog.ts';
+import { DRIFT_TIER_DISCLOSURE } from '../data/drift-lexicon.ts';
 import {
   attributionLines,
   distinctProvenance,
@@ -60,6 +61,37 @@ export function SeedEntryDisclosure({
         style={[styles.disclosureText, { color: theme.color.ink, fontFamily: theme.font.sans }]}
       >
         {SEED_ENTRY_DISCLOSURE}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * The Drift lexical tier's standing truth label
+ * (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md §1) — same contract as
+ * `SeedEntryDisclosure`, different tier, one uniform statement because the
+ * tier has no field-level review to report.
+ */
+export function DriftTierDisclosure({
+  testID = 'drift-tier-disclosure',
+}: {
+  readonly testID?: string;
+}): ReactNode {
+  const theme = useTheme();
+  return (
+    <View
+      accessibilityLabel={`About this entry: ${DRIFT_TIER_DISCLOSURE}`}
+      accessible
+      style={[
+        styles.disclosure,
+        { backgroundColor: theme.color.vermilionSoft, borderColor: theme.color.vermilion },
+      ]}
+      testID={testID}
+    >
+      <Text
+        style={[styles.disclosureText, { color: theme.color.ink, fontFamily: theme.font.sans }]}
+      >
+        {DRIFT_TIER_DISCLOSURE}
       </Text>
     </View>
   );
