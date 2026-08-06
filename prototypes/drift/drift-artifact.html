@@ -30,7 +30,8 @@
   .word .gloss{position:absolute;top:100%;left:50%;transform:translateX(-50%);
     font-size:.4em;font-style:italic;font-family:Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
-  .word.unfolded .yomi,.word.unfolded .gloss{opacity:1}
+  .word.unfolded .yomi{opacity:1}            /* one tap: furigana only */
+  .word.glossed .yomi,.word.glossed .gloss{opacity:1}  /* two taps: + English */
   .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 24px var(--halo)}
   .word.lod .yomi,.word.lod .gloss{opacity:0!important}
   .glyph.comp{z-index:7}
@@ -40,7 +41,8 @@
   .glyph.comp .g{font-size:24px;color:var(--pig2);border:1px solid var(--line);
     border-radius:6px;padding:2px 7px;background:var(--plaque)}
   .glyph small,.part small{display:block;font-size:11px;font-family:Georgia,serif;font-style:italic;
-    color:var(--faint);letter-spacing:.03em}
+    color:var(--faint);letter-spacing:.03em;opacity:0;transition:opacity .5s}
+  .glyph.center small,.glyph.unfolded small,.part.center small,.part.unfolded small{opacity:1}
   .part .pch{display:flex;align-items:center;justify-content:center;margin:0 auto;
     width:38px;height:38px;border:1.5px solid var(--pig2);border-radius:50%;
     font-size:19px;color:var(--pig2);background:var(--plaque)}
@@ -119,6 +121,26 @@
   #card .study{display:block;margin-top:13px;text-align:center;font-size:13px;
     letter-spacing:.14em;color:var(--pig2);text-decoration:none;border:1px solid var(--line);
     border-radius:999px;padding:9px 14px}
+  #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
+    background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;
+    font-family:inherit;cursor:pointer;vertical-align:1px}
+  #radoc{position:fixed;inset:0;z-index:11;background:var(--plaque);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;pointer-events:none;transition:opacity .4s;overflow-y:auto;
+    padding:calc(28px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom))}
+  #radoc.open{opacity:1;pointer-events:auto}
+  #radoc .wrap{max-width:560px;margin:0 auto;color:var(--ink)}
+  #radoc h2{font-size:26px;font-weight:500;letter-spacing:.06em;margin-bottom:4px}
+  #radoc .sub{font-size:12px;letter-spacing:.2em;color:var(--pig2);margin-bottom:20px}
+  #radoc p{font-size:15px;line-height:1.85;margin-bottom:15px}
+  #radoc .rex{display:flex;gap:14px;align-items:baseline;margin:10px 0;
+    border-top:1px solid var(--line);padding-top:12px}
+  #radoc .rex .rc{font-size:34px;color:var(--pig1);font-family:inherit;min-width:1.4em;text-align:center}
+  #radoc .rex .rt{font-size:13px;color:var(--faint);line-height:1.6}
+  #radoc .rex .rt b{color:var(--ink);font-weight:500;font-style:normal}
+  #radoc .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;
+    font-size:13px;letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
+    border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;font-family:inherit}
 </style>
 <canvas id="ink"></canvas>
 <div id="grain"></div>
@@ -133,6 +155,16 @@
 <div id="lvl"><div id="lvlTrack"></div><div id="lvlHandle"></div>
 <div id="lvlLabels"></div><div id="lvlInfo"></div></div>
 <div id="card"></div>
+<div id="radoc"><button class="x" id="radocX">閉じる ×</button><div class="wrap">
+<h2>部首 — radicals</h2><div class="sub">THE SHAPES A KANJI IS FILED UNDER</div>
+<p>Every kanji is built from smaller recurring shapes. One of them is chosen as its <b>radical</b> (部首, <i>bushu</i>) — the piece a dictionary files it under, the way an English word is filed under its first letter. There are <b>214</b> classical (Kangxi) radicals, and learning to spot them turns a wall of strokes into a handful of familiar parts.</p>
+<p>A radical often carries meaning. The water radical 氵 hints that a kanji is about water; the tree radical 木 that it is about wood or plants. So a radical is both an index and a clue.</p>
+<p><b>Radical vs. component.</b> A kanji contains many components, but only one is its official radical. This dictionary is careful about the difference: it says 「部首」 only when a character truly has a classical radical number; otherwise it says 「この字を含む」 — <i>kanji that contain this shape</i> — which is an honest, looser family.</p>
+<div class="rex"><span class="rc">氵</span><span class="rt"><b>water</b> (さんずい) · 海 sea · 泳 swim · 池 pond · river 河</span></div>
+<div class="rex"><span class="rc">木</span><span class="rt"><b>tree</b> (き) · 林 grove · 森 forest · 柱 pillar · 校 school</span></div>
+<div class="rex"><span class="rc">言</span><span class="rt"><b>word / speech</b> (ごんべん) · 語 language · 話 talk · 読 read · 記 record</span></div>
+<p style="color:var(--faint);font-size:13px">Tap any character in a radical's family list to travel to it and keep exploring.</p>
+</div></div>
 <script>
 "use strict";
 const TAU=Math.PI*2;
@@ -824,9 +856,9 @@ function restore(n,s){
   n.mode=s.mode==="free"?"glide":s.mode;
   n.tx=s.tx;n.ty=s.ty;n.ts=s.ts;n.top=s.top;n.orbit=s.orbit;setBlur(n,s.blur);
   n.el.style.pointerEvents="";
-  n.el.classList.remove("unfolded");
+  n.el.classList.remove("unfolded","glossed");
   n.el.classList.toggle("center",n.mode==="center");
-  if(n.mode==="center"&&n.kind==="word") n.el.classList.add("unfolded");
+  if(n.mode==="center"&&n.kind==="word") n.el.classList.add("unfolded","glossed");
 }
 // diving is a forward dolly: the layer you leave GROWS, blurs, and rushes
 // past the edges — true magnification, not a polite step back.
@@ -840,7 +872,7 @@ function recede(o,from){
   o.ts=o.ts*2.0; o.top=Math.min(o.top,0.08);
   setBlur(o,3);
   o.el.style.pointerEvents="none";
-  o.el.classList.remove("unfolded","center");
+  o.el.classList.remove("unfolded","glossed","center");
 }
 const rIn=()=>clamp(mind()*0.26,95,160);
 const rOut=()=>clamp(mind()*0.44,170,270);
@@ -1058,7 +1090,7 @@ function lockForce(){
 }
 function collapseUnfold(){
   if(!lockOn) clearBloom();
-  if(unfolded){unfolded.el.classList.remove("unfolded"); unfolded=null;}
+  if(unfolded){unfolded.el.classList.remove("unfolded","glossed"); unfolded=null;}
 }
 let loopMark=false;
 function markDive(label){
@@ -1081,7 +1113,7 @@ function recedeAllExcept(lvl,center,keep){
     lvl.receded.push({n:o,saved:snap(o)});
     if(keep&&keep.has(o)){
       o.mode="orbit"; o.ts=o.kind==="word"?orbitScale(o):1; o.top=0.92; setBlur(o,0);
-      o.el.classList.remove("unfolded","center");
+      o.el.classList.remove("unfolded","glossed","center");
     } else recede(o,center);
   }
 }
@@ -1090,7 +1122,7 @@ function diveWord(n){
   card.classList.remove("open"); clearBloom(); collapseUnfold();
   const lvl=beginLevel(n);
   recedeAllExcept(lvl,n,null);
-  n.mode="center"; n.el.classList.add("center","unfolded");
+  n.mode="center"; n.el.classList.add("center","unfolded","glossed");
   n.tx=vw()/2; n.ty=vh()*0.40; n.ts=1.8; n.top=1; setBlur(n,0);
   ripple(n.x,n.y,true);
   const ks=[...new Set(n.w)].filter(c=>isKanji(c)&&c!==n.w);
@@ -1258,7 +1290,7 @@ function surface(){
   if(!c.gone){
     restore(c,lvl.centerSaved);
     if(lvl.centerWasComp) c.el.classList.add("comp");
-    if(lvl.centerSaved.mode==="free") c.el.classList.remove("center","unfolded");
+    if(lvl.centerSaved.mode==="free") c.el.classList.remove("center","unfolded","glossed");
     if(c.ephemeral){
       c.gone=true; c.top=0; c.el.style.pointerEvents="none";
       removeNode(c,700);
@@ -1480,8 +1512,8 @@ function openCard(n){
     const on=onOf(n.ch), kun=kunOf(n.ch);
     // Kodansha move: a radical's card carries its COMPLETE family — every
     // row a door, with ON and kun readings
-    const famHtml=fam?('<div class="rhead">'+(num?("部首 "+num+" · この部首の漢字 · "):"この字を含む漢字 · ")+
-      fam.length+'字</div>'+
+    const famHtml=fam?('<div class="rhead">'+(num?("部首 "+num+"：この部首をもつ "):"この字を含む ")+
+      fam.length+'字 <button class="radq" id="radQ">部首とは？</button></div>'+
       '<div class="rlist">'+[...fam].map(c=>
         '<div class="rrow" data-ch="'+esc(c)+'"><span class="rk">'+esc(c)+'</span>'+
         '<span class="rr">'+esc(onOf(c))+(kunOf(c)?('<i>'+esc(kunOf(c))+'</i>'):"")+'</span>'+
@@ -1500,6 +1532,8 @@ function openCard(n){
       const rr=e.target.closest?e.target.closest(".rrow"):null;
       if(rr) diveFromList(rr.getAttribute("data-ch"));
     });
+    const rq=card.querySelector("#radQ");
+    if(rq) rq.addEventListener("click",e=>{e.stopPropagation();openRadoc();});
     // stroke order is never hidden: it writes itself the moment the card
     // opens; the button replays it
     if(canStroke){
@@ -1592,6 +1626,14 @@ function setHint(txt){
 }
 setTimeout(function(){hint.style.opacity="0";},7000);
 
+// ---- radical explainer ----
+const radoc=document.getElementById("radoc");
+function openRadoc(){ radoc.classList.add("open"); }
+function closeRadoc(){ radoc.classList.remove("open"); }
+document.getElementById("radocX").addEventListener("click",closeRadoc);
+radoc.addEventListener("click",e=>{ if(e.target===radoc) closeRadoc(); });
+addEventListener("keydown",e=>{ if(e.key==="Escape") closeRadoc(); });
+
 // ---- interaction ----
 function tapNode(n){
   const lvl=stack[stack.length-1];
@@ -1600,11 +1642,14 @@ function tapNode(n){
   if(n.kind==="part"){ divePart(n); return; }
   if(!n.el.classList.contains("unfolded")){
     collapseUnfold();
-    n.el.classList.add("unfolded"); unfolded=n;
+    n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana
     if(n.kind==="word"&&stack.length===0&&!lockOn) bloomFocus(n);
     return;
   }
-  diveWord(n);
+  if(!n.el.classList.contains("glossed")){
+    n.el.classList.add("glossed"); return;         // two taps: English
+  }
+  diveWord(n);                                      // then: carry in
 }
 let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false;
 let lpTimer=0,lpFired=false;
