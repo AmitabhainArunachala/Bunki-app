@@ -41,6 +41,16 @@ on this machine before this module was finalised):
   {{Wikipediapar}}, image-licence tags…). ``<ref>``/``<references>``, tables,
   galleries and HTML comments are stripped; internal links unwrap to their
   display text; interlanguage links ([[en:…]] …) vanish.
+- Malformed-source repairs (4 pages found by widening the residual net to
+  ``}}``/``</``/``style=``/``align=``/``{|``): hand-written HTML ``<table>``
+  soup that mwparserfromhell cannot tokenize is removed block-wise (pageids
+  22007 NPB standings, 39689 council-member roster — table data, consistent
+  with the wikitable policy); stray literal HTML tags from misnested markup
+  are stripped (5133); orphan image-caption debris lines whose ``[[`` was
+  destroyed in the source are dropped (6163 — NOTE: that source line also
+  carries a vandalism fragment, プラダ女性差別事件, present in the pinned
+  dump itself and removed together with the debris line); author-typo
+  ``{{UTC+9}}`` (braces around a link, 15954) normalises to ``UTC+9``.
 
 Usage:
     python -m corpus.sources.wikinews.extract DUMP OUT.jsonl \
@@ -150,7 +160,15 @@ _CATEGORY_TMPL_RE = re.compile(r"^category-(\d+)$", re.IGNORECASE)
 _MAGIC_WORD_RE = re.compile(r"__[A-Z]+__")
 # A paragraph line must contain at least one CJK char, kana, or alphanumeric.
 _HAS_CONTENT_RE = re.compile(r"[0-9A-Za-zぁ-ゖァ-ヶ一-鿿々〆ヵヶ]")
-_RESIDUAL_MARKERS = ("{{", "[[", "<ref")
+# Repairs for malformed source markup that mwparserfromhell leaves as Text.
+_HTML_TABLE_RE = re.compile(r"<table\b.*?</table\s*>", re.IGNORECASE | re.DOTALL)
+_HTML_TAG_RE = re.compile(r"</?[A-Za-z][^<>\n]*>")
+_BRACED_UTC_RE = re.compile(r"\{\{(UTC[+-]\d{1,2})\}\}")
+_CAPTION_DEBRIS_RE = re.compile(r"(?:Image|File|ファイル|画像):\S+?\|")
+# Narrow net = the original verifier; wide net adds markup halves and HTML
+# attribute debris. Both are measured; the gate applies to the wide net.
+_RESIDUAL_MARKERS_NARROW = ("{{", "[[", "<ref")
+_RESIDUAL_MARKERS = ("{{", "[[", "<ref", "}}", "</", "style=", "align=", "{|")
 
 
 # ---------------------------------------------------------------- dump reader
@@ -283,10 +301,15 @@ def _render_document(code: mwph.wikicode.Wikicode) -> str:
 
 def _paragraphs(rendered: str) -> list[str]:
     text = _MAGIC_WORD_RE.sub("", rendered)
+    text = _HTML_TABLE_RE.sub("", text)
+    text = _HTML_TAG_RE.sub("", text)
+    text = _BRACED_UTC_RE.sub(r"\1", text)
     paragraphs: list[str] = []
     current: list[str] = []
     for raw_line in text.split("\n"):
         line = raw_line.strip().lstrip("*#:;").strip()
+        if _CAPTION_DEBRIS_RE.search(line):
+            line = ""  # orphan image-caption debris (source vandalism/typos)
         if line and _HAS_CONTENT_RE.search(line):
             current.append(line)
         elif current:
@@ -365,6 +388,7 @@ class ExtractStats:
     date_max: str = ""
     distinct_categories: int = 0
     residual_markup_records: int = 0
+    residual_markup_records_narrow: int = 0
     residual_markup_ids: list[str] = field(default_factory=list)
     _categories: set[str] = field(default_factory=set, repr=False)
 
@@ -383,6 +407,7 @@ class ExtractStats:
             "date_range": [self.date_min, self.date_max],
             "distinct_categories": self.distinct_categories,
             "residual_markup_records": self.residual_markup_records,
+            "residual_markup_records_narrow": self.residual_markup_records_narrow,
             "residual_markup_ids": self.residual_markup_ids,
         }
 
@@ -441,6 +466,8 @@ def extract_records(
             stats.residual_markup_records += 1
             if len(stats.residual_markup_ids) < 50:
                 stats.residual_markup_ids.append(record.id)
+        if any(marker in text for marker in _RESIDUAL_MARKERS_NARROW):
+            stats.residual_markup_records_narrow += 1
 
         yield record
 

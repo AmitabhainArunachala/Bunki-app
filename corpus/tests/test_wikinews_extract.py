@@ -172,3 +172,43 @@ def test_paragraph_split_on_blank_lines():
 def test_related_suffix_heading_dropped():
     wt = "本文。\n== 最近の台風関連記事 ==\n*[[台風の記事]]\n== 被害 ==\n浸水した。"
     assert wikitext_to_paragraphs(wt) == ["本文。", "被害", "浸水した。"]
+
+
+# ------------------------------------- malformed-source repairs (empirical)
+
+
+def test_html_table_soup_removed_blockwise():
+    # wikinews:22007 / 39689 convention: hand-written HTML tables mwph
+    # cannot tokenize; the whole block is table data, not prose.
+    wt = (
+        "勝敗等は次のとおり。\n"
+        "<table width=90% border=0>   <td align=right>試合数</span></td></tr>\n"
+        "<tr>   6   広島   　24   </td>\n"
+        "12   ヤクルト   　.375   </table>\n"
+        "以上が結果である。"
+    )
+    assert wikitext_to_paragraphs(wt) == ["勝敗等は次のとおり。", "以上が結果である。"]
+
+
+def test_stray_html_tags_stripped():
+    # wikinews:5133 convention: misnested <font>/<div> leaves literal tags.
+    wt = '<div style="float: right; clear: right;">\n本文です。\n</div>'
+    assert wikitext_to_paragraphs(wt) == ["本文です。"]
+
+
+def test_orphan_caption_debris_line_dropped():
+    # wikinews:6163 convention: vandalism destroyed an image link's [[,
+    # leaving caption debris glued to a vandalism fragment — both dropped.
+    wt = (
+        "{{日付|2006年5月28日}}\n"
+        "プラダ女性差別事件Image:Prambanam.JPG|thumb|right|200px|被害を受けた寺院（資料）}}\n"
+        "\n死者は3,700人を超えた。"
+    )
+    assert wikitext_to_paragraphs(wt) == ["死者は3,700人を超えた。"]
+
+
+def test_braced_utc_typo_normalised():
+    # wikinews:15954 convention: {{[[w:UTC+9|UTC+9]]}} — braces are author
+    # error; the unwrapped link keeps its braces without this repair.
+    wt = "午後7時15分頃（{{[[w:UTC+9|UTC+9]]}}、以下同じ）から突風が吹いた。"
+    assert wikitext_to_paragraphs(wt) == ["午後7時15分頃（UTC+9、以下同じ）から突風が吹いた。"]

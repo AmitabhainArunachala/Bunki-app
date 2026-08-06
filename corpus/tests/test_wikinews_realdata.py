@@ -10,7 +10,12 @@ from pathlib import Path
 import pytest
 
 from corpus.records import read_jsonl
-from corpus.sources.wikinews.extract import ExtractStats, extract_records
+from corpus.sources.wikinews.extract import (
+    _RESIDUAL_MARKERS,
+    _RESIDUAL_MARKERS_NARROW,
+    ExtractStats,
+    extract_records,
+)
 from corpus.sources.wikinews.fetch import DUMP_FILENAME, DUMP_SHA256, sha256_file
 
 pytestmark = pytest.mark.realdata
@@ -72,15 +77,25 @@ def test_no_empty_texts_and_unique_ids(full_run):
 def test_residual_markup_rate_below_1_percent(full_run):
     (out, _), (stats, _) = full_run
     n = 0
-    offenders = []
+    offenders_wide, offenders_narrow = [], []
     for rec in read_jsonl(out):
         n += 1
-        if "{{" in rec.text or "[[" in rec.text or "<ref" in rec.text:
-            offenders.append(rec.id)
-    rate = len(offenders) / n
-    print(f"\nresidual-markup records: {len(offenders)} of {n} ({rate:.4%})")
-    print(f"offender ids (first 20): {offenders[:20]}")
-    assert len(offenders) == stats.residual_markup_records
+        if any(m in rec.text for m in _RESIDUAL_MARKERS):
+            offenders_wide.append(rec.id)
+        if any(m in rec.text for m in _RESIDUAL_MARKERS_NARROW):
+            offenders_narrow.append(rec.id)
+    rate = len(offenders_wide) / n
+    print(
+        f"\nresidual-markup records (wide net {_RESIDUAL_MARKERS}): "
+        f"{len(offenders_wide)} of {n} ({rate:.4%})"
+    )
+    print(
+        f"residual-markup records (narrow net {_RESIDUAL_MARKERS_NARROW}): "
+        f"{len(offenders_narrow)} of {n} ({len(offenders_narrow) / n:.4%})"
+    )
+    print(f"offender ids (first 20): {offenders_wide[:20]}")
+    assert len(offenders_wide) == stats.residual_markup_records
+    assert len(offenders_narrow) == stats.residual_markup_records_narrow
     assert rate < 0.01
 
 
