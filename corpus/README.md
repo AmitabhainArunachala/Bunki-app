@@ -17,8 +17,11 @@ Two pools, separated from day one, enforced by `corpus.provenance`:
    kanjium). Copyleft infects derivatives; anything merged with this pool
    ships under the same licence. Keep the boundary deliberate.
 
-**NC or ND anywhere in a licence is a hard error** (Tadoku, livedoor,
-WLSP-familiarity, JEV…). Research-only terms are rejected. No mainstream
+**NC or ND anywhere in a licence is a hard error** — caught in token form
+(`CC BY-NC-SA`) and spelled-out Latin form (`Attribution-NonCommercial`);
+Japanese licence wordings are not auto-classified (非営利 appears in both
+permissive and restrictive sentences) and fall to reviewer judgment plus a
+required `notes` legal basis. Research-only terms are rejected. No mainstream
 Japanese news is fetched here, ever — 朝日/毎日/読売/日経/産経/中日/共同/時事
 block ClaudeBot by name and several ban RAG and 要約 in contract (#41).
 
