@@ -46,6 +46,28 @@ def test_duplicate_ids_rejected(tmp_path):
         write_jsonl([rec("x:1"), rec("x:1")], tmp_path / "out.jsonl")
 
 
+def test_nan_meta_rejected():
+    with pytest.raises(RecordError, match="JSON"):
+        rec(meta={"score": float("nan")})
+
+
+def test_bom_and_crlf_jsonl_tolerated(tmp_path):
+    p = tmp_path / "bom.jsonl"
+    line = '{"id": "a:1", "source": "s", "title": "", "text": "本文", "meta": {}}'
+    p.write_bytes(b"\xef\xbb\xbf" + line.encode("utf-8") + b"\r\n")
+    [record] = list(read_jsonl(p))
+    assert record.id == "a:1" and record.text == "本文"
+
+
+def test_unexpected_key_wrapped_as_record_error(tmp_path):
+    p = tmp_path / "bad.jsonl"
+    p.write_text(
+        '{"id": "a", "source": "s", "title": "", "text": "t", "meta": {}, "sneaky": 1}\n'
+    )
+    with pytest.raises(RecordError, match=":1: bad record shape"):
+        list(read_jsonl(p))
+
+
 def test_invalid_jsonl_line_reported_with_lineno(tmp_path):
     p = tmp_path / "bad.jsonl"
     p.write_text('{"id": "a", "source": "s", "title": "", "text": "t", "meta": {}}\nnot json\n')
