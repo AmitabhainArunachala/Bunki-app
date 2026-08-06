@@ -1,0 +1,169 @@
+{
+  "version": "3.6.2",
+  "languages": ["eng"],
+  "commonOnly": false,
+  "dictDate": "2026-08-03",
+  "dictRevisions": [],
+  "tags": {
+    "yoji": "yojijukugo",
+    "proverb": "proverb",
+    "id": "idiomatic expression",
+    "quote": "quotation",
+    "uk": "word usually written using kana alone",
+    "n": "noun (common) (futsuumeishi)",
+    "exp": "expressions (phrases, clauses, etc.)"
+  },
+  "words": [
+    {
+      "id": "1000100",
+      "kanji": [{ "common": false, "text": "四字熟語", "tags": [] }],
+      "kana": [
+        { "common": false, "text": "よじじゅくご", "tags": [], "appliesToKanji": ["*"] }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": ["n"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["yoji"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "four-character idiom" },
+            { "lang": "ger", "gender": null, "type": null, "text": "NICHT-ENGLISCH" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1000200",
+      "kanji": [{ "common": true, "text": "多義語", "tags": [] }],
+      "kana": [
+        { "common": true, "text": "たぎご", "tags": [], "appliesToKanji": ["*"] }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": ["n"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": [],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "PLAIN-NOUN-GLOSS-MUST-NOT-SURVIVE" }
+          ]
+        },
+        {
+          "partOfSpeech": ["exp"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["id"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "idiom sense of a multi-sense entry" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1000300",
+      "kanji": [{ "common": false, "text": "諺引用", "tags": [] }],
+      "kana": [
+        { "common": false, "text": "ことわざいんよう", "tags": [], "appliesToKanji": ["*"] }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": ["exp"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["proverb"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "a proverb sense" }
+          ]
+        },
+        {
+          "partOfSpeech": ["exp", "n"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["quote"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "a quotation sense" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1000400",
+      "kanji": [{ "common": true, "text": "普通名詞", "tags": [] }],
+      "kana": [
+        { "common": true, "text": "ふつうめいし", "tags": [], "appliesToKanji": ["*"] }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": ["n"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["uk"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "an ordinary word; must be excluded" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1000050",
+      "kanji": [],
+      "kana": [
+        { "common": false, "text": "かなのみかんようく", "tags": [], "appliesToKanji": ["*"] }
+      ],
+      "sense": [
+        {
+          "partOfSpeech": ["exp"],
+          "appliesToKanji": ["*"],
+          "appliesToKana": ["*"],
+          "related": [],
+          "antonym": [],
+          "field": [],
+          "dialect": [],
+          "misc": ["id", "uk"],
+          "info": [],
+          "languageSource": [],
+          "gloss": [
+            { "lang": "eng", "gender": null, "type": null, "text": "kana-only idiom, mixed misc" }
+          ]
+        }
+      ]
+    }
+  ]
+}
