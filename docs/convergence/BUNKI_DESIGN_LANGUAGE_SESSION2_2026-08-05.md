@@ -767,3 +767,41 @@ abandoned universe falls away beneath). Operator chose magnification.
 Interaction law learned on-device: anything receded, dying, or graded must
 become **tap-transparent** (pointer-events none) the moment it fades —
 scaled-up ghosts otherwise swallow water-taps invisibly.
+
+### 8.13 Drift v10 red-team findings ledger (2026-08-06)
+
+Full-spectrum adversarial audit per the PR #22 charter
+(`docs/prompts/DRIFT_V10_RED_TEAM_CHARTER_2026-08-05.md`). Eight lanes,
+real-CDP touch evidence, single-file target `prototypes/drift/drift-artifact.html`.
+Baseline `93f3b02`. Detailed ledger + every repro script and screenshot path:
+`docs/audits/DRIFT_V10_RED_TEAM_LEDGER_2026-08-06.md`.
+
+**History:** the original Codex run got through discovery on L1/L2/L3, lost L4
+to a false-positive cyber-policy filter, never ran L5–L8, and hit its usage
+limit before applying a single fix. This session (Claude) re-ran L4–L8,
+consolidated all eight lanes, applied and **runtime-verified** the safe
+correctness/security cluster, and documented the rest for operator judgment.
+
+**FIXED + verified this round** (14/14 probes green — `bunki-verify-fixes.json`):
+- P0 duplicate kanji orbit nodes (日曜日→[日,曜,日]) — dedup with `new Set` at the dive spawn and the word-card. Invariant 2.
+- P0 wrong-schema `localStorage` bricked the app permanently (blank canvas, uncaught TypeError, no recovery) — load guard now validates shape and coerces types. Invariant 8.
+- HIGH stored-XSS: persisted `lu`/`lk` counters reached `tray.innerHTML` and executed script — counters coerced to `Number`; the malicious string can no longer reach a sink.
+- 7 latent `innerHTML` injection sinks (spawnWord/spawnGlyph/spawnPart/openCard ×3 + a `data-ch` attribute breakout) — added an `esc()` helper applied to every interpolated data value; markup now renders as inert text.
+- P1 word cards printed literal `undefined` — card now uses `glossOf()` (which has proper fallbacks) instead of the 59-entry `K[c]` map.
+- P1 asymmetric grading left a word in both `known` and `unknown` — the unknown branch now clears any prior `known` entry.
+
+**DEFERRED — documented with repro, needs data pipeline or operator judgment (NOT a code patch):**
+- P0 (L2) wrong learner readings 旺/頑/頒; radical-families mislabeled as Kangxi (74.76% of rows); wrong stroke counts 稽/衷 — needs an authoritative Kangxi/KanjiDic dataset rebuild (L2's recommended split: keep `RADK` as `COMPONENT_FAMILY`, add a separate authoritative `RADICAL_OF`). Hand-editing risks new errors.
+- P0 (L3/L6) 149 chars / 188 words dead-end word→kanji→radical navigation (missing KINFO+KRAD). The `undefined` display is fixed, but the missing radical DATA remains — the nav chain still dead-ends for those chars until authoritative coverage is ingested. Invariant 7 still partially open.
+- P0 (L6) lock viewport containment fails at zoom 2.6 for 60/60 words — spring rest-length locks in `1/cam.z` while the containment force scales with live zoom; a physics fix needing careful re-tuning + re-verification.
+- P0 (L1) pinch steals navigation inside dives; P1 pointercancel leaves gesture state dangling — gesture state machine; deferred to avoid unverified gesture regressions.
+- P0 (L8) field-word contrast below WCAG in all 5 themes — collides with the intentional depth-by-fade aesthetic; operator design call (pretty AND functional).
+- P1 (L8) hit targets <40px (slider handle, faint words); zero gesture discoverability (single hint fades at ~7s, never returns); 自 adaptive mode is a silent no-op — UX design decisions.
+- P2 quota-full grades silently lost; kana-only words cannot lock (vacuous today — corpus has none); release-tap capture near edge-pinned members.
+- INFO (L5) sub-23fps only under 6× CPU throttle; min-zoom is the expensive case — re-characterize the documented "SwiftShader floor" as CPU-bound. No leak, no rAF spiral, full 10-min soak clean.
+
+**Artifact-URL boundary:** the charter's "republish to the same claude.ai
+artifact URL" step is NOT done here — that URL belongs to the original Claude
+Code session that minted it and cannot be republished from this environment.
+The patched file + this ledger ship as a PR; republish is left to the operator
+or the originating session.
