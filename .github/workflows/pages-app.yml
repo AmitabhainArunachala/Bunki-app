@@ -1,0 +1,130 @@
+name: pages-app
+
+# Publishes the fused Bunki web app (five nihonga themes, per the Drift design
+# language) to GitHub Pages so the operator can open it on a phone like a site,
+# and hosts the Drift opening-surface prototype at /drift/ as a public,
+# sign-in-free URL alongside it. Server-backed flows stay in their designed
+# local/offline mode; this is the static client build.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/app/**'
+      - 'prototypes/drift/drift-artifact.html'
+      - '.github/workflows/pages-app.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      # GitHub Pages serves a project site under /<repo>/, so the web bundle
+      # must be built with that base path or every absolute asset URL 404s.
+      # This is a build-time mutation only — the committed app.json stays
+      # base-less so the e2e suite keeps serving the app at root.
+      - name: Set Pages base path on the web build
+        working-directory: apps/app
+        env:
+          BASE: ${{ github.event.repository.name }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const a = JSON.parse(fs.readFileSync("app.json", "utf8"));
+            a.expo.experiments = { ...(a.expo.experiments || {}), baseUrl: "/" + process.env.BASE };
+            fs.writeFileSync("app.json", JSON.stringify(a, null, 2));
+            console.log("baseUrl set to /" + process.env.BASE);
+          '
+
+      - name: Export the web bundle
+        working-directory: apps/app
+        run: npx expo export --platform web
+
+      - name: Assemble the Pages site
+        env:
+          BASE: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          SITE="$RUNNER_TEMP/site/$BASE"
+          mkdir -p "$SITE"
+          cp -r apps/app/dist/* "$SITE"/
+          # SPA fallback: any unknown path boots the app, whose client router
+          # then reads the URL. Covers dynamic routes (/kanji/<char>) that have
+          # no pre-rendered file on a static host.
+          cp apps/app/dist/index.html "$SITE"/404.html
+          # The Drift prototype: self-contained, wrapped into a full document at
+          # /<repo>/drift/ — a public, sign-in-free link for the phone.
+          mkdir -p "$SITE"/drift
+          {
+            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"></head><body>'
+            cat prototypes/drift/drift-artifact.html
+            printf '%s' '</body></html>'
+          } > "$SITE"/drift/index.html
+          echo "SITE_DIR=$RUNNER_TEMP/site" >> "$GITHUB_ENV"
+
+      - name: Upload build as downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bunki-app-static
+          path: ${{ env.SITE_DIR }}
+
+      # Pages may not be enabled by the workflow token on a private repo
+      # (configure-pages: "Resource not accessible by integration"). Attempt it,
+      # but treat unavailability as a skip, not a failure — the build above is
+      # the verified deliverable either way. Once Pages is enabled in
+      # Settings -> Pages (source: GitHub Actions), this deploys for real.
+      - id: cfg
+        continue-on-error: true
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - if: steps.cfg.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.SITE_DIR }}
+      - id: deployment
+        if: steps.cfg.outcome == 'success'
+        uses: actions/deploy-pages@v4
+
+      - name: Report Pages availability
+        env:
+          BASE: ${{ github.event.repository.name }}
+        run: |
+          if [ "${{ steps.cfg.outcome }}" = "success" ]; then
+            {
+              echo "### Pages deployed"
+              echo ""
+              echo "- App: ${{ steps.deployment.outputs.page_url }}"
+              echo "- Drift: ${{ steps.deployment.outputs.page_url }}drift/"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "### Pages not enabled on this repository"
+              echo ""
+              echo "Build succeeded and is attached as the **bunki-app-static** artifact."
+              echo "To get a live URL: Settings -> Pages -> Source: **GitHub Actions**"
+              echo "(requires a public repo or a plan with private Pages), then re-run this workflow."
+              echo "Once live it serves at:"
+              echo "- App: https://<owner>.github.io/$BASE/"
+              echo "- Drift: https://<owner>.github.io/$BASE/drift/"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
