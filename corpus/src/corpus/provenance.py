@@ -119,6 +119,16 @@ def _validate(raw: dict, origin: str) -> Provenance:
         )
 
     is_gov = any(g in licence for g in _GOV_TERMS)
+    if is_gov:
+        residue = licence
+        for g in _GOV_TERMS:
+            residue = residue.replace(g, "")
+        residue = re.sub(r"(?i)[（）()第版\d\s.\-+]|ver(sion)?", "", residue)
+        if residue and not str(raw.get("notes") or ""):
+            raise ProvenanceError(
+                f"{origin}: extra terms around government licence string in {licence!r} — "
+                "state the legal basis in 'notes'"
+            )
     is_by = "BY" in toks or "ATTRIBUTION" in norm or is_gov
     attribution = str(raw.get("attribution") or "")
     if is_by and not attribution:

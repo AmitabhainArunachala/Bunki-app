@@ -111,6 +111,20 @@ def test_government_terms_recognised_and_require_attribution(tmp_path):
     )
     with pytest.raises(ProvenanceError, match="attribution"):
         load(_write(tmp_path, no_attr, sub="asset2"))
+    versioned = VALID.replace(
+        "licence: CC BY 4.0", "licence: 政府標準利用規約（第2.0版）"
+    )
+    assert load(_write(tmp_path, versioned, sub="asset3")).pool
+
+
+def test_government_terms_with_appended_restriction_need_notes(tmp_path):
+    body = VALID.replace(
+        "licence: CC BY 4.0", "licence: 政府標準利用規約（第2.0版）ただし非営利のみ"
+    )
+    with pytest.raises(ProvenanceError, match="notes"):
+        load(_write(tmp_path, body))
+    ok = body + 'notes: "Reviewer judgment: appended terms assessed against #41."\n'
+    assert load(_write(tmp_path, ok, sub="asset2")).notes
 
 
 @pytest.mark.parametrize(
