@@ -1,0 +1,1332 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "arrive",
+      "shot": "01-arrive-shelf.png"
+    },
+    {
+      "step": 2,
+      "name": "read",
+      "shot": "02-read-passage.png"
+    },
+    {
+      "step": 3,
+      "name": "tap word",
+      "shot": "03-word-panel.png",
+      "panel": {
+        "node": "word:年",
+        "headword": "年",
+        "reading": "とし",
+        "gloss": "year, age",
+        "semRows": [],
+        "semEmpty": "この語には意味近傍がまだ書かれていない。SEM 層は現在 82 語（辞書の約 1.2%）。空白を隠さずに見せている — 拡大は #44。",
+        "kanjiChips": [
+          "過酷",
+          "試練",
+          "逆境",
+          "言葉",
+          "時間",
+          "記憶",
+          "年"
+        ]
+      }
+    },
+    {
+      "step": 3.5,
+      "name": "semantic neighbours",
+      "shot": "03b-semantic-neighbours.png",
+      "semPanel": {
+        "node": "word:過酷",
+        "headword": "過酷",
+        "semRows": [
+          {
+            "word": "厳しい",
+            "note": "everyday synonym, one register softer"
+          },
+          {
+            "word": "苛酷",
+            "note": "literary variant spelling"
+          },
+          {
+            "word": "劣悪",
+            "note": "wretched conditions"
+          },
+          {
+            "word": "熾烈",
+            "note": "cutthroat competition"
+          },
+          {
+            "word": "残酷",
+            "note": "cruelty to beings vs harsh conditions"
+          },
+          {
+            "word": "冷酷",
+            "note": "cold-hearted people"
+          },
+          {
+            "word": "酷使",
+            "note": "to overwork — what makes labor 過酷"
+          },
+          {
+            "word": "酷暑",
+            "note": "punishing heat"
+          },
+          {
+            "word": "過労",
+            "note": "overwork; 過労死"
+          },
+          {
+            "word": "過剰",
+            "note": "the excess root"
+          },
+          {
+            "word": "過酷な労働",
+            "note": "its no.1 collocation"
+          },
+          {
+            "word": "過酷な環境",
+            "note": "deserts, deep sea, workplaces"
+          },
+          {
+            "word": "過酷な運命",
+            "note": "harsh fate"
+          },
+          {
+            "word": "試練",
+            "note": "the ordeal harshness becomes"
+          },
+          {
+            "word": "逆境",
+            "note": "adversity, its home theme"
+          },
+          {
+            "word": "極限",
+            "note": "extreme limits"
+          }
+        ]
+      }
+    },
+    {
+      "step": 4,
+      "name": "kanji",
+      "shot": "04-kanji-page.png",
+      "kanjiPage": {
+        "node": "kanji:過",
+        "glyph": "過",
+        "meaning": "Overdo",
+        "tags": [
+          "12 画",
+          "漢検 6級",
+          "ShareAlike",
+          "ShareAlike プール"
+        ],
+        "sections": [
+          "部品へ",
+          "この字を含む語 — 22 語",
+          "熟語・慣用句 — 2　ShareAlike プール"
+        ]
+      }
+    },
+    {
+      "step": 4.1,
+      "name": "radical",
+      "shot": "04b-radical-page.png",
+      "radicalPage": {
+        "node": "radical:咼",
+        "glyph": "咼",
+        "name": "（名称は漢検の部首表にない部品）",
+        "family": 5,
+        "heading": "この部品を含む字 — 4 字"
+      }
+    },
+    {
+      "step": 5,
+      "name": "take",
+      "shot": "05-take-and-schedule.png",
+      "schedule": [
+        [
+          "もう一度",
+          "1 分後",
+          "2026-08-06 22:55",
+          "0.21"
+        ],
+        [
+          "難しい",
+          "6 分後",
+          "2026-08-06 23:00",
+          "1.29"
+        ],
+        [
+          "ふつう",
+          "10 分後",
+          "2026-08-06 23:04",
+          "2.31"
+        ],
+        [
+          "簡単",
+          "8 日後",
+          "2026-08-14 22:54",
+          "8.30"
+        ]
+      ]
+    },
+    {
+      "step": 6,
+      "name": "return",
+      "shot": "06-return-to-place.png",
+      "scrollBefore": 420,
+      "scrollAfter": 420
+    }
+  ],
+  "measurements": {
+    "contrast": {
+      "current": [
+        {
+          "label": "view title",
+          "selector": ".view-title",
+          "contrast": 17.22,
+          "fontSize": 22,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "shelf title",
+          "selector": ".shelf-title",
+          "contrast": 17.22,
+          "fontSize": 19,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "faint / snippet",
+          "selector": ".shelf-snippet",
+          "contrast": 2.67,
+          "fontSize": 14,
+          "color": "rgba(20, 24, 28, 0.42)"
+        },
+        {
+          "label": "faint / signal label",
+          "selector": ".sig-name",
+          "contrast": 2.67,
+          "fontSize": 12,
+          "color": "rgba(20, 24, 28, 0.42)"
+        },
+        {
+          "label": "chrome breadcrumb (background)",
+          "selector": ".crumb",
+          "contrast": 2.67,
+          "fontSize": 13,
+          "color": "rgba(20, 24, 28, 0.42)"
+        },
+        {
+          "label": "eyebrow label",
+          "selector": ".eyebrow",
+          "contrast": 2.67,
+          "fontSize": 12,
+          "color": "rgba(20, 24, 28, 0.42)"
+        },
+        {
+          "label": "reading body (focused)",
+          "selector": ".reader",
+          "contrast": 17.22,
+          "fontSize": 21,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "gloss",
+          "selector": ".gloss",
+          "contrast": 2.67,
+          "fontSize": 15,
+          "color": "rgba(20, 24, 28, 0.42)"
+        },
+        {
+          "label": "discrimination note",
+          "selector": ".sem-note",
+          "contrast": 9.52,
+          "fontSize": 13,
+          "color": "rgb(61, 68, 76)"
+        },
+        {
+          "label": "reading, the one red",
+          "selector": ".reading",
+          "contrast": 7.17,
+          "fontSize": 15,
+          "color": "rgb(158, 43, 37)"
+        }
+      ],
+      "wcag": [
+        {
+          "label": "view title",
+          "selector": ".view-title",
+          "contrast": 17.22,
+          "fontSize": 22,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "shelf title",
+          "selector": ".shelf-title",
+          "contrast": 17.22,
+          "fontSize": 19,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "faint / snippet",
+          "selector": ".shelf-snippet",
+          "contrast": 6.05,
+          "fontSize": 14,
+          "color": "rgba(20, 24, 28, 0.68)"
+        },
+        {
+          "label": "faint / signal label",
+          "selector": ".sig-name",
+          "contrast": 6.05,
+          "fontSize": 12,
+          "color": "rgba(20, 24, 28, 0.68)"
+        },
+        {
+          "label": "chrome breadcrumb (background)",
+          "selector": ".crumb",
+          "contrast": 6.05,
+          "fontSize": 13,
+          "color": "rgba(20, 24, 28, 0.68)"
+        },
+        {
+          "label": "eyebrow label",
+          "selector": ".eyebrow",
+          "contrast": 6.05,
+          "fontSize": 12,
+          "color": "rgba(20, 24, 28, 0.68)"
+        },
+        {
+          "label": "reading body (focused)",
+          "selector": ".reader",
+          "contrast": 17.22,
+          "fontSize": 21,
+          "color": "rgb(20, 24, 28)"
+        },
+        {
+          "label": "gloss",
+          "selector": ".gloss",
+          "contrast": 6.05,
+          "fontSize": 15,
+          "color": "rgba(20, 24, 28, 0.68)"
+        },
+        {
+          "label": "discrimination note",
+          "selector": ".sem-note",
+          "contrast": 9.52,
+          "fontSize": 13,
+          "color": "rgb(61, 68, 76)"
+        },
+        {
+          "label": "reading, the one red",
+          "selector": ".reading",
+          "contrast": 7.17,
+          "fontSize": 15,
+          "color": "rgb(158, 43, 37)"
+        }
+      ]
+    },
+    "text": [
+      {
+        "label": "reading body (focused)",
+        "selector": ".reader",
+        "contrast": 17.22,
+        "fontSize": 21,
+        "color": "rgb(20, 24, 28)"
+      },
+      {
+        "label": "view title",
+        "selector": ".view-title",
+        "contrast": 17.22,
+        "fontSize": 22,
+        "color": "rgb(20, 24, 28)"
+      },
+      {
+        "label": "gloss",
+        "selector": ".gloss",
+        "contrast": 2.67,
+        "fontSize": 15,
+        "color": "rgba(20, 24, 28, 0.42)"
+      },
+      {
+        "label": "discrimination note",
+        "selector": ".sem-note",
+        "contrast": 9.52,
+        "fontSize": 13,
+        "color": "rgb(61, 68, 76)"
+      },
+      {
+        "label": "faint / signal label",
+        "selector": ".sig-name",
+        "contrast": 2.67,
+        "fontSize": 12,
+        "color": "rgba(20, 24, 28, 0.42)"
+      },
+      {
+        "label": "chrome breadcrumb (background)",
+        "selector": ".crumb",
+        "contrast": 2.67,
+        "fontSize": 13,
+        "color": "rgba(20, 24, 28, 0.42)"
+      },
+      {
+        "label": "eyebrow label",
+        "selector": ".eyebrow",
+        "contrast": 2.67,
+        "fontSize": 12,
+        "color": "rgba(20, 24, 28, 0.42)"
+      },
+      {
+        "label": "reading, the one red",
+        "selector": ".reading",
+        "contrast": 7.17,
+        "fontSize": 15,
+        "color": "rgb(158, 43, 37)"
+      },
+      {
+        "label": "shelf title",
+        "selector": ".shelf-title",
+        "contrast": 17.22,
+        "fontSize": 19,
+        "color": "rgb(20, 24, 28)"
+      },
+      {
+        "label": "faint / snippet",
+        "selector": ".shelf-snippet",
+        "contrast": 2.67,
+        "fontSize": 14,
+        "color": "rgba(20, 24, 28, 0.42)"
+      }
+    ],
+    "targets": [
+      {
+        "text": "戻る",
+        "w": 54,
+        "h": 44,
+        "id": "back"
+      },
+      {
+        "text": "取 0",
+        "w": 53,
+        "h": 44,
+        "id": "tray"
+      },
+      {
+        "text": "そのまま",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "常用まで",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "すべて仮名",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "なし",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "触れて",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "つねに",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "なし",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "語の間",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "文節",
+        "w": 86,
+        "h": 40,
+        "id": ""
+      },
+      {
+        "text": "原典",
+        "w": 44,
+        "h": 40,
+        "id": "inline-link"
+      },
+      {
+        "text": "厳しいeveryday sy",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "苛酷literary var",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "劣悪wretched con",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "熾烈cutthroat co",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "残酷cruelty to b",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "冷酷cold-hearted",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "酷使to overwork ",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "酷暑punishing he",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過労overwork; 過労",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過剰the excess r",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過酷な労働its no.1 ",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過酷な環境deserts, ",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過酷な運命harsh fat",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "試練the ordeal h",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "逆境adversity, i",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "極限extreme limi",
+        "w": 358,
+        "h": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過6級",
+        "w": 44,
+        "h": 48,
+        "id": "chip"
+      },
+      {
+        "text": "酷準2級",
+        "w": 51,
+        "h": 48,
+        "id": "chip"
+      },
+      {
+        "text": "取る",
+        "w": 358,
+        "h": 48,
+        "id": "take"
+      },
+      {
+        "text": "変異 ▴",
+        "w": 67,
+        "h": 40,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻る",
+        "w": 54,
+        "h": 44,
+        "id": "back"
+      },
+      {
+        "text": "取 0",
+        "w": 53,
+        "h": 44,
+        "id": "tray"
+      },
+      {
+        "text": "世界自然遺産に7箇所を追加 ",
+        "w": 358,
+        "h": 258,
+        "id": "shelf-item"
+      },
+      {
+        "text": "マリナーズ・イチロー選手 現",
+        "w": 358,
+        "h": 289,
+        "id": "shelf-item"
+      },
+      {
+        "text": "JRおおさか東線部分開業ウィ",
+        "w": 358,
+        "h": 259,
+        "id": "shelf-item"
+      },
+      {
+        "text": "信楽高原鐵道列車衝突事故、J",
+        "w": 358,
+        "h": 286,
+        "id": "shelf-item"
+      },
+      {
+        "text": "ウィキニュース、21年の歴史",
+        "w": 358,
+        "h": 289,
+        "id": "shelf-item"
+      },
+      {
+        "text": "野ばら青空文庫 · 小川未明",
+        "w": 358,
+        "h": 288,
+        "id": "shelf-item"
+      },
+      {
+        "text": "ごん狐青空文庫 · 新美南吉",
+        "w": 358,
+        "h": 316,
+        "id": "shelf-item"
+      },
+      {
+        "text": "やまなし青空文庫 · 宮沢賢",
+        "w": 358,
+        "h": 316,
+        "id": "shelf-item"
+      },
+      {
+        "text": "育児休業やさしい日本語 用語",
+        "w": 358,
+        "h": 266,
+        "id": "shelf-item"
+      },
+      {
+        "text": "育児休業給付金やさしい日本語",
+        "w": 358,
+        "h": 289,
+        "id": "shelf-item"
+      },
+      {
+        "text": "遺族基礎年金やさしい日本語 ",
+        "w": 358,
+        "h": 289,
+        "id": "shelf-item"
+      },
+      {
+        "text": "変異 ▴",
+        "w": 67,
+        "h": 40,
+        "id": "variants-toggle"
+      }
+    ],
+    "semRowsOnProbePanel": 16
+  },
+  "shelf": [
+    {
+      "title": "世界自然遺産に7箇所を追加 知床半島も",
+      "meta": [
+        "ウィキニュース",
+        "2005-07-15",
+        "CC BY 4.0",
+        "抜粋",
+        "3つの信号。平均しない。"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "2.42 上級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "63.7%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "57.0%"
+        }
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "meta": [
+        "ウィキニュース",
+        "2006-06-17",
+        "CC BY 4.0",
+        "3つの信号。平均しない。",
+        "不一致 gap 1"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "4.23 中級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "67.4%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "41.9%"
+        }
+      ],
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "JRおおさか東線部分開業",
+      "meta": [
+        "ウィキニュース",
+        "2008-03-15",
+        "CC BY 4.0",
+        "抜粋",
+        "3つの信号。平均しない。"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "1.94 上級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "69.9%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "49.6%"
+        }
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+      "meta": [
+        "ウィキニュース",
+        "2011-04-28",
+        "CC BY 4.0",
+        "抜粋",
+        "3つの信号。平均しない。"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "1.32 上級後半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "71.1%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "49.1%"
+        }
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "ウィキニュース、21年の歴史に幕を閉じる",
+      "meta": [
+        "ウィキニュース",
+        "2026-05-03",
+        "CC BY 4.0",
+        "抜粋",
+        "3つの信号。平均しない。",
+        "不一致 gap 1"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "3.37 中級後半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "67.7%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "48.9%"
+        }
+      ],
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "野ばら",
+      "meta": [
+        "青空文庫 · 小川未明",
+        "None",
+        "PD (著作権フラグ なし) · 新字新仮名",
+        "抜粋",
+        "3つの信号。平均しない。",
+        "不一致 gap 2"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "4.52 初級後半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "86.9%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "22.1%"
+        }
+      ],
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "ごん狐",
+      "meta": [
+        "青空文庫 · 新美南吉",
+        "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
+        "PD (著作権フラグ なし) · 新字新仮名",
+        "抜粋",
+        "3つの信号。平均しない。",
+        "不一致 gap 1"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "4.27 中級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "88.8%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "24.8%"
+        }
+      ],
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "やまなし",
+      "meta": [
+        "青空文庫 · 宮沢賢治",
+        "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
+        "PD (著作権フラグ なし) · 新字新仮名",
+        "抜粋",
+        "3つの信号。平均しない。",
+        "不一致 gap 2"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "4.80 初級後半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "85.8%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "23.6%"
+        }
+      ],
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "育児休業",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary",
+        "ルビ原文",
+        "3つの信号。平均しない。",
+        "不一致 gap 1"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "4.04 中級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "100.0%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "0.0%"
+        }
+      ],
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "育児休業給付金",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary",
+        "ルビ原文",
+        "3つの信号。平均しない。",
+        "不一致 gap 2"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "5.72 初級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "69.2%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "46.2%"
+        }
+      ],
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "遺族基礎年金",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary",
+        "ルビ原文",
+        "3つの信号。平均しない。",
+        "不一致 gap 1"
+      ],
+      "signals": [
+        {
+          "name": "jreadability",
+          "value": "3.58 中級前半"
+        },
+        {
+          "name": "語彙カバー率",
+          "value": "80.0%"
+        },
+        {
+          "name": "TMR（核）",
+          "value": "20.0%"
+        }
+      ],
+      "disagreement": "不一致 gap 1"
+    }
+  ],
+  "caps": {
+    "excerptChars": 520,
+    "kanjiWordCap": 60,
+    "radicalKanjiCap": 80,
+    "idiomCap": 900,
+    "idiomCandidates": 3559,
+    "idiomTotalInSource": 4198
+  },
+  "dials": {
+    "baseline": {
+      "rt": 130,
+      "hiddenRt": 0,
+      "spacing": "reader",
+      "text": "2005年ねん7月がつ14日か、南みなみアフリカ共和きょうわ国こくダーバンで開催"
+    },
+    "noFuri": {
+      "rt": 0,
+      "hiddenRt": 0,
+      "spacing": "reader",
+      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+    },
+    "spaced": {
+      "rt": 0,
+      "hiddenRt": 0,
+      "spacing": "reader sp-bunsetsu",
+      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+    },
+    "joyo": {
+      "rt": 0,
+      "hiddenRt": 0,
+      "spacing": "reader sp-bunsetsu",
+      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+    },
+    "allKana": {
+      "rt": 0,
+      "hiddenRt": 0,
+      "spacing": "reader sp-bunsetsu",
+      "text": "2005ねん7がつ14か、みなみあふりかきょうわこくだーばんでかいさいちゅうのだ"
+    }
+  },
+  "idiomSectionPresent": true,
+  "hops": [
+    "kanji:過",
+    "word:経過",
+    "radical:咼",
+    "kanji:過"
+  ],
+  "variantShots": {
+    "A-mcd": "V-A-cards-mcd.png",
+    "A-word": "V-A-cards-word.png",
+    "B-three": "V-B-difficulty-three.png",
+    "B-band": "V-B-difficulty-band.png",
+    "C-current-shelf": "V-C-contrast-current-shelf.png",
+    "C-current": "V-C-contrast-current.png",
+    "C-wcag-shelf": "V-C-contrast-wcag-shelf.png",
+    "C-wcag": "V-C-contrast-wcag.png",
+    "D-field": "V-D-entry-field.png",
+    "D-field-to-shelf": "V-D-entry-field-to-shelf.png",
+    "D-shelf": "V-D-entry-shelf.png"
+  },
+  "graderTable": [
+    {
+      "title": "世界自然遺産に7箇所を追加 知床半島も",
+      "signals": {
+        "jreadability": "2.42 上級前半",
+        "語彙カバー率": "63.7%",
+        "TMR（核）": "57.0%"
+      },
+      "disagreement": null
+    },
+    {
+      "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "signals": {
+        "jreadability": "4.23 中級前半",
+        "語彙カバー率": "67.4%",
+        "TMR（核）": "41.9%"
+      },
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "JRおおさか東線部分開業",
+      "signals": {
+        "jreadability": "1.94 上級前半",
+        "語彙カバー率": "69.9%",
+        "TMR（核）": "49.6%"
+      },
+      "disagreement": null
+    },
+    {
+      "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+      "signals": {
+        "jreadability": "1.32 上級後半",
+        "語彙カバー率": "71.1%",
+        "TMR（核）": "49.1%"
+      },
+      "disagreement": null
+    },
+    {
+      "title": "ウィキニュース、21年の歴史に幕を閉じる",
+      "signals": {
+        "jreadability": "3.37 中級後半",
+        "語彙カバー率": "67.7%",
+        "TMR（核）": "48.9%"
+      },
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "野ばら",
+      "signals": {
+        "jreadability": "4.52 初級後半",
+        "語彙カバー率": "86.9%",
+        "TMR（核）": "22.1%"
+      },
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "ごん狐",
+      "signals": {
+        "jreadability": "4.27 中級前半",
+        "語彙カバー率": "88.8%",
+        "TMR（核）": "24.8%"
+      },
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "やまなし",
+      "signals": {
+        "jreadability": "4.80 初級後半",
+        "語彙カバー率": "85.8%",
+        "TMR（核）": "23.6%"
+      },
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "育児休業",
+      "signals": {
+        "jreadability": "4.04 中級前半",
+        "語彙カバー率": "100.0%",
+        "TMR（核）": "0.0%"
+      },
+      "disagreement": "不一致 gap 1"
+    },
+    {
+      "title": "育児休業給付金",
+      "signals": {
+        "jreadability": "5.72 初級前半",
+        "語彙カバー率": "69.2%",
+        "TMR（核）": "46.2%"
+      },
+      "disagreement": "不一致 gap 2"
+    },
+    {
+      "title": "遺族基礎年金",
+      "signals": {
+        "jreadability": "3.58 中級前半",
+        "語彙カバー率": "80.0%",
+        "TMR（核）": "20.0%"
+      },
+      "disagreement": "不一致 gap 1"
+    }
+  ],
+  "counts": {
+    "passages": 11,
+    "words": 7217,
+    "kanji": 2582,
+    "radicals": 926,
+    "idioms": 900,
+    "semHeads": 82
+  },
+  "loadMs": 351,
+  "summary": {
+    "total": 38,
+    "failed": 0
+  },
+  "results": [
+    {
+      "name": "the shelf renders real graded texts",
+      "pass": true,
+      "detail": "11 texts, ready in 351 ms"
+    },
+    {
+      "name": "every shelf text shows three signals, not one score",
+      "pass": true,
+      "detail": "11 texts × 3 signals"
+    },
+    {
+      "name": "disagreement is visible where it fires",
+      "pass": true,
+      "detail": "8/11 texts flagged"
+    },
+    {
+      "name": "the reader shows real Japanese",
+      "pass": true,
+      "detail": "900 chars rendered"
+    },
+    {
+      "name": "furigana renders as real ruby",
+      "pass": true,
+      "detail": "130 <rt> elements"
+    },
+    {
+      "name": "dial · furigana alone changes furigana",
+      "pass": true,
+      "detail": "rt 130 → 0, spacing class unchanged"
+    },
+    {
+      "name": "dial · spacing alone changes spacing",
+      "pass": true,
+      "detail": "class \"reader sp-bunsetsu\", rt still 0"
+    },
+    {
+      "name": "文節 grouping is real",
+      "pass": true,
+      "detail": "136 文節 groups"
+    },
+    {
+      "name": "dial · kanji alone changes the script",
+      "pass": true,
+      "detail": "\"2005年ねん7月がつ14日\" → \"2005ねん7がつ14か、み\""
+    },
+    {
+      "name": "furigana can be held back and revealed",
+      "pass": true,
+      "detail": "130 ruby present but hidden"
+    },
+    {
+      "name": "tapping a word opens a panel with reading + meaning",
+      "pass": true,
+      "detail": "年（とし）"
+    },
+    {
+      "name": "the panel offers a hop into the kanji",
+      "pass": true,
+      "detail": "7 chips"
+    },
+    {
+      "name": "semantic neighbours carry their discrimination notes",
+      "pass": true,
+      "detail": "過酷: 16 edges, e.g. 厳しい「everyday synonym, one register softer」"
+    },
+    {
+      "name": "word → kanji lands on a real kanji page",
+      "pass": true,
+      "detail": "過 — Overdo; 12 画 / 漢検 6級 / ShareAlike / ShareAlike プール"
+    },
+    {
+      "name": "the kanji page carries its 漢検級",
+      "pass": true,
+      "detail": "漢検 6級"
+    },
+    {
+      "name": "idioms hang off the kanji page, marked as the ShareAlike pool",
+      "pass": true,
+      "detail": "1 idiom section(s)"
+    },
+    {
+      "name": "kanji → a word that contains it",
+      "pass": true,
+      "detail": "word:経過"
+    },
+    {
+      "name": "kanji → radical lands on a real radical page with a family",
+      "pass": true,
+      "detail": "咼（（名称は漢検の部首表にない部品）） この部品を含む字 — 4 字"
+    },
+    {
+      "name": "radical → another kanji that uses it",
+      "pass": true,
+      "detail": "kanji:過"
+    },
+    {
+      "name": "any node can be taken into study",
+      "pass": true,
+      "detail": "tray reads \"取 1\""
+    },
+    {
+      "name": "the schedule preview shows what FSRS-6 would do",
+      "pass": true,
+      "detail": "もう一度→1 分後 · 難しい→6 分後 · ふつう→10 分後 · 簡単→8 日後"
+    },
+    {
+      "name": "two hops deep, 戻る returns to the reader at the same place",
+      "pass": true,
+      "detail": "scrollY 420 → 420, sheet closed=true"
+    },
+    {
+      "name": "variant A · mcd renders the target both ways",
+      "pass": true,
+      "detail": "MCD — 文脈まるごと、一語だけ空ける — face \"2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　\""
+    },
+    {
+      "name": "variant A · word renders the target both ways",
+      "pass": true,
+      "detail": "単語札 — 表は語だけ（Animecards — face \"世界\""
+    },
+    {
+      "name": "variant B · three",
+      "pass": true,
+      "detail": "33 signal rows / 0 bands / 0 uncertain markers"
+    },
+    {
+      "name": "variant B · band",
+      "pass": true,
+      "detail": "0 signal rows / 11 bands / 8 uncertain markers"
+    },
+    {
+      "name": "variant C · the WCAG side actually reaches AA",
+      "pass": true,
+      "detail": "faint text: current 2.67:1 → wcag 6.05:1 (AA needs 4.5)"
+    },
+    {
+      "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
+      "pass": true,
+      "detail": "2.67:1"
+    },
+    {
+      "name": "variant D · field entry",
+      "pass": true,
+      "detail": "26 drifting words, placeholder marked=true"
+    },
+    {
+      "name": "variant D · one gesture from the field to the shelf",
+      "pass": true,
+      "detail": "tap 棚へ → shelf"
+    },
+    {
+      "name": "variant D · shelf entry",
+      "pass": true,
+      "detail": "11 texts"
+    },
+    {
+      "name": "focused content dominates the background chrome",
+      "pass": true,
+      "detail": "reader 21px vs chrome 13px (Drift's inverted case was 11px vs 22–43px)"
+    },
+    {
+      "name": "discrimination notes are legible (AA)",
+      "pass": true,
+      "detail": "9.52:1 at 13px"
+    },
+    {
+      "name": "body ink clears AAA",
+      "pass": true,
+      "detail": "17.22:1"
+    },
+    {
+      "name": "every visible control is at least 40px",
+      "pass": true,
+      "detail": "46 controls checked"
+    },
+    {
+      "name": "the page never scrolls sideways at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs viewport 390"
+    },
+    {
+      "name": "no console errors during the walk",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "the variant strip exposes all four open decisions",
+      "pass": true,
+      "detail": "4 rows"
+    }
+  ]
+}
