@@ -192,7 +192,10 @@ export function KanjiScreen({
           <Text
             accessibilityLabel={`The kanji ${kanji.character}`}
             accessible
-            style={[styles.character, { color: theme.color.ink, fontFamily: theme.font.mincho }]}
+            // The hero glyph is laid in the theme's first mineral pigment
+            // (Drift fusion §2) — 96pt is display type, and the pigment
+            // tokens clear the 3:1 display floor in every theme.
+            style={[styles.character, { color: theme.color.pig1, fontFamily: theme.font.mincho }]}
             testID="kanji-character"
           >
             {kanji.character}

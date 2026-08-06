@@ -73,6 +73,19 @@ export const navLinkStyle = {
 } as const;
 
 /**
+ * The theme seal in the masthead (Drift fusion §3): the round 印 that cycles
+ * the five nihonga themes. Round because a seal is round; still ≥44 pt because
+ * a seal that is hard to press is a control wearing an ornament's name.
+ */
+export const themeSealStyle = {
+  ...TOUCH_TARGET,
+  alignItems: 'center',
+  borderRadius: MIN_TOUCH_TARGET / 2,
+  borderWidth: 1.5,
+  justifyContent: 'center',
+} as const;
+
+/**
  * Every interactive style in the app, by the name of the control that uses it.
  * A control missing from this map is a control nothing size-checked.
  */
@@ -82,6 +95,7 @@ export const INTERACTIVE_STYLES = {
   NavLink: navLinkStyle,
   RowButton: rowStyle,
   SearchField: searchFieldStyle,
+  ThemeSeal: themeSealStyle,
 } as const;
 
 export type InteractiveStyleName = keyof typeof INTERACTIVE_STYLES;

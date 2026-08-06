@@ -32,8 +32,11 @@ describe('touch targets', () => {
       // A control whose minHeight is 44 but whose padded content is taller is
       // fine; one whose content is *shorter* still gets 44 from minHeight. The
       // failure this catches is a negative or zero vertical padding paired with
-      // a shrunk minHeight in some future edit.
-      const contentHeight = TYPE.label * 1.2 + style.paddingVertical * 2;
+      // a shrunk minHeight in some future edit. A control with no vertical
+      // padding at all (the round theme seal centres its glyph) leans wholly
+      // on minHeight, which the max() below already covers.
+      const paddingVertical = 'paddingVertical' in style ? style.paddingVertical : 0;
+      const contentHeight = TYPE.label * 1.2 + paddingVertical * 2;
       expect(Math.max(contentHeight, style.minHeight)).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET);
     },
   );
