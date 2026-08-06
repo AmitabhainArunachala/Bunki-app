@@ -1,10 +1,10 @@
 name: pages-app
 
-# Publishes the fused Bunki web app (five nihonga themes, per the Drift design
-# language) to GitHub Pages so the operator can open it on a phone like a site,
-# and hosts the Drift opening-surface prototype at /drift/ as a public,
-# sign-in-free URL alongside it. Server-backed flows stay in their designed
-# local/offline mode; this is the static client build.
+# Publishes Bunki as ONE app to GitHub Pages. The opening surface — Drift, the
+# living-universe of the whole lexicon — is the site root: open Bunki and you
+# are in the universe. The study screens (capture, session, word, kanji) live
+# beneath it at /app/, and a quiet link carries you in. Server-backed flows stay
+# in their designed local/offline mode; this is the static client build.
 on:
   workflow_dispatch:
   push:
@@ -38,10 +38,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # GitHub Pages serves a project site under /<repo>/, so the web bundle
-      # must be built with that base path or every absolute asset URL 404s.
-      # This is a build-time mutation only — the committed app.json stays
-      # base-less so the e2e suite keeps serving the app at root.
+      # The study app is served under /<repo>/app/, so its web bundle must be
+      # built with that base path or every absolute asset URL 404s. Build-time
+      # mutation only — the committed app.json stays base-less so the e2e suite
+      # keeps serving the app at root.
       - name: Set Pages base path on the web build
         working-directory: apps/app
         env:
@@ -50,9 +50,9 @@ jobs:
           node -e '
             const fs = require("fs");
             const a = JSON.parse(fs.readFileSync("app.json", "utf8"));
-            a.expo.experiments = { ...(a.expo.experiments || {}), baseUrl: "/" + process.env.BASE };
+            a.expo.experiments = { ...(a.expo.experiments || {}), baseUrl: "/" + process.env.BASE + "/app" };
             fs.writeFileSync("app.json", JSON.stringify(a, null, 2));
-            console.log("baseUrl set to /" + process.env.BASE);
+            console.log("baseUrl set to /" + process.env.BASE + "/app");
           '
 
       - name: Export the web bundle
@@ -60,26 +60,43 @@ jobs:
         run: npx expo export --platform web
 
       - name: Assemble the Pages site
-        env:
-          BASE: ${{ github.event.repository.name }}
         run: |
           set -euo pipefail
-          SITE="$RUNNER_TEMP/site/$BASE"
-          mkdir -p "$SITE"
-          cp -r apps/app/dist/* "$SITE"/
-          # SPA fallback: any unknown path boots the app, whose client router
-          # then reads the URL. Covers dynamic routes (/kanji/<char>) that have
-          # no pre-rendered file on a static host.
-          cp apps/app/dist/index.html "$SITE"/404.html
-          # The Drift prototype: self-contained, wrapped into a full document at
-          # /<repo>/drift/ — a public, sign-in-free link for the phone.
-          mkdir -p "$SITE"/drift
+          # This directory's CONTENTS are served at https://<owner>.github.io/<repo>/,
+          # so index.html must sit at its root — no extra <repo>/ nesting.
+          SITE="$RUNNER_TEMP/site"
+          mkdir -p "$SITE/app"
+
+          # The study app beneath the opening surface.
+          cp -r apps/app/dist/* "$SITE/app"/
+          # SPA fallback so the app's dynamic routes (/app/kanji/<char>) resolve
+          # on a static host: any unknown path under /app/ boots the app, whose
+          # client router then reads the URL.
+          cp apps/app/dist/index.html "$SITE/app"/404.html
+
+          # The opening surface IS the root. Drift is self-contained; it is
+          # wrapped into a full document with one quiet link into the study app.
+          DRIFT_LINK='<a href="app/" id="to-study" style="position:fixed;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9;font:13px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;letter-spacing:.12em;color:var(--pig2,#165e83);text-decoration:none;border:1px solid var(--line,rgba(0,0,0,.2));border-radius:999px;padding:7px 13px;background:var(--plaque,rgba(255,255,255,.9))">辞書へ →</a>'
           {
             printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"></head><body>'
             cat prototypes/drift/drift-artifact.html
+            printf '%s' "$DRIFT_LINK"
             printf '%s' '</body></html>'
-          } > "$SITE"/drift/index.html
-          echo "SITE_DIR=$RUNNER_TEMP/site" >> "$GITHUB_ENV"
+          } > "$SITE/index.html"
+
+          # GitHub Pages uses ONE site-root 404 for every miss. So this 404
+          # dispatches: a miss under /app/ (a client-side app route refreshed or
+          # deep-linked) boots the study app; every other miss falls into the
+          # universe. The redirect runs in <head> before the Drift body loads,
+          # so Drift never initialises on an app-bound miss.
+          {
+            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>(function(){var p=location.pathname,i=p.indexOf("/app/");if(i>-1)location.replace(p.slice(0,i)+"/app/"+location.search+location.hash);})();</script></head><body>'
+            cat prototypes/drift/drift-artifact.html
+            printf '%s' "$DRIFT_LINK"
+            printf '%s' '</body></html>'
+          } > "$SITE/404.html"
+
+          echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
 
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4
@@ -106,25 +123,19 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Report Pages availability
-        env:
-          BASE: ${{ github.event.repository.name }}
         run: |
           if [ "${{ steps.cfg.outcome }}" = "success" ]; then
             {
               echo "### Pages deployed"
               echo ""
-              echo "- App: ${{ steps.deployment.outputs.page_url }}"
-              echo "- Drift: ${{ steps.deployment.outputs.page_url }}drift/"
+              echo "- Bunki (opens in Drift): ${{ steps.deployment.outputs.page_url }}"
+              echo "- Study app: ${{ steps.deployment.outputs.page_url }}app/"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             {
               echo "### Pages not enabled on this repository"
               echo ""
               echo "Build succeeded and is attached as the **bunki-app-static** artifact."
-              echo "To get a live URL: Settings -> Pages -> Source: **GitHub Actions**"
-              echo "(requires a public repo or a plan with private Pages), then re-run this workflow."
-              echo "Once live it serves at:"
-              echo "- App: https://<owner>.github.io/$BASE/"
-              echo "- Drift: https://<owner>.github.io/$BASE/drift/"
+              echo "To get a live URL: Settings -> Pages -> Source: **GitHub Actions**, then re-run."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
