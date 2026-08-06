@@ -90,14 +90,63 @@ def test_cc0_needs_no_attribution(tmp_path):
     assert load(_write(tmp_path, body)).licence == "CC0-1.0"
 
 
-def test_unknown_licence_in_safe_pool_needs_notes(tmp_path):
-    body = VALID.replace("licence: CC BY 4.0", "licence: 政府標準利用規約 2.0").replace(
+def test_unknown_licence_needs_notes_in_either_pool(tmp_path):
+    body = VALID.replace("licence: CC BY 4.0", "licence: bespoke wiki grant").replace(
         'attribution: "Wikinews contributors, ja.wikinews.org, CC BY 4.0"\n', ""
     )
     with pytest.raises(ProvenanceError, match="legal basis"):
         load(_write(tmp_path, body))
-    ok = body + 'notes: "Government open terms, CC BY 4.0-compatible per Wayfinder #41."\n'
+    sa_pool = body.replace("pool: proprietary_safe", "pool: share_alike")
+    with pytest.raises(ProvenanceError, match="legal basis"):
+        load(_write(tmp_path, sa_pool, sub="asset_sa"))
+    ok = body + 'notes: "Aozora-style free-redistribution wording; basis recorded."\n'
     assert load(_write(tmp_path, ok, sub="asset2")).notes
+
+
+def test_government_terms_recognised_and_require_attribution(tmp_path):
+    body = VALID.replace("licence: CC BY 4.0", "licence: 政府標準利用規約 2.0")
+    assert load(_write(tmp_path, body)).licence == "政府標準利用規約 2.0"
+    no_attr = body.replace(
+        'attribution: "Wikinews contributors, ja.wikinews.org, CC BY 4.0"\n', ""
+    )
+    with pytest.raises(ProvenanceError, match="attribution"):
+        load(_write(tmp_path, no_attr, sub="asset2"))
+
+
+@pytest.mark.parametrize(
+    "licence",
+    [
+        "Creative Commons Attribution-NonCommercial 4.0",
+        "Creative Commons Attribution-NoDerivatives 4.0 International",
+        "Attribution Non-Commercial ShareAlike 3.0",
+    ],
+)
+@pytest.mark.parametrize("pool", ["proprietary_safe", "share_alike"])
+def test_spelled_out_nc_nd_hard_error_even_with_notes(tmp_path, licence, pool):
+    body = (
+        VALID.replace("licence: CC BY 4.0", f"licence: {licence}").replace(
+            "pool: proprietary_safe", f"pool: {pool}"
+        )
+        + 'notes: "legal basis: vibes"\n'
+    )
+    with pytest.raises(ProvenanceError, match="NC/ND"):
+        load(_write(tmp_path, body))
+
+
+def test_spelled_out_sharealike_forced_to_sharealike_pool(tmp_path):
+    body = VALID.replace(
+        "licence: CC BY 4.0", "licence: Creative Commons Attribution-ShareAlike 4.0"
+    )
+    with pytest.raises(ProvenanceError, match="share_alike"):
+        load(_write(tmp_path, body))
+
+
+def test_spelled_out_attribution_requires_attribution_text(tmp_path):
+    body = VALID.replace(
+        "licence: CC BY 4.0", "licence: Creative Commons Attribution 4.0 International"
+    ).replace('attribution: "Wikinews contributors, ja.wikinews.org, CC BY 4.0"\n', "")
+    with pytest.raises(ProvenanceError, match="attribution"):
+        load(_write(tmp_path, body))
 
 
 def test_bad_date_rejected(tmp_path):
