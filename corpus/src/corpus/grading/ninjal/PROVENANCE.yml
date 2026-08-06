@@ -1,0 +1,36 @@
+name: ninjal-kyoiku-kihon-goi
+upstream:
+  - https://mmsrv.ninjal.ac.jp/brfvep/
+  - https://mmsrv.ninjal.ac.jp/brfvep/rokusyutaisyo.csv
+retrieved: "2026-08-07"
+licence: CC BY 4.0
+licence_url: http://creativecommons.org/licenses/by/4.0/
+pool: proprietary_safe
+attribution: >-
+  「日本語教育基本語彙データベース」（国立国語研究所『教育基本語彙の基本的研究
+  ―増補改訂版―（国立国語研究所報告127）』2009年 付属CD-ROM収録、
+  https://mmsrv.ninjal.ac.jp/brfvep/ にて公開）を加工して利用。
+  クリエイティブ・コモンズ 表示 4.0 国際 ライセンス
+  (http://creativecommons.org/licenses/by/4.0/)。
+restrictions: []
+upstream_pin: rokusyutaisyo.csv as published on the 2009 report page (no version id upstream; pinned by sha256)
+artifact_sha256:
+  rokusyutaisyo.csv: 80f190abebfe5fdfc52aec06a6c9c842eb4b1ff25b6687f135547a81902607af
+  kaisetsu.pdf: aef100fe58f066cfc9f3c47e09e17178b7a27879de24d05307f979136944dcd5
+notes: >-
+  Licence statement verified verbatim on https://mmsrv.ninjal.ac.jp/brfvep/
+  (retrieved 2026-08-07): 「「教育基本語彙データベース（2009年版A）」
+  「教育基本語彙データベース(2009年版B)」「日本語教育基本語彙データベース」は
+  クリエイティブ・コモンズ 表示 4.0 国際 ライセンスの下に提供されています。」
+  with the licence badge linking to http://creativecommons.org/licenses/by/4.0/
+  and /deed.ja. The file used is rokusyutaisyo.csv (page text also spells it
+  rokushutaisho.csv; the live href is rokusyutaisyo.csv), cp932, 11,827 data
+  rows: 通し番号/見出し/表記/品詞/語種/語彙配当 + six mark columns (国語研,
+  初級500語, 七種対照, 工藤, 木幡, 玉村). Substrate used: the 国語研教育基本語彙
+  column — 国立国語研究所『日本語教育のための基本語彙調査』(1984), the one list
+  built for L2 learners — 6,103 marked words (◎ core 2,071 / ○ extended 4,032),
+  matching kaisetsu.pdf 「語数は，6,103語である」. 語彙配当 (1/2/3) is the
+  阪本-derived native-schoolchildren allocation and is not used as a learner
+  level. DOI for the source report page: https://doi.org/10.15084/00001288.
+  Levels derived from this asset are always labeled ninjal-kyoiku-kihon-goi:*,
+  never JLPT.
