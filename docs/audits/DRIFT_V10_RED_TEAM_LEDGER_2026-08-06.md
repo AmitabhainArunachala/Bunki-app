@@ -122,7 +122,7 @@ KanjiVG (strokes + components, canonical) and the KANJIDIC2-derived
   「この字を含む漢字」 (kanji containing this character), not 「この部首の漢字」.
 
 Still deferred (needs KANJIDIC2 itself, blocked by the proxy in this
-environment): an authoritative per-kanji *classical* radical field
+environment): an authoritative per-kanji _classical_ radical field
 (`RADICAL_OF`) distinct from the component families in `RADK`, and
 frequency-ranked reading ordering. `RADK` remains a component-family index
 ("contains this component"), which is now what the UI says it is.
