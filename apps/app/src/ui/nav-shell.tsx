@@ -28,9 +28,9 @@ import { usePathname, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { navLinkStyle } from './interactive-styles.ts';
+import { navLinkStyle, themeSealStyle } from './interactive-styles.ts';
 import { SHELL_DESTINATIONS, type Destination } from './navigation.ts';
-import { useTheme } from './theme-context.tsx';
+import { useTheme, useThemeControl } from './theme-context.tsx';
 
 /**
  * The wordmark.
@@ -86,6 +86,7 @@ export function NavShell({ children }: NavShellProps): ReactNode {
             />
           ))}
         </View>
+        <ThemeSeal />
       </View>
       <View style={styles.body}>{children}</View>
     </View>
@@ -155,6 +156,44 @@ function NavLink({ destination, current }: NavLinkProps): ReactNode {
   );
 }
 
+/**
+ * The theme seal (Drift fusion §3): a round 印 stamped with the current
+ * theme's character. One tap advances to the next of the five nihonga
+ * themes, in the prototype's cycle order. It sits at the far edge of the
+ * masthead — a seal goes in the corner of the painting, not in the middle.
+ */
+function ThemeSeal(): ReactNode {
+  const theme = useTheme();
+  const { cycleTheme } = useThemeControl();
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <Pressable
+      accessibilityHint="Cycles through the five nihonga colour themes"
+      accessibilityLabel={`Theme: ${theme.label}. Change theme`}
+      accessibilityRole="button"
+      onBlur={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
+      onPress={cycleTheme}
+      style={({ pressed }) => [
+        styles.seal,
+        {
+          borderColor: focused ? theme.color.focusRing : theme.color.vermilion,
+          borderWidth: focused ? 2.5 : themeSealStyle.borderWidth,
+          opacity: pressed ? 0.7 : 1,
+        },
+      ]}
+      testID="nav-theme-seal"
+    >
+      <Text
+        style={[styles.sealGlyph, { color: theme.color.vermilion, fontFamily: theme.font.mincho }]}
+      >
+        {theme.seal}
+      </Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   body: { flex: 1 },
   link: { ...navLinkStyle },
@@ -169,6 +208,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
+  seal: { ...themeSealStyle, marginLeft: 'auto' },
+  sealGlyph: { fontSize: 17 },
   shell: { flex: 1 },
   wordmark: { fontSize: 22, letterSpacing: 4 },
 });

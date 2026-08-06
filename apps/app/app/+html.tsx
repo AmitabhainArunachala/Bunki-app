@@ -41,6 +41,33 @@ export default function Root({ children }: PropsWithChildren): ReactNode {
           with it.
         */}
         <ScrollViewStyleReset />
+        {/*
+          The washi ground (Drift fusion §4). The body carries the theme's
+          paper colour — set statically to the 北斎 prerender ground here and
+          kept in sync by ThemeProvider once hydrated — and a laid-line
+          texture (簀の目 every 4px, chain lines every 96px) drawn behind the
+          content at ≤4% alpha: visible as paper grain under raking light,
+          never as pattern. `z-index: -1` keeps it over the body's own
+          background paint but under everything the app renders, and
+          `pointer-events: none` means it can never eat a tap.
+        */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+body { background-color: #FBFAF5; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(120,100,80,0.04) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(120,100,80,0.03) 0 1px, transparent 1px 96px);
+}
+`,
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>
