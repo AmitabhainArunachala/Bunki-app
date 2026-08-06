@@ -36,3 +36,28 @@
 
 A hardened `prototypes/drift/drift-artifact.html` (v11), findings ledger as
 design-doc §8.15, republished to the same artifact URL, via PR.
+
+## Resolution (2026-08-06) — SHIPPED
+
+The diagnosis fan-out (5 agents, 4 axes, real CDP touch on the composed
+surface) consolidated into **nine ranked defects**; all nine are fixed in v11.
+The full findings + fix map is design-doc §8.15
+(`BUNKI_DESIGN_LANGUAGE_SESSION2_2026-08-05.md`). Headline defects:
+
+- No return-to-rest; unbounded rotation; a surfacing pinch bleeding into
+  zoom-out (`drift-artifact.html:798` was the only place the camera was ever
+  set to rest).
+- Zero collision avoidance — legible words overprinted (0.84 at rest, 0.96
+  after zoom) and drifted under fixed chrome.
+- Hint at 1.55:1 in 夜; 緑青/岩絵具 foreground at ~1.7:1.
+- A 16-word lock dissolving at min zoom; a word stuck `unfolded` after locking
+  another.
+
+**Verified**, not asserted: `prototypes/drift/tools/verify-v11.mjs` drives the
+composed surface with real touch and asserts each fix — **17/17 checks, zero
+console/page errors**. Rest overlap 0.84→≤0.01, post-zoom 0.96→≤0.05, chrome
+overlaps→0; recenter restores z→1 & rot→0; the lock renders all 16 members at
+`cam.z=0.34`; hint clears ≥9.5:1 and 緑青/岩絵具 reach parity with the other
+light themes. Known-good behaviours (ink-blob layering, zoom clamp, upright
+glyphs, swipe-grade persistence, the whole card/dictionary/radical layer) were
+confirmed and left untouched.
