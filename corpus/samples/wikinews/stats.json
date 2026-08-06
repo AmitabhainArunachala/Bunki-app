@@ -44,8 +44,7 @@
     "2026-05-03"
   ],
   "distinct_categories": 600,
-  "residual_markup_records": 1,
-  "residual_markup_ids": [
-    "wikinews:15954"
-  ]
+  "residual_markup_records": 0,
+  "residual_markup_records_narrow": 0,
+  "residual_markup_ids": []
 }
