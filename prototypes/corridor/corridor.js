@@ -894,6 +894,7 @@ function renderReader(main) {
       }
     }
     if (token.c) wireTokenGestures(span, token, index, p);
+    else if (PARTICLE_BY_SURFACE[token.s]) wireParticleGestures(span, PARTICLE_BY_SURFACE[token.s]);
     if (S.dials.spacing === 2) {
       if (token.c || !group) {
         group = el('span', 'bunsetsu');
@@ -1020,6 +1021,117 @@ function renderTray(main) {
   }
 }
 
+/* ------------------------------------------------------------- particles
+ * The structural law (design doc §4): particles are first-class doors, not
+ * dead pixels between words. Original content, authored for KAIRO. */
+const PARTICLES = [
+  { id: 'wa', p: 'は', r: 'わ', role: 'topic', roleJa: '主題', exp: 'Frames what the sentence is about — everything after は is said ABOUT it. Contrast lives here too: 犬は好きだが猫は…', ex: [{ ja: '知床半島は北海道にある。', en: 'As for the Shiretoko Peninsula, it is in Hokkaidō.' }, { ja: '今日は寒い。', en: 'Today (at least) is cold.' }], see: 'wa-ga' },
+  { id: 'ga', p: 'が', r: 'が', role: 'subject', roleJa: '主格', exp: 'Picks out WHICH one — the doer or the thing being described, often new information or the answer to a question word.', ex: [{ ja: '雨が降っている。', en: 'Rain is falling.' }, { ja: 'だれが来たの？', en: 'WHO came?' }], see: 'wa-ga' },
+  { id: 'wo', p: 'を', r: 'を', role: 'direct object', roleJa: '対格', exp: 'Marks what the action is done TO — and the space moved THROUGH with motion verbs (空を飛ぶ).', ex: [{ ja: '本を読む。', en: 'To read a book.' }, { ja: '公園を歩く。', en: 'To walk through the park.' }] },
+  { id: 'ni', p: 'に', r: 'に', role: 'target · time · location-of-being', roleJa: '着点・時点・存在場所', exp: 'The arrow-point: destination of motion, time of an event, place where something exists, and the receiver of giving.', ex: [{ ja: '七時に起きる。', en: 'To get up at seven.' }, { ja: '東京に住んでいる。', en: 'To live in Tokyo.' }] },
+  { id: 'de', p: 'で', r: 'で', role: 'place-of-action · means', roleJa: '動作場所・手段', exp: 'Where an action happens, or the tool it happens BY: 会議はここで開かれる、バスで行く。Also the boundary of a total (三人で).', ex: [{ ja: 'ダーバンで開催中の会議', en: 'the conference being held in Durban' }, { ja: '箸で食べる。', en: 'To eat with chopsticks.' }] },
+  { id: 'to', p: 'と', r: 'と', role: 'with · and · quotation', roleJa: '共同・並列・引用', exp: 'An exhaustive AND (A と B and that is the whole list), doing something WITH someone, and the mouth of a quote (…と言う).', ex: [{ ja: 'フィヨルドと知床半島が登録された。', en: 'The fjords and the Shiretoko Peninsula were registered.' }, { ja: '行くと言った。', en: 'They said they would go.' }] },
+  { id: 'mo', p: 'も', r: 'も', role: 'also · even', roleJa: '同類・強調', exp: 'ALSO this one — and stretched, EVEN this one (子供もわかる). Replaces は・が・を; stacks after other particles (にも, でも).', ex: [{ ja: '知床半島も登録された。', en: 'The Shiretoko Peninsula was ALSO registered.' }, { ja: '一円もない。', en: 'I do not have even one yen.' }] },
+  { id: 'no', p: 'の', r: 'の', role: 'of · belonging', roleJa: '連体・所有', exp: "Ties two nouns: B of A, A's B, B which is A. Also nominalizes (読むのが好き) and softens questions (行くの？).", ex: [{ ja: '日本の知床半島', en: "Japan's Shiretoko Peninsula" }, { ja: '泳ぐのが好きだ。', en: 'I like swimming.' }] },
+  { id: 'e', p: 'へ', r: 'え', role: 'toward', roleJa: '方向', exp: 'The direction faced, softer than に about arriving: 東へ向かう cares about the heading, not the doorstep.', ex: [{ ja: '北へ向かう。', en: 'To head north.' }, { ja: '日本への手紙', en: 'a letter to Japan' }] },
+  { id: 'kara', p: 'から', r: 'から', role: 'from · because', roleJa: '起点・理由', exp: 'The starting point in space or time — and, after a clause, the speaker’s reason (寒いから閉めて).', ex: [{ ja: '駅から歩く。', en: 'To walk from the station.' }, { ja: '寒いから、窓を閉めた。', en: 'Because it was cold, I shut the window.' }] },
+  { id: 'made', p: 'まで', r: 'まで', role: 'until · as far as', roleJa: '限界点', exp: 'The far edge: up TO a place, UNTIL a time, and rhetorically even-as-far-as (子供にまで笑われた).', ex: [{ ja: '駅まで走った。', en: 'I ran as far as the station.' }, { ja: '五時まで働く。', en: 'To work until five.' }] },
+  { id: 'yori', p: 'より', r: 'より', role: 'than · from (formal)', roleJa: '比較・起点', exp: 'The yardstick of comparison (AよりB), and a formal FROM in written Japanese (東京より).', ex: [{ ja: '飛行機は船より速い。', en: 'Planes are faster than ships.' }, { ja: '午後三時より開催。', en: 'Held from 3 p.m. (formal notice).' }] },
+  { id: 'ka', p: 'か', r: 'か', role: 'question · or', roleJa: '疑問・選択', exp: 'The spoken question mark — and OR between choices (コーヒーか紅茶). Doubled, it shrugs: 行くかどうか.', ex: [{ ja: '行きますか。', en: 'Are you going?' }, { ja: 'コーヒーか紅茶にする。', en: 'I will have coffee or tea.' }] },
+  { id: 'ne', p: 'ね', r: 'ね', role: 'shared feeling', roleJa: '確認・共感', exp: 'Reaches for agreement — "right?" It assumes the listener already half-knows.', ex: [{ ja: 'いい天気ですね。', en: 'Lovely weather, isn’t it?' }, { ja: 'また明日ね。', en: 'See you tomorrow, yeah?' }] },
+  { id: 'yo', p: 'よ', r: 'よ', role: 'new information', roleJa: '告知', exp: 'Hands the listener something they did not know — friendly emphasis, not shouting.', ex: [{ ja: '電車、もう出ましたよ。', en: 'The train has already left, you know.' }, { ja: '大丈夫だよ。', en: 'It’s okay, really.' }] },
+  { id: 'ba', p: 'ば', r: 'ば', role: 'if (conditional)', roleJa: '仮定', exp: 'The bare IF of the ば-form: 読めば分かる — if you read it, you will see. General truths and advice live here.', ex: [{ ja: '読めば分かる。', en: 'If you read it, you will understand.' }, { ja: '安ければ買う。', en: 'If it is cheap, I will buy it.' }] },
+  { id: 'ya', p: 'や', r: 'や', role: 'and (open list)', roleJa: '例示並列', exp: 'A sampling AND: 本やペン — books, pens, that sort of thing. と closes the list; や leaves the door open.', ex: [{ ja: '屋久島や白神山地', en: 'Yakushima, Shirakami-Sanchi, and the like' }, { ja: '肉や野菜を買う。', en: 'To buy meat, vegetables, and so on.' }] },
+  { id: 'shi', p: 'し', r: 'し', role: 'and what’s more', roleJa: '列挙・理由', exp: 'Stacks reasons with a nod that there are more: 安いし、近いし。', ex: [{ ja: '安いし、うまいし、また来る。', en: 'It’s cheap, it’s good — I’ll come again.' }, { ja: '雨だし、今日はやめよう。', en: 'It’s raining (among other things), let’s not today.' }] },
+];
+const PARTICLE_BY_SURFACE = Object.fromEntries(PARTICLES.map((p) => [p.p, p]));
+
+function renderParticleNode(sheet, node) {
+  const pt = PARTICLES.find((x) => x.id === node.id);
+  if (!pt) {
+    sheet.append(el('div', 'sem-empty', tx('この助詞はまだない。', 'This particle page does not exist yet.')));
+    return;
+  }
+  const head = el('h2', 'headword', pt.p);
+  head.append(el('span', 'headword-alt', tx('　助詞', '　particle')));
+  sheet.append(head);
+  if (pt.r !== pt.p) sheet.append(el('p', 'reading', pt.r));
+  sheet.append(el('p', 'sense-pos', bi() ? pt.role : pt.roleJa));
+  sheet.append(el('p', 'gloss', bi() ? pt.exp : pt.exp));
+  sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
+  for (const ex of pt.ex) {
+    const line = el('div', 'example');
+    line.append(el('p', 'example-ja', ex.ja));
+    if (bi()) line.append(el('p', 'example-en', ex.en));
+    sheet.append(line);
+  }
+  if (pt.see && GRAMMAR.some((g) => g.id === pt.see)) {
+    sheet.append(withEn(el('p', 'eyebrow', '文法へ'), 'related grammar', 'en-inline'));
+    const g = GRAMMAR.find((x) => x.id === pt.see);
+    const row = el('button', 'entry-row');
+    row.type = 'button';
+    row.append(el('span', 'row-glyph', '文'));
+    row.append(el('span', 'row-main', `${g.p} — ${bi() ? g.mEn : g.mJa}`));
+    row.append(el('span', 'row-go', '›'));
+    row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
+    sheet.append(row);
+  }
+}
+
+/** Particles keep the reading rhythm: a tap does nothing, a long press
+ * floats the mini, holding opens the particle page. */
+function wireParticleGestures(span, particle) {
+  let miniTimer = null;
+  let fullTimer = null;
+  let down = null;
+  const openFull = () => {
+    removeMini();
+    swallowClickUntil = Date.now() + 700;
+    go({ t: 'particle', id: particle.id });
+  };
+  const clear = () => {
+    clearTimeout(miniTimer);
+    clearTimeout(fullTimer);
+    miniTimer = fullTimer = null;
+  };
+  span.classList.add('particle');
+  span.addEventListener('contextmenu', (ev) => ev.preventDefault());
+  span.addEventListener('pointerdown', (ev) => {
+    down = { x: ev.clientX, y: ev.clientY };
+    miniTimer = setTimeout(() => {
+      removeMini();
+      const mini = el('div', null);
+      mini.id = 'mini';
+      mini.append(el('span', 'mini-word', particle.p));
+      mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
+      mini.append(el('span', 'mini-hint', tx('押しつづけて助詞のページへ', 'keep holding — the particle page')));
+      document.body.append(mini);
+      const r = span.getBoundingClientRect();
+      const m = mini.getBoundingClientRect();
+      const above = r.top > m.height + 70;
+      mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+      mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
+      mini.addEventListener('click', openFull);
+    }, GESTURE.MINI_MS);
+    fullTimer = setTimeout(openFull, GESTURE.FULL_MS);
+  });
+  span.addEventListener('pointermove', (ev) => {
+    if (!down) return;
+    if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
+      clear();
+      down = null;
+    }
+  });
+  span.addEventListener('pointercancel', () => {
+    clear();
+    down = null;
+  });
+  span.addEventListener('pointerup', () => {
+    clear();
+    down = null;
+  });
+}
+
 /* --------------------------------------------------------------- search
  * The Renzo lesson (design doc §7.2): one quiet field eating kanji, kana,
  * romaji, and English, answering while you type. Four doors, one box. */
@@ -1122,6 +1234,15 @@ function buildSearchIndex() {
   }
   for (const g of GRAMMAR) {
     searchIndex.push({ t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '', m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn });
+  }
+  for (const pt of PARTICLES) {
+    searchIndex.push({
+      t: 'particle', id: pt.id, w: pt.p,
+      r: '助詞',
+      rh: pt.r,
+      m: `${pt.role} ${pt.roleJa} particle`.toLowerCase(),
+      g: pt.role,
+    });
   }
 }
 
@@ -1254,6 +1375,7 @@ function nodeTitle(node) {
   if (node.t === 'radical') return node.id;
   if (node.t === 'idiom') return node.id;
   if (node.t === 'grammar') return GRAMMAR.find((x) => x.id === node.id)?.p || node.id;
+  if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   return '';
 }
 
@@ -1864,6 +1986,7 @@ function renderSheet(root) {
   else if (node.t === 'radical') renderRadicalNode(sheet, node);
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
   else if (node.t === 'grammar') renderGrammarNode(sheet, node);
+  else if (node.t === 'particle') renderParticleNode(sheet, node);
   root.append(sheet);
 }
 
