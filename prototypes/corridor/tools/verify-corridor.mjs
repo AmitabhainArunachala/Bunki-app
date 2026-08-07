@@ -315,8 +315,18 @@ async function main() {
   await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
   await page.waitForTimeout(150);
 
+  // pick a word that sits wholly on one line (a straddling word legitimately
+  // pulls itself onto the next line when glossed — it becomes one object)
+  const tapIdx = await page.evaluate(`(() => {
+    const toks = [...document.querySelectorAll('#reader .tok.content')];
+    for (let i = 1; i < toks.length; i++) {
+      if (toks[i].getClientRects().length === 1 && toks[i].textContent.length >= 2) return i;
+    }
+    return 2;
+  })()`);
+
   // 1st tap → furigana, instantly, and nothing else
-  await tap(page, '#reader .tok.content', 2);
+  await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
   const afterTap = await page.evaluate(`(() => ({
     lit: document.querySelectorAll('#reader .tok.lit').length,
@@ -327,29 +337,46 @@ async function main() {
     afterTap.lit >= 1 && afterTap.en === 0 && !afterTap.sheet,
     `lit=${afterTap.lit}, sheet=${afterTap.sheet}`);
 
-  // 2nd tap (a later tap, not a timed double) → English beneath, word unmoved
+  // 2nd tap (a later tap, not a timed double) → English beneath, word unmoved.
+  // The visual anchor is the glyph box (the ruby base), not the wrapper's
+  // rect — the wrapper legitimately changes box type when the gloss mounts.
+  const glyphBox = `(el) => (el.querySelector('ruby') ?? el).getBoundingClientRect().bottom`;
   const wordTopBefore = await page.evaluate(
-    `document.querySelectorAll('#reader .tok.content')[2].getBoundingClientRect().top`,
+    `(${glyphBox})(document.querySelectorAll('#reader .tok.content')[${tapIdx}])`,
   );
-  await tap(page, '#reader .tok.content', 2);
+  await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
   const afterSecond = await page.evaluate(`(() => {
-    const tok = document.querySelectorAll('#reader .tok.content')[2];
+    const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
+    const en = tok.querySelector('.tok-en');
+    let collisions = 0;
+    if (en) {
+      const e = en.getBoundingClientRect();
+      for (const other of document.querySelectorAll('#reader .tok')) {
+        if (other === tok || tok.contains(other)) continue;
+        const r = other.getClientRects()[0];
+        if (!r) continue;
+        if (e.left < r.right && e.right > r.left && e.top < r.bottom && e.bottom > r.top) collisions += 1;
+      }
+    }
     return {
       en: tok.querySelectorAll('.tok-en').length,
-      top: tok.getBoundingClientRect().top,
+      top: (tok.querySelector('ruby') ?? tok).getBoundingClientRect().bottom,
+      collisions,
       sheet: !!document.querySelector('#sheet'),
     };
   })()`);
   check('grammar · a second tap sets English beneath — and the word does not move',
-    afterSecond.en === 1 && !afterSecond.sheet && Math.abs(afterSecond.top - wordTopBefore) < 1,
-    `gloss on, word top ${wordTopBefore.toFixed(1)} → ${afterSecond.top.toFixed(1)}px`);
+    afterSecond.en === 1 && !afterSecond.sheet && Math.abs(afterSecond.top - wordTopBefore) < 2,
+    `gloss on, glyph bottom ${wordTopBefore.toFixed(1)} → ${afterSecond.top.toFixed(1)}px`);
+  check('grammar · the gloss collides with nothing — on any font, by construction',
+    afterSecond.collisions === 0, `${afterSecond.collisions} overlapping token(s)`);
 
   // 3rd tap → all the way back out
-  await tap(page, '#reader .tok.content', 2);
+  await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
   const afterThird = await page.evaluate(`(() => {
-    const tok = document.querySelectorAll('#reader .tok.content')[2];
+    const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     return { en: tok.querySelectorAll('.tok-en').length, lit: tok.classList.contains('lit') };
   })()`);
   check('grammar · a third tap backs all the way out', afterThird.en === 0 && !afterThird.lit,

@@ -337,10 +337,11 @@ h1.view-title {
   padding: 0 0.5px;
 }
 
-.tok.content:active,
-.tok.content.lit {
+/* touch feedback is momentary; a revealed word carries no permanent wash —
+ * the furigana itself is the trace (operator round 6: the washes read as
+ * highlighter clutter on a printed page) */
+.tok.content:active {
   background: var(--red-wash);
-  box-shadow: 0 1px 0 var(--red);
 }
 
 .tok.plain {
@@ -1137,11 +1138,9 @@ body.v-depth-layered .chip.t-idiom {
   border-top: 3px double color-mix(in srgb, var(--ink-2) 70%, var(--line));
 }
 
-/* what is tappable says so: content words carry a quiet indigo stitch */
-body.v-depth-layered .tok.content {
-  border-bottom: 1px dotted color-mix(in srgb, var(--ai) 55%, transparent);
-  padding-bottom: 1px;
-}
+/* v1.4: the stitch is gone — every content word is tappable, so marking
+ * each one turned the page into proofreading markup (operator, on-device).
+ * The page is clean print; the gesture hint carries the affordance. */
 
 body.v-depth-layered .sig-fill {
   background: var(--ai);
@@ -1292,28 +1291,37 @@ body.v-depth-layered .inline-link {
   margin-top: 4px;
 }
 
-/* second tap: English beneath the word. The word itself must not move —
- * the gloss floats in the line gap below, anchored to the token. */
-.tok {
-  position: relative;
+/* second tap: English beneath the word — IN THE LINE FLOW, so no font's
+ * metrics on any device can ever collide it with the next line. The token
+ * becomes a baseline-aligned column: the word keeps its exact baseline
+ * (inline-flex baseline = first item's baseline) and the line breathes
+ * down a few pixels to make room. */
+.tok.has-en {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: baseline;
+  line-height: 1.3; /* hug the glyphs; the reader's own leading houses the rt */
 }
 
+/* width: 0 + min-width: 100% — the gloss never contributes to the box's
+ * width, so the word never re-wraps; the English ellipsizes to the word's
+ * own footprint (the full senses are one hold away) */
 .tok-en {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%, -6px);
   display: block;
+  width: 0;
+  min-width: 100%;
   font-family: var(--sans);
   font-size: 9.5px;
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--ai, var(--ink-2));
   letter-spacing: 0.02em;
   white-space: nowrap;
-  max-width: 10em;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
   pointer-events: none;
+  margin-top: -0.3em;
 }
 
 .gesture-hint {
@@ -4170,8 +4178,12 @@ function paintTok(span, token, index) {
   const existingEn = span.querySelector('.tok-en');
   if (hasEn && !existingEn) {
     const g = lookup(token.b);
-    if (g?.m?.length) span.append(el('span', 'tok-en', g.m[0]));
+    if (g?.m?.length) {
+      span.classList.add('has-en');
+      span.append(el('span', 'tok-en', g.m[0]));
+    }
   } else if (!hasEn && existingEn) {
+    span.classList.remove('has-en');
     existingEn.remove();
   }
 }

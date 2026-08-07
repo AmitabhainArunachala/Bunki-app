@@ -715,8 +715,12 @@ function paintTok(span, token, index) {
   const existingEn = span.querySelector('.tok-en');
   if (hasEn && !existingEn) {
     const g = lookup(token.b);
-    if (g?.m?.length) span.append(el('span', 'tok-en', g.m[0]));
+    if (g?.m?.length) {
+      span.classList.add('has-en');
+      span.append(el('span', 'tok-en', g.m[0]));
+    }
   } else if (!hasEn && existingEn) {
+    span.classList.remove('has-en');
     existingEn.remove();
   }
 }
