@@ -79,8 +79,13 @@ async function touchAt(page, selector, index, holdMs) {
   const target = page.locator(selector).nth(index);
   await target.scrollIntoViewIfNeeded();
   await page.waitForTimeout(60);
-  const box = await target.boundingBox();
-  if (!box) throw new Error(`touch: no box for ${selector}`);
+  // aim at the element's first line fragment, the way a finger aims at the
+  // glyphs — a union box can drift into the line gap once a gloss hangs below
+  const box = await target.evaluate((node) => {
+    const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  });
+  if (!box || !box.width) throw new Error(`touch: no box for ${selector}`);
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
   const cdp = await page.context().newCDPSession(page);
@@ -307,32 +312,50 @@ async function main() {
 
   // ------------------------------- step 3 · the click grammar, then the entry
   console.log('\n— step 3 · the click grammar and the dictionary entry');
-  await page.locator('[data-dial="furigana:1"]').click();
+  await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
   await page.waitForTimeout(150);
 
-  // single tap → furigana above (and nothing else)
+  // 1st tap → furigana, instantly, and nothing else
   await tap(page, '#reader .tok.content', 2);
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(120);
   const afterTap = await page.evaluate(`(() => ({
     lit: document.querySelectorAll('#reader .tok.lit').length,
-    sheet: !!document.querySelector('#sheet'),
-  }))()`);
-  check('grammar · a single tap reveals furigana and opens nothing',
-    afterTap.lit >= 1 && !afterTap.sheet, `lit=${afterTap.lit}, sheet=${afterTap.sheet}`);
-
-  // double tap → English beneath the word
-  await tap(page, '#reader .tok.content', 4);
-  await page.waitForTimeout(80);
-  await tap(page, '#reader .tok.content', 4);
-  await page.waitForTimeout(400);
-  const afterDouble = await page.evaluate(`(() => ({
     en: document.querySelectorAll('#reader .tok-en').length,
     sheet: !!document.querySelector('#sheet'),
   }))()`);
-  check('grammar · a double tap sets English beneath the word',
-    afterDouble.en >= 1 && !afterDouble.sheet, `${afterDouble.en} inline gloss(es)`);
+  check('grammar · the first tap reveals furigana instantly, opening nothing',
+    afterTap.lit >= 1 && afterTap.en === 0 && !afterTap.sheet,
+    `lit=${afterTap.lit}, sheet=${afterTap.sheet}`);
 
-  // long press → the floating mini-dictionary
+  // 2nd tap (a later tap, not a timed double) → English beneath, word unmoved
+  const wordTopBefore = await page.evaluate(
+    `document.querySelectorAll('#reader .tok.content')[2].getBoundingClientRect().top`,
+  );
+  await tap(page, '#reader .tok.content', 2);
+  await page.waitForTimeout(120);
+  const afterSecond = await page.evaluate(`(() => {
+    const tok = document.querySelectorAll('#reader .tok.content')[2];
+    return {
+      en: tok.querySelectorAll('.tok-en').length,
+      top: tok.getBoundingClientRect().top,
+      sheet: !!document.querySelector('#sheet'),
+    };
+  })()`);
+  check('grammar · a second tap sets English beneath — and the word does not move',
+    afterSecond.en === 1 && !afterSecond.sheet && Math.abs(afterSecond.top - wordTopBefore) < 1,
+    `gloss on, word top ${wordTopBefore.toFixed(1)} → ${afterSecond.top.toFixed(1)}px`);
+
+  // 3rd tap → all the way back out
+  await tap(page, '#reader .tok.content', 2);
+  await page.waitForTimeout(120);
+  const afterThird = await page.evaluate(`(() => {
+    const tok = document.querySelectorAll('#reader .tok.content')[2];
+    return { en: tok.querySelectorAll('.tok-en').length, lit: tok.classList.contains('lit') };
+  })()`);
+  check('grammar · a third tap backs all the way out', afterThird.en === 0 && !afterThird.lit,
+    `gloss removed, highlight cleared`);
+
+  // long press → the floating mini-dictionary; a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
   await page.waitForTimeout(200);
   const mini = await page.evaluate(`(() => {
@@ -341,11 +364,22 @@ async function main() {
   })()`);
   check('grammar · a long press floats the mini-dictionary', !!mini && !!mini.word,
     mini ? `${mini.word} — ${String(mini.gloss).slice(0, 30)}` : 'no #mini');
+  await tap(page, '.view-title');
+  await page.waitForTimeout(120);
+  check('grammar · one tap anywhere else backs out of the mini',
+    (await page.locator('#mini').count()) === 0, 'mini dismissed');
 
-  // keep holding → the full entry
-  await page.locator('[data-dial="furigana:2"]').click();
+  // keep holding → the full entry (from a clean slate: whatever the mini
+  // interlude did, close it and re-aim)
+  if (await page.locator('#sheet').count()) {
+    await page.locator('#sheet-close').dispatchEvent('click');
+    await page.waitForTimeout(150);
+  }
+  await page.evaluate('window.scrollTo(0, 0)');
+  await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
+  await page.waitForTimeout(150);
   await holdWord(page, '#reader .tok.content');
-  await page.waitForSelector('#sheet');
+  await page.waitForSelector('#sheet[data-node^="word:"]');
   const panel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {

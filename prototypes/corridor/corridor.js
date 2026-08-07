@@ -633,16 +633,16 @@ function dialRow(labelJa, labelEn, key, options) {
 }
 
 /* ------------------------------------------- the reader's click grammar
- * One discipline, carried from Drift (§8 of the design-language doc) into
- * study surfaces, per operator direction 2026-08-07:
- *   tap            → furigana above
- *   double-tap     → English beneath the word
+ * One discipline, carried from Drift (§8 of the design-language doc), tuned
+ * by operator rounds 3–4 (2026-08-07). Taps are PROGRESSIVE, not timed:
+ *   1st tap        → furigana above           (instant — no double-tap wait)
+ *   2nd tap        → English beneath          (a later tap, not a fast pair)
+ *   3rd tap        → backs all the way out    (the word returns to bare)
  *   long-press     → floating mini-dictionary
  *   keep holding   → the mini window morphs into the full entry
- * A moved pointer is a scroll, never a gesture. */
-const GESTURE = { MINI_MS: 430, FULL_MS: 2100, DOUBLE_MS: 350, MOVE_PX: 9 };
-let lastTap = { index: -1, at: 0 };
-let singleTapTimer = null;
+ * A moved pointer is a scroll, never a gesture. Every action applies to the
+ * DOM directly — no full re-render, so the reader never stutters. */
+const GESTURE = { MINI_MS: 430, FULL_MS: 2100, MOVE_PX: 9 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
  * when the finger lifts — and it lands on whatever the new sheet put under
@@ -663,6 +663,16 @@ function removeMini() {
   document.getElementById('mini')?.remove();
 }
 
+/* a tap anywhere outside the mini puts it away — easy to back out of */
+document.addEventListener(
+  'pointerdown',
+  (ev) => {
+    const mini = document.getElementById('mini');
+    if (mini && !mini.contains(ev.target)) removeMini();
+  },
+  true,
+);
+
 function showMini(span, token) {
   removeMini();
   const g = lookup(token.b);
@@ -679,6 +689,36 @@ function showMini(span, token) {
   mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
   return mini;
+}
+
+/** Apply one token's reveal state straight to its DOM — no re-render. */
+function paintTok(span, token, index) {
+  const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
+  const hasEn = S.glossed?.has(index);
+  if (S.dials.furigana === 1) {
+    for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
+  } else if (S.dials.furigana === 0) {
+    // the dial says no ruby — a per-word reveal builds it on the spot
+    const built = span.querySelector('ruby');
+    if (hasReading && !built) {
+      span.querySelector('.tok-en')?.remove();
+      const frag = rubyNode(displayPairs(token), { furigana: 1, revealed: true });
+      span.textContent = '';
+      span.append(frag);
+    } else if (!hasReading && built) {
+      span.querySelector('.tok-en')?.remove();
+      span.textContent = '';
+      span.append(rubyNode(displayPairs(token), { furigana: 0, revealed: false }));
+    }
+  }
+  span.classList.toggle('lit', !!(S.revealed?.has(index) || hasEn));
+  const existingEn = span.querySelector('.tok-en');
+  if (hasEn && !existingEn) {
+    const g = lookup(token.b);
+    if (g?.m?.length) span.append(el('span', 'tok-en', g.m[0]));
+  } else if (!hasEn && existingEn) {
+    existingEn.remove();
+  }
 }
 
 function wireTokenGestures(span, token, index, p) {
@@ -721,28 +761,20 @@ function wireTokenGestures(span, token, index, p) {
     down = null;
     clear();
     if (held >= GESTURE.MINI_MS) return; // mini stays up; tap it for the full entry
-    const now = Date.now();
-    if (lastTap.index === index && now - lastTap.at < GESTURE.DOUBLE_MS) {
-      // double-tap: English beneath
-      clearTimeout(singleTapTimer);
-      lastTap = { index: -1, at: 0 };
-      (S.glossed ||= new Set());
-      if (S.glossed.has(index)) S.glossed.delete(index);
-      else S.glossed.add(index);
-      const scroll = window.scrollY;
-      render();
-      window.scrollTo(0, scroll);
+    // progressive tap, applied instantly: reading → English → back to bare
+    (S.revealed ||= new Set());
+    (S.glossed ||= new Set());
+    const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
+    const hasEn = S.glossed.has(index);
+    if (!hasReading) {
+      S.revealed.add(index);
+    } else if (!hasEn) {
+      S.glossed.add(index);
     } else {
-      lastTap = { index, at: now };
-      clearTimeout(singleTapTimer);
-      singleTapTimer = setTimeout(() => {
-        // single tap: furigana above
-        (S.revealed ||= new Set()).add(index);
-        const scroll = window.scrollY;
-        render();
-        window.scrollTo(0, scroll);
-      }, GESTURE.DOUBLE_MS + 10);
+      S.glossed.delete(index);
+      S.revealed.delete(index);
     }
+    paintTok(span, token, index);
   });
 }
 
@@ -798,8 +830,8 @@ function renderReader(main) {
 
   const grammarHint = el('p', 'gesture-hint');
   grammarHint.textContent = tx(
-    '触れる＝ふりがな · 二度＝英語 · 長押し＝辞書',
-    'tap = reading · double-tap = English · hold = dictionary',
+    '触れる＝ふりがな · もう一度＝英語 · 長押し＝辞書',
+    'tap = reading · tap again = English · hold = dictionary',
   );
   main.append(grammarHint);
 
