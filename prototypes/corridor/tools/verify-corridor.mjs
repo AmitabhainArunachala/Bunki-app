@@ -856,6 +856,33 @@ async function main() {
   check('v1.2 · the shelf carries no provenance narration (sources fold away)',
     narration.length === 0, narration.length ? `leaked: ${narration.join(', ')}` : 'quiet');
 
+  // ------------------------------------------------- v1.5 · the search field
+  console.log('\n— v1.5 · search: four doors, one box');
+  await open('?entry=shelf');
+  const doors = [
+    ['kaisai', 'word:開催', 'romaji'],
+    ['かいさい', 'word:開催', 'kana'],
+    ['開', 'kanji:開', 'kanji'],
+    ['peninsula', 'word:半島', 'English'],
+    ['ばかり', 'grammar:bakari', 'grammar'],
+  ];
+  for (const [q, want, door] of doors) {
+    await page.fill('#search', q);
+    await page.waitForTimeout(350);
+    const hit = await page.evaluate(
+      `[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === ${JSON.stringify(want)})`,
+    );
+    check(`search · the ${door} door answers`, hit, `"${q}" → ${want}`);
+  }
+  await page.fill('#search', 'kaisai');
+  await page.waitForTimeout(350);
+  await page.locator('[data-result]').first().click();
+  await page.waitForTimeout(300);
+  check('search · a result opens its full entry',
+    (await page.locator('#sheet').count()) === 1,
+    (await page.locator('#sheet').getAttribute('data-node').catch(() => 'none')) ?? '');
+  await shoot(page, shotsDir, '12-v15-search');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,
