@@ -769,6 +769,22 @@ function showMini(span, token) {
   return mini;
 }
 
+/** The inline gloss under a word must NEVER truncate (operator, morning
+ * round). JMdict first senses are wordy; the most compact sense makes the
+ * best hint — the full numbered senses are one hold away. Parentheticals
+ * drop; if everything is long, the clause before the first comma wins. */
+function inlineGloss(rec) {
+  if (!rec?.m?.length) return null;
+  const candidates = rec.m
+    .slice(0, 3)
+    .map((s) => s.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+  if (!candidates.length) return rec.m[0];
+  let best = candidates.reduce((a, b) => (b.length < a.length ? b : a));
+  if (best.length > 18 && best.includes(',')) best = best.split(',')[0].trim();
+  return best;
+}
+
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -795,7 +811,7 @@ function paintTok(span, token, index) {
     const g = lookup(token.b);
     if (g?.m?.length) {
       span.classList.add('has-en');
-      span.append(el('span', 'tok-en', g.m[0]));
+      span.append(el('span', 'tok-en', inlineGloss(g)));
     }
   } else if (!hasEn && existingEn) {
     span.classList.remove('has-en');
@@ -938,7 +954,7 @@ function renderReader(main) {
       const g = lookup(token.b);
       if (g?.m?.length) {
         span.classList.add('has-en');
-        span.append(el('span', 'tok-en', g.m[0]));
+        span.append(el('span', 'tok-en', inlineGloss(g)));
       }
     }
     if (token.c) wireTokenGestures(span, token, index, p);

@@ -1304,22 +1304,25 @@ body.v-depth-layered .inline-link {
   line-height: 1.3; /* hug the glyphs; the reader's own leading houses the rt */
 }
 
-/* the gloss may overhang its word by ~1.2em per side before ellipsizing —
- * a truncated gloss is a broken gloss ("penins…", operator round 7). The
- * box grows at most 2.4em, and an end-of-line word simply carries itself
- * whole to the next line; the collision check still stands guard. */
+/* a truncated gloss is a broken gloss — the global rule (operator, morning
+ * round): the compact sense is chosen in JS, the box may overhang ~1.6em a
+ * side, and the text WRAPS to a second line rather than ellipsizing. The
+ * gloss is in the line flow, so extra depth just breathes the line down —
+ * nothing can collide, and the two-line clamp is an unreachable last resort. */
 .tok-en {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   width: 0;
-  min-width: calc(100% + 2.4em);
+  min-width: calc(100% + 3.2em);
   font-family: var(--sans);
   font-size: 9.5px;
   line-height: 1.25;
   color: var(--ai, var(--ink-2));
   letter-spacing: 0.02em;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
   overflow: hidden;
-  text-overflow: ellipsis;
   text-align: center;
   pointer-events: none;
   margin-top: -0.3em; /* snug under its own word — the next line's ruby owns the rest of the gap */
@@ -4273,6 +4276,22 @@ function showMini(span, token) {
   return mini;
 }
 
+/** The inline gloss under a word must NEVER truncate (operator, morning
+ * round). JMdict first senses are wordy; the most compact sense makes the
+ * best hint — the full numbered senses are one hold away. Parentheticals
+ * drop; if everything is long, the clause before the first comma wins. */
+function inlineGloss(rec) {
+  if (!rec?.m?.length) return null;
+  const candidates = rec.m
+    .slice(0, 3)
+    .map((s) => s.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+  if (!candidates.length) return rec.m[0];
+  let best = candidates.reduce((a, b) => (b.length < a.length ? b : a));
+  if (best.length > 18 && best.includes(',')) best = best.split(',')[0].trim();
+  return best;
+}
+
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -4299,7 +4318,7 @@ function paintTok(span, token, index) {
     const g = lookup(token.b);
     if (g?.m?.length) {
       span.classList.add('has-en');
-      span.append(el('span', 'tok-en', g.m[0]));
+      span.append(el('span', 'tok-en', inlineGloss(g)));
     }
   } else if (!hasEn && existingEn) {
     span.classList.remove('has-en');
@@ -4442,7 +4461,7 @@ function renderReader(main) {
       const g = lookup(token.b);
       if (g?.m?.length) {
         span.classList.add('has-en');
-        span.append(el('span', 'tok-en', g.m[0]));
+        span.append(el('span', 'tok-en', inlineGloss(g)));
       }
     }
     if (token.c) wireTokenGestures(span, token, index, p);
