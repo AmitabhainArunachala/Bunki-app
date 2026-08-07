@@ -100,7 +100,11 @@ async function boot() {
 
   render();
 
+  // The standalone single-file build embeds the bundles instead of serving
+  // them; everything else about the surface is byte-identical.
+  const bundled = window.__CORRIDOR_BUNDLE__;
   const load = async (pool, name) => {
+    if (bundled) return bundled[`${pool}/${name}`];
     const res = await fetch(`data/${pool}/${name}.json`);
     if (!res.ok) throw new Error(`data/${pool}/${name}.json → ${res.status}`);
     return res.json();
@@ -108,8 +112,8 @@ async function boot() {
   const [passages, kanken, sem, kanji, words, idioms, manifest, pin] = await Promise.all([
     ...DATA.safe.map((n) => load('proprietary_safe', n)),
     ...DATA.sa.map((n) => load('share_alike', n)),
-    fetch('data/manifest.json').then((r) => r.json()),
-    fetch('data/fsrs-pin.json').then((r) => r.json()),
+    bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
+    bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
   ]);
 
   D.passages = passages.passages;
@@ -140,7 +144,7 @@ async function boot() {
   D.wordCap = manifest.caps.kanjiWordCap;
 
   try {
-    fsrsApi = await import('./vendor/ts-fsrs.mjs');
+    fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
     scheduler = fsrsApi.fsrs(
       fsrsApi.generatorParameters({
         w: pin.w,
