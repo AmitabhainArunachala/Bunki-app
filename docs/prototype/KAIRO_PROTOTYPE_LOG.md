@@ -1,9 +1,12 @@
 # 回廊 KAIRO — corridor prototype log
 
-**Run:** cloud agent, 2026-08-07. Branch `claude/kairo-corridor`.
-**Verifier:** `prototypes/corridor/tools/verify-corridor.mjs` — **38/38 checks green**,
+**Run:** cloud agent, 2026-08-07. Merged from `claude/kairo-corridor` (#59);
+fixes from the independent judge on `claude/corridor-live-verify`.
+**Verifier:** `prototypes/corridor/tools/verify-corridor.mjs` — **43/43 checks green**,
 real Chromium at 390×844 with CDP touch emulation.
-**Screenshots:** `docs/prototype/screenshots/` (18 files, all at phone size).
+**An earlier build passed 38/38 here and was still rejected by an independent
+judge — see §8 before trusting any number in this log.**
+**Screenshots:** `docs/prototype/screenshots/` (all at phone size).
 **Machine-readable results:** `docs/prototype/verification-report.json`.
 
 ---
@@ -114,7 +117,7 @@ washi ground, WCAG 2.x relative-luminance formula. Not eyeballed.
 | element                 | px  | current fade | WCAG variant |
 | ----------------------- | --- | ------------ | ------------ |
 | reading body (focused)  | 21  | 17.22:1      | 17.22:1      |
-| view title              | 22  | 17.22:1      | 17.22:1      |
+| view title              | 20  | 17.22:1      | 17.22:1      |
 | shelf title             | 19  | 17.22:1      | 17.22:1      |
 | **discrimination note** | 13  | **9.52:1**   | 9.52:1       |
 | reading, the one red    | 15  | 7.17:1       | 7.17:1       |
@@ -133,6 +136,12 @@ Screenshots of both are in the PR; that is the choice to make by looking.
 **Hierarchy** (the Drift red-team's inverted case was 11px labels against 22–43px
 background words): reading body **21px** vs chrome **13px** — a 1.6× ratio in
 the right direction. Focused content is the largest type on every screen.
+
+That last sentence was not true when first written: view titles were **22px**
+against 21px reading, so the largest type on the reader was the title, not the
+text. The independent judge measured it (§8). Titles are 20px now — a 1px
+breach, not the inverted-hierarchy pattern the law was written against, but the
+law says largest and 22 is not largest.
 
 **Hit targets:** every visible control ≥ 40px in both dimensions; the verifier
 enumerates all of them and fails on any miss. Three real failures were caught
