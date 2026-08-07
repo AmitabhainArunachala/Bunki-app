@@ -16,24 +16,20 @@
     },
     {
       "step": 3,
-      "name": "tap word",
+      "name": "click grammar + entry",
       "shot": "03-word-panel.png",
       "panel": {
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year, age",
-        "semRows": [],
-        "semEmpty": "No semantic neighbourhood is written for this word yet — the SEM layer currently covers 82 words (~1.2% of the lexicon). The gap is shown, not hidden — scaling it is #44. These words do have one:",
-        "kanjiChips": [
-          "過酷",
-          "試練",
-          "逆境",
-          "言葉",
-          "時間",
-          "記憶",
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
+        "kanjiRows": [
           "年"
-        ]
+        ],
+        "examples": 4,
+        "hasBack": true,
+        "hasClose": true
       }
     },
     {
@@ -122,13 +118,13 @@
         "tags": [
           "12 strokes",
           "漢検 6級",
-          "ShareAlike",
-          "ShareAlike pool"
+          "JLPT N2"
         ],
         "sections": [
-          "部品へinto the parts",
-          "この字を含む語 — 22 語words that contain it",
-          "熟語・慣用句 — 2　idioms and set phrasesShareAlike pool"
+          "筆順stroke order",
+          "部品components",
+          "よく使う語 — 22 語common compounds",
+          "熟語・慣用句 — 2　idioms and set phrases"
         ]
       }
     },
@@ -152,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 12:48",
+          "2026-08-07 14:27",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 12:53",
+          "2026-08-07 14:32",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 12:57",
+          "2026-08-07 14:36",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 12:47",
+          "2026-08-15 14:26",
           "8.30"
         ]
       ]
@@ -208,13 +204,6 @@
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
-          "label": "faint / signal label",
-          "selector": ".sig-name",
-          "contrast": 2.64,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
           "contrast": 2.64,
@@ -234,13 +223,6 @@
           "contrast": 16.2,
           "fontSize": 21,
           "color": "rgb(20, 24, 28)"
-        },
-        {
-          "label": "gloss",
-          "selector": ".gloss",
-          "contrast": 2.64,
-          "fontSize": 15,
-          "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "discrimination note",
@@ -280,13 +262,6 @@
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
-          "label": "faint / signal label",
-          "selector": ".sig-name",
-          "contrast": 5.89,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.68)"
-        },
-        {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
           "contrast": 5.89,
@@ -306,13 +281,6 @@
           "contrast": 16.2,
           "fontSize": 21,
           "color": "rgb(20, 24, 28)"
-        },
-        {
-          "label": "gloss",
-          "selector": ".gloss",
-          "contrast": 5.89,
-          "fontSize": 15,
-          "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "discrimination note",
@@ -346,25 +314,11 @@
         "color": "rgb(20, 24, 28)"
       },
       {
-        "label": "gloss",
-        "selector": ".gloss",
-        "contrast": 5.89,
-        "fontSize": 15,
-        "color": "rgba(20, 24, 28, 0.68)"
-      },
-      {
         "label": "discrimination note",
         "selector": ".sem-note",
         "contrast": 8.95,
         "fontSize": 13,
         "color": "rgb(61, 68, 76)"
-      },
-      {
-        "label": "faint / signal label",
-        "selector": ".sig-name",
-        "contrast": 5.89,
-        "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "chrome breadcrumb (background)",
@@ -410,13 +364,19 @@
         "id": "back"
       },
       {
-        "text": "ENon",
-        "w": 45,
+        "text": "EN",
+        "w": 44,
         "h": 44,
-        "id": "lang"
+        "id": ""
       },
       {
-        "text": "取 0tray",
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 1lists",
         "w": 52,
         "h": 44,
         "id": "tray"
@@ -480,6 +440,30 @@
         "w": 84,
         "h": 40,
         "id": "inline-link"
+      },
+      {
+        "text": "← 戻るback",
+        "w": 73,
+        "h": 42,
+        "id": "sheet-back"
+      },
+      {
+        "text": "✕",
+        "w": 42,
+        "h": 42,
+        "id": "sheet-close"
+      },
+      {
+        "text": "過Overdo›",
+        "w": 358,
+        "h": 61,
+        "id": "entry-row"
+      },
+      {
+        "text": "酷Cruel›",
+        "w": 358,
+        "h": 61,
+        "id": "entry-row"
       },
       {
         "text": "厳しいeveryday sy",
@@ -578,19 +562,7 @@
         "id": "sem-row"
       },
       {
-        "text": "過6級",
-        "w": 44,
-        "h": 49,
-        "id": "chip t-kanji"
-      },
-      {
-        "text": "酷準2級",
-        "w": 50,
-        "h": 49,
-        "id": "chip t-kanji"
-      },
-      {
-        "text": "取るtake into st",
+        "text": "覚えるmemorize",
         "w": 358,
         "h": 48,
         "id": "take"
@@ -608,82 +580,166 @@
         "id": "back"
       },
       {
-        "text": "ENon",
-        "w": 45,
+        "text": "EN",
+        "w": 44,
         "h": 44,
-        "id": "lang"
+        "id": ""
       },
       {
-        "text": "取 0tray",
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 1lists",
         "w": 52,
         "h": 44,
         "id": "tray"
       },
       {
+        "text": "文法grammar",
+        "w": 88,
+        "h": 46,
+        "id": "grammar-link"
+      },
+      {
         "text": "世界自然遺産に7箇所を追加 ",
         "w": 358,
-        "h": 336,
+        "h": 300,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
       },
       {
         "text": "マリナーズ・イチロー選手 現",
         "w": 358,
-        "h": 351,
+        "h": 335,
         "id": "shelf-item"
       },
       {
-        "text": "JRおおさか東線部分開業ウィ",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "JRおおさか東線部分開業JR",
         "w": 358,
-        "h": 309,
+        "h": 253,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
       },
       {
         "text": "信楽高原鐵道列車衝突事故、J",
         "w": 358,
-        "h": 336,
+        "h": 326,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
       },
       {
         "text": "ウィキニュース、21年の歴史",
         "w": 358,
-        "h": 351,
+        "h": 335,
         "id": "shelf-item"
       },
       {
-        "text": "野ばら青空文庫 · 小川未明",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "野ばらThe Wild Ro",
         "w": 358,
-        "h": 351,
+        "h": 335,
         "id": "shelf-item"
       },
       {
-        "text": "ごん狐青空文庫 · 新美南吉",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "ごん狐Gon the Fox",
         "w": 358,
-        "h": 378,
+        "h": 362,
         "id": "shelf-item"
       },
       {
-        "text": "やまなし青空文庫 · 宮沢賢",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "やまなしYamanashi ",
         "w": 358,
-        "h": 397,
+        "h": 381,
         "id": "shelf-item"
       },
       {
-        "text": "育児休業やさしい日本語 用語",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業Childcare ",
         "w": 358,
-        "h": 328,
+        "h": 229,
         "id": "shelf-item"
       },
       {
-        "text": "育児休業給付金やさしい日本語",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業給付金Childca",
         "w": 358,
-        "h": 352,
+        "h": 282,
         "id": "shelf-item"
       },
       {
-        "text": "遺族基礎年金やさしい日本語 ",
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族基礎年金Basic su",
         "w": 358,
-        "h": 352,
+        "h": 308,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "▸ sources & li",
+        "w": 133,
+        "h": 40,
+        "id": "sources-toggle"
       },
       {
         "text": "変異 ▴variants",
@@ -697,290 +753,132 @@
   "shelf": [
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
+      "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 3 words beyond the core",
       "meta": [
         "ウィキニュース",
         "2005-07-15",
-        "CC BY 4.0",
-        "抜粋",
-        "Three signals — never averaged."
-      ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "2.42 上級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "63.7%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "57.0%"
-        }
+        "CC BY 4.0"
       ],
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the core",
       "meta": [
         "ウィキニュース",
         "2006-06-17",
-        "CC BY 4.0",
-        "Three signals — never averaged.",
-        "不一致 gap 1signals disagree",
-        "signals disagree"
+        "CC BY 4.0"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "4.23 中級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "67.4%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "41.9%"
-        }
-      ],
-      "disagreement": "不一致 gap 1signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "JRおおさか東線部分開業",
+      "titleEn": "JR Osaka-Higashi Line partially opens",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 3 words beyond the core",
       "meta": [
         "ウィキニュース",
         "2008-03-15",
-        "CC BY 4.0",
-        "抜粋",
-        "Three signals — never averaged."
-      ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "1.94 上級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "69.9%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "49.6%"
-        }
+        "CC BY 4.0"
       ],
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+      "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 3 words beyond the core",
       "meta": [
         "ウィキニュース",
         "2011-04-28",
-        "CC BY 4.0",
-        "抜粋",
-        "Three signals — never averaged."
-      ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "1.32 上級後半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "71.1%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "49.1%"
-        }
+        "CC BY 4.0"
       ],
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
+      "titleEn": "Wikinews closes the curtain on 21 years",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the core",
       "meta": [
         "ウィキニュース",
         "2026-05-03",
-        "CC BY 4.0",
-        "抜粋",
-        "Three signals — never averaged.",
-        "不一致 gap 1signals disagree",
-        "signals disagree"
+        "CC BY 4.0"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "3.37 中級後半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "67.7%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "48.9%"
-        }
-      ],
-      "disagreement": "不一致 gap 1signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "野ばら",
+      "titleEn": "The Wild Rose — Ogawa Mimei",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 8 words beyond the core",
       "meta": [
         "青空文庫 · 小川未明",
         "None",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "Three signals — never averaged.",
-        "不一致 gap 2signals disagree",
-        "signals disagree"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "4.52 初級後半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "86.9%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "22.1%"
-        }
-      ],
-      "disagreement": "不一致 gap 2signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "ごん狐",
+      "titleEn": "Gon the Fox — Niimi Nankichi",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 9 words beyond the core",
       "meta": [
         "青空文庫 · 新美南吉",
         "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "Three signals — never averaged.",
-        "不一致 gap 1signals disagree",
-        "signals disagree"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "4.27 中級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "88.8%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "24.8%"
-        }
-      ],
-      "disagreement": "不一致 gap 1signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "やまなし",
+      "titleEn": "Yamanashi — Miyazawa Kenji",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 7 words beyond the core",
       "meta": [
         "青空文庫 · 宮沢賢治",
         "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "Three signals — never averaged.",
-        "不一致 gap 2signals disagree",
-        "signals disagree"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "4.80 初級後半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "85.8%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "23.6%"
-        }
-      ],
-      "disagreement": "不一致 gap 2signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "育児休業",
+      "titleEn": "Childcare leave",
+      "level": "Intermediate",
+      "levelNote": "中級前半",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "Three signals — never averaged.",
-        "不一致 gap 1signals disagree",
-        "signals disagree"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "4.04 中級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "100.0%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "0.0%"
-        }
-      ],
-      "disagreement": "不一致 gap 1signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "育児休業給付金",
+      "titleEn": "Childcare-leave benefit",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 3 words beyond the core",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "Three signals — never averaged.",
-        "不一致 gap 2signals disagree",
-        "signals disagree"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "5.72 初級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "69.2%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "46.2%"
-        }
-      ],
-      "disagreement": "不一致 gap 2signals disagree"
+      "disagreement": "signals disagree"
     },
     {
       "title": "遺族基礎年金",
+      "titleEn": "Basic survivor's pension",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 5 words beyond the core",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "Three signals — never averaged.",
-        "不一致 gap 1signals disagree",
-        "signals disagree"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadabilitysentence ease",
-          "value": "3.58 中級前半"
-        },
-        {
-          "name": "語彙カバー率vocab coverage",
-          "value": "80.0%"
-        },
-        {
-          "name": "TMR（核）rare-word load",
-          "value": "20.0%"
-        }
-      ],
-      "disagreement": "不一致 gap 1signals disagree"
+      "disagreement": "signals disagree"
     }
   ],
   "caps": {
@@ -1046,102 +944,69 @@
   "graderTable": [
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
-      "signals": {
-        "jreadabilitysentence ease": "2.42 上級前半",
-        "語彙カバー率vocab coverage": "63.7%",
-        "TMR（核）rare-word load": "57.0%"
-      },
+      "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond the core",
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
-      "signals": {
-        "jreadabilitysentence ease": "4.23 中級前半",
-        "語彙カバー率vocab coverage": "67.4%",
-        "TMR（核）rare-word load": "41.9%"
-      },
-      "disagreement": "不一致 gap 1signals disagree"
+      "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "JRおおさか東線部分開業",
-      "signals": {
-        "jreadabilitysentence ease": "1.94 上級前半",
-        "語彙カバー率vocab coverage": "69.9%",
-        "TMR（核）rare-word load": "49.6%"
-      },
+      "titleEn": "JR Osaka-Higashi Line partially opens",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond the core",
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
-      "signals": {
-        "jreadabilitysentence ease": "1.32 上級後半",
-        "語彙カバー率vocab coverage": "71.1%",
-        "TMR（核）rare-word load": "49.1%"
-      },
+      "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond the core",
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
-      "signals": {
-        "jreadabilitysentence ease": "3.37 中級後半",
-        "語彙カバー率vocab coverage": "67.7%",
-        "TMR（核）rare-word load": "48.9%"
-      },
-      "disagreement": "不一致 gap 1signals disagree"
+      "titleEn": "Wikinews closes the curtain on 21 years",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "野ばら",
-      "signals": {
-        "jreadabilitysentence ease": "4.52 初級後半",
-        "語彙カバー率vocab coverage": "86.9%",
-        "TMR（核）rare-word load": "22.1%"
-      },
-      "disagreement": "不一致 gap 2signals disagree"
+      "titleEn": "The Wild Rose — Ogawa Mimei",
+      "level": "Upper beginner初級後半 · ~1 in 8 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "ごん狐",
-      "signals": {
-        "jreadabilitysentence ease": "4.27 中級前半",
-        "語彙カバー率vocab coverage": "88.8%",
-        "TMR（核）rare-word load": "24.8%"
-      },
-      "disagreement": "不一致 gap 1signals disagree"
+      "titleEn": "Gon the Fox — Niimi Nankichi",
+      "level": "Intermediate中級前半 · ~1 in 9 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "やまなし",
-      "signals": {
-        "jreadabilitysentence ease": "4.80 初級後半",
-        "語彙カバー率vocab coverage": "85.8%",
-        "TMR（核）rare-word load": "23.6%"
-      },
-      "disagreement": "不一致 gap 2signals disagree"
+      "titleEn": "Yamanashi — Miyazawa Kenji",
+      "level": "Upper beginner初級後半 · ~1 in 7 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "育児休業",
-      "signals": {
-        "jreadabilitysentence ease": "4.04 中級前半",
-        "語彙カバー率vocab coverage": "100.0%",
-        "TMR（核）rare-word load": "0.0%"
-      },
-      "disagreement": "不一致 gap 1signals disagree"
+      "titleEn": "Childcare leave",
+      "level": "Intermediate中級前半",
+      "disagreement": "signals disagree"
     },
     {
       "title": "育児休業給付金",
-      "signals": {
-        "jreadabilitysentence ease": "5.72 初級前半",
-        "語彙カバー率vocab coverage": "69.2%",
-        "TMR（核）rare-word load": "46.2%"
-      },
-      "disagreement": "不一致 gap 2signals disagree"
+      "titleEn": "Childcare-leave benefit",
+      "level": "Beginner初級前半 · ~1 in 3 words beyond the core",
+      "disagreement": "signals disagree"
     },
     {
       "title": "遺族基礎年金",
-      "signals": {
-        "jreadabilitysentence ease": "3.58 中級前半",
-        "語彙カバー率vocab coverage": "80.0%",
-        "TMR（核）rare-word load": "20.0%"
-      },
-      "disagreement": "不一致 gap 1signals disagree"
+      "titleEn": "Basic survivor's pension",
+      "level": "Intermediate中級前半 · ~1 in 5 words beyond the core",
+      "disagreement": "signals disagree"
     }
   ],
   "counts": {
@@ -1152,26 +1017,31 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 185,
+  "loadMs": 285,
   "summary": {
-    "total": 42,
+    "total": 55,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 185 ms"
+      "detail": "11 texts, ready in 285 ms"
     },
     {
-      "name": "every shelf text shows three signals, not one score",
+      "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "11 texts × 3 signals"
+      "detail": "11 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Advanced上級前半 · ~1 in 3 words beyond the core"
     },
     {
       "name": "disagreement is visible where it fires",
       "pass": true,
       "detail": "8/11 texts flagged"
+    },
+    {
+      "name": "the raw three signals unfold behind 詳細",
+      "pass": true,
+      "detail": "3 signal rows on the opened card"
     },
     {
       "name": "the reader shows real Japanese",
@@ -1209,14 +1079,44 @@
       "detail": "130 ruby present but hidden"
     },
     {
-      "name": "tapping a word opens a panel with reading + meaning",
+      "name": "grammar · a single tap reveals furigana and opens nothing",
+      "pass": true,
+      "detail": "lit=1, sheet=false"
+    },
+    {
+      "name": "grammar · a double tap sets English beneath the word",
+      "pass": true,
+      "detail": "1 inline gloss(es)"
+    },
+    {
+      "name": "grammar · a long press floats the mini-dictionary",
+      "pass": true,
+      "detail": "遺産 — inheritance"
+    },
+    {
+      "name": "grammar · holding opens the full entry",
       "pass": true,
       "detail": "年（とし）"
     },
     {
-      "name": "the panel offers a hop into the kanji",
+      "name": "the sheet carries its own back and close",
       "pass": true,
-      "detail": "7 chips"
+      "detail": "back=true close=true"
+    },
+    {
+      "name": "the entry offers a hop into each kanji",
+      "pass": true,
+      "detail": "年 — 1 row(s)"
+    },
+    {
+      "name": "real usage examples come from the shelf itself",
+      "pass": true,
+      "detail": "4 example(s)"
+    },
+    {
+      "name": "the dictionary carries every sense, most common first",
+      "pass": true,
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -1226,7 +1126,7 @@
     {
       "name": "word → kanji lands on a real kanji page",
       "pass": true,
-      "detail": "過 — Overdo; 12 strokes / 漢検 6級 / ShareAlike / ShareAlike pool"
+      "detail": "過 — Overdo; 12 strokes / 漢検 6級 / JLPT N2"
     },
     {
       "name": "the kanji page carries its 漢検級",
@@ -1234,7 +1134,7 @@
       "detail": "漢検 6級"
     },
     {
-      "name": "idioms hang off the kanji page, marked as the ShareAlike pool",
+      "name": "idioms hang off the kanji page (provenance lives in the sources panel)",
       "pass": true,
       "detail": "1 idiom section(s)"
     },
@@ -1256,7 +1156,12 @@
     {
       "name": "any node can be taken into study",
       "pass": true,
-      "detail": "tray reads \"取 1tray\""
+      "detail": "chrome reads \"覚 1lists\""
+    },
+    {
+      "name": "覚える lands the item in this month's list automatically",
+      "pass": true,
+      "detail": "リスト — 2026年8月 に自動追加ずみlists — already in 2026"
     },
     {
       "name": "the schedule preview shows what FSRS-6 would do",
@@ -1281,12 +1186,12 @@
     {
       "name": "variant B · three",
       "pass": true,
-      "detail": "33 signal rows / 0 bands / 0 uncertain markers"
+      "detail": "3 signal rows / 0 bands / 0 uncertain markers (one 詳細 open)"
     },
     {
       "name": "variant B · band",
       "pass": true,
-      "detail": "0 signal rows / 11 bands / 8 uncertain markers"
+      "detail": "0 signal rows / 1 bands / 0 uncertain markers (one 詳細 open)"
     },
     {
       "name": "variant C · the WCAG side actually reaches AA",
@@ -1331,7 +1236,7 @@
     {
       "name": "every visible control is at least 40px",
       "pass": true,
-      "detail": "48 controls checked"
+      "detail": "65 controls checked"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -1351,12 +1256,17 @@
     {
       "name": "v1.1 · navigation is bilingual by default (a learner can steer)",
       "pass": true,
-      "detail": "back carries \"back\", tray carries both 取 and \"tray\", EN toggle pressed=true"
+      "detail": "back carries \"back\", 覚 carries \"lists\", EN active=true"
+    },
+    {
+      "name": "v1.2 · the language toggle reads exactly EN | 日本語",
+      "pass": true,
+      "detail": "EN=true 日本語=true"
     },
     {
       "name": "v1.1 · 日本語のみ strips the chrome back to immersion mode",
       "pass": true,
-      "detail": "after toggling: back latin=false, tray latin=false"
+      "detail": "after toggling: back latin=false, lists latin=false"
     },
     {
       "name": "v1.1 · layered depth and WCAG contrast are the defaults",
@@ -1367,6 +1277,26 @@
       "name": "v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)",
       "pass": true,
       "detail": "depth=flat&contrast=current&ui=ja"
+    },
+    {
+      "name": "v1.2 · the grammar dictionary seed stands (original content)",
+      "pass": true,
+      "detail": "12 entries in the index"
+    },
+    {
+      "name": "v1.2 · a grammar entry carries formation + examples",
+      "pass": true,
+      "detail": "〜によると: 2 examples"
+    },
+    {
+      "name": "v1.2 · the kanji page draws its stroke order (KanjiVG)",
+      "pass": true,
+      "detail": "6 strokes rendered"
+    },
+    {
+      "name": "v1.2 · the shelf carries no provenance narration (sources fold away)",
+      "pass": true,
+      "detail": "quiet"
     }
   ]
 }

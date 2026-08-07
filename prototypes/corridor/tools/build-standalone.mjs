@@ -21,6 +21,8 @@ const BUNDLES = {
   'share_alike/kanji': 'data/share_alike/kanji.json',
   'share_alike/words': 'data/share_alike/words.json',
   'share_alike/idioms': 'data/share_alike/idioms.json',
+  'share_alike/dict': 'data/share_alike/dict.json',
+  'share_alike/strokes': 'data/share_alike/strokes.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
 };

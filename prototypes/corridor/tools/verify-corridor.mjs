@@ -75,20 +75,32 @@ function check(name, pass, detail = '') {
   console.log(`${mark} ${name}${detail ? `  — ${detail}` : ''}`);
 }
 
-async function tap(page, selector, index = 0) {
+async function touchAt(page, selector, index, holdMs) {
   const target = page.locator(selector).nth(index);
   await target.scrollIntoViewIfNeeded();
   await page.waitForTimeout(60);
   const box = await target.boundingBox();
-  if (!box) throw new Error(`tap: no box for ${selector}`);
+  if (!box) throw new Error(`touch: no box for ${selector}`);
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
   const cdp = await page.context().newCDPSession(page);
   const point = { x, y, radiusX: 6, radiusY: 6, force: 1 };
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+  if (holdMs) await page.waitForTimeout(holdMs);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await cdp.detach();
   await page.waitForTimeout(120);
+}
+
+async function tap(page, selector, index = 0) {
+  await touchAt(page, selector, index, 0);
+}
+
+/** The reader's click grammar (v1.2): a full dictionary entry opens by
+ * holding a word past the mini-dictionary stage. */
+async function holdWord(page, selector, index = 0) {
+  await touchAt(page, selector, index, 2400);
+  await page.waitForTimeout(200);
 }
 
 async function shoot(page, dir, name) {
@@ -101,7 +113,7 @@ async function shoot(page, dir, name) {
 async function walkToSemPanel(page, tapFn) {
   await tapFn(page, '.shelf-item');
   await page.waitForSelector('#reader');
-  await tapFn(page, '#reader .tok.content');
+  await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
   if ((await page.locator('#sheet .sem-row').count()) === 0) {
     if (await page.locator('#sheet .chip').count()) {
@@ -203,21 +215,28 @@ async function main() {
   const shelfData = await page.evaluate(`(() => {
     return [...document.querySelectorAll('.shelf-item')].map((n) => ({
       title: n.querySelector('.shelf-title').textContent,
+      titleEn: n.querySelector('.shelf-title-en')?.textContent ?? null,
+      level: n.querySelector('.level-chip')?.textContent ?? null,
+      levelNote: n.querySelector('.level-note')?.textContent ?? null,
       meta: [...n.querySelectorAll('.shelf-meta span')].map((s) => s.textContent),
-      signals: [...n.querySelectorAll('.sig')].map((s) => ({
-        name: s.querySelector('.sig-name').textContent,
-        value: s.querySelector('.sig-val').textContent,
-      })),
       disagreement: n.querySelector('.disagree-tag')?.textContent ?? null,
     }));
   })()`);
   report.shelf = shelfData;
-  check('every shelf text shows three signals, not one score',
-    shelfData.every((s) => s.signals.length === 3),
-    `${shelfData.length} texts × 3 signals`);
+  check('every text carries an English title and a learner-readable level',
+    shelfData.every((s) => s.titleEn && s.level && /^[A-Za-z]/.test(s.level)),
+    `${shelfData.length} texts, e.g. "${shelfData[0]?.titleEn}" — ${shelfData[0]?.level}${shelfData[0]?.levelNote}`);
   check('disagreement is visible where it fires',
     shelfData.some((s) => s.disagreement),
     `${shelfData.filter((s) => s.disagreement).length}/${shelfData.length} texts flagged`);
+
+  // the raw instrument is one 詳細 tap away, not gone
+  await page.locator('[data-details]').first().click();
+  await page.waitForTimeout(200);
+  const rawSignals = await page.locator('.shelf-item .sig').count();
+  check('the raw three signals unfold behind 詳細', rawSignals === 3, `${rawSignals} signal rows on the opened card`);
+  await page.locator('[data-details]').first().click();
+  await page.waitForTimeout(150);
   await shoot(page, shotsDir, '01-arrive-shelf');
   report.steps.push({ step: 1, name: 'arrive', shot: '01-arrive-shelf.png' });
 
@@ -278,10 +297,46 @@ async function main() {
     `${beforeReveal.hiddenRt} ruby present but hidden`);
   await shoot(page, shotsDir, '02d-furigana-on-touch');
 
-  // -------------------------------------------------------- step 3 tap word
-  console.log('\n— step 3 · tap a word');
+  // ------------------------------- step 3 · the click grammar, then the entry
+  console.log('\n— step 3 · the click grammar and the dictionary entry');
+  await page.locator('[data-dial="furigana:1"]').click();
+  await page.waitForTimeout(150);
+
+  // single tap → furigana above (and nothing else)
+  await tap(page, '#reader .tok.content', 2);
+  await page.waitForTimeout(500);
+  const afterTap = await page.evaluate(`(() => ({
+    lit: document.querySelectorAll('#reader .tok.lit').length,
+    sheet: !!document.querySelector('#sheet'),
+  }))()`);
+  check('grammar · a single tap reveals furigana and opens nothing',
+    afterTap.lit >= 1 && !afterTap.sheet, `lit=${afterTap.lit}, sheet=${afterTap.sheet}`);
+
+  // double tap → English beneath the word
+  await tap(page, '#reader .tok.content', 4);
+  await page.waitForTimeout(80);
+  await tap(page, '#reader .tok.content', 4);
+  await page.waitForTimeout(400);
+  const afterDouble = await page.evaluate(`(() => ({
+    en: document.querySelectorAll('#reader .tok-en').length,
+    sheet: !!document.querySelector('#sheet'),
+  }))()`);
+  check('grammar · a double tap sets English beneath the word',
+    afterDouble.en >= 1 && !afterDouble.sheet, `${afterDouble.en} inline gloss(es)`);
+
+  // long press → the floating mini-dictionary
+  await touchAt(page, '#reader .tok.content', 6, 700);
+  await page.waitForTimeout(200);
+  const mini = await page.evaluate(`(() => {
+    const m = document.querySelector('#mini');
+    return m ? { word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent } : null;
+  })()`);
+  check('grammar · a long press floats the mini-dictionary', !!mini && !!mini.word,
+    mini ? `${mini.word} — ${String(mini.gloss).slice(0, 30)}` : 'no #mini');
+
+  // keep holding → the full entry
   await page.locator('[data-dial="furigana:2"]').click();
-  await tap(page, '#reader .tok.content');
+  await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
   const panel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
@@ -289,28 +344,33 @@ async function main() {
       node: s.dataset.node,
       headword: s.querySelector('.headword')?.textContent ?? '',
       reading: s.querySelector('.reading')?.textContent ?? '',
-      gloss: s.querySelector('.gloss')?.textContent ?? '',
-      semRows: [...s.querySelectorAll('.sem-row')].map((r) => ({
-        word: r.querySelector('.sem-word').textContent,
-        note: r.querySelector('.sem-note').textContent,
-      })),
-      semEmpty: s.querySelector('.sem-empty')?.textContent ?? null,
-      kanjiChips: [...s.querySelectorAll('.chip .big')].map((c) => c.textContent),
+      gloss: s.querySelector('.gloss')?.textContent ?? s.querySelector('.sense-list')?.textContent ?? '',
+      senses: s.querySelectorAll('.sense-list li').length,
+      kanjiRows: [...s.querySelectorAll('[data-kanjirow]')].map((c) => c.dataset.kanjirow),
+      examples: s.querySelectorAll('.example').length,
+      hasBack: !!s.querySelector('#sheet-back'),
+      hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('tapping a word opens a panel with reading + meaning',
+  check('grammar · holding opens the full entry',
     panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
     `${panel.headword}（${panel.reading}）`);
-  check('the panel offers a hop into the kanji', panel.kanjiChips.length > 0,
-    `${panel.kanjiChips.length} chips`);
+  check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
+    `back=${panel.hasBack} close=${panel.hasClose}`);
+  check('the entry offers a hop into each kanji', panel.kanjiRows.length > 0,
+    `${panel.kanjiRows.join('')} — ${panel.kanjiRows.length} row(s)`);
+  check('real usage examples come from the shelf itself', panel.examples >= 1,
+    `${panel.examples} example(s)`);
+  check('the dictionary carries every sense, most common first', panel.senses >= 2,
+    `${panel.headword}: ${panel.senses} senses`);
   await shoot(page, shotsDir, '03-word-panel');
-  report.steps.push({ step: 3, name: 'tap word', shot: '03-word-panel.png', panel });
+  report.steps.push({ step: 3, name: 'click grammar + entry', shot: '03-word-panel.png', panel });
 
   // now the surface that matters: a word that HAS semantic neighbours
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
   await page.waitForSelector('#reader');
-  await tap(page, '#reader .tok.content');
+  await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
   // from the empty-state seed chips, hop to a word that has edges
   const seedChip = page.locator('#sheet .chip').first();
@@ -343,8 +403,8 @@ async function main() {
   const hops = [];
   const nodeNow = async () => page.locator('#sheet').getAttribute('data-node');
 
-  // word → kanji
-  await tap(page, '#sheet .chip');
+  // word → kanji (the KANJI IN THIS WORD rows)
+  await tap(page, '#sheet [data-kanjirow]');
   await page.waitForTimeout(160);
   hops.push(await nodeNow());
   const kanjiPage = await page.evaluate(`(() => {
@@ -368,23 +428,21 @@ async function main() {
 
   const idiomHeading = await page.locator('#sheet .eyebrow', { hasText: '熟語' }).count();
   report.idiomSectionPresent = idiomHeading > 0;
-  check('idioms hang off the kanji page, marked as the ShareAlike pool',
-    idiomHeading > 0 &&
-      (await page.locator('#sheet .eyebrow .pool-tag.sa').count()) > 0,
-    `${idiomHeading} idiom section(s)`);
+  check('idioms hang off the kanji page (provenance lives in the sources panel)',
+    idiomHeading > 0, `${idiomHeading} idiom section(s)`);
 
   // kanji → a word containing it (same page, before descending)
   const markWordChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('含む語'));
+    const h = heads.find((x) => x.textContent.includes('よく使う語') || x.textContent.includes('含む語'));
     if (!h) return 0;
-    const first = h.nextElementSibling?.querySelector('.chip');
+    const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
     first.dataset.probe = 'wordchip';
     return 1;
   })()`);
   if (await markWordChip()) {
-    await tap(page, '#sheet .chip[data-probe="wordchip"]');
+    await tap(page, '#sheet [data-probe="wordchip"]');
     await page.waitForTimeout(160);
     check('kanji → a word that contains it', (await nodeNow()).startsWith('word:'), await nodeNow());
     hops.push(await nodeNow());
@@ -392,21 +450,21 @@ async function main() {
     await tap(page, '#back');
     await page.waitForTimeout(150);
   } else {
-    check('kanji → a word that contains it', false, 'no 含む語 section on this kanji page');
+    check('kanji → a word that contains it', false, 'no compounds section on this kanji page');
   }
 
   // kanji → radical
   const markPartChip = async () => page.evaluate(`(() => {
     const heads = [...document.querySelectorAll('#sheet .eyebrow')];
-    const h = heads.find((x) => x.textContent.includes('部品へ'));
+    const h = heads.find((x) => x.textContent.includes('部品'));
     if (!h) return 0;
-    const first = h.nextElementSibling?.querySelector('.chip');
+    const first = h.nextElementSibling?.querySelector('.entry-row');
     if (!first) return 0;
     first.dataset.probe = 'partchip';
     return 1;
   })()`);
   if (await markPartChip()) {
-    await tap(page, '#sheet .chip[data-probe="partchip"]');
+    await tap(page, '#sheet [data-probe="partchip"]');
     await page.waitForTimeout(160);
   }
   const radicalPage = await page.evaluate(`(() => {
@@ -447,10 +505,16 @@ async function main() {
   report.hops = hops;
 
   // ------------------------------------------------------------ step 5 take
-  console.log('\n— step 5 · take it');
+  console.log('\n— step 5 · 覚える');
   await tap(page, '#take');
   const taken = await page.locator('#tray').textContent();
-  check('any node can be taken into study', /取\s*[1-9]/.test(taken), `tray reads "${taken.trim()}"`);
+  check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
+  const bucket = await page.evaluate(`(() => {
+    const p = document.querySelector('.list-picker .eyebrow');
+    return p ? p.textContent : null;
+  })()`);
+  check('覚える lands the item in this month\'s list automatically',
+    !!bucket && /\d{4}年\d{1,2}月/.test(bucket), String(bucket).slice(0, 44));
   const sched = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('#sheet .sched tr')].slice(1).map((r) =>
       [...r.querySelectorAll('td')].map((td) => td.textContent));
@@ -471,9 +535,9 @@ async function main() {
   await page.evaluate('window.scrollTo(0, 420)');
   await page.waitForTimeout(80);
   const scrollBefore = await page.evaluate('window.scrollY');
-  await tap(page, '#reader .tok.content', 23);
+  await holdWord(page, '#reader .tok.content', 23);
   await page.waitForSelector('#sheet');
-  await tap(page, '#sheet .chip');
+  await tap(page, '#sheet [data-kanjirow]');
   await page.waitForTimeout(140);
   await tap(page, '#back');
   await tap(page, '#back');
@@ -495,7 +559,7 @@ async function main() {
     await open(`?entry=shelf&cards=${mode}`);
     await tap(page, '.shelf-item');
     await page.waitForSelector('#reader');
-    await tap(page, '#reader .tok.content', 5);
+    await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet .card-preview');
     await page.locator('#sheet .card-preview').scrollIntoViewIfNeeded();
     await page.waitForTimeout(120);
@@ -513,17 +577,19 @@ async function main() {
     variantShots[`A-${mode}`] = await shoot(page, shotsDir, `V-A-cards-${mode}`);
   }
 
-  // B · difficulty presentation
+  // B · difficulty presentation — behind 詳細 since v1.2, so open one card
   for (const mode of ['three', 'band']) {
     await open(`?entry=shelf&difficulty=${mode}`);
+    await page.locator('[data-details]').first().click();
+    await page.waitForTimeout(200);
     const shown = await page.evaluate(`(() => ({
       sigs: document.querySelectorAll('.shelf-item .sig').length,
       bands: document.querySelectorAll('.shelf-item .band').length,
       uncertain: document.querySelectorAll('.shelf-item .uncertain').length,
     }))()`);
     check(`variant B · ${mode}`,
-      mode === 'three' ? shown.sigs > 20 && shown.bands === 0 : shown.bands >= 8 && shown.sigs === 0,
-      `${shown.sigs} signal rows / ${shown.bands} bands / ${shown.uncertain} uncertain markers`);
+      mode === 'three' ? shown.sigs === 3 && shown.bands === 0 : shown.bands === 1 && shown.sigs === 0,
+      `${shown.sigs} signal rows / ${shown.bands} bands / ${shown.uncertain} uncertain markers (one 詳細 open)`);
     variantShots[`B-${mode}`] = await shoot(page, shotsDir, `V-B-difficulty-${mode}`);
   }
 
@@ -633,24 +699,29 @@ async function main() {
   await open('?entry=shelf');
   const biChrome = await page.evaluate(`(() => ({
     backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
-    trayEn: /tray/i.test(document.querySelector('#tray')?.textContent ?? ''),
-    trayJa: /取/.test(document.querySelector('#tray')?.textContent ?? ''),
-    dialEn: /as written/i.test(document.body.textContent),
-    lang: document.querySelector('#lang')?.getAttribute('aria-pressed'),
+    trayEn: /lists/i.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayJa: /覚/.test(document.querySelector('#tray')?.textContent ?? ''),
+    segEn: document.querySelector('#lang [data-lang="bi"]')?.textContent === 'EN',
+    segJa: document.querySelector('#lang [data-lang="ja"]')?.textContent === '日本語',
+    active: document.querySelector('#lang [data-lang="bi"]')?.getAttribute('aria-pressed'),
   }))()`);
   check('v1.1 · navigation is bilingual by default (a learner can steer)',
-    biChrome.backEn && biChrome.trayEn && biChrome.trayJa && biChrome.lang === 'true',
-    `back carries "back", tray carries both 取 and "tray", EN toggle pressed=${biChrome.lang}`);
+    biChrome.backEn && biChrome.trayEn && biChrome.trayJa && biChrome.active === 'true',
+    `back carries "back", 覚 carries "lists", EN active=${biChrome.active}`);
+  check('v1.2 · the language toggle reads exactly EN | 日本語',
+    biChrome.segEn && biChrome.segJa, `EN=${biChrome.segEn} 日本語=${biChrome.segJa}`);
 
-  await tap(page, '#lang');
+  await page.locator('#lang [data-lang="ja"]').click();
+  await page.waitForTimeout(200);
   const jaChrome = await page.evaluate(`(() => {
     const latin = (sel) => /[a-z]/i.test(document.querySelector(sel)?.textContent ?? '');
-    return { back: latin('#back'), tray: latin('#tray'), lang: document.querySelector('#lang')?.getAttribute('aria-pressed') };
+    return { back: latin('#back'), tray: latin('#tray'), active: document.querySelector('#lang [data-lang="ja"]')?.getAttribute('aria-pressed') };
   })()`);
   check('v1.1 · 日本語のみ strips the chrome back to immersion mode',
-    !jaChrome.back && !jaChrome.tray && jaChrome.lang === 'false',
-    `after toggling: back latin=${jaChrome.back}, tray latin=${jaChrome.tray}`);
-  await tap(page, '#lang');
+    !jaChrome.back && !jaChrome.tray && jaChrome.active === 'true',
+    `after toggling: back latin=${jaChrome.back}, lists latin=${jaChrome.tray}`);
+  await page.locator('#lang [data-lang="bi"]').click();
+  await page.waitForTimeout(200);
 
   const layered = await page.evaluate(`(() => ({
     layered: document.body.classList.contains('v-depth-layered'),
@@ -668,10 +739,55 @@ async function main() {
   check('v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)', flat, 'depth=flat&contrast=current&ui=ja');
   await shoot(page, shotsDir, '10-v11-flat-fade-ja');
 
+  // ------------------------------------------------- v1.2 operator round 3
+  console.log('\n— v1.2 · dictionary depth, grammar, lists, quiet surfaces');
+  await open('?entry=shelf');
+  await tap(page, '#grammar-link');
+  await page.waitForTimeout(250);
+  const grammarIndex = await page.locator('[data-grammar]').count();
+  check('v1.2 · the grammar dictionary seed stands (original content)',
+    grammarIndex >= 10, `${grammarIndex} entries in the index`);
+  await tap(page, '[data-grammar]');
+  await page.waitForTimeout(250);
+  const grammarEntry = await page.evaluate(`(() => {
+    const s = document.querySelector('#sheet');
+    return s ? {
+      headword: s.querySelector('.headword')?.textContent,
+      formation: !!s.querySelector('.formation'),
+      examples: s.querySelectorAll('.example').length,
+    } : null;
+  })()`);
+  check('v1.2 · a grammar entry carries formation + examples',
+    !!grammarEntry && grammarEntry.formation && grammarEntry.examples >= 2,
+    grammarEntry ? `${grammarEntry.headword}: ${grammarEntry.examples} examples` : 'no entry sheet');
+
+  // the kanji page draws its stroke order
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#reader');
+  await holdWord(page, '#reader .tok.content');
+  await page.waitForSelector('#sheet [data-kanjirow]');
+  await tap(page, '#sheet [data-kanjirow]');
+  await page.waitForTimeout(250);
+  const strokeCount = await page.locator('#strokes path').count();
+  check('v1.2 · the kanji page draws its stroke order (KanjiVG)',
+    strokeCount >= 3, `${strokeCount} strokes rendered`);
+  await shoot(page, shotsDir, '11-v12-kanji-strokes');
+
+  // reader surfaces carry no provenance/ticket narration
+  await open('?entry=shelf');
+  const narration = await page.evaluate(`(() => {
+    const text = document.querySelector('main').textContent;
+    return ['ShareAlike', '#58', '#44', 'corpus #', 'UNVERIFIED'].filter((m) => text.includes(m));
+  })()`);
+  check('v1.2 · the shelf carries no provenance narration (sources fold away)',
+    narration.length === 0, narration.length ? `leaked: ${narration.join(', ')}` : 'quiet');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,
-    signals: Object.fromEntries(s.signals.map((x) => [x.name, x.value])),
+    titleEn: s.titleEn,
+    level: `${s.level ?? ''}${s.levelNote ?? ''}`,
     disagreement: s.disagreement,
   }));
 

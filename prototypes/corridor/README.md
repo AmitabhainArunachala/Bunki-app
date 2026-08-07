@@ -38,17 +38,34 @@ for the reader dials (kanji, furigana, spacing).
 
 **v1.1 (operator feedback, 2026-08-07).** Navigation chrome is bilingual by
 default — a learner must be able to steer the app before they can read
-Japanese. `?ui=ja` (or the EN button in the chrome) switches to 日本語のみ, the
-opt-in immersion chrome; content is always Japanese. The same feedback round
-flipped the defaults to WCAG-AA contrast and a layered depth treatment
-(ground / card / sheet elevation, 藍 indigo for "tappable", 弁柄 red reserved
-for readings and warnings); the v1.0 look survives as
+Japanese. `?ui=ja` (or the EN｜日本語 toggle in the chrome) switches to
+日本語のみ, the opt-in immersion chrome; content is always Japanese. The same
+feedback round flipped the defaults to WCAG-AA contrast and a layered depth
+treatment (ground / card / sheet elevation, 藍 indigo for "tappable", 弁柄
+red reserved for readings and warnings); the v1.0 look survives as
 `?depth=flat&contrast=current&ui=ja`.
+
+**v1.2 (operator round 3, 2026-08-07).** The Renzo baseline lands, and the
+first act of the #36 harvest: the sites-v11 kotobako dictionary rides in as
+`data/share_alike/dict.json` (22,934 words, every JMdict sense most-common
+first) and `strokes.json` (2,136 KanjiVG stroke-path sets, drawn on the
+kanji page). Word entries carry senses / kanji-in-word rows / real examples
+from the shelf; kanji pages carry 音訓, stroke order, components, and glossed
+compounds. The reader speaks Drift's click grammar — tap = furigana,
+double-tap = English beneath, long-press = floating mini-dictionary, keep
+holding = full entry. 取る became 覚える; items land in an automatic monthly
+list (the operator's Renzo habit) plus named lists, persisted in
+localStorage. A 12-entry original-content grammar dictionary seeds the
+DoJG-class index (文法 on the shelf). Reader surfaces carry no provenance
+narration — 出典 folds away at the shelf foot; sheets carry their own
+← 戻る／✕ (the "NO BACK OPTION" fix), and a synthesized-click swallow stops
+hold-opens from teleporting a node deeper. Rebuild the dictionary assets
+with `node tools/build_dictionary.mjs`.
 
 ## Running it locally
 
 ```sh
-node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 42 checks + the screenshot set
+node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 55 checks + the screenshot set
 python3 -m http.server -d prototypes/corridor 8080     # then open http://127.0.0.1:8080/
 ```
 
