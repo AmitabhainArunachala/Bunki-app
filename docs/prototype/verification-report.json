@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 15:32",
+          "2026-08-07 15:41",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 15:37",
+          "2026-08-07 15:46",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 15:41",
+          "2026-08-07 15:50",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 15:31",
+          "2026-08-15 15:40",
           "8.30"
         ]
       ]
@@ -969,7 +969,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 323,
+  "loadMs": 313,
   "summary": {
     "total": 59,
     "failed": 0
@@ -978,7 +978,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 323 ms"
+      "detail": "11 texts, ready in 313 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",

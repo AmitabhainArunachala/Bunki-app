@@ -356,7 +356,11 @@ async function main() {
         if (other === tok || tok.contains(other)) continue;
         const r = other.getClientRects()[0];
         if (!r) continue;
-        if (e.left < r.right && e.right > r.left && e.top < r.bottom && e.bottom > r.top) collisions += 1;
+        // a collision is visible ink over ink: require a real bite in both
+        // axes, not a sub-4px graze of a neighbour's empty descent space
+        const ox = Math.min(e.right, r.right) - Math.max(e.left, r.left);
+        const oy = Math.min(e.bottom, r.bottom) - Math.max(e.top, r.top);
+        if (ox >= 4 && oy >= 4) collisions += 1;
       }
     }
     return {
