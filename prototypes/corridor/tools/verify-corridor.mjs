@@ -883,6 +883,33 @@ async function main() {
     (await page.locator('#sheet').getAttribute('data-node').catch(() => 'none')) ?? '');
   await shoot(page, shotsDir, '12-v15-search');
 
+  // ------------------------------------------ v1.6 · particles as doors
+  console.log('\n— v1.6 · particles: no dead pixels');
+  await open('?entry=shelf');
+  await page.fill('#search', 'wa');
+  await page.waitForTimeout(350);
+  check('particles · the search knows は',
+    await page.evaluate(`[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === 'particle:wa')`),
+    '"wa" → particle:wa');
+
+  await page.fill('#search', '');
+  await page.waitForTimeout(250);
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#reader');
+  const particleCount = await page.locator('#reader .tok.particle').count();
+  check('particles · the reader marks particle tokens as doors', particleCount >= 5,
+    `${particleCount} particle tokens wired`);
+  await holdWord(page, '#reader .tok.particle');
+  await page.waitForSelector('#sheet[data-node^="particle:"]');
+  const pPage = await page.evaluate(`(() => {
+    const s = document.querySelector('#sheet');
+    return { node: s.dataset.node, head: s.querySelector('.headword')?.textContent ?? '', examples: s.querySelectorAll('.example').length };
+  })()`);
+  check('particles · holding a particle opens its page with examples',
+    pPage.node.startsWith('particle:') && pPage.examples >= 2,
+    `${pPage.node} — ${pPage.head.trim()}, ${pPage.examples} examples`);
+  await shoot(page, shotsDir, '13-v16-particle');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,

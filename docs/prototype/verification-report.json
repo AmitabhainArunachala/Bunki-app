@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 15:48",
+          "2026-08-07 16:45",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 15:53",
+          "2026-08-07 16:50",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 15:57",
+          "2026-08-07 16:54",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 15:47",
+          "2026-08-15 16:44",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 432,
+  "loadMs": 626,
   "summary": {
-    "total": 65,
+    "total": 68,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 432 ms"
+      "detail": "11 texts, ready in 626 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1299,6 +1299,21 @@
       "name": "search · a result opens its full entry",
       "pass": true,
       "detail": "word:開催"
+    },
+    {
+      "name": "particles · the search knows は",
+      "pass": true,
+      "detail": "\"wa\" → particle:wa"
+    },
+    {
+      "name": "particles · the reader marks particle tokens as doors",
+      "pass": true,
+      "detail": "66 particle tokens wired"
+    },
+    {
+      "name": "particles · holding a particle opens its page with examples",
+      "pass": true,
+      "detail": "particle:de — で　particle, 2 examples"
     }
   ]
 }
