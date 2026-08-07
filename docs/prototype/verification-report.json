@@ -152,25 +152,25 @@
         [
           "もう一度",
           "1 分後",
-          "2026-08-06 22:59",
+          "2026-08-07 05:00",
           "0.21"
         ],
         [
           "難しい",
           "6 分後",
-          "2026-08-06 23:04",
+          "2026-08-07 05:05",
           "1.29"
         ],
         [
           "ふつう",
           "10 分後",
-          "2026-08-06 23:08",
+          "2026-08-07 05:09",
           "2.31"
         ],
         [
           "簡単",
           "8 日後",
-          "2026-08-14 22:58",
+          "2026-08-15 04:59",
           "8.30"
         ]
       ]
@@ -1132,7 +1132,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 173,
+  "loadMs": 275,
   "summary": {
     "total": 38,
     "failed": 0
@@ -1141,7 +1141,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 173 ms"
+      "detail": "11 texts, ready in 275 ms"
     },
     {
       "name": "every shelf text shows three signals, not one score",

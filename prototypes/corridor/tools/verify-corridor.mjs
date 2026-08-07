@@ -174,8 +174,15 @@ async function main() {
   const { server, base } = remoteBase
     ? { server: null, base: remoteBase }
     : await startCorridorServer();
+  // A sandboxed runner reaches the public internet only through its egress
+  // proxy; Chromium does not read HTTPS_PROXY on its own, so a remote --base
+  // resets the connection without this. Localhost runs must NOT be proxied.
+  const loopback = remoteBase && /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])/.test(remoteBase);
+  const proxyServer =
+    remoteBase && !loopback ? process.env.HTTPS_PROXY || process.env.https_proxy : null;
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
+    ...(proxyServer ? { proxy: { server: proxyServer } } : {}),
   });
   const context = await browser.newContext({
     viewport: VIEWPORT,

@@ -151,7 +151,7 @@ successfully.
 
 | step            | evidence                                                                                                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 arrive        | 11 texts, 33 signal rows, 8 disagreement tags, ready in ~210 ms                                                                                                                  |
+| 1 arrive        | 11 texts, 33 signal rows, 8 disagreement tags; ready in min 137 / median 189 / max 212 ms over 7 cold loads (localhost, excludes network)                                        |
 | 2 read          | 900 chars, **130 `<rt>` elements** of real ruby                                                                                                                                  |
 | 2 dials         | each axis moves only its own thing: furigana 130→0 rt with spacing class unchanged; spacing → 136 文節 groups with rt unchanged; kanji → 「2005年7月14日」→「2005ねん7がつ14か」 |
 | 2 reveal        | 130 ruby present but `opacity:0`, revealed on touch                                                                                                                              |
@@ -227,31 +227,62 @@ engine (#42), any scheduler write path, any mainstream Japanese news.
 
 ---
 
-## 6. Deployment — blocked, and why
+## 6. Deployment — live
 
-⚠️ **The Pages deploy from this branch is blocked by an environment protection
-rule.** `pages-app.yml` was extended to publish `prototypes/corridor/` at
-`/corridor/`, and dispatched against `claude/kairo-corridor`
+**https://amitabhainarunachala.github.io/Bunki-app/corridor/**
+
+Deployed from `main` after #59 was merged
+([run 31147490047](https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31147490047)).
+Alongside the existing root and `/app/`, both unchanged.
+
+### It was blocked first, and the block is worth recording
+
+`pages-app.yml` was extended to publish `prototypes/corridor/` at `/corridor/`
+and dispatched against `claude/kairo-corridor`
 ([run 31129378848](https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31129378848)).
 It failed **in 1 second with zero steps executed** — the job never started. That
 is the signature of the `github-pages` environment's deployment-branch policy
 (default: default branch only), not a build failure. Nothing in the workflow
-change is at fault, and the corridor's own build is verified green.
+change was at fault.
 
-I did not work around it by pushing to `main` — the brief says draft PRs only,
-never merges.
+I did not work around it by pushing to `main`; the brief said draft PRs only.
+Merging resolved it without any setting change, because `main` is what the
+policy was waiting for. **If a future prototype needs to deploy from a branch,
+that policy is the thing to change** — add the branch under Settings →
+Environments → `github-pages` → Deployment branches.
 
-**Two ways to open it:**
+Second-order note for anyone estimating turnaround: the successful run sat
+**queued for 23 minutes** (04:27:48 → 04:51:10 UTC) before a runner picked it
+up, then published in about 70 seconds. Runner congestion, not the build.
 
-1. **One setting, then re-run.** Settings → Environments → `github-pages` →
-   Deployment branches → add `claude/kairo-corridor` (or "All branches"), then
-   re-run the workflow. `/corridor/` appears alongside the existing root and
-   `/app/`. Merging the PR also does it, with no setting change.
+### What was verified about the deployed artifact
 
-2. **Right now, no settings.** `prototypes/corridor/corridor-standalone.html` is
-   a single self-contained file — all CSS, JS, ts-fsrs and 1.8 MB of data
-   inlined, no network at all. Download it from the PR and open it. Verified
-   working from `file://` in Chromium: 11 texts, 33 signals, FSRS live.
+All 13 published files were fetched from Pages with `curl` and compared against
+merged `main`: **13/13 byte-identical**, with the content types the app needs
+(`.mjs` as `text/javascript`, `.json` as `application/json`). The full check set
+was then run against those exact published bytes: **38/38**.
+
+⚠️ **A limit on that claim.** Chromium in the build container cannot reach the
+public internet — `example.com` and the Pages URL both fail with
+`ERR_CONNECTION_RESET`, via Playwright's `proxy` option and via
+`--proxy-server`, with the egress proxy logging zero relay attempts. `curl`
+works; the browser does not. So the checks ran against the **published bytes
+served locally**, not a live browser session against `github.io`. The bytes are
+proven identical and the URL is proven to serve 200 with correct types, but
+end-to-end CDN behaviour was not exercised from here.
+
+Mirroring is easy to get wrong in a way that fakes a pass: the first mirror pass
+missed `data/coverage.json`, `data/fsrs-pin.json` and `data/manifest.json`
+because only the two pool subdirectories were enumerated. The page then hung at
+"ready" forever. If you repeat this, enumerate `data/` recursively and serve
+`.mjs` as `text/javascript` — `python3 -m http.server` does not, and strict MIME
+checking silently blocks the module.
+
+### Offline fallback
+
+`prototypes/corridor/corridor-standalone.html` is a single self-contained file —
+all CSS, JS, ts-fsrs and 1.8 MB of data inlined, no network at all. Verified
+working from `file://` in Chromium: 11 texts, 33 signals, FSRS live.
 
 Local:
 
