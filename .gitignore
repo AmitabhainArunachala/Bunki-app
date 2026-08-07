@@ -49,3 +49,9 @@ yarn-error.*
 prototypes/bunki-sites-v11/dist/
 prototypes/bunki-sites-v11/.vinext/
 prototypes/bunki-sites-v11/.sites-runtime/
+
+# Agent worktrees. The Agent tool creates a full nested checkout per isolated
+# subagent (this run's independent verifier put 698 MB here). Ephemeral tooling
+# state, never a build input. Scoped to worktrees/ rather than all of .claude/
+# so real project config under .claude/ stays committable.
+.claude/worktrees/

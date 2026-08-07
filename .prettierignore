@@ -28,3 +28,8 @@ apps/app/src/data/generated/
 # Python corpus subtree — its own toolchain; format/test discipline lives in
 # corpus CI (pytest), and committed samples are generated data.
 corpus/
+
+# Verifier output — the corridor's evidence file is written by
+# prototypes/corridor/tools/verify-corridor.mjs on every run. Reformatting it
+# would be overwritten by the next run and would churn the diff for nothing.
+docs/prototype/verification-report.json

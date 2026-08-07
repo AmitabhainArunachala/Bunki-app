@@ -1,0 +1,38 @@
+{
+  "built": "deterministic — no clock, no rng",
+  "grader": {
+    "package": "corpus.grading (PR #58)",
+    "tokenizer": "fugashi + unidic-lite (UniDic 2.1.2 lineage)",
+    "substrate": "ninjal-kyoiku-kihon-goi (6,103 words; CC BY 4.0)",
+    "substrateSha256": "80f190abebfe5fdfc52aec06a6c9c842eb4b1ff25b6687f135547a81902607af",
+    "law": "three signals, never averaged; disagreement surfaced, never resolved"
+  },
+  "counts": {
+    "passages": 11,
+    "words": 7217,
+    "kanji": 2582,
+    "radicals": 926,
+    "idioms": 900,
+    "semHeads": 82
+  },
+  "caps": {
+    "excerptChars": 520,
+    "kanjiWordCap": 60,
+    "radicalKanjiCap": 80,
+    "idiomCap": 900,
+    "idiomCandidates": 3559,
+    "idiomTotalInSource": 4198
+  },
+  "pools": {
+    "proprietary_safe": [
+      "kanken.json",
+      "passages.json",
+      "sem.json"
+    ],
+    "share_alike": [
+      "idioms.json",
+      "kanji.json",
+      "words.json"
+    ]
+  }
+}

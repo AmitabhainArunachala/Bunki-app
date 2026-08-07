@@ -12,6 +12,7 @@ on:
     paths:
       - 'apps/app/**'
       - 'prototypes/drift/drift-artifact.html'
+      - 'prototypes/corridor/**'
       - '.github/workflows/pages-app.yml'
 
 permissions:
@@ -65,7 +66,18 @@ jobs:
           # This directory's CONTENTS are served at https://<owner>.github.io/<repo>/,
           # so index.html must sit at its root — no extra <repo>/ nesting.
           SITE="$RUNNER_TEMP/site"
-          mkdir -p "$SITE/app"
+          mkdir -p "$SITE/app" "$SITE/corridor"
+
+          # 回廊 KAIRO — the corridor prototype. A self-contained static surface
+          # at its own path, so nothing above it changes. Deliberately
+          # disposable: it is an instrument for deciding the open Wayfinder
+          # tickets, not a product surface.
+          cp -r prototypes/corridor/index.html \
+                prototypes/corridor/corridor.css \
+                prototypes/corridor/corridor.js \
+                prototypes/corridor/data \
+                prototypes/corridor/vendor \
+                "$SITE/corridor"/
 
           # The study app beneath the opening surface.
           cp -r apps/app/dist/* "$SITE/app"/
@@ -130,6 +142,7 @@ jobs:
               echo ""
               echo "- Bunki (opens in Drift): ${{ steps.deployment.outputs.page_url }}"
               echo "- Study app: ${{ steps.deployment.outputs.page_url }}app/"
+              echo "- 回廊 corridor prototype: ${{ steps.deployment.outputs.page_url }}corridor/"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             {
