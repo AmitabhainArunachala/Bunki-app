@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 15:19",
+          "2026-08-07 15:32",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 15:24",
+          "2026-08-07 15:37",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 15:28",
+          "2026-08-07 15:41",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 15:18",
+          "2026-08-15 15:31",
           "8.30"
         ]
       ]
@@ -395,7 +395,7 @@
       },
       {
         "text": "← 戻るback",
-        "w": 73,
+        "w": 72,
         "h": 42,
         "id": "sheet-back"
       },
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 310,
+  "loadMs": 323,
   "summary": {
-    "total": 58,
+    "total": 59,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 310 ms"
+      "detail": "11 texts, ready in 323 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1043,7 +1043,12 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, word top 482.8 → 482.8px"
+      "detail": "gloss on, glyph bottom 509.8 → 509.0px"
+    },
+    {
+      "name": "grammar · the gloss collides with nothing — on any font, by construction",
+      "pass": true,
+      "detail": "0 overlapping token(s)"
     },
     {
       "name": "grammar · a third tap backs all the way out",
