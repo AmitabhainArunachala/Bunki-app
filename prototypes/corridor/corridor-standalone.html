@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%239e2b25'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23fcfbf6' font-family='serif'%3E回%3C/text%3E%3C/svg%3E">
 <title>回廊 KAIRO — corridor prototype</title>
 <style>
 /* 回廊 KAIRO — the corridor prototype.
@@ -949,6 +950,229 @@ h1.view-title {
   text-align: center;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+}
+
+/* ==================================================== v1.1 · 2026-08-07 ===
+ * Operator feedback on v1.0, in two strokes:
+ *
+ * 1. Navigation must be readable before the learner can read Japanese.
+ *    The chrome is bilingual by default; 日本語のみ is the opt-in immersion
+ *    mode (the EN button in the chrome, or ?ui=ja). Content stays Japanese.
+ *
+ * 2. More contrast, more depth between layers. 藍 (ai) indigo joins 弁柄
+ *    red so red can go back to meaning exactly two things — readings and
+ *    warnings — while indigo marks "you can go here": tappable words,
+ *    word-chips, signal fills, licence provenance. The layered treatment
+ *    (variant E) separates ground / card / sheet with real elevation.
+ *    WCAG contrast (variant C) becomes the default; the old fade remains
+ *    a toggle so #47 stays decidable by looking.
+ */
+
+:root {
+  --ground-0: #fffdf6; /* raised paper — cards and the sheet */
+  --ai: #2e4d6e; /* 藍 indigo: the "you can go here" colour */
+  --ai-wash: rgba(46, 77, 110, 0.08);
+}
+
+/* ------------------------------------------------------ bilingual chrome */
+.en-sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  text-transform: lowercase;
+  line-height: 1.3;
+  color: inherit;
+  opacity: 0.62;
+  margin-top: 1px;
+}
+
+button .l-ja {
+  display: block;
+  line-height: 1.25;
+}
+
+.chrome button,
+.seg button,
+#variants .vseg button,
+.take {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.en-inline {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: inherit;
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+.kv dt .en-sub,
+.sched th .en-sub,
+.sched td .en-sub {
+  display: inline;
+  margin-left: 5px;
+}
+
+#lang[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
+
+/* the shelf's own introduction is instruction, not a preview — never clamp it */
+.shelf-snippet.intro {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+/* ------------------------------------------------- sheet scrim (tap-out) */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(20, 24, 28, 0.16);
+  animation: scrim-in 0.18s ease;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------- variant E · layered depth */
+body.v-depth-layered {
+  background-color: var(--ground-2);
+}
+
+body.v-depth-layered .chrome {
+  background: color-mix(in srgb, var(--ground-0) 94%, transparent);
+  border-bottom-color: var(--line);
+}
+
+body.v-depth-layered .shelf-item {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 14px 14px 16px;
+  margin: 0 0 12px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered .shelf-item:first-of-type {
+  border-top: 1px solid var(--line-soft);
+}
+
+body.v-depth-layered #reader,
+body.v-depth-layered .dials {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered #reader {
+  padding: 16px 15px;
+  margin-top: 10px;
+}
+
+body.v-depth-layered .sheet {
+  background: var(--ground-0);
+  box-shadow: 0 -18px 56px rgba(20, 24, 28, 0.26);
+}
+
+body.v-depth-layered .scrim {
+  background: rgba(20, 24, 28, 0.3);
+}
+
+body.v-depth-layered .sem-group {
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 10px 12px 4px;
+}
+
+body.v-depth-layered .note {
+  background: var(--ground-2);
+  border-radius: 0 6px 6px 0;
+  padding: 9px 11px 9px 10px;
+}
+
+body.v-depth-layered .card-preview {
+  border-radius: 8px;
+}
+
+body.v-depth-layered .chip {
+  background: var(--ground-0);
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(20, 24, 28, 0.06);
+}
+
+/* node kinds get distinct edges: 弁柄 for kanji, 藍 for words, dashed for
+ * parts, doubled for idioms — so the graph's layers read at a glance */
+body.v-depth-layered .chip.t-kanji {
+  border-top: 2px solid color-mix(in srgb, var(--red) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-word {
+  border-top: 2px solid color-mix(in srgb, var(--ai) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-radical {
+  border-style: dashed;
+}
+
+body.v-depth-layered .chip.t-idiom {
+  border-top: 3px double color-mix(in srgb, var(--ink-2) 70%, var(--line));
+}
+
+/* what is tappable says so: content words carry a quiet indigo stitch */
+body.v-depth-layered .tok.content {
+  border-bottom: 1px dotted color-mix(in srgb, var(--ai) 55%, transparent);
+  padding-bottom: 1px;
+}
+
+body.v-depth-layered .sig-fill {
+  background: var(--ai);
+}
+
+/* provenance is information, not alarm — indigo, leaving red to warnings */
+body.v-depth-layered .pool-tag.sa {
+  color: var(--ai);
+  border-color: color-mix(in srgb, var(--ai) 65%, var(--line));
+}
+
+body.v-depth-layered .sched th {
+  border-bottom: 2px solid var(--line);
+}
+
+body.v-depth-layered .sched tr:nth-child(even) td {
+  background: var(--ground-2);
+}
+
+body.v-depth-layered .take {
+  box-shadow: 0 2px 8px rgba(20, 24, 28, 0.18);
+}
+
+body.v-depth-layered .inline-link {
+  color: var(--ai);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim {
+    animation: none;
+  }
 }
 
 </style>
@@ -2850,38 +3074,55 @@ const DATA = {
   sa: ['kanji', 'words', 'idioms'],
 };
 
-/** The four open decisions. Crude and obvious on purpose — it is an instrument. */
+/** The four open decisions. Crude and obvious on purpose — it is an instrument.
+ * Each option carries [id, 日本語, english]; the strip renders both. `depth`
+ * and `ui` are not Wayfinder tickets — they are operator feedback on v1.0
+ * (2026-08-07): more separation between layers, and navigation a learner can
+ * read before they can read Japanese. */
 const VARIANTS = {
   cards: {
     ticket: 38,
     label: 'A 札の形 #38',
+    en: 'card format',
     options: [
-      ['mcd', 'MCD 文脈'],
-      ['word', '単語札'],
+      ['mcd', 'MCD 文脈', 'MCD cloze'],
+      ['word', '単語札', 'word card'],
     ],
   },
   difficulty: {
     ticket: 43,
     label: 'B 難易度 #43',
+    en: 'difficulty',
     options: [
-      ['three', '3信号'],
-      ['band', '帯+不確実'],
+      ['three', '3信号', '3 signals'],
+      ['band', '帯+不確実', 'band'],
     ],
   },
   contrast: {
     ticket: 47,
     label: 'C 可読性 #47',
+    en: 'legibility',
     options: [
-      ['current', '現行の淡さ'],
-      ['wcag', 'WCAG 準拠'],
+      ['wcag', 'WCAG 準拠', 'WCAG AA'],
+      ['current', '現行の淡さ', 'soft fade'],
     ],
   },
   entry: {
     ticket: 37,
     label: 'D 入口 #37',
+    en: 'entry',
     options: [
-      ['field', 'ドリフトの野'],
-      ['shelf', '読む棚'],
+      ['field', 'ドリフトの野', 'drift field'],
+      ['shelf', '読む棚', 'shelf'],
+    ],
+  },
+  depth: {
+    ticket: null,
+    label: 'E 奥行 v1.1',
+    en: 'depth',
+    options: [
+      ['layered', '層で分ける', 'layered'],
+      ['flat', '現行の平ら', 'flat'],
     ],
   },
 };
@@ -2901,7 +3142,11 @@ const S = {
   readerScroll: 0,
   stack: [],
   dials: { kanji: 0, furigana: 2, spacing: 0 },
-  variants: { cards: 'mcd', difficulty: 'three', contrast: 'current', entry: 'shelf' },
+  variants: { cards: 'mcd', difficulty: 'three', contrast: 'wcag', entry: 'shelf', depth: 'layered' },
+  /* UI language: 'bi' = navigation carries English alongside the Japanese
+   * (default — a learner must be able to steer before they can read);
+   * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
+  lang: 'bi',
   taken: [],
   debugOpen: false,
 };
@@ -2918,6 +3163,24 @@ const el = (tag, cls, text) => {
   return node;
 };
 
+/* ------------------------------------------------------------ ui language */
+const bi = () => S.lang === 'bi';
+/** Pick one rendering for prose: English when the chrome is bilingual,
+ * the Japanese original in 日本語のみ mode. */
+const tx = (ja, en) => (bi() && en != null ? en : ja);
+/** Append a small english sub-label to a control or heading (bi mode only). */
+function withEn(node, en, cls = 'en-sub') {
+  if (bi() && en) node.append(el('span', cls, en));
+  return node;
+}
+/** A label that stacks 日本語 over english inside buttons. */
+function biLabel(tag, cls, ja, en) {
+  const node = el(tag, cls);
+  node.append(el('span', 'l-ja', ja));
+  if (bi() && en) node.append(el('span', 'en-sub', en));
+  return node;
+}
+
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
@@ -2925,6 +3188,7 @@ async function boot() {
     const v = params.get(key);
     if (v && VARIANTS[key].options.some(([id]) => id === v)) S.variants[key] = v;
   }
+  if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
@@ -3113,21 +3377,27 @@ function signalRows(grading) {
   return [
     {
       name: 'jreadability',
+      en: 'sentence ease',
       value: jr.score == null ? '—' : `${jr.score.toFixed(2)} ${jr.band}`,
+      hint: tx('6.4 易 → 0.5 難（独自の尺度）', 'sentence-shape readability: 6.4 easy → 0.5 hard'),
       fill: jr.score == null ? 0 : (JREAD_MAX - jr.score) / (JREAD_MAX - JREAD_MIN),
-      hint: '6.4 易 → 0.5 難（独自の尺度）',
     },
     {
       name: '語彙カバー率',
+      en: 'vocab coverage',
       value: cov.coverage == null ? '—' : `${(cov.coverage * 100).toFixed(1)}%`,
+      hint: tx(
+        '国語研 6,103 語に対する内容語の被覆（高いほど易）',
+        'share of content words inside the NINJAL 6,103-word core (higher = easier)',
+      ),
       fill: cov.coverage == null ? 0 : 1 - cov.coverage,
-      hint: '国語研 6,103 語に対する内容語の被覆（高いほど易）',
     },
     {
       name: 'TMR（核）',
+      en: 'rare-word load',
       value: core == null ? '—' : `${(core * 100).toFixed(1)}%`,
+      hint: tx('◎ 2,071 語より上の語の割合（高いほど難）', 'share of words beyond the 2,071-word core (higher = harder)'),
       fill: core ?? 0,
-      hint: '◎ 2,071 語より上の語の割合（高いほど難）',
     },
   ];
 }
@@ -3141,7 +3411,7 @@ function renderSignals(grading, { compact = false } = {}) {
     const box = el('div', 'signals');
     for (const row of signalRows(grading)) {
       const line = el('div', 'sig');
-      line.append(el('span', 'sig-name', row.name));
+      line.append(withEn(el('span', 'sig-name', row.name), row.en));
       const track = el('div', 'sig-track');
       const fill = el('div', 'sig-fill');
       fill.style.width = `${Math.max(2, Math.min(100, row.fill * 100))}%`;
@@ -3153,9 +3423,11 @@ function renderSignals(grading, { compact = false } = {}) {
     wrap.append(box);
     const foot = el('div', 'shelf-meta');
     foot.style.marginTop = '8px';
-    foot.append(el('span', null, '3つの信号。平均しない。'));
+    foot.append(el('span', null, tx('3つの信号。平均しない。', 'Three signals — never averaged.')));
     if (grading.disagreement.flag) {
-      foot.append(el('span', 'disagree-tag', `不一致 gap ${grading.disagreement.detail.max_gap}`));
+      foot.append(
+        withEn(el('span', 'disagree-tag', `不一致 gap ${grading.disagreement.detail.max_gap}`), 'signals disagree'),
+      );
     }
     wrap.append(foot);
   } else {
@@ -3168,11 +3440,25 @@ function renderSignals(grading, { compact = false } = {}) {
     span.style.width = `${((hi - lo + 1) / 3) * 100}%`;
     scale.append(span);
     const legend = el('div', 'band-legend');
-    legend.append(el('span', null, '易'), el('span', null, '中'), el('span', null, '難'));
-    box.append(el('div', 'sig-name', '難易度の帯'), scale, legend);
+    legend.append(
+      el('span', null, tx('易', '易 easy')),
+      el('span', null, tx('中', '中 mid')),
+      el('span', null, tx('難', '難 hard')),
+    );
+    box.append(withEn(el('div', 'sig-name', '難易度の帯'), 'difficulty band'), scale, legend);
     if (grading.disagreement.flag) {
       const mark = el('div', 'uncertain');
-      mark.append(el('span', null, '⁉'), el('span', null, `不確実 — 3信号が ${grading.disagreement.detail.max_gap} 段ずれている`));
+      mark.append(
+        el('span', null, '⁉'),
+        el(
+          'span',
+          null,
+          tx(
+            `不確実 — 3信号が ${grading.disagreement.detail.max_gap} 段ずれている`,
+            `uncertain — the 3 signals are ${grading.disagreement.detail.max_gap} step(s) apart`,
+          ),
+        ),
+      );
       box.append(mark);
     }
     wrap.append(box);
@@ -3180,9 +3466,12 @@ function renderSignals(grading, { compact = false } = {}) {
 
   if (!compact) {
     const note = el('div', 'note');
-    note.textContent =
+    note.textContent = tx(
       '#58 で測定済み：jreadability はやさしい日本語を「易しくない」と採点する（符号が逆、2 seed で再現）。' +
-      'だから単一の数値は出さない。';
+        'だから単一の数値は出さない。',
+      'Measured on #58: jreadability grades Easy-Japanese as "not easy" (sign inverted, reproduced on 2 seeds). ' +
+        'That is why no single number is shown.',
+    );
     wrap.append(note);
   }
   return wrap;
@@ -3190,11 +3479,14 @@ function renderSignals(grading, { compact = false } = {}) {
 
 /* ---------------------------------------------------------------- views */
 function renderShelf(main) {
-  main.append(el('p', 'eyebrow', '回廊 · よみものの棚'));
+  main.append(withEn(el('p', 'eyebrow', '回廊 · よみものの棚'), 'KAIRO · the reading shelf', 'en-inline'));
   const h = el('h1', 'view-title', '実データの棚');
   main.append(h);
-  const sub = el('p', 'shelf-snippet');
-  sub.textContent = `${D.passages.length} 本 — ウィキニュース (CC BY 4.0)・青空文庫 (PD, 新字新仮名)・やさしい日本語 用語集。難易度は実測の3信号。`;
+  const sub = el('p', 'shelf-snippet intro');
+  sub.textContent = tx(
+    `${D.passages.length} 本 — ウィキニュース (CC BY 4.0)・青空文庫 (PD, 新字新仮名)・やさしい日本語 用語集。難易度は実測の3信号。`,
+    `${D.passages.length} real texts — Wikinews (CC BY 4.0) · Aozora Bunko (public domain) · Easy-Japanese glossary. Difficulty is three measured signals, never one score. Tap a text to read it.`,
+  );
   main.append(sub);
 
   for (const p of D.passages) {
@@ -3216,18 +3508,20 @@ function renderShelf(main) {
   }
 
   const note = el('div', 'note');
-  note.textContent =
-    '本文は原典の先頭からの抜粋（文単位、文の途中では切らない）。採点は画面に出ている本文そのものに対して実行したもの。';
+  note.textContent = tx(
+    '本文は原典の先頭からの抜粋（文単位、文の途中では切らない）。採点は画面に出ている本文そのものに対して実行したもの。',
+    'Each text is an excerpt from the start of its source, cut at sentence boundaries. The grades were computed over exactly the text shown on screen.',
+  );
   main.append(note);
   main.append(licencePanel());
 }
 
-function dialRow(labelText, key, options) {
+function dialRow(labelJa, labelEn, key, options) {
   const row = el('div', 'dial');
-  row.append(el('span', 'dial-label', labelText));
+  row.append(withEn(el('span', 'dial-label', labelJa), labelEn));
   const seg = el('div', 'seg');
-  options.forEach((label, index) => {
-    const b = el('button', null, label);
+  options.forEach(([ja, en], index) => {
+    const b = biLabel('button', null, ja, en);
     b.type = 'button';
     b.dataset.dial = `${key}:${index}`;
     b.setAttribute('aria-pressed', String(S.dials[key] === index));
@@ -3256,17 +3550,43 @@ function renderReader(main) {
     el(
       'span',
       'pool-tag',
-      p.rubySource === 'markup' ? 'ふりがな：原文のルビ' : 'ふりがな：UniDic 由来（数詞+助数詞は誤る）',
+      p.rubySource === 'markup'
+        ? tx('ふりがな：原文のルビ', 'ふりがな from the source text')
+        : tx('ふりがな：UniDic 由来（数詞+助数詞は誤る）', 'ふりがな from UniDic (counters can be wrong)'),
     ),
   );
   main.append(meta);
   main.append(renderSignals(p.grading, { compact: true }));
 
   const dials = el('div', 'dials');
-  dials.append(el('div', 'dial-label', '文字の出しかた — 三つの独立したダイヤル'));
-  dials.append(dialRow('漢字', 'kanji', ['そのまま', '常用まで', 'すべて仮名']));
-  dials.append(dialRow('ふりがな', 'furigana', ['なし', '触れて', 'つねに']));
-  dials.append(dialRow('分かち', 'spacing', ['なし', '語の間', '文節']));
+  dials.append(
+    el(
+      'div',
+      'dial-label',
+      tx('文字の出しかた — 三つの独立したダイヤル', 'How the text shows — three independent dials'),
+    ),
+  );
+  dials.append(
+    dialRow('漢字', 'kanji', 'kanji', [
+      ['そのまま', 'as written'],
+      ['常用まで', 'jōyō only'],
+      ['すべて仮名', 'all kana'],
+    ]),
+  );
+  dials.append(
+    dialRow('ふりがな', 'readings', 'furigana', [
+      ['なし', 'off'],
+      ['触れて', 'on touch'],
+      ['つねに', 'always'],
+    ]),
+  );
+  dials.append(
+    dialRow('分かち', 'spacing', 'spacing', [
+      ['なし', 'none'],
+      ['語の間', 'words'],
+      ['文節', 'phrases'],
+    ]),
+  );
   main.append(dials);
 
   const reader = el('div', 'reader');
@@ -3308,9 +3628,12 @@ function renderReader(main) {
 
   if (p.truncated) {
     const note = el('div', 'note');
-    note.textContent = `原典からの抜粋（先頭 ${p.text.length} 字、文単位）。`;
+    note.textContent = tx(
+      `原典からの抜粋（先頭 ${p.text.length} 字、文単位）。`,
+      `Excerpt — the first ${p.text.length} characters of the source, cut at a sentence boundary.`,
+    );
     if (p.url) {
-      const a = el('a', null, ' 原典');
+      const a = el('a', null, tx(' 原典', ' source 原典'));
       a.href = p.url;
       a.rel = 'noreferrer';
       a.target = '_blank';
@@ -3342,13 +3665,15 @@ function renderEntry(main) {
     node.style.left = `${x}%`;
     node.style.top = `${y}%`;
     node.style.fontSize = `${13 + ((i * 7) % 11)}px`;
-    node.style.opacity = String(0.35 + ((i * 13) % 50) / 100);
+    // the WCAG side lifts the field's floor too — at 0.35 the words all but vanish
+    const floor = S.variants.contrast === 'wcag' ? 55 : 35;
+    node.style.opacity = String((floor + ((i * 13) % (95 - floor))) / 100);
     node.style.animationDuration = `${9 + (i % 7)}s`;
     node.style.animationDelay = `-${i * 0.7}s`;
     node.addEventListener('click', () => go({ t: 'word', id: word }));
     field.append(node);
   });
-  const enter = el('button', 'field-enter', '棚へ　→');
+  const enter = el('button', 'field-enter', tx('棚へ　→', '棚へ　to the shelf →'));
   enter.type = 'button';
   enter.id = 'enter-shelf';
   enter.addEventListener('click', () => {
@@ -3359,28 +3684,43 @@ function renderEntry(main) {
   main.append(field);
 
   const note = el('div', 'note placeholder');
-  note.innerHTML =
+  note.innerHTML = tx(
     '<b>仮置き</b> — これは入口の位置を比べるための最小の野であって、Drift そのものではない。' +
-    'Drift の物理とジェスチャ文法は #46 で未決のまま、触っていない。本物の Drift はサイトの root にある。';
+      'Drift の物理とジェスチャ文法は #46 で未決のまま、触っていない。本物の Drift はサイトの root にある。',
+    '<b>placeholder</b> — a minimal field for comparing where you land, not Drift itself. ' +
+      "Drift's physics and gesture grammar stay untouched (#46). The real Drift lives at the site root.",
+  );
   main.append(note);
 }
 
 function renderTray(main) {
-  main.append(el('p', 'eyebrow', '取ったもの'));
-  main.append(el('h1', 'view-title', `${S.taken.length} 件`));
+  main.append(withEn(el('p', 'eyebrow', '取ったもの'), 'taken into study', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(`${S.taken.length} 件`, `${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)));
   const note = el('div', 'note');
-  note.textContent =
-    'これは読み取り専用のプレビュー。イベントログには何も書かない（スケジューラ本体は範囲外 — #40）。';
+  note.textContent = tx(
+    'これは読み取り専用のプレビュー。イベントログには何も書かない（スケジューラ本体は範囲外 — #40）。',
+    'A read-only preview: nothing is written to the event log (the real scheduler is out of scope — #40). ' +
+      'The red time is when FSRS-6 would next show each item if you rated it ふつう "good" now.',
+  );
   main.append(note);
   if (!S.taken.length) {
-    main.append(el('div', 'sem-empty', 'まだ何も取っていない。どのノードからでも「取る」で入る。'));
+    main.append(
+      el(
+        'div',
+        'sem-empty',
+        tx(
+          'まだ何も取っていない。どのノードからでも「取る」で入る。',
+          'Nothing taken yet. Every word, kanji, radical or idiom page has a 取る take button.',
+        ),
+      ),
+    );
     return;
   }
   for (const item of S.taken) {
     const line = el('div', 'tray-line');
     const w = el('span', 'w', item.label);
     line.append(w);
-    line.append(el('span', 'pool-tag', item.kind));
+    line.append(el('span', 'pool-tag', tx(item.kind, item.kindEn || item.kind)));
     const preview = schedulePreview();
     line.append(el('span', 'when', preview ? preview.good.when : '—'));
     line.addEventListener('click', () => go({ t: item.t, id: item.id }));
@@ -3397,10 +3737,10 @@ function nodeTitle(node) {
   return '';
 }
 
-function chipsFor(items, onTap, sub) {
+function chipsFor(items, onTap, sub, kind) {
   const wrap = el('div', 'chips');
   for (const item of items) {
-    const chip = el('button', 'chip');
+    const chip = el('button', kind ? `chip t-${kind}` : 'chip');
     chip.type = 'button';
     chip.append(el('span', 'big', item.label));
     const subText = sub ? sub(item) : item.sub;
@@ -3411,9 +3751,21 @@ function chipsFor(items, onTap, sub) {
   return wrap;
 }
 
+const NODE_KIND = {
+  word: ['語', 'word'],
+  kanji: ['漢字', 'kanji'],
+  radical: ['部品', 'part'],
+  idiom: ['熟語', 'idiom'],
+};
+
 function takeButton(node, label) {
   const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
-  const btn = el('button', already ? 'take taken' : 'take', already ? '取った ✓' : '取る');
+  const btn = biLabel(
+    'button',
+    already ? 'take taken' : 'take',
+    already ? '取った ✓' : '取る',
+    already ? 'taken' : 'take into study',
+  );
   btn.type = 'button';
   btn.id = 'take';
   btn.addEventListener('click', () => {
@@ -3422,7 +3774,8 @@ function takeButton(node, label) {
       t: node.t,
       id: node.id,
       label,
-      kind: node.t === 'word' ? '語' : node.t === 'kanji' ? '漢字' : node.t === 'radical' ? '部品' : '熟語',
+      kind: NODE_KIND[node.t][0],
+      kindEn: NODE_KIND[node.t][1],
       from: node.from || null,
     });
     render();
@@ -3442,7 +3795,7 @@ function schedulePreview() {
     const mins = Math.round(ms / 60000);
     const days = next.scheduled_days;
     out[grade.toLowerCase()] = {
-      when: days >= 1 ? `${days} 日後` : `${mins} 分後`,
+      when: days >= 1 ? tx(`${days} 日後`, `in ${days} d`) : tx(`${mins} 分後`, `in ${mins} min`),
       due: next.due.toISOString().slice(0, 16).replace('T', ' '),
       stability: next.stability,
       difficulty: next.difficulty,
@@ -3453,19 +3806,35 @@ function schedulePreview() {
 
 function renderSchedule(container) {
   const preview = schedulePreview();
-  container.append(el('p', 'card-kind', `予定される復習 — FSRS-6 · ${D.pin.parameterSetId}`));
+  container.append(
+    withEn(
+      el('p', 'card-kind', tx('予定される復習', 'if you reviewed this now') + ` — FSRS-6 · ${D.pin.parameterSetId}`),
+      null,
+    ),
+  );
   if (!preview) {
-    container.append(el('div', 'sem-empty', 'スケジューラを読み込めなかった。'));
+    container.append(el('div', 'sem-empty', tx('スケジューラを読み込めなかった。', 'The scheduler failed to load.')));
     return;
   }
   const table = el('table', 'sched');
   const head = el('tr');
-  for (const h of ['評価', 'つぎ', '日時', '安定度']) head.append(el('th', null, h));
+  const headers = [
+    ['評価', 'your rating'],
+    ['つぎ', 'next review'],
+    ['日時', 'due'],
+    ['安定度', 'stability'],
+  ];
+  for (const [ja, en] of headers) head.append(withEn(el('th', null, ja), en));
   table.append(head);
-  const labels = { again: 'もう一度', hard: '難しい', good: 'ふつう', easy: '簡単' };
+  const labels = {
+    again: ['もう一度', 'again'],
+    hard: ['難しい', 'hard'],
+    good: ['ふつう', 'good'],
+    easy: ['簡単', 'easy'],
+  };
   for (const key of ['again', 'hard', 'good', 'easy']) {
     const row = el('tr');
-    row.append(el('td', null, labels[key]));
+    row.append(withEn(el('td', null, labels[key][0]), labels[key][1]));
     row.append(el('td', key === 'good' ? 'good' : null, preview[key].when));
     row.append(el('td', null, preview[key].due));
     row.append(el('td', null, preview[key].stability.toFixed(2)));
@@ -3473,10 +3842,14 @@ function renderSchedule(container) {
   }
   container.append(table);
   const note = el('div', 'note');
-  note.textContent =
+  note.textContent = tx(
     `新規カードを「いま」評価した場合の実計算（${D.pin.package} ${D.pin.pinnedVersion}、` +
-    `retention ${D.pin.requestRetention}、fuzz ${D.pin.enableFuzz ? 'on' : 'off'}）。` +
-    'packages/domain の pin をそのまま読んでいる。書き込みはしない。';
+      `retention ${D.pin.requestRetention}、fuzz ${D.pin.enableFuzz ? 'on' : 'off'}）。` +
+      'packages/domain の pin をそのまま読んでいる。書き込みはしない。',
+    `Real FSRS-6 arithmetic for a new card rated right now (${D.pin.package} ${D.pin.pinnedVersion}, ` +
+      `retention ${D.pin.requestRetention}, fuzz ${D.pin.enableFuzz ? 'on' : 'off'}), ` +
+      "reading packages/domain's pinned parameters directly. Nothing is written.",
+  );
   container.append(note);
 }
 
@@ -3501,7 +3874,9 @@ function renderCardVariant(container, target) {
     el(
       'p',
       'card-kind',
-      kind === 'mcd' ? 'MCD — 文脈まるごと、一語だけ空ける' : '単語札 — 表は語だけ（Animecards）',
+      kind === 'mcd'
+        ? tx('MCD — 文脈まるごと、一語だけ空ける', 'MCD card — the whole context, one word blanked')
+        : tx('単語札 — 表は語だけ（Animecards）', 'Word card — the front is the word alone (Animecards)'),
     ),
   );
   const face = el('div', 'card-face');
@@ -3538,14 +3913,18 @@ function renderCardVariant(container, target) {
 
   if (!sentence) {
     const note = el('div', 'note placeholder');
-    note.innerHTML =
-      '<b>仮置き</b> — このノードは本文から開いていないので文脈の文がない。MCD 側は文脈がないと成立しない、というのがこの比較の要点のひとつ。';
+    note.innerHTML = tx(
+      '<b>仮置き</b> — このノードは本文から開いていないので文脈の文がない。MCD 側は文脈がないと成立しない、というのがこの比較の要点のひとつ。',
+      '<b>placeholder</b> — this node was not opened from a text, so there is no context sentence. That an MCD card cannot exist without context is one of the points of this comparison.',
+    );
     box.append(note);
   }
   container.append(box);
   const compare = el('div', 'note');
-  compare.textContent =
-    '#38：十五年決着していない議論。下の帯で切り替えて、同じ語が両方でどう見えるかを比べる。';
+  compare.textContent = tx(
+    '#38：十五年決着していない議論。下の帯で切り替えて、同じ語が両方でどう見えるかを比べる。',
+    '#38: a fifteen-year unresolved debate. Switch the strip below to see the same word both ways.',
+  );
   container.append(compare);
 }
 
@@ -3563,20 +3942,26 @@ function renderWordNode(sheet, node) {
 
   const gloss = el('p', word?.g ? 'gloss' : 'gloss absent');
   gloss.textContent =
-    word?.g || 'この語の語釈はまだこの層にない（6,687 語の辞書に載っていない語）。読みと接続は下にある。';
+    word?.g ||
+    tx(
+      'この語の語釈はまだこの層にない（6,687 語の辞書に載っていない語）。読みと接続は下にある。',
+      'No gloss for this word yet — it is outside the 6,687-word lexicon. Its reading and connections continue below.',
+    );
   sheet.append(gloss);
 
   if (word?.jlpt) {
     const meta = el('div', 'shelf-meta');
     meta.append(el('span', 'pool-tag', `JLPT N${word.jlpt}`));
-    meta.append(el('span', 'pool-tag sa', 'ShareAlike 由来の語釈'));
+    meta.append(el('span', 'pool-tag sa', tx('ShareAlike 由来の語釈', 'gloss from ShareAlike data')));
     sheet.append(meta);
   }
 
   // the semantic neighbourhood — the single most important surface here
   const edges = D.sem[node.id];
   const semWrap = el('div');
-  semWrap.append(el('p', 'eyebrow', '意味の近く — 使い分けつき'));
+  semWrap.append(
+    withEn(el('p', 'eyebrow', '意味の近く — 使い分けつき'), 'nearby in meaning — and how they differ', 'en-inline'),
+  );
   if (edges && edges.length) {
     const byRel = {};
     for (const edge of edges) (byRel[edge.rel] ||= []).push(edge);
@@ -3601,15 +3986,20 @@ function renderWordNode(sheet, node) {
     }
   } else {
     const empty = el('div', 'sem-empty');
-    empty.textContent =
+    empty.textContent = tx(
       `この語には意味近傍がまだ書かれていない。SEM 層は現在 ${D.manifest.counts.semHeads} 語（辞書の約 1.2%）。` +
-      '空白を隠さずに見せている — 拡大は #44。';
+        '空白を隠さずに見せている — 拡大は #44。',
+      `No semantic neighbourhood is written for this word yet — the SEM layer currently covers ${D.manifest.counts.semHeads} words (~1.2% of the lexicon). ` +
+        'The gap is shown, not hidden — scaling it is #44. These words do have one:',
+    );
     semWrap.append(empty);
     const seeds = Object.keys(D.sem).slice(0, 6);
     semWrap.append(
       chipsFor(
-        seeds.map((w) => ({ label: w, sub: '書かれている語' })),
+        seeds.map((w) => ({ label: w, sub: tx('書かれている語', 'has notes') })),
         (item) => go({ t: 'word', id: item.label, from: node.from }),
+        null,
+        'word',
       ),
     );
   }
@@ -3617,11 +4007,13 @@ function renderWordNode(sheet, node) {
 
   const chars = (word?.k || [...node.id].filter((c) => D.kanji[c])).filter((c) => D.kanji[c]);
   if (chars.length) {
-    sheet.append(el('p', 'eyebrow', '字へ'));
+    sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
     sheet.append(
       chipsFor(
-        chars.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '級なし' })),
+        chars.map((c) => ({ label: c, sub: D.kanken[c]?.kk || tx('級なし', 'no level') })),
         (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+        null,
+        'kanji',
       ),
     );
   }
@@ -3634,7 +4026,7 @@ function renderWordNode(sheet, node) {
 function renderKanjiNode(sheet, node) {
   const k = D.kanji[node.id];
   if (!k) {
-    sheet.append(el('div', 'sem-empty', 'この字はこの層にない。'));
+    sheet.append(el('div', 'sem-empty', tx('この字はこの層にない。', 'This kanji is not in this layer.')));
     return;
   }
   const hero = el('div', 'hero');
@@ -3642,7 +4034,7 @@ function renderKanjiNode(sheet, node) {
   const meta = el('div', 'hero-meta');
   meta.append(el('div', 'hero-mean', k.m));
   const chips = el('div', 'shelf-meta');
-  chips.append(el('span', 'pool-tag', `${k.st} 画`));
+  chips.append(el('span', 'pool-tag', tx(`${k.st} 画`, `${k.st} strokes`)));
   if (D.kanken[k.c]?.kk) chips.append(el('span', 'pool-tag', `漢検 ${D.kanken[k.c].kk}`));
   chips.append(el('span', 'pool-tag sa', 'ShareAlike'));
   meta.append(chips);
@@ -3652,18 +4044,20 @@ function renderKanjiNode(sheet, node) {
   const kv = el('dl', 'kv');
   const on = el('dd');
   on.append(el('span', 'on', k.on.join('・') || '—'));
-  kv.append(el('dt', null, '音'), on);
+  kv.append(withEn(el('dt', null, '音'), 'on'), on);
   const kun = el('dd');
   kun.append(el('span', 'on', k.kun.join('・') || '—'));
-  kv.append(el('dt', null, '訓'), kun);
+  kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
   if (k.parts.length) {
-    sheet.append(el('p', 'eyebrow', '部品へ'));
+    sheet.append(withEn(el('p', 'eyebrow', '部品へ'), 'into the parts', 'en-inline'));
     sheet.append(
       chipsFor(
-        k.parts.map((c) => ({ label: c, sub: D.radicals[c]?.name || '名称なし' })),
+        k.parts.map((c) => ({ label: c, sub: D.radicals[c]?.name || tx('名称なし', 'unnamed') })),
         (item) => go({ t: 'radical', id: item.label, from: node.from }),
+        null,
+        'radical',
       ),
     );
   }
@@ -3672,20 +4066,37 @@ function renderKanjiNode(sheet, node) {
   if (words.length) {
     const capped = words.length > D.wordCap;
     sheet.append(
-      el('p', 'eyebrow', capped ? `この字を含む語 — ${words.length} 語のうち ${D.wordCap} 語` : `この字を含む語 — ${words.length} 語`),
+      withEn(
+        el(
+          'p',
+          'eyebrow',
+          capped ? `この字を含む語 — ${words.length} 語のうち ${D.wordCap} 語` : `この字を含む語 — ${words.length} 語`,
+        ),
+        'words that contain it',
+        'en-inline',
+      ),
     );
     sheet.append(
       chipsFor(
         words.slice(0, D.wordCap).map((w) => ({ label: w, sub: D.words[w]?.r || '' })),
         (item) => go({ t: 'word', id: item.label, from: node.from }),
+        null,
+        'word',
       ),
     );
   }
 
   if (!words.length) {
-    sheet.append(el('p', 'eyebrow', 'この字を含む語'));
+    sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
     sheet.append(
-      el('div', 'sem-empty', `6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。`),
+      el(
+        'div',
+        'sem-empty',
+        tx(
+          `6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。`,
+          'No word in the 6,687-word lexicon contains this kanji. The walk continues through the kanji and its parts.',
+        ),
+      ),
     );
   }
 
@@ -3693,12 +4104,15 @@ function renderKanjiNode(sheet, node) {
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
     heading.append(document.createTextNode(`熟語・慣用句 — ${idioms.length}　`));
-    heading.append(el('span', 'pool-tag sa', 'ShareAlike プール'));
+    if (bi()) heading.append(el('span', 'en-inline', 'idioms and set phrases'));
+    heading.append(el('span', 'pool-tag sa', tx('ShareAlike プール', 'ShareAlike pool')));
     sheet.append(heading);
     sheet.append(
       chipsFor(
         idioms.slice(0, 24).map((w) => ({ label: w, sub: D.idioms[w]?.r || '' })),
         (item) => go({ t: 'idiom', id: item.label, from: node.from }),
+        null,
+        'idiom',
       ),
     );
   }
@@ -3710,47 +4124,60 @@ function renderKanjiNode(sheet, node) {
 function renderRadicalNode(sheet, node) {
   const r = D.radicals[node.id];
   if (!r) {
-    sheet.append(el('div', 'sem-empty', 'この部品はこの層にない。'));
+    sheet.append(el('div', 'sem-empty', tx('この部品はこの層にない。', 'This part is not in this layer.')));
     return;
   }
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', r.c));
   const meta = el('div', 'hero-meta');
-  meta.append(el('div', 'hero-mean', r.name || '（名称は漢検の部首表にない部品）'));
+  meta.append(
+    el('div', 'hero-mean', r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the 漢検 radical table)')),
+  );
   const chips = el('div', 'shelf-meta');
-  if (r.st) chips.append(el('span', 'pool-tag', `${r.st} 画`));
-  chips.append(el('span', 'pool-tag', `${r.kanjiCount} 字`));
+  if (r.st) chips.append(el('span', 'pool-tag', tx(`${r.st} 画`, `${r.st} strokes`)));
+  chips.append(el('span', 'pool-tag', tx(`${r.kanjiCount} 字`, `${r.kanjiCount} kanji`)));
   chips.append(el('span', 'pool-tag sa', 'ShareAlike'));
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
 
   const note = el('div', 'note');
-  note.textContent =
-    'RADK は「この部品を含む」族であって、康熙部首の分類ではない（#26 の赤チームで確定した言い方）。';
+  note.textContent = tx(
+    'RADK は「この部品を含む」族であって、康熙部首の分類ではない（#26 の赤チームで確定した言い方）。',
+    'RADK is the "contains this part" family, not the Kangxi radical classification (the wording settled by the #26 red team).',
+  );
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {
     sheet.append(
-      chipsFor([{ label: r.c, sub: '字としても見る' }], (item) =>
-        go({ t: 'kanji', id: item.label, from: node.from }),
+      chipsFor(
+        [{ label: r.c, sub: tx('字としても見る', 'view as a kanji') }],
+        (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+        null,
+        'kanji',
       ),
     );
   }
 
   sheet.append(
-    el(
-      'p',
-      'eyebrow',
-      r.kanjiCount > r.kanji.length
-        ? `この部品を含む字 — ${r.kanjiCount} 字のうち ${r.kanji.length} 字`
-        : `この部品を含む字 — ${r.kanjiCount} 字`,
+    withEn(
+      el(
+        'p',
+        'eyebrow',
+        r.kanjiCount > r.kanji.length
+          ? `この部品を含む字 — ${r.kanjiCount} 字のうち ${r.kanji.length} 字`
+          : `この部品を含む字 — ${r.kanjiCount} 字`,
+      ),
+      'kanji that contain this part',
+      'en-inline',
     ),
   );
   sheet.append(
     chipsFor(
       r.kanji.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+      null,
+      'kanji',
     ),
   );
 
@@ -3761,7 +4188,7 @@ function renderRadicalNode(sheet, node) {
 function renderIdiomNode(sheet, node) {
   const idiom = D.idioms[node.id];
   if (!idiom) {
-    sheet.append(el('div', 'sem-empty', 'この句はこの層にない。'));
+    sheet.append(el('div', 'sem-empty', tx('この句はこの層にない。', 'This phrase is not in this layer.')));
     return;
   }
   const head = el('h2', 'headword', idiom.w);
@@ -3769,15 +4196,17 @@ function renderIdiomNode(sheet, node) {
   sheet.append(el('p', 'reading', idiom.r));
   const meta = el('div', 'shelf-meta');
   meta.append(el('span', 'pool-tag sa', 'JMdict · CC BY-SA'));
-  if (idiom.yoji) meta.append(el('span', 'pool-tag', '四字熟語'));
+  if (idiom.yoji) meta.append(withEn(el('span', 'pool-tag', '四字熟語'), 'four-character idiom'));
   sheet.append(meta);
   for (const g of idiom.g) sheet.append(el('p', 'gloss', g));
 
-  sheet.append(el('p', 'eyebrow', '字へ'));
+  sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
   sheet.append(
     chipsFor(
       idiom.k.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
       (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+      null,
+      'kanji',
     ),
   );
   sheet.append(takeButton(node, idiom.w));
@@ -3787,6 +4216,9 @@ function renderIdiomNode(sheet, node) {
 function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
   if (!node) return;
+  const scrim = el('div', 'scrim');
+  scrim.addEventListener('click', back);
+  root.append(scrim);
   const sheet = el('div', 'sheet');
   sheet.id = 'sheet';
   sheet.dataset.node = `${node.t}:${node.id}`;
@@ -3802,9 +4234,14 @@ function licencePanel() {
   const box = el('div', 'note');
   box.append(
     document.createTextNode(
-      '出典と licence。二つのプールは別ファイルに分けて配っている（corpus #51/#41）。' +
-        'この試作は両方を読み込むので、成果物自体は ShareAlike 側に従う。' +
-        'それを黙って混ぜるのではなく、こう表に出している。',
+      tx(
+        '出典と licence。二つのプールは別ファイルに分けて配っている（corpus #51/#41）。' +
+          'この試作は両方を読み込むので、成果物自体は ShareAlike 側に従う。' +
+          'それを黙って混ぜるのではなく、こう表に出している。',
+        'Sources and licences. The two pools ship as separate files (corpus #51/#41). ' +
+          'This prototype loads both, so the artifact itself follows the ShareAlike side — ' +
+          'stated here rather than mixed silently.',
+      ),
     ),
   );
   for (const [pool, sources] of Object.entries(D.sources)) {
@@ -3822,7 +4259,7 @@ function renderVariants(root) {
   const bar = el('div');
   bar.id = 'variants';
   const top = el('div', 'vbar');
-  const toggle = el('button', 'vtoggle', S.debugOpen ? '変異 ▾' : '変異 ▴');
+  const toggle = biLabel('button', 'vtoggle', S.debugOpen ? '変異 ▾' : '変異 ▴', 'variants');
   toggle.type = 'button';
   toggle.id = 'variants-toggle';
   toggle.addEventListener('click', () => {
@@ -3832,8 +4269,11 @@ function renderVariants(root) {
   top.append(toggle);
   const summary = el('span', 'measure');
   summary.textContent = Object.entries(S.variants)
-    .map(([k, v]) => `${VARIANTS[k].label.split(' ')[0]}:${v}`)
-    .join('  ');
+    .map(([k, v]) => {
+      const opt = VARIANTS[k].options.find(([id]) => id === v);
+      return bi() ? `${VARIANTS[k].en}: ${opt[2]}` : `${VARIANTS[k].label.split(' ')[0]}:${v}`;
+    })
+    .join(bi() ? ' · ' : '  ');
   top.append(summary);
   bar.append(top);
 
@@ -3841,10 +4281,12 @@ function renderVariants(root) {
     const body = el('div', 'vbody');
     for (const [key, spec] of Object.entries(VARIANTS)) {
       const row = el('div', 'vrow');
-      row.append(el('span', 'vlabel', spec.label));
+      const label = el('span', 'vlabel', spec.label);
+      if (bi()) label.append(el('span', 'en-sub', spec.en));
+      row.append(label);
       const seg = el('div', 'vseg');
-      for (const [id, label] of spec.options) {
-        const b = el('button', null, label);
+      for (const [id, ja, en] of spec.options) {
+        const b = biLabel('button', null, ja, en);
         b.type = 'button';
         b.dataset.variant = `${key}:${id}`;
         b.setAttribute('aria-pressed', String(S.variants[key] === id));
@@ -3878,9 +4320,10 @@ function updateMeasurements() {
   const ink = $('.view-title') ? contrastOf($('.view-title')) : null;
   const readerPx = reader ? Math.round(parseFloat(getComputedStyle(reader).fontSize)) : null;
   const chromePx = Math.round(parseFloat(getComputedStyle(document.querySelector('.crumb')).fontSize));
-  out.textContent =
-    `測定：淡色 ${faint ?? '—'}:1 · 本文墨 ${ink ?? '—'}:1 · ` +
-    `焦点 ${readerPx ?? '—'}px / 周辺 ${chromePx}px`;
+  out.textContent = tx(
+    `測定：淡色 ${faint ?? '—'}:1 · 本文墨 ${ink ?? '—'}:1 · 焦点 ${readerPx ?? '—'}px / 周辺 ${chromePx}px`,
+    `measured: faint text ${faint ?? '—'}:1 · body ink ${ink ?? '—'}:1 · focus ${readerPx ?? '—'}px vs chrome ${chromePx}px`,
+  );
 }
 
 /* --------------------------------------------------------------- render */
@@ -3888,9 +4331,11 @@ function render() {
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
+  document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
+  document.body.classList.toggle('ui-bi', bi());
 
   const chrome = el('div', 'chrome');
-  const backBtn = el('button', null, '戻る');
+  const backBtn = biLabel('button', null, '戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'back';
   const atHome = !S.stack.length && (S.view === 'entry' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
@@ -3900,15 +4345,26 @@ function render() {
 
   const crumb = el('div', 'crumb');
   const parts = [];
-  if (S.view === 'entry') parts.push('野');
-  else parts.push('棚');
+  if (S.view === 'entry') parts.push(tx('野', 'field'));
+  else parts.push(tx('棚', 'shelf'));
   if (S.view === 'reader' && passage()) parts.push(passage().title);
-  if (S.view === 'tray') parts.push('取ったもの');
+  if (S.view === 'tray') parts.push(tx('取ったもの', 'taken'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
   chrome.append(crumb);
 
-  const trayBtn = el('button', null, `取 ${S.taken.length}`);
+  const langBtn = biLabel('button', 'lang', 'EN', bi() ? 'on' : 'off');
+  langBtn.type = 'button';
+  langBtn.id = 'lang';
+  langBtn.setAttribute('aria-pressed', String(bi()));
+  langBtn.title = bi() ? 'switch the chrome to 日本語のみ' : 'show English labels';
+  langBtn.addEventListener('click', () => {
+    S.lang = bi() ? 'ja' : 'bi';
+    render();
+  });
+  chrome.append(langBtn);
+
+  const trayBtn = biLabel('button', null, `取 ${S.taken.length}`, 'tray');
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
@@ -3923,7 +4379,7 @@ function render() {
   root.append(main);
 
   if (!S.ready) {
-    main.append(el('div', 'loading', '回廊 をひらいています…'));
+    main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));
     renderVariants(root);
     return;
   }
@@ -3943,7 +4399,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.dataset.error = String(err);
     const root = $('#app');
     root.textContent = '';
-    root.append(el('div', 'loading', `読み込めなかった：${err.message}`));
+    root.append(el('div', 'loading', `読み込めなかった could not load: ${err.message}`));
   });
 });
 

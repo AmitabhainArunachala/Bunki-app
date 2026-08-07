@@ -621,8 +621,52 @@ async function main() {
   await page.locator('#variants-toggle').click();
   await page.waitForTimeout(150);
   const stripRows = await page.locator('#variants .vrow').count();
-  check('the variant strip exposes all four open decisions', stripRows === 4, `${stripRows} rows`);
+  const ticketRows = await page.evaluate(
+    `[...document.querySelectorAll('#variants .vlabel')].filter((l) => /#\\d\\d/.test(l.textContent)).length`,
+  );
+  check('the variant strip exposes all four open decisions plus the v1.1 depth toggle',
+    stripRows === 5 && ticketRows === 4, `${stripRows} rows, ${ticketRows} carry ticket numbers`);
   await shoot(page, shotsDir, '08-variant-strip-open');
+
+  // ------------------------------------------------- v1.1 operator feedback
+  console.log('\n— v1.1 · bilingual chrome and layered depth');
+  await open('?entry=shelf');
+  const biChrome = await page.evaluate(`(() => ({
+    backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
+    trayEn: /tray/i.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayJa: /取/.test(document.querySelector('#tray')?.textContent ?? ''),
+    dialEn: /as written/i.test(document.body.textContent),
+    lang: document.querySelector('#lang')?.getAttribute('aria-pressed'),
+  }))()`);
+  check('v1.1 · navigation is bilingual by default (a learner can steer)',
+    biChrome.backEn && biChrome.trayEn && biChrome.trayJa && biChrome.lang === 'true',
+    `back carries "back", tray carries both 取 and "tray", EN toggle pressed=${biChrome.lang}`);
+
+  await tap(page, '#lang');
+  const jaChrome = await page.evaluate(`(() => {
+    const latin = (sel) => /[a-z]/i.test(document.querySelector(sel)?.textContent ?? '');
+    return { back: latin('#back'), tray: latin('#tray'), lang: document.querySelector('#lang')?.getAttribute('aria-pressed') };
+  })()`);
+  check('v1.1 · 日本語のみ strips the chrome back to immersion mode',
+    !jaChrome.back && !jaChrome.tray && jaChrome.lang === 'false',
+    `after toggling: back latin=${jaChrome.back}, tray latin=${jaChrome.tray}`);
+  await tap(page, '#lang');
+
+  const layered = await page.evaluate(`(() => ({
+    layered: document.body.classList.contains('v-depth-layered'),
+    wcag: document.body.classList.contains('v-contrast-wcag'),
+    stitched: !!document.querySelector('.tok') || true,
+  }))()`);
+  check('v1.1 · layered depth and WCAG contrast are the defaults',
+    layered.layered && layered.wcag, `body classes: layered=${layered.layered}, wcag=${layered.wcag}`);
+  await shoot(page, shotsDir, '09-v11-bilingual-layered');
+
+  await open('?entry=shelf&depth=flat&contrast=current&ui=ja');
+  const flat = await page.evaluate(
+    `!document.body.classList.contains('v-depth-layered') && !document.body.classList.contains('v-contrast-wcag')`,
+  );
+  check('v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)', flat, 'depth=flat&contrast=current&ui=ja');
+  await shoot(page, shotsDir, '10-v11-flat-fade-ja');
 
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({

@@ -24,7 +24,7 @@
         "reading": "とし",
         "gloss": "year, age",
         "semRows": [],
-        "semEmpty": "この語には意味近傍がまだ書かれていない。SEM 層は現在 82 語（辞書の約 1.2%）。空白を隠さずに見せている — 拡大は #44。",
+        "semEmpty": "No semantic neighbourhood is written for this word yet — the SEM layer currently covers 82 words (~1.2% of the lexicon). The gap is shown, not hidden — scaling it is #44. These words do have one:",
         "kanjiChips": [
           "過酷",
           "試練",
@@ -120,15 +120,15 @@
         "glyph": "過",
         "meaning": "Overdo",
         "tags": [
-          "12 画",
+          "12 strokes",
           "漢検 6級",
           "ShareAlike",
-          "ShareAlike プール"
+          "ShareAlike pool"
         ],
         "sections": [
-          "部品へ",
-          "この字を含む語 — 22 語",
-          "熟語・慣用句 — 2　ShareAlike プール"
+          "部品へinto the parts",
+          "この字を含む語 — 22 語words that contain it",
+          "熟語・慣用句 — 2　idioms and set phrasesShareAlike pool"
         ]
       }
     },
@@ -139,9 +139,9 @@
       "radicalPage": {
         "node": "radical:咼",
         "glyph": "咼",
-        "name": "（名称は漢検の部首表にない部品）",
+        "name": "(a part with no name in the 漢検 radical table)",
         "family": 5,
-        "heading": "この部品を含む字 — 4 字"
+        "heading": "この部品を含む字 — 4 字kanji that contain this part"
       }
     },
     {
@@ -150,27 +150,27 @@
       "shot": "05-take-and-schedule.png",
       "schedule": [
         [
-          "もう一度",
-          "1 分後",
-          "2026-08-06 22:59",
+          "もう一度again",
+          "in 1 min",
+          "2026-08-07 12:48",
           "0.21"
         ],
         [
-          "難しい",
-          "6 分後",
-          "2026-08-06 23:04",
+          "難しいhard",
+          "in 6 min",
+          "2026-08-07 12:53",
           "1.29"
         ],
         [
-          "ふつう",
-          "10 分後",
-          "2026-08-06 23:08",
+          "ふつうgood",
+          "in 10 min",
+          "2026-08-07 12:57",
           "2.31"
         ],
         [
-          "簡単",
-          "8 日後",
-          "2026-08-14 22:58",
+          "簡単easy",
+          "in 8 d",
+          "2026-08-15 12:47",
           "8.30"
         ]
       ]
@@ -189,70 +189,70 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 22,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 19,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 2.67,
+          "contrast": 2.64,
           "fontSize": 14,
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "faint / signal label",
           "selector": ".sig-name",
-          "contrast": 2.67,
+          "contrast": 2.64,
           "fontSize": 12,
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 2.67,
+          "contrast": 2.64,
           "fontSize": 13,
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 2.67,
+          "contrast": 2.64,
           "fontSize": 12,
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 21,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 2.67,
+          "contrast": 2.64,
           "fontSize": 15,
           "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.52,
+          "contrast": 8.95,
           "fontSize": 13,
           "color": "rgb(61, 68, 76)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 7.17,
+          "contrast": 6.75,
           "fontSize": 15,
           "color": "rgb(158, 43, 37)"
         }
@@ -261,70 +261,70 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 22,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 19,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 6.05,
+          "contrast": 5.89,
           "fontSize": 14,
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "faint / signal label",
           "selector": ".sig-name",
-          "contrast": 6.05,
+          "contrast": 5.89,
           "fontSize": 12,
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 6.05,
+          "contrast": 5.89,
           "fontSize": 13,
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 6.05,
+          "contrast": 5.89,
           "fontSize": 12,
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 17.22,
+          "contrast": 16.2,
           "fontSize": 21,
           "color": "rgb(20, 24, 28)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 6.05,
+          "contrast": 5.89,
           "fontSize": 15,
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.52,
+          "contrast": 8.95,
           "fontSize": 13,
           "color": "rgb(61, 68, 76)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 7.17,
+          "contrast": 6.75,
           "fontSize": 15,
           "color": "rgb(158, 43, 37)"
         }
@@ -334,348 +334,360 @@
       {
         "label": "reading body (focused)",
         "selector": ".reader",
-        "contrast": 17.22,
+        "contrast": 16.2,
         "fontSize": 21,
         "color": "rgb(20, 24, 28)"
       },
       {
         "label": "view title",
         "selector": ".view-title",
-        "contrast": 17.22,
+        "contrast": 16.2,
         "fontSize": 22,
         "color": "rgb(20, 24, 28)"
       },
       {
         "label": "gloss",
         "selector": ".gloss",
-        "contrast": 2.67,
+        "contrast": 5.89,
         "fontSize": 15,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "discrimination note",
         "selector": ".sem-note",
-        "contrast": 9.52,
+        "contrast": 8.95,
         "fontSize": 13,
         "color": "rgb(61, 68, 76)"
       },
       {
         "label": "faint / signal label",
         "selector": ".sig-name",
-        "contrast": 2.67,
+        "contrast": 5.89,
         "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "chrome breadcrumb (background)",
         "selector": ".crumb",
-        "contrast": 2.67,
+        "contrast": 5.89,
         "fontSize": 13,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "eyebrow label",
         "selector": ".eyebrow",
-        "contrast": 2.67,
+        "contrast": 5.89,
         "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "reading, the one red",
         "selector": ".reading",
-        "contrast": 7.17,
+        "contrast": 6.75,
         "fontSize": 15,
         "color": "rgb(158, 43, 37)"
       },
       {
         "label": "shelf title",
         "selector": ".shelf-title",
-        "contrast": 17.22,
+        "contrast": 16.2,
         "fontSize": 19,
         "color": "rgb(20, 24, 28)"
       },
       {
         "label": "faint / snippet",
         "selector": ".shelf-snippet",
-        "contrast": 2.67,
+        "contrast": 5.89,
         "fontSize": 14,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgba(20, 24, 28, 0.68)"
       }
     ],
     "targets": [
       {
-        "text": "戻る",
+        "text": "戻るback",
         "w": 54,
         "h": 44,
         "id": "back"
       },
       {
-        "text": "取 0",
-        "w": 53,
+        "text": "ENon",
+        "w": 45,
+        "h": 44,
+        "id": "lang"
+      },
+      {
+        "text": "取 0tray",
+        "w": 52,
         "h": 44,
         "id": "tray"
       },
       {
-        "text": "そのまま",
+        "text": "そのままas written",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "常用まで",
+        "text": "常用までjōyō only",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "すべて仮名",
+        "text": "すべて仮名all kana",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "なし",
+        "text": "なしoff",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "触れて",
+        "text": "触れてon touch",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "つねに",
+        "text": "つねにalways",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "なし",
+        "text": "なしnone",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "語の間",
+        "text": "語の間words",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "文節",
+        "text": "文節phrases",
         "w": 86,
         "h": 40,
         "id": ""
       },
       {
-        "text": "原典",
-        "w": 44,
+        "text": "source 原典",
+        "w": 84,
         "h": 40,
         "id": "inline-link"
       },
       {
         "text": "厳しいeveryday sy",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "苛酷literary var",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "劣悪wretched con",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "熾烈cutthroat co",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "残酷cruelty to b",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "冷酷cold-hearted",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "酷使to overwork ",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "酷暑punishing he",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過労overwork; 過労",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過剰the excess r",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な労働its no.1 ",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な環境deserts, ",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な運命harsh fat",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "試練the ordeal h",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "逆境adversity, i",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "極限extreme limi",
-        "w": 358,
+        "w": 332,
         "h": 50,
         "id": "sem-row"
       },
       {
         "text": "過6級",
         "w": 44,
-        "h": 48,
-        "id": "chip"
+        "h": 49,
+        "id": "chip t-kanji"
       },
       {
         "text": "酷準2級",
-        "w": 51,
-        "h": 48,
-        "id": "chip"
+        "w": 50,
+        "h": 49,
+        "id": "chip t-kanji"
       },
       {
-        "text": "取る",
+        "text": "取るtake into st",
         "w": 358,
         "h": 48,
         "id": "take"
       },
       {
-        "text": "変異 ▴",
-        "w": 67,
+        "text": "変異 ▴variants",
+        "w": 76,
         "h": 40,
         "id": "variants-toggle"
       },
       {
-        "text": "戻る",
+        "text": "戻るback",
         "w": 54,
         "h": 44,
         "id": "back"
       },
       {
-        "text": "取 0",
-        "w": 53,
+        "text": "ENon",
+        "w": 45,
+        "h": 44,
+        "id": "lang"
+      },
+      {
+        "text": "取 0tray",
+        "w": 52,
         "h": 44,
         "id": "tray"
       },
       {
         "text": "世界自然遺産に7箇所を追加 ",
         "w": 358,
-        "h": 258,
+        "h": 336,
         "id": "shelf-item"
       },
       {
         "text": "マリナーズ・イチロー選手 現",
         "w": 358,
-        "h": 289,
+        "h": 351,
         "id": "shelf-item"
       },
       {
         "text": "JRおおさか東線部分開業ウィ",
         "w": 358,
-        "h": 259,
+        "h": 309,
         "id": "shelf-item"
       },
       {
         "text": "信楽高原鐵道列車衝突事故、J",
         "w": 358,
-        "h": 286,
+        "h": 336,
         "id": "shelf-item"
       },
       {
         "text": "ウィキニュース、21年の歴史",
         "w": 358,
-        "h": 289,
+        "h": 351,
         "id": "shelf-item"
       },
       {
         "text": "野ばら青空文庫 · 小川未明",
         "w": 358,
-        "h": 288,
+        "h": 351,
         "id": "shelf-item"
       },
       {
         "text": "ごん狐青空文庫 · 新美南吉",
         "w": 358,
-        "h": 316,
+        "h": 378,
         "id": "shelf-item"
       },
       {
         "text": "やまなし青空文庫 · 宮沢賢",
         "w": 358,
-        "h": 316,
+        "h": 397,
         "id": "shelf-item"
       },
       {
         "text": "育児休業やさしい日本語 用語",
         "w": 358,
-        "h": 266,
+        "h": 328,
         "id": "shelf-item"
       },
       {
         "text": "育児休業給付金やさしい日本語",
         "w": 358,
-        "h": 289,
+        "h": 352,
         "id": "shelf-item"
       },
       {
         "text": "遺族基礎年金やさしい日本語 ",
         "w": 358,
-        "h": 289,
+        "h": 352,
         "id": "shelf-item"
       },
       {
-        "text": "変異 ▴",
-        "w": 67,
+        "text": "変異 ▴variants",
+        "w": 76,
         "h": 40,
         "id": "variants-toggle"
       }
@@ -690,19 +702,19 @@
         "2005-07-15",
         "CC BY 4.0",
         "抜粋",
-        "3つの信号。平均しない。"
+        "Three signals — never averaged."
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "2.42 上級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "63.7%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "57.0%"
         }
       ],
@@ -714,24 +726,25 @@
         "ウィキニュース",
         "2006-06-17",
         "CC BY 4.0",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "Three signals — never averaged.",
+        "不一致 gap 1signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "4.23 中級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "67.4%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "41.9%"
         }
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "JRおおさか東線部分開業",
@@ -740,19 +753,19 @@
         "2008-03-15",
         "CC BY 4.0",
         "抜粋",
-        "3つの信号。平均しない。"
+        "Three signals — never averaged."
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "1.94 上級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "69.9%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "49.6%"
         }
       ],
@@ -765,19 +778,19 @@
         "2011-04-28",
         "CC BY 4.0",
         "抜粋",
-        "3つの信号。平均しない。"
+        "Three signals — never averaged."
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "1.32 上級後半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "71.1%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "49.1%"
         }
       ],
@@ -790,24 +803,25 @@
         "2026-05-03",
         "CC BY 4.0",
         "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "Three signals — never averaged.",
+        "不一致 gap 1signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "3.37 中級後半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "67.7%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "48.9%"
         }
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "野ばら",
@@ -816,24 +830,25 @@
         "None",
         "PD (著作権フラグ なし) · 新字新仮名",
         "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "Three signals — never averaged.",
+        "不一致 gap 2signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "4.52 初級後半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "86.9%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "22.1%"
         }
       ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "ごん狐",
@@ -842,24 +857,25 @@
         "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
         "PD (著作権フラグ なし) · 新字新仮名",
         "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "Three signals — never averaged.",
+        "不一致 gap 1signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "4.27 中級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "88.8%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "24.8%"
         }
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "やまなし",
@@ -868,24 +884,25 @@
         "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
         "PD (著作権フラグ なし) · 新字新仮名",
         "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "Three signals — never averaged.",
+        "不一致 gap 2signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "4.80 初級後半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "85.8%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "23.6%"
         }
       ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "育児休業",
@@ -893,24 +910,25 @@
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
         "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "Three signals — never averaged.",
+        "不一致 gap 1signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "4.04 中級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "100.0%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "0.0%"
         }
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "育児休業給付金",
@@ -918,24 +936,25 @@
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
         "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "Three signals — never averaged.",
+        "不一致 gap 2signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "5.72 初級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "69.2%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "46.2%"
         }
       ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "遺族基礎年金",
@@ -943,24 +962,25 @@
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
         "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "Three signals — never averaged.",
+        "不一致 gap 1signals disagree",
+        "signals disagree"
       ],
       "signals": [
         {
-          "name": "jreadability",
+          "name": "jreadabilitysentence ease",
           "value": "3.58 中級前半"
         },
         {
-          "name": "語彙カバー率",
+          "name": "語彙カバー率vocab coverage",
           "value": "80.0%"
         },
         {
-          "name": "TMR（核）",
+          "name": "TMR（核）rare-word load",
           "value": "20.0%"
         }
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     }
   ],
   "caps": {
@@ -1027,101 +1047,101 @@
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
       "signals": {
-        "jreadability": "2.42 上級前半",
-        "語彙カバー率": "63.7%",
-        "TMR（核）": "57.0%"
+        "jreadabilitysentence ease": "2.42 上級前半",
+        "語彙カバー率vocab coverage": "63.7%",
+        "TMR（核）rare-word load": "57.0%"
       },
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
       "signals": {
-        "jreadability": "4.23 中級前半",
-        "語彙カバー率": "67.4%",
-        "TMR（核）": "41.9%"
+        "jreadabilitysentence ease": "4.23 中級前半",
+        "語彙カバー率vocab coverage": "67.4%",
+        "TMR（核）rare-word load": "41.9%"
       },
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "JRおおさか東線部分開業",
       "signals": {
-        "jreadability": "1.94 上級前半",
-        "語彙カバー率": "69.9%",
-        "TMR（核）": "49.6%"
+        "jreadabilitysentence ease": "1.94 上級前半",
+        "語彙カバー率vocab coverage": "69.9%",
+        "TMR（核）rare-word load": "49.6%"
       },
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
       "signals": {
-        "jreadability": "1.32 上級後半",
-        "語彙カバー率": "71.1%",
-        "TMR（核）": "49.1%"
+        "jreadabilitysentence ease": "1.32 上級後半",
+        "語彙カバー率vocab coverage": "71.1%",
+        "TMR（核）rare-word load": "49.1%"
       },
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "signals": {
-        "jreadability": "3.37 中級後半",
-        "語彙カバー率": "67.7%",
-        "TMR（核）": "48.9%"
+        "jreadabilitysentence ease": "3.37 中級後半",
+        "語彙カバー率vocab coverage": "67.7%",
+        "TMR（核）rare-word load": "48.9%"
       },
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "野ばら",
       "signals": {
-        "jreadability": "4.52 初級後半",
-        "語彙カバー率": "86.9%",
-        "TMR（核）": "22.1%"
+        "jreadabilitysentence ease": "4.52 初級後半",
+        "語彙カバー率vocab coverage": "86.9%",
+        "TMR（核）rare-word load": "22.1%"
       },
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "ごん狐",
       "signals": {
-        "jreadability": "4.27 中級前半",
-        "語彙カバー率": "88.8%",
-        "TMR（核）": "24.8%"
+        "jreadabilitysentence ease": "4.27 中級前半",
+        "語彙カバー率vocab coverage": "88.8%",
+        "TMR（核）rare-word load": "24.8%"
       },
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "やまなし",
       "signals": {
-        "jreadability": "4.80 初級後半",
-        "語彙カバー率": "85.8%",
-        "TMR（核）": "23.6%"
+        "jreadabilitysentence ease": "4.80 初級後半",
+        "語彙カバー率vocab coverage": "85.8%",
+        "TMR（核）rare-word load": "23.6%"
       },
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "育児休業",
       "signals": {
-        "jreadability": "4.04 中級前半",
-        "語彙カバー率": "100.0%",
-        "TMR（核）": "0.0%"
+        "jreadabilitysentence ease": "4.04 中級前半",
+        "語彙カバー率vocab coverage": "100.0%",
+        "TMR（核）rare-word load": "0.0%"
       },
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     },
     {
       "title": "育児休業給付金",
       "signals": {
-        "jreadability": "5.72 初級前半",
-        "語彙カバー率": "69.2%",
-        "TMR（核）": "46.2%"
+        "jreadabilitysentence ease": "5.72 初級前半",
+        "語彙カバー率vocab coverage": "69.2%",
+        "TMR（核）rare-word load": "46.2%"
       },
-      "disagreement": "不一致 gap 2"
+      "disagreement": "不一致 gap 2signals disagree"
     },
     {
       "title": "遺族基礎年金",
       "signals": {
-        "jreadability": "3.58 中級前半",
-        "語彙カバー率": "80.0%",
-        "TMR（核）": "20.0%"
+        "jreadabilitysentence ease": "3.58 中級前半",
+        "語彙カバー率vocab coverage": "80.0%",
+        "TMR（核）rare-word load": "20.0%"
       },
-      "disagreement": "不一致 gap 1"
+      "disagreement": "不一致 gap 1signals disagree"
     }
   ],
   "counts": {
@@ -1132,16 +1152,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 173,
+  "loadMs": 185,
   "summary": {
-    "total": 38,
+    "total": 42,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 173 ms"
+      "detail": "11 texts, ready in 185 ms"
     },
     {
       "name": "every shelf text shows three signals, not one score",
@@ -1206,7 +1226,7 @@
     {
       "name": "word → kanji lands on a real kanji page",
       "pass": true,
-      "detail": "過 — Overdo; 12 画 / 漢検 6級 / ShareAlike / ShareAlike プール"
+      "detail": "過 — Overdo; 12 strokes / 漢検 6級 / ShareAlike / ShareAlike pool"
     },
     {
       "name": "the kanji page carries its 漢検級",
@@ -1226,7 +1246,7 @@
     {
       "name": "kanji → radical lands on a real radical page with a family",
       "pass": true,
-      "detail": "咼（（名称は漢検の部首表にない部品）） この部品を含む字 — 4 字"
+      "detail": "咼（(a part with no name in the 漢検 radical table)） この部品を含む字 — 4 字kanji that contain this part"
     },
     {
       "name": "radical → another kanji that uses it",
@@ -1236,12 +1256,12 @@
     {
       "name": "any node can be taken into study",
       "pass": true,
-      "detail": "tray reads \"取 1\""
+      "detail": "tray reads \"取 1tray\""
     },
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度→1 分後 · 難しい→6 分後 · ふつう→10 分後 · 簡単→8 日後"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 8 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -1251,12 +1271,12 @@
     {
       "name": "variant A · mcd renders the target both ways",
       "pass": true,
-      "detail": "MCD — 文脈まるごと、一語だけ空ける — face \"2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　\""
+      "detail": "MCD card — the whole c — face \"2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　\""
     },
     {
       "name": "variant A · word renders the target both ways",
       "pass": true,
-      "detail": "単語札 — 表は語だけ（Animecards — face \"世界\""
+      "detail": "Word card — the front  — face \"世界\""
     },
     {
       "name": "variant B · three",
@@ -1271,12 +1291,12 @@
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.67:1 → wcag 6.05:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.64:1 → wcag 5.89:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
       "pass": true,
-      "detail": "2.67:1"
+      "detail": "2.64:1"
     },
     {
       "name": "variant D · field entry",
@@ -1301,17 +1321,17 @@
     {
       "name": "discrimination notes are legible (AA)",
       "pass": true,
-      "detail": "9.52:1 at 13px"
+      "detail": "8.95:1 at 13px"
     },
     {
       "name": "body ink clears AAA",
       "pass": true,
-      "detail": "17.22:1"
+      "detail": "16.2:1"
     },
     {
       "name": "every visible control is at least 40px",
       "pass": true,
-      "detail": "46 controls checked"
+      "detail": "48 controls checked"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -1324,9 +1344,29 @@
       "detail": "clean"
     },
     {
-      "name": "the variant strip exposes all four open decisions",
+      "name": "the variant strip exposes all four open decisions plus the v1.1 depth toggle",
       "pass": true,
-      "detail": "4 rows"
+      "detail": "5 rows, 4 carry ticket numbers"
+    },
+    {
+      "name": "v1.1 · navigation is bilingual by default (a learner can steer)",
+      "pass": true,
+      "detail": "back carries \"back\", tray carries both 取 and \"tray\", EN toggle pressed=true"
+    },
+    {
+      "name": "v1.1 · 日本語のみ strips the chrome back to immersion mode",
+      "pass": true,
+      "detail": "after toggling: back latin=false, tray latin=false"
+    },
+    {
+      "name": "v1.1 · layered depth and WCAG contrast are the defaults",
+      "pass": true,
+      "detail": "body classes: layered=true, wcag=true"
+    },
+    {
+      "name": "v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)",
+      "pass": true,
+      "detail": "depth=flat&contrast=current&ui=ja"
     }
   ]
 }
