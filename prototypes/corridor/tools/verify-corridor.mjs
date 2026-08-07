@@ -166,7 +166,14 @@ async function main() {
     shotArg >= 0 ? resolve(argv[shotArg + 1]) : resolve(REPO, 'docs/prototype/screenshots');
   mkdirSync(shotsDir, { recursive: true });
 
-  const { server, base } = await startCorridorServer();
+  // `--base <url>` points the same checks at an already-published corridor
+  // (the deployed Pages site), so the artifact the operator actually opens is
+  // what gets judged — not just the working copy it was built from.
+  const baseArg = argv.indexOf('--base');
+  const remoteBase = baseArg >= 0 ? argv[baseArg + 1].replace(/\/+$/, '') : null;
+  const { server, base } = remoteBase
+    ? { server: null, base: remoteBase }
+    : await startCorridorServer();
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
   });
@@ -639,7 +646,7 @@ async function main() {
   report.loadMs = loadMs;
 
   await browser.close();
-  server.close();
+  server?.close();
 
   report.summary = { total: results.length, failed: failures };
   report.results = results;
