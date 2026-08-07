@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 14:27",
+          "2026-08-07 14:47",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 14:32",
+          "2026-08-07 14:52",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 14:36",
+          "2026-08-07 14:56",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 14:26",
+          "2026-08-15 14:46",
           "8.30"
         ]
       ]
@@ -382,58 +382,10 @@
         "id": "tray"
       },
       {
-        "text": "そのままas written",
-        "w": 86,
+        "text": "▸ text setting",
+        "w": 147,
         "h": 40,
-        "id": ""
-      },
-      {
-        "text": "常用までjōyō only",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "すべて仮名all kana",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "なしoff",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "触れてon touch",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "つねにalways",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "なしnone",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "語の間words",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "文節phrases",
-        "w": 86,
-        "h": 40,
-        "id": ""
+        "id": "dials-toggle"
       },
       {
         "text": "source 原典",
@@ -1017,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 285,
+  "loadMs": 436,
   "summary": {
-    "total": 55,
+    "total": 56,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 285 ms"
+      "detail": "11 texts, ready in 436 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1052,6 +1004,11 @@
       "name": "furigana renders as real ruby",
       "pass": true,
       "detail": "130 <rt> elements"
+    },
+    {
+      "name": "the text-settings dials fold away until asked for",
+      "pass": true,
+      "detail": "hidden by default=true, 9 dial options after one tap"
     },
     {
       "name": "dial · furigana alone changes furigana",
@@ -1236,7 +1193,7 @@
     {
       "name": "every visible control is at least 40px",
       "pass": true,
-      "detail": "65 controls checked"
+      "detail": "57 controls checked"
     },
     {
       "name": "the page never scrolls sideways at 390px",

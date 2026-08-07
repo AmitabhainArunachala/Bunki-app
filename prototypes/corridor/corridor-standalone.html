@@ -3596,6 +3596,7 @@ const S = {
    * (default — a learner must be able to steer before they can read);
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
   lang: 'bi',
+  dialsOpen: false,
   taken: [],
   /** manual lists: { name: [{t,id,label,ts}] } — the operator's Renzo habit */
   lists: {},
@@ -3983,8 +3984,8 @@ function renderSignals(grading, { compact = false } = {}) {
 
 /* ---------------------------------------------------------------- views */
 function renderShelf(main) {
-  main.append(withEn(el('p', 'eyebrow', '回廊 · よみものの棚'), 'KAIRO · the reading shelf', 'en-inline'));
-  const h = el('h1', 'view-title', tx('よみものの棚', 'The reading shelf'));
+  main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+  const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
   main.append(h);
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
@@ -4202,55 +4203,47 @@ function renderReader(main) {
   }
   main.append(el('p', 'eyebrow', p.sourceLabel));
   main.append(el('h1', 'view-title', p.title));
-
-  const meta = el('div', 'shelf-meta');
-  meta.append(el('span', 'pool-tag', p.licence));
-  meta.append(
-    el(
-      'span',
-      'pool-tag',
-      p.rubySource === 'markup'
-        ? tx('ふりがな：原文のルビ', 'ふりがな from the source text')
-        : tx('ふりがな：UniDic 由来（数詞+助数詞は誤る）', 'ふりがな from UniDic (counters can be wrong)'),
-    ),
-  );
-  main.append(meta);
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
   levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.note));
   main.append(levelLine);
 
-  const dials = el('div', 'dials');
-  dials.append(
-    el(
-      'div',
-      'dial-label',
-      tx('文字の出しかた — 三つの独立したダイヤル', 'How the text shows — three independent dials'),
-    ),
-  );
-  dials.append(
-    dialRow('漢字', 'kanji', 'kanji', [
-      ['そのまま', 'as written'],
-      ['常用まで', 'jōyō only'],
-      ['すべて仮名', 'all kana'],
-    ]),
-  );
-  dials.append(
-    dialRow('ふりがな', 'readings', 'furigana', [
-      ['なし', 'off'],
-      ['触れて', 'on touch'],
-      ['つねに', 'always'],
-    ]),
-  );
-  dials.append(
-    dialRow('分かち', 'spacing', 'spacing', [
-      ['なし', 'none'],
-      ['語の間', 'words'],
-      ['文節', 'phrases'],
-    ]),
-  );
-  main.append(dials);
+  // the dials fold away — the text is the point, the settings one tap away
+  const dialsToggle = el('button', 'details-toggle');
+  dialsToggle.type = 'button';
+  dialsToggle.id = 'dials-toggle';
+  dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
+  dialsToggle.addEventListener('click', () => {
+    S.dialsOpen = !S.dialsOpen;
+    render();
+  });
+  main.append(dialsToggle);
+  if (S.dialsOpen) {
+    const dials = el('div', 'dials');
+    dials.append(
+      dialRow('漢字', 'kanji', 'kanji', [
+        ['そのまま', 'as written'],
+        ['常用まで', 'jōyō only'],
+        ['すべて仮名', 'all kana'],
+      ]),
+    );
+    dials.append(
+      dialRow('ふりがな', 'readings', 'furigana', [
+        ['なし', 'off'],
+        ['触れて', 'on touch'],
+        ['つねに', 'always'],
+      ]),
+    );
+    dials.append(
+      dialRow('分かち', 'spacing', 'spacing', [
+        ['なし', 'none'],
+        ['語の間', 'words'],
+        ['文節', 'phrases'],
+      ]),
+    );
+    main.append(dials);
+  }
 
   const grammarHint = el('p', 'gesture-hint');
   grammarHint.textContent = tx(
@@ -5199,7 +5192,7 @@ function render() {
   const crumb = el('div', 'crumb');
   const parts = [];
   if (S.view === 'entry') parts.push(tx('野', 'field'));
-  else parts.push(tx('棚', 'shelf'));
+  else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) parts.push(passage().title);
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
