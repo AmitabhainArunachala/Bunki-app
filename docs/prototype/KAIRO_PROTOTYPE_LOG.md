@@ -18,17 +18,17 @@ That is the single most important thing in this log — filed on #32.
 
 Second: the large corpora themselves (4,094 wikinews / 10,246 aozora / 85,000
 SNOW / 99,474 graded texts) are **not in the repo** — `corpus/.gitignore` excludes
-`data/`, so those live only on the machine that built them. What *is* committed:
+`data/`, so those live only on the machine that built them. What _is_ committed:
 
-| asset | committed? | size |
-| --- | --- | --- |
-| kanken kanji fact table | ✅ 6,787 rows | 2.2 MB |
-| JMdict idiom layer | ✅ 4,198 | 971 KB |
-| wikinews | sample only, 5 articles | 15 KB |
-| aozora | sample only, 3 works | 31 KB |
+| asset                   | committed?               | size   |
+| ----------------------- | ------------------------ | ------ |
+| kanken kanji fact table | ✅ 6,787 rows            | 2.2 MB |
+| JMdict idiom layer      | ✅ 4,198                 | 971 KB |
+| wikinews                | sample only, 5 articles  | 15 KB  |
+| aozora                  | sample only, 3 works     | 31 KB  |
 | やさしい日本語 glossary | sample only, ~25 entries | 4.6 KB |
-| SNOW T15/T23 | sample only | 3.2 KB |
-| the three-signal grader | ✅ code, no output | — |
+| SNOW T15/T23            | sample only              | 3.2 KB |
+| the three-signal grader | ✅ code, no output       | —      |
 
 So the corridor's shelf is **11 passages**, not 14,000. Everything on it is real;
 the ceiling is what was committed, not what was built.
@@ -46,24 +46,24 @@ text shown on screen.
 
 ### Measurement table — the three signals, per shelf text
 
-| text | jreadability | 語彙カバー率 | TMR (core) | disagreement |
-| --- | --- | --- | --- | --- |
-| 世界自然遺産に7箇所を追加 知床半島も | 2.42 上級前半 | 63.7% | 57.0% | — |
-| マリナーズ・イチロー選手 現役通算2500安打達成 | 4.23 中級前半 | 67.4% | 41.9% | gap 1 |
-| JRおおさか東線部分開業 | 1.94 上級前半 | 69.9% | 49.6% | — |
-| 信楽高原鐵道列車衝突事故…大阪地裁が認定 | 1.32 上級後半 | 71.1% | 49.1% | — |
-| ウィキニュース、21年の歴史に幕を閉じる | 3.37 中級後半 | 67.7% | 48.9% | gap 1 |
-| 野ばら（小川未明） | 4.52 初級後半 | 86.9% | 22.1% | **gap 2** |
-| ごん狐（新美南吉） | 4.27 中級前半 | 88.8% | 24.8% | gap 1 |
-| やまなし（宮沢賢治） | 4.80 初級後半 | 85.8% | 23.6% | **gap 2** |
-| 育児休業 | 4.04 中級前半 | 100.0% | 0.0% | gap 1 |
-| 育児休業給付金 | 5.72 初級前半 | 69.2% | 46.2% | **gap 2** |
-| 遺族基礎年金 | 3.58 中級前半 | 80.0% | 20.0% | gap 1 |
+| text                                          | jreadability  | 語彙カバー率 | TMR (core) | disagreement |
+| --------------------------------------------- | ------------- | ------------ | ---------- | ------------ |
+| 世界自然遺産に7箇所を追加 知床半島も          | 2.42 上級前半 | 63.7%        | 57.0%      | —            |
+| マリナーズ・イチロー選手 現役通算2500安打達成 | 4.23 中級前半 | 67.4%        | 41.9%      | gap 1        |
+| JRおおさか東線部分開業                        | 1.94 上級前半 | 69.9%        | 49.6%      | —            |
+| 信楽高原鐵道列車衝突事故…大阪地裁が認定       | 1.32 上級後半 | 71.1%        | 49.1%      | —            |
+| ウィキニュース、21年の歴史に幕を閉じる        | 3.37 中級後半 | 67.7%        | 48.9%      | gap 1        |
+| 野ばら（小川未明）                            | 4.52 初級後半 | 86.9%        | 22.1%      | **gap 2**    |
+| ごん狐（新美南吉）                            | 4.27 中級前半 | 88.8%        | 24.8%      | gap 1        |
+| やまなし（宮沢賢治）                          | 4.80 初級後半 | 85.8%        | 23.6%      | **gap 2**    |
+| 育児休業                                      | 4.04 中級前半 | 100.0%       | 0.0%       | gap 1        |
+| 育児休業給付金                                | 5.72 初級前半 | 69.2%        | 46.2%      | **gap 2**    |
+| 遺族基礎年金                                  | 3.58 中級前半 | 80.0%        | 20.0%      | gap 1        |
 
 8 of 11 texts flag disagreement.
 
 **But read the gap-2 rows carefully before believing them.** 野ばら has 86.9%
-coverage and 22.1% core-TMR — those are *easy* numbers in absolute terms, and
+coverage and 22.1% core-TMR — those are _easy_ numbers in absolute terms, and
 jreadability agrees (初級後半). The ordinal still comes out "hard" because the
 SNOW T15 reference distribution is saturated: >2/3 of its sentences have
 coverage exactly 1.0, so the tercile edges are [1.0, 1.0] and anything below
@@ -87,22 +87,22 @@ single argument on the shelf for never showing one number.
 Measured by the verifier from `getComputedStyle`, alpha composited over the
 washi ground, WCAG 2.x relative-luminance formula. Not eyeballed.
 
-| element | px | current fade | WCAG variant |
-| --- | --- | --- | --- |
-| reading body (focused) | 21 | 17.22:1 | 17.22:1 |
-| view title | 22 | 17.22:1 | 17.22:1 |
-| shelf title | 19 | 17.22:1 | 17.22:1 |
-| **discrimination note** | 13 | **9.52:1** | 9.52:1 |
-| reading, the one red | 15 | 7.17:1 | 7.17:1 |
-| gloss | 15 | **2.67:1** | **6.05:1** |
-| shelf snippet | 14 | **2.67:1** | **6.05:1** |
-| signal label | 12 | **2.67:1** | **6.05:1** |
-| chrome breadcrumb | 13 | **2.67:1** | **6.05:1** |
-| eyebrow label | 12 | **2.67:1** | **6.05:1** |
+| element                 | px  | current fade | WCAG variant |
+| ----------------------- | --- | ------------ | ------------ |
+| reading body (focused)  | 21  | 17.22:1      | 17.22:1      |
+| view title              | 22  | 17.22:1      | 17.22:1      |
+| shelf title             | 19  | 17.22:1      | 17.22:1      |
+| **discrimination note** | 13  | **9.52:1**   | 9.52:1       |
+| reading, the one red    | 15  | 7.17:1       | 7.17:1       |
+| gloss                   | 15  | **2.67:1**   | **6.05:1**   |
+| shelf snippet           | 14  | **2.67:1**   | **6.05:1**   |
+| signal label            | 12  | **2.67:1**   | **6.05:1**   |
+| chrome breadcrumb       | 13  | **2.67:1**   | **6.05:1**   |
+| eyebrow label           | 12  | **2.67:1**   | **6.05:1**   |
 
 **This is the actual cost of the depth-by-fade aesthetic: 2.67:1.** AA needs
 4.5:1. Drift's `--faint` alpha of .42 puts every secondary label at roughly
-*half* the required contrast. The WCAG variant raises alpha to .68 and lands at
+_half_ the required contrast. The WCAG variant raises alpha to .68 and lands at
 6.05:1 — comfortably AA, and to my eye it loses very little of the depth.
 Screenshots of both are in the PR; that is the choice to make by looking.
 
@@ -125,21 +125,21 @@ No console errors across the whole walk.
 Every step verified against rendered DOM, not against a function returning
 successfully.
 
-| step | evidence |
-| --- | --- |
-| 1 arrive | 11 texts, 33 signal rows, 8 disagreement tags, ready in ~210 ms |
-| 2 read | 900 chars, **130 `<rt>` elements** of real ruby |
-| 2 dials | each axis moves only its own thing: furigana 130→0 rt with spacing class unchanged; spacing → 136 文節 groups with rt unchanged; kanji → 「2005年7月14日」→「2005ねん7がつ14か」 |
-| 2 reveal | 130 ruby present but `opacity:0`, revealed on touch |
-| 3 tap a word | panel opens with headword + reading |
-| 3 semantic | 過酷 → **16 edges with notes**, e.g. 厳しい「everyday synonym, one register softer」 |
-| 4 word→kanji | 過 — Overdo, 12画, 漢検 6級 |
-| 4 kanji→word | 経過 |
-| 4 kanji→radical | 咼, family of 4 |
-| 4 radical→kanji | back out to 過 |
-| 4 idioms | present on the kanji page, tagged ShareAlike |
-| 5 take | tray 取 1; FSRS-6 もう一度 1分 / 難しい 6分 / ふつう 10分 / 簡単 8日 |
-| 6 return | two hops deep, 戻る → scrollY 420 → 420, sheet closed |
+| step            | evidence                                                                                                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 arrive        | 11 texts, 33 signal rows, 8 disagreement tags, ready in ~210 ms                                                                                                                  |
+| 2 read          | 900 chars, **130 `<rt>` elements** of real ruby                                                                                                                                  |
+| 2 dials         | each axis moves only its own thing: furigana 130→0 rt with spacing class unchanged; spacing → 136 文節 groups with rt unchanged; kanji → 「2005年7月14日」→「2005ねん7がつ14か」 |
+| 2 reveal        | 130 ruby present but `opacity:0`, revealed on touch                                                                                                                              |
+| 3 tap a word    | panel opens with headword + reading                                                                                                                                              |
+| 3 semantic      | 過酷 → **16 edges with notes**, e.g. 厳しい「everyday synonym, one register softer」                                                                                             |
+| 4 word→kanji    | 過 — Overdo, 12画, 漢検 6級                                                                                                                                                      |
+| 4 kanji→word    | 経過                                                                                                                                                                             |
+| 4 kanji→radical | 咼, family of 4                                                                                                                                                                  |
+| 4 radical→kanji | back out to 過                                                                                                                                                                   |
+| 4 idioms        | present on the kanji page, tagged ShareAlike                                                                                                                                     |
+| 5 take          | tray 取 1; FSRS-6 もう一度 1分 / 難しい 6分 / ふつう 10分 / 簡単 8日                                                                                                             |
+| 6 return        | two hops deep, 戻る → scrollY 420 → 420, sheet closed                                                                                                                            |
 
 The FSRS numbers are real: the four initial stabilities the page prints
 (0.21 / 1.29 / 2.31 / 8.30) are `FSRS_WEIGHTS[0..3]` from
@@ -150,23 +150,24 @@ that file, and `--check` fails the build if the emitted JSON ever drifts from it
 
 ## 4. Decision queue — questions filed, not silently answered
 
-| # | question | where |
-| --- | --- | --- |
-| 32 | PRs #52–#58 are closed-not-merged; seven branches are out of the review queue | #32 |
-| 32 | The bulk corpora are gitignored — the committed shelf ceiling is 11 texts | #32 |
-| 41 | The corridor loads both licence pools, so the deployed artifact is ShareAlike. Kept as separate bundles and marked in the UI rather than merged — is that the right reading of the boundary? | #41 |
-| 43 | Coverage/TMR ordinals are unusable against the saturated SNOW reference; the aozora gap-2 flags are artifacts | #43 |
-| 43 | UniDic surface readings are wrong for counters after numerals (14日 → か). Source ruby has no such problem — evidence for preferring ruby-carrying corpora | #43 |
-| 47 | The fade costs 2.67:1 against 4.5:1 required. Both rendered | #47 |
-| 38 | MCD needs a source sentence; a word taken from a kanji page has none. Marked as placeholder in the UI | #38 |
-| 37 | The entry "field" is a minimal placeholder, NOT Drift — #46's physics untouched | #37 |
-| 35 | No node/edge types were invented. Used: passage, word, kanji, radical, idiom | — |
+| #   | question                                                                                                                                                                                     | where |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 32  | PRs #52–#58 are closed-not-merged; seven branches are out of the review queue                                                                                                                | #32   |
+| 32  | The bulk corpora are gitignored — the committed shelf ceiling is 11 texts                                                                                                                    | #32   |
+| 41  | The corridor loads both licence pools, so the deployed artifact is ShareAlike. Kept as separate bundles and marked in the UI rather than merged — is that the right reading of the boundary? | #41   |
+| 43  | Coverage/TMR ordinals are unusable against the saturated SNOW reference; the aozora gap-2 flags are artifacts                                                                                | #43   |
+| 43  | UniDic surface readings are wrong for counters after numerals (14日 → か). Source ruby has no such problem — evidence for preferring ruby-carrying corpora                                   | #43   |
+| 47  | The fade costs 2.67:1 against 4.5:1 required. Both rendered                                                                                                                                  | #47   |
+| 38  | MCD needs a source sentence; a word taken from a kanji page has none. Marked as placeholder in the UI                                                                                        | #38   |
+| 37  | The entry "field" is a minimal placeholder, NOT Drift — #46's physics untouched                                                                                                              | #37   |
+| 35  | No node/edge types were invented. Used: passage, word, kanji, radical, idiom                                                                                                                 | —     |
 
 ---
 
 ## 5. Honest coverage — what works, what is faked, what is placeholder
 
 **Real, verified, not mocked**
+
 - All 11 passages: real text from the committed samples, excerpted at sentence
   boundaries, with attribution and licence on screen.
 - All three difficulty signals: the actual grader, the actual substrate.
@@ -177,12 +178,14 @@ that file, and `--check` fails the build if the emitted JSON ever drifts from it
 - 漢検級 on every kanji that has one, from the CC0 fact table.
 
 **Placeholder, marked as such in the UI**
-- The entry field (variant D) — a minimal drifting field to compare *where you
-  land*, not a Drift rewrite. Drift's lock physics and gesture grammar (#46) were
+
+- The entry field (variant D) — a minimal drifting field to compare _where you
+  land_, not a Drift rewrite. Drift's lock physics and gesture grammar (#46) were
   not touched.
 - The MCD card when a word is reached from a kanji page rather than from text.
 
 **Absent, and the UI says so where you would notice**
+
 - 283 distinct content tokens on the shelf have no gloss (they are outside the
   6,687-word lexicon). The panel still opens and still connects — it says the
   gloss is missing rather than showing an empty box.
@@ -191,6 +194,7 @@ that file, and `--check` fails the build if the emitted JSON ever drifts from it
 - Kanji with no word in the lexicon (e.g. 咼) say so and continue via components.
 
 **Declared caps** (in `data/manifest.json`, and printed in the UI where they bite)
+
 - passage excerpt 520 chars · kanji→words shown 60 · radical→kanji shown 80 ·
   idioms 900 kept of 1,796 candidates from 4,198 in source.
 
@@ -238,7 +242,7 @@ python3 -m http.server -d prototypes/corridor 8080   # then http://127.0.0.1:808
 
 - The prototype is disposable by design. Nothing in `apps/app` or `packages/*`
   was refactored for it; the only shared touchpoint is `build_fsrs_pin.mjs`
-  *reading* the domain pin (never writing it).
+  _reading_ the domain pin (never writing it).
 - Screenshots were taken on a Linux runner. Noto Serif CJK JP was installed so
   they render in mincho; on iOS the stack resolves to Hiragino Mincho ProN, which
   is closer to the reference apps than what the runner shows.
