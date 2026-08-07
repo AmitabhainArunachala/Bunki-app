@@ -819,7 +819,11 @@ async function main() {
   await page.waitForTimeout(250);
   const grammarIndex = await page.locator('[data-grammar]').count();
   check('v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)',
-    grammarIndex >= 30, `${grammarIndex} entries in the index`);
+    grammarIndex >= 55, `${grammarIndex} entries in the index`);
+  check('v1.8 · the v11 grammar harvest rides in (#36), N1 included',
+    (await page.locator('[data-grammar="n4-you-ni-naru"]').count()) === 1 &&
+      (await page.locator('[data-glevel="N1"]').count()) === 1,
+    'harvested ようになる present; N1 filter chip exists');
   await page.locator('[data-glevel="N5"]').click();
   await page.waitForTimeout(200);
   const n5Count = await page.locator('[data-grammar]').count();

@@ -15,7 +15,22 @@
 const DATA = {
   safe: ['passages', 'kanken', 'sem'],
   sa: ['kanji', 'words', 'idioms', 'dict', 'strokes'],
+  orig: ['grammar-v11'],
 };
+
+/** Corridor-authored + harvested grammar, corridor entries winning on
+ * duplicate patterns. Populated at boot; falls back to the authored seed. */
+function GRAMMARS() {
+  return D.grammar || GRAMMAR;
+}
+
+function mergeGrammar(harvested) {
+  const norm = (p) => p.replace(/[〜～\s（）()]/g, '');
+  const have = new Set(GRAMMAR.map((g) => norm(g.p)));
+  const extra = (harvested || []).filter((g) => !have.has(norm(g.p)));
+  const order = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 };
+  return [...GRAMMAR, ...extra].sort((a, b) => (order[a.lv] ?? 9) - (order[b.lv] ?? 9));
+}
 
 /** English titles for the committed shelf (authored translations of the
  * source titles — the sources themselves are CC BY / PD / glossary text). */
@@ -281,10 +296,11 @@ async function boot() {
     if (!res.ok) throw new Error(`data/${pool}/${name}.json → ${res.status}`);
     return res.json();
   };
-  const [passages, kanken, sem, kanji, words, idioms, dict, strokes, manifest, pin] =
+  const [passages, kanken, sem, kanji, words, idioms, dict, strokes, grammarV11, manifest, pin] =
     await Promise.all([
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
       ...DATA.sa.map((n) => load('share_alike', n)),
+      ...DATA.orig.map((n) => load('original', n)),
       bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
       bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
     ]);
@@ -304,6 +320,7 @@ async function boot() {
   D.idiomMeta = { total: idioms.totalCandidates, cap: idioms.cap };
   D.manifest = manifest;
   D.pin = pin;
+  D.grammar = mergeGrammar(grammarV11.entries);
   D.sources = {
     proprietary_safe: [...passages.sources, ...kanken.sources, ...sem.sources],
     share_alike: [
@@ -313,6 +330,7 @@ async function boot() {
       ...dict.sources,
       ...strokes.sources,
     ],
+    original: [...grammarV11.sources],
   };
 
   // kanji → words containing it, derived here rather than shipped twice
@@ -1093,9 +1111,9 @@ function renderParticleNode(sheet, node) {
     if (bi()) line.append(el('p', 'example-en', ex.en));
     sheet.append(line);
   }
-  if (pt.see && GRAMMAR.some((g) => g.id === pt.see)) {
+  if (pt.see && GRAMMARS().some((g) => g.id === pt.see)) {
     sheet.append(withEn(el('p', 'eyebrow', '文法へ'), 'related grammar', 'en-inline'));
-    const g = GRAMMAR.find((x) => x.id === pt.see);
+    const g = GRAMMARS().find((x) => x.id === pt.see);
     const row = el('button', 'entry-row');
     row.type = 'button';
     row.append(el('span', 'row-glyph', '文'));
@@ -1260,7 +1278,7 @@ function buildSearchIndex() {
       g: k.m,
     });
   }
-  for (const g of GRAMMAR) {
+  for (const g of GRAMMARS()) {
     searchIndex.push({ t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '', m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn });
   }
   for (const pt of PARTICLES) {
@@ -1350,12 +1368,12 @@ function renderGrammar(main) {
   main.append(el('h1', 'view-title', tx('文法', 'Grammar')));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
-    `${GRAMMAR.length} 項目。全項目版はこれから育てる。`,
-    `${GRAMMAR.length} entries, original content. The full dictionary-grade index grows from here.`,
+    `${GRAMMARS().length} 項目。全項目版はこれから育てる。`,
+    `${GRAMMARS().length} entries, original content. The full dictionary-grade index grows from here.`,
   );
   main.append(sub);
 
-  const levels = ['all', 'N5', 'N4', 'N3'];
+  const levels = ['all', 'N5', 'N4', 'N3', 'N2', 'N1'];
   const chips = el('div', 'chips');
   for (const lv of levels) {
     const active = (S.grammarLevel || 'all') === lv;
@@ -1372,7 +1390,9 @@ function renderGrammar(main) {
   main.append(chips);
 
   const rows = el('div', 'entry-rows');
-  const shown = GRAMMAR.filter((g) => (S.grammarLevel || 'all') === 'all' || g.lv === S.grammarLevel);
+  const shown = GRAMMARS().filter(
+    (g) => (S.grammarLevel || 'all') === 'all' || g.lv === S.grammarLevel,
+  );
   for (const g of shown) {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
@@ -1391,7 +1411,7 @@ function renderGrammar(main) {
 }
 
 function renderGrammarNode(sheet, node) {
-  const g = GRAMMAR.find((x) => x.id === node.id);
+  const g = GRAMMARS().find((x) => x.id === node.id);
   if (!g) {
     sheet.append(el('div', 'sem-empty', tx('この項目はまだない。', 'This entry does not exist yet.')));
     return;
@@ -1420,7 +1440,7 @@ function nodeTitle(node) {
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
   if (node.t === 'idiom') return node.id;
-  if (node.t === 'grammar') return GRAMMAR.find((x) => x.id === node.id)?.p || node.id;
+  if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   return '';
 }
