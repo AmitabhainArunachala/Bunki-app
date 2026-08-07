@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 16:45",
+          "2026-08-07 17:44",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 16:50",
+          "2026-08-07 17:49",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 16:54",
+          "2026-08-07 17:53",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 16:44",
+          "2026-08-15 17:43",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 626,
+  "loadMs": 620,
   "summary": {
-    "total": 68,
+    "total": 69,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 626 ms"
+      "detail": "11 texts, ready in 620 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1251,9 +1251,14 @@
       "detail": "depth=flat&contrast=current&ui=ja"
     },
     {
-      "name": "v1.2 · the grammar dictionary seed stands (original content)",
+      "name": "v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)",
       "pass": true,
-      "detail": "12 entries in the index"
+      "detail": "40 entries in the index"
+    },
+    {
+      "name": "v1.7 · the grammar index filters by level",
+      "pass": true,
+      "detail": "13 N5 entries of 40"
     },
     {
       "name": "v1.2 · a grammar entry carries formation + examples",

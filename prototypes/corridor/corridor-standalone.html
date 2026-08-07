@@ -1491,6 +1491,15 @@ body.v-depth-layered .inline-link {
   margin-left: 8px;
 }
 
+/* levels are metadata, not readings — they stay out of the red */
+.row-word .row-level {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-left: 8px;
+}
+
 .row-gloss {
   font-size: 12.5px;
   color: var(--ink-2);
@@ -3628,6 +3637,34 @@ const GRAMMAR = [
   { id: 'youda', p: '〜ようだ', lv: 'N4', mEn: 'it seems that …', mJa: '推量', form: '普通形 + ようだ（名詞 + のようだ）', ex: [{ ja: 'だれか来たようだ。', en: 'It seems someone came.' }, { ja: '夢のようだ。', en: 'It is like a dream.' }], note: 'Inference from evidence at hand; also the like-a simile. みたいだ is its spoken twin.' },
   { id: 'tame', p: '〜ため（に）', lv: 'N3', mEn: 'because of …; for the sake of …', mJa: '原因・目的', form: '名詞の／普通形 + ため（に）', ex: [{ ja: '事故のため、電車が止まっている。', en: 'Because of an accident, the trains are stopped.' }, { ja: '家族のために働く。', en: 'To work for one’s family.' }], note: 'Cause when the clause is settled fact, purpose when it is willed action — written Japanese leans on it hard.' },
   { id: 'ni-yotte', p: '〜によって', lv: 'N3', mEn: 'by means of …; depending on …; by (agent)', mJa: '手段・受身の動作主・相違', form: '名詞 + によって', ex: [{ ja: '国によって習慣が違う。', en: 'Customs differ depending on the country.' }, { ja: 'この寺は八世紀に建てられたと言われている。この寺は行基によって建てられた。', en: 'This temple is said to date from the 8th century — it was built by Gyōki.' }], note: 'Three doors in one form: instrument, variation, and the agent of a written passive.' },
+  { id: 'tai', p: '〜たい', lv: 'N5', mEn: 'want to …', mJa: '願望', form: '動詞マス幹 + たい', ex: [{ ja: '日本へ行きたい。', en: 'I want to go to Japan.' }, { ja: '冷たい水が飲みたい。', en: 'I want to drink cold water.' }], note: 'Conjugates like an い-adjective. The wanted thing may take が. For someone else’s visible wish, 〜たがっている.' },
+  { id: 'tekudasai', p: '〜てください', lv: 'N5', mEn: 'please do …', mJa: '依頼', form: '動詞テ形 + ください', ex: [{ ja: 'ここに名前を書いてください。', en: 'Please write your name here.' }, { ja: 'ゆっくり話してください。', en: 'Please speak slowly.' }], note: 'The everyday polite request. Dropping ください (〜て。) is casual; ないでください asks someone NOT to.' },
+  { id: 'temoii', p: '〜てもいい', lv: 'N5', mEn: 'may …; it is okay to …', mJa: '許可', form: '動詞テ形 + もいい', ex: [{ ja: 'ここで写真を撮ってもいいですか。', en: 'May I take photos here?' }, { ja: '帰ってもいいよ。', en: 'You can go home, you know.' }], note: 'Permission. The mirror is 〜てはいけない. なくてもいい = you need not.' },
+  { id: 'tewaikenai', p: '〜てはいけない', lv: 'N5', mEn: 'must not …', mJa: '禁止', form: '動詞テ形 + はいけない', ex: [{ ja: 'ここで泳いではいけない。', en: 'You must not swim here.' }, { ja: '忘れてはいけない日だ。', en: 'A day that must not be forgotten.' }], note: 'Spoken shortcut: 〜ちゃいけない／〜じゃいけない. Signs prefer 禁止.' },
+  { id: 'nakerebanaranai', p: '〜なければならない', lv: 'N4', mEn: 'must …; have to …', mJa: '義務', form: '動詞ナイ形（-い）+ ければならない', ex: [{ ja: '明日までに出さなければならない。', en: 'It must be handed in by tomorrow.' }, { ja: 'もう行かなければ。', en: 'I really have to go.' }], note: 'Speech compresses it: 〜なきゃ／〜ないと. ならない leans written, いけない spoken.' },
+  { id: 'kotogadekiru', p: '〜ことができる', lv: 'N5', mEn: 'can …; be able to …', mJa: '可能', form: '動詞辞書形 + ことができる', ex: [{ ja: '漢字を読むことができる。', en: 'I can read kanji.' }, { ja: 'ここでは切符を買うことができない。', en: 'Tickets cannot be bought here.' }], note: 'The transparent, slightly formal potential. Everyday speech prefers the potential form (読める).' },
+  { id: 'takotogaaru', p: '〜たことがある', lv: 'N4', mEn: 'have (done) before', mJa: '経験', form: '動詞タ形 + ことがある', ex: [{ ja: '北海道へ行ったことがある。', en: 'I have been to Hokkaidō.' }, { ja: 'こんな景色は見たことがない。', en: 'I have never seen scenery like this.' }], note: 'Experience as a fact about you, not an event time — no 昨日 with this form.' },
+  { id: 'nagara', p: '〜ながら', lv: 'N4', mEn: 'while …ing', mJa: '同時進行', form: '動詞マス幹 + ながら', ex: [{ ja: '音楽を聞きながら勉強する。', en: 'To study while listening to music.' }, { ja: '歩きながら考えた。', en: 'I thought it over as I walked.' }], note: 'One subject, two actions; the main act comes second. 残念ながら is a fossil: "regrettably".' },
+  { id: 'maeni', p: '〜前に', lv: 'N5', mEn: 'before …ing', mJa: '時間の前後', form: '動詞辞書形／名詞の + 前に', ex: [{ ja: '寝る前に本を読む。', en: 'I read before sleeping.' }, { ja: '会議の前に資料を配った。', en: 'Handouts went out before the meeting.' }], note: 'Always dictionary form before 前に, even in the past. The mirror is 〜た後で.' },
+  { id: 'atode', p: '〜た後で', lv: 'N5', mEn: 'after …ing', mJa: '時間の前後', form: '動詞タ形 + 後で／名詞の + 後で', ex: [{ ja: '食べた後で散歩した。', en: 'After eating, I took a walk.' }, { ja: '仕事の後でジムへ行く。', en: 'I go to the gym after work.' }], note: 'タ形 before 後で, whatever the tense. 〜てから adds "and then, from then on".' },
+  { id: 'toki', p: '〜とき', lv: 'N5', mEn: 'when …', mJa: '時', form: '普通形 + とき', ex: [{ ja: '日本にいるとき、毎日新聞を読んだ。', en: 'When I was in Japan, I read the paper daily.' }, { ja: '出かけるとき、鍵を忘れた。', en: 'When leaving (before I left), I forgot the key.' }], note: 'Tense before とき is relative: 出かけるとき = on the way out; 出かけたとき = once already out.' },
+  { id: 'tara', p: '〜たら', lv: 'N4', mEn: 'if …; when/once …', mJa: '条件・きっかけ', form: '動詞タ形 + ら', ex: [{ ja: '雨が降ったら、中止だ。', en: 'If it rains, it is called off.' }, { ja: '家に帰ったら、手紙が来ていた。', en: 'When I got home, a letter had come.' }], note: 'The most forgiving conditional — one-off ifs, whens, and discoveries all pass through たら.' },
+  { id: 'nara', p: '〜なら', lv: 'N4', mEn: 'if that is the case', mJa: '主題条件', form: '普通形／名詞 + なら', ex: [{ ja: '京都へ行くなら、秋がいい。', en: 'If it’s Kyōto you’re going to, autumn is best.' }, { ja: '寿司なら、あの店だ。', en: 'If it’s sushi (you want), it’s that place.' }], note: 'Takes what the other person said as the premise and advises on it. It does not promise sequence like たら.' },
+  { id: 'to-joken', p: '〜と（条件）', lv: 'N4', mEn: 'whenever …; if … (natural result)', mJa: '恒常条件', form: '動詞辞書形 + と', ex: [{ ja: '春になると、桜が咲く。', en: 'When spring comes, the cherries bloom.' }, { ja: 'このボタンを押すと、電気がつく。', en: 'Press this button and the light comes on.' }], note: 'Machine-like cause and effect. No requests or intentions in the second half — that is たら territory.' },
+  { id: 'tsumori', p: '〜つもり', lv: 'N4', mEn: 'intend to …', mJa: '意図', form: '動詞辞書形／ナイ形 + つもりだ', ex: [{ ja: '来年、日本で働くつもりだ。', en: 'I intend to work in Japan next year.' }, { ja: '行かないつもりだった。', en: 'I had meant not to go.' }], note: 'A held plan, firmer than 〜ようと思う. 〜たつもり = under the (possibly wrong) impression of having done.' },
+  { id: 'deshou', p: '〜でしょう', lv: 'N5', mEn: 'probably; right?', mJa: '推量・確認', form: '普通形 + でしょう', ex: [{ ja: '明日は晴れるでしょう。', en: 'It will probably be clear tomorrow.' }, { ja: '高かったでしょう？', en: 'That was expensive, right?' }], note: 'Falling pitch forecasts; rising pitch seeks agreement. だろう is its plain sibling.' },
+  { id: 'kamoshirenai', p: '〜かもしれない', lv: 'N4', mEn: 'might …; may be', mJa: '可能性', form: '普通形 + かもしれない', ex: [{ ja: '来ないかもしれない。', en: 'They might not come.' }, { ja: '雨かもしれないから、傘を持って行こう。', en: 'It might rain, so let’s take umbrellas.' }], note: 'Lower confidence than でしょう. Speech clips it to かも.' },
+  { id: 'sugiru', p: '〜すぎる', lv: 'N4', mEn: 'too …; overdo', mJa: '過度', form: '動詞マス幹／形容詞語幹 + すぎる', ex: [{ ja: '食べすぎた。', en: 'I ate too much.' }, { ja: 'この問題は難しすぎる。', en: 'This problem is too hard.' }], note: 'Attaches to verb stems and adjective stems alike (高すぎる); the result conjugates as a verb.' },
+  { id: 'yasui-nikui', p: '〜やすい／〜にくい', lv: 'N4', mEn: 'easy to … / hard to …', mJa: '難易', form: '動詞マス幹 + やすい／にくい', ex: [{ ja: 'この字は読みやすい。', en: 'This character is easy to read.' }, { ja: '彼の名前は覚えにくい。', en: 'His name is hard to remember.' }], note: 'A property of the thing, not your ability — 読みにくい字 blames the print, not the reader.' },
+  { id: 'tari', p: '〜たり〜たりする', lv: 'N4', mEn: 'do things like … and …', mJa: '例示', form: '動詞タ形 + り、…たりする', ex: [{ ja: '休みの日は、本を読んだり散歩したりする。', en: 'On days off I read, take walks, that sort of thing.' }, { ja: '泣いたり笑ったりの一日だった。', en: 'It was a day of crying and laughing by turns.' }], note: 'An open sample of activities — や for nouns, たり for verbs. Close with する.' },
+  { id: 'tekara', p: '〜てから', lv: 'N5', mEn: 'after …ing; since …', mJa: '順序・起点', form: '動詞テ形 + から', ex: [{ ja: '手を洗ってから食べる。', en: 'Wash your hands, then eat.' }, { ja: '日本に来てから、三年になる。', en: 'It has been three years since I came to Japan.' }], note: 'Stronger sequencing than plain て — and with duration, "ever since".' },
+  { id: 'hougaii', p: '〜たほうがいい', lv: 'N4', mEn: 'had better …', mJa: '助言', form: '動詞タ形 + ほうがいい', ex: [{ ja: '早く寝たほうがいい。', en: 'You had better get to bed early.' }, { ja: '行かないほうがいい。', en: 'Better not to go.' }], note: 'Advice with weight — consequences hover behind it. Negative advice keeps ナイ形.' },
+  { id: 'yori-houga', p: '〜より〜のほうが', lv: 'N5', mEn: 'B more than A', mJa: '比較', form: 'AよりBのほうが + 形容詞', ex: [{ ja: '電車より自転車のほうが速い（この町では）。', en: 'Bikes are faster than trains (in this town).' }, { ja: '夏より冬のほうが好きだ。', en: 'I like winter better than summer.' }], note: 'ほう points at the winner. Questions compare with どちら, never どれ, for two things.' },
+  { id: 'souda-youtai', p: '〜そうだ（様態）', lv: 'N4', mEn: 'looks about to …; looks …', mJa: '様態', form: '動詞マス幹／形容詞語幹 + そうだ', ex: [{ ja: '雨が降りそうだ。', en: 'It looks like rain (any moment).' }, { ja: 'このケーキはおいしそうだ。', en: 'This cake looks delicious.' }], note: 'Judged by sight, on the stem. The same word on the plain form is hearsay — the twin door in this dictionary.' },
+  { id: 'teshimau', p: '〜てしまう', lv: 'N4', mEn: 'finish completely; end up …ing', mJa: '完了・遺憾', form: '動詞テ形 + しまう', ex: [{ ja: '全部読んでしまった。', en: 'I read the whole thing (done and dusted).' }, { ja: '財布を忘れてしまった。', en: 'I went and forgot my wallet.' }], note: 'Completion shading into regret; context picks. Speech melts it to 〜ちゃう／〜じゃう.' },
+  { id: 'teoku', p: '〜ておく', lv: 'N4', mEn: 'do in advance; leave as is', mJa: '準備・放置', form: '動詞テ形 + おく', ex: [{ ja: '会議の資料を読んでおく。', en: 'I will read the materials ahead of the meeting.' }, { ja: '窓を開けておいてください。', en: 'Please leave the window open.' }], note: 'Doing now for later — preparation, or deliberately leaving a state in place. Speech: 〜とく.' },
+  { id: 'temiru', p: '〜てみる', lv: 'N4', mEn: 'try …ing (and see)', mJa: '試行', form: '動詞テ形 + みる', ex: [{ ja: '一度食べてみてください。', en: 'Try it once (and see).' }, { ja: '辞書で調べてみた。', en: 'I tried looking it up in the dictionary.' }], note: 'Attempt with an eye on the result — not effort (that is 〜ようとする) but experiment.' },
+  { id: 'age-kure-morau', p: '〜てあげる・くれる・もらう', lv: 'N4', mEn: 'do for someone / for me / have done for one', mJa: '授受', form: '動詞テ形 + あげる／くれる／もらう', ex: [{ ja: '友だちが手伝ってくれた。', en: 'A friend helped me (a favour inward).' }, { ja: '先生に見てもらった。', en: 'I had the teacher look at it.' }], note: 'The camera position of favours: あげる points away from me, くれる toward me, もらう has the receiver as subject. The politeness ladder (さしあげる・くださる・いただく) climbs from here.' },
 ];
 
 const S = {
@@ -4813,7 +4850,7 @@ function renderSearchResults(main, query) {
 
 /* -------------------------------------------------------------- grammar */
 function renderGrammar(main) {
-  main.append(withEn(el('p', 'eyebrow', '文法辞典 · 種'), 'grammar dictionary · the seed', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', '文法辞典'), 'grammar dictionary', 'en-inline'));
   main.append(el('h1', 'view-title', tx('文法', 'Grammar')));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
@@ -4821,15 +4858,33 @@ function renderGrammar(main) {
     `${GRAMMAR.length} entries, original content. The full dictionary-grade index grows from here.`,
   );
   main.append(sub);
+
+  const levels = ['all', 'N5', 'N4', 'N3'];
+  const chips = el('div', 'chips');
+  for (const lv of levels) {
+    const active = (S.grammarLevel || 'all') === lv;
+    const chip = el('button', active ? 'chip wide on-list' : 'chip wide');
+    chip.type = 'button';
+    chip.dataset.glevel = lv;
+    chip.append(el('span', 'big', lv === 'all' ? tx('すべて', 'all') : lv));
+    chip.addEventListener('click', () => {
+      S.grammarLevel = lv;
+      render();
+    });
+    chips.append(chip);
+  }
+  main.append(chips);
+
   const rows = el('div', 'entry-rows');
-  for (const g of GRAMMAR) {
+  const shown = GRAMMAR.filter((g) => (S.grammarLevel || 'all') === 'all' || g.lv === S.grammarLevel);
+  for (const g of shown) {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
     row.dataset.grammar = g.id;
     const main2 = el('span', 'row-stack');
     const top = el('span', 'row-word');
     top.append(document.createTextNode(g.p));
-    top.append(el('span', 'row-reading', g.lv));
+    top.append(el('span', 'row-level', g.lv));
     main2.append(top);
     main2.append(el('span', 'row-gloss', bi() ? g.mEn : g.mJa));
     row.append(main2, el('span', 'row-go', '›'));
