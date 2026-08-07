@@ -3567,11 +3567,13 @@ function levelPhrase(grading) {
   const level = levelMap[band] || 'Ungraded';
   const cov = grading.signals.lexical_coverage.coverage;
   let vocabNote = '';
+  let vocabNoteJa = '';
   if (cov != null && cov < 1) {
     const oneIn = Math.max(2, Math.round(1 / (1 - cov)));
     vocabNote = ` · ~1 in ${oneIn} words beyond the core`;
+    vocabNoteJa = `・約${oneIn}語に1語が基本語彙の外`;
   }
-  return { level, ja: band, note: vocabNote };
+  return { level, ja: band, note: vocabNote, noteJa: vocabNoteJa };
 }
 
 /** The four open decisions. Crude and obvious on purpose — it is an instrument.
@@ -4146,7 +4148,7 @@ function renderShelfBody() {
     const lv = levelPhrase(p.grading);
     const levelLine = el('div', 'level-line');
     levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-    levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.note.replace('~1 in', '約1/').replace(' words beyond the core', ' 語が基本語彙の外')));
+    levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
     if (p.grading.disagreement.flag) {
       levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
     }
@@ -4373,7 +4375,7 @@ function renderReader(main) {
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.note));
+  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
   main.append(levelLine);
 
   // the dials fold away — the text is the point, the settings one tap away
@@ -4906,7 +4908,7 @@ function renderGrammar(main) {
     top.append(document.createTextNode(g.p));
     top.append(el('span', 'row-level', g.lv));
     main2.append(top);
-    main2.append(el('span', 'row-gloss', bi() ? g.mEn : g.mJa));
+    main2.append(el('span', 'row-gloss', bi() ? g.mEn : g.mJa || g.mEn));
     row.append(main2, el('span', 'row-go', '›'));
     row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
     rows.append(row);
@@ -4921,8 +4923,9 @@ function renderGrammarNode(sheet, node) {
     return;
   }
   sheet.append(el('h2', 'headword', g.p));
-  sheet.append(el('p', 'reading', g.lv));
-  sheet.append(el('p', 'gloss', bi() ? `${g.mEn} — ${g.mJa}` : g.mJa));
+  sheet.append(el('p', 'sense-pos', g.lv));
+  const meaning = bi() ? (g.mJa ? `${g.mEn} — ${g.mJa}` : g.mEn) : g.mJa || g.mEn;
+  sheet.append(el('p', 'gloss', meaning));
   sheet.append(withEn(el('p', 'eyebrow', '接続'), 'formation', 'en-inline'));
   sheet.append(el('p', 'formation', g.form));
   sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
