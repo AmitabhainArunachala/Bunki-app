@@ -46,39 +46,63 @@ text shown on screen.
 
 ### Measurement table — the three signals, per shelf text
 
-| text                                          | jreadability  | 語彙カバー率 | TMR (core) | disagreement |
-| --------------------------------------------- | ------------- | ------------ | ---------- | ------------ |
-| 世界自然遺産に7箇所を追加 知床半島も          | 2.42 上級前半 | 63.7%        | 57.0%      | —            |
-| マリナーズ・イチロー選手 現役通算2500安打達成 | 4.23 中級前半 | 67.4%        | 41.9%      | gap 1        |
-| JRおおさか東線部分開業                        | 1.94 上級前半 | 69.9%        | 49.6%      | —            |
-| 信楽高原鐵道列車衝突事故…大阪地裁が認定       | 1.32 上級後半 | 71.1%        | 49.1%      | —            |
-| ウィキニュース、21年の歴史に幕を閉じる        | 3.37 中級後半 | 67.7%        | 48.9%      | gap 1        |
-| 野ばら（小川未明）                            | 4.52 初級後半 | 86.9%        | 22.1%      | **gap 2**    |
-| ごん狐（新美南吉）                            | 4.27 中級前半 | 88.8%        | 24.8%      | gap 1        |
-| やまなし（宮沢賢治）                          | 4.80 初級後半 | 85.8%        | 23.6%      | **gap 2**    |
-| 育児休業                                      | 4.04 中級前半 | 100.0%       | 0.0%       | gap 1        |
-| 育児休業給付金                                | 5.72 初級前半 | 69.2%        | 46.2%      | **gap 2**    |
-| 遺族基礎年金                                  | 3.58 中級前半 | 80.0%        | 20.0%      | gap 1        |
+`n` is content tokens — the denominator every signal is computed over. It is in
+this table because it decides how much weight each row can carry, and three rows
+cannot carry any.
 
-8 of 11 texts flag disagreement.
+| text                                          |   n | jreadability  | 語彙カバー率 | OOV   | TMR (core) | disagreement |
+| --------------------------------------------- | --: | ------------- | ------------ | ----- | ---------- | ------------ |
+| 世界自然遺産に7箇所を追加 知床半島も          | 135 | 2.42 上級前半 | 63.7%        | 36.3% | 57.0%      | —            |
+| マリナーズ・イチロー選手 現役通算2500安打達成 |  86 | 4.23 中級前半 | 67.4%        | 32.6% | 41.9%      | gap 1        |
+| JRおおさか東線部分開業                        | 133 | 1.94 上級前半 | 69.9%        | 30.1% | 49.6%      | —            |
+| 信楽高原鐵道列車衝突事故…大阪地裁が認定       | 114 | 1.32 上級後半 | 71.1%        | 28.9% | 49.1%      | —            |
+| ウィキニュース、21年の歴史に幕を閉じる        | 133 | 3.37 中級後半 | 67.7%        | 32.3% | 48.9%      | gap 1        |
+| 野ばら（小川未明）                            | 145 | 4.52 初級後半 | 86.9%        | 13.1% | 22.1%      | **gap 2**    |
+| ごん狐（新美南吉）                            | 125 | 4.27 中級前半 | 88.8%        | 11.2% | 24.8%      | gap 1        |
+| やまなし（宮沢賢治）                          | 106 | 4.80 初級後半 | 85.8%        | 14.2% | 23.6%      | **gap 2**    |
+| 育児休業                                      |   7 | 4.04 中級前半 | 100.0%       | 0.0%  | 0.0%       | gap 1        |
+| 育児休業給付金                                |  13 | 5.72 初級前半 | 69.2%        | 30.8% | 46.2%      | **gap 2**    |
+| 遺族基礎年金                                  |  15 | 3.58 中級前半 | 80.0%        | 20.0% | 20.0%      | gap 1        |
 
-**But read the gap-2 rows carefully before believing them.** 野ばら has 86.9%
-coverage and 22.1% core-TMR — those are _easy_ numbers in absolute terms, and
-jreadability agrees (初級後半). The ordinal still comes out "hard" because the
-SNOW T15 reference distribution is saturated: >2/3 of its sentences have
-coverage exactly 1.0, so the tercile edges are [1.0, 1.0] and anything below
-perfect coverage bins as maximally hard. **The gap-2 flags on the aozora texts
-are an artifact of the reference distribution, not a real disagreement between
-signals.** #58 documented this saturation as an open question; the corridor is
-the first place it is visible as a wrong answer on screen. Filed on #43.
+8 of 11 texts flag disagreement. Two separate things are wrong with that number.
 
-The genuine, non-artifactual finding is the opposite direction: the news texts
-score 1.3–2.4 on jreadability (上級 = hard) while their coverage sits at 64–71%,
-and the ISA glossary entry 育児休業給付金 scores **5.72 初級前半 — the "easiest"
-text on the shelf — while 30.8% of its content tokens are outside the 6,103-word
-substrate entirely.** That is jreadability's sentence-length-and-POS formula
-being blind to vocabulary, exactly the failure #58 measured. It is the clearest
-single argument on the shelf for never showing one number.
+**First: the three ISA glossary rows are n = 7, 13 and 15.** A glossary entry is
+one sentence. Every percentage on those rows moves in steps of 7–14 points, so
+none of them supports a conclusion about anything. They stay on the shelf because
+they are the only committed corpus carrying **source ruby**, which is what they
+are there to demonstrate — but their grades should be read as noise.
+
+**Second: the gap-2 flags are an artifact of the reference distribution.** 野ばら
+has 86.9% coverage and 22.1% core-TMR — _easy_ numbers, and jreadability agrees
+(初級後半). All three signals say easy. The ordinal still reads
+`{jread 0, coverage 2, tmr 2}` because the SNOW T15 reference is saturated: its
+committed `lexical_coverage.edges` are literally `[1.0, 1.0]`, so anything short
+of perfect coverage bins as maximally hard. #58 recorded the saturation as an
+open question; the corridor is the first place it shows as a wrong answer on
+screen, in red, on a children's story. Filed on #43.
+
+### What the adequately-sized rows actually say
+
+On the eight texts with n = 86–145, jreadability and coverage largely **agree**:
+news is harder on both (jread 1.3–4.2, OOV 29–36%), aozora easier on both
+(jread 4.3–4.8, OOV 11–14%). No sign inversion at this sample size.
+
+The sharp case is a pair, not a single text:
+
+|                       |   n | jreadability      | OOV       |
+| --------------------- | --: | ----------------- | --------- |
+| 野ばら                | 145 | **4.52** 初級後半 | **13.1%** |
+| マリナーズ・イチロー… |  86 | **4.23** 中級前半 | **32.6%** |
+
+**jreadability separates these two by 0.29 — call it identical — while the
+vocabulary load differs by 2.5×.** A learner who can read 野ばら comfortably will
+hit an unknown word every third content token in the baseball article. That is
+sentence-length-and-POS being blind to lexis, on samples big enough to mean
+something, and it is the argument on this shelf for never showing one number.
+
+**Correction to an earlier draft of this log and of PR #59:** I first led with
+育児休業給付金 (jread 5.72, OOV 30.8%) as the headline case. At n = 13 it cannot
+bear that weight, and the pair above replaces it.
 
 ---
 
