@@ -833,3 +833,62 @@ radical-vs-component distinction this build is careful about (§8.13), how to
 read the family list, and worked examples (氵 water → 海・泳・池; 木 tree →
 森・林・柱). The overlay is self-contained, so it works in the standalone
 artifact and on the deployed app alike.
+
+## 8.15 Coherence campaign → v11 (2026-08-06)
+
+Operator: "interact deeply and meticulously… many places where it seems still
+very incoherent and inconsistent… go to town — I run it." The root cause was
+named in `BUNKI_DRIFT_COHERENCE_CAMPAIGN_2026-08-06.md`: every prior refinement
+was verified in isolation, never on the **composed** surface under compound
+gesture use. A four-axis diagnosis fan-out (spatial / camera / gesture / flows)
+drove the live surface with real CDP touch and consolidated into nine ranked
+defects; all nine are fixed in v11 and re-verified against the whole surface
+(`prototypes/drift/tools/verify-v11.mjs` — 17/17 checks, zero console errors).
+
+**The four coherence failures, and what each cost the user**
+
+1. *No path home.* `cam.z`/`cam.rot` were set to rest exactly once, in
+   `buildWorld()` (`drift-artifact.html:798`), and never restored — no gesture
+   recentred the camera, rotation accumulated unbounded, and a pinch that
+   surfaced from a dive bled into continuous zoom-out and stranded the field at
+   minimum zoom. The universe could be driven into a state with no way back.
+2. *No spatial arbitration.* The word field had zero collision avoidance, so
+   legible words overprinted into illegible tangles (measured 0.84 overlap at
+   rest, 0.96 after zoom) and drifted under the brand, hint, and theme pill.
+3. *Theme-dependent illegibility.* The first-run hint sat at 1.55:1 in 夜;
+   resting words dropped to ~1.7:1 median in 緑青/岩絵具 — words vanished.
+4. *State/render divergence.* A 16-word lock visually dissolved at minimum
+   zoom; a word stayed `unfolded` after locking a different word.
+
+**The nine fixes (v11)**
+
+- *Pinch mode is latched at gesture start.* `pinch.inDive` is recorded on the
+  two-finger pointerdown (`drift-artifact.html:1677`) and the pinch branches on
+  it, not on live `stack.length` — a surfacing pinch can no longer fall through
+  to the camera-zoom branch.
+- *Return-to-rest.* A double-tap on open water runs `recenterCam()`, easing
+  pan, zoom **and** twist home together; `camT` was extended to optionally
+  carry `z`/`rot` so the lock-glide (x,y only) is untouched. A manipulation
+  gesture cancels an in-flight glide. The double-tap window is a forgiving
+  420ms — this is a deliberate "take me home," not a game input.
+- *Rotation is bounded* to ±π and always recoverable via the recenter.
+- *Spatial arbitration* (`resolveCollisions()`): at the resting surface the
+  loudest (nearest) word wins its patch of water; any legible word it would
+  tangle with — or that would sit under the fixed chrome (brand / hint / theme
+  / tray) — recedes to faint atmosphere. Rest overlap fell from 0.84 to ≤0.01,
+  post-zoom to ≤0.05, chrome overlaps to zero.
+- *Hint legibility.* `#hint` is now a `--plaque` pill with `--ink` text
+  (≥9.5:1 in every theme) instead of the faintest ink.
+- *Foreground contrast* in 緑青/岩絵具: the near-tier pigments were darkened
+  (raw ≥5:1) so the composited foreground clears the other light themes'
+  legibility band instead of being an outlier.
+- *The constellation stays whole at every zoom* — locked members are exempt
+  from the low-zoom decimation and off-screen cull, so a 16-word lock reads as
+  16 words even at `cam.z=0.34`.
+- *`collapseUnfold()` on lock and lock-release* — a stray unfolded word folds
+  back both when you lock elsewhere and when you release the lock.
+
+Known-good and deliberately untouched (confirmed by the same audit): ink-blob
+layering behind words, the zoom clamp, "zoom never opens a word," upright
+glyphs under rotation, the size hierarchy, swipe-grade persistence, and the
+whole card / dictionary / radical-explainer layer.
