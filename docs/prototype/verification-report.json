@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 17:44",
+          "2026-08-07 18:42",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 17:49",
+          "2026-08-07 18:47",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 17:53",
+          "2026-08-07 18:51",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 17:43",
+          "2026-08-15 18:41",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 620,
+  "loadMs": 4068,
   "summary": {
-    "total": 69,
+    "total": 70,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 620 ms"
+      "detail": "11 texts, ready in 4068 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1253,17 +1253,22 @@
     {
       "name": "v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)",
       "pass": true,
-      "detail": "40 entries in the index"
+      "detail": "60 entries in the index"
+    },
+    {
+      "name": "v1.8 · the v11 grammar harvest rides in (#36), N1 included",
+      "pass": true,
+      "detail": "harvested ようになる present; N1 filter chip exists"
     },
     {
       "name": "v1.7 · the grammar index filters by level",
       "pass": true,
-      "detail": "13 N5 entries of 40"
+      "detail": "13 N5 entries of 60"
     },
     {
       "name": "v1.2 · a grammar entry carries formation + examples",
       "pass": true,
-      "detail": "〜によると: 2 examples"
+      "detail": "〜ている: 2 examples"
     },
     {
       "name": "v1.2 · the kanji page draws its stroke order (KanjiVG)",

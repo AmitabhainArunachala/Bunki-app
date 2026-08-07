@@ -23,6 +23,7 @@ const BUNDLES = {
   'share_alike/idioms': 'data/share_alike/idioms.json',
   'share_alike/dict': 'data/share_alike/dict.json',
   'share_alike/strokes': 'data/share_alike/strokes.json',
+  'original/grammar-v11': 'data/original/grammar-v11.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
 };
