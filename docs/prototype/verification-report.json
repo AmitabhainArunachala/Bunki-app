@@ -121,7 +121,7 @@
         "meaning": "Overdo",
         "tags": [
           "12 画",
-          "漢検 6級",
+          "漢検 6級 →",
           "ShareAlike",
           "ShareAlike プール"
         ],
@@ -152,25 +152,25 @@
         [
           "もう一度",
           "1 分後",
-          "2026-08-07 05:00",
+          "2026-08-07 05:29",
           "0.21"
         ],
         [
           "難しい",
           "6 分後",
-          "2026-08-07 05:05",
+          "2026-08-07 05:34",
           "1.29"
         ],
         [
           "ふつう",
           "10 分後",
-          "2026-08-07 05:09",
+          "2026-08-07 05:38",
           "2.31"
         ],
         [
           "簡単",
           "8 日後",
-          "2026-08-15 04:59",
+          "2026-08-15 05:28",
           "8.30"
         ]
       ]
@@ -190,7 +190,7 @@
           "label": "view title",
           "selector": ".view-title",
           "contrast": 17.22,
-          "fontSize": 22,
+          "fontSize": 20,
           "color": "rgb(20, 24, 28)"
         },
         {
@@ -262,7 +262,7 @@
           "label": "view title",
           "selector": ".view-title",
           "contrast": 17.22,
-          "fontSize": 22,
+          "fontSize": 20,
           "color": "rgb(20, 24, 28)"
         },
         {
@@ -342,7 +342,7 @@
         "label": "view title",
         "selector": ".view-title",
         "contrast": 17.22,
-        "fontSize": 22,
+        "fontSize": 20,
         "color": "rgb(20, 24, 28)"
       },
       {
@@ -1023,6 +1023,10 @@
     "D-field-to-shelf": "V-D-entry-field-to-shelf.png",
     "D-shelf": "V-D-entry-shelf.png"
   },
+  "deadEndCensus": {
+    "total": 2582,
+    "dead": []
+  },
   "graderTable": [
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
@@ -1132,16 +1136,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 275,
+  "loadMs": 208,
   "summary": {
-    "total": 38,
+    "total": 43,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 275 ms"
+      "detail": "11 texts, ready in 208 ms"
     },
     {
       "name": "every shelf text shows three signals, not one score",
@@ -1206,12 +1210,12 @@
     {
       "name": "word → kanji lands on a real kanji page",
       "pass": true,
-      "detail": "過 — Overdo; 12 画 / 漢検 6級 / ShareAlike / ShareAlike プール"
+      "detail": "過 — Overdo; 12 画 / 漢検 6級 → / ShareAlike / ShareAlike プール"
     },
     {
       "name": "the kanji page carries its 漢検級",
       "pass": true,
-      "detail": "漢検 6級"
+      "detail": "漢検 6級 →"
     },
     {
       "name": "idioms hang off the kanji page, marked as the ShareAlike pool",
@@ -1292,6 +1296,31 @@
       "name": "variant D · shelf entry",
       "pass": true,
       "detail": "11 texts"
+    },
+    {
+      "name": "no kanji node in the whole graph is a dead end",
+      "pass": true,
+      "detail": "2582 kanji checked, 0 with zero onward links"
+    },
+    {
+      "name": "the previously stranded kanji 廿 now has somewhere to go",
+      "pass": true,
+      "detail": "kanji:廿 — 27 onward chips"
+    },
+    {
+      "name": "a page never claims a continuation it does not have",
+      "pass": true,
+      "detail": "has chips, claim is true"
+    },
+    {
+      "name": "漢検級 is a real node, not an inert tag",
+      "pass": true,
+      "detail": "kanken:8級 (tag was tappable: true)"
+    },
+    {
+      "name": "the 漢検級 node continues back into kanji",
+      "pass": true,
+      "detail": "60 kanji chips"
     },
     {
       "name": "focused content dominates the background chrome",

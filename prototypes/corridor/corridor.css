@@ -115,6 +115,10 @@ body {
   opacity: 0.35;
 }
 
+/* Ellipsis clipped the RIGHT end — which is the current node, the one thing a
+   breadcrumb exists to show. Three hops in, "where am I" fell off the 390px
+   viewport. Scroll the trail inside its own box instead and keep it pinned to
+   the end; the page itself still never scrolls sideways. */
 .crumb {
   flex: 1;
   min-width: 0;
@@ -123,8 +127,14 @@ body {
   color: var(--faint);
   letter-spacing: 0.06em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.crumb::-webkit-scrollbar {
+  display: none;
 }
 
 .crumb b {
@@ -147,9 +157,11 @@ main {
   margin: 0 0 10px;
 }
 
+/* 20px, not 22px: the reading body is 21px and the hierarchy law says the
+   focused content is the largest type on the page. The title was beating it. */
 h1.view-title {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 400;
   letter-spacing: 0.06em;
   margin: 0 0 4px;
@@ -375,6 +387,18 @@ h1.view-title {
   letter-spacing: 0.1em;
 }
 
+/* Says what 「常用まで」 will actually do to THIS text, including when the
+   answer is nothing. Uses --faint-2 so it stays legible in both contrast
+   variants rather than vanishing into the fade. */
+.dial-note {
+  font-family: var(--serif);
+  font-size: var(--t-label);
+  color: var(--faint-2, var(--faint));
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  margin-top: 8px;
+}
+
 .seg {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -585,6 +609,11 @@ h1.view-title {
   color: var(--red);
 }
 
+/* Grade labels are 2–4 characters ("準1級"), not one glyph. */
+.hero-glyph.small {
+  font-size: 40px;
+}
+
 .hero-meta {
   flex: 1;
   min-width: 0;
@@ -635,6 +664,18 @@ h1.view-title {
 .pool-tag.sa {
   border-color: var(--red);
   color: var(--red);
+}
+
+/* A tag that is actually a hop. It used to be an inert <span> styled exactly
+   like the provenance tags beside it, so the 漢検級 step read as decoration
+   and the chain stopped there. Now it is a button, and sized like one. */
+.pool-tag.tag-link {
+  min-height: 40px;
+  padding: 1px 10px;
+  color: var(--ink-2);
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .note {
@@ -851,10 +892,13 @@ h1.view-title {
 }
 
 /* ------------------------------------------------------- entry (D) */
+/* Sized so the disclaimer above it, the field, and the 棚へ way out all fit on
+   one 390×844 screen. At 100vh-120px the entry view needed scrolling to find
+   its own exit, which is a poor thing to ask of a landing surface. */
 .field {
   position: relative;
-  height: calc(100vh - 120px);
-  min-height: 420px;
+  height: calc(100vh - 300px);
+  min-height: 360px;
   overflow: hidden;
 }
 

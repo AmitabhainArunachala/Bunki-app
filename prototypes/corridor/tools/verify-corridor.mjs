@@ -593,6 +593,78 @@ async function main() {
   );
 
   // -------------------------------------------------- measurement + hygiene
+  // --------------------------------------------- step 4b no dead ends
+  // An independent judge rejected a build that scored 38/38 here, because the
+  // walk it checked never landed on one of the 296 kanji that had no onward
+  // link at all. Sampling a happy path is not evidence of "no dead ends", so
+  // this asserts over the whole shipped graph and then confirms the worst
+  // offender in the real DOM.
+  console.log('\n— step 4b · no dead ends');
+  const census = await page.evaluate(`(() => {
+    const D = window.__CORRIDOR_DATA__;
+    if (!D) return null;
+    const dead = [];
+    for (const c of Object.keys(D.kanji)) {
+      const parts = D.kanji[c].parts?.length || 0;
+      const words = (D.kanjiWords[c] || []).length;
+      const idioms = (D.idiomsByKanji[c] || []).length;
+      const usedIn = (D.radicals[c]?.kanji || []).filter((x) => x !== c).length;
+      if (!parts && !words && !idioms && !usedIn) dead.push(c);
+    }
+    return { total: Object.keys(D.kanji).length, dead };
+  })()`);
+  if (census) {
+    check(
+      'no kanji node in the whole graph is a dead end',
+      census.dead.length === 0,
+      `${census.total} kanji checked, ${census.dead.length} with zero onward links${census.dead.length ? ` — ${census.dead.slice(0, 12).join('')}` : ''}`,
+    );
+    report.deadEndCensus = census;
+  }
+
+  // 廿 is the character the judge got stranded on: no parts, no words, no
+  // idioms. It must now continue via the characters that use it as a component.
+  await open('?entry=shelf');
+  await page.evaluate(`window.__corridorGo && window.__corridorGo({ t: 'kanji', id: '廿' })`);
+  await page.waitForTimeout(200);
+  const strandedChips = await page.locator('#sheet .chip').count();
+  const strandedNode = await page.locator('#sheet').getAttribute('data-node');
+  check(
+    'the previously stranded kanji 廿 now has somewhere to go',
+    strandedNode === 'kanji:廿' && strandedChips > 0,
+    `${strandedNode} — ${strandedChips} onward chips`,
+  );
+  const strandedCopy = (await page.locator('#sheet').textContent()) ?? '';
+  check(
+    'a page never claims a continuation it does not have',
+    !(strandedChips === 0 && strandedCopy.includes('続けられる')),
+    strandedChips > 0 ? 'has chips, claim is true' : 'no chips and no false claim',
+  );
+  await shoot(page, shotsDir, '04e-formerly-dead-kanji');
+
+  // 漢検級 is named in the brief's chain. It used to be an inert <span>.
+  await open('?entry=shelf');
+  await page.evaluate(`window.__corridorGo && window.__corridorGo({ t: 'kanji', id: '世' })`);
+  await page.waitForTimeout(200);
+  const gradeTags = page.locator('#sheet .pool-tag.tag-link');
+  const hasGradeHop = (await gradeTags.count()) > 0;
+  if (hasGradeHop) {
+    await tap(page, '#sheet .pool-tag.tag-link');
+    await page.waitForTimeout(200);
+  }
+  const gradeNode = await page.locator('#sheet').getAttribute('data-node');
+  check(
+    '漢検級 is a real node, not an inert tag',
+    hasGradeHop && (gradeNode ?? '').startsWith('kanken:'),
+    `${gradeNode} (tag was tappable: ${hasGradeHop})`,
+  );
+  check(
+    'the 漢検級 node continues back into kanji',
+    (await page.locator('#sheet .chip').count()) > 0,
+    `${await page.locator('#sheet .chip').count()} kanji chips`,
+  );
+  await shoot(page, shotsDir, '04f-kanken-node');
+
   console.log('\n— measurements');
   await open('?entry=shelf');
   const shelfProbe = await page.evaluate(MEASURE_FN);
