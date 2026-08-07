@@ -818,8 +818,15 @@ async function main() {
   await tap(page, '#grammar-link');
   await page.waitForTimeout(250);
   const grammarIndex = await page.locator('[data-grammar]').count();
-  check('v1.2 · the grammar dictionary seed stands (original content)',
-    grammarIndex >= 10, `${grammarIndex} entries in the index`);
+  check('v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)',
+    grammarIndex >= 30, `${grammarIndex} entries in the index`);
+  await page.locator('[data-glevel="N5"]').click();
+  await page.waitForTimeout(200);
+  const n5Count = await page.locator('[data-grammar]').count();
+  check('v1.7 · the grammar index filters by level',
+    n5Count >= 8 && n5Count < grammarIndex, `${n5Count} N5 entries of ${grammarIndex}`);
+  await page.locator('[data-glevel="all"]').click();
+  await page.waitForTimeout(150);
   await tap(page, '[data-grammar]');
   await page.waitForTimeout(250);
   const grammarEntry = await page.evaluate(`(() => {

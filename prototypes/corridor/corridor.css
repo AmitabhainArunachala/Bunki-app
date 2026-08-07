@@ -1482,6 +1482,15 @@ body.v-depth-layered .inline-link {
   margin-left: 8px;
 }
 
+/* levels are metadata, not readings — they stay out of the red */
+.row-word .row-level {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-left: 8px;
+}
+
 .row-gloss {
   font-size: 12.5px;
   color: var(--ink-2);
