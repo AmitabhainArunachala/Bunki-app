@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 14:47",
+          "2026-08-07 15:19",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 14:52",
+          "2026-08-07 15:24",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 14:56",
+          "2026-08-07 15:28",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 14:46",
+          "2026-08-15 15:18",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 436,
+  "loadMs": 310,
   "summary": {
-    "total": 56,
+    "total": 58,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 436 ms"
+      "detail": "11 texts, ready in 310 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1036,19 +1036,29 @@
       "detail": "130 ruby present but hidden"
     },
     {
-      "name": "grammar · a single tap reveals furigana and opens nothing",
+      "name": "grammar · the first tap reveals furigana instantly, opening nothing",
       "pass": true,
       "detail": "lit=1, sheet=false"
     },
     {
-      "name": "grammar · a double tap sets English beneath the word",
+      "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "1 inline gloss(es)"
+      "detail": "gloss on, word top 482.8 → 482.8px"
+    },
+    {
+      "name": "grammar · a third tap backs all the way out",
+      "pass": true,
+      "detail": "gloss removed, highlight cleared"
     },
     {
       "name": "grammar · a long press floats the mini-dictionary",
       "pass": true,
       "detail": "遺産 — inheritance"
+    },
+    {
+      "name": "grammar · one tap anywhere else backs out of the mini",
+      "pass": true,
+      "detail": "mini dismissed"
     },
     {
       "name": "grammar · holding opens the full entry",
