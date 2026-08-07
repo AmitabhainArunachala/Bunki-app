@@ -1,9 +1,12 @@
 # 回廊 KAIRO — corridor prototype log
 
-**Run:** cloud agent, 2026-08-07. Branch `claude/kairo-corridor`.
-**Verifier:** `prototypes/corridor/tools/verify-corridor.mjs` — **38/38 checks green**,
+**Run:** cloud agent, 2026-08-07. Merged from `claude/kairo-corridor` (#59);
+fixes from the independent judge on `claude/corridor-live-verify`.
+**Verifier:** `prototypes/corridor/tools/verify-corridor.mjs` — **43/43 checks green**,
 real Chromium at 390×844 with CDP touch emulation.
-**Screenshots:** `docs/prototype/screenshots/` (18 files, all at phone size).
+**An earlier build passed 38/38 here and was still rejected by an independent
+judge — see §8 before trusting any number in this log.**
+**Screenshots:** `docs/prototype/screenshots/` (all at phone size).
 **Machine-readable results:** `docs/prototype/verification-report.json`.
 
 ---
@@ -114,7 +117,7 @@ washi ground, WCAG 2.x relative-luminance formula. Not eyeballed.
 | element                 | px  | current fade | WCAG variant |
 | ----------------------- | --- | ------------ | ------------ |
 | reading body (focused)  | 21  | 17.22:1      | 17.22:1      |
-| view title              | 22  | 17.22:1      | 17.22:1      |
+| view title              | 20  | 17.22:1      | 17.22:1      |
 | shelf title             | 19  | 17.22:1      | 17.22:1      |
 | **discrimination note** | 13  | **9.52:1**   | 9.52:1       |
 | reading, the one red    | 15  | 7.17:1       | 7.17:1       |
@@ -134,6 +137,12 @@ Screenshots of both are in the PR; that is the choice to make by looking.
 background words): reading body **21px** vs chrome **13px** — a 1.6× ratio in
 the right direction. Focused content is the largest type on every screen.
 
+That last sentence was not true when first written: view titles were **22px**
+against 21px reading, so the largest type on the reader was the title, not the
+text. The independent judge measured it (§8). Titles are 20px now — a 1px
+breach, not the inverted-hierarchy pattern the law was written against, but the
+law says largest and 22 is not largest.
+
 **Hit targets:** every visible control ≥ 40px in both dimensions; the verifier
 enumerates all of them and fails on any miss. Three real failures were caught
 and fixed during the run (an inline 原典 link at 28×14, the variant strip's
@@ -151,7 +160,7 @@ successfully.
 
 | step            | evidence                                                                                                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 arrive        | 11 texts, 33 signal rows, 8 disagreement tags, ready in ~210 ms                                                                                                                  |
+| 1 arrive        | 11 texts, 33 signal rows, 8 disagreement tags; ready in min 137 / median 189 / max 212 ms over 7 cold loads (localhost, excludes network)                                        |
 | 2 read          | 900 chars, **130 `<rt>` elements** of real ruby                                                                                                                                  |
 | 2 dials         | each axis moves only its own thing: furigana 130→0 rt with spacing class unchanged; spacing → 136 文節 groups with rt unchanged; kanji → 「2005年7月14日」→「2005ねん7がつ14か」 |
 | 2 reveal        | 130 ruby present but `opacity:0`, revealed on touch                                                                                                                              |
@@ -227,36 +236,67 @@ engine (#42), any scheduler write path, any mainstream Japanese news.
 
 ---
 
-## 6. Deployment — blocked, and why
+## 6. Deployment — live
 
-⚠️ **The Pages deploy from this branch is blocked by an environment protection
-rule.** `pages-app.yml` was extended to publish `prototypes/corridor/` at
-`/corridor/`, and dispatched against `claude/kairo-corridor`
+**https://amitabhainarunachala.github.io/Bunki-app/corridor/**
+
+Deployed from `main` after #59 was merged
+([run 31147490047](https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31147490047)).
+Alongside the existing root and `/app/`, both unchanged.
+
+### It was blocked first, and the block is worth recording
+
+`pages-app.yml` was extended to publish `prototypes/corridor/` at `/corridor/`
+and dispatched against `claude/kairo-corridor`
 ([run 31129378848](https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31129378848)).
 It failed **in 1 second with zero steps executed** — the job never started. That
 is the signature of the `github-pages` environment's deployment-branch policy
 (default: default branch only), not a build failure. Nothing in the workflow
-change is at fault, and the corridor's own build is verified green.
+change was at fault.
 
-I did not work around it by pushing to `main` — the brief says draft PRs only,
-never merges.
+I did not work around it by pushing to `main`; the brief said draft PRs only.
+Merging resolved it without any setting change, because `main` is what the
+policy was waiting for. **If a future prototype needs to deploy from a branch,
+that policy is the thing to change** — add the branch under Settings →
+Environments → `github-pages` → Deployment branches.
 
-**Two ways to open it:**
+Second-order note for anyone estimating turnaround: the successful run sat
+**queued for 23 minutes** (04:27:48 → 04:51:10 UTC) before a runner picked it
+up, then published in about 70 seconds. Runner congestion, not the build.
 
-1. **One setting, then re-run.** Settings → Environments → `github-pages` →
-   Deployment branches → add `claude/kairo-corridor` (or "All branches"), then
-   re-run the workflow. `/corridor/` appears alongside the existing root and
-   `/app/`. Merging the PR also does it, with no setting change.
+### What was verified about the deployed artifact
 
-2. **Right now, no settings.** `prototypes/corridor/corridor-standalone.html` is
-   a single self-contained file — all CSS, JS, ts-fsrs and 1.8 MB of data
-   inlined, no network at all. Download it from the PR and open it. Verified
-   working from `file://` in Chromium: 11 texts, 33 signals, FSRS live.
+All 13 published files were fetched from Pages with `curl` and compared against
+merged `main`: **13/13 byte-identical**, with the content types the app needs
+(`.mjs` as `text/javascript`, `.json` as `application/json`). The full check set
+was then run against those exact published bytes: **38/38**.
+
+⚠️ **A limit on that claim.** Chromium in the build container cannot reach the
+public internet — `example.com` and the Pages URL both fail with
+`ERR_CONNECTION_RESET`, via Playwright's `proxy` option and via
+`--proxy-server`, with the egress proxy logging zero relay attempts. `curl`
+works; the browser does not. So the checks ran against the **published bytes
+served locally**, not a live browser session against `github.io`. The bytes are
+proven identical and the URL is proven to serve 200 with correct types, but
+end-to-end CDN behaviour was not exercised from here.
+
+Mirroring is easy to get wrong in a way that fakes a pass: the first mirror pass
+missed `data/coverage.json`, `data/fsrs-pin.json` and `data/manifest.json`
+because only the two pool subdirectories were enumerated. The page then hung at
+"ready" forever. If you repeat this, enumerate `data/` recursively and serve
+`.mjs` as `text/javascript` — `python3 -m http.server` does not, and strict MIME
+checking silently blocks the module.
+
+### Offline fallback
+
+`prototypes/corridor/corridor-standalone.html` is a single self-contained file —
+all CSS, JS, ts-fsrs and 1.8 MB of data inlined, no network at all. Verified
+working from `file://` in Chromium: 11 texts, 33 signals, FSRS live.
 
 Local:
 
 ```sh
-node prototypes/corridor/tools/verify-corridor.mjs   # 38 checks + the screenshots
+node prototypes/corridor/tools/verify-corridor.mjs   # 43 checks + the screenshots
 python3 -m http.server -d prototypes/corridor 8080   # then http://127.0.0.1:8080/
 ```
 
@@ -272,3 +312,77 @@ python3 -m http.server -d prototypes/corridor 8080   # then http://127.0.0.1:808
   is closer to the reference apps than what the runner shows.
 - The verifier is the contract. If a change breaks the walk, it goes red on the
   specific step, with the DOM state that failed.
+
+---
+
+## 8. The independent judge rejected the first build
+
+Worth reading before trusting any number above it, because a green verifier is
+what let the defect ship.
+
+A separate agent that did not build the corridor walked the deployed bytes with
+real touch events at 390×844 and **rejected** it, while my own verifier reported
+38/38.
+
+### What it found
+
+**296 of 2,582 kanji were dead ends** — no components, no words, no idioms,
+nothing to tap onward — and every one was reachable by tapping the _first_ chip
+on a radical page (`字としても見る`). I re-derived the census from the shipped
+JSON rather than take its word; the number held.
+
+**Those pages then claimed otherwise.** They printed
+「6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。」 —
+_you can continue from the character and component side_ — with no component
+section on the page and nowhere to go. For a prototype whose stated ethic is
+showing gaps rather than hiding them, one page was lying.
+
+**漢検級 was never a node.** The brief names it in the chain; it rendered as an
+inert `<span>` styled exactly like the provenance tags, so the walk silently
+stopped.
+
+### Why the verifier missed it
+
+It walked one path, that path worked, and it reported "no dead ends" from a
+successful traversal. **Sampling a route that works is not evidence that no
+route fails.** This is the estate's dominant defect wearing a different coat —
+asserting on a successful return instead of on real state — and it survived
+precisely because the same author wrote the walk and the check on the walk.
+
+That is the whole argument for worker ≠ judge, demonstrated rather than
+asserted. A second pair of eyes on the same happy path would not have found it
+either; what found it was a census over the whole graph.
+
+### Fixed with data already in the bundle
+
+Characters that appear as components of other characters now link to that
+family (real RADK edges). **Dead ends 296 → 0 of 2,582.** The empty state is
+computed per page and says 「この字からは続けられない — 戻るしかない」 when true.
+漢検級 became a real node from `kanken.json`, marked 仮置き because 級 is not one
+of the six node types agreed in #35 — question filed there rather than decided.
+
+Smaller items from the same report: breadcrumb ellipsis clipped the current node
+(now scrolls, pinned to the tail); the 仮置き disclaimer on the drift field was
+buried under the fixed 変異 bar — the sentence saying "this is not real Drift"
+was the covered text; 7 overlapping tap targets in that field; view titles 22px
+against 21px reading, breaking the hierarchy law by 1px; and the #58 disclosure
+sitting behind `if (!compact)` while both call sites passed `compact: true`, so
+the reason for never showing one number was never shown to anyone.
+
+### Recorded, not fixed
+
+- **Reader word targets are 30px**, under the 40px rule. Inline spans in a 21px
+  reading column; 40px would wreck the typography. The judge measured it and
+  declined to reject on it. Recorded rather than quietly exempted.
+- **Furigana 「触れて」 cannot be used as a reading gesture** — a tap reveals the
+  reading _and_ opens the word panel, so you cannot reveal without leaving the
+  reading surface. A real design question about what a tap means here.
+- **Drift field contrast 1.36–2.23:1**, and the grid that removed the overlaps
+  makes it read as more regular and less drift-like. A marked placeholder; #46
+  untouched.
+
+### The checks that would have caught it
+
+Five new ones, 43/43 total: a census over the whole shipped graph, the specific
+character the judge got stranded on, a check that no page claims a continuation
+it lacks, and the 漢検級 hop. The census fails loudly at 296 and passes at 0.

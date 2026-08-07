@@ -174,6 +174,12 @@ function go(node) {
   if (sheet) sheet.scrollTop = 0;
 }
 
+// Exposed so a verifier can reach an arbitrary node and census the whole graph
+// rather than sampling one happy path — the gap that let 296 dead ends ship
+// behind a green run. Inspection only; the UI never calls these.
+window.__corridorGo = go;
+window.__CORRIDOR_DATA__ = D;
+
 function back() {
   if (S.stack.length) {
     S.stack.pop();
@@ -364,6 +370,15 @@ function renderShelf(main) {
   sub.textContent = `${D.passages.length} 本 — ウィキニュース (CC BY 4.0)・青空文庫 (PD, 新字新仮名)・やさしい日本語 用語集。難易度は実測の3信号。`;
   main.append(sub);
 
+  // Why there are three bars and never one number. This lived behind
+  // `if (!compact)` while both call sites passed compact:true, so the law was
+  // obeyed on screen but its reason was never actually delivered to anyone.
+  const why = el('div', 'note');
+  why.textContent =
+    '#58 で測定済み：jreadability はやさしい日本語を「易しくない」と採点する（符号が逆、2 seed で再現）。' +
+    'だから単一の数値は出さない。';
+  main.append(why);
+
   for (const p of D.passages) {
     const item = el('button', 'shelf-item');
     item.type = 'button';
@@ -434,6 +449,20 @@ function renderReader(main) {
   dials.append(dialRow('漢字', 'kanji', ['そのまま', '常用まで', 'すべて仮名']));
   dials.append(dialRow('ふりがな', 'furigana', ['なし', '触れて', 'つねに']));
   dials.append(dialRow('分かち', 'spacing', ['なし', '語の間', '文節']));
+
+  // 常用まで only rewrites characters above 常用. On most texts there are none,
+  // so the middle position lit up and changed nothing with no explanation.
+  // Count them and say the number — a dial that can do nothing here should say
+  // it can do nothing here.
+  const beyond = new Set();
+  for (const t of p.tokens) {
+    for (const ch of t.s) if (beyondJoyo(ch)) beyond.add(ch);
+  }
+  const dialNote = el('div', 'dial-note');
+  dialNote.textContent = beyond.size
+    ? `「常用まで」が置きかえる字：${[...beyond].join('・')}（${beyond.size} 字）`
+    : 'この文章に常用を超える字はない — 「常用まで」は「そのまま」と同じ見えかたになる。';
+  dials.append(dialNote);
   main.append(dials);
 
   const reader = el('div', 'reader');
@@ -503,9 +532,18 @@ function renderEntry(main) {
   }
   seeds.forEach((word, i) => {
     const node = el('div', 'field-word', word);
-    // deterministic pseudo-scatter — no rng, so screenshots are reproducible
-    const x = ((i * 37) % 78) + 4;
-    const y = ((i * 53) % 82) + 4;
+    // Deterministic scatter — no rng, so screenshots stay reproducible. Laid
+    // out on a coarse grid with per-cell offset rather than a modulo spray:
+    // the spray put 7 pairs physically on top of each other, and overlapping
+    // targets mean you cannot reliably tap the word you are aiming at.
+    const cols = 3;
+    const rows = Math.ceil(seeds.length / cols);
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = 4 + col * (92 / cols) + ((i * 13) % 7);
+    // 84%, not 94%: the bottom strip belongs to the 棚へ button, and a word
+    // sitting under it is another unreliable tap target.
+    const y = 2 + row * (84 / rows) + ((i * 5) % 3);
     node.style.left = `${x}%`;
     node.style.top = `${y}%`;
     node.style.fontSize = `${13 + ((i * 7) % 11)}px`;
@@ -523,13 +561,15 @@ function renderEntry(main) {
     render();
   });
   field.append(enter);
-  main.append(field);
-
+  // The disclaimer goes ABOVE the field. Below it, it ended up underneath the
+  // fixed 変異 bar — the one sentence saying this is not real Drift was the
+  // text being covered up. Read it before you look at the thing it disclaims.
   const note = el('div', 'note placeholder');
   note.innerHTML =
     '<b>仮置き</b> — これは入口の位置を比べるための最小の野であって、Drift そのものではない。' +
     'Drift の物理とジェスチャ文法は #46 で未決のまま、触っていない。本物の Drift はサイトの root にある。';
   main.append(note);
+  main.append(field);
 }
 
 function renderTray(main) {
@@ -561,6 +601,7 @@ function nodeTitle(node) {
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
   if (node.t === 'idiom') return node.id;
+  if (node.t === 'kanken') return `漢検 ${node.id}`;
   return '';
 }
 
@@ -810,7 +851,18 @@ function renderKanjiNode(sheet, node) {
   meta.append(el('div', 'hero-mean', k.m));
   const chips = el('div', 'shelf-meta');
   chips.append(el('span', 'pool-tag', `${k.st} 画`));
-  if (D.kanken[k.c]?.kk) chips.append(el('span', 'pool-tag', `漢検 ${D.kanken[k.c].kk}`));
+  // 漢検級 is a hop the brief asks for by name. It used to render as an inert
+  // <span> that looked identical to the other tags, so the chain silently
+  // stopped here. It is a real destination now — the grade is carried by
+  // kanken.json, nothing is invented — but 級 is NOT one of the six agreed node
+  // types (#35), so the node itself says so rather than deciding that quietly.
+  if (D.kanken[k.c]?.kk) {
+    const grade = D.kanken[k.c].kk;
+    const tag = el('button', 'pool-tag tag-link', `漢検 ${grade} →`);
+    tag.type = 'button';
+    tag.addEventListener('click', () => go({ t: 'kanken', id: grade, from: node.from }));
+    chips.append(tag);
+  }
   chips.append(el('span', 'pool-tag sa', 'ShareAlike'));
   meta.append(chips);
   hero.append(meta);
@@ -836,6 +888,7 @@ function renderKanjiNode(sheet, node) {
   }
 
   const words = D.kanjiWords[k.c] || [];
+  const idioms = D.idiomsByKanji[k.c] || [];
   if (words.length) {
     const capped = words.length > D.wordCap;
     sheet.append(
@@ -849,14 +902,46 @@ function renderKanjiNode(sheet, node) {
     );
   }
 
-  if (!words.length) {
-    sheet.append(el('p', 'eyebrow', 'この字を含む語'));
+  // A character can also be a component of other characters. That family is
+  // the only way onward for the 296 kanji that have no parts, no words and no
+  // idioms — without it they are dead ends, which is what the independent
+  // verifier rejected this build for. The edge is real RADK data, not invented.
+  const usedIn = (D.radicals[k.c]?.kanji || []).filter((c) => c !== k.c);
+  if (usedIn.length) {
+    const total = D.radicals[k.c]?.kanjiCount ?? usedIn.length;
     sheet.append(
-      el('div', 'sem-empty', `6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。`),
+      el(
+        'p',
+        'eyebrow',
+        total > usedIn.length
+          ? `この字を部品として含む字 — ${total} 字のうち ${usedIn.length} 字`
+          : `この字を部品として含む字 — ${total} 字`,
+      ),
+    );
+    sheet.append(
+      chipsFor(
+        usedIn.map((c) => ({ label: c, sub: D.kanken[c]?.kk || '' })),
+        (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+      ),
     );
   }
 
-  const idioms = D.idiomsByKanji[k.c] || [];
+  if (!words.length) {
+    sheet.append(el('p', 'eyebrow', 'この字を含む語'));
+    // Say only what is true on THIS page. The previous copy promised
+    // "字と部品の側からは続けられる" on pages that had no continuation at all.
+    const onward = k.parts.length + usedIn.length + idioms.length;
+    sheet.append(
+      el(
+        'div',
+        'sem-empty',
+        onward
+          ? '6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。'
+          : '6,687 語の辞書にこの字を含む語はない。部品も熟語も記録がない。この字からは続けられない — 戻るしかない。',
+      ),
+    );
+  }
+
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
     heading.append(document.createTextNode(`熟語・慣用句 — ${idioms.length}　`));
@@ -951,6 +1036,52 @@ function renderIdiomNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/** 漢検級 — the grade as a place you can stand, listing the kanji assigned to
+ *  it. Every character here is a real kanji node, so the walk continues. */
+function renderKankenNode(sheet, node) {
+  const chars = Object.keys(D.kanken).filter((c) => D.kanken[c].kk === node.id && D.kanji[c]);
+  const hero = el('div', 'hero');
+  hero.append(el('div', 'hero-glyph small', node.id));
+  const meta = el('div', 'hero-meta');
+  meta.append(el('div', 'hero-mean', `漢検 ${node.id} 配当漢字`));
+  const chips = el('div', 'shelf-meta');
+  chips.append(el('span', 'pool-tag', `${chars.length} 字`));
+  chips.append(el('span', 'pool-tag', 'CC0 fact table'));
+  meta.append(chips);
+  hero.append(meta);
+  sheet.append(hero);
+
+  sheet.append(
+    el(
+      'div',
+      'note placeholder',
+      '仮置き — 級は #35 で合意した6つのノード型（語・字・部品・熟語・文・文章）に入っていない。' +
+        'この頁は歩みを止めないための最小の形で、級をノードにするかは未決。質問は #35 に出した。',
+    ),
+  );
+
+  if (!chars.length) {
+    sheet.append(el('div', 'sem-empty', 'この級に配当された字がこの層にない。'));
+    return;
+  }
+  const shown = chars.slice(0, D.wordCap);
+  sheet.append(
+    el(
+      'p',
+      'eyebrow',
+      shown.length < chars.length
+        ? `この級の字 — ${chars.length} 字のうち ${shown.length} 字`
+        : `この級の字 — ${chars.length} 字`,
+    ),
+  );
+  sheet.append(
+    chipsFor(
+      shown.map((c) => ({ label: c, sub: D.kanji[c]?.m || '' })),
+      (item) => go({ t: 'kanji', id: item.label, from: node.from }),
+    ),
+  );
+}
+
 function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
   if (!node) return;
@@ -962,6 +1093,7 @@ function renderSheet(root) {
   else if (node.t === 'kanji') renderKanjiNode(sheet, node);
   else if (node.t === 'radical') renderRadicalNode(sheet, node);
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
+  else if (node.t === 'kanken') renderKankenNode(sheet, node);
   root.append(sheet);
 }
 
@@ -1073,6 +1205,12 @@ function render() {
   if (S.view === 'tray') parts.push('取ったもの');
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
+  // Keep the tail — where you are now — in view. The trail scrolls inside its
+  // own box, so deep walks lose the ancestry off the left rather than losing
+  // the current node off the right.
+  requestAnimationFrame(() => {
+    crumb.scrollLeft = crumb.scrollWidth;
+  });
   chrome.append(crumb);
 
   const trayBtn = el('button', null, `取 ${S.taken.length}`);

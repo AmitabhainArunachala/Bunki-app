@@ -55,3 +55,11 @@ prototypes/bunki-sites-v11/.sites-runtime/
 # state, never a build input. Scoped to worktrees/ rather than all of .claude/
 # so real project config under .claude/ stays committable.
 .claude/worktrees/
+
+# Throwaway browser probes at the repo root. Playwright only resolves via
+# node_modules here, so an ad-hoc `import { chromium } from 'playwright'`
+# script cannot live in a temp dir — it has to be written beside package.json
+# and deleted afterwards. Ignored so a probe still running (e.g. an independent
+# verifier's) never gets committed by accident. Durable tooling belongs in
+# prototypes/corridor/tools/, which this does not match.
+/*-probe.mjs
