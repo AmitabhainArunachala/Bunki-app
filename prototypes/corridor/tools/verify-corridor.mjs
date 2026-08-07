@@ -251,6 +251,14 @@ async function main() {
   await shoot(page, shotsDir, '02-read-passage');
   report.steps.push({ step: 2, name: 'read', shot: '02-read-passage.png' });
 
+  // the dials fold away by default (v1.2 round 4) — open them for the checks
+  const dialsHidden = (await page.locator('[data-dial]').count()) === 0;
+  await page.locator('#dials-toggle').click();
+  await page.waitForTimeout(200);
+  check('the text-settings dials fold away until asked for',
+    dialsHidden && (await page.locator('[data-dial]').count()) === 9,
+    `hidden by default=${dialsHidden}, 9 dial options after one tap`);
+
   // the three dials must be INDEPENDENT
   const dialProbe = async () => page.evaluate(`(() => {
     const r = document.querySelector('#reader');
