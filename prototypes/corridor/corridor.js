@@ -14,8 +14,46 @@
 
 const DATA = {
   safe: ['passages', 'kanken', 'sem'],
-  sa: ['kanji', 'words', 'idioms'],
+  sa: ['kanji', 'words', 'idioms', 'dict', 'strokes'],
 };
+
+/** English titles for the committed shelf (authored translations of the
+ * source titles — the sources themselves are CC BY / PD / glossary text). */
+const TITLES_EN = {
+  'wikinews:1403': 'Seven sites added to the World Natural Heritage list — including Shiretoko',
+  'wikinews:6460': "Mariners' Ichiro reaches 2,500 career hits",
+  'wikinews:12024': 'JR Osaka-Higashi Line partially opens',
+  'wikinews:20090': 'Shigaraki Kōgen Railway crash: court finds JR West 30% at fault',
+  'wikinews:45227': 'Wikinews closes the curtain on 21 years',
+  'aozora:051034': 'The Wild Rose — Ogawa Mimei',
+  'aozora:000628': 'Gon the Fox — Niimi Nankichi',
+  'aozora:046605': 'Yamanashi — Miyazawa Kenji',
+  'yasashii:1': 'Childcare leave',
+  'yasashii:2': 'Childcare-leave benefit',
+  'yasashii:3': "Basic survivor's pension",
+};
+
+/** Turn the grader's three signals into one sentence a learner can use.
+ * The raw signals stay one 詳細 tap away — translated, not discarded. */
+function levelPhrase(grading) {
+  const band = grading.signals.jreadability.band || '';
+  const levelMap = {
+    初級前半: 'Beginner',
+    初級後半: 'Upper beginner',
+    中級前半: 'Intermediate',
+    中級後半: 'Upper intermediate',
+    上級前半: 'Advanced',
+    上級後半: 'Upper advanced',
+  };
+  const level = levelMap[band] || 'Ungraded';
+  const cov = grading.signals.lexical_coverage.coverage;
+  let vocabNote = '';
+  if (cov != null && cov < 1) {
+    const oneIn = Math.max(2, Math.round(1 / (1 - cov)));
+    vocabNote = ` · ~1 in ${oneIn} words beyond the core`;
+  }
+  return { level, ja: band, note: vocabNote };
+}
 
 /** The four open decisions. Crude and obvious on purpose — it is an instrument.
  * Each option carries [id, 日本語, english]; the strip renders both. `depth`
@@ -78,6 +116,25 @@ const REL = {
   thm: ['主題', 'the theme it lives in'],
 };
 
+/** Grammar seed — DoJG-CLASS coverage begins here (operator 2026-08-07: the
+ * three Makino/Tsutsui volumes as the bar). Their text is copyrighted, so
+ * every explanation and example below is ORIGINAL, authored for KAIRO; the
+ * full ~600-point index is the roadmap, this is the first dozen. */
+const GRAMMAR = [
+  { id: 'niyoruto', p: '〜によると', lv: 'N3', mEn: 'according to …', mJa: '情報の出どころを示す', form: '名詞 + によると', ex: [{ ja: '天気予報によると、あしたは雨だ。', en: 'According to the forecast, it will rain tomorrow.' }, { ja: '新聞によると、会議は来月開かれる。', en: 'According to the paper, the meeting will be held next month.' }], note: 'Marks the source of reported information; usually paired with 〜そうだ or plain reported forms. The news texts on the shelf open with it constantly.' },
+  { id: 'rareru', p: '〜られる／〜される', lv: 'N4', mEn: 'passive — is done (by …)', mJa: '受身', form: '動詞ナイ形 + れる／られる', ex: [{ ja: '会議は毎年ここで開かれる。', en: 'The meeting is held here every year.' }, { ja: '新しい駅が作られた。', en: 'A new station was built.' }], note: 'Everywhere in written news, where events happen without a named actor. Distinguish from potential られる by context.' },
+  { id: 'kotoninaru', p: '〜ことになる', lv: 'N3', mEn: 'it has been decided that …; it follows that …', mJa: '決定・成り行き', form: '動詞辞書形／ナイ形 + ことになる', ex: [{ ja: '来年、大阪へ引っ越すことになった。', en: 'It has been decided that I will move to Osaka next year.' }, { ja: '規則では、ここで待つことになっている。', en: 'Under the rules, you are supposed to wait here.' }], note: 'The decision came from outside the speaker. 〜ことにする is the same shape with the speaker deciding.' },
+  { id: 'toshite', p: '〜として', lv: 'N3', mEn: 'as …; in the capacity of …', mJa: '資格・立場', form: '名詞 + として', ex: [{ ja: '医者として意見を言う。', en: 'I give my opinion as a doctor.' }, { ja: 'この町は温泉の町として知られている。', en: 'This town is known as a hot-spring town.' }], note: 'Sets the role or capacity from which something is done or seen.' },
+  { id: 'nitsuite', p: '〜について', lv: 'N4', mEn: 'about …; concerning …', mJa: '話題・対象', form: '名詞 + について', ex: [{ ja: '事故について説明した。', en: 'They explained about the accident.' }, { ja: '日本の歴史について本を書く。', en: 'To write a book about Japanese history.' }], note: 'The neutral way to mark a topic of discussion; 〜に関して is its formal sibling.' },
+  { id: 'teiru', p: '〜ている', lv: 'N5', mEn: 'is …ing; has …ed (state)', mJa: '進行・結果の状態', form: '動詞テ形 + いる', ex: [{ ja: '雨が降っている。', en: 'It is raining.' }, { ja: '窓が開いている。', en: 'The window is open (someone opened it / it stands open).' }], note: 'Progressive with action verbs, resulting state with change verbs — the single most load-bearing form in the language.' },
+  { id: 'souda-denbun', p: '〜そうだ（伝聞）', lv: 'N4', mEn: 'I hear that …; they say …', mJa: '伝聞', form: '普通形 + そうだ', ex: [{ ja: 'あの店はおいしいそうだ。', en: 'I hear that restaurant is good.' }, { ja: '半島も登録されたそうだ。', en: 'They say the peninsula was also registered.' }], note: 'Hearsay そうだ attaches to the plain form. The looks-like そうだ attaches to stems — same word, different door.' },
+  { id: 'bakari', p: '〜ばかり', lv: 'N3', mEn: 'just did …; nothing but …', mJa: '直後・偏り', form: '動詞タ形 + ばかり／名詞 + ばかり', ex: [{ ja: '起きたばかりだ。', en: 'I just got up.' }, { ja: 'ゲームばかりしている。', en: 'All they do is play games.' }], note: 'After タ形: immediately after. After a noun or テ形: an unbalanced diet of one thing.' },
+  { id: 'wa-ga', p: 'は と が', lv: 'N5', mEn: 'topic は vs subject が', mJa: '主題と主格', form: '名詞 + は／が', ex: [{ ja: '象は鼻が長い。', en: 'As for elephants, the nose is long.' }, { ja: 'だれが来たの？ — 田中さんが来た。', en: 'Who came? — Tanaka came.' }], note: 'は frames what the sentence is about; が picks out which one. New information leans が, known-topic leans は.' },
+  { id: 'youda', p: '〜ようだ', lv: 'N4', mEn: 'it seems that …', mJa: '推量', form: '普通形 + ようだ（名詞 + のようだ）', ex: [{ ja: 'だれか来たようだ。', en: 'It seems someone came.' }, { ja: '夢のようだ。', en: 'It is like a dream.' }], note: 'Inference from evidence at hand; also the like-a simile. みたいだ is its spoken twin.' },
+  { id: 'tame', p: '〜ため（に）', lv: 'N3', mEn: 'because of …; for the sake of …', mJa: '原因・目的', form: '名詞の／普通形 + ため（に）', ex: [{ ja: '事故のため、電車が止まっている。', en: 'Because of an accident, the trains are stopped.' }, { ja: '家族のために働く。', en: 'To work for one’s family.' }], note: 'Cause when the clause is settled fact, purpose when it is willed action — written Japanese leans on it hard.' },
+  { id: 'ni-yotte', p: '〜によって', lv: 'N3', mEn: 'by means of …; depending on …; by (agent)', mJa: '手段・受身の動作主・相違', form: '名詞 + によって', ex: [{ ja: '国によって習慣が違う。', en: 'Customs differ depending on the country.' }, { ja: 'この寺は八世紀に建てられたと言われている。この寺は行基によって建てられた。', en: 'This temple is said to date from the 8th century — it was built by Gyōki.' }], note: 'Three doors in one form: instrument, variation, and the agent of a written passive.' },
+];
+
 const S = {
   ready: false,
   view: 'shelf',
@@ -91,8 +148,52 @@ const S = {
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
   lang: 'bi',
   taken: [],
+  /** manual lists: { name: [{t,id,label,ts}] } — the operator's Renzo habit */
+  lists: {},
+  /** tokens whose English gloss is shown beneath (double-tap) */
+  glossed: null,
+  /** which shelf cards have their raw signals expanded (詳細) */
+  detailsOpen: null,
+  sourcesOpen: false,
   debugOpen: false,
 };
+
+/* ------------------------------------------------ persistence (localStorage) */
+const STORE_KEY = 'kairo-corridor-v1';
+function loadStore() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (Array.isArray(s.taken)) S.taken = s.taken;
+    if (s.lists && typeof s.lists === 'object') S.lists = s.lists;
+  } catch {
+    /* a broken store never blocks the walk */
+  }
+}
+function saveStore() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists }));
+  } catch {
+    /* quota or private mode — the session keeps working unpersisted */
+  }
+}
+
+/** Month bucket label for an epoch ms — the automatic Renzo-style list. */
+function monthKey(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}年${d.getMonth() + 1}月`;
+}
+
+/** Full dictionary record for a written form: kotobako (all senses, most
+ * common first) with the original 6,687-word layer as fallback. */
+function lookup(id) {
+  const full = D.dict[id];
+  if (full) return { r: full.r, m: full.m, p: full.p, jlpt: full.jlpt, k: full.k || [], alt: full.alt };
+  const old = D.words[id];
+  if (old) return { r: old.r, m: old.g ? [old.g] : [], jlpt: old.jlpt, k: old.k || [] };
+  return null;
+}
 
 const D = {};
 let fsrsApi = null;
@@ -132,6 +233,7 @@ async function boot() {
     if (v && VARIANTS[key].options.some(([id]) => id === v)) S.variants[key] = v;
   }
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
+  loadStore();
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
@@ -149,12 +251,13 @@ async function boot() {
     if (!res.ok) throw new Error(`data/${pool}/${name}.json → ${res.status}`);
     return res.json();
   };
-  const [passages, kanken, sem, kanji, words, idioms, manifest, pin] = await Promise.all([
-    ...DATA.safe.map((n) => load('proprietary_safe', n)),
-    ...DATA.sa.map((n) => load('share_alike', n)),
-    bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
-    bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
-  ]);
+  const [passages, kanken, sem, kanji, words, idioms, dict, strokes, manifest, pin] =
+    await Promise.all([
+      ...DATA.safe.map((n) => load('proprietary_safe', n)),
+      ...DATA.sa.map((n) => load('share_alike', n)),
+      bundled ? bundled.manifest : fetch('data/manifest.json').then((r) => r.json()),
+      bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
+    ]);
 
   D.passages = passages.passages;
   D.passageSources = passages.sources;
@@ -163,6 +266,9 @@ async function boot() {
   D.kanji = kanji.kanji;
   D.radicals = kanji.radicals;
   D.words = words.words;
+  D.dict = dict.words;
+  D.strokes = strokes.strokes;
+  D.kmeta = strokes.meta;
   D.idioms = Object.fromEntries(idioms.idioms.map((i) => [i.w, i]));
   D.idiomsByKanji = idioms.byKanji;
   D.idiomMeta = { total: idioms.totalCandidates, cap: idioms.cap };
@@ -170,7 +276,13 @@ async function boot() {
   D.pin = pin;
   D.sources = {
     proprietary_safe: [...passages.sources, ...kanken.sources, ...sem.sources],
-    share_alike: [...kanji.sources, ...words.sources, ...idioms.sources],
+    share_alike: [
+      ...kanji.sources,
+      ...words.sources,
+      ...idioms.sources,
+      ...dict.sources,
+      ...strokes.sources,
+    ],
   };
 
   // kanji → words containing it, derived here rather than shipped twice
@@ -221,7 +333,7 @@ function back() {
     if (!S.stack.length && S.view === 'reader') window.scrollTo(0, S.readerScroll);
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
     S.view = 'shelf';
     render();
     return;
@@ -423,40 +535,81 @@ function renderSignals(grading, { compact = false } = {}) {
 /* ---------------------------------------------------------------- views */
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · よみものの棚'), 'KAIRO · the reading shelf', 'en-inline'));
-  const h = el('h1', 'view-title', '実データの棚');
+  const h = el('h1', 'view-title', tx('よみものの棚', 'The reading shelf'));
   main.append(h);
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
-    `${D.passages.length} 本 — ウィキニュース (CC BY 4.0)・青空文庫 (PD, 新字新仮名)・やさしい日本語 用語集。難易度は実測の3信号。`,
-    `${D.passages.length} real texts — Wikinews (CC BY 4.0) · Aozora Bunko (public domain) · Easy-Japanese glossary. Difficulty is three measured signals, never one score. Tap a text to read it.`,
+    `${D.passages.length} 本。触れてひらく。`,
+    `${D.passages.length} real texts. Tap one to read it.`,
   );
   main.append(sub);
+
+  const gram = el('button', 'grammar-link');
+  gram.type = 'button';
+  gram.id = 'grammar-link';
+  gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
+  gram.addEventListener('click', () => {
+    S.view = 'grammar';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(gram);
 
   for (const p of D.passages) {
     const item = el('button', 'shelf-item');
     item.type = 'button';
     item.dataset.passage = p.id;
-    item.append(el('div', 'shelf-title', p.title));
+
+    const head = el('div', 'shelf-head');
+    head.append(el('div', 'shelf-title', p.title));
+    if (bi() && TITLES_EN[p.id]) head.append(el('div', 'shelf-title-en', TITLES_EN[p.id]));
+    const lv = levelPhrase(p.grading);
+    const levelLine = el('div', 'level-line');
+    levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+    levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.note.replace('~1 in', '約1/').replace(' words beyond the core', ' 語が基本語彙の外')));
+    if (p.grading.disagreement.flag) {
+      levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
+    }
+    head.append(levelLine);
+    item.append(head);
+
     const meta = el('div', 'shelf-meta');
     meta.append(el('span', null, p.sourceLabel));
     if (p.date) meta.append(el('span', null, p.date));
     meta.append(el('span', 'pool-tag', p.licence));
-    if (p.rubySource === 'markup') meta.append(el('span', 'pool-tag', 'ルビ原文'));
-    if (p.truncated) meta.append(el('span', 'pool-tag', '抜粋'));
     item.append(meta);
     item.append(el('div', 'shelf-snippet', p.text.slice(0, 64)));
-    item.append(renderSignals(p.grading, { compact: true }));
+
+    // the instrument stays one tap away: 詳細 unfolds the raw three signals
+    const details = el('button', 'details-toggle');
+    details.type = 'button';
+    details.dataset.details = p.id;
+    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details · raw signals');
+    details.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      (S.detailsOpen ||= new Set());
+      if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
+      else S.detailsOpen.add(p.id);
+      render();
+    });
+    item.append(details);
+    if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
+
     item.addEventListener('click', () => openPassage(p.id));
     main.append(item);
   }
 
-  const note = el('div', 'note');
-  note.textContent = tx(
-    '本文は原典の先頭からの抜粋（文単位、文の途中では切らない）。採点は画面に出ている本文そのものに対して実行したもの。',
-    'Each text is an excerpt from the start of its source, cut at sentence boundaries. The grades were computed over exactly the text shown on screen.',
-  );
-  main.append(note);
-  main.append(licencePanel());
+  // sources and licences: present, honest, folded
+  const src = el('button', 'details-toggle');
+  src.type = 'button';
+  src.id = 'sources-toggle';
+  src.textContent = (S.sourcesOpen ? '▾ ' : '▸ ') + tx('出典と licence', 'sources & licences');
+  src.addEventListener('click', () => {
+    S.sourcesOpen = !S.sourcesOpen;
+    render();
+  });
+  main.append(src);
+  if (S.sourcesOpen) main.append(licencePanel());
 }
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -476,6 +629,120 @@ function dialRow(labelJa, labelEn, key, options) {
   });
   row.append(seg);
   return row;
+}
+
+/* ------------------------------------------- the reader's click grammar
+ * One discipline, carried from Drift (§8 of the design-language doc) into
+ * study surfaces, per operator direction 2026-08-07:
+ *   tap            → furigana above
+ *   double-tap     → English beneath the word
+ *   long-press     → floating mini-dictionary
+ *   keep holding   → the mini window morphs into the full entry
+ * A moved pointer is a scroll, never a gesture. */
+const GESTURE = { MINI_MS: 430, FULL_MS: 2100, DOUBLE_MS: 350, MOVE_PX: 9 };
+let lastTap = { index: -1, at: 0 };
+let singleTapTimer = null;
+
+/* After a hold opens the full entry, the browser still synthesises a click
+ * when the finger lifts — and it lands on whatever the new sheet put under
+ * that spot, teleporting the reader a node deeper. Swallow that one click. */
+let swallowClickUntil = 0;
+document.addEventListener(
+  'click',
+  (ev) => {
+    if (Date.now() < swallowClickUntil) {
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
+  },
+  true,
+);
+
+function removeMini() {
+  document.getElementById('mini')?.remove();
+}
+
+function showMini(span, token) {
+  removeMini();
+  const g = lookup(token.b);
+  const mini = el('div', null);
+  mini.id = 'mini';
+  mini.append(el('span', 'mini-word', token.b));
+  if (g?.r) mini.append(el('span', 'mini-reading', g.r));
+  mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
+  mini.append(el('span', 'mini-hint', tx('押しつづけて辞書へ', 'keep holding — full entry')));
+  document.body.append(mini);
+  const r = span.getBoundingClientRect();
+  const m = mini.getBoundingClientRect();
+  const above = r.top > m.height + 70;
+  mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+  mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
+  return mini;
+}
+
+function wireTokenGestures(span, token, index, p) {
+  let miniTimer = null;
+  let fullTimer = null;
+  let down = null;
+  const openFull = () => {
+    removeMini();
+    swallowClickUntil = Date.now() + 700;
+    go({ t: 'word', id: token.b, from: { passage: p.id, index } });
+  };
+  const clear = () => {
+    clearTimeout(miniTimer);
+    clearTimeout(fullTimer);
+    miniTimer = fullTimer = null;
+  };
+  span.addEventListener('contextmenu', (ev) => ev.preventDefault());
+  span.addEventListener('pointerdown', (ev) => {
+    down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
+    miniTimer = setTimeout(() => {
+      const mini = showMini(span, token);
+      mini.addEventListener('click', openFull);
+    }, GESTURE.MINI_MS);
+    fullTimer = setTimeout(openFull, GESTURE.FULL_MS);
+  });
+  span.addEventListener('pointermove', (ev) => {
+    if (!down) return;
+    if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
+      clear();
+      down = null;
+    }
+  });
+  span.addEventListener('pointercancel', () => {
+    clear();
+    down = null;
+  });
+  span.addEventListener('pointerup', () => {
+    if (!down) return;
+    const held = Date.now() - down.at;
+    down = null;
+    clear();
+    if (held >= GESTURE.MINI_MS) return; // mini stays up; tap it for the full entry
+    const now = Date.now();
+    if (lastTap.index === index && now - lastTap.at < GESTURE.DOUBLE_MS) {
+      // double-tap: English beneath
+      clearTimeout(singleTapTimer);
+      lastTap = { index: -1, at: 0 };
+      (S.glossed ||= new Set());
+      if (S.glossed.has(index)) S.glossed.delete(index);
+      else S.glossed.add(index);
+      const scroll = window.scrollY;
+      render();
+      window.scrollTo(0, scroll);
+    } else {
+      lastTap = { index, at: now };
+      clearTimeout(singleTapTimer);
+      singleTapTimer = setTimeout(() => {
+        // single tap: furigana above
+        (S.revealed ||= new Set()).add(index);
+        const scroll = window.scrollY;
+        render();
+        window.scrollTo(0, scroll);
+      }, GESTURE.DOUBLE_MS + 10);
+    }
+  });
 }
 
 function renderReader(main) {
@@ -499,7 +766,11 @@ function renderReader(main) {
     ),
   );
   main.append(meta);
-  main.append(renderSignals(p.grading, { compact: true }));
+  const lv = levelPhrase(p.grading);
+  const levelLine = el('div', 'level-line');
+  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.note));
+  main.append(levelLine);
 
   const dials = el('div', 'dials');
   dials.append(
@@ -532,6 +803,13 @@ function renderReader(main) {
   );
   main.append(dials);
 
+  const grammarHint = el('p', 'gesture-hint');
+  grammarHint.textContent = tx(
+    '触れる＝ふりがな · 二度＝英語 · 長押し＝辞書',
+    'tap = reading · double-tap = English · hold = dictionary',
+  );
+  main.append(grammarHint);
+
   const reader = el('div', 'reader');
   reader.id = 'reader';
   if (S.dials.spacing === 1) reader.classList.add('sp-word');
@@ -549,14 +827,14 @@ function renderReader(main) {
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),
     );
-    if (token.c) {
-      span.addEventListener('click', () => {
-        if (S.dials.furigana === 1) {
-          (S.revealed ||= new Set()).add(index);
-        }
-        go({ t: 'word', id: token.b, from: { passage: p.id, index } });
-      });
+    if (token.c && S.glossed?.has(index)) {
+      const g = lookup(token.b);
+      if (g?.m?.length) {
+        span.classList.add('has-en');
+        span.append(el('span', 'tok-en', g.m[0]));
+      }
     }
+    if (token.c) wireTokenGestures(span, token, index, p);
     if (S.dials.spacing === 2) {
       if (token.c || !group) {
         group = el('span', 'bunsetsu');
@@ -637,37 +915,101 @@ function renderEntry(main) {
 }
 
 function renderTray(main) {
-  main.append(withEn(el('p', 'eyebrow', '取ったもの'), 'taken into study', 'en-inline'));
-  main.append(el('h1', 'view-title', tx(`${S.taken.length} 件`, `${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)));
-  const note = el('div', 'note');
-  note.textContent = tx(
-    'これは読み取り専用のプレビュー。イベントログには何も書かない（スケジューラ本体は範囲外 — #40）。',
-    'A read-only preview: nothing is written to the event log (the real scheduler is out of scope — #40). ' +
-      'The red time is when FSRS-6 would next show each item if you rated it ふつう "good" now.',
+  main.append(withEn(el('p', 'eyebrow', 'リスト'), 'your lists', 'en-inline'));
+  main.append(
+    el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
   );
-  main.append(note);
   if (!S.taken.length) {
     main.append(
       el(
         'div',
         'sem-empty',
         tx(
-          'まだ何も取っていない。どのノードからでも「取る」で入る。',
-          'Nothing taken yet. Every word, kanji, radical or idiom page has a 取る take button.',
+          'まだ何もない。語・漢字・部品・熟語のページの「覚える」から入る。',
+          'Nothing here yet. The 覚える memorize button on any word, kanji, part, or idiom page adds it — this month’s list fills itself.',
         ),
       ),
     );
     return;
   }
+
+  // month buckets fill themselves; named lists sit above them
+  const buckets = new Map();
   for (const item of S.taken) {
-    const line = el('div', 'tray-line');
-    const w = el('span', 'w', item.label);
-    line.append(w);
-    line.append(el('span', 'pool-tag', tx(item.kind, item.kindEn || item.kind)));
-    const preview = schedulePreview();
-    line.append(el('span', 'when', preview ? preview.good.when : '—'));
-    line.addEventListener('click', () => go({ t: item.t, id: item.id }));
-    main.append(line);
+    const key = monthKey(item.ts || 0);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  }
+  const sections = [
+    ...Object.entries(S.lists).map(([name, items]) => ({ name, items, manual: true })),
+    ...[...buckets.entries()].map(([name, items]) => ({ name, items, manual: false })),
+  ];
+  for (const sec of sections) {
+    const head = el('p', 'eyebrow list-head');
+    head.append(document.createTextNode(`${sec.name} — ${sec.items.length}`));
+    if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'named list' : 'auto · monthly'));
+    main.append(head);
+    for (const item of sec.items) {
+      const line = el('div', 'tray-line');
+      line.append(el('span', 'w', item.label));
+      line.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
+      const preview = schedulePreview();
+      line.append(el('span', 'when', preview ? preview.good.when : '—'));
+      line.addEventListener('click', () => go({ t: item.t, id: item.id }));
+      main.append(line);
+    }
+  }
+}
+
+/* -------------------------------------------------------------- grammar */
+function renderGrammar(main) {
+  main.append(withEn(el('p', 'eyebrow', '文法辞典 · 種'), 'grammar dictionary · the seed', 'en-inline'));
+  main.append(el('h1', 'view-title', tx('文法', 'Grammar')));
+  const sub = el('p', 'shelf-snippet intro');
+  sub.textContent = tx(
+    `${GRAMMAR.length} 項目。全項目版はこれから育てる。`,
+    `${GRAMMAR.length} entries, original content. The full dictionary-grade index grows from here.`,
+  );
+  main.append(sub);
+  const rows = el('div', 'entry-rows');
+  for (const g of GRAMMAR) {
+    const row = el('button', 'entry-row compound');
+    row.type = 'button';
+    row.dataset.grammar = g.id;
+    const main2 = el('span', 'row-stack');
+    const top = el('span', 'row-word');
+    top.append(document.createTextNode(g.p));
+    top.append(el('span', 'row-reading', g.lv));
+    main2.append(top);
+    main2.append(el('span', 'row-gloss', bi() ? g.mEn : g.mJa));
+    row.append(main2, el('span', 'row-go', '›'));
+    row.addEventListener('click', () => go({ t: 'grammar', id: g.id }));
+    rows.append(row);
+  }
+  main.append(rows);
+}
+
+function renderGrammarNode(sheet, node) {
+  const g = GRAMMAR.find((x) => x.id === node.id);
+  if (!g) {
+    sheet.append(el('div', 'sem-empty', tx('この項目はまだない。', 'This entry does not exist yet.')));
+    return;
+  }
+  sheet.append(el('h2', 'headword', g.p));
+  sheet.append(el('p', 'reading', g.lv));
+  sheet.append(el('p', 'gloss', bi() ? `${g.mEn} — ${g.mJa}` : g.mJa));
+  sheet.append(withEn(el('p', 'eyebrow', '接続'), 'formation', 'en-inline'));
+  sheet.append(el('p', 'formation', g.form));
+  sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples', 'en-inline'));
+  for (const ex of g.ex) {
+    const line = el('div', 'example');
+    line.append(el('p', 'example-ja', ex.ja));
+    if (bi()) line.append(el('p', 'example-en', ex.en));
+    sheet.append(line);
+  }
+  if (g.note) {
+    sheet.append(withEn(el('p', 'eyebrow', '使い分け'), 'usage', 'en-inline'));
+    sheet.append(el('p', 'sem-note grammar-note', g.note));
   }
 }
 
@@ -677,6 +1019,7 @@ function nodeTitle(node) {
   if (node.t === 'kanji') return node.id;
   if (node.t === 'radical') return node.id;
   if (node.t === 'idiom') return node.id;
+  if (node.t === 'grammar') return GRAMMAR.find((x) => x.id === node.id)?.p || node.id;
   return '';
 }
 
@@ -706,8 +1049,8 @@ function takeButton(node, label) {
   const btn = biLabel(
     'button',
     already ? 'take taken' : 'take',
-    already ? '取った ✓' : '取る',
-    already ? 'taken' : 'take into study',
+    already ? '覚える ✓' : '覚える',
+    already ? 'memorizing' : 'memorize',
   );
   btn.type = 'button';
   btn.id = 'take';
@@ -720,10 +1063,52 @@ function takeButton(node, label) {
       kind: NODE_KIND[node.t][0],
       kindEn: NODE_KIND[node.t][1],
       from: node.from || null,
+      ts: Date.now(),
     });
+    saveStore();
     render();
   });
   return btn;
+}
+
+/** After 覚える: the item lands in this month's bucket automatically (the
+ * operator's Renzo habit, automated) and can join any named list too. */
+function renderListPicker(sheet, node, label) {
+  const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
+  if (!item) return;
+  const wrap = el('div', 'list-picker');
+  wrap.append(
+    withEn(el('p', 'eyebrow', `リスト — ${monthKey(item.ts)} に自動追加ずみ`), `lists — already in ${monthKey(item.ts)}`, 'en-inline'),
+  );
+  const chips = el('div', 'chips');
+  for (const name of Object.keys(S.lists)) {
+    const inList = S.lists[name].some((x) => x.t === node.t && x.id === node.id);
+    const chip = el('button', inList ? 'chip wide on-list' : 'chip wide');
+    chip.type = 'button';
+    chip.append(el('span', 'big', name));
+    chip.append(el('span', 'sub', `${S.lists[name].length}`));
+    chip.addEventListener('click', () => {
+      if (inList) S.lists[name] = S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id));
+      else S.lists[name].push({ t: node.t, id: node.id, label, ts: item.ts });
+      saveStore();
+      render();
+    });
+    chips.append(chip);
+  }
+  const add = el('button', 'chip wide');
+  add.type = 'button';
+  add.id = 'new-list';
+  add.append(el('span', 'big', tx('＋ 新規リスト', '＋ new list')));
+  add.addEventListener('click', () => {
+    const name = window.prompt(tx('リスト名', 'List name'));
+    if (!name || S.lists[name]) return;
+    S.lists[name] = [{ t: node.t, id: node.id, label, ts: item.ts }];
+    saveStore();
+    render();
+  });
+  chips.append(add);
+  wrap.append(chips);
+  sheet.append(wrap);
 }
 
 function schedulePreview() {
@@ -785,14 +1170,7 @@ function renderSchedule(container) {
   }
   container.append(table);
   const note = el('div', 'note');
-  note.textContent = tx(
-    `新規カードを「いま」評価した場合の実計算（${D.pin.package} ${D.pin.pinnedVersion}、` +
-      `retention ${D.pin.requestRetention}、fuzz ${D.pin.enableFuzz ? 'on' : 'off'}）。` +
-      'packages/domain の pin をそのまま読んでいる。書き込みはしない。',
-    `Real FSRS-6 arithmetic for a new card rated right now (${D.pin.package} ${D.pin.pinnedVersion}, ` +
-      `retention ${D.pin.requestRetention}, fuzz ${D.pin.enableFuzz ? 'on' : 'off'}), ` +
-      "reading packages/domain's pinned parameters directly. Nothing is written.",
-  );
+  note.textContent = tx('実計算のプレビュー。まだ何も保存されない。', 'A real FSRS-6 preview — nothing is saved yet.');
   container.append(note);
 }
 
@@ -863,40 +1241,97 @@ function renderCardVariant(container, target) {
     box.append(note);
   }
   container.append(box);
-  const compare = el('div', 'note');
-  compare.textContent = tx(
-    '#38：十五年決着していない議論。下の帯で切り替えて、同じ語が両方でどう見えるかを比べる。',
-    '#38: a fifteen-year unresolved debate. Switch the strip below to see the same word both ways.',
-  );
-  container.append(compare);
+}
+
+/** Real usages from the committed shelf: sentences containing the word. */
+function findExamples(id, cap = 4) {
+  const out = [];
+  for (const p of D.passages) {
+    let sentence = [];
+    let hit = false;
+    for (const t of p.tokens) {
+      sentence.push(t);
+      if (t.c && t.b === id) hit = true;
+      if ('。！？'.includes(t.s)) {
+        if (hit) out.push({ tokens: sentence, source: p.sourceLabel, passage: p.id });
+        sentence = [];
+        hit = false;
+        if (out.length >= cap) return out;
+      }
+    }
+    if (hit && sentence.length) out.push({ tokens: sentence, source: p.sourceLabel, passage: p.id });
+    if (out.length >= cap) return out;
+  }
+  return out;
 }
 
 function renderWordNode(sheet, node) {
-  const word = D.words[node.id];
+  const rec = lookup(node.id);
+  const legacy = D.words[node.id];
   const label = node.id;
   const head = el('h2', 'headword');
   head.append(document.createTextNode(label));
+  if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
   sheet.append(head);
-  if (word?.r) {
-    const reading = el('p', 'reading', word.r);
-    if (word.rd) reading.title = 'reading derived from the pinned UniDic tokenizer';
-    sheet.append(reading);
+  if (rec?.r) sheet.append(el('p', 'reading', rec.r));
+
+  // TRANSLATION — every sense, most common first (JMdict order)
+  if (rec?.m?.length) {
+    const box = el('div', 'senses');
+    if (rec.p) box.append(el('p', 'sense-pos', rec.p));
+    if (rec.m.length === 1) {
+      box.append(el('p', 'gloss', rec.m[0]));
+    } else {
+      const ol = el('ol', 'sense-list');
+      for (const m of rec.m) ol.append(el('li', null, m));
+      box.append(ol);
+    }
+    sheet.append(box);
+  } else {
+    const gloss = el('p', 'gloss absent');
+    gloss.textContent = tx('この語の語釈はまだない。読みと接続は下にある。', 'No gloss for this word yet — its reading and connections continue below.');
+    sheet.append(gloss);
+  }
+  const jlpt = rec?.jlpt || (legacy?.jlpt ? `N${legacy.jlpt}` : null);
+  if (jlpt) {
+    const meta = el('div', 'shelf-meta');
+    meta.append(el('span', 'pool-tag', `JLPT ${String(jlpt).replace(/^N?/, 'N')}`));
+    sheet.append(meta);
   }
 
-  const gloss = el('p', word?.g ? 'gloss' : 'gloss absent');
-  gloss.textContent =
-    word?.g ||
-    tx(
-      'この語の語釈はまだこの層にない（6,687 語の辞書に載っていない語）。読みと接続は下にある。',
-      'No gloss for this word yet — it is outside the 6,687-word lexicon. Its reading and connections continue below.',
-    );
-  sheet.append(gloss);
+  // KANJI IN THIS WORD — each row opens that kanji's full entry
+  const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
+  if (rowChars.length) {
+    sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
+    const rows = el('div', 'entry-rows');
+    for (const c of rowChars) {
+      const row = el('button', 'entry-row');
+      row.type = 'button';
+      row.dataset.kanjirow = c;
+      row.append(el('span', 'row-glyph', c));
+      row.append(el('span', 'row-main', D.kanji[c].m));
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+      rows.append(row);
+    }
+    sheet.append(rows);
+  }
 
-  if (word?.jlpt) {
-    const meta = el('div', 'shelf-meta');
-    meta.append(el('span', 'pool-tag', `JLPT N${word.jlpt}`));
-    meta.append(el('span', 'pool-tag sa', tx('ShareAlike 由来の語釈', 'gloss from ShareAlike data')));
-    sheet.append(meta);
+  // EXAMPLES — real sentences from the shelf, target in red
+  const examples = findExamples(node.id);
+  if (examples.length) {
+    sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples from the shelf', 'en-inline'));
+    for (const ex of examples) {
+      const line = el('div', 'example');
+      const text = el('p', 'example-ja');
+      for (const t of ex.tokens) {
+        if (t.c && t.b === node.id) text.append(el('span', 'example-hit', t.s));
+        else text.append(document.createTextNode(t.s));
+      }
+      line.append(text);
+      line.append(el('span', 'example-src', ex.source));
+      sheet.append(line);
+    }
   }
 
   // the semantic neighbourhood — the single most important surface here
@@ -930,10 +1365,8 @@ function renderWordNode(sheet, node) {
   } else {
     const empty = el('div', 'sem-empty');
     empty.textContent = tx(
-      `この語には意味近傍がまだ書かれていない。SEM 層は現在 ${D.manifest.counts.semHeads} 語（辞書の約 1.2%）。` +
-        '空白を隠さずに見せている — 拡大は #44。',
-      `No semantic neighbourhood is written for this word yet — the SEM layer currently covers ${D.manifest.counts.semHeads} words (~1.2% of the lexicon). ` +
-        'The gap is shown, not hidden — scaling it is #44. These words do have one:',
+      'この語の意味近傍はまだ書かれていない。書かれている語：',
+      'Usage notes for this word are still being written. These words have them:',
     );
     semWrap.append(empty);
     const seeds = Object.keys(D.sem).slice(0, 6);
@@ -948,20 +1381,8 @@ function renderWordNode(sheet, node) {
   }
   sheet.append(semWrap);
 
-  const chars = (word?.k || [...node.id].filter((c) => D.kanji[c])).filter((c) => D.kanji[c]);
-  if (chars.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '字へ'), 'into the kanji', 'en-inline'));
-    sheet.append(
-      chipsFor(
-        chars.map((c) => ({ label: c, sub: D.kanken[c]?.kk || tx('級なし', 'no level') })),
-        (item) => go({ t: 'kanji', id: item.label, from: node.from }),
-        null,
-        'kanji',
-      ),
-    );
-  }
-
   sheet.append(takeButton(node, label));
+  renderListPicker(sheet, node, label);
   renderCardVariant(sheet, { id: node.id, from: node.from });
   renderSchedule(sheet);
 }
@@ -979,7 +1400,7 @@ function renderKanjiNode(sheet, node) {
   const chips = el('div', 'shelf-meta');
   chips.append(el('span', 'pool-tag', tx(`${k.st} 画`, `${k.st} strokes`)));
   if (D.kanken[k.c]?.kk) chips.append(el('span', 'pool-tag', `漢検 ${D.kanken[k.c].kk}`));
-  chips.append(el('span', 'pool-tag sa', 'ShareAlike'));
+  if (D.kmeta?.[k.c]?.jlpt) chips.append(el('span', 'pool-tag', `JLPT ${D.kmeta[k.c].jlpt}`));
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
@@ -993,53 +1414,71 @@ function renderKanjiNode(sheet, node) {
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
-  if (k.parts.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '部品へ'), 'into the parts', 'en-inline'));
-    sheet.append(
-      chipsFor(
-        k.parts.map((c) => ({ label: c, sub: D.radicals[c]?.name || tx('名称なし', 'unnamed') })),
-        (item) => go({ t: 'radical', id: item.label, from: node.from }),
-        null,
-        'radical',
-      ),
-    );
+  // STROKE ORDER — KanjiVG paths, numbered at each stroke's start
+  const paths = D.strokes?.[k.c];
+  if (paths?.length) {
+    sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 109 109');
+    svg.setAttribute('class', 'strokes');
+    svg.id = 'strokes';
+    paths.forEach((d, i) => {
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d);
+      svg.append(path);
+      const m = d.match(/M\s*([\d.]+)[\s,]+([\d.]+)/);
+      if (m) {
+        const t = document.createElementNS(NS, 'text');
+        t.setAttribute('x', m[1]);
+        t.setAttribute('y', m[2]);
+        t.textContent = String(i + 1);
+        svg.append(t);
+      }
+    });
+    sheet.append(svg);
   }
 
+  if (k.parts.length) {
+    sheet.append(withEn(el('p', 'eyebrow', '部品'), 'components', 'en-inline'));
+    const rows = el('div', 'entry-rows');
+    for (const c of k.parts) {
+      const row = el('button', 'entry-row');
+      row.type = 'button';
+      row.append(el('span', 'row-glyph', c));
+      row.append(el('span', 'row-main', D.radicals[c]?.name || tx('名称なし', 'unnamed part')));
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }));
+      rows.append(row);
+    }
+    sheet.append(rows);
+  }
+
+  // COMMON COMPOUNDS — reading + first gloss per row, every row a door
   const words = D.kanjiWords[k.c] || [];
   if (words.length) {
-    const capped = words.length > D.wordCap;
-    sheet.append(
-      withEn(
-        el(
-          'p',
-          'eyebrow',
-          capped ? `この字を含む語 — ${words.length} 語のうち ${D.wordCap} 語` : `この字を含む語 — ${words.length} 語`,
-        ),
-        'words that contain it',
-        'en-inline',
-      ),
-    );
-    sheet.append(
-      chipsFor(
-        words.slice(0, D.wordCap).map((w) => ({ label: w, sub: D.words[w]?.r || '' })),
-        (item) => go({ t: 'word', id: item.label, from: node.from }),
-        null,
-        'word',
-      ),
-    );
-  }
-
-  if (!words.length) {
+    sheet.append(withEn(el('p', 'eyebrow', `よく使う語 — ${words.length} 語`), 'common compounds', 'en-inline'));
+    const rows = el('div', 'entry-rows');
+    for (const w of words.slice(0, D.wordCap)) {
+      const g = lookup(w);
+      const row = el('button', 'entry-row compound');
+      row.type = 'button';
+      const main = el('span', 'row-stack');
+      const top = el('span', 'row-word');
+      top.append(document.createTextNode(w));
+      if (g?.r) top.append(el('span', 'row-reading', g.r));
+      main.append(top);
+      if (g?.m?.[0]) main.append(el('span', 'row-gloss', g.m[0]));
+      row.append(main);
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t: 'word', id: w, from: node.from }));
+      rows.append(row);
+    }
+    sheet.append(rows);
+  } else {
     sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
     sheet.append(
-      el(
-        'div',
-        'sem-empty',
-        tx(
-          `6,687 語の辞書にこの字を含む語はない。字と部品の側からは続けられる。`,
-          'No word in the 6,687-word lexicon contains this kanji. The walk continues through the kanji and its parts.',
-        ),
-      ),
+      el('div', 'sem-empty', tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.')),
     );
   }
 
@@ -1048,7 +1487,6 @@ function renderKanjiNode(sheet, node) {
     const heading = el('p', 'eyebrow');
     heading.append(document.createTextNode(`熟語・慣用句 — ${idioms.length}　`));
     if (bi()) heading.append(el('span', 'en-inline', 'idioms and set phrases'));
-    heading.append(el('span', 'pool-tag sa', tx('ShareAlike プール', 'ShareAlike pool')));
     sheet.append(heading);
     sheet.append(
       chipsFor(
@@ -1061,6 +1499,7 @@ function renderKanjiNode(sheet, node) {
   }
 
   sheet.append(takeButton(node, k.c));
+  renderListPicker(sheet, node, k.c);
   renderSchedule(sheet);
 }
 
@@ -1079,16 +1518,12 @@ function renderRadicalNode(sheet, node) {
   const chips = el('div', 'shelf-meta');
   if (r.st) chips.append(el('span', 'pool-tag', tx(`${r.st} 画`, `${r.st} strokes`)));
   chips.append(el('span', 'pool-tag', tx(`${r.kanjiCount} 字`, `${r.kanjiCount} kanji`)));
-  chips.append(el('span', 'pool-tag sa', 'ShareAlike'));
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
 
   const note = el('div', 'note');
-  note.textContent = tx(
-    'RADK は「この部品を含む」族であって、康熙部首の分類ではない（#26 の赤チームで確定した言い方）。',
-    'RADK is the "contains this part" family, not the Kangxi radical classification (the wording settled by the #26 red team).',
-  );
+  note.textContent = tx('「この部品を含む」族。康熙部首の分類ではない。', 'The family of characters containing this part — not the Kangxi radical classification.');
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {
@@ -1125,6 +1560,7 @@ function renderRadicalNode(sheet, node) {
   );
 
   sheet.append(takeButton(node, r.c));
+  renderListPicker(sheet, node, r.c);
   renderSchedule(sheet);
 }
 
@@ -1138,7 +1574,6 @@ function renderIdiomNode(sheet, node) {
   sheet.append(head);
   sheet.append(el('p', 'reading', idiom.r));
   const meta = el('div', 'shelf-meta');
-  meta.append(el('span', 'pool-tag sa', 'JMdict · CC BY-SA'));
   if (idiom.yoji) meta.append(withEn(el('span', 'pool-tag', '四字熟語'), 'four-character idiom'));
   sheet.append(meta);
   for (const g of idiom.g) sheet.append(el('p', 'gloss', g));
@@ -1153,6 +1588,7 @@ function renderIdiomNode(sheet, node) {
     ),
   );
   sheet.append(takeButton(node, idiom.w));
+  renderListPicker(sheet, node, idiom.w);
   renderSchedule(sheet);
 }
 
@@ -1166,10 +1602,34 @@ function renderSheet(root) {
   sheet.id = 'sheet';
   sheet.dataset.node = `${node.t}:${node.id}`;
   sheet.append(el('div', 'sheet-grip'));
+
+  // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
+  const bar = el('div', 'sheet-bar');
+  const backBtn = biLabel('button', 'sheet-back', '← 戻る', 'back');
+  backBtn.type = 'button';
+  backBtn.id = 'sheet-back';
+  backBtn.addEventListener('click', back);
+  bar.append(backBtn);
+  if (S.stack.length > 1) {
+    bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
+  }
+  const closeBtn = el('button', 'sheet-close', '✕');
+  closeBtn.type = 'button';
+  closeBtn.id = 'sheet-close';
+  closeBtn.title = tx('とじる', 'close');
+  closeBtn.addEventListener('click', () => {
+    S.stack = [];
+    render();
+    if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  });
+  bar.append(closeBtn);
+  sheet.append(bar);
+
   if (node.t === 'word') renderWordNode(sheet, node);
   else if (node.t === 'kanji') renderKanjiNode(sheet, node);
   else if (node.t === 'radical') renderRadicalNode(sheet, node);
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
+  else if (node.t === 'grammar') renderGrammarNode(sheet, node);
   root.append(sheet);
 }
 
@@ -1271,6 +1731,7 @@ function updateMeasurements() {
 
 /* --------------------------------------------------------------- render */
 function render() {
+  removeMini();
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -1291,23 +1752,33 @@ function render() {
   if (S.view === 'entry') parts.push(tx('野', 'field'));
   else parts.push(tx('棚', 'shelf'));
   if (S.view === 'reader' && passage()) parts.push(passage().title);
-  if (S.view === 'tray') parts.push(tx('取ったもの', 'taken'));
+  if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
   chrome.append(crumb);
 
-  const langBtn = biLabel('button', 'lang', 'EN', bi() ? 'on' : 'off');
-  langBtn.type = 'button';
-  langBtn.id = 'lang';
-  langBtn.setAttribute('aria-pressed', String(bi()));
-  langBtn.title = bi() ? 'switch the chrome to 日本語のみ' : 'show English labels';
-  langBtn.addEventListener('click', () => {
-    S.lang = bi() ? 'ja' : 'bi';
-    render();
-  });
-  chrome.append(langBtn);
+  // EN | 日本語 — two visible states, the active one lit
+  const langSeg = el('div', 'lang-seg');
+  langSeg.id = 'lang';
+  langSeg.setAttribute('aria-pressed', String(bi()));
+  for (const [id, label] of [
+    ['bi', 'EN'],
+    ['ja', '日本語'],
+  ]) {
+    const b = el('button', null, label);
+    b.type = 'button';
+    b.dataset.lang = id;
+    b.setAttribute('aria-pressed', String(S.lang === id));
+    b.addEventListener('click', () => {
+      S.lang = id;
+      render();
+    });
+    langSeg.append(b);
+  }
+  chrome.append(langSeg);
 
-  const trayBtn = biLabel('button', null, `取 ${S.taken.length}`, 'tray');
+  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
@@ -1330,6 +1801,7 @@ function render() {
   if (S.view === 'entry') renderEntry(main);
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
+  else if (S.view === 'grammar') renderGrammar(main);
   else renderShelf(main);
 
   renderSheet(root);
