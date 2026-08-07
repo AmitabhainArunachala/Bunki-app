@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 19:38",
+          "2026-08-07 23:21",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 19:43",
+          "2026-08-07 23:26",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 19:47",
+          "2026-08-07 23:30",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 19:37",
+          "2026-08-15 23:20",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 284,
+  "loadMs": 245,
   "summary": {
-    "total": 70,
+    "total": 71,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 284 ms"
+      "detail": "11 texts, ready in 245 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1049,6 +1049,11 @@
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
       "pass": true,
       "detail": "0 overlapping token(s)"
+    },
+    {
+      "name": "grammar · even the longest gloss renders whole — never truncated",
+      "pass": true,
+      "detail": "沿線 → \"places alongside a railway line\""
     },
     {
       "name": "grammar · a third tap backs all the way out",

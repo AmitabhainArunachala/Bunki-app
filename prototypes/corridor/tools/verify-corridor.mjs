@@ -376,6 +376,39 @@ async function main() {
   check('grammar · the gloss collides with nothing — on any font, by construction',
     afterSecond.collisions === 0, `${afterSecond.collisions} overlapping token(s)`);
 
+  // the worst long-gloss word on the shelf must render its gloss WHOLE
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item', 2); // JR おおさか東線 — carries 沿線
+  await page.waitForSelector('#reader');
+  const enIdx = await page.evaluate(
+    `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
+  );
+  if (enIdx >= 0) {
+    // furigana defaults to つねに here, so one tap goes straight to English
+    await tap(page, '#reader .tok.content', enIdx);
+    await page.waitForTimeout(150);
+    const glossFit = await page.evaluate(`(() => {
+      const en = document.querySelectorAll('#reader .tok.content')[${enIdx}].querySelector('.tok-en');
+      if (!en) return null;
+      return { text: en.textContent, whole: en.scrollHeight <= en.clientHeight + 2 && en.scrollWidth <= en.clientWidth + 2 };
+    })()`);
+    check('grammar · even the longest gloss renders whole — never truncated',
+      !!glossFit && glossFit.whole, glossFit ? `沿線 → "${glossFit.text}"` : 'no gloss mounted');
+  } else {
+    check('grammar · even the longest gloss renders whole — never truncated', false, '沿線 not found in text 3');
+  }
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#reader');
+  await page.locator('#dials-toggle').click();
+  await page.waitForTimeout(150);
+  await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
+  await page.waitForTimeout(150);
+  await tap(page, '#reader .tok.content', tapIdx);
+  await page.waitForTimeout(120);
+  await tap(page, '#reader .tok.content', tapIdx);
+  await page.waitForTimeout(120);
+
   // 3rd tap → all the way back out
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
