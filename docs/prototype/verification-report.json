@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 15:41",
+          "2026-08-07 15:48",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 15:46",
+          "2026-08-07 15:53",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 15:50",
+          "2026-08-07 15:57",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 15:40",
+          "2026-08-15 15:47",
           "8.30"
         ]
       ]
@@ -969,16 +969,16 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 313,
+  "loadMs": 432,
   "summary": {
-    "total": 59,
+    "total": 65,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 313 ms"
+      "detail": "11 texts, ready in 432 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1269,6 +1269,36 @@
       "name": "v1.2 · the shelf carries no provenance narration (sources fold away)",
       "pass": true,
       "detail": "quiet"
+    },
+    {
+      "name": "search · the romaji door answers",
+      "pass": true,
+      "detail": "\"kaisai\" → word:開催"
+    },
+    {
+      "name": "search · the kana door answers",
+      "pass": true,
+      "detail": "\"かいさい\" → word:開催"
+    },
+    {
+      "name": "search · the kanji door answers",
+      "pass": true,
+      "detail": "\"開\" → kanji:開"
+    },
+    {
+      "name": "search · the English door answers",
+      "pass": true,
+      "detail": "\"peninsula\" → word:半島"
+    },
+    {
+      "name": "search · the grammar door answers",
+      "pass": true,
+      "detail": "\"ばかり\" → grammar:bakari"
+    },
+    {
+      "name": "search · a result opens its full entry",
+      "pass": true,
+      "detail": "word:開催"
     }
   ]
 }

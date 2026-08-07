@@ -1572,3 +1572,34 @@ svg.strokes text {
   color: var(--ai, var(--ink));
   background: var(--ai-wash, transparent);
 }
+
+/* ==================================================== v1.5 · the search ===
+ * One quiet field, four doors: kanji · kana · romaji · English. */
+.search-field {
+  display: block;
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: 48px;
+  padding: 0 20px;
+  margin: 2px 0 16px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search-field:focus {
+  border-color: var(--ai, var(--ink-2));
+  box-shadow: 0 0 0 2px var(--ai-wash, transparent);
+}
+
+.search-field::placeholder {
+  color: var(--faint);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+}

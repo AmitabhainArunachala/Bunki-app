@@ -148,6 +148,7 @@ const S = {
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
   lang: 'bi',
   dialsOpen: false,
+  query: '',
   taken: [],
   /** manual lists: { name: [{t,id,label,ts}] } — the operator's Renzo habit */
   lists: {},
@@ -536,6 +537,34 @@ function renderSignals(grading, { compact = false } = {}) {
 /* ---------------------------------------------------------------- views */
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+
+  // the quiet field — kanji, kana, romaji, or English; four doors, one box
+  const search = el('input', 'search-field');
+  search.id = 'search';
+  search.type = 'search';
+  search.placeholder = tx('ことばをさがす', 'Look up a word — kanji · kana · romaji · English');
+  search.autocomplete = 'off';
+  search.value = S.query || '';
+  let debounce = null;
+  search.addEventListener('input', () => {
+    S.query = search.value;
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      // surgical swap — the field keeps focus, only the body below changes
+      document.getElementById('shelf-body')?.replaceWith(renderShelfBody());
+    }, 120);
+  });
+  main.append(search);
+  main.append(renderShelfBody());
+}
+
+function renderShelfBody() {
+  const main = el('div');
+  main.id = 'shelf-body';
+  if (S.query?.trim()) {
+    renderSearchResults(main, S.query);
+    return main;
+  }
   const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
   main.append(h);
   const sub = el('p', 'shelf-snippet intro');
@@ -611,6 +640,7 @@ function renderShelf(main) {
   });
   main.append(src);
   if (S.sourcesOpen) main.append(licencePanel());
+  return main;
 }
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -988,6 +1018,181 @@ function renderTray(main) {
       main.append(line);
     }
   }
+}
+
+/* --------------------------------------------------------------- search
+ * The Renzo lesson (design doc §7.2): one quiet field eating kanji, kana,
+ * romaji, and English, answering while you type. Four doors, one box. */
+const KATA_TO_HIRA_OFFSET = 0x30a1 - 0x3041;
+function kataToHira(s) {
+  return s.replace(/[ァ-ヶ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - KATA_TO_HIRA_OFFSET));
+}
+
+/** Hepburn-ish romaji → hiragana, table-driven longest match. Returns null
+ * when the input cannot be fully converted (then it is English, not romaji). */
+const ROMAJI = (() => {
+  const m = {
+    kya: 'きゃ', kyu: 'きゅ', kyo: 'きょ', sha: 'しゃ', shu: 'しゅ', sho: 'しょ',
+    cha: 'ちゃ', chu: 'ちゅ', cho: 'ちょ', nya: 'にゃ', nyu: 'にゅ', nyo: 'にょ',
+    hya: 'ひゃ', hyu: 'ひゅ', hyo: 'ひょ', mya: 'みゃ', myu: 'みゅ', myo: 'みょ',
+    rya: 'りゃ', ryu: 'りゅ', ryo: 'りょ', gya: 'ぎゃ', gyu: 'ぎゅ', gyo: 'ぎょ',
+    ja: 'じゃ', ju: 'じゅ', jo: 'じょ', jya: 'じゃ', jyu: 'じゅ', jyo: 'じょ',
+    bya: 'びゃ', byu: 'びゅ', byo: 'びょ', pya: 'ぴゃ', pyu: 'ぴゅ', pyo: 'ぴょ',
+    shi: 'し', chi: 'ち', tsu: 'つ', dzu: 'づ',
+    ka: 'か', ki: 'き', ku: 'く', ke: 'け', ko: 'こ',
+    sa: 'さ', si: 'し', su: 'す', se: 'せ', so: 'そ',
+    ta: 'た', ti: 'ち', tu: 'つ', te: 'て', to: 'と',
+    na: 'な', ni: 'に', nu: 'ぬ', ne: 'ね', no: 'の',
+    ha: 'は', hi: 'ひ', hu: 'ふ', fu: 'ふ', he: 'へ', ho: 'ほ',
+    ma: 'ま', mi: 'み', mu: 'む', me: 'め', mo: 'も',
+    ya: 'や', yu: 'ゆ', yo: 'よ',
+    ra: 'ら', ri: 'り', ru: 'る', re: 'れ', ro: 'ろ',
+    wa: 'わ', wo: 'を',
+    ga: 'が', gi: 'ぎ', gu: 'ぐ', ge: 'げ', go: 'ご',
+    za: 'ざ', zi: 'じ', zu: 'ず', ze: 'ぜ', zo: 'ぞ', ji: 'じ',
+    da: 'だ', di: 'ぢ', du: 'づ', de: 'で', do: 'ど',
+    ba: 'ば', bi: 'び', bu: 'ぶ', be: 'べ', bo: 'ぼ',
+    pa: 'ぱ', pi: 'ぴ', pu: 'ぷ', pe: 'ぺ', po: 'ぽ',
+    a: 'あ', i: 'い', u: 'う', e: 'え', o: 'お',
+  };
+  return (input) => {
+    let s = input.toLowerCase().replace(/[^a-z']/g, '');
+    if (!s) return null;
+    let out = '';
+    while (s.length) {
+      if (s[0] === "'") {
+        s = s.slice(1);
+        continue;
+      }
+      // sokuon: doubled consonant (not n)
+      if (s.length > 1 && s[0] === s[1] && 'kstcpgzdbfhjmyrw'.includes(s[0])) {
+        out += 'っ';
+        s = s.slice(1);
+        continue;
+      }
+      // n before consonant or at end → ん
+      if (s[0] === 'n' && (s.length === 1 || !'aiueoyn'.includes(s[1]))) {
+        out += 'ん';
+        s = s.slice(1);
+        continue;
+      }
+      if (s.startsWith('nn') && (s.length === 2 || !'aiueoy'.includes(s[2]))) {
+        out += 'ん';
+        s = s.slice(2);
+        continue;
+      }
+      let hit = null;
+      for (const len of [3, 2, 1]) {
+        const piece = s.slice(0, len);
+        if (m[piece]) {
+          hit = m[piece];
+          s = s.slice(len);
+          break;
+        }
+      }
+      if (!hit) return null; // not romaji — treat the query as English
+      out += hit;
+    }
+    return out || null;
+  };
+})();
+
+let searchIndex = null;
+function buildSearchIndex() {
+  if (searchIndex) return;
+  searchIndex = [];
+  for (const [w, rec] of Object.entries(D.dict)) {
+    searchIndex.push({
+      t: 'word', id: w, w,
+      r: rec.r || '',
+      rh: kataToHira(rec.r || ''),
+      m: (rec.m || []).join('; ').toLowerCase(),
+      g: rec.m?.[0] || '',
+    });
+  }
+  for (const [c, k] of Object.entries(D.kanji)) {
+    const readings = [...k.on, ...k.kun].join('・');
+    searchIndex.push({
+      t: 'kanji', id: c, w: c,
+      r: readings,
+      rh: kataToHira([...k.on, ...k.kun].join(' ')),
+      m: String(k.m).toLowerCase(),
+      g: k.m,
+    });
+  }
+  for (const g of GRAMMAR) {
+    searchIndex.push({ t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '', m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn });
+  }
+}
+
+function searchResults(query) {
+  buildSearchIndex();
+  const q = query.trim();
+  if (!q) return [];
+  const hasKanji = /[一-鿌]/.test(q);
+  const hasKana = /[぀-ゖァ-ヺ]/.test(q);
+  const qh = hasKana ? kataToHira(q) : ROMAJI(q);
+  const ql = q.toLowerCase();
+  const scored = [];
+  for (const e of searchIndex) {
+    let score = -1;
+    if (hasKanji) {
+      if (e.w === q) score = 100;
+      else if (e.w.startsWith(q)) score = 80;
+      else if (e.w.includes(q)) score = 60;
+    } else if (hasKana) {
+      if (e.rh === qh) score = 100;
+      else if (e.rh.startsWith(qh)) score = 80;
+      else if (e.w.includes(q)) score = 60;
+    } else {
+      // latin: try as romaji reading AND as english
+      if (qh) {
+        if (e.rh === qh) score = Math.max(score, 95);
+        else if (e.rh.startsWith(qh)) score = Math.max(score, 75);
+      }
+      if (e.m) {
+        const at = e.m.indexOf(ql);
+        if (at === 0 || (at > 0 && ' ;('.includes(e.m[at - 1]))) score = Math.max(score, 70);
+        else if (at > 0) score = Math.max(score, 40);
+      }
+    }
+    if (score >= 0) scored.push({ e, score });
+  }
+  scored.sort((a, b) => b.score - a.score || a.e.w.length - b.e.w.length);
+  return scored.slice(0, 40).map((x) => x.e);
+}
+
+function renderSearchResults(main, query) {
+  const results = searchResults(query);
+  const box = el('div', 'entry-rows');
+  box.id = 'search-results';
+  for (const e of results) {
+    const row = el('button', 'entry-row compound');
+    row.type = 'button';
+    row.dataset.result = `${e.t}:${e.id}`;
+    if (e.t === 'kanji') {
+      row.append(el('span', 'row-glyph', e.w));
+      const stack = el('span', 'row-stack');
+      stack.append(el('span', 'row-gloss', e.g));
+      stack.append(el('span', 'row-gloss', e.r));
+      row.append(stack);
+    } else {
+      const stack = el('span', 'row-stack');
+      const top = el('span', 'row-word');
+      top.append(document.createTextNode(e.w));
+      if (e.r) top.append(el('span', 'row-reading', e.r));
+      stack.append(top);
+      if (e.g) stack.append(el('span', 'row-gloss', e.g));
+      row.append(stack);
+    }
+    row.append(el('span', 'row-go', '›'));
+    row.addEventListener('click', () => go({ t: e.t, id: e.id }));
+    box.append(row);
+  }
+  if (!results.length) {
+    box.append(el('div', 'sem-empty', tx('見つからない。', 'Nothing found for that yet.')));
+  }
+  main.append(box);
 }
 
 /* -------------------------------------------------------------- grammar */
