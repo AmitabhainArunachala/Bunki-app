@@ -21,24 +21,34 @@ Live at `/corridor/` on the Pages site.
    `packages/domain`'s pinned parameters.
 6. **Return** — back to the reader at the same scroll position.
 
-## The four variants (§3 of the brief)
+## The variants (§3 of the brief, plus v1.1 operator feedback)
 
 Switch them in the 変異 strip at the bottom, or by query string:
 
-| ticket | key | options |
+| ticket | key | options (first = default) |
 | --- | --- | --- |
 | #38 card format | `cards` | `mcd` · `word` |
 | #43 difficulty presentation | `difficulty` | `three` · `band` |
-| #47 legibility vs depth | `contrast` | `current` · `wcag` |
-| #37 entry | `entry` | `field` · `shelf` |
+| #47 legibility vs depth | `contrast` | `wcag` · `current` |
+| #37 entry | `entry` | `field` · `shelf` (default `shelf`) |
+| v1.1 depth | `depth` | `layered` · `flat` |
 
-`?entry=shelf&cards=word&difficulty=band&contrast=wcag` — and `?dials=0,2,1`
+`?entry=shelf&cards=word&difficulty=band&contrast=current` — and `?dials=0,2,1`
 for the reader dials (kanji, furigana, spacing).
+
+**v1.1 (operator feedback, 2026-08-07).** Navigation chrome is bilingual by
+default — a learner must be able to steer the app before they can read
+Japanese. `?ui=ja` (or the EN button in the chrome) switches to 日本語のみ, the
+opt-in immersion chrome; content is always Japanese. The same feedback round
+flipped the defaults to WCAG-AA contrast and a layered depth treatment
+(ground / card / sheet elevation, 藍 indigo for "tappable", 弁柄 red reserved
+for readings and warnings); the v1.0 look survives as
+`?depth=flat&contrast=current&ui=ja`.
 
 ## Running it locally
 
 ```sh
-node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 38 checks + the screenshot set
+node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 42 checks + the screenshot set
 python3 -m http.server -d prototypes/corridor 8080     # then open http://127.0.0.1:8080/
 ```
 

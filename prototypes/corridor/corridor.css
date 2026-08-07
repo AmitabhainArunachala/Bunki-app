@@ -942,3 +942,226 @@ h1.view-title {
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
+
+/* ==================================================== v1.1 · 2026-08-07 ===
+ * Operator feedback on v1.0, in two strokes:
+ *
+ * 1. Navigation must be readable before the learner can read Japanese.
+ *    The chrome is bilingual by default; 日本語のみ is the opt-in immersion
+ *    mode (the EN button in the chrome, or ?ui=ja). Content stays Japanese.
+ *
+ * 2. More contrast, more depth between layers. 藍 (ai) indigo joins 弁柄
+ *    red so red can go back to meaning exactly two things — readings and
+ *    warnings — while indigo marks "you can go here": tappable words,
+ *    word-chips, signal fills, licence provenance. The layered treatment
+ *    (variant E) separates ground / card / sheet with real elevation.
+ *    WCAG contrast (variant C) becomes the default; the old fade remains
+ *    a toggle so #47 stays decidable by looking.
+ */
+
+:root {
+  --ground-0: #fffdf6; /* raised paper — cards and the sheet */
+  --ai: #2e4d6e; /* 藍 indigo: the "you can go here" colour */
+  --ai-wash: rgba(46, 77, 110, 0.08);
+}
+
+/* ------------------------------------------------------ bilingual chrome */
+.en-sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  text-transform: lowercase;
+  line-height: 1.3;
+  color: inherit;
+  opacity: 0.62;
+  margin-top: 1px;
+}
+
+button .l-ja {
+  display: block;
+  line-height: 1.25;
+}
+
+.chrome button,
+.seg button,
+#variants .vseg button,
+.take {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.en-inline {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: inherit;
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+.kv dt .en-sub,
+.sched th .en-sub,
+.sched td .en-sub {
+  display: inline;
+  margin-left: 5px;
+}
+
+#lang[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
+
+/* the shelf's own introduction is instruction, not a preview — never clamp it */
+.shelf-snippet.intro {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+/* ------------------------------------------------- sheet scrim (tap-out) */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(20, 24, 28, 0.16);
+  animation: scrim-in 0.18s ease;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------- variant E · layered depth */
+body.v-depth-layered {
+  background-color: var(--ground-2);
+}
+
+body.v-depth-layered .chrome {
+  background: color-mix(in srgb, var(--ground-0) 94%, transparent);
+  border-bottom-color: var(--line);
+}
+
+body.v-depth-layered .shelf-item {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 14px 14px 16px;
+  margin: 0 0 12px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered .shelf-item:first-of-type {
+  border-top: 1px solid var(--line-soft);
+}
+
+body.v-depth-layered #reader,
+body.v-depth-layered .dials {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered #reader {
+  padding: 16px 15px;
+  margin-top: 10px;
+}
+
+body.v-depth-layered .sheet {
+  background: var(--ground-0);
+  box-shadow: 0 -18px 56px rgba(20, 24, 28, 0.26);
+}
+
+body.v-depth-layered .scrim {
+  background: rgba(20, 24, 28, 0.3);
+}
+
+body.v-depth-layered .sem-group {
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 10px 12px 4px;
+}
+
+body.v-depth-layered .note {
+  background: var(--ground-2);
+  border-radius: 0 6px 6px 0;
+  padding: 9px 11px 9px 10px;
+}
+
+body.v-depth-layered .card-preview {
+  border-radius: 8px;
+}
+
+body.v-depth-layered .chip {
+  background: var(--ground-0);
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(20, 24, 28, 0.06);
+}
+
+/* node kinds get distinct edges: 弁柄 for kanji, 藍 for words, dashed for
+ * parts, doubled for idioms — so the graph's layers read at a glance */
+body.v-depth-layered .chip.t-kanji {
+  border-top: 2px solid color-mix(in srgb, var(--red) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-word {
+  border-top: 2px solid color-mix(in srgb, var(--ai) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-radical {
+  border-style: dashed;
+}
+
+body.v-depth-layered .chip.t-idiom {
+  border-top: 3px double color-mix(in srgb, var(--ink-2) 70%, var(--line));
+}
+
+/* what is tappable says so: content words carry a quiet indigo stitch */
+body.v-depth-layered .tok.content {
+  border-bottom: 1px dotted color-mix(in srgb, var(--ai) 55%, transparent);
+  padding-bottom: 1px;
+}
+
+body.v-depth-layered .sig-fill {
+  background: var(--ai);
+}
+
+/* provenance is information, not alarm — indigo, leaving red to warnings */
+body.v-depth-layered .pool-tag.sa {
+  color: var(--ai);
+  border-color: color-mix(in srgb, var(--ai) 65%, var(--line));
+}
+
+body.v-depth-layered .sched th {
+  border-bottom: 2px solid var(--line);
+}
+
+body.v-depth-layered .sched tr:nth-child(even) td {
+  background: var(--ground-2);
+}
+
+body.v-depth-layered .take {
+  box-shadow: 0 2px 8px rgba(20, 24, 28, 0.18);
+}
+
+body.v-depth-layered .inline-link {
+  color: var(--ai);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim {
+    animation: none;
+  }
+}
