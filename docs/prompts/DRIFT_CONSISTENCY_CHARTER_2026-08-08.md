@@ -18,9 +18,11 @@ whole matrix — and the matrix itself has become a permanent harness.
 
 One grammar, one meaning, every node, every state, every theme:
 
-- **C1 · tap** unfolds (furigana), tap-again glosses (English), third tap
-  folds. On a free word it also blooms the constellation. Identical for
-  every word — kanji-rich, single-kanji, and kana-only alike.
+- **C1 · tap** unfolds (furigana), tap-again glosses (English), and the
+  third tap carries you in — the dive; committing to a word is the third
+  act (§8.14, ratified). On a free word the first tap also blooms the
+  constellation. Identical for every word — kanji-rich, single-kanji, and
+  kana-only alike.
 - **C2 · no dead nodes.** A word with no kanji family still answers: it
   unfolds, and its bloom draws from semantic/level/reading neighbours
   instead of kanji kin. Nothing ever responds with _nothing_, and nothing

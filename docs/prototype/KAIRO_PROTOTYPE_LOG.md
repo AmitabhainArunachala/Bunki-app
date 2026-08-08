@@ -471,3 +471,53 @@ drag-carries-the-constellation-and-sticks, water-tap release. Known niggle,
 filed honestly: ring satellites can overlap each other at similar angles
 (no label collision resolution yet — 飛び出す/出勤 touched in the round's
 screenshot).
+
+---
+
+## 11. The consistency charter's first execution (2026-08-08, operator escalation)
+
+Operator: deep, thorough inconsistency across the drift architecture — words
+that explode or vanish on touch, satellite views only some words produce.
+Standing order ratified into `docs/prompts/DRIFT_CONSISTENCY_CHARTER_2026-08-08.md`:
+an eight-law interaction contract, an empirical sweep, root cause before fix,
+and the sweep as a permanent floor.
+
+**The instrument:** `tools/verify-drift-consistency.mjs` — hermetic
+CDP-touch batteries (fresh boot + virgin store per word) over stratified
+samples, auto-classified against the contract.
+
+**First sweep (16 words × battery): 18 violations, two clusters, both
+root-caused and fixed:**
+
+1. **16/16 words destroyed by a slow drag.** `grade()` fired on a 52px
+   distance threshold with no velocity term — dragging a word anywhere was
+   indistinguishable from judging it. Fix: the judgment is a FLICK
+   (held<330ms OR >0.45px/ms, horizontal); a slow drag now MOVES any free
+   word and commits to world space. Verified both ways: flick grades
+   (済み 1), slow drag moves and survives.
+2. **Dead blooms on small kanji families** (翼・刈る: zero satellites).
+   Fix: the lock's cascading-channel design comes to the tap-bloom —
+   shared kanji, then radical kin, then nearest level neighbours, floor 6;
+   kana-only words bloom their level neighbourhood. 翼 now blooms 14.
+
+**Then the deepest one, found by pressing what the operator pressed:**
+`refreshActive()` recycles any DOM word outside the top-64 priority set
+every 650ms — blind to whether the user is HOLDING it. The lock's camera
+glide reshuffles priorities, so the pressed word itself was culled
+mid-constellation: centre gone → every thread stops drawing → "it just
+disappears," nondeterministically, exactly as reported. Fix: words in an
+open bloom/lock (hl/lk/hlDom/focusN) are pinned against the recycler.
+The lock now assembles and HOLDS: centre in accent, pins large, the whole
+family on visible typed threads.
+
+Ridden along, per charter C7: lock hub lines 0.34→0.55 @1.7px, typed edges
+0.3→0.55 @1.5px, ghosts 0.26→0.5; dive brush passes end at 0.5 (was 0.3);
+whispers 0.18; lock anchor `LOCK.bx/by` tracks the centre's LIVE position
+(the bloom's detach bug had a twin in the lock); lock centre and
+DOM members wear the relief.
+
+**State: sweep 40/40 dry on the covered battery; corridor verifier 90/90.**
+Honest scope: the battery covers tap/gloss/pinch/slow-drag/cancel on free
+words; flick-grades verified by probe. Not yet in the matrix: dive-depth
+gestures, kana-only strata (rare in viewport samples), 夜 theme, soak.
+The charter stays open until the full matrix runs dry.
