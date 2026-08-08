@@ -25,7 +25,24 @@ const target = { kind: 'word', id: '静か' } as const;
 const envelope = (
   action: InteractionAction,
   modality: InteractionModality = 'programmatic',
-): InteractionEnvelope => ({ action, provenance: { modality } });
+  sourceId?: string,
+): InteractionEnvelope => ({
+  action,
+  provenance: sourceId === undefined ? { modality } : { modality, sourceId },
+});
+
+const representativeActions: Record<(typeof INTERACTION_ACTION_KINDS)[number], InteractionAction> =
+  {
+    'target.activate': { kind: 'target.activate', target },
+    'quickLook.open': { kind: 'quickLook.open', target },
+    'entry.open': { kind: 'entry.open', target },
+    'selection.move': { kind: 'selection.move', direction: 'next', itemCount: 3 },
+    'constellation.lock': { kind: 'constellation.lock', target },
+    'tide.set': { kind: 'tide.set', level: 4 },
+    'judgment.nominate': { kind: 'judgment.nominate', target, judgment: 'good' },
+    'navigation.back': { kind: 'navigation.back' },
+    'layer.dismiss': { kind: 'layer.dismiss' },
+  };
 
 describe('A0.5 interaction action vocabulary', () => {
   it('contains every ratified substrate-neutral action and no accidental aliases', () => {
@@ -50,44 +67,30 @@ describe('A0.5 interaction action vocabulary', () => {
   });
 
   it.each(INTERACTION_ACTION_KINDS)('reduces %s through the common action envelope', (kind) => {
-    const actions: Record<(typeof INTERACTION_ACTION_KINDS)[number], InteractionAction> = {
-      'target.activate': { kind: 'target.activate', target },
-      'quickLook.open': { kind: 'quickLook.open', target },
-      'entry.open': { kind: 'entry.open', target },
-      'selection.move': { kind: 'selection.move', direction: 'next', itemCount: 3 },
-      'constellation.lock': { kind: 'constellation.lock', target },
-      'tide.set': { kind: 'tide.set', level: 4 },
-      'judgment.nominate': {
-        kind: 'judgment.nominate',
-        target,
-        judgment: 'good',
-      },
-      'navigation.back': { kind: 'navigation.back' },
-      'layer.dismiss': { kind: 'layer.dismiss' },
-    };
-
     expect(() =>
-      reduceInteraction(initialInteractionState(), envelope(actions[kind])),
+      reduceInteraction(initialInteractionState(), envelope(representativeActions[kind])),
     ).not.toThrow();
   });
 });
 
 describe('input modality is provenance, never behavior', () => {
-  it.each<InteractionModality>(INTERACTION_MODALITIES)(
-    'target.activate has the same result from %s',
-    (modality) => {
-      const baseline = reduceInteraction(
-        initialInteractionState(),
-        envelope({ kind: 'target.activate', target }, 'programmatic'),
-      );
-      const actual = reduceInteraction(
-        initialInteractionState(),
-        envelope({ kind: 'target.activate', target }, modality),
-      );
+  for (const kind of INTERACTION_ACTION_KINDS) {
+    it.each<InteractionModality>(INTERACTION_MODALITIES)(
+      `${kind} has the same result from %s (sourceId included)`,
+      (modality) => {
+        const baseline = reduceInteraction(
+          initialInteractionState(),
+          envelope(representativeActions[kind], 'programmatic', 'baseline-renderer'),
+        );
+        const actual = reduceInteraction(
+          initialInteractionState(),
+          envelope(representativeActions[kind], modality, `${modality}-renderer`),
+        );
 
-      expect(actual).toEqual(baseline);
-    },
-  );
+        expect(actual).toEqual(baseline);
+      },
+    );
+  }
 
   it('keeps the staged reveal law: reading, gloss, then full entry', () => {
     const first = reduceInteraction(
@@ -122,6 +125,32 @@ describe('input modality is provenance, never behavior', () => {
 
     expect(tap).toEqual({ state: initialInteractionState(), effects: [] });
     expect(directEntry.state.entryPath).toEqual([particle]);
+  });
+});
+
+describe('runtime immutability', () => {
+  it('freezes the initial state and every nested collection', () => {
+    const state = initialInteractionState();
+
+    expect(Object.isFrozen(state)).toBe(true);
+    expect(Object.isFrozen(state.entryPath)).toBe(true);
+    expect(Object.isFrozen(state.layers)).toBe(true);
+  });
+
+  it('freezes returned state, nested values, collections, effects, and targets', () => {
+    const result = reduceInteraction(
+      initialInteractionState(),
+      envelope({ kind: 'entry.open', target }),
+    );
+
+    expect(Object.isFrozen(result)).toBe(true);
+    expect(Object.isFrozen(result.state)).toBe(true);
+    expect(Object.isFrozen(result.state.entryPath)).toBe(true);
+    expect(Object.isFrozen(result.state.entryPath[0])).toBe(true);
+    expect(Object.isFrozen(result.state.layers)).toBe(true);
+    expect(Object.isFrozen(result.state.layers[0])).toBe(true);
+    expect(Object.isFrozen(result.effects)).toBe(true);
+    expect(Object.isFrozen(result.effects[0])).toBe(true);
   });
 });
 
