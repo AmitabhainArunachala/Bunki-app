@@ -1,0 +1,27 @@
+name: mimneko-kanji-data-kanken
+upstream:
+  - https://github.com/mimneko/kanji-data
+  - https://raw.githubusercontent.com/mimneko/kanji-data/0be3577f7939ec85d2b4e373a7a94262e7449e13/%E6%BC%A2%E6%A4%9C%E6%BC%A2%E5%AD%97%E8%BE%9E%E5%85%B8%E6%BC%A2%E5%AD%97.csv
+  - https://raw.githubusercontent.com/mimneko/kanji-data/0be3577f7939ec85d2b4e373a7a94262e7449e13/%E9%83%A8%E9%A6%96%E4%B8%80%E8%A6%A7.csv
+retrieved: "2026-08-07"
+licence: CC0-1.0
+licence_url: https://github.com/mimneko/kanji-data/blob/0be3577f7939ec85d2b4e373a7a94262e7449e13/LICENSE
+pool: proprietary_safe
+restrictions:
+  - 「漢検」 is a registered trademark of 日本漢字能力検定協会 — the CC0 facts are usable, but the product must not brand itself with the trademark
+upstream_pin: 0be3577f7939ec85d2b4e373a7a94262e7449e13
+artifact_sha256:
+  kanken_kanji.csv: e3a3bade7bb738f6e25d2ff14ea4118ed3b18d9cd32f49dd6a90f5eb6d8ef84f
+  kanken_radicals.csv: ed762122791f294bba17ac9de4298599bef317dec0756de6852d7047f26ec9dc
+  datasets/kanji/kanken.jsonl: f8f8a98ee064aadbf98b559c3743d7ace18fe62a6801c6365f9a77860a7cafd7
+  datasets/kanji/kanken_radicals.jsonl: 6333deade7b66837cc3b926fb361b4bb48100620c615769b57ceefb9fbca0b1e
+notes: >-
+  The 漢検漢字辞典掲載ページ column (dictionary page numbers) is dropped
+  entirely from all outputs — page placement is the closest thing in this
+  dataset to copied arrangement (編集著作物 exposure); a test asserts the
+  string is absent from every output line. The radicals file's
+  漢検漢字辞典掲載順 (listing-order) column is dropped for the same reason.
+  The upstream README's per-level table is stale (±1 in three places) —
+  the pinned CSV is the source of truth for all counts. The 部首 file is the
+  漢検漢字辞典 classification (214 radicals), which does not match Kangxi 1:1
+  (⼡ U+2F21/⼢ U+2F22 merged; ⺍ U+2E8D added).
