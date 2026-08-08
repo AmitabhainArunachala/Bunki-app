@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-07 23:21",
+          "2026-08-08 00:48",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-07 23:26",
+          "2026-08-08 00:53",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-07 23:30",
+          "2026-08-08 00:57",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-15 23:20",
+          "2026-08-16 00:47",
           "8.30"
         ]
       ]
@@ -388,12 +388,6 @@
         "id": "dials-toggle"
       },
       {
-        "text": "source 原典",
-        "w": 84,
-        "h": 40,
-        "id": "inline-link"
-      },
-      {
         "text": "← 戻るback",
         "w": 72,
         "h": 42,
@@ -558,7 +552,7 @@
       {
         "text": "世界自然遺産に7箇所を追加 ",
         "w": 358,
-        "h": 300,
+        "h": 326,
         "id": "shelf-item"
       },
       {
@@ -570,7 +564,7 @@
       {
         "text": "マリナーズ・イチロー選手 現",
         "w": 358,
-        "h": 335,
+        "h": 306,
         "id": "shelf-item"
       },
       {
@@ -582,7 +576,7 @@
       {
         "text": "JRおおさか東線部分開業JR",
         "w": 358,
-        "h": 253,
+        "h": 278,
         "id": "shelf-item"
       },
       {
@@ -606,7 +600,7 @@
       {
         "text": "ウィキニュース、21年の歴史",
         "w": 358,
-        "h": 335,
+        "h": 306,
         "id": "shelf-item"
       },
       {
@@ -618,7 +612,7 @@
       {
         "text": "野ばらThe Wild Ro",
         "w": 358,
-        "h": 335,
+        "h": 306,
         "id": "shelf-item"
       },
       {
@@ -630,7 +624,7 @@
       {
         "text": "ごん狐Gon the Fox",
         "w": 358,
-        "h": 362,
+        "h": 333,
         "id": "shelf-item"
       },
       {
@@ -642,7 +636,7 @@
       {
         "text": "やまなしYamanashi ",
         "w": 358,
-        "h": 381,
+        "h": 352,
         "id": "shelf-item"
       },
       {
@@ -654,7 +648,7 @@
       {
         "text": "育児休業Childcare ",
         "w": 358,
-        "h": 229,
+        "h": 255,
         "id": "shelf-item"
       },
       {
@@ -666,7 +660,7 @@
       {
         "text": "育児休業給付金Childca",
         "w": 358,
-        "h": 282,
+        "h": 278,
         "id": "shelf-item"
       },
       {
@@ -678,7 +672,187 @@
       {
         "text": "遺族基礎年金Basic su",
         "w": 358,
-        "h": 308,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族厚生年金Employee",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "医療保険Medical in",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証明書Seal-re",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証Seal-regi",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "オーバーステイOversta",
+        "w": 358,
+        "h": 255,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "大家LandlordInte",
+        "w": 358,
+        "h": 229,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "介護Long-term ca",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "静かな朝A Quiet Mo",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の古本屋The Sec",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "知らない町を歩くWalkin",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "山を歩きながら考えたことTh",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "AI時代の知識と判断Know",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "五箇条の御誓文The Cha",
+        "w": 358,
+        "h": 306,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "方丈記 · 冒頭Hōjōki",
+        "w": 358,
+        "h": 278,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details · ra",
+        "w": 142,
+        "h": 40,
+        "id": "details-toggle"
+      },
+      {
+        "text": "徒然草 · 序段Tsurez",
+        "w": 358,
+        "h": 278,
         "id": "shelf-item"
       },
       {
@@ -706,8 +880,8 @@
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
       "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
-      "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 3 words beyond the core",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2005-07-15",
@@ -719,19 +893,19 @@
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
       "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the core",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2006-06-17",
         "CC BY 4.0"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
       "title": "JRおおさか東線部分開業",
       "titleEn": "JR Osaka-Higashi Line partially opens",
-      "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 3 words beyond the core",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2008-03-15",
@@ -743,7 +917,7 @@
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
       "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 3 words beyond the core",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2011-04-28",
@@ -755,95 +929,259 @@
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "titleEn": "Wikinews closes the curtain on 21 years",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the core",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2026-05-03",
         "CC BY 4.0"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
       "title": "野ばら",
       "titleEn": "The Wild Rose — Ogawa Mimei",
-      "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 8 words beyond the core",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 小川未明",
         "None",
         "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
       "title": "ごん狐",
       "titleEn": "Gon the Fox — Niimi Nankichi",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 9 words beyond the core",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 新美南吉",
         "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
         "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
       "title": "やまなし",
       "titleEn": "Yamanashi — Miyazawa Kenji",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 7 words beyond the core",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 宮沢賢治",
         "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
         "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
       "title": "育児休業",
       "titleEn": "Childcare leave",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "育児休業給付金",
+      "titleEn": "Childcare-leave benefit",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "遺族基礎年金",
+      "titleEn": "Basic survivor's pension",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "遺族厚生年金",
+      "titleEn": "Employees' survivor's pension",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "医療保険",
+      "titleEn": "Medical insurance",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証明書",
+      "titleEn": "Seal-registration certificate",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証",
+      "titleEn": "Seal-registration card",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "オーバーステイ",
+      "titleEn": "Overstaying a visa",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "大家",
+      "titleEn": "Landlord",
       "level": "Intermediate",
       "levelNote": "中級前半",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
-      "title": "育児休業給付金",
-      "titleEn": "Childcare-leave benefit",
-      "level": "Beginner",
-      "levelNote": "初級前半 · ~1 in 3 words beyond the core",
+      "title": "介護",
+      "titleEn": "Long-term care",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
     },
     {
-      "title": "遺族基礎年金",
-      "titleEn": "Basic survivor's pension",
+      "title": "静かな朝",
+      "titleEn": "A Quiet Morning",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の古本屋",
+      "titleEn": "The Second-hand Bookshop on a Rainy Day",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 5 words beyond the core",
+      "levelNote": "中級前半 · ~1 in 4 words beyond the JLPT lists",
       "meta": [
-        "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "段階別読み物 · Bunki",
+        "Bunki original"
       ],
-      "disagreement": "signals disagree"
+      "disagreement": null
+    },
+    {
+      "title": "知らない町を歩く",
+      "titleEn": "Walking an Unknown Town",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "一次資料 · Historical primary source",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "古典 · 鴨長明 · 1212",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "古典 · 吉田兼好 · 14th century",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
     }
   ],
   "caps": {
-    "excerptChars": 520,
     "kanjiWordCap": 60,
     "radicalKanjiCap": 80,
     "idiomCap": 900,
-    "idiomCandidates": 3559,
+    "idiomCandidates": 3932,
     "idiomTotalInSource": 4198
   },
   "dials": {
     "baseline": {
-      "rt": 130,
+      "rt": 306,
       "hiddenRt": 0,
       "spacing": "reader",
       "text": "2005年ねん7月がつ14日か、南みなみアフリカ共和きょうわ国こくダーバンで開催"
@@ -897,113 +1235,259 @@
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
       "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
-      "level": "Advanced上級前半 · ~1 in 3 words beyond the core",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
       "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "JRおおさか東線部分開業",
       "titleEn": "JR Osaka-Higashi Line partially opens",
-      "level": "Advanced上級前半 · ~1 in 3 words beyond the core",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
       "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
-      "level": "Upper advanced上級後半 · ~1 in 3 words beyond the core",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "titleEn": "Wikinews closes the curtain on 21 years",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "野ばら",
       "titleEn": "The Wild Rose — Ogawa Mimei",
-      "level": "Upper beginner初級後半 · ~1 in 8 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "ごん狐",
       "titleEn": "Gon the Fox — Niimi Nankichi",
-      "level": "Intermediate中級前半 · ~1 in 9 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "やまなし",
       "titleEn": "Yamanashi — Miyazawa Kenji",
-      "level": "Upper beginner初級後半 · ~1 in 7 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "育児休業",
       "titleEn": "Childcare leave",
-      "level": "Intermediate中級前半",
-      "disagreement": "signals disagree"
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "育児休業給付金",
       "titleEn": "Childcare-leave benefit",
-      "level": "Beginner初級前半 · ~1 in 3 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "遺族基礎年金",
       "titleEn": "Basic survivor's pension",
-      "level": "Intermediate中級前半 · ~1 in 5 words beyond the core",
-      "disagreement": "signals disagree"
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "遺族厚生年金",
+      "titleEn": "Employees' survivor's pension",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "医療保険",
+      "titleEn": "Medical insurance",
+      "level": "Advanced上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証明書",
+      "titleEn": "Seal-registration certificate",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証",
+      "titleEn": "Seal-registration card",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "オーバーステイ",
+      "titleEn": "Overstaying a visa",
+      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "大家",
+      "titleEn": "Landlord",
+      "level": "Intermediate中級前半",
+      "disagreement": null
+    },
+    {
+      "title": "介護",
+      "titleEn": "Long-term care",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "静かな朝",
+      "titleEn": "A Quiet Morning",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の古本屋",
+      "titleEn": "The Second-hand Bookshop on a Rainy Day",
+      "level": "Intermediate中級前半 · ~1 in 4 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "知らない町を歩く",
+      "titleEn": "Walking an Unknown Town",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     }
   ],
   "counts": {
-    "passages": 11,
-    "words": 7217,
+    "passages": 26,
+    "articleFiles": 26,
+    "words": 7910,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 245,
+  "loadMs": 211,
   "summary": {
-    "total": 71,
+    "total": 82,
     "failed": 0
   },
   "results": [
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 245 ms"
+      "detail": "26 texts, ready in 211 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "11 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Advanced上級前半 · ~1 in 3 words beyond the core"
+      "detail": "26 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
     },
     {
-      "name": "disagreement is visible where it fires",
+      "name": "disagreement fires only where two-plus ordinal signals were measured",
       "pass": true,
-      "detail": "8/11 texts flagged"
+      "detail": "0 flagged; 0 articles with >=2 ordinal signals"
     },
     {
-      "name": "the raw three signals unfold behind 詳細",
+      "name": "the raw signals unfold behind 詳細 — separate, never averaged",
       "pass": true,
-      "detail": "3 signal rows on the opened card"
+      "detail": "3 signal rows on the opened card: jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair"
+    },
+    {
+      "name": "the JLPT-lexicon signal is live on the opened card",
+      "pass": true,
+      "detail": "jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair"
+    },
+    {
+      "name": "the NINJAL pair is either measured or marked 未測定 — never faked",
+      "pass": true,
+      "detail": "国語研語彙NINJAL pair → not measured"
+    },
+    {
+      "name": "Phase 1 · the shelf holds dozens of articles",
+      "pass": true,
+      "detail": "26 articles"
+    },
+    {
+      "name": "Phase 1 · all 8 parked v11 texts stand on the shelf",
+      "pass": true,
+      "detail": "8/8 present"
+    },
+    {
+      "name": "Phase 1 · the index is lean — article bodies live in their own files",
+      "pass": true,
+      "detail": "26 per-article files"
+    },
+    {
+      "name": "Phase 1 · every article carries live signals or an honest absence",
+      "pass": true,
+      "detail": "jreadability + jlpt_lexicon live; NINJAL pair measured or reason recorded"
+    },
+    {
+      "name": "Phase 1 · ごん狐 stands on the shelf",
+      "pass": true,
+      "detail": "shelf index 6"
+    },
+    {
+      "name": "Phase 1 · the story ships full-length — no 520-char excerpt",
+      "pass": true,
+      "detail": "6144 chars rendered"
+    },
+    {
+      "name": "Phase 1 · the story reaches its final line",
+      "pass": true,
+      "detail": "the closing sentence is present"
+    },
+    {
+      "name": "Phase 1 · paragraphs survive into the reader",
+      "pass": true,
+      "detail": "81 paragraph breaks"
+    },
+    {
+      "name": "Phase 1 · a v11 original carries real furigana from the pipeline",
+      "pass": true,
+      "detail": "63 <rt> elements in 静かな朝"
     },
     {
       "name": "the reader shows real Japanese",
       "pass": true,
-      "detail": "900 chars rendered"
+      "detail": "2150 chars rendered"
     },
     {
       "name": "furigana renders as real ruby",
       "pass": true,
-      "detail": "130 <rt> elements"
+      "detail": "306 <rt> elements"
     },
     {
       "name": "the text-settings dials fold away until asked for",
@@ -1013,7 +1497,7 @@
     {
       "name": "dial · furigana alone changes furigana",
       "pass": true,
-      "detail": "rt 130 → 0, spacing class unchanged"
+      "detail": "rt 306 → 0, spacing class unchanged"
     },
     {
       "name": "dial · spacing alone changes spacing",
@@ -1023,7 +1507,7 @@
     {
       "name": "文節 grouping is real",
       "pass": true,
-      "detail": "136 文節 groups"
+      "detail": "350 文節 groups"
     },
     {
       "name": "dial · kanji alone changes the script",
@@ -1033,7 +1517,7 @@
     {
       "name": "furigana can be held back and revealed",
       "pass": true,
-      "detail": "130 ruby present but hidden"
+      "detail": "306 ruby present but hidden"
     },
     {
       "name": "grammar · the first tap reveals furigana instantly, opening nothing",
@@ -1043,7 +1527,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 509.8 → 509.0px"
+      "detail": "gloss on, glyph bottom 535.3 → 534.6px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -1193,7 +1677,7 @@
     {
       "name": "variant D · shelf entry",
       "pass": true,
-      "detail": "11 texts"
+      "detail": "26 texts"
     },
     {
       "name": "focused content dominates the background chrome",
@@ -1213,7 +1697,7 @@
     {
       "name": "every visible control is at least 40px",
       "pass": true,
-      "detail": "57 controls checked"
+      "detail": "86 controls checked"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -1323,7 +1807,7 @@
     {
       "name": "particles · the reader marks particle tokens as doors",
       "pass": true,
-      "detail": "66 particle tokens wired"
+      "detail": "144 particle tokens wired"
     },
     {
       "name": "particles · holding a particle opens its page with examples",

@@ -65,30 +65,45 @@ with `node tools/build_dictionary.mjs`.
 ## Running it locally
 
 ```sh
-node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 55 checks + the screenshot set
+node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 82 checks + the screenshot set
 python3 -m http.server -d prototypes/corridor 8080     # then open http://127.0.0.1:8080/
 ```
 
+## The article pipeline (Phase 1 of the build brief)
+
+The shelf flows through **`tools/build_articles.py`** — the batch command
+that turns every rights-clean text into one article JSON (tokens, furigana,
+paragraph starts, level signals, provenance) plus a light `data/articles/
+index.json` the corridor boots from. Articles load lazily per file and are
+prefetched in the background; adding an article to the shelf is adding a
+file. Sources are all in-repo: the corpus samples (wikinews · aozora ·
+やさしい日本語, full-length — the 520-char excerpt cap is gone) and the 8
+v11 reading-catalog texts (5 Bunki originals, pool `original`; 3
+public-domain classics).
+
+Level signals per article, stored separately, never averaged: jreadability
+(live), JLPT-lexicon coverage + band vector (live, substrate
+`open-anki-jlpt-decks/wbig-6687`, unofficial), and the NINJAL pair — measured
+when the pinned substrate is reachable from the build environment, otherwise
+recorded as `unavailable` with the reason and rendered 未測定. **Every signal
+shown is true of the exact text displayed**; the verifier enforces it.
+
 ## Rebuilding the data
 
-`prototypes/corridor/data/**` is committed so the surface is static. To rebuild
-it you need the corpus branches checked out (PRs #52–#58 are **closed but not
-merged** — their branches are alive) and the grader's runtime:
+The corpus branches (PRs #52–#58) are merged on this branch since Phase 1 —
+no cross-branch checkouts needed. With the grader's runtime installed:
 
 ```sh
-git checkout origin/corpus/01-wikinews -- corpus/samples/wikinews
-git checkout origin/corpus/02-aozora   -- corpus/samples/aozora
-git checkout origin/corpus/04-kanji-data -- corpus/datasets/kanji
-git checkout origin/corpus/05-jmdict-idioms -- corpus/datasets/jmdict_idioms
-git checkout origin/corpus/06-yasashii-nihongo -- corpus/samples/yasashii
-git checkout origin/corpus/07-grader -- corpus/src/corpus/grading
-
-python3 -m venv .venv && .venv/bin/pip install fugashi unidic-lite jreadability
+python3 -m venv .venv && .venv/bin/pip install --upgrade setuptools wheel
+.venv/bin/pip install fugashi unidic-lite jreadability==1.1.5
+# optional — fills in the NINJAL signal pair (sha256 pinned in ninjal/PROVENANCE.yml):
 mkdir -p corpus/data/ninjal && curl -o corpus/data/ninjal/rokusyutaisyo.csv \
-  https://mmsrv.ninjal.ac.jp/brfvep/rokusyutaisyo.csv   # sha256 pinned in ninjal/PROVENANCE.yml
+  https://mmsrv.ninjal.ac.jp/brfvep/rokusyutaisyo.csv
 
-CORPUS_DATA_DIR=$PWD/corpus/data .venv/bin/python prototypes/corridor/tools/build_corridor.py
+PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_articles.py
+PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_corridor.py
 node prototypes/corridor/tools/build_fsrs_pin.mjs
+node prototypes/corridor/tools/build-standalone.mjs
 ```
 
 Debian's patched setuptools cannot build `unidic-lite`'s sdist
