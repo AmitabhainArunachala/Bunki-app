@@ -9,7 +9,9 @@
  * console prints the cluster table the fix phase works from.
  *
  * Usage:
- *   node verify-drift-consistency.mjs [--words N] [--shots DIR] [--out FILE]
+ *   node verify-drift-consistency.mjs [--mode fast|full] [--words N]
+ *     [--chain-hops N] [--fuzz-seeds N,N,N] [--fuzz-gestures N]
+ *     [--soak-ms N] [--shots DIR] [--out FILE]
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
  *   tap            → unfolds + blooms (C1, C2)   [kana words included]
@@ -34,10 +36,42 @@ const arg = (name, fallback) => {
   const i = argv.indexOf(name);
   return i >= 0 ? argv[i + 1] : fallback;
 };
-const N_WORDS = Number(arg('--words', 24));
+const numberArg = (name, fallback, { min = 0 } = {}) => {
+  const value = Number(arg(name, fallback));
+  if (!Number.isFinite(value) || value < min) throw new Error(`${name} must be a number >= ${min}`);
+  return value;
+};
+const MODE = arg('--mode', 'fast');
+if (!['fast', 'full'].includes(MODE)) throw new Error('--mode must be fast or full');
+
+// `fast` is the bounded PR gate. `full` selects the binding A0 quantities,
+// but the receipt below still refuses to promote obligations the instrument
+// does not yet encode (notably the complete node × gesture × state matrix and
+// randomized fuzz). A selected mode is never itself evidence.
+const N_WORDS = numberArg('--words', MODE === 'full' ? 200 : 3, { min: 1 });
+const CHAIN_HOPS = numberArg('--chain-hops', MODE === 'full' ? 25 : 3, { min: 1 });
+const SOAK_MS = numberArg('--soak-ms', MODE === 'full' ? 300_000 : 0);
+const FUZZ_GESTURES = numberArg('--fuzz-gestures', MODE === 'full' ? 400 : 12);
+const FUZZ_SEEDS = String(arg('--fuzz-seeds', MODE === 'full' ? '1729,2718,3141' : '1729'))
+  .split(',')
+  .filter(Boolean)
+  .map((seed) => Number(seed));
+if (FUZZ_SEEDS.some((seed) => !Number.isSafeInteger(seed))) throw new Error('--fuzz-seeds must be comma-separated integers');
 const SHOTS = resolve(arg('--shots', join(TOOL_DIR, '..', '..', '..', 'docs', 'audits', 'drift-consistency-shots')));
 const OUT = resolve(arg('--out', join(TOOL_DIR, '..', '..', '..', 'docs', 'audits', 'drift-consistency-report.json')));
 mkdirSync(SHOTS, { recursive: true });
+mkdirSync(dirname(OUT), { recursive: true });
+
+const startedAt = new Date().toISOString();
+const cases = [];
+const pageErrors = [];
+let fatalError = null;
+let matrixWordsTested = 0;
+let chainCompleted = 0;
+const chainStrata = new Set();
+let strataProbe = { status: 'not-run' };
+let soakProbe = { status: SOAK_MS ? 'pending' : 'not-run', durationMs: SOAK_MS };
+const fuzzCompleted = new Map(FUZZ_SEEDS.map((seed) => [seed, 0]));
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -59,16 +93,29 @@ const server = createServer((q, r) => {
 });
 const base = await new Promise((ok) => server.listen(0, '127.0.0.1', () => ok(`http://127.0.0.1:${server.address().port}`)));
 
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
-const ctx = await browser.newContext({
+let browser;
+let page;
+try {
+  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  const ctx = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
   isMobile: true,
   hasTouch: true,
 });
-await ctx.addInitScript('try{localStorage.clear()}catch(e){}');
-const page = await ctx.newPage();
-const pageErrors = [];
+await ctx.addInitScript(`(() => {
+  try { localStorage.clear(); } catch (error) {}
+  const raw = new URL(location.href).searchParams.get('__fuzzSeed');
+  if (raw == null) return;
+  let state = (Number(raw) >>> 0) || 0x9e3779b9;
+  Math.random = () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000;
+  };
+})()`);
+page = await ctx.newPage();
 page.on('pageerror', (e) => pageErrors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && pageErrors.push(m.text()));
 const cdp = await ctx.newCDPSession(page);
@@ -102,10 +149,52 @@ const pinchAt = async (cx, cy, r0, r1, ms = 320, steps = 8) => {
   await touch('touchEnd', []);
 };
 
-const boot = async () => {
-  await page.goto(`${base}/index.html?entry=drift`);
+let currentTheme = '北斎';
+let shotN = 0;
+const file = async (word, gesture, expected, outcome, detail, extra = {}) => {
+  const bad = outcome !== 'ok';
+  const entry = {
+    word: word.w,
+    kanji: word.kanji ?? null,
+    theme: currentTheme,
+    gesture,
+    expected,
+    outcome,
+    detail,
+    shot: null,
+    ...extra,
+  };
+  if (bad && shotN < 40 && page) {
+    const safeGesture = gesture.replace(/[^a-z0-9-]+/gi, '-');
+    entry.shot = `case-${String(++shotN).padStart(2, '0')}-${safeGesture}.png`;
+    try {
+      await page.screenshot({ path: join(SHOTS, entry.shot) });
+    } catch (error) {
+      entry.screenshotError = error instanceof Error ? error.message : String(error);
+      pageErrors.push(`failure screenshot failed for ${gesture}: ${entry.screenshotError}`);
+      entry.shot = null;
+    }
+  }
+  cases.push(entry);
+  const mark = bad ? ' !! ' : ' ok ';
+  console.log(`${mark}${word.w.padEnd(12)} ${gesture.padEnd(18)} ${outcome}${detail ? ' — ' + detail : ''}`);
+};
+
+const boot = async (theme = '北斎', fuzzSeed = null) => {
+  const seedQuery = Number.isSafeInteger(fuzzSeed) ? `&__fuzzSeed=${fuzzSeed}` : '';
+  await page.goto(`${base}/index.html?entry=drift${seedQuery}`);
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await page.waitForTimeout(2100);
+  for (let attempts = 0; attempts < 5; attempts++) {
+    const observed = await page.locator('#theme').textContent();
+    if (observed === theme) {
+      currentTheme = theme;
+      return;
+    }
+    await page.locator('#theme').click();
+    await page.waitForTimeout(80);
+  }
+  throw new Error(`theme ${theme} was not reachable through the visible theme control`);
 };
 await boot();
 
@@ -114,10 +203,10 @@ await boot();
   const WBIG = JSON.parse(readFileSync(resolve(CORRIDOR, '..', 'drift', 'data', 'wbig.json'), 'utf8'));
   const LVL = new Map(WBIG.map((e) => [e[0], e[3]]));
   const lvlBox = await page.evaluate(
-    `(() => { const r = document.getElementById('lvl').getBoundingClientRect(); return { x: r.left + 17, top: r.top, h: r.height }; })()`,
+    `(() => { const r = document.getElementById('lvl').getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, w: r.width, h: r.height }; })()`,
   );
   await touch('touchStart', [[lvlBox.x, lvlBox.top + lvlBox.h * 0.2]]);
-  await page.waitForTimeout(220);
+  await page.waitForTimeout(320);
   const hot = await page.evaluate(
     `(() => { const el = document.getElementById('lvl'); return { hot: el.classList.contains('hot'), width: el.getBoundingClientRect().width }; })()`,
   );
@@ -128,15 +217,19 @@ await boot();
   );
   const levelled = words.map((w) => LVL.get(w)).filter(Boolean);
   const n1Share = levelled.length ? levelled.filter((l) => l === 1).length / levelled.length : 0;
-  const tideOk = hot.hot && hot.width >= 44 && n1Share >= 0.8;
+  const tideOk = lvlBox.w >= 44 && hot.hot && hot.width >= 44 && n1Share >= 0.8;
   console.log(
     `${tideOk ? '  ok  ' : ' FAIL '}tide · the slider answers the finger and the field obeys the stop — ` +
-      `hot=${hot.hot} width=${hot.width.toFixed(0)}px, N1 share ${(n1Share * 100).toFixed(0)}% of ${levelled.length}`,
+      `rest=${lvlBox.w.toFixed(0)}px hot=${hot.hot}/${hot.width.toFixed(0)}px, N1 share ${(n1Share * 100).toFixed(0)}% of ${levelled.length}`,
   );
-  if (!tideOk) {
-    cases.push?.({});
-    pageErrors.push('tide check failed');
-  }
+  await file(
+    { w: 'level tide', kanji: null },
+    'tide-stop',
+    'hot control >=44px and selected level >=80% of visible words',
+    tideOk ? 'ok' : 'misfired',
+    `restWidth=${lvlBox.w.toFixed(1)}px; hot=${hot.hot}; hotWidth=${hot.width.toFixed(1)}px; N1=${(n1Share * 100).toFixed(1)}% (${levelled.length} levelled words)`,
+    { state: 'surface', coordinates: { x: lvlBox.x, y: lvlBox.top + lvlBox.h * 0.2 } },
+  );
   await boot(); // back to the default field for the batteries
 }
 
@@ -213,23 +306,8 @@ const pickWords = (want) => page.evaluate(`(() => {
 })()`);
 
 /* ------------------------------------------------------------- battery */
-const cases = [];
-let shotN = 0;
-const file = async (word, gesture, expected, outcome, detail) => {
-  const bad = outcome !== 'ok';
-  let shot = null;
-  if (bad && shotN < 40) {
-    shot = `case-${String(++shotN).padStart(2, '0')}-${gesture}.png`;
-    await page.screenshot({ path: join(SHOTS, shot) });
-  }
-  cases.push({ word: word.w, kanji: word.kanji, gesture, expected, outcome, detail, shot });
-  const mark = bad ? ' !! ' : ' ok ';
-  console.log(`${mark}${word.w.padEnd(8)} ${gesture.padEnd(14)} ${outcome}${detail ? ' — ' + detail : ''}`);
-};
-const settle = async () => {
-  // a deliberate tap on TRUE open water, found empirically — a fixed point
-  // once landed on the shelf door and quietly navigated the whole app away
-  const water = await page.evaluate(`(() => {
+const waterPoint = () =>
+  page.evaluate(`(() => {
     const boxes = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, .drift-door, #theme, #lvl')]
       .map((el) => el.getBoundingClientRect());
     const spots = [[200, 210], [330, 250], [120, 300], [260, 640], [90, 560], [340, 400]];
@@ -239,9 +317,66 @@ const settle = async () => {
     }
     return { x: 200, y: 150 };
   })()`);
+const settle = async () => {
+  // a deliberate tap on TRUE open water, found empirically — a fixed point
+  // once landed on the shelf door and quietly navigated the whole app away
+  const water = await waterPoint();
   await tapAt(water.x, water.y);
   await page.waitForTimeout(450);
 };
+
+/* -------------------------------- deterministic kana/equivalence stratum */
+await boot();
+const strataSeed = { w: '静か', kanji: 1 };
+const strataExpected = [
+  { label: '穏やか', relation: 'synonym' },
+  { label: 'うるさい', relation: 'kana-only antonym' },
+];
+const lockOpened = await page.evaluate(`window.__lockWord(${JSON.stringify(strataSeed.w)})`);
+await page.waitForTimeout(1400);
+const strataObserved = await page.evaluate(`(() => {
+  const labels = ${JSON.stringify(strataExpected.map((entry) => entry.label))};
+  const result = {};
+  for (const label of labels) {
+    const el = [...document.querySelectorAll('#drift-layer .word')]
+      .find((candidate) => (candidate.querySelector('.base')?.textContent ?? '') === label);
+    if (!el) { result[label] = { exists: false }; continue; }
+    const r = el.getBoundingClientRect();
+    result[label] = {
+      exists: true,
+      interactive: getComputedStyle(el).pointerEvents !== 'none',
+      satellite: el.classList.contains('bsat'),
+      x: r.left + r.width / 2,
+      y: r.top + r.height / 2,
+      onScreen: r.width > 0 && r.right > 0 && r.left < innerWidth && r.bottom > 96 && r.top < innerHeight - 64,
+    };
+  }
+  return result;
+})()`);
+let strataOk = Boolean(lockOpened);
+for (const expected of strataExpected) {
+  const observed = strataObserved[expected.label];
+  const materialized = Boolean(observed?.exists && observed.interactive && observed.satellite && observed.onScreen);
+  strataOk &&= materialized;
+  await file(
+    { w: expected.label, kanji: (expected.label.match(/[\u4e00-\u9fff]/g) ?? []).length },
+    'lock-stratum',
+    `${expected.relation} is a materialized, visible, interactive lock member`,
+    materialized ? 'ok' : 'dead',
+    observed?.exists
+      ? `interactive=${observed.interactive}; satellite=${observed.satellite}; onScreen=${observed.onScreen}`
+      : 'relation remained absent or canvas-only',
+    { state: 'lock', relation: expected.relation },
+  );
+}
+strataProbe = {
+  status: strataOk ? 'verified' : 'failed',
+  seed: strataSeed.w,
+  expected: strataExpected,
+  observed: strataObserved,
+  note: 'The primary wbig index has zero kana-only labels; the semantic lock seam is the deterministic kana node stratum.',
+};
+await boot();
 
 // each battery picks its word FRESH from the live viewport — camera drift
 // between batteries then costs coverage variety, never false "vanished" rows
@@ -260,6 +395,7 @@ for (let round = 0; round < N_WORDS; round++) {
   tested.add(word.w);
   const at = await page.evaluate(wordProbe(word.w));
   if (!at.exists || !at.onScreen) continue;
+  matrixWordsTested++;
 
   // C1/C2 — tap: unfold + bloom (every word, kana included)
   await tapAt(at.x, at.y);
@@ -412,21 +548,501 @@ for (let round = 0; round < N_WORDS; round++) {
   await settle();
 }
 
-/* -------------------------------------------------------------- report */
-const clusters = {};
-for (const c of cases) {
-  if (c.outcome === 'ok') continue;
-  const key = `${c.gesture} → ${c.outcome}`;
-  (clusters[key] ??= []).push(c);
+await file(
+  { w: 'matrix coverage', kanji: null },
+  'sample-count',
+  `${N_WORDS} distinct visible words complete the encoded battery`,
+  matrixWordsTested === N_WORDS ? 'ok' : 'error',
+  `${matrixWordsTested}/${N_WORDS} words completed`,
+  { state: 'coverage' },
+);
+
+/* ------------------------------------------ endurance chain (A0 / A2) */
+await boot();
+const chainStartWord = await pickOne(new Set());
+if (!chainStartWord) {
+  await file(
+    { w: 'chain', kanji: null },
+    'chain-start',
+    'a visible word starts the endurance walk',
+    'dead',
+    'no visible start word',
+    { state: 'bloom' },
+  );
+} else {
+  let centre = chainStartWord.w;
+  chainStrata.add(chainStartWord.kanji === 0 ? 'kana' : chainStartWord.kanji === 1 ? 'one-kanji' : 'multi-kanji');
+  const start = await page.evaluate(wordProbe(centre));
+  await tapAt(start.x, start.y);
+  await page.waitForTimeout(1600);
+
+  for (let hop = 1; hop <= CHAIN_HOPS; hop++) {
+    const walked = new Set(cases.filter((entry) => entry.gesture === 'chain-hop').map((entry) => entry.word));
+    const satellite = await page.evaluate(`(() => {
+      const centre = ${JSON.stringify(centre)};
+      const walked = new Set(${JSON.stringify([...walked])});
+      const candidates = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
+        const r = el.getBoundingClientRect();
+        const w = el.querySelector('.base')?.textContent ?? '';
+        return { w, x: r.left + r.width / 2, y: r.top + r.height / 2, r };
+      }).filter((candidate) => candidate.w && candidate.w !== centre &&
+        candidate.r.width > 0 && candidate.r.left > 28 && candidate.r.right < 362 &&
+        candidate.r.top > 145 && candidate.r.bottom < 710);
+      candidates.sort((a, b) => Number(walked.has(a.w)) - Number(walked.has(b.w)) || a.w.localeCompare(b.w, 'ja'));
+      const selected = candidates[0];
+      return selected ? { w: selected.w, x: selected.x, y: selected.y } : null;
+    })()`);
+    if (!satellite) {
+      await file(
+        { w: centre, kanji: (centre.match(/[\u4e00-\u9fff]/g) ?? []).length },
+        'chain-hop',
+        `hop ${hop}/${CHAIN_HOPS} finds a visible satellite`,
+        'dead',
+        'no uncrowded on-screen satellite',
+        { state: 'bloom', hop },
+      );
+      break;
+    }
+
+    const previousCentre = centre;
+    await tapAt(satellite.x, satellite.y);
+    await page.waitForTimeout(650);
+    const revealed = await page.evaluate(wordProbe(satellite.w));
+    const afterReveal = await page.evaluate(worldProbe);
+    if (!revealed.exists || !revealed.glossed || afterReveal.bloomCentre !== previousCentre) {
+      await file(
+        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
+        'chain-hop',
+        `hop ${hop}/${CHAIN_HOPS} reveals in place before re-centring`,
+        !revealed.exists ? 'vanished' : 'misfired',
+        `exists=${revealed.exists}; glossed=${revealed.glossed}; centre=${afterReveal.bloomCentre ?? 'none'}`,
+        { state: 'bloom', hop, coordinates: { x: satellite.x, y: satellite.y } },
+      );
+      break;
+    }
+
+    const second = await page.evaluate(wordProbe(satellite.w));
+    if (!second.onScreen) {
+      await file(
+        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
+        'chain-hop',
+        `hop ${hop}/${CHAIN_HOPS} remains aimable for the second tap`,
+        'detached',
+        'revealed satellite moved outside the interaction viewport',
+        { state: 'bloom', hop },
+      );
+      break;
+    }
+    await tapAt(second.x, second.y);
+    await page.waitForTimeout(1700);
+    const afterRecentre = await page.evaluate(worldProbe);
+    const newCentre = await page.evaluate(wordProbe(satellite.w));
+    const oldCentre = await page.evaluate(wordProbe(previousCentre));
+    const hopOk =
+      newCentre.exists &&
+      newCentre.isCentre &&
+      oldCentre.exists &&
+      afterRecentre.bloomCentre === satellite.w &&
+      afterRecentre.sats >= 6;
+    await file(
+      { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
+      'chain-hop',
+      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet without deleting the prior planet`,
+      hopOk ? 'ok' : !newCentre.exists || !oldCentre.exists ? 'vanished' : 'detached',
+      `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}`,
+      { state: 'bloom', hop },
+    );
+    if (!hopOk) break;
+    centre = satellite.w;
+    chainCompleted++;
+    const kanji = (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length;
+    chainStrata.add(kanji === 0 ? 'kana' : kanji === 1 ? 'one-kanji' : 'multi-kanji');
+  }
 }
-const total = cases.length;
-const bad = cases.filter((c) => c.outcome !== 'ok').length;
-console.log(`\n==== sweep: ${total} cases · ${total - bad} ok · ${bad} violations · ${pageErrors.length} page errors ====`);
-for (const [key, list] of Object.entries(clusters).sort((a, b) => b[1].length - a[1].length)) {
-  console.log(`  ${String(list.length).padStart(3)} × ${key}   e.g. ${list.slice(0, 4).map((c) => c.word).join('・')}`);
+
+/* ---------------------------------------------- theme/camera parity smoke */
+for (const theme of ['北斎', '夜']) {
+  await boot(theme);
+  const candidate = await pickOne(new Set());
+  if (!candidate) {
+    await file(
+      { w: `${theme} theme`, kanji: null },
+      'theme-camera',
+      'theme exposes an interactive word',
+      'dead',
+      'no visible candidate',
+      { state: 'surface' },
+    );
+    continue;
+  }
+  const before = await page.evaluate(wordProbe(candidate.w));
+  await tapAt(before.x, before.y);
+  await page.waitForTimeout(850);
+  const opened = await page.evaluate(worldProbe);
+  await pinchAt(195, 430, 44, 96, 220, 6);
+  await page.waitForTimeout(450);
+  const navigated = await page.evaluate(worldProbe);
+  const themeOk = opened.bloomCentre === candidate.w && navigated.bloomCentre === candidate.w;
+  await file(
+    candidate,
+    'theme-camera',
+    `${theme} preserves the held constellation through a camera pinch`,
+    themeOk ? 'ok' : 'dismissed',
+    `before=${opened.bloomCentre ?? 'none'}; after=${navigated.bloomCentre ?? 'none'}`,
+    { state: 'bloom' },
+  );
 }
-writeFileSync(OUT, JSON.stringify({ generated: 'drift-consistency sweep v1', total, ok: total - bad, violations: bad, pageErrors, cases }, null, 1));
-console.log(`report → ${OUT}\nshots  → ${SHOTS}`);
-await browser.close();
-server.close();
-process.exit(0);
+
+/* --------------------------------------- seeded invariant fuzz (A0 / A3) */
+const makePrng = (seed) => {
+  let state = (seed >>> 0) || 0x9e3779b9;
+  return () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000;
+  };
+};
+const openFuzzBloom = async (seed) => {
+  await boot('北斎', seed);
+  const candidate = await pickOne(new Set());
+  if (!candidate) return null;
+  const probe = await page.evaluate(wordProbe(candidate.w));
+  await tapAt(probe.x, probe.y);
+  await page.waitForTimeout(1600);
+  const world = await page.evaluate(worldProbe);
+  return world.bloomCentre === candidate.w ? candidate.w : null;
+};
+
+for (const seed of FUZZ_SEEDS) {
+  if (FUZZ_GESTURES === 0) continue;
+  const random = makePrng(seed);
+  let centre = await openFuzzBloom(seed);
+  if (!centre) {
+    await file(
+      { w: `fuzz seed ${seed}`, kanji: null },
+      'fuzz-start',
+      'a deterministic visible word opens a held constellation',
+      'dead',
+      'could not open the seeded starting bloom',
+      { state: 'fuzz', seed, step: 0 },
+    );
+    continue;
+  }
+
+  for (let step = 1; step <= FUZZ_GESTURES; step++) {
+    const actionNames = ['pinch-out', 'pinch-in', 'pan', 'cancel', 'theme', 'slow-drag', 'sat-reveal', 'water-release'];
+    let action = actionNames[Math.floor(random() * actionNames.length)];
+    const beforeWorld = await page.evaluate(worldProbe);
+    const beforeCentre = await page.evaluate(wordProbe(centre));
+    const errorsBefore = pageErrors.length;
+    let actionDetail = '';
+    let actionSpecificOk = true;
+    let coordinates = null;
+
+    if (action === 'pinch-out') {
+      const radius = 82 + Math.floor(random() * 20);
+      coordinates = { cx: 195, cy: 430, fromRadius: 42, toRadius: radius };
+      await pinchAt(195, 430, 42, radius, 150, 4);
+      await page.waitForTimeout(180);
+    } else if (action === 'pinch-in') {
+      const radius = 38 + Math.floor(random() * 12);
+      coordinates = { cx: 195, cy: 430, fromRadius: 94, toRadius: radius };
+      await pinchAt(195, 430, 94, radius, 150, 4);
+      await page.waitForTimeout(180);
+    } else if (action === 'pan') {
+      const water = await waterPoint();
+      const dx = random() < 0.5 ? -36 : 36;
+      const dy = random() < 0.5 ? -24 : 24;
+      coordinates = { x0: water.x, y0: water.y, x1: water.x + dx, y1: water.y + dy };
+      await dragAt(water.x, water.y, water.x + dx, water.y + dy, 150, 4);
+      await page.waitForTimeout(180);
+    } else if (action === 'cancel') {
+      const x = 70 + Math.floor(random() * 250);
+      const y = 190 + Math.floor(random() * 440);
+      coordinates = { x, y };
+      await touch('touchStart', [[x, y]]);
+      await page.waitForTimeout(35);
+      await touch('touchCancel', []);
+      await page.waitForTimeout(120);
+    } else if (action === 'theme') {
+      await page.locator('#theme').click();
+      await page.waitForTimeout(140);
+      currentTheme = (await page.locator('#theme').textContent()) ?? currentTheme;
+    } else if (action === 'slow-drag') {
+      if (!beforeCentre.exists || !beforeCentre.onScreen) {
+        actionSpecificOk = false;
+        actionDetail = 'held centre was not aimable before the drag';
+      } else {
+        const dx = beforeCentre.x > 230 ? -30 : 30;
+        coordinates = { x0: beforeCentre.x, y0: beforeCentre.y, x1: beforeCentre.x + dx, y1: beforeCentre.y + 8 };
+        const trayBefore = beforeWorld.tray;
+        await dragAt(beforeCentre.x, beforeCentre.y, beforeCentre.x + dx, beforeCentre.y + 8, 440, 7);
+        await page.waitForTimeout(220);
+        actionSpecificOk = (await page.evaluate(worldProbe)).tray === trayBefore;
+        actionDetail = actionSpecificOk ? '' : 'slow drag changed the judgment tray';
+      }
+    } else if (action === 'sat-reveal') {
+      await page.waitForTimeout(500);
+      const satellite = await page.evaluate(`(() => {
+        const candidates = [...document.querySelectorAll('#drift-layer .word.bsat:not(.glossed)')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { w: el.querySelector('.base')?.textContent ?? '', x: r.left + r.width / 2, y: r.top + r.height / 2, r };
+        }).filter((candidate) => candidate.w && candidate.r.width > 0 && candidate.r.left > 28 &&
+          candidate.r.right < 362 && candidate.r.top > 145 && candidate.r.bottom < 710);
+        const candidate = candidates.find((entry) =>
+          !candidates.some((other) => other !== entry && Math.hypot(other.x - entry.x, other.y - entry.y) < 38));
+        return candidate ? { w: candidate.w, x: candidate.x, y: candidate.y } : null;
+      })()`);
+      if (!satellite) {
+        action = 'cancel-fallback';
+        await touch('touchStart', [[195, 430]]);
+        await page.waitForTimeout(35);
+        await touch('touchCancel', []);
+        await page.waitForTimeout(120);
+      } else {
+        coordinates = { x: satellite.x, y: satellite.y, satellite: satellite.w };
+        await tapAt(satellite.x, satellite.y);
+        await page.waitForTimeout(500);
+        const revealed = await page.evaluate(wordProbe(satellite.w));
+        const afterReveal = await page.evaluate(worldProbe);
+        actionSpecificOk = revealed.exists && revealed.glossed && afterReveal.bloomCentre === centre;
+        actionDetail = `satellite=${satellite.w}; exists=${revealed.exists}; glossed=${revealed.glossed}`;
+      }
+    } else {
+      const water = await waterPoint();
+      coordinates = { x: water.x, y: water.y };
+      await tapAt(water.x, water.y);
+      await page.waitForTimeout(500);
+      const released = await page.evaluate(worldProbe);
+      const prior = await page.evaluate(wordProbe(centre));
+      actionSpecificOk = released.bloomCentre == null && !released.depthOpen && prior.exists;
+      actionDetail = `centre=${released.bloomCentre ?? 'none'}; depthOpen=${released.depthOpen}; priorExists=${prior.exists}`;
+    }
+
+    const afterWorld = await page.evaluate(worldProbe);
+    const afterCentre = await page.evaluate(wordProbe(centre));
+    const preservesHeld =
+      action === 'water-release'
+        ? actionSpecificOk
+        : actionSpecificOk && afterWorld.bloomCentre === centre && afterCentre.exists;
+    const noNewErrors = pageErrors.length === errorsBefore;
+    const actionOk = preservesHeld && noNewErrors;
+    await file(
+      { w: centre, kanji: (centre.match(/[\u4e00-\u9fff]/g) ?? []).length },
+      `fuzz-${action}`,
+      action === 'water-release'
+        ? 'deliberate water tap releases the constellation without deleting its planet'
+        : 'camera/state action preserves the held planet and emits no runtime error',
+      actionOk ? 'ok' : actionSpecificOk ? 'dismissed' : 'misfired',
+      actionDetail || `centre=${afterWorld.bloomCentre ?? 'none'}; exists=${afterCentre.exists}; newErrors=${pageErrors.length - errorsBefore}`,
+      { state: 'fuzz', seed, step, coordinates },
+    );
+    if (!actionOk) break;
+    fuzzCompleted.set(seed, step);
+
+    if (action === 'water-release' && step < FUZZ_GESTURES) {
+      centre = await openFuzzBloom(seed);
+      if (!centre) {
+        await file(
+          { w: `fuzz seed ${seed}`, kanji: null },
+          'fuzz-reopen',
+          'the next deterministic fuzz segment can reopen a held constellation',
+          'dead',
+          `failed after step ${step}`,
+          { state: 'fuzz', seed, step },
+        );
+        break;
+      }
+    }
+  }
+}
+
+/* --------------------------------------------------- optional ambient soak */
+if (SOAK_MS > 0) {
+  await boot();
+  const errorsBeforeSoak = pageErrors.length;
+  await page.waitForTimeout(SOAK_MS);
+  const candidate = await pickOne(new Set());
+  let responsive = Boolean(candidate);
+  let observed = null;
+  if (candidate) {
+    const before = await page.evaluate(wordProbe(candidate.w));
+    await tapAt(before.x, before.y);
+    await page.waitForTimeout(850);
+    observed = await page.evaluate(worldProbe);
+    responsive = observed.bloomCentre === candidate.w;
+  }
+  const soakOk = responsive && pageErrors.length === errorsBeforeSoak;
+  soakProbe = {
+    status: soakOk ? 'probe-verified' : 'failed',
+    durationMs: SOAK_MS,
+    postSoakBattery: 'single tap+bloom smoke; full matrix rerun remains a separate obligation',
+    observed,
+  };
+  await file(
+    { w: candidate?.w ?? 'ambient soak', kanji: candidate?.kanji ?? null },
+    'soak-resume',
+    `${SOAK_MS}ms ambient soak leaves Drift responsive and page-error-free`,
+    soakOk ? 'ok' : 'error',
+    `responsive=${responsive}; newPageErrors=${pageErrors.length - errorsBeforeSoak}`,
+    { state: 'soak' },
+  );
+}
+
+} catch (error) {
+  fatalError = error instanceof Error ? { message: error.message, stack: error.stack ?? null } : { message: String(error), stack: null };
+  console.error(fatalError.stack ?? fatalError.message);
+} finally {
+  if (browser) {
+    try {
+      await browser.close();
+    } catch (error) {
+      pageErrors.push(`browser close failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  await new Promise((resolveClose) => server.close(resolveClose));
+
+  const uniquePageErrors = [...new Set(pageErrors)];
+  for (const message of uniquePageErrors) {
+    cases.push({
+      word: 'runtime',
+      kanji: null,
+      theme: currentTheme,
+      gesture: 'page-error',
+      expected: 'zero pageerror or console error events',
+      outcome: 'error',
+      detail: message,
+      shot: null,
+      state: 'runtime',
+    });
+  }
+  if (fatalError) {
+    cases.push({
+      word: 'verifier',
+      kanji: null,
+      theme: currentTheme,
+      gesture: 'fatal-error',
+      expected: 'the complete selected sweep writes a receipt',
+      outcome: 'error',
+      detail: fatalError.message,
+      shot: null,
+      state: 'instrument',
+    });
+  }
+
+  const clusters = {};
+  for (const c of cases) {
+    if (c.outcome === 'ok') continue;
+    const key = `${c.gesture} → ${c.outcome}`;
+    (clusters[key] ??= []).push(c);
+  }
+  const total = cases.length;
+  const bad = cases.filter((c) => c.outcome !== 'ok').length;
+  const chainViolations = cases.filter((entry) => entry.gesture === 'chain-hop' && entry.outcome !== 'ok').length;
+  const fuzzCases = cases.filter((entry) => entry.gesture.startsWith('fuzz-'));
+  const fuzzViolations = fuzzCases.filter((entry) => entry.outcome !== 'ok').length;
+  const fuzzVerified =
+    new Set(FUZZ_SEEDS).size >= 3 &&
+    FUZZ_GESTURES >= 400 &&
+    FUZZ_SEEDS.every((seed) => (fuzzCompleted.get(seed) ?? 0) >= 400) &&
+    fuzzViolations === 0;
+  const primaryWords = JSON.parse(readFileSync(resolve(CORRIDOR, '..', 'drift', 'data', 'wbig.json'), 'utf8'));
+  const primaryKana = primaryWords.filter((entry) => !/[\u4e00-\u9fff]/.test(entry[0])).length;
+  const encodedGestures = [...new Set(cases.map((entry) => entry.gesture))].sort();
+  const fullMatrixGaps = [
+    '>=200 nodes across family-size, residency, fragility, glyph, radical, particle, and dive-depth strata',
+    'third tap, long press, four-direction/two-speed drag, both flicks, open-water pinch, twist, pan/release, and depth-1/depth-2 gestures',
+    'all five themes across the full node × gesture × state matrix',
+    ...(!fuzzVerified ? ['three replayable 400-gesture fuzz seeds'] : []),
+    'a full encoded battery after the five-minute soak',
+    'two consecutive dry full-matrix runs',
+  ];
+  const chainVerified = CHAIN_HOPS >= 25 && chainCompleted >= 25 && chainStrata.size >= 2 && chainViolations === 0;
+  const report = {
+    schemaVersion: 2,
+    generated: 'drift-consistency sweep v2',
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    sourceSha: process.env.GITHUB_SHA ?? null,
+    mode: MODE,
+    configuration: {
+      words: N_WORDS,
+      chainHops: CHAIN_HOPS,
+      fuzzSeeds: FUZZ_SEEDS,
+      fuzzGesturesPerSeed: FUZZ_GESTURES,
+      soakMs: SOAK_MS,
+      viewport: { width: 390, height: 844, deviceScaleFactor: 2 },
+      browser: process.env.CHROMIUM_PATH ? 'explicit CHROMIUM_PATH' : 'playwright pinned chromium',
+    },
+    gate: {
+      scope: MODE === 'fast' ? 'bounded PR regression slice' : 'expanded A0 evidence run (not full acceptance authority)',
+      status: bad === 0 ? 'pass' : 'fail',
+      exitCode: bad === 0 ? 0 : 1,
+      promotionRule: 'pass iff every executed case is ok, no page/console/fatal errors occur, and requested sample counts complete',
+    },
+    totals: { total, ok: total - bad, violations: bad, pageErrors: uniquePageErrors.length },
+    coverage: {
+      matrix: {
+        requestedWords: N_WORDS,
+        completedWords: matrixWordsTested,
+        encodedGestures,
+        encodedStates: ['surface', 'bloom', 'lock', ...(SOAK_MS ? ['soak'] : [])],
+        themes: ['北斎', '夜'],
+      },
+      lexicalInventory: { primaryWords: primaryWords.length, primaryKanaOnly: primaryKana },
+      deterministicKanaAndEquivalenceStratum: strataProbe,
+      chain: {
+        requestedHops: CHAIN_HOPS,
+        completedHops: chainCompleted,
+        observedStrata: [...chainStrata].sort(),
+        violations: chainViolations,
+      },
+      fuzz: {
+        status: fuzzVerified ? 'verified' : fuzzViolations ? 'failed' : FUZZ_GESTURES ? 'sampled' : 'not-run',
+        seedsRequested: FUZZ_SEEDS,
+        gesturesPerSeed: FUZZ_GESTURES,
+        completedBySeed: Object.fromEntries(fuzzCompleted),
+        violations: fuzzViolations,
+        replay: 'rerun with the recorded --fuzz-seeds and --fuzz-gestures; each seeded page also receives deterministic Math.random',
+        obligation: '3 × 400 seeded, replayable gestures',
+      },
+      soak: soakProbe,
+    },
+    acceptance: {
+      A1_fullMatrixTwice: { status: 'not-proven', gaps: fullMatrixGaps },
+      A2_chain25: {
+        status: chainVerified ? 'verified' : chainViolations ? 'failed' : 'not-proven',
+        reason: chainVerified
+          ? '25 consecutive hops completed across at least two observed strata'
+          : `${chainCompleted}/${Math.max(25, CHAIN_HOPS)} required hops; strata=${[...chainStrata].sort().join(',') || 'none'}`,
+      },
+      A3_fuzz3x400: {
+        status: fuzzVerified ? 'verified' : fuzzViolations ? 'failed' : 'not-proven',
+        reason: fuzzVerified
+          ? 'at least three distinct seeds completed 400 invariant-checked gestures each'
+          : `${FUZZ_SEEDS.length} seed(s) selected at ${FUZZ_GESTURES} gestures; completed=${JSON.stringify(Object.fromEntries(fuzzCompleted))}`,
+      },
+      A4_soak5mThenFullBattery: {
+        status: soakProbe.status === 'failed' ? 'failed' : 'not-proven',
+        reason: SOAK_MS >= 300_000
+          ? 'five-minute ambient probe ran, but the complete post-soak matrix remains unencoded'
+          : `selected soak was ${SOAK_MS}ms; acceptance requires 300000ms plus the full battery`,
+      },
+      A5_corridor: { status: 'not-run', reason: 'verify-corridor.mjs is a separate gate' },
+      A6_operatorWalk: { status: 'human-only', reason: 'the verifier cannot self-grant the operator criterion' },
+    },
+    fatalError,
+    pageErrors: uniquePageErrors,
+    clusters: Object.fromEntries(Object.entries(clusters).map(([key, list]) => [key, list.length])),
+    cases,
+  };
+
+  console.log(`\n==== sweep: ${total} cases · ${total - bad} ok · ${bad} violations · ${uniquePageErrors.length} page errors ====`);
+  for (const [key, list] of Object.entries(clusters).sort((a, b) => b[1].length - a[1].length)) {
+    console.log(`  ${String(list.length).padStart(3)} × ${key}   e.g. ${list.slice(0, 4).map((c) => c.word).join('・')}`);
+  }
+  writeFileSync(OUT, JSON.stringify(report, null, 2));
+  console.log(`report → ${OUT}\nshots  → ${SHOTS}`);
+  process.exitCode = bad === 0 ? 0 : 1;
+}
