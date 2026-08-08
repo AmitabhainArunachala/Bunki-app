@@ -57,3 +57,8 @@ prototypes/bunki-sites-v11/.sites-runtime/
 .claude/worktrees/
 .venv/
 __pycache__/
+
+# Transient CDP probes written by harness/hunt agents — never committed
+prototypes/corridor/tools/.probe-*.mjs
+prototypes/corridor/tools/.shot-*.mjs
+prototypes/corridor/tools/.demo-*.mjs
