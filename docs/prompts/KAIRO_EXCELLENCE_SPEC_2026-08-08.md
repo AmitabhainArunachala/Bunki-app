@@ -375,7 +375,10 @@ scenes; here it would be a costume, not a material.
 - **A0 · Scripted closure of the zero-quirk acceptance list.** Chain endurance,
   seeded fuzz ×3, soak, the four verifications the spend limit orphaned. This is
   the safety net every later phase is measured against.
-- **A0.5 · Accessibility + measurement baseline.** Before multiplying today’s
+- **A0.5 · Accessibility + measurement baseline.** _Sequencing note: the
+  accessibility ACTION contract (gate §2.5) is the substrate-neutral layer C0
+  would otherwise build later. Implement it here as that neutral contract, not
+  as DOM-only affordances, or law 3 is violated and the work is done twice._ Before multiplying today’s
   interaction patterns: make Drift words/tide and reader tokens operable without
   a pointer; give sheets/dialogs correct semantics, focus entry/trap/return and
   Escape; remove hidden controls from tab order; implement meaningful reduced
@@ -419,7 +422,10 @@ scenes; here it would be a costume, not a material.
 - **B3 · 自 mode v1.** The tide follows actual multidimensional learner/SRS
   state — i+1 dosing, honesty contract intact. Needs A1's data to exist; it may
   not collapse the learner to a single JLPT estimate.
-- **B4 · Search doors at the canonical bar.** Preserve the one-field typed
+- **B4 · Search doors at the canonical bar.** _(Confirmed 2026-08-08: the
+  instrument was relabelling one typed door as four. It now reports
+  `1/4 canonical entry modes present` and names handwriting · radical · SKIP as
+  absent rather than counting scripts as doors.)_ Preserve the one-field typed
   search (kanji/kana/romaji/English) and add/restore handwriting, radical/
   component picker, and SKIP as actual entry modes rather than relabelling the
   typed modes as four doors.

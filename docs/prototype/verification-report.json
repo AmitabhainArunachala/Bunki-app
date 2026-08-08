@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-08 10:05",
+          "2026-08-08 12:35",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-08 10:10",
+          "2026-08-08 12:40",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-08 10:14",
+          "2026-08-08 12:44",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-16 10:04",
+          "2026-08-16 12:34",
           "8.30"
         ]
       ]
@@ -405,19 +405,19 @@
       {
         "text": "▸ text setting",
         "w": 147,
-        "h": 40,
+        "h": 44,
         "id": "dials-toggle"
       },
       {
         "text": "← 戻るback",
         "w": 72,
-        "h": 42,
+        "h": 44,
         "id": "sheet-back"
       },
       {
         "text": "✕",
-        "w": 42,
-        "h": 42,
+        "w": 44,
+        "h": 44,
         "id": "sheet-close"
       },
       {
@@ -537,7 +537,7 @@
       {
         "text": "変異 ▴variants",
         "w": 76,
-        "h": 40,
+        "h": 44,
         "id": "variants-toggle"
       },
       {
@@ -573,325 +573,325 @@
       {
         "text": "世界自然遺産に7箇所を追加 ",
         "w": 358,
-        "h": 326,
+        "h": 330,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "マリナーズ・イチロー選手 現",
         "w": 358,
-        "h": 306,
+        "h": 310,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "JRおおさか東線部分開業JR",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "信楽高原鐵道列車衝突事故、J",
         "w": 358,
-        "h": 326,
+        "h": 330,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "ウィキニュース、21年の歴史",
         "w": 358,
-        "h": 306,
+        "h": 310,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "野ばらThe Wild Ro",
         "w": 358,
-        "h": 306,
+        "h": 310,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "ごん狐Gon the Fox",
         "w": 358,
-        "h": 333,
+        "h": 337,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "やまなしYamanashi ",
         "w": 358,
-        "h": 352,
+        "h": 356,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "育児休業Childcare ",
         "w": 358,
-        "h": 255,
+        "h": 259,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "育児休業給付金Childca",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "遺族基礎年金Basic su",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "遺族厚生年金Employee",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "医療保険Medical in",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "印鑑登録証明書Seal-re",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "印鑑登録証Seal-regi",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "オーバーステイOversta",
         "w": 358,
-        "h": 255,
+        "h": 259,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "大家LandlordInte",
         "w": 358,
-        "h": 229,
+        "h": 233,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "介護Long-term ca",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "静かな朝A Quiet Mo",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "雨の日の古本屋The Sec",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "知らない町を歩くWalkin",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "山を歩きながら考えたことTh",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "AI時代の知識と判断Know",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "五箇条の御誓文The Cha",
         "w": 358,
-        "h": 306,
+        "h": 310,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "方丈記 · 冒頭Hōjōki",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "徒然草 · 序段Tsurez",
         "w": 358,
-        "h": 278,
+        "h": 282,
         "id": "shelf-item"
       },
       {
         "text": "▸ details · ra",
         "w": 142,
-        "h": 40,
+        "h": 44,
         "id": "details-toggle"
       },
       {
         "text": "▸ sources & li",
         "w": 133,
-        "h": 40,
+        "h": 44,
         "id": "sources-toggle"
       },
       {
         "text": "変異 ▴variants",
         "w": 76,
-        "h": 40,
+        "h": 44,
         "id": "variants-toggle"
       }
     ],
@@ -1419,9 +1419,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 433,
+  "loadMs": 320,
   "summary": {
-    "total": 90,
+    "total": 91,
     "failed": 0
   },
   "results": [
@@ -1448,7 +1448,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":151,\"y\":580.5,\"productive\":true}"
+      "detail": "{\"x\":153.39999389648438,\"y\":579.0999755859375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -1458,7 +1458,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 88px; mean tether 161 → 166px"
+      "detail": "centre moved 83px; mean tether 165 → 166px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -1468,7 +1468,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "26 texts, ready in 433 ms"
+      "detail": "26 texts, ready in 320 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1588,7 +1588,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 535.3 → 534.6px"
+      "detail": "gloss on, glyph bottom 551.3 → 550.6px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -1756,7 +1756,7 @@
       "detail": "16.2:1"
     },
     {
-      "name": "every visible control is at least 40px",
+      "name": "every visible control is at least 44px",
       "pass": true,
       "detail": "86 controls checked"
     },
@@ -1831,29 +1831,34 @@
       "detail": "quiet"
     },
     {
-      "name": "search · the romaji door answers",
+      "name": "search · the typed door accepts romaji",
       "pass": true,
       "detail": "\"kaisai\" → word:開催"
     },
     {
-      "name": "search · the kana door answers",
+      "name": "search · the typed door accepts kana",
       "pass": true,
       "detail": "\"かいさい\" → word:開催"
     },
     {
-      "name": "search · the kanji door answers",
+      "name": "search · the typed door accepts kanji",
       "pass": true,
       "detail": "\"開\" → kanji:開"
     },
     {
-      "name": "search · the English door answers",
+      "name": "search · the typed door accepts English",
       "pass": true,
       "detail": "\"peninsula\" → word:半島"
     },
     {
-      "name": "search · the grammar door answers",
+      "name": "search · the typed door accepts grammar",
       "pass": true,
       "detail": "\"ばかり\" → grammar:bakari"
+    },
+    {
+      "name": "search · the canonical four doors are counted honestly (B4 gap stated)",
+      "pass": true,
+      "detail": "1/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)"
     },
     {
       "name": "search · a result opens its full entry",

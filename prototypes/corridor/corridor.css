@@ -429,7 +429,7 @@ h1.view-title {
   font: inherit;
   font-family: var(--serif);
   font-size: var(--t-chrome);
-  min-height: 40px;
+  min-height: var(--tap);
   border: 0;
   border-left: 1px solid var(--line-soft);
   background: transparent;
@@ -814,7 +814,7 @@ h1.view-title {
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  min-height: 40px;
+  min-height: var(--tap);
 }
 
 #variants .vbar {
@@ -829,7 +829,7 @@ h1.view-title {
   border: 1px solid rgba(252, 251, 246, 0.4);
   color: var(--ground);
   border-radius: 2px;
-  min-height: 40px;
+  min-height: var(--tap);
   padding: 0 14px;
   cursor: pointer;
 }
@@ -867,7 +867,7 @@ h1.view-title {
 #variants .vseg button {
   font: inherit;
   font-size: 11px;
-  min-height: 40px;
+  min-height: var(--tap);
   background: transparent;
   color: var(--ground);
   border: 0;
@@ -976,7 +976,7 @@ h1.view-title {
 .inline-link {
   color: var(--red);
   display: inline-block;
-  min-height: 40px;
+  min-height: var(--tap);
   min-width: 44px;
   line-height: 40px;
   padding: 0 8px;
@@ -1255,7 +1255,7 @@ body.v-depth-layered .inline-link {
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
-  min-height: 42px;
+  min-height: var(--tap);
   padding: 0 14px;
   cursor: pointer;
 }
@@ -1278,8 +1278,8 @@ body.v-depth-layered .inline-link {
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
-  min-width: 42px;
-  min-height: 42px;
+  min-width: var(--tap);
+  min-height: var(--tap);
   cursor: pointer;
 }
 
@@ -1417,7 +1417,7 @@ body.v-depth-layered .inline-link {
   background: transparent;
   border: 0;
   padding: 6px 2px;
-  min-height: 40px;
+  min-height: var(--tap);
   cursor: pointer;
   display: block;
 }

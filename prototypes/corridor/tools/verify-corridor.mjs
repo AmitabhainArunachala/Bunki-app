@@ -28,7 +28,7 @@ export const CORRIDOR_DIR = resolve(TOOL_DIR, '..');
 const REPO = resolve(CORRIDOR_DIR, '..', '..');
 
 const VIEWPORT = { width: 390, height: 844 };
-const MIN_TAP = 40;
+const MIN_TAP = 44; // the canon's own --tap, not what the app happened to ship
 const WCAG_AA = 4.5;
 
 const MIME = {
@@ -1136,8 +1136,22 @@ async function main() {
     const hit = await page.evaluate(
       `[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === ${JSON.stringify(want)})`,
     );
-    check(`search · the ${door} door answers`, hit, `"${q}" → ${want}`);
+    check(`search · the typed door accepts ${door}`, hit, `"${q}" → ${want}`);
   }
+  // Honest naming (canon §7.2 vs this build): the CANONICAL four doors are
+  // typed · handwriting · radical/component picker · SKIP. What ships today is
+  // ONE door (typed) that eats four scripts. Calling those four "doors" was a
+  // relabelling this instrument used to enshrine; the three missing entry modes
+  // are tracked as excellence-spec B4, not quietly counted as present.
+  const entryModes = await page.evaluate(`({
+    handwriting: !!document.querySelector('[data-entry="handwriting"], #handwrite'),
+    radical: !!document.querySelector('[data-entry="radical"], #radical-picker'),
+    skip: !!document.querySelector('[data-entry="skip"], #skip-code'),
+  })`);
+  const present = 1 + Object.values(entryModes).filter(Boolean).length;
+  check('search · the canonical four doors are counted honestly (B4 gap stated)',
+    present >= 1,
+    `${present}/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)`);
   await page.fill('#search', 'kaisai');
   await page.waitForTimeout(350);
   await page.locator('[data-result]').first().click();
