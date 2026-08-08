@@ -91,7 +91,12 @@ ${scopedRules.join('\n')}
 #drift-layer #theme { top: calc(66px + env(safe-area-inset-top)); }
 #drift-layer #drift-tray { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #drift-layer #hint { bottom: calc(120px + env(safe-area-inset-bottom)); }
-#drift-layer #card { bottom: 64px; }
+#drift-layer #card { bottom: 64px; max-height: calc(100vh - 190px); overflow-y: auto; }
+/* the radical explainer is a modal: it must clear the corridor chrome band
+ * so its own close button is reachable (the hunt found the X hit-testing
+ * to the corridor's 覚 button, which navigated the whole app away) */
+#drift-layer #radoc { top: 60px; padding-top: 62px; }
+#drift-layer #radoc .x { top: calc(72px + env(safe-area-inset-top)); z-index: 12; }
 `;
 
 /* -------------------------------------------------------------- markup */
@@ -170,8 +175,8 @@ patch(
   'gate pointercancel',
 );
 patch(
-  'addEventListener("pointerup",e=>{\n  endPointer(e);',
-  'addEventListener("pointerup",e=>{\n  if(!DRIFT_ON)return;\n  endPointer(e);',
+  'addEventListener("pointerup",e=>{\n  const owner=e.pointerId===gestureId;',
+  'addEventListener("pointerup",e=>{\n  if(!DRIFT_ON)return;\n  const owner=e.pointerId===gestureId;',
   'gate main pointerup',
 );
 
