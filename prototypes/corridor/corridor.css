@@ -367,6 +367,92 @@ h1.view-title {
   cursor: pointer;
   border-radius: 2px;
   padding: 0 0.5px;
+  border: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Inline Japanese must keep natural spacing, so one-character tokens cannot
+ * grow a visible 44px box. Their owning button instead carries a real 44px
+ * hit region (the pseudo-element participates in hit testing) while the line
+ * retains print typography. The reader's ~45px line box already houses the
+ * 44px vertical floor without adding leading. */
+button.tok {
+  position: relative;
+  min-height: var(--tap);
+}
+
+button.tok::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
+
+/* All content tokens carry the same baseline box before and after English is
+ * mounted. Changing display type on the second activation moved the glyph by
+ * 3.3px on real Chrome; keeping this box stable makes the anchor invariant. */
+.tok.content {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: baseline;
+  line-height: 1.3;
+}
+
+.token-door {
+  position: relative;
+  display: inline;
+}
+
+.tok:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+  background: var(--ai-wash, var(--ground-2));
+}
+
+.token-actions {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 85;
+  display: inline-flex;
+  gap: 4px;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 20px));
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ground-0, var(--ground));
+  box-shadow: 0 6px 24px rgba(20, 24, 28, 0.2);
+  transform: translateX(-50%);
+}
+
+.token-actions[hidden] {
+  display: none;
+}
+
+.token-actions button {
+  min-height: var(--tap);
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: var(--ai, var(--ink-2));
+  background: transparent;
+  font: inherit;
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
 }
 
 /* touch feedback is momentary; a revealed word carries no permanent wash —
@@ -378,6 +464,10 @@ h1.view-title {
 
 .tok.plain {
   cursor: default;
+}
+
+.tok.particle {
+  cursor: pointer;
 }
 
 .reader.sp-word .tok + .tok {
@@ -1323,6 +1413,20 @@ body.v-depth-layered .inline-link {
   margin-top: 4px;
 }
 
+#mini .mini-entry {
+  min-height: var(--tap);
+  margin-top: 5px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ai, var(--ink-2));
+  background: transparent;
+  font: inherit;
+  font-family: var(--sans);
+  font-size: 11px;
+  cursor: pointer;
+}
+
 /* second tap: English beneath the word — IN THE LINE FLOW, so no font's
  * metrics on any device can ever collide it with the next line. The token
  * becomes a baseline-aligned column: the word keeps its exact baseline
@@ -1655,4 +1759,27 @@ svg.strokes text {
   font-family: var(--sans);
   font-size: 13.5px;
   letter-spacing: 0.02em;
+}
+
+/* Reduced motion is a behavioral mode, not a single-animation exception.
+ * Corridor-owned movement and fades become immediate; the separately owned
+ * Drift layer keeps its own reduction contract. */
+@media (prefers-reduced-motion: reduce) {
+  #app *,
+  #app *::before,
+  #app *::after,
+  #mini,
+  #mini * {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+
+  .sheet,
+  .scrim,
+  .field-word,
+  #mini {
+    animation: none !important;
+  }
 }

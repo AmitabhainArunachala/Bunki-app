@@ -155,6 +155,13 @@ async function main() {
         nativeButtons: words.filter((node) => node.matches('button')).length,
         named: words.filter((node) => !!node.getAttribute('aria-label')).length,
         actionKinds: [...new Set(words.map((node) => node.dataset.action).filter(Boolean))],
+        hitFloor: [...words, ...particles].reduce((floor, node) => {
+          const rect = node.getBoundingClientRect();
+          const expanded = getComputedStyle(node, '::before');
+          const width = Math.max(rect.width, parseFloat(expanded.width) || 0);
+          const height = Math.max(rect.height, parseFloat(expanded.height) || 0);
+          return Math.min(floor, width, height);
+        }, Infinity),
       };
     })()`);
     check(
@@ -165,6 +172,11 @@ async function main() {
         semantics.actionKinds.join(',') === 'target.activate',
       JSON.stringify(semantics),
     );
+    check(
+      'inline reader controls retain a real 44px hit region without widening print',
+      semantics.hitFloor >= 44,
+      `minimum effective hit dimension ${semantics.hitFloor.toFixed(1)}px`,
+    );
 
     const word = page.locator('#reader .tok.content').nth(2);
     await word.focus();
@@ -173,7 +185,7 @@ async function main() {
       alternatives: document.querySelectorAll('.token-actions:not([hidden]) button').length,
       hiddenTabStops: [...document.querySelectorAll('#app [hidden]')].flatMap((root) =>
         [...root.querySelectorAll('button, a, input, [tabindex]')]
-      ).filter((node) => node.tabIndex >= 0 && !node.disabled).length,
+      ).filter((node) => node.tabIndex >= 0 && !node.disabled && node.offsetParent !== null).length,
     }))()`);
     check(
       'focused word exposes quick-look and full-entry non-hold alternatives',
@@ -185,6 +197,30 @@ async function main() {
       focusProbe.hiddenTabStops === 0,
       `${focusProbe.hiddenTabStops} hidden tab stop(s)`,
     );
+    await page.keyboard.press('Tab');
+    const firstAlternative = await page.evaluate('document.activeElement?.dataset.action ?? null');
+    await page.keyboard.press('Tab');
+    const secondAlternative = await page.evaluate('document.activeElement?.dataset.action ?? null');
+    check(
+      'sequential switch navigation reaches quick look then full entry',
+      firstAlternative === 'quickLook.open' && secondAlternative === 'entry.open',
+      `${firstAlternative} → ${secondAlternative}`,
+    );
+    await word.focus();
+    const accessibilitySession = await page.context().newCDPSession(page);
+    const accessibilityTree = await accessibilitySession.send('Accessibility.getFullAXTree');
+    await accessibilitySession.detach();
+    const namedButtons = accessibilityTree.nodes
+      .filter((node) => node.role?.value === 'button' && node.name?.value)
+      .map((node) => node.name.value);
+    check(
+      'screen-reader tree exposes named token and non-hold action buttons',
+      namedButtons.some((name) => /third activation|三回目/.test(name)) &&
+        namedButtons.some((name) => /quick look|語釈/.test(name)) &&
+        namedButtons.some((name) => /full entry|全項目/.test(name)),
+      `${namedButtons.length} named button(s) in the accessibility tree`,
+    );
+    await page.waitForTimeout(80);
     await page.screenshot({ path: resolve(SHOTS_DIR, '01-reader-focus-alternatives.png') });
 
     console.log('\n— progressive action parity and geometry');
@@ -286,6 +322,7 @@ async function main() {
     await openReader(page, base);
     const invoker = page.locator('#reader .tok.content').nth(2);
     await invoker.focus();
+    const invokerIndex = await invoker.getAttribute('data-index');
     await openWordDialog(page);
     const dialog = await page.evaluate(`(() => {
       const sheet = document.querySelector('#sheet');
@@ -315,12 +352,13 @@ async function main() {
       `document.querySelector('#sheet')?.contains(document.activeElement) ?? false`,
     );
     check('Tab is contained inside the modal sheet', trapped);
+    await page.waitForTimeout(280);
     await page.screenshot({ path: resolve(SHOTS_DIR, '02-named-entry-dialog.png') });
     await page.keyboard.press('Escape');
     await page.waitForTimeout(120);
     const returnProbe = await page.evaluate(`({
       closed: !document.querySelector('#sheet'),
-      returned: document.activeElement?.matches('#reader .tok.content[data-index="2"]') ?? false,
+      returned: document.activeElement?.matches('#reader .tok.content[data-index="${invokerIndex}"]') ?? false,
     })`);
     check(
       'Escape dismisses the sheet and returns focus to its invoking token',

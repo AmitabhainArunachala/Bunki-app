@@ -51,23 +51,37 @@ first act of the #36 harvest: the sites-v11 kotobako dictionary rides in as
 first) and `strokes.json` (2,136 KanjiVG stroke-path sets, drawn on the
 kanji page). Word entries carry senses / kanji-in-word rows / real examples
 from the shelf; kanji pages carry 音訓, stroke order, components, and glossed
-compounds. The reader speaks Drift's click grammar — tap = furigana,
-double-tap = English beneath, long-press = floating mini-dictionary, keep
-holding = full entry. 取る became 覚える; items land in an automatic monthly
-list (the operator's Renzo habit) plus named lists, persisted in
-localStorage. A 12-entry original-content grammar dictionary seeds the
-DoJG-class index (文法 on the shelf). Reader surfaces carry no provenance
-narration — 出典 folds away at the shelf foot; sheets carry their own
-← 戻る／✕ (the "NO BACK OPTION" fix), and a synthesized-click swallow stops
-hold-opens from teleporting a node deeper. Rebuild the dictionary assets
-with `node tools/build_dictionary.mjs`.
+compounds. The reader now uses a staged activation grammar: first activation
+reveals the reading, second reveals the English gloss, and third carries the
+word into its full named entry. Keyboard, switch, and screen-reader users get
+the same sequence plus discoverable quick-look and full-entry controls on
+focus, without a hold gesture. Particles remain inert under pointer activation
+but expose an explicit full-entry alternative to assistive input. 取る became
+覚える; items land in an automatic monthly list (the operator's Renzo habit)
+plus named lists, persisted in localStorage. A 12-entry original-content
+grammar dictionary seeds the DoJG-class index (文法 on the shelf). Reader
+surfaces carry no provenance narration — 出典 folds away at the shelf foot;
+sheets carry their own ← 戻る／✕ (the "NO BACK OPTION" fix), and a
+synthesized-click swallow stops hold-opens from teleporting a node deeper.
+Rebuild the dictionary assets with `node tools/build_dictionary.mjs`.
 
 ## Running it locally
 
 ```sh
-node prototypes/corridor/tools/verify-corridor.mjs     # the verifier: 82 checks + the screenshot set
+CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  node prototypes/corridor/tools/verify-corridor.mjs   # 91 checks + screenshots
+CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  node prototypes/corridor/tools/verify-corridor-accessibility.mjs
+CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  node prototypes/corridor/tools/verify-corridor-performance.mjs
 python3 -m http.server -d prototypes/corridor 8080     # then open http://127.0.0.1:8080/
 ```
+
+The performance verifier is a local diagnostic and receipt generator. Its
+production thresholds remain explicitly `unproven`; in particular, it does
+not claim that warm lookup is below 100 ms. Rebuild and commit the standalone
+artifact separately when its generated Drift inputs are owned by the release
+lane.
 
 ## The article pipeline (Phase 1 of the build brief)
 
