@@ -108,16 +108,21 @@
   #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:11px}
   #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
   #card .rds .kun{color:var(--faint)}
-  #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:26px;
-    z-index:8;opacity:.32;transition:opacity .5s;touch-action:none}
-  #lvl.hot{opacity:1}
+  #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:34px;
+    z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+  #lvl.hot{opacity:1;width:56px}
   #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
-    border-radius:1px}
+    border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
+  #lvl.hot #lvlTrack{width:3.5px;background:var(--pig1);box-shadow:0 0 10px var(--halo)}
   #lvlHandle{position:absolute;left:10px;width:12px;height:12px;border-radius:50%;
-    background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%}
+    background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%;
+    transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s}
+  #lvl.hot #lvlHandle{left:6px;width:22px;height:22px;margin-top:-11px;
+    background:var(--accent);border-width:2px;
+    box-shadow:0 0 16px var(--halo),0 3px 12px rgba(0,0,0,.28)}
   #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:10px;color:var(--faint);
-    letter-spacing:.05em;opacity:0;transition:opacity .4s;pointer-events:none}
-  #lvl.hot #lvlLabels{opacity:1}
+    letter-spacing:.05em;opacity:0;transition:opacity .3s,left .25s,font-size .25s;pointer-events:none}
+  #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:13px;color:var(--ink);font-weight:600}
   .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
   #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;
     color:var(--pig2);letter-spacing:.08em;white-space:nowrap;opacity:0;transition:opacity .3s;
@@ -811,8 +816,8 @@ function buildWorld(){
 function rePri(){
   for(const wr of WORDS){
     const e=wr.e, lm=Math.abs((e[5]||3)-level);
-    wr.pri=(store.unknown[e[0]]?3:0)+(e[3]==="f"?1.2:0)+
-      (lm===0?2:lm===1?0.8:0)+((strHash(e[0])>>2)%100)/100;
+    wr.pri=(lm===0?8:lm===1?2.4:0)+(store.unknown[e[0]]?1.6:0)+
+      (e[3]==="f"?0.8:0)+((strHash(e[0])>>2)%100)/100;
   }
 }
 // the ~64 most deserving nearby words become touchable DOM; the rest are ink
@@ -1667,6 +1672,7 @@ function lvlSet(ix,commit){
   }
 }
 function tideChange(){
+  clearBloom(); collapseUnfold();
   deck=buildDeck(); rePri();
   for(const n of nodes)
     if(n.kind==="word"&&!n.gone&&(n.mode==="free"||n.mode==="glide")){
