@@ -9,11 +9,12 @@
  * (`replay` skips a byte-identical re-append) and in `@bunki/persistence`
  * (`planAppend` refuses a conflicting one). Both can be perfectly correct while
  * the *app* still forks a thread, because the app is where the key is minted:
- * `captureIdempotencyKey` derives it from the source reference and the folded
- * text, and if that derivation were unstable — if it folded width differently
- * from the thread lookup, or varied with a timestamp — every layer below would
- * dutifully store two honest, distinct, non-conflicting captures. The learner
- * would then have two threads for one word and nothing would have failed.
+ * `captureV2IdempotencyKey` fingerprints the complete persisted capture while
+ * thread lookup independently folds the selected text. If either derivation
+ * were unstable — if it varied with a timestamp, for example — every layer
+ * below would dutifully store two honest, distinct, non-conflicting captures.
+ * The learner would then have two threads for one word and nothing would have
+ * failed.
  *
  * So every assertion here goes through `AppStore.execute`, over a real durable
  * store, and reads the thread list a screen would render.

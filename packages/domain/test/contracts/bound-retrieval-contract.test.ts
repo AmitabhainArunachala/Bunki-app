@@ -3,7 +3,7 @@
  *
  * ADR-002 deliberately carries no contract -> encounter edge. The projection
  * therefore earns that edge only when the existing log determines one durable
- * thread, and it keeps the first matching pre-contract capture as the origin.
+ * thread and exactly one matching pre-contract capture as the origin.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -94,13 +94,9 @@ describe('BoundRetrievalContract source lineage', () => {
     }
   });
 
-  it('keeps same-thread re-encounters separate and binds the earliest matching origin', () => {
+  it('keeps post-contract same-thread re-encounters separate from the unique origin', () => {
     const log = parseEventLog([
       capture('ev-origin', 'enc-origin', AT.t0),
-      capture('ev-before', 'enc-before', AT.t1, {
-        text: `また${TARGET}に来た。`,
-        span: { start: 2, end: 2 + TARGET.length },
-      }),
       contract(),
       capture('ev-after', 'enc-after', AT.t3, {
         text: `${TARGET}を思い出す。`,
@@ -112,12 +108,40 @@ describe('BoundRetrievalContract source lineage', () => {
     expect(result.bound).toBe(true);
     if (result.bound) {
       expect(result.value.originEncounterId).toBe('enc-origin');
-      expect(result.value.subsequentEncounterIds).toEqual(['enc-before', 'enc-after']);
+      expect(result.value.subsequentEncounterIds).toEqual(['enc-after']);
       // Origin evidence stays exact; a later body is never substituted for it.
       expect(result.value.sourceRef).toEqual(READER_SOURCE);
       expect(result.value.span).toEqual({ start: 3, end: 5 });
       expect(result.value.targetText).toBe(TARGET);
     }
+  });
+
+  it('fails closed when multiple pre-contract encounters could be the source origin', () => {
+    const secondSource = capture('ev-before', 'enc-before', AT.t1, {
+      text: `また${TARGET}に来た。`,
+      span: { start: 2, end: 2 + TARGET.length },
+      sourceRef: {
+        sourceId: 'reader-second-source',
+        kind: 'text',
+        locator: 'article-9#p4',
+      },
+      provenance: { ...USER_PROVENANCE, sourceVersion: 'second-source-v2' },
+    });
+    const result = bindRetrievalContract(
+      parseEventLog([capture('ev-origin', 'enc-origin', AT.t0), secondSource, contract()]),
+      'contract-source-anchored',
+    );
+
+    expect(result).toMatchObject({
+      bound: false,
+      failure: {
+        reason: 'origin_ambiguous',
+        contractId: 'contract-source-anchored',
+        targetComponentId: COMPONENT,
+        threadId: THREAD,
+        encounterIds: ['enc-origin', 'enc-before'],
+      },
+    });
   });
 
   it('fails closed when different durable threads claim the component', () => {
