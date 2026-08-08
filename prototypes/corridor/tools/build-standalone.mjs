@@ -15,7 +15,6 @@ const CORRIDOR = resolve(HERE, '..');
 const read = (p) => readFileSync(resolve(CORRIDOR, p), 'utf8');
 
 const BUNDLES = {
-  'proprietary_safe/passages': 'data/proprietary_safe/passages.json',
   'proprietary_safe/kanken': 'data/proprietary_safe/kanken.json',
   'proprietary_safe/sem': 'data/proprietary_safe/sem.json',
   'share_alike/kanji': 'data/share_alike/kanji.json',
@@ -30,6 +29,16 @@ const BUNDLES = {
 
 const bundle = {};
 for (const [key, path] of Object.entries(BUNDLES)) bundle[key] = JSON.parse(read(path));
+
+// the article shelf: index + one entry per article file, keyed articles/<slug>
+// (the standalone build embeds what the served build fetches lazily)
+import { readdirSync } from 'node:fs';
+const articlesDir = resolve(CORRIDOR, 'data/articles');
+for (const file of readdirSync(articlesDir).sort()) {
+  if (!file.endsWith('.json')) continue;
+  const key = file === 'index.json' ? 'articles/index' : `articles/${file.replace(/\.json$/, '')}`;
+  bundle[key] = JSON.parse(read(`data/articles/${file}`));
+}
 
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
