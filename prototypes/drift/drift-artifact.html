@@ -828,7 +828,12 @@ function refreshActive(){
   const target=new Set(vis.slice(0,64));
   for(const wr of [...ACTIVE]){
     if(!target.has(wr)){
+      // a word the user is holding is PINNED: the recycler may never cull
+      // the bloom/lock centre or its members mid-interaction — this was the
+      // root of "some words just disappear" (charter, 2026-08-08)
+      if(wr.hl||wr.lk) continue;
       const nd=wr.node;
+      if(nd&&(nd===focusN||nd.hlDom)) continue;
       if(nd&&!nd.gone&&nd.mode==="free"){
         nd.gone=true; nd.top=0; nd.el.style.pointerEvents="none";
         removeNode(nd,600); wr.node=null;
@@ -908,18 +913,46 @@ function bloomFocus(n){
   bloomBorn=performance.now(); bloomLast=bloomBorn;
   focusN=n;
   const ks=[...n.w].filter(isKanji);
-  if(!ks.length) return;
   const cands=[];
+  const seenB=new Set([n.w]);
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
   for(const wr of WORDS){
     const w=wr.e[0];
-    if(w===n.w) continue;
+    if(seenB.has(w)) continue;
     let sc=0; for(const c of ks) if(w.includes(c)) sc++;
     if(!sc) continue;
-    cands.push([sc*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+    seenB.add(w);
+    cands.push([1e9+sc*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+  }
+  // cascade to a floor of 6 — no word ever blooms into nothing (C2):
+  // radical kin next, then nearest same-level neighbours
+  if(cands.length<6&&ks.length){
+    const comps=new Set();
+    for(const c of ks) for(const r of (KRAD[c]||"")) comps.add(r);
+    if(comps.size) for(const wr of WORDS){
+      const w=wr.e[0];
+      if(seenB.has(w)) continue;
+      let rc=0;
+      for(const c of w) if(isKanji(c)&&[...(KRAD[c]||"")].some(r=>comps.has(r))) rc++;
+      if(!rc) continue;
+      seenB.add(w);
+      cands.push([1e6+rc*1e4-Math.hypot(wr.wx-bx,wr.wy-by)*0.1,wr]);
+    }
+  }
+  if(cands.length<6){
+    const lv=n.lvl||3;
+    for(const wr of WORDS){
+      const w=wr.e[0];
+      if(seenB.has(w)||(wr.e[5]||3)!==lv) continue;
+      const d=Math.hypot(wr.wx-bx,wr.wy-by);
+      if(d>2400) continue;
+      seenB.add(w);
+      cands.push([1e3-d*0.001,wr]);
+    }
   }
   cands.sort((a,b)=>b[0]-a[0]);
   const N2=Math.min(14,cands.length);
+  if(!N2){focusN=null;return;}
   for(let i=0;i<N2;i++){
     const wr=cands[i][1];
     wr.hl=true; wr.ret=false;
@@ -1021,6 +1054,7 @@ window.__lockWord=function(w){
 function constellationLock(n){
   clearBloom();
   lockOn=true; focusN=n;
+  if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
   const isG=n.kind==="glyph";
   const selfW=isG?n.ch:n.w;
   const ks=isG?[n.ch]:[...n.w].filter(isKanji);
@@ -1057,7 +1091,7 @@ function constellationLock(n){
       const wr=WORDIX[rel];
       if(wr){
         wr.hl=true; wr.lk=true; wr.ret=false;
-        if(wr.node&&!wr.node.gone) wr.node.hlDom=true;
+        if(wr.node&&!wr.node.gone){wr.node.hlDom=true;wr.node.el.classList.add("bsat");wr.node.top=Math.max(wr.node.top,0.95);}
         FOCUS.push(wr);
         LOCK.items.push({t:"w",wr,L,pg,ty});
       } else {
@@ -1078,7 +1112,7 @@ function constellationLock(n){
     else if(shared.length===1){ pg=null; L=(150+(h%110))*inv; }
     else { pg=null; L=(252+(h%90))*inv; }
     wr.hl=true; wr.lk=true; wr.ret=false;
-    if(wr.node&&!wr.node.gone) wr.node.hlDom=true;
+    if(wr.node&&!wr.node.gone){wr.node.hlDom=true;wr.node.el.classList.add("bsat");wr.node.top=Math.max(wr.node.top,0.95);}
     FOCUS.push(wr);
     LOCK.items.push({t:"w",wr,L,pg});
   }
@@ -1088,6 +1122,11 @@ function constellationLock(n){
 // arms find their own staggered lengths and keep breathing
 function lockForce(){
   if(!LOCK) return;
+  if(focusN&&!focusN.gone){
+    const cs6=Math.cos(cam.rot), sn6=Math.sin(cam.rot);
+    const dx6=(focusN.x+focusN.dragX-vw()/2)/cam.z, dy6=(focusN.y+focusN.dragY-vh()/2)/cam.z;
+    LOCK.bx=cam.x+dx6*cs6+dy6*sn6; LOCK.by=cam.y-dx6*sn6+dy6*cs6;
+  }
   const inv=1/cam.z, sep=100*inv, csep=74*inv;
   for(const it of LOCK.items){
     if(it.t==="w"){it.px=it.wr.wx+it.wr.ox; it.py=it.wr.wy+it.wr.oy;}
@@ -1822,15 +1861,19 @@ addEventListener("pointerup",e=>{
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   if(n){
-    if(n===focusN&&n.wx!=null&&(n.dragX||n.dragY)){
+    const ddx=n.dragX, ddy=n.dragY;
+    n.x+=n.dragX; n.y+=n.dragY; n.dragX=0; n.dragY=0;
+    // the judgment is a FLICK — fast and horizontal. A slow drag is a MOVE:
+    // the word (and its constellation) goes where the finger left it.
+    const flick=(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
+    if(flick&&dx<-52){grade(n,-1);return;}
+    if(flick&&dx>52){grade(n,1);return;}
+    if(n.wx!=null&&moved&&(ddx||ddy)){
       const cs4=Math.cos(cam.rot), sn4=Math.sin(cam.rot);
-      const wdx=(n.dragX*cs4+n.dragY*sn4)/cam.z, wdy=(-n.dragX*sn4+n.dragY*cs4)/cam.z;
+      const wdx=(ddx*cs4+ddy*sn4)/cam.z, wdy=(-ddx*sn4+ddy*cs4)/cam.z;
       n.wx+=wdx; n.wy+=wdy;
       if(n.wref){n.wref.wx+=wdx; n.wref.wy+=wdy;}
     }
-    n.x+=n.dragX; n.y+=n.dragY; n.dragX=0; n.dragY=0;
-    if(dx<-52&&Math.abs(dy)<90){grade(n,-1);return;}
-    if(dx>52&&Math.abs(dy)<90){grade(n,1);return;}
     if(moved||held>600) return;
     tapNode(n); return;
   }
@@ -1859,7 +1902,7 @@ function brush(x1,y1,x2,y2,t,i,color){
   const mx=(x1+x2)/2+(y2-y1)*0.15+Math.sin(t*0.0011+i*1.7)*9;
   const my=(y1+y2)/2-(x2-x1)*0.15+Math.cos(t*0.0009+i*2.3)*9;
   fctx.lineCap="round";
-  const passes=[[7,0.06],[3.2,0.13],[1.4,0.3]];
+  const passes=[[7,0.09],[3.2,0.2],[1.4,0.5]];
   for(const p of passes){
     fctx.strokeStyle=rgba(color,p[1]);
     fctx.lineWidth=p[0];
@@ -1994,17 +2037,17 @@ function drawWorld(){
       const gold=th.dark?"#E6C86E":"#A8842C";
       const tyCol=t2=>t2==="syn"?th.pig1:t2==="fam"?th.pig2:
         t2==="col"?th.accent:t2?gold:th.pig2;
-      fctx.strokeStyle=rgba(th.pig1,0.34); fctx.lineWidth=1.3;
+      fctx.strokeStyle=rgba(th.pig1,0.55); fctx.lineWidth=1.7;
       fctx.beginPath();
       for(const it of LOCK.items) if(it.t==="g"&&!it.g.gone){
         fctx.moveTo(fx2,fy2); fctx.lineTo(it.g.x,it.g.y);
       }
       fctx.stroke();
-      fctx.lineWidth=1;
+      fctx.lineWidth=1.5;
       for(const it of LOCK.items){
         if(it.t==="w"&&it.wr.vis===frameCount){
           const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.3);
+          fctx.strokeStyle=rgba(tyCol(it.ty),0.55);
           fctx.beginPath();
           fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
           fctx.lineTo(it.wr.sx,it.wr.sy);
@@ -2012,7 +2055,7 @@ function drawWorld(){
         } else if(it.t==="s"){
           const sp2=w2s(it.gx,it.gy);
           const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.26);
+          fctx.strokeStyle=rgba(tyCol(it.ty),0.5);
           fctx.beginPath();
           fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
           fctx.lineTo(sp2.x,sp2.y);
@@ -2142,7 +2185,7 @@ function frame(t){
           if(oa.gone||ob.gone||oa.op<0.2||ob.op<0.2) continue;
           if(oa.kind!=="word"||ob.kind!=="word") continue;
           if(![...oa.w].some(ch2=>isKanji(ch2)&&ob.w.includes(ch2))) continue;
-          fctx.strokeStyle=rgba(THEMES[themeIx].pig2,.1);
+          fctx.strokeStyle=rgba(THEMES[themeIx].pig2,.18);
           fctx.lineWidth=1;
           fctx.beginPath();fctx.moveTo(oa.x,oa.y);fctx.lineTo(ob.x,ob.y);fctx.stroke();
         }

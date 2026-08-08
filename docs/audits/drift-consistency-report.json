@@ -1,0 +1,369 @@
+{
+ "generated": "drift-consistency sweep v1",
+ "total": 40,
+ "ok": 40,
+ "violations": 0,
+ "pageErrors": [],
+ "cases": [
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "触れる",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "触れる",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "触れる",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "触れる",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "救う",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "救う",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "救う",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "救う",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "量",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "7 satellites",
+   "shot": null
+  },
+  {
+   "word": "量",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "量",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "量",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "材料",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "材料",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "材料",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "材料",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "判断",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "判断",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "判断",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "判断",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "症状",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "症状",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "症状",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "症状",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "生物",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "生物",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "生物",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "生物",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  }
+ ]
+}
