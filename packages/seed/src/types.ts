@@ -155,6 +155,41 @@ export interface SeedPassage extends PassageFields {
   readonly provenance: ProvenanceByField<PassageFields>;
 }
 
+/** Addressing unit used by source anchors and `EncounterCaptured.span`. */
+export type SourceLocationUnit = 'utf16-code-unit';
+
+/** A stable, exact location inside a source document. */
+export interface SeedSourceAnchor {
+  readonly id: string;
+  readonly start: number;
+  readonly end: number;
+  readonly lexemeId: string;
+}
+
+/**
+ * One rights-accounted source document available to the reader.
+ *
+ * `contentSha256` makes source identity content-addressable while `id` remains
+ * the durable route identity. Anchors are stored in the same UTF-16 unit the
+ * frozen event catalog uses, so an encounter can preserve its exact source
+ * location without a renderer-specific coordinate.
+ */
+export interface SourceFields {
+  readonly title: string;
+  readonly language: string;
+  readonly sourceKind: 'article';
+  readonly pool: 'original' | 'licensed';
+  readonly body: string;
+  readonly contentSha256: string;
+  readonly locationUnit: SourceLocationUnit;
+  readonly anchors: readonly SeedSourceAnchor[];
+}
+
+export interface SeedSource extends SourceFields {
+  readonly id: string;
+  readonly provenance: ProvenanceByField<SourceFields>;
+}
+
 /** One entry of `data/strokes.json`: a verbatim upstream KanjiVG file. */
 export interface StrokeFile {
   readonly character: string;
@@ -191,8 +226,10 @@ export interface SeedDataset {
   readonly grammar: readonly SeedGrammar[];
   readonly sentences: readonly SeedSentence[];
   readonly passages: readonly SeedPassage[];
+  readonly sources: readonly SeedSource[];
   readonly strokes: SeedStrokes;
 }
 
 /** Every seed record shape, for code that walks the dataset generically. */
-export type SeedRecord = SeedLexeme | SeedKanji | SeedGrammar | SeedSentence | SeedPassage;
+export type SeedRecord =
+  SeedLexeme | SeedKanji | SeedGrammar | SeedSentence | SeedPassage | SeedSource;

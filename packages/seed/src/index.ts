@@ -28,6 +28,7 @@ import lexemesJson from '../data/lexemes.json';
 import passagesJson from '../data/passages.json';
 import provenanceJson from '../data/provenance.json';
 import sentencesJson from '../data/sentences.json';
+import sourcesJson from '../data/sources.json';
 import strokesJson from '../data/strokes.json';
 
 import type {
@@ -39,6 +40,7 @@ import type {
   SeedLexeme,
   SeedPassage,
   SeedSentence,
+  SeedSource,
   SeedStrokes,
 } from './types.ts';
 import {
@@ -60,6 +62,10 @@ export const PACKAGE_NAME = '@bunki/seed';
  * so this target is fully supported by seed data alone.
  */
 export const DEFAULT_CANONICAL_TARGET = '分岐';
+
+/** Permanent real-source fixture for the A1 source-anchored metabolism. */
+export const GOLDEN_SOURCE_ID = 'source-bunki-graded-n5-morning';
+export const GOLDEN_SOURCE_ANCHOR_ID = 'anchor-jibun-01';
 
 /**
  * Rendered wherever the dataset could be mistaken for a dictionary
@@ -127,6 +133,16 @@ const PASSAGE_KEYS = [
   'english',
   'lexemeIds',
   'constructionIds',
+] as const;
+const SOURCE_KEYS = [
+  'title',
+  'language',
+  'sourceKind',
+  'pool',
+  'body',
+  'contentSha256',
+  'locationUnit',
+  'anchors',
 ] as const;
 
 const registry = parseProvenanceRegistry(provenanceJson);
@@ -235,6 +251,72 @@ function buildPassages(): SeedPassage[] {
   });
 }
 
+function buildSources(): SeedSource[] {
+  return readRecordsArray(sourcesJson, 'data/sources.json').map((raw, index) => {
+    const where = `data/sources.json[${index}]`;
+    const { id, data, provenance } = resolveRecordProvenance(raw, registry, where);
+    expectDataKeys(data, SOURCE_KEYS, where);
+
+    const sourceKind = asNonEmptyString(data['sourceKind'], `${where}.sourceKind`);
+    if (sourceKind !== 'article') {
+      throw new SeedDataError(`${where}.sourceKind must be "article"`);
+    }
+    const pool = asNonEmptyString(data['pool'], `${where}.pool`);
+    if (pool !== 'original' && pool !== 'licensed') {
+      throw new SeedDataError(`${where}.pool must be "original" or "licensed"`);
+    }
+    const contentSha256 = asNonEmptyString(data['contentSha256'], `${where}.contentSha256`);
+    if (!/^[0-9a-f]{64}$/.test(contentSha256)) {
+      throw new SeedDataError(`${where}.contentSha256 must be a lowercase sha256`);
+    }
+    const locationUnit = asNonEmptyString(data['locationUnit'], `${where}.locationUnit`);
+    if (locationUnit !== 'utf16-code-unit') {
+      throw new SeedDataError(`${where}.locationUnit must be "utf16-code-unit"`);
+    }
+
+    const anchorsRaw = data['anchors'];
+    if (!Array.isArray(anchorsRaw) || anchorsRaw.length === 0) {
+      throw new SeedDataError(`${where}.anchors must be a non-empty array`);
+    }
+    const anchors = (anchorsRaw as unknown[]).map((entry, anchorIndex) => {
+      const anchorWhere = `${where}.anchors[${anchorIndex}]`;
+      const anchor = asRecord(entry, anchorWhere);
+      const keys = Object.keys(anchor).sort();
+      const expected = ['end', 'id', 'lexemeId', 'start'];
+      if (
+        keys.length !== expected.length ||
+        keys.some((key, keyIndex) => key !== expected[keyIndex])
+      ) {
+        throw new SeedDataError(`${anchorWhere} must contain exactly id, start, end, lexemeId`);
+      }
+      const start = asInteger(anchor['start'], `${anchorWhere}.start`);
+      const end = asInteger(anchor['end'], `${anchorWhere}.end`);
+      if (start < 0 || end <= start) {
+        throw new SeedDataError(`${anchorWhere} must satisfy 0 <= start < end`);
+      }
+      return {
+        id: asNonEmptyString(anchor['id'], `${anchorWhere}.id`),
+        start,
+        end,
+        lexemeId: asNonEmptyString(anchor['lexemeId'], `${anchorWhere}.lexemeId`),
+      };
+    });
+
+    return {
+      id,
+      title: asNonEmptyString(data['title'], `${where}.title`),
+      language: asNonEmptyString(data['language'], `${where}.language`),
+      sourceKind,
+      pool,
+      body: asNonEmptyString(data['body'], `${where}.body`),
+      contentSha256,
+      locationUnit,
+      anchors,
+      provenance: provenanceFor(provenance, SOURCE_KEYS, where),
+    };
+  });
+}
+
 function buildStrokes(): SeedStrokes {
   const where = 'data/strokes.json';
   const doc = asRecord(strokesJson, where);
@@ -295,6 +377,7 @@ export const seedDataset: SeedDataset = {
   grammar: buildGrammar(),
   sentences: buildSentences(),
   passages: buildPassages(),
+  sources: buildSources(),
   strokes: buildStrokes(),
 };
 
@@ -305,6 +388,7 @@ export const allSeedRecords = [
   ...seedDataset.grammar,
   ...seedDataset.sentences,
   ...seedDataset.passages,
+  ...seedDataset.sources,
 ];
 
 export const findLexeme = (id: string): SeedLexeme | undefined =>
@@ -312,6 +396,9 @@ export const findLexeme = (id: string): SeedLexeme | undefined =>
 
 export const findKanji = (character: string): SeedKanji | undefined =>
   seedDataset.kanji.find((kanji) => kanji.character === character);
+
+export const findSource = (id: string): SeedSource | undefined =>
+  seedDataset.sources.find((source) => source.id === id);
 
 export { SeedDataError } from './validate.ts';
 export type * from './types.ts';

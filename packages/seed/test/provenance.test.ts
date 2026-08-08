@@ -47,6 +47,7 @@ const RECORD_FILES = [
   'grammar.json',
   'sentences.json',
   'passages.json',
+  'sources.json',
 ] as const;
 
 const readJson = (file: string): unknown =>
