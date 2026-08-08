@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-08 00:48",
+          "2026-08-08 01:10",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-08 00:53",
+          "2026-08-08 01:15",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-08 00:57",
+          "2026-08-08 01:19",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-16 00:47",
+          "2026-08-16 01:09",
           "8.30"
         ]
       ]
@@ -185,44 +185,51 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
+        },
+        {
+          "label": "gloss",
+          "selector": ".gloss",
+          "contrast": 2.43,
+          "fontSize": 4.4,
+          "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 2.64,
+          "contrast": 2.43,
           "fontSize": 14,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 2.64,
+          "contrast": 2.43,
           "fontSize": 13,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 2.64,
+          "contrast": 2.43,
           "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
         },
         {
           "label": "discrimination note",
@@ -243,16 +250,23 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
+        },
+        {
+          "label": "gloss",
+          "selector": ".gloss",
+          "contrast": 2.43,
+          "fontSize": 4.4,
+          "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "faint / snippet",
@@ -278,9 +292,9 @@
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 16.2,
+          "contrast": 13.25,
           "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(27, 42, 58)"
         },
         {
           "label": "discrimination note",
@@ -302,16 +316,23 @@
       {
         "label": "reading body (focused)",
         "selector": ".reader",
-        "contrast": 16.2,
+        "contrast": 13.25,
         "fontSize": 21,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(27, 42, 58)"
       },
       {
         "label": "view title",
         "selector": ".view-title",
-        "contrast": 16.2,
+        "contrast": 13.25,
         "fontSize": 22,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(27, 42, 58)"
+      },
+      {
+        "label": "gloss",
+        "selector": ".gloss",
+        "contrast": 2.43,
+        "fontSize": 4.4,
+        "color": "rgba(27, 42, 58, 0.42)"
       },
       {
         "label": "discrimination note",
@@ -344,9 +365,9 @@
       {
         "label": "shelf title",
         "selector": ".shelf-title",
-        "contrast": 16.2,
+        "contrast": 13.25,
         "fontSize": 19,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(27, 42, 58)"
       },
       {
         "label": "faint / snippet",
@@ -1398,16 +1419,36 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 211,
+  "loadMs": 298,
   "summary": {
-    "total": 82,
+    "total": 86,
     "failed": 0
   },
   "results": [
     {
+      "name": "Phase 2 · the app opens into the living universe",
+      "pass": true,
+      "detail": "layer active, 64 words adrift"
+    },
+    {
+      "name": "Phase 2 · the corridor chrome rides above the universe (one fabric)",
+      "pass": true,
+      "detail": "chrome visible, shelf door present"
+    },
+    {
+      "name": "Phase 2 · one door from the universe to the shelf",
+      "pass": true,
+      "detail": "26 articles; universe asleep (display none)"
+    },
+    {
+      "name": "Phase 2 · 戻る returns from the shelf to the universe",
+      "pass": true,
+      "detail": "layer active again"
+    },
+    {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "26 texts, ready in 211 ms"
+      "detail": "26 texts, ready in 298 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1657,12 +1698,12 @@
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.64:1 → wcag 5.89:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.43:1 → wcag 5.89:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
       "pass": true,
-      "detail": "2.64:1"
+      "detail": "2.43:1"
     },
     {
       "name": "variant D · field entry",
@@ -1692,7 +1733,7 @@
     {
       "name": "body ink clears AAA",
       "pass": true,
-      "detail": "16.2:1"
+      "detail": "13.25:1"
     },
     {
       "name": "every visible control is at least 40px",
