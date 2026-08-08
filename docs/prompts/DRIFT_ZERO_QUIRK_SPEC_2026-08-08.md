@@ -117,12 +117,11 @@ internals, data-tier growth, new features not required by an invariant.
 - A6 · The operator's own walk produces no new defect report on invariants
   I1–I10 (the human criterion — the only one the agent cannot self-grant).
 
-## 6. Open questions for the operator (defaults let work proceed)
+## 6. Operator rulings on the open questions (RATIFIED 2026-08-08)
 
-- **Q1 — satellite tap staging.** Default: tap unfolds the satellite in
-  place; tap again re-centres the constellation on it.
-- **Q2 — where may the flick-judgment fire?** Default: on the held/centred
-  planet only while a constellation is open; anywhere on the free field.
-- **Q3 — campaign scope.** Default: drift + its doors into the corridor.
-
-Answers overwrite defaults; everything else proceeds without blocking.
+- **Q1 — satellite tap staging: RATIFIED.** Tap reveals the satellite in
+  place (reading + gloss); tap again re-centres the constellation on it.
+- **Q2 — flick scope: RATIFIED.** While a constellation is open, only the
+  held/centred planet may be flick-judged — satellites can never be
+  accidentally graded. On the free field the v1 grammar stands: any word.
+- **Q3 — scope: RATIFIED.** Drift + its doors into the corridor.
