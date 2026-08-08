@@ -61,6 +61,22 @@
       ],
       "verificationStatus": "baseline-crash-and-tide-target-violation-reproduced",
       "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a05-accessibility-20260808",
+      "baseSha": "81d0c12",
+      "headSha": "81d0c12",
+      "dependencies": ["codex/kairo-full-build-20260808@81d0c12"],
+      "capabilityOwner": "a05-accessibility-corridor-contract",
+      "capabilities": [
+        "substrate-neutral-interaction-actions",
+        "corridor-keyboard-and-switch-parity",
+        "dialog-focus-contract",
+        "corridor-reduced-motion",
+        "pages-corridor-packaging"
+      ],
+      "verificationStatus": "red-baseline-mapped-implementation-in-progress",
+      "status": "active"
     }
   ]
 }
