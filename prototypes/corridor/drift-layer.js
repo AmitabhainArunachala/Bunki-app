@@ -845,7 +845,7 @@ function clearBloom(keep){
   for(const wr of FOCUS) wr.lk=false;
   FOCUS.length=0; focusN=null; lockOn=false; camT=null; LOCK=null;
   for(const g of LOCKG){
-    if(!g.gone){g.gone=true;g.top=0;g.el.style.pointerEvents="none";removeNode(g,500);}
+    if(g!==keep&&!g.gone){g.gone=true;g.top=0;g.el.style.pointerEvents="none";removeNode(g,500);}
   }
   LOCKG.length=0;
 }
@@ -902,14 +902,31 @@ window.__lockWord=function(w){
   constellationLock(wr.node);
   return true;
 };
+function materializeLockWord(wr){
+  if(!wr.node||wr.node.removed||wr.node.gone){
+    const sp=w2s(wr.wx+(wr.ox||0),wr.wy+(wr.oy||0));
+    const nd=spawnWord(wr.e,sp.x,sp.y,true);
+    nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
+    nd.fromBloom=true;
+  }
+  const nd=wr.node;
+  nd.hlDom=true; nd.el.classList.add("bsat"); nd.el.style.pointerEvents="";
+  nd.top=Math.max(nd.top,0.95);
+  return nd;
+}
+function semanticLockWord(rel,gloss,lvl0,x,y){
+  const reading=[...rel].some(isKanji)?"":rel;
+  return {e:[rel,reading,gloss||"semantic relation","k","",lvl0],
+    wx:x,wy:y,pri:99,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,
+    dvx:0,dvy:0,semantic:true};
+}
 function constellationLock(n){
-  clearBloom();
+  clearBloom(n&&n.el?n:undefined);
   lockOn=true; focusN=n;
   if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
   const isG=n.kind==="glyph";
   const selfW=isG?n.ch:n.w;
   const ks=isG?[n.ch]:[...n.w].filter(isKanji);
-  if(!ks.length){lockOn=false;focusN=null;return;}
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
   camT={x:bx,y:by};
   const inv=1/cam.z;
@@ -939,16 +956,14 @@ function constellationLock(n){
       const L=((shell===1?100:shell===2?150:242)+(h%70))*inv;
       const shared=ks.filter(c=>rel.includes(c));
       const pg=(shared.length===1&&pinOf[shared[0]])?pinOf[shared[0]]:null;
-      const wr=WORDIX[rel];
-      if(wr){
-        wr.hl=true; wr.lk=true; wr.ret=false;
-        if(wr.node&&!wr.node.gone){wr.node.hlDom=true;wr.node.el.classList.add("bsat");wr.node.top=Math.max(wr.node.top,0.95);}
-        FOCUS.push(wr);
-        LOCK.items.push({t:"w",wr,L,pg,ty});
-      } else {
-        LOCK.items.push({t:"s",label:rel,ty,L,pg,
-          gx:bx+(Math.random()-.5)*40,gy:by+(Math.random()-.5)*40});
-      }
+      const ang=-Math.PI/2+semN*TAU/Math.max(Math.min(sem.length,16),3)+(h%31-15)*0.008;
+      const gx=bx+Math.cos(ang)*L, gy=by+Math.sin(ang)*L;
+      const wr=WORDIX[rel]||semanticLockWord(rel,se[2],isG?level:(n.lvl||3),gx,gy);
+      wr.ox=gx-wr.wx; wr.oy=gy-wr.wy;
+      wr.hl=true; wr.lk=true; wr.ret=false;
+      materializeLockWord(wr);
+      FOCUS.push(wr);
+      LOCK.items.push({t:"w",wr,L,pg,ty});
       if(++semN>=16) break;
     }
   }
@@ -962,8 +977,10 @@ function constellationLock(n){
     else if(shared.length===1&&pinOf[shared[0]]){ pg=pinOf[shared[0]]; L=(96+(h%120))*inv; }
     else if(shared.length===1){ pg=null; L=(150+(h%110))*inv; }
     else { pg=null; L=(252+(h%90))*inv; }
+    const ang=-Math.PI/2+LOCK.items.length*TAU/Math.max(mem.length+LOCK.items.length,12)+(h%31-15)*0.008;
+    wr.ox=bx+Math.cos(ang)*L-wr.wx; wr.oy=by+Math.sin(ang)*L-wr.wy;
     wr.hl=true; wr.lk=true; wr.ret=false;
-    if(wr.node&&!wr.node.gone){wr.node.hlDom=true;wr.node.el.classList.add("bsat");wr.node.top=Math.max(wr.node.top,0.95);}
+    materializeLockWord(wr);
     FOCUS.push(wr);
     LOCK.items.push({t:"w",wr,L,pg});
   }
@@ -1004,7 +1021,23 @@ function lockForce(){
     else if(sp3.x>vw()-46) fx-=(sp3.x-(vw()-46))*0.03*inv;
     if(sp3.y<98) fy+=(98-sp3.y)*0.03*inv;
     else if(sp3.y>vh()-132) fy-=(sp3.y-(vh()-132))*0.03*inv;
-    if(it.t==="w"){it.wr.ox+=fx; it.wr.oy+=fy;}
+    if(it.t==="w"){
+      it.wr.ox+=fx; it.wr.oy+=fy;
+      let s3=w2s(it.wr.wx+it.wr.ox,it.wr.wy+it.wr.oy);
+      // Every named lock member is interaction, not scenery. Clamp its full
+      // DOM body inside the viewport after the force step so an outer-shell
+      // semantic never becomes a visible-but-untouchable canvas-edge label.
+      const box=it.wr.node&&!it.wr.node.gone?it.wr.node.el.getBoundingClientRect():null;
+      const padx=Math.min(vw()/2-4,Math.max(48,(box?box.width/2:32)+12));
+      const pady=Math.min(vh()/2-4,Math.max(170,(box?box.height/2:18)+82));
+      const sx3=clamp(s3.x,padx,vw()-padx),sy3=clamp(s3.y,pady,vh()-pady);
+      if(sx3!==s3.x||sy3!==s3.y){
+        const safe=s2wl(sx3,sy3);
+        it.wr.ox=safe.x-it.wr.wx;it.wr.oy=safe.y-it.wr.wy;
+        s3={x:sx3,y:sy3};
+      }
+      it.wr.sx=s3.x; it.wr.sy=s3.y; it.wr.vis=frameCount;
+    }
     else if(it.t==="s"){it.gx+=fx; it.gy+=fy;}
     else {it.g.wx+=fx; it.g.wy+=fy;}
   }
@@ -1601,6 +1634,14 @@ let lpTimer=0,lpFired=false;
 // two fingers = zoom: pinch-out over a body dives into it, pinch-in surfaces
 const touches=new Map();
 let pinch=null;
+function rebasePinch(){
+  if(touches.size!==2){pinch=null;return;}
+  const pair=[...touches.entries()];
+  const a=pair[0][1],b2=pair[1][1];
+  const d=Math.hypot(a.x-b2.x,a.y-b2.y)||1;
+  pinch={ids:[pair[0][0],pair[1][0]],d0:d,last:d,
+    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z};
+}
 function pinchDive(mid){
   let best=null,bd=1e9;
   for(const n of nodes){
@@ -1621,11 +1662,16 @@ addEventListener("pointerdown",e=>{
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(FOCUS.length) bloomLast=performance.now();
   if(touches.size===2){
-    const v=[...touches.values()];
-    pinch={d0:Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1,fired:false,z0:cam.z};
+    rebasePinch();
     clearTimeout(lpTimer);
     if(pn){pn.dragX=0;pn.dragY=0;pn=null;}
-    moved=true;
+    moved=true;gestureActive=false;gestureId=null;
+    return;
+  }
+  if(touches.size>2){
+    pinch=null;clearTimeout(lpTimer);
+    if(pn){pn.dragX=0;pn.dragY=0;pn=null;}
+    moved=true;gestureActive=false;gestureId=null;
     return;
   }
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
@@ -1669,7 +1715,7 @@ const s2wl=(sx,sy)=>{
 addEventListener("pointermove",e=>{
   if(!DRIFT_ON)return;
   const t2=touches.get(e.pointerId);
-  if(FOCUS.length) bloomLast=performance.now();
+  if(FOCUS.length&&t2) bloomLast=performance.now();
   let pdx=0,pdy=0;
   if(t2){
     pdx=e.clientX-t2.x; pdy=e.clientY-t2.y;
@@ -1708,6 +1754,10 @@ addEventListener("pointermove",e=>{
     }
     return;
   }
+  // A move belongs only to the pointer that began the one-finger gesture.
+  // Mouse hover, a stale third finger, and every other foreign pointer carry
+  // no authority to move the held word or pan its camera.
+  if(!t2||touches.size!==1||e.pointerId!==gestureId) return;
   if(!pn){
     // one finger on open water: swim — pan the camera through the field
     if(t2&&touches.size===1&&gestureActive){
@@ -1727,7 +1777,7 @@ addEventListener("pointermove",e=>{
 },{passive:true});
 function endPointer(e){
   touches.delete(e.pointerId);
-  if(touches.size<2) pinch=null;
+  rebasePinch();
 }
 function cancelPointer(e){
   endPointer(e);
@@ -1752,12 +1802,13 @@ addEventListener("pointerup",e=>{
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
+  const terminalMoved=moved||Math.abs(dx)>8||Math.abs(dy)>8;
   if(n){
     const ddx=n.dragX, ddy=n.dragY;
     n.x+=n.dragX; n.y+=n.dragY; n.dragX=0; n.dragY=0;
     // the judgment is a FLICK — fast and horizontal. A slow drag is a MOVE:
     // the word (and its constellation) goes where the finger left it.
-    const flick=(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
+    const flick=moved&&(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
     const mayGrade=!FOCUS.length||n===focusN;
     if(flick&&dx<-52&&mayGrade){grade(n,-1);return;}
     if(flick&&dx>52&&mayGrade){grade(n,1);return;}
@@ -1767,10 +1818,10 @@ addEventListener("pointerup",e=>{
       n.wx+=wdx; n.wy+=wdy;
       if(n.wref){n.wref.wx+=wdx; n.wref.wy+=wdy;}
     }
-    if(moved||held>600) return;
+    if(terminalMoved||held>600) return;
     tapNode(n); return;
   }
-  if(moved||held>600) return;   // a release is deliberate, or it is nothing
+  if(terminalMoved||held>600) return; // a release is deliberate, or it is nothing
   if(card.classList.contains("open")){card.classList.remove("open");return;}
   if(stack.length){surface();return;}
   if(lockOn){clearBloom();return;}
@@ -1791,6 +1842,7 @@ addEventListener("pointerup",e=>{
   // a galaxy sun is a door too
   const hb=hubAt(e.clientX,e.clientY);
   if(hb){
+    clearBloom();
     const g=spawnGlyph(hb,e.clientX,e.clientY,false);
     g.ephemeral=true; diveKanji(g); return;
   }
@@ -2147,7 +2199,7 @@ function frame(t){
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
   }
-  if(FOCUS.length&&!lockOn&&t-bloomLast>10000) clearBloom();
+  if(FOCUS.length&&!lockOn&&touches.size===0&&t-bloomLast>10000) clearBloom();
   if(frameCount%90===0) rebuildPairs();
   frameCount++;
   drawWorld();
