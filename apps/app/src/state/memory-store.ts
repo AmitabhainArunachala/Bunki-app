@@ -42,14 +42,21 @@
 
 import {
   componentIdOfEncounter,
+  createLearnContractPair,
   createDomainEvent,
   initialThreadState,
   isEvidenceClassEvent,
+  learnContractIdentity,
+  learnContractMatchesSpecification,
   mintEvidenceSuperseded,
   mintExposureLogged,
+  mintLookupFrictionLogged,
   mintReviewGraded,
   openMintedEventBatch,
   replay,
+  targetKeyOfEncounter,
+  targetTextOfCapture,
+  validateLearnContractPair,
   threadReducer,
   type CandidateAcceptedAsNoteEvent,
   type CandidateAttachedEvent,
@@ -60,6 +67,7 @@ import {
   type DomainEvent,
   type DomainEventType,
   type EncounterCapturedEvent,
+  type LookupFrictionLoggedEvent,
   type MintedEventBatch,
   type ThreadPromotionChangedEvent,
   type ThreadState,
@@ -97,9 +105,14 @@ export function targetKeyOf(text: string): string {
   return text.trim().normalize('NFKC').toLocaleLowerCase('en-US');
 }
 
-function captureIdempotencyKey(command: Extract<AppCommand, { kind: 'capture' }>): string {
+function captureIdempotencyKey(
+  command: Extract<AppCommand, { kind: 'capture' }>,
+  targetText = targetTextOfCapture(command.text, command.span),
+): string {
   const { sourceId, locator } = command.sourceRef;
-  return `capture:${sourceId}:${locator ?? ''}:${targetKeyOf(command.text)}`;
+  const coordinates =
+    command.span === undefined ? 'whole' : `${command.span.start}-${command.span.end}`;
+  return `capture:${sourceId}:${locator ?? ''}:${coordinates}:${targetKeyOf(targetText)}`;
 }
 
 /**
@@ -335,15 +348,16 @@ export function createMemoryAppStore({
 
     if (event.type === 'EncounterCaptured') {
       const captured = event;
-      const targetKey = targetKeyOf(captured.text);
+      const targetText = targetKeyOfEncounter(captured);
+      const targetKey = targetKeyOf(targetText);
       const existing = threads.get(captured.threadId);
       const marked = 'uncertaintyMark' in captured && captured.uncertaintyMark === true;
       if (existing === undefined) {
         threads.set(captured.threadId, {
           state: initialThreadState(captured),
-          displayText: captured.text.trim(),
+          displayText: targetText,
           targetKey,
-          lexemeId: resolveLexemeId?.(captured.text) ?? null,
+          lexemeId: resolveLexemeId?.(targetText) ?? null,
           uncertainty: null,
           markRecordedInLog: marked,
           capturedAt: captured.occurredAt,
@@ -391,11 +405,15 @@ export function createMemoryAppStore({
   }
 
   function applyCapture(command: Extract<AppCommand, { kind: 'capture' }>): CommandAck {
-    const idempotencyKey = captureIdempotencyKey(command);
+    // Validate and select before consulting idempotency. `String.slice` clamps
+    // invalid bounds; using the domain helper makes malformed coordinates a
+    // typed refusal instead of a silently different target.
+    const selectedText = targetTextOfCapture(command.text, command.span);
+    const idempotencyKey = captureIdempotencyKey(command, selectedText);
     const previous = appliedKeys.get(idempotencyKey);
     if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
 
-    const targetKey = targetKeyOf(command.text);
+    const targetKey = targetKeyOf(selectedText);
     const existing = findThreadByTarget(targetKey);
     // "threadId (new or existing)" — §6.1. An encounter of text the learner has
     // met before continues that thread instead of forking a second one.
@@ -408,6 +426,7 @@ export function createMemoryAppStore({
         encounterId: context.ids.nextId('encounter'),
         threadId,
         text: command.text,
+        ...(command.span === undefined ? {} : { span: { ...command.span } }),
         sourceRef: command.sourceRef,
         provenance: command.provenance,
         // `true | absent` is the whole vocabulary the v1 schema has. The
@@ -417,6 +436,10 @@ export function createMemoryAppStore({
       },
       { idempotencyKey },
     );
+
+    // Read the exact target back from the parsed event, so live projection and
+    // reload projection share one definition of the frozen coordinates.
+    const targetText = targetKeyOfEncounter(event);
 
     events.push(event);
 
@@ -429,7 +452,7 @@ export function createMemoryAppStore({
     if (existing === undefined) {
       threads.set(threadId, {
         state: initialThreadState(event),
-        displayText: command.text.trim(),
+        displayText: targetText,
         targetKey,
         lexemeId: command.lexemeId ?? null,
         uncertainty,
@@ -500,6 +523,178 @@ export function createMemoryAppStore({
 
     const ack: CommandAck = {
       threadId: command.threadId,
+      acknowledgedAt: event.occurredAt,
+      events: [event],
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(idempotencyKey, ack);
+    return ack;
+  }
+
+  function requireExplicitUserAction(command: { readonly userAction: true }, action: string): void {
+    // Runtime backstop for JSON/`any` callers. The literal type stops ordinary
+    // TypeScript producers; this stops a forged `false` from turning an
+    // automatic lifecycle action into learner authority.
+    if ((command as { readonly userAction: unknown }).userAction !== true) {
+      throw new Error(`${action} requires an explicit user action`);
+    }
+  }
+
+  /**
+   * Activate Learn and its versioned reading + meaning pair as one app command.
+   *
+   * No screen-side factory logic lives here: the domain validates the supplied
+   * definitions, derives stable ids from the durable thread/spec identity, and
+   * mints both `ContractCreated` events. The app owns only command sequencing
+   * and journaling.
+   */
+  function applyActivateLearn(command: Extract<AppCommand, { kind: 'activateLearn' }>): CommandAck {
+    requireExplicitUserAction(command, 'Learn activation');
+    const thread = threads.get(command.threadId);
+    if (thread === undefined)
+      throw new Error(`cannot activate Learn for unknown thread ${command.threadId}`);
+
+    const origin = events.find(
+      (event): event is EncounterCapturedEvent =>
+        event.type === 'EncounterCaptured' && event.threadId === command.threadId,
+    );
+    if (origin === undefined) {
+      throw new Error(`thread ${command.threadId} has no origin capture for Learn contracts`);
+    }
+
+    // Pure, complete validation before any promotion object is minted or any
+    // event is appended. A bad meaning grader cannot leave the thread at Learn
+    // with only a reading contract.
+    validateLearnContractPair(origin, command.specification);
+    const skills = ['orthography_to_reading', 'form_to_meaning'] as const;
+    const identities = skills.map((skill) =>
+      learnContractIdentity(command.threadId, command.specification, skill),
+    );
+    const activationKey = `activate-learn:${identities.map((identity) => identity.contractId).join('|')}`;
+    const previous = appliedKeys.get(activationKey);
+    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+
+    const existingContracts = identities.map((identity) =>
+      events.filter(
+        (event): event is ContractCreatedEvent =>
+          event.type === 'ContractCreated' && event.contractId === identity.contractId,
+      ),
+    );
+    if (existingContracts.some((matches) => matches.length > 1)) {
+      throw new Error('cannot activate Learn: a stable contract id appears more than once');
+    }
+    const existingCount = existingContracts.filter((matches) => matches.length === 1).length;
+    if (existingCount !== 0 && existingCount !== skills.length) {
+      throw new Error('cannot activate Learn: the durable reading/meaning pair is incomplete');
+    }
+    if (existingCount === skills.length) {
+      for (let index = 0; index < skills.length; index += 1) {
+        const event = existingContracts[index]?.[0];
+        const skill = skills[index];
+        if (
+          event === undefined ||
+          skill === undefined ||
+          !learnContractMatchesSpecification(event, origin, command.specification, skill)
+        ) {
+          throw new Error(
+            'cannot activate Learn: a stable contract id carries different grading data',
+          );
+        }
+      }
+    }
+
+    const promotions: ThreadPromotionChangedEvent[] = [];
+    let state = thread.state;
+    const remaining =
+      state.promotion === 'captured'
+        ? (['keep', 'learn'] as const)
+        : state.promotion === 'keep'
+          ? (['learn'] as const)
+          : [];
+    let from = state.promotion;
+    for (const to of remaining) {
+      const promotion = createDomainEvent(
+        context,
+        'ThreadPromotionChanged',
+        { threadId: command.threadId, from, to, origin: 'user' },
+        { idempotencyKey: promoteIdempotencyKey(command.threadId, from, to) },
+      );
+      promotions.push(promotion);
+      state = threadReducer(state, promotion);
+      from = to;
+    }
+
+    const contracts =
+      existingCount === 0 ? createLearnContractPair(context, origin, command.specification) : [];
+    const appended: DomainEvent[] = [...promotions, ...contracts];
+    if (appended.length === 0) {
+      const acknowledgedAt = existingContracts[1]?.[0]?.occurredAt ?? origin.occurredAt;
+      return {
+        threadId: command.threadId,
+        acknowledgedAt,
+        events: [],
+        deduplicated: true,
+        durability,
+      };
+    }
+
+    events.push(...appended);
+    if (promotions.length > 0) threads.set(command.threadId, { ...thread, state });
+    for (const event of appended) {
+      appliedKeys.set(event.idempotencyKey, {
+        threadId: command.threadId,
+        acknowledgedAt: event.occurredAt,
+        events: [event],
+        deduplicated: false,
+        durability,
+      });
+    }
+
+    const acknowledgedAt = appended[appended.length - 1]?.occurredAt ?? origin.occurredAt;
+    const ack: CommandAck = {
+      threadId: command.threadId,
+      acknowledgedAt,
+      events: appended,
+      deduplicated: false,
+      durability,
+    };
+    appliedKeys.set(activationKey, ack);
+    return ack;
+  }
+
+  /** Mint and record one quick look. It has no route to a grade or FSRS. */
+  function applyRecordLookupFriction(
+    command: Extract<AppCommand, { kind: 'recordLookupFriction' }>,
+  ): CommandAck {
+    requireExplicitUserAction(command, 'Lookup friction');
+    if (command.lookupId.trim() === '') throw new Error('lookupId must be non-empty');
+
+    const idempotencyKey = `lookup-friction:${encodeURIComponent(command.lookupId)}`;
+    const previous = appliedKeys.get(idempotencyKey);
+    if (previous !== undefined) {
+      const recorded = previous.events[0];
+      if (
+        recorded?.type !== 'LookupFrictionLogged' ||
+        recorded.context !== command.context ||
+        recorded.targetRef.targetType !== command.targetRef.targetType ||
+        recorded.targetRef.targetId !== command.targetRef.targetId
+      ) {
+        throw new Error('lookupId was already used for different lookup evidence');
+      }
+      return { ...previous, events: [], deduplicated: true };
+    }
+
+    const event: LookupFrictionLoggedEvent = mintLookupFrictionLogged(
+      context,
+      { targetRef: command.targetRef, context: command.context },
+      { idempotencyKey },
+    );
+    events.push(event);
+
+    const threadId = command.targetRef.targetType === 'thread' ? command.targetRef.targetId : '';
+    const ack: CommandAck = {
+      threadId,
       acknowledgedAt: event.occurredAt,
       events: [event],
       deduplicated: false,
@@ -948,6 +1143,10 @@ export function createMemoryAppStore({
         return applyCapture(command);
       case 'promote':
         return applyPromote(command);
+      case 'activateLearn':
+        return applyActivateLearn(command);
+      case 'recordLookupFriction':
+        return applyRecordLookupFriction(command);
       case 'markUncertainty':
         return applyMarkUncertainty(command);
       case 'attachCandidate':
