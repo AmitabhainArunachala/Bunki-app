@@ -7,6 +7,7 @@ import {
   componentIdOfEncounter,
   createDeterministicContext,
   learnContractIdentity,
+  parseEvent,
   type DomainContext,
   type DomainEvent,
   type EncounterCapturedEvent,
@@ -75,6 +76,23 @@ const capture = (overrides: Partial<CaptureCommand> = {}): CaptureCommand => ({
   ...overrides,
 });
 
+const LEGACY_CAPTURE_KEY = `capture:${SOURCE.sourceId}:${SOURCE.locator}:${String(span.start)}-${String(span.end)}:${targetKeyOf(TARGET)}`;
+
+const legacyCaptureEvent = (): EncounterCapturedEvent =>
+  parseEvent({
+    eventId: 'legacy-capture-event',
+    v: 1,
+    occurredAt: '2026-08-08T00:00:00.000Z',
+    idempotencyKey: LEGACY_CAPTURE_KEY,
+    type: 'EncounterCaptured',
+    encounterId: 'legacy-capture-encounter',
+    threadId: 'legacy-capture-thread',
+    text: sourceText,
+    span,
+    sourceRef: SOURCE,
+    provenance: PROVENANCE,
+  }) as EncounterCapturedEvent;
+
 const activateLearn = (threadId: string): AppCommand => ({
   kind: 'activateLearn',
   userAction: true,
@@ -105,15 +123,99 @@ describe('CaptureCommand.span uses the frozen EncounterCaptured coordinates', ()
     expect(view?.displayText).not.toBe(sourceText);
   });
 
-  it('does not let unselected source-body text perturb idempotency', () => {
+  it('records unselected source-body and provenance drift as a new encounter', () => {
     const app = store();
     const first = app.execute(capture());
     const changedBody = '別日の分岐で道を戻る。';
-    const repeat = app.execute(capture({ text: changedBody }));
+    const changed = capture({
+      text: changedBody,
+      sourceRef: { ...SOURCE, kind: 'manual' },
+      provenance: {
+        ...PROVENANCE,
+        sourceVersion: '2026-08-10',
+        license: 'user_owned',
+        modificationStatus: 'modified',
+      },
+      uncertainty: 'meaning',
+    });
+    const recaptured = app.execute(changed);
 
-    expect(repeat.deduplicated).toBe(true);
-    expect(repeat.threadId).toBe(first.threadId);
-    expect(app.readAll()).toHaveLength(1);
+    expect(recaptured.deduplicated).toBe(false);
+    expect(recaptured.threadId).toBe(first.threadId);
+    expect(app.readAll()).toHaveLength(2);
+    expect(recaptured.events[0]).toMatchObject({
+      type: 'EncounterCaptured',
+      text: changedBody,
+      sourceRef: { ...SOURCE, kind: 'manual' },
+      provenance: {
+        sourceVersion: '2026-08-10',
+        license: 'user_owned',
+        modificationStatus: 'modified',
+      },
+      uncertaintyMark: true,
+    });
+    expect(recaptured.events[0]?.idempotencyKey).toMatch(/^capture:v2:[0-9a-f]{64}$/);
+    expect(recaptured.events[0]?.idempotencyKey).not.toBe(first.events[0]?.idempotencyKey);
+
+    const retry = app.execute(changed);
+    expect(retry.deduplicated).toBe(true);
+    expect(retry.events).toEqual([]);
+    expect(app.readAll()).toHaveLength(2);
+  });
+
+  it('rejects whitespace-only selected targets before capture or Learn can gain authority', () => {
+    const app = store();
+    const whitespaceBody = 'A \tB';
+
+    expect(() =>
+      app.execute(capture({ text: whitespaceBody, span: { start: 1, end: 3 } })),
+    ).toThrow(/selected target must contain non-whitespace text/);
+    expect(() => app.execute(capture({ text: '\u3000', span: undefined }))).toThrow(
+      /selected target must contain non-whitespace text/,
+    );
+    expect(app.readAll()).toEqual([]);
+    expect(app.getSnapshot().threads).toEqual([]);
+    expect(app.readDerived().contracts).toEqual([]);
+    expect(app.readDerived().memoryStates).toEqual([]);
+  });
+
+  it('separates source ids and locators that collide under the legacy delimiter key', () => {
+    const app = store();
+    const first = app.execute(
+      capture({ sourceRef: { sourceId: 'reader:a', kind: 'text', locator: 'p7' } }),
+    );
+    const second = app.execute(
+      capture({ sourceRef: { sourceId: 'reader', kind: 'text', locator: 'a:p7' } }),
+    );
+
+    expect(second.deduplicated).toBe(false);
+    expect(second.threadId).toBe(first.threadId);
+    expect(app.readAll()).toHaveLength(2);
+    expect(second.events[0]?.idempotencyKey).not.toBe(first.events[0]?.idempotencyKey);
+  });
+
+  it('validates invalid source and provenance even when their legacy tuple collides', () => {
+    const legacy = parseEvent({
+      eventId: 'legacy-validation-event',
+      v: 1,
+      occurredAt: '2026-08-08T00:00:00.000Z',
+      idempotencyKey: `capture:reader::${String(span.start)}-${String(span.end)}:${targetKeyOf(TARGET)}`,
+      type: 'EncounterCaptured',
+      encounterId: 'legacy-validation-encounter',
+      threadId: 'legacy-validation-thread',
+      text: sourceText,
+      span,
+      sourceRef: { sourceId: 'reader', kind: 'text' },
+      provenance: PROVENANCE,
+    });
+    const app = store('validation-', [legacy]);
+    const invalid = capture({
+      sourceRef: { sourceId: 'reader', kind: 'text', locator: '' },
+      provenance: { ...PROVENANCE, license: '' },
+    }) as unknown as CaptureCommand;
+
+    expect(() => app.execute(invalid)).toThrow();
+    expect(app.readAll()).toEqual([legacy]);
   });
 
   it('keeps two selected substrings in one body as distinct capture identities', () => {
@@ -265,6 +367,32 @@ describe('explicit lookup friction', () => {
 });
 
 describe('reload/replay authority', () => {
+  it('dual-reads an exact legacy retry but records changed legacy evidence under v2', () => {
+    const legacy = legacyCaptureEvent();
+    const app = store('legacy-', [legacy]);
+
+    const exactRetry = app.execute(capture());
+    expect(exactRetry.deduplicated).toBe(true);
+    expect(exactRetry.threadId).toBe(legacy.threadId);
+    expect(app.readAll()).toEqual([legacy]);
+
+    const driftedCommand = capture({
+      text: '別日の分岐で道を戻る。',
+      provenance: { ...PROVENANCE, sourceVersion: '2026-08-10' },
+    });
+    const drifted = app.execute(driftedCommand);
+    expect(drifted.deduplicated).toBe(false);
+    expect(drifted.threadId).toBe(legacy.threadId);
+    expect(drifted.events[0]?.idempotencyKey).toMatch(/^capture:v2:[0-9a-f]{64}$/);
+    expect(app.readAll()).toHaveLength(2);
+
+    const canonicalLog = app.readAll();
+    const reloaded = store('legacy-reloaded-', canonicalLog);
+    expect(reloaded.execute(driftedCommand).deduplicated).toBe(true);
+    expect(reloaded.readAll()).toEqual(canonicalLog);
+    expect(reloaded.readAll()[0]?.idempotencyKey).toBe(LEGACY_CAPTURE_KEY);
+  });
+
   it('rehydrates exact span identity and deduplicates all three gestures from the log', () => {
     const first = store('first-');
     const captured = first.execute(capture());

@@ -65,14 +65,13 @@ import type { ComponentId } from '../primitives.ts';
 export const COMPONENT_ID_PREFIX = 'kc:';
 
 /**
- * Resolve a prospective capture's exact target before the event is minted.
+ * Apply the frozen v1 text/span coordinate rules and return the selected bytes.
  *
- * App idempotency and thread lookup happen before `EncounterCaptured` exists,
- * so they cannot call {@link targetKeyOfEncounter}. This applies the same
- * frozen UTF-16 coordinate rules as the event schema and throws the same typed
- * validation error family instead of relying on `String.slice`'s clamping.
+ * This deliberately does not impose the prospective-write usefulness rule:
+ * historical v1 events with whitespace-only selections must remain
+ * projectable even though new writes refuse to mint them.
  */
-export function targetTextOfCapture(text: string, span: Span | undefined): string {
+function targetTextWithinCapture(text: string, span: Span | undefined): string {
   const textResult = nonEmptyString.safeParse(text);
   if (!textResult.success) {
     throw new EventValidationError(
@@ -101,6 +100,28 @@ export function targetTextOfCapture(text: string, span: Span | undefined): strin
 }
 
 /**
+ * Resolve and validate the useful target of a prospective capture.
+ *
+ * The frozen v1 event schema historically accepted a non-empty coordinate span
+ * whose bytes were only whitespace. Historical events must remain readable, so
+ * {@link targetKeyOfEncounter} keeps projecting those bytes verbatim. New
+ * writes are stricter: a target that the app's thread canonicaliser would turn
+ * into the empty key is refused before an idempotency decision or event mint.
+ */
+export function targetTextOfCapture(text: string, span: Span | undefined): string {
+  const targetText = targetTextWithinCapture(text, span);
+  if (targetText.trim() === '') {
+    throw new EventValidationError('EncounterCaptured', [
+      {
+        path: span === undefined ? 'text' : 'span',
+        message: 'selected target must contain non-whitespace text',
+      },
+    ]);
+  }
+  return targetText;
+}
+
+/**
  * The target a capture is about.
  *
  * With a span, the target is the selected substring; without one, the learner
@@ -111,7 +132,11 @@ export function targetTextOfCapture(text: string, span: Span | undefined): strin
  * the disagreement would only surface on text outside the BMP.
  */
 export function targetKeyOfEncounter(event: EncounterCapturedEvent): string {
-  return targetTextOfCapture(event.text, event.span);
+  // Do not route historical events through the prospective-write usefulness
+  // check above. Event schema v1 accepted whitespace-only targets; replay must
+  // still be able to project those bytes, even though new writes and contracts
+  // refuse to grant them authority.
+  return targetTextWithinCapture(event.text, event.span);
 }
 
 /** The canonical Phase-0 KnowledgeComponent id for a target key. */
@@ -132,7 +157,8 @@ export function componentIdOfEncounter(event: EncounterCapturedEvent): Component
  * can capture (`text` is a non-empty string in the v1 schema).
  */
 export function isCanonicalComponentId(value: string): boolean {
-  return value.startsWith(COMPONENT_ID_PREFIX) && value.length > COMPONENT_ID_PREFIX.length;
+  if (!value.startsWith(COMPONENT_ID_PREFIX)) return false;
+  return value.slice(COMPONENT_ID_PREFIX.length).trim() !== '';
 }
 
 /** The target key a canonical component id was derived from, or `null`. */

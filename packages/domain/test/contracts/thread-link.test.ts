@@ -51,6 +51,29 @@ describe('component identity is derived from the captured target', () => {
     expect(() => targetTextOfCapture('', undefined)).toThrow(/text/);
   });
 
+  it('refuses prospective targets that contain no non-whitespace text', () => {
+    expect(() => targetTextOfCapture('A \tB', { start: 1, end: 3 })).toThrow(
+      /selected target must contain non-whitespace text/,
+    );
+    expect(() => targetTextOfCapture('\u3000', undefined)).toThrow(
+      /selected target must contain non-whitespace text/,
+    );
+  });
+
+  it('keeps historical whitespace capture bytes replayable but grants them no canonical id', () => {
+    const event = parseCapture(
+      encounterCaptured(
+        { eventId: 'e-legacy-blank', at: T.capture, encounterId: 'legacy-blank', threadId: THREAD },
+        { text: 'A \tB', span: { start: 1, end: 3 } },
+      ),
+    );
+
+    expect(targetKeyOfEncounter(event)).toBe(' \t');
+    expect(componentIdOfEncounter(event)).toBe('kc: \t');
+    expect(isCanonicalComponentId('kc: \t')).toBe(false);
+    expect(targetKeyOfComponentId('kc: \t')).toBeNull();
+  });
+
   it('a span selects the target', () => {
     const event = parseCapture(capture());
     expect(targetKeyOfEncounter(event)).toBe(TARGET);
@@ -76,6 +99,7 @@ describe('component identity is derived from the captured target', () => {
   it('rejects ids that are not canonical', () => {
     expect(isCanonicalComponentId('component-0001')).toBe(false);
     expect(isCanonicalComponentId(COMPONENT_ID_PREFIX)).toBe(false);
+    expect(isCanonicalComponentId(`${COMPONENT_ID_PREFIX}\u3000`)).toBe(false);
     expect(targetKeyOfComponentId('component-0001')).toBeNull();
     expect(isCanonicalComponentId(COMPONENT)).toBe(true);
   });
