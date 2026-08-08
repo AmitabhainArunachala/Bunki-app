@@ -55,3 +55,5 @@ prototypes/bunki-sites-v11/.sites-runtime/
 # state, never a build input. Scoped to worktrees/ rather than all of .claude/
 # so real project config under .claude/ stays committable.
 .claude/worktrees/
+.venv/
+__pycache__/
