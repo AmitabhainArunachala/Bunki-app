@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "kairo-performance-protocol-receipt",
-  "verifiedCodeSha": "a3e2d88c541fb6f50a1482a98255b8ffe503f05e",
+  "verifiedCodeSha": "878f8c34e42b87f1f4ee57e678c94c3630e3ba52",
   "verdict": "unproven",
   "promotionRule": "A threshold becomes proven only from its declared production profile; local diagnostic numbers have no promotion authority.",
   "targetProfile": {
@@ -66,8 +66,8 @@
     "environment": {
       "device": "darwin arm64 development host",
       "os": "darwin",
-      "runtime": "Chrome 151.0.7922.76",
-      "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "runtime": "Chrome 141.0.7390.37",
+      "executable": "playwright-default",
       "build": "unbundled static source served with cache-control:no-store",
       "viewport": {
         "width": 390,
@@ -77,23 +77,23 @@
       "cache": "new browser context per boot; no-store loopback responses",
       "compression": "none",
       "network": "127.0.0.1 loopback; no shaping",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
     },
     "measurements": {
       "bootToReadableShelf": {
         "count": 5,
-        "min": 111,
-        "median": 117.5,
-        "p95": 119.5,
-        "max": 119.5,
+        "min": 95.6,
+        "median": 96.4,
+        "p95": 97,
+        "max": 97,
         "unit": "ms"
       },
       "warmLookupAnswer": {
         "count": 10,
-        "min": 124.3,
-        "median": 124.5,
-        "p95": 132.8,
-        "max": 132.8,
+        "min": 124.2,
+        "median": 124.8,
+        "p95": 132.6,
+        "max": 132.6,
         "unit": "ms",
         "diagnosticThresholdResult": "diagnostic_only_not_below",
         "productClaim": "unproven"
@@ -110,7 +110,7 @@
   },
   "bytes": {
     "basis": "committed decoded filesystem bytes; local server has no compression",
-    "totalCoreBytes": 7488563,
+    "totalCoreBytes": 7494970,
     "files": [
       {
         "path": "index.html",
@@ -126,11 +126,11 @@
       },
       {
         "path": "drift-layer.css",
-        "bytes": 13703
+        "bytes": 13723
       },
       {
         "path": "drift-layer.js",
-        "bytes": 780676
+        "bytes": 787063
       },
       {
         "path": "vendor/ts-fsrs.mjs",
@@ -190,9 +190,9 @@
       },
       {
         "path": "drift-layer.css",
-        "transferSize": 14003,
-        "encodedBodySize": 13703,
-        "decodedBodySize": 13703
+        "transferSize": 14023,
+        "encodedBodySize": 13723,
+        "decodedBodySize": 13723
       },
       {
         "path": "corridor.js",
@@ -202,9 +202,9 @@
       },
       {
         "path": "drift-layer.js",
-        "transferSize": 780976,
-        "encodedBodySize": 780676,
-        "decodedBodySize": 780676
+        "transferSize": 787363,
+        "encodedBodySize": 787063,
+        "decodedBodySize": 787063
       },
       {
         "path": "data/articles/index.json",
@@ -225,40 +225,16 @@
         "decodedBodySize": 38253
       },
       {
-        "path": "data/share_alike/strokes.json",
-        "transferSize": 1970747,
-        "encodedBodySize": 1970447,
-        "decodedBodySize": 1970447
-      },
-      {
         "path": "data/share_alike/kanji.json",
         "transferSize": 490803,
         "encodedBodySize": 490503,
         "decodedBodySize": 490503
       },
       {
-        "path": "data/original/grammar-v11.json",
-        "transferSize": 8580,
-        "encodedBodySize": 8280,
-        "decodedBodySize": 8280
-      },
-      {
         "path": "data/share_alike/words.json",
         "transferSize": 737211,
         "encodedBodySize": 736911,
         "decodedBodySize": 736911
-      },
-      {
-        "path": "data/manifest.json",
-        "transferSize": 1204,
-        "encodedBodySize": 904,
-        "decodedBodySize": 904
-      },
-      {
-        "path": "data/fsrs-pin.json",
-        "transferSize": 1021,
-        "encodedBodySize": 721,
-        "decodedBodySize": 721
       },
       {
         "path": "data/share_alike/idioms.json",
@@ -271,6 +247,30 @@
         "transferSize": 2890417,
         "encodedBodySize": 2890117,
         "decodedBodySize": 2890117
+      },
+      {
+        "path": "data/share_alike/strokes.json",
+        "transferSize": 1970747,
+        "encodedBodySize": 1970447,
+        "decodedBodySize": 1970447
+      },
+      {
+        "path": "data/original/grammar-v11.json",
+        "transferSize": 8580,
+        "encodedBodySize": 8280,
+        "decodedBodySize": 8280
+      },
+      {
+        "path": "data/manifest.json",
+        "transferSize": 1204,
+        "encodedBodySize": 904,
+        "decodedBodySize": 904
+      },
+      {
+        "path": "data/fsrs-pin.json",
+        "transferSize": 1021,
+        "encodedBodySize": 721,
+        "decodedBodySize": 721
       },
       {
         "path": "vendor/ts-fsrs.mjs",
@@ -289,14 +289,14 @@
       "data/articles/index.json",
       "data/proprietary_safe/kanken.json",
       "data/proprietary_safe/sem.json",
-      "data/share_alike/strokes.json",
       "data/share_alike/kanji.json",
-      "data/original/grammar-v11.json",
       "data/share_alike/words.json",
-      "data/manifest.json",
-      "data/fsrs-pin.json",
       "data/share_alike/idioms.json",
       "data/share_alike/dict.json",
+      "data/share_alike/strokes.json",
+      "data/original/grammar-v11.json",
+      "data/manifest.json",
+      "data/fsrs-pin.json",
       "vendor/ts-fsrs.mjs"
     ],
     "articleBodiesAbsentAtImmediateReady": true,
@@ -308,14 +308,14 @@
       "data/articles/index.json",
       "data/proprietary_safe/kanken.json",
       "data/proprietary_safe/sem.json",
-      "data/share_alike/strokes.json",
       "data/share_alike/kanji.json",
-      "data/original/grammar-v11.json",
       "data/share_alike/words.json",
-      "data/manifest.json",
-      "data/fsrs-pin.json",
       "data/share_alike/idioms.json",
       "data/share_alike/dict.json",
+      "data/share_alike/strokes.json",
+      "data/original/grammar-v11.json",
+      "data/manifest.json",
+      "data/fsrs-pin.json",
       "vendor/ts-fsrs.mjs",
       "data/articles/wikinews-1403.json",
       "data/articles/wikinews-6460.json",

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "a3e2d88c541fb6f50a1482a98255b8ffe503f05e",
-  "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "head": "878f8c34e42b87f1f4ee57e678c94c3630e3ba52",
+  "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
