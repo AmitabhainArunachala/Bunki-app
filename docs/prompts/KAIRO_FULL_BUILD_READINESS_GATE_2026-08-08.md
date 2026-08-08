@@ -87,7 +87,7 @@ which capability.
 - The build controller names one integration branch/base for the campaign.
 - Every workstream declares its base SHA and intended merge dependency.
 - A machine-readable or generated stack manifest records `PR/branch → base →
-  head → dependencies → capability owner → verification status`.
+head → dependencies → capability owner → verification status`.
 - CI fails or reports loudly when a supposedly landed dependency is reachable
   only through a side branch and absent from the integration base.
 - Before closing/deleting a stacked base branch, verify all child commits are
