@@ -1,5 +1,5 @@
 /**
- * Hunt regressions — the eight defects the 2026-08-08 adversarial workflow
+ * Hunt regressions — the twelve defects the 2026-08-08 adversarial workflow
  * confirmed, each pinned as a permanent check so none can ever come back.
  * (docs/prompts/DRIFT_ZERO_QUIRK_SPEC_2026-08-08.md §4.3: the case stays in
  * the matrix forever after.)
@@ -7,13 +7,16 @@
  * Usage: node verify-drift-hunt.mjs
  */
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 
 const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const EVIDENCE = resolve(CORRIDOR, 'evidence', 'a0-drift-hunts-20260808');
+const EVIDENCE_PHASE = (process.env.DRIFT_HUNT_EVIDENCE_PHASE || 'current').replace(/[^a-z0-9_-]/gi, '');
+mkdirSync(EVIDENCE, { recursive: true });
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -39,13 +42,60 @@ const ctx = await browser.newContext({
   isMobile: true,
   hasTouch: true,
 });
-await ctx.addInitScript('try{localStorage.clear()}catch(e){}');
+await ctx.addInitScript(() => {
+  try { localStorage.clear(); } catch {}
+
+  // Keep the verifier black-box while still locating the two kinds of ink
+  // that have no DOM hit target: faint hub sprites and legacy canvas-only
+  // semantic labels. The hooks observe real canvas calls; they do not reach
+  // into Drift's closure or mutate its interaction state.
+  window.__driftHuntCanvas = { hubs: [], labels: [] };
+  const cap = (items, item) => {
+    items.push(item);
+    if (items.length > 1200) items.splice(0, 600);
+  };
+  const proto = CanvasRenderingContext2D.prototype;
+  const drawImage = proto.drawImage;
+  proto.drawImage = function (...args) {
+    if (
+      this.canvas?.id === 'fx' && args.length === 5 &&
+      args[0] instanceof HTMLCanvasElement && args[0].width === 96 && args[0].height === 96
+    ) {
+      cap(window.__driftHuntCanvas.hubs, {
+        x: args[1] + args[3] / 2,
+        y: args[2] + args[4] / 2,
+        at: performance.now(),
+      });
+    }
+    return drawImage.apply(this, args);
+  };
+  const fillText = proto.fillText;
+  proto.fillText = function (text, x, y, ...rest) {
+    if (this.canvas?.id === 'fx') {
+      cap(window.__driftHuntCanvas.labels, {
+        text: String(text), x, y, at: performance.now(),
+      });
+    }
+    return fillText.call(this, text, x, y, ...rest);
+  };
+});
 const page = await ctx.newPage();
 const errs = [];
 page.on('pageerror', (e) => errs.push(e.message));
 const cdp = await ctx.newCDPSession(page);
 const T = (type, pts) =>
-  cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map(([x, y]) => ({ x, y })) });
+  cdp.send('Input.dispatchTouchEvent', {
+    type,
+    touchPoints: pts.map(([x, y, id]) => (id == null ? { x, y } : { x, y, id })),
+  });
+const M = (type, x, y) => cdp.send('Input.dispatchMouseEvent', {
+  type,
+  x,
+  y,
+  button: 'left',
+  buttons: type === 'mousePressed' ? 1 : 0,
+  clickCount: 1,
+});
 const tap = async (x, y) => {
   await T('touchStart', [[x, y]]);
   await page.waitForTimeout(65);
@@ -68,7 +118,14 @@ const wordAt = (label) => `(() => {
   const el = [...document.querySelectorAll('#drift-layer .word')].find((n) => (n.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(label)});
   if (!el) return { exists: false };
   const r = el.getBoundingClientRect();
-  return { exists: true, x: r.x + r.width / 2, y: r.y + r.height / 2, op: parseFloat(el.style.opacity || '1') };
+  return {
+    exists: true,
+    x: r.x + r.width / 2,
+    y: r.y + r.height / 2,
+    width: r.width,
+    height: r.height,
+    op: parseFloat(el.style.opacity || '1'),
+  };
 })()`;
 const world = `(() => ({
   ctr: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? null,
@@ -88,6 +145,38 @@ const anyWord = `(() => {
   }
   return null;
 })()`;
+const openWater = `(() => {
+  const blocked = [...document.querySelectorAll(
+    '#drift-layer .word, #drift-layer .glyph, #drift-layer .part, .drift-door, #theme, #lvl, #card.open, #radoc.open'
+  )].map((el) => el.getBoundingClientRect());
+  const spots = [[70,180],[320,190],[80,690],[310,670],[195,720],[55,260],[335,290],[195,205]];
+  for (const [x, y] of spots) {
+    if (!blocked.some((b) => x > b.left - 12 && x < b.right + 12 && y > b.top - 12 && y < b.bottom + 12))
+      return { x, y };
+  }
+  return null;
+})()`;
+const freshHub = `(() => {
+  const now = performance.now();
+  const nodes = [...document.querySelectorAll('#drift-layer .word.bctr, #drift-layer .word.bsat')]
+    .map((el) => { const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+  const seen = new Set();
+  const hubs = (window.__driftHuntCanvas?.hubs ?? []).filter((h) => now - h.at < 220).reverse();
+  for (const h of hubs) {
+    const key = Math.round(h.x) + ',' + Math.round(h.y);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (h.x < 52 || h.x > 338 || h.y < 170 || h.y > 690) continue;
+    if (nodes.some((n) => Math.hypot(n.x - h.x, n.y - h.y) < 58)) continue;
+    const hit = document.elementFromPoint(h.x, h.y);
+    if (hit?.closest?.('.word,.glyph,.part,#theme,#lvl,.drift-door')) continue;
+    return { x: h.x, y: h.y };
+  }
+  return null;
+})()`;
+const shot = (name) => page.screenshot({
+  path: resolve(EVIDENCE, name.replace(/\.png$/, `-${EVIDENCE_PHASE}.png`)),
+});
 
 let fails = 0;
 const check = (name, pass, detail = '') => {
@@ -287,6 +376,177 @@ await page.waitForTimeout(2000); // two recycler passes
 const origin = await page.evaluate(wordAt(w.w));
 check('hunt · a walked planet is never culled by the recycler',
   origin.exists, `origin word ${w.w} present after two hops + 2s = ${origin.exists}`);
+
+/* 7 · semantic constellation members are touchable DOM, including kana.
+ * The legacy canvas fallback was visible but untouchable: tapping its label
+ * hit water and dismantled the lock. A kana-only member must also be able to
+ * become a centre whose same-level fallback has real members. */
+await boot();
+const lockStarted = await page.evaluate(`window.__lockWord?.('厳しい') === true`);
+await page.waitForTimeout(1400);
+const semanticTarget = await page.evaluate(`(() => {
+  const el = [...document.querySelectorAll('#drift-layer .word')]
+    .find((n) => (n.querySelector('.base')?.textContent ?? '') === 'きつい');
+  if (el) {
+    const r = el.getBoundingClientRect();
+    return { dom: true, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  }
+  const now = performance.now();
+  const ink = [...(window.__driftHuntCanvas?.labels ?? [])].reverse()
+    .find((p) => p.text === 'きつい' && now - p.at < 260);
+  return ink ? { dom: false, x: ink.x, y: ink.y } : null;
+})()`);
+const semanticBefore = await page.evaluate(world);
+await shot('07-semantic-member-before.png');
+if (semanticTarget) {
+  await tap(semanticTarget.x, semanticTarget.y);
+  await page.waitForTimeout(550);
+}
+const semanticAfterTap = await page.evaluate(world);
+
+// Start the lock afresh so the old canvas failure cannot mask the kana-only
+// fallback half of the hunt.
+await page.evaluate(`window.__lockWord?.('厳しい')`);
+await page.waitForTimeout(1200);
+const kanaTarget = await page.evaluate(`(() => {
+  const el = [...document.querySelectorAll('#drift-layer .word')]
+    .find((n) => (n.querySelector('.base')?.textContent ?? '') === 'きつい');
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+})()`);
+if (kanaTarget) {
+  await T('touchStart', [[kanaTarget.x, kanaTarget.y]]);
+  await page.waitForTimeout(560);
+  await T('touchEnd', []);
+  await page.waitForTimeout(900);
+}
+const kanaFallback = await page.evaluate(world);
+await shot('07-semantic-dom-kana-fallback.png');
+check('hunt · semantic labels are touchable DOM and kana-only words grow a real fallback constellation',
+  lockStarted && semanticTarget?.dom === true &&
+    semanticBefore.ctr === '厳しい' && semanticAfterTap.ctr === '厳しい' && semanticAfterTap.sats > 0 &&
+    kanaFallback.ctr === 'きつい' && kanaFallback.sats >= 6,
+  `DOM=${semanticTarget?.dom ?? false}; short tap centre "${semanticBefore.ctr}" → "${semanticAfterTap.ctr}"; ` +
+    `kana fallback centre="${kanaFallback.ctr}", sats=${kanaFallback.sats}`);
+
+/* 8 · pointer identity is part of gesture authority. A mouse/foreign pointer
+ * may not move a touch-held word, and changing the active pair after a third
+ * finger joins must rebase the pinch before its next 1px translation. */
+await boot();
+w = await page.evaluate(anyWord);
+await page.mouse.move(w.x, w.y);
+const identityHome = await page.evaluate(wordAt(w.w));
+await T('touchStart', [[identityHome.x, identityHome.y, 21]]);
+await page.waitForTimeout(70);
+await page.mouse.move(identityHome.x + 141, identityHome.y);
+await page.waitForTimeout(180);
+const identityAfter = await page.evaluate(wordAt(w.w));
+const foreignDisplacement = identityAfter.exists
+  ? Math.hypot(identityAfter.x - identityHome.x, identityAfter.y - identityHome.y)
+  : Infinity;
+await T('touchCancel', []);
+
+await boot();
+w = await page.evaluate(anyWord);
+const a0 = [45, 190, 31];
+const b0 = [145, 190, 32];
+const a1 = [35, 190, 31];
+const b1 = [155, 190, 32];
+await T('touchStart', [a0]);
+await T('touchStart', [a0, b0]);
+await T('touchMove', [a1, b1]);
+await page.waitForTimeout(180);
+const held = await page.evaluate(wordAt(w.w));
+await T('touchStart', [a1, b1, [held.x, held.y, 33]]);
+await page.waitForTimeout(70);
+await T('touchEnd', [a1]); // A leaves; B+C is a new pair
+await page.waitForTimeout(100);
+const pinchBefore = await page.evaluate(wordAt(w.w));
+await T('touchMove', [
+  [b1[0] + 1, b1[1] + 1, 32],
+  [held.x + 1, held.y + 1, 33],
+]);
+await page.waitForTimeout(260);
+const pinchAfter = await page.evaluate(wordAt(w.w));
+const pinchScale = pinchBefore.exists && pinchAfter.exists && pinchBefore.width
+  ? pinchAfter.width / pinchBefore.width
+  : Infinity;
+await shot('08-pointer-identity-pinch-rebase.png');
+await T('touchCancel', []);
+check('hunt · foreign pointermove cannot drag a held word and a replacement pinch pair rebases',
+  foreignDisplacement < 8 && pinchScale > 0.92 && pinchScale < 1.08,
+  `foreign-pointer displacement=${Number.isFinite(foreignDisplacement) ? foreignDisplacement.toFixed(1) : '∞'}px; ` +
+    `1px replacement-pair scale=${Number.isFinite(pinchScale) ? pinchScale.toFixed(3) : '∞'}×`);
+
+/* 9 · lifecycle clocks yield to an active finger even when it is perfectly
+ * still. This deliberately crosses the ten-second idle expiry boundary. */
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(900);
+const heldBloomBefore = await page.evaluate(world);
+const stillWater = await page.evaluate(openWater);
+if (stillWater) {
+  await T('touchStart', [[stillWater.x, stillWater.y, 41]]);
+  await page.waitForTimeout(11200);
+}
+const heldBloomAfter = await page.evaluate(world);
+await shot('09-stationary-hold-lifecycle.png');
+if (stillWater) await T('touchEnd', []);
+check('hunt · a stationary active pointer prevents bloom lifecycle expiry beneath it',
+  !!stillWater && heldBloomBefore.ctr !== null &&
+    heldBloomAfter.ctr === heldBloomBefore.ctr && heldBloomAfter.sats > 0,
+  `water=${JSON.stringify(stillWater)}; centre "${heldBloomBefore.ctr}" → "${heldBloomAfter.ctr}", ` +
+    `sats=${heldBloomAfter.sats} after 11.2s`);
+
+/* 10 · release coordinates carry no authority without a delivered move.
+ * A water-down/hub-up discontinuity must not dive. A genuine hub tap still
+ * dives, but it first retires the bloom so theme changes and surfacing cannot
+ * resurrect ghost satellites. */
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(1100);
+const releaseBefore = await page.evaluate(world);
+const releaseWater = await page.evaluate(openWater);
+const releaseHub = await page.evaluate(freshHub);
+if (releaseWater && releaseHub) {
+  await M('mousePressed', releaseWater.x, releaseWater.y);
+  await page.waitForTimeout(65);
+  await M('mouseReleased', releaseHub.x, releaseHub.y); // intentionally no mouseMoved
+  await page.waitForTimeout(750);
+}
+const releaseAfter = await page.evaluate(world);
+
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(1100);
+const deliberateHub = await page.evaluate(freshHub);
+if (deliberateHub) {
+  await tap(deliberateHub.x, deliberateHub.y);
+  await page.waitForTimeout(1100);
+}
+const deliberateDive = await page.evaluate(world);
+if (deliberateDive.depth) {
+  await page.tap('#drift-layer #theme');
+  await page.waitForTimeout(350);
+  const diveWater = await page.evaluate(openWater);
+  if (diveWater) {
+    await tap(diveWater.x, diveWater.y);
+    await page.waitForTimeout(1200);
+  }
+}
+const afterThemeSurface = await page.evaluate(world);
+await shot('10-hub-release-theme-cleanup.png');
+check('hunt · hub release cannot hijack a gesture or leave themed ghost satellites',
+  !!releaseWater && !!releaseHub && releaseAfter.depth === '' && releaseAfter.ctr === releaseBefore.ctr &&
+    !!deliberateHub && deliberateDive.depth !== '' &&
+    afterThemeSurface.depth === '' && afterThemeSurface.ctr === null && afterThemeSurface.sats === 0,
+  `terminal ${Math.hypot((releaseHub?.x ?? 0) - (releaseWater?.x ?? 0), (releaseHub?.y ?? 0) - (releaseWater?.y ?? 0)).toFixed(0)}px: ` +
+    `depth="${releaseAfter.depth}", centre="${releaseAfter.ctr}"; deliberate depth="${deliberateDive.depth}"; ` +
+    `after theme+surface centre="${afterThemeSurface.ctr}", sats=${afterThemeSurface.sats}`);
 
 check('hunt · no page errors across the regression battery', errs.length === 0, errs.slice(0, 2).join(' | '));
 
