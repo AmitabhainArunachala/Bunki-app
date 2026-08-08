@@ -24,7 +24,10 @@
     "bunki:web:build": "npm --prefix prototypes/bunki-sites-v11 run build",
     "bunki:web:test": "npm --prefix prototypes/bunki-sites-v11 run test:unit",
     "bunki:web:e2e": "npm --prefix prototypes/bunki-sites-v11 run test:e2e",
-    "bunki:web:deploy": "npm --prefix prototypes/bunki-sites-v11 run deploy:worker"
+    "bunki:web:deploy": "npm --prefix prototypes/bunki-sites-v11 run deploy:worker",
+    "verify:drift": "npm run verify:drift:fast",
+    "verify:drift:fast": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode fast",
+    "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",
