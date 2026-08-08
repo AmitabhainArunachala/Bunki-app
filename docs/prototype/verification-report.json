@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-08 12:35",
+          "2026-08-08 14:34",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-08 12:40",
+          "2026-08-08 14:39",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-08 12:44",
+          "2026-08-08 14:43",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-16 12:34",
+          "2026-08-16 14:33",
           "8.30"
         ]
       ]
@@ -398,19 +398,19 @@
       },
       {
         "text": "覚 1lists",
-        "w": 52,
+        "w": 54,
         "h": 44,
         "id": "tray"
       },
       {
         "text": "▸ text setting",
-        "w": 147,
+        "w": 146,
         "h": 44,
         "id": "dials-toggle"
       },
       {
         "text": "← 戻るback",
-        "w": 72,
+        "w": 73,
         "h": 44,
         "id": "sheet-back"
       },
@@ -536,7 +536,7 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 75,
         "h": 44,
         "id": "variants-toggle"
       },
@@ -560,13 +560,13 @@
       },
       {
         "text": "覚 1lists",
-        "w": 52,
+        "w": 54,
         "h": 44,
         "id": "tray"
       },
       {
         "text": "文法grammar",
-        "w": 88,
+        "w": 87,
         "h": 46,
         "id": "grammar-link"
       },
@@ -578,7 +578,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -590,7 +590,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -602,7 +602,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -614,7 +614,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -626,7 +626,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -638,7 +638,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -650,7 +650,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -662,7 +662,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -674,7 +674,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -686,7 +686,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -698,7 +698,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -710,7 +710,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -722,7 +722,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -734,7 +734,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -746,7 +746,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -758,7 +758,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -770,7 +770,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -782,7 +782,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -794,7 +794,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -806,7 +806,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -818,7 +818,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -830,7 +830,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -842,7 +842,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -854,7 +854,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -866,7 +866,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -878,7 +878,7 @@
       },
       {
         "text": "▸ details · ra",
-        "w": 142,
+        "w": 139,
         "h": 44,
         "id": "details-toggle"
       },
@@ -890,7 +890,7 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 75,
         "h": 44,
         "id": "variants-toggle"
       }
@@ -1419,10 +1419,10 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 320,
+  "loadMs": 117,
   "summary": {
     "total": 91,
-    "failed": 0
+    "failed": 1
   },
   "results": [
     {
@@ -1448,7 +1448,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":153.39999389648438,\"y\":579.0999755859375,\"productive\":true}"
+      "detail": "{\"x\":138.60000610351562,\"y\":581.2999877929688,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -1458,7 +1458,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 83px; mean tether 165 → 166px"
+      "detail": "centre moved 92px; mean tether 166 → 166px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -1468,7 +1468,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "26 texts, ready in 320 ms"
+      "detail": "26 texts, ready in 117 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1587,8 +1587,8 @@
     },
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
-      "pass": true,
-      "detail": "gloss on, glyph bottom 551.3 → 550.6px"
+      "pass": false,
+      "detail": "gloss on, glyph bottom 547.3 → 550.6px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
