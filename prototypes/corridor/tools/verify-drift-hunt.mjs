@@ -288,6 +288,262 @@ const origin = await page.evaluate(wordAt(w.w));
 check('hunt · a walked planet is never culled by the recycler',
   origin.exists, `origin word ${w.w} present after two hops + 2s = ${origin.exists}`);
 
+/* ---- the four spend-killed claims, re-hunted and closed (2026-08-08) ----
+ * Three were refuted as filed; the probes that refuted them found five real
+ * defects underneath. Each is pinned here so none can come back. */
+
+const TI = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts });
+const press = async (x, y, ms = 620) => {
+  await T('touchStart', [[x, y]]);
+  await page.waitForTimeout(ms);
+  await T('touchEnd', []);
+};
+const lockState = `(() => {
+  const sats = [...document.querySelectorAll('#drift-layer .word.bsat')];
+  return {
+    ctr: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? null,
+    sats: sats.length,
+    mute: sats.filter((n) => !(n.querySelector('.yomi')?.textContent ?? '')).length,
+    glossed: sats.filter((n) => n.classList.contains('glossed')).length,
+    depth: document.getElementById('depth')?.textContent ?? '',
+  };
+})()`;
+// a lock member far enough from its neighbours to be aimed at unambiguously
+const someSat = `(() => {
+  const sats = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
+    const r = el.getBoundingClientRect();
+    return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }).filter((s) => s.r.width && s.r.left > 30 && s.r.right < 360 && s.r.top > 150 && s.r.bottom < 700);
+  for (const s of sats) {
+    if (sats.some((o) => o !== s && Math.hypot(o.x - s.x, o.y - s.y) < 40)) continue;
+    return { w: s.el.querySelector('.base')?.textContent ?? '',
+             mute: !(s.el.querySelector('.yomi')?.textContent ?? ''), x: s.x, y: s.y };
+  }
+  return null;
+})()`;
+// open water: >=90px from every member and every glyph anchor
+const openWater = `(() => {
+  const bodies = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph')].map((el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+  for (let y = 250; y < 640; y += 26) for (let x = 70; x < 320; x += 26) {
+    if (bodies.every((b) => Math.hypot(b.x - x, b.y - y) >= 90)) return { x, y };
+  }
+  return null;
+})()`;
+
+/* 7 · a lock does not destroy the word it locks onto (headless lock, P1) */
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(1200);
+let sat7 = await page.evaluate(someSat);
+if (sat7) {
+  await press(sat7.x, sat7.y);
+  await page.waitForTimeout(1400); // past the 500ms removeNode window
+  const st = await page.evaluate(lockState);
+  check('hunt · a long-press keeps the word it locks onto (no headless lock)',
+    st.ctr !== null, `centre after lock + 1.4s = ${st.ctr}`);
+} else {
+  check('hunt · a long-press keeps the word it locks onto (no headless lock)', false, 'no aimable satellite');
+}
+
+/* 8 · a locked constellation is made of real words, not canvas paint (I2) */
+const st8 = await page.evaluate(lockState);
+check('hunt · lock members are touchable words, not canvas labels',
+  st8.sats >= 5, `${st8.sats} DOM .bsat under lock (was 0-1 when members were fillText)`);
+
+/* 9 · a label with no reading answers with its gloss at the first tap, and
+ * touching it never razes the constellation (the ghost-tap razing, P1) */
+let sat9 = await page.evaluate(`(() => {
+  const pick = ${someSat};
+  return pick;   // someSat already skips crowded labels
+})()`);
+if (sat9) {
+  await tap(sat9.x, sat9.y);
+  await page.waitForTimeout(500);
+  const st = await page.evaluate(lockState);
+  const answered = await page.evaluate(
+    `document.querySelectorAll('#drift-layer .word.unfolded, #drift-layer .word.glossed').length`);
+  // a label we hold no reading for must reach its gloss on the FIRST tap:
+  // its furigana stage would answer with nothing visible
+  const muteOk = !sat9.mute || st.glossed > 0 || (await page.evaluate(
+    `document.querySelectorAll('#drift-layer .word.glossed').length`)) > 0;
+  check('hunt · tapping a constellation label answers instead of razing it',
+    st.ctr !== null && answered > 0 && muteOk,
+    `"${sat9.w}" mute=${sat9.mute} · centre survived=${st.ctr !== null}, answered=${answered}, glossed=${st.glossed}`);
+} else {
+  check('hunt · tapping a constellation label answers instead of razing it', false, 'no aimable satellite');
+}
+
+/* 10 · fat-finger forgiveness is reachable under a lock (it sat below an
+ * unconditional lock release and was dead code, P1) */
+await boot();
+w = await page.evaluate(anyWord);
+await press(w.x, w.y);
+await page.waitForTimeout(1400);
+let before10 = await page.evaluate(lockState);
+// the lock glides the camera to its centre, so aim at where the centre IS now
+const ctr10 = await page.evaluate(`(() => {
+  const el = document.querySelector('#drift-layer .word.bctr');
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.bottom + 22 };   // 22px below its edge, inside 44px
+})()`);
+if (ctr10) await tap(ctr10.x, ctr10.y);
+await page.waitForTimeout(500);
+let after10 = await page.evaluate(lockState);
+check('hunt · a 44px near-miss under a lock forgives instead of razing',
+  before10.ctr !== null && after10.ctr !== null,
+  `centre "${before10.ctr}" → "${after10.ctr}"`);
+
+/* 11 · a deliberate release is never consumed by the hub-sun door, and no
+ * constellation rides into a dive (P1). Six independent blooms, each
+ * released on far water — one of them lands on a hub sooner or later. */
+// Find a real hub the only way the DOM allows: hubs have no element, so probe
+// water with nothing held — a point that dives IS a hub centre. The field
+// boots deterministically, so the same screen point is the same hub next boot.
+// The bloom glides the camera, so the hub must be found in the SAME camera
+// state it will be used in: stage the bloom, release it, then probe.
+await boot();
+const wStage = await page.evaluate(anyWord);
+await tap(wStage.x, wStage.y);
+await page.waitForTimeout(1200);
+const clearWater = await page.evaluate(openWater);
+if (clearWater) { await tap(clearWater.x, clearWater.y); await page.waitForTimeout(500); }
+let hub = null;
+for (let y = 236; y < 728 && !hub; y += 30) {
+  for (let x = 44; x < 350 && !hub; x += 30) {
+    // a hub sun IS a galaxy centre, so words cluster around it — a radial
+    // clearance test excludes exactly where hubs live. Hit-test instead.
+    const clear = await page.evaluate(`(() => {
+      const el = document.elementFromPoint(${x}, ${y});
+      if (!el) return false;
+      return !el.closest('.word,.glyph,.part,#lvl,#theme,#card,#radoc,#drift-tray,.drift-door,header,nav,button,a');
+    })()`);
+    if (!clear) continue;
+    await tap(x, y);
+    await page.waitForTimeout(420);
+    const st = await page.evaluate(lockState);
+    if (st.depth !== '') { hub = { x, y, ch: st.depth }; break; }
+    if (st.ctr !== null) { await tap(x, y); await page.waitForTimeout(300); }  // stray bloom: clear it
+  }
+}
+if (hub) {
+  await boot();
+  const wh = await page.evaluate(anyWord);
+  await tap(wh.x, wh.y);
+  await page.waitForTimeout(1200);   // identical staging to the probe pass
+  const held = await page.evaluate(lockState);
+  await tap(hub.x, hub.y);
+  await page.waitForTimeout(700);
+  const after = await page.evaluate(lockState);
+  check('hunt · a release on a hub sun releases the constellation instead of diving',
+    held.ctr !== null && after.depth === '' && after.ctr === null,
+    `hub "${hub.ch}" at (${hub.x},${hub.y}) · held "${held.ctr}" → ctr ${after.ctr}, depth "${after.depth}"`);
+} else {
+  check('hunt · a release on a hub sun releases the constellation instead of diving', false,
+    'no hub found by probing — the check cannot prove anything, treat as red');
+}
+
+/* 12 · a foreign finger cannot carry a held word (pointermove had no
+ * ownership check; #card swallows pointerdown and has no pointermove
+ * listener at all, so a thumb resting on the open card was invisible to the
+ * touch set while its every move still reached the drag branch, P1).
+ * Run inside a dive with the card open: no camera pan, no tide rail, so a
+ * raw pixel delta is honest here. */
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(500);
+await tap(w.x, w.y);
+await page.waitForTimeout(400);
+await tap(w.x, w.y);
+await page.waitForTimeout(1600); // dive
+const centre = await page.evaluate(`(() => {
+  const el = document.querySelector('#drift-layer .word.center');
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+})()`);
+if (centre) { await tap(centre.x, centre.y); await page.waitForTimeout(700); } // opens the card
+const stage = await page.evaluate(`(() => {
+  const card = document.getElementById('card');
+  const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
+  // the tear is (foreign finger − owner finger) × 0.9 horizontally, so the
+  // two fingers must be as far apart as the surface allows for the failure to
+  // be unmistakable against ordinary orbit drift
+  const orb = [...document.querySelectorAll('#drift-layer .word')].map((el) => {
+    const r = el.getBoundingClientRect();
+    return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
+    parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
+    (!cr || o.r.bottom < cr.top - 20))
+    .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];   // highest and leftmost
+  return {
+    card: cr ? { x: cr.right - 26, y: cr.top + 20 } : null,   // far corner of the card
+    orb: orb ? { w: orb.el.querySelector('.base')?.textContent ?? '', x: orb.x, y: orb.y } : null,
+  };
+})()`);
+// orbiters keep circling on their own inside a dive, so a raw pixel delta
+// measures orbit, not carry. Compare the held word against the field's own
+// median displacement over the identical window — the way the hunt measured.
+const fieldPos = `(() => Object.fromEntries([...document.querySelectorAll('#drift-layer .word')]
+  .map((el) => {
+    const r = el.getBoundingClientRect();
+    return [el.querySelector('.base')?.textContent ?? '', [r.left + r.width / 2, r.top + r.height / 2]];
+  })))()`;
+if (stage.card && stage.orb) {
+  const p0 = await page.evaluate(fieldPos);
+  await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }]);
+  await page.waitForTimeout(90);
+  await TI('touchStart', [{ x: stage.orb.x, y: stage.orb.y, id: 1 }, { x: stage.card.x, y: stage.card.y, id: 2 }]);
+  for (let i = 1; i <= 6; i++) {
+    await page.waitForTimeout(40);
+    await TI('touchMove', [{ x: stage.orb.x, y: stage.orb.y, id: 1 },
+                           { x: stage.card.x - i * 22, y: stage.card.y + i * 6, id: 2 }]);
+  }
+  const p1 = await page.evaluate(fieldPos);
+  await TI('touchEnd', [{ x: stage.orb.x, y: stage.orb.y, id: 1 },
+                        { x: stage.card.x - 132, y: stage.card.y + 36, id: 2 }]);
+  await page.waitForTimeout(300);
+  const deltas = Object.keys(p0).filter((k) => p1[k] && k !== stage.orb.w)
+    .map((k) => Math.hypot(p1[k][0] - p0[k][0], p1[k][1] - p0[k][1])).sort((a, b) => a - b);
+  // receded words are frozen, so the all-words median is 0 and useless as a
+  // reference. Orbiters are what the held word is one of — compare to those,
+  // and never to itself, or the comparison is circular.
+  const live = deltas.filter((d) => d > 1);
+  const median = live.length ? live[Math.floor(live.length / 2)] : 0;
+  const target = p0[stage.orb.w] && p1[stage.orb.w]
+    ? Math.hypot(p1[stage.orb.w][0] - p0[stage.orb.w][0], p1[stage.orb.w][1] - p0[stage.orb.w][1]) : -1;
+  check('hunt · a finger the gesture never owned cannot carry a held word',
+    target >= 0 && target - median < 30,
+    `held ${target.toFixed(1)}px vs orbiter median ${median.toFixed(1)}px of ${live.length} moving ` +
+    `(all-words median ${(deltas[Math.floor(deltas.length / 2)] ?? 0).toFixed(1)}px, max ${(deltas[deltas.length - 1] ?? 0).toFixed(1)}px)`);
+} else {
+  check('hunt · a finger the gesture never owned cannot carry a held word', false,
+    `staging failed: card=${!!stage.card} orbiter=${!!stage.orb}`);
+}
+
+/* 13 · a finger on the glass is not inactivity — the bloom must outlive the
+ * 10s fade while it is being held perfectly still (P2) */
+await boot();
+w = await page.evaluate(anyWord);
+await tap(w.x, w.y);
+await page.waitForTimeout(1100);
+const water13 = await page.evaluate(openWater);
+if (water13) {
+  await T('touchStart', [[water13.x, water13.y]]);
+  await page.waitForTimeout(12500); // no further events: a genuinely static touch
+  const st = await page.evaluate(lockState);
+  await T('touchEnd', []);
+  check('hunt · a held finger keeps a constellation alive past the 10s fade',
+    st.ctr !== null, `centre after 12.5s of a static held finger = ${st.ctr}`);
+} else {
+  check('hunt · a held finger keeps a constellation alive past the 10s fade', false, 'no open water');
+}
+
 check('hunt · no page errors across the regression battery', errs.length === 0, errs.slice(0, 2).join(' | '));
 
 console.log(`\n${fails === 0 ? 'ALL HUNT REGRESSIONS GREEN' : fails + ' HUNT REGRESSION(S) FAILING'}`);
