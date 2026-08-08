@@ -226,6 +226,8 @@ const S = {
   detailsOpen: null,
   sourcesOpen: false,
   debugOpen: false,
+  /** Semantic return point for a modal entry sheet across full DOM renders. */
+  dialogInvoker: null,
 };
 
 /* ------------------------------------------------ persistence (localStorage) */
@@ -276,6 +278,54 @@ const el = (tag, cls, text) => {
   if (text != null) node.textContent = text;
   return node;
 };
+
+/* -------------------------------- substrate-neutral interaction adapter
+ * The pure semantics live in @bunki/domain. This static prototype cannot
+ * import TypeScript directly, so it emits the exact same action envelope and
+ * keeps modality as provenance only. Renderers consume the action; no branch
+ * below grants a modality extra learning or scheduling authority. */
+const INTERACTION_ACTIONS = new Set([
+  'target.activate',
+  'quickLook.open',
+  'entry.open',
+  'selection.move',
+  'constellation.lock',
+  'tide.set',
+  'judgment.nominate',
+  'navigation.back',
+  'layer.dismiss',
+]);
+const INTERACTION_MODALITIES = new Set([
+  'pointer',
+  'keyboard',
+  'switch',
+  'screenReader',
+  'programmatic',
+]);
+const interactionReceipts = [];
+
+function interaction(action, modality = 'programmatic', sourceId = 'corridor') {
+  if (!INTERACTION_ACTIONS.has(action?.kind)) throw new Error(`unknown interaction ${action?.kind}`);
+  if (!INTERACTION_MODALITIES.has(modality)) throw new Error(`unknown modality ${modality}`);
+  const envelope = Object.freeze({
+    action: Object.freeze({ ...action }),
+    provenance: Object.freeze({ modality, sourceId }),
+  });
+  interactionReceipts.push(envelope);
+  window.dispatchEvent(new CustomEvent('kairo:interaction', { detail: envelope }));
+  return envelope;
+}
+
+window.__KAIRO_INTERACTION__ = Object.freeze({
+  receipts: interactionReceipts,
+  dispatch(action, provenance = {}) {
+    return interaction(
+      action,
+      provenance.modality || 'programmatic',
+      provenance.sourceId || 'programmatic',
+    );
+  },
+});
 
 /* ------------------------------------------------------------ ui language */
 const bi = () => S.lang === 'bi';
@@ -443,8 +493,41 @@ function prefetchArticles() {
 }
 
 /* ------------------------------------------------------- navigation state */
-function go(node) {
+function invokerKey(node) {
+  if (!node) return null;
+  if (node.matches?.('#reader .tok[data-index]')) {
+    return {
+      kind: 'reader-token',
+      index: node.dataset.index,
+      targetKind: node.dataset.targetKind || 'word',
+    };
+  }
+  if (node.id) return { kind: 'id', id: node.id };
+  return null;
+}
+
+function restoreDialogInvoker() {
+  const key = S.dialogInvoker;
+  S.dialogInvoker = null;
+  if (!key) return;
+  requestAnimationFrame(() => {
+    let target = null;
+    if (key.kind === 'reader-token') {
+      target = document.querySelector(
+        `#reader .tok[data-index="${key.index}"][data-target-kind="${key.targetKind}"]`,
+      );
+    } else if (key.kind === 'id') {
+      target = document.getElementById(key.id);
+    }
+    target?.focus({ preventScroll: true });
+  });
+}
+
+function go(node, { invoker = null } = {}) {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
+  if (!S.stack.length && !S.dialogInvoker) {
+    S.dialogInvoker = invokerKey(invoker || document.activeElement);
+  }
   S.stack.push(node);
   render();
   const sheet = $('.sheet');
@@ -455,7 +538,10 @@ function back() {
   if (S.stack.length) {
     S.stack.pop();
     render();
-    if (!S.stack.length && S.view === 'reader') window.scrollTo(0, S.readerScroll);
+    if (!S.stack.length) {
+      if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+      restoreDialogInvoker();
+    }
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
@@ -471,6 +557,14 @@ function back() {
     S.view = 'drift';
     render();
   }
+}
+
+function dismissSheet() {
+  if (!S.stack.length) return;
+  S.stack = [];
+  render();
+  if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  restoreDialogInvoker();
 }
 
 function openPassage(id) {
@@ -843,7 +937,7 @@ function dialRow(labelJa, labelEn, key, options) {
  * by operator rounds 3–4 (2026-08-07). Taps are PROGRESSIVE, not timed:
  *   1st tap        → furigana above           (instant — no double-tap wait)
  *   2nd tap        → English beneath          (a later tap, not a fast pair)
- *   3rd tap        → backs all the way out    (the word returns to bare)
+ *   3rd tap        → carries into the full entry
  *   long-press     → floating mini-dictionary
  *   keep holding   → the mini window morphs into the full entry
  * A moved pointer is a scroll, never a gesture. Every action applies to the
@@ -879,22 +973,98 @@ document.addEventListener(
   true,
 );
 
-function showMini(span, token) {
+function showMini(span, token, onEntry, { focusEntry = false } = {}) {
   removeMini();
   const g = lookup(token.b);
   const mini = el('div', null);
   mini.id = 'mini';
+  mini.setAttribute('role', 'dialog');
+  mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
   mini.append(el('span', 'mini-word', token.b));
   if (g?.r) mini.append(el('span', 'mini-reading', g.r));
   mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
-  mini.append(el('span', 'mini-hint', tx('押しつづけて辞書へ', 'keep holding — full entry')));
+  mini.append(el('span', 'mini-hint', tx('辞書の全項目へ進める', 'open the complete entry')));
+  const entry = biLabel('button', 'mini-entry', '全項目', 'full entry');
+  entry.type = 'button';
+  entry.dataset.action = 'entry.open';
+  entry.dataset.targetKind = 'word';
+  entry.addEventListener('click', (event) => {
+    event.stopPropagation();
+    onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
+  });
+  mini.append(entry);
   document.body.append(mini);
   const r = span.getBoundingClientRect();
   const m = mini.getBoundingClientRect();
   const above = r.top > m.height + 70;
   mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
   mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
+  if (focusEntry) entry.focus({ preventScroll: true });
   return mini;
+}
+
+function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry }) {
+  const actions = el('span', 'token-actions');
+  actions.hidden = true;
+  actions.setAttribute('role', 'group');
+  actions.setAttribute('aria-label', tx(`${span.textContent} の操作`, `${span.textContent} actions`));
+
+  if (quickLook) {
+    const quick = biLabel('button', null, '語釈', 'quick look');
+    quick.type = 'button';
+    quick.dataset.action = 'quickLook.open';
+    quick.dataset.targetKind = target.kind;
+    quick.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const modality = event.detail === 0 ? 'keyboard' : 'pointer';
+      interaction({ kind: 'quickLook.open', target }, modality, 'reader-alternative');
+      quickLook(modality);
+    });
+    quick.tabIndex = -1;
+    actions.append(quick);
+  }
+
+  const full = biLabel('button', null, target.kind === 'particle' ? '助詞へ' : '全項目', 'full entry');
+  full.type = 'button';
+  full.dataset.action = 'entry.open';
+  full.dataset.targetKind = target.kind;
+  full.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const modality = event.detail === 0 ? 'keyboard' : 'pointer';
+    interaction({ kind: 'entry.open', target }, modality, 'reader-alternative');
+    openEntry(modality);
+  });
+  full.tabIndex = -1;
+  actions.append(full);
+
+  const show = () => {
+    if (!actions.isConnected) wrapper.append(actions);
+    actions.hidden = false;
+    for (const button of actions.querySelectorAll('button')) button.tabIndex = 0;
+    actions.style.visibility = 'hidden';
+    const targetBox = span.getBoundingClientRect();
+    const actionBox = actions.getBoundingClientRect();
+    const half = actionBox.width / 2;
+    const centre = Math.max(half + 8, Math.min(window.innerWidth - half - 8, targetBox.left + targetBox.width / 2));
+    const below = targetBox.bottom + 4;
+    const top = below + actionBox.height <= window.innerHeight - 8
+      ? below
+      : Math.max(8, targetBox.top - actionBox.height - 4);
+    actions.style.left = `${centre}px`;
+    actions.style.top = `${top}px`;
+    actions.style.visibility = '';
+  };
+  const hideAfterFocusLeaves = () => {
+    setTimeout(() => {
+      if (!wrapper.contains(document.activeElement)) {
+        for (const button of actions.querySelectorAll('button')) button.tabIndex = -1;
+        actions.hidden = true;
+        actions.remove();
+      }
+    }, 0);
+  };
+  span.addEventListener('focus', show);
+  wrapper.addEventListener('focusout', hideAfterFocusLeaves);
 }
 
 /** The inline gloss under a word must NEVER truncate (operator, morning
@@ -911,6 +1081,17 @@ function inlineGloss(rec) {
   let best = candidates.reduce((a, b) => (b.length < a.length ? b : a));
   if (best.length > 18 && best.includes(',')) best = best.split(',')[0].trim();
   return best;
+}
+
+function tokenAccessibleLabel(token, index) {
+  const record = lookup(token.b);
+  const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
+  const hasEnglish = S.glossed?.has(index);
+  const parts = [token.s || token.b, tx('語', 'word')];
+  if (hasReading && record?.r && record.r !== token.s) parts.push(record.r);
+  if (hasEnglish && record?.m?.length) parts.push(inlineGloss(record));
+  parts.push(tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'));
+  return parts.filter(Boolean).join(' · ');
 }
 
 /** Apply one token's reveal state straight to its DOM — no re-render. */
@@ -945,16 +1126,46 @@ function paintTok(span, token, index) {
     span.classList.remove('has-en');
     existingEn.remove();
   }
+  span.setAttribute('aria-label', tokenAccessibleLabel(token, index));
 }
 
 function wireTokenGestures(span, token, index, p) {
   let miniTimer = null;
   let fullTimer = null;
   let down = null;
-  const openFull = () => {
+  const target = { kind: 'word', id: token.b };
+  const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
     swallowClickUntil = Date.now() + 700;
-    go({ t: 'word', id: token.b, from: { passage: p.id, index } });
+    if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
+    go(
+      { t: 'word', id: token.b, from: { passage: p.id, index } },
+      { invoker: span },
+    );
+  };
+  const quickLook = (modality = 'pointer', emitAction = false) => {
+    if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-token');
+    showMini(span, token, (entryModality) => openFull(entryModality, true), {
+      focusEntry: modality !== 'pointer',
+    });
+  };
+  const activate = (modality) => {
+    interaction({ kind: 'target.activate', target }, modality, 'reader-token');
+    (S.revealed ||= new Set());
+    (S.glossed ||= new Set());
+    const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
+    const hasEn = S.glossed.has(index);
+    if (!hasReading) {
+      S.revealed.add(index);
+      paintTok(span, token, index);
+      return;
+    }
+    if (!hasEn) {
+      S.glossed.add(index);
+      paintTok(span, token, index);
+      return;
+    }
+    openFull(modality, false);
   };
   const clear = () => {
     clearTimeout(miniTimer);
@@ -964,11 +1175,8 @@ function wireTokenGestures(span, token, index, p) {
   span.addEventListener('contextmenu', (ev) => ev.preventDefault());
   span.addEventListener('pointerdown', (ev) => {
     down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
-    miniTimer = setTimeout(() => {
-      const mini = showMini(span, token);
-      mini.addEventListener('click', openFull);
-    }, GESTURE.MINI_MS);
-    fullTimer = setTimeout(openFull, GESTURE.FULL_MS);
+    miniTimer = setTimeout(() => quickLook('pointer', true), GESTURE.MINI_MS);
+    fullTimer = setTimeout(() => openFull('pointer', true), GESTURE.FULL_MS);
   });
   span.addEventListener('pointermove', (ev) => {
     if (!down) return;
@@ -987,21 +1195,19 @@ function wireTokenGestures(span, token, index, p) {
     down = null;
     clear();
     if (held >= GESTURE.MINI_MS) return; // mini stays up; tap it for the full entry
-    // progressive tap, applied instantly: reading → English → back to bare
-    (S.revealed ||= new Set());
-    (S.glossed ||= new Set());
-    const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
-    const hasEn = S.glossed.has(index);
-    if (!hasReading) {
-      S.revealed.add(index);
-    } else if (!hasEn) {
-      S.glossed.add(index);
-    } else {
-      S.glossed.delete(index);
-      S.revealed.delete(index);
-    }
-    paintTok(span, token, index);
+    activate('pointer');
   });
+  span.addEventListener('click', (event) => {
+    // Pointer activation was handled on pointerup so its reveal is immediate.
+    // Native keyboard/switch/AT activation arrives as a click with detail 0.
+    if (event.detail !== 0 || Date.now() < swallowClickUntil) return;
+    activate('keyboard');
+  });
+  return {
+    target,
+    quickLook: (modality) => quickLook(modality, false),
+    openEntry: (modality) => openFull(modality, false),
+  };
 }
 
 function renderReader(main) {
@@ -1056,8 +1262,8 @@ function renderReader(main) {
 
   const grammarHint = el('p', 'gesture-hint');
   grammarHint.textContent = tx(
-    '触れる＝ふりがな · もう一度＝英語 · 長押し＝辞書',
-    'tap = reading · tap again = English · hold = dictionary',
+    '触れる＝ふりがな · もう一度＝英語 · 三回目＝全項目 · フォーカス＝長押し不要の操作',
+    'activate = reading · again = English · third = full entry · focus = no-hold actions',
   );
   main.append(grammarHint);
 
@@ -1083,9 +1289,26 @@ function renderReader(main) {
       reader.append(el('span', 'para-break'));
       group = null;
     }
-    const span = el('span', token.c ? 'tok content' : 'tok plain');
+    const particle = !token.c ? PARTICLE_BY_SURFACE[token.s] : null;
+    const interactive = !!token.c || !!particle;
+    const span = el(interactive ? 'button' : 'span', token.c ? 'tok content' : 'tok plain');
+    if (interactive) span.type = 'button';
     span.dataset.index = String(index);
-    if (token.c) span.dataset.word = token.b;
+    if (token.c) {
+      span.dataset.word = token.b;
+      span.dataset.action = 'target.activate';
+      span.dataset.targetKind = 'word';
+      span.setAttribute('aria-haspopup', 'dialog');
+      span.setAttribute('aria-label', tokenAccessibleLabel(token, index));
+    } else if (particle) {
+      span.dataset.action = 'target.activate';
+      span.dataset.targetKind = 'particle';
+      span.setAttribute('aria-haspopup', 'dialog');
+      span.setAttribute(
+        'aria-label',
+        tx(`${particle.p}、助詞。通常の操作は何もしない。フォーカスで助詞の項目へ。`, `${particle.p}, particle; ordinary activation is inert; focus for its full entry`),
+      );
+    }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
       rubyNode(displayPairs(token), {
@@ -1100,16 +1323,27 @@ function renderReader(main) {
         span.append(el('span', 'tok-en', inlineGloss(g)));
       }
     }
-    if (token.c) wireTokenGestures(span, token, index, p);
-    else if (PARTICLE_BY_SURFACE[token.s]) wireParticleGestures(span, PARTICLE_BY_SURFACE[token.s]);
+    let rendered = span;
+    if (interactive) {
+      const wrapper = el('span', 'token-door');
+      wrapper.append(span);
+      if (token.c) {
+        const adapter = wireTokenGestures(span, token, index, p);
+        installTokenAlternatives(wrapper, span, adapter.target, adapter);
+      } else if (particle) {
+        const adapter = wireParticleGestures(span, particle);
+        installTokenAlternatives(wrapper, span, adapter.target, adapter);
+      }
+      rendered = wrapper;
+    }
     if (S.dials.spacing === 2) {
       if (token.c || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
-      group.append(span);
+      group.append(rendered);
     } else {
-      reader.append(span);
+      reader.append(rendered);
     }
   }
   main.append(reader);
@@ -1312,10 +1546,39 @@ function wireParticleGestures(span, particle) {
   let miniTimer = null;
   let fullTimer = null;
   let down = null;
-  const openFull = () => {
+  const target = { kind: 'particle', id: particle.id };
+  const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
     swallowClickUntil = Date.now() + 700;
-    go({ t: 'particle', id: particle.id });
+    if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-particle');
+    go({ t: 'particle', id: particle.id }, { invoker: span });
+  };
+  const quickLook = (modality = 'pointer', emitAction = false) => {
+    if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-particle');
+    removeMini();
+    const mini = el('div', null);
+    mini.id = 'mini';
+    mini.setAttribute('role', 'dialog');
+    mini.setAttribute('aria-label', tx(`${particle.p} の語釈`, `${particle.p} particle quick look`));
+    mini.append(el('span', 'mini-word', particle.p));
+    mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
+    mini.append(el('span', 'mini-hint', tx('助詞の全項目へ進める', 'open the complete particle entry')));
+    const entry = biLabel('button', 'mini-entry', '助詞へ', 'full entry');
+    entry.type = 'button';
+    entry.dataset.action = 'entry.open';
+    entry.dataset.targetKind = 'particle';
+    entry.addEventListener('click', (event) => {
+      event.stopPropagation();
+      openFull(event.detail === 0 ? 'keyboard' : 'pointer', true);
+    });
+    mini.append(entry);
+    document.body.append(mini);
+    const r = span.getBoundingClientRect();
+    const m = mini.getBoundingClientRect();
+    const above = r.top > m.height + 70;
+    mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
+    mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
+    if (modality !== 'pointer') entry.focus({ preventScroll: true });
   };
   const clear = () => {
     clearTimeout(miniTimer);
@@ -1325,23 +1588,9 @@ function wireParticleGestures(span, particle) {
   span.classList.add('particle');
   span.addEventListener('contextmenu', (ev) => ev.preventDefault());
   span.addEventListener('pointerdown', (ev) => {
-    down = { x: ev.clientX, y: ev.clientY };
-    miniTimer = setTimeout(() => {
-      removeMini();
-      const mini = el('div', null);
-      mini.id = 'mini';
-      mini.append(el('span', 'mini-word', particle.p));
-      mini.append(el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-      mini.append(el('span', 'mini-hint', tx('押しつづけて助詞のページへ', 'keep holding — the particle page')));
-      document.body.append(mini);
-      const r = span.getBoundingClientRect();
-      const m = mini.getBoundingClientRect();
-      const above = r.top > m.height + 70;
-      mini.style.left = `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
-      mini.style.top = `${above ? r.top - m.height - 10 : r.bottom + 10}px`;
-      mini.addEventListener('click', openFull);
-    }, GESTURE.MINI_MS);
-    fullTimer = setTimeout(openFull, GESTURE.FULL_MS);
+    down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
+    miniTimer = setTimeout(() => quickLook('pointer', true), GESTURE.MINI_MS);
+    fullTimer = setTimeout(() => openFull('pointer', true), GESTURE.FULL_MS);
   });
   span.addEventListener('pointermove', (ev) => {
     if (!down) return;
@@ -1355,9 +1604,23 @@ function wireParticleGestures(span, particle) {
     down = null;
   });
   span.addEventListener('pointerup', () => {
+    if (down && Date.now() - down.at < GESTURE.MINI_MS) {
+      interaction({ kind: 'target.activate', target }, 'pointer', 'reader-particle');
+    }
     clear();
     down = null;
   });
+  span.addEventListener('click', (event) => {
+    if (event.detail !== 0 || Date.now() < swallowClickUntil) return;
+    interaction({ kind: 'target.activate', target }, 'keyboard', 'reader-particle');
+    // Intentionally inert: the explicit adjacent entry.open control is the
+    // keyboard/switch/screen-reader door without changing pointer rhythm.
+  });
+  return {
+    target,
+    quickLook: (modality) => quickLook(modality, false),
+    openEntry: (modality) => openFull(modality, false),
+  };
 }
 
 /* --------------------------------------------------------------- search
@@ -2203,11 +2466,19 @@ function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
   if (!node) return;
   const scrim = el('div', 'scrim');
-  scrim.addEventListener('click', back);
+  scrim.setAttribute('aria-hidden', 'true');
+  scrim.addEventListener('click', () => {
+    interaction({ kind: 'layer.dismiss' }, 'pointer', 'sheet-scrim');
+    dismissSheet();
+  });
   root.append(scrim);
   const sheet = el('div', 'sheet');
   sheet.id = 'sheet';
   sheet.dataset.node = `${node.t}:${node.id}`;
+  sheet.tabIndex = -1;
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-label', tx(`${nodeTitle(node)} の全項目`, `${nodeTitle(node)} full entry`));
   sheet.append(el('div', 'sheet-grip'));
 
   // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
@@ -2215,7 +2486,15 @@ function renderSheet(root) {
   const backBtn = biLabel('button', 'sheet-back', '← 戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'sheet-back';
-  backBtn.addEventListener('click', back);
+  backBtn.dataset.action = 'navigation.back';
+  backBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'navigation.back' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'sheet-back',
+    );
+    back();
+  });
   bar.append(backBtn);
   if (S.stack.length > 1) {
     bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
@@ -2224,10 +2503,15 @@ function renderSheet(root) {
   closeBtn.type = 'button';
   closeBtn.id = 'sheet-close';
   closeBtn.title = tx('とじる', 'close');
-  closeBtn.addEventListener('click', () => {
-    S.stack = [];
-    render();
-    if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  closeBtn.setAttribute('aria-label', tx('全項目をとじる', 'close full entry'));
+  closeBtn.dataset.action = 'layer.dismiss';
+  closeBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'layer.dismiss' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'sheet-close',
+    );
+    dismissSheet();
   });
   bar.append(closeBtn);
   sheet.append(bar);
@@ -2238,7 +2522,35 @@ function renderSheet(root) {
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
   else if (node.t === 'grammar') renderGrammarNode(sheet, node);
   else if (node.t === 'particle') renderParticleNode(sheet, node);
+  sheet.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      interaction({ kind: 'layer.dismiss' }, 'keyboard', 'sheet-escape');
+      dismissSheet();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...sheet.querySelectorAll('button, a[href], input, [tabindex]')].filter(
+      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+    );
+    if (!focusable.length) {
+      event.preventDefault();
+      sheet.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
   root.append(sheet);
+  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
 }
 
 function licencePanel() {
@@ -2425,6 +2737,13 @@ function render() {
 
   renderSheet(root);
   renderVariants(root);
+  if (S.stack.length) {
+    for (const child of root.children) {
+      if (child.id === 'sheet' || child.classList.contains('scrim')) continue;
+      child.inert = true;
+      child.setAttribute('aria-hidden', 'true');
+    }
+  }
   updateMeasurements();
 }
 
