@@ -73,6 +73,8 @@ export interface SessionScreenProps {
   readonly newBudget?: number | undefined;
   readonly onOpenCanvas: (canvasId: string) => void;
   readonly onOpenRepair: () => void;
+  /** Opens this exact target's evidence chain after the finite end. */
+  readonly onInspectEvidence?: ((threadId: string) => void) | undefined;
   readonly onBack: () => void;
 }
 
@@ -82,6 +84,7 @@ export function SessionScreen({
   newBudget = 1,
   onOpenCanvas,
   onOpenRepair,
+  onInspectEvidence,
   onBack,
 }: SessionScreenProps): ReactNode {
   const theme = useTheme();
@@ -133,6 +136,7 @@ export function SessionScreen({
       newBudget={newBudget}
       onBack={onBack}
       onOpenCanvas={onOpenCanvas}
+      onInspectEvidence={onInspectEvidence}
       onOpenRepair={onOpenRepair}
       revealed={revealed}
       setHintsUsed={setHintsUsed}
@@ -160,6 +164,7 @@ interface SessionBodyProps {
   readonly setShowBacklog: (value: boolean) => void;
   readonly onOpenCanvas: (canvasId: string) => void;
   readonly onOpenRepair: () => void;
+  readonly onInspectEvidence?: ((threadId: string) => void) | undefined;
   readonly onBack: () => void;
 }
 
@@ -177,6 +182,7 @@ function SessionBody({
   setShowBacklog,
   onOpenCanvas,
   onOpenRepair,
+  onInspectEvidence,
   onBack,
 }: SessionBodyProps): ReactNode {
   const runtime = loop.state.runtime;
@@ -213,7 +219,7 @@ function SessionBody({
   if (runtime === null) {
     return (
       <ScreenShell
-        subtitle={`A finite sitting for the time you have. ${String(timeBudgetMin)} minutes, one new item at most.`}
+        subtitle={`A finite sitting for the time you have. ${String(timeBudgetMin)} minutes, ${String(newBudget)} new contract${newBudget === 1 ? '' : 's'} at most.`}
         testID="screen-session"
         title="Session"
       >
@@ -243,6 +249,19 @@ function SessionBody({
   const plan = runtime.plan;
   const progress = sessionProgress(runtime);
   const closed = runtime.status === 'closed';
+  const latestReview = [...loop.state.log].reverse().find((event) => event.type === 'ReviewGraded');
+  const latestDecision =
+    latestReview === undefined
+      ? undefined
+      : loop.state.derived.gateDecisions.find(
+          (decision) => decision.eventId === latestReview.eventId,
+        );
+  const latestMemory =
+    latestReview === undefined
+      ? undefined
+      : loop.state.derived.memoryStates.find(
+          (memory) => memory.contractId === latestReview.contractId,
+        );
 
   const answer = (grade: Grade): void => {
     loop.dispatch({
@@ -320,12 +339,35 @@ function SessionBody({
         </Text>
       </View>
 
+      {latestReview === undefined ? null : (
+        <Section
+          note="The grade, gate verdict, and memory state below are projections of the canonical log; this screen computes no interval."
+          testID="session-grade-evidence"
+          title="Last graded response"
+        >
+          <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+            ReviewGraded · {latestReview.grade} · tier {latestReview.tier} ·{' '}
+            {latestDecision?.admitted === true ? 'admitted by the evidence gate' : 'not admitted'}
+          </Text>
+          <Text
+            style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}
+            testID="session-memory-evidence"
+          >
+            {latestDecision?.admitted !== true || latestMemory === undefined
+              ? 'Review memory unchanged: this observation was recorded but did not pass the gate.'
+              : `Review memory updated · ${String(latestMemory.reps)} repetition(s) · ${latestMemory.phase}`}
+          </Text>
+        </Section>
+      )}
+
       {/* --------------------------------------------- the current step */}
       {closed ? (
         <CompletionPanel
           completionState={runtime.completionState}
           onBack={onBack}
+          onInspectEvidence={onInspectEvidence}
           sessionId={runtime.sessionId}
+          threadId={target.threadId}
         />
       ) : step === null ? (
         <Section
@@ -525,10 +567,14 @@ function CompletionPanel({
   completionState,
   sessionId,
   onBack,
+  onInspectEvidence,
+  threadId,
 }: {
   readonly completionState: string | null;
   readonly sessionId: string;
+  readonly threadId: string;
   readonly onBack: () => void;
+  readonly onInspectEvidence?: ((threadId: string) => void) | undefined;
 }): ReactNode {
   const theme = useTheme();
   const wording =
@@ -559,6 +605,15 @@ function CompletionPanel({
       <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
         Recorded as SessionClosed for {sessionId}. Nothing was queued behind it.
       </Text>
+      {onInspectEvidence === undefined ? null : (
+        <AppButton
+          accessibilityHint="Opens this target's source lineage, graded evidence, and export verification."
+          label="Inspect evidence and export"
+          onPress={() => onInspectEvidence(threadId)}
+          testID="session-inspect-evidence"
+          variant="primary"
+        />
+      )}
       <AppButton accessibilityHint="Returns to search." label="Back" onPress={onBack} />
     </View>
   );

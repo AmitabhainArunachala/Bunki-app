@@ -106,6 +106,8 @@ interface Enrichment {
 }
 
 export interface CaptureScreenProps {
+  /** Opens the authored A1 reading source. */
+  readonly onOpenGoldenSource: () => void;
   /** Navigate to a word page. Injected so the screen has no router dependency. */
   readonly onOpenWord: (lexemeId: string) => void;
   readonly onOpenKanji: (character: string) => void;
@@ -116,6 +118,7 @@ export interface CaptureScreenProps {
 }
 
 export function CaptureScreen({
+  onOpenGoldenSource,
   onOpenWord,
   onOpenKanji,
   onOpenEvidence,
@@ -252,6 +255,14 @@ export function CaptureScreen({
 
   return (
     <ScreenShell
+      lede={
+        <AppButton
+          accessibilityHint="Opens the authored source 静かな朝 at its exact 自分 anchor."
+          label="Read 静かな朝 — exact source"
+          onPress={onOpenGoldenSource}
+          testID="capture-open-golden-source"
+        />
+      }
       subtitle="Look something up, keep it in one tap, and mark what felt uncertain."
       testID="screen-capture"
       title="分岐 Bunki — capture"

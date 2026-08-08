@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { EvidenceInspectorScreen } from '@/screens/evidence-inspector-screen';
+import { goldenSourceStudy, isGoldenSourceReturn } from '@/data/golden-source';
 import { RouteTitle } from '@/ui/route-title';
 
 /**
@@ -13,7 +14,16 @@ import { RouteTitle } from '@/ui/route-title';
  */
 export default function EvidenceRoute(): ReactNode {
   const router = useRouter();
-  const { thread } = useLocalSearchParams<{ thread?: string }>();
+  const { thread, source, anchor } = useLocalSearchParams<{
+    thread?: string;
+    source?: string;
+    anchor?: string;
+  }>();
+  const guided = isGoldenSourceReturn(
+    typeof source === 'string' ? source : undefined,
+    typeof anchor === 'string' ? anchor : undefined,
+  );
+  const study = goldenSourceStudy();
 
   return (
     <>
@@ -21,6 +31,12 @@ export default function EvidenceRoute(): ReactNode {
       <EvidenceInspectorScreen
         onBack={() => router.push('/')}
         onOpenDebug={() => router.push('/debug')}
+        onReturnToSource={
+          guided
+            ? () => router.push(`/source?focus=${encodeURIComponent(study.anchor.id)}`)
+            : undefined
+        }
+        returnSourceLabel={guided ? `${study.source.title} · ${study.targetText}` : undefined}
         threadId={typeof thread === 'string' && thread !== '' ? thread : undefined}
       />
     </>

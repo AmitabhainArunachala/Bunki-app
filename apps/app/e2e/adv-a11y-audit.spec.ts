@@ -52,6 +52,7 @@ import { expect, test, openApp, hydrated, keepWord, visibleTestId } from './supp
 /** Every route `expo export` produced, plus the two dynamic ones with real parameters. */
 const ROUTES = [
   '/',
+  '/source',
   '/word/lex-bunki',
   '/word/lex-wakareru',
   `/kanji/${encodeURIComponent('岐')}`,

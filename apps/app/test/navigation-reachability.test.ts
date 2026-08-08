@@ -161,6 +161,7 @@ describe('the map describes the app it is in', () => {
     const labels = DESTINATIONS.map((destination) => destination.label);
     expect(labels).toEqual([
       'Capture',
+      'Source',
       'Word',
       'Kanji',
       'Session',

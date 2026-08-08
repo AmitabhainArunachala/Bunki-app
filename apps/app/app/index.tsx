@@ -21,6 +21,7 @@ export default function CaptureRoute(): ReactNode {
       <CaptureScreen
         initialQuery={typeof q === 'string' ? q : ''}
         onOpenEvidence={() => router.push('/evidence')}
+        onOpenGoldenSource={() => router.push('/source')}
         onOpenKanji={(character) => router.push(`/kanji/${encodeURIComponent(character)}`)}
         onOpenWord={(lexemeId) => router.push(`/word/${encodeURIComponent(lexemeId)}`)}
       />
