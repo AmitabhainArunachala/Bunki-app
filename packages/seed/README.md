@@ -20,6 +20,7 @@ A small, honest, hand-assembled dataset:
 | Grammar constructions                              | 3     | `data/grammar.json`                           |
 | Example sentences                                  | 8     | `data/sentences.json`                         |
 | Integration passage (160 characters)               | 1     | `data/passages.json`                          |
+| Original source article (301 characters)           | 1     | `data/sources.json`                           |
 | KanjiVG stroke SVGs                                | 10    | `data/strokes/`, manifest `data/strokes.json` |
 
 It is a **Phase-0 seed, not a dictionary.** Controller §8 and §2 both forbid a
@@ -92,12 +93,12 @@ Completeness is enforced three independent ways, so a single mistake cannot pass
 
 ## Sources actually shipped
 
-| Source                     | Licence       | State                                                         | Covers                                                              |
-| -------------------------- | ------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
-| KanjiVG                    | CC BY-SA 3.0  | **verified** against the project's own repository, 2026-07-27 | stroke SVGs; stroke counts, components, radicals                    |
-| This project               | pending OD-09 | original work                                                 | sentences, passage, grammar, readings, senses, meanings, selections |
-| JMdict / KANJIDIC2 (EDRDG) | CC BY-SA 4.0  | **deferred (D-1)** — host unreachable, **nothing shipped**    | —                                                                   |
-| Tatoeba                    | CC BY 2.0 FR  | **deferred (D-2)** — host unreachable, **nothing shipped**    | —                                                                   |
+| Source                     | Licence       | State                                                         | Covers                                                                              |
+| -------------------------- | ------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| KanjiVG                    | CC BY-SA 3.0  | **verified** against the project's own repository, 2026-07-27 | stroke SVGs; stroke counts, components, radicals                                    |
+| This project               | pending OD-09 | original work                                                 | source article, sentences, passage, grammar, readings, senses, meanings, selections |
+| JMdict / KANJIDIC2 (EDRDG) | CC BY-SA 4.0  | **deferred (D-1)** — host unreachable, **nothing shipped**    | —                                                                                   |
+| Tatoeba                    | CC BY 2.0 FR  | **deferred (D-2)** — host unreachable, **nothing shipped**    | —                                                                                   |
 
 Full detail, verbatim licence texts, per-file digests, the retrieval log and both
 deferred items: [`LICENSES.md`](LICENSES.md).
@@ -106,6 +107,14 @@ Readings and senses are hand-assembled and carry `review_status: "unreviewed"`
 with `source_entry_id: null` — they are deliberately **not** labelled JMdict or
 KANJIDIC2, because EDRDG's hosts were unreachable and inventing entry sequence
 numbers would manufacture the audit trail this package exists to make trustworthy.
+
+The permanent A1 source fixture is the existing original-pool article
+「静かな朝」 (`source-bunki-graded-n5-morning`). Its 301 UTF-16 code-unit body is
+copied byte-for-byte from the Corridor article catalog and pinned by sha256
+`cb8535ea848848a58054d17582616abebe52deb5f26320f1af29d04bea1b99b2`.
+Its golden `自分` encounter is the exact half-open span `[283, 285)`, stored in
+the same location unit as `EncounterCaptured.span`; tests recompute the digest,
+compare the source copies, and resolve the anchor to `lex-jibun`.
 
 If a needed asset's license cannot be verified against its primary source, that
 is a controller §21.3 stop condition (unresolved source licensing) — not a

@@ -116,6 +116,30 @@ const passageSchema = withProvenance({
   constructionIds: z.array(nonEmpty),
 });
 
+const sourceSchema = withProvenance({
+  title: nonEmpty,
+  language: z.literal('ja'),
+  sourceKind: z.literal('article'),
+  pool: z.enum(['original', 'licensed']),
+  body: nonEmpty,
+  contentSha256: z.string().regex(/^[0-9a-f]{64}$/),
+  locationUnit: z.literal('utf16-code-unit'),
+  anchors: z
+    .array(
+      z
+        .strictObject({
+          id: nonEmpty,
+          start: z.number().int().nonnegative(),
+          end: z.number().int().positive(),
+          lexemeId: nonEmpty,
+        })
+        .refine((anchor) => anchor.end > anchor.start, {
+          message: 'anchor end must be greater than start',
+        }),
+    )
+    .min(1),
+});
+
 const strokesSchema = z.object({
   schemaVersion: z.literal(1),
   upstream: z.strictObject({
@@ -157,6 +181,7 @@ describe('seed data files satisfy the zod schema', () => {
     ['grammar.json', grammarSchema],
     ['sentences.json', sentenceSchema],
     ['passages.json', passageSchema],
+    ['sources.json', sourceSchema],
   ] as const)('%s', (file, record) => {
     const result = fileSchema(record).safeParse(readJson(file));
     expect(result.success ? null : z.prettifyError(result.error)).toBeNull();
