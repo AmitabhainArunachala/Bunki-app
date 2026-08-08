@@ -1,7 +1,7 @@
 {
  "generated": "drift-consistency sweep v1",
- "total": 64,
- "ok": 64,
+ "total": 191,
+ "ok": 191,
  "violations": 0,
  "pageErrors": [],
  "cases": [
@@ -575,6 +575,1149 @@
   {
    "word": "生物",
    "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増やす",
+   "kanji": 1,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増やす",
+   "kanji": 1,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "増やす",
+   "kanji": 1,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "9 new satellites",
+   "shot": null
+  },
+  {
+   "word": "増加",
+   "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "出迎え",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "出迎え",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "出迎え",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "外出",
+   "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "名人",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "名人",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "名人",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "名人",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "人気",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "人気",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "人気",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "名人",
+   "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "頬",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "頬",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "頬",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "頬",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "見積もり",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "見積もり",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "見積もり",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着ける",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "着ける",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着ける",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着ける",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着替える",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着替える",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "着替える",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "翼",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "翼",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "翼",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "翼",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "光熱費",
+   "kanji": 3,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "光熱費",
+   "kanji": 3,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "光熱費",
+   "kanji": 3,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "刈る",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "刈る",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "刈る",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "刈る",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "差別",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "差別",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "差別",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "毒",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "毒",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "毒",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "毒",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "中毒",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "中毒",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "中毒",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "棟",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "棟",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "棟",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "棟",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "裂ける",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "裂ける",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "裂ける",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "裂ける",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "破裂",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "破裂",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "破裂",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "13 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "お互い",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "お互い",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "お互い",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "お互い",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "互い",
+   "kanji": 1,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "互い",
+   "kanji": 1,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "互い",
+   "kanji": 1,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "馴らす",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "馴らす",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "馴らす",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "馴らす",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "煮える",
+   "kanji": 1,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "煮える",
+   "kanji": 1,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "煮える",
+   "kanji": 1,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "飯",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "6 satellites",
+   "shot": null
+  },
+  {
+   "word": "飯",
+   "kanji": 1,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "飯",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "飯",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "昼飯",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "昼飯",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "昼飯",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "12 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "建築",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "10 satellites",
+   "shot": null
+  },
+  {
+   "word": "建築",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "建築",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "建築",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "新築",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "新築",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "新築",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "13 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "穀物",
+   "kanji": 2,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "穀物",
+   "kanji": 2,
+   "gesture": "tap-again",
+   "expected": "gloss",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "穀物",
+   "kanji": 2,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "穀物",
+   "kanji": 2,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "贈り物",
+   "kanji": 2,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "贈り物",
+   "kanji": 2,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "贈り物",
+   "kanji": 2,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 2,
+   "gesture": "cancel+tap",
+   "expected": "clean tap after cancel",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "柵",
+   "kanji": 1,
+   "gesture": "tap",
+   "expected": "unfold+bloom",
+   "outcome": "ok",
+   "detail": "14 satellites",
+   "shot": null
+  },
+  {
+   "word": "柵",
+   "kanji": 1,
+   "gesture": "pinch",
+   "expected": "bloom survives zoom",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "柵",
+   "kanji": 1,
+   "gesture": "slow-drag",
+   "expected": "moves, survives",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-flick",
+   "expected": "no judgment on satellites",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-tap",
+   "expected": "reveals in place",
+   "outcome": "ok",
+   "detail": "",
+   "shot": null
+  },
+  {
+   "word": "積極的",
+   "kanji": 3,
+   "gesture": "sat-recentre",
+   "expected": "becomes the planet",
+   "outcome": "ok",
+   "detail": "14 new satellites",
+   "shot": null
+  },
+  {
+   "word": "謎",
+   "kanji": 1,
    "gesture": "cancel+tap",
    "expected": "clean tap after cancel",
    "outcome": "ok",
