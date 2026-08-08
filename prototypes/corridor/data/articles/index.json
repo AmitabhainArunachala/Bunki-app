@@ -1,0 +1,1585 @@
+{
+ "law": "three signals, never averaged; disagreement surfaced, never resolved; every signal true of the text displayed",
+ "ninjalLive": 0,
+ "sources": {
+  "proprietary_safe": [
+   {
+    "name": "ja.wikinews",
+    "licence": "CC BY 4.0",
+    "attribution": "ja.wikinews contributors, CC BY 4.0",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozorabunko-clean",
+    "licence": "PD (著作権フラグ なし)",
+    "attribution": "青空文庫",
+    "url": "https://www.aozora.gr.jp/"
+   },
+   {
+    "name": "isa-yasashii-glossary",
+    "licence": "出入国在留管理庁 やさしい日本語 用語集",
+    "attribution": "出入国在留管理庁",
+    "url": ""
+   },
+   {
+    "name": "ninjal-kyoiku-kihon-goi",
+    "licence": "CC BY 4.0",
+    "attribution": "国立国語研究所『教育基本語彙の基本的研究―増補改訂版―』(2009)",
+    "url": "https://mmsrv.ninjal.ac.jp/brfvep/"
+   },
+   {
+    "name": "bunki-v11-historical",
+    "licence": "PD",
+    "attribution": "五箇条の御誓文 · 方丈記 · 徒然草（原文はパブリックドメイン、解説はBunkiオリジナル）",
+    "url": ""
+   }
+  ],
+  "share_alike": [
+   {
+    "name": "open-anki-jlpt-decks (via drift wbig)",
+    "licence": "CC BY-SA 4.0 (JMdict lineage glosses)",
+    "attribution": "JLPT level tags: open-anki-jlpt-decks; glosses: JMdict/EDICT (EDRDG)",
+    "url": "https://www.edrdg.org/"
+   }
+  ],
+  "original": [
+   {
+    "name": "bunki-v11-reading-catalog",
+    "licence": "Bunki original",
+    "attribution": "Bunki original graded texts and essays",
+    "url": ""
+   }
+  ]
+ },
+ "articles": [
+  {
+   "id": "wikinews:1403",
+   "title": "世界自然遺産に7箇所を追加 知床半島も",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 4.0",
+   "attribution": "ja.wikinews contributors, CC BY 4.0",
+   "url": "https://ja.wikinews.org/wiki/%E4%B8%96%E7%95%8C%E8%87%AA%E7%84%B6%E9%81%BA%E7%94%A3%E3%81%AB7%E7%AE%87%E6%89%80%E3%82%92%E8%BF%BD%E5%8A%A0_%E7%9F%A5%E5%BA%8A%E5%8D%8A%E5%B3%B6%E3%82%82",
+   "date": "2005-07-15",
+   "rubySource": "tokenizer",
+   "file": "wikinews-1403.json",
+   "chars": 1220,
+   "snippet": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、ノルウェーのフィヨルドと日本の知床半島（北海道）",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.5830988364659255,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5174418604651163,
+      "band_vector": {
+       "n5": 0.0436046511627907,
+       "n4": 0.11918604651162791,
+       "n3": 0.18895348837209303,
+       "n2": 0.07848837209302326,
+       "n1": 0.0872093023255814,
+       "oov": 0.48255813953488375
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 344
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "共和",
+    "開催",
+    "世界",
+    "遺産",
+    "会議",
+    "フィヨルド"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:6460",
+   "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 4.0",
+   "attribution": "ja.wikinews contributors, CC BY 4.0",
+   "url": "https://ja.wikinews.org/wiki/%E3%83%9E%E3%83%AA%E3%83%8A%E3%83%BC%E3%82%BA%E3%83%BB%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC%E9%81%B8%E6%89%8B_%E7%8F%BE%E5%BD%B9%E9%80%9A%E7%AE%972500%E5%AE%89%E6%89%93%E9%81%94%E6%88%90",
+   "date": "2006-06-17",
+   "rubySource": "tokenizer",
+   "file": "wikinews-6460.json",
+   "chars": 397,
+   "snippet": "サンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー選手が6月7日（UTC-7、日本時間8日）、シアトルで開か",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.233210084033614,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.32558139534883723,
+      "band_vector": {
+       "n5": 0.09302325581395349,
+       "n4": 0.05813953488372093,
+       "n3": 0.11627906976744186,
+       "n2": 0.011627906976744186,
+       "n1": 0.046511627906976744,
+       "oov": 0.6744186046511628
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 86
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "スポーツ",
+    "よる",
+    "リーグシアトルマリナーズ",
+    "選手",
+    "UTC",
+    "時間"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:12024",
+   "title": "JRおおさか東線部分開業",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 4.0",
+   "attribution": "ja.wikinews contributors, CC BY 4.0",
+   "url": "https://ja.wikinews.org/wiki/JR%E3%81%8A%E3%81%8A%E3%81%95%E3%81%8B%E6%9D%B1%E7%B7%9A%E9%83%A8%E5%88%86%E9%96%8B%E6%A5%AD",
+   "date": "2008-03-15",
+   "rubySource": "tokenizer",
+   "file": "wikinews-12024.json",
+   "chars": 779,
+   "snippet": "中国新聞によると、JR西日本の新線・おおさか東線のうち、放出～久宝寺間・9.2キロの区間が3月15日から部分開業され、各駅で出発",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.442787878787879,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5429864253393666,
+      "band_vector": {
+       "n5": 0.13122171945701358,
+       "n4": 0.1085972850678733,
+       "n3": 0.14027149321266968,
+       "n2": 0.08597285067873303,
+       "n1": 0.07692307692307693,
+       "oov": 0.45701357466063347
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 221
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "新聞",
+    "よる",
+    "JR",
+    "新線",
+    "うち",
+    "放出"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:20090",
+   "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 4.0",
+   "attribution": "ja.wikinews contributors, CC BY 4.0",
+   "url": "https://ja.wikinews.org/wiki/%E4%BF%A1%E6%A5%BD%E9%AB%98%E5%8E%9F%E9%90%B5%E9%81%93%E5%88%97%E8%BB%8A%E8%A1%9D%E7%AA%81%E4%BA%8B%E6%95%85%E3%80%81JR%E8%A5%BF%E6%97%A5%E6%9C%AC%E3%81%AE%E9%81%8E%E5%A4%B1%E3%81%AF3%E5%89%B2_-_%E5%A4%A7%E9%98%AA%E5%9C%B0%E8%A3%81%E3%81%8C%E8%AA%8D%E5%AE%9A",
+   "date": "2011-04-28",
+   "rubySource": "tokenizer",
+   "file": "wikinews-20090.json",
+   "chars": 813,
+   "snippet": "読売新聞・朝日新聞によると、1991年5月に、信楽高原鐵道（以下、「SKR」）の列車と、同鉄道に相互乗り入れしていたJR西日本の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.13752898550724701,
+      "band": "上級後半",
+      "in_scale": false,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5420168067226891,
+      "band_vector": {
+       "n5": 0.08403361344537816,
+       "n4": 0.09243697478991597,
+       "n3": 0.23529411764705882,
+       "n2": 0.0546218487394958,
+       "n1": 0.07563025210084033,
+       "oov": 0.4579831932773109
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 238
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "読売",
+    "新聞",
+    "朝日",
+    "よる",
+    "高原",
+    "鐵道"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45227",
+   "title": "ウィキニュース、21年の歴史に幕を閉じる",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 4.0",
+   "attribution": "ja.wikinews contributors, CC BY 4.0",
+   "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B",
+   "date": "2026-05-03",
+   "rubySource": "tokenizer",
+   "file": "wikinews-45227.json",
+   "chars": 1304,
+   "snippet": "ウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.2248535143970827,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.47112462006079026,
+      "band_vector": {
+       "n5": 0.0790273556231003,
+       "n4": 0.0911854103343465,
+       "n3": 0.21580547112462006,
+       "n2": 0.0243161094224924,
+       "n1": 0.060790273556231005,
+       "oov": 0.5288753799392097
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 329
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "ウィキ",
+    "ニュース",
+    "プロジェクト",
+    "メディア",
+    "財団",
+    "理事"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "aozora:051034",
+   "title": "野ばら",
+   "source": "aozorabunko-clean",
+   "sourceLabel": "青空文庫 · 小川未明",
+   "pool": "proprietary_safe",
+   "licence": "PD (著作権フラグ なし) · 新字新仮名",
+   "attribution": "青空文庫 小川未明「野ばら」",
+   "url": "https://www.aozora.gr.jp/cards/001475/card51034.html",
+   "date": "None",
+   "rubySource": "tokenizer",
+   "file": "aozora-051034.json",
+   "chars": 2350,
+   "snippet": "大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。 　",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.449779679613782,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.46365105008077545,
+      "band_vector": {
+       "n5": 0.21163166397415187,
+       "n4": 0.07754442649434572,
+       "n3": 0.13893376413570274,
+       "n2": 0.009693053311793215,
+       "n1": 0.025848142164781908,
+       "oov": 0.5363489499192245
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 619
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "大きな",
+    "それ",
+    "すこし",
+    "小さな",
+    "隣り合う",
+    "当座"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "aozora:000628",
+   "title": "ごん狐",
+   "source": "aozorabunko-clean",
+   "sourceLabel": "青空文庫 · 新美南吉",
+   "pool": "proprietary_safe",
+   "licence": "PD (著作権フラグ なし) · 新字新仮名",
+   "attribution": "青空文庫 新美南吉「ごん狐」",
+   "url": "https://www.aozora.gr.jp/cards/000121/card628.html",
+   "date": "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
+   "rubySource": "tokenizer",
+   "file": "aozora-000628.json",
+   "chars": 4934,
+   "snippet": "一  　これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。 　むかしは、私たちの村のちかくの、中山というとこ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.6370429001783595,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.33362598770851626,
+      "band_vector": {
+       "n5": 0.21334503950834066,
+       "n4": 0.05706760316066725,
+       "n3": 0.041264266900790166,
+       "n2": 0.015803336259877086,
+       "n1": 0.006145741878841089,
+       "oov": 0.6663740122914837
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 1139
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "これ",
+    "小さい",
+    "とき",
+    "いう",
+    "じい",
+    "きく"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "aozora:046605",
+   "title": "やまなし",
+   "source": "aozorabunko-clean",
+   "sourceLabel": "青空文庫 · 宮沢賢治",
+   "pool": "proprietary_safe",
+   "licence": "PD (著作権フラグ なし) · 新字新仮名",
+   "attribution": "青空文庫 宮沢賢治「やまなし」",
+   "url": "https://www.aozora.gr.jp/cards/000081/card46605.html",
+   "date": "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
+   "rubySource": "tokenizer",
+   "file": "aozora-046605.json",
+   "chars": 2722,
+   "snippet": "小さな谷川の底を写した二枚の青い幻燈です。  一、五月  　二疋の蟹の子供らが青じろい水の底で話していました。 『クラムボンはわ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.769128151466597,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.45765230312035665,
+      "band_vector": {
+       "n5": 0.2689450222882615,
+       "n4": 0.0713224368499257,
+       "n3": 0.0861812778603269,
+       "n2": 0.01634472511144131,
+       "n1": 0.014858841010401188,
+       "oov": 0.5423476968796433
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 673
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "小さな",
+    "写す",
+    "青い",
+    "幻燈",
+    "子供",
+    "青じろい"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:1",
+   "title": "育児休業",
+   "headwordRuby": "｜育児休業《いくじきゅうぎょう》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-1.json",
+   "chars": 22,
+   "snippet": "子どもを育てるために、とることができる休み。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.035333333333334,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.2857142857142857,
+      "band_vector": {
+       "n5": 0.14285714285714285,
+       "n4": 0.14285714285714285,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.7142857142857143
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 7
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "子ども",
+    "育てる",
+    "ため",
+    "とる",
+    "こと",
+    "できる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:2",
+   "title": "育児休業給付金",
+   "headwordRuby": "｜育児休業給付金《いくじきゅうぎょうきゅうふきん》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-2.json",
+   "chars": 45,
+   "snippet": "育児休業(No.1)をしているあいだに、雇用保険(No.41)からもらうことができるお金。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.720689655172413,
+      "band": "初級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.3076923076923077,
+      "band_vector": {
+       "n5": 0.0,
+       "n4": 0.0,
+       "n3": 0.07692307692307693,
+       "n2": 0.15384615384615385,
+       "n1": 0.07692307692307693,
+       "oov": 0.6923076923076923
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 13
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "育児",
+    "休業",
+    "No",
+    "いる",
+    "あいだ",
+    "雇用"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:3",
+   "title": "遺族基礎年金",
+   "headwordRuby": "｜遺族基礎年金《いぞくきそねんきん》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-3.json",
+   "chars": 46,
+   "snippet": "国民年金(No.39)に入っていた人が死んだとき、家族が国民年金からもらうことができるお金。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.577333333333332,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4666666666666667,
+      "band_vector": {
+       "n5": 0.26666666666666666,
+       "n4": 0.0,
+       "n3": 0.2,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.5333333333333333
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 15
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "国民",
+    "年金",
+    "No",
+    "入る",
+    "死ぬ",
+    "とき"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:4",
+   "title": "遺族厚生年金",
+   "headwordRuby": "｜遺族厚生年金《いぞくこうせいねんきん》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-4.json",
+   "chars": 50,
+   "snippet": "厚生年金保険(No.35)に入っていた人が死んだとき、家族が厚生年金保険からもらうことができるお金。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.0820000000000007,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4117647058823529,
+      "band_vector": {
+       "n5": 0.23529411764705882,
+       "n4": 0.0,
+       "n3": 0.058823529411764705,
+       "n2": 0.0,
+       "n1": 0.11764705882352941,
+       "oov": 0.5882352941176471
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 17
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "厚生",
+    "年金",
+    "保険",
+    "No",
+    "入る",
+    "死ぬ"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:5",
+   "title": "医療保険",
+   "headwordRuby": "｜医療保険《いりょうほけん》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-5.json",
+   "chars": 31,
+   "snippet": "みんなからお金を集めて、けがや病気で病院に行く人を助ける制度。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.1540000000000017,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8,
+      "band_vector": {
+       "n5": 0.4,
+       "n4": 0.1,
+       "n3": 0.3,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.2
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 10
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "みんな",
+    "集める",
+    "けが",
+    "病気",
+    "病院",
+    "行く"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:6",
+   "title": "印鑑登録証明書",
+   "headwordRuby": "｜印鑑登録証明書《いんかんとうろくしょうめいしょ》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-6.json",
+   "chars": 48,
+   "snippet": "あなたの「実印」(No.58)がどれか書いてある紙。住んでいるまちの役所でもらうことができます。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.2624516129032255,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.2857142857142857,
+      "band_vector": {
+       "n5": 0.21428571428571427,
+       "n4": 0.0,
+       "n3": 0.0,
+       "n2": 0.07142857142857142,
+       "n1": 0.0,
+       "oov": 0.7142857142857143
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 14
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "あなた",
+    "実印",
+    "No",
+    "どれ",
+    "書く",
+    "ある"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:7",
+   "title": "印鑑登録証",
+   "headwordRuby": "｜印鑑登録証《いんかんとうろくしょう》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-7.json",
+   "chars": 71,
+   "snippet": "住んでいるまちの役所で印鑑登録証明書(No.6)をもらうときに使うもの。「実印」(No.58)を住んでいるまちの役所が認めたとき",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.018608695652174,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4285714285714286,
+      "band_vector": {
+       "n5": 0.14285714285714285,
+       "n4": 0.0,
+       "n3": 0.09523809523809523,
+       "n2": 0.09523809523809523,
+       "n1": 0.09523809523809523,
+       "oov": 0.5714285714285714
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 21
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "住む",
+    "いる",
+    "まち",
+    "役所",
+    "印鑑",
+    "登録"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:8",
+   "title": "オーバーステイ",
+   "headwordRuby": "オーバーステイ",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-8.json",
+   "chars": 24,
+   "snippet": "在留期限(No.47)を過ぎても日本にいること。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 6.3155,
+      "band": "初級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.33333333333333337,
+      "band_vector": {
+       "n5": 0.0,
+       "n4": 0.16666666666666666,
+       "n3": 0.16666666666666666,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.6666666666666666
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 6
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "在留",
+    "期限",
+    "No",
+    "過ぎる",
+    "いる",
+    "こと"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:9",
+   "title": "大家",
+   "headwordRuby": "｜大家《おおや》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-9.json",
+   "chars": 6,
+   "snippet": "家を貸す人。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.303999999999999,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 1.0,
+      "band_vector": {
+       "n5": 1.0,
+       "n4": 0.0,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.0
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 3
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "貸す"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "yasashii:10",
+   "title": "介護",
+   "headwordRuby": "｜介護《かいご》",
+   "source": "isa-yasashii-glossary",
+   "sourceLabel": "やさしい日本語 用語集",
+   "pool": "proprietary_safe",
+   "licence": "ISA やさしい日本語 glossary",
+   "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+   "url": "",
+   "date": "",
+   "rubySource": "markup",
+   "file": "yasashii-10.json",
+   "chars": 62,
+   "snippet": "年をとったり、特別な病気になったりして、毎日の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.3749473684210525,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4736842105263158,
+      "band_vector": {
+       "n5": 0.3157894736842105,
+       "n4": 0.15789473684210525,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.5263157894736842
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 19
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "とる",
+    "特別",
+    "病気",
+    "なる",
+    "毎日",
+    "生活"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n5-morning",
+   "title": "静かな朝",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N5",
+   "lane": "graded",
+   "file": "bunki-graded-n5-morning.json",
+   "chars": 301,
+   "snippet": "朝、七時に起きました。窓を開けると、空は青くて、風は少し冷たかったです。私は水を飲んで、近くのパン屋へ歩きました。  パン屋には",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.824107226107226,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6455696202531646,
+      "band_vector": {
+       "n5": 0.5822784810126582,
+       "n4": 0.02531645569620253,
+       "n3": 0.012658227848101266,
+       "n2": 0.012658227848101266,
+       "n1": 0.012658227848101266,
+       "oov": 0.35443037974683544
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 79
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "起きる",
+    "開ける",
+    "青い",
+    "少し",
+    "冷たい",
+    "飲む"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n4-bookshop",
+   "title": "雨の日の古本屋",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N4",
+   "lane": "graded",
+   "file": "bunki-graded-n4-bookshop.json",
+   "chars": 335,
+   "snippet": "駅の近くに、小さな古本屋があります。入口は狭く、初めて見る人は通り過ぎてしまうかもしれません。私は雨の日に、その店へ入りました。",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.101333333333332,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7553191489361702,
+      "band_vector": {
+       "n5": 0.5425531914893617,
+       "n4": 0.10638297872340426,
+       "n3": 0.09574468085106383,
+       "n2": 0.010638297872340425,
+       "n1": 0.0,
+       "oov": 0.24468085106382978
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 94
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "近く",
+    "小さな",
+    "古本",
+    "ある",
+    "入口",
+    "狭い"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n3-town",
+   "title": "知らない町を歩く",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-town.json",
+   "chars": 349,
+   "snippet": "旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くよ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.227171717171718,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6285714285714286,
+      "band_vector": {
+       "n5": 0.3619047619047619,
+       "n4": 0.1619047619047619,
+       "n3": 0.08571428571428572,
+       "n2": 0.009523809523809525,
+       "n1": 0.009523809523809525,
+       "oov": 0.37142857142857144
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 105
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "旅先",
+    "歩く",
+    "とき",
+    "できる",
+    "地図",
+    "よう"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n2-mountain",
+   "title": "山を歩きながら考えたこと",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-mountain.json",
+   "chars": 448,
+   "snippet": "山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.5007788778877895,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.582089552238806,
+      "band_vector": {
+       "n5": 0.1865671641791045,
+       "n4": 0.11940298507462686,
+       "n3": 0.23134328358208955,
+       "n2": 0.022388059701492536,
+       "n1": 0.022388059701492536,
+       "oov": 0.417910447761194
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 134
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "山道",
+    "長い",
+    "歩く",
+    "いる",
+    "考え",
+    "言葉"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n1-ai",
+   "title": "AI時代の知識と判断",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-ai.json",
+   "chars": 570,
+   "snippet": "生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.004065005417118,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5642458100558659,
+      "band_vector": {
+       "n5": 0.0893854748603352,
+       "n4": 0.10614525139664804,
+       "n3": 0.26256983240223464,
+       "n2": 0.0446927374301676,
+       "n1": 0.061452513966480445,
+       "oov": 0.43575418994413406
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 179
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "生成",
+    "AI",
+    "大量",
+    "文章",
+    "瞬時",
+    "作れる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "real-gokajo",
+   "title": "五箇条の御誓文",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "一次資料 · Historical primary source",
+   "pool": "proprietary_safe",
+   "licence": "PD + Bunki原作の解説",
+   "attribution": "Historical primary source (public domain); framing text Bunki original",
+   "url": "https://www.digital.archives.go.jp/",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "primary",
+   "file": "real-gokajo.json",
+   "chars": 288,
+   "snippet": "慶応四年三月十四日、明治天皇は新しい国の基本方針として五箇条の御誓文を示した。  一、広ク会議ヲ興シ万機公論ニ決スベシ。 一、上",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.178530612244897,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.47777777777777775,
+      "band_vector": {
+       "n5": 0.05555555555555555,
+       "n4": 0.07777777777777778,
+       "n3": 0.15555555555555556,
+       "n2": 0.07777777777777778,
+       "n1": 0.1111111111111111,
+       "oov": 0.5222222222222223
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 90
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "天皇",
+    "新しい",
+    "基本",
+    "方針",
+    "箇条",
+    "誓文"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "real-hojoki",
+   "title": "方丈記 · 冒頭",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "古典 · 鴨長明 · 1212",
+   "pool": "proprietary_safe",
+   "licence": "PD + Bunki原作の解説",
+   "attribution": "鴨長明 · 1212 (public domain); framing text Bunki original",
+   "url": "https://www.aozora.gr.jp/",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1+",
+   "lane": "literature",
+   "file": "real-hojoki.json",
+   "chars": 270,
+   "snippet": "ゆく河の流れは絶えずして、しかも、もとの水にあらず。よどみに浮かぶうたかたは、かつ消え、かつ結びて、久しくとどまりたるためしなし",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.9526101694915257,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.41975308641975306,
+      "band_vector": {
+       "n5": 0.2222222222222222,
+       "n4": 0.04938271604938271,
+       "n3": 0.09876543209876543,
+       "n2": 0.0,
+       "n1": 0.04938271604938271,
+       "oov": 0.5802469135802469
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 81
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "ゆく",
+    "流れ",
+    "絶える",
+    "しかも",
+    "もと",
+    "ある"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "real-tsurezure",
+   "title": "徒然草 · 序段",
+   "source": "bunki-v11-reading-catalog",
+   "sourceLabel": "古典 · 吉田兼好 · 14th century",
+   "pool": "proprietary_safe",
+   "licence": "PD + Bunki原作の解説",
+   "attribution": "吉田兼好 · 14th century (public domain); framing text Bunki original",
+   "url": "https://www.aozora.gr.jp/",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1+",
+   "lane": "literature",
+   "file": "real-tsurezure.json",
+   "chars": 250,
+   "snippet": "つれづれなるままに、日暮らし、硯にむかひて、心にうつりゆくよしなし事を、そこはかとなく書きつくれば、あやしうこそものぐるほしけれ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.5816103896103897,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.3648648648648649,
+      "band_vector": {
+       "n5": 0.13513513513513514,
+       "n4": 0.0945945945945946,
+       "n3": 0.06756756756756757,
+       "n2": 0.02702702702702703,
+       "n1": 0.04054054054054054,
+       "oov": 0.6351351351351351
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 74
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "つれづれ",
+    "まま",
+    "日暮らし",
+    "むか",
+    "うつる",
+    "ゆく"
+   ],
+   "truncated": false
+  }
+ ]
+}

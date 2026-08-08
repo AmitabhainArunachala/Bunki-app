@@ -8,25 +8,24 @@
     "law": "three signals, never averaged; disagreement surfaced, never resolved"
   },
   "counts": {
-    "passages": 11,
-    "words": 7217,
+    "passages": 26,
+    "articleFiles": 26,
+    "words": 7910,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
     "semHeads": 82
   },
   "caps": {
-    "excerptChars": 520,
     "kanjiWordCap": 60,
     "radicalKanjiCap": 80,
     "idiomCap": 900,
-    "idiomCandidates": 3559,
+    "idiomCandidates": 3932,
     "idiomTotalInSource": 4198
   },
   "pools": {
     "proprietary_safe": [
       "kanken.json",
-      "passages.json",
       "sem.json"
     ],
     "share_alike": [

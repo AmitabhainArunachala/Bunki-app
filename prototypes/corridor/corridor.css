@@ -235,6 +235,12 @@ h1.view-title {
   background: var(--ink-2);
 }
 
+/* an unmeasured signal keeps the row's shape but shows no reading at all */
+.sig-track-na {
+  background: transparent;
+  border-style: dashed;
+}
+
 .sig-val {
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
@@ -306,6 +312,13 @@ h1.view-title {
 
 .reader ruby {
   ruby-position: over;
+}
+
+/* paragraph break — the article files carry paragraph starts, the reader
+ * honours them; a block gap, not an indent, so ruby never collides */
+.reader .para-break {
+  display: block;
+  height: 1.05em;
 }
 
 .reader rt {

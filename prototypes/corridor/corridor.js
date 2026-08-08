@@ -13,7 +13,7 @@
  */
 
 const DATA = {
-  safe: ['passages', 'kanken', 'sem'],
+  safe: ['kanken', 'sem'],
   sa: ['kanji', 'words', 'idioms', 'dict', 'strokes'],
   orig: ['grammar-v11'],
 };
@@ -46,6 +46,21 @@ const TITLES_EN = {
   'yasashii:1': 'Childcare leave',
   'yasashii:2': 'Childcare-leave benefit',
   'yasashii:3': "Basic survivor's pension",
+  'yasashii:4': "Employees' survivor's pension",
+  'yasashii:5': 'Medical insurance',
+  'yasashii:6': 'Seal-registration certificate',
+  'yasashii:7': 'Seal-registration card',
+  'yasashii:8': 'Overstaying a visa',
+  'yasashii:9': 'Landlord',
+  'yasashii:10': 'Long-term care',
+  'bunki-graded-n5-morning': 'A Quiet Morning',
+  'bunki-graded-n4-bookshop': 'The Second-hand Bookshop on a Rainy Day',
+  'bunki-graded-n3-town': 'Walking an Unknown Town',
+  'bunki-essay-n2-mountain': 'Thoughts While Walking a Mountain',
+  'bunki-essay-n1-ai': 'Knowledge and Judgment in the Age of AI',
+  'real-gokajo': 'The Charter Oath (1868)',
+  'real-hojoki': 'Hōjōki — the opening',
+  'real-tsurezure': 'Tsurezuregusa — the opening passage',
 };
 
 /** Turn the grader's three signals into one sentence a learner can use.
@@ -61,13 +76,19 @@ function levelPhrase(grading) {
     上級後半: 'Upper advanced',
   };
   const level = levelMap[band] || 'Ungraded';
-  const cov = grading.signals.lexical_coverage.coverage;
+  // vocabulary-load phrasing prefers the NINJAL pair where it was measured;
+  // otherwise the live JLPT-lexicon coverage (substrate named in the hint)
+  const ninjal = grading.signals.lexical_coverage?.coverage;
+  const jlpt = grading.signals.jlpt_lexicon?.coverage;
+  const cov = ninjal ?? jlpt;
   let vocabNote = '';
   let vocabNoteJa = '';
   if (cov != null && cov < 1) {
     const oneIn = Math.max(2, Math.round(1 / (1 - cov)));
-    vocabNote = ` · ~1 in ${oneIn} words beyond the core`;
-    vocabNoteJa = `・約${oneIn}語に1語が基本語彙の外`;
+    const outside = ninjal != null ? 'the core' : 'the JLPT lists';
+    const outsideJa = ninjal != null ? '基本語彙の外' : 'JLPT語彙の外';
+    vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
+    vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
   }
   return { level, ja: band, note: vocabNote, noteJa: vocabNoteJa };
 }
@@ -298,8 +319,15 @@ async function boot() {
     if (!res.ok) throw new Error(`data/${pool}/${name}.json → ${res.status}`);
     return res.json();
   };
-  const [passages, kanken, sem, kanji, words, idioms, dict, strokes, grammarV11, manifest, pin] =
+  const loadArticleIndex = async () => {
+    if (bundled) return bundled['articles/index'];
+    const res = await fetch('data/articles/index.json');
+    if (!res.ok) throw new Error(`data/articles/index.json → ${res.status}`);
+    return res.json();
+  };
+  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, grammarV11, manifest, pin] =
     await Promise.all([
+      loadArticleIndex(),
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
       ...DATA.sa.map((n) => load('share_alike', n)),
       ...DATA.orig.map((n) => load('original', n)),
@@ -307,8 +335,12 @@ async function boot() {
       bundled ? bundled['fsrs-pin'] : fetch('data/fsrs-pin.json').then((r) => r.json()),
     ]);
 
-  D.passages = passages.passages;
-  D.passageSources = passages.sources;
+  // The shelf boots from a light index; each article's text + tokens live in
+  // their own file, fetched on first open (and prefetched quietly after boot)
+  // — dozens of articles cost nothing until read.
+  D.passages = articleIndex.articles;
+  D.passageSources = articleIndex.sources.proprietary_safe;
+  D.articleSources = articleIndex.sources;
   D.kanken = kanken.levels;
   D.sem = sem.edges;
   D.kanji = kanji.kanji;
@@ -324,15 +356,16 @@ async function boot() {
   D.pin = pin;
   D.grammar = mergeGrammar(grammarV11.entries);
   D.sources = {
-    proprietary_safe: [...passages.sources, ...kanken.sources, ...sem.sources],
+    proprietary_safe: [...articleIndex.sources.proprietary_safe, ...kanken.sources, ...sem.sources],
     share_alike: [
+      ...articleIndex.sources.share_alike,
       ...kanji.sources,
       ...words.sources,
       ...idioms.sources,
       ...dict.sources,
       ...strokes.sources,
     ],
-    original: [...grammarV11.sources],
+    original: [...articleIndex.sources.original, ...grammarV11.sources],
   };
 
   // kanji → words containing it, derived here rather than shipped twice
@@ -365,6 +398,45 @@ async function boot() {
   S.ready = true;
   document.body.dataset.ready = '1';
   render();
+  prefetchArticles();
+}
+
+/* ----------------------------------------------- lazy article loading
+ * Each shelf row carries metadata + signals only. The article body (text,
+ * tokens, paragraph starts) arrives from its own file on first open; a quiet
+ * background queue warms the rest so search, examples, and the entry field
+ * reach full strength without blocking the first paint. */
+const bundledArticle = (p) => window.__CORRIDOR_BUNDLE__?.[`articles/${p.file.replace(/\.json$/, '')}`];
+
+async function ensureArticle(p) {
+  if (!p || p.tokens) return p;
+  if (p._loading) return p._loading;
+  const bundledBody = bundledArticle(p);
+  p._loading = (
+    bundledBody
+      ? Promise.resolve(bundledBody)
+      : fetch(`data/articles/${p.file}`).then((res) => {
+          if (!res.ok) throw new Error(`data/articles/${p.file} → ${res.status}`);
+          return res.json();
+        })
+  ).then((body) => {
+    Object.assign(p, body);
+    delete p._loading;
+    return p;
+  });
+  return p._loading;
+}
+
+function prefetchArticles() {
+  const queue = D.passages.filter((p) => !p.tokens);
+  const next = () => {
+    const p = queue.shift();
+    if (!p) return;
+    ensureArticle(p)
+      .catch((err) => console.warn(`prefetch ${p.id}`, err))
+      .then(() => setTimeout(next, 40));
+  };
+  setTimeout(next, 350);
 }
 
 /* ------------------------------------------------------- navigation state */
@@ -399,8 +471,23 @@ function openPassage(id) {
   S.view = 'reader';
   S.readerScroll = 0;
   S.stack = [];
+  S.loadError = false;
   render();
   window.scrollTo(0, 0);
+  const p = passage();
+  if (p && !p.tokens) {
+    ensureArticle(p)
+      .then(() => {
+        if (S.view === 'reader' && S.passageId === id) render();
+      })
+      .catch((err) => {
+        console.error(err);
+        if (S.view === 'reader' && S.passageId === id) {
+          S.loadError = true;
+          render();
+        }
+      });
+  }
 }
 
 /* --------------------------------------------------------------- helpers */
@@ -476,10 +563,7 @@ const JREAD_MIN = 0.5;
 function signalRows(grading) {
   const s = grading.signals;
   const jr = s.jreadability;
-  const cov = s.lexical_coverage;
-  const tmr = s.tmr;
-  const core = tmr.by_level['ninjal-kyoiku-kihon-goi:core'];
-  return [
+  const rows = [
     {
       name: 'jreadability',
       en: 'sentence ease',
@@ -487,24 +571,56 @@ function signalRows(grading) {
       hint: tx('6.4 易 → 0.5 難（独自の尺度）', 'sentence-shape readability: 6.4 easy → 0.5 hard'),
       fill: jr.score == null ? 0 : (JREAD_MAX - jr.score) / (JREAD_MAX - JREAD_MIN),
     },
-    {
+  ];
+  if (s.jlpt_lexicon) {
+    const jl = s.jlpt_lexicon;
+    rows.push({
+      name: 'JLPT語彙',
+      en: 'JLPT vocab coverage',
+      value: jl.coverage == null ? '—' : `${(jl.coverage * 100).toFixed(1)}%`,
+      hint: tx(
+        'JLPT対応 6,687 語に対する内容語の被覆（高いほど易・非公式リスト）',
+        'share of content words inside a 6,687-word JLPT-tagged lexicon (higher = easier; unofficial list)',
+      ),
+      fill: jl.coverage == null ? 0 : 1 - jl.coverage,
+    });
+  }
+  if (s.lexical_coverage) {
+    rows.push({
       name: '語彙カバー率',
       en: 'vocab coverage',
-      value: cov.coverage == null ? '—' : `${(cov.coverage * 100).toFixed(1)}%`,
+      value: s.lexical_coverage.coverage == null ? '—' : `${(s.lexical_coverage.coverage * 100).toFixed(1)}%`,
       hint: tx(
         '国語研 6,103 語に対する内容語の被覆（高いほど易）',
         'share of content words inside the NINJAL 6,103-word core (higher = easier)',
       ),
-      fill: cov.coverage == null ? 0 : 1 - cov.coverage,
-    },
-    {
+      fill: s.lexical_coverage.coverage == null ? 0 : 1 - s.lexical_coverage.coverage,
+    });
+  }
+  if (s.tmr) {
+    const core = s.tmr.by_level['ninjal-kyoiku-kihon-goi:core'];
+    rows.push({
       name: 'TMR（核）',
       en: 'rare-word load',
       value: core == null ? '—' : `${(core * 100).toFixed(1)}%`,
       hint: tx('◎ 2,071 語より上の語の割合（高いほど難）', 'share of words beyond the 2,071-word core (higher = harder)'),
       fill: core ?? 0,
-    },
-  ];
+    });
+  }
+  if (grading.unavailable?.lexical_coverage) {
+    rows.push({
+      name: '国語研語彙',
+      en: 'NINJAL pair',
+      value: tx('未測定', 'not measured'),
+      hint: tx(
+        'この版の構築環境から国語研基盤に到達できず、未測定のまま示す（偽の数値は出さない）',
+        'the NINJAL substrate was unreachable from this build environment — shown as unmeasured, never faked',
+      ),
+      fill: 0,
+      na: true,
+    });
+  }
+  return rows;
 }
 
 function renderSignals(grading, { compact = false } = {}) {
@@ -517,18 +633,23 @@ function renderSignals(grading, { compact = false } = {}) {
     for (const row of signalRows(grading)) {
       const line = el('div', 'sig');
       line.append(withEn(el('span', 'sig-name', row.name), row.en));
-      const track = el('div', 'sig-track');
-      const fill = el('div', 'sig-fill');
-      fill.style.width = `${Math.max(2, Math.min(100, row.fill * 100))}%`;
-      track.append(fill);
-      line.append(track, el('span', 'sig-val', row.value));
+      if (row.na) {
+        // an unmeasured signal draws no bar — a bar would be a fake reading
+        line.append(el('div', 'sig-track sig-track-na'), el('span', 'sig-val', row.value));
+      } else {
+        const track = el('div', 'sig-track');
+        const fill = el('div', 'sig-fill');
+        fill.style.width = `${Math.max(2, Math.min(100, row.fill * 100))}%`;
+        track.append(fill);
+        line.append(track, el('span', 'sig-val', row.value));
+      }
       line.title = row.hint;
       box.append(line);
     }
     wrap.append(box);
     const foot = el('div', 'shelf-meta');
     foot.style.marginTop = '8px';
-    foot.append(el('span', null, tx('3つの信号。平均しない。', 'Three signals — never averaged.')));
+    foot.append(el('span', null, tx('信号は別々に。平均しない。', 'Signals stay separate — never averaged.')));
     if (grading.disagreement.flag) {
       foot.append(
         withEn(el('span', 'disagree-tag', `不一致 gap ${grading.disagreement.detail.max_gap}`), 'signals disagree'),
@@ -656,7 +777,7 @@ function renderShelfBody() {
     if (p.date) meta.append(el('span', null, p.date));
     meta.append(el('span', 'pool-tag', p.licence));
     item.append(meta);
-    item.append(el('div', 'shelf-snippet', p.text.slice(0, 64)));
+    item.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
 
     // the instrument stays one tap away: 詳細 unfolds the raw three signals
     const details = el('button', 'details-toggle');
@@ -938,8 +1059,23 @@ function renderReader(main) {
   if (S.dials.spacing === 1) reader.classList.add('sp-word');
   if (S.dials.spacing === 2) reader.classList.add('sp-bunsetsu');
 
+  if (!p.tokens) {
+    // the article body is still arriving from its own file
+    const wait = el('div', 'note');
+    wait.textContent = S.loadError
+      ? tx('本文を読み込めなかった。もう一度ひらいてください。', 'The text failed to load — please open it again.')
+      : tx('本文を読み込んでいる…', 'Fetching the text…');
+    main.append(reader, wait);
+    return;
+  }
+
+  const paraBreaks = new Set(p.paras || []);
   let group = null;
   for (const [index, token] of p.tokens.entries()) {
+    if (index > 0 && paraBreaks.has(index)) {
+      reader.append(el('span', 'para-break'));
+      group = null;
+    }
     const span = el('span', token.c ? 'tok content' : 'tok plain');
     span.dataset.index = String(index);
     if (token.c) span.dataset.word = token.b;
@@ -998,7 +1134,11 @@ function renderEntry(main) {
   field.id = 'field';
   const seeds = [];
   for (const p of D.passages) {
-    for (const t of p.tokens) {
+    // index rows carry a seed list so the field is full before articles load
+    for (const w of p.seeds || []) {
+      if (seeds.length < 26 && !seeds.includes(w)) seeds.push(w);
+    }
+    for (const t of p.tokens || []) {
       if (t.c && t.s.length > 1 && seeds.length < 26 && !seeds.includes(t.b)) seeds.push(t.b);
     }
   }
@@ -1620,7 +1760,8 @@ function renderCardVariant(container, target) {
   const source = target.from ? D.passages.find((p) => p.id === target.from.passage) : null;
   let sentence = null;
   let sentenceTokens = null;
-  if (source) {
+  if (source && !source.tokens) ensureArticle(source).then(() => render()).catch(() => {});
+  if (source?.tokens) {
     const tokens = source.tokens;
     let start = target.from.index;
     let end = target.from.index;
@@ -1688,6 +1829,7 @@ function renderCardVariant(container, target) {
 function findExamples(id, cap = 4) {
   const out = [];
   for (const p of D.passages) {
+    if (!p.tokens) continue; // not yet fetched — prefetch fills these in
     let sentence = [];
     let hit = false;
     for (const t of p.tokens) {
