@@ -196,8 +196,19 @@ const file = async (word, gesture, expected, outcome, detail) => {
   console.log(`${mark}${word.w.padEnd(8)} ${gesture.padEnd(14)} ${outcome}${detail ? ' — ' + detail : ''}`);
 };
 const settle = async () => {
-  // deliberate water tap + pause: each case starts from a clean surface
-  await tapAt(355, 745);
+  // a deliberate tap on TRUE open water, found empirically — a fixed point
+  // once landed on the shelf door and quietly navigated the whole app away
+  const water = await page.evaluate(`(() => {
+    const boxes = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, .drift-door, #theme, #lvl')]
+      .map((el) => el.getBoundingClientRect());
+    const spots = [[200, 210], [330, 250], [120, 300], [260, 640], [90, 560], [340, 400]];
+    for (const [x, y] of spots) {
+      if (!boxes.some((b) => x > b.left - 8 && x < b.right + 8 && y > b.top - 8 && y < b.bottom + 8))
+        return { x, y };
+    }
+    return { x: 200, y: 150 };
+  })()`);
+  await tapAt(water.x, water.y);
   await page.waitForTimeout(450);
 };
 
@@ -277,23 +288,93 @@ for (let round = 0; round < N_WORDS; round++) {
 
   await settle();
 
-  // C6 — pointercancel mid-press, then a clean tap must still work
-  const sc = await page.evaluate(wordProbe(word.w));
+  // I3/I4 (spec v2, ratified Q1/Q2) — the satellite chain: tapping a
+  // satellite REVEALS it (never destroys); tapping again re-centres the
+  // constellation on it; a flick on a satellite never grades.
+  const chainStart = await page.evaluate(wordProbe(word.w));
+  if (chainStart.exists && chainStart.onScreen) {
+    await tapAt(chainStart.x, chainStart.y);
+    await page.waitForTimeout(1400); // satellites glide to their ring first
+    const satPick = await page.evaluate(`(() => {
+      const sats = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      });
+      for (const s of sats) {
+        if (!s.r.width || s.r.left < 30 || s.r.right > 360 || s.r.top < 150 || s.r.bottom > 700) continue;
+        const crowded = sats.some((o) => o !== s && Math.hypot(o.x - s.x, o.y - s.y) < 34);
+        if (crowded) continue;
+        return { w: s.el.querySelector('.base')?.textContent ?? '', x: s.x, y: s.y };
+      }
+      return null;
+    })()`);
+    if (satPick && satPick.w) {
+      const satWord = { w: satPick.w, kanji: (satPick.w.match(/[\u4e00-\u9fff]/g) ?? []).length };
+      // flick a satellite: must NOT grade while the constellation is open
+      const trayBeforeFlick = (await page.evaluate(worldProbe)).tray;
+      await dragAt(satPick.x, satPick.y, satPick.x + 90, satPick.y, 90, 3);
+      await page.waitForTimeout(800);
+      const afterSatFlick = await page.evaluate(worldProbe);
+      const satAfterFlick = await page.evaluate(wordProbe(satPick.w));
+      if (afterSatFlick.tray !== trayBeforeFlick)
+        await file(satWord, 'sat-flick', 'no judgment on satellites', 'misfired', 'satellite was graded inside a constellation');
+      else if (!satAfterFlick.exists)
+        await file(satWord, 'sat-flick', 'no judgment on satellites', 'vanished', 'satellite gone after a flick');
+      else await file(satWord, 'sat-flick', 'no judgment on satellites', 'ok', '');
+      // tap the satellite: it must REVEAL in place, never vanish
+      const sat2 = await page.evaluate(wordProbe(satPick.w));
+      if (sat2.exists && sat2.onScreen) {
+        await tapAt(sat2.x, sat2.y);
+        await page.waitForTimeout(700);
+        const sat3 = await page.evaluate(wordProbe(satPick.w));
+        if (!sat3.exists || sat3.opacity < 0.05)
+          await file(satWord, 'sat-tap', 'reveals in place', 'vanished', 'satellite dissolved on first tap');
+        else if (!sat3.unfolded)
+          await file(satWord, 'sat-tap', 'reveals in place', 'dead', 'no reveal');
+        else await file(satWord, 'sat-tap', 'reveals in place', 'ok', '');
+        // tap again: the constellation re-centres on it — the chain walk
+        const sat4 = await page.evaluate(wordProbe(satPick.w));
+        if (sat4.exists && sat4.onScreen) {
+          await tapAt(sat4.x, sat4.y);
+          await page.waitForTimeout(1100);
+          const w5 = await page.evaluate(worldProbe);
+          const sat5 = await page.evaluate(wordProbe(satPick.w));
+          if (!sat5.exists)
+            await file(satWord, 'sat-recentre', 'becomes the planet', 'vanished', 'satellite gone on second tap');
+          else if (w5.bloomCentre !== satPick.w && !w5.depthOpen)
+            await file(satWord, 'sat-recentre', 'becomes the planet', 'dead', `centre is ${w5.bloomCentre ?? 'nothing'}`);
+          else await file(satWord, 'sat-recentre', 'becomes the planet', 'ok', `${w5.sats} new satellites`);
+        }
+      }
+    }
+    await settle();
+  }
+
+  // C6 — pointercancel mid-press, then a clean tap must still work.
+  // Hermetic: its contract is cancel-then-tap on a clean field; the polluted
+  // mid-battery variant becomes its own designed case later.
+  await boot();
+  const sc = await page.evaluate(wordProbe(word.w)).then(async (p0) => {
+    if (p0.exists && p0.onScreen) return p0;
+    const alt = await pickOne(new Set());
+    return alt ? page.evaluate(wordProbe(alt.w)).then((p1) => ({ ...p1, alt: alt.w })) : p0;
+  });
+  const cancelWord = sc.alt ? { w: sc.alt, kanji: word.kanji } : word;
   if (sc.exists && sc.onScreen) {
     await touch('touchStart', [[sc.x, sc.y]]);
     await page.waitForTimeout(120);
     await touch('touchCancel', []);
     await page.waitForTimeout(250);
-    const sc2 = await page.evaluate(wordProbe(word.w));
+    const sc2 = await page.evaluate(wordProbe(cancelWord.w));
     if (sc2.exists && sc2.onScreen) {
       await tapAt(sc2.x, sc2.y);
       await page.waitForTimeout(650);
       const w4 = await page.evaluate(worldProbe);
-      const sc3 = await page.evaluate(wordProbe(word.w));
-      if (!sc3.exists) await file(word, 'cancel+tap', 'clean tap after cancel', 'vanished', '');
-      else if (!sc3.unfolded && w4.bloomCentre !== word.w)
-        await file(word, 'cancel+tap', 'clean tap after cancel', 'dead', 'gesture state dangling after pointercancel');
-      else await file(word, 'cancel+tap', 'clean tap after cancel', 'ok', '');
+      const sc3 = await page.evaluate(wordProbe(cancelWord.w));
+      if (!sc3.exists) await file(cancelWord, 'cancel+tap', 'clean tap after cancel', 'vanished', '');
+      else if (!sc3.unfolded && w4.bloomCentre !== cancelWord.w)
+        await file(cancelWord, 'cancel+tap', 'clean tap after cancel', 'dead', 'gesture state dangling after pointercancel');
+      else await file(cancelWord, 'cancel+tap', 'clean tap after cancel', 'ok', '');
     }
   }
 

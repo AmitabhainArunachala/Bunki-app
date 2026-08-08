@@ -155,8 +155,8 @@ patch(
   'gate keydown',
 );
 patch(
-  'addEventListener("pointerdown",e=>{\n  touches.set(',
-  'addEventListener("pointerdown",e=>{\n  if(!DRIFT_ON)return;\n  touches.set(',
+  'addEventListener("pointerdown",e=>{\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
+  'addEventListener("pointerdown",e=>{\n  if(!DRIFT_ON)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
   'gate pointerdown',
 );
 patch(
@@ -165,8 +165,8 @@ patch(
   'gate pointermove',
 );
 patch(
-  'addEventListener("pointercancel",endPointer,{passive:true});',
-  'addEventListener("pointercancel",e=>{if(DRIFT_ON)endPointer(e);},{passive:true});',
+  'addEventListener("pointercancel",cancelPointer,{passive:true});',
+  'addEventListener("pointercancel",e=>{if(DRIFT_ON)cancelPointer(e);},{passive:true});',
   'gate pointercancel',
 );
 patch(

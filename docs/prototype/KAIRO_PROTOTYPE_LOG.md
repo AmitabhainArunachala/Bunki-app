@@ -521,3 +521,57 @@ Honest scope: the battery covers tap/gloss/pinch/slow-drag/cancel on free
 words; flick-grades verified by probe. Not yet in the matrix: dive-depth
 gestures, kana-only strata (rare in viewport samples), 夜 theme, soak.
 The charter stays open until the full matrix runs dry.
+
+---
+
+## 12. Zero-quirk round 1 — the chain walk lives (2026-08-08, operator rulings ratified)
+
+Spec: `docs/prompts/DRIFT_ZERO_QUIRK_SPEC_2026-08-08.md`. Operator ratified
+all three questions: staged satellite taps (reveal, then re-centre);
+flick-judgment centre-only while a constellation is open (free field keeps
+the v1 grammar); scope = drift + its doors.
+
+**Failing case first, every fix.** The sweep grew a chain battery
+(sat-flick / sat-tap / sat-recentre) and went red exactly on the operator's
+report. Root causes found and fixed, in order of depth:
+
+1. **`collapseUnfold()` secretly released the constellation.** Folding a
+   text reveal called `clearBloom()` — so ANY tap that folded something
+   razed every materialized satellite, including the one being tapped.
+   That was the "click a satellite and it disappears." Fold and release
+   are now decoupled; the water tap releases explicitly.
+2. **Re-centre hands off, never razes.** `clearBloom(keep)` carries the
+   tapped satellite into the next constellation; a satellite that becomes
+   a planet stays in the field afterwards (nothing the walk touches ever
+   disappears — ruling I3).
+3. **Satellite taps: staged per Q1.** First tap reveals reading + gloss in
+   place; second tap re-centres — 14 new satellites assemble, chainable
+   (生物 › 生け花 › 生きる walked in the demo).
+4. **Flicks per Q2:** satellites can never be graded while a constellation
+   is open (a flick on one just moves it; it glides home). Verified both
+   ways: centre flick grades, satellite flick never.
+5. **Fat-finger forgiveness:** satellites glide, so a tap within 44px of a
+   member counts as tapping it — a near-miss no longer razes the
+   constellation via the water-tap path.
+6. **`pointercancel` fully resets gesture state** (touches, pinch, pn,
+   timers) and a fresh primary touch self-heals any stale entries — the
+   red-team's deferred dangling-state defect, closed.
+7. **Stale reveals folded everywhere:** `unfolded` tracked one node, so
+   words revealed long ago kept `glossed` and a later "first tap" jumped
+   straight to the dive. collapseUnfold now folds every revealed word.
+8. **The constellation centres itself:** a chain re-centre that lands near
+   a screen edge glides the camera to the new planet (the bloom gains the
+   lock's camT courtesy).
+
+**State:** consistency sweep **64/64 dry** (tap · gloss · pinch-survives ·
+slow-drag-moves · sat-flick-protected · sat-reveal · sat-recentre ·
+hermetic cancel+tap), corridor verifier **90/90**, zero pageerrors
+throughout. Harness hardening ridden along: true-water settle (a fixed
+point once hit the shelf door and navigated the app away), clearance-aware
+satellite picking, hermetic cancel case.
+
+**Open on the spec (next execution round):** the 25-hop chain battery needs
+settle-aware aiming (everything glides ~1.5s after a re-centre — true for
+fingers too; consider tightening assembly time); ring-overlap spacing;
+dive-depth gestures; kana strata; 夜 theme; seeded fuzz; soak. The spec
+stays open until the full matrix runs dry twice.
