@@ -798,7 +798,7 @@ function bloomFocus(n){
     const wr=cands[i][1];
     wr.hl=true; wr.ret=false;
     const ang=-Math.PI/2+i*TAU/N2+((strHash(wr.e[0])%40)-20)*0.012;
-    const r=(92+(strHash(wr.e[0])%150))/cam.z;
+    const r=((i%2?118:196)+(strHash(wr.e[0])%38))/cam.z;
     wr.bAng=ang; wr.bR=r;
     wr.hx=bx+Math.cos(ang)*r-wr.wx;
     wr.hy=by+Math.sin(ang)*r*0.9-wr.wy;
@@ -1846,7 +1846,7 @@ function drawWorld(){
     wi++;
     if(thin>1&&(wi%thin)) continue;
     if(wr.lk){}
-    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.08; wr.oy+=(wr.hy-wr.oy)*0.08;}
+    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
     else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
       if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;}
     else {
