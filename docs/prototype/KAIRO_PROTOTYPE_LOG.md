@@ -433,3 +433,41 @@ touched).
   corridor's full dictionary entry (word → 覚える → list, without leaving
   the app) — then the Drift grades and the corridor lists start feeding the
   same Phase 3 scheduler.
+
+---
+
+## 10. The bloom becomes a constellation you can hold (2026-08-08, operator round)
+
+Operator, on-device: bloom satellites "nearly out of sight," threads faint,
+and dragging the pressed word tore it off its own tethers — the constellation
+stayed anchored to where the word USED to be while the glyph walked away,
+then snapped back on release. Three orders, all landed in drift's source
+(`drift-artifact.html` — the corridor layer regenerates from it):
+
+1. **The relief.** The bloom is now its own layer over the receded field
+   (dim 0.35 → 0.30): the pressed word turns the theme's accent (朱 in 北斎),
+   satellites take 藍 pig2 (pale ultramarine on dark themes) at ~0.95
+   presence, threads are gold at 0.5/1.5px. And the root cause of
+   "nearly out of sight": most satellites existed only as 11px canvas labels
+   — they now **materialize as real DOM words** on bloom (the same cure the
+   red-team applied to the lock) and dissolve back on release.
+2. **The tether.** The constellation re-anchors every frame to the word's
+   LIVE position — drag included. On release the drag **commits to world
+   space** (screen→world through the camera's rotation and zoom), so the
+   word keeps its new place and the family settles around it. Measured:
+   centre dragged 83–111px, mean tether 150→159px, spring-back 5px (wander).
+3. **The clock.** Fade is now 10s of **inactivity**, not a flat 12s timer —
+   any touch resets it. Measured: activity at t=8s kept the bloom alive at
+   t=13s (the old code died at 12s); cleared by 19.5s. A water tap still
+   releases immediately.
+
+Ridden along: the fused layer's theme vars now land on `#drift-layer`
+instead of `document.documentElement` — cycling drift's 夜 theme can no
+longer repaint the corridor's shelf (a latent fusion leak caught in recon).
+
+Verifier 86 → **90**: relief colour-family check (three distinct colours,
+satellite floor scaled to the tapped word's kanji productivity),
+drag-carries-the-constellation-and-sticks, water-tap release. Known niggle,
+filed honestly: ring satellites can overlap each other at similar angles
+(no label collision resolution yet — 飛び出す/出勤 touched in the round's
+screenshot).

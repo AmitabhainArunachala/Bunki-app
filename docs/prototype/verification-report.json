@@ -148,25 +148,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-08 01:10",
+          "2026-08-08 03:23",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-08 01:15",
+          "2026-08-08 03:28",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-08 01:19",
+          "2026-08-08 03:32",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-16 01:09",
+          "2026-08-16 03:22",
           "8.30"
         ]
       ]
@@ -185,16 +185,16 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 22,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 19,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "gloss",
@@ -206,30 +206,30 @@
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 2.43,
+          "contrast": 2.64,
           "fontSize": 14,
-          "color": "rgba(27, 42, 58, 0.42)"
+          "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 2.43,
+          "contrast": 2.64,
           "fontSize": 13,
-          "color": "rgba(27, 42, 58, 0.42)"
+          "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 2.43,
+          "contrast": 2.64,
           "fontSize": 12,
-          "color": "rgba(27, 42, 58, 0.42)"
+          "color": "rgba(20, 24, 28, 0.42)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 21,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "discrimination note",
@@ -250,16 +250,16 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 22,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 19,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "gloss",
@@ -292,9 +292,9 @@
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 13.25,
+          "contrast": 16.2,
           "fontSize": 21,
-          "color": "rgb(27, 42, 58)"
+          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "discrimination note",
@@ -316,16 +316,16 @@
       {
         "label": "reading body (focused)",
         "selector": ".reader",
-        "contrast": 13.25,
+        "contrast": 16.2,
         "fontSize": 21,
-        "color": "rgb(27, 42, 58)"
+        "color": "rgb(20, 24, 28)"
       },
       {
         "label": "view title",
         "selector": ".view-title",
-        "contrast": 13.25,
+        "contrast": 16.2,
         "fontSize": 22,
-        "color": "rgb(27, 42, 58)"
+        "color": "rgb(20, 24, 28)"
       },
       {
         "label": "gloss",
@@ -365,9 +365,9 @@
       {
         "label": "shelf title",
         "selector": ".shelf-title",
-        "contrast": 13.25,
+        "contrast": 16.2,
         "fontSize": 19,
-        "color": "rgb(27, 42, 58)"
+        "color": "rgb(20, 24, 28)"
       },
       {
         "label": "faint / snippet",
@@ -1419,9 +1419,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 298,
+  "loadMs": 323,
   "summary": {
-    "total": 86,
+    "total": 90,
     "failed": 0
   },
   "results": [
@@ -1446,9 +1446,29 @@
       "detail": "layer active again"
     },
     {
+      "name": "Phase 2 · a kanji word stands in the field to bloom",
+      "pass": true,
+      "detail": "{\"x\":153.39999389648438,\"y\":579.0999755859375,\"productive\":true}"
+    },
+    {
+      "name": "bloom · the constellation is its own relief — three colour families",
+      "pass": true,
+      "detail": "centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(58, 95, 138)"
+    },
+    {
+      "name": "bloom · dragging the centre carries the whole constellation — and sticks",
+      "pass": true,
+      "detail": "centre moved 83px; mean tether 150 → 159px"
+    },
+    {
+      "name": "bloom · a water tap releases the constellation",
+      "pass": true,
+      "detail": "relief classes cleared"
+    },
+    {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "26 texts, ready in 298 ms"
+      "detail": "26 texts, ready in 323 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -1698,12 +1718,12 @@
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.43:1 → wcag 5.89:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.64:1 → wcag 5.89:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
       "pass": true,
-      "detail": "2.43:1"
+      "detail": "2.64:1"
     },
     {
       "name": "variant D · field entry",
@@ -1733,7 +1753,7 @@
     {
       "name": "body ink clears AAA",
       "pass": true,
-      "detail": "13.25:1"
+      "detail": "16.2:1"
     },
     {
       "name": "every visible control is at least 40px",

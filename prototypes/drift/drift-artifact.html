@@ -4,6 +4,7 @@
     --ground:#FBFAF5; --ink:#1B2A3A; --faint:rgba(27,42,58,.42); --line:rgba(27,42,58,.2);
     --pig1:#1E50A2; --pig2:#165E83; --accent:#EB6101;
     --plaque:rgba(251,250,245,.92); --halo:rgba(30,80,162,.5); --grainOp:.55;
+    --bloomSat:#165E83; --bloomCtr:#EB6101; --bloomHalo:rgba(30,80,162,.4);
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overflow:hidden;overscroll-behavior:none}
@@ -34,6 +35,13 @@
   .word.glossed .yomi,.word.glossed .gloss{opacity:1}  /* two taps: + English */
   .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 24px var(--halo)}
   .word.lod .yomi,.word.lod .gloss{opacity:0!important}
+  /* tap-bloom relief: the constellation is its own layer — centre, satellites,
+   * and threads each carry their own colour and lift gently off the field */
+  .word.bctr{color:var(--bloomCtr) !important}
+  .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
+  .word.bsat{color:var(--bloomSat) !important}
+  .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
+  .word.bsat .yomi{color:var(--bloomSat)}
   .glyph.comp{z-index:7}
   .word.center,.glyph.center,.part.center{z-index:6}
   .glyph .g{display:block;font-size:36px;line-height:1.1;text-shadow:0 0 1px currentColor}
@@ -619,6 +627,9 @@ function applyTheme(ix){
   rootStyle.setProperty("--pig1",t.pig1); rootStyle.setProperty("--pig2",t.pig2);
   rootStyle.setProperty("--accent",t.accent); rootStyle.setProperty("--plaque",t.plaque);
   rootStyle.setProperty("--halo",t.halo); rootStyle.setProperty("--grainOp",t.dark?".3":".55");
+  rootStyle.setProperty("--bloomSat",t.dark?"#9FC2EE":t.pig2);
+  rootStyle.setProperty("--bloomCtr",t.accent);
+  rootStyle.setProperty("--bloomHalo",t.halo);
   themeBtn.textContent=t.name;
   blobs.forEach((b,i)=>{b.color=b.mass?(i%2?t.pig1:t.pig2):t.pool[i%t.pool.length];});
   for(const k2 in HUBSPR) delete HUBSPR[k2];
@@ -891,10 +902,10 @@ function veilUpdate(){
 let unfolded=null, divedOnce=false;
 // tap-bloom: the word's relatives swim in and light up; the rest dims
 const FOCUS=[]; let focusN=null;
-let bloomBorn=0;
+let bloomBorn=0; let bloomLast=0;
 function bloomFocus(n){
   clearBloom();
-  bloomBorn=performance.now();
+  bloomBorn=performance.now(); bloomLast=bloomBorn;
   focusN=n;
   const ks=[...n.w].filter(isKanji);
   if(!ks.length) return;
@@ -914,18 +925,38 @@ function bloomFocus(n){
     wr.hl=true; wr.ret=false;
     const ang=-Math.PI/2+i*TAU/N2+((strHash(wr.e[0])%40)-20)*0.012;
     const r=(92+(strHash(wr.e[0])%150))/cam.z;
+    wr.bAng=ang; wr.bR=r;
     wr.hx=bx+Math.cos(ang)*r-wr.wx;
     wr.hy=by+Math.sin(ang)*r*0.9-wr.wy;
-    if(wr.node&&!wr.node.gone) wr.node.hlDom=true;
+    if(wr.node&&!wr.node.gone){
+      wr.node.hlDom=true; wr.node.el.classList.add("bsat");
+      wr.node.top=Math.max(wr.node.top,0.95);
+    } else {
+      // a satellite the field only knew as a dot materializes as a real word
+      const sp=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
+      const nd=spawnWord(wr.e,sp.x,sp.y,true);
+      nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
+      nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
+      nd.el.classList.add("bsat");
+    }
     FOCUS.push(wr);
   }
+  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
 }
 let lockOn=false;
 const LOCKG=[];
 function clearBloom(){
+  if(focusN&&focusN.el){focusN.el.classList.remove("bctr"); focusN.top=focusN.baseOp;}
   for(const wr of FOCUS){
     wr.hl=false; wr.ret=true;
-    if(wr.node) wr.node.hlDom=false;
+    if(wr.node){
+      wr.node.hlDom=false; wr.node.el.classList.remove("bsat");
+      if(wr.node.fromBloom&&!wr.node.gone){
+        const bn=wr.node;
+        bn.gone=true; bn.top=0; bn.el.style.pointerEvents="none";
+        removeNode(bn,500); wr.node=null;
+      } else { wr.node.top=wr.node.baseOp; }
+    }
   }
   for(const wr of FOCUS) wr.lk=false;
   FOCUS.length=0; focusN=null; lockOn=false; camT=null; LOCK=null;
@@ -1672,6 +1703,7 @@ function pinchDive(mid){
 }
 addEventListener("pointerdown",e=>{
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(FOCUS.length) bloomLast=performance.now();
   if(touches.size===2){
     const v=[...touches.values()];
     pinch={d0:Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1,fired:false,z0:cam.z};
@@ -1718,6 +1750,7 @@ const s2wl=(sx,sy)=>{
 };
 addEventListener("pointermove",e=>{
   const t2=touches.get(e.pointerId);
+  if(FOCUS.length) bloomLast=performance.now();
   let pdx=0,pdy=0;
   if(t2){
     pdx=e.clientX-t2.x; pdy=e.clientY-t2.y;
@@ -1780,6 +1813,7 @@ function endPointer(e){
 addEventListener("pointercancel",endPointer,{passive:true});
 addEventListener("pointerup",e=>{
   endPointer(e);
+  if(FOCUS.length) bloomLast=performance.now();
   clearTimeout(lpTimer);
   const n=pn; pn=null;
   if(!gestureActive) return;
@@ -1788,6 +1822,12 @@ addEventListener("pointerup",e=>{
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   if(n){
+    if(n===focusN&&n.wx!=null&&(n.dragX||n.dragY)){
+      const cs4=Math.cos(cam.rot), sn4=Math.sin(cam.rot);
+      const wdx=(n.dragX*cs4+n.dragY*sn4)/cam.z, wdy=(-n.dragX*sn4+n.dragY*cs4)/cam.z;
+      n.wx+=wdx; n.wy+=wdy;
+      if(n.wref){n.wref.wx+=wdx; n.wref.wy+=wdy;}
+    }
     n.x+=n.dragX; n.y+=n.dragY; n.dragX=0; n.dragY=0;
     if(dx<-52&&Math.abs(dy)<90){grade(n,-1);return;}
     if(dx>52&&Math.abs(dy)<90){grade(n,1);return;}
@@ -1940,7 +1980,16 @@ function drawWorld(){
   }
   // the bloom: family assembled, connected, named
   if(FOCUS.length&&focusN&&!focusN.gone){
-    const fx2=focusN.x, fy2=focusN.y;
+    const fx2=focusN.x+focusN.dragX, fy2=focusN.y+focusN.dragY;
+    if(!lockOn){
+      const cs3=Math.cos(cam.rot), sn3=Math.sin(cam.rot);
+      const dx3=(fx2-vw()/2)/cam.z, dy3=(fy2-vh()/2)/cam.z;
+      const ax=cam.x+dx3*cs3+dy3*sn3, ay=cam.y-dx3*sn3+dy3*cs3;
+      for(const wr of FOCUS) if(!wr.lk&&wr.bR){
+        wr.hx=ax+Math.cos(wr.bAng)*wr.bR-wr.wx;
+        wr.hy=ay+Math.sin(wr.bAng)*wr.bR*0.9-wr.wy;
+      }
+    }
     if(LOCK){
       const gold=th.dark?"#E6C86E":"#A8842C";
       const tyCol=t2=>t2==="syn"?th.pig1:t2==="fam"?th.pig2:
@@ -1977,19 +2026,22 @@ function drawWorld(){
         }
       }
     } else {
-      fctx.strokeStyle=rgba(th.pig1,0.3); fctx.lineWidth=1.1;
+      const thr=th.dark?"#E6C86E":"#A8842C";
+      fctx.strokeStyle=rgba(thr,0.5); fctx.lineWidth=1.5;
       fctx.beginPath();
       for(const wr of FOCUS) if(wr.vis===frameCount){
         fctx.moveTo(fx2,fy2); fctx.lineTo(wr.sx,wr.sy);
       }
       fctx.stroke();
     }
-    fctx.fillStyle=rgba(th.pig1,0.55);
+    const dotc=lockOn?th.pig1:(th.dark?"#E6C86E":"#A8842C");
+    const satc=lockOn?(th.dark?"#E6C86E":th.pig1):(th.dark?"#9FC2EE":th.pig2);
+    fctx.fillStyle=rgba(dotc,lockOn?0.55:0.8);
     for(const wr of FOCUS) if(wr.vis===frameCount)
       fctx.fillRect(wr.sx-2.4,wr.sy-2.4,4.8,4.8);
     fctx.font='11px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif';
     fctx.textAlign="center";
-    fctx.fillStyle=rgba(th.dark?"#E6C86E":th.pig1,0.9);
+    fctx.fillStyle=rgba(satc,lockOn?0.9:0.95);
     for(const wr of FOCUS) if(wr.vis===frameCount&&(!wr.node||wr.node.gone))
       fctx.fillText(wr.e[0],wr.sx,wr.sy-8);
   }
@@ -2140,11 +2192,11 @@ function frame(t){
     n.op+=(n.top-n.op)*0.08;
     const rt=(n.mode==="center")?0:n.rot;
     n.cr+=(rt-n.cr)*0.08;
-    n.el.style.opacity=((FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.35:n.op).toFixed(3);
+    n.el.style.opacity=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN?n.op*0.3:n.op).toFixed(3);
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
   }
-  if(FOCUS.length&&!lockOn&&t-bloomBorn>12000) clearBloom();
+  if(FOCUS.length&&!lockOn&&t-bloomLast>10000) clearBloom();
   if(frameCount%90===0) rebuildPairs();
   frameCount++;
   drawWorld();

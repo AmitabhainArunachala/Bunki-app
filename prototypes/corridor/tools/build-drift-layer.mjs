@@ -135,6 +135,14 @@ patch(
   'IIFE head + gate flag',
 );
 
+// 1b · theme vars land on the LAYER, not the document root — cycling drift's
+// nihonga themes must never repaint the corridor's own chrome and shelf
+patch(
+  'const rootStyle=document.documentElement.style;',
+  'const rootStyle=__layer.style;',
+  'theme vars scoped to layer',
+);
+
 // 2 · the six window-level listeners sleep while the layer is hidden
 patch(
   'addEventListener("pointerup",e=>{\n  if(lvlDrag){',

@@ -246,6 +246,91 @@ async function main() {
   );
   check('Phase 2 · 戻る returns from the shelf to the universe', afterBack === true, 'layer active again');
 
+  // -------------------------------------- step 0b · the bloom constellation
+  // Operator round (2026-08-08): the tap-bloom is its own relief — centre,
+  // satellites, and threads in their own colours, satellites materialized as
+  // real words — and the constellation is TETHERED to the word: drag the
+  // centre and the family re-anchors with it; the drag commits.
+  console.log('\n— step 0b · the bloom constellation');
+  await page.waitForTimeout(1200);
+  const bloomPick = await page.evaluate(`(() => {
+    const K = /[\\u4e00-\\u9fff]/;
+    // prefer a word carrying a productive kanji so the family is a real one
+    const productive = /[出日生上会気手入分立行見]/;
+    let fallback = null;
+    for (const el of document.querySelectorAll('#drift-layer .word')) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.left < 60 || r.right > 320 || r.top < 260 || r.bottom > 640) continue;
+      const t = el.textContent;
+      if (!K.test(t)) continue;
+      const at = { x: r.left + r.width / 2, y: r.top + r.height / 2, productive: productive.test(t) };
+      if (at.productive) return at;
+      fallback = fallback ?? at;
+    }
+    return fallback;
+  })()`);
+  check('Phase 2 · a kanji word stands in the field to bloom', !!bloomPick, JSON.stringify(bloomPick));
+  const satFloor = bloomPick.productive ? 8 : 3;
+  const bloomCdp = await page.context().newCDPSession(page);
+  const btouch = (type, pts) =>
+    bloomCdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map(([x, y]) => ({ x, y })) });
+  await btouch('touchStart', [[bloomPick.x, bloomPick.y]]);
+  await page.waitForTimeout(70);
+  await btouch('touchEnd', []);
+  await page.waitForTimeout(900);
+  const bloomProbe = await page.evaluate(`(() => {
+    const ctr = document.querySelector('#drift-layer .word.bctr');
+    const sats = [...document.querySelectorAll('#drift-layer .word.bsat')];
+    const field = [...document.querySelectorAll('#drift-layer .word:not(.bsat):not(.bctr)')].find((w) => w.textContent);
+    return {
+      ctr: !!ctr,
+      ctrColor: ctr ? getComputedStyle(ctr).color : null,
+      sats: sats.length,
+      satColor: sats.length ? getComputedStyle(sats[0]).color : null,
+      fieldColor: field ? getComputedStyle(field).color : null,
+      r: ctr ? (() => { const b = ctr.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })() : null,
+    };
+  })()`);
+  check('bloom · the constellation is its own relief — three colour families',
+    bloomProbe.ctr && bloomProbe.sats >= satFloor
+      && bloomProbe.ctrColor !== bloomProbe.satColor && bloomProbe.satColor !== bloomProbe.fieldColor,
+    `centre ${bloomProbe.ctrColor} · ${bloomProbe.sats} satellites ${bloomProbe.satColor} (floor ${satFloor}) · field ${bloomProbe.fieldColor}`);
+  // drag the centre; the family must follow and the drag must stick
+  const meanD = `(() => {
+    const c = document.querySelector('#drift-layer .word.bctr')?.getBoundingClientRect();
+    if (!c) return null;
+    const cx = c.x + c.width / 2, cy = c.y + c.height / 2;
+    const ds = [...document.querySelectorAll('#drift-layer .word.bsat')].map((s) => {
+      const b = s.getBoundingClientRect();
+      return Math.hypot(b.x + b.width / 2 - cx, b.y + b.height / 2 - cy);
+    });
+    return { cx, cy, mean: ds.reduce((a, d) => a + d, 0) / (ds.length || 1) };
+  })()`;
+  const dragBefore = await page.evaluate(meanD);
+  const dtx = 200, dty = Math.max(320, dragBefore.cy - 180);
+  await btouch('touchStart', [[dragBefore.cx, dragBefore.cy]]);
+  for (let i = 1; i <= 8; i++) {
+    await page.waitForTimeout(26);
+    await btouch('touchMove', [[dragBefore.cx + ((dtx - dragBefore.cx) * i) / 8, dragBefore.cy + ((dty - dragBefore.cy) * i) / 8]]);
+  }
+  await btouch('touchEnd', []);
+  await page.waitForTimeout(1600);
+  const dragAfter = await page.evaluate(meanD);
+  const dragMoved = dragAfter ? Math.hypot(dragAfter.cx - dragBefore.cx, dragAfter.cy - dragBefore.cy) : 0;
+  check('bloom · dragging the centre carries the whole constellation — and sticks',
+    dragAfter && dragMoved > 60 && Math.abs(dragAfter.mean - dragBefore.mean) < dragBefore.mean * 0.35,
+    `centre moved ${dragMoved.toFixed(0)}px; mean tether ${dragBefore.mean.toFixed(0)} → ${dragAfter.mean.toFixed(0)}px`);
+  await shoot(page, shotsDir, '18-bloom-relief-drag');
+  await btouch('touchStart', [[330, 770]]);
+  await page.waitForTimeout(60);
+  await btouch('touchEnd', []);
+  await bloomCdp.detach();
+  await page.waitForTimeout(600);
+  const bloomCleared = await page.evaluate(
+    `!document.querySelector('#drift-layer .word.bctr') && document.querySelectorAll('#drift-layer .word.bsat').length === 0`,
+  );
+  check('bloom · a water tap releases the constellation', bloomCleared, 'relief classes cleared');
+
   // ---------------------------------------------------------- step 1 arrive
   console.log('\n— step 1 · arrive');
   const t0 = Date.now();
