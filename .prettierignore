@@ -36,3 +36,7 @@ docs/prototype/verification-report.json
 
 # Local Python venv for the corpus grader runtime (never committed)
 .venv/
+
+# Consistency-sweep output — written by verify-drift-consistency.mjs each run
+docs/audits/drift-consistency-report.json
+docs/audits/drift-consistency-shots/
