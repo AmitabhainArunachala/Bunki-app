@@ -44,6 +44,21 @@ export type ContractScoring =
   | { readonly kind: 'accepted_answers'; readonly acceptedAnswers: readonly string[] }
   | { readonly kind: 'rubric'; readonly rubricId: string; readonly rubricVersion: string };
 
+/**
+ * The grader as a consumer-facing, explicit value.
+ *
+ * `ContractScoring` keeps the entity's historical `rubric` spelling. Bound
+ * contracts use `versioned_rubric` so a caller cannot accidentally erase the
+ * version requirement while projecting the XOR fields from `ContractCreated`.
+ */
+export type GradingMethod =
+  | { readonly kind: 'accepted_answers'; readonly acceptedAnswers: readonly string[] }
+  | {
+      readonly kind: 'versioned_rubric';
+      readonly rubricId: string;
+      readonly rubricVersion: string;
+    };
+
 export interface RetrievalContract {
   readonly contractId: ContractId;
   readonly contractVersion: number;
@@ -216,6 +231,23 @@ export function projectContractCreated(event: ContractCreatedEvent): RetrievalCo
     promptFamilyVersion: event.promptFamilyVersion,
     createdAt: event.occurredAt,
     createdByEventId: event.eventId,
+  };
+}
+
+/** Normalize ADR-002's answer/rubric XOR into one explicit grading method. */
+export function gradingMethodOfContractCreated(event: ContractCreatedEvent): GradingMethod {
+  if (event.acceptedAnswers !== undefined) {
+    return {
+      kind: 'accepted_answers',
+      acceptedAnswers: [...event.acceptedAnswers],
+    };
+  }
+  return {
+    kind: 'versioned_rubric',
+    // The parsed event schema guarantees the pair is complete. Keeping this
+    // total makes a future schema drift fail validation rather than a cast.
+    rubricId: event.rubricId ?? '',
+    rubricVersion: event.rubricVersion ?? '',
   };
 }
 
