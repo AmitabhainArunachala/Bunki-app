@@ -70,6 +70,14 @@ export type BoundRetrievalContractFailure =
       readonly targetComponentId: string;
       readonly threadId: ThreadId;
       readonly encounterIds: readonly EncounterId[];
+    }
+  | {
+      /** More than one pre-contract encounter could be the contract's source. */
+      readonly reason: 'origin_ambiguous';
+      readonly contractId: ContractId;
+      readonly targetComponentId: string;
+      readonly threadId: ThreadId;
+      readonly encounterIds: readonly EncounterId[];
     };
 
 export type BoundRetrievalContractResult =
@@ -120,9 +128,11 @@ const capturesOfComponent = (
  * Bind one contract id to source lineage using only the supplied canonical log.
  *
  * The component owner is resolved over the log as a whole. Re-encounters on
- * that same thread are not ambiguous; a second thread is. The origin is the
- * earliest matching capture before `ContractCreated`, so a later capture can
- * never retroactively make a previously ungrounded contract look grounded.
+ * that same thread are lineage only after the contract exists. More than one
+ * matching capture before `ContractCreated` is ambiguous because v1 carries no
+ * contract -> encounter edge; choosing the first would manufacture causality.
+ * A later capture can never retroactively make a previously ungrounded contract
+ * look grounded.
  */
 export function bindRetrievalContract(
   events: readonly DomainEvent[],
@@ -181,9 +191,29 @@ export function bindRetrievalContract(
     });
   }
   const contractIndex = events.indexOf(contractEvent);
-  const origin = captures.find(
+  const eligibleOrigins = captures.filter(
     (capture) => capture.threadId === threadId && events.indexOf(capture) < contractIndex,
   );
+  if (eligibleOrigins.length === 0) {
+    return failed({
+      reason: 'contract_precedes_origin',
+      contractId,
+      targetComponentId: contractEvent.targetComponentId,
+      threadId,
+      encounterIds: Object.freeze(captures.map((capture) => capture.encounterId)),
+    });
+  }
+  if (eligibleOrigins.length > 1) {
+    return failed({
+      reason: 'origin_ambiguous',
+      contractId,
+      targetComponentId: contractEvent.targetComponentId,
+      threadId,
+      encounterIds: Object.freeze(eligibleOrigins.map((capture) => capture.encounterId)),
+    });
+  }
+
+  const origin = eligibleOrigins[0];
   if (origin === undefined) {
     return failed({
       reason: 'contract_precedes_origin',

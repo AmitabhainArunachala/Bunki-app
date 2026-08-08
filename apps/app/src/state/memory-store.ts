@@ -55,7 +55,6 @@ import {
   openMintedEventBatch,
   replay,
   targetKeyOfEncounter,
-  targetTextOfCapture,
   validateLearnContractPair,
   threadReducer,
   type CandidateAcceptedAsNoteEvent,
@@ -73,6 +72,12 @@ import {
   type ThreadState,
 } from '@bunki/domain';
 
+import {
+  captureClaimMatchesEvent,
+  captureV2IdempotencyKey,
+  legacyCaptureIdempotencyKey,
+  validateCaptureClaim,
+} from './capture-idempotency.ts';
 import {
   CorrectionRefusedError,
   DEMONSTRATION_EXPERIENCE_PREFIX,
@@ -103,16 +108,6 @@ import {
  */
 export function targetKeyOf(text: string): string {
   return text.trim().normalize('NFKC').toLocaleLowerCase('en-US');
-}
-
-function captureIdempotencyKey(
-  command: Extract<AppCommand, { kind: 'capture' }>,
-  targetText = targetTextOfCapture(command.text, command.span),
-): string {
-  const { sourceId, locator } = command.sourceRef;
-  const coordinates =
-    command.span === undefined ? 'whole' : `${command.span.start}-${command.span.end}`;
-  return `capture:${sourceId}:${locator ?? ''}:${coordinates}:${targetKeyOf(targetText)}`;
 }
 
 /**
@@ -405,13 +400,42 @@ export function createMemoryAppStore({
   }
 
   function applyCapture(command: Extract<AppCommand, { kind: 'capture' }>): CommandAck {
-    // Validate and select before consulting idempotency. `String.slice` clamps
-    // invalid bounds; using the domain helper makes malformed coordinates a
-    // typed refusal instead of a silently different target.
-    const selectedText = targetTextOfCapture(command.text, command.span);
-    const idempotencyKey = captureIdempotencyKey(command, selectedText);
-    const previous = appliedKeys.get(idempotencyKey);
-    if (previous !== undefined) return { ...previous, events: [], deduplicated: true };
+    // Validate every field that would survive in the event before consulting
+    // idempotency. A malformed source/provenance object must not become a
+    // successful no-op merely because its incomplete legacy tuple collides.
+    const validated = validateCaptureClaim(command);
+    const selectedText = validated.selectedText;
+    const captureClaim = validated.persisted;
+    const idempotencyKey = captureV2IdempotencyKey(captureClaim);
+
+    const previousV2 = appliedKeys.get(idempotencyKey);
+    if (previousV2 !== undefined) {
+      const priorEvent = previousV2.events[0];
+      if (
+        priorEvent?.type === 'EncounterCaptured' &&
+        captureClaimMatchesEvent(captureClaim, priorEvent)
+      ) {
+        return { ...previousV2, events: [], deduplicated: true };
+      }
+      // A SHA-256 collision or a corrupt/foreign claim under the v2 namespace
+      // is not a duplicate. Refuse rather than choosing one history.
+      throw new Error('capture v2 idempotency key is claimed by different persisted evidence');
+    }
+
+    // Historical events keep their original keys. Recognise one only when its
+    // complete persisted payload is exactly the prospective payload; the old
+    // key alone omitted source body, source kind, provenance and the mark.
+    const legacyKey = legacyCaptureIdempotencyKey(captureClaim, targetKeyOf(selectedText));
+    const previousLegacy = appliedKeys.get(legacyKey);
+    if (previousLegacy !== undefined) {
+      const priorEvent = previousLegacy.events[0];
+      if (
+        priorEvent?.type === 'EncounterCaptured' &&
+        captureClaimMatchesEvent(captureClaim, priorEvent)
+      ) {
+        return { ...previousLegacy, events: [], deduplicated: true };
+      }
+    }
 
     const targetKey = targetKeyOf(selectedText);
     const existing = findThreadByTarget(targetKey);
@@ -425,14 +449,14 @@ export function createMemoryAppStore({
       {
         encounterId: context.ids.nextId('encounter'),
         threadId,
-        text: command.text,
-        ...(command.span === undefined ? {} : { span: { ...command.span } }),
-        sourceRef: command.sourceRef,
-        provenance: command.provenance,
+        text: captureClaim.text,
+        ...(captureClaim.span === null ? {} : { span: { ...captureClaim.span } }),
+        sourceRef: captureClaim.sourceRef,
+        provenance: captureClaim.provenance,
         // `true | absent` is the whole vocabulary the v1 schema has. The
         // dimension the learner chose is kept beside the log — see
         // `UncertaintyAnnotation`.
-        ...(command.uncertainty === null ? {} : { uncertaintyMark: true as const }),
+        ...(captureClaim.uncertaintyMark ? { uncertaintyMark: true as const } : {}),
       },
       { idempotencyKey },
     );
