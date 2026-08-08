@@ -546,7 +546,7 @@
    "shot": null
   },
   {
-   "word": "生け花",
+   "word": "生き物",
    "kanji": 2,
    "gesture": "sat-flick",
    "expected": "no judgment on satellites",
@@ -555,7 +555,7 @@
    "shot": null
   },
   {
-   "word": "生け花",
+   "word": "生き物",
    "kanji": 2,
    "gesture": "sat-tap",
    "expected": "reveals in place",
@@ -564,7 +564,7 @@
    "shot": null
   },
   {
-   "word": "生け花",
+   "word": "生き物",
    "kanji": 2,
    "gesture": "sat-recentre",
    "expected": "becomes the planet",
