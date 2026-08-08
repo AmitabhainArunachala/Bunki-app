@@ -272,3 +272,110 @@ python3 -m http.server -d prototypes/corridor 8080   # then http://127.0.0.1:808
   is closer to the reference apps than what the runner shows.
 - The verifier is the contract. If a change breaks the walk, it goes red on the
   specific step, with the DOM state that failed.
+
+---
+
+## 8. Phase 1 — the corpus pipeline revived (2026-08-08)
+
+**Run:** cloud agent, branch `claude/kairo-prototype-phase-1-4hdre6`, base = PR #62
+head (v1.8.2). **Verifier: 82/82 green** (was 71), real Chromium, Noto CJK,
+390×844. Corpus unit tier: **185 passed** from a fresh editable install.
+
+### 8.1 The revival itself
+
+All seven closed PRs (#52–#58) still had living branches. Each was based
+exactly on the merged corpus/00 skeleton, so all seven merged **clean, with
+history and zero conflicts**: wikinews, aozora, SNOW, kanji fact table, JMdict
+idioms, やさしい日本語, and the three-signal grader are now ON this branch —
+nothing rebuilt, nothing lost. The `pyproject.toml` three-way overlap
+(dev-deps / yasashii extra / package-data) merged textually without a single
+conflict marker.
+
+### 8.2 The wall this environment adds — and what was done about it
+
+This runner's egress policy allows **GitHub and package registries, nothing
+else**. Verified by probe: mmsrv.ninjal.ac.jp, dumps.wikimedia.org,
+aozora.gr.jp, huggingface.co, archive.org — all `CONNECT 403`. Two of the
+three shelf signals (語彙カバー率, TMR) need the NINJAL substrate download, so
+in THIS environment they are **unmeasurable**. The previous round's numbers
+were measured on 520-char excerpts; the shelf now shows full texts, so those
+numbers are not true of what is displayed and were **not carried forward**
+(they remain in §1 and in git history).
+
+The law applied: **every signal shown is true of the exact text displayed.**
+
+- `build_articles.py` computes what is computable here (jreadability + a new
+  live lexical signal, below) and records the NINJAL pair as
+  `unavailable` **with the reason string**, never a stale or faked number.
+- The UI renders the pair as 「国語研語彙 — 未測定」 with a dashed, empty
+  track (a bar would be a fake reading). A verifier check enforces
+  "measured or marked 未測定 — never faked".
+- Run the same command where mmsrv.ninjal.ac.jp is reachable and the pair
+  fills in shelf-wide, sha256-pinned as before. One command, no code change.
+
+### 8.3 The JLPT-lexicon signal (new, live, in-repo substrate)
+
+Because "never use jreadability alone" is written into the grader itself, the
+shelf needed a second live signal. The corridor already ships a 6,687-word
+JLPT-tagged lexicon (`prototypes/drift/data/wbig.json`, open-anki-jlpt-decks
+lineage). `jlpt_signal()` computes content-token coverage + an N5–N1/OOV band
+vector against it, base-form matching only (the NINJAL matcher's homophone
+conservatism, kept). Substrate named `open-anki-jlpt-decks/wbig-6687` in every
+emission; the sources panel carries its ShareAlike row; the hint says
+"unofficial list" — never presented as official JLPT.
+
+### 8.4 The shelf: 11 excerpts → 26 full articles, loaded lazily
+
+`build_articles.py` (the Phase-1 batch command) turns every rights-clean text
+into one article JSON: tokens, furigana, paragraph starts, level signals,
+provenance. The corridor boots from a light `index.json` (signals + metadata,
+no tokens), fetches each article file on first open, and quietly prefetches
+the rest. The 520-char excerpt cap is **gone** — ごん狐 ships whole (4,934
+chars, paragraphs intact, verified to its closing sentence). Todai-scale is
+now a data problem: adding an article is adding a file.
+
+On it: 5 wikinews (full), 3 aozora (full), 10 やさしい日本語 entries, and
+**the 8 parked v11 texts** — the Phase 1 definition of done.
+
+### 8.5 Measurement — authored level vs the two live signals (v11 texts)
+
+| text                     | authored | jreadability  | JLPT coverage |
+| ------------------------ | -------- | ------------- | ------------- |
+| 静かな朝                 | N5       | 4.82 初級後半 | 64.6%         |
+| 雨の日の古本屋           | N4       | 4.10 中級前半 | 75.5%         |
+| 知らない町を歩く         | N3       | 3.23 中級後半 | 62.9%         |
+| 山を歩きながら考えたこと | N2       | 2.50 中級後半 | 58.2%         |
+| AI時代の知識と判断       | N1       | 2.00 上級前半 | 56.4%         |
+| 五箇条の御誓文           | N1       | 2.18 上級前半 | 47.8%         |
+| 方丈記 · 冒頭            | N1+      | 3.95 中級前半 | 42.0%         |
+| 徒然草 · 序段            | N1+      | 3.58 中級前半 | 36.5%         |
+
+jreadability tracks the authored ladder **monotonically** across the five
+originals (4.82 → 2.00) — the pipeline and the authoring agree. Then the
+classics break it, in exactly the direction the three-signal design predicts:
+方丈記 reads 中級前半 by sentence shape while its JLPT coverage (42.0%) is the
+worst on the shelf outside 徒然草 — sentence-form easy, lexis hard, register
+invisible to both. One number would have lied; two disagreeing signals tell
+the truth. (This is §1's 野ばら/イチロー case, reproduced on classical text.)
+
+### 8.6 Defects seen with my own eyes, filed honestly
+
+- 七時 renders ruby ななじ (UniDic numeral+counter reading; しちじ is the
+  common clock reading), 私 renders わたくし. Same class as §4's 14日→か,
+  already filed on #43: tokenizer readings for numerals/counters are the weak
+  point; ruby-carrying corpora don't have the problem.
+- News texts show "~1 in 2 words beyond the JLPT lists" — true against a
+  6,687-word learner lexicon (news carries names, geography, institutions),
+  but the phrase reads heavier than the NINJAL "1 in 3". The hint explains
+  the substrate; if the operator finds it noisy, the phrasing is one string.
+- The disagreement flag currently fires nowhere: it needs ≥2 ordinal-capable
+  signals and only jreadability has a published scale here. The verifier now
+  asserts the invariant (flag ⇒ ≥2 ordinals) instead of asserting flags
+  exist. Flags return with the NINJAL pair.
+
+### 8.7 Not attempted, said plainly
+
+SNOW/aozora/wikinews upstream expansion (egress-blocked here), semantic-tier
+growth, grammar-in-reader detection (Phase 5), Drift fusion (Phase 2), any
+scheduler write. The corpus `data/` dir stays gitignored; nothing bulk was
+committed.
