@@ -656,6 +656,7 @@ function refreshActive(){
   for(const wr of WORDS){
     const s=w2s(wr.wx,wr.wy);
     wr.sx=s.x; wr.sy=s.y;
+    if(wr.gradedAt&&performance.now()-wr.gradedAt<180000) continue;
     if(s.x>-pad&&s.x<vw()+pad&&s.y>-pad&&s.y<vh()+pad) vis.push(wr);
   }
   vis.sort((a,b)=>b.pri-a.pri);
@@ -665,9 +666,10 @@ function refreshActive(){
       // a word the user is holding is PINNED: the recycler may never cull
       // the bloom/lock centre or its members mid-interaction — this was the
       // root of "some words just disappear" (charter, 2026-08-08)
-      if(wr.hl||wr.lk) continue;
+      if(wr.hl||wr.lk||wr.walked) continue;
       const nd=wr.node;
       if(nd&&(nd===focusN||nd.hlDom)) continue;
+      if(nd&&!nd.gone&&nd.el&&nd.el.classList.contains("unfolded")) continue;
       if(nd&&!nd.gone&&nd.mode==="free"){
         nd.gone=true; nd.top=0; nd.el.style.pointerEvents="none";
         removeNode(nd,600); wr.node=null;
@@ -742,6 +744,13 @@ let unfolded=null, divedOnce=false;
 // tap-bloom: the word's relatives swim in and light up; the rest dims
 const FOCUS=[]; let focusN=null;
 let bloomBorn=0; let bloomLast=0;
+const WALKED=[];   // recent planets — pinned against the 64-word recycler
+function markWalked(wr){
+  if(!wr) return;
+  const i=WALKED.indexOf(wr); if(i>=0) WALKED.splice(i,1);
+  WALKED.push(wr); wr.walked=true;
+  while(WALKED.length>14){const old=WALKED.shift(); old.walked=false;}
+}
 function bloomFocus(n){
   clearBloom(n.el?n:undefined);
   bloomBorn=performance.now(); bloomLast=bloomBorn;
@@ -816,6 +825,7 @@ function bloomFocus(n){
     FOCUS.push(wr);
   }
   if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
+  if(n.wref) markWalked(n.wref);
 }
 let lockOn=false;
 const LOCKG=[];
@@ -1309,7 +1319,11 @@ function grade(n,dir){
   updateTray();
   if(unfolded===n) unfolded=null;
   if(focusN===n) clearBloom();
-  if(n.wref) n.wref.node=null;
+  if(n.wref){
+    n.wref.node=null; n.wref.gradedAt=performance.now();
+    n.wref.walked=false;
+    const wi=WALKED.indexOf(n.wref); if(wi>=0) WALKED.splice(wi,1);
+  }
   const el=n.el;
   el.style.pointerEvents="none";
   const base="translate("+n.x.toFixed(1)+"px,"+n.y.toFixed(1)+"px) translate(-50%,-50%) ";
@@ -1323,7 +1337,8 @@ function grade(n,dir){
   el.style.opacity="0";
   removeNode(n,1000);
   if(n.kind==="word"&&!n.fromW) deck.push([n.w,n.r,n.g,n.st,n.p,n.lvl]);
-  if(wasCenter) setTimeout(surface,350);
+  const depthAtGrade=stack.length;
+  if(wasCenter) setTimeout(function(){ if(stack.length===depthAtGrade) surface(); },350);
   if(!stack.length) setTimeout(topUp,1800);
 }
 function updateTray(){
@@ -1502,6 +1517,7 @@ function lvlSet(ix,commit){
 }
 function tideChange(){
   clearBloom(); collapseUnfold();
+  for(const wr of WORDS) wr.gradedAt=0;   // a new tide is a new sky
   deck=buildDeck(); rePri();
   for(const n of nodes)
     if(n.kind==="word"&&!n.gone&&(n.mode==="free"||n.mode==="glide")){
@@ -1580,7 +1596,7 @@ function tapNode(n){
   }
   diveWord(n);                                      // then: carry in
 }
-let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false;
+let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false,gestureId=null;
 let lpTimer=0,lpFired=false;
 // two fingers = zoom: pinch-out over a body dives into it, pinch-in surfaces
 const touches=new Map();
@@ -1629,7 +1645,9 @@ addEventListener("pointerdown",e=>{
       pn=nd;
     }
   }
+  if(touches.size>1){pn=null;gestureActive=false;gestureId=null;return;}
   px=e.clientX;py=e.clientY;pt=Date.now();moved=false;gestureActive=true;
+  gestureId=e.pointerId;
   lpFired=false; clearTimeout(lpTimer);
   if(pn&&(pn.kind==="word"||pn.kind==="glyph")&&stack.length===0){
     const tn=pn;
@@ -1692,9 +1710,9 @@ addEventListener("pointermove",e=>{
   }
   if(!pn){
     // one finger on open water: swim — pan the camera through the field
-    if(t2&&touches.size===1&&stack.length===0&&gestureActive){
+    if(t2&&touches.size===1&&gestureActive){
       if(Math.abs(e.clientX-px)>8||Math.abs(e.clientY-py)>8) moved=true;
-      if(moved){
+      if(moved&&stack.length===0){
         const cs=Math.cos(cam.rot),sn=Math.sin(cam.rot);
         const wdx=(pdx*cs+pdy*sn)/cam.z, wdy=(-pdx*sn+pdy*cs)/cam.z;
         camT=null; cam.x-=wdx; cam.y-=wdy; camClamp();
@@ -1713,21 +1731,26 @@ function endPointer(e){
 }
 function cancelPointer(e){
   endPointer(e);
+  // a cancelled drag leaves no ghost offset behind (the node returns home)
+  if(pn){pn.dragX=0; pn.dragY=0;}
   touches.clear(); pinch=null; pn=null;
-  gestureActive=false; moved=false;
+  gestureActive=false; moved=false; gestureId=null;
   clearTimeout(lpTimer); lpFired=false;
 }
 addEventListener("pointercancel",e=>{if(DRIFT_ON)cancelPointer(e);},{passive:true});
 addEventListener("pointerup",e=>{
   if(!DRIFT_ON)return;
+  const owner=e.pointerId===gestureId;
   endPointer(e);
   if(FOCUS.length) bloomLast=performance.now();
+  if(!owner) return;   // a camera finger lifting is not a judgment
+  gestureId=null;
   clearTimeout(lpTimer);
   const n=pn; pn=null;
   if(!gestureActive) return;
   gestureActive=false;
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
-  if(e.target.closest&&e.target.closest("#theme,#card,#lvl")) return;
+  if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   if(n){
     const ddx=n.dragX, ddy=n.dragY;
@@ -1747,7 +1770,7 @@ addEventListener("pointerup",e=>{
     if(moved||held>600) return;
     tapNode(n); return;
   }
-  if(moved) return;
+  if(moved||held>600) return;   // a release is deliberate, or it is nothing
   if(card.classList.contains("open")){card.classList.remove("open");return;}
   if(stack.length){surface();return;}
   if(lockOn){clearBloom();return;}
