@@ -136,8 +136,52 @@ export interface InteractionTransition {
   readonly effects: readonly InteractionEffect[];
 }
 
+function freezeTarget(target: InteractionTarget): InteractionTarget {
+  return Object.freeze({ ...target });
+}
+
+function freezeState(state: InteractionState): InteractionState {
+  return Object.freeze({
+    ...state,
+    reveal:
+      state.reveal === null
+        ? null
+        : Object.freeze({ target: freezeTarget(state.reveal.target), stage: state.reveal.stage }),
+    quickLookTarget: state.quickLookTarget === null ? null : freezeTarget(state.quickLookTarget),
+    entryPath: Object.freeze(state.entryPath.map(freezeTarget)),
+    constellationTarget:
+      state.constellationTarget === null ? null : freezeTarget(state.constellationTarget),
+    nomination:
+      state.nomination === null
+        ? null
+        : Object.freeze({
+            target: freezeTarget(state.nomination.target),
+            judgment: state.nomination.judgment,
+          }),
+    layers: Object.freeze(
+      state.layers.map((layer) =>
+        Object.freeze({
+          kind: layer.kind,
+          target: layer.target === null ? null : freezeTarget(layer.target),
+        }),
+      ),
+    ),
+  });
+}
+
+function freezeEffect(effect: InteractionEffect): InteractionEffect {
+  return Object.freeze({ ...effect, target: freezeTarget(effect.target) });
+}
+
+function freezeTransition(transition: InteractionTransition): InteractionTransition {
+  return Object.freeze({
+    state: freezeState(transition.state),
+    effects: Object.freeze(transition.effects.map(freezeEffect)),
+  });
+}
+
 export function initialInteractionState(): InteractionState {
-  return {
+  return freezeState({
     reveal: null,
     quickLookTarget: null,
     entryPath: [],
@@ -146,7 +190,7 @@ export function initialInteractionState(): InteractionState {
     tideLevel: 1,
     nomination: null,
     layers: [],
-  };
+  });
 }
 
 function sameTarget(left: InteractionTarget | null, right: InteractionTarget): boolean {
@@ -210,8 +254,7 @@ function dismissLayer(state: InteractionState, requested?: InteractionLayerKind)
   };
 }
 
-/** Reduce one explicit interaction. `envelope.provenance` is never branched on. */
-export function reduceInteraction(
+function reduceInteractionValue(
   state: InteractionState,
   envelope: InteractionEnvelope,
 ): InteractionTransition {
@@ -306,4 +349,12 @@ export function reduceInteraction(
     case 'layer.dismiss':
       return { state: dismissLayer(state, action.layer), effects: [] };
   }
+}
+
+/** Reduce one explicit interaction. `envelope.provenance` is never branched on. */
+export function reduceInteraction(
+  state: InteractionState,
+  envelope: InteractionEnvelope,
+): InteractionTransition {
+  return freezeTransition(reduceInteractionValue(state, envelope));
 }
