@@ -379,3 +379,57 @@ SNOW/aozora/wikinews upstream expansion (egress-blocked here), semantic-tier
 growth, grammar-in-reader detection (Phase 5), Drift fusion (Phase 2), any
 scheduler write. The corpus `data/` dir stays gitignored; nothing bulk was
 committed.
+
+---
+
+## 9. Phase 2, first segment — Drift becomes the front door (2026-08-08)
+
+**Verifier: 86/86 green** (+4). Opening the app with no query now lands in the
+real 墨流し universe — the corridor prototype's placeholder "field" is
+superseded by the actual Drift, physics and all.
+
+### 9.1 The fusion mechanism (no fork, no iframe, no seam)
+
+`tools/build-drift-layer.mjs` extracts the red-team-hardened
+`prototypes/drift/drift-artifact.html` (which stays **byte-untouched** as the
+source of truth) into a corridor entry layer at build time:
+
+- CSS scoped under `#drift-layer` (the file has no at-rules; `:root`/`body`
+  rules collapse onto the layer, so drift's `--ink`/`--ground` never collide
+  with the corridor's).
+- The script wrapped and **gated**: 11 exact-string patches, each asserted to
+  match exactly once — if drift's source changes shape, the build fails
+  loudly instead of emitting a silently-broken fusion. The six window-level
+  gesture listeners, both `setInterval`s and the rAF loop all sleep while the
+  layer is hidden (`window.__DRIFT__.show()/hide()` is the whole seam;
+  frame-dt is clamped upstream, so resume is safe).
+- One real id collision found and renamed (`tray` → `drift-tray`; corridor's
+  覚 button owns `#tray`), with counts asserted so a drift rename cannot
+  silently bring the collision back.
+
+### 9.2 The walk segment, verified
+
+Boot → the living universe (64 DOM words adrift over the constellation
+field), **corridor chrome riding above it** — 戻る/EN|日本語/覚 remain one
+navigation fabric. One indigo door (本棚, palette law: 藍 = you can go here)
+→ the 26-article shelf; 戻る → the universe again, exactly where physics
+left it. `?entry=shelf` still boots straight to the shelf; the old
+placeholder survives as `?entry=field`（札の野・旧）. While any other view is
+open the layer is `display:none` and every drift listener early-returns —
+measured zero console errors across the whole 86-check walk.
+
+Occlusion corrections landed after looking at the first screenshot: drift's
+brand, 北斎 theme toggle, counters and hint step inside the visible band
+between corridor chrome and variant strip (presentation only; no physics
+touched).
+
+### 9.3 Honest costs and the next slices
+
+- The layer embeds drift's own copies of wbig/radk/strokes/sem (~0.7 MB;
+  standalone 7.37 → 8.11 MB, artifact cap 16 MB). Dedup path: feed the
+  corridor's richer bundles (2,136 stroke sets vs drift's 114) through the
+  `__DRIFT__` seam — a later slice, after the walk is whole.
+- Next segment: a drifting word's committed card hands off into the
+  corridor's full dictionary entry (word → 覚える → list, without leaving
+  the app) — then the Drift grades and the corridor lists start feeding the
+  same Phase 3 scheduler.

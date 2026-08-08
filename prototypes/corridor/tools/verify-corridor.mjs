@@ -209,6 +209,43 @@ async function main() {
     await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   };
 
+  // ------------------------------------------- step 0 · the front door
+  // Phase 2: opening the app with no query lands in the Drift universe —
+  // The Walk's first segment. The corridor chrome stays above it (one
+  // navigation fabric), the shelf is one door away, and the universe fully
+  // sleeps while any other view is open.
+  console.log('\n— step 0 · the front door (Drift)');
+  await open('');
+  await page.waitForTimeout(2200);
+  const driftBoot = await page.evaluate(`({
+    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
+    words: document.querySelectorAll('#drift-layer .word').length,
+    chrome: getComputedStyle(document.querySelector('.chrome')).display !== 'none',
+    door: !!document.getElementById('enter-shelf-door'),
+  })`);
+  check('Phase 2 · the app opens into the living universe',
+    driftBoot.layerActive && driftBoot.words >= 20,
+    `layer active, ${driftBoot.words} words adrift`);
+  check('Phase 2 · the corridor chrome rides above the universe (one fabric)',
+    driftBoot.chrome && driftBoot.door, 'chrome visible, shelf door present');
+  await shoot(page, shotsDir, '17-phase2-drift-entry');
+  await page.tap('#enter-shelf-door');
+  await page.waitForTimeout(600);
+  const afterDoor = await page.evaluate(`({
+    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
+    layerDisplay: getComputedStyle(document.getElementById('drift-layer')).display,
+    shelfItems: document.querySelectorAll('.shelf-item').length,
+  })`);
+  check('Phase 2 · one door from the universe to the shelf',
+    !afterDoor.layerActive && afterDoor.layerDisplay === 'none' && afterDoor.shelfItems >= 24,
+    `${afterDoor.shelfItems} articles; universe asleep (display ${afterDoor.layerDisplay})`);
+  await page.tap('#back');
+  await page.waitForTimeout(600);
+  const afterBack = await page.evaluate(
+    `document.getElementById('drift-layer')?.classList.contains('active')`,
+  );
+  check('Phase 2 · 戻る returns from the shelf to the universe', afterBack === true, 'layer active again');
+
   // ---------------------------------------------------------- step 1 arrive
   console.log('\n— step 1 · arrive');
   const t0 = Date.now();
