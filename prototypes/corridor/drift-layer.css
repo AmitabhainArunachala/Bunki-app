@@ -58,9 +58,9 @@
 #drift-layer /* tap-bloom relief: the constellation is its own layer — centre,
 #drift-layer satellites,
 #drift-layer * and threads each carry their own colour and lift gently off the field */
-  .word.bctr{color:var(--bloomCtr) !important}
+  .word.bctr{color:var(--bloomCtr) !important;z-index:6}
 #drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
-#drift-layer .word.bsat{color:var(--bloomSat) !important}
+#drift-layer .word.bsat{color:var(--bloomSat) !important;z-index:5}
 #drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
 #drift-layer .word.bsat .yomi{color:var(--bloomSat)}
 #drift-layer .glyph.comp{z-index:7}
@@ -135,7 +135,7 @@
 #drift-layer #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:11px}
 #drift-layer #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
 #drift-layer #card .rds .kun{color:var(--faint)}
-#drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:34px;
+#drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
     z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
 #drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
