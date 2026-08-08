@@ -43,8 +43,11 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
+  bindRetrievalContract,
   componentIdOfEncounter,
   SUPERSESSION_REASONS,
+  type BoundRetrievalContractResult,
+  type ContractCreatedEvent,
   type EncounterCapturedEvent,
 } from '@bunki/domain';
 import {
@@ -109,12 +112,16 @@ export interface EvidenceInspectorScreenProps {
   readonly threadId?: string | undefined;
   readonly onBack: () => void;
   readonly onOpenDebug: () => void;
+  readonly onReturnToSource?: (() => void) | undefined;
+  readonly returnSourceLabel?: string | undefined;
 }
 
 export function EvidenceInspectorScreen({
   threadId,
   onBack,
   onOpenDebug,
+  onReturnToSource,
+  returnSourceLabel,
 }: EvidenceInspectorScreenProps): ReactNode {
   const theme = useTheme();
   const store = useAppStore();
@@ -173,6 +180,28 @@ export function EvidenceInspectorScreen({
     // `snapshot.revision` is the store's change token; the log is not a value
     // React can compare, so the revision is what tells this memo to re-run.
   }, [store, thread, snapshot.revision]);
+
+  const lineage = useMemo<
+    readonly {
+      readonly event: ContractCreatedEvent;
+      readonly result: BoundRetrievalContractResult;
+    }[]
+  >(() => {
+    if (thread === null) return [];
+    const log = store.readAll();
+    const capture = log.find(
+      (event): event is EncounterCapturedEvent =>
+        event.type === 'EncounterCaptured' && event.threadId === thread.state.threadId,
+    );
+    if (capture === undefined) return [];
+    const componentId = componentIdOfEncounter(capture);
+    return log
+      .filter(
+        (event): event is ContractCreatedEvent =>
+          event.type === 'ContractCreated' && event.targetComponentId === componentId,
+      )
+      .map((event) => ({ event, result: bindRetrievalContract(log, event.contractId) }));
+  }, [snapshot.revision, store, thread]);
 
   const seedDemonstration = useCallback((): void => {
     if (thread === null) return;
@@ -295,6 +324,22 @@ export function EvidenceInspectorScreen({
         <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
           Promotion rung: {chain.promotion} · thread {chain.threadId}
         </Text>
+      </Section>
+
+      <Section
+        note="Bound from ContractCreated + EncounterCaptured only. Missing or ambiguous ancestry is shown as its typed failure and is never guessed."
+        testID="evidence-lineage"
+        title="Source and contract lineage"
+      >
+        {lineage.length === 0 ? (
+          <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+            No retrieval contract on this thread has source lineage to show.
+          </Text>
+        ) : (
+          lineage.map(({ event, result }) => (
+            <LineageRow event={event} key={event.eventId} result={result} />
+          ))
+        )}
       </Section>
 
       <Section
@@ -668,8 +713,86 @@ export function EvidenceInspectorScreen({
         onPress={onOpenDebug}
         testID="evidence-open-debug"
       />
+      {onReturnToSource === undefined ? null : (
+        <AppButton
+          accessibilityHint="Returns to the exact source route and focuses its captured span."
+          label={`Return to ${returnSourceLabel ?? 'source span'}`}
+          onPress={onReturnToSource}
+          testID="evidence-return-source"
+          variant="primary"
+        />
+      )}
       <AppButton accessibilityHint="Returns to search." label="Back to search" onPress={onBack} />
     </ScreenShell>
+  );
+}
+
+function LineageRow({
+  event,
+  result,
+}: {
+  readonly event: ContractCreatedEvent;
+  readonly result: BoundRetrievalContractResult;
+}): ReactNode {
+  const theme = useTheme();
+  if (!result.bound) {
+    return (
+      <View style={[styles.row, { borderColor: theme.color.vermilion }]}>
+        <Text style={[styles.mono, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+          {event.contractId} · {event.skill} · v{String(event.contractVersion)}
+        </Text>
+        <Text
+          style={[styles.meta, { color: theme.color.vermilion, fontFamily: theme.font.sans }]}
+          testID={`evidence-lineage-failure-${event.eventId}`}
+        >
+          Typed lineage failure: {result.failure.reason}. No source owner was inferred.
+        </Text>
+      </View>
+    );
+  }
+
+  const lineage = result.value;
+  const span =
+    lineage.span === null
+      ? 'whole encounter'
+      : `[${String(lineage.span.start)}, ${String(lineage.span.end)}) UTF-16`;
+  const grader =
+    lineage.gradingMethod.kind === 'accepted_answers'
+      ? `accepted_answers: ${lineage.gradingMethod.acceptedAnswers.join(' · ')}`
+      : `rubric: ${lineage.gradingMethod.rubricId}@${lineage.gradingMethod.rubricVersion}`;
+  return (
+    <View
+      style={[styles.row, { borderColor: theme.color.rule }]}
+      testID={`evidence-lineage-contract-${event.eventId}`}
+    >
+      <Text style={[styles.mono, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+        {event.contractId} · {event.skill} · contract v{String(event.contractVersion)}
+      </Text>
+      <Text style={[styles.body, { color: theme.color.ink, fontFamily: theme.font.sans }]}>
+        Target “{lineage.targetText}” · thread {lineage.threadId} · origin encounter{' '}
+        {lineage.originEncounterId}
+      </Text>
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        {lineage.sourceRef.sourceId} · {lineage.sourceRef.kind}
+        {lineage.sourceRef.locator === undefined ? '' : ` · ${lineage.sourceRef.locator}`} · {span}
+      </Text>
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        Provenance: {lineage.provenance.source}
+        {lineage.provenance.sourceVersion === undefined
+          ? ''
+          : ` · ${lineage.provenance.sourceVersion}`}{' '}
+        · {lineage.provenance.license} · {lineage.provenance.reviewStatus}
+      </Text>
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        Grading method: {grader}
+      </Text>
+      <Text style={[styles.meta, { color: theme.color.inkMuted, fontFamily: theme.font.sans }]}>
+        Subsequent same-thread encounters:{' '}
+        {lineage.subsequentEncounterIds.length === 0
+          ? 'none'
+          : lineage.subsequentEncounterIds.join(', ')}
+      </Text>
+    </View>
   );
 }
 
