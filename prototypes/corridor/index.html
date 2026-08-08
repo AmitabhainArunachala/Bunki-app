@@ -14,9 +14,13 @@
       content="An instrument for deciding, not a product: one continuous corridor over real graded Japanese, with four open Wayfinder decisions rendered as switchable variants."
     />
     <link rel="stylesheet" href="corridor.css" />
+    <link rel="stylesheet" href="drift-layer.css" />
   </head>
   <body>
     <div id="app"></div>
+    <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
+         the corridor's drift entry view wakes it via window.__DRIFT__ -->
+    <script defer src="drift-layer.js"></script>
     <script type="module" src="corridor.js"></script>
     <noscript>
       <p style="font-family: serif; padding: 24px">

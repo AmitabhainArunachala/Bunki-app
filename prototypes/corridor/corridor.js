@@ -131,8 +131,9 @@ const VARIANTS = {
     label: 'D 入口 #37',
     en: 'entry',
     options: [
-      ['field', 'ドリフトの野', 'drift field'],
+      ['drift', '墨流しの野', 'the Drift universe'],
       ['shelf', '読む棚', 'shelf'],
+      ['field', '札の野（旧）', 'old placeholder'],
     ],
   },
   depth: {
@@ -208,7 +209,8 @@ const S = {
   readerScroll: 0,
   stack: [],
   dials: { kanji: 0, furigana: 2, spacing: 0 },
-  variants: { cards: 'mcd', difficulty: 'three', contrast: 'wcag', entry: 'shelf', depth: 'layered' },
+  // entry: 'drift' — The Walk's first step is arriving in the living universe
+  variants: { cards: 'mcd', difficulty: 'three', contrast: 'wcag', entry: 'drift', depth: 'layered' },
   /* UI language: 'bi' = navigation carries English alongside the Japanese
    * (default — a learner must be able to steer before they can read);
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
@@ -307,6 +309,7 @@ async function boot() {
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
   }
   if (S.variants.entry === 'field') S.view = 'entry';
+  if (S.variants.entry === 'drift') S.view = 'drift';
 
   render();
 
@@ -462,6 +465,10 @@ function back() {
   }
   if (S.view === 'shelf' && S.variants.entry === 'field') {
     S.view = 'entry';
+    render();
+  }
+  if (S.view === 'shelf' && S.variants.entry === 'drift') {
+    S.view = 'drift';
     render();
   }
 }
@@ -1126,6 +1133,23 @@ function renderReader(main) {
   const attribution = el('div', 'note');
   attribution.textContent = p.attribution;
   main.append(attribution);
+}
+
+/* The Drift entry (Phase 2): the real 墨流し universe fills the viewport on
+ * its own layer beneath the chrome; the corridor contributes exactly one
+ * thing here — the door into the shelf. 藍 indigo, per the palette law:
+ * "you can go here". */
+function renderDrift(main) {
+  main.style.padding = '0';
+  const door = biLabel('button', 'drift-door', '本棚', 'the shelf');
+  door.type = 'button';
+  door.id = 'enter-shelf-door';
+  door.addEventListener('click', () => {
+    S.view = 'shelf';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(door);
 }
 
 function renderEntry(main) {
@@ -2326,7 +2350,9 @@ function render() {
   const backBtn = biLabel('button', null, '戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'back';
-  const atHome = !S.stack.length && (S.view === 'entry' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
+  const atHome =
+    !S.stack.length &&
+    (S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
   backBtn.disabled = atHome;
   backBtn.addEventListener('click', back);
   chrome.append(backBtn);
@@ -2334,6 +2360,7 @@ function render() {
   const crumb = el('div', 'crumb');
   const parts = [];
   if (S.view === 'entry') parts.push(tx('野', 'field'));
+  else if (S.view === 'drift') parts.push(tx('墨流し', 'the drift'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) parts.push(passage().title);
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
@@ -2382,7 +2409,15 @@ function render() {
     return;
   }
 
-  if (S.view === 'entry') renderEntry(main);
+  // The Drift universe sleeps unless it is the active view — its layer sits
+  // beneath the corridor chrome, so the one navigation fabric stays visible.
+  if (window.__DRIFT__) {
+    if (S.view === 'drift') window.__DRIFT__.show();
+    else window.__DRIFT__.hide();
+  }
+
+  if (S.view === 'drift') renderDrift(main);
+  else if (S.view === 'entry') renderEntry(main);
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
   else if (S.view === 'grammar') renderGrammar(main);
