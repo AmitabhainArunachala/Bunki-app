@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "campaign": "kairo-full-build-20260808",
+  "integrationBranch": "codex/kairo-full-build-20260808",
+  "startingIntegrationSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+  "currentIntegrationSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+  "sourcePullRequest": {
+    "number": 65,
+    "branch": "claude/kairo-prototype-phase-1-4hdre6",
+    "baseSha": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+    "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+    "observedAt": "2026-08-08T14:29:01Z",
+    "state": "open-draft-clean",
+    "verification": {
+      "remoteChecks": {
+        "corpusPytest": "success",
+        "verifiedBuild": "success",
+        "lintFormatTypecheckTest": "success",
+        "webE2eAccessibilityAdversarial": "success",
+        "deploy": "skipped"
+      },
+      "fourOrphanedDriftClaims": "unverified"
+    }
+  },
+  "workstreams": [
+    {
+      "branch": "codex/kairo-full-build-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "dependencies": ["pr:65@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "lead-integration",
+      "capabilities": ["campaign-integration", "shared-contracts"],
+      "verificationStatus": "baseline-pending-local-reproduction",
+      "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a0-drift-hunts-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "a0-drift-hunts",
+      "capabilities": [
+        "kana-semantic-node-interactivity",
+        "pinch-gesture-identity",
+        "active-pointer-lifecycle",
+        "hub-release-arbitration"
+      ],
+      "verificationStatus": "four-claims-reproduced-in-real-chromium-red-tests-in-progress",
+      "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a0-verifier-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "a0-verifier-truthfulness",
+      "capabilities": [
+        "drift-consistency-fail-closed",
+        "a0-ci-gate",
+        "a0-acceptance-evidence"
+      ],
+      "verificationStatus": "baseline-crash-and-tide-target-violation-reproduced",
+      "status": "active"
+    }
+  ]
+}
