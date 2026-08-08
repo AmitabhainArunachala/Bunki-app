@@ -183,6 +183,9 @@ async function main() {
     'data/fsrs-pin.json',
   ]);
   const totalCoreBytes = coreFiles.reduce((total, item) => total + item.bytes, 0);
+  const articleBodiesAfterOpening = [...new Set(afterArticleResources)]
+    .filter((path) => /data\/articles\/(?!index\.json)[^/]+\.json$/.test(path))
+    .sort();
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO, encoding: 'utf8' }).trim();
   const boot = summarize(bootSamples);
   const lookup = summarize(lookupSamples);
@@ -281,8 +284,11 @@ async function main() {
         /data\/articles\/(?!index\.json)/.test(resource.path),
       ),
       resourcesAfterOpeningFirstArticle: afterArticleResources,
-      currentGap:
-        'dictionary, kanji, word, idiom, stroke, grammar, and Drift bundles remain boot-critical; A4 sharding is not yet achieved',
+      articleBodiesAfterOpeningFirstArticle: {
+        count: articleBodiesAfterOpening.length,
+        paths: articleBodiesAfterOpening,
+      },
+      currentGap: `${articleBodiesAfterOpening.length} article bodies were fetched by the time one article opened; dictionary, kanji, word, idiom, stroke, grammar, and Drift bundles also remain boot-critical; A4 sharding is not yet achieved`,
     },
     protocolSource: 'KAIRO_EXCELLENCE_SPEC_2026-08-08.md §3 P1-P3, §4 rule 8, §5 A0.5/A4',
   };
