@@ -135,16 +135,21 @@
 #drift-layer #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:11px}
 #drift-layer #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
 #drift-layer #card .rds .kun{color:var(--faint)}
-#drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:26px;
-    z-index:8;opacity:.32;transition:opacity .5s;touch-action:none}
-#drift-layer #lvl.hot{opacity:1}
+#drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:34px;
+    z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+#drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
-    border-radius:1px}
+    border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
+#drift-layer #lvl.hot #lvlTrack{width:3.5px;background:var(--pig1);box-shadow:0 0 10px var(--halo)}
 #drift-layer #lvlHandle{position:absolute;left:10px;width:12px;height:12px;border-radius:50%;
-    background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%}
+    background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%;
+    transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s}
+#drift-layer #lvl.hot #lvlHandle{left:6px;width:22px;height:22px;margin-top:-11px;
+    background:var(--accent);border-width:2px;
+    box-shadow:0 0 16px var(--halo),0 3px 12px rgba(0,0,0,.28)}
 #drift-layer #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:10px;color:var(--faint);
-    letter-spacing:.05em;opacity:0;transition:opacity .4s;pointer-events:none}
-#drift-layer #lvl.hot #lvlLabels{opacity:1}
+    letter-spacing:.05em;opacity:0;transition:opacity .3s,left .25s,font-size .25s;pointer-events:none}
+#drift-layer #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:13px;color:var(--ink);font-weight:600}
 #drift-layer .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
 #drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;
     color:var(--pig2);letter-spacing:.08em;white-space:nowrap;opacity:0;transition:opacity .3s;

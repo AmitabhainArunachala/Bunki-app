@@ -109,6 +109,37 @@ const boot = async () => {
 };
 await boot();
 
+/* ------------------- the level tide (operator ruling, said twice — law) */
+{
+  const WBIG = JSON.parse(readFileSync(resolve(CORRIDOR, '..', 'drift', 'data', 'wbig.json'), 'utf8'));
+  const LVL = new Map(WBIG.map((e) => [e[0], e[3]]));
+  const lvlBox = await page.evaluate(
+    `(() => { const r = document.getElementById('lvl').getBoundingClientRect(); return { x: r.left + 17, top: r.top, h: r.height }; })()`,
+  );
+  await touch('touchStart', [[lvlBox.x, lvlBox.top + lvlBox.h * 0.2]]);
+  await page.waitForTimeout(220);
+  const hot = await page.evaluate(
+    `(() => { const el = document.getElementById('lvl'); return { hot: el.classList.contains('hot'), width: el.getBoundingClientRect().width }; })()`,
+  );
+  await touch('touchEnd', []);
+  await page.waitForTimeout(2600);
+  const words = await page.evaluate(
+    `[...document.querySelectorAll('#drift-layer .word')].map((el) => el.querySelector('.base')?.textContent ?? '').filter(Boolean)`,
+  );
+  const levelled = words.map((w) => LVL.get(w)).filter(Boolean);
+  const n1Share = levelled.length ? levelled.filter((l) => l === 1).length / levelled.length : 0;
+  const tideOk = hot.hot && hot.width >= 44 && n1Share >= 0.8;
+  console.log(
+    `${tideOk ? '  ok  ' : ' FAIL '}tide · the slider answers the finger and the field obeys the stop — ` +
+      `hot=${hot.hot} width=${hot.width.toFixed(0)}px, N1 share ${(n1Share * 100).toFixed(0)}% of ${levelled.length}`,
+  );
+  if (!tideOk) {
+    cases.push?.({});
+    pageErrors.push('tide check failed');
+  }
+  await boot(); // back to the default field for the batteries
+}
+
 /* ------------------------------------------------------------- probes */
 const KANJI_RE = '/[\\u4e00-\\u9fff]/';
 const wordProbe = (label) => `(() => {

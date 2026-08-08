@@ -645,8 +645,8 @@ function buildWorld(){
 function rePri(){
   for(const wr of WORDS){
     const e=wr.e, lm=Math.abs((e[5]||3)-level);
-    wr.pri=(store.unknown[e[0]]?3:0)+(e[3]==="f"?1.2:0)+
-      (lm===0?2:lm===1?0.8:0)+((strHash(e[0])>>2)%100)/100;
+    wr.pri=(lm===0?8:lm===1?2.4:0)+(store.unknown[e[0]]?1.6:0)+
+      (e[3]==="f"?0.8:0)+((strHash(e[0])>>2)%100)/100;
   }
 }
 // the ~64 most deserving nearby words become touchable DOM; the rest are ink
@@ -1501,6 +1501,7 @@ function lvlSet(ix,commit){
   }
 }
 function tideChange(){
+  clearBloom(); collapseUnfold();
   deck=buildDeck(); rePri();
   for(const n of nodes)
     if(n.kind==="word"&&!n.gone&&(n.mode==="free"||n.mode==="glide")){
