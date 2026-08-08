@@ -81,6 +81,7 @@ const kanjiSource = screen('kanji-screen.tsx');
  */
 const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'capture-screen.tsx': 'WP-05',
+  'golden-source-screen.tsx': 'KAIRO A1 golden source',
   'word-screen.tsx': 'WP-05',
   'kanji-screen.tsx': 'WP-05',
   'drift-word-screen.tsx': 'one-app convergence (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md)',

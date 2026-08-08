@@ -18,7 +18,7 @@ export default function CanvasRoute(): ReactNode {
   return (
     <>
       <RouteTitle href="/canvas" />
-      <CanvasScreen context={context} onBack={() => router.push('/session')} />
+      <CanvasScreen context={context} onBack={() => router.back()} />
     </>
   );
 }
