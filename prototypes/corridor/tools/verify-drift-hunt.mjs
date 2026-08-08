@@ -50,6 +50,15 @@ await ctx.addInitScript(() => {
   // semantic labels. The hooks observe real canvas calls; they do not reach
   // into Drift's closure or mutate its interaction state.
   window.__driftHuntCanvas = { hubs: [], labels: [] };
+  window.__driftHuntPointerDowns = [];
+  addEventListener('pointerdown', (event) => {
+    window.__driftHuntPointerDowns.push({
+      id: event.pointerId,
+      type: event.pointerType,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }, true);
   const cap = (items, item) => {
     items.push(item);
     if (items.length > 1200) items.splice(0, 600);
@@ -96,6 +105,41 @@ const M = (type, x, y) => cdp.send('Input.dispatchMouseEvent', {
   buttons: type === 'mousePressed' ? 1 : 0,
   clickCount: 1,
 });
+const runtimePointer = async (type, x, y, pointerId, isPrimary = false) => {
+  // CDP Input cannot encode a partial touch lift: touchEnd/touchCancel require
+  // an empty point list. Preserve the browser-generated active identities,
+  // then deliver the one changed PointerEvent through CDP Runtime so the app
+  // receives the exact A-up / B+C-move sequence without an invalid protocol
+  // payload or a guessed pointer id.
+  const expression = `(() => {
+    const target = document.elementFromPoint(${JSON.stringify(x)}, ${JSON.stringify(y)}) || document.body;
+    return target.dispatchEvent(new PointerEvent(${JSON.stringify(type)}, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerId: ${JSON.stringify(pointerId)},
+      pointerType: 'touch',
+      isPrimary: ${JSON.stringify(isPrimary)},
+      clientX: ${JSON.stringify(x)},
+      clientY: ${JSON.stringify(y)},
+      button: 0,
+      buttons: ${type === 'pointerup' ? 0 : 1},
+      pressure: ${type === 'pointerup' ? 0 : 0.5},
+    }));
+  })()`;
+  const result = await cdp.send('Runtime.evaluate', { expression, returnByValue: true });
+  if (result.exceptionDetails) throw new Error(`Runtime pointer dispatch failed: ${result.exceptionDetails.text}`);
+};
+const pointerIdAt = (x, y) => page.evaluate(({ x, y }) => {
+  let best = null;
+  let distance = Infinity;
+  for (const event of window.__driftHuntPointerDowns ?? []) {
+    if (event.type !== 'touch') continue;
+    const d = Math.hypot(event.x - x, event.y - y);
+    if (d < distance) { distance = d; best = event.id; }
+  }
+  return distance < 3 ? best : null;
+}, { x, y });
 const tap = async (x, y) => {
   await T('touchStart', [[x, y]]);
   await page.waitForTimeout(65);
@@ -134,6 +178,8 @@ const world = `(() => ({
   depth: document.getElementById('depth')?.textContent ?? '',
   card: document.getElementById('card')?.classList.contains('open') ?? false,
   radoc: document.getElementById('radoc')?.classList.contains('open') ?? false,
+  members: [...document.querySelectorAll('#drift-layer .word.bsat')]
+    .map((el) => el.querySelector('.base')?.textContent ?? '').filter(Boolean).sort(),
 }))()`;
 const anyWord = `(() => {
   for (const el of document.querySelectorAll('#drift-layer .word')) {
@@ -191,19 +237,24 @@ let w = await page.evaluate(anyWord);
 await tap(w.x, w.y);
 await page.waitForTimeout(900);
 let before = await page.evaluate(world);
-await T('touchStart', [[w.x + 120, w.y + 6]]);
-await T('touchStart', [[w.x + 120, w.y + 6], [w.x - 40, w.y + 170]]);
+await page.evaluate(`window.__driftHuntPointerDowns.length = 0`);
+const liftA = [w.x + 120, w.y + 6, 11];
+const liftB = [w.x - 40, w.y + 170, 12];
+const liftC = [w.x, w.y, 13];
+await T('touchStart', [liftA]);
+await T('touchStart', [liftA, liftB]);
 await page.waitForTimeout(60);
-await T('touchStart', [[w.x + 120, w.y + 6], [w.x - 40, w.y + 170], [w.x, w.y]]);
+await T('touchStart', [liftA, liftB, liftC]);
 await page.waitForTimeout(80);
-await T('touchEnd', [[w.x - 40, w.y + 170], [w.x, w.y]]);
+const liftAId = await pointerIdAt(liftA[0], liftA[1]);
+if (liftAId != null) await runtimePointer('pointerup', liftA[0], liftA[1], liftAId, true);
 await page.waitForTimeout(700);
 let after = await page.evaluate(world);
 let word = await page.evaluate(wordAt(w.w));
 check('hunt · a lifting pinch finger never grades the word beneath a third finger',
-  after.tray === before.tray && word.exists,
-  `tray "${before.tray}" → "${after.tray}", word present=${word.exists}`);
-await T('touchEnd', []);
+  liftAId != null && after.tray === before.tray && word.exists,
+  `A id=${liftAId}; tray "${before.tray}" → "${after.tray}", word present=${word.exists}`);
+await T('touchCancel', []);
 
 /* 2 · the radical explainer is a modal, not a hole (P0) — its taps must not
  * dismantle the dive stack, and its close button must be reachable. */
@@ -381,28 +432,55 @@ check('hunt · a walked planet is never culled by the recycler',
  * The legacy canvas fallback was visible but untouchable: tapping its label
  * hit water and dismantled the lock. A kana-only member must also be able to
  * become a centre whose same-level fallback has real members. */
-await boot();
-const lockStarted = await page.evaluate(`window.__lockWord?.('厳しい') === true`);
-await page.waitForTimeout(1400);
-const semanticTarget = await page.evaluate(`(() => {
+const semanticMember = (label) => page.evaluate((target) => {
   const el = [...document.querySelectorAll('#drift-layer .word')]
-    .find((n) => (n.querySelector('.base')?.textContent ?? '') === 'きつい');
+    .find((node) => (node.querySelector('.base')?.textContent ?? '') === target);
   if (el) {
     const r = el.getBoundingClientRect();
-    return { dom: true, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+    const x = r.x + r.width / 2;
+    const y = r.y + r.height / 2;
+    const hit = document.elementFromPoint(x, y);
+    return {
+      dom: true,
+      x,
+      y,
+      hitSelf: hit === el || el.contains(hit),
+      unfolded: el.classList.contains('unfolded'),
+      glossed: el.classList.contains('glossed'),
+    };
   }
   const now = performance.now();
   const ink = [...(window.__driftHuntCanvas?.labels ?? [])].reverse()
-    .find((p) => p.text === 'きつい' && now - p.at < 260);
-  return ink ? { dom: false, x: ink.x, y: ink.y } : null;
-})()`);
+    .find((point) => point.text === target && now - point.at < 260);
+  return ink ? { dom: false, hitSelf: false, x: ink.x, y: ink.y, unfolded: false, glossed: false } : null;
+}, label);
+await boot();
+const lockStarted = await page.evaluate(`window.__lockWord?.('厳しい') === true`);
+await page.waitForTimeout(1400);
+const semanticTarget = await semanticMember('きつい');
 const semanticBefore = await page.evaluate(world);
 await shot('07-semantic-member-before.png');
 if (semanticTarget) {
   await tap(semanticTarget.x, semanticTarget.y);
   await page.waitForTimeout(550);
 }
-const semanticAfterTap = await page.evaluate(world);
+const semanticRevealOne = await semanticMember('きつい');
+const semanticAfterOne = await page.evaluate(world);
+if (semanticRevealOne?.dom) {
+  await tap(semanticRevealOne.x, semanticRevealOne.y);
+  await page.waitForTimeout(500);
+}
+const semanticRevealTwo = await semanticMember('きつい');
+const semanticAfterTwo = await page.evaluate(world);
+check('hunt · a semantic canvas label is replaced by staged, hit-testable DOM interaction',
+  lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
+    semanticBefore.ctr === '厳しい' && semanticAfterOne.ctr === '厳しい' && semanticAfterTwo.ctr === '厳しい' &&
+    semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false &&
+    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true,
+  `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
+    `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false}, ` +
+    `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
+    `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"`);
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
 // fallback half of the hunt.
@@ -423,12 +501,9 @@ if (kanaTarget) {
 }
 const kanaFallback = await page.evaluate(world);
 await shot('07-semantic-dom-kana-fallback.png');
-check('hunt · semantic labels are touchable DOM and kana-only words grow a real fallback constellation',
-  lockStarted && semanticTarget?.dom === true &&
-    semanticBefore.ctr === '厳しい' && semanticAfterTap.ctr === '厳しい' && semanticAfterTap.sats > 0 &&
-    kanaFallback.ctr === 'きつい' && kanaFallback.sats >= 6,
-  `DOM=${semanticTarget?.dom ?? false}; short tap centre "${semanticBefore.ctr}" → "${semanticAfterTap.ctr}"; ` +
-    `kana fallback centre="${kanaFallback.ctr}", sats=${kanaFallback.sats}`);
+check('hunt · a kana-only semantic word grows a meaningful same-level fallback constellation',
+  kanaFallback.ctr === 'きつい' && kanaFallback.sats >= 6 && kanaFallback.members.length === kanaFallback.sats,
+  `centre="${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, members=${kanaFallback.members.join('・')}`);
 
 /* 8 · pointer identity is part of gesture authority. A mouse/foreign pointer
  * may not move a touch-held word, and changing the active pair after a third
@@ -449,6 +524,7 @@ await T('touchCancel', []);
 
 await boot();
 w = await page.evaluate(anyWord);
+await page.evaluate(`window.__driftHuntPointerDowns.length = 0`);
 const a0 = [45, 190, 31];
 const b0 = [145, 190, 32];
 const a1 = [35, 190, 31];
@@ -458,15 +534,17 @@ await T('touchStart', [a0, b0]);
 await T('touchMove', [a1, b1]);
 await page.waitForTimeout(180);
 const held = await page.evaluate(wordAt(w.w));
-await T('touchStart', [a1, b1, [held.x, held.y, 33]]);
+const c0 = [held.x, held.y, 33];
+await T('touchStart', [a1, b1, c0]);
 await page.waitForTimeout(70);
-await T('touchEnd', [a1]); // A leaves; B+C is a new pair
+const aPointer = await pointerIdAt(a0[0], a0[1]);
+const bPointer = await pointerIdAt(b0[0], b0[1]);
+const cPointer = await pointerIdAt(c0[0], c0[1]);
+if (aPointer != null) await runtimePointer('pointerup', a1[0], a1[1], aPointer, true);
 await page.waitForTimeout(100);
 const pinchBefore = await page.evaluate(wordAt(w.w));
-await T('touchMove', [
-  [b1[0] + 1, b1[1] + 1, 32],
-  [held.x + 1, held.y + 1, 33],
-]);
+if (bPointer != null) await runtimePointer('pointermove', b1[0] + 1, b1[1] + 1, bPointer);
+if (cPointer != null) await runtimePointer('pointermove', held.x + 1, held.y + 1, cPointer);
 await page.waitForTimeout(260);
 const pinchAfter = await page.evaluate(wordAt(w.w));
 const pinchScale = pinchBefore.exists && pinchAfter.exists && pinchBefore.width
@@ -474,9 +552,12 @@ const pinchScale = pinchBefore.exists && pinchAfter.exists && pinchBefore.width
   : Infinity;
 await shot('08-pointer-identity-pinch-rebase.png');
 await T('touchCancel', []);
-check('hunt · foreign pointermove cannot drag a held word and a replacement pinch pair rebases',
-  foreignDisplacement < 8 && pinchScale > 0.92 && pinchScale < 1.08,
-  `foreign-pointer displacement=${Number.isFinite(foreignDisplacement) ? foreignDisplacement.toFixed(1) : '∞'}px; ` +
+check('hunt · a foreign pointermove cannot drag a touch-held word',
+  foreignDisplacement < 8,
+  `foreign-pointer displacement=${Number.isFinite(foreignDisplacement) ? foreignDisplacement.toFixed(1) : '∞'}px`);
+check('hunt · a replacement pinch pair rebases before its first translated move',
+  aPointer != null && bPointer != null && cPointer != null && pinchScale > 0.92 && pinchScale < 1.08,
+  `browser ids A/B/C=${aPointer}/${bPointer}/${cPointer}; ` +
     `1px replacement-pair scale=${Number.isFinite(pinchScale) ? pinchScale.toFixed(3) : '∞'}×`);
 
 /* 9 · lifecycle clocks yield to an active finger even when it is perfectly
@@ -496,9 +577,12 @@ await shot('09-stationary-hold-lifecycle.png');
 if (stillWater) await T('touchEnd', []);
 check('hunt · a stationary active pointer prevents bloom lifecycle expiry beneath it',
   !!stillWater && heldBloomBefore.ctr !== null &&
-    heldBloomAfter.ctr === heldBloomBefore.ctr && heldBloomAfter.sats > 0,
+    heldBloomAfter.ctr === heldBloomBefore.ctr && heldBloomBefore.sats > 0 &&
+    heldBloomAfter.sats === heldBloomBefore.sats &&
+    JSON.stringify(heldBloomAfter.members) === JSON.stringify(heldBloomBefore.members),
   `water=${JSON.stringify(stillWater)}; centre "${heldBloomBefore.ctr}" → "${heldBloomAfter.ctr}", ` +
-    `sats=${heldBloomAfter.sats} after 11.2s`);
+    `sats=${heldBloomBefore.sats} → ${heldBloomAfter.sats}, ` +
+    `same identities=${JSON.stringify(heldBloomAfter.members) === JSON.stringify(heldBloomBefore.members)} after 11.2s`);
 
 /* 10 · release coordinates carry no authority without a delivered move.
  * A water-down/hub-up discontinuity must not dive. A genuine hub tap still
@@ -542,10 +626,13 @@ const afterThemeSurface = await page.evaluate(world);
 await shot('10-hub-release-theme-cleanup.png');
 check('hunt · hub release cannot hijack a gesture or leave themed ghost satellites',
   !!releaseWater && !!releaseHub && releaseAfter.depth === '' && releaseAfter.ctr === releaseBefore.ctr &&
+    releaseBefore.sats > 0 && releaseAfter.sats === releaseBefore.sats &&
+    JSON.stringify(releaseAfter.members) === JSON.stringify(releaseBefore.members) &&
     !!deliberateHub && deliberateDive.depth !== '' &&
     afterThemeSurface.depth === '' && afterThemeSurface.ctr === null && afterThemeSurface.sats === 0,
   `terminal ${Math.hypot((releaseHub?.x ?? 0) - (releaseWater?.x ?? 0), (releaseHub?.y ?? 0) - (releaseWater?.y ?? 0)).toFixed(0)}px: ` +
-    `depth="${releaseAfter.depth}", centre="${releaseAfter.ctr}"; deliberate depth="${deliberateDive.depth}"; ` +
+    `depth="${releaseAfter.depth}", centre="${releaseAfter.ctr}", sats=${releaseBefore.sats}→${releaseAfter.sats}, ` +
+    `same identities=${JSON.stringify(releaseAfter.members) === JSON.stringify(releaseBefore.members)}; deliberate depth="${deliberateDive.depth}"; ` +
     `after theme+surface centre="${afterThemeSurface.ctr}", sats=${afterThemeSurface.sats}`);
 
 check('hunt · no page errors across the regression battery', errs.length === 0, errs.slice(0, 2).join(' | '));
