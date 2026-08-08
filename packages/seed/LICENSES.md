@@ -230,6 +230,11 @@ third-party licence attaches. Provenance sources `bunki-authored-text`,
 
 This covers:
 
+- the permanent A1 source article `source-bunki-graded-n5-morning` (「静かな朝」),
+  copied without modification from the repository's existing Bunki v11
+  `original` article pool. Its committed body is pinned by sha256
+  `cb8535ea848848a58054d17582616abebe52deb5f26320f1af29d04bea1b99b2`;
+  no third-party source or attribution obligation attaches;
 - the integration passage `pas-bunki-01` (「分かれた道」) — hand-written for the
   §10 screen-5 contextual reuse canvas, explicitly labelled with this project as
   its author. It is not AI-generated bridging material under REQ-SRC-01(5), and

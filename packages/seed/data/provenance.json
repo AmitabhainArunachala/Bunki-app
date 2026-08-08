@@ -66,6 +66,19 @@
       "source_entry_id": null,
       "notes": "Japanese sentences, the integration passage, and grammar explanations composed for this project. Not sourced from Tatoeba or any corpus: Tatoeba's hosts were unreachable from this build session (LICENSES.md, deferred item D-2), and inventing sentence ids or contributor names would have been fabrication. These are original compositions and carry no third-party attribution obligation."
     },
+    "bunki-v11-original-reading": {
+      "source": "Bunki v11 reading catalog (original project-authored article)",
+      "source_version": "bunki-graded-n5-morning@cb8535ea848848a58054d17582616abebe52deb5f26320f1af29d04bea1b99b2",
+      "license": "pending operator decision (OD-09) — original work of this project, no third-party licence attaches",
+      "attribution": "Bunki original text — 「静かな朝」",
+      "modification_status": "unmodified",
+      "confidence": "high",
+      "review_status": "reviewed-in-project",
+      "source_url": null,
+      "retrieved_at": "2026-08-09",
+      "source_entry_id": "bunki-graded-n5-morning",
+      "notes": "Copied byte-for-byte from the repository's existing original article pool at prototypes/corridor/data/articles/bunki-graded-n5-morning.json. The seed test pins the UTF-8 sha256 and compares the committed source body to that authoritative pool record."
+    },
     "bunki-selection": {
       "source": "Bunki Phase-0 seed (selection decision by this project)",
       "source_version": "1.0.0",
