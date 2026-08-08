@@ -48,11 +48,15 @@ import type {
   DerivedState,
   DomainEvent,
   DomainEventType,
+  LearnContractPairSpecification,
+  LookupContext,
+  LookupTargetRef,
   MintedEventBatch,
   PromotionState,
   ProvenanceRecord,
   RetrievalSkill,
   SourceRef,
+  Span,
   ThreadState,
 } from '@bunki/domain';
 
@@ -230,7 +234,15 @@ export interface AppSnapshot {
 
 export interface CaptureCommand {
   readonly kind: 'capture';
+  /** Full source body retained verbatim on `EncounterCaptured`. */
   readonly text: string;
+  /**
+   * Frozen half-open UTF-16 coordinates into `text` (ADR-002).
+   *
+   * When present, this exact substring — not the source body — is the target
+   * used for display, thread/component identity, rehydration and idempotency.
+   */
+  readonly span?: Span | undefined;
   readonly sourceRef: SourceRef;
   readonly provenance: ProvenanceRecord;
   /** The one-gesture mark, or `null` when the learner did not mark anything. */
@@ -243,6 +255,36 @@ export interface PromoteCommand {
   readonly kind: 'promote';
   readonly threadId: string;
   readonly to: PromotionState;
+}
+
+/**
+ * The one explicit learner gesture that activates the Phase-A1 Learn pair.
+ *
+ * The app supplies versioned reading and meaning definitions as data; the
+ * domain derives stable ids, validates the pair, and mints `ContractCreated`.
+ * `userAction` is a literal and is checked again at runtime so an untyped
+ * caller cannot turn a view mount or model suggestion into review debt.
+ */
+export interface ActivateLearnCommand {
+  readonly kind: 'activateLearn';
+  readonly userAction: true;
+  readonly threadId: string;
+  readonly specification: LearnContractPairSpecification;
+}
+
+/**
+ * Record one deliberate quick look as fluency friction, never as a grade.
+ *
+ * `lookupId` identifies the gesture across double dispatch and reload. A later
+ * quick look receives a new id; the store never collapses all lookups for a
+ * target into one lifetime event.
+ */
+export interface RecordLookupFrictionCommand {
+  readonly kind: 'recordLookupFriction';
+  readonly userAction: true;
+  readonly lookupId: string;
+  readonly targetRef: LookupTargetRef;
+  readonly context: LookupContext;
 }
 
 /**
@@ -382,6 +424,8 @@ export interface RecordExportCommand {
 export type AppCommand =
   | CaptureCommand
   | PromoteCommand
+  | ActivateLearnCommand
+  | RecordLookupFrictionCommand
   | MarkUncertaintyCommand
   | AttachCandidateCommand
   | AcceptCandidateCommand
@@ -404,6 +448,8 @@ export type AppCommand =
 export const APP_COMMAND_KINDS = [
   'capture',
   'promote',
+  'activateLearn',
+  'recordLookupFriction',
   'markUncertainty',
   'attachCandidate',
   'acceptCandidate',

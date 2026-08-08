@@ -25,7 +25,11 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createDeterministicContext, type DomainContext } from '@bunki/domain';
+import {
+  createDeterministicContext,
+  type DomainContext,
+  type LearnContractPairSpecification,
+} from '@bunki/domain';
 
 import { createDurableAppStore, durabilityFor } from '../src/state/durable-store.ts';
 import { openAppEventStore, type OpenedAppEventStore } from '../src/state/persistence/index.ts';
@@ -38,6 +42,27 @@ const PROVENANCE = {
   modificationStatus: 'unmodified',
   reviewStatus: 'unreviewed',
 } as const;
+
+const LEARN_SPEC: LearnContractPairSpecification = {
+  specificationId: 'durable:lexeme-bunki',
+  specificationVersion: 1,
+  reading: {
+    cueModality: 'text',
+    responseModality: 'text',
+    gradingMethod: { kind: 'accepted_answers', acceptedAnswers: ['ぶんき'] },
+    hintPolicy: { hintsAllowed: true, maxHints: 1 },
+    revealPolicy: { revealAllowed: true, revealIsRecorded: true },
+    promptFamilyVersion: 'durable-reading@1',
+  },
+  meaning: {
+    cueModality: 'text',
+    responseModality: 'choice',
+    gradingMethod: { kind: 'accepted_answers', acceptedAnswers: ['branching'] },
+    hintPolicy: { hintsAllowed: true, maxHints: 1 },
+    revealPolicy: { revealAllowed: true, revealIsRecorded: true },
+    promptFamilyVersion: 'durable-meaning@1',
+  },
+};
 
 const capture = (text: string, overrides: Partial<CaptureCommand> = {}): CaptureCommand => ({
   kind: 'capture',
@@ -174,6 +199,53 @@ describe('T-01 / T-16-web — a capture survives a reload of the app', () => {
     expect(repeat.threadId).toBe(ack.threadId);
     expect(second.store.getSnapshot().threads).toHaveLength(1);
     expect(second.store.readAll()).toHaveLength(1);
+  });
+
+  it('durably replays span identity, explicit Learn contracts, and lookup friction', async () => {
+    const snapshotStore = newSnapshotStore();
+    const text = '今日の分岐で道を選ぶ。';
+    const span = { start: text.indexOf('分岐'), end: text.indexOf('分岐') + 2 };
+    const captureCommand = capture(text, { span });
+
+    const first = await launch(snapshotStore, 'run1-');
+    const captured = first.store.execute(captureCommand);
+    const learnCommand = {
+      kind: 'activateLearn',
+      userAction: true,
+      threadId: captured.threadId,
+      specification: LEARN_SPEC,
+    } as const;
+    const lookupCommand = {
+      kind: 'recordLookupFriction',
+      userAction: true,
+      lookupId: 'durable-lookup-1',
+      targetRef: { targetType: 'thread', targetId: captured.threadId },
+      context: 'reading',
+    } as const;
+    first.store.execute(learnCommand);
+    first.store.execute(lookupCommand);
+    await first.flush();
+
+    const durableIds = (await first.eventStore.readAll()).map((event) => event.eventId);
+    expect(durableIds).toEqual(first.store.readAll().map((event) => event.eventId));
+
+    const second = await launch(snapshotStore, 'run2-');
+    expect(second.store.getSnapshot().threadsById[captured.threadId]).toMatchObject({
+      displayText: '分岐',
+      targetKey: '分岐',
+      state: { promotion: 'learn' },
+    });
+    expect(second.store.readDerived().contracts).toHaveLength(2);
+    expect(second.store.readDerived().memoryStates).toHaveLength(2);
+    expect(second.store.readDerived().gateDecisions.at(-1)?.reason).toBe(
+      'lookup_is_friction_not_a_grade',
+    );
+
+    expect(second.store.execute(captureCommand).deduplicated).toBe(true);
+    expect(second.store.execute(learnCommand).deduplicated).toBe(true);
+    expect(second.store.execute(lookupCommand).deduplicated).toBe(true);
+    await second.flush();
+    expect(second.store.readAll().map((event) => event.eventId)).toEqual(durableIds);
   });
 
   it('reports device-local durability once an adapter is behind it', async () => {
