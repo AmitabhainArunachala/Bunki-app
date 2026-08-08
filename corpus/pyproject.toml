@@ -22,6 +22,10 @@ yasashii = ["pdfplumber>=0.11"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"corpus.grading" = ["*.json"]
+"corpus.grading.ninjal" = ["PROVENANCE.yml"]
+
 [tool.pytest.ini_options]
 markers = [
     "realdata: needs downloaded upstream data; run locally, excluded in CI",
