@@ -267,8 +267,8 @@ Drift was attacked. Specifically invited:
 - anything the canon already settles that this document contradicts —
   that is a bug in this document.
 
-Tracking issue for comments: see the issue linked from PR #65. Revisions
-land as commits to this file with the reason in the message.
+Tracking issue for comments: **#66** (RFC: the KAIRO Excellence Spec).
+Revisions land as commits to this file with the reason in the message.
 
 ---
 
