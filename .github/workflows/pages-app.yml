@@ -75,6 +75,8 @@ jobs:
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
+                prototypes/corridor/drift-layer.css \
+                prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
                 prototypes/corridor/vendor \
                 "$SITE/corridor"/
@@ -109,6 +111,41 @@ jobs:
           } > "$SITE/404.html"
 
           echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
+
+      - name: Smoke-test packaged Corridor assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory "$SITE_DIR" \
+            >"$RUNNER_TEMP/corridor-smoke.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          node --input-type=module <<'NODE'
+          const paths = [
+            'corridor/',
+            'corridor/corridor.css',
+            'corridor/corridor.js',
+            'corridor/drift-layer.css',
+            'corridor/drift-layer.js',
+            'corridor/vendor/ts-fsrs.mjs',
+            'corridor/data/manifest.json',
+            'corridor/data/articles/index.json',
+          ];
+          for (const path of paths) {
+            let response;
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+              try {
+                response = await fetch(`http://127.0.0.1:8765/${path}`);
+                break;
+              } catch {
+                await new Promise((accept) => setTimeout(accept, 100));
+              }
+            }
+            if (!response?.ok) throw new Error(`${path} -> ${response?.status ?? 'unreachable'}`);
+            console.log(`${response.status} /${path}`);
+          }
+          NODE
 
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4
