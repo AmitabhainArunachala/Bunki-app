@@ -241,6 +241,34 @@ h1.view-title {
   border-style: dashed;
 }
 
+/* ------------------------------------------------- the drift entry door
+ * One door out of the universe into the shelf. Sits above the drift layer
+ * (z 15) and beneath the sheets; indigo = "you can go here". */
+.drift-door {
+  position: fixed;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 22;
+  min-height: 44px;
+  min-width: 84px;
+  padding: 10px 18px;
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: #fcfbf6;
+  background: var(--ai, #2e4d6e);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(27, 42, 58, 0.28);
+  cursor: pointer;
+}
+.drift-door .en-sub {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+}
+
 .sig-val {
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);

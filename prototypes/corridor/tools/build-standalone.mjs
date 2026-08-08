@@ -45,8 +45,13 @@ const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
 
 const fragment = process.argv.includes('--fragment');
 
+// the drift layer self-mounts and sleeps until the corridor wakes it; its
+// emitter asserts the file carries no "</script" sequence, so inlining is safe
 const BODY = `<div id="app"></div>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
+<script>
+${read('drift-layer.js')}
+</script>
 <script type="module">
 ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
@@ -61,6 +66,7 @@ ${read('corridor.js')}
 const fragmentHtml = `<title>回廊 KAIRO — corridor prototype</title>
 <style>
 ${read('corridor.css')}
+${read('drift-layer.css')}
 </style>
 ${BODY}
 `;
@@ -77,11 +83,15 @@ const html = `<!doctype html>
 <title>回廊 KAIRO — corridor prototype</title>
 <style>
 ${read('corridor.css')}
+${read('drift-layer.css')}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
+<script>
+${read('drift-layer.js')}
+</script>
 <script type="module">
 ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
