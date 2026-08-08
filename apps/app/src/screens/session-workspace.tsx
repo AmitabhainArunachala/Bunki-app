@@ -38,6 +38,8 @@ import { SessionWorkspaceContext, useOwnSessionLoop, type SessionLoop } from './
 export interface SessionWorkspaceProviderProps {
   readonly children: ReactNode;
   readonly context: DomainContext;
+  /** Pins a guided source loop to its exact durable thread. */
+  readonly preferredThreadId?: string | undefined;
   /** Handed every event the session produced, for the WP-10 integration. */
   readonly onEvents?: ((events: readonly DomainEvent[]) => void) | undefined;
 }
@@ -45,9 +47,10 @@ export interface SessionWorkspaceProviderProps {
 export function SessionWorkspaceProvider({
   children,
   context,
+  preferredThreadId,
   onEvents,
 }: SessionWorkspaceProviderProps): ReactNode {
-  const loop = useOwnSessionLoop({ context, onEvents });
+  const loop = useOwnSessionLoop({ context, onEvents, preferredThreadId });
   return (
     <SessionWorkspaceContext.Provider value={loop}>{children}</SessionWorkspaceContext.Provider>
   );
