@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "verifier": "verify-corridor-accessibility.mjs",
+  "head": "9cd60c1577ef18cc90717b9b3ec1abb4768d8bf1",
+  "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "summary": {
+    "total": 17,
+    "passed": 5,
+    "failed": 12
+  },
+  "results": [
+    {
+      "name": "reader words are named native controls on the common target.activate action",
+      "pass": false,
+      "detail": "{\"words\":344,\"particles\":144,\"nativeButtons\":0,\"named\":0,\"actionKinds\":[]}"
+    },
+    {
+      "name": "focused word exposes quick-look and full-entry non-hold alternatives",
+      "pass": false,
+      "detail": "{\"tokenFocused\":false,\"alternatives\":0,\"hiddenTabStops\":0}"
+    },
+    {
+      "name": "hidden Corridor controls leave the tab order",
+      "pass": true,
+      "detail": "0 hidden tab stop(s)"
+    },
+    {
+      "name": "pointer action one reveals reading and action two reveals English",
+      "pass": true,
+      "detail": "{\"afterFirst\":{\"lit\":true,\"gloss\":false},\"afterSecond\":{\"lit\":true,\"gloss\":true}}"
+    },
+    {
+      "name": "second-action English preserves the glyph anchor within 2px",
+      "pass": false,
+      "detail": "592.5px → 595.8px"
+    },
+    {
+      "name": "pointer third target.activate carries into the full entry",
+      "pass": false,
+      "detail": ""
+    },
+    {
+      "name": "pointer route emits target.activate envelopes with pointer provenance",
+      "pass": false,
+      "detail": "0 receipt(s)"
+    },
+    {
+      "name": "keyboard/switch-shaped activation follows the same three target.activate transitions",
+      "pass": false,
+      "detail": "focusable=false sheet=0"
+    },
+    {
+      "name": "keyboard route differs only in provenance",
+      "pass": false,
+      "detail": "0 receipt(s)"
+    },
+    {
+      "name": "particle pointer tap stays inert in reading rhythm",
+      "pass": true,
+      "detail": "{\"sheet\":0,\"reveal\":false}"
+    },
+    {
+      "name": "particle exposes a keyboard/switch/screen-reader full-entry alternative",
+      "pass": false,
+      "detail": "direct door=false"
+    },
+    {
+      "name": "entry sheet is a named modal dialog and receives focus",
+      "pass": false,
+      "detail": "{\"role\":null,\"modal\":null,\"name\":null,\"focusInside\":false,\"focusables\":11}"
+    },
+    {
+      "name": "Tab is contained inside the modal sheet",
+      "pass": false,
+      "detail": ""
+    },
+    {
+      "name": "Escape dismisses the sheet and returns focus to its invoking token",
+      "pass": false,
+      "detail": "{\"closed\":false,\"returned\":false}"
+    },
+    {
+      "name": "reduced-motion removes Corridor animation and transition motion",
+      "pass": false,
+      "detail": "{\"sheet\":{\"animationName\":\"rise\",\"animationDuration\":\"0.22s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"scrim\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"ruby\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0.18s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "real walk requested no missing Corridor assets",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walk emitted no console/page errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "screenshots": [
+    "screenshots/01-reader-focus-alternatives.png",
+    "screenshots/02-named-entry-dialog.png",
+    "screenshots/03-reduced-motion-dialog.png"
+  ]
+}
