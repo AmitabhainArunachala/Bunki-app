@@ -48,7 +48,9 @@
  * adding a real edge — an explicit decision, exactly as WP-02 asked for.
  */
 
+import { EventValidationError } from '../errors.ts';
 import type { EncounterCapturedEvent } from '../events/catalog.ts';
+import { nonEmptyString, spanSchema, type Span } from '../events/shared.ts';
 import type { ComponentId } from '../primitives.ts';
 
 /**
@@ -63,6 +65,42 @@ import type { ComponentId } from '../primitives.ts';
 export const COMPONENT_ID_PREFIX = 'kc:';
 
 /**
+ * Resolve a prospective capture's exact target before the event is minted.
+ *
+ * App idempotency and thread lookup happen before `EncounterCaptured` exists,
+ * so they cannot call {@link targetKeyOfEncounter}. This applies the same
+ * frozen UTF-16 coordinate rules as the event schema and throws the same typed
+ * validation error family instead of relying on `String.slice`'s clamping.
+ */
+export function targetTextOfCapture(text: string, span: Span | undefined): string {
+  const textResult = nonEmptyString.safeParse(text);
+  if (!textResult.success) {
+    throw new EventValidationError(
+      'EncounterCaptured',
+      textResult.error.issues.map((issue) => ({ path: 'text', message: issue.message })),
+    );
+  }
+  if (span === undefined) return text;
+
+  const spanResult = spanSchema.safeParse(span);
+  if (!spanResult.success) {
+    throw new EventValidationError(
+      'EncounterCaptured',
+      spanResult.error.issues.map((issue) => ({
+        path: ['span', ...issue.path.map(String)].join('.'),
+        message: issue.message,
+      })),
+    );
+  }
+  if (spanResult.data.end > text.length) {
+    throw new EventValidationError('EncounterCaptured', [
+      { path: 'span', message: 'span must lie inside text' },
+    ]);
+  }
+  return text.slice(spanResult.data.start, spanResult.data.end);
+}
+
+/**
  * The target a capture is about.
  *
  * With a span, the target is the selected substring; without one, the learner
@@ -73,8 +111,7 @@ export const COMPONENT_ID_PREFIX = 'kc:';
  * the disagreement would only surface on text outside the BMP.
  */
 export function targetKeyOfEncounter(event: EncounterCapturedEvent): string {
-  if (event.span === undefined) return event.text;
-  return event.text.slice(event.span.start, event.span.end);
+  return targetTextOfCapture(event.text, event.span);
 }
 
 /** The canonical Phase-0 KnowledgeComponent id for a target key. */

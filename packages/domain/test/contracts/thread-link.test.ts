@@ -27,6 +27,7 @@ import {
   parseEvent,
   parseEventLog,
   resolveComponentThread,
+  targetTextOfCapture,
   targetKeyOfComponentId,
   targetKeyOfEncounter,
   type EncounterCapturedEvent,
@@ -38,6 +39,18 @@ const parseCapture = (raw: Record<string, unknown>): EncounterCapturedEvent =>
   parseEvent(raw) as EncounterCapturedEvent;
 
 describe('component identity is derived from the captured target', () => {
+  it('selects exact frozen UTF-16 coordinates before an event exists', () => {
+    expect(targetTextOfCapture('今日の分岐で道を選ぶ。', { start: 3, end: 5 })).toBe('分岐');
+  });
+
+  it('fails closed on invalid input coordinates instead of letting slice guess', () => {
+    expect(() => targetTextOfCapture('分岐', { start: 0, end: 9 })).toThrow(
+      /span must lie inside text/,
+    );
+    expect(() => targetTextOfCapture('分岐', { start: 1, end: 1 })).toThrow(/strictly less/);
+    expect(() => targetTextOfCapture('', undefined)).toThrow(/text/);
+  });
+
   it('a span selects the target', () => {
     const event = parseCapture(capture());
     expect(targetKeyOfEncounter(event)).toBe(TARGET);
