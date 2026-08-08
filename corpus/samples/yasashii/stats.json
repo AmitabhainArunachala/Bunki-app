@@ -1,0 +1,13 @@
+{
+  "artifact_kinds": {},
+  "duplicate_entry_numbers": [],
+  "entries_extracted": 134,
+  "entries_with_artifacts": 0,
+  "entries_with_ruby": 134,
+  "expected_entries": 134,
+  "missing_entry_numbers": [],
+  "pct_entries_with_artifacts": 0.0,
+  "pct_entries_with_ruby": 100.0,
+  "pdf_sha256": "c196267844463a0966f8db7e4619f1777dc6b7e178d0976bfff69dfb6ef9bbb9",
+  "total_ruby_runs": 1149
+}
