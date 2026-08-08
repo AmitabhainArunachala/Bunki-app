@@ -248,6 +248,7 @@ const wordProbe = (label) => `(() => {
       x: r.x + r.width / 2, y: r.y + r.height / 2,
       onScreen: r.width > 0 && r.right > 0 && r.left < 390 && r.bottom > 96 && r.top < 780,
       opacity: op,
+      pe: el.style.pointerEvents || '',
       unfolded: el.classList.contains('unfolded') || el.classList.contains('glossed'),
       glossed: el.classList.contains('glossed'),
       isCentre: el.classList.contains('bctr'),
@@ -393,9 +394,26 @@ for (let round = 0; round < N_WORDS; round++) {
     if (!word) break;
   }
   tested.add(word.w);
-  const at = await page.evaluate(wordProbe(word.w));
+  let at = await page.evaluate(wordProbe(word.w));
   if (!at.exists || !at.onScreen) continue;
   matrixWordsTested++;
+
+  // The field drifts between probe and touch, and words overlap. Aiming from
+  // a stale coordinate lands the tap on a neighbour and reports the innocent
+  // word "dead" — a missed aim is not a defect, so confirm what is under the
+  // finger before pressing, and re-aim if the field moved.
+  let aimed = false;
+  for (let a = 0; a < 3 && !aimed; a++) {
+    at = await page.evaluate(wordProbe(word.w));
+    if (!at.exists || !at.onScreen) break;
+    aimed = await page.evaluate(`(() => {
+      const el = document.elementFromPoint(${at.x}, ${at.y});
+      const w = el && el.closest ? el.closest('.word') : null;
+      return !!w && (w.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(word.w)};
+    })()`);
+    if (!aimed) await page.waitForTimeout(180);
+  }
+  if (!aimed) continue;   // never reached the word: no case, no verdict
 
   // C1/C2 — tap: unfold + bloom (every word, kana included)
   await tapAt(at.x, at.y);
@@ -404,7 +422,17 @@ for (let round = 0; round < N_WORDS; round++) {
   let w0 = await page.evaluate(worldProbe);
   if (!s.exists) await file(word, 'tap', 'unfold+bloom', 'vanished', 'word gone after a tap');
   else if (w0.depthOpen) await file(word, 'tap', 'unfold+bloom', 'misfired', 'single tap dived');
-  else if (!s.unfolded) await file(word, 'tap', 'unfold+bloom', 'dead', 'no furigana');
+  else if (!s.unfolded) {
+    const forensic = await page.evaluate(`(() => {
+      const copies = [...document.querySelectorAll('#drift-layer .word')]
+        .filter((n) => (n.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(word.w)})
+        .map((n) => ({ cls: n.className, op: n.style.opacity, pe: n.style.pointerEvents }));
+      const el = document.elementFromPoint(${at.x}, ${at.y});
+      return { copies, under: el ? (el.closest('.word') ? 'word:' + (el.closest('.word').querySelector('.base')?.textContent ?? '') : el.tagName + '#' + el.id) : null,
+               unfoldedNow: [...document.querySelectorAll('#drift-layer .word.unfolded')].map((n) => n.querySelector('.base')?.textContent) };
+    })()`);
+    await file(word, 'tap', 'unfold+bloom', 'dead', `no furigana (op=${at.opacity.toFixed(2)}->${s.opacity.toFixed(2)}) ${JSON.stringify(forensic)}`);
+  }
   else if (w0.bloomCentre !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no constellation (sats=${w0.sats})`);
   else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites`);
 
@@ -413,14 +441,27 @@ for (let round = 0; round < N_WORDS; round++) {
   // C1 — second tap: gloss, still here
   if (s.exists) {
     s = await page.evaluate(wordProbe(word.w));
-    if (s.exists && s.onScreen) {
+    // the bloom's assembly easing keeps moving the centre for a beat after the
+    // first tap: confirm the finger is still over the word before the second
+    let aimed2 = false;
+    for (let a = 0; a < 3 && !aimed2; a++) {
+      s = await page.evaluate(wordProbe(word.w));
+      if (!s.exists || !s.onScreen) break;
+      aimed2 = await page.evaluate(`(() => {
+        const el = document.elementFromPoint(${s.x}, ${s.y});
+        const w = el && el.closest ? el.closest('.word') : null;
+        return !!w && (w.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(word.w)};
+      })()`);
+      if (!aimed2) await page.waitForTimeout(180);
+    }
+    if (s.exists && s.onScreen && aimed2) {
       await tapAt(s.x, s.y);
       await page.waitForTimeout(500);
       const s2 = await page.evaluate(wordProbe(word.w));
       const w2 = await page.evaluate(worldProbe);
       if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'gloss', 'vanished', '');
       else if (w2.depthOpen) await file(word, 'tap-again', 'gloss', 'misfired', 'second tap dived (third act came early)');
-      else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', 'no English');
+      else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', `no English (op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
       else await file(word, 'tap-again', 'gloss', 'ok', '');
     }
   }

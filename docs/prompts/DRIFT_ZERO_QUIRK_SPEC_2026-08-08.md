@@ -125,3 +125,90 @@ internals, data-tier growth, new features not required by an invariant.
   held/centred planet may be flick-judged — satellites can never be
   accidentally graded. On the free field the v1 grammar stands: any word.
 - **Q3 — scope: RATIFIED.** Drift + its doors into the corridor.
+
+---
+
+## 7. The four spend-killed claims: re-hunted and closed (2026-08-08)
+
+When the first adversarial workflow ran, four of its twelve verification
+agents died on the account's monthly spend limit (kana strata ×2, camera ×2).
+Those four claims were recorded as UNVERIFIED — not cleared. They were
+re-hunted against `e8be255` under the same default-refute discipline.
+
+### Verdicts on the claims as filed
+
+| claim                                                           | verdict                                                                                                           |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| kana-only words are dead nodes                                  | **reproduced** (all three parts, reframed)                                                                        |
+| a third finger during a pinch teleports the held word 127px     | **refuted** — closed by the `gestureId` fix at `drift-artifact.html:1817`; measured 0.7px against a 0.2px control |
+| a locked constellation self-releases under a static held finger | **refuted** — the lock is exempt from the fade (`!lockOn`); held 25s, still locked 12s after release              |
+| a release tap over a hub sun hijacks into a dive                | **reproduced**, narrower than reported                                                                            |
+
+Two refutations are as valuable as the reproductions: they record that a
+previous fix genuinely closed a hole, measured rather than assumed.
+
+### What the probes found underneath
+
+Three of the four investigations surfaced defects that were not the claim.
+Seven fixes landed, six of them in or adjacent to `constellationLock` and the
+pointerup water path — one cluster, not seven accidents.
+
+1. **Headless lock (P1).** `constellationLock` opened with a bare
+   `clearBloom()`, so the node it was promoting to centre was still in the old
+   FOCUS with `fromBloom=true` and was removed 500ms later. `bloomFocus` had
+   always passed `keep`. Violated I3.
+2. **Fat-finger forgiveness was dead code under a lock (P1).**
+   `if(lockOn){clearBloom();return;}` returned _before_ the 44px block, so
+   while a lock was on every near-miss razed instead of forgiving.
+3. **Lock members were canvas paint, bloom members were real words (P1).**
+   `bloomFocus` materializes a dot into a touchable word; `constellationLock`
+   had no such branch. Measured: 0 DOM `.bsat` under a lock, 16 after the fix.
+   Same gesture family, different substance — the inconsistency of feel, at
+   the mechanism.
+4. **Ghost labels could not answer, and razed the constellation when
+   touched (P1).** SEM relations with no corpus headword — every kana-only
+   relative and every collocation — were `fctx.fillText` with no hit area.
+   The fix required no invented data: **SEM entries are 3-tuples and the lock
+   code was discarding `se[2]`, a hand-authored English gloss.** They now
+   enter as real words carrying their surface and that gloss. No reading is
+   fabricated: kana needs none and a collocation's is not ours to guess, so a
+   word with no reading skips the furigana stage and answers with its gloss at
+   once.
+5. **The hub-sun door outranked the release (P1).** With a constellation held,
+   a release landing within 34px of a hub became a dive. Submerged, the bloom
+   was _unreachable_ — every water tap at depth surfaces before it releases —
+   and returned at full presence on surfacing, silently undoing the release.
+   The door now sits below the release, and `diveKanji` clears the bloom the
+   way `diveWord` always has.
+6. **`diveWord`/`diveKanji` destroyed the node being dived into.** Latent
+   before, reachable once lock members became real nodes: both now pass the
+   dive target as `keep`.
+7. **A held finger counted as inactivity (P2).** `bloomLast` was written only
+   in pointer handlers, so a perfectly static touch let the 10s fade expire
+   under the learner's own finger; a 1px jiggle kept it alive forever.
+
+### The ownership hole the pinch refutation exposed (P1)
+
+`pointerup` has checked gesture ownership since the `gestureId` fix;
+`pointermove` never did. `px,py` belong to the gesture owner while
+`e.clientX,e.clientY` belong to whatever pointer sent the event. `#lvl` and
+`#card` `stopPropagation` on pointerdown but not on pointermove, so their
+finger was invisible to the touch set while its every move still reached the
+drag branch. Measured tear: 163.7px against a 53px orbit baseline.
+
+### Instrumentation
+
+Six new permanent rows in `tools/verify-drift-hunt.mjs` (8 → 14 checks). Each
+was proven failing-case-first: run against the pre-fix tree, all six fail;
+against the fixed tree, all six pass. The hub check discovers a real hub by
+probing — a water tap that dives with nothing held _is_ a hub centre — rather
+than asserting against a hard-coded coordinate.
+
+Corpus defect found by surfacing the data: SEM carried `海water` where 海水
+was meant. Invisible while it was canvas paint; a real word the moment it
+could be read. Corrected — it was the only such entry in 718 relations.
+
+### Still open before this spec can close
+
+A1 (two consecutive full-matrix dry runs), A2 (25-hop chain), A3 (seeded fuzz
+×3), A4 (soak), A6 (the operator's own walk).
