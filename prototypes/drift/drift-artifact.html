@@ -909,7 +909,7 @@ let unfolded=null, divedOnce=false;
 const FOCUS=[]; let focusN=null;
 let bloomBorn=0; let bloomLast=0;
 function bloomFocus(n){
-  clearBloom();
+  clearBloom(n.el?n:undefined);
   bloomBorn=performance.now(); bloomLast=bloomBorn;
   focusN=n;
   const ks=[...n.w].filter(isKanji);
@@ -953,6 +953,13 @@ function bloomFocus(n){
   cands.sort((a,b)=>b[0]-a[0]);
   const N2=Math.min(14,cands.length);
   if(!N2){focusN=null;return;}
+  // the constellation centres itself: if its planet sits near an edge (a
+  // chain re-centre lands wherever the satellite was), the camera glides
+  if(n.wx!=null&&stack.length===0){
+    const sN=w2s(n.wx,n.wy);
+    if(sN.x<vw()*0.24||sN.x>vw()*0.76||sN.y<vh()*0.26||sN.y>vh()*0.72)
+      camT={x:n.wx,y:n.wy};
+  }
   for(let i=0;i<N2;i++){
     const wr=cands[i][1];
     wr.hl=true; wr.ret=false;
@@ -978,13 +985,13 @@ function bloomFocus(n){
 }
 let lockOn=false;
 const LOCKG=[];
-function clearBloom(){
+function clearBloom(keep){
   if(focusN&&focusN.el){focusN.el.classList.remove("bctr"); focusN.top=focusN.baseOp;}
   for(const wr of FOCUS){
     wr.hl=false; wr.ret=true;
     if(wr.node){
       wr.node.hlDom=false; wr.node.el.classList.remove("bsat");
-      if(wr.node.fromBloom&&!wr.node.gone){
+      if(wr.node.fromBloom&&!wr.node.gone&&wr.node!==keep){
         const bn=wr.node;
         bn.gone=true; bn.top=0; bn.el.style.pointerEvents="none";
         removeNode(bn,500); wr.node=null;
@@ -1159,8 +1166,11 @@ function lockForce(){
   }
 }
 function collapseUnfold(){
-  if(!lockOn) clearBloom();
-  if(unfolded){unfolded.el.classList.remove("unfolded","glossed"); unfolded=null;}
+  // fold EVERY revealed word — a single tracked node let stale glossed
+  // states linger, making a later "first tap" jump straight to the dive
+  for(const el of document.querySelectorAll(".word.unfolded,.word.glossed"))
+    el.classList.remove("unfolded","glossed");
+  unfolded=null;
 }
 let loopMark=false;
 function markDive(label){
@@ -1710,6 +1720,19 @@ function tapNode(n){
   if(lvl&&lvl.center===n){ openCard(n); return; }
   if(n.kind==="glyph"){ diveKanji(n); return; }
   if(n.kind==="part"){ divePart(n); return; }
+  const isSat=n.kind==="word"&&stack.length===0&&!lockOn&&FOCUS.length&&n!==focusN&&n.hlDom;
+  if(isSat&&!n.el.classList.contains("unfolded")){
+    // ratified Q1: a satellite tap reveals it in place — reading and gloss
+    // together, never destruction; the second tap makes it the planet
+    collapseUnfold();
+    n.el.classList.add("unfolded","glossed"); unfolded=n;
+    bloomLast=performance.now();
+    return;
+  }
+  if(isSat){
+    bloomFocus(n);   // the chain walk: the satellite becomes the planet
+    return;
+  }
   if(!n.el.classList.contains("unfolded")){
     collapseUnfold();
     n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana
@@ -1741,6 +1764,7 @@ function pinchDive(mid){
   else diveWord(best);
 }
 addEventListener("pointerdown",e=>{
+  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(FOCUS.length) bloomLast=performance.now();
   if(touches.size===2){
@@ -1849,7 +1873,13 @@ function endPointer(e){
   touches.delete(e.pointerId);
   if(touches.size<2) pinch=null;
 }
-addEventListener("pointercancel",endPointer,{passive:true});
+function cancelPointer(e){
+  endPointer(e);
+  touches.clear(); pinch=null; pn=null;
+  gestureActive=false; moved=false;
+  clearTimeout(lpTimer); lpFired=false;
+}
+addEventListener("pointercancel",cancelPointer,{passive:true});
 addEventListener("pointerup",e=>{
   endPointer(e);
   if(FOCUS.length) bloomLast=performance.now();
@@ -1866,8 +1896,9 @@ addEventListener("pointerup",e=>{
     // the judgment is a FLICK — fast and horizontal. A slow drag is a MOVE:
     // the word (and its constellation) goes where the finger left it.
     const flick=(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
-    if(flick&&dx<-52){grade(n,-1);return;}
-    if(flick&&dx>52){grade(n,1);return;}
+    const mayGrade=!FOCUS.length||n===focusN;
+    if(flick&&dx<-52&&mayGrade){grade(n,-1);return;}
+    if(flick&&dx>52&&mayGrade){grade(n,1);return;}
     if(n.wx!=null&&moved&&(ddx||ddy)){
       const cs4=Math.cos(cam.rot), sn4=Math.sin(cam.rot);
       const wdx=(ddx*cs4+ddy*sn4)/cam.z, wdy=(-ddx*sn4+ddy*cs4)/cam.z;
@@ -1881,12 +1912,27 @@ addEventListener("pointerup",e=>{
   if(card.classList.contains("open")){card.classList.remove("open");return;}
   if(stack.length){surface();return;}
   if(lockOn){clearBloom();return;}
+  if(FOCUS.length){
+    // fat-finger forgiveness: satellites glide, so a near-miss within 44px
+    // is a tap ON that member — never a constellation-razing water tap
+    let bestN=focusN&&!focusN.gone?focusN:null;
+    let bdN=bestN?Math.hypot(bestN.x+bestN.dragX-e.clientX,bestN.y+bestN.dragY-e.clientY):44;
+    if(bdN>=44){bestN=null;bdN=44;}
+    for(const wr of FOCUS){
+      const nd2=wr.node;
+      if(!nd2||nd2.gone) continue;
+      const d2=Math.hypot(nd2.x+nd2.dragX-e.clientX,nd2.y+nd2.dragY-e.clientY);
+      if(d2<bdN){bdN=d2;bestN=nd2;}
+    }
+    if(bestN){tapNode(bestN);return;}
+  }
   // a galaxy sun is a door too
   const hb=hubAt(e.clientX,e.clientY);
   if(hb){
     const g=spawnGlyph(hb,e.clientX,e.clientY,false);
     g.ephemeral=true; diveKanji(g); return;
   }
+  if(!lockOn) clearBloom();
   collapseUnfold();
 });
 card.addEventListener("pointerdown",e=>e.stopPropagation());
