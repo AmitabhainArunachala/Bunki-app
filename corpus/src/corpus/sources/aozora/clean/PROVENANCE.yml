@@ -1,0 +1,24 @@
+name: aozorabunko-clean
+upstream:
+  - https://huggingface.co/datasets/globis-university/aozorabunko-clean
+retrieved: "2026-08-07"
+licence: CC BY 4.0
+licence_url: https://creativecommons.org/licenses/by/4.0/
+pool: proprietary_safe
+attribution: >-
+  Text from 青空文庫 (Aozora Bunko, https://www.aozora.gr.jp/), transcribed
+  by its volunteer contributors; cleaned and deduplicated as
+  globis-university/aozorabunko-clean (GLOBIS University,
+  https://huggingface.co/datasets/globis-university/aozorabunko-clean),
+  CC BY 4.0.
+restrictions: []
+upstream_pin: 42a9c9c0f1d67e6a5554d9bea4201973dc9b049c
+artifact_sha256:
+  aozorabunko-dedupe-clean.jsonl.gz: 3f41359c59b4bb1bf2d5692131463afc3f34a8208b987a563c1d60f9ab90d278
+notes: >-
+  PD-only subset of Aozora Bunko (all 16,951 rows carry 作品著作権フラグ
+  「なし」), deduplicated, with the full extended-index row preserved as
+  meta (including 文字遣い種別). Verified 2026-08-07 at the pinned revision:
+  ruby is STRIPPED from the dataset's text field (only 12/16,951 rows
+  contain 《, as quotation marks, not ruby) — furigana_coverage therefore
+  comes from raw card files (aozorabunko-index asset), never from this text.
