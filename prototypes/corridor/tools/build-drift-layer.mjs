@@ -14,7 +14,7 @@
  *   drift-layer.html  — the layer's inner markup fragment
  *   drift-layer.js    — the gated script exposing window.__DRIFT__
  *
- * Usage: node build-drift-layer.mjs
+ * Usage: node build-drift-layer.mjs [--check]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolve(HERE, '..');
 const SRC = resolve(CORRIDOR, '..', 'drift', 'drift-artifact.html');
+const CHECK = process.argv.includes('--check');
 
 const src = readFileSync(SRC, 'utf8');
 
@@ -49,7 +50,14 @@ const scopeSelector = (sel) => {
   if (s === '*') return '#drift-layer, #drift-layer *';
   return s
     .split(',')
-    .map((part) => `#drift-layer ${part.trim()}`)
+    .map((part) => {
+      const p = part.trim();
+      // Runtime preference classes live on body in the source artifact and
+      // on the layer root in the fused emission.
+      if (/^body(?=[.\[:#])/.test(p)) return p.replace(/^body/, '#drift-layer');
+      if (/^html(?=[.\[:#])/.test(p)) return p.replace(/^html/, '#drift-layer');
+      return `#drift-layer ${p}`;
+    })
     .join(',\n');
 };
 const scopedRules = [];
@@ -126,18 +134,20 @@ const patch = (from, to, label) => {
   patchCount += 1;
 };
 
-// 1 · wrap + gate flag + self-mount. The markup is injected before any of the
+// 1 · wrap + self-mount. The markup is injected before any of the
 // script's parse-time getElementById calls run, so load order is one line in
-// index.html; the layer starts asleep and window.__DRIFT__ wakes it.
+// index.html. Canonical lifetime behavior remains in the artifact; the fused
+// emission changes only its initial enabled state and drives the same setter.
 patch(
   '"use strict";',
   '(function () {\n"use strict";\n' +
     'const __layer = document.createElement("div");\n' +
     '__layer.id = "drift-layer";\n' +
+    '__layer.inert = true;\n' +
+    '__layer.setAttribute("aria-hidden", "true");\n' +
     `__layer.innerHTML = ${'__MARKUP_JSON__'};\n` +
-    'document.body.prepend(__layer);\n' +
-    'let DRIFT_ON = false;\nlet rafOn = false;',
-  'IIFE head + gate flag',
+    'document.body.prepend(__layer);',
+  'IIFE head + self mount',
 );
 
 // 1b · theme vars land on the LAYER, not the document root — cycling drift's
@@ -148,74 +158,32 @@ patch(
   'theme vars scoped to layer',
 );
 
-// 2 · the six window-level listeners sleep while the layer is hidden
+// 2 · the source artifact is awake; the fused layer starts asleep. All global
+// listeners, intervals, visibility suspension, and rAF lifetime share this
+// single source-owned authority instead of generator-only parallel gates.
 patch(
-  'addEventListener("pointerup",e=>{\n  if(lvlDrag){',
-  'addEventListener("pointerup",e=>{\n  if(!DRIFT_ON)return;\n  if(lvlDrag){',
-  'gate lvl pointerup',
-);
-patch(
-  'addEventListener("keydown",e=>{ if(e.key==="Escape") closeRadoc(); });',
-  'addEventListener("keydown",e=>{ if(DRIFT_ON&&e.key==="Escape") closeRadoc(); });',
-  'gate keydown',
-);
-patch(
-  'addEventListener("pointerdown",e=>{\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
-  'addEventListener("pointerdown",e=>{\n  if(!DRIFT_ON)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
-  'gate pointerdown',
-);
-patch(
-  'addEventListener("pointermove",e=>{\n  const t2=touches.get(e.pointerId);',
-  'addEventListener("pointermove",e=>{\n  if(!DRIFT_ON)return;\n  const t2=touches.get(e.pointerId);',
-  'gate pointermove',
-);
-patch(
-  'addEventListener("pointercancel",cancelPointer,{passive:true});',
-  'addEventListener("pointercancel",e=>{if(DRIFT_ON)cancelPointer(e);},{passive:true});',
-  'gate pointercancel',
-);
-patch(
-  'addEventListener("pointerup",e=>{\n  const owner=e.pointerId===gestureId;',
-  'addEventListener("pointerup",e=>{\n  if(!DRIFT_ON)return;\n  const owner=e.pointerId===gestureId;',
-  'gate main pointerup',
+  'let driftSurfaceEnabled=true;',
+  'let driftSurfaceEnabled=false;',
+  'fused surface initially asleep',
 );
 
-// 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
-patch(
-  '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',
-  '  drawTrail(t);\n  if(DRIFT_ON){requestAnimationFrame(frame);}else{rafOn=false;}\n}',
-  'frame loop gate',
-);
-patch(
-  'setInterval(refreshActive,650);',
-  'setInterval(function(){if(DRIFT_ON)refreshActive();},650);',
-  'gate refreshActive interval',
-);
-patch(
-  'if(!reduced) setInterval(function(){\n  fluidInject(',
-  'if(!reduced) setInterval(function(){\n  if(!DRIFT_ON)return;\n  fluidInject(',
-  'gate ambient fluid interval',
-);
-// boot: do not start the loop until the layer first shows (the boot call sits
-// at column 0; the in-loop call is indented and already rewritten above)
-patch(
-  '\nrequestAnimationFrame(frame);',
-  '\nif(DRIFT_ON){rafOn=true;requestAnimationFrame(frame);}',
-  'boot rAF deferred',
-);
-
-// 4 · the public seam the corridor drives
+// 3 · the public seam the corridor drives. Hiding evacuates focus before inert
+// lands; accessibility clients never remain parked inside an absent surface.
 js += `
 window.__DRIFT__ = {
   show() {
-    DRIFT_ON = true;
-    document.getElementById('drift-layer').classList.add('active');
+    __layer.classList.add('active');
+    __layer.inert = false;
+    __layer.setAttribute('aria-hidden', 'false');
+    setDriftSurfaceEnabled(true);
     sizeCanvases();
-    if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
-    DRIFT_ON = false;
-    document.getElementById('drift-layer').classList.remove('active');
+    setDriftSurfaceEnabled(false);
+    if (__layer.contains(document.activeElement)) document.activeElement.blur();
+    __layer.inert = true;
+    __layer.setAttribute('aria-hidden', 'true');
+    __layer.classList.remove('active');
   },
 };
 })();
@@ -236,8 +204,23 @@ const header = `/* GENERATED by tools/build-drift-layer.mjs from prototypes/drif
  * Do not edit by hand; edit the drift source or the extractor. */
 `;
 
-writeFileSync(resolve(CORRIDOR, 'drift-layer.css'), cssOut);
-writeFileSync(resolve(CORRIDOR, 'drift-layer.js'), header + js);
+const outputs = [
+  [resolve(CORRIDOR, 'drift-layer.css'), cssOut],
+  [resolve(CORRIDOR, 'drift-layer.js'), header + js],
+];
+for (const [path, expected] of outputs) {
+  if (CHECK) {
+    let actual = '';
+    try {
+      actual = readFileSync(path, 'utf8');
+    } catch {
+      throw new Error(`generated output missing: ${path}`);
+    }
+    if (actual !== expected) throw new Error(`generated output stale: ${path}`);
+  } else {
+    writeFileSync(path, expected);
+  }
+}
 console.log(
-  `drift-layer: css ${(css.length / 1024).toFixed(0)} KB · markup ${(markup.length / 1024).toFixed(1)} KB · js ${(js.length / 1024).toFixed(0)} KB · ${patchCount} patches, all asserted unique`,
+  `drift-layer${CHECK ? ' check' : ''}: css ${(css.length / 1024).toFixed(0)} KB · markup ${(markup.length / 1024).toFixed(1)} KB · js ${(js.length / 1024).toFixed(0)} KB · ${patchCount} patches, all asserted unique`,
 );

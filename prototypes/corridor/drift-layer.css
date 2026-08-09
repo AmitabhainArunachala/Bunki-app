@@ -39,7 +39,12 @@
 #drift-layer .glyph,
 #drift-layer .part{position:absolute;left:0;top:0;white-space:nowrap;cursor:pointer;
     will-change:transform,opacity;user-select:none;-webkit-user-select:none;
-    text-align:center;transition:filter .9s}
+    text-align:center;transition:filter .9s;min-width:44px;min-height:44px;
+    border:0;padding:0;background:transparent;color:inherit;font:inherit;line-height:inherit}
+#drift-layer .word:focus-visible,
+#drift-layer .glyph:focus-visible,
+#drift-layer .part:focus-visible{outline:2px solid var(--pig1);
+    outline-offset:4px;border-radius:8px}
 #drift-layer .word .base{display:block;line-height:1.15;text-shadow:0 0 1px currentColor}
 #drift-layer .word .yomi{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
@@ -92,8 +97,14 @@
     white-space:nowrap;pointer-events:none}
 #drift-layer #theme{position:fixed;top:calc(8px + env(safe-area-inset-top));right:14px;z-index:8;
     font-size:12px;letter-spacing:.12em;color:var(--ink);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-family:inherit;cursor:pointer}
+    border:1px solid var(--line);border-radius:999px;min-width:44px;min-height:44px;
+    padding:6px 14px;font-family:inherit;cursor:pointer}
 #drift-layer #theme:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
+#drift-layer #driftBack{position:fixed;top:calc(8px + env(safe-area-inset-top));left:50%;z-index:9;
+    transform:translateX(-50%);min-width:44px;min-height:44px;padding:7px 14px;
+    border:1px solid var(--line);border-radius:999px;background:var(--plaque);color:var(--ink);
+    font:12px/1.2 inherit;letter-spacing:.08em;cursor:pointer}
+#drift-layer #driftBack:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
 #drift-layer #drift-tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
     font-size:12px;color:var(--faint);letter-spacing:.1em}
 #drift-layer #drift-tray b{color:var(--accent);font-weight:500}
@@ -107,6 +118,10 @@
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     box-shadow:inset 0 0 0 1px var(--line),0 -10px 44px rgba(0,0,0,.14)}
 #drift-layer #card.open{transform:translateY(0)}
+#drift-layer #card[inert]{pointer-events:none}
+#drift-layer #cardClose{position:absolute;right:12px;top:12px;min-width:44px;min-height:44px;
+    border:1px solid var(--line);border-radius:999px;background:var(--plaque);color:var(--ink);
+    font:12px/1 inherit;cursor:pointer}
 #drift-layer #card .yomi{font-size:13px;letter-spacing:.2em;color:var(--pig2)}
 #drift-layer #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
 #drift-layer #card .gloss{font-family:Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
@@ -127,8 +142,9 @@
 #drift-layer #card .rhead{margin-top:12px;font-size:11px;letter-spacing:.14em;color:var(--faint)}
 #drift-layer #card .rlist{max-height:34vh;overflow-y:auto;margin-top:6px;border-top:1px solid var(--line);
     touch-action:pan-y;-webkit-overflow-scrolling:touch}
-#drift-layer #card .rrow{display:flex;align-items:baseline;gap:12px;padding:9px 2px;
-    border-bottom:1px solid var(--line);cursor:pointer}
+#drift-layer #card .rrow{display:flex;width:100%;align-items:baseline;gap:12px;padding:9px 2px;
+    border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;color:inherit;
+    font:inherit;text-align:left;min-height:44px}
 #drift-layer #card .rrow .rk{font-size:22px}
 #drift-layer #card .rrow .rr{font-size:12px;color:var(--pig2);letter-spacing:.06em;min-width:4.4em;
     display:flex;flex-direction:column;line-height:1.35}
@@ -137,6 +153,7 @@
 #drift-layer #card .rds .kun{color:var(--faint)}
 #drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
     z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+#drift-layer #lvl:focus-visible{outline:2px solid var(--pig1);outline-offset:-2px}
 #drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
     border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
@@ -180,7 +197,25 @@
 #drift-layer #radoc .rex .rt b{color:var(--ink);font-weight:500;font-style:normal}
 #drift-layer #radoc .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;
     font-size:13px;letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;font-family:inherit}
+    border:1px solid var(--line);border-radius:999px;min-width:44px;min-height:44px;
+    padding:8px 15px;cursor:pointer;font-family:inherit}
+#drift-layer #radoc[inert]{pointer-events:none}
+#drift-layer #driftActions{position:fixed;z-index:10;display:flex;gap:7px;left:50%;bottom:72px;
+    transform:translateX(-50%);padding:6px;border:1px solid var(--line);border-radius:999px;
+    background:var(--plaque);box-shadow:0 6px 22px rgba(0,0,0,.12)}
+#drift-layer #driftActions[hidden]{display:none}
+#drift-layer #driftActions button{min-width:44px;min-height:44px;padding:6px 11px;border:1px solid var(--line);
+    border-radius:999px;background:transparent;color:var(--ink);font:12px/1.15 inherit;cursor:pointer}
+#drift-layer #driftActions button:focus-visible,
+#drift-layer #card button:focus-visible,
+#drift-layer #radoc button:focus-visible{
+    outline:2px solid var(--pig1);outline-offset:2px}
+#drift-layer.drift-reduced,
+#drift-layer.drift-reduced *,
+#drift-layer.drift-reduced *::before,
+#drift-layer.drift-reduced *::after{
+    animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;
+    transition-delay:0s!important;scroll-behavior:auto!important}
 
 /* Overlap corrections for the fused chrome: the corridor's top bar (~58px)
  * and the bottom variant strip cover drift's own fixed chrome, so its brand,

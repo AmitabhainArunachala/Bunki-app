@@ -4,9 +4,9 @@
  * the prototype can be handed over on a host that will not serve a directory
  * (and so it survives being emailed to a phone).
  *
- * Usage: node build-standalone.mjs [outfile]
+ * Usage: node build-standalone.mjs [outfile] [--fragment] [--check]
  */
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -44,6 +44,7 @@ const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m,
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
 
 const fragment = process.argv.includes('--fragment');
+const check = process.argv.includes('--check');
 
 // the drift layer self-mounts and sleeps until the corridor wakes it; its
 // emitter asserts the file carries no "</script" sequence, so inlining is safe
@@ -106,6 +107,17 @@ ${read('corridor.js')}
 
 const outArg = process.argv.slice(2).find((a) => !a.startsWith('--'));
 const out = resolve(outArg ?? resolve(CORRIDOR, 'corridor-standalone.html'));
-mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, fragment ? fragmentHtml : html);
-console.log(`${out}  ${(statSync(out).size / 1024 / 1024).toFixed(2)} MB`);
+const expected = fragment ? fragmentHtml : html;
+if (check) {
+  let actual = '';
+  try {
+    actual = readFileSync(out, 'utf8');
+  } catch {
+    throw new Error(`generated output missing: ${out}`);
+  }
+  if (actual !== expected) throw new Error(`generated output stale: ${out}`);
+} else {
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, expected);
+}
+console.log(`${out}${check ? ' check' : ''}  ${(Buffer.byteLength(expected) / 1024 / 1024).toFixed(2)} MB`);
