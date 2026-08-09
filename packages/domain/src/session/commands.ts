@@ -28,14 +28,18 @@
  */
 
 import type { DomainContext } from '../context/index.ts';
-import { buildTargetThreadIndex, resolveComponentThread } from '../contracts/thread-link.ts';
+import {
+  bindRetrievalContract,
+  retrievalContractFromEvent,
+  type RetrievalContract,
+} from '../contracts/index.ts';
 import { RETRIEVAL_SKILLS } from '../events/shared.ts';
 import type { RetrievalSkill } from '../contracts/retrieval-contract.ts';
-import { mintReviewGraded } from '../evidence/mint.ts';
+import { mintReviewGraded, type ReviewEffort } from '../evidence/index.ts';
 import { createDomainEvent } from '../events/factories.ts';
 import type { CreateEventOptions, EventPayload } from '../events/factories.ts';
 import type { ContractCreatedEvent, DomainEvent, ReviewGradedEvent } from '../events/catalog.ts';
-import type { Grade, SessionCompletionState } from '../events/shared.ts';
+import type { SessionCompletionState } from '../events/shared.ts';
 import type { ContractId, EventId, IsoInstant, ThreadId } from '../primitives.ts';
 import { replay } from '../replay/replay.ts';
 import type { DerivedState } from '../replay/derived-state.ts';
@@ -139,13 +143,25 @@ function withLog(
 export function threadIndexByContract(
   state: SessionWorkspaceState,
 ): ReadonlyMap<ContractId, ThreadId> {
-  const index = buildTargetThreadIndex(state.log);
   const map = new Map<ContractId, ThreadId>();
   for (const contract of state.derived.contracts) {
-    const link = resolveComponentThread(index, contract.targetComponentId);
-    if (link.linked) map.set(contract.contractId, link.threadId);
+    const bound = bindRetrievalContract(state.log, contract.contractId);
+    if (bound.bound) map.set(contract.contractId, bound.value.threadId);
   }
   return map;
+}
+
+function exactContract(
+  state: SessionWorkspaceState,
+  contractId: ContractId,
+): RetrievalContract | null {
+  const event = state.log.find(
+    (candidate): candidate is ContractCreatedEvent =>
+      candidate.type === 'ContractCreated' && candidate.contractId === contractId,
+  );
+  if (event === undefined) return null;
+  const projected = retrievalContractFromEvent(event);
+  return projected.valid ? projected.contract : null;
 }
 
 function skillOf(state: SessionWorkspaceState, contractId: ContractId): RetrievalSkill | null {
@@ -248,7 +264,8 @@ export function createTargetContract(
 
 /** What a learner did on a standalone review step. */
 export interface StepAttempt {
-  readonly grade: Grade;
+  readonly response: string;
+  readonly effort: ReviewEffort;
   readonly latencyMs: number;
   readonly hintsUsed: number;
   readonly revealedBeforeRecall: boolean;
@@ -397,6 +414,8 @@ export function applySessionCommand(
       if (runtime === null || runtime.status !== 'open') return state;
       const step = currentStep(runtime);
       if (step === null || step.contractId === null) return state;
+      const contract = exactContract(state, step.contractId);
+      if (contract === null) return state;
 
       const confirmation =
         command.attempt.userConfirmedEasy === true ? { userConfirmedEasy: true as const } : {};
@@ -404,8 +423,9 @@ export function applySessionCommand(
       const event: ReviewGradedEvent = mintReviewGraded(
         context,
         {
-          contractId: step.contractId,
-          grade: command.attempt.grade,
+          contract,
+          response: command.attempt.response,
+          effort: command.attempt.effort,
           latencyMs: command.attempt.latencyMs,
           hintsUsed: command.attempt.hintsUsed,
           revealedBeforeRecall: command.attempt.revealedBeforeRecall,
@@ -470,6 +490,8 @@ export function applySessionCommand(
       if (repair === null || repair.phase !== 'in_branch') return state;
 
       const contractId = repair.stumble.contractId;
+      const contract = exactContract(state, contractId);
+      if (contract === null) return state;
       const prefix = `repair:${contractId}:`;
       // Positional for the same reason as the canvas: two attempts at the same
       // contract are two observations, and the rejoin criterion counts them.
@@ -481,8 +503,9 @@ export function applySessionCommand(
       const event: ReviewGradedEvent = mintReviewGraded(
         context,
         {
-          contractId,
-          grade: command.attempt.grade,
+          contract,
+          response: command.attempt.response,
+          effort: command.attempt.effort,
           latencyMs: command.attempt.latencyMs,
           hintsUsed: command.attempt.hintsUsed,
           revealedBeforeRecall: command.attempt.revealedBeforeRecall,

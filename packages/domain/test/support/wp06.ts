@@ -14,9 +14,13 @@
 
 import {
   componentIdForTargetKey,
+  parseEvent,
   parseEventLog,
+  retrievalContractFromEvent,
   replay,
+  type ContractCreatedEvent,
   type DerivedState,
+  type RetrievalContract,
 } from '../../src/index.ts';
 import {
   contractCreated,
@@ -103,11 +107,77 @@ export function productionContract(overrides: Raw = {}): Raw {
   return event;
 }
 
+function contractEntity(raw: Raw): RetrievalContract {
+  const event = parseEvent(raw) as ContractCreatedEvent;
+  const projected = retrievalContractFromEvent(event);
+  if (!projected.valid) {
+    throw new Error(
+      `invalid WP-06 contract fixture: ${projected.issues.map((issue) => issue.message).join('; ')}`,
+    );
+  }
+  return projected.contract;
+}
+
+/** Exact validated entities for tests that exercise the v2 evidence minter. */
+export function meaningContractEntity(overrides: Raw = {}): RetrievalContract {
+  return contractEntity(meaningContract(overrides));
+}
+
+export function readingContractEntity(overrides: Raw = {}): RetrievalContract {
+  return contractEntity(readingContract(overrides));
+}
+
+export function productionContractEntity(overrides: Raw = {}): RetrievalContract {
+  return contractEntity(productionContract(overrides));
+}
+
 export function review(
   args: { eventId: string; at: string; contractId: string; grade?: string },
   overrides: Raw = {},
 ): Raw {
-  return reviewGraded(args, overrides);
+  const requested = args.grade ?? 'good';
+  const effort =
+    overrides['effort'] === 'hard' || overrides['effort'] === 'easy'
+      ? overrides['effort']
+      : requested === 'hard' || requested === 'easy'
+        ? requested
+        : 'good';
+  const revealedBeforeRecall = overrides['revealedBeforeRecall'] === true;
+  const hintsUsed = typeof overrides['hintsUsed'] === 'number' ? overrides['hintsUsed'] : 0;
+  const acceptedAnswer = args.contractId.includes('reading') ? 'ぶんき' : 'mountain pass';
+  const response =
+    typeof overrides['response'] === 'string'
+      ? overrides['response']
+      : requested === 'again' && !revealedBeforeRecall && hintsUsed === 0
+        ? 'not the accepted answer'
+        : acceptedAnswer;
+  const normalizedResponse = response.normalize('NFKC').trim();
+  const correct = normalizedResponse === acceptedAnswer.normalize('NFKC').trim();
+  const grade = !correct || revealedBeforeRecall || hintsUsed > 0 ? 'again' : effort;
+  const confirmation =
+    grade === 'easy' && overrides['userConfirmedEasy'] === true
+      ? { userConfirmedEasy: true as const }
+      : {};
+
+  return reviewGraded(args, {
+    v: 2,
+    response,
+    effort,
+    grade,
+    hintsUsed,
+    revealedBeforeRecall,
+    graderProof: {
+      grader: 'accepted_answers',
+      policyVersion: 'accepted_answers:nfkc_trim@1',
+      contractVersion: 1,
+      responseModality: 'text',
+      normalizedResponse,
+      decision: correct ? 'correct' : 'incorrect',
+      acceptedAnswerIndex: correct ? 0 : null,
+    },
+    ...confirmation,
+    ...overrides,
+  });
 }
 
 /** Parse and replay a raw log — the same fail-closed path production uses. */

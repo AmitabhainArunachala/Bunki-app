@@ -265,6 +265,7 @@ function judge(
     reason: decision.admitted ? null : decision.reason,
     effectiveGrade: decision.admitted ? decision.effectiveGrade : null,
     forcedByReveal: decision.admitted ? decision.forcedByReveal : false,
+    authority: decision.admitted ? decision.authority : null,
     at: event.occurredAt,
   });
 

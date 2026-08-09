@@ -191,11 +191,23 @@ describe('the plan cannot grow through the command handler either', () => {
         { kind: 'completeStep' },
         {
           kind: 'answerStep',
-          attempt: { grade: 'good', latencyMs: 1200, hintsUsed: 0, revealedBeforeRecall: false },
+          attempt: {
+            response: 'mountain pass',
+            effort: 'good',
+            latencyMs: 1200,
+            hintsUsed: 0,
+            revealedBeforeRecall: false,
+          },
         },
         {
           kind: 'answerStep',
-          attempt: { grade: 'again', latencyMs: 9000, hintsUsed: 0, revealedBeforeRecall: true },
+          attempt: {
+            response: 'wrong',
+            effort: 'good',
+            latencyMs: 9000,
+            hintsUsed: 0,
+            revealedBeforeRecall: true,
+          },
         },
         { kind: 'checkRejoin' },
       ];
@@ -231,7 +243,13 @@ describe('the plan cannot grow through the command handler either', () => {
     for (let move = 0; move < 6; move += 1) {
       state = applySessionCommand(context, state, {
         kind: 'answerStep',
-        attempt: { grade: 'good', latencyMs: 1000, hintsUsed: 0, revealedBeforeRecall: false },
+        attempt: {
+          response: 'mountain pass',
+          effort: 'good',
+          latencyMs: 1000,
+          hintsUsed: 0,
+          revealedBeforeRecall: false,
+        },
       });
     }
 

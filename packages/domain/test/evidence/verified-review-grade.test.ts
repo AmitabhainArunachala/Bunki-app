@@ -9,7 +9,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { bindRetrievalContract, parseEventLog, replay } from '../../src/index.ts';
-import { capture, learnableLog, meaningContract, promote, review, T } from '../support/wp06.ts';
+import { reviewGraded } from '../support/events.ts';
+import { capture, learnableLog, meaningContract, promote, T } from '../support/wp06.ts';
 
 type Raw = Record<string, unknown>;
 
@@ -50,7 +51,7 @@ function run(raw: readonly Raw[]) {
 
 describe('ReviewGraded replay migration', () => {
   it('keeps v1 lossless but removes its unproved FSRS authority', () => {
-    const legacy = review({
+    const legacy = reviewGraded({
       eventId: 'ev-review-v1',
       at: T.review1,
       contractId: 'contract-meaning',

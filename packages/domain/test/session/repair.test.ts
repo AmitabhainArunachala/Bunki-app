@@ -263,7 +263,13 @@ describe('the flow runs end to end on the seeded target', () => {
     });
     state = applySessionCommand(ctx, state, {
       kind: 'answerStep',
-      attempt: { grade: 'again', latencyMs: 8000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'wrong',
+        effort: 'good',
+        latencyMs: 8000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const stumble = latestStumble(state);
@@ -285,7 +291,13 @@ describe('the flow runs end to end on the seeded target', () => {
     for (let attempt = 0; attempt < 5; attempt += 1) {
       state = applySessionCommand(ctx, state, {
         kind: 'repairProbe',
-        attempt: { grade: 'again', latencyMs: 9000, hintsUsed: 0, revealedBeforeRecall: false },
+        attempt: {
+          response: 'wrong',
+          effort: 'good',
+          latencyMs: 9000,
+          hintsUsed: 0,
+          revealedBeforeRecall: false,
+        },
       });
       state = applySessionCommand(ctx, state, { kind: 'checkRejoin' });
       expect(state.repair?.phase).toBe('in_branch');
@@ -294,7 +306,13 @@ describe('the flow runs end to end on the seeded target', () => {
     // A hinted success is a success of the hint, so it keeps the branch open too.
     state = applySessionCommand(ctx, state, {
       kind: 'repairProbe',
-      attempt: { grade: 'good', latencyMs: 3000, hintsUsed: 1, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 3000,
+        hintsUsed: 1,
+        revealedBeforeRecall: false,
+      },
     });
     state = applySessionCommand(ctx, state, { kind: 'checkRejoin' });
     expect(state.repair?.phase).toBe('in_branch');
@@ -302,7 +320,13 @@ describe('the flow runs end to end on the seeded target', () => {
     // Unaided, on the contract that stumbled: the criterion is met.
     state = applySessionCommand(ctx, state, {
       kind: 'repairProbe',
-      attempt: { grade: 'good', latencyMs: 2600, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 2600,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
     state = applySessionCommand(ctx, state, { kind: 'checkRejoin' });
 
@@ -327,7 +351,13 @@ describe('the flow runs end to end on the seeded target', () => {
     });
     state = applySessionCommand(ctx, state, {
       kind: 'answerStep',
-      attempt: { grade: 'again', latencyMs: 8000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'wrong',
+        effort: 'good',
+        latencyMs: 8000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
     const stumbledContract = latestStumble(state)?.contractId;
 
@@ -339,7 +369,13 @@ describe('the flow runs end to end on the seeded target', () => {
     });
     state = applySessionCommand(ctx, state, {
       kind: 'repairProbe',
-      attempt: { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 2000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const probe = state.log.at(-1);
@@ -355,7 +391,13 @@ describe('the flow runs end to end on the seeded target', () => {
     expect(
       applySessionCommand(ctx, state, {
         kind: 'repairProbe',
-        attempt: { grade: 'good', latencyMs: 1, hintsUsed: 0, revealedBeforeRecall: false },
+        attempt: {
+          response: 'mountain pass',
+          effort: 'good',
+          latencyMs: 1,
+          hintsUsed: 0,
+          revealedBeforeRecall: false,
+        },
       }),
     ).toBe(state);
   });
@@ -370,7 +412,13 @@ describe('the flow runs end to end on the seeded target', () => {
     });
     state = applySessionCommand(ctx, state, {
       kind: 'answerStep',
-      attempt: { grade: 'hard', latencyMs: 7000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'hard',
+        latencyMs: 7000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
     expect(latestStumble(state)).toBeNull();
   });

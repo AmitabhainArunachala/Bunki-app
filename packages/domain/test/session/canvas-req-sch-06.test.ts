@@ -67,24 +67,25 @@ const interaction = (overrides: Partial<CanvasInteraction> = {}): CanvasInteract
   componentIds: [COMPONENT],
   declaredContractId: READING_CONTRACT,
   targetWasHidden: true,
-  attempt: { grade: 'good', latencyMs: 3200, hintsUsed: 0, revealedBeforeRecall: false },
+  attempt: {
+    response: 'ぶんき',
+    effort: 'good',
+    latencyMs: 3200,
+    hintsUsed: 0,
+    revealedBeforeRecall: false,
+  },
   ...overrides,
 });
 
 // ---------------------------------------------------------------------------
 
 describe('a reveal before recall on the promoted target grades Again (T-06)', () => {
-  it('is classified as a declared, embedded probe', () => {
+  it('without a recorded response is exposure, never an inferred retrieval', () => {
     const classification = classifyCanvasInteraction(
       interaction({ kind: 'reveal', attempt: undefined }),
       offerFor(),
     );
-    expect(classification).toEqual({
-      kind: 'declared_probe',
-      contractId: READING_CONTRACT,
-      threadId: 'thread-wp06',
-      probeContext: 'embedded',
-    });
+    expect(classification).toMatchObject({ kind: 'exposure', reason: 'no_attempt_recorded' });
   });
 
   it('mints a tier-A ReviewGraded whose grade is again, whatever was pressed', () => {
@@ -95,7 +96,8 @@ describe('a reveal before recall on the promoted target grades Again (T-06)', ()
       // because `revealedBeforeRecall: true` *is* the record that it was forced.
       interaction({
         attempt: {
-          grade: 'easy',
+          response: 'ぶんき',
+          effort: 'easy',
           latencyMs: 800,
           hintsUsed: 0,
           revealedBeforeRecall: true,
@@ -116,7 +118,7 @@ describe('a reveal before recall on the promoted target grades Again (T-06)', ()
     expect('userConfirmedEasy' in record.event).toBe(false);
   });
 
-  it('reaches the scheduler as an again through the real gate, end to end', () => {
+  it('a blank reveal writes exposure and cannot reach the scheduler', () => {
     const context = newContext('canvas-e2e-');
     const before = createSessionWorkspace(seededLog());
     const after = applySessionCommand(context, before, {
@@ -126,16 +128,14 @@ describe('a reveal before recall on the promoted target grades Again (T-06)', ()
     });
 
     const decision = after.derived.gateDecisions.at(-1);
-    expect(decision?.admitted).toBe(true);
-    expect(decision?.effectiveGrade).toBe('again');
-    expect(decision?.forcedByReveal).toBe(false); // `again` was submitted, not overridden
+    expect(decision?.admitted).toBe(false);
+    expect(decision?.reason).toBe('exposure_is_never_retrieval');
 
     const memory = after.derived.memoryStates.find(
       (state) => state.contractId === READING_CONTRACT,
     );
-    expect(memory?.admittedReviewCount).toBe(1);
-    expect(memory?.lapses).toBeGreaterThanOrEqual(0);
-    expect(memory?.phase).not.toBe('new');
+    expect(memory?.admittedReviewCount).toBe(0);
+    expect(memory?.phase).toBe('new');
   });
 
   it('records the override when a non-again grade was submitted after a reveal', () => {
@@ -143,7 +143,13 @@ describe('a reveal before recall on the promoted target grades Again (T-06)', ()
     const after = applySessionCommand(context, createSessionWorkspace(seededLog()), {
       kind: 'canvasInteraction',
       interaction: interaction({
-        attempt: { grade: 'good', latencyMs: 900, hintsUsed: 0, revealedBeforeRecall: true },
+        attempt: {
+          response: 'ぶんき',
+          effort: 'good',
+          latencyMs: 900,
+          hintsUsed: 0,
+          revealedBeforeRecall: true,
+        },
       }),
       offer: offerFor(),
     });
@@ -283,7 +289,13 @@ describe('the narrowness of "contract-conforming" (REQ-SCH-06)', () => {
     {
       name: 'more hints than the contract budgets',
       interaction: interaction({
-        attempt: { grade: 'good', latencyMs: 4000, hintsUsed: 4, revealedBeforeRecall: false },
+        attempt: {
+          response: 'ぶんき',
+          effort: 'good',
+          latencyMs: 4000,
+          hintsUsed: 4,
+          revealedBeforeRecall: false,
+        },
       }),
       offer: offerFor(),
       reason: 'hints_exceeded_the_contract_budget',
@@ -291,7 +303,13 @@ describe('the narrowness of "contract-conforming" (REQ-SCH-06)', () => {
     {
       name: 'a reveal on a contract that forbids revealing',
       interaction: interaction({
-        attempt: { grade: 'good', latencyMs: 400, hintsUsed: 0, revealedBeforeRecall: true },
+        attempt: {
+          response: 'ぶんき',
+          effort: 'good',
+          latencyMs: 400,
+          hintsUsed: 0,
+          revealedBeforeRecall: true,
+        },
       }),
       offer: { ...offerFor(), revealAllowed: false },
       reason: 'reveal_not_permitted_by_this_contract',

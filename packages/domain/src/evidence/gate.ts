@@ -35,6 +35,7 @@ import {
 } from '../contracts/index.ts';
 import { CandidateEvidenceBoundaryError } from '../errors.ts';
 import {
+  ACCEPTED_ANSWER_GRADING_POLICY_VERSION,
   isEvidenceClassEvent,
   type DomainEvent,
   type ReviewGradedEvent,
@@ -79,6 +80,19 @@ export const GATE_REJECTION_REASONS = [
 
 export type GateRejectionReason = (typeof GATE_REJECTION_REASONS)[number];
 
+/**
+ * Closed proof of scheduler authority. A parsed ReviewGraded v2 is only a
+ * claim; this value exists only after the gate independently recomputed the
+ * answer, exact contract, policy and source lineage.
+ */
+export interface VerifiedRetrievalAuthority {
+  readonly kind: 'verified_retrieval_v2';
+  readonly grader: 'accepted_answers';
+  readonly policyVersion: typeof ACCEPTED_ANSWER_GRADING_POLICY_VERSION;
+  readonly contractVersion: number;
+  readonly sourceBinding: 'exact_origin';
+}
+
 export type GateDecision =
   | {
       readonly admitted: true;
@@ -88,6 +102,8 @@ export type GateDecision =
       readonly effectiveGrade: Grade;
       /** True when the submitted grade was overridden by the reveal rule. */
       readonly forcedByReveal: boolean;
+      /** Gate-produced authority; never present on raw parsed evidence. */
+      readonly authority: VerifiedRetrievalAuthority;
     }
   | {
       readonly admitted: false;
@@ -388,5 +404,12 @@ function admitReviewGraded(event: ReviewGradedEvent, context: EvidenceGateContex
     threadId: link.threadId,
     effectiveGrade: grade,
     forcedByReveal,
+    authority: {
+      kind: 'verified_retrieval_v2',
+      grader: 'accepted_answers',
+      policyVersion: ACCEPTED_ANSWER_GRADING_POLICY_VERSION,
+      contractVersion: contract.contractVersion,
+      sourceBinding: 'exact_origin',
+    },
   };
 }

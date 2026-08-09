@@ -133,9 +133,13 @@ function splitOptionality(entries: readonly string[]): { name: string; optional:
 
 /** What a schema actually accepts, read off its shape: field name → optional?. */
 function acceptedFields(type: DomainEventType): { name: string; optional: boolean }[] {
-  const shape = (
-    EVENT_SCHEMAS[type] as unknown as { shape: Record<string, { isOptional(): boolean }> }
-  ).shape;
+  const schema = EVENT_SCHEMAS[type] as unknown as {
+    shape?: Record<string, { isOptional(): boolean }>;
+    def?: { shape?: Record<string, { isOptional(): boolean }> };
+    _def?: { shape?: Record<string, { isOptional(): boolean }> };
+  };
+  const shape = schema.shape ?? schema.def?.shape ?? schema._def?.shape;
+  if (shape === undefined) throw new Error(`cannot inspect ${type} schema shape`);
   return Object.entries(shape)
     .map(([name, field]) => ({ name, optional: field.isOptional() }))
     .sort((a, b) => a.name.localeCompare(b.name));

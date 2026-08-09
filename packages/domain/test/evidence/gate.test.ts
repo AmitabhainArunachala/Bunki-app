@@ -56,6 +56,7 @@ import {
   capture,
   decisionOf,
   learnableLog,
+  review,
   run,
 } from '../support/wp06.ts';
 
@@ -71,6 +72,36 @@ function contextFrom(options: {
 }): EvidenceGateContext {
   const index = emptyTargetThreadIndex();
   (options.encounters ?? []).forEach((event) => indexEncounter(index, event));
+  const contractEvents = (options.contracts ?? []).map((contract) => {
+    const scoring =
+      contract.scoring.kind === 'accepted_answers'
+        ? { acceptedAnswers: [...contract.scoring.acceptedAnswers] }
+        : {
+            rubricId: contract.scoring.rubricId,
+            rubricVersion: contract.scoring.rubricVersion,
+          };
+    return parse(
+      contractCreated(
+        {
+          eventId: contract.createdByEventId,
+          at: contract.createdAt,
+          contractId: contract.contractId,
+        },
+        {
+          contractVersion: contract.contractVersion,
+          targetComponentId: contract.targetComponentId,
+          skill: contract.skill,
+          cueModality: contract.cueModality,
+          responseModality: contract.responseModality,
+          hintPolicy: contract.hintPolicy,
+          revealPolicy: contract.revealPolicy,
+          promptFamilyVersion: contract.promptFamilyVersion,
+          ...scoring,
+          ...(contract.scoring.kind === 'rubric' ? { acceptedAnswers: undefined } : {}),
+        },
+      ),
+    );
+  });
   return {
     contracts: new Map(
       (options.contracts ?? []).map((contract) => [contract.contractId, contract]),
@@ -80,6 +111,7 @@ function contextFrom(options: {
     promotionByThread: new Map(Object.entries(options.promotion ?? {})),
     deletedThreadIds: new Set(options.deletedThreadIds ?? []),
     supersededEventIds: new Set(options.supersededEventIds ?? []),
+    eventLog: [...(options.encounters ?? []), ...contractEvents],
   };
 }
 
@@ -103,10 +135,56 @@ const production = projectContractCreated(
   ) as ContractCreatedEvent,
 );
 
-const gradedReview = (overrides: Record<string, unknown> = {}): ReviewGradedEvent =>
+const audio = projectContractCreated(
   parse(
-    reviewGraded({ eventId: 'r1', at: T.review1, contractId: 'contract-meaning' }, overrides),
+    contractCreated(
+      { eventId: 'c-audio', at: T.contract, contractId: 'contract-audio' },
+      { targetComponentId: COMPONENT, responseModality: 'audio' },
+    ),
+  ) as ContractCreatedEvent,
+);
+
+const rubricRaw = contractCreated(
+  { eventId: 'c-rubric', at: T.contract, contractId: 'contract-rubric' },
+  {
+    targetComponentId: COMPONENT,
+    responseModality: 'text',
+    rubricId: 'rubric-text',
+    rubricVersion: '1.0.0',
+    acceptedAnswers: undefined,
+  },
+);
+const rubric = projectContractCreated(parse(rubricRaw) as ContractCreatedEvent);
+
+const gradedReview = (overrides: Record<string, unknown> = {}): ReviewGradedEvent => {
+  const requestedGrade = typeof overrides['grade'] === 'string' ? overrides['grade'] : 'good';
+  const { grade: _grade, ...rest } = overrides;
+  return parse(
+    review(
+      {
+        eventId: 'r1',
+        at: T.review1,
+        contractId: 'contract-meaning',
+        grade: requestedGrade,
+      },
+      rest,
+    ),
   ) as ReviewGradedEvent;
+};
+
+const reviewFor = (
+  contractId: string,
+  overrides: Record<string, unknown> = {},
+): ReviewGradedEvent => {
+  const requestedGrade = typeof overrides['grade'] === 'string' ? overrides['grade'] : 'good';
+  const { grade: _grade, ...rest } = overrides;
+  return parse(
+    review({ eventId: `r-${contractId}`, at: T.review1, contractId, grade: requestedGrade }, rest),
+  ) as ReviewGradedEvent;
+};
+
+const tamperedReview = (overrides: Record<string, unknown>): ReviewGradedEvent =>
+  parse({ ...gradedReview(), ...overrides }) as ReviewGradedEvent;
 
 const reasonsSeen = new Set<GateRejectionReason>();
 
@@ -139,6 +217,13 @@ describe('the gate admits exactly one thing', () => {
       threadId: THREAD,
       effectiveGrade: 'good',
       forcedByReveal: false,
+      authority: {
+        kind: 'verified_retrieval_v2',
+        grader: 'accepted_answers',
+        policyVersion: 'accepted_answers:nfkc_trim@1',
+        contractVersion: 1,
+        sourceBinding: 'exact_origin',
+      },
     });
   });
 });
@@ -201,6 +286,18 @@ describe('every rejection branch', () => {
     );
   });
 
+  it('legacy v1 self-grades stay visible but have no scheduler authority', () => {
+    expectRejection(
+      admitToScheduler(
+        parse(
+          reviewGraded({ eventId: 'legacy-r1', at: T.review1, contractId: 'contract-meaning' }),
+        ),
+        contextFrom(active),
+      ),
+      'response_unverified',
+    );
+  });
+
   it('a contract that failed REQ-DM-05 validation', () => {
     expectRejection(
       admitToScheduler(
@@ -251,6 +348,28 @@ describe('every rejection branch', () => {
     );
   });
 
+  it('two same-thread pre-contract origins fail closed rather than inventing lineage', () => {
+    const secondOrigin = parse(
+      encounterCaptured(
+        {
+          eventId: 'ev-second-origin',
+          at: '2026-07-27T09:00:30.000Z',
+          encounterId: 'encounter-second-origin',
+          threadId: THREAD,
+        },
+        { text: TEXT, span: { start: 0, end: TARGET.length } },
+      ),
+    ) as EncounterCapturedEvent;
+
+    expectRejection(
+      admitToScheduler(
+        gradedReview(),
+        contextFrom({ ...active, encounters: [captureEvent, secondOrigin] }),
+      ),
+      'source_lineage_unverified',
+    );
+  });
+
   it('a thread with no promotion state in the log', () => {
     expectRejection(
       admitToScheduler(gradedReview(), contextFrom({ ...active, promotion: {} })),
@@ -260,12 +379,7 @@ describe('every rejection branch', () => {
 
   it('a skill the current rung does not activate', () => {
     expectRejection(
-      admitToScheduler(
-        parse(
-          reviewGraded({ eventId: 'r2', at: T.review1, contractId: 'contract-production' }),
-        ) as ReviewGradedEvent,
-        contextFrom(active),
-      ),
+      admitToScheduler(reviewFor('contract-production'), contextFrom(active)),
       'skill_not_activated_by_promotion',
     );
   });
@@ -281,6 +395,103 @@ describe('every rejection branch', () => {
     expectRejection(
       admitToScheduler(gradedReview({ grade: 'easy' }), contextFrom(active)),
       'easy_requires_user_confirmation',
+    );
+  });
+
+  it('a blank response proves no retrieval even when the v2 envelope parses', () => {
+    const base = gradedReview();
+    if (base.v !== 2) throw new Error('fixture must be ReviewGraded v2');
+    expectRejection(
+      admitToScheduler(
+        tamperedReview({
+          response: '   ',
+          effort: 'good',
+          grade: 'again',
+          graderProof: {
+            ...base.graderProof,
+            normalizedResponse: '   ',
+            decision: 'incorrect',
+            acceptedAnswerIndex: null,
+          },
+        }),
+        contextFrom(active),
+      ),
+      'response_blank',
+    );
+  });
+
+  it('a response modality without a closed grader remains typed-unverified', () => {
+    const event = reviewFor('contract-audio');
+    if (event.v !== 2) throw new Error('fixture must be ReviewGraded v2');
+    expectRejection(
+      admitToScheduler(
+        tamperedReview({
+          contractId: 'contract-audio',
+          graderProof: { ...event.graderProof, responseModality: 'audio' },
+        }),
+        contextFrom({ ...active, contracts: [meaning, audio] }),
+      ),
+      'response_modality_unverified',
+    );
+  });
+
+  it('a rubric claim stays unverified until that exact grader exists', () => {
+    const event = reviewFor('contract-rubric');
+    expectRejection(
+      admitToScheduler(event, contextFrom({ ...active, contracts: [meaning, rubric] })),
+      'grading_method_unverified',
+    );
+  });
+
+  it('rejects an attempt outside the exact contract hint policy', () => {
+    expectRejection(
+      admitToScheduler(gradedReview({ hintsUsed: 2 }), contextFrom(active)),
+      'attempt_violates_contract_policy',
+    );
+  });
+
+  it('rejects a proof tied to another contract version', () => {
+    const event = gradedReview();
+    if (event.v !== 2) throw new Error('fixture must be ReviewGraded v2');
+    expectRejection(
+      admitToScheduler(
+        tamperedReview({ graderProof: { ...event.graderProof, contractVersion: 99 } }),
+        contextFrom(active),
+      ),
+      'contract_version_mismatch',
+    );
+  });
+
+  it('rejects an unpinned grading policy', () => {
+    const event = gradedReview();
+    if (event.v !== 2) throw new Error('fixture must be ReviewGraded v2');
+    expectRejection(
+      admitToScheduler(
+        tamperedReview({ graderProof: { ...event.graderProof, policyVersion: 'future-policy' } }),
+        contextFrom(active),
+      ),
+      'grading_policy_mismatch',
+    );
+  });
+
+  it('rejects a proof payload that deterministic recomputation contradicts', () => {
+    const event = gradedReview();
+    if (event.v !== 2) throw new Error('fixture must be ReviewGraded v2');
+    expectRejection(
+      admitToScheduler(
+        tamperedReview({
+          graderProof: { ...event.graderProof, normalizedResponse: 'tampered' },
+        }),
+        contextFrom(active),
+      ),
+      'grader_proof_mismatch',
+    );
+  });
+
+  it('rejects a grade that was not derived from the verified response', () => {
+    expectRejection(
+      admitToScheduler(tamperedReview({ grade: 'hard' }), contextFrom(active)),
+      'grade_not_derived_from_proof',
     );
   });
 

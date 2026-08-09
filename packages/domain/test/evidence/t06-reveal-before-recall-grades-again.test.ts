@@ -23,7 +23,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { createDeterministicContext, mintReviewGraded } from '../../src/index.ts';
-import { T, decisionOf, learnableLog, memoryStateOf, review, run } from '../support/wp06.ts';
+import {
+  T,
+  decisionOf,
+  learnableLog,
+  memoryStateOf,
+  readingContractEntity,
+  review,
+  run,
+} from '../support/wp06.ts';
 
 const context = () =>
   createDeterministicContext({ instants: T.review1, idPrefix: 't06-', seed: 1 });
@@ -33,8 +41,9 @@ describe('T-06: reveal-before-recall grades Again', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-reading',
-        grade: 'good',
+        contract: readingContractEntity(),
+        response: 'ぶんき',
+        effort: 'good',
         latencyMs: 9100,
         hintsUsed: 0,
         revealedBeforeRecall: true,
@@ -52,8 +61,9 @@ describe('T-06: reveal-before-recall grades Again', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-reading',
-        grade: 'good',
+        contract: readingContractEntity(),
+        response: 'ぶんき',
+        effort: 'good',
         latencyMs: 3200,
         hintsUsed: 0,
         revealedBeforeRecall: false,
@@ -69,8 +79,9 @@ describe('T-06: reveal-before-recall grades Again', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-reading',
-        grade: 'easy',
+        contract: readingContractEntity(),
+        response: 'ぶんき',
+        effort: 'easy',
         userConfirmedEasy: true,
         latencyMs: 1200,
         hintsUsed: 0,

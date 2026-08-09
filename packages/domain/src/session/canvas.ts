@@ -43,9 +43,9 @@
 import type { DomainContext } from '../context/index.ts';
 import { activatesSkill } from '../contracts/promotion-activation.ts';
 import type { RetrievalContract, RetrievalSkill } from '../contracts/retrieval-contract.ts';
-import { mintExposureLogged, mintReviewGraded } from '../evidence/mint.ts';
+import { mintExposureLogged, mintReviewGraded, type ReviewEffort } from '../evidence/index.ts';
 import type { ExposureLoggedEvent, ReviewGradedEvent } from '../events/catalog.ts';
-import type { Grade, PromotionState } from '../events/shared.ts';
+import type { PromotionState } from '../events/shared.ts';
 import type { ComponentId, ContractId, ExperienceId, ThreadId } from '../primitives.ts';
 
 // ---------------------------------------------------------------------------
@@ -63,6 +63,8 @@ import type { ComponentId, ContractId, ExperienceId, ThreadId } from '../primiti
  * found would be the "relabelled exposure → false mastery" risk DL-19 names.
  */
 export interface CanvasProbeOffer {
+  /** Exact validated contract; the v2 minter derives proof from this value. */
+  readonly contract: RetrievalContract;
   readonly contractId: ContractId;
   readonly threadId: ThreadId;
   /** The KnowledgeComponent the contract TESTS (REQ-DM-05). */
@@ -81,6 +83,7 @@ export function canvasProbeOffer(
   args: { readonly threadId: ThreadId; readonly promotion: PromotionState },
 ): CanvasProbeOffer {
   return {
+    contract,
     contractId: contract.contractId,
     threadId: args.threadId,
     targetComponentId: contract.targetComponentId,
@@ -120,7 +123,8 @@ const RETRIEVAL_KINDS: readonly CanvasInteractionKind[] = Object.freeze([
  * forget to mention that the answer was on screen.
  */
 export interface CanvasProbeAttempt {
-  readonly grade: Grade;
+  readonly response: string;
+  readonly effort: ReviewEffort;
   readonly latencyMs: number;
   readonly hintsUsed: number;
   readonly revealedBeforeRecall: boolean;
@@ -211,7 +215,9 @@ export type CanvasClassification =
       readonly detail: string;
     };
 
-const exposure = (reason: CanvasExposureReason): CanvasClassification => ({
+const exposure = (
+  reason: CanvasExposureReason,
+): Extract<CanvasClassification, { kind: 'exposure' }> => ({
   kind: 'exposure',
   reason,
   detail: CANVAS_EXPOSURE_EXPLANATIONS[reason],
@@ -281,9 +287,7 @@ export function classifyCanvasInteraction(
  * one the ledger has nothing about.
  */
 function resolveAttempt(interaction: CanvasInteraction): CanvasProbeAttempt | null {
-  if (interaction.attempt !== undefined) return interaction.attempt;
-  if (interaction.kind !== 'reveal') return null;
-  return { grade: 'again', latencyMs: 0, hintsUsed: 0, revealedBeforeRecall: true };
+  return interaction.attempt ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -348,12 +352,21 @@ export function recordCanvasInteraction(
   // rejected that case by name — but the fallback is spelled out rather than
   // asserted, because a cast here would be a cast on the path that mints tier-A
   // evidence.
-  const attempt = resolveAttempt(interaction) ?? {
-    grade: 'again' as Grade,
-    latencyMs: 0,
-    hintsUsed: 0,
-    revealedBeforeRecall: true,
-  };
+  const attempt = resolveAttempt(interaction);
+  if (attempt === null || offer === null) {
+    const refusal = exposure('no_attempt_recorded');
+    return {
+      classification: refusal,
+      event: mintExposureLogged(
+        context,
+        {
+          componentIds: [...interaction.componentIds],
+          experienceId: interaction.experienceId,
+        },
+        { idempotencyKey: options.idempotencyKey },
+      ),
+    };
+  }
 
   const confirmation =
     attempt.userConfirmedEasy === true ? { userConfirmedEasy: true as const } : {};
@@ -363,8 +376,9 @@ export function recordCanvasInteraction(
     event: mintReviewGraded(
       context,
       {
-        contractId: classification.contractId,
-        grade: attempt.grade,
+        contract: offer.contract,
+        response: attempt.response,
+        effort: attempt.effort,
         latencyMs: attempt.latencyMs,
         hintsUsed: attempt.hintsUsed,
         revealedBeforeRecall: attempt.revealedBeforeRecall,

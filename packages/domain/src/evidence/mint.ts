@@ -32,20 +32,25 @@
  */
 
 import type { DomainContext } from '../context/index.ts';
+import type { RetrievalContract } from '../contracts/retrieval-contract.ts';
 import type {
   DomainEvent,
   EvidenceSupersededEvent,
   ExposureLoggedEvent,
   LookupFrictionLoggedEvent,
   ProductionObservedEvent,
-  ReviewGradedEvent,
+  ReviewGradedV2Event,
 } from '../events/catalog.ts';
 import type { CreateEventOptions, EventPayload } from '../events/factories.ts';
-import { EVENT_SCHEMA_VERSION } from '../events/envelope.ts';
+import { EVENT_SCHEMA_VERSION, REVIEW_GRADED_EVENT_VERSION } from '../events/envelope.ts';
 import { recordKernelMint } from '../events/mint-registry.ts';
 import { parseEvent } from '../events/parse.ts';
-import type { Grade } from '../events/shared.ts';
+import { ReviewVerificationError } from '../errors.ts';
 import { assertNotCandidate } from './gate.ts';
+import {
+  verifyAcceptedAnswerAttempt,
+  type VerifiedReviewAttempt,
+} from './accepted-answer-grader.ts';
 
 /**
  * Stamp the envelope.
@@ -85,8 +90,10 @@ function mintedEvidenceEvent<TEvent extends DomainEvent>(candidate: unknown): TE
   return recordKernelMint(parseEvent(candidate)) as TEvent;
 }
 
-/** `ReviewGraded` minus the tier the gate stamps. */
-export type ReviewGradedInput = Omit<EventPayload<'ReviewGraded'>, 'tier'>;
+/** Everything the v2 minter needs; correctness and final grade are absent. */
+export interface ReviewGradedInput extends VerifiedReviewAttempt {
+  readonly contract: RetrievalContract;
+}
 
 /**
  * Mint a tier-A graded review.
@@ -102,10 +109,14 @@ export function mintReviewGraded(
   context: DomainContext,
   input: ReviewGradedInput,
   options: CreateEventOptions,
-): ReviewGradedEvent {
+): ReviewGradedV2Event {
   assertNotCandidate(input);
 
-  const grade: Grade = input.revealedBeforeRecall ? 'again' : input.grade;
+  const { contract, ...attempt } = input;
+  const verified = verifyAcceptedAnswerAttempt(contract, attempt);
+  if (!verified.verified) {
+    throw new ReviewVerificationError(verified.reason, contract.contractId, verified.detail);
+  }
 
   // The confirmation flag is kept only where it means something. On any grade
   // other than `easy` it is noise, and on a grade the reveal rule just forced
@@ -113,17 +124,24 @@ export function mintReviewGraded(
   // `exactOptionalPropertyTypes` is why this is a spread and not an assignment
   // of `undefined`: absent and present-and-undefined are different evidence
   // ("never asked" versus "declined"), and only absent is true here.
-  const { userConfirmedEasy: submittedConfirmation, ...rest } = input;
+  const { userConfirmedEasy: submittedConfirmation, ...rest } = attempt;
   const confirmation =
-    grade === 'easy' && submittedConfirmation === true ? { userConfirmedEasy: true as const } : {};
+    verified.grade === 'easy' && submittedConfirmation === true
+      ? { userConfirmedEasy: true as const }
+      : {};
 
-  return mintedEvidenceEvent<ReviewGradedEvent>({
+  return mintedEvidenceEvent<ReviewGradedV2Event>({
     ...rest,
     ...confirmation,
-    grade,
+    contractId: contract.contractId,
+    grade: verified.grade,
+    graderProof: verified.proof,
     tier: 'A' as const,
     type: 'ReviewGraded' as const,
-    ...envelope(context, options),
+    eventId: options.eventId ?? context.ids.nextId('event'),
+    v: REVIEW_GRADED_EVENT_VERSION,
+    occurredAt: options.occurredAt ?? context.clock.now(),
+    idempotencyKey: options.idempotencyKey,
   });
 }
 

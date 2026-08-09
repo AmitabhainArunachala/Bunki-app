@@ -26,7 +26,7 @@
 
 import type { EvidenceTier, Grade, SessionCompletionState } from '../events/shared.ts';
 import type { EventId, IsoInstant } from '../primitives.ts';
-import type { GateRejectionReason } from '../evidence/gate.ts';
+import type { GateRejectionReason, VerifiedRetrievalAuthority } from '../evidence/gate.ts';
 import type { MemoryState } from '../reducers/memory-state.ts';
 import type { ThreadState } from '../reducers/thread.ts';
 
@@ -80,6 +80,8 @@ export interface GateDecisionRecord {
   readonly effectiveGrade: Grade | null;
   /** True when the reveal rule overrode the submitted grade. */
   readonly forcedByReveal: boolean;
+  /** Non-null only for an independently verified, source-bound v2 retrieval. */
+  readonly authority: VerifiedRetrievalAuthority | null;
   readonly at: IsoInstant;
 }
 
@@ -165,6 +167,9 @@ export function freezeDerivedState(state: DerivedState): DerivedState {
     thread.promotionHistory.forEach(Object.freeze);
     Object.freeze(thread.promotionHistory);
     Object.freeze(thread);
+  });
+  state.gateDecisions.forEach((decision) => {
+    if (decision.authority !== null) Object.freeze(decision.authority);
   });
   [
     state.contracts,

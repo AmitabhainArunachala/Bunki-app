@@ -44,6 +44,7 @@ import {
   type MintedEventBatch,
 } from '../../src/index.ts';
 import { AT, READER_SOURCE, USER_PROVENANCE } from '../support/events.ts';
+import { meaningContractEntity } from '../support/wp06.ts';
 
 const PACKAGE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -71,8 +72,9 @@ function aReview(): DomainEvent {
   return mintReviewGraded(
     context,
     {
-      contractId: 'con-1',
-      grade: 'good',
+      contract: meaningContractEntity(),
+      response: 'mountain pass',
+      effort: 'good',
       latencyMs: 1200,
       hintsUsed: 0,
       revealedBeforeRecall: false,
@@ -205,8 +207,9 @@ describe('mint provenance — tampering after the mint', () => {
     const real = mintReviewGraded(
       context,
       {
-        contractId: 'con-1',
-        grade: 'good',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'good',
         latencyMs: 900,
         hintsUsed: 0,
         // Reveal forces `again` at the mint (T-06); the tamper below tries to

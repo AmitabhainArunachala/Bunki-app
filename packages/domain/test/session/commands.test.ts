@@ -95,7 +95,13 @@ describe('what a caller can and cannot say', () => {
     const context = newContext('cmd-tier-');
     const after = applySessionCommand(context, started(context), {
       kind: 'answerStep',
-      attempt: { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 2000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const graded = after.log.at(-1);
@@ -111,7 +117,13 @@ describe('what a caller can and cannot say', () => {
     let state = started(context);
     state = applySessionCommand(context, state, {
       kind: 'answerStep',
-      attempt: { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 2000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
     state = applySessionCommand(context, state, { kind: 'close' });
 
@@ -125,7 +137,13 @@ describe('what a caller can and cannot say', () => {
     let state = started(context);
     state = applySessionCommand(context, state, {
       kind: 'answerStep',
-      attempt: { grade: 'good', latencyMs: 2000, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 2000,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const evidence = state.log.filter((event) => isEvidenceEventType(event.type));
@@ -144,7 +162,13 @@ describe('what a caller can and cannot say', () => {
     expect(
       applySessionCommand(context, empty, {
         kind: 'answerStep',
-        attempt: { grade: 'good', latencyMs: 1, hintsUsed: 0, revealedBeforeRecall: false },
+        attempt: {
+          response: 'mountain pass',
+          effort: 'good',
+          latencyMs: 1,
+          hintsUsed: 0,
+          revealedBeforeRecall: false,
+        },
       }),
     ).toBe(empty);
     expect(applySessionCommand(context, empty, { kind: 'skipStep' })).toBe(empty);
@@ -187,7 +211,8 @@ describe('idempotency keys, per path', () => {
     const context = newContext('cmd-key-review-');
     const open = started(context);
     const attempt = {
-      grade: 'good' as const,
+      response: 'mountain pass',
+      effort: 'good' as const,
       latencyMs: 2000,
       hintsUsed: 0,
       revealedBeforeRecall: false,
@@ -237,7 +262,13 @@ describe('idempotency keys, per path', () => {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       state = applySessionCommand(context, state, {
         kind: 'repairProbe',
-        attempt: { grade: 'hard', latencyMs: 1200, hintsUsed: 0, revealedBeforeRecall: false },
+        attempt: {
+          response: 'ぶんき',
+          effort: 'hard',
+          latencyMs: 1200,
+          hintsUsed: 0,
+          revealedBeforeRecall: false,
+        },
       });
     }
 
@@ -287,7 +318,13 @@ describe('progress is about the sitting, never about the learner', () => {
 
     state = applySessionCommand(context, state, {
       kind: 'answerStep',
-      attempt: { grade: 'good', latencyMs: 1500, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 1500,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
     state = applySessionCommand(context, state, { kind: 'skipStep' });
 
@@ -307,7 +344,13 @@ describe('progress is about the sitting, never about the learner', () => {
     const state = applySessionCommand(context, started(context), {
       kind: 'answerStep',
       // `easy` with no confirmation: representable, recordable, and refused.
-      attempt: { grade: 'easy', latencyMs: 900, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'easy',
+        latencyMs: 900,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const decision = state.derived.gateDecisions.at(-1);
@@ -322,7 +365,13 @@ describe('the observation join the repair criterion reads', () => {
     const context = newContext('cmd-join-');
     const state = applySessionCommand(context, started(context), {
       kind: 'answerStep',
-      attempt: { grade: 'good', latencyMs: 1500, hintsUsed: 0, revealedBeforeRecall: false },
+      attempt: {
+        response: 'mountain pass',
+        effort: 'good',
+        latencyMs: 1500,
+        hintsUsed: 0,
+        revealedBeforeRecall: false,
+      },
     });
 
     const observations = rejoinObservations(state);

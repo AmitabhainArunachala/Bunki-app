@@ -26,7 +26,7 @@ import {
   mintReviewGraded,
   type DomainContext,
 } from '../../src/index.ts';
-import { COMPONENT, T } from '../support/wp06.ts';
+import { COMPONENT, T, meaningContractEntity } from '../support/wp06.ts';
 
 const context = (): DomainContext =>
   createDeterministicContext({ instants: T.review1, idPrefix: 'mint-', seed: 7 });
@@ -55,8 +55,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'good',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'good',
         latencyMs: 3100,
         hintsUsed: 0,
         revealedBeforeRecall: false,
@@ -69,7 +70,13 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     expect(event.probeContext).toBe('embedded');
     expect(event.eventId).toBe('mint-event-0001');
     expect(event.occurredAt).toBe(T.review1);
-    expect(event.v).toBe(1);
+    expect(event.v).toBe(2);
+    expect(event.response).toBe('mountain pass');
+    expect(event.graderProof).toMatchObject({
+      grader: 'accepted_answers',
+      decision: 'correct',
+      acceptedAnswerIndex: 0,
+    });
   });
 
   it('stamps tier D on exposure', () => {
@@ -127,8 +134,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const first = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'good',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'good',
         latencyMs: 1,
         hintsUsed: 0,
         revealedBeforeRecall: false,
@@ -139,8 +147,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const second = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'good',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'good',
         latencyMs: 1,
         hintsUsed: 0,
         revealedBeforeRecall: false,
@@ -158,8 +167,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'easy',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'easy',
         latencyMs: 900,
         hintsUsed: 0,
         revealedBeforeRecall: false,
@@ -176,8 +186,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'easy',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'easy',
         userConfirmedEasy: true,
         latencyMs: 900,
         hintsUsed: 0,
@@ -194,8 +205,9 @@ describe('minted evidence is stamped, validated, and deterministic', () => {
     const event = mintReviewGraded(
       context(),
       {
-        contractId: 'contract-meaning',
-        grade: 'good',
+        contract: meaningContractEntity(),
+        response: 'mountain pass',
+        effort: 'good',
         userConfirmedEasy: true,
         latencyMs: 900,
         hintsUsed: 0,
