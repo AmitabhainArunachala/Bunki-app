@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { type ReactNode } from 'react';
 
 import { SessionWorkspaceProvider } from '@/screens/session-workspace';
@@ -27,8 +27,12 @@ import { createRuntimeContext } from '@/state/runtime';
 const context = createRuntimeContext();
 
 export default function SessionGroupLayout(): ReactNode {
+  const { thread } = useLocalSearchParams<{ thread?: string }>();
   return (
-    <SessionWorkspaceProvider context={context}>
+    <SessionWorkspaceProvider
+      context={context}
+      preferredThreadId={typeof thread === 'string' && thread !== '' ? thread : undefined}
+    >
       <Stack screenOptions={{ headerShown: false }} />
     </SessionWorkspaceProvider>
   );

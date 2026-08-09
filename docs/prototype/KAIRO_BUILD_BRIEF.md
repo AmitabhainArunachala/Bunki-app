@@ -94,7 +94,7 @@ fonts-noto-cjk` before any visual claim, or every screenshot is a lie.
 - tap = furigana above
 - tap **again** on the same word = English underneath (progressive cycle,
   never a timed double-tap)
-- third tap backs out
+- third tap carries into the full entry
 - long-press (~430ms) = floating mini-dictionary
 - keep holding (~2.1s) = full dictionary entry
 - particles: tap stays **inert** (reading rhythm); hold opens the particle

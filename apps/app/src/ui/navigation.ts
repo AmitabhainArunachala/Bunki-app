@@ -73,6 +73,18 @@ export const DESTINATIONS: readonly Destination[] = [
     reach: { kind: 'shell' },
   },
   {
+    href: '/source',
+    routeFile: 'source.tsx',
+    screen: 'screens/golden-source-screen.tsx',
+    label: 'Source',
+    blurb: 'Read 静かな朝 at the exact 自分 anchor.',
+    reach: {
+      kind: 'from',
+      from: 'src/screens/capture-screen.tsx',
+      via: 'onOpenGoldenSource',
+    },
+  },
+  {
     href: '/word/[lexemeId]',
     routeFile: 'word/[lexemeId].tsx',
     screen: 'screens/word-screen.tsx',

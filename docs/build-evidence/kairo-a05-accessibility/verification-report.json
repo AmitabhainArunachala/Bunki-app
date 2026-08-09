@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "verifier": "verify-corridor-accessibility.mjs",
+  "head": "a3e2d88c541fb6f50a1482a98255b8ffe503f05e",
+  "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  },
+  "results": [
+    {
+      "name": "reader words are named native controls on the common target.activate action",
+      "pass": true,
+      "detail": "{\"words\":344,\"particles\":144,\"nativeButtons\":344,\"named\":344,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
+    },
+    {
+      "name": "inline reader controls retain a real 44px hit region without widening print",
+      "pass": true,
+      "detail": "minimum effective hit dimension 44.0px"
+    },
+    {
+      "name": "focused word exposes quick-look and full-entry non-hold alternatives",
+      "pass": true,
+      "detail": "{\"tokenFocused\":true,\"alternatives\":2,\"hiddenTabStops\":0}"
+    },
+    {
+      "name": "hidden Corridor controls leave the tab order",
+      "pass": true,
+      "detail": "0 hidden tab stop(s)"
+    },
+    {
+      "name": "sequential switch navigation reaches quick look then full entry",
+      "pass": true,
+      "detail": "quickLook.open → entry.open"
+    },
+    {
+      "name": "screen-reader tree exposes named token and non-hold action buttons",
+      "pass": true,
+      "detail": "496 named button(s) in the accessibility tree"
+    },
+    {
+      "name": "pointer action one reveals reading and action two reveals English",
+      "pass": true,
+      "detail": "{\"afterFirst\":{\"lit\":true,\"gloss\":false},\"afterSecond\":{\"lit\":true,\"gloss\":true}}"
+    },
+    {
+      "name": "second-action English preserves the glyph anchor within 2px",
+      "pass": true,
+      "detail": "614.2px → 614.2px"
+    },
+    {
+      "name": "pointer third target.activate carries into the full entry",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "pointer route emits target.activate envelopes with pointer provenance",
+      "pass": true,
+      "detail": "3 receipt(s)"
+    },
+    {
+      "name": "keyboard/switch-shaped activation follows the same three target.activate transitions",
+      "pass": true,
+      "detail": "focusable=true sheet=1"
+    },
+    {
+      "name": "keyboard route differs only in provenance",
+      "pass": true,
+      "detail": "3 receipt(s)"
+    },
+    {
+      "name": "particle pointer tap stays inert in reading rhythm",
+      "pass": true,
+      "detail": "{\"sheet\":0,\"reveal\":false}"
+    },
+    {
+      "name": "particle exposes a keyboard/switch/screen-reader full-entry alternative",
+      "pass": true,
+      "detail": "direct door=true"
+    },
+    {
+      "name": "entry sheet is a named modal dialog and receives focus",
+      "pass": true,
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":11}"
+    },
+    {
+      "name": "Tab is contained inside the modal sheet",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape dismisses the sheet and returns focus to its invoking token",
+      "pass": true,
+      "detail": "{\"closed\":true,\"returned\":true}"
+    },
+    {
+      "name": "reduced-motion removes Corridor animation and transition motion",
+      "pass": true,
+      "detail": "{\"sheet\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"scrim\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"ruby\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "real walk requested no missing Corridor assets",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walk emitted no console/page errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "screenshots": [
+    "screenshots/01-reader-focus-alternatives.png",
+    "screenshots/02-named-entry-dialog.png",
+    "screenshots/03-reduced-motion-dialog.png"
+  ]
+}

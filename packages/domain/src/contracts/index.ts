@@ -8,5 +8,7 @@
 
 export * from './component-identity.ts';
 export * from './retrieval-contract.ts';
+export * from './bound-retrieval-contract.ts';
+export * from './learn-contracts.ts';
 export * from './thread-link.ts';
 export * from './promotion-activation.ts';

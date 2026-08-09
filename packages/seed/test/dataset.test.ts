@@ -8,20 +8,30 @@
  * demo will walk a reviewer straight into.
  */
 
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_CANONICAL_TARGET,
+  GOLDEN_SOURCE_ANCHOR_ID,
+  GOLDEN_SOURCE_ID,
   SEED_COVERAGE_DISCLOSURE,
   SEED_ENTRY_DISCLOSURE,
   allSeedRecords,
   findKanji,
   findLexeme,
+  findSource,
   seedDataset,
 } from '../src/index.ts';
 
 /** Leading run of non-kana characters — the part of a headword inflection cannot change. */
 const kanjiStem = (headword: string): string => /^[^぀-ヿ]*/.exec(headword)?.[0] ?? headword;
+
+const REPOSITORY_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
 describe('controller §8 dataset scope', () => {
   it('holds 12–20 lexemes', () => {
@@ -54,6 +64,35 @@ describe('controller §8 dataset scope', () => {
     expect([...(passage?.body ?? '')].length).toBeLessThanOrEqual(200);
     expect(passage?.body).toContain(DEFAULT_CANONICAL_TARGET);
     expect(passage?.targetForm).toBe(DEFAULT_CANONICAL_TARGET);
+  });
+
+  it('pins one real original article as the permanent A1 golden source', () => {
+    expect(seedDataset.sources).toHaveLength(1);
+    const source = findSource(GOLDEN_SOURCE_ID);
+    expect(source?.title).toBe('静かな朝');
+    expect(source?.pool).toBe('original');
+    expect(source?.sourceKind).toBe('article');
+    expect(source?.locationUnit).toBe('utf16-code-unit');
+
+    const authoritative = JSON.parse(
+      readFileSync(
+        join(REPOSITORY_ROOT, 'prototypes/corridor/data/articles/bunki-graded-n5-morning.json'),
+        'utf8',
+      ),
+    ) as { id: string; title: string; text: string; pool: string };
+    expect(authoritative.id).toBe('bunki-graded-n5-morning');
+    expect(authoritative.pool).toBe('original');
+    expect(source?.title).toBe(authoritative.title);
+    expect(source?.body).toBe(authoritative.text);
+    expect(source?.body.length).toBe(301);
+    expect(
+      createHash('sha256')
+        .update(source?.body ?? '', 'utf8')
+        .digest('hex'),
+    ).toBe(source?.contentSha256);
+    expect(source?.contentSha256).toBe(
+      'cb8535ea848848a58054d17582616abebe52deb5f26320f1af29d04bea1b99b2',
+    );
   });
 
   it('carries a stroke SVG for every seed kanji', () => {
@@ -112,6 +151,35 @@ describe('the seed closes over itself', () => {
         expect(constructionIds, `${record.id} -> ${id}`).toContain(id);
       }
     }
+  });
+
+  it('resolves every exact source anchor to its lexeme and source substring', () => {
+    for (const source of seedDataset.sources) {
+      const anchorIds = source.anchors.map((anchor) => anchor.id);
+      expect(new Set(anchorIds).size, `${source.id} has duplicate anchor ids`).toBe(
+        anchorIds.length,
+      );
+      for (const anchor of source.anchors) {
+        const lexeme = findLexeme(anchor.lexemeId);
+        expect(lexeme, `${source.id}.${anchor.id} -> ${anchor.lexemeId}`).toBeDefined();
+        expect(anchor.end, `${source.id}.${anchor.id} exceeds source body`).toBeLessThanOrEqual(
+          source.body.length,
+        );
+        expect(source.body.slice(anchor.start, anchor.end), `${source.id}.${anchor.id}`).toBe(
+          lexeme?.headword,
+        );
+      }
+    }
+
+    const golden = findSource(GOLDEN_SOURCE_ID);
+    const anchor = golden?.anchors.find((candidate) => candidate.id === GOLDEN_SOURCE_ANCHOR_ID);
+    expect(anchor).toEqual({
+      id: 'anchor-jibun-01',
+      start: 283,
+      end: 285,
+      lexemeId: 'lex-jibun',
+    });
+    expect(golden?.body.slice(anchor?.start, anchor?.end)).toBe('自分');
   });
 
   it('really contains each linked lexeme, matching on the stem so inflection still counts', () => {
@@ -195,9 +263,17 @@ describe('honesty about what this dataset is (controller §8, REQ-GATE-03)', () 
     expect(bodyProvenance?.license).toMatch(/pending operator decision/);
   });
 
+  it('labels the golden article as unchanged project-authored original content', () => {
+    const source = findSource(GOLDEN_SOURCE_ID);
+    expect(source?.provenance.body.source).toMatch(/original project-authored article/);
+    expect(source?.provenance.body.modification_status).toBe('unmodified');
+    expect(source?.provenance.body.license).toMatch(/pending operator decision/);
+    expect(source?.provenance.body.source_entry_id).toBe('bunki-graded-n5-morning');
+  });
+
   it('leaves the repository licence pending on every project-authored field (OD-09)', () => {
     for (const source of Object.values(seedDataset.provenanceSources)) {
-      if (!source.source.startsWith('Bunki Phase-0 seed')) continue;
+      if (!/^Bunki (Phase-0 seed|v11 reading catalog)/.test(source.source)) continue;
       expect(source.license, source.source).toMatch(/pending operator decision/);
     }
   });

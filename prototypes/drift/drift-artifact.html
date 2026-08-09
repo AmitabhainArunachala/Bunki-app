@@ -37,9 +37,9 @@
   .word.lod .yomi,.word.lod .gloss{opacity:0!important}
   /* tap-bloom relief: the constellation is its own layer — centre, satellites,
    * and threads each carry their own colour and lift gently off the field */
-  .word.bctr{color:var(--bloomCtr) !important}
+  .word.bctr{color:var(--bloomCtr) !important;z-index:6}
   .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
-  .word.bsat{color:var(--bloomSat) !important}
+  .word.bsat{color:var(--bloomSat) !important;z-index:5}
   .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
   .word.bsat .yomi{color:var(--bloomSat)}
   .glyph.comp{z-index:7}
@@ -108,7 +108,7 @@
   #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:11px}
   #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
   #card .rds .kun{color:var(--faint)}
-  #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:34px;
+  #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
     z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
   #lvl.hot{opacity:1;width:56px}
   #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
@@ -1124,7 +1124,6 @@ function constellationLock(n){
   const isG=n.kind==="glyph";
   const selfW=isG?n.ch:n.w;
   const ks=isG?[n.ch]:[...n.w].filter(isKanji);
-  if(!ks.length){lockOn=false;focusN=null;return;}
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
   camT={x:bx,y:by};
   const inv=1/cam.z;
@@ -1144,6 +1143,7 @@ function constellationLock(n){
   const seenSem=new Set([selfW]);
   const sem=SEM[selfW]||null;
   if(sem){
+    const semLimit=Math.min(12,sem.length);
     let semN=0;
     for(const se of sem){
       const rel=se[0], ty=se[1];
@@ -1154,21 +1154,23 @@ function constellationLock(n){
       const L=((shell===1?100:shell===2?150:242)+(h%70))*inv;
       const shared=ks.filter(c=>rel.includes(c));
       const pg=(shared.length===1&&pinOf[shared[0]])?pinOf[shared[0]]:null;
+      const ang=-Math.PI/2+semN*TAU/Math.max(semLimit,3)+(h%31-15)*0.008;
+      const gx=bx+Math.cos(ang)*L, gy=by+Math.sin(ang)*L;
       const wr=WORDIX[rel];
       if(wr){
+        wr.ox=gx-wr.wx; wr.oy=gy-wr.wy;
         wr.hl=true; wr.lk=true; wr.ret=false;
         lockMaterialize(wr);
         FOCUS.push(wr);
         LOCK.items.push({t:"w",wr,L,pg,ty});
       } else {
-        const gw=bx+(Math.random()-.5)*40, gh=by+(Math.random()-.5)*40;
-        LOCK.items.push({t:"s",label:rel,ty,L,pg,node:lockGhost(rel,se[2],gw,gh)});
+        LOCK.items.push({t:"s",label:rel,ty,L,pg,node:lockGhost(rel,se[2],gx,gy)});
       }
-      if(++semN>=16) break;
+      if(++semN>=semLimit) break;
     }
   }
   const need=Math.max(0,12-LOCK.items.filter(it=>it.t!=="g").length);
-  const mem=need?relationsFor(ks,selfW,isG?level:(n.lvl||3),seenSem).slice(0,need+4):[];
+  const mem=need?relationsFor(ks,selfW,isG?level:(n.lvl||3),seenSem).slice(0,need):[];
   for(const wr of mem){
     const h=strHash(wr.e[0]);
     const shared=ks.filter(c=>wr.e[0].includes(c));
@@ -1177,12 +1179,28 @@ function constellationLock(n){
     else if(shared.length===1&&pinOf[shared[0]]){ pg=pinOf[shared[0]]; L=(96+(h%120))*inv; }
     else if(shared.length===1){ pg=null; L=(150+(h%110))*inv; }
     else { pg=null; L=(252+(h%90))*inv; }
+    const ang=-Math.PI/2+LOCK.items.length*TAU/Math.max(mem.length+LOCK.items.length,12)+(h%31-15)*0.008;
+    wr.ox=bx+Math.cos(ang)*L-wr.wx; wr.oy=by+Math.sin(ang)*L-wr.wy;
     wr.hl=true; wr.lk=true; wr.ret=false;
     lockMaterialize(wr);
     FOCUS.push(wr);
     LOCK.items.push({t:"w",wr,L,pg});
   }
   ripple(n.x,n.y,true);
+}
+function lockSafeScreenPoint(point,padx,pady){
+  const minX=padx,maxX=vw()-padx,minY=pady,maxY=vh()-pady;
+  if(point.x>=minX&&point.x<=maxX&&point.y>=minY&&point.y<=maxY) return point;
+  const rawAnchor=w2s(LOCK.bx,LOCK.by);
+  const ax=clamp(rawAnchor.x,minX,maxX),ay=clamp(rawAnchor.y,minY,maxY);
+  const dx=point.x-ax,dy=point.y-ay;
+  let scale=1;
+  if(dx>0) scale=Math.min(scale,(maxX-ax)/dx);
+  else if(dx<0) scale=Math.min(scale,(minX-ax)/dx);
+  if(dy>0) scale=Math.min(scale,(maxY-ay)/dy);
+  else if(dy<0) scale=Math.min(scale,(minY-ay)/dy);
+  scale=clamp(scale,0,1);
+  return {x:ax+dx*scale,y:ay+dy*scale};
 }
 // live force layout: springs along the graph, repulsion between all — the
 // arms find their own staggered lengths and keep breathing
@@ -1219,8 +1237,37 @@ function lockForce(){
     else if(sp3.x>vw()-46) fx-=(sp3.x-(vw()-46))*0.03*inv;
     if(sp3.y<98) fy+=(98-sp3.y)*0.03*inv;
     else if(sp3.y>vh()-132) fy-=(sp3.y-(vh()-132))*0.03*inv;
-    if(it.t==="w"){it.wr.ox+=fx; it.wr.oy+=fy;}
-    else if(it.t==="s"){it.node.wx+=fx; it.node.wy+=fy;}
+    if(it.t==="w"){
+      it.wr.ox+=fx; it.wr.oy+=fy;
+      let s3=w2s(it.wr.wx+it.wr.ox,it.wr.wy+it.wr.oy);
+      // Every named lock member is interaction, not scenery. Clamp its full
+      // DOM body inside the viewport after the force step so an outer-shell
+      // semantic never becomes a visible-but-untouchable canvas-edge label.
+      const box=it.wr.node&&!it.wr.node.gone?it.wr.node.el.getBoundingClientRect():null;
+      const padx=Math.min(vw()/2-4,Math.max(48,(box?box.width/2:32)+12));
+      const pady=Math.min(vh()/2-4,Math.max(170,(box?box.height/2:18)+82));
+      const safeScreen=lockSafeScreenPoint(s3,padx,pady);
+      const sx3=safeScreen.x,sy3=safeScreen.y;
+      if(sx3!==s3.x||sy3!==s3.y){
+        const safe=s2wl(sx3,sy3);
+        it.wr.ox=safe.x-it.wr.wx;it.wr.oy=safe.y-it.wr.wy;
+        s3={x:sx3,y:sy3};
+      }
+      it.wr.sx=s3.x; it.wr.sy=s3.y; it.wr.vis=frameCount;
+    }
+    else if(it.t==="s"){
+      it.node.wx+=fx; it.node.wy+=fy;
+      let s3=w2s(it.node.wx,it.node.wy);
+      const box=!it.node.gone?it.node.el.getBoundingClientRect():null;
+      const padx=Math.min(vw()/2-4,Math.max(48,(box?box.width/2:32)+12));
+      const pady=Math.min(vh()/2-4,Math.max(170,(box?box.height/2:18)+82));
+      const safeScreen=lockSafeScreenPoint(s3,padx,pady);
+      const sx3=safeScreen.x,sy3=safeScreen.y;
+      if(sx3!==s3.x||sy3!==s3.y){
+        const safe=s2wl(sx3,sy3);
+        it.node.wx=safe.x;it.node.wy=safe.y;
+      }
+    }
     else {it.g.wx+=fx; it.g.wy+=fy;}
   }
 }
@@ -1819,9 +1866,6 @@ function tapNode(n){
   if(!n.el.classList.contains("glossed")){
     n.el.classList.add("glossed"); return;         // two taps: English
   }
-  // a ghost with no kanji has nothing to carry into — the dive would open on
-  // an empty level. It stays where it is, answered, rather than misleading.
-  if(n.ghost&&![...n.w].some(isKanji)) return;
   diveWord(n);                                      // then: carry in
 }
 let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false,gestureId=null;
@@ -1829,6 +1873,14 @@ let lpTimer=0,lpFired=false;
 // two fingers = zoom: pinch-out over a body dives into it, pinch-in surfaces
 const touches=new Map();
 let pinch=null;
+function rebasePinch(){
+  if(touches.size!==2){pinch=null;return;}
+  const pair=[...touches.entries()];
+  const a=pair[0][1],b2=pair[1][1];
+  const d=Math.hypot(a.x-b2.x,a.y-b2.y)||1;
+  pinch={ids:[pair[0][0],pair[1][0]],d0:d,last:d,
+    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z};
+}
 function pinchDive(mid){
   let best=null,bd=1e9;
   for(const n of nodes){
@@ -1848,11 +1900,16 @@ addEventListener("pointerdown",e=>{
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(FOCUS.length) bloomLast=performance.now();
   if(touches.size===2){
-    const v=[...touches.values()];
-    pinch={d0:Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1,fired:false,z0:cam.z};
+    rebasePinch();
     clearTimeout(lpTimer);
     if(pn){pn.dragX=0;pn.dragY=0;pn=null;}
-    moved=true;
+    moved=true;gestureActive=false;gestureId=null;
+    return;
+  }
+  if(touches.size>2){
+    pinch=null;clearTimeout(lpTimer);
+    if(pn){pn.dragX=0;pn.dragY=0;pn=null;}
+    moved=true;gestureActive=false;gestureId=null;
     return;
   }
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
@@ -1895,7 +1952,7 @@ const s2wl=(sx,sy)=>{
 };
 addEventListener("pointermove",e=>{
   const t2=touches.get(e.pointerId);
-  if(FOCUS.length) bloomLast=performance.now();
+  if(FOCUS.length&&t2) bloomLast=performance.now();
   let pdx=0,pdy=0;
   if(t2){
     pdx=e.clientX-t2.x; pdy=e.clientY-t2.y;
@@ -1934,14 +1991,10 @@ addEventListener("pointermove",e=>{
     }
     return;
   }
-  // only the finger that began this gesture may carry it. pointerup has
-  // checked ownership since the gestureId fix; pointermove never did, and
-  // px,py belong to the owner while e.clientX,e.clientY belong to whatever
-  // pointer sent the event. #lvl and #card stopPropagation on pointerdown
-  // but not on pointermove, so their finger is invisible to `touches` while
-  // its every move still reached the drag branch — a foreign thumb resting
-  // on the rail or the open card tore a held word 130-200px off its hub.
-  if(e.pointerId!==gestureId) return;
+  // A move belongs only to the pointer that began the one-finger gesture.
+  // Mouse hover, a stale third finger, and every other foreign pointer carry
+  // no authority to move the held word or pan its camera.
+  if(!t2||touches.size!==1||e.pointerId!==gestureId) return;
   if(!pn){
     // one finger on open water: swim — pan the camera through the field
     if(t2&&touches.size===1&&gestureActive){
@@ -1960,11 +2013,15 @@ addEventListener("pointermove",e=>{
   if(!lpFired){pn.dragX=dx*0.9; pn.dragY=dy*0.4;}
 },{passive:true});
 function endPointer(e){
-  touches.delete(e.pointerId);
-  if(touches.size<2) pinch=null;
+  if(!touches.delete(e.pointerId)) return false;
+  if(FOCUS.length) bloomLast=performance.now();
+  rebasePinch();
+  return true;
 }
 function cancelPointer(e){
-  endPointer(e);
+  // A cancel has authority only for a pointer this surface actually tracks.
+  // A foreign control or synthetic stream cannot erase the learner's hand.
+  if(!endPointer(e)) return;
   // a cancelled drag leaves no ghost offset behind (the node returns home)
   if(pn){pn.dragX=0; pn.dragY=0;}
   touches.clear(); pinch=null; pn=null;
@@ -1974,8 +2031,7 @@ function cancelPointer(e){
 addEventListener("pointercancel",cancelPointer,{passive:true});
 addEventListener("pointerup",e=>{
   const owner=e.pointerId===gestureId;
-  endPointer(e);
-  if(FOCUS.length) bloomLast=performance.now();
+  if(!endPointer(e)) return;
   if(!owner) return;   // a camera finger lifting is not a judgment
   gestureId=null;
   clearTimeout(lpTimer);
@@ -1985,12 +2041,13 @@ addEventListener("pointerup",e=>{
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
+  const terminalMoved=moved||Math.abs(dx)>8||Math.abs(dy)>8;
   if(n){
     const ddx=n.dragX, ddy=n.dragY;
     n.x+=n.dragX; n.y+=n.dragY; n.dragX=0; n.dragY=0;
     // the judgment is a FLICK — fast and horizontal. A slow drag is a MOVE:
     // the word (and its constellation) goes where the finger left it.
-    const flick=(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
+    const flick=moved&&(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
     const mayGrade=!FOCUS.length||n===focusN;
     if(flick&&dx<-52&&mayGrade){grade(n,-1);return;}
     if(flick&&dx>52&&mayGrade){grade(n,1);return;}
@@ -2000,10 +2057,10 @@ addEventListener("pointerup",e=>{
       n.wx+=wdx; n.wy+=wdy;
       if(n.wref){n.wref.wx+=wdx; n.wref.wy+=wdy;}
     }
-    if(moved||held>600) return;
+    if(terminalMoved||held>600) return;
     tapNode(n); return;
   }
-  if(moved||held>600) return;   // a release is deliberate, or it is nothing
+  if(terminalMoved||held>600) return; // a release is deliberate, or it is nothing
   if(card.classList.contains("open")){card.classList.remove("open");return;}
   if(stack.length){surface();return;}
   if(FOCUS.length){
@@ -2384,9 +2441,8 @@ function frame(t){
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
   }
-  // true inactivity means no hand on the glass. A finger held perfectly still
-  // emits no pointer events, so bloomLast never refreshed and the bloom died
-  // under the learner's own finger at 10s — a 1px jiggle kept it alive forever.
+  // A still finger emits no move events. Refresh from the tracked touch set
+  // each frame so cancellation starts a fresh, honest inactivity interval.
   if(touches.size) bloomLast=t;
   if(FOCUS.length&&!lockOn&&t-bloomLast>10000) clearBloom();
   if(frameCount%90===0) rebuildPairs();

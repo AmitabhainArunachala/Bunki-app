@@ -155,7 +155,19 @@ const MEASURE_FN = `(() => {
   };
   const targets = [...document.querySelectorAll('button, [role=button], a')]
     .filter((n) => n.offsetParent !== null)
-    .map((n) => { const r = n.getBoundingClientRect(); return { text: (n.textContent||'').trim().slice(0, 14), w: Math.round(r.width), h: Math.round(r.height), id: n.id || n.className }; });
+    .map((n) => {
+      const r = n.getBoundingClientRect();
+      const expanded = n.matches('#reader button.tok') ? getComputedStyle(n, '::before') : null;
+      const expandedW = expanded ? parseFloat(expanded.width) : 0;
+      const expandedH = expanded ? parseFloat(expanded.height) : 0;
+      return {
+        text: (n.textContent||'').trim().slice(0, 14),
+        w: Math.round(r.width), h: Math.round(r.height),
+        hitW: Math.round(Math.max(r.width, expandedW || 0)),
+        hitH: Math.round(Math.max(r.height, expandedH || 0)),
+        id: n.id || n.className,
+      };
+    });
   return {
     text: [
       measure('.reader', 'reading body (focused)'),
@@ -629,15 +641,20 @@ async function main() {
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
 
-  // 3rd tap → all the way back out
+  // 3rd tap → carries into the full entry (ratified click grammar)
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
-  const afterThird = await page.evaluate(`(() => {
-    const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
-    return { en: tok.querySelectorAll('.tok-en').length, lit: tok.classList.contains('lit') };
-  })()`);
-  check('grammar · a third tap backs all the way out', afterThird.en === 0 && !afterThird.lit,
-    `gloss removed, highlight cleared`);
+  const afterThird = await page.evaluate(`(() => ({
+    sheet: document.querySelector('#sheet')?.dataset.node ?? '',
+    named: document.querySelector('#sheet')?.getAttribute('aria-label') ?? '',
+  }))()`);
+  check('grammar · a third tap carries into the full entry',
+    afterThird.sheet.startsWith('word:') && afterThird.named.length > 0,
+    `${afterThird.sheet} · ${afterThird.named}`);
+  if (afterThird.sheet) {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(120);
+  }
 
   // long press → the floating mini-dictionary; a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
@@ -773,7 +790,7 @@ async function main() {
     check('kanji → a word that contains it', (await nodeNow()).startsWith('word:'), await nodeNow());
     hops.push(await nodeNow());
     await shoot(page, shotsDir, '04d-kanji-to-word');
-    await tap(page, '#back');
+    await tap(page, '#sheet-back');
     await page.waitForTimeout(150);
   } else {
     check('kanji → a word that contains it', false, 'no compounds section on this kanji page');
@@ -865,8 +882,8 @@ async function main() {
   await page.waitForSelector('#sheet');
   await tap(page, '#sheet [data-kanjirow]');
   await page.waitForTimeout(140);
-  await tap(page, '#back');
-  await tap(page, '#back');
+  await tap(page, '#sheet-back');
+  await tap(page, '#sheet-back');
   await page.waitForTimeout(200);
   const scrollAfter = await page.evaluate('window.scrollY');
   const sheetGone = (await page.locator('#sheet').count()) === 0;
@@ -999,9 +1016,11 @@ async function main() {
   const bodyInk = m.text.find((t) => t.label === 'view title' || t.label === 'shelf title');
   check('body ink clears AAA', bodyInk && bodyInk.contrast >= 7, `${bodyInk?.contrast}:1`);
 
-  const small = m.targets.filter((t) => t.h < MIN_TAP || t.w < MIN_TAP);
+  const small = m.targets.filter((t) => t.hitH < MIN_TAP || t.hitW < MIN_TAP);
   check(`every visible control is at least ${MIN_TAP}px`, small.length === 0,
-    small.length ? small.map((t) => `${t.id || t.text} ${t.w}×${t.h}`).join(', ') : `${m.targets.length} controls checked`);
+    small.length
+      ? small.map((t) => `${t.id || t.text} visual ${t.w}×${t.h}, hit ${t.hitW}×${t.hitH}`).join(', ')
+      : `${m.targets.length} controls checked, including inline token hit regions`);
 
   check('the page never scrolls sideways at 390px',
     m.docScrollWidth <= m.innerWidth,
