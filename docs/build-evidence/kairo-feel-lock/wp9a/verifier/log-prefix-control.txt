@@ -1,0 +1,46 @@
+--- md5 BEFORE control ---
+113e8d7a8c102e48147ca1229ef509a3  prototypes/drift/drift-artifact.html
+a1b84fc3bb9549e0d7d7cf3a20104dc0  prototypes/corridor/drift-layer.js
+94a3836975fbba6a7751c3497081b0ec  prototypes/corridor/corridor-standalone.html
+77e3e56a6a1c00f5fe8dd59c754442a9  prototypes/corridor/drift-layer.css
+drift-layer: css 14 KB · markup 2.0 KB · js 617 KB · 12 patches, all asserted unique
+/home/user/Bunki-app/.claude/worktrees/agent-a3e020977353ad705/prototypes/corridor/corridor-standalone.html  8.20 MB
+--- md5 with PRE-FIX in tree (must differ) ---
+d7bac3b0bcd8403a14d92f76d57e6929  prototypes/drift/drift-artifact.html
+ad84348bce6f89fa1db63c7dc9c51e9f  prototypes/corridor/drift-layer.js
+3e3909a4363da756cc63205e53fa31ac  prototypes/corridor/corridor-standalone.html
+77e3e56a6a1c00f5fe8dd59c754442a9  prototypes/corridor/drift-layer.css
+##### CONTROL DRIFT FAST 1 #####
+==== sweep: 43 cases · 43 ok · 0 violations · 0 page errors ====
+##### CONTROL DRIFT FAST 2 #####
+==== sweep: 45 cases · 45 ok · 0 violations · 0 page errors ====
+##### CONTROL DRIFT FAST 3 #####
+==== sweep: 45 cases · 45 ok · 0 violations · 0 page errors ====
+##### CONTROL HUNT 1 #####
+ FAIL hunt · a flick judgment sticks (the word does not rematerialize)  — tray ""; word back after 5s = true
+ FAIL hunt · a held finger keeps a constellation alive past the 10s fade  — no open water
+ FAIL hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction  — DOM=true, hitSelf=true; stage1=false/false, stage2=false/false; centre "過酷" → "null" → "null"
+##### CONTROL HUNT 2 #####
+ FAIL hunt · a flick judgment sticks (the word does not rematerialize)  — tray ""; word back after 5s = true
+ FAIL hunt · a held finger keeps a constellation alive past the 10s fade  — no open water
+ FAIL hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction  — DOM=true, hitSelf=true; stage1=false/false, stage2=false/false; centre "過酷" → "null" → "null"
+ FAIL hunt · a kana-only semantic word grows a meaningful same-level fallback constellation  — DOM=true, hitSelf=true, hit="きつい", reading="", first=true/true; centre="厳しい"→"現実は厳しい", DOM sats=12, members=事実・厳しい・実に・実は・実力・実施・実現・実行・実際・実験・現場・現実
+ FAIL hunt · hub release cannot hijack a gesture or leave themed ghost satellites  — terminal 193px: depth="", centre="増加", sats=14→14, same identities=true; deliberate release ctr="増加"→"増加", depth=""; second-tap depth=""; after theme+surface centre="増加", sats=14
+5 HUNT REGRESSION(S) FAILING
+--- restoring f058461 ---
+drift-layer: css 14 KB · markup 2.0 KB · js 621 KB · 12 patches, all asserted unique
+/home/user/Bunki-app/.claude/worktrees/agent-a3e020977353ad705/prototypes/corridor/corridor-standalone.html  8.20 MB
+--- md5 AFTER restore (must match BEFORE) ---
+113e8d7a8c102e48147ca1229ef509a3  prototypes/drift/drift-artifact.html
+a1b84fc3bb9549e0d7d7cf3a20104dc0  prototypes/corridor/drift-layer.js
+94a3836975fbba6a7751c3497081b0ec  prototypes/corridor/corridor-standalone.html
+77e3e56a6a1c00f5fe8dd59c754442a9  prototypes/corridor/drift-layer.css
+ M docs/audits/drift-consistency-report.json
+?? docs/audits/drift-consistency-shots/case-01-tap-again.png
+?? node_modules
+?? prototypes/corridor/evidence/a0-drift-hunts-20260808/07-semantic-dom-kana-fallback-current.png
+?? prototypes/corridor/evidence/a0-drift-hunts-20260808/07-semantic-member-before-current.png
+?? prototypes/corridor/evidence/a0-drift-hunts-20260808/08-pointer-identity-pinch-rebase-current.png
+?? prototypes/corridor/evidence/a0-drift-hunts-20260808/09-stationary-hold-lifecycle-current.png
+?? prototypes/corridor/evidence/a0-drift-hunts-20260808/10-hub-release-theme-cleanup-current.png
+CONTROL-DONE
