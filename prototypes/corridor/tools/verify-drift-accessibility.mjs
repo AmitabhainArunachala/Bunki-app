@@ -137,15 +137,18 @@ async function visibleWord(page, root = '#drift-layer') {
   for (const handle of handles) {
     const probe = await handle.evaluate((node) => {
       const rect = node.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
       return {
         opacity: Number.parseFloat(getComputedStyle(node).opacity || '1'),
         pointer: getComputedStyle(node).pointerEvents,
+        directHit: hit === node || hit?.closest?.('.word,.glyph,.part') === node,
         rect: { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom },
       };
     });
     if (
       probe.opacity >= 0.4 &&
       probe.pointer !== 'none' &&
+      probe.directHit &&
       probe.rect.left > 55 &&
       probe.rect.right < VIEWPORT.width - 55 &&
       probe.rect.top > 165 &&
@@ -302,11 +305,54 @@ async function main() {
     await fused.waitForTimeout(600);
     const lock = await fused.evaluate(`(() => {
       const members = [...document.querySelectorAll('#drift-layer .word.bsat')];
+      const centerNode = document.querySelector('#drift-layer .word.bctr,#drift-layer .glyph.bctr');
+      const bodies = [centerNode, ...members, ...document.querySelectorAll('#drift-layer .glyph.lockpin')].filter(Boolean);
+      const rects = bodies.map((node) => {
+        const rect = node.getBoundingClientRect();
+        const label = node.querySelector('.base,.g');
+        const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return {
+          left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom,
+          direct: hit === node || hit?.closest?.('.word,.glyph,.part') === node,
+          isolated: getComputedStyle(label).backgroundColor !== 'rgba(0, 0, 0, 0)',
+        };
+      });
+      let overlaps = 0;
+      for (let a = 0; a < rects.length; a += 1) for (let b = a + 1; b < rects.length; b += 1) {
+        const width = Math.min(rects[a].right, rects[b].right) - Math.max(rects[a].left, rects[b].left);
+        const height = Math.min(rects[a].bottom, rects[b].bottom) - Math.max(rects[a].top, rects[b].top);
+        if (width > 1 && height > 1) overlaps += 1;
+      }
+      const actions = document.querySelector('#drift-layer #driftActions');
+      const actionRect = actions.getBoundingClientRect();
+      const doorRect = document.querySelector('#enter-shelf-door').getBoundingClientRect();
+      const actionDoorOverlap = Math.max(0, Math.min(actionRect.right, doorRect.right) - Math.max(actionRect.left, doorRect.left)) *
+        Math.max(0, Math.min(actionRect.bottom, doorRect.bottom) - Math.max(actionRect.top, doorRect.top));
+      const controls = [...actions.querySelectorAll('button:not([hidden])')];
+      const directControls = controls.filter((button) => {
+        const rect = button.getBoundingClientRect();
+        const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return hit === button || hit?.closest?.('button') === button;
+      }).length;
       return {
         center: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? '',
         members: members.length,
         named: members.filter((node) => Boolean(node.getAttribute('aria-label'))).length,
         typed: members.filter((node) => Boolean(node.dataset.relation)).length,
+        geometry: {
+          bodies: bodies.length,
+          overlaps,
+          direct: rects.filter((rect) => rect.direct).length,
+          isolated: rects.filter((rect) => rect.isolated).length,
+        },
+        actions: {
+          controls: controls.length,
+          direct: directControls,
+          doorOverlap: actionDoorOverlap,
+          inViewport: actionRect.left >= 0 && actionRect.right <= innerWidth &&
+            actionRect.top >= 0 && actionRect.bottom <= innerHeight,
+          hintOpacity: Number.parseFloat(getComputedStyle(document.querySelector('#drift-layer #hint')).opacity),
+        },
         receipt: window.__KAIRO_INTERACTION__?.receipts?.at(-1) ?? null,
       };
     })()`);
@@ -324,6 +370,18 @@ async function main() {
       'constellation lock emits the same neutral action with keyboard provenance',
       lock.receipt?.action?.kind === 'constellation.lock' && lock.receipt?.provenance?.modality === 'keyboard',
       JSON.stringify(lock.receipt),
+    );
+    check(
+      'locked graph bodies remain separated, directly hittable, and isolated from edge ink',
+      lock.geometry.bodies >= 12 && lock.geometry.overlaps === 0 &&
+        lock.geometry.direct === lock.geometry.bodies && lock.geometry.isolated === lock.geometry.bodies,
+      JSON.stringify(lock.geometry),
+    );
+    check(
+      'non-hold action strip is fully visible and unobscured by Corridor chrome',
+      lock.actions.controls === 3 && lock.actions.direct === 3 && lock.actions.doorOverlap === 0 &&
+        lock.actions.inViewport && lock.actions.hintOpacity < 0.1,
+      JSON.stringify(lock.actions),
     );
     await fused.screenshot({ path: resolve(SHOTS_DIR, `${PHASE}-01-keyboard-constellation.png`) });
 

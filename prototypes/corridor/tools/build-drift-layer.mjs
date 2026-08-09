@@ -99,6 +99,16 @@ ${scopedRules.join('\n')}
 #drift-layer #theme { top: calc(66px + env(safe-area-inset-top)); }
 #drift-layer #drift-tray { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #drift-layer #hint { bottom: calc(120px + env(safe-area-inset-bottom)); }
+#drift-layer #driftActions {
+  left: 48px;
+  right: 112px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  transform: none;
+  gap: 4px;
+  padding: 5px;
+  justify-content: space-between;
+}
+#drift-layer #driftActions button { padding: 6px 8px; font-size: 11px; }
 #drift-layer #card { bottom: 64px; max-height: calc(100vh - 190px); overflow-y: auto; }
 /* the radical explainer is a modal: it must clear the corridor chrome band
  * so its own close button is reachable (the hunt found the X hit-testing

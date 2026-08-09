@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "verifier": "verify-drift-accessibility.mjs",
+  "evidencePhase": "green",
+  "head": "1940ee38edcee3b339a9d7a2e23aaf51b78f1266",
+  "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "summary": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0
+  },
+  "results": [
+    {
+      "name": "fused Drift bodies are named native target.activate controls",
+      "pass": true,
+      "detail": "{\"count\":64,\"native\":64,\"named\":64,\"targetActions\":64,\"tabStops\":30,\"minHit\":44.046051025390625}"
+    },
+    {
+      "name": "fused actionable Drift bodies retain a 44px hit floor",
+      "pass": true,
+      "detail": "minimum 44.0px"
+    },
+    {
+      "name": "source Drift bodies are named native target.activate controls",
+      "pass": true,
+      "detail": "{\"count\":64,\"native\":64,\"named\":64,\"targetActions\":64,\"tabStops\":42,\"minHit\":44.0537109375}"
+    },
+    {
+      "name": "source actionable Drift bodies retain a 44px hit floor",
+      "pass": true,
+      "detail": "minimum 44.1px"
+    },
+    {
+      "name": "unrevealed word exposes only its surface in the accessibility tree",
+      "pass": true,
+      "detail": "{\"first\":{\"reading\":\"で\",\"surface\":\"出\",\"gloss\":\"outflow, coming (going) out\"},\"initialAX\":[{\"role\":\"button\",\"name\":\"出\"}]}"
+    },
+    {
+      "name": "Enter follows the same reading-then-English staging as pointer activation",
+      "pass": true,
+      "detail": "{\"target\":\"判断\",\"focusable\":true,\"firstStage\":{\"unfolded\":true,\"glossed\":false,\"name\":\"判断, reading はんだん\"},\"secondStage\":{\"unfolded\":true,\"glossed\":true,\"name\":\"判断, reading はんだん, judgment, decision\"}}"
+    },
+    {
+      "name": "keyboard target activation emits neutral envelopes with keyboard provenance",
+      "pass": true,
+      "detail": "2 receipt(s)"
+    },
+    {
+      "name": "sequential switch navigation reaches the discoverable non-hold constellation action",
+      "pass": true,
+      "detail": "constellation.lock"
+    },
+    {
+      "name": "non-hold lock preserves the real ≥12-member constellation",
+      "pass": true,
+      "detail": "{\"center\":\"判断\",\"members\":12,\"named\":12,\"typed\":12,\"geometry\":{\"bodies\":15,\"overlaps\":0,\"direct\":15,\"isolated\":15},\"actions\":{\"controls\":3,\"direct\":3,\"doorOverlap\":0,\"inViewport\":true,\"hintOpacity\":0.055353},\"receipt\":{\"action\":{\"kind\":\"constellation.lock\",\"target\":{\"kind\":\"word\",\"id\":\"判断\"}},\"provenance\":{\"modality\":\"keyboard\",\"sourceId\":\"drift\"}}}"
+    },
+    {
+      "name": "constellation relation types are semantic, not color-only",
+      "pass": true,
+      "detail": "12/12 typed member(s)"
+    },
+    {
+      "name": "constellation lock emits the same neutral action with keyboard provenance",
+      "pass": true,
+      "detail": "{\"action\":{\"kind\":\"constellation.lock\",\"target\":{\"kind\":\"word\",\"id\":\"判断\"}},\"provenance\":{\"modality\":\"keyboard\",\"sourceId\":\"drift\"}}"
+    },
+    {
+      "name": "locked graph bodies remain separated, directly hittable, and isolated from edge ink",
+      "pass": true,
+      "detail": "{\"bodies\":15,\"overlaps\":0,\"direct\":15,\"isolated\":15}"
+    },
+    {
+      "name": "non-hold action strip is fully visible and unobscured by Corridor chrome",
+      "pass": true,
+      "detail": "{\"controls\":3,\"direct\":3,\"doorOverlap\":0,\"inViewport\":true,\"hintOpacity\":0.055353}"
+    },
+    {
+      "name": "tide is a named vertical slider with value semantics and a 44px target",
+      "pass": true,
+      "detail": "{\"role\":\"slider\",\"tabIndex\":0,\"min\":\"0\",\"max\":\"5\",\"now\":\"3\",\"text\":\"N3 — N3 · 小5–6 · 漢検6–5級\",\"width\":44}"
+    },
+    {
+      "name": "tide arrow keys commit a new stop through tide.set",
+      "pass": true,
+      "detail": "{\"tideAfter\":{\"now\":\"2\",\"text\":\"N2 — N2 · 中学 · 漢検4–3級\"},\"tideReceipt\":{\"action\":{\"kind\":\"tide.set\",\"value\":\"N2\",\"level\":2},\"provenance\":{\"modality\":\"keyboard\",\"sourceId\":\"drift\"}}}"
+    },
+    {
+      "name": "theme control names its current value and updates it after keyboard activation",
+      "pass": true,
+      "detail": "{\"themeBefore\":{\"text\":\"北斎\",\"name\":\"pigment theme: 北斎\"},\"themeAfter\":{\"text\":\"墨\",\"name\":\"pigment theme: 墨\"}}"
+    },
+    {
+      "name": "theme activation also travels through the neutral target action",
+      "pass": true,
+      "detail": "{\"action\":{\"kind\":\"target.activate\",\"target\":{\"kind\":\"theme\",\"id\":\"墨\"}},\"provenance\":{\"modality\":\"keyboard\",\"sourceId\":\"drift\"}}"
+    },
+    {
+      "name": "a discoverable navigation.back alternative appears at dive depth",
+      "pass": true,
+      "detail": "{\"depth\":\"判断\",\"back\":\"水面へ戻る — back\"}"
+    },
+    {
+      "name": "Drift card is a named dialog with close semantics and focus entry",
+      "pass": true,
+      "detail": "{\"open\":true,\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"判断 details\",\"focusInside\":true,\"close\":true}"
+    },
+    {
+      "name": "Escape closes the card, removes it from AT, and returns focus to its body",
+      "pass": true,
+      "detail": "{\"closed\":true,\"hidden\":\"true\",\"focusOnBody\":true}"
+    },
+    {
+      "name": "closed Drift overlays are inert, AT-hidden, and absent from tab order",
+      "pass": true,
+      "detail": "{\"leaks\":[],\"roots\":[{\"id\":\"card\",\"hidden\":\"true\",\"inert\":true},{\"id\":\"radoc\",\"hidden\":\"true\",\"inert\":true}]}"
+    },
+    {
+      "name": "hiding the fused layer evacuates focus and makes the whole surface inert",
+      "pass": true,
+      "detail": "{\"active\":\"\",\"inside\":false,\"inert\":true,\"hidden\":\"true\"}"
+    },
+    {
+      "name": "accessibility reveal/selection actions write neither Drift judgment nor Corridor/FSRS state",
+      "pass": true,
+      "detail": "{\"writes\":[],\"drift\":null,\"corridor\":null}"
+    },
+    {
+      "name": "explicit judgment alternative only nominates locally and cannot write Corridor/FSRS state",
+      "pass": true,
+      "detail": "{\"receipt\":{\"action\":{\"kind\":\"judgment.nominate\",\"target\":{\"kind\":\"word\",\"id\":\"判断\"},\"judgment\":\"known\"},\"provenance\":{\"modality\":\"keyboard\",\"sourceId\":\"drift\"}},\"writes\":[{\"key\":\"bunki-drift-v1\",\"value\":\"{\\\"known\\\":{\\\"判断\\\":1},\\\"unknown\\\":{},\\\"lk\\\":1,\\\"lu\\\":0}\"}],\"drift\":\"{\\\"known\\\":{\\\"判断\\\":1},\\\"unknown\\\":{},\\\"lk\\\":1,\\\"lu\\\":0}\",\"corridor\":null}"
+    },
+    {
+      "name": "background-tab time is suspended and does not consume the 10s constellation TTL",
+      "pass": true,
+      "detail": "{\"hiddenState\":\"hidden\",\"bloomBefore\":14,\"bloomAfter\":14}"
+    },
+    {
+      "name": "reduced motion removes Drift transitions and animation durations",
+      "pass": true,
+      "detail": "{\"root\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"word\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"yomi\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"card\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"tide\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "settled reduced-motion Drift is visually stationary across frames",
+      "pass": true,
+      "detail": "db8c82b9eb0c0d16 → db8c82b9eb0c0d16"
+    },
+    {
+      "name": "runtime reduced-motion preference changes take effect without reload",
+      "pass": true,
+      "detail": "{\"matches\":true,\"marked\":true,\"transition\":\"0s\"}"
+    },
+    {
+      "name": "committed fused Drift outputs match the authoritative artifact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "committed standalone matches the authoritative fused inputs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walks requested no missing assets",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walks emitted no page/console/parity errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "screenshots": [
+    "screenshots/green-01-keyboard-constellation.png",
+    "screenshots/green-02-semantic-controls.png",
+    "screenshots/green-03-reduced-motion.png",
+    "screenshots/green-04-source-authority.png"
+  ],
+  "errors": [],
+  "misses": []
+}

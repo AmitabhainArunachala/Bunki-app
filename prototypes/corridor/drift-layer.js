@@ -7,7 +7,7 @@ const __layer = document.createElement("div");
 __layer.id = "drift-layer";
 __layer.inert = true;
 __layer.setAttribute("aria-hidden", "true");
-__layer.innerHTML = "<canvas id=\"ink\"></canvas>\n<div id=\"grain\"></div>\n<div id=\"veil\"></div>\n<canvas id=\"fx\"></canvas>\n<div id=\"sky\"></div>\n<div id=\"brand\"><span id=\"seal\">分</span>墨流し</div>\n<div id=\"depth\"></div>\n<button id=\"theme\" type=\"button\" aria-label=\"pigment theme: 北斎\">北斎</button>\n<button id=\"driftBack\" type=\"button\" data-action=\"navigation.back\" aria-label=\"水面へ戻る — back\" hidden>水面へ戻る</button>\n<div id=\"drift-tray\"></div>\n<div id=\"hint\">ことばに触れて</div>\n<div id=\"lvl\" role=\"slider\" tabindex=\"0\" aria-label=\"ことばの潮位\" aria-orientation=\"vertical\"><div id=\"lvlTrack\"></div><div id=\"lvlHandle\"></div>\n<div id=\"lvlLabels\"></div><div id=\"lvlInfo\"></div></div>\n<div id=\"card\" role=\"dialog\" aria-modal=\"true\" aria-hidden=\"true\" inert></div>\n<div id=\"radoc\" role=\"dialog\" aria-modal=\"true\" aria-label=\"部首 — radicals\" aria-hidden=\"true\" inert><button type=\"button\" class=\"x\" id=\"radocX\" data-action=\"layer.dismiss\">閉じる ×</button><div class=\"wrap\">\n<h2>部首 — radicals</h2><div class=\"sub\">THE SHAPES A KANJI IS FILED UNDER</div>\n<p>Every kanji is built from smaller recurring shapes. One of them is chosen as its <b>radical</b> (部首, <i>bushu</i>) — the piece a dictionary files it under, the way an English word is filed under its first letter. There are <b>214</b> classical (Kangxi) radicals, and learning to spot them turns a wall of strokes into a handful of familiar parts.</p>\n<p>A radical often carries meaning. The water radical 氵 hints that a kanji is about water; the tree radical 木 that it is about wood or plants. So a radical is both an index and a clue.</p>\n<p><b>Radical vs. component.</b> A kanji contains many components, but only one is its official radical. This dictionary is careful about the difference: it says 「部首」 only when a character truly has a classical radical number; otherwise it says 「この字を含む」 — <i>kanji that contain this shape</i> — which is an honest, looser family.</p>\n<div class=\"rex\"><span class=\"rc\">氵</span><span class=\"rt\"><b>water</b> (さんずい) · 海 sea · 泳 swim · 池 pond · river 河</span></div>\n<div class=\"rex\"><span class=\"rc\">木</span><span class=\"rt\"><b>tree</b> (き) · 林 grove · 森 forest · 柱 pillar · 校 school</span></div>\n<div class=\"rex\"><span class=\"rc\">言</span><span class=\"rt\"><b>word / speech</b> (ごんべん) · 語 language · 話 talk · 読 read · 記 record</span></div>\n<p style=\"color:var(--faint);font-size:13px\">Tap any character in a radical's family list to travel to it and keep exploring.</p>\n</div></div>\n<div id=\"driftActions\" role=\"group\" aria-label=\"選んだことばの操作\" hidden>\n<button type=\"button\" data-action=\"constellation.lock\">つながりを開く</button>\n<button type=\"button\" data-action=\"judgment.nominate\" data-judgment=\"known\">知っている</button>\n<button type=\"button\" data-action=\"judgment.nominate\" data-judgment=\"unknown\">まだ知らない</button>\n</div>";
+__layer.innerHTML = "<canvas id=\"ink\"></canvas>\n<div id=\"grain\"></div>\n<div id=\"veil\"></div>\n<canvas id=\"fx\"></canvas>\n<div id=\"sky\"></div>\n<div id=\"brand\"><span id=\"seal\">分</span>墨流し</div>\n<div id=\"depth\"></div>\n<button id=\"theme\" type=\"button\" aria-label=\"pigment theme: 北斎\">北斎</button>\n<button id=\"driftBack\" type=\"button\" data-action=\"navigation.back\" aria-label=\"水面へ戻る — back\" hidden>水面へ戻る</button>\n<div id=\"drift-tray\"></div>\n<div id=\"hint\">ことばに触れて</div>\n<div id=\"lvl\" role=\"slider\" tabindex=\"0\" aria-label=\"ことばの潮位\" aria-orientation=\"vertical\"><div id=\"lvlTrack\"></div><div id=\"lvlHandle\"></div>\n<div id=\"lvlLabels\"></div><div id=\"lvlInfo\"></div></div>\n<div id=\"card\" role=\"dialog\" aria-modal=\"true\" aria-hidden=\"true\" inert></div>\n<div id=\"radoc\" role=\"dialog\" aria-modal=\"true\" aria-label=\"部首 — radicals\" aria-hidden=\"true\" inert><button type=\"button\" class=\"x\" id=\"radocX\" data-action=\"layer.dismiss\">閉じる ×</button><div class=\"wrap\">\n<h2>部首 — radicals</h2><div class=\"sub\">THE SHAPES A KANJI IS FILED UNDER</div>\n<p>Every kanji is built from smaller recurring shapes. One of them is chosen as its <b>radical</b> (部首, <i>bushu</i>) — the piece a dictionary files it under, the way an English word is filed under its first letter. There are <b>214</b> classical (Kangxi) radicals, and learning to spot them turns a wall of strokes into a handful of familiar parts.</p>\n<p>A radical often carries meaning. The water radical 氵 hints that a kanji is about water; the tree radical 木 that it is about wood or plants. So a radical is both an index and a clue.</p>\n<p><b>Radical vs. component.</b> A kanji contains many components, but only one is its official radical. This dictionary is careful about the difference: it says 「部首」 only when a character truly has a classical radical number; otherwise it says 「この字を含む」 — <i>kanji that contain this shape</i> — which is an honest, looser family.</p>\n<div class=\"rex\"><span class=\"rc\">氵</span><span class=\"rt\"><b>water</b> (さんずい) · 海 sea · 泳 swim · 池 pond · river 河</span></div>\n<div class=\"rex\"><span class=\"rc\">木</span><span class=\"rt\"><b>tree</b> (き) · 林 grove · 森 forest · 柱 pillar · 校 school</span></div>\n<div class=\"rex\"><span class=\"rc\">言</span><span class=\"rt\"><b>word / speech</b> (ごんべん) · 語 language · 話 talk · 読 read · 記 record</span></div>\n<p style=\"color:var(--faint);font-size:13px\">Tap any character in a radical's family list to travel to it and keep exploring.</p>\n</div></div>\n<div id=\"driftActions\" role=\"group\" aria-label=\"選んだことばの操作\" hidden>\n<button type=\"button\" data-action=\"constellation.lock\" aria-label=\"つながりを開く — show connections\">つながり</button>\n<button type=\"button\" data-action=\"judgment.nominate\" data-judgment=\"known\">知っている</button>\n<button type=\"button\" data-action=\"judgment.nominate\" data-judgment=\"unknown\" aria-label=\"まだ知らない — not yet known\">まだ</button>\n</div>";
 document.body.prepend(__layer);
 const TAU=Math.PI*2;
 const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
@@ -403,9 +403,9 @@ function drawInk(t){
       b.x+=fv.x*(vw()/FW)*0.22; b.y+=fv.y*(vh()/FH)*0.22;
       b.x=clamp(b.x,-80,vw()+80); b.y=clamp(b.y,-80,vh()+80);
     }
-    const bx=b.x+Math.cos(t*b.sp+b.ph)*b.amp+b.ix;
-    const by=b.y+Math.sin(t*b.sp*0.8+b.ph2)*b.amp*0.7+b.iy;
-    b.ix*=0.95; b.iy*=0.95;
+    const bx=reduced?b.x:(b.x+Math.cos(t*b.sp+b.ph)*b.amp+b.ix);
+    const by=reduced?b.y:(b.y+Math.sin(t*b.sp*0.8+b.ph2)*b.amp*0.7+b.iy);
+    if(reduced){b.ix=0;b.iy=0;} else {b.ix*=0.95;b.iy*=0.95;}
     const sp2=blobSprite(b.color);
     ictx.globalAlpha=Math.min(.5,th.blobA*b.a);
     ictx.drawImage(sp2,bx-b.r,by-b.r,b.r*2,b.r*2);
@@ -630,6 +630,7 @@ function showNodeActions(n){
   lock.hidden=n.kind==="part"||stack.length>0;
   n.el.after(driftActions);
   driftActions.hidden=false;
+  hint.style.opacity="0";
 }
 function hideNodeActions(){
   driftActions.hidden=true;
@@ -1113,6 +1114,7 @@ function constellationLock(n){
   const pinOf={};
   anat.forEach((c,i)=>{
     const g=spawnGlyph(c,n.x,n.y,isG);
+    g.el.classList.add("lockpin");
     g.wx=bx+(Math.random()-.5)*30; g.wy=by+(Math.random()-.5)*30;
     g.mode="glide"; g.top=.95;
     LOCKG.push(g); pinOf[c]=g; g.hlDom=true;
@@ -1162,9 +1164,14 @@ function constellationLock(n){
     const ang=-Math.PI/2+LOCK.items.length*TAU/Math.max(mem.length+LOCK.items.length,12)+(h%31-15)*0.008;
     wr.ox=bx+Math.cos(ang)*L-wr.wx; wr.oy=by+Math.sin(ang)*L-wr.wy;
     wr.hl=true; wr.lk=true; wr.ret=false;
-    lockMaterialize(wr);
+    // Cascaded corpus relations still carry meaning: shared surface kanji are
+    // a word-family relation; the same-level safety floor is thematic kin.
+    // This label is announced as well as painted, so fallback edges are never
+    // color-only when SEM has no authored entry for the center.
+    const ty=shared.length?"fam":"thm";
+    setNodeRelation(lockMaterialize(wr),ty);
     FOCUS.push(wr);
-    LOCK.items.push({t:"w",wr,L,pg});
+    LOCK.items.push({t:"w",wr,L,pg,ty});
   }
   ripple(n.x,n.y,true);
 }
@@ -1185,13 +1192,13 @@ function lockSafeScreenPoint(point,padx,pady){
 // live force layout: springs along the graph, repulsion between all — the
 // arms find their own staggered lengths and keep breathing
 function lockForce(){
-  if(!LOCK) return;
+  if(!LOCK||reduced) return;
   if(focusN&&!focusN.gone){
     const cs6=Math.cos(cam.rot), sn6=Math.sin(cam.rot);
     const dx6=(focusN.x+focusN.dragX-vw()/2)/cam.z, dy6=(focusN.y+focusN.dragY-vh()/2)/cam.z;
     LOCK.bx=cam.x+dx6*cs6+dy6*sn6; LOCK.by=cam.y-dx6*sn6+dy6*cs6;
   }
-  const inv=1/cam.z, sep=100*inv, csep=74*inv;
+  const inv=1/cam.z, sep=112*inv, csep=86*inv;
   for(const it of LOCK.items){
     if(it.t==="w"){it.px=it.wr.wx+it.wr.ox; it.py=it.wr.wy+it.wr.oy;}
     else if(it.t==="s"){it.px=it.node.wx; it.py=it.node.wy;}
@@ -1515,6 +1522,7 @@ function drawTrail(t){
 // ---- grading: pigment bloom / ink sink ----
 const ripples=[],particles=[];
 function ripple(x,y,big){
+  if(reduced) return;
   ripples.push({x,y,r:big?10:4,alpha:big?0.5:0.32,sp:big?4.5:2.6,echo:false});
   fluidBurst(x,y,big?0.5:0.16);
   for(const b of blobs){
@@ -1524,6 +1532,7 @@ function ripple(x,y,big){
   }
 }
 function bloom(n){
+  if(reduced) return;
   const th=THEMES[themeIx];
   const rect=n.el.getBoundingClientRect();
   const cols=[th.pig1,th.pig2,th.accent,th.dark?"#E6C86E":"#A8842C"];
@@ -1538,6 +1547,7 @@ function bloom(n){
   ripple(n.x,n.y,false);
 }
 function sink(n){
+  if(reduced) return;
   const th=THEMES[themeIx];
   const rect=n.el.getBoundingClientRect();
   const col=th.dark?th.pig1:th.ink;
@@ -1604,7 +1614,7 @@ function updateTray(){
 // the center; surfacing dissolves it back into the list it came from
 function diveFromList(ch){
   if(!ch) return;
-  card.classList.remove("open");
+  closeCard("programmatic",false);
   const g=spawnGlyph(ch,vw()/2,vh()*0.62,false);
   g.ephemeral=true; g.op=0;
   diveKanji(g);
@@ -1669,12 +1679,19 @@ function studyHtml(kind,key,fallback){
     (kind==='word'?'語':'字')+'を学ぶ →</a>';
 }
 let cardReturnNode=null;
+function setDialogTabbable(root,on){
+  for(const control of root.querySelectorAll('button,a[href],input,select,textarea,[tabindex]')){
+    if(on) control.removeAttribute("tabindex");
+    else control.tabIndex=-1;
+  }
+}
 function closeCard(modality="programmatic",emit=true){
   if(!card.classList.contains("open")) return false;
   if(emit) driftEmit({kind:"layer.dismiss",layer:"drift-card"},modality);
   card.classList.remove("open");
   card.setAttribute("aria-hidden","true");
   card.inert=true;
+  setDialogTabbable(card,false);
   const back=cardReturnNode;
   cardReturnNode=null;
   if(back&&!back.gone&&!back.removed) back.el.focus({preventScroll:true});
@@ -1754,8 +1771,16 @@ function openCard(n){
   card.setAttribute("aria-label",nodeSurface(n)+" details");
   card.setAttribute("aria-hidden","false");
   card.inert=false;
+  setDialogTabbable(card,true);
   card.classList.add("open");
-  closer.focus({preventScroll:true});
+  const focusClose=()=>{
+    if(card.classList.contains("open")&&closer.isConnected) closer.focus({preventScroll:true});
+  };
+  focusClose();
+  // Touch activation applies native button focus after pointerup. Reassert the
+  // dialog entry point once that default action settles, just as the keyboard
+  // route does synchronously above.
+  setTimeout(focusClose,0);
 }
 
 // ---- level slider: N5→N1 blended with school grade + 漢検; 自 = adaptive ----
@@ -1854,16 +1879,19 @@ setTimeout(function(){hint.style.opacity="0";},7000);
 
 // ---- radical explainer ----
 const radoc=document.getElementById("radoc");
+setDialogTabbable(radoc,false);
 let radocReturnFocus=null;
 function openRadoc(){
   radocReturnFocus=document.activeElement;
   radoc.inert=false; radoc.setAttribute("aria-hidden","false"); radoc.classList.add("open");
+  setDialogTabbable(radoc,true);
   document.getElementById("radocX").focus({preventScroll:true});
 }
 function closeRadoc(modality="programmatic",emit=true){
   if(!radoc.classList.contains("open")) return false;
   if(emit) driftEmit({kind:"layer.dismiss",layer:"radical-explainer"},modality);
   radoc.classList.remove("open"); radoc.inert=true; radoc.setAttribute("aria-hidden","true");
+  setDialogTabbable(radoc,false);
   const back=radocReturnFocus; radocReturnFocus=null;
   if(back&&back.isConnected&&typeof back.focus==="function") back.focus({preventScroll:true});
   return true;
@@ -1971,6 +1999,7 @@ function pinchDive(mid){
     if(d<bd){bd=d;best=n;}
   }
   if(!best||bd>110) return;
+  driftEmit({kind:"target.activate",target:actionTarget(best)},"pointer");
   const lvl2=stack[stack.length-1];
   if(lvl2&&lvl2.center===best){openCard(best);return;}
   if(best.kind==="glyph") diveKanji(best);
@@ -1978,6 +2007,7 @@ function pinchDive(mid){
   else diveWord(best);
 }
 addEventListener("pointerdown",e=>{
+  if(!driftRunning()) return;
   if(e.isPrimary&&touches.size){touches.clear();pinch=null;}
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(FOCUS.length) bloomLast=performance.now();
@@ -2020,11 +2050,11 @@ addEventListener("pointerdown",e=>{
     lpTimer=setTimeout(function(){
       if(pn===tn&&!moved&&touches.size===1&&!tn.gone){
         lpFired=true;
-        constellationLock(tn);
+        lockNode(tn,"pointer");
       }
     },430);
   }
-  if(!e.target.closest||!e.target.closest("#theme,#card,#lvl")) ripple(px,py,false);
+  if(!e.target.closest||!e.target.closest("#theme,#card,#lvl,#radoc,#driftActions,#driftBack")) ripple(px,py,false);
   hint.style.opacity="0";
 },{passive:true});
 const s2wl=(sx,sy)=>{
@@ -2033,6 +2063,7 @@ const s2wl=(sx,sy)=>{
   return {x:cam.x+ux*cs+uy*sn, y:cam.y-ux*sn+uy*cs};
 };
 addEventListener("pointermove",e=>{
+  if(!driftRunning()) return;
   const t2=touches.get(e.pointerId);
   if(FOCUS.length&&t2) bloomLast=performance.now();
   let pdx=0,pdy=0;
@@ -2053,8 +2084,8 @@ addEventListener("pointermove",e=>{
         if(ratio>1.28){pinch.fired=true;pinchDive(mid);}
         else if(ratio<0.74){
           pinch.fired=true;
-          if(card.classList.contains("open")) card.classList.remove("open");
-          else surface();
+          if(card.classList.contains("open")) closeCard("pointer");
+          else navigateBack("pointer");
         }
       }
     } else {
@@ -2110,8 +2141,9 @@ function cancelPointer(e){
   gestureActive=false; moved=false; gestureId=null;
   clearTimeout(lpTimer); lpFired=false;
 }
-addEventListener("pointercancel",cancelPointer,{passive:true});
+addEventListener("pointercancel",e=>{if(driftRunning())cancelPointer(e);},{passive:true});
 addEventListener("pointerup",e=>{
+  if(!driftRunning()) return;
   const owner=e.pointerId===gestureId;
   if(!endPointer(e)) return;
   if(!owner) return;   // a camera finger lifting is not a judgment
@@ -2121,7 +2153,7 @@ addEventListener("pointerup",e=>{
   if(!gestureActive) return;
   gestureActive=false;
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
-  if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
+  if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc,#driftActions,#driftBack")) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   const terminalMoved=moved||Math.abs(dx)>8||Math.abs(dy)>8;
   if(n){
@@ -2131,8 +2163,8 @@ addEventListener("pointerup",e=>{
     // the word (and its constellation) goes where the finger left it.
     const flick=moved&&(held<330||Math.abs(dx)/Math.max(held,1)>0.45)&&Math.abs(dy)<90;
     const mayGrade=!FOCUS.length||n===focusN;
-    if(flick&&dx<-52&&mayGrade){grade(n,-1);return;}
-    if(flick&&dx>52&&mayGrade){grade(n,1);return;}
+    if(flick&&dx<-52&&mayGrade){nominateNode(n,-1,"pointer");return;}
+    if(flick&&dx>52&&mayGrade){nominateNode(n,1,"pointer");return;}
     if(n.wx!=null&&moved&&(ddx||ddy)){
       const cs4=Math.cos(cam.rot), sn4=Math.sin(cam.rot);
       const wdx=(ddx*cs4+ddy*sn4)/cam.z, wdy=(-ddx*sn4+ddy*cs4)/cam.z;
@@ -2140,11 +2172,12 @@ addEventListener("pointerup",e=>{
       if(n.wref){n.wref.wx+=wdx; n.wref.wy+=wdy;}
     }
     if(terminalMoved||held>600) return;
-    tapNode(n); return;
+    n.pointerHandledUntil=performance.now()+600;
+    activateNode(n,"pointer"); return;
   }
   if(terminalMoved||held>600) return; // a release is deliberate, or it is nothing
-  if(card.classList.contains("open")){card.classList.remove("open");return;}
-  if(stack.length){surface();return;}
+  if(card.classList.contains("open")){closeCard("pointer");return;}
+  if(stack.length){navigateBack("pointer");return;}
   if(FOCUS.length){
     // fat-finger forgiveness: satellites glide, so a near-miss within 44px
     // is a tap ON that member — never a constellation-razing water tap.
@@ -2159,7 +2192,10 @@ addEventListener("pointerup",e=>{
       const d2=Math.hypot(nd2.x+nd2.dragX-e.clientX,nd2.y+nd2.dragY-e.clientY);
       if(d2<bdN){bdN=d2;bestN=nd2;}
     }
-    if(bestN){tapNode(bestN);return;}
+    if(bestN){
+      bestN.pointerHandledUntil=performance.now()+600;
+      activateNode(bestN,"pointer");return;
+    }
   }
   if(lockOn){clearBloom();collapseUnfold();return;}
   // a galaxy sun is a door too — but never at the cost of a release the
@@ -2169,7 +2205,7 @@ addEventListener("pointerup",e=>{
     const hb=hubAt(e.clientX,e.clientY);
     if(hb){
       const g=spawnGlyph(hb,e.clientX,e.clientY,false);
-      g.ephemeral=true; diveKanji(g); return;
+      g.ephemeral=true; activateNode(g,"pointer"); return;
     }
   }
   clearBloom();
@@ -2180,11 +2216,12 @@ card.addEventListener("pointerup",e=>{
   e.stopPropagation();
   // tapping the card's own paper (not a row or button) closes it
   if(e.target===card||e.target.classList.contains("note")||
-     e.target.classList.contains("gloss")) card.classList.remove("open");
+     e.target.classList.contains("gloss")) closeCard("pointer");
 });
 
 // ---- tendrils ----
 function brush(x1,y1,x2,y2,t,i,color){
+  if(reduced) t=0;
   const mx=(x1+x2)/2+(y2-y1)*0.15+Math.sin(t*0.0011+i*1.7)*9;
   const my=(y1+y2)/2-(x2-x1)*0.15+Math.cos(t*0.0009+i*2.3)*9;
   fctx.lineCap="round";
@@ -2248,10 +2285,15 @@ function drawWorld(){
     wi++;
     if(thin>1&&(wi%thin)) continue;
     if(wr.lk){}
-    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
-    else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
+    else if(wr.hl){
+      if(reduced){wr.ox=wr.hx;wr.oy=wr.hy;}
+      else {wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
+    }
+    else if(wr.ret){
+      if(reduced){wr.ox=0;wr.oy=0;wr.ret=false;}
+      else {wr.ox*=0.93; wr.oy*=0.93;}
       if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;}
-    else {
+    else if(!reduced){
       wr.ox+=wr.dvx; if(wr.ox>16||wr.ox<-16) wr.dvx*=-1;
       wr.oy+=wr.dvy; if(wr.oy>12||wr.oy<-12) wr.dvy*=-1;
     }
@@ -2411,6 +2453,7 @@ function drawGraph(){
   }
 }
 function drawFx(t,dt){
+  if(reduced){ripples.length=0;particles.length=0;return;}
   const th=THEMES[themeIx];
   for(let i=ripples.length-1;i>=0;i--){
     const rp=ripples[i];
@@ -2434,6 +2477,8 @@ function drawFx(t,dt){
 // ---- frame loop ----
 let lastT=0;
 function frame(t){
+  if(!driftRunning()){driftRafOn=false;return;}
+  driftRafOn=true;
   const dt=Math.min(34,(t-lastT)||16); lastT=t;
   if(!reduced) fluidStep();
   lockForce();
@@ -2477,12 +2522,15 @@ function frame(t){
   }
   // camera glides toward a locked constellation center
   if(camT&&stack.length===0){
-    cam.x+=(camT.x-cam.x)*0.07; cam.y+=(camT.y-cam.y)*0.07;
-    if(Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3) camT=null;
+    if(reduced){cam.x=camT.x;cam.y=camT.y;camT=null;}
+    else {
+      cam.x+=(camT.x-cam.x)*0.07; cam.y+=(camT.y-cam.y)*0.07;
+      if(Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3) camT=null;
+    }
     camClamp();
   }
   // camera momentum glides after a flick
-  if(stack.length===0&&(Math.abs(cam.vx)>0.02||Math.abs(cam.vy)>0.02)){
+  if(!reduced&&stack.length===0&&(Math.abs(cam.vx)>0.02||Math.abs(cam.vy)>0.02)){
     cam.x+=cam.vx; cam.y+=cam.vy; camClamp();
     cam.vx*=0.92; cam.vy*=0.92;
   }
@@ -2502,26 +2550,34 @@ function frame(t){
       if(n.lod!==lod){n.lod=lod;n.el.classList.toggle("lod",lod);}
     } else if(n.mode==="glide"){
       if(n.wx!=null){const s=w2s(n.wx,n.wy);n.tx=s.x;n.ty=s.y;}
-      n.x+=(n.tx-n.x)*0.07; n.y+=(n.ty-n.y)*0.07;
-      if(Math.abs(n.tx-n.x)<2&&Math.abs(n.ty-n.y)<2) n.mode="free";
+      if(reduced){n.x=n.tx;n.y=n.ty;n.mode="free";}
+      else {
+        n.x+=(n.tx-n.x)*0.07; n.y+=(n.ty-n.y)*0.07;
+        if(Math.abs(n.tx-n.x)<2&&Math.abs(n.ty-n.y)<2) n.mode="free";
+      }
     } else {
       if(n.mode==="orbit"&&n.orbit&&!n.orbit.c.gone){
         const ob=n.orbit;
-        ob.ang+=ob.spd*dt;
-        const br=1+0.045*Math.sin(t*0.0011+ob.ang*2);
+        if(!reduced) ob.ang+=ob.spd*dt;
+        const br=reduced?1:(1+0.045*Math.sin(t*0.0011+ob.ang*2));
         const fv=reduced?{x:0,y:0}:fluidAt(n.x,n.y);
         n.tx=ob.c.x+Math.cos(ob.ang)*ob.rx*br+fv.x*(vw()/FW)*0.14;
         n.ty=ob.c.y+Math.sin(ob.ang)*ob.ry*br+fv.y*(vh()/FH)*0.14;
       }
-      n.x+=(n.tx-n.x)*0.085; n.y+=(n.ty-n.y)*0.085;
+      if(reduced){n.x=n.tx;n.y=n.ty;}
+      else {n.x+=(n.tx-n.x)*0.085; n.y+=(n.ty-n.y)*0.085;}
     }
-    n.s+=(n.ts-n.s)*0.09;
-    n.op+=(n.top-n.op)*0.08;
     const rt=(n.mode==="center")?0:n.rot;
-    n.cr+=(rt-n.cr)*0.08;
+    if(reduced){n.s=n.ts;n.op=n.top;n.cr=rt;}
+    else {
+      n.s+=(n.ts-n.s)*0.09;
+      n.op+=(n.top-n.op)*0.08;
+      n.cr+=(rt-n.cr)*0.08;
+    }
     n.el.style.opacity=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN?n.op*0.3:n.op).toFixed(3);
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
+    syncNodeAvailability(n);
   }
   // A still finger emits no move events. Refresh from the tracked touch set
   // each frame so cancellation starts a fresh, honest inactivity interval.
@@ -2533,7 +2589,8 @@ function frame(t){
   drawGraph();
   drawFx(t,dt);
   drawTrail(t);
-  requestAnimationFrame(frame);
+  if(driftRunning()) requestAnimationFrame(frame);
+  else driftRafOn=false;
 }
 addEventListener("resize",sizeCanvases);
 sizeCanvases();
@@ -2542,12 +2599,13 @@ applyTheme(0);
 updateTray();
 buildWorld();
 refreshActive();
-setInterval(refreshActive,650);
-if(!reduced) setInterval(function(){
+setInterval(function(){if(driftRunning()&&!reduced)refreshActive();},650);
+setInterval(function(){
+  if(!driftRunning()||reduced) return;
   fluidInject(Math.random()*vw(),Math.random()*vh(),
     (Math.random()-.5)*26,(Math.random()-.5)*26);
 },3600);
-requestAnimationFrame(frame);
+startDriftFrame();
 window.__DRIFT__ = {
   show() {
     __layer.classList.add('active');

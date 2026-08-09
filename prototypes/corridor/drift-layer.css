@@ -63,11 +63,18 @@
 #drift-layer /* tap-bloom relief: the constellation is its own layer — centre,
 #drift-layer satellites,
 #drift-layer * and threads each carry their own colour and lift gently off the field */
-  .word.bctr{color:var(--bloomCtr) !important;z-index:6}
+  .word.bctr{color:var(--bloomCtr) !important;z-index:6;filter:none!important;font-size:20px!important}
 #drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
 #drift-layer .word.bsat{color:var(--bloomSat) !important;z-index:5}
+#drift-layer .word.bsat{font-size:16px!important}
+#drift-layer .word.bsat .base,
+#drift-layer .word.bctr .base,
+#drift-layer .glyph.lockpin .g{
+    padding:3px 6px;border-radius:7px;background:var(--plaque);
+    box-shadow:0 0 0 1px var(--line),0 2px 9px rgba(0,0,0,.1)}
 #drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
 #drift-layer .word.bsat .yomi{color:var(--bloomSat)}
+#drift-layer .glyph.lockpin .g{font-size:26px;color:var(--pig2)}
 #drift-layer .glyph.comp{z-index:7}
 #drift-layer .word.center,
 #drift-layer .glyph.center,
@@ -205,7 +212,8 @@
     background:var(--plaque);box-shadow:0 6px 22px rgba(0,0,0,.12)}
 #drift-layer #driftActions[hidden]{display:none}
 #drift-layer #driftActions button{min-width:44px;min-height:44px;padding:6px 11px;border:1px solid var(--line);
-    border-radius:999px;background:transparent;color:var(--ink);font:12px/1.15 inherit;cursor:pointer}
+    border-radius:999px;background:transparent;color:var(--ink);font:12px/1.15 inherit;
+    white-space:nowrap;cursor:pointer}
 #drift-layer #driftActions button:focus-visible,
 #drift-layer #card button:focus-visible,
 #drift-layer #radoc button:focus-visible{
@@ -226,6 +234,16 @@
 #drift-layer #theme { top: calc(66px + env(safe-area-inset-top)); }
 #drift-layer #drift-tray { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #drift-layer #hint { bottom: calc(120px + env(safe-area-inset-bottom)); }
+#drift-layer #driftActions {
+  left: 48px;
+  right: 112px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  transform: none;
+  gap: 4px;
+  padding: 5px;
+  justify-content: space-between;
+}
+#drift-layer #driftActions button { padding: 6px 8px; font-size: 11px; }
 #drift-layer #card { bottom: 64px; max-height: calc(100vh - 190px); overflow-y: auto; }
 /* the radical explainer is a modal: it must clear the corridor chrome band
  * so its own close button is reachable (the hunt found the X hit-testing
