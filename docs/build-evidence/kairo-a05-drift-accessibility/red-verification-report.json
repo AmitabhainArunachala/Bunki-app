@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "verifier": "verify-drift-accessibility.mjs",
+  "evidencePhase": "red",
+  "head": "94bd091759d4172765ba6b0d278609992e1878b5",
+  "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "summary": {
+    "total": 30,
+    "passed": 5,
+    "failed": 25
+  },
+  "results": [
+    {
+      "name": "fused Drift bodies are named native target.activate controls",
+      "pass": false,
+      "detail": "{\"count\":64,\"native\":0,\"named\":0,\"targetActions\":0,\"tabStops\":0,\"minHit\":null}"
+    },
+    {
+      "name": "fused actionable Drift bodies retain a 44px hit floor",
+      "pass": false,
+      "detail": "minimum nonepx"
+    },
+    {
+      "name": "source Drift bodies are named native target.activate controls",
+      "pass": false,
+      "detail": "{\"count\":64,\"native\":0,\"named\":0,\"targetActions\":0,\"tabStops\":0,\"minHit\":null}"
+    },
+    {
+      "name": "source actionable Drift bodies retain a 44px hit floor",
+      "pass": false,
+      "detail": "minimum nonepx"
+    },
+    {
+      "name": "unrevealed word exposes only its surface in the accessibility tree",
+      "pass": false,
+      "detail": "{\"first\":{\"reading\":\"で\",\"surface\":\"出\",\"gloss\":\"outflow, coming (going) out\"},\"initialAX\":[{\"role\":\"generic\",\"name\":\"\"},{\"role\":\"StaticText\",\"name\":\"で\"},{\"role\":\"InlineTextBox\",\"name\":\"で\"},{\"role\":\"StaticText\",\"name\":\"出\"},{\"role\":\"InlineTextBox\",\"name\":\"出\"},{\"role\":\"StaticText\",\"name\":\"outflow, coming (going) out\"},{\"role\":\"InlineTextBox\",\"name\":\"outflow, coming (going) out\"}]}"
+    },
+    {
+      "name": "Enter follows the same reading-then-English staging as pointer activation",
+      "pass": false,
+      "detail": "{\"target\":\"触れる\",\"focusable\":false,\"firstStage\":{\"unfolded\":false,\"glossed\":false,\"name\":null},\"secondStage\":{\"unfolded\":false,\"glossed\":false,\"name\":null}}"
+    },
+    {
+      "name": "keyboard target activation emits neutral envelopes with keyboard provenance",
+      "pass": false,
+      "detail": "0 receipt(s)"
+    },
+    {
+      "name": "sequential switch navigation reaches the discoverable non-hold constellation action",
+      "pass": false,
+      "detail": "null"
+    },
+    {
+      "name": "non-hold lock preserves the real ≥12-member constellation",
+      "pass": false,
+      "detail": "{\"center\":\"\",\"members\":0,\"named\":0,\"typed\":0,\"receipt\":null}"
+    },
+    {
+      "name": "constellation relation types are semantic, not color-only",
+      "pass": false,
+      "detail": "0/0 typed member(s)"
+    },
+    {
+      "name": "constellation lock emits the same neutral action with keyboard provenance",
+      "pass": false,
+      "detail": "null"
+    },
+    {
+      "name": "tide is a named vertical slider with value semantics and a 44px target",
+      "pass": false,
+      "detail": "{\"role\":null,\"tabIndex\":-1,\"min\":null,\"max\":null,\"now\":null,\"text\":null,\"width\":44}"
+    },
+    {
+      "name": "tide arrow keys commit a new stop through tide.set",
+      "pass": false,
+      "detail": "{\"tideAfter\":{\"now\":null,\"text\":null},\"tideReceipt\":null}"
+    },
+    {
+      "name": "theme control names its current value and updates it after keyboard activation",
+      "pass": false,
+      "detail": "{\"themeBefore\":{\"text\":\"北斎\",\"name\":\"pigment theme\"},\"themeAfter\":{\"text\":\"墨\",\"name\":\"pigment theme\"}}"
+    },
+    {
+      "name": "theme activation also travels through the neutral target action",
+      "pass": false,
+      "detail": "null"
+    },
+    {
+      "name": "a discoverable navigation.back alternative appears at dive depth",
+      "pass": false,
+      "detail": "{\"depth\":\"謎\",\"back\":\"\"}"
+    },
+    {
+      "name": "Drift card is a named dialog with close semantics and focus entry",
+      "pass": false,
+      "detail": "{\"open\":true,\"role\":null,\"modal\":null,\"name\":null,\"focusInside\":false,\"close\":false}"
+    },
+    {
+      "name": "Escape closes the card, removes it from AT, and returns focus to its body",
+      "pass": false,
+      "detail": "{\"closed\":false,\"hidden\":null,\"focusOnBody\":false}"
+    },
+    {
+      "name": "closed Drift overlays are inert, AT-hidden, and absent from tab order",
+      "pass": false,
+      "detail": "{\"leaks\":[\"radocX\"],\"roots\":[{\"id\":\"radoc\",\"hidden\":null,\"inert\":false}]}"
+    },
+    {
+      "name": "hiding the fused layer evacuates focus and makes the whole surface inert",
+      "pass": false,
+      "detail": "{\"active\":\"theme\",\"inside\":true,\"inert\":false,\"hidden\":null}"
+    },
+    {
+      "name": "accessibility reveal/selection actions write neither Drift judgment nor Corridor/FSRS state",
+      "pass": true,
+      "detail": "{\"writes\":[],\"drift\":null,\"corridor\":null}"
+    },
+    {
+      "name": "explicit judgment alternative only nominates locally and cannot write Corridor/FSRS state",
+      "pass": false,
+      "detail": "{\"receipt\":null,\"writes\":[],\"drift\":null,\"corridor\":null}"
+    },
+    {
+      "name": "background-tab time is suspended and does not consume the 10s constellation TTL",
+      "pass": false,
+      "detail": "{\"hiddenState\":\"hidden\",\"bloomBefore\":14,\"bloomAfter\":0}"
+    },
+    {
+      "name": "reduced motion removes Drift transitions and animation durations",
+      "pass": false,
+      "detail": "{\"root\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"1.2s\",\"scrollBehavior\":\"auto\"},\"word\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0.9s\",\"scrollBehavior\":\"auto\"},\"yomi\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0.5s\",\"scrollBehavior\":\"auto\"},\"card\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0.5s\",\"scrollBehavior\":\"auto\"},\"tide\":{\"animationDuration\":\"0s\",\"transitionDuration\":\"0.4s, 0.25s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "settled reduced-motion Drift is visually stationary across frames",
+      "pass": false,
+      "detail": "8b15f04c44508ab4 → e5f457703bb22c97"
+    },
+    {
+      "name": "runtime reduced-motion preference changes take effect without reload",
+      "pass": false,
+      "detail": "{\"matches\":true,\"marked\":false,\"transition\":\"0.9s\"}"
+    },
+    {
+      "name": "committed fused Drift outputs match the authoritative artifact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "committed standalone matches the authoritative fused inputs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walks requested no missing assets",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walks emitted no page/console/parity errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "screenshots": [
+    "screenshots/red-01-keyboard-constellation.png",
+    "screenshots/red-02-semantic-controls.png",
+    "screenshots/red-03-reduced-motion.png",
+    "screenshots/red-04-source-authority.png"
+  ],
+  "errors": [],
+  "misses": []
+}
