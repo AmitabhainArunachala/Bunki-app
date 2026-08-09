@@ -4,11 +4,7 @@ import { canonicalJson, deriveMonthlyTruth } from '@bunki/domain';
 import { representativeLog } from '@bunki/persistence';
 import { describe, expect, it } from 'vitest';
 
-import {
-  buildExportEnvelope,
-  parseExportEnvelope,
-  serializeExportEnvelope,
-} from '../src/index.ts';
+import { buildExportEnvelope, parseExportEnvelope, serializeExportEnvelope } from '../src/index.ts';
 
 describe('monthly truth export boundary', () => {
   it('re-derives byte-equivalent monthly truth after JSON serialisation', () => {

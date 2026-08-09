@@ -38,6 +38,10 @@ import type { GateRejectionReason } from '../evidence/gate.ts';
 import type { IsoInstant } from '../primitives.ts';
 import type { MemoryPhase } from '../reducers/memory-state.ts';
 import { replay } from '../replay/replay.ts';
+import {
+  adaptMonthlyReviewAuthority,
+  type MonthlyRetrievalAuthority,
+} from './monthly-retrieval-authority.ts';
 
 /** Canonical calendar bucket: UTC year and month, never the device locale. */
 export type MonthId = string;
@@ -198,10 +202,7 @@ export interface MonthlyRecordedRetrievalClaim {
   readonly revealedBeforeRecall: boolean;
   readonly probeContext: ReviewGradedEvent['probeContext'];
   readonly evidenceTier: 'A';
-  readonly authority: {
-    readonly kind: 'recorded_claim';
-    readonly reason: 'response_and_grader_authority_not_recorded_in_v1';
-  };
+  readonly authority: MonthlyRetrievalAuthority;
   readonly gate: MonthlyGateStanding;
 }
 
@@ -499,10 +500,7 @@ function retrievalClaim(
     revealedBeforeRecall: event.revealedBeforeRecall,
     probeContext: event.probeContext,
     evidenceTier: event.tier,
-    authority: {
-      kind: 'recorded_claim',
-      reason: 'response_and_grader_authority_not_recorded_in_v1',
-    },
+    authority: adaptMonthlyReviewAuthority(event),
     gate,
   };
 }
