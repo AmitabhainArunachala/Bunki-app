@@ -9,7 +9,7 @@ the primary checkout at `/Users/dhyana/Bunki-app`; it is unrelated user work.
 - Repository: `AmitabhainArunachala/Bunki-app`
 - Integration branch: `codex/kairo-full-build-20260808`
 - Draft integration PR: `#67` (temporarily based on the PR #65 branch)
-- Safe integration SHA: `976233dfef53a5958063fac13c12b5531c174a29`
+- Safe integrated product SHA: `976233dfef53a5958063fac13c12b5531c174a29`
 - Starting campaign SHA: `e8be255e1ea13a350759198f3e85caf0e239560d`
 - Upstream prototype PR: `#65`, still draft/open/clean at
   `dda0d123c45afd3be7825d67ce556ee06843bb84`
@@ -59,8 +59,18 @@ Exact integrated checks already run:
 
 ## Promotion blocker — do this first
 
-Branch `origin/codex/kairo-a1-verified-grade-20260809` is a clean branch at
-`976233d`, ready for implementation.
+Branch `origin/codex/kairo-a1-verified-grade-20260809` is clean and pushed at
+`d85d62796c92f23d76dea9b125dcac56983cdef0`. It is an explicit WIP and must not
+be promoted by itself. Commit `7b39955` preserves the eight-case red proof;
+`d85d627` makes those eight adversarial domain cases green and passes the domain
+source typecheck.
+
+The WIP implements the v2 parser/schema, deterministic NFKC/trim proof,
+v1 `response_unverified`, tamper rejection, and source-bound gate/activation.
+It intentionally leaves the minter, session/canvas/repair UI, evidence copy,
+golden ambiguity state, exact routing, and broad regression migration undone.
+Resume from that branch and begin with the domain workspace typecheck to
+enumerate the remaining call sites.
 
 The independent judge reproduced a P0 authority bug: the current session has no
 response input. Clicking `Good` mints v1 `ReviewGraded`, the gate admits it, and
@@ -102,8 +112,17 @@ Commits:
 - `87f54c6` — pure non-scalar UTC monthly projection + export proof;
 - `3a7d22f` — accessible `/monthly` Expo route/navigation.
 
-Checks: projection/export 5/5, navigation 10/10, domain/export/app typechecks,
-focused ESLint/Prettier/diff pass. Chromium export/E2E is not yet run.
+The pushed branch is clean at
+`3a7d22fa1cf2daac542a3dc895d926a8f5acadea`. Checks: projection/export 5/5,
+navigation 10/10, domain/export/app typechecks, focused ESLint/Prettier/diff,
+and a fresh 15-route Expo export all pass.
+
+Dedicated Chromium falsified two UI assumptions before cutoff: the 390 px
+viewport overflows horizontally by 38 px, and the UTC month-switch test could
+not find `monthly-month-2026-07`. The uncommitted diagnostic spec/fix is safely
+preserved in immutable stash commit
+`cb93ceee68f0cc4026f792e11ab371d15ff23992`; apply that commit as a stash only
+when resuming this lane. Full E2E/axe and screenshot inspection remain undone.
 
 It exposes eight separate lenses and no aggregate mastery/level: recognition,
 meaning recall, production, listening, kanji reading, writing, grammar
@@ -117,20 +136,22 @@ run Chromium.
 
 Remote branch: `origin/codex/kairo-drift-a11y-20260809`
 
-Commits:
+Latest commits:
 
 - `c44025c` — authoritative real-Chromium red verifier/evidence, 5/30 green and
   25/30 red;
 - `7e9efa8` — explicit WIP runtime checkpoint, syntax-valid but not generated.
+- `1940ee3` — generator-reconciled WIP with real Chromium at 19/30.
 
-The WIP adds native-control/action scaffolding, tide/dialog/focus semantics, and
-reduced-motion groundwork in the authoritative Drift artifact. The generator
-currently fails closed at the old `gate lvl pointerup` anchor because the source
-now uses `driftSurfaceEnabled`. Resume by updating the asserted generator anchor,
-then run artifact → `build-drift-layer.mjs` → `build-standalone.mjs` twice. Do not
-promote the WIP commit itself. Required closure is verifier 30/30, union hunts
-twice, Drift fast twice, Corridor 91/91, zero page errors, and inspected green
-screenshots.
+The branch is clean and pushed at
+`1940ee3`. Artifact/generator syntax, both generator `--check` commands,
+generated parity, assets, and console checks are green. The remaining 11 rows
+cover per-frame availability/AX sync, typed fallback relations, pointer
+double-routing, closed-dialog tab leakage, paused TTL, and truly static reduced
+motion. Do not apply the old local stash; it duplicates committed `7e9efa8`.
+Do not promote the WIP commit itself. Required closure is verifier 30/30, union
+hunts twice, Drift fast twice, Corridor 91/91, zero page errors, and inspected
+green screenshots.
 
 ## Safe integration order
 
