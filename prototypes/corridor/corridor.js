@@ -145,6 +145,29 @@ const VARIANTS = {
       ['flat', '現行の平ら', 'flat'],
     ],
   },
+  /* F and G are the Drift tap ladder. Both rows are open questions the
+   * operator settles by feel — this strip states what each position does and
+   * takes no position on which one is right. The Drift layer owns the
+   * mechanism (see V_LADDER / V_SATTAP in prototypes/drift/drift-artifact.html);
+   * the strip only names the setting and hands it across window.__DRIFT_TAP__. */
+  ladder: {
+    ticket: null,
+    label: 'F 触れの段',
+    en: 'tap ladder',
+    options: [
+      ['stage3', '三段', '3-stage'],
+      ['stage4', '四段', '4-stage'],
+    ],
+  },
+  sattap: {
+    ticket: null,
+    label: 'G 衛星の触れ',
+    en: 'satellite tap',
+    options: [
+      ['staged', '段階', 'staged'],
+      ['recenter', '即中心', 'instant recenter'],
+    ],
+  },
 };
 
 const REL = {
@@ -215,7 +238,17 @@ const S = {
   stack: [],
   dials: { kanji: 0, furigana: 2, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
-  variants: { cards: 'mcd', difficulty: 'three', contrast: 'wcag', entry: 'drift', depth: 'layered' },
+  variants: {
+    cards: 'mcd',
+    difficulty: 'three',
+    contrast: 'wcag',
+    entry: 'drift',
+    depth: 'layered',
+    // F/G: the Drift tap ladder. Both start on the behaviour the field
+    // already shipped with, so an untouched strip is the field as it was.
+    ladder: 'stage3',
+    sattap: 'staged',
+  },
   /* UI language: 'bi' = navigation carries English alongside the Japanese
    * (default — a learner must be able to steer before they can read);
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
@@ -3289,6 +3322,11 @@ function render() {
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
+  // F/G ride across to the Drift layer, which owns the tap ladder itself. Sent
+  // on every render (not only on a click) so the layer carries the strip's
+  // reading whenever it finishes loading, and unknown values are ignored there.
+  if (window.__DRIFT_TAP__)
+    window.__DRIFT_TAP__.set({ ladder: S.variants.ladder, satTap: S.variants.sattap });
   document.body.classList.toggle('ui-bi', bi());
   // the reading measure is per-view: a column for the texts, the full window
   // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.

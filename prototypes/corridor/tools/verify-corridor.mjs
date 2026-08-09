@@ -1035,8 +1035,22 @@ async function main() {
   const ticketRows = await page.evaluate(
     `[...document.querySelectorAll('#variants .vlabel')].filter((l) => /#\\d\\d/.test(l.textContent)).length`,
   );
-  check('the variant strip exposes all four open decisions plus the v1.1 depth toggle',
-    stripRows === 5 && ticketRows === 4, `${stripRows} rows, ${ticketRows} carry ticket numbers`);
+  // Named, not counted: a bare row total said nothing about WHICH decisions
+  // were on the strip, so it passed for any five rows and failed for the right
+  // seven. The four Wayfinder tickets keep their own count; every other row the
+  // strip is supposed to carry is now named here and must actually be present.
+  const NON_TICKET_ROWS = ['E 奥行', 'F 触れの段', 'G 衛星の触れ'];
+  const rowKeys = await page.evaluate(
+    `[...document.querySelectorAll('#variants .vseg button')].map((b) => b.dataset.variant.split(':')[0])
+       .filter((k, i, a) => a.indexOf(k) === i)`,
+  );
+  const labels = await page.evaluate(
+    `[...document.querySelectorAll('#variants .vlabel')].map((l) => l.textContent)`,
+  );
+  const namedPresent = NON_TICKET_ROWS.filter((n) => labels.some((l) => l.includes(n)));
+  check('the variant strip exposes all four open decisions, the v1.1 depth toggle and the drift tap ladder',
+    ticketRows === 4 && namedPresent.length === NON_TICKET_ROWS.length && stripRows === ticketRows + NON_TICKET_ROWS.length,
+    `${stripRows} rows (${rowKeys.join(', ')}); ${ticketRows} carry ticket numbers; named rows present: ${namedPresent.join(' · ') || 'none'}`);
   await shoot(page, shotsDir, '08-variant-strip-open');
 
   // ------------------------------------------------- v1.1 operator feedback
