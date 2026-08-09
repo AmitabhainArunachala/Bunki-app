@@ -1536,6 +1536,32 @@ function renderDrift(main) {
   main.append(door);
 }
 
+/* ------------------------------------------- the Drift card's study door
+ * The drift universe is generated from its own source and knows nothing about
+ * the corridor. It asks its host one question — "can you open this entry?" —
+ * and draws the study door on a word card only if the answer is yes. Here the
+ * answer comes from the corridor's own dictionary, and the door opens the
+ * corridor's own full entry: the same sheet the shelf and the reader open,
+ * with senses, 漢字 doors and 意味の近く. No app base, no href, no navigation
+ * away — one app, one entry surface, and a word the corridor does not carry
+ * simply keeps the card's honest note instead of a door onto nothing.
+ *
+ * The seam is installed at module scope, before boot resolves, because the
+ * drift layer consults it lazily (on each card open) and never at load. */
+window.__BUNKI_OPEN_ENTRY = {
+  has(kind, key) {
+    if (!S.ready || !key) return false;
+    if (kind === 'word') return !!lookup(key);
+    if (kind === 'kanji') return !!D.kanji[key];
+    return false;
+  },
+  open(kind, key) {
+    if (S.view !== 'drift' || !this.has(kind, key)) return;
+    interaction({ kind: 'entry.open' }, 'pointer', `drift-study-${kind}`);
+    go({ t: kind, id: key });
+  },
+};
+
 function renderEntry(main) {
   main.style.padding = '0 16px 92px';
   const field = el('div', 'field');
@@ -3398,8 +3424,14 @@ function render() {
 
   // The Drift universe sleeps unless it is the active view — its layer sits
   // beneath the corridor chrome, so the one navigation fabric stays visible.
+  // It also sleeps under an open entry sheet: the layer is a sibling of #app,
+  // so the inert pass below cannot reach it, and its six window-level pointer
+  // listeners would read every tap on the sheet as a tap on open water and
+  // raze the constellation underneath. Sleeping is not forgetting — the stack,
+  // the centre and its satellites are all held in the layer's own state, so
+  // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
-    if (S.view === 'drift') window.__DRIFT__.show();
+    if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
 
