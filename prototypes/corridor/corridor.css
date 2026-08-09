@@ -1783,3 +1783,355 @@ svg.strokes text {
     animation: none !important;
   }
 }
+
+/* ==================================================== v1.9 · 筆順 =========
+ * Stroke order gets a page, not a thumbnail. A kanji is written, so the
+ * strokes must be seen arriving in order — the sheet's diagram is only the
+ * door to that page.
+ *
+ * Colour law here: NOTHING below names a colour. Ink is --ink, paper is
+ * --ground / --ground-0, the guide is --line, secondary text is --faint, and
+ * 藍 --ai marks the things you can go through or press. 弁柄 --red stays out
+ * entirely: on this page there is no reading to mark and nothing has gone
+ * wrong — a missing stroke order is an absence, not an alarm.
+ */
+
+/* --------------------------------------------------------------- the door */
+.stroke-door {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ai, var(--ink-2));
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: var(--tap);
+  margin: 0 0 14px;
+  cursor: pointer;
+}
+
+.stroke-door svg.strokes {
+  width: 92px;
+  height: 92px;
+  flex: none;
+  margin: 0;
+}
+
+.stroke-door-glyph {
+  font-family: var(--serif);
+  font-size: 54px;
+  line-height: 92px;
+  width: 92px;
+  flex: none;
+  text-align: center;
+  color: var(--ink);
+}
+
+.stroke-door-side {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.stroke-door-title {
+  font-size: 14px;
+  color: var(--ai, var(--ink-2));
+}
+
+.stroke-door.bare .stroke-door-title {
+  color: var(--ink-2);
+}
+
+.stroke-door-sub {
+  font-size: var(--t-label);
+  color: var(--faint);
+}
+
+.stroke-door .row-go {
+  color: var(--ai, var(--faint));
+}
+
+.stroke-door.bare .row-go {
+  color: var(--faint);
+}
+
+.stroke-door:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------- the full-screen page */
+.stroke-page {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--ground);
+  color: var(--ink);
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom));
+}
+
+/* the layered treatment separates ground from card exactly as the shelf does:
+ * the page takes the recessed ground, the writing square the raised paper */
+body.v-depth-layered .stroke-page {
+  background: var(--ground-2);
+}
+
+.stroke-page:focus {
+  outline: none;
+}
+
+.stroke-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  margin-bottom: 4px;
+  background: inherit;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.stroke-back,
+.stroke-close {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 12px;
+  font-family: var(--serif);
+  font-size: var(--t-chrome);
+  color: var(--ink-2);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.stroke-close {
+  font-family: var(--sans);
+  font-size: 15px;
+}
+
+.stroke-back:focus-visible,
+.stroke-close:focus-visible,
+.stroke-btn:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
+.stroke-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+
+.stroke-title-glyph {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--ink);
+}
+
+.stroke-title-word {
+  font-family: var(--serif);
+  font-size: var(--t-label);
+  letter-spacing: 0.16em;
+  color: var(--faint);
+}
+
+/* ------------------------------------------------------------- the paper */
+.stroke-body {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stroke-stage {
+  flex: none;
+  width: min(100%, 420px);
+  margin: 10px 0 6px;
+}
+
+.stroke-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+}
+
+.stroke-grid line {
+  stroke: var(--line-soft);
+  stroke-width: 0.6;
+  stroke-dasharray: 4 5;
+}
+
+/* where the hand is going — the finished glyph, barely there */
+.stroke-guide path {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the ink itself: dashed to its own measured length, offset walked to zero */
+.stroke-ink path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stroke-num {
+  font-family: var(--sans);
+  font-size: 6px;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--ground-0, var(--ground));
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity 0.16s linear;
+}
+
+.stroke-page[data-numbers='off'] .stroke-nums {
+  display: none;
+}
+
+/* ------------------------------------------------------- counter + controls */
+.stroke-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 2px 0 10px;
+}
+
+.stroke-count {
+  font-family: var(--serif);
+  font-size: 30px;
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stroke-count-unit {
+  font-size: var(--t-label);
+  letter-spacing: 0.14em;
+  color: var(--faint);
+}
+
+.stroke-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.stroke-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 96px;
+  padding: 6px 16px;
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-2);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.stroke-btn.primary {
+  color: var(--ai, var(--ink));
+  border-color: color-mix(in srgb, var(--ai, var(--ink)) 55%, var(--line));
+}
+
+/* a pressed toggle fills with ink, the way every other segmented control in
+ * the corridor does (.seg, #lang) — 藍 stays reserved for going somewhere */
+.stroke-btn[aria-pressed='true'] {
+  color: var(--ground);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.stroke-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.stroke-meta {
+  font-size: var(--t-label);
+  color: var(--faint);
+  text-align: center;
+  margin: 0;
+}
+
+/* ---------------------------------------- the 448 without a stroke order */
+.stroke-missing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 12px 0 24px;
+}
+
+.stroke-missing-glyph {
+  font-family: var(--serif);
+  font-size: clamp(120px, 46vw, 260px);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.stroke-missing-line {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink-2);
+  margin: 6px 0 0;
+}
+
+.stroke-missing-note {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--faint);
+  max-width: 34em;
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .stroke-stage {
+    width: min(100%, 480px);
+  }
+}
