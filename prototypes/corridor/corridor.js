@@ -228,6 +228,15 @@ const S = {
   debugOpen: false,
   /** Semantic return point for a modal entry sheet across full DOM renders. */
   dialogInvoker: null,
+  /** 筆順 · the full-screen stroke-order page, layered over the kanji sheet.
+   * null when closed; { id, sheetScroll, invoker, step } when open. */
+  strokes: null,
+  /** The learner's stroke-number preference survives closing the page. */
+  strokeNumbers: true,
+  /** Sheet scrollTop to put back on the next render (returning from 筆順). */
+  sheetScrollRestore: null,
+  /** Element id inside the sheet that should take focus on the next render. */
+  sheetFocus: null,
 };
 
 /* ------------------------------------------------ persistence (localStorage) */
@@ -535,6 +544,11 @@ function go(node, { invoker = null } = {}) {
 }
 
 function back() {
+  // 筆順 is the topmost layer when it is open — it leaves before the sheet does
+  if (S.strokes) {
+    closeStrokePage();
+    return;
+  }
   if (S.stack.length) {
     S.stack.pop();
     render();
@@ -560,11 +574,43 @@ function back() {
 }
 
 function dismissSheet() {
+  if (S.strokes) {
+    cancelStrokeAnimation();
+    S.strokes = null;
+  }
+  S.sheetScrollRestore = null;
+  S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
   render();
   if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
   restoreDialogInvoker();
+}
+
+/* ------------------------------------------------ 筆順 · the stroke page */
+/** Open the dedicated full-screen stroke-order page over the kanji sheet.
+ * The sheet stays exactly where it was: its scrollTop rides along in the
+ * layer's own state and is put back, unchanged, when the page closes. */
+function openStrokePage(id, { invoker = null } = {}) {
+  const sheet = $('.sheet');
+  S.strokes = {
+    id,
+    step: 0,
+    sheetScroll: sheet ? sheet.scrollTop : 0,
+    invoker: invoker?.id || null,
+  };
+  render();
+}
+
+/** Close it and hand the sheet back untouched — same scroll, same focus. */
+function closeStrokePage() {
+  if (!S.strokes) return;
+  const { sheetScroll, invoker } = S.strokes;
+  cancelStrokeAnimation();
+  S.strokes = null;
+  S.sheetScrollRestore = sheetScroll;
+  S.sheetFocus = invoker;
+  render();
 }
 
 function openPassage(id) {
@@ -2344,30 +2390,10 @@ function renderKanjiNode(sheet, node) {
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
-  // STROKE ORDER — KanjiVG paths, numbered at each stroke's start
-  const paths = D.strokes?.[k.c];
-  if (paths?.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
-    const NS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 109 109');
-    svg.setAttribute('class', 'strokes');
-    svg.id = 'strokes';
-    paths.forEach((d, i) => {
-      const path = document.createElementNS(NS, 'path');
-      path.setAttribute('d', d);
-      svg.append(path);
-      const m = d.match(/M\s*([\d.]+)[\s,]+([\d.]+)/);
-      if (m) {
-        const t = document.createElementNS(NS, 'text');
-        t.setAttribute('x', m[1]);
-        t.setAttribute('y', m[2]);
-        t.textContent = String(i + 1);
-        svg.append(t);
-      }
-    });
-    sheet.append(svg);
-  }
+  // STROKE ORDER — the diagram is a door, not a picture. It opens the
+  // dedicated full-screen page where the strokes actually draw themselves.
+  sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
+  sheet.append(strokeDoor(k));
 
   if (k.parts.length) {
     sheet.append(withEn(el('p', 'eyebrow', '部品'), 'components', 'en-inline'));
@@ -2431,6 +2457,451 @@ function renderKanjiNode(sheet, node) {
   sheet.append(takeButton(node, k.c));
   renderListPicker(sheet, node, k.c);
   renderSchedule(sheet);
+}
+
+/* ==================================================== 筆順 · stroke order ===
+ * A kanji is written, not drawn — so the stroke diagram gets a page of its
+ * own instead of a thumbnail in a list. On that page the KanjiVG paths draw
+ * themselves in order, one after another, the way a hand moves: each path is
+ * dashed to its own measured length (getTotalLength) and its dashoffset walks
+ * to zero.
+ *
+ * 448 of the 2,582 kanji in this layer carry no KanjiVG path data. Their door
+ * still opens — it shows the character large and says, in both languages,
+ * that the stroke order is not known here. An empty frame would be a lie.
+ *
+ * Every colour on the page is a theme token (--ink / --ground / --ground-0 /
+ * --line / --faint / --ai). Nothing here names a colour, so both the flat and
+ * the layered treatment — and either contrast variant — carry through intact.
+ */
+const STROKE_VIEWBOX = '0 0 109 109';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** Does this character have real KanjiVG path data in the shipped layer? */
+const strokePathsFor = (ch) => D.strokes?.[ch] || [];
+
+/** The learner asked the platform not to animate — we obey it at the source,
+ * never by playing the animation faster. */
+const strokeReduced = () =>
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let strokeFrame = null;
+function cancelStrokeAnimation() {
+  if (strokeFrame != null) cancelAnimationFrame(strokeFrame);
+  strokeFrame = null;
+}
+
+/** KanjiVG stores each stroke's start as its path's first moveto. */
+function strokeStart(d) {
+  const m = /M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/.exec(d);
+  return m ? { x: Number(m[1]), y: Number(m[2]) } : null;
+}
+
+/** The sheet's small diagram — unchanged geometry, now wrapped in a door. */
+function strokeThumb(paths) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', STROKE_VIEWBOX);
+  svg.setAttribute('class', 'strokes');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.id = 'strokes';
+  paths.forEach((d, i) => {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+    const start = strokeStart(d);
+    if (start) {
+      const t = document.createElementNS(SVG_NS, 'text');
+      t.setAttribute('x', String(start.x));
+      t.setAttribute('y', String(start.y));
+      t.textContent = String(i + 1);
+      svg.append(t);
+    }
+  });
+  return svg;
+}
+
+/** The door on the kanji sheet. It exists for every kanji, with data or
+ * without — the corridor has no dead ends, only honest rooms. */
+function strokeDoor(k) {
+  const paths = strokePathsFor(k.c);
+  const door = el('button', paths.length ? 'stroke-door' : 'stroke-door bare');
+  door.type = 'button';
+  door.id = 'strokes-door';
+  door.dataset.action = 'entry.open';
+  door.dataset.strokes = String(paths.length);
+  door.setAttribute(
+    'aria-label',
+    paths.length
+      ? tx(
+          `${k.c} の筆順をひらく — ${paths.length} 画`,
+          `open the stroke order for ${k.c} — ${paths.length} strokes`,
+        )
+      : tx(
+          `${k.c} の筆順 — 筆順のデータはまだない`,
+          `${k.c} stroke order — stroke data not yet available`,
+        ),
+  );
+  if (paths.length) door.append(strokeThumb(paths));
+  else door.append(el('span', 'stroke-door-glyph', k.c));
+
+  const side = el('span', 'stroke-door-side');
+  side.append(
+    el(
+      'span',
+      'stroke-door-title',
+      paths.length
+        ? tx(`${paths.length} 画を順に書く`, `watch all ${paths.length} strokes draw in order`)
+        : tx('筆順のデータはまだない', 'stroke data not yet available'),
+    ),
+  );
+  side.append(
+    el(
+      'span',
+      'stroke-door-sub',
+      paths.length
+        ? tx('全画面でひらく', 'opens full screen')
+        : tx('画数だけは分かっている', 'the count is known, the order is not'),
+    ),
+  );
+  door.append(side);
+  door.append(el('span', 'row-go', '›'));
+
+  door.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'entry.open', target: { kind: 'kanji', id: k.c } },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-door',
+    );
+    openStrokePage(k.c, { invoker: door });
+  });
+  return door;
+}
+
+/** Put the page into a definite state: `shown` strokes complete, the last of
+ * them `progress` of the way drawn. Called by the animation every frame and
+ * by the step-through control once per press. */
+function paintStrokes(page, shown, progress = 1) {
+  const paths = [...page.querySelectorAll('.stroke-ink path')];
+  const total = paths.length;
+  paths.forEach((path, i) => {
+    const len = Number(path.dataset.len) || 0;
+    let offset = len;
+    if (i < shown - 1) offset = 0;
+    else if (i === shown - 1) offset = len * (1 - progress);
+    path.style.strokeDashoffset = String(offset);
+  });
+  for (const [i, num] of [...page.querySelectorAll('.stroke-num')].entries()) {
+    num.style.opacity = i < shown ? '1' : '0';
+  }
+  const counter = page.querySelector('#stroke-count');
+  if (counter) {
+    const current = Math.max(0, Math.min(total, shown));
+    counter.dataset.current = String(current);
+    counter.dataset.total = String(total);
+    counter.textContent = `${current} / ${total}`;
+  }
+  const prev = page.querySelector('#stroke-prev');
+  const next = page.querySelector('#stroke-next');
+  if (prev) prev.disabled = shown <= 1;
+  if (next) next.disabled = shown >= total;
+}
+
+/** Draw the strokes in order. Each path's duration follows its own measured
+ * length, so a long sweep takes longer than a tick — handwriting, not a
+ * metronome. */
+function startStrokeAnimation(page) {
+  cancelStrokeAnimation();
+  const paths = [...page.querySelectorAll('.stroke-ink path')];
+  if (!paths.length) return;
+  for (const path of paths) {
+    const len = path.getTotalLength();
+    path.dataset.len = String(len);
+    path.style.strokeDasharray = `${len} ${len}`;
+    path.style.strokeDashoffset = String(len);
+  }
+  const total = paths.length;
+
+  if (strokeReduced()) {
+    // Reduced motion is a mode, not a faster animation: the finished glyph is
+    // there at once and the learner walks it stroke by stroke by hand.
+    S.strokes.step = total;
+    page.dataset.state = 'static';
+    paintStrokes(page, total, 1);
+    return;
+  }
+
+  const GAP = 90;
+  const durations = paths.map((path) =>
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
+  );
+  const starts = [];
+  let acc = 0;
+  for (const d of durations) {
+    starts.push(acc);
+    acc += d + GAP;
+  }
+  const span = acc;
+
+  page.dataset.state = 'drawing';
+  paintStrokes(page, 1, 0);
+
+  let t0 = null;
+  const frame = (ts) => {
+    if (t0 == null) t0 = ts;
+    const t = ts - t0;
+    if (t >= span) {
+      paintStrokes(page, total, 1);
+      page.dataset.state = 'done';
+      S.strokes.step = total;
+      strokeFrame = null;
+      return;
+    }
+    let index = 0;
+    while (index < total - 1 && t >= starts[index + 1]) index += 1;
+    const local = Math.max(0, Math.min(1, (t - starts[index]) / durations[index]));
+    paintStrokes(page, index + 1, local);
+    S.strokes.step = index + 1;
+    strokeFrame = requestAnimationFrame(frame);
+  };
+  strokeFrame = requestAnimationFrame(frame);
+}
+
+function strokeControl(id, ja, en) {
+  const btn = el('button', 'stroke-btn');
+  btn.type = 'button';
+  btn.id = id;
+  btn.append(el('span', 'l-ja', ja));
+  if (bi() && en) btn.append(el('span', 'en-sub', en));
+  if (!bi()) btn.setAttribute('aria-label', ja);
+  return btn;
+}
+
+/** The honest room: a character we can show but whose order we do not know. */
+function strokeMissing(page, id, k) {
+  const box = el('div', 'stroke-missing');
+  box.append(el('div', 'stroke-missing-glyph', id));
+  const line = el('p', 'stroke-missing-line');
+  line.id = 'stroke-missing';
+  line.textContent = tx('筆順のデータはまだない。', 'Stroke data not yet available.');
+  box.append(line);
+  const note = el('p', 'stroke-missing-note');
+  note.textContent = k?.st
+    ? tx(
+        `分かっているのは画数だけ — ${k.st} 画。この字の筆順は KanjiVG にまだ入っていない。`,
+        `What is known is the count — ${k.st} strokes. KanjiVG does not carry this character's stroke paths yet.`,
+      )
+    : tx(
+        'この字の筆順は KanjiVG にまだ入っていない。',
+        'KanjiVG does not carry this character’s stroke paths yet.',
+      );
+  box.append(note);
+  page.append(box);
+}
+
+function renderStrokePage(root) {
+  const st = S.strokes;
+  if (!st) return;
+  const k = D.kanji[st.id];
+  const paths = strokePathsFor(st.id);
+  const reduced = strokeReduced();
+
+  const page = el('div', 'stroke-page');
+  page.id = 'stroke-page';
+  page.tabIndex = -1;
+  page.setAttribute('role', 'dialog');
+  page.setAttribute('aria-modal', 'true');
+  page.setAttribute('aria-label', tx(`${st.id} の筆順`, `${st.id} — stroke order`));
+  page.dataset.kanji = st.id;
+  page.dataset.strokes = String(paths.length);
+  page.dataset.motion = reduced ? 'reduced' : 'full';
+  page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+  page.dataset.state = paths.length ? 'drawing' : 'nodata';
+
+  const bar = el('div', 'stroke-bar');
+  const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
+  backBtn.type = 'button';
+  backBtn.id = 'strokes-back';
+  backBtn.dataset.action = 'navigation.back';
+  backBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'navigation.back' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-back',
+    );
+    closeStrokePage();
+  });
+  bar.append(backBtn);
+
+  const title = el('span', 'stroke-title');
+  title.append(el('span', 'stroke-title-glyph', st.id));
+  title.append(el('span', 'stroke-title-word', tx('筆順', 'stroke order')));
+  bar.append(title);
+
+  const closeBtn = el('button', 'stroke-close', '✕');
+  closeBtn.type = 'button';
+  closeBtn.id = 'strokes-close';
+  closeBtn.dataset.action = 'layer.dismiss';
+  closeBtn.setAttribute('aria-label', tx('筆順をとじる', 'close stroke order'));
+  closeBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'layer.dismiss' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-close',
+    );
+    closeStrokePage();
+  });
+  bar.append(closeBtn);
+  page.append(bar);
+
+  if (!paths.length) {
+    strokeMissing(page, st.id, k);
+  } else {
+    const body = el('div', 'stroke-body');
+    const stage = el('div', 'stroke-stage');
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', STROKE_VIEWBOX);
+    svg.setAttribute('class', 'stroke-canvas');
+    svg.id = 'stroke-canvas';
+    svg.setAttribute('aria-hidden', 'true');
+
+    // 界 — the writing guide: quarters of the square, the way squared paper
+    // teaches balance. Drawn from --line, so it fades with the theme.
+    const grid = document.createElementNS(SVG_NS, 'g');
+    grid.setAttribute('class', 'stroke-grid');
+    for (const [x1, y1, x2, y2] of [
+      [54.5, 0, 54.5, 109],
+      [0, 54.5, 109, 54.5],
+    ]) {
+      const l = document.createElementNS(SVG_NS, 'line');
+      l.setAttribute('x1', String(x1));
+      l.setAttribute('y1', String(y1));
+      l.setAttribute('x2', String(x2));
+      l.setAttribute('y2', String(y2));
+      grid.append(l);
+    }
+    svg.append(grid);
+
+    // the whole glyph, very faint: where the hand is going
+    const guide = document.createElementNS(SVG_NS, 'g');
+    guide.setAttribute('class', 'stroke-guide');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      guide.append(p);
+    }
+    svg.append(guide);
+
+    const ink = document.createElementNS(SVG_NS, 'g');
+    ink.setAttribute('class', 'stroke-ink');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      ink.append(p);
+    }
+    svg.append(ink);
+
+    const nums = document.createElementNS(SVG_NS, 'g');
+    nums.setAttribute('class', 'stroke-nums');
+    paths.forEach((d, i) => {
+      const start = strokeStart(d);
+      if (!start) return;
+      const t = document.createElementNS(SVG_NS, 'text');
+      t.setAttribute('class', 'stroke-num');
+      t.setAttribute('x', String(start.x));
+      t.setAttribute('y', String(start.y));
+      t.textContent = String(i + 1);
+      nums.append(t);
+    });
+    svg.append(nums);
+    stage.append(svg);
+    body.append(stage);
+
+    const readout = el('div', 'stroke-readout');
+    const counter = el('span', 'stroke-count', `0 / ${paths.length}`);
+    counter.id = 'stroke-count';
+    counter.dataset.current = '0';
+    counter.dataset.total = String(paths.length);
+    if (reduced) {
+      counter.setAttribute('role', 'status');
+      counter.setAttribute('aria-live', 'polite');
+    }
+    readout.append(counter);
+    readout.append(el('span', 'stroke-count-unit', tx('画', 'strokes')));
+    body.append(readout);
+
+    const controls = el('div', 'stroke-controls');
+    if (reduced) {
+      const prev = strokeControl('stroke-prev', '← 前の画', 'previous stroke');
+      prev.addEventListener('click', () => {
+        S.strokes.step = Math.max(1, S.strokes.step - 1);
+        paintStrokes(page, S.strokes.step, 1);
+      });
+      const next = strokeControl('stroke-next', '次の画 →', 'next stroke');
+      next.addEventListener('click', () => {
+        S.strokes.step = Math.min(paths.length, S.strokes.step + 1);
+        paintStrokes(page, S.strokes.step, 1);
+      });
+      controls.append(prev, next);
+    } else {
+      const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
+      replay.classList.add('primary');
+      replay.addEventListener('click', () => startStrokeAnimation(page));
+      controls.append(replay);
+    }
+
+    const numbers = strokeControl('stroke-numbers', '番号', 'stroke numbers');
+    numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+    numbers.addEventListener('click', () => {
+      S.strokeNumbers = !S.strokeNumbers;
+      numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+      page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+    });
+    controls.append(numbers);
+    body.append(controls);
+
+    const meta = el('p', 'stroke-meta');
+    const bits = [];
+    if (k) bits.push(tx(`${k.m}`, `${k.m}`));
+    if (D.kanken[st.id]?.kk) bits.push(`漢検 ${D.kanken[st.id].kk}`);
+    if (D.kmeta?.[st.id]?.jlpt) bits.push(`JLPT ${D.kmeta[st.id].jlpt}`);
+    bits.push(tx(`${paths.length} 画`, `${paths.length} strokes`));
+    meta.textContent = bits.join(' · ');
+    body.append(meta);
+    page.append(body);
+  }
+
+  page.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      interaction({ kind: 'layer.dismiss' }, 'keyboard', 'strokes-escape');
+      closeStrokePage();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...page.querySelectorAll('button, a[href], [tabindex]')].filter(
+      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+    );
+    if (!focusable.length) {
+      event.preventDefault();
+      page.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  root.append(page);
+  if (paths.length) startStrokeAnimation(page);
+  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
 }
 
 function renderRadicalNode(sheet, node) {
@@ -2610,7 +3081,20 @@ function renderSheet(root) {
     }
   });
   root.append(sheet);
-  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
+
+  // The sheet keeps its place across a full re-render: 筆順 carries the
+  // scrollTop it left with and hands it straight back.
+  const restore = S.strokes ? S.strokes.sheetScroll : S.sheetScrollRestore;
+  if (restore != null) sheet.scrollTop = restore;
+  S.sheetScrollRestore = null;
+
+  if (S.strokes) return; // the stroke page above owns focus
+  const focusId = S.sheetFocus;
+  S.sheetFocus = null;
+  queueMicrotask(() => {
+    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || backBtn;
+    target.focus({ preventScroll: true });
+  });
 }
 
 function licencePanel() {
@@ -2796,10 +3280,22 @@ function render() {
   else renderShelf(main);
 
   renderSheet(root);
+  renderStrokePage(root);
   renderVariants(root);
-  if (S.stack.length) {
+
+  // Exactly one layer is live at a time. 筆順 sits above the sheet, so when it
+  // is open even the sheet goes inert — nothing behind the top layer is
+  // reachable by finger, keyboard, or screen reader.
+  if (S.strokes || S.stack.length) {
     for (const child of root.children) {
-      if (child.id === 'sheet' || child.classList.contains('scrim')) continue;
+      const live = S.strokes
+        ? child.id === 'stroke-page'
+        : child.id === 'sheet' || child.classList.contains('scrim');
+      if (live) {
+        child.inert = false;
+        child.removeAttribute('aria-hidden');
+        continue;
+      }
       child.inert = true;
       child.setAttribute('aria-hidden', 'true');
     }
