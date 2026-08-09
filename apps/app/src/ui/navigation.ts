@@ -133,12 +133,24 @@ export const DESTINATIONS: readonly Destination[] = [
     reach: { kind: 'shell' },
   },
   {
+    href: '/monthly',
+    routeFile: 'monthly.tsx',
+    screen: 'monthly/monthly-truth-screen.tsx',
+    label: 'Monthly truth',
+    blurb: 'Eight separate lenses over one UTC month, without an ability score.',
+    reach: { kind: 'shell' },
+  },
+  {
     href: '/debug',
     routeFile: 'debug.tsx',
     screen: 'screens/inspector-debug-screen.tsx',
     label: 'About & diagnostics',
     blurb: 'What this build stores, and where it is honest about it.',
-    reach: { kind: 'shell' },
+    reach: {
+      kind: 'from',
+      from: 'src/screens/evidence-inspector-screen.tsx',
+      via: 'onOpenDebug',
+    },
   },
 ];
 

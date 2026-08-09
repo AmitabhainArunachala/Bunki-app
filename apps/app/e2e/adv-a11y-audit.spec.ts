@@ -60,6 +60,7 @@ const ROUTES = [
   '/canvas',
   '/repair',
   '/evidence',
+  '/monthly',
   '/debug',
 ] as const;
 
@@ -272,7 +273,7 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
     'nav-capture',
     'nav-session',
     'nav-evidence',
-    'nav-about-diagnostics',
+    'nav-monthly-truth',
   ]);
 
   // Reading order: focus moves down the page, never back up. Compared by row
