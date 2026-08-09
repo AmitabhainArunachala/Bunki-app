@@ -24,6 +24,38 @@ const CURRENT_STRENGTH=0.038;
 // CURRENT_DRIFT — how fast the gyre's eye wanders the field, in radians/ms. This is what turns a standing pull into motion: a parked eye holds every word at a fixed offset and nothing moves. Turn it up and the swirl roams restlessly; turn it down and the field leans and holds.
 const CURRENT_DRIFT=0.0017;
 
+// ---- OPERATOR VARIANTS: two open settings on the tap ladder. -----------------
+// Each has two positions. This file states what each position DOES and nothing
+// else: no position here is preferred, endorsed, or scheduled to win. The
+// operator rules by feel; until then both stay built and both stay working.
+// The initial value of each is the behaviour the field already shipped with, so
+// a field nobody has switched is the field as it was.
+//
+// V_LADDER — how many taps a word takes from untouched to its full entry.
+//   "stage3": tap = forefront + family + reading · tap2 = English · tap3 = entry
+//   "stage4": tap = forefront + family · tap2 = reading · tap3 = English · tap4 = entry
+let V_LADDER="stage3";
+// V_SATTAP — what the first tap on a constellation satellite does.
+//   "staged":   the satellite reveals itself where it stands; a second tap
+//               makes it the planet.
+//   "recenter": the satellite becomes the planet on that first tap, with its
+//               own family, and climbs V_LADDER from its first rung.
+let V_SATTAP="staged";
+// The seam the host chrome (and a probe) drives. Unknown values are ignored, so
+// a stale caller can never put the field in a state it has no rung for.
+function driftTapSet(o){
+  if(o){
+    if(o.ladder==="stage3"||o.ladder==="stage4") V_LADDER=o.ladder;
+    if(o.satTap==="staged"||o.satTap==="recenter") V_SATTAP=o.satTap;
+  }
+  return {ladder:V_LADDER,satTap:V_SATTAP};
+}
+window.__DRIFT_TAP__={set:driftTapSet,get:function(){return {ladder:V_LADDER,satTap:V_SATTAP};}};
+try{
+  const _q=new URLSearchParams(location.search);
+  driftTapSet({ladder:_q.get("ladder"),satTap:_q.get("sattap")});
+}catch(err){/* a query string never blocks the field */}
+
 const rgbOf=h=>{const n=parseInt(h.slice(1),16);return [n>>16,(n>>8)&255,n&255];};
 const rgba=(h,a)=>{const c=rgbOf(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";};
 const shade=(h,f,a)=>{const c=rgbOf(h);
@@ -1611,15 +1643,43 @@ function strokeSheet(ch){
 }
 
 // ---- card ----
-// When Drift is the opening surface of the deployed app, the wrapper sets
-// window.__BUNKI_APP_BASE and every card gains a real door into the study
-// screens. Standalone (the claude.ai artifact) the base is absent and the
-// card keeps its honest placeholder note instead of a link that would 404.
+// The study door is the ONE seam Drift keeps to whatever hosts it, and it is
+// asked, never assumed. A host that can open the entry itself — the 回廊
+// fusion, which owns a full dictionary and its own entry sheet — installs
+//   window.__BUNKI_OPEN_ENTRY = { has(kind,key)->boolean, open(kind,key) }
+// and the door is drawn ONLY when has() says the far side really exists, then
+// hands the word straight over: no href, no navigation, no external base. A
+// host that has URLs instead (the Pages wrapper) sets __BUNKI_APP_BASE as
+// before. Standalone (the claude.ai artifact) neither exists, and the card
+// keeps its honest placeholder note rather than a door onto nothing — every
+// element is a door, so an element that cannot be one stays a note.
+function studyHost(kind,key){
+  const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_ENTRY;
+  if(!h||typeof h.open!=="function") return null;
+  if(typeof h.has==="function"&&!h.has(kind,key)) return null;
+  return h;
+}
 function studyHtml(kind,key,fallback){
+  const label='この'+(kind==='word'?'語':'字')+'を学ぶ →';
+  if(studyHost(kind,key))
+    return '<button type="button" class="study" data-study-kind="'+esc(kind)+
+      '" data-study-key="'+esc(key)+'">'+esc(label)+'</button>';
   const base=typeof window!=="undefined"&&window.__BUNKI_APP_BASE;
   if(!base) return '<div class="note">'+fallback+'</div>';
-  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">この'+
-    (kind==='word'?'語':'字')+'を学ぶ →</a>';
+  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">'+
+    esc(label)+'</a>';
+}
+// the host-driven door: the card's own pointerup guard already stops taps on
+// buttons from closing the card, so this only has to hand the key over.
+function wireStudy(){
+  const b=card.querySelector("button.study[data-study-key]");
+  if(!b) return;
+  b.addEventListener("click",e=>{
+    e.stopPropagation();
+    const kind=b.getAttribute("data-study-kind"),key=b.getAttribute("data-study-key");
+    const h=studyHost(kind,key);
+    if(h) h.open(kind,key);
+  });
 }
 function openCard(n){
   if(n.kind==="word"){
@@ -1678,13 +1738,14 @@ function openCard(n){
         const cell=document.createElement("div"); cell.className="scell";
         const sh=strokeSheet(n.ch);
         cell.appendChild(sh.svg);
-        card.insertBefore(cell,card.querySelector(".note"));
+        card.insertBefore(cell,card.querySelector(".note,.study"));
         sh.play();
       };
       card.querySelector("#strokeBtn").addEventListener("click",show);
       show();
     }
   }
+  wireStudy();
   card.classList.add("open");
 }
 
@@ -1779,9 +1840,28 @@ function tapNode(n){
   if(n.kind==="glyph"){ diveKanji(n); return; }
   if(n.kind==="part"){ divePart(n); return; }
   const isSat=n.kind==="word"&&stack.length===0&&!lockOn&&FOCUS.length&&n!==focusN&&n.hlDom;
+  if(isSat&&V_SATTAP==="recenter"){
+    // V_SATTAP "recenter": the satellite skips the reveal-in-place and becomes
+    // the planet at once, then climbs V_LADDER from its first rung like any
+    // other word. Nothing is destroyed here either — the old constellation is
+    // released by bloomFocus, which keeps the tapped node alive.
+    collapseUnfold();
+    bloomFocus(n);
+    // rung 1 of three carries the reading with the family; rung 1 of four does
+    // not — unless no family came up at all, in which case a tap that showed
+    // nothing would be a dead tap, so the reading answers instead.
+    if(V_LADDER==="stage3"||focusN!==n){
+      n.el.classList.add("unfolded"); unfolded=n;
+      if(!n.r) n.el.classList.add("glossed");
+    }
+    bloomLast=performance.now();
+    return;
+  }
   if(isSat&&!n.el.classList.contains("unfolded")){
-    // ratified Q1: a satellite tap reveals it in place — reading and gloss
-    // together, never destruction; the second tap makes it the planet
+    // V_SATTAP "staged" — what spec Q1 ratified and the field shipped: a
+    // satellite tap reveals it in place, reading and gloss together, never
+    // destruction; the second tap makes it the planet. Recorded here as
+    // provenance, not as a verdict on this row — WP6 rules on neither position.
     collapseUnfold();
     n.el.classList.add("unfolded","glossed"); unfolded=n;
     bloomLast=performance.now();
@@ -1791,13 +1871,26 @@ function tapNode(n){
     bloomFocus(n);   // the chain walk: the satellite becomes the planet
     return;
   }
+  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;
+  if(V_LADDER==="stage4"&&canBloom&&focusN!==n&&!n.el.classList.contains("unfolded")){
+    // rung 1 of four: the word comes forward with its family and nothing is
+    // read yet. Only where a family can actually bloom — inside a dive there
+    // is no constellation to raise, so this rung would answer with nothing.
+    collapseUnfold();
+    bloomFocus(n);
+    if(focusN===n){ bloomLast=performance.now(); return; }
+    // no family came up: there is no rung to stand on, so this tap reads the
+    // word rather than answering with nothing
+  }
   if(!n.el.classList.contains("unfolded")){
     collapseUnfold();
     n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana
     // a word we hold no reading for has no furigana stage to show: it would
     // answer a tap with nothing visible. It gives its gloss at once instead.
     if(!n.r) n.el.classList.add("glossed");
-    if(n.kind==="word"&&stack.length===0&&!lockOn) bloomFocus(n);
+    // under stage4 the family is already up from rung 1 — re-blooming here
+    // would rebuild the same constellation out from under the finger
+    if(canBloom&&(V_LADDER!=="stage4"||focusN!==n)) bloomFocus(n);
     return;
   }
   if(!n.el.classList.contains("glossed")){
