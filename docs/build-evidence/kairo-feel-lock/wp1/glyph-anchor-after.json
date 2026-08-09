@@ -1,0 +1,613 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "budgetPx": 0.5,
+  "article": "wikinews:1403",
+  "tokensMeasured": [
+    "含ふくめ",
+    "認みとめ",
+    "含ふくむ",
+    "突つき出で",
+    "際さいし",
+    "豊ゆたか",
+    "含ふくむ",
+    "高たかく"
+  ],
+  "paths": [
+    {
+      "path": "default dials (furigana:2) — rest → English gloss",
+      "query": "",
+      "budget": 0.5,
+      "worst": 0,
+      "tokensWithGlossMounted": 6,
+      "quorum": true,
+      "rows": [
+        {
+          "token": "含ふくめ",
+          "index": "34",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 186.453,
+              "y": 326.563,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 186.453,
+              "y": 326.563,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "認みとめ",
+          "index": "63",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 32.5,
+              "y": 379.563,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 32.5,
+              "y": 379.563,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "含ふくむ",
+          "index": "152",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 358.438,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 358.438,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "突つき出で",
+          "index": "166",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 882.297,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 882.297,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": false,
+          "rubyAppeared": true,
+          "stateChanged": false,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "際さいし",
+          "index": "230",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 904.688,
+              "y": 688.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 904.688,
+              "y": 688.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": false,
+          "rubyAppeared": true,
+          "stateChanged": false,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "豊ゆたか",
+          "index": "244",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 198.609,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 198.609,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "含ふくむ",
+          "index": "254",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 579.781,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 579.781,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "高たかく",
+          "index": "263",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 872.266,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 872.266,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "path": "furigana:0 dial — rest → furigana reveal → English gloss",
+      "query": "&dials=0,0,0",
+      "budget": 0.5,
+      "worst": 0,
+      "tokensWithGlossMounted": 6,
+      "quorum": true,
+      "rows": [
+        {
+          "token": "含ふくめ",
+          "index": "34",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 186.453,
+              "y": 326.563,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 186.453,
+              "y": 326.563,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 186.453,
+              "y": 326.563,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "認みとめ",
+          "index": "63",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 32.5,
+              "y": 379.563,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 32.5,
+              "y": 379.563,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 32.5,
+              "y": 379.563,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "含ふくむ",
+          "index": "152",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 358.438,
+              "y": 582.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 358.438,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 358.438,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "突つき出で",
+          "index": "166",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 875.141,
+              "y": 582.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 875.141,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 875.141,
+              "y": 582.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": false,
+          "rubyAppeared": true,
+          "stateChanged": false,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "際さいし",
+          "index": "230",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 864.109,
+              "y": 688.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 864.109,
+              "y": 688.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 864.109,
+              "y": 688.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": false,
+          "rubyAppeared": true,
+          "stateChanged": false,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "豊ゆたか",
+          "index": "244",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 145.609,
+              "y": 741.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 145.609,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 145.609,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "含ふくむ",
+          "index": "254",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 526.781,
+              "y": 741.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 526.781,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 526.781,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        },
+        {
+          "token": "高たかく",
+          "index": "263",
+          "samples": [
+            {
+              "state": "rest",
+              "x": 819.266,
+              "y": 741.656,
+              "hasRuby": false,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "furigana",
+              "x": 819.266,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": false,
+              "tokH": 44,
+              "childRows": 1
+            },
+            {
+              "state": "gloss",
+              "x": 819.266,
+              "y": 741.656,
+              "hasRuby": true,
+              "hasEn": true,
+              "tokH": 44,
+              "childRows": 2
+            }
+          ],
+          "maxDx": 0,
+          "maxDy": 0,
+          "glossMounted": true,
+          "rubyAppeared": true,
+          "stateChanged": true,
+          "withinBudget": true,
+          "pass": true
+        }
+      ],
+      "pass": true
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "pass": true
+}
