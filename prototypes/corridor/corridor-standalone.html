@@ -7893,17 +7893,51 @@ const ROMAJI = (() => {
   };
 })();
 
+/**
+ * Normalise one English gloss (or one English query) to its bare head phrase,
+ * so that a whole-gloss match can be recognised across the shapes JMdict-style
+ * glosses actually take:
+ *   · parenthetical qualifiers are dropped — "world (of haiku, art, etc.)" → "world",
+ *     "water (esp. cool or cold)" → "water";
+ *   · one leading article or infinitive marker is dropped — "the world" → "world",
+ *     "to eat" → "eat" — but only when something survives, so the gloss "a" or
+ *     the query "to" stays itself.
+ * Applied to BOTH sides, so typing "the world" or "to eat" lands the same place.
+ */
+const GLOSS_MESSY = /[(]|\s\s|[^\S ]/; // parenthesis, doubled space, or exotic whitespace
+const GLOSS_LEAD = new Set(['the', 'a', 'an', 'to']);
+function normalizeGloss(s) {
+  let bare = String(s).toLowerCase();
+  // the regex work is the whole index-build cost, and ~80% of glosses are
+  // already clean — so pay for it only when the string actually needs it.
+  if (GLOSS_MESSY.test(bare)) {
+    bare = bare.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ');
+  }
+  bare = bare.trim();
+  const sp = bare.indexOf(' ');
+  if (sp > 0 && GLOSS_LEAD.has(bare.slice(0, sp))) return bare.slice(sp + 1);
+  return bare;
+}
+
+// commonness rank for the exact-gloss tiers: a graded (JLPT) word is the one a
+// learner means. 0 = N5 … 4 = N1, 5 = ungraded.
+const JLPT_RANK = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 };
+const jlptRank = (lv) => JLPT_RANK[String(lv || '').toUpperCase()] ?? 5;
+
 let searchIndex = null;
 function buildSearchIndex() {
   if (searchIndex) return;
   searchIndex = [];
   for (const [w, rec] of Object.entries(D.dict)) {
+    const glosses = rec.m || [];
     searchIndex.push({
       t: 'word', id: w, w,
       r: rec.r || '',
       rh: kataToHira(rec.r || ''),
-      m: (rec.m || []).join('; ').toLowerCase(),
-      g: rec.m?.[0] || '',
+      m: glosses.join('; ').toLowerCase(),
+      g: glosses[0] || '',
+      ng: glosses.map(normalizeGloss),
+      j: jlptRank(rec.jlpt),
     });
   }
   for (const [c, k] of Object.entries(D.kanji)) {
@@ -7914,10 +7948,16 @@ function buildSearchIndex() {
       rh: kataToHira([...k.on, ...k.kun].join(' ')),
       m: String(k.m).toLowerCase(),
       g: k.m,
+      ng: [normalizeGloss(k.m)],
+      j: 5,
     });
   }
   for (const g of GRAMMARS()) {
-    searchIndex.push({ t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '', m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn });
+    searchIndex.push({
+      t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '',
+      m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn,
+      ng: [normalizeGloss(g.mEn)], j: jlptRank(g.lv),
+    });
   }
   for (const pt of PARTICLES) {
     searchIndex.push({
@@ -7926,6 +7966,8 @@ function buildSearchIndex() {
       rh: pt.r,
       m: `${pt.role} ${pt.roleJa} particle`.toLowerCase(),
       g: pt.role,
+      ng: [normalizeGloss(pt.role)],
+      j: 5,
     });
   }
 }
@@ -7938,9 +7980,14 @@ function searchResults(query) {
   const hasKana = /[぀-ゖァ-ヺ]/.test(q);
   const qh = hasKana ? kataToHira(q) : ROMAJI(q);
   const ql = q.toLowerCase();
+  const qn = hasKanji || hasKana ? '' : normalizeGloss(q);
   const scored = [];
   for (const e of searchIndex) {
     let score = -1;
+    // Only the English exact-gloss tiers set this; every other lane leaves it
+    // at 0, so their relative order stays exactly what it was (score, then
+    // shorter headword) — the kana, romaji and kanji doors are untouched.
+    let tie = 0;
     if (hasKanji) {
       if (e.w === q) score = 100;
       else if (e.w.startsWith(q)) score = 80;
@@ -7956,14 +8003,27 @@ function searchResults(query) {
         else if (e.rh.startsWith(qh)) score = Math.max(score, 75);
       }
       if (e.m) {
+        // English priority tiers, above the old word-boundary/substring pair:
+        //   92 · the query IS this entry's PRIMARY gloss   ("world" → 世界 "the world")
+        //   85 · the query IS one of its later glosses     ("world" → 俗 "…; the world; …")
+        // Both sit under the romaji-exact 95, so the reading door still wins
+        // when a query is genuine romaji.
+        const gi = qn ? e.ng.indexOf(qn) : -1;
+        const exact = gi === 0 ? 92 : gi > 0 ? 85 : -1;
+        if (exact > score) {
+          score = exact;
+          // within a tier: real words before single-kanji meaning-labels,
+          // then earlier gloss position, then commonness, then shorter word.
+          tie = (e.t === 'kanji' ? 1000 : 0) + gi * 10 + e.j;
+        }
         const at = e.m.indexOf(ql);
         if (at === 0 || (at > 0 && ' ;('.includes(e.m[at - 1]))) score = Math.max(score, 70);
         else if (at > 0) score = Math.max(score, 40);
       }
     }
-    if (score >= 0) scored.push({ e, score });
+    if (score >= 0) scored.push({ e, score, tie });
   }
-  scored.sort((a, b) => b.score - a.score || a.e.w.length - b.e.w.length);
+  scored.sort((a, b) => b.score - a.score || a.tie - b.tie || a.e.w.length - b.e.w.length);
   return scored.slice(0, 40).map((x) => x.e);
 }
 
