@@ -8,6 +8,7 @@ the primary checkout at `/Users/dhyana/Bunki-app`; it is unrelated user work.
 
 - Repository: `AmitabhainArunachala/Bunki-app`
 - Integration branch: `codex/kairo-full-build-20260808`
+- Draft integration PR: `#67` (temporarily based on the PR #65 branch)
 - Safe integration SHA: `976233dfef53a5958063fac13c12b5531c174a29`
 - Starting campaign SHA: `e8be255e1ea13a350759198f3e85caf0e239560d`
 - Upstream prototype PR: `#65`, still draft/open/clean at
