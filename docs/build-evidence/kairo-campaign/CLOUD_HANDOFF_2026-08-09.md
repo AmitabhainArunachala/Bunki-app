@@ -60,17 +60,23 @@ Exact integrated checks already run:
 ## Promotion blocker — do this first
 
 Branch `origin/codex/kairo-a1-verified-grade-20260809` is clean and pushed at
-`d85d62796c92f23d76dea9b125dcac56983cdef0`. It is an explicit WIP and must not
+`29b944ba7296d3c0ac090d6b248ae69c647b0cd6`. It is an explicit WIP and must not
 be promoted by itself. Commit `7b39955` preserves the eight-case red proof;
-`d85d627` makes those eight adversarial domain cases green and passes the domain
-source typecheck.
+`d85d627` closes the initial parser/gate boundary; `29b944b` adds the exact
+contract + response + effort minter and migrates the domain session, repair, and
+canvas command boundaries.
 
 The WIP implements the v2 parser/schema, deterministic NFKC/trim proof,
-v1 `response_unverified`, tamper rejection, and source-bound gate/activation.
-It intentionally leaves the minter, session/canvas/repair UI, evidence copy,
-golden ambiguity state, exact routing, and broad regression migration undone.
-Resume from that branch and begin with the domain workspace typecheck to
-enumerate the remaining call sites.
+v1 `response_unverified`, tamper rejection, source-bound gate/activation, and a
+closed `verified_retrieval_v2` authority value that exists only on an admitted
+gate decision—not on a raw parsed event. Domain typecheck and the focused nine
+files / 161 tests pass. Full domain remains intentionally red: 10/586 failures
+across five files (old fail-closed version assertions, schema-shape inspection,
+legacy replay goldens/authority migration, unsupported production/rubric
+expectations, and a fuzz generator that still emits v1 reviews). App UI,
+durable/export migration, exact routing, golden ambiguity state, and Chromium
+remain undone. Resume by making the complete domain suite green, then migrate
+the app and golden E2E.
 
 The independent judge reproduced a P0 authority bug: the current session has no
 response input. Clicking `Good` mints v1 `ReviewGraded`, the gate admits it, and
