@@ -1,6 +1,6 @@
 /** The A2 monthly truth surface: records stay separate by capability and authority. */
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -86,6 +86,7 @@ export const MONTHLY_SIGNAL_COPY = {
 
 interface MonthlyTruthScreenProps {
   readonly requestedMonth?: string | undefined;
+  readonly onSelectMonth: (month: MonthId) => void;
 }
 
 type ProjectionResult =
@@ -103,11 +104,13 @@ function currentUtcMonth(): MonthId {
   return candidate;
 }
 
-export function MonthlyTruthScreen({ requestedMonth }: MonthlyTruthScreenProps): ReactNode {
+export function MonthlyTruthScreen({
+  requestedMonth,
+  onSelectMonth,
+}: MonthlyTruthScreenProps): ReactNode {
   const theme = useTheme();
   const store = useAppStore();
   const snapshot = useAppSnapshot();
-  const [chosenMonth, setChosenMonth] = useState<MonthId | null>(null);
 
   const result = useMemo<ProjectionResult>(() => {
     try {
@@ -119,7 +122,7 @@ export function MonthlyTruthScreen({ requestedMonth }: MonthlyTruthScreenProps):
       }
       const events = store.readAll();
       const recordedMonths = availableMonthlyTruthMonths(events);
-      const selected = chosenMonth ?? requestedMonth ?? recordedMonths[0] ?? currentUtcMonth();
+      const selected = requestedMonth ?? recordedMonths[0] ?? currentUtcMonth();
       if (!isMonthId(selected)) {
         return { kind: 'error', message: 'The selected month is not a UTC month.' };
       }
@@ -136,7 +139,7 @@ export function MonthlyTruthScreen({ requestedMonth }: MonthlyTruthScreenProps):
       };
     }
     // `snapshot.revision` is the raw log's change token.
-  }, [chosenMonth, requestedMonth, snapshot.revision, store]);
+  }, [requestedMonth, snapshot.revision, store]);
 
   if (result.kind === 'error') {
     return (
@@ -197,7 +200,7 @@ export function MonthlyTruthScreen({ requestedMonth }: MonthlyTruthScreenProps):
               accessibilityLabel={`Show monthly truth for ${month}`}
               key={month}
               label={month}
-              onPress={() => setChosenMonth(month)}
+              onPress={() => onSelectMonth(month)}
               selected={month === truth.month}
               testID={`monthly-month-${month}`}
             />
