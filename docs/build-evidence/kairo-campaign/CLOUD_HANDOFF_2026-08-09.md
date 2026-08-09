@@ -110,29 +110,35 @@ Remote branch: `origin/codex/kairo-a2-monthly-20260809`
 Commits:
 
 - `87f54c6` — pure non-scalar UTC monthly projection + export proof;
-- `3a7d22f` — accessible `/monthly` Expo route/navigation.
+- `3a7d22f` — accessible `/monthly` Expo route/navigation;
+- `99ca6d8` — isolate the monthly review-authority adapter;
+- `e078713` — close UTC/reload/mobile Chromium verification.
 
 The pushed branch is clean at
-`3a7d22fa1cf2daac542a3dc895d926a8f5acadea`. Checks: projection/export 5/5,
-navigation 10/10, domain/export/app typechecks, focused ESLint/Prettier/diff,
-and a fresh 15-route Expo export all pass.
-
-Dedicated Chromium falsified two UI assumptions before cutoff: the 390 px
-viewport overflows horizontally by 38 px, and the UTC month-switch test could
-not find `monthly-month-2026-07`. The uncommitted diagnostic spec/fix is safely
-preserved in immutable stash commit
-`cb93ceee68f0cc4026f792e11ab371d15ff23992`, published so a remote runner can
-fetch it at `origin/codex/kairo-a2-monthly-wip-20260809`. Fetch that ref, then
-apply the commit as a stash only when resuming this lane. Full E2E/axe and
-screenshot inspection remain undone.
+`e0787130eb64d40733c5e4fb136024a772ff6da1`. The initial Chromium run
+falsified a 38 px mobile overflow and a non-deterministic UTC switch; both are
+now fixed with URL-backed month selection, a timer-safe fixed clock, and the
+shorter shell label. Checks: root Vitest 97 files / 1,652 tests; focused
+authority/monthly/export 7/7; export verification 14/14; axe plus monthly
+13/13; full Chromium 41/41; all workspace typechecks; root ESLint and
+Prettier; fresh Expo export with 15 routes. Light/dark and 390 px screenshots
+were inspected with no clipping or horizontal overflow. The old immutable WIP
+stash `cb93ceee68f0cc4026f792e11ab371d15ff23992` remains recoverable but is
+superseded and must not be applied to this head.
 
 It exposes eight separate lenses and no aggregate mastery/level: recognition,
 meaning recall, production, listening, kanji reading, writing, grammar
 discrimination, and source familiarity/exposure. Unsupported entity/writing/
 source links remain visibly unresolved. It deliberately classifies v1
 `ReviewGraded` only as an unverified recorded claim. After grading v2 lands,
-extend this closed classifier with the proof-bearing variant, then integrate and
-run Chromium.
+extend this closed classifier from the replay gate's recomputed proof-bearing
+authority—not from the raw v2 event alone—then integrate and rerun Chromium.
+An independent judge blocks the current UI from product integration: raw
+snake_case reasons and contract/event/replay jargon dominate the learner-facing
+surface, and the screen reads ambient `new Date()` outside the canonical runtime
+clock. Map every reason to calm learner copy, put audit details behind a named
+disclosure, inject the canonical clock/month, and add v2 plus raw-enum-negative
+tests before promotion.
 
 ## Ready side lane — Drift accessibility
 
