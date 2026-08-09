@@ -1,0 +1,30 @@
+{
+  "tag": "WP6-defaults",
+  "src": "/home/user/Bunki-app/.claude/worktrees/agent-aa8fa572d39c96ca3/prototypes/drift/drift-artifact.html",
+  "query": "",
+  "atRest": {
+    "minRenderedOp": 0.327,
+    "quietest": "出",
+    "ghostFloor": 0.327,
+    "FOCUS": 0,
+    "bloomDimmedWords": 0,
+    "predictedBloomFloor": 0.098
+  },
+  "bloomed": {
+    "minRenderedOp": 0.098,
+    "quietest": "出",
+    "ghostFloor": 0.327,
+    "FOCUS": 14,
+    "bloomDimmedWords": 63,
+    "predictedBloomFloor": 0.098
+  },
+  "backAtRest": {
+    "minRenderedOp": 0.327,
+    "quietest": "出",
+    "ghostFloor": 0.327,
+    "FOCUS": 0,
+    "bloomDimmedWords": 0,
+    "predictedBloomFloor": 0.098
+  },
+  "errs": []
+}
