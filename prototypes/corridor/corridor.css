@@ -132,9 +132,25 @@ body {
   font-weight: 400;
 }
 
+/* THE READING MEASURE. A line of 21px mincho wants ~35–40 characters; a
+ * 1280px window gives it 60+, which is not a book, it is a spreadsheet. The
+ * column stops at 820px and centres.
+ *
+ * No media query on purpose: below 820px the max-width is above the viewport
+ * and the auto margins resolve to 0, so every phone and tablet layout is
+ * untouched to the pixel. 野 and 墨流し opt out — they are landscapes, not
+ * columns, and the drift layer beneath them is never in this box. */
 main {
   flex: 1;
   padding: 14px 16px 92px;
+  max-width: 820px;
+  margin-inline: auto;
+}
+
+body[data-view='entry'] main,
+body[data-view='drift'] main {
+  max-width: none;
+  margin-inline: 0;
 }
 
 /* ------------------------------------------------------------- headings */
@@ -556,6 +572,10 @@ button.tok::before {
   z-index: 40;
   max-height: 82vh;
   overflow-y: auto;
+  /* the entry keeps the same measure as the text it came from — left/right are
+   * both 0, so the auto margins centre it once max-width binds (≥820px only) */
+  max-width: 820px;
+  margin-inline: auto;
   background: var(--ground);
   border-top: 1px solid var(--line);
   border-radius: 12px 12px 0 0;

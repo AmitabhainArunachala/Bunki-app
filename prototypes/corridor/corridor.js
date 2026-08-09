@@ -207,6 +207,11 @@ const S = {
   view: 'shelf',
   passageId: null,
   readerScroll: 0,
+  /** Where the shelf was standing when you last walked off it. The reader has
+   * kept its place since v1; the shelf is its analog — leaving records the
+   * offset, returning puts it back. Session-only: the store persists what you
+   * took, never where you were. */
+  shelfScroll: 0,
   stack: [],
   dials: { kanji: 0, furigana: 2, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
@@ -532,8 +537,21 @@ function restoreDialogInvoker() {
   });
 }
 
-function go(node, { invoker = null } = {}) {
+/** Record the page beneath before a layer or a new view covers it. A sheet is
+ * fixed, so the page under it has not moved — re-recording is a no-op. */
+function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
+  else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
+}
+
+/** Hand the current view back the offset it walked away from. */
+function returnScroll() {
+  if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
+}
+
+function go(node, { invoker = null } = {}) {
+  keepScroll();
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
@@ -553,7 +571,7 @@ function back() {
     S.stack.pop();
     render();
     if (!S.stack.length) {
-      if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+      returnScroll();
       restoreDialogInvoker();
     }
     return;
@@ -561,13 +579,17 @@ function back() {
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
     S.view = 'shelf';
     render();
+    // the shelf gets its place back the way the reader always has
+    window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'shelf' && S.variants.entry === 'field') {
+    keepScroll();
     S.view = 'entry';
     render();
   }
   if (S.view === 'shelf' && S.variants.entry === 'drift') {
+    keepScroll();
     S.view = 'drift';
     render();
   }
@@ -583,7 +605,7 @@ function dismissSheet() {
   if (!S.stack.length) return;
   S.stack = [];
   render();
-  if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  returnScroll();
   restoreDialogInvoker();
 }
 
@@ -614,6 +636,7 @@ function closeStrokePage() {
 }
 
 function openPassage(id) {
+  keepScroll();
   S.passageId = id;
   S.view = 'reader';
   S.readerScroll = 0;
@@ -911,6 +934,7 @@ function renderShelfBody() {
   gram.id = 'grammar-link';
   gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
   gram.addEventListener('click', () => {
+    keepScroll();
     S.view = 'grammar';
     render();
     window.scrollTo(0, 0);
@@ -1000,6 +1024,8 @@ function dialRow(labelJa, labelEn, key, options) {
  *   1st tap        → furigana above           (instant — no double-tap wait)
  *   2nd tap        → English beneath          (a later tap, not a fast pair)
  *   3rd tap        → carries into the full entry
+ * With ふりがな on つねに the first rung is already climbed, so the ladder is
+ * two rungs: English, then the full entry. tapLadderHint() says which.
  *   long-press     → floating mini-dictionary
  *   keep holding   → the mini window morphs into the full entry
  * A moved pointer is a scroll, never a gesture. Every action applies to the
@@ -1145,6 +1171,25 @@ function inlineGloss(rec) {
   return best;
 }
 
+/** The tap ladder has one rung fewer when the ふりがな dial is つねに: the
+ * reading is already on the page, so the first activation cannot reveal it and
+ * goes straight to the English gloss (see activate(), below). The hint has to
+ * describe the ladder the reader actually has under their finger. */
+const readingsAlwaysOn = () => S.dials.furigana === 2;
+
+function tapLadderHint() {
+  if (readingsAlwaysOn()) {
+    return tx(
+      '触れる＝英語 · もう一度＝全項目 · フォーカス＝長押し不要の操作',
+      'activate = English · again = full entry · focus = no-hold actions',
+    );
+  }
+  return tx(
+    '触れる＝ふりがな · もう一度＝英語 · 三回目＝全項目 · フォーカス＝長押し不要の操作',
+    'activate = reading · again = English · third = full entry · focus = no-hold actions',
+  );
+}
+
 function tokenAccessibleLabel(token, index) {
   const record = lookup(token.b);
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -1152,7 +1197,11 @@ function tokenAccessibleLabel(token, index) {
   const parts = [token.s || token.b, tx('語', 'word')];
   if (hasReading && record?.r && record.r !== token.s) parts.push(record.r);
   if (hasEnglish && record?.m?.length) parts.push(inlineGloss(record));
-  parts.push(tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'));
+  parts.push(
+    readingsAlwaysOn()
+      ? tx('もう一度で全項目。フォーカスで別の操作。', 'a further activation opens the full entry; focus for more actions')
+      : tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'),
+  );
   return parts.filter(Boolean).join(' · ');
 }
 
@@ -1331,10 +1380,7 @@ function renderReader(main) {
   }
 
   const grammarHint = el('p', 'gesture-hint');
-  grammarHint.textContent = tx(
-    '触れる＝ふりがな · もう一度＝英語 · 三回目＝全項目 · フォーカス＝長押し不要の操作',
-    'activate = reading · again = English · third = full entry · focus = no-hold actions',
-  );
+  grammarHint.textContent = tapLadderHint();
   main.append(grammarHint);
 
   const reader = el('div', 'reader');
@@ -1451,7 +1497,8 @@ function renderDrift(main) {
   door.addEventListener('click', () => {
     S.view = 'shelf';
     render();
-    window.scrollTo(0, 0);
+    // first arrival is 0; a return from the drift lands where you left off
+    window.scrollTo(0, S.shelfScroll);
   });
   main.append(door);
 }
@@ -1492,6 +1539,7 @@ function renderEntry(main) {
   enter.addEventListener('click', () => {
     S.view = 'shelf';
     render();
+    window.scrollTo(0, S.shelfScroll);
   });
   field.append(enter);
   main.append(field);
@@ -2387,6 +2435,20 @@ function renderWordNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
+ * layer carry an empty `name` — they are shape components, not Kangxi radicals,
+ * and the 漢検 table never named them. "unnamed part" said only that we had
+ * nothing, and made a live door look like a dead one. The honest line says what
+ * IS known and what the door actually opens: the family of kanji built from
+ * this shape, which is exactly what renderRadicalNode() shows on the far side. */
+function componentLabel(c) {
+  const r = D.radicals[c];
+  if (r?.name) return r.name;
+  const n = r?.kanjiCount;
+  if (n) return tx(`部品 — ${n} 字に使われる`, `component — used in ${n} kanji`);
+  return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the 漢検 radical table');
+}
+
 function renderKanjiNode(sheet, node) {
   const k = D.kanji[node.id];
   if (!k) {
@@ -2426,7 +2488,7 @@ function renderKanjiNode(sheet, node) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.append(el('span', 'row-glyph', c));
-      row.append(el('span', 'row-main', D.radicals[c]?.name || tx('名称なし', 'unnamed part')));
+      row.append(el('span', 'row-main', componentLabel(c)));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }));
       rows.append(row);
@@ -3184,7 +3246,10 @@ function renderVariants(root) {
         b.addEventListener('click', () => {
           S.variants[key] = id;
           if (key === 'entry') {
-            if (id === 'field' && S.view === 'shelf') S.view = 'entry';
+            if (id === 'field' && S.view === 'shelf') {
+              keepScroll();
+              S.view = 'entry';
+            }
             if (id === 'shelf' && S.view === 'entry') S.view = 'shelf';
           }
           render();
@@ -3225,6 +3290,9 @@ function render() {
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
   document.body.classList.toggle('ui-bi', bi());
+  // the reading measure is per-view: a column for the texts, the full window
+  // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
+  document.body.dataset.view = S.view;
 
   const chrome = el('div', 'chrome');
   const backBtn = biLabel('button', null, '戻る', 'back');
@@ -3273,6 +3341,7 @@ function render() {
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
+    keepScroll();
     S.stack = [];
     S.view = 'tray';
     render();
