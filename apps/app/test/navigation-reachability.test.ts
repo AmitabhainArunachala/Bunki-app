@@ -22,7 +22,7 @@
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
@@ -83,8 +83,7 @@ describe('every route is on the map', () => {
   it('renders the screen each entry names', () => {
     for (const destination of DESTINATIONS) {
       const source = read(resolve(ROUTES_ROOT, destination.routeFile));
-      const component = destination.screen
-        .replace(/^screens\//, '')
+      const component = basename(destination.screen)
         .replace(/\.tsx?$/, '')
         .split('-')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -168,6 +167,7 @@ describe('the map describes the app it is in', () => {
       'Integration canvas',
       'Repair branch',
       'Evidence',
+      'Monthly truth',
       'About & diagnostics',
     ]);
   });
@@ -181,7 +181,7 @@ describe('the map describes the app it is in', () => {
       'Capture',
       'Session',
       'Evidence',
-      'About & diagnostics',
+      'Monthly truth',
     ]);
   });
 });
