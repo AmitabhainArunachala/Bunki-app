@@ -1,0 +1,1584 @@
+{
+  "root": "/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/prefix-corridor",
+  "article": "wikinews:1403",
+  "worstShift": 301.661,
+  "samples": 16,
+  "errors": {
+    "console": [],
+    "page": []
+  },
+  "results": [
+    {
+      "dials": "0,2,0",
+      "index": 34,
+      "word": "含める",
+      "text": "含ふくめ",
+      "shift": 3.985,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 3.985,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 3.985,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 143.109,
+            "y": 542.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "含ふくめ"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 147.094,
+            "y": 542.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to include",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくめto include"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 147.094,
+            "y": 542.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to include",
+          "hasEnClass": true,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくめto include"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 37,
+      "word": "カ所",
+      "text": "カ所しょ",
+      "shift": 0,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 221.797,
+            "y": 542.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "カ所しょ"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 221.797,
+            "y": 542.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "カ所しょ"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 221.797,
+            "y": 542.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "カ所しょ"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 63,
+      "word": "認める",
+      "text": "認みとめ",
+      "shift": 3.985,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 3.985,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 3.985,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 218.531,
+            "y": 737.125,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "認みとめ"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 222.516,
+            "y": 737.125,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to observe",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "認みとめto observe"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 222.516,
+            "y": 737.125,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to observe",
+          "hasEnClass": true,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "認みとめto observe"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 152,
+      "word": "含む",
+      "text": "含ふくむ",
+      "shift": 3.984,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 3.984,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 3.984,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 33,
+            "y": 1353.813,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "含ふくむ"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 36.984,
+            "y": 1353.813,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to have",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくむto have"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 36.984,
+            "y": 1353.813,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to have",
+          "hasEnClass": true,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくむto have"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 166,
+      "word": "突き出る",
+      "text": "突つき出で",
+      "shift": 0,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 236.797,
+            "y": 1417.406,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": true,
+          "rubyCount": 2,
+          "visibleRt": 2,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "ruby"
+          ],
+          "tokH": 95.89,
+          "tokW": 23.42,
+          "text": "突つき出で"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 236.797,
+            "y": 1417.406,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": true,
+          "rubyCount": 2,
+          "visibleRt": 2,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "ruby"
+          ],
+          "tokH": 95.89,
+          "tokW": 23.42,
+          "text": "突つき出で"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 236.797,
+            "y": 1417.406,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": true,
+          "rubyCount": 2,
+          "visibleRt": 2,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "ruby"
+          ],
+          "tokH": 95.89,
+          "tokW": 23.42,
+          "text": "突つき出で"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 230,
+      "word": "際する",
+      "text": "際さいし",
+      "shift": 0,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 144.109,
+            "y": 1886.297,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "際さいし"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 144.109,
+            "y": 1886.297,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "際さいし"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 144.109,
+            "y": 1886.297,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "際さいし"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 244,
+      "word": "豊か",
+      "text": "豊ゆたか",
+      "shift": 3.984,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 3.984,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 3.984,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 317.375,
+            "y": 1949.891,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "豊ゆたか"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 321.359,
+            "y": 1949.891,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "rich",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "豊ゆたかrich"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 321.359,
+            "y": 1949.891,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "rich",
+          "hasEnClass": true,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "豊ゆたかrich"
+        }
+      ]
+    },
+    {
+      "dials": "0,2,0",
+      "index": 263,
+      "word": "高い",
+      "text": "高たかく",
+      "shift": 3.985,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 3.985,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 3.985,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": false,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 327.484,
+            "y": 2066.484,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "高たかく"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 331.469,
+            "y": 2066.484,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "high",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "高たかくhigh"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 331.469,
+            "y": 2066.484,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "high",
+          "hasEnClass": true,
+          "lit": false,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "高たかくhigh"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 34,
+      "word": "含める",
+      "text": "含ふくめ",
+      "shift": 4.485,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 4.485,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 142.609,
+            "y": 563.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "含め"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 143.109,
+            "y": 563.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "含ふくめ"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 147.094,
+            "y": 563.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to include",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくめto include"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 37,
+      "word": "カ所",
+      "text": "カ所しょ",
+      "shift": 0,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 243.219,
+            "y": 563.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "カ所"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 243.219,
+            "y": 563.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "カ所しょ"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 243.219,
+            "y": 563.938,
+            "w": 22.422,
+            "h": 24,
+            "ch": "カ"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "カ所しょ"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 63,
+      "word": "認める",
+      "text": "認みとめ",
+      "shift": 4.484,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 4.484,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 234.297,
+            "y": 722.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "認め"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 234.797,
+            "y": 722.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "認みとめ"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 238.781,
+            "y": 722.938,
+            "w": 21.422,
+            "h": 24,
+            "ch": "認"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to observe",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "認みとめto observe"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 152,
+      "word": "含む",
+      "text": "含ふくむ",
+      "shift": 4.484,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 4.484,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 32.5,
+            "y": 1350.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "含む"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 33,
+            "y": 1350.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "含ふくむ"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 36.984,
+            "y": 1350.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "含"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "to have",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "含ふくむto have"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 166,
+      "word": "突き出る",
+      "text": "突つき出で",
+      "shift": 0.5,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0.5,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 236.297,
+            "y": 1403.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 3,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 66.27,
+          "text": "突き出"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 236.797,
+            "y": 1403.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": true,
+          "rubyCount": 2,
+          "visibleRt": 2,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "ruby"
+          ],
+          "tokH": 95.89,
+          "tokW": 23.42,
+          "text": "突つき出で"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 236.797,
+            "y": 1403.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "突"
+          },
+          "hasRuby": true,
+          "rubyCount": 2,
+          "visibleRt": 2,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "ruby"
+          ],
+          "tokH": 95.89,
+          "tokW": 23.42,
+          "text": "突つき出で"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 230,
+      "word": "際する",
+      "text": "際さいし",
+      "shift": 0.5,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 0.5,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": false,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 99.766,
+            "y": 1827.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "際し"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 100.266,
+            "y": 1827.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "際さいし"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 100.266,
+            "y": 1827.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "際"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "際さいし"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 244,
+      "word": "豊か",
+      "text": "豊ゆたか",
+      "shift": 4.484,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 0.5,
+          "dy": 0
+        },
+        {
+          "state": "tap2",
+          "dx": 4.484,
+          "dy": 0
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 258.719,
+            "y": 1880.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "豊か"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 259.219,
+            "y": 1880.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "豊ゆたか"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 263.203,
+            "y": 1880.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "豊"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "rich",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "豊ゆたかrich"
+        }
+      ]
+    },
+    {
+      "dials": "0,0,0",
+      "index": 263,
+      "word": "高い",
+      "text": "高たかく",
+      "shift": 301.661,
+      "deltas": [
+        {
+          "state": "tap1",
+          "dx": 292.984,
+          "dy": -53
+        },
+        {
+          "state": "tap2",
+          "dx": 296.969,
+          "dy": -53
+        }
+      ],
+      "rubyChanged": true,
+      "glossMounted": true,
+      "states": [
+        {
+          "state": "rest",
+          "base": {
+            "x": 32.5,
+            "y": 2039.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": false,
+          "rubyCount": 0,
+          "visibleRt": 0,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": false,
+          "bareSiblings": 2,
+          "wordRows": 0,
+          "childOrder": [],
+          "tokH": 44,
+          "tokW": 44.84,
+          "text": "高く"
+        },
+        {
+          "state": "tap1",
+          "base": {
+            "x": 325.484,
+            "y": 1986.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": false,
+          "enText": null,
+          "hasEnClass": false,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby"
+          ],
+          "tokH": 61.59,
+          "tokW": 23.42,
+          "text": "高たかく"
+        },
+        {
+          "state": "tap2",
+          "base": {
+            "x": 329.469,
+            "y": 1986.031,
+            "w": 21.422,
+            "h": 24,
+            "ch": "高"
+          },
+          "hasRuby": true,
+          "rubyCount": 1,
+          "visibleRt": 1,
+          "hasEn": true,
+          "enText": "high",
+          "hasEnClass": true,
+          "lit": true,
+          "bareSiblings": 1,
+          "wordRows": 0,
+          "childOrder": [
+            "ruby",
+            "tok-en"
+          ],
+          "tokH": 70.63,
+          "tokW": 31.39,
+          "text": "高たかくhigh"
+        }
+      ]
+    }
+  ]
+}
