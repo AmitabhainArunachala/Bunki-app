@@ -35,7 +35,12 @@ const slice = (after, before, label) => {
 };
 
 /* ------------------------------------------------------------------ css */
-const rawCss = slice('<style>', '</style>', 'style block');
+// Comments are stripped BEFORE scoping. The scoper treats everything between
+// `}` and `{` as the selector list and splits it on commas — a `/* ... */` that
+// carries a comma there would be sliced into several invalid selectors, and an
+// invalid selector kills its whole rule, silently. Stripping first means the
+// drift source may comment its CSS the way it comments everything else.
+const rawCss = slice('<style>', '</style>', 'style block').replace(/\/\*[\s\S]*?\*\//g, '');
 
 // Scope every rule under #drift-layer. The file has no at-rules (verified
 // below); selectors are :root / * / html,body / body / canvas / #id / .class.
@@ -92,6 +97,11 @@ ${scopedRules.join('\n')}
 #drift-layer #drift-tray { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #drift-layer #hint { bottom: calc(120px + env(safe-area-inset-bottom)); }
 #drift-layer #card { bottom: 64px; max-height: calc(100vh - 190px); overflow-y: auto; }
+/* the card's study door is full-width in the standalone; in the fusion the
+ * corridor's own 本棚 door is fixed over the card's bottom-right corner
+ * (94x56 at right:16px / bottom:76px), so the door stops short of it rather
+ * than putting two doors under one finger */
+#drift-layer #card .study { width: auto; margin-right: 96px; }
 /* the radical explainer is a modal: it must clear the corridor chrome band
  * so its own close button is reachable (the hunt found the X hit-testing
  * to the corridor's 覚 button, which navigated the whole app away) */

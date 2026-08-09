@@ -139,9 +139,18 @@
   #lvl.hot #lvlInfo{opacity:1}
   #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-  #card .study{display:block;margin-top:13px;text-align:center;font-size:13px;
-    letter-spacing:.14em;color:var(--pig2);text-decoration:none;border:1px solid var(--line);
-    border-radius:999px;padding:9px 14px}
+  /* the study door — drawn only when a host can actually open the entry, so it
+     is never a dead door, and it is now a real target (>=44px, was 35px). The
+     LABEL is ink: the only value that clears 4.5:1 in all five pigment worlds,
+     the same footing as the hint pill v11 measures. The pigment moves to the
+     rim, where it says "you can go here" without carrying the type. 朱 is
+     untouched — red stays readings-only. It is a <button> under a host that
+     opens the entry in place, an <a> under a host that only has URLs. */
+  #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
+    min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
+    font-size:13px;letter-spacing:.14em;text-decoration:none;cursor:pointer;
+    color:var(--ink);background:none;border:1px solid var(--pig2);
+    border-radius:999px}
   #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
     background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;
     font-family:inherit;cursor:pointer;vertical-align:1px}
@@ -1790,15 +1799,43 @@ function strokeSheet(ch){
 }
 
 // ---- card ----
-// When Drift is the opening surface of the deployed app, the wrapper sets
-// window.__BUNKI_APP_BASE and every card gains a real door into the study
-// screens. Standalone (the claude.ai artifact) the base is absent and the
-// card keeps its honest placeholder note instead of a link that would 404.
+// The study door is the ONE seam Drift keeps to whatever hosts it, and it is
+// asked, never assumed. A host that can open the entry itself — the 回廊
+// fusion, which owns a full dictionary and its own entry sheet — installs
+//   window.__BUNKI_OPEN_ENTRY = { has(kind,key)->boolean, open(kind,key) }
+// and the door is drawn ONLY when has() says the far side really exists, then
+// hands the word straight over: no href, no navigation, no external base. A
+// host that has URLs instead (the Pages wrapper) sets __BUNKI_APP_BASE as
+// before. Standalone (the claude.ai artifact) neither exists, and the card
+// keeps its honest placeholder note rather than a door onto nothing — every
+// element is a door, so an element that cannot be one stays a note.
+function studyHost(kind,key){
+  const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_ENTRY;
+  if(!h||typeof h.open!=="function") return null;
+  if(typeof h.has==="function"&&!h.has(kind,key)) return null;
+  return h;
+}
 function studyHtml(kind,key,fallback){
+  const label='この'+(kind==='word'?'語':'字')+'を学ぶ →';
+  if(studyHost(kind,key))
+    return '<button type="button" class="study" data-study-kind="'+esc(kind)+
+      '" data-study-key="'+esc(key)+'">'+esc(label)+'</button>';
   const base=typeof window!=="undefined"&&window.__BUNKI_APP_BASE;
   if(!base) return '<div class="note">'+fallback+'</div>';
-  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">この'+
-    (kind==='word'?'語':'字')+'を学ぶ →</a>';
+  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">'+
+    esc(label)+'</a>';
+}
+// the host-driven door: the card's own pointerup guard already stops taps on
+// buttons from closing the card, so this only has to hand the key over.
+function wireStudy(){
+  const b=card.querySelector("button.study[data-study-key]");
+  if(!b) return;
+  b.addEventListener("click",e=>{
+    e.stopPropagation();
+    const kind=b.getAttribute("data-study-kind"),key=b.getAttribute("data-study-key");
+    const h=studyHost(kind,key);
+    if(h) h.open(kind,key);
+  });
 }
 function openCard(n){
   if(n.kind==="word"){
@@ -1857,13 +1894,14 @@ function openCard(n){
         const cell=document.createElement("div"); cell.className="scell";
         const sh=strokeSheet(n.ch);
         cell.appendChild(sh.svg);
-        card.insertBefore(cell,card.querySelector(".note"));
+        card.insertBefore(cell,card.querySelector(".note,.study"));
         sh.play();
       };
       card.querySelector("#strokeBtn").addEventListener("click",show);
       show();
     }
   }
+  wireStudy();
   card.classList.add("open");
 }
 
