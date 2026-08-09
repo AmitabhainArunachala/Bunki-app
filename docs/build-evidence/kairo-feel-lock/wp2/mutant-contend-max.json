@@ -1,29 +1,29 @@
 {
-  "label": "wp2r3-run2",
-  "src": "/home/user/Bunki-app/.claude/worktrees/agent-a44c6ed5a4ffb4670/prototypes/drift/drift-artifact.html",
-  "when": "2026-08-09T10:53:27.934Z",
-  "passed": 21,
+  "label": "mutant-CONTEND_MAX-0.95",
+  "src": "/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/mut-contend.html",
+  "when": "2026-08-09T10:54:30.933Z",
+  "passed": 20,
   "total": 21,
   "results": [
     {
       "fix": "law-rest-presence",
       "pass": true,
-      "detail": "faintest ghost op=0.327 vs the field's own faintest unarbitrated presence 0.3266 (live floor 0.327); ghost contrast 1.638:1 vs quietest present word 1.467:1 — 5/36 ghosted"
+      "detail": "faintest ghost op=0.327 vs the field's own faintest unarbitrated presence 0.3266 (live floor 0.327); ghost contrast 1.428:1 vs quietest present word 1.467:1 — 12/36 ghosted"
     },
     {
       "fix": "law-rest-reachable",
-      "pass": true,
-      "detail": "pointer-events:none on 0; ghosts not under a hub with no reachable point: 0; live tap on ghost \"単なる\" (op 0.327) -> {\"collide\":1,\"isFocus\":true,\"hl\":false,\"unfolded\":true} · 0 ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: 4 full-presence words fully covered by other words, 0 covered by chrome"
+      "pass": false,
+      "detail": "pointer-events:none on 0; ghosts not under a hub with no reachable point: 2 [{\"t\":\"しりあい知合いa\",\"op\":0.327,\"onScreenPts\":5,\"openPts\":0,\"pe\":\"auto\"},{\"t\":\"にえる煮えるto\",\"op\":0.327,\"onScreenPts\":25,\"openPts\":0,\"pe\":\"auto\"}]; live tap on ghost \"単なる\" (op 0.327) -> {\"collide\":1,\"isFocus\":true,\"hl\":false,\"unfolded\":true} · 1 ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: 2 full-presence words fully covered by other words, 0 covered by chrome"
     },
     {
       "fix": "law-ghost-residual",
       "pass": true,
-      "detail": "deleting a ghost changes its box by mean Δ 12.53/23.92/21.93 (max Δ 68/80/111); kept controls mean Δ 12.02/18.41/22.73 — bar is ≥50% of the quietest kept (12.02)"
+      "detail": "deleting a ghost changes its box by mean Δ 13.62/11.21/23.14 (max Δ 80/38/75); kept controls mean Δ 18.85/19.93/32.85 — bar is ≥50% of the quietest kept (18.85)"
     },
     {
       "fix": "4-rest-contention",
       "pass": true,
-      "detail": "arbitrable contending pairs=0 (bar 0) · left standing: 4 where both words are too quiet to win (receding either would breach the floor 0.327) + 1 ghost-over-ghost (both already ground) · worstContention=1 · raw geometry unchanged: worstOverlap=0.835 over 5 pairs of 33 words"
+      "detail": "arbitrable contending pairs=0 (bar 0) · left standing: 3 where both words are too quiet to win (receding either would breach the floor 0.327) + 2 ghost-over-ghost (both already ground) · worstContention=1 · raw geometry unchanged: worstOverlap=0.833 over 5 pairs of 33 words"
     },
     {
       "fix": "6-chrome-keepout",
@@ -43,17 +43,17 @@
     {
       "fix": "2-return-to-rest",
       "pass": true,
-      "detail": "messy(z=2.6,rot=2.623) -> home(z=1,rot=0) via double-tap at 330,350"
+      "detail": "messy(z=2.6,rot=2.618) -> home(z=1,rot=0) via double-tap at 270,390"
     },
     {
       "fix": "4-zoom-contention",
       "pass": true,
-      "detail": "after zoom (z=2.6) arbitrable contending pairs=0, left standing 11 too-quiet-to-win + 10 ghost-over-ghost, worstContention=1 · raw worstOverlap=1 over 27 pairs of 37 words"
+      "detail": "after zoom (z=2.6) arbitrable contending pairs=0, left standing 9 too-quiet-to-win + 8 ghost-over-ghost, worstContention=1 · raw worstOverlap=1 over 24 pairs of 39 words"
     },
     {
       "fix": "law-zoom-presence",
       "pass": true,
-      "detail": "zoomed: faintest ghost op=0.327 vs the field's faintest unarbitrated 0.3265 (floor 0.327); pointer-events:none on 0; ghosts out of reach with nothing over them: 0; 0 yielding to a galaxy sun · crowding context: 6/18 ghosts and 3/19 full-presence words are covered by other words at this zoom"
+      "detail": "zoomed: faintest ghost op=0.327 vs the field's faintest unarbitrated 0.3265 (floor 0.327); pointer-events:none on 0; ghosts out of reach with nothing over them: 0; 0 yielding to a galaxy sun · crowding context: 9/23 ghosts and 3/16 full-presence words are covered by other words at this zoom"
     },
     {
       "fix": "8-unfold-clear-on-lock",
@@ -98,17 +98,17 @@
     {
       "fix": "7-parity[岩絵具]",
       "pass": true,
-      "detail": "fg med=2.59 (n=18) vs light baseline 2.62 — want >=2.4 and >=90% of baseline"
+      "detail": "fg med=2.51 (n=22) vs light baseline 2.62 — want >=2.4 and >=90% of baseline"
     },
     {
       "fix": "7-parity[緑青]",
       "pass": true,
-      "detail": "fg med=2.5 (n=18) vs light baseline 2.62 — want >=2.4 and >=90% of baseline"
+      "detail": "fg med=2.5 (n=22) vs light baseline 2.62 — want >=2.4 and >=90% of baseline"
     },
     {
       "fix": "7-night-legible",
       "pass": true,
-      "detail": "夜 fg med=4.07 (n=18)"
+      "detail": "夜 fg med=4.02 (n=22)"
     }
   ],
   "errs": [],
@@ -125,16 +125,16 @@
     },
     "restCensus": {
       "words": 36,
-      "ghosts": 5,
-      "present": 31,
-      "rawWorst": 0.902,
+      "ghosts": 12,
+      "present": 24,
+      "rawWorst": 0.905,
       "rawPairs": 9,
       "worstContend": 1,
       "contendBad": [
         {
           "a": "たんなる単なるm",
           "b": "とりあげる取り上",
-          "f": 0.61,
+          "f": 0.66,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -146,11 +146,11 @@
         {
           "a": "ぶき武器weap",
           "b": "くらす暮らすto",
-          "f": 0.28,
+          "f": 0.26,
           "hi": 0.395,
-          "lo": 0.35,
-          "contend": 0.89,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.83,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -158,7 +158,7 @@
         {
           "a": "いんさつ印刷pr",
           "b": "ぎし技師engi",
-          "f": 0.32,
+          "f": 0.34,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -170,11 +170,11 @@
         {
           "a": "くやしい悔しいr",
           "b": "てんこう天候we",
-          "f": 0.67,
+          "f": 0.69,
           "hi": 0.594,
-          "lo": 0.392,
-          "contend": 0.66,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.55,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -182,47 +182,47 @@
         {
           "a": "ふれる触れるto",
           "b": "はんだん判断ju",
-          "f": 0.28,
+          "f": 0.29,
           "hi": 0.588,
-          "lo": 0.522,
-          "contend": 0.89,
+          "lo": 0.327,
+          "contend": 0.56,
           "cA": 1,
-          "cB": 1,
+          "cB": 0,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
           "a": "しりあい知合いa",
           "b": "さくひん作品wo",
-          "f": 0.9,
-          "hi": 0.395,
-          "lo": 0.371,
-          "contend": 0.94,
-          "cA": 1,
-          "cB": 1,
+          "f": 0.91,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0,
           "arbitrable": false,
-          "bothGhosts": false
+          "bothGhosts": true
         },
         {
           "a": "しんせん新鮮fr",
           "b": "にえる煮えるto",
-          "f": 0.82,
-          "hi": 0.49,
-          "lo": 0.474,
-          "contend": 0.97,
-          "cA": 1,
-          "cB": 1,
+          "f": 0.83,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0,
           "arbitrable": false,
-          "bothGhosts": false
+          "bothGhosts": true
         },
         {
           "a": "しんせん新鮮fr",
           "b": "はく掃くto s",
-          "f": 0.5,
+          "f": 0.51,
           "hi": 0.553,
-          "lo": 0.474,
-          "contend": 0.86,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.59,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -230,11 +230,11 @@
         {
           "a": "にえる煮えるto",
           "b": "はく掃くto s",
-          "f": 0.88,
+          "f": 0.87,
           "hi": 0.553,
-          "lo": 0.49,
-          "contend": 0.89,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.59,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -264,20 +264,33 @@
         }
       ],
       "peNone": [],
-      "unreachableGhosts": [],
-      "hubShadowedGhosts": [],
+      "unreachableGhosts": [
+        {
+          "t": "しりあい知合いa",
+          "op": 0.327,
+          "onScreenPts": 5,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
+          "t": "にえる煮えるto",
+          "op": 0.327,
+          "onScreenPts": 25,
+          "openPts": 0,
+          "pe": "auto"
+        }
+      ],
+      "hubShadowedGhosts": [
+        {
+          "t": "ぶき武器weap",
+          "op": 0.327,
+          "hubPts": 25
+        }
+      ],
       "ghostsLostWithNothingOver": [],
       "unreachableOther": [
         {
           "t": "だいとうりょう大",
-          "op": 0.49
-        },
-        {
-          "t": "しりあい知合いa",
-          "op": 0.371
-        },
-        {
-          "t": "にえる煮えるto",
           "op": 0.49
         },
         {
@@ -292,7 +305,7 @@
       "minGhostOp": 0.327,
       "maxGhostOp": 0.327,
       "minPresentOp": 0.327,
-      "minGhostContrast": 1.638,
+      "minGhostContrast": 1.428,
       "minPresentContrast": 1.467,
       "sampleGhosts": [
         {
@@ -308,6 +321,12 @@
           "seqId": 3
         },
         {
+          "t": "ぶき武器weap",
+          "op": 0.327,
+          "contrast": 1.428,
+          "seqId": 5
+        },
+        {
           "t": "とりあげる取り上",
           "op": 0.327,
           "contrast": 1.638,
@@ -320,10 +339,10 @@
           "seqId": 15
         },
         {
-          "t": "ぎし技師engi",
+          "t": "くやしい悔しいr",
           "op": 0.327,
           "contrast": 1.638,
-          "seqId": 23
+          "seqId": 16
         }
       ]
     },
@@ -331,8 +350,8 @@
       "probe": {
         "seqId": 2,
         "w": "単なる",
-        "x": 52.64175033569336,
-        "y": 355.60462951660156,
+        "x": 53.318634033203125,
+        "y": 356.1407165527344,
         "opBefore": 0.327
       },
       "after": {
@@ -348,63 +367,63 @@
         "kind": "GHOST",
         "w": "単なる",
         "op": 0.327,
-        "maxD": 68,
-        "mean": 12.53,
-        "pctGt8": 34.7
+        "maxD": 80,
+        "mean": 13.62,
+        "pctGt8": 35.8
+      },
+      {
+        "kind": "GHOST",
+        "w": "武器",
+        "op": 0.327,
+        "maxD": 38,
+        "mean": 11.21,
+        "pctGt8": 46.2
       },
       {
         "kind": "GHOST",
         "w": "書物",
         "op": 0.327,
-        "maxD": 80,
-        "mean": 23.92,
-        "pctGt8": 54.4
-      },
-      {
-        "kind": "GHOST",
-        "w": "印刷",
-        "op": 0.327,
-        "maxD": 111,
-        "mean": 21.93,
-        "pctGt8": 53.2
+        "maxD": 75,
+        "mean": 23.14,
+        "pctGt8": 55.8
       },
       {
         "kind": "KEPT",
         "w": "出",
         "op": 0.327,
-        "maxD": 46,
-        "mean": 12.02,
-        "pctGt8": 62.2
+        "maxD": 59,
+        "mean": 18.85,
+        "pctGt8": 76.2
       },
       {
         "kind": "KEPT",
         "w": "万一",
         "op": 0.632,
-        "maxD": 113,
-        "mean": 18.41,
-        "pctGt8": 27.3
+        "maxD": 130,
+        "mean": 19.93,
+        "pctGt8": 29.4
       },
       {
         "kind": "KEPT",
         "w": "謎",
         "op": 0.588,
-        "maxD": 50,
-        "mean": 22.73,
-        "pctGt8": 79
+        "maxD": 65,
+        "mean": 32.85,
+        "pctGt8": 88.8
       }
     ],
     "restCensus2": {
       "words": 33,
-      "ghosts": 6,
-      "present": 27,
-      "rawWorst": 0.835,
+      "ghosts": 9,
+      "present": 24,
+      "rawWorst": 0.833,
       "rawPairs": 5,
       "worstContend": 1,
       "contendBad": [
         {
           "a": "いんさつ印刷pr",
           "b": "ぎし技師engi",
-          "f": 0.67,
+          "f": 0.68,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -416,11 +435,11 @@
         {
           "a": "しりあい知合いa",
           "b": "くらす暮らすto",
-          "f": 0.45,
+          "f": 0.44,
           "hi": 0.395,
-          "lo": 0.371,
-          "contend": 0.94,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.83,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -428,23 +447,23 @@
         {
           "a": "しんせん新鮮fr",
           "b": "にえる煮えるto",
-          "f": 0.62,
-          "hi": 0.49,
-          "lo": 0.474,
-          "contend": 0.97,
-          "cA": 1,
-          "cB": 1,
+          "f": 0.65,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0,
           "arbitrable": false,
-          "bothGhosts": false
+          "bothGhosts": true
         },
         {
           "a": "しんせん新鮮fr",
           "b": "はく掃くto s",
-          "f": 0.4,
+          "f": 0.41,
           "hi": 0.553,
-          "lo": 0.474,
-          "contend": 0.86,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.59,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -452,11 +471,11 @@
         {
           "a": "にえる煮えるto",
           "b": "はく掃くto s",
-          "f": 0.84,
+          "f": 0.83,
           "hi": 0.553,
-          "lo": 0.49,
-          "contend": 0.89,
-          "cA": 1,
+          "lo": 0.327,
+          "contend": 0.59,
+          "cA": 0,
           "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
@@ -492,16 +511,18 @@
       ],
       "peNone": [],
       "unreachableGhosts": [],
-      "hubShadowedGhosts": [],
+      "hubShadowedGhosts": [
+        {
+          "t": "にえる煮えるto",
+          "op": 0.327,
+          "hubPts": 2
+        }
+      ],
       "ghostsLostWithNothingOver": [],
       "unreachableOther": [
         {
           "t": "しょもつ書物bo",
           "op": 0.553
-        },
-        {
-          "t": "にえる煮えるto",
-          "op": 0.49
         }
       ],
       "underChromeOnly": [],
@@ -511,7 +532,7 @@
       "minGhostOp": 0.327,
       "maxGhostOp": 0.327,
       "minPresentOp": 0.327,
-      "minGhostContrast": 1.638,
+      "minGhostContrast": 1.428,
       "minPresentContrast": 1.467,
       "sampleGhosts": [
         {
@@ -545,10 +566,10 @@
           "seqId": 23
         },
         {
-          "t": "かいし開始sta",
+          "t": "しりあい知合いa",
           "op": 0.327,
-          "contrast": 1.685,
-          "seqId": 34
+          "contrast": 1.721,
+          "seqId": 30
         }
       ]
     },
@@ -556,23 +577,11 @@
       {
         "a": "しりあい知合いa",
         "b": "くらす暮らすto",
-        "f": 0.45,
+        "f": 0.44,
         "hi": 0.395,
-        "lo": 0.371,
-        "contend": 0.94,
-        "cA": 1,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "しんせん新鮮fr",
-        "b": "にえる煮えるto",
-        "f": 0.62,
-        "hi": 0.49,
-        "lo": 0.474,
-        "contend": 0.97,
-        "cA": 1,
+        "lo": 0.327,
+        "contend": 0.83,
+        "cA": 0,
         "cB": 1,
         "arbitrable": false,
         "bothGhosts": false
@@ -580,11 +589,11 @@
       {
         "a": "しんせん新鮮fr",
         "b": "はく掃くto s",
-        "f": 0.4,
+        "f": 0.41,
         "hi": 0.553,
-        "lo": 0.474,
-        "contend": 0.86,
-        "cA": 1,
+        "lo": 0.327,
+        "contend": 0.59,
+        "cA": 0,
         "cB": 1,
         "arbitrable": false,
         "bothGhosts": false
@@ -592,11 +601,11 @@
       {
         "a": "にえる煮えるto",
         "b": "はく掃くto s",
-        "f": 0.84,
+        "f": 0.83,
         "hi": 0.553,
-        "lo": 0.49,
-        "contend": 0.89,
-        "cA": 1,
+        "lo": 0.327,
+        "contend": 0.59,
+        "cA": 0,
         "cB": 1,
         "arbitrable": false,
         "bothGhosts": false
@@ -606,7 +615,19 @@
       {
         "a": "いんさつ印刷pr",
         "b": "ぎし技師engi",
-        "f": 0.67,
+        "f": 0.68,
+        "hi": 0.327,
+        "lo": 0.327,
+        "contend": 1,
+        "cA": 0,
+        "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": true
+      },
+      {
+        "a": "しんせん新鮮fr",
+        "b": "にえる煮えるto",
+        "f": 0.65,
         "hi": 0.327,
         "lo": 0.327,
         "contend": 1,
@@ -645,13 +666,13 @@
     },
     "messy": {
       "z": 2.6,
-      "rot": 2.623,
+      "rot": 2.618,
       "stack": 0,
       "lockOn": false,
       "focus": 0,
       "focusVis": 0,
       "unfolded": 0,
-      "words": 67
+      "words": 69
     },
     "home": {
       "z": 1,
@@ -664,41 +685,17 @@
       "words": 64
     },
     "zoomCensus": {
-      "words": 37,
-      "ghosts": 18,
-      "present": 19,
+      "words": 39,
+      "ghosts": 23,
+      "present": 16,
       "rawWorst": 1,
-      "rawPairs": 27,
+      "rawPairs": 24,
       "worstContend": 1,
       "contendBad": [
         {
-          "a": "がいしゅつ外出o",
-          "b": "とびだす飛び出す",
-          "f": 0.56,
-          "hi": 0.327,
-          "lo": 0.327,
-          "contend": 1,
-          "cA": 0,
-          "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": true
-        },
-        {
-          "a": "とりあげる取り上",
-          "b": "さきおととい一昨",
-          "f": 0.28,
-          "hi": 0.327,
-          "lo": 0.327,
-          "contend": 1,
-          "cA": 0,
-          "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": true
-        },
-        {
           "a": "とりあげる取り上",
           "b": "ゆびわ指輪(fi",
-          "f": 0.92,
+          "f": 0.71,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -706,59 +703,83 @@
           "cB": 0,
           "arbitrable": false,
           "bothGhosts": true
+        },
+        {
+          "a": "がいしゅつ外出o",
+          "b": "こうか高価hig",
+          "f": 0.65,
+          "hi": 0.449,
+          "lo": 0.327,
+          "contend": 0.73,
+          "cA": 0.833,
+          "cB": 0,
+          "arbitrable": false,
+          "bothGhosts": false
+        },
+        {
+          "a": "がいしゅつ外出o",
+          "b": "とびだす飛び出す",
+          "f": 0.49,
+          "hi": 0.449,
+          "lo": 0.327,
+          "contend": 0.73,
+          "cA": 0.833,
+          "cB": 0,
+          "arbitrable": false,
+          "bothGhosts": false
         },
         {
           "a": "ざいりょう材料i",
           "b": "かみのけ髪の毛h",
-          "f": 0.31,
-          "hi": 0.395,
-          "lo": 0.371,
-          "contend": 0.94,
-          "cA": 1,
+          "f": 0.4,
+          "hi": 0.371,
+          "lo": 0.327,
+          "contend": 0.88,
+          "cA": 0,
           "cB": 1,
-          "arbitrable": false,
-          "bothGhosts": false
-        },
-        {
-          "a": "ざいりょう材料i",
-          "b": "ひとりひとり一人",
-          "f": 0.51,
-          "hi": 0.395,
-          "lo": 0.327,
-          "contend": 0.83,
-          "cA": 1,
-          "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": false
-        },
-        {
-          "a": "よみ読みread",
-          "b": "ひとりひとり一人",
-          "f": 1,
-          "hi": 0.392,
-          "lo": 0.327,
-          "contend": 0.83,
-          "cA": 1,
-          "cB": 0,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
           "a": "よみ読みread",
           "b": "めいれい命令or",
-          "f": 0.47,
-          "hi": 0.42,
-          "lo": 0.392,
-          "contend": 0.93,
-          "cA": 1,
-          "cB": 1,
+          "f": 0.45,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0.001,
           "arbitrable": false,
-          "bothGhosts": false
+          "bothGhosts": true
+        },
+        {
+          "a": "こうか高価hig",
+          "b": "とびだす飛び出す",
+          "f": 1,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0,
+          "arbitrable": false,
+          "bothGhosts": true
+        },
+        {
+          "a": "せい性sex, ",
+          "b": "しゅっしん出身c",
+          "f": 0.5,
+          "hi": 0.327,
+          "lo": 0.327,
+          "contend": 1,
+          "cA": 0,
+          "cB": 0,
+          "arbitrable": false,
+          "bothGhosts": true
         },
         {
           "a": "きんにく筋肉mu",
           "b": "ぎょぎょう漁業f",
-          "f": 0.73,
+          "f": 0.71,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -769,128 +790,56 @@
         },
         {
           "a": "ぜい税tax",
-          "b": "しょうぼうしょ消",
-          "f": 0.93,
-          "hi": 0.327,
+          "b": "せんす扇子fol",
+          "f": 0.46,
+          "hi": 0.392,
           "lo": 0.327,
-          "contend": 1,
-          "cA": 0,
+          "contend": 0.83,
+          "cA": 0.996,
           "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": true
-        },
-        {
-          "a": "さいしゅう最終l",
-          "b": "ひとりひとり一人",
-          "f": 0.45,
-          "hi": 0.327,
-          "lo": 0.327,
-          "contend": 1,
-          "cA": 0,
-          "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": true
-        },
-        {
-          "a": "さいしゅう最終l",
-          "b": "にくらしい憎らし",
-          "f": 0.55,
-          "hi": 0.327,
-          "lo": 0.327,
-          "contend": 1,
-          "cA": 0,
-          "cB": 0,
-          "arbitrable": false,
-          "bothGhosts": true
-        },
-        {
-          "a": "ひとりひとり一人",
-          "b": "めいれい命令or",
-          "f": 1,
-          "hi": 0.42,
-          "lo": 0.327,
-          "contend": 0.78,
-          "cA": 0,
-          "cB": 1,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
-          "a": "ひとりひとり一人",
-          "b": "ぜひ是非cert",
-          "f": 0.46,
-          "hi": 0.457,
+          "a": "ぜい税tax",
+          "b": "しょうぼうしょ消",
+          "f": 1,
+          "hi": 0.392,
           "lo": 0.327,
-          "contend": 0.72,
-          "cA": 0,
-          "cB": 1,
+          "contend": 0.83,
+          "cA": 0.996,
+          "cB": 0.004,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
           "a": "ぐん軍army,",
           "b": "しょうぼうしょ消",
-          "f": 0.34,
-          "hi": 0.327,
+          "f": 0.37,
+          "hi": 0.42,
           "lo": 0.327,
-          "contend": 1,
-          "cA": 1,
-          "cB": 0,
+          "contend": 0.78,
+          "cA": 0.996,
+          "cB": 0.004,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
           "a": "めいれい命令or",
           "b": "ぜひ是非cert",
-          "f": 0.28,
-          "hi": 0.457,
-          "lo": 0.42,
-          "contend": 0.92,
-          "cA": 1,
-          "cB": 1,
-          "arbitrable": false,
-          "bothGhosts": false
-        },
-        {
-          "a": "しじん詩人poe",
-          "b": "はんにん犯人of",
-          "f": 0.85,
-          "hi": 0.474,
-          "lo": 0.395,
-          "contend": 0.83,
-          "cA": 1,
-          "cB": 1,
-          "arbitrable": false,
-          "bothGhosts": false
-        },
-        {
-          "a": "はんにん犯人of",
-          "b": "まもなく間も無く",
-          "f": 0.27,
+          "f": 0.65,
           "hi": 0.522,
-          "lo": 0.395,
-          "contend": 0.76,
-          "cA": 1,
-          "cB": 1,
+          "lo": 0.327,
+          "contend": 0.63,
+          "cA": 0.001,
+          "cB": 0.999,
           "arbitrable": false,
           "bothGhosts": false
         },
         {
-          "a": "けずる削るto ",
-          "b": "めだつ目立つto",
-          "f": 0.69,
-          "hi": 0.595,
-          "lo": 0.355,
-          "contend": 0.6,
-          "cA": 0.88,
-          "cB": 0.12,
-          "arbitrable": false,
-          "bothGhosts": false
-        },
-        {
-          "a": "しょうぼうしょ消",
-          "b": "がんじつ元日Ne",
-          "f": 0.84,
+          "a": "とびだす飛び出す",
+          "b": "にくらしい憎らし",
+          "f": 0.33,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
@@ -900,28 +849,52 @@
           "bothGhosts": true
         },
         {
-          "a": "しょうぼうしょ消",
-          "b": "ゆうひ夕日(in",
-          "f": 0.46,
+          "a": "せんす扇子fol",
+          "b": "しょうぼうしょ消",
+          "f": 1,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
           "cA": 0,
-          "cB": 0.003,
+          "cB": 0.004,
           "arbitrable": false,
           "bothGhosts": true
         },
         {
-          "a": "がんじつ元日Ne",
-          "b": "ゆうひ夕日(in",
-          "f": 0.82,
+          "a": "しょうぼうしょ消",
+          "b": "がんじつ元日Ne",
+          "f": 1,
           "hi": 0.327,
           "lo": 0.327,
           "contend": 1,
-          "cA": 0,
-          "cB": 0.003,
+          "cA": 0.004,
+          "cB": 0,
           "arbitrable": false,
           "bothGhosts": true
+        },
+        {
+          "a": "しょうぼうしょ消",
+          "b": "ゆうひ夕日(in",
+          "f": 0.66,
+          "hi": 0.42,
+          "lo": 0.327,
+          "contend": 0.78,
+          "cA": 0.004,
+          "cB": 0.996,
+          "arbitrable": false,
+          "bothGhosts": false
+        },
+        {
+          "a": "がんじつ元日Ne",
+          "b": "ゆうひ夕日(in",
+          "f": 0.77,
+          "hi": 0.42,
+          "lo": 0.327,
+          "contend": 0.78,
+          "cA": 0,
+          "cB": 0.996,
+          "arbitrable": false,
+          "bothGhosts": false
         }
       ],
       "chromeAtReading": [],
@@ -932,12 +905,17 @@
           "op": 0.327
         },
         {
+          "w": "せい性sex, ",
+          "chrome": "lvl",
+          "op": 0.327
+        },
+        {
           "w": "きんにく筋肉mu",
           "chrome": "theme",
           "op": 0.327
         },
         {
-          "w": "けんせつ建設co",
+          "w": "しゅっしん出身c",
           "chrome": "lvl",
           "op": 0.327
         },
@@ -960,13 +938,6 @@
       "peNone": [],
       "unreachableGhosts": [
         {
-          "t": "がいしゅつ外出o",
-          "op": 0.327,
-          "onScreenPts": 10,
-          "openPts": 0,
-          "pe": "auto"
-        },
-        {
           "t": "とりあげる取り上",
           "op": 0.327,
           "onScreenPts": 5,
@@ -974,29 +945,57 @@
           "pe": "auto"
         },
         {
-          "t": "きんにく筋肉mu",
-          "op": 0.327,
-          "onScreenPts": 20,
-          "openPts": 0,
-          "pe": "auto"
-        },
-        {
-          "t": "ぜい税tax",
+          "t": "よみ読みread",
           "op": 0.327,
           "onScreenPts": 25,
           "openPts": 0,
           "pe": "auto"
         },
         {
-          "t": "けんせつ建設co",
+          "t": "こうか高価hig",
+          "op": 0.327,
+          "onScreenPts": 25,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
+          "t": "せい性sex, ",
           "op": 0.327,
           "onScreenPts": 0,
           "openPts": 0,
           "pe": "auto"
         },
         {
+          "t": "しゅっしん出身c",
+          "op": 0.327,
+          "onScreenPts": 5,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
+          "t": "はんにん犯人of",
+          "op": 0.347,
+          "onScreenPts": 0,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
+          "t": "かんびょう看病n",
+          "op": 0.327,
+          "onScreenPts": 0,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
+          "t": "せんす扇子fol",
+          "op": 0.327,
+          "onScreenPts": 25,
+          "openPts": 0,
+          "pe": "auto"
+        },
+        {
           "t": "めだつ目立つto",
-          "op": 0.355,
+          "op": 0.327,
           "onScreenPts": 0,
           "openPts": 0,
           "pe": "auto"
@@ -1006,231 +1005,217 @@
       "ghostsLostWithNothingOver": [],
       "unreachableOther": [
         {
-          "t": "よみ読みread",
+          "t": "ぜい税tax",
           "op": 0.392
         },
         {
-          "t": "けずる削るto ",
-          "op": 0.595
+          "t": "しじん詩人poe",
+          "op": 0.56
         },
         {
-          "t": "せんす扇子fol",
-          "op": 0.63
+          "t": "けずる削るto ",
+          "op": 0.711
         }
       ],
-      "underChromeOnly": [
-        "しじん詩人poe"
-      ],
+      "underChromeOnly": [],
       "ghostFloor": 0.327,
       "winMin": 0.616,
       "minBaseOp": 0.3265,
       "minGhostOp": 0.327,
-      "maxGhostOp": 0.355,
+      "maxGhostOp": 0.347,
       "minPresentOp": 0.327,
       "minGhostContrast": 1.428,
-      "minPresentContrast": 1.467,
+      "minPresentContrast": 1.594,
       "sampleGhosts": [
-        {
-          "t": "がいしゅつ外出o",
-          "op": 0.327,
-          "contrast": 1.721,
-          "seqId": 411
-        },
         {
           "t": "とりあげる取り上",
           "op": 0.327,
-          "contrast": 1.721,
-          "seqId": 447
+          "contrast": 1.638,
+          "seqId": 383
         },
         {
-          "t": "ひとり独りalo",
-          "op": 0.327,
-          "contrast": 1.721,
-          "seqId": 507
-        },
-        {
-          "t": "きんにく筋肉mu",
-          "op": 0.327,
-          "contrast": 1.685,
-          "seqId": 511
-        },
-        {
-          "t": "ぜい税tax",
+          "t": "ざいりょう材料i",
           "op": 0.327,
           "contrast": 1.638,
-          "seqId": 515
+          "seqId": 404
         },
         {
-          "t": "さいしゅう最終l",
+          "t": "せいぶつ生物li",
           "op": 0.327,
           "contrast": 1.638,
-          "seqId": 518
+          "seqId": 410
+        },
+        {
+          "t": "よみ読みread",
+          "op": 0.327,
+          "contrast": 1.638,
+          "seqId": 448
+        },
+        {
+          "t": "こうか高価hig",
+          "op": 0.327,
+          "contrast": 1.638,
+          "seqId": 452
+        },
+        {
+          "t": "せい性sex, ",
+          "op": 0.327,
+          "contrast": 1.638,
+          "seqId": 455
         }
       ]
     },
     "zoomUnarbitrable": [
       {
-        "a": "ざいりょう材料i",
-        "b": "かみのけ髪の毛h",
-        "f": 0.31,
-        "hi": 0.395,
-        "lo": 0.371,
-        "contend": 0.94,
-        "cA": 1,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "ざいりょう材料i",
-        "b": "ひとりひとり一人",
-        "f": 0.51,
-        "hi": 0.395,
+        "a": "がいしゅつ外出o",
+        "b": "こうか高価hig",
+        "f": 0.65,
+        "hi": 0.449,
         "lo": 0.327,
-        "contend": 0.83,
-        "cA": 1,
+        "contend": 0.73,
+        "cA": 0.833,
         "cB": 0,
         "arbitrable": false,
         "bothGhosts": false
       },
       {
-        "a": "よみ読みread",
-        "b": "ひとりひとり一人",
+        "a": "がいしゅつ外出o",
+        "b": "とびだす飛び出す",
+        "f": 0.49,
+        "hi": 0.449,
+        "lo": 0.327,
+        "contend": 0.73,
+        "cA": 0.833,
+        "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": false
+      },
+      {
+        "a": "ざいりょう材料i",
+        "b": "かみのけ髪の毛h",
+        "f": 0.4,
+        "hi": 0.371,
+        "lo": 0.327,
+        "contend": 0.88,
+        "cA": 0,
+        "cB": 1,
+        "arbitrable": false,
+        "bothGhosts": false
+      },
+      {
+        "a": "ぜい税tax",
+        "b": "せんす扇子fol",
+        "f": 0.46,
+        "hi": 0.392,
+        "lo": 0.327,
+        "contend": 0.83,
+        "cA": 0.996,
+        "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": false
+      },
+      {
+        "a": "ぜい税tax",
+        "b": "しょうぼうしょ消",
         "f": 1,
         "hi": 0.392,
         "lo": 0.327,
         "contend": 0.83,
-        "cA": 1,
-        "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "よみ読みread",
-        "b": "めいれい命令or",
-        "f": 0.47,
-        "hi": 0.42,
-        "lo": 0.392,
-        "contend": 0.93,
-        "cA": 1,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "ひとりひとり一人",
-        "b": "めいれい命令or",
-        "f": 1,
-        "hi": 0.42,
-        "lo": 0.327,
-        "contend": 0.78,
-        "cA": 0,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "ひとりひとり一人",
-        "b": "ぜひ是非cert",
-        "f": 0.46,
-        "hi": 0.457,
-        "lo": 0.327,
-        "contend": 0.72,
-        "cA": 0,
-        "cB": 1,
+        "cA": 0.996,
+        "cB": 0.004,
         "arbitrable": false,
         "bothGhosts": false
       },
       {
         "a": "ぐん軍army,",
         "b": "しょうぼうしょ消",
-        "f": 0.34,
-        "hi": 0.327,
+        "f": 0.37,
+        "hi": 0.42,
         "lo": 0.327,
-        "contend": 1,
-        "cA": 1,
-        "cB": 0,
+        "contend": 0.78,
+        "cA": 0.996,
+        "cB": 0.004,
         "arbitrable": false,
         "bothGhosts": false
       },
       {
         "a": "めいれい命令or",
         "b": "ぜひ是非cert",
-        "f": 0.28,
-        "hi": 0.457,
-        "lo": 0.42,
-        "contend": 0.92,
-        "cA": 1,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "しじん詩人poe",
-        "b": "はんにん犯人of",
-        "f": 0.85,
-        "hi": 0.474,
-        "lo": 0.395,
-        "contend": 0.83,
-        "cA": 1,
-        "cB": 1,
-        "arbitrable": false,
-        "bothGhosts": false
-      },
-      {
-        "a": "はんにん犯人of",
-        "b": "まもなく間も無く",
-        "f": 0.27,
+        "f": 0.65,
         "hi": 0.522,
-        "lo": 0.395,
-        "contend": 0.76,
-        "cA": 1,
-        "cB": 1,
+        "lo": 0.327,
+        "contend": 0.63,
+        "cA": 0.001,
+        "cB": 0.999,
         "arbitrable": false,
         "bothGhosts": false
       },
       {
-        "a": "けずる削るto ",
-        "b": "めだつ目立つto",
-        "f": 0.69,
-        "hi": 0.595,
-        "lo": 0.355,
-        "contend": 0.6,
-        "cA": 0.88,
-        "cB": 0.12,
+        "a": "しょうぼうしょ消",
+        "b": "ゆうひ夕日(in",
+        "f": 0.66,
+        "hi": 0.42,
+        "lo": 0.327,
+        "contend": 0.78,
+        "cA": 0.004,
+        "cB": 0.996,
+        "arbitrable": false,
+        "bothGhosts": false
+      },
+      {
+        "a": "がんじつ元日Ne",
+        "b": "ゆうひ夕日(in",
+        "f": 0.77,
+        "hi": 0.42,
+        "lo": 0.327,
+        "contend": 0.78,
+        "cA": 0,
+        "cB": 0.996,
         "arbitrable": false,
         "bothGhosts": false
       }
     ],
     "zoomGhostOverGhost": [
       {
-        "a": "がいしゅつ外出o",
-        "b": "とびだす飛び出す",
-        "f": 0.56,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
-        "a": "とりあげる取り上",
-        "b": "さきおととい一昨",
-        "f": 0.28,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
         "a": "とりあげる取り上",
         "b": "ゆびわ指輪(fi",
-        "f": 0.92,
+        "f": 0.71,
+        "hi": 0.327,
+        "lo": 0.327,
+        "contend": 1,
+        "cA": 0,
+        "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": true
+      },
+      {
+        "a": "よみ読みread",
+        "b": "めいれい命令or",
+        "f": 0.45,
+        "hi": 0.327,
+        "lo": 0.327,
+        "contend": 1,
+        "cA": 0,
+        "cB": 0.001,
+        "arbitrable": false,
+        "bothGhosts": true
+      },
+      {
+        "a": "こうか高価hig",
+        "b": "とびだす飛び出す",
+        "f": 1,
+        "hi": 0.327,
+        "lo": 0.327,
+        "contend": 1,
+        "cA": 0,
+        "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": true
+      },
+      {
+        "a": "せい性sex, ",
+        "b": "しゅっしん出身c",
+        "f": 0.5,
         "hi": 0.327,
         "lo": 0.327,
         "contend": 1,
@@ -1242,7 +1227,7 @@
       {
         "a": "きんにく筋肉mu",
         "b": "ぎょぎょう漁業f",
-        "f": 0.73,
+        "f": 0.71,
         "hi": 0.327,
         "lo": 0.327,
         "contend": 1,
@@ -1252,74 +1237,38 @@
         "bothGhosts": true
       },
       {
-        "a": "ぜい税tax",
-        "b": "しょうぼうしょ消",
-        "f": 0.93,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
-        "a": "さいしゅう最終l",
-        "b": "ひとりひとり一人",
-        "f": 0.45,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
-        "a": "さいしゅう最終l",
+        "a": "とびだす飛び出す",
         "b": "にくらしい憎らし",
-        "f": 0.55,
+        "f": 0.33,
         "hi": 0.327,
         "lo": 0.327,
         "contend": 1,
         "cA": 0,
         "cB": 0,
+        "arbitrable": false,
+        "bothGhosts": true
+      },
+      {
+        "a": "せんす扇子fol",
+        "b": "しょうぼうしょ消",
+        "f": 1,
+        "hi": 0.327,
+        "lo": 0.327,
+        "contend": 1,
+        "cA": 0,
+        "cB": 0.004,
         "arbitrable": false,
         "bothGhosts": true
       },
       {
         "a": "しょうぼうしょ消",
         "b": "がんじつ元日Ne",
-        "f": 0.84,
+        "f": 1,
         "hi": 0.327,
         "lo": 0.327,
         "contend": 1,
-        "cA": 0,
+        "cA": 0.004,
         "cB": 0,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
-        "a": "しょうぼうしょ消",
-        "b": "ゆうひ夕日(in",
-        "f": 0.46,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0.003,
-        "arbitrable": false,
-        "bothGhosts": true
-      },
-      {
-        "a": "がんじつ元日Ne",
-        "b": "ゆうひ夕日(in",
-        "f": 0.82,
-        "hi": 0.327,
-        "lo": 0.327,
-        "contend": 1,
-        "cA": 0,
-        "cB": 0.003,
         "arbitrable": false,
         "bothGhosts": true
       }
@@ -1336,7 +1285,7 @@
         "focus": 12,
         "focusVis": 12,
         "unfolded": 0,
-        "words": 124
+        "words": 133
       }
     },
     "lockMinZoom": {
@@ -1362,9 +1311,9 @@
     "themes": {
       "北斎": {
         "name": "北斎",
-        "med": 2.84,
+        "med": 2.79,
         "min": 2.29,
-        "n": 18,
+        "n": 22,
         "hintCr": 13.97,
         "hintBg": "rgba(251, 250, 245, 0.92)",
         "hintRendered": 1
@@ -1373,16 +1322,16 @@
         "name": "墨",
         "med": 2.62,
         "min": 1.96,
-        "n": 18,
+        "n": 22,
         "hintCr": 13.25,
         "hintBg": "rgba(247, 246, 241, 0.92)",
         "hintRendered": 1
       },
       "岩絵具": {
         "name": "岩絵具",
-        "med": 2.59,
+        "med": 2.51,
         "min": 2.04,
-        "n": 18,
+        "n": 22,
         "hintCr": 11.32,
         "hintBg": "rgba(243, 234, 216, 0.92)",
         "hintRendered": 1
@@ -1391,16 +1340,16 @@
         "name": "緑青",
         "med": 2.5,
         "min": 2.19,
-        "n": 18,
+        "n": 22,
         "hintCr": 9.54,
         "hintBg": "rgba(237, 242, 230, 0.92)",
         "hintRendered": 1
       },
       "夜": {
         "name": "夜",
-        "med": 4.07,
+        "med": 4.02,
         "min": 2.79,
-        "n": 18,
+        "n": 22,
         "hintCr": 17.81,
         "hintBg": "rgba(31, 21, 15, 0.93)",
         "hintRendered": 1

@@ -1,15 +1,15 @@
 rest: {"z":1,"rot":0,"stack":0,"lockOn":false,"focus":0,"focusVis":0,"unfolded":0,"words":64}
-census: 36 words · 5 ghosted · rawWorstOverlap=0.892 · minGhostOp=0.327 minPresentOp=0.327
+census: 36 words · 5 ghosted · rawWorstOverlap=0.903 · minGhostOp=0.327 minPresentOp=0.327
 PASS  law-rest-presence: faintest ghost op=0.327 vs the field's own faintest unarbitrated presence 0.3266 (live floor 0.327); ghost contrast 1.638:1 vs quietest present word 1.467:1 — 5/36 ghosted
-PASS  law-rest-reachable: pointer-events:none on 0; ghosts with no reachable point: 0; live tap on ghost "単なる" (op 0.327) -> {"collide":1,"isFocus":true,"hl":false,"unfolded":true} · pre-existing crowding, not the arbiter's doing: 4 full-presence words fully covered by other words, 0 covered by chrome
-PASS  law-ghost-residual: deleting a ghost changes its box by mean Δ 12.95/23.51/23.65 (max Δ 70/74/110); kept controls mean Δ 11.86/22.94/41.22 — bar is ≥50% of the quietest kept (11.86)
-PASS  4-rest-contention: arbitrable contending pairs=0 (bar 0) · un-arbitrable left standing=5 (both words too quiet to win; receding either would breach the floor 0.327) · worstContention=1 · raw geometry unchanged: worstOverlap=0.837 over 5 pairs of 33 words
+PASS  law-rest-reachable: pointer-events:none on 0; ghosts not under a hub with no reachable point: 0; live tap on ghost "単なる" (op 0.327) -> {"collide":1,"isFocus":true,"hl":false,"unfolded":true} · 0 ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: 4 full-presence words fully covered by other words, 0 covered by chrome
+PASS  law-ghost-residual: deleting a ghost changes its box by mean Δ 10.47/23.07/23.65 (max Δ 61/84/120); kept controls mean Δ 12.69/17.88/32.67 — bar is ≥50% of the quietest kept (12.69)
+PASS  4-rest-contention: arbitrable contending pairs=0 (bar 0) · left standing: 4 where both words are too quiet to win (receding either would breach the floor 0.327) + 1 ghost-over-ghost (both already ground) · worstContention=1 · raw geometry unchanged: worstOverlap=0.834 over 5 pairs of 34 words
 PASS  6-chrome-keepout: 0 words at reading presence (≥0.44) under chrome; 5 present under chrome at all (as ghosts)
 PASS  1-pinch-surface-nobleed: stack 1->0, z 1->1 (must stay >0.7, not floor at 0.34)
 PASS  3-rot-clamp: twist registered: rot 0 -> 2.793 (must move >0.5); after 3x160deg rot=3.142 (must be within +-3.14)
-PASS  2-return-to-rest: messy(z=2.6,rot=2.623) -> home(z=1,rot=0) via double-tap at 360,110
-PASS  4-zoom-contention: after zoom (z=2.6) arbitrable contending pairs=0, un-arbitrable=16, worstContention=1 · raw worstOverlap=1 over 25 pairs of 38 words
-PASS  law-zoom-presence: zoomed: faintest ghost op=0.327 vs the field's faintest unarbitrated 0.3266 (floor 0.327); pointer-events:none on 0; ghosts out of reach with nothing over them: 0 · crowding context: 7/20 ghosts and 3/18 full-presence words are covered by other words at this zoom
+PASS  2-return-to-rest: messy(z=2.6,rot=2.622) -> home(z=1,rot=0) via double-tap at 360,110
+PASS  4-zoom-contention: after zoom (z=2.6) arbitrable contending pairs=0, left standing 22 too-quiet-to-win + 3 ghost-over-ghost, worstContention=1 · raw worstOverlap=1 over 28 pairs of 39 words
+PASS  law-zoom-presence: zoomed: faintest ghost op=0.35 vs the field's faintest unarbitrated 0.3502 (floor 0.35); pointer-events:none on 0; ghosts out of reach with nothing over them: 0; 0 yielding to a galaxy sun · crowding context: 4/11 ghosts and 5/28 full-presence words are covered by other words at this zoom
 PASS  8-unfold-clear-on-lock: tapped A=すくう救うt (unfolded=1), locked B=ごぶさた御無 -> unfolded=0, lockOn=true, members=12
 PASS  8-lock-persists-minzoom: z=0.34 (want <=0.5), lockOn=true, focus=12, visibleMembers=12
 PASS  8-lock-release-clean: after water-tap release lockOn=false, unfolded=0
@@ -18,9 +18,9 @@ PASS  5-hint[墨]: hint text/plate contrast=13.25 on rgba(247, 246, 241, 0.92); 
 PASS  5-hint[岩絵具]: hint text/plate contrast=11.32 on rgba(243, 234, 216, 0.92); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
 PASS  5-hint[緑青]: hint text/plate contrast=9.54 on rgba(237, 242, 230, 0.92); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
 PASS  5-hint[夜]: hint text/plate contrast=17.81 on rgba(31, 21, 15, 0.93); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
-PASS  7-parity[岩絵具]: fg med=2.44 (n=19) vs light baseline 2.62 — want >=2.4 and >=90% of baseline
-PASS  7-parity[緑青]: fg med=2.5 (n=19) vs light baseline 2.62 — want >=2.4 and >=90% of baseline
-PASS  7-night-legible: 夜 fg med=3.76 (n=19)
+PASS  7-parity[岩絵具]: fg med=2.51 (n=18) vs light baseline 2.62 — want >=2.4 and >=90% of baseline
+PASS  7-parity[緑青]: fg med=2.67 (n=18) vs light baseline 2.62 — want >=2.4 and >=90% of baseline
+PASS  7-night-legible: 夜 fg med=4.02 (n=18)
 
 ERRORS: none
 

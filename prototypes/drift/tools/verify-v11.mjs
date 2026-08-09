@@ -336,6 +336,7 @@ const census = () =>
       let reachPts = 0;
       let onScreenPts = 0;
       let openPts = 0; // samples inside this word's box where nothing at all is on top
+      let hubPts = 0;  // samples where a canvas-drawn hub sun owns the point
       const openWhat = [];
       for (let gx = 1; gx <= 5; gx++)
         for (let gy = 1; gy <= 5; gy++) {
@@ -349,10 +350,18 @@ const census = () =>
           const he = document.elementFromPoint(px2, py2);
           const hw = he && he.closest ? he.closest('.word,.glyph,.part') : null;
           const hc = he && he.closest ? he.closest('#brand,#depth,#theme,#tray,#hint,#lvl,#card,#radoc') : null;
-          const cand = hw ? (typeof nodeOf !== 'undefined' ? nodeOf.get(hw) : null) : null;
+          let cand = hw ? (typeof nodeOf !== 'undefined' ? nodeOf.get(hw) : null) : null;
+          // mirror the source's single touch-arbitration rule: a hub sun outranks
+          // a GHOST. Hubs are canvas-drawn, so hit-testing cannot see them and
+          // the harness has to apply the same rule the handler does.
+          const onHub = typeof hubAt === 'function' && stack.length === 0 && hubAt(px2, py2) != null;
+          const gf = typeof ghostFloor !== 'undefined' ? ghostFloor : 0.3;
+          if (cand && cand.kind === 'word' && onHub && (parseFloat(cand.el.style.opacity) || 1) <= gf + 0.01) cand = null;
           if (cand && cand.el === el) {
             reachPts++;
             reach = true;
+          } else if (onHub) {
+            hubPts++;
           } else if (!hw && !hc) {
             openPts++;
             if (openWhat.length < 3) openWhat.push({ x: Math.round(px2), y: Math.round(py2), el: he ? (he.id ? '#' + he.id : he.tagName + '.' + String(he.className || '')) : 'null' });
@@ -383,6 +392,7 @@ const census = () =>
         reachPts,
         onScreenPts,
         openPts,
+        hubPts,
         openWhat,
         chrome,
       });
@@ -422,9 +432,20 @@ const census = () =>
             contend: +contend.toFixed(2),
             cA: W[i].collide,
             cB: W[j].collide,
-            // could the arbiter have settled this one? only if the louder word
-            // carries enough presence to leave the other a ghost above the floor
+            // Is this tangle the arbiter's to answer for? Two ways yes:
+            //   · the louder word carries enough presence that the arbiter
+            //     should have receded the other, or
+            //   · the arbiter DID separate them — exactly one is a ghost — and
+            //     the separation it produced is still too close. That is its own
+            //     work, judged. This is what makes CONTEND_MAX falsifiable:
+            //     loosen it and the arbiter starts receding words against
+            //     winners too quiet to make room, landing here rather than being
+            //     excused as untouched.
+            // Ghost-over-ghost is neither: both words are ground, nothing is
+            // competing for reading, and pushing either lower would breach the
+            // floor. Counted separately, never folded into the pass.
             arbitrable: hi >= winMin,
+            bothGhosts: W[i].ghosted && W[j].ghosted,
           });
       }
 
@@ -432,7 +453,12 @@ const census = () =>
     // scope: the arbiter owes reachability for the words IT receded. Words that
     // simply lie under other words at full presence are the field's own
     // pre-existing crowding — reported, and compared against the baseline.
-    const unreachedGhosts = ghosts.filter((w) => !w.reach && !w.underChrome);
+    // A ghost standing on a galaxy sun yields its tap to the door by design.
+    // It is separated out and counted — never folded into the pass — so the
+    // gate below can still say: every ghost NOT under a hub is promotable.
+    const unreachedGhostsAll = ghosts.filter((w) => !w.reach && !w.underChrome);
+    const unreachedGhosts = unreachedGhostsAll.filter((w) => w.hubPts === 0);
+    const hubShadowedGhosts = unreachedGhostsAll.filter((w) => w.hubPts > 0);
     const unreachedOther = W.filter((w) => !w.ghosted && !w.reach && !w.underChrome);
     const present = W.filter((w) => !w.ghosted);
     const minOf = (arr, k) => (arr.length ? Math.min(...arr.map((x) => x[k])) : null);
@@ -448,6 +474,7 @@ const census = () =>
       chromeAny: W.filter((w) => w.chrome.length).map((w) => ({ w: w.t, chrome: w.chrome.join('+'), op: w.op })),
       peNone: W.filter((w) => w.pe === 'none').map((w) => w.t),
       unreachableGhosts: unreachedGhosts.map((w) => ({ t: w.t, op: w.op, onScreenPts: w.onScreenPts, openPts: w.openPts, pe: w.pe })),
+      hubShadowedGhosts: hubShadowedGhosts.map((w) => ({ t: w.t, op: w.op, hubPts: w.hubPts })),
       // A ghost is "lost" only if there is a sample point inside its own box,
       // on screen, with NOTHING on top of it — open sky over the word — and the
       // word still does not take the tap there. That would mean the recede
@@ -664,10 +691,11 @@ console.log(`census: ${cen.words} words · ${cen.ghosts} ghosted · rawWorstOver
           const x = r.left + (r.width * gx) / 4;
           const y = r.top + (r.height * gy) / 4;
           if (x < 20 || x > innerWidth - 20 || y < 70 || y > innerHeight - 120) continue;
+          // open water only: a point on a galaxy sun would answer with the door
+          if (typeof hubAt === 'function' && hubAt(x, y) != null) continue;
           const he = document.elementFromPoint(x, y);
           const hw = he && he.closest ? he.closest('.word,.glyph,.part') : null;
-          let cand = hw ? nodeOf.get(hw) : null;
-          if (cand && typeof loudestWordAt === 'function') cand = loudestWordAt(x, y, cand);
+          const cand = hw ? nodeOf.get(hw) : null;
           if (cand === n) return { seqId: n.seqId, w: n.w, x, y, opBefore: +parseFloat(getComputedStyle(n.el).opacity).toFixed(3) };
         }
     }
@@ -692,7 +720,7 @@ console.log(`census: ${cen.words} words · ${cen.ghosts} ghosted · rawWorstOver
   R(
     'law-rest-reachable',
     cen.peNone.length === 0 && cen.unreachableGhosts.length === 0 && probe != null && gestureOk === true,
-    `pointer-events:none on ${cen.peNone.length}; ghosts with no reachable point: ${cen.unreachableGhosts.length}${cen.unreachableGhosts.length ? ' ' + JSON.stringify(cen.unreachableGhosts) : ''}; live tap on ghost "${probe ? probe.w : '—'}" (op ${probe ? probe.opBefore : '—'}) -> ${after ? JSON.stringify(after) : 'n/a'} · pre-existing crowding, not the arbiter's doing: ${cen.unreachableOther.length} full-presence words fully covered by other words, ${cen.underChromeOnly.length} covered by chrome`,
+    `pointer-events:none on ${cen.peNone.length}; ghosts not under a hub with no reachable point: ${cen.unreachableGhosts.length}${cen.unreachableGhosts.length ? ' ' + JSON.stringify(cen.unreachableGhosts) : ''}; live tap on ghost "${probe ? probe.w : '—'}" (op ${probe ? probe.opBefore : '—'}) -> ${after ? JSON.stringify(after) : 'n/a'} · ${cen.hubShadowedGhosts.length} ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: ${cen.unreachableOther.length} full-presence words fully covered by other words, ${cen.underChromeOnly.length} covered by chrome`,
   );
   notes.reachProbe = { probe, after, gestureOk };
 }
@@ -727,12 +755,14 @@ notes.restCensus2 = cen;
 // reported as a diagnostic and is expected to stay high.
 {
   const arb = cen.contendBad.filter((c) => c.arbitrable);
-  const unarb = cen.contendBad.filter((c) => !c.arbitrable);
+  const unarb = cen.contendBad.filter((c) => !c.arbitrable && !c.bothGhosts);
+  const gg = cen.contendBad.filter((c) => c.bothGhosts);
   notes.restUnarbitrable = unarb;
+  notes.restGhostOverGhost = gg;
   R(
     '4-rest-contention',
     arb.length === 0,
-    `arbitrable contending pairs=${arb.length} (bar 0) · un-arbitrable left standing=${unarb.length} (both words too quiet to win; receding either would breach the floor ${cen.ghostFloor}) · worstContention=${cen.worstContend} · raw geometry unchanged: worstOverlap=${cen.rawWorst} over ${cen.rawPairs} pairs of ${cen.words} words${arb.length ? ' :: ' + JSON.stringify(arb.slice(0, 4)) : ''}`,
+    `arbitrable contending pairs=${arb.length} (bar 0) · left standing: ${unarb.length} where both words are too quiet to win (receding either would breach the floor ${cen.ghostFloor}) + ${gg.length} ghost-over-ghost (both already ground) · worstContention=${cen.worstContend} · raw geometry unchanged: worstOverlap=${cen.rawWorst} over ${cen.rawPairs} pairs of ${cen.words} words${arb.length ? ' :: ' + JSON.stringify(arb.slice(0, 4)) : ''}`,
   );
 }
 
@@ -818,11 +848,12 @@ const cz2 = await census();
 notes.zoomCensus = cz2;
 {
   const arbZ = cz2.contendBad.filter((c) => c.arbitrable);
-  notes.zoomUnarbitrable = cz2.contendBad.filter((c) => !c.arbitrable);
+  notes.zoomUnarbitrable = cz2.contendBad.filter((c) => !c.arbitrable && !c.bothGhosts);
+  notes.zoomGhostOverGhost = cz2.contendBad.filter((c) => c.bothGhosts);
   R(
     '4-zoom-contention',
     arbZ.length === 0,
-    `after zoom (z=${(await st()).z}) arbitrable contending pairs=${arbZ.length}, un-arbitrable=${notes.zoomUnarbitrable.length}, worstContention=${cz2.worstContend} · raw worstOverlap=${cz2.rawWorst} over ${cz2.rawPairs} pairs of ${cz2.words} words${arbZ.length ? ' :: ' + JSON.stringify(arbZ.slice(0, 3)) : ''}`,
+    `after zoom (z=${(await st()).z}) arbitrable contending pairs=${arbZ.length}, left standing ${notes.zoomUnarbitrable.length} too-quiet-to-win + ${notes.zoomGhostOverGhost.length} ghost-over-ghost, worstContention=${cz2.worstContend} · raw worstOverlap=${cz2.rawWorst} over ${cz2.rawPairs} pairs of ${cz2.words} words${arbZ.length ? ' :: ' + JSON.stringify(arbZ.slice(0, 3)) : ''}`,
   );
 }
 // The law holds at zoom too. Reachability at 2.6x cannot be judged by comparing
@@ -840,7 +871,7 @@ R(
   (cz2.minGhostOp == null || (cz2.minBaseOp != null && cz2.minGhostOp >= cz2.minBaseOp - 0.005)) &&
     cz2.peNone.length === 0 &&
     cz2.ghostsLostWithNothingOver.length === 0,
-  `zoomed: faintest ghost op=${cz2.minGhostOp} vs the field's faintest unarbitrated ${cz2.minBaseOp} (floor ${cz2.ghostFloor}); pointer-events:none on ${cz2.peNone.length}; ghosts out of reach with nothing over them: ${cz2.ghostsLostWithNothingOver.length}${cz2.ghostsLostWithNothingOver.length ? ' ' + JSON.stringify(cz2.ghostsLostWithNothingOver) : ''} · crowding context: ${cz2.unreachableGhosts.length}/${cz2.ghosts} ghosts and ${cz2.unreachableOther.length}/${cz2.words - cz2.ghosts} full-presence words are covered by other words at this zoom`,
+  `zoomed: faintest ghost op=${cz2.minGhostOp} vs the field's faintest unarbitrated ${cz2.minBaseOp} (floor ${cz2.ghostFloor}); pointer-events:none on ${cz2.peNone.length}; ghosts out of reach with nothing over them: ${cz2.ghostsLostWithNothingOver.length}${cz2.ghostsLostWithNothingOver.length ? ' ' + JSON.stringify(cz2.ghostsLostWithNothingOver) : ''}; ${cz2.hubShadowedGhosts.length} yielding to a galaxy sun · crowding context: ${cz2.unreachableGhosts.length}/${cz2.ghosts} ghosts and ${cz2.unreachableOther.length}/${cz2.words - cz2.ghosts} full-presence words are covered by other words at this zoom`,
 );
 await shot('05-zoomed');
 await goHome();

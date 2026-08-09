@@ -1950,12 +1950,26 @@ addEventListener("pointerdown",e=>{
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
   pn=el?nodeOf.get(el):null;
   if(pn&&pn.gone) pn=null;
-  // NOTE, deliberately: touch is NOT re-arbitrated by loudness here. An earlier
-  // cut handed a tap in an overlap to the louder word, which reads well until
-  // you measure it — a ghost lying wholly inside a louder word then has no
+  // NOTE, deliberately: touch is NOT re-arbitrated by loudness between WORDS. An
+  // earlier cut handed a tap in an overlap to the louder word, which reads well
+  // until you measure it — a ghost lying wholly inside a louder word then has no
   // point of its own left, and an unreachable word is a disappeared word. Paint
-  // recedes; touch stays exactly as the field always resolved it, and answering
-  // a ghost brings it straight back to full presence.
+  // recedes; touch between words stays exactly as the field always resolved it,
+  // and answering a ghost brings it straight back to full presence.
+  //
+  // THE ONE EXCEPTION, and the whole rule in a sentence: a tap that lands on a
+  // galaxy sun is answered by the hub, not by a word that is painted at or below
+  // ghost presence — a word at full presence still outranks the hub, exactly as
+  // it always has.
+  // A hub is canvas-drawn, so hit-testing cannot see it and this comparison has
+  // to be made by hand. The test is on RENDERED opacity, not on the arbiter's
+  // flag: a constellation suspends arbitration, so a receded word's collide is
+  // already back at 1 while the bloom still paints it at a third of its
+  // presence, and reading the flag there would miss exactly the case the hunt
+  // exercises — a release over a hub with a constellation held.
+  if(pn&&pn.kind==="word"&&stack.length===0&&
+     (parseFloat(pn.el.style.opacity)||1)<=ghostFloor+0.01&&
+     hubAt(e.clientX,e.clientY)) pn=null;
   if(!pn&&lockOn&&stack.length===0){
     let best=null,bd=40;
     for(const wr of FOCUS){
@@ -2415,28 +2429,24 @@ function drawFx(t,dt){
 // THE LOSER OF A TANGLE BECOMES A GHOST, NOT AN ABSENCE. The law is that
 // nothing leaves this screen except a deliberate flick judgment, so the arbiter
 // is bound on both sides:
-//   · from below — a ghost renders at GHOST_ABS at the very least, a presence
-//     the field already paints its own faintest words at, and it NEVER loses
-//     its touch target. Tap it and it comes back at full presence.
-//   · from above — a ghost is at most GHOST_REL of the word that beat it, so
-//     there is always a real figure and a real ground.
+//   · from below — a ghost renders at the FLOOR, and never loses its touch
+//     target. Tap it and it comes back at full presence.
+//   · from above — the quieter word of a contested pair is at most CONTEND_MAX
+//     of the louder, so there is always a real figure and a real ground.
 // The floor is not a number picked here. It is read from the field itself each
-// pass: the quietest word spawnWord is already painting. A ghost is never
-// quieter than the quietest word the surface is showing anyway — so the arbiter
-// can only ever move a word WITHIN the presence range the field already uses,
-// and can never invent a new, fainter one. That ladder predates the arbiter and
-// the arbiter cannot move it.
+// pass: the quietest word spawnWord is already painting (never below GHOST_ABS).
+// A ghost is never quieter than the quietest word the surface is showing anyway
+// — so the arbiter can only ever move a word WITHIN the presence range the field
+// already uses, and can never invent a new, fainter one. That ladder predates
+// the arbiter and the arbiter cannot move it.
 //
-// The two bounds only both fit when the winner is loud enough to make room
-// (floor <= GHOST_REL * winner, i.e. winner >= floor / CONTEND_MAX), so a word
-// quieter than that has no right to push anyone back. When no one can win, the
-// arbiter leaves the tangle alone rather than push a word out of existence —
+// Those two bounds meet in ONE derived number. A ghost sits at the floor, so a
+// pair ends at floor/winner; holding that under CONTEND_MAX means only a word
+// carrying floor/CONTEND_MAX presence may take anyone's water. A word quieter
+// than that has no right to push anyone back, and when nobody can win the
+// arbiter leaves the tangle standing rather than push a word out of existence —
 // a soft tangle is a legibility cost; a vanished word breaks the law.
-// GHOST_REL sits below CONTEND_MAX on purpose: it leaves the floor binding for
-// all but the loudest winners, which is the safe side of the trade — a ghost
-// pinned at the field's own floor is both the most present it can be for the
-// law and the most separated it can be for reading.
-const GHOST_ABS=0.30, GHOST_REL=0.45, CONTEND_MAX=0.53;
+const GHOST_ABS=0.30, CONTEND_MAX=0.53;
 let ghostFloor=GHOST_ABS;   // the live floor, exposed so the harness can audit it
 let chromeRects=[];
 function refreshChromeRects(){
@@ -2498,23 +2508,23 @@ function resolveCollisions(){
     for(const c of chromeRects){
       if(a.cx+a.hw>c.x&&a.cx-a.hw<c.x+c.w&&a.cy+a.hh>c.y&&a.cy-a.hh<c.y+c.h){ghost=floorOp;break;}
     }
-    if(!ghost){
-      // A ghost must be quiet enough for EVERY word it tangles with, not just
-      // the loudest one — a word beaten by a loud neighbour may also overlap a
-      // quiet one, and pitched against that quiet one it would still be mush.
-      // So the level is set by the QUIETEST winner in the tangle.
-      let quietestWinner=Infinity;
-      for(const k of kept){
-        if(k.eff<winMin) continue;              // too quiet to take anyone's water
-        const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
-        if(ox<=0) continue;
-        const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
-        if(oy<=0) continue;
-        // 0.12, not a comfortable 0.16: at high zoom the field drifts across the
-        // screen ~cam.z times faster, so a tangle can slip between two passes
-        if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.12&&k.eff<quietestWinner) quietestWinner=k.eff;
-      }
-      if(quietestWinner<Infinity) ghost=Math.max(floorOp,GHOST_REL*quietestWinner);
+    // A ghost always lands on the floor exactly — there is no relative term. An
+    // earlier cut carried one (ghost = max(floor, 0.45 * winner)); verification
+    // showed the floor bound every observed case, so the relative term was dead
+    // code that no check could falsify. The separation it was supposed to
+    // provide is enforced instead at the other end: a word may only take
+    // someone's water if it carries floor/CONTEND_MAX presence, which pins the
+    // quieter word of every contested pair at no more than CONTEND_MAX of the
+    // louder. Both constants now do visible work and both are falsifiable.
+    if(!ghost) for(const k of kept){
+      if(k.eff<winMin) continue;                // too quiet to take anyone's water
+      const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
+      if(ox<=0) continue;
+      const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
+      if(oy<=0) continue;
+      // 0.12, not a comfortable 0.16: at high zoom the field drifts across the
+      // screen ~cam.z times faster, so a tangle can slip between two passes
+      if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.12){ ghost=floorOp; break; }
     }
     if(ghost){ a.n.ghostOp=ghost; a.n.collideTarget=0; }
     else { a.n.collideTarget=1; kept.push(a); }

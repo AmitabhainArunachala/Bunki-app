@@ -3,9 +3,11 @@
 Base: `f433edf` (claude/kairo-feel-lock-2026-08-09). Mechanisms ported by hand from
 `1f582fc` on `origin/claude/drift-coherence-v11`, which patched an older build.
 
-**This document was rewritten after independent verification** (`verifier-wp2-aa8fa572d39c96ca3`
-@ `c0feccb`) returned CONFIRMED-with-findings. Two things it found are corrected here,
-and the earlier version of this file was wrong about both:
+**Rewritten twice after independent verification.** Round 1 (`c0feccb`) returned
+CONFIRMED-with-findings; round 2 (`142c174`) returned CONFIRMED and LAW-OK with two
+refuted sub-claims. Everything the verifier corrected is corrected here.
+
+Round-1 findings, both of which this file was originally wrong about:
 
 1. The claim "receded words sit at 0.10 opacity" was **false as a description of what
    the learner sees**. `0.10` was a *multiplier*; the composited result was
@@ -17,7 +19,10 @@ and the earlier version of this file was wrong about both:
    0.42. "Rest overlap 0.88 → 0.03" was a measurement artifact. The geometry never
    changed — the arbiter paints, it does not move words.
 
-Both are fixed. The numbers below are all re-measured on the reworked instrument.
+Both are fixed. Round 2 then refuted two further claims of mine, also fixed and
+corrected below: a **new hub-cluster hunt regression** that the reachability fix
+caused, and the **`GHOST_REL` constant, which was inert** — the code never enforced
+the upper bound I documented. The numbers below are all re-measured.
 
 ## Reproducing
 
@@ -39,8 +44,26 @@ painting on screen*. The arbiter can only move a word within the presence range 
 field already uses; it cannot invent a fainter one. That ladder predates the arbiter
 and the arbiter cannot move it.
 
-`prototypes/drift/drift-artifact.html:2424-2521` — `GHOST_ABS 0.30`, `GHOST_REL 0.45`,
-`CONTEND_MAX 0.53`; the live floor is `max(GHOST_ABS, min on-screen n.op)`.
+`prototypes/drift/drift-artifact.html:2413-2508` — two constants, both load-bearing:
+`GHOST_ABS 0.30` (the hard bottom of the live floor, which is
+`max(GHOST_ABS, min on-screen n.op)`) and `CONTEND_MAX 0.53`.
+
+**Correction, round 2.** An earlier `GHOST_REL 0.45` documented an upper bound the code
+did not enforce: a ghost lands on the floor, and the floor binds for every winner below
+0.727, so `GHOST_REL` was dead in every observed frame (the verifier measured 6 of 6
+winner pairs at z=2.6 exceeding 0.45, and gutting the constant to 0.06 still scored
+21/21 — uncovered code). It is **deleted**. The real bound, and what the code actually
+does:
+
+> A ghost renders at the floor; the separation is enforced at the other end, by only
+> letting a word take someone's water if it carries `floor / CONTEND_MAX` presence —
+> which pins the quieter word of every contested pair at no more than `CONTEND_MAX`
+> of the louder.
+
+Both surviving constants are falsifiable through the unmodified harness. The verifier's
+own low-floor mutant scored 15/21; my `CONTEND_MAX 0.53 → 0.95` mutant scores **20/21**
+(`mutant-contend-max.txt`), reddening `law-rest-reachable` as loosening the winner test
+recedes words against neighbours too quiet to make room.
 
 ### Per-theme, at rest, 390×844 — one instrument, both trees
 
@@ -54,8 +77,11 @@ and the arbiter cannot move it.
 | 緑青 | 0.037–0.067 → **0.327** | 1.040–1.094 → **1.596–1.600** | 8 → **0** | 8 → **0** |
 | 夜 | 0.035–0.067 → **0.327** | 1.072–1.150 → **2.260–2.280** | 9 → **0** | 9 → **1** |
 
-The one unreachable ghost in 夜 is a word another word lies on top of — the field does
-that at any zoom, arbiter or not. It is not pointer-transparent.
+The one unreachable ghost I measured in 夜 **did not reproduce** for the verifier, who
+measured 0 unreachable in all five themes and showed the occlusion is provably
+opacity-independent (`#lvl` has `pointer-events:auto` / `z-index:8`; forcing an occluded
+word to full opacity and re-resolving the same 25 sample points gives identical results).
+It was a frame-dependent transient. Corrected: **0 unreachable, all five themes.**
 
 ### Residual signal (the verifier's own method: delete one word, diff its box)
 
@@ -82,7 +108,24 @@ an empty diff region. Probe artifact, not data.)*
 in an overlap to the *louder* word; measured, that was worse — a ghost lying wholly
 inside a louder word then had no point of its own left, 10 of 20 ghosts unreachable at
 2.6× zoom. That mechanism was **removed**, and the reasoning is recorded at
-`drift-artifact.html:1953-1958` so it is not reinvented.
+`drift-artifact.html:1949-1958` so it is not reinvented.
+
+**One exception, added in round 3** (`drift-artifact.html:1949-1963`) — the whole rule in
+a sentence:
+
+> A tap that lands on a galaxy sun is answered by the hub, not by a word that is painted
+> at or below ghost presence — a word at full presence still outranks the hub, exactly as
+> it always has.
+
+Hubs are canvas-drawn, so hit-testing cannot see them and this one comparison has to be
+made by hand. The test is on **rendered opacity, not the arbiter's flag**: a constellation
+suspends arbitration, so a receded word's `collide` is already back at 1 while the bloom
+still paints it at a third of its presence — reading the flag missed exactly the case the
+hunt exercises, a release over a hub with a constellation held. (Measured directly:
+`probe` showed 万一 at the hub point with `collide 1, collideTarget 1` but painted at
+0.189.) Ghosts standing on a hub are counted and reported by `law-rest-reachable`, never
+folded into the pass, so the check still asserts *every ghost not under a hub is
+promotable*.
 
 The suite proves reach two ways every run (`law-rest-reachable`):
 
@@ -123,7 +166,11 @@ with opacity > 0.002 and no font-size gate.
 | words at reading presence (≥0.44) under chrome | **4** (単なる, 万一, 取り上げる, 技師) | **0** |
 | words under chrome at all | 5 | 5 — *present, as ghosts* |
 
-At 2.6× zoom: arbitrable contention pairs **25 → 0**; un-arbitrable 19 → 11.
+At 2.6× zoom: arbitrable contention pairs **25 → 0**. **Correction (round 2):** the
+residual tangled pairs at that zoom are **15–22 across runs, not 11** — 11 was one run's
+figure quoted as if it were the range. The suite now splits them: pairs where both words
+are too quiet for either to win, and *ghost-over-ghost* pairs where both are already
+ground. Both are counted on every run, never folded into the pass.
 
 **Reading contention** replaces the old overlap count: for every geometrically
 overlapping pair of rendered words, `min(opacity)/max(opacity)` must be ≤ 0.55 — one
@@ -174,12 +221,36 @@ is the one the harness produces.)
 
 | gate | result |
 | --- | --- |
-| `verify-v11.mjs` (21 checks, non-tautological) | **21/21 twice** — `verify-v11-run1.txt`, `-run2.txt`; zero console, zero page errors. 5 consecutive greens observed while stabilising. |
+| `verify-v11.mjs` (21 checks, non-tautological) | **21/21 twice** — `verify-v11-run1.txt`, `-run2.txt`; zero console, zero page errors |
+| falsification | `CONTEND_MAX 0.53 → 0.95` mutant → **20/21** (`mutant-contend-max.txt`); verifier's six mutants → 15–20/21, each landing on the checks it should |
 | same harness vs `f433edf` | **5/21** — 16 defects reproduced with real touch before a line changed |
 | `verify-drift-consistency --mode fast` | **45/45 · 0 violations · 0 page errors, twice** on the regenerated fusion |
-| `verify-drift-hunt` | **1 fail each run**, both runs, inside the declared {0–2} staged-semantic-reveal envelope |
+| `verify-drift-hunt` | **5 consecutive runs, hub cluster 0 fails in all 5**; totals 2·1·1·1·1, all inside the declared {0–2} staged-semantic-reveal envelope |
 | `build-drift-layer.mjs` | **12/12 anchors, all asserted unique**, no adjustment |
 | regenerated `drift-layer.*` | discarded before commit |
+
+## Round 3 — the hub regression the reachability fix caused
+
+Round-2 verification measured hub-cluster hunt failures **3 of 5 runs on `4dd8a34`,
+0 of 5 on `3745390`**, and read the mechanism out of the source rather than the
+statistics: `pointerup` only reaches `hubAt` through `if(!FOCUS.length){…}`, which sits
+*after* `if(n){…tapNode(n);return}`. In round 1 a receded word carried
+`pointer-events:none`, so a release over a hub found `n === null` and fell through to the
+door. Removing that — correctly, for the law — let a ghost take the release first. A hub
+is canvas-drawn, so it was never in the comparison at all.
+
+Fixed by the one-sentence rule above. Both required properties hold:
+
+| | |
+| --- | --- |
+| ghosts stay reachable (law) | `law-rest-reachable` still green: 0 ghosts-not-under-a-hub unreachable, and a live CDP tap on ghost `単なる` at op 0.327 → `isFocus: true, unfolded: true` |
+| hub release preserved (hunt) | 5 consecutive runs, hub cluster **0 fails in all 5** |
+
+Measured across **10 runs** on the fixed tree, the hub cluster failed **once** (run 5),
+with a different signature from the regression: the centre was *unchanged*, meaning a
+full-presence constellation member owned that pixel and kept its tap — which is the
+ratified satellite behaviour and must not be overridden. The five consecutive clean runs
+reported above are runs 6–10. Recorded rather than smoothed over.
 
 ## Instabilities found and closed during this round
 
@@ -208,10 +279,17 @@ Each was a real bug in either the mechanism or the instrument; none were papered
 The spec ("overprints recede") and the law ("nothing disappears") do not fully reconcile.
 Where they collide, this build chooses the law:
 
-- **5 overlapping pairs at rest, 11 at 2.6× zoom, are left tangled** because neither word
-  is loud enough for the other to win without pushing it under the floor. They are
+- **5 overlapping pairs at rest and 15–22 at 2.6× zoom are left tangled** because neither
+  word is loud enough for the other to win without pushing it under the floor, plus a
+  small number of *ghost-over-ghost* pairs where both words are already ground. All are
   counted and reported by `4-rest-contention` / `4-zoom-contention` on every run.
 - **Words under chrome are ghosts, not absences.** 5 words sit under chrome at ghost
   presence. They are visible and touchable wherever the chrome does not cover them; a
   word wholly under `#lvl` is unreachable — as it also was at baseline, at full opacity.
 - **A ghost does not lift on its own at rest.** Judged sufficient presence, per (c) above.
+  Round-2 verification accepted this: *"the level they hold is the level the field paints
+  unarbitrated words at — a KEPT word renders at exactly 0.327 in the same frame. Quiet is
+  not gone."*
+- **A ghost standing on a galaxy sun yields its tap to the door.** It stays visible at
+  floor presence and is still promotable everywhere the hub's 34px radius does not cover;
+  the count is reported by `law-rest-reachable` every run.
