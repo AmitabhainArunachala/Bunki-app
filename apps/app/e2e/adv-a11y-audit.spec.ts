@@ -273,7 +273,7 @@ test('keyboard: focus follows reading order, is always visible, and never traps'
     'nav-capture',
     'nav-session',
     'nav-evidence',
-    'nav-monthly-truth',
+    'nav-monthly',
   ]);
 
   // Reading order: focus moves down the page, never back up. Compared by row

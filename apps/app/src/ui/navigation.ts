@@ -136,7 +136,7 @@ export const DESTINATIONS: readonly Destination[] = [
     href: '/monthly',
     routeFile: 'monthly.tsx',
     screen: 'monthly/monthly-truth-screen.tsx',
-    label: 'Monthly truth',
+    label: 'Monthly',
     blurb: 'Eight separate lenses over one UTC month, without an ability score.',
     reach: { kind: 'shell' },
   },
