@@ -23,7 +23,10 @@
   #sky{position:fixed;inset:0;z-index:4}
   .word,.glyph,.part{position:absolute;left:0;top:0;white-space:nowrap;cursor:pointer;
     will-change:transform,opacity;user-select:none;-webkit-user-select:none;
-    text-align:center;transition:filter .9s}
+    text-align:center;transition:filter .9s;min-width:44px;min-height:44px;
+    border:0;padding:0;background:transparent;color:inherit;font:inherit;line-height:inherit}
+  .word:focus-visible,.glyph:focus-visible,.part:focus-visible{outline:2px solid var(--pig1);
+    outline-offset:4px;border-radius:8px}
   .word .base{display:block;line-height:1.15;text-shadow:0 0 1px currentColor}
   .word .yomi{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
     font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
@@ -65,8 +68,14 @@
     white-space:nowrap;pointer-events:none}
   #theme{position:fixed;top:calc(8px + env(safe-area-inset-top));right:14px;z-index:8;
     font-size:12px;letter-spacing:.12em;color:var(--ink);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-family:inherit;cursor:pointer}
+    border:1px solid var(--line);border-radius:999px;min-width:44px;min-height:44px;
+    padding:6px 14px;font-family:inherit;cursor:pointer}
   #theme:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
+  #driftBack{position:fixed;top:calc(8px + env(safe-area-inset-top));left:50%;z-index:9;
+    transform:translateX(-50%);min-width:44px;min-height:44px;padding:7px 14px;
+    border:1px solid var(--line);border-radius:999px;background:var(--plaque);color:var(--ink);
+    font:12px/1.2 inherit;letter-spacing:.08em;cursor:pointer}
+  #driftBack:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
   #tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
     font-size:12px;color:var(--faint);letter-spacing:.1em}
   #tray b{color:var(--accent);font-weight:500}
@@ -80,6 +89,10 @@
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     box-shadow:inset 0 0 0 1px var(--line),0 -10px 44px rgba(0,0,0,.14)}
   #card.open{transform:translateY(0)}
+  #card[inert]{pointer-events:none}
+  #cardClose{position:absolute;right:12px;top:12px;min-width:44px;min-height:44px;
+    border:1px solid var(--line);border-radius:999px;background:var(--plaque);color:var(--ink);
+    font:12px/1 inherit;cursor:pointer}
   #card .yomi{font-size:13px;letter-spacing:.2em;color:var(--pig2)}
   #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
   #card .gloss{font-family:Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
@@ -100,8 +113,9 @@
   #card .rhead{margin-top:12px;font-size:11px;letter-spacing:.14em;color:var(--faint)}
   #card .rlist{max-height:34vh;overflow-y:auto;margin-top:6px;border-top:1px solid var(--line);
     touch-action:pan-y;-webkit-overflow-scrolling:touch}
-  #card .rrow{display:flex;align-items:baseline;gap:12px;padding:9px 2px;
-    border-bottom:1px solid var(--line);cursor:pointer}
+  #card .rrow{display:flex;width:100%;align-items:baseline;gap:12px;padding:9px 2px;
+    border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;color:inherit;
+    font:inherit;text-align:left;min-height:44px}
   #card .rrow .rk{font-size:22px}
   #card .rrow .rr{font-size:12px;color:var(--pig2);letter-spacing:.06em;min-width:4.4em;
     display:flex;flex-direction:column;line-height:1.35}
@@ -110,6 +124,7 @@
   #card .rds .kun{color:var(--faint)}
   #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
     z-index:8;opacity:.4;transition:opacity .4s,width .25s;touch-action:none}
+  #lvl:focus-visible{outline:2px solid var(--pig1);outline-offset:-2px}
   #lvl.hot{opacity:1;width:56px}
   #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
     border-radius:2px;transition:background .25s,width .25s,box-shadow .25s}
@@ -153,7 +168,20 @@
   #radoc .rex .rt b{color:var(--ink);font-weight:500;font-style:normal}
   #radoc .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;
     font-size:13px;letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;font-family:inherit}
+    border:1px solid var(--line);border-radius:999px;min-width:44px;min-height:44px;
+    padding:8px 15px;cursor:pointer;font-family:inherit}
+  #radoc[inert]{pointer-events:none}
+  #driftActions{position:fixed;z-index:10;display:flex;gap:7px;left:50%;bottom:72px;
+    transform:translateX(-50%);padding:6px;border:1px solid var(--line);border-radius:999px;
+    background:var(--plaque);box-shadow:0 6px 22px rgba(0,0,0,.12)}
+  #driftActions[hidden]{display:none}
+  #driftActions button{min-width:44px;min-height:44px;padding:6px 11px;border:1px solid var(--line);
+    border-radius:999px;background:transparent;color:var(--ink);font:12px/1.15 inherit;cursor:pointer}
+  #driftActions button:focus-visible,#card button:focus-visible,#radoc button:focus-visible{
+    outline:2px solid var(--pig1);outline-offset:2px}
+  body.drift-reduced,body.drift-reduced *,body.drift-reduced *::before,body.drift-reduced *::after{
+    animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;
+    transition-delay:0s!important;scroll-behavior:auto!important}
 </style>
 <canvas id="ink"></canvas>
 <div id="grain"></div>
@@ -162,13 +190,14 @@
 <div id="sky"></div>
 <div id="brand"><span id="seal">分</span>墨流し</div>
 <div id="depth"></div>
-<button id="theme" aria-label="pigment theme">北斎</button>
+<button id="theme" type="button" aria-label="pigment theme: 北斎">北斎</button>
+<button id="driftBack" type="button" data-action="navigation.back" aria-label="水面へ戻る — back" hidden>水面へ戻る</button>
 <div id="tray"></div>
 <div id="hint">ことばに触れて</div>
-<div id="lvl"><div id="lvlTrack"></div><div id="lvlHandle"></div>
+<div id="lvl" role="slider" tabindex="0" aria-label="ことばの潮位" aria-orientation="vertical"><div id="lvlTrack"></div><div id="lvlHandle"></div>
 <div id="lvlLabels"></div><div id="lvlInfo"></div></div>
-<div id="card"></div>
-<div id="radoc"><button class="x" id="radocX">閉じる ×</button><div class="wrap">
+<div id="card" role="dialog" aria-modal="true" aria-hidden="true" inert></div>
+<div id="radoc" role="dialog" aria-modal="true" aria-label="部首 — radicals" aria-hidden="true" inert><button type="button" class="x" id="radocX" data-action="layer.dismiss">閉じる ×</button><div class="wrap">
 <h2>部首 — radicals</h2><div class="sub">THE SHAPES A KANJI IS FILED UNDER</div>
 <p>Every kanji is built from smaller recurring shapes. One of them is chosen as its <b>radical</b> (部首, <i>bushu</i>) — the piece a dictionary files it under, the way an English word is filed under its first letter. There are <b>214</b> classical (Kangxi) radicals, and learning to spot them turns a wall of strokes into a handful of familiar parts.</p>
 <p>A radical often carries meaning. The water radical 氵 hints that a kanji is about water; the tree radical 木 that it is about wood or plants. So a radical is both an index and a clue.</p>
@@ -178,12 +207,27 @@
 <div class="rex"><span class="rc">言</span><span class="rt"><b>word / speech</b> (ごんべん) · 語 language · 話 talk · 読 read · 記 record</span></div>
 <p style="color:var(--faint);font-size:13px">Tap any character in a radical's family list to travel to it and keep exploring.</p>
 </div></div>
+<div id="driftActions" role="group" aria-label="選んだことばの操作" hidden>
+<button type="button" data-action="constellation.lock">つながりを開く</button>
+<button type="button" data-action="judgment.nominate" data-judgment="known">知っている</button>
+<button type="button" data-action="judgment.nominate" data-judgment="unknown">まだ知らない</button>
+</div>
 <script>
 "use strict";
 const TAU=Math.PI*2;
 const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
-const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reducedQuery=matchMedia("(prefers-reduced-motion: reduce)");
+let reduced=reducedQuery.matches;
+const driftRoot=document.getElementById("drift-layer")||document.body;
+function syncReducedMotion(){
+  reduced=reducedQuery.matches;
+  driftRoot.classList.toggle("drift-reduced",reduced);
+  if(reduced){ripples?.splice?.(0);particles?.splice?.(0);trailFx=null;cam.vx=0;cam.vy=0;camT=null;}
+}
+if(reducedQuery.addEventListener) reducedQuery.addEventListener("change",syncReducedMotion);
+else if(reducedQuery.addListener) reducedQuery.addListener(syncReducedMotion);
+driftRoot.classList.toggle("drift-reduced",reduced);
 const rgbOf=h=>{const n=parseInt(h.slice(1),16);return [n>>16,(n>>8)&255,n&255];};
 const rgba=(h,a)=>{const c=rgbOf(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";};
 const shade=(h,f,a)=>{const c=rgbOf(h);
@@ -340,7 +384,68 @@ const hint=document.getElementById("hint");
 const depthEl=document.getElementById("depth");
 const veilEl=document.getElementById("veil");
 const themeBtn=document.getElementById("theme");
+const driftBack=document.getElementById("driftBack");
+const driftActions=document.getElementById("driftActions");
 const rootStyle=document.documentElement.style;
+
+// ---- substrate-neutral action boundary ----
+// Drift owns presentation and its small local known/unknown pigment memory.
+// Every input route first emits the same semantic action envelope. The
+// Corridor/domain layer may observe that nomination, but Drift never calls a
+// scheduler and never writes Corridor/FSRS state.
+const DRIFT_ACTIONS=new Set(["target.activate","constellation.lock","tide.set",
+  "judgment.nominate","navigation.back","layer.dismiss"]);
+const driftReceipts=[];
+let lastInputModality="programmatic";
+addEventListener("keydown",()=>{lastInputModality="keyboard";},true);
+addEventListener("pointerdown",()=>{lastInputModality="pointer";},true);
+function modalityOf(e){return e&&e.detail===0?"keyboard":lastInputModality;}
+function driftEmit(action,modality="programmatic",sourceId="drift"){
+  if(!DRIFT_ACTIONS.has(action&&action.kind)) throw new Error("unknown Drift action "+(action&&action.kind));
+  const upstream=window.__KAIRO_INTERACTION__;
+  if(upstream&&typeof upstream.dispatch==="function")
+    return upstream.dispatch(action,{modality,sourceId});
+  const envelope=Object.freeze({action:Object.freeze({...action}),
+    provenance:Object.freeze({modality,sourceId})});
+  driftReceipts.push(envelope);
+  window.dispatchEvent(new CustomEvent("kairo:interaction",{detail:envelope}));
+  return envelope;
+}
+window.__DRIFT_INTERACTION__=Object.freeze({receipts:driftReceipts,dispatch:driftEmit});
+function actionTarget(n){
+  return {kind:n.kind,id:n.kind==="word"?n.w:n.ch};
+}
+
+// Source Drift is awake by default. The fused generator changes this one
+// authoritative flag to false and drives it through __DRIFT__. Page visibility
+// is a second, independent lifetime boundary so background time consumes no
+// constellation TTL or ambient work.
+let driftSurfaceEnabled=true;
+let driftPageVisible=!document.hidden;
+let driftRafOn=false;
+let driftHiddenAt=0;
+const driftRunning=()=>driftSurfaceEnabled&&driftPageVisible;
+function startDriftFrame(){
+  if(driftRunning()&&!driftRafOn){driftRafOn=true;lastT=0;requestAnimationFrame(frame);}
+}
+function setDriftSurfaceEnabled(on){
+  driftSurfaceEnabled=!!on;
+  if(!on){touches?.clear?.();pinch=null;gestureActive=false;gestureId=null;clearTimeout(lpTimer);}
+  else startDriftFrame();
+}
+document.addEventListener("visibilitychange",()=>{
+  const now=performance.now();
+  driftPageVisible=!document.hidden;
+  if(!driftPageVisible){driftHiddenAt=now;return;}
+  if(driftHiddenAt){
+    const paused=now-driftHiddenAt;
+    if(bloomBorn) bloomBorn+=paused;
+    if(bloomLast) bloomLast+=paused;
+    if(trailFx) trailFx.born+=paused;
+    driftHiddenAt=0;
+  }
+  startDriftFrame();
+});
 
 // ---- canvases ----
 const ink=document.getElementById("ink"), ictx=ink.getContext("2d");
@@ -636,6 +741,7 @@ function applyTheme(ix){
   rootStyle.setProperty("--bloomCtr",t.accent);
   rootStyle.setProperty("--bloomHalo",t.halo);
   themeBtn.textContent=t.name;
+  themeBtn.setAttribute("aria-label","pigment theme: "+t.name);
   blobs.forEach((b,i)=>{b.color=b.mass?(i%2?t.pig1:t.pig2):t.pool[i%t.pool.length];});
   for(const k2 in HUBSPR) delete HUBSPR[k2];
   for(const n of nodes)
@@ -643,7 +749,11 @@ function applyTheme(ix){
   renderPaper();
   ripple(vw()/2,vh()/2,true);
 }
-themeBtn.addEventListener("click",()=>applyTheme((themeIx+1)%THEMES.length));
+themeBtn.addEventListener("click",e=>{
+  const next=(themeIx+1)%THEMES.length;
+  driftEmit({kind:"target.activate",target:{kind:"theme",id:THEMES[next].name}},modalityOf(e));
+  applyTheme(next);
+});
 
 // ---- nodes ----
 const nodeOf=new Map();
@@ -692,6 +802,71 @@ const stack=[];
 let journey=[];
 
 function setBlur(n,b){ if(n.blur!==b){n.blur=b;n.el.style.filter=b?("blur("+b+"px)"):"";} }
+const RELATION_LABEL={syn:"synonym",fam:"word family",thm:"theme",col:"collocation",
+  ant:"opposite",reg:"register variant"};
+let selectedActionNode=null;
+function nodeSurface(n){return n.kind==="word"?n.w:n.ch;}
+function syncNodeSemantic(n){
+  const bits=[nodeSurface(n)];
+  if(n.kind==="word"){
+    if(n.el.classList.contains("unfolded")&&n.r) bits.push("reading "+n.r);
+    if(n.el.classList.contains("glossed")&&n.g) bits.push(n.g);
+  } else {
+    const gloss=n.kind==="part"?(PDEF[n.ch]&&PDEF[n.ch][1]):glossOf(n.ch);
+    if(gloss) bits.push(gloss);
+  }
+  if(n.el.dataset.relation) bits.push(RELATION_LABEL[n.el.dataset.relation]||n.el.dataset.relation);
+  n.el.setAttribute("aria-label",bits.join(", "));
+}
+function syncNodeAvailability(n){
+  const on=!n.gone&&!n.removed&&n.mode!=="recede"&&n.op>0.16&&
+    n.x>-30&&n.x<vw()+30&&n.y>72&&n.y<vh()-58;
+  n.el.tabIndex=on?0:-1;
+  n.el.setAttribute("aria-hidden",on?"false":"true");
+  if(!on&&document.activeElement===n.el){
+    const fallback=!driftBack.hidden?driftBack:themeBtn;
+    fallback.focus({preventScroll:true});
+  }
+}
+function showNodeActions(n){
+  if(!n||n.gone||n.removed) return;
+  selectedActionNode=n;
+  const lock=driftActions.querySelector('[data-action="constellation.lock"]');
+  lock.hidden=n.kind==="part"||stack.length>0;
+  n.el.after(driftActions);
+  driftActions.hidden=false;
+}
+function hideNodeActions(){
+  driftActions.hidden=true;
+  selectedActionNode=null;
+}
+function wireNode(n){
+  const el=n.el;
+  el.type="button";
+  el.dataset.action="target.activate";
+  el.dataset.targetKind=n.kind;
+  el.dataset.targetId=nodeSurface(n);
+  for(const child of el.children) child.setAttribute("aria-hidden","true");
+  syncNodeSemantic(n);
+  syncNodeAvailability(n);
+  n.semanticObserver=new MutationObserver(()=>syncNodeSemantic(n));
+  n.semanticObserver.observe(el,{attributes:true,attributeFilter:["class","data-relation"]});
+  el.addEventListener("keydown",e=>{
+    if(e.key==="Enter"||e.key===" ") showNodeActions(n);
+  });
+  el.addEventListener("click",e=>{
+    e.stopPropagation();
+    if(n.pointerHandledUntil&&performance.now()<n.pointerHandledUntil&&e.detail!==0) return;
+    const modality=modalityOf(e);
+    if(modality!=="pointer") showNodeActions(n);
+    activateNode(n,modality);
+  });
+}
+function setNodeRelation(n,type){
+  if(!n||!type) return;
+  n.el.dataset.relation=type;
+  syncNodeSemantic(n);
+}
 function spawnWord(entry,x,y,fadeIn){
   const w=entry[0],r=entry[1],g=entry[2],p=entry[4]||"",lvl=entry[5]||3;
   const i=seq++;
@@ -702,7 +877,7 @@ function spawnWord(entry,x,y,fadeIn){
   const st=fragile?"f":"k";
   const z=fragile?[1,1.22][i%2]:[0.66,0.84,1,1.18][i%4];
   const base=fragile?27+(i%3)*4:16+(i%4)*3;
-  const el=document.createElement("div");
+  const el=document.createElement("button");
   el.className="word"+(fragile?" fragile":"");
   el.innerHTML='<span class="yomi">'+esc(r)+'</span><span class="base">'+esc(w)+'</span><span class="gloss">'+esc(g)+'</span>';
   el.style.fontSize=Math.round(base*z)+"px";
@@ -718,11 +893,11 @@ function spawnWord(entry,x,y,fadeIn){
     dragX:0,dragY:0,mode:"free",orbit:null,blur:0,gone:false,removed:false,fromW:false};
   n.cr=n.rot;
   if(z<0.7) setBlur(n,1.2);
-  nodes.push(n); nodeOf.set(el,n);
+  nodes.push(n); nodeOf.set(el,n); wireNode(n);
   return n;
 }
 function spawnGlyph(ch,x,y,comp){
-  const el=document.createElement("div");
+  const el=document.createElement("button");
   el.className="glyph"+(comp?" comp":"");
   el.innerHTML='<span class="g">'+esc(ch)+'</span><small>'+esc(glossOf(ch))+'</small>';
   sky.appendChild(el);
@@ -730,17 +905,17 @@ function spawnGlyph(ch,x,y,comp){
   el.style.color=THEMES[themeIx].wcol[ci];
   const n={kind:"glyph",ch,comp:!!comp,el,x,y,z:1,baseOp:.95,ci,s:.3,ts:1,tx:x,ty:y,op:0,top:.95,
     rot:0,cr:0,vx:0,vy:0,dragX:0,dragY:0,mode:"orbit",orbit:null,blur:0,gone:false,removed:false};
-  nodes.push(n); nodeOf.set(el,n);
+  nodes.push(n); nodeOf.set(el,n); wireNode(n);
   return n;
 }
 function spawnPart(ch,x,y){
-  const el=document.createElement("div");
+  const el=document.createElement("button");
   el.className="part";
   el.innerHTML='<span class="pch">'+esc(ch)+'</span><small>'+esc(PDEF[ch]?PDEF[ch][1]:"")+'</small>';
   sky.appendChild(el);
   const n={kind:"part",ch,el,x,y,z:1,baseOp:.9,s:.3,ts:1,tx:x,ty:y,op:0,top:.9,
     rot:0,cr:0,vx:0,vy:0,dragX:0,dragY:0,mode:"orbit",orbit:null,blur:0,gone:false,removed:false};
-  nodes.push(n); nodeOf.set(el,n);
+  nodes.push(n); nodeOf.set(el,n); wireNode(n);
   return n;
 }
 // ---- the vault-field: a world plane of galaxies, seen through a camera ----
@@ -860,7 +1035,13 @@ const topUp=refreshActive;
 
 function removeNode(n,delay){
   const el=n.el;
+  if(selectedActionNode===n) hideNodeActions();
+  if(document.activeElement===el){
+    const fallback=!driftBack.hidden?driftBack:themeBtn;
+    fallback.focus({preventScroll:true});
+  }
   setTimeout(function(){
+    if(n.semanticObserver) n.semanticObserver.disconnect();
     el.remove(); nodeOf.delete(el); n.removed=true;
     const ix=nodes.indexOf(n); if(ix>=0) nodes.splice(ix,1);
   },delay);
@@ -1036,6 +1217,7 @@ function clearBloom(keep){
     wr.hl=false; wr.ret=true;
     if(wr.node){
       wr.node.hlDom=false; wr.node.el.classList.remove("bsat");
+      delete wr.node.el.dataset.relation;
       if(wr.node.fromBloom&&!wr.node.gone&&wr.node!==keep){
         const bn=wr.node;
         bn.gone=true; bn.top=0; bn.el.style.pointerEvents="none";
@@ -1052,6 +1234,7 @@ function clearBloom(keep){
   // ghosts go home with their constellation — except one the learner touched,
   // which has earned its place in the field (I1)
   for(const s of LOCKS){
+    delete s.el.dataset.relation;
     if(s===keep||s.walked||s.el.classList.contains("unfolded")){
       s.ghostKept=true; s.hlDom=false; s.el.classList.remove("bsat");
       s.top=s.baseOp; continue;
@@ -1160,11 +1343,13 @@ function constellationLock(n){
       if(wr){
         wr.ox=gx-wr.wx; wr.oy=gy-wr.wy;
         wr.hl=true; wr.lk=true; wr.ret=false;
-        lockMaterialize(wr);
+        setNodeRelation(lockMaterialize(wr),ty);
         FOCUS.push(wr);
         LOCK.items.push({t:"w",wr,L,pg,ty});
       } else {
-        LOCK.items.push({t:"s",label:rel,ty,L,pg,node:lockGhost(rel,se[2],gx,gy)});
+        const ghost=lockGhost(rel,se[2],gx,gy);
+        setNodeRelation(ghost,ty);
+        LOCK.items.push({t:"s",label:rel,ty,L,pg,node:ghost});
       }
       if(++semN>=semLimit) break;
     }
@@ -1287,6 +1472,8 @@ function markDive(label){
   }
   journey.push(label);
   maxDepth=Math.max(maxDepth,stack.length);
+  driftBack.hidden=stack.length===0;
+  hideNodeActions();
   updateTray(); veilUpdate();
 }
 function beginLevel(center){
@@ -1308,7 +1495,7 @@ function diveWord(n){
   // the node we are diving INTO must survive the constellation it came from —
   // a bare clearBloom() marks a materialized member gone and removes it 500ms
   // into the dive, leaving the level with a centre that no longer exists
-  card.classList.remove("open"); clearBloom(n); collapseUnfold();
+  closeCard("programmatic",false); clearBloom(n); collapseUnfold();
   const lvl=beginLevel(n);
   recedeAllExcept(lvl,n,null);
   n.mode="center"; n.el.classList.add("center","unfolded","glossed");
@@ -1381,7 +1568,7 @@ function diveWord(n){
   if(!divedOnce){divedOnce=true;setHint("水にふれると戻る");}
 }
 function diveKanji(g){
-  card.classList.remove("open");
+  closeCard("programmatic",false);
   // no constellation rides into a dive: submerged it is unreachable (every
   // water tap at depth surfaces instead of releasing) and comes back at full
   // presence, silently undoing the release the learner made. diveWord has
@@ -1445,7 +1632,7 @@ function diveKanji(g){
   stack.push(lvl); markDive(g.ch);
 }
 function divePart(p){
-  card.classList.remove("open");
+  closeCard("programmatic",false);
   const parent=stack[stack.length-1];
   const lvl=beginLevel(p);
   const keep=new Set();
@@ -1478,7 +1665,8 @@ function divePart(p){
 let trailFx=null;
 function surface(){
   const lvl=stack.pop(); if(!lvl) return;
-  card.classList.remove("open");
+  closeCard("programmatic",false);
+  driftBack.hidden=stack.length===0;
   for(const rec of lvl.receded) if(!rec.n.gone) restore(rec.n,rec.saved);
   const c=lvl.center;
   if(!c.gone){
@@ -1685,7 +1873,21 @@ function studyHtml(kind,key,fallback){
   return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">この'+
     (kind==='word'?'語':'字')+'を学ぶ →</a>';
 }
+let cardReturnNode=null;
+function closeCard(modality="programmatic",emit=true){
+  if(!card.classList.contains("open")) return false;
+  if(emit) driftEmit({kind:"layer.dismiss",layer:"drift-card"},modality);
+  card.classList.remove("open");
+  card.setAttribute("aria-hidden","true");
+  card.inert=true;
+  const back=cardReturnNode;
+  cardReturnNode=null;
+  if(back&&!back.gone&&!back.removed) back.el.focus({preventScroll:true});
+  else if(!driftBack.hidden) driftBack.focus({preventScroll:true});
+  return true;
+}
 function openCard(n){
+  cardReturnNode=n;
   if(n.kind==="word"){
     const ks=[...new Set(n.w)].filter(isKanji);
     card.innerHTML='<div class="yomi">'+esc(n.r)+'</div><h1>'+esc(n.w)+'</h1>'+
@@ -1714,9 +1916,9 @@ function openCard(n){
     const famHtml=fam?('<div class="rhead">'+(num?("部首 "+num+"：この部首をもつ "):"この字を含む ")+
       fam.length+'字 <button class="radq" id="radQ">部首とは？</button></div>'+
       '<div class="rlist">'+[...fam].map(c=>
-        '<div class="rrow" data-ch="'+esc(c)+'"><span class="rk">'+esc(c)+'</span>'+
-        '<span class="rr">'+esc(onOf(c))+(kunOf(c)?('<i>'+esc(kunOf(c))+'</i>'):"")+'</span>'+
-        '<span class="rm">'+esc(glossOf(c))+'</span></div>').join("")+'</div>'):"";
+        '<button type="button" class="rrow" data-ch="'+esc(c)+'"><span class="rk">'+esc(c)+'</span>'+ 
+        '<span class="rr">'+esc(onOf(c))+(kunOf(c)?('<i>'+esc(kunOf(c))+'</i>'):"")+'</span>'+ 
+        '<span class="rm">'+esc(glossOf(c))+'</span></button>').join("")+'</div>'):"";
     card.innerHTML='<div class="yomi">'+esc(glossOf(n.ch))+(num?(' · 部首 '+num):"")+'</div>'+
       '<div class="kx"><h1>'+esc(n.ch)+'</h1>'+
       ((on||kun)?('<div class="rds">'+(on?('<div>'+esc(on)+'</div>'):"")+
@@ -1749,7 +1951,16 @@ function openCard(n){
       show();
     }
   }
+  const closer=document.createElement("button");
+  closer.type="button"; closer.id="cardClose"; closer.dataset.action="layer.dismiss";
+  closer.setAttribute("aria-label","詳細を閉じる — close"); closer.textContent="閉じる ×";
+  closer.addEventListener("click",e=>{e.stopPropagation();closeCard(modalityOf(e));});
+  card.prepend(closer);
+  card.setAttribute("aria-label",nodeSurface(n)+" details");
+  card.setAttribute("aria-hidden","false");
+  card.inert=false;
   card.classList.add("open");
+  closer.focus({preventScroll:true});
 }
 
 // ---- level slider: N5→N1 blended with school grade + 漢検; 自 = adaptive ----
@@ -1771,16 +1982,23 @@ STOPS.forEach((s,i)=>{
   lvlLabels.appendChild(d);
 });
 let lvlHotTimer=0;
+let lvlIx=3;
+lvlEl.setAttribute("aria-valuemin","0");
+lvlEl.setAttribute("aria-valuemax",String(STOPS.length-1));
 function lvlStopAt(clientY){
   const r=lvlEl.getBoundingClientRect();
   const f=clamp((clientY-r.top)/r.height,0,1);
   return Math.round(f*(STOPS.length-1));
 }
-function lvlSet(ix,commit){
+function lvlSet(ix,commit,modality="programmatic"){
+  ix=clamp(ix,0,STOPS.length-1); lvlIx=ix;
   const s=STOPS[ix];
   lvlHandle.style.top=(ix/(STOPS.length-1)*100)+"%";
   lvlInfo.textContent=s.info;
+  lvlEl.setAttribute("aria-valuenow",String(ix));
+  lvlEl.setAttribute("aria-valuetext",s.k+" — "+s.info);
   if(commit){
+    driftEmit({kind:"tide.set",value:s.k,level:s.lv||null},modality);
     if(s.lv&&s.lv!==level){level=s.lv;tideChange();}
     if(!s.lv) setHint("実物では、AI評価・SRS・模試から現在地を推定");
   }
@@ -1801,6 +2019,7 @@ function tideChange(){
 }
 let lvlDrag=false;
 lvlEl.addEventListener("pointerdown",e=>{
+  if(!driftRunning()) return;
   e.stopPropagation();lvlDrag=true;
   lvlEl.classList.add("hot");clearTimeout(lvlHotTimer);
   lvlSet(lvlStopAt(e.clientY),false);
@@ -1809,13 +2028,24 @@ lvlEl.addEventListener("pointermove",e=>{
   if(lvlDrag){e.stopPropagation();lvlSet(lvlStopAt(e.clientY),false);}
 });
 addEventListener("pointerup",e=>{
+  if(!driftRunning()) return;
   if(lvlDrag){
     lvlDrag=false;
-    lvlSet(lvlStopAt(e.clientY),true);
+    lvlSet(lvlStopAt(e.clientY),true,"pointer");
     clearTimeout(lvlHotTimer);
     lvlHotTimer=setTimeout(()=>lvlEl.classList.remove("hot"),1600);
   }
 },true);
+lvlEl.addEventListener("keydown",e=>{
+  let next=lvlIx;
+  if(e.key==="ArrowUp"||e.key==="ArrowLeft") next--;
+  else if(e.key==="ArrowDown"||e.key==="ArrowRight") next++;
+  else if(e.key==="Home") next=0;
+  else if(e.key==="End") next=STOPS.length-1;
+  else return;
+  e.preventDefault();
+  lvlSet(clamp(next,0,STOPS.length-1),true,"keyboard");
+});
 lvlSet(3,false);
 
 // ---- hint ----
@@ -1829,11 +2059,68 @@ setTimeout(function(){hint.style.opacity="0";},7000);
 
 // ---- radical explainer ----
 const radoc=document.getElementById("radoc");
-function openRadoc(){ radoc.classList.add("open"); }
-function closeRadoc(){ radoc.classList.remove("open"); }
-document.getElementById("radocX").addEventListener("click",closeRadoc);
+let radocReturnFocus=null;
+function openRadoc(){
+  radocReturnFocus=document.activeElement;
+  radoc.inert=false; radoc.setAttribute("aria-hidden","false"); radoc.classList.add("open");
+  document.getElementById("radocX").focus({preventScroll:true});
+}
+function closeRadoc(modality="programmatic",emit=true){
+  if(!radoc.classList.contains("open")) return false;
+  if(emit) driftEmit({kind:"layer.dismiss",layer:"radical-explainer"},modality);
+  radoc.classList.remove("open"); radoc.inert=true; radoc.setAttribute("aria-hidden","true");
+  const back=radocReturnFocus; radocReturnFocus=null;
+  if(back&&back.isConnected&&typeof back.focus==="function") back.focus({preventScroll:true});
+  return true;
+}
+document.getElementById("radocX").addEventListener("click",e=>closeRadoc(modalityOf(e)));
 radoc.addEventListener("click",e=>{ if(e.target===radoc) closeRadoc(); });
-addEventListener("keydown",e=>{ if(e.key==="Escape") closeRadoc(); });
+addEventListener("keydown",e=>{
+  if(!driftRunning()) return;
+  if(e.key==="Escape"){
+    if(closeRadoc("keyboard")){e.preventDefault();return;}
+    if(closeCard("keyboard")){e.preventDefault();return;}
+  }
+  if(e.key==="Tab"&&radoc.classList.contains("open")){
+    const stops=[...radoc.querySelectorAll('button,a[href],[tabindex]:not([tabindex="-1"])')]
+      .filter(el=>!el.disabled&&!el.hidden);
+    if(!stops.length) return;
+    const first=stops[0],last=stops[stops.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+});
+
+function activateNode(n,modality){
+  if(!n||n.gone||n.removed) return;
+  driftEmit({kind:"target.activate",target:actionTarget(n)},modality);
+  tapNode(n);
+}
+function lockNode(n,modality){
+  if(!n||n.gone||n.removed||stack.length||n.kind==="part") return;
+  driftEmit({kind:"constellation.lock",target:actionTarget(n)},modality);
+  constellationLock(n);
+}
+function nominateNode(n,dir,modality){
+  if(!n||n.gone||n.removed) return;
+  driftEmit({kind:"judgment.nominate",target:actionTarget(n),judgment:dir>0?"known":"unknown"},modality);
+  grade(n,dir);
+}
+function navigateBack(modality){
+  if(!stack.length) return;
+  driftEmit({kind:"navigation.back",from:"drift-depth"},modality);
+  closeCard(modality,false);
+  surface();
+}
+driftActions.querySelector('[data-action="constellation.lock"]').addEventListener("click",e=>{
+  e.stopPropagation(); lockNode(selectedActionNode,modalityOf(e));
+});
+for(const button of driftActions.querySelectorAll('[data-action="judgment.nominate"]'))
+  button.addEventListener("click",e=>{
+    e.stopPropagation();
+    nominateNode(selectedActionNode,button.dataset.judgment==="known"?1:-1,modalityOf(e));
+  });
+driftBack.addEventListener("click",e=>{e.stopPropagation();navigateBack(modalityOf(e));});
 
 // ---- interaction ----
 function tapNode(n){
