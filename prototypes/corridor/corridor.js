@@ -618,6 +618,22 @@ function rubyNode(pairs, { furigana, revealed }) {
   return frag;
 }
 
+/** The token's word content as exactly ONE row.
+ *
+ * `.tok.content` is an inline-flex COLUMN (it keeps the glyph box identical
+ * before and after English mounts — see corridor.css). rubyNode returns a
+ * FRAGMENT, so a token whose ruby covers only the stem — 含め becomes
+ * <ruby>含<rt>ふく</rt></ruby> plus a bare "め" text node — would drop the ruby
+ * and its okurigana into that column as SIBLING flex items, and the word would
+ * tear into stacked rows (含 over め). Wrapping the word in this single child
+ * keeps the column at exactly [word row, optional .tok-en gloss row].
+ */
+function wordRow(pairs, opts) {
+  const row = el('span', 'tok-word');
+  row.append(rubyNode(pairs, opts));
+  return row;
+}
+
 /** Kanji dial: 0 as written · 1 above-常用 replaced by its reading · 2 all kana. */
 function displayPairs(token) {
   const mode = S.dials.kanji;
@@ -1101,17 +1117,25 @@ function paintTok(span, token, index) {
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
   } else if (S.dials.furigana === 0) {
-    // the dial says no ruby — a per-word reveal builds it on the spot
+    // the dial says no ruby — a per-word reveal builds it on the spot.
+    // Swap the WORD ROW alone: the column must stay [word row, gloss row], so
+    // wiping the whole span (and re-appending) would both drop the wrapper and
+    // land a rebuilt word AFTER an existing gloss. replaceWith keeps the order
+    // and leaves any mounted .tok-en untouched for the block below.
     const built = span.querySelector('ruby');
-    if (hasReading && !built) {
-      span.querySelector('.tok-en')?.remove();
-      const frag = rubyNode(displayPairs(token), { furigana: 1, revealed: true });
-      span.textContent = '';
-      span.append(frag);
-    } else if (!hasReading && built) {
-      span.querySelector('.tok-en')?.remove();
-      span.textContent = '';
-      span.append(rubyNode(displayPairs(token), { furigana: 0, revealed: false }));
+    if (hasReading !== !!built) {
+      const next = wordRow(displayPairs(token), {
+        furigana: hasReading ? 1 : 0,
+        revealed: hasReading,
+      });
+      const row = span.querySelector('.tok-word');
+      if (row) {
+        row.replaceWith(next);
+      } else {
+        span.querySelector('.tok-en')?.remove();
+        span.textContent = '';
+        span.append(next);
+      }
     }
   }
   span.classList.toggle('lit', !!(S.revealed?.has(index) || hasEn));
@@ -1311,7 +1335,7 @@ function renderReader(main) {
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
-      rubyNode(displayPairs(token), {
+      wordRow(displayPairs(token), {
         furigana: S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),

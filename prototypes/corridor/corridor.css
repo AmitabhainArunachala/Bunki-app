@@ -409,6 +409,16 @@ button.tok::before {
   line-height: 1.3;
 }
 
+/* The word is ONE row inside that column. A stem-only ruby (含め → <ruby>含</ruby>
+ * + bare "め") otherwise lands as two SIBLING flex items and the word tears
+ * into stacked rows. The wrapper is inert on .tok.plain — it stays a normal
+ * inline span there and changes no line flow; only inside the flex column does
+ * it become the single word row, holding the column to [word, gloss]. */
+.tok.content > .tok-word {
+  display: block;
+  white-space: nowrap;
+}
+
 .token-door {
   position: relative;
   display: inline;
