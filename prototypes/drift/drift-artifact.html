@@ -725,7 +725,7 @@ function spawnWord(entry,x,y,fadeIn){
   // font box the DOM carries, seqId the stable tie-break, collide the eased
   // "recede to atmosphere" multiplier the arbiter drives (never a removal)
   const n={kind:"word",w,r,g,st,p,lvl,el,z,baseOp,ci,
-    seqId:i,fpx:Math.round(base*z),collide:1,collideTarget:1,pevSet:"",
+    seqId:i,fpx:Math.round(base*z),collide:1,collideTarget:1,ghostOp:null,
     x,y,s:1,ts:1,tx:x,ty:y,op:fadeIn?0:baseOp,top:baseOp,
     rot:(Math.random()-.5)*3,cr:0,
     vx:(Math.random()-.5)*.26,vy:(Math.random()-.5)*.18,
@@ -1950,6 +1950,12 @@ addEventListener("pointerdown",e=>{
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
   pn=el?nodeOf.get(el):null;
   if(pn&&pn.gone) pn=null;
+  // NOTE, deliberately: touch is NOT re-arbitrated by loudness here. An earlier
+  // cut handed a tap in an overlap to the louder word, which reads well until
+  // you measure it — a ghost lying wholly inside a louder word then has no
+  // point of its own left, and an unreachable word is a disappeared word. Paint
+  // recedes; touch stays exactly as the field always resolved it, and answering
+  // a ghost brings it straight back to full presence.
   if(!pn&&lockOn&&stack.length===0){
     let best=null,bd=40;
     for(const wr of FOCUS){
@@ -2402,12 +2408,36 @@ function drawFx(t,dt){
 }
 
 // ---- spatial arbitration ----
-// No two legible words may overprint, and no live word may sit beneath the
-// fixed chrome. Runs only at the resting surface with nothing held: the
-// loudest (nearest, largest) word wins its patch of water and anything it
-// would tangle with recedes to faint atmosphere. Nothing is ever removed —
-// recede is an eased opacity floor the arbiter lifts again the moment the
-// tangle clears, so the only thing that ever leaves the field is a judgment.
+// Two words at reading presence must not print through each other, and no word
+// at reading presence may sit beneath the fixed chrome. Runs only at the
+// resting surface with nothing held.
+//
+// THE LOSER OF A TANGLE BECOMES A GHOST, NOT AN ABSENCE. The law is that
+// nothing leaves this screen except a deliberate flick judgment, so the arbiter
+// is bound on both sides:
+//   · from below — a ghost renders at GHOST_ABS at the very least, a presence
+//     the field already paints its own faintest words at, and it NEVER loses
+//     its touch target. Tap it and it comes back at full presence.
+//   · from above — a ghost is at most GHOST_REL of the word that beat it, so
+//     there is always a real figure and a real ground.
+// The floor is not a number picked here. It is read from the field itself each
+// pass: the quietest word spawnWord is already painting. A ghost is never
+// quieter than the quietest word the surface is showing anyway — so the arbiter
+// can only ever move a word WITHIN the presence range the field already uses,
+// and can never invent a new, fainter one. That ladder predates the arbiter and
+// the arbiter cannot move it.
+//
+// The two bounds only both fit when the winner is loud enough to make room
+// (floor <= GHOST_REL * winner, i.e. winner >= floor / CONTEND_MAX), so a word
+// quieter than that has no right to push anyone back. When no one can win, the
+// arbiter leaves the tangle alone rather than push a word out of existence —
+// a soft tangle is a legibility cost; a vanished word breaks the law.
+// GHOST_REL sits below CONTEND_MAX on purpose: it leaves the floor binding for
+// all but the loudest winners, which is the safe side of the trade — a ghost
+// pinned at the field's own floor is both the most present it can be for the
+// law and the most separated it can be for reading.
+const GHOST_ABS=0.30, GHOST_REL=0.45, CONTEND_MAX=0.53;
+let ghostFloor=GHOST_ABS;   // the live floor, exposed so the harness can audit it
 let chromeRects=[];
 function refreshChromeRects(){
   chromeRects.length=0;
@@ -2436,24 +2466,58 @@ function resolveCollisions(){
     // a held word and its constellation are never arbitrated away
     if(n===focusN||n.hlDom){ n.collideTarget=1; continue; }
     const fpx=(n.fpx||14)*n.s*cz;
-    if(n.op<0.34||fpx<13){ n.collideTarget=1; continue; }   // faint atmosphere is left alone
-    arr.push({n,cx:n.x+n.dragX,cy:n.y+n.dragY,hw:n.w.length*fpx*0.55,hh:fpx*0.62,eff:n.op,fpx});
+    // EVERY word is a candidate to recede — a naturally quiet word printed
+    // through a loud one is exactly as unreadable as two loud ones, and an
+    // entry filter here would leave that pair permanently tangled. What ARB_MIN
+    // gates is the right to WIN: only a word at reading presence can push
+    // another one back, because only then is there room for a ghost that stays
+    // above the floor.
+    const cx=n.x+n.dragX, cy=n.y+n.dragY, hw=n.w.length*fpx*0.55, hh=fpx*0.62;
+    // Only the field the learner can actually see takes part. A word parked off
+    // screen can tangle with nothing, and — the reason this matters — letting it
+    // into the set drags the floor down: the floor is meant to be the quietest
+    // presence ON SCREEN, and an off-screen word would set a floor no visible
+    // word ever reaches, leaving ghosts fainter than anything actually shown.
+    // exactly the words with pixels on screen — no margin. A word with nothing
+    // visible can tangle with nothing, and including it would let it set a floor
+    // that no word the learner can see ever reaches.
+    if(cx+hw<0||cx-hw>vw()||cy+hh<0||cy-hh>vh()){ n.collideTarget=1; continue; }
+    arr.push({n,cx,cy,hw,hh,eff:n.op,fpx});
   }
+  // the field's own floor, read fresh each pass: the quietest presence
+  // spawnWord is already painting, never under GHOST_ABS
+  let minEff=Infinity;
+  for(const a of arr) if(a.eff<minEff) minEff=a.eff;
+  const floorOp=Math.max(GHOST_ABS,minEff===Infinity?GHOST_ABS:minEff);
+  ghostFloor=floorOp;
+  const winMin=floorOp/CONTEND_MAX;   // the presence it takes to win a patch of water
   arr.sort((a,b)=> b.eff-a.eff || b.fpx-a.fpx || a.n.seqId-b.n.seqId);
   const kept=[];
   for(const a of arr){
-    let hide=false;
+    let ghost=0;   // 0 = keep; >0 = the rendered opacity this word recedes to
     for(const c of chromeRects){
-      if(a.cx+a.hw>c.x&&a.cx-a.hw<c.x+c.w&&a.cy+a.hh>c.y&&a.cy-a.hh<c.y+c.h){hide=true;break;}
+      if(a.cx+a.hw>c.x&&a.cx-a.hw<c.x+c.w&&a.cy+a.hh>c.y&&a.cy-a.hh<c.y+c.h){ghost=floorOp;break;}
     }
-    if(!hide) for(const k of kept){
-      const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
-      if(ox<=0) continue;
-      const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
-      if(oy<=0) continue;
-      if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.16){hide=true;break;}
+    if(!ghost){
+      // A ghost must be quiet enough for EVERY word it tangles with, not just
+      // the loudest one — a word beaten by a loud neighbour may also overlap a
+      // quiet one, and pitched against that quiet one it would still be mush.
+      // So the level is set by the QUIETEST winner in the tangle.
+      let quietestWinner=Infinity;
+      for(const k of kept){
+        if(k.eff<winMin) continue;              // too quiet to take anyone's water
+        const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
+        if(ox<=0) continue;
+        const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
+        if(oy<=0) continue;
+        // 0.12, not a comfortable 0.16: at high zoom the field drifts across the
+        // screen ~cam.z times faster, so a tangle can slip between two passes
+        if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.12&&k.eff<quietestWinner) quietestWinner=k.eff;
+      }
+      if(quietestWinner<Infinity) ghost=Math.max(floorOp,GHOST_REL*quietestWinner);
     }
-    if(hide) a.n.collideTarget=0.10; else { a.n.collideTarget=1; kept.push(a); }
+    if(ghost){ a.n.ghostOp=ghost; a.n.collideTarget=0; }
+    else { a.n.collideTarget=1; kept.push(a); }
   }
 }
 
@@ -2563,24 +2627,27 @@ function frame(t){
     n.op+=(n.top-n.op)*0.08;
     const rt=(n.mode==="center")?0:n.rot;
     n.cr+=(rt-n.cr)*0.08;
-    let col=1;
+    const dimBase=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
+    let outOp=dimBase;
     if(n.kind==="word"){
       if(n.collide==null){n.collide=1;n.collideTarget=1;}
       // a word taken into a constellation arrives at FULL presence at once:
       // easing a receded word back over ~330ms handed the learner a satellite
-      // that was still faint and still pointer-transparent when they tapped it
+      // that was still faint when they tapped it
       if(n===focusN||n.hlDom){n.collide=1;n.collideTarget=1;}
       else n.collide+=((n.collideTarget==null?1:n.collideTarget)-n.collide)*0.12;
-      col=n.collide;
-      // a word receded to atmosphere stops swallowing the taps meant for the
-      // loud word printed over it; it takes them back as it returns
-      if(!n.gone){
-        const pev=n.collide<0.4?"none":"";
-        if(n.pevSet!==pev){n.pevSet=pev;n.el.style.pointerEvents=pev;}
-      }
+      // collide eases between present (1) and ghost (0). The ghost is a
+      // RENDERED opacity, not a multiplier: it cannot be diluted to nothing by
+      // a word that was already quiet, and receding never brightens a word
+      // that is fainter than the floor to begin with.
+      const gh=Math.min(dimBase,n.ghostOp==null?ghostFloor:n.ghostOp);
+      outOp=dimBase*n.collide+gh*(1-n.collide);
     }
-    const dimBase=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
-    n.el.style.opacity=(dimBase*col).toFixed(3);
+    // NOTE: a receded word never loses its touch target. Loudest-word-wins is a
+    // rule about PAINT; the tap arbitration in pointerdown hands the finger to
+    // the loudest word under it, which leaves the ghost reachable everywhere
+    // nothing louder covers it. Tapping one brings it straight back.
+    n.el.style.opacity=outOp.toFixed(3);
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
   }

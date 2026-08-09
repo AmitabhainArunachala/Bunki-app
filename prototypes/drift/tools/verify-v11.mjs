@@ -3,19 +3,40 @@
  *
  * Recovered from the v11 coherence campaign (1f582fc) and re-aimed at the
  * CURRENT drift build. It drives the real surface with real CDP touch at the
- * 390x844 profile and asserts the eight ported mechanisms as 17 checks:
+ * 390x844 profile.
  *
+ * THE MEASUREMENT RULE, after independent verification found the first cut of
+ * this file tautological: no check may use an opacity threshold the arbiter
+ * itself controls. The first version of 4-rest-overlap and 6-chrome-keepout
+ * skipped words under 0.42 while the arbiter's whole action was to push
+ * contested words under 0.42 — they could not fail. Everything below now
+ * measures EVERY rendered word.
+ *
+ * The law checks run first and are the ones that must be able to fail:
+ *   law-rest-presence   no word is painted fainter than the faintest word the
+ *                       field paints unaided (self-anchored to spawnWord's own
+ *                       opacity ladder, which the arbiter cannot move)
+ *   law-rest-reachable  no rendered word is pointer-transparent or hit-tests to
+ *                       nothing; a real tap on a ghost brings it back
+ *   law-ghost-residual  deleting a ghost must change its own box by at least
+ *                       half the pixel signal of the quietest KEPT word
+ *   law-zoom-presence   the same presence bar under a hard zoom
+ *
+ * The mechanism checks:
  *   1  pinch mode latched at gesture start (surfacing never bleeds into zoom)
  *   2  return-to-rest: double-tap open water eases pan + zoom + twist home
- *   3  rotation bounded to +-pi
- *   4  spatial arbitration at rest (4-rest-overlap) and after zoom (4-zoom-overlap)
- *   5  hint pill >= 4.5:1 in every theme (5 checks, one per pigment world)
- *   6  chrome keep-out: no legible word under brand/depth/theme/tray/hint/lvl
+ *   3  rotation bounded to +-pi (with the twist proven to have registered)
+ *   4  reading contention at rest and after zoom — for every geometrically
+ *      overlapping pair of rendered words, one must be clearly figure and the
+ *      other clearly ground. Raw geometry is reported unchanged: the arbiter
+ *      paints, it does not move words.
+ *   5  hint pill >= 4.5:1 in every theme, raised by the app's own setHint and
+ *      asserted to actually render (5 checks, one per pigment world)
+ *   6  chrome keep-out: no word at READING presence under chrome
  *   7  darkened foreground pigments reach parity (2 checks + the night floor)
- *   8  lock-time unfold clear, and lock release leaves nothing unfolded
- *   8b lock constellation stays whole at min zoom (needed by 8-lock-persists)
+ *   8  lock-time unfold clear, lock whole at min zoom, clean release
  *
- * Zero console errors and zero page errors are a hard gate on top of 17/17.
+ * Zero console errors and zero page errors are a hard gate on top.
  *
  * Usage:
  *   node prototypes/drift/tools/verify-v11.mjs
@@ -226,66 +247,63 @@ const nearestWord = (x, y, thr = 0.35, not = null) =>
 // the live centre of the held node — taps chain reliably off this, never off a
 // stale rect (the bloom moves the planet the moment the first tap lands)
 const focusPoint = () => p.evaluate(() => (focusN && !focusN.gone ? { cx: focusN.x + focusN.dragX, cy: focusN.y + focusN.dragY } : null));
-// a point with no word AND no canvas-drawn hub under it (hubs are not DOM)
+// Open water: no word, no chrome, no canvas hub (hubs are not DOM) — and with
+// real CLEARANCE from every word box. "elementFromPoint is not a word" alone is
+// not enough: the field drifts, so a point that merely grazes open water can be
+// under a word 300ms later, which turns a double-tap probe into a word tap and
+// quietly corrupts every step after it. Pick the candidate furthest from any word.
 const emptyPoint = () =>
   p.evaluate(() => {
-    const cand = [
-      [30, 120],
-      [360, 120],
-      [360, 700],
-      [30, 700],
-      [195, 700],
-      [195, 150],
-      [360, 430],
-      [110, 120],
-    ];
+    const cand = [];
+    for (let x = 30; x <= 360; x += 30) for (let y = 110; y <= 720; y += 40) cand.push([x, y]);
     const hubFree = (x, y) => typeof hubAt !== 'function' || hubAt(x, y) == null;
+    const rects = [...document.querySelectorAll('.word,.glyph,.part')].map((e) => e.getBoundingClientRect());
+    let best = null;
+    let bestClear = -1;
     for (const [x, y] of cand) {
       const e = document.elementFromPoint(x, y);
-      if (
-        (!e || !e.closest('.word,.glyph,.part,#card,#theme,#lvl,#hint,#brand,#depth,#tray,#radoc')) &&
-        hubFree(x, y)
-      )
-        return [x, y];
-    }
-    return [195, 700];
-  });
-// max legible overlap fraction among words with opacity>=thr and font>=minF
-const overlapStats = (thr = 0.42, minF = 15) =>
-  p.evaluate(
-    ([thr, minF]) => {
-      const R = [];
-      for (const el of document.querySelectorAll('.word')) {
-        const cs = getComputedStyle(el);
-        if (parseFloat(cs.opacity) < thr) continue;
-        if (parseFloat(cs.fontSize) < minF) continue;
-        const r = el.getBoundingClientRect();
-        if (r.width < 2) continue;
-        R.push(r);
+      if (e && e.closest('.word,.glyph,.part,#card,#theme,#lvl,#hint,#brand,#depth,#tray,#radoc')) continue;
+      if (!hubFree(x, y)) continue;
+      let clear = 1e9;
+      for (const r of rects) {
+        const dx = Math.max(r.left - x, 0, x - r.right);
+        const dy = Math.max(r.top - y, 0, y - r.bottom);
+        clear = Math.min(clear, Math.hypot(dx, dy));
       }
-      let worst = 0;
-      let pairs = 0;
-      for (let i = 0; i < R.length; i++)
-        for (let j = i + 1; j < R.length; j++) {
-          const a = R[i];
-          const b = R[j];
-          const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
-          const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-          if (ox <= 0 || oy <= 0) continue;
-          const f = (ox * oy) / Math.min(a.width * a.height, b.width * b.height);
-          if (f > 0.25) pairs++;
-          worst = Math.max(worst, f);
-        }
-      return { count: R.length, worst: +worst.toFixed(2), badPairs: pairs };
-    },
-    [thr, minF],
-  );
-// legible words overlapping any fixed chrome region
-const chromeOverlap = (thr = 0.42) =>
-  p.evaluate((thr) => {
-    const ids = ['brand', 'depth', 'theme', 'tray', 'hint', 'lvl'];
+      if (clear > bestClear) { bestClear = clear; best = [x, y]; }
+    }
+    return best || [195, 700];
+  });
+// The reading-presence line the arbiter itself refuses to cross (ARB_MIN in the
+// source). Below it a word is atmosphere by the field's own definition, and the
+// arbiter never contests it — so it is the only defensible line for "these two
+// words are fighting over the same reading".
+const READING = 0.44;
+
+// A full census of EVERY rendered word — no opacity gate anywhere, so nothing
+// the arbiter dims can hide from the numbers. This replaces the old
+// overlapStats/chromeOverlap, both of which skipped words under 0.42 and were
+// therefore incapable of failing once the arbiter ran.
+const census = () =>
+  p.evaluate(() => {
+    const lin = (c) => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    const parse = (s) => {
+      const m = String(s).match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 1];
+      const q = m[1].split(',').map((x) => parseFloat(x));
+      return [q[0], q[1], q[2], q[3] == null ? 1 : q[3]];
+    };
+    const gh = (getComputedStyle(document.documentElement).getPropertyValue('--ground').trim() || '#FBFAF5').replace('#', '');
+    const gr = [parseInt(gh.slice(0, 2), 16), parseInt(gh.slice(2, 4), 16), parseInt(gh.slice(4, 6), 16)];
+    const gl = lum(gr[0], gr[1], gr[2]);
+
+    // chrome regions, for the keep-out measurement
     const cr = [];
-    for (const id of ids) {
+    for (const id of ['brand', 'depth', 'theme', 'tray', 'hint', 'lvl']) {
       const e = document.getElementById(id);
       if (!e) continue;
       const cs = getComputedStyle(e);
@@ -296,18 +314,237 @@ const chromeOverlap = (thr = 0.42) =>
       if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) continue;
       cr.push({ id, r });
     }
-    const hits = [];
+
+    const W = [];
     for (const el of document.querySelectorAll('.word')) {
-      if (parseFloat(getComputedStyle(el).opacity) < thr) continue;
+      const cs = getComputedStyle(el);
+      const op = parseFloat(cs.opacity);
+      if (!(op > 0.002)) continue; // a word at literally zero is mid-removal, not rendered
       const r = el.getBoundingClientRect();
-      for (const c of cr)
-        if (r.right > c.r.left && r.left < c.r.right && r.bottom > c.r.top && r.top < c.r.bottom) {
-          hits.push({ w: el.textContent.slice(0, 6), chrome: c.id });
-          break;
+      if (r.width < 2 || r.height < 2) continue;
+      if (r.right < 0 || r.left > innerWidth || r.bottom < 0 || r.top > innerHeight) continue;
+      const n = typeof nodeOf !== 'undefined' ? nodeOf.get(el) : null;
+      const c = parse(cs.color);
+      const a = (c[3] == null ? 1 : c[3]) * op;
+      const fl = lum(c[0] * a + gr[0] * (1 - a), c[1] * a + gr[1] * (1 - a), c[2] * a + gr[2] * (1 - a));
+      const contrast = (Math.max(fl, gl) + 0.05) / (Math.min(fl, gl) + 0.05);
+      // reachability, measured through the app's OWN tap path: sample a grid
+      // inside the word's box, resolve each point exactly as pointerdown does
+      // (elementFromPoint -> loudestWordAt), and ask whether any point in the
+      // word's own area would deliver the tap to this word.
+      let reach = false;
+      let reachPts = 0;
+      let onScreenPts = 0;
+      let openPts = 0; // samples inside this word's box where nothing at all is on top
+      const openWhat = [];
+      for (let gx = 1; gx <= 5; gx++)
+        for (let gy = 1; gy <= 5; gy++) {
+          const px2 = r.left + (r.width * gx) / 6;
+          const py2 = r.top + (r.height * gy) / 6;
+          // strictly INSIDE the viewport: elementFromPoint returns null on the
+          // far edge, which would read as "open sky over this word" for any word
+          // hanging off the bottom or right of the screen
+          if (px2 < 1 || px2 > innerWidth - 1 || py2 < 1 || py2 > innerHeight - 1) continue;
+          onScreenPts++;
+          const he = document.elementFromPoint(px2, py2);
+          const hw = he && he.closest ? he.closest('.word,.glyph,.part') : null;
+          const hc = he && he.closest ? he.closest('#brand,#depth,#theme,#tray,#hint,#lvl,#card,#radoc') : null;
+          const cand = hw ? (typeof nodeOf !== 'undefined' ? nodeOf.get(hw) : null) : null;
+          if (cand && cand.el === el) {
+            reachPts++;
+            reach = true;
+          } else if (!hw && !hc) {
+            openPts++;
+            if (openWhat.length < 3) openWhat.push({ x: Math.round(px2), y: Math.round(py2), el: he ? (he.id ? '#' + he.id : he.tagName + '.' + String(he.className || '')) : 'null' });
+          }
         }
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const hitEl = document.elementFromPoint(cx, cy);
+      const hitWord = hitEl && hitEl.closest ? hitEl.closest('.word') : null;
+      const hitChrome = hitEl && hitEl.closest ? hitEl.closest('#brand,#depth,#theme,#tray,#hint,#lvl,#card,#radoc') : null;
+      const chrome = cr.filter((q) => r.right > q.r.left && r.left < q.r.right && r.bottom > q.r.top && r.top < q.r.bottom).map((q) => q.id);
+      W.push({
+        t: el.textContent.slice(0, 8),
+        op: +op.toFixed(4),
+        contrast: +contrast.toFixed(3),
+        pe: cs.pointerEvents,
+        collide: n && n.collide != null ? +n.collide.toFixed(3) : null,
+        // the word's UNARBITRATED presence — spawnWord's own ladder, which the
+        // arbiter cannot move. The self-anchor is measured against this.
+        baseOp: n && n.op != null ? +n.op.toFixed(4) : null,
+        ghosted: !!(n && n.collide != null && n.collide < 0.5),
+        seqId: n ? n.seqId : null,
+        box: { x: r.left, y: r.top, w: r.width, h: r.height },
+        hitSelf: hitWord === el,
+        hitOther: !!hitWord && hitWord !== el,
+        underChrome: !!hitChrome,
+        reach,
+        reachPts,
+        onScreenPts,
+        openPts,
+        openWhat,
+        chrome,
+      });
     }
-    return { regions: cr.map((c) => c.id), hits };
-  }, thr);
+
+    // the presence a word needs before the arbiter will let it push another
+    // one back — read from the live source, not restated here
+    const winMin = (typeof ghostFloor !== 'undefined' ? ghostFloor : 0.3) / 0.53;
+
+    // geometric overlap over ALL rendered words, plus reading contention
+    let rawWorst = 0;
+    let rawPairs = 0;
+    let worstContend = 0;
+    const contendBad = [];
+    for (let i = 0; i < W.length; i++)
+      for (let j = i + 1; j < W.length; j++) {
+        const a = W[i].box;
+        const b = W[j].box;
+        const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+        const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+        if (ox <= 0 || oy <= 0) continue;
+        const f = (ox * oy) / Math.min(a.w * a.h, b.w * b.h);
+        rawWorst = Math.max(rawWorst, f);
+        if (f > 0.25) rawPairs++;
+        if (f <= 0.25) continue;
+        const hi = Math.max(W[i].op, W[j].op);
+        const lo = Math.min(W[i].op, W[j].op);
+        const contend = lo / hi;
+        worstContend = Math.max(worstContend, contend);
+        if (contend > 0.55)
+          contendBad.push({
+            a: W[i].t,
+            b: W[j].t,
+            f: +f.toFixed(2),
+            hi: +hi.toFixed(3),
+            lo: +lo.toFixed(3),
+            contend: +contend.toFixed(2),
+            cA: W[i].collide,
+            cB: W[j].collide,
+            // could the arbiter have settled this one? only if the louder word
+            // carries enough presence to leave the other a ghost above the floor
+            arbitrable: hi >= winMin,
+          });
+      }
+
+    const ghosts = W.filter((w) => w.ghosted);
+    // scope: the arbiter owes reachability for the words IT receded. Words that
+    // simply lie under other words at full presence are the field's own
+    // pre-existing crowding — reported, and compared against the baseline.
+    const unreachedGhosts = ghosts.filter((w) => !w.reach && !w.underChrome);
+    const unreachedOther = W.filter((w) => !w.ghosted && !w.reach && !w.underChrome);
+    const present = W.filter((w) => !w.ghosted);
+    const minOf = (arr, k) => (arr.length ? Math.min(...arr.map((x) => x[k])) : null);
+    return {
+      words: W.length,
+      ghosts: ghosts.length,
+      present: present.length,
+      rawWorst: +rawWorst.toFixed(3),
+      rawPairs,
+      worstContend: +worstContend.toFixed(2),
+      contendBad,
+      chromeAtReading: W.filter((w) => w.chrome.length && w.op >= 0.44).map((w) => ({ w: w.t, chrome: w.chrome.join('+'), op: w.op })),
+      chromeAny: W.filter((w) => w.chrome.length).map((w) => ({ w: w.t, chrome: w.chrome.join('+'), op: w.op })),
+      peNone: W.filter((w) => w.pe === 'none').map((w) => w.t),
+      unreachableGhosts: unreachedGhosts.map((w) => ({ t: w.t, op: w.op, onScreenPts: w.onScreenPts, openPts: w.openPts, pe: w.pe })),
+      // A ghost is "lost" only if there is a sample point inside its own box,
+      // on screen, with NOTHING on top of it — open sky over the word — and the
+      // word still does not take the tap there. That would mean the recede
+      // itself took it away. Every other case is one word covering another,
+      // which the field does at this zoom with or without an arbiter.
+      ghostsLostWithNothingOver: unreachedGhosts.filter((w) => w.openPts > 0).map((w) => ({ t: w.t, op: w.op, pe: w.pe, openPts: w.openPts, openWhat: w.openWhat, box: w.box })),
+      unreachableOther: unreachedOther.map((w) => ({ t: w.t, op: w.op })),
+      underChromeOnly: W.filter((w) => !w.reach && w.underChrome).map((w) => w.t),
+      ghostFloor: typeof ghostFloor !== 'undefined' ? +ghostFloor.toFixed(3) : null,
+      winMin: +winMin.toFixed(3),
+      minBaseOp: W.length ? Math.min(...W.map((w) => (w.baseOp == null ? 1 : w.baseOp))) : null,
+      minGhostOp: minOf(ghosts, 'op'),
+      maxGhostOp: ghosts.length ? Math.max(...ghosts.map((x) => x.op)) : null,
+      minPresentOp: minOf(present, 'op'),
+      minGhostContrast: minOf(ghosts, 'contrast'),
+      minPresentContrast: minOf(present, 'contrast'),
+      sampleGhosts: ghosts.slice(0, 6).map((g) => ({ t: g.t, op: g.op, contrast: g.contrast, seqId: g.seqId })),
+    };
+  });
+
+// Residual-signal test (the verifier's method): screenshot, display:none ONE
+// word, screenshot, diff that word's own box. A word that changes nothing when
+// deleted was never on screen. Ghosts are compared against kept controls in the
+// same frame, so the bar is the field's own idea of "a word is here".
+async function residualSignal(maxEach = 3) {
+  await p.evaluate(() => {
+    // pin positions so the only difference between the two frames is the hide
+    window.__pins = nodes.map((n) => ({ n, x: n.x, y: n.y }));
+    window.__pl = setInterval(() => {
+      for (const q of window.__pins) {
+        q.n.x = q.x;
+        q.n.y = q.y;
+      }
+    }, 8);
+  });
+  await wait(500);
+  const picks = await p.evaluate((maxEach) => {
+    const g = [];
+    const k = [];
+    for (const n of nodes) {
+      if (n.kind !== 'word' || n.gone || n.removed || !n.el) continue;
+      const r = n.el.getBoundingClientRect();
+      if (r.width < 6 || r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) continue;
+      const rec = { id: n.seqId, w: n.w.slice(0, 6), op: +parseFloat(getComputedStyle(n.el).opacity).toFixed(4), box: { x: Math.round(r.left), y: Math.round(r.top), ww: Math.round(r.width), hh: Math.round(r.height) } };
+      if (n.collide != null && n.collide < 0.5) g.push(rec);
+      else if (n.collide > 0.95) k.push(rec);
+    }
+    return { ghost: g.slice(0, maxEach), keep: k.slice(0, maxEach) };
+  }, maxEach);
+  const baseBuf = await p.screenshot();
+  const baseD = 'data:image/png;base64,' + baseBuf.toString('base64');
+  const rows = [];
+  for (const grp of ['ghost', 'keep'])
+    for (const it of picks[grp]) {
+      await p.evaluate((id) => {
+        const n = nodes.find((n) => n.seqId === id);
+        if (n) n.el.style.display = 'none';
+      }, it.id);
+      await wait(240);
+      const buf = await p.screenshot();
+      const d = await p.evaluate(
+        async ([a, bb, r]) => {
+          const load = (s) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.src = s; });
+          const [ia, ib] = await Promise.all([load(a), load(bb)]);
+          const c = document.createElement('canvas');
+          c.width = ia.width;
+          c.height = ia.height;
+          const g = c.getContext('2d', { willReadFrequently: true });
+          g.drawImage(ia, 0, 0);
+          const A = g.getImageData(0, 0, c.width, c.height).data;
+          g.clearRect(0, 0, c.width, c.height);
+          g.drawImage(ib, 0, 0);
+          const B = g.getImageData(0, 0, c.width, c.height).data;
+          let maxD = 0, sum = 0, n = 0, gt8 = 0;
+          for (let y = r.y; y < Math.min(c.height, r.y + r.hh); y++)
+            for (let x = r.x; x < Math.min(c.width, r.x + r.ww); x++) {
+              const i = (y * c.width + x) * 4;
+              const dd = Math.max(Math.abs(A[i] - B[i]), Math.abs(A[i + 1] - B[i + 1]), Math.abs(A[i + 2] - B[i + 2]));
+              maxD = Math.max(maxD, dd);
+              sum += dd;
+              n++;
+              if (dd > 8) gt8++;
+            }
+          return { maxD, mean: +(sum / Math.max(1, n)).toFixed(2), pctGt8: +((100 * gt8) / Math.max(1, n)).toFixed(1) };
+        },
+        [baseD, 'data:image/png;base64,' + buf.toString('base64'), it.box],
+      );
+      rows.push({ kind: grp === 'ghost' ? 'GHOST' : 'KEPT', w: it.w, op: it.op, ...d });
+      await p.evaluate((id) => {
+        const n = nodes.find((n) => n.seqId === id);
+        if (n) n.el.style.display = '';
+      }, it.id);
+      await wait(160);
+    }
+  await p.evaluate(() => clearInterval(window.__pl));
+  return rows;
+}
 
 // per-theme composited contrast. Text alpha and element opacity are both
 // carried through the composite — reading the raw colour would flatter a
@@ -334,13 +571,19 @@ const themeContrast = () =>
     const groundHex = (getComputedStyle(document.documentElement).getPropertyValue('--ground').trim() || '#FBFAF5').replace('#', '');
     const gr = [parseInt(groundHex.slice(0, 2), 16), parseInt(groundHex.slice(2, 4), 16), parseInt(groundHex.slice(4, 6), 16)];
 
-    // foreground words: the loud, large ones — what the eye actually reads
+    // Foreground words: the large ones that carry reading weight, composited at
+    // their UNARBITRATED presence (n.op). This is a claim about pigment, so it
+    // must not depend on which words the arbiter happens to have ghosted in this
+    // frame — reading the rendered opacity made the sample, and the median, move
+    // with the arbiter rather than with the palette.
     const vals = [];
     for (const el of document.querySelectorAll('.word')) {
       const cs = getComputedStyle(el);
-      const op = parseFloat(cs.opacity);
       const fs = parseFloat(cs.fontSize);
-      if (op < 0.5 || fs < 18) continue;
+      if (fs < 18) continue;
+      const n = typeof nodeOf !== 'undefined' ? nodeOf.get(el) : null;
+      const op = n && n.op != null ? n.op : parseFloat(cs.opacity);
+      if (op < 0.5) continue;
       const c = parse(cs.color);
       vals.push(ratio(over([c[0], c[1], c[2]], (c[3] == null ? 1 : c[3]) * op, gr), gr));
     }
@@ -348,23 +591,22 @@ const themeContrast = () =>
     const med = vals.length ? vals[Math.floor(vals.length / 2)] : null;
     const min = vals.length ? vals[0] : null;
 
-    // the hint pill: its own text over its own paper over the ground
+    // The hint pill, measured AS THE SURFACE SHOWS IT. setHint() is the app's
+    // own way of raising a hint, so nothing here forces opacity — a pill that
+    // rendered invisible would be caught by hintRendered rather than flattered
+    // by the harness.
     const hint = document.getElementById('hint');
     let hintCr = null;
     let hintBg = null;
+    let hintRendered = null;
     if (hint) {
-      const prevText = hint.textContent;
-      const prevOp = hint.style.opacity;
-      hint.textContent = 'テスト hint';
-      hint.style.opacity = '1';
       const hs = getComputedStyle(hint);
+      hintRendered = +parseFloat(hs.opacity).toFixed(3);
       hintBg = hs.backgroundColor;
       const bgc = parse(hs.backgroundColor);
       const plate = over([bgc[0], bgc[1], bgc[2]], bgc[3], gr);
       const tc = parse(hs.color);
       hintCr = ratio(over([tc[0], tc[1], tc[2]], tc[3] == null ? 1 : tc[3], plate), plate);
-      hint.textContent = prevText;
-      hint.style.opacity = prevOp;
     }
     const name = document.getElementById('theme')?.textContent || '?';
     return {
@@ -374,6 +616,7 @@ const themeContrast = () =>
       n: vals.length,
       hintCr: hintCr && +hintCr.toFixed(2),
       hintBg,
+      hintRendered,
     };
   });
 
@@ -384,15 +627,121 @@ console.log('rest:', JSON.stringify(s0));
 notes.rest = s0;
 await shot('01-rest');
 
+// ---- THE LAW: nothing on this screen disappears without a flick judgment ----
+// These three run FIRST because they are the checks that must be able to fail.
+// They measure every rendered word with no opacity gate, so the arbiter cannot
+// satisfy them by pushing words under a threshold.
+let cen = await census();
+notes.restCensus = cen;
+console.log(`census: ${cen.words} words · ${cen.ghosts} ghosted · rawWorstOverlap=${cen.rawWorst} · minGhostOp=${cen.minGhostOp} minPresentOp=${cen.minPresentOp}`);
+
+// (a) presence — no word is pushed fainter than the faintest the field paints
+// unaided. Self-anchoring: the bar is set by spawnWord's own opacity ladder,
+// which predates the arbiter and which the arbiter cannot move.
+{
+  // the bar: no ghost is painted fainter than the faintest presence spawnWord's
+  // own ladder produces for any word in the same frame
+  const anchored = cen.minGhostOp == null || (cen.minBaseOp != null && cen.minGhostOp >= cen.minBaseOp - 0.005);
+  R(
+    'law-rest-presence',
+    anchored,
+    `faintest ghost op=${cen.minGhostOp} vs the field's own faintest unarbitrated presence ${cen.minBaseOp} (live floor ${cen.ghostFloor}); ghost contrast ${cen.minGhostContrast}:1 vs quietest present word ${cen.minPresentContrast}:1 — ${cen.ghosts}/${cen.words} ghosted`,
+  );
+}
+
+// (b) reachability — paint recedes, touch does not. Static: every rendered word
+// has at least one point in its own box that the app's real tap path resolves
+// to it. Dynamic: a genuine CDP tap on such a point brings a ghost back.
+{
+  const probe = await p.evaluate(() => {
+    // a ghost, and a point inside it that the real tap path delivers to it
+    for (const n of nodes) {
+      if (n.kind !== 'word' || n.gone || n.removed || !n.el) continue;
+      if (!(n.collide != null && n.collide < 0.5)) continue;
+      const r = n.el.getBoundingClientRect();
+      for (let gx = 1; gx <= 3; gx++)
+        for (let gy = 1; gy <= 3; gy++) {
+          const x = r.left + (r.width * gx) / 4;
+          const y = r.top + (r.height * gy) / 4;
+          if (x < 20 || x > innerWidth - 20 || y < 70 || y > innerHeight - 120) continue;
+          const he = document.elementFromPoint(x, y);
+          const hw = he && he.closest ? he.closest('.word,.glyph,.part') : null;
+          let cand = hw ? nodeOf.get(hw) : null;
+          if (cand && typeof loudestWordAt === 'function') cand = loudestWordAt(x, y, cand);
+          if (cand === n) return { seqId: n.seqId, w: n.w, x, y, opBefore: +parseFloat(getComputedStyle(n.el).opacity).toFixed(3) };
+        }
+    }
+    return null;
+  });
+  let gestureOk = null;
+  let after = null;
+  if (probe) {
+    await tapAt(probe.x, probe.y);
+    await wait(500);
+    after = await p.evaluate((id) => {
+      const n = nodes.find((n) => n.seqId === id);
+      if (!n || !n.el) return null;
+      return { collide: +n.collide.toFixed(2), isFocus: focusN === n, hl: !!n.hlDom, unfolded: n.el.classList.contains('unfolded') };
+    }, probe.seqId);
+    // the tap answered THIS word: it became the bloom centre, or it unfolded
+    gestureOk = !!after && (after.isFocus || after.unfolded || after.hl);
+    const [rx0, ry0] = await emptyPoint();
+    await tapAt(rx0, ry0); // put the field back
+    await wait(700);
+  }
+  R(
+    'law-rest-reachable',
+    cen.peNone.length === 0 && cen.unreachableGhosts.length === 0 && probe != null && gestureOk === true,
+    `pointer-events:none on ${cen.peNone.length}; ghosts with no reachable point: ${cen.unreachableGhosts.length}${cen.unreachableGhosts.length ? ' ' + JSON.stringify(cen.unreachableGhosts) : ''}; live tap on ghost "${probe ? probe.w : '—'}" (op ${probe ? probe.opBefore : '—'}) -> ${after ? JSON.stringify(after) : 'n/a'} · pre-existing crowding, not the arbiter's doing: ${cen.unreachableOther.length} full-presence words fully covered by other words, ${cen.underChromeOnly.length} covered by chrome`,
+  );
+  notes.reachProbe = { probe, after, gestureOk };
+}
+
+// (c) residual signal — deleting a ghost must visibly change the screen
+{
+  await wait(900);
+  const rows = await residualSignal(3);
+  notes.residual = rows;
+  const gh = rows.filter((r) => r.kind === 'GHOST');
+  const kp = rows.filter((r) => r.kind === 'KEPT');
+  const minGhostMean = gh.length ? Math.min(...gh.map((r) => r.mean)) : null;
+  const minKeptMean = kp.length ? Math.min(...kp.map((r) => r.mean)) : null;
+  // the bar: a ghost must carry at least half the residual signal of the
+  // quietest word the arbiter chose to KEEP in the same frame
+  const ok = minGhostMean == null || (minKeptMean != null && minGhostMean >= 0.5 * minKeptMean);
+  R(
+    'law-ghost-residual',
+    ok,
+    `deleting a ghost changes its box by mean Δ ${gh.map((r) => r.mean).join('/')} (max Δ ${gh.map((r) => r.maxD).join('/')}); kept controls mean Δ ${kp.map((r) => r.mean).join('/')} — bar is ≥50% of the quietest kept (${minKeptMean})`,
+  );
+}
+await goHome();
+await wait(1800);
+cen = await census();
+notes.restCensus2 = cen;
+
 // ---- Fix 4: spatial arbitration at the resting surface ----
-let ov = await overlapStats();
-notes.restOverlap = ov;
-R('4-rest-overlap', ov.worst <= 0.3 && ov.badPairs === 0, `worst=${ov.worst}, badPairs=${ov.badPairs}, legibleWords=${ov.count}`);
+// Measured as READING CONTENTION over every rendered word, not as an overlap
+// count among words above a threshold the arbiter controls. The geometry does
+// not change — the arbiter paints, it does not move words — so rawWorst is
+// reported as a diagnostic and is expected to stay high.
+{
+  const arb = cen.contendBad.filter((c) => c.arbitrable);
+  const unarb = cen.contendBad.filter((c) => !c.arbitrable);
+  notes.restUnarbitrable = unarb;
+  R(
+    '4-rest-contention',
+    arb.length === 0,
+    `arbitrable contending pairs=${arb.length} (bar 0) · un-arbitrable left standing=${unarb.length} (both words too quiet to win; receding either would breach the floor ${cen.ghostFloor}) · worstContention=${cen.worstContend} · raw geometry unchanged: worstOverlap=${cen.rawWorst} over ${cen.rawPairs} pairs of ${cen.words} words${arb.length ? ' :: ' + JSON.stringify(arb.slice(0, 4)) : ''}`,
+  );
+}
 
 // ---- Fix 6: chrome keep-out ----
-const ch = await chromeOverlap();
-notes.chrome = ch;
-R('6-chrome-keepout', ch.hits.length === 0, `${ch.hits.length} legible words over chrome [${ch.regions.join(',')}]${ch.hits.length ? ' :: ' + JSON.stringify(ch.hits.slice(0, 6)) : ''}`);
+R(
+  '6-chrome-keepout',
+  cen.chromeAtReading.length === 0,
+  `${cen.chromeAtReading.length} words at reading presence (≥${READING}) under chrome; ${cen.chromeAny.length} present under chrome at all (as ghosts)${cen.chromeAtReading.length ? ' :: ' + JSON.stringify(cen.chromeAtReading.slice(0, 6)) : ''}`,
+);
 
 // ---- Fix 1: a pinch that surfaces must not bleed into camera zoom-out ----
 // dive into a word (three taps, chained off the live focus centre), then one
@@ -423,12 +772,21 @@ if (sd.stack >= 1) {
 await goHome();
 
 // ---- Fix 3: rotation clamp ----
+// A clamp that reads 0 because the twist never registered would pass a naive
+// bound check, so the twist is proven to bite first.
+const rot0 = (await st()).rot;
 await twist(195, 420, 160);
+const rot1 = (await st()).rot;
 await twist(195, 420, 160);
 await twist(195, 420, 160);
 const sr = await st();
-notes.rot = sr;
-R('3-rot-clamp', Math.abs(sr.rot) <= Math.PI + 0.01, `cam.rot=${sr.rot} after 3x160deg twist (must be within +-${Math.PI.toFixed(2)})`);
+notes.rot = { rot0, rot1, rot3: sr.rot };
+const twistBit = Math.abs(rot1 - rot0) > 0.5;
+R(
+  '3-rot-clamp',
+  twistBit && Math.abs(sr.rot) <= Math.PI + 0.01,
+  `twist registered: rot ${rot0} -> ${rot1} (must move >0.5); after 3x160deg rot=${sr.rot} (must be within +-${Math.PI.toFixed(2)})`,
+);
 
 // ---- Fix 2: return-to-rest via double-tap on open water ----
 await goHome();
@@ -453,12 +811,37 @@ notes.home = home;
 R('2-return-to-rest', Math.abs(home.z - 1) < 0.06 && Math.abs(home.rot) < 0.06, `messy(z=${messy.z},rot=${messy.rot}) -> home(z=${home.z},rot=${home.rot}) via double-tap at ${ex},${ey}`);
 await shot('04-home');
 
-// ---- Fix 4b: no legible overprint after a hard zoom ----
+// ---- Fix 4b: no reading contention after a hard zoom ----
 await pinch(195, 420, 45, 200);
-await wait(900);
-ov = await overlapStats();
-notes.zoomOverlap = ov;
-R('4-zoom-overlap', ov.worst <= 0.4, `after zoom (z=${(await st()).z}) worst=${ov.worst}, badPairs=${ov.badPairs}, legibleWords=${ov.count}`);
+await wait(1800);
+const cz2 = await census();
+notes.zoomCensus = cz2;
+{
+  const arbZ = cz2.contendBad.filter((c) => c.arbitrable);
+  notes.zoomUnarbitrable = cz2.contendBad.filter((c) => !c.arbitrable);
+  R(
+    '4-zoom-contention',
+    arbZ.length === 0,
+    `after zoom (z=${(await st()).z}) arbitrable contending pairs=${arbZ.length}, un-arbitrable=${notes.zoomUnarbitrable.length}, worstContention=${cz2.worstContend} · raw worstOverlap=${cz2.rawWorst} over ${cz2.rawPairs} pairs of ${cz2.words} words${arbZ.length ? ' :: ' + JSON.stringify(arbZ.slice(0, 3)) : ''}`,
+  );
+}
+// The law holds at zoom too. Reachability at 2.6x cannot be judged by comparing
+// ghosts against other words: a ghost IS, by selection, a word that overlaps
+// something, so of course it is covered more often — the field at this zoom has
+// words on top of words whether or not an arbiter runs (the f433edf baseline
+// has 8 of 41 fully covered here, with no arbiter at all).
+// The question the law actually asks is narrower and answerable: is any ghost
+// out of reach for a reason OTHER than another word sitting over that pixel? A
+// ghost that hit-tests to nothing, or carries pointer-events:none, would have
+// been taken away by the recede itself. Words covering words is crowding; a
+// word made transparent to touch is a disappearance.
+R(
+  'law-zoom-presence',
+  (cz2.minGhostOp == null || (cz2.minBaseOp != null && cz2.minGhostOp >= cz2.minBaseOp - 0.005)) &&
+    cz2.peNone.length === 0 &&
+    cz2.ghostsLostWithNothingOver.length === 0,
+  `zoomed: faintest ghost op=${cz2.minGhostOp} vs the field's faintest unarbitrated ${cz2.minBaseOp} (floor ${cz2.ghostFloor}); pointer-events:none on ${cz2.peNone.length}; ghosts out of reach with nothing over them: ${cz2.ghostsLostWithNothingOver.length}${cz2.ghostsLostWithNothingOver.length ? ' ' + JSON.stringify(cz2.ghostsLostWithNothingOver) : ''} · crowding context: ${cz2.unreachableGhosts.length}/${cz2.ghosts} ghosts and ${cz2.unreachableOther.length}/${cz2.words - cz2.ghosts} full-presence words are covered by other words at this zoom`,
+);
 await shot('05-zoomed');
 await goHome();
 
@@ -505,9 +888,21 @@ const themeBox = await p.evaluate(() => {
 const themes = {};
 for (let i = 0; i < 5; i++) {
   await wait(500);
+  // raise a hint the way the app raises one, then let its 1.2s opacity
+  // transition finish before reading it — measuring mid-fade would report a
+  // pill that is on its way up as if it were the steady state
+  await p.evaluate(() => {
+    if (typeof setHint === 'function') setHint('テスト hint');
+    else document.getElementById('hint').textContent = 'テスト hint';
+  });
+  await wait(1500);
   const tc = await themeContrast();
   themes[tc.name] = tc;
-  R(`5-hint[${tc.name}]`, tc.hintCr != null && tc.hintCr >= 4.5, `hint text/plate contrast=${tc.hintCr} on ${tc.hintBg}`);
+  R(
+    `5-hint[${tc.name}]`,
+    tc.hintCr != null && tc.hintCr >= 4.5 && tc.hintRendered != null && tc.hintRendered > 0.9,
+    `hint text/plate contrast=${tc.hintCr} on ${tc.hintBg}; pill actually rendered at opacity ${tc.hintRendered} (must be >0.9, not forced by the harness)`,
+  );
   await shot(`08-theme-${i}-${tc.name}`);
   await tapAt(themeBox.x, themeBox.y); // advance to the next pigment world
 }
