@@ -1,0 +1,15 @@
+source: /home/user/Bunki-app/.claude/worktrees/agent-accda929946b3f0eb/prototypes/drift/drift-artifact.html
+agreement N1 z=1: 64/64 poses identical
+agreement N2 z=1: 64/64 poses identical
+agreement N3 z=1: 64/64 poses identical
+agreement N4 z=1: 64/64 poses identical
+agreement N5 z=1: 64/64 poses identical
+
+N1 z=1 — own-level surfaced 529/2279 (23.2%) · distinct total 529 · 1600 poses
+N2 z=1 — own-level surfaced 524/1489 (35.2%) · distinct total 524 · 1600 poses
+N3 z=1 — own-level surfaced 515/1837 (28.0%) · distinct total 515 · 1600 poses
+N4 z=1 — own-level surfaced 422/535 (78.9%) · distinct total 547 · 1600 poses
+N5 z=1 — own-level surfaced 426/553 (77.0%) · distinct total 601 · 1600 poses
+
+page errors: 0
+wrote sweep-fixed-phase0.json

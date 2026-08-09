@@ -907,7 +907,42 @@ function w2s(wx,wy){
 function camClamp(){
   const mx=Math.min(WR.w*0.44,vw()/(2*cam.z)*0.7), my=Math.min(WR.h*0.44,vh()/(2*cam.z)*0.7);
   cam.x=clamp(cam.x,mx,WR.w-mx); cam.y=clamp(cam.y,my,WR.h-my);
+  pageOdometer();
 }
+// ---- pool paging -----------------------------------------------------------
+// A tide's own level holds far more words than the 64 refreshActive can carry
+// as readable DOM at once (N1 alone is 2,279), and `pri` used to end in a FIXED
+// per-word hash — so the same ~530 of N1 won every contest forever and the rest
+// of the tier could never be read at all, only seen as ink. `pagePhase` rotates
+// that tie-break so the 64 slots page through the whole tier.
+//
+// It advances with PAN DISTANCE, never with the clock: hold still and the field
+// is exactly as stable as it has always been — nothing re-sorts under a resting
+// eye. The exchange happens only while you are already swimming, under cover of
+// the words the pan is already carrying off-glass.
+//
+// PAGE_SPAN is 2 for an exact reason, not a tuned one. The seat h01 is the old
+// tie-break rescaled from its (-0.99, 0.99) into [0, 1), so at pagePhase 0 the
+// wheel contributes 2*h01 = oldTieBreak + 1 — a CONSTANT +1 on every word in
+// the field, which is no reordering at all. A tide that has not been panned yet
+// therefore chooses the same 64 words this file has always chosen, down to the
+// tie order; the rest state the arbiter and the v11 laws were verified against
+// is preserved exactly, and the wheel only ever departs from it while swimming.
+// The bound that matters is the other one: a tide's own level must still
+// outrank every neighbour absolutely, own-level floor 8 > 2.4+1.6+0.8+PAGE_SPAN
+// = 6.8, which holds with room to spare.
+const PAGE_SPAN=2.0, PAGE_CYCLE=40000;
+let pagePhase=0, panOdoX=null, panOdoY=null;
+function pageOdometer(){
+  if(panOdoX!==null){
+    const d=Math.hypot(cam.x-panOdoX,cam.y-panOdoY);
+    // a teleport is not swimming: a resize rebuild or a dive's camera ease can
+    // move the camera a screen in one step, and the wheel must not lurch for it
+    if(d<200) pagePhase=(pagePhase+d/PAGE_CYCLE)%1;
+  }
+  panOdoX=cam.x; panOdoY=cam.y;
+}
+const pageOf=wr=>wr.h01<pagePhase?wr.h01-pagePhase+1:wr.h01-pagePhase;
 const strHash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;};
 // kanji hubs: the most word-productive characters become galaxy suns
 const HUBS=(()=>{
@@ -968,8 +1003,25 @@ function buildWorld(){
 function rePri(){
   for(const wr of WORDS){
     const e=wr.e, lm=Math.abs((e[5]||3)-level);
+    // the standing part of the priority — level band, then the two judgments
     wr.pri=(lm===0?8:lm===1?2.4:0)+(store.unknown[e[0]]?1.6:0)+
-      (e[3]==="f"?0.8:0)+((strHash(e[0])>>2)%100)/100;
+      (e[3]==="f"?0.8:0);
+    // ...and the word's fixed seat on the paging wheel, which pagePhase turns.
+    // This is the SAME expression that used to ride on pri, only rescaled from
+    // its true range into [0, 1). `>>` is the signed shift and strHash returns a
+    // full uint32, so `%100` here is NEGATIVE for the ~half of words whose hash
+    // has bit 31 set: the term has always spanned (-0.99, 0.99), not [0, 0.99).
+    // Harmless as a static rider on an 8.0 band — and the /200 + 0.5 below is
+    // what turns that quirk into a virtue, mapping the full signed range onto
+    // the wheel so every word gets a seat instead of half of them riding the
+    // bottom of every rotation forever.
+    //
+    // 199 seats rather than one per word is also deliberate: words sharing a
+    // seat share a score, and the sort is stable, so the 64-slot boundary cuts a
+    // seat the same way from one tick to the next. Measured, that is most of the
+    // difference between this and a glass that re-sorts as the window slides
+    // (docs/build-evidence/kairo-feel-lock/wp9a/paging-sim.mjs).
+    wr.h01=((strHash(e[0])>>2)%100)/200+0.5;
   }
 }
 // the ~64 most deserving nearby words become touchable DOM; the rest are ink
@@ -982,7 +1034,7 @@ function refreshActive(){
     if(wr.gradedAt&&performance.now()-wr.gradedAt<180000) continue;
     if(s.x>-pad&&s.x<vw()+pad&&s.y>-pad&&s.y<vh()+pad) vis.push(wr);
   }
-  vis.sort((a,b)=>b.pri-a.pri);
+  vis.sort((a,b)=>(b.pri+PAGE_SPAN*pageOf(b))-(a.pri+PAGE_SPAN*pageOf(a)));
   const target=new Set(vis.slice(0,64));
   for(const wr of [...ACTIVE]){
     if(!target.has(wr)){
