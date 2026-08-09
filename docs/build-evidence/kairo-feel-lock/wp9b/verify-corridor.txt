@@ -6,13 +6,13 @@
   ok   Phase 2 · 戻る returns from the shelf to the universe  — layer active again
 
 — step 0b · the bloom constellation
-  ok   Phase 2 · a kanji word stands in the field to bloom  — {"x":153.8000030517578,"y":579,"productive":true}
+  ok   Phase 2 · a kanji word stands in the field to bloom  — {"x":151.10000610351562,"y":580.2999877929688,"productive":true}
   ok   bloom · the constellation is its own relief — three colour families  — centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(58, 95, 138)
-  ok   bloom · dragging the centre carries the whole constellation — and sticks  — centre moved 82px; mean tether 165 → 166px
+  ok   bloom · dragging the centre carries the whole constellation — and sticks  — centre moved 88px; mean tether 160 → 166px
   ok   bloom · a water tap releases the constellation  — relief classes cleared
 
 — step 1 · arrive
-  ok   the shelf renders real graded texts  — 40 texts, ready in 624 ms
+  ok   the shelf renders real graded texts  — 40 texts, ready in 448 ms
   ok   every text carries an English title and a learner-readable level  — 40 texts, e.g. "Seven sites added to the World Natural Heritage list — including Shiretoko" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists
   ok   disagreement fires only where two-plus ordinal signals were measured  — 0 flagged; 0 articles with >=2 ordinal signals
   ok   the raw signals unfold behind 詳細 — separate, never averaged  — 3 signal rows on the opened card: jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair

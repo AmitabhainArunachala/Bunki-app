@@ -1,5 +1,6 @@
   ok   the shelf carries 40 articles  — 40 in index.json
   ok   bunki-graded-n5-station · stands on the shelf  — 駅で待つ時間
+  ok   bunki-graded-n5-station · repaired readings render correctly  — 七=しち (and no 七=なな)
   ok   bunki-graded-n5-station · lazy-loads its own file  — data/articles/bunki-graded-n5-station.json → 200
   ok   bunki-graded-n5-station · the reader renders tokens  — 171 tokens (67 content), 375 chars
   ok   bunki-graded-n5-station · furigana render  — 58 <rt>
@@ -8,32 +9,36 @@
   ok   bunki-graded-n5-station · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 朝  あさ  noun · adverb  mornin
   ok   bunki-graded-n5-station · opened with zero console/page errors  — 0 new
   ok   bunki-graded-n5-kitchen · stands on the shelf  — 台所の音
+  ok   bunki-graded-n5-kitchen · repaired readings render correctly  — 日本=にほん (and no 日本=にっぽん)
   ok   bunki-graded-n5-kitchen · lazy-loads its own file  — data/articles/bunki-graded-n5-kitchen.json → 200
-  ok   bunki-graded-n5-kitchen · the reader renders tokens  — 159 tokens (61 content), 338 chars
+  ok   bunki-graded-n5-kitchen · the reader renders tokens  — 159 tokens (61 content), 337 chars
   ok   bunki-graded-n5-kitchen · furigana render  — 45 <rt>
   ok   bunki-graded-n5-kitchen · paragraphs survive  — 4 paragraph breaks
   ok   bunki-graded-n5-kitchen · the gloss ladder opens on a held word  — 夜(よる)→night · も→also · even · 本(ほん)→book
   ok   bunki-graded-n5-kitchen · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 夜  よる  noun · adverb  night 
   ok   bunki-graded-n5-kitchen · opened with zero console/page errors  — 0 new
   ok   bunki-graded-n5-neighbour · stands on the shelf  — となりの部屋の人
+  ok   bunki-graded-n5-neighbour · repaired readings render correctly  — 日本=にほん · 一日=いちにち (and no 日本=にっぽん / 一日=ついたち)
   ok   bunki-graded-n5-neighbour · lazy-loads its own file  — data/articles/bunki-graded-n5-neighbour.json → 200
-  ok   bunki-graded-n5-neighbour · the reader renders tokens  — 162 tokens (56 content), 341 chars
+  ok   bunki-graded-n5-neighbour · the reader renders tokens  — 162 tokens (56 content), 340 chars
   ok   bunki-graded-n5-neighbour · furigana render  — 46 <rt>
   ok   bunki-graded-n5-neighbour · paragraphs survive  — 4 paragraph breaks
   ok   bunki-graded-n5-neighbour · the gloss ladder opens on a held word  — 私(わたし)→I · 少し(すこし)→a little
   ok   bunki-graded-n5-neighbour · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 私  わたし  pronoun  I me JLPT N
   ok   bunki-graded-n5-neighbour · opened with zero console/page errors  — 0 new
   ok   bunki-graded-n4-letter · stands on the shelf  — 引き出しの中の手紙
+  ok   bunki-graded-n4-letter · repaired readings render correctly  — 日本=にほん (and no 日本=にっぽん)
   ok   bunki-graded-n4-letter · lazy-loads its own file  — data/articles/bunki-graded-n4-letter.json → 200
-  ok   bunki-graded-n4-letter · the reader renders tokens  — 213 tokens (83 content), 431 chars
+  ok   bunki-graded-n4-letter · the reader renders tokens  — 213 tokens (83 content), 430 chars
   ok   bunki-graded-n4-letter · furigana render  — 61 <rt>
   ok   bunki-graded-n4-letter · paragraphs survive  — 3 paragraph breaks
   ok   bunki-graded-n4-letter · the gloss ladder opens on a held word  — 引っ越し(ひっこし)→moving (dwelling,  · 住所(じゅうしょ)→address (of a home · また(また)→again
   ok   bunki-graded-n4-letter · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 引っ越し  ひっこし  noun · suru verb
   ok   bunki-graded-n4-letter · opened with zero console/page errors  — 0 new
   ok   bunki-graded-n4-market · stands on the shelf  — 朝の市場
+  ok   bunki-graded-n4-market · repaired readings render correctly  — 市場=いちば · 十=じゅっ (and no 市場=しじょう / 十=じゅう)
   ok   bunki-graded-n4-market · lazy-loads its own file  — data/articles/bunki-graded-n4-market.json → 200
-  ok   bunki-graded-n4-market · the reader renders tokens  — 194 tokens (71 content), 409 chars
+  ok   bunki-graded-n4-market · the reader renders tokens  — 194 tokens (71 content), 407 chars
   ok   bunki-graded-n4-market · furigana render  — 58 <rt>
   ok   bunki-graded-n4-market · paragraphs survive  — 3 paragraph breaks
   ok   bunki-graded-n4-market · the gloss ladder opens on a held word  — 日曜(にちよう)→Sunday · ある(ある)→to be
@@ -56,21 +61,23 @@
   ok   bunki-graded-n3-river · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 家  いえ  noun  house residence
   ok   bunki-graded-n3-river · opened with zero console/page errors  — 0 new
   ok   bunki-graded-n3-radio · stands on the shelf  — 深夜のラジオ
+  ok   bunki-graded-n3-radio · repaired readings render correctly  — 日本=にほん (and no 日本=にっぽん)
   ok   bunki-graded-n3-radio · lazy-loads its own file  — data/articles/bunki-graded-n3-radio.json → 200
-  ok   bunki-graded-n3-radio · the reader renders tokens  — 194 tokens (87 content), 454 chars
+  ok   bunki-graded-n3-radio · the reader renders tokens  — 194 tokens (87 content), 453 chars
   ok   bunki-graded-n3-radio · furigana render  — 63 <rt>
   ok   bunki-graded-n3-radio · paragraphs survive  — 3 paragraph breaks
   ok   bunki-graded-n3-radio · the gloss ladder opens on a held word  — を→direct object · いる(いる)→to be needed · 半年(はんとし)→half a year
   ok   bunki-graded-n3-radio · the full entry opens on a longer hold  — #sheet · 0 rows · ← 戻る back ✕ を　particle  direct object  M
   ok   bunki-graded-n3-radio · opened with zero console/page errors  — 0 new
-  ok   bunki-graded-n3-handwriting · stands on the shelf  — 手で書くということ
-  ok   bunki-graded-n3-handwriting · lazy-loads its own file  — data/articles/bunki-graded-n3-handwriting.json → 200
-  ok   bunki-graded-n3-handwriting · the reader renders tokens  — 199 tokens (89 content), 424 chars
-  ok   bunki-graded-n3-handwriting · furigana render  — 69 <rt>
-  ok   bunki-graded-n3-handwriting · paragraphs survive  — 3 paragraph breaks
-  ok   bunki-graded-n3-handwriting · the gloss ladder opens on a held word  — 漢字(かんじ)→kanji · ぼんやり(ぼんやり)→dimly · こと(こと)→thing
-  ok   bunki-graded-n3-handwriting · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 漢字  かんじ  noun  kanji Chinese
-  ok   bunki-graded-n3-handwriting · opened with zero console/page errors  — 0 new
+  ok   bunki-essay-n2-handwriting · stands on the shelf  — 手で書くということ
+  ok   bunki-essay-n2-handwriting · repaired readings render correctly  — 数=かず (and no 数=すう)
+  ok   bunki-essay-n2-handwriting · lazy-loads its own file  — data/articles/bunki-essay-n2-handwriting.json → 200
+  ok   bunki-essay-n2-handwriting · the reader renders tokens  — 199 tokens (89 content), 424 chars
+  ok   bunki-essay-n2-handwriting · furigana render  — 69 <rt>
+  ok   bunki-essay-n2-handwriting · paragraphs survive  — 3 paragraph breaks
+  ok   bunki-essay-n2-handwriting · the gloss ladder opens on a held word  — 漢字(かんじ)→kanji · ぼんやり(ぼんやり)→dimly · こと(こと)→thing
+  ok   bunki-essay-n2-handwriting · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 漢字  かんじ  noun  kanji Chinese
+  ok   bunki-essay-n2-handwriting · opened with zero console/page errors  — 0 new
   ok   bunki-essay-n2-notebook · stands on the shelf  — 余白のためのノート
   ok   bunki-essay-n2-notebook · lazy-loads its own file  — data/articles/bunki-essay-n2-notebook.json → 200
   ok   bunki-essay-n2-notebook · the reader renders tokens  — 267 tokens (122 content), 619 chars
@@ -88,14 +95,16 @@
   ok   bunki-essay-n2-rain · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 雨  あめ  noun  rain rainy day 
   ok   bunki-essay-n2-rain · opened with zero console/page errors  — 0 new
   ok   bunki-essay-n2-translation · stands on the shelf  — 訳せない言葉について
+  ok   bunki-essay-n2-translation · repaired readings render correctly  — 日本=にほん · 四=よっ (and no 日本=にっぽん / 四=よん)
   ok   bunki-essay-n2-translation · lazy-loads its own file  — data/articles/bunki-essay-n2-translation.json → 200
-  ok   bunki-essay-n2-translation · the reader renders tokens  — 308 tokens (129 content), 725 chars
+  ok   bunki-essay-n2-translation · the reader renders tokens  — 308 tokens (129 content), 724 chars
   ok   bunki-essay-n2-translation · furigana render  — 101 <rt>
   ok   bunki-essay-n2-translation · paragraphs survive  — 4 paragraph breaks
   ok   bunki-essay-n2-translation · the gloss ladder opens on a held word  — 外国(がいこく)→foreign country · 言葉(ことば)→language · が→subject
   ok   bunki-essay-n2-translation · the full entry opens on a longer hold  — #sheet · 6 rows · ← 戻る back ✕ 外国  がいこく  noun · no-adjectiv
   ok   bunki-essay-n2-translation · opened with zero console/page errors  — 0 new
   ok   bunki-essay-n1-memory · stands on the shelf  — 忘却を前提とした設計
+  ok   bunki-essay-n1-memory · repaired readings render correctly  — 何=なに · 縁=ふち · 何=なん (and no 縁=えん)
   ok   bunki-essay-n1-memory · lazy-loads its own file  — data/articles/bunki-essay-n1-memory.json → 200
   ok   bunki-essay-n1-memory · the reader renders tokens  — 385 tokens (193 content), 1027 chars
   ok   bunki-essay-n1-memory · furigana render  — 138 <rt>
@@ -113,5 +122,5 @@
   ok   bunki-essay-n1-city · opened with zero console/page errors  — 0 new
   ok   zero console errors, page exceptions or failed requests across the whole run  — []
 
-114/114 checks passed
+123/123 checks passed
 screenshots → /home/user/Bunki-app/.claude/worktrees/agent-a159f4933ec7bd26d/docs/build-evidence/kairo-feel-lock/wp9b/screenshots

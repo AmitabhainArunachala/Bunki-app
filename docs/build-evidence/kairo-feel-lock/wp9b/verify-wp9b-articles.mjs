@@ -49,13 +49,44 @@ const NEW_IDS = [
   'bunki-graded-n4-bicycle',
   'bunki-graded-n3-river',
   'bunki-graded-n3-radio',
-  'bunki-graded-n3-handwriting',
+  'bunki-essay-n2-handwriting',
   'bunki-essay-n2-notebook',
   'bunki-essay-n2-rain',
   'bunki-essay-n2-translation',
   'bunki-essay-n1-memory',
   'bunki-essay-n1-city',
 ];
+/**
+ * Homograph readings repaired by build_wp9b_articles.py's override hook,
+ * asserted on RENDERED ruby rather than on the JSON — the claim is that the
+ * learner sees the right reading, so the browser is what gets asked.
+ * `absent` guards the context-sensitive ones: 何度 must stay なんど even though
+ * 何が/何を became なにが/なにを.
+ */
+const RUBY_EXPECTED = {
+  'bunki-graded-n5-station': { present: [['七', 'しち']], absent: [['七', 'なな']] },
+  'bunki-graded-n5-kitchen': { present: [['日本', 'にほん']], absent: [['日本', 'にっぽん']] },
+  'bunki-graded-n5-neighbour': {
+    present: [['日本', 'にほん'], ['一日', 'いちにち']],
+    absent: [['日本', 'にっぽん'], ['一日', 'ついたち']],
+  },
+  'bunki-graded-n4-letter': { present: [['日本', 'にほん']], absent: [['日本', 'にっぽん']] },
+  'bunki-graded-n4-market': {
+    present: [['市場', 'いちば'], ['十', 'じゅっ']],
+    absent: [['市場', 'しじょう'], ['十', 'じゅう']],
+  },
+  'bunki-graded-n3-radio': { present: [['日本', 'にほん']], absent: [['日本', 'にっぽん']] },
+  'bunki-essay-n2-handwriting': { present: [['数', 'かず']], absent: [['数', 'すう']] },
+  'bunki-essay-n2-translation': {
+    present: [['日本', 'にほん'], ['四', 'よっ']],
+    absent: [['日本', 'にっぽん'], ['四', 'よん']],
+  },
+  'bunki-essay-n1-memory': {
+    present: [['何', 'なに'], ['縁', 'ふち'], ['何', 'なん']], // 何度 keeps なん
+    absent: [['縁', 'えん']],
+  },
+};
+
 /** Articles screenshotted in full (reader + an open mini-dictionary). */
 const SHOT_IDS = new Set([
   'bunki-graded-n5-station',
@@ -178,6 +209,26 @@ for (const id of NEW_IDS) {
     paras: document.querySelectorAll('#reader .para-break').length,
     chars: document.getElementById('reader').innerText.replace(/\\s/g, '').length,
   }))()`);
+
+  // rendered furigana — every repaired homograph, checked as the reader sees it
+  const expect = RUBY_EXPECTED[id];
+  if (expect) {
+    const ruby = await page.evaluate(`(() => [...document.querySelectorAll('#reader ruby')].map((r) => {
+      const rt = r.querySelector('rt');
+      const base = [...r.childNodes].filter((n) => n !== rt).map((n) => n.textContent).join('');
+      return [base, rt ? rt.textContent : ''];
+    }))()`);
+    const has = ([t, r]) => ruby.some(([bt, br]) => bt === t && br === r);
+    const missing = (expect.present ?? []).filter((p) => !has(p));
+    const lingering = (expect.absent ?? []).filter((p) => has(p));
+    check(
+      `${id} · repaired readings render correctly`,
+      missing.length === 0 && lingering.length === 0,
+      missing.length || lingering.length
+        ? `missing ${JSON.stringify(missing)} lingering ${JSON.stringify(lingering)}`
+        : `${(expect.present ?? []).map((p) => p.join('=')).join(' · ')} (and no ${(expect.absent ?? []).map((p) => p.join('=')).join(' / ')})`,
+    );
+  }
 
   // The reader's click grammar (corridor.js GESTURE): a hold past MINI_MS=430
   // floats the mini-dictionary; holding past FULL_MS=2100 morphs it into the

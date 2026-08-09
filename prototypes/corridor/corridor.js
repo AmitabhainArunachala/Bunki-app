@@ -67,7 +67,7 @@ const TITLES_EN = {
   'bunki-graded-n4-bicycle': 'The Day I Lost My Bicycle',
   'bunki-graded-n3-river': 'The Road Along the River',
   'bunki-graded-n3-radio': 'Late-night Radio',
-  'bunki-graded-n3-handwriting': 'On Writing by Hand',
+  'bunki-essay-n2-handwriting': 'On Writing by Hand',
   'bunki-essay-n2-notebook': 'A Notebook Kept for Its Margins',
   'bunki-essay-n2-rain': 'The Speed of a Rainy Day',
   'bunki-essay-n2-translation': 'On Words That Resist Translation',

@@ -33,10 +33,11 @@
          bunki-graded-n4-bicycle    288字  jread=4.46 (中級前半)  jlpt-cov=63.5%  ninjal=unavailable
            bunki-graded-n3-river    313字  jread=3.94 (中級前半)  jlpt-cov=63.0%  ninjal=unavailable
            bunki-graded-n3-radio    313字  jread=3.05 (中級後半)  jlpt-cov=55.2%  ninjal=unavailable
-     bunki-graded-n3-handwriting    303字  jread=2.62 (中級後半)  jlpt-cov=65.2%  ninjal=unavailable
+      bunki-essay-n2-handwriting    303字  jread=2.62 (中級後半)  jlpt-cov=65.2%  ninjal=unavailable
          bunki-essay-n2-notebook    417字  jread=3.07 (中級後半)  jlpt-cov=54.1%  ninjal=unavailable
              bunki-essay-n2-rain    428字  jread=3.18 (中級後半)  jlpt-cov=65.2%  ninjal=unavailable
       bunki-essay-n2-translation    481字  jread=3.10 (中級後半)  jlpt-cov=62.8%  ninjal=unavailable
            bunki-essay-n1-memory    628字  jread=2.26 (上級前半)  jlpt-cov=53.9%  ninjal=unavailable
              bunki-essay-n1-city    624字  jread=2.19 (上級前半)  jlpt-cov=60.9%  ninjal=unavailable
 · index: 40 articles, ninjal live on 0
+· reading overrides applied: 17/17

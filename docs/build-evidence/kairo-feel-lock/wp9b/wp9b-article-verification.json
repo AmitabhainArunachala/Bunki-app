@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-09T11:57:20.615Z",
+ "generated": "2026-08-09T14:12:41.706Z",
  "articles": [
   {
    "id": "bunki-graded-n5-station",
@@ -18,7 +18,7 @@
    "content": 61,
    "rt": 45,
    "paras": 4,
-   "chars": 338,
+   "chars": 337,
    "glossed": 3
   },
   {
@@ -28,7 +28,7 @@
    "content": 56,
    "rt": 46,
    "paras": 4,
-   "chars": 341,
+   "chars": 340,
    "glossed": 2
   },
   {
@@ -38,7 +38,7 @@
    "content": 83,
    "rt": 61,
    "paras": 3,
-   "chars": 431,
+   "chars": 430,
    "glossed": 3
   },
   {
@@ -48,7 +48,7 @@
    "content": 71,
    "rt": 58,
    "paras": 3,
-   "chars": 409,
+   "chars": 407,
    "glossed": 2
   },
   {
@@ -78,12 +78,12 @@
    "content": 87,
    "rt": 63,
    "paras": 3,
-   "chars": 454,
+   "chars": 453,
    "glossed": 3
   },
   {
-   "id": "bunki-graded-n3-handwriting",
-   "file": "bunki-graded-n3-handwriting.json",
+   "id": "bunki-essay-n2-handwriting",
+   "file": "bunki-essay-n2-handwriting.json",
    "toks": 199,
    "content": 89,
    "rt": 69,
@@ -118,7 +118,7 @@
    "content": 129,
    "rt": 101,
    "paras": 4,
-   "chars": 725,
+   "chars": 724,
    "glossed": 3
   },
   {
@@ -153,6 +153,11 @@
    "name": "bunki-graded-n5-station · stands on the shelf",
    "pass": true,
    "detail": "駅で待つ時間"
+  },
+  {
+   "name": "bunki-graded-n5-station · repaired readings render correctly",
+   "pass": true,
+   "detail": "七=しち (and no 七=なな)"
   },
   {
    "name": "bunki-graded-n5-station · lazy-loads its own file",
@@ -195,6 +200,11 @@
    "detail": "台所の音"
   },
   {
+   "name": "bunki-graded-n5-kitchen · repaired readings render correctly",
+   "pass": true,
+   "detail": "日本=にほん (and no 日本=にっぽん)"
+  },
+  {
    "name": "bunki-graded-n5-kitchen · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-graded-n5-kitchen.json → 200"
@@ -202,7 +212,7 @@
   {
    "name": "bunki-graded-n5-kitchen · the reader renders tokens",
    "pass": true,
-   "detail": "159 tokens (61 content), 338 chars"
+   "detail": "159 tokens (61 content), 337 chars"
   },
   {
    "name": "bunki-graded-n5-kitchen · furigana render",
@@ -235,6 +245,11 @@
    "detail": "となりの部屋の人"
   },
   {
+   "name": "bunki-graded-n5-neighbour · repaired readings render correctly",
+   "pass": true,
+   "detail": "日本=にほん · 一日=いちにち (and no 日本=にっぽん / 一日=ついたち)"
+  },
+  {
    "name": "bunki-graded-n5-neighbour · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-graded-n5-neighbour.json → 200"
@@ -242,7 +257,7 @@
   {
    "name": "bunki-graded-n5-neighbour · the reader renders tokens",
    "pass": true,
-   "detail": "162 tokens (56 content), 341 chars"
+   "detail": "162 tokens (56 content), 340 chars"
   },
   {
    "name": "bunki-graded-n5-neighbour · furigana render",
@@ -275,6 +290,11 @@
    "detail": "引き出しの中の手紙"
   },
   {
+   "name": "bunki-graded-n4-letter · repaired readings render correctly",
+   "pass": true,
+   "detail": "日本=にほん (and no 日本=にっぽん)"
+  },
+  {
    "name": "bunki-graded-n4-letter · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-graded-n4-letter.json → 200"
@@ -282,7 +302,7 @@
   {
    "name": "bunki-graded-n4-letter · the reader renders tokens",
    "pass": true,
-   "detail": "213 tokens (83 content), 431 chars"
+   "detail": "213 tokens (83 content), 430 chars"
   },
   {
    "name": "bunki-graded-n4-letter · furigana render",
@@ -315,6 +335,11 @@
    "detail": "朝の市場"
   },
   {
+   "name": "bunki-graded-n4-market · repaired readings render correctly",
+   "pass": true,
+   "detail": "市場=いちば · 十=じゅっ (and no 市場=しじょう / 十=じゅう)"
+  },
+  {
    "name": "bunki-graded-n4-market · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-graded-n4-market.json → 200"
@@ -322,7 +347,7 @@
   {
    "name": "bunki-graded-n4-market · the reader renders tokens",
    "pass": true,
-   "detail": "194 tokens (71 content), 409 chars"
+   "detail": "194 tokens (71 content), 407 chars"
   },
   {
    "name": "bunki-graded-n4-market · furigana render",
@@ -435,6 +460,11 @@
    "detail": "深夜のラジオ"
   },
   {
+   "name": "bunki-graded-n3-radio · repaired readings render correctly",
+   "pass": true,
+   "detail": "日本=にほん (and no 日本=にっぽん)"
+  },
+  {
    "name": "bunki-graded-n3-radio · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-graded-n3-radio.json → 200"
@@ -442,7 +472,7 @@
   {
    "name": "bunki-graded-n3-radio · the reader renders tokens",
    "pass": true,
-   "detail": "194 tokens (87 content), 454 chars"
+   "detail": "194 tokens (87 content), 453 chars"
   },
   {
    "name": "bunki-graded-n3-radio · furigana render",
@@ -470,42 +500,47 @@
    "detail": "0 new"
   },
   {
-   "name": "bunki-graded-n3-handwriting · stands on the shelf",
+   "name": "bunki-essay-n2-handwriting · stands on the shelf",
    "pass": true,
    "detail": "手で書くということ"
   },
   {
-   "name": "bunki-graded-n3-handwriting · lazy-loads its own file",
+   "name": "bunki-essay-n2-handwriting · repaired readings render correctly",
    "pass": true,
-   "detail": "data/articles/bunki-graded-n3-handwriting.json → 200"
+   "detail": "数=かず (and no 数=すう)"
   },
   {
-   "name": "bunki-graded-n3-handwriting · the reader renders tokens",
+   "name": "bunki-essay-n2-handwriting · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n2-handwriting.json → 200"
+  },
+  {
+   "name": "bunki-essay-n2-handwriting · the reader renders tokens",
    "pass": true,
    "detail": "199 tokens (89 content), 424 chars"
   },
   {
-   "name": "bunki-graded-n3-handwriting · furigana render",
+   "name": "bunki-essay-n2-handwriting · furigana render",
    "pass": true,
    "detail": "69 <rt>"
   },
   {
-   "name": "bunki-graded-n3-handwriting · paragraphs survive",
+   "name": "bunki-essay-n2-handwriting · paragraphs survive",
    "pass": true,
    "detail": "3 paragraph breaks"
   },
   {
-   "name": "bunki-graded-n3-handwriting · the gloss ladder opens on a held word",
+   "name": "bunki-essay-n2-handwriting · the gloss ladder opens on a held word",
    "pass": true,
    "detail": "漢字(かんじ)→kanji · ぼんやり(ぼんやり)→dimly · こと(こと)→thing"
   },
   {
-   "name": "bunki-graded-n3-handwriting · the full entry opens on a longer hold",
+   "name": "bunki-essay-n2-handwriting · the full entry opens on a longer hold",
    "pass": true,
    "detail": "#sheet · 6 rows · ← 戻る back ✕ 漢字  かんじ  noun  kanji Chinese"
   },
   {
-   "name": "bunki-graded-n3-handwriting · opened with zero console/page errors",
+   "name": "bunki-essay-n2-handwriting · opened with zero console/page errors",
    "pass": true,
    "detail": "0 new"
   },
@@ -595,6 +630,11 @@
    "detail": "訳せない言葉について"
   },
   {
+   "name": "bunki-essay-n2-translation · repaired readings render correctly",
+   "pass": true,
+   "detail": "日本=にほん · 四=よっ (and no 日本=にっぽん / 四=よん)"
+  },
+  {
    "name": "bunki-essay-n2-translation · lazy-loads its own file",
    "pass": true,
    "detail": "data/articles/bunki-essay-n2-translation.json → 200"
@@ -602,7 +642,7 @@
   {
    "name": "bunki-essay-n2-translation · the reader renders tokens",
    "pass": true,
-   "detail": "308 tokens (129 content), 725 chars"
+   "detail": "308 tokens (129 content), 724 chars"
   },
   {
    "name": "bunki-essay-n2-translation · furigana render",
@@ -633,6 +673,11 @@
    "name": "bunki-essay-n1-memory · stands on the shelf",
    "pass": true,
    "detail": "忘却を前提とした設計"
+  },
+  {
+   "name": "bunki-essay-n1-memory · repaired readings render correctly",
+   "pass": true,
+   "detail": "何=なに · 縁=ふち · 何=なん (and no 縁=えん)"
   },
   {
    "name": "bunki-essay-n1-memory · lazy-loads its own file",
