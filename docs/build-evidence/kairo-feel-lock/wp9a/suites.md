@@ -143,8 +143,9 @@ node instrument-pool.mjs --src /tmp/drift-prefix.html \
      --probe sweep --zooms 1 --grid 40 --agree 64
 
 # the phase-0 identity, in the browser: the same sweep on the FIXED source must
-# reproduce the pre-fix ceiling, because the sweep jumps the camera and the
-# odometer's 200px teleport guard refuses to turn the wheel for a jump
+# reproduce the pre-fix ceiling (run with --pin-phase 0; the earlier claim here
+# that the teleport guard refuses the sweep's jumps was stale — README §4 has
+# the correct account of the guard, verified by the unpinned sweep numbers)
 node instrument-pool.mjs --probe sweep --zooms 1 --grid 40 --agree 64
 
 # previously-unreachable words, now surfacing

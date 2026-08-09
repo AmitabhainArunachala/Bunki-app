@@ -209,8 +209,13 @@ PAGE_SPAN * h01  =  2 * (((strHash>>2) % 100)/200 + 0.5)  =  oldTieBreak + 1
 
 — a **constant +1 on every word in the field**, which is no reordering at all.
 A tide that has not been panned yet therefore chooses the same 64 words this file
-has always chosen, down to the tie order. `paging-sim.mjs` asserts this rather
-than claiming it:
+has always chosen, down to the tie order — **for a fresh store**. [Verifier
+narrowing: the `+1` moved inside the float sum (`fl(band+T)` → `fl(band+(T+1))`),
+which rounds differently on systematic score collisions. On a fresh store the
+chosen-64 set differs 0/3,000 windows at all five tides; with ~14% of words
+carrying judgments, ~2–3% of windows swap 1–2 of 64 words — every swap between
+NOMINALLY EQUAL priorities, no inversions, no law touched.] `paging-sim.mjs`
+asserts the fresh-store identity rather than claiming it:
 
 ```
 phase-0 identity check: max |PAGE_SPAN*h01 - (oldTieBreak + 1)| = 0 over 6693 words
@@ -403,10 +408,22 @@ schemas are untouched.
   whole tier eventually" is measured in tens of minutes of drifting, not
   minutes. `PAGE_CYCLE` is the lever, and turning it down costs on-glass
   exchange proportionally. **Not tuned further here** — that is a feel call.
-* **The wheel does not turn on zoom.** `pageOdometer` measures `cam.x`/`cam.y`
-  only, so pinching does not page. Pinching in already surfaces a different set
-  by shrinking the window (README §3), so the two mechanisms are complementary,
-  but a learner who only ever pinches never pages.
+* **Zoom barely turns the wheel.** [Verifier correction: the original claim
+  "pinching does not page because `pageOdometer` measures `cam.x`/`cam.y` only"
+  had the right conclusion but the wrong mechanism — an off-centre pinch DOES
+  move `cam.x`/`cam.y` (line 2299) and measures at 0.0033 of a turn for a full
+  z=1→2.6 pinch about a point 150px off-centre; the `camT` ease also turns it
+  slightly. "Turned by pan distance" is precisely "turned by camera distance,
+  however the camera came to move".] Pinching in already surfaces a different
+  set by shrinking the window (README §3), so the two mechanisms are
+  complementary, but a learner who only ever pinches effectively never pages.
+* **The teleport guard's screen threshold scales with zoom** [verifier
+  finding]: `if(d<200)` is in WORLD px, so a `pointermove` of D screen px moves
+  the camera D/z — the guard cuts at 520 screen px at z=2.6 but only 68 px at
+  z=0.34. Measured: at z=0.34, sixty successive 90-screen-px moves carried the
+  camera 13,388 world px and turned the wheel by exactly 0. A brisk drag while
+  fully pinched out pages nothing; at default zoom no real drag hits the
+  threshold. Fails safe (no paging rather than wrong paging).
 * **A learner who marks 64+ own-level words *unknown* inside one screen of world
   can still starve a plain word there.** `PAGE_SPAN` (2.0) is below the maximum
   judgment bonus (2.4) by construction — that is what makes the phase-0 identity
@@ -426,7 +443,11 @@ schemas are untouched.
   fades per second in the centre half, only while dragging (§6). It was not
   removed, because forbidding on-glass culls entirely lets `ACTIVE` grow past
   its 64-node DOM budget — a perf regression traded for a legibility one. Stated
-  rather than silently accepted.
+  rather than silently accepted. [Verifier unit correction: the tick is 650ms,
+  so per-SECOND figures are: centre-half baseline ~1.0 fades/sec from the pan
+  itself, and the wheel adds +0.21/sec (N5) to +0.41/sec (N1) — about 1.5×
+  more than the "+0.2/sec" stated here and in the commit message. The per-tick
+  table in §6 was always correct; the prose conversion was the slip.]
 * **`wr.gradedAt`, `store.unknown`, and the `localStorage` schema are
   untouched.** So are the WP2 arbiter, WP7's gyre/calm, and the WP6 variants.
 
