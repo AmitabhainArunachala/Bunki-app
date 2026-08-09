@@ -1,0 +1,255 @@
+{
+  "label": "wp2-run1",
+  "src": "/home/user/Bunki-app/.claude/worktrees/agent-a44c6ed5a4ffb4670/prototypes/drift/drift-artifact.html",
+  "when": "2026-08-09T06:08:35.637Z",
+  "passed": 17,
+  "total": 17,
+  "results": [
+    {
+      "fix": "4-rest-overlap",
+      "pass": true,
+      "detail": "worst=0, badPairs=0, legibleWords=29"
+    },
+    {
+      "fix": "6-chrome-keepout",
+      "pass": true,
+      "detail": "0 legible words over chrome [brand,theme,hint,lvl]"
+    },
+    {
+      "fix": "1-pinch-surface-nobleed",
+      "pass": true,
+      "detail": "stack 1->0, z 1->1 (must stay >0.7, not floor at 0.34)"
+    },
+    {
+      "fix": "3-rot-clamp",
+      "pass": true,
+      "detail": "cam.rot=3.142 after 3x160deg twist (must be within +-3.14)"
+    },
+    {
+      "fix": "2-return-to-rest",
+      "pass": true,
+      "detail": "messy(z=2.6,rot=2.622) -> home(z=1,rot=0) via double-tap at 30,120"
+    },
+    {
+      "fix": "4-zoom-overlap",
+      "pass": true,
+      "detail": "after zoom (z=2.6) worst=0.08, badPairs=0, legibleWords=17"
+    },
+    {
+      "fix": "8-unfold-clear-on-lock",
+      "pass": true,
+      "detail": "tapped A=すくう救うt (unfolded=1), locked B=ぞうきょう増 -> unfolded=0, lockOn=true, members=12"
+    },
+    {
+      "fix": "8-lock-persists-minzoom",
+      "pass": true,
+      "detail": "z=0.34 (want <=0.5), lockOn=true, focus=12, visibleMembers=12"
+    },
+    {
+      "fix": "8-lock-release-clean",
+      "pass": true,
+      "detail": "after water-tap release lockOn=false, unfolded=0"
+    },
+    {
+      "fix": "5-hint[北斎]",
+      "pass": true,
+      "detail": "hint text/plate contrast=13.97 on rgba(251, 250, 245, 0.92)"
+    },
+    {
+      "fix": "5-hint[墨]",
+      "pass": true,
+      "detail": "hint text/plate contrast=13.25 on rgba(247, 246, 241, 0.92)"
+    },
+    {
+      "fix": "5-hint[岩絵具]",
+      "pass": true,
+      "detail": "hint text/plate contrast=11.32 on rgba(243, 234, 216, 0.92)"
+    },
+    {
+      "fix": "5-hint[緑青]",
+      "pass": true,
+      "detail": "hint text/plate contrast=9.54 on rgba(237, 242, 230, 0.92)"
+    },
+    {
+      "fix": "5-hint[夜]",
+      "pass": true,
+      "detail": "hint text/plate contrast=17.81 on rgba(31, 21, 15, 0.93)"
+    },
+    {
+      "fix": "7-parity[岩絵具]",
+      "pass": true,
+      "detail": "fg med=2.69 (n=15) vs light baseline 2.66 — want >=2.4 and >=90% of baseline"
+    },
+    {
+      "fix": "7-parity[緑青]",
+      "pass": true,
+      "detail": "fg med=2.68 (n=15) vs light baseline 2.66 — want >=2.4 and >=90% of baseline"
+    },
+    {
+      "fix": "7-night-legible",
+      "pass": true,
+      "detail": "夜 fg med=4.43 (n=15)"
+    }
+  ],
+  "errs": [],
+  "notes": {
+    "rest": {
+      "z": 1,
+      "rot": 0,
+      "stack": 0,
+      "lockOn": false,
+      "focus": 0,
+      "focusVis": 0,
+      "unfolded": 0,
+      "words": 64
+    },
+    "restOverlap": {
+      "count": 29,
+      "worst": 0,
+      "badPairs": 0
+    },
+    "chrome": {
+      "regions": [
+        "brand",
+        "theme",
+        "hint",
+        "lvl"
+      ],
+      "hits": []
+    },
+    "pinchSurface": {
+      "before": {
+        "z": 1,
+        "rot": 0,
+        "stack": 1,
+        "lockOn": false,
+        "focus": 0,
+        "focusVis": 0,
+        "unfolded": 1,
+        "words": 82
+      },
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": false,
+        "focus": 0,
+        "focusVis": 0,
+        "unfolded": 0,
+        "words": 64
+      }
+    },
+    "rot": {
+      "z": 1,
+      "rot": 3.142,
+      "stack": 0,
+      "lockOn": false,
+      "focus": 0,
+      "focusVis": 0,
+      "unfolded": 0,
+      "words": 64
+    },
+    "messy": {
+      "z": 2.6,
+      "rot": 2.622,
+      "stack": 0,
+      "lockOn": false,
+      "focus": 0,
+      "focusVis": 0,
+      "unfolded": 0,
+      "words": 66
+    },
+    "home": {
+      "z": 1,
+      "rot": 0,
+      "stack": 0,
+      "lockOn": false,
+      "focus": 0,
+      "focusVis": 0,
+      "unfolded": 0,
+      "words": 64
+    },
+    "zoomOverlap": {
+      "count": 17,
+      "worst": 0.08,
+      "badPairs": 0
+    },
+    "lock": {
+      "A": "すくう救うto rescue from, to help out of",
+      "B": "ぞうきょう増強reinforce, increase",
+      "unfoldedBefore": 1,
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": true,
+        "focus": 12,
+        "focusVis": 12,
+        "unfolded": 0,
+        "words": 75
+      }
+    },
+    "lockMinZoom": {
+      "z": 0.34,
+      "rot": 0,
+      "stack": 0,
+      "lockOn": true,
+      "focus": 12,
+      "focusVis": 12,
+      "unfolded": 0,
+      "words": 78
+    },
+    "lockRelease": {
+      "z": 0.34,
+      "rot": 0,
+      "stack": 0,
+      "lockOn": false,
+      "focus": 0,
+      "focusVis": 0,
+      "unfolded": 0,
+      "words": 68
+    },
+    "themes": {
+      "北斎": {
+        "name": "北斎",
+        "med": 2.83,
+        "min": 2.25,
+        "n": 13,
+        "hintCr": 13.97,
+        "hintBg": "rgba(251, 250, 245, 0.92)"
+      },
+      "墨": {
+        "name": "墨",
+        "med": 2.66,
+        "min": 1.96,
+        "n": 14,
+        "hintCr": 13.25,
+        "hintBg": "rgba(247, 246, 241, 0.92)"
+      },
+      "岩絵具": {
+        "name": "岩絵具",
+        "med": 2.69,
+        "min": 2.15,
+        "n": 15,
+        "hintCr": 11.32,
+        "hintBg": "rgba(243, 234, 216, 0.92)"
+      },
+      "緑青": {
+        "name": "緑青",
+        "med": 2.68,
+        "min": 2.19,
+        "n": 15,
+        "hintCr": 9.54,
+        "hintBg": "rgba(237, 242, 230, 0.92)"
+      },
+      "夜": {
+        "name": "夜",
+        "med": 4.43,
+        "min": 3.24,
+        "n": 15,
+        "hintCr": 17.81,
+        "hintBg": "rgba(31, 21, 15, 0.93)"
+      }
+    }
+  }
+}

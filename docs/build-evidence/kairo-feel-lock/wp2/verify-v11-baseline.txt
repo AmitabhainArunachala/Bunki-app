@@ -1,0 +1,23 @@
+rest: {"z":1,"rot":0,"stack":0,"lockOn":false,"focus":0,"focusVis":0,"unfolded":0,"words":64}
+FAIL  4-rest-overlap: worst=0.88, badPairs=10, legibleWords=39
+FAIL  6-chrome-keepout: 3 legible words over chrome [brand,theme,hint,lvl] :: [{"w":"たんなる単な","chrome":"lvl"},{"w":"とりあげる取","chrome":"lvl"},{"w":"ぎし技師en","chrome":"brand"}]
+FAIL  1-pinch-surface-nobleed: stack 1->0, z 1->0.34 (must stay >0.7, not floor at 0.34)
+FAIL  3-rot-clamp: cam.rot=8.378 after 3x160deg twist (must be within +-3.14)
+FAIL  2-return-to-rest: messy(z=2.6,rot=2.618) -> home(z=2.6,rot=2.618) via double-tap at 360,120
+FAIL  4-zoom-overlap: after zoom (z=2.6) worst=1, badPairs=29, legibleWords=39
+FAIL  8-unfold-clear-on-lock: tapped A=せい所為ca (unfolded=1), locked B=いまにも今に -> unfolded=1, lockOn=true, members=12
+FAIL  8-lock-persists-minzoom: z=0.34 (want <=0.5), lockOn=true, focus=12, visibleMembers=1
+PASS  8-lock-release-clean: after water-tap release lockOn=false, unfolded=0
+FAIL  5-hint[北斎]: hint text/plate contrast=2.45 on rgba(0, 0, 0, 0)
+FAIL  5-hint[墨]: hint text/plate contrast=2.29 on rgba(0, 0, 0, 0)
+FAIL  5-hint[岩絵具]: hint text/plate contrast=2.32 on rgba(0, 0, 0, 0)
+FAIL  5-hint[緑青]: hint text/plate contrast=2.18 on rgba(0, 0, 0, 0)
+FAIL  5-hint[夜]: hint text/plate contrast=3.53 on rgba(0, 0, 0, 0)
+FAIL  7-parity[岩絵具]: fg med=2.12 (n=22) vs light baseline 2.82 — want >=2.4 and >=90% of baseline
+FAIL  7-parity[緑青]: fg med=2.17 (n=22) vs light baseline 2.82 — want >=2.4 and >=90% of baseline
+PASS  7-night-legible: 夜 fg med=4.08 (n=22)
+
+ERRORS: none
+
+2/17 checks passed
+results -> docs/build-evidence/kairo-feel-lock/wp2/verify-v11-baseline.json
