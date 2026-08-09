@@ -1,0 +1,719 @@
+{
+ "generated": "2026-08-09T11:57:20.615Z",
+ "articles": [
+  {
+   "id": "bunki-graded-n5-station",
+   "file": "bunki-graded-n5-station.json",
+   "toks": 171,
+   "content": 67,
+   "rt": 58,
+   "paras": 4,
+   "chars": 375,
+   "glossed": 2
+  },
+  {
+   "id": "bunki-graded-n5-kitchen",
+   "file": "bunki-graded-n5-kitchen.json",
+   "toks": 159,
+   "content": 61,
+   "rt": 45,
+   "paras": 4,
+   "chars": 338,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-graded-n5-neighbour",
+   "file": "bunki-graded-n5-neighbour.json",
+   "toks": 162,
+   "content": 56,
+   "rt": 46,
+   "paras": 4,
+   "chars": 341,
+   "glossed": 2
+  },
+  {
+   "id": "bunki-graded-n4-letter",
+   "file": "bunki-graded-n4-letter.json",
+   "toks": 213,
+   "content": 83,
+   "rt": 61,
+   "paras": 3,
+   "chars": 431,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-graded-n4-market",
+   "file": "bunki-graded-n4-market.json",
+   "toks": 194,
+   "content": 71,
+   "rt": 58,
+   "paras": 3,
+   "chars": 409,
+   "glossed": 2
+  },
+  {
+   "id": "bunki-graded-n4-bicycle",
+   "file": "bunki-graded-n4-bicycle.json",
+   "toks": 197,
+   "content": 74,
+   "rt": 57,
+   "paras": 3,
+   "chars": 416,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-graded-n3-river",
+   "file": "bunki-graded-n3-river.json",
+   "toks": 205,
+   "content": 92,
+   "rt": 73,
+   "paras": 3,
+   "chars": 467,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-graded-n3-radio",
+   "file": "bunki-graded-n3-radio.json",
+   "toks": 194,
+   "content": 87,
+   "rt": 63,
+   "paras": 3,
+   "chars": 454,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-graded-n3-handwriting",
+   "file": "bunki-graded-n3-handwriting.json",
+   "toks": 199,
+   "content": 89,
+   "rt": 69,
+   "paras": 3,
+   "chars": 424,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-essay-n2-notebook",
+   "file": "bunki-essay-n2-notebook.json",
+   "toks": 267,
+   "content": 122,
+   "rt": 95,
+   "paras": 4,
+   "chars": 619,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-essay-n2-rain",
+   "file": "bunki-essay-n2-rain.json",
+   "toks": 281,
+   "content": 132,
+   "rt": 100,
+   "paras": 4,
+   "chars": 670,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-essay-n2-translation",
+   "file": "bunki-essay-n2-translation.json",
+   "toks": 308,
+   "content": 129,
+   "rt": 101,
+   "paras": 4,
+   "chars": 725,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-essay-n1-memory",
+   "file": "bunki-essay-n1-memory.json",
+   "toks": 385,
+   "content": 193,
+   "rt": 138,
+   "paras": 5,
+   "chars": 1027,
+   "glossed": 3
+  },
+  {
+   "id": "bunki-essay-n1-city",
+   "file": "bunki-essay-n1-city.json",
+   "toks": 393,
+   "content": 179,
+   "rt": 154,
+   "paras": 5,
+   "chars": 1037,
+   "glossed": 2
+  }
+ ],
+ "noise": [],
+ "results": [
+  {
+   "name": "the shelf carries 40 articles",
+   "pass": true,
+   "detail": "40 in index.json"
+  },
+  {
+   "name": "bunki-graded-n5-station · stands on the shelf",
+   "pass": true,
+   "detail": "駅で待つ時間"
+  },
+  {
+   "name": "bunki-graded-n5-station · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n5-station.json → 200"
+  },
+  {
+   "name": "bunki-graded-n5-station · the reader renders tokens",
+   "pass": true,
+   "detail": "171 tokens (67 content), 375 chars"
+  },
+  {
+   "name": "bunki-graded-n5-station · furigana render",
+   "pass": true,
+   "detail": "58 <rt>"
+  },
+  {
+   "name": "bunki-graded-n5-station · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n5-station · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "朝(あさ)→morning · 外(そと)→outside"
+  },
+  {
+   "name": "bunki-graded-n5-station · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 朝  あさ  noun · adverb  mornin"
+  },
+  {
+   "name": "bunki-graded-n5-station · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · stands on the shelf",
+   "pass": true,
+   "detail": "台所の音"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n5-kitchen.json → 200"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · the reader renders tokens",
+   "pass": true,
+   "detail": "159 tokens (61 content), 338 chars"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · furigana render",
+   "pass": true,
+   "detail": "45 <rt>"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "夜(よる)→night · も→also · even · 本(ほん)→book"
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 夜  よる  noun · adverb  night "
+  },
+  {
+   "name": "bunki-graded-n5-kitchen · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · stands on the shelf",
+   "pass": true,
+   "detail": "となりの部屋の人"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n5-neighbour.json → 200"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · the reader renders tokens",
+   "pass": true,
+   "detail": "162 tokens (56 content), 341 chars"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · furigana render",
+   "pass": true,
+   "detail": "46 <rt>"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "私(わたし)→I · 少し(すこし)→a little"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 私  わたし  pronoun  I me JLPT N"
+  },
+  {
+   "name": "bunki-graded-n5-neighbour · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n4-letter · stands on the shelf",
+   "pass": true,
+   "detail": "引き出しの中の手紙"
+  },
+  {
+   "name": "bunki-graded-n4-letter · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n4-letter.json → 200"
+  },
+  {
+   "name": "bunki-graded-n4-letter · the reader renders tokens",
+   "pass": true,
+   "detail": "213 tokens (83 content), 431 chars"
+  },
+  {
+   "name": "bunki-graded-n4-letter · furigana render",
+   "pass": true,
+   "detail": "61 <rt>"
+  },
+  {
+   "name": "bunki-graded-n4-letter · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n4-letter · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "引っ越し(ひっこし)→moving (dwelling,  · 住所(じゅうしょ)→address (of a home · また(また)→again"
+  },
+  {
+   "name": "bunki-graded-n4-letter · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 引っ越し  ひっこし  noun · suru verb"
+  },
+  {
+   "name": "bunki-graded-n4-letter · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n4-market · stands on the shelf",
+   "pass": true,
+   "detail": "朝の市場"
+  },
+  {
+   "name": "bunki-graded-n4-market · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n4-market.json → 200"
+  },
+  {
+   "name": "bunki-graded-n4-market · the reader renders tokens",
+   "pass": true,
+   "detail": "194 tokens (71 content), 409 chars"
+  },
+  {
+   "name": "bunki-graded-n4-market · furigana render",
+   "pass": true,
+   "detail": "58 <rt>"
+  },
+  {
+   "name": "bunki-graded-n4-market · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n4-market · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "日曜(にちよう)→Sunday · ある(ある)→to be"
+  },
+  {
+   "name": "bunki-graded-n4-market · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 日曜  にちよう  noun  Sunday  この語の"
+  },
+  {
+   "name": "bunki-graded-n4-market · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · stands on the shelf",
+   "pass": true,
+   "detail": "自転車をなくした日"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n4-bicycle.json → 200"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · the reader renders tokens",
+   "pass": true,
+   "detail": "197 tokens (74 content), 416 chars"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · furigana render",
+   "pass": true,
+   "detail": "57 <rt>"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "駅(えき)→railway station · いう(いう)→(no gloss yet) · 紙(かみ)→paper"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 駅  えき  noun  railway station"
+  },
+  {
+   "name": "bunki-graded-n4-bicycle · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n3-river · stands on the shelf",
+   "pass": true,
+   "detail": "川沿いの道"
+  },
+  {
+   "name": "bunki-graded-n3-river · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n3-river.json → 200"
+  },
+  {
+   "name": "bunki-graded-n3-river · the reader renders tokens",
+   "pass": true,
+   "detail": "205 tokens (92 content), 467 chars"
+  },
+  {
+   "name": "bunki-graded-n3-river · furigana render",
+   "pass": true,
+   "detail": "73 <rt>"
+  },
+  {
+   "name": "bunki-graded-n3-river · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n3-river · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "家(いえ)→house · 高い(たかい)→high · 見つける(みつける)→to find"
+  },
+  {
+   "name": "bunki-graded-n3-river · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 家  いえ  noun  house residence"
+  },
+  {
+   "name": "bunki-graded-n3-river · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n3-radio · stands on the shelf",
+   "pass": true,
+   "detail": "深夜のラジオ"
+  },
+  {
+   "name": "bunki-graded-n3-radio · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n3-radio.json → 200"
+  },
+  {
+   "name": "bunki-graded-n3-radio · the reader renders tokens",
+   "pass": true,
+   "detail": "194 tokens (87 content), 454 chars"
+  },
+  {
+   "name": "bunki-graded-n3-radio · furigana render",
+   "pass": true,
+   "detail": "63 <rt>"
+  },
+  {
+   "name": "bunki-graded-n3-radio · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n3-radio · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "を→direct object · いる(いる)→to be needed · 半年(はんとし)→half a year"
+  },
+  {
+   "name": "bunki-graded-n3-radio · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ を　particle  direct object  M"
+  },
+  {
+   "name": "bunki-graded-n3-radio · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · stands on the shelf",
+   "pass": true,
+   "detail": "手で書くということ"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-graded-n3-handwriting.json → 200"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · the reader renders tokens",
+   "pass": true,
+   "detail": "199 tokens (89 content), 424 chars"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · furigana render",
+   "pass": true,
+   "detail": "69 <rt>"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · paragraphs survive",
+   "pass": true,
+   "detail": "3 paragraph breaks"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "漢字(かんじ)→kanji · ぼんやり(ぼんやり)→dimly · こと(こと)→thing"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 漢字  かんじ  noun  kanji Chinese"
+  },
+  {
+   "name": "bunki-graded-n3-handwriting · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · stands on the shelf",
+   "pass": true,
+   "detail": "余白のためのノート"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n2-notebook.json → 200"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · the reader renders tokens",
+   "pass": true,
+   "detail": "267 tokens (122 content), 619 chars"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · furigana render",
+   "pass": true,
+   "detail": "95 <rt>"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "ノート(ノート)→notebook · 作り出す(つくりだす)→to manufacture · 分かる(わかる)→to understand"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ ノート  ノート  noun  notebook cop"
+  },
+  {
+   "name": "bunki-essay-n2-notebook · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-essay-n2-rain · stands on the shelf",
+   "pass": true,
+   "detail": "雨の日の速度"
+  },
+  {
+   "name": "bunki-essay-n2-rain · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n2-rain.json → 200"
+  },
+  {
+   "name": "bunki-essay-n2-rain · the reader renders tokens",
+   "pass": true,
+   "detail": "281 tokens (132 content), 670 chars"
+  },
+  {
+   "name": "bunki-essay-n2-rain · furigana render",
+   "pass": true,
+   "detail": "100 <rt>"
+  },
+  {
+   "name": "bunki-essay-n2-rain · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-essay-n2-rain · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "雨(あめ)→rain · 散る(ちる)→to fall (e.g. blos · 作る(つくる)→to make"
+  },
+  {
+   "name": "bunki-essay-n2-rain · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 雨  あめ  noun  rain rainy day "
+  },
+  {
+   "name": "bunki-essay-n2-rain · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-essay-n2-translation · stands on the shelf",
+   "pass": true,
+   "detail": "訳せない言葉について"
+  },
+  {
+   "name": "bunki-essay-n2-translation · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n2-translation.json → 200"
+  },
+  {
+   "name": "bunki-essay-n2-translation · the reader renders tokens",
+   "pass": true,
+   "detail": "308 tokens (129 content), 725 chars"
+  },
+  {
+   "name": "bunki-essay-n2-translation · furigana render",
+   "pass": true,
+   "detail": "101 <rt>"
+  },
+  {
+   "name": "bunki-essay-n2-translation · paragraphs survive",
+   "pass": true,
+   "detail": "4 paragraph breaks"
+  },
+  {
+   "name": "bunki-essay-n2-translation · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "外国(がいこく)→foreign country · 言葉(ことば)→language · が→subject"
+  },
+  {
+   "name": "bunki-essay-n2-translation · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 外国  がいこく  noun · no-adjectiv"
+  },
+  {
+   "name": "bunki-essay-n2-translation · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-essay-n1-memory · stands on the shelf",
+   "pass": true,
+   "detail": "忘却を前提とした設計"
+  },
+  {
+   "name": "bunki-essay-n1-memory · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n1-memory.json → 200"
+  },
+  {
+   "name": "bunki-essay-n1-memory · the reader renders tokens",
+   "pass": true,
+   "detail": "385 tokens (193 content), 1027 chars"
+  },
+  {
+   "name": "bunki-essay-n1-memory · furigana render",
+   "pass": true,
+   "detail": "138 <rt>"
+  },
+  {
+   "name": "bunki-essay-n1-memory · paragraphs survive",
+   "pass": true,
+   "detail": "5 paragraph breaks"
+  },
+  {
+   "name": "bunki-essay-n1-memory · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "学習(がくしゅう)→learning · ほう(ほう)→(no gloss yet) · 何(なに)→what"
+  },
+  {
+   "name": "bunki-essay-n1-memory · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 8 rows · ← 戻る back ✕ 学習  がくしゅう  noun · suru verb "
+  },
+  {
+   "name": "bunki-essay-n1-memory · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "bunki-essay-n1-city · stands on the shelf",
+   "pass": true,
+   "detail": "都市の匿名性と言語"
+  },
+  {
+   "name": "bunki-essay-n1-city · lazy-loads its own file",
+   "pass": true,
+   "detail": "data/articles/bunki-essay-n1-city.json → 200"
+  },
+  {
+   "name": "bunki-essay-n1-city · the reader renders tokens",
+   "pass": true,
+   "detail": "393 tokens (179 content), 1037 chars"
+  },
+  {
+   "name": "bunki-essay-n1-city · furigana render",
+   "pass": true,
+   "detail": "154 <rt>"
+  },
+  {
+   "name": "bunki-essay-n1-city · paragraphs survive",
+   "pass": true,
+   "detail": "5 paragraph breaks"
+  },
+  {
+   "name": "bunki-essay-n1-city · the gloss ladder opens on a held word",
+   "pass": true,
+   "detail": "大きな(おおきな)→big · 届く(とどく)→to reach"
+  },
+  {
+   "name": "bunki-essay-n1-city · the full entry opens on a longer hold",
+   "pass": true,
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 大きな  おおきな  adj-pn  big large"
+  },
+  {
+   "name": "bunki-essay-n1-city · opened with zero console/page errors",
+   "pass": true,
+   "detail": "0 new"
+  },
+  {
+   "name": "zero console errors, page exceptions or failed requests across the whole run",
+   "pass": true,
+   "detail": "[]"
+  }
+ ],
+ "failures": 0
+}

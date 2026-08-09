@@ -48,6 +48,12 @@
     "licence": "Bunki original",
     "attribution": "Bunki original graded texts and essays",
     "url": ""
+   },
+   {
+    "name": "bunki-wp9b-reading-catalog",
+    "licence": "Bunki original",
+    "attribution": "Bunki original graded texts and essays (WP9b shelf expansion)",
+    "url": ""
    }
   ]
  },
@@ -1578,6 +1584,846 @@
     "むか",
     "うつる",
     "ゆく"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n5-station",
+   "title": "駅で待つ時間",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N5",
+   "lane": "graded",
+   "file": "bunki-graded-n5-station.json",
+   "chars": 255,
+   "snippet": "朝、私は駅で電車を待ちました。時計を見ると、七時五十分でした。電車はまだ来ません。  ホームには人がたくさんいました。学生も会社",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.737061988304093,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7761194029850746,
+      "band_vector": {
+       "n5": 0.6865671641791045,
+       "n4": 0.07462686567164178,
+       "n3": 0.014925373134328358,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.22388059701492538
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 67
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "電車",
+    "待つ",
+    "時計",
+    "見る",
+    "まだ",
+    "ホーム"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n5-kitchen",
+   "title": "台所の音",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N5",
+   "lane": "graded",
+   "file": "bunki-graded-n5-kitchen.json",
+   "chars": 244,
+   "snippet": "夜、母が台所で料理を作っています。私は隣の部屋で日本語の本を読んでいます。  包丁の音が聞こえます。トン、トン、トン。水の音も聞",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.862475471698113,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6885245901639344,
+      "band_vector": {
+       "n5": 0.5573770491803278,
+       "n4": 0.08196721311475409,
+       "n3": 0.03278688524590164,
+       "n2": 0.01639344262295082,
+       "n1": 0.0,
+       "oov": 0.3114754098360656
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 61
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "台所",
+    "料理",
+    "作る",
+    "部屋",
+    "読む",
+    "包丁"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n5-neighbour",
+   "title": "となりの部屋の人",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N5",
+   "lane": "graded",
+   "file": "bunki-graded-n5-neighbour.json",
+   "chars": 244,
+   "snippet": "私のアパートのとなりに、おじいさんが住んでいます。毎朝、六時に部屋を出ます。  初めて会った日、私は何も言えませんでした。日本語",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.437135802469137,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6785714285714286,
+      "band_vector": {
+       "n5": 0.5892857142857143,
+       "n4": 0.08928571428571429,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.32142857142857145
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 56
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "アパート",
+    "となり",
+    "じい",
+    "住む",
+    "毎朝",
+    "部屋"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n4-letter",
+   "title": "引き出しの中の手紙",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N4",
+   "lane": "graded",
+   "file": "bunki-graded-n4-letter.json",
+   "chars": 310,
+   "snippet": "引っ越しの準備をしていたとき、机の引き出しから古い手紙が出てきました。私が書いたものではありません。前にこの部屋に住んでいた人の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.8171011523687586,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6144578313253012,
+      "band_vector": {
+       "n5": 0.4457831325301205,
+       "n4": 0.13253012048192772,
+       "n3": 0.024096385542168676,
+       "n2": 0.012048192771084338,
+       "n1": 0.0,
+       "oov": 0.3855421686746988
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 83
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "引っ越し",
+    "準備",
+    "とき",
+    "引き出し",
+    "古い",
+    "手紙"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n4-market",
+   "title": "朝の市場",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N4",
+   "lane": "graded",
+   "file": "bunki-graded-n4-market.json",
+   "chars": 281,
+   "snippet": "日曜日の朝、私は近くの市場へ行きました。まだ早い時間でしたが、店の人たちはもう準備を終えていました。  野菜の名前が紙に書いてあ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.001312089971884,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.676056338028169,
+      "band_vector": {
+       "n5": 0.5070422535211268,
+       "n4": 0.09859154929577464,
+       "n3": 0.04225352112676056,
+       "n2": 0.014084507042253521,
+       "n1": 0.014084507042253521,
+       "oov": 0.323943661971831
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 71
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "日曜",
+    "近く",
+    "市場",
+    "行く",
+    "まだ",
+    "早い"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n4-bicycle",
+   "title": "自転車をなくした日",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N4",
+   "lane": "graded",
+   "file": "bunki-graded-n4-bicycle.json",
+   "chars": 288,
+   "snippet": "駅の前に自転車を置いておいたのですが、夕方に戻ると、そこにありませんでした。私は同じ場所を三回探しました。やはりありません。  ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.46416785109983,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6351351351351351,
+      "band_vector": {
+       "n5": 0.43243243243243246,
+       "n4": 0.12162162162162163,
+       "n3": 0.04054054054054054,
+       "n2": 0.0,
+       "n1": 0.04054054054054054,
+       "oov": 0.36486486486486486
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 74
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "自転",
+    "置く",
+    "おく",
+    "夕方",
+    "戻る",
+    "そこ"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n3-river",
+   "title": "川沿いの道",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-river.json",
+   "chars": 313,
+   "snippet": "家から駅まで、二つの道がある。一つは大通りで、五分早く着く。もう一つは川沿いの道で、遠回りになる。私はたいてい川のほうを選ぶ。 ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.943849906191369,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6304347826086957,
+      "band_vector": {
+       "n5": 0.41304347826086957,
+       "n4": 0.11956521739130435,
+       "n3": 0.05434782608695652,
+       "n2": 0.03260869565217391,
+       "n1": 0.010869565217391304,
+       "oov": 0.3695652173913043
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 92
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "ある",
+    "大通り",
+    "早い",
+    "着く",
+    "もう",
+    "川沿い"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n3-radio",
+   "title": "深夜のラジオ",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-radio.json",
+   "chars": 313,
+   "snippet": "日本語を聞く練習として、私は深夜のラジオを流したまま眠ることにしていた。内容を理解するためではない。音の形に慣れるためだ。  最",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.050625429553264,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5517241379310345,
+      "band_vector": {
+       "n5": 0.1839080459770115,
+       "n4": 0.16091954022988506,
+       "n3": 0.16091954022988506,
+       "n2": 0.022988505747126436,
+       "n1": 0.022988505747126436,
+       "oov": 0.4482758620689655
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 87
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "聞く",
+    "練習",
+    "深夜",
+    "ラジオ",
+    "流す",
+    "まま"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-graded-n3-handwriting",
+   "title": "手で書くということ",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-handwriting.json",
+   "chars": 303,
+   "snippet": "漢字を覚えるとき、私はしばらく手で書くのをやめていた。画面で選べば済むし、そのほうが速いと思ったからだ。  しかし、読めるのに書",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.6219643672910014,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.651685393258427,
+      "band_vector": {
+       "n5": 0.2808988764044944,
+       "n4": 0.25842696629213485,
+       "n3": 0.10112359550561797,
+       "n2": 0.011235955056179775,
+       "n1": 0.0,
+       "oov": 0.34831460674157305
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 89
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "漢字",
+    "覚える",
+    "とき",
+    "しばらく",
+    "書く",
+    "やめる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n2-notebook",
+   "title": "余白のためのノート",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-notebook.json",
+   "chars": 417,
+   "snippet": "ノートを取る目的は、内容を残すことだと長く思っていた。だから、できるだけ多くを書き写し、余白を作らないようにしていた。しかし、後",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.066861423220974,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.540983606557377,
+      "band_vector": {
+       "n5": 0.22131147540983606,
+       "n4": 0.11475409836065574,
+       "n3": 0.18032786885245902,
+       "n2": 0.0,
+       "n1": 0.02459016393442623,
+       "oov": 0.45901639344262296
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 122
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "ノート",
+    "取る",
+    "目的",
+    "内容",
+    "残す",
+    "こと"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n2-rain",
+   "title": "雨の日の速度",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-rain.json",
+   "chars": 428,
+   "snippet": "雨の日は、町の速度が落ちる。傘を差した人の歩幅は狭くなり、自転車は減り、交差点で立ち止まる時間が長くなる。同じ道を歩いても、晴れ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.175375444839858,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6515151515151515,
+      "band_vector": {
+       "n5": 0.2196969696969697,
+       "n4": 0.20454545454545456,
+       "n3": 0.1590909090909091,
+       "n2": 0.045454545454545456,
+       "n1": 0.022727272727272728,
+       "oov": 0.3484848484848485
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 132
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "速度",
+    "落ちる",
+    "差す",
+    "歩幅",
+    "狭い",
+    "なる"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n2-translation",
+   "title": "訳せない言葉について",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-translation.json",
+   "chars": 481,
+   "snippet": "外国語を学んでいると、辞書の訳語では届かない言葉に必ず出会う。日本語で言えば「もったいない」や「おつかれさま」がよく例に挙げられ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.0968606060606056,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.627906976744186,
+      "band_vector": {
+       "n5": 0.26356589147286824,
+       "n4": 0.10077519379844961,
+       "n3": 0.20930232558139536,
+       "n2": 0.015503875968992248,
+       "n1": 0.03875968992248062,
+       "oov": 0.37209302325581395
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 129
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "外国",
+    "学ぶ",
+    "いる",
+    "辞書",
+    "訳語",
+    "届く"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n1-memory",
+   "title": "忘却を前提とした設計",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-memory.json",
+   "chars": 628,
+   "snippet": "学習の計画は、しばしば「覚えること」を中心に組み立てられる。しかし、実際に設計すべきなのは、忘れることを前提にしたときに何が残る",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.26147899159664,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.538860103626943,
+      "band_vector": {
+       "n5": 0.10362694300518134,
+       "n4": 0.07772020725388601,
+       "n3": 0.23316062176165803,
+       "n2": 0.046632124352331605,
+       "n1": 0.07772020725388601,
+       "oov": 0.46113989637305697
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 193
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "学習",
+    "計画",
+    "しばしば",
+    "覚える",
+    "こと",
+    "中心"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "bunki-essay-n1-city",
+   "title": "都市の匿名性と言語",
+   "source": "bunki-wp9b-reading-catalog",
+   "sourceLabel": "随筆 · Bunki",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-city.json",
+   "chars": 624,
+   "snippet": "大きな都市で暮らす利点の一つは、誰からも説明を求められないことだと言われる。出身も職業も伏せたまま、日々の用件だけで生活が成り立",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.193674032409268,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6089385474860336,
+      "band_vector": {
+       "n5": 0.13966480446927373,
+       "n4": 0.16201117318435754,
+       "n3": 0.20670391061452514,
+       "n2": 0.027932960893854747,
+       "n1": 0.07262569832402235,
+       "oov": 0.39106145251396646
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 179
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "大きな",
+    "都市",
+    "暮らす",
+    "利点",
+    "説明",
+    "求める"
    ],
    "truncated": false
   }
