@@ -19,15 +19,21 @@ import { z } from 'zod';
 
 import { isoInstantSchema, nonEmptyString } from './shared.ts';
 
-/** The only schema version this build implements. */
+/** The envelope version used by every original ADR-002 event family. */
 export const EVENT_SCHEMA_VERSION = 1;
+
+/** ReviewGraded alone has a replay-compatible v2 evidence payload. */
+export const REVIEW_GRADED_EVENT_VERSION = 2;
 
 /**
  * Versions this build accepts. A one-element list today; the shape is a list so
  * that the day a v2 exists, accepting both is a data change in one place rather
  * than a rewrite of the parser's control flow.
  */
-export const SUPPORTED_EVENT_VERSIONS: readonly number[] = [EVENT_SCHEMA_VERSION];
+export const SUPPORTED_EVENT_VERSIONS: readonly number[] = [
+  EVENT_SCHEMA_VERSION,
+  REVIEW_GRADED_EVENT_VERSION,
+];
 
 export const eventEnvelopeSchema = z.strictObject({
   eventId: nonEmptyString,
@@ -36,7 +42,15 @@ export const eventEnvelopeSchema = z.strictObject({
   idempotencyKey: nonEmptyString,
 });
 
+export const eventEnvelopeV2Schema = z.strictObject({
+  eventId: nonEmptyString,
+  v: z.literal(REVIEW_GRADED_EVENT_VERSION),
+  occurredAt: isoInstantSchema,
+  idempotencyKey: nonEmptyString,
+});
+
 export type EventEnvelope = z.infer<typeof eventEnvelopeSchema>;
+export type EventEnvelopeV2 = z.infer<typeof eventEnvelopeV2Schema>;
 
 /** The envelope keys, as data — used to derive factory payload types. */
 export const ENVELOPE_KEYS = ['eventId', 'v', 'occurredAt', 'idempotencyKey'] as const;

@@ -38,9 +38,9 @@
 
 import {
   activatesSkill,
+  bindRetrievalContract,
   emptyTargetThreadIndex,
   indexEncounter,
-  resolveComponentThread,
   retrievalContractFromEvent,
   type MutableTargetThreadIndex,
   type RetrievalContract,
@@ -86,6 +86,8 @@ interface MutableObservation {
 }
 
 interface Accumulator {
+  /** Applied canonical prefix, used for source-bound contract authority. */
+  readonly appliedEvents: DomainEvent[];
   readonly threads: Map<string, ThreadState>;
   readonly contracts: Map<string, ContractRecord>;
   readonly observations: MutableObservation[];
@@ -116,6 +118,7 @@ interface Accumulator {
 
 function emptyAccumulator(): Accumulator {
   return {
+    appliedEvents: [],
     threads: new Map(),
     contracts: new Map(),
     observations: [],
@@ -167,6 +170,7 @@ function gateContext(
     promotionByThread: accumulator.promotionByThread,
     deletedThreadIds: accumulator.deletedThreadIds,
     supersededEventIds,
+    eventLog: accumulator.appliedEvents,
   };
 }
 
@@ -179,10 +183,10 @@ function gateContext(
  * disagree about the same contract.
  */
 function isContractActive(accumulator: Accumulator, contract: RetrievalContract): boolean {
-  const link = resolveComponentThread(accumulator.componentIndex, contract.targetComponentId);
-  if (!link.linked) return false;
-  if (accumulator.deletedThreadIds.has(link.threadId)) return false;
-  const promotion = accumulator.promotionByThread.get(link.threadId);
+  const bound = bindRetrievalContract(accumulator.appliedEvents, contract.contractId);
+  if (!bound.bound) return false;
+  if (accumulator.deletedThreadIds.has(bound.value.threadId)) return false;
+  const promotion = accumulator.promotionByThread.get(bound.value.threadId);
   if (promotion === undefined) return false;
   return activatesSkill(promotion, contract.skill);
 }
@@ -640,6 +644,7 @@ export function replay(events: readonly DomainEvent[]): DerivedState {
     }
 
     applyEvent(accumulator, event, supersededEventIds);
+    accumulator.appliedEvents.push(event);
     // Promotion activates contracts (REQ-DM-09). Three families can change the
     // answer — promotion, contract creation, capture — and a tombstone can
     // withdraw it, so activation is settled once per event rather than in four

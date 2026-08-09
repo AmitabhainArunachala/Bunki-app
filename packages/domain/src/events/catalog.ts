@@ -20,7 +20,7 @@
 import { z } from 'zod';
 
 import type { ExactOptional } from '../primitives.ts';
-import { eventEnvelopeSchema } from './envelope.ts';
+import { eventEnvelopeSchema, eventEnvelopeV2Schema } from './envelope.ts';
 import {
   candidateEnvelopeMetadataSchema,
   exportScopeSchema,
@@ -49,6 +49,11 @@ const withEnvelope = <TType extends string, TShape extends z.ZodRawShape>(
   type: TType,
   shape: TShape,
 ) => eventEnvelopeSchema.extend({ type: z.literal(type) }).extend(shape);
+
+const withEnvelopeV2 = <TType extends string, TShape extends z.ZodRawShape>(
+  type: TType,
+  shape: TShape,
+) => eventEnvelopeV2Schema.extend({ type: z.literal(type) }).extend(shape);
 
 // ---------------------------------------------------------------------------
 // Capture and threads
@@ -163,6 +168,41 @@ export const reviewGradedSchema = withEnvelope('ReviewGraded', {
   userConfirmedEasy: z.literal(true).optional(),
   probeContext: probeContextSchema,
   tier: z.literal('A'),
+});
+
+/** The only deterministic grader implemented by this build. */
+export const ACCEPTED_ANSWER_GRADING_POLICY_VERSION = 'accepted_answers:nfkc_trim@1';
+
+/** Correct, unhelped retrievals use one explicit effort judgement. */
+export const REVIEW_EFFORT_GRADES = ['hard', 'good', 'easy'] as const;
+
+/**
+ * Replay-verifiable ReviewGraded v2.
+ *
+ * The proof is deliberately redundant. Replay independently derives every
+ * field from the raw response and exact ContractCreated payload, then rejects a
+ * disagreement. Redundancy here is an audit surface, not a caller permission.
+ */
+export const reviewGradedV2Schema = withEnvelopeV2('ReviewGraded', {
+  contractId: nonEmptyString,
+  response: nonEmptyString,
+  effort: z.enum(REVIEW_EFFORT_GRADES),
+  grade: gradeSchema,
+  latencyMs: z.number().int().min(0),
+  hintsUsed: z.number().int().min(0),
+  revealedBeforeRecall: z.boolean(),
+  userConfirmedEasy: z.literal(true).optional(),
+  probeContext: probeContextSchema,
+  tier: z.literal('A'),
+  graderProof: z.strictObject({
+    grader: z.literal('accepted_answers'),
+    policyVersion: nonEmptyString,
+    contractVersion: z.number().int().min(1),
+    responseModality: z.enum(MODALITIES),
+    normalizedResponse: z.string(),
+    decision: z.enum(['correct', 'incorrect']),
+    acceptedAnswerIndex: z.number().int().min(0).nullable(),
+  }),
 });
 
 export const productionObservedSchema = withEnvelope('ProductionObserved', {
@@ -298,7 +338,9 @@ export type ThreadPromotionChangedEvent = ExactOptional<
   z.infer<typeof threadPromotionChangedSchema>
 >;
 export type ContractCreatedEvent = ExactOptional<z.infer<typeof contractCreatedSchema>>;
-export type ReviewGradedEvent = ExactOptional<z.infer<typeof reviewGradedSchema>>;
+export type ReviewGradedV1Event = ExactOptional<z.infer<typeof reviewGradedSchema>>;
+export type ReviewGradedV2Event = ExactOptional<z.infer<typeof reviewGradedV2Schema>>;
+export type ReviewGradedEvent = ReviewGradedV1Event | ReviewGradedV2Event;
 export type ProductionObservedEvent = ExactOptional<z.infer<typeof productionObservedSchema>>;
 export type ExposureLoggedEvent = ExactOptional<z.infer<typeof exposureLoggedSchema>>;
 export type LookupFrictionLoggedEvent = ExactOptional<z.infer<typeof lookupFrictionLoggedSchema>>;

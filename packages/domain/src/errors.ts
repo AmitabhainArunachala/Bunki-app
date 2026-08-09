@@ -24,6 +24,7 @@ export const DOMAIN_ERROR_CODES = [
   'EVIDENCE_FACTORY_BOUNDARY',
   'CONTRACT_VALIDATION_FAILED',
   'CANDIDATE_NOT_EVIDENCE',
+  'REVIEW_VERIFICATION_FAILED',
   'FOREIGN_EVENT_PROVENANCE',
 ] as const;
 
@@ -291,6 +292,27 @@ export class CandidateEvidenceBoundaryError extends DomainError {
       `Refused: the value offered to the evidence gate carries the AI-candidate marker ${JSON.stringify(marker)}. AI output is never evidence and can never reach memory state (REQ-ARCH-04, REQ-SCH-03, T-09).`,
     );
     this.marker = marker;
+  }
+}
+
+export type ReviewVerificationFailureReason =
+  | 'response_blank'
+  | 'response_modality_unverified'
+  | 'grading_method_unverified'
+  | 'attempt_violates_contract_policy';
+
+/** A caller asked the kernel to mint a review it cannot independently grade. */
+export class ReviewVerificationError extends DomainError {
+  readonly reason: ReviewVerificationFailureReason;
+  readonly contractId: string;
+
+  constructor(reason: ReviewVerificationFailureReason, contractId: string, detail: string) {
+    super(
+      'REVIEW_VERIFICATION_FAILED',
+      `Review for contract ${contractId} is typed-unverified (${reason}): ${detail}`,
+    );
+    this.reason = reason;
+    this.contractId = contractId;
   }
 }
 

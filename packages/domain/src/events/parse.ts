@@ -36,9 +36,14 @@ import {
   DOMAIN_EVENT_TYPES,
   EVENT_SCHEMAS,
   isDomainEventType,
+  reviewGradedV2Schema,
   type DomainEvent,
 } from './catalog.ts';
-import { EVENT_SCHEMA_VERSION, SUPPORTED_EVENT_VERSIONS } from './envelope.ts';
+import {
+  EVENT_SCHEMA_VERSION,
+  REVIEW_GRADED_EVENT_VERSION,
+  SUPPORTED_EVENT_VERSIONS,
+} from './envelope.ts';
 
 function toIssues(error: z.ZodError): readonly EventValidationIssue[] {
   return error.issues.map((issue) => ({
@@ -66,7 +71,7 @@ export function parseEvent(raw: unknown, index: number | null = null): DomainEve
 
   // (2) Version first — see the file header.
   const version: unknown = raw['v'];
-  if (version !== EVENT_SCHEMA_VERSION) {
+  if (!SUPPORTED_EVENT_VERSIONS.includes(version as number)) {
     throw new UnknownEventVersionError(version, SUPPORTED_EVENT_VERSIONS, index);
   }
 
@@ -77,7 +82,16 @@ export function parseEvent(raw: unknown, index: number | null = null): DomainEve
   }
 
   // (4) Then the family's own schema, strictly.
-  const result = EVENT_SCHEMAS[type].safeParse(raw);
+  const schema =
+    version === REVIEW_GRADED_EVENT_VERSION && type === 'ReviewGraded'
+      ? reviewGradedV2Schema
+      : version === EVENT_SCHEMA_VERSION
+        ? EVENT_SCHEMAS[type]
+        : null;
+  if (schema === null) {
+    throw new UnknownEventVersionError(version, [EVENT_SCHEMA_VERSION], index);
+  }
+  const result = schema.safeParse(raw);
   if (!result.success) {
     throw new EventValidationError(type, toIssues(result.error), index);
   }

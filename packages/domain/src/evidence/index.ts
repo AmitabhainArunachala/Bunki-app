@@ -8,3 +8,4 @@
 
 export * from './gate.ts';
 export * from './mint.ts';
+export * from './accepted-answer-grader.ts';

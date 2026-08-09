@@ -28,7 +28,7 @@
 
 import {
   activatesSkill,
-  resolveComponentThread,
+  bindRetrievalContract,
   type RetrievalContract,
   type TargetThreadIndex,
   type MutableTargetThreadIndex,
@@ -41,6 +41,7 @@ import {
 } from '../events/catalog.ts';
 import type { Grade, PromotionState } from '../events/shared.ts';
 import type { ContractId, EventId, ThreadId } from '../primitives.ts';
+import { verifyReviewGraderProof } from './accepted-answer-grader.ts';
 
 /**
  * Every way an observation can fail to reach the scheduler.
@@ -63,6 +64,16 @@ export const GATE_REJECTION_REASONS = [
   'skill_not_activated_by_promotion',
   'thread_deleted',
   'easy_requires_user_confirmation',
+  'response_unverified',
+  'source_lineage_unverified',
+  'response_blank',
+  'response_modality_unverified',
+  'grading_method_unverified',
+  'contract_version_mismatch',
+  'grading_policy_mismatch',
+  'grader_proof_mismatch',
+  'attempt_violates_contract_policy',
+  'grade_not_derived_from_proof',
   'evidence_superseded',
 ] as const;
 
@@ -101,6 +112,8 @@ export interface EvidenceGateContext {
   readonly deletedThreadIds: ReadonlySet<ThreadId>;
   /** Observations a later `EvidenceSuperseded` retracted (REQ-DM-04.2). */
   readonly supersededEventIds: ReadonlySet<EventId>;
+  /** Canonical log prefix before the observation being judged. */
+  readonly eventLog: readonly DomainEvent[];
 }
 
 // ---------------------------------------------------------------------------
@@ -255,6 +268,17 @@ function admitReviewGraded(event: ReviewGradedEvent, context: EvidenceGateContex
     );
   }
 
+  // v1 records a self-reported grade but no response or grader proof. It stays
+  // parseable and visible forever; replay intentionally removes its former
+  // scheduler authority.
+  if (event.v === 1) {
+    return reject(
+      'response_unverified',
+      'ReviewGraded v1 records no learner response or reproducible grader proof; it is preserved as history and cannot update scheduler truth',
+      event.contractId,
+    );
+  }
+
   if (context.invalidContractIds.has(event.contractId)) {
     return reject(
       'contract_invalid',
@@ -272,10 +296,48 @@ function admitReviewGraded(event: ReviewGradedEvent, context: EvidenceGateContex
     );
   }
 
-  const link = resolveComponentThread(context.threadIndex, contract.targetComponentId);
-  if (!link.linked) {
-    return reject(link.reason, link.detail, event.contractId);
+  const sourceBound = bindRetrievalContract(context.eventLog, event.contractId);
+  if (!sourceBound.bound) {
+    switch (sourceBound.failure.reason) {
+      case 'component_missing':
+        return reject(
+          'component_never_captured',
+          'source binding failed closed: component_missing',
+          event.contractId,
+        );
+      case 'thread_ambiguous':
+        return reject(
+          'component_ambiguous',
+          'source binding failed closed: thread_ambiguous',
+          event.contractId,
+        );
+      case 'contract_invalid':
+        return reject(
+          'contract_invalid',
+          'source binding failed closed: contract_invalid',
+          event.contractId,
+        );
+      case 'contract_missing':
+      case 'contract_ambiguous':
+        return reject(
+          'contract_unknown',
+          `source binding failed closed: ${sourceBound.failure.reason}`,
+          event.contractId,
+        );
+      case 'contract_precedes_origin':
+      case 'origin_ambiguous':
+        return reject(
+          'source_lineage_unverified',
+          `source binding failed closed: ${sourceBound.failure.reason}; no origin encounter was inferred`,
+          event.contractId,
+        );
+      default: {
+        const unreachable: never = sourceBound.failure;
+        return unreachable;
+      }
+    }
   }
+  const link = { linked: true as const, threadId: sourceBound.value.threadId };
 
   // A tombstoned thread stops scheduling at once. The marker is sync-safe and
   // the purge follows; a thread that kept accruing intervals after the learner
@@ -313,20 +375,12 @@ function admitReviewGraded(event: ReviewGradedEvent, context: EvidenceGateContex
     );
   }
 
-  const grade = effectiveGradeOf(event);
-  const forcedByReveal = event.revealedBeforeRecall && event.grade !== 'again';
-
-  // REQ-DM-07: `Easy` is never inferred. An unconfirmed `easy` is a
-  // representable, recordable event — the ledger keeps it and the inspector can
-  // show it — but it does not schedule. Silently demoting it to `good` would be
-  // the system making a claim about the learner that the learner did not make.
-  if (grade === 'easy' && event.userConfirmedEasy !== true) {
-    return reject(
-      'easy_requires_user_confirmation',
-      'grade "easy" requires userConfirmedEasy: true; Easy is never inferred from speed or from anything else (REQ-DM-07)',
-      event.contractId,
-    );
+  const proof = verifyReviewGraderProof(event, contract);
+  if (!proof.verified) {
+    return reject(proof.reason, proof.detail, event.contractId);
   }
+  const grade = proof.effectiveGrade;
+  const forcedByReveal = event.revealedBeforeRecall;
 
   return {
     admitted: true,
