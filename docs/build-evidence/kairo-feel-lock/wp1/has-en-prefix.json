@@ -1,0 +1,37 @@
+{
+  "build": "/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/prefix-standalone.html",
+  "label": "prefix",
+  "article": "wikinews:1403",
+  "tapped": 4,
+  "hasEn": [
+    {
+      "text": "含ふくめto include",
+      "hasWordRow": false,
+      "hasEnRow": true,
+      "childRows": 2,
+      "en": "to include",
+      "height": 70.63,
+      "display": "inline-flex"
+    },
+    {
+      "text": "認みとめto observe",
+      "hasWordRow": false,
+      "hasEnRow": true,
+      "childRows": 2,
+      "en": "to observe",
+      "height": 70.63,
+      "display": "inline-flex"
+    },
+    {
+      "text": "含ふくむto have",
+      "hasWordRow": false,
+      "hasEnRow": true,
+      "childRows": 2,
+      "en": "to have",
+      "height": 70.63,
+      "display": "inline-flex"
+    }
+  ],
+  "tallerThan50": 3,
+  "errors": []
+}
