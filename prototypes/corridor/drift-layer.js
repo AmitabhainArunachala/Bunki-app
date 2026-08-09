@@ -13,6 +13,17 @@ const TAU=Math.PI*2;
 const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---- OPERATOR TUNABLES: how alive the water is. Ruled by feel, not derived. ----
+// All three are silenced entirely by prefers-reduced-motion (see `reduced` above):
+// under `reduce` the field does not drift and the current does not run at all.
+// DRIFT_SPEED — how fast each word breathes inside its own wander box, on its own private heading. Turn it up and the field fidgets harder; 1 was the whole of the old near-stillness, 0 freezes the breathing. Measured finding: this is the EXPENSIVE way to buy motion — private headings do not agree, so raising it drives neighbours across each other (shear) and leaves the ghost arbiter chasing new overlaps. The current below buys the same speed coherently and almost for free, so most of the aliveness is bought there and this stays low.
+const DRIFT_SPEED=1.15;
+// CURRENT_STRENGTH — how much of the field the slow gyre owns: how far it carries a word off its anchor (CURREACH world units, below) and how hard it stirs the water the ink and the flow motes ride. Turn it up and the field travels as one body; 0 leaves every word rattling privately and takes the current off the water.
+const CURRENT_STRENGTH=0.038;
+// CURRENT_DRIFT — how fast the gyre's eye wanders the field, in radians/ms. This is what turns a standing pull into motion: a parked eye holds every word at a fixed offset and nothing moves. Turn it up and the swirl roams restlessly; turn it down and the field leans and holds.
+const CURRENT_DRIFT=0.0017;
+
 const rgbOf=h=>{const n=parseInt(h.slice(1),16);return [n>>16,(n>>8)&255,n&255];};
 const rgba=(h,a)=>{const c=rgbOf(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";};
 const shade=(h,f,a)=>{const c=rgbOf(h);
@@ -303,6 +314,7 @@ function initBlobs(){
       sp:(mass?0.00005:0.00008)+Math.random()*0.00012,
       amp:mass?18+Math.random()*26:30+Math.random()*55,
       ix:0,iy:0,color:"#1E50A2",a:(mass?1.9+Math.random()*0.7:0.7+Math.random()*0.5)});
+    const b=blobs[blobs.length-1]; b.hx=b.x; b.hy=b.y;
   }
 }
 function drawWave(t){
@@ -332,6 +344,12 @@ function drawInk(t){
     if(!reduced){
       const fv=fluidAt(b.x,b.y);
       b.x+=fv.x*(vw()/FW)*0.22; b.y+=fv.y*(vh()/FH)*0.22;
+      // Pigment is stain sunk into paper, not free dust. A weak return keeps a
+      // pool near its own place, so the standing current sways the washes
+      // instead of draining every one of them to the same rim over a long sit
+      // (measured: 3 of 9 pools clamped at the left edge after 90s without it).
+      // Slack enough — ~2s — that a finger's burst still throws pigment.
+      b.x+=(b.hx-b.x)*0.02; b.y+=(b.hy-b.y)*0.02;
       b.x=clamp(b.x,-80,vw()+80); b.y=clamp(b.y,-80,vh()+80);
     }
     const bx=b.x+Math.cos(t*b.sp+b.ph)*b.amp+b.ix;
@@ -400,7 +418,86 @@ function fluidBurst(px2,py2,s){
     const i=FI(x,y); fvx[i]+=dx*f; fvy[i]+=dy*f;
   }
 }
+// ---- the slow coherent current -------------------------------------------
+// One gyre, whose eye wanders the field on a slow Lissajous path that never
+// quite repeats (the terms are mutually incommensurate). It is the same current
+// in two places: it stirs the water here, and it carries every resting word in
+// drawGraph. That shared eye is what makes the field read as one body leaning
+// rather than sixty things jittering — words a thumb apart travel together
+// because they are being carried by the same water, not because they agree.
+// The eye ranges well outside the glass on purpose. A gyre whose eye sits in
+// the middle of the field turns hard: two words a thumb apart get pulled in
+// visibly different directions, they tangle, and the WP2 arbiter spends its life
+// chasing new overlaps. Held out at arm's length the same gyre reads on screen
+// as one broad lean that slowly changes its mind — the coherence goes UP and the
+// shear between neighbours goes DOWN at the same time.
+let curT=0;   // elapsed animated time, advanced once a frame in frame()
+// The water settles under a hand. While any finger is down the ambient drift and
+// the current ease to a stop over ~7 frames, and ease back when the hand lifts.
+// Two reasons, and the first is the real one:
+//  · it is what water does. You reach in and the surface under your hand goes
+//    quiet; the moment you let go it starts moving again.
+//  · a word must not walk out from under a finger that is already resting on it.
+//    Ambient drift during a held gesture is indistinguishable, to anything
+//    downstream, from the field dragging the word — which is precisely what the
+//    hunt battery's "a foreign pointermove cannot drag a touch-held word"
+//    (threshold: 8px) is there to forbid.
+// Finger-made motion is untouched: fluidInject/fluidBurst still stir the ink, so
+// stirring the water with a fingertip works exactly as before.
+let calm=1;
+function currentCenter(t){
+  const a=t*CURRENT_DRIFT;
+  return {x:(0.5+0.62*Math.sin(a)+0.20*Math.sin(a*2.3+1.3))*vw(),
+          y:(0.5+0.62*Math.cos(a*0.77)+0.20*Math.cos(a*1.7+0.6))*vh()};
+}
+// Heading of the current at a screen point: tangential (counter-clockwise) with
+// a slight inward lean, so it reads as a PULL toward the eye and not a carousel.
+// It eases to nothing at the eye itself — the centre is calm water, not a
+// pinhole — and fades out toward the far rim.
+//
+// This runs for every word and every water cell on every frame, so it is
+// written in sqrt and one divide: Math.hypot and Math.exp here cost the fusion
+// its 60fps outright (p95 33ms with them, 17ms without). rim2 is the rim
+// distance SQUARED and the falloff is the Lorentzian rim2/(rim2+d^2) — same
+// shape as the exponential to the eye, a fraction of the price.
+function currentHeadingAt(cx,cy,eye,rim2,sx,sy,out){
+  const dx=sx-cx, dy=sy-cy, d2=dx*dx+dy*dy, d=Math.sqrt(d2)||1;
+  const f=(d<eye?d/eye:1)*rim2/(rim2+d2)/d;
+  out.x=(-dy*0.94-dx*0.34)*f; out.y=(dx*0.94-dy*0.34)*f;
+  return out;
+}
+// A WIDE calm core (not the pinhole a literal vortex would have) is the other
+// half of the low-shear story: inside it the pull eases linearly to nothing, so
+// the direction never whips round between one word and the next.
+const CUR_EYE=()=>mind()*0.75;
+const CUR_RIM2=()=>{const r=Math.sqrt(vw()*vw()+vh()*vh())*1.15; return r*r;};
+// Inject the same gyre into the water. Pressure projection keeps rotational
+// flow (it is divergence-free), so this survives the solve and the ink, the
+// pigment blobs and the flow motes all turn with it.
+const _fc={x:0,y:0}, _wh={x:0,y:0};
+// how far off its anchor the current may carry a word, in world units. Derived
+// from CURRENT_STRENGTH so the operator has one knob for "how much of the field
+// the current owns" rather than two that must be kept in step; the wander box a
+// word breathes inside is +-16/+-12, so this stays comfortably under it.
+const CURREACH=CURRENT_STRENGTH*230;
+// How often the ghost arbiter re-reads the field, in frames. Pinned to the
+// drift so a faster field is not arbitrated more slowly than a slow one: a
+// tangle forms in proportionally fewer frames when the water moves quicker. At
+// DRIFT_SPEED 1 this is exactly the historical every-5th-frame.
+const ARB_EVERY=Math.max(1,Math.round(5/Math.max(1,DRIFT_SPEED)));
+function fluidCurrent(t){
+  if(reduced||CURRENT_STRENGTH<=0) return;
+  const s=CURRENT_STRENGTH*0.05*calm, c=currentCenter(t);
+  const eye=CUR_EYE(), rim2=CUR_RIM2();
+  const gw=vw()/FW, gh=vh()/FH;
+  for(let y=1;y<FH-1;y++)for(let x=1;x<FW-1;x++){
+    currentHeadingAt(c.x,c.y,eye,rim2,(x+0.5)*gw,(y+0.5)*gh,_fc);
+    const i=FI(x,y);
+    fvx[i]+=_fc.x*s; fvy[i]+=_fc.y*s;
+  }
+}
 function fluidStep(){
+  fluidCurrent(curT);
   for(let i=0;i<FN;i++){fvx[i]*=0.985;fvy[i]*=0.985;}
   for(let y=1;y<FH-1;y++)for(let x=1;x<FW-1;x++){
     const i=FI(x,y);
@@ -624,7 +721,7 @@ function buildWorld(){
       x=(hsh%1000)/1000*WR.w; y=((hsh>>10)%1000)/1000*WR.h;
     }
     const wrN={e,wx:clamp(x,60,WR.w-60),wy:clamp(y,90,WR.h-90),
-      pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,
+      pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,px:0,py:0,
       dvx:(((hsh>>3)%100)/100-0.5)*0.16,dvy:(((hsh>>7)%100)/100-0.5)*0.12};
     WORDS.push(wrN); WORDIX[e[0]]=wrN;
   }
@@ -2057,18 +2154,53 @@ function drawWorld(){
   const r3=r2*1.35, rr3=r3*2;
   const dHit=[],dMid=[],dLow=[];
   const thin=cz<0.45?4:(far?2:1);
+  // one eye for the whole field this frame — hoisted so the gyre costs four
+  // trig calls a frame rather than four per word
+  const curOn=!reduced&&CURRENT_STRENGTH>0;
+  const curC=currentCenter(curT);
+  const curEye=CUR_EYE(), curRim2=CUR_RIM2();
+  // WORDS is the whole dictionary, thousands of entries, and only the hundred-odd
+  // near the glass can be carried anywhere the eye would notice. Beyond this band
+  // the gyre's falloff has already taken the displacement to under a pixel, so
+  // the heading is not worth computing — this is the difference between the
+  // fusion holding 60fps and missing every third frame.
+  const curBandX=W2+250, curBandY=H2+250;
   for(const wr of WORDS){
     wi++;
     // locked constellation members are never thinned out — the bloom must stay
     // whole at every zoom, so "16 words locked" reads as 16 even at cam.z=0.34
     if(thin>1&&(wi%thin)&&!wr.lk) continue;
+    // The current's displacement for THIS word, in world units. It is a shared
+    // field, so two words standing near each other are carried the same way at
+    // the same moment — that togetherness is what the eye reads as a current
+    // rather than sixty independent twitches. Computed in screen space (the
+    // gyre lives on the visible field, not in the world map) and carried back
+    // through the inverse camera rotation.
+    let cdx=0, cdy=0;
+    if(curOn&&wr.sx>-curBandX&&wr.sx<curBandX&&wr.sy>-curBandY&&wr.sy<curBandY){
+      const h=currentHeadingAt(curC.x,curC.y,curEye,curRim2,wr.sx,wr.sy,_wh);
+      cdx=(h.x*cs+h.y*sn)*CURREACH; cdy=(h.y*cs-h.x*sn)*CURREACH;
+    }
     if(wr.lk){}
-    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
+    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;
+      wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
     else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
-      if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;}
+      if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;
+      wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
+    else if(reduced){
+      // prefers-reduced-motion stills the field entirely: no ambient drift, no
+      // current. Everything below this branch — bloom gather, return, every
+      // gesture — still runs, because those are answers to a finger, not motion
+      // the field makes on its own.
+    }
     else {
-      wr.ox+=wr.dvx; if(wr.ox>16||wr.ox<-16) wr.dvx*=-1;
-      wr.oy+=wr.dvy; if(wr.oy>12||wr.oy<-12) wr.dvy*=-1;
+      // the word's own breathing, bounded to its wander box exactly as before —
+      // DRIFT_SPEED is the only thing that changed about it
+      wr.px+=wr.dvx*DRIFT_SPEED*calm; if(wr.px>16||wr.px<-16) wr.dvx*=-1;
+      wr.py+=wr.dvy*DRIFT_SPEED*calm; if(wr.py>12||wr.py<-12) wr.dvy*=-1;
+      // ...carried by the current on top. The current never brakes the
+      // breathing and the breathing never fights the current: they add.
+      wr.ox=wr.px+cdx; wr.oy=wr.py+cdy;
     }
     const dx=wr.wx+wr.ox-ccx, dy=wr.wy+wr.oy-ccy;
     const sx=hw+(dx*cs-dy*sn)*cz, sy=hh+(dx*sn+dy*cs)*cz;
@@ -2360,6 +2492,13 @@ function resolveCollisions(){
 let lastT=0;
 function frame(t){
   const dt=Math.min(34,(t-lastT)||16); lastT=t;
+  // The current runs on the field's OWN clock — elapsed animated time, not wall
+  // time. dt is already clamped to 34ms, so a tab that was backgrounded for a
+  // minute resumes the lean exactly where it left it instead of snapping the
+  // whole field to a phase an idle minute away. At 60fps this is wall time.
+  calm+=((touches.size?0:1)-calm)*0.14;
+  if(calm<0.002) calm=0;
+  if(!reduced) curT+=dt*calm;
   if(!reduced) fluidStep();
   lockForce();
   drawInk(t);
@@ -2425,7 +2564,9 @@ function frame(t){
   // everywhere else every word is released back to full presence, so nothing
   // stays wrongly dimmed on return
   if(stack.length===0&&!lockOn&&!FOCUS.length&&!card.classList.contains("open")){
-    if(frameCount%5===0) resolveCollisions();
+    // ARB_EVERY, not a fixed 5: same rule, same thresholds, same 0.12 ease —
+    // only the sampling cadence follows the water. See its definition above.
+    if(frameCount%ARB_EVERY===0) resolveCollisions();
   } else {
     for(const n of nodes) if(n.kind==="word"&&n.collideTarget!==1) n.collideTarget=1;
   }
@@ -2437,7 +2578,9 @@ function frame(t){
         const s=w2s(n.wx+(_o?_o.ox:0),n.wy+(_o?_o.oy:0));
         if(!reduced){
           const fv=fluidAt(s.x,s.y);
-          n.x=s.x+fv.x*(vw()/FW)*1.8; n.y=s.y+fv.y*(vh()/FH)*1.8;
+          // ...and the water's own push on a word settles under a hand too, so
+          // "still under a finger" means still, not still-except-for-the-water
+          n.x=s.x+fv.x*(vw()/FW)*1.8*calm; n.y=s.y+fv.y*(vh()/FH)*1.8*calm;
         } else { n.x=s.x; n.y=s.y; }
       }
       n.tx=n.x; n.ty=n.y;
