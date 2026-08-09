@@ -32,11 +32,13 @@ const THEMES=[
  {name:"岩絵具",ground:"#F3EAD8",ink:"#40291C",faint:"rgba(64,41,28,.42)",line:"rgba(64,41,28,.2)",
   pig1:"#C39143",pig2:"#8F2E14",accent:"#47885E",plaque:"rgba(243,234,216,.92)",
   halo:"rgba(195,145,67,.6)",dark:false,blobA:.15,pool:["#C39143","#C39143","#8F2E14","#8F2E14","#47885E"],
-  wcol:["#40291C","#8F2E14","#C39143","#47885E","#8A7B5C"]},
+  // foreground pigments run darker than the atmospheric pool: 岩絵具's gold and
+  // green were the legibility outliers of the five worlds when laid on paper
+  wcol:["#40291C","#8F2E14","#8C5F1E","#356B49","#8A7B5C"]},
  {name:"緑青",ground:"#EDF2E6",ink:"#1F4433",faint:"rgba(31,68,51,.42)",line:"rgba(31,68,51,.2)",
   pig1:"#47885E",pig2:"#4C6CB3",accent:"#F8B500",plaque:"rgba(237,242,230,.92)",
   halo:"rgba(71,136,94,.5)",dark:false,blobA:.14,pool:["#47885E","#47885E","#4C6CB3","#4C6CB3","#F8B500"],
-  wcol:["#1F4433","#47885E","#4C6CB3","#5C8A46","#7FA08A"]},
+  wcol:["#1F4433","#2E6B49","#38539A","#3F6A2E","#7FA08A"]},
  {name:"夜",ground:"#281A14",ink:"#FFFFFC",faint:"rgba(255,255,252,.38)",line:"rgba(255,255,252,.22)",
   pig1:"#4C6CB3",pig2:"#8FA3DC",accent:"#E2041B",plaque:"rgba(31,21,15,.93)",
   halo:"rgba(76,108,179,.85)",dark:true,blobA:.17,pool:["#113285","#113285","#4C6CB3","#4C6CB3","#E2041B"],
@@ -540,7 +542,11 @@ function spawnWord(entry,x,y,fadeIn){
   const ci=fragile?(i%3):(z<0.85?3+(i%2):1+(i%3));
   el.style.color=THEMES[themeIx].wcol[ci];
   const baseOp=(fragile?0.95:0.4+(i%5)*0.08)*(0.6+0.4*(z/1.22))*(wellKnown?0.55:1);
+  // seqId / fpx / collide feed the spatial arbiter: fpx is the exact rendered
+  // font box the DOM carries, seqId the stable tie-break, collide the eased
+  // "recede to atmosphere" multiplier the arbiter drives (never a removal)
   const n={kind:"word",w,r,g,st,p,lvl,el,z,baseOp,ci,
+    seqId:i,fpx:Math.round(base*z),collide:1,collideTarget:1,ghostOp:null,
     x,y,s:1,ts:1,tx:x,ty:y,op:fadeIn?0:baseOp,top:baseOp,
     rot:(Math.random()-.5)*3,cr:0,
     vx:(Math.random()-.5)*.26,vy:(Math.random()-.5)*.18,
@@ -948,6 +954,10 @@ function constellationLock(n){
   // the bloom it came from — without this it is marked gone and removed
   // 500ms later, leaving a headless lock (bloomFocus has always done this)
   clearBloom(n.el?n:undefined);
+  // fold any word an earlier single tap left open: locking B must not leave
+  // A's reveal hanging over the new constellation (the release side of this
+  // has always folded; the lock side never did)
+  collapseUnfold();
   lockOn=true; focusN=n;
   if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
   const isG=n.kind==="glyph";
@@ -1700,6 +1710,16 @@ function tapNode(n){
 }
 let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false,gestureId=null;
 let lpTimer=0,lpFired=false;
+let waterTapT=0,waterTapX=0,waterTapY=0;
+// the way home: ease the WHOLE camera — pan, zoom AND twist — back to the
+// resting universe. camT carries z/rot only for this reset, so the lock-glide
+// (which sets camT={x,y}) still leaves zoom and rotation untouched.
+function recenterCam(){
+  cam.vx=0; cam.vy=0;
+  camT={x:WR.w/2,y:WR.h/2,z:1,rot:0};
+  ripple(vw()/2,vh()/2,true);
+  setHint("中心へ戻る · home");
+}
 // two fingers = zoom: pinch-out over a body dives into it, pinch-in surfaces
 const touches=new Map();
 let pinch=null;
@@ -1708,8 +1728,15 @@ function rebasePinch(){
   const pair=[...touches.entries()];
   const a=pair[0][1],b2=pair[1][1];
   const d=Math.hypot(a.x-b2.x,a.y-b2.y)||1;
+  // MODE IS LATCHED AT GESTURE START. inDive records dive-vs-surface intent
+  // when the second finger lands; a rebase (a third finger joining or leaving)
+  // inherits it rather than re-reading the stack. Without this, a pinch-in that
+  // surfaces mid-gesture finds stack.length===0 on its next move and bleeds
+  // straight into continuous camera zoom-out.
+  const held=pinch?pinch.inDive:null;
   pinch={ids:[pair[0][0],pair[1][0]],d0:d,last:d,
-    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z};
+    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z,
+    inDive:held==null?stack.length>0:held};
 }
 function pinchDive(mid){
   let best=null,bd=1e9;
@@ -1746,6 +1773,26 @@ addEventListener("pointerdown",e=>{
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
   pn=el?nodeOf.get(el):null;
   if(pn&&pn.gone) pn=null;
+  // NOTE, deliberately: touch is NOT re-arbitrated by loudness between WORDS. An
+  // earlier cut handed a tap in an overlap to the louder word, which reads well
+  // until you measure it — a ghost lying wholly inside a louder word then has no
+  // point of its own left, and an unreachable word is a disappeared word. Paint
+  // recedes; touch between words stays exactly as the field always resolved it,
+  // and answering a ghost brings it straight back to full presence.
+  //
+  // THE ONE EXCEPTION, and the whole rule in a sentence: a tap that lands on a
+  // galaxy sun is answered by the hub, not by a word that is painted at or below
+  // ghost presence — a word at full presence still outranks the hub, exactly as
+  // it always has.
+  // A hub is canvas-drawn, so hit-testing cannot see it and this comparison has
+  // to be made by hand. The test is on RENDERED opacity, not on the arbiter's
+  // flag: a constellation suspends arbitration, so a receded word's collide is
+  // already back at 1 while the bloom still paints it at a third of its
+  // presence, and reading the flag there would miss exactly the case the hunt
+  // exercises — a release over a hub with a constellation held.
+  if(pn&&pn.kind==="word"&&stack.length===0&&
+     (parseFloat(pn.el.style.opacity)||1)<=ghostFloor+0.01&&
+     hubAt(e.clientX,e.clientY)) pn=null;
   if(!pn&&lockOn&&stack.length===0){
     let best=null,bd=40;
     for(const wr of FOCUS){
@@ -1796,8 +1843,10 @@ addEventListener("pointermove",e=>{
     const d=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1;
     const ang=Math.atan2(v[1].y-v[0].y,v[1].x-v[0].x);
     const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};
-    if(stack.length){
-      // inside a dive: pinch keeps its discrete grammar
+    if(pinch.inDive){
+      // inside a dive: pinch keeps its discrete grammar for the WHOLE gesture,
+      // even after surface() empties the stack mid-pinch — so surfacing can
+      // never bleed into the continuous zoom-out below
       if(!pinch.fired){
         const ratio=d/pinch.d0;
         if(ratio>1.28){pinch.fired=true;pinchDive(mid);}
@@ -1810,12 +1859,15 @@ addEventListener("pointermove",e=>{
     } else {
       // at the surface: continuous camera — zoom about the pinch midpoint,
       // twist to rotate the whole vault (glyphs stay upright)
+      camT=null;   // a manipulation gesture cancels any in-flight glide/recenter
       if(pinch.last==null){pinch.last=d;pinch.lastAng=ang;}
       const wpt=s2wl(mid.x,mid.y);
       cam.z=clamp(cam.z*(d/pinch.last),0.34,2.6);
       let da=ang-pinch.lastAng;
       if(da>Math.PI)da-=TAU; if(da<-Math.PI)da+=TAU;
-      cam.rot+=da;
+      // twist is bounded to ±half a turn so it can never run away, and the
+      // double-tap return-to-rest always brings it back to 0
+      cam.rot=clamp(cam.rot+da,-Math.PI,Math.PI);
       const wpt2=s2wl(mid.x,mid.y);
       cam.x+=wpt.x-wpt2.x; cam.y+=wpt.y-wpt2.y; camClamp();
       pinch.last=d; pinch.lastAng=ang;
@@ -1923,6 +1975,16 @@ addEventListener("pointerup",e=>{
       g.ephemeral=true; diveKanji(g); return;
     }
   }
+  // double-tap open water eases the whole camera home (return-to-rest).
+  // 420ms is a forgiving window — this is a deliberate "take me home", not a
+  // rapid game input, so a relaxed double-tap reads far more reliably. It sits
+  // BELOW every release path: a tap that dismisses a constellation or opens a
+  // door is spent on that, and the window starts from the next open-water tap.
+  const nowT=Date.now();
+  if(nowT-waterTapT<420&&Math.abs(e.clientX-waterTapX)<48&&Math.abs(e.clientY-waterTapY)<48){
+    waterTapT=0; clearBloom(); collapseUnfold(); recenterCam(); return;
+  }
+  waterTapT=nowT; waterTapX=e.clientX; waterTapY=e.clientY;
   clearBloom();
   collapseUnfold();
 });
@@ -1997,7 +2059,9 @@ function drawWorld(){
   const thin=cz<0.45?4:(far?2:1);
   for(const wr of WORDS){
     wi++;
-    if(thin>1&&(wi%thin)) continue;
+    // locked constellation members are never thinned out — the bloom must stay
+    // whole at every zoom, so "16 words locked" reads as 16 even at cam.z=0.34
+    if(thin>1&&(wi%thin)&&!wr.lk) continue;
     if(wr.lk){}
     else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
     else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
@@ -2009,7 +2073,7 @@ function drawWorld(){
     const dx=wr.wx+wr.ox-ccx, dy=wr.wy+wr.oy-ccy;
     const sx=hw+(dx*cs-dy*sn)*cz, sy=hh+(dx*sn+dy*cs)*cz;
     wr.sx=sx; wr.sy=sy;
-    if(sx<-50||sx>W2||sy<-50||sy>H2) continue;
+    if((sx<-50||sx>W2||sy<-50||sy>H2)&&!wr.lk) continue;
     wr.vis=frameCount;
     const lm=Math.abs((wr.e[5]||3)-level);
     if(!wr.node||wr.node.gone){
@@ -2182,6 +2246,116 @@ function drawFx(t,dt){
   }
 }
 
+// ---- spatial arbitration ----
+// Two words at reading presence must not print through each other, and no word
+// at reading presence may sit beneath the fixed chrome. Runs only at the
+// resting surface with nothing held.
+//
+// THE LOSER OF A TANGLE BECOMES A GHOST, NOT AN ABSENCE. The law is that
+// nothing leaves this screen except a deliberate flick judgment, so the arbiter
+// is bound on both sides:
+//   · from below — a ghost renders at the FLOOR, and never loses its touch
+//     target. Tap it and it comes back at full presence.
+//   · from above — the quieter word of a contested pair is at most CONTEND_MAX
+//     of the louder, so there is always a real figure and a real ground.
+// The floor is not a number picked here. It is read from the field itself each
+// pass: the quietest word spawnWord is already painting (never below GHOST_ABS).
+// A ghost is never quieter than the quietest word the surface is showing anyway
+// — so the arbiter can only ever move a word WITHIN the presence range the field
+// already uses, and can never invent a new, fainter one. That ladder predates
+// the arbiter and the arbiter cannot move it.
+//
+// Those two bounds meet in ONE derived number. A ghost sits at the floor, so a
+// pair ends at floor/winner; holding that under CONTEND_MAX means only a word
+// carrying floor/CONTEND_MAX presence may take anyone's water. A word quieter
+// than that has no right to push anyone back, and when nobody can win the
+// arbiter leaves the tangle standing rather than push a word out of existence —
+// a soft tangle is a legibility cost; a vanished word breaks the law.
+const GHOST_ABS=0.30, CONTEND_MAX=0.53;
+let ghostFloor=GHOST_ABS;   // the live floor, exposed so the harness can audit it
+let chromeRects=[];
+function refreshChromeRects(){
+  chromeRects.length=0;
+  // enumerated one by one, not via a string loop, so the corridor extractor's
+  // getElementById("drift-tray") -> "drift-tray" rename still reaches this call
+  const els=[document.getElementById("brand"),document.getElementById("depth"),
+    document.getElementById("theme"),document.getElementById("drift-tray"),
+    document.getElementById("hint"),document.getElementById("lvl")];
+  for(const el of els){
+    if(!el) continue;
+    const cs2=getComputedStyle(el);
+    if(cs2.display==="none"||cs2.visibility==="hidden") continue;
+    if(parseFloat(cs2.opacity||"1")<0.05) continue;
+    const r=el.getBoundingClientRect();
+    if(r.width<1||r.height<1) continue;
+    if(r.bottom<0||r.top>vh()||r.right<0||r.left>vw()) continue;
+    chromeRects.push({x:r.left-6,y:r.top-6,w:r.width+12,h:r.height+12});
+  }
+}
+function resolveCollisions(){
+  refreshChromeRects();
+  const cz=cam.z, arr=[];
+  for(const n of nodes){
+    if(n.kind!=="word"||n.gone||n.removed) continue;
+    if(n.mode!=="free"&&n.mode!=="glide"){ n.collideTarget=1; continue; }
+    // a held word and its constellation are never arbitrated away
+    if(n===focusN||n.hlDom){ n.collideTarget=1; continue; }
+    const fpx=(n.fpx||14)*n.s*cz;
+    // EVERY word is a candidate to recede — a naturally quiet word printed
+    // through a loud one is exactly as unreadable as two loud ones, and an
+    // entry filter here would leave that pair permanently tangled. What ARB_MIN
+    // gates is the right to WIN: only a word at reading presence can push
+    // another one back, because only then is there room for a ghost that stays
+    // above the floor.
+    const cx=n.x+n.dragX, cy=n.y+n.dragY, hw=n.w.length*fpx*0.55, hh=fpx*0.62;
+    // Only the field the learner can actually see takes part. A word parked off
+    // screen can tangle with nothing, and — the reason this matters — letting it
+    // into the set drags the floor down: the floor is meant to be the quietest
+    // presence ON SCREEN, and an off-screen word would set a floor no visible
+    // word ever reaches, leaving ghosts fainter than anything actually shown.
+    // exactly the words with pixels on screen — no margin. A word with nothing
+    // visible can tangle with nothing, and including it would let it set a floor
+    // that no word the learner can see ever reaches.
+    if(cx+hw<0||cx-hw>vw()||cy+hh<0||cy-hh>vh()){ n.collideTarget=1; continue; }
+    arr.push({n,cx,cy,hw,hh,eff:n.op,fpx});
+  }
+  // the field's own floor, read fresh each pass: the quietest presence
+  // spawnWord is already painting, never under GHOST_ABS
+  let minEff=Infinity;
+  for(const a of arr) if(a.eff<minEff) minEff=a.eff;
+  const floorOp=Math.max(GHOST_ABS,minEff===Infinity?GHOST_ABS:minEff);
+  ghostFloor=floorOp;
+  const winMin=floorOp/CONTEND_MAX;   // the presence it takes to win a patch of water
+  arr.sort((a,b)=> b.eff-a.eff || b.fpx-a.fpx || a.n.seqId-b.n.seqId);
+  const kept=[];
+  for(const a of arr){
+    let ghost=0;   // 0 = keep; >0 = the rendered opacity this word recedes to
+    for(const c of chromeRects){
+      if(a.cx+a.hw>c.x&&a.cx-a.hw<c.x+c.w&&a.cy+a.hh>c.y&&a.cy-a.hh<c.y+c.h){ghost=floorOp;break;}
+    }
+    // A ghost always lands on the floor exactly — there is no relative term. An
+    // earlier cut carried one (ghost = max(floor, 0.45 * winner)); verification
+    // showed the floor bound every observed case, so the relative term was dead
+    // code that no check could falsify. The separation it was supposed to
+    // provide is enforced instead at the other end: a word may only take
+    // someone's water if it carries floor/CONTEND_MAX presence, which pins the
+    // quieter word of every contested pair at no more than CONTEND_MAX of the
+    // louder. Both constants now do visible work and both are falsifiable.
+    if(!ghost) for(const k of kept){
+      if(k.eff<winMin) continue;                // too quiet to take anyone's water
+      const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
+      if(ox<=0) continue;
+      const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
+      if(oy<=0) continue;
+      // 0.12, not a comfortable 0.16: at high zoom the field drifts across the
+      // screen ~cam.z times faster, so a tangle can slip between two passes
+      if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.12){ ghost=floorOp; break; }
+    }
+    if(ghost){ a.n.ghostOp=ghost; a.n.collideTarget=0; }
+    else { a.n.collideTarget=1; kept.push(a); }
+  }
+}
+
 // ---- frame loop ----
 let lastT=0;
 function frame(t){
@@ -2226,16 +2400,34 @@ function frame(t){
         }
     }
   }
-  // camera glides toward a locked constellation center
+  // camera glides toward a target: a locked constellation centre (x,y only) or
+  // the resting universe (x,y,z,rot — the double-tap return-to-rest)
   if(camT&&stack.length===0){
     cam.x+=(camT.x-cam.x)*0.07; cam.y+=(camT.y-cam.y)*0.07;
-    if(Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3) camT=null;
+    let done=Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3;
+    if(camT.z!=null){
+      cam.z+=(camT.z-cam.z)*0.09;
+      if(Math.abs(camT.z-cam.z)<0.008) cam.z=camT.z; else done=false;
+    }
+    if(camT.rot!=null){
+      cam.rot+=(camT.rot-cam.rot)*0.09;
+      if(Math.abs(camT.rot-cam.rot)<0.004) cam.rot=camT.rot; else done=false;
+    }
+    if(done) camT=null;
     camClamp();
   }
   // camera momentum glides after a flick
   if(stack.length===0&&(Math.abs(cam.vx)>0.02||Math.abs(cam.vy)>0.02)){
     cam.x+=cam.vx; cam.y+=cam.vy; camClamp();
     cam.vx*=0.92; cam.vy*=0.92;
+  }
+  // spatial arbitration only at the resting surface with nothing held;
+  // everywhere else every word is released back to full presence, so nothing
+  // stays wrongly dimmed on return
+  if(stack.length===0&&!lockOn&&!FOCUS.length&&!card.classList.contains("open")){
+    if(frameCount%5===0) resolveCollisions();
+  } else {
+    for(const n of nodes) if(n.kind==="word"&&n.collideTarget!==1) n.collideTarget=1;
   }
   for(const n of nodes){
     if(n.removed||n.frozen) continue;
@@ -2270,7 +2462,27 @@ function frame(t){
     n.op+=(n.top-n.op)*0.08;
     const rt=(n.mode==="center")?0:n.rot;
     n.cr+=(rt-n.cr)*0.08;
-    n.el.style.opacity=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN?n.op*0.3:n.op).toFixed(3);
+    const dimBase=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
+    let outOp=dimBase;
+    if(n.kind==="word"){
+      if(n.collide==null){n.collide=1;n.collideTarget=1;}
+      // a word taken into a constellation arrives at FULL presence at once:
+      // easing a receded word back over ~330ms handed the learner a satellite
+      // that was still faint when they tapped it
+      if(n===focusN||n.hlDom){n.collide=1;n.collideTarget=1;}
+      else n.collide+=((n.collideTarget==null?1:n.collideTarget)-n.collide)*0.12;
+      // collide eases between present (1) and ghost (0). The ghost is a
+      // RENDERED opacity, not a multiplier: it cannot be diluted to nothing by
+      // a word that was already quiet, and receding never brightens a word
+      // that is fainter than the floor to begin with.
+      const gh=Math.min(dimBase,n.ghostOp==null?ghostFloor:n.ghostOp);
+      outOp=dimBase*n.collide+gh*(1-n.collide);
+    }
+    // NOTE: a receded word never loses its touch target. Loudest-word-wins is a
+    // rule about PAINT; the tap arbitration in pointerdown hands the finger to
+    // the loudest word under it, which leaves the ghost reachable everywhere
+    // nothing louder covers it. Tapping one brings it straight back.
+    n.el.style.opacity=outOp.toFixed(3);
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
     n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
   }
