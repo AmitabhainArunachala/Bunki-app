@@ -167,7 +167,7 @@ describe('the map describes the app it is in', () => {
       'Integration canvas',
       'Repair branch',
       'Evidence',
-      'Monthly truth',
+      'Monthly',
       'About & diagnostics',
     ]);
   });
@@ -181,7 +181,7 @@ describe('the map describes the app it is in', () => {
       'Capture',
       'Session',
       'Evidence',
-      'Monthly truth',
+      'Monthly',
     ]);
   });
 });
