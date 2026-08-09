@@ -121,8 +121,10 @@ Dedicated Chromium falsified two UI assumptions before cutoff: the 390 px
 viewport overflows horizontally by 38 px, and the UTC month-switch test could
 not find `monthly-month-2026-07`. The uncommitted diagnostic spec/fix is safely
 preserved in immutable stash commit
-`cb93ceee68f0cc4026f792e11ab371d15ff23992`; apply that commit as a stash only
-when resuming this lane. Full E2E/axe and screenshot inspection remain undone.
+`cb93ceee68f0cc4026f792e11ab371d15ff23992`, published so a remote runner can
+fetch it at `origin/codex/kairo-a2-monthly-wip-20260809`. Fetch that ref, then
+apply the commit as a stash only when resuming this lane. Full E2E/axe and
+screenshot inspection remain undone.
 
 It exposes eight separate lenses and no aggregate mastery/level: recognition,
 meaning recall, production, listening, kanji reading, writing, grammar
