@@ -2322,3 +2322,94 @@ body.v-depth-layered .stroke-page {
   font-family: var(--serif);
   letter-spacing: 0.05em;
 }
+
+/* ------------------------------------------------ review sessions (SRS)
+ * One queue, four honest buttons. The face is quiet paper; the grades sit in
+ * one row like Anki's, each carrying its real next interval. */
+.review-face {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 34px 18px 26px;
+  margin: 10px 0 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-front {
+  font-family: var(--serif);
+  font-size: 44px;
+  line-height: 1.2;
+}
+
+.review-reading {
+  color: var(--red);
+  letter-spacing: 0.18em;
+  font-size: 15px;
+}
+
+.review-sense {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.review-face .chip {
+  margin-top: 8px;
+}
+
+.review-start.quiet {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: var(--line);
+}
+
+.grade-row {
+  display: flex;
+  gap: 8px;
+}
+
+.grade {
+  font: inherit;
+  flex: 1;
+  min-height: 56px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.grade .g-label {
+  font-family: var(--serif);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.grade .g-when {
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.grade.g-again {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.grade.g-good {
+  border-color: var(--ink);
+}
+
+.review-summary {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 14px;
+  flex-wrap: wrap;
+}
