@@ -8467,6 +8467,9 @@ addEventListener(
     if (S.view !== 'reader' || !S.passageId || S.stack.length) return;
     clearTimeout(readerPosTimer);
     readerPosTimer = setTimeout(() => {
+      // re-checked at fire time: a sheet may have opened (and zeroed the
+      // window scroll) in the 900ms since the scroll that armed this
+      if (S.view !== 'reader' || !S.passageId || S.stack.length) return;
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
     }, 900);
@@ -8518,6 +8521,12 @@ function back() {
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead') {
+    // the bookmark records the exact line being left, not the debounce's guess
+    if (S.view === 'reader' && S.passageId) {
+      clearTimeout(readerPosTimer);
+      S.readerPos[S.passageId] = Math.round(window.scrollY);
+      saveStore();
+    }
     S.view = 'shelf';
     render();
     // the shelf gets its place back the way the reader always has
@@ -12580,8 +12589,19 @@ function updateMeasurements() {
 }
 
 /* --------------------------------------------------------------- render */
+/** The view rendered by the previous render() pass — lets a re-render of
+ * the SAME view keep the walker's place (see the restore at the bottom). */
+let lastRenderedView = null;
 function render() {
   removeMini();
+  // Rebuilding #app empties the page for a moment, and the browser clamps
+  // window scroll to 0 — so a double-tap for a gloss, opening a sheet, or
+  // any other in-place re-render of the reader threw the walker back to
+  // the top of the article. Snapshot before the rebuild; restore after,
+  // but only for a same-view re-render of the reader — every view CHANGE
+  // keeps its existing behaviour (callers set their own scroll, and cards
+  // like review want the top of each new face).
+  const restoreY = lastRenderedView === S.view && S.view === 'reader' ? window.scrollY : null;
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -12719,6 +12739,8 @@ function render() {
     }
   }
   updateMeasurements();
+  if (restoreY != null) window.scrollTo(0, restoreY);
+  lastRenderedView = S.view;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
