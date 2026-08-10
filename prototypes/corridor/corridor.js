@@ -5187,30 +5187,10 @@ function strokeDoor(k) {
           `${k.c} stroke order — stroke data not yet available`,
         ),
   );
+  // just the stroke-order glyph — tap the box and it opens (operator 2026-08-10:
+  // "no writing next to the stroke-order kanji"). No side label, no chevron.
   if (paths.length) door.append(strokeThumb(paths));
   else door.append(el('span', 'stroke-door-glyph', k.c));
-
-  const side = el('span', 'stroke-door-side');
-  side.append(
-    el(
-      'span',
-      'stroke-door-title',
-      paths.length
-        ? tx(`${paths.length} 画を順に書く`, `watch all ${paths.length} strokes draw in order`)
-        : tx('筆順のデータはまだない', 'stroke data not yet available'),
-    ),
-  );
-  side.append(
-    el(
-      'span',
-      'stroke-door-sub',
-      paths.length
-        ? tx('全画面でひらく', 'opens full screen')
-        : tx('画数だけは分かっている', 'the count is known, the order is not'),
-    ),
-  );
-  door.append(side);
-  door.append(el('span', 'row-go', '›'));
 
   door.addEventListener('click', (event) => {
     interaction(
