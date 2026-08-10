@@ -2576,3 +2576,15 @@ body.v-depth-layered .stroke-page {
   color: var(--faint);
   margin: 6px 0 26px;
 }
+
+/* ------------------------------------- the learner model in the text
+ * Words on the memorize list wear a quiet under-ink in the reader; it
+ * deepens when the card is due right now. box-shadow, not border — the
+ * line box must never shift because of what you happen to be learning. */
+.reader .tok.content.tok-learning > .tok-word {
+  box-shadow: 0 2px 0 rgba(158, 43, 37, 0.2);
+}
+
+.reader .tok.content.tok-due > .tok-word {
+  box-shadow: 0 2px 0 rgba(158, 43, 37, 0.48);
+}

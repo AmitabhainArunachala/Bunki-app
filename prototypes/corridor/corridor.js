@@ -1541,6 +1541,13 @@ function renderReader(main) {
   }
 
   const paraBreaks = new Set(p.paras || []);
+  // the shared learner model, visible in the text itself: words on the
+  // memorize list carry a quiet under-ink — deeper when the card is due
+  // right now. The reader and the review pile never disagree about what
+  // you are learning, because they read the same store.
+  const learning = new Set();
+  for (const t of S.taken) if (t.t === 'word') learning.add(t.id);
+  const dueNow = new Date();
   let group = null;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
@@ -1556,6 +1563,11 @@ function renderReader(main) {
       span.dataset.word = token.b;
       span.dataset.action = 'target.activate';
       span.dataset.targetKind = 'word';
+      if (learning.has(token.b)) {
+        span.classList.add('tok-learning');
+        const rec = S.srs[srsKey('word', token.b)];
+        if (rec && new Date(rec.due) <= dueNow) span.classList.add('tok-due');
+      }
       span.setAttribute('aria-haspopup', 'dialog');
       span.setAttribute('aria-label', tokenAccessibleLabel(token, index));
     } else if (particle) {
