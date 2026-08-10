@@ -77,7 +77,12 @@ function check(name, pass, detail = '') {
 
 async function touchAt(page, selector, index, holdMs) {
   const target = page.locator(selector).nth(index);
-  await target.scrollIntoViewIfNeeded();
+  // centre, don't nudge: scrollIntoViewIfNeeded moves the minimum, which
+  // can park the target at the viewport's top edge UNDER the fixed chrome
+  // — the touch then lands on 戻る and navigates away instead of holding
+  // the word. (Surfaced when per-article bookmarks began reopening texts
+  // mid-scroll; a centred target is always clear of both chrome bands.)
+  await target.evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(60);
   // aim at the element's first line fragment, the way a finger aims at the
   // glyphs — a union box can drift into the line gap once a gloss hangs below
@@ -108,6 +113,24 @@ async function holdWord(page, selector, index = 0) {
   await page.waitForTimeout(200);
 }
 
+/** Wait until the reader's tokens stop changing. An article's text loads
+ * asynchronously on first open and its arrival re-renders the view — a
+ * hold begun on a token from the FIRST render dies when that render is
+ * replaced mid-press, and the sheet never opens. Real fingers survive
+ * this because the swap is early and fast; a probe that grabs the very
+ * first token does not. Poll until the token count holds still. */
+async function settleReader(page) {
+  await page.waitForSelector('#reader .tok');
+  await page.evaluate('window.__tokN = -1');
+  await page.waitForFunction(
+    `(() => { const n = document.querySelectorAll('#reader .tok').length;
+       if (window.__tokN === n && n > 0) return true;
+       window.__tokN = n; return false; })()`,
+    null,
+    { polling: 400, timeout: 15000 },
+  );
+}
+
 async function shoot(page, dir, name) {
   const file = join(dir, `${name}.png`);
   await page.screenshot({ path: file });
@@ -117,7 +140,7 @@ async function shoot(page, dir, name) {
 /** Walk the UI the way a reader does until a word panel with semantic edges is open. */
 async function walkToSemPanel(page, tapFn) {
   await tapFn(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
   if ((await page.locator('#sheet .sem-row').count()) === 0) {
@@ -480,7 +503,7 @@ async function main() {
   // ------------------------------------------------------------ step 2 read
   console.log('\n— step 2 · read');
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   const readerText = await page.locator('#reader').innerText();
   check('the reader shows real Japanese', /[぀-ヿ一-鿌]/.test(readerText), `${readerText.length} chars rendered`);
   const rubyCount = await page.locator('#reader rt').count();
@@ -611,7 +634,7 @@ async function main() {
   // the worst long-gloss word on the shelf must render its gloss WHOLE
   await open('?entry=shelf');
   await tap(page, '.shelf-item', 2); // JR おおさか東線 — carries 沿線
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   const enIdx = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
   );
@@ -631,7 +654,7 @@ async function main() {
   }
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   await page.locator('#dials-toggle').click();
   await page.waitForTimeout(150);
   await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
@@ -712,7 +735,7 @@ async function main() {
   // now the surface that matters: a word that HAS semantic neighbours
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
   // from the empty-state seed chips, hop to a word that has edges
@@ -874,9 +897,13 @@ async function main() {
   await page.evaluate('window.scrollTo(0, 0)');
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   await page.evaluate('window.scrollTo(0, 420)');
   await page.waitForTimeout(80);
+  // reach the word first (touchAt centres its target — the finger's own
+  // scroll), THEN record the place the reader is actually at when touching
+  await page.locator('#reader .tok.content').nth(23).evaluate((n) => n.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(150);
   const scrollBefore = await page.evaluate('window.scrollY');
   await holdWord(page, '#reader .tok.content', 23);
   await page.waitForSelector('#sheet');
@@ -901,7 +928,7 @@ async function main() {
   for (const mode of ['mcd', 'word']) {
     await open(`?entry=shelf&cards=${mode}`);
     await tap(page, '.shelf-item');
-    await page.waitForSelector('#reader .tok');
+    await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet .card-preview');
     await page.locator('#sheet .card-preview').scrollIntoViewIfNeeded();
@@ -1134,7 +1161,7 @@ async function main() {
   // the kanji page draws its stroke order
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet [data-kanjirow]');
   await tap(page, '#sheet [data-kanjirow]');
@@ -1206,7 +1233,7 @@ async function main() {
   await page.fill('#search', '');
   await page.waitForTimeout(250);
   await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
+  await settleReader(page);
   const particleCount = await page.locator('#reader .tok.particle').count();
   check('particles · the reader marks particle tokens as doors', particleCount >= 5,
     `${particleCount} particle tokens wired`);
