@@ -68,32 +68,24 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
 
-          node --input-type=module <<'NODE'
-          const paths = [
-            '',
-            'apple-touch-icon.png',
-            'corridor.css',
-            'corridor.js',
-            'drift-layer.css',
-            'drift-layer.js',
-            'vendor/ts-fsrs.mjs',
-            'data/manifest.json',
-            'data/articles/index.json',
-          ];
-          for (const path of paths) {
-            let response;
-            for (let attempt = 0; attempt < 5; attempt += 1) {
-              try {
-                response = await fetch(`http://127.0.0.1:8765/${path}`);
-                break;
-              } catch {
-                await new Promise((accept) => setTimeout(accept, 100));
-              }
-            }
-            if (!response?.ok) throw new Error(`${path} -> ${response?.status ?? 'unreachable'}`);
-            console.log(`${response.status} /${path}`);
-          }
-          NODE
+# curl, not node fetch: unconsumed keep-alive bodies trip an undici
+          # internal assertion at process exit on some Node lines (seen live:
+          # "assert(!this.paused)" AFTER every path had already printed 200)
+          for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
+                      'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
+                      'data/manifest.json' 'data/articles/index.json'; do
+            code=""
+            for attempt in 1 2 3 4 5; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8765/$path" || true)
+              [ "$code" = "200" ] && break
+              sleep 0.2
+            done
+            if [ "$code" != "200" ]; then
+              echo "FAIL $code /$path" >&2
+              exit 1
+            fi
+            echo "200 /$path"
+          done
 
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4
