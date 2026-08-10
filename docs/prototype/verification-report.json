@@ -121,9 +121,10 @@
           "JLPT N2"
         ],
         "sections": [
+          "部首radical",
           "筆順stroke order",
-          "部品components",
-          "よく使う語 — 22 語common compounds",
+          "部品main components",
+          "よく使う語 — 44 語common compounds",
           "熟語・慣用句 — 2　idioms and set phrases"
         ]
       }
@@ -148,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-09 04:55",
+          "2026-08-10 16:22",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-09 05:00",
+          "2026-08-10 16:27",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-09 05:04",
+          "2026-08-10 16:31",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-17 04:54",
+          "2026-08-18 16:21",
           "8.30"
         ]
       ]
@@ -175,8 +176,8 @@
       "step": 6,
       "name": "return",
       "shot": "06-return-to-place.png",
-      "scrollBefore": 420,
-      "scrollAfter": 420
+      "scrollBefore": 269,
+      "scrollAfter": 269
     }
   ],
   "measurements": {
@@ -385,6 +386,14 @@
         "hitW": 54,
         "hitH": 44,
         "id": "back"
+      },
+      {
+        "text": "北",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "theme-seal"
       },
       {
         "text": "EN",
@@ -4323,6 +4332,14 @@
         "id": "tok content"
       },
       {
+        "text": "読み終えたmark as f",
+        "w": 117,
+        "h": 44,
+        "hitW": 117,
+        "hitH": 44,
+        "id": "read-fin"
+      },
+      {
         "text": "← 戻るback",
         "w": 72,
         "h": 44,
@@ -4507,6 +4524,14 @@
         "id": "back"
       },
       {
+        "text": "北",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "theme-seal"
+      },
+      {
         "text": "EN",
         "w": 44,
         "h": 44,
@@ -4531,12 +4556,60 @@
         "id": "tray"
       },
       {
+        "text": "級で学ぶJLPT · 漢検 ",
+        "w": 123,
+        "h": 46,
+        "hitW": 123,
+        "hitH": 46,
+        "id": "levels-link"
+      },
+      {
+        "text": "レッスンlessons",
+        "w": 102,
+        "h": 46,
+        "hitW": 102,
+        "hitH": 46,
+        "id": "lessons-link"
+      },
+      {
         "text": "文法grammar",
         "w": 88,
         "h": 46,
         "hitW": 88,
         "hitH": 46,
         "id": "grammar-link"
+      },
+      {
+        "text": "類語synonyms, si",
+        "w": 169,
+        "h": 46,
+        "hitW": 169,
+        "hitH": 46,
+        "id": "thesaurus-link"
+      },
+      {
+        "text": "四字熟語four-chara",
+        "w": 159,
+        "h": 46,
+        "hitW": 159,
+        "hitH": 46,
+        "id": "yoji-link"
+      },
+      {
+        "text": "字引find a kanji",
+        "w": 156,
+        "h": 46,
+        "hitW": 156,
+        "hitH": 46,
+        "id": "kanjidex-link"
+      },
+      {
+        "text": "先生を招くinvite th",
+        "w": 124,
+        "h": 46,
+        "hitW": 124,
+        "hitH": 46,
+        "id": "ai-link"
       },
       {
         "text": "世界自然遺産に7箇所を追加 ",
@@ -4547,10 +4620,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4563,10 +4636,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4579,10 +4652,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4595,10 +4668,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4611,10 +4684,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4627,10 +4700,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4643,10 +4716,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4659,10 +4732,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4675,10 +4748,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4691,10 +4764,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4707,10 +4780,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4723,10 +4796,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4739,10 +4812,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4755,10 +4828,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4771,10 +4844,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4787,10 +4860,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4803,10 +4876,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4819,10 +4892,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4835,10 +4908,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4851,10 +4924,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4867,10 +4940,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4883,10 +4956,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4899,10 +4972,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4915,10 +4988,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4931,10 +5004,10 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4947,10 +5020,234 @@
         "id": "shelf-item"
       },
       {
-        "text": "▸ details · ra",
-        "w": 142,
+        "text": "▸ details",
+        "w": 58,
         "h": 44,
-        "hitW": 142,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "駅で待つ時間Waiting ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "台所の音Sounds fro",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "となりの部屋の人The Ma",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "引き出しの中の手紙A Let",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "朝の市場The Mornin",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "自転車をなくした日The D",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "川沿いの道The Road ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "深夜のラジオLate-nig",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "手で書くということOn Wr",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "余白のためのノートA Not",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の速度The Spee",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "訳せない言葉についてOn W",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "忘却を前提とした設計Desi",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "都市の匿名性と言語Anony",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5267,6 +5564,160 @@
         "PD + Bunki原作の解説"
       ],
       "disagreement": null
+    },
+    {
+      "title": "駅で待つ時間",
+      "titleEn": "Waiting at the Station",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "台所の音",
+      "titleEn": "Sounds from the Kitchen",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "となりの部屋の人",
+      "titleEn": "The Man in the Next Room",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "引き出しの中の手紙",
+      "titleEn": "A Letter in the Drawer",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "朝の市場",
+      "titleEn": "The Morning Market",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "自転車をなくした日",
+      "titleEn": "The Day I Lost My Bicycle",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "川沿いの道",
+      "titleEn": "The Road Along the River",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "深夜のラジオ",
+      "titleEn": "Late-night Radio",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "手で書くということ",
+      "titleEn": "On Writing by Hand",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "余白のためのノート",
+      "titleEn": "A Notebook Kept for Its Margins",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の速度",
+      "titleEn": "The Speed of a Rainy Day",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "訳せない言葉について",
+      "titleEn": "On Words That Resist Translation",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "忘却を前提とした設計",
+      "titleEn": "Designing for Forgetting",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "都市の匿名性と言語",
+      "titleEn": "Anonymity in the City, and Language",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
     }
   ],
   "caps": {
@@ -5311,7 +5762,7 @@
   "idiomSectionPresent": true,
   "hops": [
     "kanji:過",
-    "word:経過",
+    "word:過ぎる",
     "radical:咼",
     "kanji:過"
   ],
@@ -5484,6 +5935,90 @@
       "titleEn": "Tsurezuregusa — the opening passage",
       "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
+    },
+    {
+      "title": "駅で待つ時間",
+      "titleEn": "Waiting at the Station",
+      "level": "Upper beginner初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "台所の音",
+      "titleEn": "Sounds from the Kitchen",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "となりの部屋の人",
+      "titleEn": "The Man in the Next Room",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "引き出しの中の手紙",
+      "titleEn": "A Letter in the Drawer",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "朝の市場",
+      "titleEn": "The Morning Market",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "自転車をなくした日",
+      "titleEn": "The Day I Lost My Bicycle",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "川沿いの道",
+      "titleEn": "The Road Along the River",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "深夜のラジオ",
+      "titleEn": "Late-night Radio",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "手で書くということ",
+      "titleEn": "On Writing by Hand",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "余白のためのノート",
+      "titleEn": "A Notebook Kept for Its Margins",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の速度",
+      "titleEn": "The Speed of a Rainy Day",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "訳せない言葉について",
+      "titleEn": "On Words That Resist Translation",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "忘却を前提とした設計",
+      "titleEn": "Designing for Forgetting",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "都市の匿名性と言語",
+      "titleEn": "Anonymity in the City, and Language",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
     }
   ],
   "counts": {
@@ -5495,26 +6030,26 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 316,
+  "loadMs": 343,
   "summary": {
     "total": 91,
     "failed": 0
   },
   "results": [
     {
-      "name": "Phase 2 · the app opens into the living universe",
+      "name": "銀河 · the app opens into the living galaxy",
       "pass": true,
       "detail": "layer active, 64 words adrift"
     },
     {
-      "name": "Phase 2 · the corridor chrome rides above the universe (one fabric)",
+      "name": "銀河 · the hero rests bare but for the single symbol (no top chrome)",
       "pass": true,
-      "detail": "chrome visible, shelf door present"
+      "detail": "symbol present, top chrome receded"
     },
     {
       "name": "Phase 2 · one door from the universe to the shelf",
       "pass": true,
-      "detail": "26 articles; universe asleep (display none)"
+      "detail": "40 articles; universe asleep (display none)"
     },
     {
       "name": "Phase 2 · 戻る returns from the shelf to the universe",
@@ -5524,17 +6059,17 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":150.5,\"y\":580.5999755859375,\"productive\":true}"
+      "detail": "{\"x\":147.5800018310547,\"y\":570.9400024414062,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
       "pass": true,
-      "detail": "centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(58, 95, 138)"
+      "detail": "centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(110, 135, 166)"
     },
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 88px; mean tether 162 → 166px"
+      "detail": "centre moved 89px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -5544,12 +6079,12 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "26 texts, ready in 316 ms"
+      "detail": "40 texts, ready in 343 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "26 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
+      "detail": "40 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
     },
     {
       "name": "disagreement fires only where two-plus ordinal signals were measured",
@@ -5574,7 +6109,7 @@
     {
       "name": "Phase 1 · the shelf holds dozens of articles",
       "pass": true,
-      "detail": "26 articles"
+      "detail": "40 articles"
     },
     {
       "name": "Phase 1 · all 8 parked v11 texts stand on the shelf",
@@ -5584,7 +6119,7 @@
     {
       "name": "Phase 1 · the index is lean — article bodies live in their own files",
       "pass": true,
-      "detail": "26 per-article files"
+      "detail": "40 per-article files"
     },
     {
       "name": "Phase 1 · every article carries live signals or an honest absence",
@@ -5664,7 +6199,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 565.9 → 565.9px"
+      "detail": "gloss on, glyph bottom 431.9 → 431.9px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -5739,7 +6274,7 @@
     {
       "name": "kanji → a word that contains it",
       "pass": true,
-      "detail": "word:経過"
+      "detail": "word:過ぎる"
     },
     {
       "name": "kanji → radical lands on a real radical page with a family",
@@ -5769,7 +6304,7 @@
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
       "pass": true,
-      "detail": "scrollY 420 → 420, sheet closed=true"
+      "detail": "scrollY 269 → 269, sheet closed=true"
     },
     {
       "name": "variant A · mcd renders the target both ways",
@@ -5814,7 +6349,7 @@
     {
       "name": "variant D · shelf entry",
       "pass": true,
-      "detail": "26 texts"
+      "detail": "40 texts"
     },
     {
       "name": "focused content dominates the background chrome",
@@ -5834,7 +6369,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "574 controls checked, including inline token hit regions"
+      "detail": "611 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -5847,9 +6382,9 @@
       "detail": "clean"
     },
     {
-      "name": "the variant strip exposes all four open decisions plus the v1.1 depth toggle",
+      "name": "the variant strip exposes all four open decisions, the v1.1 depth toggle and the drift tap ladder",
       "pass": true,
-      "detail": "5 rows, 4 carry ticket numbers"
+      "detail": "7 rows (cards, difficulty, contrast, entry, depth, ladder, sattap); 4 carry ticket numbers; named rows present: E 奥行 · F 触れの段 · G 衛星の触れ"
     },
     {
       "name": "v1.1 · navigation is bilingual by default (a learner can steer)",
@@ -5879,7 +6414,7 @@
     {
       "name": "v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)",
       "pass": true,
-      "detail": "60 entries in the index"
+      "detail": "240 entries in the index"
     },
     {
       "name": "v1.8 · the v11 grammar harvest rides in (#36), N1 included",
@@ -5889,7 +6424,7 @@
     {
       "name": "v1.7 · the grammar index filters by level",
       "pass": true,
-      "detail": "13 N5 entries of 60"
+      "detail": "17 N5 entries of 240"
     },
     {
       "name": "v1.2 · a grammar entry carries formation + examples",
