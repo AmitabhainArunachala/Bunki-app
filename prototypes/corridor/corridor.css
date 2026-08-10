@@ -2475,3 +2475,56 @@ body.v-depth-layered .stroke-page {
   color: var(--red);
   border-color: var(--red);
 }
+
+/* ------------------------------------------------------------ thesaurus
+ * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
+ * followed by sem-rows (shared with the entry sheet's 意味の近く block). */
+.thes-block {
+  margin: 0 0 22px;
+}
+
+.thes-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0 7px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.thes-word {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.thes-reading {
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.thes-gloss {
+  font-size: 13px;
+  color: var(--faint);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thes-rel {
+  font-size: 11px;
+  color: var(--faint);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  align-self: center;
+}

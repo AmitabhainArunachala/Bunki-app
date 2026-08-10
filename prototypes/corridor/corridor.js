@@ -188,6 +188,7 @@ const VARIANTS = {
 const REL = {
   syn: ['類義', 'everyday synonyms and near-neighbours'],
   ant: ['対義', 'opposites'],
+  reg: ['語感', 'same meaning, different register'],
   fam: ['同族', 'shares a kanji — the family around it'],
   col: ['共起', 'what it actually appears with'],
   thm: ['主題', 'the theme it lives in'],
@@ -651,7 +652,7 @@ function back() {
     render();
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus') {
     S.view = 'shelf';
     render();
     // the shelf gets its place back the way the reader always has
@@ -1039,6 +1040,18 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(les);
+
+  const thes = el('button', 'grammar-link');
+  thes.type = 'button';
+  thes.id = 'thesaurus-link';
+  thes.append(el('span', 'l-ja', '類語'), el('span', 'en-sub', bi() ? 'synonyms, side by side' : ''));
+  thes.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'thesaurus';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(thes);
 
   const ai = el('button', 'grammar-link');
   ai.type = 'button';
@@ -2039,6 +2052,62 @@ function renderLevels(main) {
   for (const l of JLPT_LANES) renderLane(main, l, `JLPT ${l}`, lanes.jlpt[l], 'word');
   main.append(withEn(el('p', 'eyebrow', '漢検'), 'kanji kentei, 10級 → 1級', 'en-inline'));
   for (const l of KANKEN_LANES) renderLane(main, `漢検 ${l}`, l, lanes.kanken[l], 'kanji');
+}
+
+/* ------------------------------------------------------------ thesaurus
+ * 類語 — the synonym dictionary as its own page, not a footnote at the foot
+ * of an entry. The clusters are the same hand-written edges that feed the
+ * 意味の近く block inside entries; this page is the paper-thesaurus spread
+ * of all of them at once: headword, near-neighbours, one line each on how
+ * they actually differ. Only the near-in-meaning relations belong here —
+ * kanji families, collocations and themes stay on the entry pages. */
+const THES_RELS = ['syn', 'ant', 'reg'];
+
+function thesClusters() {
+  const out = [];
+  for (const [w, edges] of Object.entries(D.sem)) {
+    const near = edges.filter((e) => THES_RELS.includes(e.rel));
+    if (near.length) out.push({ w, near });
+  }
+  // a paper thesaurus orders by reading, not by codepoint
+  const key = (c) => lookup(c.w)?.r || c.w;
+  out.sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
+  return out;
+}
+
+function renderThesaurus(main) {
+  main.append(withEn(el('p', 'eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
+  main.append(el('h1', 'view-title', '類語辞典'));
+  const clusters = thesClusters();
+  const sub = el('p', 'shelf-snippet intro');
+  sub.textContent = tx(
+    `${clusters.length} 語群。どの語もそのまま項目へひらく。`,
+    `${clusters.length} clusters, every note hand-written. Any word opens its full entry.`,
+  );
+  main.append(sub);
+  for (const { w, near } of clusters) {
+    const block = el('div', 'thes-block');
+    const rec = lookup(w);
+    const head = el('button', 'thes-head');
+    head.type = 'button';
+    head.dataset.thes = w;
+    head.append(el('span', 'thes-word', w));
+    if (rec?.r && rec.r !== w) head.append(el('span', 'thes-reading', rec.r));
+    if (rec?.m?.length) head.append(el('span', 'thes-gloss', rec.m[0]));
+    head.addEventListener('click', () => go({ t: 'word', id: w }));
+    block.append(head);
+    for (const edge of near) {
+      const row = el('button', 'sem-row');
+      row.type = 'button';
+      row.dataset.thesRow = edge.w;
+      row.append(el('span', 'sem-word', edge.w));
+      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', REL[edge.rel][0]));
+      row.append(el('span', 'sem-note', edge.note));
+      row.addEventListener('click', () => go({ t: 'word', id: edge.w }));
+      block.append(row);
+    }
+    main.append(block);
+  }
 }
 
 /* ------------------------------------------------------------- particles
@@ -4077,6 +4146,7 @@ function render() {
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
+  if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
@@ -4144,6 +4214,7 @@ function render() {
   else if (S.view === 'levels') renderLevels(main);
   else if (S.view === 'ai') renderAiSetup(main);
   else if (S.view === 'lessons') renderLessons(main);
+  else if (S.view === 'thesaurus') renderThesaurus(main);
   else if (S.view === 'grammar') renderGrammar(main);
   else renderShelf(main);
 
