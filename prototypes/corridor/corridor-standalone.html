@@ -8094,7 +8094,7 @@ function back() {
     render();
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels') {
     S.view = 'shelf';
     render();
     // the shelf gets its place back the way the reader always has
@@ -8458,6 +8458,18 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(gram);
+
+  const lanes = el('button', 'grammar-link');
+  lanes.type = 'button';
+  lanes.id = 'levels-link';
+  lanes.append(el('span', 'l-ja', '級で学ぶ'), el('span', 'en-sub', bi() ? 'JLPT · 漢検 lanes' : ''));
+  lanes.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'levels';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(lanes);
 
   for (const p of D.passages) {
     const item = el('button', 'shelf-item');
@@ -9157,6 +9169,89 @@ function renderTray(main) {
       main.append(line);
     }
   }
+}
+
+/* --------------------------------------------------- JLPT · 漢検 lanes
+ * Training lanes over the layers the corridor already carries: JLPT words
+ * from the dictionary's own levels, 漢検 kanji from the kanken table. Each
+ * lane knows how much of it is already being memorized, opens its members
+ * as ordinary entry sheets, and can hand the next twenty unmemorized items
+ * to the tray — capture that becomes cards without labor.
+ * N1 words are not in this layer yet; the lane says so instead of hiding. */
+const JLPT_LANES = ['N5', 'N4', 'N3', 'N2', 'N1'];
+const KANKEN_LANES = ['10級', '9級', '8級', '7級', '6級', '5級', '4級', '3級', '準2級', '2級', '準1級', '1級'];
+let LANE_CACHE = null;
+function laneMembers() {
+  if (LANE_CACHE) return LANE_CACHE;
+  const jlpt = Object.fromEntries(JLPT_LANES.map((l) => [l, []]));
+  for (const [w, rec] of Object.entries(D.dict)) if (rec.jlpt && jlpt[rec.jlpt]) jlpt[rec.jlpt].push(w);
+  for (const l of JLPT_LANES) jlpt[l].sort();
+  const kanken = Object.fromEntries(KANKEN_LANES.map((l) => [l, []]));
+  for (const [c, rec] of Object.entries(D.kanken)) if (kanken[rec.kk]) kanken[rec.kk].push(c);
+  for (const l of KANKEN_LANES) kanken[l].sort();
+  LANE_CACHE = { jlpt, kanken };
+  return LANE_CACHE;
+}
+function renderLane(main, title, en, ids, t) {
+  const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
+  const mem = ids.filter((id) => takenSet.has(srsKey(t, id))).length;
+  const head = el('p', 'eyebrow list-head');
+  head.append(document.createTextNode(`${title} — ${ids.length}`));
+  if (bi()) head.append(el('span', 'en-inline', en));
+  main.append(head);
+  if (!ids.length) {
+    main.append(el('div', 'sem-empty', tx('この級の語はこの層にまだない。', 'Not in this layer yet.')));
+    return;
+  }
+  main.append(
+    el('p', 'card-kind', tx(`覚えている ${mem} / ${ids.length}`, `memorizing ${mem} of ${ids.length}`)),
+  );
+  // paper-dictionary chips: a kanji headword shows its reading; a kana
+  // headword would just repeat itself, so it shows its first sense instead
+  const hasKanji = (s) => [...s].some((c) => c >= '一' && c <= '鿿');
+  const label = (id) => {
+    if (t !== 'word') return D.kanji[id]?.m || '';
+    const rec = lookup(id);
+    if (!rec) return '';
+    return hasKanji(id) ? rec.r || '' : (rec.m && rec.m[0]) || '';
+  };
+  main.append(
+    chipsFor(
+      ids.slice(0, 18).map((id) => ({ label: id, sub: label(id) })),
+      (item) => go({ t, id: item.label }),
+      null,
+      t,
+    ),
+  );
+  if (ids.length > 18)
+    main.append(el('p', 'card-kind', tx(`ほか ${ids.length - 18} 件はページから`, `${ids.length - 18} more open from their pages`)));
+  const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));
+  if (fresh.length) {
+    const btn = biLabel(
+      'button',
+      'take',
+      `この級から ${Math.min(20, fresh.length)} 件を覚える`,
+      `memorize the next ${Math.min(20, fresh.length)}`,
+    );
+    btn.type = 'button';
+    btn.addEventListener('click', () => {
+      const kindRow = NODE_KIND[t];
+      for (const id of fresh.slice(0, 20))
+        S.taken.push({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now() });
+      saveStore();
+      render();
+    });
+    main.append(btn);
+  }
+}
+function renderLevels(main) {
+  main.append(withEn(el('p', 'eyebrow', '級で学ぶ'), 'study by level', 'en-inline'));
+  main.append(el('h1', 'view-title', tx('JLPT と 漢検', 'JLPT and 漢検 lanes')));
+  const lanes = laneMembers();
+  main.append(withEn(el('p', 'eyebrow', 'JLPT'), 'the five levels', 'en-inline'));
+  for (const l of JLPT_LANES) renderLane(main, l, `JLPT ${l}`, lanes.jlpt[l], 'word');
+  main.append(withEn(el('p', 'eyebrow', '漢検'), 'kanji kentei, 10級 → 1級', 'en-inline'));
+  for (const l of KANKEN_LANES) renderLane(main, `漢検 ${l}`, l, lanes.kanken[l], 'kanji');
 }
 
 /* ------------------------------------------------------------- particles
@@ -11114,6 +11209,7 @@ function render() {
   if (S.view === 'reader' && passage()) parts.push(passage().title);
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review') parts.push(tx('復習', 'review'));
+  if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
@@ -11178,6 +11274,7 @@ function render() {
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
   else if (S.view === 'review') renderReview(main);
+  else if (S.view === 'levels') renderLevels(main);
   else if (S.view === 'grammar') renderGrammar(main);
   else renderShelf(main);
 
