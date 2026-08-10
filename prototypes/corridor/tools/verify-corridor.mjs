@@ -245,26 +245,30 @@ async function main() {
   };
 
   // ------------------------------------------- step 0 · the front door
-  // Phase 2: opening the app with no query lands in the Drift universe —
-  // The Walk's first segment. The corridor chrome stays above it (one
-  // navigation fabric), the shelf is one door away, and the universe fully
-  // sleeps while any other view is open.
-  console.log('\n— step 0 · the front door (Drift)');
+  // 銀河 (operator 2026-08-10): opening the app lands in the galaxy — the
+  // hero. It rests bare but for a single symbol; the persistent top chrome is
+  // gone. Tapping the symbol opens the bar and two corner bubbles; 本棚 is one
+  // of them, and it is the one door to the shelf. The universe sleeps while
+  // any other view is open.
+  console.log('\n— step 0 · the front door (銀河)');
   await open('');
   await page.waitForTimeout(2200);
   const driftBoot = await page.evaluate(`({
     layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
     words: document.querySelectorAll('#drift-layer .word').length,
-    chrome: getComputedStyle(document.querySelector('.chrome')).display !== 'none',
-    door: !!document.getElementById('enter-shelf-door'),
+    symbol: !!document.querySelector('.nav-symbol'),
+    chromeGone: !document.querySelector('.chrome'),
   })`);
-  check('Phase 2 · the app opens into the living universe',
+  check('銀河 · the app opens into the living galaxy',
     driftBoot.layerActive && driftBoot.words >= 20,
     `layer active, ${driftBoot.words} words adrift`);
-  check('Phase 2 · the corridor chrome rides above the universe (one fabric)',
-    driftBoot.chrome && driftBoot.door, 'chrome visible, shelf door present');
+  check('銀河 · the hero rests bare but for the single symbol (no top chrome)',
+    driftBoot.symbol && driftBoot.chromeGone, 'symbol present, top chrome receded');
   await shoot(page, shotsDir, '17-phase2-drift-entry');
-  await page.tap('#enter-shelf-door');
+  // the shelf is reached through the symbol → 本棚 bubble
+  await page.tap('.nav-symbol');
+  await page.waitForTimeout(300);
+  await page.tap('.bubble-shelf');
   await page.waitForTimeout(600);
   const afterDoor = await page.evaluate(`({
     layerActive: document.getElementById('drift-layer')?.classList.contains('active'),

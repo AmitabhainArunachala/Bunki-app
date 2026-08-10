@@ -285,6 +285,411 @@ h1.view-title {
   opacity: 0.85;
 }
 
+/* ---------------------------------------------------------- 銀河 hero nav
+ * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
+ * counters and hint so nothing but the galaxy and the single symbol shows. The
+ * symbol opens a top bar and two corner bubbles; tapping the scrim closes it. */
+body.ginga #drift-layer #brand,
+body.ginga #drift-layer #depth,
+body.ginga #drift-layer #theme,
+body.ginga #drift-layer #drift-tray,
+body.ginga #drift-layer #hint {
+  display: none !important;
+}
+
+.nav-symbol {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ink, #23303f);
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  border-radius: 999px;
+  box-shadow: 0 3px 14px rgba(20, 26, 34, 0.18);
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 0.3s ease;
+}
+.nav-symbol svg {
+  width: 26px;
+  height: 26px;
+}
+.nav-symbol.open {
+  transform: translateX(-50%) rotate(90deg);
+}
+.nav-symbol:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 24;
+  background: transparent;
+}
+
+.nav-bar {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 28;
+  width: min(92vw, 460px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(20, 26, 34, 0.22);
+  animation: nav-drop 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.nav-arrows {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+.nav-arrow {
+  width: 34px;
+  height: 38px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink, #23303f);
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.nav-arrow:disabled {
+  color: var(--faint, #a9a293);
+  cursor: default;
+}
+.nav-dojo {
+  flex: none;
+  padding: 8px 12px;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: #fcfbf6;
+  background: #2e4d6e;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  line-height: 1.15;
+}
+.nav-dojo .en-sub {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+
+/* EN⇄日本語 sliding pill */
+.lang-slide {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  padding: 3px;
+  background: color-mix(in srgb, var(--ink, #23303f) 8%, transparent);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+}
+.lang-opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 3px 9px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2, #55606c);
+  transition: color 0.28s ease;
+}
+.lang-knob {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: 34px;
+  background: var(--ground-0, #fff);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(20, 26, 34, 0.22);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.lang-slide[data-lang='ja'] .lang-knob {
+  transform: translateX(34px);
+  width: 48px;
+}
+.lang-slide[data-lang='bi'] .lang-opt.en,
+.lang-slide[data-lang='ja'] .lang-opt.ja {
+  color: var(--ink, #23303f);
+  font-weight: 600;
+}
+
+/* search field inside the bar */
+.nav-search {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.nav-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink, #23303f);
+  background: var(--ground, #fbf8f0);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 10px;
+}
+.nav-search-input:focus {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 1px;
+}
+.nav-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 46vh;
+  overflow-y: auto;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(20, 26, 34, 0.22);
+}
+.nav-search-results:empty {
+  display: none;
+}
+.nav-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 11px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line-soft, #ece5d5);
+  cursor: pointer;
+}
+.nav-search-row:last-child {
+  border-bottom: none;
+}
+.nsr-glyph {
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--ink);
+  flex: none;
+}
+.nsr-stack {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.nsr-read {
+  font-size: 12px;
+  color: var(--red, #9e2b25);
+}
+.nsr-gloss {
+  font-size: 12px;
+  color: var(--ink-2, #55606c);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-search-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--faint, #a9a293);
+}
+
+/* the two corner bubbles — 本棚 left, 先生 right */
+.corner-bubble {
+  position: fixed;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  z-index: 28;
+  min-height: 52px;
+  padding: 10px 18px;
+  font-family: var(--serif);
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  color: #fcfbf6;
+  background: #2e4d6e;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(27, 42, 58, 0.3);
+  cursor: pointer;
+  animation: bubble-rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.corner-bubble .en-sub {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+.bubble-shelf {
+  left: 18px;
+}
+.bubble-sensei {
+  right: 18px;
+  background: #6a3b52; /* a warmer pigment for the tutor, distinct from the shelf */
+}
+@keyframes bubble-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------- 集中道場 focus dojo */
+.focus-choices {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+.focus-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 14px 6px;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.focus-chip.on {
+  border-color: var(--ai, #2e4d6e);
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
+  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
+}
+.focus-chip-n {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
+}
+.focus-chip-u {
+  font-size: 11px;
+  color: var(--faint, #a9a293);
+}
+.focus-modes {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+.focus-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px;
+  text-align: left;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.focus-mode.on {
+  border-color: var(--ai, #2e4d6e);
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
+  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
+}
+.focus-mode-t {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+.focus-mode-sub {
+  font-size: 12px;
+  color: var(--ink-2, #55606c);
+}
+.focus-start {
+  margin-top: 6px;
+}
+
+/* the countdown strip during a block */
+.focus-hud {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 26;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px 8px 16px;
+  background: #2e4d6e;
+  color: #fcfbf6;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(27, 42, 58, 0.32);
+}
+.focus-hud.done {
+  background: #6a3b52;
+}
+.focus-hud-left {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.focus-badge {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+.focus-clock-el {
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 600;
+}
+.focus-hud-end {
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #fcfbf6;
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.focus-hud-end .en-sub {
+  display: block;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
 .sig-val {
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
