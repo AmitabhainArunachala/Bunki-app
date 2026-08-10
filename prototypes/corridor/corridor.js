@@ -14,7 +14,7 @@
 
 const DATA = {
   safe: ['kanken', 'sem'],
-  sa: ['kanji', 'words', 'idioms', 'dict', 'strokes'],
+  sa: ['kanji', 'words', 'idioms', 'dict', 'strokes', 'radicals214'],
   orig: ['grammar-v11'],
 };
 
@@ -669,7 +669,7 @@ async function boot() {
     if (!res.ok) throw new Error(`data/articles/index.json → ${res.status}`);
     return res.json();
   };
-  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, grammarV11, manifest, pin] =
+  const [articleIndex, kanken, sem, kanji, words, idioms, dict, strokes, radicals214, grammarV11, manifest, pin] =
     await Promise.all([
       loadArticleIndex(),
       ...DATA.safe.map((n) => load('proprietary_safe', n)),
@@ -693,6 +693,16 @@ async function boot() {
   D.dict = dict.words;
   D.strokes = strokes.strokes;
   D.kmeta = strokes.meta;
+  // the official radical (部首) table, keyed by Kangxi number 1–214; each kanji
+  // record carries its `rad` number and looks its identity up here. A reverse
+  // map (canonical glyph and positional variant → the row) lets a component
+  // page recognise when it is itself an official radical.
+  D.radInfo = radicals214;
+  D.radByGlyph = {};
+  for (const r of Object.values(radicals214)) {
+    D.radByGlyph[r.c] = r;
+    if (r.var) D.radByGlyph[r.var] = r;
+  }
   D.idioms = Object.fromEntries(idioms.idioms.map((i) => [i.w, i]));
   D.idiomsByKanji = idioms.byKanji;
   D.idiomMeta = { total: idioms.totalCandidates, cap: idioms.cap };
@@ -5005,6 +5015,28 @@ function renderKanjiNode(sheet, node) {
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
+  // 部首 — the ONE official radical (the Kangxi classification), with its
+  // Japanese name, position, and number. This is the dictionary's radical, not
+  // up for debate; the shape-components further down are a different thing.
+  const rad = k.rad && D.radInfo ? D.radInfo[k.rad] : null;
+  if (rad) {
+    sheet.append(withEn(el('p', 'eyebrow', '部首'), 'radical', 'en-inline'));
+    const door = el('button', 'rad-door');
+    door.type = 'button';
+    const glyph = el('span', 'rad-glyph', rad.c);
+    if (rad.var && rad.var !== rad.c) glyph.append(el('span', 'rad-var', rad.var));
+    door.append(glyph);
+    const text = el('span', 'rad-text');
+    text.append(el('span', 'rad-name', rad.name));
+    const posLabel =
+      rad.pos === '独立' ? tx('独立', 'stands alone') : tx(rad.pos, `${rad.pos} · ${rad.posEn}`);
+    text.append(el('span', 'rad-sub', tx(`${posLabel}・部首 ${rad.n}`, `${posLabel} · radical ${rad.n}`)));
+    door.append(text);
+    door.append(el('span', 'row-go', '›'));
+    door.addEventListener('click', () => go({ t: 'radical', id: rad.c, from: node.from }));
+    sheet.append(door);
+  }
+
   // まぎらわしい字 — the look-alikes, laid side by side to break the spell
   const twins = confusablesFor(k.c);
   if (twins.length) {
@@ -5580,13 +5612,28 @@ function renderRadicalNode(sheet, node) {
     sheet.append(el('div', 'sem-empty', tx('この部品はこの層にない。', 'This part is not in this layer.')));
     return;
   }
+  // Is this component itself one of the 214 official radicals? If so, name it
+  // as one — the operator's point: the radical system is real, not "up for
+  // debate". If not, it is a shape-component and says so plainly.
+  const official = D.radByGlyph?.[node.id];
+  const posText =
+    official && (official.pos === '独立' ? tx('独立', 'stands alone') : tx(official.pos, `${official.pos} · ${official.posEn}`));
+
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', r.c));
   const meta = el('div', 'hero-meta');
   meta.append(
-    el('div', 'hero-mean', r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the 漢検 radical table)')),
+    el(
+      'div',
+      'hero-mean',
+      (official && official.name) || r.name || tx('（名称は漢検の部首表にない部品）', '(a part with no name in the 漢検 radical table)'),
+    ),
   );
   const chips = el('div', 'shelf-meta');
+  if (official) {
+    chips.append(el('span', 'pool-tag', tx(`部首 ${official.n}`, `radical ${official.n}`)));
+    chips.append(el('span', 'pool-tag', posText));
+  }
   if (r.st) chips.append(el('span', 'pool-tag', tx(`${r.st} 画`, `${r.st} strokes`)));
   chips.append(el('span', 'pool-tag', tx(`${r.kanjiCount} 字`, `${r.kanjiCount} kanji`)));
   meta.append(chips);
@@ -5594,7 +5641,12 @@ function renderRadicalNode(sheet, node) {
   sheet.append(hero);
 
   const note = el('div', 'note');
-  note.textContent = tx('「この部品を含む」族。康熙部首の分類ではない。', 'The family of characters containing this part — not the Kangxi radical classification.');
+  note.textContent = official
+    ? tx(
+        `康熙部首の第 ${official.n} 番「${official.name}」。位置は${posText}。下は、この部品を含む字。`,
+        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,
+      )
+    : tx('「この部品を含む」族。康熙部首ではない部品。', 'The family of characters containing this part — a shape component, not one of the Kangxi radicals.');
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {

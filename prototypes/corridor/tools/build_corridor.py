@@ -333,6 +333,10 @@ def main() -> int:
             "kk": kanken_level.get(ch, ""),
             "kr": kanken_rank.get(ch, 0),
             "parts": KRAD.get(ch, []),
+            # NOTE: the official radical number `rad` (KANJIDIC2 classical
+            # rad_value, 1–214) is added to each record by the post-step
+            # tools/build-radicals.mjs, which also emits data/share_alike/
+            # radicals214.json. Run it after this script so `rad` persists.
         }
 
     radicals: dict[str, dict] = {}
