@@ -755,7 +755,7 @@ function back() {
     render();
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's guess
     if (S.view === 'reader' && S.passageId) {
       clearTimeout(readerPosTimer);
@@ -1154,6 +1154,18 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(les);
+
+  const yj = el('button', 'grammar-link');
+  yj.type = 'button';
+  yj.id = 'yoji-link';
+  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'four-character idioms' : ''));
+  yj.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'yoji';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(yj);
 
   const kdx = el('button', 'grammar-link');
   kdx.type = 'button';
@@ -2538,6 +2550,68 @@ function renderLevels(main) {
   for (const l of JLPT_LANES) renderLane(main, l, `JLPT ${l}`, lanes.jlpt[l], 'word');
   main.append(withEn(el('p', 'eyebrow', '漢検'), 'kanji kentei, 10級 → 1級', 'en-inline'));
   for (const l of KANKEN_LANES) renderLane(main, `漢検 ${l}`, l, lanes.kanken[l], 'kanji');
+}
+
+/* ------------------------------------------------------------ 四字熟語
+ * The four-character idioms as their own shelf — 900 of them, ordered by
+ * reading like a paper compendium, with one quiet filter box. Every row
+ * opens the same idiom entry the kanji pages open. */
+function renderYoji(main) {
+  main.append(withEn(el('p', 'eyebrow', '四字熟語'), 'four-character idioms', 'en-inline'));
+  main.append(el('h1', 'view-title', '四字熟語'));
+  const all = Object.values(D.idioms)
+    .filter((i) => i.yoji)
+    .sort((a, b) => (a.r < b.r ? -1 : a.r > b.r ? 1 : 0));
+  const sub = el('p', 'shelf-snippet intro');
+  sub.textContent = tx(
+    `${all.length} 語。読みの順。どの語も項目へひらく。`,
+    `${all.length} idioms, in reading order — any row opens its full entry.`,
+  );
+  main.append(sub);
+  const filter = el('input', 'search-field');
+  filter.id = 'yoji-filter';
+  filter.type = 'search';
+  filter.placeholder = tx('しぼる — 字でも読みでも', 'narrow — by character or reading');
+  filter.autocomplete = 'off';
+  filter.value = S.yojiQ || '';
+  let deb = null;
+  filter.addEventListener('input', () => {
+    S.yojiQ = filter.value;
+    clearTimeout(deb);
+    deb = setTimeout(() => {
+      document.getElementById('yoji-body')?.replaceWith(renderYojiBody(all));
+    }, 120);
+  });
+  main.append(filter);
+  main.append(renderYojiBody(all));
+}
+function renderYojiBody(all) {
+  const body = el('div');
+  body.id = 'yoji-body';
+  const q = (S.yojiQ || '').trim();
+  const hits = q ? all.filter((i) => i.w.includes(q) || i.r.includes(q)) : all;
+  const CAP = 80;
+  if (q || hits.length !== all.length || hits.length > CAP) {
+    body.append(
+      el('p', 'card-kind', hits.length > CAP ? tx(`${hits.length} 語 — 先頭 ${CAP} 語`, `${hits.length} idioms — first ${CAP} shown`) : tx(`${hits.length} 語`, `${hits.length} idioms`)),
+    );
+  }
+  for (const i of hits.slice(0, CAP)) {
+    const row = el('button', 'entry-row compound');
+    row.type = 'button';
+    row.dataset.yoji = i.w;
+    const stack = el('span', 'row-stack');
+    const top = el('span', 'row-word');
+    top.append(document.createTextNode(i.w));
+    top.append(el('span', 'row-reading', i.r));
+    stack.append(top);
+    if (i.g?.[0]) stack.append(el('span', 'row-gloss', i.g[0]));
+    row.append(stack, el('span', 'row-go', '›'));
+    row.addEventListener('click', () => go({ t: 'idiom', id: i.w }));
+    body.append(row);
+  }
+  if (!hits.length) body.append(el('div', 'sem-empty', tx('その形の語はない。', 'No idiom matches that.')));
+  return body;
 }
 
 /* ------------------------------------------------------------- 字引
@@ -5177,6 +5251,7 @@ function render() {
   if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
+  if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
@@ -5248,6 +5323,7 @@ function render() {
   else if (S.view === 'thesaurus') renderThesaurus(main);
   else if (S.view === 'airead') renderAiReading(main);
   else if (S.view === 'kanjidex') renderKanjidex(main);
+  else if (S.view === 'yoji') renderYoji(main);
   else if (S.view === 'grammar') renderGrammar(main);
   else renderShelf(main);
 
