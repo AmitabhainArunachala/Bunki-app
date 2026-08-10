@@ -3915,6 +3915,33 @@ function componentLabel(c) {
   return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the 漢検 radical table');
 }
 
+/* まぎらわしい字 — the margin note every paper kanji dictionary keeps:
+ * characters that look alike enough to be misread. Hand-authored sets of
+ * classic confusions; only members the layer actually carries render, and
+ * a set survives only if at least one OTHER member is present. */
+const CONFUSABLE_SETS = [
+  ['末', '未'], ['土', '士'], ['人', '入'], ['木', '本'], ['大', '太', '犬'],
+  ['王', '玉'], ['千', '干'], ['午', '牛'], ['白', '百'], ['目', '自'],
+  ['田', '由', '申'], ['休', '体'], ['買', '貝'], ['石', '右'], ['名', '各'],
+  ['刀', '力'], ['問', '間'], ['幸', '辛'], ['待', '持'], ['授', '受'],
+  ['複', '復', '腹'], ['講', '構', '購'], ['績', '積'], ['義', '議'],
+  ['象', '像'], ['険', '検', '験'], ['招', '紹'], ['折', '析'],
+  ['暑', '署'], ['微', '徴'], ['綱', '網'], ['壊', '懐'],
+  ['薄', '簿'], ['防', '妨'], ['師', '帥'], ['官', '宮'],
+];
+let CONFUSABLE_MAP = null;
+function confusablesFor(c) {
+  if (!CONFUSABLE_MAP) {
+    CONFUSABLE_MAP = {};
+    for (const set of CONFUSABLE_SETS) {
+      const here = set.filter((ch) => D.kanji[ch]);
+      if (here.length < 2) continue;
+      for (const ch of here) (CONFUSABLE_MAP[ch] ||= new Set()) && here.forEach((o) => o !== ch && CONFUSABLE_MAP[ch].add(o));
+    }
+  }
+  return [...(CONFUSABLE_MAP[c] || [])];
+}
+
 function renderKanjiNode(sheet, node) {
   const k = D.kanji[node.id];
   if (!k) {
@@ -3941,6 +3968,24 @@ function renderKanjiNode(sheet, node) {
   kun.append(el('span', 'on', k.kun.join('・') || '—'));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
+
+  // まぎらわしい字 — the look-alikes, laid side by side to break the spell
+  const twins = confusablesFor(k.c);
+  if (twins.length) {
+    sheet.append(withEn(el('p', 'eyebrow', 'まぎらわしい字'), 'easily confused with', 'en-inline'));
+    const rows = el('div', 'entry-rows');
+    for (const c of twins) {
+      const row = el('button', 'entry-row');
+      row.type = 'button';
+      row.dataset.confusable = c;
+      row.append(el('span', 'row-glyph', c));
+      row.append(el('span', 'row-main', D.kanji[c].m));
+      row.append(el('span', 'row-go', '›'));
+      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+      rows.append(row);
+    }
+    sheet.append(rows);
+  }
 
   // STROKE ORDER — the diagram is a door, not a picture. It opens the
   // dedicated full-screen page where the strokes actually draw themselves.
