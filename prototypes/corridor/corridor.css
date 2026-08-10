@@ -2417,3 +2417,21 @@ body.v-depth-layered .stroke-page {
 .review-undo {
   margin-top: 4px;
 }
+
+/* --------------------------------------------------- the tutor (AI in-app) */
+.ai-tutor {
+  margin: 14px 0;
+}
+
+.ai-tutor .ai-answer {
+  font-family: Georgia, serif;
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  margin-top: 8px;
+  line-height: 1.55;
+}
+
+.ai-tutor .ai-answer:empty {
+  display: none;
+}
