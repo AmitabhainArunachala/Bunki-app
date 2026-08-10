@@ -23,7 +23,7 @@ document.
   allows it). The operator feels builds on an iPhone via that URL.
 - Suites that must stay green: `node prototypes/drift/tools/verify-v11.mjs`
   (21/21), `node prototypes/corridor/tools/verify-drift-consistency.mjs --mode
-  fast` (45/45), `node prototypes/corridor/tools/verify-corridor.mjs` (91/91).
+fast` (45/45), `node prototypes/corridor/tools/verify-corridor.mjs` (91/91).
   `verify-drift-hunt.mjs` is flaky by spawn randomization (3–6 fails machine
   envelope, documented in `docs/build-evidence/kairo-feel-lock/`).
 
@@ -94,6 +94,7 @@ their verdict. Do not claim victory from numbers.
 ## THE LEDGER — 20 points, verified state as of the base commit
 
 Fixed by the previous agent — RE-VERIFY each, don't trust:
+
 1. Frame cadence and easing (dt-normalized, blur removed) — reopened by feel;
    see primary task.
 2. Constellation families are meaning-first (authored SEM > rarity-weighted
@@ -114,37 +115,27 @@ Fixed by the previous agent — RE-VERIFY each, don't trust:
 10. Ghost-floor law preserved under paling (`gh` reads unpaled base;
     verify-v11 21/21).
 
-Open — the previous agent saw these with its own eyes and did not fix:
-11. **Rest overprints**: two words stacked at the same spot render as an
-    unreadable smear (e.g. 単なる/取り上げる). The arbiter only PAINTS; it
-    never separates. Add a gentle position-separation force at rest (a few px
-    over seconds, trance-compatible), or accept-and-document.
-12. **Edge clipping**: words sit half-off the screen at rest (日光, 徐行).
-    Keep-in-bounds margin or fade-at-edge.
-13. **Family false friends**: gloss-token collisions admit strangers (安易
-    "easy-going" enters 外出's family via the token "going"; hyphen splitting
-    is the mechanism). Improve tokenization (keep hyphenated compounds whole)
-    or add a small stop-pair list.
-14. **Untraced 404** in the corridor's console on load (one resource; find it,
-    fix it or remove the reference).
-15. **Fog blobs**: the 墨流し marbling reads as blue-grey murk over the field
-    rather than ink-in-water. Aesthetic tuning of the ink/stain canvases
-    (amplitude, hue, edge softness) — this is half of "no ambience".
-16. **Possible duplicate satellites** in the dive state (two 出 nodes were
-    observed once — kanji pin + word node?). Reproduce and dedupe.
-17. **Connector aesthetics**: first-tap bloom uses thin straight yellow
-    spokes; the dive state draws curved indigo brush strokes. One language —
-    the curved brush stroke — everywhere, and never wire a satellite that is
-    rendered too faint to read.
-18. **iOS pinch double-zoom** (see primary task hypothesis 4).
-19. **Constellation typography**: the centre's English gloss renders in
-    italic Latin serif under 外出 — check it against the app's type system
-    (sans for glosses elsewhere); satellites' composed reveal
-    (reading+word+gloss concatenated) needs typographic rhythm.
-20. **One-app deploy**: the Pages site now serves the corridor at root
-    (`pages-app.yml`), retiring the old standalone-Drift root and /app/ path.
-    Keep it that way — one URL, one app. If you touch the workflow, keep the
-    smoke-test step.
+Open — the previous agent saw these with its own eyes and did not fix: 11. **Rest overprints**: two words stacked at the same spot render as an
+unreadable smear (e.g. 単なる/取り上げる). The arbiter only PAINTS; it
+never separates. Add a gentle position-separation force at rest (a few px
+over seconds, trance-compatible), or accept-and-document. 12. **Edge clipping**: words sit half-off the screen at rest (日光, 徐行).
+Keep-in-bounds margin or fade-at-edge. 13. **Family false friends**: gloss-token collisions admit strangers (安易
+"easy-going" enters 外出's family via the token "going"; hyphen splitting
+is the mechanism). Improve tokenization (keep hyphenated compounds whole)
+or add a small stop-pair list. 14. **Untraced 404** in the corridor's console on load (one resource; find it,
+fix it or remove the reference). 15. **Fog blobs**: the 墨流し marbling reads as blue-grey murk over the field
+rather than ink-in-water. Aesthetic tuning of the ink/stain canvases
+(amplitude, hue, edge softness) — this is half of "no ambience". 16. **Possible duplicate satellites** in the dive state (two 出 nodes were
+observed once — kanji pin + word node?). Reproduce and dedupe. 17. **Connector aesthetics**: first-tap bloom uses thin straight yellow
+spokes; the dive state draws curved indigo brush strokes. One language —
+the curved brush stroke — everywhere, and never wire a satellite that is
+rendered too faint to read. 18. **iOS pinch double-zoom** (see primary task hypothesis 4). 19. **Constellation typography**: the centre's English gloss renders in
+italic Latin serif under 外出 — check it against the app's type system
+(sans for glosses elsewhere); satellites' composed reveal
+(reading+word+gloss concatenated) needs typographic rhythm. 20. **One-app deploy**: the Pages site now serves the corridor at root
+(`pages-app.yml`), retiring the old standalone-Drift root and /app/ path.
+Keep it that way — one URL, one app. If you touch the workflow, keep the
+smoke-test step.
 
 ## Working rules
 
