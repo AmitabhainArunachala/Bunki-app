@@ -644,6 +644,7 @@ async function boot() {
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   loadStore();
+  setKairoTheme(themeId());
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
@@ -5398,6 +5399,63 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
+/* ---------------------------------------------------------- nihonga themes
+ * The five Drift worlds (北斎・墨・岩絵具・緑青・夜) applied across the WHOLE
+ * corridor, not just the front door (operator: "the colour theme options
+ * should apply throughout the entire app"). The seal in the chrome cycles
+ * them; the choice persists on-device and drives the Drift layer in lockstep,
+ * so the door and every room behind it share one world. Palette values live
+ * as [data-theme] token blocks in corridor.css; default :root is 北斎. */
+const THEME_UI = [
+  { id: 'hokusai', seal: '北' },
+  { id: 'sumi', seal: '墨' },
+  { id: 'iwa', seal: '岩' },
+  { id: 'rokusho', seal: '緑' },
+  { id: 'yoru', seal: '夜' },
+];
+const THEME_STORE = 'kairo-theme';
+function themeId() {
+  let stored = '';
+  try {
+    stored = localStorage.getItem(THEME_STORE) || '';
+  } catch {
+    stored = '';
+  }
+  if (THEME_UI.some((t) => t.id === stored)) return stored;
+  try {
+    if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'yoru';
+  } catch {
+    /* no matchMedia */
+  }
+  return 'hokusai';
+}
+function themeIx() {
+  return Math.max(0, THEME_UI.findIndex((t) => t.id === themeId()));
+}
+function setKairoTheme(id) {
+  const t = THEME_UI.find((x) => x.id === id) || THEME_UI[0];
+  // 北斎 is the bare :root default — no attribute, so nothing overrides it
+  document.documentElement.setAttribute('data-theme', t.id === 'hokusai' ? '' : t.id);
+  try {
+    localStorage.setItem(THEME_STORE, t.id);
+  } catch {
+    /* private mode — the theme still applies for this session */
+  }
+  syncDriftTheme();
+}
+/** Keep the Drift layer's own five-world palette in step with the corridor. */
+function syncDriftTheme() {
+  try {
+    if (window.__DRIFT__ && window.__DRIFT__.setTheme) window.__DRIFT__.setTheme(themeIx());
+  } catch {
+    /* drift not mounted yet — render() re-syncs when it first shows */
+  }
+}
+function cycleKairoTheme() {
+  setKairoTheme(THEME_UI[(themeIx() + 1) % THEME_UI.length].id);
+  render();
+}
+
 function render() {
   removeMini();
   // Rebuilding #app empties the page for a moment, and the browser clamps
@@ -5458,6 +5516,13 @@ function render() {
   chrome.append(crumb);
 
   // EN | 日本語 — two visible states, the active one lit
+  const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
+  seal.type = 'button';
+  seal.id = 'theme-seal';
+  seal.setAttribute('aria-label', tx('色の主題を変える', 'change the colour theme'));
+  seal.addEventListener('click', cycleKairoTheme);
+  chrome.append(seal);
+
   const langSeg = el('div', 'lang-seg');
   langSeg.id = 'lang';
   langSeg.setAttribute('aria-pressed', String(bi()));
@@ -5507,6 +5572,7 @@ function render() {
   // the centre and its satellites are all held in the layer's own state, so
   // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
+    syncDriftTheme();
     if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }

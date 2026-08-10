@@ -281,7 +281,7 @@ h1.view-title {
   font-size: 16px;
   letter-spacing: 0.1em;
   color: #fcfbf6;
-  background: var(--ai, #2e4d6e);
+  background: #2e4d6e; /* pinned indigo: the enter-door keeps light text legible in every world */
   border: 1px solid rgba(0, 0, 0, 0.18);
   border-radius: 999px;
   box-shadow: 0 4px 18px rgba(27, 42, 58, 0.28);
@@ -1138,6 +1138,93 @@ button.tok::before {
   --ground-0: #fffdf6; /* raised paper — cards and the sheet */
   --ai: #2e4d6e; /* 藍 indigo: the "you can go here" colour */
   --ai-wash: rgba(46, 77, 110, 0.08);
+}
+
+/* ------------------------------------------------------------ nihonga themes
+ * The five Drift worlds carried across the whole corridor. Default :root above
+ * is 北斎; each block below re-derives every palette token for its own ground,
+ * so backgrounds, ink, lines, fades and the go-indigo all shift together while
+ * the 弁柄 reading-red holds across the light worlds and lightens on 夜 so it
+ * never drops below the legibility floor. The Drift layer keeps its matching
+ * world, driven from the same seal. */
+:root[data-theme='sumi'] {
+  --ground: #f7f6f1;
+  --ground-2: #eeede6;
+  --ground-0: #fcfbf7;
+  --ink: #26241f;
+  --ink-2: #55534e;
+  --red: #9e2b25;
+  --red-wash: rgba(158, 43, 37, 0.08);
+  --line: rgba(43, 42, 40, 0.16);
+  --line-soft: rgba(43, 42, 40, 0.08);
+  --faint: rgba(43, 42, 40, 0.42);
+  --faint-2: rgba(43, 42, 40, 0.3);
+  --ai: #4b5560;
+  --ai-wash: rgba(75, 85, 96, 0.08);
+}
+:root[data-theme='iwa'] {
+  --ground: #f3ead8;
+  --ground-2: #ebe0c9;
+  --ground-0: #faf3e4;
+  --ink: #3a2517;
+  --ink-2: #6a4f3d;
+  --red: #8f2e14;
+  --red-wash: rgba(143, 46, 20, 0.08);
+  --line: rgba(64, 41, 28, 0.18);
+  --line-soft: rgba(64, 41, 28, 0.09);
+  --faint: rgba(64, 41, 28, 0.44);
+  --faint-2: rgba(64, 41, 28, 0.32);
+  --ai: #356b49;
+  --ai-wash: rgba(53, 107, 73, 0.08);
+}
+:root[data-theme='rokusho'] {
+  --ground: #edf2e6;
+  --ground-2: #e0e8d6;
+  --ground-0: #f6f9f0;
+  --ink: #1c3f2f;
+  --ink-2: #46614e;
+  --red: #9e2b25;
+  --red-wash: rgba(158, 43, 37, 0.08);
+  --line: rgba(31, 68, 51, 0.18);
+  --line-soft: rgba(31, 68, 51, 0.09);
+  --faint: rgba(31, 68, 51, 0.44);
+  --faint-2: rgba(31, 68, 51, 0.32);
+  --ai: #38539a;
+  --ai-wash: rgba(56, 83, 154, 0.08);
+}
+:root[data-theme='yoru'] {
+  --ground: #281a14;
+  --ground-2: #33241c;
+  --ground-0: #34251c;
+  --ink: #fffffc;
+  --ink-2: #cabfb1;
+  --red: #ef8079;
+  --red-wash: rgba(239, 128, 121, 0.14);
+  --line: rgba(255, 255, 252, 0.2);
+  --line-soft: rgba(255, 255, 252, 0.1);
+  --faint: rgba(255, 255, 252, 0.4);
+  --faint-2: rgba(255, 255, 252, 0.28);
+  --ai: #9fb3e6;
+  --ai-wash: rgba(159, 179, 230, 0.14);
+}
+
+/* the seal that cycles the five worlds — a small round chrome control */
+.theme-seal {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--ground-0);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+.theme-seal:active {
+  opacity: 0.6;
 }
 
 /* ------------------------------------------------------ bilingual chrome */
@@ -2606,12 +2693,12 @@ body.v-depth-layered .stroke-page {
 }
 
 .read-fin.finished {
-  color: #9e2b25;
+  color: var(--red);
   border-color: rgba(158, 43, 37, 0.35);
 }
 
 .pool-tag.read-tag {
-  color: #9e2b25;
+  color: var(--red);
   border-color: rgba(158, 43, 37, 0.3);
 }
 
@@ -2647,7 +2734,7 @@ body.v-depth-layered .stroke-page {
 }
 
 .rest-toggle.resting {
-  color: #9e2b25;
+  color: var(--red);
   border-color: rgba(158, 43, 37, 0.35);
 }
 
@@ -2670,7 +2757,7 @@ body.v-depth-layered .stroke-page {
 }
 
 .chat-turn.me {
-  color: #9e2b25;
+  color: var(--red);
   padding-left: 14px;
   border-left: 2px solid rgba(158, 43, 37, 0.35);
 }
@@ -2798,8 +2885,8 @@ body.v-depth-layered .stroke-page {
 }
 
 .kdx-chip.on-list {
-  border-color: #9e2b25;
-  color: #9e2b25;
+  border-color: var(--red);
+  color: var(--red);
 }
 
 .kdx-sthead {
@@ -6029,6 +6116,11 @@ window.__DRIFT__ = {
     DRIFT_ON = false;
     document.getElementById('drift-layer').classList.remove('active');
   },
+  // the corridor drives the shared nihonga world from its chrome seal; the
+  // drift keeps its own five-theme palette in step (0..4, north-star order)
+  setTheme(ix) {
+    if (typeof ix === 'number' && ix >= 0 && ix < THEMES.length && ix !== themeIx) applyTheme(ix);
+  },
 };
 })();
 
@@ -8554,6 +8646,7 @@ async function boot() {
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   loadStore();
+  setKairoTheme(themeId());
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
     if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
@@ -13308,6 +13401,63 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
+/* ---------------------------------------------------------- nihonga themes
+ * The five Drift worlds (北斎・墨・岩絵具・緑青・夜) applied across the WHOLE
+ * corridor, not just the front door (operator: "the colour theme options
+ * should apply throughout the entire app"). The seal in the chrome cycles
+ * them; the choice persists on-device and drives the Drift layer in lockstep,
+ * so the door and every room behind it share one world. Palette values live
+ * as [data-theme] token blocks in corridor.css; default :root is 北斎. */
+const THEME_UI = [
+  { id: 'hokusai', seal: '北' },
+  { id: 'sumi', seal: '墨' },
+  { id: 'iwa', seal: '岩' },
+  { id: 'rokusho', seal: '緑' },
+  { id: 'yoru', seal: '夜' },
+];
+const THEME_STORE = 'kairo-theme';
+function themeId() {
+  let stored = '';
+  try {
+    stored = localStorage.getItem(THEME_STORE) || '';
+  } catch {
+    stored = '';
+  }
+  if (THEME_UI.some((t) => t.id === stored)) return stored;
+  try {
+    if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'yoru';
+  } catch {
+    /* no matchMedia */
+  }
+  return 'hokusai';
+}
+function themeIx() {
+  return Math.max(0, THEME_UI.findIndex((t) => t.id === themeId()));
+}
+function setKairoTheme(id) {
+  const t = THEME_UI.find((x) => x.id === id) || THEME_UI[0];
+  // 北斎 is the bare :root default — no attribute, so nothing overrides it
+  document.documentElement.setAttribute('data-theme', t.id === 'hokusai' ? '' : t.id);
+  try {
+    localStorage.setItem(THEME_STORE, t.id);
+  } catch {
+    /* private mode — the theme still applies for this session */
+  }
+  syncDriftTheme();
+}
+/** Keep the Drift layer's own five-world palette in step with the corridor. */
+function syncDriftTheme() {
+  try {
+    if (window.__DRIFT__ && window.__DRIFT__.setTheme) window.__DRIFT__.setTheme(themeIx());
+  } catch {
+    /* drift not mounted yet — render() re-syncs when it first shows */
+  }
+}
+function cycleKairoTheme() {
+  setKairoTheme(THEME_UI[(themeIx() + 1) % THEME_UI.length].id);
+  render();
+}
+
 function render() {
   removeMini();
   // Rebuilding #app empties the page for a moment, and the browser clamps
@@ -13368,6 +13518,13 @@ function render() {
   chrome.append(crumb);
 
   // EN | 日本語 — two visible states, the active one lit
+  const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
+  seal.type = 'button';
+  seal.id = 'theme-seal';
+  seal.setAttribute('aria-label', tx('色の主題を変える', 'change the colour theme'));
+  seal.addEventListener('click', cycleKairoTheme);
+  chrome.append(seal);
+
   const langSeg = el('div', 'lang-seg');
   langSeg.id = 'lang';
   langSeg.setAttribute('aria-pressed', String(bi()));
@@ -13417,6 +13574,7 @@ function render() {
   // the centre and its satellites are all held in the layer's own state, so
   // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
+    syncDriftTheme();
     if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }

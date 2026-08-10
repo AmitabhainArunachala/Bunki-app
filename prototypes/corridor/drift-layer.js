@@ -2930,5 +2930,10 @@ window.__DRIFT__ = {
     DRIFT_ON = false;
     document.getElementById('drift-layer').classList.remove('active');
   },
+  // the corridor drives the shared nihonga world from its chrome seal; the
+  // drift keeps its own five-theme palette in step (0..4, north-star order)
+  setTheme(ix) {
+    if (typeof ix === 'number' && ix >= 0 && ix < THEMES.length && ix !== themeIx) applyTheme(ix);
+  },
 };
 })();
