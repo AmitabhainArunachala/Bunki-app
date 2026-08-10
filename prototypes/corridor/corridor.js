@@ -2799,6 +2799,7 @@ function renderReview(main) {
     for (const key of ['again', 'hard', 'good', 'easy'])
       if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
     main.append(sum);
+    renderAiCoach(main, rv);
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';
     out.addEventListener('click', () => {
@@ -3100,6 +3101,36 @@ function renderAiTutor(sheet, node, rec) {
   });
   wrap.append(btn, out);
   sheet.append(wrap);
+}
+
+/* The coach at the end of a review session — the tutor reads the grades
+ * and says where to press next. Advice only: the canon's line is AI
+ * proposing, never scheduling — FSRS alone decides when cards return, and
+ * nothing here writes to the SRS state. Absent without a key. */
+function renderAiCoach(main, rv) {
+  if (!aiKey()) return;
+  const wrap = el('div', 'ai-tutor');
+  const btn = biLabel('button', 'chip ai-ask', '先生の一言', 'a word from the tutor');
+  btn.type = 'button';
+  btn.id = 'ai-coach';
+  const out = el('div', 'ai-answer');
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    out.textContent = tx('考え中…', 'thinking…');
+    try {
+      // history is queue-ordered (grades push sequentially, undo pops)
+      const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
+      out.textContent = await aiAsk(
+        "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
+        `Learner level: about JLPT ${aiLevelGuess()}. Session grades:\n${lines.join('\n')}`,
+      );
+    } catch {
+      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+    }
+    btn.disabled = false;
+  });
+  wrap.append(btn, out);
+  main.append(wrap);
 }
 
 /* The tutor's reading room — 私の読み物. The operator's words for phase 3:
