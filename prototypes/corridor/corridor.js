@@ -58,6 +58,21 @@ const TITLES_EN = {
   'bunki-graded-n3-town': 'Walking an Unknown Town',
   'bunki-essay-n2-mountain': 'Thoughts While Walking a Mountain',
   'bunki-essay-n1-ai': 'Knowledge and Judgment in the Age of AI',
+  // WP9b shelf expansion — 14 further Bunki originals (pool: original)
+  'bunki-graded-n5-station': 'Waiting at the Station',
+  'bunki-graded-n5-kitchen': 'Sounds from the Kitchen',
+  'bunki-graded-n5-neighbour': 'The Man in the Next Room',
+  'bunki-graded-n4-letter': 'A Letter in the Drawer',
+  'bunki-graded-n4-market': 'The Morning Market',
+  'bunki-graded-n4-bicycle': 'The Day I Lost My Bicycle',
+  'bunki-graded-n3-river': 'The Road Along the River',
+  'bunki-graded-n3-radio': 'Late-night Radio',
+  'bunki-essay-n2-handwriting': 'On Writing by Hand',
+  'bunki-essay-n2-notebook': 'A Notebook Kept for Its Margins',
+  'bunki-essay-n2-rain': 'The Speed of a Rainy Day',
+  'bunki-essay-n2-translation': 'On Words That Resist Translation',
+  'bunki-essay-n1-memory': 'Designing for Forgetting',
+  'bunki-essay-n1-city': 'Anonymity in the City, and Language',
   'real-gokajo': 'The Charter Oath (1868)',
   'real-hojoki': 'Hōjōki — the opening',
   'real-tsurezure': 'Tsurezuregusa — the opening passage',
@@ -145,6 +160,29 @@ const VARIANTS = {
       ['flat', '現行の平ら', 'flat'],
     ],
   },
+  /* F and G are the Drift tap ladder. Both rows are open questions the
+   * operator settles by feel — this strip states what each position does and
+   * takes no position on which one is right. The Drift layer owns the
+   * mechanism (see V_LADDER / V_SATTAP in prototypes/drift/drift-artifact.html);
+   * the strip only names the setting and hands it across window.__DRIFT_TAP__. */
+  ladder: {
+    ticket: null,
+    label: 'F 触れの段',
+    en: 'tap ladder',
+    options: [
+      ['stage3', '三段', '3-stage'],
+      ['stage4', '四段', '4-stage'],
+    ],
+  },
+  sattap: {
+    ticket: null,
+    label: 'G 衛星の触れ',
+    en: 'satellite tap',
+    options: [
+      ['staged', '段階', 'staged'],
+      ['recenter', '即中心', 'instant recenter'],
+    ],
+  },
 };
 
 const REL = {
@@ -207,10 +245,25 @@ const S = {
   view: 'shelf',
   passageId: null,
   readerScroll: 0,
+  /** Where the shelf was standing when you last walked off it. The reader has
+   * kept its place since v1; the shelf is its analog — leaving records the
+   * offset, returning puts it back. Session-only: the store persists what you
+   * took, never where you were. */
+  shelfScroll: 0,
   stack: [],
   dials: { kanji: 0, furigana: 2, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
-  variants: { cards: 'mcd', difficulty: 'three', contrast: 'wcag', entry: 'drift', depth: 'layered' },
+  variants: {
+    cards: 'mcd',
+    difficulty: 'three',
+    contrast: 'wcag',
+    entry: 'drift',
+    depth: 'layered',
+    // F/G: the Drift tap ladder. Both start on the behaviour the field
+    // already shipped with, so an untouched strip is the field as it was.
+    ladder: 'stage3',
+    sattap: 'staged',
+  },
   /* UI language: 'bi' = navigation carries English alongside the Japanese
    * (default — a learner must be able to steer before they can read);
    * 'ja' = 日本語のみ, the opt-in immersion chrome for advanced use. */
@@ -228,6 +281,15 @@ const S = {
   debugOpen: false,
   /** Semantic return point for a modal entry sheet across full DOM renders. */
   dialogInvoker: null,
+  /** 筆順 · the full-screen stroke-order page, layered over the kanji sheet.
+   * null when closed; { id, sheetScroll, invoker, step } when open. */
+  strokes: null,
+  /** The learner's stroke-number preference survives closing the page. */
+  strokeNumbers: true,
+  /** Sheet scrollTop to put back on the next render (returning from 筆順). */
+  sheetScrollRestore: null,
+  /** Element id inside the sheet that should take focus on the next render. */
+  sheetFocus: null,
 };
 
 /* ------------------------------------------------ persistence (localStorage) */
@@ -348,10 +410,15 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
+  let anyVariantParam = params.get('variants') === '1';
   for (const key of Object.keys(VARIANTS)) {
     const v = params.get(key);
-    if (v && VARIANTS[key].options.some(([id]) => id === v)) S.variants[key] = v;
+    if (v && VARIANTS[key].options.some(([id]) => id === v)) {
+      S.variants[key] = v;
+      anyVariantParam = true;
+    }
   }
+  S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   loadStore();
   if (params.get('dials')) {
@@ -523,8 +590,21 @@ function restoreDialogInvoker() {
   });
 }
 
-function go(node, { invoker = null } = {}) {
+/** Record the page beneath before a layer or a new view covers it. A sheet is
+ * fixed, so the page under it has not moved — re-recording is a no-op. */
+function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
+  else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
+}
+
+/** Hand the current view back the offset it walked away from. */
+function returnScroll() {
+  if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
+}
+
+function go(node, { invoker = null } = {}) {
+  keepScroll();
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
@@ -535,11 +615,16 @@ function go(node, { invoker = null } = {}) {
 }
 
 function back() {
+  // 筆順 is the topmost layer when it is open — it leaves before the sheet does
+  if (S.strokes) {
+    closeStrokePage();
+    return;
+  }
   if (S.stack.length) {
     S.stack.pop();
     render();
     if (!S.stack.length) {
-      if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+      returnScroll();
       restoreDialogInvoker();
     }
     return;
@@ -547,27 +632,64 @@ function back() {
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
     S.view = 'shelf';
     render();
+    // the shelf gets its place back the way the reader always has
+    window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'shelf' && S.variants.entry === 'field') {
+    keepScroll();
     S.view = 'entry';
     render();
   }
   if (S.view === 'shelf' && S.variants.entry === 'drift') {
+    keepScroll();
     S.view = 'drift';
     render();
   }
 }
 
 function dismissSheet() {
+  if (S.strokes) {
+    cancelStrokeAnimation();
+    S.strokes = null;
+  }
+  S.sheetScrollRestore = null;
+  S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
   render();
-  if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
+  returnScroll();
   restoreDialogInvoker();
 }
 
+/* ------------------------------------------------ 筆順 · the stroke page */
+/** Open the dedicated full-screen stroke-order page over the kanji sheet.
+ * The sheet stays exactly where it was: its scrollTop rides along in the
+ * layer's own state and is put back, unchanged, when the page closes. */
+function openStrokePage(id, { invoker = null } = {}) {
+  const sheet = $('.sheet');
+  S.strokes = {
+    id,
+    step: 0,
+    sheetScroll: sheet ? sheet.scrollTop : 0,
+    invoker: invoker?.id || null,
+  };
+  render();
+}
+
+/** Close it and hand the sheet back untouched — same scroll, same focus. */
+function closeStrokePage() {
+  if (!S.strokes) return;
+  const { sheetScroll, invoker } = S.strokes;
+  cancelStrokeAnimation();
+  S.strokes = null;
+  S.sheetScrollRestore = sheetScroll;
+  S.sheetFocus = invoker;
+  render();
+}
+
 function openPassage(id) {
+  keepScroll();
   S.passageId = id;
   S.view = 'reader';
   S.readerScroll = 0;
@@ -616,6 +738,22 @@ function rubyNode(pairs, { furigana, revealed }) {
     frag.append(ruby);
   }
   return frag;
+}
+
+/** The token's word content as exactly ONE row.
+ *
+ * `.tok.content` is an inline-flex COLUMN (it keeps the glyph box identical
+ * before and after English mounts — see corridor.css). rubyNode returns a
+ * FRAGMENT, so a token whose ruby covers only the stem — 含め becomes
+ * <ruby>含<rt>ふく</rt></ruby> plus a bare "め" text node — would drop the ruby
+ * and its okurigana into that column as SIBLING flex items, and the word would
+ * tear into stacked rows (含 over め). Wrapping the word in this single child
+ * keeps the column at exactly [word row, optional .tok-en gloss row].
+ */
+function wordRow(pairs, opts) {
+  const row = el('span', 'tok-word');
+  row.append(rubyNode(pairs, opts));
+  return row;
 }
 
 /** Kanji dial: 0 as written · 1 above-常用 replaced by its reading · 2 all kana. */
@@ -849,6 +987,7 @@ function renderShelfBody() {
   gram.id = 'grammar-link';
   gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
   gram.addEventListener('click', () => {
+    keepScroll();
     S.view = 'grammar';
     render();
     window.scrollTo(0, 0);
@@ -884,7 +1023,7 @@ function renderShelfBody() {
     const details = el('button', 'details-toggle');
     details.type = 'button';
     details.dataset.details = p.id;
-    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details · raw signals');
+    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
     details.addEventListener('click', (ev) => {
       ev.stopPropagation();
       (S.detailsOpen ||= new Set());
@@ -938,6 +1077,8 @@ function dialRow(labelJa, labelEn, key, options) {
  *   1st tap        → furigana above           (instant — no double-tap wait)
  *   2nd tap        → English beneath          (a later tap, not a fast pair)
  *   3rd tap        → carries into the full entry
+ * With ふりがな on つねに the first rung is already climbed, so the ladder is
+ * two rungs: English, then the full entry. tapLadderHint() says which.
  *   long-press     → floating mini-dictionary
  *   keep holding   → the mini window morphs into the full entry
  * A moved pointer is a scroll, never a gesture. Every action applies to the
@@ -1083,6 +1224,25 @@ function inlineGloss(rec) {
   return best;
 }
 
+/** The tap ladder has one rung fewer when the ふりがな dial is つねに: the
+ * reading is already on the page, so the first activation cannot reveal it and
+ * goes straight to the English gloss (see activate(), below). The hint has to
+ * describe the ladder the reader actually has under their finger. */
+const readingsAlwaysOn = () => S.dials.furigana === 2;
+
+function tapLadderHint() {
+  if (readingsAlwaysOn()) {
+    return tx(
+      'ことばに触れると英語、もう一度で辞書が開く',
+      'tap a word for English — tap again to open its entry',
+    );
+  }
+  return tx(
+    '触れるとふりがな、もう一度で英語、三回目で辞書',
+    'tap a word for its reading — again for English, once more for its entry',
+  );
+}
+
 function tokenAccessibleLabel(token, index) {
   const record = lookup(token.b);
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -1090,7 +1250,11 @@ function tokenAccessibleLabel(token, index) {
   const parts = [token.s || token.b, tx('語', 'word')];
   if (hasReading && record?.r && record.r !== token.s) parts.push(record.r);
   if (hasEnglish && record?.m?.length) parts.push(inlineGloss(record));
-  parts.push(tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'));
+  parts.push(
+    readingsAlwaysOn()
+      ? tx('もう一度で全項目。フォーカスで別の操作。', 'a further activation opens the full entry; focus for more actions')
+      : tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'),
+  );
   return parts.filter(Boolean).join(' · ');
 }
 
@@ -1101,17 +1265,25 @@ function paintTok(span, token, index) {
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
   } else if (S.dials.furigana === 0) {
-    // the dial says no ruby — a per-word reveal builds it on the spot
+    // the dial says no ruby — a per-word reveal builds it on the spot.
+    // Swap the WORD ROW alone: the column must stay [word row, gloss row], so
+    // wiping the whole span (and re-appending) would both drop the wrapper and
+    // land a rebuilt word AFTER an existing gloss. replaceWith keeps the order
+    // and leaves any mounted .tok-en untouched for the block below.
     const built = span.querySelector('ruby');
-    if (hasReading && !built) {
-      span.querySelector('.tok-en')?.remove();
-      const frag = rubyNode(displayPairs(token), { furigana: 1, revealed: true });
-      span.textContent = '';
-      span.append(frag);
-    } else if (!hasReading && built) {
-      span.querySelector('.tok-en')?.remove();
-      span.textContent = '';
-      span.append(rubyNode(displayPairs(token), { furigana: 0, revealed: false }));
+    if (hasReading !== !!built) {
+      const next = wordRow(displayPairs(token), {
+        furigana: hasReading ? 1 : 0,
+        revealed: hasReading,
+      });
+      const row = span.querySelector('.tok-word');
+      if (row) {
+        row.replaceWith(next);
+      } else {
+        span.querySelector('.tok-en')?.remove();
+        span.textContent = '';
+        span.append(next);
+      }
     }
   }
   span.classList.toggle('lit', !!(S.revealed?.has(index) || hasEn));
@@ -1261,10 +1433,7 @@ function renderReader(main) {
   }
 
   const grammarHint = el('p', 'gesture-hint');
-  grammarHint.textContent = tx(
-    '触れる＝ふりがな · もう一度＝英語 · 三回目＝全項目 · フォーカス＝長押し不要の操作',
-    'activate = reading · again = English · third = full entry · focus = no-hold actions',
-  );
+  grammarHint.textContent = tapLadderHint();
   main.append(grammarHint);
 
   const reader = el('div', 'reader');
@@ -1311,7 +1480,7 @@ function renderReader(main) {
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
-      rubyNode(displayPairs(token), {
+      wordRow(displayPairs(token), {
         furigana: S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),
@@ -1381,10 +1550,37 @@ function renderDrift(main) {
   door.addEventListener('click', () => {
     S.view = 'shelf';
     render();
-    window.scrollTo(0, 0);
+    // first arrival is 0; a return from the drift lands where you left off
+    window.scrollTo(0, S.shelfScroll);
   });
   main.append(door);
 }
+
+/* ------------------------------------------- the Drift card's study door
+ * The drift universe is generated from its own source and knows nothing about
+ * the corridor. It asks its host one question — "can you open this entry?" —
+ * and draws the study door on a word card only if the answer is yes. Here the
+ * answer comes from the corridor's own dictionary, and the door opens the
+ * corridor's own full entry: the same sheet the shelf and the reader open,
+ * with senses, 漢字 doors and 意味の近く. No app base, no href, no navigation
+ * away — one app, one entry surface, and a word the corridor does not carry
+ * simply keeps the card's honest note instead of a door onto nothing.
+ *
+ * The seam is installed at module scope, before boot resolves, because the
+ * drift layer consults it lazily (on each card open) and never at load. */
+window.__BUNKI_OPEN_ENTRY = {
+  has(kind, key) {
+    if (!S.ready || !key) return false;
+    if (kind === 'word') return !!lookup(key);
+    if (kind === 'kanji') return !!D.kanji[key];
+    return false;
+  },
+  open(kind, key) {
+    if (S.view !== 'drift' || !this.has(kind, key)) return;
+    interaction({ kind: 'entry.open' }, 'pointer', `drift-study-${kind}`);
+    go({ t: kind, id: key });
+  },
+};
 
 function renderEntry(main) {
   main.style.padding = '0 16px 92px';
@@ -1422,6 +1618,7 @@ function renderEntry(main) {
   enter.addEventListener('click', () => {
     S.view = 'shelf';
     render();
+    window.scrollTo(0, S.shelfScroll);
   });
   field.append(enter);
   main.append(field);
@@ -1700,17 +1897,51 @@ const ROMAJI = (() => {
   };
 })();
 
+/**
+ * Normalise one English gloss (or one English query) to its bare head phrase,
+ * so that a whole-gloss match can be recognised across the shapes JMdict-style
+ * glosses actually take:
+ *   · parenthetical qualifiers are dropped — "world (of haiku, art, etc.)" → "world",
+ *     "water (esp. cool or cold)" → "water";
+ *   · one leading article or infinitive marker is dropped — "the world" → "world",
+ *     "to eat" → "eat" — but only when something survives, so the gloss "a" or
+ *     the query "to" stays itself.
+ * Applied to BOTH sides, so typing "the world" or "to eat" lands the same place.
+ */
+const GLOSS_MESSY = /[(]|\s\s|[^\S ]/; // parenthesis, doubled space, or exotic whitespace
+const GLOSS_LEAD = new Set(['the', 'a', 'an', 'to']);
+function normalizeGloss(s) {
+  let bare = String(s).toLowerCase();
+  // the regex work is the whole index-build cost, and ~80% of glosses are
+  // already clean — so pay for it only when the string actually needs it.
+  if (GLOSS_MESSY.test(bare)) {
+    bare = bare.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ');
+  }
+  bare = bare.trim();
+  const sp = bare.indexOf(' ');
+  if (sp > 0 && GLOSS_LEAD.has(bare.slice(0, sp))) return bare.slice(sp + 1);
+  return bare;
+}
+
+// commonness rank for the exact-gloss tiers: a graded (JLPT) word is the one a
+// learner means. 0 = N5 … 4 = N1, 5 = ungraded.
+const JLPT_RANK = { N5: 0, N4: 1, N3: 2, N2: 3, N1: 4 };
+const jlptRank = (lv) => JLPT_RANK[String(lv || '').toUpperCase()] ?? 5;
+
 let searchIndex = null;
 function buildSearchIndex() {
   if (searchIndex) return;
   searchIndex = [];
   for (const [w, rec] of Object.entries(D.dict)) {
+    const glosses = rec.m || [];
     searchIndex.push({
       t: 'word', id: w, w,
       r: rec.r || '',
       rh: kataToHira(rec.r || ''),
-      m: (rec.m || []).join('; ').toLowerCase(),
-      g: rec.m?.[0] || '',
+      m: glosses.join('; ').toLowerCase(),
+      g: glosses[0] || '',
+      ng: glosses.map(normalizeGloss),
+      j: jlptRank(rec.jlpt),
     });
   }
   for (const [c, k] of Object.entries(D.kanji)) {
@@ -1721,10 +1952,16 @@ function buildSearchIndex() {
       rh: kataToHira([...k.on, ...k.kun].join(' ')),
       m: String(k.m).toLowerCase(),
       g: k.m,
+      ng: [normalizeGloss(k.m)],
+      j: 5,
     });
   }
   for (const g of GRAMMARS()) {
-    searchIndex.push({ t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '', m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn });
+    searchIndex.push({
+      t: 'grammar', id: g.id, w: g.p, r: g.lv, rh: '',
+      m: `${g.mEn} ${g.mJa}`.toLowerCase(), g: g.mEn,
+      ng: [normalizeGloss(g.mEn)], j: jlptRank(g.lv),
+    });
   }
   for (const pt of PARTICLES) {
     searchIndex.push({
@@ -1733,6 +1970,8 @@ function buildSearchIndex() {
       rh: pt.r,
       m: `${pt.role} ${pt.roleJa} particle`.toLowerCase(),
       g: pt.role,
+      ng: [normalizeGloss(pt.role)],
+      j: 5,
     });
   }
 }
@@ -1745,9 +1984,14 @@ function searchResults(query) {
   const hasKana = /[぀-ゖァ-ヺ]/.test(q);
   const qh = hasKana ? kataToHira(q) : ROMAJI(q);
   const ql = q.toLowerCase();
+  const qn = hasKanji || hasKana ? '' : normalizeGloss(q);
   const scored = [];
   for (const e of searchIndex) {
     let score = -1;
+    // Only the English exact-gloss tiers set this; every other lane leaves it
+    // at 0, so their relative order stays exactly what it was (score, then
+    // shorter headword) — the kana, romaji and kanji doors are untouched.
+    let tie = 0;
     if (hasKanji) {
       if (e.w === q) score = 100;
       else if (e.w.startsWith(q)) score = 80;
@@ -1763,14 +2007,27 @@ function searchResults(query) {
         else if (e.rh.startsWith(qh)) score = Math.max(score, 75);
       }
       if (e.m) {
+        // English priority tiers, above the old word-boundary/substring pair:
+        //   92 · the query IS this entry's PRIMARY gloss   ("world" → 世界 "the world")
+        //   85 · the query IS one of its later glosses     ("world" → 俗 "…; the world; …")
+        // Both sit under the romaji-exact 95, so the reading door still wins
+        // when a query is genuine romaji.
+        const gi = qn ? e.ng.indexOf(qn) : -1;
+        const exact = gi === 0 ? 92 : gi > 0 ? 85 : -1;
+        if (exact > score) {
+          score = exact;
+          // within a tier: real words before single-kanji meaning-labels,
+          // then earlier gloss position, then commonness, then shorter word.
+          tie = (e.t === 'kanji' ? 1000 : 0) + gi * 10 + e.j;
+        }
         const at = e.m.indexOf(ql);
         if (at === 0 || (at > 0 && ' ;('.includes(e.m[at - 1]))) score = Math.max(score, 70);
         else if (at > 0) score = Math.max(score, 40);
       }
     }
-    if (score >= 0) scored.push({ e, score });
+    if (score >= 0) scored.push({ e, score, tie });
   }
-  scored.sort((a, b) => b.score - a.score || a.e.w.length - b.e.w.length);
+  scored.sort((a, b) => b.score - a.score || a.tie - b.tie || a.e.w.length - b.e.w.length);
   return scored.slice(0, 40).map((x) => x.e);
 }
 
@@ -2257,6 +2514,20 @@ function renderWordNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
+ * layer carry an empty `name` — they are shape components, not Kangxi radicals,
+ * and the 漢検 table never named them. "unnamed part" said only that we had
+ * nothing, and made a live door look like a dead one. The honest line says what
+ * IS known and what the door actually opens: the family of kanji built from
+ * this shape, which is exactly what renderRadicalNode() shows on the far side. */
+function componentLabel(c) {
+  const r = D.radicals[c];
+  if (r?.name) return r.name;
+  const n = r?.kanjiCount;
+  if (n) return tx(`部品 — ${n} 字に使われる`, `component — used in ${n} kanji`);
+  return tx('部品 — 漢検の部首表に名前がない', 'component — no name in the 漢検 radical table');
+}
+
 function renderKanjiNode(sheet, node) {
   const k = D.kanji[node.id];
   if (!k) {
@@ -2284,30 +2555,10 @@ function renderKanjiNode(sheet, node) {
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
 
-  // STROKE ORDER — KanjiVG paths, numbered at each stroke's start
-  const paths = D.strokes?.[k.c];
-  if (paths?.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
-    const NS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 109 109');
-    svg.setAttribute('class', 'strokes');
-    svg.id = 'strokes';
-    paths.forEach((d, i) => {
-      const path = document.createElementNS(NS, 'path');
-      path.setAttribute('d', d);
-      svg.append(path);
-      const m = d.match(/M\s*([\d.]+)[\s,]+([\d.]+)/);
-      if (m) {
-        const t = document.createElementNS(NS, 'text');
-        t.setAttribute('x', m[1]);
-        t.setAttribute('y', m[2]);
-        t.textContent = String(i + 1);
-        svg.append(t);
-      }
-    });
-    sheet.append(svg);
-  }
+  // STROKE ORDER — the diagram is a door, not a picture. It opens the
+  // dedicated full-screen page where the strokes actually draw themselves.
+  sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
+  sheet.append(strokeDoor(k));
 
   if (k.parts.length) {
     sheet.append(withEn(el('p', 'eyebrow', '部品'), 'components', 'en-inline'));
@@ -2316,7 +2567,7 @@ function renderKanjiNode(sheet, node) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.append(el('span', 'row-glyph', c));
-      row.append(el('span', 'row-main', D.radicals[c]?.name || tx('名称なし', 'unnamed part')));
+      row.append(el('span', 'row-main', componentLabel(c)));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'radical', id: c, from: node.from }));
       rows.append(row);
@@ -2371,6 +2622,496 @@ function renderKanjiNode(sheet, node) {
   sheet.append(takeButton(node, k.c));
   renderListPicker(sheet, node, k.c);
   renderSchedule(sheet);
+}
+
+/* ==================================================== 筆順 · stroke order ===
+ * A kanji is written, not drawn — so the stroke diagram gets a page of its
+ * own instead of a thumbnail in a list. On that page the KanjiVG paths draw
+ * themselves in order, one after another, the way a hand moves: each path is
+ * dashed to its own measured length (getTotalLength) and its dashoffset walks
+ * to zero.
+ *
+ * 448 of the 2,582 kanji in this layer carry no KanjiVG path data. Their door
+ * still opens — it shows the character large and says, in both languages,
+ * that the stroke order is not known here. An empty frame would be a lie.
+ *
+ * Every colour on the page is a theme token (--ink / --ground / --ground-0 /
+ * --line / --faint / --ai). Nothing here names a colour, so both the flat and
+ * the layered treatment — and either contrast variant — carry through intact.
+ */
+const STROKE_VIEWBOX = '0 0 109 109';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** Does this character have real KanjiVG path data in the shipped layer? */
+const strokePathsFor = (ch) => D.strokes?.[ch] || [];
+
+/** The learner asked the platform not to animate — we obey it at the source,
+ * never by playing the animation faster. */
+const strokeReduced = () =>
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let strokeFrame = null;
+function cancelStrokeAnimation() {
+  if (strokeFrame != null) cancelAnimationFrame(strokeFrame);
+  strokeFrame = null;
+}
+
+/** KanjiVG stores each stroke's start as its path's first moveto. */
+function strokeStart(d) {
+  const m = /M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/.exec(d);
+  return m ? { x: Number(m[1]), y: Number(m[2]) } : null;
+}
+
+/** The sheet's small diagram — unchanged geometry, now wrapped in a door. */
+function strokeThumb(paths) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', STROKE_VIEWBOX);
+  svg.setAttribute('class', 'strokes');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.id = 'strokes';
+  paths.forEach((d, i) => {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+    const start = strokeStart(d);
+    if (start) {
+      const t = document.createElementNS(SVG_NS, 'text');
+      t.setAttribute('x', String(start.x));
+      t.setAttribute('y', String(start.y));
+      t.textContent = String(i + 1);
+      svg.append(t);
+    }
+  });
+  return svg;
+}
+
+/** The door on the kanji sheet. It exists for every kanji, with data or
+ * without — the corridor has no dead ends, only honest rooms. */
+function strokeDoor(k) {
+  const paths = strokePathsFor(k.c);
+  const door = el('button', paths.length ? 'stroke-door' : 'stroke-door bare');
+  door.type = 'button';
+  door.id = 'strokes-door';
+  door.dataset.action = 'entry.open';
+  door.dataset.strokes = String(paths.length);
+  door.setAttribute(
+    'aria-label',
+    paths.length
+      ? tx(
+          `${k.c} の筆順をひらく — ${paths.length} 画`,
+          `open the stroke order for ${k.c} — ${paths.length} strokes`,
+        )
+      : tx(
+          `${k.c} の筆順 — 筆順のデータはまだない`,
+          `${k.c} stroke order — stroke data not yet available`,
+        ),
+  );
+  if (paths.length) door.append(strokeThumb(paths));
+  else door.append(el('span', 'stroke-door-glyph', k.c));
+
+  const side = el('span', 'stroke-door-side');
+  side.append(
+    el(
+      'span',
+      'stroke-door-title',
+      paths.length
+        ? tx(`${paths.length} 画を順に書く`, `watch all ${paths.length} strokes draw in order`)
+        : tx('筆順のデータはまだない', 'stroke data not yet available'),
+    ),
+  );
+  side.append(
+    el(
+      'span',
+      'stroke-door-sub',
+      paths.length
+        ? tx('全画面でひらく', 'opens full screen')
+        : tx('画数だけは分かっている', 'the count is known, the order is not'),
+    ),
+  );
+  door.append(side);
+  door.append(el('span', 'row-go', '›'));
+
+  door.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'entry.open', target: { kind: 'kanji', id: k.c } },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-door',
+    );
+    openStrokePage(k.c, { invoker: door });
+  });
+  return door;
+}
+
+/** Put the page into a definite state: `shown` strokes complete, the last of
+ * them `progress` of the way drawn. Called by the animation every frame and
+ * by the step-through control once per press. */
+function paintStrokes(page, shown, progress = 1) {
+  const paths = [...page.querySelectorAll('.stroke-ink path')];
+  const bleeds = [...page.querySelectorAll('.stroke-bleed path')];
+  const total = paths.length;
+  paths.forEach((path, i) => {
+    const len = Number(path.dataset.len) || 0;
+    let offset = len;
+    if (i < shown - 1) offset = 0;
+    else if (i === shown - 1) offset = len * (1 - progress);
+    path.style.strokeDashoffset = String(offset);
+    if (bleeds[i]) bleeds[i].style.strokeDashoffset = String(offset);
+  });
+  for (const [i, num] of [...page.querySelectorAll('.stroke-num')].entries()) {
+    num.style.opacity = i < shown ? '1' : '0';
+  }
+  const counter = page.querySelector('#stroke-count');
+  if (counter) {
+    const current = Math.max(0, Math.min(total, shown));
+    counter.dataset.current = String(current);
+    counter.dataset.total = String(total);
+    counter.textContent = `${current} / ${total}`;
+  }
+  const prev = page.querySelector('#stroke-prev');
+  const next = page.querySelector('#stroke-next');
+  if (prev) prev.disabled = shown <= 1;
+  if (next) next.disabled = shown >= total;
+}
+
+/** Draw the strokes in order. Each path's duration follows its own measured
+ * length, so a long sweep takes longer than a tick — handwriting, not a
+ * metronome. */
+function startStrokeAnimation(page) {
+  cancelStrokeAnimation();
+  const paths = [...page.querySelectorAll('.stroke-ink path')];
+  const bleeds = [...page.querySelectorAll('.stroke-bleed path')];
+  if (!paths.length) return;
+  paths.forEach((path, i) => {
+    const len = path.getTotalLength();
+    path.dataset.len = String(len);
+    path.style.strokeDasharray = `${len} ${len}`;
+    path.style.strokeDashoffset = String(len);
+    if (bleeds[i]) {
+      bleeds[i].style.strokeDasharray = `${len} ${len}`;
+      bleeds[i].style.strokeDashoffset = String(len);
+    }
+  });
+  const total = paths.length;
+
+  if (strokeReduced()) {
+    // Reduced motion is a mode, not a faster animation: the finished glyph is
+    // there at once and the learner walks it stroke by stroke by hand.
+    S.strokes.step = total;
+    page.dataset.state = 'static';
+    paintStrokes(page, total, 1);
+    return;
+  }
+
+  const GAP = 90;
+  const durations = paths.map((path) =>
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
+  );
+  const starts = [];
+  let acc = 0;
+  for (const d of durations) {
+    starts.push(acc);
+    acc += d + GAP;
+  }
+  const span = acc;
+
+  page.dataset.state = 'drawing';
+  paintStrokes(page, 1, 0);
+
+  let t0 = null;
+  const frame = (ts) => {
+    if (t0 == null) t0 = ts;
+    const t = ts - t0;
+    if (t >= span) {
+      paintStrokes(page, total, 1);
+      page.dataset.state = 'done';
+      S.strokes.step = total;
+      strokeFrame = null;
+      return;
+    }
+    let index = 0;
+    while (index < total - 1 && t >= starts[index + 1]) index += 1;
+    const local = Math.max(0, Math.min(1, (t - starts[index]) / durations[index]));
+    paintStrokes(page, index + 1, local);
+    S.strokes.step = index + 1;
+    strokeFrame = requestAnimationFrame(frame);
+  };
+  strokeFrame = requestAnimationFrame(frame);
+}
+
+function strokeControl(id, ja, en) {
+  const btn = el('button', 'stroke-btn');
+  btn.type = 'button';
+  btn.id = id;
+  btn.append(el('span', 'l-ja', ja));
+  if (bi() && en) btn.append(el('span', 'en-sub', en));
+  if (!bi()) btn.setAttribute('aria-label', ja);
+  return btn;
+}
+
+/** The honest room: a character we can show but whose order we do not know. */
+function strokeMissing(page, id, k) {
+  const box = el('div', 'stroke-missing');
+  box.append(el('div', 'stroke-missing-glyph', id));
+  const line = el('p', 'stroke-missing-line');
+  line.id = 'stroke-missing';
+  line.textContent = tx('筆順のデータはまだない。', 'Stroke data not yet available.');
+  box.append(line);
+  const note = el('p', 'stroke-missing-note');
+  note.textContent = k?.st
+    ? tx(
+        `分かっているのは画数だけ — ${k.st} 画。この字の筆順は KanjiVG にまだ入っていない。`,
+        `What is known is the count — ${k.st} strokes. KanjiVG does not carry this character's stroke paths yet.`,
+      )
+    : tx(
+        'この字の筆順は KanjiVG にまだ入っていない。',
+        'KanjiVG does not carry this character’s stroke paths yet.',
+      );
+  box.append(note);
+  page.append(box);
+}
+
+function renderStrokePage(root) {
+  const st = S.strokes;
+  if (!st) return;
+  const k = D.kanji[st.id];
+  const paths = strokePathsFor(st.id);
+  const reduced = strokeReduced();
+
+  const page = el('div', 'stroke-page');
+  page.id = 'stroke-page';
+  page.tabIndex = -1;
+  page.setAttribute('role', 'dialog');
+  page.setAttribute('aria-modal', 'true');
+  page.setAttribute('aria-label', tx(`${st.id} の筆順`, `${st.id} — stroke order`));
+  page.dataset.kanji = st.id;
+  page.dataset.strokes = String(paths.length);
+  page.dataset.motion = reduced ? 'reduced' : 'full';
+  page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+  page.dataset.state = paths.length ? 'drawing' : 'nodata';
+  page.dataset.ink = S.strokeInk || 'sumi';
+
+  const bar = el('div', 'stroke-bar');
+  const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
+  backBtn.type = 'button';
+  backBtn.id = 'strokes-back';
+  backBtn.dataset.action = 'navigation.back';
+  backBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'navigation.back' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-back',
+    );
+    closeStrokePage();
+  });
+  bar.append(backBtn);
+
+  const title = el('span', 'stroke-title');
+  title.append(el('span', 'stroke-title-glyph', st.id));
+  title.append(el('span', 'stroke-title-word', tx('筆順', 'stroke order')));
+  bar.append(title);
+
+  const closeBtn = el('button', 'stroke-close', '✕');
+  closeBtn.type = 'button';
+  closeBtn.id = 'strokes-close';
+  closeBtn.dataset.action = 'layer.dismiss';
+  closeBtn.setAttribute('aria-label', tx('筆順をとじる', 'close stroke order'));
+  closeBtn.addEventListener('click', (event) => {
+    interaction(
+      { kind: 'layer.dismiss' },
+      event.detail === 0 ? 'keyboard' : 'pointer',
+      'strokes-close',
+    );
+    closeStrokePage();
+  });
+  bar.append(closeBtn);
+  page.append(bar);
+
+  if (!paths.length) {
+    strokeMissing(page, st.id, k);
+  } else {
+    const body = el('div', 'stroke-body');
+    const stage = el('div', 'stroke-stage');
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', STROKE_VIEWBOX);
+    svg.setAttribute('class', 'stroke-canvas');
+    svg.id = 'stroke-canvas';
+    svg.setAttribute('aria-hidden', 'true');
+
+    // 界 — the writing guide: quarters of the square, the way squared paper
+    // teaches balance. Drawn from --line, so it fades with the theme.
+    const grid = document.createElementNS(SVG_NS, 'g');
+    grid.setAttribute('class', 'stroke-grid');
+    for (const [x1, y1, x2, y2] of [
+      [54.5, 0, 54.5, 109],
+      [0, 54.5, 109, 54.5],
+    ]) {
+      const l = document.createElementNS(SVG_NS, 'line');
+      l.setAttribute('x1', String(x1));
+      l.setAttribute('y1', String(y1));
+      l.setAttribute('x2', String(x2));
+      l.setAttribute('y2', String(y2));
+      grid.append(l);
+    }
+    svg.append(grid);
+
+    // the whole glyph, very faint: where the hand is going
+    const guide = document.createElementNS(SVG_NS, 'g');
+    guide.setAttribute('class', 'stroke-guide');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      guide.append(p);
+    }
+    svg.append(guide);
+
+    // 滲み — the ink's soft bleed into the paper, a wider ghost of each
+    // stroke beneath the crisp line. Two passes read as sumi on washi where
+    // one uniform line reads as marker on cardboard.
+    const bleed = document.createElementNS(SVG_NS, 'g');
+    bleed.setAttribute('class', 'stroke-bleed');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      bleed.append(p);
+    }
+    svg.append(bleed);
+
+    const ink = document.createElementNS(SVG_NS, 'g');
+    ink.setAttribute('class', 'stroke-ink');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      ink.append(p);
+    }
+    svg.append(ink);
+
+    const nums = document.createElementNS(SVG_NS, 'g');
+    nums.setAttribute('class', 'stroke-nums');
+    paths.forEach((d, i) => {
+      const start = strokeStart(d);
+      if (!start) return;
+      const t = document.createElementNS(SVG_NS, 'text');
+      t.setAttribute('class', 'stroke-num');
+      t.setAttribute('x', String(start.x));
+      t.setAttribute('y', String(start.y));
+      t.textContent = String(i + 1);
+      nums.append(t);
+    });
+    svg.append(nums);
+    stage.append(svg);
+    body.append(stage);
+
+    const readout = el('div', 'stroke-readout');
+    const counter = el('span', 'stroke-count', `0 / ${paths.length}`);
+    counter.id = 'stroke-count';
+    counter.dataset.current = '0';
+    counter.dataset.total = String(paths.length);
+    if (reduced) {
+      counter.setAttribute('role', 'status');
+      counter.setAttribute('aria-live', 'polite');
+    }
+    readout.append(counter);
+    readout.append(el('span', 'stroke-count-unit', tx('画', 'strokes')));
+    body.append(readout);
+
+    const controls = el('div', 'stroke-controls');
+    if (reduced) {
+      const prev = strokeControl('stroke-prev', '← 前の画', 'previous stroke');
+      prev.addEventListener('click', () => {
+        S.strokes.step = Math.max(1, S.strokes.step - 1);
+        paintStrokes(page, S.strokes.step, 1);
+      });
+      const next = strokeControl('stroke-next', '次の画 →', 'next stroke');
+      next.addEventListener('click', () => {
+        S.strokes.step = Math.min(paths.length, S.strokes.step + 1);
+        paintStrokes(page, S.strokes.step, 1);
+      });
+      controls.append(prev, next);
+    } else {
+      const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
+      replay.classList.add('primary');
+      replay.addEventListener('click', () => startStrokeAnimation(page));
+      controls.append(replay);
+    }
+
+    // 顔料 — four inks. A quiet row of pigment dots; the page holds the choice.
+    const inks = el('div', 'stroke-inks');
+    inks.setAttribute('role', 'group');
+    inks.setAttribute('aria-label', tx('墨の色', 'ink color'));
+    for (const [id, name] of [
+      ['sumi', '墨'],
+      ['bengara', '弁柄'],
+      ['ai', '藍'],
+      ['rokusho', '緑青'],
+    ]) {
+      const dot = el('button', 'ink-dot');
+      dot.type = 'button';
+      dot.dataset.ink = id;
+      dot.setAttribute('aria-label', name);
+      dot.setAttribute('aria-pressed', String((S.strokeInk || 'sumi') === id));
+      dot.addEventListener('click', () => {
+        S.strokeInk = id;
+        page.dataset.ink = id;
+        for (const d of inks.querySelectorAll('.ink-dot'))
+          d.setAttribute('aria-pressed', String(d.dataset.ink === id));
+      });
+      inks.append(dot);
+    }
+    body.append(inks);
+
+    const numbers = strokeControl('stroke-numbers', '番号', 'stroke numbers');
+    numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+    numbers.addEventListener('click', () => {
+      S.strokeNumbers = !S.strokeNumbers;
+      numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+      page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+    });
+    controls.append(numbers);
+    body.append(controls);
+
+    const meta = el('p', 'stroke-meta');
+    const bits = [];
+    if (k) bits.push(tx(`${k.m}`, `${k.m}`));
+    if (D.kanken[st.id]?.kk) bits.push(`漢検 ${D.kanken[st.id].kk}`);
+    if (D.kmeta?.[st.id]?.jlpt) bits.push(`JLPT ${D.kmeta[st.id].jlpt}`);
+    bits.push(tx(`${paths.length} 画`, `${paths.length} strokes`));
+    meta.textContent = bits.join(' · ');
+    body.append(meta);
+    page.append(body);
+  }
+
+  page.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      interaction({ kind: 'layer.dismiss' }, 'keyboard', 'strokes-escape');
+      closeStrokePage();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...page.querySelectorAll('button, a[href], [tabindex]')].filter(
+      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+    );
+    if (!focusable.length) {
+      event.preventDefault();
+      page.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  root.append(page);
+  if (paths.length) startStrokeAnimation(page);
+  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
 }
 
 function renderRadicalNode(sheet, node) {
@@ -2550,7 +3291,20 @@ function renderSheet(root) {
     }
   });
   root.append(sheet);
-  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
+
+  // The sheet keeps its place across a full re-render: 筆順 carries the
+  // scrollTop it left with and hands it straight back.
+  const restore = S.strokes ? S.strokes.sheetScroll : S.sheetScrollRestore;
+  if (restore != null) sheet.scrollTop = restore;
+  S.sheetScrollRestore = null;
+
+  if (S.strokes) return; // the stroke page above owns focus
+  const focusId = S.sheetFocus;
+  S.sheetFocus = null;
+  queueMicrotask(() => {
+    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || backBtn;
+    target.focus({ preventScroll: true });
+  });
 }
 
 function licencePanel() {
@@ -2579,6 +3333,11 @@ function licencePanel() {
 
 /* --------------------------------------------------------- debug strip */
 function renderVariants(root) {
+  // The variants strip is an operator's instrument, not part of the app. It
+  // taped a black band of developer vocabulary across every surface — the
+  // reader, the drift, the entry sheets. It now appears only when summoned:
+  // ?variants=1 (or any variant/debug URL parameter already present).
+  if (!S.variantsBar) return;
   const bar = el('div');
   bar.id = 'variants';
   const top = el('div', 'vbar');
@@ -2616,7 +3375,10 @@ function renderVariants(root) {
         b.addEventListener('click', () => {
           S.variants[key] = id;
           if (key === 'entry') {
-            if (id === 'field' && S.view === 'shelf') S.view = 'entry';
+            if (id === 'field' && S.view === 'shelf') {
+              keepScroll();
+              S.view = 'entry';
+            }
             if (id === 'shelf' && S.view === 'entry') S.view = 'shelf';
           }
           render();
@@ -2656,7 +3418,15 @@ function render() {
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
+  // F/G ride across to the Drift layer, which owns the tap ladder itself. Sent
+  // on every render (not only on a click) so the layer carries the strip's
+  // reading whenever it finishes loading, and unknown values are ignored there.
+  if (window.__DRIFT_TAP__)
+    window.__DRIFT_TAP__.set({ ladder: S.variants.ladder, satTap: S.variants.sattap });
   document.body.classList.toggle('ui-bi', bi());
+  // the reading measure is per-view: a column for the texts, the full window
+  // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
+  document.body.dataset.view = S.view;
 
   const chrome = el('div', 'chrome');
   const backBtn = biLabel('button', null, '戻る', 'back');
@@ -2705,6 +3475,7 @@ function render() {
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
+    keepScroll();
     S.stack = [];
     S.view = 'tray';
     render();
@@ -2723,8 +3494,14 @@ function render() {
 
   // The Drift universe sleeps unless it is the active view — its layer sits
   // beneath the corridor chrome, so the one navigation fabric stays visible.
+  // It also sleeps under an open entry sheet: the layer is a sibling of #app,
+  // so the inert pass below cannot reach it, and its six window-level pointer
+  // listeners would read every tap on the sheet as a tap on open water and
+  // raze the constellation underneath. Sleeping is not forgetting — the stack,
+  // the centre and its satellites are all held in the layer's own state, so
+  // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
-    if (S.view === 'drift') window.__DRIFT__.show();
+    if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
 
@@ -2736,10 +3513,22 @@ function render() {
   else renderShelf(main);
 
   renderSheet(root);
+  renderStrokePage(root);
   renderVariants(root);
-  if (S.stack.length) {
+
+  // Exactly one layer is live at a time. 筆順 sits above the sheet, so when it
+  // is open even the sheet goes inert — nothing behind the top layer is
+  // reachable by finger, keyboard, or screen reader.
+  if (S.strokes || S.stack.length) {
     for (const child of root.children) {
-      if (child.id === 'sheet' || child.classList.contains('scrim')) continue;
+      const live = S.strokes
+        ? child.id === 'stroke-page'
+        : child.id === 'sheet' || child.classList.contains('scrim');
+      if (live) {
+        child.inert = false;
+        child.removeAttribute('aria-hidden');
+        continue;
+      }
       child.inert = true;
       child.setAttribute('aria-hidden', 'true');
     }

@@ -1,0 +1,45 @@
+{
+  "src": "/home/user/Bunki-app/.claude/worktrees/agent-a410e2afa6886da30/prototypes/drift/drift-artifact.html",
+  "still": {
+    "words": 64,
+    "maxWordPx": 0,
+    "wordsThatMoved": 0,
+    "maxBlobPx": 0,
+    "maxMoteFrac": 0,
+    "maxOffsetPx": 0,
+    "fluidBefore": 0,
+    "fluidAfter": 0
+  },
+  "results": [
+    {
+      "fix": "reduced-media-query-seen",
+      "pass": true,
+      "detail": "the page's own `reduced` flag reads true"
+    },
+    {
+      "fix": "reduced-field-still",
+      "pass": true,
+      "detail": "over 10s: 0/64 words moved (max 0px), pigment pools max 0px, flow motes max 0, drift offsets max 0, fluid |v|max 0->0"
+    },
+    {
+      "fix": "reduced-tap-ladder",
+      "pass": true,
+      "detail": "\"材料\": rest {\"unfolded\":false,\"glossed\":false,\"gone\":false} -> one tap {\"unfolded\":true,\"glossed\":false,\"gone\":false} -> two taps {\"unfolded\":true,\"glossed\":true,\"gone\":false}"
+    },
+    {
+      "fix": "reduced-bloom-released",
+      "pass": true,
+      "detail": "water tap at 57,300 left FOCUS=0"
+    },
+    {
+      "fix": "reduced-flick-judgment",
+      "pass": true,
+      "detail": "flicked \"救う\" right (known): {\"found\":true,\"gone\":true,\"removed\":false,\"graded\":true}"
+    },
+    {
+      "fix": "reduced-no-errors",
+      "pass": true,
+      "detail": "none"
+    }
+  ]
+}

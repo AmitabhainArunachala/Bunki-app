@@ -1,0 +1,63 @@
+{
+  "1-stores-at-defaults": {
+    "keys": [],
+    "parsed": {}
+  },
+  "2-strip-buttons": {
+    "count": 15,
+    "ladder": [
+      "ladder:stage3",
+      "ladder:stage4"
+    ],
+    "sattap": [
+      "sattap:staged",
+      "sattap:recenter"
+    ]
+  },
+  "3-drift-layer-received": {
+    "before": null,
+    "after": null
+  },
+  "4-rows-inherit-44px-and-aria": [
+    {
+      "v": "ladder:stage3",
+      "pressed": "false",
+      "h": 44,
+      "text": "三段3-stage"
+    },
+    {
+      "v": "ladder:stage4",
+      "pressed": "true",
+      "h": 44,
+      "text": "四段4-stage"
+    },
+    {
+      "v": "sattap:staged",
+      "pressed": "false",
+      "h": 44,
+      "text": "段階staged"
+    },
+    {
+      "v": "sattap:recenter",
+      "pressed": "true",
+      "h": 44,
+      "text": "即中心instant recenter"
+    }
+  ],
+  "5-stores-after-standing-off-defaults": {
+    "keys": [],
+    "parsed": {}
+  },
+  "6-after-reload": {
+    "drift": null,
+    "pressed": [
+      "ladder:stage3",
+      "sattap:staged"
+    ],
+    "stores": {
+      "keys": [],
+      "parsed": {}
+    }
+  },
+  "ERRORS": []
+}

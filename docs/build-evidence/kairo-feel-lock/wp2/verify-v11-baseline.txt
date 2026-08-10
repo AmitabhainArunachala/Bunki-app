@@ -1,0 +1,28 @@
+rest: {"z":1,"rot":0,"stack":0,"lockOn":false,"focus":0,"focusVis":0,"unfolded":0,"words":64}
+census: 36 words · 0 ghosted · rawWorstOverlap=0.903 · minGhostOp=null minPresentOp=0.327
+PASS  law-rest-presence: faintest ghost op=null vs the field's own faintest unarbitrated presence 0.3266 (live floor null); ghost contrast null:1 vs quietest present word 1.467:1 — 0/36 ghosted
+FAIL  law-rest-reachable: pointer-events:none on 0; ghosts with no reachable point: 0; live tap on ghost "—" (op —) -> n/a · pre-existing crowding, not the arbiter's doing: 4 full-presence words fully covered by other words, 0 covered by chrome
+PASS  law-ghost-residual: deleting a ghost changes its box by mean Δ  (max Δ ); kept controls mean Δ  — bar is ≥50% of the quietest kept (null)
+FAIL  4-rest-contention: arbitrable contending pairs=3 (bar 0) · un-arbitrable left standing=4 (both words too quiet to win; receding either would breach the floor null) · worstContention=0.97 · raw geometry unchanged: worstOverlap=1 over 7 pairs of 33 words :: [{"a":"いんさつ印刷pr","b":"ぎし技師engi","f":0.47,"hi":0.632,"lo":0.395,"contend":0.63,"cA":null,"cB":null,"arbitrable":true},{"a":"ぎし技師engi","b":"せいこう精巧el","f":0.26,"hi":0.632,"lo":0.474,"contend":0.75,"cA":null,"cB":null,"arbitrable":true},{"a":"ふれる触れるto","b":"はんだん判断ju","f":0.97,"hi":0.588,"lo":0.522,"contend":0.89,"cA":null,"cB":null,"arbitrable":true}]
+FAIL  6-chrome-keepout: 4 words at reading presence (≥0.44) under chrome; 5 present under chrome at all (as ghosts) :: [{"w":"たんなる単なるm","chrome":"lvl","op":0.52},{"w":"まんいち万一by","chrome":"lvl","op":0.632},{"w":"とりあげる取り上","chrome":"lvl","op":0.668},{"w":"ぎし技師engi","chrome":"brand","op":0.632}]
+FAIL  1-pinch-surface-nobleed: stack 1->0, z 1->0.34 (must stay >0.7, not floor at 0.34)
+FAIL  3-rot-clamp: twist registered: rot 0 -> 2.793 (must move >0.5); after 3x160deg rot=8.378 (must be within +-3.14)
+FAIL  2-return-to-rest: messy(z=2.6,rot=2.618) -> home(z=2.6,rot=2.618) via double-tap at 270,150
+FAIL  4-zoom-contention: after zoom (z=2.6) arbitrable contending pairs=18, un-arbitrable=10, worstContention=1 · raw worstOverlap=1 over 29 pairs of 41 words :: [{"a":"かくご覚悟res","b":"おでかけお出掛け","f":0.41,"hi":0.711,"lo":0.711,"contend":1,"cA":null,"cB":null,"arbitrable":true},{"a":"そふ祖父gran","b":"ぶき武器weap","f":0.35,"hi":0.711,"lo":0.632,"contend":0.89,"cA":null,"cB":null,"arbitrable":true},{"a":"せつめい説明ex","b":"でむかえる出迎え","f":0.26,"hi":0.588,"lo":0.474,"contend":0.81,"cA":null,"cB":null,"arbitrable":true}]
+PASS  law-zoom-presence: zoomed: faintest ghost op=null vs the field's faintest unarbitrated 0.3266 (floor null); pointer-events:none on 0; ghosts out of reach with nothing over them: 0 · crowding context: 0/0 ghosts and 11/41 full-presence words are covered by other words at this zoom
+FAIL  8-unfold-clear-on-lock: tapped A=はんい範囲e (unfolded=1), locked B=ごぶさた御無 -> unfolded=1, lockOn=true, members=12
+FAIL  8-lock-persists-minzoom: z=0.34 (want <=0.5), lockOn=true, focus=12, visibleMembers=4
+PASS  8-lock-release-clean: after water-tap release lockOn=false, unfolded=0
+FAIL  5-hint[北斎]: hint text/plate contrast=2.45 on rgba(0, 0, 0, 0); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
+FAIL  5-hint[墨]: hint text/plate contrast=2.29 on rgba(0, 0, 0, 0); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
+FAIL  5-hint[岩絵具]: hint text/plate contrast=2.32 on rgba(0, 0, 0, 0); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
+FAIL  5-hint[緑青]: hint text/plate contrast=2.18 on rgba(0, 0, 0, 0); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
+FAIL  5-hint[夜]: hint text/plate contrast=3.53 on rgba(0, 0, 0, 0); pill actually rendered at opacity 1 (must be >0.9, not forced by the harness)
+FAIL  7-parity[岩絵具]: fg med=1.91 (n=21) vs light baseline 2.66 — want >=2.4 and >=90% of baseline
+FAIL  7-parity[緑青]: fg med=2.21 (n=21) vs light baseline 2.66 — want >=2.4 and >=90% of baseline
+PASS  7-night-legible: 夜 fg med=4.07 (n=21)
+
+ERRORS: none
+
+5/21 checks passed
+results -> docs/build-evidence/kairo-feel-lock/wp2/verify-v11-baseline.json

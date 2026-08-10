@@ -1,0 +1,58 @@
+{
+  "probe": "prove",
+  "viewport": {
+    "VW": 390,
+    "VH": 844
+  },
+  "tierByLevel": {
+    "1": 2279,
+    "2": 1489,
+    "3": 1837,
+    "4": 535,
+    "5": 553
+  },
+  "tides": {},
+  "prove": {
+    "N1": {
+      "preFixUnreachable": 1739,
+      "sampled": 20,
+      "nowSurfaced": 20,
+      "medianPanPx": 14400,
+      "maxPanPx": 25803,
+      "misses": []
+    },
+    "N2": {
+      "preFixUnreachable": 962,
+      "sampled": 20,
+      "nowSurfaced": 20,
+      "medianPanPx": 18882,
+      "maxPanPx": 36457,
+      "misses": []
+    },
+    "N3": {
+      "preFixUnreachable": 1319,
+      "sampled": 20,
+      "nowSurfaced": 20,
+      "medianPanPx": 17760,
+      "maxPanPx": 30217,
+      "misses": []
+    },
+    "N4": {
+      "preFixUnreachable": 111,
+      "sampled": 20,
+      "nowSurfaced": 20,
+      "medianPanPx": 470,
+      "maxPanPx": 29737,
+      "misses": []
+    },
+    "N5": {
+      "preFixUnreachable": 127,
+      "sampled": 20,
+      "nowSurfaced": 20,
+      "medianPanPx": 470,
+      "maxPanPx": 27272,
+      "misses": []
+    }
+  },
+  "pageErrors": []
+}

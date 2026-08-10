@@ -1,0 +1,336 @@
+{
+  "what": "WP7 motion / aliveness — before (pristine 0c6fb07) vs after, real Chromium 390x844 touch",
+  "tunables": {
+    "DRIFT_SPEED": 1.15,
+    "CURRENT_STRENGTH": 0.038,
+    "CURRENT_DRIFT": 0.0017,
+    "derived": {
+      "CURREACH_worldUnits": 8.74,
+      "ARB_EVERY_frames": 4
+    }
+  },
+  "driftStandalone": {
+    "before": {
+      "label": "baseline-standalone",
+      "reducedMotion": false,
+      "seconds": 10,
+      "wordsTracked": 64,
+      "speed": {
+        "medianPxPerSec": 3.795,
+        "meanPxPerSec": 3.315,
+        "p90PxPerSec": 5.103,
+        "maxPxPerSec": 5.792,
+        "medianNetPx": 20.599,
+        "maxNetPx": 33.207
+      },
+      "neighbourShearPxPerSec": 3.501,
+      "pairAlignmentByDistance": {
+        "0-100px": {
+          "meanCos": 0.3399,
+          "pairs": 4546
+        },
+        "100-250px": {
+          "meanCos": 0.2956,
+          "pairs": 15764
+        },
+        "250-450px": {
+          "meanCos": 0.3156,
+          "pairs": 29619
+        },
+        "450-infpx": {
+          "meanCos": 0.3239,
+          "pairs": 48855
+        }
+      },
+      "flockOrder": {
+        "mean": 0.6024,
+        "min": 0.0696,
+        "max": 0.769,
+        "frames": 49,
+        "nWords": 64,
+        "jitterFloor": 0.125
+      },
+      "motesAboutWanderingEye": {
+        "tangential": -0.4462,
+        "radial": -0.0124,
+        "meanStepPx": 0.1621,
+        "samples": 4356
+      },
+      "wordsAboutWanderingEye": {
+        "tangential": 0.0345,
+        "radial": 0.0143,
+        "meanStepPx": 0.6527,
+        "samples": 3136
+      },
+      "frames": {
+        "n": 598,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 33.2,
+        "over20ms": 1,
+        "over50ms": 0,
+        "fpsFromP50": 59.9
+      },
+      "errors": []
+    },
+    "after": {
+      "label": "wp7-after-standalone",
+      "reducedMotion": false,
+      "seconds": 10,
+      "wordsTracked": 64,
+      "speed": {
+        "medianPxPerSec": 10.402,
+        "meanPxPerSec": 10.531,
+        "p90PxPerSec": 12.703,
+        "maxPxPerSec": 14.365,
+        "medianNetPx": 17.593,
+        "maxNetPx": 33.579
+      },
+      "neighbourShearPxPerSec": 4.711,
+      "pairAlignmentByDistance": {
+        "0-100px": {
+          "meanCos": 0.7386,
+          "pairs": 4676
+        },
+        "100-250px": {
+          "meanCos": 0.6249,
+          "pairs": 16208
+        },
+        "250-450px": {
+          "meanCos": 0.4517,
+          "pairs": 30303
+        },
+        "450-infpx": {
+          "meanCos": 0.1881,
+          "pairs": 49613
+        }
+      },
+      "flockOrder": {
+        "mean": 0.7187,
+        "min": 0.1276,
+        "max": 0.9472,
+        "frames": 50,
+        "nWords": 64,
+        "jitterFloor": 0.125
+      },
+      "motesAboutWanderingEye": {
+        "tangential": 0.68,
+        "radial": 0.1292,
+        "meanStepPx": 7.3268,
+        "samples": 4391
+      },
+      "wordsAboutWanderingEye": {
+        "tangential": 0.1474,
+        "radial": -0.3017,
+        "meanStepPx": 2.013,
+        "samples": 3200
+      },
+      "frames": {
+        "n": 599,
+        "p50": 16.7,
+        "p95": 16.7,
+        "p99": 16.8,
+        "max": 33.4,
+        "over20ms": 1,
+        "over50ms": 0,
+        "fpsFromP50": 59.9
+      },
+      "errors": []
+    }
+  },
+  "corridorFusion": {
+    "after": {
+      "label": "wp7-after-fusion",
+      "reducedMotion": false,
+      "seconds": 10,
+      "wordsTracked": 64,
+      "speed": {
+        "medianPxPerSec": 11.176,
+        "meanPxPerSec": 11.115,
+        "p90PxPerSec": 13.262,
+        "maxPxPerSec": 14.506,
+        "medianNetPx": 15.403,
+        "maxNetPx": 28.595
+      },
+      "neighbourShearPxPerSec": 5.033,
+      "pairAlignmentByDistance": {
+        "0-100px": {
+          "meanCos": 0.7198,
+          "pairs": 4619
+        },
+        "100-250px": {
+          "meanCos": 0.603,
+          "pairs": 16398
+        },
+        "250-450px": {
+          "meanCos": 0.4269,
+          "pairs": 30062
+        },
+        "450-infpx": {
+          "meanCos": 0.133,
+          "pairs": 49721
+        }
+      },
+      "flockOrder": {
+        "mean": 0.6822,
+        "min": 0.1182,
+        "max": 0.9137,
+        "frames": 50,
+        "nWords": 64,
+        "jitterFloor": 0.125
+      },
+      "motesAboutWanderingEye": null,
+      "wordsAboutWanderingEye": {
+        "tangential": 0.038,
+        "radial": -0.0113,
+        "meanStepPx": 2.0465,
+        "samples": 3200
+      },
+      "frames": {
+        "n": 599,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 16.8,
+        "over20ms": 0,
+        "over50ms": 0,
+        "fpsFromP50": 59.9
+      },
+      "errors": []
+    }
+  },
+  "reducedMotion": {
+    "before": {
+      "label": "baseline-reduced",
+      "reducedMotion": true,
+      "seconds": 10,
+      "wordsTracked": 64,
+      "speed": {
+        "medianPxPerSec": 3.744,
+        "meanPxPerSec": 3.284,
+        "p90PxPerSec": 5.032,
+        "maxPxPerSec": 5.803,
+        "medianNetPx": 20.701,
+        "maxNetPx": 33.13
+      },
+      "neighbourShearPxPerSec": 3.489,
+      "pairAlignmentByDistance": {
+        "0-100px": {
+          "meanCos": 0.3361,
+          "pairs": 4644
+        },
+        "100-250px": {
+          "meanCos": 0.2993,
+          "pairs": 16082
+        },
+        "250-450px": {
+          "meanCos": 0.317,
+          "pairs": 30218
+        },
+        "450-infpx": {
+          "meanCos": 0.3244,
+          "pairs": 49856
+        }
+      },
+      "flockOrder": {
+        "mean": 0.6025,
+        "min": 0.0827,
+        "max": 0.7577,
+        "frames": 50,
+        "nWords": 64,
+        "jitterFloor": 0.125
+      },
+      "motesAboutWanderingEye": {
+        "tangential": null,
+        "radial": null,
+        "meanStepPx": 0,
+        "samples": 4400
+      },
+      "wordsAboutWanderingEye": {
+        "tangential": 0.0339,
+        "radial": 0.015,
+        "meanStepPx": 0.6499,
+        "samples": 3200
+      },
+      "frames": {
+        "n": 599,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 16.8,
+        "over20ms": 0,
+        "over50ms": 0,
+        "fpsFromP50": 59.9
+      },
+      "errors": []
+    },
+    "after": {
+      "label": "wp7-after-reduced",
+      "reducedMotion": true,
+      "seconds": 10,
+      "wordsTracked": 64,
+      "speed": {
+        "medianPxPerSec": 0,
+        "meanPxPerSec": 0,
+        "p90PxPerSec": 0,
+        "maxPxPerSec": 0,
+        "medianNetPx": 0,
+        "maxNetPx": 0
+      },
+      "neighbourShearPxPerSec": 0,
+      "pairAlignmentByDistance": {
+        "0-100px": null,
+        "100-250px": null,
+        "250-450px": null,
+        "450-infpx": null
+      },
+      "flockOrder": null,
+      "motesAboutWanderingEye": {
+        "tangential": null,
+        "radial": null,
+        "meanStepPx": 0,
+        "samples": 4400
+      },
+      "wordsAboutWanderingEye": {
+        "tangential": null,
+        "radial": null,
+        "meanStepPx": 0,
+        "samples": 3200
+      },
+      "frames": {
+        "n": 599,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 16.8,
+        "over20ms": 0,
+        "over50ms": 0,
+        "fpsFromP50": 59.9
+      },
+      "errors": []
+    }
+  },
+  "pigmentAtRest": {
+    "note": "the five pigment medians measured at rest with no session history — the quantity v11 7-parity exists to protect",
+    "before": {
+      "北斎": 2.706,
+      "墨": 2.659,
+      "岩絵具": 2.603,
+      "緑青": 2.681,
+      "夜": 4.073,
+      "n": 20,
+      "lightBase": 2.659
+    },
+    "after": {
+      "北斎": 2.706,
+      "墨": 2.659,
+      "岩絵具": 2.603,
+      "緑青": 2.681,
+      "夜": 4.073,
+      "n": 20,
+      "lightBase": 2.659
+    },
+    "identical": true
+  }
+}

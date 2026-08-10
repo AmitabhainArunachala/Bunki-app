@@ -1,0 +1,118 @@
+{
+  "2a-search": {
+    "tried": [
+      {
+        "move": 0,
+        "hits": 0,
+        "z": 1
+      },
+      {
+        "move": 1,
+        "hits": 11,
+        "z": 1
+      }
+    ],
+    "found": {
+      "x": 44,
+      "y": 278,
+      "w": "刑事",
+      "seqId": 121,
+      "op": 0.35,
+      "collide": 0,
+      "move": 1
+    }
+  },
+  "2a-ghost-on-hub-door-answers": {
+    "point": {
+      "x": 44,
+      "y": 278,
+      "w": "刑事",
+      "seqId": 121,
+      "op": 0.35,
+      "collide": 0,
+      "move": 1
+    },
+    "preTap": {
+      "op": 0.35,
+      "collide": 0
+    },
+    "before": {
+      "stack": 0,
+      "depth": ""
+    },
+    "after": {
+      "stack": 1,
+      "depth": "事",
+      "ctr": null
+    },
+    "ghostAfter": {
+      "isFocus": false,
+      "unfolded": false
+    },
+    "PASS": true
+  },
+  "2b-bloom-state": {
+    "seed": "流れる",
+    "held": {
+      "focus": 14,
+      "ctr": "流れる",
+      "lockOn": false
+    },
+    "dimmedOnHub": 19,
+    "sample": [
+      {
+        "x": 68,
+        "y": 506,
+        "w": "稼ぐ",
+        "seqId": 70,
+        "op": 0.111,
+        "collide": 1
+      },
+      {
+        "x": 68,
+        "y": 510,
+        "w": "稼ぐ",
+        "seqId": 70,
+        "op": 0.111,
+        "collide": 1
+      },
+      {
+        "x": 68,
+        "y": 514,
+        "w": "稼ぐ",
+        "seqId": 70,
+        "op": 0.111,
+        "collide": 1
+      }
+    ]
+  },
+  "2b-release-over-hub-with-dimmed-word": {
+    "point": {
+      "x": 68,
+      "y": 506,
+      "w": "稼ぐ",
+      "seqId": 70,
+      "op": 0.111,
+      "collide": 1
+    },
+    "preTap": {
+      "op": 0.111,
+      "collide": 1,
+      "isMember": false,
+      "isCentre": false
+    },
+    "before": {
+      "focus": 14,
+      "ctr": "流れる"
+    },
+    "after": {
+      "focus": 0,
+      "ctr": null,
+      "stack": 0,
+      "depth": ""
+    },
+    "PASS_constellationReleasedOrDoorOpened": true,
+    "FAIL_wordAteTheRelease": false
+  },
+  "ERRORS": []
+}

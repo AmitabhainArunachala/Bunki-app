@@ -48,20 +48,15 @@
     font-size:.4em;font-style:italic;font-family:Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
 #drift-layer .word.unfolded .yomi{opacity:1}
-#drift-layer /* one tap: furigana only */
-  .word.glossed .yomi,
+#drift-layer .word.glossed .yomi,
 #drift-layer .word.glossed .gloss{opacity:1}
-#drift-layer /* two taps: + English */
-  .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 24px var(--halo)}
+#drift-layer .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 10px var(--halo)}
 #drift-layer .word.lod .yomi,
 #drift-layer .word.lod .gloss{opacity:0!important}
-#drift-layer /* tap-bloom relief: the constellation is its own layer — centre,
-#drift-layer satellites,
-#drift-layer * and threads each carry their own colour and lift gently off the field */
-  .word.bctr{color:var(--bloomCtr) !important;z-index:6}
-#drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
+#drift-layer .word.bctr{color:var(--bloomCtr) !important;z-index:6}
+#drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 10px var(--bloomHalo)}
 #drift-layer .word.bsat{color:var(--bloomSat) !important;z-index:5}
-#drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
+#drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 8px var(--bloomHalo)}
 #drift-layer .word.bsat .yomi{color:var(--bloomSat)}
 #drift-layer .glyph.comp{z-index:7}
 #drift-layer .word.center,
@@ -97,9 +92,14 @@
 #drift-layer #drift-tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
     font-size:12px;color:var(--faint);letter-spacing:.1em}
 #drift-layer #drift-tray b{color:var(--accent);font-weight:500}
-#drift-layer #hint{position:fixed;bottom:calc(42px + env(safe-area-inset-bottom));left:0;right:0;z-index:8;
-    text-align:center;font-size:12px;letter-spacing:.3em;color:var(--faint);
-    opacity:1;transition:opacity 1.4s;pointer-events:none}
+#drift-layer #hint{position:fixed;bottom:calc(40px + env(safe-area-inset-bottom));left:50%;
+    transform:translateX(-50%);z-index:8;max-width:82vw;
+    text-align:center;font-size:12px;letter-spacing:.14em;color:var(--ink);
+    background:var(--plaque);border:1px solid var(--line);border-radius:999px;
+    padding:7px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    opacity:1;transition:opacity 1.2s;pointer-events:none}
+#drift-layer #hint:empty{display:none}
 #drift-layer #card{position:fixed;left:12px;right:12px;bottom:12px;z-index:9;background:var(--plaque);
     border:1px solid var(--line);border-radius:14px;
     padding:20px 20px calc(16px + env(safe-area-inset-bottom));
@@ -158,9 +158,11 @@
 #drift-layer #lvl.hot #lvlInfo{opacity:1}
 #drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-#drift-layer #card .study{display:block;margin-top:13px;text-align:center;font-size:13px;
-    letter-spacing:.14em;color:var(--pig2);text-decoration:none;border:1px solid var(--line);
-    border-radius:999px;padding:9px 14px}
+#drift-layer #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
+    min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
+    font-size:13px;letter-spacing:.14em;text-decoration:none;cursor:pointer;
+    color:var(--ink);background:none;border:1px solid var(--pig2);
+    border-radius:999px}
 #drift-layer #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
     background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;
     font-family:inherit;cursor:pointer;vertical-align:1px}
@@ -192,6 +194,11 @@
 #drift-layer #drift-tray { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #drift-layer #hint { bottom: calc(120px + env(safe-area-inset-bottom)); }
 #drift-layer #card { bottom: 64px; max-height: calc(100vh - 190px); overflow-y: auto; }
+/* the card's study door is full-width in the standalone; in the fusion the
+ * corridor's own 本棚 door is fixed over the card's bottom-right corner
+ * (94x56 at right:16px / bottom:76px), so the door stops short of it rather
+ * than putting two doors under one finger */
+#drift-layer #card .study { width: auto; margin-right: 96px; }
 /* the radical explainer is a modal: it must clear the corridor chrome band
  * so its own close button is reachable (the hunt found the X hit-testing
  * to the corridor's 覚 button, which navigated the whole app away) */

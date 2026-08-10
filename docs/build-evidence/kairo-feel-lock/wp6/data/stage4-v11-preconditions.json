@@ -1,0 +1,104 @@
+{
+  "src": "/home/user/Bunki-app/.claude/worktrees/agent-add617906432261fd/prototypes/drift/drift-artifact.html",
+  "at": "2026-08-09T17:04:15.880Z",
+  "results": [
+    {
+      "name": "stage4+staged · a pinch that surfaces still does not bleed into zoom (4 taps to the dive)",
+      "pass": true,
+      "detail": "4 taps opened the dive (stack=1); pinch-in → stack 1->0, z 1->1 (must stay >0.7)"
+    },
+    {
+      "name": "stage4+staged · a lock still folds another word's reveal (2 taps to the reading)",
+      "pass": true,
+      "detail": "tapped A=すくう救うt twice (unfolded=1), locked B=ごぶさた御無 → unfolded=0, lockOn=true, members=12"
+    },
+    {
+      "name": "stage4+recenter · a pinch that surfaces still does not bleed into zoom (4 taps to the dive)",
+      "pass": true,
+      "detail": "4 taps opened the dive (stack=1); pinch-in → stack 1->0, z 1->1 (must stay >0.7)"
+    },
+    {
+      "name": "stage4+recenter · a lock still folds another word's reveal (2 taps to the reading)",
+      "pass": true,
+      "detail": "tapped A=すくう救うt twice (unfolded=1), locked B=ごぶさた御無 → unfolded=0, lockOn=true, members=12"
+    },
+    {
+      "name": "zero console/page errors",
+      "pass": true,
+      "detail": "none"
+    }
+  ],
+  "notes": {
+    "stage4+staged-pinch": {
+      "before": {
+        "z": 1,
+        "rot": 0,
+        "stack": 1,
+        "lockOn": false,
+        "focus": 0,
+        "unfolded": 1,
+        "words": 82
+      },
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": false,
+        "focus": 0,
+        "unfolded": 0,
+        "words": 64
+      },
+      "word": "すくう救うto rescue from, to help out of"
+    },
+    "stage4+staged-lock": {
+      "A": "すくう救うto rescue from, to help out of",
+      "B": "ごぶさた御無沙汰not writing or contacting for a ",
+      "unfoldedBefore": 1,
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": true,
+        "focus": 12,
+        "unfolded": 0,
+        "words": 121
+      }
+    },
+    "stage4+recenter-pinch": {
+      "before": {
+        "z": 1,
+        "rot": 0,
+        "stack": 1,
+        "lockOn": false,
+        "focus": 0,
+        "unfolded": 1,
+        "words": 82
+      },
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": false,
+        "focus": 0,
+        "unfolded": 0,
+        "words": 64
+      },
+      "word": "すくう救うto rescue from, to help out of"
+    },
+    "stage4+recenter-lock": {
+      "A": "すくう救うto rescue from, to help out of",
+      "B": "ごぶさた御無沙汰not writing or contacting for a ",
+      "unfoldedBefore": 1,
+      "after": {
+        "z": 1,
+        "rot": 0,
+        "stack": 0,
+        "lockOn": true,
+        "focus": 12,
+        "unfolded": 0,
+        "words": 115
+      }
+    }
+  },
+  "errs": []
+}

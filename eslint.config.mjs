@@ -302,10 +302,16 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      // The Agent tool checks out nested worktrees here; linting them from the
+      // repo root double-lints their whole tree with the wrong tsconfig root.
+      '.claude/**',
       // Preserved Sites v11 snapshot: a separate app with its own toolchain
       // (eslint-config-next etc.). Linting it from the monorepo root pulls in
       // devDependencies that are not installed here (PR #20 CI failure).
       'prototypes/**',
+      // Build-evidence harnesses: throwaway measurement scripts committed as
+      // audit evidence next to their reports, same class as prototypes/**.
+      'docs/build-evidence/**',
       '**/build/**',
       '**/coverage/**',
       '**/.expo/**',

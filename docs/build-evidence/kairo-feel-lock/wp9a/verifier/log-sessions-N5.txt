@@ -1,0 +1,82 @@
+=== --file=/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/drift-prefix.html --level=5 --rounds=3000 --out=/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/A-pre-n5.json ===
+{
+ "file": "drift-prefix.html",
+ "level": 5,
+ "rounds": 3000,
+ "pinned": false,
+ "still": false,
+ "hasPaging": false,
+ "tier": 553,
+ "distinctAtLevel": 426,
+ "distinctAll": 600,
+ "panPx": 544038,
+ "turns": null,
+ "finalPhase": null,
+ "ticks": 3000,
+ "evictions": 53076,
+ "onGlassFades": 7583,
+ "sample": [
+  "余り",
+  "地下鉄",
+  "辛い",
+  "お母さん",
+  "生徒"
+ ],
+ "pageErrors": 0
+}
+trace: [{"r":0,"panPx":166,"phase":null,"seenAtLevel":64},{"r":50,"panPx":8531,"phase":null,"seenAtLevel":230},{"r":100,"panPx":18439,"phase":null,"seenAtLevel":323},{"r":150,"panPx":27686,"phase":null,"seenAtLevel":367},{"r":200,"panPx":36405,"phase":null,"seenAtLevel":396},{"r":250,"panPx":45370,"phase":null,"seenAtLevel":397},{"r":300,"panPx":54474,"phase":null,"seenAtLevel":406},{"r":350,"panPx":63395,"phase":null,"seenAtLevel":406},{"r":400,"panPx":71072,"phase":null,"seenAtLevel":406},{"r":450,"panPx":81327,"phase":null,"seenAtLevel":406},{"r":500,"panPx":91367,"phase":null,"seenAtLevel":406},{"r":550,"panPx":99120,"phase":null,"seenAtLevel":426},{"r":600,"panPx":108862,"phase":null,"seenAtLevel":426},{"r":650,"panPx":117227,"phase":null,"seenAtLevel":426},{"r":700,"panPx":127198,"phase":null,"seenAtLevel":426},{"r":750,"panPx":136725,"phase":null,"seenAtLevel":426},{"r":800,"panPx":144994,"phase":null,"seenAtLevel":426},{"r":850,"panPx":154121,"phase":null,"seenAtLevel":426},{"r":900,"panPx":163830,"phase":null,"seenAtLevel":426},{"r":950,"panPx":173796,"phase":null,"seenAtLevel":426},{"r":1000,"panPx":183363,"phase":null,"seenAtLevel":426},{"r":1050,"panPx":193621,"phase":null,"seenAtLevel":426},{"r":1100,"panPx":206134,"phase":null,"seenAtLevel":426},{"r":1150,"panPx":213837,"phase":null,"seenAtLevel":426},{"r":1200,"panPx":223748,"phase":null,"seenAtLevel":426},{"r":1250,"panPx":234426,"phase":null,"seenAtLevel":426},{"r":1300,"panPx":242282,"phase":null,"seenAtLevel":426},{"r":1350,"panPx":251904,"phase":null,"seenAtLevel":426},{"r":1400,"panPx":260845,"phase":null,"seenAtLevel":426},{"r":1450,"panPx":269083,"phase":null,"seenAtLevel":426},{"r":1500,"panPx":277654,"phase":null,"seenAtLevel":426},{"r":1550,"panPx":286515,"phase":null,"seenAtLevel":426},{"r":1600,"panPx":294357,"phase":null,"seenAtLevel":426},{"r":1650,"panPx":302152,"phase":null,"seenAtLevel":426},{"r":1700,"panPx":311881,"phase":null,"seenAtLevel":426},{"r":1750,"panPx":319421,"phase":null,"seenAtLevel":426},{"r":1800,"panPx":327928,"phase":null,"seenAtLevel":426},{"r":1850,"panPx":335394,"phase":null,"seenAtLevel":426},{"r":1900,"panPx":343768,"phase":null,"seenAtLevel":426},{"r":1950,"panPx":352456,"phase":null,"seenAtLevel":426},{"r":2000,"panPx":360991,"phase":null,"seenAtLevel":426},{"r":2050,"panPx":370760,"phase":null,"seenAtLevel":426},{"r":2100,"panPx":380778,"phase":null,"seenAtLevel":426},{"r":2150,"panPx":390798,"phase":null,"seenAtLevel":426},{"r":2200,"panPx":400643,"phase":null,"seenAtLevel":426},{"r":2250,"panPx":409952,"phase":null,"seenAtLevel":426},{"r":2300,"panPx":418068,"phase":null,"seenAtLevel":426},{"r":2350,"panPx":425550,"phase":null,"seenAtLevel":426},{"r":2400,"panPx":435059,"phase":null,"seenAtLevel":426},{"r":2450,"panPx":445541,"phase":null,"seenAtLevel":426},{"r":2500,"panPx":455476,"phase":null,"seenAtLevel":426},{"r":2550,"panPx":463625,"phase":null,"seenAtLevel":426},{"r":2600,"panPx":471594,"phase":null,"seenAtLevel":426},{"r":2650,"panPx":480584,"phase":null,"seenAtLevel":426},{"r":2700,"panPx":488744,"phase":null,"seenAtLevel":426},{"r":2750,"panPx":497656,"phase":null,"seenAtLevel":426},{"r":2800,"panPx":507733,"phase":null,"seenAtLevel":426},{"r":2850,"panPx":515837,"phase":null,"seenAtLevel":426},{"r":2900,"panPx":524682,"phase":null,"seenAtLevel":426},{"r":2950,"panPx":534480,"phase":null,"seenAtLevel":426}]
+=== --file=/home/user/Bunki-app/.claude/worktrees/agent-a3e020977353ad705/prototypes/drift/drift-artifact.html --level=5 --rounds=3000 --out=/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/A-fix-n5.json ===
+{
+ "file": "drift-artifact.html",
+ "level": 5,
+ "rounds": 3000,
+ "pinned": false,
+ "still": false,
+ "hasPaging": true,
+ "tier": 553,
+ "distinctAtLevel": 553,
+ "distinctAll": 885,
+ "panPx": 544038,
+ "turns": 13.6,
+ "finalPhase": 0.60026,
+ "ticks": 3000,
+ "evictions": 56941,
+ "onGlassFades": 8907,
+ "sample": [
+  "余り",
+  "地下鉄",
+  "辛い",
+  "お母さん",
+  "生徒"
+ ],
+ "pageErrors": 0
+}
+trace: [{"r":0,"panPx":166,"phase":0.00347,"seenAtLevel":64},{"r":50,"panPx":8531,"phase":0.21258,"seenAtLevel":248},{"r":100,"panPx":18439,"phase":0.46028,"seenAtLevel":341},{"r":150,"panPx":27686,"phase":0.69147,"seenAtLevel":480},{"r":200,"panPx":36405,"phase":0.90942,"seenAtLevel":506},{"r":250,"panPx":45370,"phase":0.13355,"seenAtLevel":507},{"r":300,"panPx":54474,"phase":0.36115,"seenAtLevel":542},{"r":350,"panPx":63395,"phase":0.58419,"seenAtLevel":548},{"r":400,"panPx":71072,"phase":0.77611,"seenAtLevel":548},{"r":450,"panPx":81327,"phase":0.03248,"seenAtLevel":548},{"r":500,"panPx":91367,"phase":0.28348,"seenAtLevel":548},{"r":550,"panPx":99120,"phase":0.47731,"seenAtLevel":548},{"r":600,"panPx":108862,"phase":0.72084,"seenAtLevel":548},{"r":650,"panPx":117227,"phase":0.92999,"seenAtLevel":548},{"r":700,"panPx":127198,"phase":0.17926,"seenAtLevel":548},{"r":750,"panPx":136725,"phase":0.41742,"seenAtLevel":551},{"r":800,"panPx":144994,"phase":0.62416,"seenAtLevel":551},{"r":850,"panPx":154121,"phase":0.85232,"seenAtLevel":552},{"r":900,"panPx":163830,"phase":0.09506,"seenAtLevel":552},{"r":950,"panPx":173796,"phase":0.3442,"seenAtLevel":552},{"r":1000,"panPx":183363,"phase":0.58337,"seenAtLevel":552},{"r":1050,"panPx":193621,"phase":0.83983,"seenAtLevel":552},{"r":1100,"panPx":206134,"phase":0.15265,"seenAtLevel":552},{"r":1150,"panPx":213837,"phase":0.34522,"seenAtLevel":553},{"r":1200,"panPx":223748,"phase":0.59301,"seenAtLevel":553},{"r":1250,"panPx":234426,"phase":0.85995,"seenAtLevel":553},{"r":1300,"panPx":242282,"phase":0.05635,"seenAtLevel":553},{"r":1350,"panPx":251904,"phase":0.2969,"seenAtLevel":553},{"r":1400,"panPx":260845,"phase":0.52043,"seenAtLevel":553},{"r":1450,"panPx":269083,"phase":0.72637,"seenAtLevel":553},{"r":1500,"panPx":277654,"phase":0.94067,"seenAtLevel":553},{"r":1550,"panPx":286515,"phase":0.16219,"seenAtLevel":553},{"r":1600,"panPx":294357,"phase":0.35823,"seenAtLevel":553},{"r":1650,"panPx":302152,"phase":0.5531,"seenAtLevel":553},{"r":1700,"panPx":311881,"phase":0.79633,"seenAtLevel":553},{"r":1750,"panPx":319421,"phase":0.98482,"seenAtLevel":553},{"r":1800,"panPx":327928,"phase":0.19751,"seenAtLevel":553},{"r":1850,"panPx":335394,"phase":0.38415,"seenAtLevel":553},{"r":1900,"panPx":343768,"phase":0.5935,"seenAtLevel":553},{"r":1950,"panPx":352456,"phase":0.81072,"seenAtLevel":553},{"r":2000,"panPx":360991,"phase":0.02407,"seenAtLevel":553},{"r":2050,"panPx":370760,"phase":0.26831,"seenAtLevel":553},{"r":2100,"panPx":380778,"phase":0.51877,"seenAtLevel":553},{"r":2150,"panPx":390798,"phase":0.76925,"seenAtLevel":553},{"r":2200,"panPx":400643,"phase":0.01538,"seenAtLevel":553},{"r":2250,"panPx":409952,"phase":0.24812,"seenAtLevel":553},{"r":2300,"panPx":418068,"phase":0.45099,"seenAtLevel":553},{"r":2350,"panPx":425550,"phase":0.63805,"seenAtLevel":553},{"r":2400,"panPx":435059,"phase":0.87579,"seenAtLevel":553},{"r":2450,"panPx":445541,"phase":0.13784,"seenAtLevel":553},{"r":2500,"panPx":455476,"phase":0.38621,"seenAtLevel":553},{"r":2550,"panPx":463625,"phase":0.58994,"seenAtLevel":553},{"r":2600,"panPx":471594,"phase":0.78916,"seenAtLevel":553},{"r":2650,"panPx":480584,"phase":0.01391,"seenAtLevel":553},{"r":2700,"panPx":488744,"phase":0.2179,"seenAtLevel":553},{"r":2750,"panPx":497656,"phase":0.44069,"seenAtLevel":553},{"r":2800,"panPx":507733,"phase":0.69263,"seenAtLevel":553},{"r":2850,"panPx":515837,"phase":0.89522,"seenAtLevel":553},{"r":2900,"panPx":524682,"phase":0.11636,"seenAtLevel":553},{"r":2950,"panPx":534480,"phase":0.3613,"seenAtLevel":553}]
+=== --file=/home/user/Bunki-app/.claude/worktrees/agent-a3e020977353ad705/prototypes/drift/drift-artifact.html --level=5 --rounds=3000 --pin --out=/tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/A-fixpin-n5.json ===
+{
+ "file": "drift-artifact.html",
+ "level": 5,
+ "rounds": 3000,
+ "pinned": true,
+ "still": false,
+ "hasPaging": true,
+ "tier": 553,
+ "distinctAtLevel": 426,
+ "distinctAll": 600,
+ "panPx": 544038,
+ "turns": 13.6,
+ "finalPhase": 0,
+ "ticks": 3000,
+ "evictions": 53076,
+ "onGlassFades": 7583,
+ "sample": [
+  "余り",
+  "地下鉄",
+  "辛い",
+  "お母さん",
+  "生徒"
+ ],
+ "pageErrors": 0
+}
+trace: [{"r":0,"panPx":166,"phase":0,"seenAtLevel":64},{"r":50,"panPx":8531,"phase":0,"seenAtLevel":230},{"r":100,"panPx":18439,"phase":0,"seenAtLevel":323},{"r":150,"panPx":27686,"phase":0,"seenAtLevel":367},{"r":200,"panPx":36405,"phase":0,"seenAtLevel":396},{"r":250,"panPx":45370,"phase":0,"seenAtLevel":397},{"r":300,"panPx":54474,"phase":0,"seenAtLevel":406},{"r":350,"panPx":63395,"phase":0,"seenAtLevel":406},{"r":400,"panPx":71072,"phase":0,"seenAtLevel":406},{"r":450,"panPx":81327,"phase":0,"seenAtLevel":406},{"r":500,"panPx":91367,"phase":0,"seenAtLevel":406},{"r":550,"panPx":99120,"phase":0,"seenAtLevel":426},{"r":600,"panPx":108862,"phase":0,"seenAtLevel":426},{"r":650,"panPx":117227,"phase":0,"seenAtLevel":426},{"r":700,"panPx":127198,"phase":0,"seenAtLevel":426},{"r":750,"panPx":136725,"phase":0,"seenAtLevel":426},{"r":800,"panPx":144994,"phase":0,"seenAtLevel":426},{"r":850,"panPx":154121,"phase":0,"seenAtLevel":426},{"r":900,"panPx":163830,"phase":0,"seenAtLevel":426},{"r":950,"panPx":173796,"phase":0,"seenAtLevel":426},{"r":1000,"panPx":183363,"phase":0,"seenAtLevel":426},{"r":1050,"panPx":193621,"phase":0,"seenAtLevel":426},{"r":1100,"panPx":206134,"phase":0,"seenAtLevel":426},{"r":1150,"panPx":213837,"phase":0,"seenAtLevel":426},{"r":1200,"panPx":223748,"phase":0,"seenAtLevel":426},{"r":1250,"panPx":234426,"phase":0,"seenAtLevel":426},{"r":1300,"panPx":242282,"phase":0,"seenAtLevel":426},{"r":1350,"panPx":251904,"phase":0,"seenAtLevel":426},{"r":1400,"panPx":260845,"phase":0,"seenAtLevel":426},{"r":1450,"panPx":269083,"phase":0,"seenAtLevel":426},{"r":1500,"panPx":277654,"phase":0,"seenAtLevel":426},{"r":1550,"panPx":286515,"phase":0,"seenAtLevel":426},{"r":1600,"panPx":294357,"phase":0,"seenAtLevel":426},{"r":1650,"panPx":302152,"phase":0,"seenAtLevel":426},{"r":1700,"panPx":311881,"phase":0,"seenAtLevel":426},{"r":1750,"panPx":319421,"phase":0,"seenAtLevel":426},{"r":1800,"panPx":327928,"phase":0,"seenAtLevel":426},{"r":1850,"panPx":335394,"phase":0,"seenAtLevel":426},{"r":1900,"panPx":343768,"phase":0,"seenAtLevel":426},{"r":1950,"panPx":352456,"phase":0,"seenAtLevel":426},{"r":2000,"panPx":360991,"phase":0,"seenAtLevel":426},{"r":2050,"panPx":370760,"phase":0,"seenAtLevel":426},{"r":2100,"panPx":380778,"phase":0,"seenAtLevel":426},{"r":2150,"panPx":390798,"phase":0,"seenAtLevel":426},{"r":2200,"panPx":400643,"phase":0,"seenAtLevel":426},{"r":2250,"panPx":409952,"phase":0,"seenAtLevel":426},{"r":2300,"panPx":418068,"phase":0,"seenAtLevel":426},{"r":2350,"panPx":425550,"phase":0,"seenAtLevel":426},{"r":2400,"panPx":435059,"phase":0,"seenAtLevel":426},{"r":2450,"panPx":445541,"phase":0,"seenAtLevel":426},{"r":2500,"panPx":455476,"phase":0,"seenAtLevel":426},{"r":2550,"panPx":463625,"phase":0,"seenAtLevel":426},{"r":2600,"panPx":471594,"phase":0,"seenAtLevel":426},{"r":2650,"panPx":480584,"phase":0,"seenAtLevel":426},{"r":2700,"panPx":488744,"phase":0,"seenAtLevel":426},{"r":2750,"panPx":497656,"phase":0,"seenAtLevel":426},{"r":2800,"panPx":507733,"phase":0,"seenAtLevel":426},{"r":2850,"panPx":515837,"phase":0,"seenAtLevel":426},{"r":2900,"panPx":524682,"phase":0,"seenAtLevel":426},{"r":2950,"panPx":534480,"phase":0,"seenAtLevel":426}]
+ALL-A-DONE

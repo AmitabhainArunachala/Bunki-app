@@ -1,0 +1,28 @@
+  ok  hunt · a lifting pinch finger never grades the word beneath a third finger  — A id=3; tray "" → "", word present=true
+  ok  hunt · explainer taps do not dismantle the world beneath it  — depth "増加 › 増 › 土" → "増加 › 増 › 土", still open=true
+  ok  hunt · the explainer close button is reachable by a finger  — hit-test at (328,150) reaches the X: true
+  ok  hunt · the explainer closes without navigating the app away  — radoc open=false, depth "増加 › 増 › 土" → "増加 › 増 › 土"
+  ok  hunt · a slow drag on water inside a dive does not surface a level  — depth "増加" → "増加"
+  ok  hunt · a long press on water inside a dive does not surface a level  — depth "増加" → "増加"
+  ok  hunt · pointercancel leaves no ghost drag offset  — word rests 6px from home
+ FAIL hunt · a flick judgment sticks (the word does not rematerialize)  — tray ""; word back after 5s = true
+  ok  hunt · a walked planet is never culled by the recycler  — origin word 増加 present after two hops + 2s = true
+  ok  hunt · a long-press keeps the word it locks onto (no headless lock)  — centre after lock + 1.4s = 増やす
+  ok  hunt · lock members are touchable words, not canvas labels  — 12 DOM .bsat under lock (was 0-1 when members were fillText)
+  ok  hunt · tapping a constellation label answers instead of razing it  — "増加" mute=false · centre survived=true, answered=1, glossed=0
+  ok  hunt · a 44px near-miss under a lock forgives instead of razing  — true-water=true at 36px; centre "増加" → "増加"
+ FAIL hunt · a release on a hub sun releases the constellation instead of diving  — no hub found by probing — the check cannot prove anything, treat as red
+  ok  hunt · a finger the gesture never owned cannot carry a held word  — held 42.9px vs orbiter median 61.2px of 4 moving (all-words median 0.0px, max 68.4px)
+ FAIL hunt · a held finger keeps a constellation alive past the 10s fade  — no open water
+ FAIL hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction  — DOM=true, hitSelf=true; stage1=false/false, stage2=true/false; centre "過酷" → "過酷" → "過酷"
+ FAIL hunt · a kana-only semantic word grows a meaningful same-level fallback constellation  — DOM=true, hitSelf=true, hit="きつい", reading="", first=false/false; centre="厳しい"→"きつい", DOM sats=12, members=予報・報告・心理・情報・感情・感覚・成長・決定・理解・解決・言語・配達
+  ok  hunt · a foreign pointermove cannot drag a touch-held word  — foreign-pointer displacement=2.8px
+  ok  hunt · a replacement pinch pair rebases before its first translated move  — browser ids A/B/C=2/3/4; 1px replacement-pair scale=1.000×
+  ok  hunt · a rebased replacement pair remains a live pinch  — deliberate replacement-pair spread scale=1.136×
+  ok  hunt · a stationary active pointer prevents bloom lifecycle expiry beneath it  — water={"x":70,"y":180}; centre "増加" → "増加", sats=14 → 14, same identities=true after 11.2s
+  ok  hunt · foreign cancel cannot erase a tracked hand or its bloom lifecycle  — centre "増加" → foreign "増加" → tracked+1.2s "増加"; foreign identities=true, fresh-idle identities=true
+  ok  hunt · node-down/far-up without a delivered move is not a tap, drag, or grade  — word displacement=3.4px; tray ""→"", ctr=null, depth=""
+ FAIL hunt · hub release cannot hijack a gesture or leave themed ghost satellites  — terminal 372px: depth="", centre="増加", sats=14→14, same identities=true; deliberate release ctr="増加"→"増加", depth=""; second-tap depth=""; after theme+surface centre="増加", sats=14
+  ok  hunt · no page errors across the regression battery
+
+6 HUNT REGRESSION(S) FAILING

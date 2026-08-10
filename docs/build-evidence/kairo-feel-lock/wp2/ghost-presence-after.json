@@ -1,0 +1,733 @@
+{
+  "label": "after",
+  "src": "prototypes/drift/drift-artifact.html",
+  "when": "2026-08-09T08:30:23.847Z",
+  "errs": [],
+  "themes": {
+    "北斎": {
+      "words": 37,
+      "ghosts": 6,
+      "ghostOpMin": 0.327,
+      "ghostOpMax": 0.327,
+      "ghostContrastMin": 1.638,
+      "ghostContrastMax": 1.721,
+      "ghostsPeNone": 0,
+      "ghostsUnreachable": 0,
+      "residual": [
+        {
+          "kind": "GHOST",
+          "id": 2,
+          "w": "単なる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.638,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 26,
+            "y": 342,
+            "ww": 67,
+            "hh": 26
+          },
+          "maxD": 74,
+          "mean": 15,
+          "pctGt8": 40.9
+        },
+        {
+          "kind": "GHOST",
+          "id": 3,
+          "w": "万一",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.721,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 34,
+            "y": 270,
+            "ww": 61,
+            "hh": 36
+          },
+          "maxD": 66,
+          "mean": 10.14,
+          "pctGt8": 22.4
+        },
+        {
+          "kind": "GHOST",
+          "id": 14,
+          "w": "取り上げる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.638,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 29,
+            "y": 360,
+            "ww": 112,
+            "hh": 26
+          },
+          "maxD": 77,
+          "mean": 12.72,
+          "pctGt8": 32.6
+        },
+        {
+          "kind": "GHOST",
+          "id": 15,
+          "w": "印刷",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.721,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": -13,
+            "y": 3,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": 89,
+          "mean": 13.21,
+          "pctGt8": 33.2
+        },
+        {
+          "kind": "KEPT",
+          "id": 4,
+          "w": "謎",
+          "ghost": false,
+          "op": 0.588,
+          "contrast": 2.61,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 50,
+            "y": 181,
+            "ww": 11,
+            "hh": 13
+          },
+          "maxD": 70,
+          "mean": 36.6,
+          "pctGt8": 91.6
+        },
+        {
+          "kind": "KEPT",
+          "id": 6,
+          "w": "順",
+          "ghost": false,
+          "op": 0.445,
+          "contrast": 2.151,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 278,
+            "y": 745,
+            "ww": 22,
+            "hh": 26
+          },
+          "maxD": 87,
+          "mean": 27.51,
+          "pctGt8": 57.5
+        },
+        {
+          "kind": "KEPT",
+          "id": 17,
+          "w": "大統領",
+          "ghost": false,
+          "op": 0.49,
+          "contrast": 1.737,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 376,
+            "y": 154,
+            "ww": 48,
+            "hh": 19
+          },
+          "maxD": 43,
+          "mean": 10.8,
+          "pctGt8": 34.6
+        }
+      ]
+    },
+    "墨": {
+      "words": 34,
+      "ghosts": 5,
+      "ghostOpMin": 0.327,
+      "ghostOpMax": 0.327,
+      "ghostContrastMin": 1.498,
+      "ghostContrastMax": 1.761,
+      "ghostsPeNone": 0,
+      "ghostsUnreachable": 0,
+      "residual": [
+        {
+          "kind": "GHOST",
+          "id": 2,
+          "w": "単なる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.498,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 19,
+            "y": 338,
+            "ww": 67,
+            "hh": 26
+          },
+          "maxD": 43,
+          "mean": 9.05,
+          "pctGt8": 28.2
+        },
+        {
+          "kind": "GHOST",
+          "id": 3,
+          "w": "万一",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.761,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 27,
+            "y": 253,
+            "ww": 61,
+            "hh": 36
+          },
+          "maxD": 53,
+          "mean": 8.39,
+          "pctGt8": 22.9
+        },
+        {
+          "kind": "GHOST",
+          "id": 14,
+          "w": "取り上げる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.498,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 16,
+            "y": 367,
+            "ww": 112,
+            "hh": 26
+          },
+          "maxD": 40,
+          "mean": 8.6,
+          "pctGt8": 29.7
+        },
+        {
+          "kind": "GHOST",
+          "id": 15,
+          "w": "印刷",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.761,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": -16,
+            "y": -15,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": null,
+          "mean": null,
+          "pctGt8": 21
+        },
+        {
+          "kind": "KEPT",
+          "id": 4,
+          "w": "謎",
+          "ghost": false,
+          "op": 0.588,
+          "contrast": 2.173,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 43,
+            "y": 183,
+            "ww": 11,
+            "hh": 13
+          },
+          "maxD": 44,
+          "mean": 24.05,
+          "pctGt8": 95.8
+        },
+        {
+          "kind": "KEPT",
+          "id": 6,
+          "w": "順",
+          "ghost": false,
+          "op": 0.445,
+          "contrast": 2.232,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 276,
+            "y": 753,
+            "ww": 22,
+            "hh": 26
+          },
+          "maxD": 67,
+          "mean": 24.15,
+          "pctGt8": 57.3
+        },
+        {
+          "kind": "KEPT",
+          "id": 7,
+          "w": "書物",
+          "ghost": false,
+          "op": 0.553,
+          "contrast": 2.457,
+          "pe": "auto",
+          "reach": false,
+          "box": {
+            "x": 119,
+            "y": -32,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": null,
+          "mean": null,
+          "pctGt8": 0.5
+        }
+      ]
+    },
+    "岩絵具": {
+      "words": 36,
+      "ghosts": 5,
+      "ghostOpMin": 0.327,
+      "ghostOpMax": 0.327,
+      "ghostContrastMin": 1.581,
+      "ghostContrastMax": 1.732,
+      "ghostsPeNone": 0,
+      "ghostsUnreachable": 0,
+      "residual": [
+        {
+          "kind": "GHOST",
+          "id": 2,
+          "w": "単なる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.581,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 24,
+            "y": 339,
+            "ww": 67,
+            "hh": 26
+          },
+          "maxD": 57,
+          "mean": 13.45,
+          "pctGt8": 35.5
+        },
+        {
+          "kind": "GHOST",
+          "id": 3,
+          "w": "万一",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.732,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 32,
+            "y": 257,
+            "ww": 61,
+            "hh": 36
+          },
+          "maxD": 57,
+          "mean": 8.56,
+          "pctGt8": 19.8
+        },
+        {
+          "kind": "GHOST",
+          "id": 14,
+          "w": "取り上げる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.581,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 31,
+            "y": 362,
+            "ww": 112,
+            "hh": 26
+          },
+          "maxD": 57,
+          "mean": 12.17,
+          "pctGt8": 32
+        },
+        {
+          "kind": "GHOST",
+          "id": 15,
+          "w": "印刷",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.732,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": -20,
+            "y": -4,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": null,
+          "mean": null,
+          "pctGt8": 28
+        },
+        {
+          "kind": "KEPT",
+          "id": 4,
+          "w": "謎",
+          "ghost": false,
+          "op": 0.588,
+          "contrast": 2.412,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 48,
+            "y": 193,
+            "ww": 11,
+            "hh": 13
+          },
+          "maxD": 69,
+          "mean": 37.17,
+          "pctGt8": 94.4
+        },
+        {
+          "kind": "KEPT",
+          "id": 6,
+          "w": "順",
+          "ghost": false,
+          "op": 0.445,
+          "contrast": 2.165,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 274,
+            "y": 765,
+            "ww": 22,
+            "hh": 26
+          },
+          "maxD": 76,
+          "mean": 26.61,
+          "pctGt8": 55.4
+        },
+        {
+          "kind": "KEPT",
+          "id": 17,
+          "w": "大統領",
+          "ghost": false,
+          "op": 0.49,
+          "contrast": 1.722,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 379,
+            "y": 139,
+            "ww": 48,
+            "hh": 19
+          },
+          "maxD": 36,
+          "mean": 10.21,
+          "pctGt8": 37.8
+        }
+      ]
+    },
+    "緑青": {
+      "words": 32,
+      "ghosts": 6,
+      "ghostOpMin": 0.327,
+      "ghostOpMax": 0.327,
+      "ghostContrastMin": 1.596,
+      "ghostContrastMax": 1.6,
+      "ghostsPeNone": 0,
+      "ghostsUnreachable": 0,
+      "residual": [
+        {
+          "kind": "GHOST",
+          "id": 2,
+          "w": "単なる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.596,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 21,
+            "y": 341,
+            "ww": 67,
+            "hh": 26
+          },
+          "maxD": 75,
+          "mean": 15.47,
+          "pctGt8": 46.7
+        },
+        {
+          "kind": "GHOST",
+          "id": 3,
+          "w": "万一",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.6,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 30,
+            "y": 269,
+            "ww": 61,
+            "hh": 36
+          },
+          "maxD": 58,
+          "mean": 8.53,
+          "pctGt8": 19.8
+        },
+        {
+          "kind": "GHOST",
+          "id": 14,
+          "w": "取り上げる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.596,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 15,
+            "y": 355,
+            "ww": 112,
+            "hh": 26
+          },
+          "maxD": 76,
+          "mean": 15.37,
+          "pctGt8": 45.4
+        },
+        {
+          "kind": "GHOST",
+          "id": 15,
+          "w": "印刷",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 1.6,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": -23,
+            "y": -2,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": null,
+          "mean": null,
+          "pctGt8": 24.1
+        },
+        {
+          "kind": "KEPT",
+          "id": 4,
+          "w": "謎",
+          "ghost": false,
+          "op": 0.588,
+          "contrast": 2.467,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 46,
+            "y": 199,
+            "ww": 11,
+            "hh": 13
+          },
+          "maxD": 61,
+          "mean": 32.69,
+          "pctGt8": 91.6
+        },
+        {
+          "kind": "KEPT",
+          "id": 6,
+          "w": "順",
+          "ghost": false,
+          "op": 0.445,
+          "contrast": 1.936,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 272,
+            "y": 757,
+            "ww": 22,
+            "hh": 26
+          },
+          "maxD": 75,
+          "mean": 25.79,
+          "pctGt8": 51.7
+        },
+        {
+          "kind": "KEPT",
+          "id": 17,
+          "w": "大統領",
+          "ghost": false,
+          "op": 0.49,
+          "contrast": 1.518,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 358,
+            "y": 154,
+            "ww": 48,
+            "hh": 19
+          },
+          "maxD": 36,
+          "mean": 12.05,
+          "pctGt8": 45.9
+        }
+      ]
+    },
+    "夜": {
+      "words": 36,
+      "ghosts": 6,
+      "ghostOpMin": 0.327,
+      "ghostOpMax": 0.327,
+      "ghostContrastMin": 2.26,
+      "ghostContrastMax": 2.28,
+      "ghostsPeNone": 0,
+      "ghostsUnreachable": 1,
+      "residual": [
+        {
+          "kind": "GHOST",
+          "id": 2,
+          "w": "単なる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 2.26,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 21,
+            "y": 336,
+            "ww": 67,
+            "hh": 26
+          },
+          "maxD": 80,
+          "mean": 17.01,
+          "pctGt8": 46.9
+        },
+        {
+          "kind": "GHOST",
+          "id": 3,
+          "w": "万一",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 2.28,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 29,
+            "y": 253,
+            "ww": 61,
+            "hh": 36
+          },
+          "maxD": 63,
+          "mean": 9.33,
+          "pctGt8": 21
+        },
+        {
+          "kind": "GHOST",
+          "id": 14,
+          "w": "取り上げる",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 2.26,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 32,
+            "y": 349,
+            "ww": 112,
+            "hh": 26
+          },
+          "maxD": 85,
+          "mean": 14.74,
+          "pctGt8": 39
+        },
+        {
+          "kind": "GHOST",
+          "id": 15,
+          "w": "印刷",
+          "ghost": true,
+          "op": 0.327,
+          "contrast": 2.28,
+          "pe": "auto",
+          "reach": false,
+          "box": {
+            "x": -25,
+            "y": -16,
+            "ww": 60,
+            "hh": 35
+          },
+          "maxD": null,
+          "mean": null,
+          "pctGt8": 20.6
+        },
+        {
+          "kind": "KEPT",
+          "id": 4,
+          "w": "謎",
+          "ghost": false,
+          "op": 0.588,
+          "contrast": 4.37,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 45,
+            "y": 189,
+            "ww": 11,
+            "hh": 13
+          },
+          "maxD": 67,
+          "mean": 34.36,
+          "pctGt8": 89.5
+        },
+        {
+          "kind": "KEPT",
+          "id": 6,
+          "w": "順",
+          "ghost": false,
+          "op": 0.445,
+          "contrast": 3.115,
+          "pe": "auto",
+          "reach": true,
+          "box": {
+            "x": 270,
+            "y": 745,
+            "ww": 22,
+            "hh": 26
+          },
+          "maxD": 88,
+          "mean": 31.63,
+          "pctGt8": 61.2
+        },
+        {
+          "kind": "KEPT",
+          "id": 17,
+          "w": "大統領",
+          "ghost": false,
+          "op": 0.49,
+          "contrast": 3.494,
+          "pe": "auto",
+          "reach": false,
+          "box": {
+            "x": 381,
+            "y": 139,
+            "ww": 48,
+            "hh": 19
+          },
+          "maxD": 96,
+          "mean": 24.87,
+          "pctGt8": 42.7
+        }
+      ]
+    }
+  }
+}

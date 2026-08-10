@@ -1,0 +1,16 @@
+  ok  hunt · a lifting pinch finger never grades the word beneath a third finger  — A id=3; tray "" → "", word present=true
+  ok  hunt · explainer taps do not dismantle the world beneath it  — depth "増加 › 増 › 土" → "増加 › 増 › 土", still open=true
+  ok  hunt · the explainer close button is reachable by a finger  — hit-test at (328,150) reaches the X: true
+  ok  hunt · the explainer closes without navigating the app away  — radoc open=false, depth "増加 › 増 › 土" → "増加 › 増 › 土"
+  ok  hunt · a slow drag on water inside a dive does not surface a level  — depth "増加" → "増加"
+  ok  hunt · a long press on water inside a dive does not surface a level  — depth "増加" → "増加"
+  ok  hunt · pointercancel leaves no ghost drag offset  — word rests 4px from home
+  ok  hunt · a flick judgment sticks (the word does not rematerialize)  — tray "済み 1"; word back after 5s = false
+file:///tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v3/pristine/prototypes/corridor/tools/verify-drift-hunt.mjs:403
+await tap(w.x, w.y);
+            ^
+
+TypeError: Cannot read properties of null (reading 'x')
+    at file:///tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v3/pristine/prototypes/corridor/tools/verify-drift-hunt.mjs:403:13
+
+Node.js v22.22.2

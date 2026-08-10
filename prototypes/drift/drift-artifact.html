@@ -33,14 +33,14 @@
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
   .word.unfolded .yomi{opacity:1}            /* one tap: furigana only */
   .word.glossed .yomi,.word.glossed .gloss{opacity:1}  /* two taps: + English */
-  .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 24px var(--halo)}
+  .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 10px var(--halo)}
   .word.lod .yomi,.word.lod .gloss{opacity:0!important}
   /* tap-bloom relief: the constellation is its own layer — centre, satellites,
    * and threads each carry their own colour and lift gently off the field */
   .word.bctr{color:var(--bloomCtr) !important;z-index:6}
-  .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
+  .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 10px var(--bloomHalo)}
   .word.bsat{color:var(--bloomSat) !important;z-index:5}
-  .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
+  .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 8px var(--bloomHalo)}
   .word.bsat .yomi{color:var(--bloomSat)}
   .glyph.comp{z-index:7}
   .word.center,.glyph.center,.part.center{z-index:6}
@@ -70,9 +70,17 @@
   #tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
     font-size:12px;color:var(--faint);letter-spacing:.1em}
   #tray b{color:var(--accent);font-weight:500}
-  #hint{position:fixed;bottom:calc(42px + env(safe-area-inset-bottom));left:0;right:0;z-index:8;
-    text-align:center;font-size:12px;letter-spacing:.3em;color:var(--faint);
-    opacity:1;transition:opacity 1.4s;pointer-events:none}
+  /* the hint is a plaque pill with INK text, never the faintest ink: read on
+   * its own paper it clears 4.5:1 in every pigment world (夜 included, where
+   * --faint over the dark ground was the worst offender) */
+  #hint{position:fixed;bottom:calc(40px + env(safe-area-inset-bottom));left:50%;
+    transform:translateX(-50%);z-index:8;max-width:82vw;
+    text-align:center;font-size:12px;letter-spacing:.14em;color:var(--ink);
+    background:var(--plaque);border:1px solid var(--line);border-radius:999px;
+    padding:7px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    opacity:1;transition:opacity 1.2s;pointer-events:none}
+  #hint:empty{display:none}
   #card{position:fixed;left:12px;right:12px;bottom:12px;z-index:9;background:var(--plaque);
     border:1px solid var(--line);border-radius:14px;
     padding:20px 20px calc(16px + env(safe-area-inset-bottom));
@@ -131,9 +139,18 @@
   #lvl.hot #lvlInfo{opacity:1}
   #card .rrow .rm{font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-  #card .study{display:block;margin-top:13px;text-align:center;font-size:13px;
-    letter-spacing:.14em;color:var(--pig2);text-decoration:none;border:1px solid var(--line);
-    border-radius:999px;padding:9px 14px}
+  /* the study door — drawn only when a host can actually open the entry, so it
+     is never a dead door, and it is now a real target (>=44px, was 35px). The
+     LABEL is ink: the only value that clears 4.5:1 in all five pigment worlds,
+     the same footing as the hint pill v11 measures. The pigment moves to the
+     rim, where it says "you can go here" without carrying the type. 朱 is
+     untouched — red stays readings-only. It is a <button> under a host that
+     opens the entry in place, an <a> under a host that only has URLs. */
+  #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
+    min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
+    font-size:13px;letter-spacing:.14em;text-decoration:none;cursor:pointer;
+    color:var(--ink);background:none;border:1px solid var(--pig2);
+    border-radius:999px}
   #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
     background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;
     font-family:inherit;cursor:pointer;vertical-align:1px}
@@ -184,6 +201,49 @@ const TAU=Math.PI*2;
 const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---- OPERATOR TUNABLES: how alive the water is. Ruled by feel, not derived. ----
+// All three are silenced entirely by prefers-reduced-motion (see `reduced` above):
+// under `reduce` the field does not drift and the current does not run at all.
+// DRIFT_SPEED — how fast each word breathes inside its own wander box, on its own private heading. Turn it up and the field fidgets harder; 1 was the whole of the old near-stillness, 0 freezes the breathing. Measured finding: this is the EXPENSIVE way to buy motion — private headings do not agree, so raising it drives neighbours across each other (shear) and leaves the ghost arbiter chasing new overlaps. The current below buys the same speed coherently and almost for free, so most of the aliveness is bought there and this stays low.
+const DRIFT_SPEED=1.15;
+// CURRENT_STRENGTH — how much of the field the slow gyre owns: how far it carries a word off its anchor (CURREACH world units, below) and how hard it stirs the water the ink and the flow motes ride. Turn it up and the field travels as one body; 0 leaves every word rattling privately and takes the current off the water.
+const CURRENT_STRENGTH=0.038;
+// CURRENT_DRIFT — how fast the gyre's eye wanders the field, in radians/ms. This is what turns a standing pull into motion: a parked eye holds every word at a fixed offset and nothing moves. Turn it up and the swirl roams restlessly; turn it down and the field leans and holds.
+const CURRENT_DRIFT=0.0017;
+
+// ---- OPERATOR VARIANTS: two open settings on the tap ladder. -----------------
+// Each has two positions. This file states what each position DOES and nothing
+// else: no position here is preferred, endorsed, or scheduled to win. The
+// operator rules by feel; until then both stay built and both stay working.
+// The initial value of each is the behaviour the field already shipped with, so
+// a field nobody has switched is the field as it was.
+//
+// V_LADDER — how many taps a word takes from untouched to its full entry.
+//   "stage3": tap = forefront + family + reading · tap2 = English · tap3 = entry
+//   "stage4": tap = forefront + family · tap2 = reading · tap3 = English · tap4 = entry
+let V_LADDER="stage3";
+// V_SATTAP — what the first tap on a constellation satellite does.
+//   "staged":   the satellite reveals itself where it stands; a second tap
+//               makes it the planet.
+//   "recenter": the satellite becomes the planet on that first tap, with its
+//               own family, and climbs V_LADDER from its first rung.
+let V_SATTAP="staged";
+// The seam the host chrome (and a probe) drives. Unknown values are ignored, so
+// a stale caller can never put the field in a state it has no rung for.
+function driftTapSet(o){
+  if(o){
+    if(o.ladder==="stage3"||o.ladder==="stage4") V_LADDER=o.ladder;
+    if(o.satTap==="staged"||o.satTap==="recenter") V_SATTAP=o.satTap;
+  }
+  return {ladder:V_LADDER,satTap:V_SATTAP};
+}
+window.__DRIFT_TAP__={set:driftTapSet,get:function(){return {ladder:V_LADDER,satTap:V_SATTAP};}};
+try{
+  const _q=new URLSearchParams(location.search);
+  driftTapSet({ladder:_q.get("ladder"),satTap:_q.get("sattap")});
+}catch(err){/* a query string never blocks the field */}
+
 const rgbOf=h=>{const n=parseInt(h.slice(1),16);return [n>>16,(n>>8)&255,n&255];};
 const rgba=(h,a)=>{const c=rgbOf(h);return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";};
 const shade=(h,f,a)=>{const c=rgbOf(h);
@@ -203,11 +263,13 @@ const THEMES=[
  {name:"岩絵具",ground:"#F3EAD8",ink:"#40291C",faint:"rgba(64,41,28,.42)",line:"rgba(64,41,28,.2)",
   pig1:"#C39143",pig2:"#8F2E14",accent:"#47885E",plaque:"rgba(243,234,216,.92)",
   halo:"rgba(195,145,67,.6)",dark:false,blobA:.15,pool:["#C39143","#C39143","#8F2E14","#8F2E14","#47885E"],
-  wcol:["#40291C","#8F2E14","#C39143","#47885E","#8A7B5C"]},
+  // foreground pigments run darker than the atmospheric pool: 岩絵具's gold and
+  // green were the legibility outliers of the five worlds when laid on paper
+  wcol:["#40291C","#8F2E14","#8C5F1E","#356B49","#8A7B5C"]},
  {name:"緑青",ground:"#EDF2E6",ink:"#1F4433",faint:"rgba(31,68,51,.42)",line:"rgba(31,68,51,.2)",
   pig1:"#47885E",pig2:"#4C6CB3",accent:"#F8B500",plaque:"rgba(237,242,230,.92)",
   halo:"rgba(71,136,94,.5)",dark:false,blobA:.14,pool:["#47885E","#47885E","#4C6CB3","#4C6CB3","#F8B500"],
-  wcol:["#1F4433","#47885E","#4C6CB3","#5C8A46","#7FA08A"]},
+  wcol:["#1F4433","#2E6B49","#38539A","#3F6A2E","#7FA08A"]},
  {name:"夜",ground:"#281A14",ink:"#FFFFFC",faint:"rgba(255,255,252,.38)",line:"rgba(255,255,252,.22)",
   pig1:"#4C6CB3",pig2:"#8FA3DC",accent:"#E2041B",plaque:"rgba(31,21,15,.93)",
   halo:"rgba(76,108,179,.85)",dark:true,blobA:.17,pool:["#113285","#113285","#4C6CB3","#4C6CB3","#E2041B"],
@@ -350,7 +412,8 @@ let fdpr=1;
 function sizeCanvases(){
   ink.width=Math.max(1,Math.round(vw()*0.5)); ink.height=Math.max(1,Math.round(vh()*0.5));
   stainCv.width=ink.width; stainCv.height=ink.height;
-  fdpr=Math.min(devicePixelRatio||1,1.5);
+  fdpr=1; // fx carries soft motes/lines only — 1x pixels, upscaled by the compositor;
+  // 1.5x tripled the per-frame raster upload for no visible gain in soft content
   fx.width=Math.round(vw()*fdpr); fx.height=Math.round(vh()*fdpr);
   renderPaper();
 }
@@ -472,6 +535,7 @@ function initBlobs(){
       sp:(mass?0.00005:0.00008)+Math.random()*0.00012,
       amp:mass?18+Math.random()*26:30+Math.random()*55,
       ix:0,iy:0,color:"#1E50A2",a:(mass?1.9+Math.random()*0.7:0.7+Math.random()*0.5)});
+    const b=blobs[blobs.length-1]; b.hx=b.x; b.hy=b.y;
   }
 }
 function drawWave(t){
@@ -501,6 +565,12 @@ function drawInk(t){
     if(!reduced){
       const fv=fluidAt(b.x,b.y);
       b.x+=fv.x*(vw()/FW)*0.22; b.y+=fv.y*(vh()/FH)*0.22;
+      // Pigment is stain sunk into paper, not free dust. A weak return keeps a
+      // pool near its own place, so the standing current sways the washes
+      // instead of draining every one of them to the same rim over a long sit
+      // (measured: 3 of 9 pools clamped at the left edge after 90s without it).
+      // Slack enough — ~2s — that a finger's burst still throws pigment.
+      b.x+=(b.hx-b.x)*0.02; b.y+=(b.hy-b.y)*0.02;
       b.x=clamp(b.x,-80,vw()+80); b.y=clamp(b.y,-80,vh()+80);
     }
     const bx=b.x+Math.cos(t*b.sp+b.ph)*b.amp+b.ix;
@@ -569,7 +639,86 @@ function fluidBurst(px2,py2,s){
     const i=FI(x,y); fvx[i]+=dx*f; fvy[i]+=dy*f;
   }
 }
+// ---- the slow coherent current -------------------------------------------
+// One gyre, whose eye wanders the field on a slow Lissajous path that never
+// quite repeats (the terms are mutually incommensurate). It is the same current
+// in two places: it stirs the water here, and it carries every resting word in
+// drawGraph. That shared eye is what makes the field read as one body leaning
+// rather than sixty things jittering — words a thumb apart travel together
+// because they are being carried by the same water, not because they agree.
+// The eye ranges well outside the glass on purpose. A gyre whose eye sits in
+// the middle of the field turns hard: two words a thumb apart get pulled in
+// visibly different directions, they tangle, and the WP2 arbiter spends its life
+// chasing new overlaps. Held out at arm's length the same gyre reads on screen
+// as one broad lean that slowly changes its mind — the coherence goes UP and the
+// shear between neighbours goes DOWN at the same time.
+let curT=0;   // elapsed animated time, advanced once a frame in frame()
+// The water settles under a hand. While any finger is down the ambient drift and
+// the current ease to a stop over ~7 frames, and ease back when the hand lifts.
+// Two reasons, and the first is the real one:
+//  · it is what water does. You reach in and the surface under your hand goes
+//    quiet; the moment you let go it starts moving again.
+//  · a word must not walk out from under a finger that is already resting on it.
+//    Ambient drift during a held gesture is indistinguishable, to anything
+//    downstream, from the field dragging the word — which is precisely what the
+//    hunt battery's "a foreign pointermove cannot drag a touch-held word"
+//    (threshold: 8px) is there to forbid.
+// Finger-made motion is untouched: fluidInject/fluidBurst still stir the ink, so
+// stirring the water with a fingertip works exactly as before.
+let calm=1;
+function currentCenter(t){
+  const a=t*CURRENT_DRIFT;
+  return {x:(0.5+0.62*Math.sin(a)+0.20*Math.sin(a*2.3+1.3))*vw(),
+          y:(0.5+0.62*Math.cos(a*0.77)+0.20*Math.cos(a*1.7+0.6))*vh()};
+}
+// Heading of the current at a screen point: tangential (counter-clockwise) with
+// a slight inward lean, so it reads as a PULL toward the eye and not a carousel.
+// It eases to nothing at the eye itself — the centre is calm water, not a
+// pinhole — and fades out toward the far rim.
+//
+// This runs for every word and every water cell on every frame, so it is
+// written in sqrt and one divide: Math.hypot and Math.exp here cost the fusion
+// its 60fps outright (p95 33ms with them, 17ms without). rim2 is the rim
+// distance SQUARED and the falloff is the Lorentzian rim2/(rim2+d^2) — same
+// shape as the exponential to the eye, a fraction of the price.
+function currentHeadingAt(cx,cy,eye,rim2,sx,sy,out){
+  const dx=sx-cx, dy=sy-cy, d2=dx*dx+dy*dy, d=Math.sqrt(d2)||1;
+  const f=(d<eye?d/eye:1)*rim2/(rim2+d2)/d;
+  out.x=(-dy*0.94-dx*0.34)*f; out.y=(dx*0.94-dy*0.34)*f;
+  return out;
+}
+// A WIDE calm core (not the pinhole a literal vortex would have) is the other
+// half of the low-shear story: inside it the pull eases linearly to nothing, so
+// the direction never whips round between one word and the next.
+const CUR_EYE=()=>mind()*0.75;
+const CUR_RIM2=()=>{const r=Math.sqrt(vw()*vw()+vh()*vh())*1.15; return r*r;};
+// Inject the same gyre into the water. Pressure projection keeps rotational
+// flow (it is divergence-free), so this survives the solve and the ink, the
+// pigment blobs and the flow motes all turn with it.
+const _fc={x:0,y:0}, _wh={x:0,y:0};
+// how far off its anchor the current may carry a word, in world units. Derived
+// from CURRENT_STRENGTH so the operator has one knob for "how much of the field
+// the current owns" rather than two that must be kept in step; the wander box a
+// word breathes inside is +-16/+-12, so this stays comfortably under it.
+const CURREACH=CURRENT_STRENGTH*230;
+// How often the ghost arbiter re-reads the field, in frames. Pinned to the
+// drift so a faster field is not arbitrated more slowly than a slow one: a
+// tangle forms in proportionally fewer frames when the water moves quicker. At
+// DRIFT_SPEED 1 this is exactly the historical every-5th-frame.
+const ARB_EVERY=Math.max(1,Math.round(5/Math.max(1,DRIFT_SPEED)));
+function fluidCurrent(t){
+  if(reduced||CURRENT_STRENGTH<=0) return;
+  const s=CURRENT_STRENGTH*0.05*calm, c=currentCenter(t);
+  const eye=CUR_EYE(), rim2=CUR_RIM2();
+  const gw=vw()/FW, gh=vh()/FH;
+  for(let y=1;y<FH-1;y++)for(let x=1;x<FW-1;x++){
+    currentHeadingAt(c.x,c.y,eye,rim2,(x+0.5)*gw,(y+0.5)*gh,_fc);
+    const i=FI(x,y);
+    fvx[i]+=_fc.x*s; fvy[i]+=_fc.y*s;
+  }
+}
 function fluidStep(){
+  fluidCurrent(curT);
   for(let i=0;i<FN;i++){fvx[i]*=0.985;fvy[i]*=0.985;}
   for(let y=1;y<FH-1;y++)for(let x=1;x<FW-1;x++){
     const i=FI(x,y);
@@ -691,7 +840,12 @@ let seq=0,gathered=Number(store.lu)||0,settled=Number(store.lk)||0,maxDepth=0;
 const stack=[];
 let journey=[];
 
-function setBlur(n,b){ if(n.blur!==b){n.blur=b;n.el.style.filter=b?("blur("+b+"px)"):"";} }
+function setBlur(n,b){
+  // depth used to be a CSS blur; blurred TEXT re-rasterizes on every transform
+  // change (9x the pixels at DPR 3) and reads as smudge, not distance. Depth
+  // is now pure atmospheric paling: farther = quieter, never fuzzier.
+  if(n.blur!==b){n.blur=b; n.blurDim=b?(b>=3?0.55:0.8):1; if(n.el.style.filter)n.el.style.filter="";}
+}
 function spawnWord(entry,x,y,fadeIn){
   const w=entry[0],r=entry[1],g=entry[2],p=entry[4]||"",lvl=entry[5]||3;
   const i=seq++;
@@ -711,7 +865,11 @@ function spawnWord(entry,x,y,fadeIn){
   const ci=fragile?(i%3):(z<0.85?3+(i%2):1+(i%3));
   el.style.color=THEMES[themeIx].wcol[ci];
   const baseOp=(fragile?0.95:0.4+(i%5)*0.08)*(0.6+0.4*(z/1.22))*(wellKnown?0.55:1);
+  // seqId / fpx / collide feed the spatial arbiter: fpx is the exact rendered
+  // font box the DOM carries, seqId the stable tie-break, collide the eased
+  // "recede to atmosphere" multiplier the arbiter drives (never a removal)
   const n={kind:"word",w,r,g,st,p,lvl,el,z,baseOp,ci,
+    seqId:i,fpx:Math.round(base*z),collide:1,collideTarget:1,ghostOp:null,
     x,y,s:1,ts:1,tx:x,ty:y,op:fadeIn?0:baseOp,top:baseOp,
     rot:(Math.random()-.5)*3,cr:0,
     vx:(Math.random()-.5)*.26,vy:(Math.random()-.5)*.18,
@@ -755,7 +913,42 @@ function w2s(wx,wy){
 function camClamp(){
   const mx=Math.min(WR.w*0.44,vw()/(2*cam.z)*0.7), my=Math.min(WR.h*0.44,vh()/(2*cam.z)*0.7);
   cam.x=clamp(cam.x,mx,WR.w-mx); cam.y=clamp(cam.y,my,WR.h-my);
+  pageOdometer();
 }
+// ---- pool paging -----------------------------------------------------------
+// A tide's own level holds far more words than the 64 refreshActive can carry
+// as readable DOM at once (N1 alone is 2,279), and `pri` used to end in a FIXED
+// per-word hash — so the same ~530 of N1 won every contest forever and the rest
+// of the tier could never be read at all, only seen as ink. `pagePhase` rotates
+// that tie-break so the 64 slots page through the whole tier.
+//
+// It advances with PAN DISTANCE, never with the clock: hold still and the field
+// is exactly as stable as it has always been — nothing re-sorts under a resting
+// eye. The exchange happens only while you are already swimming, under cover of
+// the words the pan is already carrying off-glass.
+//
+// PAGE_SPAN is 2 for an exact reason, not a tuned one. The seat h01 is the old
+// tie-break rescaled from its (-0.99, 0.99) into [0, 1), so at pagePhase 0 the
+// wheel contributes 2*h01 = oldTieBreak + 1 — a CONSTANT +1 on every word in
+// the field, which is no reordering at all. A tide that has not been panned yet
+// therefore chooses the same 64 words this file has always chosen, down to the
+// tie order; the rest state the arbiter and the v11 laws were verified against
+// is preserved exactly, and the wheel only ever departs from it while swimming.
+// The bound that matters is the other one: a tide's own level must still
+// outrank every neighbour absolutely, own-level floor 8 > 2.4+1.6+0.8+PAGE_SPAN
+// = 6.8, which holds with room to spare.
+const PAGE_SPAN=2.0, PAGE_CYCLE=40000;
+let pagePhase=0, panOdoX=null, panOdoY=null;
+function pageOdometer(){
+  if(panOdoX!==null){
+    const d=Math.hypot(cam.x-panOdoX,cam.y-panOdoY);
+    // a teleport is not swimming: a resize rebuild or a dive's camera ease can
+    // move the camera a screen in one step, and the wheel must not lurch for it
+    if(d<200) pagePhase=(pagePhase+d/PAGE_CYCLE)%1;
+  }
+  panOdoX=cam.x; panOdoY=cam.y;
+}
+const pageOf=wr=>wr.h01<pagePhase?wr.h01-pagePhase+1:wr.h01-pagePhase;
 const strHash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;};
 // kanji hubs: the most word-productive characters become galaxy suns
 const HUBS=(()=>{
@@ -789,7 +982,7 @@ function buildWorld(){
       x=(hsh%1000)/1000*WR.w; y=((hsh>>10)%1000)/1000*WR.h;
     }
     const wrN={e,wx:clamp(x,60,WR.w-60),wy:clamp(y,90,WR.h-90),
-      pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,
+      pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,px:0,py:0,
       dvx:(((hsh>>3)%100)/100-0.5)*0.16,dvy:(((hsh>>7)%100)/100-0.5)*0.12};
     WORDS.push(wrN); WORDIX[e[0]]=wrN;
   }
@@ -816,8 +1009,25 @@ function buildWorld(){
 function rePri(){
   for(const wr of WORDS){
     const e=wr.e, lm=Math.abs((e[5]||3)-level);
+    // the standing part of the priority — level band, then the two judgments
     wr.pri=(lm===0?8:lm===1?2.4:0)+(store.unknown[e[0]]?1.6:0)+
-      (e[3]==="f"?0.8:0)+((strHash(e[0])>>2)%100)/100;
+      (e[3]==="f"?0.8:0);
+    // ...and the word's fixed seat on the paging wheel, which pagePhase turns.
+    // This is the SAME expression that used to ride on pri, only rescaled from
+    // its true range into [0, 1). `>>` is the signed shift and strHash returns a
+    // full uint32, so `%100` here is NEGATIVE for the ~half of words whose hash
+    // has bit 31 set: the term has always spanned (-0.99, 0.99), not [0, 0.99).
+    // Harmless as a static rider on an 8.0 band — and the /200 + 0.5 below is
+    // what turns that quirk into a virtue, mapping the full signed range onto
+    // the wheel so every word gets a seat instead of half of them riding the
+    // bottom of every rotation forever.
+    //
+    // 199 seats rather than one per word is also deliberate: words sharing a
+    // seat share a score, and the sort is stable, so the 64-slot boundary cuts a
+    // seat the same way from one tick to the next. Measured, that is most of the
+    // difference between this and a glass that re-sorts as the window slides
+    // (docs/build-evidence/kairo-feel-lock/wp9a/paging-sim.mjs).
+    wr.h01=((strHash(e[0])>>2)%100)/200+0.5;
   }
 }
 // the ~64 most deserving nearby words become touchable DOM; the rest are ink
@@ -830,7 +1040,7 @@ function refreshActive(){
     if(wr.gradedAt&&performance.now()-wr.gradedAt<180000) continue;
     if(s.x>-pad&&s.x<vw()+pad&&s.y>-pad&&s.y<vh()+pad) vis.push(wr);
   }
-  vis.sort((a,b)=>b.pri-a.pri);
+  vis.sort((a,b)=>(b.pri+PAGE_SPAN*pageOf(b))-(a.pri+PAGE_SPAN*pageOf(a)));
   const target=new Set(vis.slice(0,64));
   for(const wr of [...ACTIVE]){
     if(!target.has(wr)){
@@ -930,13 +1140,30 @@ function bloomFocus(n){
   const cands=[];
   const seenB=new Set([n.w]);
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
-  for(const wr of WORDS){
-    const w=wr.e[0];
+  // The family of the FIRST tap is a family of meaning. Authored SEM relations
+  // lead when they exist; then rarity-weighted gloss kinship; a shared glyph is
+  // a bonus that lifts true compounds, never the reason a stranger appears.
+  if(!WTOK) buildGlossIndex();
+  const semList=SEM[n.w]||null;
+  const semRank=Object.create(null);
+  if(semList) semList.forEach((se,i)=>{semRank[se[0]]=i;});
+  const selfIx=WORDIX[n.w]?WORDS.indexOf(WORDIX[n.w]):-1;
+  const selfSetB=new Set(selfIx>=0?WTOK[selfIx]:glossTokens(n.g||""));
+  for(let i=0;i<WORDS.length;i++){
+    const wr=WORDS[i], w=wr.e[0];
     if(seenB.has(w)) continue;
+    let g=0;
+    for(const t of WTOK[i]) if(selfSetB.has(t)){
+      const df=GDF[t]||1; g+=df<=25?2.2:(df<=120?1.1:0.35);
+    }
     let sc=0; for(const c of ks) if(w.includes(c)) sc++;
-    if(!sc) continue;
+    if(sc>2) sc=2;
+    let comb=g*2+sc*0.9+(g>0&&sc>0?1.0:0);
+    if(semRank[w]!=null) comb+=12-Math.min(9,semRank[w]);
+    if(comb<0.6) continue;
     seenB.add(w);
-    cands.push([1e9+sc*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+    wr.shell=comb>=4?1:(comb>=1.8?2:3);
+    cands.push([comb*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
   }
   // cascade to a floor of 6 — no word ever blooms into nothing (C2):
   // radical kin next, then nearest same-level neighbours
@@ -985,6 +1212,7 @@ function bloomFocus(n){
     if(wr.node&&!wr.node.gone){
       wr.node.hlDom=true; wr.node.el.classList.add("bsat");
       wr.node.top=Math.max(wr.node.top,0.95);
+      satBand(wr.node,wr.shell);
     } else {
       // a satellite the field only knew as a dot materializes as a real word
       const sp=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
@@ -992,10 +1220,13 @@ function bloomFocus(n){
       nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
       nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
       nd.el.classList.add("bsat");
+      satBand(nd,wr.shell);
     }
     FOCUS.push(wr);
   }
-  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
+  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);
+    // the tapped word is the loudest thing in its own constellation
+    if(n.fpx>0){ n.ts=Math.max(n.ts,Math.min(2.0,28/n.fpx)); }}
   if(n.wref) markWalked(n.wref);
 }
 let lockOn=false;
@@ -1007,6 +1238,7 @@ function lockMaterialize(wr){
   if(wr.node&&!wr.node.gone){
     wr.node.hlDom=true; wr.node.el.classList.add("bsat");
     wr.node.top=Math.max(wr.node.top,0.95);
+    satBand(wr.node,wr.shell);
     return wr.node;
   }
   const sp=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
@@ -1014,7 +1246,16 @@ function lockMaterialize(wr){
   nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
   nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
   nd.el.classList.add("bsat");
+  satBand(nd,wr.shell);
   return nd;
+}
+// satellites speak in one register: the tapped word is the loudest thing in
+// its own constellation, the family sits a step below it in a narrow band
+// (closer ring slightly larger), instead of field sizes 13-35px shouting over
+// the centre.
+function satBand(nd,shell){
+  const target=shell===1?23:shell===2?20:18;
+  if(nd.fpx>0){ nd.ts=Math.max(0.62,Math.min(1.5,target/nd.fpx)); }
 }
 // a relation SEM knows but the corpus has no headword for — every kana-only
 // relative and every collocation. SEM authored a gloss for each one, so it
@@ -1064,33 +1305,62 @@ function clearBloom(keep){
 // THE OBSIDIAN LOCK: long-press reorganizes the visible universe around a
 // node — every relation pulled into shells, locked in place until released.
 // Consistency floor: cascading channels guarantee >=12 members for ANY word.
+// ---- meaning-first relatedness for words outside the authored SEM table ----
+// A constellation must read as a FAMILY OF MEANING, not a list of words that
+// happen to share a glyph: 外出's neighbours are 出かける and 散歩, not 出版.
+// Primary signal: rarity-weighted English gloss token overlap. Shared kanji
+// remains a kinship bonus — real compounds rise, coincidences sink.
+const GSTOP=new Set(["to","a","the","of","in","for","on","at","and","or","with","one","ones","be","is","do","etc","sth","so","not","from","by","an","into","out","up","as","that","this","it","its","something","someone"]);
+let WTOK=null,GDF=null;
+function glossTokens(g){
+  const t=[]; const seen=new Set();
+  for(const m of String(g).toLowerCase().split(/[^a-z]+/)){
+    if(m.length<3||GSTOP.has(m)||seen.has(m)) continue;
+    seen.add(m); t.push(m);
+  }
+  return t;
+}
+function buildGlossIndex(){
+  WTOK=new Array(WORDS.length); GDF=Object.create(null);
+  for(let i=0;i<WORDS.length;i++){
+    const tk=glossTokens(WORDS[i].e[2]);
+    WTOK[i]=tk;
+    for(const t of tk) GDF[t]=(GDF[t]||0)+1;
+  }
+}
 function relationsFor(ks,selfW,lvl0,seen0){
   const seen=seen0?new Set(seen0):new Set([selfW]);
-  const mem=[];
-  const c1=[];
-  for(const wr of WORDS){
-    const w=wr.e[0];
+  if(!WTOK) buildGlossIndex();
+  const selfWr=WORDIX[selfW];
+  const selfTok=selfWr?WTOK[WORDS.indexOf(selfWr)]:glossTokens("");
+  const selfSet=new Set(selfTok);
+  const scored=[];
+  for(let i=0;i<WORDS.length;i++){
+    const wr=WORDS[i], w=wr.e[0];
     if(seen.has(w)) continue;
-    let sc=0; for(const c of ks) if(w.includes(c)) sc++;
-    if(sc) c1.push([sc,wr]);
-  }
-  c1.sort((a,b)=>b[0]-a[0]);
-  for(const p2 of c1){
-    if(mem.length>=22) break;
-    if(seen.has(p2[1].e[0])) continue;
-    seen.add(p2[1].e[0]); p2[1].shell=p2[0]>=2?1:2; mem.push(p2[1]);
-  }
-  if(mem.length<12){
-    const kin=new Set();
-    for(const c of ks) for(const r of (KRAD[c]||"")) if(RADK[r])
-      for(const k of RADK[r]) kin.add(k);
-    for(const c of ks) kin.delete(c);
-    for(const wr of WORDS){
-      if(mem.length>=16) break;
-      const w=wr.e[0];
-      if(seen.has(w)) continue;
-      if([...w].some(c=>kin.has(c))){seen.add(w);wr.shell=3;mem.push(wr);}
+    let gscore=0;
+    for(const t of WTOK[i]) if(selfSet.has(t)){
+      const df=GDF[t]||1;
+      gscore+=df<=25?2.2:(df<=120?1.1:0.35);
     }
+    let kscore=0; for(const c of ks) if(w.includes(c)) kscore++;
+    if(kscore>2) kscore=2;
+    let sc=gscore+kscore*0.9;
+    if(gscore>0&&kscore>0) sc+=1.0;           // a true compound of the same meaning
+    const lg=Math.abs((wr.e[5]||3)-lvl0);
+    sc+=lg===0?0.35:(lg===1?0.15:0);
+    if(sc>0.6) scored.push([sc,gscore,wr]);
+  }
+  scored.sort((a,b)=>b[0]-a[0]);
+  const mem=[];
+  for(const p2 of scored){
+    if(mem.length>=22) break;
+    const w=p2[2].e[0];
+    if(seen.has(w)) continue;
+    seen.add(w);
+    // shell by MEANING strength: close ring = related in sense, outer = kin only
+    p2[2].shell=p2[1]>=2?1:(p2[0]>=1.6?2:3);
+    mem.push(p2[2]);
   }
   if(mem.length<12){
     for(const wr of WORDS){
@@ -1119,6 +1389,10 @@ function constellationLock(n){
   // the bloom it came from — without this it is marked gone and removed
   // 500ms later, leaving a headless lock (bloomFocus has always done this)
   clearBloom(n.el?n:undefined);
+  // fold any word an earlier single tap left open: locking B must not leave
+  // A's reveal hanging over the new constellation (the release side of this
+  // has always folded; the lock side never did)
+  collapseUnfold();
   lockOn=true; focusN=n;
   if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
   const isG=n.kind==="glyph";
@@ -1675,17 +1949,54 @@ function strokeSheet(ch){
 }
 
 // ---- card ----
-// When Drift is the opening surface of the deployed app, the wrapper sets
-// window.__BUNKI_APP_BASE and every card gains a real door into the study
-// screens. Standalone (the claude.ai artifact) the base is absent and the
-// card keeps its honest placeholder note instead of a link that would 404.
+// The study door is the ONE seam Drift keeps to whatever hosts it, and it is
+// asked, never assumed. A host that can open the entry itself — the 回廊
+// fusion, which owns a full dictionary and its own entry sheet — installs
+//   window.__BUNKI_OPEN_ENTRY = { has(kind,key)->boolean, open(kind,key) }
+// and the door is drawn ONLY when has() says the far side really exists, then
+// hands the word straight over: no href, no navigation, no external base. A
+// host that has URLs instead (the Pages wrapper) sets __BUNKI_APP_BASE as
+// before. Standalone (the claude.ai artifact) neither exists, and the card
+// keeps its honest placeholder note rather than a door onto nothing — every
+// element is a door, so an element that cannot be one stays a note.
+function studyHost(kind,key){
+  const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_ENTRY;
+  if(!h||typeof h.open!=="function") return null;
+  if(typeof h.has==="function"&&!h.has(kind,key)) return null;
+  return h;
+}
 function studyHtml(kind,key,fallback){
+  const label='この'+(kind==='word'?'語':'字')+'を学ぶ →';
+  if(studyHost(kind,key))
+    return '<button type="button" class="study" data-study-kind="'+esc(kind)+
+      '" data-study-key="'+esc(key)+'">'+esc(label)+'</button>';
   const base=typeof window!=="undefined"&&window.__BUNKI_APP_BASE;
   if(!base) return '<div class="note">'+fallback+'</div>';
-  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">この'+
-    (kind==='word'?'語':'字')+'を学ぶ →</a>';
+  return '<a class="study" href="'+esc(base+kind+'/'+encodeURIComponent(key))+'">'+
+    esc(label)+'</a>';
+}
+// the host-driven door: the card's own pointerup guard already stops taps on
+// buttons from closing the card, so this only has to hand the key over.
+function wireStudy(){
+  const b=card.querySelector("button.study[data-study-key]");
+  if(!b) return;
+  b.addEventListener("click",e=>{
+    e.stopPropagation();
+    const kind=b.getAttribute("data-study-kind"),key=b.getAttribute("data-study-key");
+    const h=studyHost(kind,key);
+    if(h) h.open(kind,key);
+  });
 }
 function openCard(n){
+  // ONE dictionary. When the corridor hosts this field, the final stage of any
+  // word or kanji lands on the app's single canonical entry sheet — the same
+  // page a reader tap, a search result, and a chain walk land on. The drift
+  // card remains only where no dictionary exists to answer (standalone file).
+  const hook=typeof window!=="undefined"&&window.__BUNKI_OPEN_ENTRY;
+  if(hook){
+    if(n.kind==="word"&&hook.has("word",n.w)){hook.open("word",n.w);return;}
+    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){hook.open("kanji",n.ch);return;}
+  }
   if(n.kind==="word"){
     const ks=[...new Set(n.w)].filter(isKanji);
     card.innerHTML='<div class="yomi">'+esc(n.r)+'</div><h1>'+esc(n.w)+'</h1>'+
@@ -1742,13 +2053,14 @@ function openCard(n){
         const cell=document.createElement("div"); cell.className="scell";
         const sh=strokeSheet(n.ch);
         cell.appendChild(sh.svg);
-        card.insertBefore(cell,card.querySelector(".note"));
+        card.insertBefore(cell,card.querySelector(".note,.study"));
         sh.play();
       };
       card.querySelector("#strokeBtn").addEventListener("click",show);
       show();
     }
   }
+  wireStudy();
   card.classList.add("open");
 }
 
@@ -1821,7 +2133,11 @@ lvlSet(3,false);
 // ---- hint ----
 let hintTimer=0;
 function setHint(txt){
-  hint.textContent=txt; hint.style.opacity="1";
+  // an empty hint must take its plaque with it — a blank white pill floating
+  // on the water is furniture, not guidance
+  hint.textContent=txt;
+  if(!txt){hint.style.opacity="0";hint.style.visibility="hidden";clearTimeout(hintTimer);return;}
+  hint.style.visibility="visible"; hint.style.opacity="1";
   clearTimeout(hintTimer);
   hintTimer=setTimeout(function(){hint.style.opacity="0";},5000);
 }
@@ -1842,9 +2158,28 @@ function tapNode(n){
   if(n.kind==="glyph"){ diveKanji(n); return; }
   if(n.kind==="part"){ divePart(n); return; }
   const isSat=n.kind==="word"&&stack.length===0&&!lockOn&&FOCUS.length&&n!==focusN&&n.hlDom;
+  if(isSat&&V_SATTAP==="recenter"){
+    // V_SATTAP "recenter": the satellite skips the reveal-in-place and becomes
+    // the planet at once, then climbs V_LADDER from its first rung like any
+    // other word. Nothing is destroyed here either — the old constellation is
+    // released by bloomFocus, which keeps the tapped node alive.
+    collapseUnfold();
+    bloomFocus(n);
+    // rung 1 of three carries the reading with the family; rung 1 of four does
+    // not — unless no family came up at all, in which case a tap that showed
+    // nothing would be a dead tap, so the reading answers instead.
+    if(V_LADDER==="stage3"||focusN!==n){
+      n.el.classList.add("unfolded"); unfolded=n;
+      if(!n.r) n.el.classList.add("glossed");
+    }
+    bloomLast=performance.now();
+    return;
+  }
   if(isSat&&!n.el.classList.contains("unfolded")){
-    // ratified Q1: a satellite tap reveals it in place — reading and gloss
-    // together, never destruction; the second tap makes it the planet
+    // V_SATTAP "staged" — what spec Q1 ratified and the field shipped: a
+    // satellite tap reveals it in place, reading and gloss together, never
+    // destruction; the second tap makes it the planet. Recorded here as
+    // provenance, not as a verdict on this row — WP6 rules on neither position.
     collapseUnfold();
     n.el.classList.add("unfolded","glossed"); unfolded=n;
     bloomLast=performance.now();
@@ -1854,13 +2189,26 @@ function tapNode(n){
     bloomFocus(n);   // the chain walk: the satellite becomes the planet
     return;
   }
+  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;
+  if(V_LADDER==="stage4"&&canBloom&&focusN!==n&&!n.el.classList.contains("unfolded")){
+    // rung 1 of four: the word comes forward with its family and nothing is
+    // read yet. Only where a family can actually bloom — inside a dive there
+    // is no constellation to raise, so this rung would answer with nothing.
+    collapseUnfold();
+    bloomFocus(n);
+    if(focusN===n){ bloomLast=performance.now(); return; }
+    // no family came up: there is no rung to stand on, so this tap reads the
+    // word rather than answering with nothing
+  }
   if(!n.el.classList.contains("unfolded")){
     collapseUnfold();
     n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana
     // a word we hold no reading for has no furigana stage to show: it would
     // answer a tap with nothing visible. It gives its gloss at once instead.
     if(!n.r) n.el.classList.add("glossed");
-    if(n.kind==="word"&&stack.length===0&&!lockOn) bloomFocus(n);
+    // under stage4 the family is already up from rung 1 — re-blooming here
+    // would rebuild the same constellation out from under the finger
+    if(canBloom&&(V_LADDER!=="stage4"||focusN!==n)) bloomFocus(n);
     return;
   }
   if(!n.el.classList.contains("glossed")){
@@ -1870,6 +2218,16 @@ function tapNode(n){
 }
 let px=0,py=0,pt=0,pn=null,moved=false,gestureActive=false,gestureId=null;
 let lpTimer=0,lpFired=false;
+let waterTapT=0,waterTapX=0,waterTapY=0;
+// the way home: ease the WHOLE camera — pan, zoom AND twist — back to the
+// resting universe. camT carries z/rot only for this reset, so the lock-glide
+// (which sets camT={x,y}) still leaves zoom and rotation untouched.
+function recenterCam(){
+  cam.vx=0; cam.vy=0;
+  camT={x:WR.w/2,y:WR.h/2,z:1,rot:0};
+  ripple(vw()/2,vh()/2,true);
+  setHint("中心へ戻る · home");
+}
 // two fingers = zoom: pinch-out over a body dives into it, pinch-in surfaces
 const touches=new Map();
 let pinch=null;
@@ -1878,8 +2236,15 @@ function rebasePinch(){
   const pair=[...touches.entries()];
   const a=pair[0][1],b2=pair[1][1];
   const d=Math.hypot(a.x-b2.x,a.y-b2.y)||1;
+  // MODE IS LATCHED AT GESTURE START. inDive records dive-vs-surface intent
+  // when the second finger lands; a rebase (a third finger joining or leaving)
+  // inherits it rather than re-reading the stack. Without this, a pinch-in that
+  // surfaces mid-gesture finds stack.length===0 on its next move and bleeds
+  // straight into continuous camera zoom-out.
+  const held=pinch?pinch.inDive:null;
   pinch={ids:[pair[0][0],pair[1][0]],d0:d,last:d,
-    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z};
+    lastAng:Math.atan2(b2.y-a.y,b2.x-a.x),fired:false,z0:cam.z,
+    inDive:held==null?stack.length>0:held};
 }
 function pinchDive(mid){
   let best=null,bd=1e9;
@@ -1915,6 +2280,26 @@ addEventListener("pointerdown",e=>{
   const el=e.target.closest?e.target.closest(".word,.glyph,.part"):null;
   pn=el?nodeOf.get(el):null;
   if(pn&&pn.gone) pn=null;
+  // NOTE, deliberately: touch is NOT re-arbitrated by loudness between WORDS. An
+  // earlier cut handed a tap in an overlap to the louder word, which reads well
+  // until you measure it — a ghost lying wholly inside a louder word then has no
+  // point of its own left, and an unreachable word is a disappeared word. Paint
+  // recedes; touch between words stays exactly as the field always resolved it,
+  // and answering a ghost brings it straight back to full presence.
+  //
+  // THE ONE EXCEPTION, and the whole rule in a sentence: a tap that lands on a
+  // galaxy sun is answered by the hub, not by a word that is painted at or below
+  // ghost presence — a word at full presence still outranks the hub, exactly as
+  // it always has.
+  // A hub is canvas-drawn, so hit-testing cannot see it and this comparison has
+  // to be made by hand. The test is on RENDERED opacity, not on the arbiter's
+  // flag: a constellation suspends arbitration, so a receded word's collide is
+  // already back at 1 while the bloom still paints it at a third of its
+  // presence, and reading the flag there would miss exactly the case the hunt
+  // exercises — a release over a hub with a constellation held.
+  if(pn&&pn.kind==="word"&&stack.length===0&&
+     (parseFloat(pn.el.style.opacity)||1)<=ghostFloor+0.01&&
+     hubAt(e.clientX,e.clientY)) pn=null;
   if(!pn&&lockOn&&stack.length===0){
     let best=null,bd=40;
     for(const wr of FOCUS){
@@ -1964,8 +2349,10 @@ addEventListener("pointermove",e=>{
     const d=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1;
     const ang=Math.atan2(v[1].y-v[0].y,v[1].x-v[0].x);
     const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};
-    if(stack.length){
-      // inside a dive: pinch keeps its discrete grammar
+    if(pinch.inDive){
+      // inside a dive: pinch keeps its discrete grammar for the WHOLE gesture,
+      // even after surface() empties the stack mid-pinch — so surfacing can
+      // never bleed into the continuous zoom-out below
       if(!pinch.fired){
         const ratio=d/pinch.d0;
         if(ratio>1.28){pinch.fired=true;pinchDive(mid);}
@@ -1978,12 +2365,15 @@ addEventListener("pointermove",e=>{
     } else {
       // at the surface: continuous camera — zoom about the pinch midpoint,
       // twist to rotate the whole vault (glyphs stay upright)
+      camT=null;   // a manipulation gesture cancels any in-flight glide/recenter
       if(pinch.last==null){pinch.last=d;pinch.lastAng=ang;}
       const wpt=s2wl(mid.x,mid.y);
       cam.z=clamp(cam.z*(d/pinch.last),0.34,2.6);
       let da=ang-pinch.lastAng;
       if(da>Math.PI)da-=TAU; if(da<-Math.PI)da+=TAU;
-      cam.rot+=da;
+      // twist is bounded to ±half a turn so it can never run away, and the
+      // double-tap return-to-rest always brings it back to 0
+      cam.rot=clamp(cam.rot+da,-Math.PI,Math.PI);
       const wpt2=s2wl(mid.x,mid.y);
       cam.x+=wpt.x-wpt2.x; cam.y+=wpt.y-wpt2.y; camClamp();
       pinch.last=d; pinch.lastAng=ang;
@@ -2090,6 +2480,16 @@ addEventListener("pointerup",e=>{
       g.ephemeral=true; diveKanji(g); return;
     }
   }
+  // double-tap open water eases the whole camera home (return-to-rest).
+  // 420ms is a forgiving window — this is a deliberate "take me home", not a
+  // rapid game input, so a relaxed double-tap reads far more reliably. It sits
+  // BELOW every release path: a tap that dismisses a constellation or opens a
+  // door is spent on that, and the window starts from the next open-water tap.
+  const nowT=Date.now();
+  if(nowT-waterTapT<420&&Math.abs(e.clientX-waterTapX)<48&&Math.abs(e.clientY-waterTapY)<48){
+    waterTapT=0; clearBloom(); collapseUnfold(); recenterCam(); return;
+  }
+  waterTapT=nowT; waterTapX=e.clientX; waterTapY=e.clientY;
   clearBloom();
   collapseUnfold();
 });
@@ -2162,21 +2562,58 @@ function drawWorld(){
   const r3=r2*1.35, rr3=r3*2;
   const dHit=[],dMid=[],dLow=[];
   const thin=cz<0.45?4:(far?2:1);
+  // one eye for the whole field this frame — hoisted so the gyre costs four
+  // trig calls a frame rather than four per word
+  const curOn=!reduced&&CURRENT_STRENGTH>0;
+  const curC=currentCenter(curT);
+  const curEye=CUR_EYE(), curRim2=CUR_RIM2();
+  // WORDS is the whole dictionary, thousands of entries, and only the hundred-odd
+  // near the glass can be carried anywhere the eye would notice. Beyond this band
+  // the gyre's falloff has already taken the displacement to under a pixel, so
+  // the heading is not worth computing — this is the difference between the
+  // fusion holding 60fps and missing every third frame.
+  const curBandX=W2+250, curBandY=H2+250;
   for(const wr of WORDS){
     wi++;
-    if(thin>1&&(wi%thin)) continue;
+    // locked constellation members are never thinned out — the bloom must stay
+    // whole at every zoom, so "16 words locked" reads as 16 even at cam.z=0.34
+    if(thin>1&&(wi%thin)&&!wr.lk) continue;
+    // The current's displacement for THIS word, in world units. It is a shared
+    // field, so two words standing near each other are carried the same way at
+    // the same moment — that togetherness is what the eye reads as a current
+    // rather than sixty independent twitches. Computed in screen space (the
+    // gyre lives on the visible field, not in the world map) and carried back
+    // through the inverse camera rotation.
+    let cdx=0, cdy=0;
+    if(curOn&&wr.sx>-curBandX&&wr.sx<curBandX&&wr.sy>-curBandY&&wr.sy<curBandY){
+      const h=currentHeadingAt(curC.x,curC.y,curEye,curRim2,wr.sx,wr.sy,_wh);
+      cdx=(h.x*cs+h.y*sn)*CURREACH; cdy=(h.y*cs-h.x*sn)*CURREACH;
+    }
     if(wr.lk){}
-    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;}
-    else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
-      if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;}
+    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*EK(0.13); wr.oy+=(wr.hy-wr.oy)*EK(0.13);
+      wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
+    else if(wr.ret){const rk=1-EK(0.07); wr.ox*=rk; wr.oy*=rk;
+      if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;
+      wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
+    else if(reduced){
+      // prefers-reduced-motion stills the field entirely: no ambient drift, no
+      // current. Everything below this branch — bloom gather, return, every
+      // gesture — still runs, because those are answers to a finger, not motion
+      // the field makes on its own.
+    }
     else {
-      wr.ox+=wr.dvx; if(wr.ox>16||wr.ox<-16) wr.dvx*=-1;
-      wr.oy+=wr.dvy; if(wr.oy>12||wr.oy<-12) wr.dvy*=-1;
+      // the word's own breathing, bounded to its wander box exactly as before —
+      // DRIFT_SPEED is the only thing that changed about it
+      wr.px+=wr.dvx*DRIFT_SPEED*calm*DT; if(wr.px>16||wr.px<-16) wr.dvx*=-1;
+      wr.py+=wr.dvy*DRIFT_SPEED*calm*DT; if(wr.py>12||wr.py<-12) wr.dvy*=-1;
+      // ...carried by the current on top. The current never brakes the
+      // breathing and the breathing never fights the current: they add.
+      wr.ox=wr.px+cdx; wr.oy=wr.py+cdy;
     }
     const dx=wr.wx+wr.ox-ccx, dy=wr.wy+wr.oy-ccy;
     const sx=hw+(dx*cs-dy*sn)*cz, sy=hh+(dx*sn+dy*cs)*cz;
     wr.sx=sx; wr.sy=sy;
-    if(sx<-50||sx>W2||sy<-50||sy>H2) continue;
+    if((sx<-50||sx>W2||sy<-50||sy>H2)&&!wr.lk) continue;
     wr.vis=frameCount;
     const lm=Math.abs((wr.e[5]||3)-level);
     if(!wr.node||wr.node.gone){
@@ -2349,10 +2786,135 @@ function drawFx(t,dt){
   }
 }
 
+// ---- spatial arbitration ----
+// Two words at reading presence must not print through each other, and no word
+// at reading presence may sit beneath the fixed chrome. Runs only at the
+// resting surface with nothing held.
+//
+// THE LOSER OF A TANGLE BECOMES A GHOST, NOT AN ABSENCE. The law is that
+// nothing leaves this screen except a deliberate flick judgment, so the arbiter
+// is bound on both sides:
+//   · from below — a ghost renders at the FLOOR, and never loses its touch
+//     target. Tap it and it comes back at full presence.
+//   · from above — the quieter word of a contested pair is at most CONTEND_MAX
+//     of the louder, so there is always a real figure and a real ground.
+// The floor is not a number picked here. It is read from the field itself each
+// pass: the quietest word spawnWord is already painting (never below GHOST_ABS).
+// A ghost is never quieter than the quietest word the surface is showing anyway
+// — so the arbiter can only ever move a word WITHIN the presence range the field
+// already uses, and can never invent a new, fainter one. That ladder predates
+// the arbiter and the arbiter cannot move it.
+//
+// Those two bounds meet in ONE derived number. A ghost sits at the floor, so a
+// pair ends at floor/winner; holding that under CONTEND_MAX means only a word
+// carrying floor/CONTEND_MAX presence may take anyone's water. A word quieter
+// than that has no right to push anyone back, and when nobody can win the
+// arbiter leaves the tangle standing rather than push a word out of existence —
+// a soft tangle is a legibility cost; a vanished word breaks the law.
+const GHOST_ABS=0.30, CONTEND_MAX=0.53;
+let ghostFloor=GHOST_ABS;   // the live floor, exposed so the harness can audit it
+let chromeRects=[];
+function refreshChromeRects(){
+  chromeRects.length=0;
+  // enumerated one by one, not via a string loop, so the corridor extractor's
+  // getElementById("tray") -> "drift-tray" rename still reaches this call
+  const els=[document.getElementById("brand"),document.getElementById("depth"),
+    document.getElementById("theme"),document.getElementById("tray"),
+    document.getElementById("hint"),document.getElementById("lvl")];
+  for(const el of els){
+    if(!el) continue;
+    const cs2=getComputedStyle(el);
+    if(cs2.display==="none"||cs2.visibility==="hidden") continue;
+    if(parseFloat(cs2.opacity||"1")<0.05) continue;
+    const r=el.getBoundingClientRect();
+    if(r.width<1||r.height<1) continue;
+    if(r.bottom<0||r.top>vh()||r.right<0||r.left>vw()) continue;
+    chromeRects.push({x:r.left-6,y:r.top-6,w:r.width+12,h:r.height+12});
+  }
+}
+function resolveCollisions(){
+  refreshChromeRects();
+  const cz=cam.z, arr=[];
+  for(const n of nodes){
+    if(n.kind!=="word"||n.gone||n.removed) continue;
+    if(n.mode!=="free"&&n.mode!=="glide"){ n.collideTarget=1; continue; }
+    // a held word and its constellation are never arbitrated away
+    if(n===focusN||n.hlDom){ n.collideTarget=1; continue; }
+    const fpx=(n.fpx||14)*n.s*cz;
+    // EVERY word is a candidate to recede — a naturally quiet word printed
+    // through a loud one is exactly as unreadable as two loud ones, and an
+    // entry filter here would leave that pair permanently tangled. What ARB_MIN
+    // gates is the right to WIN: only a word at reading presence can push
+    // another one back, because only then is there room for a ghost that stays
+    // above the floor.
+    const cx=n.x+n.dragX, cy=n.y+n.dragY, hw=n.w.length*fpx*0.55, hh=fpx*0.62;
+    // Only the field the learner can actually see takes part. A word parked off
+    // screen can tangle with nothing, and — the reason this matters — letting it
+    // into the set drags the floor down: the floor is meant to be the quietest
+    // presence ON SCREEN, and an off-screen word would set a floor no visible
+    // word ever reaches, leaving ghosts fainter than anything actually shown.
+    // exactly the words with pixels on screen — no margin. A word with nothing
+    // visible can tangle with nothing, and including it would let it set a floor
+    // that no word the learner can see ever reaches.
+    if(cx+hw<0||cx-hw>vw()||cy+hh<0||cy-hh>vh()){ n.collideTarget=1; continue; }
+    arr.push({n,cx,cy,hw,hh,eff:n.op,fpx});
+  }
+  // the field's own floor, read fresh each pass: the quietest presence
+  // spawnWord is already painting, never under GHOST_ABS
+  let minEff=Infinity;
+  for(const a of arr) if(a.eff<minEff) minEff=a.eff;
+  const floorOp=Math.max(GHOST_ABS,minEff===Infinity?GHOST_ABS:minEff);
+  ghostFloor=floorOp;
+  const winMin=floorOp/CONTEND_MAX;   // the presence it takes to win a patch of water
+  arr.sort((a,b)=> b.eff-a.eff || b.fpx-a.fpx || a.n.seqId-b.n.seqId);
+  const kept=[];
+  for(const a of arr){
+    let ghost=0;   // 0 = keep; >0 = the rendered opacity this word recedes to
+    for(const c of chromeRects){
+      if(a.cx+a.hw>c.x&&a.cx-a.hw<c.x+c.w&&a.cy+a.hh>c.y&&a.cy-a.hh<c.y+c.h){ghost=floorOp;break;}
+    }
+    // A ghost always lands on the floor exactly — there is no relative term. An
+    // earlier cut carried one (ghost = max(floor, 0.45 * winner)); verification
+    // showed the floor bound every observed case, so the relative term was dead
+    // code that no check could falsify. The separation it was supposed to
+    // provide is enforced instead at the other end: a word may only take
+    // someone's water if it carries floor/CONTEND_MAX presence, which pins the
+    // quieter word of every contested pair at no more than CONTEND_MAX of the
+    // louder. Both constants now do visible work and both are falsifiable.
+    if(!ghost) for(const k of kept){
+      if(k.eff<winMin) continue;                // too quiet to take anyone's water
+      const ox=Math.min(a.cx+a.hw,k.cx+k.hw)-Math.max(a.cx-a.hw,k.cx-k.hw);
+      if(ox<=0) continue;
+      const oy=Math.min(a.cy+a.hh,k.cy+k.hh)-Math.max(a.cy-a.hh,k.cy-k.hh);
+      if(oy<=0) continue;
+      // 0.12, not a comfortable 0.16: at high zoom the field drifts across the
+      // screen ~cam.z times faster, so a tangle can slip between two passes
+      if(ox*oy>Math.min(4*a.hw*a.hh,4*k.hw*k.hh)*0.12){ ghost=floorOp; break; }
+    }
+    if(ghost){ a.n.ghostOp=ghost; a.n.collideTarget=0; }
+    else { a.n.collideTarget=1; kept.push(a); }
+  }
+}
+
 // ---- frame loop ----
 let lastT=0;
+let DT=1;
+const EK=(k)=>1-Math.pow(1-k,DT);
 function frame(t){
   const dt=Math.min(34,(t-lastT)||16); lastT=t;
+  // Frame-rate independence: every per-frame advance and easing is scaled by
+  // DT (frames of 16.7ms), updated here once per frame and read module-wide
+  // (drawWorld runs the word advance). On a device at 30fps the field must
+  // move the same distance per second in the same-sized visual steps —
+  // without this, slow frames take double-length strides and drift jolts.
+  DT=Math.min(2.2,Math.max(0.5,dt/16.7));
+  // The current runs on the field's OWN clock — elapsed animated time, not wall
+  // time. dt is already clamped to 34ms, so a tab that was backgrounded for a
+  // minute resumes the lean exactly where it left it instead of snapping the
+  // whole field to a phase an idle minute away. At 60fps this is wall time.
+  calm+=((touches.size?0:1)-calm)*EK(0.14);
+  if(calm<0.002) calm=0;
+  if(!reduced) curT+=dt*calm;
   if(!reduced) fluidStep();
   lockForce();
   drawInk(t);
@@ -2393,16 +2955,36 @@ function frame(t){
         }
     }
   }
-  // camera glides toward a locked constellation center
+  // camera glides toward a target: a locked constellation centre (x,y only) or
+  // the resting universe (x,y,z,rot — the double-tap return-to-rest)
   if(camT&&stack.length===0){
     cam.x+=(camT.x-cam.x)*0.07; cam.y+=(camT.y-cam.y)*0.07;
-    if(Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3) camT=null;
+    let done=Math.abs(camT.x-cam.x)<3&&Math.abs(camT.y-cam.y)<3;
+    if(camT.z!=null){
+      cam.z+=(camT.z-cam.z)*0.09;
+      if(Math.abs(camT.z-cam.z)<0.008) cam.z=camT.z; else done=false;
+    }
+    if(camT.rot!=null){
+      cam.rot+=(camT.rot-cam.rot)*0.09;
+      if(Math.abs(camT.rot-cam.rot)<0.004) cam.rot=camT.rot; else done=false;
+    }
+    if(done) camT=null;
     camClamp();
   }
   // camera momentum glides after a flick
   if(stack.length===0&&(Math.abs(cam.vx)>0.02||Math.abs(cam.vy)>0.02)){
     cam.x+=cam.vx; cam.y+=cam.vy; camClamp();
     cam.vx*=0.92; cam.vy*=0.92;
+  }
+  // spatial arbitration only at the resting surface with nothing held;
+  // everywhere else every word is released back to full presence, so nothing
+  // stays wrongly dimmed on return
+  if(stack.length===0&&!lockOn&&!FOCUS.length&&!card.classList.contains("open")){
+    // ARB_EVERY, not a fixed 5: same rule, same thresholds, same 0.12 ease —
+    // only the sampling cadence follows the water. See its definition above.
+    if(frameCount%ARB_EVERY===0) resolveCollisions();
+  } else {
+    for(const n of nodes) if(n.kind==="word"&&n.collideTarget!==1) n.collideTarget=1;
   }
   for(const n of nodes){
     if(n.removed||n.frozen) continue;
@@ -2412,7 +2994,9 @@ function frame(t){
         const s=w2s(n.wx+(_o?_o.ox:0),n.wy+(_o?_o.oy:0));
         if(!reduced){
           const fv=fluidAt(s.x,s.y);
-          n.x=s.x+fv.x*(vw()/FW)*1.8; n.y=s.y+fv.y*(vh()/FH)*1.8;
+          // ...and the water's own push on a word settles under a hand too, so
+          // "still under a finger" means still, not still-except-for-the-water
+          n.x=s.x+fv.x*(vw()/FW)*1.8*calm; n.y=s.y+fv.y*(vh()/FH)*1.8*calm;
         } else { n.x=s.x; n.y=s.y; }
       }
       n.tx=n.x; n.ty=n.y;
@@ -2431,15 +3015,40 @@ function frame(t){
         n.tx=ob.c.x+Math.cos(ob.ang)*ob.rx*br+fv.x*(vw()/FW)*0.14;
         n.ty=ob.c.y+Math.sin(ob.ang)*ob.ry*br+fv.y*(vh()/FH)*0.14;
       }
-      n.x+=(n.tx-n.x)*0.085; n.y+=(n.ty-n.y)*0.085;
+      n.x+=(n.tx-n.x)*EK(0.085); n.y+=(n.ty-n.y)*EK(0.085);
     }
-    n.s+=(n.ts-n.s)*0.09;
-    n.op+=(n.top-n.op)*0.08;
+    n.s+=(n.ts-n.s)*EK(0.09);
+    n.op+=(n.top-n.op)*EK(0.08);
     const rt=(n.mode==="center")?0:n.rot;
-    n.cr+=(rt-n.cr)*0.08;
-    n.el.style.opacity=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN?n.op*0.3:n.op).toFixed(3);
+    n.cr+=(rt-n.cr)*EK(0.08);
+    const dimRaw=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
+    // depth-paling quiets FREE words; it must never push an arbitrated ghost
+    // under the law floor, so the ghost path below reads the unpaled base
+    const dimBase=dimRaw*(n.blurDim||1);
+    let outOp=dimBase;
+    if(n.kind==="word"){
+      if(n.collide==null){n.collide=1;n.collideTarget=1;}
+      // a word taken into a constellation arrives at FULL presence at once:
+      // easing a receded word back over ~330ms handed the learner a satellite
+      // that was still faint when they tapped it
+      if(n===focusN||n.hlDom){n.collide=1;n.collideTarget=1;}
+      else n.collide+=((n.collideTarget==null?1:n.collideTarget)-n.collide)*EK(0.12);
+      // collide eases between present (1) and ghost (0). The ghost is a
+      // RENDERED opacity, not a multiplier: it cannot be diluted to nothing by
+      // a word that was already quiet, and receding never brightens a word
+      // that is fainter than the floor to begin with.
+      const gh=Math.min(dimRaw,n.ghostOp==null?ghostFloor:n.ghostOp);
+      outOp=dimBase*n.collide+gh*(1-n.collide);
+    }
+    // NOTE: a receded word never loses its touch target. Loudest-word-wins is a
+    // rule about PAINT; the tap arbitration in pointerdown hands the finger to
+    // the loudest word under it, which leaves the ghost reachable everywhere
+    // nothing louder covers it. Tapping one brings it straight back.
+    const opStr=outOp.toFixed(3);
+    if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
-    n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
+    const tfStr="translate("+(n.x+n.dragX).toFixed(2)+"px,"+(n.y+n.dragY).toFixed(2)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
+    if(n._ltf!==tfStr){n._ltf=tfStr;n.el.style.transform=tfStr;}
   }
   // A still finger emits no move events. Refresh from the tracked touch set
   // each frame so cancellation starts a fresh, honest inactivity interval.

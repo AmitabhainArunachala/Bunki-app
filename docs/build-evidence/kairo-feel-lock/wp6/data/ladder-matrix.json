@@ -1,0 +1,1068 @@
+{
+  "src": "/home/user/Bunki-app/.claude/worktrees/agent-add617906432261fd/prototypes/drift/drift-artifact.html",
+  "at": "2026-08-09T17:20:54.205Z",
+  "results": [
+    {
+      "name": "stage3+staged · centre rung1 = forefront + family + reading",
+      "pass": true,
+      "detail": "\"救う\" forefront=true family=14 reading=1 english=0 stack=0"
+    },
+    {
+      "name": "stage3+staged · centre rung2 = English",
+      "pass": true,
+      "detail": "reading=1 english=1 stack=0"
+    },
+    {
+      "name": "stage3+staged · centre rung3 = entry (and no rung before it dived)",
+      "pass": true,
+      "detail": "stack after taps 1/2/3 = 0/0/1"
+    },
+    {
+      "name": "stage3+staged · the walked word never disappears",
+      "pass": true,
+      "detail": "present at every rung: true,true,true,true"
+    },
+    {
+      "name": "stage3+staged · the word under the finger stays reachable and present at every rung",
+      "pass": true,
+      "detail": "tap1 op=0.942 pe=auto · tap2 op=0.97 pe=auto · tap3 op=0.999 pe=auto"
+    },
+    {
+      "name": "stage3+staged · satellite tap1 reveals it in place, the planet keeps its seat",
+      "pass": true,
+      "detail": "\"風呂敷\" reading=1 english=1 centre \"救う\"→\"救う\" family unchanged=true"
+    },
+    {
+      "name": "stage3+staged · satellite tap2 makes it the centre with its own family",
+      "pass": true,
+      "detail": "centre \"救う\"→\"風呂敷\" forefront=true family=14 (new set=true)"
+    },
+    {
+      "name": "stage3+staged · the tapped satellite never disappears",
+      "pass": true,
+      "detail": "present after tap1=true, after tap2=true"
+    },
+    {
+      "name": "stage3+staged · the tapped satellite stays reachable and present",
+      "pass": true,
+      "detail": "tap1 op=0.95 pe=auto · tap2 op=0.968 pe=auto"
+    },
+    {
+      "name": "stage3+staged · no page or console errors",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "stage3+recenter · centre rung1 = forefront + family + reading",
+      "pass": true,
+      "detail": "\"救う\" forefront=true family=14 reading=1 english=0 stack=0"
+    },
+    {
+      "name": "stage3+recenter · centre rung2 = English",
+      "pass": true,
+      "detail": "reading=1 english=1 stack=0"
+    },
+    {
+      "name": "stage3+recenter · centre rung3 = entry (and no rung before it dived)",
+      "pass": true,
+      "detail": "stack after taps 1/2/3 = 0/0/1"
+    },
+    {
+      "name": "stage3+recenter · the walked word never disappears",
+      "pass": true,
+      "detail": "present at every rung: true,true,true,true"
+    },
+    {
+      "name": "stage3+recenter · the word under the finger stays reachable and present at every rung",
+      "pass": true,
+      "detail": "tap1 op=0.95 pe=auto · tap2 op=0.97 pe=auto · tap3 op=0.999 pe=auto"
+    },
+    {
+      "name": "stage3+recenter · satellite tap1 recentres it at once with its own family",
+      "pass": true,
+      "detail": "centre \"救う\"→\"風呂敷\" forefront=true family=14 (new set=true)"
+    },
+    {
+      "name": "stage3+recenter · the recentred satellite lands on rung 1 of stage3",
+      "pass": true,
+      "detail": "reading=1 (want 1) english=0, satellite carries a reading=true"
+    },
+    {
+      "name": "stage3+recenter · the tapped satellite never disappears",
+      "pass": true,
+      "detail": "present after tap1=true"
+    },
+    {
+      "name": "stage3+recenter · the tapped satellite stays reachable and present",
+      "pass": true,
+      "detail": "tap1 op=0.967 pe=auto"
+    },
+    {
+      "name": "stage3+recenter · no page or console errors",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "stage4+staged · centre rung1 = forefront + family, nothing read",
+      "pass": true,
+      "detail": "\"救う\" forefront=true family=14 reading=0 english=0 stack=0"
+    },
+    {
+      "name": "stage4+staged · centre rung2 = reading, still no English",
+      "pass": true,
+      "detail": "reading=1 english=0 stack=0"
+    },
+    {
+      "name": "stage4+staged · centre rung3 = English",
+      "pass": true,
+      "detail": "reading=1 english=1 stack=0"
+    },
+    {
+      "name": "stage4+staged · centre rung4 = entry (and no rung before it dived)",
+      "pass": true,
+      "detail": "stack after taps 1/2/3/4 = 0/0/0/1"
+    },
+    {
+      "name": "stage4+staged · the extra rung does not rebuild the family under the finger",
+      "pass": true,
+      "detail": "family 14→14, centre \"救う\"→\"救う\""
+    },
+    {
+      "name": "stage4+staged · the walked word never disappears",
+      "pass": true,
+      "detail": "present at every rung: true,true,true,true,true"
+    },
+    {
+      "name": "stage4+staged · the word under the finger stays reachable and present at every rung",
+      "pass": true,
+      "detail": "tap1 op=0.957 pe=auto · tap2 op=0.97 pe=auto · tap3 op=0.97 pe=auto · tap4 op=0.999 pe=auto"
+    },
+    {
+      "name": "stage4+staged · satellite tap1 reveals it in place, the planet keeps its seat",
+      "pass": true,
+      "detail": "\"風呂敷\" reading=1 english=1 centre \"救う\"→\"救う\" family unchanged=true"
+    },
+    {
+      "name": "stage4+staged · satellite tap2 makes it the centre with its own family",
+      "pass": true,
+      "detail": "centre \"救う\"→\"風呂敷\" forefront=true family=14 (new set=true)"
+    },
+    {
+      "name": "stage4+staged · the tapped satellite never disappears",
+      "pass": true,
+      "detail": "present after tap1=true, after tap2=true"
+    },
+    {
+      "name": "stage4+staged · the tapped satellite stays reachable and present",
+      "pass": true,
+      "detail": "tap1 op=0.949 pe=auto · tap2 op=0.968 pe=auto"
+    },
+    {
+      "name": "stage4+staged · no page or console errors",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "stage4+recenter · centre rung1 = forefront + family, nothing read",
+      "pass": true,
+      "detail": "\"救う\" forefront=true family=14 reading=0 english=0 stack=0"
+    },
+    {
+      "name": "stage4+recenter · centre rung2 = reading, still no English",
+      "pass": true,
+      "detail": "reading=1 english=0 stack=0"
+    },
+    {
+      "name": "stage4+recenter · centre rung3 = English",
+      "pass": true,
+      "detail": "reading=1 english=1 stack=0"
+    },
+    {
+      "name": "stage4+recenter · centre rung4 = entry (and no rung before it dived)",
+      "pass": true,
+      "detail": "stack after taps 1/2/3/4 = 0/0/0/1"
+    },
+    {
+      "name": "stage4+recenter · the extra rung does not rebuild the family under the finger",
+      "pass": true,
+      "detail": "family 14→14, centre \"救う\"→\"救う\""
+    },
+    {
+      "name": "stage4+recenter · the walked word never disappears",
+      "pass": true,
+      "detail": "present at every rung: true,true,true,true,true"
+    },
+    {
+      "name": "stage4+recenter · the word under the finger stays reachable and present at every rung",
+      "pass": true,
+      "detail": "tap1 op=0.956 pe=auto · tap2 op=0.97 pe=auto · tap3 op=0.97 pe=auto · tap4 op=0.999 pe=auto"
+    },
+    {
+      "name": "stage4+recenter · satellite tap1 recentres it at once with its own family",
+      "pass": true,
+      "detail": "centre \"救う\"→\"風呂敷\" forefront=true family=14 (new set=true)"
+    },
+    {
+      "name": "stage4+recenter · the recentred satellite lands on rung 1 of stage4",
+      "pass": true,
+      "detail": "reading=0 (want 0) english=0, satellite carries a reading=true"
+    },
+    {
+      "name": "stage4+recenter · the tapped satellite never disappears",
+      "pass": true,
+      "detail": "present after tap1=true"
+    },
+    {
+      "name": "stage4+recenter · the tapped satellite stays reachable and present",
+      "pass": true,
+      "detail": "tap1 op=0.967 pe=auto"
+    },
+    {
+      "name": "stage4+recenter · no page or console errors",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "leak · after stage4+recenter and back, the ladder is three rungs again",
+      "pass": true,
+      "detail": "seam=stage3/staged · rung1 reading=1 forefront=true family=14 · rung2 english=1 · rung3 stack=1"
+    },
+    {
+      "name": "leak · no errors on the round trip",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "default · an unset field is stage3 + staged",
+      "pass": true,
+      "detail": "stage3 / staged"
+    },
+    {
+      "name": "default · unset centre ladder is 3 rungs, reading on the first",
+      "pass": true,
+      "detail": "rung1 reading=1/english=0/forefront=true · rung2 english=1 · rung3 stack=1"
+    },
+    {
+      "name": "default · unset satellite tap reveals in place, second tap recentres",
+      "pass": true,
+      "detail": "tap1 reading/english=1/1 centre held=\"救う\" · tap2 centre=\"風呂敷\""
+    },
+    {
+      "name": "default · no errors",
+      "pass": true,
+      "detail": "0 new"
+    },
+    {
+      "name": "zero console/page errors across the whole matrix",
+      "pass": true,
+      "detail": "none"
+    }
+  ],
+  "matrix": {
+    "stage3+staged": {
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.5,
+            "cy": 447.2
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.942,
+            "pe": "auto",
+            "cx": 220.4,
+            "cy": 448.5
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 231.7,
+            "cy": 447.4
+          },
+          {
+            "tap": 3,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.8,
+            "cy": 339.6
+          }
+        ]
+      },
+      "sat": {
+        "centre": "救う",
+        "centreBefore": "救う",
+        "sat": "風呂敷",
+        "satReading": "ふろしき",
+        "famBefore": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s0": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.924,
+          "pe": "auto",
+          "cx": 112,
+          "cy": 622.6
+        },
+        "s1": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.95,
+          "pe": "auto",
+          "cx": 117.2,
+          "cy": 624.4
+        },
+        "fam1": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s2": {
+          "stack": 0,
+          "family": 14,
+          "centre": "風呂敷",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": true,
+          "satellite": false,
+          "op": 0.968,
+          "pe": "auto",
+          "cx": 185.6,
+          "cy": 395.4
+        },
+        "fam2": "お風呂·台風·屋敷·座敷·扇風機·暴風·気風·洋風·風·風景·風船·風車·風邪·～風"
+      },
+      "newErrors": 0
+    },
+    "stage3+recenter": {
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.1,
+            "cy": 447.8
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.95,
+            "pe": "auto",
+            "cx": 220.3,
+            "cy": 448.7
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 230.4,
+            "cy": 447.3
+          },
+          {
+            "tap": 3,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.6,
+            "cy": 339.3
+          }
+        ]
+      },
+      "sat": {
+        "centre": "救う",
+        "centreBefore": "救う",
+        "sat": "風呂敷",
+        "satReading": "ふろしき",
+        "famBefore": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s0": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.924,
+          "pe": "auto",
+          "cx": 112.1,
+          "cy": 622.5
+        },
+        "s1": {
+          "stack": 0,
+          "family": 14,
+          "centre": "風呂敷",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 0,
+          "forefront": true,
+          "satellite": false,
+          "op": 0.967,
+          "pe": "auto",
+          "cx": 182.6,
+          "cy": 395
+        },
+        "fam1": "お風呂·台風·屋敷·座敷·扇風機·暴風·気風·洋風·風·風景·風船·風車·風邪·～風",
+        "s2": null,
+        "fam2": null
+      },
+      "newErrors": 0
+    },
+    "stage4+staged": {
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.7,
+            "cy": 447.5
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.957,
+            "pe": "auto",
+            "cx": 221.1,
+            "cy": 447.8
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 232.9,
+            "cy": 448.4
+          },
+          {
+            "tap": 3,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 238.8,
+            "cy": 449.1
+          },
+          {
+            "tap": 4,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.6,
+            "cy": 339.2
+          }
+        ]
+      },
+      "sat": {
+        "centre": "救う",
+        "centreBefore": "救う",
+        "sat": "風呂敷",
+        "satReading": "ふろしき",
+        "famBefore": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s0": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.913,
+          "pe": "auto",
+          "cx": 112.4,
+          "cy": 619.4
+        },
+        "s1": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.949,
+          "pe": "auto",
+          "cx": 118.4,
+          "cy": 624.7
+        },
+        "fam1": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s2": {
+          "stack": 0,
+          "family": 14,
+          "centre": "風呂敷",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": true,
+          "satellite": false,
+          "op": 0.968,
+          "pe": "auto",
+          "cx": 185.8,
+          "cy": 395.4
+        },
+        "fam2": "お風呂·台風·屋敷·座敷·扇風機·暴風·気風·洋風·風·風景·風船·風車·風邪·～風"
+      },
+      "newErrors": 0
+    },
+    "stage4+recenter": {
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.5,
+            "cy": 447.9
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.956,
+            "pe": "auto",
+            "cx": 220.9,
+            "cy": 448
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 233.2,
+            "cy": 448.4
+          },
+          {
+            "tap": 3,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 239,
+            "cy": 448.8
+          },
+          {
+            "tap": 4,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.6,
+            "cy": 339.2
+          }
+        ]
+      },
+      "sat": {
+        "centre": "救う",
+        "centreBefore": "救う",
+        "sat": "風呂敷",
+        "satReading": "ふろしき",
+        "famBefore": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s0": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.919,
+          "pe": "auto",
+          "cx": 112.2,
+          "cy": 621.3
+        },
+        "s1": {
+          "stack": 0,
+          "family": 14,
+          "centre": "風呂敷",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": true,
+          "satellite": false,
+          "op": 0.967,
+          "pe": "auto",
+          "cx": 183.4,
+          "cy": 382.5
+        },
+        "fam1": "お風呂·台風·屋敷·座敷·扇風機·暴風·気風·洋風·風·風景·風船·風車·風邪·～風",
+        "s2": null,
+        "fam2": null
+      },
+      "newErrors": 0
+    },
+    "leak-check": {
+      "away": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.4,
+            "cy": 447.7
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.955,
+            "pe": "auto",
+            "cx": 220.8,
+            "cy": 448.1
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 232.7,
+            "cy": 447.9
+          },
+          {
+            "tap": 3,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 239.4,
+            "cy": 448.5
+          },
+          {
+            "tap": 4,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.6,
+            "cy": 339.2
+          }
+        ]
+      },
+      "back": {
+        "ladder": "stage3",
+        "satTap": "staged"
+      },
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.461,
+            "pe": "auto",
+            "cx": 219.6,
+            "cy": 453.7
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.955,
+            "pe": "auto",
+            "cx": 216.7,
+            "cy": 451.9
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 228.1,
+            "cy": 455.4
+          },
+          {
+            "tap": 3,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.5,
+            "cy": 339.3
+          }
+        ]
+      }
+    },
+    "untouched-default": {
+      "got": {
+        "ladder": "stage3",
+        "satTap": "staged"
+      },
+      "centre": {
+        "word": "救う",
+        "reading": "すくう",
+        "steps": [
+          {
+            "tap": 0,
+            "stack": 0,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 0,
+            "english": 0,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.457,
+            "pe": "auto",
+            "cx": 216.9,
+            "cy": 447.5
+          },
+          {
+            "tap": 1,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 0,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.958,
+            "pe": "auto",
+            "cx": 221.5,
+            "cy": 447.5
+          },
+          {
+            "tap": 2,
+            "stack": 0,
+            "family": 14,
+            "centre": "救う",
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": true,
+            "satellite": false,
+            "op": 0.97,
+            "pe": "auto",
+            "cx": 233,
+            "cy": 447.9
+          },
+          {
+            "tap": 3,
+            "stack": 1,
+            "family": 0,
+            "centre": null,
+            "lockOn": false,
+            "present": true,
+            "reading": 1,
+            "english": 1,
+            "forefront": false,
+            "satellite": false,
+            "op": 0.999,
+            "pe": "auto",
+            "cx": 195.7,
+            "cy": 339.3
+          }
+        ]
+      },
+      "sat": {
+        "centre": "救う",
+        "centreBefore": "救う",
+        "sat": "風呂敷",
+        "satReading": "ふろしき",
+        "famBefore": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s0": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 0,
+          "english": 0,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.926,
+          "pe": "auto",
+          "cx": 112.3,
+          "cy": 622.8
+        },
+        "s1": {
+          "stack": 0,
+          "family": 14,
+          "centre": "救う",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": false,
+          "satellite": true,
+          "op": 0.95,
+          "pe": "auto",
+          "cx": 118.8,
+          "cy": 624.9
+        },
+        "fam1": "一昨昨日·光熱費·御無沙汰·救い·救助·救援·救済·漁業·無沙汰·無邪気·素っ気無い·郵便局·風呂敷·飽和",
+        "s2": {
+          "stack": 0,
+          "family": 14,
+          "centre": "風呂敷",
+          "lockOn": false,
+          "present": true,
+          "reading": 1,
+          "english": 1,
+          "forefront": true,
+          "satellite": false,
+          "op": 0.969,
+          "pe": "auto",
+          "cx": 188.3,
+          "cy": 350.5
+        },
+        "fam2": "お風呂·台風·屋敷·座敷·扇風機·暴風·気風·洋風·風·風景·風船·風車·風邪·～風"
+      }
+    }
+  },
+  "errs": []
+}

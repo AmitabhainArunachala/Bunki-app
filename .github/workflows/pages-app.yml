@@ -1,16 +1,16 @@
 name: pages-app
 
-# Publishes Bunki as ONE app to GitHub Pages. The opening surface — Drift, the
-# living-universe of the whole lexicon — is the site root: open Bunki and you
-# are in the universe. The study screens (capture, session, word, kanji) live
-# beneath it at /app/, and a quiet link carries you in. Server-backed flows stay
-# in their designed local/offline mode; this is the static client build.
+# Publishes ONE app to GitHub Pages: the 回廊 corridor — the comprehensive
+# prototype. Its own front door is the Drift universe; the shelf, reader,
+# dictionary, and memorize loop live behind it. There is no second version:
+# the old standalone-Drift root page and the separate study-app path were
+# retired when the corridor became the whole product (operator direction,
+# 2026-08-10 — "one comprehensive full prototype").
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'apps/app/**'
       - 'prototypes/drift/drift-artifact.html'
       - 'prototypes/corridor/**'
       - '.github/workflows/pages-app.yml'
@@ -36,42 +36,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm ci
-
-      # The study app is served under /<repo>/app/, so its web bundle must be
-      # built with that base path or every absolute asset URL 404s. Build-time
-      # mutation only — the committed app.json stays base-less so the e2e suite
-      # keeps serving the app at root.
-      - name: Set Pages base path on the web build
-        working-directory: apps/app
-        env:
-          BASE: ${{ github.event.repository.name }}
-        run: |
-          node -e '
-            const fs = require("fs");
-            const a = JSON.parse(fs.readFileSync("app.json", "utf8"));
-            a.expo.experiments = { ...(a.expo.experiments || {}), baseUrl: "/" + process.env.BASE + "/app" };
-            fs.writeFileSync("app.json", JSON.stringify(a, null, 2));
-            console.log("baseUrl set to /" + process.env.BASE + "/app");
-          '
-
-      - name: Export the web bundle
-        working-directory: apps/app
-        run: npx expo export --platform web
-
       - name: Assemble the Pages site
         run: |
           set -euo pipefail
           # This directory's CONTENTS are served at https://<owner>.github.io/<repo>/,
-          # so index.html must sit at its root — no extra <repo>/ nesting.
+          # so the corridor's index.html sits at the root — the corridor IS the site.
           SITE="$RUNNER_TEMP/site"
-          mkdir -p "$SITE/app" "$SITE/corridor"
+          mkdir -p "$SITE"
 
-          # 回廊 KAIRO — the corridor prototype. A self-contained static surface
-          # at its own path, so nothing above it changes. Deliberately
-          # disposable: it is an instrument for deciding the open Wayfinder
-          # tickets, not a product surface.
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
@@ -79,40 +51,14 @@ jobs:
                 prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
                 prototypes/corridor/vendor \
-                "$SITE/corridor"/
+                "$SITE"/
 
-          # The study app beneath the opening surface.
-          cp -r apps/app/dist/* "$SITE/app"/
-          # SPA fallback so the app's dynamic routes (/app/kanji/<char>) resolve
-          # on a static host: any unknown path under /app/ boots the app, whose
-          # client router then reads the URL.
-          cp apps/app/dist/index.html "$SITE/app"/404.html
-
-          # The opening surface IS the root. Drift is self-contained; it is
-          # wrapped into a full document with one quiet link into the study app.
-          DRIFT_LINK='<a href="app/" id="to-study" style="position:fixed;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9;font:13px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;letter-spacing:.12em;color:var(--pig2,#165e83);text-decoration:none;border:1px solid var(--line,rgba(0,0,0,.2));border-radius:999px;padding:7px 13px;background:var(--plaque,rgba(255,255,255,.9))">辞書へ →</a>'
-          {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";</script></head><body>'
-            cat prototypes/drift/drift-artifact.html
-            printf '%s' "$DRIFT_LINK"
-            printf '%s' '</body></html>'
-          } > "$SITE/index.html"
-
-          # GitHub Pages uses ONE site-root 404 for every miss. So this 404
-          # dispatches: a miss under /app/ (a client-side app route refreshed or
-          # deep-linked) boots the study app; every other miss falls into the
-          # universe. The redirect runs in <head> before the Drift body loads,
-          # so Drift never initialises on an app-bound miss.
-          {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";(function(){var p=location.pathname,i=p.indexOf("/app/");if(i>-1){try{sessionStorage.setItem("bunki-deep-link",p+location.search+location.hash)}catch(e){}location.replace(p.slice(0,i)+"/app/")}})();</script></head><body>'
-            cat prototypes/drift/drift-artifact.html
-            printf '%s' "$DRIFT_LINK"
-            printf '%s' '</body></html>'
-          } > "$SITE/404.html"
+          # One app means one landing: any missed path returns to the front door.
+          cp prototypes/corridor/index.html "$SITE/404.html"
 
           echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
 
-      - name: Smoke-test packaged Corridor assets
+      - name: Smoke-test packaged assets
         shell: bash
         run: |
           set -euo pipefail
@@ -123,14 +69,14 @@ jobs:
 
           node --input-type=module <<'NODE'
           const paths = [
-            'corridor/',
-            'corridor/corridor.css',
-            'corridor/corridor.js',
-            'corridor/drift-layer.css',
-            'corridor/drift-layer.js',
-            'corridor/vendor/ts-fsrs.mjs',
-            'corridor/data/manifest.json',
-            'corridor/data/articles/index.json',
+            '',
+            'corridor.css',
+            'corridor.js',
+            'drift-layer.css',
+            'drift-layer.js',
+            'vendor/ts-fsrs.mjs',
+            'data/manifest.json',
+            'data/articles/index.json',
           ];
           for (const path of paths) {
             let response;
@@ -153,11 +99,6 @@ jobs:
           name: bunki-app-static
           path: ${{ env.SITE_DIR }}
 
-      # Pages may not be enabled by the workflow token on a private repo
-      # (configure-pages: "Resource not accessible by integration"). Attempt it,
-      # but treat unavailability as a skip, not a failure — the build above is
-      # the verified deliverable either way. Once Pages is enabled in
-      # Settings -> Pages (source: GitHub Actions), this deploys for real.
       - id: cfg
         continue-on-error: true
         uses: actions/configure-pages@v5
@@ -175,17 +116,14 @@ jobs:
         run: |
           if [ "${{ steps.cfg.outcome }}" = "success" ]; then
             {
-              echo "### Pages deployed"
+              echo "### Pages deployed — one app"
               echo ""
-              echo "- Bunki (opens in Drift): ${{ steps.deployment.outputs.page_url }}"
-              echo "- Study app: ${{ steps.deployment.outputs.page_url }}app/"
-              echo "- 回廊 corridor prototype: ${{ steps.deployment.outputs.page_url }}corridor/"
+              echo "- 回廊 KAIRO (opens in the Drift): ${{ steps.deployment.outputs.page_url }}"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             {
               echo "### Pages not enabled on this repository"
               echo ""
               echo "Build succeeded and is attached as the **bunki-app-static** artifact."
-              echo "To get a live URL: Settings -> Pages -> Source: **GitHub Actions**, then re-run."
             } >> "$GITHUB_STEP_SUMMARY"
           fi

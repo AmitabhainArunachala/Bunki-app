@@ -1,0 +1,112 @@
+{
+  "NORMAL": {
+    "motion": {
+      "n": 64,
+      "dtSec": 4.13,
+      "medianSpeedPxPerSec": 4.46,
+      "maxSpeedPxPerSec": 9.43,
+      "agreement": {
+        "<100": 0.689,
+        "100-200": 0.732,
+        "200-300": 0.743,
+        ">300": 0.665
+      },
+      "pairCounts": {
+        "<100": 97,
+        "100-200": 172,
+        "200-300": 326,
+        ">300": 1421
+      }
+    },
+    "law": {
+      "maxExcursionOx": 24.04,
+      "maxExcursionOy": 20.06,
+      "wanderBox": "±16/±12",
+      "offScreenSamples": 1776,
+      "offScreenWords": [
+        "炊く",
+        "書物",
+        "見解",
+        "男の人",
+        "今にも",
+        "納める",
+        "過程",
+        "差別"
+      ],
+      "underChromeAtReadingSamples": 0,
+      "underChromeWords": [],
+      "minRenderedOp": 0.327
+    },
+    "interactions": {
+      "word": "救う",
+      "afterTap1": "word unfolded bctr",
+      "afterTap2": "word unfolded bctr glossed",
+      "ladderOk": true,
+      "flick": {
+        "word": "救い",
+        "trayBefore": "",
+        "trayAfter": "",
+        "graded": false
+      }
+    },
+    "calm": {
+      "calmAtRest": 1
+    },
+    "errs": []
+  },
+  "REDUCED-MOTION": {
+    "motion": {
+      "n": 64,
+      "dtSec": 4.1,
+      "medianSpeedPxPerSec": 0,
+      "maxSpeedPxPerSec": 0,
+      "agreement": {
+        "<100": null,
+        "100-200": null,
+        "200-300": null,
+        ">300": null
+      },
+      "pairCounts": {
+        "<100": 0,
+        "100-200": 0,
+        "200-300": 0,
+        ">300": 0
+      }
+    },
+    "law": {
+      "maxExcursionOx": 0,
+      "maxExcursionOy": 0,
+      "wanderBox": "±16/±12",
+      "offScreenSamples": 1860,
+      "offScreenWords": [
+        "炊く",
+        "書物",
+        "見解",
+        "男の人",
+        "今にも",
+        "納める",
+        "過程",
+        "差別"
+      ],
+      "underChromeAtReadingSamples": 0,
+      "underChromeWords": [],
+      "minRenderedOp": 0.327
+    },
+    "interactions": {
+      "word": "救う",
+      "afterTap1": "word unfolded bctr",
+      "afterTap2": "word unfolded bctr glossed",
+      "ladderOk": true,
+      "flick": {
+        "word": "救い",
+        "trayBefore": "",
+        "trayAfter": "",
+        "graded": false
+      }
+    },
+    "calm": {
+      "calmAtRest": 1
+    },
+    "errs": []
+  }
+}
