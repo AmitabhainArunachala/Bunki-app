@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-10 16:22",
+          "2026-08-10 16:46",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-10 16:27",
+          "2026-08-10 16:51",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-10 16:31",
+          "2026-08-10 16:55",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-18 16:21",
+          "2026-08-18 16:45",
           "8.30"
         ]
       ]
@@ -6030,7 +6030,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 343,
+  "loadMs": 337,
   "summary": {
     "total": 91,
     "failed": 0
@@ -6059,7 +6059,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.5800018310547,\"y\":570.9400024414062,\"productive\":true}"
+      "detail": "{\"x\":147.61000061035156,\"y\":570.8400268554688,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6079,7 +6079,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 343 ms"
+      "detail": "40 texts, ready in 337 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
