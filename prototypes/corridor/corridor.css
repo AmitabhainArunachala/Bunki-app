@@ -356,6 +356,10 @@ h1.view-title {
 
 .reader ruby {
   ruby-position: over;
+  /* A reading wider than its word must OVERHANG, not pry the word apart:
+   * the browser default justifies base glyphs to the ruby's width, which
+   * splits 拡張 into 拡 張 mid-word. Center keeps the word whole. */
+  ruby-align: center;
 }
 
 /* paragraph break — the article files carry paragraph starts, the reader
@@ -2164,4 +2168,157 @@ body.v-depth-layered .stroke-page {
   .stroke-stage {
     width: min(100%, 480px);
   }
+}
+
+/* ==================================================== v2.0 · 2026-08-10 ===
+ * 筆順 as ink on washi. The stroke room stops being a whiteboard: warm paper
+ * sheet, sumi bleed under every stroke, four pigments to write with, and a
+ * quiet composition. Operator direction: thin, minimal, gentle, artistic.
+ */
+
+.stroke-page {
+  --stroke-ink: #1c1e21; /* 墨 */
+  background:
+    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.016) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.012) 0 1px, transparent 1px),
+    var(--ground);
+  background-size: 13px 13px, 19px 19px, auto;
+}
+
+.stroke-page[data-ink='bengara'] { --stroke-ink: #9e2b25; }
+.stroke-page[data-ink='ai']      { --stroke-ink: #2e4d6e; }
+.stroke-page[data-ink='rokusho'] { --stroke-ink: #3a6a52; }
+
+/* the sheet of paper the hand writes on */
+.stroke-stage {
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255, 253, 246, 0.9), transparent 60%),
+    radial-gradient(90% 120% at 75% 80%, rgba(20, 24, 28, 0.025), transparent 55%),
+    var(--ground-0);
+  border: 1px solid rgba(20, 24, 28, 0.07);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 26px rgba(20, 24, 28, 0.035),
+    0 2px 14px rgba(20, 24, 28, 0.05);
+}
+
+/* the writing guide: a paper crease, not a chart grid */
+.stroke-grid line {
+  stroke: rgba(20, 24, 28, 0.055);
+  stroke-dasharray: none;
+}
+
+/* where the hand is going: a breath of the finished glyph */
+.stroke-guide path {
+  stroke: rgba(20, 24, 28, 0.075);
+}
+
+/* the ink itself — crisp line over its own bleed */
+.stroke-ink path {
+  stroke: var(--stroke-ink);
+}
+
+.stroke-bleed path {
+  fill: none;
+  stroke: var(--stroke-ink);
+  stroke-width: 9.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.13;
+}
+
+.stroke-num {
+  fill: var(--stroke-ink);
+  opacity: 0.55;
+}
+
+/* the count: a margin note, not a scoreboard */
+.stroke-readout {
+  font-family: var(--serif);
+}
+
+.stroke-count {
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.stroke-count-unit {
+  font-size: 11px;
+  color: var(--faint);
+  letter-spacing: 0.14em;
+}
+
+/* controls in one quiet register — outline chips, serif, no black slab */
+.stroke-controls button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-family: var(--serif);
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.stroke-controls button.primary {
+  background: transparent;
+  color: var(--ai);
+  border-color: color-mix(in srgb, var(--ai) 55%, var(--line));
+}
+
+.stroke-controls button[aria-pressed='true'] {
+  /* the pressed state writes with the chosen pigment, not a black slab */
+  background: var(--stroke-ink, var(--ink));
+  color: var(--ground-0, var(--ground));
+  border-color: var(--stroke-ink, var(--ink));
+}
+
+/* 顔料 — the four inks */
+.stroke-inks {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.ink-dot {
+  position: relative;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.ink-dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.14);
+}
+
+.ink-dot[data-ink='sumi']::after    { background: #1c1e21; }
+.ink-dot[data-ink='bengara']::after { background: #9e2b25; }
+.ink-dot[data-ink='ai']::after      { background: #2e4d6e; }
+.ink-dot[data-ink='rokusho']::after { background: #3a6a52; }
+
+.ink-dot[aria-pressed='true']::after {
+  outline: 1.5px solid var(--ink-2);
+  outline-offset: 3px;
+}
+
+.ink-dot:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+}
+
+.stroke-meta {
+  font-family: var(--serif);
+  letter-spacing: 0.05em;
 }

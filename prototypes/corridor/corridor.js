@@ -410,10 +410,15 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
+  let anyVariantParam = params.get('variants') === '1';
   for (const key of Object.keys(VARIANTS)) {
     const v = params.get(key);
-    if (v && VARIANTS[key].options.some(([id]) => id === v)) S.variants[key] = v;
+    if (v && VARIANTS[key].options.some(([id]) => id === v)) {
+      S.variants[key] = v;
+      anyVariantParam = true;
+    }
   }
+  S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
   loadStore();
   if (params.get('dials')) {
@@ -1018,7 +1023,7 @@ function renderShelfBody() {
     const details = el('button', 'details-toggle');
     details.type = 'button';
     details.dataset.details = p.id;
-    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details · raw signals');
+    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
     details.addEventListener('click', (ev) => {
       ev.stopPropagation();
       (S.detailsOpen ||= new Set());
@@ -1228,13 +1233,13 @@ const readingsAlwaysOn = () => S.dials.furigana === 2;
 function tapLadderHint() {
   if (readingsAlwaysOn()) {
     return tx(
-      '触れる＝英語 · もう一度＝全項目 · フォーカス＝長押し不要の操作',
-      'activate = English · again = full entry · focus = no-hold actions',
+      'ことばに触れると英語、もう一度で辞書が開く',
+      'tap a word for English — tap again to open its entry',
     );
   }
   return tx(
-    '触れる＝ふりがな · もう一度＝英語 · 三回目＝全項目 · フォーカス＝長押し不要の操作',
-    'activate = reading · again = English · third = full entry · focus = no-hold actions',
+    '触れるとふりがな、もう一度で英語、三回目で辞書',
+    'tap a word for its reading — again for English, once more for its entry',
   );
 }
 
@@ -2743,6 +2748,7 @@ function strokeDoor(k) {
  * by the step-through control once per press. */
 function paintStrokes(page, shown, progress = 1) {
   const paths = [...page.querySelectorAll('.stroke-ink path')];
+  const bleeds = [...page.querySelectorAll('.stroke-bleed path')];
   const total = paths.length;
   paths.forEach((path, i) => {
     const len = Number(path.dataset.len) || 0;
@@ -2750,6 +2756,7 @@ function paintStrokes(page, shown, progress = 1) {
     if (i < shown - 1) offset = 0;
     else if (i === shown - 1) offset = len * (1 - progress);
     path.style.strokeDashoffset = String(offset);
+    if (bleeds[i]) bleeds[i].style.strokeDashoffset = String(offset);
   });
   for (const [i, num] of [...page.querySelectorAll('.stroke-num')].entries()) {
     num.style.opacity = i < shown ? '1' : '0';
@@ -2773,13 +2780,18 @@ function paintStrokes(page, shown, progress = 1) {
 function startStrokeAnimation(page) {
   cancelStrokeAnimation();
   const paths = [...page.querySelectorAll('.stroke-ink path')];
+  const bleeds = [...page.querySelectorAll('.stroke-bleed path')];
   if (!paths.length) return;
-  for (const path of paths) {
+  paths.forEach((path, i) => {
     const len = path.getTotalLength();
     path.dataset.len = String(len);
     path.style.strokeDasharray = `${len} ${len}`;
     path.style.strokeDashoffset = String(len);
-  }
+    if (bleeds[i]) {
+      bleeds[i].style.strokeDasharray = `${len} ${len}`;
+      bleeds[i].style.strokeDashoffset = String(len);
+    }
+  });
   const total = paths.length;
 
   if (strokeReduced()) {
@@ -2877,6 +2889,7 @@ function renderStrokePage(root) {
   page.dataset.motion = reduced ? 'reduced' : 'full';
   page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
   page.dataset.state = paths.length ? 'drawing' : 'nodata';
+  page.dataset.ink = S.strokeInk || 'sumi';
 
   const bar = el('div', 'stroke-bar');
   const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
@@ -2952,6 +2965,18 @@ function renderStrokePage(root) {
     }
     svg.append(guide);
 
+    // 滲み — the ink's soft bleed into the paper, a wider ghost of each
+    // stroke beneath the crisp line. Two passes read as sumi on washi where
+    // one uniform line reads as marker on cardboard.
+    const bleed = document.createElementNS(SVG_NS, 'g');
+    bleed.setAttribute('class', 'stroke-bleed');
+    for (const d of paths) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('d', d);
+      bleed.append(p);
+    }
+    svg.append(bleed);
+
     const ink = document.createElementNS(SVG_NS, 'g');
     ink.setAttribute('class', 'stroke-ink');
     for (const d of paths) {
@@ -3009,6 +3034,31 @@ function renderStrokePage(root) {
       replay.addEventListener('click', () => startStrokeAnimation(page));
       controls.append(replay);
     }
+
+    // 顔料 — four inks. A quiet row of pigment dots; the page holds the choice.
+    const inks = el('div', 'stroke-inks');
+    inks.setAttribute('role', 'group');
+    inks.setAttribute('aria-label', tx('墨の色', 'ink color'));
+    for (const [id, name] of [
+      ['sumi', '墨'],
+      ['bengara', '弁柄'],
+      ['ai', '藍'],
+      ['rokusho', '緑青'],
+    ]) {
+      const dot = el('button', 'ink-dot');
+      dot.type = 'button';
+      dot.dataset.ink = id;
+      dot.setAttribute('aria-label', name);
+      dot.setAttribute('aria-pressed', String((S.strokeInk || 'sumi') === id));
+      dot.addEventListener('click', () => {
+        S.strokeInk = id;
+        page.dataset.ink = id;
+        for (const d of inks.querySelectorAll('.ink-dot'))
+          d.setAttribute('aria-pressed', String(d.dataset.ink === id));
+      });
+      inks.append(dot);
+    }
+    body.append(inks);
 
     const numbers = strokeControl('stroke-numbers', '番号', 'stroke numbers');
     numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
@@ -3283,6 +3333,11 @@ function licencePanel() {
 
 /* --------------------------------------------------------- debug strip */
 function renderVariants(root) {
+  // The variants strip is an operator's instrument, not part of the app. It
+  // taped a black band of developer vocabulary across every surface — the
+  // reader, the drift, the entry sheets. It now appears only when summoned:
+  // ?variants=1 (or any variant/debug URL parameter already present).
+  if (!S.variantsBar) return;
   const bar = el('div');
   bar.id = 'variants';
   const top = el('div', 'vbar');

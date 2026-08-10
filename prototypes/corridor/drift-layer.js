@@ -224,7 +224,8 @@ let fdpr=1;
 function sizeCanvases(){
   ink.width=Math.max(1,Math.round(vw()*0.5)); ink.height=Math.max(1,Math.round(vh()*0.5));
   stainCv.width=ink.width; stainCv.height=ink.height;
-  fdpr=Math.min(devicePixelRatio||1,1.5);
+  fdpr=1; // fx carries soft motes/lines only — 1x pixels, upscaled by the compositor;
+  // 1.5x tripled the per-frame raster upload for no visible gain in soft content
   fx.width=Math.round(vw()*fdpr); fx.height=Math.round(vh()*fdpr);
   renderPaper();
 }
@@ -651,7 +652,12 @@ let seq=0,gathered=Number(store.lu)||0,settled=Number(store.lk)||0,maxDepth=0;
 const stack=[];
 let journey=[];
 
-function setBlur(n,b){ if(n.blur!==b){n.blur=b;n.el.style.filter=b?("blur("+b+"px)"):"";} }
+function setBlur(n,b){
+  // depth used to be a CSS blur; blurred TEXT re-rasterizes on every transform
+  // change (9x the pixels at DPR 3) and reads as smudge, not distance. Depth
+  // is now pure atmospheric paling: farther = quieter, never fuzzier.
+  if(n.blur!==b){n.blur=b; n.blurDim=b?(b>=3?0.55:0.8):1; if(n.el.style.filter)n.el.style.filter="";}
+}
 function spawnWord(entry,x,y,fadeIn){
   const w=entry[0],r=entry[1],g=entry[2],p=entry[4]||"",lvl=entry[5]||3;
   const i=seq++;
@@ -946,13 +952,30 @@ function bloomFocus(n){
   const cands=[];
   const seenB=new Set([n.w]);
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
-  for(const wr of WORDS){
-    const w=wr.e[0];
+  // The family of the FIRST tap is a family of meaning. Authored SEM relations
+  // lead when they exist; then rarity-weighted gloss kinship; a shared glyph is
+  // a bonus that lifts true compounds, never the reason a stranger appears.
+  if(!WTOK) buildGlossIndex();
+  const semList=SEM[n.w]||null;
+  const semRank=Object.create(null);
+  if(semList) semList.forEach((se,i)=>{semRank[se[0]]=i;});
+  const selfIx=WORDIX[n.w]?WORDS.indexOf(WORDIX[n.w]):-1;
+  const selfSetB=new Set(selfIx>=0?WTOK[selfIx]:glossTokens(n.g||""));
+  for(let i=0;i<WORDS.length;i++){
+    const wr=WORDS[i], w=wr.e[0];
     if(seenB.has(w)) continue;
+    let g=0;
+    for(const t of WTOK[i]) if(selfSetB.has(t)){
+      const df=GDF[t]||1; g+=df<=25?2.2:(df<=120?1.1:0.35);
+    }
     let sc=0; for(const c of ks) if(w.includes(c)) sc++;
-    if(!sc) continue;
+    if(sc>2) sc=2;
+    let comb=g*2+sc*0.9+(g>0&&sc>0?1.0:0);
+    if(semRank[w]!=null) comb+=12-Math.min(9,semRank[w]);
+    if(comb<0.6) continue;
     seenB.add(w);
-    cands.push([1e9+sc*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+    wr.shell=comb>=4?1:(comb>=1.8?2:3);
+    cands.push([comb*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
   }
   // cascade to a floor of 6 — no word ever blooms into nothing (C2):
   // radical kin next, then nearest same-level neighbours
@@ -1001,6 +1024,7 @@ function bloomFocus(n){
     if(wr.node&&!wr.node.gone){
       wr.node.hlDom=true; wr.node.el.classList.add("bsat");
       wr.node.top=Math.max(wr.node.top,0.95);
+      satBand(wr.node,wr.shell);
     } else {
       // a satellite the field only knew as a dot materializes as a real word
       const sp=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
@@ -1008,10 +1032,13 @@ function bloomFocus(n){
       nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
       nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
       nd.el.classList.add("bsat");
+      satBand(nd,wr.shell);
     }
     FOCUS.push(wr);
   }
-  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}
+  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);
+    // the tapped word is the loudest thing in its own constellation
+    if(n.fpx>0){ n.ts=Math.max(n.ts,Math.min(2.0,28/n.fpx)); }}
   if(n.wref) markWalked(n.wref);
 }
 let lockOn=false;
@@ -1023,6 +1050,7 @@ function lockMaterialize(wr){
   if(wr.node&&!wr.node.gone){
     wr.node.hlDom=true; wr.node.el.classList.add("bsat");
     wr.node.top=Math.max(wr.node.top,0.95);
+    satBand(wr.node,wr.shell);
     return wr.node;
   }
   const sp=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
@@ -1030,7 +1058,16 @@ function lockMaterialize(wr){
   nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
   nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
   nd.el.classList.add("bsat");
+  satBand(nd,wr.shell);
   return nd;
+}
+// satellites speak in one register: the tapped word is the loudest thing in
+// its own constellation, the family sits a step below it in a narrow band
+// (closer ring slightly larger), instead of field sizes 13-35px shouting over
+// the centre.
+function satBand(nd,shell){
+  const target=shell===1?23:shell===2?20:18;
+  if(nd.fpx>0){ nd.ts=Math.max(0.62,Math.min(1.5,target/nd.fpx)); }
 }
 // a relation SEM knows but the corpus has no headword for — every kana-only
 // relative and every collocation. SEM authored a gloss for each one, so it
@@ -1080,33 +1117,62 @@ function clearBloom(keep){
 // THE OBSIDIAN LOCK: long-press reorganizes the visible universe around a
 // node — every relation pulled into shells, locked in place until released.
 // Consistency floor: cascading channels guarantee >=12 members for ANY word.
+// ---- meaning-first relatedness for words outside the authored SEM table ----
+// A constellation must read as a FAMILY OF MEANING, not a list of words that
+// happen to share a glyph: 外出's neighbours are 出かける and 散歩, not 出版.
+// Primary signal: rarity-weighted English gloss token overlap. Shared kanji
+// remains a kinship bonus — real compounds rise, coincidences sink.
+const GSTOP=new Set(["to","a","the","of","in","for","on","at","and","or","with","one","ones","be","is","do","etc","sth","so","not","from","by","an","into","out","up","as","that","this","it","its","something","someone"]);
+let WTOK=null,GDF=null;
+function glossTokens(g){
+  const t=[]; const seen=new Set();
+  for(const m of String(g).toLowerCase().split(/[^a-z]+/)){
+    if(m.length<3||GSTOP.has(m)||seen.has(m)) continue;
+    seen.add(m); t.push(m);
+  }
+  return t;
+}
+function buildGlossIndex(){
+  WTOK=new Array(WORDS.length); GDF=Object.create(null);
+  for(let i=0;i<WORDS.length;i++){
+    const tk=glossTokens(WORDS[i].e[2]);
+    WTOK[i]=tk;
+    for(const t of tk) GDF[t]=(GDF[t]||0)+1;
+  }
+}
 function relationsFor(ks,selfW,lvl0,seen0){
   const seen=seen0?new Set(seen0):new Set([selfW]);
-  const mem=[];
-  const c1=[];
-  for(const wr of WORDS){
-    const w=wr.e[0];
+  if(!WTOK) buildGlossIndex();
+  const selfWr=WORDIX[selfW];
+  const selfTok=selfWr?WTOK[WORDS.indexOf(selfWr)]:glossTokens("");
+  const selfSet=new Set(selfTok);
+  const scored=[];
+  for(let i=0;i<WORDS.length;i++){
+    const wr=WORDS[i], w=wr.e[0];
     if(seen.has(w)) continue;
-    let sc=0; for(const c of ks) if(w.includes(c)) sc++;
-    if(sc) c1.push([sc,wr]);
-  }
-  c1.sort((a,b)=>b[0]-a[0]);
-  for(const p2 of c1){
-    if(mem.length>=22) break;
-    if(seen.has(p2[1].e[0])) continue;
-    seen.add(p2[1].e[0]); p2[1].shell=p2[0]>=2?1:2; mem.push(p2[1]);
-  }
-  if(mem.length<12){
-    const kin=new Set();
-    for(const c of ks) for(const r of (KRAD[c]||"")) if(RADK[r])
-      for(const k of RADK[r]) kin.add(k);
-    for(const c of ks) kin.delete(c);
-    for(const wr of WORDS){
-      if(mem.length>=16) break;
-      const w=wr.e[0];
-      if(seen.has(w)) continue;
-      if([...w].some(c=>kin.has(c))){seen.add(w);wr.shell=3;mem.push(wr);}
+    let gscore=0;
+    for(const t of WTOK[i]) if(selfSet.has(t)){
+      const df=GDF[t]||1;
+      gscore+=df<=25?2.2:(df<=120?1.1:0.35);
     }
+    let kscore=0; for(const c of ks) if(w.includes(c)) kscore++;
+    if(kscore>2) kscore=2;
+    let sc=gscore+kscore*0.9;
+    if(gscore>0&&kscore>0) sc+=1.0;           // a true compound of the same meaning
+    const lg=Math.abs((wr.e[5]||3)-lvl0);
+    sc+=lg===0?0.35:(lg===1?0.15:0);
+    if(sc>0.6) scored.push([sc,gscore,wr]);
+  }
+  scored.sort((a,b)=>b[0]-a[0]);
+  const mem=[];
+  for(const p2 of scored){
+    if(mem.length>=22) break;
+    const w=p2[2].e[0];
+    if(seen.has(w)) continue;
+    seen.add(w);
+    // shell by MEANING strength: close ring = related in sense, outer = kin only
+    p2[2].shell=p2[1]>=2?1:(p2[0]>=1.6?2:3);
+    mem.push(p2[2]);
   }
   if(mem.length<12){
     for(const wr of WORDS){
@@ -1734,6 +1800,15 @@ function wireStudy(){
   });
 }
 function openCard(n){
+  // ONE dictionary. When the corridor hosts this field, the final stage of any
+  // word or kanji lands on the app's single canonical entry sheet — the same
+  // page a reader tap, a search result, and a chain walk land on. The drift
+  // card remains only where no dictionary exists to answer (standalone file).
+  const hook=typeof window!=="undefined"&&window.__BUNKI_OPEN_ENTRY;
+  if(hook){
+    if(n.kind==="word"&&hook.has("word",n.w)){hook.open("word",n.w);return;}
+    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){hook.open("kanji",n.ch);return;}
+  }
   if(n.kind==="word"){
     const ks=[...new Set(n.w)].filter(isKanji);
     card.innerHTML='<div class="yomi">'+esc(n.r)+'</div><h1>'+esc(n.w)+'</h1>'+
@@ -1871,7 +1946,11 @@ lvlSet(3,false);
 // ---- hint ----
 let hintTimer=0;
 function setHint(txt){
-  hint.textContent=txt; hint.style.opacity="1";
+  // an empty hint must take its plaque with it — a blank white pill floating
+  // on the water is furniture, not guidance
+  hint.textContent=txt;
+  if(!txt){hint.style.opacity="0";hint.style.visibility="hidden";clearTimeout(hintTimer);return;}
+  hint.style.visibility="visible"; hint.style.opacity="1";
   clearTimeout(hintTimer);
   hintTimer=setTimeout(function(){hint.style.opacity="0";},5000);
 }
@@ -2327,9 +2406,9 @@ function drawWorld(){
       cdx=(h.x*cs+h.y*sn)*CURREACH; cdy=(h.y*cs-h.x*sn)*CURREACH;
     }
     if(wr.lk){}
-    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*0.13; wr.oy+=(wr.hy-wr.oy)*0.13;
+    else if(wr.hl){wr.ox+=(wr.hx-wr.ox)*EK(0.13); wr.oy+=(wr.hy-wr.oy)*EK(0.13);
       wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
-    else if(wr.ret){wr.ox*=0.93; wr.oy*=0.93;
+    else if(wr.ret){const rk=1-EK(0.07); wr.ox*=rk; wr.oy*=rk;
       if(wr.ox<2&&wr.ox>-2&&wr.oy<2&&wr.oy>-2) wr.ret=false;
       wr.px=wr.ox-cdx; wr.py=wr.oy-cdy;}
     else if(reduced){
@@ -2341,8 +2420,8 @@ function drawWorld(){
     else {
       // the word's own breathing, bounded to its wander box exactly as before —
       // DRIFT_SPEED is the only thing that changed about it
-      wr.px+=wr.dvx*DRIFT_SPEED*calm; if(wr.px>16||wr.px<-16) wr.dvx*=-1;
-      wr.py+=wr.dvy*DRIFT_SPEED*calm; if(wr.py>12||wr.py<-12) wr.dvy*=-1;
+      wr.px+=wr.dvx*DRIFT_SPEED*calm*DT; if(wr.px>16||wr.px<-16) wr.dvx*=-1;
+      wr.py+=wr.dvy*DRIFT_SPEED*calm*DT; if(wr.py>12||wr.py<-12) wr.dvy*=-1;
       // ...carried by the current on top. The current never brakes the
       // breathing and the breathing never fights the current: they add.
       wr.ox=wr.px+cdx; wr.oy=wr.py+cdy;
@@ -2635,13 +2714,21 @@ function resolveCollisions(){
 
 // ---- frame loop ----
 let lastT=0;
+let DT=1;
+const EK=(k)=>1-Math.pow(1-k,DT);
 function frame(t){
   const dt=Math.min(34,(t-lastT)||16); lastT=t;
+  // Frame-rate independence: every per-frame advance and easing is scaled by
+  // DT (frames of 16.7ms), updated here once per frame and read module-wide
+  // (drawWorld runs the word advance). On a device at 30fps the field must
+  // move the same distance per second in the same-sized visual steps —
+  // without this, slow frames take double-length strides and drift jolts.
+  DT=Math.min(2.2,Math.max(0.5,dt/16.7));
   // The current runs on the field's OWN clock — elapsed animated time, not wall
   // time. dt is already clamped to 34ms, so a tab that was backgrounded for a
   // minute resumes the lean exactly where it left it instead of snapping the
   // whole field to a phase an idle minute away. At 60fps this is wall time.
-  calm+=((touches.size?0:1)-calm)*0.14;
+  calm+=((touches.size?0:1)-calm)*EK(0.14);
   if(calm<0.002) calm=0;
   if(!reduced) curT+=dt*calm;
   if(!reduced) fluidStep();
@@ -2744,13 +2831,16 @@ function frame(t){
         n.tx=ob.c.x+Math.cos(ob.ang)*ob.rx*br+fv.x*(vw()/FW)*0.14;
         n.ty=ob.c.y+Math.sin(ob.ang)*ob.ry*br+fv.y*(vh()/FH)*0.14;
       }
-      n.x+=(n.tx-n.x)*0.085; n.y+=(n.ty-n.y)*0.085;
+      n.x+=(n.tx-n.x)*EK(0.085); n.y+=(n.ty-n.y)*EK(0.085);
     }
-    n.s+=(n.ts-n.s)*0.09;
-    n.op+=(n.top-n.op)*0.08;
+    n.s+=(n.ts-n.s)*EK(0.09);
+    n.op+=(n.top-n.op)*EK(0.08);
     const rt=(n.mode==="center")?0:n.rot;
-    n.cr+=(rt-n.cr)*0.08;
-    const dimBase=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
+    n.cr+=(rt-n.cr)*EK(0.08);
+    const dimRaw=(FOCUS.length&&n.mode==="free"&&!n.hlDom&&n!==focusN)?n.op*0.3:n.op;
+    // depth-paling quiets FREE words; it must never push an arbitrated ghost
+    // under the law floor, so the ghost path below reads the unpaled base
+    const dimBase=dimRaw*(n.blurDim||1);
     let outOp=dimBase;
     if(n.kind==="word"){
       if(n.collide==null){n.collide=1;n.collideTarget=1;}
@@ -2758,21 +2848,23 @@ function frame(t){
       // easing a receded word back over ~330ms handed the learner a satellite
       // that was still faint when they tapped it
       if(n===focusN||n.hlDom){n.collide=1;n.collideTarget=1;}
-      else n.collide+=((n.collideTarget==null?1:n.collideTarget)-n.collide)*0.12;
+      else n.collide+=((n.collideTarget==null?1:n.collideTarget)-n.collide)*EK(0.12);
       // collide eases between present (1) and ghost (0). The ghost is a
       // RENDERED opacity, not a multiplier: it cannot be diluted to nothing by
       // a word that was already quiet, and receding never brightens a word
       // that is fainter than the floor to begin with.
-      const gh=Math.min(dimBase,n.ghostOp==null?ghostFloor:n.ghostOp);
+      const gh=Math.min(dimRaw,n.ghostOp==null?ghostFloor:n.ghostOp);
       outOp=dimBase*n.collide+gh*(1-n.collide);
     }
     // NOTE: a receded word never loses its touch target. Loudest-word-wins is a
     // rule about PAINT; the tap arbitration in pointerdown hands the finger to
     // the loudest word under it, which leaves the ghost reachable everywhere
     // nothing louder covers it. Tapping one brings it straight back.
-    n.el.style.opacity=outOp.toFixed(3);
+    const opStr=outOp.toFixed(3);
+    if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}
     const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;
-    n.el.style.transform="translate("+(n.x+n.dragX).toFixed(1)+"px,"+(n.y+n.dragY).toFixed(1)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
+    const tfStr="translate("+(n.x+n.dragX).toFixed(2)+"px,"+(n.y+n.dragY).toFixed(2)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";
+    if(n._ltf!==tfStr){n._ltf=tfStr;n.el.style.transform=tfStr;}
   }
   // A still finger emits no move events. Refresh from the tracked touch set
   // each frame so cancellation starts a fresh, honest inactivity interval.

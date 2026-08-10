@@ -50,13 +50,13 @@
 #drift-layer .word.unfolded .yomi{opacity:1}
 #drift-layer .word.glossed .yomi,
 #drift-layer .word.glossed .gloss{opacity:1}
-#drift-layer .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 24px var(--halo)}
+#drift-layer .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 10px var(--halo)}
 #drift-layer .word.lod .yomi,
 #drift-layer .word.lod .gloss{opacity:0!important}
 #drift-layer .word.bctr{color:var(--bloomCtr) !important;z-index:6}
-#drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 18px var(--bloomHalo)}
+#drift-layer .word.bctr .base{text-shadow:0 0 1px currentColor,0 0 10px var(--bloomHalo)}
 #drift-layer .word.bsat{color:var(--bloomSat) !important;z-index:5}
-#drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 12px var(--bloomHalo)}
+#drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 8px var(--bloomHalo)}
 #drift-layer .word.bsat .yomi{color:var(--bloomSat)}
 #drift-layer .glyph.comp{z-index:7}
 #drift-layer .word.center,
