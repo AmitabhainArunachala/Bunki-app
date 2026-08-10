@@ -2775,42 +2775,143 @@ function renderYojiBody(all) {
  * are) and the character's total stroke count. Every hit opens the same
  * kanji entry as everywhere else. */
 function renderKanjidex(main) {
-  (S.kdx ||= { part: null, st: null });
-  main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji by its shape', 'en-inline'));
+  S.kdx ||= {};
+  if (typeof S.kdx.mode !== 'string') S.kdx.mode = 'parts';
+  if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
+  main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
   main.append(el('h1', 'view-title', '字引'));
-  const sub = el('p', 'shelf-snippet intro');
-  sub.textContent = tx(
-    '読めない字は、形から。部品と画数、どちらからでも、両方でも。',
-    'A character you cannot read yet, found from its shape — by component, by stroke count, or both.',
-  );
-  main.append(sub);
 
-  // 画数 — total strokes
-  main.append(withEn(el('p', 'eyebrow', '画数'), 'stroke count', 'en-inline'));
-  const stRow = el('div', 'kdx-row');
-  for (let n = 1; n <= 29; n++) {
-    const on = S.kdx.st === n;
-    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', String(n));
+  // one door, several lenses (operator 2026-08-10, KKLD tab model): the parts
+  // picker, a draw canvas, reading, meaning, and stroke count — every hit
+  // opens the same kanji entry as everywhere else.
+  const LENSES = [
+    ['parts', '部品', 'by its parts'],
+    ['draw', '手書き', 'draw it'],
+    ['reading', '音訓', 'by reading'],
+    ['meaning', '意味', 'by meaning'],
+    ['strokes', '画数', 'by strokes'],
+  ];
+  const lensRow = el('div', 'kdx-lenses');
+  for (const [id, ja, en] of LENSES) {
+    const b = el('button', S.kdx.mode === id ? 'kdx-lens on' : 'kdx-lens');
     b.type = 'button';
-    b.dataset.kdxSt = String(n);
+    b.append(el('span', 'l-ja', ja));
+    if (bi()) b.append(el('span', 'en-sub', en));
     b.addEventListener('click', () => {
-      S.kdx.st = on ? null : n;
+      S.kdx.mode = id;
+      render();
+      window.scrollTo(0, 0);
+    });
+    lensRow.append(b);
+  }
+  main.append(lensRow);
+
+  if (S.kdx.mode === 'draw') renderKdxDraw(main);
+  else if (S.kdx.mode === 'reading') renderKdxText(main, 'reading');
+  else if (S.kdx.mode === 'meaning') renderKdxText(main, 'meaning');
+  else if (S.kdx.mode === 'strokes') renderKdxStrokes(main);
+  else renderKdxParts(main);
+}
+
+/** The shared results grid — every hit opens the same kanji entry. */
+function renderKdxGrid(host, chars, CAP = 200) {
+  host.append(
+    withEn(
+      el('p', 'eyebrow', `見つかった字 — ${chars.length}`),
+      chars.length > CAP ? `found — first ${CAP} shown` : 'found',
+      'en-inline',
+    ),
+  );
+  if (!chars.length) {
+    host.append(el('div', 'sem-empty', tx('この条件の字はない。', 'No character matches that yet.')));
+    return;
+  }
+  const grid = el('div', 'kdx-grid');
+  for (const c of chars.slice(0, CAP)) {
+    const b = el('button', 'kdx-glyph', c);
+    b.type = 'button';
+    b.dataset.kdxHit = c;
+    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+    b.addEventListener('click', () => go({ t: 'kanji', id: c }));
+    grid.append(b);
+  }
+  host.append(grid);
+}
+
+/* 部品 — multi-radical. Tap several parts you can see; the set narrows to
+ * kanji containing ALL of them, and components that can no longer co-occur
+ * grey out. A filter names the grid — Jisho's single most-hated screen is its
+ * unlabelled radical wall; this one you can search and it collapses as you go. */
+function kdxPartHits() {
+  const sel = S.kdx.parts;
+  let chars;
+  if (sel.length) {
+    chars = [...(D.radicals[sel[0]]?.kanji || [])];
+    for (const p of sel.slice(1)) {
+      const set = new Set(D.radicals[p]?.kanji || []);
+      chars = chars.filter((c) => set.has(c));
+    }
+  } else {
+    chars = S.kdx.st ? Object.keys(D.kanji) : [];
+  }
+  chars = chars.filter((c) => D.kanji[c] && (!S.kdx.st || D.kanji[c].st === S.kdx.st));
+  chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
+  return chars;
+}
+function renderKdxParts(main) {
+  if (S.kdx.parts.length) {
+    const chosen = el('div', 'kdx-chosen');
+    for (const p of S.kdx.parts) {
+      const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
+      b.type = 'button';
+      b.addEventListener('click', () => {
+        S.kdx.parts = S.kdx.parts.filter((x) => x !== p);
+        render();
+      });
+      chosen.append(b);
+    }
+    const clr = el('button', 'kdx-clear', tx('ぜんぶ消す', 'clear'));
+    clr.type = 'button';
+    clr.addEventListener('click', () => {
+      S.kdx.parts = [];
       render();
     });
-    stRow.append(b);
+    chosen.append(clr);
+    main.append(chosen);
   }
-  main.append(stRow);
 
-  // the hits sit right under the dials — picking a component far down the
-  // index must not strand its results below another page of chips
-  renderKanjidexHits(main);
+  const hits = kdxPartHits();
+  if (S.kdx.parts.length || S.kdx.st) renderKdxGrid(main, hits, 160);
 
-  // 部品 — components, ordered the paper way: by their own stroke count;
-  // parts the table never counted go last, named for what they are
-  main.append(withEn(el('p', 'eyebrow', '部品'), 'component', 'en-inline'));
-  const parts = Object.values(D.radicals)
-    .filter((r) => (r.kanjiCount || 0) >= 8)
-    .sort((a, b) => ((a.st || 99) - (b.st || 99)) || b.kanjiCount - a.kanjiCount);
+  // which components still co-occur with the current hits? (the union of the
+  // hits' own parts). Nothing selected → everything is available.
+  let coPresent = null;
+  if (S.kdx.parts.length) {
+    coPresent = new Set(S.kdx.parts);
+    for (const c of hits) for (const p of D.kanji[c].parts || []) coPresent.add(p);
+  }
+
+  main.append(withEn(el('p', 'eyebrow', '部品'), 'tap the parts you can see', 'en-inline'));
+  const filt = el('input', 'kdx-field');
+  filt.type = 'search';
+  filt.id = 'kdx-partfilter';
+  filt.placeholder = tx('部品をしぼる（名前・字）', 'filter parts — by name or shape');
+  filt.value = S.kdx.partq || '';
+  filt.autocomplete = 'off';
+  filt.addEventListener('input', () => {
+    S.kdx.partq = filt.value;
+    document.getElementById('kdx-partgrid')?.replaceWith(kdxPartGrid(coPresent));
+  });
+  main.append(filt);
+  main.append(kdxPartGrid(coPresent));
+}
+function kdxPartGrid(coPresent) {
+  const wrap = el('div');
+  wrap.id = 'kdx-partgrid';
+  const q = (S.kdx.partq || '').trim().toLowerCase();
+  let parts = Object.values(D.radicals).filter((r) => (r.kanjiCount || 0) >= 8);
+  if (q) parts = parts.filter((r) => r.c === q || (r.name && r.name.toLowerCase().includes(q)));
+  parts.sort((a, b) => (a.st || 99) - (b.st || 99) || b.kanjiCount - a.kanjiCount);
   const bySt = new Map();
   for (const r of parts) {
     const g = r.st || 99;
@@ -2818,55 +2919,327 @@ function renderKanjidex(main) {
     bySt.get(g).push(r);
   }
   for (const [g, group] of bySt) {
-    const head = el(
-      'p',
-      'kdx-sthead',
-      g === 99 ? tx('画数のない部品', 'parts without a counted shape') : tx(`${g} 画`, `${g} stroke${g === 1 ? '' : 's'}`),
+    wrap.append(
+      el('p', 'kdx-sthead', g === 99 ? tx('画数のない部品', 'uncounted') : tx(`${g} 画`, `${g} stroke${g === 1 ? '' : 's'}`)),
     );
-    main.append(head);
     const row = el('div', 'kdx-row');
     for (const r of group) {
-      const on = S.kdx.part === r.c;
-      const b = el('button', on ? 'kdx-chip kdx-part on-list' : 'kdx-chip kdx-part', r.c);
+      const sel = S.kdx.parts.includes(r.c);
+      const dead = coPresent && !sel && !coPresent.has(r.c);
+      const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
       b.type = 'button';
-      b.dataset.kdxPart = r.c;
       if (r.name) b.setAttribute('aria-label', r.name);
+      if (dead) b.disabled = true;
       b.addEventListener('click', () => {
-        S.kdx.part = on ? null : r.c;
+        S.kdx.parts = sel ? S.kdx.parts.filter((x) => x !== r.c) : [...S.kdx.parts, r.c];
         render();
         window.scrollTo(0, 0);
       });
       row.append(b);
     }
-    main.append(row);
+    wrap.append(row);
+  }
+  return wrap;
+}
+
+/* 画数 — the stroke-count index, on its own and as a filter shared with 部品. */
+function renderKdxStrokes(main) {
+  main.append(withEn(el('p', 'eyebrow', '画数'), 'total strokes', 'en-inline'));
+  const stRow = el('div', 'kdx-row');
+  for (let n = 1; n <= 30; n++) {
+    const on = S.kdx.st === n;
+    const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', String(n));
+    b.type = 'button';
+    b.addEventListener('click', () => {
+      S.kdx.st = on ? null : n;
+      render();
+      window.scrollTo(0, 0);
+    });
+    stRow.append(b);
+  }
+  main.append(stRow);
+  if (S.kdx.st) {
+    const chars = Object.keys(D.kanji)
+      .filter((c) => D.kanji[c].st === S.kdx.st)
+      .sort((a, b) => (a < b ? -1 : 1));
+    renderKdxGrid(main, chars, 300);
   }
 }
 
-function renderKanjidexHits(main) {
-  if (S.kdx.part || S.kdx.st) {
-    let chars = S.kdx.part ? [...(D.radicals[S.kdx.part]?.kanji || [])] : Object.keys(D.kanji);
-    chars = chars.filter((c) => D.kanji[c] && (!S.kdx.st || D.kanji[c].st === S.kdx.st));
-    chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-    const CAP = 160;
-    main.append(
-      withEn(
-        el('p', 'eyebrow', `見つかった字 — ${chars.length}`),
-        chars.length > CAP ? `found — first ${CAP} shown` : 'found',
-        'en-inline',
-      ),
-    );
-    const grid = el('div', 'kdx-grid');
-    for (const c of chars.slice(0, CAP)) {
-      const b = el('button', 'kdx-glyph', c);
-      b.type = 'button';
-      b.dataset.kdxHit = c;
-      b.setAttribute('aria-label', D.kanji[c].m);
-      b.addEventListener('click', () => go({ t: 'kanji', id: c }));
-      grid.append(b);
-    }
-    main.append(grid);
-    if (!chars.length) main.append(el('div', 'sem-empty', tx('この組み合わせの字はない。', 'No character matches that combination.')));
+/* 音訓 / 意味 — reading (kana or romaji) and English-meaning lookup, straight
+ * over the kanji layer, with the results swapped in place as you type. */
+function renderKdxText(main, kind) {
+  const inp = el('input', 'kdx-field');
+  inp.type = 'search';
+  inp.id = 'kdx-textfield';
+  inp.autocomplete = 'off';
+  inp.placeholder =
+    kind === 'reading' ? tx('音・訓（かな か ローマ字）', 'reading — kana or romaji') : tx('英語の意味', 'English meaning');
+  inp.value = (kind === 'reading' ? S.kdx.reading : S.kdx.meaning) || '';
+  let deb = null;
+  inp.addEventListener('input', () => {
+    if (kind === 'reading') S.kdx.reading = inp.value;
+    else S.kdx.meaning = inp.value;
+    clearTimeout(deb);
+    deb = setTimeout(() => document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind)), 120);
+  });
+  main.append(inp);
+  main.append(kdxTextResults(kind));
+}
+function kdxTextResults(kind) {
+  const wrap = el('div');
+  wrap.id = 'kdx-results';
+  const q = ((kind === 'reading' ? S.kdx.reading : S.kdx.meaning) || '').trim();
+  if (!q) return wrap;
+  let chars;
+  if (kind === 'reading') {
+    const hasKana = /[ぁ-んァ-ンー]/.test(q);
+    const qh = (hasKana ? kataToHira(q) : ROMAJI(q) || q.toLowerCase()).replace(/[.\-・\s]/g, '');
+    // match PER reading (never concatenated — else 介 + い.う spuriously reads
+    // かいう ⊇ かい): a reading whose okurigana-stripped stem starts with the
+    // query counts, so typing か…かい narrows the same way a paper index does.
+    chars = Object.keys(D.kanji).filter((c) => {
+      const k = D.kanji[c];
+      return (
+        qh &&
+        [...k.on, ...k.kun].some((r) => {
+          const rh = kataToHira(r).replace(/[.\-・\s].*$/, '').replace(/[.\-・\s]/g, '');
+          return rh === qh || rh.startsWith(qh);
+        })
+      );
+    });
+  } else {
+    const ql = q.toLowerCase();
+    chars = Object.keys(D.kanji).filter((c) => String(D.kanji[c].m).toLowerCase().includes(ql));
   }
+  chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
+  renderKdxGrid(wrap, chars, 200);
+  return wrap;
+}
+
+/* 手書き — draw the character. Recognition matches the ink against the KanjiVG
+ * stroke templates we already ship, sampled through the DOM; it is stroke-
+ * order- and (±) stroke-count-tolerant, re-ranking as you draw. Offline, open
+ * data, exactly the "saw-it-on-a-sign" path the operator asked for. */
+function renderKdxDraw(main) {
+  main.append(withEn(el('p', 'eyebrow', '手書き'), 'draw it — stroke order need not be perfect', 'en-inline'));
+  const stage = el('div', 'kdx-draw');
+  const canvas = el('canvas', 'kdx-canvas');
+  stage.append(canvas);
+  main.append(stage);
+  const ctrl = el('div', 'kdx-draw-ctrl');
+  const undo = el('button', 'kdx-clear', tx('一画消す', 'undo stroke'));
+  const clear = el('button', 'kdx-clear', tx('消す', 'clear'));
+  undo.type = clear.type = 'button';
+  ctrl.append(undo, clear);
+  main.append(ctrl);
+  const results = el('div');
+  results.id = 'kdx-results';
+  main.append(results);
+
+  const SIZE = 300;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const strokes = [];
+  let cur = null;
+  const inkColor = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#14181c';
+  const redraw = () => {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.strokeStyle = inkColor();
+    ctx.lineWidth = 7;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const draw = (s) => {
+      ctx.beginPath();
+      s.forEach((p, i) => (i ? ctx.lineTo(p.x * SIZE, p.y * SIZE) : ctx.moveTo(p.x * SIZE, p.y * SIZE)));
+      ctx.stroke();
+    };
+    strokes.forEach(draw);
+    if (cur) draw(cur);
+  };
+  const at = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+  };
+  const recognize = () => {
+    document.getElementById('kdx-results')?.replaceWith(kdxDrawResults(recognizeKanji(strokes)));
+  };
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    canvas.setPointerCapture?.(e.pointerId);
+    cur = [at(e)];
+    redraw();
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!cur) return;
+    e.preventDefault();
+    cur.push(at(e));
+    redraw();
+  });
+  const finish = () => {
+    if (!cur) return;
+    if (cur.length > 1) strokes.push(cur);
+    cur = null;
+    redraw();
+    recognize();
+  };
+  canvas.addEventListener('pointerup', finish);
+  canvas.addEventListener('pointercancel', finish);
+  undo.addEventListener('click', () => {
+    strokes.pop();
+    redraw();
+    strokes.length ? recognize() : document.getElementById('kdx-results')?.replaceWith(Object.assign(el('div'), { id: 'kdx-results' }));
+  });
+  clear.addEventListener('click', () => {
+    strokes.length = 0;
+    cur = null;
+    redraw();
+    document.getElementById('kdx-results')?.replaceWith(Object.assign(el('div'), { id: 'kdx-results' }));
+  });
+}
+function kdxDrawResults(chars) {
+  const wrap = el('div');
+  wrap.id = 'kdx-results';
+  if (!chars.length) return wrap;
+  wrap.append(withEn(el('p', 'eyebrow', 'にた字'), 'closest matches — tap to open', 'en-inline'));
+  const grid = el('div', 'kdx-grid');
+  for (const c of chars) {
+    const b = el('button', 'kdx-glyph', c);
+    b.type = 'button';
+    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+    b.addEventListener('click', () => go({ t: 'kanji', id: c }));
+    grid.append(b);
+  }
+  wrap.append(grid);
+  return wrap;
+}
+
+/* ---- handwriting recogniser: resample strokes to fixed point-counts, scale
+ * each character into a unit box, and score by greedy order-tolerant stroke
+ * pairing. Templates are the KanjiVG paths in D.strokes, sampled once through
+ * a hidden SVG path element and cached by stroke count. */
+const _KDX_NPTS = 12;
+let _kdxTmpl = null;
+function _kdxResample(points, n) {
+  if (!points.length) return [];
+  if (points.length === 1) return Array.from({ length: n }, () => ({ ...points[0] }));
+  let total = 0;
+  for (let i = 1; i < points.length; i++) total += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  const step = total / (n - 1);
+  const out = [{ ...points[0] }];
+  let prev = points[0];
+  let i = 1;
+  let acc = 0;
+  for (let k = 1; k < n; k++) {
+    const target = k * step;
+    while (i < points.length) {
+      const d = Math.hypot(points[i].x - prev.x, points[i].y - prev.y);
+      if (acc + d >= target || i === points.length - 1) break;
+      acc += d;
+      prev = points[i];
+      i++;
+    }
+    const seg = Math.hypot(points[i].x - prev.x, points[i].y - prev.y) || 1e-6;
+    const t = Math.min(1, Math.max(0, (target - acc) / seg));
+    out.push({ x: prev.x + (points[i].x - prev.x) * t, y: prev.y + (points[i].y - prev.y) * t });
+  }
+  return out;
+}
+function _kdxNorm(strokes) {
+  let minx = 1e9,
+    miny = 1e9,
+    maxx = -1e9,
+    maxy = -1e9;
+  for (const s of strokes)
+    for (const p of s) {
+      if (p.x < minx) minx = p.x;
+      if (p.y < miny) miny = p.y;
+      if (p.x > maxx) maxx = p.x;
+      if (p.y > maxy) maxy = p.y;
+    }
+  const w = Math.max(maxx - minx, 1e-6);
+  const h = Math.max(maxy - miny, 1e-6);
+  const sc = 1 / Math.max(w, h);
+  const ox = (1 - w * sc) / 2;
+  const oy = (1 - h * sc) / 2;
+  return strokes.map((s) => s.map((p) => ({ x: (p.x - minx) * sc + ox, y: (p.y - miny) * sc + oy })));
+}
+function _kdxTemplates(n) {
+  _kdxTmpl ||= new Map();
+  if (_kdxTmpl.has(n)) return _kdxTmpl.get(n);
+  const list = [];
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  const path = document.createElementNS(NS, 'path');
+  svg.appendChild(path);
+  svg.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden');
+  document.body.appendChild(svg);
+  for (const [c, paths] of Object.entries(D.strokes)) {
+    if (!Array.isArray(paths) || paths.length !== n) continue;
+    const strokes = [];
+    for (const d of paths) {
+      path.setAttribute('d', d);
+      const L = path.getTotalLength();
+      const pts = [];
+      for (let i = 0; i < _KDX_NPTS; i++) {
+        const q = path.getPointAtLength(L ? (i / (_KDX_NPTS - 1)) * L : 0);
+        pts.push({ x: q.x / 109, y: q.y / 109 });
+      }
+      strokes.push(pts);
+    }
+    list.push({ c, strokes: _kdxNorm(strokes) });
+  }
+  svg.remove();
+  _kdxTmpl.set(n, list);
+  return list;
+}
+function _kdxStrokeDist(a, b) {
+  let s = 0;
+  for (let i = 0; i < a.length; i++) s += Math.hypot(a[i].x - b[i].x, a[i].y - b[i].y);
+  return s / a.length;
+}
+function _kdxDist(user, tmpl) {
+  const [small, big] = user.length <= tmpl.length ? [user, tmpl] : [tmpl, user];
+  const used = new Array(big.length).fill(false);
+  let total = 0;
+  for (const us of small) {
+    let best = 1e9,
+      bi = -1;
+    for (let j = 0; j < big.length; j++) {
+      if (used[j]) continue;
+      const d = _kdxStrokeDist(us, big[j]);
+      if (d < best) {
+        best = d;
+        bi = j;
+      }
+    }
+    used[bi] = true;
+    total += best;
+  }
+  return (total + (big.length - small.length) * 0.28) / big.length;
+}
+function recognizeKanji(strokes) {
+  if (!strokes.length) return [];
+  const user = _kdxNorm(strokes).map((s) => _kdxResample(s, _KDX_NPTS));
+  const n = user.length;
+  const cands = [];
+  for (const dn of [n, n - 1, n + 1, n - 2, n + 2]) {
+    if (dn < 1) continue;
+    for (const t of _kdxTemplates(dn)) cands.push({ c: t.c, d: _kdxDist(user, t.strokes) });
+  }
+  cands.sort((a, b) => a.d - b.d);
+  const seen = new Set();
+  const out = [];
+  for (const x of cands) {
+    if (seen.has(x.c)) continue;
+    seen.add(x.c);
+    out.push(x.c);
+    if (out.length >= 24) break;
+  }
+  return out;
 }
 
 /* ------------------------------------------------------------ thesaurus
