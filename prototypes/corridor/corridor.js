@@ -3192,9 +3192,32 @@ function renderReview(main) {
   }
   const item = rv.queue[rv.ix];
   main.append(el('p', 'card-kind', `${rv.ix + 1} / ${rv.queue.length} — FSRS-6 · ${D.pin.parameterSetId}`));
+  // Anki's cloze, fed by the corpus: every other repetition of a word that
+  // lives in the shelf's real sentences is asked inside one — the blank
+  // holds the word's place, the context does the asking. No hand-made
+  // cards, and the schedule is the same one card either way.
+  let cloze = null;
+  if (item.t === 'word' && (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1) {
+    cloze = findExamples(item.id, 1)[0] || null;
+  }
   const face = el('div', 'review-face');
   face.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
-  face.append(el('div', 'review-front', item.label));
+  if (cloze) {
+    face.append(el('span', 'pool-tag', tx('文の中で', 'in its sentence')));
+    const line = el('p', 'review-cloze');
+    for (const t of cloze.tokens) {
+      if (t.c && t.b === item.id) {
+        if (rv.revealed) line.append(el('span', 'example-hit', t.s));
+        else line.append(document.createTextNode('＿＿＿'));
+      } else {
+        line.append(document.createTextNode(t.s));
+      }
+    }
+    face.append(line);
+    if (rv.revealed) face.append(el('div', 'review-front', item.label));
+  } else {
+    face.append(el('div', 'review-front', item.label));
+  }
   if (rv.revealed) {
     const backc = reviewBack(item);
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));

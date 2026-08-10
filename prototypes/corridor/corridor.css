@@ -2717,3 +2717,12 @@ body.v-depth-layered .stroke-page {
 .aiq-start {
   margin-top: 12px;
 }
+
+/* the cloze face: the shelf's own sentence, with the word's place held */
+.review-cloze {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 2;
+  color: var(--ink);
+  margin: 6px 0 4px;
+}
