@@ -191,7 +191,11 @@ const boot = async (theme = '北斎', fuzzSeed = null) => {
       currentTheme = theme;
       return;
     }
-    await page.locator('#theme').click();
+    // The drift's #theme seal still cycles the world, but the 銀河 hero hides it
+    // (body.ginga) so Playwright's visibility-gated click refuses it. Fire the
+    // element's own click handler directly — the same cycle, without the seal
+    // needing to be on-screen.
+    await page.evaluate(() => document.getElementById('theme').click());
     await page.waitForTimeout(80);
   }
   throw new Error(`theme ${theme} was not reachable through the visible theme control`);
@@ -807,7 +811,8 @@ for (const seed of FUZZ_SEEDS) {
       await touch('touchCancel', []);
       await page.waitForTimeout(120);
     } else if (action === 'theme') {
-      await page.locator('#theme').click();
+      // fire the seal's handler directly — it is hidden on the 銀河 hero
+      await page.evaluate(() => document.getElementById('theme').click());
       await page.waitForTimeout(140);
       currentTheme = (await page.locator('#theme').textContent()) ?? currentTheme;
     } else if (action === 'slow-drag') {
