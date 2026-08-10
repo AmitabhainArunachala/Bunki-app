@@ -3,7 +3,7 @@
   :root{
     --ground:#FBFAF5; --ink:#1B2A3A; --faint:rgba(27,42,58,.42); --line:rgba(27,42,58,.2);
     --pig1:#1E50A2; --pig2:#165E83; --accent:#EB6101;
-    --plaque:rgba(251,250,245,.92); --halo:rgba(30,80,162,.5); --grainOp:.55;
+    --plaque:rgba(251,250,245,.92); --halo:rgba(30,80,162,.5); --grainOp:.28;
     --bloomSat:#165E83; --bloomCtr:#EB6101; --bloomHalo:rgba(30,80,162,.4);
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -42,6 +42,9 @@
   .word.bsat{color:var(--bloomSat) !important;z-index:5}
   .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 8px var(--bloomHalo)}
   .word.bsat .yomi{color:var(--bloomSat)}
+  .word.bsat.bstruct{color:var(--faint) !important}
+  .word.bctr[data-family]::after{content:attr(data-family);display:block;margin-top:.28em;
+    font-size:9px;letter-spacing:.14em;color:var(--faint);font-weight:400}
   .glyph.comp{z-index:7}
   .word.center,.glyph.center,.part.center{z-index:6}
   .glyph .g{display:block;font-size:36px;line-height:1.1;text-shadow:0 0 1px currentColor}
@@ -206,11 +209,11 @@ const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 // All three are silenced entirely by prefers-reduced-motion (see `reduced` above):
 // under `reduce` the field does not drift and the current does not run at all.
 // DRIFT_SPEED — how fast each word breathes inside its own wander box, on its own private heading. Turn it up and the field fidgets harder; 1 was the whole of the old near-stillness, 0 freezes the breathing. Measured finding: this is the EXPENSIVE way to buy motion — private headings do not agree, so raising it drives neighbours across each other (shear) and leaves the ghost arbiter chasing new overlaps. The current below buys the same speed coherently and almost for free, so most of the aliveness is bought there and this stays low.
-const DRIFT_SPEED=1.15;
+const DRIFT_SPEED=0.24;
 // CURRENT_STRENGTH — how much of the field the slow gyre owns: how far it carries a word off its anchor (CURREACH world units, below) and how hard it stirs the water the ink and the flow motes ride. Turn it up and the field travels as one body; 0 leaves every word rattling privately and takes the current off the water.
-const CURRENT_STRENGTH=0.038;
+const CURRENT_STRENGTH=0.030;
 // CURRENT_DRIFT — how fast the gyre's eye wanders the field, in radians/ms. This is what turns a standing pull into motion: a parked eye holds every word at a fixed offset and nothing moves. Turn it up and the swirl roams restlessly; turn it down and the field leans and holds.
-const CURRENT_DRIFT=0.0017;
+const CURRENT_DRIFT=0.000035;
 
 // ---- OPERATOR VARIANTS: two open settings on the tap ladder. -----------------
 // Each has two positions. This file states what each position DOES and nothing
@@ -409,7 +412,19 @@ const ink=document.getElementById("ink"), ictx=ink.getContext("2d");
 const fx=document.getElementById("fx"), fctx=fx.getContext("2d");
 const paper=document.createElement("canvas"), pctx=paper.getContext("2d");
 let fdpr=1;
+let canvasVW=0,canvasVH=0,resizeFrame=0;
 function sizeCanvases(){
+  const nextW=vw(),nextH=vh();
+  // Safari's address bar and VisualViewport can change the glass without a
+  // gesture. Keep the world point under the old glass fixed instead of letting
+  // every word jump by half the height delta when the browser chrome settles.
+  if(canvasVW&&canvasVH&&typeof WR!=="undefined"&&WR.w){
+    const dx=(nextW-canvasVW)/2,dy=(nextH-canvasVH)/2;
+    const cs=Math.cos(cam.rot),sn=Math.sin(cam.rot),iz=1/(cam.z||1);
+    cam.x+=(dx*cs+dy*sn)*iz; cam.y+=(-dx*sn+dy*cs)*iz;
+    camClamp();
+  }
+  canvasVW=nextW; canvasVH=nextH;
   ink.width=Math.max(1,Math.round(vw()*0.5)); ink.height=Math.max(1,Math.round(vh()*0.5));
   stainCv.width=ink.width; stainCv.height=ink.height;
   fdpr=1; // fx carries soft motes/lines only — 1x pixels, upscaled by the compositor;
@@ -417,18 +432,34 @@ function sizeCanvases(){
   fx.width=Math.round(vw()*fdpr); fx.height=Math.round(vh()*fdpr);
   renderPaper();
 }
+function scheduleCanvasSize(){
+  if(resizeFrame) return;
+  resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;sizeCanvases();refreshActive(true);});
+}
+
+function seeded(seed){
+  let a=seed>>>0;
+  return function(){
+    a=(a+0x6D2B79F5)|0;
+    let t=Math.imul(a^(a>>>15),1|a);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;
+    return ((t^(t>>>14))>>>0)/4294967296;
+  };
+}
 
 // ---- layered parchment, pre-rendered once per theme ----
 function renderPaper(){
   paper.width=ink.width; paper.height=ink.height;
   const th=THEMES[themeIx];
+  const rnd=seeded((ink.width*73856093)^(ink.height*19349663)^((themeIx+1)*83492791));
   pctx.setTransform(0.5,0,0,0.5,0,0);
   pctx.fillStyle=th.ground; pctx.fillRect(0,0,vw(),vh());
-  // tonal mottling — uneven age of the sheet
-  for(let i=0;i<16;i++){
+  // A quiet sheet first. Texture is fixed for a given glass, so a resize never
+  // re-rolls the paper underneath the learner's eye.
+  for(let i=0;i<8;i++){
     const f=i%2?1.045:0.94;
-    const r=mind()*(0.16+Math.random()*0.34);
-    const x=Math.random()*vw(), y=Math.random()*vh();
+    const r=mind()*(0.16+rnd()*0.30);
+    const x=rnd()*vw(), y=rnd()*vh();
     const g=pctx.createRadialGradient(x,y,0,x,y,r);
     g.addColorStop(0,shade(th.ground,f,th.dark?.22:.5));
     g.addColorStop(1,shade(th.ground,f,0));
@@ -436,22 +467,22 @@ function renderPaper(){
   }
   // fibers — long thin strands laid into the sheet
   pctx.lineWidth=.7;
-  for(let i=0;i<240;i++){
-    const x=Math.random()*vw(), y=Math.random()*vh();
-    const ang=Math.random()<.6?(Math.random()-.5)*.5:Math.random()*TAU;
-    const len=60+Math.random()*170;
-    const bend=(Math.random()-.5)*30;
-    pctx.strokeStyle=rgba(th.ink,th.dark?.04:.032+Math.random()*.02);
+  for(let i=0;i<120;i++){
+    const x=rnd()*vw(), y=rnd()*vh();
+    const ang=rnd()<.6?(rnd()-.5)*.5:rnd()*TAU;
+    const len=60+rnd()*170;
+    const bend=(rnd()-.5)*30;
+    pctx.strokeStyle=rgba(th.ink,th.dark?.025:.018+rnd()*.012);
     pctx.beginPath(); pctx.moveTo(x,y);
     pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+bend,y+Math.sin(ang)*len/2-bend,
       x+Math.cos(ang)*len,y+Math.sin(ang)*len);
     pctx.stroke();
   }
   // 簀の目 — laid screen-lines of the papermaker's bamboo screen
-  const la=th.dark?.028:.05;
+  const la=th.dark?.018:.028;
   pctx.lineWidth=.5;
   for(let y=0;y<vh();y+=7){
-    pctx.strokeStyle=rgba(th.ink,la*(0.7+Math.random()*0.6));
+    pctx.strokeStyle=rgba(th.ink,la*(0.7+rnd()*0.6));
     pctx.beginPath();
     pctx.moveTo(0,y+Math.sin(y*1.7)*0.9);
     pctx.lineTo(vw(),y+Math.cos(y*2.3)*0.9);
@@ -463,28 +494,28 @@ function renderPaper(){
     pctx.beginPath(); pctx.moveTo(x,0); pctx.lineTo(x+2,vh()); pctx.stroke();
   }
   // per-grain speckle
-  for(let i=0;i<2600;i++){
-    pctx.fillStyle=rgba(th.ink,0.015+Math.random()*0.035);
-    pctx.fillRect(Math.random()*vw(),Math.random()*vh(),1.1,1.1);
+  for(let i=0;i<650;i++){
+    pctx.fillStyle=rgba(th.ink,0.012+rnd()*0.022);
+    pctx.fillRect(rnd()*vw(),rnd()*vh(),1.1,1.1);
   }
   // heavier kozo strands
   pctx.lineWidth=1.3;
-  for(let i=0;i<26;i++){
-    const x=Math.random()*vw(), y=Math.random()*vh();
-    const ang=Math.random()*TAU, len=30+Math.random()*90;
-    pctx.strokeStyle=rgba(th.ink,th.dark?.06:.05);
+  for(let i=0;i<14;i++){
+    const x=rnd()*vw(), y=rnd()*vh();
+    const ang=rnd()*TAU, len=30+rnd()*90;
+    pctx.strokeStyle=rgba(th.ink,th.dark?.04:.032);
     pctx.beginPath(); pctx.moveTo(x,y);
-    pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+(Math.random()-.5)*22,
+    pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+(rnd()-.5)*22,
       y+Math.sin(ang)*len/2,x+Math.cos(ang)*len,y+Math.sin(ang)*len);
     pctx.stroke();
   }
   // foxing — age spots on light sheets
   if(!th.dark){
-    for(let i=0;i<46;i++){
-      const r=1+Math.random()*(Math.random()<.15?8:2.5);
-      const x=Math.random()*vw(), y=Math.random()*vh();
+    for(let i=0;i<20;i++){
+      const r=1+rnd()*(rnd()<.15?7:2.2);
+      const x=rnd()*vw(), y=rnd()*vh();
       const g=pctx.createRadialGradient(x,y,0,x,y,r);
-      g.addColorStop(0,"rgba(138,107,74,"+(0.04+Math.random()*0.06)+")");
+      g.addColorStop(0,"rgba(138,107,74,"+(0.025+rnd()*0.035)+")");
       g.addColorStop(1,"rgba(138,107,74,0)");
       pctx.fillStyle=g; pctx.beginPath(); pctx.arc(x,y,r,0,TAU); pctx.fill();
     }
@@ -493,22 +524,46 @@ function renderPaper(){
   const vg=pctx.createRadialGradient(vw()/2,vh()*0.42,mind()*0.35,
     vw()/2,vh()*0.5,Math.hypot(vw(),vh())*0.62);
   vg.addColorStop(0,"rgba(0,0,0,0)");
-  vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));
+  vg.addColorStop(1,th.dark?"rgba(0,0,0,.34)":rgba(th.ink,.075));
   pctx.fillStyle=vg; pctx.fillRect(0,0,vw(),vh());
 }
 
-// ---- living suminagashi: pigment masses + mist + the wave band ----
+// ---- living suminagashi: sparse veined pigment on open paper ----
 const SPRC={};
 function blobSprite(color){
   let s=SPRC[color];
   if(s) return s;
-  s=document.createElement("canvas"); s.width=s.height=128;
+  s=document.createElement("canvas"); s.width=s.height=192;
   const c2=s.getContext("2d");
-  const g=c2.createRadialGradient(64,64,0,64,64,64);
-  g.addColorStop(0,rgba(color,1));
-  g.addColorStop(0.55,rgba(color,0.5));
+  // Suminagashi carries rims, veins and torn contours, not a circular fog.
+  // A faint sunk wash gives the rings a body without filling the glass.
+  const g=c2.createRadialGradient(96,96,4,96,96,88);
+  g.addColorStop(0,rgba(color,.08));
+  g.addColorStop(.55,rgba(color,.035));
   g.addColorStop(1,rgba(color,0));
-  c2.fillStyle=g; c2.fillRect(0,0,128,128);
+  c2.fillStyle=g; c2.fillRect(0,0,192,192);
+  const phase=color.split("").reduce((n,ch)=>n+ch.charCodeAt(0),0)*0.071;
+  c2.lineCap="round"; c2.lineJoin="round";
+  for(let ring=0;ring<6;ring++){
+    const r=22+ring*11.5;
+    c2.strokeStyle=rgba(color,.22-ring*.021);
+    c2.lineWidth=ring%3===0?2.2:1.05;
+    c2.beginPath();
+    for(let i=0;i<=64;i++){
+      const a=i/64*TAU;
+      const rr=r+Math.sin(a*3+phase+ring*.8)*(2.8+ring*.25)+
+        Math.sin(a*7-phase*.6+ring)*1.6;
+      const x=96+Math.cos(a)*rr,y=96+Math.sin(a)*rr*.82;
+      if(i===0)c2.moveTo(x,y);else c2.lineTo(x,y);
+    }
+    c2.closePath(); c2.stroke();
+  }
+  // two hairline tributaries keep the mark directional rather than target-like
+  for(let i=0;i<2;i++){
+    c2.strokeStyle=rgba(color,.14); c2.lineWidth=.8;
+    c2.beginPath(); c2.moveTo(30,80+i*22);
+    c2.bezierCurveTo(66,55+i*19,119,127-i*17,166,88+i*15); c2.stroke();
+  }
   SPRC[color]=s;
   return s;
 }
@@ -522,19 +577,20 @@ function addStain(x,y,r,color,a){
   stainCtx.fillStyle=g;
   stainCtx.beginPath(); stainCtx.arc(x,y,r,0,TAU); stainCtx.fill();
 }
-const NB=9, blobs=[], stains=[];
+const NB=6, blobs=[], stains=[];
 function initBlobs(){
   blobs.length=0;
+  const rnd=seeded((Math.round(vw())*2654435761)^(Math.round(vh())*1597334677));
   for(let i=0;i<NB;i++){
-    const mass=i<3;
+    const mass=i<2;
     blobs.push({mass,
-      x:Math.random()*vw(),
-      y:mass?vh()*(0.5+Math.random()*0.42):Math.random()*vh(),
-      r:mass?(0.12+Math.random()*0.14)*mind()+60:(0.22+Math.random()*0.4)*mind()+80,
-      ph:Math.random()*TAU,ph2:Math.random()*TAU,
-      sp:(mass?0.00005:0.00008)+Math.random()*0.00012,
-      amp:mass?18+Math.random()*26:30+Math.random()*55,
-      ix:0,iy:0,color:"#1E50A2",a:(mass?1.9+Math.random()*0.7:0.7+Math.random()*0.5)});
+      x:rnd()*vw(),
+      y:mass?vh()*(0.54+rnd()*0.34):rnd()*vh(),
+      r:mass?(0.10+rnd()*0.10)*mind()+44:(0.13+rnd()*0.19)*mind()+52,
+      ph:rnd()*TAU,ph2:rnd()*TAU,
+      sp:(mass?0.000025:0.000035)+rnd()*0.000035,
+      amp:mass?10+rnd()*16:16+rnd()*28,
+      ix:0,iy:0,color:"#1E50A2",a:(mass?.9+rnd()*.25:.58+rnd()*.24)});
     const b=blobs[blobs.length-1]; b.hx=b.x; b.hy=b.y;
   }
 }
@@ -542,7 +598,7 @@ function drawWave(t){
   const th=THEMES[themeIx];
   const y0=vh()*0.80, ph=t*0.00012;
   ictx.lineCap="round";
-  const passes=[[mind()*0.13,.05,th.pig1],[mind()*0.055,.07,th.pig1],[3,.12,th.pig2]];
+  const passes=[[8,.018,th.pig1],[3,.034,th.pig1],[1,.075,th.pig2]];
   for(const p of passes){
     ictx.strokeStyle=rgba(p[2],p[1]+(th.dark?.03:0));
     ictx.lineWidth=p[0];
@@ -562,22 +618,24 @@ function drawInk(t){
   ictx.setTransform(0.5,0,0,0.5,0,0);
   ictx.globalCompositeOperation=th.dark?"lighter":"multiply";
   for(const b of blobs){
-    if(!reduced){
+    if(!reduced&&calm>0.002){
       const fv=fluidAt(b.x,b.y);
-      b.x+=fv.x*(vw()/FW)*0.22; b.y+=fv.y*(vh()/FH)*0.22;
+      b.x+=fv.x*(vw()/FW)*0.16*calm; b.y+=fv.y*(vh()/FH)*0.16*calm;
       // Pigment is stain sunk into paper, not free dust. A weak return keeps a
       // pool near its own place, so the standing current sways the washes
       // instead of draining every one of them to the same rim over a long sit
       // (measured: 3 of 9 pools clamped at the left edge after 90s without it).
       // Slack enough — ~2s — that a finger's burst still throws pigment.
-      b.x+=(b.hx-b.x)*0.02; b.y+=(b.hy-b.y)*0.02;
+      b.x+=(b.hx-b.x)*0.012*calm; b.y+=(b.hy-b.y)*0.012*calm;
       b.x=clamp(b.x,-80,vw()+80); b.y=clamp(b.y,-80,vh()+80);
     }
     const bx=b.x+Math.cos(t*b.sp+b.ph)*b.amp+b.ix;
     const by=b.y+Math.sin(t*b.sp*0.8+b.ph2)*b.amp*0.7+b.iy;
-    b.ix*=0.95; b.iy*=0.95;
+    // A resting finger freezes the thrown pigment too. It keeps the exact mark
+    // beneath the hand; release lets the displacement settle again.
+    if(calm>0.002){b.ix*=0.95; b.iy*=0.95;}
     const sp2=blobSprite(b.color);
-    ictx.globalAlpha=Math.min(.5,th.blobA*b.a);
+    ictx.globalAlpha=Math.min(.18,th.blobA*b.a*.42);
     ictx.drawImage(sp2,bx-b.r,by-b.r,b.r*2,b.r*2);
   }
   ictx.globalAlpha=1;
@@ -665,7 +723,7 @@ let curT=0;   // elapsed animated time, advanced once a frame in frame()
 //    (threshold: 8px) is there to forbid.
 // Finger-made motion is untouched: fluidInject/fluidBurst still stir the ink, so
 // stirring the water with a fingertip works exactly as before.
-let calm=1;
+let calm=1, fingerStir=false;
 function currentCenter(t){
   const a=t*CURRENT_DRIFT;
   return {x:(0.5+0.62*Math.sin(a)+0.20*Math.sin(a*2.3+1.3))*vw(),
@@ -763,7 +821,7 @@ function drawMotes(){
   for(const m of MOTES){
     const X=m.x*vw(),Y=m.y*vh();
     const v=fluidAt(X,Y);
-    const nx=X+v.x*26, ny=Y+v.y*26;
+    const nx=X+v.x*26*calm, ny=Y+v.y*26*calm;
     const sp=Math.hypot(v.x,v.y);
     fctx.strokeStyle=rgba(th.dark?"#8FA3DC":th.pig2,Math.min(.3,.035+sp*2.2));
     fctx.beginPath(); fctx.moveTo(X,Y); fctx.lineTo(nx,ny); fctx.stroke();
@@ -780,7 +838,7 @@ function applyTheme(ix){
   rootStyle.setProperty("--faint",t.faint); rootStyle.setProperty("--line",t.line);
   rootStyle.setProperty("--pig1",t.pig1); rootStyle.setProperty("--pig2",t.pig2);
   rootStyle.setProperty("--accent",t.accent); rootStyle.setProperty("--plaque",t.plaque);
-  rootStyle.setProperty("--halo",t.halo); rootStyle.setProperty("--grainOp",t.dark?".3":".55");
+  rootStyle.setProperty("--halo",t.halo); rootStyle.setProperty("--grainOp",t.dark?".16":".28");
   rootStyle.setProperty("--bloomSat",t.dark?"#9FC2EE":t.pig2);
   rootStyle.setProperty("--bloomCtr",t.accent);
   rootStyle.setProperty("--bloomHalo",t.halo);
@@ -977,13 +1035,13 @@ function buildWorld(){
     let x,y;
     if(hs.length){
       x=hs.reduce((s2,c)=>s2+HUBPOS[c].x,0)/hs.length+((hsh%230)-115)*(hs.length>1?1.5:1);
-      y=hs.reduce((s2,c)=>s2+HUBPOS[c].y,0)/hs.length+(((hsh>>5)%230)-115)*(hs.length>1?1.5:1);
+      y=hs.reduce((s2,c)=>s2+HUBPOS[c].y,0)/hs.length+(((hsh>>>5)%230)-115)*(hs.length>1?1.5:1);
     } else {
-      x=(hsh%1000)/1000*WR.w; y=((hsh>>10)%1000)/1000*WR.h;
+      x=(hsh%1000)/1000*WR.w; y=((hsh>>>10)%1000)/1000*WR.h;
     }
     const wrN={e,wx:clamp(x,60,WR.w-60),wy:clamp(y,90,WR.h-90),
       pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,px:0,py:0,
-      dvx:(((hsh>>3)%100)/100-0.5)*0.16,dvy:(((hsh>>7)%100)/100-0.5)*0.12};
+      dvx:(((hsh>>>3)%100)/100-0.5)*0.16,dvy:(((hsh>>>7)%100)/100-0.5)*0.12};
     WORDS.push(wrN); WORDIX[e[0]]=wrN;
   }
   rePri();
@@ -1030,18 +1088,57 @@ function rePri(){
     wr.h01=((strHash(e[0])>>2)%100)/200+0.5;
   }
 }
-// the ~64 most deserving nearby words become touchable DOM; the rest are ink
-function refreshActive(){
-  if(stack.length) return;
-  const pad=140, vis=[];
+// Readable words are a stable window onto the larger ink vault. Membership is
+// camera-driven, never clock-driven: hold the glass still and no label is
+// silently exchanged for another. Selection uses the whole label box, not its
+// centre, and rejects collisions before opacity has to arbitrate them.
+let activeView=null;
+function activeRefreshNeeded(force){
+  if(force||!activeView||!ACTIVE.size) return true;
+  const dp=Math.abs(pagePhase-activeView.phase);
+  return Math.hypot(cam.x-activeView.x,cam.y-activeView.y)*cam.z>58||
+    Math.abs(cam.z-activeView.z)>.045||Math.abs(cam.rot-activeView.rot)>.035||
+    Math.min(dp,1-dp)>.008||vw()!==activeView.w||vh()!==activeView.h;
+}
+function activeBox(wr,s){
+  const live=wr.node&&!wr.node.gone&&!wr.node.removed?wr.node:null;
+  const fragile=wr.e[3]==="f"||!!store.unknown[wr.e[0]];
+  const fpx=(live&&live.fpx)|| (fragile?39:30);
+  return {wr,cx:s.x,cy:s.y,hw:Math.max(25,wr.e[0].length*fpx*.54+5),hh:fpx*.72};
+}
+function boxSafe(b){
+  if(b.cx-b.hw<16||b.cx+b.hw>vw()-16||b.cy-b.hh<62||b.cy+b.hh>vh()-68) return false;
+  for(const c of chromeRects)
+    if(b.cx+b.hw>c.x&&b.cx-b.hw<c.x+c.w&&b.cy+b.hh>c.y&&b.cy-b.hh<c.y+c.h) return false;
+  return true;
+}
+function boxesTangle(a,b,gap=9){
+  return a.cx+a.hw+gap>b.cx-b.hw&&a.cx-a.hw-gap<b.cx+b.hw&&
+    a.cy+a.hh+gap>b.cy-b.hh&&a.cy-a.hh-gap<b.cy+b.hh;
+}
+function refreshActive(force=false){
+  if(stack.length||!activeRefreshNeeded(force)) return;
+  activeView={x:cam.x,y:cam.y,z:cam.z,rot:cam.rot,phase:pagePhase,w:vw(),h:vh()};
+  refreshChromeRects();
+  const vis=[];
   for(const wr of WORDS){
-    const s=w2s(wr.wx,wr.wy);
+    const s=w2s(wr.wx+wr.ox,wr.wy+wr.oy);
     wr.sx=s.x; wr.sy=s.y;
     if(wr.gradedAt&&performance.now()-wr.gradedAt<180000) continue;
-    if(s.x>-pad&&s.x<vw()+pad&&s.y>-pad&&s.y<vh()+pad) vis.push(wr);
+    const box=activeBox(wr,s);
+    if(boxSafe(box)) vis.push({wr,box,score:wr.pri+PAGE_SPAN*pageOf(wr)});
   }
-  vis.sort((a,b)=>(b.pri+PAGE_SPAN*pageOf(b))-(a.pri+PAGE_SPAN*pageOf(a)));
-  const target=new Set(vis.slice(0,64));
+  vis.sort((a,b)=>b.score-a.score);
+  const targetN=Math.round(clamp(vw()*vh()/8500,28,42));
+  const chosen=[],target=new Set();
+  const admit=(row)=>{
+    if(target.has(row.wr)||chosen.some(old=>boxesTangle(row.box,old.box))) return false;
+    chosen.push(row); target.add(row.wr); return true;
+  };
+  // Preserve every still-valid member before filling vacancies. The priority
+  // wheel is allowed to choose new water only after the camera has moved.
+  for(const row of vis) if(ACTIVE.has(row.wr)&&chosen.length<targetN) admit(row);
+  for(const row of vis) if(chosen.length<targetN) admit(row);
   for(const wr of [...ACTIVE]){
     if(!target.has(wr)){
       // a word the user is holding is PINNED: the recycler may never cull
@@ -1053,7 +1150,7 @@ function refreshActive(){
       if(nd&&!nd.gone&&nd.el&&nd.el.classList.contains("unfolded")) continue;
       if(nd&&!nd.gone&&nd.mode==="free"){
         nd.gone=true; nd.top=0; nd.el.style.pointerEvents="none";
-        removeNode(nd,600); wr.node=null;
+        removeNode(nd,420); wr.node=null;
       }
       if(!nd||nd.mode==="free") ACTIVE.delete(wr);
     }
@@ -1140,56 +1237,26 @@ function bloomFocus(n){
   const cands=[];
   const seenB=new Set([n.w]);
   const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
-  // The family of the FIRST tap is a family of meaning. Authored SEM relations
-  // lead when they exist; then rarity-weighted gloss kinship; a shared glyph is
-  // a bonus that lifts true compounds, never the reason a stranger appears.
-  if(!WTOK) buildGlossIndex();
+  // Authored, typed meaning relations lead. If that pilot has no edge for this
+  // word, the outer ring may show only a plainly labelled SAME-CHARACTER
+  // structure family. English gloss fragments, radical resemblance and nearby
+  // same-level words are never allowed to impersonate meaning.
   const semList=SEM[n.w]||null;
-  const semRank=Object.create(null);
-  if(semList) semList.forEach((se,i)=>{semRank[se[0]]=i;});
-  const selfIx=WORDIX[n.w]?WORDS.indexOf(WORDIX[n.w]):-1;
-  const selfSetB=new Set(selfIx>=0?WTOK[selfIx]:glossTokens(n.g||""));
-  for(let i=0;i<WORDS.length;i++){
-    const wr=WORDS[i], w=wr.e[0];
+  const hasMeaning=!!(semList&&semList.some(se=>WORDIX[se[0]]));
+  if(semList) semList.forEach((se,i)=>{
+    const wr=WORDIX[se[0]];
+    if(!wr||seenB.has(se[0])) return;
+    seenB.add(se[0]);
+    wr.relTy=se[1]; wr.shell=se[1]==="syn"?1:(se[1]==="fam"||se[1]==="ant"?2:3);
+    cands.push([1e9-i*1e6-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+  });
+  if(ks.length) for(const wr of WORDS){
+    const w=wr.e[0];
     if(seenB.has(w)) continue;
-    let g=0;
-    for(const t of WTOK[i]) if(selfSetB.has(t)){
-      const df=GDF[t]||1; g+=df<=25?2.2:(df<=120?1.1:0.35);
-    }
-    let sc=0; for(const c of ks) if(w.includes(c)) sc++;
-    if(sc>2) sc=2;
-    let comb=g*2+sc*0.9+(g>0&&sc>0?1.0:0);
-    if(semRank[w]!=null) comb+=12-Math.min(9,semRank[w]);
-    if(comb<0.6) continue;
-    seenB.add(w);
-    wr.shell=comb>=4?1:(comb>=1.8?2:3);
-    cands.push([comb*1e7-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
-  }
-  // cascade to a floor of 6 — no word ever blooms into nothing (C2):
-  // radical kin next, then nearest same-level neighbours
-  if(cands.length<6&&ks.length){
-    const comps=new Set();
-    for(const c of ks) for(const r of (KRAD[c]||"")) comps.add(r);
-    if(comps.size) for(const wr of WORDS){
-      const w=wr.e[0];
-      if(seenB.has(w)) continue;
-      let rc=0;
-      for(const c of w) if(isKanji(c)&&[...(KRAD[c]||"")].some(r=>comps.has(r))) rc++;
-      if(!rc) continue;
-      seenB.add(w);
-      cands.push([1e6+rc*1e4-Math.hypot(wr.wx-bx,wr.wy-by)*0.1,wr]);
-    }
-  }
-  if(cands.length<6){
-    const lv=n.lvl||3;
-    for(const wr of WORDS){
-      const w=wr.e[0];
-      if(seenB.has(w)||(wr.e[5]||3)!==lv) continue;
-      const d=Math.hypot(wr.wx-bx,wr.wy-by);
-      if(d>2400) continue;
-      seenB.add(w);
-      cands.push([1e3-d*0.001,wr]);
-    }
+    const shared=ks.filter(c=>w.includes(c)).length;
+    if(!shared) continue;
+    seenB.add(w); wr.relTy="struct"; wr.shell=3;
+    cands.push([shared*1e6-Math.hypot(wr.wx-bx,wr.wy-by),wr]);
   }
   cands.sort((a,b)=>b[0]-a[0]);
   const N2=Math.min(14,cands.length);
@@ -1205,12 +1272,13 @@ function bloomFocus(n){
     const wr=cands[i][1];
     wr.hl=true; wr.ret=false;
     const ang=-Math.PI/2+i*TAU/N2+((strHash(wr.e[0])%40)-20)*0.012;
-    const r=((i%2?118:196)+(strHash(wr.e[0])%38))/cam.z;
+    const ring=wr.shell===1?94:wr.shell===2?132:168;
+    const r=(ring+(strHash(wr.e[0])%28))/cam.z;
     wr.bAng=ang; wr.bR=r;
-    wr.hx=bx+Math.cos(ang)*r-wr.wx;
-    wr.hy=by+Math.sin(ang)*r*0.9-wr.wy;
+    placeBloom(wr,bx,by);
     if(wr.node&&!wr.node.gone){
       wr.node.hlDom=true; wr.node.el.classList.add("bsat");
+      wr.node.el.classList.toggle("bstruct",wr.relTy==="struct");
       wr.node.top=Math.max(wr.node.top,0.95);
       satBand(wr.node,wr.shell);
     } else {
@@ -1220,11 +1288,14 @@ function bloomFocus(n){
       nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
       nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
       nd.el.classList.add("bsat");
+      nd.el.classList.toggle("bstruct",wr.relTy==="struct");
       satBand(nd,wr.shell);
     }
     FOCUS.push(wr);
   }
-  if(FOCUS.length&&n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);
+  if(FOCUS.length&&n.el){n.el.classList.add("bctr");
+    n.el.dataset.family=hasMeaning?"意味の近く":"同じ字をもつ語";
+    n.top=Math.max(n.top,0.97);
     // the tapped word is the loudest thing in its own constellation
     if(n.fpx>0){ n.ts=Math.max(n.ts,Math.min(2.0,28/n.fpx)); }}
   if(n.wref) markWalked(n.wref);
@@ -1237,6 +1308,7 @@ const LOCKS=[];   // ghost members: SEM relations with no corpus headword
 function lockMaterialize(wr){
   if(wr.node&&!wr.node.gone){
     wr.node.hlDom=true; wr.node.el.classList.add("bsat");
+    wr.node.el.classList.toggle("bstruct",wr.relTy==="struct");
     wr.node.top=Math.max(wr.node.top,0.95);
     satBand(wr.node,wr.shell);
     return wr.node;
@@ -1246,6 +1318,7 @@ function lockMaterialize(wr){
   nd.wx=wr.wx; nd.wy=wr.wy; nd.wref=wr; wr.node=nd;
   nd.fromBloom=true; nd.hlDom=true; nd.top=0.95;
   nd.el.classList.add("bsat");
+  nd.el.classList.toggle("bstruct",wr.relTy==="struct");
   satBand(nd,wr.shell);
   return nd;
 }
@@ -1256,6 +1329,20 @@ function lockMaterialize(wr){
 function satBand(nd,shell){
   const target=shell===1?23:shell===2?20:18;
   if(nd.fpx>0){ nd.ts=Math.max(0.62,Math.min(1.5,target/nd.fpx)); }
+}
+function placeBloom(wr,bx,by){
+  const tx=bx+Math.cos(wr.bAng)*wr.bR;
+  const ty=by+Math.sin(wr.bAng)*wr.bR*.9;
+  const s=w2s(tx,ty);
+  const nd=wr.node&&!wr.node.gone?wr.node:null;
+  const box=nd?nd.el.getBoundingClientRect():null;
+  const fpx=(nd&&nd.fpx)||24;
+  const padx=Math.min(vw()/2-4,Math.max(50,(box?box.width/2:wr.e[0].length*fpx*.52)+14));
+  const hh=(box?box.height/2:fpx*.7)+10;
+  const sx=clamp(s.x,padx,vw()-padx);
+  const sy=clamp(s.y,112+hh,vh()-142-hh);
+  const safe=s2wl(sx,sy);
+  wr.hx=safe.x-wr.wx;wr.hy=safe.y-wr.wy;
 }
 // a relation SEM knows but the corpus has no headword for — every kana-only
 // relative and every collocation. SEM authored a gloss for each one, so it
@@ -1272,11 +1359,11 @@ function lockGhost(label,gloss,wx,wy){
   return nd;
 }
 function clearBloom(keep){
-  if(focusN&&focusN.el){focusN.el.classList.remove("bctr"); focusN.top=focusN.baseOp;}
+  if(focusN&&focusN.el){focusN.el.classList.remove("bctr");delete focusN.el.dataset.family;focusN.top=focusN.baseOp;}
   for(const wr of FOCUS){
     wr.hl=false; wr.ret=true;
     if(wr.node){
-      wr.node.hlDom=false; wr.node.el.classList.remove("bsat");
+      wr.node.hlDom=false; wr.node.el.classList.remove("bsat","bstruct");
       if(wr.node.fromBloom&&!wr.node.gone&&wr.node!==keep){
         const bn=wr.node;
         bn.gone=true; bn.top=0; bn.el.style.pointerEvents="none";
@@ -1306,69 +1393,31 @@ function clearBloom(keep){
 // node — every relation pulled into shells, locked in place until released.
 // Consistency floor: cascading channels guarantee >=12 members for ANY word.
 // ---- meaning-first relatedness for words outside the authored SEM table ----
-// A constellation must read as a FAMILY OF MEANING, not a list of words that
-// happen to share a glyph: 外出's neighbours are 出かける and 散歩, not 出版.
-// Primary signal: rarity-weighted English gloss token overlap. Shared kanji
-// remains a kinship bonus — real compounds rise, coincidences sink.
-const GSTOP=new Set(["to","a","the","of","in","for","on","at","and","or","with","one","ones","be","is","do","etc","sth","so","not","from","by","an","into","out","up","as","that","this","it","its","something","someone"]);
-let WTOK=null,GDF=null;
-function glossTokens(g){
-  const t=[]; const seen=new Set();
-  for(const m of String(g).toLowerCase().split(/[^a-z]+/)){
-    if(m.length<3||GSTOP.has(m)||seen.has(m)) continue;
-    seen.add(m); t.push(m);
-  }
-  return t;
-}
-function buildGlossIndex(){
-  WTOK=new Array(WORDS.length); GDF=Object.create(null);
-  for(let i=0;i<WORDS.length;i++){
-    const tk=glossTokens(WORDS[i].e[2]);
-    WTOK[i]=tk;
-    for(const t of tk) GDF[t]=(GDF[t]||0)+1;
-  }
-}
+// The fallback surface is structure, and says so. It never uses translated
+// gloss tokens as a semantic proxy and never pads a family with level peers.
 function relationsFor(ks,selfW,lvl0,seen0){
   const seen=seen0?new Set(seen0):new Set([selfW]);
-  if(!WTOK) buildGlossIndex();
-  const selfWr=WORDIX[selfW];
-  const selfTok=selfWr?WTOK[WORDS.indexOf(selfWr)]:glossTokens("");
-  const selfSet=new Set(selfTok);
-  const scored=[];
-  for(let i=0;i<WORDS.length;i++){
-    const wr=WORDS[i], w=wr.e[0];
-    if(seen.has(w)) continue;
-    let gscore=0;
-    for(const t of WTOK[i]) if(selfSet.has(t)){
-      const df=GDF[t]||1;
-      gscore+=df<=25?2.2:(df<=120?1.1:0.35);
-    }
-    let kscore=0; for(const c of ks) if(w.includes(c)) kscore++;
-    if(kscore>2) kscore=2;
-    let sc=gscore+kscore*0.9;
-    if(gscore>0&&kscore>0) sc+=1.0;           // a true compound of the same meaning
-    const lg=Math.abs((wr.e[5]||3)-lvl0);
-    sc+=lg===0?0.35:(lg===1?0.15:0);
-    if(sc>0.6) scored.push([sc,gscore,wr]);
-  }
-  scored.sort((a,b)=>b[0]-a[0]);
   const mem=[];
-  for(const p2 of scored){
-    if(mem.length>=22) break;
-    const w=p2[2].e[0];
-    if(seen.has(w)) continue;
-    seen.add(w);
-    // shell by MEANING strength: close ring = related in sense, outer = kin only
-    p2[2].shell=p2[1]>=2?1:(p2[0]>=1.6?2:3);
-    mem.push(p2[2]);
+  for(const se of (SEM[selfW]||[])){
+    const wr=WORDIX[se[0]];
+    if(!wr||seen.has(se[0])) continue;
+    seen.add(se[0]); wr.relTy=se[1];
+    wr.shell=se[1]==="syn"?1:(se[1]==="fam"||se[1]==="ant"?2:3);
+    mem.push(wr);
+    if(mem.length>=22) return mem;
   }
-  if(mem.length<12){
-    for(const wr of WORDS){
-      if(mem.length>=12) break;
-      const w=wr.e[0];
-      if(seen.has(w)) continue;
-      if((wr.e[5]||3)===lvl0){seen.add(w);wr.shell=3;mem.push(wr);}
-    }
+  const self=WORDIX[selfW],bx=self?self.wx:cam.x,by=self?self.wy:cam.y;
+  const structural=[];
+  if(ks.length) for(const wr of WORDS){
+    const w=wr.e[0];
+    if(seen.has(w)) continue;
+    const shared=ks.filter(c=>w.includes(c)).length;
+    if(shared) structural.push([shared,Math.hypot(wr.wx-bx,wr.wy-by),wr]);
+  }
+  structural.sort((a,b)=>b[0]-a[0]||a[1]-b[1]);
+  for(const row of structural){
+    if(mem.length>=22) break;
+    const wr=row[2]; seen.add(wr.e[0]); wr.relTy="struct";wr.shell=3;mem.push(wr);
   }
   return mem;
 }
@@ -1416,6 +1465,7 @@ function constellationLock(n){
   });
   const seenSem=new Set([selfW]);
   const sem=SEM[selfW]||null;
+  if(n.el)n.el.dataset.family=sem&&sem.length?"意味の近く":"同じ字をもつ語";
   if(sem){
     const semLimit=Math.min(12,sem.length);
     let semN=0;
@@ -1424,7 +1474,7 @@ function constellationLock(n){
       if(seenSem.has(rel)) continue;
       seenSem.add(rel);
       const h=strHash(rel);
-      const shell=ty==="syn"?1:(ty==="fam"?2:3);
+      const shell=ty==="syn"?1:(ty==="fam"||ty==="ant"?2:3);
       const L=((shell===1?100:shell===2?150:242)+(h%70))*inv;
       const shared=ks.filter(c=>rel.includes(c));
       const pg=(shared.length===1&&pinOf[shared[0]])?pinOf[shared[0]]:null;
@@ -1432,6 +1482,7 @@ function constellationLock(n){
       const gx=bx+Math.cos(ang)*L, gy=by+Math.sin(ang)*L;
       const wr=WORDIX[rel];
       if(wr){
+        wr.shell=shell;wr.relTy=ty;
         wr.ox=gx-wr.wx; wr.oy=gy-wr.wy;
         wr.hl=true; wr.lk=true; wr.ret=false;
         lockMaterialize(wr);
@@ -1458,7 +1509,7 @@ function constellationLock(n){
     wr.hl=true; wr.lk=true; wr.ret=false;
     lockMaterialize(wr);
     FOCUS.push(wr);
-    LOCK.items.push({t:"w",wr,L,pg});
+    LOCK.items.push({t:"w",wr,L,pg,ty:wr.relTy});
   }
   ripple(n.x,n.y,true);
 }
@@ -2262,6 +2313,9 @@ function pinchDive(mid){
 }
 addEventListener("pointerdown",e=>{
   if(e.isPrimary&&touches.size){touches.clear();pinch=null;}
+  // Catch a moving sheet the instant a finger lands. A new deliberate drag can
+  // begin from here; inherited momentum must not keep sliding beneath it.
+  cam.vx=0; cam.vy=0;
   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(FOCUS.length) bloomLast=performance.now();
   if(touches.size===2){
@@ -2342,6 +2396,7 @@ addEventListener("pointermove",e=>{
   if(t2){
     pdx=e.clientX-t2.x; pdy=e.clientY-t2.y;
     fluidInject(e.clientX,e.clientY,pdx,pdy);
+    if(Math.abs(pdx)+Math.abs(pdy)>0.1) fingerStir=true;
     t2.x=e.clientX;t2.y=e.clientY;
   }
   if(pinch&&touches.size===2){
@@ -2502,14 +2557,18 @@ card.addEventListener("pointerup",e=>{
 });
 
 // ---- tendrils ----
-function brush(x1,y1,x2,y2,t,i,color){
-  const mx=(x1+x2)/2+(y2-y1)*0.15+Math.sin(t*0.0011+i*1.7)*9;
-  const my=(y1+y2)/2-(x2-x1)*0.15+Math.cos(t*0.0009+i*2.3)*9;
+function brush(x1,y1,x2,y2,t,i,color,alpha=1,width=1){
+  // Every relationship is the same curved, three-density brush. Its bend is
+  // seeded by the edge identity and does not wriggle independently over time.
+  const h=strHash(String(i));
+  const bend=((h%1000)/999-.5)*18;
+  const mx=(x1+x2)/2+(y2-y1)*0.13+bend;
+  const my=(y1+y2)/2-(x2-x1)*0.13+(((h>>>10)%1000)/999-.5)*18;
   fctx.lineCap="round";
   const passes=[[7,0.09],[3.2,0.2],[1.4,0.5]];
   for(const p of passes){
-    fctx.strokeStyle=rgba(color,p[1]);
-    fctx.lineWidth=p[0];
+    fctx.strokeStyle=rgba(color,p[1]*alpha);
+    fctx.lineWidth=p[0]*width;
     fctx.beginPath(); fctx.moveTo(x1,y1); fctx.quadraticCurveTo(mx,my,x2,y2); fctx.stroke();
   }
 }
@@ -2544,10 +2603,10 @@ function drawWorld(){
   if(half) ictx.setTransform(0.5,0,0,0.5,0,0);
   const lw=half?1.3:0.8;
   const far=cam.z<0.5, edgeCap=far?230:440;
-  const dotA1=rgba(th.pig1,(far?0.16:0.13)*(cam.z>0.8?0.6:1));
-  const dotA2=rgba(th.pig1,(far?0.30:0.26)*(cam.z>0.8?0.6:1));
+  const dotA1=rgba(th.pig1,(far?0.10:0.08)*(cam.z>0.8?0.52:1));
+  const dotA2=rgba(th.pig1,(far?0.20:0.16)*(cam.z>0.8?0.52:1));
   fctx.lineWidth=0.8;
-  const r2=Math.max(1,1.9*cam.z), rr=r2*2;
+  const r2=Math.max(.65,1.25*cam.z), rr=r2*2;
   // hoisted camera transform: no trig, no allocation inside the hot loop
   const cs=Math.cos(cam.rot), sn=Math.sin(cam.rot), cz=cam.z;
   const ccx=cam.x, ccy=cam.y, hw=vw()/2, hh=vh()/2;
@@ -2557,9 +2616,13 @@ function drawWorld(){
     const dx=HUBPOS[h].x-ccx, dy=HUBPOS[h].y-ccy;
     HSX[h]=hw+(dx*cs-dy*sn)*cz; HSY[h]=hh+(dx*sn+dy*cs)*cz;
   }
-  const drawEdges=edges<edgeCap&&cz<1.5;
-  const dotFaint=rgba(th.pig1,far?0.06:0.045);
-  const r3=r2*1.35, rr3=r3*2;
+  // The resting vault has depth but no connector claims. All relationships
+  // wait until a family is raised, where the single curved brush language can
+  // state them honestly; the old straight hub web was both murk and a second
+  // visual grammar.
+  const drawEdges=false;
+  const dotFaint=rgba(th.pig1,far?0.028:0.018);
+  const r3=r2*1.25, rr3=r3*2;
   const dHit=[],dMid=[],dLow=[];
   const thin=cz<0.45?4:(far?2:1);
   // one eye for the whole field this frame — hoisted so the gyre costs four
@@ -2647,21 +2710,10 @@ function drawWorld(){
     lctx.stroke();
   };
   const dimF=FOCUS.length?0.4:1;
-  draw(eB,0.067*dimF); draw(eD,0.038*dimF);
-  // relative-mesh: shared-kanji chains, one batched stroke
-  if(cz<1.6&&MESH.length){
-    lctx.lineWidth=lw;
-    lctx.strokeStyle=rgba(th.pig1,(cz<0.7?0.05:0.032)*(FOCUS.length?0.4:1));
-    lctx.beginPath();
-    let mdrawn=0;
-    const mcap=cz<0.5?300:1200;
-    for(let k2=0;k2<MESH.length&&mdrawn<mcap;k2+=2){
-      const a=WORDS[MESH[k2]], b2=WORDS[MESH[k2+1]];
-      if(a.vis!==frameCount||b2.vis!==frameCount) continue;
-      lctx.moveTo(a.sx,a.sy);lctx.lineTo(b2.sx,b2.sy);mdrawn++;
-    }
-    lctx.stroke();
-  }
+  draw(eB,0.026*dimF); draw(eD,0.012*dimF);
+  // Shared-kanji mesh used to lay a second straight-line language across the
+  // entire surface. The dots keep the vault's depth; relationships appear only
+  // when raised, in the curved brush language above.
   // the bloom: family assembled, connected, named
   if(FOCUS.length&&focusN&&!focusN.gone){
     const fx2=focusN.x+focusN.dragX, fy2=focusN.y+focusN.dragY;
@@ -2670,51 +2722,38 @@ function drawWorld(){
       const dx3=(fx2-vw()/2)/cam.z, dy3=(fy2-vh()/2)/cam.z;
       const ax=cam.x+dx3*cs3+dy3*sn3, ay=cam.y-dx3*sn3+dy3*cs3;
       for(const wr of FOCUS) if(!wr.lk&&wr.bR){
-        wr.hx=ax+Math.cos(wr.bAng)*wr.bR-wr.wx;
-        wr.hy=ay+Math.sin(wr.bAng)*wr.bR*0.9-wr.wy;
+        placeBloom(wr,ax,ay);
       }
     }
     if(LOCK){
       const gold=th.dark?"#E6C86E":"#A8842C";
-      const tyCol=t2=>t2==="syn"?th.pig1:t2==="fam"?th.pig2:
+      const tyCol=t2=>t2==="struct"?th.ink:t2==="syn"?th.pig1:t2==="fam"?th.pig2:
         t2==="col"?th.accent:t2?gold:th.pig2;
-      fctx.strokeStyle=rgba(th.pig1,0.55); fctx.lineWidth=1.7;
-      fctx.beginPath();
       for(const it of LOCK.items) if(it.t==="g"&&!it.g.gone){
-        fctx.moveTo(fx2,fy2); fctx.lineTo(it.g.x,it.g.y);
+        brush(fx2,fy2,it.g.x,it.g.y,curT,"glyph:"+(it.g.ch||""),th.pig1,.9,.48);
       }
-      fctx.stroke();
-      fctx.lineWidth=1.5;
       for(const it of LOCK.items){
         if(it.t==="w"&&it.wr.vis===frameCount){
           const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.55);
-          fctx.beginPath();
-          fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
-          fctx.lineTo(it.wr.sx,it.wr.sy);
-          fctx.stroke();
+          brush(p2?p2.x:fx2,p2?p2.y:fy2,it.wr.sx,it.wr.sy,curT,
+            "lock:"+it.wr.e[0],tyCol(it.ty),it.ty==="struct"?.28:.9,.44);
         } else if(it.t==="s"&&it.node&&!it.node.gone){
           // the label itself is a real DOM word now — canvas draws only the
           // thread and the anchor dot, never a second copy of the text
           const sp2=w2s(it.node.wx,it.node.wy);
           const p2=it.pg&&!it.pg.gone?it.pg:null;
-          fctx.strokeStyle=rgba(tyCol(it.ty),0.5);
-          fctx.beginPath();
-          fctx.moveTo(p2?p2.x:fx2,p2?p2.y:fy2);
-          fctx.lineTo(sp2.x,sp2.y);
-          fctx.stroke();
+          brush(p2?p2.x:fx2,p2?p2.y:fy2,sp2.x,sp2.y,curT,
+            "ghost:"+it.label,tyCol(it.ty),it.ty==="struct"?.26:.82,.42);
           fctx.fillStyle=rgba(tyCol(it.ty),0.55);
           fctx.fillRect(sp2.x-2.2,sp2.y-2.2,4.4,4.4);
         }
       }
     } else {
       const thr=th.dark?"#E6C86E":"#A8842C";
-      fctx.strokeStyle=rgba(thr,0.5); fctx.lineWidth=1.5;
-      fctx.beginPath();
       for(const wr of FOCUS) if(wr.vis===frameCount){
-        fctx.moveTo(fx2,fy2); fctx.lineTo(wr.sx,wr.sy);
+        brush(fx2,fy2,wr.sx,wr.sy,curT,"bloom:"+wr.e[0],
+          wr.relTy==="struct"?th.ink:thr,wr.relTy==="struct"?.24:.86,.42);
       }
-      fctx.stroke();
     }
     const dotc=lockOn?th.pig1:(th.dark?"#E6C86E":"#A8842C");
     const satc=lockOn?(th.dark?"#E6C86E":th.pig1):(th.dark?"#9FC2EE":th.pig2);
@@ -2757,9 +2796,7 @@ function drawGraph(){
     const d=Math.hypot(a.x-b.x,a.y-b.y);
     if(d>210) continue;
     const al=(1-d/210)*.16;
-    fctx.strokeStyle=rgba(th.pig2,al);
-    fctx.lineWidth=1;
-    fctx.beginPath(); fctx.moveTo(a.x,a.y); fctx.lineTo(b.x,b.y); fctx.stroke();
+    brush(a.x,a.y,b.x,b.y,curT,a.w+"→"+b.w,th.pig2,al/.5,.34);
     fctx.fillStyle=rgba(th.pig2,al*1.5);
     fctx.beginPath(); fctx.arc(a.x,a.y,2,0,TAU); fctx.fill();
     fctx.beginPath(); fctx.arc(b.x,b.y,2,0,TAU); fctx.fill();
@@ -2821,6 +2858,10 @@ function refreshChromeRects(){
   const els=[document.getElementById("brand"),document.getElementById("depth"),
     document.getElementById("theme"),document.getElementById("tray"),
     document.getElementById("hint"),document.getElementById("lvl")];
+  // In the fused vessel the corridor contributes its own top chrome and shelf
+  // door above this layer. They are part of the same glass and therefore part
+  // of the same keep-out geometry.
+  for(const el of document.querySelectorAll(".chrome,.drift-door")) els.push(el);
   for(const el of els){
     if(!el) continue;
     const cs2=getComputedStyle(el);
@@ -2915,12 +2956,16 @@ function frame(t){
   calm+=((touches.size?0:1)-calm)*EK(0.14);
   if(calm<0.002) calm=0;
   if(!reduced) curT+=dt*calm;
-  if(!reduced) fluidStep();
+  // Residual current is held, not merely damped, beneath a resting finger.
+  // A moving finger still gets one solve per stirred frame, so direct response
+  // remains alive without autonomous motion leaking through the hold.
+  if(!reduced&&(calm>0.002||fingerStir)) fluidStep();
+  fingerStir=false;
   lockForce();
-  drawInk(t);
+  drawInk(curT);
   fctx.setTransform(fdpr,0,0,fdpr,0,0);
   fctx.clearRect(0,0,vw(),vh());
-  drawStars(t);
+  drawStars(curT);
   if(!reduced) drawMotes();
   if(stack.length){
     const lvl=stack[stack.length-1];
@@ -2938,7 +2983,7 @@ function frame(t){
         if(!o.gone&&o.op>0.15){
           const col=o.kind==="word"?THEMES[themeIx].pig1:
             o.kind==="part"?THEMES[themeIx].accent:THEMES[themeIx].pig2;
-          brush(c.x,c.y,o.x,o.y,t,i,col);
+          brush(c.x,c.y,o.x,o.y,curT,(c.w||c.ch||"center")+":"+i,col);
         }
         i++;
       }
@@ -2949,9 +2994,8 @@ function frame(t){
           if(oa.gone||ob.gone||oa.op<0.2||ob.op<0.2) continue;
           if(oa.kind!=="word"||ob.kind!=="word") continue;
           if(![...oa.w].some(ch2=>isKanji(ch2)&&ob.w.includes(ch2))) continue;
-          fctx.strokeStyle=rgba(THEMES[themeIx].pig2,.18);
-          fctx.lineWidth=1;
-          fctx.beginPath();fctx.moveTo(oa.x,oa.y);fctx.lineTo(ob.x,ob.y);fctx.stroke();
+          brush(oa.x,oa.y,ob.x,ob.y,curT,"deep:"+oa.w+"→"+ob.w,
+            THEMES[themeIx].pig2,.34,.32);
         }
     }
   }
@@ -2976,6 +3020,7 @@ function frame(t){
     cam.x+=cam.vx; cam.y+=cam.vy; camClamp();
     cam.vx*=0.92; cam.vy*=0.92;
   }
+  if(frameCount%12===0) refreshActive();
   // spatial arbitration only at the resting surface with nothing held;
   // everywhere else every word is released back to full presence, so nothing
   // stays wrongly dimmed on return
@@ -2996,8 +3041,11 @@ function frame(t){
           const fv=fluidAt(s.x,s.y);
           // ...and the water's own push on a word settles under a hand too, so
           // "still under a finger" means still, not still-except-for-the-water
-          n.x=s.x+fv.x*(vw()/FW)*1.8*calm; n.y=s.y+fv.y*(vh()/FH)*1.8*calm;
-        } else { n.x=s.x; n.y=s.y; }
+          const txf=fv.x*(vw()/FW)*1.45*calm,tyf=fv.y*(vh()/FH)*1.45*calm;
+          n.fdx=(n.fdx||0)+(txf-(n.fdx||0))*EK(.12);
+          n.fdy=(n.fdy||0)+(tyf-(n.fdy||0))*EK(.12);
+          n.x=s.x+n.fdx; n.y=s.y+n.fdy;
+        } else { n.fdx=0;n.fdy=0;n.x=s.x; n.y=s.y; }
       }
       n.tx=n.x; n.ty=n.y;
       const lod=cam.z<0.62;
@@ -3009,8 +3057,8 @@ function frame(t){
     } else {
       if(n.mode==="orbit"&&n.orbit&&!n.orbit.c.gone){
         const ob=n.orbit;
-        ob.ang+=ob.spd*dt;
-        const br=1+0.045*Math.sin(t*0.0011+ob.ang*2);
+        ob.ang+=ob.spd*dt*calm;
+        const br=1+0.045*Math.sin(curT*0.0011+ob.ang*2);
         const fv=reduced?{x:0,y:0}:fluidAt(n.x,n.y);
         n.tx=ob.c.x+Math.cos(ob.ang)*ob.rx*br+fv.x*(vw()/FW)*0.14;
         n.ty=ob.c.y+Math.sin(ob.ang)*ob.ry*br+fv.y*(vh()/FH)*0.14;
@@ -3062,17 +3110,16 @@ function frame(t){
   drawTrail(t);
   requestAnimationFrame(frame);
 }
-addEventListener("resize",sizeCanvases);
+addEventListener("resize",scheduleCanvasSize);
+if(window.visualViewport) window.visualViewport.addEventListener("resize",scheduleCanvasSize);
+const driftGestureActive=()=>typeof DRIFT_ON==="undefined"||DRIFT_ON;
+for(const name of ["gesturestart","gesturechange"])
+  addEventListener(name,e=>{if(driftGestureActive())e.preventDefault();},{passive:false});
 sizeCanvases();
 initBlobs();
 applyTheme(0);
 updateTray();
 buildWorld();
-refreshActive();
-setInterval(refreshActive,650);
-if(!reduced) setInterval(function(){
-  fluidInject(Math.random()*vw(),Math.random()*vh(),
-    (Math.random()-.5)*26,(Math.random()-.5)*26);
-},3600);
+refreshActive(true);
 requestAnimationFrame(frame);
 </script>

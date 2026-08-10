@@ -189,6 +189,7 @@ const REL = {
   syn: ['類義', 'everyday synonyms and near-neighbours'],
   ant: ['対義', 'opposites'],
   fam: ['同族', 'shares a kanji — the family around it'],
+  reg: ['語感', 'the same idea in a different register or tone'],
   col: ['共起', 'what it actually appears with'],
   thm: ['主題', 'the theme it lives in'],
 };
@@ -273,6 +274,22 @@ const S = {
   taken: [],
   /** manual lists: { name: [{t,id,label,ts}] } — the operator's Renzo habit */
   lists: {},
+  /**
+   * One persisted learning spine. `taken` remains the learner's explicit
+   * Learn list; a card exists only after a Learn action made under the current
+   * contract. Legacy v1 list rows deliberately stay cardless until the learner
+   * activates them in the review room — the old UI promised that its schedule
+   * table saved nothing.
+   */
+  review: { version: 1, cards: {}, history: [] },
+  /** Unknown future review payload, retained byte-for-JSON-field on writes. */
+  reviewOpaque: null,
+  /** A finite, frozen queue. It is session-only and never refills mid-walk. */
+  reviewSession: null,
+  /** A persistence failure is visible and blocks a false claim of learning. */
+  storeError: null,
+  /** Malformed/unreadable storage is quarantined in place, never overwritten. */
+  storeReadOnly: false,
   /** tokens whose English gloss is shown beneath (double-tap) */
   glossed: null,
   /** which shelf cards have their raw signals expanded (詳細) */
@@ -301,15 +318,49 @@ function loadStore() {
     const s = JSON.parse(raw);
     if (Array.isArray(s.taken)) S.taken = s.taken;
     if (s.lists && typeof s.lists === 'object') S.lists = s.lists;
+    if (s.review && typeof s.review === 'object') {
+      const version = Number.isInteger(s.review.version) ? s.review.version : 1;
+      if (version !== 1) S.reviewOpaque = s.review;
+      S.review = {
+        version,
+        cards:
+          s.review.cards && typeof s.review.cards === 'object' && !Array.isArray(s.review.cards)
+            ? s.review.cards
+            : {},
+        history: Array.isArray(s.review.history) ? s.review.history : [],
+      };
+    }
   } catch {
-    /* a broken store never blocks the walk */
+    S.storeReadOnly = true;
+    S.storeError = tx(
+      '端末の学習データを読めなかった。元のデータを上書きしないため、変更を止めている。',
+      'The learner data on this device could not be read. Changes are paused so the original bytes are not overwritten.',
+    );
   }
 }
 function saveStore() {
+  if (S.storeReadOnly) {
+    if (!S.storeError) {
+      S.storeError = tx(
+        '読めない学習データを保護しているため、ここでは保存しない。',
+        'Saving is paused here to protect unreadable learner data.',
+      );
+    }
+    return false;
+  }
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists }));
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify({ taken: S.taken, lists: S.lists, review: S.reviewOpaque || S.review }),
+    );
+    S.storeError = null;
+    return true;
   } catch {
-    /* quota or private mode — the session keeps working unpersisted */
+    S.storeError = tx(
+      '端末に保存できなかった。評価もリスト変更も確定していない。',
+      'This device could not save the change. No review or list change was confirmed.',
+    );
+    return false;
   }
 }
 
@@ -629,7 +680,7 @@ function back() {
     }
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'review' || S.view === 'grammar') {
     S.view = 'shelf';
     render();
     // the shelf gets its place back the way the reader always has
@@ -977,8 +1028,8 @@ function renderShelfBody() {
   main.append(h);
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
-    `${D.passages.length} 本。触れてひらく。`,
-    `${D.passages.length} real texts. Tap one to read it.`,
+    '気になる読みものを、ひとつ。',
+    'Choose a reading that pulls you in.',
   );
   main.append(sub);
 
@@ -1652,6 +1703,61 @@ function renderTray(main) {
     return;
   }
 
+  const due = dueReviewCount();
+  const promoted = S.taken.filter((item) => reviewRecord(item)).length;
+  const lobby = el('section', due ? 'review-lobby due' : 'review-lobby');
+  lobby.id = 'review-lobby';
+  lobby.append(withEn(el('p', 'eyebrow', '復習'), 'review', 'en-inline'));
+  if (due) {
+    lobby.append(el('h2', 'review-lobby-title', tx(`${due} 件が戻っている`, `${due} item${due === 1 ? '' : 's'} ready to return`)));
+    const start = biLabel('button', 'review-start', '復習を始める', 'begin a finite session');
+    start.type = 'button';
+    start.id = 'start-review';
+    start.addEventListener('click', startReview);
+    lobby.append(start);
+  } else {
+    const active = S.taken
+      .map((item) => ({ item, record: reviewRecord(item) }))
+      .filter(({ item, record }) => reviewCompatible(record, item))
+      .map(({ record }) => record.memory)
+      .filter((memory) => memory.active)
+      .sort((a, b) => Date.parse(a.dueAt) - Date.parse(b.dueAt));
+    lobby.append(
+      el(
+        'h2',
+        'review-lobby-title',
+        active.length
+          ? tx(`つぎは ${relativeDue(active[0].dueAt)}`, `The next item returns ${relativeDue(active[0].dueAt)}`)
+          : tx('いま戻るものはない', 'Nothing is asking to return now'),
+      ),
+    );
+  }
+  if (promoted < S.taken.length) {
+    lobby.append(
+      el(
+        'p',
+        'review-state',
+        tx(
+          `${S.taken.length - promoted} 件は以前のリストのまま。復習にはまだ入っていない。`,
+          `${S.taken.length - promoted} older item${S.taken.length - promoted === 1 ? '' : 's'} remain${S.taken.length - promoted === 1 ? 's' : ''} in the list only — no review debt was created.`,
+        ),
+      ),
+    );
+  }
+  if (S.review.version !== 1) {
+    lobby.append(
+      el(
+        'div',
+        'review-warning',
+        tx(
+          'この復習データは新しい形式で書かれている。ここでは変更せず、そのまま保つ。',
+          'This review data was written by a newer format. It is preserved here without grading or migration.',
+        ),
+      ),
+    );
+  }
+  main.append(lobby);
+
   // month buckets fill themselves; named lists sit above them
   const buckets = new Map();
   for (const item of S.taken) {
@@ -1670,14 +1776,313 @@ function renderTray(main) {
     main.append(head);
     for (const item of sec.items) {
       const line = el('div', 'tray-line');
-      line.append(el('span', 'w', item.label));
-      line.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
-      const preview = schedulePreview();
-      line.append(el('span', 'when', preview ? preview.good.when : '—'));
-      line.addEventListener('click', () => go({ t: item.t, id: item.id }));
+      const entry = el('button', 'tray-entry');
+      entry.type = 'button';
+      entry.append(el('span', 'w', item.label));
+      entry.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
+      entry.addEventListener('click', () => go({ t: item.t, id: item.id }));
+      line.append(entry);
+      const record = reviewRecord(item);
+      if (!record) {
+        line.append(el('span', 'when', tx('リストだけ', 'list only')));
+        const promote = biLabel('button', 'review-toggle', '復習に入れる', 'start learning');
+        promote.type = 'button';
+        promote.dataset.reviewPromote = reviewKey(item);
+        promote.disabled = S.review.version !== 1 || S.storeReadOnly;
+        promote.addEventListener('click', () => {
+          const created = promoteToReview(item);
+          if (!created) {
+            S.storeError = tx('この形式では復習を変更できない。', 'This review format cannot be changed here.');
+          } else if (!saveStore()) {
+            delete S.review.cards[reviewKey(item)];
+          }
+          render();
+        });
+        line.append(promote);
+      } else {
+        const compatible = reviewCompatible(record, item);
+        const active = record?.memory?.active === true;
+        line.append(
+          el(
+            'span',
+            compatible ? 'when' : 'when scheduler-warning',
+            !compatible
+              ? tx('予定を読めない', 'scheduler changed')
+              : active
+              ? relativeDue(record.memory.dueAt)
+              : tx('休んでいる', 'paused'),
+          ),
+        );
+        const toggle = biLabel(
+          'button',
+          'review-toggle',
+          active ? '休む' : '再開',
+          active ? 'pause' : 'resume',
+        );
+        toggle.type = 'button';
+        toggle.dataset.reviewToggle = reviewKey(item);
+        toggle.setAttribute('aria-pressed', String(active));
+        toggle.disabled = !compatible;
+        toggle.addEventListener('click', () => {
+          setReviewActive(item, !active);
+          render();
+        });
+        line.append(toggle);
+      }
       main.append(line);
     }
   }
+}
+
+function currentReviewItem() {
+  const session = S.reviewSession;
+  if (!session || session.cursor >= session.ids.length) return null;
+  return itemForReviewKey(session.ids[session.cursor]);
+}
+
+function reviewContext(item) {
+  if (!item?.from?.passage || !Number.isInteger(item.from.index)) return null;
+  const source = D.passages.find((p) => p.id === item.from.passage);
+  if (!source) return null;
+  if (!source.tokens) {
+    ensureArticle(source)
+      .then(() => {
+        if (S.view === 'review' && currentReviewItem() === item) render();
+      })
+      .catch(() => {});
+    return null;
+  }
+  const tokens = source.tokens;
+  const anchor = Math.max(0, Math.min(item.from.index, tokens.length - 1));
+  let start = anchor;
+  let end = anchor;
+  while (start > 0 && !'。！？'.includes(tokens[start - 1].s)) start -= 1;
+  while (end < tokens.length - 1 && !'。！？'.includes(tokens[end].s)) end += 1;
+  return { source, tokens: tokens.slice(start, end + 1) };
+}
+
+function reviewContent(item) {
+  if (item.t === 'word') {
+    const word = lookup(item.id);
+    return {
+      cue: item.id,
+      reading: word?.r || '',
+      meanings: word?.m?.length ? word.m.slice(0, 5) : [tx('意味はまだない', 'meaning not yet present')],
+    };
+  }
+  if (item.t === 'kanji') {
+    const kanji = D.kanji[item.id];
+    return {
+      cue: item.id,
+      reading: [...(kanji?.on || []), ...(kanji?.kun || [])].join('・'),
+      meanings: kanji?.m ? [kanji.m] : [tx('意味はまだない', 'meaning not yet present')],
+    };
+  }
+  if (item.t === 'idiom') {
+    const idiom = D.idioms[item.id];
+    return {
+      cue: item.id,
+      reading: idiom?.r || '',
+      meanings: idiom?.g?.length ? idiom.g : [tx('語釈はまだない', 'gloss not yet present')],
+    };
+  }
+  const part = D.radicals[item.id];
+  return {
+    cue: item.id,
+    reading: part?.name || '',
+    meanings: [
+      part
+        ? tx(`${part.kanjiCount} 字に使われる部品`, `a component used in ${part.kanjiCount} kanji`)
+        : tx('この部品の説明はまだない', 'this component is not described yet'),
+    ],
+  };
+}
+
+function appendReviewContext(container, context, reveal) {
+  if (!context) return;
+  const line = el('p', 'review-context');
+  for (const token of context.tokens) {
+    const target = currentReviewItem();
+    if (target?.t === 'word' && token.b === target.id && token.c) {
+      line.append(el('span', reveal ? 'review-context-target revealed' : 'review-context-target', reveal ? token.s : '＿＿'));
+    } else {
+      line.append(document.createTextNode(token.s));
+    }
+  }
+  container.append(line);
+  container.append(el('p', 'review-source', context.source.title));
+}
+
+function revealReviewAnswer(revealedBeforeRecall) {
+  const item = currentReviewItem();
+  if (!S.reviewSession || !item) return;
+  S.reviewSession.revealed = true;
+  S.reviewSession.declaredRecall = !revealedBeforeRecall;
+  S.reviewSession.revealedBeforeRecall = revealedBeforeRecall;
+  S.reviewSession.attemptedAt = new Date().toISOString();
+  // Giving up is already a complete, unambiguous observation. Record the
+  // reveal as Again before drawing the answer so a reload cannot erase the
+  // clearest evidence that recall failed. The lone button afterward only moves
+  // to the next frozen card; it does not schedule twice.
+  if (revealedBeforeRecall) {
+    S.reviewSession.rated = applyReview(item, 'again', new Date(), true);
+  }
+  render();
+}
+
+function gradeCurrentReview(grade) {
+  const item = currentReviewItem();
+  const session = S.reviewSession;
+  if (!item || !session?.revealed) return;
+  const forcedAgain = !!session.revealedBeforeRecall;
+  if (forcedAgain && grade !== 'again') return;
+  if (forcedAgain && session.rated) {
+    advanceReview();
+    return;
+  }
+  const receipt = applyReview(item, grade, new Date(), forcedAgain);
+  if (!receipt) {
+    render();
+    return;
+  }
+  session.rated = receipt;
+  advanceReview();
+}
+
+function renderReview(main) {
+  main.append(withEn(el('p', 'eyebrow', '復習'), 'review', 'en-inline'));
+  const session = S.reviewSession;
+  if (!session) {
+    main.append(el('h1', 'view-title', tx('思い出す時間', 'A quiet return')));
+    const empty = el('section', 'review-closure');
+    empty.append(el('p', null, tx('リストから今日の復習を始める。', 'Begin today’s finite review from your list.')));
+    const lobby = biLabel('button', 'review-finish', 'リストへ', 'open review list');
+    lobby.type = 'button';
+    lobby.id = 'review-finish';
+    lobby.addEventListener('click', () => {
+      S.view = 'tray';
+      render();
+    });
+    empty.append(lobby);
+    main.append(empty);
+    return;
+  }
+
+  const item = currentReviewItem();
+  if (!item) {
+    main.append(el('h1', 'view-title', tx('今日はここまで。', 'That is enough for now.')));
+    const close = el('section', 'review-closure');
+    close.append(
+      el(
+        'p',
+        null,
+        session.deferredDueCount
+          ? tx(
+              `この回はここで閉じる。残り ${session.deferredDueCount} 件は次の回まで静かに待つ。`,
+              `This session closes here. ${session.deferredDueCount} more wait quietly for another session.`,
+            )
+          : tx('新しい予定は、押した評価からだけ決まった。', 'Only your answers shaped what returns next.'),
+      ),
+    );
+    const finish = biLabel('button', 'review-finish', 'リストへ戻る', 'return to the list');
+    finish.type = 'button';
+    finish.id = 'review-finish';
+    finish.addEventListener('click', () => {
+      S.reviewSession = null;
+      S.view = 'tray';
+      render();
+    });
+    close.append(finish);
+    main.append(close);
+    return;
+  }
+
+  const record = reviewRecord(item);
+  const memoryCompatible = reviewCompatible(record, item);
+  const content = reviewContent(item);
+  const context = reviewContext(item);
+  const room = el('section', 'review-room');
+  room.id = 'review-room';
+  room.dataset.planSize = String(session.ids.length);
+  room.dataset.cursor = String(session.cursor);
+  room.dataset.card = reviewKey(item);
+
+  const state = el(
+    'p',
+    'review-state',
+    tx(
+      `あと ${session.ids.length - session.cursor} 件`,
+      `${session.ids.length - session.cursor} remaining in this session`,
+    ),
+  );
+  room.append(state);
+
+  const prompt = el('div', 'review-prompt');
+  prompt.append(withEn(el('p', 'eyebrow', '意味を思い出す'), 'recall the meaning', 'en-inline'));
+  prompt.append(el('div', 'review-cue', content.cue));
+  appendReviewContext(prompt, context, session.revealed);
+  room.append(prompt);
+
+  if (!memoryCompatible) {
+    room.append(
+      el(
+        'div',
+        'review-warning',
+        tx(
+          'このカードの予定を安全に読めない。評価は保存されない。',
+          'This card’s scheduler stamp cannot be read safely, so grading is paused.',
+        ),
+      ),
+    );
+  }
+
+  if (!session.revealed) {
+    const actions = el('div', 'review-actions');
+    const reveal = biLabel('button', 'review-action primary', '答え合わせ', 'show after recalling');
+    reveal.type = 'button';
+    reveal.id = 'review-reveal';
+    reveal.addEventListener('click', () => revealReviewAnswer(false));
+    actions.append(reveal);
+    const giveUp = biLabel('button', 'review-action', '思い出せない', 'show and repeat');
+    giveUp.type = 'button';
+    giveUp.id = 'review-give-up';
+    giveUp.addEventListener('click', () => revealReviewAnswer(true));
+    actions.append(giveUp);
+    room.append(actions);
+  } else {
+    const answer = el('div', 'review-answer');
+    answer.id = 'review-answer';
+    if (content.reading) answer.append(el('p', 'review-reading', content.reading));
+    const meanings = el('div', 'review-meanings');
+    for (const meaning of content.meanings) meanings.append(el('p', null, meaning));
+    answer.append(meanings);
+    appendReviewContext(answer, context, true);
+    const entry = biLabel('button', 'review-entry', '項目をひらく', 'open the full entry');
+    entry.type = 'button';
+    entry.addEventListener('click', () => go({ t: item.t, id: item.id, from: item.from || null }));
+    answer.append(entry);
+    room.append(answer);
+
+    const ratings = el('div', 'review-ratings');
+    const grades = session.revealedBeforeRecall
+      ? [['again', 'もう一度', 'again']]
+      : [
+          ['again', 'もう一度', 'again'],
+          ['hard', '難しかった', 'hard'],
+          ['good', '思い出せた', 'good'],
+          ['easy', 'すぐ分かった', 'easy'],
+        ];
+    for (const [grade, ja, en] of grades) {
+      const button = biLabel('button', 'review-grade', ja, en);
+      button.type = 'button';
+      button.dataset.reviewGrade = grade;
+      button.disabled = !memoryCompatible;
+      button.addEventListener('click', () => gradeCurrentReview(grade));
+      ratings.append(button);
+    }
+    room.append(ratings);
+  }
+  main.append(room);
 }
 
 /* ------------------------------------------------------------- particles
@@ -2169,8 +2574,349 @@ const NODE_KIND = {
   idiom: ['熟語', 'idiom'],
 };
 
+const REVIEW_SESSION_CAP = 20;
+const REVIEW_PHASE_TO_STATE = {
+  new: () => fsrsApi.State.New,
+  learning: () => fsrsApi.State.Learning,
+  review: () => fsrsApi.State.Review,
+  relearning: () => fsrsApi.State.Relearning,
+};
+
+function reviewKey(item) {
+  return `${item.t}:${item.id}`;
+}
+
+function itemForReviewKey(key) {
+  return S.taken.find((item) => reviewKey(item) === key) || null;
+}
+
+function reviewRecord(item) {
+  return item ? S.review.cards[reviewKey(item)] || null : null;
+}
+
+function reviewCompatible(record, item) {
+  const memory = record?.memory;
+  const stamp = memory?.scheduler;
+  const contract = record?.contract;
+  const finite = (value) => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  const whole = (value) => finite(value) && Number.isInteger(value);
+  const instant = (value) => {
+    if (typeof value !== 'string' || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(value)) return false;
+    try {
+      return new Date(value).toISOString() === value;
+    } catch {
+      return false;
+    }
+  };
+  const key = item ? reviewKey(item) : null;
+  const expectedContractId = key ? `corridor:${key}:form-to-meaning:v1` : null;
+  return (
+    S.review.version === 1 &&
+    !!item &&
+    !!scheduler &&
+    !!fsrsApi &&
+    contract?.contractId === expectedContractId &&
+    contract.contractVersion === 1 &&
+    contract.targetComponentId === `kc:${item.id}` &&
+    contract.skill === 'form_to_meaning' &&
+    contract.cueModality === 'text' &&
+    contract.responseModality === 'free' &&
+    contract.scoring?.kind === 'rubric' &&
+    contract.scoring.rubricId === 'bunki-self-check-form-to-meaning' &&
+    contract.scoring.rubricVersion === '1' &&
+    contract.hintPolicy?.hintsAllowed === false &&
+    contract.hintPolicy?.maxHints === 0 &&
+    contract.revealPolicy?.revealAllowed === true &&
+    contract.revealPolicy?.revealIsRecorded === true &&
+    contract.promptFamilyVersion === 'corridor-form-to-meaning-v1' &&
+    instant(contract.createdAt) &&
+    memory?.contractId === contract.contractId &&
+    typeof memory.active === 'boolean' &&
+    Object.hasOwn(REVIEW_PHASE_TO_STATE, memory.phase) &&
+    finite(memory.stability) &&
+    finite(memory.difficulty) &&
+    instant(memory.dueAt) &&
+    (memory.lastReviewedAt === null || instant(memory.lastReviewedAt)) &&
+    instant(memory.schedulerAnchorAt) &&
+    instant(memory.activatedAt) &&
+    whole(memory.scheduledDays) &&
+    whole(memory.learningStep) &&
+    whole(memory.reps) &&
+    whole(memory.lapses) &&
+    whole(memory.admittedReviewCount) &&
+    stamp?.package === D.pin?.package &&
+    stamp?.version === D.pin?.pinnedVersion &&
+    stamp?.algorithm === D.pin?.algorithm &&
+    stamp?.parameterSetId === D.pin?.parameterSetId &&
+    stamp?.reviewTimePolicyId === D.pin?.reviewTimePolicyId
+  );
+}
+
+function schedulerStamp() {
+  return {
+    package: D.pin.package,
+    version: D.pin.pinnedVersion,
+    algorithm: D.pin.algorithm,
+    parameterSetId: D.pin.parameterSetId,
+    reviewTimePolicyId: D.pin.reviewTimePolicyId,
+  };
+}
+
+/** Promotion is an explicit Learn action, not a side effect of lookup/capture. */
+function promoteToReview(item, at = new Date()) {
+  if (S.review.version !== 1 || S.storeReadOnly) return null;
+  const key = reviewKey(item);
+  const existing = S.review.cards[key];
+  if (existing) {
+    if (!reviewCompatible(existing, item)) return null;
+    existing.memory.active = true;
+    return existing;
+  }
+  const activatedAt = new Date(at).toISOString();
+  const contractId = `corridor:${key}:form-to-meaning:v1`;
+  const record = {
+    contract: {
+      contractId,
+      contractVersion: 1,
+      targetComponentId: `kc:${item.id}`,
+      skill: 'form_to_meaning',
+      cueModality: 'text',
+      responseModality: 'free',
+      scoring: {
+        kind: 'rubric',
+        rubricId: 'bunki-self-check-form-to-meaning',
+        rubricVersion: '1',
+      },
+      hintPolicy: { hintsAllowed: false, maxHints: 0 },
+      revealPolicy: { revealAllowed: true, revealIsRecorded: true },
+      promptFamilyVersion: 'corridor-form-to-meaning-v1',
+      createdAt: activatedAt,
+      createdByEventId: `corridor:learn:${key}:${activatedAt}`,
+    },
+    memory: {
+      contractId,
+      active: true,
+      phase: 'new',
+      stability: 0,
+      difficulty: 0,
+      dueAt: activatedAt,
+      lastReviewedAt: null,
+      schedulerAnchorAt: activatedAt,
+      scheduledDays: 0,
+      learningStep: 0,
+      reps: 0,
+      lapses: 0,
+      admittedReviewCount: 0,
+      activatedAt,
+      scheduler: schedulerStamp(),
+    },
+  };
+  S.review.cards[key] = record;
+  return record;
+}
+
+function setReviewActive(item, active) {
+  const record = reviewRecord(item);
+  if (!record?.memory || !reviewCompatible(record, item)) return;
+  const before = record.memory.active;
+  record.memory.active = active;
+  if (!saveStore()) record.memory.active = before;
+}
+
+function cardFromMemory(memory) {
+  if (memory.phase === 'new' && memory.reps === 0) {
+    return fsrsApi.createEmptyCard(memory.schedulerAnchorAt);
+  }
+  return {
+    due: memory.dueAt,
+    stability: memory.stability,
+    difficulty: memory.difficulty,
+    elapsed_days: 0,
+    scheduled_days: memory.scheduledDays,
+    learning_steps: memory.learningStep,
+    reps: memory.reps,
+    lapses: memory.lapses,
+    state: REVIEW_PHASE_TO_STATE[memory.phase](),
+    last_review: memory.schedulerAnchorAt,
+  };
+}
+
+function roundMemory(value) {
+  return Number.parseFloat(value.toFixed(D.pin.statePrecision));
+}
+
+/**
+ * The only mutating scheduling door in Corridor. Reveal-before-recall is
+ * forced to Again; raw submitted and effective grades both remain in history.
+ */
+function applyReview(item, submittedGrade, reviewedAt, revealedBeforeRecall) {
+  if (!scheduler || !fsrsApi) return null;
+  const record = reviewRecord(item);
+  if (!record?.memory?.active || !reviewCompatible(record, item)) return null;
+  const before = { ...record.memory };
+  const rawAt = new Date(reviewedAt).toISOString();
+  const effectiveGrade = revealedBeforeRecall ? 'again' : submittedGrade;
+  const anchorMs = Date.parse(before.schedulerAnchorAt);
+  const reviewMs = Date.parse(rawAt);
+  const schedulerAt = new Date(Math.max(anchorMs, reviewMs));
+  const ratingName = effectiveGrade[0].toUpperCase() + effectiveGrade.slice(1);
+  const next = scheduler.next(
+    cardFromMemory(before),
+    schedulerAt,
+    fsrsApi.Rating[ratingName],
+  ).card;
+  const phaseByState = {
+    [fsrsApi.State.New]: 'new',
+    [fsrsApi.State.Learning]: 'learning',
+    [fsrsApi.State.Review]: 'review',
+    [fsrsApi.State.Relearning]: 'relearning',
+  };
+  record.memory = {
+    ...before,
+    phase: phaseByState[next.state],
+    stability: roundMemory(next.stability),
+    difficulty: roundMemory(next.difficulty),
+    dueAt: next.due.toISOString(),
+    lastReviewedAt: rawAt,
+    schedulerAnchorAt: schedulerAt.toISOString(),
+    scheduledDays: next.scheduled_days,
+    learningStep: next.learning_steps,
+    reps: next.reps,
+    lapses: next.lapses,
+    admittedReviewCount: before.admittedReviewCount + 1,
+  };
+  const receipt = {
+    id: `corridor:review:${reviewKey(item)}:${rawAt}:${S.review.history.length}`,
+    sessionId: S.reviewSession?.sessionId || null,
+    contractId: record.contract.contractId,
+    item: { t: item.t, id: item.id },
+    reviewedAt: rawAt,
+    schedulerAt: schedulerAt.toISOString(),
+    submittedGrade,
+    effectiveGrade,
+    revealedBeforeRecall,
+    userConfirmedEasy: submittedGrade === 'easy' && !revealedBeforeRecall,
+    parameterSetId: D.pin.parameterSetId,
+    before: {
+      phase: before.phase,
+      dueAt: before.dueAt,
+      stability: before.stability,
+      difficulty: before.difficulty,
+    },
+    after: {
+      phase: record.memory.phase,
+      dueAt: record.memory.dueAt,
+      stability: record.memory.stability,
+      difficulty: record.memory.difficulty,
+    },
+    source: item.from || null,
+  };
+  const itemStartedMs = Date.parse(S.reviewSession?.itemStartedAt || rawAt);
+  const attemptedMs = Date.parse(S.reviewSession?.attemptedAt || rawAt);
+  const latencyMs = Math.max(0, Math.round(attemptedMs - itemStartedMs));
+  // Schema-shaped local evidence, deliberately not presented as a canonical
+  // @bunki/domain event: the static prototype does not own the domain gate or
+  // immutable log yet. Keeping the boundary named prevents this adapter from
+  // silently acquiring replay/export authority.
+  receipt.observation = {
+    authority: 'prototype-local-self-report',
+    observationId: receipt.id,
+    observedAt: rawAt,
+    contractId: record.contract.contractId,
+    grade: effectiveGrade,
+    latencyMs,
+    hintsUsed: 0,
+    revealedBeforeRecall,
+    ...(effectiveGrade === 'easy' ? { userConfirmedEasy: true } : {}),
+    probeContext: 'standalone',
+    tier: 'A',
+  };
+  S.review.history.push(receipt);
+  if (!saveStore()) {
+    S.review.history.pop();
+    record.memory = before;
+    return null;
+  }
+  return receipt;
+}
+
+function dueReviewItems(now = new Date()) {
+  const at = now.getTime();
+  return S.taken
+    .filter((item) => {
+      const record = reviewRecord(item);
+      const memory = record?.memory;
+      return reviewCompatible(record, item) && memory.active && Date.parse(memory.dueAt) <= at;
+    })
+    .sort((a, b) => {
+      const ad = Date.parse(reviewRecord(a).memory.dueAt);
+      const bd = Date.parse(reviewRecord(b).memory.dueAt);
+      return ad - bd || (a.ts || 0) - (b.ts || 0) || reviewKey(a).localeCompare(reviewKey(b));
+    });
+}
+
+function dueReviewCount() {
+  return dueReviewItems().length;
+}
+
+function relativeDue(dueAt, now = new Date()) {
+  const ms = Date.parse(dueAt) - now.getTime();
+  if (ms <= 30_000) return tx('いま', 'now');
+  const mins = Math.max(1, Math.round(ms / 60_000));
+  if (mins < 60) return tx(`${mins} 分後`, `in ${mins} min`);
+  const hours = Math.round(ms / 3_600_000);
+  if (hours < 36) return tx(`${hours} 時間後`, `in ${hours} h`);
+  const days = Math.round(ms / 86_400_000);
+  return tx(`${days} 日後`, `in ${days} d`);
+}
+
+function startReview() {
+  if (
+    S.reviewSession &&
+    S.reviewSession.cursor < S.reviewSession.ids.length
+  ) {
+    S.stack = [];
+    S.view = 'review';
+    render();
+    return;
+  }
+  const due = dueReviewItems();
+  const ids = due.slice(0, REVIEW_SESSION_CAP).map(reviewKey);
+  const startedAt = new Date().toISOString();
+  S.reviewSession = {
+    sessionId: `corridor:session:${startedAt}`,
+    ids: Object.freeze(ids),
+    cursor: 0,
+    revealed: false,
+    declaredRecall: false,
+    revealedBeforeRecall: false,
+    attemptedAt: null,
+    rated: null,
+    deferredDueCount: Math.max(0, due.length - ids.length),
+    startedAt,
+    itemStartedAt: startedAt,
+  };
+  S.stack = [];
+  S.view = 'review';
+  window.scrollTo(0, 0);
+  render();
+}
+
+function advanceReview() {
+  if (!S.reviewSession) return;
+  S.reviewSession.cursor += 1;
+  S.reviewSession.revealed = false;
+  S.reviewSession.declaredRecall = false;
+  S.reviewSession.revealedBeforeRecall = false;
+  S.reviewSession.attemptedAt = null;
+  S.reviewSession.rated = null;
+  S.reviewSession.itemStartedAt = new Date().toISOString();
+  render();
+}
+
 function takeButton(node, label) {
   const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
+  const writable = S.review.version === 1 && !S.storeReadOnly;
   const btn = biLabel(
     'button',
     already ? 'take taken' : 'take',
@@ -2179,9 +2925,10 @@ function takeButton(node, label) {
   );
   btn.type = 'button';
   btn.id = 'take';
+  btn.disabled = !already && !writable;
   btn.addEventListener('click', () => {
-    if (already) return;
-    S.taken.push({
+    if (already || !writable) return;
+    const item = {
       t: node.t,
       id: node.id,
       label,
@@ -2189,8 +2936,19 @@ function takeButton(node, label) {
       kindEn: NODE_KIND[node.t][1],
       from: node.from || null,
       ts: Date.now(),
-    });
-    saveStore();
+    };
+    const priorRecord = S.review.cards[reviewKey(item)] || null;
+    const priorActive = priorRecord?.memory?.active;
+    S.taken.push(item);
+    const promoted = promoteToReview(item, item.ts);
+    if (!promoted || !saveStore()) {
+      S.taken.pop();
+      if (!priorRecord) delete S.review.cards[reviewKey(item)];
+      else if (typeof priorActive === 'boolean') priorRecord.memory.active = priorActive;
+      if (!S.storeError) {
+        S.storeError = tx('復習を始められなかった。', 'Review could not be started safely.');
+      }
+    }
     render();
   });
   return btn;
@@ -2213,9 +2971,10 @@ function renderListPicker(sheet, node, label) {
     chip.append(el('span', 'big', name));
     chip.append(el('span', 'sub', `${S.lists[name].length}`));
     chip.addEventListener('click', () => {
+      const before = [...S.lists[name]];
       if (inList) S.lists[name] = S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id));
       else S.lists[name].push({ t: node.t, id: node.id, label, ts: item.ts });
-      saveStore();
+      if (!saveStore()) S.lists[name] = before;
       render();
     });
     chips.append(chip);
@@ -2228,7 +2987,7 @@ function renderListPicker(sheet, node, label) {
     const name = window.prompt(tx('リスト名', 'List name'));
     if (!name || S.lists[name]) return;
     S.lists[name] = [{ t: node.t, id: node.id, label, ts: item.ts }];
-    saveStore();
+    if (!saveStore()) delete S.lists[name];
     render();
   });
   chips.append(add);
@@ -2297,6 +3056,62 @@ function renderSchedule(container) {
   const note = el('div', 'note');
   note.textContent = tx('実計算のプレビュー。まだ何も保存されない。', 'A real FSRS-6 preview — nothing is saved yet.');
   container.append(note);
+}
+
+function renderMemoryStatus(container, node) {
+  const item = S.taken.find((candidate) => candidate.t === node.t && candidate.id === node.id);
+  if (!item) return;
+  const record = reviewRecord(item);
+  const wrap = el('div', 'review-entry-state');
+  if (!record) {
+    wrap.append(
+      el(
+        'p',
+        'review-state',
+        tx(
+          '以前のリストに残した項目。復習はまだ始まっていない。',
+          'Kept in an older list; no review schedule has been created.',
+        ),
+      ),
+    );
+    const promote = biLabel('button', 'review-toggle wide', '復習に入れる', 'start learning');
+    promote.type = 'button';
+    promote.dataset.reviewPromote = reviewKey(item);
+    promote.disabled = S.review.version !== 1 || S.storeReadOnly;
+    promote.addEventListener('click', () => {
+      const created = promoteToReview(item);
+      if (!created) {
+        S.storeError = tx('この形式では復習を変更できない。', 'This review format cannot be changed here.');
+      } else if (!saveStore()) {
+        delete S.review.cards[reviewKey(item)];
+      }
+      render();
+    });
+    wrap.append(promote);
+  } else {
+    const compatible = reviewCompatible(record, item);
+    wrap.append(
+      el(
+        'p',
+        compatible ? 'review-state' : 'review-warning',
+        !compatible
+          ? tx(
+              'このカードは別の予定表で作られている。履歴を保ったまま復習を止めている。',
+              'This card belongs to a different scheduler pin. Its history is kept and grading is paused.',
+            )
+          : record.memory.active
+          ? tx(`つぎの復習：${relativeDue(record.memory.dueAt)}`, `Next review: ${relativeDue(record.memory.dueAt)}`)
+          : tx('復習を休んでいる。履歴はそのまま残っている。', 'Review is paused; its history is still here.'),
+      ),
+    );
+    if (compatible && record.memory.active && Date.parse(record.memory.dueAt) <= Date.now()) {
+      const open = biLabel('button', 'review-toggle wide', '復習へ', 'open review');
+      open.type = 'button';
+      open.addEventListener('click', startReview);
+      wrap.append(open);
+    }
+  }
+  container.append(wrap);
 }
 
 /** Variant A (#38): the SAME target word rendered both ways. */
@@ -2510,8 +3325,12 @@ function renderWordNode(sheet, node) {
 
   sheet.append(takeButton(node, label));
   renderListPicker(sheet, node, label);
-  renderCardVariant(sheet, { id: node.id, from: node.from });
-  renderSchedule(sheet);
+  if (S.variantsBar) {
+    renderCardVariant(sheet, { id: node.id, from: node.from });
+    renderSchedule(sheet);
+  } else {
+    renderMemoryStatus(sheet, node);
+  }
 }
 
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
@@ -2621,7 +3440,8 @@ function renderKanjiNode(sheet, node) {
 
   sheet.append(takeButton(node, k.c));
   renderListPicker(sheet, node, k.c);
-  renderSchedule(sheet);
+  if (S.variantsBar) renderSchedule(sheet);
+  else renderMemoryStatus(sheet, node);
 }
 
 /* ==================================================== 筆順 · stroke order ===
@@ -3172,7 +3992,8 @@ function renderRadicalNode(sheet, node) {
 
   sheet.append(takeButton(node, r.c));
   renderListPicker(sheet, node, r.c);
-  renderSchedule(sheet);
+  if (S.variantsBar) renderSchedule(sheet);
+  else renderMemoryStatus(sheet, node);
 }
 
 function renderIdiomNode(sheet, node) {
@@ -3200,7 +4021,8 @@ function renderIdiomNode(sheet, node) {
   );
   sheet.append(takeButton(node, idiom.w));
   renderListPicker(sheet, node, idiom.w);
-  renderSchedule(sheet);
+  if (S.variantsBar) renderSchedule(sheet);
+  else renderMemoryStatus(sheet, node);
 }
 
 function renderSheet(root) {
@@ -3446,6 +4268,7 @@ function render() {
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) parts.push(passage().title);
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  if (S.view === 'review') parts.push(tx('復習', 'review'));
   if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
@@ -3471,13 +4294,17 @@ function render() {
   }
   chrome.append(langSeg);
 
-  const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
+  const dueNow = S.ready ? dueReviewCount() : 0;
+  const trayBtn = biLabel('button', null, dueNow ? `復 ${dueNow}` : `覚 ${S.taken.length}`, dueNow ? 'review' : 'lists');
   trayBtn.type = 'button';
-  trayBtn.id = 'tray';
+  trayBtn.id = 'review';
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];
-    S.view = 'tray';
+    S.view =
+      S.reviewSession && S.reviewSession.cursor < S.reviewSession.ids.length
+        ? 'review'
+        : 'tray';
     render();
   });
   chrome.append(trayBtn);
@@ -3485,6 +4312,13 @@ function render() {
 
   const main = el('main');
   root.append(main);
+
+  if (S.storeError) {
+    const warning = el('div', 'review-warning', S.storeError);
+    warning.id = 'store-warning';
+    warning.setAttribute('role', 'alert');
+    main.append(warning);
+  }
 
   if (!S.ready) {
     main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));
@@ -3509,6 +4343,7 @@ function render() {
   else if (S.view === 'entry') renderEntry(main);
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
+  else if (S.view === 'review') renderReview(main);
   else if (S.view === 'grammar') renderGrammar(main);
   else renderShelf(main);
 

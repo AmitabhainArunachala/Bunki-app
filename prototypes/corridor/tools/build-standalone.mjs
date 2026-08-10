@@ -41,7 +41,7 @@ for (const file of readdirSync(articlesDir).sort()) {
 }
 
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
-const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating'];
+const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating', 'State'];
 
 const fragment = process.argv.includes('--fragment');
 

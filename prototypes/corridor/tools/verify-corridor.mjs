@@ -297,7 +297,10 @@ async function main() {
     return {
       ctr: !!ctr,
       ctrColor: ctr ? getComputedStyle(ctr).color : null,
+      family: ctr?.dataset.family ?? null,
       sats: sats.length,
+      structural: sats.filter((s) => s.classList.contains('bstruct')).length,
+      clipped: sats.filter((s) => { const b = s.getBoundingClientRect(); return b.left < 0 || b.right > innerWidth || b.top < 60 || b.bottom > innerHeight - 64; }).length,
       satColor: sats.length ? getComputedStyle(sats[0]).color : null,
       fieldColor: field ? getComputedStyle(field).color : null,
       r: ctr ? (() => { const b = ctr.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; })() : null,
@@ -305,8 +308,9 @@ async function main() {
   })()`);
   check('bloom · the constellation is its own relief — three colour families',
     bloomProbe.ctr && bloomProbe.sats >= satFloor
+      && bloomProbe.clipped === 0 && !!bloomProbe.family
       && bloomProbe.ctrColor !== bloomProbe.satColor && bloomProbe.satColor !== bloomProbe.fieldColor,
-    `centre ${bloomProbe.ctrColor} · ${bloomProbe.sats} satellites ${bloomProbe.satColor} (floor ${satFloor}) · field ${bloomProbe.fieldColor}`);
+    `centre ${bloomProbe.ctrColor} · ${bloomProbe.sats} satellites (${bloomProbe.structural} structural; ${bloomProbe.clipped} clipped) · ${bloomProbe.family} · field ${bloomProbe.fieldColor}`);
   // drag the centre; the family must follow and the drag must stick
   const meanD = `(() => {
     const c = document.querySelector('#drift-layer .word.bctr')?.getBoundingClientRect();
@@ -847,27 +851,318 @@ async function main() {
   await shoot(page, shotsDir, '04c-radical-to-kanji');
   report.hops = hops;
 
-  // ------------------------------------------------------------ step 5 take
-  console.log('\n— step 5 · 覚える');
+  // ---------------------------------------------------------- step 5 review
+  // Three result slots replace the three old take/schedule-preview slots, so
+  // the frozen suite total remains 91. Each slot is a complete state-machine
+  // walk: creation + honest recall, a capped finite plan, then legacy opt-in.
+  console.log('\n— step 5 · 覚える → 復習');
+  const reviewProbes = [];
+
+  // A new explicit Learn action creates both the list row and its due card.
   await tap(page, '#take');
-  const taken = await page.locator('#tray').textContent();
-  check('any node can be taken into study', /覚\s*[1-9]/.test(taken), `chrome reads "${taken.trim()}"`);
-  const bucket = await page.evaluate(`(() => {
-    const p = document.querySelector('.list-picker .eyebrow');
-    return p ? p.textContent : null;
+  const firstTake = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const item = store.taken.at(-1);
+    const key = item ? item.t + ':' + item.id : null;
+    const card = key ? store.review?.cards?.[key] : null;
+    return {
+      key,
+      taken: store.taken.length,
+      cards: Object.keys(store.review?.cards || {}).length,
+      active: card?.memory?.active,
+      due: Date.parse(card?.memory?.dueAt || '') <= Date.now(),
+      admitted: card?.memory?.admittedReviewCount,
+      history: store.review?.history?.length,
+      chrome: document.querySelector('#review')?.textContent?.trim() || '',
+      bucket: document.querySelector('.list-picker .eyebrow')?.textContent || '',
+    };
   })()`);
-  check('覚える lands the item in this month\'s list automatically',
-    !!bucket && /\d{4}年\d{1,2}月/.test(bucket), String(bucket).slice(0, 44));
-  const sched = await page.evaluate(`(() => {
-    const rows = [...document.querySelectorAll('#sheet .sched tr')].slice(1).map((r) =>
-      [...r.querySelectorAll('td')].map((td) => td.textContent));
-    return { rows, note: document.querySelector('#sheet .sched')?.previousElementSibling?.textContent ?? '' };
+
+  await tap(page, '#sheet-close');
+  await page.waitForSelector('#sheet', { state: 'detached' });
+  await tap(page, '#review');
+  await page.waitForSelector('#review-lobby');
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await tap(page, '#start-review');
+  await page.waitForSelector('#review-room');
+  const reviewBeforeReveal = await page.evaluate(`(() => ({
+    answer: document.querySelectorAll('#review-answer').length,
+    reveal: document.querySelectorAll('#review-reveal').length,
+    giveUp: document.querySelectorAll('#review-give-up').length,
+    planSize: Number(document.querySelector('#review-room')?.dataset.planSize),
+    card: document.querySelector('#review-room')?.dataset.card || '',
+  }))()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  await tap(page, '#review-reveal');
+  await page.waitForSelector('#review-answer');
+  const normalReveal = await page.evaluate(`(() => ({
+    answer: document.querySelectorAll('#review-answer').length,
+    grades: [...document.querySelectorAll('[data-review-grade]')].map((b) => b.dataset.reviewGrade),
+  }))()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await shoot(page, shotsDir, '05-review-room');
+  await tap(page, '[data-review-grade="good"]');
+  await page.waitForSelector('#review-finish');
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  const afterGood = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const item = store.taken.at(-1);
+    const key = item.t + ':' + item.id;
+    const card = store.review.cards[key];
+    const receipt = store.review.history.at(-1);
+    return {
+      key,
+      history: store.review.history.length,
+      admitted: card.memory.admittedReviewCount,
+      lastReviewedAt: card.memory.lastReviewedAt,
+      dueAt: card.memory.dueAt,
+      receiptGrade: receipt?.submittedGrade,
+      effectiveGrade: receipt?.effectiveGrade,
+      revealedBeforeRecall: receipt?.revealedBeforeRecall,
+      receiptDueAt: receipt?.after?.dueAt,
+    };
   })()`);
-  check('the schedule preview shows what FSRS-6 would do',
-    sched.rows.length === 4 && sched.rows.every((r) => r[1] && r[2]),
-    sched.rows.map((r) => `${r[0]}→${r[1]}`).join(' · '));
-  await shoot(page, shotsDir, '05-take-and-schedule');
-  report.steps.push({ step: 5, name: 'take', shot: '05-take-and-schedule.png', schedule: sched.rows });
+
+  // A navigation reload must reconstruct the same memory and receipt.
+  await open('?entry=shelf');
+  const reloadedGood = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const item = store.taken.at(-1);
+    const key = item.t + ':' + item.id;
+    const card = store.review.cards[key];
+    return {
+      key,
+      history: store.review.history.length,
+      admitted: card.memory.admittedReviewCount,
+      lastReviewedAt: card.memory.lastReviewedAt,
+      dueAt: card.memory.dueAt,
+    };
+  })()`);
+  await tap(page, '#review');
+  await page.waitForSelector('#review-lobby');
+  const reloadUi = await page.evaluate(`({
+    toggles: document.querySelectorAll('[data-review-toggle]').length,
+    due: document.querySelectorAll('#start-review').length,
+  })`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  check('Review · 覚える creates a due card; honest Good persists through reload',
+    firstTake.taken === 1 && firstTake.cards === 1 && firstTake.active && firstTake.due
+      && firstTake.admitted === 0 && firstTake.history === 0
+      && /復\s*1/.test(firstTake.chrome) && /\d{4}年\d{1,2}月/.test(firstTake.bucket)
+      && reviewBeforeReveal.answer === 0 && reviewBeforeReveal.reveal === 1 && reviewBeforeReveal.giveUp === 1
+      && reviewBeforeReveal.planSize === 1 && reviewBeforeReveal.card === firstTake.key
+      && normalReveal.answer === 1 && normalReveal.grades.join(',') === 'again,hard,good,easy'
+      && afterGood.history === 1 && afterGood.admitted === 1 && !!afterGood.lastReviewedAt
+      && afterGood.receiptGrade === 'good' && afterGood.effectiveGrade === 'good'
+      && afterGood.revealedBeforeRecall === false && afterGood.receiptDueAt === afterGood.dueAt
+      && reloadedGood.key === afterGood.key && reloadedGood.history === afterGood.history
+      && reloadedGood.admitted === afterGood.admitted
+      && reloadedGood.lastReviewedAt === afterGood.lastReviewedAt
+      && reloadedGood.dueAt === afterGood.dueAt && reloadUi.toggles === 1,
+    `taken/card/history ${firstTake.taken}/${firstTake.cards}/${firstTake.history}; `
+      + `pre-answer ${reviewBeforeReveal.answer}; ratings ${normalReveal.grades.join(',')}; `
+      + `Good receipts ${afterGood.history}; reload receipts ${reloadedGood.history}`);
+
+  // Seed 21 due cards from the valid persisted scheduler stamp. The room owns
+  // only 20: its data-plan-size must not change and the 21st must not refill it.
+  const finiteSeed = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const original = store.taken.at(-1);
+    const originalKey = original.t + ':' + original.id;
+    const template = store.review.cards[originalKey];
+    const now = Date.now();
+    const anchor = new Date(now - 180000).toISOString();
+    template.memory.active = true;
+    template.memory.dueAt = new Date(now - 120000).toISOString();
+    template.memory.lastReviewedAt = anchor;
+    template.memory.schedulerAnchorAt = anchor;
+    for (let i = 0; i < 20; i += 1) {
+      const id = '検証用' + String(i + 1).padStart(2, '0');
+      const key = 'word:' + id;
+      const contractId = 'corridor:' + key + ':form-to-meaning:v1';
+      const record = JSON.parse(JSON.stringify(template));
+      record.contract.contractId = contractId;
+      record.contract.targetComponentId = 'kc:' + id;
+      record.memory.contractId = contractId;
+      record.memory.active = true;
+      record.memory.dueAt = new Date(now - 60000 + i * 100).toISOString();
+      record.memory.lastReviewedAt = anchor;
+      record.memory.schedulerAnchorAt = anchor;
+      store.taken.push({ t: 'word', id, label: id, kind: '語', kindEn: 'word', from: null, ts: now + i });
+      store.review.cards[key] = record;
+    }
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify(store));
+    return { originalKey, history: store.review.history.length, due: store.taken.length };
+  })()`);
+  await open('?entry=shelf');
+  await tap(page, '#review');
+  await page.waitForSelector('#start-review');
+  await tap(page, '#start-review');
+  await page.waitForSelector('#review-room');
+  const finitePlan = await page.evaluate(`(() => ({
+    size: Number(document.querySelector('#review-room').dataset.planSize),
+    cursor: Number(document.querySelector('#review-room').dataset.cursor),
+    card: document.querySelector('#review-room').dataset.card,
+  }))()`);
+  const planSnapshots = [finitePlan];
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  await tap(page, '#review-give-up');
+  await page.waitForSelector('#review-answer');
+  const giveUpReveal = await page.evaluate(
+    `[...document.querySelectorAll('[data-review-grade]')].map((b) => b.dataset.reviewGrade)`,
+  );
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await tap(page, '[data-review-grade="again"]');
+
+  for (let cursor = 1; cursor < finitePlan.size; cursor += 1) {
+    await page.waitForSelector('#review-room');
+    planSnapshots.push(await page.evaluate(`(() => ({
+      size: Number(document.querySelector('#review-room').dataset.planSize),
+      cursor: Number(document.querySelector('#review-room').dataset.cursor),
+      card: document.querySelector('#review-room').dataset.card,
+    }))()`));
+    await tap(page, '#review-reveal');
+    await page.waitForSelector('#review-answer');
+    await tap(page, '[data-review-grade="good"]');
+  }
+  await page.waitForSelector('#review-finish');
+  const finiteClose = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const due = Object.values(store.review.cards)
+      .filter((record) => record.memory.active && Date.parse(record.memory.dueAt) <= Date.now()).length;
+    const receipt = store.review.history[${finiteSeed.history}];
+    return {
+      history: store.review.history.length,
+      due,
+      finish: document.querySelectorAll('#review-finish').length,
+      text: document.querySelector('.review-closure')?.textContent || '',
+      chrome: document.querySelector('#review')?.textContent?.trim() || '',
+      receipt: receipt ? {
+        submittedGrade: receipt.submittedGrade,
+        effectiveGrade: receipt.effectiveGrade,
+        revealedBeforeRecall: receipt.revealedBeforeRecall,
+      } : null,
+    };
+  })()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  check('Review · give-up forces Again and a frozen finite plan closes without refill',
+    finiteSeed.due === 21 && finitePlan.size === 20 && finitePlan.cursor === 0
+      && finitePlan.card === finiteSeed.originalKey && giveUpReveal.join(',') === 'again'
+      && planSnapshots.length === finitePlan.size
+      && planSnapshots.every((snapshot, index) => snapshot.size === finitePlan.size && snapshot.cursor === index)
+      && finiteClose.history === finiteSeed.history + finitePlan.size
+      && finiteClose.receipt?.submittedGrade === 'again'
+      && finiteClose.receipt?.effectiveGrade === 'again'
+      && finiteClose.receipt?.revealedBeforeRecall === true
+      && finiteClose.finish === 1 && finiteClose.due === 1
+      && /1/.test(finiteClose.text) && /復\s*1/.test(finiteClose.chrome),
+    `plan ${finitePlan.size}, snapshots ${planSnapshots.length}; give-up ratings ${giveUpReveal.join(',')}; `
+      + `receipts ${finiteSeed.history}→${finiteClose.history}; deferred due ${finiteClose.due}`);
+
+  // The v1 shape is intentionally debt-free. Only the visible opt-in creates a
+  // card; after one receipt, pausing removes it from due work without erasing it.
+  await page.evaluate(`(() => {
+    const ts = Date.now() - 86400000;
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      taken: [{ t: 'word', id: '世界', label: '世界', kind: '語', kindEn: 'word', from: null, ts }],
+      lists: {},
+    }));
+  })()`);
+  await open('?entry=shelf');
+  await tap(page, '#review');
+  await page.waitForSelector('#review-lobby');
+  const legacyBefore = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return {
+      hasReview: Object.prototype.hasOwnProperty.call(store, 'review'),
+      start: document.querySelectorAll('#start-review').length,
+      promote: document.querySelectorAll('[data-review-promote]').length,
+      toggle: document.querySelectorAll('[data-review-toggle]').length,
+    };
+  })()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await tap(page, '[data-review-promote]');
+  const legacyPromoted = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const records = Object.values(store.review.cards);
+    return {
+      cards: records.length,
+      history: store.review.history.length,
+      active: records[0]?.memory?.active,
+      due: Date.parse(records[0]?.memory?.dueAt || '') <= Date.now(),
+      start: document.querySelectorAll('#start-review').length,
+      promote: document.querySelectorAll('[data-review-promote]').length,
+      toggle: document.querySelectorAll('[data-review-toggle]').length,
+    };
+  })()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await tap(page, '#start-review');
+  await page.waitForSelector('#review-room');
+  await tap(page, '#review-reveal');
+  await page.waitForSelector('#review-answer');
+  await tap(page, '[data-review-grade="good"]');
+  await page.waitForSelector('#review-finish');
+  await tap(page, '#review-finish');
+  await page.waitForSelector('[data-review-toggle]');
+
+  // Make the learned card due before reloading so the pause assertion proves
+  // removal from the due set, rather than merely hiding an already-future card.
+  await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const record = Object.values(store.review.cards)[0];
+    record.memory.dueAt = new Date(Date.now() - 60000).toISOString();
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify(store));
+  })()`);
+  await open('?entry=shelf');
+  await tap(page, '#review');
+  await page.waitForSelector('#start-review');
+  const beforePause = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return {
+      history: store.review.history.length,
+      active: Object.values(store.review.cards)[0].memory.active,
+      due: document.querySelectorAll('#start-review').length,
+    };
+  })()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+  await tap(page, '[data-review-toggle]');
+  const afterPause = await page.evaluate(`(() => {
+    const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return {
+      history: store.review.history.length,
+      active: Object.values(store.review.cards)[0].memory.active,
+      due: document.querySelectorAll('#start-review').length,
+      toggle: document.querySelectorAll('[data-review-toggle]').length,
+    };
+  })()`);
+  reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+  check('Review · legacy lists stay debt-free until opt-in; pause keeps the receipt and removes due',
+    legacyBefore.hasReview === false && legacyBefore.start === 0
+      && legacyBefore.promote === 1 && legacyBefore.toggle === 0
+      && legacyPromoted.cards === 1 && legacyPromoted.history === 0
+      && legacyPromoted.active && legacyPromoted.due && legacyPromoted.start === 1
+      && legacyPromoted.promote === 0 && legacyPromoted.toggle === 1
+      && beforePause.history === 1 && beforePause.active && beforePause.due === 1
+      && afterPause.history === beforePause.history && !afterPause.active
+      && afterPause.due === 0 && afterPause.toggle === 1,
+    `legacy review=${legacyBefore.hasReview}, promote ${legacyBefore.promote}; `
+      + `cards ${legacyPromoted.cards}; history ${beforePause.history}→${afterPause.history}; due ${beforePause.due}→${afterPause.due}`);
+  report.steps.push({
+    step: 5,
+    name: 'review',
+    shot: '05-review-room.png',
+    firstTake,
+    normalReveal,
+    afterGood,
+    finite: { plan: finitePlan.size, snapshots: planSnapshots.length, deferredDue: finiteClose.due },
+    legacy: { before: legacyBefore, promoted: legacyPromoted, beforePause, afterPause },
+  });
 
   // ---------------------------------------------------------- step 6 return
   console.log('\n— step 6 · return without losing your place');
@@ -998,7 +1293,13 @@ async function main() {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
-  m.targets = [...panelProbe.targets, ...shelfProbe.targets];
+  // Review was exercised earlier in every meaningful state (lobby, hidden
+  // answer, ratings, closure, legacy opt-in, pause). Fold those probes into the
+  // existing hygiene checks instead of creating new result slots.
+  const allHygieneProbes = [panelProbe, shelfProbe, ...reviewProbes];
+  m.targets = allHygieneProbes.flatMap((probe) => probe.targets);
+  m.docScrollWidth = Math.max(...allHygieneProbes.map((probe) => probe.docScrollWidth));
+  m.innerWidth = Math.min(...allHygieneProbes.map((probe) => probe.innerWidth));
   report.measurements.text = m.text;
   report.measurements.targets = m.targets;
   report.measurements.semRowsOnProbePanel = semRows;
@@ -1020,7 +1321,7 @@ async function main() {
   check(`every visible control is at least ${MIN_TAP}px`, small.length === 0,
     small.length
       ? small.map((t) => `${t.id || t.text} visual ${t.w}×${t.h}, hit ${t.hitW}×${t.hitH}`).join(', ')
-      : `${m.targets.length} controls checked, including inline token hit regions`);
+      : `${m.targets.length} controls checked, including review and inline-token hit regions`);
 
   check('the page never scrolls sideways at 390px',
     m.docScrollWidth <= m.innerWidth,
@@ -1058,8 +1359,8 @@ async function main() {
   await open('?entry=shelf');
   const biChrome = await page.evaluate(`(() => ({
     backEn: /back/i.test(document.querySelector('#back')?.textContent ?? ''),
-    trayEn: /lists/i.test(document.querySelector('#tray')?.textContent ?? ''),
-    trayJa: /覚/.test(document.querySelector('#tray')?.textContent ?? ''),
+    trayEn: /lists/i.test(document.querySelector('#review')?.textContent ?? ''),
+    trayJa: /覚/.test(document.querySelector('#review')?.textContent ?? ''),
     segEn: document.querySelector('#lang [data-lang="bi"]')?.textContent === 'EN',
     segJa: document.querySelector('#lang [data-lang="ja"]')?.textContent === '日本語',
     active: document.querySelector('#lang [data-lang="bi"]')?.getAttribute('aria-pressed'),
@@ -1074,7 +1375,7 @@ async function main() {
   await page.waitForTimeout(200);
   const jaChrome = await page.evaluate(`(() => {
     const latin = (sel) => /[a-z]/i.test(document.querySelector(sel)?.textContent ?? '');
-    return { back: latin('#back'), tray: latin('#tray'), active: document.querySelector('#lang [data-lang="ja"]')?.getAttribute('aria-pressed') };
+    return { back: latin('#back'), tray: latin('#review'), active: document.querySelector('#lang [data-lang="ja"]')?.getAttribute('aria-pressed') };
   })()`);
   check('v1.1 · 日本語のみ strips the chrome back to immersion mode',
     !jaChrome.back && !jaChrome.tray && jaChrome.active === 'true',

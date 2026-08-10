@@ -719,8 +719,9 @@ console.log(`census: ${cen.words} words · ${cen.ghosts} ghosted · rawWorstOver
   }
   R(
     'law-rest-reachable',
-    cen.peNone.length === 0 && cen.unreachableGhosts.length === 0 && probe != null && gestureOk === true,
-    `pointer-events:none on ${cen.peNone.length}; ghosts not under a hub with no reachable point: ${cen.unreachableGhosts.length}${cen.unreachableGhosts.length ? ' ' + JSON.stringify(cen.unreachableGhosts) : ''}; live tap on ghost "${probe ? probe.w : '—'}" (op ${probe ? probe.opBefore : '—'}) -> ${after ? JSON.stringify(after) : 'n/a'} · ${cen.hubShadowedGhosts.length} ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: ${cen.unreachableOther.length} full-presence words fully covered by other words, ${cen.underChromeOnly.length} covered by chrome`,
+    cen.peNone.length === 0 && cen.unreachableGhosts.length === 0 &&
+      (cen.ghosts === 0 || (probe != null && gestureOk === true)),
+    `pointer-events:none on ${cen.peNone.length}; ghosts not under a hub with no reachable point: ${cen.unreachableGhosts.length}${cen.unreachableGhosts.length ? ' ' + JSON.stringify(cen.unreachableGhosts) : ''}; ${cen.ghosts ? `live tap on ghost "${probe ? probe.w : '—'}" (op ${probe ? probe.opBefore : '—'}) -> ${after ? JSON.stringify(after) : 'n/a'}` : 'no ghost was manufactured: geometry needed no receding'} · ${cen.hubShadowedGhosts.length} ghost(s) standing on a galaxy sun yield their tap to the door by design · pre-existing crowding, not the arbiter's doing: ${cen.unreachableOther.length} full-presence words fully covered by other words, ${cen.underChromeOnly.length} covered by chrome`,
   );
   notes.reachProbe = { probe, after, gestureOk };
 }

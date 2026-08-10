@@ -260,6 +260,15 @@ h1.view-title {
 /* ------------------------------------------------- the drift entry door
  * One door out of the universe into the shelf. Sits above the drift layer
  * (z 15) and beneath the sheets; indigo = "you can go here". */
+html.drift-active,
+html.drift-active body,
+html.drift-active .app,
+html.drift-active .chrome,
+html.drift-active .drift-door {
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
 .drift-door {
   position: fixed;
   right: 16px;
@@ -2321,4 +2330,344 @@ body.v-depth-layered .stroke-page {
 .stroke-meta {
   font-family: var(--serif);
   letter-spacing: 0.05em;
+}
+
+/* ==================================================== v2.1 · the return ===
+ * Review is a finite sitting on raised washi, not a dashboard. Indigo opens
+ * every door; bengara appears only where the answer is read or the scheduler
+ * needs to warn. Nothing in the room animates or grows behind the learner.
+ */
+
+.review-lobby,
+.review-room,
+.review-closure {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 24% 14%, rgba(255, 253, 246, 0.92), transparent 62%),
+    var(--ground-0, var(--ground));
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 22px rgba(20, 24, 28, 0.025),
+    0 3px 18px rgba(20, 24, 28, 0.055);
+}
+
+.review-lobby {
+  padding: 18px;
+  margin: 16px 0 24px;
+}
+
+.review-lobby.due {
+  border-color: color-mix(in srgb, var(--ai) 24%, var(--line-soft));
+}
+
+.review-lobby-title {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(20px, 6vw, 26px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.035em;
+  overflow-wrap: anywhere;
+}
+
+.review-start,
+.review-action,
+.review-grade,
+.review-entry,
+.review-finish,
+.review-toggle,
+.tray-entry {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  max-width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--serif);
+  line-height: 1.35;
+  transition: none;
+  animation: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.review-start,
+.review-finish {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 9px 16px;
+  border: 1px solid var(--ai);
+  background: var(--ai);
+  color: var(--ground-0, var(--ground));
+  letter-spacing: 0.075em;
+}
+
+.review-room {
+  padding: clamp(16px, 5vw, 28px);
+  margin: 14px 0 22px;
+}
+
+.review-prompt {
+  min-width: 0;
+  padding: clamp(18px, 6vw, 30px) clamp(14px, 5vw, 26px);
+  margin: 12px 0 18px;
+  background: color-mix(in srgb, var(--ground-0, var(--ground)) 94%, var(--ground-2));
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  box-shadow: inset 0 0 18px rgba(20, 24, 28, 0.02);
+}
+
+.review-cue {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(34px, 13vw, 58px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.review-context {
+  margin: 20px 0 0;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: clamp(16px, 4.6vw, 19px);
+  line-height: 2;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.review-context-target {
+  display: inline-block;
+  min-width: 2.8em;
+  padding-inline: 0.12em;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.review-context-target.revealed {
+  color: var(--ink);
+  background: var(--ai-wash);
+  border-bottom-color: color-mix(in srgb, var(--ai) 45%, var(--line));
+}
+
+.review-source {
+  margin: 6px 0 0;
+  color: var(--faint);
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.55;
+  letter-spacing: 0.035em;
+  overflow-wrap: anywhere;
+}
+
+.review-answer {
+  min-width: 0;
+  padding: 18px clamp(14px, 5vw, 24px);
+  margin: 0 0 16px;
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+
+.review-reading {
+  margin: 0 0 8px;
+  color: var(--red);
+  font-family: var(--serif);
+  font-size: clamp(18px, 5.4vw, 24px);
+  line-height: 1.6;
+  letter-spacing: 0.055em;
+  overflow-wrap: anywhere;
+}
+
+.review-meanings {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.review-meanings p {
+  margin: 0;
+}
+
+.review-meanings p + p {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.review-actions,
+.review-ratings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+}
+
+.review-action,
+.review-grade,
+.review-entry,
+.review-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, var(--line));
+  background: transparent;
+  color: var(--ai);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.review-action.primary {
+  background: var(--ai);
+  color: var(--ground-0, var(--ground));
+  border-color: var(--ai);
+}
+
+.review-grade {
+  min-height: 52px;
+}
+
+.review-ratings > :only-child {
+  grid-column: 1 / -1;
+}
+
+.review-entry {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.review-closure {
+  padding: clamp(20px, 7vw, 34px);
+  margin: 18px 0;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+.review-closure p {
+  margin: 0 0 18px;
+}
+
+.review-state {
+  margin: 8px 0 12px;
+  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.65;
+  letter-spacing: 0.025em;
+  overflow-wrap: anywhere;
+}
+
+.review-warning {
+  margin: 12px 0 16px;
+  padding: 10px 12px;
+  color: var(--red);
+  background: var(--red-wash);
+  border-left: 2px solid var(--red);
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.review-entry-state {
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  margin: 2px 0 14px;
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+
+.review-entry-state .review-state {
+  margin-top: 0;
+}
+
+.review-toggle.wide {
+  width: 100%;
+}
+
+/* A tray row remains one compact line: the entry owns the elastic space,
+ * while the due state and pause/resume door keep their readable widths. */
+.tray-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.tray-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 2px;
+  color: var(--ai);
+  background: transparent;
+  border: 0;
+  text-align: left;
+}
+
+.tray-entry .w {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tray-line .when {
+  margin-left: 0;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.tray-line .when.scheduler-warning {
+  color: var(--red);
+  white-space: normal;
+  text-align: right;
+}
+
+.tray-line .review-toggle {
+  min-width: 58px;
+  padding-inline: 8px;
+}
+
+.review-start:focus-visible,
+.review-action:focus-visible,
+.review-grade:focus-visible,
+.review-entry:focus-visible,
+.review-finish:focus-visible,
+.review-toggle:focus-visible,
+.tray-entry:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+}
+
+.review-action:disabled,
+.review-grade:disabled,
+.review-entry:disabled,
+.review-start:disabled,
+.review-finish:disabled,
+.review-toggle:disabled {
+  cursor: default;
+  opacity: 0.42;
 }
