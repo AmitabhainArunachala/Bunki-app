@@ -2605,3 +2605,12 @@ body.v-depth-layered .stroke-page {
   color: #9e2b25;
   border-color: rgba(158, 43, 37, 0.3);
 }
+
+/* the synonym cluster woven into search results */
+.search-syn {
+  margin: 18px 0 8px;
+}
+
+.search-syn .search-syn-door {
+  margin-top: 10px;
+}

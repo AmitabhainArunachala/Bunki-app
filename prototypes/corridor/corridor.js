@@ -2586,6 +2586,40 @@ function renderSearchResults(main, query) {
     box.append(el('div', 'sem-empty', tx('見つからない。', 'Nothing found for that yet.')));
   }
   main.append(box);
+
+  // the weave: a searched word that has a hand-written cluster shows its
+  // near-in-meaning neighbours right here — the thesaurus meets you where
+  // you look things up, instead of waiting behind its own door.
+  const clustered = results.find(
+    (e) => e.t === 'word' && (D.sem[e.id] || []).some((x) => THES_RELS.includes(x.rel)),
+  );
+  if (clustered) {
+    const near = D.sem[clustered.id].filter((x) => THES_RELS.includes(x.rel)).slice(0, 4);
+    const wrap = el('div', 'search-syn');
+    wrap.append(
+      withEn(el('p', 'eyebrow', `${clustered.id} の類語`), 'nearby in meaning — and how they differ', 'en-inline'),
+    );
+    for (const edge of near) {
+      const row = el('button', 'sem-row');
+      row.type = 'button';
+      row.dataset.searchSyn = edge.w;
+      row.append(el('span', 'sem-word', edge.w));
+      if (edge.rel !== 'syn') row.append(el('span', 'thes-rel', REL[edge.rel][0]));
+      row.append(el('span', 'sem-note', edge.note));
+      row.addEventListener('click', () => go({ t: 'word', id: edge.w }));
+      wrap.append(row);
+    }
+    const door = biLabel('button', 'chip search-syn-door', '類語辞典へ', 'the synonym dictionary');
+    door.type = 'button';
+    door.addEventListener('click', () => {
+      keepScroll();
+      S.view = 'thesaurus';
+      render();
+      window.scrollTo(0, 0);
+    });
+    wrap.append(door);
+    main.append(wrap);
+  }
 }
 
 /* -------------------------------------------------------------- grammar */
