@@ -1927,6 +1927,8 @@ function renderTray(main) {
         ),
       ),
     );
+    // a fresh device is exactly where bringing a record back matters most
+    renderPortRow(main);
     return;
   }
 
@@ -1979,6 +1981,52 @@ function renderTray(main) {
       main.append(line);
     }
   }
+
+  renderPortRow(main);
+}
+
+/* The record is yours to carry: one plain JSON file out, the same file
+ * back in on any device. The API key never travels — it lives outside
+ * this store, and exporting must never leak it. Import replaces
+ * wholesale (the honest semantic: the file IS the record), then the app
+ * reboots clean on the imported state. */
+function renderPortRow(main) {
+  const port = el('div', 'port-row');
+  const exp = biLabel('button', 'chip', '書き出す', 'export your record');
+  exp.type = 'button';
+  exp.id = 'export-store';
+  exp.addEventListener('click', () => {
+    const blob = new Blob([localStorage.getItem(STORE_KEY) || '{}'], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `kairo-${dayKey()}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+  const imp = biLabel('button', 'chip', '読み込む', 'import a record');
+  imp.type = 'button';
+  imp.id = 'import-store';
+  const file = el('input');
+  file.type = 'file';
+  file.accept = 'application/json,.json';
+  file.hidden = true;
+  file.id = 'import-file';
+  const portNote = el('p', 'airead-note');
+  imp.addEventListener('click', () => file.click());
+  file.addEventListener('change', async () => {
+    const f = file.files?.[0];
+    if (!f) return;
+    try {
+      const s = JSON.parse(await f.text());
+      if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      location.reload();
+    } catch {
+      portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
+    }
+  });
+  port.append(exp, imp, file);
+  main.append(port, portNote);
 }
 
 /* --------------------------------------------------- JLPT · 漢検 lanes

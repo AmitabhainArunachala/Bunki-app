@@ -2754,3 +2754,10 @@ body.v-depth-layered .stroke-page {
   align-items: center;
   gap: 8px;
 }
+
+/* carrying the record: the export / import pair at the tray's foot */
+.port-row {
+  display: flex;
+  gap: 8px;
+  margin: 26px 0 0;
+}
