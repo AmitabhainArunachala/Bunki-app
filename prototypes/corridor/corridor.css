@@ -2741,3 +2741,16 @@ body.v-depth-layered .stroke-page {
   font-family: var(--serif);
   font-size: 18px;
 }
+
+/* the per-list review door on a list heading */
+.list-head .list-review {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 3px 9px;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
