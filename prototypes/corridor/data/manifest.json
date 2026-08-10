@@ -8,9 +8,13 @@
     "law": "three signals, never averaged; disagreement surfaced, never resolved"
   },
   "counts": {
-    "passages": 26,
-    "articleFiles": 26,
+    "passages": 40,
+    "articleFiles": 40,
     "words": 7910,
+    "dictionaryCoreHeadwords": 22934,
+    "dictionaryEntries": 69996,
+    "dictionaryForms": 146643,
+    "dictionarySenses": 89713,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
@@ -29,9 +33,16 @@
       "sem.json"
     ],
     "share_alike": [
+      "dict.json",
+      "dict-v2/index.json + 16 detail shards",
       "idioms.json",
       "kanji.json",
+      "strokes.json",
       "words.json"
+    ],
+    "original": [
+      "grammar-v11.json",
+      "lessons-v1.json"
     ]
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Phase 2 — extract the Drift universe from prototypes/drift/drift-artifact.html
- * (the red-team-hardened source of truth, which stays byte-untouched) into a
+ * (the red-team-hardened source of truth) into a
  * corridor entry layer: scoped CSS, a markup fragment, and the script wrapped
  * with a visibility gate so the universe fully sleeps while other corridor
  * views are open.
@@ -196,16 +196,6 @@ patch(
   '  drawTrail(t);\n  if(DRIFT_ON){requestAnimationFrame(frame);}else{rafOn=false;}\n}',
   'frame loop gate',
 );
-patch(
-  'setInterval(refreshActive,650);',
-  'setInterval(function(){if(DRIFT_ON)refreshActive();},650);',
-  'gate refreshActive interval',
-);
-patch(
-  'if(!reduced) setInterval(function(){\n  fluidInject(',
-  'if(!reduced) setInterval(function(){\n  if(!DRIFT_ON)return;\n  fluidInject(',
-  'gate ambient fluid interval',
-);
 // boot: do not start the loop until the layer first shows (the boot call sits
 // at column 0; the in-loop call is indented and already rewritten above)
 patch(
@@ -220,12 +210,15 @@ window.__DRIFT__ = {
   show() {
     DRIFT_ON = true;
     document.getElementById('drift-layer').classList.add('active');
+    document.documentElement.classList.add('drift-active');
     sizeCanvases();
+    refreshActive(true);
     if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
     DRIFT_ON = false;
     document.getElementById('drift-layer').classList.remove('active');
+    document.documentElement.classList.remove('drift-active');
   },
 };
 })();

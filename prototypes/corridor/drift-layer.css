@@ -17,7 +17,7 @@
 #drift-layer{
     --ground:#FBFAF5; --ink:#1B2A3A; --faint:rgba(27,42,58,.42); --line:rgba(27,42,58,.2);
     --pig1:#1E50A2; --pig2:#165E83; --accent:#EB6101;
-    --plaque:rgba(251,250,245,.92); --halo:rgba(30,80,162,.5); --grainOp:.55;
+    --plaque:rgba(251,250,245,.92); --halo:rgba(30,80,162,.5); --grainOp:.28;
     --bloomSat:#165E83; --bloomCtr:#EB6101; --bloomHalo:rgba(30,80,162,.4);
   }
 #drift-layer, #drift-layer *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -58,6 +58,9 @@
 #drift-layer .word.bsat{color:var(--bloomSat) !important;z-index:5}
 #drift-layer .word.bsat .base{text-shadow:0 0 1px currentColor,0 0 8px var(--bloomHalo)}
 #drift-layer .word.bsat .yomi{color:var(--bloomSat)}
+#drift-layer .word.bsat.bstruct{color:var(--faint) !important}
+#drift-layer .word.bctr[data-family]::after{content:attr(data-family);display:block;margin-top:.28em;
+    font-size:9px;letter-spacing:.14em;color:var(--faint);font-weight:400}
 #drift-layer .glyph.comp{z-index:7}
 #drift-layer .word.center,
 #drift-layer .glyph.center,

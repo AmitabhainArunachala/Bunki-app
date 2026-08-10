@@ -235,12 +235,14 @@ await boot();
 
 /* ------------------------------------------------------------- probes */
 const KANJI_RE = '/[\\u4e00-\\u9fff]/';
-const wordProbe = (label) => `(() => {
+const wordProbe = (label, requiredClass = null) => `(() => {
   const K = ${KANJI_RE};
   const target = ${JSON.stringify(label)};
+  const requiredClass = ${JSON.stringify(requiredClass)};
   for (const el of document.querySelectorAll('#drift-layer .word')) {
     const base = el.querySelector('.base')?.textContent ?? '';
     if (base !== target) continue;
+    if (requiredClass && !el.classList.contains(requiredClass)) continue;
     const r = el.getBoundingClientRect();
     const op = parseFloat(el.style.opacity || '1');
     return {
@@ -256,6 +258,39 @@ const wordProbe = (label) => `(() => {
   }
   return { exists: false };
 })()`;
+const aimWord = async (label, requiredClass = null, requiredGlossed = null) => {
+  let previous = null;
+  let last = { exists: false, aimable: false, reason: 'not found' };
+  for (let attempt = 0; attempt < 6; attempt++) {
+    last = await page.evaluate(`(() => {
+      const target = ${JSON.stringify(label)};
+      const requiredClass = ${JSON.stringify(requiredClass)};
+      const requiredGlossed = ${JSON.stringify(requiredGlossed)};
+      const candidates = [...document.querySelectorAll('#drift-layer .word')]
+        .filter((el) => (el.querySelector('.base')?.textContent ?? '') === target)
+        .filter((el) => !requiredClass || el.classList.contains(requiredClass))
+        .filter((el) => requiredGlossed == null || el.classList.contains('glossed') === requiredGlossed);
+      for (const el of candidates) {
+        const r = el.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+        const hit = document.elementFromPoint(x, y)?.closest?.('.word') ?? null;
+        const visible = r.width > 0 && r.height > 0 && r.left > 28 && r.right < 362 && r.top > 145 && r.bottom < 710;
+        const interactive = getComputedStyle(el).pointerEvents !== 'none' && Number(getComputedStyle(el).opacity) >= 0.12;
+        if (visible && interactive && hit === el) return { exists: true, aimable: true, x, y };
+      }
+      return { exists: candidates.length > 0, aimable: false, reason: candidates.length ? 'not safely hit-owned' : 'not found' };
+    })()`);
+    if (last.aimable) {
+      if (previous && Math.hypot(last.x - previous.x, last.y - previous.y) <= 2.5) return last;
+      previous = last;
+    } else {
+      previous = null;
+    }
+    await page.waitForTimeout(120);
+  }
+  return { ...last, aimable: false, reason: last.aimable ? 'still moving' : last.reason };
+};
 const worldProbe = `(() => ({
   bloomCentre: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? null,
   sats: document.querySelectorAll('#drift-layer .word.bsat').length,
@@ -263,6 +298,95 @@ const worldProbe = `(() => ({
   depthOpen: (document.getElementById('depth')?.textContent ?? '') !== '',
   cardOpen: document.getElementById('card')?.classList.contains('open') ?? false,
 }))()`;
+const bloomGeometryProbe = `(() => {
+  const viewport = { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
+  const safe = { left: 12, top: 112, right: innerWidth - 12, bottom: innerHeight - 142 };
+  const round = (value) => Math.round(value * 10) / 10;
+  const allSatellites = [...document.querySelectorAll('#drift-layer .word.bsat')];
+  const satellites = allSatellites
+    .map((el, index) => {
+      const r = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      return {
+        index,
+        word: el.querySelector('.base')?.textContent ?? '',
+        visible: r.width > 0 && r.height > 0 && style.display !== 'none' &&
+          style.visibility !== 'hidden' && Number(style.opacity) > 0.05,
+        rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
+      };
+    })
+    .filter((entry) => entry.visible);
+  const outsideViewport = satellites.filter(({ rect: r }) =>
+    r.left < viewport.left || r.top < viewport.top || r.right > viewport.right || r.bottom > viewport.bottom);
+  const outsideSafeBody = satellites.filter(({ rect: r }) =>
+    r.left < safe.left || r.top < safe.top || r.right > safe.right || r.bottom > safe.bottom);
+  const overlaps = [];
+  for (let i = 0; i < satellites.length; i++) {
+    for (let j = i + 1; j < satellites.length; j++) {
+      const a = satellites[i];
+      const b = satellites[j];
+      const width = Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left);
+      const height = Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top);
+      if (width > 0.01 && height > 0.01)
+        overlaps.push({ a: a.word, b: b.word, width: round(width), height: round(height) });
+    }
+  }
+  const describe = ({ index, word, rect: r }) => ({
+    index,
+    word,
+    rect: { left: round(r.left), top: round(r.top), right: round(r.right), bottom: round(r.bottom) },
+  });
+  return {
+    ok: outsideViewport.length === 0 && outsideSafeBody.length === 0 && overlaps.length === 0,
+    bloomCentre: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? null,
+    total: allSatellites.length,
+    visible: satellites.length,
+    safe,
+    satellites: satellites.map(describe),
+    outsideViewport: outsideViewport.map(describe),
+    outsideSafeBody: outsideSafeBody.map(describe),
+    overlaps,
+  };
+})()`;
+const waitForBloomSettled = async (expectedCentre, { timeoutMs = 6000, intervalMs = 200, requiredSamples = 3 } = {}) => {
+  const started = Date.now();
+  let previous = null;
+  let consecutive = 0;
+  let latest = null;
+  let maxMotion = Infinity;
+  while (Date.now() - started <= timeoutMs) {
+    latest = await page.evaluate(bloomGeometryProbe);
+    const current = new Map(latest.satellites.map((entry) => [`${entry.index}:${entry.word}`, entry.rect]));
+    const comparable = previous && previous.size === current.size &&
+      [...current.keys()].every((key) => previous.has(key));
+    maxMotion = comparable
+      ? Math.max(0, ...[...current].flatMap(([key, rect]) => {
+          const prior = previous.get(key);
+          return [
+            Math.abs(rect.left - prior.left),
+            Math.abs(rect.top - prior.top),
+            Math.abs(rect.right - prior.right),
+            Math.abs(rect.bottom - prior.bottom),
+          ];
+        }))
+      : Infinity;
+    const stateReady = latest.bloomCentre === expectedCentre && latest.total > 0 && latest.visible === latest.total;
+    const stable = comparable && maxMotion <= 0.75;
+    consecutive = stateReady && latest.ok && stable ? consecutive + 1 : 0;
+    if (consecutive >= requiredSamples) {
+      return { settled: true, elapsedMs: Date.now() - started, consecutive, maxMotion, geometry: latest };
+    }
+    previous = current;
+    await page.waitForTimeout(intervalMs);
+  }
+  return {
+    settled: false,
+    elapsedMs: Date.now() - started,
+    consecutive,
+    maxMotion,
+    geometry: latest,
+  };
+};
 
 const pickOne = (exclude) => page.evaluate(`(() => {
   const done = new Set(${JSON.stringify([...exclude])});
@@ -499,11 +623,15 @@ for (let round = 0; round < N_WORDS; round++) {
   // I3/I4 (spec v2, ratified Q1/Q2) — the satellite chain: tapping a
   // satellite REVEALS it (never destroys); tapping again re-centres the
   // constellation on it; a flick on a satellite never grades.
-  const chainStart = await page.evaluate(wordProbe(word.w));
-  if (chainStart.exists && chainStart.onScreen) {
+  const chainStart = await aimWord(word.w);
+  if (chainStart.aimable) {
     await tapAt(chainStart.x, chainStart.y);
-    await page.waitForTimeout(1400); // satellites glide to their ring first
-    const satPick = await page.evaluate(`(() => {
+    // A family assembles from corpus positions, so a fixed delay made this
+    // coverage depend on whether the chosen words happened to begin nearby.
+    // Use the same bounded, geometry-aware settlement contract as the long
+    // chain below before selecting a satellite for the three I3/I4 probes.
+    const matrixBloomSettle = await waitForBloomSettled(word.w);
+    const satPick = matrixBloomSettle.settled ? await page.evaluate(`(() => {
       const sats = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
         const r = el.getBoundingClientRect();
         return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -512,41 +640,60 @@ for (let round = 0; round < N_WORDS; round++) {
         if (!s.r.width || s.r.left < 30 || s.r.right > 360 || s.r.top < 150 || s.r.bottom > 700) continue;
         const crowded = sats.some((o) => o !== s && Math.hypot(o.x - s.x, o.y - s.y) < 34);
         if (crowded) continue;
-        return { w: s.el.querySelector('.base')?.textContent ?? '', x: s.x, y: s.y };
+        return { w: s.el.querySelector('.base')?.textContent ?? '' };
       }
       return null;
-    })()`);
+    })()`) : null;
+    if (!matrixBloomSettle.settled) {
+      const geometry = matrixBloomSettle.geometry;
+      await file(
+        word,
+        'sat-flick',
+        'a settled satellite exists for the chain battery',
+        'detached',
+        `settle timeout ${matrixBloomSettle.elapsedMs}ms; ` +
+          `viewport=${JSON.stringify(geometry?.outsideViewport ?? [])}; ` +
+          `safeBody=${JSON.stringify(geometry?.outsideSafeBody ?? [])}; ` +
+          `overlaps=${JSON.stringify(geometry?.overlaps ?? [])}`,
+      );
+    }
     if (satPick && satPick.w) {
       const satWord = { w: satPick.w, kanji: (satPick.w.match(/[\u4e00-\u9fff]/g) ?? []).length };
       // flick a satellite: must NOT grade while the constellation is open
       const trayBeforeFlick = (await page.evaluate(worldProbe)).tray;
-      await dragAt(satPick.x, satPick.y, satPick.x + 90, satPick.y, 90, 3);
+      const flickAim = await aimWord(satPick.w, 'bsat');
+      if (!flickAim.aimable) {
+        await file(satWord, 'sat-flick', 'no judgment on satellites', 'detached', flickAim.reason);
+        await settle();
+        continue;
+      }
+      await dragAt(flickAim.x, flickAim.y, flickAim.x + 90, flickAim.y, 90, 3);
       await page.waitForTimeout(800);
       const afterSatFlick = await page.evaluate(worldProbe);
-      const satAfterFlick = await page.evaluate(wordProbe(satPick.w));
+      const satAfterFlick = await page.evaluate(wordProbe(satPick.w, 'bsat'));
       if (afterSatFlick.tray !== trayBeforeFlick)
         await file(satWord, 'sat-flick', 'no judgment on satellites', 'misfired', 'satellite was graded inside a constellation');
       else if (!satAfterFlick.exists)
         await file(satWord, 'sat-flick', 'no judgment on satellites', 'vanished', 'satellite gone after a flick');
       else await file(satWord, 'sat-flick', 'no judgment on satellites', 'ok', '');
       // tap the satellite: it must REVEAL in place, never vanish
-      const sat2 = await page.evaluate(wordProbe(satPick.w));
-      if (sat2.exists && sat2.onScreen) {
+      const sat2 = await aimWord(satPick.w, 'bsat', false);
+      if (sat2.aimable) {
         await tapAt(sat2.x, sat2.y);
         await page.waitForTimeout(700);
-        const sat3 = await page.evaluate(wordProbe(satPick.w));
+        const sat3 = await page.evaluate(wordProbe(satPick.w, 'bsat'));
         if (!sat3.exists || sat3.opacity < 0.05)
           await file(satWord, 'sat-tap', 'reveals in place', 'vanished', 'satellite dissolved on first tap');
         else if (!sat3.unfolded)
           await file(satWord, 'sat-tap', 'reveals in place', 'dead', 'no reveal');
         else await file(satWord, 'sat-tap', 'reveals in place', 'ok', '');
         // tap again: the constellation re-centres on it — the chain walk
-        const sat4 = await page.evaluate(wordProbe(satPick.w));
-        if (sat4.exists && sat4.onScreen) {
+        const sat4 = await aimWord(satPick.w, 'bsat', true);
+        if (sat4.aimable) {
           await tapAt(sat4.x, sat4.y);
           await page.waitForTimeout(1100);
           const w5 = await page.evaluate(worldProbe);
-          const sat5 = await page.evaluate(wordProbe(satPick.w));
+          const sat5 = await page.evaluate(wordProbe(satPick.w, 'bctr'));
           if (!sat5.exists)
             await file(satWord, 'sat-recentre', 'becomes the planet', 'vanished', 'satellite gone on second tap');
           else if (w5.bloomCentre !== satPick.w && !w5.depthOpen)
@@ -613,7 +760,8 @@ if (!chainStartWord) {
 } else {
   let centre = chainStartWord.w;
   chainStrata.add(chainStartWord.kanji === 0 ? 'kana' : chainStartWord.kanji === 1 ? 'one-kanji' : 'multi-kanji');
-  const start = await page.evaluate(wordProbe(centre));
+  const start = await aimWord(centre);
+  if (!start.aimable) throw new Error(`chain start ${centre} was not safely aimable: ${start.reason}`);
   await tapAt(start.x, start.y);
   await page.waitForTimeout(1600);
 
@@ -622,7 +770,7 @@ if (!chainStartWord) {
     const satellite = await page.evaluate(`(() => {
       const centre = ${JSON.stringify(centre)};
       const walked = new Set(${JSON.stringify([...walked])});
-      const candidates = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
+      const candidates = [...document.querySelectorAll('#drift-layer .word.bsat:not(.glossed)')].map((el) => {
         const r = el.getBoundingClientRect();
         const w = el.querySelector('.base')?.textContent ?? '';
         return { w, x: r.left + r.width / 2, y: r.top + r.height / 2, r };
@@ -631,7 +779,7 @@ if (!chainStartWord) {
         candidate.r.top > 145 && candidate.r.bottom < 710);
       candidates.sort((a, b) => Number(walked.has(a.w)) - Number(walked.has(b.w)) || a.w.localeCompare(b.w, 'ja'));
       const selected = candidates[0];
-      return selected ? { w: selected.w, x: selected.x, y: selected.y } : null;
+      return selected ? { w: selected.w } : null;
     })()`);
     if (!satellite) {
       await file(
@@ -646,9 +794,21 @@ if (!chainStartWord) {
     }
 
     const previousCentre = centre;
-    await tapAt(satellite.x, satellite.y);
+    const first = await aimWord(satellite.w, 'bsat', false);
+    if (!first.aimable) {
+      await file(
+        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
+        'chain-hop',
+        `hop ${hop}/${CHAIN_HOPS} is owned by the intended live satellite`,
+        'detached',
+        first.reason,
+        { state: 'bloom', hop },
+      );
+      break;
+    }
+    await tapAt(first.x, first.y);
     await page.waitForTimeout(650);
-    const revealed = await page.evaluate(wordProbe(satellite.w));
+    const revealed = await page.evaluate(wordProbe(satellite.w, 'bsat'));
     const afterReveal = await page.evaluate(worldProbe);
     if (!revealed.exists || !revealed.glossed || afterReveal.bloomCentre !== previousCentre) {
       await file(
@@ -657,40 +817,51 @@ if (!chainStartWord) {
         `hop ${hop}/${CHAIN_HOPS} reveals in place before re-centring`,
         !revealed.exists ? 'vanished' : 'misfired',
         `exists=${revealed.exists}; glossed=${revealed.glossed}; centre=${afterReveal.bloomCentre ?? 'none'}`,
-        { state: 'bloom', hop, coordinates: { x: satellite.x, y: satellite.y } },
+        { state: 'bloom', hop, coordinates: { x: first.x, y: first.y } },
       );
       break;
     }
 
-    const second = await page.evaluate(wordProbe(satellite.w));
-    if (!second.onScreen) {
+    const second = await aimWord(satellite.w, 'bsat', true);
+    if (!second.aimable) {
       await file(
         { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
         'chain-hop',
         `hop ${hop}/${CHAIN_HOPS} remains aimable for the second tap`,
         'detached',
-        'revealed satellite moved outside the interaction viewport',
+        second.reason,
         { state: 'bloom', hop },
       );
       break;
     }
     await tapAt(second.x, second.y);
-    await page.waitForTimeout(1700);
+    const settleResult = await waitForBloomSettled(satellite.w);
     const afterRecentre = await page.evaluate(worldProbe);
-    const newCentre = await page.evaluate(wordProbe(satellite.w));
+    const newCentre = await page.evaluate(wordProbe(satellite.w, 'bctr'));
     const oldCentre = await page.evaluate(wordProbe(previousCentre));
-    const hopOk =
+    const recentreOk =
       newCentre.exists &&
       newCentre.isCentre &&
       oldCentre.exists &&
       afterRecentre.bloomCentre === satellite.w &&
-      afterRecentre.sats >= 6;
+      // Sparse, sourced families are valid. Requiring six here rewarded the
+      // old arbitrary filler that the semantic integrity pass removed.
+      afterRecentre.sats > 0;
+    const geometry = settleResult.geometry;
+    const hopOk = recentreOk && settleResult.settled && geometry?.ok;
+    const geometryDetail = geometry
+      ? `settled=${settleResult.settled}; settleMs=${settleResult.elapsedMs}; ` +
+        `stableSamples=${settleResult.consecutive}; maxMotion=${Number.isFinite(settleResult.maxMotion) ? settleResult.maxMotion.toFixed(2) : 'unmatched'}; ` +
+        `geometry=${geometry.ok ? 'clear' : 'broken'}; visible=${geometry.visible}/${geometry.total}; ` +
+        `viewport=${JSON.stringify(geometry.outsideViewport)}; ` +
+        `safeBody=${JSON.stringify(geometry.outsideSafeBody)}; overlaps=${JSON.stringify(geometry.overlaps)}`
+      : 'geometry=not-reached';
     await file(
       { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
       'chain-hop',
-      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet without deleting the prior planet`,
+      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet and keeps every visible satellite inside the safe body without overlap`,
       hopOk ? 'ok' : !newCentre.exists || !oldCentre.exists ? 'vanished' : 'detached',
-      `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}`,
+      `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}; ${geometryDetail}`,
       { state: 'bloom', hop },
     );
     if (!hopOk) break;
@@ -833,19 +1004,20 @@ for (const seed of FUZZ_SEEDS) {
           candidate.r.right < 362 && candidate.r.top > 145 && candidate.r.bottom < 710);
         const candidate = candidates.find((entry) =>
           !candidates.some((other) => other !== entry && Math.hypot(other.x - entry.x, other.y - entry.y) < 38));
-        return candidate ? { w: candidate.w, x: candidate.x, y: candidate.y } : null;
+        return candidate ? { w: candidate.w } : null;
       })()`);
-      if (!satellite) {
+      const revealAim = satellite ? await aimWord(satellite.w, 'bsat', false) : null;
+      if (!satellite || !revealAim?.aimable) {
         action = 'cancel-fallback';
         await touch('touchStart', [[195, 430]]);
         await page.waitForTimeout(35);
         await touch('touchCancel', []);
         await page.waitForTimeout(120);
       } else {
-        coordinates = { x: satellite.x, y: satellite.y, satellite: satellite.w };
-        await tapAt(satellite.x, satellite.y);
+        coordinates = { x: revealAim.x, y: revealAim.y, satellite: satellite.w };
+        await tapAt(revealAim.x, revealAim.y);
         await page.waitForTimeout(500);
-        const revealed = await page.evaluate(wordProbe(satellite.w));
+        const revealed = await page.evaluate(wordProbe(satellite.w, 'bsat'));
         const afterReveal = await page.evaluate(worldProbe);
         actionSpecificOk = revealed.exists && revealed.glossed && afterReveal.bloomCentre === centre;
         actionDetail = `satellite=${satellite.w}; exists=${revealed.exists}; glossed=${revealed.glossed}`;
