@@ -1119,18 +1119,8 @@ function renderShelfBody() {
   );
   main.append(sub);
 
-  const gram = el('button', 'grammar-link');
-  gram.type = 'button';
-  gram.id = 'grammar-link';
-  gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
-  gram.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'grammar';
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(gram);
-
+  // door order is the learner's order, not the build order: the lanes
+  // that teach first, then the reference books, then the tutor
   const lanes = el('button', 'grammar-link');
   lanes.type = 'button';
   lanes.id = 'levels-link';
@@ -1142,7 +1132,6 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(lanes);
-
   const les = el('button', 'grammar-link');
   les.type = 'button';
   les.id = 'lessons-link';
@@ -1154,31 +1143,17 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(les);
-
-  const yj = el('button', 'grammar-link');
-  yj.type = 'button';
-  yj.id = 'yoji-link';
-  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'four-character idioms' : ''));
-  yj.addEventListener('click', () => {
+  const gram = el('button', 'grammar-link');
+  gram.type = 'button';
+  gram.id = 'grammar-link';
+  gram.append(el('span', 'l-ja', '文法'), el('span', 'en-sub', bi() ? 'grammar' : ''));
+  gram.addEventListener('click', () => {
     keepScroll();
-    S.view = 'yoji';
+    S.view = 'grammar';
     render();
     window.scrollTo(0, 0);
   });
-  main.append(yj);
-
-  const kdx = el('button', 'grammar-link');
-  kdx.type = 'button';
-  kdx.id = 'kanjidex-link';
-  kdx.append(el('span', 'l-ja', '字引'), el('span', 'en-sub', bi() ? 'find a kanji by shape' : ''));
-  kdx.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'kanjidex';
-    render();
-    window.scrollTo(0, 0);
-  });
-  main.append(kdx);
-
+  main.append(gram);
   const thes = el('button', 'grammar-link');
   thes.type = 'button';
   thes.id = 'thesaurus-link';
@@ -1190,7 +1165,28 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(thes);
-
+  const yj = el('button', 'grammar-link');
+  yj.type = 'button';
+  yj.id = 'yoji-link';
+  yj.append(el('span', 'l-ja', '四字熟語'), el('span', 'en-sub', bi() ? 'four-character idioms' : ''));
+  yj.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'yoji';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(yj);
+  const kdx = el('button', 'grammar-link');
+  kdx.type = 'button';
+  kdx.id = 'kanjidex-link';
+  kdx.append(el('span', 'l-ja', '字引'), el('span', 'en-sub', bi() ? 'find a kanji by shape' : ''));
+  kdx.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'kanjidex';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(kdx);
   const ai = el('button', 'grammar-link');
   ai.type = 'button';
   ai.id = 'ai-link';
