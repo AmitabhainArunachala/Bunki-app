@@ -2761,3 +2761,60 @@ body.v-depth-layered .stroke-page {
   gap: 8px;
   margin: 26px 0 0;
 }
+
+/* ------------------------------------------------------- 字引 the finder
+ * Chip rows for strokes and components, a glyph grid for the hits —
+ * dense like a paper index page, but with finger-sized doors. */
+.kdx-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.kdx-chip {
+  min-width: 34px;
+  padding: 5px 8px;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.kdx-chip.kdx-part {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+
+.kdx-chip.on-list {
+  border-color: #9e2b25;
+  color: #9e2b25;
+}
+
+.kdx-sthead {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  margin: 8px 0 2px;
+}
+
+.kdx-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 20px;
+}
+
+.kdx-glyph {
+  width: 46px;
+  height: 46px;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--ink);
+  cursor: pointer;
+}
