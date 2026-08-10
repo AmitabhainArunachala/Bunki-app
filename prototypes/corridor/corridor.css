@@ -2614,3 +2614,34 @@ body.v-depth-layered .stroke-page {
 .search-syn .search-syn-door {
   margin-top: 10px;
 }
+
+/* -------------------------------------------------- SRS depth: rest/wake
+ * The forecast line under the review button, and the per-line rest toggle
+ * — small ink, since resting a card is a quiet act, not a feature. */
+.srs-forecast {
+  font-size: 12px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  margin: 6px 0 0;
+}
+
+.rest-toggle {
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--faint);
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 7px;
+  cursor: pointer;
+  flex: none;
+}
+
+.rest-toggle.resting {
+  color: #9e2b25;
+  border-color: rgba(158, 43, 37, 0.35);
+}
+
+.review-rest {
+  margin-top: 10px;
+}
