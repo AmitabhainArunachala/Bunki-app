@@ -2700,3 +2700,20 @@ body.v-depth-layered .stroke-page {
 .key-head {
   margin-top: 26px;
 }
+
+/* the tutor's quiz — question card and the one-line why */
+.aiq-q {
+  font-size: 20px;
+  line-height: 1.9;
+}
+
+.aiq-why {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin: 10px 0 4px;
+}
+
+.aiq-start {
+  margin-top: 12px;
+}

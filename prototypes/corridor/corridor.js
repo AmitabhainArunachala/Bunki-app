@@ -300,6 +300,8 @@ const S = {
   suspended: {},
   /** the conversation with the tutor: [{ role: 'user'|'tutor', text }] */
   aiChat: [],
+  /** a running tutor quiz: { qs, ix, picked, correct } — in-memory only */
+  aiQuiz: null,
   /** articles marked finished: { passageId: ts } */
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
@@ -685,6 +687,12 @@ function back() {
   }
   if (S.view === 'review') {
     S.review = null;
+    S.view = 'tray';
+    render();
+    return;
+  }
+  if (S.view === 'aiquiz') {
+    S.aiQuiz = null;
     S.view = 'tray';
     render();
     return;
@@ -1835,6 +1843,28 @@ function renderTray(main) {
         ),
       );
     }
+    // one layer of the tutor's testing — absent without a key
+    if (aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
+      const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'a quiz from the tutor');
+      qb.type = 'button';
+      qb.id = 'aiq-start';
+      const note = el('p', 'airead-note');
+      qb.addEventListener('click', async () => {
+        qb.disabled = true;
+        note.textContent = tx('先生が問題を書いている…', 'the tutor is writing questions…');
+        try {
+          await aiQuizStart();
+          S.view = 'aiquiz';
+          render();
+          window.scrollTo(0, 0);
+          return;
+        } catch {
+          note.textContent = tx('いまは作れない。あとでもう一度。', 'The tutor could not write a quiz just now — try again in a moment.');
+        }
+        qb.disabled = false;
+      });
+      main.append(qb, note);
+    }
   }
   if (!S.taken.length) {
     main.append(
@@ -2130,6 +2160,106 @@ function renderLessons(main) {
 }
 
 /* The one place the app asks for a key — once, plainly, stored on-device. */
+/* The tutor's quiz — the operator's 'many layers of testing', first layer.
+ * The tutor writes five questions from the learner's own memorize list;
+ * the app renders and scores them like a lesson quiz. Testing only:
+ * nothing here writes to the SRS — FSRS alone schedules. The strict-JSON
+ * contract is parsed defensively; a malformed reply degrades to the same
+ * quiet one-line failure as every other tutor door. In-memory only: a
+ * quiz is an event, not a possession. */
+function aiQuizParse(raw) {
+  const m = raw.match(/\[[\s\S]*\]/);
+  if (!m) return null;
+  let qs;
+  try {
+    qs = JSON.parse(m[0]);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(qs)) return null;
+  const ok = qs.filter(
+    (q) =>
+      q &&
+      typeof q.q === 'string' &&
+      Array.isArray(q.opts) &&
+      q.opts.length === 4 &&
+      q.opts.every((o) => typeof o === 'string') &&
+      Number.isInteger(q.right) &&
+      q.right >= 0 &&
+      q.right < 4 &&
+      typeof q.why === 'string',
+  );
+  return ok.length >= 3 ? ok.slice(0, 5) : null;
+}
+async function aiQuizStart() {
+  const words = S.taken.filter((t) => t.t === 'word').slice(-14).map((t) => t.id);
+  const raw = await aiAsk(
+    'You write a short quiz inside a Japanese-learning app. Output ONLY a JSON array, no prose, no markdown fences. Five items, each exactly {"q": string, "opts": [4 strings], "right": 0-3, "why": string}. Each q is one short Japanese question or cloze sentence (with readings in parentheses for kanji above the learner\'s level) testing one of the given words in context; opts are four plausible answers in Japanese or English; right is the index of the correct one; why is one short English sentence explaining it. Vary the words tested.',
+    `Learner level: about JLPT ${aiLevelGuess()}. Words to test: ${words.join('、')}.`,
+  );
+  const qs = aiQuizParse(raw);
+  if (!qs) throw new Error('shape');
+  S.aiQuiz = { qs, ix: 0, picked: null, correct: 0 };
+}
+function renderAiQuiz(main) {
+  const run = S.aiQuiz;
+  main.append(withEn(el('p', 'eyebrow', '先生の小テスト'), "the tutor's quiz", 'en-inline'));
+  if (!run) {
+    S.view = 'tray';
+    render();
+    return;
+  }
+  if (run.ix >= run.qs.length) {
+    main.append(el('h1', 'view-title', tx(`${run.correct} / ${run.qs.length}`, `${run.correct} of ${run.qs.length}`)));
+    main.append(
+      el('p', 'gloss', tx('採点だけ。予定は変わらない — 育てるのは復習のほう。', 'A score, nothing more — your review schedule is untouched. The reviews do the growing.')),
+    );
+    const out = biLabel('button', 'take', 'リストへ', 'back to lists');
+    out.type = 'button';
+    out.addEventListener('click', () => {
+      S.aiQuiz = null;
+      S.view = 'tray';
+      render();
+    });
+    main.append(out);
+    return;
+  }
+  const q = run.qs[run.ix];
+  main.append(el('p', 'card-kind', tx(`${run.ix + 1} / ${run.qs.length}`, `${run.ix + 1} / ${run.qs.length}`)));
+  main.append(el('div', 'review-face aiq-q', q.q));
+  const list = el('div', 'lesson-options');
+  q.opts.forEach((opt, i) => {
+    const b = el('button', 'lesson-option');
+    b.type = 'button';
+    b.textContent = opt;
+    if (run.picked != null) {
+      if (i === q.right) b.classList.add('right');
+      else if (i === run.picked) b.classList.add('wrong');
+      b.disabled = true;
+    } else {
+      b.addEventListener('click', () => {
+        run.picked = i;
+        if (i === q.right) run.correct += 1;
+        render();
+      });
+    }
+    list.append(b);
+  });
+  main.append(list);
+  if (run.picked != null) {
+    main.append(el('p', 'aiq-why', q.why));
+    const btn = biLabel('button', 'take', run.ix + 1 < run.qs.length ? 'つぎへ' : 'おわりへ', run.ix + 1 < run.qs.length ? 'next' : 'finish');
+    btn.type = 'button';
+    btn.id = 'aiq-next';
+    btn.addEventListener('click', () => {
+      run.ix += 1;
+      run.picked = null;
+      render();
+    });
+    main.append(btn);
+  }
+}
+
 /* You speak to it — the operator's words. A small conversation with the
  * tutor on its own page: it knows your rough level and answers as a
  * teacher inside this app, not a search engine. The exchange is kept on
@@ -4568,6 +4698,7 @@ function render() {
   if (S.view === 'reader' && passage()) parts.push(passage().title);
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review') parts.push(tx('復習', 'review'));
+  if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
@@ -4637,6 +4768,7 @@ function render() {
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
   else if (S.view === 'review') renderReview(main);
+  else if (S.view === 'aiquiz') renderAiQuiz(main);
   else if (S.view === 'levels') renderLevels(main);
   else if (S.view === 'ai') renderAiSetup(main);
   else if (S.view === 'lessons') renderLessons(main);
