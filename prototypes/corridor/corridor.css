@@ -2645,3 +2645,58 @@ body.v-depth-layered .stroke-page {
 .review-rest {
   margin-top: 10px;
 }
+
+/* ------------------------------------------------ talking with the tutor
+ * A conversation set in the app's own paper — turns as quiet ink blocks,
+ * the learner's slightly indented and warmed, never chat-bubble plastic. */
+.chat-log {
+  margin: 6px 0 12px;
+}
+
+.chat-turn {
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+}
+
+.chat-turn.me {
+  color: #9e2b25;
+  padding-left: 14px;
+  border-left: 2px solid rgba(158, 43, 37, 0.35);
+}
+
+.chat-turn.tutor {
+  color: var(--ink);
+}
+
+.chat-turn.thinking {
+  color: var(--faint);
+}
+
+.chat-empty {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.chat-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.chat-row .chat-field {
+  flex: 1;
+  margin: 0;
+}
+
+.chat-row .chat-send {
+  flex: none;
+  width: auto;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.key-head {
+  margin-top: 26px;
+}
