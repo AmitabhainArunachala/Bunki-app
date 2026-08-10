@@ -2435,3 +2435,43 @@ body.v-depth-layered .stroke-page {
 .ai-tutor .ai-answer:empty {
   display: none;
 }
+
+/* ------------------------------------------------------------- lessons */
+.lesson-row .row-glyph {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.lesson-row .row-main {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+
+.lesson-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.lesson-option {
+  font: inherit;
+  font-family: Georgia, serif;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.lesson-option.right {
+  border-color: var(--ink);
+  background: var(--line-soft);
+}
+
+.lesson-option.wrong {
+  color: var(--red);
+  border-color: var(--red);
+}
