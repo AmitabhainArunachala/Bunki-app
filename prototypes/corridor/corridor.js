@@ -335,6 +335,8 @@ const S = {
   lessonRun: null,
   /** the tutor's custom reading: { text, lv, ts } — persisted; null until asked */
   aiReading: null,
+  /** earlier readings, newest first, capped — a shelf, not a stream */
+  aiReadings: [],
   /** cards resting outside the review cycle: { 't:id': ts } — Anki's
    * suspend, simplified. The item stays on its list; reviews skip it. */
   suspended: {},
@@ -380,6 +382,7 @@ function loadStore() {
     if (s.srs && typeof s.srs === 'object') S.srs = s.srs;
     if (s.lessonsDone && typeof s.lessonsDone === 'object') S.lessonsDone = s.lessonsDone;
     if (s.aiReading && typeof s.aiReading === 'object') S.aiReading = s.aiReading;
+    if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
     if (s.suspended && typeof s.suspended === 'object') S.suspended = s.suspended;
     if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
     if (s.stats && typeof s.stats === 'object') S.stats = s.stats;
@@ -391,7 +394,7 @@ function loadStore() {
 }
 function saveStore() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, suspended: S.suspended, aiChat: S.aiChat.slice(-24), stats: S.stats, readDone: S.readDone, readerPos: S.readerPos }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, aiReadings: S.aiReadings.slice(0, 10), suspended: S.suspended, aiChat: S.aiChat.slice(-24), stats: S.stats, readDone: S.readDone, readerPos: S.readerPos }));
   } catch {
     /* quota or private mode — the session keeps working unpersisted */
   }
@@ -3980,7 +3983,9 @@ function renderAiReading(main) {
         'You write one short Japanese reading passage inside a learning app. Output ONLY the passage: four to six short sentences of natural Japanese. No title, no translation, no romaji, no commentary, no markdown. Keep vocabulary and grammar at or below the JLPT level the user names. Immediately after every word written with kanji, give its reading in hiragana inside full-width parentheses, like 学校（がっこう） or 食べる（たべる）. Use full-width parentheses for readings and for nothing else.',
         `Level: JLPT ${aiLevelGuess()}. A small scene from everyday life, quietly pleasant.${woven.length ? ` If it stays natural, weave in a few of these words the learner is memorizing: ${woven.join('、')}.` : ''}`,
       );
-      // a model may emit a literal backslash-n; never show it as ink
+      // a model may emit a literal backslash-n; never show it as ink.
+      // The reading being replaced joins the shelf of earlier ones.
+      if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
       S.aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
       saveStore();
       render();
@@ -4031,6 +4036,35 @@ function renderAiReading(main) {
         ),
       ),
     );
+  }
+
+  // the shelf of earlier readings — re-reading at level is the point
+  if (S.aiReadings.length) {
+    main.append(withEn(el('p', 'eyebrow', '前の読み物'), 'earlier readings — tap to reopen', 'en-inline'));
+    S.aiReadings.forEach((r, ix) => {
+      const row = el('button', 'entry-row compound');
+      row.type = 'button';
+      row.dataset.aireadPast = String(ix);
+      const stack = el('span', 'row-stack');
+      const top = el('span', 'row-word airead-past-head');
+      top.append(document.createTextNode(r.text.replace(/（[^）]*）/g, '').slice(0, 16) + '…'));
+      top.append(el('span', 'row-level', r.lv));
+      stack.append(top);
+      stack.append(el('span', 'row-gloss', new Date(r.ts).toLocaleDateString()));
+      row.append(stack, el('span', 'row-go', '›'));
+      row.addEventListener('click', () => {
+        // swap: the current reading takes this one's place on the shelf
+        const chosen = S.aiReadings[ix];
+        S.aiReadings.splice(ix, 1);
+        if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
+        S.aiReading = chosen;
+        saveStore();
+        keepScroll();
+        render();
+        window.scrollTo(0, 0);
+      });
+      main.append(row);
+    });
   }
 }
 
