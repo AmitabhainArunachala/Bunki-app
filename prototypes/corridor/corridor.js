@@ -1547,6 +1547,7 @@ function renderDrift(main) {
   const door = biLabel('button', 'drift-door', '本棚', 'the shelf');
   door.type = 'button';
   door.id = 'enter-shelf-door';
+  door.setAttribute('data-drift-chrome', '');
   door.addEventListener('click', () => {
     S.view = 'shelf';
     render();
@@ -3429,6 +3430,9 @@ function render() {
   document.body.dataset.view = S.view;
 
   const chrome = el('div', 'chrome');
+  // the drift's spatial arbiter reads this tag: words recede under the top bar
+  // instead of printing through it half-cut
+  chrome.setAttribute('data-drift-chrome', '');
   const backBtn = biLabel('button', null, '戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'back';

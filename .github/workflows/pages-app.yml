@@ -45,6 +45,7 @@ jobs:
           mkdir -p "$SITE"
 
           cp -r prototypes/corridor/index.html \
+                prototypes/corridor/apple-touch-icon.png \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
                 prototypes/corridor/drift-layer.css \
@@ -70,6 +71,7 @@ jobs:
           node --input-type=module <<'NODE'
           const paths = [
             '',
+            'apple-touch-icon.png',
             'corridor.css',
             'corridor.js',
             'drift-layer.css',

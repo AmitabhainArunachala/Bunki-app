@@ -201,11 +201,6 @@ patch(
   'setInterval(function(){if(DRIFT_ON)refreshActive();},650);',
   'gate refreshActive interval',
 );
-patch(
-  'if(!reduced) setInterval(function(){\n  fluidInject(',
-  'if(!reduced) setInterval(function(){\n  if(!DRIFT_ON)return;\n  fluidInject(',
-  'gate ambient fluid interval',
-);
 // boot: do not start the loop until the layer first shows (the boot call sits
 // at column 0; the in-loop call is indented and already rewritten above)
 patch(
