@@ -5155,19 +5155,14 @@ function strokeThumb(paths) {
   svg.setAttribute('class', 'strokes');
   svg.setAttribute('aria-hidden', 'true');
   svg.id = 'strokes';
-  paths.forEach((d, i) => {
+  // just the painted character — no stroke-numbers on the preview (operator
+  // 2026-08-10: "no writing next to the stroke-order kanji; tap to open"). The
+  // numbers still guide inside the full-screen 筆順 page.
+  for (const d of paths) {
     const path = document.createElementNS(SVG_NS, 'path');
     path.setAttribute('d', d);
     svg.append(path);
-    const start = strokeStart(d);
-    if (start) {
-      const t = document.createElementNS(SVG_NS, 'text');
-      t.setAttribute('x', String(start.x));
-      t.setAttribute('y', String(start.y));
-      t.textContent = String(i + 1);
-      svg.append(t);
-    }
-  });
+  }
   return svg;
 }
 
