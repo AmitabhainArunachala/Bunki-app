@@ -348,6 +348,68 @@ body.ginga #drift-layer #hint {
   background: transparent;
 }
 
+/* the ghost world-seal, upper right — super faint until touched, then it wakes
+ * and turns the galaxy to the next nihonga world */
+.ginga-seal {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 16px;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  opacity: 0.2;
+  cursor: pointer;
+  transition:
+    opacity 0.5s ease,
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+.ginga-seal:hover,
+.ginga-seal:focus-visible,
+.ginga-seal:active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.ginga-seal:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.ginga-seal.awake {
+  animation: seal-wake 1.6s ease-out;
+}
+@keyframes seal-wake {
+  0% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ginga-seal.awake {
+    animation: none;
+  }
+}
+
 .nav-bar {
   position: fixed;
   top: calc(64px + env(safe-area-inset-top));
@@ -15017,6 +15079,20 @@ function buildGingaChrome(root) {
     render();
   });
   root.append(symbol);
+
+  // a ghost of a seal in the upper-right: barely there on the galaxy until you
+  // touch it, when it comes to life and turns the world to the next nihonga
+  // palette (operator 2026-08-10). The drift's own seal stays hidden here.
+  const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
+  seal.type = 'button';
+  seal.id = 'ginga-theme-seal';
+  seal.setAttribute('aria-label', tx('世界を変える', 'change the world (theme)'));
+  seal.addEventListener('click', () => {
+    S.sealWake = true;
+    cycleKairoTheme();
+  });
+  root.append(seal);
+  if (S.sealWake) S.sealWake = false;
 
   if (!S.navOpen) return;
 

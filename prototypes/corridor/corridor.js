@@ -6367,6 +6367,20 @@ function buildGingaChrome(root) {
   });
   root.append(symbol);
 
+  // a ghost of a seal in the upper-right: barely there on the galaxy until you
+  // touch it, when it comes to life and turns the world to the next nihonga
+  // palette (operator 2026-08-10). The drift's own seal stays hidden here.
+  const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
+  seal.type = 'button';
+  seal.id = 'ginga-theme-seal';
+  seal.setAttribute('aria-label', tx('世界を変える', 'change the world (theme)'));
+  seal.addEventListener('click', () => {
+    S.sealWake = true;
+    cycleKairoTheme();
+  });
+  root.append(seal);
+  if (S.sealWake) S.sealWake = false;
+
   if (!S.navOpen) return;
 
   const scrim = el('div', 'nav-scrim');
