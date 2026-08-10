@@ -9493,19 +9493,23 @@ function renderLane(main, title, en, ids, t) {
   }
 }
 /* --------------------------------------------------------------- lessons
- * The first Duolingo-class lane: small lessons cut from the JLPT levels the
- * dictionary already carries. Each lesson teaches its words plainly, quizzes
- * them, and on completion the words land in the memorize list — capture that
- * becomes cards without labor, feeding the same FSRS sessions as everything
- * else. One shared learner model; no separate notion of "known". */
+ * The Duolingo-class lane: small lessons cut from the JLPT word levels and
+ * the 漢検 kanji grades the dictionary already carries. Each lesson teaches
+ * its items plainly, quizzes them, and on completion the items land in the
+ * memorize list — capture that becomes cards without labor, feeding the
+ * same FSRS sessions as everything else. One shared learner model; no
+ * separate notion of "known". */
 const LESSON_SIZE = 10;
-function lessonPlan(lvl) {
-  const ids = laneMembers().jlpt[lvl] || [];
+function lessonLaneIds(kind, lvl) {
+  return (kind === 'kanji' ? laneMembers().kanken[lvl] : laneMembers().jlpt[lvl]) || [];
+}
+function lessonPlan(kind, lvl) {
+  const ids = lessonLaneIds(kind, lvl);
   const out = [];
   for (let i = 0; i < ids.length; i += LESSON_SIZE) {
     const words = ids.slice(i, i + LESSON_SIZE);
     if (words.length < 4) break;
-    out.push({ id: `${lvl}-${out.length + 1}`, lvl, words });
+    out.push({ id: `${lvl}-${out.length + 1}`, lvl, kind, words });
   }
   return out;
 }
@@ -9514,13 +9518,17 @@ function startLesson(lesson) {
   render();
   window.scrollTo(0, 0);
 }
+/** The one-line meaning an item is quizzed on, by kind. */
+function lessonGloss(kind, id) {
+  return kind === 'kanji' ? D.kanji[id]?.m || '' : lookup(id)?.m?.[0] || '';
+}
 function lessonChoices(run) {
   const word = run.words[run.ix];
-  const right = lookup(word)?.m?.[0] || '';
-  const pool = laneMembers().jlpt[run.lvl].filter((w) => w !== word);
+  const right = lessonGloss(run.kind, word);
+  const pool = lessonLaneIds(run.kind, run.lvl).filter((w) => w !== word);
   const wrong = new Set();
   while (wrong.size < 3 && wrong.size < pool.length) {
-    const cand = lookup(pool[Math.floor(Math.random() * pool.length)])?.m?.[0];
+    const cand = lessonGloss(run.kind, pool[Math.floor(Math.random() * pool.length)]);
     if (cand && cand !== right) wrong.add(cand);
   }
   const opts = [right, ...wrong];
@@ -9535,12 +9543,12 @@ function renderLessons(main) {
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
   if (!run) {
     main.append(el('h1', 'view-title', tx('入り口から、順に', 'From the entrance, in order')));
-    for (const lvl of JLPT_LANES) {
-      const plan = lessonPlan(lvl);
-      if (!plan.length) continue;
+    const section = (kind, lvl, label) => {
+      const plan = lessonPlan(kind, lvl);
+      if (!plan.length) return;
       const done = plan.filter((l) => S.lessonsDone[l.id]).length;
       const head = el('p', 'eyebrow list-head');
-      head.append(document.createTextNode(`${lvl} — ${done} / ${plan.length}`));
+      head.append(document.createTextNode(`${label} — ${done} / ${plan.length}`));
       if (bi()) head.append(el('span', 'en-inline', `${plan.length} lessons`));
       main.append(head);
       const next = plan.filter((l) => !S.lessonsDone[l.id]).slice(0, 5);
@@ -9554,21 +9562,24 @@ function renderLessons(main) {
         main.append(row);
       }
       if (!next.length) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
-    }
+    };
+    for (const lvl of JLPT_LANES) section('word', lvl, lvl);
+    main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by 漢検 grade', 'en-inline'));
+    for (const lvl of KANKEN_LANES) section('kanji', lvl, `漢検 ${lvl}`);
     return;
   }
   // learn phase: one word at a time, plainly
   if (run.phase === 'learn') {
     const word = run.words[run.ix];
-    const rec = lookup(word);
+    const backc = reviewBack({ t: run.kind || 'word', id: word });
     main.append(el('p', 'card-kind', `${run.id} — ${run.ix + 1} / ${run.words.length}`));
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
-    if (rec?.r) face.append(el('div', 'review-reading', rec.r));
-    for (const m of (rec?.m || []).slice(0, 3)) face.append(el('div', 'review-sense', m));
+    if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
+    for (const m of backc.senses.slice(0, 3)) face.append(el('div', 'review-sense', m));
     const door = biLabel('button', 'chip', 'ページへ', 'full entry');
     door.type = 'button';
-    door.addEventListener('click', () => go({ t: 'word', id: word }));
+    door.addEventListener('click', () => go({ t: run.kind || 'word', id: word }));
     face.append(door);
     main.append(face);
     const btn = biLabel('button', 'take', run.ix + 1 < run.words.length ? 'つぎへ' : '小テストへ', run.ix + 1 < run.words.length ? 'next word' : 'to the quiz');
@@ -9585,12 +9596,12 @@ function renderLessons(main) {
   // quiz phase: pick the meaning, honest marking, then on
   if (run.phase === 'quiz') {
     const word = run.words[run.ix];
-    const rec = lookup(word);
+    const backc = reviewBack({ t: run.kind || 'word', id: word });
     if (!run.choices) run.choices = lessonChoices(run);
     main.append(el('p', 'card-kind', tx(`小テスト — ${run.ix + 1} / ${run.words.length}`, `quiz — ${run.ix + 1} / ${run.words.length}`)));
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
-    if (run.picked != null && rec?.r) face.append(el('div', 'review-reading', rec.r));
+    if (run.picked != null && backc.reading) face.append(el('div', 'review-reading', backc.reading));
     main.append(face);
     const list = el('div', 'lesson-options');
     run.choices.opts.forEach((opt) => {
@@ -9619,10 +9630,11 @@ function renderLessons(main) {
         if (run.ix + 1 < run.words.length) { run.ix += 1; run.picked = null; run.choices = null; }
         else {
           S.lessonsDone[run.id] = { score: run.correct, total: run.words.length, ts: Date.now() };
+          const kt = run.kind || 'word';
           const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
           for (const w of run.words)
-            if (!takenSet.has(srsKey('word', w)))
-              S.taken.push({ t: 'word', id: w, label: w, kind: NODE_KIND.word[0], kindEn: NODE_KIND.word[1], from: null, ts: Date.now() });
+            if (!takenSet.has(srsKey(kt, w)))
+              S.taken.push({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now() });
           saveStore();
           run.phase = 'end';
         }
