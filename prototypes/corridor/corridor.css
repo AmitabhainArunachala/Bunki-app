@@ -2588,3 +2588,20 @@ body.v-depth-layered .stroke-page {
 .reader .tok.content.tok-due > .tok-word {
   box-shadow: 0 2px 0 rgba(158, 43, 37, 0.48);
 }
+
+/* --------------------------------------------- the reader's bookkeeping
+ * 読了 marks on the shelf and the finish control at an article's end —
+ * quiet ink, never a badge. */
+.read-done {
+  margin: 18px 0 6px;
+}
+
+.read-fin.finished {
+  color: #9e2b25;
+  border-color: rgba(158, 43, 37, 0.35);
+}
+
+.pool-tag.read-tag {
+  color: #9e2b25;
+  border-color: rgba(158, 43, 37, 0.3);
+}

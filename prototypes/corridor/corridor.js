@@ -285,6 +285,10 @@ const S = {
   lessonRun: null,
   /** the tutor's custom reading: { text, lv, ts } — persisted; null until asked */
   aiReading: null,
+  /** articles marked finished: { passageId: ts } */
+  readDone: {},
+  /** where you left each article: { passageId: scrollY } */
+  readerPos: {},
   /** tokens whose English gloss is shown beneath (double-tap) */
   glossed: null,
   /** which shelf cards have their raw signals expanded (詳細) */
@@ -316,13 +320,15 @@ function loadStore() {
     if (s.srs && typeof s.srs === 'object') S.srs = s.srs;
     if (s.lessonsDone && typeof s.lessonsDone === 'object') S.lessonsDone = s.lessonsDone;
     if (s.aiReading && typeof s.aiReading === 'object') S.aiReading = s.aiReading;
+    if (s.readDone && typeof s.readDone === 'object') S.readDone = s.readDone;
+    if (s.readerPos && typeof s.readerPos === 'object') S.readerPos = s.readerPos;
   } catch {
     /* a broken store never blocks the walk */
   }
 }
 function saveStore() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, readDone: S.readDone, readerPos: S.readerPos }));
   } catch {
     /* quota or private mode — the session keeps working unpersisted */
   }
@@ -618,6 +624,22 @@ function returnScroll() {
   else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
 }
 
+/* The reader remembers your place per article, surviving reloads — the
+ * debounce keeps localStorage writes rare while a thumb is scrolling. */
+let readerPosTimer = null;
+addEventListener(
+  'scroll',
+  () => {
+    if (S.view !== 'reader' || !S.passageId || S.stack.length) return;
+    clearTimeout(readerPosTimer);
+    readerPosTimer = setTimeout(() => {
+      S.readerPos[S.passageId] = Math.round(window.scrollY);
+      saveStore();
+    }, 900);
+  },
+  { passive: true },
+);
+
 function go(node, { invoker = null } = {}) {
   keepScroll();
   if (!S.stack.length && !S.dialogInvoker) {
@@ -718,16 +740,21 @@ function openPassage(id) {
   keepScroll();
   S.passageId = id;
   S.view = 'reader';
-  S.readerScroll = 0;
+  // an article you have visited opens where you left it, like a bookmark
+  S.readerScroll = S.readerPos[id] || 0;
   S.stack = [];
   S.loadError = false;
   render();
-  window.scrollTo(0, 0);
+  window.scrollTo(0, S.readerScroll);
   const p = passage();
   if (p && !p.tokens) {
     ensureArticle(p)
       .then(() => {
-        if (S.view === 'reader' && S.passageId === id) render();
+        if (S.view === 'reader' && S.passageId === id) {
+          render();
+          // the text just grew under us — restore the bookmark now it can hold
+          window.scrollTo(0, S.readerScroll);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -1105,6 +1132,9 @@ function renderShelfBody() {
     meta.append(el('span', null, p.sourceLabel));
     if (p.date) meta.append(el('span', null, p.date));
     meta.append(el('span', 'pool-tag', p.licence));
+    // the shelf remembers with you: finished, or open to your bookmark
+    if (S.readDone[p.id]) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
+    else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
     item.append(meta);
     item.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
 
@@ -1634,6 +1664,28 @@ function renderReader(main) {
     }
     main.append(note);
   }
+  // the quiet close of a reading: mark it finished, or take the mark back
+  const fin = el('div', 'read-done');
+  const done = !!S.readDone[p.id];
+  const finBtn = biLabel(
+    'button',
+    done ? 'chip read-fin finished' : 'chip read-fin',
+    done ? '読了 ✓' : '読み終えた',
+    done ? 'finished — tap to unmark' : 'mark as finished',
+  );
+  finBtn.type = 'button';
+  finBtn.id = 'read-fin';
+  finBtn.addEventListener('click', () => {
+    if (S.readDone[p.id]) delete S.readDone[p.id];
+    else S.readDone[p.id] = Date.now();
+    saveStore();
+    keepScroll();
+    render();
+    returnScroll();
+  });
+  fin.append(finBtn);
+  main.append(fin);
+
   const attribution = el('div', 'note');
   attribution.textContent = p.attribution;
   main.append(attribution);
