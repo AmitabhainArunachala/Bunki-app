@@ -23,6 +23,7 @@ const BUNDLES = {
   'share_alike/dict': 'data/share_alike/dict.json',
   'share_alike/strokes': 'data/share_alike/strokes.json',
   'original/grammar-v11': 'data/original/grammar-v11.json',
+  'original/lessons-v1': 'data/original/lessons-v1.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
 };
@@ -40,6 +41,23 @@ for (const file of readdirSync(articlesDir).sort()) {
   bundle[key] = JSON.parse(read(`data/articles/${file}`));
 }
 
+// The expanded dictionary stays JSON-inert until search or a full entry asks
+// for it. This keeps the handoff self-contained and avoids allocating the 70k
+// JS object graph at boot. The browser still has to receive and tokenize these
+// raw nodes, so the directory build remains the phone/deployment path; each
+// node is removed by corridor.js after its JSON is parsed to avoid retaining
+// both raw text and live objects.
+const dictionaryDir = resolve(CORRIDOR, 'data/share_alike/dict-v2');
+const dictionaryScripts = readdirSync(dictionaryDir)
+  .filter((file) => file.endsWith('.json'))
+  .sort((a, b) => (a === 'index.json' ? -1 : b === 'index.json' ? 1 : a.localeCompare(b)))
+  .map((file) => {
+    const id = file.replace(/\.json$/, '');
+    const json = read(`data/share_alike/dict-v2/${file}`).replace(/</g, '\\u003c');
+    return `<script type="application/json" id="corridor-dictionary-${id}">${json}</script>`;
+  })
+  .join('\n');
+
 const tsfsrs = read('vendor/ts-fsrs.mjs').replace(/\/\/# sourceMappingURL=.*$/m, '');
 const EXPORTS = ['fsrs', 'generatorParameters', 'createEmptyCard', 'Rating', 'State'];
 
@@ -49,6 +67,7 @@ const fragment = process.argv.includes('--fragment');
 // emitter asserts the file carries no "</script" sequence, so inlining is safe
 const BODY = `<div id="app"></div>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
+${dictionaryScripts}
 <script>
 ${read('drift-layer.js')}
 </script>
@@ -57,6 +76,7 @@ ${tsfsrs}
 window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
 </script>
 <script type="module">
+window.__CORRIDOR_STANDALONE__ = true;
 window.__CORRIDOR_BUNDLE__ = JSON.parse(document.getElementById('corridor-bundle').textContent);
 ${read('corridor.js')}
 </script>`;
@@ -87,19 +107,7 @@ ${read('drift-layer.css')}
 </style>
 </head>
 <body>
-<div id="app"></div>
-<script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
-<script>
-${read('drift-layer.js')}
-</script>
-<script type="module">
-${tsfsrs}
-window.__TSFSRS__ = { ${EXPORTS.join(', ')} };
-</script>
-<script type="module">
-window.__CORRIDOR_BUNDLE__ = JSON.parse(document.getElementById('corridor-bundle').textContent);
-${read('corridor.js')}
-</script>
+${BODY}
 </body>
 </html>
 `;

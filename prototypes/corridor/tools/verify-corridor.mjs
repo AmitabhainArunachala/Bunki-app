@@ -76,25 +76,69 @@ function check(name, pass, detail = '') {
 }
 
 async function touchAt(page, selector, index, holdMs) {
-  const target = page.locator(selector).nth(index);
-  await target.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(60);
-  // aim at the element's first line fragment, the way a finger aims at the
-  // glyphs — a union box can drift into the line gap once a gloss hangs below
-  const box = await target.evaluate((node) => {
-    const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: r.x, y: r.y, width: r.width, height: r.height };
-  });
-  if (!box || !box.width) throw new Error(`touch: no box for ${selector}`);
-  const x = box.x + box.width / 2;
-  const y = box.y + box.height / 2;
-  const cdp = await page.context().newCDPSession(page);
-  const point = { x, y, radiusX: 6, radiusY: 6, force: 1 };
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
-  if (holdMs) await page.waitForTimeout(holdMs);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await cdp.detach();
-  await page.waitForTimeout(120);
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const target = page.locator(selector).nth(index);
+    try {
+      await target.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(60);
+      // Aim at visible ink the browser says belongs to this control. A line-union
+      // centre can fall into blank inline space or under fixed chrome after ruby
+      // and glosses reflow; dispatching there tests the harness, not the app.
+      const point = await target.evaluate((node) => {
+        const fractions = [0.5, 0.32, 0.68, 0.18, 0.82];
+        for (const r of node.getClientRects()) {
+          for (const fx of fractions) {
+            for (const fy of [0.5, 0.35, 0.65]) {
+              const x = r.left + r.width * fx;
+              const y = r.top + r.height * fy;
+              if (x < 1 || x >= innerWidth - 1 || y < 1 || y >= innerHeight - 1) continue;
+              const hit = document.elementFromPoint(x, y);
+              if (hit && (hit === node || node.contains(hit))) return { x, y };
+            }
+          }
+        }
+        return null;
+      });
+      if (!point) {
+        const debug = await target.evaluate((node) => ({
+          text: node.textContent?.trim().slice(0, 40) ?? '',
+          pointerEvents: getComputedStyle(node).pointerEvents,
+          rects: [...node.getClientRects()].map((r) => {
+            const x = r.left + r.width / 2;
+            const y = r.top + r.height / 2;
+            const hit = document.elementFromPoint(x, y);
+            return {
+              x, y, width: r.width, height: r.height,
+              hit: hit ? `${hit.tagName}.${hit.className}` : null,
+              hitText: hit?.textContent?.trim().slice(0, 40) ?? '',
+              hitOwned: !!hit && (hit === node || node.contains(hit)),
+            };
+          }),
+        }));
+        // A lazy dictionary render can replace the button between the point
+        // scan and this diagnostic scan. Retry only when the freshly resolved
+        // replacement demonstrably owns that same visible point.
+        if (attempt < 2 && debug.rects.some((rect) => rect.hitOwned)) {
+          await page.waitForTimeout(120);
+          continue;
+        }
+        throw new Error(`touch: no unobscured point for ${selector}[${index}] ${JSON.stringify(debug)}`);
+      }
+      const { x, y } = point;
+      const cdp = await page.context().newCDPSession(page);
+      const touchPoint = { x, y, radiusX: 6, radiusY: 6, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [touchPoint] });
+      if (holdMs) await page.waitForTimeout(holdMs);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await cdp.detach();
+      await page.waitForTimeout(120);
+      return;
+    } catch (error) {
+      const detached = /not attached|detached/i.test(error instanceof Error ? error.message : String(error));
+      if (!detached || attempt === 2) throw error;
+      await page.waitForTimeout(120);
+    }
+  }
 }
 
 async function tap(page, selector, index = 0) {
@@ -110,7 +154,43 @@ async function holdWord(page, selector, index = 0) {
 
 async function shoot(page, dir, name) {
   const file = join(dir, `${name}.png`);
-  await page.screenshot({ path: file });
+  // Direct-start verifier URLs (for example ?entry=shelf) intentionally summon
+  // the operator's black variant instrument. Product screenshots should match
+  // the ordinary URL, where that developer strip does not exist; one named
+  // capture below keeps it visible to prove the instrument still works.
+  const hideDebug = name !== '08-variant-strip-open' && !name.startsWith('V-');
+  const hiddenCount = hideDebug
+    ? await page.evaluate(() => {
+        const nodes = new Set([
+          document.getElementById('variants'),
+          ...document.querySelectorAll('.card-preview'),
+        ]);
+        for (const table of document.querySelectorAll('.sched')) {
+          nodes.add(table);
+          if (table.previousElementSibling?.classList.contains('card-kind')) {
+            nodes.add(table.previousElementSibling);
+          }
+        }
+        nodes.delete(null);
+        for (const node of nodes) {
+          node.dataset.captureVisibility = node.style.visibility;
+          node.style.visibility = 'hidden';
+        }
+        return nodes.size;
+      })
+    : 0;
+  try {
+    await page.screenshot({ path: file });
+  } finally {
+    if (hiddenCount) {
+      await page.evaluate(() => {
+        for (const node of document.querySelectorAll('[data-capture-visibility]')) {
+          node.style.visibility = node.dataset.captureVisibility;
+          delete node.dataset.captureVisibility;
+        }
+      });
+    }
+  }
   return file;
 }
 
@@ -120,11 +200,30 @@ async function walkToSemPanel(page, tapFn) {
   await page.waitForSelector('#reader .tok');
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
-  if ((await page.locator('#sheet .sem-row').count()) === 0) {
-    if (await page.locator('#sheet .chip').count()) {
-      await tapFn(page, '#sheet .chip');
-      await page.waitForTimeout(160);
+  if ((await page.locator('#sheet .sem-row.static').count()) === 0) {
+    // Walk through the first-class lexical room to an edited head that carries
+    // both real dictionary doors and source-only phrase labels. This proves a
+    // semantic placeholder is printed without becoming focusable homework.
+    await tapFn(page, '#sheet-close');
+    await page.waitForSelector('#sheet', { state: 'detached' });
+    if ((await page.locator('body').getAttribute('data-view')) !== 'shelf') {
+      await tapFn(page, '#back');
     }
+    await page.waitForFunction(
+      'document.body.dataset.view === "shelf" && !!document.querySelector("#thesaurus-link")',
+    );
+    await page.locator('#thesaurus-link').dispatchEvent('click');
+    await page.waitForFunction(
+      'document.body.dataset.view === "thesaurus" && !!document.querySelector("#thesaurus-search")',
+    );
+    await page.fill('#thesaurus-search', '過酷');
+    await page.waitForSelector('[data-thesaurus^="過酷"]', { timeout: 30_000 });
+    await page.locator('[data-thesaurus^="過酷"]').first().dispatchEvent('click');
+    await page.waitForFunction(
+      () => document.querySelector('#sheet[data-node="word:過酷"] .sem-row.static')
+        && document.querySelector('#sheet[data-node="word:過酷"] .sem-row:not(.static)'),
+      { timeout: 30_000 },
+    );
   }
   return page.locator('#sheet .sem-row').count();
 }
@@ -209,10 +308,14 @@ async function main() {
   });
   const page = await context.newPage();
   const consoleErrors = [];
+  const pageErrors = [];
   page.on('console', (m) => {
     if (m.type() === 'error') consoleErrors.push(m.text());
   });
-  page.on('pageerror', (e) => consoleErrors.push(`pageerror: ${e.message}`));
+  page.on('pageerror', (e) => {
+    pageErrors.push(e.message);
+    consoleErrors.push(`pageerror: ${e.message}`);
+  });
 
   const report = { viewport: VIEWPORT, steps: [], measurements: {}, shelf: [], caps: {} };
 
@@ -316,11 +419,22 @@ async function main() {
     const c = document.querySelector('#drift-layer .word.bctr')?.getBoundingClientRect();
     if (!c) return null;
     const cx = c.x + c.width / 2, cy = c.y + c.height / 2;
-    const ds = [...document.querySelectorAll('#drift-layer .word.bsat')].map((s) => {
+    const points = [...document.querySelectorAll('#drift-layer .word.bsat')].map((s) => {
       const b = s.getBoundingClientRect();
-      return Math.hypot(b.x + b.width / 2 - cx, b.y + b.height / 2 - cy);
+      return { x: b.x + b.width / 2, y: b.y + b.height / 2, b };
     });
-    return { cx, cy, mean: ds.reduce((a, d) => a + d, 0) / (ds.length || 1) };
+    const ds = points.map((p) => Math.hypot(p.x - cx, p.y - cy));
+    return {
+      cx, cy,
+      count: points.length,
+      mean: ds.reduce((a, d) => a + d, 0) / (ds.length || 1),
+      max: Math.max(0, ...ds),
+      sx: points.reduce((a, p) => a + p.x, 0) / (points.length || 1),
+      sy: points.reduce((a, p) => a + p.y, 0) / (points.length || 1),
+      clipped: points.filter((p) =>
+        p.b.left < 0 || p.b.right > innerWidth || p.b.top < 60 || p.b.bottom > innerHeight - 64
+      ).length,
+    };
   })()`;
   const dragBefore = await page.evaluate(meanD);
   const dtx = 200, dty = Math.max(320, dragBefore.cy - 180);
@@ -333,9 +447,18 @@ async function main() {
   await page.waitForTimeout(1600);
   const dragAfter = await page.evaluate(meanD);
   const dragMoved = dragAfter ? Math.hypot(dragAfter.cx - dragBefore.cx, dragAfter.cy - dragBefore.cy) : 0;
+  const satMoved = dragAfter ? Math.hypot(dragAfter.sx - dragBefore.sx, dragAfter.sy - dragBefore.sy) : 0;
+  const dragDot = dragAfter
+    ? (dragAfter.cx - dragBefore.cx) * (dragAfter.sx - dragBefore.sx)
+      + (dragAfter.cy - dragBefore.cy) * (dragAfter.sy - dragBefore.sy)
+    : 0;
   check('bloom · dragging the centre carries the whole constellation — and sticks',
-    dragAfter && dragMoved > 60 && Math.abs(dragAfter.mean - dragBefore.mean) < dragBefore.mean * 0.35,
-    `centre moved ${dragMoved.toFixed(0)}px; mean tether ${dragBefore.mean.toFixed(0)} → ${dragAfter.mean.toFixed(0)}px`);
+    dragAfter && dragMoved > 60 && dragAfter.count === dragBefore.count
+      && dragAfter.clipped === 0 && dragAfter.max < 235
+      && satMoved > dragMoved * 0.25 && dragDot > 0,
+    `centre ${dragMoved.toFixed(0)}px; family ${satMoved.toFixed(0)}px; `
+      + `mean tether ${dragBefore.mean.toFixed(0)} → ${dragAfter.mean.toFixed(0)}px; `
+      + `max ${dragAfter.max.toFixed(0)}px; clipped ${dragAfter.clipped}`);
   await shoot(page, shotsDir, '18-bloom-relief-drag');
   await btouch('touchStart', [[330, 770]]);
   await page.waitForTimeout(60);
@@ -352,8 +475,21 @@ async function main() {
   const t0 = Date.now();
   await open('?entry=shelf');
   const loadMs = Date.now() - t0;
-  check('the shelf renders real graded texts', (await page.locator('.shelf-item').count()) >= 8,
-    `${await page.locator('.shelf-item').count()} texts, ready in ${loadMs} ms`);
+  const searchFit = await page.evaluate(`(() => {
+    const input = document.querySelector('#search');
+    const style = getComputedStyle(input);
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    context.font = style.font;
+    const width = context.measureText(input.placeholder).width;
+    const available = input.clientWidth
+      - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0');
+    return { placeholder: input.placeholder, width, available };
+  })()`);
+  check('the shelf renders real graded texts',
+    (await page.locator('.shelf-item').count()) >= 8 && searchFit.width <= searchFit.available,
+    `${await page.locator('.shelf-item').count()} texts, ready in ${loadMs} ms; `
+      + `search ${searchFit.width.toFixed(0)}/${searchFit.available.toFixed(0)}px`);
 
   const shelfData = await page.evaluate(`(() => {
     return [...document.querySelectorAll('.shelf-item')].map((n) => ({
@@ -590,7 +726,10 @@ async function main() {
       const e = en.getBoundingClientRect();
       for (const other of document.querySelectorAll('#reader .tok')) {
         if (other === tok || tok.contains(other)) continue;
-        const r = other.getClientRects()[0];
+        // Measure the neighbour's ink row, not its deliberately expanded
+        // 44px button/hit box. A hit region overlapping a gloss is harmless;
+        // glyphs painting over it are not.
+        const r = (other.querySelector('.tok-word') ?? other).getClientRects()[0];
         if (!r) continue;
         // a collision is visible ink over ink: require a real bite in both
         // axes, not a sub-4px graze of a neighbour's empty descent space
@@ -656,8 +795,14 @@ async function main() {
     afterThird.sheet.startsWith('word:') && afterThird.named.length > 0,
     `${afterThird.sheet} · ${afterThird.named}`);
   if (afterThird.sheet) {
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(120);
+    // Use the same real touch path as the learner. A synthetic DOM click can
+    // race a lazy dictionary rerender and report on a detached old button.
+    await tap(page, '#sheet-close');
+    await page.waitForSelector('#sheet', { state: 'detached' });
+  }
+  if (await page.locator('.token-actions').count()) {
+    await tap(page, '.view-title');
+    await page.waitForSelector('.token-actions', { state: 'detached' });
   }
 
   // long press → the floating mini-dictionary; a tap anywhere else puts it away
@@ -685,6 +830,7 @@ async function main() {
   await page.waitForTimeout(150);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet[data-node^="word:"]');
+  await page.waitForSelector('#sheet .dictionary-sense', { timeout: 30_000 });
   const panel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {
@@ -692,7 +838,7 @@ async function main() {
       headword: s.querySelector('.headword')?.textContent ?? '',
       reading: s.querySelector('.reading')?.textContent ?? '',
       gloss: s.querySelector('.gloss')?.textContent ?? s.querySelector('.sense-list')?.textContent ?? '',
-      senses: s.querySelectorAll('.sense-list li').length,
+      senses: s.querySelectorAll('.dictionary-sense').length,
       kanjiRows: [...s.querySelectorAll('[data-kanjirow]')].map((c) => c.dataset.kanjirow),
       examples: s.querySelectorAll('.example').length,
       hasBack: !!s.querySelector('#sheet-back'),
@@ -708,23 +854,527 @@ async function main() {
     `${panel.kanjiRows.join('')} — ${panel.kanjiRows.length} row(s)`);
   check('real usage examples come from the shelf itself', panel.examples >= 1,
     `${panel.examples} example(s)`);
-  check('the dictionary carries every sense, most common first', panel.senses >= 2,
-    `${panel.headword}: ${panel.senses} senses`);
   await shoot(page, shotsDir, '03-word-panel');
   report.steps.push({ step: 3, name: 'click grammar + entry', shot: '03-word-panel.png', panel });
 
+  // A form-to-meaning prompt cannot distinguish homographs that print and read
+  // alike. Prove through the visible UI that learning one exact カラー entry
+  // creates one form card whose answer gathers all three compatible primary
+  // senses. Reload before the lazy dictionary opens and reveal that aggregate
+  // from its saved snapshot. This is folded into the existing dictionary-depth
+  // result slot so the frozen suite remains exactly 91 checks.
+  const homographReview = {
+    resultRows: [],
+    learned: null,
+    review: null,
+    cleaned: false,
+    error: null,
+  };
+  try {
+    await page.locator('#sheet-close').dispatchEvent('click');
+    await page.waitForFunction(
+      'document.body.dataset.view === "reader" && !document.querySelector("#sheet")',
+    );
+    await page.locator('#back').dispatchEvent('click');
+    await page.waitForFunction(
+      'document.body.dataset.view === "shelf" && !!document.querySelector("#search")',
+    );
+    await page.fill('#search', 'カラー');
+    const collarResult = 'word:カラー:2853151';
+    const colorResult = 'word:カラー:1038500';
+    const callaResult = 'word:カラー:2853152';
+    await page.waitForSelector(`[data-result="${collarResult}"]`, { timeout: 30_000 });
+    await page.waitForSelector(`[data-result="${colorResult}"]`, { timeout: 30_000 });
+    await page.waitForSelector(`[data-result="${callaResult}"]`, { timeout: 30_000 });
+    homographReview.resultRows = await page.evaluate(`(() =>
+      [...document.querySelectorAll('[data-result^="word:カラー:"]')].map((row) => ({
+        id: row.dataset.result,
+        gloss: row.querySelector('.row-gloss')?.textContent || '',
+      })))()`);
+
+    // Enter through the collar sense, then explicitly choose Learn once. The
+    // scheduler's cue is the printed form, so its answer contract must include
+    // the other indistinguishable entries rather than create hidden rubrics.
+    await page.locator(`[data-result="${collarResult}"]`).dispatchEvent('click');
+    await page.waitForSelector('#sheet .dictionary-sense', { timeout: 30_000 });
+    const openedCollarSenses = await page.evaluate(`(() =>
+      [...document.querySelectorAll('#sheet .dictionary-sense .gloss, #sheet .dictionary-sense .dictionary-glosses li')]
+        .map((node) => node.textContent.trim()).filter(Boolean))()`);
+    await tap(page, '#take');
+    await page.waitForFunction('document.querySelector("#take")?.classList.contains("taken")');
+
+    homographReview.learned = await page.evaluate(`(() => {
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const items = store.taken.filter((item) => item.t === 'word' && item.id === 'カラー');
+      const card = store.review.cards['word:カラー@カラー'];
+      return {
+        items: items.map((item) => ({ seq: item.seq, cueReading: item.cueReading, answer: item.answer })),
+        keys: Object.keys(store.review.cards),
+        target: card?.contract?.targetComponentId,
+        cardCount: Object.keys(store.review.cards).length,
+      };
+    })()`);
+
+    // A navigation reload creates a fresh dictionary state. Enter Review
+    // directly: neither the index nor a shard may be fetched to answer the
+    // saved aggregate form card.
+    await open('?entry=shelf');
+    const resourcesBefore = await page.evaluate(
+      `performance.getEntriesByType('resource').filter((entry) => entry.name.includes('/dict-v2/')).map((entry) => entry.name)`,
+    );
+    await tap(page, '#review');
+    await page.waitForSelector('#review-lobby');
+    const trayRows = await page.locator('.tray-entry').count();
+    await tap(page, '#start-review');
+    await page.waitForSelector('#review-room[data-card="word:カラー@カラー"]');
+    const card = await page.locator('#review-room').getAttribute('data-card');
+    await tap(page, '#review-reveal');
+    await page.waitForSelector('#review-answer');
+    const revealed = await page.evaluate(`(() => ({
+      reading: document.querySelector('#review-answer .review-reading')?.textContent || '',
+      meanings: [...document.querySelectorAll('#review-answer .review-meanings p')]
+        .map((node) => node.textContent.trim()).filter(Boolean),
+      dictResources: performance.getEntriesByType('resource')
+        .filter((entry) => entry.name.includes('/dict-v2/')).map((entry) => entry.name),
+    }))()`);
+    homographReview.review = {
+      card,
+      trayRows,
+      resourcesBefore,
+      ...revealed,
+      openedCollarSenses,
+    };
+  } catch (err) {
+    homographReview.error = err instanceof Error ? err.message : String(err);
+  } finally {
+    await page.evaluate("localStorage.removeItem('kairo-corridor-v1')");
+    await open('?entry=shelf');
+    homographReview.cleaned = await page.evaluate(
+      "localStorage.getItem('kairo-corridor-v1') === null",
+    );
+  }
+  const learnedHomograph = homographReview.learned;
+  const revealedAggregate = homographReview.review;
+  const savedAnswer = learnedHomograph?.items?.[0]?.answer;
+
+  // One JMdict entry may constrain different senses to different readings.
+  // Search must show the reading/gloss pair the learner typed, then carry that
+  // match into the one canonical entry rather than snapping back to a global
+  // first reading. Fold this into the dictionary-depth slot below.
+  const restrictedReadings = { rows: [], error: null };
+  try {
+    for (const [query, gloss] of [
+      ['さける', 'to avoid (situation)'],
+      ['よける', 'to avoid (physical contact with)'],
+    ]) {
+      await page.fill('#search', query);
+      const resultId = 'word:避ける:1583260';
+      await page.waitForFunction(
+        ({ id, reading, expectedGloss }) => {
+          const row = [...document.querySelectorAll('[data-result]')]
+            .find((candidate) => candidate.dataset.result === id);
+          return row?.querySelector('.row-reading')?.textContent?.trim() === reading
+            && row?.querySelector('.row-gloss')?.textContent?.trim() === expectedGloss;
+        },
+        { id: resultId, reading: query, expectedGloss: gloss },
+        { timeout: 30_000 },
+      );
+      const result = page.locator(`[data-result="${resultId}"]`).first();
+      const row = await result.evaluate((node) => ({
+        id: node.dataset.result,
+        word: node.querySelector('.row-word')?.childNodes[0]?.textContent?.trim() || '',
+        reading: node.querySelector('.row-reading')?.textContent?.trim() || '',
+        gloss: node.querySelector('.row-gloss')?.textContent?.trim() || '',
+      }));
+      await result.click();
+      await page.waitForSelector('#sheet .dictionary-sense', { timeout: 30_000 });
+      const canonical = await page.evaluate(
+        ([expectedReading, expectedGloss]) => {
+          const sheet = document.querySelector('#sheet');
+          const compatibleSense = [...sheet.querySelectorAll('.dictionary-sense')].some((sense) => {
+            const restriction = sense.querySelector('.dictionary-restriction')?.textContent || '';
+            return restriction.includes(expectedReading) && sense.textContent.includes(expectedGloss);
+          });
+          return {
+            node: sheet.dataset.node,
+            headword: sheet.querySelector('.headword')?.textContent?.trim() || '',
+            reading: sheet.querySelector('.reading')?.textContent?.trim() || '',
+            compatibleSense,
+          };
+        },
+        [query, gloss],
+      );
+      restrictedReadings.rows.push({ query, expectedGloss: gloss, row, canonical });
+      await page.locator('#sheet-close').click();
+      await page.waitForSelector('#sheet', { state: 'detached' });
+    }
+  } catch (err) {
+    restrictedReadings.error = err instanceof Error ? err.message : String(err);
+  }
+
+  // English lookup must preserve the learner's lexical intent all the way
+  // through the canonical sheet and explicit Learn action. These cases use a
+  // later gloss whose permitted reading differs from the entry default, so a
+  // first-reading/first-gloss fallback would create a silently false Review
+  // contract. The written-form and cross-reference probes exercise the same
+  // routing boundary without consuming another frozen result slot.
+  const lexicalIntent = {
+    searches: [],
+    writtenForm: null,
+    crossReference: null,
+    senseQualifiedCrossReference: null,
+    workerThrottle: null,
+    cleaned: false,
+    error: null,
+  };
+  try {
+    await page.evaluate("localStorage.removeItem('kairo-corridor-v1')");
+    const throttleBaseline = await page.evaluate(
+      'window.__KAIRO_DICTIONARY_PERF__?.workerSearchDispatches || 0',
+    );
+    for (const value of ['a', 'as', 'asi', 'asid', 'aside']) {
+      await page.fill('#search', value);
+      await page.waitForTimeout(200);
+    }
+    const beforeSettle = await page.evaluate(`(() => ({
+      dispatches: window.__KAIRO_DICTIONARY_PERF__?.workerSearchDispatches || 0,
+      rows: document.querySelectorAll('#search-results .entry-row').length,
+      query: document.querySelector('#search')?.value || '',
+    }))()`);
+    await page.waitForFunction(
+      (start) => (window.__KAIRO_DICTIONARY_PERF__?.workerSearchDispatches || 0) === start + 1
+        && window.__KAIRO_DICTIONARY_PERF__?.lastDispatchedQuery === 'aside',
+      throttleBaseline,
+      { timeout: 30_000 },
+    );
+    await page.waitForFunction(
+      () => document.querySelector('#shelf-body')?.dataset.renderToken?.endsWith('\u0000full'),
+      { timeout: 30_000 },
+    );
+    const naturalDispatches = await page.evaluate(
+      'window.__KAIRO_DICTIONARY_PERF__.workerSearchDispatches',
+    );
+    await page.fill('#search', '');
+    await page.waitForTimeout(200);
+    await page.fill('#search', 'aside');
+    await page.waitForTimeout(700);
+    const afterCachedRepeat = await page.evaluate(
+      'window.__KAIRO_DICTIONARY_PERF__.workerSearchDispatches',
+    );
+    await page.fill('#search', 'zzqx-one');
+    await page.waitForTimeout(460);
+    const beforeMidFlightChange = await page.evaluate(
+      'window.__KAIRO_DICTIONARY_PERF__.workerSearchDispatches',
+    );
+    await page.fill('#search', 'zzqx-two');
+    await page.waitForFunction(
+      (minimum) => window.__KAIRO_DICTIONARY_PERF__?.lastDispatchedQuery === 'zzqx-two'
+        && (window.__KAIRO_DICTIONARY_PERF__?.workerSearchDispatches || 0) <= minimum + 1
+        && document.querySelector('#shelf-body')?.dataset.renderToken === 'zzqx-two\u0000full',
+      beforeMidFlightChange,
+      { timeout: 30_000 },
+    );
+    const afterMidFlight = await page.evaluate(
+      'window.__KAIRO_DICTIONARY_PERF__.workerSearchDispatches',
+    );
+    lexicalIntent.workerThrottle = {
+      baseline: throttleBaseline,
+      beforeSettle,
+      naturalDelta: naturalDispatches - throttleBaseline,
+      cachedRepeatDelta: afterCachedRepeat - naturalDispatches,
+      midFlightDelta: afterMidFlight - afterCachedRepeat,
+    };
+    const cases = [
+      {
+        query: 'put aside',
+        seq: '1583260',
+        word: '避ける',
+        reading: 'よける',
+        gloss: 'to put aside',
+        card: 'word:避ける@よける',
+        alternate: '除ける',
+      },
+      {
+        query: 'semicircle',
+        seq: '1583170',
+        word: '半月',
+        reading: 'はんげつ',
+        gloss: 'semicircle',
+        card: 'word:半月@はんげつ',
+        alternate: '',
+      },
+    ];
+    for (const probe of cases) {
+      await page.fill('#search', probe.query);
+      await page.waitForFunction(
+        ({ seq, reading, gloss }) => {
+          const row = [...document.querySelectorAll('[data-result]')]
+            .find((candidate) => candidate.dataset.result?.endsWith(`:${seq}`));
+          return row?.querySelector('.row-reading')?.textContent?.trim() === reading
+            && row?.querySelector('.row-gloss')?.textContent?.trim() === gloss;
+        },
+        { seq: probe.seq, reading: probe.reading, gloss: probe.gloss },
+        { timeout: 30_000 },
+      );
+      const result = page.locator(`[data-result$=":${probe.seq}"]`).first();
+      const row = await result.evaluate((node) => ({
+        id: node.dataset.result,
+        word: node.querySelector('.row-word')?.childNodes[0]?.textContent?.trim() || '',
+        reading: node.querySelector('.row-reading')?.textContent?.trim() || '',
+        gloss: node.querySelector('.row-gloss')?.textContent?.trim() || '',
+      }));
+      await result.click();
+      await page.waitForSelector('#sheet .dictionary-sense', { timeout: 30_000 });
+      await page.waitForFunction(
+        ({ reading, gloss }) => {
+          const sheet = document.querySelector('#sheet');
+          return sheet?.querySelector('.reading')?.textContent?.trim() === reading
+            && [...sheet.querySelectorAll('.dictionary-sense')]
+              .some((sense) => sense.textContent.includes(gloss));
+        },
+        { reading: probe.reading, gloss: probe.gloss },
+        { timeout: 30_000 },
+      );
+      const canonical = await page.evaluate(
+        ({ reading, gloss }) => {
+          const sheet = document.querySelector('#sheet');
+          const matchedSense = [...sheet.querySelectorAll('.dictionary-sense')]
+            .find((sense) => sense.textContent.includes(gloss));
+          return {
+            node: sheet.dataset.node,
+            headword: sheet.querySelector('.headword')?.textContent?.trim() || '',
+            reading: sheet.querySelector('.reading')?.textContent?.trim() || '',
+            matchedGloss: !!matchedSense,
+            restriction: matchedSense?.querySelector('.dictionary-restriction')?.textContent?.trim() || '',
+          };
+        },
+        { reading: probe.reading, gloss: probe.gloss },
+      );
+      await tap(page, '#take');
+      await page.waitForFunction('document.querySelector("#take")?.classList.contains("taken")');
+      const learned = await page.evaluate(
+        ({ word, reading, card }) => {
+          const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+          const items = store.taken.filter(
+            (item) => item.t === 'word' && item.id === word && item.cueReading === reading,
+          );
+          const reviewCard = store.review.cards[card];
+          return {
+            itemCount: items.length,
+            answer: items[0]?.answer || null,
+            cardPresent: !!reviewCard,
+            target: reviewCard?.contract?.targetComponentId || '',
+          };
+        },
+        { word: probe.word, reading: probe.reading, card: probe.card },
+      );
+      lexicalIntent.searches.push({ ...probe, row, canonical, learned });
+      await page.locator('#sheet-close').click();
+      await page.waitForSelector('#sheet', { state: 'detached' });
+    }
+
+    // 除ける participates in multiple entries. If the 避ける entry is offered
+    // for that exact written query, it can only be paired with よける: さける
+    // is not a source-compatible reading of the written form 除ける.
+    await page.fill('#search', '除ける');
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('[data-result]')]
+        .some((row) => /:(1411270|1583260)$/.test(row.dataset.result || '')),
+      { timeout: 30_000 },
+    );
+    lexicalIntent.writtenForm = await page.evaluate(`(() => {
+      const rows = [...document.querySelectorAll('[data-result]')].map((row) => ({
+        id: row.dataset.result || '',
+        word: row.querySelector('.row-word')?.childNodes[0]?.textContent?.trim() || '',
+        reading: row.querySelector('.row-reading')?.textContent?.trim() || '',
+        gloss: row.querySelector('.row-gloss')?.textContent?.trim() || '',
+      }));
+      const targetRows = rows.filter((row) => row.id.endsWith(':1583260'));
+      return {
+        query: document.querySelector('#search')?.value || '',
+        resultCount: rows.length,
+        targetRows,
+        safe: targetRows.every((row) => row.reading === 'よける')
+          && targetRows.every((row) => row.reading !== 'さける'),
+      };
+    })()`);
+
+    // JMdict qualifies this 金山 cross-reference with かなやま. The qualifier
+    // is lexical routing data, not a decorative note: following it must select
+    // the かなやま entry rather than falling back to the きんざん homograph.
+    await page.fill('#search', 'gold mine');
+    const goldMineResult = 'word:金山:1662950';
+    await page.waitForFunction(
+      (id) => {
+        const row = document.querySelector(`[data-result="${id}"]`);
+        return row?.querySelector('.row-reading')?.textContent?.trim() === 'きんざん'
+          && row?.querySelector('.row-gloss')?.textContent?.trim() === 'gold mine';
+      },
+      goldMineResult,
+      { timeout: 30_000 },
+    );
+    await page.locator(`[data-result="${goldMineResult}"]`).click();
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('#sheet .dictionary-rel')].some((row) =>
+        row.querySelector('.dictionary-rel-word')?.textContent?.trim() === '金山'
+          && row.querySelector('.dictionary-rel-note')?.textContent?.trim() === 'かなやま'),
+      { timeout: 30_000 },
+    );
+    const relation = page.locator('#sheet .dictionary-rel').filter({ hasText: 'かなやま' }).first();
+    const from = await page.evaluate(`(() => ({
+      node: document.querySelector('#sheet')?.dataset.node || '',
+      reading: document.querySelector('#sheet .reading')?.textContent?.trim() || '',
+    }))()`);
+    const qualifier = await relation.locator('.dictionary-rel-note').textContent();
+    await relation.click();
+    await page.waitForFunction(
+      () => document.querySelector('#sheet .reading')?.textContent?.trim() === 'かなやま'
+        && document.querySelector('[data-dictionary-entry="2838215"].active'),
+      { timeout: 30_000 },
+    );
+    lexicalIntent.crossReference = await page.evaluate(
+      ([qualifierText, fromState]) => ({
+        qualifier: qualifierText.trim(),
+        from: fromState,
+        node: document.querySelector('#sheet')?.dataset.node || '',
+        headword: document.querySelector('#sheet .headword')?.textContent?.trim() || '',
+        reading: document.querySelector('#sheet .reading')?.textContent?.trim() || '',
+        activeSeq: document.querySelector('.dictionary-homograph.active')?.dataset.dictionaryEntry || '',
+      }),
+      [qualifier || '', from],
+    );
+
+    // Sense numbers in JMdict xref qualifiers are displayed as source data,
+    // but are not part of the reading itself. 辛い／からい points to the
+    // distinct 辛い／つらい entry through the literal qualifier つらい・1.
+    await page.locator('#sheet-close').click();
+    await page.waitForSelector('#sheet', { state: 'detached' });
+    await page.fill('#search', 'spicy');
+    const spicyResult = 'word:辛い:1365850';
+    await page.waitForSelector(`[data-result="${spicyResult}"]`, { timeout: 30_000 });
+    await page.locator(`[data-result="${spicyResult}"]`).click();
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('#sheet .dictionary-rel')].some((row) =>
+        row.querySelector('.dictionary-rel-note')?.textContent?.trim() === 'つらい・1'),
+      { timeout: 30_000 },
+    );
+    const senseQualified = page.locator('#sheet .dictionary-rel').filter({ hasText: 'つらい・1' }).first();
+    const sourceQualifier = (await senseQualified.locator('.dictionary-rel-note').textContent())?.trim() || '';
+    await senseQualified.click();
+    await page.waitForFunction(
+      () => document.querySelector('#sheet .reading')?.textContent?.trim() === 'つらい'
+        && document.querySelector('[data-dictionary-entry="1365860"].active'),
+      { timeout: 30_000 },
+    );
+    lexicalIntent.senseQualifiedCrossReference = await page.evaluate(
+      (qualifierText) => ({
+        qualifier: qualifierText,
+        node: document.querySelector('#sheet')?.dataset.node || '',
+        reading: document.querySelector('#sheet .reading')?.textContent?.trim() || '',
+        activeSeq: document.querySelector('.dictionary-homograph.active')?.dataset.dictionaryEntry || '',
+      }),
+      sourceQualifier,
+    );
+  } catch (err) {
+    lexicalIntent.error = err instanceof Error ? err.message : String(err);
+  } finally {
+    await page.evaluate("localStorage.removeItem('kairo-corridor-v1')");
+    await open('?entry=shelf');
+    lexicalIntent.cleaned = await page.evaluate(
+      "localStorage.getItem('kairo-corridor-v1') === null",
+    );
+  }
+  check('the dictionary carries every sense, most common first',
+    panel.senses >= 2
+      && homographReview.error === null
+      && homographReview.resultRows.length === 3
+      && learnedHomograph?.items.length === 1
+      && learnedHomograph.items[0].seq == null
+      && learnedHomograph.items[0].cueReading === 'カラー'
+      && learnedHomograph.cardCount === 1
+      && learnedHomograph.keys.join(',') === 'word:カラー@カラー'
+      && learnedHomograph.target === 'kc:word:カラー@カラー'
+      && savedAnswer?.entries?.join(',') === '1038500,2853151,2853152'
+      && savedAnswer?.meanings?.includes('color')
+      && savedAnswer.meanings.includes('collar')
+      && savedAnswer.meanings.includes('calla (variety of arum lily)')
+      && revealedAggregate?.card === 'word:カラー@カラー'
+      && revealedAggregate.trayRows === 1
+      && revealedAggregate.resourcesBefore.length === 0
+      && revealedAggregate.dictResources.length === 0
+      && revealedAggregate.meanings.join('\u0000') === savedAnswer.meanings.join('\u0000')
+      && revealedAggregate.meanings.includes('color')
+      && revealedAggregate.meanings.includes('collar')
+      && revealedAggregate.meanings.includes('calla (variety of arum lily)')
+      && revealedAggregate.openedCollarSenses.includes('collar')
+      && homographReview.cleaned
+      && restrictedReadings.error === null
+      && restrictedReadings.rows.length === 2
+      && restrictedReadings.rows.every(({ query, expectedGloss, row, canonical }) =>
+        row.id === 'word:避ける:1583260'
+          && row.word === '避ける'
+          && row.reading === query
+          && row.gloss === expectedGloss
+          && canonical.node === 'word:避ける'
+          && canonical.headword.startsWith('避ける')
+          && canonical.reading === query
+          && canonical.compatibleSense)
+      && lexicalIntent.error === null
+      && lexicalIntent.workerThrottle?.beforeSettle.dispatches === lexicalIntent.workerThrottle.baseline
+      && lexicalIntent.workerThrottle.beforeSettle.rows > 0
+      && lexicalIntent.workerThrottle.beforeSettle.query === 'aside'
+      && lexicalIntent.workerThrottle.naturalDelta === 1
+      && lexicalIntent.workerThrottle.cachedRepeatDelta === 0
+      && lexicalIntent.workerThrottle.midFlightDelta <= 2
+      && lexicalIntent.searches.length === 2
+      && lexicalIntent.searches.every(({ seq, word, reading, gloss, card, alternate, row, canonical, learned }) =>
+        row.id.endsWith(`:${seq}`)
+          && row.word === word
+          && row.reading === reading
+          && row.gloss === gloss
+          && canonical.node === `word:${word}`
+          && canonical.headword.startsWith(word)
+          && (!alternate || canonical.headword.includes(alternate))
+          && canonical.reading === reading
+          && canonical.matchedGloss
+          && learned.itemCount === 1
+          && learned.cardPresent
+          && learned.target === `kc:${card}`
+          && learned.answer?.reading === reading
+          && learned.answer?.selectedEntrySeq === seq
+          && learned.answer?.entries?.includes(seq)
+          && learned.answer?.meanings?.includes(gloss))
+      && lexicalIntent.writtenForm?.query === '除ける'
+      && lexicalIntent.writtenForm.resultCount > 0
+      && lexicalIntent.writtenForm.safe
+      && lexicalIntent.crossReference?.qualifier === 'かなやま'
+      && lexicalIntent.crossReference.from?.node === 'word:金山'
+      && lexicalIntent.crossReference.from.reading === 'きんざん'
+      && lexicalIntent.crossReference.node === 'word:金山'
+      && lexicalIntent.crossReference.headword.startsWith('金山')
+      && lexicalIntent.crossReference.reading === 'かなやま'
+      && lexicalIntent.crossReference.activeSeq === '2838215'
+      && lexicalIntent.senseQualifiedCrossReference?.qualifier === 'つらい・1'
+      && lexicalIntent.senseQualifiedCrossReference.node === 'word:辛い'
+      && lexicalIntent.senseQualifiedCrossReference.reading === 'つらい'
+      && lexicalIntent.senseQualifiedCrossReference.activeSeq === '1365860'
+      && lexicalIntent.cleaned,
+    `${panel.headword}: ${panel.senses} senses; カラー card ${learnedHomograph?.keys?.join(' / ') || 'none'}; `
+      + `entries ${savedAnswer?.entries?.join(' / ') || 'none'}; reload ${revealedAggregate?.card || homographReview.error || 'none'} `
+      + `→ ${revealedAggregate?.meanings?.join(' · ') || 'no answer'}; dictionary fetches ${revealedAggregate?.dictResources?.length ?? 'n/a'}; `
+      + `避ける ${restrictedReadings.rows.map(({ row }) => `${row.reading}「${row.gloss}」`).join(' / ') || restrictedReadings.error || 'missing'}; `
+      + `intent ${lexicalIntent.searches.map(({ row }) => `${row.word}／${row.reading}「${row.gloss}」`).join(' · ') || lexicalIntent.error || 'missing'}; `
+      + `worker natural/cache/mid-flight ${lexicalIntent.workerThrottle?.naturalDelta ?? '?'}/${lexicalIntent.workerThrottle?.cachedRepeatDelta ?? '?'}/${lexicalIntent.workerThrottle?.midFlightDelta ?? '?'}; `
+      + `除ける ${lexicalIntent.writtenForm?.targetRows?.map(({ reading }) => reading).join(' / ') || 'seq absent'}; `
+      + `金山 ${lexicalIntent.crossReference?.from?.reading || '?'} → ${lexicalIntent.crossReference?.reading || '?'}; `
+      + `辛い ${lexicalIntent.senseQualifiedCrossReference?.qualifier || '?'} → ${lexicalIntent.senseQualifiedCrossReference?.reading || '?'}`);
+  report.dictionaryHomographs = homographReview;
+  report.dictionaryRestrictedReadings = restrictedReadings;
+  report.dictionaryLexicalIntent = lexicalIntent;
+
   // now the surface that matters: a word that HAS semantic neighbours
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
-  await page.waitForSelector('#reader .tok');
-  await holdWord(page, '#reader .tok.content');
-  await page.waitForSelector('#sheet');
-  // from the empty-state seed chips, hop to a word that has edges
-  const seedChip = page.locator('#sheet .chip').first();
-  if (await seedChip.count()) {
-    await tap(page, '#sheet .chip');
-    await page.waitForTimeout(160);
-  }
+  await walkToSemPanel(page, tap);
   const semPanel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {
@@ -733,17 +1383,33 @@ async function main() {
       semRows: [...s.querySelectorAll('.sem-row')].map((r) => ({
         word: r.querySelector('.sem-word').textContent,
         note: r.querySelector('.sem-note').textContent,
+        tag: r.tagName,
+        static: r.classList.contains('static'),
+        tabIndex: r.tabIndex,
       })),
     };
   })()`);
   check('semantic neighbours carry their discrimination notes',
-    semPanel.semRows.length > 0 && semPanel.semRows.every((r) => r.note.length > 0),
+    semPanel.semRows.length > 0
+      && semPanel.semRows.every((r) => r.note.length > 0)
+      && semPanel.semRows.some((r) => r.tag === 'BUTTON' && !r.static)
+      && semPanel.semRows.some((r) => r.tag === 'DIV' && r.static && r.tabIndex === -1),
     semPanel.semRows.length
-      ? `${semPanel.headword}: ${semPanel.semRows.length} edges, e.g. ${semPanel.semRows[0].word}「${semPanel.semRows[0].note}」`
+      ? `${semPanel.headword}: ${semPanel.semRows.length} edges, ${semPanel.semRows.filter((row) => !row.static).length} doors and ${semPanel.semRows.filter((row) => row.static).length} source-only labels`
       : 'no edges reached',
   );
   await shoot(page, shotsDir, '03b-semantic-neighbours');
   report.steps.push({ step: 3.5, name: 'semantic neighbours', shot: '03b-semantic-neighbours.png', semPanel });
+
+  // Keep one unobscured proof of the first-class lexical room itself. The
+  // entry sheet above is canonical, but it should not be the only evidence
+  // that the room behind it exists as a navigable surface.
+  await tap(page, '#sheet-close');
+  await page.waitForSelector('#sheet', { state: 'detached' });
+  await shoot(page, shotsDir, '03c-word-relations-room');
+  await page.locator('[data-thesaurus^="過酷"]').first().dispatchEvent('click');
+  await page.waitForSelector('#sheet[data-node="word:過酷"]');
+  await page.waitForSelector('#sheet .dictionary-sense', { timeout: 30_000 });
 
   // ------------------------------------------------------ step 4 the graph
   console.log('\n— step 4 · walk the graph');
@@ -899,6 +1565,10 @@ async function main() {
   const normalReveal = await page.evaluate(`(() => ({
     answer: document.querySelectorAll('#review-answer').length,
     grades: [...document.querySelectorAll('[data-review-grade]')].map((b) => b.dataset.reviewGrade),
+    readingGroups: [...document.querySelectorAll('.review-reading-group')].map((group) => ({
+      text: group.textContent,
+      lines: group.getClientRects().length,
+    })),
   }))()`);
   reviewProbes.push(await page.evaluate(MEASURE_FN));
   await shoot(page, shotsDir, '05-review-room');
@@ -955,6 +1625,9 @@ async function main() {
       && reviewBeforeReveal.answer === 0 && reviewBeforeReveal.reveal === 1 && reviewBeforeReveal.giveUp === 1
       && reviewBeforeReveal.planSize === 1 && reviewBeforeReveal.card === firstTake.key
       && normalReveal.answer === 1 && normalReveal.grades.join(',') === 'again,hard,good,easy'
+      && normalReveal.readingGroups.length > 0
+      && normalReveal.readingGroups.every((group) => group.lines === 1)
+      && normalReveal.readingGroups.some((group) => group.text.includes('す.ごす'))
       && afterGood.history === 1 && afterGood.admitted === 1 && !!afterGood.lastReviewedAt
       && afterGood.receiptGrade === 'good' && afterGood.effectiveGrade === 'good'
       && afterGood.revealedBeforeRecall === false && afterGood.receiptDueAt === afterGood.dueAt
@@ -964,6 +1637,7 @@ async function main() {
       && reloadedGood.dueAt === afterGood.dueAt && reloadUi.toggles === 1,
     `taken/card/history ${firstTake.taken}/${firstTake.cards}/${firstTake.history}; `
       + `pre-answer ${reviewBeforeReveal.answer}; ratings ${normalReveal.grades.join(',')}; `
+      + `reading groups ${normalReveal.readingGroups.map((group) => group.text).join('|')}; `
       + `Good receipts ${afterGood.history}; reload receipts ${reloadedGood.history}`);
 
   // Seed 21 due cards from the valid persisted scheduler stamp. The room owns
@@ -1142,6 +1816,414 @@ async function main() {
   })()`);
   reviewProbes.push(await page.evaluate(MEASURE_FN));
 
+  // The lesson, canonical entry and Review must share one learner record.
+  // Exercise the migration edges through visible controls, and fold them into
+  // this existing storage result so the suite keeps its frozen 91 slots.
+  const lessonStore = {
+    legacyTaken: null,
+    keepThenCanonical: null,
+    malformed: null,
+    future: null,
+    malformedRoots: [],
+    malformedReview: null,
+    driftObservation: null,
+    articleRetry: null,
+    cleaned: false,
+    error: null,
+  };
+  const failOnceArticlePattern = '**/data/articles/bunki-graded-n5-kitchen.json';
+  let failOnceArticleRouteInstalled = false;
+  let lessonEvidenceCaptured = false;
+  const seedStore = async (value) => {
+    const raw = JSON.stringify(value);
+    await page.evaluate(
+      ([key, bytes]) => localStorage.setItem(key, bytes),
+      ['kairo-corridor-v1', raw],
+    );
+    return raw;
+  };
+  const enterFirstLesson = async () => {
+    await open('?entry=shelf');
+    await page.locator('#path-link').click();
+    await page.waitForFunction(
+      'document.body.dataset.view === "path" && !!document.querySelector(`[data-lesson="n5-kitchen-teiru"]`)',
+    );
+    if (!lessonEvidenceCaptured) await shoot(page, shotsDir, '23-guided-path');
+    await page.locator('[data-lesson="n5-kitchen-teiru"]').click();
+    await page.waitForFunction(
+      'document.body.dataset.view === "lesson" && !!document.querySelector(".lesson-disposition")',
+      null,
+      { timeout: 30_000 },
+    );
+    if (!lessonEvidenceCaptured) {
+      await shoot(page, shotsDir, '24-first-lesson');
+      lessonEvidenceCaptured = true;
+    }
+    const row = page.locator('.lesson-disposition').filter({ hasText: '〜ている' }).first();
+    await row.waitFor();
+    return row;
+  };
+  const probeReadOnlyRaw = async (kind, raw) => {
+    await page.evaluate(
+      ([key, bytes]) => localStorage.setItem(key, bytes),
+      ['kairo-corridor-v1', raw],
+    );
+    const errorsAt = pageErrors.length;
+    await enterFirstLesson();
+    const probe = await page.evaluate(`(() => {
+      const mutators = [...document.querySelectorAll('.lesson-keep, .lesson-learn, .lesson-choice, #lesson-close')];
+      return {
+        view: document.body.dataset.view,
+        title: document.querySelector('.lesson-title')?.textContent || '',
+        warning: document.querySelector('#store-warning')?.textContent || '',
+        mutators: mutators.length,
+        disabled: mutators.filter((button) => button.disabled).length,
+        raw: localStorage.getItem('kairo-corridor-v1'),
+      };
+    })()`);
+    probe.kind = kind;
+    probe.pageErrors = pageErrors.length - errorsAt;
+    probe.rawPreserved = probe.raw === raw;
+    delete probe.raw;
+    return probe;
+  };
+  try {
+    // (a) A legacy list row is not yet a card. Lesson Learn must stay enabled,
+    // promote that exact row, and write the lesson disposition beside it.
+    await seedStore({
+      taken: [{
+        t: 'grammar', id: 'teiru', label: '〜ている', kind: '文法', kindEn: 'grammar',
+        from: null, ts: Date.now() - 86_400_000,
+      }],
+      lists: {},
+    });
+    let grammarRow = await enterFirstLesson();
+    const legacyBeforeLessonLearn = {
+      learnDisabled: await grammarRow.locator('.lesson-learn').isDisabled(),
+      keepDisabled: await grammarRow.locator('.lesson-keep').isDisabled(),
+      rowCount: await page.locator('.lesson-disposition').count(),
+    };
+    await grammarRow.locator('.lesson-learn').click();
+    await page.waitForFunction(
+      'document.querySelector(".lesson-disposition .lesson-learn.selected")?.disabled === true',
+    );
+    const legacyAfterLessonLearn = await page.evaluate(`(() => {
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const card = store.review?.cards?.['grammar:teiru'];
+      const thread = store.learning?.threads?.['grammar:teiru'];
+      return {
+        taken: store.taken.filter((item) => item.t === 'grammar' && item.id === 'teiru').length,
+        cards: Object.keys(store.review?.cards || {}),
+        target: card?.contract?.targetComponentId,
+        active: card?.memory?.active,
+        disposition: thread?.disposition,
+        encounters: thread?.encounters?.length,
+        selected: document.querySelector('.lesson-disposition .lesson-learn')?.classList.contains('selected'),
+      };
+    })()`);
+    lessonStore.legacyTaken = { before: legacyBeforeLessonLearn, after: legacyAfterLessonLearn };
+
+    // (b) Keep records only the encounter. Opening the canonical grammar sheet
+    // and choosing 覚える must reconcile that same thread to Learn and create
+    // the same scheduler identity used by the lesson action.
+    await seedStore({
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: { version: 1, threads: {}, lessons: {}, evidence: [] },
+    });
+    grammarRow = await enterFirstLesson();
+    const keepWasEnabled = !(await grammarRow.locator('.lesson-keep').isDisabled());
+    await grammarRow.locator('.lesson-keep').click();
+    await page.waitForFunction(
+      'document.querySelector(".lesson-disposition .lesson-keep.selected") !== null',
+    );
+    const afterKeep = await page.evaluate(`(() => {
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const thread = store.learning?.threads?.['grammar:teiru'];
+      return {
+        disposition: thread?.disposition,
+        encounters: thread?.encounters?.length,
+        taken: store.taken.length,
+        cards: Object.keys(store.review?.cards || {}).length,
+        learnDisabled: document.querySelector('.lesson-disposition .lesson-learn')?.disabled,
+      };
+    })()`);
+    await page.locator('#lesson-grammar-door').click();
+    await page.waitForSelector('#sheet[data-node="grammar:teiru"]');
+    const canonicalTakeWasEnabled = !(await page.locator('#take').isDisabled());
+    await page.locator('#take').click();
+    await page.waitForFunction('document.querySelector("#take")?.classList.contains("taken")');
+    const afterCanonicalLearn = await page.evaluate(`(() => {
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const thread = store.learning?.threads?.['grammar:teiru'];
+      const card = store.review?.cards?.['grammar:teiru'];
+      return {
+        disposition: thread?.disposition,
+        encounters: thread?.encounters?.length,
+        taken: store.taken.filter((item) => item.t === 'grammar' && item.id === 'teiru').length,
+        cards: Object.keys(store.review?.cards || {}),
+        target: card?.contract?.targetComponentId,
+        active: card?.memory?.active,
+        selected: document.querySelector('#take')?.classList.contains('taken'),
+      };
+    })()`);
+    lessonStore.keepThenCanonical = {
+      keepWasEnabled,
+      canonicalTakeWasEnabled,
+      afterKeep,
+      afterCanonicalLearn,
+    };
+
+    // (c1) A malformed current record is quarantined byte-for-byte. The lesson
+    // still reads, but every mutation is visibly disabled and a warning names
+    // the pause instead of silently replacing evidence.
+    const malformedValue = {
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: { version: 1, threads: {}, lessons: {}, evidence: [null] },
+    };
+    const malformedRaw = await seedStore(malformedValue);
+    const malformedErrorsAt = pageErrors.length;
+    await enterFirstLesson();
+    const malformedProbe = await page.evaluate(`(() => {
+      const mutators = [...document.querySelectorAll('.lesson-keep, .lesson-learn, .lesson-choice, #lesson-close')];
+      return {
+        view: document.body.dataset.view,
+        title: document.querySelector('.lesson-title')?.textContent || '',
+        warning: document.querySelector('#store-warning')?.textContent || '',
+        mutators: mutators.length,
+        disabled: mutators.filter((button) => button.disabled).length,
+        raw: localStorage.getItem('kairo-corridor-v1'),
+      };
+    })()`);
+    malformedProbe.pageErrors = pageErrors.length - malformedErrorsAt;
+    malformedProbe.rawPreserved = malformedProbe.raw === malformedRaw;
+    delete malformedProbe.raw;
+    lessonStore.malformed = malformedProbe;
+    reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+    // (c2) A future learning payload remains opaque. Navigation and reading
+    // are safe, while current-version lesson mutation stays disabled.
+    const futureValue = {
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: {
+        version: 27,
+        futureThreads: [{ target: 'grammar:teiru', disposition: 'perhaps' }],
+        futureEvidence: { shape: 'intentionally unknown' },
+        sentinel: 'preserve-me',
+      },
+    };
+    const futureRaw = await seedStore(futureValue);
+    const futureErrorsAt = pageErrors.length;
+    await open('?entry=shelf');
+    await page.locator('#path-link').click();
+    await page.waitForFunction('document.body.dataset.view === "path"');
+    const futurePathWarning = await page.locator('main .review-warning').textContent();
+    await page.locator('[data-lesson="n5-kitchen-teiru"]').click();
+    await page.waitForFunction(
+      'document.body.dataset.view === "lesson" && !!document.querySelector(".lesson-disposition")',
+      null,
+      { timeout: 30_000 },
+    );
+    const futureProbe = await page.evaluate(`(() => {
+      const mutators = [...document.querySelectorAll('.lesson-keep, .lesson-learn, .lesson-choice, #lesson-close')];
+      return {
+        view: document.body.dataset.view,
+        title: document.querySelector('.lesson-title')?.textContent || '',
+        storeWarning: document.querySelector('#store-warning')?.textContent || '',
+        mutators: mutators.length,
+        disabled: mutators.filter((button) => button.disabled).length,
+        raw: localStorage.getItem('kairo-corridor-v1'),
+      };
+    })()`);
+    futureProbe.pathWarning = futurePathWarning || '';
+    futureProbe.pageErrors = pageErrors.length - futureErrorsAt;
+    futureProbe.rawPreserved = futureProbe.raw === futureRaw;
+    delete futureProbe.raw;
+    lessonStore.future = futureProbe;
+    reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+    // (c3) JSON can parse successfully and still not be a storage envelope.
+    // Array/scalar roots and a malformed current Review payload are quarantined
+    // exactly like a malformed learning row: bytes stay in place, the warning
+    // is visible, and all learner-state mutation is paused.
+    lessonStore.malformedRoots.push(
+      await probeReadOnlyRaw('array root', '[]'),
+      await probeReadOnlyRaw('scalar root', '42'),
+    );
+    const malformedReviewValue = {
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: [], history: 'bad' },
+      learning: { version: 1, threads: {}, lessons: {}, evidence: [] },
+    };
+    lessonStore.malformedReview = await probeReadOnlyRaw(
+      'current review envelope',
+      JSON.stringify(malformedReviewValue),
+    );
+    reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+    // A Drift judgment becomes partial evidence in the same learner spine,
+    // while taken/Review/lesson threads/practice evidence remain untouched.
+    // Current-v1 fields unknown to this client survive the write. A storage
+    // failure synchronously rejects the bridge and rolls the observation back.
+    await seedStore({
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: {
+        version: 1,
+        threads: {},
+        lessons: {},
+        evidence: [],
+        adjacentClientField: { preserve: true },
+      },
+      adjacentEnvelopeField: 'preserve-too',
+    });
+    await open('?entry=shelf');
+    const acceptedObservation = await page.evaluate(`(() => {
+      const detail = {
+        version: 1,
+        target: { t: 'word', id: '世界' },
+        judgment: 'familiar',
+        count: 2,
+        at: '2026-08-10T12:34:56.000Z',
+      };
+      dispatchEvent(new CustomEvent('bunki:drift-judgment', { detail }));
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      return {
+        bridgeSaved: detail.bridgeSaved,
+        observations: store.learning?.observations || {},
+        taken: store.taken.length,
+        cards: Object.keys(store.review?.cards || {}).length,
+        history: store.review?.history?.length,
+        threads: Object.keys(store.learning?.threads || {}).length,
+        evidence: store.learning?.evidence?.length,
+        learningExtra: store.learning?.adjacentClientField?.preserve,
+        envelopeExtra: store.adjacentEnvelopeField,
+      };
+    })()`);
+    // Leave the verifier-only `entry=shelf` strip: normal product rendering
+    // shows learner evidence, while that comparison strip intentionally shows
+    // card/schedule variants in its place.
+    await open('');
+    await tap(page, '#enter-shelf-door');
+    await page.waitForFunction('document.body.dataset.view === "shelf"');
+    await page.locator('#thesaurus-link').click();
+    await page.fill('#thesaurus-search', '世界');
+    await page.waitForSelector('[data-thesaurus^="世界"]', { timeout: 30_000 });
+    await page.locator('[data-thesaurus^="世界"]').first().click();
+    await page.waitForSelector('#sheet[data-node="word:世界"] .drift-observation');
+    acceptedObservation.status = await page.locator('.drift-observation').textContent();
+
+    await seedStore({
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: { version: 1, threads: {}, lessons: {}, evidence: [] },
+    });
+    await open('?entry=shelf');
+    const rejectedObservation = await page.evaluate(`(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key, value) {
+        if (key === 'kairo-corridor-v1') throw new DOMException('full', 'QuotaExceededError');
+        return original.call(this, key, value);
+      };
+      const detail = {
+        version: 1,
+        target: { t: 'kanji', id: '読' },
+        judgment: 'fragile',
+        count: 1,
+        at: '2026-08-10T12:35:00.000Z',
+      };
+      try {
+        dispatchEvent(new CustomEvent('bunki:drift-judgment', { detail }));
+      } finally {
+        Storage.prototype.setItem = original;
+      }
+      const store = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      return {
+        bridgeSaved: detail.bridgeSaved,
+        observations: Object.keys(store.learning?.observations || {}).length,
+        taken: store.taken.length,
+        cards: Object.keys(store.review?.cards || {}).length,
+        threads: Object.keys(store.learning?.threads || {}).length,
+        evidence: store.learning?.evidence?.length,
+      };
+    })()`);
+    lessonStore.driftObservation = {
+      accepted: acceptedObservation,
+      rejected: rejectedObservation,
+    };
+    reviewProbes.push(await page.evaluate(MEASURE_FN));
+
+    // A failed article request must clear its in-flight promise. The lesson's
+    // visible retry should issue a second request and recover in place.
+    let articleRequests = 0;
+    await page.route(failOnceArticlePattern, async (route) => {
+      articleRequests += 1;
+      if (articleRequests === 1) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          // A caught JSON decode failure exercises the same rejected promise
+          // without manufacturing a browser-console network error.
+          body: '{',
+        });
+      } else {
+        await route.continue();
+      }
+    });
+    failOnceArticleRouteInstalled = true;
+    await seedStore({
+      taken: [],
+      lists: {},
+      review: { version: 1, cards: {}, history: [] },
+      learning: { version: 1, threads: {}, lessons: {}, evidence: [] },
+    });
+    const retryErrorsAt = pageErrors.length;
+    await open('?entry=shelf');
+    await page.locator('#path-link').click();
+    await page.waitForFunction('document.body.dataset.view === "path"');
+    await page.locator('[data-lesson="n5-kitchen-teiru"]').click();
+    await page.waitForSelector('main .dictionary-retry', { timeout: 30_000 });
+    const failedState = await page.evaluate(`(() => ({
+      view: document.body.dataset.view,
+      warning: document.querySelector('main .review-warning')?.textContent || '',
+      retry: document.querySelector('main .dictionary-retry')?.textContent || '',
+    }))()`);
+    await page.locator('main .dictionary-retry').click();
+    await page.waitForSelector('.lesson-title', { timeout: 30_000 });
+    lessonStore.articleRetry = await page.evaluate(`(() => ({
+      view: document.body.dataset.view,
+      title: document.querySelector('.lesson-title')?.textContent || '',
+      retryGone: !document.querySelector('main .dictionary-retry'),
+      dispositions: document.querySelectorAll('.lesson-disposition').length,
+    }))()`);
+    lessonStore.articleRetry.failedState = failedState;
+    lessonStore.articleRetry.requests = articleRequests;
+    lessonStore.articleRetry.pageErrors = pageErrors.length - retryErrorsAt;
+    await page.unroute(failOnceArticlePattern);
+    failOnceArticleRouteInstalled = false;
+    reviewProbes.push(await page.evaluate(MEASURE_FN));
+  } catch (err) {
+    lessonStore.error = err instanceof Error ? err.message : String(err);
+  } finally {
+    if (failOnceArticleRouteInstalled) {
+      await page.unroute(failOnceArticlePattern);
+      failOnceArticleRouteInstalled = false;
+    }
+    await page.evaluate("localStorage.removeItem('kairo-corridor-v1')");
+    await open('?entry=shelf');
+    lessonStore.cleaned = await page.evaluate(
+      "localStorage.getItem('kairo-corridor-v1') === null && !document.querySelector('#store-warning')",
+    );
+  }
+
   check('Review · legacy lists stay debt-free until opt-in; pause keeps the receipt and removes due',
     legacyBefore.hasReview === false && legacyBefore.start === 0
       && legacyBefore.promote === 1 && legacyBefore.toggle === 0
@@ -1150,9 +2232,101 @@ async function main() {
       && legacyPromoted.promote === 0 && legacyPromoted.toggle === 1
       && beforePause.history === 1 && beforePause.active && beforePause.due === 1
       && afterPause.history === beforePause.history && !afterPause.active
-      && afterPause.due === 0 && afterPause.toggle === 1,
+      && afterPause.due === 0 && afterPause.toggle === 1
+      && lessonStore.error === null
+      && lessonStore.legacyTaken?.before.learnDisabled === false
+      && lessonStore.legacyTaken.before.keepDisabled === true
+      && lessonStore.legacyTaken.after.taken === 1
+      && lessonStore.legacyTaken.after.cards.join(',') === 'grammar:teiru'
+      && lessonStore.legacyTaken.after.target === 'kc:grammar:teiru'
+      && lessonStore.legacyTaken.after.active === true
+      && lessonStore.legacyTaken.after.disposition === 'learn'
+      && lessonStore.legacyTaken.after.encounters === 2
+      && lessonStore.legacyTaken.after.selected === true
+      && lessonStore.keepThenCanonical?.keepWasEnabled === true
+      && lessonStore.keepThenCanonical.canonicalTakeWasEnabled === true
+      && lessonStore.keepThenCanonical.afterKeep.disposition === 'keep'
+      && lessonStore.keepThenCanonical.afterKeep.encounters === 2
+      && lessonStore.keepThenCanonical.afterKeep.taken === 0
+      && lessonStore.keepThenCanonical.afterKeep.cards === 0
+      && lessonStore.keepThenCanonical.afterKeep.learnDisabled === false
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.disposition === 'learn'
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.encounters === 2
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.taken === 1
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.cards.join(',') === 'grammar:teiru'
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.target === 'kc:grammar:teiru'
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.active === true
+      && lessonStore.keepThenCanonical.afterCanonicalLearn.selected === true
+      && lessonStore.malformed?.view === 'lesson'
+      && lessonStore.malformed.title.length > 0
+      && lessonStore.malformed.warning.length > 0
+      && lessonStore.malformed.mutators > 0
+      && lessonStore.malformed.disabled === lessonStore.malformed.mutators
+      && lessonStore.malformed.rawPreserved === true
+      && lessonStore.malformed.pageErrors === 0
+      && lessonStore.future?.view === 'lesson'
+      && lessonStore.future.title.length > 0
+      && lessonStore.future.storeWarning === ''
+      && lessonStore.future.pathWarning.length > 0
+      && lessonStore.future.mutators > 0
+      && lessonStore.future.disabled === lessonStore.future.mutators
+      && lessonStore.future.rawPreserved === true
+      && lessonStore.future.pageErrors === 0
+      && lessonStore.malformedRoots.length === 2
+      && lessonStore.malformedRoots.every((probe) =>
+        probe.view === 'lesson'
+          && probe.title.length > 0
+          && probe.warning.length > 0
+          && probe.mutators > 0
+          && probe.disabled === probe.mutators
+          && probe.rawPreserved === true
+          && probe.pageErrors === 0)
+      && lessonStore.malformedReview?.view === 'lesson'
+      && lessonStore.malformedReview.title.length > 0
+      && lessonStore.malformedReview.warning.length > 0
+      && lessonStore.malformedReview.mutators > 0
+      && lessonStore.malformedReview.disabled === lessonStore.malformedReview.mutators
+      && lessonStore.malformedReview.rawPreserved === true
+      && lessonStore.malformedReview.pageErrors === 0
+      && lessonStore.driftObservation?.accepted.bridgeSaved === true
+      && Object.keys(lessonStore.driftObservation.accepted.observations).join(',') === 'word:世界'
+      && lessonStore.driftObservation.accepted.observations['word:世界']?.judgment === 'familiar'
+      && lessonStore.driftObservation.accepted.observations['word:世界']?.count === 2
+      && lessonStore.driftObservation.accepted.taken === 0
+      && lessonStore.driftObservation.accepted.cards === 0
+      && lessonStore.driftObservation.accepted.history === 0
+      && lessonStore.driftObservation.accepted.threads === 0
+      && lessonStore.driftObservation.accepted.evidence === 0
+      && lessonStore.driftObservation.accepted.learningExtra === true
+      && lessonStore.driftObservation.accepted.envelopeExtra === 'preserve-too'
+      && /not a claim of mastery|既知とは確定せず/.test(lessonStore.driftObservation.accepted.status)
+      && /not scheduled|復習にも入っていない/.test(lessonStore.driftObservation.accepted.status)
+      && lessonStore.driftObservation.rejected.bridgeSaved === false
+      && lessonStore.driftObservation.rejected.observations === 0
+      && lessonStore.driftObservation.rejected.taken === 0
+      && lessonStore.driftObservation.rejected.cards === 0
+      && lessonStore.driftObservation.rejected.threads === 0
+      && lessonStore.driftObservation.rejected.evidence === 0
+      && lessonStore.articleRetry?.failedState.view === 'lesson'
+      && lessonStore.articleRetry.failedState.warning.length > 0
+      && lessonStore.articleRetry.failedState.retry.length > 0
+      && lessonStore.articleRetry.view === 'lesson'
+      && lessonStore.articleRetry.title.length > 0
+      && lessonStore.articleRetry.retryGone === true
+      && lessonStore.articleRetry.dispositions === 6
+      && lessonStore.articleRetry.requests === 2
+      && lessonStore.articleRetry.pageErrors === 0
+      && lessonStore.cleaned,
     `legacy review=${legacyBefore.hasReview}, promote ${legacyBefore.promote}; `
-      + `cards ${legacyPromoted.cards}; history ${beforePause.history}→${afterPause.history}; due ${beforePause.due}→${afterPause.due}`);
+      + `cards ${legacyPromoted.cards}; history ${beforePause.history}→${afterPause.history}; due ${beforePause.due}→${afterPause.due}; `
+      + `lesson legacy ${lessonStore.legacyTaken?.after?.disposition || lessonStore.error || 'missing'}; `
+      + `keep→${lessonStore.keepThenCanonical?.afterCanonicalLearn?.disposition || 'missing'}; `
+      + `malformed disabled ${lessonStore.malformed?.disabled ?? 'n/a'}/${lessonStore.malformed?.mutators ?? 'n/a'}; `
+      + `future disabled ${lessonStore.future?.disabled ?? 'n/a'}/${lessonStore.future?.mutators ?? 'n/a'}; `
+      + `bad roots ${lessonStore.malformedRoots.map((probe) => `${probe.kind}:${probe.disabled}/${probe.mutators}`).join(',') || 'missing'}; `
+      + `bad review ${lessonStore.malformedReview?.disabled ?? 'n/a'}/${lessonStore.malformedReview?.mutators ?? 'n/a'}; `
+      + `Drift observation ${lessonStore.driftObservation?.accepted?.bridgeSaved ?? 'missing'} / rollback ${lessonStore.driftObservation?.rejected?.bridgeSaved ?? 'missing'}; `
+      + `article retry ${lessonStore.articleRetry?.requests ?? 'n/a'} request(s)`);
   report.steps.push({
     step: 5,
     name: 'review',
@@ -1162,6 +2336,7 @@ async function main() {
     afterGood,
     finite: { plan: finitePlan.size, snapshots: planSnapshots.length, deferredDue: finiteClose.due },
     legacy: { before: legacyBefore, promoted: legacyPromoted, beforePause, afterPause },
+    lessonStore,
   });
 
   // ---------------------------------------------------------- step 6 return
@@ -1286,17 +2461,21 @@ async function main() {
   console.log('\n— measurements');
   await open('?entry=shelf');
   const shelfProbe = await page.evaluate(MEASURE_FN);
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#reader .tok');
+  const readerProbe = await page.evaluate(MEASURE_FN);
+  await open('?entry=shelf');
   const semRows = await walkToSemPanel(page, tap);
   const panelProbe = await page.evaluate(MEASURE_FN);
   const mergedText = new Map();
-  for (const row of [...panelProbe.text, ...shelfProbe.text]) {
+  for (const row of [...panelProbe.text, ...readerProbe.text, ...shelfProbe.text]) {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
   // Review was exercised earlier in every meaningful state (lobby, hidden
   // answer, ratings, closure, legacy opt-in, pause). Fold those probes into the
   // existing hygiene checks instead of creating new result slots.
-  const allHygieneProbes = [panelProbe, shelfProbe, ...reviewProbes];
+  const allHygieneProbes = [panelProbe, readerProbe, shelfProbe, ...reviewProbes];
   m.targets = allHygieneProbes.flatMap((probe) => probe.targets);
   m.docScrollWidth = Math.max(...allHygieneProbes.map((probe) => probe.docScrollWidth));
   m.innerWidth = Math.min(...allHygieneProbes.map((probe) => probe.innerWidth));
@@ -1444,6 +2623,12 @@ async function main() {
   check('v1.2 · the kanji page draws its stroke order (KanjiVG)',
     strokeCount >= 3, `${strokeCount} strokes rendered`);
   await shoot(page, shotsDir, '11-v12-kanji-strokes');
+  await tap(page, '#strokes-door');
+  await page.waitForSelector('#stroke-page');
+  await page.waitForTimeout(500);
+  await shoot(page, shotsDir, '11b-stroke-room');
+  await tap(page, '#strokes-close');
+  await page.waitForSelector('#stroke-page', { state: 'detached' });
 
   // reader surfaces carry no provenance/ticket narration
   await open('?entry=shelf');
@@ -1468,7 +2653,7 @@ async function main() {
     await page.fill('#search', q);
     await page.waitForTimeout(350);
     const hit = await page.evaluate(
-      `[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === ${JSON.stringify(want)})`,
+      `[...document.querySelectorAll('[data-result]')].some((r) => r.dataset.result === ${JSON.stringify(want)} || r.dataset.result.startsWith(${JSON.stringify(want + ':')}))`,
     );
     check(`search · the typed door accepts ${door}`, hit, `"${q}" → ${want}`);
   }

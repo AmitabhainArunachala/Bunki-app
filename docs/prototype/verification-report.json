@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "yearageyearspast one's primeold age",
-        "senses": 5,
+        "gloss": "year",
+        "senses": 3,
         "kanjiRows": [
           "年"
         ],
@@ -42,67 +42,115 @@
         "semRows": [
           {
             "word": "厳しい",
-            "note": "everyday synonym, one register softer"
+            "note": "everyday synonym, one register softer",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "苛酷",
-            "note": "literary variant spelling"
+            "note": "literary variant spelling",
+            "tag": "DIV",
+            "static": true,
+            "tabIndex": -1
           },
           {
             "word": "劣悪",
-            "note": "wretched conditions"
+            "note": "wretched conditions",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "熾烈",
-            "note": "cutthroat competition"
+            "note": "cutthroat competition",
+            "tag": "DIV",
+            "static": true,
+            "tabIndex": -1
           },
           {
             "word": "残酷",
-            "note": "cruelty to beings vs harsh conditions"
+            "note": "cruelty to beings vs harsh conditions",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "冷酷",
-            "note": "cold-hearted people"
+            "note": "cold-hearted people",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "酷使",
-            "note": "to overwork — what makes labor 過酷"
+            "note": "to overwork — what makes labor 過酷",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "酷暑",
-            "note": "punishing heat"
+            "note": "punishing heat",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "過労",
-            "note": "overwork; 過労死"
+            "note": "overwork; 過労死",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "過剰",
-            "note": "the excess root"
+            "note": "the excess root",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "過酷な労働",
-            "note": "its no.1 collocation"
+            "note": "its no.1 collocation",
+            "tag": "DIV",
+            "static": true,
+            "tabIndex": -1
           },
           {
             "word": "過酷な環境",
-            "note": "deserts, deep sea, workplaces"
+            "note": "deserts, deep sea, workplaces",
+            "tag": "DIV",
+            "static": true,
+            "tabIndex": -1
           },
           {
             "word": "過酷な運命",
-            "note": "harsh fate"
+            "note": "harsh fate",
+            "tag": "DIV",
+            "static": true,
+            "tabIndex": -1
           },
           {
             "word": "試練",
-            "note": "the ordeal harshness becomes"
+            "note": "the ordeal harshness becomes",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "逆境",
-            "note": "adversity, its home theme"
+            "note": "adversity, its home theme",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           },
           {
             "word": "極限",
-            "note": "extreme limits"
+            "note": "extreme limits",
+            "tag": "BUTTON",
+            "static": false,
+            "tabIndex": 0
           }
         ]
       }
@@ -162,18 +210,36 @@
           "hard",
           "good",
           "easy"
+        ],
+        "readingGroups": [
+          {
+            "text": "カ・",
+            "lines": 1
+          },
+          {
+            "text": "す.ぎる・",
+            "lines": 1
+          },
+          {
+            "text": "す.ぎ・",
+            "lines": 1
+          },
+          {
+            "text": "す.ごす",
+            "lines": 1
+          }
         ]
       },
       "afterGood": {
         "key": "kanji:過",
         "history": 1,
         "admitted": 1,
-        "lastReviewedAt": "2026-08-10T04:33:37.477Z",
-        "dueAt": "2026-08-10T04:43:37.477Z",
+        "lastReviewedAt": "2026-08-10T14:34:12.342Z",
+        "dueAt": "2026-08-10T14:44:12.342Z",
         "receiptGrade": "good",
         "effectiveGrade": "good",
         "revealedBeforeRecall": false,
-        "receiptDueAt": "2026-08-10T04:43:37.477Z"
+        "receiptDueAt": "2026-08-10T14:44:12.342Z"
       },
       "finite": {
         "plan": 20,
@@ -207,6 +273,148 @@
           "due": 0,
           "toggle": 1
         }
+      },
+      "lessonStore": {
+        "legacyTaken": {
+          "before": {
+            "learnDisabled": false,
+            "keepDisabled": true,
+            "rowCount": 6
+          },
+          "after": {
+            "taken": 1,
+            "cards": [
+              "grammar:teiru"
+            ],
+            "target": "kc:grammar:teiru",
+            "active": true,
+            "disposition": "learn",
+            "encounters": 2,
+            "selected": true
+          }
+        },
+        "keepThenCanonical": {
+          "keepWasEnabled": true,
+          "canonicalTakeWasEnabled": true,
+          "afterKeep": {
+            "disposition": "keep",
+            "encounters": 2,
+            "taken": 0,
+            "cards": 0,
+            "learnDisabled": false
+          },
+          "afterCanonicalLearn": {
+            "disposition": "learn",
+            "encounters": 2,
+            "taken": 1,
+            "cards": [
+              "grammar:teiru"
+            ],
+            "target": "kc:grammar:teiru",
+            "active": true,
+            "selected": true
+          }
+        },
+        "malformed": {
+          "view": "lesson",
+          "title": "今していること・台所の音",
+          "warning": "A learning record cannot be read safely. Changes are paused so its original bytes are not overwritten.",
+          "mutators": 24,
+          "disabled": 24,
+          "pageErrors": 0,
+          "rawPreserved": true
+        },
+        "future": {
+          "view": "lesson",
+          "title": "今していること・台所の音",
+          "storeWarning": "",
+          "mutators": 24,
+          "disabled": 24,
+          "pathWarning": "This learning record uses a newer format. It is preserved here without mutation.",
+          "pageErrors": 0,
+          "rawPreserved": true
+        },
+        "malformedRoots": [
+          {
+            "view": "lesson",
+            "title": "今していること・台所の音",
+            "warning": "The learner-data envelope cannot be read safely. Changes are paused so its original bytes are not overwritten.",
+            "mutators": 24,
+            "disabled": 24,
+            "kind": "array root",
+            "pageErrors": 0,
+            "rawPreserved": true
+          },
+          {
+            "view": "lesson",
+            "title": "今していること・台所の音",
+            "warning": "The learner-data envelope cannot be read safely. Changes are paused so its original bytes are not overwritten.",
+            "mutators": 24,
+            "disabled": 24,
+            "kind": "scalar root",
+            "pageErrors": 0,
+            "rawPreserved": true
+          }
+        ],
+        "malformedReview": {
+          "view": "lesson",
+          "title": "今していること・台所の音",
+          "warning": "A review record cannot be read safely. Changes are paused so its original bytes are not overwritten.",
+          "mutators": 24,
+          "disabled": 24,
+          "kind": "current review envelope",
+          "pageErrors": 0,
+          "rawPreserved": true
+        },
+        "driftObservation": {
+          "accepted": {
+            "bridgeSaved": true,
+            "observations": {
+              "word:世界": {
+                "version": 1,
+                "target": {
+                  "t": "word",
+                  "id": "世界"
+                },
+                "judgment": "familiar",
+                "count": 2,
+                "at": "2026-08-10T12:34:56.000Z",
+                "source": "drift"
+              }
+            },
+            "taken": 0,
+            "cards": 0,
+            "history": 0,
+            "threads": 0,
+            "evidence": 0,
+            "learningExtra": true,
+            "envelopeExtra": "preserve-too",
+            "status": "Seen as familiar in the Drift; this is not a claim of mastery and is not scheduled."
+          },
+          "rejected": {
+            "bridgeSaved": false,
+            "observations": 0,
+            "taken": 0,
+            "cards": 0,
+            "threads": 0,
+            "evidence": 0
+          }
+        },
+        "articleRetry": {
+          "view": "lesson",
+          "title": "今していること・台所の音",
+          "retryGone": true,
+          "dispositions": 6,
+          "failedState": {
+            "view": "lesson",
+            "warning": "The reading could not be opened. The path itself is unchanged.",
+            "retry": "もう一度ひらくtry the reading again"
+          },
+          "requests": 2,
+          "pageErrors": 0
+        },
+        "cleaned": true,
+        "error": null
       }
     },
     {
@@ -261,13 +469,6 @@
           "contrast": 2.64,
           "fontSize": 12,
           "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
-          "label": "reading body (focused)",
-          "selector": ".reader",
-          "contrast": 16.2,
-          "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
         },
         {
           "label": "discrimination note",
@@ -328,13 +529,6 @@
           "color": "rgba(20, 24, 28, 0.68)"
         },
         {
-          "label": "reading body (focused)",
-          "selector": ".reader",
-          "contrast": 16.2,
-          "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
-        },
-        {
           "label": "discrimination note",
           "selector": ".sem-note",
           "contrast": 8.95,
@@ -351,13 +545,6 @@
       ]
     },
     "text": [
-      {
-        "label": "reading body (focused)",
-        "selector": ".reader",
-        "contrast": 16.2,
-        "fontSize": 21,
-        "color": "rgb(20, 24, 28)"
-      },
       {
         "label": "view title",
         "selector": ".view-title",
@@ -378,6 +565,13 @@
         "contrast": 8.95,
         "fontSize": 13,
         "color": "rgb(61, 68, 76)"
+      },
+      {
+        "label": "faint / snippet",
+        "selector": ".shelf-snippet",
+        "contrast": 5.89,
+        "fontSize": 14,
+        "color": "rgba(20, 24, 28, 0.68)"
       },
       {
         "label": "chrome breadcrumb (background)",
@@ -401,18 +595,18 @@
         "color": "rgb(158, 43, 37)"
       },
       {
+        "label": "reading body (focused)",
+        "selector": ".reader",
+        "contrast": 16.2,
+        "fontSize": 21,
+        "color": "rgb(20, 24, 28)"
+      },
+      {
         "label": "shelf title",
         "selector": ".shelf-title",
         "contrast": 16.2,
         "fontSize": 19,
         "color": "rgb(20, 24, 28)"
-      },
-      {
-        "label": "faint / snippet",
-        "selector": ".shelf-snippet",
-        "contrast": 5.89,
-        "fontSize": 14,
-        "color": "rgba(20, 24, 28, 0.68)"
       }
     ],
     "targets": [
@@ -441,18 +635,202 @@
         "id": ""
       },
       {
-        "text": "覚 1lists",
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "過酷かこくsevereusa",
+        "w": 358,
+        "h": 86,
+        "hitW": 358,
+        "hitH": 86,
+        "id": "entry-row compound"
+      },
+      {
+        "text": "← 戻るback",
+        "w": 72,
+        "h": 44,
+        "hitW": 72,
+        "hitH": 44,
+        "id": "sheet-back"
+      },
+      {
+        "text": "×",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "sheet-close"
+      },
+      {
+        "text": "CC BY-SA 4.0",
+        "w": 69,
+        "h": 44,
+        "hitW": 69,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "過Overdo›",
+        "w": 358,
+        "h": 61,
+        "hitW": 358,
+        "hitH": 61,
+        "id": "entry-row"
+      },
+      {
+        "text": "酷Cruel›",
+        "w": 358,
+        "h": 61,
+        "hitW": 358,
+        "hitH": 61,
+        "id": "entry-row"
+      },
+      {
+        "text": "厳しいeveryday sy",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "劣悪wretched con",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "残酷cruelty to b",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "冷酷cold-hearted",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "酷使to overwork ",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "酷暑punishing he",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過労overwork; 過労",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "過剰the excess r",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "試練the ordeal h",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "逆境adversity, i",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "極限extreme limi",
+        "w": 332,
+        "h": 50,
+        "hitW": 332,
+        "hitH": 50,
+        "id": "sem-row"
+      },
+      {
+        "text": "覚えるmemorize",
+        "w": 358,
+        "h": 48,
+        "hitW": 358,
+        "hitH": 48,
+        "id": "take"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
         "w": 55,
         "h": 44,
         "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "▸ text setting",
-        "w": 147,
+        "w": 139,
         "h": 44,
-        "hitW": 147,
+        "hitW": 139,
         "hitH": 44,
         "id": "dials-toggle"
       },
@@ -554,9 +932,9 @@
       },
       {
         "text": "フィヨルド",
-        "w": 108,
+        "w": 106,
         "h": 44,
-        "hitW": 108,
+        "hitW": 106,
         "hitH": 44,
         "id": "tok content"
       },
@@ -754,9 +1132,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1178,7 +1556,7 @@
       },
       {
         "text": "m",
-        "w": 21,
+        "w": 22,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -1226,9 +1604,9 @@
       },
       {
         "text": "中心ちゅうしん",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1346,7 +1724,7 @@
       },
       {
         "text": "マツ",
-        "w": 44,
+        "w": 43,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -1354,9 +1732,9 @@
       },
       {
         "text": "トドマツ",
-        "w": 87,
+        "w": 86,
         "h": 44,
-        "hitW": 87,
+        "hitW": 86,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1386,17 +1764,17 @@
       },
       {
         "text": "ダケカンバ",
-        "w": 108,
+        "w": 106,
         "h": 44,
-        "hitW": 108,
+        "hitW": 106,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ミズナラ",
-        "w": 87,
+        "w": 86,
         "h": 44,
-        "hitW": 87,
+        "hitW": 86,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1434,9 +1812,9 @@
       },
       {
         "text": "山頂さんちょう",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1458,9 +1836,9 @@
       },
       {
         "text": "稜線りょうせん",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1482,9 +1860,9 @@
       },
       {
         "text": "植物しょくぶつ",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1546,9 +1924,9 @@
       },
       {
         "text": "流氷りゅうひょう",
-        "w": 61,
+        "w": 59,
         "h": 44,
-        "hitW": 61,
+        "hitW": 59,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1690,9 +2068,9 @@
       },
       {
         "text": "環境かんきょう",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1714,9 +2092,9 @@
       },
       {
         "text": "特色とくしょく",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2018,9 +2396,9 @@
       },
       {
         "text": "シマフクロウ",
-        "w": 130,
+        "w": 129,
         "h": 44,
-        "hitW": 130,
+        "hitW": 129,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2210,7 +2588,7 @@
       },
       {
         "text": "岬みさき",
-        "w": 31,
+        "w": 30,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -2218,9 +2596,9 @@
       },
       {
         "text": "周辺しゅうへん",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2522,9 +2900,9 @@
       },
       {
         "text": "フレー",
-        "w": 65,
+        "w": 64,
         "h": 44,
-        "hitW": 65,
+        "hitW": 64,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2538,17 +2916,17 @@
       },
       {
         "text": "フォート",
-        "w": 87,
+        "w": 86,
         "h": 44,
-        "hitW": 87,
+        "hitW": 86,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ドーム",
-        "w": 64,
+        "w": 65,
         "h": 44,
-        "hitW": 64,
+        "hitW": 65,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2578,7 +2956,7 @@
       },
       {
         "text": "鯨くじら",
-        "w": 31,
+        "w": 30,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -2610,15 +2988,15 @@
       },
       {
         "text": "フィヨルド",
-        "w": 108,
+        "w": 106,
         "h": 44,
-        "hitW": 108,
+        "hitW": 106,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 44,
+        "w": 43,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -2626,9 +3004,9 @@
       },
       {
         "text": "フィヨルド",
-        "w": 108,
+        "w": 106,
         "h": 44,
-        "hitW": 108,
+        "hitW": 106,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2642,9 +3020,9 @@
       },
       {
         "text": "ナールオイ・フィヨルド",
-        "w": 237,
+        "w": 233,
         "h": 44,
-        "hitW": 237,
+        "hitW": 233,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2698,17 +3076,17 @@
       },
       {
         "text": "ドンパヤーイェン",
-        "w": 172,
+        "w": 170,
         "h": 44,
-        "hitW": 172,
+        "hitW": 170,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "カオヤイ",
-        "w": 87,
+        "w": 86,
         "h": 44,
-        "hitW": 87,
+        "hitW": 86,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2730,9 +3108,9 @@
       },
       {
         "text": "コイバ",
-        "w": 65,
+        "w": 64,
         "h": 44,
-        "hitW": 65,
+        "hitW": 64,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2890,9 +3268,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3114,9 +3492,9 @@
       },
       {
         "text": "現状げんじょう",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3386,9 +3764,9 @@
       },
       {
         "text": "提出ていしゅつ",
-        "w": 51,
+        "w": 49,
         "h": 44,
-        "hitW": 51,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3666,9 +4044,9 @@
       },
       {
         "text": "状況じょうきょう",
-        "w": 61,
+        "w": 59,
         "h": 44,
-        "hitW": 61,
+        "hitW": 59,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4122,7 +4500,7 @@
       },
       {
         "text": "サン",
-        "w": 44,
+        "w": 43,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -4130,7 +4508,7 @@
       },
       {
         "text": "ガイ",
-        "w": 44,
+        "w": 43,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
@@ -4361,178 +4739,10 @@
         "id": "tok content"
       },
       {
-        "text": "← 戻るback",
-        "w": 71,
-        "h": 44,
-        "hitW": 71,
-        "hitH": 44,
-        "id": "sheet-back"
-      },
-      {
-        "text": "✕",
-        "w": 44,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "sheet-close"
-      },
-      {
-        "text": "過Overdo›",
-        "w": 358,
-        "h": 61,
-        "hitW": 358,
-        "hitH": 61,
-        "id": "entry-row"
-      },
-      {
-        "text": "酷Cruel›",
-        "w": 358,
-        "h": 61,
-        "hitW": 358,
-        "hitH": 61,
-        "id": "entry-row"
-      },
-      {
-        "text": "厳しいeveryday sy",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "苛酷literary var",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "劣悪wretched con",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "熾烈cutthroat co",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "残酷cruelty to b",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "冷酷cold-hearted",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "酷使to overwork ",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "酷暑punishing he",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "過労overwork; 過労",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "過剰the excess r",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "過酷な労働its no.1 ",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "過酷な環境deserts, ",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "過酷な運命harsh fat",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "試練the ordeal h",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "逆境adversity, i",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "極限extreme limi",
-        "w": 332,
-        "h": 50,
-        "hitW": 332,
-        "hitH": 50,
-        "id": "sem-row"
-      },
-      {
-        "text": "覚えるmemorize",
-        "w": 358,
-        "h": 48,
-        "hitW": 358,
-        "hitH": 48,
-        "id": "take"
-      },
-      {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -4561,20 +4771,36 @@
         "id": ""
       },
       {
-        "text": "覚 1lists",
-        "w": 55,
+        "text": "覚 0lists",
+        "w": 53,
         "h": 44,
-        "hitW": 55,
+        "hitW": 53,
         "hitH": 44,
         "id": "review"
       },
       {
-        "text": "文法grammar",
-        "w": 88,
+        "text": "道guided path",
+        "w": 114,
         "h": 46,
-        "hitW": 88,
+        "hitW": 114,
+        "hitH": 46,
+        "id": "path-link"
+      },
+      {
+        "text": "文法grammar",
+        "w": 114,
+        "h": 46,
+        "hitW": 114,
         "hitH": 46,
         "id": "grammar-link"
+      },
+      {
+        "text": "類語word relatio",
+        "w": 114,
+        "h": 46,
+        "hitW": 114,
+        "hitH": 46,
+        "id": "thesaurus-link"
       },
       {
         "text": "世界自然遺産に7箇所を追加 ",
@@ -4586,9 +4812,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4602,9 +4828,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4618,9 +4844,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4634,9 +4860,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4650,9 +4876,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4666,9 +4892,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4682,9 +4908,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4698,9 +4924,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4714,25 +4940,25 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
       {
         "text": "育児休業給付金Childca",
         "w": 358,
-        "h": 282,
+        "h": 257,
         "hitW": 358,
-        "hitH": 282,
+        "hitH": 257,
         "id": "shelf-item"
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4746,9 +4972,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4762,9 +4988,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4778,9 +5004,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4794,9 +5020,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4810,25 +5036,25 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
       {
         "text": "オーバーステイOversta",
         "w": 358,
-        "h": 259,
+        "h": 233,
         "hitW": 358,
-        "hitH": 259,
+        "hitH": 233,
         "id": "shelf-item"
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4842,9 +5068,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4858,9 +5084,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4874,9 +5100,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4890,9 +5116,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4906,9 +5132,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4922,9 +5148,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4938,9 +5164,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4954,9 +5180,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4970,9 +5196,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -4986,9 +5212,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5002,9 +5228,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5018,9 +5244,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5034,9 +5260,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5050,9 +5276,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5066,9 +5292,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5082,9 +5308,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5098,9 +5324,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5114,9 +5340,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5130,9 +5356,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5146,9 +5372,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5162,9 +5388,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5178,9 +5404,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5194,9 +5420,9 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
@@ -5210,25 +5436,25 @@
       },
       {
         "text": "▸ details",
-        "w": 58,
+        "w": 55,
         "h": 44,
-        "hitW": 58,
+        "hitW": 55,
         "hitH": 44,
         "id": "details-toggle"
       },
       {
         "text": "▸ sources & li",
-        "w": 133,
+        "w": 123,
         "h": 44,
-        "hitW": 133,
+        "hitW": 123,
         "hitH": 44,
         "id": "sources-toggle"
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5258,25 +5484,25 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "復習を始めるbegin a ",
-        "w": 282,
+        "w": 264,
         "h": 53,
-        "hitW": 282,
+        "hitW": 264,
         "hitH": 53,
         "id": "start-review"
       },
       {
         "text": "過kanji",
-        "w": 223,
+        "w": 206,
         "h": 44,
-        "hitW": 223,
+        "hitW": 206,
         "hitH": 44,
         "id": "tray-entry"
       },
@@ -5290,9 +5516,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5322,33 +5548,33 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "答え合わせshow afte",
-        "w": 154,
+        "w": 128,
         "h": 51,
-        "hitW": 154,
+        "hitW": 128,
         "hitH": 51,
         "id": "review-reveal"
       },
       {
         "text": "思い出せないshow and",
-        "w": 154,
+        "w": 128,
         "h": 51,
-        "hitW": 154,
+        "hitW": 128,
         "hitH": 51,
         "id": "review-give-up"
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5378,9 +5604,9 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
@@ -5426,9 +5652,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5458,9 +5684,9 @@
       },
       {
         "text": "覚 1lists",
-        "w": 55,
+        "w": 52,
         "h": 44,
-        "hitW": 55,
+        "hitW": 52,
         "hitH": 44,
         "id": "review"
       },
@@ -5474,9 +5700,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5506,17 +5732,17 @@
       },
       {
         "text": "覚 1lists",
-        "w": 55,
+        "w": 52,
         "h": 44,
-        "hitW": 55,
+        "hitW": 52,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "過kanji",
-        "w": 230,
+        "w": 235,
         "h": 44,
-        "hitW": 230,
+        "hitW": 235,
         "hitH": 44,
         "id": "tray-entry"
       },
@@ -5530,9 +5756,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5562,33 +5788,33 @@
       },
       {
         "text": "復 21review",
-        "w": 64,
+        "w": 61,
         "h": 44,
-        "hitW": 64,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "答え合わせshow afte",
-        "w": 154,
+        "w": 128,
         "h": 51,
-        "hitW": 154,
+        "hitW": 128,
         "hitH": 51,
         "id": "review-reveal"
       },
       {
         "text": "思い出せないshow and",
-        "w": 154,
+        "w": 128,
         "h": 51,
-        "hitW": 154,
+        "hitW": 128,
         "hitH": 51,
         "id": "review-give-up"
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5618,9 +5844,9 @@
       },
       {
         "text": "復 20review",
-        "w": 64,
+        "w": 61,
         "h": 44,
-        "hitW": 64,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
@@ -5642,9 +5868,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5674,9 +5900,9 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
@@ -5690,9 +5916,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5722,17 +5948,17 @@
       },
       {
         "text": "覚 1lists",
-        "w": 55,
+        "w": 52,
         "h": 44,
-        "hitW": 55,
+        "hitW": 52,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "世界word",
-        "w": 183,
+        "w": 186,
         "h": 44,
-        "hitW": 183,
+        "hitW": 186,
         "hitH": 44,
         "id": "tray-entry"
       },
@@ -5746,9 +5972,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5778,25 +6004,25 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "復習を始めるbegin a ",
-        "w": 282,
+        "w": 264,
         "h": 53,
-        "hitW": 282,
+        "hitW": 264,
         "hitH": 53,
         "id": "start-review"
       },
       {
         "text": "世界word",
-        "w": 223,
+        "w": 206,
         "h": 44,
-        "hitW": 223,
+        "hitW": 206,
         "hitH": 44,
         "id": "tray-entry"
       },
@@ -5810,9 +6036,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5842,25 +6068,25 @@
       },
       {
         "text": "復 1review",
-        "w": 63,
+        "w": 61,
         "h": 44,
-        "hitW": 63,
+        "hitW": 61,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "復習を始めるbegin a ",
-        "w": 282,
+        "w": 264,
         "h": 53,
-        "hitW": 282,
+        "hitW": 264,
         "hitH": 53,
         "id": "start-review"
       },
       {
         "text": "世界word",
-        "w": 223,
+        "w": 206,
         "h": 44,
-        "hitW": 223,
+        "hitW": 206,
         "hitH": 44,
         "id": "tray-entry"
       },
@@ -5874,9 +6100,9 @@
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       },
@@ -5906,33 +6132,1801 @@
       },
       {
         "text": "覚 1lists",
-        "w": 55,
+        "w": 52,
         "h": 44,
-        "hitW": 55,
+        "hitW": 52,
         "hitH": 44,
         "id": "review"
       },
       {
         "text": "世界word",
-        "w": 241,
+        "w": 245,
         "h": 44,
-        "hitW": 241,
+        "hitW": 245,
         "hitH": 44,
         "id": "tray-entry"
       },
       {
         "text": "再開resume",
-        "w": 59,
+        "w": 58,
         "h": 51,
-        "hitW": 59,
+        "hitW": 58,
         "hitH": 51,
         "id": "review-toggle"
       },
       {
         "text": "変異 ▴variants",
-        "w": 76,
+        "w": 73,
         "h": 44,
-        "hitW": 76,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "〜ているis …ing; h",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-grammar-door"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "料理",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "今、本を読んでいる",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "これから本を読むつもりだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "前に本を読んだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "窓が開いている。",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "読 を見るopen the ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-kanji-door"
+      },
+      {
+        "text": "筆順open stroke ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-strokes-door"
+      },
+      {
+        "text": "よむ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "かく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "きく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所の音open the f",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-reader-door"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "ここまでplace a bo",
+        "w": 358,
+        "h": 45,
+        "hitW": 358,
+        "hitH": 45,
+        "id": "lesson-close"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "〜ているis …ing; h",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-grammar-door"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "料理",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "今、本を読んでいる",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "これから本を読むつもりだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "前に本を読んだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "窓が開いている。",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "読 を見るopen the ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-kanji-door"
+      },
+      {
+        "text": "筆順open stroke ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-strokes-door"
+      },
+      {
+        "text": "よむ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "かく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "きく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所の音open the f",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-reader-door"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "ここまでplace a bo",
+        "w": 358,
+        "h": 45,
+        "hitW": 358,
+        "hitH": 45,
+        "id": "lesson-close"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "〜ているis …ing; h",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-grammar-door"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "料理",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "今、本を読んでいる",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "これから本を読むつもりだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "前に本を読んだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "窓が開いている。",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "読 を見るopen the ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-kanji-door"
+      },
+      {
+        "text": "筆順open stroke ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-strokes-door"
+      },
+      {
+        "text": "よむ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "かく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "きく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所の音open the f",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-reader-door"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "ここまでplace a bo",
+        "w": 358,
+        "h": 45,
+        "hitW": 358,
+        "hitH": 45,
+        "id": "lesson-close"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "道guided path",
+        "w": 114,
+        "h": 46,
+        "hitW": 114,
+        "hitH": 46,
+        "id": "path-link"
+      },
+      {
+        "text": "文法grammar",
+        "w": 114,
+        "h": 46,
+        "hitW": 114,
+        "hitH": 46,
+        "id": "grammar-link"
+      },
+      {
+        "text": "類語word relatio",
+        "w": 114,
+        "h": 46,
+        "hitW": 114,
+        "hitH": 46,
+        "id": "thesaurus-link"
+      },
+      {
+        "text": "世界自然遺産に7箇所を追加 ",
+        "w": 358,
+        "h": 330,
+        "hitW": 358,
+        "hitH": 330,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "マリナーズ・イチロー選手 現",
+        "w": 358,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "JRおおさか東線部分開業JR",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "信楽高原鐵道列車衝突事故、J",
+        "w": 358,
+        "h": 330,
+        "hitW": 358,
+        "hitH": 330,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "ウィキニュース、21年の歴史",
+        "w": 358,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "野ばらThe Wild Ro",
+        "w": 358,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "ごん狐Gon the Fox",
+        "w": 358,
+        "h": 337,
+        "hitW": 358,
+        "hitH": 337,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "やまなしYamanashi ",
+        "w": 358,
+        "h": 356,
+        "hitW": 358,
+        "hitH": 356,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業Childcare ",
+        "w": 358,
+        "h": 259,
+        "hitW": 358,
+        "hitH": 259,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業給付金Childca",
+        "w": 358,
+        "h": 257,
+        "hitW": 358,
+        "hitH": 257,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族基礎年金Basic su",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族厚生年金Employee",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "医療保険Medical in",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証明書Seal-re",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証Seal-regi",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "オーバーステイOversta",
+        "w": 358,
+        "h": 233,
+        "hitW": 358,
+        "hitH": 233,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "大家LandlordInte",
+        "w": 358,
+        "h": 233,
+        "hitW": 358,
+        "hitH": 233,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "介護Long-term ca",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "静かな朝A Quiet Mo",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の古本屋The Sec",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "知らない町を歩くWalkin",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "山を歩きながら考えたことTh",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "AI時代の知識と判断Know",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "五箇条の御誓文The Cha",
+        "w": 358,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "方丈記 · 冒頭Hōjōki",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "徒然草 · 序段Tsurez",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "駅で待つ時間Waiting ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "台所の音Sounds fro",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "となりの部屋の人The Ma",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "引き出しの中の手紙A Let",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "朝の市場The Mornin",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "自転車をなくした日The D",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "川沿いの道The Road ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "深夜のラジオLate-nig",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "手で書くということOn Wr",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "余白のためのノートA Not",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の速度The Spee",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "訳せない言葉についてOn W",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "忘却を前提とした設計Desi",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "都市の匿名性と言語Anony",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "▸ sources & li",
+        "w": 123,
+        "h": 44,
+        "hitW": 123,
+        "hitH": 44,
+        "id": "sources-toggle"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "variants-toggle"
+      },
+      {
+        "text": "戻るback",
+        "w": 54,
+        "h": 44,
+        "hitW": 54,
+        "hitH": 44,
+        "id": "back"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 0lists",
+        "w": 53,
+        "h": 44,
+        "hitW": 53,
+        "hitH": 44,
+        "id": "review"
+      },
+      {
+        "text": "〜ているis …ing; h",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-grammar-door"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "料理",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "今、本を読んでいる",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "これから本を読むつもりだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "前に本を読んだ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "窓が開いている。",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "作っています",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "読 を見るopen the ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-kanji-door"
+      },
+      {
+        "text": "筆順open stroke ",
+        "w": 175,
+        "h": 58,
+        "hitW": 175,
+        "hitH": 58,
+        "id": "lesson-strokes-door"
+      },
+      {
+        "text": "よむ",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "かく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "きく",
+        "w": 328,
+        "h": 44,
+        "hitW": 328,
+        "hitH": 44,
+        "id": "lesson-choice"
+      },
+      {
+        "text": "台所の音open the f",
+        "w": 358,
+        "h": 79,
+        "hitW": 358,
+        "hitH": 79,
+        "id": "lesson-reader-door"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "残すkeep",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-keep"
+      },
+      {
+        "text": "覚えるlearn",
+        "w": 72,
+        "h": 45,
+        "hitW": 72,
+        "hitH": 45,
+        "id": "lesson-learn"
+      },
+      {
+        "text": "ここまでplace a bo",
+        "w": 358,
+        "h": 45,
+        "hitW": 358,
+        "hitH": 45,
+        "id": "lesson-close"
+      },
+      {
+        "text": "変異 ▴variants",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
         "hitH": 44,
         "id": "variants-toggle"
       }
@@ -6428,6 +8422,225 @@
       "text": "2005\nねん\n7\nがつ\n14か、みなみあふりか\nきょうわ\nこくだーばんで\nかい"
     }
   },
+  "dictionaryHomographs": {
+    "resultRows": [
+      {
+        "id": "word:カラー:1038500",
+        "gloss": "color"
+      },
+      {
+        "id": "word:カラー:2853151",
+        "gloss": "collar"
+      },
+      {
+        "id": "word:カラー:2853152",
+        "gloss": "calla (variety of arum lily)"
+      }
+    ],
+    "learned": {
+      "items": [
+        {
+          "cueReading": "カラー",
+          "answer": {
+            "reading": "カラー",
+            "meanings": [
+              "collar",
+              "color",
+              "calla (variety of arum lily)"
+            ],
+            "entries": [
+              "1038500",
+              "2853151",
+              "2853152"
+            ],
+            "selectedEntrySeq": "2853151"
+          }
+        }
+      ],
+      "keys": [
+        "word:カラー@カラー"
+      ],
+      "target": "kc:word:カラー@カラー",
+      "cardCount": 1
+    },
+    "review": {
+      "card": "word:カラー@カラー",
+      "trayRows": 1,
+      "resourcesBefore": [],
+      "reading": "カラー",
+      "meanings": [
+        "collar",
+        "color",
+        "calla (variety of arum lily)"
+      ],
+      "dictResources": [],
+      "openedCollarSenses": [
+        "collar"
+      ]
+    },
+    "cleaned": true,
+    "error": null
+  },
+  "dictionaryRestrictedReadings": {
+    "rows": [
+      {
+        "query": "さける",
+        "expectedGloss": "to avoid (situation)",
+        "row": {
+          "id": "word:避ける:1583260",
+          "word": "避ける",
+          "reading": "さける",
+          "gloss": "to avoid (situation)"
+        },
+        "canonical": {
+          "node": "word:避ける",
+          "headword": "避ける／除ける",
+          "reading": "さける",
+          "compatibleSense": true
+        }
+      },
+      {
+        "query": "よける",
+        "expectedGloss": "to avoid (physical contact with)",
+        "row": {
+          "id": "word:避ける:1583260",
+          "word": "避ける",
+          "reading": "よける",
+          "gloss": "to avoid (physical contact with)"
+        },
+        "canonical": {
+          "node": "word:避ける",
+          "headword": "避ける／除ける",
+          "reading": "よける",
+          "compatibleSense": true
+        }
+      }
+    ],
+    "error": null
+  },
+  "dictionaryLexicalIntent": {
+    "searches": [
+      {
+        "query": "put aside",
+        "seq": "1583260",
+        "word": "避ける",
+        "reading": "よける",
+        "gloss": "to put aside",
+        "card": "word:避ける@よける",
+        "alternate": "除ける",
+        "row": {
+          "id": "word:避ける:1583260",
+          "word": "避ける",
+          "reading": "よける",
+          "gloss": "to put aside"
+        },
+        "canonical": {
+          "node": "word:避ける",
+          "headword": "避ける／除ける",
+          "reading": "よける",
+          "matchedGloss": true,
+          "restriction": "with reading よける"
+        },
+        "learned": {
+          "itemCount": 1,
+          "answer": {
+            "reading": "よける",
+            "meanings": [
+              "to put aside",
+              "to avoid (physical contact with)"
+            ],
+            "entries": [
+              "1583260"
+            ],
+            "selectedEntrySeq": "1583260"
+          },
+          "cardPresent": true,
+          "target": "kc:word:避ける@よける"
+        }
+      },
+      {
+        "query": "semicircle",
+        "seq": "1583170",
+        "word": "半月",
+        "reading": "はんげつ",
+        "gloss": "semicircle",
+        "card": "word:半月@はんげつ",
+        "alternate": "",
+        "row": {
+          "id": "word:半月:1583170",
+          "word": "半月",
+          "reading": "はんげつ",
+          "gloss": "semicircle"
+        },
+        "canonical": {
+          "node": "word:半月",
+          "headword": "半月",
+          "reading": "はんげつ",
+          "matchedGloss": true,
+          "restriction": "with reading はんげつ"
+        },
+        "learned": {
+          "itemCount": 1,
+          "answer": {
+            "reading": "はんげつ",
+            "meanings": [
+              "semicircle",
+              "half-moon"
+            ],
+            "entries": [
+              "1583170"
+            ],
+            "selectedEntrySeq": "1583170"
+          },
+          "cardPresent": true,
+          "target": "kc:word:半月@はんげつ"
+        }
+      }
+    ],
+    "writtenForm": {
+      "query": "除ける",
+      "resultCount": 3,
+      "targetRows": [
+        {
+          "id": "word:除ける:1583260",
+          "word": "除ける",
+          "reading": "よける",
+          "gloss": "to avoid (physical contact with)"
+        }
+      ],
+      "safe": true
+    },
+    "crossReference": {
+      "qualifier": "かなやま",
+      "from": {
+        "node": "word:金山",
+        "reading": "きんざん"
+      },
+      "node": "word:金山",
+      "headword": "金山",
+      "reading": "かなやま",
+      "activeSeq": "2838215"
+    },
+    "senseQualifiedCrossReference": {
+      "qualifier": "つらい・1",
+      "node": "word:辛い",
+      "reading": "つらい",
+      "activeSeq": "1365860"
+    },
+    "workerThrottle": {
+      "baseline": 2,
+      "beforeSettle": {
+        "dispatches": 2,
+        "rows": 20,
+        "query": "aside"
+      },
+      "naturalDelta": 1,
+      "cachedRepeatDelta": 0,
+      "midFlightDelta": 2
+    },
+    "cleaned": true,
+    "error": null
+  },
   "idiomSectionPresent": true,
   "hops": [
     "kanji:過",
@@ -6691,15 +8904,19 @@
     }
   ],
   "counts": {
-    "passages": 26,
-    "articleFiles": 26,
+    "passages": 40,
+    "articleFiles": 40,
     "words": 7910,
+    "dictionaryCoreHeadwords": 22934,
+    "dictionaryEntries": 69996,
+    "dictionaryForms": 146643,
+    "dictionarySenses": 89713,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 221,
+  "loadMs": 1112,
   "summary": {
     "total": 91,
     "failed": 0
@@ -6708,7 +8925,7 @@
     {
       "name": "Phase 2 · the app opens into the living universe",
       "pass": true,
-      "detail": "layer active, 28 words adrift"
+      "detail": "layer active, 23 words adrift"
     },
     {
       "name": "Phase 2 · the corridor chrome rides above the universe (one fabric)",
@@ -6728,7 +8945,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":151.77999877929688,\"y\":583.8800048828125,\"productive\":true}"
+      "detail": "{\"x\":150.3800048828125,\"y\":584.8200073242188,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6738,7 +8955,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 85px; mean tether 146 → 161px"
+      "detail": "centre 87px; family 81px; mean tether 129 → 161px; max 205px; clipped 0"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6748,7 +8965,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 221 ms"
+      "detail": "40 texts, ready in 1112 ms; search 298/316px"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6868,7 +9085,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 565.9 → 565.9px"
+      "detail": "gloss on, glyph bottom 568.9 → 568.9px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -6918,12 +9135,12 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 5 senses"
+      "detail": "年: 3 senses; カラー card word:カラー@カラー; entries 1038500 / 2853151 / 2853152; reload word:カラー@カラー → collar · color · calla (variety of arum lily); dictionary fetches 0; 避ける さける「to avoid (situation)」 / よける「to avoid (physical contact with)」; intent 避ける／よける「to put aside」 · 半月／はんげつ「semicircle」; worker natural/cache/mid-flight 1/0/2; 除ける よける; 金山 きんざん → かなやま; 辛い つらい・1 → つらい"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
       "pass": true,
-      "detail": "過酷: 16 edges, e.g. 厳しい「everyday synonym, one register softer」"
+      "detail": "過酷: 16 edges, 11 doors and 5 source-only labels"
     },
     {
       "name": "word → kanji lands on a real kanji page",
@@ -6958,7 +9175,7 @@
     {
       "name": "Review · 覚える creates a due card; honest Good persists through reload",
       "pass": true,
-      "detail": "taken/card/history 1/1/0; pre-answer 0; ratings again,hard,good,easy; Good receipts 1; reload receipts 1"
+      "detail": "taken/card/history 1/1/0; pre-answer 0; ratings again,hard,good,easy; reading groups カ・|す.ぎる・|す.ぎ・|す.ごす; Good receipts 1; reload receipts 1"
     },
     {
       "name": "Review · give-up forces Again and a frozen finite plan closes without refill",
@@ -6968,7 +9185,7 @@
     {
       "name": "Review · legacy lists stay debt-free until opt-in; pause keeps the receipt and removes due",
       "pass": true,
-      "detail": "legacy review=false, promote 1; cards 1; history 1→1; due 1→0"
+      "detail": "legacy review=false, promote 1; cards 1; history 1→1; due 1→0; lesson legacy learn; keep→learn; malformed disabled 24/24; future disabled 24/24; bad roots array root:24/24,scalar root:24/24; bad review 24/24; Drift observation true / rollback false; article retry 2 request(s)"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -7038,7 +9255,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "690 controls checked, including review and inline-token hit regions"
+      "detail": "915 controls checked, including review and inline-token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",

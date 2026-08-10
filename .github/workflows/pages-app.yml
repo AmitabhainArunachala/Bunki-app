@@ -47,6 +47,7 @@ jobs:
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
+                prototypes/corridor/dictionary-worker.js \
                 prototypes/corridor/drift-layer.css \
                 prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
@@ -62,23 +63,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          node --check "$SITE_DIR/corridor.js"
+          node --check "$SITE_DIR/dictionary-worker.js"
           python3 -m http.server 8765 --bind 127.0.0.1 --directory "$SITE_DIR" \
             >"$RUNNER_TEMP/corridor-smoke.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
 
           node --input-type=module <<'NODE'
-          const paths = [
-            '',
-            'corridor.css',
-            'corridor.js',
-            'drift-layer.css',
-            'drift-layer.js',
-            'vendor/ts-fsrs.mjs',
-            'data/manifest.json',
-            'data/articles/index.json',
-          ];
-          for (const path of paths) {
+          const EXPECTED_DICTIONARY = Object.freeze({
+            schemaVersion: 2,
+            pool: 'share_alike',
+            shardCount: 16,
+            sourcePin: '3.6.2+20260803141815',
+            jmdictSha256: '1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c',
+            kanjidic2Sha256: '5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6',
+            sharding: Object.freeze({
+              id: 'fnv1a32-ascii-seq-mask15',
+              input: 'decimal ASCII JMdict ent_seq string',
+              offsetBasis: 2166136261,
+              prime: 16777619,
+              reduction: 'unsignedHash & 15',
+            }),
+          });
+
+          const parsedJsonPaths = new Set();
+          const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+          const assertInvariant = (condition, message) => {
+            if (!condition) throw new Error(message);
+          };
+          const sameJson = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+
+          const fetchAsset = async (path) => {
             let response;
             for (let attempt = 0; attempt < 5; attempt += 1) {
               try {
@@ -89,8 +105,240 @@ jobs:
               }
             }
             if (!response?.ok) throw new Error(`${path} -> ${response?.status ?? 'unreachable'}`);
-            console.log(`${response.status} /${path}`);
+            const body = await response.text();
+            let json;
+            if (path.endsWith('.json')) {
+              try {
+                json = JSON.parse(body);
+              } catch (error) {
+                throw new Error(`${path} is not valid JSON: ${error.message}`);
+              }
+              parsedJsonPaths.add(path);
+            }
+            return { status: response.status, json };
+          };
+
+          const validateSharding = (sharding, label) => {
+            assertInvariant(isRecord(sharding), `${label}: sharding metadata is missing`);
+            for (const [field, expected] of Object.entries(EXPECTED_DICTIONARY.sharding)) {
+              assertInvariant(sharding[field] === expected, `${label}: sharding.${field} is wrong`);
+            }
+            assertInvariant(
+              sharding.shardCount === EXPECTED_DICTIONARY.shardCount,
+              `${label}: sharding.shardCount is wrong`,
+            );
+            assertInvariant(
+              Array.isArray(sharding.entryCounts)
+                && sharding.entryCounts.length === EXPECTED_DICTIONARY.shardCount
+                && sharding.entryCounts.every((count) => Number.isSafeInteger(count) && count > 0),
+              `${label}: sharding.entryCounts is malformed`,
+            );
+          };
+
+          // Kept separate from the index envelope so an eventual split-index
+          // build can feed each index shard through this same row validator.
+          const validateDictionaryIndexEntries = (entries, layout, label) => {
+            const expectedColumns = [
+              'seq',
+              'head',
+              'primaryReading',
+              'primaryGloss',
+              'writtenForms',
+              'kanaForms',
+              'englishGlosses',
+              'normalizedGlosses',
+              'commonFlag',
+              'readingSummaries',
+              'glossApplicability',
+              'readingWrittenScopes',
+            ];
+            assertInvariant(Array.isArray(entries) && entries.length > 0, `${label}: entries are missing`);
+            assertInvariant(
+              Array.isArray(layout?.indexEntry)
+                && sameJson(layout.indexEntry.slice(0, expectedColumns.length), expectedColumns),
+              `${label}: index layout is unsupported`,
+            );
+            const sequences = new Set();
+            let previousSequence = -1;
+            for (const [rowNumber, row] of entries.entries()) {
+              const sequence = String(row?.[0] ?? '');
+              const numericSequence = Number(sequence);
+              assertInvariant(
+                Array.isArray(row)
+                  && row.length === layout.indexEntry.length
+                  && /^\d+$/.test(sequence)
+                  && Number.isSafeInteger(numericSequence)
+                  && Array.isArray(row[4])
+                  && Array.isArray(row[5])
+                  && Array.isArray(row[6])
+                  && Array.isArray(row[7])
+                  && Array.isArray(row[9])
+                  && Array.isArray(row[10])
+                  && row[10].length === row[6].length
+                  && Array.isArray(row[11])
+                  && row[11].length === row[5].length,
+                `${label}: malformed index row ${rowNumber}`,
+              );
+              assertInvariant(numericSequence > previousSequence, `${label}: sequence order is not strictly increasing`);
+              assertInvariant(!sequences.has(sequence), `${label}: duplicate sequence ${sequence}`);
+              previousSequence = numericSequence;
+              sequences.add(sequence);
+            }
+            return sequences;
+          };
+
+          const validateDictionaryIndex = (index) => {
+            const label = 'data/share_alike/dict-v2/index.json';
+            assertInvariant(isRecord(index), `${label}: index envelope is malformed`);
+            assertInvariant(index.schemaVersion === EXPECTED_DICTIONARY.schemaVersion, `${label}: schemaVersion is wrong`);
+            assertInvariant(index.pool === EXPECTED_DICTIONARY.pool, `${label}: pool is wrong`);
+            assertInvariant(index.shardCount === EXPECTED_DICTIONARY.shardCount, `${label}: shardCount is wrong`);
+            validateSharding(index.sharding, label);
+            assertInvariant(index.source?.pin === EXPECTED_DICTIONARY.sourcePin, `${label}: source pin is wrong`);
+            assertInvariant(
+              index.source?.jmdict?.sha256 === EXPECTED_DICTIONARY.jmdictSha256,
+              `${label}: JMdict source digest is wrong`,
+            );
+            assertInvariant(
+              index.source?.kanjidic2?.sha256 === EXPECTED_DICTIONARY.kanjidic2Sha256,
+              `${label}: KANJIDIC2 source digest is wrong`,
+            );
+            assertInvariant(
+              index.counts?.selectedEntries === index.entries?.length,
+              `${label}: selectedEntries does not match the index`,
+            );
+            assertInvariant(
+              index.sharding.entryCounts.reduce((sum, count) => sum + count, 0) === index.entries?.length,
+              `${label}: shard entry counts do not add up to the index`,
+            );
+            return validateDictionaryIndexEntries(index.entries, index.layout, label);
+          };
+
+          const dictionaryShardFor = (sequence) => {
+            let hash = EXPECTED_DICTIONARY.sharding.offsetBasis;
+            for (const character of sequence) {
+              hash ^= character.charCodeAt(0);
+              hash = Math.imul(hash, EXPECTED_DICTIONARY.sharding.prime) >>> 0;
+            }
+            return hash & (EXPECTED_DICTIONARY.shardCount - 1);
+          };
+
+          const detailSequences = new Set();
+          const seenShards = new Set();
+          const validateDictionaryShard = (shard, expectedShard, index, indexSequences, path) => {
+            assertInvariant(isRecord(shard), `${path}: shard envelope is malformed`);
+            assertInvariant(shard.schemaVersion === index.schemaVersion, `${path}: schemaVersion is wrong`);
+            assertInvariant(shard.pool === index.pool, `${path}: pool is wrong`);
+            assertInvariant(shard.shard === expectedShard, `${path}: shard number is wrong`);
+            assertInvariant(shard.shardCount === index.shardCount, `${path}: shardCount is wrong`);
+            assertInvariant(shard.sourcePin === index.source.pin, `${path}: source pin does not match the index`);
+            validateSharding(shard.sharding, path);
+            assertInvariant(
+              sameJson(shard.sharding.entryCounts, index.sharding.entryCounts),
+              `${path}: shard distribution metadata does not match the index`,
+            );
+            assertInvariant(
+              sameJson(shard.layout?.detailEntry, index.layout?.detailEntry),
+              `${path}: detail layout does not match the index`,
+            );
+            assertInvariant(Array.isArray(shard.entries), `${path}: entries are missing`);
+            assertInvariant(shard.counts?.entries === shard.entries.length, `${path}: counts.entries is wrong`);
+            assertInvariant(
+              shard.entries.length === index.sharding.entryCounts[expectedShard],
+              `${path}: entry count does not match the index`,
+            );
+
+            for (const [rowNumber, row] of shard.entries.entries()) {
+              const sequence = String(row?.[0] ?? '');
+              assertInvariant(
+                Array.isArray(row)
+                  && row.length === 4
+                  && /^\d+$/.test(sequence)
+                  && Array.isArray(row[1])
+                  && Array.isArray(row[2])
+                  && Array.isArray(row[3]),
+                `${path}: malformed detail row ${rowNumber}`,
+              );
+              assertInvariant(
+                dictionaryShardFor(sequence) === expectedShard,
+                `${path}: sequence ${sequence} fails FNV shard membership`,
+              );
+              assertInvariant(indexSequences.has(sequence), `${path}: sequence ${sequence} is absent from the index`);
+              assertInvariant(!detailSequences.has(sequence), `${path}: duplicate detail sequence ${sequence}`);
+              detailSequences.add(sequence);
+            }
+            seenShards.add(expectedShard);
+          };
+
+          const paths = [
+            '',
+            'corridor.css',
+            'corridor.js',
+            'dictionary-worker.js',
+            'drift-layer.css',
+            'drift-layer.js',
+            'vendor/ts-fsrs.mjs',
+            'data/manifest.json',
+            'data/articles/index.json',
+            'data/proprietary_safe/kanken.json',
+            'data/proprietary_safe/sem.json',
+            'data/share_alike/kanji.json',
+            'data/share_alike/words.json',
+            'data/share_alike/idioms.json',
+            'data/share_alike/dict.json',
+            'data/share_alike/strokes.json',
+            'data/original/grammar-v11.json',
+            'data/original/lessons-v1.json',
+            'data/fsrs-pin.json',
+            'data/share_alike/dict-v2/index.json',
+          ];
+          const articleIndex = (await fetchAsset('data/articles/index.json')).json;
+          assertInvariant(Array.isArray(articleIndex?.articles), 'data/articles/index.json: articles are missing');
+          const articleFiles = new Set();
+          for (const article of articleIndex.articles) {
+            assertInvariant(
+              typeof article?.file === 'string' && /^[a-z0-9][a-z0-9._-]*\.json$/i.test(article.file),
+              'data/articles/index.json: an article file name is malformed',
+            );
+            assertInvariant(!articleFiles.has(article.file), `data/articles/index.json: duplicate ${article.file}`);
+            articleFiles.add(article.file);
+            paths.push(`data/articles/${article.file}`);
           }
+          const dictionaryIndex = (await fetchAsset('data/share_alike/dict-v2/index.json')).json;
+          const indexSequences = validateDictionaryIndex(dictionaryIndex);
+          for (let shard = 0; shard < dictionaryIndex.shardCount; shard += 1) {
+            paths.push(`data/share_alike/dict-v2/${shard.toString(16).padStart(2, '0')}.json`);
+          }
+          for (const path of paths) {
+            const asset = await fetchAsset(path);
+            const shardMatch = path.match(/data\/share_alike\/dict-v2\/([0-9a-f]{2})\.json$/);
+            if (shardMatch) {
+              validateDictionaryShard(
+                asset.json,
+                Number.parseInt(shardMatch[1], 16),
+                dictionaryIndex,
+                indexSequences,
+                path,
+              );
+            }
+            console.log(`${asset.status} /${path}`);
+          }
+          const expectedJsonPaths = new Set(paths.filter((path) => path.endsWith('.json')));
+          assertInvariant(
+            [...expectedJsonPaths].every((path) => parsedJsonPaths.has(path)),
+            'not every packaged JSON asset was parsed',
+          );
+          assertInvariant(
+            seenShards.size === EXPECTED_DICTIONARY.shardCount,
+            `only ${seenShards.size}/${EXPECTED_DICTIONARY.shardCount} dictionary shards were validated`,
+          );
+          assertInvariant(
+            detailSequences.size === indexSequences.size,
+            `dictionary detail coverage ${detailSequences.size}/${indexSequences.size}`,
+          );
+          console.log(
+            `validated ${expectedJsonPaths.size} JSON assets and ${detailSequences.size} dictionary detail entries`,
+          );
           NODE
 
       - name: Upload build as downloadable artifact

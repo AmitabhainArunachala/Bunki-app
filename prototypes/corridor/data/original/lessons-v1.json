@@ -1,0 +1,432 @@
+{
+  "schema": "bunki-lessons-v1",
+  "version": 1,
+  "pool": "original",
+  "sources": [
+    {
+      "name": "Bunki integrated lessons",
+      "licence": "Bunki original",
+      "attribution": "Bunki original lesson structure and prompts"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "n5-kitchen-teiru",
+      "title": "今していること・台所の音",
+      "summary": "「台所の音」で、今続いている動作を見つける。",
+      "articleId": "bunki-graded-n5-kitchen",
+      "threads": [
+        {
+          "axis": "jlpt",
+          "label": "N5の土台",
+          "target": {
+            "t": "grammar",
+            "id": "teiru"
+          }
+        },
+        {
+          "axis": "kanken",
+          "label": "漢字の糸・読",
+          "target": {
+            "t": "kanji",
+            "id": "読"
+          }
+        }
+      ],
+      "sourceSpans": [
+        {
+          "id": "mother-cooking-sentence",
+          "articleId": "bunki-graded-n5-kitchen",
+          "tokenStart": 0,
+          "tokenEnd": 13,
+          "focus": {
+            "tokenStart": 8,
+            "tokenEnd": 12
+          }
+        },
+        {
+          "id": "learner-reading-sentence",
+          "articleId": "bunki-graded-n5-kitchen",
+          "tokenStart": 13,
+          "tokenEnd": 29,
+          "focus": {
+            "tokenStart": 24,
+            "tokenEnd": 28
+          }
+        }
+      ],
+      "targets": [
+        {
+          "key": "grammar-teiru",
+          "target": {
+            "t": "grammar",
+            "id": "teiru"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 8,
+              "sourceSpanId": "mother-cooking-sentence"
+            },
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 24,
+              "sourceSpanId": "learner-reading-sentence"
+            }
+          ]
+        },
+        {
+          "key": "word-ryouri",
+          "target": {
+            "t": "word",
+            "id": "料理"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 6,
+              "sourceSpanId": "mother-cooking-sentence"
+            }
+          ]
+        },
+        {
+          "key": "word-tsukuru",
+          "target": {
+            "t": "word",
+            "id": "作る"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 8,
+              "sourceSpanId": "mother-cooking-sentence"
+            }
+          ]
+        },
+        {
+          "key": "word-yomu",
+          "target": {
+            "t": "word",
+            "id": "読む"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 24,
+              "sourceSpanId": "learner-reading-sentence"
+            }
+          ]
+        },
+        {
+          "key": "word-daidokoro",
+          "target": {
+            "t": "word",
+            "id": "台所"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 4,
+              "sourceSpanId": "mother-cooking-sentence"
+            }
+          ]
+        },
+        {
+          "key": "kanji-yomu",
+          "target": {
+            "t": "kanji",
+            "id": "読"
+          },
+          "encounters": [
+            {
+              "articleId": "bunki-graded-n5-kitchen",
+              "tokenIndex": 24,
+              "sourceSpanId": "learner-reading-sentence"
+            }
+          ]
+        }
+      ],
+      "statePolicy": {
+        "implicitWrites": false,
+        "practiceAnswerWrites": "practice-evidence-only",
+        "keepWrites": "thread-only",
+        "learnWrites": "thread-and-review",
+        "closureWrites": "visit-progress-only"
+      },
+      "steps": [
+        {
+          "id": "notice",
+          "title": "気づく",
+          "kind": "notice",
+          "sourceSpanIds": [
+            "mother-cooking-sentence",
+            "learner-reading-sentence"
+          ],
+          "targetKeys": [
+            "grammar-teiru"
+          ]
+        },
+        {
+          "id": "grammar",
+          "title": "わかる",
+          "kind": "canonical-room",
+          "open": {
+            "target": {
+              "t": "grammar",
+              "id": "teiru"
+            },
+            "room": "entry"
+          },
+          "returnStepId": "grammar"
+        },
+        {
+          "id": "practice",
+          "title": "ためす",
+          "kind": "practice",
+          "prompts": [
+            {
+              "id": "kitchen-teiru-ongoing-v1",
+              "kind": "single-choice",
+              "promptJa": "母が今している動作はどれですか。",
+              "context": {
+                "kind": "article-span",
+                "sourceSpanId": "mother-cooking-sentence"
+              },
+              "choices": [
+                {
+                  "id": "action",
+                  "content": {
+                    "kind": "article-focus",
+                    "sourceSpanId": "mother-cooking-sentence"
+                  }
+                },
+                {
+                  "id": "place",
+                  "content": {
+                    "kind": "article-tokens",
+                    "articleId": "bunki-graded-n5-kitchen",
+                    "tokenStart": 4,
+                    "tokenEnd": 5
+                  }
+                },
+                {
+                  "id": "thing",
+                  "content": {
+                    "kind": "article-tokens",
+                    "articleId": "bunki-graded-n5-kitchen",
+                    "tokenStart": 6,
+                    "tokenEnd": 7
+                  }
+                }
+              ],
+              "answerChoiceId": "action",
+              "feedback": {
+                "answerJa": "ここでは、作っています が今進んでいる動作です。",
+                "revisitJa": "母の動作を表す語尾を、文の中でもう一度見ます。"
+              },
+              "evidence": {
+                "capability": "contextual_comprehension",
+                "target": {
+                  "t": "grammar",
+                  "id": "teiru"
+                },
+                "source": {
+                  "articleId": "bunki-graded-n5-kitchen",
+                  "tokenIndex": 8
+                }
+              }
+            },
+            {
+              "id": "kitchen-teiru-reading-v1",
+              "kind": "single-choice",
+              "promptJa": "「読んでいます」が表すのはどれですか。",
+              "context": {
+                "kind": "article-span",
+                "sourceSpanId": "learner-reading-sentence"
+              },
+              "choices": [
+                {
+                  "id": "ongoing",
+                  "textJa": "今、本を読んでいる"
+                },
+                {
+                  "id": "intention",
+                  "textJa": "これから本を読むつもりだ"
+                },
+                {
+                  "id": "past",
+                  "textJa": "前に本を読んだ"
+                }
+              ],
+              "answerChoiceId": "ongoing",
+              "feedback": {
+                "answerJa": "読んでいます は、今続いている動作です。",
+                "revisitJa": "文の中の 〜ています に目を戻します。"
+              },
+              "evidence": {
+                "capability": "contextual_comprehension",
+                "target": {
+                  "t": "grammar",
+                  "id": "teiru"
+                },
+                "source": {
+                  "articleId": "bunki-graded-n5-kitchen",
+                  "tokenIndex": 24
+                }
+              }
+            },
+            {
+              "id": "kitchen-teiru-state-v1",
+              "kind": "single-choice",
+              "promptJa": "動作の結果が続いている状態を表すのはどちらですか。",
+              "choices": [
+                {
+                  "id": "resulting-state",
+                  "content": {
+                    "kind": "grammar-example",
+                    "grammarId": "teiru",
+                    "exampleIndex": 1
+                  }
+                },
+                {
+                  "id": "ongoing-action",
+                  "content": {
+                    "kind": "article-focus",
+                    "sourceSpanId": "mother-cooking-sentence"
+                  }
+                }
+              ],
+              "answerChoiceId": "resulting-state",
+              "feedback": {
+                "answerJa": "窓が開いている は、開いたあとの状態が続いています。",
+                "revisitJa": "動作そのものと、変化のあとの状態を見比べます。"
+              },
+              "evidence": {
+                "capability": "grammar_discrimination",
+                "target": {
+                  "t": "grammar",
+                  "id": "teiru"
+                },
+                "source": {
+                  "grammarId": "teiru",
+                  "exampleIndex": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "kanji",
+          "title": "漢字の糸",
+          "kind": "canonical-room-and-practice",
+          "open": [
+            {
+              "target": {
+                "t": "kanji",
+                "id": "読"
+              },
+              "room": "entry"
+            },
+            {
+              "target": {
+                "t": "kanji",
+                "id": "読"
+              },
+              "room": "strokes"
+            }
+          ],
+          "returnStepId": "kanji",
+          "prompts": [
+            {
+              "id": "kitchen-kanji-yomu-v1",
+              "kind": "single-choice",
+              "promptJa": "「読む」の「読」は、どう読みますか。",
+              "context": {
+                "kind": "article-tokens",
+                "articleId": "bunki-graded-n5-kitchen",
+                "tokenStart": 24,
+                "tokenEnd": 25
+              },
+              "choices": [
+                {
+                  "id": "yomu",
+                  "textJa": "よむ"
+                },
+                {
+                  "id": "kaku",
+                  "textJa": "かく"
+                },
+                {
+                  "id": "kiku",
+                  "textJa": "きく"
+                }
+              ],
+              "answerChoiceId": "yomu",
+              "feedback": {
+                "answerJa": "この 読 は よむ です。",
+                "revisitJa": "読む の辞書の形に戻って読みを見ます。"
+              },
+              "evidence": {
+                "capability": "kanji_reading_recognition",
+                "target": {
+                  "t": "kanji",
+                  "id": "読"
+                },
+                "source": {
+                  "articleId": "bunki-graded-n5-kitchen",
+                  "tokenIndex": 24
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "reader",
+          "title": "読む",
+          "kind": "canonical-room",
+          "open": {
+            "articleId": "bunki-graded-n5-kitchen",
+            "room": "reader"
+          },
+          "returnStepId": "reader"
+        },
+        {
+          "id": "disposition",
+          "title": "残すもの",
+          "kind": "explicit-disposition",
+          "targetKeys": [
+            "grammar-teiru",
+            "word-ryouri",
+            "word-tsukuru",
+            "word-yomu",
+            "word-daidokoro",
+            "kanji-yomu"
+          ],
+          "actions": [
+            {
+              "id": "keep",
+              "label": "残す",
+              "effect": "thread-only"
+            },
+            {
+              "id": "learn",
+              "label": "覚える",
+              "effect": "thread-and-review"
+            }
+          ],
+          "defaultAction": null
+        },
+        {
+          "id": "closure",
+          "title": "ここまで",
+          "kind": "visit-closure",
+          "records": [
+            "visited-steps",
+            "lesson-completed-at"
+          ],
+          "claim": "navigation-progress-only"
+        }
+      ]
+    }
+  ]
+}
