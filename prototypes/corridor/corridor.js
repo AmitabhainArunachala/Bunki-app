@@ -3813,7 +3813,75 @@ function nodeTitle(node) {
   if (node.t === 'idiom') return node.id;
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
+  if (node.t === 'catalog') return catalogLabel(node.by, node.value);
   return '';
+}
+
+/* ------------------------------------------------------ category catalogs
+ * Operator (2026-08-10): a level or count on an entry should be a door — tap
+ * 漢検 3級 / JLPT N1 / 12 画 and see EVERY kanji in that group, exhaustively.
+ * The same node opens the same way everywhere the chip appears. */
+function catalogLabel(by, value) {
+  if (by === 'strokes') return tx(`${value} 画`, `${value} strokes`);
+  if (by === 'kanken') return `漢検 ${value}`;
+  if (by === 'jlpt') return `JLPT ${value}`;
+  return String(value);
+}
+function catalogEn(by, value) {
+  if (by === 'strokes') return `${value}-stroke kanji`;
+  if (by === 'kanken') return `Kanken ${value} kanji`;
+  if (by === 'jlpt') return `JLPT ${value} kanji`;
+  return '';
+}
+/** Every kanji in a category, ordered common-first (by 漢検 rank) then simpler. */
+function catalogMatch(by, value) {
+  const out = [];
+  for (const [c, k] of Object.entries(D.kanji)) {
+    const hit =
+      by === 'strokes'
+        ? k.st === value
+        : by === 'kanken'
+          ? k.kk === value
+          : by === 'jlpt'
+            ? D.kmeta?.[c]?.jlpt === value
+            : false;
+    if (hit) out.push(c);
+  }
+  out.sort(
+    (a, b) =>
+      (D.kanji[a].kr || 9999) - (D.kanji[b].kr || 9999) || D.kanji[a].st - D.kanji[b].st || a.localeCompare(b),
+  );
+  return out;
+}
+/** A tappable chip that opens the catalog for its category. */
+function catalogChip(ja, en, by, value, from) {
+  const chip = el('button', 'pool-tag cat-chip', bi() && en ? en : ja);
+  chip.type = 'button';
+  chip.setAttribute('aria-label', tx(`${ja} の漢字をすべて見る`, `see every ${en} kanji`));
+  chip.addEventListener('click', () => go({ t: 'catalog', id: `${by}:${value}`, by, value, from }));
+  return chip;
+}
+function renderCatalogNode(sheet, node) {
+  const { by, value } = node;
+  const chars = catalogMatch(by, value);
+  sheet.append(withEn(el('h1', 'view-title', catalogLabel(by, value)), catalogEn(by, value), 'en-inline'));
+  sheet.append(
+    el('p', 'gloss', tx(`このくくりの漢字 — 全 ${chars.length} 字`, `every kanji in this group — all ${chars.length}`)),
+  );
+  if (!chars.length) {
+    sheet.append(el('div', 'sem-empty', tx('この層に該当する字がない。', 'No kanji in this layer match.')));
+    return;
+  }
+  const grid = el('div', 'cat-grid');
+  for (const c of chars) {
+    const cell = el('button', 'cat-cell');
+    cell.type = 'button';
+    cell.append(el('span', 'cat-glyph', c));
+    cell.append(el('span', 'cat-mean', D.kanji[c].m));
+    cell.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+    grid.append(cell);
+  }
+  sheet.append(grid);
 }
 
 function chipsFor(items, onTap, sub, kind) {
@@ -5189,9 +5257,11 @@ function renderKanjiNode(sheet, node) {
   const meta = el('div', 'hero-meta');
   meta.append(el('div', 'hero-mean', k.m));
   const chips = el('div', 'shelf-meta');
-  chips.append(el('span', 'pool-tag', tx(`${k.st} 画`, `${k.st} strokes`)));
-  if (D.kanken[k.c]?.kk) chips.append(el('span', 'pool-tag', `漢検 ${D.kanken[k.c].kk}`));
-  if (D.kmeta?.[k.c]?.jlpt) chips.append(el('span', 'pool-tag', `JLPT ${D.kmeta[k.c].jlpt}`));
+  chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
+  if (D.kanken[k.c]?.kk)
+    chips.append(catalogChip(`漢検 ${D.kanken[k.c].kk}`, `漢検 ${D.kanken[k.c].kk}`, 'kanken', D.kanken[k.c].kk, node.from));
+  if (D.kmeta?.[k.c]?.jlpt)
+    chips.append(catalogChip(`JLPT ${D.kmeta[k.c].jlpt}`, `JLPT ${D.kmeta[k.c].jlpt}`, 'jlpt', D.kmeta[k.c].jlpt, node.from));
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
@@ -5753,12 +5823,27 @@ function renderStrokePage(root) {
     body.append(controls);
 
     const meta = el('p', 'stroke-meta');
-    const bits = [];
-    if (k) bits.push(tx(`${k.m}`, `${k.m}`));
-    if (D.kanken[st.id]?.kk) bits.push(`漢検 ${D.kanken[st.id].kk}`);
-    if (D.kmeta?.[st.id]?.jlpt) bits.push(`JLPT ${D.kmeta[st.id].jlpt}`);
-    bits.push(tx(`${paths.length} 画`, `${paths.length} strokes`));
-    meta.textContent = bits.join(' · ');
+    // 漢検 · JLPT · 画数 are doors here too: each opens the exhaustive list of
+    // every kanji in that group. The stroke page is not a sheet, so close it
+    // first, then open the catalog over the kanji entry it came from.
+    const metaLink = (label, by, value) => {
+      const b = el('button', 'stroke-meta-link', label);
+      b.type = 'button';
+      b.addEventListener('click', () => {
+        closeStrokePage();
+        go({ t: 'catalog', id: `${by}:${value}`, by, value });
+      });
+      return b;
+    };
+    const links = [];
+    if (D.kanken[st.id]?.kk) links.push(metaLink(`漢検 ${D.kanken[st.id].kk}`, 'kanken', D.kanken[st.id].kk));
+    if (D.kmeta?.[st.id]?.jlpt) links.push(metaLink(`JLPT ${D.kmeta[st.id].jlpt}`, 'jlpt', D.kmeta[st.id].jlpt));
+    links.push(metaLink(tx(`${k?.st ?? paths.length} 画`, `${k?.st ?? paths.length} strokes`), 'strokes', k?.st ?? paths.length));
+    if (k) meta.append(el('span', 'stroke-meta-mean', k.m), document.createTextNode('　·　'));
+    links.forEach((b, i) => {
+      if (i) meta.append(document.createTextNode(' · '));
+      meta.append(b);
+    });
     body.append(meta);
     page.append(body);
   }
@@ -5965,6 +6050,7 @@ function renderSheet(root) {
   else if (node.t === 'idiom') renderIdiomNode(sheet, node);
   else if (node.t === 'grammar') renderGrammarNode(sheet, node);
   else if (node.t === 'particle') renderParticleNode(sheet, node);
+  else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   sheet.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -6180,8 +6266,10 @@ function cycleKairoTheme() {
  * bubbles (本棚 bottom-left, 先生 bottom-right). Everything hides again on
  * dismiss, leaving the galaxy uncovered. Only on 銀河 — inner pages keep the
  * ordinary top bar. */
+// the 鳥居 gate (operator's pick) with a single star above — a threshold into
+// the galaxy: the two lintels (笠木・貫), two pillars, and one point of light.
 const GINGA_SYMBOL_SVG =
-  '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 24C24 15 33 12 36 18C40 26 28 34 19 30C9 25 12 11 24 9C38 7 43 22 38 33" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="24" cy="24" r="1.9" fill="currentColor"/></svg>';
+  '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 15.5C20 13 28 13 40 15.5M11.5 21H36.5M16.5 21V37M31.5 21V37" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="8.5" r="1.7" fill="currentColor"/></svg>';
 
 /** One forward step: navForward undoes the most recent navBack. */
 function navForward() {
