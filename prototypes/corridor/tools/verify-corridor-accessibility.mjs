@@ -215,7 +215,10 @@ async function main() {
       .map((node) => node.name.value);
     check(
       'screen-reader tree exposes named token and non-hold action buttons',
-      namedButtons.some((name) => /third activation|三回目/.test(name)) &&
+      // the token label describes the ladder from its CURRENT rung — with
+      // full furigana the default, "a further activation" is the honest
+      // wording; "third activation" was the fixed-ladder phrasing it replaced
+      namedButtons.some((name) => /further activation|third activation|三回目/.test(name)) &&
         namedButtons.some((name) => /quick look|語釈/.test(name)) &&
         namedButtons.some((name) => /full entry|全項目/.test(name)),
       `${namedButtons.length} named button(s) in the accessibility tree`,

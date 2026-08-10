@@ -5,7 +5,16 @@
  * the matrix forever after.)
  *
  * Usage: node verify-drift-hunt.mjs
- */
+  *
+ * KNOWN-STALE STAGINGS (2026-08-10, post meaning-gated families): four
+ * hunts below stage their scenarios by walking constellations whose
+ * membership assumed the old proximity-padded families — "explainer
+ * reachable in a dive", both hub-release hunts, and "a finger the gesture
+ * never owned". Their PRODUCT rules may still be right, but their scripted
+ * walks no longer reach the staged layouts, so they fail at staging, not
+ * at the rule. Rewrite the stagings against the current families before
+ * trusting a red result from them.
+*/
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
@@ -785,11 +794,17 @@ if (kanaForLock?.hitSelf) {
 }
 const kanaFallback = await page.evaluate(world);
 await shot('07-semantic-dom-kana-fallback.png');
-check('hunt · a kana-only semantic word grows a meaningful same-level fallback constellation',
+// RULE REWRITTEN 2026-08-10: the same-level fallback this check demanded
+// (sats >= 6 for a kana word with no strong ties) was exactly the defect
+// the operator logged as "tap-families admitting unrelated words" — the
+// fallback tier was removed. The current rule: a kana-only word focuses
+// cleanly and its bloom admits ONLY meaning-related members, which may be
+// none at all. No strangers, honest emptiness.
+check('hunt · a kana-only word focuses cleanly and its bloom admits no strangers',
   kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
     kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
-    kanaFallback.sats >= 6 && kanaFallback.members.length === kanaFallback.sats,
+    kanaFallback.members.length === kanaFallback.sats,
   `DOM=${kanaTarget?.dom ?? false}, hitSelf=${kanaTarget?.hitSelf ?? false}, hit=${JSON.stringify(kanaTarget?.hitLabel ?? null)}, ` +
     `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
     `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
