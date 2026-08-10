@@ -4489,6 +4489,81 @@ function renderWordNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/* The MAIN components of a kanji — its official radical and the one or two
+ * other major pieces, not every nested shape fragment (operator 2026-08-10,
+ * with WaniKani/Renzo examples: 快 → 忄+夬, not 忄・心・夬・大・人). The kanji data
+ * ships a flattened bag of every sub-shape, so this recovers the top level: a
+ * part is dropped when it sits inside another listed part. Containment has two
+ * sources — a component that is itself a kanji carries its own parts; a
+ * component that is not (夬, 咅, 袁) is resolved by co-occurrence, where a
+ * fragment that appears in EVERY kanji built from that component is a piece of
+ * it. The co-occurrence is guarded two ways: only for rare components (≤12
+ * host kanji, so a common radical's noise can't merge real siblings), and a
+ * smaller kanji may never absorb a larger standalone one (or 五 would swallow
+ * 吾 in 語). Radical variants written in place (忄 for 心, 氵 for 水) fold onto
+ * the form actually used, and lone connecting strokes drop once a real piece
+ * survives. Applied to every kanji entry. */
+const RADICAL_VARIANT = {
+  忄: '心', 氵: '水', 艹: '艸', 扌: '手', 犭: '犬', 礻: '示', 衤: '衣',
+  '⺍': '小', 纟: '糸', 讠: '言', 饣: '食', 阝: '邑', 亻: '人',
+};
+const GLUE_STROKE = new Set(['丶', '丿', '乀', '乁', '乛', '乚']);
+const _compsCache = new Map();
+function _strokeOf(x) {
+  const k = D.kanji[x];
+  if (k && k.st) return k.st;
+  const r = D.radicals[x];
+  if (r && r.st) return r.st;
+  return null;
+}
+function _componentsOf(q) {
+  if (_compsCache.has(q)) return _compsCache.get(q);
+  const out = new Set();
+  const kv = D.kanji[q];
+  if (kv && kv.parts) for (const p of kv.parts) if (p !== q) out.add(p);
+  const r = D.radicals[q];
+  if (r && r.kanji && r.kanji.length >= 2 && r.kanji.length <= 12) {
+    const lists = r.kanji.filter((x) => D.kanji[x]).map((x) => new Set(D.kanji[x].parts));
+    if (lists.length >= 2) {
+      const [first, ...rest] = lists;
+      const qInK = !!D.kanji[q];
+      const sq = _strokeOf(q);
+      for (const p of first) {
+        if (p === q || !rest.every((s) => s.has(p))) continue;
+        const sp = _strokeOf(p);
+        if (qInK && D.kanji[p] && sp != null && sq != null && sp > sq) continue;
+        out.add(p);
+      }
+    }
+  }
+  out.delete(q);
+  _compsCache.set(q, out);
+  return out;
+}
+function _allSub(q) {
+  const seen = new Set();
+  const stack = [..._componentsOf(q)];
+  while (stack.length) {
+    const x = stack.pop();
+    if (x !== q && !seen.has(x)) {
+      seen.add(x);
+      for (const y of _componentsOf(x)) stack.push(y);
+    }
+  }
+  return seen;
+}
+function mainParts(c) {
+  const k = D.kanji[c];
+  if (!k || !k.parts || !k.parts.length) return [];
+  const P = [...new Set(k.parts)];
+  const subs = new Map(P.map((q) => [q, _allSub(q)]));
+  let keep = P.filter((p) => !P.some((q) => q !== p && subs.get(q).has(p)));
+  const present = new Set(keep);
+  keep = keep.filter((p) => ![...present].some((v) => RADICAL_VARIANT[v] === p));
+  if (keep.length > 1) keep = keep.filter((p) => !GLUE_STROKE.has(p));
+  return keep.slice(0, 3);
+}
+
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
  * layer carry an empty `name` — they are shape components, not Kangxi radicals,
  * and the 漢検 table never named them. "unnamed part" said only that we had
@@ -4580,10 +4655,11 @@ function renderKanjiNode(sheet, node) {
   sheet.append(withEn(el('p', 'eyebrow', '筆順'), 'stroke order', 'en-inline'));
   sheet.append(strokeDoor(k));
 
-  if (k.parts.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '部品'), 'components', 'en-inline'));
+  const parts = mainParts(k.c);
+  if (parts.length) {
+    sheet.append(withEn(el('p', 'eyebrow', '部品'), 'main components', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    for (const c of k.parts) {
+    for (const c of parts) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.append(el('span', 'row-glyph', c));
