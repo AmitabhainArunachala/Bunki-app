@@ -2304,13 +2304,19 @@ function srsStore(item, card) {
   };
   saveStore();
 }
-/** Items ready to review: never-seen cards are due at once, like Anki's new
- * queue; the rest by their real due date. */
+/** Items ready to review: real reviews by their due date, then never-seen
+ * cards — capped at 20 a session, Anki's default pacing, so a long list
+ * arrives as days of honest work instead of one avalanche. */
+const NEW_PER_SESSION = 20;
 function srsDueItems(now = new Date()) {
-  return S.taken.filter((item) => {
+  const reviews = [];
+  const fresh = [];
+  for (const item of S.taken) {
     const rec = S.srs[srsKey(item.t, item.id)];
-    return !rec || new Date(rec.due) <= now;
-  });
+    if (!rec) fresh.push(item);
+    else if (new Date(rec.due) <= now) reviews.push(item);
+  }
+  return [...reviews, ...fresh.slice(0, NEW_PER_SESSION)];
 }
 /** Relative due label for a tray line — the row tells the truth per item. */
 function srsWhen(item) {
@@ -2327,7 +2333,7 @@ function srsWhen(item) {
 function startReview() {
   const queue = srsDueItems();
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 } };
+  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
   S.view = 'review';
   render();
 }
@@ -2379,6 +2385,7 @@ function renderReview(main) {
       render();
     });
     main.append(out);
+    renderReviewUndo(main, rv);
     return;
   }
   const item = rv.queue[rv.ix];
@@ -2405,6 +2412,7 @@ function renderReview(main) {
       render();
     });
     main.append(btn);
+    renderReviewUndo(main, rv);
     return;
   }
   const now = new Date();
@@ -2426,6 +2434,7 @@ function renderReview(main) {
     b.append(el('span', 'g-label', tx(ja, key)));
     b.append(el('span', 'g-when', when));
     b.addEventListener('click', () => {
+      rv.history.push({ key, prev: S.srs[srsKey(item.t, item.id)] });
       srsStore(item, result[fsrsApi.Rating[rating]].card);
       rv.done[key] += 1;
       rv.ix += 1;
@@ -2435,6 +2444,28 @@ function renderReview(main) {
     row.append(b);
   }
   main.append(row);
+  renderReviewUndo(main, rv);
+}
+/* Anki's most-used safety: the last grade can always be taken back — the
+ * previous card state is restored exactly, never recomputed. Reachable from
+ * every state of the session, the summary included. */
+function renderReviewUndo(main, rv) {
+  if (!rv.history.length) return;
+  const undo = biLabel('button', 'chip review-undo', 'ひとつ戻す', 'undo last grade');
+  undo.type = 'button';
+  undo.addEventListener('click', () => {
+    const last = rv.history.pop();
+    const prevItem = rv.queue[rv.ix - 1];
+    if (!prevItem) return;
+    if (last.prev === undefined) delete S.srs[srsKey(prevItem.t, prevItem.id)];
+    else S.srs[srsKey(prevItem.t, prevItem.id)] = last.prev;
+    saveStore();
+    rv.done[last.key] -= 1;
+    rv.ix -= 1;
+    rv.revealed = false;
+    render();
+  });
+  main.append(undo);
 }
 
 function renderSchedule(container) {

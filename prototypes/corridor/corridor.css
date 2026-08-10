@@ -2413,3 +2413,7 @@ body.v-depth-layered .stroke-page {
   margin: 6px 0 14px;
   flex-wrap: wrap;
 }
+
+.review-undo {
+  margin-top: 4px;
+}
