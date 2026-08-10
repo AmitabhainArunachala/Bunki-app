@@ -1287,13 +1287,18 @@ function markWalked(wr){
   while(WALKED.length>14){const old=WALKED.shift(); old.walked=false;}
 }
 function bloomFocus(n){
+  // A promoted satellite is drawn at its corpus position plus the held
+  // constellation offset. Plan the next family around that live position,
+  // not its (often off-screen) corpus home, or every edge clamp can collapse
+  // onto the same corner when the satellite becomes the new planet.
+  const bx=n.wref?n.wref.wx+n.wref.ox:(n.wx!=null?n.wx:cam.x);
+  const by=n.wref?n.wref.wy+n.wref.oy:(n.wy!=null?n.wy:cam.y);
   clearBloom(n.el?n:undefined);
   bloomBorn=performance.now(); bloomLast=bloomBorn;
   focusN=n;
   const ks=[...n.w].filter(isKanji);
   const cands=[];
   const seenB=new Set([n.w]);
-  const bx=n.wx!=null?n.wx:cam.x, by=n.wy!=null?n.wy:cam.y;
   // Authored, typed meaning relations lead. If that pilot has no edge for this
   // word, the outer ring may show only a plainly labelled SAME-CHARACTER
   // structure family. English gloss fragments, radical resemblance and nearby

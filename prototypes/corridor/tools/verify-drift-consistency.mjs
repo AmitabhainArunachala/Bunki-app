@@ -298,6 +298,95 @@ const worldProbe = `(() => ({
   depthOpen: (document.getElementById('depth')?.textContent ?? '') !== '',
   cardOpen: document.getElementById('card')?.classList.contains('open') ?? false,
 }))()`;
+const bloomGeometryProbe = `(() => {
+  const viewport = { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
+  const safe = { left: 12, top: 112, right: innerWidth - 12, bottom: innerHeight - 142 };
+  const round = (value) => Math.round(value * 10) / 10;
+  const allSatellites = [...document.querySelectorAll('#drift-layer .word.bsat')];
+  const satellites = allSatellites
+    .map((el, index) => {
+      const r = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      return {
+        index,
+        word: el.querySelector('.base')?.textContent ?? '',
+        visible: r.width > 0 && r.height > 0 && style.display !== 'none' &&
+          style.visibility !== 'hidden' && Number(style.opacity) > 0.05,
+        rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
+      };
+    })
+    .filter((entry) => entry.visible);
+  const outsideViewport = satellites.filter(({ rect: r }) =>
+    r.left < viewport.left || r.top < viewport.top || r.right > viewport.right || r.bottom > viewport.bottom);
+  const outsideSafeBody = satellites.filter(({ rect: r }) =>
+    r.left < safe.left || r.top < safe.top || r.right > safe.right || r.bottom > safe.bottom);
+  const overlaps = [];
+  for (let i = 0; i < satellites.length; i++) {
+    for (let j = i + 1; j < satellites.length; j++) {
+      const a = satellites[i];
+      const b = satellites[j];
+      const width = Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left);
+      const height = Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top);
+      if (width > 0.01 && height > 0.01)
+        overlaps.push({ a: a.word, b: b.word, width: round(width), height: round(height) });
+    }
+  }
+  const describe = ({ index, word, rect: r }) => ({
+    index,
+    word,
+    rect: { left: round(r.left), top: round(r.top), right: round(r.right), bottom: round(r.bottom) },
+  });
+  return {
+    ok: outsideViewport.length === 0 && outsideSafeBody.length === 0 && overlaps.length === 0,
+    bloomCentre: document.querySelector('#drift-layer .word.bctr')?.querySelector('.base')?.textContent ?? null,
+    total: allSatellites.length,
+    visible: satellites.length,
+    safe,
+    satellites: satellites.map(describe),
+    outsideViewport: outsideViewport.map(describe),
+    outsideSafeBody: outsideSafeBody.map(describe),
+    overlaps,
+  };
+})()`;
+const waitForBloomSettled = async (expectedCentre, { timeoutMs = 6000, intervalMs = 200, requiredSamples = 3 } = {}) => {
+  const started = Date.now();
+  let previous = null;
+  let consecutive = 0;
+  let latest = null;
+  let maxMotion = Infinity;
+  while (Date.now() - started <= timeoutMs) {
+    latest = await page.evaluate(bloomGeometryProbe);
+    const current = new Map(latest.satellites.map((entry) => [`${entry.index}:${entry.word}`, entry.rect]));
+    const comparable = previous && previous.size === current.size &&
+      [...current.keys()].every((key) => previous.has(key));
+    maxMotion = comparable
+      ? Math.max(0, ...[...current].flatMap(([key, rect]) => {
+          const prior = previous.get(key);
+          return [
+            Math.abs(rect.left - prior.left),
+            Math.abs(rect.top - prior.top),
+            Math.abs(rect.right - prior.right),
+            Math.abs(rect.bottom - prior.bottom),
+          ];
+        }))
+      : Infinity;
+    const stateReady = latest.bloomCentre === expectedCentre && latest.total > 0 && latest.visible === latest.total;
+    const stable = comparable && maxMotion <= 0.75;
+    consecutive = stateReady && latest.ok && stable ? consecutive + 1 : 0;
+    if (consecutive >= requiredSamples) {
+      return { settled: true, elapsedMs: Date.now() - started, consecutive, maxMotion, geometry: latest };
+    }
+    previous = current;
+    await page.waitForTimeout(intervalMs);
+  }
+  return {
+    settled: false,
+    elapsedMs: Date.now() - started,
+    consecutive,
+    maxMotion,
+    geometry: latest,
+  };
+};
 
 const pickOne = (exclude) => page.evaluate(`(() => {
   const done = new Set(${JSON.stringify([...exclude])});
@@ -537,8 +626,12 @@ for (let round = 0; round < N_WORDS; round++) {
   const chainStart = await aimWord(word.w);
   if (chainStart.aimable) {
     await tapAt(chainStart.x, chainStart.y);
-    await page.waitForTimeout(1400); // satellites glide to their ring first
-    const satPick = await page.evaluate(`(() => {
+    // A family assembles from corpus positions, so a fixed delay made this
+    // coverage depend on whether the chosen words happened to begin nearby.
+    // Use the same bounded, geometry-aware settlement contract as the long
+    // chain below before selecting a satellite for the three I3/I4 probes.
+    const matrixBloomSettle = await waitForBloomSettled(word.w);
+    const satPick = matrixBloomSettle.settled ? await page.evaluate(`(() => {
       const sats = [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
         const r = el.getBoundingClientRect();
         return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -550,7 +643,20 @@ for (let round = 0; round < N_WORDS; round++) {
         return { w: s.el.querySelector('.base')?.textContent ?? '' };
       }
       return null;
-    })()`);
+    })()`) : null;
+    if (!matrixBloomSettle.settled) {
+      const geometry = matrixBloomSettle.geometry;
+      await file(
+        word,
+        'sat-flick',
+        'a settled satellite exists for the chain battery',
+        'detached',
+        `settle timeout ${matrixBloomSettle.elapsedMs}ms; ` +
+          `viewport=${JSON.stringify(geometry?.outsideViewport ?? [])}; ` +
+          `safeBody=${JSON.stringify(geometry?.outsideSafeBody ?? [])}; ` +
+          `overlaps=${JSON.stringify(geometry?.overlaps ?? [])}`,
+      );
+    }
     if (satPick && satPick.w) {
       const satWord = { w: satPick.w, kanji: (satPick.w.match(/[\u4e00-\u9fff]/g) ?? []).length };
       // flick a satellite: must NOT grade while the constellation is open
@@ -729,11 +835,11 @@ if (!chainStartWord) {
       break;
     }
     await tapAt(second.x, second.y);
-    await page.waitForTimeout(1700);
+    const settleResult = await waitForBloomSettled(satellite.w);
     const afterRecentre = await page.evaluate(worldProbe);
     const newCentre = await page.evaluate(wordProbe(satellite.w, 'bctr'));
     const oldCentre = await page.evaluate(wordProbe(previousCentre));
-    const hopOk =
+    const recentreOk =
       newCentre.exists &&
       newCentre.isCentre &&
       oldCentre.exists &&
@@ -741,12 +847,21 @@ if (!chainStartWord) {
       // Sparse, sourced families are valid. Requiring six here rewarded the
       // old arbitrary filler that the semantic integrity pass removed.
       afterRecentre.sats > 0;
+    const geometry = settleResult.geometry;
+    const hopOk = recentreOk && settleResult.settled && geometry?.ok;
+    const geometryDetail = geometry
+      ? `settled=${settleResult.settled}; settleMs=${settleResult.elapsedMs}; ` +
+        `stableSamples=${settleResult.consecutive}; maxMotion=${Number.isFinite(settleResult.maxMotion) ? settleResult.maxMotion.toFixed(2) : 'unmatched'}; ` +
+        `geometry=${geometry.ok ? 'clear' : 'broken'}; visible=${geometry.visible}/${geometry.total}; ` +
+        `viewport=${JSON.stringify(geometry.outsideViewport)}; ` +
+        `safeBody=${JSON.stringify(geometry.outsideSafeBody)}; overlaps=${JSON.stringify(geometry.overlaps)}`
+      : 'geometry=not-reached';
     await file(
       { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
       'chain-hop',
-      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet without deleting the prior planet`,
+      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet and keeps every visible satellite inside the safe body without overlap`,
       hopOk ? 'ok' : !newCentre.exists || !oldCentre.exists ? 'vanished' : 'detached',
-      `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}`,
+      `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}; ${geometryDetail}`,
       { state: 'bloom', hop },
     );
     if (!hopOk) break;

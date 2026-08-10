@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-10T14:46:50.325Z",
-  "finishedAt": "2026-08-10T14:49:02.736Z",
+  "startedAt": "2026-08-10T16:18:55.062Z",
+  "finishedAt": "2026-08-10T16:21:22.489Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -39,6 +39,7 @@
       "encodedGestures": [
         "cancel+tap",
         "chain-hop",
+        "fuzz-cancel-fallback",
         "fuzz-pan",
         "fuzz-pinch-in",
         "fuzz-pinch-out",
@@ -88,16 +89,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 59.36999320983887,
-          "y": 554.6400146484375,
+          "x": 58.83999824523926,
+          "y": 544.6099853515625,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 222.16000366210938,
-          "y": 553.6799926757812,
+          "x": 218.5,
+          "y": 573.0499877929688,
           "onScreen": true
         }
       },
@@ -174,7 +175,7 @@
       "gesture": "tide-stop",
       "expected": "hot control >=44px and selected level >=80% of visible words",
       "outcome": "ok",
-      "detail": "restWidth=44.0px; hot=true; hotWidth=56.0px; N1=80.0% (20 levelled words)",
+      "detail": "restWidth=44.0px; hot=true; hotWidth=55.9px; N1=80.0% (20 levelled words)",
       "shot": null,
       "state": "surface",
       "coordinates": {
@@ -327,8 +328,8 @@
       "shot": null
     },
     {
-      "word": "句読点",
-      "kanji": 3,
+      "word": "腹立ち",
+      "kanji": 2,
       "theme": "北斎",
       "gesture": "sat-flick",
       "expected": "no judgment on satellites",
@@ -337,8 +338,8 @@
       "shot": null
     },
     {
-      "word": "句読点",
-      "kanji": 3,
+      "word": "腹立ち",
+      "kanji": 2,
       "theme": "北斎",
       "gesture": "sat-tap",
       "expected": "reveals in place",
@@ -347,8 +348,8 @@
       "shot": null
     },
     {
-      "word": "句読点",
-      "kanji": 3,
+      "word": "腹立ち",
+      "kanji": 2,
       "theme": "北斎",
       "gesture": "sat-recentre",
       "expected": "becomes the planet",
@@ -462,9 +463,9 @@
       "kanji": 2,
       "theme": "北斎",
       "gesture": "chain-hop",
-      "expected": "hop 1/3 makes the satellite the held planet without deleting the prior planet",
+      "expected": "hop 1/3 makes the satellite the held planet and keeps every visible satellite inside the safe body without overlap",
       "outcome": "ok",
-      "detail": "centre=作戦; sats=14; priorExists=true",
+      "detail": "centre=作戦; sats=14; priorExists=true; settled=true; settleMs=2674; stableSamples=3; maxMotion=0.10; geometry=clear; visible=14/14; viewport=[]; safeBody=[]; overlaps=[]",
       "shot": null,
       "state": "bloom",
       "hop": 1
@@ -474,21 +475,21 @@
       "kanji": 2,
       "theme": "北斎",
       "gesture": "chain-hop",
-      "expected": "hop 2/3 makes the satellite the held planet without deleting the prior planet",
+      "expected": "hop 2/3 makes the satellite the held planet and keeps every visible satellite inside the safe body without overlap",
       "outcome": "ok",
-      "detail": "centre=耕作; sats=14; priorExists=true",
+      "detail": "centre=耕作; sats=14; priorExists=true; settled=true; settleMs=3441; stableSamples=3; maxMotion=0.20; geometry=clear; visible=14/14; viewport=[]; safeBody=[]; overlaps=[]",
       "shot": null,
       "state": "bloom",
       "hop": 2
     },
     {
-      "word": "耕地",
-      "kanji": 2,
+      "word": "耕す",
+      "kanji": 1,
       "theme": "北斎",
       "gesture": "chain-hop",
-      "expected": "hop 3/3 makes the satellite the held planet without deleting the prior planet",
+      "expected": "hop 3/3 makes the satellite the held planet and keeps every visible satellite inside the safe body without overlap",
       "outcome": "ok",
-      "detail": "centre=耕地; sats=14; priorExists=true",
+      "detail": "centre=耕す; sats=3; priorExists=true; settled=true; settleMs=3710; stableSamples=3; maxMotion=0.10; geometry=clear; visible=3/3; viewport=[]; safeBody=[]; overlaps=[]",
       "shot": null,
       "state": "bloom",
       "hop": 3
@@ -595,19 +596,15 @@
       "word": "戦う",
       "kanji": 1,
       "theme": "北斎",
-      "gesture": "fuzz-sat-reveal",
+      "gesture": "fuzz-cancel-fallback",
       "expected": "camera/state action preserves the held planet and emits no runtime error",
       "outcome": "ok",
-      "detail": "satellite=戦術; exists=true; glossed=true",
+      "detail": "centre=戦う; exists=true; newErrors=0",
       "shot": null,
       "state": "fuzz",
       "seed": 1729,
       "step": 5,
-      "coordinates": {
-        "x": 297.6000061035156,
-        "y": 627.1699829101562,
-        "satellite": "戦術"
-      }
+      "coordinates": null
     },
     {
       "word": "戦う",
@@ -660,8 +657,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 135.2100067138672,
-        "y": 288.5899963378906,
+        "x": 137.71000289916992,
+        "y": 275.4100112915039,
         "satellite": "大戦"
       }
     },
@@ -697,8 +694,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 286.9599914550781,
-        "y": 286.6300048828125,
+        "x": 285.8800048828125,
+        "y": 286.6199951171875,
         "satellite": "作戦"
       }
     },
@@ -715,8 +712,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 218.55999755859375,
-        "y": 273.6199951171875,
+        "x": 218.52000427246094,
+        "y": 272.1000061035156,
         "satellite": "戦争"
       }
     },
@@ -733,10 +730,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 119,
-        "y0": 468.3900146484375,
-        "x1": 149,
-        "y1": 476.3900146484375
+        "x0": 125.41999816894531,
+        "y0": 462.54998779296875,
+        "x1": 155.4199981689453,
+        "y1": 470.54998779296875
       }
     }
   ]

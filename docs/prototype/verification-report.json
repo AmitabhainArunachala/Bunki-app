@@ -234,12 +234,12 @@
         "key": "kanji:過",
         "history": 1,
         "admitted": 1,
-        "lastReviewedAt": "2026-08-10T14:34:12.342Z",
-        "dueAt": "2026-08-10T14:44:12.342Z",
+        "lastReviewedAt": "2026-08-10T16:09:11.249Z",
+        "dueAt": "2026-08-10T16:19:11.249Z",
         "receiptGrade": "good",
         "effectiveGrade": "good",
         "revealedBeforeRecall": false,
-        "receiptDueAt": "2026-08-10T14:44:12.342Z"
+        "receiptDueAt": "2026-08-10T16:19:11.249Z"
       },
       "finite": {
         "plan": 20,
@@ -8916,7 +8916,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 1112,
+  "loadMs": 1226,
   "summary": {
     "total": 91,
     "failed": 0
@@ -8945,7 +8945,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":150.3800048828125,\"y\":584.8200073242188,\"productive\":true}"
+      "detail": "{\"x\":151.42999267578125,\"y\":584.1400146484375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -8955,7 +8955,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre 87px; family 81px; mean tether 129 → 161px; max 205px; clipped 0"
+      "detail": "centre 86px; family 49px; mean tether 153 → 162px; max 202px; clipped 0"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -8965,7 +8965,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 1112 ms; search 298/316px"
+      "detail": "40 texts, ready in 1226 ms; search 298/316px"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
