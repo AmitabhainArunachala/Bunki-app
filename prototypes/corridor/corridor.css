@@ -2853,3 +2853,24 @@ body.v-depth-layered .stroke-page {
   font-size: 17px;
   color: var(--ink);
 }
+
+/* "show all" affordance under a capped list (kanji compounds): a full-width
+ * indigo text row — 藍 says "you can go here" — that reveals the remainder in
+ * place, so the whole dictionary depth is one tap away, never truncated. */
+.more-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  padding: 13px 2px;
+  font-family: var(--sans);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--ai, #2e4d6e);
+  cursor: pointer;
+}
+.more-row:active {
+  opacity: 0.6;
+}

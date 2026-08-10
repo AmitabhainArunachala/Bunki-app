@@ -711,13 +711,37 @@ async function boot() {
     original: [...articleIndex.sources.original, ...grammarV11.sources],
   };
 
-  // kanji → words containing it, derived here rather than shipped twice
+  // kanji → words containing it, from the FULL bundled dictionary (dict.json,
+  // ~23k entries) unioned with the graded word list — NOT the 7,910-entry
+  // subset that once fed this and showed only a paltry few compounds per kanji
+  // (快 had 7 where a real kanji dictionary has dozens). Ordering is by
+  // commonness: graded (JLPT-tagged) words first, most-common level first, then
+  // shorter words, so the everyday compounds sit at the top like a paper
+  // dictionary. The ceiling now scales automatically with a larger dictionary.
   D.kanjiWords = {};
-  for (const w of Object.values(D.words)) {
-    for (const c of w.k || []) (D.kanjiWords[c] ||= []).push(w.w);
-  }
-  for (const c of Object.keys(D.kanjiWords)) {
-    D.kanjiWords[c].sort((a, b) => a.length - b.length || (a < b ? -1 : 1));
+  {
+    const isKanji = (c) => c >= '一' && c <= '鿿';
+    const buckets = {};
+    const add = (c, w) => (buckets[c] ||= new Set()).add(w);
+    for (const rec of Object.values(D.words)) {
+      const chars = rec.k && rec.k.length ? rec.k : [...rec.w].filter(isKanji);
+      for (const c of chars) add(c, rec.w);
+    }
+    for (const [w, rec] of Object.entries(D.dict)) {
+      const chars = rec.k && rec.k.length ? rec.k : [...w].filter(isKanji);
+      for (const c of chars) add(c, w);
+    }
+    const rank = (w) => {
+      const g = D.words[w];
+      const graded = g && g.jlpt ? 0 : 1;
+      const jl = g && g.jlpt ? 5 - g.jlpt : 9;
+      return graded * 100 + jl * 10 + Math.min([...w].length, 9);
+    };
+    for (const c of Object.keys(buckets)) {
+      D.kanjiWords[c] = [...buckets[c]].sort(
+        (a, b) => rank(a) - rank(b) || [...a].length - [...b].length || (a < b ? -1 : 1),
+      );
+    }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
 
@@ -4518,12 +4542,15 @@ function renderKanjiNode(sheet, node) {
     sheet.append(rows);
   }
 
-  // COMMON COMPOUNDS — reading + first gloss per row, every row a door
+  // COMMON COMPOUNDS — reading + first gloss per row, every row a door.
+  // No silent cap: an initial page, then "show all" reveals the whole list
+  // (Renzo shows "6 of 96" the same way). The count in the heading is the true
+  // total, so the depth of the dictionary is visible at a glance.
   const words = D.kanjiWords[k.c] || [];
   if (words.length) {
     sheet.append(withEn(el('p', 'eyebrow', `よく使う語 — ${words.length} 語`), 'common compounds', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    for (const w of words.slice(0, D.wordCap)) {
+    const makeRow = (w) => {
       const g = lookup(w);
       const row = el('button', 'entry-row compound');
       row.type = 'button';
@@ -4536,9 +4563,22 @@ function renderKanjiNode(sheet, node) {
       row.append(main);
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'word', id: w, from: node.from }));
-      rows.append(row);
-    }
+      return row;
+    };
+    const FIRST = 24;
+    for (const w of words.slice(0, FIRST)) rows.append(makeRow(w));
     sheet.append(rows);
+    if (words.length > FIRST) {
+      const more = el('button', 'more-row');
+      more.type = 'button';
+      const remain = words.length - FIRST;
+      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${words.length} — ${remain} more`);
+      more.addEventListener('click', () => {
+        for (const w of words.slice(FIRST)) rows.append(makeRow(w));
+        more.remove();
+      });
+      sheet.append(more);
+    }
   } else {
     sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
     sheet.append(
