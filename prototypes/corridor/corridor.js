@@ -3954,6 +3954,96 @@ function renderAiReading(main) {
   }
 }
 
+/* ------------------------------------------------------------- 活用
+ * Conjugation, computed — every dictionary app's table, derived from the
+ * headword and its part of speech, no data shipped. Godan rows and the
+ * euphonic te-forms are the whole of it; the two honest exclusions are
+ * いい-type adjectives and lone する／来る (irregular beyond their worth
+ * here — their entries still show everything else). */
+const GODAN_ROW = {
+  う: ['わ', 'い', 'え', 'お'], く: ['か', 'き', 'け', 'こ'], ぐ: ['が', 'ぎ', 'げ', 'ご'],
+  す: ['さ', 'し', 'せ', 'そ'], つ: ['た', 'ち', 'て', 'と'], ぬ: ['な', 'に', 'ね', 'の'],
+  ぶ: ['ば', 'び', 'べ', 'ぼ'], む: ['ま', 'み', 'め', 'も'], る: ['ら', 'り', 'れ', 'ろ'],
+};
+const GODAN_TE = { う: 'って', つ: 'って', る: 'って', ぬ: 'んで', ぶ: 'んで', む: 'んで', く: 'いて', ぐ: 'いで', す: 'して' };
+function conjugations(word, pos) {
+  if (!pos || !word) return null;
+  if (/godan verb/.test(pos)) {
+    const last = word.slice(-1);
+    const row = GODAN_ROW[last];
+    if (!row) return null;
+    const stem = word.slice(0, -1);
+    const [a, i, e, o] = row;
+    const te = word.endsWith('行く') || word === '行く' ? `${stem}って` : stem + GODAN_TE[last];
+    return [
+      ['ます形', 'polite', `${stem}${i}ます`],
+      ['て形', 'te-form', te],
+      ['た形', 'past', te.replace(/て$/, 'た').replace(/で$/, 'だ')],
+      ['ない形', 'negative', `${stem}${a}ない`],
+      ['可能', 'potential', `${stem}${e}る`],
+      ['ば形', 'conditional', `${stem}${e}ば`],
+      ['意向形', 'volitional', `${stem}${o}う`],
+      ['受身', 'passive', `${stem}${a}れる`],
+      ['使役', 'causative', `${stem}${a}せる`],
+      ['命令形', 'imperative', `${stem}${e}`],
+    ];
+  }
+  if (/ichidan verb/.test(pos) && word.endsWith('る')) {
+    const stem = word.slice(0, -1);
+    return [
+      ['ます形', 'polite', `${stem}ます`],
+      ['て形', 'te-form', `${stem}て`],
+      ['た形', 'past', `${stem}た`],
+      ['ない形', 'negative', `${stem}ない`],
+      ['可能・受身', 'potential / passive', `${stem}られる`],
+      ['ば形', 'conditional', `${stem}れば`],
+      ['意向形', 'volitional', `${stem}よう`],
+      ['使役', 'causative', `${stem}させる`],
+      ['命令形', 'imperative', `${stem}ろ`],
+    ];
+  }
+  if (/suru verb/.test(pos) && !/godan|ichidan/.test(pos) && !/する$/.test(word)) {
+    return [
+      ['ます形', 'polite', `${word}します`],
+      ['て形', 'te-form', `${word}して`],
+      ['た形', 'past', `${word}した`],
+      ['ない形', 'negative', `${word}しない`],
+      ['可能', 'potential', `${word}できる`],
+      ['ば形', 'conditional', `${word}すれば`],
+      ['意向形', 'volitional', `${word}しよう`],
+      ['受身', 'passive', `${word}される`],
+    ];
+  }
+  if (/i-adjective/.test(pos) && word.endsWith('い') && !word.endsWith('いい')) {
+    const stem = word.slice(0, -1);
+    return [
+      ['く形', 'adverbial', `${stem}く`],
+      ['て形', 'te-form', `${stem}くて`],
+      ['た形', 'past', `${stem}かった`],
+      ['ない形', 'negative', `${stem}くない`],
+      ['ば形', 'conditional', `${stem}ければ`],
+    ];
+  }
+  return null;
+}
+
+function renderConjugation(sheet, word, pos) {
+  const rows = conjugations(word, pos);
+  if (!rows) return;
+  sheet.append(withEn(el('p', 'eyebrow', '活用'), 'conjugation', 'en-inline'));
+  const table = el('div', 'conj-table');
+  for (const [ja, en, form] of rows) {
+    const row = el('div', 'conj-row');
+    const label = el('span', 'conj-label');
+    label.append(document.createTextNode(ja));
+    if (bi()) label.append(el('span', 'conj-en', en));
+    row.append(label);
+    row.append(el('span', 'conj-form', form));
+    table.append(row);
+  }
+  sheet.append(table);
+}
+
 function renderWordNode(sheet, node) {
   const rec = lookup(node.id);
   const legacy = D.words[node.id];
@@ -3987,6 +4077,7 @@ function renderWordNode(sheet, node) {
     meta.append(el('span', 'pool-tag', `JLPT ${String(jlpt).replace(/^N?/, 'N')}`));
     sheet.append(meta);
   }
+  renderConjugation(sheet, node.id, rec?.p);
   renderAiTutor(sheet, node, rec);
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry
