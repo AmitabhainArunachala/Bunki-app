@@ -68,7 +68,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
 
-# curl, not node fetch: unconsumed keep-alive bodies trip an undici
+          # curl, not node fetch: unconsumed keep-alive bodies trip an undici
           # internal assertion at process exit on some Node lines (seen live:
           # "assert(!this.paused)" AFTER every path had already printed 200)
           for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
