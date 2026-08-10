@@ -302,6 +302,9 @@ const S = {
   aiChat: [],
   /** a running tutor quiz: { qs, ix, picked, correct } — in-memory only */
   aiQuiz: null,
+  /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
+   * from the first graded card onward; nothing is backfilled or invented */
+  stats: {},
   /** articles marked finished: { passageId: ts } */
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
@@ -339,6 +342,7 @@ function loadStore() {
     if (s.aiReading && typeof s.aiReading === 'object') S.aiReading = s.aiReading;
     if (s.suspended && typeof s.suspended === 'object') S.suspended = s.suspended;
     if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
+    if (s.stats && typeof s.stats === 'object') S.stats = s.stats;
     if (s.readDone && typeof s.readDone === 'object') S.readDone = s.readDone;
     if (s.readerPos && typeof s.readerPos === 'object') S.readerPos = s.readerPos;
   } catch {
@@ -347,10 +351,16 @@ function loadStore() {
 }
 function saveStore() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, suspended: S.suspended, aiChat: S.aiChat.slice(-24), readDone: S.readDone, readerPos: S.readerPos }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, suspended: S.suspended, aiChat: S.aiChat.slice(-24), stats: S.stats, readDone: S.readDone, readerPos: S.readerPos }));
   } catch {
     /* quota or private mode — the session keeps working unpersisted */
   }
+}
+
+/** Local calendar day for the review trace — the learner's day, not UTC's. */
+function dayKey(d = new Date()) {
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
 /** Month bucket label for an epoch ms — the automatic Renzo-style list. */
@@ -1843,6 +1853,22 @@ function renderTray(main) {
         ),
       );
     }
+    // the review trace: the last seven days as they actually happened
+    const totalReviews = Object.values(S.stats).reduce((a, s) => a + (s.n || 0), 0);
+    if (totalReviews > 0) {
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000);
+        days.push(S.stats[dayKey(d)]?.n || 0);
+      }
+      main.append(
+        el(
+          'p',
+          'srs-forecast srs-trace',
+          tx(`この7日 ${days.join('・')} ｜ 計 ${totalReviews}`, `last 7 days ${days.join(' · ')} | all time ${totalReviews}`),
+        ),
+      );
+    }
     // one layer of the tutor's testing — absent without a key
     if (aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
       const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'a quiz from the tutor');
@@ -3315,8 +3341,13 @@ function renderReview(main) {
     b.append(el('span', 'g-label', tx(ja, key)));
     b.append(el('span', 'g-when', when));
     b.addEventListener('click', () => {
-      rv.history.push({ key, prev: S.srs[srsKey(item.t, item.id)] });
+      const day = dayKey();
+      rv.history.push({ key, prev: S.srs[srsKey(item.t, item.id)], day });
       srsStore(item, result[fsrsApi.Rating[rating]].card);
+      const st = (S.stats[day] ||= { n: 0, again: 0 });
+      st.n += 1;
+      if (key === 'again') st.again += 1;
+      saveStore();
       rv.done[key] += 1;
       rv.ix += 1;
       rv.revealed = false;
@@ -3361,6 +3392,11 @@ function renderReviewUndo(main, rv) {
       if (last.prev === undefined) delete S.srs[key];
       else S.srs[key] = last.prev;
       rv.done[last.key] -= 1;
+      const st = last.day && S.stats[last.day];
+      if (st) {
+        st.n = Math.max(0, st.n - 1);
+        if (last.key === 'again') st.again = Math.max(0, st.again - 1);
+      }
     }
     saveStore();
     rv.ix -= 1;
