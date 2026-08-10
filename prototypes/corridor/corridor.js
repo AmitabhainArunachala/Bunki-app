@@ -1900,6 +1900,7 @@ function renderTray(main) {
       const line = el('div', 'tray-line');
       line.append(el('span', 'w', item.label));
       line.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
+      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
       line.append(el('span', 'when', srsWhen(item)));
       // rest / wake — the card stays on the list, reviews skip it
       const key = srsKey(item.t, item.id);
@@ -3086,6 +3087,15 @@ function srsStore(item, card) {
  * cards — capped at 20 a session, Anki's default pacing, so a long list
  * arrives as days of honest work instead of one avalanche. */
 const NEW_PER_SESSION = 20;
+/* Anki's leech, simplified and softened: a card that keeps lapsing is
+ * named 苦手 and offered a rest — surfaced, never auto-hidden. Partial
+ * knowledge is first-class; the learner decides what rests. */
+const LEECH_LAPSES = 6;
+function isLeech(item) {
+  const key = srsKey(item.t, item.id);
+  const rec = S.srs[key];
+  return !!rec && (rec.lapses || 0) >= LEECH_LAPSES && !S.suspended[key];
+}
 function srsDueItems(now = new Date()) {
   const reviews = [];
   const fresh = [];
@@ -3178,6 +3188,35 @@ function renderReview(main) {
     for (const key of ['again', 'hard', 'good', 'easy'])
       if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
     main.append(sum);
+    // the struggling cards, by name — with a rest offered, never imposed
+    const leeches = rv.queue.filter(isLeech);
+    if (leeches.length) {
+      main.append(withEn(el('p', 'eyebrow list-head', '苦手な札'), 'cards that keep slipping', 'en-inline'));
+      main.append(
+        el(
+          'p',
+          'gloss',
+          tx(
+            '何度も戻ってくる札。休ませるのも手 — リストから、いつでも起こせる。',
+            'These keep coming back. Letting one rest is a fair move — you can wake it from the list whenever you like.',
+          ),
+        ),
+      );
+      for (const item of leeches) {
+        const row = el('div', 'leech-row');
+        row.append(el('span', 'w', item.label));
+        const rest = biLabel('button', 'chip', '休ませる', 'let it rest');
+        rest.type = 'button';
+        rest.dataset.leechRest = item.id;
+        rest.addEventListener('click', () => {
+          S.suspended[srsKey(item.t, item.id)] = Date.now();
+          saveStore();
+          render();
+        });
+        row.append(rest);
+        main.append(row);
+      }
+    }
     renderAiCoach(main, rv);
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';

@@ -2726,3 +2726,18 @@ body.v-depth-layered .stroke-page {
   color: var(--ink);
   margin: 6px 0 4px;
 }
+
+/* the struggling cards on the session summary */
+.leech-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line-soft);
+  padding: 8px 0;
+}
+
+.leech-row .w {
+  font-family: var(--serif);
+  font-size: 18px;
+}
