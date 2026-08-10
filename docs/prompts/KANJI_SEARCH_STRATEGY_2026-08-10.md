@@ -18,7 +18,7 @@ digests of those pages; the taxonomy is cross-corroborated.
 
 **Partially — so yes, we should add it as a first-class plan.**
 
-- The vision codex (`JAPANESE_LEARNING_OS_CODEX_V1_FREEZE`) *gestures* at two of
+- The vision codex (`JAPANESE_LEARNING_OS_CODEX_V1_FREEZE`) _gestures_ at two of
   the nine methods: **handwriting** is named but explicitly **deferred**
   ("only when the learner activates it"; "deferred until the user's desired
   role for writing is known"), and **camera/OCR** is filed under **"Later"**
@@ -41,27 +41,28 @@ Ranked roughly by modern real-world value. "KAIRO today" = what the corridor
 already has. "Data on hand" = whether we can build it with what's already in
 the bundle.
 
-| # | Method | Reading needed? | For whom | KAIRO today | Data on hand |
-|---|--------|-----------------|----------|-------------|--------------|
-| 1 | **Camera / OCR** (point at text) | no | everyone; the 2020s default | ✗ | ✗ (needs an OCR engine) |
-| 2 | **Multi-radical** (tap any components you see; intersect; grey out the impossible) | no | beginner→intermediate default at a keyboard | partial (single component only) | **✓ (D.radicals: component→kanji)** |
-| 3 | **Handwriting / draw** (stroke-order-tolerant) | no | decorative/handwritten forms; offline; the operator asked for this | ✗ | **✓ (KanjiVG stroke paths in strokes.json)** |
-| 4 | **Reading (on/kun, romaji)** | yes | confirming/producing a known reading | partial (mixed text box) | **✓ (k.on / k.kun)** |
-| 5 | **Meaning / English** | no | reverse lookup / production | partial (text box) | **✓ (k.m)** |
-| 6 | **SKIP** (shape pattern 1–4 + segment stroke counts) | no | KKLD users; systematic shape index | ✗ | ✗ (needs SKIP codes from KANJIDIC2) |
-| 7 | **By frequency / grade / JLPT browse** | — | study sequencing, not glyph lookup | partial (JLPT/漢検 lanes exist) | mostly ✓ (grade/JLPT; freq missing) |
-| 8 | **Stroke-count browse** | no | last-resort disambiguator | **✓ (in 字引)** | ✓ |
-| 9 | **Single Kangxi radical** ("which radical is *the* radical?") | no | legacy/paper | n/a | ✓ but **de-prioritize** |
+| #   | Method                                                                             | Reading needed? | For whom                                                           | KAIRO today                     | Data on hand                                 |
+| --- | ---------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------ | ------------------------------- | -------------------------------------------- |
+| 1   | **Camera / OCR** (point at text)                                                   | no              | everyone; the 2020s default                                        | ✗                               | ✗ (needs an OCR engine)                      |
+| 2   | **Multi-radical** (tap any components you see; intersect; grey out the impossible) | no              | beginner→intermediate default at a keyboard                        | partial (single component only) | **✓ (D.radicals: component→kanji)**          |
+| 3   | **Handwriting / draw** (stroke-order-tolerant)                                     | no              | decorative/handwritten forms; offline; the operator asked for this | ✗                               | **✓ (KanjiVG stroke paths in strokes.json)** |
+| 4   | **Reading (on/kun, romaji)**                                                       | yes             | confirming/producing a known reading                               | partial (mixed text box)        | **✓ (k.on / k.kun)**                         |
+| 5   | **Meaning / English**                                                              | no              | reverse lookup / production                                        | partial (text box)              | **✓ (k.m)**                                  |
+| 6   | **SKIP** (shape pattern 1–4 + segment stroke counts)                               | no              | KKLD users; systematic shape index                                 | ✗                               | ✗ (needs SKIP codes from KANJIDIC2)          |
+| 7   | **By frequency / grade / JLPT browse**                                             | —               | study sequencing, not glyph lookup                                 | partial (JLPT/漢検 lanes exist) | mostly ✓ (grade/JLPT; freq missing)          |
+| 8   | **Stroke-count browse**                                                            | no              | last-resort disambiguator                                          | **✓ (in 字引)**                 | ✓                                            |
+| 9   | **Single Kangxi radical** ("which radical is _the_ radical?")                      | no              | legacy/paper                                                       | n/a                             | ✓ but **de-prioritize**                      |
 
 **The pedagogy verdict** (what to lead with):
+
 - **OCR is now the dominant real-world method** — lowest effort, whole
-  passages at once. But it's the heaviest to build offline and the *least
-  calm* interaction, and the codex already parks it under "Later."
+  passages at once. But it's the heaviest to build offline and the _least
+  calm_ interaction, and the codex already parks it under "Later."
 - **Multi-radical is the #1 structural method** and the one learners actually
   use at a keyboard. It removes the classic "which radical is the radical?"
-  failure — you match *any* parts you can see and the set collapses. Jisho's
+  failure — you match _any_ parts you can see and the set collapses. Jisho's
   single biggest, most-cited frustration is that its radical grid is
-  *stroke-sorted and unlabeled*; the whole community wrote userscripts to add
+  _stroke-sorted and unlabeled_; the whole community wrote userscripts to add
   a searchable radical box. **We can beat Jisho here for free.**
 - **Handwriting is now a fallback, not a headline** (one major app removed it
   in 2025) — but it's exactly the case OCR fails on (calligraphy, signs,
@@ -78,7 +79,7 @@ the bundle.
   once.
 
 **App landscape in one line:** text + single-radical + stroke count are
-table-stakes; apps differentiate on (a) handwriting recognition *quality*
+table-stakes; apps differentiate on (a) handwriting recognition _quality_
 (Yomiwa, Shirabe lead), (b) whether they have camera OCR at all (Yomiwa,
 Nihongo), and (c) loved power features — SKIP (imiwa?), wildcard (Shirabe),
 auto-clipboard (Takoboto), faceted "stack the filters" search (Kanji Study).
@@ -88,6 +89,7 @@ auto-clipboard (Takoboto), faceted "stack the filters" search (Kanji Study).
 ## 3. Strategy for KAIRO
 
 ### The shape of it: one door, several lenses
+
 Fold everything into the existing **`字引` "find a kanji by its shape"** as one
 calm surface with switchable lenses — not scattered features. A quiet row of
 modes at the top (部品 · 手書き · 画数 · 音訓 · 意味 · SKIP), each swapping the
@@ -98,8 +100,9 @@ grade) while staying in the corridor's paper aesthetic.
 ### Build order (highest value / lowest cost first)
 
 **Phase A — the two free wins (no new data, uses what we ship):**
+
 1. **Multi-radical component picker.** Upgrade `字引` from single-component to
-   *select several* components; intersect (`D.radicals[c].kanji`), and **grey
+   _select several_ components; intersect (`D.radicals[c].kanji`), and **grey
    out components that can no longer co-occur** with the current selection —
    the move that makes it fast and forgiving. Add a small **name/reading filter
    over the component grid** (the thing Jisho users had to hack in). This is
@@ -110,25 +113,22 @@ grade) while staying in the corridor's paper aesthetic.
    data, and exactly what the operator asked for. (Reference open engines:
    KanjiCanvas / Ctegaki, both KanjiVG-based, MIT.)
 
-**Phase B — reading/meaning/browse (small data, mostly on hand):**
-3. **Reading (音・訓) and Meaning (英) kanji lenses** built from `k.on`/`k.kun`/
-   `k.m` — direct kanji lookup, not just word text.
-4. **By grade / JLPT / frequency browser** like KKLD's tabs. Grade/JLPT we
-   have; **frequency rank** needs to come in from KANJIDIC2 (CC BY-SA — keep
-   attribution).
+**Phase B — reading/meaning/browse (small data, mostly on hand):** 3. **Reading (音・訓) and Meaning (英) kanji lenses** built from `k.on`/`k.kun`/
+`k.m` — direct kanji lookup, not just word text. 4. **By grade / JLPT / frequency browser** like KKLD's tabs. Grade/JLPT we
+have; **frequency rank** needs to come in from KANJIDIC2 (CC BY-SA — keep
+attribution).
 
-**Phase C — the heavier, later pieces:**
-5. **SKIP browser + `字引` SKIP lens.** Requires importing **SKIP codes** from
-   KANJIDIC2. Worth it because the operator likes it and it's a rare
-   differentiator, but it's classification-ambiguous for beginners, so pair it
-   with cross-referencing (list a kanji under the codes users are likely to
-   mis-guess), exactly as Halpern does.
-6. **Camera / OCR.** The dominant modern method but the heaviest offline lift
-   for a web app (a JS OCR like tesseract-jpn or KanjiTomo-class engine, or a
-   cloud call). The codex already marks OCR "Later"; keep it last, and when it
-   lands, route recognized characters straight into the same kanji entry.
+**Phase C — the heavier, later pieces:** 5. **SKIP browser + `字引` SKIP lens.** Requires importing **SKIP codes** from
+KANJIDIC2. Worth it because the operator likes it and it's a rare
+differentiator, but it's classification-ambiguous for beginners, so pair it
+with cross-referencing (list a kanji under the codes users are likely to
+mis-guess), exactly as Halpern does. 6. **Camera / OCR.** The dominant modern method but the heaviest offline lift
+for a web app (a JS OCR like tesseract-jpn or KanjiTomo-class engine, or a
+cloud call). The codex already marks OCR "Later"; keep it last, and when it
+lands, route recognized characters straight into the same kanji entry.
 
 ### Data & licence notes
+
 - Multi-radical and handwriting need **nothing new** — `D.radicals` and KanjiVG
   are already bundled.
 - SKIP codes + frequency come from **KANJIDIC2 (CC BY-SA)** — same licence pool
@@ -138,8 +138,9 @@ grade) while staying in the corridor's paper aesthetic.
 - Camera OCR is the only piece needing a genuinely new, heavy dependency.
 
 ### What I'd de-scope
+
 Single-canonical-radical indexing (the "which radical?" trap) and a raw
-total-stroke-count *primary* browse. Keep stroke count only as a **secondary
+total-stroke-count _primary_ browse. Keep stroke count only as a **secondary
 filter** inside the component picker, where it earns its place.
 
 ---
