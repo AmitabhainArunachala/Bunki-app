@@ -30,14 +30,16 @@
   "id": "fnv1a32-utf8-mask15",
   "indexShards": 16,
   "sentsPerShard": 2000,
-  "sentenceShards": 21
+  "sentenceShards": 23
  },
  "coverage": {
   "targets": 22934,
-  "with_4_plus": 10543,
-  "with_1_to_3": 4509,
-  "with_0": 7882,
-  "sentences": 41222,
-  "note": "shelf sentences add runtime coverage on top; absence stays honest"
+  "with_4_plus": 10915,
+  "with_1_to_3": 4364,
+  "with_0": 7655,
+  "indexed_forms": 40082,
+  "matchable_forms": 113421,
+  "sentences": 45276,
+  "note": "core-dictionary denominators; the index also carries deep-tier and variant forms — shelf sentences add runtime coverage on top; absence stays honest"
  }
 }

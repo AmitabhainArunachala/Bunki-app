@@ -95,8 +95,35 @@ def main() -> int:
     tagger = get_tagger()
 
     dict_words = json.loads((CORRIDOR / "data/share_alike/dict.json").read_text("utf-8"))["words"]
-    targets = set(dict_words.keys())
-    print(f"· {len(targets)} target words (core dictionary)")
+
+    # the FULL capturable universe: every written and kana form in the deep
+    # 70k tier (operator's law, 2026-08-11 — a card must never open onto
+    # zero examples just because its word lives past the core). A sentence
+    # lemma matching any form of a JMdict entry credits every form of that
+    # entry, so 引越す finds the 引っ越す sentences. Kana-form matching is
+    # entry-restricted to kana-only words; kana KEYS may merge homophones —
+    # usage evidence, disambiguated by the entry itself.
+    match_map: dict[str, set[str]] = {}
+    n_entries = 0
+    for i in range(16):
+        shard = json.loads(
+            (CORRIDOR / f"data/share_alike/dict-v2/{i:02x}.json").read_text("utf-8")
+        )
+        for e in shard["entries"]:
+            n_entries += 1
+            kforms = [f[0] for f in e[1]]
+            kanas = [k[0] for k in e[2]]
+            if kforms:
+                credit = set(kforms) | set(kanas)
+                for kf in kforms:
+                    match_map.setdefault(kf, set()).update(credit)
+            else:
+                for kn in kanas:
+                    match_map.setdefault(kn, set()).update(kanas)
+    for w in dict_words:
+        match_map.setdefault(w, {w}).add(w)
+    targets = set(match_map.keys())
+    print(f"· {len(targets)} matchable forms across {n_entries} deep entries + core")
 
     import gzip
     import re as _re
@@ -176,12 +203,15 @@ def main() -> int:
             continue
         seen_text.add(text)
         tokens = pre_tokenised.get(rid) or bc.tokenise(text, tagger)
-        content = [t["b"] for t in tokens if t["c"] and t["b"] in targets]
+        content: set[str] = set()
+        for t in tokens:
+            if t["c"] and t["b"] in targets:
+                content.update(match_map[t["b"]])
         if not content:
             continue
         # SNOW/Tanaka first (short, translated, example-shaped); newsprint
         # fills what only it can
-        candidates.append((0 if src < 2 else 1, len(tokens), len(text), rid, en, tokens, content, src))
+        candidates.append((0 if src < 2 else 1, len(tokens), len(text), rid, en, tokens, sorted(content), src))
     candidates.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
     print(f"· {len(candidates)} deduplicated candidates with target words")
 
@@ -225,16 +255,19 @@ def main() -> int:
             json.dumps(shard, ensure_ascii=False, separators=(",", ":")), "utf-8"
         )
 
-    full = sum(1 for w in targets if per_word.get(w, 0) >= TARGET_PER_WORD)
-    some = sum(1 for w in targets if 0 < per_word.get(w, 0) < TARGET_PER_WORD)
-    none = len(targets) - full - some
+    core = set(dict_words.keys())
+    full = sum(1 for w in core if per_word.get(w, 0) >= TARGET_PER_WORD)
+    some = sum(1 for w in core if 0 < per_word.get(w, 0) < TARGET_PER_WORD)
+    none = len(core) - full - some
     coverage = {
-        "targets": len(targets),
+        "targets": len(core),
         "with_4_plus": full,
         "with_1_to_3": some,
         "with_0": none,
+        "indexed_forms": len(index),
+        "matchable_forms": len(targets),
         "sentences": len(sent_rows),
-        "note": "shelf sentences add runtime coverage on top; absence stays honest",
+        "note": "core-dictionary denominators; the index also carries deep-tier and variant forms — shelf sentences add runtime coverage on top; absence stays honest",
     }
     manifest = {
         "v": 1,

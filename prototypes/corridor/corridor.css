@@ -3447,6 +3447,18 @@ body.zen .probe-context {
   font-size: 19px;
 }
 
+/* the answer face's example lines — quieter than the cloze, still living */
+.review-example {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--ink-2);
+  margin: 4px 0 0;
+}
+body.zen .review-example {
+  font-size: 17px;
+}
+
 /* the struggling cards on the session summary */
 .leech-row {
   display: flex;

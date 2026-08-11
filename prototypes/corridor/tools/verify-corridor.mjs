@@ -1188,8 +1188,14 @@ async function main() {
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet [data-kanjirow]');
+  // two one-time sheet swaps can land after open — the deep dictionary's
+  // richer senses and the example bank's sentences; tapping mid-swap dies
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+    .catch(() => {});
+  await page.waitForTimeout(800);
   await tap(page, '#sheet [data-kanjirow]');
-  await page.waitForTimeout(250);
+  await page.waitForSelector('#strokes path', { timeout: 6000 }).catch(() => {});
   const strokeCount = await page.locator('#strokes path').count();
   check('v1.2 · the kanji page draws its stroke order (KanjiVG)',
     strokeCount >= 3, `${strokeCount} strokes rendered`);
@@ -1442,6 +1448,49 @@ async function main() {
   check('capture offers 語だけ・この文・段落 and the choice persists',
     (await page.locator('[data-ctx-scope]').count()) === 3 && ctxStored?.scope === 'sent' && typeof ctxStored?.i === 'number',
     JSON.stringify(ctxStored));
+
+  // the bank reaches past the core: deep-tier and variant forms are indexed,
+  // and the SRS answer face carries sentences of its own
+  const bankManifest = JSON.parse(
+    readFileSync(resolve(CORRIDOR_DIR, 'data/proprietary_safe/examples/manifest.json'), 'utf8'),
+  );
+  check('the bank indexes far beyond the core dictionary',
+    bankManifest.coverage.indexed_forms > bankManifest.coverage.targets,
+    `${bankManifest.coverage.indexed_forms} indexed forms vs ${bankManifest.coverage.targets} core targets`);
+  await tap(page, '#sheet-back');
+  await tap(page, '#back');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  await tap(page, '#review-start');
+  await page.waitForSelector('#reveal, .review-cloze', { timeout: 10000 });
+  // the queue may open on a kanji card from an earlier step — grade through
+  // to the first WORD card, whose answer face must carry living sentences
+  // (chosen context via its article's async load, or bank via its shard)
+  let answerFace = { lines: 0, live: 0, word: '' };
+  for (let cardN = 0; cardN < 6; cardN++) {
+    await page.waitForSelector('#reveal', { timeout: 10000 });
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
+    await page
+      .waitForFunction(
+        () => document.querySelectorAll('.review-example, .review-cloze').length >= 1,
+        null,
+        { timeout: 8000 },
+      )
+      .catch(() => {});
+    answerFace = await page.evaluate(`(() => ({
+      lines: document.querySelectorAll('.review-example, .review-cloze').length,
+      live: document.querySelectorAll('.review-example .sentence-tok, .review-cloze .sentence-tok').length,
+      word: document.querySelector('.review-front')?.textContent ?? '',
+    }))()`);
+    if (answerFace.lines >= 1) break;
+    await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+    await page.waitForTimeout(300);
+  }
+  check('the answer face carries living sentences — never a bare word where the corpus holds any',
+    answerFace.lines >= 1 && answerFace.live >= 1,
+    `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
+  await shoot(page, shotsDir, '18-review-answer-face');
 
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({

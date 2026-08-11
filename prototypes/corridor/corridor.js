@@ -5722,7 +5722,15 @@ function renderReview(main) {
   // time. No hand-made cards; the schedule is the same one card either way.
   let cloze = null;
   if (item.t === 'word') {
-    ensureBankExamples(item.id); // warm — the next repetition finds it ready
+    // warm the bank; if it lands while THIS answer face is up, repaint once
+    // so the reveal never sits on an emptiness the corpus could fill
+    if (!D.exampleBank?.has(item.id)) {
+      ensureBankExamples(item.id).then((entries) => {
+        if (entries.length && S.view === 'review' && S.review?.queue[S.review.ix] === item && S.review.revealed) {
+          render();
+        }
+      });
+    }
     cloze = takenContext(item);
     if (!cloze && (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1) {
       cloze = findExamples(item.id, 1)[0] || null;
@@ -5747,6 +5755,20 @@ function renderReview(main) {
     const backc = reviewBack(item);
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
     for (const s of backc.senses) face.append(el('div', 'review-sense', s));
+    // the answer face carries the word in the wild: up to two real
+    // sentences, every token ladder-live (operator's law — a card never
+    // opens onto zero examples where the corpus holds any)
+    if (item.t === 'word') {
+      const clozeText = cloze ? cloze.tokens.map((t) => t.s).join('') : null;
+      const exs = findExamples(item.id, 3)
+        .filter((ex) => ex.tokens.map((t) => t.s).join('') !== clozeText)
+        .slice(0, 2);
+      for (const ex of exs) {
+        const line = el('p', 'review-example');
+        renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
+        face.append(line);
+      }
+    }
   }
   main.append(face);
 
