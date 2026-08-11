@@ -5183,6 +5183,59 @@ const NODE_KIND = {
   idiom: ['熟語', 'idiom'],
 };
 
+/** The context a learner chose at capture — resolved fresh from the article
+ * each time (the store carries only {p, i, scope}; the text stays in its
+ * source file, never duplicated into the envelope). */
+function takenContext(item) {
+  const ctx = item.ctx;
+  if (!ctx) return null;
+  const p = D.passages.find((x) => x.id === ctx.p);
+  if (!p) {
+    // an archive capture on a fresh boot: pull the stack's index in quietly
+    if (!D.archive && !D.archiveLoading && window.__CORRIDOR_STANDALONE__ !== true) {
+      ensureArchiveIndex()
+        .then(() => {
+          if (S.view === 'review') render();
+        })
+        .catch(() => {});
+    }
+    return null;
+  }
+  if (!p.tokens) {
+    ensureArticle(p)
+      .then(() => {
+        if (S.view === 'review') render();
+      })
+      .catch(() => {});
+    return null;
+  }
+  let start = 0;
+  let end = p.tokens.length;
+  if (ctx.scope === 'para' && Array.isArray(p.paras) && p.paras.length) {
+    for (const ps of p.paras) {
+      if (ps <= ctx.i) start = ps;
+      else {
+        end = ps;
+        break;
+      }
+    }
+  } else {
+    for (let k = ctx.i - 1; k >= 0; k--) {
+      if ('。！？'.includes(p.tokens[k].s)) {
+        start = k + 1;
+        break;
+      }
+    }
+    for (let k = ctx.i; k < p.tokens.length; k++) {
+      if ('。！？'.includes(p.tokens[k].s)) {
+        end = k + 1;
+        break;
+      }
+    }
+  }
+  return { tokens: p.tokens.slice(start, end), source: p.sourceLabel, passage: p.id };
+}
+
 function takeButton(node, label) {
   const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
   const btn = biLabel(
@@ -5233,6 +5286,43 @@ function takeButton(node, label) {
 
 /** After 覚える: the item lands in this month's bucket automatically (the
  * operator's Renzo habit, automated) and can join any named list too. */
+/** The capture's context scope — 語だけ, この文, or 段落. Only offered when
+ * the word was taken from a real passage (the provenance {passage, index}
+ * rides on the node); the choice stores {p, i, scope} on the taken item and
+ * the review card resolves the text fresh from the article every time. */
+function renderContextPicker(sheet, node) {
+  const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
+  if (!item || node.t !== 'word') return;
+  const from = node.from || item.from;
+  if (!from?.passage || from.index == null) return;
+  const wrap = el('div', 'list-picker context-picker');
+  wrap.append(
+    withEn(el('p', 'eyebrow', '札の文脈'), 'how much context the card carries', 'en-inline'),
+  );
+  const chips = el('div', 'chips');
+  const scopes = [
+    [null, '語だけ', 'the word alone'],
+    ['sent', 'この文', 'this sentence'],
+    ['para', '段落ごと', 'the whole paragraph'],
+  ];
+  const current = item.ctx?.scope ?? null;
+  for (const [scope, ja, en] of scopes) {
+    const on = current === scope;
+    const chip = biLabel('button', on ? 'chip on-list' : 'chip', ja, en);
+    chip.type = 'button';
+    chip.dataset.ctxScope = scope ?? 'word';
+    chip.addEventListener('click', () => {
+      if (scope === null) delete item.ctx;
+      else item.ctx = { p: from.passage, i: Number(from.index), scope };
+      saveStore();
+      render();
+    });
+    chips.append(chip);
+  }
+  wrap.append(chips);
+  sheet.append(wrap);
+}
+
 function renderListPicker(sheet, node, label) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item) return;
@@ -5626,24 +5716,28 @@ function renderReview(main) {
   main.append(moreBtn);
 
   // Anki's cloze, fed by the corpus: every other repetition of a word that
-  // lives in the shelf's real sentences is asked inside one — the blank
-  // holds the word's place, the context does the asking. No hand-made
-  // cards, and the schedule is the same one card either way.
+  // lives in real sentences is asked inside one — the blank holds the
+  // word's place, the context does the asking. A context the learner chose
+  // at capture (この文 / 段落) outranks the corpus draw and shows every
+  // time. No hand-made cards; the schedule is the same one card either way.
   let cloze = null;
-  if (item.t === 'word' && (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1) {
-    cloze = findExamples(item.id, 1)[0] || null;
+  if (item.t === 'word') {
+    ensureBankExamples(item.id); // warm — the next repetition finds it ready
+    cloze = takenContext(item);
+    if (!cloze && (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1) {
+      cloze = findExamples(item.id, 1)[0] || null;
+    }
   }
   const face = el('div', 'review-face');
   if (cloze) {
     const line = el('p', 'review-cloze');
-    for (const t of cloze.tokens) {
-      if (t.c && t.b === item.id) {
-        if (rv.revealed) line.append(el('span', 'example-hit', t.s));
-        else line.append(document.createTextNode('＿＿＿'));
-      } else {
-        line.append(document.createTextNode(t.s));
-      }
-    }
+    // the card's sentence carries the reader's full ladder — every word in
+    // it is furigana-able, glossable, and a door to its own entry
+    renderSentenceTokens(line, cloze.tokens, {
+      targetId: item.id,
+      hideTarget: !rv.revealed,
+      contextId: cloze.passage || 'bank',
+    });
     face.append(line);
     if (rv.revealed) face.append(el('div', 'review-front', item.label));
   } else {
@@ -6301,11 +6395,18 @@ function renderProbe(main) {
   const context = findExamples(it.w, 1)[0];
   if (context) {
     const line = el('p', 'probe-context');
-    for (const t of context.tokens) {
-      if (t.c && t.b === it.w) line.append(el('span', 'example-hit', t.s));
-      else line.append(document.createTextNode(t.s));
-    }
+    // full ladder on the neighbours; the probed word itself stays sealed
+    // until the reveal — its reading is the question
+    renderSentenceTokens(line, context.tokens, {
+      targetId: it.w,
+      maskTargetLadder: !pr.revealed,
+      contextId: context.passage || 'bank',
+    });
     face.append(line);
+  } else if (!D.exampleBank?.has(it.w) && window.__CORRIDOR_STANDALONE__ !== true) {
+    ensureBankExamples(it.w).then((entries) => {
+      if (entries.length && S.view === 'probe' && S.probe?.queue[S.probe.ix] === it && !S.probe.revealed) render();
+    });
   }
   if (pr.revealed) {
     face.append(el('div', 'review-reading', it.r));
@@ -6502,7 +6603,163 @@ function findExamples(id, cap = 4) {
     if (hit && sentence.length) out.push({ tokens: sentence, source: p.sourceLabel, passage: p.id });
     if (out.length >= cap) return out;
   }
+  // the bank fills what the shelf cannot — already-fetched sentences only
+  // (ensureBankExamples warms this cache; callers refresh once it lands)
+  const banked = D.exampleBank?.get(id);
+  if (banked) {
+    const seen = new Set(out.map((ex) => ex.tokens.map((t) => t.s).join('')));
+    for (const ex of banked) {
+      if (out.length >= cap) break;
+      const text = ex.tokens.map((t) => t.s).join('');
+      if (!seen.has(text)) {
+        seen.add(text);
+        out.push(ex);
+      }
+    }
+  }
   return out;
+}
+
+/* ------------------------------------------------- 用例の蔵 (example bank)
+ * SNOW T15/T23 sentences (CC BY 4.0), tokenised at build time into the
+ * corridor's own token grammar and sharded for lazy fetch: a word's index
+ * shard names its sentence ids; sentence shards carry [tokens, english].
+ * Served build only — the single file keeps shelf sentences and stays
+ * honest about the rest. See tools/build_examples.py. */
+const EXAMPLE_DIR = 'data/proprietary_safe/examples';
+function exampleFnv(word) {
+  let h = 0x811c9dc5;
+  const bytes = new TextEncoder().encode(word);
+  for (const b of bytes) {
+    h ^= b;
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h & 15;
+}
+function inflateExampleToken(row) {
+  const [s, b, r, c, p, f] = row;
+  return { s, b, r, c: !!c, p, f: (f || []).map((pair) => (pair[1] ? { t: pair[0], r: pair[1] } : { t: pair[0] })) };
+}
+async function fetchExampleJson(path) {
+  const res = await fetch(`${EXAMPLE_DIR}/${path}`);
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
+}
+async function ensureBankExamples(word) {
+  if (window.__CORRIDOR_STANDALONE__ === true) return [];
+  D.exampleBank ||= new Map();
+  if (D.exampleBank.has(word)) return D.exampleBank.get(word);
+  D.examplePending ||= new Map();
+  if (D.examplePending.has(word)) return D.examplePending.get(word);
+  const job = (async () => {
+    try {
+      D.exampleManifest ||= await fetchExampleJson('manifest.json');
+      D.exampleIndexShards ||= new Map();
+      const ix = exampleFnv(word);
+      if (!D.exampleIndexShards.has(ix)) {
+        D.exampleIndexShards.set(ix, await fetchExampleJson(`ex-${String(ix).padStart(2, '0')}.json`));
+      }
+      const sids = D.exampleIndexShards.get(ix)[word] || [];
+      const per = D.exampleManifest.sharding.sentsPerShard;
+      D.exampleSentShards ||= new Map();
+      const entries = [];
+      for (const sid of sids) {
+        const shard = Math.floor(sid / per);
+        if (!D.exampleSentShards.has(shard)) {
+          D.exampleSentShards.set(shard, await fetchExampleJson(`s-${String(shard).padStart(2, '0')}.json`));
+        }
+        const row = D.exampleSentShards.get(shard)[sid - shard * per];
+        if (row) {
+          const src = D.exampleManifest.sources?.[row[2]] || null;
+          entries.push({
+            tokens: row[0].map(inflateExampleToken),
+            en: row[1] || '',
+            source: src ? tx(src.labelJa, src.labelEn) : tx('用例', 'examples corpus'),
+            bank: true,
+          });
+        }
+      }
+      D.exampleBank.set(word, entries);
+      return entries;
+    } catch {
+      D.exampleBank.set(word, []); // absence recorded — never retried this session
+      return [];
+    } finally {
+      D.examplePending.delete(word);
+    }
+  })();
+  D.examplePending.set(word, job);
+  return job;
+}
+
+/* ---------------------------------- the reader's ladder, outside the reader
+ * Any sentence the app shows — a sheet's 用例, a review cloze, a probe's
+ * context line — carries the same click grammar as the reader: first tap
+ * ふりがな, second tap the English gloss beneath, third tap the full entry.
+ * Each sentence keeps its own quiet ladder state; taps land in the obslog
+ * with the sentence's own context id. */
+function renderSentenceTokens(container, tokens, opts = {}) {
+  const target = opts.targetId || null;
+  const contextId = opts.contextId || 'sentence';
+  const revealed = new Set();
+  const glossed = new Set();
+  tokens.forEach((token, index) => {
+    if (!token.c || !token.f?.length) {
+      container.append(document.createTextNode(token.s));
+      return;
+    }
+    if (target && token.b === target) {
+      if (opts.hideTarget) {
+        container.append(document.createTextNode('＿＿＿'));
+        return;
+      }
+      if (opts.maskTargetLadder) {
+        // the probe asks THIS word — its reading must not be one tap away
+        container.append(el('span', 'example-hit', token.s));
+        return;
+      }
+      const hit = el('span', 'example-hit');
+      hit.append(wordRow(displayPairs(token), { furigana: S.dials.furigana, revealed: revealed.has(index) }));
+      container.append(hit);
+      return;
+    }
+    const span = el('span', 'tok content sentence-tok');
+    const paint = () => {
+      span.textContent = '';
+      // a tapped word shows its reading whatever the dial says — the tap IS
+      // the request (rubyNode's mode 0 never prints rt, so promote to 1)
+      span.append(
+        wordRow(displayPairs(token), {
+          furigana: revealed.has(index) ? 1 : S.dials.furigana,
+          revealed: S.dials.furigana === 2 || revealed.has(index),
+        }),
+      );
+      if (glossed.has(index)) {
+        const g = lookup(token.b);
+        if (g?.m?.length) span.append(el('span', 'tok-en', inlineGloss(g)));
+      }
+    };
+    paint();
+    span.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const hasReading = S.dials.furigana === 2 || revealed.has(index);
+      if (!hasReading) {
+        revealed.add(index);
+        obsLog('tap', srsKey('word', token.b), 1, contextId);
+        paint();
+        return;
+      }
+      if (!glossed.has(index)) {
+        glossed.add(index);
+        obsLog('tap', srsKey('word', token.b), 2, contextId);
+        paint();
+        return;
+      }
+      obsLog('tap', srsKey('word', token.b), 3, contextId);
+      go({ t: 'word', id: token.b });
+    });
+    container.append(span);
+  });
 }
 
 /* ------------------------------------------------------------- AI in the app
@@ -7220,18 +7477,31 @@ function renderWordNode(sheet, node) {
     sheet.append(rows);
   }
 
-  // EXAMPLES — real sentences from the shelf, target in red
-  const examples = findExamples(node.id);
+  // EXAMPLES — real sentences, shelf first, the bank behind them; every
+  // token carries the reader's ladder (ふりがな → gloss → full entry)
+  if (!D.exampleBank?.has(node.id) && window.__CORRIDOR_STANDALONE__ !== true) {
+    ensureBankExamples(node.id).then((entries) => {
+      if (!entries.length) return;
+      const top = S.stack[S.stack.length - 1];
+      if (top && top.t === 'word' && top.id === node.id) {
+        keepScroll();
+        render();
+        returnScroll();
+      }
+    });
+  }
+  const examples = findExamples(node.id, 6);
   if (examples.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples from the shelf', 'en-inline'));
+    sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples — tap a word to climb its ladder', 'en-inline'));
     for (const ex of examples) {
       const line = el('div', 'example');
       const text = el('p', 'example-ja');
-      for (const t of ex.tokens) {
-        if (t.c && t.b === node.id) text.append(el('span', 'example-hit', t.s));
-        else text.append(document.createTextNode(t.s));
-      }
+      renderSentenceTokens(text, ex.tokens, {
+        targetId: node.id,
+        contextId: ex.passage || 'bank',
+      });
       line.append(text);
+      if (ex.en) line.append(el('p', 'example-en', ex.en));
       line.append(el('span', 'example-src', ex.source));
       sheet.append(line);
     }
@@ -7286,6 +7556,7 @@ function renderWordNode(sheet, node) {
   sheet.append(semWrap);
 
   sheet.append(takeButton(node, label));
+  renderContextPicker(sheet, node);
   renderListPicker(sheet, node, label);
   renderCardVariant(sheet, { id: node.id, from: node.from });
   renderSchedule(sheet);

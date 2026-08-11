@@ -305,6 +305,8 @@ SOURCES = {
         {"name": "aozorabunko-clean", "licence": "PD (著作権フラグ なし)", "attribution": "青空文庫", "url": "https://www.aozora.gr.jp/"},
         {"name": "isa-yasashii-glossary", "licence": "出入国在留管理庁 やさしい日本語 用語集", "attribution": "出入国在留管理庁", "url": ""},
         {"name": "ninjal-kyoiku-kihon-goi", "licence": "CC BY 4.0", "attribution": "国立国語研究所『教育基本語彙の基本的研究―増補改訂版―』(2009)", "url": "https://mmsrv.ninjal.ac.jp/brfvep/"},
+        {"name": "snow-t15-t23", "licence": "CC BY 4.0", "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）", "url": "https://www.jnlp.org/GengoHouse/snow/t15"},
+        {"name": "tanaka-corpus", "licence": "CC BY 2.0 FR", "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）", "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"},
         {"name": "bunki-v11-historical", "licence": "PD", "attribution": "五箇条の御誓文 · 方丈記 · 徒然草（原文はパブリックドメイン、解説はBunkiオリジナル）", "url": ""},
     ],
     "share_alike": [

@@ -1384,6 +1384,65 @@ async function main() {
     'no articles/archive bundle keys in corridor-standalone.html');
   await shoot(page, shotsDir, '16-archive-stack');
 
+  // ------------------ 用例の蔵 · examples everywhere, sentences that answer
+  console.log('\n— the example bank: ≥4 sentences, every token a door');
+  await open('?entry=shelf');
+  await page.fill('#search', '学校');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result="word:学校"]');
+  await page.waitForSelector('#sheet');
+  await page
+    .waitForFunction(() => document.querySelectorAll('#sheet .example').length >= 4, null, { timeout: 15000 })
+    .catch(() => {});
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
+    .catch(() => {});
+  await page.waitForTimeout(400);
+  const bankSheet = await page.evaluate(`(() => ({
+    n: document.querySelectorAll('#sheet .example').length,
+    live: document.querySelectorAll('#sheet .example .sentence-tok').length,
+    en: document.querySelectorAll('#sheet .example .example-en').length,
+  }))()`);
+  check('a common word carries at least 4 example sentences',
+    bankSheet.n >= 4 && bankSheet.en >= 1,
+    `${bankSheet.n} examples · ${bankSheet.en} with English`);
+  const ladderProof = await page.evaluate(`(() => {
+    const tok = document.querySelector('#sheet .example .sentence-tok');
+    if (!tok) return null;
+    const fire = () => tok.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fire();
+    const rt = tok.querySelectorAll('rt').length;
+    fire();
+    const gloss = !!tok.querySelector('.tok-en');
+    return { rt, gloss };
+  })()`);
+  check('example tokens climb the reader ladder — ふりがな, then English',
+    !!ladderProof && ladderProof.gloss,
+    JSON.stringify(ladderProof));
+  await shoot(page, shotsDir, '17-example-bank');
+
+  // capture scope: 語だけ · この文 · 段落 — the choice rides the card
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await settleReader(page);
+  await holdWord(page, '#reader .tok.content', 6);
+  await page.waitForSelector('#sheet #take');
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
+    .catch(() => {});
+  await tap(page, '#sheet #take');
+  await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
+  await tap(page, '[data-ctx-scope="sent"]');
+  await page.waitForTimeout(300);
+  const ctxStored = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const it = (e.taken || []).find((t) => t.ctx);
+    return it ? it.ctx : null;
+  })()`);
+  check('capture offers 語だけ・この文・段落 and the choice persists',
+    (await page.locator('[data-ctx-scope]').count()) === 3 && ctxStored?.scope === 'sent' && typeof ctxStored?.i === 'number',
+    JSON.stringify(ctxStored));
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,
