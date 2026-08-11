@@ -111,16 +111,42 @@ arbitrate.** Phases 0–B are decided and buildable now.
 - Diagnosis principle: the log is the learner model's substrate; AI
   proposes structured findings, FSRS alone schedules.
 
-**PLAN v1 (open to revision when review feedback arrives):**
+**PLAN v2 (revised 2026-08-11 after the R1 review — see
+`R1_REVIEW_RESPONSE_2026-08-11.md` for the full concede/hold record):**
 
-- Four-lane content strategy over a **personal-coverage router**
-  (study 90–97% · speed ≥98% timed · BYOT · gap-targeted generation) —
-  see the debate doc for the evidence and the concessions already made.
+- Content modes over a **personal-coverage router** with honest bands:
+  Cold Flow ≥~98% (a routing prior, validated by observed assistance and
+  comprehension — never a guarantee) · Supported Study ~95–98% ·
+  Intensive/Decode ~90–95% · Unscored when analysis fails closed.
+  Coverage reported as confirmed–possible intervals; OOV stays in the
+  denominator.
+- Fresh content portfolio: government PDL pages (labeled official
+  source), Global Voices JA, Aozora, **Wikinews archive only** (all
+  editions read-only since 2026-05-04 — fresh wikinews is dead), BYOT,
+  reviewed adaptations. SLO: eligible choices per mode per day and
+  8–12 reviewed units/week; no 300-count acceptance gate.
+- Knowledge bootstrap before routing: Anki/known-list import +
+  contextual calibration as ROUTING-ONLY assertions (never FSRS state),
+  alongside the corridor's own mature cards/captures/deepWords.
+- Fluency (CPM) contract: cold / practiced / assisted structurally
+  separate; explicit Start; assistance marks the run; live speed hidden;
+  passage removed before probes; 80% comprehension floor as product
+  rule; no trend claimed before ≥4 matched cold passages and ≥20 scored
+  responses; 250–300 CPM is a provisional personal zone, not an N1 fact.
 - Production approach: auto-minted `:prod` twins, 再構成 reconstruction,
-  tutor back-translation.
+  tutor back-translation. Port kuromoji from sites-v11 WITHOUT its
+  coverage math (OOV-dropping, partial credit, sentence-level mass
+  updates — named defects, do not carry).
 
 **OPEN — operator's word required:**
 
+0. **Vessel confirmation.** The R1 review directs the build into the
+   Expo/domain stack and calls the corridor disposable — but it audited
+   stale `main` and this contradicts the standing operator ruling
+   ("one comprehensive full prototype", 2026-08-10, reaffirmed via the
+   trunk choice). Standing ruling holds unless the operator reverses it;
+   the recommendation on record is: stay on the corridor, absorb R1's
+   contracts as corridor-native increments.
 1. **Feel verdict on the current deploy** → merge trunk to `main` →
    retire PRs #60–#70. (The standing gate on everything.)
 2. Nihonga stroke-treatment pick (ten mockups shown two sessions ago —
