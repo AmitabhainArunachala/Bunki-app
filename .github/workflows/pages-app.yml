@@ -44,10 +44,15 @@ jobs:
           SITE="$RUNNER_TEMP/site"
           mkdir -p "$SITE"
 
+          # a syntax error must never reach the phone
+          node --check prototypes/corridor/corridor.js
+          node --check prototypes/corridor/dictionary-worker.js
+
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/apple-touch-icon.png \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
+                prototypes/corridor/dictionary-worker.js \
                 prototypes/corridor/drift-layer.css \
                 prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
@@ -72,8 +77,12 @@ jobs:
           # internal assertion at process exit on some Node lines (seen live:
           # "assert(!this.paused)" AFTER every path had already printed 200)
           for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
+                      'dictionary-worker.js' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
-                      'data/manifest.json' 'data/articles/index.json'; do
+                      'data/manifest.json' 'data/articles/index.json' \
+                      'data/share_alike/dict-v2/index.json' \
+                      'data/share_alike/dict-v2/00.json' \
+                      'data/share_alike/dict-v2/0f.json'; do
             code=""
             for attempt in 1 2 3 4 5; do
               code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8765/$path" || true)
@@ -86,6 +95,25 @@ jobs:
             fi
             echo "200 /$path"
           done
+
+          # the deep dictionary the site ships must be the pinned, sharded one
+          python3 - "$SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
+          assert index["schemaVersion"] == 2, "dict-v2 schema"
+          assert index["shardCount"] == 16, "dict-v2 shard count"
+          assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
+          assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"
+          counts = index["sharding"]["entryCounts"]
+          assert len(counts) == 16 and all(c > 0 for c in counts), "dict-v2 entry counts"
+          assert len(index["entries"]) == sum(counts), "dict-v2 index entry total"
+          for shard_id in ("00", "07", "0f"):
+              shard = json.load(open(f"{site}/data/share_alike/dict-v2/{shard_id}.json"))
+              assert shard["sourcePin"] == index["source"]["pin"], f"shard {shard_id} pin"
+              assert len(shard["entries"]) == counts[int(shard_id, 16)], f"shard {shard_id} count"
+          print(f"dict-v2 verified: {len(index['entries'])} entries across 16 shards")
+          PYEOF
 
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4

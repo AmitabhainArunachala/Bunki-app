@@ -3672,3 +3672,184 @@ body.v-depth-layered .stroke-page {
   gap: 10px;
   margin: 0 0 14px;
 }
+
+/* --------------------------------------------- the deep dictionary (70k)
+ * Complete JMdict senses on the word sheet, homograph choices, and the
+ * quiet opening/warning lines behind search — harvested from the codex line
+ * and restyled with this app's own variables. */
+.dictionary-opening,
+.dictionary-warning,
+.dictionary-credit {
+  margin: 7px 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+.dictionary-warning {
+  color: var(--red);
+}
+.dictionary-retry {
+  min-height: var(--tap);
+  border: 1px solid var(--indigo);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--indigo);
+  padding: 7px 14px;
+  margin: 0 0 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-credit a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin: -13px 0;
+  color: var(--indigo);
+  text-underline-offset: 3px;
+}
+.dictionary-entry {
+  margin: 0 0 12px;
+}
+.dictionary-homographs {
+  margin: 8px 0 14px;
+  padding: 9px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.dictionary-homograph {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 7px 1px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--indigo);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-homograph:last-child {
+  border-bottom: 0;
+}
+.dictionary-homograph.active {
+  color: var(--ink-2);
+  cursor: default;
+}
+.dictionary-forms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--serif);
+}
+.dictionary-spellings {
+  color: var(--ink);
+  font-size: 16px;
+}
+.dictionary-readings {
+  color: var(--red);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.dictionary-sense {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 7px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.dictionary-sense:last-child {
+  border-bottom: 0;
+}
+.dictionary-sense-number {
+  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 12px;
+  padding-top: 3px;
+}
+.dictionary-sense-body {
+  min-width: 0;
+}
+.dictionary-sense-body .gloss {
+  margin-bottom: 4px;
+}
+.dictionary-glosses {
+  margin: 0 0 5px;
+  padding-left: 18px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.62;
+}
+.dictionary-restriction,
+.dictionary-info {
+  margin: 2px 0 6px;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.dictionary-relations {
+  margin: 8px 0 2px;
+}
+.dictionary-rel-title {
+  margin: 0;
+  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.dictionary-rel {
+  display: grid;
+  grid-template-columns: minmax(4em, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 7px 1px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--indigo);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-rel:last-child {
+  border-bottom: 0;
+}
+.dictionary-rel.muted {
+  color: var(--ink-2);
+  cursor: default;
+}
+.dictionary-rel-word {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.dictionary-rel-note {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--faint);
+  font-size: 12px;
+}
+.dictionary-entry-rule {
+  height: 1px;
+  margin: 4px 0 12px;
+  background: var(--line-soft);
+}
+
+/* the record's health — one quiet line in the tray, never a modal */
+.store-warning,
+.store-nudge {
+  margin: 2px 0 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+.store-warning {
+  color: var(--red);
+}

@@ -23,7 +23,7 @@ set. The prototype loads both and marks every ShareAlike node in the UI; the
 combined deployed artifact is therefore itself ShareAlike. That boundary is
 made visible rather than crossed silently — see the note filed on #41.
 
-Usage:  python build_corridor.py [--out DIR]
+Usage:  python build_corridor.py [--out DIR] [--sem-only]
 Requires fugashi + unidic-lite + jreadability (see requirements note in the log).
 """
 
@@ -106,6 +106,35 @@ def furigana_pairs(surface: str, reading: str) -> list[dict]:
 # --------------------------------------------------------------------------
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text("utf-8").splitlines() if line.strip()]
+
+
+def load_sem_source() -> dict[str, list]:
+    return json.loads((REPO / "prototypes/drift/data/sem.json").read_text("utf-8"))
+
+
+def build_sem_edges(sem: dict[str, list]) -> dict[str, list]:
+    return {
+        head: [
+            {"w": target, "rel": rel, "note": note}
+            for target, rel, note in edges
+        ]
+        for head, edges in sem.items()
+    }
+
+
+def sem_bundle(sem: dict[str, list]) -> dict:
+    return {
+        "pool": "proprietary_safe",
+        "sources": [
+            {
+                "name": "bunki sem tier",
+                "licence": "project-owned",
+                "attribution": "回廊 semantic tier (this project)",
+                "url": "",
+            }
+        ],
+        "edges": build_sem_edges(sem),
+    }
 
 
 RUBY_RE = re.compile(r"｜([^《]+)《([^》]+)》")
@@ -207,9 +236,25 @@ def tokenise_ruby_markup(markup: str, tagger) -> list[dict]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(CORRIDOR / "data"))
+    ap.add_argument(
+        "--sem-only",
+        action="store_true",
+        help="regenerate only proprietary_safe/sem.json from the authored Drift SEM source",
+    )
     args = ap.parse_args()
     out = Path(args.out)
     (out).mkdir(parents=True, exist_ok=True)
+
+    sem = load_sem_source()
+    if args.sem_only:
+        path = out / "proprietary_safe" / "sem.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(sem_bundle(sem), ensure_ascii=False, separators=(",", ":")),
+            "utf-8",
+        )
+        print(f"· sem-only: {len(sem)} heads → {path}")
+        return 0
 
     from corpus.grading._mecab import get_tagger
 
@@ -235,7 +280,6 @@ def main() -> int:
     radk = json.loads((REPO / "prototypes/drift/data/radk.json").read_text("utf-8"))
     RADK = radk["RADK"]
     wbig = json.loads((REPO / "prototypes/drift/data/wbig.json").read_text("utf-8"))
-    sem = json.loads((REPO / "prototypes/drift/data/sem.json").read_text("utf-8"))
 
     kanken_level: dict[str, str] = {}
     kanken_rank: dict[str, int] = {}
@@ -289,11 +333,8 @@ def main() -> int:
     words.update(shelf_words)
 
     # semantic edges — ours, with the discrimination notes intact
-    sem_out: dict[str, list] = {}
+    sem_out = build_sem_edges(sem)
     for head, edges in sem.items():
-        sem_out[head] = [
-            {"w": target, "rel": rel, "note": note} for target, rel, note in edges
-        ]
         if head not in words:
             words[head] = {"w": head, "r": "", "g": "", "jlpt": None,
                            "k": sorted({c for c in head if c in KINFO}), "fromSem": True}
@@ -334,7 +375,7 @@ def main() -> int:
             "kr": kanken_rank.get(ch, 0),
             "parts": KRAD.get(ch, []),
             # NOTE: the official radical number `rad` (KANJIDIC2 classical
-            # rad_value, 1–214) is added to each record by the post-step
+            # rad_value, 1-214) is added to each record by the post-step
             # tools/build-radicals.mjs, which also emits data/share_alike/
             # radicals214.json. Run it after this script so `rad` persists.
         }
@@ -415,12 +456,7 @@ def main() -> int:
                 ],
                 "levels": {ch: {"kk": k["kk"], "kr": k["kr"]} for ch, k in kanji.items() if k["kk"]},
             },
-            "sem.json": {
-                "pool": "proprietary_safe",
-                "sources": [{"name": "bunki sem tier", "licence": "project-owned",
-                             "attribution": "回廊 semantic tier (this project)", "url": ""}],
-                "edges": sem_out,
-            },
+            "sem.json": sem_bundle(sem),
         },
         "share_alike": {
             "kanji.json": {

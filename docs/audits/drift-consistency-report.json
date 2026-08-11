@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-10T15:41:18.460Z",
-  "finishedAt": "2026-08-10T15:43:03.920Z",
+  "startedAt": "2026-08-11T03:39:25.656Z",
+  "finishedAt": "2026-08-11T03:41:21.478Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -89,16 +89,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 233,
-          "y": 338.29998779296875,
+          "x": 215.1699981689453,
+          "y": 506.70994567871094,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 74.76999092102051,
-          "y": 407.5400085449219,
+          "x": 74.51998710632324,
+          "y": 540.8200073242188,
           "onScreen": true
         }
       },
@@ -459,37 +459,37 @@
       "state": "coverage"
     },
     {
-      "word": "敬語",
-      "kanji": 2,
+      "word": "議事堂",
+      "kanji": 3,
       "theme": "北斎",
       "gesture": "chain-hop",
       "expected": "hop 1/3 makes the satellite the held planet without deleting the prior planet",
       "outcome": "ok",
-      "detail": "centre=敬語; sats=14; priorExists=true",
+      "detail": "centre=議事堂; sats=14; priorExists=true",
       "shot": null,
       "state": "bloom",
       "hop": 1
     },
     {
-      "word": "～語",
+      "word": "～館",
       "kanji": 1,
       "theme": "北斎",
       "gesture": "chain-hop",
       "expected": "hop 2/3 makes the satellite the held planet without deleting the prior planet",
       "outcome": "ok",
-      "detail": "centre=～語; sats=14; priorExists=true",
+      "detail": "centre=～館; sats=14; priorExists=true",
       "shot": null,
       "state": "bloom",
       "hop": 2
     },
     {
-      "word": "漢語",
+      "word": "家屋",
       "kanji": 2,
       "theme": "北斎",
       "gesture": "chain-hop",
       "expected": "hop 3/3 makes the satellite the held planet without deleting the prior planet",
       "outcome": "ok",
-      "detail": "centre=漢語; sats=14; priorExists=true",
+      "detail": "centre=家屋; sats=14; priorExists=true",
       "shot": null,
       "state": "bloom",
       "hop": 3
@@ -648,15 +648,19 @@
       "word": "謎",
       "kanji": 1,
       "theme": "北斎",
-      "gesture": "fuzz-cancel-fallback",
+      "gesture": "fuzz-sat-reveal",
       "expected": "camera/state action preserves the held planet and emits no runtime error",
       "outcome": "ok",
-      "detail": "centre=謎; exists=true; newErrors=0",
+      "detail": "satellite=議事堂; exists=true; glossed=true",
       "shot": null,
       "state": "fuzz",
       "seed": 1729,
       "step": 8,
-      "coordinates": null
+      "coordinates": {
+        "x": 266.1799850463867,
+        "y": 416.75,
+        "satellite": "議事堂"
+      }
     },
     {
       "word": "謎",
@@ -690,8 +694,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 65.91999816894531,
-        "y": 271.739990234375,
+        "x": 64.19999885559082,
+        "y": 273.69000244140625,
         "satellite": "謎謎"
       }
     },
@@ -702,15 +706,15 @@
       "gesture": "fuzz-sat-reveal",
       "expected": "camera/state action preserves the held planet and emits no runtime error",
       "outcome": "ok",
-      "detail": "satellite=調味料; exists=true; glossed=true",
+      "detail": "satellite=句読点; exists=true; glossed=true",
       "shot": null,
       "state": "fuzz",
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 128.2899932861328,
-        "y": 362.8900146484375,
-        "satellite": "調味料"
+        "x": 116.70998764038086,
+        "y": 343.75,
+        "satellite": "句読点"
       }
     },
     {
@@ -726,10 +730,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 81,
-        "y0": 486.55999755859375,
-        "x1": 111,
-        "y1": 494.55999755859375
+        "x0": 76.44000053405762,
+        "y0": 492.7200012207031,
+        "x1": 106.44000053405762,
+        "y1": 500.7200012207031
       }
     }
   ]

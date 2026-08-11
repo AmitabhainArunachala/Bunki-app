@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "yearageyearspast one's primeold age",
-        "senses": 5,
+        "gloss": "year",
+        "senses": 3,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-10 16:46",
+          "2026-08-11 03:50",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-10 16:51",
+          "2026-08-11 03:55",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-10 16:55",
+          "2026-08-11 03:59",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-18 16:45",
+          "2026-08-19 03:49",
           "8.30"
         ]
       ]
@@ -4356,6 +4356,14 @@
         "id": "sheet-close"
       },
       {
+        "text": "CC BY-SA 4.0",
+        "w": 77,
+        "h": 44,
+        "hitW": 77,
+        "hitH": 44,
+        "id": ""
+      },
+      {
         "text": "過Overdo›",
         "w": 358,
         "h": 61,
@@ -6030,7 +6038,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 337,
+  "loadMs": 486,
   "summary": {
     "total": 91,
     "failed": 0
@@ -6059,7 +6067,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.61000061035156,\"y\":570.8400268554688,\"productive\":true}"
+      "detail": "{\"x\":148.16000366210938,\"y\":570.2000122070312,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6069,7 +6077,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 89px; mean tether 163 → 163px"
+      "detail": "centre moved 87px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6079,7 +6087,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 337 ms"
+      "detail": "40 texts, ready in 486 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6249,7 +6257,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 5 senses"
+      "detail": "年: 3 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -6369,7 +6377,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "611 controls checked, including inline token hit regions"
+      "detail": "612 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",

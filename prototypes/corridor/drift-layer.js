@@ -221,7 +221,19 @@ const ink=document.getElementById("ink"), ictx=ink.getContext("2d");
 const fx=document.getElementById("fx"), fctx=fx.getContext("2d");
 const paper=document.createElement("canvas"), pctx=paper.getContext("2d");
 let fdpr=1;
+let canvasVW=0,canvasVH=0,resizeFrame=0;
 function sizeCanvases(){
+  const nextW=vw(),nextH=vh();
+  // Safari's address bar and VisualViewport can change the glass without a
+  // gesture. Keep the world point under the old glass fixed instead of letting
+  // every word jump by half the height delta when the browser chrome settles.
+  if(canvasVW&&canvasVH&&typeof WR!=="undefined"&&WR.w){
+    const dx=(nextW-canvasVW)/2,dy=(nextH-canvasVH)/2;
+    const cs=Math.cos(cam.rot),sn=Math.sin(cam.rot),iz=1/(cam.z||1);
+    cam.x+=(dx*cs+dy*sn)*iz; cam.y+=(-dx*sn+dy*cs)*iz;
+    camClamp();
+  }
+  canvasVW=nextW; canvasVH=nextH;
   ink.width=Math.max(1,Math.round(vw()*0.5)); ink.height=Math.max(1,Math.round(vh()*0.5));
   stainCv.width=ink.width; stainCv.height=ink.height;
   fdpr=1; // fx carries soft motes/lines only — 1x pixels, upscaled by the compositor;
@@ -231,16 +243,28 @@ function sizeCanvases(){
 }
 
 // ---- layered parchment, pre-rendered once per theme ----
+function seeded(seed){
+  let a=seed>>>0;
+  return function(){
+    a=(a+0x6D2B79F5)|0;
+    let t2=Math.imul(a^(a>>>15),1|a);
+    t2=(t2+Math.imul(t2^(t2>>>7),61|t2))^t2;
+    return ((t2^(t2>>>14))>>>0)/4294967296;
+  };
+}
 function renderPaper(){
   paper.width=ink.width; paper.height=ink.height;
   const th=THEMES[themeIx];
+  // texture is fixed for a given glass+theme, so a resize never re-rolls
+  // the paper underneath the learner's eye
+  const rnd=seeded((ink.width*73856093)^(ink.height*19349663)^((themeIx+1)*83492791));
   pctx.setTransform(0.5,0,0,0.5,0,0);
   pctx.fillStyle=th.ground; pctx.fillRect(0,0,vw(),vh());
   // tonal mottling — uneven age of the sheet
   for(let i=0;i<16;i++){
     const f=i%2?1.045:0.94;
-    const r=mind()*(0.16+Math.random()*0.34);
-    const x=Math.random()*vw(), y=Math.random()*vh();
+    const r=mind()*(0.16+rnd()*0.34);
+    const x=rnd()*vw(), y=rnd()*vh();
     const g=pctx.createRadialGradient(x,y,0,x,y,r);
     g.addColorStop(0,shade(th.ground,f,th.dark?.22:.5));
     g.addColorStop(1,shade(th.ground,f,0));
@@ -249,11 +273,11 @@ function renderPaper(){
   // fibers — long thin strands laid into the sheet
   pctx.lineWidth=.7;
   for(let i=0;i<240;i++){
-    const x=Math.random()*vw(), y=Math.random()*vh();
-    const ang=Math.random()<.6?(Math.random()-.5)*.5:Math.random()*TAU;
-    const len=60+Math.random()*170;
-    const bend=(Math.random()-.5)*30;
-    pctx.strokeStyle=rgba(th.ink,th.dark?.04:.032+Math.random()*.02);
+    const x=rnd()*vw(), y=rnd()*vh();
+    const ang=rnd()<.6?(rnd()-.5)*.5:rnd()*TAU;
+    const len=60+rnd()*170;
+    const bend=(rnd()-.5)*30;
+    pctx.strokeStyle=rgba(th.ink,th.dark?.04:.032+rnd()*.02);
     pctx.beginPath(); pctx.moveTo(x,y);
     pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+bend,y+Math.sin(ang)*len/2-bend,
       x+Math.cos(ang)*len,y+Math.sin(ang)*len);
@@ -263,7 +287,7 @@ function renderPaper(){
   const la=th.dark?.028:.05;
   pctx.lineWidth=.5;
   for(let y=0;y<vh();y+=7){
-    pctx.strokeStyle=rgba(th.ink,la*(0.7+Math.random()*0.6));
+    pctx.strokeStyle=rgba(th.ink,la*(0.7+rnd()*0.6));
     pctx.beginPath();
     pctx.moveTo(0,y+Math.sin(y*1.7)*0.9);
     pctx.lineTo(vw(),y+Math.cos(y*2.3)*0.9);
@@ -276,27 +300,27 @@ function renderPaper(){
   }
   // per-grain speckle
   for(let i=0;i<2600;i++){
-    pctx.fillStyle=rgba(th.ink,0.015+Math.random()*0.035);
-    pctx.fillRect(Math.random()*vw(),Math.random()*vh(),1.1,1.1);
+    pctx.fillStyle=rgba(th.ink,0.015+rnd()*0.035);
+    pctx.fillRect(rnd()*vw(),rnd()*vh(),1.1,1.1);
   }
   // heavier kozo strands
   pctx.lineWidth=1.3;
   for(let i=0;i<26;i++){
-    const x=Math.random()*vw(), y=Math.random()*vh();
-    const ang=Math.random()*TAU, len=30+Math.random()*90;
+    const x=rnd()*vw(), y=rnd()*vh();
+    const ang=rnd()*TAU, len=30+rnd()*90;
     pctx.strokeStyle=rgba(th.ink,th.dark?.06:.05);
     pctx.beginPath(); pctx.moveTo(x,y);
-    pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+(Math.random()-.5)*22,
+    pctx.quadraticCurveTo(x+Math.cos(ang)*len/2+(rnd()-.5)*22,
       y+Math.sin(ang)*len/2,x+Math.cos(ang)*len,y+Math.sin(ang)*len);
     pctx.stroke();
   }
   // foxing — age spots on light sheets
   if(!th.dark){
     for(let i=0;i<46;i++){
-      const r=1+Math.random()*(Math.random()<.15?8:2.5);
-      const x=Math.random()*vw(), y=Math.random()*vh();
+      const r=1+rnd()*(rnd()<.15?8:2.5);
+      const x=rnd()*vw(), y=rnd()*vh();
       const g=pctx.createRadialGradient(x,y,0,x,y,r);
-      g.addColorStop(0,"rgba(138,107,74,"+(0.04+Math.random()*0.06)+")");
+      g.addColorStop(0,"rgba(138,107,74,"+(0.04+rnd()*0.06)+")");
       g.addColorStop(1,"rgba(138,107,74,0)");
       pctx.fillStyle=g; pctx.beginPath(); pctx.arc(x,y,r,0,TAU); pctx.fill();
     }
@@ -637,20 +661,44 @@ function buildDeck(){
   return pick.concat(near.slice(0,Math.max(30,pick.length>>2)),far.slice(0,14));
 }
 let deck=buildDeck();
-// swipes add up: judgments persist across sessions
+// Swipes add up across sessions. Unknown top-level fields are retained for
+// forward compatibility. An unreadable envelope is quarantined byte-for-byte:
+// the water can still be explored, but a flick cannot silently replace data
+// this build cannot prove.
+const DRIFT_STORE_KEY="bunki-drift-v1";
+const plainRec=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
+const judgmentMap=v=>v==null||plainRec(v);
+const optCounter=v=>v==null||Number.isFinite(Number(v));
 let store={known:{},unknown:{},lk:0,lu:0};
-try{const s=localStorage.getItem("bunki-drift-v1");
+let storeReadOnly=false;
+let storeIssue="";
+try{const s=localStorage.getItem(DRIFT_STORE_KEY);
   if(s){const o=JSON.parse(s);
-    if(o&&typeof o==="object"){
-      const isMap=v=>v&&typeof v==="object"&&!Array.isArray(v);
-      store={
-        known:isMap(o.known)?o.known:{},
-        unknown:isMap(o.unknown)?o.unknown:{},
-        lk:Number(o.lk)||0,
-        lu:Number(o.lu)||0
-      };
-    }}}catch(err){}
-function saveStore(){try{localStorage.setItem("bunki-drift-v1",JSON.stringify(store));}catch(err){}}
+    if(!plainRec(o)||!judgmentMap(o.known)||!judgmentMap(o.unknown)||
+      !optCounter(o.lk)||!optCounter(o.lu)){
+      storeReadOnly=true;
+      storeIssue="端末のことば記録を保護中 — 判断は変更していません";
+    }else{
+      store={...o,known:{...(o.known||{})},unknown:{...(o.unknown||{})},
+        lk:Number(o.lk)||0,lu:Number(o.lu)||0};
+    }
+  }}catch(err){
+    storeReadOnly=true;
+    storeIssue="端末のことば記録を保護中 — 判断は変更していません";
+  }
+function saveStore(){
+  if(storeReadOnly){
+    setHint(storeIssue||"端末のことば記録を保護中 — 判断は変更していません");
+    return false;
+  }
+  try{
+    localStorage.setItem(DRIFT_STORE_KEY,JSON.stringify(store));
+    return true;
+  }catch(err){
+    setHint("この判断は保存できなかった。ことばはここに残した");
+    return false;
+  }
+}
 let seq=0,gathered=Number(store.lu)||0,settled=Number(store.lk)||0,maxDepth=0;
 const stack=[];
 let journey=[];
@@ -792,14 +840,14 @@ function buildWorld(){
     let x,y;
     if(hs.length){
       x=hs.reduce((s2,c)=>s2+HUBPOS[c].x,0)/hs.length+((hsh%230)-115)*(hs.length>1?1.5:1);
-      y=hs.reduce((s2,c)=>s2+HUBPOS[c].y,0)/hs.length+(((hsh>>5)%230)-115)*(hs.length>1?1.5:1);
+      y=hs.reduce((s2,c)=>s2+HUBPOS[c].y,0)/hs.length+(((hsh>>>5)%230)-115)*(hs.length>1?1.5:1);
     } else {
-      x=(hsh%1000)/1000*WR.w; y=((hsh>>10)%1000)/1000*WR.h;
+      x=(hsh%1000)/1000*WR.w; y=((hsh>>>10)%1000)/1000*WR.h;
     }
     const wrN={e,wx:clamp(x,60,WR.w-60),wy:clamp(y,90,WR.h-90),
       pri:0,node:null,sx:-999,sy:-999,vis:0,ox:0,oy:0,px:0,py:0,
-      q1:((hsh>>3)%628)/100,q2:((hsh>>7)%628)/100,
-      f1:0.85+((hsh>>11)%100)/200,f2:0.85+((hsh>>13)%100)/200};
+      q1:((hsh>>>3)%628)/100,q2:((hsh>>>7)%628)/100,
+      f1:0.85+((hsh>>>11)%100)/200,f2:0.85+((hsh>>>13)%100)/200};
     WORDS.push(wrN); WORDIX[e[0]]=wrN;
   }
   rePri();
@@ -1657,20 +1705,28 @@ function sink(n){
 // pigment; unknown turns 朱, falls the full height, and joins the ink pool.
 function grade(n,dir){
   if(n.gone) return;
-  n.gone=true; n.frozen=true;
   const lvl=stack[stack.length-1];
   const wasCenter=lvl&&lvl.center===n;
   const key=n.kind==="word"?n.w:n.ch;
+  // The record commits before the word departs: if this device cannot keep
+  // the judgment, the word stays in the water and the learner is told once.
+  const prior={known:store.known[key],unknown:store.unknown[key]};
   if(dir>0){
-    settled++;bloom(n);
     store.known[key]=(store.known[key]||0)+1;
     if(store.unknown[key]) delete store.unknown[key];
   } else {
-    gathered++;sink(n);
     store.unknown[key]=(store.unknown[key]||0)+1;
     if(store.known[key]) delete store.known[key];
   }
-  store.lk=settled; store.lu=gathered; saveStore();
+  store.lk=settled+(dir>0?1:0); store.lu=gathered+(dir>0?0:1);
+  if(!saveStore()){
+    if(prior.known==null) delete store.known[key]; else store.known[key]=prior.known;
+    if(prior.unknown==null) delete store.unknown[key]; else store.unknown[key]=prior.unknown;
+    store.lk=settled; store.lu=gathered;
+    return;
+  }
+  n.gone=true; n.frozen=true;
+  if(dir>0){settled++;bloom(n);} else {gathered++;sink(n);}
   updateTray();
   if(unfolded===n) unfolded=null;
   if(focusN===n) clearBloom();
@@ -2839,7 +2895,7 @@ function frame(t){
       if(n.mode==="orbit"&&n.orbit&&!n.orbit.c.gone){
         const ob=n.orbit;
         ob.ang+=ob.spd*dt;
-        const br=1+0.045*Math.sin(t*0.0011+ob.ang*2);
+        const br=1+0.045*Math.sin(curT*0.0011+ob.ang*2);
         const fv=reduced?{x:0,y:0}:fluidAt(n.x,n.y);
         n.tx=ob.c.x+Math.cos(ob.ang)*ob.rx*br+fv.x*(vw()/FW)*0.14;
         n.ty=ob.c.y+Math.sin(ob.ang)*ob.ry*br+fv.y*(vh()/FH)*0.14;
@@ -2910,7 +2966,12 @@ function frame(t){
   drawTrail(t);
   if(DRIFT_ON){requestAnimationFrame(frame);}else{rafOn=false;}
 }
-addEventListener("resize",sizeCanvases);
+function scheduleCanvasSize(){
+  if(resizeFrame) return;
+  resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;sizeCanvases();});
+}
+addEventListener("resize",scheduleCanvasSize);
+if(window.visualViewport) window.visualViewport.addEventListener("resize",scheduleCanvasSize);
 sizeCanvases();
 initBlobs();
 applyTheme(0);

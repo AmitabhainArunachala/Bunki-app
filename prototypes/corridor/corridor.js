@@ -462,6 +462,14 @@ const S = {
   /** real FSRS-6 card state per memorized item, keyed `${t}:${id}` — dates
    * stored as ISO strings, revived at the scheduler boundary */
   srs: {},
+  /** compact records for words taken from the deep 70k tier, keyed by written
+   * form — the card's answer travels inside the learner's own store */
+  deepWords: {},
+  /** storage protection: read-only quarantine when the stored envelope cannot
+   * be read (never overwrite what we cannot read), plus the one quiet line */
+  storeReadOnly: false,
+  storeError: null,
+  storeExtras: null,
   /** a running review session: { queue, ix, revealed, done } — null at rest */
   review: null,
   /** finished lessons: { 'N5-1': {score, total, ts} } */
@@ -507,31 +515,118 @@ const S = {
 
 /* ------------------------------------------------ persistence (localStorage) */
 const STORE_KEY = 'kairo-corridor-v1';
-function loadStore() {
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return;
-    const s = JSON.parse(raw);
-    if (Array.isArray(s.taken)) S.taken = s.taken;
-    if (s.lists && typeof s.lists === 'object') S.lists = s.lists;
-    if (s.srs && typeof s.srs === 'object') S.srs = s.srs;
-    if (s.lessonsDone && typeof s.lessonsDone === 'object') S.lessonsDone = s.lessonsDone;
-    if (s.aiReading && typeof s.aiReading === 'object') S.aiReading = s.aiReading;
-    if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
-    if (s.suspended && typeof s.suspended === 'object') S.suspended = s.suspended;
-    if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
-    if (s.stats && typeof s.stats === 'object') S.stats = s.stats;
-    if (s.readDone && typeof s.readDone === 'object') S.readDone = s.readDone;
-    if (s.readerPos && typeof s.readerPos === 'object') S.readerPos = s.readerPos;
-  } catch {
-    /* a broken store never blocks the walk */
-  }
+/** The keys this build knows how to carry. Anything else found in the stored
+ * envelope is preserved verbatim across every save — a newer build's record
+ * must survive a visit from an older one with not a byte dropped. */
+const STORE_KNOWN_KEYS = [
+  'v',
+  'taken',
+  'lists',
+  'srs',
+  'deepWords',
+  'lessonsDone',
+  'aiReading',
+  'aiReadings',
+  'suspended',
+  'aiChat',
+  'stats',
+  'readDone',
+  'readerPos',
+];
+
+function plainRecord(value) {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
 }
-function saveStore() {
+
+/** Never overwrite what cannot be read. A store that fails to parse, or that
+ * declares a future major version, flips this session to read-only: the app
+ * keeps working in memory, the original bytes stay untouched on the device,
+ * and one quiet line says so where the record lives (覚える). */
+function protectStore(messageJa, messageEn) {
+  S.storeReadOnly = true;
+  S.storeError = tx(messageJa, messageEn);
+}
+
+function loadStore() {
+  let raw = null;
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ taken: S.taken, lists: S.lists, srs: S.srs, lessonsDone: S.lessonsDone, aiReading: S.aiReading, aiReadings: S.aiReadings.slice(0, 10), suspended: S.suspended, aiChat: S.aiChat.slice(-24), stats: S.stats, readDone: S.readDone, readerPos: S.readerPos }));
+    raw = localStorage.getItem(STORE_KEY);
+  } catch {
+    /* private mode — nothing stored, nothing to protect */
+  }
+  if (!raw) return;
+  let s = null;
+  try {
+    s = JSON.parse(raw);
+  } catch {
+    protectStore(
+      '端末の学習データを読めない。元のデータを守るため、この回は保存しない。',
+      'The saved learner record could not be read. Saving is paused so its original bytes stay safe.',
+    );
+    return;
+  }
+  if (!plainRecord(s)) {
+    protectStore(
+      '端末の学習データの形が読めない。元のデータを守るため、この回は保存しない。',
+      'The saved learner record has an unreadable shape. Saving is paused so its original bytes stay safe.',
+    );
+    return;
+  }
+  if (Number.isInteger(s.v) && s.v > 1) {
+    protectStore(
+      'このデータは新しい版のもの。古い版で上書きしないため、この回は保存しない。',
+      'This record was written by a newer version of the app. Saving is paused so it is not rewritten by an older one.',
+    );
+    return;
+  }
+  if (Array.isArray(s.taken)) S.taken = s.taken;
+  if (plainRecord(s.lists)) S.lists = s.lists;
+  if (plainRecord(s.srs)) S.srs = s.srs;
+  if (plainRecord(s.deepWords)) S.deepWords = s.deepWords;
+  if (plainRecord(s.lessonsDone)) S.lessonsDone = s.lessonsDone;
+  if (plainRecord(s.aiReading)) S.aiReading = s.aiReading;
+  if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
+  if (plainRecord(s.suspended)) S.suspended = s.suspended;
+  if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
+  if (plainRecord(s.stats)) S.stats = s.stats;
+  if (plainRecord(s.readDone)) S.readDone = s.readDone;
+  if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
+  S.storeExtras = Object.fromEntries(
+    Object.entries(s).filter(([key]) => !STORE_KNOWN_KEYS.includes(key)),
+  );
+}
+
+function saveStore() {
+  if (S.storeReadOnly) return false;
+  try {
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify({
+        ...(S.storeExtras || {}),
+        v: 1,
+        taken: S.taken,
+        lists: S.lists,
+        srs: S.srs,
+        deepWords: S.deepWords || {},
+        lessonsDone: S.lessonsDone,
+        aiReading: S.aiReading,
+        aiReadings: S.aiReadings.slice(0, 10),
+        suspended: S.suspended,
+        aiChat: S.aiChat.slice(-24),
+        stats: S.stats,
+        readDone: S.readDone,
+        readerPos: S.readerPos,
+      }),
+    );
+    S.storeError = null;
+    return true;
   } catch {
     /* quota or private mode — the session keeps working unpersisted */
+    S.storeError = tx(
+      '端末に保存できなかった。この端末の空きを確かめて、記録を書き出しておくと安全。',
+      'This device could not save the change. Check free space, and export your record to keep it safe.',
+    );
+    return false;
   }
 }
 
@@ -549,17 +644,578 @@ function monthKey(ts) {
 
 /** Full dictionary record for a written form: kotobako (all senses, most
  * common first) with the original 6,687-word layer as fallback. */
-function lookup(id) {
+function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
   const full = D.dict[id];
-  if (full) return { r: full.r, m: full.m, p: full.p, jlpt: full.jlpt, k: full.k || [], alt: full.alt };
+  // Reader and lesson tokens were editorially resolved into the boot core.
+  // Opening the larger index must never make their immediate reading/meaning
+  // jump to a different homograph merely because its ent_seq sorts first.
+  if (!seq && full) {
+    return { head: id, r: full.r, m: full.m, p: full.p, jlpt: full.jlpt, k: full.k || [], alt: full.alt };
+  }
+  const indexed = seq ? dictionaryRowBySeq(seq) : dictionaryRowsForForm(id)[0];
+  if (indexed) {
+    const [entrySeq, defaultHead, defaultReading, defaultGloss, written, kana, glosses] = indexed;
+    const glossIndex = requestedGloss
+      ? indexed[6]?.findIndex((gloss) => normalizeGloss(gloss) === normalizeGloss(requestedGloss))
+      : -1;
+    const glossSummary = glossIndex >= 0 ? dictionaryGlossSummary(indexed, glossIndex) : null;
+    const requestedSummary =
+      glossSummary && (!requestedReading || kataToHira(glossSummary[0]) === kataToHira(requestedReading))
+        ? glossSummary
+        : dictionarySummaryFor(indexed, requestedReading, id);
+    const [reading, head, firstGloss] = requestedSummary ||
+      dictionarySummaryFor(indexed, requestedReading, id) || [defaultReading, defaultHead, defaultGloss];
+    const core = D.dict[id] || D.dict[head];
+    const orderedMeanings = firstGloss
+      ? [firstGloss, ...(glosses || []).filter((gloss) => gloss !== firstGloss)]
+      : glosses || [];
+    return {
+      seq: entrySeq,
+      head,
+      r: reading,
+      m: orderedMeanings,
+      p: core?.p,
+      jlpt: core?.jlpt,
+      k: [...head].filter((c) => /[一-鿌々]/.test(c)),
+      alt: written?.find((form) => form !== head) || null,
+      written: written || [],
+      kana: kana || [],
+    };
+  }
+  // A word taken from the deep tier keeps a snapshot in the record itself, so
+  // reviews and lists resolve it on any device without re-opening the index.
+  const kept = !seq && S.deepWords ? S.deepWords[id] : null;
+  if (kept) {
+    return {
+      head: id,
+      r: kept.r || '',
+      m: kept.m || [],
+      p: kept.p,
+      jlpt: kept.jlpt,
+      k: kept.k || [...id].filter((c) => /[一-鿌々]/.test(c)),
+      alt: kept.alt,
+    };
+  }
+  // A stable JMdict sequence names one lexical entry, not merely its printed
+  // spelling. Falling back to the spelling-keyed core here would silently
+  // answer a homograph with whichever sense happened to win the legacy bundle.
+  if (seq != null && seq !== '') return null;
   const old = D.words[id];
-  if (old) return { r: old.r, m: old.g ? [old.g] : [], jlpt: old.jlpt, k: old.k || [] };
+  if (old) return { head: id, r: old.r, m: old.g ? [old.g] : [], jlpt: old.jlpt, k: old.k || [] };
   return null;
 }
 
 const D = {};
 let fsrsApi = null;
 let scheduler = null;
+
+/* --------------------------------------------- the deep dictionary (70k)
+ * The boot core stays the small compatibility dictionary that powers the
+ * Drift, the reader and the lessons. Behind it sits the full JMdict tier —
+ * 69,996 entries, pinned and licensed — opened lazily: a search focus opens
+ * the index (off the main thread, in a worker, on the served build), and a
+ * word sheet then opens just the shard holding that entry's complete senses,
+ * restrictions, cross-references and antonyms. Harvested from the codex line
+ * (PR #70) and woven under this app's own surfaces. */
+const DICTIONARY_INDEX_PATH = 'data/share_alike/dict-v2/index.json';
+const DICTIONARY_CORE_PATH = 'data/share_alike/dict.json';
+const DICTIONARY_SHARD_PATH = (id) => `data/share_alike/dict-v2/${id}.json`;
+const DICTIONARY_SEARCH_SETTLE_MS = 320;
+let dictionaryIndexPromise = null;
+const dictionaryShardPromises = new Map();
+let dictionaryWorker = null;
+let dictionaryWorkerRequestId = 0;
+let dictionarySearchGeneration = 0;
+let dictionarySearchInFlight = null;
+let dictionarySearchQueued = null;
+let dictionarySearchTimer = null;
+let navSearchRepaint = null;
+const dictionaryWorkerRequests = new Map();
+
+function embeddedDictionaryJson(name) {
+  const node = document.getElementById(`corridor-dictionary-${name}`);
+  if (!node) return null;
+  const parsed = JSON.parse(node.textContent);
+  // The standalone keeps source bytes in inert nodes for self-containment.
+  // Once a file has become real JS data, retaining the raw text as well would
+  // nearly double its phone-memory cost.
+  node.remove();
+  return parsed;
+}
+
+async function loadDictionaryJson(name) {
+  const embedded = embeddedDictionaryJson(name);
+  if (embedded) return embedded;
+  const path = name === 'index' ? DICTIONARY_INDEX_PATH : DICTIONARY_SHARD_PATH(name);
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
+}
+
+function hasEmbeddedDictionaryIndex() {
+  return window.__CORRIDOR_STANDALONE__ === true || !!document.getElementById('corridor-dictionary-index');
+}
+
+function dictionaryWorkerRequest(type, payload = {}, generation = 0) {
+  if (!dictionaryWorker) return Promise.reject(new Error('dictionary worker is unavailable'));
+  const id = ++dictionaryWorkerRequestId;
+  return new Promise((resolve, reject) => {
+    dictionaryWorkerRequests.set(id, { resolve, reject, type, generation });
+    try {
+      dictionaryWorker.postMessage({ id, type, generation, ...payload });
+    } catch (error) {
+      dictionaryWorkerRequests.delete(id);
+      reject(error);
+    }
+  });
+}
+
+function stopDictionaryWorker(error) {
+  const reason = error instanceof Error ? error : new Error(String(error || 'dictionary worker stopped'));
+  for (const request of dictionaryWorkerRequests.values()) request.reject(reason);
+  dictionaryWorkerRequests.clear();
+  dictionaryWorker?.terminate();
+  dictionaryWorker = null;
+}
+
+async function startDictionaryWorker() {
+  if (dictionaryWorker) return dictionaryWorker;
+  dictionaryWorker = new Worker(new URL('dictionary-worker.js', import.meta.url));
+  dictionaryWorker.addEventListener('message', (event) => {
+    const message = event.data || {};
+    const request = dictionaryWorkerRequests.get(message.id);
+    if (!request) return;
+    dictionaryWorkerRequests.delete(message.id);
+    if (message.ok) request.resolve(message);
+    else request.reject(new Error(message.error || `dictionary worker ${request.type} failed`));
+  });
+  dictionaryWorker.addEventListener('error', (event) => {
+    stopDictionaryWorker(new Error(event.message || 'dictionary worker failed'));
+  });
+  return dictionaryWorker;
+}
+
+function recordDictionaryPerformance(performanceRecord) {
+  D.dictionaryPerformance = {
+    ...(D.dictionaryPerformance || {}),
+    ...performanceRecord,
+    receivedAt: performance.now(),
+  };
+  window.__KAIRO_DICTIONARY_PERF__ = D.dictionaryPerformance;
+  window.dispatchEvent(
+    new CustomEvent('kairo:dictionary-performance', { detail: { ...D.dictionaryPerformance } }),
+  );
+}
+
+function dictionaryCoreMatch(form, row) {
+  const core = D.dict?.[form];
+  if (!core) return { compatible: false, reading: false, gloss: false };
+  const coreGlosses = new Set((core.m || []).map(normalizeGloss));
+  const summaries = dictionaryReadingSummaries(row)
+    .filter((summary) => dictionaryReadingSupportsForm(row, summary[0], form))
+    .map((summary) => [summary[0], form, summary[2]]);
+  const reading = summaries.some((summary) => !!core.r && kataToHira(core.r) === kataToHira(summary[0]));
+  const gloss = summaries.some((summary) => !!summary[2] && coreGlosses.has(normalizeGloss(summary[2])));
+  const compatible = summaries.some(
+    (summary) =>
+      !!core.r &&
+      kataToHira(core.r) === kataToHira(summary[0]) &&
+      !!summary[2] &&
+      coreGlosses.has(normalizeGloss(summary[2])),
+  );
+  return { compatible, reading, gloss };
+}
+
+/** Decode the compact per-reading summaries without allocating an expanded
+ * 70k index. Current data aligns row[9] with row[5]: the reading is inferred
+ * from kanaForms and zero means "same as the default head/gloss". During the
+ * schema transition we also accept the earlier explicit 3-cell tuples. */
+function dictionaryReadingSummaries(row) {
+  if (!Array.isArray(row)) return [];
+  const defaultSummary = [row[2] || '', row[1] || '', row[3] || ''];
+  const encoded = Array.isArray(row[9]) ? row[9] : [];
+  const kana = Array.isArray(row[5]) ? row[5] : [];
+  if (!encoded.length) return [defaultSummary];
+  if (encoded.every((summary) => Array.isArray(summary) && summary.length >= 3)) {
+    return encoded.map((summary) => [summary[0] || '', summary[1] || row[1] || '', summary[2] || row[3] || '']);
+  }
+  if (encoded.length !== kana.length) return [defaultSummary];
+  return encoded.map((summary, index) => [
+    kana[index] || '',
+    Array.isArray(summary) && summary[0] ? summary[0] : row[1] || '',
+    Array.isArray(summary) && summary[1] ? summary[1] : row[3] || '',
+  ]);
+}
+
+/** Decode the restriction-compatible cue for one flattened English gloss.
+ * Cell 10 is aligned 1:1 with cells 6/7; its kana index selects the exact
+ * JMdict reading permitted by the source sense. */
+function dictionaryGlossSummary(row, glossIndex) {
+  if (!Array.isArray(row) || !Number.isInteger(glossIndex) || glossIndex < 0) return null;
+  const glosses = Array.isArray(row[6]) ? row[6] : [];
+  const kana = Array.isArray(row[5]) ? row[5] : [];
+  const encoded = Array.isArray(row[10]) ? row[10] : [];
+  const mapping = encoded[glossIndex];
+  if (
+    glossIndex >= glosses.length ||
+    !Array.isArray(mapping) ||
+    !Number.isInteger(mapping[0]) ||
+    mapping[0] < 0 ||
+    mapping[0] >= kana.length
+  ) {
+    return null;
+  }
+  return [kana[mapping[0]] || row[2] || '', mapping[1] || row[1] || '', glosses[glossIndex] || row[3] || ''];
+}
+
+/** Whether a source reading may be printed with this exact spelling. Cell 11
+ * is aligned with kana forms: 0 means every written form, 1 means no written
+ * form, and an array names the permitted row[4] indexes. */
+function dictionaryReadingSupportsForm(row, reading, form) {
+  if (!Array.isArray(row) || !form) return false;
+  const kana = Array.isArray(row[5]) ? row[5] : [];
+  const kanaIndex = kana.findIndex((candidate) => kataToHira(candidate) === kataToHira(reading || ''));
+  if (kanaIndex < 0) return false;
+  if (kataToHira(kana[kanaIndex]) === kataToHira(form) && kana.includes(form)) return true;
+  const written = Array.isArray(row[4]) ? row[4] : [];
+  const writtenIndex = written.indexOf(form);
+  if (writtenIndex < 0) return false;
+  const scope = Array.isArray(row[11]) ? row[11][kanaIndex] : null;
+  if (scope === 0) return true;
+  if (scope === 1) return false;
+  return Array.isArray(scope) && scope.includes(writtenIndex);
+}
+
+function dictionarySummaryFor(row, requestedReading = '', requestedHead = '') {
+  const summaries = dictionaryReadingSummaries(row);
+  if (!summaries.length) return null;
+  const reading = kataToHira(requestedReading || '');
+  if (reading) {
+    const exact = summaries.find(
+      (summary) =>
+        kataToHira(summary[0]) === reading &&
+        (!requestedHead || dictionaryReadingSupportsForm(row, summary[0], requestedHead)),
+    );
+    if (exact) return requestedHead ? [exact[0], requestedHead, exact[2]] : exact;
+    return summaries.find((summary) => kataToHira(summary[0]) === reading) || summaries[0];
+  }
+  const forHead = requestedHead
+    ? summaries.find((summary) => dictionaryReadingSupportsForm(row, summary[0], requestedHead))
+    : null;
+  return forHead ? [forHead[0], requestedHead, forHead[2]] : summaries[0];
+}
+
+function validDictionaryRow(row, previousSeq = -1) {
+  return (
+    Array.isArray(row) &&
+    row.length >= 12 &&
+    /^\d+$/.test(String(row[0])) &&
+    Array.isArray(row[4]) &&
+    Array.isArray(row[5]) &&
+    Array.isArray(row[6]) &&
+    Array.isArray(row[7]) &&
+    Array.isArray(row[9]) &&
+    Array.isArray(row[10]) &&
+    Array.isArray(row[11]) &&
+    row[10].length === row[6].length &&
+    row[11].length === row[5].length &&
+    Number(row[0]) > previousSeq
+  );
+}
+
+function installDictionaryIndex(index, { mode = 'main', performanceRecord = null } = {}) {
+  const mainEntries = Array.isArray(index?.entries) ? index.entries : null;
+  if (
+    index?.schemaVersion !== 2 ||
+    index?.shardCount !== 16 ||
+    index?.sharding?.id !== 'fnv1a32-ascii-seq-mask15' ||
+    index.sharding.shardCount !== index.shardCount ||
+    (mode === 'main' && !mainEntries) ||
+    (mode === 'worker' && mainEntries)
+  ) {
+    throw new Error('dictionary index has an unsupported shape');
+  }
+  if (mainEntries) {
+    let previousSeq = -1;
+    for (const row of mainEntries) {
+      if (!validDictionaryRow(row, previousSeq)) throw new Error('dictionary index row is malformed');
+      previousSeq = Number(row[0]);
+    }
+  }
+  D.dictionaryIndex = index;
+  D.dictionaryMode = mode;
+  // In the served build these maps contain only rows returned for a complete
+  // search/form/seq request. The 70k entry array never crosses the worker
+  // boundary; the standalone fallback uses the embedded entries directly.
+  D.dictionaryBySeq = new Map();
+  D.dictionaryByForm = new Map();
+  D.dictionaryCompleteForms = new Set();
+  D.dictionarySearchCache = new Map();
+  D.dictionarySearchPending = new Map();
+  D.dictionarySearchErrors = new Map();
+  D.dictionaryState = 'ready';
+  D.dictionaryError = null;
+  if (performanceRecord) recordDictionaryPerformance(performanceRecord);
+  else {
+    recordDictionaryPerformance({
+      mode: 'embedded-main',
+      entries: mainEntries?.length || 0,
+      mainThreadIndexEntries: mainEntries?.length || 0,
+    });
+  }
+  if (D.sources?.share_alike && !D.sources.share_alike.some((source) => source.name === index.source?.name)) {
+    D.sources.share_alike.push({
+      name: index.source.name,
+      licence: index.source.licence,
+      attribution: index.source.attribution,
+      url: index.source.licenceUrl,
+    });
+  }
+  // One genuine core→full transition refreshes the live result body once.
+  queueMicrotask(refreshDictionaryBodies);
+}
+
+function cacheDictionaryRow(row) {
+  if (!validDictionaryRow(row)) throw new Error('dictionary worker returned a malformed row');
+  D.dictionaryBySeq ||= new Map();
+  D.dictionaryBySeq.set(String(row[0]), row);
+  return row;
+}
+
+function cacheDictionaryFormRows(form, rows) {
+  const key = String(form || '');
+  if (!key || !Array.isArray(rows)) throw new Error('dictionary worker returned malformed form rows');
+  const seen = new Set();
+  for (const row of rows) {
+    if (
+      !validDictionaryRow(row) ||
+      seen.has(String(row[0])) ||
+      !(row[1] === key || row[4].includes(key) || row[5].includes(key))
+    ) {
+      throw new Error(`dictionary worker returned malformed rows for ${key}`);
+    }
+    seen.add(String(row[0]));
+    cacheDictionaryRow(row);
+  }
+  D.dictionaryByForm ||= new Map();
+  D.dictionaryCompleteForms ||= new Set();
+  D.dictionaryByForm.set(key, rows);
+  D.dictionaryCompleteForms.add(key);
+  return rows;
+}
+
+function dictionaryRowBySeq(seq) {
+  if (!D.dictionaryIndex) return null;
+  const key = String(seq);
+  if (D.dictionaryBySeq?.has(key)) return D.dictionaryBySeq.get(key);
+  if (!Array.isArray(D.dictionaryIndex.entries)) return null;
+  const target = Number(key);
+  if (!Number.isFinite(target)) return null;
+  const entries = D.dictionaryIndex.entries;
+  let low = 0;
+  let high = entries.length - 1;
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    const value = Number(entries[middle][0]);
+    if (value === target) {
+      D.dictionaryBySeq.set(key, entries[middle]);
+      return entries[middle];
+    }
+    if (value < target) low = middle + 1;
+    else high = middle - 1;
+  }
+  return null;
+}
+
+function dictionaryRowsForForm(form) {
+  if (!D.dictionaryIndex || !form) return [];
+  const key = String(form);
+  if (D.dictionaryCompleteForms?.has(key) && D.dictionaryByForm?.has(key)) {
+    return D.dictionaryByForm.get(key);
+  }
+  if (!Array.isArray(D.dictionaryIndex.entries)) return [];
+  const rows = [];
+  for (const row of D.dictionaryIndex.entries) {
+    if (row[1] === key || row[4].includes(key) || row[5].includes(key)) rows.push(row);
+  }
+  const core = D.dict?.[key];
+  const score = (row) => {
+    const [, head, , , written, kana, , , common] = row;
+    const match = dictionaryCoreMatch(key, row);
+    return (
+      Number(match.compatible) * 32 +
+      Number(match.gloss) * 16 +
+      Number(match.reading) * 8 +
+      Number(head === key) * 2 +
+      Number(common) +
+      Number(!!core?.alt && [...written, ...kana].includes(core.alt))
+    );
+  };
+  rows.sort((left, right) => score(right) - score(left) || Number(left[0]) - Number(right[0]));
+  D.dictionaryByForm.set(key, rows);
+  D.dictionaryCompleteForms?.add(key);
+  return rows;
+}
+
+function ensureDictionaryIndex() {
+  if (D.dictionaryIndex) return Promise.resolve(D.dictionaryIndex);
+  if (dictionaryIndexPromise) return dictionaryIndexPromise;
+  D.dictionaryState = 'loading';
+  const opening = hasEmbeddedDictionaryIndex()
+    ? loadDictionaryJson('index').then((index) => {
+        installDictionaryIndex(index, { mode: 'main' });
+        return index;
+      })
+    : startDictionaryWorker()
+        .then(() =>
+          dictionaryWorkerRequest('init', {
+            indexUrl: new URL(DICTIONARY_INDEX_PATH, document.baseURI).href,
+            coreUrl: new URL(DICTIONARY_CORE_PATH, document.baseURI).href,
+          }),
+        )
+        .then((message) => {
+          installDictionaryIndex(message.result.metadata, {
+            mode: 'worker',
+            performanceRecord: message.result.performance,
+          });
+          return D.dictionaryIndex;
+        });
+  dictionaryIndexPromise = opening.catch((err) => {
+    D.dictionaryState = 'error';
+    D.dictionaryError = err;
+    dictionaryIndexPromise = null;
+    if (D.dictionaryMode !== 'main') stopDictionaryWorker(err);
+    queueMicrotask(refreshDictionaryBodies);
+    throw err;
+  });
+  return dictionaryIndexPromise;
+}
+
+async function ensureDictionaryRowBySeq(seq) {
+  await ensureDictionaryIndex();
+  const cached = dictionaryRowBySeq(seq);
+  if (cached || D.dictionaryMode === 'main') return cached;
+  const message = await dictionaryWorkerRequest('rowBySeq', { seq: String(seq) });
+  return message.result.row ? cacheDictionaryRow(message.result.row) : null;
+}
+
+async function ensureDictionaryRowsForForm(form) {
+  await ensureDictionaryIndex();
+  const key = String(form || '');
+  if (!key) return [];
+  if (D.dictionaryCompleteForms?.has(key) || D.dictionaryMode === 'main') {
+    return dictionaryRowsForForm(key);
+  }
+  const message = await dictionaryWorkerRequest('rowsForForm', { form: key });
+  if (message.result.form !== key) throw new Error('dictionary worker returned the wrong form');
+  return cacheDictionaryFormRows(key, message.result.rows);
+}
+
+async function ensureDictionaryRowsForNode(node) {
+  if (!node) return [];
+  if (node.seq) {
+    const row = await ensureDictionaryRowBySeq(node.seq);
+    return row ? [row] : [];
+  }
+  const rows = await ensureDictionaryRowsForForm(node.id);
+  if (node.reading && rows.length) {
+    const reading = kataToHira(node.reading);
+    const chosen = rows.find((row) =>
+      dictionaryReadingSummaries(row).some(
+        (summary) =>
+          kataToHira(summary[0]) === reading && dictionaryReadingSupportsForm(row, summary[0], node.id),
+      ),
+    );
+    if (chosen) node.dictionaryResolvedSeq = String(chosen[0]);
+  }
+  return rows;
+}
+
+function dictionaryRowsFor(node) {
+  if (!D.dictionaryIndex || !node) return [];
+  if (node.seq) {
+    const row = dictionaryRowBySeq(node.seq);
+    return row ? [row] : [];
+  }
+  return dictionaryRowsForForm(node.id);
+}
+
+function dictionaryDetailRowsFor(node) {
+  const rows = dictionaryRowsFor(node);
+  if (node?.seq || !rows.length) return rows;
+  const core = D.dict?.[node.id];
+  const compatibleRows = core ? rows.filter((row) => dictionaryCoreMatch(node.id, row).compatible) : rows;
+  if (core && !compatibleRows.length) return [];
+  if (compatibleRows.length <= 1) return compatibleRows;
+  const chosen =
+    compatibleRows.find((row) => String(row[0]) === String(node.dictionaryResolvedSeq || '')) ||
+    compatibleRows[0];
+  if (chosen) node.dictionaryResolvedSeq = String(chosen[0]);
+  return chosen ? [chosen] : [];
+}
+
+function dictionaryShardNumber(seq) {
+  let hash = 0x811c9dc5;
+  for (const character of String(seq)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash & (D.dictionaryIndex.shardCount - 1);
+}
+
+function dictionaryShardId(seq) {
+  return dictionaryShardNumber(seq).toString(16).padStart(2, '0');
+}
+
+function ensureDictionaryShard(id) {
+  if (D.dictionaryShards?.has(id)) return Promise.resolve(D.dictionaryShards.get(id));
+  if (dictionaryShardPromises.has(id)) return dictionaryShardPromises.get(id);
+  const promise = loadDictionaryJson(id)
+    .then((shard) => {
+      const shardNumber = Number.parseInt(id, 16);
+      if (
+        shard?.schemaVersion !== 2 ||
+        shard?.shard !== shardNumber ||
+        shard?.shardCount !== D.dictionaryIndex?.shardCount ||
+        shard?.sharding?.id !== D.dictionaryIndex?.sharding?.id ||
+        shard?.sourcePin !== D.dictionaryIndex?.source?.pin ||
+        !Array.isArray(shard.entries) ||
+        shard.entries.some((entry) => dictionaryShardNumber(entry?.[0]) !== shardNumber)
+      ) {
+        throw new Error(`dictionary shard ${id} has an unsupported shape`);
+      }
+      D.dictionaryShards ||= new Map();
+      D.dictionaryDetails ||= new Map();
+      D.dictionaryShards.set(id, shard);
+      for (const entry of shard.entries) D.dictionaryDetails.set(String(entry[0]), entry);
+      return shard;
+    })
+    .catch((err) => {
+      dictionaryShardPromises.delete(id);
+      throw err;
+    });
+  dictionaryShardPromises.set(id, promise);
+  return promise;
+}
+
+async function ensureDictionaryDetails(node) {
+  await ensureDictionaryIndex();
+  await ensureDictionaryRowsForNode(node);
+  const rows = dictionaryDetailRowsFor(node);
+  const shards = [...new Set(rows.map((row) => dictionaryShardId(row[0])))];
+  await Promise.all(shards.map(ensureDictionaryShard));
+  return rows.map((row) => D.dictionaryDetails?.get(String(row[0]))).filter(Boolean);
+}
+
+function dictionaryDetailsFor(node) {
+  return dictionaryDetailRowsFor(node)
+    .map((row) => D.dictionaryDetails?.get(String(row[0])))
+    .filter(Boolean);
+}
+
+function dictionaryTag(tag) {
+  return D.dictionaryIndex?.tags?.[tag] || tag;
+}
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -696,6 +1352,16 @@ async function boot() {
   D.radicals = kanji.radicals;
   D.words = words.words;
   D.dict = dict.words;
+  D.dictionaryState = 'core';
+  D.dictionaryMode = 'core';
+  D.dictionaryShards = new Map();
+  D.dictionaryDetails = new Map();
+  D.dictionaryBySeq = new Map();
+  D.dictionaryByForm = new Map();
+  D.dictionaryCompleteForms = new Set();
+  D.dictionarySearchCache = new Map();
+  D.dictionarySearchPending = new Map();
+  D.dictionarySearchErrors = new Map();
   D.strokes = strokes.strokes;
   D.kmeta = strokes.meta;
   // the official radical (部首) table, keyed by Kangxi number 1–214; each kanji
@@ -1273,8 +1939,11 @@ function renderShelf(main) {
   search.autocomplete = 'off';
   search.value = S.query || '';
   let debounce = null;
+  const openFullDictionary = () => ensureDictionaryIndex().catch(() => {});
+  search.addEventListener('focus', openFullDictionary, { once: true });
   search.addEventListener('input', () => {
     S.query = search.value;
+    if (S.query.trim()) openFullDictionary();
     clearTimeout(debounce);
     debounce = setTimeout(() => {
       // surgical swap — the field keeps focus, only the body below changes
@@ -1288,8 +1957,34 @@ function renderShelf(main) {
 function renderShelfBody() {
   const main = el('div');
   main.id = 'shelf-body';
+  main.dataset.renderToken = shelfBodyToken();
   if (S.query?.trim()) {
     renderSearchResults(main, S.query);
+    if (dictionaryQueryOpening(S.query)) {
+      main.append(
+        el('p', 'dictionary-opening', tx('辞書の奥をひらいています…', 'Opening the rest of the dictionary…')),
+      );
+    } else if (dictionaryQueryError(S.query)) {
+      const retry = biLabel('button', 'dictionary-retry', '辞書をもう一度ひらく', 'try the full dictionary again');
+      retry.type = 'button';
+      retry.addEventListener('click', () => {
+        D.dictionaryError = null;
+        D.dictionarySearchErrors?.delete(dictionaryQueryKey(S.query));
+        ensureDictionaryIndex().catch(() => {});
+        refreshShelfBody();
+      });
+      main.append(
+        el(
+          'p',
+          'dictionary-warning',
+          tx(
+            '手元の小辞書は使えるが、辞書の奥をまだ読めない。',
+            'The immediate dictionary still works, but the full index could not be opened.',
+          ),
+        ),
+        retry,
+      );
+    }
     return main;
   }
   const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
@@ -2070,6 +2765,33 @@ function renderTray(main) {
   main.append(
     el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
   );
+  // The record's health, said once and quietly, exactly where the record
+  // lives: a storage problem if there is one, else a gentle backup reminder
+  // when weeks of reviews are sitting on one device unexported.
+  if (S.storeError) {
+    main.append(el('p', 'store-warning', S.storeError));
+  } else {
+    const cardCount = S.taken.length + Object.keys(S.srs).length;
+    const last = Number(S.stats?.lastExportTs) || 0;
+    const stale = !last || Date.now() - last > 14 * 86400000;
+    if (cardCount >= 20 && stale) {
+      main.append(
+        el(
+          'p',
+          'store-nudge',
+          last
+            ? tx(
+                '最後の書き出しから二週間以上。下の「書き出す」で記録をひとつのファイルに。',
+                'It has been over two weeks since your last export — 書き出す below keeps the whole record in one file.',
+              )
+            : tx(
+                '記録はこの端末だけにある。下の「書き出す」でひとつのファイルに残せる。',
+                'Your record lives only on this device so far — 書き出す below keeps it all in one file.',
+              ),
+        ),
+      );
+    }
+  }
   if (S.taken.length && scheduler) {
     const due = srsDueItems();
     const btn = biLabel(
@@ -2221,6 +2943,11 @@ function renderPortRow(main) {
     a.download = `kairo-${dayKey()}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    // remember when the record last left the device — the tray's quiet backup
+    // reminder counts from here
+    S.stats ||= {};
+    S.stats.lastExportTs = Date.now();
+    saveStore();
   });
   const imp = biLabel('button', 'chip', '読み込む', 'import a record');
   imp.type = 'button';
@@ -3462,6 +4189,10 @@ function kataToHira(s) {
   return s.replace(/[ァ-ヶ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - KATA_TO_HIRA_OFFSET));
 }
 
+function hiraToKata(s) {
+  return String(s || '').replace(/[぀-ゖ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + KATA_TO_HIRA_OFFSET));
+}
+
 /** Hepburn-ish romaji → hiragana, table-driven longest match. Returns null
  * when the input cannot be fully converted (then it is English, not romaji). */
 const ROMAJI = (() => {
@@ -3570,6 +4301,7 @@ function buildSearchIndex() {
     const glosses = rec.m || [];
     searchIndex.push({
       t: 'word', id: w, w,
+      core: true,
       r: rec.r || '',
       rh: kataToHira(rec.r || ''),
       m: glosses.join('; ').toLowerCase(),
@@ -3610,15 +4342,210 @@ function buildSearchIndex() {
   }
 }
 
-function searchResults(query) {
-  buildSearchIndex();
-  const q = query.trim();
-  if (!q) return [];
+/* ------------------------------ the deep tier behind the one search box
+ * The core index answers instantly, exactly as before. The full 70k index
+ * answers behind it: on the served build a worker scans it off the main
+ * thread and the visible results refresh once when it settles; on the
+ * standalone the embedded entries are scanned inline. A deep row that is
+ * fully compatible with a core word replaces that core row (the deep entry
+ * is the superset — every sense, homographs, cross-references). */
+function dictionarySearchContext(query) {
+  const q = String(query || '').trim();
   const hasKanji = /[一-鿌]/.test(q);
   const hasKana = /[぀-ゖァ-ヺ]/.test(q);
   const qh = hasKana ? kataToHira(q) : ROMAJI(q);
-  const ql = q.toLowerCase();
-  const qn = hasKanji || hasKana ? '' : normalizeGloss(q);
+  return {
+    q,
+    hasKanji,
+    hasKana,
+    qh,
+    qk: qh ? hiraToKata(qh) : null,
+    ql: q.toLowerCase(),
+    qn: hasKanji || hasKana ? '' : normalizeGloss(q),
+  };
+}
+
+function dictionaryQueryKey(query) {
+  return String(query || '').trim();
+}
+
+function dictionaryQueryOpening(query) {
+  const key = dictionaryQueryKey(query);
+  return (
+    D.dictionaryState === 'loading' ||
+    !!D.dictionarySearchPending?.has(key) ||
+    dictionarySearchQueued?.key === key
+  );
+}
+
+function dictionaryQueryError(query) {
+  const key = dictionaryQueryKey(query);
+  return D.dictionaryError || D.dictionarySearchErrors?.get(key) || null;
+}
+
+function dictionaryQueryToken(query) {
+  const key = dictionaryQueryKey(query);
+  if (dictionaryQueryError(key)) return 'error';
+  if (dictionaryQueryOpening(key)) return 'opening';
+  if (D.dictionarySearchCache?.has(key)) return 'full';
+  return D.dictionaryState || 'core';
+}
+
+function shelfBodyToken() {
+  return `${S.query?.trim() || ''}\u0000${dictionaryQueryToken(S.query)}`;
+}
+
+function refreshShelfBody() {
+  const live = document.getElementById('shelf-body');
+  if (!live || live.dataset.renderToken === shelfBodyToken()) return;
+  live.replaceWith(renderShelfBody());
+}
+
+function refreshDictionaryBodies() {
+  if (S.view === 'shelf' && S.query?.trim()) refreshShelfBody();
+  if (typeof navSearchRepaint === 'function') navSearchRepaint();
+}
+
+function activeDictionaryQuery() {
+  const nav = document.getElementById('nav-search-input');
+  if (nav?.value.trim()) return dictionaryQueryKey(nav.value);
+  if (S.view === 'shelf') return dictionaryQueryKey(S.query);
+  return '';
+}
+
+function clearDictionarySearchTimer() {
+  if (dictionarySearchTimer != null) clearTimeout(dictionarySearchTimer);
+  dictionarySearchTimer = null;
+}
+
+function dispatchQueuedDictionarySearch() {
+  clearDictionarySearchTimer();
+  if (dictionarySearchInFlight || !dictionarySearchQueued) return;
+  const queued = dictionarySearchQueued;
+  if (
+    activeDictionaryQuery() !== queued.key ||
+    D.dictionaryMode !== 'worker' ||
+    D.dictionaryState !== 'ready' ||
+    D.dictionarySearchCache?.has(queued.key)
+  ) {
+    dictionarySearchQueued = null;
+    queueMicrotask(refreshDictionaryBodies);
+    return;
+  }
+  const remaining = queued.eligibleAt - performance.now();
+  if (remaining > 0) {
+    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, remaining);
+    return;
+  }
+
+  dictionarySearchQueued = null;
+  const generation = ++dictionarySearchGeneration;
+  const flight = { key: queued.key, generation };
+  dictionarySearchInFlight = flight;
+  D.dictionarySearchPending.set(queued.key, generation);
+  D.dictionarySearchErrors.delete(queued.key);
+  recordDictionaryPerformance({
+    workerSearchDispatches: (D.dictionaryPerformance?.workerSearchDispatches || 0) + 1,
+    lastDispatchedQuery: queued.key,
+    searchConcurrency: 1,
+  });
+
+  const release = () => {
+    if (dictionarySearchInFlight !== flight) return;
+    dictionarySearchInFlight = null;
+    if (D.dictionarySearchPending.get(queued.key) === generation) {
+      D.dictionarySearchPending.delete(queued.key);
+    }
+  };
+
+  dictionaryWorkerRequest(
+    'search',
+    { context: queued.context, matchingCoreIds: [...queued.matchingCoreIds] },
+    generation,
+  )
+    .then((message) => {
+      release();
+      // A worker reply belongs only to the exact query that is still visible.
+      // Stale rows never enter the cache maps and therefore can never render.
+      if (message.generation !== generation || activeDictionaryQuery() !== queued.key) return;
+      const result = message.result;
+      if (
+        !Array.isArray(result?.results) ||
+        !Array.isArray(result?.compatibleCoreIds) ||
+        !Array.isArray(result?.formRows)
+      ) {
+        throw new Error('dictionary worker returned a malformed search result');
+      }
+      for (const pair of result.formRows) {
+        if (!Array.isArray(pair) || pair.length !== 2) {
+          throw new Error('dictionary worker returned malformed result families');
+        }
+        cacheDictionaryFormRows(pair[0], pair[1]);
+      }
+      const scored = result.results.map((item) => {
+        const row = dictionaryRowBySeq(item?.result?.seq);
+        if (!row || !Number.isFinite(item.score) || !Number.isFinite(item.tie)) {
+          throw new Error('dictionary worker result is missing its compact row');
+        }
+        return { e: { ...item.result, dictionaryRow: row }, score: item.score, tie: item.tie };
+      });
+      D.dictionarySearchCache.set(queued.key, {
+        scored,
+        compatibleCoreIds: result.compatibleCoreIds,
+      });
+      while (D.dictionarySearchCache.size > 12) {
+        D.dictionarySearchCache.delete(D.dictionarySearchCache.keys().next().value);
+      }
+      recordDictionaryPerformance({
+        lastSearch: result.performance,
+        cachedRows: D.dictionaryBySeq.size,
+        cachedForms: D.dictionaryCompleteForms.size,
+      });
+      refreshDictionaryBodies();
+    })
+    .catch((error) => {
+      release();
+      if (activeDictionaryQuery() !== queued.key) return;
+      D.dictionarySearchErrors.set(queued.key, error);
+      refreshDictionaryBodies();
+    })
+    .finally(() => {
+      release();
+      dispatchQueuedDictionarySearch();
+    });
+}
+
+function requestDictionarySearch(context, matchingCoreIds) {
+  const key = context.q;
+  if (
+    !key ||
+    D.dictionaryMode !== 'worker' ||
+    D.dictionaryState !== 'ready' ||
+    D.dictionarySearchCache?.has(key) ||
+    dictionarySearchInFlight?.key === key
+  ) {
+    return;
+  }
+  // Exactly one replaceable request waits behind the active worker call. A
+  // natural typing stream continuously replaces this slot; only 320ms of
+  // quiet makes the latest visible query eligible to cross the worker seam.
+  dictionarySearchQueued = {
+    key,
+    context,
+    matchingCoreIds: new Set(matchingCoreIds),
+    eligibleAt: performance.now() + DICTIONARY_SEARCH_SETTLE_MS,
+  };
+  if (!dictionarySearchInFlight) {
+    clearDictionarySearchTimer();
+    dictionarySearchTimer = setTimeout(dispatchQueuedDictionarySearch, DICTIONARY_SEARCH_SETTLE_MS);
+  }
+}
+
+function searchResults(query) {
+  buildSearchIndex();
+  const context = dictionarySearchContext(query);
+  const { q, hasKanji, hasKana, qh, qk, ql, qn } = context;
+  if (!q) return [];
   const scored = [];
   for (const e of searchIndex) {
     let score = -1;
@@ -3661,8 +4588,136 @@ function searchResults(query) {
     }
     if (score >= 0) scored.push({ e, score, tie });
   }
-  scored.sort((a, b) => b.score - a.score || a.tie - b.tie || a.e.w.length - b.e.w.length);
-  return scored.slice(0, 40).map((x) => x.e);
+  const matchingCoreIds = new Set(scored.filter(({ e }) => e.core).map(({ e }) => e.id));
+  const workerSearch = D.dictionarySearchCache?.get(q) || null;
+  if (workerSearch) scored.push(...workerSearch.scored);
+  else requestDictionarySearch(context, matchingCoreIds);
+
+  // The full dictionary index stays in its compact source tuples. Search all
+  // spellings, all readings and every English gloss without materialising a
+  // second expanded index. Each hit carries ent_seq into the canonical sheet,
+  // so homographs no longer disappear behind a first-wins written key.
+  for (const row of D.dictionaryIndex?.entries || []) {
+    const [seq, head, reading, firstGloss, written, kana, glosses, normalGlosses, common] = row;
+    const summaries = dictionaryReadingSummaries(row);
+    const defaultSummary = [reading || '', head || '', firstGloss || ''];
+    let matchedSummary = defaultSummary;
+    let score = -1;
+    let tie = common ? 0 : 6;
+    if (hasKanji) {
+      const matchedWritten =
+        written.find((form) => form === q) ||
+        written.find((form) => form.startsWith(q)) ||
+        written.find((form) => form.includes(q));
+      if (matchedWritten) {
+        score = matchedWritten === q ? 100 : matchedWritten.startsWith(q) ? 80 : 60;
+        const permitted = summaries.find((summary) =>
+          dictionaryReadingSupportsForm(row, summary[0], matchedWritten),
+        );
+        if (permitted) matchedSummary = [permitted[0], matchedWritten, permitted[2]];
+      }
+    } else if (hasKana) {
+      const exact = summaries.find((summary) => kataToHira(summary[0]) === qh);
+      const prefix = exact ? null : summaries.find((summary) => kataToHira(summary[0]).startsWith(qh));
+      if (exact) {
+        score = 100;
+        matchedSummary = exact;
+      } else if (prefix) {
+        score = 80;
+        matchedSummary = prefix;
+      } else if (
+        written.some((form) => form.includes(q)) ||
+        kana.some((form) => form.includes(q) || form.includes(qh) || form.includes(qk))
+      ) {
+        score = 60;
+        matchedSummary = summaries.find((summary) => kataToHira(summary[0]).includes(qh)) || defaultSummary;
+      }
+    } else {
+      if (qh) {
+        const exact = summaries.find((summary) => kataToHira(summary[0]) === qh);
+        const prefix = exact ? null : summaries.find((summary) => kataToHira(summary[0]).startsWith(qh));
+        if (exact) {
+          score = 95;
+          matchedSummary = exact;
+        } else if (prefix) {
+          score = 75;
+          matchedSummary = prefix;
+        }
+      }
+      const gi = qn ? normalGlosses.indexOf(qn) : -1;
+      const glossExact = gi >= 0 ? dictionaryGlossSummary(row, gi) : null;
+      const exact = gi === 0 ? 92 : gi > 0 ? 85 : -1;
+      if (exact > score) {
+        score = exact;
+        if (glossExact) matchedSummary = glossExact;
+        tie += gi * 10 + jlptRank(D.dict[head]?.jlpt);
+      }
+      if (score < 92) {
+        let boundaryIndex = -1;
+        let anywhereIndex = -1;
+        for (let glossIndex = 0; glossIndex < glosses.length; glossIndex += 1) {
+          const gloss = glosses[glossIndex];
+          // JMdict English glosses are overwhelmingly lowercase. Avoid making
+          // a fresh lowercase string for every gloss on every keystroke; pay
+          // that cost only for the minority that actually contain capitals.
+          const searchable = /[A-Z]/.test(gloss) ? gloss.toLowerCase() : gloss;
+          const at = searchable.indexOf(ql);
+          if (at === 0 || (at > 0 && ' ;('.includes(searchable[at - 1]))) {
+            boundaryIndex = glossIndex;
+            break;
+          }
+          if (at > 0 && anywhereIndex < 0) anywhereIndex = glossIndex;
+        }
+        if (boundaryIndex >= 0) {
+          score = Math.max(score, 70);
+          matchedSummary = dictionaryGlossSummary(row, boundaryIndex) || matchedSummary;
+        } else if (anywhereIndex >= 0) {
+          score = Math.max(score, 40);
+          matchedSummary = dictionaryGlossSummary(row, anywhereIndex) || matchedSummary;
+        }
+      }
+    }
+    if (score >= 0) {
+      const [matchedReading, displayHead, matchedGloss] = matchedSummary;
+      scored.push({
+        e: {
+          t: 'word',
+          id: displayHead || head,
+          seq,
+          reading: matchedReading || reading || '',
+          w: displayHead || head,
+          r: matchedReading || reading || '',
+          g: matchedGloss || firstGloss || '',
+          matchedGloss: matchedGloss || firstGloss || '',
+          dictionaryRow: row,
+        },
+        score,
+        tie,
+      });
+    }
+  }
+  scored.sort(
+    (a, b) =>
+      b.score - a.score || Number(!a.e.seq) - Number(!b.e.seq) || a.tie - b.tie || a.e.w.length - b.e.w.length,
+  );
+  const coreIds = new Set(scored.filter(({ e }) => e.core).map(({ e }) => e.id));
+  const compatibleCoreIds = new Set(workerSearch?.compatibleCoreIds || []);
+  for (const { e } of scored) {
+    if (!e.dictionaryRow) continue;
+    const forms = new Set([e.dictionaryRow[1], ...e.dictionaryRow[4], ...e.dictionaryRow[5]]);
+    for (const form of forms) {
+      if (coreIds.has(form) && dictionaryCoreMatch(form, e.dictionaryRow).compatible) {
+        compatibleCoreIds.add(form);
+      }
+    }
+  }
+  const results = [];
+  for (const { e } of scored) {
+    if (e.core && compatibleCoreIds.has(e.id)) continue;
+    results.push(e);
+    if (results.length >= 40) break;
+  }
+  return results;
 }
 
 function renderSearchResults(main, query) {
@@ -3672,7 +4727,7 @@ function renderSearchResults(main, query) {
   for (const e of results) {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
-    row.dataset.result = `${e.t}:${e.id}`;
+    row.dataset.result = `${e.t}:${e.id}${e.seq ? `:${e.seq}` : ''}`;
     if (e.t === 'kanji') {
       row.append(el('span', 'row-glyph', e.w));
       const stack = el('span', 'row-stack');
@@ -3689,7 +4744,13 @@ function renderSearchResults(main, query) {
       row.append(stack);
     }
     row.append(el('span', 'row-go', '›'));
-    row.addEventListener('click', () => go({ t: e.t, id: e.id }));
+    row.addEventListener('click', () =>
+      go(
+        e.seq
+          ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
+          : { t: e.t, id: e.id },
+      ),
+    );
     box.append(row);
   }
   if (!results.length) {
@@ -3917,7 +4978,7 @@ function takeButton(node, label) {
   btn.id = 'take';
   btn.addEventListener('click', () => {
     if (already) return;
-    S.taken.push({
+    const item = {
       t: node.t,
       id: node.id,
       label,
@@ -3925,7 +4986,28 @@ function takeButton(node, label) {
       kindEn: NODE_KIND[node.t][1],
       from: node.from || null,
       ts: Date.now(),
-    });
+    };
+    // A word taken from the deep tier writes its own compact record into the
+    // learner's store: the card must answer on any device, offline, without
+    // re-opening the 70k index. The exact entry (ent_seq) and the reading the
+    // learner actually met ride along as provenance.
+    if (node.t === 'word' && !D.dict[node.id]) {
+      const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+      if (rec?.seq) item.entrySeq = String(rec.seq);
+      if (rec?.r) item.cueReading = rec.r;
+      if (rec) {
+        S.deepWords ||= {};
+        S.deepWords[node.id] = {
+          r: rec.r || '',
+          m: (rec.m || []).slice(0, 8),
+          ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
+          ...(rec.alt ? { alt: rec.alt } : {}),
+          ...(rec.k?.length ? { k: rec.k } : {}),
+          ...(rec.seq ? { seq: String(rec.seq) } : {}),
+        };
+      }
+    }
+    S.taken.push(item);
     saveStore();
     render();
   });
@@ -5005,25 +6087,270 @@ function renderConjugation(sheet, word, pos) {
   sheet.append(table);
 }
 
+/* ------------------------------- complete JMdict senses on the word sheet
+ * The deep tier's shard holds the entry's full record: numbered senses with
+ * usage tags, spelling/reading restrictions, source-language notes, and
+ * JMdict's own cross-references and antonyms. Those relations are the
+ * dictionary's voice, kept apart from the hand-written 類語 clusters — a
+ * JMdict xref is never dressed up as an authored synonym note. */
+function relationTarget(tuple) {
+  return Array.isArray(tuple) ? String(tuple[0] || '').replace(/・\d+$/, '') : '';
+}
+
+function relationReadingQualifier(value) {
+  return typeof value === 'string' ? value.replace(/・\d+$/, '') : '';
+}
+
+function dictionaryRelationRoute(tuple, from) {
+  const target = relationTarget(tuple);
+  if (!target) return null;
+  const rows = dictionaryRowsForForm(target);
+  for (const qualifier of tuple.slice(1)) {
+    const readingQualifier = relationReadingQualifier(qualifier);
+    if (!readingQualifier) continue;
+    for (const row of rows) {
+      const summary = dictionaryReadingSummaries(row).find(
+        (candidate) =>
+          kataToHira(candidate[0]) === kataToHira(readingQualifier) &&
+          dictionaryReadingSupportsForm(row, candidate[0], target),
+      );
+      if (summary) {
+        return { t: 'word', id: target, seq: String(row[0]), reading: summary[0], from };
+      }
+    }
+  }
+  if (
+    D.dictionaryMode === 'worker' &&
+    D.dictionaryState === 'ready' &&
+    !D.dictionaryCompleteForms?.has(target)
+  ) {
+    const reading = tuple.slice(1).map(relationReadingQualifier).find(Boolean) || '';
+    return { t: 'word', id: target, from, dictionaryPendingLookup: true, ...(reading ? { reading } : {}) };
+  }
+  if (rows.length || lookup(target)) return { t: 'word', id: target, from };
+  return null;
+}
+
+function renderDictionaryRelations(container, titleJa, titleEn, tuples, node) {
+  if (!tuples?.length) return;
+  const block = el('div', 'dictionary-relations');
+  block.append(withEn(el('p', 'dictionary-rel-title', titleJa), titleEn, 'en-inline'));
+  for (const tuple of tuples) {
+    const target = relationTarget(tuple);
+    if (!target) continue;
+    const route = dictionaryRelationRoute(tuple, node.from);
+    const routable = !!route;
+    const row = el(routable ? 'button' : 'div', routable ? 'dictionary-rel' : 'dictionary-rel muted');
+    if (routable) {
+      row.type = 'button';
+      row.addEventListener('click', async () => {
+        let destination = route;
+        if (route.dictionaryPendingLookup) {
+          try {
+            await ensureDictionaryRowsForForm(target);
+            destination = dictionaryRelationRoute(tuple, node.from);
+          } catch {
+            return;
+          }
+        }
+        if (!destination) return;
+        const { dictionaryPendingLookup, ...resolved } = destination;
+        go(resolved);
+      });
+    }
+    row.append(el('span', 'dictionary-rel-word', target));
+    // The compact detail tuple may end with an internal source/sense integer.
+    // Only JMdict's textual qualifiers belong in the visible relation note.
+    const qualifier = tuple.slice(1).filter((value) => typeof value === 'string').join(' · ');
+    if (qualifier) row.append(el('span', 'dictionary-rel-note', qualifier));
+    if (routable) row.append(el('span', 'row-go', '›'));
+    block.append(row);
+  }
+  container.append(block);
+}
+
+function renderDictionaryDetails(container, details, node) {
+  details.forEach((entry, entryIndex) => {
+    const [, kanjiForms, kanaForms, senses] = entry;
+    const block = el('section', 'dictionary-entry');
+    if (details.length > 1 || kanjiForms.length > 1 || kanaForms.length > 1) {
+      const forms = el('div', 'dictionary-forms');
+      const spellings = kanjiForms.map((form) => form[0]);
+      if (spellings.length) forms.append(el('span', 'dictionary-spellings', spellings.join('・')));
+      forms.append(el('span', 'dictionary-readings', kanaForms.map((form) => form[0]).join('・')));
+      block.append(forms);
+    }
+    senses.forEach((sense, senseIndex) => {
+      const [
+        partOfSpeech,
+        appliesToKanji,
+        appliesToKana,
+        related,
+        antonym,
+        field,
+        dialect,
+        misc,
+        info,
+        languageSources,
+        glosses,
+      ] = sense;
+      const section = el('div', 'dictionary-sense');
+      section.append(el('span', 'dictionary-sense-number', String(senseIndex + 1)));
+      const body = el('div', 'dictionary-sense-body');
+      const tags = [...partOfSpeech, ...field, ...dialect, ...misc].map(dictionaryTag);
+      if (tags.length) body.append(el('p', 'sense-pos', [...new Set(tags)].join(' · ')));
+      const restrictions = [];
+      if (appliesToKanji?.length && appliesToKanji[0] !== '*') {
+        restrictions.push(tx(`${appliesToKanji.join('・')} の語義`, `for ${appliesToKanji.join('・')}`));
+      }
+      if (appliesToKana?.length && appliesToKana[0] !== '*') {
+        restrictions.push(tx(`${appliesToKana.join('・')} の読み`, `with reading ${appliesToKana.join('・')}`));
+      }
+      if (restrictions.length) body.append(el('p', 'dictionary-restriction', restrictions.join(' · ')));
+      const meanings = glosses.map((gloss) => {
+        const [text, gender, type] = gloss;
+        const marks = [type, gender].filter(Boolean);
+        return marks.length ? `${text} (${marks.join(', ')})` : text;
+      });
+      if (meanings.length === 1) body.append(el('p', 'gloss', meanings[0]));
+      else {
+        const list = el('ul', 'dictionary-glosses');
+        for (const meaning of meanings) list.append(el('li', null, meaning));
+        body.append(list);
+      }
+      for (const note of info || []) body.append(el('p', 'dictionary-info', note));
+      if (languageSources?.length) {
+        const sources = languageSources
+          .map(([lang, full, wasei, text]) =>
+            [lang, text, full ? 'full form' : null, wasei ? 'wasei' : null].filter(Boolean).join(' · '),
+          )
+          .join('; ');
+        body.append(el('p', 'dictionary-info', tx(`語源 ${sources}`, `source ${sources}`)));
+      }
+      renderDictionaryRelations(body, '辞書内の関連項目', 'dictionary cross-references', related, node);
+      renderDictionaryRelations(body, '対義語', 'antonyms', antonym, node);
+      section.append(body);
+      block.append(section);
+    });
+    if (entryIndex < details.length - 1) block.append(el('div', 'dictionary-entry-rule'));
+    container.append(block);
+  });
+}
+
+function renderDictionaryHomographs(container, node) {
+  const rows = dictionaryRowsForForm(node.id);
+  const choices = [];
+  const seen = new Set();
+  for (const row of rows) {
+    for (const summary of dictionaryReadingSummaries(row)) {
+      if (!dictionaryReadingSupportsForm(row, summary[0], node.id)) continue;
+      const key = `${row[0]}\u0000${summary[0]}\u0000${summary[1]}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      choices.push({ row, summary: [summary[0], node.id, summary[2]] });
+    }
+  }
+  if (choices.length <= 1) return;
+  const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
+  const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
+  const block = el('div', 'dictionary-homographs');
+  block.append(
+    withEn(
+      el('p', 'dictionary-rel-title', `同じ形の ${choices.length} 項目`),
+      `${choices.length} readings or entries share this form`,
+      'en-inline',
+    ),
+  );
+  for (const { row, summary } of choices) {
+    const [seq] = row;
+    const [reading, headForm, primaryGloss] = summary;
+    const active = String(seq) === currentSeq && (!currentReading || kataToHira(reading) === currentReading);
+    const choice = el('button', active ? 'dictionary-homograph active' : 'dictionary-homograph');
+    choice.type = 'button';
+    choice.dataset.dictionaryEntry = String(seq);
+    choice.setAttribute('aria-pressed', String(active));
+    const stack = el('span', 'row-stack');
+    const top = el('span', 'row-word');
+    top.append(document.createTextNode(headForm));
+    if (reading) top.append(el('span', 'row-reading', reading));
+    stack.append(top);
+    if (primaryGloss) stack.append(el('span', 'row-gloss', primaryGloss));
+    choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
+    choice.addEventListener('click', () => {
+      if (active || S.stack[S.stack.length - 1] !== node) return;
+      S.stack[S.stack.length - 1] = {
+        t: 'word',
+        id: headForm,
+        seq: String(seq),
+        reading,
+        from: node.from || null,
+      };
+      render();
+      const live = document.getElementById('sheet');
+      if (live) live.scrollTop = 0;
+    });
+    block.append(choice);
+  }
+  container.append(block);
+}
+
+function requestDictionaryDetails(node) {
+  if (node.dictionaryPending || node.dictionaryReady) return;
+  node.dictionaryPending = true;
+  node.dictionaryError = null;
+  ensureDictionaryDetails(node)
+    .then(() => {
+      node.dictionaryPending = false;
+      node.dictionaryReady = true;
+      if (S.stack[S.stack.length - 1] !== node) return;
+      const live = document.getElementById('sheet');
+      S.sheetScrollRestore = live?.scrollTop || 0;
+      S.sheetFocus = document.activeElement?.id || null;
+      render();
+    })
+    .catch((err) => {
+      node.dictionaryPending = false;
+      node.dictionaryError = err;
+      if (S.stack[S.stack.length - 1] !== node) return;
+      const live = document.getElementById('sheet');
+      S.sheetScrollRestore = live?.scrollTop || 0;
+      render();
+    });
+}
+
 function renderWordNode(sheet, node) {
-  const rec = lookup(node.id);
+  const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
   const legacy = D.words[node.id];
-  const label = node.id;
+  const label = rec?.head || node.id;
+  const details = dictionaryDetailsFor(node);
   const head = el('h2', 'headword');
   head.append(document.createTextNode(label));
-  if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
+  const alternateSpellings = (rec?.written || []).filter((form) => form !== label).slice(0, 5);
+  if (alternateSpellings.length) {
+    head.append(el('span', 'headword-alt', `／${alternateSpellings.join('・')}`));
+  } else if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
   sheet.append(head);
   if (rec?.r) sheet.append(el('p', 'reading', rec.r));
+  renderDictionaryHomographs(sheet, node);
 
-  // TRANSLATION — every sense, most common first (JMdict order)
-  if (rec?.m?.length) {
+  // TRANSLATION — every sense, most common first (JMdict order). Once the
+  // word's shard arrives, the full source senses take this spot: homographs,
+  // restrictions, usage fields, cross-references and antonyms. Until then the
+  // immediate record stays useful instead of becoming a spinner.
+  if (details.length) {
+    const box = el('div', 'senses dictionary-senses');
+    if (rec?.p) box.append(el('p', 'sense-pos', rec.p));
+    renderDictionaryDetails(box, details, node);
+    sheet.append(box);
+  } else if (rec?.m?.length) {
     const box = el('div', 'senses');
     if (rec.p) box.append(el('p', 'sense-pos', rec.p));
-    if (rec.m.length === 1) {
-      box.append(el('p', 'gloss', rec.m[0]));
+    const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
+    if (immediate.length === 1) {
+      box.append(el('p', 'gloss', immediate[0]));
     } else {
       const ol = el('ol', 'sense-list');
-      for (const m of rec.m) ol.append(el('li', null, m));
+      for (const m of immediate) ol.append(el('li', null, m));
       box.append(ol);
     }
     sheet.append(box);
@@ -5031,6 +6358,37 @@ function renderWordNode(sheet, node) {
     const gloss = el('p', 'gloss absent');
     gloss.textContent = tx('この語の語釈はまだない。読みと接続は下にある。', 'No gloss for this word yet — its reading and connections continue below.');
     sheet.append(gloss);
+  }
+  if (!details.length && !node.dictionaryError && !node.dictionaryReady && D.dictionaryState !== 'error') {
+    sheet.append(
+      el('p', 'dictionary-opening', tx('語義と用法をひらいています…', 'Opening complete senses and usage…')),
+    );
+    queueMicrotask(() => requestDictionaryDetails(node));
+  } else if (node.dictionaryError) {
+    const warning = el(
+      'p',
+      'dictionary-warning',
+      tx('手元の語釈は読めるが、詳しい語義をまだひらけない。', 'The immediate gloss is available, but the complete entry could not be opened.'),
+    );
+    const retry = biLabel('button', 'dictionary-retry', 'もう一度ひらく', 'try the complete entry again');
+    retry.type = 'button';
+    retry.addEventListener('click', () => {
+      node.dictionaryError = null;
+      node.dictionaryReady = false;
+      requestDictionaryDetails(node);
+      render();
+    });
+    sheet.append(warning, retry);
+  }
+  if (details.length) {
+    const credit = el('p', 'dictionary-credit');
+    credit.append(document.createTextNode('JMdict · EDRDG · '));
+    const licence = el('a', null, 'CC BY-SA 4.0');
+    licence.href = 'https://www.edrdg.org/edrdg/licence.html';
+    licence.target = '_blank';
+    licence.rel = 'noreferrer';
+    credit.append(licence);
+    sheet.append(credit);
   }
   const jlpt = rec?.jlpt || (legacy?.jlpt ? `N${legacy.jlpt}` : null);
   if (jlpt) {
@@ -6334,12 +7692,30 @@ function buildNavSearch() {
       row.append(stack);
       row.addEventListener('click', () => {
         S.navOpen = false;
-        go({ t: e.t, id: e.id });
+        go(
+          e.seq
+            ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
+            : { t: e.t, id: e.id },
+        );
       });
       results.append(row);
     }
   };
-  input.addEventListener('input', paint);
+  // The deep tier answers here too: the first touch opens the 70k index, and
+  // when the worker's batch for the visible query settles, the same rows
+  // repaint once — the field itself never loses focus.
+  navSearchRepaint = () => {
+    if (!document.body.contains(input)) {
+      navSearchRepaint = null;
+      return;
+    }
+    paint();
+  };
+  input.addEventListener('focus', () => ensureDictionaryIndex().catch(() => {}), { once: true });
+  input.addEventListener('input', () => {
+    if (input.value.trim()) ensureDictionaryIndex().catch(() => {});
+    paint();
+  });
   input.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') {
       const first = results.querySelector('.nav-search-row');

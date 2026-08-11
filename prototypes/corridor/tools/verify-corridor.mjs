@@ -143,6 +143,12 @@ async function walkToSemPanel(page, tapFn) {
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
+  // the deep tier swaps richer senses into the sheet moments after it opens;
+  // wait for that one settle so nothing is aimed at mid-swap
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+    .catch(() => {});
+  await page.waitForTimeout(160);
   if ((await page.locator('#sheet .sem-row').count()) === 0) {
     if (await page.locator('#sheet .chip').count()) {
       await tapFn(page, '#sheet .chip');
@@ -715,7 +721,9 @@ async function main() {
       headword: s.querySelector('.headword')?.textContent ?? '',
       reading: s.querySelector('.reading')?.textContent ?? '',
       gloss: s.querySelector('.gloss')?.textContent ?? s.querySelector('.sense-list')?.textContent ?? '',
-      senses: s.querySelectorAll('.sense-list li').length,
+      // senses arrive in either shape: the immediate core list, or the deep
+      // tier's numbered JMdict sections once the word's shard has opened
+      senses: s.querySelectorAll('.sense-list li').length + s.querySelectorAll('.dictionary-sense').length,
       kanjiRows: [...s.querySelectorAll('[data-kanjirow]')].map((c) => c.dataset.kanjirow),
       examples: s.querySelectorAll('.example').length,
       hasBack: !!s.querySelector('#sheet-back'),
@@ -742,6 +750,12 @@ async function main() {
   await settleReader(page);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet');
+  // the deep tier swaps richer senses into the sheet moments after it opens;
+  // let that settle so the seed chips are stable before aiming a finger
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+    .catch(() => {});
+  await page.waitForTimeout(160);
   // from the empty-state seed chips, hop to a word that has edges
   const seedChip = page.locator('#sheet .chip').first();
   if (await seedChip.count()) {
