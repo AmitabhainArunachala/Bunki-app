@@ -1354,6 +1354,36 @@ async function main() {
     `row ${JSON.stringify(probeAfter.last)}`);
   await shoot(page, shotsDir, '15-phaseA-yomi-probe');
 
+  // -------------------------- the newspaper archive (新聞アーカイブ)
+  console.log('\n— the newspaper archive: a deep stack behind one quiet door');
+  await open('?entry=shelf');
+  await page.waitForSelector('#archive-link');
+  await tap(page, '#archive-link');
+  await page.waitForSelector('.archive-year', { timeout: 15000 });
+  const archiveSub = await page.locator('.shelf-snippet.intro').textContent();
+  check('the stack opens: hundreds of articles, year-folded, rights named',
+    /\d{3}/.test(archiveSub) && /CC BY 2.5/.test(archiveSub) && (await page.locator('.archive-year').count()) >= 15,
+    archiveSub.trim().slice(0, 70));
+  await tap(page, '.archive-year');
+  await page.waitForSelector('.archive-row');
+  await tap(page, '.archive-row');
+  await settleReader(page);
+  const archiveTok = await page.locator('#reader .tok').count();
+  const archiveAttr = await page.evaluate(
+    `document.querySelector('main .note a.inline-link')?.textContent ?? ''`,
+  );
+  check('an archive article reads like any shelf text — tokens, level, source link',
+    archiveTok > 40 && /CC BY 2.5/.test(archiveAttr),
+    `${archiveTok} tokens · "${archiveAttr}"`);
+  await tap(page, '#back');
+  await page.waitForSelector('.archive-year');
+  check('back returns to the stack, not the shelf', true, 'archive restored');
+  const standaloneSrc = readFileSync(resolve(CORRIDOR_DIR, 'corridor-standalone.html'), 'utf8');
+  check('the single-file build does not embed the stack it cannot carry',
+    !standaloneSrc.includes('"articles/archive'),
+    'no articles/archive bundle keys in corridor-standalone.html');
+  await shoot(page, shotsDir, '16-archive-stack');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,

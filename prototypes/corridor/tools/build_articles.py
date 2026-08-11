@@ -271,7 +271,9 @@ def collect_articles() -> list[dict]:
                 "id": entry["id"],
                 "title": entry["title"],
                 "text": entry["text"],
-                "source": "bunki-v11-reading-catalog",
+                # the three PD classics cite the dedicated historical registry
+                # record (rights-gate consistency: pool must match the registry)
+                "source": "bunki-v11-reading-catalog" if original else "bunki-v11-historical",
                 "sourceLabel": lane_label.get(entry["lane"], "読み物") + (" · Bunki" if original else f" · {entry['sourceName']}"),
                 "pool": "original" if original else "proprietary_safe",
                 "licence": "Bunki original" if original else "PD + Bunki原作の解説",
@@ -314,12 +316,104 @@ SOURCES = {
 }
 
 
+def collect_archive() -> list[dict]:
+    """The wikinews archive tranche — curated by corpus.sources.wikinews.curate,
+    committed at corpus/datasets/wikinews/archive.jsonl. Same record grammar as
+    the shelf; bodies land under articles/archive/ so the curated shelf index
+    is never touched."""
+    articles: list[dict] = []
+    for rec in bc.read_jsonl(REPO / "corpus/datasets/wikinews/archive.jsonl"):
+        meta = rec.get("meta", {})
+        articles.append(
+            {
+                "id": rec["id"],
+                "title": rec["title"],
+                "text": rec["text"].replace("\r\n", "\n").strip(),
+                "source": "ja.wikinews",
+                "sourceLabel": "ウィキニュース",
+                "pool": "proprietary_safe",
+                "licence": "CC BY 2.5",
+                "attribution": "ja.wikinews contributors, CC BY 2.5",
+                "url": meta.get("url", ""),
+                "date": meta.get("date", ""),
+                "rubySource": "tokenizer",
+            }
+        )
+    seen: set[str] = set()
+    for a in articles:
+        a["file"] = "archive/" + slugify(a["id"]) + ".json"
+        if a["file"] in seen:
+            raise SystemExit(f"archive file collision: {a['file']}")
+        seen.add(a["file"])
+    return articles
+
+
+def build_archive(out: Path) -> int:
+    """Mint the archive: full bodies (tokens + grading) under articles/archive/,
+    plus a LIGHT index — no token data, and only the two signals the shelf row
+    needs (jreadability + jlpt-lexicon coverage); the full grading rides in the
+    body it describes. The curated shelf's index.json is not read or written."""
+    from corpus.grading._mecab import get_tagger
+
+    tagger = get_tagger()
+    jlpt_maps = load_jlpt_lexicon()
+    articles = collect_archive()
+    print(f"· {len(articles)} archive articles through the pipeline")
+    (out / "archive").mkdir(parents=True, exist_ok=True)
+
+    index_rows: list[dict] = []
+    for n, a in enumerate(articles, 1):
+        tokens, para_starts = tokenise_paragraphs(a["text"], tagger)
+        grading = grade_article(a["text"], tokens, tagger, jlpt_maps)
+        record = dict(a)
+        record["tokens"] = tokens
+        record["paras"] = para_starts
+        record["grading"] = grading
+        record["truncated"] = False
+        (out / a["file"]).write_text(
+            json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
+        )
+
+        row = {k: v for k, v in a.items() if k != "text"}
+        row["chars"] = len(a["text"])
+        row["snippet"] = a["text"].replace("\n", " ")[:64]
+        jl = grading["signals"]["jlpt_lexicon"]
+        row["grading"] = {
+            "signals": {
+                "jreadability": grading["signals"]["jreadability"],
+                "jlpt_lexicon": {"coverage": jl["coverage"], "substrate": jl.get("substrate")},
+            }
+        }
+        row["truncated"] = False
+        index_rows.append(row)
+        if n % 100 == 0:
+            print(f"    …{n}/{len(articles)}")
+
+    index = {
+        "law": "three signals, never averaged; disagreement surfaced, never resolved; every signal true of the text displayed",
+        "note": "light rows — full grading lives in each body under archive/",
+        "articles": index_rows,
+    }
+    (out / "archive-index.json").write_text(
+        json.dumps(index, ensure_ascii=False, separators=(",", ":")), "utf-8"
+    )
+    print(f"· archive index: {len(index_rows)} articles")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(CORRIDOR / "data" / "articles"))
+    ap.add_argument(
+        "--archive",
+        action="store_true",
+        help="mint the wikinews archive tranche (articles/archive/ + archive-index.json) instead of the curated shelf",
+    )
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    if args.archive:
+        return build_archive(out)
 
     from corpus.grading._mecab import get_tagger
 

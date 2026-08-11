@@ -37,6 +37,10 @@ import { readdirSync } from 'node:fs';
 const articlesDir = resolve(CORRIDOR, 'data/articles');
 for (const file of readdirSync(articlesDir).sort()) {
   if (!file.endsWith('.json')) continue;
+  // the newspaper archive (archive/ + its index) stays served-build only:
+  // embedding the index without its 694 bodies would advertise a stack the
+  // single file cannot open, and embedding the bodies would add ~28 MB
+  if (file === 'archive-index.json') continue;
   const key = file === 'index.json' ? 'articles/index' : `articles/${file.replace(/\.json$/, '')}`;
   bundle[key] = JSON.parse(read(`data/articles/${file}`));
 }

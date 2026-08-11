@@ -80,6 +80,7 @@ jobs:
                       'dictionary-worker.js' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
                       'data/manifest.json' 'data/articles/index.json' \
+                      'data/articles/archive-index.json' \
                       'data/share_alike/dict-v2/index.json' \
                       'data/share_alike/dict-v2/00.json' \
                       'data/share_alike/dict-v2/0f.json'; do
@@ -147,6 +148,25 @@ jobs:
               for k in ("pool", "licence", "attribution", "url", "source"):
                   assert body.get(k) == a.get(k), f"{aid}: body {k!r} disagrees with the index"
           print(f"rights verified: {len(idx['articles'])} shelf items — licensed, attributed, pooled, linked where a source home exists")
+
+          # the newspaper archive answers to the same law: every item fully
+          # labeled, registry-consistent, body agreeing with its index row
+          arc = json.load(open(f"{base}/archive-index.json"))
+          seen_ids = {a["id"] for a in idx["articles"]}
+          for a in arc["articles"]:
+              aid = a.get("id", "?")
+              assert aid not in seen_ids, f"{aid}: archive duplicates a shelf item"
+              for k in ("pool", "licence", "attribution", "source", "file", "url", "date"):
+                  assert a.get(k, "").strip(), f"{aid}: archive row missing {k}"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None and pool == a["pool"], f"{aid}: archive source/pool not registry-consistent"
+              assert a["licence"] == "CC BY 2.5" and "CC BY 2.5" in a["attribution"], f"{aid}: archive licence must be CC BY 2.5"
+              assert a["file"].startswith("archive/"), f"{aid}: archive body must live under archive/"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: archive body {k!r} disagrees with its row"
+              assert body.get("tokens"), f"{aid}: archive body carries no tokens"
+          print(f"rights verified: {len(arc['articles'])} archive items — same law, same gate")
           PYEOF
 
       - name: Upload build as downloadable artifact

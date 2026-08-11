@@ -3395,6 +3395,39 @@ body.v-depth-layered .stroke-page {
   margin: 6px 0 4px;
 }
 
+/* 新聞アーカイブ — light rows for a deep stack; the year folds carry the
+ * weight, each article is one quiet line and a level chip */
+.archive-year {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+.archive-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  padding: 10px 2px;
+  font-family: var(--sans);
+  color: var(--ink);
+  cursor: pointer;
+}
+.archive-row-title {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.archive-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
 /* 読み探査 — the probe keeps the review room's glass; only its own two
  * lines are new: a shelf sentence under the word, and the quiet exact
  * meta line (漢検 band · reading type) after the reveal */

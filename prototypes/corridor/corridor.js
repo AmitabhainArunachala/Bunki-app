@@ -1536,8 +1536,105 @@ async function ensureArticle(p) {
   return p._loading;
 }
 
+/* --------------------------------------------------- 新聞アーカイブ
+ * The frozen ja.wikinews archive, minted through the same pipeline as the
+ * shelf (tokens + level signals per body) but carried apart from it: a
+ * light index fetched only when the stack is opened, bodies fetched one
+ * at a time on read. Rows merge into D.passages so the reader, search and
+ * examples treat an archive article exactly like a shelf one. The
+ * standalone single-file build does not carry the stack. */
+function ensureArchiveIndex() {
+  if (D.archive) return Promise.resolve(D.archive);
+  if (D.archiveLoading) return D.archiveLoading;
+  D.archiveLoading = fetch('data/articles/archive-index.json')
+    .then((res) => {
+      if (!res.ok) throw new Error(`archive-index → ${res.status}`);
+      return res.json();
+    })
+    .then((index) => {
+      const known = new Set(D.passages.map((p) => p.id));
+      D.archive = index.articles.filter((a) => !known.has(a.id));
+      D.passages.push(...D.archive);
+      delete D.archiveLoading;
+      return D.archive;
+    })
+    .catch((err) => {
+      delete D.archiveLoading;
+      throw err;
+    });
+  return D.archiveLoading;
+}
+
+function renderArchive(main) {
+  main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+  main.append(withEn(el('h1', 'view-title', '新聞アーカイブ'), 'the newspaper archive', 'en-inline'));
+  if (!D.archive) {
+    main.append(el('p', 'gloss', tx('棚をひらいています…', 'Opening the stack…')));
+    if (D.archiveError) {
+      main.append(
+        el('div', 'sem-empty', tx('アーカイブを読み込めなかった。', 'The archive could not be opened here.')),
+      );
+    } else {
+      ensureArchiveIndex()
+        .then(() => {
+          if (S.view === 'archive') render();
+        })
+        .catch(() => {
+          D.archiveError = true;
+          if (S.view === 'archive') render();
+        });
+    }
+    return;
+  }
+  const sub = el('p', 'shelf-snippet intro');
+  const years = new Map();
+  for (const a of D.archive) {
+    const y = (a.date || '').slice(0, 4) || '？';
+    if (!years.has(y)) years.set(y, []);
+    years.get(y).push(a);
+  }
+  sub.textContent = tx(
+    `ウィキニュース ${D.archive.length} 本 · ${[...years.keys()].sort()[0]}–${[...years.keys()].sort().at(-1)} · CC BY 2.5 · 凍結アーカイブ`,
+    `${D.archive.length} real news articles · ${[...years.keys()].sort()[0]}–${[...years.keys()].sort().at(-1)} · CC BY 2.5 · the frozen ja.wikinews archive`,
+  );
+  main.append(sub);
+  S.archiveYears ||= new Set();
+  for (const y of [...years.keys()].sort().reverse()) {
+    const list = years.get(y);
+    const open = S.archiveYears.has(y);
+    const toggle = el('button', 'details-toggle archive-year');
+    toggle.type = 'button';
+    toggle.dataset.year = y;
+    toggle.textContent = `${open ? '▾' : '▸'} ${y} 年 · ${list.length} ${tx('本', '')}`.trim();
+    toggle.addEventListener('click', () => {
+      if (S.archiveYears.has(y)) S.archiveYears.delete(y);
+      else S.archiveYears.add(y);
+      keepScroll();
+      render();
+      returnScroll();
+    });
+    main.append(toggle);
+    if (!open) continue;
+    for (const a of list) {
+      const row = el('button', 'archive-row');
+      row.type = 'button';
+      row.dataset.passage = a.id;
+      const head = el('div', 'archive-row-head');
+      head.append(el('span', 'archive-row-title', a.title));
+      const lv = levelPhrase(a.grading);
+      const meta = el('div', 'archive-row-meta');
+      meta.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+      meta.append(el('span', null, `${a.date || ''} · ${a.chars}字${S.readDone[a.id] ? ' · 読了 ✓' : ''}`));
+      row.append(head, meta);
+      row.addEventListener('click', () => openPassage(a.id));
+      main.append(row);
+    }
+  }
+}
+
 function prefetchArticles() {
-  const queue = D.passages.filter((p) => !p.tokens);
+  // archive bodies are read-on-open only — never bulk-prefetched
+  const queue = D.passages.filter((p) => !p.tokens && !String(p.file || '').startsWith('archive/'));
   const next = () => {
     const p = queue.shift();
     if (!p) return;
@@ -1670,12 +1767,23 @@ function back() {
     render();
     return;
   }
+  if (S.view === 'archive') {
+    S.view = 'shelf';
+    render();
+    return;
+  }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's guess
     if (S.view === 'reader' && S.passageId) {
       clearTimeout(readerPosTimer);
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
+    }
+    // an archive article returns to its stack, not the curated shelf
+    if (S.view === 'reader' && String(passage()?.file || '').startsWith('archive/')) {
+      S.view = 'archive';
+      render();
+      return;
     }
     S.view = 'shelf';
     render();
@@ -2056,10 +2164,11 @@ function renderShelfBody() {
   }
   const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
   main.append(h);
+  const curated = D.passages.filter((p) => !String(p.file || '').startsWith('archive/'));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
-    `${D.passages.length} 本。触れてひらく。`,
-    `${D.passages.length} real texts. Tap one to read it.`,
+    `${curated.length} 本。触れてひらく。`,
+    `${curated.length} real texts. Tap one to read it.`,
   );
   main.append(sub);
 
@@ -2158,7 +2267,7 @@ function renderShelfBody() {
     main.append(aread);
   }
 
-  for (const p of D.passages) {
+  for (const p of curated) {
     const item = el('button', 'shelf-item');
     item.type = 'button';
     item.dataset.passage = p.id;
@@ -2203,6 +2312,25 @@ function renderShelfBody() {
 
     item.addEventListener('click', () => openPassage(p.id));
     main.append(item);
+  }
+
+  // the deep stack: the frozen wikinews archive, its own quiet room —
+  // absent from the single-file build, which does not carry the stack
+  if (window.__CORRIDOR_STANDALONE__ !== true) {
+    const arc = el('button', 'grammar-link');
+    arc.type = 'button';
+    arc.id = 'archive-link';
+    arc.append(
+      el('span', 'l-ja', '新聞アーカイブ'),
+      el('span', 'en-sub', bi() ? 'the newspaper archive · 2005–2026' : 'ウィキニュース 2005–2026'),
+    );
+    arc.addEventListener('click', () => {
+      keepScroll();
+      S.view = 'archive';
+      render();
+      window.scrollTo(0, 0);
+    });
+    main.append(arc);
   }
 
   // sources and licences: present, honest, folded
@@ -8564,6 +8692,7 @@ function render() {
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
   if (S.view === 'probe') parts.push(tx('読み探査', 'yomi probe'));
+  if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
@@ -8645,6 +8774,7 @@ function render() {
   else if (S.view === 'tray') renderTray(main);
   else if (S.view === 'review') renderReview(main);
   else if (S.view === 'probe') renderProbe(main);
+  else if (S.view === 'archive') renderArchive(main);
   else if (S.view === 'dojo') renderFocus(main);
   else if (S.view === 'aiquiz') renderAiQuiz(main);
   else if (S.view === 'levels') renderLevels(main);
