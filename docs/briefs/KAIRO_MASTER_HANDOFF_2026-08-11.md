@@ -110,6 +110,10 @@ arbitrate.** Phases 0–B are decided and buildable now.
   `S.stats.fuzzOff`), content-blind keys.
 - Diagnosis principle: the log is the learner model's substrate; AI
   proposes structured findings, FSRS alone schedules.
+- **Vessel (operator ruling, 2026-08-11): the corridor IS the product and
+  stays KAIRO — the theme, the vibe, everything built to now.** The R1
+  review's Expo-pivot verdict is rejected (it audited stale `main`); R1's
+  contracts land as corridor-native increments. Do not re-litigate.
 
 **PLAN v2 (revised 2026-08-11 after the R1 review — see
 `R1_REVIEW_RESPONSE_2026-08-11.md` for the full concede/hold record):**
@@ -140,13 +144,6 @@ arbitrate.** Phases 0–B are decided and buildable now.
 
 **OPEN — operator's word required:**
 
-0. **Vessel confirmation.** The R1 review directs the build into the
-   Expo/domain stack and calls the corridor disposable — but it audited
-   stale `main` and this contradicts the standing operator ruling
-   ("one comprehensive full prototype", 2026-08-10, reaffirmed via the
-   trunk choice). Standing ruling holds unless the operator reverses it;
-   the recommendation on record is: stay on the corridor, absorb R1's
-   contracts as corridor-native increments.
 1. **Feel verdict on the current deploy** → merge trunk to `main` →
    retire PRs #60–#70. (The standing gate on everything.)
 2. Nihonga stroke-treatment pick (ten mockups shown two sessions ago —
