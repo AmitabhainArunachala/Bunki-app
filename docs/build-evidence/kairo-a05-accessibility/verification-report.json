@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "27107d870aad0b3aef6988d5c7df9c2041af80d3",
+  "head": "7bab39baaeae4e143ce15cfb857d393ff9e0fd57",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
   },
   "summary": {
-    "total": 20,
-    "passed": 20,
+    "total": 22,
+    "passed": 22,
     "failed": 0
   },
   "results": [
@@ -102,6 +102,16 @@
       "name": "reduced-motion removes Corridor animation and transition motion",
       "pass": true,
       "detail": "{\"sheet\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"scrim\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"ruby\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
+      "pass": true,
+      "detail": "eyebrow 6.10:1 · pool-tag 6.10:1"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the yoru world",
+      "pass": true,
+      "detail": "eyebrow 9.49:1 · pool-tag 9.49:1"
     },
     {
       "name": "real walk requested no missing Corridor assets",

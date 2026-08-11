@@ -48,6 +48,16 @@
   --faint-2: rgba(20, 24, 28, 0.6);
 }
 
+/* The lift above is dark ink for the light washi worlds — on 夜 it sank
+ * every quiet label into the night ground at ~1.2:1 (operator's phone,
+ * 2026-08-11: conjugation labels, eyebrows, chips all near-invisible).
+ * The night world re-derives the same lift from its own white ink:
+ * 7.9:1 and 10.6:1 against #281a14, computed not eyeballed. */
+:root[data-theme='yoru'] .v-contrast-wcag {
+  --faint: rgba(255, 255, 252, 0.78);
+  --faint-2: rgba(255, 255, 252, 0.66);
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;

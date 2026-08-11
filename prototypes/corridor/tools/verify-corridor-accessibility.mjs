@@ -406,6 +406,51 @@ async function main() {
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
+    // Quiet-label contrast across all five nihonga worlds. The WCAG contrast
+    // variant once pinned light-world ink values that sank every label into
+    // the 夜 ground at ~1.2:1 (operator's phone, 2026-08-11) — this walk
+    // measures the real composited colors so no theme can regress silently.
+    const themePage = await context.newPage();
+    for (const theme of ['hokusai', 'yoru']) {
+      await openReader(themePage, base);
+      await themePage.evaluate(`localStorage.setItem('kairo-theme', '${theme}')`);
+      await themePage.reload();
+      await openReader(themePage, base);
+      await openWordDialog(themePage);
+      const ratios = await themePage.evaluate(`(() => {
+        const lum = ([r, g, b]) => {
+          const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const parse = (s) => s.match(/[\\d.]+/g).map(Number);
+        const composite = (fg, bg) => {
+          const c = parse(fg); const a = c.length === 4 ? c[3] : 1; const b = parse(bg);
+          return [0, 1, 2].map((i) => c[i] * a + b[i] * (1 - a));
+        };
+        const contrast = (fgStr, bgStr) => {
+          const L1 = lum(composite(fgStr, bgStr)); const L2 = lum(parse(bgStr));
+          const [hi, lo] = L1 > L2 ? [L1, L2] : [L2, L1];
+          return (hi + 0.05) / (lo + 0.05);
+        };
+        const bg = getComputedStyle(document.querySelector('#sheet')).backgroundColor;
+        const out = {};
+        for (const sel of ['#sheet .eyebrow', '#sheet .pool-tag']) {
+          const node = document.querySelector(sel);
+          if (node) out[sel] = contrast(getComputedStyle(node).color, bg);
+        }
+        return out;
+      })()`);
+      const values = Object.values(ratios);
+      check(
+        `quiet sheet labels meet 4.5:1 in the ${theme} world`,
+        values.length > 0 && values.every((r) => r >= 4.5),
+        Object.entries(ratios)
+          .map(([sel, r]) => `${sel.replace('#sheet .', '')} ${r.toFixed(2)}:1`)
+          .join(' · '),
+      );
+    }
+    await themePage.close();
+
     check('real walk requested no missing Corridor assets', misses.length === 0, misses.join(', '));
     check('real walk emitted no console/page errors', errors.length === 0, errors.join(' | '));
 
