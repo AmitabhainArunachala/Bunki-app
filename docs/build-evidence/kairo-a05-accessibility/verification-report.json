@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "b79e127d1cf370f905b35f15f230ea4cad58fc72",
+  "head": "e90d4627c48bee805eec29e91c20f95f912c8107",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,

@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-11 10:13",
+          "2026-08-11 14:56",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-11 10:18",
+          "2026-08-11 15:01",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-11 10:22",
+          "2026-08-11 15:05",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-20 10:12",
+          "in 7 d",
+          "2026-08-18 14:55",
           "8.30"
         ]
       ]
@@ -4340,6 +4340,14 @@
         "id": "read-fin"
       },
       {
+        "text": "ja.wikinews co",
+        "w": 228,
+        "h": 44,
+        "hitW": 228,
+        "hitH": 44,
+        "id": "inline-link"
+      },
+      {
         "text": "← 戻るback",
         "w": 72,
         "h": 44,
@@ -5287,7 +5295,7 @@
       "meta": [
         "ウィキニュース",
         "2005-07-15",
-        "CC BY 4.0"
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
@@ -5299,7 +5307,7 @@
       "meta": [
         "ウィキニュース",
         "2006-06-17",
-        "CC BY 4.0"
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
@@ -5311,7 +5319,7 @@
       "meta": [
         "ウィキニュース",
         "2008-03-15",
-        "CC BY 4.0"
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
@@ -5323,7 +5331,7 @@
       "meta": [
         "ウィキニュース",
         "2011-04-28",
-        "CC BY 4.0"
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
@@ -5335,7 +5343,7 @@
       "meta": [
         "ウィキニュース",
         "2026-05-03",
-        "CC BY 4.0"
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
@@ -6038,7 +6046,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 457,
+  "loadMs": 372,
   "summary": {
     "total": 91,
     "failed": 0
@@ -6067,7 +6075,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.63999938964844,\"y\":570.72998046875,\"productive\":true}"
+      "detail": "{\"x\":147.63999938964844,\"y\":570.739990234375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6087,7 +6095,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 457 ms"
+      "detail": "40 texts, ready in 372 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6307,7 +6315,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6377,7 +6385,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "612 controls checked, including inline token hit regions"
+      "detail": "613 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
