@@ -3979,3 +3979,21 @@ body.zen .focus-hud-end {
   color: var(--faint);
   min-height: var(--tap);
 }
+
+/* the beat between learning steps — a soft count while the next card ripens */
+.zen-wait {
+  gap: 18px;
+}
+.zen-wait-clock {
+  font-family: var(--serif);
+  font-size: 40px;
+  color: var(--ink-2);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+.zen-wait-note {
+  margin: 0;
+  color: var(--faint);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}

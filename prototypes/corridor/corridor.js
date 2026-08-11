@@ -465,6 +465,10 @@ const S = {
   /** compact records for words taken from the deep 70k tier, keyed by written
    * form — the card's answer travels inside the learner's own store */
   deepWords: {},
+  /** the review log: append-only, one row per grade, never rewritten. The
+   * foundation for FSRS weight optimization, analytics and state recovery —
+   * see the layout comment at srsLogReview. */
+  revlog: [],
   /** storage protection: read-only quarantine when the stored envelope cannot
    * be read (never overwrite what we cannot read), plus the one quiet line */
   storeReadOnly: false,
@@ -525,6 +529,7 @@ const STORE_KNOWN_KEYS = [
   'taken',
   'lists',
   'srs',
+  'revlog',
   'deepWords',
   'lessonsDone',
   'aiReading',
@@ -584,6 +589,7 @@ function loadStore() {
   if (Array.isArray(s.taken)) S.taken = s.taken;
   if (plainRecord(s.lists)) S.lists = s.lists;
   if (plainRecord(s.srs)) S.srs = s.srs;
+  if (Array.isArray(s.revlog)) S.revlog = s.revlog;
   if (plainRecord(s.deepWords)) S.deepWords = s.deepWords;
   if (plainRecord(s.lessonsDone)) S.lessonsDone = s.lessonsDone;
   if (plainRecord(s.aiReading)) S.aiReading = s.aiReading;
@@ -609,6 +615,7 @@ function saveStore() {
         taken: S.taken,
         lists: S.lists,
         srs: S.srs,
+        revlog: S.revlog || [],
         deepWords: S.deepWords || {},
         lessonsDone: S.lessonsDone,
         aiReading: S.aiReading,
@@ -1436,7 +1443,13 @@ async function boot() {
         w: pin.w,
         request_retention: pin.requestRetention,
         maximum_interval: pin.maximumInterval,
-        enable_fuzz: pin.enableFuzz,
+        // Fuzz is ON here by app-level decision (S.stats.fuzzOff = true turns
+        // it off), deliberately diverging from the domain pin's false: it
+        // keeps batch-captured cards from staying due-synchronized for years.
+        // Replay stays deterministic — the engine seeds fuzz from
+        // `${reviewTimeMs}_${reps}_${d*s}`, all of which the review log
+        // records exactly.
+        enable_fuzz: S.stats?.fuzzOff === true ? false : true,
         enable_short_term: pin.enableShortTerm,
         learning_steps: pin.learningSteps,
         relearning_steps: pin.relearningSteps,
@@ -5082,6 +5095,16 @@ function schedulePreview() {
  * item carries a real FSRS-6 card, a session walks the due queue, and each
  * grade is scheduled and saved. All of Anki's core loop, simplified — no
  * decks, no options screens: one queue, four honest buttons. */
+/* ---------------- card identity: the scheduler is content-blind ----------
+ * A card is any opaque "type:id" string; the engine never looks inside it.
+ * Today the app mints one recognition card per item (word:安堵 · kanji:海 ·
+ * radical:氵 · idiom:一期一会). The key grammar deliberately leaves room for
+ * the Japanese card families to come — kanji:海:on / kanji:海:kun (reading
+ * cards), word:安堵:prod (production), sent:<sourceId>#<n> (mined sentence
+ * cards) — each its own card with its own FSRS state and its own revlog
+ * rows, sharing the item's content record. Adding them touches capture and
+ * rendering only; srsCardOf / srsStore / srsDueItems / the revlog need no
+ * changes. */
 const srsKey = (t, id) => `${t}:${id}`;
 function srsCardOf(item, now) {
   const rec = S.srs[srsKey(item.t, item.id)];
@@ -5098,10 +5121,66 @@ function srsStore(item, card) {
   };
   saveStore();
 }
+/* --------------------------------------------------- the review log
+ * Append-only, one compact row per grade, never rewritten. Layout:
+ *
+ *   [t, key, g, stBefore, elapsed, r, sBefore, dBefore, sAfter, dAfter, ivl, dueAfter]
+ *
+ *   t        press time, epoch MILLISECONDS (ms precision matters: the
+ *            engine's fuzz seed is `${time}_${reps}_${d*s}`, so the exact
+ *            timestamp makes every fuzzed interval reproducible on replay)
+ *   key      "type:id" scheduler key
+ *   g        FSRS Rating pressed (1 Again · 2 Hard · 3 Good · 4 Easy);
+ *            g = 0 is a revocation (undo): the row is [t, key, 0, revokedIndex]
+ *   stBefore card state before (0 New · 1 Learning · 2 Review · 3 Relearning)
+ *   elapsed  days since last_review at press (3 dp; null on a first press)
+ *   r        engine retrievability at press (4 dp; null without last_review)
+ *   sBefore/dBefore  memory state before (4 dp; null on a first press)
+ *   sAfter/dAfter    memory state after
+ *   ivl      scheduled_days of the stored result
+ *   dueAfter stored due, epoch ms
+ *
+ * This is sufficient for the FSRS optimizer (per-card sequences of
+ * (elapsed, rating)), for analytics, and — with the pinned parameters —
+ * for full deterministic state reconstruction by replay. */
+function srsLogReview(key, before, after, rating, now) {
+  const rnd = (v, p) => (v == null || !Number.isFinite(v) ? null : Number(v.toFixed(p)));
+  let elapsed = null;
+  let r = null;
+  if (before.last_review) {
+    elapsed = rnd((now.getTime() - before.last_review.getTime()) / 86400000, 3);
+    try {
+      r = rnd(scheduler.get_retrievability(before, now, false), 4);
+    } catch {
+      r = null;
+    }
+  }
+  const first = !before.last_review;
+  (S.revlog ||= []).push([
+    now.getTime(),
+    key,
+    rating,
+    before.state ?? 0,
+    elapsed,
+    r,
+    first ? null : rnd(before.stability, 4),
+    first ? null : rnd(before.difficulty, 4),
+    rnd(after.stability, 4),
+    rnd(after.difficulty, 4),
+    after.scheduled_days,
+    after.due.getTime(),
+  ]);
+  return S.revlog.length - 1;
+}
 /** Items ready to review: real reviews by their due date, then never-seen
- * cards — capped at 20 a session, Anki's default pacing, so a long list
- * arrives as days of honest work instead of one avalanche. */
-const NEW_PER_SESSION = 20;
+ * cards — capped at 20 a DAY (Anki's default pacing), so a long list arrives
+ * as days of honest work instead of one avalanche. The count of cards
+ * introduced today lives in S.stats[day].nnew, written on a card's first
+ * grade and honoured across every session of the day. */
+const NEW_PER_DAY = 20;
+/** How many pool items a dojo refill draws at once — session pacing only,
+ * unrelated to the daily new-card cap. */
+const FOCUS_BATCH = 20;
 /* Anki's leech, simplified and softened: a card that keeps lapsing is
  * named 苦手 and offered a rest — surfaced, never auto-hidden. Partial
  * knowledge is first-class; the learner decides what rests. */
@@ -5121,7 +5200,9 @@ function srsDueItems(now = new Date()) {
     if (!rec) fresh.push(item);
     else if (new Date(rec.due) <= now) reviews.push(item);
   }
-  return [...reviews, ...fresh.slice(0, NEW_PER_SESSION)];
+  const introducedToday = S.stats[dayKey(now)]?.nnew || 0;
+  const room = Math.max(0, NEW_PER_DAY - introducedToday);
+  return [...reviews, ...fresh.slice(0, room)];
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
 function startOfDay(d) {
@@ -5223,15 +5304,23 @@ function renderReview(main) {
   }
   if (rv.ix >= rv.queue.length) {
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
-    const n = rv.queue.length;
+    // count grades pressed, not queue rows — re-inserted learning passes
+    // would otherwise inflate the goodbye number
+    const n = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
     main.append(el('h1', 'view-title', tx(`復習おわり — ${n} 件`, `Session done — ${n} card${n === 1 ? '' : 's'}`)));
     const sum = el('div', 'review-summary');
     const labels = { again: ['もう一度', 'again'], hard: ['難しい', 'hard'], good: ['ふつう', 'good'], easy: ['簡単', 'easy'] };
     for (const key of ['again', 'hard', 'good', 'easy'])
       if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
     main.append(sum);
-    // the struggling cards, by name — with a rest offered, never imposed
-    const leeches = rv.queue.filter(isLeech);
+    // the struggling cards, by name (each once) — a rest offered, never imposed
+    const leechSeen = new Set();
+    const leeches = rv.queue.filter((i) => {
+      const k = srsKey(i.t, i.id);
+      if (leechSeen.has(k)) return false;
+      leechSeen.add(k);
+      return true;
+    }).filter(isLeech);
     if (leeches.length) {
       main.append(withEn(el('p', 'eyebrow list-head', '苦手な札'), 'cards that keep slipping', 'en-inline'));
       main.append(
@@ -5270,6 +5359,36 @@ function renderReview(main) {
     main.append(out);
     renderReviewUndo(main, rv);
     return;
+  }
+  // A re-inserted learning card may not have ripened yet. The nearest-ripening
+  // card comes forward (a ready card is always nearest). A short beat — the
+  // 1-minute step — is honoured with a quiet countdown: that pause IS the
+  // step. A longer gap is pulled early instead of parking the learner
+  // (Anki's learn-ahead), and the engine's same-day math prices early passes
+  // correctly. The dojo skips all of this — drilling early is its point.
+  if (!S.focus) {
+    const nowMs = Date.now();
+    const dueAt = (q) => {
+      const rec = S.srs[srsKey(q.t, q.id)];
+      return rec ? new Date(rec.due).getTime() : 0; // never-seen cards are always ready
+    };
+    if (dueAt(rv.queue[rv.ix]) > nowMs) {
+      let best = rv.ix;
+      for (let k = rv.ix + 1; k < rv.queue.length; k++) {
+        if (dueAt(rv.queue[k]) < dueAt(rv.queue[best])) best = k;
+      }
+      if (best !== rv.ix) {
+        const held = rv.queue[rv.ix];
+        rv.queue[rv.ix] = rv.queue[best];
+        rv.queue[best] = held;
+      }
+      const left = dueAt(rv.queue[rv.ix]) - nowMs;
+      if (left > 0 && left <= REVIEW_WAIT_HOLD_MS && !rv.showEarly) {
+        renderReviewWait(main, rv, dueAt(rv.queue[rv.ix]));
+        return;
+      }
+      rv.showEarly = false;
+    }
   }
   const item = rv.queue[rv.ix];
   // ZEN — while a card is up there is nothing on the glass but the card.
@@ -5398,8 +5517,26 @@ function renderReview(main) {
     b.append(el('span', 'g-when', when));
     b.addEventListener('click', () => {
       const day = dayKey();
-      rv.history.push({ key, prev: S.srs[srsKey(item.t, item.id)], day });
-      srsStore(item, result[fsrsApi.Rating[rating]].card);
+      const skey = srsKey(item.t, item.id);
+      const next = result[fsrsApi.Rating[rating]].card;
+      const prevRec = S.srs[skey];
+      // every grade lands in the append-only review log before anything else
+      const logIx = srsLogReview(skey, card, next, fsrsApi.Rating[rating], now);
+      const entry = { key, prev: prevRec, day, logIx };
+      if (prevRec === undefined) {
+        // a first grade introduces the card — it counts against today's cap
+        const st0 = (S.stats[day] ||= { n: 0, again: 0 });
+        st0.nnew = (st0.nnew || 0) + 1;
+        entry.introduced = true;
+      }
+      // a card still inside its short steps ripens within minutes — it comes
+      // back in THIS session, the way a modern SRS queue behaves
+      if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
+        rv.queue.push(item);
+        entry.reinserted = true;
+      }
+      rv.history.push(entry);
+      srsStore(item, next);
       const st = (S.stats[day] ||= { n: 0, again: 0 });
       st.n += 1;
       if (key === 'again') st.again += 1;
@@ -5415,6 +5552,57 @@ function renderReview(main) {
   // rest · undo · the full entry live behind the … mark — the zen glass
   // holds only the card and the four honest buttons
 }
+/* The quiet beat between learning steps: every remaining card is a short
+ * step that hasn't ripened. The glass keeps its zen — a soft count, one way
+ * out — and turns the next card over by itself the moment the step matures.
+ * Beats longer than this are pulled early instead of held. */
+const REVIEW_WAIT_HOLD_MS = 90000;
+let reviewWaitTimer = null;
+function renderReviewWait(main, rv, nearestDueMs) {
+  const progress = el('div', 'zen-progress');
+  const fill = el('i');
+  fill.style.width = `${Math.min(100, Math.round((rv.ix / rv.queue.length) * 100))}%`;
+  progress.append(fill);
+  main.append(progress);
+  const exit = el('button', 'zen-exit', '×');
+  exit.type = 'button';
+  exit.id = 'zen-exit';
+  exit.setAttribute('aria-label', tx('復習を閉じる', 'leave the session'));
+  exit.addEventListener('click', () => {
+    clearTimeout(reviewWaitTimer);
+    S.review = null;
+    S.view = 'tray';
+    render();
+  });
+  main.append(exit);
+  const face = el('div', 'review-face zen-wait');
+  const left = Math.max(0, nearestDueMs - Date.now());
+  const mm = Math.floor(left / 60000);
+  const ss = Math.floor((left % 60000) / 1000);
+  face.append(el('div', 'zen-wait-clock', `${mm}:${String(ss).padStart(2, '0')}`));
+  face.append(
+    el('p', 'zen-wait-note', tx('つぎの札が熟すまで、ひと息。', 'The next card is ripening — one breath.')),
+  );
+  const early = biLabel('button', 'chip zen-wait-skip', 'いま見る', 'show it now');
+  early.type = 'button';
+  early.id = 'zen-wait-skip';
+  early.addEventListener('click', () => {
+    clearTimeout(reviewWaitTimer);
+    rv.showEarly = true;
+    render();
+  });
+  face.append(early);
+  face.setAttribute('data-review-wait', '');
+  main.append(face);
+  clearTimeout(reviewWaitTimer);
+  reviewWaitTimer = setTimeout(
+    () => {
+      if (S.view === 'review' && S.review === rv) render();
+    },
+    Math.min(1000, Math.max(120, left)),
+  );
+}
+
 /* Anki's most-used safety: the last grade can always be taken back — the
  * previous card state is restored exactly, never recomputed. Reachable from
  * every state of the session, the summary included. */
@@ -5438,6 +5626,17 @@ function renderReviewUndo(main, rv) {
       if (st) {
         st.n = Math.max(0, st.n - 1);
         if (last.key === 'again') st.again = Math.max(0, st.again - 1);
+        if (last.introduced && st.nnew) st.nnew -= 1;
+      }
+      // the log is append-only: an undo never erases the row it takes back —
+      // it files a revocation pointing at it, so history stays whole
+      if (last.logIx != null) {
+        (S.revlog ||= []).push([Date.now(), key, 0, last.logIx]);
+      }
+      // if this grade re-queued a learning step, remove that pending copy
+      if (last.reinserted) {
+        const tail = rv.queue.lastIndexOf(prevItem);
+        if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
       }
     }
     saveStore();
@@ -5508,7 +5707,7 @@ function focusPool(mode) {
 function refillFocusQueue(rv) {
   const f = S.focus;
   if (!f || !f.pool.length) return false;
-  for (let i = 0; i < NEW_PER_SESSION; i++) {
+  for (let i = 0; i < FOCUS_BATCH; i++) {
     rv.queue.push(f.pool[f.cursor % f.pool.length]);
     f.cursor += 1;
   }
@@ -5522,7 +5721,7 @@ function startFocus(min, mode) {
     return;
   }
   S.focusEmpty = null;
-  const first = pool.slice(0, Math.min(pool.length, NEW_PER_SESSION));
+  const first = pool.slice(0, Math.min(pool.length, FOCUS_BATCH));
   S.focus = { min, mode, deadline: Date.now() + min * 60000, ended: false, pool, cursor: first.length };
   S.review = { queue: first.slice(), ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
   S.view = 'review';
