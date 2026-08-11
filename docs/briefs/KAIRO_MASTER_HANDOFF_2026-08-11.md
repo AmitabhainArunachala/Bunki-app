@@ -180,18 +180,33 @@ debate doc first and fold in any new feedback before building.
 current build. On their word: merge to `main`, confirm auto-deploy,
 close stale PRs. Never do this unprompted.
 
-**Phase A — diagnosis backbone (decided; build next).**
+**Phase A — diagnosis backbone. DONE 2026-08-11** (items 1–2; the
+bootstrap importer remains open, below).
 
-1. Reader tap telemetry: log every tap-ladder interaction (item key, tap
-   depth: furigana/gloss/entry, article id, ts) as observation rows in
-   the same append-only log family as the revlog. Storage cost is small;
-   respect the quarantine and export paths (`STORE_KNOWN_KEYS`).
-2. Yomi-probe dojo mode: uncaptured compounds sampled stratified across
-   kanji × reading-type × Kanken band (from dict-v2 + KANJIDIC2 + kanken
-   table, offline); sentence context from the shelf where available;
-   reveal → self-grade; failures auto-mint cards; probe rows logged.
-3. Acceptance: taps visible in the exported envelope; a probe session
-   walk at 390×844; suites green.
+1. ~~Reader tap telemetry~~ **DONE**: every tap-ladder interaction logs
+   `[t, 'tap', key, depth, articleId]` into `S.obslog` — append-only,
+   quarantine-protected, exported with the envelope, persisted on a
+   1.2 s trailing debounce with a pagehide flush. Depth 1 ふりがな ·
+   2 gloss (incl. the long-press mini) · 3 full entry. A tap never
+   writes FSRS state.
+2. ~~Yomi-probe dojo mode~~ **DONE**: 読み探査 is the dojo's third
+   mode. 13,713 untaken core compounds, each carrying its hardest
+   kanji's 漢検 band and a reading type (音/訓/混/熟 — classified
+   against KANJIDIC2 on/kun with rendaku + sokuon variants; 熟 means
+   "not resolvable here"). Batches of 20 draw stratified: bands
+   round-robin hardest-first, reading types cycled, no head kanji
+   repeated. Same zen glass as 復習; shelf sentence context when one
+   exists; reveal → 読めた/読めなかった; a miss mints the word into
+   覚える (daily cap applies) and logs `[t,'probe',key,1,minted]`;
+   a hit logs and costs nothing. Probes are observations — zero FSRS
+   writes, enforced by suite check. Instrument handle:
+   `window.__KAIRO_PROBE__`.
+3. Acceptance landed as permanent checks: verify-corridor now runs
+   99 checks (tap-ladder rows, envelope persistence, no-FSRS doctrine,
+   classifier/pool/draw stats, a probe walk at 390×844).
+4. Still open from Phase A's original scope: the **knowledge bootstrap**
+   (Anki/known-list import + contextual calibration, routing-only) —
+   build alongside the shadow router in Phase B/C.
 
 **Phase B — content + rights integrity (decided; parallel-safe with A).**
 

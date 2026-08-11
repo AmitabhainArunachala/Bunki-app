@@ -3385,6 +3385,25 @@ body.v-depth-layered .stroke-page {
   margin: 6px 0 4px;
 }
 
+/* 読み探査 — the probe keeps the review room's glass; only its own two
+ * lines are new: a shelf sentence under the word, and the quiet exact
+ * meta line (漢検 band · reading type) after the reveal */
+.probe-context {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 2;
+  color: var(--ink-2);
+  margin: 4px 0 0;
+}
+.probe-meta {
+  color: var(--ink-2);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+body.zen .probe-context {
+  font-size: 19px;
+}
+
 /* the struggling cards on the session summary */
 .leech-row {
   display: flex;

@@ -469,6 +469,11 @@ const S = {
    * foundation for FSRS weight optimization, analytics and state recovery —
    * see the layout comment at srsLogReview. */
   revlog: [],
+  /** the observation log: append-only rows of encounters and assistance —
+   * reader taps, dojo probes. Evidence for routing, never knownness: a tap
+   * is friction, not a grade, and no row here touches FSRS state. See the
+   * layout comment at obsLog. */
+  obslog: [],
   /** storage protection: read-only quarantine when the stored envelope cannot
    * be read (never overwrite what we cannot read), plus the one quiet line */
   storeReadOnly: false,
@@ -476,6 +481,9 @@ const S = {
   storeExtras: null,
   /** a running review session: { queue, ix, revealed, done } — null at rest */
   review: null,
+  /** a running yomi probe: { queue, ix, revealed, right, missed, minted } —
+   * session-only; its evidence lives in the obslog, never in FSRS state */
+  probe: null,
   /** zen review: whether the quiet … row (undo · rest · entry) is open */
   reviewMore: false,
   /** finished lessons: { 'N5-1': {score, total, ts} } */
@@ -530,6 +538,7 @@ const STORE_KNOWN_KEYS = [
   'lists',
   'srs',
   'revlog',
+  'obslog',
   'deepWords',
   'lessonsDone',
   'aiReading',
@@ -590,6 +599,7 @@ function loadStore() {
   if (plainRecord(s.lists)) S.lists = s.lists;
   if (plainRecord(s.srs)) S.srs = s.srs;
   if (Array.isArray(s.revlog)) S.revlog = s.revlog;
+  if (Array.isArray(s.obslog)) S.obslog = s.obslog;
   if (plainRecord(s.deepWords)) S.deepWords = s.deepWords;
   if (plainRecord(s.lessonsDone)) S.lessonsDone = s.lessonsDone;
   if (plainRecord(s.aiReading)) S.aiReading = s.aiReading;
@@ -616,6 +626,7 @@ function saveStore() {
         lists: S.lists,
         srs: S.srs,
         revlog: S.revlog || [],
+        obslog: S.obslog || [],
         deepWords: S.deepWords || {},
         lessonsDone: S.lessonsDone,
         aiReading: S.aiReading,
@@ -638,6 +649,40 @@ function saveStore() {
     return false;
   }
 }
+
+/* ------------------------------------------------ the observation log
+ * Append-only, one compact row per observation — the diagnosis backbone's
+ * evidence stream. Rows share the revlog's discipline (never rewritten,
+ * quarantine-protected, exported inside the envelope) but record encounters
+ * and assistance, never knownness: a tap marks friction on a word, not a
+ * grade, and nothing here ever writes FSRS state. Layouts:
+ *
+ *   [t, 'tap', key, depth, articleId]
+ *       the reader's assistance ladder on a content token —
+ *       depth 1 ふりがな revealed · 2 gloss shown (incl. the long-press
+ *       mini) · 3 full entry opened; t is epoch ms, key "word:<base>"
+ *   [t, 'probe', key, g, minted]
+ *       a yomi-probe self-grade in the dojo — g 1 read it wrong · 3 read
+ *       it right; minted 1 when the miss minted a card, else 0
+ *
+ * Taps arrive in bursts mid-reading, so rows persist on a short trailing
+ * debounce instead of a full envelope write per tap; pagehide flushes. */
+let obsSaveTimer = null;
+function obsFlush() {
+  if (obsSaveTimer == null) return;
+  clearTimeout(obsSaveTimer);
+  obsSaveTimer = null;
+  saveStore();
+}
+function obsLog(kind, key, ...detail) {
+  (S.obslog ||= []).push([Date.now(), kind, key, ...detail]);
+  clearTimeout(obsSaveTimer);
+  obsSaveTimer = setTimeout(obsFlush, 1200);
+}
+addEventListener('pagehide', obsFlush);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') obsFlush();
+});
 
 /** Local calendar day for the review trace — the learner's day, not UTC's. */
 function dayKey(d = new Date()) {
@@ -1602,6 +1647,13 @@ function back() {
     render();
     return;
   }
+  if (S.view === 'probe') {
+    endFocus();
+    S.probe = null;
+    S.view = 'dojo';
+    render();
+    return;
+  }
   if (S.view === 'dojo') {
     S.view = 'drift';
     render();
@@ -2421,9 +2473,11 @@ function wireTokenGestures(span, token, index, p) {
   let fullTimer = null;
   let down = null;
   const target = { kind: 'word', id: token.b };
+  const obsKey = srsKey('word', token.b);
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
     swallowClickUntil = Date.now() + 700;
+    obsLog('tap', obsKey, 3, p.id);
     if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     go(
       { t: 'word', id: token.b, from: { passage: p.id, index } },
@@ -2431,6 +2485,7 @@ function wireTokenGestures(span, token, index, p) {
     );
   };
   const quickLook = (modality = 'pointer', emitAction = false) => {
+    obsLog('tap', obsKey, 2, p.id);
     if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-token');
     showMini(span, token, (entryModality) => openFull(entryModality, true), {
       focusEntry: modality !== 'pointer',
@@ -2444,11 +2499,13 @@ function wireTokenGestures(span, token, index, p) {
     const hasEn = S.glossed.has(index);
     if (!hasReading) {
       S.revealed.add(index);
+      obsLog('tap', obsKey, 1, p.id);
       paintTok(span, token, index);
       return;
     }
     if (!hasEn) {
       S.glossed.add(index);
+      obsLog('tap', obsKey, 2, p.id);
       paintTok(span, token, index);
       return;
     }
@@ -5686,7 +5743,7 @@ function stopFocusTicker() {
 function startFocusTicker() {
   stopFocusTicker();
   focusTicker = setInterval(() => {
-    if (!S.focus || S.view !== 'review') {
+    if (!S.focus || (S.view !== 'review' && S.view !== 'probe')) {
       stopFocusTicker();
       return;
     }
@@ -5731,6 +5788,7 @@ function refillFocusQueue(rv) {
   return true;
 }
 function startFocus(min, mode) {
+  if (mode === 'yomi') return startProbe(min);
   const pool = focusPool(mode);
   if (!pool.length) {
     S.focusEmpty = mode;
@@ -5748,7 +5806,7 @@ function startFocus(min, mode) {
 
 /** The fixed countdown strip shown while a focus block runs. */
 function renderFocusHud(root) {
-  if (!S.focus || S.view !== 'review') return;
+  if (!S.focus || (S.view !== 'review' && S.view !== 'probe')) return;
   const hud = el('div', 'focus-hud' + (S.focus.ended ? ' done' : ''));
   hud.setAttribute('data-drift-chrome', '');
   const left = el('span', 'focus-hud-left');
@@ -5765,6 +5823,7 @@ function renderFocusHud(root) {
   end.type = 'button';
   end.addEventListener('click', () => {
     endFocus();
+    S.probe = null;
     keepScroll();
     S.view = 'dojo';
     render();
@@ -5810,6 +5869,7 @@ function renderFocus(main) {
   const modeDefs = [
     ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている`, `${due} waiting`)],
     ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
+    ['yomi', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took')],
   ];
   S.focusMode = S.focusMode || 'due';
   for (const [id, ja, en, sub] of modeDefs) {
@@ -5832,7 +5892,9 @@ function renderFocus(main) {
         'sem-empty',
         S.focusEmpty === 'due'
           ? tx('いま待っている札がない。覚えるリストに足すか、漢字だけで始めよう。', 'No cards are waiting. Add some to your list, or start a kanji-only run.')
-          : tx('漢字が見つからない。', 'No kanji to drill yet.'),
+          : S.focusEmpty === 'yomi'
+            ? tx('探査できる熟語が見つからない。', 'No compounds left to probe.')
+            : tx('漢字が見つからない。', 'No kanji to drill yet.'),
       ),
     );
   }
@@ -5841,6 +5903,343 @@ function renderFocus(main) {
   start.type = 'button';
   start.addEventListener('click', () => startFocus(S.focusMin, S.focusMode));
   main.append(start);
+}
+
+/* ------------------------------------------------------------- 読み探査
+ * The yomi probe: measure what was never captured. Compounds the learner
+ * has NOT taken are sampled stratified across Kanken band × reading type ×
+ * head kanji, shown bare (sentence context from the shelf when it has one),
+ * and self-graded on one question only — could you read it. A probe is an
+ * observation, never a grade: rows land in the obslog, FSRS state is never
+ * written. A miss mints the word into 覚える (subject to the same daily
+ * cap as any capture); a hit costs nothing. Everything here runs offline
+ * from the committed data: dict core + KANJIDIC2 readings + kanken table. */
+
+/** Katakana on-readings and dotted kun-readings become matchable variants:
+ * the plain form, the rendaku'd form (first mora voiced), and the sokuon
+ * form (final つ/ち/く/き → っ) — enough to recognize 学+校 = がっこう and
+ * 人+人 = ひとびと without pretending to be a full morphophonology. */
+const YOMI_DAKUTEN = {
+  か: 'が', き: 'ぎ', く: 'ぐ', け: 'げ', こ: 'ご',
+  さ: 'ざ', し: 'じ', す: 'ず', せ: 'ぜ', そ: 'ぞ',
+  た: 'だ', ち: 'ぢ', つ: 'づ', て: 'で', と: 'ど',
+  は: 'ば', ひ: 'び', ふ: 'ぶ', へ: 'べ', ほ: 'ぼ',
+};
+const YOMI_HANDAKU = { は: 'ぱ', ひ: 'ぴ', ふ: 'ぷ', へ: 'ぺ', ほ: 'ぽ' };
+const yomiVariantCache = new Map();
+function yomiVariantsOf(ch) {
+  if (yomiVariantCache.has(ch)) return yomiVariantCache.get(ch);
+  const k = D.kanji?.[ch];
+  const out = [];
+  const add = (reading, type) => {
+    const base = kataToHira(reading).replace(/-/g, '');
+    if (!base) return;
+    const seen = new Set();
+    const sokuon = base.length >= 2 && 'つちくき'.includes(base.at(-1)) ? base.slice(0, -1) + 'っ' : null;
+    for (const v of sokuon ? [base, sokuon] : [base]) {
+      for (const head of [v[0], YOMI_DAKUTEN[v[0]], YOMI_HANDAKU[v[0]]]) {
+        if (!head) continue;
+        const form = head + v.slice(1);
+        if (!seen.has(form)) {
+          seen.add(form);
+          out.push([form, type]);
+        }
+      }
+    }
+  };
+  for (const on of k?.on || []) add(on, 'on');
+  for (const kun of k?.kun || []) {
+    add(kun.split('.')[0], 'kun'); // the stem alone (compound position)
+    if (kun.includes('.')) add(kun.replace('.', ''), 'kun'); // stem + okurigana
+  }
+  out.sort((a, b) => b[0].length - a[0].length); // greedy: longest first
+  yomiVariantCache.set(ch, out);
+  return out;
+}
+
+/** Classify how a compound is read against its kanji's own readings:
+ * 音 (all on), 訓 (all kun), 混 (湯桶/重箱 mixes), 熟 (no per-kanji parse —
+ * jukujikun, gikun, or readings beyond the variant model). Honest about
+ * its limits: 熟 means "not resolvable here", never a claim about origin. */
+function yomiReadingType(word, reading) {
+  const target = kataToHira(reading || '');
+  if (!target) return '熟';
+  const chars = [...word];
+  const step = (ci, rest, sawOn, sawKun) => {
+    if (ci === chars.length) return rest === '' ? { sawOn, sawKun } : null;
+    const ch = chars[ci];
+    if (!/[一-鿿々]/.test(ch)) {
+      const lit = kataToHira(ch);
+      return rest.startsWith(lit) ? step(ci + 1, rest.slice(lit.length), sawOn, sawKun) : null;
+    }
+    const source = ch === '々' ? chars[ci - 1] : ch;
+    for (const [form, type] of source ? yomiVariantsOf(source) : []) {
+      if (!rest.startsWith(form)) continue;
+      const hit = step(ci + 1, rest.slice(form.length), sawOn || type === 'on', sawKun || type === 'kun');
+      if (hit) return hit;
+    }
+    return null;
+  };
+  const parsed = step(0, target, false, false);
+  if (!parsed) return '熟';
+  if (parsed.sawOn && parsed.sawKun) return '混';
+  return parsed.sawOn ? '音' : '訓';
+}
+
+/** The probe pool: every core-dictionary compound (2+ kanji) the learner has
+ * neither taken nor probed, carrying its hardest kanji's Kanken band and its
+ * reading type. Built once per session, on first use. */
+function buildYomiPool() {
+  const takenWords = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
+  const probed = new Set(
+    (S.obslog || []).filter((r) => r[1] === 'probe').map((r) => String(r[2]).slice('word:'.length)),
+  );
+  const pool = [];
+  for (const [w, rec] of Object.entries(D.dict)) {
+    if (takenWords.has(w) || probed.has(w) || !rec.r || !rec.m?.length) continue;
+    const marks = [...w].filter((c) => /[一-鿿々]/.test(c));
+    if (marks.length < 2) continue; // 熟語 — compounds are the probe's subject
+    let kr = 0;
+    let band = null;
+    for (const c of new Set(marks.filter((c) => c !== '々'))) {
+      const kb = D.kanken?.[c];
+      if (!kb) {
+        band = null;
+        break;
+      }
+      if (kb.kr > kr) {
+        kr = kb.kr;
+        band = kb.kk;
+      }
+    }
+    if (!band) continue; // no honest band — leave it out rather than guess
+    pool.push({ w, r: rec.r, m: rec.m, band, kr, rt: yomiReadingType(w, rec.r), head: marks[0] });
+  }
+  return pool;
+}
+
+/** One stratified batch: bands round-robin (hardest first), reading types
+ * cycled within each band, no head kanji repeated within the batch. */
+function drawYomiBatch(pool, drawn, n = FOCUS_BATCH) {
+  const byBand = new Map();
+  for (const it of pool) {
+    if (drawn.has(it.w)) continue;
+    if (!byBand.has(it.band)) byBand.set(it.band, { kr: it.kr, cell: [] });
+    byBand.get(it.band).cell.push(it);
+  }
+  const bands = [...byBand.entries()].sort((a, b) => b[1].kr - a[1].kr).map(([name]) => name);
+  const usedHeads = new Set();
+  const rtCycle = ['音', '訓', '混', '熟'];
+  const out = [];
+  let rtIx = 0;
+  while (out.length < n && bands.length) {
+    let advanced = false;
+    for (const band of [...bands]) {
+      if (out.length >= n) break;
+      const cell = byBand.get(band).cell;
+      let pick = -1;
+      for (let pass = 0; pass < rtCycle.length && pick < 0; pass++) {
+        const rt = rtCycle[(rtIx + pass) % rtCycle.length];
+        const fits = cell.map((it, ix) => ({ it, ix })).filter(({ it }) => it.rt === rt && !usedHeads.has(it.head));
+        if (fits.length) pick = fits[Math.floor(Math.random() * fits.length)].ix;
+      }
+      if (pick < 0) {
+        const fits = cell.map((it, ix) => ({ it, ix })).filter(({ it }) => !usedHeads.has(it.head));
+        if (fits.length) pick = fits[Math.floor(Math.random() * fits.length)].ix;
+      }
+      if (pick < 0 && cell.length) pick = Math.floor(Math.random() * cell.length);
+      if (pick >= 0) {
+        const it = cell.splice(pick, 1)[0];
+        usedHeads.add(it.head);
+        drawn.add(it.w);
+        out.push(it);
+        rtIx += 1;
+        advanced = true;
+      }
+      if (!cell.length) bands.splice(bands.indexOf(band), 1);
+    }
+    if (!advanced) break;
+  }
+  return out;
+}
+
+const YOMI_RT_LABEL = { 音: ['音読み', 'on'], 訓: ['訓読み', 'kun'], 混: ['混読', 'mixed'], 熟: ['熟字訓など', 'irregular'] };
+
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * read-only access to the probe's classifier and sampler, so acceptance
+ * checks exercise the real code instead of a re-implementation. */
+window.__KAIRO_PROBE__ = Object.freeze({
+  readingType: (w, r) => yomiReadingType(w, r),
+  poolStats: () => {
+    const pool = buildYomiPool();
+    const bands = {};
+    const rts = {};
+    for (const it of pool) {
+      bands[it.band] = (bands[it.band] || 0) + 1;
+      rts[it.rt] = (rts[it.rt] || 0) + 1;
+    }
+    return { n: pool.length, bands, rts };
+  },
+  drawStats: (n = FOCUS_BATCH) => {
+    const batch = drawYomiBatch(buildYomiPool(), new Set(), n);
+    return {
+      n: batch.length,
+      heads: new Set(batch.map((b) => b.head)).size,
+      bands: new Set(batch.map((b) => b.band)).size,
+      words: batch.map((b) => `${b.w}:${b.band}:${b.rt}`),
+    };
+  },
+});
+
+function startProbe(min) {
+  D.yomiPool ||= buildYomiPool();
+  const drawn = new Set();
+  const queue = drawYomiBatch(D.yomiPool, drawn, FOCUS_BATCH);
+  if (!queue.length) {
+    S.focusEmpty = 'yomi';
+    render();
+    return;
+  }
+  S.focusEmpty = null;
+  S.focus = { min, mode: 'yomi', deadline: Date.now() + min * 60000, ended: false, drawn };
+  S.probe = { queue, ix: 0, revealed: false, right: 0, missed: [], minted: 0 };
+  S.view = 'probe';
+  startFocusTicker();
+  render();
+}
+
+/** The probe room: the same zen glass as 復習 — the word alone, a shelf
+ * sentence when one exists, one reveal, two honest answers. */
+function renderProbe(main) {
+  const pr = S.probe;
+  if (!pr) {
+    S.view = 'dojo';
+    return renderFocus(main);
+  }
+  // the clock keeps the queue full; once it ends the batch in hand plays out
+  if (pr.ix >= pr.queue.length && S.focus && !S.focus.ended && Date.now() < S.focus.deadline) {
+    const more = drawYomiBatch(D.yomiPool || [], S.focus.drawn, FOCUS_BATCH);
+    if (more.length) pr.queue.push(...more);
+  }
+  if (pr.ix >= pr.queue.length) {
+    main.append(withEn(el('p', 'eyebrow', '読み探査'), 'yomi probe', 'en-inline'));
+    const n = pr.right + pr.missed.length;
+    main.append(el('h1', 'view-title', tx(`探査おわり — ${n} 語`, `Probe done — ${n} word${n === 1 ? '' : 's'}`)));
+    const sum = el('div', 'review-summary');
+    sum.append(el('span', 'pool-tag', tx(`読めた ${pr.right}`, `read ${pr.right}`)));
+    sum.append(el('span', 'pool-tag', tx(`読めなかった ${pr.missed.length}`, `missed ${pr.missed.length}`)));
+    main.append(sum);
+    if (pr.missed.length) {
+      main.append(
+        el(
+          'p',
+          'gloss',
+          tx(
+            `落ちた ${pr.minted} 語は札になって、明日からの新しい札に混ざる。`,
+            `The ${pr.minted} misses became cards — they join the daily stream of new ones.`,
+          ),
+        ),
+      );
+      for (const it of pr.missed) {
+        const row = el('div', 'leech-row');
+        row.append(el('span', 'w', `${it.w}（${it.r}）`));
+        const door = biLabel('button', 'chip', 'ページへ', 'full entry');
+        door.type = 'button';
+        door.addEventListener('click', () => go({ t: 'word', id: it.w }));
+        row.append(door);
+        main.append(row);
+      }
+    }
+    const out = biLabel('button', 'take', '道場へ', 'back to the dojo');
+    out.type = 'button';
+    out.addEventListener('click', () => {
+      endFocus();
+      S.probe = null;
+      S.view = 'dojo';
+      render();
+    });
+    main.append(out);
+    return;
+  }
+  const it = pr.queue[pr.ix];
+  const progress = el('div', 'zen-progress');
+  const fill = el('i');
+  fill.style.width = `${Math.min(100, Math.round((pr.ix / pr.queue.length) * 100))}%`;
+  progress.append(fill);
+  main.append(progress);
+
+  const face = el('div', 'review-face');
+  face.append(el('div', 'review-front', it.w));
+  const context = findExamples(it.w, 1)[0];
+  if (context) {
+    const line = el('p', 'probe-context');
+    for (const t of context.tokens) {
+      if (t.c && t.b === it.w) line.append(el('span', 'example-hit', t.s));
+      else line.append(document.createTextNode(t.s));
+    }
+    face.append(line);
+  }
+  if (pr.revealed) {
+    face.append(el('div', 'review-reading', it.r));
+    face.append(el('div', 'review-sense', it.m.slice(0, 3).join('; ')));
+    const rt = YOMI_RT_LABEL[it.rt] || YOMI_RT_LABEL['熟'];
+    face.append(el('div', 'probe-meta', `漢検${it.band} · ${tx(rt[0], rt[1])}`));
+  }
+  main.append(face);
+
+  if (!pr.revealed) {
+    face.addEventListener('click', () => {
+      pr.revealed = true;
+      render();
+    });
+    const btn = biLabel('button', 'take review-reveal', '読みを見る', 'show the reading');
+    btn.type = 'button';
+    btn.id = 'probe-reveal';
+    btn.addEventListener('click', () => {
+      pr.revealed = true;
+      render();
+    });
+    main.append(btn);
+    return;
+  }
+  const row = el('div', 'grade-row probe-row');
+  const answers = [
+    ['again', '読めなかった', 'missed it', false],
+    ['good', '読めた', 'read it', true],
+  ];
+  for (const [tone, ja, en, ok] of answers) {
+    const b = el('button', `grade g-${tone}`);
+    b.type = 'button';
+    b.dataset.probe = ok ? 'right' : 'wrong';
+    b.append(el('span', 'g-label', tx(ja, en)));
+    b.addEventListener('click', () => {
+      const key = srsKey('word', it.w);
+      let minted = 0;
+      if (!ok && !S.taken.some((t) => t.t === 'word' && t.id === it.w)) {
+        S.taken.push({
+          t: 'word',
+          id: it.w,
+          label: it.w,
+          kind: NODE_KIND.word[0],
+          kindEn: NODE_KIND.word[1],
+          from: null,
+          ts: Date.now(),
+        });
+        minted = 1;
+        pr.minted += 1;
+      }
+      // the probe is an observation: one obslog row, zero FSRS writes
+      obsLog('probe', key, ok ? 3 : 1, minted);
+      if (ok) pr.right += 1;
+      else pr.missed.push(it);
+      saveStore(); // a minted card must not wait on the tap debounce
+      pr.ix += 1;
+      pr.revealed = false;
+      render();
+    });
+    row.append(b);
+  }
+  main.append(row);
 }
 
 function renderSchedule(container) {
@@ -8136,7 +8535,9 @@ function render() {
     !!scheduler &&
     !!fsrsApi &&
     (S.review.ix < S.review.queue.length || !!focusLive);
-  document.body.classList.toggle('zen', !!zenReview);
+  // the probe room keeps the same glass: word up → world recedes
+  const zenProbe = S.ready && S.view === 'probe' && !!S.probe && S.probe.ix < S.probe.queue.length;
+  document.body.classList.toggle('zen', !!zenReview || !!zenProbe);
   if (!zenReview) S.reviewMore = false;
 
   const chrome = el('div', 'chrome');
@@ -8162,6 +8563,7 @@ function render() {
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
+  if (S.view === 'probe') parts.push(tx('読み探査', 'yomi probe'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
@@ -8242,6 +8644,7 @@ function render() {
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
   else if (S.view === 'review') renderReview(main);
+  else if (S.view === 'probe') renderProbe(main);
   else if (S.view === 'dojo') renderFocus(main);
   else if (S.view === 'aiquiz') renderAiQuiz(main);
   else if (S.view === 'levels') renderLevels(main);

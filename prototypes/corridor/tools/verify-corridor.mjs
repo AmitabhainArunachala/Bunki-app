@@ -925,6 +925,12 @@ async function main() {
   const scrollBefore = await page.evaluate('window.scrollY');
   await holdWord(page, '#reader .tok.content', 23);
   await page.waitForSelector('#sheet');
+  // the deep tier's one-time re-render replaces the sheet body moments after
+  // it opens — tapping a kanji row mid-swap dies with it (same settle as
+  // walkToSemPanel)
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+    .catch(() => {});
   await tap(page, '#sheet [data-kanjirow]');
   await page.waitForTimeout(140);
   await tap(page, '#sheet-back');
@@ -1265,6 +1271,88 @@ async function main() {
     pPage.node.startsWith('particle:') && pPage.examples >= 2,
     `${pPage.node} — ${pPage.head.trim()}, ${pPage.examples} examples`);
   await shoot(page, shotsDir, '13-v16-particle');
+
+  // ------------------------------ Phase A · the observation log (taps)
+  console.log('\n— Phase A · reader taps land in the observation log');
+  await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
+  await tap(page, '.shelf-item');
+  await settleReader(page);
+  const obsBefore = await page.evaluate(
+    `(JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').obslog || []).length`,
+  );
+  await tap(page, '#reader .tok.content', 3);
+  await page.waitForTimeout(250);
+  await tap(page, '#reader .tok.content', 3);
+  await page.waitForTimeout(250);
+  await tap(page, '#reader .tok.content', 3);
+  await page.waitForSelector('#sheet');
+  await page.waitForTimeout(1600); // the trailing debounce persists the rows
+  const obs = await page.evaluate(`(() => {
+    const env = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (env.obslog || []).slice(${obsBefore});
+    return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
+  })()`);
+  const ladder = obs.rows.filter((r) => r[1] === 'tap');
+  const sameWord = ladder.length === 3 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  check('three taps climb the ladder — ふりがな, gloss, entry — one row each',
+    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3',
+    ladder.map((r) => `${r[2]}@${r[4]} depth ${r[3]}`).join(' → ') || 'no rows');
+  check('rows persist inside the exported envelope with ms timestamps',
+    ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
+    `${obs.rows.length} rows appended after ${obsBefore} existing`);
+  check('a tap is friction, never a grade — no FSRS state minted',
+    obs.srsHasKey === false,
+    `srs["${ladder[0]?.[2]}"] absent`);
+  await shoot(page, shotsDir, '14-phaseA-obslog');
+
+  // -------------------------- Phase A · the yomi probe (読み探査)
+  console.log('\n— Phase A · yomi probe: stratified sampling, honest rows');
+  const probeStats = await page.evaluate(`(() => {
+    const cases = [['学校','がっこう'],['人々','ひとびと'],['手帳','てちょう'],['大人','おとな'],['電話','でんわ']];
+    return {
+      cls: cases.map(([w, r]) => window.__KAIRO_PROBE__.readingType(w, r)).join(''),
+      pool: window.__KAIRO_PROBE__.poolStats(),
+      draw: window.__KAIRO_PROBE__.drawStats(20),
+    };
+  })()`);
+  check('classifier · 音訓混熟 land on the canonical compounds',
+    probeStats.cls === '音訓混熟音',
+    `学校/人々/手帳/大人/電話 → ${probeStats.cls}`);
+  check('pool · thousands of untaken compounds, banded and typed',
+    probeStats.pool.n > 3000 && Object.keys(probeStats.pool.bands).length >= 8 && Object.keys(probeStats.pool.rts).length === 4,
+    `${probeStats.pool.n} compounds · ${Object.keys(probeStats.pool.bands).length} bands`);
+  check('draw · a batch of 20 spreads bands, no head kanji repeats',
+    probeStats.draw.n === 20 && probeStats.draw.heads === 20 && probeStats.draw.bands >= 6,
+    `${probeStats.draw.heads} heads · ${probeStats.draw.bands} bands`);
+
+  await open('');
+  await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+  await tap(page, '#ginga-symbol');
+  await page.waitForSelector('.nav-dojo');
+  await tap(page, '.nav-dojo');
+  await page.waitForSelector('.focus-mode');
+  await page.locator('.focus-mode', { hasText: '読み探査' }).click();
+  await page.locator('.focus-start').click();
+  await page.waitForSelector('.review-front', { timeout: 20000 });
+  const probeZen = await page.evaluate(`document.body.classList.contains('zen')`);
+  check('the probe room keeps the zen glass', probeZen === true, 'body.zen while a compound is up');
+  await page.locator('#probe-reveal').click();
+  await page.waitForSelector('.probe-meta');
+  const probeEnvBefore = await page.evaluate(
+    `(() => { const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}'); return { taken: (e.taken||[]).length }; })()`,
+  );
+  await page.locator('[data-probe="wrong"]').click();
+  await page.waitForTimeout(300);
+  const probeAfter = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (e.obslog || []).filter((r) => r[1] === 'probe');
+    const last = rows[rows.length - 1];
+    return { taken: (e.taken||[]).length, last, srsHas: last ? Object.prototype.hasOwnProperty.call(e.srs || {}, last[2]) : null };
+  })()`);
+  check('a missed probe mints the card and logs one row — never FSRS state',
+    probeAfter.taken === probeEnvBefore.taken + 1 && probeAfter.last?.[3] === 1 && probeAfter.last?.[4] === 1 && probeAfter.srsHas === false,
+    `row ${JSON.stringify(probeAfter.last)}`);
+  await shoot(page, shotsDir, '15-phaseA-yomi-probe');
 
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({

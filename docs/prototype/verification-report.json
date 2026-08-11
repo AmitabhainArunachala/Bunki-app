@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-11 14:56",
+          "2026-08-11 15:37",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-11 15:01",
+          "2026-08-11 15:42",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-11 15:05",
+          "2026-08-11 15:46",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 7 d",
-          "2026-08-18 14:55",
+          "in 6 d",
+          "2026-08-17 15:36",
           "8.30"
         ]
       ]
@@ -6046,9 +6046,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 372,
+  "loadMs": 426,
   "summary": {
-    "total": 91,
+    "total": 99,
     "failed": 0
   },
   "results": [
@@ -6095,7 +6095,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 372 ms"
+      "detail": "40 texts, ready in 426 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6315,7 +6315,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 6 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6506,6 +6506,46 @@
       "name": "particles · holding a particle opens its page with examples",
       "pass": true,
       "detail": "particle:de — で　particle, 2 examples"
+    },
+    {
+      "name": "three taps climb the ladder — ふりがな, gloss, entry — one row each",
+      "pass": true,
+      "detail": "word:開催@wikinews:1403 depth 1 → word:開催@wikinews:1403 depth 2 → word:開催@wikinews:1403 depth 3"
+    },
+    {
+      "name": "rows persist inside the exported envelope with ms timestamps",
+      "pass": true,
+      "detail": "3 rows appended after 25 existing"
+    },
+    {
+      "name": "a tap is friction, never a grade — no FSRS state minted",
+      "pass": true,
+      "detail": "srs[\"word:開催\"] absent"
+    },
+    {
+      "name": "classifier · 音訓混熟 land on the canonical compounds",
+      "pass": true,
+      "detail": "学校/人々/手帳/大人/電話 → 音訓混熟音"
+    },
+    {
+      "name": "pool · thousands of untaken compounds, banded and typed",
+      "pass": true,
+      "detail": "13713 compounds · 13 bands"
+    },
+    {
+      "name": "draw · a batch of 20 spreads bands, no head kanji repeats",
+      "pass": true,
+      "detail": "20 heads · 13 bands"
+    },
+    {
+      "name": "the probe room keeps the zen glass",
+      "pass": true,
+      "detail": "body.zen while a compound is up"
+    },
+    {
+      "name": "a missed probe mints the card and logs one row — never FSRS state",
+      "pass": true,
+      "detail": "row [1786462646823,\"probe\",\"word:屏風\",1,1]"
     }
   ]
 }
