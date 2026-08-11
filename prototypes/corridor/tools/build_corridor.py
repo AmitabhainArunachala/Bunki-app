@@ -3,7 +3,7 @@
 Nothing here is mocked. Every field traces to a committed corpus asset or to a
 pinned upstream fetched under its recorded sha256:
 
-  passages   corpus/samples/wikinews  (ja.wikinews, CC BY 4.0)
+  passages   corpus/samples/wikinews  (ja.wikinews, CC BY 2.5)
              corpus/samples/aozora    (青空文庫 clean, PD, 新字新仮名 only)
              corpus/samples/yasashii  (ISA やさしい日本語 glossary, ruby preserved)
   grading    corpus.grading.grade — the real three-signal grader from PR #58,

@@ -9,7 +9,7 @@ scales by adding data, not app code.
 
 Sources (all in-repo, nothing fetched):
 
-  corpus/samples/wikinews/sample.jsonl     ja.wikinews (CC BY 4.0)     full text
+  corpus/samples/wikinews/sample.jsonl     ja.wikinews (CC BY 2.5)     full text
   corpus/samples/aozora/sample.jsonl       青空文庫 clean (PD)          full text
   corpus/samples/yasashii/sample.jsonl     ISA glossary (source ruby)   full text
   prototypes/bunki-sites-v11/app/lib/reading-catalog.ts
@@ -211,8 +211,8 @@ def collect_articles() -> list[dict]:
                 "source": "ja.wikinews",
                 "sourceLabel": "ウィキニュース",
                 "pool": "proprietary_safe",
-                "licence": "CC BY 4.0",
-                "attribution": "ja.wikinews contributors, CC BY 4.0",
+                "licence": "CC BY 2.5",
+                "attribution": "ja.wikinews contributors, CC BY 2.5",
                 "url": rec.get("meta", {}).get("url", ""),
                 "date": rec.get("meta", {}).get("date", ""),
                 "rubySource": "tokenizer",
@@ -299,7 +299,7 @@ def collect_articles() -> list[dict]:
 
 SOURCES = {
     "proprietary_safe": [
-        {"name": "ja.wikinews", "licence": "CC BY 4.0", "attribution": "ja.wikinews contributors, CC BY 4.0", "url": "https://ja.wikinews.org/"},
+        {"name": "ja.wikinews", "licence": "CC BY 2.5", "attribution": "ja.wikinews contributors, CC BY 2.5", "url": "https://ja.wikinews.org/"},
         {"name": "aozorabunko-clean", "licence": "PD (著作権フラグ なし)", "attribution": "青空文庫", "url": "https://www.aozora.gr.jp/"},
         {"name": "isa-yasashii-glossary", "licence": "出入国在留管理庁 やさしい日本語 用語集", "attribution": "出入国在留管理庁", "url": ""},
         {"name": "ninjal-kyoiku-kihon-goi", "licence": "CC BY 4.0", "attribution": "国立国語研究所『教育基本語彙の基本的研究―増補改訂版―』(2009)", "url": "https://mmsrv.ninjal.ac.jp/brfvep/"},

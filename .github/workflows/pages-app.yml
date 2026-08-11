@@ -115,6 +115,40 @@ jobs:
           print(f"dict-v2 verified: {len(index['entries'])} entries across 16 shards")
           PYEOF
 
+          # rights are fail-closed: no shelf item ships without complete,
+          # registry-consistent licence metadata (round-3 review, 2026-08-11 —
+          # this very check would have caught the live CC BY 4.0 mislabel)
+          python3 - "$SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          base = f"{site}/data/articles"
+          idx = json.load(open(f"{base}/index.json"))
+          source_by_name = {}
+          for pool, records in idx["sources"].items():
+              for s in records:
+                  for k in ("name", "licence", "attribution"):
+                      assert s.get(k, "").strip(), f"source record missing {k}: {s}"
+                  assert "url" in s, f"source record {s['name']!r} missing url field"
+                  source_by_name[s["name"]] = (pool, s)
+          for a in idx["articles"]:
+              aid = a.get("id", "?")
+              for k in ("pool", "licence", "attribution", "source", "file"):
+                  assert a.get(k, "").strip(), f"{aid}: missing {k}"
+              assert "url" in a, f"{aid}: missing url field"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None, f"{aid}: source {a['source']!r} not in the sources registry"
+              assert pool == a["pool"], f"{aid}: pool {a['pool']!r} != registry pool {pool!r}"
+              if src["url"].strip():
+                  assert a["url"].strip(), f"{aid}: source has a home URL but the item has no per-item url"
+              if a["source"] == "ja.wikinews":
+                  assert a["licence"] == "CC BY 2.5", f"{aid}: ja.wikinews content is CC BY 2.5, labeled {a['licence']!r}"
+                  assert "CC BY 2.5" in a["attribution"], f"{aid}: attribution must state CC BY 2.5"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: body {k!r} disagrees with the index"
+          print(f"rights verified: {len(idx['articles'])} shelf items — licensed, attributed, pooled, linked where a source home exists")
+          PYEOF
+
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4
         with:

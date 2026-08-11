@@ -2682,8 +2682,25 @@ function renderReader(main) {
   fin.append(finBtn);
   main.append(fin);
 
+  if (p.pendingVerification) {
+    const pv = el('div', 'note');
+    pv.textContent = tx(
+      '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
+      'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+    );
+    main.append(pv);
+  }
+
   const attribution = el('div', 'note');
-  attribution.textContent = p.attribution;
+  if (p.url) {
+    const a = el('a', 'inline-link', p.attribution);
+    a.href = p.url;
+    a.rel = 'noreferrer';
+    a.target = '_blank';
+    attribution.append(a);
+  } else {
+    attribution.textContent = p.attribution;
+  }
   main.append(attribution);
 }
 
