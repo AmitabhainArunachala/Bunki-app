@@ -195,14 +195,19 @@ close stale PRs. Never do this unprompted.
 
 **Phase B — content + rights integrity (decided; parallel-safe with A).**
 
-0. Slice-0 corrections first: relabel the five Wikinews shelf items
-   **CC BY 2.5** (verified — not the 4.0 currently stamped); flag
-   `wikinews:45227` (dated 2026-05-03, one day before the closure
-   cutoff) pending final-revision verification against the frozen
-   archive — visible with a provenance note, not silently removed;
-   render each article's attribution as a **clickable source link**
-   (the `url` field already exists, unused); add a fail-closed deploy
-   check: no shelf item without complete rights metadata.
+0. ~~Slice-0 corrections first~~ **DONE 2026-08-11** (commit
+   `6b9e47c`): the five Wikinews shelf items relabeled **CC BY 2.5**
+   in bodies, index, and the generator; `wikinews:45227` flagged
+   `pendingVerification` with a visible bilingual provenance note in
+   the reader (final-revision check against the frozen archive still
+   an open task); attribution renders as a clickable source link
+   wherever `url` is non-empty; `pages-app.yml` carries a fail-closed
+   rights gate (pool/licence/attribution/source non-empty, url where
+   the source has a home, registry-consistent pooling, index/body
+   agreement, exact CC BY 2.5 on ja.wikinews). The gate immediately
+   caught a second defect: the three `real-*` classical texts cited
+   the original-pool catalog while pooled `proprietary_safe`; they
+   now cite `bunki-v11-historical`.
 1. Content flow — fresh from **PDL government pages (labeled official
    source) + Global Voices JA + Aozora**; the Wikinews **archive** as a
    finite, license-isolated pool (all editions read-only since
