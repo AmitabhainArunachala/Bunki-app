@@ -472,6 +472,8 @@ const S = {
   storeExtras: null,
   /** a running review session: { queue, ix, revealed, done } — null at rest */
   review: null,
+  /** zen review: whether the quiet … row (undo · rest · entry) is open */
+  reviewMore: false,
   /** finished lessons: { 'N5-1': {score, total, ts} } */
   lessonsDone: {},
   /** a running lesson: { id, lvl, words, ix, phase, ... } — null at rest */
@@ -5121,24 +5123,38 @@ function srsDueItems(now = new Date()) {
   }
   return [...reviews, ...fresh.slice(0, NEW_PER_SESSION)];
 }
-/** Relative due label for a tray line — the row tells the truth per item. */
+/** Midnight at the start of a date, in the learner's own calendar. */
+function startOfDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+/** Relative due label for a tray line — the row tells the truth per item,
+ * in calendar terms a person uses: minutes, hours, 明日, then real days. */
 function srsWhen(item) {
   if (S.suspended[srsKey(item.t, item.id)]) return tx('休み中', 'resting');
   const rec = S.srs[srsKey(item.t, item.id)];
   if (!rec) return tx('新規', 'new');
-  const ms = new Date(rec.due).getTime() - Date.now();
+  const now = new Date();
+  const due = new Date(rec.due);
+  const ms = due.getTime() - now.getTime();
   if (ms <= 0) return tx('いま', 'due now');
   const mins = Math.round(ms / 60000);
   if (mins < 60) return tx(`${mins} 分後`, `in ${mins} min`);
-  const days = Math.round(ms / 86400000);
-  if (days < 1) return tx(`${Math.round(mins / 60)} 時間後`, `in ${Math.round(mins / 60)} h`);
-  return tx(`${days} 日後`, `in ${days} d`);
+  const dayGap = Math.round((startOfDay(due) - startOfDay(now)) / 86400000);
+  if (dayGap === 0) return tx(`${Math.round(mins / 60)} 時間後`, `in ${Math.round(mins / 60)} h`);
+  if (dayGap === 1) return tx('明日', 'tomorrow');
+  return tx(`${dayGap} 日後`, `in ${dayGap} d`);
 }
 /** Anki's stats screen, reduced to one honest line: what today, tomorrow
  * and the coming week actually hold, plus the untouched new cards. */
 function srsForecast(now = new Date()) {
   const f = { today: 0, tomorrow: 0, week: 0, fresh: 0 };
   const DAY = 86400000;
+  // Calendar buckets, the way a person counts: everything due before tonight's
+  // midnight is TODAY (a card due in three hours is not 明日), tomorrow is
+  // tomorrow's calendar day, and the week is the six days after that.
+  const endToday = startOfDay(now) + DAY;
+  const endTomorrow = endToday + DAY;
+  const endWeek = endToday + 7 * DAY;
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
     if (S.suspended[key]) continue;
@@ -5147,10 +5163,10 @@ function srsForecast(now = new Date()) {
       f.fresh += 1;
       continue;
     }
-    const ms = new Date(rec.due).getTime() - now.getTime();
-    if (ms <= 0) f.today += 1;
-    else if (ms <= DAY) f.tomorrow += 1;
-    else if (ms <= 7 * DAY) f.week += 1;
+    const due = new Date(rec.due).getTime();
+    if (due < endToday) f.today += 1;
+    else if (due < endTomorrow) f.tomorrow += 1;
+    else if (due < endWeek) f.week += 1;
   }
   return f;
 }
@@ -5200,12 +5216,13 @@ function renderReview(main) {
   if (rv && S.focus && !S.focus.ended && rv.ix >= rv.queue.length && Date.now() < S.focus.deadline) {
     refillFocusQueue(rv);
   }
-  main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
   if (!rv || !scheduler || !fsrsApi) {
+    main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     main.append(el('div', 'sem-empty', tx('復習を始められない。', 'No session to run.')));
     return;
   }
   if (rv.ix >= rv.queue.length) {
+    main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     const n = rv.queue.length;
     main.append(el('h1', 'view-title', tx(`復習おわり — ${n} 件`, `Session done — ${n} card${n === 1 ? '' : 's'}`)));
     const sum = el('div', 'review-summary');
@@ -5255,7 +5272,38 @@ function renderReview(main) {
     return;
   }
   const item = rv.queue[rv.ix];
-  main.append(el('p', 'card-kind', `${rv.ix + 1} / ${rv.queue.length} — FSRS-6 · ${D.pin.parameterSetId}`));
+  // ZEN — while a card is up there is nothing on the glass but the card.
+  // Progress is a hairline, not a count. One quiet way out. Everything
+  // secondary (undo · rest · the full entry) waits behind one faint mark.
+  const progress = el('div', 'zen-progress');
+  const fill = el('i');
+  fill.style.width = `${Math.min(100, Math.round((rv.ix / rv.queue.length) * 100))}%`;
+  progress.append(fill);
+  main.append(progress);
+  if (!S.focus) {
+    // the dojo has its own quiet clock and door; plain review gets one ×
+    const exit = el('button', 'zen-exit', '×');
+    exit.type = 'button';
+    exit.id = 'zen-exit';
+    exit.setAttribute('aria-label', tx('復習を閉じる', 'leave the session'));
+    exit.addEventListener('click', () => {
+      S.review = null;
+      S.view = 'tray';
+      render();
+    });
+    main.append(exit);
+  }
+  const moreBtn = el('button', 'zen-more' + (S.reviewMore ? ' open' : ''), '…');
+  moreBtn.type = 'button';
+  moreBtn.id = 'zen-more';
+  moreBtn.setAttribute('aria-expanded', String(!!S.reviewMore));
+  moreBtn.setAttribute('aria-label', tx('その他', 'more'));
+  moreBtn.addEventListener('click', () => {
+    S.reviewMore = !S.reviewMore;
+    render();
+  });
+  main.append(moreBtn);
+
   // Anki's cloze, fed by the corpus: every other repetition of a word that
   // lives in the shelf's real sentences is asked inside one — the blank
   // holds the word's place, the context does the asking. No hand-made
@@ -5265,9 +5313,7 @@ function renderReview(main) {
     cloze = findExamples(item.id, 1)[0] || null;
   }
   const face = el('div', 'review-face');
-  face.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
   if (cloze) {
-    face.append(el('span', 'pool-tag', tx('文の中で', 'in its sentence')));
     const line = el('p', 'review-cloze');
     for (const t of cloze.tokens) {
       if (t.c && t.b === item.id) {
@@ -5286,13 +5332,42 @@ function renderReview(main) {
     const backc = reviewBack(item);
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
     for (const s of backc.senses) face.append(el('div', 'review-sense', s));
-    const door = biLabel('button', 'chip', 'ページへ', 'full entry');
-    door.type = 'button';
-    door.addEventListener('click', () => go({ t: item.t, id: item.id }));
-    face.append(door);
   }
   main.append(face);
+
+  if (S.reviewMore) {
+    const moreRow = el('div', 'zen-more-row');
+    renderReviewUndo(moreRow, rv);
+    const rest2 = biLabel('button', 'chip review-rest', '休ませる', 'rest this card');
+    rest2.type = 'button';
+    rest2.id = 'review-rest';
+    rest2.addEventListener('click', () => {
+      const key = srsKey(item.t, item.id);
+      S.suspended[key] = Date.now();
+      saveStore();
+      rv.history.push({ key: 'suspend' });
+      rv.ix += 1;
+      rv.revealed = false;
+      S.reviewMore = false;
+      render();
+    });
+    moreRow.append(rest2);
+    if (rv.revealed) {
+      const door = biLabel('button', 'chip', 'ページへ', 'full entry');
+      door.type = 'button';
+      door.addEventListener('click', () => go({ t: item.t, id: item.id }));
+      moreRow.append(door);
+    }
+    main.append(moreRow);
+  }
+
   if (!rv.revealed) {
+    // the card itself turns over — and the labeled button stays for hands
+    // and readers that want one
+    face.addEventListener('click', () => {
+      rv.revealed = true;
+      render();
+    });
     const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
     btn.type = 'button';
     btn.id = 'reveal';
@@ -5301,7 +5376,6 @@ function renderReview(main) {
       render();
     });
     main.append(btn);
-    renderReviewUndo(main, rv);
     return;
   }
   const now = new Date();
@@ -5338,22 +5412,8 @@ function renderReview(main) {
     row.append(b);
   }
   main.append(row);
-  // Anki's suspend, in session: rest the card without grading it — no
-  // schedule is touched, it simply stops coming up until woken on the list
-  const rest = biLabel('button', 'chip review-rest', 'この札はしばらく休ませる', 'rest this card for now');
-  rest.type = 'button';
-  rest.id = 'review-rest';
-  rest.addEventListener('click', () => {
-    const key = srsKey(item.t, item.id);
-    S.suspended[key] = Date.now();
-    saveStore();
-    rv.history.push({ key: 'suspend' });
-    rv.ix += 1;
-    rv.revealed = false;
-    render();
-  });
-  main.append(rest);
-  renderReviewUndo(main, rv);
+  // rest · undo · the full entry live behind the … mark — the zen glass
+  // holds only the card and the four honest buttons
 }
 /* Anki's most-used safety: the last grade can always be taken back — the
  * previous card state is restored exactly, never recomputed. Reachable from
@@ -7849,6 +7909,20 @@ function render() {
   if (!heroMode && S.navOpen) S.navOpen = false;
   if (heroMode) buildGingaChrome(root);
 
+  // 復習 is zen: while a card is up, the whole world recedes — no top bar, no
+  // crumb, no counters. Just the card, the answer, the four honest buttons.
+  // The session summary at the end brings the ordinary room back.
+  const focusLive = S.focus && !S.focus.ended && Date.now() < S.focus.deadline && S.focus.pool?.length;
+  const zenReview =
+    S.ready &&
+    S.view === 'review' &&
+    !!S.review &&
+    !!scheduler &&
+    !!fsrsApi &&
+    (S.review.ix < S.review.queue.length || !!focusLive);
+  document.body.classList.toggle('zen', !!zenReview);
+  if (!zenReview) S.reviewMore = false;
+
   const chrome = el('div', 'chrome');
   // the drift's spatial arbiter reads this tag: words recede under the top bar
   // instead of printing through it half-cut
@@ -7922,7 +7996,7 @@ function render() {
     render();
   });
   chrome.append(trayBtn);
-  if (!heroMode) root.append(chrome);
+  if (!heroMode && !zenReview) root.append(chrome);
 
   const main = el('main');
   root.append(main);

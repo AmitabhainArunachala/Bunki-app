@@ -3053,6 +3053,7 @@ body.v-depth-layered .stroke-page {
 .grade .g-when {
   font-size: 11px;
   color: var(--ink-2);
+  white-space: nowrap;
 }
 
 .grade.g-again {
@@ -3852,4 +3853,129 @@ body.v-depth-layered .stroke-page {
 }
 .store-warning {
   color: var(--red);
+}
+
+/* ------------------------------------------------------------ 復習 · zen
+ * While a card is up, the glass holds only the card: no bar, no crumb, no
+ * counts. A hairline of progress, one faint way out, one faint …, and the
+ * four honest buttons within the thumb's reach. */
+body.zen main {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 18px calc(20px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+.zen-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  z-index: 5;
+}
+.zen-progress i {
+  display: block;
+  height: 100%;
+  background: var(--faint);
+  opacity: 0.55;
+  transition: width 0.4s ease;
+}
+.zen-exit,
+.zen-more {
+  position: fixed;
+  top: calc(4px + env(safe-area-inset-top));
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  z-index: 6;
+}
+.zen-exit {
+  right: 6px;
+}
+.zen-more {
+  left: 6px;
+  letter-spacing: 0.08em;
+}
+.zen-more.open {
+  opacity: 1;
+  color: var(--ink-2);
+}
+body.zen .review-face {
+  border: 0;
+  padding: 10px 6px;
+  margin: 0;
+  background: transparent;
+  flex: 1;
+  justify-content: center;
+  gap: 14px;
+}
+body.zen .review-front {
+  font-size: 58px;
+  line-height: 1.15;
+}
+body.zen .review-cloze {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 2;
+  margin: 0;
+}
+body.zen .review-reading {
+  font-size: 17px;
+}
+body.zen .review-sense {
+  font-size: 16px;
+  line-height: 1.6;
+}
+body.zen .review-reveal {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 340px;
+}
+body.zen .grade-row {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 380px;
+}
+.zen-more-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0 12px;
+}
+body.zen .variants-bar {
+  display: none;
+}
+/* the dojo's clock becomes a whisper: time and one small door, nothing more */
+body.zen .focus-hud {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: calc(6px + env(safe-area-inset-top)) 54px 0;
+  justify-content: center;
+  gap: 10px;
+}
+body.zen .focus-hud .focus-badge {
+  display: none;
+}
+body.zen .focus-hud-left {
+  color: var(--faint);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+}
+body.zen .focus-hud-end {
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  min-height: var(--tap);
 }

@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-11 03:50",
+          "2026-08-11 08:30",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-11 03:55",
+          "2026-08-11 08:35",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-11 03:59",
+          "2026-08-11 08:39",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-19 03:49",
+          "2026-08-19 08:29",
           "8.30"
         ]
       ]
@@ -6038,7 +6038,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 486,
+  "loadMs": 624,
   "summary": {
     "total": 91,
     "failed": 0
@@ -6067,7 +6067,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.16000366210938,\"y\":570.2000122070312,\"productive\":true}"
+      "detail": "{\"x\":148.00999450683594,\"y\":570.280029296875,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6077,7 +6077,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 87px; mean tether 163 → 163px"
+      "detail": "centre moved 88px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6087,7 +6087,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 486 ms"
+      "detail": "40 texts, ready in 624 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
