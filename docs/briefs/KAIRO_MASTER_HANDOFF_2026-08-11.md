@@ -27,6 +27,12 @@ arbitrate.** Phases 0–B are decided and buildable now.
 - **Deliver by deploying**, then one plain paragraph on what will FEEL
   different. An honest partial beats a polished claim.
 - **Merge nothing without being told.**
+- **Aesthetic doctrine (operator, 2026-08-11): zen is not softness.**
+  Hakuin's stick as much as the still water — the fierce zen of the
+  burning Dogen and the ajari in the snow. The instrument's rigor IS the
+  zen: Shinkansen precision, Japanese-grade engineering, exact numbers
+  delivered quietly. Never bury the stillness under dashboards; never
+  soften the truth to protect the calm.
 
 ## 1 · Where things stand (verified, do not re-derive)
 
@@ -115,8 +121,9 @@ arbitrate.** Phases 0–B are decided and buildable now.
   review's Expo-pivot verdict is rejected (it audited stale `main`); R1's
   contracts land as corridor-native increments. Do not re-litigate.
 
-**PLAN v2 (revised 2026-08-11 after the R1 review — see
-`R1_REVIEW_RESPONSE_2026-08-11.md` for the full concede/hold record):**
+**PLAN v3 (revised 2026-08-11 after review round 3 — see
+`R1_REVIEW_RESPONSE_2026-08-11.md` and
+`R1_ROUND3_RESPONSE_2026-08-11.md` for the concede/hold records):**
 
 - Content modes over a **personal-coverage router** with honest bands:
   Cold Flow ≥~98% (a routing prior, validated by observed assistance and
@@ -131,14 +138,24 @@ arbitrate.** Phases 0–B are decided and buildable now.
   8–12 reviewed units/week; no 300-count acceptance gate.
 - Knowledge bootstrap before routing: Anki/known-list import +
   contextual calibration as ROUTING-ONLY assertions (never FSRS state),
-  alongside the corridor's own mature cards/captures/deepWords.
+  alongside graded-retrieval history from the revlog. **deepWords and
+  captures are encounter provenance, not knownness** — a capture usually
+  marks a word you did NOT securely know; routing knownness comes from
+  graded retrieval evidence only.
+- Coverage is reported as **evidence shares**, not a pseudo-interval:
+  observed (graded retrieval) · provisional (import/calibration) ·
+  friction (recent lookups/failures) · unobserved · unresolved. Fail
+  closed to unscored. Four matched cold passages / 20 scored responses
+  establish a **provisional baseline**, not a validated trend.
 - Fluency (CPM) contract: cold / practiced / assisted structurally
   separate; explicit Start; assistance marks the run; live speed hidden;
   passage removed before probes; 80% comprehension floor as product
   rule; no trend claimed before ≥4 matched cold passages and ≥20 scored
   responses; 250–300 CPM is a provisional personal zone, not an N1 fact.
-- Production approach: auto-minted `:prod` twins, 再構成 reconstruction,
-  tutor back-translation. Port kuromoji from sites-v11 WITHOUT its
+- Production approach: `:prod` twins are **proposed on graduation and
+  admitted by one explicit tap — never silently minted** (no review debt
+  without consent); 再構成 reconstruction; tutor back-translation. Port
+  kuromoji from sites-v11 WITHOUT its
   coverage math (OOV-dropping, partial credit, sentence-level mass
   updates — named defects, do not carry).
 
@@ -176,32 +193,49 @@ close stale PRs. Never do this unprompted.
 3. Acceptance: taps visible in the exported envelope; a probe session
    walk at 390×844; suites green.
 
-**Phase B — content volume (decided; parallel-safe with A).**
+**Phase B — content + rights integrity (decided; parallel-safe with A).**
 
-1. Run the corpus pipeline as a routine: wikinews + Aozora batches,
-   graded, sharded, committed — target 200+ articles on the shelf.
-   (Needs the local fugashi toolchain; if the session can't run it,
-   deliver the runner script + instructions instead of a claim.)
+0. Slice-0 corrections first: relabel the five Wikinews shelf items
+   **CC BY 2.5** (verified — not the 4.0 currently stamped); flag
+   `wikinews:45227` (dated 2026-05-03, one day before the closure
+   cutoff) pending final-revision verification against the frozen
+   archive — visible with a provenance note, not silently removed;
+   render each article's attribution as a **clickable source link**
+   (the `url` field already exists, unused); add a fail-closed deploy
+   check: no shelf item without complete rights metadata.
+1. Content flow — fresh from **PDL government pages (labeled official
+   source) + Global Voices JA + Aozora**; the Wikinews **archive** as a
+   finite, license-isolated pool (all editions read-only since
+   2026-05-04). Week-1 checkpoint: ~30 attributed substantive units
+   (current shelf truth: 28 of 40 items reach 250+ chars). Sustainable
+   8–12 reviewed units/week. Content _addition_ starts week 1; content
+   _throughput SLOs_ are measured only once the router exists.
 2. Port kuromoji.js from `prototypes/bunki-sites-v11` for in-browser
    tokenization → paste-any-text becomes an instrumented reader page
-   (BYOT). On-device only, never redistributed.
-3. Personal-coverage scoring: percent of a text's content tokens in the
-   learner's known set (mature cards + core-known heuristics); shown
-   quietly per article; this is the router the strategy stands on.
-4. Acceptance: shelf count; BYOT walk with a pasted paragraph; coverage
-   number visible and sane on known articles.
+   (BYOT). On-device only, never redistributed. Do not port its
+   coverage math.
+3. Personal-coverage scoring as **evidence shares** (observed graded
+   retrieval / provisional import / friction / unobserved / unresolved);
+   run the router in **shadow mode first** — it ranks invisibly and logs
+   whether its Flow predictions matched observed assistance and
+   comprehension, before it ever steers the learner.
+4. Acceptance: rights labels verified; BYOT walk; shadow-router log
+   showing predictions vs outcomes on known articles.
 
-**Phase C — speed lane (PLAN v1; re-check feedback first).**
-Timed reading of ≥98%-coverage texts; chars/min logged per session and
-charted toward the 250–300 cpm N1 band; repeated timed re-reading of
+**Phase C — speed lane (PLAN v3).**
+Timed reading of high-readiness texts (router-ranked, shadow-validated);
+chars/min logged per session — cold / practiced / assisted structurally
+separate; **250–300 cpm appears only as a provisional personal training
+zone (JLPT defines no CPM threshold)**; repeated timed re-reading of
 studied articles as the zero-cost feedstock; generated-easy as the
-targeted feedstock. Zen presentation consistent with the review room.
+targeted feedstock. Zen presentation consistent with the review room:
+fierce precision, quiet delivery.
 
 **Phase D — loop closing (PLAN v1; operator steers).**
 Weekly 苦手の地図 weakness map (mechanical clustering over the log);
 gap-targeted 私の読み物 (clusters + due-soon words + one untested N1
-pattern woven into 400–600 chars, provenance-marked); auto-minted
-`:prod` production twins for graduated cards; 再構成 after finishing an
+pattern woven into 400–600 chars, provenance-marked); proposed-on-graduation
+`:prod` production twins (one-tap admission, never silent); 再構成 after finishing an
 article; tutor back-translation probes (key-gated, structured findings).
 
 **Phase E — infrastructure debts (any time, low risk).**
