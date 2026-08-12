@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node prototypes/corridor/tools/build-dictionary-v2.mjs \
- *     [--source-dir corpus/data/jmdict] [--check]
+ *     [--source-dir corpus/data/jmdict] [--output-dir PATH] [--check]
  */
 import {
   existsSync,
@@ -37,6 +37,7 @@ const PROVENANCE = resolve(
 );
 const DEFAULT_SOURCE_DIR = resolve(REPO, 'corpus', 'data', 'jmdict');
 const OUTPUT_DIR = resolve(CORRIDOR, 'data', 'share_alike', 'dict-v2');
+const SCHEMA_VERSION = 3;
 
 const EXPECTED = Object.freeze({
   pin: '3.6.2+20260803141815',
@@ -85,11 +86,13 @@ const LAYOUT = Object.freeze({
     'readingSummaries',
     'glossApplicability',
     'readingWrittenScopes',
+    'senseTagRows',
   ],
   readingSummary: ['displayHeadOr0', 'primaryGlossOr0'],
   glossApplicability: ['kanaIndex', 'displayHeadOr0'],
   readingWrittenScope:
     '0 = all writtenForms; 1 = no writtenForms; otherwise an array of zero-based writtenForms indexes',
+  senseTagRow: ['glossStart', 'glossCount', 'misc', 'field', 'dialect'],
   detailEntry: ['seq', 'kanjiForms', 'kanaForms', 'senses'],
   kanjiForm: ['text', 'commonFlag', 'tags'],
   kanaForm: ['text', 'commonFlag', 'tags', 'appliesToKanji'],
@@ -123,6 +126,8 @@ const LAYOUT = Object.freeze({
       'Aligned 1:1 with englishGlosses and normalizedGlosses in source sense/gloss order. kanaIndex is zero-based into kanaForms; displayHeadOr0 is 0 for index head, otherwise the restriction-compatible written or kana display form. When a sense permits several readings, prefer the first source-order reading whose reading-summary primary gloss is that sense\'s first English gloss, then the first source-order compatible reading. Every tuple is proved against both reading and sense restrictions at build time.',
     readingWrittenScopes:
       'Aligned 1:1 and in source order with kanaForms and readingSummaries. Each cell decodes to exactly the writtenForms permitted by that kana form: 0 means all, 1 means none, and an index array is the exact restricted subset. The builder proves both directions against JMdict appliesToKanji; detail shards retain the original tags and restriction strings.',
+    senseTagRows:
+      'One row per source sense, in source order. glossStart/glossCount identify that sense\'s contiguous range in englishGlosses. misc, field and dialect are the exact JMdict tag-code arrays in source order; empty arrays are retained so absence is explicit.',
     commonFlag: '0 or 1; JMdict common metadata is otherwise preserved on every form.',
     glossLanguage: 'English is implicit because the pinned JMdict asset is English-only.',
     ordering: 'Entry sequence is numeric ascending; forms, senses, and glosses retain source order.',
@@ -135,7 +140,7 @@ function die(message) {
 }
 
 function parseArgs(argv) {
-  const options = { check: false, sourceDir: DEFAULT_SOURCE_DIR };
+  const options = { check: false, sourceDir: DEFAULT_SOURCE_DIR, outputDir: OUTPUT_DIR };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--check') {
@@ -145,9 +150,14 @@ function parseArgs(argv) {
       options.sourceDir = resolve(argv[(i += 1)]);
     } else if (arg.startsWith('--source-dir=')) {
       options.sourceDir = resolve(arg.slice('--source-dir='.length));
+    } else if (arg === '--output-dir') {
+      if (!argv[i + 1]) die('--output-dir requires a path');
+      options.outputDir = resolve(argv[(i += 1)]);
+    } else if (arg.startsWith('--output-dir=')) {
+      options.outputDir = resolve(arg.slice('--output-dir='.length));
     } else if (arg === '--help' || arg === '-h') {
       console.log(
-        'Usage: node build-dictionary-v2.mjs [--source-dir PATH] [--check]',
+        'Usage: node build-dictionary-v2.mjs [--source-dir PATH] [--output-dir PATH] [--check]',
       );
       process.exit(0);
     } else {
@@ -598,6 +608,43 @@ function englishGlosses(entry) {
   return glosses;
 }
 
+function senseTagRows(entry, flattenedGlosses) {
+  const rows = [];
+  let glossStart = 0;
+  for (const sense of entry.sense) {
+    const englishCount = sense.gloss.filter((gloss) => gloss.lang === 'eng').length;
+    for (const field of ['misc', 'field', 'dialect']) {
+      if (!Array.isArray(sense[field])) {
+        die(`entry ${entry.id}: sense.${field} is not an array`);
+      }
+    }
+    rows.push([
+      glossStart,
+      englishCount,
+      sense.misc,
+      sense.field,
+      sense.dialect,
+    ]);
+    glossStart += englishCount;
+  }
+  if (
+    rows.length !== entry.sense.length ||
+    glossStart !== flattenedGlosses.length ||
+    rows.some(
+      (row, senseIndex) =>
+        row[0] < 0 ||
+        row[1] < 1 ||
+        row[0] + row[1] > flattenedGlosses.length ||
+        row[2] !== entry.sense[senseIndex].misc ||
+        row[3] !== entry.sense[senseIndex].field ||
+        row[4] !== entry.sense[senseIndex].dialect,
+    )
+  ) {
+    die(`entry ${entry.id}: sense-tag rows lost a source sense or gloss boundary`);
+  }
+  return rows;
+}
+
 function compactSense(sense, seq) {
   for (const field of [
     'partOfSpeech',
@@ -738,6 +785,14 @@ function buildOutputs(jmdict, kanjidic2, pin) {
   let selectedReadingScopesAll = 0;
   let selectedReadingScopesNone = 0;
   let selectedReadingScopesRestricted = 0;
+  let selectedTaggedSenses = 0;
+  let selectedAbbreviationSenses = 0;
+  let selectedSensitiveSenses = 0;
+  const selectedSenseTagCodes = {
+    misc: new Set(),
+    field: new Set(),
+    dialect: new Set(),
+  };
   const indexEntries = [];
   const shardEntries = Array.from({ length: SHARD_COUNT }, () => []);
   for (const entry of selected) {
@@ -751,6 +806,7 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     const glosses = englishGlosses(entry);
     const perGloss = glossApplicability(entry, canonical, glosses, perReading);
     const perReadingScopes = readingWrittenScopes(entry);
+    const perSenseTags = senseTagRows(entry, glosses);
     if (![...writtenForms, ...kanaForms].includes(head)) {
       die(`entry ${entry.id}: canonical head is not one of its forms`);
     }
@@ -774,6 +830,14 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     selectedReadingScopesAll += perReadingScopes.filter((scope) => scope === 0).length;
     selectedReadingScopesNone += perReadingScopes.filter((scope) => scope === 1).length;
     selectedReadingScopesRestricted += perReadingScopes.filter(Array.isArray).length;
+    for (const [, , misc, field, dialect] of perSenseTags) {
+      if (misc.length || field.length || dialect.length) selectedTaggedSenses += 1;
+      if (misc.includes('abbr')) selectedAbbreviationSenses += 1;
+      if (misc.includes('sens')) selectedSensitiveSenses += 1;
+      for (const tag of misc) selectedSenseTagCodes.misc.add(tag);
+      for (const tag of field) selectedSenseTagCodes.field.add(tag);
+      for (const tag of dialect) selectedSenseTagCodes.dialect.add(tag);
+    }
 
     indexEntries.push([
       entry.id,
@@ -788,6 +852,7 @@ function buildOutputs(jmdict, kanjidic2, pin) {
       encodedSummaries,
       perGloss,
       perReadingScopes,
+      perSenseTags,
     ]);
     shardEntries[shardForSeq(entry.id)].push(compactDetail(entry));
   }
@@ -880,6 +945,9 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     selectedReadingScopesAll,
     selectedReadingScopesNone,
     selectedReadingScopesRestricted,
+    selectedTaggedSenses,
+    selectedAbbreviationSenses,
+    selectedSensitiveSenses,
   };
   const source = {
     name: 'JMdict and KANJIDIC2 via jmdict-simplified',
@@ -931,10 +999,24 @@ function buildOutputs(jmdict, kanjidic2, pin) {
   };
 
   const files = new Map();
+  const senseTagVocabulary = Object.fromEntries(
+    Object.entries(selectedSenseTagCodes).map(([category, codes]) => [
+      category,
+      Object.fromEntries(
+        [...codes]
+          .sort()
+          .map((code) => {
+            const description = jmdict.tags[code];
+            if (!description) die(`JMdict does not define sense tag ${code}`);
+            return [code, description];
+          }),
+      ),
+    ]),
+  );
   files.set(
     'index.json',
     JSON.stringify({
-      schemaVersion: 2,
+      schemaVersion: SCHEMA_VERSION,
       pool: 'share_alike',
       shardCount: SHARD_COUNT,
       sharding,
@@ -942,6 +1024,7 @@ function buildOutputs(jmdict, kanjidic2, pin) {
       selection,
       counts,
       tags: jmdict.tags,
+      senseTagVocabulary,
       layout: LAYOUT,
       entries: indexEntries,
     }),
@@ -951,7 +1034,7 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     files.set(
       `${name}.json`,
       JSON.stringify({
-        schemaVersion: 2,
+        schemaVersion: SCHEMA_VERSION,
         pool: 'share_alike',
         shard,
         shardCount: SHARD_COUNT,
@@ -977,24 +1060,24 @@ function buildOutputs(jmdict, kanjidic2, pin) {
   return { files, counts };
 }
 
-function verifyOrWrite(files, check) {
+function verifyOrWrite(files, check, outputDir) {
   const expectedNames = new Set(files.keys());
-  if (existsSync(OUTPUT_DIR)) {
-    const extras = readdirSync(OUTPUT_DIR).filter(
+  if (existsSync(outputDir)) {
+    const extras = readdirSync(outputDir).filter(
       (name) => name.endsWith('.json') && !expectedNames.has(name),
     );
     if (extras.length > 0) {
-      die(`unexpected JSON files in ${OUTPUT_DIR}: ${extras.sort().join(', ')}`);
+      die(`unexpected JSON files in ${outputDir}: ${extras.sort().join(', ')}`);
     }
   } else if (check) {
-    die(`missing output directory ${OUTPUT_DIR}`);
+    die(`missing output directory ${outputDir}`);
   } else {
-    mkdirSync(OUTPUT_DIR, { recursive: true });
+    mkdirSync(outputDir, { recursive: true });
   }
 
   let totalBytes = 0;
   for (const [name, text] of files) {
-    const path = resolve(OUTPUT_DIR, name);
+    const path = resolve(outputDir, name);
     const expected = Buffer.from(text);
     totalBytes += expected.length;
     if (check) {
@@ -1015,9 +1098,11 @@ const kanjidicPath = resolve(options.sourceDir, pin.kanjidic2.asset);
 const jmdict = unzipJson(jmdictPath, pin.jmdict.sha256);
 const kanjidic2 = unzipJson(kanjidicPath, pin.kanjidic2.sha256);
 const { files, counts } = buildOutputs(jmdict, kanjidic2, pin);
-const totalBytes = verifyOrWrite(files, options.check);
+const totalBytes = verifyOrWrite(files, options.check, options.outputDir);
 const action = options.check ? 'current' : 'written';
-const outputSizes = [...files.keys()].map((name) => `${name}=${statSync(resolve(OUTPUT_DIR, name)).size}`);
+const outputSizes = [...files.keys()].map((name) =>
+  `${name}=${statSync(resolve(options.outputDir, name)).size}`,
+);
 console.log(
   `dictionary-v2 ${action}: ${counts.selectedEntries} entries · ` +
     `${counts.selectedForms} forms · ${counts.selectedSenses} senses · ` +
