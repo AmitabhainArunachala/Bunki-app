@@ -62,3 +62,8 @@ __pycache__/
 prototypes/corridor/tools/.probe-*.mjs
 prototypes/corridor/tools/.shot-*.mjs
 prototypes/corridor/tools/.demo-*.mjs
+
+# Deno writes a lockfile into the repo root when the design-round WGSL
+# harness runs (Deno+lavapipe verifies the WebGPU engine in stroke-art-v5).
+# The repo has no Deno project; the lockfile is container-tooling residue.
+deno.lock
