@@ -1,0 +1,146 @@
+name: Nightly prototype verification
+
+# IMPORTANT: GitHub only dispatches `schedule` events for workflow files on
+# the repository's default branch, and the scheduled run uses default-branch
+# HEAD. The requested integration-branch push trigger remains useful, but a
+# trunk-only harvest cannot activate this cron until the workflow also exists
+# on the repository default branch. `workflow_dispatch` has the same default-
+# branch visibility constraint in the Actions UI.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 02:30 JST; GitHub Actions cron is UTC.
+    - cron: '30 17 * * *'
+  push:
+    branches:
+      - claude/app-vision-next-steps-wei73a
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-battery:
+    name: Corridor / accessibility / storage / drift / unit / format
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install pinned Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the full verification battery
+        id: battery
+        shell: bash
+        env:
+          ARTIFACT_ROOT: ${{ runner.temp }}/nightly-verify-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          # Both browser suites have historical fixed output paths. Remove the
+          # checked-out receipts first, then copy only files created by this
+          # run into the unique runner-temp evidence root.
+          rm -f docs/prototype/verification-report.json
+          rm -f docs/build-evidence/kairo-a05-accessibility/verification-report.json
+          rm -rf docs/build-evidence/kairo-a05-accessibility/screenshots
+          mkdir -p \
+            "${ARTIFACT_ROOT}/logs" \
+            "${ARTIFACT_ROOT}/corridor" \
+            "${ARTIFACT_ROOT}/accessibility" \
+            "${ARTIFACT_ROOT}/storage-integrity"
+          overall=0
+
+          run_check() {
+            local name="$1"
+            shift
+            echo "::group::${name}"
+
+            # GitHub invokes bash with `-e -o pipefail`. Temporarily disable
+            # errexit so a red command or a failed tee is recorded instead of
+            # aborting the battery before its later independent gates run.
+            set +e
+            "$@" 2>&1 | tee "${ARTIFACT_ROOT}/logs/${name}.log"
+            local -a statuses=("${PIPESTATUS[@]}")
+            set -e
+
+            local command_status="${statuses[0]:-1}"
+            local tee_status="${statuses[1]:-1}"
+            echo "::endgroup::"
+            if [[ "${command_status}" -eq 0 && "${tee_status}" -eq 0 ]]; then
+              echo "- ✅ ${name}" >> "${GITHUB_STEP_SUMMARY}"
+            else
+              echo "- ❌ ${name} (command ${command_status}; tee ${tee_status})" >> "${GITHUB_STEP_SUMMARY}"
+              overall=1
+            fi
+            return 0
+          }
+
+          capture_file() {
+            local source="$1"
+            local destination="$2"
+            [[ -f "${source}" ]] || return 0
+            if ! cp "${source}" "${destination}"; then
+              echo "- ❌ evidence copy failed: ${source}" >> "${GITHUB_STEP_SUMMARY}"
+              overall=1
+            fi
+          }
+
+          capture_directory() {
+            local source="$1"
+            local destination="$2"
+            [[ -d "${source}" ]] || return 0
+            if ! cp -R "${source}" "${destination}"; then
+              echo "- ❌ evidence copy failed: ${source}" >> "${GITHUB_STEP_SUMMARY}"
+              overall=1
+            fi
+          }
+
+          echo "## Nightly verification battery" >> "${GITHUB_STEP_SUMMARY}"
+          run_check corridor \
+            node prototypes/corridor/tools/verify-corridor.mjs \
+              --shots "${ARTIFACT_ROOT}/corridor/screenshots"
+          capture_file \
+            docs/prototype/verification-report.json \
+            "${ARTIFACT_ROOT}/corridor/report.json"
+          run_check accessibility \
+            node prototypes/corridor/tools/verify-corridor-accessibility.mjs
+          capture_file \
+            docs/build-evidence/kairo-a05-accessibility/verification-report.json \
+            "${ARTIFACT_ROOT}/accessibility/report.json"
+          capture_directory \
+            docs/build-evidence/kairo-a05-accessibility/screenshots \
+            "${ARTIFACT_ROOT}/accessibility/screenshots"
+          run_check unit-tests npm test
+          run_check drift-fast \
+            npm run verify:drift:fast -- \
+              --out "${ARTIFACT_ROOT}/drift-fast/report.json" \
+              --shots "${ARTIFACT_ROOT}/drift-fast/screenshots"
+          run_check storage-integrity \
+            node prototypes/drift/tools/verify-storage-integrity.mjs \
+              --out "${ARTIFACT_ROOT}/storage-integrity/report.json"
+          run_check format npm run format:check
+
+          exit "${overall}"
+
+      - name: Upload failure screenshots and reports
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nightly-verify-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/nightly-verify-${{ github.run_id }}-${{ github.run_attempt }}/
+          if-no-files-found: warn
+          retention-days: 14
