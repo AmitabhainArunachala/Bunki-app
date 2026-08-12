@@ -1,0 +1,1306 @@
+[
+  {
+    "articleId": "bunki-graded-n3-zoka-sanjin-morning",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "videoId": "cGIOm0txsgo",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "channel": "神社チャンネル",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天地初発",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "deity-entry-and-scholarship"
+      },
+      {
+        "title": "高御産巣日神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "role": "musuhi-reading-and-scholarship"
+      },
+      {
+        "title": "神産巣日神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "role": "deity-entry-and-scholarship"
+      }
+    ],
+    "inspirationAngle": "A warm first encounter with the three names, followed by a visible split between the Kojiki record and V1's cosmic, bodily, energetic, and nakaima interpretations.",
+    "claimsRequiringReview": [
+      "Wording of the Kojiki opening, hitorigami, concealment, and the order of the three deities",
+      "Explanation of zoka and musuhi as scholarly interpretations rather than settled definitions",
+      "Every reference to energy, the cosmos, the body, and time remains explicitly attributed to V1 and is not framed as science"
+    ],
+    "fictionOrCompositeDisclosure": "none",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-warm-explainer; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 606,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-nakaima-diary",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "videoId": "cGIOm0txsgo",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "channel": "神社チャンネル",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天地初発",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "role": "primary-text-boundary"
+      },
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "deity-entry"
+      }
+    ],
+    "inspirationAngle": "An original day-in-the-life diary tests nakaima as V1's interpretive lens for attention and action, without claiming that it is the Kojiki's definition or that it controls events.",
+    "claimsRequiringReview": [
+      "Attribution of the past-present-future and nakaima model solely to V1",
+      "Accuracy of the brief Kojiki comparison",
+      "Tone of the diary's distinction between reflective practice and practical action"
+    ],
+    "fictionOrCompositeDisclosure": "original-fiction: first-person learner diary; no real diarist or testimony",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-fictional-diary; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 628,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-world-beginning",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "videoId": "5vEtGV5y5ZE",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "channel": "ハテナ見聞録",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天地初発",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "zoka-sanjin-scholarship"
+      }
+    ],
+    "inspirationAngle": "V2's mystery question becomes a source-limited retelling in which the question mark is preserved and no unrecorded creative act, speech, or motive is supplied.",
+    "claimsRequiringReview": [
+      "Exact order and classification of the first five deities",
+      "Separation of the opening deities from the later kuniumi episode",
+      "Discussion of zoka and possible continental intellectual context as scholarly positions"
+    ],
+    "fictionOrCompositeDisclosure": "none; no dialogue, motive, or divine action has been invented",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-source-limited-retelling; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 617,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-hidden-deity",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "videoId": "5vEtGV5y5ZE",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "channel": "ハテナ見聞録",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天地初発",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "role": "primary-text-boundary"
+      },
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "deity-entry"
+      }
+    ],
+    "inspirationAngle": "A student-teacher conversation treats V2's mystery framing as a prompt for disciplined questions about textual silence, firstness, supremacy, and concealment.",
+    "claimsRequiringReview": [
+      "The Kojiki does not state a motive, destination, death, sleep, command, battle, or hierarchy for Amenominakanushi in this passage",
+      "The distinction between first appearance and supreme rank",
+      "Respectful theological tone while leaving concealment open"
+    ],
+    "fictionOrCompositeDisclosure": "original-fiction: invented student-teacher dialogue; neither speaker is a real source or witness",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-student-teacher-dialogue; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 609,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-kojiki-book",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "videoId": "jidCDQCJGT0",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "channel": "中田敦彦のYouTube大学",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "古事記について",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/about-kojiki/",
+        "role": "date-volumes-purpose-literary-and-historical-context"
+      },
+      {
+        "title": "『古事記』の稗田阿礼をめぐる論争",
+        "publisher": "國學院大學",
+        "url": "https://www.kokugakuin.ac.jp/article/432300",
+        "role": "compilation-account-and-source-limits"
+      },
+      {
+        "title": "『古事記』はどう読まれることを望んでいたのか。",
+        "publisher": "國學院大學",
+        "url": "https://www.kokugakuin.ac.jp/article/104110",
+        "role": "court-centered-history-and-state-formation-context"
+      },
+      {
+        "title": "古事記 | 書物で見る日本古典文学史",
+        "publisher": "国文学研究資料館",
+        "url": "https://www.nijl.ac.jp/etenji/bungakushi/contents/detail/detail01-01_001.html",
+        "role": "date-editor-and-contents"
+      }
+    ],
+    "inspirationAngle": "A lively classroom feature borrows V3's accessible momentum while independently anchoring the date, volumes, compilation account, political setting, and mixed literary-historical character.",
+    "claimsRequiringReview": [
+      "Completion in 712, three-volume structure, and contents of the volumes",
+      "Status of the preface and the roles attributed there to Tenmu, Genmei, Hieda no Are, and O no Yasumaro",
+      "Careful framing of myth, tradition, historical reflection, literary construction, and court-centered perspective",
+      "No edutainment analogy or deity ranking is presented as source text"
+    ],
+    "fictionOrCompositeDisclosure": "original-fiction: the classroom scene and teacher/student remarks are an invented framing device",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-classroom-feature; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 634,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-hashira-counter",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "videoId": "jidCDQCJGT0",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "channel": "中田敦彦のYouTube大学",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天地初発",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "role": "primary-text-example-of-three-pillars"
+      },
+      {
+        "title": "二柱",
+        "publisher": "コトバンク / 精選版 日本国語大辞典",
+        "url": "https://kotobank.jp/word/%E4%BA%8C%E6%9F%B1-2079972",
+        "role": "dictionary-definition-and-historical-example"
+      },
+      {
+        "title": "柱",
+        "publisher": "コトバンク / デジタル大辞泉・精選版 日本国語大辞典",
+        "url": "https://kotobank.jp/word/%E6%9F%B1-71675",
+        "role": "counter-definition"
+      }
+    ],
+    "inspirationAngle": "A language column pauses V3's rapid succession of deities to explain hashira as a counter and to reject attractive but unsupported origin stories.",
+    "claimsRequiringReview": [
+      "Readings and current use of 一柱, 二柱, and 三柱",
+      "Historical dictionary scope of 柱 for deities, buddhas, and honored persons, alongside its modern use chiefly for deities",
+      "No etymology is inferred from architectural pillars, world-support, or deity descent without evidence"
+    ],
+    "fictionOrCompositeDisclosure": "none",
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-language-column; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 573,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-feel-jingu-forest",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "videoId": "IprA5aUY9oI",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "channel": "伊勢神宮 公式チャンネル (ISE-JINGU)",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "神宮を感じる FEEL JINGU Vol.1 産霊・天・地・祈り",
+        "publisher": "伊勢神宮",
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "role": "official-film-context-and-institutional-presentation"
+      },
+      {
+        "title": "高御産巣日神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "role": "musuhi-reading-and-scholarship"
+      }
+    ],
+    "inspirationAngle": "A sensory response walks only through the official film's camera-and-sound construction—nature, stillness, prayer, and craft—while explicitly denying a fabricated visit.",
+    "claimsRequiringReview": [
+      "Every described image, sound, movement, and editorial pattern is actually observable in V4",
+      "The distinction between an official contemporary self-presentation and evidence about ancient cosmology",
+      "Musuhi wording follows scholarship and is not treated as a definition proved by the film"
+    ],
+    "fictionOrCompositeDisclosure": "none; explicitly a film response, not a claimed visit to Ise Jingu",
+    "originalityReview": "cross-review-no-obvious-narration-copying-or-presenter-imitation-detected; original-film-response; shot-level-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 640,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-musubi-visual",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "videoId": "IprA5aUY9oI",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "channel": "伊勢神宮 公式チャンネル (ISE-JINGU)",
+        "role": "primary-inspiration",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI"
+      }
+    ],
+    "factSources": [
+      {
+        "title": "神宮を感じる FEEL JINGU Vol.1 産霊・天・地・祈り",
+        "publisher": "伊勢神宮",
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "role": "official-film-context-and-institutional-presentation"
+      },
+      {
+        "title": "高御産巣日神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "role": "musuhi-reading-orthography-and-scholarship"
+      },
+      {
+        "title": "神産巣日神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "role": "musuhi-deity-scholarship"
+      }
+    ],
+    "inspirationAngle": "A contemplative visual essay reads the film's sky, earth, nature, prayer, and craft as a web of relation while labeling every symbolic mapping as the essayist's interpretation.",
+    "claimsRequiringReview": [
+      "Musuhi/musubi reading note and production-generation interpretation",
+      "Every film observation is grounded in V4 rather than a fabricated visit",
+      "No symbolic mapping of sky, earth, people, or deities is presented as a Kojiki or Ise Jingu claim",
+      "Official contemporary media is not used to prove ancient cosmology"
+    ],
+    "fictionOrCompositeDisclosure": "none; symbolic statements are disclosed in prose as the essayist's interpretation",
+    "originalityReview": "cross-review-no-obvious-narration-copying-or-presenter-imitation-detected; original-contemplative-visual-essay; shot-level-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 597,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-gratitude-week",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "deity-name-and-textual-background-only"
+      }
+    ],
+    "inspirationAngle": "Only V5's recovered title and devotional phrase inspire an explicitly fictional seven-day learner diary; no unseen video content, efficacy, miracle, health, protection, luck, money, or brain claim is used.",
+    "claimsRequiringReview": [
+      "The prose never implies that V5 was watched or that its unseen explanation is known",
+      "No event is attributed causally to chanting and no outcome is promised",
+      "Prayer is never substituted for emergency, medical, financial, administrative, or interpersonal action",
+      "Respectful tone toward devotional practice without turning fictional experience into testimony"
+    ],
+    "fictionOrCompositeDisclosure": "original-fiction: invented learner and diary; explicitly identified in the article as non-testimonial fiction",
+    "originalityReview": "cross-review-original-from-recovered-title-and-phrase-only; unseen-video-content-not-reconstructed; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 560,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-graded-n3-thanks-before-help",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [
+      {
+        "title": "天之御中主神",
+        "publisher": "國學院大學 古典文化学事業",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "role": "deity-name-and-textual-background-only"
+      }
+    ],
+    "inspirationAngle": "An invented dialogue examines gratitude-before-help as a voluntary devotional practice while insisting on direct requests, emergency action, professional help, and epistemic caution about testimony.",
+    "claimsRequiringReview": [
+      "The prose uses only V5's recovered title and phrase and never invents its contents",
+      "Grammar discussion does not overstate a single religious meaning",
+      "No healing, protection, luck, money, brain, guaranteed-relief, or miracle claim appears",
+      "Medical, emergency, financial, and practical boundaries are clear without mocking believers"
+    ],
+    "fictionOrCompositeDisclosure": "original-fiction/composite: invented speakers and conversation; neither voice is testimony from V5 or a real person",
+    "originalityReview": "cross-review-original-from-recovered-title-and-phrase-only; unseen-video-content-not-reconstructed; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 643,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-zoka-as-one",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "videoId": "cGIOm0txsgo",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "channel": "神社チャンネル",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "authority": "國學院大學・古事記ビューアー",
+        "supports": "天地初発における三柱の出現、独神、身を隠すという本文"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "高御産巣日神の登場箇所、ムスヒの生成に関する諸説"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "神産巣日神の登場箇所、ムスヒの生成に関する諸説"
+      }
+    ],
+    "inspirationAngle": "V1が三柱を一つの働きとして結ぶ読みを提示する点を出発点にし、その統合的な魅力と本文上の差異を往復して検討する。宇宙エネルギーや身体対応は動画作者の現代的解釈としてのみ扱う。",
+    "claimsRequiringReview": [
+      "『古事記』序文の『造化』と現在の『造化三神』という総称の関係",
+      "高御産巣日神・神産巣日神の後続登場箇所の簡潔な要約",
+      "ムスヒを生産・生成に関わるとする記述が諸説の一つであることの表現"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-prose-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 688,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-nakaima-time",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "videoId": "cGIOm0txsgo",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "channel": "神社チャンネル",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "authority": "國學院大學・古事記ビューアー",
+        "supports": "天地初発における天之御中主神の短い本文記述"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "天之御中主神の登場箇所と本文上の限定性"
+      }
+    ],
+    "inspirationAngle": "V1の『中今』を、古事記本文の定義ではなく動画作者が提示する時間理解のレンズとして検討し、過去への責任と未来への行為を含む現在へ展開する。",
+    "claimsRequiringReview": [
+      "『中今』が天地初発本文に定義されていないという境界の明瞭さ",
+      "『応答できる時間の幅』という筆者独自の哲学的展開が古典語義に見えないこと",
+      "危機・医療・債務では具体的支援を優先する安全表現"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-prose-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 693,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-creator-god",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "videoId": "5vEtGV5y5ZE",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "channel": "ハテナ見聞録",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "authority": "國學院大學・古事記ビューアー",
+        "supports": "三柱が高天原に『成る』という本文と、未成熟な地上の後続記述"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "造化の意味、天之御中主神の職能をめぐる複数説"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "ムスヒの表記・生成機能をめぐる諸説"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/about-kojiki/outline/",
+        "authority": "國學院大學・『古事記』あらすじ",
+        "supports": "天地初発から国生みへ進む物語上の区別"
+      }
+    ],
+    "inspirationAngle": "V2の題名にある疑問符を保持し、『創造神』という現代の圧縮語が本文へ持ち込む唯一神・全能・無からの創造という含意を点検する。",
+    "claimsRequiringReview": [
+      "『創造神』と他宗教の創造主を比較する箇所の宗教学的精度",
+      "国生みを伊邪那岐神・伊邪那美神の段に置く要約",
+      "『最初』と『最高・最強』を区別する説明の神学的な調子"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-prose-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 664,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-silent-amenominakanushi",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "videoId": "5vEtGV5y5ZE",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "channel": "ハテナ見聞録",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "authority": "國學院大學・古事記ビューアー",
+        "supports": "天之御中主神の初出、独神、身を隠すという本文"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "登場が冒頭に限られること、神名解釈と職能に複数説があること、『日本書紀』諸伝との差"
+      }
+    ],
+    "inspirationAngle": "V2の『謎』という入口から、資料の少なさを自由な断定へ変えず、本文の沈黙・後世の解釈・読者の投影を三層に分ける。旧稿の題名だけを保持し、本文は全面的に再執筆した。",
+    "claimsRequiringReview": [
+      "『古事記』以後の登場がないという表現の正確さ",
+      "『日本書紀』天地開闢諸伝との違いを一文に圧縮した箇所",
+      "資料の沈黙の可能性を列挙する箇所が仮説であることの明瞭さ"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "title-retained-body-rewritten-from-scratch-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 680,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-kojiki-myth-history",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "videoId": "jidCDQCJGT0",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "channel": "中田敦彦のYouTube大学 - NAKATA UNIVERSITY",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://www.nijl.ac.jp/etenji/bungakushi/contents/detail/detail01-01_001.html",
+        "authority": "国文学研究資料館・書物で見る日本古典文学史",
+        "supports": "七一二年成立、太安万侶の筆録編集、神代から推古天皇までという書誌的範囲"
+      },
+      {
+        "url": "https://www.kokugakuin.ac.jp/article/104110",
+        "authority": "國學院大學",
+        "supports": "天皇家中心の歴史記録、律令国家形成期の編纂事業、音声と文字の関係"
+      }
+    ],
+    "inspirationAngle": "V3のアクセスしやすい物語と歴史背景の併置を受けつつ、『神話か歴史か』を事実／虚構の二択にせず、書物の構成・編纂目的・後世の読まれ方へ広げる。",
+    "claimsRequiringReview": [
+      "『歴史書』という分類と現代歴史学の検証済み事実を区別する言い回し",
+      "律令国家の体制整備との関連を確定し過ぎない『考えられている』という限定",
+      "考古学・文献・写本・言語資料の役割をN2向けに簡略化した箇所"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-prose-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 678,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-myth-to-book",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "videoId": "jidCDQCJGT0",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "channel": "中田敦彦のYouTube大学 - NAKATA UNIVERSITY",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://www.kokugakuin.ac.jp/article/432300",
+        "authority": "國學院大學",
+        "supports": "序文に基づく成立経緯、稗田阿礼の史料上の限定、性別・誦習をめぐる論争"
+      },
+      {
+        "url": "https://www.kokugakuin.ac.jp/article/104110",
+        "authority": "國學院大學",
+        "supports": "太安万侶の表記上の工夫、音声で読まれるテキストという研究上の見方"
+      },
+      {
+        "url": "https://www.nijl.ac.jp/etenji/bungakushi/contents/detail/detail01-01_001.html",
+        "authority": "国文学研究資料館・書物で見る日本古典文学史",
+        "supports": "七一二年成立、稗田阿礼の伝承を太安万侶が筆録編集したという基本情報"
+      }
+    ],
+    "inspirationAngle": "V3の速度ある現代的な語りを鏡にし、口承から文字への移行を『単純な書き取り』にせず、序文の自己説明、表記、選択、編集という工程をドキュメンタリー風に描く。",
+    "claimsRequiringReview": [
+      "帝紀・先代旧辞・誦習・筆録の用語と年代",
+      "稗田阿礼の性別論争を現在も未決の諸説として扱う箇所",
+      "音読を意識した表記という説明が研究者の可能性提示であること"
+    ],
+    "fictionOrCompositeDisclosure": "冒頭から続くカメラ、画面、字幕の指示は筆者による架空のドキュメンタリー構成であり、古代の実景・発言・撮影記録ではない。歴史人物の台詞や内面は創作していない。",
+    "originalityReview": "original-documentary-frame-no-transcript-consulted; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 656,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-feel-jingu-musubi",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "videoId": "IprA5aUY9oI",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "channel": "伊勢神宮 公式チャンネル (ISE-JINGU)",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "authority": "伊勢神宮・神宮を感じる FEEL JINGU Vol.1",
+        "supports": "『産霊・天・地・祈り』という公式の映像構成と、自然・静寂を通じて神宮を感じるという現在の制度的提示"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "ムスヒの『産巣日』『産霊』等の表記と生成をめぐる諸説"
+      },
+      {
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "authority": "國學院大學・神名データベース",
+        "supports": "ムスヒの語源・神格が単一説ではないこと"
+      }
+    ],
+    "inspirationAngle": "V4を映像作品かつ伊勢神宮の現在の自己表現として読み、画面、音、間、反復、選択された自然・祈り・手仕事が『産霊』の感覚をどう組み立てるかを論じる。",
+    "claimsRequiringReview": [
+      "映像に現れる具体的素材・所作とカット順の全編再照合",
+      "静けさ、循環、連続性を編集効果として述べる批評語の妥当性",
+      "『産霊』と神名の『産巣日』を同一の定義にしない境界"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-film-criticism-no-narration-copied; shot-level-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 689,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-prayer-on-screen",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "videoId": "IprA5aUY9oI",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "channel": "伊勢神宮 公式チャンネル (ISE-JINGU)",
+        "role": "primary-inspiration",
+        "availability": "available-2026-08-12",
+        "contentVerified": true,
+        "playable": true
+      }
+    ],
+    "factSources": [
+      {
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "authority": "伊勢神宮・神宮を感じる FEEL JINGU Vol.1",
+        "supports": "伊勢神宮が『産霊・天・地・祈り』を自然と静寂の映像として現在提示していること"
+      }
+    ],
+    "inspirationAngle": "V4の観察可能な所作・素材・撮影距離と、映像だけでは直接読めない内面を分け、祈りが画面上でどのように見えるものとして配置されるかを考える。",
+    "claimsRequiringReview": [
+      "木・布・器・水・建物・手仕事が実際の映像に出ることのショット単位確認",
+      "撮影距離や音の間に関する記述が作品の実際の編集と一致すること",
+      "美的経験・信仰上の意味・科学的効果を分ける表現の宗教的敬意"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "original-observational-essay-no-narration-copied; shot-level-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 722,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-thanks-first",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [],
+    "inspirationAngle": "確認できなかったV5について、回収できた題名と『アメノミナカヌシ様ありがとうございます』という句だけを出発点にする。感謝を先に置く言葉の複数の対人的・信仰的な意味を考え、心理効果や奇跡を主張しない。",
+    "claimsRequiringReview": [
+      "『すみませんが』と『ありがとうございます』に関する日本語語用論の自然さ",
+      "祈りの場面で感謝を先に述べる可能性として説明する箇所の神学的な調子",
+      "医療・暴力・災害・債務では具体的支援につながるという安全境界",
+      "V5の内容を一切見たことにせず、題名以上を帰属していないこと"
+    ],
+    "fictionOrCompositeDisclosure": "友人への感謝で関係に気付く場面は、効果を示す実話や体験談ではなく、筆者が作った明示的な架空例である。",
+    "originalityReview": "original-prose-derived-from-recovered-title-only-no-video-content-claimed; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 691,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n2-testimony-literacy",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [],
+    "inspirationAngle": "利用不能のV5から題名にある『効果と体験談』だけを問いとして回収し、出来事の記憶、原因解釈、一般化を分ける人間的なメディア・リテラシーを提示する。特定の未視聴体験談は紹介しない。",
+    "claimsRequiringReview": [
+      "体験談を三層に分ける枠組みが心理学的な定説ではなく本稿の整理法だと読めること",
+      "体験者の意味を尊重しながら効能の証拠とは区別する調子",
+      "医療・法律・金融・災害対応を遅らせないという安全境界",
+      "V5の作者・体験者・内容へ未確認の帰属をしていないこと"
+    ],
+    "fictionOrCompositeDisclosure": "冒頭の仮想的な体験談と『句の後に連絡が来た』という例は、特定の実在体験談ではなく、判断の層を説明するために筆者が作った仮想例である。",
+    "originalityReview": "original-media-literacy-essay-derived-from-recovered-title-only-no-video-content-claimed; human-similarity-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 711,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-cosmic-analogy",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "sourceId": "V1",
+        "videoId": "cGIOm0txsgo",
+        "channel": "神社チャンネル",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天地初発",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "supports": "『古事記』冒頭の神名、出現順、独神・隠身の本文範囲",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天之御中主神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "supports": "具体的活動の乏しさ、造化三神・神格・名義に関する諸説",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "高御産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "supports": "むすひの表記・読み・語源・生成作用に関する諸説",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "神産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "supports": "むすひの解釈が単一ではないこと",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "NASA Science",
+        "title": "Webb Telescope & The Big Bang",
+        "url": "https://science.nasa.gov/mission/webb/big-bang-q-and-a/",
+        "supports": "ビッグバンを一点の爆発や宇宙の中心とみなさない科学的境界",
+        "role": "authoritative-scientific-boundary"
+      },
+      {
+        "publisher": "National Institute of Standards and Technology",
+        "title": "Local Realism, Bell's Inequality, and T-Shirts: An Entangled Tale",
+        "url": "https://www.nist.gov/blogs/taking-measure/local-realism-bells-inequality-and-t-shirts-entangled-tale",
+        "supports": "量子論の解釈が複数あり、理論が実験的検証を通じて評価されるという科学的境界",
+        "role": "authoritative-scientific-boundary"
+      }
+    ],
+    "inspirationAngle": "V1が提示する宇宙・ビッグバン・量子・身体対応の類比を、想像力を否定せず、古典本文と科学的証拠から厳密に切り分ける批評。",
+    "claimsRequiringReview": [
+      "V1における各現代的類比の帰属表現が動画内容を過剰に一般化していないか",
+      "『古事記』本文に天地創造の具体的行為が記されないという表現の精度",
+      "ビッグバンと量子論に関する簡潔な科学的境界",
+      "むすひの読み・語源・神格をめぐる学説紹介"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-critical-essay; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 815,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-nakaima-time-theory",
+    "primaryVideo": "V1",
+    "inspirationSources": [
+      {
+        "sourceId": "V1",
+        "videoId": "cGIOm0txsgo",
+        "channel": "神社チャンネル",
+        "title": "アメノミナカヌシ（天之御中主神）タカミムスビ、カミムスビ造化三神の秘密",
+        "url": "https://www.youtube.com/watch?v=cGIOm0txsgo",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天地初発",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "supports": "冒頭本文と、本文が『中今』を定義していないことの確認",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天之御中主神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "supports": "天之御中主神の本文上の位置と解釈の幅",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V1の『中今』を古典の定義ではなく現代的な解釈レンズと明記し、記憶・予期・責任を含む現在の厚みとして検討する哲学的試論。",
+    "claimsRequiringReview": [
+      "V1が『中今』と三柱の時間対応をどう提示するかの帰属精度",
+      "『古事記』本文に『中今』の定義がないという否定的主張",
+      "トラウマ、医療、備えに触れる箇所の安全性と語調",
+      "時間経験に関する哲学的説明が特定学説の無断要約になっていないか"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-philosophical-essay; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 805,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-first-versus-supreme",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "sourceId": "V2",
+        "videoId": "5vEtGV5y5ZE",
+        "channel": "ハテナ見聞録",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天地初発",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "supports": "三柱の出現順と冒頭本文",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天之御中主神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "supports": "天之御中主神の登場箇所、具体的活動の不在、名義・職能の諸説、『日本書紀』異伝との比較",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "高御産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "supports": "高御産巣日神の後続場面での働き",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "神産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "supports": "神産巣日神の後続場面での働き",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V2の疑問形の謎解きを出発点に、登場順、神話上の活動、祭祀上の重要性、個人的信仰を別軸として『最高神』という順位語を批判する。",
+    "claimsRequiringReview": [
+      "天之御中主神、高御産巣日神、神産巣日神の登場箇所と活動の要約",
+      "『日本書紀』の天地開闢諸伝との相違に関する表現",
+      "一神教・主権・物語上の強さ・祭祀上の中心を区別する比較宗教学的記述",
+      "後世の受容史を不変の古代序列へ遡及しないという論旨"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-source-critical-essay; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 805,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-silent-god-theology",
+    "primaryVideo": "V2",
+    "inspirationSources": [
+      {
+        "sourceId": "V2",
+        "videoId": "5vEtGV5y5ZE",
+        "channel": "ハテナ見聞録",
+        "title": "世界を創造した？日本神話の原初の神『造化三神』の謎",
+        "url": "https://www.youtube.com/watch?v=5vEtGV5y5ZE",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天地初発",
+        "url": "https://kojiki.kokugakuin.ac.jp/kojiki/%E5%A4%A9%E5%9C%B0%E5%88%9D%E7%99%BA/",
+        "supports": "成る、独神、身を隠すという本文上の最小記述",
+        "role": "primary-text-and-modern-translation"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天之御中主神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "supports": "一度のみの登場、活動の不在、職能・成立をめぐる複数説",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "高御産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "supports": "高御産巣日神の後続物語での働きとの対照",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "神産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "supports": "神産巣日神の後続物語での働きとの対照",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V2が強調する原初神の謎を、空白へ答えを捏造する契機ではなく、本文の沈黙と読者自身の付加を識別する文学・哲学的契機として読む。",
+    "claimsRequiringReview": [
+      "天之御中主神が再登場せず具体的活動を見せないという記述",
+      "祭祀記録の乏しさと本文上の不在を区別する論述",
+      "道教思想の影響や観念的創出をめぐる学説の紹介",
+      "神学・宗教経験に関する表現が特定宗派の教義を一般化していないか"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-literary-philosophical-essay; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 820,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-kojiki-power",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "sourceId": "V3",
+        "videoId": "jidCDQCJGT0",
+        "channel": "中田敦彦のYouTube大学",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學",
+        "title": "古事記は誰のために作られたもの？――古事記の成り立ちを知る――",
+        "url": "https://www.kokugakuin.ac.jp/article/82153",
+        "supports": "三巻構成、天武朝から元明朝・712年までの成立説明、文体、成立目的をめぐる複数説、『日本書紀』との比較",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學",
+        "title": "『古事記』の稗田阿礼をめぐる論争",
+        "url": "https://www.kokugakuin.ac.jp/article/432300",
+        "supports": "序文に基づく稗田阿礼・太安万侶・成立年の説明と、稗田阿礼に関する資料上の限界",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "『古事記』あらすじ",
+        "url": "https://kojiki.kokugakuin.ac.jp/about-kojiki/outline/",
+        "supports": "上中下巻を通じた神代・皇統・物語内容の確認",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V3の高速で見通しのよい歴史解説を入口に、序文の自己説明、編集の選択、王権・氏族系譜、作品の多声性を分けて考える史学的エッセイ。",
+    "claimsRequiringReview": [
+      "序文が述べる天武天皇・稗田阿礼・元明天皇・太安万侶・712年の成立経緯",
+      "帝紀・旧辞と誦習・撰録の説明",
+      "編纂目的をめぐる複数説と完成後の受容の不確実性",
+      "『日本書紀』の成立年・正史としての性格・漢文体との比較",
+      "政治的正統化と文学的複雑さの均衡"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-historiographical-essay; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 817,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-beyond-fact-fiction",
+    "primaryVideo": "V3",
+    "inspirationSources": [
+      {
+        "sourceId": "V3",
+        "videoId": "jidCDQCJGT0",
+        "channel": "中田敦彦のYouTube大学",
+        "title": "【古事記】壮大なる日本の神話！成り立ちから歴史的背景まで完全解説！【Update版】",
+        "url": "https://www.youtube.com/watch?v=jidCDQCJGT0",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "國學院大學",
+        "title": "古事記は誰のために作られたもの？――古事記の成り立ちを知る――",
+        "url": "https://www.kokugakuin.ac.jp/article/82153",
+        "supports": "『古事記』の構成、成立、文体、成立目的に関する複数説",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "『古事記』あらすじ",
+        "url": "https://kojiki.kokugakuin.ac.jp/about-kojiki/outline/",
+        "supports": "天地初発から神々・皇統へ続く内容構成",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "天之御中主神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/amenominakanushinokami/",
+        "supports": "記紀間の異伝と学説の複数性の具体例",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V3の親しみやすい大筋を踏まえ、史実、成立史、社会的機能、宗教経験、文学的真実を同じ『事実』で処理しないための解釈学的論説。",
+    "claimsRequiringReview": [
+      "『古事記』を近代小説の意味でのフィクションに還元しないジャンル論",
+      "文献・考古・祭祀・受容史が異なる種類の証拠であるという方法論",
+      "記紀異伝への言及",
+      "信仰的真実と歴史的主張の境界が宗教者を不当に描いていないか"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-transcript-copying-or-presenter-imitation-detected; original-hermeneutic-editorial; complete-transcript-similarity-and-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 830,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-sacred-media",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "sourceId": "V4",
+        "videoId": "IprA5aUY9oI",
+        "channel": "伊勢神宮公式",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "伊勢神宮",
+        "title": "神宮を感じる FEEL JINGU Vol.1 産霊・天・地・祈り",
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "supports": "四作品の公式構成と、豊かな自然・凛とした空気・静寂を強調する現代の制度的提示",
+        "role": "official-institutional-presentation"
+      },
+      {
+        "publisher": "伊勢神宮公式",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "supports": "画面、音、速度、距離、反復など映像作品自体で観察できる特徴のみ。古代宇宙論や『古事記』解釈の証拠には用いない",
+        "role": "primary-object-observation-only-not-ancient-authority"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "高御産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "supports": "『産霊』映像の題と古典語の学説を同一視しないための、むすひの表記・読み・語源の諸説",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V4の映像、音、速度、距離、反復を分析し、神聖さを感じさせる構成と伊勢神宮による現代的な制度表現を可視化するメディア批評。",
+    "claimsRequiringReview": [
+      "V4に実際に映る森・水・空・祈り・手仕事と編集・音響の記述",
+      "公式ページが提示する作品名と鑑賞フレーム",
+      "制度的自己表現という分析が神宮の意図を過剰に断定していないか",
+      "映像の『産霊』と古代の語義を分離する表現"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-narration-copying-or-presenter-imitation-detected; original-institutional-media-analysis; shot-level-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 825,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-ise-time",
+    "primaryVideo": "V4",
+    "inspirationSources": [
+      {
+        "sourceId": "V4",
+        "videoId": "IprA5aUY9oI",
+        "channel": "伊勢神宮公式",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "role": "primary-inspiration"
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "伊勢神宮",
+        "title": "神宮を感じる FEEL JINGU Vol.1 産霊・天・地・祈り",
+        "url": "https://www.isejingu.or.jp/feel/vol01/index.html",
+        "supports": "V4を含む四作品と、自然・静寂を中心にした公式の現代的提示",
+        "role": "official-institutional-presentation"
+      },
+      {
+        "publisher": "伊勢神宮公式",
+        "title": "【伊勢神宮】神宮を感じる FEEL JINGU『産霊 ダイジェスト』4K",
+        "url": "https://www.youtube.com/watch?v=IprA5aUY9oI",
+        "supports": "自然、祈り、手仕事、反復など映像作品自体で観察できる特徴のみ。古代宇宙論や『古事記』解釈の証拠には用いない",
+        "role": "primary-object-observation-only-not-ancient-authority"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "高御産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/takamimusuhinokami/",
+        "supports": "むすひの表記・読み・語源・生成作用に関する複数説",
+        "role": "authoritative-scholarly-anchor"
+      },
+      {
+        "publisher": "國學院大學 古典文化学事業",
+        "title": "神産巣日神",
+        "url": "https://kojiki.kokugakuin.ac.jp/shinmei/kamumusuhinokami/",
+        "supports": "むすひを『結び』だけに固定しない学説上の境界",
+        "role": "authoritative-scholarly-anchor"
+      }
+    ],
+    "inspirationAngle": "V4の自然、祈り、手仕事、反復を、直線的年表とは異なる継承の時間として読む叙情的文化批評。ただし制度的提示と古代宇宙論を峻別する。",
+    "claimsRequiringReview": [
+      "水、森、光、衣、道具、手仕事、祈りなどV4の具体的映像描写",
+      "公式発信における『産霊』の位置付け",
+      "むすひの読み・語源・神格をめぐる学説の要約",
+      "継承、制度、労働をめぐる批評が事実の断定ではなく映像解釈として明示されているか"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-no-obvious-narration-copying-or-presenter-imitation-detected; original-lyrical-cultural-criticism; shot-level-final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 825,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-miracle-testimony",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "Stanford Encyclopedia of Philosophy",
+        "title": "Epistemological Problems of Testimony",
+        "url": "https://plato.stanford.edu/entries/testimony-episprob/",
+        "supports": "証言を知識・証拠として受け取る条件が単純ではないという認識論的背景",
+        "role": "scholarly-conceptual-background"
+      },
+      {
+        "publisher": "Stanford Encyclopedia of Philosophy",
+        "title": "Religious Experience",
+        "url": "https://plato.stanford.edu/entries/religious-experience/",
+        "supports": "宗教経験、感情、外的実在についての主張を区別する概念的背景",
+        "role": "scholarly-conceptual-background"
+      }
+    ],
+    "inspirationAngle": "利用不能なV5の回収タイトルと感謝句だけを起点に、証言者の尊厳を守りながら、個人的意味、因果証明、一般的効能、実務上の安全を分離する認識論的エッセイ。",
+    "claimsRequiringReview": [
+      "V5についてタイトルと devotional phrase 以外の内容を一切帰属していないこと",
+      "availability、contentVerified、playable の状態",
+      "証言の誠実さと因果的・一般的効能を区別する認識論",
+      "医療、暴力、災害、債務、失業で実務支援を優先する安全文言",
+      "唱和による奇跡・治癒・保護・金運・脳変化・確実な救済を示唆していないこと"
+    ],
+    "fictionOrCompositeDisclosure": null,
+    "originalityReview": "cross-review-original-from-recovered-title-and-phrase-only; unavailable-source-content-not-reconstructed; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 821,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  },
+  {
+    "articleId": "bunki-essay-n1-prayer-reality",
+    "primaryVideo": "V5",
+    "inspirationSources": [
+      {
+        "videoId": "tX_UZOfEYA",
+        "role": "recovered-devotional-inspiration",
+        "availability": "unavailable-2026-08-12",
+        "contentVerified": false,
+        "playable": false
+      }
+    ],
+    "factSources": [
+      {
+        "publisher": "Stanford Encyclopedia of Philosophy",
+        "title": "Epistemological Problems of Testimony",
+        "url": "https://plato.stanford.edu/entries/testimony-episprob/",
+        "supports": "個人的証言から一般的な知識主張へ進む際の認識論的背景",
+        "role": "scholarly-conceptual-background"
+      },
+      {
+        "publisher": "Stanford Encyclopedia of Philosophy",
+        "title": "Religious Experience",
+        "url": "https://plato.stanford.edu/entries/religious-experience/",
+        "supports": "宗教経験、感情、外部の原因についての主張を区別する概念的背景",
+        "role": "scholarly-conceptual-background"
+      }
+    ],
+    "inspirationAngle": "V5の回収タイトルと devotional phrase のみを起点に、信じる人、研究者、懐疑する人の創作上の三声から、祈りが変え得る『現実』の層と安全上の限界を問う。",
+    "claimsRequiringReview": [
+      "冒頭とメタデータの双方で三者が実在しない創作上の声だと明示されていること",
+      "V5を見た、または内容を知るという虚偽の帰属がないこと",
+      "宗教的意味と外部世界への因果的効能を分離する表現",
+      "医療、緊急避難、警察、支援窓口、債務相談を祈りで代替しない安全文言",
+      "信仰者と懐疑者のいずれも戯画化せず、奇跡・治癒・金運・保護を保証していないこと"
+    ],
+    "fictionOrCompositeDisclosure": "Original polyphonic fiction. The believer, scholar, and skeptic are invented composite voices created for this Bunki article; none is a real V5 participant or testimonial source.",
+    "originalityReview": "cross-review-original-polyphonic-fiction-from-recovered-title-and-phrase-only; unavailable-source-content-not-reconstructed; final-human-review-pending",
+    "humanReviewStatus": "pending",
+    "unidicLexicalTokenCount": 815,
+    "tokenizerReceipt": "fugashi 1.5.2 + unidic-lite 1.0.8 (UniDic 2.1.2 lineage); punctuation excluded"
+  }
+]
