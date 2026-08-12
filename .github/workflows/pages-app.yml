@@ -57,6 +57,7 @@ jobs:
                 prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
                 prototypes/corridor/vendor \
+                prototypes/corridor/design \
                 "$SITE"/
 
           # One app means one landing: any missed path returns to the front door.
