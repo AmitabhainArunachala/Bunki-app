@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "baselineHead": "cfb73c6ca1e3cdf0d69d4a01585a24034bc2016b",
+  "purpose": "Immutable first-40 preservation receipt for the PR #69 corridor shelf",
+  "runtimeLayers": {
+    "wordsBaseCount": 7910,
+    "wordsRecordsSha256": "2c014190a09ca65de41e6a7f2b0eb2710f0e9f1c83f41d70229e95bf59272d8e",
+    "first40ContentBaseCount": 2098,
+    "first40LookupProjectionSha256": "2d102247c3129ddeaf2e1049548324e3d95a87166e9cdfca89ab136099d959aa",
+    "semFileSha256": "a9712e6bf29a59a5986cce018acbe28feaab9e694136e8737674abf77bbc1917",
+    "idiomsFileSha256": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9"
+  },
+  "articles": [
+    {
+      "position": 1,
+      "id": "wikinews:1403",
+      "file": "wikinews-1403.json",
+      "indexRowSha256": "c0cbcd35c1034b5cfe6704e1194a7448714c5badfaa94904b2b16ee25c5c4849",
+      "articleFileSha256": "8b5f6986a0e2570d70b9d3ae9fb880ed71d52b8cf8daada7d2d01a318c9ff21f",
+      "sourceTextSha256": "e166666798cd3c13e991418d13519bad8e07562810c0be82d81ef666324b55da"
+    },
+    {
+      "position": 2,
+      "id": "wikinews:6460",
+      "file": "wikinews-6460.json",
+      "indexRowSha256": "7dd6b3efa6363dd4488577eb61afd466136f828cc1d789a76f89d783adfbfb8e",
+      "articleFileSha256": "031b6225220a1402ef7393c1c9c4b93bff63c746e893700351bd1aad67776b18",
+      "sourceTextSha256": "485016b4501d2aa8ed67710048652df6bc6fb06533f8eb259ec4fd396e816180"
+    },
+    {
+      "position": 3,
+      "id": "wikinews:12024",
+      "file": "wikinews-12024.json",
+      "indexRowSha256": "67f6c5cbada4be4462a6d383a464ba51cc65e82405c4f14fa788f8e35e2bedf1",
+      "articleFileSha256": "7ef4f35b4e676238ac04cd804ef9769cc7be12ff4ee990ac375568f8b3efd5b1",
+      "sourceTextSha256": "6f758397107a0840ade0df73ba6c7bc97ff2545f44b5c971e89cc9aadd9dc7fc"
+    },
+    {
+      "position": 4,
+      "id": "wikinews:20090",
+      "file": "wikinews-20090.json",
+      "indexRowSha256": "1705fe9e6d265a5c9c4c2b94d47bf4367dd3e100ff8234148be176a5fd2758e7",
+      "articleFileSha256": "814e0e2b6bbf01fb2862bcf368d60a9757de20069b27ac3c5adb694f25edee62",
+      "sourceTextSha256": "1ad2eecafc16cd321a036265570f142096042ac62744f221bb3e731f12bb97c1"
+    },
+    {
+      "position": 5,
+      "id": "wikinews:45227",
+      "file": "wikinews-45227.json",
+      "indexRowSha256": "54fd7d210aef6212e7d1d739e7a78b5b261df477ebad86805cc5fff11db458fb",
+      "articleFileSha256": "282304999477624923e5a7f20bcf397ad2e67ab2919e064acdbb6971c7454cce",
+      "sourceTextSha256": "58320605e9a99bbc89f8330879ca4e1ce723e813ad19d3b1fe71fbc14036b24b"
+    },
+    {
+      "position": 6,
+      "id": "aozora:051034",
+      "file": "aozora-051034.json",
+      "indexRowSha256": "aa91c1845aaa7c47d6c47dbf7ad1e57a2d1e815497496f00ab9deea913c6cd5f",
+      "articleFileSha256": "ba2c54657593b032a7e051457e3565d4b965f1a607ceae27111a861df3ef2455",
+      "sourceTextSha256": "e954e4cd734ca5d1e2f9d2d3da061cd0445a1aed4db17b5be32790cf148fda6c"
+    },
+    {
+      "position": 7,
+      "id": "aozora:000628",
+      "file": "aozora-000628.json",
+      "indexRowSha256": "2f896fd57fa684fe87e3dee5dc9d105a79a684072ac12e02e90d1d10bc302fc2",
+      "articleFileSha256": "adf02db6152acd530bbab2dfa0f5f73ab0f414ced974c9d2112021ddb69b9f0a",
+      "sourceTextSha256": "f200fd02ea013be32a98f6c7eb507cfaf564c8fe6bb658229bb246851eb7e067"
+    },
+    {
+      "position": 8,
+      "id": "aozora:046605",
+      "file": "aozora-046605.json",
+      "indexRowSha256": "bb0fec5158325a57aa10bf1ba5d2a9016ade916d08d318febfa1d03218357ffc",
+      "articleFileSha256": "e4f0cbd54234885ac68a8a626760c057f206cbaea4924acc3fd5ba7d0e0ca421",
+      "sourceTextSha256": "09b2ee231703630dfda338dc6c81ad2fe879ce76556d96f89f5214dccad238b5"
+    },
+    {
+      "position": 9,
+      "id": "yasashii:1",
+      "file": "yasashii-1.json",
+      "indexRowSha256": "82c05cc2808377d5cc2845e0536720d3745cb6ca3715f7855cb8e2dc1b18f75a",
+      "articleFileSha256": "f06b3f55a72c2670740daabd60136f4a6f06eeb592161063a980f1b6c33ac974",
+      "sourceTextSha256": "c1c1a378df46dafb2915031f1ed275b157a3cdce4db01569c315fbeddbbee7b7"
+    },
+    {
+      "position": 10,
+      "id": "yasashii:2",
+      "file": "yasashii-2.json",
+      "indexRowSha256": "79b243fcbe85ae4a46ec433843927839680d66994b6817c999764504b2741efd",
+      "articleFileSha256": "2b68db292bb966e585ee831959e293321169a638a75a7b6bb17fe21d1d805f7e",
+      "sourceTextSha256": "f3292abc308a422d4aa0770b34a687aa9c98cd892a80a6d3db424555eb3c1027"
+    },
+    {
+      "position": 11,
+      "id": "yasashii:3",
+      "file": "yasashii-3.json",
+      "indexRowSha256": "047f28c3bcb785d1c63ed980d73c10b4a165a8e37f664c2437d10231e92d3fb7",
+      "articleFileSha256": "b3a896d22731e6da88713ede13eb4ca42df2a3c2f05cd071283c46e6bad42378",
+      "sourceTextSha256": "a448c512c617707a86591c53fc537426eb9f1314c30e45975f656fd9ba58122c"
+    },
+    {
+      "position": 12,
+      "id": "yasashii:4",
+      "file": "yasashii-4.json",
+      "indexRowSha256": "85d23638869cf90e4f5d6026aa005839609ac70b62e6b60161f35cb22aadcf03",
+      "articleFileSha256": "baf1c97e7af41816179ac308d02c5bc5da3d6580df4e92cc8abe49eb5f973bb5",
+      "sourceTextSha256": "022a5c5651c50fa75cfd1dfa6c2d54860548fe023006edd24a70799df7219888"
+    },
+    {
+      "position": 13,
+      "id": "yasashii:5",
+      "file": "yasashii-5.json",
+      "indexRowSha256": "f129963a64ef0cf6302094a4c1cb1459f9aaf47caf52547b07d6d346012b699e",
+      "articleFileSha256": "a43c305d7a15cba8e1d1253e3371384de59ce37341aaad572b2995d9f8dcc569",
+      "sourceTextSha256": "e46b27566e5ffcc769c398043ecb1dc2e6fd7dd68617116311d967076d0fcef5"
+    },
+    {
+      "position": 14,
+      "id": "yasashii:6",
+      "file": "yasashii-6.json",
+      "indexRowSha256": "f072a34dc470544566d1a424545c0a132e1230acdf88e759ebe44a00232159e1",
+      "articleFileSha256": "903fb523502d68e82fe8c0440d33e7ab6c2e5d590fb23b10840ba35090ae2f48",
+      "sourceTextSha256": "ea1b32bf815bff455add273a55257e106b48f0326de9d1c53b6f81812dcdd50d"
+    },
+    {
+      "position": 15,
+      "id": "yasashii:7",
+      "file": "yasashii-7.json",
+      "indexRowSha256": "e45303124f89c5451ed6c333e853c086c2dcc1cb0d7ec443fc5fb7f8ddf0094f",
+      "articleFileSha256": "691337b7672042633f9c77b6b057a7212a2fbffdcabce03ea871e4cd81842bfd",
+      "sourceTextSha256": "efad008f3b46646ec4b37b90df188b8e81f3fb887797a85115dedac0a9ea1bf7"
+    },
+    {
+      "position": 16,
+      "id": "yasashii:8",
+      "file": "yasashii-8.json",
+      "indexRowSha256": "ac65981abd72efa9118a9ac1f2b517ec8f7c99029080d5fb3494aac3fe561876",
+      "articleFileSha256": "18a1a67f4817b7dc8f2e2c52fae8fedcd069f0f97f281d7cbb34708510aaa635",
+      "sourceTextSha256": "cf949930f76da163816746be8f83372f3d544d3a1e1490c9f4a2c5770031f371"
+    },
+    {
+      "position": 17,
+      "id": "yasashii:9",
+      "file": "yasashii-9.json",
+      "indexRowSha256": "732de82573fb31913a6a01373bbb6e9193b31eaf2b068bb8af8fabd2121a8571",
+      "articleFileSha256": "cc62fcd126a578c8ecf916f7a6d8cb7113287d98acace9e1fc0c4a997f9fb6f4",
+      "sourceTextSha256": "42eaef4cba83e968d56cdf5609ea47ee7e472665111beea5bb9e6cacd4d086a7"
+    },
+    {
+      "position": 18,
+      "id": "yasashii:10",
+      "file": "yasashii-10.json",
+      "indexRowSha256": "40ba26f527a809c36f6f41fa07378208257b1bbde5647130927718228312924f",
+      "articleFileSha256": "ffe07d8510aab8004b7fa7c0ff807481c14e11a309a609c7fdbca55ac3dc69a4",
+      "sourceTextSha256": "831ed474e61cd44b0f9c2405badc887c7d5190df501148ae903c58d06ea30eaa"
+    },
+    {
+      "position": 19,
+      "id": "bunki-graded-n5-morning",
+      "file": "bunki-graded-n5-morning.json",
+      "indexRowSha256": "3da873e350c7c459b892c5edcbeb58141c807d4777d55e3b4c7fd5f58d2a4081",
+      "articleFileSha256": "ec13c342a3e8e67f67d7e4e1fa5417b6ce9278b6b90ef8be041cc0ffd334e92c",
+      "sourceTextSha256": "cb8535ea848848a58054d17582616abebe52deb5f26320f1af29d04bea1b99b2"
+    },
+    {
+      "position": 20,
+      "id": "bunki-graded-n4-bookshop",
+      "file": "bunki-graded-n4-bookshop.json",
+      "indexRowSha256": "263bf983ea2002ef2889bc13504e8673e59c49f5d9747ff4043c0200d00cee1d",
+      "articleFileSha256": "544e27c972bd03f784fb559c7ab24ea2cf576f77e6e5b513e5f4933099942ade",
+      "sourceTextSha256": "4bf7e006f375c3961441c3fb27b958a53b8b7beae3d76b370e28a9a2ff103176"
+    },
+    {
+      "position": 21,
+      "id": "bunki-graded-n3-town",
+      "file": "bunki-graded-n3-town.json",
+      "indexRowSha256": "844535a527a1a58d55daa262ceb350ab55654b3e7541376d6d4305e13e731806",
+      "articleFileSha256": "699754f4d22f33cb46d7ff9490d4ece04640f069af445179f5d98f5d5b464829",
+      "sourceTextSha256": "d54dfd51d8997e167f2510f52d2744eeea590482a296654a9611f34ec53f398a"
+    },
+    {
+      "position": 22,
+      "id": "bunki-essay-n2-mountain",
+      "file": "bunki-essay-n2-mountain.json",
+      "indexRowSha256": "b3e9f4db435a40275a38ce8ae4ce01a8c66ce7b4a7d562f41c7d9c918e129e9a",
+      "articleFileSha256": "7c4d5896fb37561fea5000c11c3bd825bd2388ae75d62b876e9fa45c8548d7fd",
+      "sourceTextSha256": "9da0d8022e7262f08e86296f59813e811710309bc380720ef0670edec7790222"
+    },
+    {
+      "position": 23,
+      "id": "bunki-essay-n1-ai",
+      "file": "bunki-essay-n1-ai.json",
+      "indexRowSha256": "651329ab5e387313d580f98ed753684b7decb1e7a62796b91dcd1f25fc34ba26",
+      "articleFileSha256": "aa773c51a3fde749b0f65e05ea680c280d4486a583c3c93330e9d93341872f77",
+      "sourceTextSha256": "297ecd36a51f873c47ee7de37eea2d4b01bbe68452feac95e810250e661b6bed"
+    },
+    {
+      "position": 24,
+      "id": "real-gokajo",
+      "file": "real-gokajo.json",
+      "indexRowSha256": "ffb514de171c69c1e0e509ea23b3867d93f0900aeb5912996c4254aa186d6b61",
+      "articleFileSha256": "0880d66239af78c71276be0934987515480f5a40cce4b4101ee4ebbd32d076b6",
+      "sourceTextSha256": "8abbb71a652ba199a4d81b4052edddbb72882c39a03645c95aaf544d21ecef2e"
+    },
+    {
+      "position": 25,
+      "id": "real-hojoki",
+      "file": "real-hojoki.json",
+      "indexRowSha256": "5714ddfca06a34cac1d761ac31b4e305a7495c6f7b8be4d5957fae7d0a49c067",
+      "articleFileSha256": "e51861fabbe3ad328f3d36978dea5c6c351527d95f03d236b9894390a833b825",
+      "sourceTextSha256": "df250c03c681f7c8952eff85df61a891e34700ad00883884224fc6fe4cab6d65"
+    },
+    {
+      "position": 26,
+      "id": "real-tsurezure",
+      "file": "real-tsurezure.json",
+      "indexRowSha256": "5601cb619ce82300a2d34cea67ba525043cad088580201b7060335ddc2639d10",
+      "articleFileSha256": "68ebdf1edf425e54caef9614f01e5b8270b40c5b9a63157e76a38a1b6390b05f",
+      "sourceTextSha256": "cf3e3aa0eff65ffed6fa4dba9ac423db10697d8c223310a6c5254b93f05e7e86"
+    },
+    {
+      "position": 27,
+      "id": "bunki-graded-n5-station",
+      "file": "bunki-graded-n5-station.json",
+      "indexRowSha256": "e9c254b48c06614b611949a3e332192bcb53ebeb942b5327685cd6cf1b4711f5",
+      "articleFileSha256": "076e918ef938db7f16f12344cbb1513df77f7394d87464cca86a9299baa879b0",
+      "sourceTextSha256": "2d46c2741e5ca13b59416ca43b158a5806a54695640b0b90865accd9407afa72"
+    },
+    {
+      "position": 28,
+      "id": "bunki-graded-n5-kitchen",
+      "file": "bunki-graded-n5-kitchen.json",
+      "indexRowSha256": "d27de5c898a09c1d672d297442cca5bb2332456b110e8a6b756bda1742b9aca0",
+      "articleFileSha256": "13b6532d1fee76455e2c287cf6c8284e6c1c02f80e95a3494a6ca4288f87632d",
+      "sourceTextSha256": "e5730fbfd3d553277ee83c1381e85b337fb41c8446e91f03f3f60f54643596e7"
+    },
+    {
+      "position": 29,
+      "id": "bunki-graded-n5-neighbour",
+      "file": "bunki-graded-n5-neighbour.json",
+      "indexRowSha256": "6c99a3492a1731d3e2f83ea2c5373a0280485e69ef96e71a159094a4750d7796",
+      "articleFileSha256": "0b3590bf29b6fd62d8b5786a14bafb652e32ee288b6d8c25c458a182d18df265",
+      "sourceTextSha256": "d437384db3b87124e0eb1a956cedcc186122307ba9c37ba54b09dd08bf6236c9"
+    },
+    {
+      "position": 30,
+      "id": "bunki-graded-n4-letter",
+      "file": "bunki-graded-n4-letter.json",
+      "indexRowSha256": "31eca2023bdeb3e507aef947788c5449ea22c46ba5228c666cc54f14d9e2728f",
+      "articleFileSha256": "e43e531f90dd6fbf888c577a9c8d0565f3ec90060f0352dcb8d291830b6e9e22",
+      "sourceTextSha256": "5cf4bdda77d83ad79a5ffc3a310b22b0415dc838b1fa57407ee56fcaf99c2a53"
+    },
+    {
+      "position": 31,
+      "id": "bunki-graded-n4-market",
+      "file": "bunki-graded-n4-market.json",
+      "indexRowSha256": "03c95ecabcb83d9b78554e776c9542109f0efc9bf4513301990812cf7cfc8d89",
+      "articleFileSha256": "b6d0809d31bf082eb8d4f566e85d8a845ddeffd8ea95051248ce81ee575be5db",
+      "sourceTextSha256": "4040343241df1ca3bc452cea353f56e2c07a3f50d9e18688a08edb6d694f732d"
+    },
+    {
+      "position": 32,
+      "id": "bunki-graded-n4-bicycle",
+      "file": "bunki-graded-n4-bicycle.json",
+      "indexRowSha256": "9a5fdfbc0479d67d55a2c3d5b0d4780beb0e9c5135bba618574ca8380f063eb3",
+      "articleFileSha256": "dd92f9b4412fd040f367ef903599dc38c7f7e7811dc2556851f4fe57c8482638",
+      "sourceTextSha256": "c5335dc6f04fc7cb4b55b0b1242dab038d5fa0250f2560b3654922665e464a79"
+    },
+    {
+      "position": 33,
+      "id": "bunki-graded-n3-river",
+      "file": "bunki-graded-n3-river.json",
+      "indexRowSha256": "6f6fb0e772d85a3b165aada7f74ddbe37c3845851fdc58b85a3e995a742e369c",
+      "articleFileSha256": "d9c5ed9a2311ead5b20042de1ae8c283d4618ee76e228312fa92bca55f22651f",
+      "sourceTextSha256": "ab5eec6ffedae9ef48e66e395064e4b2f02604941187d6a5a9d029383b4c98ae"
+    },
+    {
+      "position": 34,
+      "id": "bunki-graded-n3-radio",
+      "file": "bunki-graded-n3-radio.json",
+      "indexRowSha256": "dc564e99fdd9d2e3d330d4f5e2a76bb16257619c73fc59fe5cd43a8f2e298388",
+      "articleFileSha256": "4ccb9d84a19bd873b803667d4e054ed4741db28b2686f83dfcb796dbf17591ba",
+      "sourceTextSha256": "5e9a95362b242f0343edb69fbd429aade18866f84e9f005eefc6624321dee9ee"
+    },
+    {
+      "position": 35,
+      "id": "bunki-essay-n2-handwriting",
+      "file": "bunki-essay-n2-handwriting.json",
+      "indexRowSha256": "026abbd24e173e3e15b736f371b23ca49321d3220aafd09b9cb49fdd09d84cbd",
+      "articleFileSha256": "3d723210c2bafef35f203bae6ea1867a777e444a12626f1f00408d26a605ef83",
+      "sourceTextSha256": "93b29066b781d36d88b4f4f999f2e3f890c9b9f806544bd27c032074bc94a830"
+    },
+    {
+      "position": 36,
+      "id": "bunki-essay-n2-notebook",
+      "file": "bunki-essay-n2-notebook.json",
+      "indexRowSha256": "863c75978a4bbdd5f11886e3eb6636a1a77ee8036d75c2155a2a3ba9a51ba947",
+      "articleFileSha256": "b3babf52ad1c9396b72a27b3c1d095abe8f04663b8d27dc6efa4bb3590bf555e",
+      "sourceTextSha256": "671ed281f744c2d0bd11b05634a40e111f10b17bdf1c9c5be212857e99bb282e"
+    },
+    {
+      "position": 37,
+      "id": "bunki-essay-n2-rain",
+      "file": "bunki-essay-n2-rain.json",
+      "indexRowSha256": "8548d42292b1a18bf33af913db04750ad354dcb0a4b407b52ddf0be5026d9896",
+      "articleFileSha256": "b822bab305aaaf030fc57fed7066f0c296b582d3a239a637ec6b34bebc6487f1",
+      "sourceTextSha256": "22f429a3e53a421dc20dcabdc5b32c0ed60a185f742edebd41603a6a2c9cb4e5"
+    },
+    {
+      "position": 38,
+      "id": "bunki-essay-n2-translation",
+      "file": "bunki-essay-n2-translation.json",
+      "indexRowSha256": "584ffdcacb3bf1d4fd120c152bf469ac79c5e77873582d67f08badad14880b0d",
+      "articleFileSha256": "a5f5a14645ebcad2fbeabda0aa29ecfbc1afda48d655248ce744809c85587399",
+      "sourceTextSha256": "167f342be336d20461dd92c3a5247e11ef6487723a85ba4fbfffeee4f61ce143"
+    },
+    {
+      "position": 39,
+      "id": "bunki-essay-n1-memory",
+      "file": "bunki-essay-n1-memory.json",
+      "indexRowSha256": "5e7d4d4cec77c95bea856f0df9549d1c8ebe9fc45bf2777340761ec6665fb0f4",
+      "articleFileSha256": "d70b920b532ab719978479db42123775c4331b76995be0e070f940f9ea48511d",
+      "sourceTextSha256": "3f1800fd505bf184707ba86eb579dd260c4666f742894071d230abe14069218b"
+    },
+    {
+      "position": 40,
+      "id": "bunki-essay-n1-city",
+      "file": "bunki-essay-n1-city.json",
+      "indexRowSha256": "d1df48f61d4e22a93222548bfbf6ae61aa55ca1007963d5f58b6ddb6cdbd2372",
+      "articleFileSha256": "c9164455c907b9c963a009f884e0779fd3653b5f5febb7bf2ba7b0030eedce91",
+      "sourceTextSha256": "723b3146ea1a5a7b5eabb441ae5ab8493403de307e65c3ab24a4b78d3fd569f9"
+    }
+  ]
+}

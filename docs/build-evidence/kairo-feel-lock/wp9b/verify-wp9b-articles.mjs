@@ -149,7 +149,10 @@ const index = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/index.jso
 const rowById = new Map(index.articles.map((r) => [r.id, r]));
 
 const { server, base } = await serve(CORRIDOR);
-const browser = await chromium.launch();
+const browser = await chromium.launch({
+  executablePath: process.env.CHROMIUM_PATH || undefined,
+  args: ['--no-sandbox'],
+});
 const context = await browser.newContext({
   viewport: VIEWPORT,
   hasTouch: true,
@@ -173,7 +176,11 @@ page.on('response', (r) => {
 
 const perArticle = [];
 
-check('the shelf carries 40 articles', index.articles.length === 40, `${index.articles.length} in index.json`);
+check(
+  'the current shelf carries 70 articles while the 14 WP9b records remain in place',
+  index.articles.length === 70 && NEW_IDS.every((id) => rowById.has(id)),
+  `${index.articles.length} in index.json`,
+);
 
 for (const id of NEW_IDS) {
   const row = rowById.get(id);

@@ -74,6 +74,10 @@ CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
   node prototypes/corridor/tools/verify-corridor-accessibility.mjs
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
   node prototypes/corridor/tools/verify-corridor-performance.mjs
+PYTHONPATH=corpus/src .venv/bin/python \
+  prototypes/corridor/tools/verify-native-readings.py --rebuild
+CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  node prototypes/corridor/tools/verify-native-readings.mjs
 python3 -m http.server -d prototypes/corridor 8080     # then open http://127.0.0.1:8080/
 ```
 
@@ -89,18 +93,38 @@ The shelf flows through **`tools/build_articles.py`** — the batch command
 that turns every rights-clean text into one article JSON (tokens, furigana,
 paragraph starts, level signals, provenance) plus a light `data/articles/
 index.json` the corridor boots from. Articles load lazily per file and are
-prefetched in the background; adding an article to the shelf is adding a
-file. Sources are all in-repo: the corpus samples (wikinews · aozora ·
-やさしい日本語, full-length — the 520-char excerpt cap is gone) and the 8
-v11 reading-catalog texts (5 Bunki originals, pool `original`; 3
-public-domain classics).
+prefetched in the same generic background queue; adding an article to the
+shelf is adding a file. Sources are all in-repo: the corpus samples
+(wikinews · aozora · やさしい日本語, full-length — the 520-char excerpt cap is
+gone), the 8 v11 reading-catalog texts (5 Bunki originals, pool `original`; 3
+public-domain classics), the 14 WP9b Bunki originals, and the 30 native Bunki
+originals in `docs/content/bunki-originals-zoka-sanjin.jsonl`.
+
+Those 30 use the same five-field source shape, normalizer, shelf rows, lazy
+article files, `renderReader()` path, and runtime provenance as the earlier
+Bunki originals. Video inspiration and claim-level evidence stay outside the
+runtime in `docs/content/bunki-originals-zoka-sanjin.editorial.json`; a video
+is never promoted silently into historical or scientific authority. The
+sidecar's human-review status is a publication gate, not UI state.
 
 Level signals per article, stored separately, never averaged: jreadability
 (live), JLPT-lexicon coverage + band vector (live, substrate
-`open-anki-jlpt-decks/wbig-6687`, unofficial), and the NINJAL pair — measured
-when the pinned substrate is reachable from the build environment, otherwise
-recorded as `unavailable` with the reason and rendered 未測定. **Every signal
-shown is true of the exact text displayed**; the verifier enforces it.
+`open-anki-jlpt-decks/wbig-6687`, unofficial), and the NINJAL pair. The
+default reproducible build does not download or consult a gitignored NINJAL
+cache: the pair is recorded as `unavailable` with its reason and rendered
+未測定. **Every signal shown is true of the exact text displayed**; the
+verifier enforces it. This keeps a clean checkout byte-identical instead of
+allowing ambient local data to change grading receipts.
+The first 40 generated files retain their historical unavailable receipt
+verbatim as part of the byte-preservation contract; newly built entries carry
+the current `UnavailableByBuildPolicy` receipt.
+
+Shared graph growth is monotonic as well. The dictionary keeps the exact PR
+#69 word-record prefix and all first-40 lookup projections, then appends only
+vocabulary unique to later shelf records. Semantic edges and the capped
+900-idiom set remain stable, so rebuilding after a shelf append cannot evict
+or rewrite a dictionary path used by an existing reader. New lemma readings
+are derived from the lemma itself, never copied from an inflected surface.
 
 ## Rebuilding the data
 
@@ -110,12 +134,10 @@ no cross-branch checkouts needed. With the grader's runtime installed:
 ```sh
 python3 -m venv .venv && .venv/bin/pip install --upgrade setuptools wheel
 .venv/bin/pip install fugashi unidic-lite jreadability==1.1.5
-# optional — fills in the NINJAL signal pair (sha256 pinned in ninjal/PROVENANCE.yml):
-mkdir -p corpus/data/ninjal && curl -o corpus/data/ninjal/rokusyutaisyo.csv \
-  https://mmsrv.ninjal.ac.jp/brfvep/rokusyutaisyo.csv
 
 PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_articles.py
 PYTHONPATH=corpus/src .venv/bin/python prototypes/corridor/tools/build_corridor.py
+node prototypes/corridor/tools/build-radicals.mjs
 node prototypes/corridor/tools/build_fsrs_pin.mjs
 node prototypes/corridor/tools/build-standalone.mjs
 ```

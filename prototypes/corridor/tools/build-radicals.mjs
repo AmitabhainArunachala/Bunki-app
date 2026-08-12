@@ -26,7 +26,7 @@
  *   - patches data/share_alike/kanji.json in place, adding `rad` (the number) to
  *     each kanji record. build_corridor.py carries the same line for durability.
  *
- * Usage: node build-radicals.mjs
+ * Usage: node build-radicals.mjs [--data DIR]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -35,7 +35,9 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolve(HERE, '..');
 const REPO = resolve(CORRIDOR, '..', '..');
-const SA = resolve(CORRIDOR, 'data', 'share_alike');
+const dataArg = process.argv.indexOf('--data');
+const DATA = dataArg >= 0 ? resolve(process.argv[dataArg + 1]) : resolve(CORRIDOR, 'data');
+const SA = resolve(DATA, 'share_alike');
 
 /**
  * Authored positional table, keyed by Kangxi number.

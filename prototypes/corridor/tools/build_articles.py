@@ -16,6 +16,12 @@ Sources (all in-repo, nothing fetched):
                                            8 parked v11 texts: 5 Bunki
                                            originals (pool: original) and
                                            3 public-domain classics
+  docs/build-evidence/kairo-feel-lock/wp9b/originals.jsonl
+                                           14 Bunki originals
+  docs/content/bunki-originals-zoka-sanjin.jsonl
+                                           30 Bunki originals; inspiration
+                                           and factual evidence live only in
+                                           the non-runtime editorial sidecar
 
 Level signals (stored separately, never averaged — the #42 law):
 
@@ -28,12 +34,12 @@ Level signals (stored separately, never averaged — the #42 law):
                     the signal; it is NOT official JLPT and is never
                     presented as such.
   lexical_coverage  the NINJAL 国語研教育基本語彙 pair from corpus.grading —
-  + tmr             computed when the pinned substrate is available to the
-                    build environment. This environment's egress policy
-                    blocks mmsrv.ninjal.ac.jp, so when the download fails
-                    the pair is recorded as unavailable WITH the reason, and
-                    the UI shows the absence instead of a stale number.
-                    Signals shown are always true of the text displayed.
+  + tmr             intentionally recorded as unavailable in the default
+                    clean build. The pinned CSV is not committed, and ambient
+                    gitignored caches must never change generated receipts.
+                    The UI shows the absence instead of a stale or
+                    machine-dependent number. Signals shown are always true
+                    of the text displayed.
 
 Usage:
   python build_articles.py            # build the full shelf
@@ -57,11 +63,151 @@ REPO = bc.REPO
 CORRIDOR = bc.CORRIDOR
 
 JLPT_SUBSTRATE = "open-anki-jlpt-decks/wbig-6687"
-NINJAL_UNAVAILABLE_REASON = (
+NINJAL_UNAVAILABLE_REASON_LEGACY = (
     "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the "
     "build environment (egress policy); run the build where "
     "mmsrv.ninjal.ac.jp is reachable to fill this pair in"
 )
+NINJAL_UNAVAILABLE_REASON = (
+    "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible "
+    "default build does not download or consult gitignored local grading data"
+)
+
+WP9B_ORIGINALS = REPO / "docs/build-evidence/kairo-feel-lock/wp9b/originals.jsonl"
+VIDEO_INSPIRED_ORIGINALS = REPO / "docs/content/bunki-originals-zoka-sanjin.jsonl"
+
+LANE_LABEL = {"graded": "段階別読み物", "essay": "随筆"}
+
+
+# --------------------------------------------------------------------------
+# Reading overrides — asserted repairs for UniDic homographs
+# --------------------------------------------------------------------------
+# These are the existing WP9b repairs, moved into the canonical builder so a
+# clean checkout has one reproducible path for the whole shelf. Every rule is
+# article- and context-specific and fails loudly if either text or tokenisation
+# drifts. Only reading/ruby fields change; text, base form, POS and grading do
+# not.
+READING_OVERRIDES = [
+    {
+        "article": "bunki-essay-n2-handwriting",
+        "surface": "数",
+        "was": "すう",
+        "reading": "かず",
+        "next": "は",
+        "count": 1,
+    },
+    {
+        "article": "bunki-essay-n1-memory",
+        "surface": "縁",
+        "was": "えん",
+        "reading": "ふち",
+        "next": "に",
+        "count": 1,
+    },
+    {
+        "article": "bunki-graded-n5-station",
+        "surface": "七",
+        "was": "なな",
+        "reading": "しち",
+        "next": "時",
+        "count": 1,
+    },
+    {
+        "article": "bunki-graded-n5-neighbour",
+        "surface": "一日",
+        "was": "ついたち",
+        "reading": "いちにち",
+        "count": 1,
+    },
+    {
+        "article": "bunki-graded-n4-market",
+        "surface": "市場",
+        "was": "しじょう",
+        "reading": "いちば",
+        "count": 2,
+    },
+    {
+        "article": "bunki-graded-n4-market",
+        "surface": "十",
+        "was": "じゅう",
+        "reading": "じゅっ",
+        "next": "個",
+        "count": 1,
+    },
+    {
+        "article": "bunki-essay-n2-translation",
+        "surface": "四",
+        "was": "よん",
+        "reading": "よっ",
+        "next": "つ",
+        "count": 1,
+    },
+    {
+        "article": "bunki-essay-n1-memory",
+        "surface": "何",
+        "was": "なん",
+        "reading": "なに",
+        "next": ["が", "を"],
+        "count": 4,
+    },
+    *[
+        {
+            "article": article_id,
+            "surface": "日本",
+            "was": "にっぽん",
+            "reading": "にほん",
+            "next": "語",
+            "count": 1,
+        }
+        for article_id in (
+            "bunki-graded-n5-kitchen",
+            "bunki-graded-n5-neighbour",
+            "bunki-graded-n4-letter",
+            "bunki-graded-n3-radio",
+            "bunki-essay-n2-translation",
+        )
+    ],
+]
+
+
+def _neighbour_matches(tokens: list[dict], index: int, offset: int, wanted) -> bool:
+    if wanted is None:
+        return True
+    neighbour = index + offset
+    if not 0 <= neighbour < len(tokens):
+        return False
+    surface = tokens[neighbour]["s"]
+    return surface in wanted if isinstance(wanted, list) else surface == wanted
+
+
+def apply_reading_overrides(article_id: str, tokens: list[dict]) -> int:
+    applied = 0
+    for rule in READING_OVERRIDES:
+        if rule["article"] != article_id:
+            continue
+        hits = [
+            index
+            for index, token in enumerate(tokens)
+            if token["s"] == rule["surface"]
+            and _neighbour_matches(tokens, index, 1, rule.get("next"))
+            and _neighbour_matches(tokens, index, -1, rule.get("prev"))
+        ]
+        if len(hits) != rule["count"]:
+            raise SystemExit(
+                f"reading override drift in {article_id}: {rule['surface']!r} "
+                f"matched {len(hits)}, expected {rule['count']}"
+            )
+        for index in hits:
+            got = tokens[index]["r"]
+            if got != rule["was"]:
+                raise SystemExit(
+                    f"reading override stale in {article_id}: {rule['surface']!r} "
+                    f"reads {got!r}, expected {rule['was']!r}"
+                )
+            tokens[index]["r"] = rule["reading"]
+            tokens[index]["f"] = bc.furigana_pairs(rule["surface"], rule["reading"])
+            applied += 1
+    return applied
 
 
 # --------------------------------------------------------------------------
@@ -146,28 +292,40 @@ def jlpt_signal(tokens: list[dict], ortho: dict, kana: dict) -> dict:
 # --------------------------------------------------------------------------
 # Grading — everything computable here, absence recorded with its reason
 # --------------------------------------------------------------------------
-def grade_article(text: str, tokens: list[dict], tagger, jlpt_maps) -> dict:
+def grade_article(
+    text: str,
+    tokens: list[dict],
+    tagger,
+    jlpt_maps,
+    *,
+    legacy_unavailable_receipt: bool = False,
+) -> dict:
     from corpus.grading.jread import jread_signal
 
-    try:
-        from corpus.grading.grade import grade
-
-        grading = grade(text, tagger=tagger)
-    except Exception as err:  # substrate unreachable — record, never fake
-        grading = {
-            "signals": {"jreadability": jread_signal(text, tagger=tagger)},
-            "disagreement": {
-                "flag": False,
-                "detail": {
-                    "reason": "fewer than two ordinal-capable signals in this build",
-                },
+    # Reproducibility boundary: the NINJAL CSV is intentionally not committed
+    # and corpus.grading would otherwise download it into a gitignored cache.
+    # This default build never consults that ambient cache or the network. It
+    # reproduces the committed unavailable receipt byte-for-byte for the first
+    # 40 articles and applies the same honest absence to additions.
+    unavailable_reason = (
+        NINJAL_UNAVAILABLE_REASON_LEGACY
+        if legacy_unavailable_receipt
+        else NINJAL_UNAVAILABLE_REASON
+    )
+    grading = {
+        "signals": {"jreadability": jread_signal(text, tagger=tagger)},
+        "disagreement": {
+            "flag": False,
+            "detail": {
+                "reason": "fewer than two ordinal-capable signals in this build",
             },
-            "unavailable": {
-                "lexical_coverage": NINJAL_UNAVAILABLE_REASON,
-                "tmr": NINJAL_UNAVAILABLE_REASON,
-                "error": f"{type(err).__name__}",
-            },
-        }
+        },
+        "unavailable": {
+            "lexical_coverage": unavailable_reason,
+            "tmr": unavailable_reason,
+            "error": "URLError" if legacy_unavailable_receipt else "UnavailableByBuildPolicy",
+        },
+    }
     grading["signals"]["jlpt_lexicon"] = jlpt_signal(tokens, *jlpt_maps)
     return grading
 
@@ -196,6 +354,43 @@ def tokenise_paragraphs(text: str, tagger, ruby_markup: str | None = None) -> tu
         else:
             tokens.extend(bc.tokenise(para.strip(), tagger))
     return tokens, para_starts
+
+
+def native_original_entries(path: Path, *, source: str, expected: int) -> list[dict]:
+    """Load the exact five-field Bunki-original source shape."""
+    rows = bc.read_jsonl(path)
+    if len(rows) != expected:
+        raise SystemExit(f"{path}: expected {expected} source records, found {len(rows)}")
+    out: list[dict] = []
+    for rec in rows:
+        if set(rec) != {"id", "level", "lane", "title", "text"}:
+            raise SystemExit(f"{path}:{rec.get('id', '?')}: source shape must have exactly five native fields")
+        lane = rec["lane"]
+        if lane not in LANE_LABEL:
+            raise SystemExit(f"{rec['id']}: unknown lane {lane!r}")
+        expected_prefix = "bunki-graded-n3-" if lane == "graded" else f"bunki-essay-{rec['level'].lower()}-"
+        if source == "bunki-original-reading-catalog" and not rec["id"].startswith(expected_prefix):
+            raise SystemExit(f"{rec['id']}: native id does not match {expected_prefix!r}")
+        out.append(
+            {
+                "id": rec["id"],
+                "title": rec["title"],
+                "text": rec["text"].replace("\r\n", "\n").strip(),
+                "source": source,
+                "sourceLabel": LANE_LABEL[lane] + " · Bunki",
+                "pool": "original",
+                "licence": "Bunki original",
+                "attribution": "Bunki original text",
+                "url": "",
+                "date": "",
+                "rubySource": "tokenizer",
+                # Authored intent only. Measured signals live separately in
+                # `grading`; the UI never calls this official certification.
+                "authorLevel": rec["level"],
+                "lane": lane,
+            }
+        )
+    return out
 
 
 def collect_articles() -> list[dict]:
@@ -288,6 +483,21 @@ def collect_articles() -> list[dict]:
             }
         )
 
+    articles.extend(
+        native_original_entries(
+            WP9B_ORIGINALS,
+            source="bunki-wp9b-reading-catalog",
+            expected=14,
+        )
+    )
+    articles.extend(
+        native_original_entries(
+            VIDEO_INSPIRED_ORIGINALS,
+            source="bunki-original-reading-catalog",
+            expected=30,
+        )
+    )
+
     seen: set[str] = set()
     for a in articles:
         a["file"] = slugify(a["id"]) + ".json"
@@ -310,6 +520,8 @@ SOURCES = {
     ],
     "original": [
         {"name": "bunki-v11-reading-catalog", "licence": "Bunki original", "attribution": "Bunki original graded texts and essays", "url": ""},
+        {"name": "bunki-wp9b-reading-catalog", "licence": "Bunki original", "attribution": "Bunki original graded texts and essays (WP9b shelf expansion)", "url": ""},
+        {"name": "bunki-original-reading-catalog", "licence": "Bunki original", "attribution": "Bunki original text", "url": ""},
     ],
 }
 
@@ -330,11 +542,23 @@ def main() -> int:
     print(f"· {len(articles)} articles through the pipeline")
 
     ninjal_live = 0
+    reading_overrides_applied = 0
     index_rows: list[dict] = []
     for a in articles:
         markup = a.pop("rubyMarkup", None)
         tokens, para_starts = tokenise_paragraphs(a["text"], tagger, ruby_markup=markup)
-        grading = grade_article(a["text"], tokens, tagger, jlpt_maps)
+        reading_overrides_applied += apply_reading_overrides(a["id"], tokens)
+        # The first 40 records are an immutable compatibility surface. Their
+        # historical unavailable receipt (including its original error label)
+        # stays byte-identical; additions use the accurate deterministic-build
+        # policy receipt above.
+        grading = grade_article(
+            a["text"],
+            tokens,
+            tagger,
+            jlpt_maps,
+            legacy_unavailable_receipt=len(index_rows) < 40,
+        )
         if "lexical_coverage" in grading["signals"]:
             ninjal_live += 1
 
@@ -378,6 +602,12 @@ def main() -> int:
     }
     (out / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), "utf-8")
     print(f"· index: {len(index_rows)} articles, ninjal live on {ninjal_live}")
+    expected_overrides = sum(rule["count"] for rule in READING_OVERRIDES)
+    if reading_overrides_applied != expected_overrides:
+        raise SystemExit(
+            f"reading overrides: applied {reading_overrides_applied}, declared {expected_overrides}"
+        )
+    print(f"· reading overrides applied: {reading_overrides_applied}/{expected_overrides}")
     return 0
 
 

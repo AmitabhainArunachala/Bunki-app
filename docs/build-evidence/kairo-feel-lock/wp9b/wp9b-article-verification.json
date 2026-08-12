@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-09T14:12:41.706Z",
+ "generated": "2026-08-12T05:41:10.567Z",
  "articles": [
   {
    "id": "bunki-graded-n5-station",
@@ -9,7 +9,7 @@
    "rt": 58,
    "paras": 4,
    "chars": 375,
-   "glossed": 2
+   "glossed": 3
   },
   {
    "id": "bunki-graded-n5-kitchen",
@@ -29,7 +29,7 @@
    "rt": 46,
    "paras": 4,
    "chars": 340,
-   "glossed": 2
+   "glossed": 3
   },
   {
    "id": "bunki-graded-n4-letter",
@@ -49,7 +49,7 @@
    "rt": 58,
    "paras": 3,
    "chars": 407,
-   "glossed": 2
+   "glossed": 3
   },
   {
    "id": "bunki-graded-n4-bicycle",
@@ -99,7 +99,7 @@
    "rt": 95,
    "paras": 4,
    "chars": 619,
-   "glossed": 3
+   "glossed": 2
   },
   {
    "id": "bunki-essay-n2-rain",
@@ -139,15 +139,15 @@
    "rt": 154,
    "paras": 5,
    "chars": 1037,
-   "glossed": 2
+   "glossed": 3
   }
  ],
  "noise": [],
  "results": [
   {
-   "name": "the shelf carries 40 articles",
+   "name": "the current shelf carries 70 articles while the 14 WP9b records remain in place",
    "pass": true,
-   "detail": "40 in index.json"
+   "detail": "70 in index.json"
   },
   {
    "name": "bunki-graded-n5-station · stands on the shelf",
@@ -182,7 +182,7 @@
   {
    "name": "bunki-graded-n5-station · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "朝(あさ)→morning · 外(そと)→outside"
+   "detail": "朝(あさ)→morning · を→direct object · に→target · time · lo"
   },
   {
    "name": "bunki-graded-n5-station · the full entry opens on a longer hold",
@@ -227,7 +227,7 @@
   {
    "name": "bunki-graded-n5-kitchen · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "夜(よる)→night · も→also · even · 本(ほん)→book"
+   "detail": "夜(よる)→night · 音(おと)→sound · を→direct object"
   },
   {
    "name": "bunki-graded-n5-kitchen · the full entry opens on a longer hold",
@@ -272,12 +272,12 @@
   {
    "name": "bunki-graded-n5-neighbour · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "私(わたし)→I · 少し(すこし)→a little"
+   "detail": "の→of · belonging · 少し(すこし)→a little · おはよう(おはよう)→good morning"
   },
   {
    "name": "bunki-graded-n5-neighbour · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 私  わたし  pronoun  I me JLPT N"
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ の　particle  of · belonging  "
   },
   {
    "name": "bunki-graded-n5-neighbour · opened with zero console/page errors",
@@ -317,7 +317,7 @@
   {
    "name": "bunki-graded-n4-letter · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "引っ越し(ひっこし)→moving (dwelling,  · 住所(じゅうしょ)→address (of a home · また(また)→again"
+   "detail": "引っ越し(ひっこし)→moving (dwelling,  · は→topic · 春(はる)→spring"
   },
   {
    "name": "bunki-graded-n4-letter · the full entry opens on a longer hold",
@@ -362,12 +362,12 @@
   {
    "name": "bunki-graded-n4-market · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "日曜(にちよう)→Sunday · ある(ある)→to be"
+   "detail": "日(ひ)→day · ば→if (conditional) · で→place-of-action · "
   },
   {
    "name": "bunki-graded-n4-market · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 日曜  にちよう  noun  Sunday  この語の"
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 日  ひ  noun  day days sun sun"
   },
   {
    "name": "bunki-graded-n4-market · opened with zero console/page errors",
@@ -402,12 +402,12 @@
   {
    "name": "bunki-graded-n4-bicycle · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "駅(えき)→railway station · いう(いう)→(no gloss yet) · 紙(かみ)→paper"
+   "detail": "の→of · belonging · いう(いう)→(no gloss yet) · を→direct object"
   },
   {
    "name": "bunki-graded-n4-bicycle · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 駅  えき  noun  railway station"
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ の　particle  of · belonging  "
   },
   {
    "name": "bunki-graded-n4-bicycle · opened with zero console/page errors",
@@ -442,12 +442,12 @@
   {
    "name": "bunki-graded-n3-river · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "家(いえ)→house · 高い(たかい)→high · 見つける(みつける)→to find"
+   "detail": "から→from · because · 高い(たかい)→high · 見つける(みつける)→to find"
   },
   {
    "name": "bunki-graded-n3-river · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 家  いえ  noun  house residence"
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ から　particle  from · because "
   },
   {
    "name": "bunki-graded-n3-river · opened with zero console/page errors",
@@ -532,12 +532,12 @@
   {
    "name": "bunki-essay-n2-handwriting · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "漢字(かんじ)→kanji · ぼんやり(ぼんやり)→dimly · こと(こと)→thing"
+   "detail": "を→direct object · ぼんやり(ぼんやり)→dimly · に→target · time · lo"
   },
   {
    "name": "bunki-essay-n2-handwriting · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 漢字  かんじ  noun  kanji Chinese"
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ を　particle  direct object  M"
   },
   {
    "name": "bunki-essay-n2-handwriting · opened with zero console/page errors",
@@ -572,7 +572,7 @@
   {
    "name": "bunki-essay-n2-notebook · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "ノート(ノート)→notebook · 作り出す(つくりだす)→to manufacture · 分かる(わかる)→to understand"
+   "detail": "ノート(ノート)→notebook · 作り出す(つくりだす)→to manufacture"
   },
   {
    "name": "bunki-essay-n2-notebook · the full entry opens on a longer hold",
@@ -612,12 +612,12 @@
   {
    "name": "bunki-essay-n2-rain · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "雨(あめ)→rain · 散る(ちる)→to fall (e.g. blos · 作る(つくる)→to make"
+   "detail": "の→of · belonging · 散る(ちる)→to fall (e.g. blos · 作る(つくる)→to make"
   },
   {
    "name": "bunki-essay-n2-rain · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 雨  あめ  noun  rain rainy day "
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ の　particle  of · belonging  "
   },
   {
    "name": "bunki-essay-n2-rain · opened with zero console/page errors",
@@ -657,12 +657,12 @@
   {
    "name": "bunki-essay-n2-translation · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "外国(がいこく)→foreign country · 言葉(ことば)→language · が→subject"
+   "detail": "語(ご)→word · に→target · time · lo · が→subject"
   },
   {
    "name": "bunki-essay-n2-translation · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 6 rows · ← 戻る back ✕ 外国  がいこく  noun · no-adjectiv"
+   "detail": "#sheet · 6 rows · ← 戻る back ✕ 語  ご  noun · n-suf · counter"
   },
   {
    "name": "bunki-essay-n2-translation · opened with zero console/page errors",
@@ -702,12 +702,12 @@
   {
    "name": "bunki-essay-n1-memory · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "学習(がくしゅう)→learning · ほう(ほう)→(no gloss yet) · 何(なに)→what"
+   "detail": "の→of · belonging · が→subject · を→direct object"
   },
   {
    "name": "bunki-essay-n1-memory · the full entry opens on a longer hold",
    "pass": true,
-   "detail": "#sheet · 8 rows · ← 戻る back ✕ 学習  がくしゅう  noun · suru verb "
+   "detail": "#sheet · 0 rows · ← 戻る back ✕ の　particle  of · belonging  "
   },
   {
    "name": "bunki-essay-n1-memory · opened with zero console/page errors",
@@ -742,7 +742,7 @@
   {
    "name": "bunki-essay-n1-city · the gloss ladder opens on a held word",
    "pass": true,
-   "detail": "大きな(おおきな)→big · 届く(とどく)→to reach"
+   "detail": "大きな(おおきな)→big · 届く(とどく)→to reach · 小さい(ちいさい)→small"
   },
   {
    "name": "bunki-essay-n1-city · the full entry opens on a longer hold",

@@ -1,5 +1,12 @@
 # WP9b — the shelf grows from 26 to 40 articles
 
+> Historical receipt: this document records the WP9b expansion as it was
+> verified. The current canonical `prototypes/corridor/tools/build_articles.py`
+> now owns these same 14 records and reading overrides directly, and the
+> historical `build_wp9b_articles.py` command is only a compatibility
+> delegator. Current shelf/standalone counts are recorded by the later native
+> readings evidence, not by the snapshots below.
+
 Data-only expansion of the corridor's in-file article shelf. Every new article
 flows through the existing Phase-1 batch command
 (`prototypes/corridor/tools/build_articles.py`) — same tokeniser, same

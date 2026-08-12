@@ -47,6 +47,25 @@ KATA_TO_HIRA_OFFSET = ord("ぁ") - ord("ァ")
 KANA_RE = re.compile(r"^[ぁ-ゖァ-ヺー々〆〤ｦ-ﾟ]+$")
 KANJI_RE = re.compile(r"[一-鿌㐀-䶵豈-﫿]")
 
+# The checked-in PR #69 runtime graph was last built from the first 26 shelf
+# records, before WP9b appended records 27–40.  Growing the shelf must not
+# silently change dictionary, semantic-neighbour, or capped-idiom behaviour
+# under those existing 40 readers.  Shared layers therefore have a stable
+# compatibility base, while only genuinely new (41+) article vocabulary is
+# appended.  This is an ordering/file-size policy for every future shelf
+# addition, not an article-provenance branch.
+RUNTIME_GRAPH_BASE_COUNT = 26
+IMMUTABLE_SHELF_COUNT = 40
+
+# PR #69 shipped this historical semantic target and its explanatory note.
+# The project-owned source was corrected later, but changing the generated
+# edge would alter the existing 海 entry.  Preserve the runtime spelling until
+# that behaviour is migrated deliberately rather than as a side effect of
+# adding readings.
+SEM_RUNTIME_COMPAT = {
+    ("海", "海水"): ("海water", "seawater — see 海水"),
+}
+
 
 def kata_to_hira(s: str) -> str:
     return "".join(
@@ -268,10 +287,12 @@ def main() -> int:
             },
         )
 
-    # every word that appears as a content token in the shelf, even if wbig
-    # does not carry it — the reader must never open an empty panel
+    # Reproduce the PR #69 shared-word base from the same first 26 records that
+    # originally fed it.  The 27–40 readers already shipped against this layer;
+    # promoting their previously absent bases now would change their lookup
+    # behaviour merely because later articles were added.
     shelf_words: dict[str, dict] = {}
-    for passage in shelf:
+    for passage in shelf[:RUNTIME_GRAPH_BASE_COUNT]:
         for tok in passage["tokens"]:
             if not tok["c"]:
                 continue
@@ -291,16 +312,46 @@ def main() -> int:
     # semantic edges — ours, with the discrimination notes intact
     sem_out: dict[str, list] = {}
     for head, edges in sem.items():
-        sem_out[head] = [
-            {"w": target, "rel": rel, "note": note} for target, rel, note in edges
-        ]
+        runtime_edges = []
+        for target, rel, note in edges:
+            target, note = SEM_RUNTIME_COMPAT.get((head, target), (target, note))
+            runtime_edges.append({"w": target, "rel": rel, "note": note})
+        sem_out[head] = runtime_edges
         if head not in words:
             words[head] = {"w": head, "r": "", "g": "", "jlpt": None,
                            "k": sorted({c for c in head if c in KINFO}), "fromSem": True}
-        for target, _rel, _note in edges:
+        for edge in runtime_edges:
+            target = edge["w"]
             if target not in words:
                 words[target] = {"w": target, "r": "", "g": "", "jlpt": None,
                                  "k": sorted({c for c in target if c in KINFO}), "fromSem": True}
+
+    # Append vocabulary introduced by records 41+ without changing any lookup
+    # reachable from the immutable first 40.  A base that already occurs in an
+    # old article stays absent if it was absent in the shipped graph.  Reading
+    # is derived from the lemma itself below, never copied from an inflected
+    # surface token (which would turn やめる into the incorrect やめ).
+    immutable_bases = {
+        tok["b"]
+        for passage in shelf[:IMMUTABLE_SHELF_COUNT]
+        for tok in passage["tokens"]
+        if tok["c"]
+    }
+    for passage in shelf[IMMUTABLE_SHELF_COUNT:]:
+        for tok in passage["tokens"]:
+            if not tok["c"]:
+                continue
+            base = tok["b"]
+            if base in words or base in immutable_bases:
+                continue
+            words[base] = {
+                "w": base,
+                "r": "",
+                "g": "",
+                "jlpt": None,
+                "k": sorted({c for c in base if c in KINFO}),
+                "fromText": True,
+            }
 
     # Readings for words the 6,687-word lexicon does not carry (sem-tier heads
     # and targets, text-only words): read them off the SAME pinned tokenizer
@@ -369,7 +420,15 @@ def main() -> int:
     # ---------------- ShareAlike pool: idioms ----------------
     print("· indexing idioms (ShareAlike pool, kept separate)")
     idioms_all = read_jsonl(REPO / "corpus/datasets/jmdict_idioms/idioms.jsonl")
-    shelf_kanji = {c for p in shelf for c in p["text"] if c in kanji}
+    # The 900-entry layer is capped.  Re-ranking it with each shelf append
+    # evicts links from existing kanji pages, so its focus remains the shipped
+    # graph base.  This makes growth monotonic instead of provenance-sensitive.
+    shelf_kanji = {
+        c
+        for p in shelf[:RUNTIME_GRAPH_BASE_COUNT]
+        for c in p["text"]
+        if c in kanji
+    }
     sem_kanji = {c for head in sem_out for c in head if c in kanji}
     focus = shelf_kanji | sem_kanji
 
@@ -494,7 +553,11 @@ def main() -> int:
         for name, payload in files.items():
             path = pool_dir / name
             path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), "utf-8")
-            print(f"    {path.relative_to(CORRIDOR)}  {path.stat().st_size / 1024:.0f} KB")
+            try:
+                label = path.relative_to(CORRIDOR)
+            except ValueError:
+                label = path
+            print(f"    {label}  {path.stat().st_size / 1024:.0f} KB")
 
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), "utf-8")
     print(json.dumps(manifest["counts"], ensure_ascii=False))
