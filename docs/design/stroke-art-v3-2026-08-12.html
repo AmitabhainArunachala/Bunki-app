@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="data:," />
+    <title>墨五態 — five natures of ink</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        margin: 0;
+        background: #121009;
+        color: #e6dfd0;
+        font-family: 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: max(22px, env(safe-area-inset-top)) 14px 50px;
+      }
+      h1 {
+        font-weight: normal;
+        font-size: 18px;
+        letter-spacing: 0.4em;
+        margin: 6px 0 2px;
+      }
+      .sub {
+        font-size: 11px;
+        color: #97897a;
+        letter-spacing: 0.1em;
+        margin: 0 0 22px;
+      }
+      .panel {
+        width: min(92vw, 460px);
+        margin-bottom: 40px;
+      }
+      canvas.card {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 3px;
+        cursor: pointer;
+        box-shadow:
+          0 14px 50px rgba(0, 0, 0, 0.6),
+          0 3px 10px rgba(0, 0, 0, 0.45);
+      }
+      .label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 10px 2px 0;
+      }
+      .label b {
+        font-weight: normal;
+        font-size: 16px;
+        letter-spacing: 0.24em;
+      }
+      .label span {
+        font-size: 10.5px;
+        color: #8d8577;
+      }
+      .note {
+        font-size: 12px;
+        line-height: 1.85;
+        color: #b3aa99;
+        margin: 5px 2px 0;
+      }
+      footer {
+        font-size: 9.5px;
+        color: #675e51;
+        text-align: center;
+        line-height: 1.9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>墨五態</h1>
+    <p class="sub">five natures of ink · tap any sheet to write again — no two writings alike</p>
+
+    <div class="panel">
+      <canvas class="card" id="p1"></canvas>
+      <div class="label"><b>一 · 飛白</b><span>the dry brush splits</span></div>
+      <p class="note">
+        Forty bristles, one dying ink load. Where the hand moves fast the brush runs dry and the
+        stroke tears into white wind — 空海's flying-white, grown from real bristle depletion, never
+        a texture stamp.
+      </p>
+    </div>
+
+    <div class="panel">
+      <canvas class="card" id="p2"></canvas>
+      <div class="label"><b>二 · 滲み</b><span>wet ink keeps walking</span></div>
+      <p class="note">
+        Written on damp gasenshi: after the brush passes, the ink keeps travelling — feathering
+        outward along the paper's fibers in tendrils, edges fraying like living things. The stroke
+        breathes for two seconds after it lands.
+      </p>
+    </div>
+
+    <div class="panel">
+      <canvas class="card" id="p3"></canvas>
+      <div class="label"><b>三 · 拓本</b><span>stone rubbing</span></div>
+      <p class="note">
+        The character as a thousand-year stele: paper pressed onto carved stone and rubbed with an
+        ink ball. The glyph is the ABSENCE — white stone cut through charcoal black, edges chipped,
+        surface pocked by the rubbing.
+      </p>
+    </div>
+
+    <div class="panel">
+      <canvas class="card" id="p4"></canvas>
+      <div class="label"><b>四 · 銀河墨</b><span>the ink is a galaxy</span></div>
+      <p class="note">
+        The wild one, and the one that already knows this app: inside each stroke body drifts the
+        墨流し universe — star dust, slow nebulae. The kanji as a window cut into night. The
+        corridor's own galaxy, held in a brush shape.
+      </p>
+    </div>
+
+    <div class="panel">
+      <canvas class="card" id="p5"></canvas>
+      <div class="label"><b>五 · 墨流し</b><span>written on marbled water</span></div>
+      <p class="note">
+        Suminagashi — the oldest marbling on earth, and the app's own name. The sheet was pulled
+        from a tray of floating ink rings; the character is written over the drifted rings in dense
+        fresh sumi with a heavy bleed.
+      </p>
+    </div>
+
+    <footer>
+      stroke bodies: AnimCJK · Arphic PL — ink, bristles, stone &amp; water: procedural · KAIRO
+      design round 2026-08-12
+    </footer>
+
+    <script>
+      const GLYPH = {
+        永: {
+          outlines: [
+            'M440 112Q497 169 535 182Q553 183 562 168Q569 152 564 133Q546 85 477 72Q438 59 421 66Q414 69 418 83Q421 96 440 112Z',
+            'M532 452Q532 353 546 330Q559 311 546 299Q524 280 486 264Q462 255 413 285Q371 301 306 311Q290 312 299 322Q309 332 324 338Q343 342 370 335Q406 325 441 313Q460 306 467 316Q473 334 475 362Q482 629 470 790Q469 820 459 833Q453 839 369 818Q342 805 344 821Q411 873 450 913Q463 932 480 938Q490 942 499 932Q541 884 540 823Q533 693 532 497C532 467 532 467 532 452Z',
+            'M117 499Q104 499 102 508Q101 515 117 523Q163 548 192 537Q309 503 320 505Q333 508 323 535Q280 644 240 695Q200 753 126 814Q111 827 122 829Q132 830 153 820Q220 786 275 728Q327 676 394 538Q404 516 416 503Q431 491 422 481Q412 468 374 455Q353 445 305 466Q215 488 117 499Z',
+            'M567 493Q639 448 745 374Q767 358 793 348Q817 338 806 318Q793 299 765 282Q740 266 725 268Q712 269 715 284Q719 318 641 395Q601 435 556 480C552 484 562 496 567 493Z',
+            'M556 480Q543 464 532 452C521 441 523 485 532 497Q737 786 799 784Q871 774 933 765Q960 762 960 755Q961 748 930 735Q777 683 733 647Q678 604 567 493C560 484 560 484 556 480Z',
+          ],
+          medians: [
+            'M421 74L554 171',
+            'M305 317L464 286L511 319L499 846L473 886L351 818',
+            'M110 506L183 515L326 480L375 497L265 703L128 824',
+            'M723 273L752 341L562 484',
+            'M534 466L771 721L953 752',
+          ],
+        },
+      }['永'];
+      const DPR = Math.min(2.5, window.devicePixelRatio || 1);
+      const SIZE = 460;
+      const S = SIZE * DPR;
+      const K = S / 1024;
+
+      function rng(seed) {
+        let s = seed >>> 0;
+        return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+      }
+
+      /* ---------- median helpers ---------- */
+      function parseMedian(d) {
+        const n = d.match(/-?[\d.]+/g).map(Number);
+        const p = [];
+        for (let i = 0; i < n.length; i += 2) p.push([n[i], n[i + 1]]);
+        return p;
+      }
+      function medianLen(pts) {
+        let L = 0;
+        const cum = [0];
+        for (let i = 1; i < pts.length; i++) {
+          L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+          cum.push(L);
+        }
+        return { L, cum };
+      }
+      function pointAt(pts, cum, t) {
+        const target = t * cum[cum.length - 1];
+        let i = 1;
+        while (i < cum.length && cum[i] < target) i++;
+        if (i >= cum.length) return { p: pts[pts.length - 1], dir: dirAt(pts, pts.length - 1) };
+        const f = (target - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
+        return {
+          p: [
+            pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f,
+            pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f,
+          ],
+          dir: norm([pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]]),
+        };
+      }
+      function dirAt(pts, i) {
+        const a = pts[Math.max(0, i - 1)],
+          b = pts[Math.min(pts.length - 1, i)];
+        return norm([b[0] - a[0], b[1] - a[1]]);
+      }
+      function norm(v) {
+        const l = Math.hypot(v[0], v[1]) || 1;
+        return [v[0] / l, v[1] / l];
+      }
+
+      const STROKES = GLYPH.outlines.map((o, i) => {
+        const medPts = parseMedian(GLYPH.medians[i]);
+        const { L, cum } = medianLen(medPts);
+        const last = Math.hypot(
+          medPts.at(-1)[0] - medPts.at(-2)[0],
+          medPts.at(-1)[1] - medPts.at(-2)[1],
+        );
+        const type = last / L > 0.3 ? 'sweep' : L < 220 ? 'dot' : 'stop';
+        return { outline: o, medPts, cum, L, type, dur: 360 + Math.pow(L, 0.88) * 2.7 };
+      });
+      function easeFor(type) {
+        if (type === 'sweep') return (k) => Math.pow(k, 0.72);
+        if (type === 'dot') return (k) => 1 - Math.pow(1 - k, 2.2);
+        return (k) => (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2);
+      }
+
+      /* ---------- shared: bristle-drawn ink body (the NATURAL core) ---------- */
+      function bristleBody(g, stroke, pal, seed) {
+        const r = rng(seed);
+        const path = new Path2D(stroke.outline);
+        g.save();
+        g.scale(K, K);
+        g.clip(path);
+        // ink wash base — uneven, not flat
+        g.globalAlpha = pal.baseAlpha;
+        g.fillStyle = pal.ink;
+        g.fillRect(0, 0, 1024, 1024);
+        // the bristles: many thin strands riding the median, clipped by the true body
+        const nB = pal.bristles;
+        for (let b = 0; b < nB; b++) {
+          const off = (b / (nB - 1) - 0.5) * 150 * (0.85 + r() * 0.3);
+          const load = 0.75 + r() * 0.45; // this bristle's ink load
+          const deplete = pal.deplete * (0.7 + r() * 0.7);
+          g.beginPath();
+          let started = false;
+          const steps = Math.max(26, Math.floor(stroke.L / 14));
+          for (let sIx = 0; sIx <= steps; sIx++) {
+            const t = sIx / steps;
+            const { p, dir } = pointAt(stroke.medPts, stroke.cum, t);
+            const px = p[0] - dir[1] * off + (r() - 0.5) * 7;
+            const py = p[1] + dir[0] * off + (r() - 0.5) * 7;
+            if (!started) {
+              g.moveTo(px, py);
+              started = true;
+            } else g.lineTo(px, py);
+          }
+          const edge = Math.abs(off) / 75; // edge bristles carry less ink
+          const alpha = Math.max(0, load - edge * 0.5) * pal.bristleAlpha;
+          g.strokeStyle = pal.inkVar[b % pal.inkVar.length];
+          g.lineWidth = 4 + r() * 13;
+          g.lineCap = 'round';
+          // depletion: draw in segments whose alpha decays; kasure = segments drop out
+          const segs = 5;
+          for (let sg = 0; sg < segs; sg++) {
+            const a = alpha * (1 - deplete * (sg / segs)) * (0.65 + r() * 0.35);
+            if (
+              pal.kasure &&
+              ((sg > segs - 3 && r() < 0.4 * deplete * (sg / segs) * 3) || r() < 0.05)
+            )
+              continue; // the brush tears
+            g.globalAlpha = Math.max(0, a);
+            g.setLineDash([stroke.L / segs, (stroke.L * (segs - 1)) / segs]);
+            g.lineDashOffset = (-stroke.L * sg) / segs;
+            g.stroke();
+          }
+          g.setLineDash([]);
+        }
+        // 起筆 press pool
+        const e = stroke.medPts[0];
+        const pool = g.createRadialGradient(e[0], e[1], 2, e[0], e[1], 56);
+        pool.addColorStop(0, pal.rim);
+        pool.addColorStop(1, 'rgba(0,0,0,0)');
+        g.globalAlpha = 0.4;
+        g.fillStyle = pool;
+        g.beginPath();
+        g.arc(e[0], e[1], 58, 0, 7);
+        g.fill();
+        // rim
+        g.globalAlpha = pal.rimAlpha || 0.42;
+        g.strokeStyle = pal.rim;
+        g.lineWidth = pal.rimW || 6;
+        g.stroke(path);
+        g.restore();
+      }
+      /* fiber-nibbled edges: erode the boundary with blobby noise */
+      const NIBBLE = (() => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 128;
+        const g = c.getContext('2d');
+        const r = rng(41);
+        for (let i = 0; i < 240; i++) {
+          g.fillStyle = `rgba(255,255,255,${0.5 + r() * 0.5})`;
+          g.beginPath();
+          g.arc(r() * 128, r() * 128, 0.6 + r() * 2.4, 0, 7);
+          g.fill();
+        }
+        return c;
+      })();
+      function nibbleEdges(g, stroke, amount) {
+        const path = new Path2D(stroke.outline);
+        g.save();
+        g.globalCompositeOperation = 'destination-out';
+        g.globalAlpha = amount;
+        g.scale(K, K);
+        g.strokeStyle = g.createPattern(NIBBLE, 'repeat');
+        g.lineWidth = 10;
+        g.stroke(path);
+        g.restore();
+      }
+
+      /* ---------- sprite builder per theme ---------- */
+      function buildSprite(stroke, pal, seed) {
+        const c = document.createElement('canvas');
+        c.width = c.height = S;
+        const g = c.getContext('2d');
+        bristleBody(g, stroke, pal, seed);
+        nibbleEdges(g, stroke, pal.nibble);
+        return c;
+      }
+      /* tendril bleed: three rings, fractal-cut so edges feather, fiber-shifted */
+      function buildBleed(sprite, pal, seed) {
+        const c = document.createElement('canvas');
+        c.width = c.height = S;
+        const g = c.getContext('2d');
+        const r = rng(seed);
+        const rings = [
+          [3, 0.1],
+          [8, 0.07],
+          [15, 0.045],
+        ];
+        for (const [blur, alpha] of rings) {
+          g.save();
+          g.filter = `blur(${blur * DPR}px)`;
+          g.globalAlpha = alpha * pal.bleed;
+          const dx = (r() - 0.5) * 4 * DPR,
+            dy = (r() - 0.5) * 4 * DPR;
+          g.drawImage(sprite, dx, dy);
+          g.restore();
+        }
+        // fractal cut: bite tendrils into the halo
+        g.save();
+        g.globalCompositeOperation = 'destination-out';
+        const rr = rng(seed + 9);
+        for (let i = 0; i < 900; i++) {
+          g.globalAlpha = 0.5 + rr() * 0.5;
+          g.beginPath();
+          g.arc(rr() * S, rr() * S, (1 + rr() * 5) * DPR, 0, 7);
+          g.fill();
+        }
+        g.restore();
+        return c;
+      }
+
+      /* ---------- grounds ---------- */
+      function groundWashi(g, r, warm) {
+        const base = g.createLinearGradient(0, 0, S * 0.9, S);
+        if (warm) {
+          base.addColorStop(0, '#f2e9d2');
+          base.addColorStop(0.6, '#e9dbba');
+          base.addColorStop(1, '#dfcda4');
+        } else {
+          base.addColorStop(0, '#f0ecdf');
+          base.addColorStop(0.6, '#e6e0cc');
+          base.addColorStop(1, '#dcd4bb');
+        }
+        g.fillStyle = base;
+        g.fillRect(0, 0, S, S);
+        for (let i = 0; i < 2400; i++) {
+          const x = r() * S,
+            y = r() * S,
+            len = (12 + r() * 84) * DPR;
+          const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5) * 1.0;
+          g.beginPath();
+          g.moveTo(x, y);
+          g.quadraticCurveTo(
+            x + Math.cos(a) * len * 0.5 + (r() - 0.5) * 20 * DPR,
+            y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 20 * DPR,
+            x + Math.cos(a) * len,
+            y + Math.sin(a) * len,
+          );
+          g.strokeStyle =
+            r() < 0.8
+              ? `rgba(180,158,116,${0.04 + r() * 0.08})`
+              : `rgba(252,246,228,${0.09 + r() * 0.1})`;
+          g.lineWidth = (0.4 + r() * 0.7) * DPR;
+          g.stroke();
+        }
+        const v = g.createRadialGradient(S / 2, S / 2, S * 0.42, S / 2, S / 2, S * 0.74);
+        v.addColorStop(0, 'rgba(0,0,0,0)');
+        v.addColorStop(1, 'rgba(90,70,40,0.15)');
+        g.fillStyle = v;
+        g.fillRect(0, 0, S, S);
+      }
+      function groundStone(g, r) {
+        g.fillStyle = '#14120f';
+        g.fillRect(0, 0, S, S);
+        // the rubbing: thousands of charcoal daubs, denser in patches
+        for (let i = 0; i < 5200; i++) {
+          const x = r() * S,
+            y = r() * S;
+          const patch = Math.sin((x * 0.004) / DPR) * Math.cos((y * 0.0035) / DPR);
+          const l = 26 + r() * 24; // one luminance, faintly warm — charcoal, never confetti
+          g.fillStyle = `rgba(${l | 0},${(l * 0.96) | 0},${(l * 0.88) | 0},${0.25 + r() * 0.4 + patch * 0.12})`;
+          g.beginPath();
+          g.arc(x, y, (0.8 + r() * 3.2) * DPR, 0, 7);
+          g.fill();
+        }
+        for (let i = 0; i < 22; i++) {
+          // pale scars in the stone
+          g.strokeStyle = `rgba(120,112,98,${0.05 + r() * 0.08})`;
+          g.lineWidth = (0.5 + r()) * DPR;
+          g.beginPath();
+          g.moveTo(r() * S, r() * S);
+          g.lineTo(r() * S, r() * S);
+          g.stroke();
+        }
+      }
+      function groundNight(g, r) {
+        const base = g.createLinearGradient(0, 0, S * 0.7, S);
+        base.addColorStop(0, '#101425');
+        base.addColorStop(0.55, '#0b0e1d');
+        base.addColorStop(1, '#070912');
+        g.fillStyle = base;
+        g.fillRect(0, 0, S, S);
+        for (let i = 0; i < 130; i++) {
+          // far stars on the paper itself, faint
+          g.fillStyle = `rgba(190,200,230,${0.04 + r() * 0.1})`;
+          g.beginPath();
+          g.arc(r() * S, r() * S, (0.4 + r() * 0.9) * DPR, 0, 7);
+          g.fill();
+        }
+      }
+      function groundSuminagashi(g, r) {
+        const base = g.createLinearGradient(0, 0, S, S);
+        base.addColorStop(0, '#efe9d8');
+        base.addColorStop(1, '#e2d9c0');
+        g.fillStyle = base;
+        g.fillRect(0, 0, S, S);
+        // floating ink rings, drifted by a slow current
+        const cx = S * (0.3 + r() * 0.4),
+          cy = S * (0.3 + r() * 0.4);
+        const nRings = 26;
+        for (let ring = nRings; ring > 0; ring--) {
+          const rad = ring * S * 0.032 * (0.85 + r() * 0.3);
+          g.beginPath();
+          for (let a = 0; a <= 128; a++) {
+            const th = (a / 128) * Math.PI * 2;
+            const drift =
+              Math.sin(th * 3 + ring * 1.7) * S * 0.012 +
+              Math.sin(th * 7 - ring) * S * 0.008 +
+              Math.cos(th * 2 + ring * 0.6) * S * 0.02 * Math.sin(ring * 0.9);
+            const rr2 = rad + drift + (th > 2 && th < 4 ? Math.sin((th - 2) * 1.5) * S * 0.05 : 0); // the current pulls one side
+            const x = cx + Math.cos(th) * rr2 * 1.12,
+              y = cy + Math.sin(th) * rr2 * 0.94;
+            a === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+          }
+          g.closePath();
+          g.strokeStyle =
+            ring % 2
+              ? `rgba(50,48,46,${0.16 + r() * 0.12})`
+              : `rgba(120,116,110,${0.07 + r() * 0.06})`;
+          g.lineWidth = (0.8 + r() * 1.6) * DPR;
+          g.stroke();
+        }
+        g.save();
+        g.filter = `blur(${0.6 * DPR}px)`;
+        g.drawImage(g.canvas, 0, 0);
+        g.restore();
+      }
+
+      /* ---------- the five natures ---------- */
+      const THEMES = {
+        p1: {
+          // 飛白 — dry brush
+          ground: (g, r) => groundWashi(g, r, true),
+          pal: {
+            ink: '#221d16',
+            inkVar: ['#241f18', '#1a1611', '#2c2419'],
+            rim: '#0f0c08',
+            baseAlpha: 0.2,
+            bristles: 46,
+            bristleAlpha: 0.44,
+            deplete: 1.25,
+            kasure: true,
+            nibble: 0.75,
+            bleed: 0.5,
+          },
+          tip: 'rgba(30,24,16,0.5)',
+        },
+        p2: {
+          // 滲み — living bleed
+          ground: (g, r) => groundWashi(g, r, false),
+          pal: {
+            ink: '#24262b',
+            inkVar: ['#24262b', '#2b2e34', '#1c1e22'],
+            rim: '#101216',
+            baseAlpha: 0.5,
+            bristles: 22,
+            bristleAlpha: 0.3,
+            deplete: 0.35,
+            kasure: false,
+            nibble: 0.5,
+            bleed: 2.6,
+          },
+          tip: 'rgba(30,33,40,0.5)',
+          bloom: true,
+        },
+        p3: {
+          // 拓本 — stone rubbing (inverted)
+          ground: groundStone,
+          pal: {
+            ink: '#efe8d8',
+            inkVar: ['#efe8d8', '#e6dcc4', '#f6f0e2'],
+            rim: '#cfc5ae',
+            baseAlpha: 0.7,
+            bristles: 20,
+            bristleAlpha: 0.4,
+            deplete: 0.3,
+            kasure: false,
+            nibble: 1.0,
+            bleed: 0.25,
+          },
+          tip: 'rgba(240,232,214,0.4)',
+          seal: true,
+        },
+        p4: {
+          // 銀河墨 — galaxy ink
+          ground: groundNight,
+          pal: {
+            ink: '#151d3c',
+            inkVar: ['#1b2650', '#151d3c', '#22305e'],
+            rim: '#6b85d6',
+            baseAlpha: 0.95,
+            bristles: 18,
+            bristleAlpha: 0.28,
+            deplete: 0.2,
+            kasure: false,
+            nibble: 0.35,
+            bleed: 0.9,
+            rimAlpha: 0.75,
+            rimW: 9,
+            halo: 'rgba(120,150,255,0.28)',
+          },
+          tip: 'rgba(170,190,255,0.5)',
+          galaxy: true,
+        },
+        p5: {
+          // 墨流し — on marbled water
+          ground: groundSuminagashi,
+          pal: {
+            ink: '#211e19',
+            inkVar: ['#211e19', '#191713', '#282419'],
+            rim: '#0e0c09',
+            baseAlpha: 0.55,
+            bristles: 26,
+            bristleAlpha: 0.32,
+            deplete: 0.5,
+            kasure: false,
+            nibble: 0.55,
+            bleed: 1.7,
+          },
+          tip: 'rgba(30,26,20,0.5)',
+        },
+      };
+
+      /* ---------- scene runner (one per card) ---------- */
+      const STATE = (window.__SUMI = { state: {}, hold: false });
+      function runCard(id) {
+        const theme = THEMES[id];
+        const canvas = document.getElementById(id);
+        canvas.width = canvas.height = S;
+        const ctx = canvas.getContext('2d');
+        let st = null;
+
+        function start() {
+          const seed = (Math.random() * 1e9) >>> 0;
+          const r = rng(seed);
+          const ground = document.createElement('canvas');
+          ground.width = ground.height = S;
+          theme.ground(ground.getContext('2d'), r);
+          const base = document.createElement('canvas');
+          base.width = base.height = S;
+          base.getContext('2d').drawImage(ground, 0, 0);
+          const sprites = STROKES.map((s, i) => buildSprite(s, theme.pal, seed + i * 977));
+          st = {
+            seed,
+            base,
+            sprites,
+            i: 0,
+            t0: performance.now() + 500,
+            settling: null,
+            blooms: [],
+            stars: null,
+            done: false,
+          };
+          if (theme.galaxy) {
+            st.stars = [];
+            const rr = rng(seed + 5);
+            for (let i = 0; i < 460; i++) st.stars.push([rr() * S, rr() * S, rr(), rr() * 7]);
+          }
+          STATE.state[id] = 'writing';
+        }
+
+        function frame(now) {
+          requestAnimationFrame(frame);
+          if (!st) return;
+          ctx.clearRect(0, 0, S, S);
+          ctx.drawImage(st.base, 0, 0);
+
+          // living blooms (滲み) — the ink keeps walking after it lands
+          if (theme.bloom) {
+            for (const b of st.blooms) {
+              const k = Math.min(1, (now - b.t0) / 2100);
+              ctx.save();
+              ctx.globalAlpha = 0.16 * (1 - Math.pow(1 - k, 2)) * theme.pal.bleed * 0.4;
+              ctx.filter = `blur(${(2 + k * 13) * DPR}px)`;
+              ctx.drawImage(b.sprite, 0, 0);
+              ctx.restore();
+            }
+          }
+          // the galaxy lives INSIDE the finished ink
+          if (theme.galaxy && st.i > 0) {
+            ctx.save();
+            const clip = new Path2D();
+            for (let j = 0; j < st.i; j++) clip.addPath(new Path2D(STROKES[j].outline));
+            ctx.scale(K, K);
+            ctx.clip(clip);
+            ctx.scale(1 / K, 1 / K);
+            const t = now / 1000;
+            for (const [x, y, m, ph] of st.stars) {
+              const tw = 0.5 + Math.sin(t * (0.6 + m) + ph) * 0.4;
+              ctx.fillStyle = m < 0.85 ? `rgba(214,226,255,${tw})` : `rgba(255,218,176,${tw})`;
+              const drift = Math.sin(t * 0.07 + ph) * 6 * DPR;
+              ctx.beginPath();
+              ctx.arc(x + drift, y, (0.6 + m * 1.7) * DPR, 0, 7);
+              ctx.fill();
+            }
+            const neb = ctx.createRadialGradient(
+              S * 0.62 + Math.sin(t * 0.05) * 20 * DPR,
+              S * 0.5,
+              S * 0.02,
+              S * 0.62,
+              S * 0.5,
+              S * 0.5,
+            );
+            neb.addColorStop(0, 'rgba(96,118,214,0.3)');
+            neb.addColorStop(0.6, 'rgba(158,96,170,0.13)');
+            neb.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = neb;
+            ctx.fillRect(0, 0, S, S);
+            ctx.restore();
+          }
+          if (st.done) return;
+          const s = STROKES[st.i];
+          if (!s) {
+            st.done = true;
+            return;
+          }
+          const raw = (now - st.t0) / s.dur;
+
+          if (st.settling) {
+            const k = Math.min(1, (now - st.settling) / 420);
+            if (k >= 1) {
+              const g = st.base.getContext('2d');
+              g.drawImage(buildBleed(st.sprites[st.i], theme.pal, st.seed + st.i * 31), 0, 0);
+              if (theme.pal.halo) {
+                // moonlit edge so night ink reads against night paper
+                g.save();
+                g.scale(K, K);
+                g.strokeStyle = theme.pal.halo;
+                g.lineWidth = 3;
+                g.shadowColor = theme.pal.halo;
+                g.shadowBlur = 16 * DPR;
+                g.stroke(new Path2D(STROKES[st.i].outline));
+                g.restore();
+              }
+              g.drawImage(st.sprites[st.i], 0, 0);
+              if (theme.bloom) st.blooms.push({ sprite: st.sprites[st.i], t0: now });
+              if (theme.seal && st.i === STROKES.length - 1) {
+                g.save();
+                g.scale(K, K);
+                g.fillStyle = 'rgba(178,52,32,0.88)';
+                g.fillRect(850, 880, 92, 92);
+                g.fillStyle = '#f0e6d2';
+                g.font = '64px serif';
+                g.textAlign = 'center';
+                g.textBaseline = 'middle';
+                g.fillText('永', 896, 930);
+                g.restore();
+              }
+              st.settling = null;
+              st.i += 1;
+              st.t0 = now + (s.type === 'stop' ? 300 : 170);
+              if (st.i >= STROKES.length) {
+                st.done = true;
+                STATE.state[id] = 'done';
+                setTimeout(() => {
+                  if (st && !STATE.hold) start();
+                }, 6200); // dwell, then write again — fresh seed
+              }
+              return;
+            }
+            ctx.globalAlpha = 1;
+            ctx.drawImage(st.sprites[st.i], 0, 0);
+            return;
+          }
+          if (raw < 0) return;
+          const t = easeFor(s.type)(Math.min(1, raw));
+
+          const mask = document.createElement('canvas');
+          mask.width = mask.height = S;
+          const mg = mask.getContext('2d');
+          mg.drawImage(st.sprites[st.i], 0, 0);
+          mg.globalCompositeOperation = 'destination-in';
+          mg.save();
+          mg.scale(K, K);
+          mg.strokeStyle = '#fff';
+          mg.lineWidth = 195;
+          mg.lineCap = 'round';
+          mg.lineJoin = 'round';
+          mg.beginPath();
+          const upto = t * s.cum[s.cum.length - 1];
+          mg.moveTo(s.medPts[0][0], s.medPts[0][1]);
+          for (let i = 1; i < s.medPts.length; i++) {
+            if (s.cum[i] <= upto) mg.lineTo(s.medPts[i][0], s.medPts[i][1]);
+            else {
+              const f = (upto - s.cum[i - 1]) / (s.cum[i] - s.cum[i - 1] || 1);
+              mg.lineTo(
+                s.medPts[i - 1][0] + (s.medPts[i][0] - s.medPts[i - 1][0]) * f,
+                s.medPts[i - 1][1] + (s.medPts[i][1] - s.medPts[i - 1][1]) * f,
+              );
+              break;
+            }
+          }
+          mg.stroke();
+          mg.restore();
+          ctx.drawImage(mask, 0, 0);
+
+          const { p: tip } = pointAt(s.medPts, s.cum, t);
+          ctx.save();
+          ctx.scale(K, K);
+          const tg = ctx.createRadialGradient(tip[0], tip[1], 2, tip[0], tip[1], 36);
+          tg.addColorStop(0, theme.tip);
+          tg.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = tg;
+          ctx.beginPath();
+          ctx.arc(tip[0], tip[1], 36, 0, 7);
+          ctx.fill();
+          ctx.restore();
+          if (raw >= 1) st.settling = now;
+        }
+        canvas.addEventListener('click', start);
+        start();
+        requestAnimationFrame(frame);
+      }
+      for (const id of ['p1', 'p2', 'p3', 'p4', 'p5']) runCard(id);
+    </script>
+  </body>
+</html>
