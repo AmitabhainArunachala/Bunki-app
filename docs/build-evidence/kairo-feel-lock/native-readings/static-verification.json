@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "kind": "native-bunki-readings-verification",
+  "baselineCommit": "ca07a8e5b1dc6d45ff70ad0feec3c7333285eff9",
+  "builderGap": {
+    "canonicalRows": 26,
+    "wp9bRows": 40,
+    "committedShelfRows": 70,
+    "status": "reported-not-patched-per-work-order"
+  },
+  "articles": [
+    {
+      "id": "bunki-graded-n3-zoka-sanjin-morning",
+      "level": "N3",
+      "title": "造化三神に出会う朝",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 606,
+      "paragraphs": 7,
+      "generatedFile": "bunki-graded-n3-zoka-sanjin-morning.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-nakaima-diary",
+      "level": "N3",
+      "title": "「中今」を感じる一日",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 628,
+      "paragraphs": 8,
+      "generatedFile": "bunki-graded-n3-nakaima-diary.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-world-beginning",
+      "level": "N3",
+      "title": "世界のはじまりに現れた三柱",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 617,
+      "paragraphs": 8,
+      "generatedFile": "bunki-graded-n3-world-beginning.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-hidden-deity",
+      "level": "N3",
+      "title": "姿を隠した神さま",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 609,
+      "paragraphs": 14,
+      "generatedFile": "bunki-graded-n3-hidden-deity.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-kojiki-book",
+      "level": "N3",
+      "title": "『古事記』はどんな本？",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 634,
+      "paragraphs": 7,
+      "generatedFile": "bunki-graded-n3-kojiki-book.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-hashira-counter",
+      "level": "N3",
+      "title": "神さまを「一柱」と数えるわけ",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 573,
+      "paragraphs": 7,
+      "generatedFile": "bunki-graded-n3-hashira-counter.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-feel-jingu-forest",
+      "level": "N3",
+      "title": "伊勢神宮の森を映像で歩く",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 640,
+      "paragraphs": 8,
+      "generatedFile": "bunki-graded-n3-feel-jingu-forest.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-musubi-visual",
+      "level": "N3",
+      "title": "天・地・祈りをつなぐ「むすひ」",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 597,
+      "paragraphs": 7,
+      "generatedFile": "bunki-graded-n3-musubi-visual.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-gratitude-week",
+      "level": "N3",
+      "title": "一週間、感謝の言葉を唱えてみた",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 560,
+      "paragraphs": 9,
+      "generatedFile": "bunki-graded-n3-gratitude-week.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-graded-n3-thanks-before-help",
+      "level": "N3",
+      "title": "「助けて」より先に「ありがとう」？",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 643,
+      "paragraphs": 18,
+      "generatedFile": "bunki-graded-n3-thanks-before-help.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-zoka-as-one",
+      "level": "N2",
+      "title": "三柱の神を一つの働きとして読む",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 688,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n2-zoka-as-one.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-nakaima-time",
+      "level": "N2",
+      "title": "過去・現在・未来と「中今」",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 693,
+      "paragraphs": 9,
+      "generatedFile": "bunki-essay-n2-nakaima-time.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-creator-god",
+      "level": "N2",
+      "title": "「創造神」という言葉はどこまで正しいか",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 664,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n2-creator-god.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-silent-amenominakanushi",
+      "level": "N2",
+      "title": "天之御中主神――語られない神をどう読むか",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 680,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n2-silent-amenominakanushi.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-kojiki-myth-history",
+      "level": "N2",
+      "title": "『古事記』は神話か、歴史か",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 678,
+      "paragraphs": 7,
+      "generatedFile": "bunki-essay-n2-kojiki-myth-history.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-myth-to-book",
+      "level": "N2",
+      "title": "語りから書物へ――神話を編む",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 656,
+      "paragraphs": 7,
+      "generatedFile": "bunki-essay-n2-myth-to-book.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-feel-jingu-musubi",
+      "level": "N2",
+      "title": "映像が伝える「むすひ」",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 689,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n2-feel-jingu-musubi.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-prayer-on-screen",
+      "level": "N2",
+      "title": "映像の中で祈りはどう見えるか",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 722,
+      "paragraphs": 9,
+      "generatedFile": "bunki-essay-n2-prayer-on-screen.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-thanks-first",
+      "level": "N2",
+      "title": "「ありがとうございます」を先に言う心理",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 691,
+      "paragraphs": 7,
+      "generatedFile": "bunki-essay-n2-thanks-first.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n2-testimony-literacy",
+      "level": "N2",
+      "title": "体験談をどう受け取るか",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 711,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n2-testimony-literacy.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-cosmic-analogy",
+      "level": "N1",
+      "title": "造化三神を宇宙論として読む誘惑",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 815,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-cosmic-analogy.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-nakaima-time-theory",
+      "level": "N1",
+      "title": "「中今」は時間論になり得るか",
+      "primaryVideo": "V1",
+      "unidicLexicalTokens": 805,
+      "paragraphs": 7,
+      "generatedFile": "bunki-essay-n1-nakaima-time-theory.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-first-versus-supreme",
+      "level": "N1",
+      "title": "原初神を「最高神」と呼ぶときの問題",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 805,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-first-versus-supreme.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-silent-god-theology",
+      "level": "N1",
+      "title": "沈黙する神と不在の神学",
+      "primaryVideo": "V2",
+      "unidicLexicalTokens": 820,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-silent-god-theology.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-kojiki-power",
+      "level": "N1",
+      "title": "『古事記』編纂と権力の物語",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 817,
+      "paragraphs": 7,
+      "generatedFile": "bunki-essay-n1-kojiki-power.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-beyond-fact-fiction",
+      "level": "N1",
+      "title": "神話を「事実か虚構か」で裁かないために",
+      "primaryVideo": "V3",
+      "unidicLexicalTokens": 830,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-beyond-fact-fiction.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-sacred-media",
+      "level": "N1",
+      "title": "「感じる」映像は神聖さをどう構成するか",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 825,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-sacred-media.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-ise-time",
+      "level": "N1",
+      "title": "産霊・自然・反復――伊勢の時間",
+      "primaryVideo": "V4",
+      "unidicLexicalTokens": 825,
+      "paragraphs": 10,
+      "generatedFile": "bunki-essay-n1-ise-time.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-miracle-testimony",
+      "level": "N1",
+      "title": "奇跡の体験談と認識の責任",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 821,
+      "paragraphs": 8,
+      "generatedFile": "bunki-essay-n1-miracle-testimony.json",
+      "pass": true
+    },
+    {
+      "id": "bunki-essay-n1-prayer-reality",
+      "level": "N1",
+      "title": "祈りの言葉は誰の現実を変えるのか",
+      "primaryVideo": "V5",
+      "unidicLexicalTokens": 815,
+      "paragraphs": 11,
+      "generatedFile": "bunki-essay-n1-prayer-reality.json",
+      "pass": true
+    }
+  ],
+  "primaryVideoCounts": {
+    "V1": 6,
+    "V2": 6,
+    "V3": 6,
+    "V4": 6,
+    "V5": 6
+  },
+  "humanReviewStatus": {
+    "pending": 30
+  },
+  "publicationReady": false,
+  "checks": [
+    {
+      "name": "exactly 30 authored source records",
+      "pass": true,
+      "detail": "30"
+    },
+    {
+      "name": "source records use exactly the native five-field shape",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "IDs, titles, authored levels, order, and primary mappings match the matrix",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "10 N3, 10 N2, and 10 N1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "native lane convention",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "editorial sidecar has exactly the same 30 IDs in order",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every sidecar record carries the required editorial fields",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "six primary articles per video",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "YouTube in factSources is limited to explicit V4 film-object observation, never ancient/scientific authority",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every primary video is explicitly present in inspirationSources",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "fictional diaries, dialogues, and composite voices are disclosed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all six V5 records preserve the unavailable/unverified boundary",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all 30 meet their UniDic target ranges and agree source → index → generated tokens/ruby/paragraphs/grading",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the native catalog is registered in both the committed index and current article builder",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "all 70 shelf rows satisfy the fail-closed rights contract",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "shelf index has exactly 70 lean rows",
+      "pass": true,
+      "detail": "70"
+    },
+    {
+      "name": "first 40 IDs, order, index rows, source texts, and generated records match ca07a8e",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the 7,910-word prefix and first-40 lookup behavior preserve ca07a8e",
+      "pass": true,
+      "detail": "2098 lookup bases; 7910 compatibility word records"
+    },
+    {
+      "name": "archive, examples bank, forbidden app files, drift data, and Pages workflow are ca07a8e-identical",
+      "pass": true,
+      "detail": "694 archive bodies; 40 example-bank files"
+    },
+    {
+      "name": "no forbidden app-side English-title wiring was added",
+      "pass": true,
+      "detail": "Japanese titles render from index data; TITLES_EN wiring is left to the trunk keeper"
+    },
+    {
+      "name": "no reading-pack runtime identity, component, badge, or CSS remains",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no competing reader deliverable exists",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest reports 70 passages and article files",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "current standalone carries the same 70-entry shelf while excluding archive/examples data",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "cross-article near-copy tripwire",
+      "pass": true,
+      "detail": "longest shared normalized run: 29 chars (bunki-graded-n3-thanks-before-help / bunki-essay-n1-miracle-testimony)"
+    },
+    {
+      "name": "current standalone rebuild is byte-identical and the unpatched 26/40 article-builder gap is measured",
+      "pass": true,
+      "detail": "standalone exit 0; canonical=26; wp9b=40"
+    },
+    {
+      "name": "human Japanese editorial publication gate",
+      "pass": null,
+      "detail": "blocked until approved: {'pending': 30}"
+    }
+  ],
+  "failures": []
+}
