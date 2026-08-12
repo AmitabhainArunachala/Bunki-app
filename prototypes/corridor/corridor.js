@@ -437,7 +437,10 @@ const S = {
   // bar's ▸ arrow can undo a back().
   navOpen: false,
   fwd: null,
-  dials: { kanji: 0, furigana: 2, spacing: 0 },
+  /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
+   * survive the session, and the baseline is bare kanji with readings on
+   * request (ふりがな タップで), not readings everywhere. */
+  dials: { kanji: 0, furigana: 1, spacing: 0 },
   // entry: 'drift' — The Walk's first step is arriving in the living universe
   variants: {
     cards: 'mcd',
@@ -548,6 +551,7 @@ const STORE_KNOWN_KEYS = [
   'stats',
   'readDone',
   'readerPos',
+  'dials',
 ];
 
 function plainRecord(value) {
@@ -609,6 +613,11 @@ function loadStore() {
   if (plainRecord(s.stats)) S.stats = s.stats;
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
+  if (plainRecord(s.dials)) {
+    for (const key of ['kanji', 'furigana', 'spacing']) {
+      if ([0, 1, 2].includes(s.dials[key])) S.dials[key] = s.dials[key];
+    }
+  }
   S.storeExtras = Object.fromEntries(
     Object.entries(s).filter(([key]) => !STORE_KNOWN_KEYS.includes(key)),
   );
@@ -636,6 +645,7 @@ function saveStore() {
         stats: S.stats,
         readDone: S.readDone,
         readerPos: S.readerPos,
+        dials: S.dialsUrlOverride ? S.dialsStored : S.dials,
       }),
     );
     S.storeError = null;
@@ -1362,7 +1372,13 @@ async function boot() {
   setKairoTheme(themeId());
   if (params.get('dials')) {
     const [k, f, s] = params.get('dials').split(',').map(Number);
-    if ([k, f, s].every((n) => n >= 0 && n <= 2)) S.dials = { kanji: k, furigana: f, spacing: s };
+    if ([k, f, s].every((n) => n >= 0 && n <= 2)) {
+      // a URL override steers THIS session only — the learner's stored
+      // choice stays untouched until they move a dial themselves
+      S.dialsStored = { ...S.dials };
+      S.dialsUrlOverride = true;
+      S.dials = { kanji: k, furigana: f, spacing: s };
+    }
   }
   if (S.variants.entry === 'field') S.view = 'entry';
   if (S.variants.entry === 'drift') S.view = 'drift';
@@ -2358,6 +2374,8 @@ function dialRow(labelJa, labelEn, key, options) {
     b.setAttribute('aria-pressed', String(S.dials[key] === index));
     b.addEventListener('click', () => {
       S.dials[key] = index;
+      S.dialsUrlOverride = false; // a real hand on the dial IS the choice
+      saveStore(); // the chosen setting survives the session
       render();
     });
     seg.append(b);
@@ -2605,6 +2623,7 @@ function wireTokenGestures(span, token, index, p) {
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
     swallowClickUntil = Date.now() + 700;
+    (S.entered ||= new Set()).add(index); // the next tap can fold back
     obsLog('tap', obsKey, 3, p.id);
     if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     go(
@@ -2623,6 +2642,7 @@ function wireTokenGestures(span, token, index, p) {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
+    (S.entered ||= new Set());
     const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
     const hasEn = S.glossed.has(index);
     if (!hasReading) {
@@ -2637,7 +2657,16 @@ function wireTokenGestures(span, token, index, p) {
       paintTok(span, token, index);
       return;
     }
-    openFull(modality, false);
+    if (!S.entered.has(index)) {
+      openFull(modality, false);
+      return;
+    }
+    // the way back (operator, 2026-08-12): after the full entry has been
+    // seen, one more tap folds the word to plain kanji — ladder reset
+    S.revealed.delete(index);
+    S.glossed.delete(index);
+    S.entered.delete(index);
+    paintTok(span, token, index);
   };
   const clear = () => {
     clearTimeout(miniTimer);
@@ -2793,7 +2822,10 @@ function renderReader(main) {
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
       wordRow(displayPairs(token), {
-        furigana: S.dials.furigana,
+        // a per-word reveal survives a full re-render even at ふりがな なし
+        // (mode 0 never prints rt, so a revealed token is promoted to 1 —
+        // the same promotion paintTok applies on the spot)
+        furigana: S.dials.furigana === 0 && S.revealed?.has(index) ? 1 : S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),
     );
@@ -6417,11 +6449,10 @@ function renderProbe(main) {
   const context = findExamples(it.w, 1)[0];
   if (context) {
     const line = el('p', 'probe-context');
-    // full ladder on the neighbours; the probed word itself stays sealed
-    // until the reveal — its reading is the question
+    // full ladder on the neighbours; the probed word itself stays sealed —
+    // its reading is the question, and afterward it lives on the answer face
     renderSentenceTokens(line, context.tokens, {
       targetId: it.w,
-      maskTargetLadder: !pr.revealed,
       contextId: context.passage || 'bank',
     });
     face.append(line);
@@ -6716,15 +6747,19 @@ async function ensureBankExamples(word) {
 
 /* ---------------------------------- the reader's ladder, outside the reader
  * Any sentence the app shows — a sheet's 用例, a review cloze, a probe's
- * context line — carries the same click grammar as the reader: first tap
- * ふりがな, second tap the English gloss beneath, third tap the full entry.
- * Each sentence keeps its own quiet ladder state; taps land in the obslog
- * with the sentence's own context id. */
+ * context line — carries the reader's click grammar, and starts BARE:
+ * no furigana until it is asked for (operator's law, 2026-08-12 — the
+ * sentence is the exercise; readings on request only, whatever the
+ * reader's own dial says). First tap ふりがな, second tap the English
+ * gloss beneath, third tap the full entry — and after the entry, one
+ * more tap folds the word back to plain kanji. Each sentence keeps its
+ * own quiet ladder state; taps land in the obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
   const revealed = new Set();
   const glossed = new Set();
+  const entered = new Set();
   tokens.forEach((token, index) => {
     if (!token.c || !token.f?.length) {
       container.append(document.createTextNode(token.s));
@@ -6735,25 +6770,18 @@ function renderSentenceTokens(container, tokens, opts = {}) {
         container.append(document.createTextNode('＿＿＿'));
         return;
       }
-      if (opts.maskTargetLadder) {
-        // the probe asks THIS word — its reading must not be one tap away
-        container.append(el('span', 'example-hit', token.s));
-        return;
-      }
-      const hit = el('span', 'example-hit');
-      hit.append(wordRow(displayPairs(token), { furigana: S.dials.furigana, revealed: revealed.has(index) }));
-      container.append(hit);
+      // the asked/answered word stands bare and sealed — its reading lives
+      // on the answer face, never one accidental tap away
+      container.append(el('span', 'example-hit', token.s));
       return;
     }
     const span = el('span', 'tok content sentence-tok');
     const paint = () => {
       span.textContent = '';
-      // a tapped word shows its reading whatever the dial says — the tap IS
-      // the request (rubyNode's mode 0 never prints rt, so promote to 1)
       span.append(
         wordRow(displayPairs(token), {
-          furigana: revealed.has(index) ? 1 : S.dials.furigana,
-          revealed: S.dials.furigana === 2 || revealed.has(index),
+          furigana: revealed.has(index) ? 1 : 0,
+          revealed: revealed.has(index),
         }),
       );
       if (glossed.has(index)) {
@@ -6764,8 +6792,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     paint();
     span.addEventListener('click', (ev) => {
       ev.stopPropagation();
-      const hasReading = S.dials.furigana === 2 || revealed.has(index);
-      if (!hasReading) {
+      if (!revealed.has(index)) {
         revealed.add(index);
         obsLog('tap', srsKey('word', token.b), 1, contextId);
         paint();
@@ -6777,8 +6804,17 @@ function renderSentenceTokens(container, tokens, opts = {}) {
         paint();
         return;
       }
-      obsLog('tap', srsKey('word', token.b), 3, contextId);
-      go({ t: 'word', id: token.b });
+      if (!entered.has(index)) {
+        entered.add(index);
+        obsLog('tap', srsKey('word', token.b), 3, contextId);
+        go({ t: 'word', id: token.b });
+        return;
+      }
+      // the way back: fold the word to plain kanji, ladder reset
+      revealed.delete(index);
+      glossed.delete(index);
+      entered.delete(index);
+      paint();
     });
     container.append(span);
   });

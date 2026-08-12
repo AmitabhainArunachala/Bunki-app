@@ -649,7 +649,9 @@ async function main() {
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
   );
   if (enIdx >= 0) {
-    // furigana defaults to つねに here, so one tap goes straight to English
+    // furigana defaults to タップで — first tap reads, second sets English
+    await tap(page, '#reader .tok.content', enIdx);
+    await page.waitForTimeout(150);
     await tap(page, '#reader .tok.content', enIdx);
     await page.waitForTimeout(150);
     const glossFit = await page.evaluate(`(() => {
@@ -743,6 +745,10 @@ async function main() {
     `${panel.headword}: ${panel.senses} senses`);
   await shoot(page, shotsDir, '03-word-panel');
   report.steps.push({ step: 3, name: 'click grammar + entry', shot: '03-word-panel.png', panel });
+  // the dial change above now PERSISTS (dials ride the envelope) — put the
+  // baseline back so later walks meet the app as a fresh phone would
+  await page.locator('[data-dial="furigana:1"]').dispatchEvent('click').catch(() => {});
+  await page.waitForTimeout(120);
 
   // now the surface that matters: a word that HAS semantic neighbours
   await open('?entry=shelf');
@@ -955,6 +961,12 @@ async function main() {
     await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
     await page.waitForSelector('#sheet .card-preview');
+    // two one-time sheet swaps may follow the open (deep senses, bank
+    // examples) — let them land before touching located elements
+    await page
+      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+      .catch(() => {});
+    await page.waitForTimeout(600);
     await page.locator('#sheet .card-preview').scrollIntoViewIfNeeded();
     await page.waitForTimeout(120);
     const card = await page.evaluate(`(() => {
@@ -1457,16 +1469,76 @@ async function main() {
   check('the bank indexes far beyond the core dictionary',
     bankManifest.coverage.indexed_forms > bankManifest.coverage.targets,
     `${bankManifest.coverage.indexed_forms} indexed forms vs ${bankManifest.coverage.targets} core targets`);
-  await tap(page, '#sheet-back');
+  // bare by default, and the way back (operator's law, 2026-08-12): the app
+  // boots with readings on request; the tap cycle ends where it began.
+  // Self-baselining: earlier sections may have exercised the (persisted)
+  // dials — this asserts the FACTORY default, so clear any stored choice.
+  await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    delete e.dials;
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify(e));
+  })()`);
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await settleReader(page);
+  const bareBoot = await page.evaluate(`(() => ({
+    visible: [...document.querySelectorAll('#reader rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
+    hidden: document.querySelectorAll('#reader rt.hidden-rt').length,
+  }))()`);
+  check('the reader boots bare — ふりがな waits for the tap',
+    bareBoot.visible === 0 && bareBoot.hidden > 10,
+    `${bareBoot.visible} shown · ${bareBoot.hidden} waiting`);
+  const cycleTap = () => page.evaluate(`(() => {
+    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt'));
+    t.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }));
+    t.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 10, clientY: 10 }));
+  })()`);
+  const cycleState = () => page.evaluate(`(() => {
+    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')) ||
+      [...document.querySelectorAll('#reader .tok.content')][0];
+    return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en') };
+  })()`);
+  await cycleTap();
+  await page.waitForTimeout(150);
+  const cyc1 = await cycleState();
+  await cycleTap();
+  await page.waitForTimeout(150);
+  await cycleTap();
+  await page.waitForSelector('#sheet', { timeout: 8000 });
+  await page.waitForTimeout(300);
+  await page.evaluate(
+    `(document.querySelector('#sheet-back') || document.querySelector('#sheet-close'))?.click()`,
+  );
+  await page.waitForTimeout(300);
+  await cycleTap();
+  await page.waitForTimeout(200);
+  const cyc4 = await cycleState();
+  check('the tap cycle returns home — ふりがな · gloss · entry · plain kanji again',
+    cyc1.rt >= 1 && cyc4.rt === 0 && !cyc4.gloss,
+    `reveal rt=${cyc1.rt} → after entry+tap rt=${cyc4.rt} gloss=${cyc4.gloss}`);
+  await page.evaluate(`document.querySelector('#dials-toggle')?.click()`);
+  await page.waitForSelector('[data-dial="furigana:2"]', { state: 'attached', timeout: 8000 });
+  await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
+  await page.waitForTimeout(300);
+  const dialPersist = await page.evaluate(
+    `JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').dials?.furigana`,
+  );
+  check('文字設定 rides the envelope — a chosen dial survives the session',
+    dialPersist === 2,
+    `stored furigana=${dialPersist}`);
+  await page.locator('[data-dial="furigana:1"]').dispatchEvent('click'); // restore the baseline
+  await page.waitForTimeout(200);
+
+  // into the review room: the queue may open on a kanji card from an
+  // earlier step — grade through to the first WORD card, whose answer face
+  // must carry living sentences (chosen context via its article's async
+  // load, or bank via its shard)
   await tap(page, '#back');
   await page.waitForSelector('#tray');
   await tap(page, '#tray');
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
   await page.waitForSelector('#reveal, .review-cloze', { timeout: 10000 });
-  // the queue may open on a kanji card from an earlier step — grade through
-  // to the first WORD card, whose answer face must carry living sentences
-  // (chosen context via its article's async load, or bank via its shard)
   let answerFace = { lines: 0, live: 0, word: '' };
   for (let cardN = 0; cardN < 6; cardN++) {
     await page.waitForSelector('#reveal', { timeout: 10000 });

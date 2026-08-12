@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-11 23:56",
+          "2026-08-12 00:45",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-12 00:01",
+          "2026-08-12 00:50",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-12 00:05",
+          "2026-08-12 00:54",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-20 23:55",
+          "in 7 d",
+          "2026-08-19 00:44",
           "8.30"
         ]
       ]
@@ -176,8 +176,8 @@
       "step": 6,
       "name": "return",
       "shot": "06-return-to-place.png",
-      "scrollBefore": 269,
-      "scrollAfter": 269
+      "scrollBefore": 287,
+      "scrollAfter": 287
     }
   ],
   "measurements": {
@@ -5754,7 +5754,7 @@
   "dials": {
     "baseline": {
       "rt": 306,
-      "hiddenRt": 0,
+      "hiddenRt": 306,
       "spacing": "reader",
       "text": "2005\n年ねん\n7\n月がつ\n14日か、南みなみアフリカ\n共和きょうわ\n国こくダ"
     },
@@ -6054,9 +6054,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 418,
+  "loadMs": 395,
   "summary": {
-    "total": 108,
+    "total": 111,
     "failed": 0
   },
   "results": [
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.72000122070312,\"y\":570.47998046875,\"productive\":true}"
+      "detail": "{\"x\":147.5800018310547,\"y\":570.5599975585938,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 418 ms"
+      "detail": "40 texts, ready in 395 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,12 +6323,12 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
       "pass": true,
-      "detail": "scrollY 269 → 269, sheet closed=true"
+      "detail": "scrollY 287 → 287, sheet closed=true"
     },
     {
       "name": "variant A · mcd renders the target both ways",
@@ -6523,7 +6523,7 @@
     {
       "name": "rows persist inside the exported envelope with ms timestamps",
       "pass": true,
-      "detail": "3 rows appended after 25 existing"
+      "detail": "3 rows appended after 26 existing"
     },
     {
       "name": "a tap is friction, never a grade — no FSRS state minted",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786492575772,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786495547607,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6594,6 +6594,21 @@
       "name": "the bank indexes far beyond the core dictionary",
       "pass": true,
       "detail": "40082 indexed forms vs 22934 core targets"
+    },
+    {
+      "name": "the reader boots bare — ふりがな waits for the tap",
+      "pass": true,
+      "detail": "0 shown · 306 waiting"
+    },
+    {
+      "name": "the tap cycle returns home — ふりがな · gloss · entry · plain kanji again",
+      "pass": true,
+      "detail": "reveal rt=1 → after entry+tap rt=0 gloss=false"
+    },
+    {
+      "name": "文字設定 rides the envelope — a chosen dial survives the session",
+      "pass": true,
+      "detail": "stored furigana=2"
     },
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
