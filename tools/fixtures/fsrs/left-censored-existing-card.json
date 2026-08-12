@@ -1,0 +1,53 @@
+{
+  "v": 1,
+  "fixture": {
+    "kind": "corridor-v1-left-censored-pre-existing-srs-card",
+    "note": "S.srs predates the first retained S.revlog row for this card"
+  },
+  "taken": [],
+  "srs": {
+    "word:pre-existing": {
+      "due": "2025-02-07T12:10:00.000Z",
+      "stability": 2.51941463,
+      "difficulty": 8.58482389,
+      "elapsed_days": 37,
+      "scheduled_days": 0,
+      "reps": 9,
+      "lapses": 2,
+      "learning_steps": 0,
+      "state": 3,
+      "last_review": "2025-02-07T12:00:00.000Z"
+    }
+  },
+  "revlog": [
+    [
+      1735732800000,
+      "word:pre-existing",
+      3,
+      2,
+      12.125,
+      0.9114,
+      14.25,
+      5.75,
+      37.0932,
+      5.7395,
+      37,
+      1738929600000
+    ],
+    [
+      1738929600000,
+      "word:pre-existing",
+      1,
+      2,
+      37,
+      0.9002,
+      37.0932,
+      5.7395,
+      2.5194,
+      8.5848,
+      0,
+      1738930200000
+    ]
+  ],
+  "obslog": []
+}
