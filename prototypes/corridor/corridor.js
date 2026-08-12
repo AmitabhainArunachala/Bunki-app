@@ -2538,8 +2538,18 @@ function inlineGloss(rec) {
     .map((s) => s.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim())
     .filter(Boolean);
   if (!candidates.length) return rec.m[0];
-  let best = candidates.reduce((a, b) => (b.length < a.length ? b : a));
+  // THE FIRST SENSE WINS. JMdict orders senses by importance; picking the
+  // shortest string across senses surfaced tag-stripped minor senses as THE
+  // meaning — 半島 glossed "Korea" instead of "peninsula" (operator, on a
+  // real phone, 2026-08-12). Shortening happens WITHIN the first sense
+  // (comma cut); a later sense is a last resort only when the first cannot
+  // be made to fit at all.
+  let best = candidates[0];
   if (best.length > 18 && best.includes(',')) best = best.split(',')[0].trim();
+  if (best.length > 24) {
+    const shorter = candidates.slice(1).find((c) => c.length <= 18);
+    if (shorter) best = shorter;
+  }
   return best;
 }
 
@@ -2693,19 +2703,26 @@ function wireTokenGestures(span, token, index, p) {
     clear();
     down = null;
   });
+  let heldAt = 0;
   span.addEventListener('pointerup', () => {
     if (!down) return;
     const held = Date.now() - down.at;
     down = null;
     clear();
-    if (held >= GESTURE.MINI_MS) return; // mini stays up; tap it for the full entry
-    activate('pointer');
+    // a hold's release still synthesises a click — mark it inert
+    if (held >= GESTURE.MINI_MS) heldAt = Date.now();
   });
   span.addEventListener('click', (event) => {
-    // Pointer activation was handled on pointerup so its reveal is immediate.
-    // Native keyboard/switch/AT activation arrives as a click with detail 0.
-    if (event.detail !== 0 || Date.now() < swallowClickUntil) return;
-    activate('keyboard');
+    // Activation lives on the CLICK: inside scrollable surfaces iOS
+    // pointercancels a plain tap and pointerup never arrives — activating
+    // there left real fingers dead (operator's phone, 2026-08-12). The
+    // click still fires after a cancel; scrolls fire no click at all.
+    if (Date.now() < swallowClickUntil) return;
+    if (heldAt && Date.now() - heldAt < 800) {
+      heldAt = 0;
+      return;
+    }
+    activate(event.detail === 0 ? 'keyboard' : 'pointer');
   });
   return {
     target,
@@ -5141,8 +5158,11 @@ function nodeTitle(node) {
 function renderSentenceNode(sheet, node) {
   sheet.append(withEn(el('p', 'eyebrow', '文'), 'one sentence, read closely', 'en-inline'));
   const line = el('p', 'sent-reader');
+  // on its own page the sentence is ALL reader: the highlighted word keeps
+  // its mark but joins the ladder like every neighbour
   renderSentenceTokens(line, node.tokens, {
     targetId: node.target || null,
+    targetLive: true,
     contextId: node.passage || 'bank',
   });
   sheet.append(line);
@@ -6810,17 +6830,18 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(document.createTextNode(token.s));
       return;
     }
-    if (target && token.b === target) {
-      if (opts.hideTarget) {
-        container.append(document.createTextNode('＿＿＿'));
-        return;
-      }
+    const isTarget = target && token.b === target;
+    if (isTarget && opts.hideTarget) {
+      container.append(document.createTextNode('＿＿＿'));
+      return;
+    }
+    if (isTarget && !opts.targetLive) {
       // the asked/answered word stands bare and sealed — its reading lives
       // on the answer face, never one accidental tap away
       container.append(el('span', 'example-hit', token.s));
       return;
     }
-    const span = el('span', 'tok content sentence-tok');
+    const span = el('span', 'tok content sentence-tok' + (isTarget ? ' example-hit' : ''));
     const paint = () => {
       span.textContent = '';
       span.append(
@@ -6886,18 +6907,23 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       clearHold();
       down = null;
     });
+    let heldAt = 0;
     span.addEventListener('pointerup', () => {
       if (!down) return;
       const held = Date.now() - down.at;
       down = null;
       clearHold();
-      if (held >= GESTURE.MINI_MS) return; // the mini stays up; tap it for the entry
-      cycle();
+      if (held >= GESTURE.MINI_MS) heldAt = Date.now(); // release click stays inert
     });
     span.addEventListener('click', (ev) => {
       ev.stopPropagation();
-      // pointer taps were handled on pointerup; this path serves keyboard/AT
-      if (ev.detail !== 0 || Date.now() < swallowClickUntil) return;
+      // activation on the CLICK — it survives the pointercancel a scrollable
+      // sheet hands a plain tap on iOS (the pointerup path never fires there)
+      if (Date.now() < swallowClickUntil) return;
+      if (heldAt && Date.now() - heldAt < 800) {
+        heldAt = 0;
+        return;
+      }
       cycle();
     });
     container.append(span);

@@ -947,6 +947,9 @@ body.ginga #drift-layer #hint {
   text-align: inherit;
   -webkit-appearance: none;
   appearance: none;
+  /* taps must stay taps on iOS: no double-tap zoom delay, and fewer
+   * pointercancels inside scrollable sheets */
+  touch-action: manipulation;
 }
 
 /* Inline Japanese must keep natural spacing, so one-character tokens cannot

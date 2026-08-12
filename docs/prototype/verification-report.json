@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-12 04:29",
+          "2026-08-12 05:32",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-12 04:34",
+          "2026-08-12 05:37",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-12 04:38",
+          "2026-08-12 05:41",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-21 04:28",
+          "in 7 d",
+          "2026-08-19 05:31",
           "8.30"
         ]
       ]
@@ -6054,9 +6054,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 586,
+  "loadMs": 710,
   "summary": {
-    "total": 115,
+    "total": 116,
     "failed": 0
   },
   "results": [
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.3699951171875,\"y\":570.0999755859375,\"productive\":true}"
+      "detail": "{\"x\":150.44000244140625,\"y\":569.2100219726562,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6093,7 +6093,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 87px; mean tether 163 → 163px"
+      "detail": "centre moved 83px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 586 ms"
+      "detail": "40 texts, ready in 710 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786508980760,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786512787447,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6588,12 +6588,17 @@
     {
       "name": "the sentence opens on its own page — large, every token alive",
       "pass": true,
-      "detail": "1 live tokens · en=true"
+      "detail": "2 live tokens · en=true"
     },
     {
       "name": "戻る from the sentence page returns one step, to the word",
       "pass": true,
       "detail": "sheet after back: word:学校"
+    },
+    {
+      "name": "the first sense wins — 半島 glosses peninsula, never Korea",
+      "pass": true,
+      "detail": "inline gloss: \"peninsula\" (real taps on the sentence page)"
     },
     {
       "name": "capture offers 語だけ・この文・段落 and the choice persists",
@@ -6633,7 +6638,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     }
   ]
 }

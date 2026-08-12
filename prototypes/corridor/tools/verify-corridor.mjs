@@ -1465,6 +1465,27 @@ async function main() {
     `sheet after back: ${backToWord}`);
   await shoot(page, shotsDir, '17-example-bank');
 
+  // the first sense wins — 半島 is the canary (its JMdict entry carries a
+  // short minor sense, "Korea", that a shortest-wins gloss once surfaced)
+  await open('?entry=shelf');
+  await page.fill('#search', '半島');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result="word:半島"]');
+  await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
+  await page.waitForTimeout(400);
+  await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
+  await page.waitForSelector('#sheet .sent-reader .sentence-tok.example-hit', { timeout: 8000 });
+  await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
+  await page.waitForTimeout(200);
+  await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
+  await page.waitForTimeout(300);
+  const hantoGloss = await page.evaluate(
+    `document.querySelector('#sheet .sent-reader .sentence-tok.example-hit .tok-en')?.textContent ?? null`,
+  );
+  check('the first sense wins — 半島 glosses peninsula, never Korea',
+    hantoGloss === 'peninsula',
+    `inline gloss: "${hantoGloss}" (real taps on the sentence page)`);
+
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
   await open('?entry=shelf');
   await tap(page, '.shelf-item');
@@ -1518,6 +1539,8 @@ async function main() {
     const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt'));
     t.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }));
     t.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 10, clientY: 10 }));
+    // activation rides the click a real browser sends after the tap
+    t.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
   })()`);
   const cycleState = () => page.evaluate(`(() => {
     const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')) ||
