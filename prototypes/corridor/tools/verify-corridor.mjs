@@ -676,20 +676,21 @@ async function main() {
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
 
-  // 3rd tap → carries into the full entry (ratified click grammar)
+  // 3rd tap → the circle closes: plain kanji again, no sheet (operator
+  // ruling 2026-08-12 — the entry moved to the holds)
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
-  const afterThird = await page.evaluate(`(() => ({
-    sheet: document.querySelector('#sheet')?.dataset.node ?? '',
-    named: document.querySelector('#sheet')?.getAttribute('aria-label') ?? '',
-  }))()`);
-  check('grammar · a third tap carries into the full entry',
-    afterThird.sheet.startsWith('word:') && afterThird.named.length > 0,
-    `${afterThird.sheet} · ${afterThird.named}`);
-  if (afterThird.sheet) {
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(120);
-  }
+  const afterThird = await page.evaluate(`(() => {
+    const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
+    return {
+      sheet: document.querySelector('#sheet')?.dataset.node ?? '',
+      rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length,
+      gloss: !!t.querySelector('.tok-en'),
+    };
+  })()`);
+  check('grammar · a third tap closes the circle — plain kanji, no sheet',
+    afterThird.sheet === '' && afterThird.rt === 0 && !afterThird.gloss,
+    JSON.stringify(afterThird));
 
   // long press → the floating mini-dictionary; a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
@@ -767,6 +768,12 @@ async function main() {
   if (await seedChip.count()) {
     await tap(page, '#sheet .chip');
     await page.waitForTimeout(160);
+    // the hopped-to word's sheet gets its own one-time swaps (deep senses,
+    // bank examples) — settle before step 4 walks its rows
+    await page
+      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
+      .catch(() => {});
+    await page.waitForTimeout(600);
   }
   const semPanel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
@@ -1302,7 +1309,7 @@ async function main() {
   await page.waitForTimeout(250);
   await tap(page, '#reader .tok.content', 3);
   await page.waitForTimeout(250);
-  await tap(page, '#reader .tok.content', 3);
+  await holdWord(page, '#reader .tok.content', 3); // the entry lives on the hold now
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
   const obs = await page.evaluate(`(() => {
@@ -1311,10 +1318,12 @@ async function main() {
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
-  const sameWord = ladder.length === 3 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  check('three taps climb the ladder — ふりがな, gloss, entry — one row each',
-    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3',
-    ladder.map((r) => `${r[2]}@${r[4]} depth ${r[3]}`).join(' → ') || 'no rows');
+  const sameWord = ladder.length === 4 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  // 1,2 from the taps; the hold passes THROUGH the mini (its gloss is real
+  // assistance — an honest 2) on the way to the full entry's 3
+  check('two taps and a hold — ふりがな, gloss, mini, entry — every rung logged',
+    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,2,3',
+    ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
     `${obs.rows.length} rows appended after ${obsBefore} existing`);
@@ -1437,6 +1446,23 @@ async function main() {
   check('example tokens climb the reader ladder — ふりがな, then English',
     !!ladderProof && ladderProof.gloss,
     JSON.stringify(ladderProof));
+  // every example sentence carries a door into its own minimum reader —
+  // and 戻る from there returns exactly one step, to the word's entry
+  await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
+  await page.waitForSelector('#sheet .sent-reader', { timeout: 8000 });
+  const sentPage = await page.evaluate(`(() => ({
+    toks: document.querySelectorAll('#sheet .sent-reader .sentence-tok').length,
+    en: !!document.querySelector('#sheet .sent-reader-en'),
+  }))()`);
+  check('the sentence opens on its own page — large, every token alive',
+    sentPage.toks >= 1,
+    `${sentPage.toks} live tokens · en=${sentPage.en}`);
+  await page.evaluate(`document.querySelector('#sheet-back')?.click()`);
+  await page.waitForTimeout(300);
+  const backToWord = await page.evaluate(`document.querySelector('#sheet')?.dataset.node ?? 'closed'`);
+  check('戻る from the sentence page returns one step, to the word',
+    backToWord === 'word:学校',
+    `sheet after back: ${backToWord}`);
   await shoot(page, shotsDir, '17-example-bank');
 
   // capture scope: 語だけ · この文 · 段落 — the choice rides the card
@@ -1503,19 +1529,28 @@ async function main() {
   const cyc1 = await cycleState();
   await cycleTap();
   await page.waitForTimeout(150);
-  await cycleTap();
-  await page.waitForSelector('#sheet', { timeout: 8000 });
-  await page.waitForTimeout(300);
-  await page.evaluate(
-    `(document.querySelector('#sheet-back') || document.querySelector('#sheet-close'))?.click()`,
-  );
-  await page.waitForTimeout(300);
+  const cyc2 = await cycleState();
   await cycleTap();
   await page.waitForTimeout(200);
-  const cyc4 = await cycleState();
-  check('the tap cycle returns home — ふりがな · gloss · entry · plain kanji again',
-    cyc1.rt >= 1 && cyc4.rt === 0 && !cyc4.gloss,
-    `reveal rt=${cyc1.rt} → after entry+tap rt=${cyc4.rt} gloss=${cyc4.gloss}`);
+  const cyc3 = await cycleState();
+  check('the tap circle closes — ふりがな · gloss · plain kanji again',
+    cyc1.rt >= 1 && cyc2.gloss && cyc3.rt === 0 && !cyc3.gloss,
+    `rt=${cyc1.rt} → gloss=${cyc2.gloss} → back to rt=${cyc3.rt} gloss=${cyc3.gloss}`);
+  // definitions live on the holds: a short hold floats the mini, a tap on it
+  // (or a long hold) opens the full entry — and 戻る works IMMEDIATELY
+  await touchAt(page, '#reader .tok.content', 4, 700); // past MINI_MS, short of FULL_MS
+  await page.waitForSelector('#mini', { timeout: 6000 });
+  const miniUp = await page.evaluate(`(() => ({
+    word: document.querySelector('#mini .mini-word')?.textContent ?? '',
+    gloss: !!document.querySelector('#mini .mini-gloss'),
+  }))()`);
+  check('a short hold floats the simple definition', miniUp.word.length > 0 && miniUp.gloss, `mini: ${miniUp.word}`);
+  await page.evaluate(`document.querySelector('#mini .mini-entry')?.click()`);
+  await page.waitForSelector('#sheet', { timeout: 8000 });
+  await page.evaluate(`document.querySelector('#sheet-back')?.click()`); // immediately — no dead window
+  await page.waitForTimeout(300);
+  const backWorked = await page.evaluate(`!document.querySelector('#sheet')`);
+  check('戻る answers the very first tap after an entry opens', backWorked, 'sheet closed on the immediate back');
   await page.evaluate(`document.querySelector('#dials-toggle')?.click()`);
   await page.waitForSelector('[data-dial="furigana:2"]', { state: 'attached', timeout: 8000 });
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');

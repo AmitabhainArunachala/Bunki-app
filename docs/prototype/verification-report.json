@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year",
-        "senses": 3,
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-12 00:45",
+          "2026-08-12 04:29",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-12 00:50",
+          "2026-08-12 04:34",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-12 00:54",
+          "2026-08-12 04:38",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 7 d",
-          "2026-08-19 00:44",
+          "in 9 d",
+          "2026-08-21 04:28",
           "8.30"
         ]
       ]
@@ -6054,9 +6054,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 395,
+  "loadMs": 586,
   "summary": {
-    "total": 111,
+    "total": 115,
     "failed": 0
   },
   "results": [
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.5800018310547,\"y\":570.5599975585938,\"productive\":true}"
+      "detail": "{\"x\":148.3699951171875,\"y\":570.0999755859375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6093,7 +6093,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 89px; mean tether 163 → 163px"
+      "detail": "centre moved 87px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 395 ms"
+      "detail": "40 texts, ready in 586 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6236,9 +6236,9 @@
       "detail": "沿線 → \"places alongside a railway line\""
     },
     {
-      "name": "grammar · a third tap carries into the full entry",
+      "name": "grammar · a third tap closes the circle — plain kanji, no sheet",
       "pass": true,
-      "detail": "word:月 · 月 full entry"
+      "detail": "{\"sheet\":\"\",\"rt\":0,\"gloss\":false}"
     },
     {
       "name": "grammar · a long press floats the mini-dictionary",
@@ -6273,7 +6273,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 3 senses"
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6516,14 +6516,14 @@
       "detail": "particle:de — で　particle, 2 examples"
     },
     {
-      "name": "three taps climb the ladder — ふりがな, gloss, entry — one row each",
+      "name": "two taps and a hold — ふりがな, gloss, mini, entry — every rung logged",
       "pass": true,
-      "detail": "word:開催@wikinews:1403 depth 1 → word:開催@wikinews:1403 depth 2 → word:開催@wikinews:1403 depth 3"
+      "detail": "depth 1 → depth 2 → depth 2 → depth 3 (word:開催@wikinews:1403)"
     },
     {
       "name": "rows persist inside the exported envelope with ms timestamps",
       "pass": true,
-      "detail": "3 rows appended after 26 existing"
+      "detail": "4 rows appended after 25 existing"
     },
     {
       "name": "a tap is friction, never a grade — no FSRS state minted",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786495547607,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786508980760,\"probe\",\"word:金屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6586,6 +6586,16 @@
       "detail": "{\"rt\":1,\"gloss\":true}"
     },
     {
+      "name": "the sentence opens on its own page — large, every token alive",
+      "pass": true,
+      "detail": "1 live tokens · en=true"
+    },
+    {
+      "name": "戻る from the sentence page returns one step, to the word",
+      "pass": true,
+      "detail": "sheet after back: word:学校"
+    },
+    {
       "name": "capture offers 語だけ・この文・段落 and the choice persists",
       "pass": true,
       "detail": "{\"p\":\"wikinews:1403\",\"i\":19,\"scope\":\"sent\"}"
@@ -6601,9 +6611,19 @@
       "detail": "0 shown · 306 waiting"
     },
     {
-      "name": "the tap cycle returns home — ふりがな · gloss · entry · plain kanji again",
+      "name": "the tap circle closes — ふりがな · gloss · plain kanji again",
       "pass": true,
-      "detail": "reveal rt=1 → after entry+tap rt=0 gloss=false"
+      "detail": "rt=1 → gloss=true → back to rt=0 gloss=false"
+    },
+    {
+      "name": "a short hold floats the simple definition",
+      "pass": true,
+      "detail": "mini: 回"
+    },
+    {
+      "name": "戻る answers the very first tap after an entry opens",
+      "pass": true,
+      "detail": "sheet closed on the immediate back"
     },
     {
       "name": "文字設定 rides the envelope — a chosen dial survives the session",
@@ -6613,7 +6633,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     }
   ]
 }

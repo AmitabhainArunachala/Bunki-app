@@ -253,8 +253,20 @@ async function main() {
       `${beforeGlossBottom.toFixed(1)}px → ${afterGlossBottom.toFixed(1)}px`,
     );
     await touchAt(page, '#reader .tok.content', tokenIndex);
-    const pointerThird = await page.locator('#sheet').count();
-    check('pointer third target.activate carries into the full entry', pointerThird === 1);
+    // the circle grammar (2026-08-12): the third activation folds the word
+    // back to plain kanji — the full entry lives on the holds and the
+    // focus-alternatives door, both covered elsewhere in this suite
+    const pointerThirdState = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      lit: node.classList.contains('lit'),
+      gloss: Boolean(node.querySelector('.tok-en')),
+      sheet: Boolean(document.querySelector('#sheet')),
+    }));
+    check(
+      'pointer third target.activate closes the circle — plain kanji, no sheet',
+      !pointerThirdState.lit && !pointerThirdState.gloss && !pointerThirdState.sheet,
+      JSON.stringify(pointerThirdState),
+    );
+    const pointerThird = 0;
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
@@ -279,13 +291,17 @@ async function main() {
       await page.waitForTimeout(180);
     }
     const keyboardThird = await page.locator('#sheet').count();
+    const keyboardCircle = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      lit: node.classList.contains('lit'),
+      gloss: Boolean(node.querySelector('.tok-en')),
+    }));
     const keyboardReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
     check(
-      'keyboard/switch-shaped activation follows the same three target.activate transitions',
-      keyboardFocusable && keyboardThird === 1,
-      `focusable=${keyboardFocusable} sheet=${keyboardThird}`,
+      'keyboard/switch-shaped activation walks the same circle — three activations end plain',
+      keyboardFocusable && keyboardThird === 0 && !keyboardCircle.lit && !keyboardCircle.gloss,
+      `focusable=${keyboardFocusable} sheet=${keyboardThird} state=${JSON.stringify(keyboardCircle)}`,
     );
     check(
       'keyboard route differs only in provenance',

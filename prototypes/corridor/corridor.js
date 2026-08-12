@@ -2386,26 +2386,32 @@ function dialRow(labelJa, labelEn, key, options) {
 
 /* ------------------------------------------- the reader's click grammar
  * One discipline, carried from Drift (§8 of the design-language doc), tuned
- * by operator rounds 3–4 (2026-08-07). Taps are PROGRESSIVE, not timed:
+ * by operator rounds 3–4 (2026-08-07) and the circle ruling (2026-08-12).
+ * Taps are PROGRESSIVE, not timed, and they close a circle:
  *   1st tap        → furigana above           (instant — no double-tap wait)
  *   2nd tap        → English beneath          (a later tap, not a fast pair)
- *   3rd tap        → carries into the full entry
- * With ふりがな on つねに the first rung is already climbed, so the ladder is
- * two rungs: English, then the full entry. tapLadderHint() says which.
- *   long-press     → floating mini-dictionary
+ *   3rd tap        → back to plain kanji      (the circle closes; no one-way reveals)
+ * With ふりがな on つねに the first rung is already climbed, so the circle is
+ * two taps: English, then plain again. tapLadderHint() says which.
+ *   long-press     → floating mini-dictionary (the simple definition)
  *   keep holding   → the mini window morphs into the full entry
+ *   tap the mini   → the full entry
  * A moved pointer is a scroll, never a gesture. Every action applies to the
  * DOM directly — no full re-render, so the reader never stutters. */
 const GESTURE = { MINI_MS: 430, FULL_MS: 2100, MOVE_PX: 9 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
  * when the finger lifts — and it lands on whatever the new sheet put under
- * that spot, teleporting the reader a node deeper. Swallow that one click. */
+ * that spot, teleporting the reader a node deeper. Swallow exactly THAT
+ * click and no other: a 700 ms blanket also ate the very next real tap —
+ * 戻る pressed right after an entry opened simply died, and the retries
+ * cascaded the whole stack down to the drift (operator, 2026-08-12). */
 let swallowClickUntil = 0;
 document.addEventListener(
   'click',
   (ev) => {
     if (Date.now() < swallowClickUntil) {
+      swallowClickUntil = 0; // one ghost click, once
       ev.stopPropagation();
       ev.preventDefault();
     }
@@ -2546,13 +2552,13 @@ const readingsAlwaysOn = () => S.dials.furigana === 2;
 function tapLadderHint() {
   if (readingsAlwaysOn()) {
     return tx(
-      'ことばに触れると英語、もう一度で辞書が開く',
-      'tap a word for English — tap again to open its entry',
+      'ことばに触れると英語、もう一度で元どおり。長押しで辞書。',
+      'tap a word for English — again to clear it; hold for the dictionary',
     );
   }
   return tx(
-    '触れるとふりがな、もう一度で英語、三回目で辞書',
-    'tap a word for its reading — again for English, once more for its entry',
+    '触れるとふりがな、もう一度で英語、三回目で元どおり。長押しで辞書。',
+    'tap for the reading, again for English, a third time to clear — hold for the dictionary',
   );
 }
 
@@ -2565,8 +2571,8 @@ function tokenAccessibleLabel(token, index) {
   if (hasEnglish && record?.m?.length) parts.push(inlineGloss(record));
   parts.push(
     readingsAlwaysOn()
-      ? tx('もう一度で全項目。フォーカスで別の操作。', 'a further activation opens the full entry; focus for more actions')
-      : tx('三回目で全項目。フォーカスで別の操作。', 'third activation opens the full entry; focus for more actions'),
+      ? tx('もう一度で元どおり。長押しで全項目。フォーカスで別の操作。', 'a further activation clears; hold for the full entry; focus for more actions')
+      : tx('三回目で元どおり。長押しで全項目。フォーカスで別の操作。', 'a third activation clears; hold for the full entry; focus for more actions'),
   );
   return parts.filter(Boolean).join(' · ');
 }
@@ -2622,8 +2628,10 @@ function wireTokenGestures(span, token, index, p) {
   const obsKey = srsKey('word', token.b);
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
-    swallowClickUntil = Date.now() + 700;
-    (S.entered ||= new Set()).add(index); // the next tap can fold back
+    // a held finger's release will synthesize one click onto the new sheet —
+    // arm the swallow only then (arming on a button click would eat the
+    // user's NEXT real tap instead)
+    if (down) swallowClickUntil = Date.now() + 700;
     obsLog('tap', obsKey, 3, p.id);
     if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     go(
@@ -2642,7 +2650,6 @@ function wireTokenGestures(span, token, index, p) {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
-    (S.entered ||= new Set());
     const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
     const hasEn = S.glossed.has(index);
     if (!hasReading) {
@@ -2657,15 +2664,11 @@ function wireTokenGestures(span, token, index, p) {
       paintTok(span, token, index);
       return;
     }
-    if (!S.entered.has(index)) {
-      openFull(modality, false);
-      return;
-    }
-    // the way back (operator, 2026-08-12): after the full entry has been
-    // seen, one more tap folds the word to plain kanji — ladder reset
+    // the third tap closes the circle (operator, 2026-08-12): back to plain
+    // kanji, ladder reset. Definitions live on the holds — a short hold for
+    // the mini, a long hold (or a tap on the mini) for the full entry.
     S.revealed.delete(index);
     S.glossed.delete(index);
-    S.entered.delete(index);
     paintTok(span, token, index);
   };
   const clear = () => {
@@ -4356,7 +4359,8 @@ function wireParticleGestures(span, particle) {
   const target = { kind: 'particle', id: particle.id };
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
-    swallowClickUntil = Date.now() + 700;
+    // arm only while a finger is down — its release ghosts one click
+    if (down) swallowClickUntil = Date.now() + 700;
     if (emitAction) interaction({ kind: 'entry.open', target }, modality, 'reader-particle');
     go({ t: 'particle', id: particle.id }, { invoker: span });
   };
@@ -5124,7 +5128,46 @@ function nodeTitle(node) {
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'catalog') return catalogLabel(node.by, node.value);
+  if (node.t === 'sent') return tx('文', 'sentence');
   return '';
+}
+
+/* ------------------------------------------- 文 · the minimum reader
+ * Every example sentence opens into its own small reading page (operator,
+ * 2026-08-12): the sentence alone, large, every token carrying the full
+ * gesture grammar — the tap circle, the hold for the simple definition,
+ * the long hold for the entry. The translation and the source sit beneath,
+ * quiet. It rides the sheet stack, so 戻る returns exactly one step. */
+function renderSentenceNode(sheet, node) {
+  sheet.append(withEn(el('p', 'eyebrow', '文'), 'one sentence, read closely', 'en-inline'));
+  const line = el('p', 'sent-reader');
+  renderSentenceTokens(line, node.tokens, {
+    targetId: node.target || null,
+    contextId: node.passage || 'bank',
+  });
+  sheet.append(line);
+  if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
+  if (node.source) sheet.append(el('p', 'example-src', node.source));
+  sheet.append(el('p', 'gloss', tapLadderHint()));
+}
+
+/** The quiet door every example line carries into its own reading page. */
+function sentenceDoor(ex, target) {
+  const door = el('button', 'sent-door', '▹');
+  door.type = 'button';
+  door.setAttribute('aria-label', tx('この文だけをひらく', 'open this sentence on its own page'));
+  door.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    go({
+      t: 'sent',
+      tokens: ex.tokens,
+      en: ex.en || '',
+      source: ex.source || '',
+      passage: ex.passage || null,
+      target: target || null,
+    });
+  });
+  return door;
 }
 
 /* ------------------------------------------------------ category catalogs
@@ -5771,13 +5814,14 @@ function renderReview(main) {
   const face = el('div', 'review-face');
   if (cloze) {
     const line = el('p', 'review-cloze');
-    // the card's sentence carries the reader's full ladder — every word in
-    // it is furigana-able, glossable, and a door to its own entry
+    // the card's sentence carries the reader's full gesture grammar — every
+    // word tap-circles, holds float its definition
     renderSentenceTokens(line, cloze.tokens, {
       targetId: item.id,
       hideTarget: !rv.revealed,
       contextId: cloze.passage || 'bank',
     });
+    if (rv.revealed) line.append(sentenceDoor(cloze, item.id));
     face.append(line);
     if (rv.revealed) face.append(el('div', 'review-front', item.label));
   } else {
@@ -5798,6 +5842,7 @@ function renderReview(main) {
       for (const ex of exs) {
         const line = el('p', 'review-example');
         renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
+        line.append(sentenceDoor(ex, item.id));
         face.append(line);
       }
     }
@@ -6455,6 +6500,7 @@ function renderProbe(main) {
       targetId: it.w,
       contextId: context.passage || 'bank',
     });
+    if (pr.revealed) line.append(sentenceDoor(context, it.w));
     face.append(line);
   } else if (!D.exampleBank?.has(it.w) && window.__CORRIDOR_STANDALONE__ !== true) {
     ensureBankExamples(it.w).then((entries) => {
@@ -6759,7 +6805,6 @@ function renderSentenceTokens(container, tokens, opts = {}) {
   const contextId = opts.contextId || 'sentence';
   const revealed = new Set();
   const glossed = new Set();
-  const entered = new Set();
   tokens.forEach((token, index) => {
     if (!token.c || !token.f?.length) {
       container.append(document.createTextNode(token.s));
@@ -6790,8 +6835,16 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       }
     };
     paint();
-    span.addEventListener('click', (ev) => {
-      ev.stopPropagation();
+    // the reader's full gesture grammar, in miniature: taps circle
+    // ふりがな → English → plain again; a short hold floats the simple
+    // definition, a long hold (or a tap on it) opens the full entry
+    const openEntry = () => {
+      removeMini();
+      if (down) swallowClickUntil = Date.now() + 700; // held release → one ghost click
+      obsLog('tap', srsKey('word', token.b), 3, contextId);
+      go({ t: 'word', id: token.b });
+    };
+    const cycle = () => {
       if (!revealed.has(index)) {
         revealed.add(index);
         obsLog('tap', srsKey('word', token.b), 1, contextId);
@@ -6804,17 +6857,48 @@ function renderSentenceTokens(container, tokens, opts = {}) {
         paint();
         return;
       }
-      if (!entered.has(index)) {
-        entered.add(index);
-        obsLog('tap', srsKey('word', token.b), 3, contextId);
-        go({ t: 'word', id: token.b });
-        return;
-      }
-      // the way back: fold the word to plain kanji, ladder reset
       revealed.delete(index);
       glossed.delete(index);
-      entered.delete(index);
       paint();
+    };
+    let miniTimer = null;
+    let fullTimer = null;
+    let down = null;
+    const clearHold = () => {
+      clearTimeout(miniTimer);
+      clearTimeout(fullTimer);
+      miniTimer = fullTimer = null;
+    };
+    span.addEventListener('contextmenu', (ev) => ev.preventDefault());
+    span.addEventListener('pointerdown', (ev) => {
+      down = { x: ev.clientX, y: ev.clientY, at: Date.now() };
+      miniTimer = setTimeout(() => showMini(span, token, openEntry), GESTURE.MINI_MS);
+      fullTimer = setTimeout(openEntry, GESTURE.FULL_MS);
+    });
+    span.addEventListener('pointermove', (ev) => {
+      if (!down) return;
+      if (Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > GESTURE.MOVE_PX) {
+        clearHold();
+        down = null;
+      }
+    });
+    span.addEventListener('pointercancel', () => {
+      clearHold();
+      down = null;
+    });
+    span.addEventListener('pointerup', () => {
+      if (!down) return;
+      const held = Date.now() - down.at;
+      down = null;
+      clearHold();
+      if (held >= GESTURE.MINI_MS) return; // the mini stays up; tap it for the entry
+      cycle();
+    });
+    span.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // pointer taps were handled on pointerup; this path serves keyboard/AT
+      if (ev.detail !== 0 || Date.now() < swallowClickUntil) return;
+      cycle();
     });
     container.append(span);
   });
@@ -7558,6 +7642,7 @@ function renderWordNode(sheet, node) {
         targetId: node.id,
         contextId: ex.passage || 'bank',
       });
+      text.append(sentenceDoor(ex, node.id));
       line.append(text);
       if (ex.en) line.append(el('p', 'example-en', ex.en));
       line.append(el('span', 'example-src', ex.source));
@@ -8541,6 +8626,7 @@ function renderSheet(root) {
   else if (node.t === 'grammar') renderGrammarNode(sheet, node);
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
+  else if (node.t === 'sent') renderSentenceNode(sheet, node);
   sheet.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();

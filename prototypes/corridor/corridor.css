@@ -3447,6 +3447,33 @@ body.zen .probe-context {
   font-size: 19px;
 }
 
+/* 文 · the minimum reader — one sentence, large, room for its rt */
+.sent-reader {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 2.3;
+  color: var(--ink);
+  margin: 8px 0 12px;
+}
+.sent-reader-en {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 0 0 6px;
+}
+/* the quiet door on every example line into its own page */
+.sent-door {
+  background: transparent;
+  border: 0;
+  padding: 0 4px;
+  margin-left: 4px;
+  font-size: 14px;
+  color: var(--ai, var(--ink-2));
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
 /* the answer face's example lines — quieter than the cloze, still living */
 .review-example {
   font-family: var(--serif);

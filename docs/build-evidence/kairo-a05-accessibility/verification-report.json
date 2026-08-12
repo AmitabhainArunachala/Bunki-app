@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "d60162ad6440ae9962b32946d1f75471fa4a2899",
+  "head": "c9625945cefa83a8d0fcee0e4e947f47329c7adf",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -54,9 +54,9 @@
       "detail": "565.9px → 565.9px"
     },
     {
-      "name": "pointer third target.activate carries into the full entry",
+      "name": "pointer third target.activate closes the circle — plain kanji, no sheet",
       "pass": true,
-      "detail": ""
+      "detail": "{\"lit\":false,\"gloss\":false,\"sheet\":false}"
     },
     {
       "name": "pointer route emits target.activate envelopes with pointer provenance",
@@ -64,9 +64,9 @@
       "detail": "3 receipt(s)"
     },
     {
-      "name": "keyboard/switch-shaped activation follows the same three target.activate transitions",
+      "name": "keyboard/switch-shaped activation walks the same circle — three activations end plain",
       "pass": true,
-      "detail": "focusable=true sheet=1"
+      "detail": "focusable=true sheet=0 state={\"lit\":false,\"gloss\":false}"
     },
     {
       "name": "keyboard route differs only in provenance",
@@ -86,7 +86,7 @@
     {
       "name": "entry sheet is a named modal dialog and receives focus",
       "pass": true,
-      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":11}"
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":12}"
     },
     {
       "name": "Tab is contained inside the modal sheet",
