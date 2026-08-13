@@ -206,21 +206,48 @@ APPENDIX, populated by the inventory agents — see §10.)
 
 ## §7 How to run the battery (every phase gate)
 
-- `node prototypes/corridor/tools/verify-corridor.mjs` → 116 checks
-  (self-serves a static server; needs Playwright chromium at the path in §5).
-- `node prototypes/corridor/tools/verify-corridor-accessibility.mjs` → 22
-  checks (EXTEND the theme loop to all 8 worlds in P1).
-- `npm test` → 1645 tests.
-- `node prototypes/drift/tools/verify-storage-integrity.mjs` → 9 checks.
-- `npm run verify:drift:fast`.
-- `npm run format:check` (prettier governs; `prototypes/**` is
-  prettier-IGNORED so the corridor JS/CSS aren't reformatted — but
-  `docs/**` IS formatted).
+**CRITICAL FIRST STEP — export the browser path.** The three core
+verifiers read `process.env.CHROMIUM_PATH`; they do NOT hardcode it and
+have NO npm-script alias (invoke with `node` directly). Without this the
+browser-driven gates fail to find Chromium:
+
+```
+export CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome
+```
+
+Then, in this order (verified by the harness inventory agent):
+
+- `npm run format:check` — fast, no browser. (`prototypes/**` is
+  prettier-IGNORED so corridor JS/CSS aren't reformatted; `docs/**` IS.)
+- `node prototypes/corridor/tools/verify-corridor.mjs` → **116/116**.
+  Self-serves an ephemeral `node:http` static server; drives touch via
+  CDP at 390×844 iPhone profile; imports `chromium` from `playwright-core`
+  (not `@playwright/test`). Writes `docs/prototype/verification-report.json`.
+- `node prototypes/corridor/tools/verify-corridor-accessibility.mjs` →
+  **22/22**. The theme loop at ~line 430 is `for (const theme of
+['hokusai', 'yoru'])` — it walks ONLY 2 of the 8 worlds, and its own
+  comment stalely says "all five nihonga worlds." **P1 must extend this
+  array to all eight and re-measure.** Writes
+  `docs/build-evidence/kairo-a05-accessibility/verification-report.json`.
+- `npm test` → **1645** tests (vitest).
+- `node prototypes/drift/tools/verify-storage-integrity.mjs` → **9**
+  checks (drives `prototypes/drift/drift-artifact.html`; also honors
+  `BUNKI_DRIFT_CHROMIUM`).
+- `npm run verify:drift:fast` (=
+  `node prototypes/corridor/tools/verify-drift-consistency.mjs --mode fast`).
 - Deploy: dispatch `pages-app.yml` via the GitHub Actions MCP tool
   (`mcp__github__actions_run_trigger`, method run_workflow, workflow_id
-  `pages-app.yml`, ref the working branch). Then poll
+  `pages-app.yml`, ref the working branch). The build's smoke step runs
+  `node --check` on corridor.js/dictionary-worker.js and the fail-closed
+  rights gate. Then poll
   `https://amitabhainarunachala.github.io/Bunki-app/...` until 200.
-- The phase gate ALSO wants a five/eight-world screenshot matrix committed
+- WebGPU (only if touching the ink engine, needs lavapipe present —
+  `apt-get install -y mesa-vulkan-drivers`): `/root/.deno/bin/deno run
+--unstable-webgpu --allow-all <scratchpad/harness-*.ts>`. The harnesses
+  read `assets-*.json` produced first by the matching
+  `scratchpad/export-*.mjs`; they are not self-contained, and they live
+  in the SCRATCHPAD, not the repo.
+- The phase gate ALSO wants an eight-world screenshot matrix committed
   under `docs/build-evidence/gosai-rebuild/pN/`.
 
 ## §8 Parallel work outstanding (Codex)
