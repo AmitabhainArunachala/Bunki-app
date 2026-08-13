@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "3e119f4e533e399f14c234fe5f684052c88cf29f",
+  "head": "6d2abd2fefe18a44701ed9ac0fa210cddb227e59",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -106,12 +106,12 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
       "pass": true,
-      "detail": "eyebrow 6.10:1 · pool-tag 6.10:1"
+      "detail": "eyebrow 5.54:1 · pool-tag 5.54:1"
     },
     {
       "name": "quiet sheet labels meet 4.5:1 in the yoru world",
       "pass": true,
-      "detail": "eyebrow 9.49:1 · pool-tag 9.49:1"
+      "detail": "eyebrow 8.22:1 · pool-tag 8.22:1"
     },
     {
       "name": "real walk requested no missing Corridor assets",

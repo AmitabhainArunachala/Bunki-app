@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-12 05:32",
+          "2026-08-13 02:31",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-12 05:37",
+          "2026-08-13 02:36",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-12 05:41",
+          "2026-08-13 02:40",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 7 d",
-          "2026-08-19 05:31",
+          "in 6 d",
+          "2026-08-19 02:30",
           "8.30"
         ]
       ]
@@ -186,130 +186,130 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 2.43,
+          "contrast": 2.36,
           "fontSize": 4.4,
           "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 2.64,
+          "contrast": 2.49,
           "fontSize": 14,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(33, 30, 23, 0.42)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 2.64,
+          "contrast": 2.49,
           "fontSize": 13,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(33, 30, 23, 0.42)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 2.64,
+          "contrast": 2.49,
           "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "color": "rgba(33, 30, 23, 0.42)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 8.95,
+          "contrast": 7.59,
           "fontSize": 13,
-          "color": "rgb(61, 68, 76)"
+          "color": "rgb(74, 69, 58)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 6.75,
+          "contrast": 5.88,
           "fontSize": 15,
-          "color": "rgb(158, 43, 37)"
+          "color": "rgb(160, 42, 30)"
         }
       ],
       "wcag": [
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 2.43,
+          "contrast": 2.36,
           "fontSize": 4.4,
           "color": "rgba(27, 42, 58, 0.42)"
         },
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 5.89,
+          "contrast": 5.17,
           "fontSize": 14,
-          "color": "rgba(20, 24, 28, 0.68)"
+          "color": "rgba(33, 30, 23, 0.68)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 5.89,
+          "contrast": 5.17,
           "fontSize": 13,
-          "color": "rgba(20, 24, 28, 0.68)"
+          "color": "rgba(33, 30, 23, 0.68)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 5.89,
+          "contrast": 5.17,
           "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.68)"
+          "color": "rgba(33, 30, 23, 0.68)"
         },
         {
           "label": "reading body (focused)",
           "selector": ".reader",
-          "contrast": 16.2,
+          "contrast": 13.24,
           "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(33, 30, 23)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 8.95,
+          "contrast": 7.59,
           "fontSize": 13,
-          "color": "rgb(61, 68, 76)"
+          "color": "rgb(74, 69, 58)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 6.75,
+          "contrast": 5.88,
           "fontSize": 15,
-          "color": "rgb(158, 43, 37)"
+          "color": "rgb(160, 42, 30)"
         }
       ]
     },
@@ -317,65 +317,65 @@
       {
         "label": "reading body (focused)",
         "selector": ".reader",
-        "contrast": 16.2,
+        "contrast": 13.24,
         "fontSize": 21,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(33, 30, 23)"
       },
       {
         "label": "view title",
         "selector": ".view-title",
-        "contrast": 16.2,
+        "contrast": 13.24,
         "fontSize": 22,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(33, 30, 23)"
       },
       {
         "label": "gloss",
         "selector": ".gloss",
-        "contrast": 2.43,
+        "contrast": 2.36,
         "fontSize": 4.4,
         "color": "rgba(27, 42, 58, 0.42)"
       },
       {
         "label": "discrimination note",
         "selector": ".sem-note",
-        "contrast": 8.95,
+        "contrast": 7.59,
         "fontSize": 13,
-        "color": "rgb(61, 68, 76)"
+        "color": "rgb(74, 69, 58)"
       },
       {
         "label": "chrome breadcrumb (background)",
         "selector": ".crumb",
-        "contrast": 5.89,
+        "contrast": 5.17,
         "fontSize": 13,
-        "color": "rgba(20, 24, 28, 0.68)"
+        "color": "rgba(33, 30, 23, 0.68)"
       },
       {
         "label": "eyebrow label",
         "selector": ".eyebrow",
-        "contrast": 5.89,
+        "contrast": 5.17,
         "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.68)"
+        "color": "rgba(33, 30, 23, 0.68)"
       },
       {
         "label": "reading, the one red",
         "selector": ".reading",
-        "contrast": 6.75,
+        "contrast": 5.88,
         "fontSize": 15,
-        "color": "rgb(158, 43, 37)"
+        "color": "rgb(160, 42, 30)"
       },
       {
         "label": "shelf title",
         "selector": ".shelf-title",
-        "contrast": 16.2,
+        "contrast": 13.24,
         "fontSize": 19,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(33, 30, 23)"
       },
       {
         "label": "faint / snippet",
         "selector": ".shelf-snippet",
-        "contrast": 5.89,
+        "contrast": 5.17,
         "fontSize": 14,
-        "color": "rgba(20, 24, 28, 0.68)"
+        "color": "rgba(33, 30, 23, 0.68)"
       }
     ],
     "targets": [
@@ -388,7 +388,7 @@
         "id": "back"
       },
       {
-        "text": "北",
+        "text": "墨",
         "w": 44,
         "h": 44,
         "hitW": 44,
@@ -4540,7 +4540,7 @@
         "id": "back"
       },
       {
-        "text": "北",
+        "text": "墨",
         "w": 44,
         "h": 44,
         "hitW": 44,
@@ -6054,7 +6054,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 710,
+  "loadMs": 476,
   "summary": {
     "total": 116,
     "failed": 0
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":150.44000244140625,\"y\":569.2100219726562,\"productive\":true}"
+      "detail": "{\"x\":147.72000122070312,\"y\":570.469970703125,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6093,7 +6093,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 83px; mean tether 163 → 163px"
+      "detail": "centre moved 89px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 710 ms"
+      "detail": "40 texts, ready in 476 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 6 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6353,12 +6353,12 @@
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.64:1 → wcag 5.89:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.49:1 → wcag 5.17:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
       "pass": true,
-      "detail": "2.64:1"
+      "detail": "2.49:1"
     },
     {
       "name": "variant D · field entry",
@@ -6383,12 +6383,12 @@
     {
       "name": "discrimination notes are legible (AA)",
       "pass": true,
-      "detail": "8.95:1 at 13px"
+      "detail": "7.59:1 at 13px"
     },
     {
       "name": "body ink clears AAA",
       "pass": true,
-      "detail": "16.2:1"
+      "detail": "13.24:1"
     },
     {
       "name": "every visible control is at least 44px",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786512787447,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786588294285,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",

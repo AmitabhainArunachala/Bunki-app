@@ -8805,19 +8805,21 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
-/* ---------------------------------------------------------- nihonga themes
- * The five Drift worlds (北斎・墨・岩絵具・緑青・夜) applied across the WHOLE
- * corridor, not just the front door (operator: "the colour theme options
- * should apply throughout the entire app"). The seal in the chrome cycles
- * them; the choice persists on-device and drives the Drift layer in lockstep,
- * so the door and every room behind it share one world. Palette values live
- * as [data-theme] token blocks in corridor.css; default :root is 北斎. */
+/* ------------------------------------------------------- 五彩 GOSAI worlds
+ * The five palettes the operator locked from the living-ink round
+ * (2026-08-12) — 墨・楮紙, 朱・胡粉, 焦茶・柿渋, 胡粉・黒漆, 紺紙金泥 — applied
+ * across the WHOLE corridor (operator: "locked in and wired in as the new
+ * standard across the entire app"). The seal in the chrome cycles them; the
+ * choice persists on-device. The ids are the HISTORICAL world keys so saved
+ * preferences keep working — the values in corridor.css are the new standard.
+ * The Drift layer's matching worlds follow via its own build (generated file;
+ * next slice). Default :root is 墨・楮紙. */
 const THEME_UI = [
-  { id: 'hokusai', seal: '北' },
-  { id: 'sumi', seal: '墨' },
-  { id: 'iwa', seal: '岩' },
-  { id: 'rokusho', seal: '緑' },
-  { id: 'yoru', seal: '夜' },
+  { id: 'hokusai', seal: '墨' }, // 墨・楮紙 — sumi on kōzo (day canon)
+  { id: 'sumi', seal: '朱' }, // 朱・胡粉 — vermilion on shell white
+  { id: 'iwa', seal: '柿' }, // 焦茶・柿渋 — umber on persimmon tannin
+  { id: 'rokusho', seal: '漆' }, // 胡粉・黒漆 — shell white on lacquer
+  { id: 'yoru', seal: '金' }, // 紺紙金泥 — sutra gold on indigo
 ];
 const THEME_STORE = 'kairo-theme';
 function themeId() {
