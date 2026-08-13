@@ -8805,21 +8805,24 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
-/* ------------------------------------------------------- 五彩 GOSAI worlds
- * The five palettes the operator locked from the living-ink round
- * (2026-08-12) — 墨・楮紙, 朱・胡粉, 焦茶・柿渋, 胡粉・黒漆, 紺紙金泥 — applied
- * across the WHOLE corridor (operator: "locked in and wired in as the new
- * standard across the entire app"). The seal in the chrome cycles them; the
- * choice persists on-device. The ids are the HISTORICAL world keys so saved
- * preferences keep working — the values in corridor.css are the new standard.
- * The Drift layer's matching worlds follow via its own build (generated file;
- * next slice). Default :root is 墨・楮紙. */
+/* ------------------------------------------------------- 八彩 HASSAI worlds
+ * The eight worlds the operator locked from the carousel (2026-08-13,
+ * "keep 墨・楮紙; default 藍 ベロ藍・浪") — three families, one token law,
+ * applied across the WHOLE corridor. The seal in the chrome cycles them,
+ * day worlds first, then the nights; the choice persists on-device. The ids
+ * are the HISTORICAL world keys where one existed so saved preferences keep
+ * working — the values in corridor.css are the standard. The Drift layer's
+ * matching worlds follow via its own build (generated file; next slice).
+ * Default :root is ベロ藍・浪. */
 const THEME_UI = [
-  { id: 'hokusai', seal: '墨' }, // 墨・楮紙 — sumi on kōzo (day canon)
-  { id: 'sumi', seal: '朱' }, // 朱・胡粉 — vermilion on shell white
+  { id: 'hokusai', seal: '藍' }, // ベロ藍・浪 — Prussian blue on print cream (DEFAULT)
+  { id: 'sumi', seal: '墨' }, // 墨・楮紙 — sumi on kōzo
+  { id: 'akafuji', seal: '赤' }, // 凱風快晴 — Red Fuji on dawn paper
   { id: 'iwa', seal: '柿' }, // 焦茶・柿渋 — umber on persimmon tannin
   { id: 'rokusho', seal: '漆' }, // 胡粉・黒漆 — shell white on lacquer
   { id: 'yoru', seal: '金' }, // 紺紙金泥 — sutra gold on indigo
+  { id: 'nami', seal: '浪' }, // 神奈川沖浪裏 — foam on the deep sea
+  { id: 'kaku', seal: '殻' }, // 攻殻・燐光 — phosphor on terminal black
 ];
 const THEME_STORE = 'kairo-theme';
 function themeId() {

@@ -1,5 +1,9 @@
 # 五彩 GOSAI — the locked colour standard (operator lock, 2026-08-12)
 
+> **SUPERSEDED 2026-08-13 by 八彩 —** see `HASSAI_STANDARD_2026-08-13.md`.
+> The operator re-picked eight worlds from the thirteen-world carousel;
+> this document remains as the record of the first lock.
+
 The operator reviewed 十彩の墨 (ten nihonga colorings of the living-ink
 engine, `design/stroke-art-iro.html`) and locked **five** as the standard
 across the entire app: _"pick five of them and then make it locked in and

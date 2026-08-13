@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "6d2abd2fefe18a44701ed9ac0fa210cddb227e59",
+  "head": "147b3084c7d153a848d8b75da79962ed5f14eff2",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -106,7 +106,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
       "pass": true,
-      "detail": "eyebrow 5.54:1 · pool-tag 5.54:1"
+      "detail": "eyebrow 6.09:1 · pool-tag 6.09:1"
     },
     {
       "name": "quiet sheet labels meet 4.5:1 in the yoru world",

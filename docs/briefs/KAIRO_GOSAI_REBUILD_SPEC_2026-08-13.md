@@ -23,17 +23,28 @@ persisted on-device. **Every surface re-dresses completely when the world
 changes.** (The vision page showed different rooms in different worlds
 for illustration; in the app, the active world governs everything.)
 
-| seal | world      | ground           | ink                  | red (the one) | go-colour  |
-| ---- | ---------- | ---------------- | -------------------- | ------------- | ---------- |
-| 墨   | 墨・楮紙   | warm kōzo washi  | sumi                 | 朱 #a02a1e    | 藍 indigo  |
-| 朱   | 朱・胡粉   | shell white      | warm sumi            | 朱 #b02318    | 藍 indigo  |
-| 柿   | 焦茶・柿渋 | persimmon tannin | burnt umber          | 深朱 #7e2410  | 藍 textile |
-| 漆   | 胡粉・黒漆 | black lacquer    | gofun shell-white    | 朱燈 #e0796b  | 金 gold    |
-| 金   | 紺紙金泥   | indigo (紺紙)    | parchment gold-white | 朱燈 #ef8079  | 金 gold    |
+**AMENDED 2026-08-13 (operator lock): the palette is EIGHT worlds — 八彩.**
+The operator re-picked from the thirteen-world carousel ("keep 墨・楮紙;
+default 藍 ベロ藍・浪"). The authoritative table lives in
+`docs/design/HASSAI_STANDARD_2026-08-13.md`; summary:
 
-Token values: already live in `corridor.css` (§ GOSAI worlds). Structural
-tokens added by P1: `--paper-url` (per-world ground texture),
-`--sheet-*` (lacquer constants), `--seal-*` (hanko constants),
+| seal | world        | ground            | ink               | red (the one) | go-colour             |
+| ---- | ------------ | ----------------- | ----------------- | ------------- | --------------------- |
+| 藍   | ベロ藍・浪   | print cream       | Prussian blue     | 蔓朱 #b03a2e  | ベロ藍 blue — DEFAULT |
+| 墨   | 墨・楮紙     | warm kōzo washi   | sumi              | 朱 #a02a1e    | 藍 indigo             |
+| 赤   | 凱風快晴     | dawn paper        | Fuji rust         | 朱 #a03a20    | 空 sky blue           |
+| 柿   | 焦茶・柿渋   | persimmon tannin  | burnt umber       | 深朱 #7e2410  | 藍 textile            |
+| 漆   | 胡粉・黒漆   | black lacquer     | gofun shell-white | 朱燈 #e0796b  | 金 gold               |
+| 金   | 紺紙金泥     | indigo (紺紙)     | parchment white   | 朱燈 #ef8079  | 金 gold               |
+| 浪   | 神奈川沖浪裏 | deep Prussian sea | wave foam         | 朱燈 #e08a6e  | 飛沫 spindrift        |
+| 殻   | 攻殻・燐光   | terminal black    | phosphor white    | 警朱 #ff6b4a  | 燐光 phosphor         |
+
+Every "five worlds" elsewhere in this spec now reads "eight worlds"; the
+screenshot matrices are ×8. With eight worlds, the seal ALSO gains a
+long-press picker (the eight world-stones, P1 mechanic) so cycling never
+feels like a chore. Token values: live in `corridor.css` (§ HASSAI
+worlds). Structural tokens added by P1: `--paper-url` (per-world ground
+texture), `--sheet-*` (lacquer constants), `--seal-*` (hanko constants),
 `--gold: #d9b25f`.
 
 ## §2 Global structures (applied on every surface, all five worlds)
@@ -153,5 +164,7 @@ the phone and given the feel verdict. Until all of that is true, this
 build is OPEN and the next session picks up at the first unfinished
 phase — this file is the hand-off.
 
-**Status: P1 pending — build not started until the operator locks this
-spec (one word: 合).**
+**Status: LOCKED 2026-08-13 — the operator answered the two open gates
+("1. Keep 2. 藍 ベロ藍・浪"), fixing the palette at eight worlds with
+ベロ藍・浪 as the default. The eight are wired into the live corridor
+(tokens + seal cycle, battery green). The build is OPEN at P1.**

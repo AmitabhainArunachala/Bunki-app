@@ -10,26 +10,26 @@
  */
 
 :root {
-  /* 五彩 GOSAI standard (operator lock, 2026-08-12): the five nihonga worlds
-   * proven by the living-ink round — 墨・楮紙, 朱・胡粉, 焦茶・柿渋, 胡粉・黒漆,
-   * 紺紙金泥 — are THE palette across the entire app. Default world: 墨・楮紙,
-   * warm kōzo washi under sumi ink. docs/design/GOSAI_STANDARD_2026-08-12.md */
-  --ground: #f5efe0;
-  --ground-2: #ede5d0;
-  --ink: #211e17;
-  --ink-2: #4a453a;
+  /* 八彩 HASSAI standard (operator lock, 2026-08-13): eight worlds chosen
+   * from the living-ink carousel — three families, one law. Default world:
+   * ベロ藍・浪, Hokusai's Prussian blue on woodblock print cream.
+   * docs/design/HASSAI_STANDARD_2026-08-13.md */
+  --ground: #f1e9d3;
+  --ground-2: #e9dfc2;
+  --ink: #1c2f42;
+  --ink-2: #4a5d70;
 
-  /* the one red: 朱 shu vermilion (五彩 action colour). Readings, seals, the
-   * live accent, nothing else. */
-  --red: #a02a1e;
-  --red-wash: rgba(160, 42, 30, 0.08);
+  /* the one red: the print's cartouche red. Readings, seals, the live
+   * accent, nothing else. */
+  --red: #b03a2e;
+  --red-wash: rgba(176, 58, 46, 0.08);
 
-  --line: rgba(33, 30, 23, 0.16);
-  --line-soft: rgba(33, 30, 23, 0.08);
+  --line: rgba(28, 47, 66, 0.16);
+  --line-soft: rgba(28, 47, 66, 0.08);
 
   /* Variant C (#47) swaps this pair. See .v-contrast-wcag. */
-  --faint: rgba(33, 30, 23, 0.42); /* depth-by-fade, as Drift ships it */
-  --faint-2: rgba(33, 30, 23, 0.3);
+  --faint: rgba(28, 47, 66, 0.42); /* depth-by-fade, as Drift ships it */
+  --faint-2: rgba(28, 47, 66, 0.3);
 
   --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP',
     'Source Han Serif JP', 'Songti SC', serif;
@@ -48,14 +48,16 @@
 /* Variant C: WCAG-compliant contrast. 4.54:1 and 7.06:1 against the washi
  * ground, measured by the verifier — not eyeballed. */
 .v-contrast-wcag {
-  --faint: rgba(33, 30, 23, 0.68);
-  --faint-2: rgba(33, 30, 23, 0.6);
+  /* ベロ藍 ink is lighter than the old sumi — 0.68 measured 4.34:1, shy of
+   * AA's 4.5 (suite, 2026-08-13). Lifted until the verifier says AA. */
+  --faint: rgba(28, 47, 66, 0.76);
+  --faint-2: rgba(28, 47, 66, 0.68);
 }
 
-/* The lift above is dark ink for the light washi worlds — on 夜 it sank
+/* The lift above is dark ink for the light paper worlds — on 夜 it sank
  * every quiet label into the night ground at ~1.2:1 (operator's phone,
  * 2026-08-11: conjugation labels, eyebrows, chips all near-invisible).
- * The dark worlds re-derive the same lift from their own pale ink —
+ * Every dark world re-derives the same lift from its own pale ink —
  * measured by the accessibility verifier, not eyeballed. */
 :root[data-theme='yoru'] .v-contrast-wcag {
   --faint: rgba(244, 236, 217, 0.78);
@@ -64,6 +66,14 @@
 :root[data-theme='rokusho'] .v-contrast-wcag {
   --faint: rgba(242, 236, 223, 0.78);
   --faint-2: rgba(242, 236, 223, 0.66);
+}
+:root[data-theme='nami'] .v-contrast-wcag {
+  --faint: rgba(234, 230, 216, 0.78);
+  --faint-2: rgba(234, 230, 216, 0.66);
+}
+:root[data-theme='kaku'] .v-contrast-wcag {
+  --faint: rgba(216, 239, 233, 0.78);
+  --faint-2: rgba(216, 239, 233, 0.66);
 }
 
 * {
@@ -1693,33 +1703,51 @@ button.tok::before {
   --ai-wash: rgba(46, 77, 110, 0.08);
 }
 
-/* ------------------------------------------------------- 五彩 GOSAI worlds
- * The five palettes the operator locked from the living-ink round
- * (2026-08-12), carried across the whole corridor. The storage keys are the
- * historical world names so saved preferences survive; the VALUES are the
- * new standard. Default :root above is 墨・楮紙 — sumi on warm kōzo.
- *   ''        → 墨・楮紙   sumi ink on kōzo washi (the reading day-world)
- *   sumi      → 朱・胡粉   shrine vermilion on shell white
- *   iwa       → 焦茶・柿渋 burnt umber on persimmon-tannin paper (the archive)
- *   rokusho   → 胡粉・黒漆 shell white on black lacquer (the dictionary night)
- *   yoru      → 紺紙金泥   sutra gold on indigo (the deep night)
+/* ------------------------------------------------------- 八彩 HASSAI worlds
+ * The eight worlds the operator locked from the carousel (2026-08-13),
+ * carried across the whole corridor. Storage keys stay historical so saved
+ * preferences survive; the VALUES are the standard. Default :root above is
+ * ベロ藍・浪 — Hokusai's Prussian blue on print cream.
+ *   ''        → ベロ藍・浪   Prussian blue on print cream (DEFAULT day)
+ *   sumi      → 墨・楮紙     sumi ink on kōzo washi (kept by name)
+ *   akafuji   → 凱風快晴     Red Fuji — rust on dawn paper
+ *   iwa       → 焦茶・柿渋   burnt umber on persimmon-tannin paper
+ *   rokusho   → 胡粉・黒漆   shell white on black lacquer
+ *   yoru      → 紺紙金泥     sutra gold on indigo
+ *   nami      → 神奈川沖浪裏 foam on the deep sea
+ *   kaku      → 攻殻・燐光   phosphor green on terminal black
  * Each block re-derives every token for its own ground so backgrounds, ink,
- * lines, fades, the 朱 action-red and the go-colour shift together; the dark
- * worlds lift their quiet print per the night legibility law. */
+ * lines, fades, the one action-red and the go-colour shift together; every
+ * dark world lifts its quiet print per the night legibility law. */
 :root[data-theme='sumi'] {
-  --ground: #f9f5eb;
-  --ground-2: #f2ecdb;
-  --ground-0: #fdfaf2;
-  --ink: #2b2620;
-  --ink-2: #575145;
-  --red: #b02318;
-  --red-wash: rgba(176, 35, 24, 0.08);
-  --line: rgba(43, 38, 32, 0.16);
-  --line-soft: rgba(43, 38, 32, 0.08);
-  --faint: rgba(43, 38, 32, 0.42);
-  --faint-2: rgba(43, 38, 32, 0.3);
+  --ground: #f5efe0;
+  --ground-2: #ede5d0;
+  --ground-0: #faf6ea;
+  --ink: #211e17;
+  --ink-2: #4a453a;
+  --red: #a02a1e;
+  --red-wash: rgba(160, 42, 30, 0.08);
+  --line: rgba(33, 30, 23, 0.16);
+  --line-soft: rgba(33, 30, 23, 0.08);
+  --faint: rgba(33, 30, 23, 0.42);
+  --faint-2: rgba(33, 30, 23, 0.3);
   --ai: #2e4d6e;
   --ai-wash: rgba(46, 77, 110, 0.08);
+}
+:root[data-theme='akafuji'] {
+  --ground: #f3e3cf;
+  --ground-2: #ecd7bd;
+  --ground-0: #f8ecdc;
+  --ink: #45291a;
+  --ink-2: #7a5540;
+  --red: #a03a20;
+  --red-wash: rgba(160, 58, 32, 0.08);
+  --line: rgba(69, 41, 26, 0.16);
+  --line-soft: rgba(69, 41, 26, 0.08);
+  --faint: rgba(69, 41, 26, 0.44);
+  --faint-2: rgba(69, 41, 26, 0.32);
+  --ai: #2a5d8a;
+  --ai-wash: rgba(42, 93, 138, 0.08);
 }
 :root[data-theme='iwa'] {
   --ground: #ddb083;
@@ -1769,6 +1797,36 @@ button.tok::before {
   --faint-2: rgba(244, 236, 217, 0.52);
   --ai: #d9b25f;
   --ai-wash: rgba(217, 178, 95, 0.14);
+}
+:root[data-theme='nami'] {
+  --ground: #11273b;
+  --ground-2: #18314a;
+  --ground-0: #1a3450;
+  --ink: #eae6d8;
+  --ink-2: #b9c4cc;
+  --red: #e08a6e;
+  --red-wash: rgba(224, 138, 110, 0.14);
+  --line: rgba(234, 230, 216, 0.2);
+  --line-soft: rgba(234, 230, 216, 0.1);
+  --faint: rgba(234, 230, 216, 0.66);
+  --faint-2: rgba(234, 230, 216, 0.52);
+  --ai: #8fb3d1;
+  --ai-wash: rgba(143, 179, 209, 0.14);
+}
+:root[data-theme='kaku'] {
+  --ground: #050d12;
+  --ground-2: #0b161d;
+  --ground-0: #0d1921;
+  --ink: #d8efe9;
+  --ink-2: #93b5ad;
+  --red: #ff6b4a;
+  --red-wash: rgba(255, 107, 74, 0.14);
+  --line: rgba(216, 239, 233, 0.2);
+  --line-soft: rgba(216, 239, 233, 0.1);
+  --faint: rgba(216, 239, 233, 0.66);
+  --faint-2: rgba(216, 239, 233, 0.52);
+  --ai: #37e8b0;
+  --ai-wash: rgba(55, 232, 176, 0.14);
 }
 
 /* the seal that cycles the five worlds — a small round chrome control */
