@@ -3245,6 +3245,11 @@ body.v-depth-layered .stroke-page {
   opacity: 0.55;
 }
 
+.stroke-engine {
+  color: var(--faint-2);
+  letter-spacing: 0.08em;
+}
+
 /* the count: a margin note, not a scoreboard */
 .stroke-readout {
   font-family: var(--serif);

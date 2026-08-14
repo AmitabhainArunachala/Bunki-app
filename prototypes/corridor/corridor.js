@@ -8507,6 +8507,8 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     };
     page.dataset.living = 'on';
     page.dataset.inkKind = handle.kind;
+    const tag = page.querySelector('#stroke-engine');
+    if (tag) tag.textContent = handle.kind === 'gpu' ? '筆 WebGPU' : '筆 WebGL';
     // 触れて、もう一度 — touch the sheet and the hand writes again
     stage.addEventListener('click', () => {
       if (inkRoom === room && room.handle) room.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
@@ -8784,6 +8786,11 @@ function renderStrokePage(root) {
       if (i) meta.append(document.createTextNode(' · '));
       meta.append(b);
     });
+    // honest engineering: name the engine actually drawing the ink, so a
+    // fallback never masquerades as the real lattice (筆 WebGPU / WebGL / 図)
+    const engineTag = el('span', 'stroke-engine');
+    engineTag.id = 'stroke-engine';
+    meta.append(document.createTextNode(' · '), engineTag);
     body.append(meta);
     page.append(body);
   }

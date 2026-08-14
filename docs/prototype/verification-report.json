@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-14 08:06",
+          "2026-08-14 08:22",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-14 08:11",
+          "2026-08-14 08:27",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-14 08:15",
+          "2026-08-14 08:31",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-23 08:05",
+          "in 10 d",
+          "2026-08-24 08:21",
           "8.30"
         ]
       ]
@@ -6054,7 +6054,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 459,
+  "loadMs": 607,
   "summary": {
     "total": 116,
     "failed": 0
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.74000549316406,\"y\":570.4299926757812,\"productive\":true}"
+      "detail": "{\"x\":148.02000427246094,\"y\":570.280029296875,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 459 ms"
+      "detail": "40 texts, ready in 607 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786694784923,\"probe\",\"word:刺繍\",1,1]"
+      "detail": "row [1786695789199,\"probe\",\"word:石鹸\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6638,7 +6638,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“刺繍” · 2 sentence lines · 5 live tokens"
+      "detail": "“石鹸” · 2 sentence lines · 3 live tokens"
     }
   ]
 }
