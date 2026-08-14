@@ -758,16 +758,25 @@ function startGPU(canvas, spec, device) {
     entries: [{ binding: 0, resource: engine.frame.createView() }, { binding: 1, resource: blitSamp }] });
   const initCheck = device.popErrorScope().then((e) => { if (e) throw new Error('webgpu validation: ' + e.message); });
   const writer = makeWriterFor(spec.strokes);
-  function begin() {
+  // writing → drying → idle. The sheet only counts as finished after the
+  // drying tail — the water dies and the pigment deposits crisp; that dried
+  // state IS the design stills' quality. No auto-rewrite: the design law is
+  // 触れて、もう一度 — the hand writes again on touch, never on a timer.
+  let mode = 'idle', tScale = 1, writeT0 = 0, dryLeft = 0;
+  const DRY_STEPS = 240;
+  function begin(scale) {
     try {
+      tScale = scale || 1;
       seed = (Math.random() * 1e9) >>> 0;
       const r = rng(seed);
       engine.reset(seed);
       device.queue.copyExternalImageToTexture({ source: spec.ground(r, N) }, { texture: engine.ground }, [N, N]);
       uploadSprite(0);
-      writer.start(performance.now());
-      done = false;
+      writer.start(0);
+      writeT0 = performance.now();
+      mode = 'writing';
       spec.onPhase && spec.onPhase('writing');
+      spec.onStroke && spec.onStroke(0);
     } catch (e) { console.error('ink gpu begin failed:', e); dead = true; }
   }
   function uploadSprite(ix) {
@@ -787,27 +796,33 @@ function startGPU(canvas, spec, device) {
     if (!alive) return;
     if (dead) { handle.ondead && handle.ondead(); return; }
     requestAnimationFrame(frame);
-    if (done) { blit(); return; }
     try {
-      const step = writer.advance(now);
-      if (step.beginStroke !== null) uploadSprite(step.beginStroke);
-      engine.frameStep(step.splats, seed);
-      blit();
-      if (step.finished) {
-        done = true;
-        spec.onPhase && spec.onPhase('done');
-        setTimeout(() => { if (alive && !dead && (!spec.shouldRewrite || spec.shouldRewrite())) begin(); }, spec.rewriteDelay ?? 6500);
+      if (mode === 'writing') {
+        const step = writer.advance((now - writeT0) * tScale);
+        if (step.beginStroke !== null) {
+          uploadSprite(step.beginStroke);
+          spec.onStroke && spec.onStroke(step.beginStroke);
+        }
+        engine.frameStep(step.splats, seed);
+        blit();
+        if (step.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
+      } else if (mode === 'drying') {
+        for (let i = 0; i < 4 && dryLeft > 0; i++, dryLeft--) engine.frameStep([], seed);
+        blit();
+        if (!dryLeft) { mode = 'idle'; spec.onPhase && spec.onPhase('done'); }
+      } else {
+        blit();
       }
     } catch (e) { console.error('ink gpu frame failed:', e); dead = true; }
   }
   const handle = {
     kind: 'gpu',
     ondead: null,
-    rewrite() { if (alive && !dead) begin(); },
+    rewrite(scale) { if (alive && !dead) begin(scale); },
     stop() { alive = false; try { engine.destroy(); } catch { /* already gone */ } },
     ready: initCheck,
   };
-  begin();
+  begin(spec.firstScale ?? 1);
   requestAnimationFrame(frame);
   return handle;
 }
@@ -948,13 +963,17 @@ function startGL2(canvas, spec) {
   let cur = 0;
   const writer = makeWriterFor(spec.strokes);
   const U = (p, n) => gl.getUniformLocation(p, n);
+  // same lifecycle law as the GPU path: writing → drying → idle, touch to rewrite
+  let mode = 'idle', tScale = 1, writeT0 = 0, dryLeft = 0;
+  const DRY_STEPS = 480; // gl2 counts single lattice steps (the gpu path counts frameSteps of two)
   function draw() {
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
-  function begin() {
+  function begin(scale) {
+    tScale = scale || 1;
     seed = (Math.random() * 1e9) >>> 0;
     const r = rng(seed);
     gl.bindTexture(gl.TEXTURE_2D, fiberT);
@@ -968,9 +987,11 @@ function startGL2(canvas, spec) {
       gl.clear(gl.COLOR_BUFFER_BIT);
     }
     uploadSprite(0);
-    writer.start(performance.now());
-    done = false;
+    writer.start(0);
+    writeT0 = performance.now();
+    mode = 'writing';
     spec.onPhase && spec.onPhase('writing');
+    spec.onStroke && spec.onStroke(0);
   }
   function uploadSprite(ix) {
     gl.bindTexture(gl.TEXTURE_2D, spriteT);
@@ -1036,29 +1057,35 @@ function startGL2(canvas, spec) {
   function frame(now) {
     if (!alive) return;
     requestAnimationFrame(frame);
-    if (done) { render(); return; }
-    const out = writer.advance(now);
-    if (out.beginStroke !== null) uploadSprite(out.beginStroke);
-    if (out.splats.length) splat(out.splats);
-    step();
-    step();
-    render();
-    if (out.finished) {
-      done = true;
-      spec.onPhase && spec.onPhase('done');
-      setTimeout(() => { if (alive && (!spec.shouldRewrite || spec.shouldRewrite())) begin(); }, spec.rewriteDelay ?? 6500);
+    if (mode === 'writing') {
+      const out = writer.advance((now - writeT0) * tScale);
+      if (out.beginStroke !== null) {
+        uploadSprite(out.beginStroke);
+        spec.onStroke && spec.onStroke(out.beginStroke);
+      }
+      if (out.splats.length) splat(out.splats);
+      step();
+      step();
+      render();
+      if (out.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
+    } else if (mode === 'drying') {
+      for (let i = 0; i < 8 && dryLeft > 0; i++, dryLeft--) step();
+      render();
+      if (!dryLeft) { mode = 'idle'; spec.onPhase && spec.onPhase('done'); }
+    } else {
+      render();
     }
   }
   const handle = {
     kind: 'gl2',
     ondead: null,
-    rewrite() { if (alive) begin(); },
+    rewrite(scale) { if (alive) begin(scale); },
     stop() {
       alive = false;
       try { gl.getExtension('WEBGL_lose_context')?.loseContext(); } catch { /* gone */ }
     },
   };
-  begin();
+  begin(spec.firstScale ?? 1);
   requestAnimationFrame(frame);
   return handle;
 }

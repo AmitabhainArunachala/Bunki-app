@@ -2872,25 +2872,138 @@ body.v-depth-layered .stroke-page {
   margin: 10px 0 6px;
 }
 
-/* 書の間 — the living sheet: the kanji written in real fluid ink (the D2Q9
- * engine in corridor-ink.js), the hero of the stroke page. The canvas is a
- * square sheet in the world's paper; tap it and the hand writes again. If
- * no engine can run, the holder removes itself and the SVG diagram stands. */
-.ink-stage {
-  flex: none;
+/* 書の間 — the design's room, in the app (gosai-strokepage.html made real):
+ * the glyph header, then ONE square sheet where the kanji is written in real
+ * fluid ink (corridor-ink.js), the SVG riding above it as the numbers/guide
+ * overlay. data-living on the page decides the dress: 'on' shows the ink and
+ * hides the classic diagram layers; 'off' (no engine) is the classic board;
+ * 'still' is a hand-painted finished sheet for reduced motion. */
+.stroke-khead {
   width: min(100%, 420px);
-  margin: 12px 0 2px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow:
-    0 14px 44px rgba(10, 10, 8, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 14px 0 0;
+  font-family: var(--serif);
 }
-.ink-sheet {
+.stroke-k {
+  font-size: 30px;
+  line-height: 1.2;
+}
+.stroke-k-meta {
+  font-size: 12px;
+  color: var(--ink-2);
+  letter-spacing: 0.2em;
+  margin-left: 10px;
+}
+.stroke-readings {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  line-height: 1.9;
+  color: var(--ink-2);
+}
+.stroke-kun-stem {
+  color: var(--red);
+}
+.stroke-stage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 6px;
+}
+/* the CANVAS stays in normal flow (an absolutely-positioned software-GL
+ * canvas can drop out of the compositor under a promoted overlay — seen in
+ * the harness); the SVG is the absolute overlay riding above the ink */
+.stroke-stage .ink-sheet {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
+}
+.stroke-stage svg.stroke-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.stroke-page[data-living='on'] .stroke-stage svg.stroke-canvas,
+.stroke-page[data-living='still'] .stroke-stage svg.stroke-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* the overlay exists only while the numbers are asked for — an
+   * always-mounted positioned overlay can knock a software-GL canvas out
+   * of the compositor entirely (found live in the harness) */
+  display: none;
+}
+.stroke-page[data-living='on'][data-numbers='on'] .stroke-stage svg.stroke-canvas,
+.stroke-page[data-living='still'][data-numbers='on'] .stroke-stage svg.stroke-canvas {
+  display: block;
+}
+.stroke-page[data-living='on'] .stroke-stage {
+  cursor: pointer;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.stroke-page[data-living='on'] .stroke-grid,
+.stroke-page[data-living='still'] .stroke-grid,
+.stroke-page[data-living='on'] .stroke-guide,
+.stroke-page[data-living='still'] .stroke-guide,
+.stroke-page[data-living='on'] .stroke-bleed,
+.stroke-page[data-living='still'] .stroke-bleed,
+.stroke-page[data-living='on'] .stroke-ink,
+.stroke-page[data-living='still'] .stroke-ink {
+  display: none;
+}
+.stroke-page[data-living='on'] .stroke-inks,
+.stroke-page[data-living='still'] .stroke-inks {
+  display: none; /* the ink follows the world here — no separate pigment row */
+}
+.stroke-page[data-living='on'] .stroke-readout,
+.stroke-page[data-living='still'] .stroke-readout {
+  position: absolute; /* the pips carry the count; keep the counter for readers */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.stroke-pips {
+  display: none;
+  gap: 9px;
+  justify-content: center;
+  margin: 14px 0 0;
+}
+.stroke-page[data-living='on'] .stroke-pips,
+.stroke-page[data-living='still'] .stroke-pips {
+  display: flex;
+}
+.stroke-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--red);
+  font-style: normal;
+}
+.stroke-pip.filled {
+  background: var(--red);
+}
+.stroke-hint {
+  display: none;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--faint);
+  margin: 12px 0 0;
+}
+.stroke-page[data-living='on'] .stroke-hint {
+  display: block;
+}
+.stroke-hint .en-sub {
+  letter-spacing: 0.08em;
+  margin-top: 3px;
 }
 
 .stroke-canvas {

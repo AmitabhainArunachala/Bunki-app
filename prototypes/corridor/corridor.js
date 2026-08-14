@@ -522,8 +522,10 @@ const S = {
   /** 筆順 · the full-screen stroke-order page, layered over the kanji sheet.
    * null when closed; { id, sheetScroll, invoker, step } when open. */
   strokes: null,
-  /** The learner's stroke-number preference survives closing the page. */
-  strokeNumbers: true,
+  /** The learner's stroke-number preference survives closing the page.
+   * Off by default — the room opens on the clean finished sheet (the
+   * design's law); 筆順の番号 is one tap away. */
+  strokeNumbers: false,
   /** Sheet scrollTop to put back on the next render (returning from 筆順). */
   sheetScrollRestore: null,
   /** Element id inside the sheet that should take focus on the next render. */
@@ -8307,14 +8309,19 @@ function inkSpecFor(INK, strokes, disp) {
     disp,
   };
 }
-async function mountInkRoom(holder, ch, paths, reduced) {
+async function mountInkRoom(room2, ch, paths, reduced) {
   stopInkRoom();
+  const { page, stage, pips } = room2;
   const disp = Math.round(Math.min(2.5, window.devicePixelRatio || 1) * 460);
   const canvas = el('canvas', 'ink-sheet');
   canvas.width = canvas.height = disp;
   canvas.setAttribute('aria-hidden', 'true');
-  holder.append(canvas);
+  stage.prepend(canvas); // beneath the SVG overlay (numbers ride on the ink)
   const room = (inkRoom = { handle: null, canvas });
+  const fillPips = (upto) => {
+    if (!pips) return;
+    [...pips.children].forEach((p, i) => p.classList.toggle('filled', i < upto));
+  };
   try {
     const [INK, glyph] = await Promise.all([ensureInkModule(), animcjkGlyphFor(ch)]);
     if (inkRoom !== room || !document.contains(canvas)) return;
@@ -8322,19 +8329,38 @@ async function mountInkRoom(holder, ch, paths, reduced) {
     // quality); the KanjiVG-synthesized body only for the rare rest
     const strokes = glyph ? INK.deriveStrokes(glyph.strokes, glyph.medians) : INK.strokesFromKanjiVG(paths);
     const spec = inkSpecFor(INK, strokes, disp);
+    // the stroke pips and number positions follow the glyph actually written
+    if (pips && pips.children.length !== strokes.length) {
+      pips.textContent = '';
+      for (let i = 0; i < strokes.length; i++) pips.append(el('i', 'stroke-pip'));
+    }
+    if (glyph) {
+      const nums = page.querySelectorAll('.stroke-num');
+      strokes.forEach((s, i) => {
+        const n = nums[i];
+        if (!n) return;
+        n.setAttribute('x', String((s.medPts[0][0] * 109) / 1024));
+        n.setAttribute('y', String((s.medPts[0][1] * 109) / 1024));
+      });
+    }
     if (reduced) {
       // stillness by choice: one finished sheet, hand-painted, no engine
       INK.paintStillFor(canvas, spec);
-      holder.dataset.ink = 'still';
+      page.dataset.living = 'still';
+      fillPips(strokes.length);
       return;
     }
+    spec.firstScale = 5; // the room opens on the sheet finishing, not waiting
     spec.freshCanvas = () => {
       const nu = room.canvas.cloneNode(false);
       room.canvas.replaceWith(nu);
       room.canvas = nu;
       return nu;
     };
-    spec.shouldRewrite = () => inkRoom === room && document.contains(room.canvas);
+    spec.onStroke = (ix) => fillPips(ix);
+    spec.onPhase = (phase) => {
+      if (phase === 'done') fillPips(strokes.length);
+    };
     const handle = await INK.startInk(canvas, spec);
     if (inkRoom !== room) {
       handle.stop();
@@ -8343,18 +8369,19 @@ async function mountInkRoom(holder, ch, paths, reduced) {
     room.handle = handle;
     handle.ondead = () => {
       // device lost mid-write: the page keeps its SVG diagram — honest, quiet
-      if (inkRoom === room) holder.dataset.ink = 'lost';
+      if (inkRoom === room) page.dataset.living = 'off';
     };
-    holder.dataset.ink = handle.kind;
-    // touch the sheet, the hand writes again
-    holder.addEventListener('click', () => {
-      if (inkRoom === room && room.handle) room.handle.rewrite();
+    page.dataset.living = 'on';
+    page.dataset.inkKind = handle.kind;
+    // 触れて、もう一度 — touch the sheet and the hand writes again
+    stage.addEventListener('click', () => {
+      if (inkRoom === room && room.handle) room.handle.rewrite(S.strokeSlow ? 0.45 : 1);
     });
   } catch (e) {
     console.warn('書の間: living ink unavailable —', e && e.message);
     if (inkRoom === room) {
-      holder.dataset.ink = 'none';
-      holder.remove(); // no engine and no still — the SVG diagram stands alone
+      page.dataset.living = 'off';
+      canvas.remove(); // no engine and no still — the SVG diagram stands alone
     }
   }
 }
@@ -8398,38 +8425,44 @@ function renderStrokePage(root) {
   bar.append(backBtn);
 
   const title = el('span', 'stroke-title');
-  title.append(el('span', 'stroke-title-glyph', st.id));
-  title.append(el('span', 'stroke-title-word', tx('筆順', 'stroke order')));
+  title.append(el('span', 'stroke-title-word', tx('書の間', 'the writing room')));
   bar.append(title);
 
-  const closeBtn = el('button', 'stroke-close', '✕');
-  closeBtn.type = 'button';
-  closeBtn.id = 'strokes-close';
-  closeBtn.dataset.action = 'layer.dismiss';
-  closeBtn.setAttribute('aria-label', tx('筆順をとじる', 'close stroke order'));
-  closeBtn.addEventListener('click', (event) => {
-    interaction(
-      { kind: 'layer.dismiss' },
-      event.detail === 0 ? 'keyboard' : 'pointer',
-      'strokes-close',
-    );
-    closeStrokePage();
-  });
-  bar.append(closeBtn);
+  // the world seal, top right — the room re-dresses AND re-inks on a world
+  // change (the design's chrome-row: ← 戻る · 書の間 · seal)
+  const seal = el('button', 'theme-seal stroke-seal', THEME_UI[themeIx()].seal);
+  seal.type = 'button';
+  seal.id = 'stroke-world-seal';
+  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  attachWorldPicker(seal);
+  bar.append(seal);
   page.append(bar);
 
   if (!paths.length) {
     strokeMissing(page, st.id, k);
   } else {
     const body = el('div', 'stroke-body');
-    // 書の間 — the living sheet first: the kanji written in real fluid ink,
-    // in the active world's own pigment. The SVG diagram below stays the
-    // practical guide (numbers, replay, tracing) in every circumstance.
-    const inkStage = el('div', 'ink-stage');
-    inkStage.id = 'ink-stage';
-    mountInkRoom(inkStage, st.id, paths, reduced);
-    body.append(inkStage);
+    // the glyph header — 永 五画 · 水部, readings to the right, the kun stem
+    // in the world's red (the design's khead, from real kanji data)
+    const khead = el('div', 'stroke-khead');
+    const kleft = el('span', 'stroke-k', st.id);
+    const radC = D.radInfo?.[k?.rad]?.c;
+    kleft.append(
+      el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
+    );
+    const readings = el('span', 'stroke-readings');
+    if (k?.on?.length) readings.append(el('span', 'stroke-on', k.on.slice(0, 2).join('・')));
+    for (const kn of (k?.kun || []).slice(0, 2)) {
+      const [stem, oku] = kn.split('.');
+      const row = el('span', 'stroke-kun');
+      row.append(el('span', 'stroke-kun-stem', stem));
+      if (oku) row.append(document.createTextNode(oku));
+      readings.append(row);
+    }
+    khead.append(kleft, readings);
+    body.append(khead);
     const stage = el('div', 'stroke-stage');
+    stage.id = 'ink-stage';
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', STROKE_VIEWBOX);
     svg.setAttribute('class', 'stroke-canvas');
@@ -8500,6 +8533,21 @@ function renderStrokePage(root) {
     stage.append(svg);
     body.append(stage);
 
+    // the stroke pips — one dot per stroke, pressed as the hand writes
+    const pips = el('div', 'stroke-pips');
+    pips.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < paths.length; i++) pips.append(el('i', 'stroke-pip'));
+    body.append(pips);
+
+    const hint = el('p', 'stroke-hint', '触れて、もう一度 — 二度と同じ書にならない');
+    if (bi()) hint.append(el('span', 'en-sub', 'touch — it writes again, never the same twice'));
+    body.append(hint);
+
+    // the living sheet mounts beneath the SVG overlay; the page's data-living
+    // attribute decides which layers show (the ink, or the classic diagram)
+    page.dataset.living = 'off';
+    mountInkRoom({ page, stage, pips }, st.id, paths, reduced);
+
     const readout = el('div', 'stroke-readout');
     const counter = el('span', 'stroke-count', `0 / ${paths.length}`);
     counter.id = 'stroke-count';
@@ -8529,8 +8577,20 @@ function renderStrokePage(root) {
     } else {
       const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
       replay.classList.add('primary');
-      replay.addEventListener('click', () => startStrokeAnimation(page));
+      replay.addEventListener('click', () => {
+        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(S.strokeSlow ? 0.45 : 1);
+        else startStrokeAnimation(page);
+      });
       controls.append(replay);
+      // ゆっくり — the next writing goes at a learner's pace
+      const slow = strokeControl('stroke-slow', 'ゆっくり', 'slowly');
+      slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
+      slow.addEventListener('click', () => {
+        S.strokeSlow = !S.strokeSlow;
+        slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
+        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(S.strokeSlow ? 0.45 : 1);
+      });
+      controls.append(slow);
     }
 
     // 顔料 — four inks. A quiet row of pigment dots; the page holds the choice.
@@ -8558,7 +8618,7 @@ function renderStrokePage(root) {
     }
     body.append(inks);
 
-    const numbers = strokeControl('stroke-numbers', '番号', 'stroke numbers');
+    const numbers = strokeControl('stroke-numbers', '筆順の番号', 'stroke numbers');
     numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
     numbers.addEventListener('click', () => {
       S.strokeNumbers = !S.strokeNumbers;
