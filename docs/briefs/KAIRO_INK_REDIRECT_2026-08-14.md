@@ -88,3 +88,19 @@ generated files only via their builders; behaviour untouchable (tap circle,
 holds, capture scopes, FSRS, storage keys, rights gate).
 
 **Status: OPEN at Z1 (2026-08-14).**
+
+## §6 Operator feel verdicts (amendments by feel, same day)
+
+- **The always-lacquer sheet is REPEALED** ("too dark, no other theme
+  options, too hard to read"): the dictionary sheet wears the WORLD's
+  raised paper — light in the day worlds, natively dark at night. The
+  `--sheet-*` tokens remain reserved for surfaces that may still want
+  lacquer by choice.
+- **The pace law**: simulation density is FIXED at the gallery's rhythm
+  (~16.7 write-ms per lattice frame). Wall speed comes from sim-frames-
+  per-rAF; ゆっくり is speed 0.7 (MORE simulation per stroke, richer ink,
+  never poorer). No sped-up writing is ever shown: the first sheet
+  computes hidden at full density and fades in finished.
+- **筆順の番号 fixed**: in the living room the numbers answer the chip
+  directly (the classic SVG animation owned their inline opacity — they
+  never showed reliably over the ink).

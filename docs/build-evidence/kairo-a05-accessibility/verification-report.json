@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "292fe9e5a6c5501fc87e0d084d310d62a02396f3",
+  "head": "b0ee27ea4d43b96c5e4d5e085db3dd8386fdca6d",
   "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
   "viewport": {
     "width": 390,
@@ -106,7 +106,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 6.09:1 · pool-tag 6.09:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the hokusai world",
@@ -116,7 +116,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the sumi world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 6.09:1 · pool-tag 6.09:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the sumi world",
@@ -126,7 +126,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the akafuji world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 5.84:1 · pool-tag 5.84:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the akafuji world",
@@ -136,7 +136,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the iwa world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 4.60:1 · pool-tag 4.60:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the iwa world",
@@ -146,7 +146,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the rokusho world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 8.97:1 · pool-tag 8.97:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the rokusho world",
@@ -156,7 +156,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the yoru world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 8.22:1 · pool-tag 8.22:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the yoru world",
@@ -166,7 +166,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the nami world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 6.84:1 · pool-tag 6.84:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the nami world",
@@ -176,7 +176,7 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the kaku world",
       "pass": true,
-      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+      "detail": "eyebrow 9.34:1 · pool-tag 9.34:1"
     },
     {
       "name": "living paper stays within ±3% of --ground in the kaku world",

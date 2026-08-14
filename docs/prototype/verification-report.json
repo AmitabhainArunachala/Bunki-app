@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-14 06:44",
+          "2026-08-14 07:57",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-14 06:49",
+          "2026-08-14 08:02",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-14 06:53",
+          "2026-08-14 08:06",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 7 d",
-          "2026-08-21 06:43",
+          "in 10 d",
+          "2026-08-24 07:56",
           "8.30"
         ]
       ]
@@ -235,16 +235,16 @@
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.66,
+          "contrast": 5.11,
           "fontSize": 13,
-          "color": "rgb(205, 195, 176)"
+          "color": "rgb(74, 93, 112)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 5.58,
+          "contrast": 5.57,
           "fontSize": 15,
-          "color": "rgb(224, 121, 107)"
+          "color": "rgb(176, 58, 46)"
         }
       ],
       "wcag": [
@@ -300,16 +300,16 @@
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.66,
+          "contrast": 5.11,
           "fontSize": 13,
-          "color": "rgb(205, 195, 176)"
+          "color": "rgb(74, 93, 112)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 5.58,
+          "contrast": 5.57,
           "fontSize": 15,
-          "color": "rgb(224, 121, 107)"
+          "color": "rgb(176, 58, 46)"
         }
       ]
     },
@@ -338,9 +338,9 @@
       {
         "label": "discrimination note",
         "selector": ".sem-note",
-        "contrast": 9.66,
+        "contrast": 5.11,
         "fontSize": 13,
-        "color": "rgb(205, 195, 176)"
+        "color": "rgb(74, 93, 112)"
       },
       {
         "label": "chrome breadcrumb (background)",
@@ -359,9 +359,9 @@
       {
         "label": "reading, the one red",
         "selector": ".reading",
-        "contrast": 5.58,
+        "contrast": 5.57,
         "fontSize": 15,
-        "color": "rgb(224, 121, 107)"
+        "color": "rgb(176, 58, 46)"
       },
       {
         "label": "shelf title",
@@ -6054,7 +6054,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 496,
+  "loadMs": 434,
   "summary": {
     "total": 116,
     "failed": 0
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.11000061035156,\"y\":570.219970703125,\"productive\":true}"
+      "detail": "{\"x\":147.77000427246094,\"y\":570.4099731445312,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 496 ms"
+      "detail": "40 texts, ready in 434 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6383,7 +6383,7 @@
     {
       "name": "discrimination notes are legible (AA)",
       "pass": true,
-      "detail": "9.66:1 at 13px"
+      "detail": "5.11:1 at 13px"
     },
     {
       "name": "body ink clears AAA",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786689912491,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786694274026,\"probe\",\"word:金屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6638,7 +6638,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     }
   ]
 }

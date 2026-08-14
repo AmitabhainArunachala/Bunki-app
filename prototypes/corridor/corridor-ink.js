@@ -762,20 +762,28 @@ function startGPU(canvas, spec, device) {
   // drying tail — the water dies and the pigment deposits crisp; that dried
   // state IS the design stills' quality. No auto-rewrite: the design law is
   // 触れて、もう一度 — the hand writes again on touch, never on a timer.
-  let mode = 'idle', tScale = 1, writeT0 = 0, dryLeft = 0;
+  //
+  // PACE LAW (quality bug found live): the simulation density is FIXED —
+  // every write advances the hand ~16.7 write-ms per lattice frameStep, the
+  // exact rhythm the gallery renders were made at. Wall-clock speed comes
+  // from `iterations` (sim frames per rAF, physics identical), and the
+  // learner's ゆっくり from `speed` (< 1 = MORE simulation per stroke —
+  // richer ink, never poorer). Never trade sim steps for wall time.
+  let mode = 'idle', writeSpeed = 1, iterations = 1, writeClock = 0, dryLeft = 0;
   const DRY_STEPS = 240;
-  function begin(scale) {
+  function begin(opts) {
     try {
-      tScale = scale || 1;
+      writeSpeed = (opts && opts.speed) || 1;
+      iterations = (opts && opts.iterations) || 1;
       seed = (Math.random() * 1e9) >>> 0;
       const r = rng(seed);
       engine.reset(seed);
       device.queue.copyExternalImageToTexture({ source: spec.ground(r, N) }, { texture: engine.ground }, [N, N]);
       uploadSprite(0);
       writer.start(0);
-      writeT0 = performance.now();
+      writeClock = 0;
       mode = 'writing';
-      spec.onPhase && spec.onPhase('writing');
+      spec.onPhase && spec.onPhase('writing', { hidden: !!(opts && opts.hidden) });
       spec.onStroke && spec.onStroke(0);
     } catch (e) { console.error('ink gpu begin failed:', e); dead = true; }
   }
@@ -798,16 +806,20 @@ function startGPU(canvas, spec, device) {
     requestAnimationFrame(frame);
     try {
       if (mode === 'writing') {
-        const step = writer.advance((now - writeT0) * tScale);
-        if (step.beginStroke !== null) {
-          uploadSprite(step.beginStroke);
-          spec.onStroke && spec.onStroke(step.beginStroke);
+        for (let k = 0; k < iterations && mode === 'writing'; k++) {
+          writeClock += 16.7 * writeSpeed;
+          const step = writer.advance(writeClock);
+          if (step.beginStroke !== null) {
+            uploadSprite(step.beginStroke);
+            spec.onStroke && spec.onStroke(step.beginStroke);
+          }
+          engine.frameStep(step.splats, seed);
+          if (step.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
         }
-        engine.frameStep(step.splats, seed);
         blit();
-        if (step.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
       } else if (mode === 'drying') {
-        for (let i = 0; i < 4 && dryLeft > 0; i++, dryLeft--) engine.frameStep([], seed);
+        const per = Math.max(4, iterations * 4);
+        for (let i = 0; i < per && dryLeft > 0; i++, dryLeft--) engine.frameStep([], seed);
         blit();
         if (!dryLeft) { mode = 'idle'; spec.onPhase && spec.onPhase('done'); }
       } else {
@@ -818,11 +830,11 @@ function startGPU(canvas, spec, device) {
   const handle = {
     kind: 'gpu',
     ondead: null,
-    rewrite(scale) { if (alive && !dead) begin(scale); },
+    rewrite(opts) { if (alive && !dead) begin(opts); },
     stop() { alive = false; try { engine.destroy(); } catch { /* already gone */ } },
     ready: initCheck,
   };
-  begin(spec.firstScale ?? 1);
+  begin(spec.first);
   requestAnimationFrame(frame);
   return handle;
 }
@@ -963,8 +975,9 @@ function startGL2(canvas, spec) {
   let cur = 0;
   const writer = makeWriterFor(spec.strokes);
   const U = (p, n) => gl.getUniformLocation(p, n);
-  // same lifecycle law as the GPU path: writing → drying → idle, touch to rewrite
-  let mode = 'idle', tScale = 1, writeT0 = 0, dryLeft = 0;
+  // same lifecycle and PACE LAW as the GPU path: fixed simulation density,
+  // wall speed via iterations, ゆっくり via speed < 1 (more sim, richer ink)
+  let mode = 'idle', writeSpeed = 1, iterations = 1, writeClock = 0, dryLeft = 0;
   const DRY_STEPS = 480; // gl2 counts single lattice steps (the gpu path counts frameSteps of two)
   function draw() {
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -972,8 +985,9 @@ function startGL2(canvas, spec) {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
-  function begin(scale) {
-    tScale = scale || 1;
+  function begin(opts) {
+    writeSpeed = (opts && opts.speed) || 1;
+    iterations = (opts && opts.iterations) || 1;
     seed = (Math.random() * 1e9) >>> 0;
     const r = rng(seed);
     gl.bindTexture(gl.TEXTURE_2D, fiberT);
@@ -988,9 +1002,9 @@ function startGL2(canvas, spec) {
     }
     uploadSprite(0);
     writer.start(0);
-    writeT0 = performance.now();
+    writeClock = 0;
     mode = 'writing';
-    spec.onPhase && spec.onPhase('writing');
+    spec.onPhase && spec.onPhase('writing', { hidden: !!(opts && opts.hidden) });
     spec.onStroke && spec.onStroke(0);
   }
   function uploadSprite(ix) {
@@ -1058,18 +1072,22 @@ function startGL2(canvas, spec) {
     if (!alive) return;
     requestAnimationFrame(frame);
     if (mode === 'writing') {
-      const out = writer.advance((now - writeT0) * tScale);
-      if (out.beginStroke !== null) {
-        uploadSprite(out.beginStroke);
-        spec.onStroke && spec.onStroke(out.beginStroke);
+      for (let k = 0; k < iterations && mode === 'writing'; k++) {
+        writeClock += 16.7 * writeSpeed;
+        const out = writer.advance(writeClock);
+        if (out.beginStroke !== null) {
+          uploadSprite(out.beginStroke);
+          spec.onStroke && spec.onStroke(out.beginStroke);
+        }
+        if (out.splats.length) splat(out.splats);
+        step();
+        step();
+        if (out.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
       }
-      if (out.splats.length) splat(out.splats);
-      step();
-      step();
       render();
-      if (out.finished) { mode = 'drying'; dryLeft = DRY_STEPS; }
     } else if (mode === 'drying') {
-      for (let i = 0; i < 8 && dryLeft > 0; i++, dryLeft--) step();
+      const per = Math.max(8, iterations * 8);
+      for (let i = 0; i < per && dryLeft > 0; i++, dryLeft--) step();
       render();
       if (!dryLeft) { mode = 'idle'; spec.onPhase && spec.onPhase('done'); }
     } else {
@@ -1079,13 +1097,13 @@ function startGL2(canvas, spec) {
   const handle = {
     kind: 'gl2',
     ondead: null,
-    rewrite(scale) { if (alive) begin(scale); },
+    rewrite(opts) { if (alive) begin(opts); },
     stop() {
       alive = false;
       try { gl.getExtension('WEBGL_lose_context')?.loseContext(); } catch { /* gone */ }
     },
   };
-  begin(spec.firstScale ?? 1);
+  begin(spec.first);
   requestAnimationFrame(frame);
   return handle;
 }

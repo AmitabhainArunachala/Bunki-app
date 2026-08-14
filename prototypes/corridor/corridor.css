@@ -1156,24 +1156,10 @@ button.tok::before {
 
 /* --------------------------------------------------------------- panel */
 .sheet {
-  /* S3 黒漆 — the bottom sheet is black lacquer in EVERY world (rebuild spec
-   * §2): the dictionary's native dress. The live tokens are re-scoped to the
-   * lacquer constants here, so every renderer inside the sheet — entry, kanji
-   * node, radical, conjugation, pickers — inherits the material without
-   * knowing about it. Behaviour (grip, 戻る, rise) is untouched. */
-  --ground: var(--sheet-ground);
-  --ground-2: var(--sheet-ground-2);
-  --ground-0: var(--sheet-ground-0);
-  --ink: var(--sheet-ink);
-  --ink-2: var(--sheet-ink-2);
-  --red: var(--sheet-red);
-  --red-wash: var(--sheet-red-wash);
-  --line: var(--sheet-line);
-  --line-soft: var(--sheet-line-soft);
-  --faint: var(--sheet-faint);
-  --faint-2: var(--sheet-faint-2);
-  --ai: var(--sheet-ai);
-  --ai-wash: var(--sheet-ai-wash);
+  /* The sheet wears the WORLD. The spec's always-lacquer constant was
+   * REPEALED by the operator on feel (2026-08-14: "too dark, hard to
+   * read") — the dictionary now rises as the world's raised paper: light
+   * and legible in the day worlds, natively dark in the night worlds. */
   position: fixed;
   left: 0;
   right: 0;
@@ -1185,11 +1171,10 @@ button.tok::before {
    * both 0, so the auto margins centre it once max-width binds (≥820px only) */
   max-width: 820px;
   margin-inline: auto;
-  background: var(--ground);
-  /* one gold hairline where the lacquer meets the room */
-  border-top: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  background: var(--ground-0, var(--ground));
+  border-top: 1px solid var(--line);
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 -14px 40px rgba(20, 24, 28, 0.2);
   padding: 8px 16px calc(22px + env(safe-area-inset-bottom));
   transform: translateY(0);
   animation: rise 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -2921,6 +2906,19 @@ body.v-depth-layered .stroke-page {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
+  /* the first sheet is computed unseen and fades in finished */
+  transition: opacity 0.5s ease;
+}
+.stroke-stage .ink-sheet.brewing {
+  opacity: 0;
+}
+/* in the living room the numbers answer the chip, not the SVG animation
+ * (which owns their inline opacity in classic mode — that was the broken
+ * 筆順の番号); stronger halo so they read over wet ink in every world */
+.stroke-page[data-living='on'] .stroke-num,
+.stroke-page[data-living='still'] .stroke-num {
+  opacity: 0.92 !important;
+  stroke-width: 2.4px;
 }
 .stroke-stage svg.stroke-canvas {
   display: block;

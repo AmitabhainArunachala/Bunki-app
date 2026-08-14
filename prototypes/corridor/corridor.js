@@ -8350,7 +8350,12 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       fillPips(strokes.length);
       return;
     }
-    spec.firstScale = 5; // the room opens on the sheet finishing, not waiting
+    // the room OPENS on the finished dried sheet: the first write runs at
+    // full simulation density (the pace law) but many sim frames per rAF,
+    // hidden behind a fade — no sped-up writing is ever shown. Every visible
+    // write (touch, もう一度) is the gallery's true real-time pace.
+    spec.first = { iterations: 12, hidden: true };
+    canvas.classList.add('brewing');
     spec.freshCanvas = () => {
       const nu = room.canvas.cloneNode(false);
       room.canvas.replaceWith(nu);
@@ -8358,8 +8363,12 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       return nu;
     };
     spec.onStroke = (ix) => fillPips(ix);
-    spec.onPhase = (phase) => {
-      if (phase === 'done') fillPips(strokes.length);
+    spec.onPhase = (phase, detail) => {
+      if (phase === 'writing' && !(detail && detail.hidden)) room.canvas.classList.remove('brewing');
+      if (phase === 'done') {
+        fillPips(strokes.length);
+        room.canvas.classList.remove('brewing'); // the finished sheet fades in
+      }
     };
     const handle = await INK.startInk(canvas, spec);
     if (inkRoom !== room) {
@@ -8375,7 +8384,7 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     page.dataset.inkKind = handle.kind;
     // 触れて、もう一度 — touch the sheet and the hand writes again
     stage.addEventListener('click', () => {
-      if (inkRoom === room && room.handle) room.handle.rewrite(S.strokeSlow ? 0.45 : 1);
+      if (inkRoom === room && room.handle) room.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
     });
   } catch (e) {
     console.warn('書の間: living ink unavailable —', e && e.message);
@@ -8578,7 +8587,7 @@ function renderStrokePage(root) {
       const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
       replay.classList.add('primary');
       replay.addEventListener('click', () => {
-        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(S.strokeSlow ? 0.45 : 1);
+        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
         else startStrokeAnimation(page);
       });
       controls.append(replay);
@@ -8588,7 +8597,7 @@ function renderStrokePage(root) {
       slow.addEventListener('click', () => {
         S.strokeSlow = !S.strokeSlow;
         slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
-        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(S.strokeSlow ? 0.45 : 1);
+        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
       });
       controls.append(slow);
     }
