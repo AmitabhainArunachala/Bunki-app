@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-14 06:01",
+          "2026-08-14 06:12",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-14 06:06",
+          "2026-08-14 06:17",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-14 06:10",
+          "2026-08-14 06:21",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-23 06:00",
+          "in 7 d",
+          "2026-08-21 06:11",
           "8.30"
         ]
       ]
@@ -6054,7 +6054,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 556,
+  "loadMs": 607,
   "summary": {
     "total": 116,
     "failed": 0
@@ -6083,7 +6083,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.27999877929688,\"y\":570.1400146484375,\"productive\":true}"
+      "detail": "{\"x\":148.14999389648438,\"y\":570.219970703125,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6093,7 +6093,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 87px; mean tether 163 → 163px"
+      "detail": "centre moved 88px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -6103,7 +6103,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 556 ms"
+      "detail": "40 texts, ready in 607 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6323,7 +6323,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6553,7 +6553,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786687320528,\"probe\",\"word:石鹸\",1,1]"
+      "detail": "row [1786687982769,\"probe\",\"word:石鹸\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",

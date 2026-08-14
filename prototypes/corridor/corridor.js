@@ -8258,6 +8258,25 @@ let inkModulePromise = null;
 function ensureInkModule() {
   return (inkModulePromise ||= import('./corridor-ink.js'));
 }
+/* AnimCJK true brush outlines (data/share_alike/animcjk, Arphic Public
+ * License) — the gallery-quality glyph data, covering 2,581 of the 2,582
+ * corridor kanji. Fetched by shard on first need, cached for the session. */
+const animcjkShards = new Map();
+async function animcjkGlyphFor(ch) {
+  try {
+    const sid = (ch.codePointAt(0) % 16).toString(16).padStart(2, '0');
+    if (!animcjkShards.has(sid)) {
+      animcjkShards.set(
+        sid,
+        fetch(`data/share_alike/animcjk/${sid}.json`).then((r) => (r.ok ? r.json() : null)),
+      );
+    }
+    const shard = await animcjkShards.get(sid);
+    return (shard && shard.entries && shard.entries[ch]) || null;
+  } catch {
+    return null;
+  }
+}
 let inkRoom = null; // { handle, canvas } — at most ONE living sheet in the app
 function stopInkRoom() {
   if (!inkRoom) return;
@@ -8268,13 +8287,13 @@ function stopInkRoom() {
   }
   inkRoom = null;
 }
-function inkSpecFor(INK, paths, disp) {
+function inkSpecFor(INK, strokes, disp) {
   const world = THEME_UI[themeIx()];
   const iw = INK_WORLDS[world.id] || INK_WORLDS.sumi;
   return {
     pal: iw.pal,
     wetScale: iw.wetScale,
-    strokes: INK.strokesFromKanjiVG(paths),
+    strokes,
     still: world.ink,
     // the sheet's paper is the world's own, grown by the S1 painters
     ground: (r, size) => {
@@ -8288,7 +8307,7 @@ function inkSpecFor(INK, paths, disp) {
     disp,
   };
 }
-async function mountInkRoom(holder, paths, reduced) {
+async function mountInkRoom(holder, ch, paths, reduced) {
   stopInkRoom();
   const disp = Math.round(Math.min(2.5, window.devicePixelRatio || 1) * 460);
   const canvas = el('canvas', 'ink-sheet');
@@ -8297,9 +8316,12 @@ async function mountInkRoom(holder, paths, reduced) {
   holder.append(canvas);
   const room = (inkRoom = { handle: null, canvas });
   try {
-    const INK = await ensureInkModule();
+    const [INK, glyph] = await Promise.all([ensureInkModule(), animcjkGlyphFor(ch)]);
     if (inkRoom !== room || !document.contains(canvas)) return;
-    const spec = inkSpecFor(INK, paths, disp);
+    // TRUE brush outlines when AnimCJK carries the character (gallery
+    // quality); the KanjiVG-synthesized body only for the rare rest
+    const strokes = glyph ? INK.deriveStrokes(glyph.strokes, glyph.medians) : INK.strokesFromKanjiVG(paths);
+    const spec = inkSpecFor(INK, strokes, disp);
     if (reduced) {
       // stillness by choice: one finished sheet, hand-painted, no engine
       INK.paintStillFor(canvas, spec);
@@ -8405,7 +8427,7 @@ function renderStrokePage(root) {
     // practical guide (numbers, replay, tracing) in every circumstance.
     const inkStage = el('div', 'ink-stage');
     inkStage.id = 'ink-stage';
-    mountInkRoom(inkStage, paths, reduced);
+    mountInkRoom(inkStage, st.id, paths, reduced);
     body.append(inkStage);
     const stage = el('div', 'stroke-stage');
     const svg = document.createElementNS(SVG_NS, 'svg');

@@ -599,6 +599,29 @@ function synthesizeOutline(medPts, cum, L, type) {
   return 'M' + poly.map(([px, py]) => `${px.toFixed(1)} ${py.toFixed(1)}`).join('L') + 'Z';
 }
 
+/** AnimCJK glyph data (TRUE brush outlines + medians, 1024-space — the same
+ * format the design gallery's 永 carried) → engine stroke objects. This is
+ * the gallery-quality path; the derivation is iro's STROKES map verbatim. */
+export function deriveStrokes(outlines, medians) {
+  const parseMedian = (d) => {
+    if (Array.isArray(d)) return d; // AnimCJK shards carry point arrays
+    const n = d.match(/-?[\d.]+/g).map(Number);
+    const p = [];
+    for (let i = 0; i < n.length; i += 2) p.push([n[i], n[i + 1]]);
+    return p;
+  };
+  return outlines.map((o, i) => {
+    const medPts = parseMedian(medians[i]);
+    const { L, cum } = medianLen(medPts);
+    const last = Math.hypot(
+      medPts[medPts.length - 1][0] - medPts[medPts.length - 2][0],
+      medPts[medPts.length - 1][1] - medPts[medPts.length - 2][1],
+    );
+    const type = last / L > 0.3 ? 'sweep' : L < 220 ? 'dot' : 'stop';
+    return { outline: o, medPts, cum, L, type, dur: 420 + Math.pow(L, 0.88) * 3.0 };
+  });
+}
+
 /** KanjiVG stroke paths (109-space centerlines) → engine stroke objects. */
 export function strokesFromKanjiVG(paths) {
   return paths.map((d) => {

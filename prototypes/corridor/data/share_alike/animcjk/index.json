@@ -1,0 +1,36 @@
+{
+ "what": "AnimCJK stroke graphics for the corridor kanji set — true brush outlines + medians, the living-ink engine's glyph data",
+ "sources": [
+  {
+   "name": "AnimCJK stroke graphics",
+   "licence": "Arphic Public License",
+   "attribution": "AnimCJK (parsimonhi) — glyphs derived from Arphic PL KaitiM fonts and Makemeahanzi, redistributed under the Arphic Public License",
+   "url": "https://github.com/parsimonhi/animCJK"
+  }
+ ],
+ "licenceFile": "ARPHIC-PUBLIC-LICENSE.txt",
+ "counts": {
+  "kanji": 2581,
+  "shards": 16
+ },
+ "shardCounts": {
+  "00": 159,
+  "01": 173,
+  "02": 170,
+  "03": 160,
+  "04": 159,
+  "05": 153,
+  "06": 158,
+  "07": 152,
+  "08": 154,
+  "09": 160,
+  "0a": 169,
+  "0b": 181,
+  "0c": 163,
+  "0d": 152,
+  "0e": 149,
+  "0f": 169
+ },
+ "shardKey": "codepoint % 16 as two hex digits",
+ "space": "glyph units 0..1024, y-down (flipped from Arphic font units at build: y = 900 - y)"
+}
