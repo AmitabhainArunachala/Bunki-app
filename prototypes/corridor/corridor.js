@@ -8475,12 +8475,11 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       fillPips(strokes.length);
       return;
     }
-    // the room OPENS on the finished dried sheet: the first write runs at
-    // full simulation density (the pace law) but many sim frames per rAF,
-    // hidden behind a fade — no sped-up writing is ever shown. Every visible
-    // write (touch, もう一度) is the gallery's true real-time pace.
-    spec.first = { iterations: 12, hidden: true };
-    canvas.classList.add('brewing');
+    // the room opens WRITING, exactly as the design gallery did on promote:
+    // wall-clock hand, one lattice pass per displayed frame, freeze at
+    // finish. No hidden fast-forward — a fast-forward trades away the very
+    // simulation density that makes the ink dense and detailed.
+    spec.first = { speed: S.strokeSlow ? 0.7 : 1 };
     spec.freshCanvas = () => {
       const nu = room.canvas.cloneNode(false);
       room.canvas.replaceWith(nu);
@@ -8488,12 +8487,8 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       return nu;
     };
     spec.onStroke = (ix) => fillPips(ix);
-    spec.onPhase = (phase, detail) => {
-      if (phase === 'writing' && !(detail && detail.hidden)) room.canvas.classList.remove('brewing');
-      if (phase === 'done') {
-        fillPips(strokes.length);
-        room.canvas.classList.remove('brewing'); // the finished sheet fades in
-      }
+    spec.onPhase = (phase) => {
+      if (phase === 'done') fillPips(strokes.length);
     };
     const handle = await INK.startInk(canvas, spec);
     if (inkRoom !== room) {

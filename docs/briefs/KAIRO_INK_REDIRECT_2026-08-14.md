@@ -96,11 +96,20 @@ holds, capture scopes, FSRS, storage keys, rights gate).
   raised paper — light in the day worlds, natively dark at night. The
   `--sheet-*` tokens remain reserved for surfaces that may still want
   lacquer by choice.
-- **The pace law**: simulation density is FIXED at the gallery's rhythm
-  (~16.7 write-ms per lattice frame). Wall speed comes from sim-frames-
-  per-rAF; ゆっくり is speed 0.7 (MORE simulation per stroke, richer ink,
-  never poorer). No sped-up writing is ever shown: the first sheet
-  computes hidden at full density and fades in finished.
+- **The gallery law** (supersedes the earlier "pace law", which was a
+  misreading — operator verdict "still worse than yesterday" traced to it):
+  the engine runs EXACTLY as the design gallery ran it. The hand advances
+  on the wall clock (`writer.advance(performance.now())`) and the lattice
+  steps once per displayed frame (gl2: twice) — on a 120Hz phone the fluid
+  receives twice the simulation per stroke, and that density is the
+  interior detail of the original renders. The sheet FREEZES the instant
+  the last stroke lands: no drying tail — post-finish steps only diffuse
+  the deposits and soften the bristle detail. The room opens writing,
+  visibly, as the gallery did on promote; no hidden fast-forward exists.
+  ゆっくり dilates the clock (speed 0.7 — more physics per stroke, richer
+  ink, never poorer). Same day, also reverted: the 引き締め smoothstep in
+  the WebGPU render shader (fallback keeps it) — the GPU pipeline is
+  byte-identical to the gallery engine.
 - **筆順の番号 fixed**: in the living room the numbers answer the chip
   directly (the classic SVG animation owned their inline opacity — they
   never showed reliably over the ink).

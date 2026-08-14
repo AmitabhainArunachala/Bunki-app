@@ -2906,11 +2906,6 @@ body.v-depth-layered .stroke-page {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
-  /* the first sheet is computed unseen and fades in finished */
-  transition: opacity 0.5s ease;
-}
-.stroke-stage .ink-sheet.brewing {
-  opacity: 0;
 }
 /* in the living room the numbers answer the chip, not the SVG animation
  * (which owns their inline opacity in classic mode — that was the broken
