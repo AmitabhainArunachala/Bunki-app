@@ -3172,8 +3172,11 @@ body.v-depth-layered .stroke-page {
 .ink-dot[data-ink='ai']::after      { background: #2e4d6e; }
 .ink-dot[data-ink='rokusho']::after { background: #3a6a52; }
 
+/* the chosen pigment is ringed in the world's red — the same stone language
+ * as the world picker (Z4 wires ink-follows-the-world; the row stays local
+ * until then) */
 .ink-dot[aria-pressed='true']::after {
-  outline: 1.5px solid var(--ink-2);
+  outline: 2px solid var(--red);
   outline-offset: 3px;
 }
 

@@ -168,3 +168,12 @@ phase — this file is the hand-off.
 ("1. Keep 2. 藍 ベロ藍・浪"), fixing the palette at eight worlds with
 ベロ藍・浪 as the default. The eight are wired into the live corridor
 (tokens + seal cycle, battery green). The build is OPEN at P1.**
+
+**AMENDED 2026-08-14 — P1 foundations executed, deployed, battery green
+(evidence: `docs/build-evidence/gosai-rebuild/p1/`). On the operator's
+review the build was REDIRECTED to 全墨: the ground under every surface
+becomes the LIVE fluid-ink engine and the world options are one tap away
+everywhere. The redirect contract is
+`docs/briefs/KAIRO_INK_REDIRECT_2026-08-14.md`; its phases Z1–Z4 run
+first, then this spec's P2–P8 surface walk continues on the living
+ground. The build is OPEN at Z1→Z2.**

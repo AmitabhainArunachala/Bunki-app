@@ -8877,10 +8877,8 @@ function syncDriftTheme() {
     /* drift not mounted yet — render() re-syncs when it first shows */
   }
 }
-function cycleKairoTheme() {
-  setKairoTheme(THEME_UI[(themeIx() + 1) % THEME_UI.length].id);
-  render();
-}
+// (the old tap-to-cycle retired 2026-08-14 — with eight worlds the operator
+// wants the stones one tap away on every screen; see attachWorldPicker)
 
 /* ---------------------------------------------------- S1 living paper ground
  * The ground is grown, not painted flat: each world gets its own procedural
@@ -9116,12 +9114,14 @@ window.addEventListener('resize', () => {
 });
 
 /* ------------------------------------------------------ the eight world-stones
- * With eight worlds, cycling alone would make the far seals a chore — a
- * LONG-PRESS on a theme seal opens the stones for a direct jump (rebuild
- * spec §1); a plain tap still cycles. iOS war-scars honored: activation is
- * on CLICK, and the one-shot swallow that keeps the hold from also cycling
- * is armed only while the pointer is down on the seal. */
+ * The colour options are ONE TAP away on every screen (operator redirect,
+ * 2026-08-14): tapping a theme seal opens the eight stones for a direct
+ * jump; a long-press opens the same picker (muscle memory from the P1
+ * mechanic keeps working). iOS war-scars honored: activation is on CLICK,
+ * and the one-shot swallow that keeps the hold's release from re-opening
+ * the picker is armed only while the pointer is down on the seal. */
 let worldPickerEls = null;
+let worldPickerOpener = null;
 function worldPickerEsc(e) {
   if (e.key === 'Escape') closeWorldPicker();
 }
@@ -9130,6 +9130,9 @@ function closeWorldPicker() {
   for (const n of worldPickerEls) n.remove();
   worldPickerEls = null;
   document.removeEventListener('keydown', worldPickerEsc, true);
+  // hand focus back to the seal that opened the stones (keyboard walkers)
+  if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
+  worldPickerOpener = null;
 }
 function openWorldPicker(anchor) {
   closeWorldPicker();
@@ -9155,10 +9158,12 @@ function openWorldPicker(anchor) {
     b.addEventListener('click', () => {
       closeWorldPicker();
       setKairoTheme(t.id);
+      S.sealWake = true; // the 銀河 seal plays its wake on a world change
       render();
     });
     pop.append(b);
   }
+  worldPickerOpener = anchor;
   scrim.addEventListener('click', closeWorldPicker);
   document.body.append(scrim, pop);
   // hang beneath the seal, held inside the viewport
@@ -9171,8 +9176,8 @@ function openWorldPicker(anchor) {
   (activeStone || pop.firstChild).focus();
 }
 const WORLD_PICKER_HOLD_MS = 480;
-/** Give a seal button both gestures: tap runs onTap, a hold opens the stones. */
-function attachWorldPicker(sealBtn, onTap) {
+/** A seal button opens the stones on TAP; a hold opens them early. */
+function attachWorldPicker(sealBtn) {
   let holdT = 0;
   let swallow = false;
   sealBtn.addEventListener('pointerdown', (e) => {
@@ -9180,7 +9185,7 @@ function attachWorldPicker(sealBtn, onTap) {
     swallow = false;
     clearTimeout(holdT);
     holdT = setTimeout(() => {
-      swallow = true; // the press became a hold — the click that follows is not a tap
+      swallow = true; // the press became a hold — the release must not re-open
       openWorldPicker(sealBtn);
     }, WORLD_PICKER_HOLD_MS);
   });
@@ -9193,7 +9198,7 @@ function attachWorldPicker(sealBtn, onTap) {
       swallow = false;
       return;
     }
-    onTap();
+    openWorldPicker(sealBtn);
   });
 }
 
@@ -9328,11 +9333,8 @@ function buildGingaChrome(root) {
   const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'ginga-theme-seal';
-  seal.setAttribute('aria-label', tx('世界を変える（長押しで一覧）', 'change the world (hold for the picker)'));
-  attachWorldPicker(seal, () => {
-    S.sealWake = true;
-    cycleKairoTheme();
-  });
+  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  attachWorldPicker(seal);
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
 
@@ -9487,8 +9489,8 @@ function render() {
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'theme-seal';
-  seal.setAttribute('aria-label', tx('色の主題を変える（長押しで一覧）', 'change the colour theme (hold for the picker)'));
-  attachWorldPicker(seal, cycleKairoTheme);
+  seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  attachWorldPicker(seal);
   chrome.append(seal);
 
   const langSeg = el('div', 'lang-seg');
