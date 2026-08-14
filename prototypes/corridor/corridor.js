@@ -8289,7 +8289,141 @@ function stopInkRoom() {
   }
   inkRoom = null;
 }
-function inkSpecFor(INK, strokes, disp) {
+/** The ink sheet's paper at DESIGN strength — the full-amplitude grounds the
+ * original renders sat on (the app ground's ±3% quiet law protects text; the
+ * sheet holds no text, so it gets the real paper back: strong fiber, true
+ * vignette, visible tooth). Ported from the design pages' painters. */
+function inkGroundFor(world, size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const g = c.getContext('2d');
+  const S = size;
+  const u = S / 920;
+  const r = paperRng({ cream: 13, kozo: 11, dawn: 19, kaki: 29, urushi: 41, kon: 23, sea: 31, terminal: 59 }[world.paper] || 7);
+  const grad = (stops, slant) => {
+    const base = g.createLinearGradient(0, 0, S * (slant ?? 0.7), S);
+    stops.forEach((col, i) => base.addColorStop(i / (stops.length - 1), col));
+    g.fillStyle = base;
+    g.fillRect(0, 0, S, S);
+  };
+  const fibers = (n, dark, light) => {
+    for (let i = 0; i < n; i++) {
+      const x = r() * S, y = r() * S, len = (10 + r() * 70) * u;
+      const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5);
+      g.beginPath();
+      g.moveTo(x, y);
+      g.quadraticCurveTo(x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 16 * u, x + Math.cos(a) * len, y + Math.sin(a) * len);
+      g.strokeStyle = r() < 0.8 ? dark(r) : light(r);
+      g.lineWidth = (0.4 + r() * 0.7) * u;
+      g.stroke();
+    }
+  };
+  const vignette = (rgba) => {
+    const v = g.createRadialGradient(S / 2, S / 2, S * 0.38, S / 2, S / 2, S * 0.72);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, rgba);
+    g.fillStyle = v;
+    g.fillRect(0, 0, S, S);
+  };
+  const kind = world.paper;
+  if (kind === 'cream') {
+    grad(['#f3ecd8', '#eee5cc', '#e4d8b8'], 0.9);
+    fibers(2000, (r) => `rgba(170,150,110,${0.03 + r() * 0.06})`, (r) => `rgba(252,248,232,${0.08 + r() * 0.09})`);
+    vignette('rgba(85,70,42,0.15)');
+  } else if (kind === 'kozo') {
+    grad(['#f6f0e1', '#efe7d2', '#e5d8ba'], 0.9);
+    fibers(2400, (r) => `rgba(180,158,116,${0.03 + r() * 0.07})`, (r) => `rgba(252,246,228,${0.08 + r() * 0.09})`);
+    vignette('rgba(90,70,40,0.16)');
+  } else if (kind === 'dawn') {
+    grad(['#f6e8d2', '#f1ddc4', '#e6cbaa'], 0.5);
+    const glow = g.createRadialGradient(S * 0.75, S * 0.2, 10, S * 0.75, S * 0.2, S * 0.55);
+    glow.addColorStop(0, 'rgba(220,140,90,0.10)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = glow;
+    g.fillRect(0, 0, S, S);
+    fibers(1800, (r) => `rgba(180,140,100,${0.03 + r() * 0.05})`, (r) => `rgba(255,246,230,${0.07 + r() * 0.08})`);
+    vignette('rgba(110,70,40,0.15)');
+  } else if (kind === 'kaki') {
+    grad(['#e0b587', '#d5a672', '#c2915c'], 0.8);
+    for (let i = 0; i < 36; i++) {
+      const x = r() * S, y = r() * S, rad = (30 + r() * 110) * u;
+      const cl = g.createRadialGradient(x, y, 2, x, y, rad);
+      cl.addColorStop(0, r() < 0.55 ? `rgba(130,74,32,${0.07 + r() * 0.1})` : `rgba(230,180,120,${0.06 + r() * 0.08})`);
+      cl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = cl;
+      g.beginPath();
+      g.arc(x, y, rad, 0, 7);
+      g.fill();
+    }
+    fibers(1400, (r) => `rgba(120,70,30,${0.03 + r() * 0.05})`, (r) => `rgba(240,200,150,${0.04 + r() * 0.05})`);
+    vignette('rgba(70,38,12,0.2)');
+  } else if (kind === 'urushi') {
+    grad(['#1c1713', '#151110', '#0e0b09'], 0.6);
+    const sheen = g.createRadialGradient(S * 0.3, S * 0.22, 10, S * 0.3, S * 0.22, S * 0.75);
+    sheen.addColorStop(0, 'rgba(90,80,66,0.13)');
+    sheen.addColorStop(0.5, 'rgba(40,34,28,0.05)');
+    sheen.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = sheen;
+    g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 420; i++) {
+      const x = r() * S, y = r() * S, len = (6 + r() * 38) * u, a = -0.6 + (r() - 0.5) * 0.5;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len);
+      g.strokeStyle = `rgba(70,60,48,${0.03 + r() * 0.05})`;
+      g.lineWidth = (0.3 + r() * 0.5) * u;
+      g.stroke();
+    }
+  } else if (kind === 'kon') {
+    grad(['#161e38', '#111830', '#0b1122'], 0.7);
+    fibers(1400, (r) => `rgba(90,110,170,${0.015 + r() * 0.04})`, (r) => `rgba(140,160,220,${0.02 + r() * 0.04})`);
+    for (let i = 0; i < 200; i++) {
+      const b = r();
+      g.fillStyle = `rgba(${(200 + b * 40) | 0},${(205 + b * 30) | 0},${(235 + b * 20) | 0},${0.06 + r() * 0.45})`;
+      g.beginPath();
+      g.arc(r() * S, r() * S, (0.4 + r() * 1.1) * u, 0, 7);
+      g.fill();
+    }
+  } else if (kind === 'sea') {
+    grad(['#16324a', '#102940', '#0a1e30'], 0.5);
+    for (let i = 0; i < 14; i++) {
+      const y0 = r() * S;
+      g.beginPath();
+      g.moveTo(0, y0);
+      for (let x = 0; x <= S; x += S / 24) g.lineTo(x, y0 + Math.sin((x / S) * 12.56 + i) * 10 * u);
+      g.strokeStyle = `rgba(130,170,205,${0.02 + r() * 0.045})`;
+      g.lineWidth = (0.6 + r() * 1.2) * u;
+      g.stroke();
+    }
+    for (let i = 0; i < 120; i++) {
+      g.fillStyle = `rgba(220,232,240,${0.04 + r() * 0.2})`;
+      g.beginPath();
+      g.arc(r() * S, r() * S, (0.3 + r() * 1.0) * u, 0, 7);
+      g.fill();
+    }
+  } else {
+    grad(['#081218', '#050d12', '#03080c'], 0.3);
+    g.font = `${9 * u}px monospace`;
+    for (let col = 0; col < 16; col++) {
+      const x = ((col + 0.5) * S) / 16;
+      let y = r() * S;
+      const n = 3 + ((r() * 7) | 0);
+      for (let i = 0; i < n; i++) {
+        const ch = PAPER_KATA[(r() * PAPER_KATA.length) | 0];
+        g.fillStyle = `rgba(55,232,176,${(0.03 + r() * 0.09) * (1 - (i / n) * 0.6)})`;
+        g.fillText(ch, x, y + i * 12 * u);
+      }
+    }
+    for (let i = 0; i < 3; i++) {
+      const y = r() * S;
+      g.fillStyle = 'rgba(120,255,210,0.015)';
+      g.fillRect(0, y, S, 8 * u);
+    }
+  }
+  return c;
+}
+
+function inkSpecFor(INK, strokes) {
   const world = THEME_UI[themeIx()];
   const iw = INK_WORLDS[world.id] || INK_WORLDS.sumi;
   return {
@@ -8297,25 +8431,16 @@ function inkSpecFor(INK, strokes, disp) {
     wetScale: iw.wetScale,
     strokes,
     still: world.ink,
-    // the sheet's paper is the world's own, grown by the S1 painters
-    ground: (r, size) => {
-      const c = document.createElement('canvas');
-      c.width = c.height = size;
-      paintPaper(c.getContext('2d'), size, size, world, world.g);
-      return c;
-    },
+    ground: (r, size) => inkGroundFor(world, size),
     gpuN: 1024,
     gl2Sim: 800,
-    disp,
   };
 }
 async function mountInkRoom(room2, ch, paths, reduced) {
   stopInkRoom();
   const { page, stage, pips } = room2;
-  const disp = Math.round(Math.min(2.5, window.devicePixelRatio || 1) * 460);
   const canvas = el('canvas', 'ink-sheet');
-  canvas.width = canvas.height = disp;
-  canvas.setAttribute('aria-hidden', 'true');
+  canvas.setAttribute('aria-hidden', 'true'); // the backends set the backing 1:1 to the lattice
   stage.prepend(canvas); // beneath the SVG overlay (numbers ride on the ink)
   const room = (inkRoom = { handle: null, canvas });
   const fillPips = (upto) => {
@@ -8328,7 +8453,7 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     // TRUE brush outlines when AnimCJK carries the character (gallery
     // quality); the KanjiVG-synthesized body only for the rare rest
     const strokes = glyph ? INK.deriveStrokes(glyph.strokes, glyph.medians) : INK.strokesFromKanjiVG(paths);
-    const spec = inkSpecFor(INK, strokes, disp);
+    const spec = inkSpecFor(INK, strokes);
     // the stroke pips and number positions follow the glyph actually written
     if (pips && pips.children.length !== strokes.length) {
       pips.textContent = '';

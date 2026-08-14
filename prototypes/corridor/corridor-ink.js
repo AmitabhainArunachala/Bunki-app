@@ -711,13 +711,12 @@ export function buildFiberBytes(seed, size) {
 
 /* --------------------------------------------------- still ink (instant boot) */
 export function paintStillFor(canvas, spec) {
-  const disp = spec.disp;
-  canvas.width = canvas.height = disp;
+  const sim = spec.gl2Sim;
+  canvas.width = canvas.height = sim;
   const g = canvas.getContext('2d');
   const r = rng((Math.random() * 1e9) >>> 0);
-  g.drawImage(spec.ground(r, disp), 0, 0);
-  const sim = spec.gl2Sim;
-  const scale = disp / sim;
+  g.drawImage(spec.ground(r, sim), 0, 0);
+  const scale = 1;
   for (let i = 0; i < spec.strokes.length; i++) {
     const sp = buildSpriteCanvas(spec.strokes[i], 7 + i * 977, sim);
     const t = document.createElement('canvas');
@@ -743,6 +742,10 @@ function startGPU(canvas, spec, device) {
   const N = spec.gpuN;
   device.pushErrorScope('validation');
   const engine = createLBM(device, N, spec.pal);
+  // 1:1 presentation — the canvas backing IS the lattice, so the browser
+  // downsamples once to display size and every kasure streak stays sharp
+  // (the old disp-sized backing UPSCALED 1024 -> ~1150 and softened it all)
+  canvas.width = canvas.height = N;
   const ctx = canvas.getContext('webgpu');
   const format = navigator.gpu.getPreferredCanvasFormat();
   ctx.configure({ device, format, alphaMode: 'opaque' });
@@ -934,7 +937,8 @@ function startGL2(canvas, spec) {
   gl.getExtension('OES_texture_float_linear');
   let alive = true, done = false, seed = 0;
   const SIM = spec.gl2Sim;
-  const DISP = spec.disp;
+  // 1:1 presentation (see the GPU path) — backing = simulation resolution
+  canvas.width = canvas.height = SIM;
   const quad = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -970,7 +974,7 @@ function startGL2(canvas, spec) {
     return f;
   });
   const fiberT = tex(SIM, SIM, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
-  const groundT = tex(DISP, DISP, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
+  const groundT = tex(SIM, SIM, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
   const spriteT = tex(SIM, SIM, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
   let cur = 0;
   const writer = makeWriterFor(spec.strokes);
@@ -993,7 +997,7 @@ function startGL2(canvas, spec) {
     gl.bindTexture(gl.TEXTURE_2D, fiberT);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, SIM, SIM, 0, gl.RGBA, gl.UNSIGNED_BYTE, buildFiberBytes(seed + 3, SIM));
     gl.bindTexture(gl.TEXTURE_2D, groundT);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, spec.ground(r, DISP));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, spec.ground(r, SIM));
     for (const f of fbs) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, f);
       gl.viewport(0, 0, SIM, SIM);
@@ -1049,7 +1053,7 @@ function startGL2(canvas, spec) {
   function render() {
     gl.useProgram(pRender);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, DISP, DISP);
+    gl.viewport(0, 0, SIM, SIM);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, state[cur]);
     gl.activeTexture(gl.TEXTURE1);
