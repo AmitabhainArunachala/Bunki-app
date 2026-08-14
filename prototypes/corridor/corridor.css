@@ -2872,6 +2872,27 @@ body.v-depth-layered .stroke-page {
   margin: 10px 0 6px;
 }
 
+/* 書の間 — the living sheet: the kanji written in real fluid ink (the D2Q9
+ * engine in corridor-ink.js), the hero of the stroke page. The canvas is a
+ * square sheet in the world's paper; tap it and the hand writes again. If
+ * no engine can run, the holder removes itself and the SVG diagram stands. */
+.ink-stage {
+  flex: none;
+  width: min(100%, 420px);
+  margin: 12px 0 2px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    0 14px 44px rgba(10, 10, 8, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+.ink-sheet {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
 .stroke-canvas {
   display: block;
   width: 100%;
@@ -3041,7 +3062,10 @@ body.v-depth-layered .stroke-page {
  */
 
 .stroke-page {
-  --stroke-ink: #1c1e21; /* 墨 */
+  /* the default 墨 is the WORLD's ink — dark sumi on the paper worlds, pale
+   * ink on the night worlds, so the diagram never sinks into its ground
+   * (it was hard-coded #1c1e21 and unreadable on 漆金浪殻) */
+  --stroke-ink: var(--ink);
   background:
     radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.016) 0 1px, transparent 1px),
     radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.012) 0 1px, transparent 1px),
@@ -3052,6 +3076,20 @@ body.v-depth-layered .stroke-page {
 .stroke-page[data-ink='bengara'] { --stroke-ink: #9e2b25; }
 .stroke-page[data-ink='ai']      { --stroke-ink: #2e4d6e; }
 .stroke-page[data-ink='rokusho'] { --stroke-ink: #3a6a52; }
+
+/* the three named pigments lift on the night grounds — same pigment, lit */
+:root[data-theme='rokusho'] .stroke-page[data-ink='bengara'],
+:root[data-theme='yoru'] .stroke-page[data-ink='bengara'],
+:root[data-theme='nami'] .stroke-page[data-ink='bengara'],
+:root[data-theme='kaku'] .stroke-page[data-ink='bengara'] { --stroke-ink: #c96a50; }
+:root[data-theme='rokusho'] .stroke-page[data-ink='ai'],
+:root[data-theme='yoru'] .stroke-page[data-ink='ai'],
+:root[data-theme='nami'] .stroke-page[data-ink='ai'],
+:root[data-theme='kaku'] .stroke-page[data-ink='ai'] { --stroke-ink: #8fb3d1; }
+:root[data-theme='rokusho'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='yoru'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='nami'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='kaku'] .stroke-page[data-ink='rokusho'] { --stroke-ink: #7fc0a0; }
 
 /* the sheet of paper the hand writes on */
 .stroke-stage {
@@ -3167,7 +3205,7 @@ body.v-depth-layered .stroke-page {
   box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.14);
 }
 
-.ink-dot[data-ink='sumi']::after    { background: #1c1e21; }
+.ink-dot[data-ink='sumi']::after    { background: var(--ink); }
 .ink-dot[data-ink='bengara']::after { background: #9e2b25; }
 .ink-dot[data-ink='ai']::after      { background: #2e4d6e; }
 .ink-dot[data-ink='rokusho']::after { background: #3a6a52; }

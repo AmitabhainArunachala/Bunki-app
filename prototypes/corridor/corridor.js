@@ -1853,6 +1853,7 @@ function closeStrokePage() {
   if (!S.strokes) return;
   const { sheetScroll, invoker } = S.strokes;
   cancelStrokeAnimation();
+  stopInkRoom();
   S.strokes = null;
   S.sheetScrollRestore = sheetScroll;
   S.sheetFocus = invoker;
@@ -8227,9 +8228,121 @@ function strokeMissing(page, id, k) {
   page.append(box);
 }
 
+/* ------------------------------------------------- 書の間 · the living ink
+ * The stroke page's hero: the kanji WRITTEN in real fluid ink by the same
+ * D2Q9 lattice engine that made the design renders (corridor-ink.js — the
+ * canonical home of the physics). The ink follows the world (HASSAI): each
+ * of the eight worlds carries its own pigment; the sheet's paper is grown
+ * by the same painters as the app ground. The engine mounts when the page
+ * opens and stops when it leaves; reduced motion gets a hand-painted still;
+ * no GPU at all keeps the SVG diagram alone. */
+const INK_WORLDS = {
+  // 藍 ベロ藍 — Prussian blue (authored from the carousel's aizuri line)
+  hokusai: { pal: { mode: 0, low: [0.48, 0.58, 0.78], high: [0.07, 0.14, 0.28], sheen: [0.05, 0.06, 0.08] }, wetScale: 1.0 },
+  // 墨 — the canon, stroke-art-v5's exact numbers
+  sumi: { pal: { mode: 0, low: [0.512, 0.448, 0.352], high: [0.16, 0.16, 0.24], sheen: [0.05, 0.055, 0.06] }, wetScale: 1.0 },
+  // 赤 赤富士の錆 — rust between 朱 and 弁柄 (authored)
+  akafuji: { pal: { mode: 0, low: [0.88, 0.55, 0.4], high: [0.55, 0.18, 0.09], sheen: [0.055, 0.05, 0.045] }, wetScale: 1.0 },
+  // 柿 焦茶 — the iro card verbatim
+  iwa: { pal: { mode: 0, low: [0.7, 0.52, 0.38], high: [0.3, 0.16, 0.08], sheen: [0.05, 0.045, 0.04] }, wetScale: 1.0 },
+  // 漆 胡粉 — the iro card verbatim (additive shell-white)
+  rokusho: { pal: { mode: 1, low: [0.3, 0.28, 0.25], high: [0.94, 0.91, 0.85], sheen: [0.14, 0.13, 0.12], spark: [1.0, 0.98, 0.92], metal: 0.25 }, wetScale: 0.9 },
+  // 金 金泥 — the canon, kept no matter what
+  yoru: { pal: { mode: 1, low: [0.42, 0.3, 0.1], high: [1.0, 0.83, 0.45], sheen: [0.1, 0.12, 0.2], spark: [1.0, 0.9, 0.6], metal: 1 }, wetScale: 0.85 },
+  // 浪 波の泡 — spindrift white on the deep sea (authored)
+  nami: { pal: { mode: 1, low: [0.32, 0.38, 0.44], high: [0.9, 0.94, 0.97], sheen: [0.1, 0.12, 0.16], spark: [0.95, 1.0, 1.0], metal: 0.35 }, wetScale: 0.9 },
+  // 殻 燐光 — phosphor on terminal black (authored)
+  kaku: { pal: { mode: 1, low: [0.08, 0.3, 0.24], high: [0.5, 1.0, 0.82], sheen: [0.08, 0.14, 0.12], spark: [0.6, 1.0, 0.85], metal: 0.6 }, wetScale: 0.9 },
+};
+let inkModulePromise = null;
+function ensureInkModule() {
+  return (inkModulePromise ||= import('./corridor-ink.js'));
+}
+let inkRoom = null; // { handle, canvas } — at most ONE living sheet in the app
+function stopInkRoom() {
+  if (!inkRoom) return;
+  try {
+    if (inkRoom.handle) inkRoom.handle.stop();
+  } catch {
+    /* engine already gone */
+  }
+  inkRoom = null;
+}
+function inkSpecFor(INK, paths, disp) {
+  const world = THEME_UI[themeIx()];
+  const iw = INK_WORLDS[world.id] || INK_WORLDS.sumi;
+  return {
+    pal: iw.pal,
+    wetScale: iw.wetScale,
+    strokes: INK.strokesFromKanjiVG(paths),
+    still: world.ink,
+    // the sheet's paper is the world's own, grown by the S1 painters
+    ground: (r, size) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      paintPaper(c.getContext('2d'), size, size, world, world.g);
+      return c;
+    },
+    gpuN: 1024,
+    gl2Sim: 800,
+    disp,
+  };
+}
+async function mountInkRoom(holder, paths, reduced) {
+  stopInkRoom();
+  const disp = Math.round(Math.min(2.5, window.devicePixelRatio || 1) * 460);
+  const canvas = el('canvas', 'ink-sheet');
+  canvas.width = canvas.height = disp;
+  canvas.setAttribute('aria-hidden', 'true');
+  holder.append(canvas);
+  const room = (inkRoom = { handle: null, canvas });
+  try {
+    const INK = await ensureInkModule();
+    if (inkRoom !== room || !document.contains(canvas)) return;
+    const spec = inkSpecFor(INK, paths, disp);
+    if (reduced) {
+      // stillness by choice: one finished sheet, hand-painted, no engine
+      INK.paintStillFor(canvas, spec);
+      holder.dataset.ink = 'still';
+      return;
+    }
+    spec.freshCanvas = () => {
+      const nu = room.canvas.cloneNode(false);
+      room.canvas.replaceWith(nu);
+      room.canvas = nu;
+      return nu;
+    };
+    spec.shouldRewrite = () => inkRoom === room && document.contains(room.canvas);
+    const handle = await INK.startInk(canvas, spec);
+    if (inkRoom !== room) {
+      handle.stop();
+      return;
+    }
+    room.handle = handle;
+    handle.ondead = () => {
+      // device lost mid-write: the page keeps its SVG diagram — honest, quiet
+      if (inkRoom === room) holder.dataset.ink = 'lost';
+    };
+    holder.dataset.ink = handle.kind;
+    // touch the sheet, the hand writes again
+    holder.addEventListener('click', () => {
+      if (inkRoom === room && room.handle) room.handle.rewrite();
+    });
+  } catch (e) {
+    console.warn('書の間: living ink unavailable —', e && e.message);
+    if (inkRoom === room) {
+      holder.dataset.ink = 'none';
+      holder.remove(); // no engine and no still — the SVG diagram stands alone
+    }
+  }
+}
+
 function renderStrokePage(root) {
   const st = S.strokes;
-  if (!st) return;
+  if (!st) {
+    stopInkRoom(); // the page is gone however it left — never orphan an engine
+    return;
+  }
   const k = D.kanji[st.id];
   const paths = strokePathsFor(st.id);
   const reduced = strokeReduced();
@@ -8287,6 +8400,13 @@ function renderStrokePage(root) {
     strokeMissing(page, st.id, k);
   } else {
     const body = el('div', 'stroke-body');
+    // 書の間 — the living sheet first: the kanji written in real fluid ink,
+    // in the active world's own pigment. The SVG diagram below stays the
+    // practical guide (numbers, replay, tracing) in every circumstance.
+    const inkStage = el('div', 'ink-stage');
+    inkStage.id = 'ink-stage';
+    mountInkRoom(inkStage, paths, reduced);
+    body.append(inkStage);
     const stage = el('div', 'stroke-stage');
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', STROKE_VIEWBOX);

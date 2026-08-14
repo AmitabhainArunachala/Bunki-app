@@ -46,12 +46,14 @@ jobs:
 
           # a syntax error must never reach the phone
           node --check prototypes/corridor/corridor.js
+          node --check prototypes/corridor/corridor-ink.js
           node --check prototypes/corridor/dictionary-worker.js
 
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/apple-touch-icon.png \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
+                prototypes/corridor/corridor-ink.js \
                 prototypes/corridor/dictionary-worker.js \
                 prototypes/corridor/drift-layer.css \
                 prototypes/corridor/drift-layer.js \
@@ -78,7 +80,7 @@ jobs:
           # internal assertion at process exit on some Node lines (seen live:
           # "assert(!this.paused)" AFTER every path had already printed 200)
           for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
-                      'dictionary-worker.js' \
+                      'corridor-ink.js' 'dictionary-worker.js' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
                       'data/manifest.json' 'data/articles/index.json' \
                       'data/articles/archive-index.json' \
