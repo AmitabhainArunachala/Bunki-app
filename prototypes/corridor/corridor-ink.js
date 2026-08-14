@@ -322,11 +322,15 @@ fn main(@builtin(global_invocation_id) g: vec3u) {
   if (P.mode == 0u) {
     var alpha = 1.0 - exp(-ink * 1.8);
     alpha *= 0.92 + 0.08 * fib;
+    // 引き締め — the originals COMMIT: thin veil dies, the edge snaps.
+    // Measured against the design renders (veil ratio 0.06, not 0.12).
+    alpha = smoothstep(0.12, 0.6, alpha);
     let tint = mix(P.inkLow.rgb, P.inkHigh.rgb, clamp(ink * 0.55, 0.0, 1.0));
     col = min(paper * mix(vec3f(1.0), tint, alpha), paper);
     col += P.sheenC.rgb * smoothstep(0.01, 0.3, water);
   } else {
-    let alpha = 1.0 - exp(-ink * 1.5);
+    var alpha = 1.0 - exp(-ink * 1.5);
+    alpha = smoothstep(0.08, 0.68, alpha); // 引き締め, night side — keep the metal's tonal breath
     let spark = smoothstep(0.55, 1.0, fib) * alpha * P.metal;
     let metalC = mix(P.inkLow.rgb, P.inkHigh.rgb, clamp(ink * 0.5, 0.0, 1.0));
     col = paper + metalC * alpha * 0.95 + P.sparkC.rgb * spark * 0.35;
@@ -916,6 +920,7 @@ void main(){
   if (uMode == 0) {
     float a = 1. - exp(-ink * 1.8);
     a *= 0.92 + 0.08*fib;
+    a = smoothstep(0.12, 0.6, a);
     vec3 tint = mix(uLow, uHigh, clamp(ink*0.55, 0., 1.));
     vec3 col = paper * mix(vec3(1.), tint, a);
     col = min(col, paper);
@@ -923,6 +928,7 @@ void main(){
     o = vec4(col, 1.);
   } else {
     float a = 1. - exp(-ink * 1.5);
+    a = smoothstep(0.08, 0.68, a);
     float spark = smoothstep(0.55, 1.0, fib) * a * uMetal;
     vec3 metalC = mix(uLow, uHigh, clamp(ink*0.5, 0., 1.));
     vec3 col = paper + metalC * a * 0.95 + uSpark * spark * 0.35;
