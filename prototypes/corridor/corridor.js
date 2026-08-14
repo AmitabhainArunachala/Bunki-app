@@ -8239,22 +8239,22 @@ function strokeMissing(page, id, k) {
  * opens and stops when it leaves; reduced motion gets a hand-painted still;
  * no GPU at all keeps the SVG diagram alone. */
 const INK_WORLDS = {
-  // 藍 ベロ藍 — Prussian blue (authored from the carousel's aizuri line)
-  hokusai: { pal: { mode: 0, low: [0.48, 0.58, 0.78], high: [0.07, 0.14, 0.28], sheen: [0.05, 0.06, 0.08] }, wetScale: 1.0 },
+  // 藍 ベロ藍 — Prussian blue, TUNED against ink-hoku-berlin.png (mean Δ ≤ 6/255)
+  hokusai: { pal: { mode: 0, low: [0.33, 0.43, 0.6], high: [0.08, 0.17, 0.35], sheen: [0.05, 0.06, 0.08] }, wetScale: 1.0 },
   // 墨 — the canon, stroke-art-v5's exact numbers
   sumi: { pal: { mode: 0, low: [0.512, 0.448, 0.352], high: [0.16, 0.16, 0.24], sheen: [0.05, 0.055, 0.06] }, wetScale: 1.0 },
-  // 赤 赤富士の錆 — rust between 朱 and 弁柄 (authored)
-  akafuji: { pal: { mode: 0, low: [0.88, 0.55, 0.4], high: [0.55, 0.18, 0.09], sheen: [0.055, 0.05, 0.045] }, wetScale: 1.0 },
+  // 赤 赤富士の錆 — rust, TUNED against ink-hoku-akafuji.png (mean Δ ≤ 4/255)
+  akafuji: { pal: { mode: 0, low: [0.76, 0.44, 0.3], high: [0.55, 0.18, 0.09], sheen: [0.055, 0.05, 0.045] }, wetScale: 1.0 },
   // 柿 焦茶 — the iro card verbatim
   iwa: { pal: { mode: 0, low: [0.7, 0.52, 0.38], high: [0.3, 0.16, 0.08], sheen: [0.05, 0.045, 0.04] }, wetScale: 1.0 },
   // 漆 胡粉 — the iro card verbatim (additive shell-white)
   rokusho: { pal: { mode: 1, low: [0.3, 0.28, 0.25], high: [0.94, 0.91, 0.85], sheen: [0.14, 0.13, 0.12], spark: [1.0, 0.98, 0.92], metal: 0.25 }, wetScale: 0.9 },
   // 金 金泥 — the canon, kept no matter what
   yoru: { pal: { mode: 1, low: [0.42, 0.3, 0.1], high: [1.0, 0.83, 0.45], sheen: [0.1, 0.12, 0.2], spark: [1.0, 0.9, 0.6], metal: 1 }, wetScale: 0.85 },
-  // 浪 波の泡 — spindrift white on the deep sea (authored)
-  nami: { pal: { mode: 1, low: [0.32, 0.38, 0.44], high: [0.9, 0.94, 0.97], sheen: [0.1, 0.12, 0.16], spark: [0.95, 1.0, 1.0], metal: 0.35 }, wetScale: 0.9 },
-  // 殻 燐光 — phosphor on terminal black (authored)
-  kaku: { pal: { mode: 1, low: [0.08, 0.3, 0.24], high: [0.5, 1.0, 0.82], sheen: [0.08, 0.14, 0.12], spark: [0.6, 1.0, 0.85], metal: 0.6 }, wetScale: 0.9 },
+  // 浪 波の泡 — spindrift, TUNED against ink-hoku-nami.png (light end exact)
+  nami: { pal: { mode: 1, low: [0.5, 0.58, 0.66], high: [0.9, 0.94, 0.97], sheen: [0.1, 0.12, 0.16], spark: [0.95, 1.0, 1.0], metal: 0.35 }, wetScale: 0.9 },
+  // 殻 燐光 — phosphor, TUNED against ink-cyber-ghost.png (light end exact)
+  kaku: { pal: { mode: 1, low: [0.12, 0.52, 0.42], high: [0.36, 1.0, 0.82], sheen: [0.08, 0.14, 0.12], spark: [0.6, 1.0, 0.85], metal: 0.6 }, wetScale: 0.9 },
 };
 let inkModulePromise = null;
 function ensureInkModule() {
