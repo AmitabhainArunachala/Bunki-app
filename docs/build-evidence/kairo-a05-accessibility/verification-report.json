@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "d438e153cd4a031f8b6342463ebe63361ece5bc3",
+  "head": "3df6c35cadefa7f595b40f4a9408fce4337f1202",
   "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
   "viewport": {
     "width": 390,
