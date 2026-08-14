@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "147b3084c7d153a848d8b75da79962ed5f14eff2",
-  "chromium": "playwright-default",
+  "head": "852fa3b8d6b7903a397b2f6b8326dd86c35b02f8",
+  "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
   "viewport": {
     "width": 390,
     "height": 844
   },
   "summary": {
-    "total": 22,
-    "passed": 22,
+    "total": 36,
+    "passed": 36,
     "failed": 0
   },
   "results": [
@@ -106,12 +106,82 @@
     {
       "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
       "pass": true,
-      "detail": "eyebrow 6.09:1 · pool-tag 6.09:1"
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the hokusai world",
+      "pass": true,
+      "detail": "mean -1.69% · rms 2.03% vs ground rgb(233,223,194) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the sumi world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the sumi world",
+      "pass": true,
+      "detail": "mean -1.88% · rms 2.20% vs ground rgb(237,229,208) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the akafuji world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the akafuji world",
+      "pass": true,
+      "detail": "mean -2.43% · rms 2.67% vs ground rgb(236,215,189) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the iwa world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the iwa world",
+      "pass": true,
+      "detail": "mean -1.90% · rms 2.34% vs ground rgb(210,162,113) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the rokusho world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the rokusho world",
+      "pass": true,
+      "detail": "mean 0.26% · rms 0.33% vs ground rgb(34,28,21) over 819200px"
     },
     {
       "name": "quiet sheet labels meet 4.5:1 in the yoru world",
       "pass": true,
-      "detail": "eyebrow 8.22:1 · pool-tag 8.22:1"
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the yoru world",
+      "pass": true,
+      "detail": "mean 0.06% · rms 0.23% vs ground rgb(27,36,64) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the nami world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the nami world",
+      "pass": true,
+      "detail": "mean 0.15% · rms 0.26% vs ground rgb(24,49,74) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the kaku world",
+      "pass": true,
+      "detail": "eyebrow 7.48:1 · pool-tag 7.48:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the kaku world",
+      "pass": true,
+      "detail": "mean 0.02% · rms 0.05% vs ground rgb(11,22,29) over 819200px"
     },
     {
       "name": "real walk requested no missing Corridor assets",

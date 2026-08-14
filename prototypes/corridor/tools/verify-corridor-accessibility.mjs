@@ -422,12 +422,18 @@ async function main() {
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
-    // Quiet-label contrast across all five nihonga worlds. The WCAG contrast
+    // Quiet-label contrast across ALL EIGHT 八彩 worlds. The WCAG contrast
     // variant once pinned light-world ink values that sank every label into
     // the 夜 ground at ~1.2:1 (operator's phone, 2026-08-11) — this walk
-    // measures the real composited colors so no theme can regress silently.
+    // measures the real composited colors so no world can regress silently.
+    // Since P1 the walk ALSO measures the S1 living-paper amplitude law
+    // (rebuild spec §2 S1): the grown texture's luminance must stay within
+    // ±3% of the flat --ground it hangs over — measured as RMS deviation on
+    // the WCAG relative-luminance scale — so the ratios measured here keep
+    // describing what the eye actually meets.
     const themePage = await context.newPage();
-    for (const theme of ['hokusai', 'yoru']) {
+    const WORLDS = ['hokusai', 'sumi', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'kaku'];
+    for (const theme of WORLDS) {
       await openReader(themePage, base);
       await themePage.evaluate(`localStorage.setItem('kairo-theme', '${theme}')`);
       await themePage.reload();
@@ -463,6 +469,47 @@ async function main() {
         Object.entries(ratios)
           .map(([sel, r]) => `${sel.replace('#sheet .', '')} ${r.toFixed(2)}:1`)
           .join(' · '),
+      );
+      // the paper grows off the interaction beat — wait for the data-URL
+      await themePage
+        .waitForFunction(
+          `getComputedStyle(document.documentElement).getPropertyValue('--paper-url').includes('data:')`,
+          null,
+          { timeout: 15000 },
+        )
+        .catch(() => {});
+      const paper = await themePage.evaluate(`(async () => {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue('--paper-url').trim();
+        const m = raw.match(/url\\("?(data:[^")]+)"?\\)/);
+        if (!m) return { missing: true };
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = m[1]; });
+        const cv = document.createElement('canvas');
+        cv.width = img.width; cv.height = img.height;
+        const g = cv.getContext('2d', { willReadFrequently: true });
+        g.drawImage(img, 0, 0);
+        const data = g.getImageData(0, 0, cv.width, cv.height).data;
+        const f = new Float64Array(256);
+        for (let i = 0; i < 256; i++) {
+          const c = i / 255;
+          f[i] = c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+        const groundRgb = getComputedStyle(document.body).backgroundColor.match(/[\\d.]+/g).map(Number);
+        const L0 = 0.2126 * f[groundRgb[0]] + 0.7152 * f[groundRgb[1]] + 0.0722 * f[groundRgb[2]];
+        let sum = 0; let sumSq = 0; let n = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const L = 0.2126 * f[data[i]] + 0.7152 * f[data[i + 1]] + 0.0722 * f[data[i + 2]];
+          const d = L - L0;
+          sum += d; sumSq += d * d; n += 1;
+        }
+        return { mean: sum / n, rms: Math.sqrt(sumSq / n), ground: groundRgb.join(','), px: n };
+      })()`);
+      check(
+        `living paper stays within ±3% of --ground in the ${theme} world`,
+        !paper.missing && Math.abs(paper.mean) <= 0.03 && paper.rms <= 0.03,
+        paper.missing
+          ? 'no --paper-url grown'
+          : `mean ${(paper.mean * 100).toFixed(2)}% · rms ${(paper.rms * 100).toFixed(2)}% vs ground rgb(${paper.ground}) over ${paper.px}px`,
       );
     }
     await themePage.close();

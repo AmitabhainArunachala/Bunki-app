@@ -5916,18 +5916,21 @@ function renderReview(main) {
   const card = srsCardOf(item, now);
   const result = scheduler.repeat(card, now);
   const row = el('div', 'grade-row');
+  // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
+  // honest FSRS interval kept beneath (suites and screen readers select those)
   const grades = [
-    ['Again', 'again', 'もう一度'],
-    ['Hard', 'hard', '難しい'],
-    ['Good', 'good', 'ふつう'],
-    ['Easy', 'easy', '簡単'],
+    ['Again', 'again', 'もう一度', '再'],
+    ['Hard', 'hard', '難しい', '難'],
+    ['Good', 'good', 'ふつう', '良'],
+    ['Easy', 'easy', '簡単', '易'],
   ];
-  for (const [rating, key, ja] of grades) {
+  for (const [rating, key, ja, sealChar] of grades) {
     const next = result[fsrsApi.Rating[rating]].card;
     const ms = next.due.getTime() - now.getTime();
     const when = next.scheduled_days >= 1 ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`) : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
-    const b = el('button', `grade g-${key}`);
+    const b = el('button', `grade hanko g-${key}`);
     b.type = 'button';
+    b.append(el('span', 'g-seal', sealChar));
     b.append(el('span', 'g-label', tx(ja, key)));
     b.append(el('span', 'g-when', when));
     b.addEventListener('click', () => {
@@ -8814,15 +8817,26 @@ let lastRenderedView = null;
  * working — the values in corridor.css are the standard. The Drift layer's
  * matching worlds follow via its own build (generated file; next slice).
  * Default :root is ベロ藍・浪. */
+/* Each world carries its preview colours (g/ink/red MIRROR the corridor.css
+ * token blocks — change both together) and the paper its ground is grown
+ * from (S1 living paper, the painter key). */
 const THEME_UI = [
-  { id: 'hokusai', seal: '藍' }, // ベロ藍・浪 — Prussian blue on print cream (DEFAULT)
-  { id: 'sumi', seal: '墨' }, // 墨・楮紙 — sumi on kōzo
-  { id: 'akafuji', seal: '赤' }, // 凱風快晴 — Red Fuji on dawn paper
-  { id: 'iwa', seal: '柿' }, // 焦茶・柿渋 — umber on persimmon tannin
-  { id: 'rokusho', seal: '漆' }, // 胡粉・黒漆 — shell white on lacquer
-  { id: 'yoru', seal: '金' }, // 紺紙金泥 — sutra gold on indigo
-  { id: 'nami', seal: '浪' }, // 神奈川沖浪裏 — foam on the deep sea
-  { id: 'kaku', seal: '殻' }, // 攻殻・燐光 — phosphor on terminal black
+  // ベロ藍・浪 — Prussian blue on print cream (DEFAULT)
+  { id: 'hokusai', seal: '藍', name: 'ベロ藍・浪', g: '#f1e9d3', ink: '#1c2f42', red: '#b03a2e', paper: 'cream' },
+  // 墨・楮紙 — sumi on kōzo
+  { id: 'sumi', seal: '墨', name: '墨・楮紙', g: '#f5efe0', ink: '#211e17', red: '#a02a1e', paper: 'kozo' },
+  // 凱風快晴 — Red Fuji on dawn paper
+  { id: 'akafuji', seal: '赤', name: '凱風快晴', g: '#f3e3cf', ink: '#45291a', red: '#a03a20', paper: 'dawn' },
+  // 焦茶・柿渋 — umber on persimmon tannin
+  { id: 'iwa', seal: '柿', name: '焦茶・柿渋', g: '#ddb083', ink: '#2e1a0c', red: '#7e2410', paper: 'kaki' },
+  // 胡粉・黒漆 — shell white on lacquer
+  { id: 'rokusho', seal: '漆', name: '胡粉・黒漆', g: '#171310', ink: '#f2ecdf', red: '#e0796b', paper: 'urushi' },
+  // 紺紙金泥 — sutra gold on indigo
+  { id: 'yoru', seal: '金', name: '紺紙金泥', g: '#131a30', ink: '#f4ecd9', red: '#ef8079', paper: 'kon' },
+  // 神奈川沖浪裏 — foam on the deep sea
+  { id: 'nami', seal: '浪', name: '神奈川沖浪裏', g: '#11273b', ink: '#eae6d8', red: '#e08a6e', paper: 'sea' },
+  // 攻殻・燐光 — phosphor on terminal black
+  { id: 'kaku', seal: '殻', name: '攻殻・燐光', g: '#050d12', ink: '#d8efe9', red: '#ff6b4a', paper: 'terminal' },
 ];
 const THEME_STORE = 'kairo-theme';
 function themeId() {
@@ -8852,6 +8866,7 @@ function setKairoTheme(id) {
   } catch {
     /* private mode — the theme still applies for this session */
   }
+  applyPaper(t.id);
   syncDriftTheme();
 }
 /** Keep the Drift layer's own five-world palette in step with the corridor. */
@@ -8865,6 +8880,321 @@ function syncDriftTheme() {
 function cycleKairoTheme() {
   setKairoTheme(THEME_UI[(themeIx() + 1) % THEME_UI.length].id);
   render();
+}
+
+/* ---------------------------------------------------- S1 living paper ground
+ * The ground is grown, not painted flat: each world gets its own procedural
+ * paper — kōzo strokes, print-cream grain, dawn fiber, tannin clouds, lacquer
+ * polish-lines, indigo and stars, sea swells, terminal rain — grown ONCE per
+ * world+viewport on an offscreen canvas, cached as a data-URL and hung behind
+ * the app through the `--paper-url` token (body::before in corridor.css).
+ * Amplitude law (rebuild spec §2 S1): texture luminance stays within ±3% of
+ * `--ground`, MEASURED by the accessibility verifier — the paper may breathe
+ * but the measured contrast ratios never move. Growth happens off the
+ * interaction beat and never per-frame, so the reading loop keeps its 60fps. */
+const PAPER_SEED = { cream: 13, kozo: 11, dawn: 19, kaki: 29, urushi: 41, kon: 23, sea: 31, terminal: 59 };
+const PAPER_KATA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789';
+const PAPER_MAX_PIXELS = 1.6e6;
+const paperCache = new Map();
+let paperGrowToken = 0;
+let paperViewKey = '';
+
+function paperRng(seed) {
+  let s = seed >>> 0;
+  return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+}
+
+/** Texture size: the viewport at a capped scale, bucketed to 64px so the tiny
+ * iOS chrome-bar resizes don't force a regrow (cover absorbs the stretch). */
+function paperSize() {
+  const vw = Math.max(320, window.innerWidth || 390);
+  const vh = Math.max(480, window.innerHeight || 844);
+  let scale = Math.min(1.5, window.devicePixelRatio || 1);
+  if (vw * vh * scale * scale > PAPER_MAX_PIXELS) scale = Math.sqrt(PAPER_MAX_PIXELS / (vw * vh));
+  const bucket = (n) => Math.ceil((n * scale) / 64) * 64;
+  return { w: bucket(vw), h: bucket(vh) };
+}
+
+function paintPaper(g, w, h, world, base) {
+  const r = paperRng(PAPER_SEED[world.paper] || 7);
+  const u = w / 390; // stroke unit — the painters were tuned on the phone width
+  g.fillStyle = base || world.g;
+  g.fillRect(0, 0, w, h);
+  const wash = (stops, slant) => {
+    const lg = g.createLinearGradient(0, 0, w * (slant ?? 0.7), h);
+    for (const [p, c] of stops) lg.addColorStop(p, c);
+    g.fillStyle = lg;
+    g.fillRect(0, 0, w, h);
+  };
+  const fibers = (n, dark, light, darkBias = 0.8) => {
+    for (let i = 0; i < n; i++) {
+      const x = r() * w;
+      const y = r() * h;
+      const len = (10 + r() * 70) * u;
+      const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5);
+      g.beginPath();
+      g.moveTo(x, y);
+      g.quadraticCurveTo(x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 14 * u, x + Math.cos(a) * len, y + Math.sin(a) * len);
+      g.strokeStyle = r() < darkBias ? dark(r) : light(r);
+      g.lineWidth = (0.4 + r() * 0.7) * u;
+      g.stroke();
+    }
+  };
+  const vignette = (rgba) => {
+    const v = g.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.72);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, rgba);
+    g.fillStyle = v;
+    g.fillRect(0, 0, w, h);
+  };
+  const glow = (cx, cy, radius, rgba) => {
+    const gl = g.createRadialGradient(w * cx, h * cy, 6, w * cx, h * cy, h * radius);
+    gl.addColorStop(0, rgba);
+    gl.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = gl;
+    g.fillRect(0, 0, w, h);
+  };
+  if (world.paper === 'cream') {
+    // 藍 print cream — the woodblock sheet's even grain
+    wash([[0, 'rgba(255,252,240,0.04)'], [1, 'rgba(60,45,20,0.016)']], 0.9);
+    fibers(1900, (r) => `rgba(170,150,110,${0.02 + r() * 0.035})`, (r) => `rgba(252,248,232,${0.06 + r() * 0.07})`, 0.5);
+    vignette('rgba(85,70,42,0.022)');
+  } else if (world.paper === 'kozo') {
+    // 墨 kōzo washi — long mulberry strokes
+    wash([[0, 'rgba(255,250,238,0.04)'], [1, 'rgba(70,55,25,0.016)']], 0.9);
+    fibers(2300, (r) => `rgba(180,158,116,${0.02 + r() * 0.035})`, (r) => `rgba(252,246,228,${0.06 + r() * 0.07})`, 0.5);
+    vignette('rgba(90,70,40,0.022)');
+  } else if (world.paper === 'dawn') {
+    // 赤 dawn paper — warm fiber with the first light in one corner
+    wash([[0, 'rgba(255,245,230,0.045)'], [1, 'rgba(120,70,35,0.012)']], 0.5);
+    glow(0.75, 0.18, 0.5, 'rgba(220,140,90,0.05)');
+    fibers(1700, (r) => `rgba(180,140,100,${0.02 + r() * 0.03})`, (r) => `rgba(255,246,230,${0.05 + r() * 0.06})`, 0.5);
+    vignette('rgba(110,70,40,0.016)');
+  } else if (world.paper === 'kaki') {
+    // 柿 persimmon tannin — the dye settles in clouds
+    wash([[0, 'rgba(240,205,160,0.045)'], [1, 'rgba(90,50,20,0.02)']], 0.8);
+    for (let i = 0; i < 30; i++) {
+      const x = r() * w;
+      const y = r() * h;
+      const rad = (30 + r() * 100) * u;
+      const cl = g.createRadialGradient(x, y, 2, x, y, rad);
+      cl.addColorStop(0, r() < 0.45 ? `rgba(130,74,32,${0.025 + r() * 0.03})` : `rgba(235,190,130,${0.035 + r() * 0.035})`);
+      cl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = cl;
+      g.beginPath();
+      g.arc(x, y, rad, 0, 7);
+      g.fill();
+    }
+    fibers(1200, (r) => `rgba(120,70,30,${0.02 + r() * 0.03})`, (r) => `rgba(240,200,150,${0.04 + r() * 0.045})`, 0.5);
+    vignette('rgba(70,38,12,0.025)');
+  } else if (world.paper === 'urushi') {
+    // 漆 black lacquer — polish lines catching one soft sheen
+    wash([[0, 'rgba(255,240,210,0.02)'], [1, 'rgba(0,0,0,0.05)']], 0.6);
+    glow(0.3, 0.22, 0.75, 'rgba(120,105,85,0.05)');
+    for (let i = 0; i < 420; i++) {
+      const x = r() * w;
+      const y = r() * h;
+      const len = (6 + r() * 38) * u;
+      const a = -0.6 + (r() - 0.5) * 0.5;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len);
+      g.strokeStyle = `rgba(70,60,48,${0.03 + r() * 0.04})`;
+      g.lineWidth = (0.3 + r() * 0.5) * u;
+      g.stroke();
+    }
+  } else if (world.paper === 'kon') {
+    // 金 紺紙 — indigo fiber, and the sutra's scattered stars
+    wash([[0, 'rgba(80,100,170,0.03)'], [1, 'rgba(0,0,10,0.05)']], 0.7);
+    fibers(1200, (r) => `rgba(90,110,170,${0.015 + r() * 0.03})`, (r) => `rgba(140,160,220,${0.02 + r() * 0.03})`);
+    for (let i = 0; i < 150; i++) {
+      const b = r();
+      g.fillStyle = `rgba(${(200 + b * 40) | 0},${(205 + b * 30) | 0},${(235 + b * 20) | 0},${0.05 + r() * 0.28})`;
+      g.beginPath();
+      g.arc(r() * w, r() * h, (0.4 + r() * 1.0) * u, 0, 7);
+      g.fill();
+    }
+  } else if (world.paper === 'sea') {
+    // 浪 the deep Prussian sea — long swells, a little spindrift
+    wash([[0, 'rgba(120,170,210,0.03)'], [1, 'rgba(0,10,20,0.05)']], 0.5);
+    for (let i = 0; i < 16; i++) {
+      const y0 = r() * h;
+      g.beginPath();
+      g.moveTo(0, y0);
+      for (let x = 0; x <= w; x += w / 24) g.lineTo(x, y0 + Math.sin((x / w) * 12.56 + i) * 10 * u);
+      g.strokeStyle = `rgba(130,170,205,${0.02 + r() * 0.035})`;
+      g.lineWidth = (0.6 + r() * 1.1) * u;
+      g.stroke();
+    }
+    for (let i = 0; i < 110; i++) {
+      g.fillStyle = `rgba(220,232,240,${0.04 + r() * 0.14})`;
+      g.beginPath();
+      g.arc(r() * w, r() * h, (0.3 + r() * 1.0) * u, 0, 7);
+      g.fill();
+    }
+  } else {
+    // 殻 terminal black — faint glyph rain and scanlines
+    wash([[0, 'rgba(30,70,80,0.03)'], [1, 'rgba(0,0,0,0.05)']], 0.3);
+    g.font = `${9 * u}px monospace`;
+    for (let col = 0; col < 16; col++) {
+      const x = ((col + 0.5) * w) / 16;
+      let y = r() * h;
+      const n = 3 + ((r() * 7) | 0);
+      for (let i = 0; i < n; i++) {
+        const ch = PAPER_KATA[(r() * PAPER_KATA.length) | 0];
+        g.fillStyle = `rgba(55,232,176,${(0.02 + r() * 0.05) * (1 - (i / n) * 0.6)})`;
+        g.fillText(ch, x, y + i * 12 * u);
+      }
+    }
+    for (let i = 0; i < 3; i++) {
+      const y = r() * h;
+      g.fillStyle = 'rgba(120,255,210,0.012)';
+      g.fillRect(0, y, w, 8 * u);
+    }
+  }
+}
+
+/** Hang the active world's paper. Cached growth applies at once; a fresh
+ * world grows off the interaction beat — the seal press paints the tokens
+ * immediately and the paper follows a breath later. */
+let paperBase = '';
+function applyPaper(id) {
+  const world = THEME_UI.find((t) => t.id === id) || THEME_UI[0];
+  const root = document.documentElement;
+  const { w, h } = paperSize();
+  paperViewKey = `${w}x${h}`;
+  // the paper grows on the surface the body ACTUALLY shows — variant E's
+  // layered depth grounds the app on --ground-2, not --ground, and the
+  // amplitude law is measured against the real ground
+  const base = document.body ? getComputedStyle(document.body).backgroundColor : '';
+  paperBase = base;
+  const key = `${world.id}:${base}:${paperViewKey}`;
+  if (paperCache.has(key)) {
+    root.style.setProperty('--paper-url', paperCache.get(key));
+    return;
+  }
+  // never leave the OLD world's paper hanging over the NEW world's ground
+  root.style.setProperty('--paper-url', 'none');
+  const token = ++paperGrowToken;
+  const grow = () => {
+    if (token !== paperGrowToken) return; // superseded by a newer world/viewport
+    try {
+      const cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      const g = cv.getContext('2d');
+      if (!g) return;
+      paintPaper(g, w, h, world, base);
+      const url = `url("${cv.toDataURL('image/png')}")`;
+      paperCache.set(key, url);
+      if (paperCache.size > 10) paperCache.delete(paperCache.keys().next().value);
+      if (token === paperGrowToken) root.style.setProperty('--paper-url', url);
+    } catch {
+      /* canvas denied — the flat ground stands */
+    }
+  };
+  (window.requestIdleCallback || ((f) => setTimeout(f, 30)))(grow);
+}
+
+/** Called by render() after the body classes settle: if a variant moved the
+ * body onto a different ground, the paper regrows to match it. A no-op
+ * whenever the resolved ground is unchanged. */
+function syncPaper() {
+  if (!document.body || !paperBase) return;
+  if (getComputedStyle(document.body).backgroundColor !== paperBase) applyPaper(themeId());
+}
+
+// a REAL viewport change (rotation, split view) regrows the paper; the 64px
+// bucket in paperSize() already swallows the iOS chrome-bar jitter
+let paperResizeT = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(paperResizeT);
+  paperResizeT = setTimeout(() => {
+    const { w, h } = paperSize();
+    if (`${w}x${h}` !== paperViewKey) applyPaper(themeId());
+  }, 250);
+});
+
+/* ------------------------------------------------------ the eight world-stones
+ * With eight worlds, cycling alone would make the far seals a chore — a
+ * LONG-PRESS on a theme seal opens the stones for a direct jump (rebuild
+ * spec §1); a plain tap still cycles. iOS war-scars honored: activation is
+ * on CLICK, and the one-shot swallow that keeps the hold from also cycling
+ * is armed only while the pointer is down on the seal. */
+let worldPickerEls = null;
+function worldPickerEsc(e) {
+  if (e.key === 'Escape') closeWorldPicker();
+}
+function closeWorldPicker() {
+  if (!worldPickerEls) return;
+  for (const n of worldPickerEls) n.remove();
+  worldPickerEls = null;
+  document.removeEventListener('keydown', worldPickerEsc, true);
+}
+function openWorldPicker(anchor) {
+  closeWorldPicker();
+  const scrim = el('div', 'world-picker-scrim');
+  const pop = el('div', 'world-picker');
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
+  let activeStone = null;
+  for (const t of THEME_UI) {
+    const b = el('button', 'world-stone', t.seal);
+    b.type = 'button';
+    // each stone previews its own world — the colours mirror corridor.css
+    b.style.background = t.g;
+    b.style.color = t.ink;
+    b.style.setProperty('--stone-red', t.red);
+    b.setAttribute('aria-label', t.name);
+    const active = t.id === themeId();
+    b.setAttribute('aria-pressed', String(active));
+    if (active) {
+      b.classList.add('active');
+      activeStone = b;
+    }
+    b.addEventListener('click', () => {
+      closeWorldPicker();
+      setKairoTheme(t.id);
+      render();
+    });
+    pop.append(b);
+  }
+  scrim.addEventListener('click', closeWorldPicker);
+  document.body.append(scrim, pop);
+  // hang beneath the seal, held inside the viewport
+  const rect = anchor.getBoundingClientRect();
+  const pw = pop.offsetWidth;
+  pop.style.top = `${Math.round(Math.min(rect.bottom + 8, window.innerHeight - pop.offsetHeight - 8))}px`;
+  pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
+  document.addEventListener('keydown', worldPickerEsc, true);
+  worldPickerEls = [scrim, pop];
+  (activeStone || pop.firstChild).focus();
+}
+const WORLD_PICKER_HOLD_MS = 480;
+/** Give a seal button both gestures: tap runs onTap, a hold opens the stones. */
+function attachWorldPicker(sealBtn, onTap) {
+  let holdT = 0;
+  let swallow = false;
+  sealBtn.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    swallow = false;
+    clearTimeout(holdT);
+    holdT = setTimeout(() => {
+      swallow = true; // the press became a hold — the click that follows is not a tap
+      openWorldPicker(sealBtn);
+    }, WORLD_PICKER_HOLD_MS);
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) {
+    sealBtn.addEventListener(ev, () => clearTimeout(holdT));
+  }
+  sealBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+  sealBtn.addEventListener('click', () => {
+    if (swallow) {
+      swallow = false;
+      return;
+    }
+    onTap();
+  });
 }
 
 /* ------------------------------------------------------------ 銀河 hero nav
@@ -8998,8 +9328,8 @@ function buildGingaChrome(root) {
   const seal = el('button', 'ginga-seal' + (S.sealWake ? ' awake' : ''), THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'ginga-theme-seal';
-  seal.setAttribute('aria-label', tx('世界を変える', 'change the world (theme)'));
-  seal.addEventListener('click', () => {
+  seal.setAttribute('aria-label', tx('世界を変える（長押しで一覧）', 'change the world (hold for the picker)'));
+  attachWorldPicker(seal, () => {
     S.sealWake = true;
     cycleKairoTheme();
   });
@@ -9078,6 +9408,7 @@ function render() {
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
   document.body.classList.toggle('v-depth-layered', S.variants.depth === 'layered');
+  syncPaper();
   // F/G ride across to the Drift layer, which owns the tap ladder itself. Sent
   // on every render (not only on a click) so the layer carries the strip's
   // reading whenever it finishes loading, and unknown values are ignored there.
@@ -9156,8 +9487,8 @@ function render() {
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'theme-seal';
-  seal.setAttribute('aria-label', tx('色の主題を変える', 'change the colour theme'));
-  seal.addEventListener('click', cycleKairoTheme);
+  seal.setAttribute('aria-label', tx('色の主題を変える（長押しで一覧）', 'change the colour theme (hold for the picker)'));
+  attachWorldPicker(seal, cycleKairoTheme);
   chrome.append(seal);
 
   const langSeg = el('div', 'lang-seg');

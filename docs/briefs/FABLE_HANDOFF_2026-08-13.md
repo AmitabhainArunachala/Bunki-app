@@ -109,8 +109,8 @@ These cost real time to learn. Honor them.
   (lavapipe CPU Vulkan) + Deno at `/root/.deno/bin/deno`. Deno runs
   WebGPU on lavapipe.
 - Harness pattern (see scratchpad harness-*.ts): extract the
-  `/*ENGINE-CORE:BEGIN*/ … /*ENGINE-CORE:END*/` block from the stroke-art
-  HTML via regex, `import('data:text/javascript,'+encodeURIComponent(core))`,
+  `/*ENGINE-CORE:BEGIN*/ … /*ENGINE-CORE:END\*/`block from the stroke-art
+  HTML via regex,`import('data:text/javascript,'+encodeURIComponent(core))`,
   run against lavapipe, ASSERT physics (rho mean ≈ 1.0 ± 0.15, % pigment
   in-glyph > 0.85, zero non-finite cells), render frames to PPM →
   Pillow → PNG. Run form: `/root/.deno/bin/deno run --unstable-webgpu

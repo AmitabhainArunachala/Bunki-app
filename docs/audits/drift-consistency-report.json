@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-12T05:34:14.120Z",
-  "finishedAt": "2026-08-12T05:36:08.615Z",
+  "startedAt": "2026-08-14T02:17:57.010Z",
+  "finishedAt": "2026-08-14T02:19:53.238Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -18,7 +18,7 @@
       "height": 844,
       "deviceScaleFactor": 2
     },
-    "browser": "playwright pinned chromium"
+    "browser": "explicit CHROMIUM_PATH"
   },
   "gate": {
     "scope": "bounded PR regression slice",
@@ -89,16 +89,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 235.89999389648438,
-          "y": 514.2199554443359,
+          "x": 169.6999969482422,
+          "y": 504.13999938964844,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 74.69999980926514,
-          "y": 535.6900024414062,
+          "x": 73.88999652862549,
+          "y": 541.5800170898438,
           "onScreen": true
         }
       },
@@ -657,8 +657,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 265.8399963378906,
-        "y": 417.5199890136719,
+        "x": 265.8299789428711,
+        "y": 417.510009765625,
         "satellite": "議事堂"
       }
     },
@@ -694,8 +694,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 63.529998779296875,
-        "y": 274.32000732421875,
+        "x": 63.58000373840332,
+        "y": 274.29998779296875,
         "satellite": "謎謎"
       }
     },
@@ -712,8 +712,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 115.67000198364258,
-        "y": 345.1300048828125,
+        "x": 115.64999008178711,
+        "y": 345.1199951171875,
         "satellite": "句読点"
       }
     },
@@ -730,10 +730,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 75.78999900817871,
-        "y0": 494.0899963378906,
-        "x1": 105.78999900817871,
-        "y1": 502.0899963378906
+        "x0": 75.74999809265137,
+        "y0": 494.1700134277344,
+        "x1": 105.74999809265137,
+        "y1": 502.1700134277344
       }
     }
   ]

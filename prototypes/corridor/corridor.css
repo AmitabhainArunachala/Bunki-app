@@ -95,11 +95,21 @@ body {
   font-size: var(--t-body);
   line-height: 1.6;
   overscroll-behavior-y: none;
-  /* washi tooth — two very low-amplitude gradients, no external asset */
-  background-image:
-    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.018) 0 1px, transparent 1px),
-    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
-  background-size: 13px 13px, 19px 19px;
+}
+
+/* S1 living paper — the per-world procedural ground grown by corridor.js and
+ * hung here through --paper-url. A fixed layer painted once and composited,
+ * never per-frame; it sits above the flat ground colour (which the canvas
+ * inherits from body) and below every box the app draws. Amplitude law:
+ * the texture's luminance stays within ±3% of --ground, measured by the
+ * accessibility verifier — see paintPaper() in corridor.js. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--paper-url, none) center / cover no-repeat;
 }
 
 #app {
@@ -389,6 +399,11 @@ body.ginga #drift-layer #hint {
   border-radius: 999px;
   opacity: 0.2;
   cursor: pointer;
+  /* long-press opens the world-stones — keep iOS's own hold menus away */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
   transition:
     opacity 0.5s ease,
     transform 0.3s ease,
@@ -1141,6 +1156,24 @@ button.tok::before {
 
 /* --------------------------------------------------------------- panel */
 .sheet {
+  /* S3 黒漆 — the bottom sheet is black lacquer in EVERY world (rebuild spec
+   * §2): the dictionary's native dress. The live tokens are re-scoped to the
+   * lacquer constants here, so every renderer inside the sheet — entry, kanji
+   * node, radical, conjugation, pickers — inherits the material without
+   * knowing about it. Behaviour (grip, 戻る, rise) is untouched. */
+  --ground: var(--sheet-ground);
+  --ground-2: var(--sheet-ground-2);
+  --ground-0: var(--sheet-ground-0);
+  --ink: var(--sheet-ink);
+  --ink-2: var(--sheet-ink-2);
+  --red: var(--sheet-red);
+  --red-wash: var(--sheet-red-wash);
+  --line: var(--sheet-line);
+  --line-soft: var(--sheet-line-soft);
+  --faint: var(--sheet-faint);
+  --faint-2: var(--sheet-faint-2);
+  --ai: var(--sheet-ai);
+  --ai-wash: var(--sheet-ai-wash);
   position: fixed;
   left: 0;
   right: 0;
@@ -1153,9 +1186,10 @@ button.tok::before {
   max-width: 820px;
   margin-inline: auto;
   background: var(--ground);
-  border-top: 1px solid var(--line);
+  /* one gold hairline where the lacquer meets the room */
+  border-top: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 -14px 40px rgba(20, 24, 28, 0.14);
+  box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.45);
   padding: 8px 16px calc(22px + env(safe-area-inset-bottom));
   transform: translateY(0);
   animation: rise 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -1701,6 +1735,49 @@ button.tok::before {
   --ground-0: #faf6ea; /* raised paper — cards and the sheet */
   --ai: #2e4d6e; /* 藍 indigo: the "you can go here" colour */
   --ai-wash: rgba(46, 77, 110, 0.08);
+
+  /* ------------------------------------------------ 八彩 structural constants
+   * (rebuild spec §2). These do NOT follow the active world — they are the
+   * two fixed materials of the house plus the seal grammar. */
+  --gold: #d9b25f; /* 金 — the go-colour of the dark worlds, the sheet's hairlines */
+
+  /* S3 the lacquer sheet — 胡粉・黒漆 in EVERY world. The .sheet rule scopes
+   * the live tokens to these, so everything a sheet contains dresses itself
+   * in lacquer automatically. */
+  --sheet-ground: #171310;
+  --sheet-ground-2: #221c15;
+  --sheet-ground-0: #251e16;
+  --sheet-ink: #f2ecdf;
+  --sheet-ink-2: #cdc3b0;
+  --sheet-red: #e0796b;
+  --sheet-red-wash: rgba(224, 121, 107, 0.14);
+  --sheet-line: rgba(242, 236, 223, 0.2);
+  --sheet-line-soft: rgba(242, 236, 223, 0.1);
+  /* night-lift: quiet print inside the lacquer needs more light than paper */
+  --sheet-faint: rgba(242, 236, 223, 0.7);
+  --sheet-faint-2: rgba(242, 236, 223, 0.56);
+  --sheet-ai: #d9b25f;
+  --sheet-ai-wash: rgba(217, 178, 95, 0.14);
+
+  /* S2 the review card — warm washi (墨・楮紙) on every desk, in every world */
+  --card-ground: #f5efe0;
+  --card-ground-2: #ede5d0;
+  --card-ground-0: #faf6ea;
+  --card-ink: #211e17;
+  --card-ink-2: #4a453a;
+  --card-red: #a02a1e;
+  --card-red-wash: rgba(160, 42, 30, 0.08);
+  --card-line: rgba(33, 30, 23, 0.16);
+  --card-line-soft: rgba(33, 30, 23, 0.08);
+  --card-faint: rgba(33, 30, 23, 0.42);
+  --card-faint-2: rgba(33, 30, 23, 0.3);
+  --card-ai: #2e4d6e;
+  --card-ai-wash: rgba(46, 77, 110, 0.08);
+
+  /* S4 hanko controls — the seal grammar shared by every stamped control */
+  --seal-size: 56px;
+  --seal-radius: 5px;
+  --seal-font: 22px;
 }
 
 /* ------------------------------------------------------- 八彩 HASSAI worlds
@@ -1829,7 +1906,9 @@ button.tok::before {
   --ai-wash: rgba(55, 232, 176, 0.14);
 }
 
-/* the seal that cycles the five worlds — a small round chrome control */
+/* the seal that cycles the eight worlds — a small round chrome control.
+ * A LONG-PRESS opens the world-stones below; the touch-action and callout
+ * guards keep iOS from claiming the hold for its own menus. */
 .theme-seal {
   flex: 0 0 auto;
   width: 34px;
@@ -1843,9 +1922,51 @@ button.tok::before {
   line-height: 1;
   cursor: pointer;
   padding: 0;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .theme-seal:active {
   opacity: 0.6;
+}
+
+/* the eight world-stones — the long-press picker. Each stone previews its
+ * own world (inline colours from THEME_UI); the active one is ringed in its
+ * world's red. */
+.world-picker-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: transparent;
+}
+.world-picker {
+  position: fixed;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 10px;
+  padding: 12px;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(10, 10, 8, 0.32);
+}
+.world-stone {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 999px;
+  border: 2px solid var(--line-soft);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+}
+.world-stone.active {
+  border-color: var(--stone-red, var(--red));
+  box-shadow: 0 0 0 1px var(--stone-red, var(--red));
 }
 
 /* ------------------------------------------------------ bilingual chrome */
@@ -3067,11 +3188,35 @@ body.v-depth-layered .stroke-page {
 }
 
 /* ------------------------------------------------ review sessions (SRS)
- * One queue, four honest buttons. The face is quiet paper; the grades sit in
- * one row like Anki's, each carrying its real next interval. */
+ * One queue, four honest seals. The face is the second structural constant
+ * (rebuild spec §2 S2): a raised warm-washi card on every desk, in every
+ * world — dark rooms get a lit card, the way a real desk holds real paper.
+ * The grades sit in one row, stamped as hanko, each carrying its real next
+ * interval. */
 .review-face {
+  --ground: var(--card-ground);
+  --ground-2: var(--card-ground-2);
+  --ground-0: var(--card-ground-0);
+  --ink: var(--card-ink);
+  --ink-2: var(--card-ink-2);
+  --red: var(--card-red);
+  --red-wash: var(--card-red-wash);
+  --line: var(--card-line);
+  --line-soft: var(--card-line-soft);
+  --faint: var(--card-faint);
+  --faint-2: var(--card-faint-2);
+  --ai: var(--card-ai);
+  --ai-wash: var(--card-ai-wash);
+  color: var(--ink);
+  background: var(--ground-0);
+  /* S2 raised paper: fine washi tooth + one soft shadow — never a flat rectangle */
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.018) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
+  background-size: 13px 13px, 19px 19px;
   border: 1px solid var(--line);
   border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(10, 10, 8, 0.16);
   padding: 34px 18px 26px;
   margin: 10px 0 14px;
   text-align: center;
@@ -3149,6 +3294,66 @@ body.v-depth-layered .stroke-page {
 
 .grade.g-good {
   border-color: var(--ink);
+}
+
+/* S4 hanko — the four grades stamped as seals (rebuild spec §2 S4): 再 waits
+ * in red outline, 難 is quiet, 良 is pressed solid in the world's red, 易 is
+ * edged in gold. The EN sublabels and the honest FSRS intervals stay in the
+ * DOM — suites and screen readers keep selecting again/hard/good/easy. The
+ * probe row keeps the plain .grade box above. */
+.grade.hanko {
+  border: 0;
+  background: transparent;
+  gap: 4px;
+  padding: 2px 0 4px;
+  color: var(--ink);
+}
+
+.grade.hanko .g-seal {
+  width: var(--seal-size);
+  height: var(--seal-size);
+  border-radius: var(--seal-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: var(--seal-font);
+  line-height: 1;
+}
+
+.grade.hanko .g-label {
+  font-size: 11px;
+  color: var(--ink-2);
+  letter-spacing: 0.06em;
+}
+
+.grade.hanko:active .g-seal {
+  transform: translateY(1px);
+}
+
+.grade.hanko.g-again .g-seal {
+  color: var(--red);
+  border: 2px solid color-mix(in srgb, var(--red) 75%, transparent);
+  background: var(--red-wash);
+}
+
+.grade.hanko.g-hard .g-seal {
+  color: var(--ink-2);
+  border: 2px solid var(--line);
+  background: transparent;
+}
+
+.grade.hanko.g-good .g-seal {
+  color: var(--ground-0);
+  border: 2px solid var(--red);
+  background: var(--red);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--red) 45%, transparent);
+}
+
+.grade.hanko.g-easy .g-seal {
+  color: var(--ink);
+  border: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
 }
 
 .review-summary {
@@ -4091,7 +4296,9 @@ body.zen .review-face {
   border: 0;
   padding: 10px 6px;
   margin: 0;
-  background: transparent;
+  /* zen keeps its stillness, but the card keeps its material: the S2 washi
+   * constant (background + tooth from .review-face) holds in every world —
+   * a session card is real paper even at night */
   flex: 1;
   justify-content: center;
   gap: 14px;

@@ -170,10 +170,23 @@ const MEASURE_FN = `(() => {
     return { rgb: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
   };
   const bodyBg = parse(getComputedStyle(document.body).backgroundColor) || { rgb: [252,251,246], a: 1 };
+  // measure against the surface the text actually sits on — since S3 the
+  // bottom sheet is 黒漆 lacquer in every world, so a sheet label composited
+  // against the BODY ground would report a fiction (1.3:1 for real 8:1)
+  const bgOf = (node) => {
+    let n = node;
+    while (n && n !== document.documentElement) {
+      const bg = parse(getComputedStyle(n).backgroundColor);
+      if (bg && bg.a >= 0.9) return bg;
+      n = n.parentElement;
+    }
+    return bodyBg;
+  };
   const ratio = (node) => {
     const fg = parse(getComputedStyle(node).color); if (!fg) return null;
-    const c = fg.rgb.map((v, i) => v * fg.a + bodyBg.rgb[i] * (1 - fg.a));
-    const l1 = lum(c), l2 = lum(bodyBg.rgb);
+    const bg = bgOf(node);
+    const c = fg.rgb.map((v, i) => v * fg.a + bg.rgb[i] * (1 - fg.a));
+    const l1 = lum(c), l2 = lum(bg.rgb);
     return Math.round(((Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05)) * 100) / 100;
   };
   const measure = (sel, label) => {

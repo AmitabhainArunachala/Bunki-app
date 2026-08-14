@@ -34,8 +34,8 @@ The operator's current verdict on this prototype: the drift's movement is still 
 ## Practical facts (not laws — just how the repo works)
 
 - Repo AmitabhainArunachala/Bunki-app. Reference state: branch claude/kairo-feel-lock-2026-08-09, tip commit 39a917b (a pinned earlier reference is 69cd501). Cut your own branch; do not merge anything — the operator decides what ships by feel.
-- The Drift's source is prototypes/drift/drift-artifact.html; the corridor's drift files are GENERATED from it by node prototypes/corridor/tools/build-drift-layer.mjs, and the single-file build by node prototypes/corridor/tools/build-standalone.mjs. Regenerate after every drift edit; never hand-edit drift-layer.* or corridor-standalone.html.
-- Verification suites exist (prototypes/drift/tools/verify-v11.mjs, prototypes/corridor/tools/verify-*.mjs). They are AI-written tools that encode previous agents' assumptions (including invented design rules). Use them as regression tripwires; rewrite them when they enforce something the operator hasn't asked for. They are not the gate.
+- The Drift's source is prototypes/drift/drift-artifact.html; the corridor's drift files are GENERATED from it by node prototypes/corridor/tools/build-drift-layer.mjs, and the single-file build by node prototypes/corridor/tools/build-standalone.mjs. Regenerate after every drift edit; never hand-edit drift-layer.\* or corridor-standalone.html.
+- Verification suites exist (prototypes/drift/tools/verify-v11.mjs, prototypes/corridor/tools/verify-\*.mjs). They are AI-written tools that encode previous agents' assumptions (including invented design rules). Use them as regression tripwires; rewrite them when they enforce something the operator hasn't asked for. They are not the gate.
 - Data: JMdict / KANJIDIC2 / KanjiVG (CC BY-SA — keep attribution files intact); full JMdict (~200k entries; the ~70k common-word cut is a reasonable dictionary tier) is freely available if the bundle needs to grow.
 - The operator is on a phone. Deliver by deploying, then one plain paragraph: what will FEEL different. No jargon, no numbers, no internal vocabulary.
 
