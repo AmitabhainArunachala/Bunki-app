@@ -210,6 +210,10 @@ const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 // seal, nav and corner bubbles leaked through and razed the constellation.
 // Standalone drift has no host and the guard is a no-op.
 const hostChrome=t=>{try{return !!(t&&t.closest&&window.bunkiDriftChrome&&t.closest(window.bunkiDriftChrome));}catch{return false;}};
+// 深さの橋 — the host learns how deep the water goes (dive stack depth) and
+// may surface one level itself (its nav back arrow). No host: both no-ops.
+const hostDepth=()=>{try{window.bunkiDriftDepth&&window.bunkiDriftDepth(stack.length);}catch{/* host must never break the water */}};
+try{window.bunkiDriftSurface=function(){if(stack.length)surface();};}catch{/* sealed environments keep the water private */}
 
 // ---- OPERATOR TUNABLES: how alive the water is. Ruled by feel, not derived. ----
 // All three are silenced entirely by prefers-reduced-motion (see `reduced` above):
@@ -1610,6 +1614,7 @@ function collapseUnfold(){
 }
 let loopMark=false;
 function markDive(label){
+  hostDepth();
   // the Hofstadter moment: the chain returns to somewhere it has been
   if(journey.includes(label)&&!loopMark){
     loopMark=true;
@@ -1808,6 +1813,7 @@ function divePart(p){
 let trailFx=null;
 function surface(){
   const lvl=stack.pop(); if(!lvl) return;
+  hostDepth();
   card.classList.remove("open");
   for(const rec of lvl.receded) if(!rec.n.gone) restore(rec.n,rec.saved);
   const c=lvl.center;

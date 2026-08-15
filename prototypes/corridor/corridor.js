@@ -1057,6 +1057,16 @@ window.bunkiDriftJudgment = (kind, key, dir) => {
 // open-water tap (which razed the learner's constellation — P1, review)
 window.bunkiDriftChrome =
   '#ginga-symbol, #ginga-theme-seal, .ginga-seal, .nav-scrim, .nav-bar, .corner-bubble, .world-picker, .world-picker-scrim, #variants, #chrome';
+// 深さの橋 — the water reports its dive depth so the fused chrome can offer
+// a way OUT of a dive (the in-water return hint is chrome-hidden and the
+// nav back arrow knew only the corridor stack — P1, review: "no visible
+// way out of a dive"). Depth > 0 reveals the drift's own return hint
+// (body.drift-dived) and arms the nav back arrow to surface one level.
+window.bunkiDriftDepth = (depth) => {
+  S.driftDepth = depth;
+  document.body.classList.toggle('drift-dived', depth > 0);
+  if (S.navOpen) render(); // the open nav's back arrow re-arms live
+};
 addEventListener('pagehide', obsFlush);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') obsFlush();
@@ -10777,6 +10787,13 @@ function navForward() {
   render();
 }
 function navBackFromGinga() {
+  // inside a drift dive, back means SURFACE one level of the water first
+  if (S.driftDepth > 0 && window.bunkiDriftSurface) {
+    S.navOpen = false;
+    window.bunkiDriftSurface();
+    render();
+    return;
+  }
   // at the true galaxy home there is nowhere back; the arrow is disabled there.
   S.navOpen = false;
   back();
@@ -10906,7 +10923,7 @@ function buildGingaChrome(root) {
   const backB = el('button', 'nav-arrow', '‹');
   backB.type = 'button';
   backB.setAttribute('aria-label', tx('もどる', 'back'));
-  backB.disabled = !S.stack.length && S.view === 'drift';
+  backB.disabled = !S.stack.length && S.view === 'drift' && !S.driftDepth;
   backB.addEventListener('click', navBackFromGinga);
   const fwdB = el('button', 'nav-arrow', '›');
   fwdB.type = 'button';

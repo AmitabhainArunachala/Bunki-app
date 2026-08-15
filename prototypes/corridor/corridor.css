@@ -310,6 +310,11 @@ body.ginga #drift-layer #drift-tray,
 body.ginga #drift-layer #hint {
   display: none !important;
 }
+/* inside a dive the water's own return hint (水にふれると戻る) is the way
+ * out — chrome-hiding it left no visible exit (P1, review) */
+body.ginga.drift-dived #drift-layer #hint {
+  display: block !important;
+}
 
 .nav-symbol {
   position: fixed;
