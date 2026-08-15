@@ -1385,7 +1385,11 @@ async function boot() {
     const v = params.get(key);
     if (v && VARIANTS[key].options.some(([id]) => id === v)) {
       S.variants[key] = v;
-      anyVariantParam = true;
+      // 'entry' doubles as the documented navigation param (?entry=shelf).
+      // Choosing a front door must never summon the operator debug strip —
+      // the fixed strip swallows taps (filed by three review lanes). The
+      // strip remains reachable explicitly via ?variants=1.
+      if (key !== 'entry') anyVariantParam = true;
     }
   }
   S.variantsBar = anyVariantParam;
