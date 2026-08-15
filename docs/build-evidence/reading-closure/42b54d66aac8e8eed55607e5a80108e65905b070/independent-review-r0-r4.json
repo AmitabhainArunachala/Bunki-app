@@ -1,0 +1,43 @@
+{
+  "schema": "bunki.reading.r0.independent-review/v1",
+  "reviewedRemoteRef": "refs/heads/agent/reading-r0-evidence-20260815-r4",
+  "reviewedHead": "c2671a50a5ed6af25bbe556e826e115537c9f471",
+  "reviewedTree": "d3ab204db10ef1fac63404591a255bef5196681c",
+  "soleParent": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "authorityTree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "reviewer": "product-evidence-auditor",
+  "reviewedAt": "2026-08-15T12:46:22Z",
+  "verdict": "FAIL",
+  "identityChecks": {
+    "remoteHeadTreeParent": "PASS",
+    "artifactProjection": "PASS",
+    "corpusClosure": "PASS",
+    "deploymentMetadataAndLiveHashes": "PASS",
+    "rubricArithmetic": "PASS",
+    "browserAndDevice": "NOT_RUN"
+  },
+  "blockingFindings": [
+    {
+      "id": "R0-R4-CONTROL-OMISSION",
+      "summary": "The claimed 51-family exact census omitted controls on directly reachable AI-reading, focus-dojo, focus-HUD, and yomi-probe surfaces.",
+      "omittedFamilies": [
+        "#airead-make",
+        ".airead-hit",
+        "[data-airead-past]",
+        ".focus-chip",
+        ".focus-mode",
+        ".focus-start",
+        ".focus-hud-end",
+        "#probe-reveal",
+        "[data-probe]",
+        "probe summary entry and back controls"
+      ]
+    },
+    {
+      "id": "R0-R4-EVENT-ASSERTION-MIXING",
+      "summary": "Drift, tray, and review rows mixed event-free navigation/lookup controls with event-bearing judgment, grade, rest, undo, and import/export controls.",
+      "example": "drift.surface-nodes included flick judgments while claiming no learner event, even though the host records obsLog through bunkiDriftJudgment."
+    }
+  ],
+  "repairDisposition": "The follow-up packet expands the exact allowlist to 66 families, adds the omitted destination surfaces, separates non-event controls from event-bearing actions, and requires a new independent remote review. No browser/device result is promoted."
+}
