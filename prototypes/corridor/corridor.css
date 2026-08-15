@@ -3097,7 +3097,12 @@ body:has(.stroke-page[data-minimal='on'][data-chrome='awake'][data-numbers='on']
   stroke-width: 1.8px;
   stroke-linejoin: round;
   opacity: 0;
-  transition: opacity 0.16s linear;
+  /* Stroke numerals are part of the brush clock, not decorative chrome.
+   * A fade leaves the actually visible body-lifted marker one or more frames
+   * behind data-stroke-shown (and the stroke pips), and lets old markers
+   * linger when a rewrite resets to zero. The first real splat therefore
+   * switches the numeral atomically. */
+  transition: none;
 }
 
 .stroke-page[data-numbers='off'] .stroke-nums {

@@ -140,6 +140,7 @@ async function roomSnapshot(page) {
     const numberRoot = document.querySelector('.stroke-nums-lift') || room;
     const nums = [...numberRoot.querySelectorAll('.stroke-num')];
     const pips = [...room.querySelectorAll('.stroke-pip')];
+    const lift = document.querySelector('.stroke-nums-lift');
     return {
       minimal: room.dataset.minimal,
       chrome: room.dataset.chrome,
@@ -149,7 +150,10 @@ async function roomSnapshot(page) {
       total: nums.length,
       world: room.dataset.world,
       stageRect: rectOf(stage),
-      liftRect: rectOf(document.querySelector('.stroke-nums-lift')),
+      // The Safari-safe lift remains mounted while number mode is off, but is
+      // deliberately display:none.  A hidden element's 0x0 DOMRect is not an
+      // alignment measurement; only compare the layer while it is painted.
+      liftRect: lift && getComputedStyle(lift).display !== 'none' ? rectOf(lift) : null,
       describedBy: room.getAttribute('aria-describedby'),
       exitDescription:
         document.getElementById(room.getAttribute('aria-describedby') || '')?.textContent || '',
@@ -347,16 +351,6 @@ async function main() {
         awake.stageRect.bottom <= awake.field.rect.top + 1,
       JSON.stringify({ stage: awake?.stageRect, field: awake?.field?.rect }),
     );
-    check(
-      'a live body-level number layer stays aligned after the field wakes',
-      !awake?.liftRect ||
-        (Math.abs(awake.liftRect.top - awake.stageRect.top) <= 1 &&
-          Math.abs(awake.liftRect.left - awake.stageRect.left) <= 1 &&
-          Math.abs(awake.liftRect.bottom - awake.stageRect.bottom) <= 1 &&
-          Math.abs(awake.liftRect.right - awake.stageRect.right) <= 1),
-      JSON.stringify({ stage: awake?.stageRect, lift: awake?.liftRect }),
-    );
-
     const palettes = await page
       .locator('.stroke-palette-choice')
       .evaluateAll((nodes) =>
@@ -509,6 +503,19 @@ async function main() {
       numberState?.numbers === 'on' &&
         (await page.locator('#stroke-numbers').getAttribute('aria-pressed')) === 'true',
       JSON.stringify(numberState),
+    );
+    check(
+      'a visible live body-level number layer stays aligned with the ink stage',
+      numberState?.living !== 'on' ||
+        (!!numberState.stageRect &&
+          !!numberState.liftRect &&
+          numberState.liftRect.right > numberState.liftRect.left &&
+          numberState.liftRect.bottom > numberState.liftRect.top &&
+          Math.abs(numberState.liftRect.top - numberState.stageRect.top) <= 1 &&
+          Math.abs(numberState.liftRect.left - numberState.stageRect.left) <= 1 &&
+          Math.abs(numberState.liftRect.bottom - numberState.stageRect.bottom) <= 1 &&
+          Math.abs(numberState.liftRect.right - numberState.stageRect.right) <= 1),
+      JSON.stringify({ stage: numberState?.stageRect, lift: numberState?.liftRect }),
     );
     check(
       'each number and pip arises atomically with its stroke',
