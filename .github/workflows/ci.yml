@@ -119,6 +119,12 @@ jobs:
           --out "${{ runner.temp }}/drift-consistency-fast/report.json"
           --shots "${{ runner.temp }}/drift-consistency-fast/shots"
 
+      # The operator's current writing-room contract is smaller than the whole
+      # app walk and stricter about what may remain visible. It also proves the
+      # brush/number callback lands on the first real ink sample.
+      - name: Quiet writing-room contract
+        run: npm run verify:writing-room
+
       # Controller §17.5's build proof, and the artefact the E2E then drives.
       # It runs here rather than in `checks` because a bundle that fails to
       # export and a lint rule that fails are not the same news.
