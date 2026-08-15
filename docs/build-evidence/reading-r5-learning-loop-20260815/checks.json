@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "baseCandidate": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "baseTree": "9320a1c741812a7d38f7afd54263cb7d133c3fbf",
+  "checks": [
+    {
+      "name": "verify-corridor-storage-integrity",
+      "status": "PASS",
+      "checks": 28,
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs"
+    },
+    {
+      "name": "javascript-syntax",
+      "status": "PASS",
+      "command": "node --check prototypes/corridor/corridor.js"
+    },
+    {
+      "name": "full-vitest",
+      "status": "PASS",
+      "files": 94,
+      "tests": 1645,
+      "command": "npm test"
+    },
+    {
+      "name": "workspace-typecheck",
+      "status": "PASS",
+      "workspaces": 6,
+      "command": "npm run typecheck"
+    },
+    {
+      "name": "prettier",
+      "status": "PASS",
+      "command": "prettier --check prototypes/corridor/corridor.js prototypes/corridor/tools/verify-corridor-storage-integrity.mjs"
+    },
+    {
+      "name": "eslint",
+      "status": "NOT_APPLICABLE",
+      "reason": "The repository ESLint configuration intentionally ignores prototypes/corridor JavaScript; --no-ignore exposes hundreds of pre-existing browser-global/configuration findings and is not a valid clean gate."
+    },
+    {
+      "name": "git-diff-check",
+      "status": "PASS",
+      "command": "git diff --check"
+    }
+  ],
+  "browserAndDevice": [
+    {
+      "name": "rendered-Chromium",
+      "status": "NOT_RUN",
+      "reason": "No usable Chromium binary was available."
+    },
+    {
+      "name": "primary-WebKit",
+      "status": "NOT_RUN",
+      "reason": "No WebKit runtime lane was available."
+    },
+    {
+      "name": "physical-iPhone-and-VoiceOver",
+      "status": "NOT_RUN",
+      "reason": "Requires operator and physical-device action."
+    }
+  ]
+}
+

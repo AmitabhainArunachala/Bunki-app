@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "baseCandidate": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "source": "prototypes/corridor/corridor.js",
+  "classification": "PRE_EXISTING_MUTATION_BEFORE_UNCHECKED_SAVE",
+  "count": 19,
+  "callers": [
+    { "lineAfterPatch": 714, "surface": "observation debounce flush", "roots": ["obslog"] },
+    { "lineAfterPatch": 1782, "surface": "reader scroll debounce", "roots": ["readerPos"] },
+    { "lineAfterPatch": 1857, "surface": "app Back from reader", "roots": ["readerPos"] },
+    { "lineAfterPatch": 2498, "surface": "reader display dials", "roots": ["dials"] },
+    { "lineAfterPatch": 3310, "surface": "tray rest or wake", "roots": ["suspended"] },
+    { "lineAfterPatch": 3343, "surface": "export timestamp", "roots": ["stats"] },
+    { "lineAfterPatch": 3438, "surface": "tray bulk memorize", "roots": ["taken"] },
+    { "lineAfterPatch": 3587, "surface": "lesson completion", "roots": ["lessonsDone", "taken"] },
+    { "lineAfterPatch": 3747, "surface": "AI chat user message", "roots": ["aiChat"] },
+    { "lineAfterPatch": 3760, "surface": "AI chat tutor message", "roots": ["aiChat"] },
+    { "lineAfterPatch": 5542, "surface": "capture context scope", "roots": ["taken"] },
+    { "lineAfterPatch": 5568, "surface": "manual list membership", "roots": ["lists"] },
+    { "lineAfterPatch": 5581, "surface": "new manual list", "roots": ["lists"] },
+    { "lineAfterPatch": 5859, "surface": "summary leech rest", "roots": ["suspended"] },
+    { "lineAfterPatch": 6009, "surface": "current review-card rest", "roots": ["suspended"] },
+    { "lineAfterPatch": 6237, "surface": "review undo", "roots": ["suspended", "srs", "revlog", "stats"] },
+    { "lineAfterPatch": 6763, "surface": "yomi probe grade or mint", "roots": ["taken", "obslog", "stats"] },
+    { "lineAfterPatch": 7327, "surface": "AI reading generation", "roots": ["aiReading", "aiReadings"] },
+    { "lineAfterPatch": 7398, "surface": "AI reading history swap", "roots": ["aiReading", "aiReadings"] }
+  ],
+  "additionalBypasses": [
+    {
+      "surface": "learner-record export",
+      "risk": "Direct localStorage.getItem is not covered by read quarantine."
+    },
+    {
+      "surface": "learner-record import",
+      "risk": "Direct localStorage.setItem bypasses candidate construction and performs only weak envelope validation."
+    }
+  ],
+  "claimBoundary": "Only learner-store read quarantine, write-before-publish helper semantics, reader finish, entry capture, standard/focus-drill grade, visible storage alert, and article-load retry are closed by this donor."
+}

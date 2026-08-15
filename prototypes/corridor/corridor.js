@@ -470,7 +470,7 @@ const S = {
   deepWords: {},
   /** the review log: append-only, one row per grade, never rewritten. The
    * foundation for FSRS weight optimization, analytics and state recovery —
-   * see the layout comment at srsLogReview. */
+   * see the layout comment at srsReviewLogRow. */
   revlog: [],
   /** the observation log: append-only rows of encounters and assistance —
    * reader taps, dojo probes. Evidence for routing, never knownness: a tap
@@ -569,7 +569,7 @@ function plainRecord(value) {
 /** Never overwrite what cannot be read. A store that fails to parse, or that
  * declares a future major version, flips this session to read-only: the app
  * keeps working in memory, the original bytes stay untouched on the device,
- * and one quiet line says so where the record lives (覚える). */
+ * and one quiet alert says so in the active learner surface. */
 function protectStore(messageJa, messageEn) {
   S.storeReadOnly = true;
   S.storeError = tx(messageJa, messageEn);
@@ -580,9 +580,13 @@ function loadStore() {
   try {
     raw = localStorage.getItem(STORE_KEY);
   } catch {
-    /* private mode — nothing stored, nothing to protect */
+    protectStore(
+      '端末の学習データにアクセスできない。元のデータを守るため、この回は保存しない。',
+      'The saved learner record could not be accessed. Saving is paused so its original bytes stay safe.',
+    );
+    return;
   }
-  if (!raw) return;
+  if (raw === null) return;
   let s = null;
   try {
     s = JSON.parse(raw);
@@ -631,31 +635,34 @@ function loadStore() {
   );
 }
 
-function saveStore() {
-  if (S.storeReadOnly) return false;
+function storeEnvelope(state) {
+  return {
+    ...(state.storeExtras || {}),
+    v: 1,
+    taken: state.taken,
+    lists: state.lists,
+    srs: state.srs,
+    revlog: state.revlog || [],
+    obslog: state.obslog || [],
+    deepWords: state.deepWords || {},
+    lessonsDone: state.lessonsDone,
+    aiReading: state.aiReading,
+    aiReadings: state.aiReadings.slice(0, 10),
+    suspended: state.suspended,
+    aiChat: state.aiChat.slice(-24),
+    stats: state.stats,
+    readDone: state.readDone,
+    readerPos: state.readerPos,
+    dials: state.dialsUrlOverride ? state.dialsStored : state.dials,
+  };
+}
+
+/** localStorage.setItem returning is the synchronous durability boundary.
+ * The caller's live learner roots are never published before that boundary. */
+function writeStore(state) {
+  if (state.storeReadOnly) return false;
   try {
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify({
-        ...(S.storeExtras || {}),
-        v: 1,
-        taken: S.taken,
-        lists: S.lists,
-        srs: S.srs,
-        revlog: S.revlog || [],
-        obslog: S.obslog || [],
-        deepWords: S.deepWords || {},
-        lessonsDone: S.lessonsDone,
-        aiReading: S.aiReading,
-        aiReadings: S.aiReadings.slice(0, 10),
-        suspended: S.suspended,
-        aiChat: S.aiChat.slice(-24),
-        stats: S.stats,
-        readDone: S.readDone,
-        readerPos: S.readerPos,
-        dials: S.dialsUrlOverride ? S.dialsStored : S.dials,
-      }),
-    );
+    localStorage.setItem(STORE_KEY, JSON.stringify(storeEnvelope(state)));
     S.storeError = null;
     return true;
   } catch {
@@ -666,6 +673,20 @@ function saveStore() {
     );
     return false;
   }
+}
+
+function saveStore() {
+  return writeStore(S);
+}
+
+/** Persist copied learner roots as one envelope, then make them visible.
+ * Patch values must be constructed off-side; mutating a live nested value
+ * before this call would defeat the write-before-publish boundary. */
+function commitStorePatch(patch) {
+  const candidate = { ...S, ...patch };
+  if (!writeStore(candidate)) return false;
+  Object.assign(S, patch);
+  return true;
 }
 
 /* ------------------------------------------------ the observation log
@@ -1581,11 +1602,14 @@ async function ensureArticle(p) {
           if (!res.ok) throw new Error(`data/articles/${p.file} → ${res.status}`);
           return res.json();
         })
-  ).then((body) => {
-    Object.assign(p, body);
-    delete p._loading;
-    return p;
-  });
+  )
+    .then((body) => {
+      Object.assign(p, body);
+      return p;
+    })
+    .finally(() => {
+      delete p._loading;
+    });
   return p._loading;
 }
 
@@ -3005,9 +3029,13 @@ function renderReader(main) {
   finBtn.type = 'button';
   finBtn.id = 'read-fin';
   finBtn.addEventListener('click', () => {
-    if (S.readDone[p.id]) delete S.readDone[p.id];
-    else S.readDone[p.id] = Date.now();
-    saveStore();
+    const readDone = { ...S.readDone };
+    if (readDone[p.id]) delete readDone[p.id];
+    else readDone[p.id] = Date.now();
+    if (!commitStorePatch({ readDone })) {
+      render();
+      return;
+    }
     keepScroll();
     render();
     returnScroll();
@@ -5448,6 +5476,7 @@ function takeButton(node, label) {
       from: node.from || null,
       ts: Date.now(),
     };
+    let deepWord = null;
     // A word taken from the deep tier writes its own compact record into the
     // learner's store: the card must answer on any device, offline, without
     // re-opening the 70k index. The exact entry (ent_seq) and the reading the
@@ -5457,8 +5486,7 @@ function takeButton(node, label) {
       if (rec?.seq) item.entrySeq = String(rec.seq);
       if (rec?.r) item.cueReading = rec.r;
       if (rec) {
-        S.deepWords ||= {};
-        S.deepWords[node.id] = {
+        deepWord = {
           r: rec.r || '',
           m: (rec.m || []).slice(0, 8),
           ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
@@ -5468,8 +5496,14 @@ function takeButton(node, label) {
         };
       }
     }
-    S.taken.push(item);
-    saveStore();
+    const patch = { taken: [...S.taken, item] };
+    if (deepWord) {
+      patch.deepWords = { ...(S.deepWords || {}), [node.id]: deepWord };
+    }
+    if (!commitStorePatch(patch)) {
+      render();
+      return;
+    }
     render();
   });
   return btn;
@@ -5586,7 +5620,7 @@ function schedulePreview() {
  * cards), word:安堵:prod (production), sent:<sourceId>#<n> (mined sentence
  * cards) — each its own card with its own FSRS state and its own revlog
  * rows, sharing the item's content record. Adding them touches capture and
- * rendering only; srsCardOf / srsStore / srsDueItems / the revlog need no
+ * rendering only; srsCardOf / srsStoredRecord / srsDueItems / the revlog need no
  * changes. */
 const srsKey = (t, id) => `${t}:${id}`;
 function srsCardOf(item, now) {
@@ -5596,13 +5630,12 @@ function srsCardOf(item, now) {
   if (rec.last_review) c.last_review = new Date(rec.last_review);
   return c;
 }
-function srsStore(item, card) {
-  S.srs[srsKey(item.t, item.id)] = {
+function srsStoredRecord(card) {
+  return {
     ...card,
     due: card.due.toISOString(),
     last_review: card.last_review ? card.last_review.toISOString() : undefined,
   };
-  saveStore();
 }
 /* --------------------------------------------------- the review log
  * Append-only, one compact row per grade, never rewritten. Layout:
@@ -5626,7 +5659,7 @@ function srsStore(item, card) {
  * This is sufficient for the FSRS optimizer (per-card sequences of
  * (elapsed, rating)), for analytics, and — with the pinned parameters —
  * for full deterministic state reconstruction by replay. */
-function srsLogReview(key, before, after, rating, now) {
+function srsReviewLogRow(key, before, after, rating, now) {
   const rnd = (v, p) => (v == null || !Number.isFinite(v) ? null : Number(v.toFixed(p)));
   let elapsed = null;
   let r = null;
@@ -5639,7 +5672,7 @@ function srsLogReview(key, before, after, rating, now) {
     }
   }
   const first = !before.last_review;
-  (S.revlog ||= []).push([
+  return [
     now.getTime(),
     key,
     rating,
@@ -5652,8 +5685,7 @@ function srsLogReview(key, before, after, rating, now) {
     rnd(after.difficulty, 4),
     after.scheduled_days,
     after.due.getTime(),
-  ]);
-  return S.revlog.length - 1;
+  ];
 }
 /** Items ready to review: real reviews by their due date, then never-seen
  * cards — capped at 20 a DAY (Anki's default pacing), so a long list arrives
@@ -6045,28 +6077,48 @@ function renderReview(main) {
       const isDrillOnly =
         S.focus && prevRec === undefined && !S.taken.some((t) => t.t === item.t && t.id === item.id);
       if (isDrillOnly) {
-        obsLog('dojo', skey, fsrsApi.Rating[rating]);
+        const obslog = [
+          ...(S.obslog || []),
+          [now.getTime(), 'dojo', skey, fsrsApi.Rating[rating]],
+        ];
+        if (!commitStorePatch({ obslog })) {
+          render();
+          return;
+        }
         const entry = { key, drill: true };
         if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
           rv.queue.push(item);
           entry.reinserted = true;
         }
         rv.history.push(entry);
-        saveStore();
         rv.done[key] += 1;
         rv.ix += 1;
         rv.revealed = false;
         render();
         return;
       }
-      // every grade lands in the append-only review log before anything else
-      const logIx = srsLogReview(skey, card, next, fsrsApi.Rating[rating], now);
+      // Build every durable root off-side. The session cannot advance until
+      // the whole grade, schedule, and daily trace cross one write boundary.
+      const revlog = [
+        ...(S.revlog || []),
+        srsReviewLogRow(skey, card, next, fsrsApi.Rating[rating], now),
+      ];
+      const logIx = revlog.length - 1;
+      const srs = { ...S.srs, [skey]: srsStoredRecord(next) };
+      const priorStats = S.stats?.[day] || { n: 0, again: 0 };
+      const dayStats = { ...priorStats };
       const entry = { key, prev: prevRec, day, logIx };
       if (prevRec === undefined) {
         // a first grade introduces the card — it counts against today's cap
-        const st0 = (S.stats[day] ||= { n: 0, again: 0 });
-        st0.nnew = (st0.nnew || 0) + 1;
+        dayStats.nnew = (dayStats.nnew || 0) + 1;
         entry.introduced = true;
+      }
+      dayStats.n = (dayStats.n || 0) + 1;
+      if (key === 'again') dayStats.again = (dayStats.again || 0) + 1;
+      const stats = { ...(S.stats || {}), [day]: dayStats };
+      if (!commitStorePatch({ srs, revlog, stats })) {
+        render();
+        return;
       }
       // a card still inside its short steps ripens within minutes — it comes
       // back in THIS session, the way a modern SRS queue behaves
@@ -6075,11 +6127,6 @@ function renderReview(main) {
         entry.reinserted = true;
       }
       rv.history.push(entry);
-      srsStore(item, next);
-      const st = (S.stats[day] ||= { n: 0, again: 0 });
-      st.n += 1;
-      if (key === 'again') st.again += 1;
-      saveStore();
       rv.done[key] += 1;
       rv.ix += 1;
       rv.revealed = false;
@@ -9609,6 +9656,11 @@ function renderSheet(root) {
   });
   bar.append(closeBtn);
   sheet.append(bar);
+  if (S.storeError) {
+    const warning = el('p', 'store-warning', S.storeError);
+    warning.setAttribute('role', 'alert');
+    sheet.append(warning);
+  }
 
   if (node.t === 'word') renderWordNode(sheet, node);
   else if (node.t === 'kanji') renderKanjiNode(sheet, node);
@@ -10677,6 +10729,11 @@ function render() {
 
   const main = el('main');
   root.append(main);
+  if (S.storeError && S.view !== 'tray') {
+    const warning = el('p', 'store-warning', S.storeError);
+    warning.setAttribute('role', 'alert');
+    main.append(warning);
+  }
 
   if (!S.ready) {
     main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));
