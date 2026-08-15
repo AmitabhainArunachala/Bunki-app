@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-15 19:15",
+          "2026-08-15 20:23",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-15 19:20",
+          "2026-08-15 20:28",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-15 19:24",
+          "2026-08-15 20:32",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 7 d",
-          "2026-08-22 19:14",
+          "in 10 d",
+          "2026-08-25 20:22",
           "8.30"
         ]
       ]
@@ -5764,7 +5764,7 @@
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005\nねん\n7\nがつ\n14か、みなみあふりか\nきょうわ\nこくだーばんで\nかい"
+      "text": "2005\nねん\n7\nがつ\n14か、みなみアフリカ\nきょうわ\nこくダーバンで\nかい"
     }
   },
   "idiomSectionPresent": true,
@@ -6038,7 +6038,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 602,
+  "loadMs": 671,
   "summary": {
     "total": 116,
     "failed": 0
@@ -6067,7 +6067,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.14999389648438,\"y\":570.2100219726562,\"productive\":true}"
+      "detail": "{\"x\":148.0500030517578,\"y\":570.27001953125,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6087,7 +6087,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 602 ms"
+      "detail": "40 texts, ready in 671 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6307,7 +6307,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 7 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6537,7 +6537,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786821325204,\"probe\",\"word:屏風\",1,1]"
+      "detail": "row [1786825435734,\"probe\",\"word:金屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",

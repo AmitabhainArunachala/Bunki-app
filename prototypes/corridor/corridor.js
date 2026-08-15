@@ -2402,7 +2402,14 @@ function wordRow(pairs, opts) {
 function displayPairs(token) {
   const mode = S.dials.kanji;
   if (mode === 0) return token.f;
-  if (mode === 2) return [{ t: token.r || token.s }];
+  if (mode === 2) {
+    // all-kana converts KANJI runs to their readings and leaves kana runs
+    // as written — flattening the whole token to its hiragana reading
+    // rewrote katakana loanwords and proper nouns (みなみあふりか…),
+    // misteaching standard orthography (P2, full-instrument review)
+    if (!token.f) return [{ t: token.r || token.s }];
+    return token.f.map((pair) => (pair.r ? { t: pair.r } : pair));
+  }
   return token.f.map((pair) => {
     if (!pair.r) return pair;
     return [...pair.t].some(beyondJoyo) ? { t: pair.r } : pair;
@@ -3659,7 +3666,10 @@ function renderTray(main) {
     for (const item of sec.items) {
       const line = el('div', 'tray-line');
       line.append(el('span', 'w', item.label));
-      line.append(el('span', 'pool-tag', tx(item.kind || '', item.kindEn || item.kind || '')));
+      // rows stored before the kind fields existed heal at render time
+      const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
+      const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
+      line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
       if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
       line.append(el('span', 'when', srsWhen(item)));
       // rest / wake — the card stays on the list, reviews skip it
@@ -5935,7 +5945,17 @@ function renderListPicker(sheet, node, label) {
           name,
           S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id)),
         );
-      else S.lists[name].push({ t: node.t, id: node.id, label, ts: item.ts });
+      else
+        S.lists[name].push({
+          t: node.t,
+          id: node.id,
+          label,
+          // the kind pill was stripped at store time and named-list rows
+          // rendered an empty grey pill (P2, full-instrument review)
+          kind: NODE_KIND[node.t]?.[0],
+          kindEn: NODE_KIND[node.t]?.[1],
+          ts: item.ts,
+        });
       saveStore();
       render();
     });
