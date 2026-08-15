@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "_comment": "The app's tests and evidence script (WP-05). Node types are allowed here and only here: the stroke tests read the seed's SVG files off disk, the screen-contract scan reads src/ as text, and scripts/capture-evidence.mjs drives a browser. Keeping this split means the app bundle cannot quietly acquire a Node dependency.",
-  "compilerOptions": {
-    "types": ["react", "expo", "node"]
-  },
-  "include": ["app", "src", "test", "e2e", "scripts", "expo-env.d.ts"]
-}

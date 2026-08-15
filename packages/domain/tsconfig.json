@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "_comment": "The kernel's own program (WP-02). `types: []` is the point: with no ambient @types loaded, `process`, `Buffer`, and every other Node global are *type errors* inside src/ rather than merely lint findings. Purity (REQ-ARCH-02) stops depending on a rule someone could relax. Tests need the filesystem to read golden fixtures and to scan src, so they compile under tsconfig.test.json instead.",
-  "compilerOptions": {
-    "types": []
-  },
-  "include": ["src"]
-}

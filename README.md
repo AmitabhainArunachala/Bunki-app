@@ -1,115 +1,108 @@
-# Bunki (分岐)
+# vinext-starter
 
-Phase-0 build of one closed learning loop: paste or select a provenance-labeled
-seeded encounter → durable thread → bounded AI candidate explanation → explicit
-promotion → one retrieval contract → one contextual reuse → scored probe →
-finite session → inspect and export the evidence.
+A clean full-stack starter running on
+[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
+Drizzle support.
 
-**LICENSE: pending operator decision** (OD-09). The repository is private. Until
-the operator chooses, no dependency or data may constrain that choice beyond the
-share-alike seed data confined to `packages/seed/`.
+## Prerequisites
 
-## Run the complete web app
+- Node.js `>=22.13.0`
+- Linux with `flock`, `curl`, and GNU `timeout`
 
-The current interactive product lives in `prototypes/bunki-sites-v11/`. It is the
-same Bunki reader, dictionary, kanji drill-down, sentence mining, SRS, and coach
-source used by the polished public checkpoint—not a screenshot or a reduced mock.
+## Sites Lifecycle
 
-- [Open this PR branch in GitHub Codespaces](https://codespaces.new/AmitabhainArunachala/Bunki-app?quickstart=1&ref=claude/sites-v11-interaction-recovery)
-- [Open the current public checkpoint](https://bunki-living-japanese.amitabha1982.chatgpt.site)
-- [Review the source and verification PR](https://github.com/AmitabhainArunachala/Bunki-app/pull/20)
+The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
 
-Codespaces installs the nested app, starts it, forwards port 5173, and opens the
-preview. From a normal clone:
+This starter does not use `wrangler.jsonc`.
 
-```bash
-npm run bunki:web:dev
+`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout and then validates the Sites artifact. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
+
+Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+
+## Included Shape
+
+- edit site code under `app/`
+- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
+- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
+- `vite.config.ts` simulates declared bindings for local development
+- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
+- `db/schema.ts` starts intentionally empty
+- `examples/d1/` contains an optional D1 example surface
+- `drizzle.config.ts` supports local migration generation when needed
+
+## Workspace Auth Headers
+
+OpenAI workspace sites can read the current user's email from
+`oai-authenticated-user-email`.
+
+SIWC-authenticated workspace sites may also receive
+`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
+`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
+`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+
+Treat the full name as optional and fall back to email when it is absent:
+
+```tsx
+import { headers } from "next/headers";
+
+export default async function Home() {
+  const requestHeaders = await headers();
+  const email = requestHeaders.get("oai-authenticated-user-email");
+  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
+  const fullName =
+    encodedFullName &&
+    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
+      "percent-encoded-utf-8"
+      ? decodeURIComponent(encodedFullName)
+      : null;
+
+  const displayName = fullName ?? email;
+  // ...
+}
 ```
 
-Every PR runs the production build, unit suite, and the real browser acceptance
-suite in mobile Chromium, mobile WebKit, and desktop Chromium. After human merge,
-GitHub Actions can deploy the full Vinext/Cloudflare Worker when the repository
-contains `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets. GitHub Pages
-is retained only as a client-only preview because it cannot run Bunki's article,
-RSS, transcript, AI, or sync routes.
+## Optional Dispatch-Owned ChatGPT Sign-In
 
-## Status
+Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
+optional or required ChatGPT sign-in:
 
-The repository now preserves two complementary build tracks: the runnable Bunki
-web product under `prototypes/bunki-sites-v11/`, and the deterministic Phase-0
-core under `apps/` and `packages/`. Product features are real and interactive;
-claims about efficacy, retention, or review burden remain outside the evidence
-currently collected (REQ-GATE-03).
+- Use `getChatGPTUser()` for optional signed-in UI.
+- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
+  anonymous visitors through Sign in with ChatGPT.
+- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
+  browser links or actions.
+- Pass a same-origin relative `returnTo` path for the destination after sign-in
+  or sign-out. The helper validates and safely encodes it.
+- Mark protected pages with `export const dynamic = "force-dynamic"` because
+  they depend on per-request identity headers.
 
-## Governing documents
+Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
+OAuth cookies, and identity header injection. Do not implement app routes for
+those reserved paths. Routes that do not import and call the helper remain
+anonymous-compatible.
 
-The build is driven by frozen specifications under `docs/specs/`. They are
-hash-verified against `docs/specs/BUNKI_SPEC_INTEGRITY_SHA256_2026-07-27.txt` and
-**must never be edited**:
+SIWC establishes identity only; it does not prove workspace membership. Use the
+Sites hosting platform's access policy controls for workspace-wide restrictions,
+or enforce explicit server-side membership or allowlist checks.
 
-| Document                                                          | Role                                                   |
-| ----------------------------------------------------------------- | ------------------------------------------------------ |
-| `BUNKI_PHASE0_CLOSED_LOOP_LONG_RUNNING_GOAL_V1_2026-07-27.md`     | the controller — work packages, tests, stop conditions |
-| `BUNKI_V2_CONVERGED_PRODUCT_ARCHITECTURE_SPEC_2026-07-27.md`      | design authority                                       |
-| `BUNKI_PHASE0_MULTI_AGENT_BUILD_ORCHESTRATION_SPEC_2026-07-27.md` | who builds what, when                                  |
+Use SIWC for account pages, user-specific dashboards, saved records, and write
+actions tied to the current ChatGPT user. Leave public content anonymous.
 
-Architecture decisions live in `docs/adr/`; build evidence and the resumable
-capsule live in `docs/build-evidence/`.
+## Diagnostic Commands
 
-## Layout (controller §5)
+- `npm run install:ci`: perform the one bounded lockfile install
+- `npm run dev`: start the Vite/Vinext development server
+- `npm run build`: build and validate the deployable Sites artifact
+- `npm run start`: start the built Vinext application
+- `npm test`: build, validate, and verify the rendered development-preview metadata
+- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
+- `npm run db:generate`: generate Drizzle migrations after schema changes
 
-npm workspaces monorepo, Node ≥ 22.
+Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
 
-```
-apps/app/              Expo app, web + native targets
-packages/domain/       @bunki/domain — pure core (events, reducers, evidence gate, session)
-packages/persistence/  @bunki/persistence — event store ports + adapters
-packages/seed/         @bunki/seed — licensed seed dataset with per-field provenance
-packages/ai/           @bunki/ai — bounded AI candidate path
-packages/export/       @bunki/export — versioned lossless export
-```
+The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
 
-Each package README states its owning work package and its boundary rules.
+## Learn More
 
-## Boundaries that are enforced, not merely documented
-
-See ADR-001. The short version, all lint-enforced in `eslint.config.mjs`:
-
-- `@bunki/domain` imports no React, React Native, Expo, Node builtin, or sibling
-  package — clock/ID/randomness are injected, which is what makes deterministic
-  replay possible.
-- `apps/app` reaches `@bunki/persistence` from exactly one directory,
-  `apps/app/src/state/persistence/`; no screen, route, or test can obtain an
-  `EventStorePort`, so every append still flows through the domain command
-  handler and evidence-class events still pass the evidence gate (WP-10 narrowed
-  WP-05's blanket ban rather than dropping it; `test/boundaries.test.ts` proves
-  the seam is that one directory).
-- Only `@bunki/domain` imports `ts-fsrs` — one scheduler, nothing else computes
-  intervals.
-
-## Commands
-
-```bash
-npm install
-
-npm run lint          # eslint, incl. the boundary rules above
-npm run format:check  # prettier
-npm run typecheck     # tsc --noEmit in every workspace
-npm run test          # vitest, all workspaces
-
-npm run test:replay   # golden replay        — placeholder until WP-02
-npm run verify:export # export→replay equality — placeholder until WP-03
-npm run test:e2e      # Playwright web flow  — placeholder until WP-10
-
-(cd apps/app && npx expo export --platform web)   # build proof
-```
-
-The three placeholder scripts print that they are unimplemented and exit 0. They
-are defined now because the controller's check set names them; they are not
-evidence of anything passing.
-
-## Runtime honesty
-
-Web results are never reported as native results. Native persistence, capture
-loss, and latency numbers come only from on-device runs (WP-11) and are marked
-UNVERIFIED until then.
+- [vinext Documentation](https://github.com/cloudflare/vinext)
+- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)

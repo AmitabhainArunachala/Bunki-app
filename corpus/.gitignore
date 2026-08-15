@@ -1,8 +1,0 @@
-data/
-out/
-/REGISTRY.md
-.venv/
-__pycache__/
-*.egg-info/
-.pytest_cache/
-uv.lock

@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "_comment": "The kernel's tests (WP-02). Node types are allowed here and only here — the golden-fixture harness reads JSON from disk and the purity scan reads src/ as text. `eslint.config.mjs` draws the same line: Node builtins are restricted in packages/domain/src and permitted in packages/domain/test.",
-  "compilerOptions": {
-    "types": ["node"]
-  },
-  "include": ["src", "test"]
-}

@@ -1,7 +1,0 @@
-drift-prefix.html                N1 {"appearances":21131,"oneTickShare":0.42,"p25":1,"median":2,"p75":4,"p95":12,"mean":3.62,"meanSeconds":2.35} errs 0
-drift-fixed.html [pinned]        N1 {"appearances":21131,"oneTickShare":0.42,"p25":1,"median":2,"p75":4,"p95":12,"mean":3.62,"meanSeconds":2.35} errs 0
-drift-fixed.html                 N1 {"appearances":24645,"oneTickShare":0.447,"p25":1,"median":2,"p75":4,"p95":10,"mean":3.11,"meanSeconds":2.02} errs 0
-drift-prefix.html                N5 {"appearances":19866,"oneTickShare":0.427,"p25":1,"median":2,"p75":4,"p95":13,"mean":3.71,"meanSeconds":2.41} errs 0
-drift-fixed.html [pinned]        N5 {"appearances":19866,"oneTickShare":0.427,"p25":1,"median":2,"p75":4,"p95":13,"mean":3.71,"meanSeconds":2.41} errs 0
-drift-fixed.html                 N5 {"appearances":22004,"oneTickShare":0.436,"p25":1,"median":2,"p75":4,"p95":11,"mean":3.35,"meanSeconds":2.18} errs 0
-DWELL-DONE

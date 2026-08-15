@@ -1,44 +1,44 @@
 {
-  "name": "bunki",
-  "version": "0.0.0",
+  "name": "bunki-kairo-preview",
+  "version": "0.1.0",
   "private": true,
-  "description": "Bunki (分岐) — Phase-0 closed learning loop. Monorepo root (WP-01).",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.13.0"
   },
   "scripts": {
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
-    "test": "vitest run",
-    "test:replay": "vitest run packages/domain/test/replay",
-    "test:e2e": "playwright test --config apps/app/e2e/playwright.config.ts",
-    "test:e2e:build": "npm run export:web --workspace @bunki/app",
-    "verify:export": "vitest run packages/export/test/verify-export.test.ts",
-    "verify:integration-manifest": "node scripts/verify-integration-manifest.mjs",
-    "bunki:web:dev": "npm --prefix prototypes/bunki-sites-v11 run dev -- --host 0.0.0.0",
-    "bunki:web:build": "npm --prefix prototypes/bunki-sites-v11 run build",
-    "bunki:web:test": "npm --prefix prototypes/bunki-sites-v11 run test:unit",
-    "bunki:web:e2e": "npm --prefix prototypes/bunki-sites-v11 run test:e2e",
-    "bunki:web:deploy": "npm --prefix prototypes/bunki-sites-v11 run deploy:worker",
-    "verify:drift": "npm run verify:drift:fast",
-    "verify:drift:fast": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode fast",
-    "verify:drift:full": "node prototypes/corridor/tools/verify-drift-consistency.mjs --mode full"
+    "install:ci": "bash scripts/install-ci.sh",
+    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
+    "build": "bash scripts/build-verified.sh",
+    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "validate:artifact": "bash scripts/validate-artifact.sh",
+    "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
+    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.12.1",
-    "@eslint/js": "10.0.1",
-    "@playwright/test": "1.56.0",
-    "eslint": "10.8.0",
-    "playwright-core": "1.56.0",
-    "prettier": "3.9.6",
-    "typescript": "6.0.3",
-    "typescript-eslint": "8.65.0",
-    "vitest": "4.1.10"
-  }
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vinext": "0.0.50",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "type": "module",
+  "displayName": "Bunki KAIRO Visual Prototype"
 }

@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "_comment": "WP-03. Node types are for the tests only: verify:export opens real stores, and the SQLite one needs a temporary file on disk. Nothing under src/ touches a platform API \u2014 @bunki/export is pure over its inputs so the same verification runs in CI, in a browser, and on a device.",
-  "compilerOptions": {
-    "types": ["node"]
-  },
-  "include": ["src", "test"]
-}
