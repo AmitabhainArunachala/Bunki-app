@@ -6034,6 +6034,31 @@ function renderReview(main) {
       const skey = srsKey(item.t, item.id);
       const next = result[fsrsApi.Rating[rating]].card;
       const prevRec = S.srs[skey];
+      // 道場の礼 — a focus drill on a card the learner never TOOK is
+      // exposure, not deck membership (P0, full-instrument review): grading
+      // it must not mint FSRS state the due queue can never surface
+      // (srsDueItems walks S.taken only), must not write revlog rows for a
+      // card that does not exist, and must not burn one of the day's
+      // new-card slots. The drill still behaves like a session — short
+      // ratings repeat in-session, the judgment lands in the observation
+      // ledger as evidence, and undo takes it back.
+      const isDrillOnly =
+        S.focus && prevRec === undefined && !S.taken.some((t) => t.t === item.t && t.id === item.id);
+      if (isDrillOnly) {
+        obsLog('dojo', skey, fsrsApi.Rating[rating]);
+        const entry = { key, drill: true };
+        if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
+          rv.queue.push(item);
+          entry.reinserted = true;
+        }
+        rv.history.push(entry);
+        saveStore();
+        rv.done[key] += 1;
+        rv.ix += 1;
+        rv.revealed = false;
+        render();
+        return;
+      }
       // every grade lands in the append-only review log before anything else
       const logIx = srsLogReview(skey, card, next, fsrsApi.Rating[rating], now);
       const entry = { key, prev: prevRec, day, logIx };
@@ -6132,6 +6157,15 @@ function renderReviewUndo(main, rv) {
     if (last.key === 'suspend') {
       // a rest is taken back whole: wake the card, no schedule was touched
       delete S.suspended[key];
+    } else if (last.drill) {
+      // a dojo drill is taken back from the observation ledger, never from
+      // FSRS state — detail 0 files the revocation beside the judgment
+      obsLog('dojo', key, 0);
+      rv.done[last.key] -= 1;
+      if (last.reinserted) {
+        const tail = rv.queue.lastIndexOf(prevItem);
+        if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
+      }
     } else {
       if (last.prev === undefined) delete S.srs[key];
       else S.srs[key] = last.prev;
