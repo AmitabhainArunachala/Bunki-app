@@ -10824,7 +10824,10 @@ function buildNavSearch() {
   const input = el('input', 'nav-search-input');
   input.type = 'search';
   input.id = 'nav-search-input';
-  input.placeholder = tx('言葉・漢字・英語で探す', 'search words · kanji · English');
+  // the bar squeezes this input to ~71px on a 390px phone — a long
+  // placeholder truncated to "searc" (P2, review); 検索 fits at any width
+  // and the aria-label keeps the bilingual name
+  input.placeholder = '検索';
   input.setAttribute('aria-label', tx('検索', 'search'));
   const results = el('div', 'nav-search-results');
   const paint = () => {
