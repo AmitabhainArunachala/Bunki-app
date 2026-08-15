@@ -19,7 +19,7 @@
 - Public build receipt/SHA: absent.
 - Article audio, living lanes, article search, deep links, share, offline cache, comprehension, and article-level AI loop: absent.
 - Reader browser/device journeys: `NOT_RUN`; no claim is promoted from source inspection.
-- R2 independent review failed broad control catch-alls. R4 independent review then found omitted AI-reading/focus/probe surfaces and mixed navigation/event assertions. This follow-up hash-binds both deployed JavaScript files and enumerates 66 source families with 66 one-to-one click rows; a fresh independent review is pending and every rendered click remains `NOT_RUN`.
+- R2 independent review failed broad control catch-alls. R4 independent review then found omitted AI-reading/focus/probe surfaces and mixed navigation/event assertions. A further direct-destination audit added level, lesson, AI tutor/quiz, idiom, kanji-index, thesaurus, and grammar controls. This follow-up hash-binds both deployed JavaScript files and enumerates 90 source families with 90 one-to-one click rows; a fresh independent review is pending and every rendered click remains `NOT_RUN`.
 - The authority verification report is 115/116: six visible `.sent-door` controls measure 15×16 rather than the required 44×44 target. This source-adjacent report is not substituted for controller browser/device journeys.
 - Corridor keeps a separate learner store and scheduler; canonical one-state integration is not closed.
 

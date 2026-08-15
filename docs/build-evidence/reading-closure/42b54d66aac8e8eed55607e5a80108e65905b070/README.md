@@ -24,13 +24,14 @@ screenshots. Public release is blocked by absent approval truth. This packet is
 an R0 baseline and is not a release candidate.
 
 `control-census.json` binds both deployed JavaScript files by SHA-256 and
-enumerates 66 source-visible reading control families, including dynamic,
-conditional, pointer-only, canvas-hit, AI-reading, focus-dojo, yomi-probe,
+enumerates 90 source-visible reading control families, including dynamic,
+conditional, pointer-only, canvas-hit, AI-reading/tutor/quiz, level and lesson
+lanes, focus-dojo, yomi-probe, idiom/kanji/grammar/thesaurus catalogs,
 legacy-field, entry-recursion, review, and stroke-motion states. Navigation and
-lookup families are separated from Drift judgment, probe/review grade, rest,
-undo, capture, and import/export mutations. The audit script requires an exact
-one-to-one set of 66 matching control rows in `click-ledger.jsonl`; a broad or
-mixed catch-all cannot hide an omission or event assertion. Every rendered
+lookup families are separated from Drift judgment, quiz/probe/review response,
+rest, undo, capture, and import/export mutations. The audit script requires an
+exact one-to-one set of 90 matching control rows in `click-ledger.jsonl`; a
+broad or mixed catch-all cannot hide an omission or event assertion. Every rendered
 result remains `NOT_RUN`, so source presence is never represented as a
 successful click. Every capability claim names its learner fixture,
 browser/device lanes, evidence class, reviewer, and expected learner-event

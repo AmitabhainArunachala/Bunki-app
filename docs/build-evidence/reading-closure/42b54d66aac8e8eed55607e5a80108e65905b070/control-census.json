@@ -299,6 +299,312 @@
       "browserResult": "NOT_RUN"
     },
     {
+      "controlId": "levels.entry-doors",
+      "view": "jlpt-and-kanken-level-lanes",
+      "selectors": [".chip.t-word", ".chip.t-kanji"],
+      "role": "button",
+      "count": {
+        "mode": "lane-formula",
+        "expression": "up to 18 entry doors for each nonempty JLPT or Kanken lane",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3364-3396,3807-3815" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "levels.bulk-capture",
+      "view": "jlpt-and-kanken-level-lane-with-fresh-items",
+      "selectors": [".take"],
+      "role": "button",
+      "count": {
+        "mode": "lane-formula",
+        "expression": "one bulk-capture control for each nonempty lane with uncaptured items",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-confirmed-capture-batch-after-durable-commit"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3397-3414" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.catalog",
+      "view": "lessons-catalog",
+      "selectors": [".lesson-row"],
+      "role": "button",
+      "count": {
+        "mode": "lesson-plan-formula",
+        "expression": "up to five unfinished lesson rows per JLPT or Kanken lane",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3462-3490" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.learn-navigation",
+      "view": "lesson-learn-step",
+      "selectors": [".review-face .chip", "#lesson-next"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3492-3515" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.quiz-response",
+      "view": "lesson-quiz-unanswered",
+      "selectors": [".lesson-option"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 4, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-canonical-assessment-response"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3517-3545" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_RESPONSE_AND_NO_CANONICAL_EVENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.quiz-navigation",
+      "view": "lesson-quiz-answered-before-final-item",
+      "selectors": ["#lesson-next"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "one after a nonfinal answer", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3546-3565" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.finish-capture",
+      "view": "lesson-quiz-final-answer",
+      "selectors": ["#lesson-next"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "one after the final answer", "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-lesson-completion-and-confirmed-capture-batch-after-durable-commit"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3546-3565" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "lessons.finish-navigation",
+      "view": "lesson-finished",
+      "selectors": ["main > button.take"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3568-3579" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-quiz.response",
+      "view": "ai-quiz-unanswered",
+      "selectors": [".lesson-option"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 4, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-canonical-comprehension-response"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3624-3667" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_RESPONSE_AND_NO_CANONICAL_EVENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-quiz.navigation",
+      "view": "ai-quiz-answered-or-summary",
+      "selectors": ["#aiq-next", "main > button.take"],
+      "role": "button",
+      "count": { "mode": "state", "answered": 1, "summary": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3632-3645,3669-3680" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-chat.input",
+      "view": "ai-tutor-with-key",
+      "selectors": ["#chat-input"],
+      "role": "input",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3687-3747" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-chat.send",
+      "view": "ai-tutor-with-key-and-nonempty-input",
+      "selectors": ["#chat-send"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-versioned-conversation-turn-after-durable-commit"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3712-3745" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_TWO_WRITE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-setup.credentials",
+      "view": "ai-tutor-credential-setup",
+      "selectors": ["#ai-key-input", "#ai-key-save", ".take.taken"],
+      "roles": ["input", "button"],
+      "count": { "mode": "state", "withoutKey": 2, "withKey": 3, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3750-3804" }],
+      "sourceResult": "PRESENT_WITH_SEPARATE_LOCAL_CREDENTIAL_STORE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "yoji.filter",
+      "view": "four-character-idiom-catalog",
+      "selectors": ["#yoji-filter"],
+      "role": "input",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3821-3848" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "yoji.entries",
+      "view": "four-character-idiom-catalog-results",
+      "selectors": ["[data-yoji]"],
+      "role": "button",
+      "count": { "mode": "range", "minimum": 0, "maximum": 80, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3850-3876" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.lenses",
+      "view": "kanji-index-all-lenses",
+      "selectors": [".kdx-lens"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 5, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3885-3922" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_DISPLAY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.part-filters",
+      "view": "kanji-index-parts-lens",
+      "selectors": ["#kdx-partfilter", ".kdx-part", ".kdx-chosen .kdx-clear"],
+      "roles": ["input", "button"],
+      "count": {
+        "mode": "content-formula",
+        "expression": "one search input + selectable component chips + selected component chips + optional clear-all",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3969-4051" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_FILTER_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.stroke-filters",
+      "view": "kanji-index-stroke-count-lens",
+      "selectors": [".kdx-row .kdx-chip"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 30, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "4054-4075" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_FILTER_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.text-search",
+      "view": "kanji-index-reading-or-meaning-lens",
+      "selectors": ["#kdx-textfield"],
+      "role": "input",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "4079-4126" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_FILTER_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.handwriting",
+      "view": "kanji-index-handwriting-lens",
+      "selectors": [".kdx-canvas", ".kdx-draw-ctrl .kdx-clear"],
+      "roles": ["pointer-canvas", "button"],
+      "gestures": ["pointer-stroke", "undo", "clear"],
+      "count": { "mode": "exact", "sourceValue": 3, "semantic": 2, "pointerOnly": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "4132-4210" }],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_CANVAS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "kanjidex.results",
+      "view": "kanji-index-any-result-lens",
+      "selectors": [".kdx-glyph"],
+      "role": "button",
+      "count": { "mode": "range", "minimum": 0, "maximum": 300, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/corridor.js", "lines": "3925-3947,4211-4225" }
+      ],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "thesaurus.entries",
+      "view": "thesaurus-catalog",
+      "selectors": [".thes-head", "[data-thes-row]"],
+      "role": "button",
+      "count": {
+        "mode": "corpus-formula",
+        "expression": "one headword door per semantic cluster + one row per near-meaning edge",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "4374-4407" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "grammar.filters",
+      "view": "grammar-catalog",
+      "selectors": ["[data-glevel]"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 6, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5163-5187" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_FILTER_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "grammar.entries",
+      "view": "grammar-catalog-filtered-results",
+      "selectors": ["[data-grammar]"],
+      "role": "button",
+      "count": {
+        "mode": "corpus-formula",
+        "expression": "all grammar records matching the selected all/N5/N4/N3/N2/N1 filter",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5189-5207" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
       "controlId": "shelf.article-open",
       "view": "shelf-default",
       "selectors": [".shelf-item[data-passage]"],
@@ -980,5 +1286,5 @@
     { "id": "archive.retry", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
     { "id": "draft.route-or-filter", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" }
   ],
-  "sourceConclusion": "The exact two hash-bound JavaScript files yield 66 source-enumerated reading control families after separating navigation/lookup from Drift judgment, probe grade, review grade, rest, undo, and import/export mutations. Exactly two source call sites open a corpus passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
+  "sourceConclusion": "The exact two hash-bound JavaScript files yield 90 source-enumerated reading control families after adding every directly reachable shelf destination and separating navigation/lookup/display from Drift judgment, assessment/probe/review response, rest, undo, capture, and import/export mutations. Exactly two source call sites open a corpus passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
 }
