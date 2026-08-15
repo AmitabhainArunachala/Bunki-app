@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "candidate": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "automated": [
+    { "name": "corpus-tests", "runId": 31880627752, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31880627752", "status": "PASS" },
+    { "name": "pages-app", "runId": 31880628237, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31880628237", "status": "PASS" },
+    { "name": "Bunki verified build", "runId": 31880627761, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31880627761", "status": "PASS" },
+    { "name": "CI", "runId": 31880627753, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31880627753", "status": "PASS" },
+    { "name": "complete-workflow-artifact-byte-comparison", "status": "PASS", "files": 859, "bytes": 120759578 },
+    { "name": "article-json-integrity", "status": "PASS", "filesParsed": 736 },
+    { "name": "corpus-body-consistency", "status": "PASS", "bodies": 734 },
+    { "name": "source-control-census", "status": "PASS", "families": 22, "browserResult": "NOT_RUN" },
+    { "name": "claim-and-click-ledger-jsonl", "status": "PASS", "claimRows": 21, "clickRows": 42 },
+    { "name": "evidence-manifest-coverage", "status": "PASS", "files": 15 },
+    { "name": "javascript-syntax", "status": "PASS" },
+    { "name": "git-integrity", "status": "PASS" }
+  ],
+  "browserAndDevice": [
+    { "name": "cloud-browser-live-DOM", "status": "NOT_RUN", "reason": "Browser recovery superseded tab refresh twice." },
+    { "name": "local-playwright", "status": "NOT_RUN", "reason": "No usable Chromium binary; deterministic install failed." },
+    { "name": "primary-WebKit", "status": "NOT_RUN", "reason": "No runtime lane available." },
+    { "name": "physical-iPhone", "status": "NOT_RUN", "reason": "Requires operator/device action." },
+    { "name": "VoiceOver", "status": "NOT_RUN", "reason": "Requires physical-device lane." }
+  ],
+  "warnings": [
+    "The legacy combined-status endpoint reports pending with zero statuses; six check-runs on the exact SHA report five success and one deployment skip.",
+    "No check-runs attach to the synthetic pull-request merge SHA; checks above are bound to the authority head."
+  ]
+}

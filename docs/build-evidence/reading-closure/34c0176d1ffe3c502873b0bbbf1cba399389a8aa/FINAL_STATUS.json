@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "candidate": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "status": "BASELINE_ONLY_NOT_RELEASE_CANDIDATE",
+  "rubric": 17.0,
+  "hardCap": 30,
+  "browserEvidence": "NOT_RUN",
+  "physicalDeviceEvidence": "NOT_RUN",
+  "editorialApproval": "FAIL",
+  "nativeVoicePanel": "NOT_APPLICABLE_AUDIO_ABSENT",
+  "reason": "The remote candidate is byte-bound and audited, but complete reader/audio/discovery/canonical-state/editorial/browser/device closure is absent."
+}

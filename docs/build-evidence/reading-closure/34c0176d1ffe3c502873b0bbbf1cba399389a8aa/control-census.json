@@ -1,0 +1,370 @@
+{
+  "schema": "bunki.reading.r0.control-census/v1",
+  "candidate": {
+    "sha": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+    "tree": "9320a1c741812a7d38f7afd54263cb7d133c3fbf"
+  },
+  "evidenceClass": "SOURCE_AND_CORPUS_INSPECTION",
+  "browserResult": "NOT_RUN",
+  "coverageRule": "Every statically discoverable reading-visible button, link, pointer-only target, and dynamic instance family is listed. Formula rows cover every runtime instance; they are not substituted for rendered click evidence.",
+  "corpusControlCounts": {
+    "primaryArticles": 40,
+    "archiveArticles": 694,
+    "primaryTokens": 14463,
+    "primaryWordButtons": 6045,
+    "primaryParticleButtons": 3476,
+    "fixedFixtures": [
+      { "position": "first", "id": "wikinews:1403", "wordButtons": 344, "particleButtons": 144 },
+      {
+        "position": "middle-floor-(N-1)/2",
+        "id": "bunki-graded-n4-bookshop",
+        "wordButtons": 94,
+        "particleButtons": 57
+      },
+      { "position": "last", "id": "bunki-essay-n1-city", "wordButtons": 179, "particleButtons": 117 }
+    ]
+  },
+  "controlFamilies": [
+    {
+      "controlId": "global.chrome",
+      "view": "ordinary-non-zen",
+      "selectors": ["#back", "#theme-seal", "#lang [data-lang=\"bi\"]", "#lang [data-lang=\"ja\"]", "#tray"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 5, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "10630-10731" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "drift.ginga.closed",
+      "view": "drift-hero-closed",
+      "selectors": ["#ginga-symbol", "#ginga-theme-seal"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "10383-10436" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "drift.ginga.open",
+      "view": "drift-hero-open",
+      "selectors": [
+        ".nav-arrow",
+        "#lang.lang-slide",
+        "#nav-search-input",
+        ".nav-dojo",
+        ".bubble-shelf",
+        ".bubble-sensei",
+        ".nav-search-row",
+        ".nav-scrim"
+      ],
+      "roles": ["button", "input", "pointer-only-scrim"],
+      "count": {
+        "mode": "formula",
+        "expression": "9 + searchHits(0..8) semantic controls + 1 pointer-only scrim",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "10383-10594" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "world.picker",
+      "view": "world-picker-open",
+      "selectors": [".world-stone", ".world-picker-scrim"],
+      "roles": ["button", "pointer-only-scrim"],
+      "count": { "mode": "exact", "sourceValue": 11, "semantic": 10, "pointerOnly": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9920-10048" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "variant.strip",
+      "view": "all-non-stroke",
+      "selectors": ["#variants-toggle", "[data-variant]"],
+      "role": "button",
+      "count": { "mode": "state", "closed": 1, "open": 16, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9747-9874" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.default",
+      "view": "shelf-default",
+      "selectors": [
+        "#search",
+        "#levels-link",
+        "#lessons-link",
+        "#grammar-link",
+        "#thesaurus-link",
+        "#yoji-link",
+        "#kanjidex-link",
+        "#ai-link",
+        "#airead-link",
+        ".shelf-item[data-passage]",
+        "[data-details]",
+        "#archive-link",
+        "#sources-toggle"
+      ],
+      "roles": ["input", "button"],
+      "count": {
+        "mode": "formula",
+        "expression": "89 + aiKey(0|1) + archiveAvailable(0|1)",
+        "deployedNoAiKey": 90,
+        "articleOuterButtons": 40,
+        "nestedDetailButtons": 40,
+        "renderedValue": null
+      },
+      "structuralDefect": "Each shelf-item button contains a nested data-details button, which is invalid interactive nesting.",
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2529" }],
+      "sourceResult": "PRESENT_WITH_NESTED_BUTTON_DEFECT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.query",
+      "view": "shelf-search",
+      "selectors": ["#search", "#search-results [data-result]", "[data-search-syn]", ".search-syn-door", ".dictionary-retry"],
+      "roles": ["input", "button"],
+      "count": {
+        "mode": "formula",
+        "expression": "1 + articleResults(0..40) + synonymResults(0..4) + synonymDoor(0|1) + dictionaryRetry(0|1)",
+        "renderedValue": null
+      },
+      "scopeNote": "This searches dictionary/word surfaces; no article-title or article-body search route opens a reader.",
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2381" }],
+      "sourceResult": "PRESENT_WORD_SEARCH_ONLY",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.loaded",
+      "view": "reader-body-loaded",
+      "selectors": [
+        "#dials-toggle",
+        "#reader .tok.content[data-index][data-target-kind=\"word\"]",
+        "#reader .tok.particle[data-index][data-target-kind=\"particle\"]",
+        "#read-fin",
+        ".note a.inline-link"
+      ],
+      "roles": ["button", "link"],
+      "count": {
+        "mode": "formula",
+        "expression": "2 + wordButtons(article) + particleButtons(article) + attribution(0|1) + truncatedSource(0|1)",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": [],
+        "boundary": "Passive open/read/lookup/source exposure expects no canonical learner event; explicit finish is separately event-bearing."
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2808-3050" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.settings",
+      "view": "reader-settings-open",
+      "selectors": ["[data-dial^=\"kanji:\"]", "[data-dial^=\"furigana:\"]", "[data-dial^=\"spacing:\"]"],
+      "role": "button",
+      "count": { "mode": "exact-additive", "sourceValue": 9, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2824-2878" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.focused-token",
+      "view": "reader-one-token-focused",
+      "selectors": [".token-actions [data-action=\"quickLook.open\"]", ".token-actions [data-action=\"entry.open\"]"],
+      "role": "button",
+      "count": { "mode": "exact-additive", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2530-2807" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.mini-lookup",
+      "view": "reader-mini-lookup-open",
+      "selectors": ["#mini .mini-entry"],
+      "role": "button",
+      "count": { "mode": "exact-additive", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2022-2145" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.loading-error",
+      "view": "reader-loading-or-error",
+      "selectors": ["#dials-toggle", "[data-dial]"],
+      "role": "button",
+      "count": { "mode": "state", "dialsClosed": 1, "dialsOpen": 10, "retryControls": 0, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2888-2901" }],
+      "sourceResult": "PRESENT_WITHOUT_RETRY",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "archive.loaded",
+      "view": "archive-loaded",
+      "selectors": [".archive-year[data-year]", ".archive-row[data-passage]"],
+      "role": "button",
+      "count": {
+        "mode": "formula",
+        "expression": "21 year toggles + sum(rows in expanded years)",
+        "defaultRows": 0,
+        "allYearsExpandedRows": 694,
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "1621-1684" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "archive.loading-error",
+      "view": "archive-loading-or-error",
+      "selectors": [],
+      "role": "none",
+      "count": { "mode": "exact", "sourceValue": 0, "retryControls": 0, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "1621-1647" }],
+      "sourceResult": "ABSENT_RETRY",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.sheet",
+      "view": "entry-sheet",
+      "selectors": ["#sheet-back", "#sheet-close", ".scrim", "#take", "#new-list", ".sem-row", ".chip"],
+      "roles": ["button", "pointer-only-scrim"],
+      "count": {
+        "mode": "formula",
+        "expression": "2 fixed semantic + 1 pointer-only scrim + node-dependent graph, capture, context, list, schedule, and source controls",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": [],
+        "boundary": "Lookup/navigation expects none; explicit capture/context/list/suspend controls are separately event-bearing."
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5379-5586,7670-9744" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "tray.empty",
+      "view": "tray-empty",
+      "selectors": ["#export-store", "#import-store"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 2, "hiddenFileInputExcludedFromVisibleCount": true, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["export-or-migration-receipt"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3130-3384" }],
+      "sourceResult": "PRESENT_WITHOUT_CANONICAL_RECEIPT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "tray.nonempty",
+      "view": "tray-nonempty",
+      "selectors": ["#review-start", "[data-list-review]", ".tray-line", ".rest-toggle", "#aiq-start", "#export-store", "#import-store"],
+      "roles": ["button", "pointer-only-row"],
+      "count": {
+        "mode": "formula",
+        "expression": "3 + 2*(taken + manual-list-memberships) + dueSections + aiQuiz(0|1)",
+        "renderedValue": null
+      },
+      "accessibilityDefect": "tray-line is pointer-clickable without button role or keyboard activation.",
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["review-start-or-suspend-resume-or-export-import"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3130-3384" }],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_ROWS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.front",
+      "view": "review-front",
+      "selectors": ["#zen-exit", "#zen-more", "#reveal", ".review-face", ".sentence-tok"],
+      "roles": ["button", "pointer-only-face", "pointer-only-token"],
+      "count": { "mode": "formula", "expression": "3 semantic + 1 pointer-only face + sentenceTokens", "renderedValue": null },
+      "accessibilityDefect": "review-face and sentence-tok are pointer-clickable without equivalent semantic button roles.",
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["reveal-requires-again-judgment"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-6031" }],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_TARGETS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.answer",
+      "view": "review-answer",
+      "selectors": ["#zen-exit", "#zen-more", ".grade.g-again", ".grade.g-hard", ".grade.g-good", ".grade.g-easy", ".sentence-tok"],
+      "roles": ["button", "pointer-only-token"],
+      "count": { "mode": "formula", "expression": "6 semantic + sentenceTokens", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["immutable-review-response", "schedule-effect"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5900-6090" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.more",
+      "view": "review-more-open",
+      "selectors": [".review-undo", "#review-rest", ".zen-more-row > .chip"],
+      "role": "button",
+      "count": { "mode": "state", "minimum": 1, "maximum": 3, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["supersession-or-suspend"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5960-6022,6160-6245" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.wait",
+      "view": "review-wait",
+      "selectors": ["#zen-exit", "#zen-wait-skip"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6091-6160" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.summary",
+      "view": "review-summary",
+      "selectors": ["[data-leech-rest]", "#ai-coach", "main > button.take", ".review-undo"],
+      "role": "button",
+      "count": { "mode": "formula", "expression": "1 back-to-list + uniqueLeeches + coach(0|1) + undo(0|1)", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["suspend-or-supersession"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-5868" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "browserResult": "NOT_RUN"
+    }
+  ],
+  "readingEntryGraph": [
+    { "from": "/", "to": "drift", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "/?entry=drift", "to": "drift", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "/?entry=shelf", "to": "shelf", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "/?entry=field", "via": "#enter-shelf", "to": "shelf", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "drift", "via": "#ginga-symbol then .bubble-shelf", "to": "shelf", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "shelf", "via": ".shelf-item[data-passage]", "to": "curated-reader", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "shelf", "via": "#archive-link then .archive-year then .archive-row[data-passage]", "to": "archive-reader", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "reader-or-review", "via": "word/particle assistance", "to": "entry-sheet", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" },
+    { "from": "reader", "via": "#back", "to": "archive-or-shelf", "sourceResult": "PRESENT_APP_STATE_ONLY", "browserResult": "NOT_RUN" },
+    { "from": "tray", "via": "#review-start or [data-list-review]", "to": "review", "sourceResult": "PRESENT", "browserResult": "NOT_RUN" }
+  ],
+  "negativeCapabilities": [
+    { "id": "reader.canonical-deep-link", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.browser-back-forward", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.reload-attachment", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.audio", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.related-next-previous", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.share", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "reader.offline-save", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "article.search", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "archive.retry", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
+    { "id": "draft.route-or-filter", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" }
+  ],
+  "sourceConclusion": "Exactly two source call sites open a passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
+}
