@@ -1919,15 +1919,18 @@ button.tok::before {
 /* the eight world-stones — the long-press picker. Each stone previews its
  * own world (inline colours from THEME_UI); the active one is ringed in its
  * world's red. */
+/* the stones are a transient modal: they must surface above EVERY overlay —
+ * the stroke page rides at z-90 and buried them (operator: "no options to
+ * change colors at all"), so the picker tops the whole stack */
 .world-picker-scrim {
   position: fixed;
   inset: 0;
-  z-index: 59;
+  z-index: 120;
   background: transparent;
 }
 .world-picker {
   position: fixed;
-  z-index: 60;
+  z-index: 121;
   display: grid;
   grid-template-columns: repeat(4, auto);
   gap: 10px;
