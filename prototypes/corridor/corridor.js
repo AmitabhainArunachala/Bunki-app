@@ -2194,6 +2194,14 @@ function back() {
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
     }
+    // the lists tray opened from inside an article returns TO the article
+    if (S.view === 'tray' && S.trayFrom === 'reader' && S.passageId) {
+      S.trayFrom = null;
+      S.view = 'reader';
+      render();
+      window.scrollTo(0, S.readerPos?.[S.passageId] || 0);
+      return;
+    }
     // an archive article returns to its stack, not the curated shelf
     if (S.view === 'reader' && String(passage()?.file || '').startsWith('archive/')) {
       S.view = 'archive';
@@ -7155,7 +7163,10 @@ function renderSchedule(container) {
   const preview = schedulePreview();
   container.append(
     withEn(
-      el('p', 'card-kind', tx('予定される復習', 'if you reviewed this now') + ` — FSRS-6 · ${D.pin.parameterSetId}`),
+      // the scheduler is named for the learner; its internal parameter-set
+      // slug (bunki-fsrs6-…) is provenance and stays in exports/debug —
+      // it leaked into every entry footer (P2, full-instrument review)
+      el('p', 'card-kind', tx('予定される復習', 'if you reviewed this now') + ' — FSRS-6'),
       null,
     ),
   );
@@ -11108,6 +11119,14 @@ function render() {
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];
+    // the tray remembers its door: opened mid-article, back returns to the
+    // article — not the shelf (P2, review: "abandons the article mid-read")
+    S.trayFrom = S.view === 'reader' && S.passageId ? 'reader' : null;
+    if (S.trayFrom === 'reader') {
+      clearTimeout(readerPosTimer);
+      S.readerPos[S.passageId] = Math.round(window.scrollY);
+      saveStore();
+    }
     S.view = 'tray';
     render();
   });
