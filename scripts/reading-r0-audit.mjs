@@ -40,6 +40,19 @@ try {
 
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'));
+const jsonl = async (file) =>
+  (await readFile(file, 'utf8'))
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line, index) => {
+      try {
+        return JSON.parse(line);
+      } catch (error) {
+        throw new Error(`${file}:${index + 1}: invalid JSONL: ${error.message}`, {
+          cause: error,
+        });
+      }
+    });
 const exists = (value) => value !== undefined && value !== null && String(value).trim() !== '';
 
 async function walk(directory) {
@@ -292,6 +305,134 @@ const corpusCensus = {
     (await json(path.join(corridor, 'data/manifest.json'))).counts.articleFiles === primary.length,
   generationCommand: `node scripts/reading-r0-audit.mjs --candidate ${candidate} --out ${output}`,
 };
+
+// This exact-candidate source census is deliberately an allowlist. A broad
+// "entry sheet" or "stroke room" bucket hid missing dynamic/conditional
+// controls in the first packet. Keep one named family per source-visible
+// behavior and one identically named click-ledger row. The candidate and the
+// two deployed JavaScript hashes bind this set; browser/device evidence stays
+// independent and may never be inferred from it.
+const requiredControlFamilyIds = [
+  'archive.article-open',
+  'archive.error-retry',
+  'archive.year-toggles',
+  'drift.card-fallback',
+  'drift.ginga.closed',
+  'drift.ginga.open',
+  'drift.surface-nodes',
+  'drift.surface-settings',
+  'entry.capture',
+  'entry.context-and-lists',
+  'entry.field-enter-shelf',
+  'entry.field-words',
+  'entry.kanji-recursion',
+  'entry.other-node-recursion',
+  'entry.sentence-recursion',
+  'entry.sheet-fixed',
+  'entry.word-ai',
+  'entry.word-dictionary-choice',
+  'entry.word-dictionary-failure-source',
+  'entry.word-dictionary-relations',
+  'entry.word-recursion',
+  'global.chrome',
+  'reader.dials',
+  'reader.dials-toggle',
+  'reader.error-retry',
+  'reader.finish',
+  'reader.mini-entry',
+  'reader.particle-buttons',
+  'reader.source-links',
+  'reader.token-actions',
+  'reader.word-buttons',
+  'review.answer-grades',
+  'review.front',
+  'review.more',
+  'review.summary',
+  'review.wait',
+  'shelf.ai-reading-door',
+  'shelf.article-details',
+  'shelf.article-open',
+  'shelf.fixed-doors',
+  'shelf.query-results',
+  'shelf.search-input',
+  'stroke.base',
+  'stroke.metadata',
+  'stroke.minimal',
+  'stroke.standard-full-motion',
+  'stroke.standard-reduced-motion',
+  'tray.export-import',
+  'tray.review-and-items',
+  'variant.strip',
+  'world.picker',
+];
+const controlCensusPath = path.join(output, 'control-census.json');
+const clickLedgerPath = path.join(output, 'click-ledger.jsonl');
+const controlCensus = await json(controlCensusPath);
+const clickRows = await jsonl(clickLedgerPath);
+if (controlCensus.candidate?.sha !== candidate || controlCensus.candidate?.tree !== tree) {
+  throw new Error('control census is not bound to the requested candidate and tree');
+}
+const sourceByPath = new Map(entries.map((entry) => [entry.source, entry]));
+for (const binding of controlCensus.sourceBindings || []) {
+  const actual = sourceByPath.get(binding.path);
+  if (!actual || actual.bytes !== binding.bytes || actual.sha256 !== binding.sha256) {
+    throw new Error(`control census source binding mismatch: ${binding.path}`);
+  }
+}
+if ((controlCensus.sourceBindings || []).length !== 2) {
+  throw new Error('control census must bind corridor.js and drift-layer.js exactly');
+}
+const sortedUnique = (values) => [...new Set(values)].sort();
+const censusIds = controlCensus.controlFamilies.map((family) => family.controlId);
+const controlRows = clickRows.filter((row) => row.row_kind === 'control_family');
+const ledgerIds = controlRows.map((row) => row.control_id);
+for (const [label, values] of [
+  ['required', requiredControlFamilyIds],
+  ['census', censusIds],
+  ['click ledger', ledgerIds],
+]) {
+  if (values.length !== new Set(values).size)
+    throw new Error(`${label} control IDs are not unique`);
+}
+const requiredJson = JSON.stringify(sortedUnique(requiredControlFamilyIds));
+if (JSON.stringify(sortedUnique(censusIds)) !== requiredJson) {
+  throw new Error('control census is missing or adds an unreviewed source family');
+}
+if (JSON.stringify(sortedUnique(ledgerIds)) !== requiredJson) {
+  throw new Error('click ledger does not match the exact source-control family set');
+}
+const censusEventById = new Map(
+  controlCensus.controlFamilies.map((family) => [
+    family.controlId,
+    family.eventAssertion?.noLearnerEventExpected,
+  ]),
+);
+for (const row of controlRows) {
+  if (
+    row.candidate !== candidate ||
+    row.tree !== tree ||
+    !exists(row.fixture) ||
+    !exists(row.learner_fixture) ||
+    !Array.isArray(row.required_browser_device_lanes) ||
+    row.required_browser_device_lanes.length === 0 ||
+    typeof row.no_learner_event_expected !== 'boolean' ||
+    typeof row.expected_event_present !== 'boolean'
+  ) {
+    throw new Error(`incomplete click-ledger contract: ${row.control_id}`);
+  }
+  if (censusEventById.get(row.control_id) !== row.no_learner_event_expected) {
+    throw new Error(`event assertion differs between census and ledger: ${row.control_id}`);
+  }
+  if (
+    !row.no_learner_event_expected &&
+    (!Array.isArray(row.expected_event) || row.expected_event.length === 0)
+  ) {
+    throw new Error(`event-bearing row lacks an expected event: ${row.control_id}`);
+  }
+  if (row.browser_result === 'PASS' || row.overall_result === 'PASS') {
+    throw new Error(`source census may not promote browser evidence: ${row.control_id}`);
+  }
+}
 
 await mkdir(output, { recursive: true });
 await writeFile(

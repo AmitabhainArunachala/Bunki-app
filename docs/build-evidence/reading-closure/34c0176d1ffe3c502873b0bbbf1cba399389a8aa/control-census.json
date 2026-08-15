@@ -5,8 +5,32 @@
     "tree": "9320a1c741812a7d38f7afd54263cb7d133c3fbf"
   },
   "evidenceClass": "SOURCE_AND_CORPUS_INSPECTION",
+  "sourceBindings": [
+    {
+      "path": "prototypes/corridor/corridor.js",
+      "bytes": 531330,
+      "sha256": "892c5089207f750739285e3f600c33bfeda85d1ccd99da2136d96cb4315e2245"
+    },
+    {
+      "path": "prototypes/corridor/drift-layer.js",
+      "bytes": 827970,
+      "sha256": "db85c0a3f9fb9dae78073a5e663c53ad82d7784a19697a479f83b01c69049868"
+    }
+  ],
   "browserResult": "NOT_RUN",
-  "coverageRule": "Every statically discoverable reading-visible button, link, pointer-only target, and dynamic instance family is listed. Formula rows cover every runtime instance; they are not substituted for rendered click evidence.",
+  "coverageRule": "For the exact two bound deployed JavaScript files, every reading-journey button, link, input, pointer-only target, template/helper-created control, delegated target, canvas hit region, dynamic instance family, conditional state, and explicit absence is assigned one controlId with one matching click-ledger row. Formula rows cover runtime instances; they are never substituted for rendered click evidence.",
+  "coverageMethod": {
+    "files": ["prototypes/corridor/corridor.js", "prototypes/corridor/drift-layer.js"],
+    "inspectedForms": [
+      "el/biLabel/createElement button and anchor factories",
+      "innerHTML/template buttons and anchors",
+      "inputs and pointer-only elements",
+      "delegated closest/querySelector targets",
+      "global pointer, keyboard, history, and canvas hit-test handlers"
+    ],
+    "conditionalHandling": "Conditional families remain listed with their visibility predicates and state formulas. Drift fallback card controls are not called unreachable: the Corridor host short-circuits resolvable word/kanji cards, while unresolved/part fallback states remain conditional and enumerated.",
+    "verifier": "scripts/reading-r0-audit.mjs rejects a source hash mismatch, a missing/extra/duplicate family, missing fixture/lane/event assertions, or any browser PASS without a recorded run."
+  },
   "corpusControlCounts": {
     "primaryArticles": 40,
     "archiveArticles": 694,
@@ -94,10 +118,97 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "shelf.default",
+      "controlId": "drift.surface-settings",
+      "view": "drift-surface",
+      "selectors": ["#theme", "#lvl"],
+      "roles": ["button", "pointer-slider"],
+      "count": { "mode": "exact", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/drift-layer.js", "lines": "8,614-634,1950-2003" }
+      ],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "drift.surface-nodes",
+      "view": "drift-surface",
+      "selectors": ["#drift-layer .word", "#drift-layer .glyph", "#drift-layer .part", "#ink", "#fx"],
+      "roles": ["pointer-node", "canvas-hit-region"],
+      "gestures": ["tap", "hold", "flick", "drag", "double-tap", "two-finger-pinch"],
+      "count": {
+        "mode": "runtime-formula",
+        "expression": "visible word + glyph + part nodes + two canvases carrying manual hub/surface hit regions",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": []
+      },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/drift-layer.js", "lines": "636-1935,2030-2630" }
+      ],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_DYNAMIC_TARGETS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "drift.card-fallback",
+      "view": "drift-card-or-radical-explainer",
+      "selectors": ["button.study", "a.study", ".rrow", "#radQ", "#strokeBtn", "#radocX", "#radoc"],
+      "roles": ["button", "link", "pointer-only-row", "pointer-only-scrim"],
+      "count": {
+        "mode": "conditional-runtime-formula",
+        "expression": "fallback card controls only when the Corridor host cannot resolve the selected word/kanji; part cards have no study door; radical explainer controls require a fallback glyph card",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": []
+      },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/drift-layer.js", "lines": "8,1826-1935,2018-2024" },
+        { "path": "prototypes/corridor/corridor.js", "lines": "3063-3075" }
+      ],
+      "sourceResult": "CONDITIONAL_HOST_FALLBACK",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.field-words",
+      "view": "legacy-entry-field",
+      "selectors": [".field-word"],
+      "role": "pointer-only-node",
+      "count": { "mode": "exact-at-candidate", "sourceValue": 26, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3077-3105" }],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_TARGETS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.field-enter-shelf",
+      "view": "legacy-entry-field",
+      "selectors": ["#enter-shelf"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3107-3115" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.search-input",
+      "view": "shelf-default",
+      "selectors": ["#search"],
+      "role": "input",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2290" }],
+      "sourceResult": "PRESENT_WORD_SEARCH_ONLY",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.fixed-doors",
       "view": "shelf-default",
       "selectors": [
-        "#search",
         "#levels-link",
         "#lessons-link",
         "#grammar-link",
@@ -105,35 +216,58 @@
         "#yoji-link",
         "#kanjidex-link",
         "#ai-link",
-        "#airead-link",
-        ".shelf-item[data-passage]",
-        "[data-details]",
         "#archive-link",
         "#sources-toggle"
       ],
-      "roles": ["input", "button"],
-      "count": {
-        "mode": "formula",
-        "expression": "89 + aiKey(0|1) + archiveAvailable(0|1)",
-        "deployedNoAiKey": 90,
-        "articleOuterButtons": 40,
-        "nestedDetailButtons": 40,
-        "renderedValue": null
-      },
-      "structuralDefect": "Each shelf-item button contains a nested data-details button, which is invalid interactive nesting.",
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 9, "renderedValue": null },
       "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2529" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.ai-reading-door",
+      "view": "shelf-default-with-ai-key",
+      "selectors": ["#airead-link"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "aiKey(0|1)", "deployedNoKey": 0, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2529" }],
+      "sourceResult": "CONDITIONAL",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.article-open",
+      "view": "shelf-default",
+      "selectors": [".shelf-item[data-passage]"],
+      "role": "button",
+      "count": { "mode": "exact-at-candidate", "sourceValue": 40, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2382-2426" }],
       "sourceResult": "PRESENT_WITH_NESTED_BUTTON_DEFECT",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "shelf.query",
+      "controlId": "shelf.article-details",
+      "view": "shelf-default",
+      "selectors": ["[data-details]"],
+      "role": "button",
+      "count": { "mode": "exact-at-candidate", "sourceValue": 40, "renderedValue": null },
+      "structuralDefect": "Each details button is nested inside its shelf-item button, which is invalid interactive nesting.",
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2382-2426" }],
+      "sourceResult": "PRESENT_WITH_NESTED_BUTTON_DEFECT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "shelf.query-results",
       "view": "shelf-search",
-      "selectors": ["#search", "#search-results [data-result]", "[data-search-syn]", ".search-syn-door", ".dictionary-retry"],
-      "roles": ["input", "button"],
+      "selectors": ["#search-results [data-result]", "[data-search-syn]", ".search-syn-door", ".dictionary-retry"],
+      "role": "button",
       "count": {
         "mode": "formula",
-        "expression": "1 + articleResults(0..40) + synonymResults(0..4) + synonymDoor(0|1) + dictionaryRetry(0|1)",
+        "expression": "dictionaryResults(0..40) + synonymResults(0..4) + synonymDoor(0|1) + dictionaryRetry(0|1)",
         "renderedValue": null
       },
       "scopeNote": "This searches dictionary/word surfaces; no article-title or article-body search route opens a reader.",
@@ -143,32 +277,90 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "reader.loaded",
+      "controlId": "reader.dials-toggle",
       "view": "reader-body-loaded",
-      "selectors": [
-        "#dials-toggle",
-        "#reader .tok.content[data-index][data-target-kind=\"word\"]",
-        "#reader .tok.particle[data-index][data-target-kind=\"particle\"]",
-        "#read-fin",
-        ".note a.inline-link"
-      ],
-      "roles": ["button", "link"],
-      "count": {
-        "mode": "formula",
-        "expression": "2 + wordButtons(article) + particleButtons(article) + attribution(0|1) + truncatedSource(0|1)",
-        "renderedValue": null
-      },
+      "selectors": ["#dials-toggle"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
       "eventAssertion": {
         "noLearnerEventExpected": true,
         "expected": [],
-        "boundary": "Passive open/read/lookup/source exposure expects no canonical learner event; explicit finish is separately event-bearing."
+        "boundary": "Explicit finish and token assistance are separately event-bearing."
       },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2808-3050" }],
       "sourceResult": "PRESENT",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "reader.settings",
+      "controlId": "reader.source-links",
+      "view": "reader-body-loaded-with-source-links",
+      "selectors": [".note a.inline-link"],
+      "role": "link",
+      "count": {
+        "mode": "formula",
+        "expression": "attribution(0|1) + truncatedSource(0|1)",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2888-3050" }],
+      "sourceResult": "PRESENT_CONDITIONAL",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.word-buttons",
+      "view": "reader-body-loaded",
+      "selectors": ["#reader .tok.content[data-index][data-target-kind=\"word\"]"],
+      "role": "button",
+      "count": {
+        "mode": "exact-corpus-formula",
+        "expression": "wordButtons(article)",
+        "primaryTotal": 6045,
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": []
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2530-2807" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_OBSERVATION_MUTATION",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.particle-buttons",
+      "view": "reader-body-loaded",
+      "selectors": ["#reader .tok.particle[data-index][data-target-kind=\"particle\"]"],
+      "role": "button",
+      "count": {
+        "mode": "exact-corpus-formula",
+        "expression": "particleButtons(article)",
+        "primaryTotal": 3476,
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": [],
+        "boundary": "Short activation, hold, quick-look, and full-entry are lookup/assistance exposure; the controller requires no canonical learner event."
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "4466-4547,2530-2807" }],
+      "sourceResult": "PRESENT_WITH_MIXED_GESTURE_SEMANTICS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.finish",
+      "view": "reader-body-loaded",
+      "selectors": ["#read-fin"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["canonical-article-finished-or-supersession-after-durable-commit"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2997-3014" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "reader.dials",
       "view": "reader-settings-open",
       "selectors": ["[data-dial^=\"kanji:\"]", "[data-dial^=\"furigana:\"]", "[data-dial^=\"spacing:\"]"],
       "role": "button",
@@ -179,7 +371,7 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "reader.focused-token",
+      "controlId": "reader.token-actions",
       "view": "reader-one-token-focused",
       "selectors": [".token-actions [data-action=\"quickLook.open\"]", ".token-actions [data-action=\"entry.open\"]"],
       "role": "button",
@@ -190,7 +382,7 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "reader.mini-lookup",
+      "controlId": "reader.mini-entry",
       "view": "reader-mini-lookup-open",
       "selectors": ["#mini .mini-entry"],
       "role": "button",
@@ -201,35 +393,40 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "reader.loading-error",
+      "controlId": "reader.error-retry",
       "view": "reader-loading-or-error",
-      "selectors": ["#dials-toggle", "[data-dial]"],
-      "role": "button",
-      "count": { "mode": "state", "dialsClosed": 1, "dialsOpen": 10, "retryControls": 0, "renderedValue": null },
+      "selectors": [],
+      "role": "none",
+      "count": { "mode": "exact", "sourceValue": 0, "retryControls": 0, "renderedValue": null },
       "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2888-2901" }],
-      "sourceResult": "PRESENT_WITHOUT_RETRY",
+      "sourceResult": "ABSENT_AND_REJECTED_PROMISE_PINNED",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "archive.loaded",
+      "controlId": "archive.year-toggles",
       "view": "archive-loaded",
-      "selectors": [".archive-year[data-year]", ".archive-row[data-passage]"],
+      "selectors": [".archive-year[data-year]"],
       "role": "button",
-      "count": {
-        "mode": "formula",
-        "expression": "21 year toggles + sum(rows in expanded years)",
-        "defaultRows": 0,
-        "allYearsExpandedRows": 694,
-        "renderedValue": null
-      },
+      "count": { "mode": "exact-at-candidate", "sourceValue": 21, "renderedValue": null },
       "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "1621-1684" }],
       "sourceResult": "PRESENT",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "archive.loading-error",
+      "controlId": "archive.article-open",
+      "view": "archive-loaded-years-expanded",
+      "selectors": [".archive-row[data-passage]"],
+      "role": "button",
+      "count": { "mode": "exact-at-candidate", "sourceValue": 694, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "1650-1684" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "archive.error-retry",
       "view": "archive-loading-or-error",
       "selectors": [],
       "role": "none",
@@ -240,26 +437,249 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "entry.sheet",
+      "controlId": "entry.sheet-fixed",
       "view": "entry-sheet",
-      "selectors": ["#sheet-back", "#sheet-close", ".scrim", "#take", "#new-list", ".sem-row", ".chip"],
+      "selectors": ["#sheet-back", "#sheet-close", ".scrim"],
       "roles": ["button", "pointer-only-scrim"],
-      "count": {
-        "mode": "formula",
-        "expression": "2 fixed semantic + 1 pointer-only scrim + node-dependent graph, capture, context, list, schedule, and source controls",
-        "renderedValue": null
-      },
-      "eventAssertion": {
-        "noLearnerEventExpected": true,
-        "expected": [],
-        "boundary": "Lookup/navigation expects none; explicit capture/context/list/suspend controls are separately event-bearing."
-      },
-      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5379-5586,7670-9744" }],
+      "count": { "mode": "exact", "sourceValue": 3, "semantic": 2, "pointerOnly": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9559-9635" }],
       "sourceResult": "PRESENT",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "tray.empty",
+      "controlId": "entry.word-dictionary-choice",
+      "view": "entry-word-homographs",
+      "selectors": [".dictionary-homograph"],
+      "role": "button",
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "one button per distinct reading/entry when more than one choice shares the form",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7601-7663" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.word-dictionary-relations",
+      "view": "entry-word-complete-dictionary",
+      "selectors": [".dictionary-rel:not(.muted)"],
+      "role": "button",
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "routable JMdict cross-reference and antonym tuples",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7451-7531" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.word-dictionary-failure-source",
+      "view": "entry-word-error-or-complete-dictionary",
+      "selectors": [".dictionary-retry", ".dictionary-credit a[href]"],
+      "roles": ["button", "link"],
+      "count": {
+        "mode": "state",
+        "errorRetry": "0|1",
+        "completeLicenceLink": "0|1",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7730-7760" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.word-ai",
+      "view": "entry-word-with-ai-key",
+      "selectors": [".chip.ai-ask"],
+      "role": "button",
+      "count": { "mode": "conditional-exact", "sourceValueWithKey": 2, "sourceValueWithoutKey": 0, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": [],
+        "boundary": "An AI lineage receipt is audit metadata, not a learner event; the candidate calls the provider directly and emits no canonical lineage receipt."
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7066-7195,7767-7818" }],
+      "sourceResult": "CONDITIONAL_WITHOUT_CANONICAL_AI_LINEAGE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.word-recursion",
+      "view": "entry-word",
+      "selectors": [".entry-row[data-kanjirow]", ".sem-row", ".chip.t-word"],
+      "roles": ["button"],
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "kanji in headword + authored semantic rows, or fallback word chips when semantic notes are absent",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7770-7865" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.sentence-recursion",
+      "view": "entry-word-examples-or-sentence-node",
+      "selectors": [".sentence-tok", ".sent-door", ".token-actions", "#mini .mini-entry"],
+      "roles": ["pointer-only-token", "button"],
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "live sentence tokens + one door per example + two focused-token actions + one conditional mini-entry",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": true,
+        "expected": []
+      },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/corridor.js", "lines": "5254-5287,6956-7064,7801-7816" }
+      ],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_TOKENS_AND_LOCAL_OBSERVATION_MUTATION",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.kanji-recursion",
+      "view": "entry-kanji",
+      "selectors": [
+        ".pool-tag.cat-chip",
+        ".rad-door",
+        ".entry-row[data-confusable]",
+        ".entry-rows .entry-row",
+        ".more-row",
+        ".chip.t-idiom",
+        "#strokes-door",
+        ".stroke-door"
+      ],
+      "role": "button",
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "category chips + optional radical + confusables + main components + compound rows + optional show-all + idioms + exactly one stroke door",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7990-8143,8202-8237" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.other-node-recursion",
+      "view": "entry-radical-idiom-particle-catalog",
+      "selectors": [".chip.t-kanji", ".entry-row", ".cat-cell"],
+      "role": "button",
+      "count": {
+        "mode": "node-dependent-formula",
+        "expression": "radical/idiom kanji chips + optional particle related-grammar row + every catalog result cell",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/corridor.js", "lines": "4434-4463,5333-5354,9450-9557" }
+      ],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.capture",
+      "view": "entry-capturable",
+      "selectors": ["#take"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "one for each untaken capturable node", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-capture-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5379-5474" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "entry.context-and-lists",
+      "view": "entry-taken",
+      "selectors": ["[data-ctx-scope]", ".list-picker .chip", "#new-list"],
+      "role": "button",
+      "count": {
+        "mode": "formula",
+        "expression": "3 context scopes + existing manual lists + one new-list control",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["canonical-context-or-membership-event"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5475-5586" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "stroke.base",
+      "view": "stroke-room-all-states",
+      "selectors": ["#strokes-back", "#stroke-world-seal", "#ink-stage"],
+      "roles": ["button", "pointer-only-stage"],
+      "count": {
+        "mode": "state",
+        "semantic": 2,
+        "rewriteStageWithPathData": "0|1",
+        "historyEscapeTransitions": 2,
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "1885-1955,9046-9261,9396-9448" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "stroke.minimal",
+      "view": "stroke-room-minimal",
+      "selectors": [".stroke-chrome-trigger", ".stroke-palette-choice", "#stroke-numbers"],
+      "role": "button",
+      "count": {
+        "mode": "state",
+        "sleeping": 1,
+        "awakeWithPathData": 12,
+        "awakeMissingPathData": 11,
+        "paletteChoices": 10,
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "8427-8488,9387-9393" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "stroke.standard-full-motion",
+      "view": "stroke-room-standard-full-motion-with-data",
+      "selectors": ["#stroke-replay", "#stroke-slow", ".ink-dot", "#stroke-numbers"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 7, "inkChoices": 4, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9299-9345" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "stroke.standard-reduced-motion",
+      "view": "stroke-room-standard-reduced-motion-with-data",
+      "selectors": ["#stroke-prev", "#stroke-next", "#stroke-numbers"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 3, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9282-9298,9344-9345" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "stroke.metadata",
+      "view": "stroke-room-standard-with-data",
+      "selectors": [".stroke-meta-link"],
+      "role": "button",
+      "count": { "mode": "range", "minimum": 1, "maximum": 3, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "9347-9382" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "tray.export-import",
       "view": "tray-empty",
       "selectors": ["#export-store", "#import-store"],
       "role": "button",
@@ -270,7 +690,7 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "tray.nonempty",
+      "controlId": "tray.review-and-items",
       "view": "tray-nonempty",
       "selectors": ["#review-start", "[data-list-review]", ".tray-line", ".rest-toggle", "#aiq-start", "#export-store", "#import-store"],
       "roles": ["button", "pointer-only-row"],
@@ -298,7 +718,7 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "review.answer",
+      "controlId": "review.answer-grades",
       "view": "review-answer",
       "selectors": ["#zen-exit", "#zen-more", ".grade.g-again", ".grade.g-hard", ".grade.g-good", ".grade.g-easy", ".sentence-tok"],
       "roles": ["button", "pointer-only-token"],
@@ -366,5 +786,5 @@
     { "id": "archive.retry", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
     { "id": "draft.route-or-filter", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" }
   ],
-  "sourceConclusion": "Exactly two source call sites open a passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
+  "sourceConclusion": "The exact two hash-bound JavaScript files yield 51 one-to-one reading control families. Exactly two source call sites open a passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
 }

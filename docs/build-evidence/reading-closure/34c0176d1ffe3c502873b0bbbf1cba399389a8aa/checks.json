@@ -9,9 +9,9 @@
     { "name": "complete-workflow-artifact-byte-comparison", "status": "PASS", "files": 859, "bytes": 120759578 },
     { "name": "article-json-integrity", "status": "PASS", "filesParsed": 736 },
     { "name": "corpus-body-consistency", "status": "PASS", "bodies": 734 },
-    { "name": "source-control-census", "status": "PASS", "families": 22, "browserResult": "NOT_RUN" },
-    { "name": "claim-and-click-ledger-jsonl", "status": "PASS", "claimRows": 21, "clickRows": 42 },
-    { "name": "evidence-manifest-coverage", "status": "PASS", "files": 15 },
+    { "name": "source-control-census", "status": "PASS", "families": 51, "matchingClickRows": 51, "sourceFilesHashBound": 2, "browserResult": "NOT_RUN" },
+    { "name": "claim-and-click-ledger-jsonl", "status": "PASS", "claimRows": 21, "clickRows": 59 },
+    { "name": "evidence-manifest-coverage", "status": "PASS", "files": 16 },
     { "name": "javascript-syntax", "status": "PASS" },
     { "name": "git-integrity", "status": "PASS" }
   ],
@@ -23,6 +23,7 @@
     { "name": "VoiceOver", "status": "NOT_RUN", "reason": "Requires physical-device lane." }
   ],
   "warnings": [
+    "Historical checkpoint: after this cut, authority and Pages advanced to 42b54d66aac8e8eed55607e5a80108e65905b070; these results do not describe the current live payload.",
     "The legacy combined-status endpoint reports pending with zero statuses; six check-runs on the exact SHA report five success and one deployment skip.",
     "No check-runs attach to the synthetic pull-request merge SHA; checks above are bound to the authority head."
   ]
