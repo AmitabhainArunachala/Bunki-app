@@ -2896,6 +2896,18 @@ body.v-depth-layered .stroke-page {
 .stroke-kun-stem {
   color: var(--red);
 }
+/* complete labeled readings: 音 then 訓, each row wrapping as needed */
+.stroke-read-row {
+  display: block;
+  max-width: 46vw;
+  overflow-wrap: anywhere;
+}
+.stroke-read-label {
+  margin-right: 0.6em;
+  font-size: 9.5px;
+  opacity: 0.62;
+  letter-spacing: 0.3em;
+}
 .stroke-stage {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -2913,7 +2925,6 @@ body.v-depth-layered .stroke-page {
 /* in the living room the numbers answer the chip, not the SVG animation
  * (which owns their inline opacity in classic mode — that was the broken
  * 筆順の番号); stronger halo so they read over wet ink in every world */
-.stroke-page[data-living='on'] .stroke-num,
 .stroke-page[data-living='still'] .stroke-num {
   opacity: 0.92 !important;
   stroke-width: 2.4px;
@@ -2923,18 +2934,42 @@ body.v-depth-layered .stroke-page {
   width: 100%;
   height: 100%;
 }
-.stroke-page[data-living='on'] .stroke-stage svg.stroke-canvas,
+/* While the engine LIVES the numbers SVG rides a body-level fixed layer —
+ * any sibling overlay stacked above the live canvas can blank the canvas
+ * outright (harness-proven: ink vanished under the in-stage overlay and
+ * returned the instant it hid; the fixed world-picker floats over the same
+ * canvas without harm). The layer is position-synced to the stage. */
+.stroke-nums-lift {
+  position: fixed;
+  z-index: 95;
+  display: none;
+  pointer-events: none;
+}
+body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
+  display: block;
+}
+.stroke-nums-lift svg.stroke-canvas {
+  width: 100%;
+  height: 100%;
+}
+/* a numeral belongs to its stroke — it surfaces the moment the hand begins
+ * that stroke (reference-prototype behavior), never all at once */
+.stroke-nums-lift .stroke-num {
+  opacity: 0 !important;
+  transition: opacity 0.25s ease;
+  stroke-width: 2.4px;
+}
+.stroke-nums-lift .stroke-num.revealed {
+  opacity: 0.92 !important;
+}
+/* the still room keeps its in-stage overlay (a 2d canvas composits fine) */
 .stroke-page[data-living='still'] .stroke-stage svg.stroke-canvas {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  /* the overlay exists only while the numbers are asked for — an
-   * always-mounted positioned overlay can knock a software-GL canvas out
-   * of the compositor entirely (found live in the harness) */
   display: none;
 }
-.stroke-page[data-living='on'][data-numbers='on'] .stroke-stage svg.stroke-canvas,
 .stroke-page[data-living='still'][data-numbers='on'] .stroke-stage svg.stroke-canvas {
   display: block;
 }
@@ -2946,12 +2981,16 @@ body.v-depth-layered .stroke-page {
 }
 .stroke-page[data-living='on'] .stroke-grid,
 .stroke-page[data-living='still'] .stroke-grid,
+.stroke-nums-lift .stroke-grid,
 .stroke-page[data-living='on'] .stroke-guide,
 .stroke-page[data-living='still'] .stroke-guide,
+.stroke-nums-lift .stroke-guide,
 .stroke-page[data-living='on'] .stroke-bleed,
 .stroke-page[data-living='still'] .stroke-bleed,
+.stroke-nums-lift .stroke-bleed,
 .stroke-page[data-living='on'] .stroke-ink,
-.stroke-page[data-living='still'] .stroke-ink {
+.stroke-page[data-living='still'] .stroke-ink,
+.stroke-nums-lift .stroke-ink {
   display: none;
 }
 .stroke-page[data-living='on'] .stroke-inks,

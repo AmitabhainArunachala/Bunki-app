@@ -8287,6 +8287,12 @@ function stopInkRoom() {
   } catch {
     /* engine already gone */
   }
+  try {
+    inkRoom.unsync && inkRoom.unsync();
+    inkRoom.lift && inkRoom.lift.remove();
+  } catch {
+    /* overlay already gone */
+  }
   inkRoom = null;
 }
 /** The ink sheet's paper at DESIGN strength — the full-amplitude grounds the
@@ -8486,9 +8492,22 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       room.canvas = nu;
       return nu;
     };
-    spec.onStroke = (ix) => fillPips(ix);
+    // each number surfaces WITH its stroke (reference behavior: the numeral
+    // belongs to the moment its stroke is written, not to a finished chart);
+    // document-wide query — while the engine lives the SVG rides a body-level
+    // fixed layer, outside the page subtree
+    const revealNums = (upto) => {
+      document.querySelectorAll('.stroke-num').forEach((n, i) => n.classList.toggle('revealed', i <= upto));
+    };
+    spec.onStroke = (ix) => {
+      fillPips(ix);
+      revealNums(ix);
+    };
     spec.onPhase = (phase) => {
-      if (phase === 'done') fillPips(strokes.length);
+      if (phase === 'done') {
+        fillPips(strokes.length);
+        revealNums(strokes.length);
+      }
     };
     const handle = await INK.startInk(canvas, spec);
     if (inkRoom !== room) {
@@ -8497,13 +8516,56 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     }
     room.handle = handle;
     handle.ondead = () => {
-      // device lost mid-write: the page keeps its SVG diagram — honest, quiet
-      if (inkRoom === room) page.dataset.living = 'off';
+      // device lost mid-write: the page keeps its SVG diagram — honest, quiet.
+      // The numbers SVG returns from the lift to the stage first: the classic
+      // diagram animation owns it again.
+      if (inkRoom === room) {
+        try {
+          room.unsync && room.unsync();
+          if (room.lift) {
+            const s = room.lift.querySelector('svg.stroke-canvas');
+            if (s) stage.append(s);
+            room.lift.remove();
+            room.lift = null;
+          }
+        } catch {
+          /* overlay already gone */
+        }
+        page.dataset.living = 'off';
+      }
     };
     page.dataset.living = 'on';
     page.dataset.inkKind = handle.kind;
     const tag = page.querySelector('#stroke-engine');
     if (tag) tag.textContent = handle.kind === 'gpu' ? '筆 WebGPU' : '筆 WebGL';
+    // While the engine lives, the numbers SVG leaves the stage for a BODY-level
+    // fixed layer aligned over it. A sibling overlay stacked above the live
+    // canvas can blank the canvas entirely (proven in the harness: the ink
+    // vanished under the in-stage overlay and returned the instant it hid,
+    // while the body-level world-picker floats over the same canvas without
+    // harm). The layer tracks the stage through scroll and resize.
+    const numsSvg = page.querySelector('svg.stroke-canvas');
+    if (numsSvg) {
+      const lift = el('div', 'stroke-nums-lift');
+      lift.setAttribute('aria-hidden', 'true');
+      lift.append(numsSvg);
+      document.body.append(lift);
+      const sync = () => {
+        const r = stage.getBoundingClientRect();
+        lift.style.top = `${r.top}px`;
+        lift.style.left = `${r.left}px`;
+        lift.style.width = `${r.width}px`;
+        lift.style.height = `${r.height}px`;
+      };
+      sync();
+      page.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync);
+      room.lift = lift;
+      room.unsync = () => {
+        page.removeEventListener('scroll', sync);
+        window.removeEventListener('resize', sync);
+      };
+    }
     // 触れて、もう一度 — touch the sheet and the hand writes again
     stage.addEventListener('click', () => {
       if (inkRoom === room && room.handle) room.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
@@ -8581,13 +8643,25 @@ function renderStrokePage(root) {
     kleft.append(
       el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
     );
+    // COMPLETE readings, labeled 音/訓 — the truncated unlabeled pair was
+    // called out against the reference prototype (operator, 2026-08-15)
     const readings = el('span', 'stroke-readings');
-    if (k?.on?.length) readings.append(el('span', 'stroke-on', k.on.slice(0, 2).join('・')));
-    for (const kn of (k?.kun || []).slice(0, 2)) {
-      const [stem, oku] = kn.split('.');
-      const row = el('span', 'stroke-kun');
-      row.append(el('span', 'stroke-kun-stem', stem));
-      if (oku) row.append(document.createTextNode(oku));
+    if (k?.on?.length) {
+      const row = el('span', 'stroke-read-row');
+      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.join('・')));
+      readings.append(row);
+    }
+    if (k?.kun?.length) {
+      const row = el('span', 'stroke-read-row');
+      row.append(el('span', 'stroke-read-label', '訓'));
+      (k.kun || []).forEach((kn, i) => {
+        const [stem, oku] = kn.split('.');
+        if (i) row.append(document.createTextNode('・'));
+        const one = el('span', 'stroke-kun');
+        one.append(el('span', 'stroke-kun-stem', stem));
+        if (oku) one.append(document.createTextNode(oku));
+        row.append(one);
+      });
       readings.append(row);
     }
     khead.append(kleft, readings);
