@@ -4927,6 +4927,16 @@ body.zen .grade-row {
   margin: 0 auto;
   width: 100%;
   max-width: 380px;
+  /* the four seals stay in reach: on tall answer faces the row landed
+   * below the fold (top 1137 in an 844px viewport) with no scroll cue —
+   * P1, full-instrument review. It now rides the bottom edge on a washi
+   * backing while the face scrolls beneath it. */
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 8px 0 calc(10px + env(safe-area-inset-bottom));
+  background: var(--ground-0, var(--ground));
+  box-shadow: 0 -10px 24px -18px rgba(10, 10, 8, 0.55);
 }
 .zen-more-row {
   display: flex;
