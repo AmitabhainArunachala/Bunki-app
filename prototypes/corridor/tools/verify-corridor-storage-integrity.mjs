@@ -793,9 +793,12 @@ verified('bounded-handlers-call-executed-actions', () => {
   assert.match(finishHandler, /commitReadDone\(p\.id\)/);
   assert.doesNotMatch(finishHandler, /saveStore\(|S\.readDone\[/);
 
-  const captureHandler = between('function takeButton(node, label) {', '/** After 覚える:');
+  // capture is reversible now (operator directive §3): both directions ride
+  // the guarded transactional path through toggleTaken
+  const captureHandler = between('function toggleTaken(node, label) {', '/** After 覚える:');
   assert.match(captureHandler, /commitCapture\(node, label\)/);
-  assert.doesNotMatch(captureHandler, /saveStore\(|S\.taken\.push|S\.deepWords\[/);
+  assert.match(captureHandler, /commitStorePatch\(\{ taken:/);
+  assert.doesNotMatch(captureHandler, /saveStore\(|S\.taken\.push|S\.taken\.splice|S\.deepWords\[/);
 
   const gradeHandler = between(
     'for (const [rating, key, ja, sealChar] of grades) {',

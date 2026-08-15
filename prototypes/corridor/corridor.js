@@ -5864,22 +5864,30 @@ function commitCapture(node, label, now = Date.now()) {
   return commitStorePatch(patch);
 }
 
+/** Capture is a DOOR THAT SWINGS BOTH WAYS (operator directive §3): taking
+ * adds the card; taking again removes it from the deck while its FSRS
+ * history and revlog stay whole, so a re-take resumes the schedule instead
+ * of pretending the card is new. Both directions ride the guarded
+ * transactional store path. */
+function toggleTaken(node, label) {
+  const ix = S.taken.findIndex((t) => t.t === node.t && t.id === node.id);
+  if (ix < 0) return commitCapture(node, label);
+  return commitStorePatch({ taken: S.taken.filter((_, i) => i !== ix) });
+}
+
 function takeButton(node, label) {
   const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
   const btn = biLabel(
     'button',
     already ? 'take taken' : 'take',
-    already ? '覚える ✓' : '覚える',
-    already ? 'memorizing' : 'memorize',
+    already ? '覚える ✓ — やめる' : '覚える',
+    already ? 'memorizing — tap to stop' : 'memorize',
   );
   btn.type = 'button';
   btn.id = 'take';
+  btn.setAttribute('aria-pressed', String(already));
   btn.addEventListener('click', () => {
-    if (already) return;
-    if (!commitCapture(node, label)) {
-      render();
-      return;
-    }
+    toggleTaken(node, label);
     render();
   });
   return btn;
@@ -10052,6 +10060,24 @@ function renderSheet(root) {
   bar.append(backBtn);
   if (S.stack.length > 1) {
     bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
+  }
+  // 覚 top-right on EVERY capturable sheet (operator directive §3: one
+  // button, top right corner, on every screen)
+  if (NODE_KIND[node.t]) {
+    const takenNow = S.taken.some((t) => t.t === node.t && t.id === node.id);
+    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
+    capture.type = 'button';
+    capture.id = 'sheet-take';
+    capture.setAttribute('aria-pressed', String(takenNow));
+    capture.setAttribute(
+      'aria-label',
+      tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize'),
+    );
+    capture.addEventListener('click', () => {
+      toggleTaken(node, nodeTitle(node));
+      render();
+    });
+    bar.append(capture);
   }
   const closeBtn = el('button', 'sheet-close', '✕');
   closeBtn.type = 'button';

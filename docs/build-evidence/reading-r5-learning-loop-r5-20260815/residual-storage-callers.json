@@ -109,7 +109,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 5918,
+      "lineAfterPatch": 5926,
       "surface": "capture context scope",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "taken"
@@ -118,7 +118,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 5959,
+      "lineAfterPatch": 5967,
       "surface": "manual list membership",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "lists"
@@ -127,7 +127,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 5972,
+      "lineAfterPatch": 5980,
       "surface": "new manual list",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "lists"
@@ -136,7 +136,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6287,
+      "lineAfterPatch": 6295,
       "surface": "summary leech rest",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended"
@@ -145,7 +145,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6437,
+      "lineAfterPatch": 6445,
       "surface": "current review-card rest",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended"
@@ -159,7 +159,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6646,
+      "lineAfterPatch": 6654,
       "surface": "review undo",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended",
@@ -183,7 +183,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7172,
+      "lineAfterPatch": 7180,
       "surface": "yomi probe grade or mint",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "taken",
@@ -199,7 +199,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7739,
+      "lineAfterPatch": 7747,
       "surface": "AI reading generation",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiReading",
@@ -209,7 +209,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7810,
+      "lineAfterPatch": 7818,
       "surface": "AI reading history swap",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiReading",
@@ -219,7 +219,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 11149,
+      "lineAfterPatch": 11175,
       "surface": "lists tray door bookmark",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"

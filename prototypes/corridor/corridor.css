@@ -2255,6 +2255,28 @@ body.v-depth-layered .inline-link {
   text-overflow: ellipsis;
 }
 
+/* 覚 — the capture door, top-right of every capturable sheet; pressed
+ * state wears the seal red */
+.sheet-take {
+  margin-left: auto;
+  font: inherit;
+  font-size: 15px;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+.sheet-take[aria-pressed='true'] {
+  color: var(--red);
+  border-color: var(--red);
+}
+.sheet-take + .sheet-close {
+  margin-left: 8px;
+}
 .sheet-close {
   margin-left: auto;
   font: inherit;
