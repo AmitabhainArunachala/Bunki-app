@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 3,
+  "capturedAt": "2026-08-15T13:38:31Z",
+  "authorityHeadAtCut": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+  "authorityTreeAtCut": "8a2636c7a47c1e3ba43c333921b818bed38c405a",
+  "branch": "agent/reading-r5-learning-loop-r5-20260815",
+  "sourceBlobs": {
+    "prototypes/corridor/corridor.js": "d90f06e29ae37221f685c4a9bcb28393efb1b3b8",
+    "prototypes/corridor/corridor.css": "a12454b6fdcba96a5eb343225073a41b85913082",
+    "prototypes/corridor/tools/verify-corridor-storage-integrity.mjs": "9c97b4d6038f8293d1195fee53cfc05fe311a9c3",
+    "docs/build-evidence/reading-r5-learning-loop-r5-20260815/residual-storage-callers.json": "3227f16fd2e415841756fdd0d14347b54fc3ecf7"
+  },
+  "checks": [
+    {
+      "name": "verify-corridor-storage-integrity",
+      "status": "PASS",
+      "checks": 22,
+      "residualUnsafeSaveCallers": 19,
+      "directStorageBypasses": 2,
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs"
+    },
+    {
+      "name": "javascript-syntax",
+      "status": "PASS",
+      "command": "node --check prototypes/corridor/corridor.js"
+    },
+    {
+      "name": "full-vitest",
+      "status": "PASS",
+      "files": 94,
+      "tests": 1645,
+      "command": "npm test"
+    },
+    {
+      "name": "workspace-typecheck",
+      "status": "PASS",
+      "workspaces": 6,
+      "command": "npm run typecheck"
+    },
+    {
+      "name": "workspace-eslint",
+      "status": "PASS",
+      "command": "npm run lint"
+    },
+    {
+      "name": "workspace-prettier",
+      "status": "PASS",
+      "command": "npm run format:check"
+    },
+    {
+      "name": "explicit-base-diff-check",
+      "status": "PASS",
+      "command": "git diff --check ac880aff052991b230dfdd9b7f39267ae764a05f --"
+    },
+    {
+      "name": "known-root-and-version-canary-matrix",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "Executable fake-storage cases cover every known learner-envelope root, typed capture provenance and context, FSRS state/learning-step bounds, conditional review/observation row layouts, nested invalid shapes, missing/old/typed/fractional/null versions, non-finite values, and non-record prototypes; every case preserves prior bytes, performs zero writes, and leaves live learner roots unpublished. Reserved JSON member names are covered separately as valid own-property data."
+    },
+    {
+      "name": "post-setitem-ui-exception-canary",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "The fake DOM throws from alert/layout lookup after setItem returns; durable bytes and live candidate publication still succeed, and a later safe alert sync recovers."
+    },
+    {
+      "name": "dynamic-sheet-description-lifecycle",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "Without render, the stable alert token is added to and removed from an open sheet aria-describedby value while unrelated tokens are preserved."
+    },
+    {
+      "name": "reserved-name-round-trip",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "Executable write/reload cases cover __proto__, constructor, and prototype as list names plus top-level and nested unknown extras; own properties and bytes survive without changing Object.prototype."
+    },
+    {
+      "name": "candidate-self-validation",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "An invalid serialized candidate is rejected before setItem, leaving prior durable bytes untouched; the static check requires validation before the durability boundary."
+    },
+    {
+      "name": "sticky-grade-row-byte-preservation",
+      "status": "PASS",
+      "command": "node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs",
+      "detail": "The verifier compares the complete body.zen .grade-row rule with the exact authority blob."
+    },
+    {
+      "name": "fresh-live-head-replay",
+      "status": "PASS",
+      "command": "git merge-tree --write-tree --messages ac880aff052991b230dfdd9b7f39267ae764a05f 84487d2fb1a95e5bb0cf53ba06fb6dd0d137dd68",
+      "resultTree": "bcdc35c97a3877d6c701b7c40b13e14bdba16c60",
+      "detail": "The reviewed r4 capability had sole parent ac880; r5 was rebuilt fresh on the same authority, preserving the live host-chrome guard and sticky grade CSS before applying the narrow reserved-name repair."
+    },
+    {
+      "name": "standalone-regeneration",
+      "status": "NOT_RUN",
+      "reason": "The bounded donor intentionally does not regenerate the already-stale standalone artifact."
+    }
+  ],
+  "browserAndDevice": [
+    {
+      "name": "rendered-Chromium",
+      "status": "NOT_RUN",
+      "reason": "No browser lane was used; fake-DOM and CSS checks are source-level evidence only."
+    },
+    {
+      "name": "primary-WebKit",
+      "status": "NOT_RUN",
+      "reason": "No WebKit runtime lane was used."
+    },
+    {
+      "name": "physical-iPhone-and-VoiceOver",
+      "status": "NOT_RUN",
+      "reason": "Requires operator and physical-device action."
+    },
+    {
+      "name": "storage-eviction-and-200-percent-text",
+      "status": "NOT_RUN",
+      "reason": "Requires a rendered browser/device matrix; no source test is counted as a substitute."
+    }
+  ]
+}

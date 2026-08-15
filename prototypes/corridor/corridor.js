@@ -470,7 +470,7 @@ const S = {
   deepWords: {},
   /** the review log: append-only, one row per grade, never rewritten. The
    * foundation for FSRS weight optimization, analytics and state recovery —
-   * see the layout comment at srsLogReview. */
+   * see the layout comment at srsReviewLogRow. */
   revlog: [],
   /** the observation log: append-only rows of encounters and assistance —
    * reader taps, dojo probes. Evidence for routing, never knownness: a tap
@@ -563,16 +563,312 @@ const STORE_KNOWN_KEYS = [
 ];
 
 function plainRecord(value) {
-  return !!value && typeof value === 'object' && !Array.isArray(value);
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  // Ordinary cross-realm records have a one-hop prototype whose own
+  // prototype is null. Null-prototype dictionaries are safe too; class
+  // instances and records whose prototype was replaced are not JSON records.
+  return prototype === null || Object.getPrototypeOf(prototype) === null;
+}
+
+const STORE_ITEM_TYPES = new Set(['word', 'kanji', 'radical', 'idiom']);
+const owns = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+const finiteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+const nonEmptyString = (value) => typeof value === 'string' && value.length > 0;
+const validInstant = (value) => typeof value === 'string' && Number.isFinite(Date.parse(value));
+
+function safeJsonValue(value, depth = 0) {
+  if (depth > 24) return false;
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return true;
+  if (finiteNumber(value)) return true;
+  if (Array.isArray(value)) return value.every((item) => safeJsonValue(item, depth + 1));
+  if (!plainRecord(value)) return false;
+  // JSON member names are data, including "__proto__", "constructor", and
+  // "prototype". They are safe while retained as own data properties; a
+  // blanket name ban corrupts legitimate list names and unknown future data.
+  return Object.values(value).every((item) => safeJsonValue(item, depth + 1));
+}
+
+/** Define a dictionary entry without invoking Object.prototype.__proto__'s
+ * legacy setter. All user-provided map keys cross this seam. */
+function setOwnRecordValue(record, key, value) {
+  Object.defineProperty(record, key, {
+    configurable: true,
+    enumerable: true,
+    value,
+    writable: true,
+  });
+  return value;
+}
+
+function optional(value, key, predicate) {
+  return !owns(value, key) || predicate(value[key]);
+}
+
+function validTakenSource(value) {
+  return (
+    value === null ||
+    (plainRecord(value) &&
+      nonEmptyString(value.passage) &&
+      Number.isInteger(value.index) &&
+      value.index >= 0 &&
+      safeJsonValue(value))
+  );
+}
+
+function validTakenContext(value) {
+  return (
+    plainRecord(value) &&
+    nonEmptyString(value.p) &&
+    Number.isInteger(value.i) &&
+    value.i >= 0 &&
+    ['sent', 'para'].includes(value.scope) &&
+    safeJsonValue(value)
+  );
+}
+
+function validTakenItem(item) {
+  return (
+    plainRecord(item) &&
+    STORE_ITEM_TYPES.has(item.t) &&
+    nonEmptyString(item.id) &&
+    optional(item, 'label', (value) => typeof value === 'string') &&
+    optional(item, 'kind', (value) => typeof value === 'string') &&
+    optional(item, 'kindEn', (value) => typeof value === 'string') &&
+    optional(item, 'ts', finiteNumber) &&
+    optional(item, 'from', validTakenSource) &&
+    optional(item, 'ctx', validTakenContext) &&
+    optional(item, 'entrySeq', nonEmptyString) &&
+    optional(item, 'cueReading', nonEmptyString) &&
+    safeJsonValue(item)
+  );
+}
+
+function validListItem(item) {
+  return (
+    plainRecord(item) &&
+    STORE_ITEM_TYPES.has(item.t) &&
+    nonEmptyString(item.id) &&
+    optional(item, 'label', (value) => typeof value === 'string') &&
+    optional(item, 'ts', finiteNumber) &&
+    safeJsonValue(item)
+  );
+}
+
+function validStoredCard(card) {
+  if (!plainRecord(card) || !safeJsonValue(card) || !validInstant(card.due)) return false;
+  if (!optional(card, 'last_review', (value) => value === undefined || validInstant(value))) return false;
+  for (const key of ['stability', 'difficulty', 'elapsed_days', 'scheduled_days']) {
+    if (!owns(card, key) || !finiteNumber(card[key]) || card[key] < 0) return false;
+  }
+  for (const key of ['reps', 'lapses', 'learning_steps']) {
+    if (!owns(card, key) || !Number.isInteger(card[key]) || card[key] < 0) return false;
+  }
+  return owns(card, 'state') && Number.isInteger(card.state) && card.state >= 0 && card.state <= 3;
+}
+
+function validReviewRow(row) {
+  if (!Array.isArray(row) || !finiteNumber(row[0]) || !nonEmptyString(row[1])) return false;
+  if (row[2] === 0) return row.length === 4 && Number.isInteger(row[3]) && row[3] >= 0;
+  return (
+    row.length === 12 &&
+    Number.isInteger(row[2]) &&
+    row[2] >= 1 &&
+    row[2] <= 4 &&
+    Number.isInteger(row[3]) &&
+    row[3] >= 0 &&
+    row[3] <= 3 &&
+    row.slice(4, 8).every((value) => value === null || finiteNumber(value)) &&
+    row.slice(8, 10).every(finiteNumber) &&
+    Number.isInteger(row[10]) &&
+    row[10] >= 0 &&
+    finiteNumber(row[11])
+  );
+}
+
+function validObservationRow(row) {
+  if (!Array.isArray(row) || !finiteNumber(row[0]) || !nonEmptyString(row[2])) return false;
+  if (row[1] === 'tap') {
+    return row.length === 5 && [1, 2, 3].includes(row[3]) && nonEmptyString(row[4]);
+  }
+  if (row[1] === 'probe') {
+    return row.length === 5 && [1, 3].includes(row[3]) && [0, 1].includes(row[4]);
+  }
+  if (row[1] === 'drift') return row.length === 4 && [1, 3].includes(row[3]);
+  if (row[1] === 'dojo') {
+    return row.length === 4 && Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
+  }
+  return false;
+}
+
+function validDeepWord(word) {
+  return (
+    plainRecord(word) &&
+    optional(word, 'r', (value) => typeof value === 'string') &&
+    optional(word, 'm', (value) => Array.isArray(value) && value.every((item) => typeof item === 'string')) &&
+    optional(word, 'jlpt', (value) => typeof value === 'string' || Number.isInteger(value)) &&
+    optional(word, 'alt', (value) => typeof value === 'string') &&
+    optional(word, 'k', (value) => Array.isArray(value) && value.every((item) => typeof item === 'string')) &&
+    optional(word, 'seq', (value) => typeof value === 'string') &&
+    safeJsonValue(word)
+  );
+}
+
+function validLessonResult(result) {
+  return (
+    plainRecord(result) &&
+    optional(result, 'score', finiteNumber) &&
+    optional(result, 'total', finiteNumber) &&
+    optional(result, 'ts', finiteNumber) &&
+    safeJsonValue(result)
+  );
+}
+
+function validAiReading(reading) {
+  return (
+    plainRecord(reading) &&
+    typeof reading.text === 'string' &&
+    optional(reading, 'lv', (value) => typeof value === 'string') &&
+    optional(reading, 'ts', finiteNumber) &&
+    safeJsonValue(reading)
+  );
+}
+
+function validChatTurn(turn) {
+  return (
+    plainRecord(turn) &&
+    ['user', 'tutor'].includes(turn.role) &&
+    typeof turn.text === 'string' &&
+    safeJsonValue(turn)
+  );
+}
+
+function validStats(stats) {
+  if (!plainRecord(stats) || !safeJsonValue(stats)) return false;
+  return Object.entries(stats).every(([key, value]) => {
+    if (key === 'lastExportTs') return finiteNumber(value);
+    if (key === 'fuzzOff') return typeof value === 'boolean';
+    return (
+      plainRecord(value) &&
+      optional(value, 'n', finiteNumber) &&
+      optional(value, 'again', finiteNumber) &&
+      optional(value, 'nnew', finiteNumber) &&
+      safeJsonValue(value)
+    );
+  });
+}
+
+const STORE_ROOT_VALIDATORS = {
+  taken: (value) => Array.isArray(value) && value.every(validTakenItem),
+  lists: (value) =>
+    plainRecord(value) &&
+    safeJsonValue(value) &&
+    Object.values(value).every((items) => Array.isArray(items) && items.every(validListItem)),
+  srs: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validStoredCard),
+  revlog: (value) => Array.isArray(value) && value.every(validReviewRow),
+  obslog: (value) => Array.isArray(value) && value.every(validObservationRow),
+  deepWords: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validDeepWord),
+  lessonsDone: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validLessonResult),
+  aiReading: (value) => value === null || validAiReading(value),
+  aiReadings: (value) => Array.isArray(value) && value.every(validAiReading),
+  suspended: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
+  aiChat: (value) => Array.isArray(value) && value.every(validChatTurn),
+  stats: validStats,
+  readDone: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
+  readerPos: (value) =>
+    plainRecord(value) &&
+    safeJsonValue(value) &&
+    Object.values(value).every((item) => finiteNumber(item) && item >= 0),
+  dials: (value) =>
+    plainRecord(value) &&
+    safeJsonValue(value) &&
+    ['kanji', 'furigana', 'spacing'].every(
+      (key) => !owns(value, key) || (Number.isInteger(value[key]) && value[key] >= 0 && value[key] <= 2),
+    ),
+};
+
+function validStoreEnvelope(value) {
+  if (!plainRecord(value) || value.v !== 1 || !safeJsonValue(value)) return false;
+  return Object.entries(STORE_ROOT_VALIDATORS).every(
+    ([key, validate]) => !owns(value, key) || validate(value[key]),
+  );
 }
 
 /** Never overwrite what cannot be read. A store that fails to parse, or that
  * declares a future major version, flips this session to read-only: the app
  * keeps working in memory, the original bytes stay untouched on the device,
- * and one quiet line says so where the record lives (覚える). */
+ * and one quiet alert says so in the active learner surface. */
+let storeAlertNode = null;
+
+function positionStoreAlert(node) {
+  if (!node || typeof document === 'undefined') return;
+  let lowerEdge = 0;
+  for (const blocker of document.querySelectorAll(
+    '.chrome, .nav-symbol, .zen-exit, .zen-more, .focus-hud',
+  )) {
+    const rect = blocker.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) lowerEdge = Math.max(lowerEdge, rect.bottom);
+  }
+  node.style.setProperty('--store-alert-top', `${Math.ceil(lowerEdge + 8)}px`);
+}
+
+/** One stable live region sits outside #app so a render never repeats the same
+ * announcement and no Drift/dialog inert pass can hide a storage failure. */
+function syncStoreAlert() {
+  if (typeof document === 'undefined' || !document.body) return null;
+  if (!storeAlertNode?.isConnected) {
+    storeAlertNode = document.getElementById('store-alert');
+    if (!storeAlertNode) {
+      storeAlertNode = document.createElement('p');
+      storeAlertNode.id = 'store-alert';
+      storeAlertNode.className = 'store-warning store-warning-live';
+      storeAlertNode.setAttribute('role', 'alert');
+      storeAlertNode.setAttribute('aria-atomic', 'true');
+      storeAlertNode.hidden = true;
+      document.body.append(storeAlertNode);
+    }
+  }
+  const message = S.storeError || '';
+  if (message) {
+    if (storeAlertNode.hidden) storeAlertNode.hidden = false;
+    if (storeAlertNode.textContent !== message) storeAlertNode.textContent = message;
+  } else {
+    if (!storeAlertNode.hidden) storeAlertNode.hidden = true;
+    if (storeAlertNode.textContent) storeAlertNode.textContent = '';
+  }
+  const sheet = document.getElementById('sheet');
+  if (sheet) {
+    const describedBy = new Set(
+      (sheet.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean),
+    );
+    if (message) describedBy.add('store-alert');
+    else describedBy.delete('store-alert');
+    if (describedBy.size) sheet.setAttribute('aria-describedby', [...describedBy].join(' '));
+    else sheet.removeAttribute('aria-describedby');
+  }
+  positionStoreAlert(storeAlertNode);
+  return storeAlertNode;
+}
+
+/** Storage truth never depends on presentation code. DOM/layout failures are
+ * deliberately swallowed at this seam and remain retryable on the next sync. */
+function safelySyncStoreAlert() {
+  try {
+    return syncStoreAlert();
+  } catch {
+    return null;
+  }
+}
+
 function protectStore(messageJa, messageEn) {
   S.storeReadOnly = true;
   S.storeError = tx(messageJa, messageEn);
+  safelySyncStoreAlert();
 }
 
 function loadStore() {
@@ -580,9 +876,13 @@ function loadStore() {
   try {
     raw = localStorage.getItem(STORE_KEY);
   } catch {
-    /* private mode — nothing stored, nothing to protect */
+    protectStore(
+      '端末の学習データにアクセスできない。元のデータを守るため、この回は保存しない。',
+      'The saved learner record could not be accessed. Saving is paused so its original bytes stay safe.',
+    );
+    return;
   }
-  if (!raw) return;
+  if (raw === null) return;
   let s = null;
   try {
     s = JSON.parse(raw);
@@ -604,6 +904,13 @@ function loadStore() {
     protectStore(
       'このデータは新しい版のもの。古い版で上書きしないため、この回は保存しない。',
       'This record was written by a newer version of the app. Saving is paused so it is not rewritten by an older one.',
+    );
+    return;
+  }
+  if (!validStoreEnvelope(s)) {
+    protectStore(
+      '端末の学習データの中身が読めない。元のデータを守るため、この回は保存しない。',
+      'The saved learner record contains invalid data. Saving is paused so its original bytes stay safe.',
     );
     return;
   }
@@ -631,41 +938,78 @@ function loadStore() {
   );
 }
 
-function saveStore() {
-  if (S.storeReadOnly) return false;
+function storeEnvelope(state) {
+  return {
+    ...(state.storeExtras || {}),
+    v: 1,
+    taken: state.taken,
+    lists: state.lists,
+    srs: state.srs,
+    revlog: state.revlog || [],
+    obslog: state.obslog || [],
+    deepWords: state.deepWords || {},
+    lessonsDone: state.lessonsDone,
+    aiReading: state.aiReading,
+    aiReadings: state.aiReadings.slice(0, 10),
+    suspended: state.suspended,
+    aiChat: state.aiChat.slice(-24),
+    stats: state.stats,
+    readDone: state.readDone,
+    readerPos: state.readerPos,
+    dials: state.dialsUrlOverride ? state.dialsStored : state.dials,
+  };
+}
+
+/** localStorage.setItem returning is the synchronous durability boundary.
+ * The caller's live learner roots are never published before that boundary. */
+function writeStore(state) {
+  if (state.storeReadOnly) {
+    safelySyncStoreAlert();
+    return false;
+  }
+  let bytes = null;
   try {
-    localStorage.setItem(
-      STORE_KEY,
-      JSON.stringify({
-        ...(S.storeExtras || {}),
-        v: 1,
-        taken: S.taken,
-        lists: S.lists,
-        srs: S.srs,
-        revlog: S.revlog || [],
-        obslog: S.obslog || [],
-        deepWords: S.deepWords || {},
-        lessonsDone: S.lessonsDone,
-        aiReading: S.aiReading,
-        aiReadings: S.aiReadings.slice(0, 10),
-        suspended: S.suspended,
-        aiChat: S.aiChat.slice(-24),
-        stats: S.stats,
-        readDone: S.readDone,
-        readerPos: S.readerPos,
-        dials: S.dialsUrlOverride ? S.dialsStored : S.dials,
-      }),
+    bytes = JSON.stringify(storeEnvelope(state));
+    // Validate the exact bytes that would cross the durability boundary. JSON
+    // normalization intentionally removes undefined optionals, while any
+    // envelope the next boot would quarantine is stopped before setItem.
+    if (!validStoreEnvelope(JSON.parse(bytes))) throw new TypeError('invalid learner-store candidate');
+  } catch {
+    S.storeError = tx(
+      '端末に保存できなかった。この端末の空きを確かめて、記録を書き出しておくと安全。',
+      'This device could not save the change. Check free space, and export your record to keep it safe.',
     );
-    S.storeError = null;
-    return true;
+    safelySyncStoreAlert();
+    return false;
+  }
+  try {
+    localStorage.setItem(STORE_KEY, bytes);
   } catch {
     /* quota or private mode — the session keeps working unpersisted */
     S.storeError = tx(
       '端末に保存できなかった。この端末の空きを確かめて、記録を書き出しておくと安全。',
       'This device could not save the change. Check free space, and export your record to keep it safe.',
     );
+    safelySyncStoreAlert();
     return false;
   }
+  S.storeError = null;
+  safelySyncStoreAlert();
+  return true;
+}
+
+function saveStore() {
+  return writeStore(S);
+}
+
+/** Persist copied learner roots as one envelope, then make them visible.
+ * Patch values must be constructed off-side; mutating a live nested value
+ * before this call would defeat the write-before-publish boundary. */
+function commitStorePatch(patch) {
+  const candidate = { ...S, ...patch };
+  if (!writeStore(candidate)) return false;
+  Object.assign(S, patch);
+  return true;
 }
 
 /* ------------------------------------------------ the observation log
@@ -1586,11 +1930,14 @@ async function ensureArticle(p) {
           if (!res.ok) throw new Error(`data/articles/${p.file} → ${res.status}`);
           return res.json();
         })
-  ).then((body) => {
-    Object.assign(p, body);
-    delete p._loading;
-    return p;
-  });
+  )
+    .then((body) => {
+      Object.assign(p, body);
+      return p;
+    })
+    .finally(() => {
+      delete p._loading;
+    });
   return p._loading;
 }
 
@@ -2832,6 +3179,13 @@ function wireTokenGestures(span, token, index, p) {
   };
 }
 
+function commitReadDone(articleId, now = Date.now()) {
+  const readDone = { ...S.readDone };
+  if (readDone[articleId]) delete readDone[articleId];
+  else readDone[articleId] = now;
+  return commitStorePatch({ readDone });
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -3010,9 +3364,10 @@ function renderReader(main) {
   finBtn.type = 'button';
   finBtn.id = 'read-fin';
   finBtn.addEventListener('click', () => {
-    if (S.readDone[p.id]) delete S.readDone[p.id];
-    else S.readDone[p.id] = Date.now();
-    saveStore();
+    if (!commitReadDone(p.id)) {
+      render();
+      return;
+    }
     keepScroll();
     render();
     returnScroll();
@@ -3135,12 +3490,9 @@ function renderTray(main) {
   main.append(
     el('h1', 'view-title', tx(`覚える ${S.taken.length} 件`, `Memorizing ${S.taken.length} item${S.taken.length === 1 ? '' : 's'}`)),
   );
-  // The record's health, said once and quietly, exactly where the record
-  // lives: a storage problem if there is one, else a gentle backup reminder
-  // when weeks of reviews are sitting on one device unexported.
-  if (S.storeError) {
-    main.append(el('p', 'store-warning', S.storeError));
-  } else {
+  // The stable global live region owns storage errors. This surface adds only
+  // the quiet backup reminder when the record itself is healthy.
+  if (!S.storeError) {
     const cardCount = S.taken.length + Object.keys(S.srs).length;
     const last = Number(S.stats?.lastExportTs) || 0;
     const stale = !last || Date.now() - last > 14 * 86400000;
@@ -5432,6 +5784,41 @@ function takenContext(item) {
   return { tokens: p.tokens.slice(start, end), source: p.sourceLabel, passage: p.id };
 }
 
+function commitCapture(node, label, now = Date.now()) {
+  const item = {
+    t: node.t,
+    id: node.id,
+    label,
+    kind: NODE_KIND[node.t][0],
+    kindEn: NODE_KIND[node.t][1],
+    from: node.from || null,
+    ts: now,
+  };
+  let deepWord = null;
+  // A word taken from the deep tier writes its own compact record into the
+  // learner's store: the card must answer on any device, offline, without
+  // re-opening the 70k index. The exact entry (ent_seq) and the reading the
+  // learner actually met ride along as provenance.
+  if (node.t === 'word' && !D.dict[node.id]) {
+    const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+    if (rec?.seq) item.entrySeq = String(rec.seq);
+    if (rec?.r) item.cueReading = rec.r;
+    if (rec) {
+      deepWord = {
+        r: rec.r || '',
+        m: (rec.m || []).slice(0, 8),
+        ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
+        ...(rec.alt ? { alt: rec.alt } : {}),
+        ...(rec.k?.length ? { k: rec.k } : {}),
+        ...(rec.seq ? { seq: String(rec.seq) } : {}),
+      };
+    }
+  }
+  const patch = { taken: [...S.taken, item] };
+  if (deepWord) patch.deepWords = { ...(S.deepWords || {}), [node.id]: deepWord };
+  return commitStorePatch(patch);
+}
+
 function takeButton(node, label) {
   const already = S.taken.some((t) => t.t === node.t && t.id === node.id);
   const btn = biLabel(
@@ -5444,37 +5831,10 @@ function takeButton(node, label) {
   btn.id = 'take';
   btn.addEventListener('click', () => {
     if (already) return;
-    const item = {
-      t: node.t,
-      id: node.id,
-      label,
-      kind: NODE_KIND[node.t][0],
-      kindEn: NODE_KIND[node.t][1],
-      from: node.from || null,
-      ts: Date.now(),
-    };
-    // A word taken from the deep tier writes its own compact record into the
-    // learner's store: the card must answer on any device, offline, without
-    // re-opening the 70k index. The exact entry (ent_seq) and the reading the
-    // learner actually met ride along as provenance.
-    if (node.t === 'word' && !D.dict[node.id]) {
-      const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
-      if (rec?.seq) item.entrySeq = String(rec.seq);
-      if (rec?.r) item.cueReading = rec.r;
-      if (rec) {
-        S.deepWords ||= {};
-        S.deepWords[node.id] = {
-          r: rec.r || '',
-          m: (rec.m || []).slice(0, 8),
-          ...(rec.jlpt ? { jlpt: rec.jlpt } : {}),
-          ...(rec.alt ? { alt: rec.alt } : {}),
-          ...(rec.k?.length ? { k: rec.k } : {}),
-          ...(rec.seq ? { seq: String(rec.seq) } : {}),
-        };
-      }
+    if (!commitCapture(node, label)) {
+      render();
+      return;
     }
-    S.taken.push(item);
-    saveStore();
     render();
   });
   return btn;
@@ -5534,7 +5894,12 @@ function renderListPicker(sheet, node, label) {
     chip.append(el('span', 'big', name));
     chip.append(el('span', 'sub', `${S.lists[name].length}`));
     chip.addEventListener('click', () => {
-      if (inList) S.lists[name] = S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id));
+      if (inList)
+        setOwnRecordValue(
+          S.lists,
+          name,
+          S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id)),
+        );
       else S.lists[name].push({ t: node.t, id: node.id, label, ts: item.ts });
       saveStore();
       render();
@@ -5547,8 +5912,8 @@ function renderListPicker(sheet, node, label) {
   add.append(el('span', 'big', tx('＋ 新規リスト', '＋ new list')));
   add.addEventListener('click', () => {
     const name = window.prompt(tx('リスト名', 'List name'));
-    if (!name || S.lists[name]) return;
-    S.lists[name] = [{ t: node.t, id: node.id, label, ts: item.ts }];
+    if (!name || owns(S.lists, name)) return;
+    setOwnRecordValue(S.lists, name, [{ t: node.t, id: node.id, label, ts: item.ts }]);
     saveStore();
     render();
   });
@@ -5591,7 +5956,7 @@ function schedulePreview() {
  * cards), word:安堵:prod (production), sent:<sourceId>#<n> (mined sentence
  * cards) — each its own card with its own FSRS state and its own revlog
  * rows, sharing the item's content record. Adding them touches capture and
- * rendering only; srsCardOf / srsStore / srsDueItems / the revlog need no
+ * rendering only; srsCardOf / srsStoredRecord / srsDueItems / the revlog need no
  * changes. */
 const srsKey = (t, id) => `${t}:${id}`;
 function srsCardOf(item, now) {
@@ -5601,13 +5966,12 @@ function srsCardOf(item, now) {
   if (rec.last_review) c.last_review = new Date(rec.last_review);
   return c;
 }
-function srsStore(item, card) {
-  S.srs[srsKey(item.t, item.id)] = {
+function srsStoredRecord(card) {
+  return {
     ...card,
     due: card.due.toISOString(),
     last_review: card.last_review ? card.last_review.toISOString() : undefined,
   };
-  saveStore();
 }
 /* --------------------------------------------------- the review log
  * Append-only, one compact row per grade, never rewritten. Layout:
@@ -5631,7 +5995,7 @@ function srsStore(item, card) {
  * This is sufficient for the FSRS optimizer (per-card sequences of
  * (elapsed, rating)), for analytics, and — with the pinned parameters —
  * for full deterministic state reconstruction by replay. */
-function srsLogReview(key, before, after, rating, now) {
+function srsReviewLogRow(key, before, after, rating, now) {
   const rnd = (v, p) => (v == null || !Number.isFinite(v) ? null : Number(v.toFixed(p)));
   let elapsed = null;
   let r = null;
@@ -5644,7 +6008,7 @@ function srsLogReview(key, before, after, rating, now) {
     }
   }
   const first = !before.last_review;
-  (S.revlog ||= []).push([
+  return [
     now.getTime(),
     key,
     rating,
@@ -5657,9 +6021,45 @@ function srsLogReview(key, before, after, rating, now) {
     rnd(after.difficulty, 4),
     after.scheduled_days,
     after.due.getTime(),
-  ]);
-  return S.revlog.length - 1;
+  ];
 }
+
+function advanceReviewSession(rv, item, next, entry) {
+  if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
+    rv.queue.push(item);
+    entry.reinserted = true;
+  }
+  rv.history.push(entry);
+  rv.done[entry.key] += 1;
+  rv.ix += 1;
+  rv.revealed = false;
+}
+
+function commitDrillGrade({ rv, item, next, key, skey, rating, now }) {
+  const obslog = [...(S.obslog || []), [now.getTime(), 'dojo', skey, rating]];
+  if (!commitStorePatch({ obslog })) return false;
+  advanceReviewSession(rv, item, next, { key, drill: true });
+  return true;
+}
+
+function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, day, prevRec }) {
+  const revlog = [...(S.revlog || []), srsReviewLogRow(skey, card, next, rating, now)];
+  const logIx = revlog.length - 1;
+  const srs = { ...S.srs, [skey]: srsStoredRecord(next) };
+  const dayStats = { ...(S.stats?.[day] || { n: 0, again: 0 }) };
+  const entry = { key, prev: prevRec, day, logIx };
+  if (prevRec === undefined) {
+    dayStats.nnew = (dayStats.nnew || 0) + 1;
+    entry.introduced = true;
+  }
+  dayStats.n = (dayStats.n || 0) + 1;
+  if (key === 'again') dayStats.again = (dayStats.again || 0) + 1;
+  const stats = { ...(S.stats || {}), [day]: dayStats };
+  if (!commitStorePatch({ srs, revlog, stats })) return false;
+  advanceReviewSession(rv, item, next, entry);
+  return true;
+}
+
 /** Items ready to review: real reviews by their due date, then never-seen
  * cards — capped at 20 a DAY (Anki's default pacing), so a long list arrives
  * as days of honest work instead of one avalanche. The count of cards
@@ -6050,44 +6450,40 @@ function renderReview(main) {
       const isDrillOnly =
         S.focus && prevRec === undefined && !S.taken.some((t) => t.t === item.t && t.id === item.id);
       if (isDrillOnly) {
-        obsLog('dojo', skey, fsrsApi.Rating[rating]);
-        const entry = { key, drill: true };
-        if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
-          rv.queue.push(item);
-          entry.reinserted = true;
+        if (
+          !commitDrillGrade({
+            rv,
+            item,
+            next,
+            key,
+            skey,
+            rating: fsrsApi.Rating[rating],
+            now,
+          })
+        ) {
+          render();
+          return;
         }
-        rv.history.push(entry);
-        saveStore();
-        rv.done[key] += 1;
-        rv.ix += 1;
-        rv.revealed = false;
         render();
         return;
       }
-      // every grade lands in the append-only review log before anything else
-      const logIx = srsLogReview(skey, card, next, fsrsApi.Rating[rating], now);
-      const entry = { key, prev: prevRec, day, logIx };
-      if (prevRec === undefined) {
-        // a first grade introduces the card — it counts against today's cap
-        const st0 = (S.stats[day] ||= { n: 0, again: 0 });
-        st0.nnew = (st0.nnew || 0) + 1;
-        entry.introduced = true;
+      if (
+        !commitStandardGrade({
+          rv,
+          item,
+          card,
+          next,
+          key,
+          skey,
+          rating: fsrsApi.Rating[rating],
+          now,
+          day,
+          prevRec,
+        })
+      ) {
+        render();
+        return;
       }
-      // a card still inside its short steps ripens within minutes — it comes
-      // back in THIS session, the way a modern SRS queue behaves
-      if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
-        rv.queue.push(item);
-        entry.reinserted = true;
-      }
-      rv.history.push(entry);
-      srsStore(item, next);
-      const st = (S.stats[day] ||= { n: 0, again: 0 });
-      st.n += 1;
-      if (key === 'again') st.again += 1;
-      saveStore();
-      rv.done[key] += 1;
-      rv.ix += 1;
-      rv.revealed = false;
       render();
     });
     row.append(b);
@@ -10260,6 +10656,7 @@ function syncPaper() {
 // bucket in paperSize() already swallows the iOS chrome-bar jitter
 let paperResizeT = 0;
 window.addEventListener('resize', () => {
+  safelySyncStoreAlert();
   clearTimeout(paperResizeT);
   paperResizeT = setTimeout(() => {
     const { w, h } = paperSize();
@@ -10686,6 +11083,7 @@ function render() {
   if (!S.ready) {
     main.append(el('div', 'loading', tx('回廊 をひらいています…', 'opening the corridor…')));
     renderVariants(root);
+    safelySyncStoreAlert();
     return;
   }
 
@@ -10744,6 +11142,7 @@ function render() {
       child.setAttribute('aria-hidden', 'true');
     }
   }
+  safelySyncStoreAlert();
   updateMeasurements();
   if (restoreY != null) window.scrollTo(0, restoreY);
   lastRenderedView = S.view;

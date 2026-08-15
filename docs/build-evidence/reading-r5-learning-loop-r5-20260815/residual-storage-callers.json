@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 2,
+  "authorityHeadAtCut": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+  "authorityTreeAtCut": "8a2636c7a47c1e3ba43c333921b818bed38c405a",
+  "source": "prototypes/corridor/corridor.js",
+  "classification": "PRE_EXISTING_MUTATION_WITH_UNCONSUMED_SAVE_RESULT",
+  "count": 19,
+  "callers": [
+    {
+      "lineAfterPatch": 1037,
+      "surface": "observation debounce flush",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "obslog"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "obsSaveTimer"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 2110,
+      "surface": "reader scroll debounce",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "readerPos"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "readerPosTimer"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 2185,
+      "surface": "app Back from reader",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "readerPos"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 2826,
+      "surface": "reader display dials",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "dials"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "dialsUrlOverride"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 3639,
+      "surface": "tray rest or wake",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "suspended"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 3672,
+      "surface": "export timestamp",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "stats"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 3767,
+      "surface": "tray bulk memorize",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "taken"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 3916,
+      "surface": "lesson completion",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "lessonsDone",
+        "taken"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "lessonRun.phase"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 4076,
+      "surface": "AI chat user message",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "aiChat"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "chatInput",
+        "chatSend"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 4089,
+      "surface": "AI chat tutor message",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "aiChat"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 5873,
+      "surface": "capture context scope",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "taken"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 5904,
+      "surface": "manual list membership",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "lists"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 5917,
+      "surface": "new manual list",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "lists"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 6232,
+      "surface": "summary leech rest",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "suspended"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 6382,
+      "surface": "current review-card rest",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "suspended"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "review.history",
+        "review.ix",
+        "review.revealed",
+        "reviewMore"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 6591,
+      "surface": "review undo",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "suspended",
+        "srs",
+        "revlog",
+        "obslog",
+        "stats"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "review.history",
+        "review.done",
+        "review.queue",
+        "review.ix",
+        "review.revealed"
+      ],
+      "conditionalBranches": [
+        "suspend",
+        "drill",
+        "standard"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 7117,
+      "surface": "yomi probe grade or mint",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "taken",
+        "obslog"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [
+        "probe.minted",
+        "probe.right",
+        "probe.missed",
+        "probe.ix",
+        "probe.revealed"
+      ],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 7681,
+      "surface": "AI reading generation",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "aiReading",
+        "aiReadings"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    },
+    {
+      "lineAfterPatch": 7752,
+      "surface": "AI reading history swap",
+      "learnerRootsMutatedBeforeUncheckedSave": [
+        "aiReading",
+        "aiReadings"
+      ],
+      "sessionRootsMutatedBeforeOrAfterUncheckedSave": [],
+      "saveResultConsumed": false
+    }
+  ],
+  "directLearnerStoreBypasses": [
+    {
+      "lineAfterPatch": 3662,
+      "surface": "learner-record export",
+      "operation": "getItem",
+      "keyExpression": "STORE_KEY",
+      "risk": "Direct read is outside quarantine and can throw before export feedback."
+    },
+    {
+      "lineAfterPatch": 3690,
+      "surface": "learner-record import",
+      "operation": "setItem",
+      "keyExpression": "STORE_KEY",
+      "risk": "Direct replacement bypasses candidate construction and performs only weak envelope validation."
+    }
+  ],
+  "excludedOtherLocalStorageKeys": [
+    "AI_KEY_STORE",
+    "THEME_STORE"
+  ],
+  "claimBoundary": "Only deep learner-store read quarantine, exact-byte candidate self-validation, reserved-name-safe record production and round-trip, write-before-publish helper semantics with post-setItem UI isolation, reader finish, entry capture, standard/focus-drill grade, one stable visible storage alert with dynamic sheet description, and article-load retry are closed by this donor."
+}

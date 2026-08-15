@@ -4834,6 +4834,34 @@ body.zen .review-example {
 .store-warning {
   color: var(--red);
 }
+.store-warning-live {
+  position: fixed;
+  top: var(--store-alert-top, calc(68px + env(safe-area-inset-top)));
+  left: 50%;
+  z-index: 130;
+  width: min(calc(100% - 24px), 760px);
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+  color: var(--red);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(20, 24, 28, 0.22);
+  pointer-events: none;
+}
+.store-warning-live[hidden] {
+  display: none;
+}
+@media (forced-colors: active) {
+  .store-warning-live {
+    color: CanvasText;
+    background: Canvas;
+    border-color: CanvasText;
+  }
+}
 
 /* ------------------------------------------------------------ 復習 · zen
  * While a card is up, the glass holds only the card: no bar, no crumb, no
