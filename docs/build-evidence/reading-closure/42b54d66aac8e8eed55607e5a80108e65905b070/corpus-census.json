@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "candidate": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "tree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "evidenceClass": "SOURCE_INSPECTION",
+  "primary": {
+    "total": 40,
+    "uniqueIds": 40,
+    "pools": {
+      "original": 19,
+      "proprietary_safe": 21
+    },
+    "sources": {
+      "aozorabunko-clean": 3,
+      "bunki-v11-historical": 3,
+      "bunki-v11-reading-catalog": 5,
+      "bunki-wp9b-reading-catalog": 14,
+      "isa-yasashii-glossary": 10,
+      "ja.wikinews": 5
+    },
+    "nonemptyDates": 8,
+    "isoDates": 5,
+    "authorLevels": {
+      "(missing)": 18,
+      "N1": 4,
+      "N1+": 2,
+      "N2": 5,
+      "N3": 3,
+      "N4": 4,
+      "N5": 4
+    },
+    "lanes": {
+      "(missing)": 18,
+      "essay": 8,
+      "graded": 11,
+      "literature": 2,
+      "primary": 1
+    },
+    "metadataPresence": {
+      "titleEn": 0,
+      "titleKana": 0,
+      "genre": 0,
+      "category": 0,
+      "tags": 0,
+      "topics": 0,
+      "audio": 0,
+      "image": 0,
+      "addedAt": 0,
+      "reviewedAt": 0,
+      "readingTime": 0,
+      "wordCount": 0,
+      "series": 0,
+      "questions": 0,
+      "approvalState": 0,
+      "editorial": 0
+    },
+    "charLength": {
+      "min": 6,
+      "median": 306.5,
+      "max": 4934,
+      "atMost71": 10
+    },
+    "runtimeEnglishTitleOverlayCount": 40,
+    "publicApprovalReceipts": 0
+  },
+  "archive": {
+    "total": 694,
+    "uniqueIds": 694,
+    "pools": {
+      "proprietary_safe": 694
+    },
+    "sources": {
+      "ja.wikinews": 694
+    },
+    "nonemptyDates": 694,
+    "isoDates": 694,
+    "metadataPresence": {
+      "titleEn": 0,
+      "titleKana": 0,
+      "genre": 0,
+      "category": 0,
+      "tags": 0,
+      "topics": 0,
+      "audio": 0,
+      "image": 0,
+      "addedAt": 0,
+      "reviewedAt": 0,
+      "readingTime": 0,
+      "wordCount": 0,
+      "series": 0,
+      "questions": 0,
+      "approvalState": 0,
+      "editorial": 0
+    }
+  },
+  "all": {
+    "total": 734,
+    "uniqueIds": 734,
+    "duplicateIds": 0,
+    "bodyFiles": 734,
+    "indexedBodyFiles": 734,
+    "tokenizedBodies": 734,
+    "orphanBodies": [],
+    "licenceAssertions": {
+      "Bunki original": 19,
+      "CC BY 2.5": 699,
+      "ISA やさしい日本語 glossary": 10,
+      "PD (著作権フラグ なし) · 新字新仮名": 3,
+      "PD + Bunki原作の解説": 3
+    },
+    "nonemptyUrls": 705,
+    "pendingVerification": 1,
+    "publicationStatus": {
+      "approved": 0,
+      "private": 0,
+      "draft": 0,
+      "blockedMissingApprovalReceipt": 734,
+      "note": "Visibility or a licence assertion is not a human editorial approval receipt."
+    }
+  },
+  "shippedManifestClaim": {
+    "passages": 26,
+    "articleFiles": 26,
+    "words": 7910,
+    "kanji": 2582,
+    "radicals": 926,
+    "idioms": 900,
+    "semHeads": 82
+  },
+  "shippedManifestConsistentWithPrimaryCount": false,
+  "generationCommand": "node scripts/reading-r0-audit.mjs --candidate 42b54d66aac8e8eed55607e5a80108e65905b070 --out docs/build-evidence/reading-closure/42b54d66aac8e8eed55607e5a80108e65905b070"
+}

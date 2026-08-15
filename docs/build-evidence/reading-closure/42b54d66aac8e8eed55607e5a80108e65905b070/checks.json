@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "candidate": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "automated": [
+    { "name": "corpus-tests", "runId": 31883465898, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31883465898", "status": "PASS" },
+    { "name": "pages-app", "runId": 31883465596, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31883465596", "status": "PASS" },
+    { "name": "Bunki verified build", "runId": 31883465961, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31883465961", "status": "PASS" },
+    { "name": "CI", "runId": 31883465860, "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31883465860", "status": "PASS" },
+    { "name": "complete-workflow-artifact-byte-comparison", "status": "PASS", "files": 859, "bytes": 120760056 },
+    { "name": "article-json-integrity", "status": "PASS", "filesParsed": 736 },
+    { "name": "corpus-body-consistency", "status": "PASS", "bodies": 734 },
+    { "name": "source-control-census", "status": "PASS", "families": 51, "matchingClickRows": 51, "sourceFilesHashBound": 2, "browserResult": "NOT_RUN" },
+    { "name": "claim-and-click-ledger-jsonl", "status": "PASS", "claimRows": 21, "clickRows": 59 },
+    { "name": "evidence-manifest-coverage", "status": "PASS", "files": 16 },
+    { "name": "javascript-syntax", "status": "PASS" },
+    { "name": "git-integrity", "status": "PASS" },
+    { "name": "authority-prototype-verification", "status": "FAIL", "passed": 115, "total": 116, "reason": "Six visible .sent-door controls measure 15x16 rather than 44x44 in docs/prototype/verification-report.json." }
+  ],
+  "browserAndDevice": [
+    { "name": "cloud-browser-live-DOM", "status": "NOT_RUN", "reason": "Browser recovery superseded tab refresh twice." },
+    { "name": "local-playwright", "status": "NOT_RUN", "reason": "No usable Chromium binary; deterministic install failed." },
+    { "name": "primary-WebKit", "status": "NOT_RUN", "reason": "No runtime lane available." },
+    { "name": "physical-iPhone", "status": "NOT_RUN", "reason": "Requires operator/device action." },
+    { "name": "VoiceOver", "status": "NOT_RUN", "reason": "Requires physical-device lane." }
+  ],
+  "warnings": [
+    "Candidate-bound checkpoint: if authority or Pages advances, regenerate before relying on these results.",
+    "The legacy combined-status endpoint reports pending with zero statuses; six check-runs on the exact SHA report five success and one deployment skip.",
+    "No check-runs attach to the synthetic pull-request merge SHA; checks above are bound to the authority head."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "candidate": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "status": "CURRENT_BASELINE_ONLY_NOT_RELEASE_CANDIDATE",
+  "rubric": 17.0,
+  "hardCap": 30,
+  "browserEvidence": "NOT_RUN",
+  "physicalDeviceEvidence": "NOT_RUN",
+  "editorialApproval": "FAIL",
+  "nativeVoicePanel": "NOT_APPLICABLE_AUDIO_ABSENT",
+  "reason": "The current authority candidate is byte-bound and audited, but complete reader/audio/discovery/canonical-state/editorial/browser/device closure is absent and the authority verification report retains a 44px control failure."
+}
