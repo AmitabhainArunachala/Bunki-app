@@ -5,7 +5,7 @@
 | Reconcile Git/GitHub/deploy authority | PASS | `coordinate.json`, `deployment-receipt.json` |
 | Bind live URL to source/artifact bytes | PASS | Complete 859-file comparison plus seven cache-busted HTTP hashes |
 | Page-visible SHA/build receipt | FAIL | Required receipt paths return the custom 404/front door |
-| Enumerate reading entry paths and control families | SOURCE PASS; FOLLOW-UP REVIEW PENDING | `control-census.json`; 66 exact hash-bound families with one-to-one click rows, not rendered clicks |
+| Enumerate reading entry paths and control families | SOURCE PASS; FOLLOW-UP REVIEW PENDING | `control-census.json`; 90 exact hash-bound families with one-to-one click rows, not rendered clicks |
 | Exercise every visible control/link | NOT_RUN | Every source family has a `click-ledger.jsonl` row; all rendered results remain `NOT_RUN` |
 | Matched viewport screenshots | NOT_RUN | `screenshot-index.json` |
 | Console/network/a11y/performance/offline rendered logs | NOT_RUN | `checks.json` |
