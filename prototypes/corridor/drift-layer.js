@@ -1726,6 +1726,10 @@ function grade(n,dir){
     return;
   }
   n.gone=true; n.frozen=true;
+  // 分流の橋 — when the corridor hosts this water, every committed judgment
+  // also reaches the app's one learner state (exposure evidence, never a
+  // card). Standalone drift has no host hook and the guard makes it a no-op.
+  try{window.bunkiDriftJudgment&&window.bunkiDriftJudgment(n.kind,key,dir);}catch{/* host hook must never break the water */}
   if(dir>0){settled++;bloom(n);} else {gathered++;sink(n);}
   updateTray();
   if(unfolded===n) unfolded=null;

@@ -697,6 +697,17 @@ function obsLog(kind, key, ...detail) {
   clearTimeout(obsSaveTimer);
   obsSaveTimer = setTimeout(obsFlush, 1200);
 }
+// 分流の橋 — the drift's flick judgments were persisting only to the drift's
+// own store, which nothing in the corridor ever read (P0, full-instrument
+// review). The water now hands each committed judgment to the observation
+// ledger as EXPOSURE evidence: detail 3 = flicked known, 1 = flicked
+// unknown, same scale as the tap ladder. Constitution holds — exposure is
+// not mastery, so this never touches FSRS state or creates a card; it makes
+// the judgment visible to the one learner state (obslog is stored, exported,
+// and read by evidence surfaces).
+window.bunkiDriftJudgment = (kind, key, dir) => {
+  obsLog('drift', srsKey(kind === 'kanji' ? 'kanji' : 'word', key), dir > 0 ? 3 : 1);
+};
 addEventListener('pagehide', obsFlush);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') obsFlush();

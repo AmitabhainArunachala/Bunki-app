@@ -1122,7 +1122,9 @@ async function main() {
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
 
-  await open('?entry=shelf');
+  // the strip is summoned explicitly now — ?entry=shelf is a front door and
+  // no longer raises the operator instrument (full-instrument review P1)
+  await open('?entry=shelf&variants=1');
   await page.locator('#variants-toggle').click();
   await page.waitForTimeout(150);
   const stripRows = await page.locator('#variants .vrow').count();

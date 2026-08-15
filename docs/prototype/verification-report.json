@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-15 06:44",
+          "2026-08-15 08:34",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-15 06:49",
+          "2026-08-15 08:39",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-15 06:53",
+          "2026-08-15 08:43",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 10 d",
-          "2026-08-25 06:43",
+          "in 9 d",
+          "2026-08-24 08:33",
           "8.30"
         ]
       ]
@@ -4388,54 +4388,6 @@
         "id": "entry-row"
       },
       {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 15,
-        "hitH": 16,
-        "id": "sent-door"
-      },
-      {
         "text": "厳しいeveryday sy",
         "w": 332,
         "h": 50,
@@ -4570,14 +4522,6 @@
         "hitW": 358,
         "hitH": 48,
         "id": "take"
-      },
-      {
-        "text": "変異 ▴variants",
-        "w": 76,
-        "h": 44,
-        "hitW": 76,
-        "hitH": 44,
-        "id": "variants-toggle"
       },
       {
         "text": "戻るback",
@@ -5330,14 +5274,6 @@
         "hitW": 133,
         "hitH": 44,
         "id": "sources-toggle"
-      },
-      {
-        "text": "変異 ▴variants",
-        "w": 76,
-        "h": 44,
-        "hitW": 76,
-        "hitH": 44,
-        "id": "variants-toggle"
       }
     ],
     "semRowsOnProbePanel": 16
@@ -6102,10 +6038,10 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 480,
+  "loadMs": 387,
   "summary": {
     "total": 116,
-    "failed": 1
+    "failed": 0
   },
   "results": [
     {
@@ -6131,7 +6067,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.64999389648438,\"y\":570.6799926757812,\"productive\":true}"
+      "detail": "{\"x\":147.6999969482422,\"y\":570.530029296875,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6151,7 +6087,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 480 ms"
+      "detail": "40 texts, ready in 387 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6371,7 +6307,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6440,8 +6376,8 @@
     },
     {
       "name": "every visible control is at least 44px",
-      "pass": false,
-      "detail": "sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16"
+      "pass": true,
+      "detail": "612 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -6601,7 +6537,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786776268694,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786782867479,\"probe\",\"word:屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
