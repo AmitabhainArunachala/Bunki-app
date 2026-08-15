@@ -24,18 +24,21 @@ screenshots. Public release is blocked by absent approval truth. This packet is
 an R0 baseline and is not a release candidate.
 
 `control-census.json` binds both deployed JavaScript files by SHA-256 and
-enumerates 51 source-visible reading control families, including dynamic,
-conditional, pointer-only, canvas-hit, legacy-field, entry-recursion, and
-stroke-motion states. The audit script requires an exact one-to-one set of 51
-matching control rows in `click-ledger.jsonl`; a broad catch-all cannot hide an
-omission. Every rendered result remains `NOT_RUN`, so source presence is never
-represented as a successful click. Every capability claim names its learner
-fixture, browser/device lanes, evidence class, reviewer, and expected
-learner-event effect in `claim-ledger.jsonl`.
+enumerates 66 source-visible reading control families, including dynamic,
+conditional, pointer-only, canvas-hit, AI-reading, focus-dojo, yomi-probe,
+legacy-field, entry-recursion, review, and stroke-motion states. Navigation and
+lookup families are separated from Drift judgment, probe/review grade, rest,
+undo, capture, and import/export mutations. The audit script requires an exact
+one-to-one set of 66 matching control rows in `click-ledger.jsonl`; a broad or
+mixed catch-all cannot hide an omission or event assertion. Every rendered
+result remains `NOT_RUN`, so source presence is never represented as a
+successful click. Every capability claim names its learner fixture,
+browser/device lanes, evidence class, reviewer, and expected learner-event
+effect in `claim-ledger.jsonl`.
 
-The independent review of remote r2 correctly failed its broad source-control
-census. `independent-review-r0-r2.json` preserves that result and the repaired,
-current-authority r4 packet remains subject to a fresh independent review.
+The independent reviews of remote r2 and remote r4 correctly failed incomplete
+source-control censuses. Their records preserve those results. This follow-up
+repairs the r4 omissions and remains subject to a fresh independent review.
 
 Reproduce the deterministic census and Pages projection:
 

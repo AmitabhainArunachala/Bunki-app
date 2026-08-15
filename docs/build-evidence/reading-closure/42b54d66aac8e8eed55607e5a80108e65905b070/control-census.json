@@ -135,7 +135,7 @@
       "view": "drift-surface",
       "selectors": ["#drift-layer .word", "#drift-layer .glyph", "#drift-layer .part", "#ink", "#fx"],
       "roles": ["pointer-node", "canvas-hit-region"],
-      "gestures": ["tap", "hold", "flick", "drag", "double-tap", "two-finger-pinch"],
+      "gestures": ["tap", "hold", "drag", "double-tap", "two-finger-pinch"],
       "count": {
         "mode": "runtime-formula",
         "expression": "visible word + glyph + part nodes + two canvases carrying manual hub/surface hit regions",
@@ -149,6 +149,28 @@
         { "path": "prototypes/corridor/drift-layer.js", "lines": "636-1935,2030-2630" }
       ],
       "sourceResult": "PRESENT_WITH_POINTER_ONLY_DYNAMIC_TARGETS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "drift.surface-judgment",
+      "view": "drift-surface-flick-judgment",
+      "selectors": ["#drift-layer .word", "#drift-layer .glyph", "#drift-layer .part"],
+      "role": "pointer-node",
+      "gestures": ["horizontal-flick-left", "horizontal-flick-right"],
+      "count": {
+        "mode": "runtime-formula",
+        "expression": "each currently gradeable visible word, glyph, or part node; a focused constellation restricts grading to its focus node",
+        "renderedValue": null
+      },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-drift-observation-after-local-durable-commit"]
+      },
+      "sourceEvidence": [
+        { "path": "prototypes/corridor/drift-layer.js", "lines": "1706-1733,2313-2318" },
+        { "path": "prototypes/corridor/corridor.js", "lines": "705-710" }
+      ],
+      "sourceResult": "PRESENT_WITH_LOCAL_OBSERVATION_HOOK",
       "browserResult": "NOT_RUN"
     },
     {
@@ -235,6 +257,45 @@
       "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "2218-2529" }],
       "sourceResult": "CONDITIONAL",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-reading.generate",
+      "view": "ai-reading-room",
+      "selectors": ["#airead-make"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "localStateEffect": "Replaces aiReading and may archive the prior reading through an unchecked noncanonical save; no canonical learner event is expected.",
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7258-7295" }],
+      "sourceResult": "PRESENT_WITH_AI_KEY_AND_LOCAL_NONCANONICAL_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-reading.word-doors",
+      "view": "ai-reading-room-with-generated-reading",
+      "selectors": [".airead-hit"],
+      "role": "button",
+      "count": {
+        "mode": "generated-content-formula",
+        "expression": "one door for each generated ruby base that resolves through the local dictionary",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7297-7330" }],
+      "sourceResult": "PRESENT_CONDITIONAL_ON_GENERATED_CONTENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "ai-reading.history-swap",
+      "view": "ai-reading-room-with-history",
+      "selectors": ["[data-airead-past]"],
+      "role": "button",
+      "count": { "mode": "range", "minimum": 0, "maximum": 10, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "localStateEffect": "Swaps current and historical AI readings through an unchecked noncanonical save; no canonical learner event is expected.",
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "7332-7365" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
       "browserResult": "NOT_RUN"
     },
     {
@@ -679,6 +740,73 @@
       "browserResult": "NOT_RUN"
     },
     {
+      "controlId": "focus.lobby",
+      "view": "focus-dojo-lobby",
+      "selectors": [".focus-chip", ".focus-mode", ".focus-start"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 8, "minutes": 4, "modes": 3, "start": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6327-6379" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_SELECTION_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "focus.hud-end",
+      "view": "focus-review-or-probe",
+      "selectors": [".focus-hud-end"],
+      "role": "button",
+      "count": { "mode": "exact-when-focus-active", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6296-6319" }],
+      "sourceResult": "PRESENT_WITH_SESSION_ONLY_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "probe.front-navigation",
+      "view": "yomi-probe-front-or-revealed-context",
+      "selectors": [".review-face", "#probe-reveal", ".sentence-tok", ".sent-door"],
+      "roles": ["button", "pointer-only-face", "pointer-only-token"],
+      "count": {
+        "mode": "content-formula",
+        "expression": "one pointer-only face + one reveal button before reveal + context sentenceTokens + optional revealed sentence door",
+        "renderedValue": null
+      },
+      "accessibilityDefect": "The probe review-face and sentence tokens are pointer-clickable without equivalent semantic button roles.",
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6638-6684" }],
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_TARGETS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "probe.answer-grades",
+      "view": "yomi-probe-answer",
+      "selectors": ["[data-probe=\"wrong\"]", "[data-probe=\"right\"]"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 2, "renderedValue": null },
+      "eventAssertion": {
+        "noLearnerEventExpected": false,
+        "expected": ["one-probe-observation-and-optional-confirmed-capture-after-durable-commit"]
+      },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6686-6723" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "probe.summary-navigation",
+      "view": "yomi-probe-summary",
+      "selectors": [".leech-row .chip", "main > button.take"],
+      "role": "button",
+      "count": {
+        "mode": "formula",
+        "expression": "one back-to-dojo button + one full-entry door for each missed item",
+        "renderedValue": null
+      },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6605-6636" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
       "controlId": "tray.export-import",
       "view": "tray-empty",
       "selectors": ["#export-store", "#import-store"],
@@ -692,17 +820,28 @@
     {
       "controlId": "tray.review-and-items",
       "view": "tray-nonempty",
-      "selectors": ["#review-start", "[data-list-review]", ".tray-line", ".rest-toggle", "#aiq-start", "#export-store", "#import-store"],
+      "selectors": ["#review-start", "[data-list-review]", ".tray-line", "#aiq-start"],
       "roles": ["button", "pointer-only-row"],
       "count": {
         "mode": "formula",
-        "expression": "3 + 2*(taken + manual-list-memberships) + dueSections + aiQuiz(0|1)",
+        "expression": "one review-start + dueSections + taken/manual-list pointer rows + aiQuiz(0|1)",
         "renderedValue": null
       },
       "accessibilityDefect": "tray-line is pointer-clickable without button role or keyboard activation.",
-      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["review-start-or-suspend-resume-or-export-import"] },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3130-3384" }],
       "sourceResult": "PRESENT_WITH_POINTER_ONLY_ROWS",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "tray.rest-actions",
+      "view": "tray-nonempty",
+      "selectors": [".rest-toggle"],
+      "role": "button",
+      "count": { "mode": "formula", "expression": "taken + manual-list-memberships", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-suspend-or-resume-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "3267-3287" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
       "browserResult": "NOT_RUN"
     },
     {
@@ -712,31 +851,64 @@
       "roles": ["button", "pointer-only-face", "pointer-only-token"],
       "count": { "mode": "formula", "expression": "3 semantic + 1 pointer-only face + sentenceTokens", "renderedValue": null },
       "accessibilityDefect": "review-face and sentence-tok are pointer-clickable without equivalent semantic button roles.",
-      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["reveal-requires-again-judgment"] },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-6031" }],
       "sourceResult": "PRESENT_WITH_POINTER_ONLY_TARGETS",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "review.answer-grades",
+      "controlId": "review.answer-navigation",
       "view": "review-answer",
-      "selectors": ["#zen-exit", "#zen-more", ".grade.g-again", ".grade.g-hard", ".grade.g-good", ".grade.g-easy", ".sentence-tok"],
+      "selectors": ["#zen-exit", "#zen-more", ".sentence-tok", ".sent-door"],
       "roles": ["button", "pointer-only-token"],
-      "count": { "mode": "formula", "expression": "6 semantic + sentenceTokens", "renderedValue": null },
-      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["immutable-review-response", "schedule-effect"] },
+      "count": { "mode": "formula", "expression": "two semantic chrome controls + sentenceTokens + sentenceDoors", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5900-6090" }],
-      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "sourceResult": "PRESENT_WITH_POINTER_ONLY_TOKENS",
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "review.more",
-      "view": "review-more-open",
-      "selectors": [".review-undo", "#review-rest", ".zen-more-row > .chip"],
+      "controlId": "review.answer-grades",
+      "view": "review-answer",
+      "selectors": [".grade.g-again", ".grade.g-hard", ".grade.g-good", ".grade.g-easy"],
       "role": "button",
-      "count": { "mode": "state", "minimum": 1, "maximum": 3, "renderedValue": null },
-      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["supersession-or-suspend"] },
-      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5960-6022,6160-6245" }],
-      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "count": { "mode": "exact", "sourceValue": 4, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["immutable-review-response", "schedule-effect"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6032-6090" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_TWO_WRITE_RISK",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.more-navigation",
+      "view": "review-more-open",
+      "selectors": [".zen-more-row > .chip:not(.review-undo):not(.review-rest)"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "one full-entry door only while the answer is revealed", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5960-6022" }],
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.more-rest",
+      "view": "review-more-open",
+      "selectors": ["#review-rest"],
+      "role": "button",
+      "count": { "mode": "exact", "sourceValue": 1, "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-suspend-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5960-5990" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.more-undo",
+      "view": "review-more-open-after-history",
+      "selectors": [".review-undo"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "history(0|1)", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-supersession-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "6160-6245" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
       "browserResult": "NOT_RUN"
     },
     {
@@ -751,14 +923,36 @@
       "browserResult": "NOT_RUN"
     },
     {
-      "controlId": "review.summary",
+      "controlId": "review.summary-navigation",
       "view": "review-summary",
-      "selectors": ["[data-leech-rest]", "#ai-coach", "main > button.take", ".review-undo"],
+      "selectors": ["#ai-coach", "main > button.take"],
       "role": "button",
-      "count": { "mode": "formula", "expression": "1 back-to-list + uniqueLeeches + coach(0|1) + undo(0|1)", "renderedValue": null },
-      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["suspend-or-supersession"] },
+      "count": { "mode": "formula", "expression": "one back-to-list + coach(0|1)", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": true, "expected": [] },
       "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-5868" }],
-      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_STATE",
+      "sourceResult": "PRESENT",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.summary-rest",
+      "view": "review-summary-with-leeches",
+      "selectors": ["[data-leech-rest]"],
+      "role": "button",
+      "count": { "mode": "formula", "expression": "one per unique leech", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-suspend-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-5868" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
+      "browserResult": "NOT_RUN"
+    },
+    {
+      "controlId": "review.summary-undo",
+      "view": "review-summary-after-history",
+      "selectors": [".review-undo"],
+      "role": "button",
+      "count": { "mode": "conditional", "expression": "history(0|1)", "renderedValue": null },
+      "eventAssertion": { "noLearnerEventExpected": false, "expected": ["one-canonical-supersession-after-durable-commit"] },
+      "sourceEvidence": [{ "path": "prototypes/corridor/corridor.js", "lines": "5776-5868,6160-6245" }],
+      "sourceResult": "PRESENT_WITH_LOCAL_NONCANONICAL_UNSAFE_STATE",
       "browserResult": "NOT_RUN"
     }
   ],
@@ -786,5 +980,5 @@
     { "id": "archive.retry", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" },
     { "id": "draft.route-or-filter", "sourceResult": "ABSENT", "browserResult": "NOT_RUN" }
   ],
-  "sourceConclusion": "The exact two hash-bound JavaScript files yield 51 one-to-one reading control families. Exactly two source call sites open a passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
+  "sourceConclusion": "The exact two hash-bound JavaScript files yield 66 source-enumerated reading control families after separating navigation/lookup from Drift judgment, probe grade, review grade, rest, undo, and import/export mutations. Exactly two source call sites open a corpus passage: curated shelf cards and archive rows. Boot parses entry/UI/dial/variant parameters only; its history protocol covers the stroke room, not article routes. Browser evidence remains NOT_RUN."
 }
