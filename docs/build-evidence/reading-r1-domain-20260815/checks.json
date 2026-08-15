@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-08-15T12:29:08Z",
+  "authorityHeadAtCut": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "authorityTree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "authorityDeltaAudit": {
+    "from": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+    "to": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "commits": 1,
+    "overlapsOwnedPaths": false,
+    "result": "SAFE_REPLAY"
+  },
+  "checks": [
+    {
+      "command": "./node_modules/.bin/vitest run packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts packages/persistence/test/contract.web-provisional.test.ts packages/persistence/test/t16-web-restart.test.ts",
+      "status": "PASS",
+      "testFiles": 3,
+      "tests": 29
+    },
+    {
+      "command": "./node_modules/.bin/vitest run packages/persistence/test",
+      "status": "PASS",
+      "testFiles": 11,
+      "tests": 113
+    },
+    {
+      "command": "./node_modules/.bin/vitest run",
+      "status": "PASS",
+      "testFiles": 95,
+      "tests": 1647
+    },
+    {
+      "command": "./node_modules/.bin/tsc --noEmit plus the six workspace tsconfig commands listed in workspaces",
+      "status": "PASS",
+      "workspaces": ["app", "ai", "domain", "export", "persistence", "seed"],
+      "workspaceCommands": [
+        "./node_modules/.bin/tsc --noEmit -p apps/app/tsconfig.json",
+        "./node_modules/.bin/tsc --noEmit -p apps/app/tsconfig.test.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/ai/tsconfig.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/ai/tsconfig.test.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/domain/tsconfig.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/domain/tsconfig.test.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/export/tsconfig.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/persistence/tsconfig.json",
+        "./node_modules/.bin/tsc --noEmit -p packages/seed/tsconfig.json"
+      ]
+    },
+    {
+      "command": "./node_modules/.bin/eslint packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts",
+      "status": "PASS"
+    },
+    {
+      "command": "./node_modules/.bin/prettier --check packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check 42b54d66aac8e8eed55607e5a80108e65905b070..HEAD",
+      "status": "PASS"
+    }
+  ]
+}

@@ -77,7 +77,16 @@ import { assertPurgeAuthorised, planPurge } from '../purge.ts';
 export const PROVISIONAL_WEB_ADAPTER_NOTICE =
   'Provisional web storage: this adapter keeps the event log in memory and snapshots it to browser storage. It is not the native store, and web persistence results are never reported as native persistence.';
 
-/** `localStorage`'s shape, exactly. Pass `window.localStorage` or a map. */
+/**
+ * `localStorage`'s shape, exactly. Pass `window.localStorage` or a map.
+ *
+ * `setItem` is the durability boundary: it must either replace the value and
+ * return, or throw without changing the previous value. That is the browser
+ * Storage contract this provisional adapter is designed around. A backend that
+ * commits and then throws cannot be reconciled through this synchronous shape;
+ * callers must not emulate rollback with a second, potentially destructive
+ * write.
+ */
 export interface SnapshotStore {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -203,19 +212,23 @@ export class ProvisionalWebEventStore implements EventStore {
     this.#cache = parsed.cache ?? null;
   }
 
-  #persist(): void {
+  #persist(
+    records: readonly StoredEventRecord[],
+    batches: ReadonlyMap<string, AppendBatchRecord>,
+    cache: DerivedStateCacheMeta | null,
+  ): void {
     const payload: WebSnapshotPayload = {
       webSnapshotVersion: WEB_SNAPSHOT_VERSION,
-      events: this.#records.map((record) => record.event),
-      purgedEventIds: this.#records
+      events: records.map((record) => record.event),
+      purgedEventIds: records
         .filter((record) => record.purged)
         .map((record) => record.event.eventId),
-      batches: [...this.#batches.values()].map((batch) => ({
+      batches: [...batches.values()].map((batch) => ({
         idempotencyKey: batch.idempotencyKey,
         fingerprint: batch.fingerprint,
         eventIds: [...batch.eventIds],
       })),
-      cache: this.#cache,
+      cache,
     };
     this.#snapshotStore.setItem(this.#snapshotKey, JSON.stringify(payload));
   }
@@ -278,32 +291,41 @@ export class ProvisionalWebEventStore implements EventStore {
 
     const storedEvents = nextRecords.map((record) => record.event);
     const state = replay(storedEvents);
+    const nextIndexes = [...computeEventIndexes(storedEvents)];
+    const nextBatches = new Map(this.#batches);
 
-    // Past this line nothing can throw, so the mutations below are the commit.
-    this.#records = nextRecords;
-    this.#indexes = [...computeEventIndexes(storedEvents)];
-
-    // Forget the batches that carried purged events, for the reason the SQLite
+    // Forget the staged batches that carried purged events, for the reason the SQLite
     // adapter does: the stored fingerprint is a digest rather than the content,
     // but a digest of a short text is not nothing, and "deleted" should not come
     // with a footnote. Behaviourally free — a re-append falls through to the
     // per-event checks, which skip purged events.
-    [...this.#batches.entries()].forEach(([key, batch]) => {
-      if (batch.eventIds.some((id) => purgedEventIds.has(id))) this.#batches.delete(key);
+    [...nextBatches.entries()].forEach(([key, batch]) => {
+      if (batch.eventIds.some((id) => purgedEventIds.has(id))) nextBatches.delete(key);
     });
 
-    this.#batches.set(options.idempotencyKey, {
+    nextBatches.set(options.idempotencyKey, {
       idempotencyKey: options.idempotencyKey,
       fingerprint: plan.batchFingerprint,
       eventIds: plan.toInsert.map((event) => event.eventId),
     });
-    this.#cache = {
+    const nextCache: DerivedStateCacheMeta = {
       eventCount: state.appliedEventCount,
       lastEventId: state.lastEventId,
       rebuiltAt: this.#config.clock.now(),
       stateSchemaVersion: state.schemaVersion,
     };
-    this.#persist();
+
+    // Persist the complete candidate before publishing any of it through this
+    // live handle. A failure-atomic SnapshotStore throw therefore leaves log,
+    // indexes, batches, cache, exports, and subscribers on one committed truth.
+    this.#persist(nextRecords, nextBatches, nextCache);
+
+    // `setItem` returned: the durable write is committed and the assignments
+    // below are non-throwing publication of that same candidate.
+    this.#records = nextRecords;
+    this.#indexes = nextIndexes;
+    this.#batches = nextBatches;
+    this.#cache = nextCache;
 
     return {
       outcome: plan.outcome,

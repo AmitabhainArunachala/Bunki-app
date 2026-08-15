@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-08-15T11:39:35Z",
+  "reviewer": "r1-remote-reviewer",
+  "independence": "The reviewer did not implement or publish this donor.",
+  "scope": "This PASS covers the immutable r2 source donor. The current-authority r3 replay requires a fresh remote identity review before harvest.",
+  "reviewedDonor": {
+    "branch": "agent/reading-r1-domain-20260815-r2",
+    "head": "3d119f1f82a63bb88ef99de667bf8c04fdfb0e05",
+    "tree": "1ed1d307fadc8d40bfe2ae7c4686fdd3b7209bf4",
+    "base": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa"
+  },
+  "result": "PASS",
+  "identity": {
+    "remoteRef": "PASS",
+    "singleParentAndMergeBase": "PASS",
+    "mergeTreeReproducesDonorTree": "PASS"
+  },
+  "behavioralReview": {
+    "writeBeforePublishOrdering": "PASS",
+    "ordinaryFailedAppendLeavesDurableAndLiveStateUnchanged": "PASS",
+    "failedPurgeKeepsCanaryAndBatchRetryable": "PASS",
+    "readStreamAfterFailedAppendUnchanged": "PASS",
+    "freshReopenAfterFailureSeesPriorDurableState": "PASS",
+    "cacheAndIndexDerivedSurfacesAfterFailureUnchanged": "PASS"
+  },
+  "reproducedChecks": [
+    { "name": "targeted-vitest", "status": "PASS", "files": 3, "tests": 29 },
+    { "name": "persistence-vitest", "status": "PASS", "files": 11, "tests": 113 },
+    { "name": "full-vitest", "status": "PASS", "files": 95, "tests": 1647 },
+    { "name": "workspace-typecheck", "status": "PASS", "workspaces": 6 },
+    { "name": "targeted-eslint-prettier-diff-check", "status": "PASS" }
+  ],
+  "nonBlockingBoundaries": [
+    "The guarantee relies on the documented failure-atomic SnapshotStore.setItem contract; a commit-then-throw injected backend is explicitly nonconforming.",
+    "App optimistic state, Corridor local learner state, migration, UI, and deployment remain out of scope.",
+    "The evidence wording mentions subscribers although EventStore exposes no subscriber surface; behavior is unaffected."
+  ],
+  "blockingFindings": []
+}
