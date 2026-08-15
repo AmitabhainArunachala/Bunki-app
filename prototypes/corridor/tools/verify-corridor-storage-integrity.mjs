@@ -870,8 +870,8 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
   const residual = JSON.parse(readFileSync(residualPath, 'utf8'));
   assert.equal(residual.schemaVersion, 2);
   assert.equal(residual.authorityHeadAtCut, BASE);
-  assert.equal(residual.count, 19);
-  assert.equal(residual.callers.length, 19);
+  assert.equal(residual.count, 20);
+  assert.equal(residual.callers.length, 20);
   assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
 
   const lines = source.split(/\r?\n/);

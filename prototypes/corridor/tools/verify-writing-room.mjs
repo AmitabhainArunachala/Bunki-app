@@ -160,6 +160,7 @@ async function roomSnapshot(page) {
       trigger: trigger
         ? {
             text: trigger.textContent.trim(),
+            mark: Boolean(trigger.querySelector('svg path')),
             controls: trigger.getAttribute('aria-controls'),
             expanded: trigger.getAttribute('aria-expanded'),
             label: trigger.getAttribute('aria-label'),
@@ -288,16 +289,18 @@ async function main() {
       JSON.stringify({ minimal: asleep?.minimal, chrome: asleep?.chrome }),
     );
     check(
-      'the faint trigger and the back door are the only sleeping controls',
-      asleep?.interactive.length === 2 &&
+      'sleeping controls are the four corners and the ensō mark, nothing else',
+      asleep?.interactive.length === 5 &&
         asleep.interactive.some((node) => node.isTrigger) &&
-        asleep.interactive.some((node) => node.id === 'strokes-back'),
+        ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].every((id) =>
+          asleep.interactive.some((node) => node.id === id),
+        ),
       JSON.stringify(asleep?.interactive),
     );
     check(
       'the trigger names a real dormant field and reports collapsed',
       asleep?.trigger?.visible &&
-        asleep.trigger.text === '⋯' &&
+        asleep.trigger.mark === true &&
         asleep.trigger.controls === 'stroke-awake-field' &&
         asleep.trigger.expanded === 'false' &&
         asleep.field,
@@ -343,7 +346,12 @@ async function main() {
     check(
       'every visible control belongs to the awake field or is its trigger',
       awake?.interactive.length > 1 &&
-        awake.interactive.every((node) => node.inField || node.isTrigger || node.id === 'strokes-back'),
+        awake.interactive.every(
+          (node) =>
+            node.inField ||
+            node.isTrigger ||
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+        ),
       JSON.stringify(awake?.interactive),
     );
     check(
@@ -353,35 +361,36 @@ async function main() {
         awake.stageRect.bottom <= awake.field.rect.top + 1,
       JSON.stringify({ stage: awake?.stageRect, field: awake?.field?.rect }),
     );
+    await page.locator('#stroke-world-seal').click();
+    await page.waitForSelector('.world-picker', { timeout: 8000 });
     const palettes = await page
-      .locator('.stroke-palette-choice')
-      .evaluateAll((nodes) =>
-        nodes.map((node) => [
-          node.dataset.world,
-          node.querySelector('.stroke-palette-seal')?.textContent?.trim() ||
-            node.textContent.trim(),
-        ]),
-      );
+      .locator('.world-picker .world-stone')
+      .evaluateAll((nodes) => nodes.map((node) => node.textContent.trim()));
     check(
-      'the public palette is exactly 墨 朱 柿 漆 金 藍 赤 浪 板 雷 in that order',
-      JSON.stringify(palettes) === JSON.stringify(PUBLIC_WORLDS),
+      'the seal opens the public ten 墨 朱 柿 漆 金 藍 赤 浪 板 雷 in order',
+      JSON.stringify(palettes) === JSON.stringify(PUBLIC_WORLDS.map((pair) => pair[1])),
       JSON.stringify(palettes),
     );
-    const paletteGroup = await page.locator('.stroke-palette-field').evaluate((node) => ({
+    const paletteGroup = await page.locator('.world-picker').evaluate((node) => ({
       role: node.getAttribute('role'),
       label: node.getAttribute('aria-label'),
     }));
     check(
-      'the palette choices form one named accessibility group',
-      paletteGroup.role === 'group' && Boolean(paletteGroup.label),
+      'the world stones form one named dialog',
+      paletteGroup.role === 'dialog' && Boolean(paletteGroup.label),
       JSON.stringify(paletteGroup),
     );
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
 
     // One public world from each side of the field proves the choices act,
     // persist, re-ink, and keep the field awake. The exact ten-entry/order
     // assertion above prevents a dead or extra public stone from hiding.
     for (const id of ['shu', 'hakuu']) {
-      await page.locator(`.stroke-palette-choice[data-world="${id}"]`).click();
+      await page.locator('#stroke-world-seal').click();
+      await page.waitForSelector('.world-picker', { timeout: 8000 });
+      const seal = PUBLIC_WORLDS.find((pair) => pair[0] === id)[1];
+      await page.locator('.world-picker .world-stone', { hasText: seal }).click();
       await page.waitForFunction(
         (world) => document.querySelector('#stroke-page')?.dataset.world === world,
         id,
@@ -391,9 +400,8 @@ async function main() {
         (world) => ({
           stored: localStorage.getItem('kairo-theme'),
           chrome: document.querySelector('#stroke-page')?.dataset.chrome,
-          pressed: document.querySelectorAll(
-            `.stroke-palette-choice[data-world="${world}"][aria-pressed="true"]`,
-          ).length,
+          pressed: 1, // the stones close on choice; the stored world is the proof
+
           canvases: document.querySelectorAll('#stroke-page .ink-sheet').length,
         }),
         id,
@@ -617,9 +625,12 @@ async function main() {
     check(
       'Escape sleeps an awake field before it closes the room',
       slept?.chrome === 'sleeping' &&
-        slept.interactive.length === 2 &&
         slept.interactive.some((node) => node.isTrigger) &&
-        slept.interactive.some((node) => node.id === 'strokes-back'),
+        slept.interactive.every(
+          (node) =>
+            node.isTrigger ||
+            ['strokes-back', 'stroke-world-seal', 'stroke-numbers', 'stroke-speed'].includes(node.id),
+        ),
       JSON.stringify(slept),
     );
     await page.keyboard.press('Escape');
@@ -675,9 +686,10 @@ async function main() {
       'a no-stroke kanji keeps the same valid dormant trigger contract',
       noData?.minimal === 'on' &&
         noData.chrome === 'sleeping' &&
-        noData.interactive.length === 2 &&
+        noData.interactive.length === 3 &&
         noData.interactive.some((node) => node.isTrigger) &&
         noData.interactive.some((node) => node.id === 'strokes-back') &&
+        noData.interactive.some((node) => node.id === 'stroke-world-seal') &&
         noData.trigger?.controls === 'stroke-awake-field' &&
         noDataProse.target,
       JSON.stringify({ room: noData, noDataProse }),

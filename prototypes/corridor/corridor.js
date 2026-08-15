@@ -8884,39 +8884,15 @@ function strokeNumbersControl(page, reduced) {
 }
 
 /** Minimal mode is an allowlist, not legacy chrome made transparent. */
-function strokeAwakeField(page, k, reduced, hasStrokeData = true) {
+function strokeAwakeField(page, k) {
+  // 四隅の間 (operator spec, 2026-08-15): the corners carry the controls —
+  // worlds top-right on the seal, numbers bottom-right, speed bottom-left,
+  // back top-left. The wake mark opens ONLY the readings, underneath the
+  // glyph, so nothing crowds the sheet.
   const field = el('section', 'stroke-awake-field');
   field.id = 'stroke-awake-field';
   field.dataset.strokeChrome = '';
-  field.setAttribute('aria-label', tx('書の間の操作', 'writing-room controls'));
-
-  const palettes = el('div', 'stroke-palette-field');
-  palettes.setAttribute('role', 'group');
-  palettes.setAttribute('aria-label', tx('すべての色彩', 'all color palettes'));
-  for (const id of PUBLIC_THEME_IDS) {
-    const t = THEME_UI.find((world) => world.id === id);
-    if (!t) continue;
-    const choice = el('button', 'stroke-palette-choice');
-    choice.type = 'button';
-    choice.dataset.world = t.id;
-    choice.title = t.name;
-    choice.setAttribute('aria-label', t.name);
-    choice.setAttribute('aria-pressed', String(t.id === themeId()));
-    choice.style.setProperty('--palette-ground', t.g);
-    choice.style.setProperty('--palette-ink', t.ink);
-    choice.style.setProperty('--palette-red', t.red);
-    choice.append(
-      el('span', 'stroke-palette-seal', t.seal),
-      el('span', 'stroke-palette-name', t.name),
-    );
-    choice.addEventListener('click', () => {
-      S.sealWake = true;
-      S.strokePaletteFocus = t.id;
-      setKairoTheme(t.id);
-      render();
-    });
-    palettes.append(choice);
-  }
+  field.setAttribute('aria-label', tx('読み', 'readings'));
 
   const readings = el('div', 'stroke-reading-field');
   readings.setAttribute('role', 'group');
@@ -8926,13 +8902,23 @@ function strokeAwakeField(page, k, reduced, hasStrokeData = true) {
     strokeReadingRow('訓読み', 'kun', k?.kun, 'kun'),
   );
 
-  field.append(palettes, readings);
-  if (hasStrokeData) {
-    const numbers = strokeNumbersControl(page, reduced);
-    numbers.classList.add('stroke-number-choice');
-    field.append(numbers);
-  }
+  field.append(readings);
   return field;
+}
+
+/** ゆっくり — the speed corner (bottom-left). The stored slow preference
+ * used to apply silently with no way to see or undo it (P1, review). */
+function strokeSpeedControl(page) {
+  const speed = strokeControl('stroke-speed', 'ゆっくり', 'slowly');
+  speed.setAttribute('aria-pressed', String(!!S.strokeSlow));
+  speed.addEventListener('click', () => {
+    S.strokeSlow = !S.strokeSlow;
+    speed.setAttribute('aria-pressed', String(!!S.strokeSlow));
+    if (page.dataset.living === 'on' && inkRoom?.handle) {
+      inkRoom.handle.rewrite(strokeRewriteOptions());
+    }
+  });
+  return speed;
 }
 
 /** The honest room: a character we can show but whose order we do not know. */
@@ -9570,7 +9556,8 @@ function renderStrokePage(root) {
   const seal = el('button', 'theme-seal stroke-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'stroke-world-seal';
-  seal.dataset.strokeChrome = '';
+  // NOT part of the sleeping-inert chrome sweep: the seal is the top-right
+  // corner of the quiet room (operator spec) and must answer while sleeping
   seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
   attachWorldPicker(seal);
   bar.append(seal);
@@ -9586,7 +9573,7 @@ function renderStrokePage(root) {
       stage.setAttribute('role', 'img');
       stage.setAttribute('aria-label', st.id);
       stage.append(el('span', 'stroke-missing-glyph', st.id));
-      body.append(stage, strokeAwakeField(page, k, reduced, false));
+      body.append(stage, strokeAwakeField(page, k));
       page.append(body);
     } else {
       strokeMissing(page, st.id, k);
@@ -9739,7 +9726,7 @@ function renderStrokePage(root) {
     if (!S.strokeMinimal) body.append(readout);
 
     if (S.strokeMinimal) {
-      body.append(strokeAwakeField(page, k, reduced));
+      body.append(strokeAwakeField(page, k));
     } else {
       const controls = el('div', 'stroke-controls');
       if (reduced) {
@@ -9844,11 +9831,25 @@ function renderStrokePage(root) {
   }
 
   if (S.strokeMinimal) {
-    const wake = el('button', 'stroke-chrome-trigger', '⋯');
+    // the wake mark is an ensō — one brush circle, not three dots
+    // (operator: "a more artistic symbol… it should open up elegantly")
+    const wake = el('button', 'stroke-chrome-trigger');
     wake.type = 'button';
+    wake.innerHTML =
+      '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M25 7 C 35.5 7.6, 42 15, 41.8 24.4 C 41.6 34, 33.8 41.2, 24 41 C 14.4 40.8, 6.8 33.4, 7 23.8 C 7.2 15, 13.6 8.4, 21.4 7.2" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><path d="M25 7 C 30 7.3, 34 9, 37 12" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" opacity="0.85"/></svg>';
     wake.setAttribute('aria-controls', 'stroke-awake-field');
     wake.addEventListener('click', () => setStrokeChrome(page, !S.strokeChromeAwake));
     page.append(wake);
+    if (paths.length) {
+      // 四隅 — numbers bottom-right, speed bottom-left; always in reach,
+      // faint until touched, never crowding the sheet (operator spec)
+      const numbersCorner = strokeNumbersControl(page, reduced);
+      numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
+      page.append(numbersCorner);
+      const speedCorner = strokeSpeedControl(page);
+      speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
+      page.append(speedCorner);
+    }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
 

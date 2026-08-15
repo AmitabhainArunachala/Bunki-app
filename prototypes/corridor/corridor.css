@@ -3580,8 +3580,19 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: none;
 }
 
+/* the readings open ELEGANTLY — a slow rise and settle, not a pop */
+.stroke-awake-field {
+  transition:
+    opacity 0.34s ease,
+    transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1),
+    visibility 0s linear 0s;
+}
 .stroke-page[data-chrome='sleeping'] .stroke-awake-field {
-  transform: translate(-50%, 7px);
+  transform: translate(-50%, 16px);
+  transition:
+    opacity 0.26s ease,
+    transform 0.26s ease,
+    visibility 0s linear 0.26s;
 }
 
 .stroke-palette-field {
@@ -3745,9 +3756,70 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border: 0;
   background: transparent;
 }
-.stroke-page[data-minimal='on'] .stroke-title,
-.stroke-page[data-minimal='on'] #stroke-world-seal {
+.stroke-page[data-minimal='on'] .stroke-title {
   display: none;
+}
+/* 四隅の間 — the worlds live on the seal, top right, the same door as every
+ * screen (operator spec: "the ten color choices from the top right, just
+ * like in the normal settings") */
+.stroke-page[data-minimal='on'] #stroke-world-seal {
+  position: fixed;
+  right: calc(8px + env(safe-area-inset-right));
+  top: calc(8px + env(safe-area-inset-top));
+  z-index: 7;
+  opacity: 0.44;
+  transition: opacity 0.22s ease;
+}
+.stroke-page[data-minimal='on'] #stroke-world-seal:is(:hover, :focus-visible),
+.stroke-page[data-minimal='on'][data-chrome='awake'] #stroke-world-seal {
+  opacity: 0.85;
+}
+/* the ensō wake mark yields the top-right corner to the seal and rests
+ * bottom-center, beneath the sheet */
+.stroke-page[data-minimal='on'] .stroke-chrome-trigger {
+  right: auto;
+  top: auto;
+  left: 50%;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+}
+.stroke-chrome-trigger svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+/* numbers bottom-right · speed bottom-left — faint until touched, always
+ * in reach, never crowding the sheet */
+.stroke-corner {
+  position: fixed;
+  z-index: 7;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  opacity: 0.36;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.22s ease;
+}
+.stroke-corner:is(:hover, :focus-visible),
+.stroke-corner[aria-pressed='true'],
+.stroke-page[data-chrome='awake'] .stroke-corner {
+  opacity: 0.82;
+}
+.stroke-corner-br {
+  right: calc(8px + env(safe-area-inset-right));
+}
+.stroke-corner-bl {
+  left: calc(8px + env(safe-area-inset-left));
+}
+.stroke-corner:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: -4px;
 }
 .stroke-page[data-minimal='on'] #strokes-back {
   min-width: 44px;
