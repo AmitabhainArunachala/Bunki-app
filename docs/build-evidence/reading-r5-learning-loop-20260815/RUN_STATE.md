@@ -45,4 +45,3 @@ verifier are the bounded harvest units.
 Rendered Chromium, WebKit, physical-iPhone, VoiceOver, storage-eviction, and
 offline journeys are `NOT_RUN`; no browser binary or physical device lane was
 available. The donor requires independent source/test review before harvest.
-
