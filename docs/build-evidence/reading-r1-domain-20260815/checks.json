@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "authorityHeadAtCut": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "authorityTree": "9320a1c741812a7d38f7afd54263cb7d133c3fbf",
+  "authorityDeltaAudit": {
+    "from": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+    "to": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+    "commits": 1,
+    "overlapsOwnedPaths": false,
+    "result": "SAFE_REPLAY"
+  },
+  "checks": [
+    {
+      "command": "vitest run packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts packages/persistence/test/contract.web-provisional.test.ts packages/persistence/test/t16-web-restart.test.ts",
+      "status": "PASS",
+      "testFiles": 3,
+      "tests": 29
+    },
+    {
+      "command": "vitest run packages/persistence/test",
+      "status": "PASS",
+      "testFiles": 11,
+      "tests": 113
+    },
+    {
+      "command": "vitest run",
+      "status": "PASS",
+      "testFiles": 95,
+      "tests": 1647
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "workspaces": ["app", "ai", "domain", "export", "persistence", "seed"]
+    },
+    {
+      "command": "eslint packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts",
+      "status": "PASS"
+    },
+    {
+      "command": "prettier --check packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ]
+}
