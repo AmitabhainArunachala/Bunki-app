@@ -204,6 +204,12 @@ const TAU=Math.PI*2;
 const vw=()=>innerWidth, vh=()=>innerHeight, mind=()=>Math.min(vw(),vh());
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+// 分流の岸 — when a host app fuses its own chrome over this water, it names
+// those elements in window.bunkiDriftChrome (a selector string). A tap on
+// host chrome is never a judgment on the water: without this, the torii,
+// seal, nav and corner bubbles leaked through and razed the constellation.
+// Standalone drift has no host and the guard is a no-op.
+const hostChrome=t=>{try{return !!(t&&t.closest&&window.bunkiDriftChrome&&t.closest(window.bunkiDriftChrome));}catch{return false;}};
 
 // ---- OPERATOR TUNABLES: how alive the water is. Ruled by feel, not derived. ----
 // All three are silenced entirely by prefers-reduced-motion (see `reduced` above):
@@ -2389,7 +2395,7 @@ addEventListener("pointerdown",e=>{
       }
     },430);
   }
-  if(!e.target.closest||!e.target.closest("#theme,#card,#lvl")) ripple(px,py,false);
+  if((!e.target.closest||!e.target.closest("#theme,#card,#lvl"))&&!hostChrome(e.target)) ripple(px,py,false);
   hint.style.opacity="0";
 },{passive:true});
 const s2wl=(sx,sy)=>{
@@ -2492,6 +2498,7 @@ addEventListener("pointerup",e=>{
   gestureActive=false;
   if(lpFired){lpFired=false; if(n){n.dragX=0;n.dragY=0;} return;}
   if(e.target.closest&&e.target.closest("#theme,#card,#lvl,#radoc")) return;
+  if(hostChrome(e.target)) return;
   const dx=e.clientX-px, dy=e.clientY-py, held=Date.now()-pt;
   const terminalMoved=moved||Math.abs(dx)>8||Math.abs(dy)>8;
   if(n){

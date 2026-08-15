@@ -708,6 +708,11 @@ function obsLog(kind, key, ...detail) {
 window.bunkiDriftJudgment = (kind, key, dir) => {
   obsLog('drift', srsKey(kind === 'kanji' ? 'kanji' : 'word', key), dir > 0 ? 3 : 1);
 };
+// 分流の岸 — the corridor names its fused chrome so a tap on the torii,
+// seal, nav, bubbles, or any overlay is never read by the water as an
+// open-water tap (which razed the learner's constellation — P1, review)
+window.bunkiDriftChrome =
+  '#ginga-symbol, #ginga-theme-seal, .ginga-seal, .nav-scrim, .nav-bar, .corner-bubble, .world-picker, .world-picker-scrim, #variants, #chrome';
 addEventListener('pagehide', obsFlush);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') obsFlush();
