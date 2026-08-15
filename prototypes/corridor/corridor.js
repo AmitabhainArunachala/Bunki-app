@@ -7638,14 +7638,21 @@ function renderDictionaryHomographs(container, node) {
     if (primaryGloss) stack.append(el('span', 'row-gloss', primaryGloss));
     choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
     choice.addEventListener('click', () => {
-      if (active || S.stack[S.stack.length - 1] !== node) return;
-      S.stack[S.stack.length - 1] = {
+      // guard by CONTENT, not object identity — async dictionary resolution
+      // can replace the stack-top object after this row rendered, and the
+      // identity check made the tap a silent no-op
+      const top = S.stack[S.stack.length - 1];
+      if (active || !top || top.t !== 'word' || top.id !== node.id) return;
+      // a homograph is a DOOR, not a correction: it PUSHES, so ← 戻る
+      // returns to the entry the learner was reading (replacing the stack
+      // top made back close the whole sheet — P1, full-instrument review)
+      S.stack.push({
         t: 'word',
         id: headForm,
         seq: String(seq),
         reading,
         from: node.from || null,
-      };
+      });
       render();
       const live = document.getElementById('sheet');
       if (live) live.scrollTop = 0;
