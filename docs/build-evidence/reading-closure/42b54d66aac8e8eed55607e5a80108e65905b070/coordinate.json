@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-08-15T12:16:46Z",
+  "repository": "AmitabhainArunachala/Bunki-app",
+  "authorityBranch": "claude/app-vision-next-steps-wei73a",
+  "authorityHeadAtCut": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "authorityTree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "mainHead": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+  "mergeBaseWithMain": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+  "commitsAheadOfMain": 292,
+  "integrationPullRequest": {
+    "number": 71,
+    "url": "https://github.com/AmitabhainArunachala/Bunki-app/pull/71",
+    "state": "OPEN_DRAFT",
+    "mergeable": true,
+    "head": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "base": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece"
+  },
+  "controller": {
+    "branch": "agent/reading-campaign-controller-2026-08-15",
+    "head": "aa647bab72307288265027fb801cdb37e59b747b",
+    "remoteVisible": true
+  },
+  "cleanCheckout": {
+    "statusPorcelain": "",
+    "result": "PASS"
+  },
+  "authorityProtection": {
+    "githubBranchProtection": false,
+    "requiredContexts": [],
+    "note": "The Claude integration authority is controller-governed, not GitHub-enforced."
+  }
+}

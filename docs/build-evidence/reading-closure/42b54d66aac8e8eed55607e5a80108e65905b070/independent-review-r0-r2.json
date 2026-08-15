@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "reviewedBranch": "agent/reading-r0-evidence-20260815-r2",
+  "reviewedCommit": "fccf9934e8657c142191232cd129635186d40a46",
+  "reviewedTree": "66a47f9d3d438b45599cc90884c8fc708c1b87e3",
+  "candidate": "34c0176d1ffe3c502873b0bbbf1cba399389a8aa",
+  "result": "FAIL",
+  "reviewClass": "INDEPENDENT_REMOTE_READ_ONLY",
+  "verified": [
+    "remote ref, tree, parent, workflow runs, deployment, and live payload hashes",
+    "859-file 120759578-byte workflow artifact identity",
+    "40 primary plus 694 archive corpus closure and 306.5 median",
+    "17-point rubric arithmetic and evidence-link resolution",
+    "honest NOT_RUN browser and device lanes"
+  ],
+  "blockingFindings": [
+    "reader.loaded mixed the event-bearing finish control into a no-event family",
+    "shelf query mislabeled dictionary results as article results",
+    "the legacy field route omitted its 26 field-word targets and enter-shelf control",
+    "the broad entry.sheet row omitted conditional dictionary, AI, recursion, catalog, and stroke-door families",
+    "stroke-room state-specific controls were absent",
+    "Drift surface gestures and conditional fallback-card controls were neither enumerated nor explicitly conditioned"
+  ],
+  "repairDisposition": "The current-authority r4 working packet carries the r3 repair: it splits passive/event-bearing controls, renames dictionary results, binds both deployed JavaScript hashes, and assigns 51 exact source families one-to-one to 51 click-ledger rows. A new independent review is required before r4 closure.",
+  "reviewedAt": "2026-08-15T11:41:00Z"
+}

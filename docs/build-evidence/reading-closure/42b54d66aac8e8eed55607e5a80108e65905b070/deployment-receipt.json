@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-08-15T12:16:46Z",
+  "repository": "AmitabhainArunachala/Bunki-app",
+  "source": {
+    "branch": "claude/app-vision-next-steps-wei73a",
+    "sha": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "tree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c"
+  },
+  "deployment": {
+    "id": 5920193628,
+    "statusId": 16849316487,
+    "status": "SUCCESS",
+    "deployedAt": "2026-08-15T12:00:27Z",
+    "url": "https://amitabhainarunachala.github.io/Bunki-app/",
+    "workflowRunId": 31883465596,
+    "workflowRunUrl": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31883465596",
+    "trigger": "workflow_dispatch"
+  },
+  "workflowArtifacts": [
+    {
+      "id": 9246617090,
+      "name": "bunki-app-static",
+      "bytes": 27713342,
+      "zipSha256": "eaad198971c8400f7967f4840660c24819c04df3067b0d0dd32cc156a6a121ce",
+      "expiresAt": "2026-11-13T11:59:47Z",
+      "completeArtifactComparison": "PASS",
+      "fileCount": 859,
+      "uncompressedBytes": 120760056
+    },
+    {
+      "id": 9246617688,
+      "name": "github-pages",
+      "bytes": 27023181,
+      "digest": "sha256:2af6b399f2b808424f9f9dbabbe1b5ce263f8944575274fc014c34ce88de1ea1",
+      "expiresAt": "2026-08-16T12:00:15Z"
+    }
+  ],
+  "cacheBustedPublicPayloadChecks": [
+    {
+      "path": "index.html",
+      "bytes": 1625,
+      "sha256": "32991e6fd192816ffaaefca9d5695172d61b65641ff587f8d793c070aa784d25",
+      "result": "PASS"
+    },
+    {
+      "path": "corridor.js",
+      "bytes": 531330,
+      "sha256": "892c5089207f750739285e3f600c33bfeda85d1ccd99da2136d96cb4315e2245",
+      "result": "PASS"
+    },
+    {
+      "path": "corridor.css",
+      "bytes": 113012,
+      "sha256": "439aea5b95e25239674c53d7999957aa87093d607efa03c7f7da9a78daa4c15e",
+      "result": "PASS"
+    },
+    {
+      "path": "drift-layer.js",
+      "bytes": 827970,
+      "sha256": "db85c0a3f9fb9dae78073a5e663c53ad82d7784a19697a479f83b01c69049868",
+      "result": "PASS"
+    },
+    {
+      "path": "data/articles/index.json",
+      "bytes": 81534,
+      "sha256": "af6779d3dce3cb266c9c1d01441709263b658e2a52d5dd79738f5f09f3be1b79",
+      "result": "PASS"
+    },
+    {
+      "path": "data/articles/archive-index.json",
+      "bytes": 736218,
+      "sha256": "628fff8d9eac0a80bc7dda723e42ef9d99e84400b637b9930fae3a9dab9e58cf",
+      "result": "PASS"
+    },
+    {
+      "path": "data/manifest.json",
+      "bytes": 904,
+      "sha256": "9606f6c33e14b83662ba3e1904db2699ab7dc51cebb7e612fd408487cae1f082",
+      "result": "PASS",
+      "warning": "Payload identity matches, but this manifest is semantically stale: it declares 26 passages while the article index contains 40 primary records."
+    }
+  ],
+  "publicBuildReceipt": {
+    "status": "FAIL",
+    "shaVisibleInPage": false,
+    "receiptPaths": {
+      "build-receipt.json": "HTTP_404_WITH_FRONT_DOOR_BODY",
+      "deployment-receipt.json": "HTTP_404_WITH_FRONT_DOOR_BODY",
+      "version.json": "HTTP_404_WITH_FRONT_DOOR_BODY",
+      "manifest.webmanifest": "HTTP_404_WITH_FRONT_DOOR_BODY",
+      "service-worker.js": "HTTP_404_WITH_FRONT_DOOR_BODY",
+      "sw.js": "HTTP_404_WITH_FRONT_DOOR_BODY"
+    }
+  },
+  "contentManifestDigest": "sha256:9606f6c33e14b83662ba3e1904db2699ab7dc51cebb7e612fd408487cae1f082",
+  "serviceWorkerVersion": "NONE",
+  "providerConfigurationDigest": "NOT_APPLICABLE_NO_READER_AUDIO_PROVIDER",
+  "identityConclusion": "The GitHub deployment, complete downloadable artifact, source projection, and sampled public payload bytes bind the live URL to the source SHA. The required page-visible receipt is still absent."
+}
