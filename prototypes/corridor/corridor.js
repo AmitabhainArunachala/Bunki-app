@@ -9618,6 +9618,18 @@ function renderSheet(root) {
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
+  // reading position survives the doors: the sheet remembers where each
+  // stack entry was scrolled and restores it when that entry returns —
+  // back no longer teleports a ~2,700px entry to its top (P1, review).
+  // Tracked continuously (passive) onto the node; session-only by design.
+  sheet.addEventListener(
+    'scroll',
+    () => {
+      if (S.stack[S.stack.length - 1] === node) node.sheetScroll = sheet.scrollTop;
+    },
+    { passive: true },
+  );
+  if (node.sheetScroll) requestAnimationFrame(() => (sheet.scrollTop = node.sheetScroll));
   sheet.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
