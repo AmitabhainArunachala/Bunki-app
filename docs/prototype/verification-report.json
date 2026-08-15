@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year",
-        "senses": 3,
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-15 04:37",
+          "2026-08-15 06:44",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-15 04:42",
+          "2026-08-15 06:49",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-15 04:46",
+          "2026-08-15 06:53",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-24 04:36",
+          "in 10 d",
+          "2026-08-25 06:43",
           "8.30"
         ]
       ]
@@ -214,7 +214,7 @@
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 2.28,
+          "contrast": 2.38,
           "fontSize": 13,
           "color": "rgba(28, 47, 66, 0.42)"
         },
@@ -272,23 +272,23 @@
         {
           "label": "faint / snippet",
           "selector": ".shelf-snippet",
-          "contrast": 5.4,
+          "contrast": 6.38,
           "fontSize": 14,
-          "color": "rgba(28, 47, 66, 0.76)"
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
         },
         {
           "label": "chrome breadcrumb (background)",
           "selector": ".crumb",
-          "contrast": 5.4,
+          "contrast": 7.34,
           "fontSize": 13,
-          "color": "rgba(28, 47, 66, 0.76)"
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
         },
         {
           "label": "eyebrow label",
           "selector": ".eyebrow",
-          "contrast": 5.4,
+          "contrast": 6.38,
           "fontSize": 12,
-          "color": "rgba(28, 47, 66, 0.76)"
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
         },
         {
           "label": "reading body (focused)",
@@ -345,16 +345,16 @@
       {
         "label": "chrome breadcrumb (background)",
         "selector": ".crumb",
-        "contrast": 5.4,
+        "contrast": 7.34,
         "fontSize": 13,
-        "color": "rgba(28, 47, 66, 0.76)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       },
       {
         "label": "eyebrow label",
         "selector": ".eyebrow",
-        "contrast": 5.4,
+        "contrast": 6.38,
         "fontSize": 12,
-        "color": "rgba(28, 47, 66, 0.76)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       },
       {
         "label": "reading, the one red",
@@ -373,9 +373,9 @@
       {
         "label": "faint / snippet",
         "selector": ".shelf-snippet",
-        "contrast": 5.4,
+        "contrast": 6.38,
         "fontSize": 14,
-        "color": "rgba(28, 47, 66, 0.76)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       }
     ],
     "targets": [
@@ -6102,7 +6102,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 400,
+  "loadMs": 480,
   "summary": {
     "total": 116,
     "failed": 1
@@ -6131,7 +6131,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.61000061035156,\"y\":570.8400268554688,\"productive\":true}"
+      "detail": "{\"x\":147.64999389648438,\"y\":570.6799926757812,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6151,7 +6151,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 400 ms"
+      "detail": "40 texts, ready in 480 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6321,7 +6321,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 3 senses"
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -6371,7 +6371,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6401,7 +6401,7 @@
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.28:1 → wcag 5.4:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.28:1 → wcag 6.38:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
@@ -6601,7 +6601,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786768647948,\"probe\",\"word:刺繍\",1,1]"
+      "detail": "row [1786776268694,\"probe\",\"word:金屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -6686,7 +6686,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“刺繍” · 2 sentence lines · 5 live tokens"
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     }
   ]
 }

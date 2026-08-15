@@ -3716,6 +3716,48 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.82;
 }
 
+/* The quiet room's visible back door (operator, 2026-08-15: a learner must
+ * never be trapped behind a history gesture). The bar pares down to one
+ * faint always-live 戻る mirroring the ⋯ trigger; title and seal belong to
+ * the awake field in this mode. */
+.stroke-page[data-minimal='on'] .stroke-bar {
+  position: absolute;
+  left: calc(8px + env(safe-area-inset-left));
+  top: calc(8px + env(safe-area-inset-top));
+  z-index: 7;
+  align-self: auto;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.stroke-page[data-minimal='on'] .stroke-title,
+.stroke-page[data-minimal='on'] #stroke-world-seal {
+  display: none;
+}
+.stroke-page[data-minimal='on'] #strokes-back {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  opacity: 0.36;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.22s ease;
+}
+.stroke-page[data-minimal='on'] #strokes-back:is(:hover, :focus-visible),
+.stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
+  opacity: 0.82;
+}
+.stroke-page[data-minimal='on'] #strokes-back:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: -4px;
+  background: color-mix(in srgb, var(--ground-0) 54%, transparent);
+}
+
 .stroke-chrome-trigger:focus-visible {
   outline: 2px solid var(--ai, var(--ink-2));
   outline-offset: -4px;

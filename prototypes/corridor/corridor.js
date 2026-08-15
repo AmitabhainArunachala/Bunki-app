@@ -9032,7 +9032,9 @@ function renderStrokePage(root) {
   const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'strokes-back';
-  backBtn.dataset.strokeChrome = '';
+  // NOT part of the sleeping-inert chrome sweep: the back door must stay
+  // tappable while the room sleeps (operator, 2026-08-15: "no functioning
+  // back button" — a learner may never be trapped behind a history gesture)
   backBtn.dataset.action = 'navigation.back';
   backBtn.addEventListener('click', (event) => {
     interaction(
@@ -9057,7 +9059,10 @@ function renderStrokePage(root) {
   seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
   attachWorldPicker(seal);
   bar.append(seal);
-  if (!S.strokeMinimal) page.append(bar);
+  // The bar mounts in BOTH modes. In the quiet room CSS pares it to one
+  // faint, always-live 戻る (44px) — the visible back door beside the ⋯
+  // trigger; title and seal stay awake-field concerns there.
+  page.append(bar);
 
   if (!paths.length) {
     if (S.strokeMinimal) {

@@ -288,8 +288,10 @@ async function main() {
       JSON.stringify({ minimal: asleep?.minimal, chrome: asleep?.chrome }),
     );
     check(
-      'the faint trigger is the only visible/focusable control',
-      asleep?.interactive.length === 1 && asleep.interactive[0].isTrigger,
+      'the faint trigger and the back door are the only sleeping controls',
+      asleep?.interactive.length === 2 &&
+        asleep.interactive.some((node) => node.isTrigger) &&
+        asleep.interactive.some((node) => node.id === 'strokes-back'),
       JSON.stringify(asleep?.interactive),
     );
     check(
@@ -341,7 +343,7 @@ async function main() {
     check(
       'every visible control belongs to the awake field or is its trigger',
       awake?.interactive.length > 1 &&
-        awake.interactive.every((node) => node.inField || node.isTrigger),
+        awake.interactive.every((node) => node.inField || node.isTrigger || node.id === 'strokes-back'),
       JSON.stringify(awake?.interactive),
     );
     check(
@@ -615,8 +617,9 @@ async function main() {
     check(
       'Escape sleeps an awake field before it closes the room',
       slept?.chrome === 'sleeping' &&
-        slept.interactive.length === 1 &&
-        slept.interactive[0].isTrigger,
+        slept.interactive.length === 2 &&
+        slept.interactive.some((node) => node.isTrigger) &&
+        slept.interactive.some((node) => node.id === 'strokes-back'),
       JSON.stringify(slept),
     );
     await page.keyboard.press('Escape');
@@ -672,8 +675,9 @@ async function main() {
       'a no-stroke kanji keeps the same valid dormant trigger contract',
       noData?.minimal === 'on' &&
         noData.chrome === 'sleeping' &&
-        noData.interactive.length === 1 &&
-        noData.interactive[0].isTrigger &&
+        noData.interactive.length === 2 &&
+        noData.interactive.some((node) => node.isTrigger) &&
+        noData.interactive.some((node) => node.id === 'strokes-back') &&
         noData.trigger?.controls === 'stroke-awake-field' &&
         noDataProse.target,
       JSON.stringify({ room: noData, noDataProse }),
