@@ -1,0 +1,10 @@
+{"journey_id":"cold-open-3x","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"open-first-middle-last-primary","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"open-draft","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"BLOCKED","required_lane":"content-fixture","reason":"the exact payload has no private draft lane"}
+{"journey_id":"open-archive","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"missing-and-malformed-article","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"full-body-reader","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser-and-phone","reason":"browser and device unavailable"}
+{"journey_id":"back-forward-escape-edge-back","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser-and-phone","reason":"browser and device unavailable"}
+{"journey_id":"resume-reload","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"offline-and-failure-states","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"rendered-browser","reason":"browser unavailable"}
+{"journey_id":"read-listen-inspect-capture-review-return","candidate":"952dbc7acc3ce5fc5e0497e854c0df39e41c51ab","status":"NOT_RUN","required_lane":"physical-iPhone","reason":"audio is absent and physical device is required"}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "candidate": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+  "tree": "ba95db981b91b928fb3580cb2adc073d103ef1b8",
+  "selfExcluded": "evidence-manifest.json",
+  "fileCount": 14,
+  "totalBytes": 247349,
+  "files": [
+    {
+      "path": "artifact-manifest.json",
+      "bytes": 219801,
+      "sha256": "cc7cc66a4a3322edfdaacca1e12d79fdf9621a71bb646dc80bf828aeaca996d3"
+    },
+    {
+      "path": "checks.json",
+      "bytes": 1964,
+      "sha256": "ef76c99048f78754666295dfec0814aca49d46b0034f0da7378ec8e22ddc17be"
+    },
+    {
+      "path": "claim-ledger.jsonl",
+      "bytes": 5760,
+      "sha256": "4999bbc282b9407cc9ae6a933f9609fbb5a475364f8285c28e1b2e8d3f8e5106"
+    },
+    {
+      "path": "click-ledger.jsonl",
+      "bytes": 1890,
+      "sha256": "89a0870a21cd609dc1baf9d2cacc86766668e31c33621d053eb560d9fcacd56c"
+    },
+    {
+      "path": "coordinate.json",
+      "bytes": 1176,
+      "sha256": "8f65108663ef9249e614999c55cba1d5660e1d5fd1b07dd4fefdd4877afced15"
+    },
+    {
+      "path": "corpus-census.json",
+      "bytes": 3077,
+      "sha256": "45578ac372aae878acb152a912d29844a271ec744c7905b448504ea9a37b65b4"
+    },
+    {
+      "path": "current-rubric.json",
+      "bytes": 3032,
+      "sha256": "7daf7729c29288a141bdc52fdc5720b10a25e226c3023203933ec2d902493bc4"
+    },
+    {
+      "path": "deployment-receipt.json",
+      "bytes": 3602,
+      "sha256": "a7df9c94572b144685ad5a9bc6a39b46cfdc6108ec724557778888ef34f20318"
+    },
+    {
+      "path": "DONE_LADDER.md",
+      "bytes": 1309,
+      "sha256": "c0991b44a90ff026aa86ceda96fd9fcf8be9c2ffd27cc8990642e259921900bd"
+    },
+    {
+      "path": "FINAL_STATUS.json",
+      "bytes": 484,
+      "sha256": "2ce8acf20251dea288dcf67c45fa81d1180cbc43e19524c518ec210dd01bd402"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1627,
+      "sha256": "0ecaac8b9ec415b61bb1b753071a69fcf4ca4d8c60bcf9dfb1b19411191bfd6d"
+    },
+    {
+      "path": "RUN_STATE.md",
+      "bytes": 1931,
+      "sha256": "9db4c2ac6376d1c47ee1160d92baf3a7b7189d073fbea03b93a28463c3a4dbfc"
+    },
+    {
+      "path": "screenshot-index.json",
+      "bytes": 542,
+      "sha256": "7ab9fc7b34f818309b2403fec5a54c49ae4ebea766bfee89eb959f1972250d4b"
+    },
+    {
+      "path": "TEST_PLAN.md",
+      "bytes": 1154,
+      "sha256": "bd357b3a5c07aad0f169e357ff1e069bd7e3c2b90b6ebee449c64707c04e2586"
+    }
+  ]
+}

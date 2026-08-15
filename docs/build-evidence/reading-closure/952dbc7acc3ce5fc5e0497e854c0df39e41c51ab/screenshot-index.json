@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "candidate": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+  "status": "NOT_RUN",
+  "screenshots": [],
+  "requiredViewports": ["320x568", "390x844", "430x932", "tablet", "desktop"],
+  "reason": "The cloud browser failed during recovery twice and no usable local browser binary was available. Existing repository screenshots predate this candidate and are reference imagery, not exact-SHA evidence.",
+  "operatorRule": "Do not infer rendered behavior from source, historical screenshots, or cache-busted HTTP bytes."
+}
