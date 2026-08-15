@@ -4,7 +4,7 @@
   "tree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
   "selfExcluded": "evidence-manifest.json",
   "fileCount": 17,
-  "totalBytes": 423241,
+  "totalBytes": 425013,
   "files": [
     {
       "path": "artifact-manifest.json",
@@ -28,8 +28,8 @@
     },
     {
       "path": "control-census.json",
-      "bytes": 59587,
-      "sha256": "aa42a06b7fb2d756ca8c2306e2544bed0522db3906526d0b724916d6f02e174f"
+      "bytes": 61359,
+      "sha256": "122fc32594d790aaae9f0ad444a287078267fdbddeca5ee6ed6ff7709b5ace8c"
     },
     {
       "path": "coordinate.json",
