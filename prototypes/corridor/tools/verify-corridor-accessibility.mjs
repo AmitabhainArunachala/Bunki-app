@@ -324,7 +324,10 @@ async function main() {
       particleTap.sheet === 0 && !particleTap.reveal,
       JSON.stringify(particleTap),
     );
-    await particle.focus();
+    // a fresh particle: focus arriving within a beat of the SAME token's own
+    // tap is treated as the press and suppresses the pill (review P2 fix) —
+    // a switch/AT user does not press the token they are navigating to
+    await page.locator('#reader .tok.particle').nth(1).focus();
     const particleDoor = page.locator(
       '.token-actions:not([hidden]) [data-action="entry.open"][data-target-kind="particle"]',
     );

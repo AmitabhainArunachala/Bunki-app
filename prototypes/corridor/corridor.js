@@ -2893,6 +2893,12 @@ document.addEventListener(
 
 function showMini(span, token, onEntry, { focusEntry = false } = {}) {
   removeMini();
+  // the mini owns the moment: any lingering token-actions pill from an
+  // earlier focus would double 全項目 beside it
+  for (const pill of document.querySelectorAll('.token-actions:not([hidden])')) {
+    pill.hidden = true;
+    pill.remove();
+  }
   const g = lookup(token.b);
   const mini = el('div', null);
   mini.id = 'mini';
@@ -2981,13 +2987,17 @@ function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry 
       }
     }, 0);
   };
+  // focus caused by PRESSING THIS TOKEN follows its own pointerdown within
+  // a beat (touch focuses after release; a long-press after ~750ms). That
+  // focus is the press — showing the pill there popped it over the next
+  // prose line after every tap, doubled 全項目 beside the long-press mini,
+  // and put a button under the lifting finger (P2 ×2, review). Keyboard,
+  // switch, and screen-reader focus arrives with no press on this token
+  // (AT cursor flicks target the screen, not the span) and keeps the pill.
+  let ownPressAt = 0;
+  wrapper.addEventListener('pointerdown', () => (ownPressAt = Date.now()), true);
   span.addEventListener('focus', () => {
-    // KEYBOARD-ONLY: pointer users already hold the tap ladder and the
-    // long-press mini. Pointer focus also raised this pill — popping over
-    // the next line after every ordinary tap, doubling 全項目 beside the
-    // mini on long-press, and spawning under the lifting finger where it
-    // could swallow the release (P2 ×2, full-instrument review).
-    if (span.matches(':focus-visible')) show();
+    if (Date.now() - ownPressAt > 900 && !document.getElementById('mini')) show();
   });
   wrapper.addEventListener('focusout', hideAfterFocusLeaves);
 }
