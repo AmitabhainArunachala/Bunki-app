@@ -65,9 +65,9 @@ function easeFor(type) {
 
 /** The hand — iro's makeWriter with the glyph as a parameter. */
 export function makeWriterFor(strokes) {
-  let i = -1, t0 = 0, prevT = 0, settleUntil = 0, after = 0, done = true;
+  let i = -1, t0 = 0, prevT = 0, settleUntil = 0, after = 0, begun = false, done = true;
   return {
-    start(now) { i = 0; t0 = now + 600; prevT = 0; settleUntil = 0; after = 0; done = false; },
+    start(now) { i = 0; t0 = now + 600; prevT = 0; settleUntil = 0; after = 0; begun = false; done = false; },
     get done() { return done; },
     advance(now) {
       const out = { splats: [], beginStroke: null, finished: false };
@@ -75,6 +75,9 @@ export function makeWriterFor(strokes) {
       const s = strokes[i];
       const raw = (now - t0) / s.dur;
       if (raw >= 0 && prevT < 1) {
+        // Announce the stroke with its first real ink sample, never during
+        // the anticipatory pause. The number overlay shares this exact tick.
+        if (!begun) { begun = true; out.beginStroke = i; }
         // a slow frame must slow the hand, never tear the stroke: cap the
         // advance so one frame's splats always fit the engine's buffer
         const tCap = prevT + (115 * 5) / s.L;
@@ -101,7 +104,7 @@ export function makeWriterFor(strokes) {
         if (t >= 1) settleUntil = now + (s.type === 'stop' ? 460 : 260);
       }
       if (prevT >= 1 && now >= settleUntil) {
-        if (i + 1 < strokes.length) { i += 1; prevT = 0; t0 = now + 120; out.beginStroke = i; }
+        if (i + 1 < strokes.length) { i += 1; prevT = 0; begun = false; t0 = now + 120; }
         else if (!after) after = now + 4200;
       }
       if (after && now >= after) { done = true; out.finished = true; }
@@ -784,7 +787,6 @@ function startGPU(canvas, spec, device) {
       writer.start(t0);
       writing = true;
       spec.onPhase && spec.onPhase('writing');
-      spec.onStroke && spec.onStroke(0);
     } catch (e) { console.error('ink gpu begin failed:', e); dead = true; }
   }
   function uploadSprite(ix) {
@@ -998,7 +1000,6 @@ function startGL2(canvas, spec) {
     writer.start(t0);
     writing = true;
     spec.onPhase && spec.onPhase('writing');
-    spec.onStroke && spec.onStroke(0);
   }
   function uploadSprite(ix) {
     gl.bindTexture(gl.TEXTURE_2D, spriteT);

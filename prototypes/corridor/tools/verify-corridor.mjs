@@ -165,9 +165,20 @@ const MEASURE_FN = `(() => {
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
   const parse = (s) => {
-    const m = s.match(/rgba?\\(([^)]+)\\)/); if (!m) return null;
-    const p = m[1].split(/[\\s,/]+/).filter(Boolean).map(Number);
-    return { rgb: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+    const rgb = s.match(/rgba?\\(([^)]+)\\)/);
+    if (rgb) {
+      const p = rgb[1].split(/[\\s,/]+/).filter(Boolean).map(Number);
+      return { rgb: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+    }
+    // Chromium serializes computed color-mix(in srgb, ...) values as
+    // color(srgb r g b / a), with unit-interval channels. Variant C now
+    // derives its quiet ink from each world's --ink, so rejecting that
+    // standards-form serialization turns a real rendered contrast into null.
+    const srgb = s.match(/^color\\(srgb\\s+([^)]+)\\)$/i);
+    if (!srgb) return null;
+    const p = srgb[1].split(/[\\s/]+/).filter(Boolean).map(Number);
+    if (p.length < 3 || p.some((v) => !Number.isFinite(v))) return null;
+    return { rgb: p.slice(0, 3).map((v) => v * 255), a: p.length > 3 ? p[3] : 1 };
   };
   const bodyBg = parse(getComputedStyle(document.body).backgroundColor) || { rgb: [252,251,246], a: 1 };
   // measure against the surface the text actually sits on — since S3 the

@@ -5,6 +5,26 @@ seeded encounter → durable thread → bounded AI candidate explanation → exp
 promotion → one retrieval contract → one contextual reuse → scored probe →
 finite session → inspect and export the evidence.
 
+## Current integrated prototype — 2026-08-15
+
+The active KAIRO/Corridor integration lives on
+[`agent/bunki-integrated-prototype-2026-08-15`](https://github.com/AmitabhainArunachala/Bunki-app/tree/agent/bunki-integrated-prototype-2026-08-15),
+based directly on the current PR #71 head. Start with the
+[current product constitution](docs/operator/BUNKI_CURRENT_PRODUCT_CONSTITUTION_2026-08-15.md);
+it is the dated front door to the frozen product laws, current visual rulings,
+ten public worlds, and the quiet writing-room contract.
+
+- [Open the current integrated prototype](https://bunki-integrated-prototype.simandharswami1111.chatgpt.site)
+
+Sites v5 is preserved without modification on
+[`sites/v5-import`](https://github.com/AmitabhainArunachala/Bunki-app/tree/sites/v5-import)
+at `a3de88251d7ea0acde086b190bdd8f3afda46b94`. It is a donor, not an alternate
+authority. The exact port boundary and remote-agent handoff are recorded in
+[`SITES_V5_CLAUDE_HANDOFF_2026-08-15.md`](docs/handoffs/SITES_V5_CLAUDE_HANDOFF_2026-08-15.md).
+
+The older Sites v11 material below remains useful implementation history, but
+it is not the current visual or interaction baseline.
+
 **LICENSE: pending operator decision** (OD-09). The repository is private. Until
 the operator chooses, no dependency or data may constrain that choice beyond the
 share-alike seed data confined to `packages/seed/`.

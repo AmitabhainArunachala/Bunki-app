@@ -422,7 +422,8 @@ async function main() {
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
-    // Quiet-label contrast across ALL EIGHT 八彩 worlds. The WCAG contrast
+    // Quiet-label contrast across the exact ten public worlds and the retained
+    // legacy-only 殻 world. The WCAG contrast
     // variant once pinned light-world ink values that sank every label into
     // the 夜 ground at ~1.2:1 (operator's phone, 2026-08-11) — this walk
     // measures the real composited colors so no world can regress silently.
@@ -432,7 +433,19 @@ async function main() {
     // the WCAG relative-luminance scale — so the ratios measured here keep
     // describing what the eye actually meets.
     const themePage = await context.newPage();
-    const WORLDS = ['hokusai', 'sumi', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'kaku'];
+    const WORLDS = [
+      'sumi',
+      'shu',
+      'iwa',
+      'rokusho',
+      'yoru',
+      'hokusai',
+      'akafuji',
+      'nami',
+      'keyblock',
+      'hakuu',
+      'kaku',
+    ];
     for (const theme of WORLDS) {
       await openReader(themePage, base);
       await themePage.evaluate(`localStorage.setItem('kairo-theme', '${theme}')`);
@@ -444,7 +457,18 @@ async function main() {
           const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
           return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
         };
-        const parse = (s) => s.match(/[\\d.]+/g).map(Number);
+        // Chromium preserves color-mix() results as color(srgb 0..1 / a),
+        // while legacy rgb()/rgba() computed values use 0..255 channels.
+        // Normalize both serializations before doing WCAG luminance math;
+        // treating color(srgb) fractions as 8-bit values produced false
+        // failures in every dark world even though the rendered ink is AA.
+        const parse = (s) => {
+          const values = s.match(/-?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[-+]?\\d+)?/gi)?.map(Number) ?? [];
+          if (values.length < 3) throw new Error('Unsupported computed color: ' + s);
+          const scale = /^color\\(\\s*srgb(?:\\s|\\/)/i.test(s) ? 255 : 1;
+          const channel = (value) => Math.max(0, Math.min(255, value * scale));
+          return [channel(values[0]), channel(values[1]), channel(values[2]), values[3] ?? 1];
+        };
         const composite = (fg, bg) => {
           const c = parse(fg); const a = c.length === 4 ? c[3] : 1; const b = parse(bg);
           return [0, 1, 2].map((i) => c[i] * a + b[i] * (1 - a));

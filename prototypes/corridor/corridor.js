@@ -526,6 +526,12 @@ const S = {
    * Off by default — the room opens on the clean finished sheet (the
    * design's law); 筆順の番号 is one tap away. */
   strokeNumbers: false,
+  /** 書の間 is quiet by default: the page and all chrome recede until the
+   * learner wakes the single purpose-built control field. `?minimal=0`
+   * remains an internal comparison route for the historical framed room. */
+  strokeMinimal: true,
+  strokeChromeAwake: false,
+  strokePaletteFocus: null,
   /** Sheet scrollTop to put back on the next render (returning from 筆順). */
   sheetScrollRestore: null,
   /** Element id inside the sheet that should take focus on the next render. */
@@ -1360,6 +1366,20 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
+  // A reload cannot reconstruct the entry sheet until data has booted. Remove
+  // a stale same-document room sentinel now so Back never lands on an inert
+  // history stop; ordinary Forward navigation is handled live by popstate.
+  try {
+    if (history.state?.bunkiStrokeRoom) {
+      const normalized = { ...history.state };
+      delete normalized.bunkiStrokeRoom;
+      history.replaceState(normalized, '', location.href);
+    }
+  } catch {
+    /* history may be unavailable in a constrained embedded preview */
+  }
+  S.strokeMinimal = params.get('minimal') !== '0';
+  S.strokeChromeAwake = !S.strokeMinimal;
   let anyVariantParam = params.get('variants') === '1';
   for (const key of Object.keys(VARIANTS)) {
     const v = params.get(key);
@@ -1836,22 +1856,51 @@ function dismissSheet() {
 }
 
 /* ------------------------------------------------ 筆順 · the stroke page */
+let strokeHistorySerial = 0;
+
 /** Open the dedicated full-screen stroke-order page over the kanji sheet.
  * The sheet stays exactly where it was: its scrollTop rides along in the
  * layer's own state and is put back, unchanged, when the page closes. */
-function openStrokePage(id, { invoker = null } = {}) {
+function openStrokePage(id, { invoker = null, historyEntry = null } = {}) {
   const sheet = $('.sheet');
+  S.strokeChromeAwake = !S.strokeMinimal;
+  const sheetScroll = historyEntry?.sheetScroll ?? (sheet ? sheet.scrollTop : 0);
+  const invokerKeyValue = historyEntry?.invoker ?? invoker?.id ?? null;
+  let historyToken = historyEntry?.token ?? null;
+  if (S.strokeMinimal && !historyEntry) {
+    try {
+      historyToken = `bunki-stroke-${Date.now().toString(36)}-${++strokeHistorySerial}`;
+      const previous = history.state && typeof history.state === 'object' ? history.state : {};
+      history.pushState(
+        {
+          ...previous,
+          bunkiStrokeRoom: {
+            token: historyToken,
+            id,
+            sheetScroll,
+            invoker: invokerKeyValue,
+          },
+        },
+        '',
+        location.href,
+      );
+    } catch {
+      historyToken = null;
+    }
+  }
   S.strokes = {
     id,
     step: 0,
-    sheetScroll: sheet ? sheet.scrollTop : 0,
-    invoker: invoker?.id || null,
+    sheetScroll,
+    invoker: invokerKeyValue,
+    historyToken,
+    closing: false,
   };
   render();
 }
 
-/** Close it and hand the sheet back untouched — same scroll, same focus. */
-function closeStrokePage() {
+/** Finish closing and hand the sheet back untouched — same scroll, same focus. */
+function finalizeStrokePageClose() {
   if (!S.strokes) return;
   const { sheetScroll, invoker } = S.strokes;
   cancelStrokeAnimation();
@@ -1861,6 +1910,35 @@ function closeStrokePage() {
   S.sheetFocus = invoker;
   render();
 }
+
+/** Request a close. Quiet mode consumes its same-URL history sentinel so the
+ * platform Back gesture and the app's Escape path are the same operation. */
+function closeStrokePage({ fromHistory = false } = {}) {
+  if (!S.strokes) return;
+  const marker = history.state?.bunkiStrokeRoom;
+  const ownsHistory =
+    !!S.strokes.historyToken && marker?.token === S.strokes.historyToken;
+  if (!fromHistory && ownsHistory) {
+    if (!S.strokes.closing) {
+      S.strokes.closing = true;
+      history.back();
+    }
+    return;
+  }
+  finalizeStrokePageClose();
+}
+
+// iPhone Back and the edge-swipe are the quiet room's invisible exit. They
+// restore the existing entry sheet instead of leaving the SPA; Escape remains
+// the keyboard equivalent and no extra visible control is introduced.
+addEventListener('popstate', () => {
+  if (S.strokes?.historyToken) {
+    closeStrokePage({ fromHistory: true });
+    return;
+  }
+  const marker = history.state?.bunkiStrokeRoom;
+  if (marker?.token && marker?.id) openStrokePage(marker.id, { historyEntry: marker });
+});
 
 function openPassage(id) {
   keepScroll();
@@ -8102,6 +8180,26 @@ function strokeDoor(k) {
   return door;
 }
 
+/** One clock for the numbered overlay. The page remembers how many strokes
+ * have actually begun even while numbers are switched off, so waking the
+ * option never invents a future marker. */
+function syncStrokeNumbers(page, shown = Number(page.dataset.strokeShown || 0)) {
+  const markerRoot = inkRoom?.page === page && inkRoom?.lift ? inkRoom.lift : page;
+  const markers = [...markerRoot.querySelectorAll('.stroke-num')];
+  const current = Math.max(0, Math.min(markers.length, Math.floor(Number(shown) || 0)));
+  page.dataset.strokeShown = String(current);
+  const enabled = page.dataset.numbers === 'on';
+  markers.forEach((marker, i) => {
+    marker.style.opacity = enabled && i < current ? '0.92' : '0';
+  });
+  const status = page.querySelector('#stroke-live-status');
+  if (status)
+    status.textContent = tx(
+      `${current} / ${markers.length} 画`,
+      `stroke ${current} of ${markers.length}`,
+    );
+}
+
 /** Put the page into a definite state: `shown` strokes complete, the last of
  * them `progress` of the way drawn. Called by the animation every frame and
  * by the step-through control once per press. */
@@ -8117,8 +8215,13 @@ function paintStrokes(page, shown, progress = 1) {
     path.style.strokeDashoffset = String(offset);
     if (bleeds[i]) bleeds[i].style.strokeDashoffset = String(offset);
   });
-  for (const [i, num] of [...page.querySelectorAll('.stroke-num')].entries()) {
-    num.style.opacity = i < shown ? '1' : '0';
+  // Once living ink owns the stage, its first-splat callback owns the number
+  // clock too. The hidden SVG rAF must never race ahead of the real brush.
+  if (page.dataset.living !== 'on') {
+    // At progress zero the pending SVG stroke is still fully dash-hidden.
+    // Keep its number hidden for that frame too; both become visible on the
+    // first positive drawing sample, matching the living-ink first-splat law.
+    syncStrokeNumbers(page, progress > 0 ? shown : shown - 1);
   }
   const counter = page.querySelector('#stroke-count');
   if (counter) {
@@ -8208,6 +8311,115 @@ function strokeControl(id, ja, en) {
   return btn;
 }
 
+/** KANJIDIC writes okurigana after a dot (なが.い). Keep that boundary
+ * visible without making a screen reader pronounce the punctuation. */
+function displayKunReading(reading) {
+  const value = String(reading || '');
+  const dot = value.indexOf('.');
+  return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
+}
+
+function strokeReadingRow(ja, en, values, kind = 'on') {
+  const row = el('div', 'stroke-reading-row');
+  const label = el('span', 'stroke-reading-label', ja);
+  label.append(el('span', 'en-sub', en));
+  const raw = values?.length ? values : [];
+  const value = el(
+    'span',
+    'stroke-reading-value',
+    raw.length
+      ? raw.map((item) => (kind === 'kun' ? displayKunReading(item) : item)).join('・')
+      : '—',
+  );
+  value.lang = 'ja';
+  if (kind === 'kun' && raw.length) {
+    value.setAttribute('aria-label', raw.map((item) => item.replaceAll('.', '')).join('、'));
+  }
+  row.append(label, value);
+  return row;
+}
+
+/** The quiet room has one learning option. Enabling it starts a fresh write,
+ * guaranteeing that marker n rises with stroke n rather than appearing over
+ * an already-finished character. */
+function strokeNumbersControl(page, reduced) {
+  const numbers = strokeControl('stroke-numbers', '筆順の番号', 'stroke order numbers');
+  numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+  numbers.addEventListener('click', () => {
+    S.strokeNumbers = !S.strokeNumbers;
+    numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
+    page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+    if (!S.strokeNumbers) {
+      syncStrokeNumbers(page);
+      return;
+    }
+
+    syncStrokeNumbers(page, 0);
+    if (reduced) {
+      const total = page.querySelectorAll('.stroke-num').length;
+      S.strokes.step = total;
+      paintStrokes(page, total, 1);
+    } else if (page.dataset.living === 'on' && inkRoom?.handle) {
+      inkRoom.handle.rewrite(strokeRewriteOptions());
+    } else {
+      startStrokeAnimation(page);
+    }
+  });
+  return numbers;
+}
+
+/** Minimal mode is an allowlist, not legacy chrome made transparent. */
+function strokeAwakeField(page, k, reduced, hasStrokeData = true) {
+  const field = el('section', 'stroke-awake-field');
+  field.id = 'stroke-awake-field';
+  field.dataset.strokeChrome = '';
+  field.setAttribute('aria-label', tx('書の間の操作', 'writing-room controls'));
+
+  const palettes = el('div', 'stroke-palette-field');
+  palettes.setAttribute('role', 'group');
+  palettes.setAttribute('aria-label', tx('すべての色彩', 'all color palettes'));
+  for (const id of PUBLIC_THEME_IDS) {
+    const t = THEME_UI.find((world) => world.id === id);
+    if (!t) continue;
+    const choice = el('button', 'stroke-palette-choice');
+    choice.type = 'button';
+    choice.dataset.world = t.id;
+    choice.title = t.name;
+    choice.setAttribute('aria-label', t.name);
+    choice.setAttribute('aria-pressed', String(t.id === themeId()));
+    choice.style.setProperty('--palette-ground', t.g);
+    choice.style.setProperty('--palette-ink', t.ink);
+    choice.style.setProperty('--palette-red', t.red);
+    choice.append(
+      el('span', 'stroke-palette-seal', t.seal),
+      el('span', 'stroke-palette-name', t.name),
+    );
+    choice.addEventListener('click', () => {
+      S.sealWake = true;
+      S.strokePaletteFocus = t.id;
+      setKairoTheme(t.id);
+      render();
+    });
+    palettes.append(choice);
+  }
+
+  const readings = el('div', 'stroke-reading-field');
+  readings.setAttribute('role', 'group');
+  readings.setAttribute('aria-label', tx('読み', 'readings'));
+  readings.append(
+    strokeReadingRow('音読み', 'on', k?.on, 'on'),
+    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun'),
+  );
+
+  field.append(palettes, readings);
+  if (hasStrokeData) {
+    const numbers = strokeNumbersControl(page, reduced);
+    numbers.classList.add('stroke-number-choice');
+    field.append(numbers);
+  }
+  return field;
+}
+
 /** The honest room: a character we can show but whose order we do not know. */
 function strokeMissing(page, id, k) {
   const box = el('div', 'stroke-missing');
@@ -8233,28 +8445,124 @@ function strokeMissing(page, id, k) {
 /* ------------------------------------------------- 書の間 · the living ink
  * The stroke page's hero: the kanji WRITTEN in real fluid ink by the same
  * D2Q9 lattice engine that made the design renders (corridor-ink.js — the
- * canonical home of the physics). The ink follows the world (HASSAI): each
- * of the eight worlds carries its own pigment; the sheet's paper is grown
+ * canonical home of the physics). The ink follows the public ten-world
+ * canon; the historical 殻 pigment remains loadable for saved state.
+ * The sheet's paper is grown
  * by the same painters as the app ground. The engine mounts when the page
  * opens and stops when it leaves; reduced motion gets a hand-painted still;
  * no GPU at all keeps the SVG diagram alone. */
 const INK_WORLDS = {
   // 藍 ベロ藍 — Prussian blue, TUNED against ink-hoku-berlin.png (mean Δ ≤ 6/255)
-  hokusai: { pal: { mode: 0, low: [0.33, 0.43, 0.6], high: [0.08, 0.17, 0.35], sheen: [0.05, 0.06, 0.08] }, wetScale: 1.0 },
+  hokusai: {
+    pal: { mode: 0, low: [0.33, 0.43, 0.6], high: [0.08, 0.17, 0.35], sheen: [0.05, 0.06, 0.08] },
+    wetScale: 1.0,
+    still: '#1f3766',
+  },
   // 墨 — the canon, stroke-art-v5's exact numbers
-  sumi: { pal: { mode: 0, low: [0.512, 0.448, 0.352], high: [0.16, 0.16, 0.24], sheen: [0.05, 0.055, 0.06] }, wetScale: 1.0 },
+  sumi: {
+    pal: {
+      mode: 0,
+      low: [0.512, 0.448, 0.352],
+      high: [0.16, 0.16, 0.24],
+      sheen: [0.05, 0.055, 0.06],
+    },
+    wetScale: 1.0,
+    still: '#1c1913',
+  },
+  // 朱 — shrine vermilion, verbatim from stroke-art-iro
+  shu: {
+    pal: { mode: 0, low: [0.95, 0.52, 0.38], high: [0.62, 0.14, 0.1], sheen: [0.06, 0.05, 0.05] },
+    wetScale: 1.0,
+    still: '#a8281e',
+  },
   // 赤 赤富士の錆 — rust, TUNED against ink-hoku-akafuji.png (mean Δ ≤ 4/255)
-  akafuji: { pal: { mode: 0, low: [0.76, 0.44, 0.3], high: [0.55, 0.18, 0.09], sheen: [0.055, 0.05, 0.045] }, wetScale: 1.0 },
+  akafuji: {
+    pal: { mode: 0, low: [0.76, 0.44, 0.3], high: [0.55, 0.18, 0.09], sheen: [0.055, 0.05, 0.045] },
+    wetScale: 1.0,
+    still: '#8c351f',
+  },
   // 柿 焦茶 — the iro card verbatim
-  iwa: { pal: { mode: 0, low: [0.7, 0.52, 0.38], high: [0.3, 0.16, 0.08], sheen: [0.05, 0.045, 0.04] }, wetScale: 1.0 },
+  iwa: {
+    pal: { mode: 0, low: [0.7, 0.52, 0.38], high: [0.3, 0.16, 0.08], sheen: [0.05, 0.045, 0.04] },
+    wetScale: 1.0,
+    still: '#3e2410',
+  },
   // 漆 胡粉 — the iro card verbatim (additive shell-white)
-  rokusho: { pal: { mode: 1, low: [0.3, 0.28, 0.25], high: [0.94, 0.91, 0.85], sheen: [0.14, 0.13, 0.12], spark: [1.0, 0.98, 0.92], metal: 0.25 }, wetScale: 0.9 },
+  rokusho: {
+    pal: {
+      mode: 1,
+      low: [0.3, 0.28, 0.25],
+      high: [0.94, 0.91, 0.85],
+      sheen: [0.14, 0.13, 0.12],
+      spark: [1.0, 0.98, 0.92],
+      metal: 0.25,
+    },
+    wetScale: 0.9,
+    still: '#efe9dc',
+  },
   // 金 金泥 — the canon, kept no matter what
-  yoru: { pal: { mode: 1, low: [0.42, 0.3, 0.1], high: [1.0, 0.83, 0.45], sheen: [0.1, 0.12, 0.2], spark: [1.0, 0.9, 0.6], metal: 1 }, wetScale: 0.85 },
+  yoru: {
+    pal: {
+      mode: 1,
+      low: [0.42, 0.3, 0.1],
+      high: [1.0, 0.83, 0.45],
+      sheen: [0.1, 0.12, 0.2],
+      spark: [1.0, 0.9, 0.6],
+      metal: 1,
+    },
+    wetScale: 0.85,
+    still: '#d9b25f',
+  },
   // 浪 波の泡 — spindrift, TUNED against ink-hoku-nami.png (light end exact)
-  nami: { pal: { mode: 1, low: [0.5, 0.58, 0.66], high: [0.9, 0.94, 0.97], sheen: [0.1, 0.12, 0.16], spark: [0.95, 1.0, 1.0], metal: 0.35 }, wetScale: 0.9 },
+  nami: {
+    pal: {
+      mode: 1,
+      low: [0.5, 0.58, 0.66],
+      high: [0.9, 0.94, 0.97],
+      sheen: [0.1, 0.12, 0.16],
+      spark: [0.95, 1.0, 1.0],
+      metal: 0.35,
+    },
+    wetScale: 0.9,
+    still: '#eae6d8',
+  },
+  // 板 — canonical keyblock sumi on print cream
+  keyblock: {
+    pal: {
+      mode: 0,
+      low: [0.512, 0.448, 0.352],
+      high: [0.16, 0.16, 0.24],
+      sheen: [0.05, 0.055, 0.06],
+    },
+    wetScale: 1.0,
+    still: '#26221c',
+  },
+  // 雷 — canonical gold carried onto 山下白雨's storm paper
+  hakuu: {
+    pal: {
+      mode: 1,
+      low: [0.42, 0.3, 0.1],
+      high: [1.0, 0.83, 0.45],
+      sheen: [0.1, 0.12, 0.2],
+      spark: [1.0, 0.9, 0.6],
+      metal: 1,
+    },
+    wetScale: 0.85,
+    still: '#d9a93f',
+  },
   // 殻 燐光 — phosphor, TUNED against ink-cyber-ghost.png (light end exact)
-  kaku: { pal: { mode: 1, low: [0.12, 0.52, 0.42], high: [0.36, 1.0, 0.82], sheen: [0.08, 0.14, 0.12], spark: [0.6, 1.0, 0.85], metal: 0.6 }, wetScale: 0.9 },
+  kaku: {
+    pal: {
+      mode: 1,
+      low: [0.12, 0.52, 0.42],
+      high: [0.36, 1.0, 0.82],
+      sheen: [0.08, 0.14, 0.12],
+      spark: [0.6, 1.0, 0.85],
+      metal: 0.6,
+    },
+    wetScale: 0.9,
+    still: '#50f0c3',
+  },
 };
 let inkModulePromise = null;
 function ensureInkModule() {
@@ -8279,7 +8587,8 @@ async function animcjkGlyphFor(ch) {
     return null;
   }
 }
-let inkRoom = null; // { handle, canvas } — at most ONE living sheet in the app
+let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } — one sheet
+const strokeRewriteOptions = () => ({ speed: S.strokeSlow ? 0.7 : 1.1 });
 function stopInkRoom() {
   if (!inkRoom) return;
   try {
@@ -8288,8 +8597,8 @@ function stopInkRoom() {
     /* engine already gone */
   }
   try {
-    inkRoom.unsync && inkRoom.unsync();
-    inkRoom.lift && inkRoom.lift.remove();
+    if (inkRoom.unsync) inkRoom.unsync();
+    if (inkRoom.lift) inkRoom.lift.remove();
   } catch {
     /* overlay already gone */
   }
@@ -8305,7 +8614,20 @@ function inkGroundFor(world, size) {
   const g = c.getContext('2d');
   const S = size;
   const u = S / 920;
-  const r = paperRng({ cream: 13, kozo: 11, dawn: 19, kaki: 29, urushi: 41, kon: 23, sea: 31, terminal: 59 }[world.paper] || 7);
+  const r = paperRng(
+    {
+      cream: 13,
+      shell: 17,
+      kozo: 11,
+      dawn: 19,
+      kaki: 29,
+      urushi: 41,
+      kon: 23,
+      sea: 31,
+      storm: 43,
+      terminal: 59,
+    }[world.paper] || 7,
+  );
   const grad = (stops, slant) => {
     const base = g.createLinearGradient(0, 0, S * (slant ?? 0.7), S);
     stops.forEach((col, i) => base.addColorStop(i / (stops.length - 1), col));
@@ -8313,14 +8635,18 @@ function inkGroundFor(world, size) {
     g.fillRect(0, 0, S, S);
   };
   const fibers = (n, dark, light) => {
+    g.lineCap = 'round';
     for (let i = 0; i < n; i++) {
-      const x = r() * S, y = r() * S, len = (10 + r() * 70) * u;
-      const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5);
+      const x = r() * S,
+        y = r() * S,
+        len = (10 + r() * 70) * u;
+      const along = r() < 0.72;
+      const a = (along ? 0 : Math.PI / 2) + (r() - 0.5) * (along ? 0.42 : 0.72);
       g.beginPath();
       g.moveTo(x, y);
       g.quadraticCurveTo(x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 16 * u, x + Math.cos(a) * len, y + Math.sin(a) * len);
       g.strokeStyle = r() < 0.8 ? dark(r) : light(r);
-      g.lineWidth = (0.4 + r() * 0.7) * u;
+      g.lineWidth = (0.32 + r() * 0.82) * u;
       g.stroke();
     }
   };
@@ -8336,6 +8662,14 @@ function inkGroundFor(world, size) {
     grad(['#f3ecd8', '#eee5cc', '#e4d8b8'], 0.9);
     fibers(2000, (r) => `rgba(170,150,110,${0.03 + r() * 0.06})`, (r) => `rgba(252,248,232,${0.08 + r() * 0.09})`);
     vignette('rgba(85,70,42,0.15)');
+  } else if (kind === 'shell') {
+    grad(['#faf6ec', '#f4eede', '#ebe2cc'], 0.9);
+    fibers(
+      2200,
+      (r) => `rgba(180,158,116,${0.03 + r() * 0.06})`,
+      (r) => `rgba(252,246,228,${0.08 + r() * 0.09})`,
+    );
+    vignette('rgba(90,70,40,0.14)');
   } else if (kind === 'kozo') {
     grad(['#f6f0e1', '#efe7d2', '#e5d8ba'], 0.9);
     fibers(2400, (r) => `rgba(180,158,116,${0.03 + r() * 0.07})`, (r) => `rgba(252,246,228,${0.08 + r() * 0.09})`);
@@ -8407,6 +8741,31 @@ function inkGroundFor(world, size) {
       g.arc(r() * S, r() * S, (0.3 + r() * 1.0) * u, 0, 7);
       g.fill();
     }
+  } else if (kind === 'storm') {
+    grad(['#2a2117', '#1e1710', '#14100a'], 0.4);
+    for (let i = 0; i < 22; i++) {
+      const x = r() * S,
+        y = r() * S,
+        len = (30 + r() * 120) * u;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x - len * 0.25, y + len);
+      g.strokeStyle = `rgba(120,102,70,${0.02 + r() * 0.04})`;
+      g.lineWidth = (0.5 + r() * 0.9) * u;
+      g.stroke();
+    }
+    g.beginPath();
+    let lx = S * 0.12,
+      ly = S * 0.55;
+    g.moveTo(lx, ly);
+    for (let i = 0; i < 7; i++) {
+      lx += (r() - 0.3) * 60 * u;
+      ly += (18 + r() * 46) * u;
+      g.lineTo(lx, ly);
+    }
+    g.strokeStyle = 'rgba(217,169,63,0.14)';
+    g.lineWidth = 2.2 * u;
+    g.stroke();
   } else {
     grad(['#081218', '#050d12', '#03080c'], 0.3);
     g.font = `${9 * u}px monospace`;
@@ -8436,7 +8795,7 @@ function inkSpecFor(INK, strokes) {
     pal: iw.pal,
     wetScale: iw.wetScale,
     strokes,
-    still: world.ink,
+    still: iw.still || world.ink,
     ground: (r, size) => inkGroundFor(world, size),
     gpuN: 1024,
     gl2Sim: 800,
@@ -8448,7 +8807,15 @@ async function mountInkRoom(room2, ch, paths, reduced) {
   const canvas = el('canvas', 'ink-sheet');
   canvas.setAttribute('aria-hidden', 'true'); // the backends set the backing 1:1 to the lattice
   stage.prepend(canvas); // beneath the SVG overlay (numbers ride on the ink)
-  const room = (inkRoom = { handle: null, canvas });
+  const room = (inkRoom = {
+    handle: null,
+    canvas,
+    page,
+    stage,
+    lift: null,
+    syncLift: null,
+    unsync: null,
+  });
   const fillPips = (upto) => {
     if (!pips) return;
     [...pips.children].forEach((p, i) => p.classList.toggle('filled', i < upto));
@@ -8466,47 +8833,56 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       for (let i = 0; i < strokes.length; i++) pips.append(el('i', 'stroke-pip'));
     }
     if (glyph) {
-      const nums = page.querySelectorAll('.stroke-num');
-      strokes.forEach((s, i) => {
-        const n = nums[i];
-        if (!n) return;
-        n.setAttribute('x', String((s.medPts[0][0] * 109) / 1024));
-        n.setAttribute('y', String((s.medPts[0][1] * 109) / 1024));
-      });
+      // AnimCJK is the living hand's authority. A small number of glyphs have
+      // a different stroke count from KanjiVG (for example 衷: 10 vs 9), so
+      // rebuild the marker group rather than silently dropping the last
+      // number from the live sequence.
+      const nums = page.querySelector('.stroke-nums');
+      if (nums) {
+        nums.textContent = '';
+        strokes.forEach((stroke, i) => {
+          const marker = document.createElementNS(SVG_NS, 'text');
+          marker.setAttribute('class', 'stroke-num');
+          marker.setAttribute('x', String((stroke.medPts[0][0] * 109) / 1024));
+          marker.setAttribute('y', String((stroke.medPts[0][1] * 109) / 1024));
+          marker.textContent = String(i + 1);
+          nums.append(marker);
+        });
+      }
     }
     if (reduced) {
       // stillness by choice: one finished sheet, hand-painted, no engine
       INK.paintStillFor(canvas, spec);
       page.dataset.living = 'still';
+      page.dataset.inkReady = 'still';
       fillPips(strokes.length);
+      syncStrokeNumbers(page, strokes.length);
       return;
     }
     // the room opens WRITING, exactly as the design gallery did on promote:
     // wall-clock hand, one lattice pass per displayed frame, freeze at
     // finish. No hidden fast-forward — a fast-forward trades away the very
     // simulation density that makes the ink dense and detailed.
-    spec.first = { speed: S.strokeSlow ? 0.7 : 1 };
+    spec.first = strokeRewriteOptions();
     spec.freshCanvas = () => {
       const nu = room.canvas.cloneNode(false);
       room.canvas.replaceWith(nu);
       room.canvas = nu;
       return nu;
     };
-    // each number surfaces WITH its stroke (reference behavior: the numeral
-    // belongs to the moment its stroke is written, not to a finished chart);
-    // document-wide query — while the engine lives the SVG rides a body-level
-    // fixed layer, outside the page subtree
-    const revealNums = (upto) => {
-      document.querySelectorAll('.stroke-num').forEach((n, i) => n.classList.toggle('revealed', i <= upto));
-    };
     spec.onStroke = (ix) => {
-      fillPips(ix);
-      revealNums(ix);
+      const shown = Math.min(strokes.length, ix + 1);
+      fillPips(shown);
+      syncStrokeNumbers(page, shown);
     };
     spec.onPhase = (phase) => {
+      if (phase === 'writing') {
+        fillPips(0);
+        syncStrokeNumbers(page, 0);
+      }
       if (phase === 'done') {
         fillPips(strokes.length);
-        revealNums(strokes.length);
+        syncStrokeNumbers(page, strokes.length);
       }
     };
     const handle = await INK.startInk(canvas, spec);
@@ -8516,67 +8892,99 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     }
     room.handle = handle;
     handle.ondead = () => {
-      // device lost mid-write: the page keeps its SVG diagram — honest, quiet.
-      // The numbers SVG returns from the lift to the stage first: the classic
-      // diagram animation owns it again.
+      // Device loss returns the numbered SVG to the stage before classic
+      // drawing resumes. The page therefore never loses its honest fallback.
       if (inkRoom === room) {
         try {
-          room.unsync && room.unsync();
+          if (room.unsync) room.unsync();
           if (room.lift) {
-            const s = room.lift.querySelector('svg.stroke-canvas');
-            if (s) stage.append(s);
+            const liftedSvg = room.lift.querySelector('svg.stroke-canvas');
+            if (liftedSvg) stage.append(liftedSvg);
             room.lift.remove();
             room.lift = null;
+            room.syncLift = null;
           }
         } catch {
           /* overlay already gone */
         }
+        if (room.canvas?.isConnected) room.canvas.remove();
         page.dataset.living = 'off';
+        page.dataset.inkReady = 'fallback';
+        syncStrokeNumbers(page);
       }
     };
     page.dataset.living = 'on';
+    page.dataset.inkReady = handle.kind;
     page.dataset.inkKind = handle.kind;
     const tag = page.querySelector('#stroke-engine');
     if (tag) tag.textContent = handle.kind === 'gpu' ? '筆 WebGPU' : '筆 WebGL';
-    // While the engine lives, the numbers SVG leaves the stage for a BODY-level
-    // fixed layer aligned over it. A sibling overlay stacked above the live
-    // canvas can blank the canvas entirely (proven in the harness: the ink
-    // vanished under the in-stage overlay and returned the instant it hid,
-    // while the body-level world-picker floats over the same canvas without
-    // harm). The layer tracks the stage through scroll and resize.
+    // A positioned sibling over the live WebGL canvas can blank that canvas
+    // in Safari. Move only the numbered SVG to a body-level fixed layer and
+    // keep it aligned to the stage; the world picker already proves this
+    // compositor path is safe. The SVG fallback and reduced still stay put.
     const numsSvg = page.querySelector('svg.stroke-canvas');
     if (numsSvg) {
       const lift = el('div', 'stroke-nums-lift');
       lift.setAttribute('aria-hidden', 'true');
+      lift.style.setProperty(
+        '--stroke-ink',
+        getComputedStyle(page).getPropertyValue('--stroke-ink'),
+      );
       lift.append(numsSvg);
       document.body.append(lift);
       const sync = () => {
-        const r = stage.getBoundingClientRect();
-        lift.style.top = `${r.top}px`;
-        lift.style.left = `${r.left}px`;
-        lift.style.width = `${r.width}px`;
-        lift.style.height = `${r.height}px`;
+        const rect = stage.getBoundingClientRect();
+        lift.style.top = `${rect.top}px`;
+        lift.style.left = `${rect.left}px`;
+        lift.style.width = `${rect.width}px`;
+        lift.style.height = `${rect.height}px`;
       };
       sync();
       page.addEventListener('scroll', sync, { passive: true });
       window.addEventListener('resize', sync);
       room.lift = lift;
+      room.syncLift = sync;
       room.unsync = () => {
         page.removeEventListener('scroll', sync);
         window.removeEventListener('resize', sync);
       };
+      syncStrokeNumbers(page);
     }
-    // 触れて、もう一度 — touch the sheet and the hand writes again
-    stage.addEventListener('click', () => {
-      if (inkRoom === room && room.handle) room.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
-    });
   } catch (e) {
     console.warn('書の間: living ink unavailable —', e && e.message);
     if (inkRoom === room) {
       page.dataset.living = 'off';
+      page.dataset.inkReady = 'fallback';
       canvas.remove(); // no engine and no still — the SVG diagram stands alone
     }
   }
+}
+
+/** Sleep or wake the quiet room's single allowed field. Visibility alone is
+ * not enough: inert + aria-hidden remove the sleeping controls from keyboard
+ * and screen-reader navigation while the kanji stands by itself. */
+function setStrokeChrome(page, awake) {
+  S.strokeChromeAwake = !!awake;
+  page.dataset.chrome = S.strokeChromeAwake ? 'awake' : 'sleeping';
+  const trigger = page.querySelector('.stroke-chrome-trigger');
+  if (trigger) {
+    trigger.setAttribute('aria-expanded', String(S.strokeChromeAwake));
+    trigger.setAttribute(
+      'aria-label',
+      tx(
+        S.strokeChromeAwake ? '操作を隠す' : '操作を表示',
+        S.strokeChromeAwake ? 'hide controls' : 'show controls',
+      ),
+    );
+  }
+  for (const field of page.querySelectorAll('[data-stroke-chrome]')) {
+    field.inert = !S.strokeChromeAwake;
+    if (S.strokeChromeAwake) field.removeAttribute('aria-hidden');
+    else field.setAttribute('aria-hidden', 'true');
+  }
+  requestAnimationFrame(() => {
+    if (inkRoom?.page === page && inkRoom.syncLift) inkRoom.syncLift();
+  });
 }
 
 function renderStrokePage(root) {
@@ -8599,13 +9007,32 @@ function renderStrokePage(root) {
   page.dataset.strokes = String(paths.length);
   page.dataset.motion = reduced ? 'reduced' : 'full';
   page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
+  page.dataset.strokeShown = '0';
   page.dataset.state = paths.length ? 'drawing' : 'nodata';
+  page.dataset.inkReady = paths.length ? 'pending' : 'missing';
   page.dataset.ink = S.strokeInk || 'sumi';
+  page.dataset.world = themeId();
+  page.dataset.minimal = S.strokeMinimal ? 'on' : 'off';
+  page.dataset.chrome = S.strokeChromeAwake ? 'awake' : 'sleeping';
+  if (S.strokeMinimal) {
+    const exitDescription = el(
+      'p',
+      'visually-hidden',
+      tx(
+        '書の間を出るには、ブラウザまたは端末の戻る操作を使います。',
+        'Use the browser or device Back command to leave the writing room.',
+      ),
+    );
+    exitDescription.id = 'stroke-exit-description';
+    page.setAttribute('aria-describedby', exitDescription.id);
+    page.append(exitDescription);
+  }
 
   const bar = el('div', 'stroke-bar');
   const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
   backBtn.type = 'button';
   backBtn.id = 'strokes-back';
+  backBtn.dataset.strokeChrome = '';
   backBtn.dataset.action = 'navigation.back';
   backBtn.addEventListener('click', (event) => {
     interaction(
@@ -8626,13 +9053,24 @@ function renderStrokePage(root) {
   const seal = el('button', 'theme-seal stroke-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
   seal.id = 'stroke-world-seal';
+  seal.dataset.strokeChrome = '';
   seal.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
   attachWorldPicker(seal);
   bar.append(seal);
-  page.append(bar);
+  if (!S.strokeMinimal) page.append(bar);
 
   if (!paths.length) {
-    strokeMissing(page, st.id, k);
+    if (S.strokeMinimal) {
+      const body = el('div', 'stroke-body');
+      const stage = el('div', 'stroke-stage stroke-missing-stage');
+      stage.setAttribute('role', 'img');
+      stage.setAttribute('aria-label', st.id);
+      stage.append(el('span', 'stroke-missing-glyph', st.id));
+      body.append(stage, strokeAwakeField(page, k, reduced, false));
+      page.append(body);
+    } else {
+      strokeMissing(page, st.id, k);
+    }
   } else {
     const body = el('div', 'stroke-body');
     // the glyph header — 永 五画 · 水部, readings to the right, the kun stem
@@ -8643,8 +9081,6 @@ function renderStrokePage(root) {
     kleft.append(
       el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
     );
-    // COMPLETE readings, labeled 音/訓 — the truncated unlabeled pair was
-    // called out against the reference prototype (operator, 2026-08-15)
     const readings = el('span', 'stroke-readings');
     if (k?.on?.length) {
       const row = el('span', 'stroke-read-row');
@@ -8654,20 +9090,22 @@ function renderStrokePage(root) {
     if (k?.kun?.length) {
       const row = el('span', 'stroke-read-row');
       row.append(el('span', 'stroke-read-label', '訓'));
-      (k.kun || []).forEach((kn, i) => {
+      k.kun.forEach((kn, i) => {
         const [stem, oku] = kn.split('.');
         if (i) row.append(document.createTextNode('・'));
-        const one = el('span', 'stroke-kun');
-        one.append(el('span', 'stroke-kun-stem', stem));
-        if (oku) one.append(document.createTextNode(oku));
-        row.append(one);
+        const reading = el('span', 'stroke-kun');
+        reading.append(el('span', 'stroke-kun-stem', stem));
+        if (oku) reading.append(document.createTextNode(oku));
+        row.append(reading);
       });
       readings.append(row);
     }
     khead.append(kleft, readings);
-    body.append(khead);
+    if (!S.strokeMinimal) body.append(khead);
     const stage = el('div', 'stroke-stage');
     stage.id = 'ink-stage';
+    stage.setAttribute('role', 'img');
+    stage.setAttribute('aria-label', tx(`${st.id} の筆順`, `${st.id} stroke order`));
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', STROKE_VIEWBOX);
     svg.setAttribute('class', 'stroke-canvas');
@@ -8742,16 +9180,30 @@ function renderStrokePage(root) {
     const pips = el('div', 'stroke-pips');
     pips.setAttribute('aria-hidden', 'true');
     for (let i = 0; i < paths.length; i++) pips.append(el('i', 'stroke-pip'));
-    body.append(pips);
+    if (!S.strokeMinimal) body.append(pips);
 
     const hint = el('p', 'stroke-hint', '触れて、もう一度 — 二度と同じ書にならない');
     if (bi()) hint.append(el('span', 'en-sub', 'touch — it writes again, never the same twice'));
-    body.append(hint);
+    if (!S.strokeMinimal) body.append(hint);
 
     // the living sheet mounts beneath the SVG overlay; the page's data-living
     // attribute decides which layers show (the ink, or the classic diagram)
     page.dataset.living = 'off';
     mountInkRoom({ page, stage, pips }, st.id, paths, reduced);
+    // 触れて、もう一度 — live and honest SVG fallback share the same silent
+    // touch-to-rewrite gesture. Reduced motion remains a finished still.
+    stage.addEventListener('click', () => {
+      if (reduced) return;
+      if (page.dataset.living === 'on' && inkRoom?.page === page && inkRoom.handle)
+        inkRoom.handle.rewrite(strokeRewriteOptions());
+      else startStrokeAnimation(page);
+    });
+
+    const liveStatus = el('span', 'visually-hidden');
+    liveStatus.id = 'stroke-live-status';
+    liveStatus.setAttribute('role', 'status');
+    liveStatus.setAttribute('aria-live', 'polite');
+    body.append(liveStatus);
 
     const readout = el('div', 'stroke-readout');
     const counter = el('span', 'stroke-count', `0 / ${paths.length}`);
@@ -8764,117 +9216,143 @@ function renderStrokePage(root) {
     }
     readout.append(counter);
     readout.append(el('span', 'stroke-count-unit', tx('画', 'strokes')));
-    body.append(readout);
+    if (!S.strokeMinimal) body.append(readout);
 
-    const controls = el('div', 'stroke-controls');
-    if (reduced) {
-      const prev = strokeControl('stroke-prev', '← 前の画', 'previous stroke');
-      prev.addEventListener('click', () => {
-        S.strokes.step = Math.max(1, S.strokes.step - 1);
-        paintStrokes(page, S.strokes.step, 1);
-      });
-      const next = strokeControl('stroke-next', '次の画 →', 'next stroke');
-      next.addEventListener('click', () => {
-        S.strokes.step = Math.min(paths.length, S.strokes.step + 1);
-        paintStrokes(page, S.strokes.step, 1);
-      });
-      controls.append(prev, next);
+    if (S.strokeMinimal) {
+      body.append(strokeAwakeField(page, k, reduced));
     } else {
-      const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
-      replay.classList.add('primary');
-      replay.addEventListener('click', () => {
-        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
-        else startStrokeAnimation(page);
-      });
-      controls.append(replay);
-      // ゆっくり — the next writing goes at a learner's pace
-      const slow = strokeControl('stroke-slow', 'ゆっくり', 'slowly');
-      slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
-      slow.addEventListener('click', () => {
-        S.strokeSlow = !S.strokeSlow;
+      const controls = el('div', 'stroke-controls');
+      if (reduced) {
+        const prev = strokeControl('stroke-prev', '← 前の画', 'previous stroke');
+        prev.addEventListener('click', () => {
+          S.strokes.step = Math.max(1, S.strokes.step - 1);
+          paintStrokes(page, S.strokes.step, 1);
+        });
+        const next = strokeControl('stroke-next', '次の画 →', 'next stroke');
+        next.addEventListener('click', () => {
+          S.strokes.step = Math.min(paths.length, S.strokes.step + 1);
+          paintStrokes(page, S.strokes.step, 1);
+        });
+        controls.append(prev, next);
+      } else {
+        const replay = strokeControl('stroke-replay', 'もう一度', 'replay');
+        replay.classList.add('primary');
+        replay.addEventListener('click', () => {
+          if (page.dataset.living === 'on' && inkRoom?.handle)
+            inkRoom.handle.rewrite(strokeRewriteOptions());
+          else startStrokeAnimation(page);
+        });
+        controls.append(replay);
+        // ゆっくり — the next writing goes at a learner's pace
+        const slow = strokeControl('stroke-slow', 'ゆっくり', 'slowly');
         slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
-        if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite({ speed: S.strokeSlow ? 0.7 : 1 });
+        slow.addEventListener('click', () => {
+          S.strokeSlow = !S.strokeSlow;
+          slow.setAttribute('aria-pressed', String(!!S.strokeSlow));
+          if (page.dataset.living === 'on' && inkRoom?.handle)
+            inkRoom.handle.rewrite(strokeRewriteOptions());
+        });
+        controls.append(slow);
+      }
+
+      // 顔料 — four inks. A quiet row of pigment dots; the page holds the choice.
+      const inks = el('div', 'stroke-inks');
+      inks.setAttribute('role', 'group');
+      inks.setAttribute('aria-label', tx('墨の色', 'ink color'));
+      for (const [id, name] of [
+        ['sumi', '墨'],
+        ['bengara', '弁柄'],
+        ['ai', '藍'],
+        ['rokusho', '緑青'],
+      ]) {
+        const dot = el('button', 'ink-dot');
+        dot.type = 'button';
+        dot.dataset.ink = id;
+        dot.setAttribute('aria-label', name);
+        dot.setAttribute('aria-pressed', String((S.strokeInk || 'sumi') === id));
+        dot.addEventListener('click', () => {
+          S.strokeInk = id;
+          page.dataset.ink = id;
+          for (const d of inks.querySelectorAll('.ink-dot'))
+            d.setAttribute('aria-pressed', String(d.dataset.ink === id));
+        });
+        inks.append(dot);
+      }
+      body.append(inks);
+
+      controls.append(strokeNumbersControl(page, reduced));
+      body.append(controls);
+
+      const meta = el('p', 'stroke-meta');
+      // 漢検 · JLPT · 画数 are doors here too: each opens the exhaustive list of
+      // every kanji in that group. The stroke page is not a sheet, so close it
+      // first, then open the catalog over the kanji entry it came from.
+      const metaLink = (label, by, value) => {
+        const b = el('button', 'stroke-meta-link', label);
+        b.type = 'button';
+        b.addEventListener('click', () => {
+          closeStrokePage();
+          go({ t: 'catalog', id: `${by}:${value}`, by, value });
+        });
+        return b;
+      };
+      const links = [];
+      if (D.kanken[st.id]?.kk)
+        links.push(metaLink(`漢検 ${D.kanken[st.id].kk}`, 'kanken', D.kanken[st.id].kk));
+      if (D.kmeta?.[st.id]?.jlpt)
+        links.push(metaLink(`JLPT ${D.kmeta[st.id].jlpt}`, 'jlpt', D.kmeta[st.id].jlpt));
+      links.push(
+        metaLink(
+          tx(`${k?.st ?? paths.length} 画`, `${k?.st ?? paths.length} strokes`),
+          'strokes',
+          k?.st ?? paths.length,
+        ),
+      );
+      if (k) meta.append(el('span', 'stroke-meta-mean', k.m), document.createTextNode('　·　'));
+      links.forEach((b, i) => {
+        if (i) meta.append(document.createTextNode(' · '));
+        meta.append(b);
       });
-      controls.append(slow);
+      // honest engineering: name the engine actually drawing the ink, so a
+      // fallback never masquerades as the real lattice (筆 WebGPU / WebGL / 図)
+      const engineTag = el('span', 'stroke-engine');
+      engineTag.id = 'stroke-engine';
+      meta.append(document.createTextNode(' · '), engineTag);
+      body.append(meta);
     }
-
-    // 顔料 — four inks. A quiet row of pigment dots; the page holds the choice.
-    const inks = el('div', 'stroke-inks');
-    inks.setAttribute('role', 'group');
-    inks.setAttribute('aria-label', tx('墨の色', 'ink color'));
-    for (const [id, name] of [
-      ['sumi', '墨'],
-      ['bengara', '弁柄'],
-      ['ai', '藍'],
-      ['rokusho', '緑青'],
-    ]) {
-      const dot = el('button', 'ink-dot');
-      dot.type = 'button';
-      dot.dataset.ink = id;
-      dot.setAttribute('aria-label', name);
-      dot.setAttribute('aria-pressed', String((S.strokeInk || 'sumi') === id));
-      dot.addEventListener('click', () => {
-        S.strokeInk = id;
-        page.dataset.ink = id;
-        for (const d of inks.querySelectorAll('.ink-dot'))
-          d.setAttribute('aria-pressed', String(d.dataset.ink === id));
-      });
-      inks.append(dot);
-    }
-    body.append(inks);
-
-    const numbers = strokeControl('stroke-numbers', '筆順の番号', 'stroke numbers');
-    numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
-    numbers.addEventListener('click', () => {
-      S.strokeNumbers = !S.strokeNumbers;
-      numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
-      page.dataset.numbers = S.strokeNumbers ? 'on' : 'off';
-    });
-    controls.append(numbers);
-    body.append(controls);
-
-    const meta = el('p', 'stroke-meta');
-    // 漢検 · JLPT · 画数 are doors here too: each opens the exhaustive list of
-    // every kanji in that group. The stroke page is not a sheet, so close it
-    // first, then open the catalog over the kanji entry it came from.
-    const metaLink = (label, by, value) => {
-      const b = el('button', 'stroke-meta-link', label);
-      b.type = 'button';
-      b.addEventListener('click', () => {
-        closeStrokePage();
-        go({ t: 'catalog', id: `${by}:${value}`, by, value });
-      });
-      return b;
-    };
-    const links = [];
-    if (D.kanken[st.id]?.kk) links.push(metaLink(`漢検 ${D.kanken[st.id].kk}`, 'kanken', D.kanken[st.id].kk));
-    if (D.kmeta?.[st.id]?.jlpt) links.push(metaLink(`JLPT ${D.kmeta[st.id].jlpt}`, 'jlpt', D.kmeta[st.id].jlpt));
-    links.push(metaLink(tx(`${k?.st ?? paths.length} 画`, `${k?.st ?? paths.length} strokes`), 'strokes', k?.st ?? paths.length));
-    if (k) meta.append(el('span', 'stroke-meta-mean', k.m), document.createTextNode('　·　'));
-    links.forEach((b, i) => {
-      if (i) meta.append(document.createTextNode(' · '));
-      meta.append(b);
-    });
-    // honest engineering: name the engine actually drawing the ink, so a
-    // fallback never masquerades as the real lattice (筆 WebGPU / WebGL / 図)
-    const engineTag = el('span', 'stroke-engine');
-    engineTag.id = 'stroke-engine';
-    meta.append(document.createTextNode(' · '), engineTag);
-    body.append(meta);
     page.append(body);
+  }
+
+  if (S.strokeMinimal) {
+    const wake = el('button', 'stroke-chrome-trigger', '⋯');
+    wake.type = 'button';
+    wake.setAttribute('aria-controls', 'stroke-awake-field');
+    wake.addEventListener('click', () => setStrokeChrome(page, !S.strokeChromeAwake));
+    page.append(wake);
+    setStrokeChrome(page, S.strokeChromeAwake);
   }
 
   page.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
+      if (S.strokeMinimal && S.strokeChromeAwake) {
+        setStrokeChrome(page, false);
+        page.querySelector('.stroke-chrome-trigger')?.focus({ preventScroll: true });
+        return;
+      }
       interaction({ kind: 'layer.dismiss' }, 'keyboard', 'strokes-escape');
       closeStrokePage();
       return;
     }
     if (event.key !== 'Tab') return;
     const focusable = [...page.querySelectorAll('button, a[href], [tabindex]')].filter(
-      (item) => !item.disabled && item.tabIndex >= 0 && item.offsetParent !== null,
+      (item) =>
+        !item.disabled &&
+        !item.closest('[inert]') &&
+        item.tabIndex >= 0 &&
+        item.offsetParent !== null &&
+        getComputedStyle(item).visibility !== 'hidden',
     );
     if (!focusable.length) {
       event.preventDefault();
@@ -8894,7 +9372,18 @@ function renderStrokePage(root) {
 
   root.append(page);
   if (paths.length) startStrokeAnimation(page);
-  queueMicrotask(() => backBtn.focus({ preventScroll: true }));
+  queueMicrotask(() => {
+    const paletteFocus = S.strokePaletteFocus;
+    S.strokePaletteFocus = null;
+    if (S.strokeMinimal && paletteFocus && S.strokeChromeAwake) {
+      const choice = page.querySelector(`.stroke-palette-choice[data-world='${paletteFocus}']`);
+      if (choice) {
+        choice.focus({ preventScroll: true });
+        return;
+      }
+    }
+    (S.strokeMinimal ? page : backBtn).focus({ preventScroll: true });
+  });
 }
 
 function renderRadicalNode(sheet, node) {
@@ -9220,8 +9709,8 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
-/* ------------------------------------------------------- 八彩 HASSAI worlds
- * The eight worlds the operator locked from the carousel (2026-08-13,
+/* ------------------------------------------------------ corridor paper worlds
+ * The restored ten public worlds from the carousel (2026-08-15,
  * "keep 墨・楮紙; default 藍 ベロ藍・浪") — three families, one token law,
  * applied across the WHOLE corridor. The seal in the chrome cycles them,
  * day worlds first, then the nights; the choice persists on-device. The ids
@@ -9236,7 +9725,25 @@ const THEME_UI = [
   // ベロ藍・浪 — Prussian blue on print cream (DEFAULT)
   { id: 'hokusai', seal: '藍', name: 'ベロ藍・浪', g: '#f1e9d3', ink: '#1c2f42', red: '#b03a2e', paper: 'cream' },
   // 墨・楮紙 — sumi on kōzo
-  { id: 'sumi', seal: '墨', name: '墨・楮紙', g: '#f5efe0', ink: '#211e17', red: '#a02a1e', paper: 'kozo' },
+  {
+    id: 'sumi',
+    seal: '墨',
+    name: '墨・楮紙',
+    g: '#f5efe0',
+    ink: '#211e17',
+    red: '#a02a1e',
+    paper: 'kozo',
+  },
+  // 朱・胡粉 — vermilion on shell white
+  {
+    id: 'shu',
+    seal: '朱',
+    name: '朱・胡粉',
+    g: '#f9f5eb',
+    ink: '#2b2620',
+    red: '#b02318',
+    paper: 'shell',
+  },
   // 凱風快晴 — Red Fuji on dawn paper
   { id: 'akafuji', seal: '赤', name: '凱風快晴', g: '#f3e3cf', ink: '#45291a', red: '#a03a20', paper: 'dawn' },
   // 焦茶・柿渋 — umber on persimmon tannin
@@ -9246,9 +9753,51 @@ const THEME_UI = [
   // 紺紙金泥 — sutra gold on indigo
   { id: 'yoru', seal: '金', name: '紺紙金泥', g: '#131a30', ink: '#f4ecd9', red: '#ef8079', paper: 'kon' },
   // 神奈川沖浪裏 — foam on the deep sea
-  { id: 'nami', seal: '浪', name: '神奈川沖浪裏', g: '#11273b', ink: '#eae6d8', red: '#e08a6e', paper: 'sea' },
+  {
+    id: 'nami',
+    seal: '浪',
+    name: '神奈川沖浪裏',
+    g: '#11273b',
+    ink: '#eae6d8',
+    red: '#e08a6e',
+    paper: 'sea',
+  },
+  // 板木・墨 — keyblock sumi on print cream
+  {
+    id: 'keyblock',
+    seal: '板',
+    name: '板木・墨',
+    g: '#f2ead6',
+    ink: '#26221c',
+    red: '#b03a2e',
+    paper: 'cream',
+  },
+  // 山下白雨 — lightning-gold on storm paper
+  {
+    id: 'hakuu',
+    seal: '雷',
+    name: '山下白雨',
+    g: '#221b12',
+    ink: '#efe5cf',
+    red: '#e0796b',
+    paper: 'storm',
+  },
   // 攻殻・燐光 — phosphor on terminal black
   { id: 'kaku', seal: '殻', name: '攻殻・燐光', g: '#050d12', ink: '#d8efe9', red: '#ff6b4a', paper: 'terminal' },
+];
+// Every public picker follows the reference strip exactly. 殻 remains a
+// complete internal world so an existing saved preference never breaks.
+const PUBLIC_THEME_IDS = [
+  'sumi',
+  'shu',
+  'iwa',
+  'rokusho',
+  'yoru',
+  'hokusai',
+  'akafuji',
+  'nami',
+  'keyblock',
+  'hakuu',
 ];
 const THEME_STORE = 'kairo-theme';
 function themeId() {
@@ -9273,6 +9822,11 @@ function setKairoTheme(id) {
   const t = THEME_UI.find((x) => x.id === id) || THEME_UI[0];
   // 北斎 is the bare :root default — no attribute, so nothing overrides it
   document.documentElement.setAttribute('data-theme', t.id === 'hokusai' ? '' : t.id);
+  const night = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'].includes(t.id);
+  document.documentElement.style.colorScheme = night ? 'dark' : 'light';
+  document
+    .querySelector('meta[name="color-scheme"]')
+    ?.setAttribute('content', night ? 'dark' : 'light');
   try {
     localStorage.setItem(THEME_STORE, t.id);
   } catch {
@@ -9281,15 +9835,31 @@ function setKairoTheme(id) {
   applyPaper(t.id);
   syncDriftTheme();
 }
-/** Keep the Drift layer's own five-world palette in step with the corridor. */
+/** Drift owns five atmospheric families. Map by identity so adding or
+ * reordering paper worlds cannot send an unrelated raw index into it. */
+const DRIFT_THEME_BY_WORLD = {
+  hokusai: 0,
+  keyblock: 1,
+  sumi: 1,
+  shu: 2,
+  akafuji: 2,
+  iwa: 2,
+  rokusho: 4,
+  yoru: 4,
+  nami: 4,
+  hakuu: 4,
+  kaku: 4,
+};
 function syncDriftTheme() {
   try {
-    if (window.__DRIFT__ && window.__DRIFT__.setTheme) window.__DRIFT__.setTheme(themeIx());
+    if (window.__DRIFT__ && window.__DRIFT__.setTheme) {
+      window.__DRIFT__.setTheme(DRIFT_THEME_BY_WORLD[themeId()] ?? 0);
+    }
   } catch {
     /* drift not mounted yet — render() re-syncs when it first shows */
   }
 }
-// (the old tap-to-cycle retired 2026-08-14 — with eight worlds the operator
+// (the old tap-to-cycle retired 2026-08-14 — the worlds are direct choices;
 // wants the stones one tap away on every screen; see attachWorldPicker)
 
 /* ---------------------------------------------------- S1 living paper ground
@@ -9302,7 +9872,18 @@ function syncDriftTheme() {
  * `--ground`, MEASURED by the accessibility verifier — the paper may breathe
  * but the measured contrast ratios never move. Growth happens off the
  * interaction beat and never per-frame, so the reading loop keeps its 60fps. */
-const PAPER_SEED = { cream: 13, kozo: 11, dawn: 19, kaki: 29, urushi: 41, kon: 23, sea: 31, terminal: 59 };
+const PAPER_SEED = {
+  cream: 13,
+  shell: 17,
+  kozo: 11,
+  dawn: 19,
+  kaki: 29,
+  urushi: 41,
+  kon: 23,
+  sea: 31,
+  storm: 43,
+  terminal: 59,
+};
 const PAPER_KATA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789';
 const PAPER_MAX_PIXELS = 1.6e6;
 const paperCache = new Map();
@@ -9337,16 +9918,18 @@ function paintPaper(g, w, h, world, base) {
     g.fillRect(0, 0, w, h);
   };
   const fibers = (n, dark, light, darkBias = 0.8) => {
+    g.lineCap = 'round';
     for (let i = 0; i < n; i++) {
       const x = r() * w;
       const y = r() * h;
       const len = (10 + r() * 70) * u;
-      const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5);
+      const along = r() < 0.72;
+      const a = (along ? 0 : Math.PI / 2) + (r() - 0.5) * (along ? 0.42 : 0.72);
       g.beginPath();
       g.moveTo(x, y);
       g.quadraticCurveTo(x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 14 * u, x + Math.cos(a) * len, y + Math.sin(a) * len);
       g.strokeStyle = r() < darkBias ? dark(r) : light(r);
-      g.lineWidth = (0.4 + r() * 0.7) * u;
+      g.lineWidth = (0.32 + r() * 0.82) * u;
       g.stroke();
     }
   };
@@ -9366,20 +9949,63 @@ function paintPaper(g, w, h, world, base) {
   };
   if (world.paper === 'cream') {
     // 藍 print cream — the woodblock sheet's even grain
-    wash([[0, 'rgba(255,252,240,0.04)'], [1, 'rgba(60,45,20,0.016)']], 0.9);
-    fibers(1900, (r) => `rgba(170,150,110,${0.02 + r() * 0.035})`, (r) => `rgba(252,248,232,${0.06 + r() * 0.07})`, 0.5);
-    vignette('rgba(85,70,42,0.022)');
+    wash(
+      [
+        [0, 'rgba(255,252,240,0.04)'],
+        [1, 'rgba(60,45,20,0.016)'],
+      ],
+      0.9,
+    );
+    fibers(
+      2150,
+      (r) => `rgba(170,150,110,${0.02 + r() * 0.035})`,
+      (r) => `rgba(252,248,232,${0.06 + r() * 0.07})`,
+      0.5,
+    );
+    vignette('rgba(85,70,42,0.032)');
+  } else if (world.paper === 'shell') {
+    // 朱 shell white — smooth gofun paper with pale shell fibers
+    wash(
+      [
+        [0, 'rgba(255,253,246,0.035)'],
+        [1, 'rgba(80,70,55,0.012)'],
+      ],
+      0.9,
+    );
+    fibers(
+      2300,
+      (r) => `rgba(190,175,150,${0.016 + r() * 0.03})`,
+      (r) => `rgba(255,252,244,${0.05 + r() * 0.055})`,
+      0.5,
+    );
+    vignette('rgba(80,70,55,0.028)');
   } else if (world.paper === 'kozo') {
     // 墨 kōzo washi — long mulberry strokes
-    wash([[0, 'rgba(255,250,238,0.04)'], [1, 'rgba(70,55,25,0.016)']], 0.9);
-    fibers(2300, (r) => `rgba(180,158,116,${0.02 + r() * 0.035})`, (r) => `rgba(252,246,228,${0.06 + r() * 0.07})`, 0.5);
-    vignette('rgba(90,70,40,0.022)');
+    wash(
+      [
+        [0, 'rgba(255,250,238,0.04)'],
+        [1, 'rgba(70,55,25,0.016)'],
+      ],
+      0.9,
+    );
+    fibers(
+      2550,
+      (r) => `rgba(180,158,116,${0.02 + r() * 0.035})`,
+      (r) => `rgba(252,246,228,${0.06 + r() * 0.07})`,
+      0.5,
+    );
+    vignette('rgba(90,70,40,0.032)');
   } else if (world.paper === 'dawn') {
     // 赤 dawn paper — warm fiber with the first light in one corner
     wash([[0, 'rgba(255,245,230,0.045)'], [1, 'rgba(120,70,35,0.012)']], 0.5);
     glow(0.75, 0.18, 0.5, 'rgba(220,140,90,0.05)');
-    fibers(1700, (r) => `rgba(180,140,100,${0.02 + r() * 0.03})`, (r) => `rgba(255,246,230,${0.05 + r() * 0.06})`, 0.5);
-    vignette('rgba(110,70,40,0.016)');
+    fibers(
+      1900,
+      (r) => `rgba(180,140,100,${0.02 + r() * 0.03})`,
+      (r) => `rgba(255,246,230,${0.05 + r() * 0.06})`,
+      0.5,
+    );
+    vignette('rgba(110,70,40,0.024)');
   } else if (world.paper === 'kaki') {
     // 柿 persimmon tannin — the dye settles in clouds
     wash([[0, 'rgba(240,205,160,0.045)'], [1, 'rgba(90,50,20,0.02)']], 0.8);
@@ -9395,8 +10021,13 @@ function paintPaper(g, w, h, world, base) {
       g.arc(x, y, rad, 0, 7);
       g.fill();
     }
-    fibers(1200, (r) => `rgba(120,70,30,${0.02 + r() * 0.03})`, (r) => `rgba(240,200,150,${0.04 + r() * 0.045})`, 0.5);
-    vignette('rgba(70,38,12,0.025)');
+    fibers(
+      1320,
+      (r) => `rgba(120,70,30,${0.02 + r() * 0.03})`,
+      (r) => `rgba(240,200,150,${0.04 + r() * 0.045})`,
+      0.5,
+    );
+    vignette('rgba(70,38,12,0.034)');
   } else if (world.paper === 'urushi') {
     // 漆 black lacquer — polish lines catching one soft sheen
     wash([[0, 'rgba(255,240,210,0.02)'], [1, 'rgba(0,0,0,0.05)']], 0.6);
@@ -9442,6 +10073,39 @@ function paintPaper(g, w, h, world, base) {
       g.arc(r() * w, r() * h, (0.3 + r() * 1.0) * u, 0, 7);
       g.fill();
     }
+  } else if (world.paper === 'storm') {
+    // 雷 山下白雨 — diagonal rain in brown-black air, one quiet flash
+    wash(
+      [
+        [0, 'rgba(90,70,40,0.025)'],
+        [1, 'rgba(0,0,0,0.045)'],
+      ],
+      0.4,
+    );
+    for (let i = 0; i < 22; i++) {
+      const x = r() * w;
+      const y = r() * h;
+      const len = (30 + r() * 120) * u;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x - len * 0.25, y + len);
+      g.strokeStyle = `rgba(120,102,70,${0.012 + r() * 0.025})`;
+      g.lineWidth = (0.45 + r() * 0.75) * u;
+      g.stroke();
+    }
+    g.beginPath();
+    let lx = w * 0.12;
+    let ly = h * 0.55;
+    g.moveTo(lx, ly);
+    for (let i = 0; i < 7; i++) {
+      lx += (r() - 0.3) * 60 * u;
+      ly += (18 + r() * 46) * u;
+      g.lineTo(lx, ly);
+    }
+    g.strokeStyle = 'rgba(217,169,63,0.055)';
+    g.lineWidth = 1.3 * u;
+    g.stroke();
+    vignette('rgba(0,0,0,0.025)');
   } else {
     // 殻 terminal black — faint glyph rain and scanlines
     wash([[0, 'rgba(30,70,80,0.03)'], [1, 'rgba(0,0,0,0.05)']], 0.3);
@@ -9497,7 +10161,7 @@ function applyPaper(id) {
       paintPaper(g, w, h, world, base);
       const url = `url("${cv.toDataURL('image/png')}")`;
       paperCache.set(key, url);
-      if (paperCache.size > 10) paperCache.delete(paperCache.keys().next().value);
+      if (paperCache.size > THEME_UI.length + 2) paperCache.delete(paperCache.keys().next().value);
       if (token === paperGrowToken) root.style.setProperty('--paper-url', url);
     } catch {
       /* canvas denied — the flat ground stands */
@@ -9525,7 +10189,7 @@ window.addEventListener('resize', () => {
   }, 250);
 });
 
-/* ------------------------------------------------------ the eight world-stones
+/* -------------------------------------------------------- the ten world-stones
  * The colour options are ONE TAP away on every screen (operator redirect,
  * 2026-08-14): tapping a theme seal opens the eight stones for a direct
  * jump; a long-press opens the same picker (muscle memory from the P1
@@ -9553,7 +10217,9 @@ function openWorldPicker(anchor) {
   pop.setAttribute('role', 'dialog');
   pop.setAttribute('aria-label', tx('世界を選ぶ', 'choose a world'));
   let activeStone = null;
-  for (const t of THEME_UI) {
+  for (const id of PUBLIC_THEME_IDS) {
+    const t = THEME_UI.find((world) => world.id === id);
+    if (!t) continue;
     const b = el('button', 'world-stone', t.seal);
     b.type = 'button';
     // each stone previews its own world — the colours mirror corridor.css
