@@ -2981,7 +2981,14 @@ function installTokenAlternatives(wrapper, span, target, { quickLook, openEntry 
       }
     }, 0);
   };
-  span.addEventListener('focus', show);
+  span.addEventListener('focus', () => {
+    // KEYBOARD-ONLY: pointer users already hold the tap ladder and the
+    // long-press mini. Pointer focus also raised this pill — popping over
+    // the next line after every ordinary tap, doubling 全項目 beside the
+    // mini on long-press, and spawning under the lifting finger where it
+    // could swallow the release (P2 ×2, full-instrument review).
+    if (span.matches(':focus-visible')) show();
+  });
   wrapper.addEventListener('focusout', hideAfterFocusLeaves);
 }
 

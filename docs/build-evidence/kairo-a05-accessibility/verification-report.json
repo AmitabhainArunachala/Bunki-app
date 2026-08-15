@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "40322350167c7f351a36aac211483b65f087cf12",
+  "head": "792bb66545585e7f364d355178f142daf3441e3e",
   "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
   "viewport": {
     "width": 390,
@@ -9,8 +9,8 @@
   },
   "summary": {
     "total": 42,
-    "passed": 42,
-    "failed": 0
+    "passed": 39,
+    "failed": 3
   },
   "results": [
     {
@@ -25,8 +25,8 @@
     },
     {
       "name": "focused word exposes quick-look and full-entry non-hold alternatives",
-      "pass": true,
-      "detail": "{\"tokenFocused\":true,\"alternatives\":2,\"hiddenTabStops\":0}"
+      "pass": false,
+      "detail": "{\"tokenFocused\":true,\"alternatives\":0,\"hiddenTabStops\":0}"
     },
     {
       "name": "hidden Corridor controls leave the tab order",
@@ -35,8 +35,8 @@
     },
     {
       "name": "sequential switch navigation reaches quick look then full entry",
-      "pass": true,
-      "detail": "quickLook.open → entry.open"
+      "pass": false,
+      "detail": "target.activate → quickLook.open"
     },
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
@@ -80,13 +80,13 @@
     },
     {
       "name": "particle exposes a keyboard/switch/screen-reader full-entry alternative",
-      "pass": true,
-      "detail": "direct door=true"
+      "pass": false,
+      "detail": "direct door=false"
     },
     {
       "name": "entry sheet is a named modal dialog and receives focus",
       "pass": true,
-      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":12}"
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":17}"
     },
     {
       "name": "Tab is contained inside the modal sheet",
