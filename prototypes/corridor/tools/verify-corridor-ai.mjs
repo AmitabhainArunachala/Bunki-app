@@ -308,6 +308,29 @@ async function main() {
   check('quiz · the exchange lands whole in the archive',
     exchangeShape(quizRows, 'quiz', OVERRIDE_MODEL), `${quizRows.length} rows`);
 
+  // POL-13 · the run itself is durable: reload mid-quiz and the tray offers
+  // the way back in — the SAME tutor-written question stands, and the stub
+  // counts zero new provider calls (the init script resets it per navigation)
+  const quizQBefore = await page.evaluate(`document.querySelector('.aiq-q')?.textContent ?? ''`);
+  await open('?entry=shelf');
+  await page.click('#tray');
+  await page.waitForSelector('#aiq-resume', { timeout: 8000 });
+  await page.click('#aiq-resume');
+  await page.waitForSelector('.aiq-q', { timeout: 8000 });
+  const quizResume = await page.evaluate(`({
+    q: document.querySelector('.aiq-q')?.textContent ?? '',
+    calls: window.__AI_STUB.calls,
+  })`);
+  check('quiz · a mid-quiz reload resumes the same written questions — not a word lost, no new request',
+    quizQBefore.length > 0 && quizResume.q === quizQBefore && quizResume.calls === 0,
+    `"${quizResume.q}" · calls since reload ${quizResume.calls}`);
+  // let the run go so the rest of the walk meets the tray it always met
+  await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    e.aiQuiz = null;
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify(e));
+  })()`);
+
   await open('?entry=shelf');
   await page.click('#tray');
   await page.waitForSelector('#review-start', { timeout: 8000 });

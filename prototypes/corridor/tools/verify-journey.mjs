@@ -14,7 +14,8 @@
  *   4  the reader → capture a word (覚える)
  *   5  the learner mark (under-ink) appearing in the text just read
  *   6  途中 on the shelf after leaving mid-article
- *   7  a JLPT lesson end to end (learn → quiz → words land in the tray)
+ *   7  a JLPT lesson end to end (learn → quiz → practice evidence; the
+ *      deck grows only through the end screen's explicit enroll choice)
  *   8  the tray → a review session through to its summary
  *   9  the day's review trace appearing under the review button
  *  10  levels · grammar (≥100 entries) · thesaurus · 字引 · export doors
@@ -83,7 +84,11 @@ await step('1 drift front door', async () => {
 });
 
 await step('2 shelf', async () => {
-  await page.click('#enter-shelf-door');
+  // the galaxy's one symbol opens the bar; the 本棚 bubble is the one door
+  // (the old #enter-shelf-door predates the 銀河 front door and is gone)
+  await page.tap('.nav-symbol');
+  await page.waitForTimeout(400);
+  await page.tap('.bubble-shelf');
   await page.waitForSelector('.shelf-item', { timeout: 10000 });
 });
 
@@ -102,11 +107,31 @@ await step('3 search + synonym cluster + entry', async () => {
 await step('4 reader capture', async () => {
   await page.click('.shelf-item');
   await page.waitForSelector('.reader .tok.content', { timeout: 10000 });
+  // the article body arrives async and re-renders once — wait for the token
+  // count to hold still so the hold below is not cut by a mid-press repaint
+  await page.evaluate(() => (window.__tokN = -1));
+  await page.waitForFunction(
+    () => {
+      const n = document.querySelectorAll('.reader .tok').length;
+      if (window.__tokN === n && n > 0) return true;
+      window.__tokN = n;
+      return false;
+    },
+    { polling: 400, timeout: 15000 },
+  );
+  // the click grammar (v1.2): the full entry opens by HOLDING a word — the
+  // old double-tap stops at the gloss rung and never reaches the sheet
   const tok = await page.$('.reader .tok.content');
-  await tok.tap();
-  await page.waitForTimeout(400);
-  await tok.tap();
-  await page.waitForSelector('.sheet .headword', { timeout: 5000 });
+  await tok.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(150);
+  const box = await tok.boundingBox();
+  const cdp = await page.context().newCDPSession(page);
+  const point = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 6, radiusY: 6, force: 1 };
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+  await page.waitForTimeout(2400);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+  await page.waitForSelector('.sheet .headword', { timeout: 8000 });
   await page.waitForTimeout(800); // the sheet's same-gesture click guard
   const take = await page.$('.sheet .take:not(.taken)');
   if (!take) throw new Error('no take button on sheet');
@@ -149,6 +174,19 @@ await step('7 JLPT lesson end to end', async () => {
     const t = await page.evaluate(() => document.querySelector('.view-title')?.textContent || '');
     if (/of|\//.test(t)) break;
   }
+  // completion alone enrolls nothing (PR70-P0-1): the reader capture from
+  // station 4 must still be the only deck row; the end screen's explicit
+  // ぜんぶ覚える door is what mints the run
+  const takenBefore = await page.evaluate(
+    () => (JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').taken || []).length,
+  );
+  if (takenBefore !== 1) throw new Error('lesson completion minted deck rows: ' + takenBefore);
+  await page.click('#lesson-enroll-all');
+  await page.waitForTimeout(300);
+  const takenAfter = await page.evaluate(
+    () => (JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}').taken || []).length,
+  );
+  if (takenAfter < 10) throw new Error('the enroll door did not mint the run: ' + takenAfter);
   await shot('07-lesson-end');
   await page.evaluate(() =>
     [...document.querySelectorAll('.take')].find((b) => /レッスン一覧|back to lessons/.test(b.textContent))?.click(),

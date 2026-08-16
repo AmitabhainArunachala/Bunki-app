@@ -2921,6 +2921,270 @@ async function main() {
     consoleErrors.length === errsBeforeR3D,
     consoleErrors.slice(errsBeforeR3D).join(' | ') || 'clean');
 
+  // --------------------- R4-B · lesson disposition, dojo refill honesty,
+  // and the quiz that survives reload. Every probe here convicts a reverted
+  // build: the old lesson completion auto-minted ten deck rows, the old
+  // refill regraded the same schedules lap after lap, and the old quiz died
+  // with the tab. Each probe runs on a controlled envelope and hands the
+  // learner's own bytes back untouched.
+  console.log('\n— R4-B · practice writes evidence; enrolling is a choice; nothing is lost');
+  const errsBeforeR4B = consoleErrors.length;
+  const r4bSnapshot = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+
+  // (a) PR70-P0-1 · a finished lesson creates ZERO deck rows; the end screen
+  // holds the one explicit door — per word or all — and only that choice mints
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+  await open('?entry=shelf');
+  await page.waitForSelector('#lessons-link');
+  await tap(page, '#lessons-link');
+  await page.waitForSelector('.lesson-row');
+  const lessonBreadth = await page.evaluate(`({
+    jlptHeads: [...document.querySelectorAll('.list-head')].filter((n) => /^N[1-5]/.test(n.textContent.trim())).length,
+    kanken: [...document.querySelectorAll('.eyebrow')].some((n) => n.textContent.includes('漢検')),
+  })`);
+  check('R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades',
+    lessonBreadth.jlptHeads >= 3 && lessonBreadth.kanken,
+    `${lessonBreadth.jlptHeads} JLPT lanes · 漢検 ${lessonBreadth.kanken}`);
+  await page.evaluate(`document.querySelector('.lesson-row').click()`);
+  await page.waitForSelector('#lesson-next');
+  for (let i = 0; i < 60; i += 1) {
+    const stage = await page.evaluate(`(() => {
+      if (document.querySelector('.lesson-enroll')) return 'end';
+      const next = document.querySelector('#lesson-next');
+      if (next) { next.click(); return 'advanced'; }
+      const opt = document.querySelector('.lesson-option:not([disabled])');
+      if (opt) { opt.click(); return 'picked'; }
+      return 'unknown';
+    })()`);
+    if (stage === 'end') break;
+    await page.waitForTimeout(60);
+  }
+  await page.waitForSelector('.lesson-enroll', { timeout: 8000 });
+  const lessonDone = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (e.obslog || []).filter((r) => r[1] === 'lesson');
+    return {
+      taken: (e.taken || []).length,
+      srsKeys: Object.keys(e.srs || {}).length,
+      revlog: (e.revlog || []).length,
+      done: Object.keys(e.lessonsDone || {}),
+      rows,
+      score: document.querySelector('.view-title')?.textContent ?? '',
+    };
+  })()`);
+  check('R4-B · lesson completion alone creates ZERO deck rows — the score and the evidence, nothing else',
+    lessonDone.taken === 0 && lessonDone.srsKeys === 0 && lessonDone.revlog === 0 &&
+      lessonDone.done.length === 1 && /\d+ (\/|of) \d+/.test(lessonDone.score),
+    `taken ${lessonDone.taken} · srs ${lessonDone.srsKeys} · lessonsDone ${JSON.stringify(lessonDone.done)} · "${lessonDone.score.trim()}"`);
+  check('R4-B · the run\'s words land as practice-evidence rows, one per word, named by the run',
+    lessonDone.rows.length === 10 &&
+      lessonDone.rows.every((r) => [1, 3].includes(r[3]) && r[4] === lessonDone.done[0] && String(r[2]).startsWith('word:')),
+    `${lessonDone.rows.length} lesson rows for ${lessonDone.done[0]}`);
+  const chosenWord = await page.evaluate(`document.querySelector('[data-enroll]')?.dataset.enroll ?? null`);
+  await page.evaluate(`document.querySelector('[data-enroll]').click()`);
+  await page.waitForTimeout(250);
+  const afterOne = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return {
+      taken: (e.taken || []).map((t) => [t.id, Number.isFinite(t.started)]),
+      srsKeys: Object.keys(e.srs || {}).length,
+    };
+  })()`);
+  check('R4-B · one word chosen → exactly one deck row, started-marked, still cardless until reviewed',
+    afterOne.taken.length === 1 && chosenWord && afterOne.taken[0][0] === chosenWord &&
+      afterOne.taken[0][1] === true && afterOne.srsKeys === 0,
+    `${JSON.stringify(afterOne.taken)} for choice ${chosenWord}`);
+  await shoot(page, shotsDir, '23-r4b-lesson-enroll-choice');
+  await page.evaluate(`document.querySelector('#lesson-enroll-all').click()`);
+  await page.waitForTimeout(250);
+  const afterAll = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const ids = (e.taken || []).map((t) => t.id);
+    return {
+      n: ids.length,
+      unique: new Set(ids).size,
+      allStarted: (e.taken || []).every((t) => Number.isFinite(t.started)),
+      allDoorGone: !document.querySelector('#lesson-enroll-all'),
+    };
+  })()`);
+  check('R4-B · ぜんぶ覚える enrolls exactly the rest — ten rows, no duplicates, every one started',
+    afterAll.n === 10 && afterAll.unique === 10 && afterAll.allStarted && afterAll.allDoorGone,
+    JSON.stringify(afterAll));
+
+  // (b) POL-12 · the dojo's due block: each waiting card takes ONE honest
+  // schedule grade; when the clock outlasts the pool, the refill's second
+  // lap is practice — the copy says so, the seals stamp 稽古, and the
+  // long-term schedule holds still while evidence rows accrue
+  await page.evaluate(`(() => {
+    const T = Date.now();
+    const iso = (ms) => new Date(ms).toISOString();
+    const card = (agoDays) => ({
+      due: iso(T - agoDays * 86400000), last_review: iso(T - (agoDays + 3) * 86400000),
+      stability: 4, difficulty: 5, elapsed_days: 3, scheduled_days: 3,
+      reps: 3, lapses: 0, learning_steps: 0, state: 2,
+    });
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      taken: [
+        { t: 'word', id: '学校', label: '学校', ts: T, started: T },
+        { t: 'word', id: '先生', label: '先生', ts: T, started: T },
+      ],
+      srs: { 'word:学校': card(2), 'word:先生': card(1) },
+    }));
+  })()`);
+  await open('');
+  await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+  await tap(page, '#ginga-symbol');
+  await page.waitForSelector('.nav-dojo');
+  await tap(page, '.nav-dojo');
+  await page.waitForSelector('.focus-mode');
+  const dueModeSub = await page.evaluate(`(() => {
+    const mode = [...document.querySelectorAll('.focus-mode')].find((b) => b.textContent.includes('覚えるの札'));
+    return mode?.querySelector('.focus-mode-sub')?.textContent ?? '';
+  })()`);
+  check('R4-B · the due-mode copy says what the refill does — after the first lap, practice',
+    /稽古|practice/.test(dueModeSub) && dueModeSub.includes('2'),
+    `sub "${dueModeSub}"`);
+  await page.locator('.focus-mode', { hasText: '覚えるの札' }).click();
+  await page.locator('.focus-start').click();
+  await page.waitForSelector('.review-front', { timeout: 20000 });
+  for (let i = 0; i < 2; i += 1) {
+    await page.waitForSelector('#reveal');
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
+    await page.waitForSelector('.grade-row');
+    if (i === 0) {
+      const lap1 = await page.evaluate(`({
+        practice: document.querySelector('.grade-row').hasAttribute('data-practice'),
+        whens: [...document.querySelectorAll('.grade .g-when')].map((n) => n.textContent),
+      })`);
+      check('R4-B · lap one grades for real — honest intervals, no practice stamp',
+        lap1.practice === false && lap1.whens.length === 4 &&
+          lap1.whens.every((w) => /\d+ (min|d|分|日)$/.test(w)),
+        lap1.whens.join(' · '));
+    }
+    await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+    await page.waitForTimeout(300);
+  }
+  const lap1After = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return {
+      srs: e.srs,
+      revlog: (e.revlog || []).length,
+      dojoRows: (e.obslog || []).filter((r) => r[1] === 'dojo').length,
+    };
+  })()`);
+  check('R4-B · the first lap wrote the deck — two schedules moved, two revlog rows, zero practice rows',
+    lap1After.revlog === 2 && lap1After.dojoRows === 0 &&
+      Object.values(lap1After.srs).every((rec) => new Date(rec.due) > new Date()),
+    `revlog ${lap1After.revlog} · dojo rows ${lap1After.dojoRows}`);
+  await page.waitForSelector('.review-front');
+  const lap2Front = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+  await page.waitForSelector('#reveal');
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade-row[data-practice]', { timeout: 8000 });
+  const lap2Whens = await page.evaluate(
+    `[...document.querySelectorAll('.grade .g-when')].map((n) => n.textContent)`,
+  );
+  check('R4-B · lap two stamps 稽古 on every seal — the schedule is promised nothing',
+    lap2Front === '学校' && lap2Whens.length === 4 &&
+      lap2Whens.every((w) => w === '稽古' || w === 'practice'),
+    `${lap2Front} → ${lap2Whens.join(' · ')}`);
+  await shoot(page, shotsDir, '24-r4b-dojo-second-lap');
+  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  await page.waitForTimeout(300);
+  const lap2After = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
+    return { srs: e.srs, revlog: (e.revlog || []).length, rows };
+  })()`);
+  check('R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room',
+    lap2After.revlog === 2 &&
+      JSON.stringify(lap2After.srs) === JSON.stringify(lap1After.srs) &&
+      lap2After.rows.length === 1 && lap2After.rows[0][2] === 'word:学校' &&
+      lap2After.rows[0][3] === 3 && lap2After.rows[0][4] === 'due',
+    `row ${JSON.stringify(lap2After.rows[0])} · revlog ${lap2After.revlog}`);
+
+  // (c) POL-13 · the tutor's quiz survives reload: the seeded run stands in
+  // the envelope exactly as the app would persist it — no key, no deck, no
+  // network — and the tray's resume door reopens it where it stood
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    v: 1,
+    aiQuiz: {
+      qs: [
+        { q: 'RELOAD-Q1 問一', opts: ['a1', 'b1', 'c1', 'd1'], right: 0, why: 'because one' },
+        { q: 'RELOAD-Q2 問二', opts: ['a2', 'b2', 'c2', 'd2'], right: 1, why: 'because two' },
+        { q: 'RELOAD-Q3 問三', opts: ['a3', 'b3', 'c3', 'd3'], right: 2, why: 'because three' },
+      ],
+      ix: 1, picked: null, correct: 1, ts: Date.now(),
+    },
+  }))`);
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#aiq-resume');
+  await page.evaluate(`document.querySelector('#aiq-resume').click()`);
+  await page.waitForSelector('.aiq-q');
+  const resumed = await page.evaluate(`({
+    q: document.querySelector('.aiq-q')?.textContent ?? '',
+    at: document.querySelector('.card-kind')?.textContent ?? '',
+  })`);
+  check('R4-B · a reload later, the quiz stands where it stood — question two, running score kept',
+    resumed.q.includes('RELOAD-Q2') && /2\s*\/\s*3/.test(resumed.at),
+    `"${resumed.q}" at "${resumed.at.trim()}"`);
+  await page.evaluate(`[...document.querySelectorAll('.lesson-option')][1].click()`);
+  await page.waitForTimeout(250);
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#aiq-resume');
+  await page.evaluate(`document.querySelector('#aiq-resume').click()`);
+  await page.waitForSelector('#aiq-next');
+  const midPick = await page.evaluate(`({
+    why: document.querySelector('.aiq-why')?.textContent ?? '',
+    marked: document.querySelectorAll('.lesson-option.right').length,
+  })`);
+  check('R4-B · even the marked answer survives a reload — the why line and the mark come back',
+    midPick.why === 'because two' && midPick.marked === 1,
+    JSON.stringify(midPick));
+  await page.evaluate(`document.querySelector('#aiq-next').click()`);
+  await page.waitForTimeout(150);
+  await page.evaluate(`[...document.querySelectorAll('.lesson-option')][0].click()`);
+  await page.waitForTimeout(150);
+  await page.evaluate(`document.querySelector('#aiq-next').click()`);
+  await page.waitForTimeout(250);
+  const quizScore = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return {
+      title: document.querySelector('.view-title')?.textContent ?? '',
+      stored: e.aiQuiz !== null,
+      taken: (e.taken || []).length,
+      srsKeys: Object.keys(e.srs || {}).length,
+    };
+  })()`);
+  check('R4-B · the finished quiz shows its honest score and still grades nothing',
+    /2\s*(\/|of)\s*3/.test(quizScore.title) &&
+      quizScore.stored &&
+      quizScore.taken === 0 &&
+      quizScore.srsKeys === 0,
+    `title "${quizScore.title.trim()}" · stored ${quizScore.stored}`);
+  await page.evaluate(`document.querySelector('#aiq-close').click()`);
+  await page.waitForTimeout(250);
+  const quizClosed = await page.evaluate(
+    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).aiQuiz`,
+  );
+  check('R4-B · only the learner\'s own door lets the quiz go',
+    quizClosed === null, `stored aiQuiz ${JSON.stringify(quizClosed)}`);
+
+  // hand the envelope back exactly as found — these probes leave no learner state
+  await page.evaluate(`(() => {
+    const snap = ${JSON.stringify(r4bSnapshot)};
+    if (snap === null) localStorage.removeItem('kairo-corridor-v1');
+    else localStorage.setItem('kairo-corridor-v1', snap);
+  })()`);
+  check('R4-B · the probes leave no console errors',
+    consoleErrors.length === errsBeforeR4B,
+    consoleErrors.slice(errsBeforeR4B).join(' | ') || 'clean');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,

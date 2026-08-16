@@ -487,7 +487,9 @@ const S = {
    * Empty means the built-in defaults at AI_DEFAULT_*; store-durable so a
    * future settings surface (or an imported record) can carry the choice. */
   ai: {},
-  /** a running tutor quiz: { qs, ix, picked, correct } — in-memory only */
+  /** a running tutor quiz: { qs, ix, picked, correct, ts } — persisted
+   * (POL-13): a mid-quiz reload resumes with the tutor's written questions
+   * intact; null at rest. Closed only by the learner's own door. */
   aiQuiz: null,
   /** how many chat turns the log unfolds before 前の会話 — session-only */
   aiChatShown: null,
@@ -557,6 +559,7 @@ const STORE_KNOWN_KEYS = [
   'suspended',
   'aiChat',
   'ai',
+  'aiQuiz',
   'stats',
   'srsPrefs',
   'readDone',
@@ -709,6 +712,11 @@ function validObservationRow(row) {
     return row.length === 4 && row[2] === 'fsrs' && nonEmptyString(row[3]);
   }
   if (row[1] === 'reveal') return row.length === 4 && [0, 1].includes(row[3]);
+  if (row[1] === 'lesson') {
+    // PR70-P0-1 · a lesson quiz answer, practice evidence only:
+    // [t, 'lesson', key, g, lessonId] — g 3 answered right · 1 answered wrong
+    return row.length === 5 && [1, 3].includes(row[3]) && nonEmptyString(row[4]);
+  }
   if (row[1] === 'dojo') {
     // four wide (older rows and undo's revocation), or five with the drill
     // room's name riding as the trailing mode
@@ -758,6 +766,45 @@ function validChatTurn(turn) {
     ['user', 'tutor'].includes(turn.role) &&
     typeof turn.text === 'string' &&
     safeJsonValue(turn)
+  );
+}
+
+/** One question the tutor wrote — the exact shape aiQuizParse accepts, so a
+ * run the app itself persisted is never quarantined on the next boot. */
+function validAiQuizQuestion(q) {
+  return (
+    plainRecord(q) &&
+    typeof q.q === 'string' &&
+    Array.isArray(q.opts) &&
+    q.opts.length === 4 &&
+    q.opts.every((o) => typeof o === 'string') &&
+    Number.isInteger(q.right) &&
+    q.right >= 0 &&
+    q.right < 4 &&
+    typeof q.why === 'string' &&
+    safeJsonValue(q)
+  );
+}
+
+/** POL-13 · the persisted quiz run: the tutor's written questions plus the
+ * learner's place in them. ix may sit one past the last question — that is
+ * the score screen, kept whole until the learner closes it. */
+function validAiQuizRun(run) {
+  return (
+    plainRecord(run) &&
+    Array.isArray(run.qs) &&
+    run.qs.length >= 3 &&
+    run.qs.length <= 5 &&
+    run.qs.every(validAiQuizQuestion) &&
+    Number.isInteger(run.ix) &&
+    run.ix >= 0 &&
+    run.ix <= run.qs.length &&
+    optional(run, 'picked', (value) => value === null || (Number.isInteger(value) && value >= 0 && value < 4)) &&
+    Number.isInteger(run.correct) &&
+    run.correct >= 0 &&
+    run.correct <= run.qs.length &&
+    optional(run, 'ts', finiteNumber) &&
+    safeJsonValue(run)
   );
 }
 
@@ -883,6 +930,7 @@ const STORE_ROOT_VALIDATORS = {
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
   aiChat: (value) => Array.isArray(value) && value.every(validChatTurn),
   ai: validAiConfig,
+  aiQuiz: (value) => value === null || validAiQuizRun(value),
   stats: validStats,
   srsPrefs: validSrsPrefs,
   readDone: (value) =>
@@ -1033,6 +1081,7 @@ function loadStore() {
   if (plainRecord(s.suspended)) S.suspended = s.suspended;
   if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
   if (plainRecord(s.ai)) S.ai = s.ai;
+  if (plainRecord(s.aiQuiz)) S.aiQuiz = s.aiQuiz;
   if (plainRecord(s.stats)) S.stats = s.stats;
   if (plainRecord(s.srsPrefs)) {
     if (validNewPerDay(s.srsPrefs.newPerDay)) S.srsPrefs.newPerDay = s.srsPrefs.newPerDay;
@@ -1069,6 +1118,7 @@ function storeEnvelope(state) {
     suspended: state.suspended,
     aiChat: state.aiChat.slice(-24),
     ai: state.ai || {},
+    aiQuiz: state.aiQuiz || null,
     stats: state.stats,
     srsPrefs: state.srsPrefs || {},
     readDone: state.readDone,
@@ -1144,11 +1194,19 @@ function commitStorePatch(patch) {
  *       a yomi-probe self-grade in the dojo — g 1 read it wrong · 3 read
  *       it right; minted 1 when the miss minted a card, else 0
  *   [t, 'dojo', key, g, mode?]
- *       a focus-drill grade on a card the learner never TOOK — practice
- *       evidence on the FSRS scale (g 1–4; a g 0 row is undo's revocation,
- *       filed beside the judgment); mode names the drill room ('kanji')
- *       on rows written since the room was recorded. Evidence only:
- *       no FSRS state, no revlog row, no daily new-card slot.
+ *       a focus-drill grade that is practice, not a scheduled review: a
+ *       card the learner never TOOK, or (POL-12) a second-lap pass in a
+ *       timed block over a card whose one honest schedule grade this block
+ *       already recorded. FSRS scale (g 1–4; a g 0 row is undo's
+ *       revocation, filed beside the judgment); mode names the drill room
+ *       ('kanji', 'due') on rows written since the room was recorded.
+ *       Evidence only: no FSRS state, no revlog row, no daily new-card slot.
+ *   [t, 'lesson', key, g, lessonId]
+ *       a lesson quiz answer (PR70-P0-1) — practice evidence from the
+ *       Duolingo-class lane: g 3 answered right · 1 answered wrong;
+ *       lessonId names the run ('N5-1'). Completion writes these rows and
+ *       the score, nothing else — no deck rows, no FSRS state: entering
+ *       覚える is the learner's own explicit choice on the end screen.
  *   [t, 'reveal', key, declared]
  *       the zen review room's declared-recall gate (kernel law ADR-002
  *       T-06): before the answer turns over, the learner declares —
@@ -2387,7 +2445,8 @@ function back() {
     return;
   }
   if (S.view === 'aiquiz') {
-    S.aiQuiz = null;
+    // POL-13: stepping out mid-quiz discards nothing — the run stays durable
+    // and the tray holds the way back in (and the quiet やめる to let it go)
     S.view = 'tray';
     render();
     return;
@@ -4094,8 +4153,9 @@ function renderTray(main) {
       );
     }
     renderSrsPrefs(main);
-    // one layer of the tutor's testing — absent without a key
-    if (aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
+    // one layer of the tutor's testing — absent without a key, and folded
+    // away while an unfinished quiz still holds the room (POL-13)
+    if (!S.aiQuiz && aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
       const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'a quiz from the tutor');
       qb.type = 'button';
       qb.id = 'aiq-start';
@@ -4116,6 +4176,30 @@ function renderTray(main) {
       });
       main.append(qb, note);
     }
+  }
+  // POL-13 · a quiz that was left mid-run survives reload: the way back in
+  // stands here — no new request, the tutor's written questions intact —
+  // with a quiet やめる beside it. No key and no deck are needed to finish
+  // what is already on the device, so the row lives outside every gate.
+  if (S.aiQuiz) {
+    const qrow = el('div', 'aiq-resume-row');
+    const qb = biLabel('button', 'chip aiq-start', '先生の小テスト — 続きから', "resume the tutor's quiz");
+    qb.type = 'button';
+    qb.id = 'aiq-resume';
+    qb.addEventListener('click', () => {
+      S.view = 'aiquiz';
+      render();
+      window.scrollTo(0, 0);
+    });
+    const drop = biLabel('button', 'chip aiq-drop', 'やめる', 'let it go');
+    drop.type = 'button';
+    drop.id = 'aiq-drop';
+    drop.addEventListener('click', () => {
+      aiQuizCommit(null);
+      render();
+    });
+    qrow.append(qb, drop);
+    main.append(qrow);
   }
   if (!S.taken.length) {
     main.append(
@@ -4462,10 +4546,13 @@ function renderLane(main, title, en, ids, t) {
 /* --------------------------------------------------------------- lessons
  * The Duolingo-class lane: small lessons cut from the JLPT word levels and
  * the 漢検 kanji grades the dictionary already carries. Each lesson teaches
- * its items plainly, quizzes them, and on completion the items land in the
- * memorize list — capture that becomes cards without labor, feeding the
- * same FSRS sessions as everything else. One shared learner model; no
- * separate notion of "known". */
+ * its items plainly and quizzes them. Completion writes practice EVIDENCE
+ * only — one obslog row per word, the score in lessonsDone — and the end
+ * screen offers the one explicit door into 覚える, per word or all at once
+ * (PR70-P0-1: exposure is not mastery, and a lesson finishing itself is
+ * not the learner choosing retrieval). No default action: choose nothing
+ * and the deck gains nothing. One shared learner model; no separate
+ * notion of "known". */
 const LESSON_SIZE = 10;
 function lessonLaneIds(kind, lvl) {
   return (kind === 'kanji' ? laneMembers().kanken[lvl] : laneMembers().jlpt[lvl]) || [];
@@ -4601,20 +4688,24 @@ function renderLessons(main) {
       btn.type = 'button';
       btn.id = 'lesson-next';
       btn.addEventListener('click', () => {
+        // each answered word leaves its honest mark in the session run —
+        // the completion commit files them all as evidence rows
+        (run.results ||= [])[run.ix] = run.picked === run.choices.right ? 3 : 1;
         if (run.ix + 1 < run.words.length) { run.ix += 1; run.picked = null; run.choices = null; }
         else {
-          // completion writes the result and the minted words as ONE commit;
-          // a failed persist ends nothing — the run stays, the alert speaks
-          const lessonsDone = { ...S.lessonsDone, [run.id]: { score: run.correct, total: run.words.length, ts: Date.now() } };
+          // 稽古は記録、入門は選択 (PR70-P0-1): completion writes the score
+          // and one practice-evidence obslog row per word as ONE commit —
+          // zero deck rows, zero FSRS state. The way into 覚える is the
+          // explicit choice on the end screen. A failed persist ends
+          // nothing — the run stays, the alert speaks.
           const kt = run.kind || 'word';
-          const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
-          const taken = [
-            ...S.taken,
-            ...run.words
-              .filter((w) => !takenSet.has(srsKey(kt, w)))
-              .map((w) => ({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() })),
+          const now = Date.now();
+          const lessonsDone = { ...S.lessonsDone, [run.id]: { score: run.correct, total: run.words.length, ts: now } };
+          const obslog = [
+            ...(S.obslog || []),
+            ...run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, run.id]),
           ];
-          if (!commitStorePatch({ lessonsDone, taken })) {
+          if (!commitStorePatch({ lessonsDone, obslog })) {
             render();
             return;
           }
@@ -4626,11 +4717,62 @@ function renderLessons(main) {
     }
     return;
   }
-  // end: the honest score, and where the words went
+  // end: the honest score, the evidence named — and the ONE explicit door
+  // into the deck (PR70-P0-1). Nothing enrolled itself: the run's practice
+  // stands in the observation ledger; 覚える is a quiet choice, per word
+  // or all at once, and choosing nothing adds nothing.
   main.append(el('h1', 'view-title', tx(`${run.correct} / ${run.words.length}`, `${run.correct} of ${run.words.length}`)));
   main.append(
-    el('p', 'gloss', tx('この課の語はぜんぶ「覚える」に入った。復習が育てていく。', 'Every word from this lesson is now in your memorize list — the reviews will grow them from here.')),
+    el(
+      'p',
+      'gloss',
+      tx(
+        '稽古は記録に残った。札にするかどうかは、ここで選ぶ — 選ばなければ、何も増えない。',
+        'The practice is on the record. Whether a word becomes a card is chosen here — choose nothing, and nothing is added.',
+      ),
+    ),
   );
+  const kt = run.kind || 'word';
+  const inDeck = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
+  // an enroll is the learner's explicit promotion: the row carries the
+  // started mark the moment it is chosen (R2-A), one guarded commit each
+  const enrollRow = (w) => ({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() });
+  const list = el('div', 'lesson-enroll');
+  run.words.forEach((w, i) => {
+    const row = el('div', 'lesson-enroll-row');
+    const right = (run.results || [])[i] === 3;
+    row.append(el('span', 'lesson-enroll-mark' + (right ? ' right' : ' wrong'), right ? '○' : '×'));
+    row.append(el('span', 'lesson-enroll-word', w));
+    const have = inDeck.has(srsKey(kt, w));
+    const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
+    b.type = 'button';
+    b.dataset.enroll = w;
+    b.disabled = have;
+    if (!have) {
+      b.addEventListener('click', () => {
+        if (commitStorePatch({ taken: [...S.taken, enrollRow(w)] })) render();
+      });
+    }
+    row.append(b);
+    list.append(row);
+  });
+  main.append(list);
+  const freshWords = run.words.filter((w) => !inDeck.has(srsKey(kt, w)));
+  if (freshWords.length) {
+    const all = biLabel(
+      'button',
+      'chip lesson-enroll-all',
+      `ぜんぶ覚える — ${freshWords.length} 件`,
+      `memorize all ${freshWords.length}`,
+    );
+    all.type = 'button';
+    all.id = 'lesson-enroll-all';
+    all.addEventListener('click', () => {
+      // exactly the not-yet-chosen words, as ONE committed batch (P0-4)
+      if (commitStorePatch({ taken: [...S.taken, ...freshWords.map(enrollRow)] })) render();
+    });
+    main.append(all);
+  }
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
   again.type = 'button';
   again.addEventListener('click', endLessonRun);
@@ -4643,8 +4785,9 @@ function renderLessons(main) {
  * the app renders and scores them like a lesson quiz. Testing only:
  * nothing here writes to the SRS — FSRS alone schedules. The strict-JSON
  * contract is parsed defensively; a malformed reply degrades to the same
- * quiet one-line failure as every other tutor door. In-memory only: a
- * quiz is an event, not a possession. */
+ * quiet one-line failure as every other tutor door. The RUN is durable
+ * (POL-13): every step commits, so a mid-quiz reload resumes with not a
+ * word of the tutor's lost; only the learner's own door closes it. */
 function aiQuizParse(raw) {
   const m = raw.match(/\[[\s\S]*\]/);
   if (!m) return null;
@@ -4669,6 +4812,13 @@ function aiQuizParse(raw) {
   );
   return ok.length >= 3 ? ok.slice(0, 5) : null;
 }
+/** POL-13 · every quiz step crosses the durability boundary, so a reload
+ * lands back exactly where the learner stood. A device that cannot save
+ * keeps the quiz alive in memory — the storage alert speaks, the learner
+ * still finishes; only durability is lost, never the words. */
+function aiQuizCommit(next) {
+  if (!commitStorePatch({ aiQuiz: next })) S.aiQuiz = next;
+}
 async function aiQuizStart() {
   const words = S.taken.filter((t) => t.t === 'word').slice(-14).map((t) => t.id);
   const raw = await aiAsk(
@@ -4678,7 +4828,7 @@ async function aiQuizStart() {
   );
   const qs = aiQuizParse(raw);
   if (!qs) throw new Error('shape');
-  S.aiQuiz = { qs, ix: 0, picked: null, correct: 0 };
+  aiQuizCommit({ qs, ix: 0, picked: null, correct: 0, ts: Date.now() });
 }
 function renderAiQuiz(main) {
   const run = S.aiQuiz;
@@ -4695,8 +4845,10 @@ function renderAiQuiz(main) {
     );
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';
+    out.id = 'aiq-close';
     out.addEventListener('click', () => {
-      S.aiQuiz = null;
+      // the learner's own door is the one thing that lets a quiz go
+      aiQuizCommit(null);
       S.view = 'tray';
       render();
     });
@@ -4717,8 +4869,9 @@ function renderAiQuiz(main) {
       b.disabled = true;
     } else {
       b.addEventListener('click', () => {
-        run.picked = i;
-        if (i === q.right) run.correct += 1;
+        // the pick commits before it shows (POL-13): a reload mid-question
+        // reopens on the same marked answer and the same running score
+        aiQuizCommit({ ...run, picked: i, correct: run.correct + (i === q.right ? 1 : 0) });
         render();
       });
     }
@@ -4731,8 +4884,7 @@ function renderAiQuiz(main) {
     btn.type = 'button';
     btn.id = 'aiq-next';
     btn.addEventListener('click', () => {
-      run.ix += 1;
-      run.picked = null;
+      aiQuizCommit({ ...run, ix: run.ix + 1, picked: null });
       render();
     });
     main.append(btn);
@@ -7186,7 +7338,10 @@ function reviewBack(item) {
 function renderReview(main) {
   const rv = S.review;
   // a focus block keeps the queue full: when the cards run dry before the
-  // clock, draw the next batch from the pool so drilling never stalls
+  // clock, draw the next lap from the pool so drilling never stalls — and
+  // laps after the first are PRACTICE (POL-12): the schedule already took
+  // its one honest grade per card this block; repeats stamp 稽古 evidence
+  // rows, never a second mutation
   if (rv && S.focus && !S.focus.ended && rv.ix >= rv.queue.length && Date.now() < S.focus.deadline) {
     refillFocusQueue(rv);
   }
@@ -7473,14 +7628,19 @@ function renderReview(main) {
   // not deck membership (P0, full-instrument review): grading it must not
   // mint FSRS state the due queue can never surface (srsDueItems walks
   // S.taken only), must not write revlog rows for a card that does not
-  // exist, and must not burn one of the day's new-card slots. The drill
-  // still behaves like a session — short ratings repeat in-session, the
+  // exist, and must not burn one of the day's new-card slots. The same
+  // rite covers the refill's second lap (POL-12): a card this block
+  // already graded took its one honest schedule grade — a repeat pass
+  // (item.drillPass, stamped by refillFocusQueue) is practice, never a
+  // same-minute remutation of the long-term schedule. The drill still
+  // behaves like a session — short ratings repeat in-session, the
   // judgment lands in the observation ledger as evidence (the drill room
   // rides the row), and undo takes it back.
   const drillOnly =
     S.focus &&
-    S.srs[srsKey(item.t, item.id)] === undefined &&
-    !S.taken.some((t) => t.t === item.t && t.id === item.id);
+    (item.drillPass === true ||
+      (S.srs[srsKey(item.t, item.id)] === undefined &&
+        !S.taken.some((t) => t.t === item.t && t.id === item.id)));
   const row = el('div', 'grade-row');
   if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
@@ -7746,7 +7906,13 @@ function refillFocusQueue(rv) {
   const f = S.focus;
   if (!f || !f.pool.length) return false;
   for (let i = 0; i < FOCUS_BATCH; i++) {
-    rv.queue.push(f.pool[f.cursor % f.pool.length]);
+    const item = f.pool[f.cursor % f.pool.length];
+    // 二周目からは稽古 (POL-12): once the cursor has walked the whole pool,
+    // every further draw is a PRACTICE pass — the block's first grade stays
+    // the only one that touched the long-term schedule. The copy marks the
+    // lap, the seals stamp 稽古, and the grade path files a 'dojo' evidence
+    // row instead of regrading a card that is no longer due.
+    rv.queue.push(f.cursor >= f.pool.length ? { ...item, drillPass: true } : item);
     f.cursor += 1;
   }
   return true;
@@ -7831,7 +7997,9 @@ function renderFocus(main) {
   const due = forecast.today + forecast.fresh;
   const modes = el('div', 'focus-modes');
   const modeDefs = [
-    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている`, `${due} waiting`)],
+    // the sub tells the whole truth (POL-12): the block reviews each waiting
+    // card once; when the clock outlasts the pool, further laps are practice
+    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている ・ 二周目からは稽古`, `${due} waiting · after the first lap, practice`)],
     ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
     ['yomi', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took')],
   ];

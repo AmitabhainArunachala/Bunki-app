@@ -4216,6 +4216,52 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border-color: var(--red);
 }
 
+/* the end screen's explicit enroll choice (PR70-P0-1): one quiet row per
+ * word — its honest ○/× mark, the word, and the 覚える door */
+.lesson-enroll {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 12px;
+}
+
+.lesson-enroll-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.lesson-enroll-mark {
+  flex: none;
+  width: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.lesson-enroll-mark.wrong {
+  color: var(--red);
+}
+
+.lesson-enroll-word {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 17px;
+}
+
+.lesson-enroll-one {
+  flex: none;
+}
+
+.lesson-enroll-one.on {
+  color: var(--ink-2);
+}
+
+.lesson-enroll-all {
+  margin: 10px 0 4px;
+}
+
 /* ------------------------------------------------------------ thesaurus
  * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
  * followed by sem-rows (shared with the entry sheet's 意味の近く block). */
@@ -4502,6 +4548,18 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .aiq-start {
   margin-top: 12px;
+}
+
+/* POL-13 · the surviving quiz's two doors on the tray: back in, or let go */
+.aiq-resume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.aiq-drop {
+  color: var(--ink-2);
 }
 
 /* the cloze face: the shelf's own sentence, with the word's place held */

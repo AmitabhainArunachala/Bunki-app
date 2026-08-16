@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year",
-        "senses": 3,
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 12:58",
+          "2026-08-16 13:28",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 13:03",
+          "2026-08-16 13:33",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 13:07",
+          "2026-08-16 13:37",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 12:57",
+          "2026-08-24 13:27",
           "8.30"
         ]
       ]
@@ -7493,9 +7493,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 373,
+  "loadMs": 673,
   "summary": {
-    "total": 190,
+    "total": 205,
     "failed": 0
   },
   "results": [
@@ -7522,7 +7522,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.7100067138672,\"y\":570.489990234375,\"productive\":true}"
+      "detail": "{\"x\":147.6300048828125,\"y\":570.75,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7542,7 +7542,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 373 ms"
+      "detail": "82 texts, ready in 673 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7742,7 +7742,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 3 senses"
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -8022,7 +8022,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786885127491,\"probe\",\"word:石鹸\",1,1]"
+      "detail": "row [1786886944385,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8047,7 +8047,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786885131126,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786886948159,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8142,7 +8142,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“石鹸” · 2 sentence lines · 3 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8262,12 +8262,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T12:59:32.580Z; due 2026-08-26T12:59:32.580Z"
+      "detail": "anchor held at 2026-08-19T13:29:52.289Z; due 2026-08-26T13:29:52.289Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786885173508 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786886993336 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8417,7 +8417,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T13:00:13.205Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T13:30:34.598Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8446,6 +8446,81 @@
     },
     {
       "name": "R3-D · the probes leave no console errors",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades",
+      "pass": true,
+      "detail": "4 JLPT lanes · 漢検 true"
+    },
+    {
+      "name": "R4-B · lesson completion alone creates ZERO deck rows — the score and the evidence, nothing else",
+      "pass": true,
+      "detail": "taken 0 · srs 0 · lessonsDone [\"N5-1\"] · \"1 of 10\""
+    },
+    {
+      "name": "R4-B · the run's words land as practice-evidence rows, one per word, named by the run",
+      "pass": true,
+      "detail": "10 lesson rows for N5-1"
+    },
+    {
+      "name": "R4-B · one word chosen → exactly one deck row, started-marked, still cardless until reviewed",
+      "pass": true,
+      "detail": "[[\"ああ\",true]] for choice ああ"
+    },
+    {
+      "name": "R4-B · ぜんぶ覚える enrolls exactly the rest — ten rows, no duplicates, every one started",
+      "pass": true,
+      "detail": "{\"n\":10,\"unique\":10,\"allStarted\":true,\"allDoorGone\":true}"
+    },
+    {
+      "name": "R4-B · the due-mode copy says what the refill does — after the first lap, practice",
+      "pass": true,
+      "detail": "sub \"2 waiting · after the first lap, practice\""
+    },
+    {
+      "name": "R4-B · lap one grades for real — honest intervals, no practice stamp",
+      "pass": true,
+      "detail": "10 min · 11 d · 16 d · 26 d"
+    },
+    {
+      "name": "R4-B · the first lap wrote the deck — two schedules moved, two revlog rows, zero practice rows",
+      "pass": true,
+      "detail": "revlog 2 · dojo rows 0"
+    },
+    {
+      "name": "R4-B · lap two stamps 稽古 on every seal — the schedule is promised nothing",
+      "pass": true,
+      "detail": "学校 → practice · practice · practice · practice"
+    },
+    {
+      "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
+      "pass": true,
+      "detail": "row [1786887051285,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+    },
+    {
+      "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",
+      "pass": true,
+      "detail": "\"RELOAD-Q2 問二\" at \"2 / 3\""
+    },
+    {
+      "name": "R4-B · even the marked answer survives a reload — the why line and the mark come back",
+      "pass": true,
+      "detail": "{\"why\":\"because two\",\"marked\":1}"
+    },
+    {
+      "name": "R4-B · the finished quiz shows its honest score and still grades nothing",
+      "pass": true,
+      "detail": "title \"2 of 3\" · stored true"
+    },
+    {
+      "name": "R4-B · only the learner's own door lets the quiz go",
+      "pass": true,
+      "detail": "stored aiQuiz null"
+    },
+    {
+      "name": "R4-B · the probes leave no console errors",
       "pass": true,
       "detail": "clean"
     }

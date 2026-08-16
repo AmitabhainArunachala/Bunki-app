@@ -71,6 +71,7 @@ function state(overrides = {}) {
     suspended: {},
     aiChat: [],
     ai: {},
+    aiQuiz: null,
     stats: {},
     srsPrefs: { newPerDay: 20, reviewLimit: 20 },
     readDone: {},
@@ -271,6 +272,9 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [15, 'params', 'fsrs', 'length'],
       [15, 'reveal', 'word:海', 1],
       [16, 'reveal', 'word:海', 0],
+      [17, 'lesson', 'word:海', 3, 'N5-1'],
+      [18, 'lesson', 'word:海', 1, 'N5-1'],
+      [19, 'dojo', 'word:海', 3, 'due'],
     ],
     deepWords: { 海: { r: 'うみ', m: ['sea'], jlpt: 'N5', k: ['海'], seq: '1' } },
     lessonsDone: { lesson: { score: 1, total: 1, ts: 10 } },
@@ -279,6 +283,17 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
     suspended: { 'word:波': 10 },
     aiChat: [{ role: 'user', text: '海' }],
     ai: { baseUrl: 'https://example.invalid', model: 'test-model' },
+    aiQuiz: {
+      qs: [
+        { q: '問一', opts: ['a', 'b', 'c', 'd'], right: 0, why: 'one' },
+        { q: '問二', opts: ['a', 'b', 'c', 'd'], right: 1, why: 'two' },
+        { q: '問三', opts: ['a', 'b', 'c', 'd'], right: 3, why: 'three' },
+      ],
+      ix: 3,
+      picked: null,
+      correct: 2,
+      ts: 10,
+    },
     stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
     srsPrefs: {
       newPerDay: 35,
@@ -301,6 +316,10 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   assert.equal(storeContext.S.srs['word:海'].state, 2);
   assert.equal(storeContext.S.ai.baseUrl, 'https://example.invalid');
   assert.equal(storeContext.S.ai.model, 'test-model');
+  // POL-13 · a persisted quiz run — the score screen included — hydrates whole
+  assert.equal(storeContext.S.aiQuiz.ix, 3);
+  assert.equal(storeContext.S.aiQuiz.qs.length, 3);
+  assert.equal(storeContext.S.aiQuiz.correct, 2);
   assert.equal(storeContext.S.srsPrefs.newPerDay, 35);
   assert.equal(storeContext.S.srsPrefs.reviewLimit, 45);
   // R3-D · the learner's fitted weights hydrate VERBATIM alongside pacing
@@ -311,6 +330,14 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
 });
 
 verified('every-known-root-and-version-shape-fails-closed', () => {
+  const quizQ = () => ({ q: '問', opts: ['a', 'b', 'c', 'd'], right: 0, why: 'w' });
+  const quizRun = (over = {}) => ({
+    qs: [quizQ(), quizQ(), quizQ()],
+    ix: 0,
+    picked: null,
+    correct: 0,
+    ...over,
+  });
   const validCard = {
     due: '2026-08-16T00:00:00.000Z',
     last_review: '2026-08-15T00:00:00.000Z',
@@ -400,6 +427,11 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog non-integer reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', '1']] }],
     ['obslog short reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海']] }],
     ['obslog overlong reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海', 1, 'extra']] }],
+    ['obslog malformed lesson grade', { v: 1, obslog: [[1, 'lesson', 'word:海', 2, 'N5-1']] }],
+    ['obslog short lesson row', { v: 1, obslog: [[1, 'lesson', 'word:海', 3]] }],
+    ['obslog lesson id type', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, 42]] }],
+    ['obslog lesson id empty', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, '']] }],
+    ['obslog overlong lesson row', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, 'N5-1', 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -418,6 +450,32 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['ai root', { v: 1, ai: [] }],
     ['ai nested baseUrl', { v: 1, ai: { baseUrl: 1 } }],
     ['ai nested model', { v: 1, ai: { model: '' } }],
+    ['aiQuiz root', { v: 1, aiQuiz: [] }],
+    ['aiQuiz missing questions', { v: 1, aiQuiz: { ix: 0, picked: null, correct: 0 } }],
+    ['aiQuiz too few questions', { v: 1, aiQuiz: quizRun({ qs: [quizQ(), quizQ()] }) }],
+    [
+      'aiQuiz too many questions',
+      { v: 1, aiQuiz: quizRun({ qs: [quizQ(), quizQ(), quizQ(), quizQ(), quizQ(), quizQ()] }) },
+    ],
+    ['aiQuiz question shape', { v: 1, aiQuiz: quizRun({ qs: [null, quizQ(), quizQ()] }) }],
+    [
+      'aiQuiz question option count',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), opts: ['a', 'b', 'c'] }, quizQ(), quizQ()] }) },
+    ],
+    [
+      'aiQuiz question option type',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), opts: [1, 'b', 'c', 'd'] }, quizQ(), quizQ()] }) },
+    ],
+    [
+      'aiQuiz question right index',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), right: 4 }, quizQ(), quizQ()] }) },
+    ],
+    ['aiQuiz cursor type', { v: 1, aiQuiz: quizRun({ ix: '0' }) }],
+    ['aiQuiz cursor past the end', { v: 1, aiQuiz: quizRun({ ix: 4 }) }],
+    ['aiQuiz picked range', { v: 1, aiQuiz: quizRun({ picked: 4 }) }],
+    ['aiQuiz picked type', { v: 1, aiQuiz: quizRun({ picked: '1' }) }],
+    ['aiQuiz correct range', { v: 1, aiQuiz: quizRun({ correct: 4 }) }],
+    ['aiQuiz timestamp type', { v: 1, aiQuiz: quizRun({ ts: 'now' }) }],
     ['stats root', { v: 1, stats: [] }],
     ['stats nested day', { v: 1, stats: { day: [] } }],
     ['stats nested count', { v: 1, stats: { day: { n: 'one' } } }],
@@ -1430,18 +1488,81 @@ verified('bounded-standard-review-freeze-and-dojo-refill-kept', () => {
   assert.match(startBlock, /deferred/);
   const refill = between('function refillFocusQueue(rv) {', 'function startFocus(');
   assert.match(refill, /FOCUS_BATCH/, 'the timed dojo keeps its refill pacing');
+  assert.match(refill, /drillPass: true/, 'the second lap is marked practice (POL-12)');
+  assert.match(refill, /f\.cursor >= f\.pool\.length/);
+});
+
+/* ------------------------------------------------ POL-12 · the refill's
+ * second lap. The REAL extracted refill runs in vm: the first walk over the
+ * pool hands out the pool's own rows (they take their one honest schedule
+ * grade), and every draw after the cursor has passed the pool's length is a
+ * COPY marked drillPass — the grade path reads that mark and files practice
+ * evidence instead of remutating a schedule that already moved this block. */
+verified('dojo-refill-second-lap-is-practice', () => {
+  const batchBlock = between(
+    '/** How many pool items a dojo refill draws at once',
+    'const LEECH_LAPSES',
+  );
+  const refillBlock = between('function refillFocusQueue(rv) {', 'function startFocus(');
+  const context = vm.createContext({ S: { focus: null } });
+  vm.runInContext(
+    `${batchBlock}\n${refillBlock}\n;globalThis.__refill = refillFocusQueue;`,
+    context,
+    { filename: 'corridor-refill-block.js' },
+  );
+  const a = { t: 'word', id: '海' };
+  const b = { t: 'word', id: '波' };
+  // a fresh block: the first lap hands out the pool's own rows untouched,
+  // and the wrap that follows in the same batch is already marked practice
+  context.S.focus = { pool: [a, b], cursor: 0 };
+  const rv = { queue: [] };
+  assert.equal(context.__refill(rv), true);
+  assert.equal(rv.queue.length, 20);
+  assert.strictEqual(rv.queue[0], a);
+  assert.strictEqual(rv.queue[1], b);
+  assert.ok(rv.queue.slice(0, 2).every((row) => row.drillPass === undefined));
+  assert.ok(
+    rv.queue.slice(2).every((row) => row.drillPass === true && row !== a && row !== b),
+    'every wrap draw is a marked copy, never the pool row itself',
+  );
+  assert.equal(rv.queue[2].id, '海');
+  assert.equal(rv.queue[3].id, '波');
+  // a later refill in the same block draws practice passes only
+  const rv2 = { queue: [] };
+  assert.equal(context.__refill(rv2), true);
+  assert.ok(rv2.queue.every((row) => row.drillPass === true));
+  // an empty pool refuses the refill
+  context.S.focus = { pool: [], cursor: 0 };
+  assert.equal(context.__refill({ queue: [] }), false);
+  // and the grade path honours the mark inside the dojo branch alone
+  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
+  assert.match(gradeRegion, /S\.focus &&\s*\(item\.drillPass === true \|\|/);
 });
 
 verified('every-in-app-mint-carries-the-started-mark', () => {
-  // capture (覚える), lane bulk memorize, lesson completion, probe miss mint
+  // capture (覚える), lane bulk memorize, lesson enroll choice, probe miss mint
   assert.match(captureActionBlock, /started: now/);
   const laneMint = between('const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));', '/* --------------------------------------------------------------- lessons');
   assert.match(laneMint, /started: Date\.now\(\)/);
-  // lesson completion mints on copies and commits once (R3-C sweep)
-  const lessonMint = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
-  assert.match(lessonMint, /started: Date\.now\(\)/);
-  assert.match(lessonMint, /commitStorePatch\(\{ lessonsDone, taken \}\)/);
-  assert.doesNotMatch(lessonMint, /S\.taken\.push|saveStore\(/);
+  // lesson completion writes EVIDENCE only (PR70-P0-1): the score and one
+  // obslog row per word ride ONE commit — no deck rows, no promotion mark
+  const lessonFinish = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
+  assert.match(lessonFinish, /commitStorePatch\(\{ lessonsDone, obslog \}\)/);
+  assert.doesNotMatch(lessonFinish, /started|taken|saveStore\(/);
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'lesson', 'word:海', 3, 'N5-1']] }),
+    true,
+  );
+  // …and the end screen's explicit enroll door is where the mark is minted —
+  // per word or all at once, each choice one guarded commit built on copies
+  const lessonEnroll = between('const enrollRow = (w) =>', "'レッスン一覧へ'");
+  assert.match(lessonEnroll, /started: Date\.now\(\)/);
+  assert.match(lessonEnroll, /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, enrollRow\(w\)\] \}\)/);
+  assert.match(
+    lessonEnroll,
+    /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, \.\.\.freshWords\.map\(enrollRow\)\] \}\)/,
+  );
+  assert.doesNotMatch(lessonEnroll, /S\.taken\.push|saveStore\(/);
   // the probe's mint now rides the guarded boundary (R3-C sweep): the
   // started mark is built on the patch copy, never pushed live
   const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'commitStorePatch(patch)');
@@ -1691,6 +1812,9 @@ console.log(
         'ignored-params-obslog-note',
         'declared-recall-obslog-row',
         'transactional-sweep-p04',
+        'lesson-practice-evidence-and-explicit-enroll',
+        'dojo-second-lap-practice',
+        'persisted-quiz-run',
       ],
       residualUnsafeSaveCallers: 5,
       browserAndDevice: 'NOT_RUN',
