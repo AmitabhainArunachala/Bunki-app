@@ -13,6 +13,15 @@
  * must render each English title from the record itself, and every
  * human-review-pending row must stay visibly 検収前 on the shelf.
  *
+ * R3-A (furigana truth): the reading-override lexicon
+ * (docs/content/reading-overrides.json) must be minted into every curated
+ * body — the suspect-reading rules are re-run here in JS over all curated
+ * tokens (deity-name 神 reads かみ-family ruby, never an unreviewed しん;
+ * no lexicon site unapplied; no rubyless kanji token; no unreviewed 都(と)
+ * or unknown-word kanji fallback), the committed checker report must agree
+ * with that recount with zero open rows, and the flagship article's DOM must
+ * render the lexicon readings as its actual ruby.
+ *
  * Usage:
  *   CHROMIUM_PATH=/path/to/chromium node tools/verify-native-readings.mjs
  *   node tools/verify-native-readings.mjs --shots DIR --report FILE
@@ -307,6 +316,129 @@ const quickTokenIndex = new Map(
   }),
 );
 
+// ---------------------------------------------------------------- R3-A
+// Furigana truth: the reading-override lexicon is DATA with provenance, the
+// mint pipeline applies it at tokenization time, and these probes convict a
+// reverted build on the committed bytes alone (no browser needed for this
+// half). The rules mirror tools/check_suspect_readings.py exactly.
+const FLAGSHIP_ID = 'bunki-graded-n3-zoka-sanjin-morning';
+const KANJI_RE = /[㐀-䶵一-鿌豈-﫿]/;
+const LEXICON_PATH = resolve(REPO, 'docs/content/reading-overrides.json');
+const SUSPECT_REPORT_PATH = resolve(
+  REPO,
+  'docs/build-evidence/renkan/furigana-truth/suspect-readings.json',
+);
+const lexicon = JSON.parse(readFileSync(LEXICON_PATH, 'utf8'));
+const curatedBodies = index.articles
+  .filter((row) => !String(row.file || '').startsWith('archive/'))
+  .map((row) => [
+    row.id,
+    JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles', row.file), 'utf8')),
+  ]);
+const sequenceSites = (tokens, entries) => {
+  const ordered = [...entries].sort((a, b) => b.surfaces.length - a.surfaces.length);
+  const sites = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const entry = ordered.find(
+      (candidate) =>
+        i + candidate.surfaces.length <= tokens.length &&
+        candidate.surfaces.every((surface, j) => tokens[i + j].s === surface),
+    );
+    if (!entry) {
+      i += 1;
+      continue;
+    }
+    sites.push([i, entry]);
+    i += entry.surfaces.length;
+  }
+  return sites;
+};
+{
+  check(
+    'the reading-override lexicon is committed with provenance and aligned entries',
+    lexicon.kind === 'reading-override-lexicon' &&
+      !!lexicon.provenance?.policy &&
+      Array.isArray(lexicon.entries) &&
+      lexicon.entries.length > 0 &&
+      lexicon.entries.every(
+        (entry) =>
+          entry.word &&
+          entry.reading &&
+          Array.isArray(entry.surfaces) &&
+          entry.surfaces.length === entry.readings.length &&
+          !!entry.note,
+      ),
+    `${lexicon.entries?.length ?? 0} entries · ${lexicon.accepts?.length ?? 0} accepts`,
+  );
+
+  const recount = { 'lexicon-fixed': 0, accepted: 0, open: 0 };
+  const openRows = [];
+  let deityKamiSites = 0;
+  let flagshipShin = 0;
+  for (const [id, body] of curatedBodies) {
+    const tokens = body.tokens;
+    const acceptCover = new Set();
+    for (const [start, entry] of sequenceSites(tokens, lexicon.accepts ?? [])) {
+      const ok = entry.readings.every(
+        (reading, j) => reading === null || tokens[start + j].r === reading,
+      );
+      if (ok) for (let j = 0; j < entry.surfaces.length; j += 1) acceptCover.add(start + j);
+    }
+    const tally = (i, rule, resolved) => {
+      recount[resolved] += 1;
+      if (resolved === 'open')
+        openRows.push(`${id} #${i} ${tokens[i].s}(${tokens[i].r}) [${rule}]`);
+    };
+    for (const [start, entry] of sequenceSites(tokens, lexicon.entries)) {
+      entry.readings.forEach((reading, j) => {
+        if (reading === null) return;
+        const token = tokens[start + j];
+        const minted = token.r === reading && token.rs === 'lexicon';
+        tally(start + j, 'override-site', minted ? 'lexicon-fixed' : 'open');
+        if (entry.kind === 'deity-name' && /かみ$/.test(reading) && minted) deityKamiSites += 1;
+      });
+    }
+    tokens.forEach((token, i) => {
+      const covered = token.rs === 'lexicon';
+      const accepted = acceptCover.has(i);
+      const hasKanji = KANJI_RE.test(token.s);
+      if (token.s === '神' && token.r !== 'かみ' && !covered) {
+        tally(i, 'kami-on', accepted ? 'accepted' : 'open');
+        if (id === FLAGSHIP_ID && !accepted) flagshipShin += 1;
+      }
+      if (hasKanji && !token.r && !covered) tally(i, 'empty-ruby', accepted ? 'accepted' : 'open');
+      if (token.s === '都' && token.r === 'と' && !covered)
+        tally(i, 'miyako', accepted ? 'accepted' : 'open');
+      if (token.p === '記号' && hasKanji && !covered)
+        tally(i, 'unk-kanji', accepted ? 'accepted' : 'open');
+    });
+  }
+  check(
+    'every lexicon override site is minted into the curated bodies — no suspect reading left open',
+    recount.open === 0 && recount['lexicon-fixed'] > 0,
+    openRows.slice(0, 4).join(' | ') ||
+      `${recount['lexicon-fixed']} lexicon-fixed · ${recount.accepted} accepted across ${curatedBodies.length} bodies`,
+  );
+  check(
+    'deity names read かみ-family ruby at every minted site; the flagship carries no unreviewed 神(しん)',
+    deityKamiSites >= 90 && flagshipShin === 0,
+    `${deityKamiSites} deity かみ sites · ${flagshipShin} unreviewed しん in ${FLAGSHIP_ID}`,
+  );
+  const suspectReport = JSON.parse(readFileSync(SUSPECT_REPORT_PATH, 'utf8'));
+  const reportCounts = suspectReport.statusCounts ?? {};
+  check(
+    'the committed suspect-readings report is empty of unfixed rows and agrees with this recount',
+    suspectReport.kind === 'suspect-readings-report' &&
+      suspectReport.openCount === 0 &&
+      suspectReport.rows.every((row) => row.status !== 'open') &&
+      (reportCounts['lexicon-fixed'] ?? 0) === recount['lexicon-fixed'] &&
+      (reportCounts.accepted ?? 0) === recount.accepted &&
+      suspectReport.scanned?.articles === curatedBodies.length,
+    `report ${reportCounts['lexicon-fixed'] ?? 0}/${reportCounts.accepted ?? 0}/${suspectReport.openCount} vs recount ${recount['lexicon-fixed']}/${recount.accepted}/${recount.open}`,
+  );
+}
+
 const executablePath = process.env.CHROMIUM_PATH || undefined;
 const { server, base } = await startServer(CORRIDOR);
 let browser;
@@ -462,6 +594,48 @@ try {
     await touchAt(page, page.locator('[data-dial="furigana:2"]'));
     const settingsChanged =
       (await page.locator('[data-dial="furigana:2"]').getAttribute('aria-pressed')) === 'true';
+
+    // R3-A — the flagship's rendered ruby IS the lexicon reading at every
+    // override site: 神 wears かみ in deity-name positions, しん never.
+    if (id === FLAGSHIP_ID) {
+      const lexiconSites = body.tokens
+        .map((token, i) => ({ token, i }))
+        .filter(({ token }) => token.rs === 'lexicon')
+        .map(({ token, i }) => ({
+          i,
+          surface: token.s,
+          ruby: token.f.filter((pair) => pair.r).map((pair) => pair.r),
+        }));
+      const domRuby = await page.evaluate(
+        (positions) =>
+          positions.map((position) => {
+            const tok = document.querySelectorAll('#reader .tok')[position];
+            return tok ? [...tok.querySelectorAll('rt')].map((rt) => rt.textContent) : null;
+          }),
+        lexiconSites.map((site) => site.i),
+      );
+      const mismatched = lexiconSites.filter(
+        (site, n) => JSON.stringify(domRuby[n]) !== JSON.stringify(site.ruby),
+      );
+      // Name positions are the 神 tokens whose lexicon ruby is かみ (the
+      // reviewed compound 創造神(そうぞうしん) is a term, not a name).
+      const kamiSites = lexiconSites.filter(
+        (site) => site.surface === '神' && site.ruby.join('') === 'かみ',
+      );
+      const kamiWrong = kamiSites.filter((site) => {
+        const rendered = domRuby[lexiconSites.indexOf(site)]?.join('');
+        return rendered !== 'かみ' || rendered === 'しん';
+      });
+      check(
+        'flagship DOM renders the lexicon ruby at every override site — 神 reads かみ in name positions, しん never',
+        lexiconSites.length >= 18 &&
+          kamiSites.length >= 6 &&
+          mismatched.length === 0 &&
+          kamiWrong.length === 0,
+        `${lexiconSites.length} sites (${kamiSites.length} bare 神) · mismatched ${mismatched.length}`,
+        id,
+      );
+    }
 
     const quick = await openQuickLook(page, quickTokenIndex.get(id));
     let fullEntry = null;
