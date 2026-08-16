@@ -2395,6 +2395,26 @@ function go(node, { invoker = null } = {}) {
 }
 
 function back() {
+  // The chrome's own overlays are the topmost layers of all: an open nav,
+  // the world stones, the capture panel. Device Back could not see them, so
+  // a learner who opened one and pressed Back left the app entirely with it
+  // still on the glass (E3 round-A, dead-ends lens). They dismiss in the
+  // order they stack, before any room moves.
+  if (worldPickerEls) {
+    closeWorldPicker();
+    return;
+  }
+  if (S.captureOpen) {
+    S.captureOpen = false;
+    render();
+    return;
+  }
+  if (S.navOpen) {
+    S.navOpen = false;
+    S.navReturn = false;
+    render();
+    return;
+  }
   // 筆順 is the topmost layer when it is open — it leaves before the sheet does
   if (S.strokes) {
     closeStrokePage();
@@ -2477,6 +2497,16 @@ function back() {
       S.view = 'reader';
       render();
       window.scrollTo(0, S.readerPos?.[S.passageId] || 0);
+      return;
+    }
+    // …and every other room it can be opened from, at the offset it was
+    // opened at
+    if (S.view === 'tray' && plainRecord(S.trayFrom) && S.trayFrom.view) {
+      const home = S.trayFrom;
+      S.trayFrom = null;
+      S.view = home.view;
+      render();
+      window.scrollTo(0, home.scroll || 0);
       return;
     }
     // an archive article returns to its stack, not the curated shelf — and to
@@ -2614,6 +2644,9 @@ let walkConsuming = false;
 /** Whether the app's own back() would still move — the mirror of the chrome's
  * atHome test, plus the layers back() itself handles first. */
 function canWalkBack() {
+  // the chrome overlays are walkable layers too — the sentinel must stay
+  // armed while one is open, or Back would leave the app instead of it
+  if (worldPickerEls || S.captureOpen || S.navOpen) return true;
   if (S.strokes || S.stack.length) return true;
   if (S.view === 'drift') return S.driftDepth > 0;
   if (S.view === 'entry') return false;
@@ -12753,9 +12786,17 @@ function render() {
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];
-    // the tray remembers its door: opened mid-article, back returns to the
-    // article — not the shelf (P2, review: "abandons the article mid-read")
-    S.trayFrom = S.view === 'reader' && S.passageId ? 'reader' : null;
+    // the tray remembers its door — WHICHEVER door it was. It is the one
+    // control present in the chrome of every surface, so returning always to
+    // the shelf threw away the archive year-list, the levels room, the
+    // lessons list… every room but the reader (E3 round-A, dead-ends lens).
+    // The origin is the view and its offset, not a single special case.
+    S.trayFrom =
+      S.view === 'reader' && S.passageId
+        ? 'reader'
+        : S.view !== 'tray'
+          ? { view: S.view, scroll: Math.round(window.scrollY) }
+          : null;
     if (S.trayFrom === 'reader') {
       // readerPos bookmark — UI preference, not learner evidence (P0-4
       // residual-ledger disposition, same as the reader's own two writers)
@@ -12765,6 +12806,10 @@ function render() {
     }
     S.view = 'tray';
     render();
+    // every other room door lands at its own top; the one door present on
+    // EVERY surface did not, so the tray opened at the previous surface's
+    // offset — often past its own end (E3 round-A, dead-ends lens)
+    window.scrollTo(0, 0);
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
