@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 10:54",
+          "2026-08-16 10:59",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 10:59",
+          "2026-08-16 11:04",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 11:03",
+          "2026-08-16 11:08",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 10:53",
+          "2026-08-24 10:58",
           "8.30"
         ]
       ]
@@ -7494,9 +7494,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 682,
+  "loadMs": 656,
   "summary": {
-    "total": 159,
+    "total": 167,
     "failed": 0
   },
   "results": [
@@ -7523,7 +7523,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.66000366210938,\"y\":570.7899780273438,\"productive\":true}"
+      "detail": "{\"x\":147.63999938964844,\"y\":570.739990234375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7533,7 +7533,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 90px; mean tether 163 → 163px"
+      "detail": "centre moved 89px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7543,7 +7543,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 682 ms"
+      "detail": "82 texts, ready in 656 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -8023,7 +8023,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786877703535,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786877999395,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8048,7 +8048,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786877708002,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786878003403,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8258,12 +8258,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T10:55:51.559Z; due 2026-08-26T10:55:51.559Z"
+      "detail": "anchor held at 2026-08-19T11:00:45.232Z; due 2026-08-26T11:00:45.232Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786877752638 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786878046213 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8294,6 +8294,46 @@
       "name": "the tray never contradicts itself — a closed review door names its when",
       "pass": true,
       "detail": "{\"disabled\":true,\"label\":\"復習する — いまは予定なしnothing due right now\",\"forecast\":\"later today 25 · tomorrow 0 · this week 0 · new 3\",\"todayN\":25}"
+    },
+    {
+      "name": "R3-B · device Back from a word sheet walks to the reader, place intact",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"reader\",\"sheet\":false,\"y\":498} (kept 498)"
+    },
+    {
+      "name": "R3-B · a kanji word stands in the field to dive into",
+      "pass": true,
+      "detail": "ふれる触れるto touch, to feel"
+    },
+    {
+      "name": "R3-B · the tap ladder carries into the dive",
+      "pass": true,
+      "detail": "drift-dived after ladder taps"
+    },
+    {
+      "name": "R3-B · device Back from a dive surfaces one level, never leaves the water",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"drift\",\"dived\":false,\"layerActive\":true}"
+    },
+    {
+      "name": "R3-B · Back from an archive article lands on the year list where it was left",
+      "pass": true,
+      "detail": "view=archive y=800 (kept 800)"
+    },
+    {
+      "name": "R3-B · Back from the archive returns to the shelf at its door",
+      "pass": true,
+      "detail": "view=shelf y=25436 (kept 25436)"
+    },
+    {
+      "name": "R3-B · the nav-search session survives the round trip — query, results, focus",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"drift\",\"sheet\":false,\"q\":\"水\",\"rows\":8,\"focusInSearch\":true} (rows before: 8)"
+    },
+    {
+      "name": "R3-B · the walks leave no console errors",
+      "pass": true,
+      "detail": "clean"
     }
   ]
 }

@@ -2318,6 +2318,184 @@ async function main() {
     JSON.stringify(trayTruth));
   await shoot(page, shotsDir, '19-tray-later-today');
 
+  // -------------- R3-B · device Back walks the app, not out of it
+  // The writing room's same-URL sentinel generalized: one armed history entry
+  // whenever any stacked context stands under the learner, so the platform
+  // Back gesture (the operator's iPhone edge-swipe) performs the app's OWN
+  // back() — context restored — instead of unloading the SPA. Every probe
+  // stamps the document first: if Back had left the page, the stamp dies
+  // with it, so a reverted build cannot pass by reloading into a lookalike.
+  console.log('\n— R3-B · device Back walks the app, not out of it');
+  const errsBeforeR3B = consoleErrors.length;
+
+  // (a) from a word sheet: one press closes the sheet and hands the reader
+  // back its exact place
+  await open('?entry=shelf');
+  const gonIx3b = await page.evaluate(
+    `[...document.querySelectorAll('.shelf-item .shelf-title')].findIndex((n) => n.textContent.includes('ごん狐'))`,
+  );
+  await tap(page, '.shelf-item', Math.max(gonIx3b, 0));
+  await settleReader(page);
+  await page.evaluate('window.scrollTo(0, 600)');
+  await page.waitForTimeout(200);
+  const midTok = await page.evaluate(`(() => {
+    const toks = [...document.querySelectorAll('#reader .tok.content')];
+    const ix = toks.findIndex((t) => {
+      const r = t.getBoundingClientRect();
+      return r.top > 260 && r.bottom < 560;
+    });
+    return ix >= 0 ? ix : 5;
+  })()`);
+  await holdWord(page, '#reader .tok.content', midTok);
+  await page.waitForSelector('#sheet', { timeout: 10000 });
+  // the hold recentres its token, so the kept offset is measured, not assumed
+  const readerYKept = await page.evaluate('Math.round(window.scrollY)');
+  await page.evaluate('window.__r3bSheet = 1');
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const backFromSheet = await page.evaluate(`({
+    sameDocument: window.__r3bSheet === 1,
+    view: document.body.dataset.view,
+    sheet: !!document.querySelector('#sheet'),
+    y: Math.round(window.scrollY),
+  })`);
+  check('R3-B · device Back from a word sheet walks to the reader, place intact',
+    backFromSheet.sameDocument && backFromSheet.view === 'reader' && !backFromSheet.sheet &&
+      readerYKept > 200 && Math.abs(backFromSheet.y - readerYKept) <= 20,
+    `${JSON.stringify(backFromSheet)} (kept ${readerYKept})`);
+
+  // (b) from a drift dive: one press surfaces ONE level of the water
+  await open('');
+  await page.waitForTimeout(2200);
+  const divePickText = await page.evaluate(`(() => {
+    const K = /[\\u4e00-\\u9fff]/;
+    for (const w of document.querySelectorAll('#drift-layer .word')) {
+      const r = w.getBoundingClientRect();
+      if (!r.width || r.left < 60 || r.right > 320 || r.top < 260 || r.bottom > 640) continue;
+      if (!K.test(w.textContent)) continue;
+      w.dataset.r3b = '1';
+      return w.textContent;
+    }
+    return null;
+  })()`);
+  check('R3-B · a kanji word stands in the field to dive into', !!divePickText, divePickText ?? 'none');
+  const diveCdp = await page.context().newCDPSession(page);
+  let dived = false;
+  for (let i = 0; i < 5 && !dived && divePickText; i++) {
+    const at = await page.evaluate(`(() => {
+      const w = document.querySelector('#drift-layer .word[data-r3b]');
+      if (!w) return null;
+      const r = w.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })()`);
+    if (!at) break;
+    await diveCdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: at.x, y: at.y }],
+    });
+    await page.waitForTimeout(70);
+    await diveCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await page.waitForTimeout(650);
+    dived = await page.evaluate(`document.body.classList.contains('drift-dived')`);
+  }
+  await diveCdp.detach();
+  check('R3-B · the tap ladder carries into the dive', dived, `drift-dived after ladder taps`);
+  await page.evaluate('window.__r3bDive = 1');
+  await page.goBack();
+  await page.waitForTimeout(800);
+  const backFromDive = await page.evaluate(`({
+    sameDocument: window.__r3bDive === 1,
+    view: document.body.dataset.view,
+    dived: document.body.classList.contains('drift-dived'),
+    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
+  })`);
+  check('R3-B · device Back from a dive surfaces one level, never leaves the water',
+    backFromDive.sameDocument && backFromDive.view === 'drift' && !backFromDive.dived &&
+      backFromDive.layerActive,
+    JSON.stringify(backFromDive));
+
+  // (c) the archive keeps BOTH scroll contexts across Back — the year list
+  // where a row was opened, and the shelf where its door stands ~20,000px deep
+  await open('?entry=shelf');
+  await page.evaluate(`document.getElementById('archive-link').scrollIntoView({ block: 'center' })`);
+  await page.waitForTimeout(200);
+  const shelfYKept = await page.evaluate('Math.round(window.scrollY)');
+  await page.evaluate(`document.getElementById('archive-link').click()`);
+  await page.waitForTimeout(400);
+  await page.evaluate(`(() => {
+    const toggles = [...document.querySelectorAll('.archive-year')];
+    const num = (t) => Number((t.textContent.match(/·\\s*([0-9]+)/) || [0, 0])[1]);
+    let best = toggles[0];
+    for (const t of toggles) if (num(t) > num(best)) best = t;
+    best.click();
+  })()`);
+  await page.waitForSelector('.archive-row', { timeout: 10000 });
+  await page.evaluate('window.scrollTo(0, 800)');
+  await page.waitForTimeout(200);
+  const archYKept = await page.evaluate('Math.round(window.scrollY)');
+  await page.evaluate(`(() => {
+    const rows = [...document.querySelectorAll('.archive-row')];
+    rows[Math.min(20, rows.length - 1)].click();
+  })()`);
+  await page.waitForFunction(`document.body.dataset.view === 'reader'`, null, { timeout: 10000 });
+  await page.waitForTimeout(1400); // the archive body fetch re-renders once
+  await page.evaluate('window.scrollTo(0, 400)'); // read a little way down
+  await page.waitForTimeout(200);
+  await page.evaluate('window.__r3bArch = 1');
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const backToList = await page.evaluate(`({
+    sameDocument: window.__r3bArch === 1,
+    view: document.body.dataset.view,
+    y: Math.round(window.scrollY),
+  })`);
+  check('R3-B · Back from an archive article lands on the year list where it was left',
+    backToList.sameDocument && backToList.view === 'archive' &&
+      Math.abs(backToList.y - archYKept) <= 20,
+    `view=${backToList.view} y=${backToList.y} (kept ${archYKept})`);
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const backToShelf = await page.evaluate(`({
+    sameDocument: window.__r3bArch === 1,
+    view: document.body.dataset.view,
+    y: Math.round(window.scrollY),
+  })`);
+  check('R3-B · Back from the archive returns to the shelf at its door',
+    backToShelf.sameDocument && backToShelf.view === 'shelf' && shelfYKept > 2000 &&
+      Math.abs(backToShelf.y - shelfYKept) <= 20,
+    `view=${backToShelf.view} y=${backToShelf.y} (kept ${shelfYKept})`);
+
+  // (d) the 銀河 search session survives a result round-trip: query, results,
+  // and focus on the row that was left
+  await open('');
+  await page.waitForTimeout(1600);
+  await page.tap('.nav-symbol');
+  await page.waitForSelector('#nav-search-input');
+  await page.locator('#nav-search-input').fill('水');
+  await page.waitForSelector('.nav-search-row', { timeout: 10000 });
+  const rowsBefore = await page.locator('.nav-search-row').count();
+  await page.evaluate('window.__r3bNav = 1');
+  await page.locator('.nav-search-row').first().click();
+  await page.waitForSelector('#sheet', { timeout: 10000 });
+  await page.goBack();
+  await page.waitForTimeout(700);
+  const navRound = await page.evaluate(`({
+    sameDocument: window.__r3bNav === 1,
+    view: document.body.dataset.view,
+    sheet: !!document.querySelector('#sheet'),
+    q: document.getElementById('nav-search-input')?.value ?? null,
+    rows: document.querySelectorAll('.nav-search-row').length,
+    focusInSearch: !!document.activeElement?.closest?.('.nav-search'),
+  })`);
+  check('R3-B · the nav-search session survives the round trip — query, results, focus',
+    navRound.sameDocument && navRound.view === 'drift' && !navRound.sheet &&
+      navRound.q === '水' && navRound.rows >= 1 && navRound.focusInSearch,
+    `${JSON.stringify(navRound)} (rows before: ${rowsBefore})`);
+
+  check('R3-B · the walks leave no console errors',
+    consoleErrors.length === errsBeforeR3B,
+    consoleErrors.slice(errsBeforeR3B).join(' | ') || 'clean');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,

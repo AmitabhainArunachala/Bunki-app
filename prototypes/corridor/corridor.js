@@ -385,11 +385,22 @@ const S = {
    * offset, returning puts it back. Session-only: the store persists what you
    * took, never where you were. */
   shelfScroll: 0,
+  /** The archive's analog of shelfScroll: the year-list offset when you last
+   * walked into an article (or out to the shelf). Session-only, like its
+   * sibling — 93 rows of 2016 keep their place while one of them is read. */
+  archiveScroll: 0,
   stack: [],
   // 銀河 hero: the galaxy rests bare but for one symbol; navOpen reveals the
   // top bar and the two corner bubbles. fwd holds a single forward step so the
   // bar's ▸ arrow can undo a back().
   navOpen: false,
+  /** The 銀河 search session. The bar's input node dies with every render, so
+   * the query lives here; navReturn marks a departure THROUGH a result, and
+   * the walk back (in-app or device Back) reopens the bar — query, results,
+   * and focus on the row you left from. A deliberate dismissal (scrim, the
+   * symbol) clears both. Session-only, never persisted. */
+  navQ: '',
+  navReturn: false,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
@@ -1107,6 +1118,10 @@ window.bunkiDriftChrome =
 window.bunkiDriftDepth = (depth) => {
   S.driftDepth = depth;
   document.body.classList.toggle('drift-dived', depth > 0);
+  // diving arms the same-URL Back sentinel (the water renders itself, so the
+  // corridor's render hook never sees the depth change); surfacing home
+  // consumes it — device Back then means leave, as it should
+  syncWalkSentinel();
   if (S.navOpen) render(); // the open nav's back arrow re-arms live
 };
 addEventListener('pagehide', obsFlush);
@@ -1786,11 +1801,17 @@ async function boot() {
   // a stale same-document room sentinel now so Back never lands on an inert
   // history stop; ordinary Forward navigation is handled live by popstate.
   try {
-    if (history.state?.bunkiStrokeRoom) {
+    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
+      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    // The corridor owns every scroll restore (reader bookmarks, shelf and
+    // archive offsets, sheet stacks). The platform's own traversal guess
+    // would land the walk-back sentinel pops on a stale offset and fight
+    // returnScroll — so the guess is switched off for this document.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   } catch {
     /* history may be unavailable in a constrained embedded preview */
   }
@@ -2117,6 +2138,9 @@ function invokerKey(node) {
       targetKind: node.dataset.targetKind || 'word',
     };
   }
+  // a 銀河 search row has no id and dies with the bar; its index survives so
+  // the restored results can hand focus back to the row that was left
+  if (node.matches?.('.nav-search-row')) return { kind: 'nav-row', ix: node.dataset.ix || '0' };
   if (node.id) return { kind: 'id', id: node.id };
   return null;
 }
@@ -2131,6 +2155,11 @@ function restoreDialogInvoker() {
       target = document.querySelector(
         `#reader .tok[data-index="${key.index}"][data-target-kind="${key.targetKind}"]`,
       );
+    } else if (key.kind === 'nav-row') {
+      // the deep tier may still be settling; the input is the honest fallback
+      target =
+        document.querySelector(`.nav-search-row[data-ix="${key.ix}"]`) ||
+        document.getElementById('nav-search-input');
     } else if (key.kind === 'id') {
       target = document.getElementById(key.id);
     }
@@ -2143,12 +2172,14 @@ function restoreDialogInvoker() {
 function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
   else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
+  else if (S.view === 'archive') S.archiveScroll = window.scrollY;
 }
 
 /** Hand the current view back the offset it walked away from. */
 function returnScroll() {
   if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
   else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
+  else if (S.view === 'archive') window.scrollTo(0, S.archiveScroll);
 }
 
 /* The reader remembers your place per article, surviving reloads — the
@@ -2189,11 +2220,24 @@ function back() {
   }
   if (S.stack.length) {
     S.stack.pop();
+    if (!S.stack.length) {
+      // a sheet opened from a 銀河 search result closes back INTO the search:
+      // the bar reopens with its query, results, and the row that was left
+      if (S.view === 'drift' && S.navReturn) S.navOpen = true;
+      S.navReturn = false;
+    }
     render();
     if (!S.stack.length) {
       returnScroll();
       restoreDialogInvoker();
     }
+    return;
+  }
+  // inside a drift dive, back means SURFACE one level of the water first —
+  // the same walk whether it arrives from the nav arrow or the device Back
+  if (S.view === 'drift' && S.driftDepth > 0 && window.bunkiDriftSurface) {
+    window.bunkiDriftSurface();
+    render();
     return;
   }
   if (S.view === 'review') {
@@ -2232,6 +2276,9 @@ function back() {
   if (S.view === 'archive') {
     S.view = 'shelf';
     render();
+    // the shelf gets its place back — its archive door stands ~20,000px deep,
+    // and losing that offset dumped the learner at the top of 70 cards
+    window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
@@ -2249,10 +2296,12 @@ function back() {
       window.scrollTo(0, S.readerPos?.[S.passageId] || 0);
       return;
     }
-    // an archive article returns to its stack, not the curated shelf
+    // an archive article returns to its stack, not the curated shelf — and to
+    // the year-list offset it was opened from, not wherever the reading ended
     if (S.view === 'reader' && String(passage()?.file || '').startsWith('archive/')) {
       S.view = 'archive';
       render();
+      window.scrollTo(0, S.archiveScroll);
       return;
     }
     S.view = 'shelf';
@@ -2282,6 +2331,9 @@ function dismissSheet() {
   S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
+  // Escape/scrim from a result's sheet walks back into the search too
+  if (S.view === 'drift' && S.navReturn) S.navOpen = true;
+  S.navReturn = false;
   render();
   returnScroll();
   restoreDialogInvoker();
@@ -2360,16 +2412,92 @@ function closeStrokePage({ fromHistory = false } = {}) {
   finalizeStrokePageClose();
 }
 
-// iPhone Back and the edge-swipe are the quiet room's invisible exit. They
-// restore the existing entry sheet instead of leaving the SPA; Escape remains
-// the keyboard equivalent and no extra visible control is introduced.
+/* ------------------------------------- 歩み — one history discipline (R3-B)
+ * The writing room proved the shape (bunkiStrokeRoom): a same-URL history
+ * entry so the platform Back gesture works the room instead of leaving the
+ * app. This generalizes it to the whole corridor with ONE sentinel, not one
+ * entry per surface: whenever any stacked context stands under the learner —
+ * a sheet stack, a drift dive, the archive, review, any inner room — one
+ * armed entry waits in the history. Device Back pops it, the app performs its
+ * OWN back() (the same walk as 戻る: scroll returned, focus returned), and
+ * the sentinel re-arms while there is anywhere left to walk. Walking home
+ * in-app consumes the standing entry quietly, so from home the very next
+ * Back leaves the app — it never eats a press. The context itself (stack,
+ * scrolls, invokers, the search session) lives in S; the entry carries only
+ * the marker, because a same-document pop never loses the module state. */
+let walkArmed = false;
+let walkConsuming = false;
+
+/** Whether the app's own back() would still move — the mirror of the chrome's
+ * atHome test, plus the layers back() itself handles first. */
+function canWalkBack() {
+  if (S.strokes || S.stack.length) return true;
+  if (S.view === 'drift') return S.driftDepth > 0;
+  if (S.view === 'entry') return false;
+  if (S.view === 'shelf') return S.variants.entry !== 'shelf';
+  return true; // every inner room walks back somewhere
+}
+
+/** Keep exactly one armed sentinel while there is anywhere to walk back to.
+ * Called at the end of every render and on drift depth reports — both idle
+ * no-ops unless the answer to canWalkBack() has actually changed. */
+function syncWalkSentinel() {
+  if (walkConsuming) return;
+  const should = canWalkBack();
+  if (should && !walkArmed) {
+    try {
+      const previous = history.state && typeof history.state === 'object' ? { ...history.state } : {};
+      delete previous.bunkiStrokeRoom;
+      history.pushState({ ...previous, bunkiWalk: { v: 1 } }, '', location.href);
+      walkArmed = true;
+    } catch {
+      /* embedded previews without history keep the plain exit */
+    }
+  } else if (!should && walkArmed) {
+    // the learner walked home in-app — consume the standing entry so the
+    // next platform Back leaves the app instead of being swallowed
+    walkConsuming = true;
+    try {
+      history.back();
+    } catch {
+      walkConsuming = false;
+      walkArmed = false;
+    }
+  }
+}
+
+// iPhone Back and the edge-swipe are the corridor's invisible exit ramp. The
+// stroke room's own sentinel stays the topmost layer's contract; beneath it
+// the walk sentinel turns every device Back into the app's own back() until
+// the stack is empty — only then does Back actually leave.
 addEventListener('popstate', () => {
   if (S.strokes?.historyToken) {
     closeStrokePage({ fromHistory: true });
     return;
   }
   const marker = history.state?.bunkiStrokeRoom;
-  if (marker?.token && marker?.id) openStrokePage(marker.id, { historyEntry: marker });
+  if (marker?.token && marker?.id) {
+    openStrokePage(marker.id, { historyEntry: marker });
+    return;
+  }
+  if (walkConsuming) {
+    // our own quiet consume landed; re-check in case the learner moved on
+    walkConsuming = false;
+    walkArmed = false;
+    syncWalkSentinel();
+    return;
+  }
+  if (walkArmed) {
+    walkArmed = false;
+    if (canWalkBack()) back(); // render() re-arms while there is more to walk
+    return;
+  }
+  // a stale sentinel (Forward, or one left below a reload) — adopt it so the
+  // discipline holds instead of leaving a dead history stop
+  if (history.state?.bunkiWalk) {
+    walkArmed = true;
+    syncWalkSentinel();
+  }
 });
 
 function openPassage(id) {
@@ -11656,14 +11784,9 @@ function navForward() {
   render();
 }
 function navBackFromGinga() {
-  // inside a drift dive, back means SURFACE one level of the water first
-  if (S.driftDepth > 0 && window.bunkiDriftSurface) {
-    S.navOpen = false;
-    window.bunkiDriftSurface();
-    render();
-    return;
-  }
-  // at the true galaxy home there is nowhere back; the arrow is disabled there.
+  // one walk: back() itself surfaces a dive one level (R3-B), so the arrow
+  // and the device Back gesture are the same operation. At the true galaxy
+  // home there is nowhere back; the arrow is disabled there.
   S.navOpen = false;
   back();
 }
@@ -11700,6 +11823,11 @@ function buildNavSearch() {
   input.setAttribute('aria-label', tx('検索', 'search'));
   const results = el('div', 'nav-search-results');
   const paint = () => {
+    // the deep tier repaints these rows when its worker batch settles; if a
+    // row holds focus at that moment (a restored session, or a keyboard
+    // walk), the rebuild must hand focus back instead of dropping it on body
+    const focusedRow = document.activeElement?.closest?.('.nav-search-row');
+    const focusIx = focusedRow && results.contains(focusedRow) ? focusedRow.dataset.ix : null;
     results.textContent = '';
     const q = input.value.trim();
     if (!q) return;
@@ -11708,23 +11836,33 @@ function buildNavSearch() {
       results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
       return;
     }
-    for (const e of hits) {
+    hits.forEach((e, ix) => {
       const row = el('button', 'nav-search-row');
       row.type = 'button';
+      row.dataset.ix = String(ix);
       row.append(el('span', 'nsr-glyph', e.w));
       const stack = el('span', 'nsr-stack');
       if (e.r) stack.append(el('span', 'nsr-read', e.r));
       if (e.g) stack.append(el('span', 'nsr-gloss', e.g));
       row.append(stack);
       row.addEventListener('click', () => {
+        // leaving THROUGH a result keeps the session: the walk back reopens
+        // the bar with this query, these results, and focus on this row
+        S.navQ = input.value;
+        S.navReturn = true;
         S.navOpen = false;
         go(
           e.seq
             ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
             : { t: e.t, id: e.id },
+          { invoker: row },
         );
       });
       results.append(row);
+    });
+    if (focusIx != null) {
+      const again = results.querySelector(`.nav-search-row[data-ix="${focusIx}"]`);
+      (again || input).focus({ preventScroll: true });
     }
   };
   // The deep tier answers here too: the first touch opens the 70k index, and
@@ -11739,6 +11877,7 @@ function buildNavSearch() {
   };
   input.addEventListener('focus', () => ensureDictionaryIndex().catch(() => {}), { once: true });
   input.addEventListener('input', () => {
+    S.navQ = input.value; // the input node dies with every render; S carries it
     if (input.value.trim()) ensureDictionaryIndex().catch(() => {});
     paint();
   });
@@ -11749,6 +11888,12 @@ function buildNavSearch() {
     }
   });
   wrap.append(input, results);
+  // a surviving session repaints in place — same query, same rows
+  if (S.navQ) {
+    input.value = S.navQ;
+    if (S.navQ.trim()) ensureDictionaryIndex().catch(() => {});
+    paint();
+  }
   return wrap;
 }
 
@@ -11765,6 +11910,11 @@ function buildGingaChrome(root) {
   symbol.innerHTML = GINGA_SYMBOL_SVG;
   symbol.addEventListener('click', () => {
     S.navOpen = !S.navOpen;
+    // closing by hand is a deliberate dismissal — the search session ends
+    if (!S.navOpen) {
+      S.navQ = '';
+      S.navReturn = false;
+    }
     render();
   });
   root.append(symbol);
@@ -11785,6 +11935,9 @@ function buildGingaChrome(root) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => {
     S.navOpen = false;
+    // tapping the water away is a deliberate dismissal too
+    S.navQ = '';
+    S.navReturn = false;
     render();
   });
   root.append(scrim);
@@ -11848,6 +12001,9 @@ function render() {
   // keeps its existing behaviour (callers set their own scroll, and cards
   // like review want the top of each new face).
   const restoreY = lastRenderedView === S.view && S.view === 'reader' ? window.scrollY : null;
+  // leaving the galaxy for a ROOM ends the search round-trip: only a walk
+  // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
+  if (lastRenderedView !== S.view) S.navReturn = false;
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -12103,6 +12259,8 @@ function render() {
   updateMeasurements();
   if (restoreY != null) window.scrollTo(0, restoreY);
   lastRenderedView = S.view;
+  // every navigation passes through here — keep the Back sentinel honest
+  syncWalkSentinel();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

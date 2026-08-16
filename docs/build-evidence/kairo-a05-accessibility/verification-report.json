@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "8d717a0a3cc7a5ee28a591e848ea38b2bcaef584",
-  "chromium": "playwright-default",
+  "head": "621750c1dea045d607eee675bdda5d3e264eda59",
+  "chromium": "/opt/pw-browsers/chromium",
   "viewport": {
     "width": 390,
     "height": 844
   },
   "summary": {
-    "total": 44,
-    "passed": 44,
+    "total": 46,
+    "passed": 46,
     "failed": 0
   },
   "results": [
@@ -22,6 +22,16 @@
       "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
       "pass": true,
       "detail": "82/82 text doors · 82/82 sibling toggles"
+    },
+    {
+      "name": "hidden layers keep no tabbable control (the invisible 閉じる × discipline)",
+      "pass": true,
+      "detail": "every tab stop is visible"
+    },
+    {
+      "name": "first Tab at the galaxy home lands on a real, visible control",
+      "pass": true,
+      "detail": "{\"id\":\"ginga-symbol\",\"opacity\":1,\"w\":46,\"h\":46}"
     },
     {
       "name": "reader words are named native controls on the common target.activate action",

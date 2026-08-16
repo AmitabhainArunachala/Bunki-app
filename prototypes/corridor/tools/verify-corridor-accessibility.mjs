@@ -174,6 +174,73 @@ async function main() {
         `${shelfStructure.cardsWithSiblingDetails}/${shelfStructure.cards} sibling toggles`,
     );
 
+    console.log('\n— 銀河 home: the tab order names only visible controls');
+    // R3-B: the drift layer's radical explainer rests at opacity:0 — invisible
+    // to fingers yet its 閉じる × button stayed in the tab order, so the FIRST
+    // Tab at the galaxy home landed on a control no eye can find. The layer
+    // must be inert while hidden; more generally, nothing invisible anywhere
+    // in the fused document may keep a tab stop.
+    await page.goto(`${base}/index.html`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
+    await page.waitForFunction(
+      `document.getElementById('drift-layer')?.classList.contains('active')`,
+      null,
+      { timeout: 15_000 },
+    );
+    await page.waitForTimeout(1400);
+    const hiddenTabbables = await page.evaluate(`(() => {
+      const offenders = [];
+      for (const node of document.querySelectorAll('button, a[href], input, select, textarea, [tabindex]')) {
+        if (node.tabIndex < 0 || node.disabled) continue;
+        if (node.closest('[inert]')) continue; // honestly out of the order
+        const rect = node.getBoundingClientRect();
+        if (!rect.width && !rect.height) continue; // collapsed: unfocusable anyway
+        let invisible = false;
+        for (let anc = node; anc; anc = anc.parentElement) {
+          const style = getComputedStyle(anc);
+          // display:none / visibility:hidden already remove focusability
+          if (style.display === 'none' || style.visibility === 'hidden') break;
+          if (Number.parseFloat(style.opacity) === 0) {
+            invisible = true;
+            break;
+          }
+        }
+        if (invisible) {
+          offenders.push({ id: node.id || null, cls: String(node.className).slice(0, 40) });
+        }
+      }
+      return offenders;
+    })()`);
+    check(
+      'hidden layers keep no tabbable control (the invisible 閉じる × discipline)',
+      hiddenTabbables.length === 0,
+      hiddenTabbables.length ? JSON.stringify(hiddenTabbables) : 'every tab stop is visible',
+    );
+    await page.evaluate(
+      'document.activeElement instanceof HTMLElement && document.activeElement.blur()',
+    );
+    await page.keyboard.press('Tab');
+    const firstStop = await page.evaluate(`(() => {
+      const node = document.activeElement;
+      if (!node || node === document.body) return { none: true };
+      let opacity = 1;
+      for (let anc = node; anc; anc = anc.parentElement) {
+        opacity = Math.min(opacity, Number.parseFloat(getComputedStyle(anc).opacity) || 0);
+      }
+      const rect = node.getBoundingClientRect();
+      return {
+        id: node.id || String(node.className).slice(0, 40),
+        opacity: Number(opacity.toFixed(3)),
+        w: Math.round(rect.width),
+        h: Math.round(rect.height),
+      };
+    })()`);
+    check(
+      'first Tab at the galaxy home lands on a real, visible control',
+      !firstStop.none && firstStop.opacity > 0.05 && firstStop.w > 0 && firstStop.h > 0,
+      JSON.stringify(firstStop),
+    );
+
     console.log('\n— reader semantics and non-hold alternatives');
     await openReader(page, base);
     const semantics = await page.evaluate(`(() => {
