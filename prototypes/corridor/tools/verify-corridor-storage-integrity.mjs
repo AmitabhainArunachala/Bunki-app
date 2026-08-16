@@ -21,6 +21,9 @@ const residualPath = fileURLToPath(
 const driftLayerPath = fileURLToPath(new URL('../drift-layer.js', import.meta.url));
 const driftArtifactPath = fileURLToPath(new URL('../../drift/drift-artifact.html', import.meta.url));
 const source = readFileSync(corridorPath, 'utf8');
+const PIN = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../data/fsrs-pin.json', import.meta.url)), 'utf8'),
+);
 const css = readFileSync(cssPath, 'utf8');
 const driftCss = readFileSync(driftCssPath, 'utf8');
 const driftLayerSource = readFileSync(driftLayerPath, 'utf8');
@@ -188,7 +191,7 @@ const storeContext = vm.createContext({
   tx: (_ja, en) => en,
 });
 vm.runInContext(
-  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue };`,
+  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };`,
   storeContext,
   { filename: 'corridor-persistence-block.js' },
 );
@@ -265,6 +268,7 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [12, 'drift', 'word:海', 1],
       [13, 'dojo', 'word:海', 0],
       [14, 'dojo', 'kanji:海', 3, 'kanji'],
+      [15, 'params', 'fsrs', 'length'],
     ],
     deepWords: { 海: { r: 'うみ', m: ['sea'], jlpt: 'N5', k: ['海'], seq: '1' } },
     lessonsDone: { lesson: { score: 1, total: 1, ts: 10 } },
@@ -274,7 +278,11 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
     aiChat: [{ role: 'user', text: '海' }],
     ai: { baseUrl: 'https://example.invalid', model: 'test-model' },
     stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
-    srsPrefs: { newPerDay: 35, reviewLimit: 45 },
+    srsPrefs: {
+      newPerDay: 35,
+      reviewLimit: 45,
+      fsrs: { w: PIN.w, source: 'bunki-fsrs6-r090-personal-v1 @ 2026-08-16', basedOnReviews: 500 },
+    },
     readDone: { article: 10 },
     readerPos: { article: 120 },
     dials: { kanji: 0, furigana: 1, spacing: 2 },
@@ -293,6 +301,9 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   assert.equal(storeContext.S.ai.model, 'test-model');
   assert.equal(storeContext.S.srsPrefs.newPerDay, 35);
   assert.equal(storeContext.S.srsPrefs.reviewLimit, 45);
+  // R3-D · the learner's fitted weights hydrate VERBATIM alongside pacing
+  assert.equal(storeContext.S.srsPrefs.fsrs.w.length, 21);
+  assert.equal(storeContext.S.srsPrefs.fsrs.basedOnReviews, 500);
   assert.equal(storeContext.S.storeExtras.futureField.nested[0], 'preserved');
   assert.equal(storeContext.localStorage.writes, 0);
 });
@@ -380,6 +391,9 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog malformed dojo grade', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 9]] }],
     ['obslog malformed dojo mode', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 42]] }],
     ['obslog overlong dojo row', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 'kanji', 'extra']] }],
+    ['obslog params off-key', { v: 1, obslog: [[1, 'params', 'other', 'length']] }],
+    ['obslog params reason type', { v: 1, obslog: [[1, 'params', 'fsrs', 7]] }],
+    ['obslog overlong params row', { v: 1, obslog: [[1, 'params', 'fsrs', 'length', 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -1270,19 +1284,137 @@ verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
 });
 
 verified('one-scheduler-policy-fuzz-off-with-the-pin', () => {
-  const pin = JSON.parse(
-    readFileSync(fileURLToPath(new URL('../data/fsrs-pin.json', import.meta.url)), 'utf8'),
-  );
+  const pin = PIN;
   assert.equal(pin.enableFuzz, false);
   assert.equal(pin.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
   const schedulerInit = between('fsrsApi = window.__TSFSRS__', 'S.ready = true');
   assert.match(schedulerInit, /enable_fuzz: pin\.enableFuzz/);
   assert.doesNotMatch(schedulerInit, /fuzzOff/, 'the dead app-level override is gone');
+  // R3-D · the learner's fitted weights enter through the fail-closed gate
+  // and ONLY the weight vector: everything else stays the pin's policy
+  assert.match(schedulerInit, /srsParamsProblem\(fitted\)/);
+  assert.match(schedulerInit, /noteIgnoredSrsParams\(fittedProblem\)/);
+  assert.match(schedulerInit, /w: srsCustom \? fitted\.w\.slice\(\) : pin\.w/);
+  assert.match(schedulerInit, /request_retention: pin\.requestRetention/);
   // the grade path prices the four previews and the committed grade at the clamp
   const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
   assert.match(gradeRegion, /srsSchedulerInstant\(card, now\)/);
   assert.match(gradeRegion, /scheduler\.repeat\(card, schedNow\)/);
   assert.doesNotMatch(gradeRegion, /scheduler\.repeat\(card, now\)/);
+});
+
+/* ------------------------------------------- R3-D · learner FSRS parameters
+ * The optimizer loop's landing: srsPrefs.fsrs may carry the learner's own
+ * fitted weights, gated fail-closed at the scheduler seam. Wrong length,
+ * non-finite entries, out-of-bounds values — every one of these must be
+ * IGNORED (defaults rule, one quiet obslog note), never a crash and never a
+ * quarantine of the whole record. */
+
+await verifiedAsync('learner-fsrs-params-fail-closed-gate', async () => {
+  const gate = storeApi.srsParamsProblem;
+  const w = () => PIN.w.slice();
+
+  // the vendored scheduler's clamp ranges are the ONE bounds table: the
+  // corridor's copy and the optimizer's PARAMETER_BOUNDS may never drift
+  const optimizer = await import(
+    new URL('../../../tools/fsrs-optimize.mjs', import.meta.url).href
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(storeApi.FSRS_WEIGHT_BOUNDS)),
+    JSON.parse(JSON.stringify(optimizer.PARAMETER_BOUNDS)),
+  );
+
+  // a genuine fitted set passes, with or without its provenance fields
+  assert.equal(gate({ w: w(), source: 'x @ 2026-08-16', basedOnReviews: 500 }), null);
+  assert.equal(gate({ w: w() }), null);
+  // every rejection names its reason — the quiet obslog note's payload
+  assert.equal(gate(undefined), 'shape');
+  assert.equal(gate(null), 'shape');
+  assert.equal(gate([]), 'shape');
+  assert.equal(gate({}), 'shape');
+  assert.equal(gate({ w: 'defaults' }), 'shape');
+  assert.equal(gate({ w: w().slice(0, 20) }), 'length');
+  assert.equal(gate({ w: [...w(), 0.5] }), 'length');
+  const withNaN = w();
+  withNaN[7] = NaN;
+  assert.equal(gate({ w: withNaN }), 'not-finite');
+  const withInf = w();
+  withInf[0] = Infinity;
+  assert.equal(gate({ w: withInf }), 'not-finite');
+  const withString = w();
+  withString[3] = '8.3';
+  assert.equal(gate({ w: withString }), 'not-finite');
+  const below = w();
+  below[4] = 0.5; // w[4] floor is 1
+  assert.equal(gate({ w: below }), 'bounds');
+  const above = w();
+  above[20] = 0.9; // decay ceiling is 0.8
+  assert.equal(gate({ w: above }), 'bounds');
+  assert.equal(gate({ w: w(), source: '' }), 'source');
+  assert.equal(gate({ w: w(), basedOnReviews: 0 }), 'basedOnReviews');
+  assert.equal(gate({ w: w(), basedOnReviews: 1.5 }), 'basedOnReviews');
+
+  // an unusable set NEVER quarantines the record: the envelope carries it
+  // verbatim (load, then save) while the scheduler seam ignores it
+  const shortSet = { w: PIN.w.slice(0, 20), source: 'future-build' };
+  storeContext.S = state();
+  storeContext.localStorage = storage(
+    JSON.stringify({ v: 1, taken: [], srsPrefs: { newPerDay: 10, reviewLimit: 10, fsrs: shortSet } }),
+  );
+  storeApi.loadStore();
+  assert.equal(storeContext.S.storeReadOnly, false);
+  assert.equal(storeContext.S.srsPrefs.newPerDay, 10);
+  assert.deepEqual(JSON.parse(JSON.stringify(storeContext.S.srsPrefs.fsrs)), shortSet);
+  assert.equal(storeApi.saveStore(), true);
+  assert.deepEqual(
+    JSON.parse(storeContext.localStorage.value).srsPrefs.fsrs,
+    shortSet,
+    'not a byte dropped on the round trip',
+  );
+
+  // the import door: a parameter file lands through the SAME gate and the
+  // guarded boundary — never a raw localStorage write, never a started mark
+  const importBlock = between("file.addEventListener('change'", 'port.append(');
+  assert.match(importBlock, /srsParamsProblem\(fitted\)/);
+  assert.match(importBlock, /commitStorePatch\(\{ srsPrefs: \{ \.\.\.S\.srsPrefs, fsrs: fitted \} \}\)/);
+  assert.match(importBlock, /candidatePin/);
+  assert.ok(
+    importBlock.indexOf('srsParamsProblem') < importBlock.indexOf('commitStorePatch'),
+    'validation precedes the commit',
+  );
+});
+
+verified('ignored-params-note-is-one-quiet-deduped-obslog-row', () => {
+  const context = bridgeContext();
+  vm.runInContext('globalThis.__note = noteIgnoredSrsParams;', context);
+  let commits = 0;
+  context.commitStorePatch = (patch) => {
+    commits += 1;
+    Object.assign(context.S, patch);
+    return true;
+  };
+  context.__note('length');
+  context.__note('length');
+  context.__note('length');
+  assert.equal(context.S.obslog.length, 1, 'the same broken field notes once, not per boot');
+  const row = context.S.obslog[0];
+  assert.equal(row[1], 'params');
+  assert.equal(row[2], 'fsrs');
+  assert.equal(row[3], 'length');
+  // a DIFFERENT problem is new evidence and appends
+  context.__note('bounds');
+  assert.equal(context.S.obslog.length, 2);
+  assert.equal(context.S.obslog[1][3], 'bounds');
+  // every note round-trips the fail-closed envelope validator
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
+    true,
+  );
+  // the note is an observation: no FSRS state, no capture, no review debt
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+  assert.equal(context.S.revlog.length, 0);
+  assert.equal(commits, 0, 'the note rides the obslog debounce, never its own commit');
 });
 
 verified('bounded-standard-review-freeze-and-dojo-refill-kept', () => {
@@ -1464,6 +1596,8 @@ console.log(
         'fuzz-off-scheduler-policy',
         'bounded-standard-review',
         'started-mark-promotion',
+        'learner-fsrs-params-gate',
+        'ignored-params-obslog-note',
       ],
       residualUnsafeSaveCallers: 19,
       browserAndDevice: 'NOT_RUN',

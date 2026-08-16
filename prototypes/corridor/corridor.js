@@ -688,6 +688,11 @@ function validObservationRow(row) {
     return row.length === 5 && [1, 3].includes(row[3]) && [0, 1].includes(row[4]);
   }
   if (row[1] === 'drift') return row.length === 4 && [1, 3].includes(row[3]);
+  if (row[1] === 'params') {
+    // R3-D · the scheduler-parameter note: [t, 'params', 'fsrs', reason] —
+    // a stored learner parameter set could not drive the scheduler, and why
+    return row.length === 4 && row[2] === 'fsrs' && nonEmptyString(row[3]);
+  }
   if (row[1] === 'dojo') {
     // four wide (older rows and undo's revocation), or five with the drill
     // room's name riding as the trailing mode
@@ -768,6 +773,59 @@ function validSrsPrefs(prefs) {
     optional(prefs, 'newPerDay', validNewPerDay) &&
     optional(prefs, 'reviewLimit', validReviewLimit)
   );
+}
+
+/** R3-D · the learner's own fitted FSRS-6 weights ride inside srsPrefs as
+ * srsPrefs.fsrs: { w: [...21 numbers], source, basedOnReviews } — written by
+ * the import door from a tools/fsrs-optimize.mjs run. The envelope carries
+ * the field VERBATIM (a newer build's fit must survive a visit from an older
+ * one with not a byte dropped); USE is gated here, fail-closed: anything but
+ * 21 finite numbers inside the vendored scheduler's own clamp ranges is
+ * ignored — the pinned defaults rule and one quiet obslog note says why.
+ * Bounds mirror ts-fsrs@5.4.1 clipParameters, the same table
+ * tools/fsrs-optimize.mjs fits inside (PARAMETER_BOUNDS); the storage
+ * verifier holds the two tables together so they can never drift apart. */
+const FSRS_WEIGHT_BOUNDS = [
+  [0.001, 100],
+  [0.001, 100],
+  [0.001, 100],
+  [0.001, 100],
+  [1, 10],
+  [0.001, 4],
+  [0.001, 4],
+  [0.001, 0.75],
+  [0, 4.5],
+  [0, 0.8],
+  [0.001, 3.5],
+  [0.001, 5],
+  [0.001, 0.25],
+  [0.001, 0.9],
+  [0, 4],
+  [0, 1],
+  [1, 6],
+  [0, 2],
+  [0, 2],
+  [0.01, 0.8],
+  [0.1, 0.8],
+];
+
+/** Why a stored parameter set cannot drive the scheduler — null when it can.
+ * The reason string is the quiet obslog note's payload (never a crash). */
+function srsParamsProblem(field) {
+  if (!plainRecord(field) || !Array.isArray(field.w)) return 'shape';
+  if (field.w.length !== FSRS_WEIGHT_BOUNDS.length) return 'length';
+  for (let i = 0; i < field.w.length; i += 1) {
+    if (!finiteNumber(field.w[i])) return 'not-finite';
+    const [lo, hi] = FSRS_WEIGHT_BOUNDS[i];
+    if (field.w[i] < lo || field.w[i] > hi) return 'bounds';
+  }
+  if (owns(field, 'source') && !nonEmptyString(field.source)) return 'source';
+  if (
+    owns(field, 'basedOnReviews') &&
+    !(Number.isInteger(field.basedOnReviews) && field.basedOnReviews > 0)
+  )
+    return 'basedOnReviews';
+  return null;
 }
 
 function validStats(stats) {
@@ -963,6 +1021,9 @@ function loadStore() {
   if (plainRecord(s.srsPrefs)) {
     if (validNewPerDay(s.srsPrefs.newPerDay)) S.srsPrefs.newPerDay = s.srsPrefs.newPerDay;
     if (validReviewLimit(s.srsPrefs.reviewLimit)) S.srsPrefs.reviewLimit = s.srsPrefs.reviewLimit;
+    // the learner's fitted weights ride verbatim — validity is judged where
+    // the scheduler is built (srsParamsProblem), never by dropping bytes here
+    if (owns(s.srsPrefs, 'fsrs')) S.srsPrefs.fsrs = s.srsPrefs.fsrs;
   }
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
@@ -1086,6 +1147,19 @@ function obsLog(kind, key, ...detail) {
   (S.obslog ||= []).push([Date.now(), kind, key, ...detail]);
   clearTimeout(obsSaveTimer);
   obsSaveTimer = setTimeout(obsFlush, 1200);
+}
+/** R3-D · when a stored learner parameter set cannot drive the scheduler,
+ * the pinned defaults rule and ONE quiet append-only row says why:
+ * [t, 'params', 'fsrs', reason]. Deduped against the latest params note so
+ * a thousand boots over the same broken field never write a thousand rows. */
+function noteIgnoredSrsParams(reason) {
+  const rows = S.obslog || [];
+  for (let i = rows.length - 1; i >= 0; i -= 1) {
+    if (rows[i][1] !== 'params') continue;
+    if (rows[i][3] === reason) return;
+    break;
+  }
+  obsLog('params', 'fsrs', reason);
 }
 // 分流の橋 — the drift's flick judgments were persisting only to the drift's
 // own store, which nothing in the corridor ever read (P0, full-instrument
@@ -1211,6 +1285,11 @@ let scheduler = null;
  * verification suites can read the policy actually in force (fuzz OFF, the
  * pin's numbers) instead of trusting a comment. */
 let srsParams = null;
+/** R3-D · non-null when the scheduler was built with the learner's own
+ * fitted weights (srsPrefs.fsrs) instead of the pinned defaults —
+ * { source, basedOnReviews }. The entry footer and the instrument handle
+ * read this so the schedule shown is never passed off as the default's. */
+let srsCustom = null;
 
 /* --------------------------------------------- the deep dictionary (70k)
  * The boot core stays the small compatibility dictionary that powers the
@@ -1962,8 +2041,20 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
+    // R3-D · the learner's own fitted weights (srsPrefs.fsrs, written by the
+    // import door from a tools/fsrs-optimize.mjs run) drive the scheduler
+    // when — and only when — they pass the fail-closed gate srsParamsProblem.
+    // Anything else is IGNORED: the pinned defaults rule, nothing crashes,
+    // and one quiet obslog row says why. Everything but the weight vector
+    // stays the pin's (fuzz OFF, retention, steps): one scheduler policy.
+    const fitted = S.srsPrefs?.fsrs;
+    const fittedProblem = fitted === undefined ? 'absent' : srsParamsProblem(fitted);
+    if (fitted !== undefined && fittedProblem) noteIgnoredSrsParams(fittedProblem);
+    srsCustom = fittedProblem
+      ? null
+      : { source: fitted.source ?? null, basedOnReviews: fitted.basedOnReviews ?? null };
     srsParams = fsrsApi.generatorParameters({
-      w: pin.w,
+      w: srsCustom ? fitted.w.slice() : pin.w,
       request_retention: pin.requestRetention,
       maximum_interval: pin.maximumInterval,
       // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
@@ -3865,6 +3956,23 @@ function renderSrsPrefs(main) {
   };
   stepper('新規 / 日', 'new cards a day', 'newPerDay', srsNewPerDay(), 0, NEW_PER_DAY_MAX, 5);
   stepper('一回の枚数', 'cards a sitting', 'reviewLimit', srsReviewLimit(), REVIEW_LIMIT_MIN, REVIEW_LIMIT_MAX, 5);
+  // R3-D · when the learner's own fitted weights rule the scheduler, this
+  // fold — the scheduler-preferences surface — names it quietly, with the
+  // honest basis. The raw parameter-set slug stays in exports/debug.
+  if (srsCustom) {
+    rows.append(
+      el(
+        'p',
+        'card-kind',
+        srsCustom.basedOnReviews
+          ? tx(
+              `復習の予定は自分の記録（${srsCustom.basedOnReviews} 回の復習）で調整済み`,
+              `scheduling tuned from your own record (${srsCustom.basedOnReviews} reviews)`,
+            )
+          : tx('復習の予定は自分の記録で調整済み', 'scheduling tuned from your own record'),
+      ),
+    );
+  }
   main.append(rows);
 }
 
@@ -4200,6 +4308,30 @@ function renderPortRow(main) {
     if (!f) return;
     try {
       const s = JSON.parse(await f.text());
+      // R3-D · the quiet counterpart door: a parameter file from
+      // tools/fsrs-optimize.mjs (the dry-run report or its candidate pin)
+      // lands as the learner's own scheduler weights — validated fail-closed
+      // by the same gate the boot applies, committed through the guarded
+      // boundary, then the app reboots so the scheduler is rebuilt on what
+      // was accepted. Nothing else in the record is touched.
+      const candidate = plainRecord(s) && plainRecord(s.candidatePin) ? s.candidatePin : s;
+      if (plainRecord(candidate) && owns(candidate, 'w') && !owns(candidate, 'taken')) {
+        const fitted = {
+          w: candidate.w,
+          source: `${nonEmptyString(candidate.parameterSetId) ? candidate.parameterSetId : 'fsrs-optimize'} @ ${new Date().toISOString()}`,
+        };
+        const reviews = s.input?.trainingReviews;
+        if (Number.isInteger(reviews) && reviews > 0) fitted.basedOnReviews = reviews;
+        if (candidate.algorithm !== 'FSRS-6' || srsParamsProblem(fitted)) {
+          portNote.textContent = tx(
+            'このパラメータは読めない。fsrs-optimize の出力をそのまま。',
+            'Those parameters could not be read — use a tools/fsrs-optimize.mjs output, unchanged.',
+          );
+          return;
+        }
+        if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, fsrs: fitted } })) location.reload();
+        return;
+      }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
       location.reload();
@@ -6919,6 +7051,14 @@ window.__KAIRO_SRS__ = Object.freeze({
     pinFuzz: D.pin?.enableFuzz ?? null,
     reviewTimePolicyId: D.pin?.reviewTimePolicyId ?? null,
   }),
+  // R3-D · the parameter set actually in force: the learner's own fitted
+  // weights when srsPrefs.fsrs passed the gate, the pinned defaults otherwise
+  params: () => ({
+    custom: !!srsCustom,
+    source: srsCustom ? srsCustom.source : null,
+    basedOnReviews: srsCustom ? srsCustom.basedOnReviews : null,
+    w: srsParams ? Array.from(srsParams.w) : null,
+  }),
   schedulerInstant: (lastReviewIso, nowMs) =>
     srsSchedulerInstant(
       lastReviewIso ? { last_review: new Date(lastReviewIso) } : {},
@@ -7952,8 +8092,16 @@ function renderSchedule(container) {
     withEn(
       // the scheduler is named for the learner; its internal parameter-set
       // slug (bunki-fsrs6-…) is provenance and stays in exports/debug —
-      // it leaked into every entry footer (P2, full-instrument review)
-      el('p', 'card-kind', tx('予定される復習', 'if you reviewed this now') + ' — FSRS-6'),
+      // it leaked into every entry footer (P2, full-instrument review).
+      // When the learner's own fitted weights rule (R3-D), the footer says
+      // so: the schedule shown is never passed off as the default's.
+      el(
+        'p',
+        'card-kind',
+        tx('予定される復習', 'if you reviewed this now') +
+          ' — FSRS-6' +
+          (srsCustom ? tx('・自分の記録で調整済み', ' · tuned from your record') : ''),
+      ),
       null,
     ),
   );

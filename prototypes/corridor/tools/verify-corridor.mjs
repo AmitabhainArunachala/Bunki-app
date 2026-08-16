@@ -16,7 +16,8 @@
  */
 
 import { createServer } from 'node:http';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -2495,6 +2496,156 @@ async function main() {
   check('R3-B · the walks leave no console errors',
     consoleErrors.length === errsBeforeR3B,
     consoleErrors.slice(errsBeforeR3B).join(' | ') || 'clean');
+
+  // ------------------------------------------- R3-D · the optimizer loop
+  // closes (T7): a parameter file from tools/fsrs-optimize.mjs enters the
+  // learner's own 読み込む door, the scheduler is rebuilt on the fitted
+  // weights, and a graded card's stored schedule matches the custom-weights
+  // prediction — replayed independently on the vendored ts-fsrs, under both
+  // weight sets, so a build that quietly kept the defaults cannot pass. An
+  // invalid set is ignored: defaults rule, one quiet obslog note, no crash.
+  console.log('\n— R3-D · fitted FSRS parameters drive the real scheduler');
+  const errsBeforeR3D = consoleErrors.length;
+  const pinR3D = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/fsrs-pin.json'), 'utf8'));
+  const roundtripDir = resolve(REPO, 'docs/build-evidence/renkan/optimizer-roundtrip');
+  const candidateR3D = JSON.parse(readFileSync(resolve(roundtripDir, 'candidate-fsrs-pin.json'), 'utf8'));
+  const DAY_MS = 86400000;
+  // one due card whose next Good interval DIFFERS between the fitted and the
+  // default weights (25 d vs 24 d at ten elapsed days) — no coincidences
+  await page.evaluate(`(() => {
+    const T = Date.now();
+    const iso = (ms) => new Date(ms).toISOString();
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      taken: [{ t: 'word', id: '学校', label: '学校', ts: T - 10 * ${DAY_MS}, started: T - 10 * ${DAY_MS} }],
+      srs: { 'word:学校': { due: iso(T - 4 * ${DAY_MS}), last_review: iso(T - 10 * ${DAY_MS}), stability: 5, difficulty: 5, elapsed_days: 6, scheduled_days: 6, reps: 3, lapses: 0, learning_steps: 0, state: 2 } },
+    }));
+  })()`);
+  await open('?entry=shelf');
+  const paramsBefore = await page.evaluate(`window.__KAIRO_SRS__.params()`);
+  // import the full dry-run REPORT: the door unwraps candidatePin and keeps
+  // the training-review count as honest provenance
+  await tap(page, '#tray');
+  await page.waitForSelector('#import-file', { state: 'attached' });
+  await page.setInputFiles('#import-file', resolve(roundtripDir, 'fsrs-dry-run.json'));
+  await page.waitForFunction(
+    `(() => { try { return !!JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs.fsrs; } catch { return false; } })()`,
+    null, { timeout: 8000 },
+  );
+  await open('?entry=shelf');
+  const paramsAfter = await page.evaluate(`window.__KAIRO_SRS__.params()`);
+  check('R3-D · the 読み込む door installs the optimizer output into the live scheduler',
+    paramsBefore.custom === false &&
+      JSON.stringify(paramsBefore.w) === JSON.stringify(pinR3D.w) &&
+      paramsAfter.custom === true &&
+      JSON.stringify(paramsAfter.w) === JSON.stringify(candidateR3D.w) &&
+      paramsAfter.basedOnReviews === 500 &&
+      String(paramsAfter.source).startsWith(candidateR3D.parameterSetId),
+    `custom=${paramsAfter.custom} · basedOnReviews=${paramsAfter.basedOnReviews} · ${paramsAfter.source}`);
+  await tap(page, '#tray');
+  await page.waitForSelector('.tray-line');
+  await page.locator('.tray-line').first().click();
+  await page.waitForSelector('#sheet');
+  const footerR3D = await page.evaluate(
+    `[...document.querySelectorAll('#sheet p.card-kind')].map((n) => n.textContent).find((t) => t.includes('FSRS-6')) ?? ''`,
+  );
+  check('R3-D · the entry footer says the truth about the weights in force',
+    footerR3D.includes('FSRS-6') && footerR3D.includes('tuned from your record'),
+    JSON.stringify(footerR3D));
+  await shoot(page, shotsDir, '22-r3d-fitted-params');
+  // a malformed parameter file is refused AT THE DOOR: told once, store kept
+  const badDirR3D = mkdtempSync(join(tmpdir(), 'r3d-bad-'));
+  const badPathR3D = join(badDirR3D, 'bad-params.json');
+  writeFileSync(badPathR3D, JSON.stringify({ ...candidateR3D, w: candidateR3D.w.slice(0, 20) }));
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#import-file', { state: 'attached' });
+  await page.setInputFiles('#import-file', badPathR3D);
+  await page.waitForTimeout(500);
+  const afterBadR3D = await page.evaluate(`(() => ({
+    note: document.querySelector('.port-row + .airead-note')?.textContent ?? '',
+    w: JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs.fsrs.w.length,
+  }))()`);
+  check('R3-D · a malformed parameter file is refused at the door; the record stands',
+    afterBadR3D.note.includes('fsrs-optimize') && afterBadR3D.w === 21,
+    `note "${afterBadR3D.note}" · stored w length ${afterBadR3D.w}`);
+  // grade the seeded card in the real review flow, then replay the press in
+  // Node on the vendored scheduler under BOTH weight sets
+  const preGradeR3D = await page.evaluate(
+    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srs['word:学校']`,
+  );
+  await page.waitForSelector('#review-start');
+  await tap(page, '#review-start');
+  await page.waitForSelector('#reveal');
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade.g-good');
+  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  await page.waitForTimeout(400);
+  const gradedR3D = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return { rec: e.srs['word:学校'], row: e.revlog[e.revlog.length - 1] };
+  })()`);
+  const fsrsVendor = await import(resolve(CORRIDOR_DIR, 'vendor/ts-fsrs.mjs'));
+  const engineR3D = (w) =>
+    fsrsVendor.fsrs(fsrsVendor.generatorParameters({
+      w,
+      request_retention: pinR3D.requestRetention,
+      maximum_interval: pinR3D.maximumInterval,
+      enable_fuzz: pinR3D.enableFuzz,
+      enable_short_term: pinR3D.enableShortTerm,
+      learning_steps: pinR3D.learningSteps,
+      relearning_steps: pinR3D.relearningSteps,
+    }));
+  const reviveR3D = {
+    ...preGradeR3D,
+    due: new Date(preGradeR3D.due),
+    last_review: new Date(preGradeR3D.last_review),
+  };
+  const predictR3D = (w) =>
+    engineR3D(w).repeat({ ...reviveR3D }, new Date(gradedR3D.row[0]))[fsrsVendor.Rating.Good].card;
+  const customR3D = predictR3D(candidateR3D.w);
+  const defaultR3D = predictR3D(pinR3D.w);
+  check('R3-D · the graded schedule is the CUSTOM prediction to 8 dp, not the default',
+    gradedR3D.row[1] === 'word:学校' && gradedR3D.row[2] === 3 &&
+      Math.abs(gradedR3D.rec.stability - customR3D.stability) < 5e-9 &&
+      gradedR3D.rec.scheduled_days === customR3D.scheduled_days &&
+      Date.parse(gradedR3D.rec.due) === customR3D.due.getTime() &&
+      Math.abs(customR3D.stability - defaultR3D.stability) > 1e-6,
+    `stored s=${gradedR3D.rec.stability} ivl=${gradedR3D.rec.scheduled_days}d · custom s=${customR3D.stability} ivl=${customR3D.scheduled_days}d · default s=${defaultR3D.stability} ivl=${defaultR3D.scheduled_days}d`);
+  // an out-of-bounds STORED set is ignored fail-closed: the pinned defaults
+  // rule, the bytes are kept verbatim, and one quiet obslog note says why
+  await page.evaluate(`(() => {
+    const key = 'kairo-corridor-v1';
+    const e = JSON.parse(localStorage.getItem(key));
+    e.srsPrefs.fsrs = { w: e.srsPrefs.fsrs.w.map((x, i) => (i === 20 ? 5 : x)) };
+    localStorage.setItem(key, JSON.stringify(e));
+  })()`);
+  await open('?entry=shelf');
+  await page.waitForTimeout(1500); // the note rides the obslog debounce
+  const ignoredR3D = await page.evaluate(`(() => {
+    const p = window.__KAIRO_SRS__.params();
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return {
+      custom: p.custom,
+      w20: p.w ? p.w[20] : null,
+      kept: e.srsPrefs.fsrs.w[20],
+      notes: (e.obslog || []).filter((r) => r[1] === 'params').map((r) => r.slice(1)),
+    };
+  })()`);
+  check('R3-D · an out-of-bounds stored set is ignored — defaults rule, bytes kept, one quiet note',
+    ignoredR3D.custom === false && ignoredR3D.w20 === pinR3D.w[20] && ignoredR3D.kept === 5 &&
+      JSON.stringify(ignoredR3D.notes) === JSON.stringify([['params', 'fsrs', 'bounds']]),
+    JSON.stringify(ignoredR3D));
+  await open('?entry=shelf');
+  await page.waitForTimeout(1500);
+  const dedupR3D = await page.evaluate(
+    `(JSON.parse(localStorage.getItem('kairo-corridor-v1')).obslog || []).filter((r) => r[1] === 'params').length`,
+  );
+  check('R3-D · a thousand boots write one note, not a thousand',
+    dedupR3D === 1, `params notes after a second boot: ${dedupR3D}`);
+  check('R3-D · the probes leave no console errors',
+    consoleErrors.length === errsBeforeR3D,
+    consoleErrors.slice(errsBeforeR3D).join(' | ') || 'clean');
 
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({

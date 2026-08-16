@@ -1,0 +1,117 @@
+{
+  "walkedAt": "2026-08-16T11:30:07.953Z",
+  "fixture": "tools/fixtures/fsrs/synthetic-retention-085.json",
+  "optimizer": {
+    "command": "node tools/fsrs-optimize.mjs tools/fixtures/fsrs/synthetic-retention-085.json",
+    "trainingReviews": 500,
+    "logLossBefore": 0.42029737,
+    "logLossAfter": 0.41994976,
+    "parameterSetId": "bunki-fsrs6-r090-personal-v1"
+  },
+  "seededCard": {
+    "due": "2026-08-12T11:30:04.696Z",
+    "last_review": "2026-08-06T11:30:04.696Z",
+    "stability": 5,
+    "difficulty": 5,
+    "elapsed_days": 6,
+    "scheduled_days": 6,
+    "reps": 3,
+    "lapses": 0,
+    "learning_steps": 0,
+    "state": 2
+  },
+  "pressInstant": "2026-08-16T11:30:07.306Z",
+  "stored": {
+    "stability": 24.52184027,
+    "scheduledDays": 25,
+    "due": "2026-09-10T11:30:07.306Z"
+  },
+  "customPrediction": {
+    "stability": 24.52184027,
+    "scheduledDays": 25,
+    "due": "2026-09-10T11:30:07.306Z"
+  },
+  "defaultPrediction": {
+    "stability": 24.4728247,
+    "scheduledDays": 24,
+    "due": "2026-09-09T11:30:07.306Z"
+  },
+  "stabilityDeltaFromCustom": 0,
+  "revlogRow": [
+    1786879807306,
+    "word:学校",
+    3,
+    2,
+    10,
+    0.8458,
+    5,
+    5,
+    24.5218,
+    4.9899,
+    25,
+    1789039807306
+  ],
+  "steps": [
+    {
+      "name": "optimizer exits 0 over the committed fixture",
+      "pass": true,
+      "detail": "exit 0"
+    },
+    {
+      "name": "a fresh run reproduces the committed candidate byte for byte",
+      "pass": true,
+      "detail": "deterministic full-batch Adam — no clock, no shuffle"
+    },
+    {
+      "name": "the fitted weights genuinely differ from the pinned defaults",
+      "pass": true,
+      "detail": "20/21 weights moved"
+    },
+    {
+      "name": "before the import the pinned defaults rule",
+      "pass": true,
+      "detail": "params() custom=false, w = pin.w"
+    },
+    {
+      "name": "the import door installs the fitted weights into the live scheduler",
+      "pass": true,
+      "detail": "source: bunki-fsrs6-r090-personal-v1 @ 2026-08-16T11:30:05.647Z"
+    },
+    {
+      "name": "the stored field carries honest provenance",
+      "pass": true,
+      "detail": "bunki-fsrs6-r090-personal-v1 @ 2026-08-16T11:30:05.647Z"
+    },
+    {
+      "name": "the entry footer says the truth — tuned, never passed off as the default",
+      "pass": true,
+      "detail": "\"if you reviewed this now — FSRS-6 · tuned from your record\""
+    },
+    {
+      "name": "one grade, one revlog row",
+      "pass": true,
+      "detail": "g=3"
+    },
+    {
+      "name": "stored stability matches the CUSTOM-weights prediction to 8 dp",
+      "pass": true,
+      "detail": "stored 24.52184027 vs custom 24.52184027 (|Δ| = 0)"
+    },
+    {
+      "name": "stored interval and due match the CUSTOM-weights prediction exactly",
+      "pass": true,
+      "detail": "ivl 25 d · due 2026-09-10T11:30:07.306Z"
+    },
+    {
+      "name": "the DEFAULT-weights prediction is a different schedule — the fit is real",
+      "pass": true,
+      "detail": "custom ivl 25 d vs default ivl 24 d · stability Δ 0.04901557"
+    },
+    {
+      "name": "the walk leaves no console errors",
+      "pass": true,
+      "detail": "clean"
+    }
+  ],
+  "status": "PASS"
+}
