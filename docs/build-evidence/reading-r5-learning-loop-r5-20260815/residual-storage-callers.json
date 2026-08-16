@@ -58,7 +58,7 @@
    "dispositionNote": "Display dials (kanji/furigana/spacing) are presentation preferences; the session keeps working unpersisted and the alert names any failure."
   },
   {
-   "lineAfterPatch": 12817,
+   "lineAfterPatch": 12831,
    "surface": "lists tray door bookmark",
    "learnerRootsMutatedBeforeUncheckedSave": [
     "readerPos"
@@ -94,14 +94,14 @@
  },
  "directLearnerStoreBypasses": [
   {
-   "lineAfterPatch": 4440,
+   "lineAfterPatch": 4454,
    "surface": "learner-record export",
    "operation": "getItem",
    "keyExpression": "STORE_KEY",
    "risk": "Direct read is outside quarantine and can throw before export feedback."
   },
   {
-   "lineAfterPatch": 4491,
+   "lineAfterPatch": 4505,
    "surface": "learner-record import",
    "operation": "setItem",
    "keyExpression": "STORE_KEY",

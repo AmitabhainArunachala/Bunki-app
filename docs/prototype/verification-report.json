@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year",
-        "senses": 3,
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 16:11",
+          "2026-08-16 16:19",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 16:16",
+          "2026-08-16 16:24",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 16:20",
+          "2026-08-16 16:28",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 16:10",
+          "2026-08-24 16:18",
           "8.30"
         ]
       ]
@@ -452,12 +452,36 @@
         "id": "tok content"
       },
       {
+        "text": "日か",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "南みなみアフリカ",
+        "w": 116,
+        "h": 44,
+        "hitW": 116,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "共和きょうわ",
         "w": 44,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "国こく",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "で",
@@ -476,12 +500,28 @@
         "id": "tok content"
       },
       {
+        "text": "中ちゅう",
+        "w": 31,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "第だい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "回かい",
@@ -548,6 +588,14 @@
         "id": "tok plain particle"
       },
       {
+        "text": "日本にっぽん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
@@ -556,12 +604,28 @@
         "id": "tok plain particle"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "半島はんとう",
         "w": 44,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "北海道ほっかいどう",
+        "w": 65,
+        "h": 44,
+        "hitW": 65,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "含ふくめ",
@@ -892,6 +956,14 @@
         "id": "tok content"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "半島はんとう",
         "w": 44,
         "h": 44,
@@ -908,6 +980,30 @@
         "id": "tok plain particle"
       },
       {
+        "text": "日本にっぽん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "国こく",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "内ない",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "で",
         "w": 23,
         "h": 45,
@@ -922,6 +1018,30 @@
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "屋久やく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "島とう",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "白神しらかみ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "山地さんち",
@@ -948,12 +1068,28 @@
         "id": "tok content"
       },
       {
+        "text": "三さん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "番ばん",
         "w": 22,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "目め",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "の",
@@ -1002,6 +1138,14 @@
         "hitW": 46,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "北海道ほっかいどう",
+        "w": 65,
+        "h": 44,
+        "hitW": 65,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "内うち",
@@ -1132,6 +1276,14 @@
         "id": "tok content"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "半島はんとう",
         "w": 44,
         "h": 44,
@@ -1146,6 +1298,14 @@
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "羅臼らうす",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "岳たけ",
@@ -1178,6 +1338,14 @@
         "hitW": 45,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "火山かざん",
@@ -1234,6 +1402,14 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "海かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "に",
@@ -1316,6 +1492,14 @@
         "id": "tok content"
       },
       {
+        "text": "樹じゅ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
@@ -1356,6 +1540,14 @@
         "id": "tok content"
       },
       {
+        "text": "樹じゅ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
@@ -1394,6 +1586,14 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "林りん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "が",
@@ -1458,6 +1658,14 @@
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "高山たかやま",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "植物しょくぶつ",
@@ -1578,6 +1786,14 @@
         "hitW": 46,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "半島はんとう",
@@ -1724,6 +1940,14 @@
         "id": "tok content"
       },
       {
+        "text": "系けい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "とりわけ",
         "w": 91,
         "h": 44,
@@ -1860,6 +2084,14 @@
         "id": "tok content"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "半島はんとう",
         "w": 44,
         "h": 44,
@@ -1988,6 +2220,14 @@
         "id": "tok content"
       },
       {
+        "text": "類るい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "ヒグマ",
         "w": 68,
         "h": 44,
@@ -2028,6 +2268,14 @@
         "id": "tok content"
       },
       {
+        "text": "類るい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "が",
         "w": 23,
         "h": 45,
@@ -2044,12 +2292,28 @@
         "id": "tok content"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "半島はんとう",
         "w": 44,
         "h": 44,
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "中部ちゅうぶ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "から",
@@ -2132,6 +2396,14 @@
         "id": "tok content"
       },
       {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "国立こくりつ",
         "w": 44,
         "h": 44,
@@ -2186,6 +2458,14 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "岬みさき",
@@ -2348,6 +2628,14 @@
         "id": "tok content"
       },
       {
+        "text": "日本にっぽん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "語ご",
         "w": 22,
         "h": 44,
@@ -2362,6 +2650,14 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "半島はんとう",
@@ -2532,6 +2828,14 @@
         "id": "tok content"
       },
       {
+        "text": "南みなみアフリカ",
+        "w": 116,
+        "h": 44,
+        "hitW": 116,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "ワジ",
         "w": 46,
         "h": 44,
@@ -2570,6 +2874,22 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "知床しれとこ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
+        "text": "日本にっぽん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "西にし",
@@ -2996,6 +3316,14 @@
         "id": "tok content"
       },
       {
+        "text": "一いち",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "回かい",
         "w": 22,
         "h": 44,
@@ -3404,6 +3732,14 @@
         "id": "tok plain particle"
       },
       {
+        "text": "国連こくれん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "機関きかん",
         "w": 44,
         "h": 44,
@@ -3628,6 +3964,14 @@
         "id": "tok content"
       },
       {
+        "text": "後ご",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "は",
         "w": 23,
         "h": 45,
@@ -3738,6 +4082,14 @@
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "再さい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "審査しんさ",
@@ -3852,6 +4204,14 @@
         "id": "tok content"
       },
       {
+        "text": "日か",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
+      },
+      {
         "text": "に",
         "w": 23,
         "h": 45,
@@ -3922,6 +4282,14 @@
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "好こう",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "成績せいせき",
@@ -4250,6 +4618,14 @@
         "hitW": 44,
         "hitH": 44,
         "id": "tok content"
+      },
+      {
+        "text": "日か",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok named"
       },
       {
         "text": "まで",
@@ -6943,31 +7319,31 @@
       "rt": 306,
       "hiddenRt": 306,
       "spacing": "reader",
-      "text": "2005\n年ねん\n7\n月がつ\n14日か、南みなみアフリカ\n共和きょうわ\n国こくダ"
+      "text": "2005\n年ねん\n7\n月がつ\n14\n日か\n、\n南みなみアフリカ\n共和きょうわ\n国"
     },
     "noFuri": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader",
-      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
+      "text": "2005\n年\n7\n月\n14\n日\n、\n南アフリカ\n共和\n国\nダーバンで\n開催\n中\n"
     },
     "spaced": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
+      "text": "2005\n年\n7\n月\n14\n日\n、\n南アフリカ\n共和\n国\nダーバンで\n開催\n中\n"
     },
     "joyo": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
+      "text": "2005\n年\n7\n月\n14\n日\n、\n南アフリカ\n共和\n国\nダーバンで\n開催\n中\n"
     },
     "allKana": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005\nねん\n7\nがつ\n14か、みなみアフリカ\nきょうわ\nこくダーバンで\nかい"
+      "text": "2005\nねん\n7\nがつ\n14\nか\n、\nみなみアフリカ\nきょうわ\nこく\nダーバン"
     }
   },
   "idiomSectionPresent": true,
@@ -7493,7 +7869,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 485,
+  "loadMs": 410,
   "summary": {
     "total": 215,
     "failed": 0
@@ -7522,7 +7898,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.63999938964844,\"y\":570.8499755859375,\"productive\":true}"
+      "detail": "{\"x\":147.60000610351562,\"y\":570.9000244140625,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7542,7 +7918,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 485 ms"
+      "detail": "82 texts, ready in 410 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7647,7 +8023,7 @@
     {
       "name": "the reader shows real Japanese",
       "pass": true,
-      "detail": "2712 chars rendered"
+      "detail": "2763 chars rendered"
     },
     {
       "name": "furigana renders as real ruby",
@@ -7742,7 +8118,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 3 senses"
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -7862,7 +8238,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "702 controls checked, including inline token hit regions"
+      "detail": "749 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -8022,7 +8398,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786896675230,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786897207024,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8047,7 +8423,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786896678880,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786897211007,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8142,7 +8518,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8262,12 +8638,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T16:12:09.442Z; due 2026-08-26T16:12:09.442Z"
+      "detail": "anchor held at 2026-08-19T16:20:54.665Z; due 2026-08-26T16:20:54.665Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786896730467 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786897255702 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8377,7 +8753,7 @@
     {
       "name": "R3-B · device Back from a word sheet walks to the reader, place intact",
       "pass": true,
-      "detail": "{\"sameDocument\":true,\"view\":\"reader\",\"sheet\":false,\"y\":498} (kept 498)"
+      "detail": "{\"sameDocument\":true,\"view\":\"reader\",\"sheet\":false,\"y\":499} (kept 499)"
     },
     {
       "name": "R3-B · a kanji word stands in the field to dive into",
@@ -8417,7 +8793,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T16:12:51.455Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T16:21:36.950Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8547,7 +8923,7 @@
     {
       "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
       "pass": true,
-      "detail": "row [1786896792901,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+      "detail": "row [1786897317289,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
     },
     {
       "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",

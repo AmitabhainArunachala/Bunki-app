@@ -3825,8 +3825,23 @@ function renderReader(main) {
       if (crossRefs.skip.has(index)) continue;
     }
     const particle = !token.c ? PARTICLE_BY_SURFACE[token.s] : null;
-    const interactive = !!token.c || !!particle;
-    const span = el(interactive ? 'button' : 'span', token.c ? 'tok content' : 'tok plain');
+    // A name is exactly what a learner cannot read. The `c` flag comes from
+    // the GRADER, whose 固有名詞/数詞 exclusion means "do not count this as a
+    // content word" — a readability rule that was doing double duty as the
+    // reader's interactivity law, leaving 知床半島 and 藤田譲瑠チマ as dead
+    // text with no reading, no gloss, no 覚える (E3 round-A, reader lens).
+    // Any token written with kanji that carries a reading is now a door,
+    // whatever the grader thinks of it; punctuation and bare kana are not.
+    const namedReading =
+      !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
+    const interactive = !!token.c || !!particle || namedReading;
+    // its own class: a door, but never mistaken for a graded content word —
+    // the app and its verifiers both select on .tok.content, and a name with
+    // no dictionary entry answering to that name breaks both
+    const span = el(
+      interactive ? 'button' : 'span',
+      token.c ? 'tok content' : namedReading ? 'tok named' : 'tok plain',
+    );
     if (interactive) span.type = 'button';
     span.dataset.index = String(index);
     if (token.c) {
