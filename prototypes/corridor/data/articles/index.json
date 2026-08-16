@@ -2450,7 +2450,7 @@
    "id": "bunki-graded-n3-zoka-sanjin-morning",
    "title": "造化三神に出会う朝",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2504,13 +2504,14 @@
     "場面",
     "意外"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-nakaima-diary",
    "title": "「中今」を感じる一日",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2564,13 +2565,14 @@
     "昨日",
     "出す"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-world-beginning",
    "title": "世界のはじまりに現れた三柱",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2624,13 +2626,14 @@
     "始まる",
     "ただし"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-hidden-deity",
    "title": "姿を隠した神さま",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2684,13 +2687,14 @@
     "すぐ",
     "隠れる"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-kojiki-book",
    "title": "『古事記』はどんな本？",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2744,13 +2748,14 @@
     "表紙",
     "古事"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-hashira-counter",
    "title": "神さまを「一柱」と数えるわけ",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2804,13 +2809,14 @@
     "いう",
     "数詞"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-feel-jingu-forest",
    "title": "伊勢神宮の森を映像で歩く",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2864,13 +2870,14 @@
     "ない",
     "深い"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-musubi-visual",
    "title": "天・地・祈りをつなぐ「むすひ」",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2924,13 +2931,14 @@
     "落ちる",
     "低い"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-gratitude-week",
    "title": "一週間、感謝の言葉を唱えてみた",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2984,13 +2992,14 @@
     "創作",
     "日記"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-graded-n3-thanks-before-help",
    "title": "「助けて」より先に「ありがとう」？",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3044,13 +3053,14 @@
     "ござる",
     "言う"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-zoka-as-one",
    "title": "三柱の神を一つの働きとして読む",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3104,13 +3114,14 @@
     "起こる",
     "現れる"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-nakaima-time",
    "title": "過去・現在・未来と「中今」",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3164,13 +3175,14 @@
     "予定",
     "心配"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-creator-god",
    "title": "「創造神」という言葉はどこまで正しいか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3224,13 +3236,14 @@
     "多く",
     "意思"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-silent-amenominakanushi",
    "title": "天之御中主神――語られない神をどう読むか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3284,13 +3297,14 @@
     "すぐ",
     "舞台"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-kojiki-myth-history",
    "title": "『古事記』は神話か、歴史か",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3344,13 +3358,14 @@
     "歴史",
     "質問"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-myth-to-book",
    "title": "語りから書物へ――神話を編む",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3404,13 +3419,14 @@
     "作る",
     "最初"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-feel-jingu-musubi",
    "title": "映像が伝える「むすひ」",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3464,13 +3480,14 @@
     "ダイジェスト",
     "教室"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-prayer-on-screen",
    "title": "映像の中で祈りはどう見えるか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3524,13 +3541,14 @@
     "内側",
     "カメラ"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-thanks-first",
    "title": "「ありがとうございます」を先に言う心理",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3584,13 +3602,14 @@
     "前置き",
     "する"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n2-testimony-literacy",
    "title": "体験談をどう受け取るか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3644,13 +3663,14 @@
     "悩む",
     "問題"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-cosmic-analogy",
    "title": "造化三神を宇宙論として読む誘惑",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3704,13 +3724,14 @@
     "あまり",
     "似合い"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-nakaima-time-theory",
    "title": "「中今」は時間論になり得るか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3764,13 +3785,14 @@
     "ある",
     "疑わしい"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-first-versus-supreme",
    "title": "原初神を「最高神」と呼ぶときの問題",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3824,13 +3846,14 @@
     "最も",
     "偉い"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-silent-god-theology",
    "title": "沈黙する神と不在の神学",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3884,13 +3907,14 @@
     "古事",
     "命令"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-kojiki-power",
    "title": "『古事記』編纂と権力の物語",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3944,13 +3968,14 @@
     "背後",
     "必ず"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-beyond-fact-fiction",
    "title": "神話を「事実か虚構か」で裁かないために",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4004,13 +4029,14 @@
     "しばしば",
     "用意"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-sacred-media",
    "title": "「感じる」映像は神聖さをどう構成するか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4064,13 +4090,14 @@
     "写る",
     "物体"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-ise-time",
    "title": "産霊・自然・反復――伊勢の時間",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4124,13 +4151,14 @@
     "触れる",
     "止まる"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-miracle-testimony",
    "title": "奇跡の体験談と認識の責任",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4184,13 +4212,14 @@
     "助け",
     "いう"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "bunki-essay-n1-prayer-reality",
    "title": "祈りの言葉は誰の現実を変えるのか",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki",
+   "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4244,7 +4273,8 @@
     "ため",
     "書く"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   }
  ]
 }
