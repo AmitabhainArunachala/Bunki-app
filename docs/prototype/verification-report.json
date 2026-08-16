@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 04:58",
+          "2026-08-16 05:36",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 05:03",
+          "2026-08-16 05:41",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 05:07",
+          "2026-08-16 05:45",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-25 04:57",
+          "in 10 d",
+          "2026-08-26 05:35",
           "8.30"
         ]
       ]
@@ -4084,6 +4084,14 @@
         "id": "tok plain particle"
       },
       {
+        "text": "エクアドル",
+        "w": 113,
+        "h": 44,
+        "hitW": 113,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
@@ -4124,12 +4132,36 @@
         "id": "tok content"
       },
       {
+        "text": "マリ",
+        "w": 46,
+        "h": 44,
+        "hitW": 46,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
         "text": "の",
         "w": 23,
         "h": 45,
         "hitW": 44,
         "hitH": 45,
         "id": "tok plain particle"
+      },
+      {
+        "text": "トンブクトゥ",
+        "w": 136,
+        "h": 44,
+        "hitW": 136,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "アルバニア",
+        "w": 113,
+        "h": 44,
+        "hitW": 113,
+        "hitH": 44,
+        "id": "tok content"
       },
       {
         "text": "の",
@@ -7036,7 +7068,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 506,
+  "loadMs": 466,
   "summary": {
     "total": 116,
     "failed": 0
@@ -7065,7 +7097,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148,\"y\":570.280029296875,\"productive\":true}"
+      "detail": "{\"x\":147.72000122070312,\"y\":570.47998046875,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7075,7 +7107,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 88px; mean tether 163 → 163px"
+      "detail": "centre moved 89px; mean tether 163 → 163px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7085,7 +7117,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "70 texts, ready in 506 ms"
+      "detail": "70 texts, ready in 466 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7160,7 +7192,7 @@
     {
       "name": "the reader shows real Japanese",
       "pass": true,
-      "detail": "2686 chars rendered"
+      "detail": "2712 chars rendered"
     },
     {
       "name": "furigana renders as real ruby",
@@ -7185,7 +7217,7 @@
     {
       "name": "文節 grouping is real",
       "pass": true,
-      "detail": "350 文節 groups"
+      "detail": "354 文節 groups"
     },
     {
       "name": "dial · kanji alone changes the script",
@@ -7305,7 +7337,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -7375,7 +7407,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "673 controls checked, including inline token hit regions"
+      "detail": "677 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -7535,7 +7567,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786856303650,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786858602656,\"probe\",\"word:屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -7620,7 +7652,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     }
   ]
 }
