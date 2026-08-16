@@ -1,218 +1,87 @@
-# 連環 RENKAN — RUN_STATE
+# 連環 RENKAN — RUN_STATE (final)
 
 **Campaign:** `docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md`
-**Branch:** `claude/renkan-one-push-2026-08-16`
-**Base:** `main` @ `e335ab7aad68caf43747bb9bde4c04c06b1b81b3` (PR #73 merged)
-**Round:** 0 (bootstrap)
-**Last updated:** 2026-08-16
+**Branch:** `claude/renkan-one-push-2026-08-16` · **PR:** #74 (draft, stays draft)
+**Base:** `main` @ `e335ab7` (PR #73 merged) · **Rounds run:** 0–4 + Wave C + Wave E
+**Exact SHAs per landing:** `manifest.json` (schema-bound round ledger)
 
-## Terminal board (§1)
+## §1 terminal board — final typed states
 
-| #   | Terminal          | State | Evidence |
-| --- | ----------------- | ----- | -------- |
-| T1  | Every gate green  | OPEN  | —        |
-| T2  | One learner state | OPEN  | —        |
-| T3  | Reading Crown     | OPEN  | —        |
-| T4  | The feed          | OPEN  | —        |
-| T5  | Ledger zero       | OPEN  | —        |
-| T6  | AI stack honest   | OPEN  | —        |
-| T7  | SRS complete      | OPEN  | —        |
-| T8  | Truth pass        | OPEN  | —        |
+Every row is CLOSED with bound evidence or typed onto the operator decision
+sheet (§5). No third state.
 
-States: OPEN → IN-ROUND → CLOSED(sha, evidence) | DECISION-SHEET(item).
+| #   | Terminal          | State                        | Binding                                                                                                                             |
+| --- | ----------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| T1  | Every gate green  | **CLOSED**                   | `battery-final/SUMMARY.md` — fresh full §4 battery on the final head; corridor 190, storage 35, a11y, writing-room 37, drift 52, AI 19, native-readings 50, feed 27, replay, export, e2e 44, corpus pytest 193 |
+| T2  | One learner state | **DECISION-SHEET (OD-9)**    | Engineering complete: PR70 backlog drained or ADR-disposed; parity enforced by verifiers. `docs/adr/ADR-004-one-learner-state.md` awaits your ratification — the ADR route §1 itself permits |
+| T3  | Reading Crown     | **DECISION-SHEET (OD-6/7)**  | 30-cap **lifted** by the exact-SHA demo (`reader-demo/10c440c…`, 85/86 assertions). Honest re-score **28.4/100** (`RUBRIC_REASSESSMENT_2026-08-16.md`). ≥70 is unreachable without physical-device evidence (OD-7) and audio (OD-6) — the rubric's own scale caps everything else at 40 |
+| T4  | The feed          | **DECISION-SHEET (OD-3)**    | Loop closed and gated: two consecutive automated runs, grader-scored, pools separated, EN titles as data (82 shelf + 682 archive), cull authority, `verify-feed.mjs` 27/27. 0/N approved **stays 0/N** until you decide — a feed of *approved* material cannot self-close |
+| T5  | Ledger zero       | **DECISION-SHEET (OD-19)**   | 83-finding triage + 13 hunt findings burned down across rounds 1–4; the closing double-dry HUNT (8 lenses × 2) could not run — the account hit its monthly spend limit mid-round-4. Script staged, one command from done |
+| T6  | AI stack honest   | **CLOSED (ADR-004 sibling)** | 10s abort on every surface, provider/model seam, lossless IndexedDB archive across all six surfaces, 24-turn destruction gone, `verify-corridor-ai.mjs` 19/19. Literal package import deferred by ADR-004 §sibling with named rationale |
+| T7  | SRS complete      | **CLOSED**                   | Optimizer harvested (11/11), revlog has a reader, fitted params drive the scheduler fail-closed (R3-D, evidence in `optimizer-roundtrip/`), session budget is the learner's (R2-X), capture reversible everywhere (R2-B), fuzz/clock policy unified (ADR-003) |
+| T8  | Truth pass        | **CLOSED**                   | README rewritten to what is real; in-app copy repaired (R2-C/R3-E honest signals, true crumbs); campaign manifest v2 authored fresh and passing `verify:integration-manifest`; this file's terminal states typed |
 
-## Round ledger
+## What landed (rounds 0–4)
 
-### Round 0 — bootstrap + recon + safe landings (closed this commit)
+Round 0 — corpus spine ancestry (PR #60's debt), FSRS optimizer harvest,
+baseline battery 14/14, ground truth absorbed, decision-sheet proposals drafted.
 
-- Branch created from `main` @ `e335ab7`, pushed; draft PR #74 opened.
-- Ground truth absorbed: constitution, rubric+closure spec, full-review LEDGER,
-  PR70 reconciliation, campaign spec, Wayfinder #32/#37, reading-excellence goal,
-  GOSAI/HASSAI/full-instrument distillations, ADR-001/002.
-- **Baseline battery: 14/14 GREEN** on `d1604e9` tree (see `battery-baseline/SUMMARY.md`).
-  Environment notes: e2e requires `npm run test:e2e:build` first (now in battery.sh);
-  corpus pytest needs the venv at `/home/user/.venv-bunki-corpus` (Debian setuptools
-  breaks unidic-lite sdist outside a venv).
-- **B1 CLOSED**: corpus spine landed as ancestry merge `a14dcbd` — recon proved all
-  seven corpus branches byte-identical subset of main (harvest ledger concurs);
-  merge-tree verified conflict-free no-op. PR #60's ancestry debt closes when the
-  campaign merges.
-- **T7 optimizer harvested**: `f8c3b03` cherry-picked as `fa78a65` — 11/11 tests,
-  typecheck/lint/format green. Reads the real corridor export envelope `{v:1,…}`.
-- **30-article donor superseded**: `codex/native-readings-20260812` (307a4dd) fully
-  landed+evolved on main via PR #73 (`1606a1e`/`774f1dc`). Do NOT merge the donor.
-- Ledger staleness measured (triage, 83 findings): 33 FIXED on head / 39 OPEN /
-  11 PARTIAL. Detail lands with Round 1 integration.
-- New confirmed defect (optimizer brief): corridor passes raw wall-clock to
-  `scheduler.repeat` — violates `append-order-monotonic-clamp-v1` pin. → Round 2.
-- Decision-sheet proposal drafts written under `proposals/` (#35 thread/weave,
-  #38/#40 cards+overrides incl. fuzz conflict, TTS 澄/語/話 samples plan,
-  #49 rename inventory: corridor is already KAIRO internally).
+Round 1 — drift judgments reach the learner obslog (P0, ack-gated with
+rollback); dojo drills stamp practice, never orphaned FSRS state (P0); AI
+runtime honesty (abort + provider seam + lossless archive); titleEn as data
+(TITLES_EN map deleted); sent-door 44px. Triage of the 65-finding ledger
+against the live head: 83 rows measured (33 already fixed).
 
-### Round 1 — CLOSED at `e8b0ccd` (workflow wf_0c28e955-c23: 13 agents, 4/4 builds CONFIRMED)
+Round 2 — capture sovereignty (覚える top-right everywhere, un-memorize,
+list management); one scheduler policy (fuzz off + monotonic clamp, ADR-003),
+overdueness ordering, bounded review, no-debt legacy migration, ペース
+settings; the feed loop with the operator review queue; reader/shelf truths;
+694 archive EN titles; app-kernel budget + real lookup friction; drift ring
+honours the 390px glass + first-touch cue. Three HUNT lenses ran.
 
-All four builds adversarially CONFIRMED (independent verifiers reproduced claims
-end-to-end, incl. an independent CDP flick smoke for A1a) and landed serially:
+Round 3 — furigana truth (the ruby stopped lying about deity names: 303
+readings re-minted under a provenance-carrying override lexicon, with a
+checker and DOM probes); device Back walks the app instead of leaving it;
+declared recall gates the reveal (T-06) plus the transactional sweep
+(unchecked learner-root writes 19 → 5); the optimizer loop closed; honest
+difficulty signals, true crumbs, kept places.
 
-- **A1a** `db46914` — drift judgments commit synchronously to obslog via
-  commitStorePatch, ack-gated with drift-store rollback on persist failure.
-  Never touches S.srs/S.taken/revlog. +7 storage-integrity probes.
-- **A1b** `f757944` — dojo drills on non-taken items stamp practice obslog rows
-  only (no FSRS state, no revlog, no new-slot burn); taken items unchanged.
-  corridor suite grew 116→121.
-- **A2** `bdddc28` — aiConverse: 10s AbortController; provider/model store seam;
-  IndexedDB append-only AI archive (all six surfaces, "not a word is lost");
-  24-turn chat destruction removed (render from durable transcript). New
-  verifier `verify-corridor-ai.mjs` (19 checks) joined the battery.
-- **B3** `ca14e09` — all 70 primary index rows carry titleEn as data
-  (titleEnSource: shelf-map-2026 ×40, renkan-ai-2026-08 ×30); TITLES_EN map
-  deleted; archive render honors titleEn when present; native-readings verifier
-  grew to 44 checks.
-- `0f3aac3` standalone regenerated (builder-only); `e8b0ccd` sent-door 44px hit
-  region — the integrated walk exposed a latent sub-44px control the baseline
-  viewport had hidden; fixed with the established button.tok ::before pattern.
-- Integration notes: residual-storage-callers.json is a line-pin; recompute from
-  the merged corridor.js on every landing (script pattern in session log).
-- Triage: `triage-round1.json` — 83 findings, 33 FIXED / 39 OPEN / 11 PARTIAL.
-  Key PARTIAL details: PR70-P0-2/3/4 substrate landed post-audit (remaining:
-  key/data migration, T-06 reveal-forces-Again, universal transactional helper);
-  P1-4: one lost を in wikinews-1403 remains.
-- Battery: fresh full run on `e8b0ccd` → `battery-round1/SUMMARY.md`.
+Round 4 — lessons write evidence and enrolling is the learner's choice
+(PR70-P0-1), the dojo's second lap is honest practice, the tutor's quiz
+survives reload; one Learn lineage in `apps/app` (P1-18) with durable
+uncertainty and real kanji-page capture (P2-18).
 
-### Terminal board notes (post round 1)
+Wave C — the exact-SHA end-to-end reader demonstration (C1) and the honest
+rubric re-assessment (C2).
 
-- T2: obslog is now the one observation ledger (drift + dojo bridges). ADR-003
-  disposition next (R2). PR70 backlog: 4 items PARTIAL-with-substrate, 3 OPEN.
-- T4: B1 ✅ B3 ✅; feed pipeline + review queue = R2-D.
-- T5: burn-down map = triage-round1.json (50 OPEN/PARTIAL, minus round-1 closures).
-- T6: deployed AI now has timeout/abort + lossless persistence + provider seam at
-  the choke point (behavior parity with @bunki/ai runtime). Open honesty item:
-  whether "routes through @bunki/ai" needs literal package unification or an ADR
-  documenting contract parity — goes into ADR-003's sibling section (R2/R3).
-- T7: optimizer ✅ + revlog reader ✅; R2: monotonic clamp, fuzz-off ADR, bounded
-  plan, settings; R3: param round-trip demo on real export.
+## Not done, named honestly
 
-### Round 2 — landings complete; battery running (workflow wf_03729f77-e93: 17 agents, 0 errors)
+- **R4-C** (obslog reader: the 出会い exposure trail on entry sheets; tray
+  rest/wake 44px) and **R4-D** (mock-tests proposal doc) — briefs preserved
+  below; both died unstarted on the account spend limit.
+- **R4-A's independent adversarial verify** — the verify agent died on the
+  same limit. The lander re-ran every gate it claimed (typecheck, lint,
+  vitest 1710/1710, e2e 44/44) but no decorrelated agent refuted it. Typed
+  as OD-20.
+- **E3 double-dry HUNT** — see T5 / OD-19.
 
-All four builds CONFIRMED and landed serially (worktree bases were `main`/e335ab7,
-so cross-round merges were the lander's ring — resolved semantically, verified
-per landing):
+### Preserved briefs (for the next session)
 
-- **R2-B** `78bfaad` — 覚える top-right of every capture-eligible surface;
-  un-memorize (revlog append-only, FSRS state retained); list create/rename/
-  delete on the lists surface. Corridor suite 121→~140s range with A: 151 total.
-- **R2-A** `98c0eab` — fuzz OFF per pin + ADR-003; monotonic clamp
-  (`srsSchedulerInstant`, raw ts stays audit truth); overdueness-ordered dues;
-  bounded Review ≤ learner's limit with あと N; no-debt `started` mark (未着手
-  + 始める); ペース fold (newPerDay 0–50, reviewLimit 5–100) as validated
-  `srsPrefs`. Corridor 151/151 on A+B (committed evidence).
-- **R2-D** `a83b2b9` + convergence commit — the feed loop: `feed_ingest.py`
-  (deterministic, level-balanced tranche from committed archive stock; live
-  fetch degrades honestly), minting through `build_articles.py`, 12 検収前
-  candidates on the shelf with addedAt/titleEn, curation/cull report, TWO
-  consecutive runs committed under `feed/`, `verify-feed.mjs` (27 checks) +
-  `feed_apply_review.py` (idempotent, fail-closed). Convergence: the queue
-  gained kind `legacy` — 30 pre-feed pending originals now queue rows, so
-  `docs/content/feed-review-queue.json` (44 rows) is the ONE operator decision
-  file (OD-2 + OD-3 unified).
-- **R2-C** `83b16c4` — shelf category sections; nested-button a11y repair;
-  用例 hold hint; glossary cross-refs resolved; glossary rows honestly labeled;
-  tray 今日このあと reconciliation. P1-4 CLOSED as source-faithful: the
-  original Wikinews text has no を at 「（北海道）含め」 — the ledger's suspicion
-  was wrong; body untouched, verified against corpus sample.
-- **Fleet** `c17bd76` — 694 archive titleEn (now 682 archive + 12 promoted),
-  lander-verified coverage + fidelity spot-check.
-- **R2-X** `184b258` — apps/app: session budget is the learner's (5–60 chips,
-  plan-integrated, persisted); real lookups mint LookupFrictionLogged (T-07,
-  no grade); e2e 39→41. Independently CONFIRMED.
-- **R2-Y** (drift ring edge fix + first-touch cue, 544d93b): verdict PARTIAL —
-  ring+cue+builders CONFIRMED with teeth, but a hunt-07 (lock-member reveal)
-  regression signal must be reconciled. Sent back to its builder; NOT landed.
-
-HUNT lenses (13 findings, `hunts-round2.json`): headline P1 — tokenizer
-furigana misteaches deity-name readings (神→しん where the name reads 〜のかみ)
-in the flagship 検収前 texts, lander-verified against token data (60/70
-articles carry rubySource:tokenizer). Also: device-Back exits the SPA outside
-the writing room (sentinel exists, one room uses it); galaxy nav-search state
-razed; archive scroll context; keyboard Tab on invisible button; full-render()
-100–200ms long tasks; crumb lies (dojo/galaxy).
-
-Decision sheet grew: OD-11..OD-16 (see DECISION_SHEET.md).
-
-### Round 3 — CLOSED (workflow wf_c930a16c-262: 10 agents, 5/5 builds CONFIRMED)
-
-- **R3-A** `d54c37c` — furigana truth: reading-override lexicon (31 entries,
-  provenance header) applied AT TOKENIZATION TIME; the scan found the P1 far
-  worse than the hunt (theonyms shredded, 最高神/唯一神 read wrong, classical
-  都=みやこ wrong in 野ばら AND 方丈記); 303 readings re-minted across 25
-  bodies deterministically (`--remint-readings`, idempotent, refuses ambient
-  drift); checker `check_suspect_readings.py` (0 open rows committed);
-  native-readings 44→50 with a DOM ruby probe; conviction-tested.
-- **R3-B** `e0018d7` — device Back walks the app: the stroke room's sentinel
-  generalized to one history discipline (sheets, dives, review, archive,
-  lessons, tray, AI rooms); nav-search state survives round-trips; archive
-  scroll restored both directions; hidden layers untabbable.
-- **R3-D** `269dfb5` — T7 closes: validated learner FSRS params
-  (fail-closed, obslog note on rejection) drive the scheduler; import door;
-  full loop demonstrated on real-shaped fixture (evidence in
-  `optimizer-roundtrip/`); honest scheduler label.
-- **R3-C** `abedb40` — T-06: declared recall (思い出した/まだ) gates the
-  reveal; まだ forces Again; declaration in obslog (validated kind); P0-4
-  transactional sweep: unchecked learner-root saveStore() callers 19→5
-  (remaining 5 are UI-preference only, documented in the ledger).
-- **R3-E** `d895a16` + `cf2f1d0` — honest signals: JLPT kana-matching fix
-  (the flatlined difficulty subtitle now varies truthfully; regrade-jlpt run
-  across all 764 bodies), date 'None' dies, true crumbs (dojo/archive origin),
-  lesson-list place kept, theme-switch light swap (no full rebuild).
-- Lander integration notes: R3-E vs R3-A data collision resolved by merging
-  the TOOL and regenerating (A's readings + E's signals coexist, marker `rs`
-  verified); callers pin now 5 (take R3-C's ledger THEN re-pin lines).
-- PR70 backlog: ALL items now landed or ADR-004-disposed. T2's parity work is
-  complete pending operator ratification (OD-9).
-- Battery: `battery-round3/SUMMARY.md`.
-
-### Round 4 — READY (final build round; script staged)
-
-R4-A apps/app lineage unification (P1-18) + durable uncertainty/kanji capture
-(P2-18). R4-B lesson disposition (PR70-P0-1: completion stops auto-enrolling;
-explicit choice) + dojo refill honesty (POL-12) + quiz survives reload
-(POL-13). R4-C obslog reader (P2-19: 出会い exposure trail on entry sheets) +
-rest/wake 44px (POL-9). R4-D mock-tests proposal doc (DIR-9 → decision sheet).
-Then Wave C (T3 demo + rubric re-score) and Wave E (E1 battery+screenshots,
-E2 truth pass + manifest v2, E3 double-dry HUNT ×8 lenses ×2).
-
-1. **Furigana truth** (from hunt P1): reading-override lexicon in the mint
-   pipeline for name compounds; re-mint affected token readings; deity-name
-   verifier probe. The 30 検収前 bodies are the priority surface.
-2. **History sentinel everywhere**: generalize the writing room's Back
-   sentinel so device-Back walks the app's own stack (drift dive, sheets,
-   review, archive) instead of exiting; hunt repro steps in hunts-round2.json.
-3. **T-06 reveal-forces-Again** in corridor review (PR70-P0-3 delta) +
-   universal transactional helper sweep (P0-4 delta).
-4. **T7 param round-trip**: export → fsrs-optimize → import params into
-   corridor scheduler (validated store field), demonstrated on a real export.
-5. **Small truths**: archive scroll restore, nav-search state preservation,
-   dojo/galaxy crumb, lesson-list scroll, 'None' date render, difficulty
-   subtitle near-constant fix, keyboard-Tab order at galaxy home.
-6. **R2-Y reconciliation** (in flight with its builder).
-7. Then Wave C: T3 demo walk + rubric re-assessment; Wave E: truth pass,
-   final battery, double-dry HUNT.
-
-Script staged at `<session>/workflows/scripts/renkan-round-2.js`; a fresh session
-re-authors it from this queue: (R2-A) SRS/review integrity: monotonic clamp,
-fuzz OFF + ADR-003-corridor-fuzz-and-clock, overdueness-ordered dues, bounded
-review ≤20 + deferred count, no-debt legacy migration marker, NEW_PER_DAY +
-review-bound settings. (R2-B) capture sovereignty: 覚える top-right everywhere,
-un-memorize (revlog append-only), list rename/delete/create. (R2-C) reader
-truths: wikinews-1403 を, nested buttons, 用例 hint, glossary cross-refs, shelf
-sections, glossary honesty labels, tray messaging. (R2-D) T4 feed: ingest tranche
-→ mint via build_articles.py → 検収前 candidates + addedAt + titleEn → operator
-review-queue JSON + apply script → curation/cull report → two consecutive runs →
-feed verifier. (Fleet) 694 archive titleEn in 6 batches. (Hunt) reader-experience,
-dead-ends-navigation, console-perf lenses.
+R4-C: one honest consumer for the observation ledger — an 出会い eyebrow on
+word/kanji entry sheets distilling that item's obslog (first seen, times met,
+last practice, drift judgment) as evidence display, never a level claim; plus
+the tray rest/wake control's 44px hit region (button.tok ::before pattern).
+R4-D: `proposals/MOCK_TESTS_PROPOSAL.md` — what exists (tutor quiz, yomi
+probe), what a mock-test surface honestly requires (JLPT items are
+copyrighted: original-format items vs licensed banks vs generated+人手 review
+検収前 pools), staged shape, cost, ending in a decision-requested line.
+E3: `renkan-e3-double-dry.js` (staged) — 8 lenses × 2 rounds, adversarial
+confirmation of every finding, dry twice or it is not done.
 
 ## Resume instructions
 
-Fresh session: read the campaign spec, then this file, then `manifest.json`
-(exact SHAs). Continue from "Next" above. The battery of §4 is the gate for
-every integrated head. Nothing merges to `main` without the operator's word.
+A fresh session needs only this repo: read the campaign spec, then this file,
+then `manifest.json` (exact SHAs), then `DECISION_SHEET.md`. The battery is
+`bash docs/build-evidence/renkan/battery.sh <outdir>`; environment notes are in
+the manifest (`e2e` needs its build first; corpus pytest needs the venv).
+Nothing merges to `main` without the operator's explicit word.
