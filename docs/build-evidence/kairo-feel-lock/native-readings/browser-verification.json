@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T08:57:48.724Z",
+  "completedAt": "2026-08-16T10:26:19.454Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "5e023d8ad7256a2d29a41c8860b83b80831854fda6d59e1c94318b7c6a3a0761",
+    "index": "016f0fd45b565a450de387c43cb2b112c66da11f79715b40a33d4c8ade1f6e0f",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "7ffcd4d73cff8585bba8e96dbb3bad36d7a0cca8df17a65e0e001c5115076043",
-    "corridorCss": "0658c94577f7a50a18cbd7543a046fcd3128fedf5293fe98e4e46342607c2a07",
-    "standalone": "0c459ff609f5eeb69b1eeada3b63f5858e667f28dbe9a1cfa76bc7f8e6345926",
+    "corridorJs": "59200fdebadd6bf49c0681365c90c04fc68d0f64dc982a92344a2a039c415910",
+    "corridorCss": "70224581d7a8304adad32d86914667d03d7d84cac49bad550ea8a99a8d462c6c",
+    "standalone": "36b3c291bdc11bd49c1c2107177bfe38597e518fbb909cdaac1e90af919b04db",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -57,29 +57,33 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "b6210ca23bd4e21c26d465c4cbdc7b7e5167c87046cf1a6113781a5af04fd9d4"
+        "sha256": "58ce24c01afad852716e5819753cbf4954d5ffb9ed88b7710a7e5536efbaff4e"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "46a17d9c09461057b6f104136c3fee5d244eadbe332910228c04b2a5ad551e54"
+        "sha256": "fa40c8623b9f732b5b8597738d4a11b86907c51e961f556555c7fa08f2fda4e8"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "6debdc5805348228a75b8b15803ecf1e323f39f1c768d41516d2ffaf9ff53d79"
+        "sha256": "b055a9bf499b8ebe4bb2481132560f3e3a0bb5097bf115971399cc0b31c87059"
+      },
+      "biShelf": {
+        "path": "screenshots/shelf-bilingual-titles.png",
+        "sha256": "9a8716321ae3dbc4c154b8ca29c820026e16b29ecd15b4f7e0148521a6efd90d"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "c53aef699b145c332a32a17a03d68229d51fb6d8fba38ab2a645251650515fc3"
+        "sha256": "4c98c01e416de8585fa63ebcbcdb37bf89a92ddb00c92dfefbfc15cf2c8eaffc"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "e25624cecf6505761e36f39281b3f71bf2150b9948e80c7f0ae4883a9da37168"
+        "sha256": "eec8884431cce3c8bf0eed071262823d72b76087a8232b0d59fe4cc2e90843ef"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "8b3be0a50748e4e148fb545c0d4565c5530b20f3cec43dce6af8c933484e24d7"
+        "sha256": "91802bd298a44c3799febd697441fda02468a9952d5d5fe4f5c19bd4b062740e"
       }
     }
   },
@@ -116,21 +120,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "の",
-        "reading": "",
-        "gloss": "連体・所有"
+        "word": "朝",
+        "reading": "あさ",
+        "gloss": "morning"
       },
       "fullEntry": {
-        "headword": "の　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nの　助詞\n\n連体・所有\n\nTies two nouns: B of A, A's B, B which is A. Also nominalizes (読むのが好き) and softens questions (行くの？"
+        "headword": "朝",
+        "reading": "あさ",
+        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例 — ことばは長押しで辞書へ\n\n今回\nの\n部"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10105,
-      "returnedShelfY": 10105,
+      "shelfY": 11083,
+      "returnedShelfY": 11083,
       "newNoise": []
     },
     {
@@ -172,14 +176,14 @@
       "fullEntry": {
         "headword": "半",
         "reading": "はん",
-        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\nhalf\nsemi-\npartial\nhalf-past\nodd number\nhan (unit of land area, approx. 595.8 m^2)\n\n語義と用法"
+        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\n1\n\nnoun, used as a prefix · noun (common) (futsuumeishi)\n\nhalf\nsemi-\npartial\n2\n\nnoun, use"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10105,
-      "returnedShelfY": 10105,
+      "shelfY": 11083,
+      "returnedShelfY": 11083,
       "newNoise": []
     },
     {
@@ -227,8 +231,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10291,
-      "returnedShelfY": 10291,
+      "shelfY": 11269,
+      "returnedShelfY": 11269,
       "newNoise": []
     },
     {
@@ -276,8 +280,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10842,
-      "returnedShelfY": 10842,
+      "shelfY": 11820,
+      "returnedShelfY": 11820,
       "newNoise": []
     },
     {
@@ -325,8 +329,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10842,
-      "returnedShelfY": 10842,
+      "shelfY": 11820,
+      "returnedShelfY": 11820,
       "newNoise": []
     },
     {
@@ -374,8 +378,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11028,
-      "returnedShelfY": 11028,
+      "shelfY": 12006,
+      "returnedShelfY": 12006,
       "newNoise": []
     },
     {
@@ -423,8 +427,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11579,
-      "returnedShelfY": 11579,
+      "shelfY": 12557,
+      "returnedShelfY": 12557,
       "newNoise": []
     },
     {
@@ -472,8 +476,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11579,
-      "returnedShelfY": 11579,
+      "shelfY": 12557,
+      "returnedShelfY": 12557,
       "newNoise": []
     },
     {
@@ -521,8 +525,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11765,
-      "returnedShelfY": 11765,
+      "shelfY": 12744,
+      "returnedShelfY": 12744,
       "newNoise": []
     },
     {
@@ -570,8 +574,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12330,
-      "returnedShelfY": 12330,
+      "shelfY": 13308,
+      "returnedShelfY": 13308,
       "newNoise": []
     },
     {
@@ -619,8 +623,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12330,
-      "returnedShelfY": 12330,
+      "shelfY": 15575,
+      "returnedShelfY": 15575,
       "newNoise": []
     },
     {
@@ -668,8 +672,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12530,
-      "returnedShelfY": 12530,
+      "shelfY": 15575,
+      "returnedShelfY": 15575,
       "newNoise": []
     },
     {
@@ -717,8 +721,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13095,
-      "returnedShelfY": 13095,
+      "shelfY": 15789,
+      "returnedShelfY": 15789,
       "newNoise": []
     },
     {
@@ -766,8 +770,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13095,
-      "returnedShelfY": 13095,
+      "shelfY": 16353,
+      "returnedShelfY": 16353,
       "newNoise": []
     },
     {
@@ -815,8 +819,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13322,
-      "returnedShelfY": 13322,
+      "shelfY": 16353,
+      "returnedShelfY": 16353,
       "newNoise": []
     },
     {
@@ -858,14 +862,14 @@
       "fullEntry": {
         "headword": "もし／若し",
         "reading": "もし",
-        "text": "← 戻る\n覚\n✕\nもし／若し\n\nもし\n\n同じ形の 2 項目\n\nもしもし\nif\n›\nもしもし\nexcuse me! (when calling out to someone)\n›\n\nadverb\n\n1\n\nadverb (fukushi) · "
+        "text": "← 戻る\n覚\n✕\nもし／若し\n\nもし\n\nadverb\n\nif\nin case\nsupposing\n\n語義と用法をひらいています…\n\nJLPT N4\n\n用例 — ことばは長押しで辞書へ\n\n」「もし\n家\nで\n火事\nが\n起き\nたら、\nまず\n何\nを"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13873,
-      "returnedShelfY": 13873,
+      "shelfY": 16553,
+      "returnedShelfY": 16553,
       "newNoise": []
     },
     {
@@ -913,8 +917,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13873,
-      "returnedShelfY": 13873,
+      "shelfY": 17104,
+      "returnedShelfY": 17104,
       "newNoise": []
     },
     {
@@ -962,8 +966,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14060,
-      "returnedShelfY": 14060,
+      "shelfY": 17104,
+      "returnedShelfY": 17104,
       "newNoise": []
     },
     {
@@ -1011,8 +1015,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14624,
-      "returnedShelfY": 14624,
+      "shelfY": 17318,
+      "returnedShelfY": 17318,
       "newNoise": []
     },
     {
@@ -1060,8 +1064,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14624,
-      "returnedShelfY": 14624,
+      "shelfY": 17869,
+      "returnedShelfY": 17869,
       "newNoise": []
     },
     {
@@ -1109,8 +1113,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14824,
-      "returnedShelfY": 14824,
+      "shelfY": 17869,
+      "returnedShelfY": 17869,
       "newNoise": []
     },
     {
@@ -1158,8 +1162,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15375,
-      "returnedShelfY": 15375,
+      "shelfY": 18055,
+      "returnedShelfY": 18055,
       "newNoise": []
     },
     {
@@ -1207,8 +1211,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15375,
-      "returnedShelfY": 15375,
+      "shelfY": 18620,
+      "returnedShelfY": 18620,
       "newNoise": []
     },
     {
@@ -1256,8 +1260,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15589,
-      "returnedShelfY": 15589,
+      "shelfY": 18620,
+      "returnedShelfY": 18620,
       "newNoise": []
     },
     {
@@ -1305,8 +1309,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16140,
-      "returnedShelfY": 16140,
+      "shelfY": 18820,
+      "returnedShelfY": 18820,
       "newNoise": []
     },
     {
@@ -1354,8 +1358,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16140,
-      "returnedShelfY": 16140,
+      "shelfY": 19385,
+      "returnedShelfY": 19385,
       "newNoise": []
     },
     {
@@ -1403,8 +1407,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16381,
-      "returnedShelfY": 16381,
+      "shelfY": 19385,
+      "returnedShelfY": 19385,
       "newNoise": []
     },
     {
@@ -1439,21 +1443,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "が",
-        "reading": "",
-        "gloss": "主格"
+        "word": "水",
+        "reading": "みず",
+        "gloss": "water (esp. cool or cold)"
       },
       "fullEntry": {
-        "headword": "が　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nが　助詞\n\n主格\n\nPicks out WHICH one — the doer or the thing being described, often new information or the answer to a"
+        "headword": "水",
+        "reading": "みず",
+        "text": "← 戻る\n覚\n✕\n水\n\nみず\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nwater (esp. cool or cold)\n\n辞書内の関連項目\n\n湯\nゆ・1\n›\n2\n\nnoun (common) (fu"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16932,
-      "returnedShelfY": 16932,
+      "shelfY": 19612,
+      "returnedShelfY": 19612,
       "newNoise": []
     },
     {
@@ -1501,8 +1505,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16932,
-      "returnedShelfY": 16932,
+      "shelfY": 20163,
+      "returnedShelfY": 20163,
       "newNoise": []
     },
     {
@@ -1550,13 +1554,49 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17119,
-      "returnedShelfY": 17119,
+      "shelfY": 20163,
+      "returnedShelfY": 20163,
       "newNoise": []
     }
   ],
   "noise": [],
   "results": [
+    {
+      "name": "every primary index row carries a non-empty titleEn",
+      "pass": true,
+      "detail": "82/82",
+      "articleId": null
+    },
+    {
+      "name": "every titleEn names its provenance in titleEnSource",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "検収前 rows carry the AI-authored title marker; approved rows the migrated shelf-map one",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every archive row carries a non-empty titleEn with wrapper provenance",
+      "pass": true,
+      "detail": "682 rows · source renkan-ai-2026-08",
+      "articleId": null
+    },
+    {
+      "name": "the code-side TITLES_EN map is gone from corridor.js — titles live in data only",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
     {
       "name": "the one native shelf renders exactly the curated index rows",
       "pass": true,
@@ -1757,6 +1797,36 @@
     },
     {
       "name": "all completion and bookmark state survives localStorage",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the 日本語のみ chrome renders no English titles",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row is visibly 検収前 on the 日本語のみ shelf",
+      "pass": true,
+      "detail": "42 pending rows marked",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf renders every English title from the records themselves",
+      "pass": true,
+      "detail": "82 titles",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row stays visibly 検収前 on the bilingual shelf",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf pass added no request, console, or page errors",
       "pass": true,
       "detail": "",
       "articleId": null

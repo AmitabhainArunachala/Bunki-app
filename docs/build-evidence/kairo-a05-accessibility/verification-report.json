@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "67d80732154304015f18dc6bfb8027a9a8c2d06b",
-  "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+  "head": "8d717a0a3cc7a5ee28a591e848ea38b2bcaef584",
+  "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
@@ -16,12 +16,12 @@
     {
       "name": "no interactive control nests inside another anywhere on the shelf",
       "pass": true,
-      "detail": "{\"cards\":70,\"nestedInteractive\":0,\"cardsWithOwnDoor\":70,\"cardsWithSiblingDetails\":70}"
+      "detail": "{\"cards\":82,\"nestedInteractive\":0,\"cardsWithOwnDoor\":82,\"cardsWithSiblingDetails\":82}"
     },
     {
       "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
       "pass": true,
-      "detail": "70/70 text doors · 70/70 sibling toggles"
+      "detail": "82/82 text doors · 82/82 sibling toggles"
     },
     {
       "name": "reader words are named native controls on the common target.activate action",
@@ -51,7 +51,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "501 named button(s) in the accessibility tree"
+      "detail": "502 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",
@@ -61,7 +61,7 @@
     {
       "name": "second-action English preserves the glyph anchor within 2px",
       "pass": true,
-      "detail": "565.9px → 565.9px"
+      "detail": "567.1px → 567.1px"
     },
     {
       "name": "pointer third target.activate closes the circle — plain kanji, no sheet",

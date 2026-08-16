@@ -624,18 +624,18 @@ try {
     waitUntil: 'load',
   });
   await page.waitForFunction(
-    () =>
+    (want) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === 70,
-    null,
+      document.querySelectorAll('.shelf-item').length === want,
+    CURATED_COUNT,
     { timeout: 30_000 },
   );
   const biCards = await readShelfCards();
   const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
   check(
-    'the bilingual shelf renders all 70 English titles from the records themselves',
+    'the bilingual shelf renders every English title from the records themselves',
     wrongEn.length === 0,
-    wrongEn.map((record) => record.id).slice(0, 4).join(', '),
+    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${index.articles.length} titles`,
   );
   const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
   check(

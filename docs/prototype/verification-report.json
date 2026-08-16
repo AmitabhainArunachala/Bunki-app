@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 08:59",
+          "2026-08-16 10:12",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 09:04",
+          "2026-08-16 10:17",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 09:08",
+          "2026-08-16 10:21",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-25 08:58",
+          "in 8 d",
+          "2026-08-24 10:11",
           "8.30"
         ]
       ]
@@ -176,8 +176,8 @@
       "step": 6,
       "name": "return",
       "shot": "06-return-to-place.png",
-      "scrollBefore": 287,
-      "scrollAfter": 287
+      "scrollBefore": 288,
+      "scrollAfter": 288
     }
   ],
   "measurements": {
@@ -382,9 +382,9 @@
       {
         "text": "戻るback",
         "w": 54,
-        "h": 44,
+        "h": 47,
         "hitW": 54,
-        "hitH": 44,
+        "hitH": 47,
         "id": "back"
       },
       {
@@ -405,18 +405,26 @@
       },
       {
         "text": "日本語",
-        "w": 55,
+        "w": 54,
         "h": 44,
-        "hitW": 55,
+        "hitW": 54,
         "hitH": 44,
         "id": ""
       },
       {
+        "text": "覚えるmemorize",
+        "w": 80,
+        "h": 44,
+        "hitW": 80,
+        "hitH": 44,
+        "id": "reader-take"
+      },
+      {
         "text": "覚 1lists",
         "w": 52,
-        "h": 44,
+        "h": 47,
         "hitW": 52,
-        "hitH": 44,
+        "hitH": 47,
         "id": "tray"
       },
       {
@@ -525,9 +533,9 @@
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -557,9 +565,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -573,9 +581,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -645,9 +653,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -661,9 +669,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -725,9 +733,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -741,17 +749,17 @@
       },
       {
         "text": "認みとめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "この",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -773,9 +781,9 @@
       },
       {
         "text": "より",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -877,9 +885,9 @@
       },
       {
         "text": "なる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -933,9 +941,9 @@
       },
       {
         "text": "つぐ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -989,9 +997,9 @@
       },
       {
         "text": "なっ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1061,17 +1069,17 @@
       },
       {
         "text": "あわせ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "はじめて",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1117,9 +1125,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1165,9 +1173,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1197,9 +1205,9 @@
       },
       {
         "text": "中心ちゅうしん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1261,9 +1269,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1317,17 +1325,17 @@
       },
       {
         "text": "マツ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "トドマツ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1357,17 +1365,17 @@
       },
       {
         "text": "ダケカンバ",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ミズナラ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1397,17 +1405,17 @@
       },
       {
         "text": "しげり",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "山頂さんちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1429,9 +1437,9 @@
       },
       {
         "text": "稜線りょうせん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1453,9 +1461,9 @@
       },
       {
         "text": "植物しょくぶつ",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1485,9 +1493,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1517,9 +1525,9 @@
       },
       {
         "text": "流氷りゅうひょう",
-        "w": 60,
+        "w": 61,
         "h": 44,
-        "hitW": 60,
+        "hitW": 61,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1565,9 +1573,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1621,9 +1629,9 @@
       },
       {
         "text": "際さいし",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1637,9 +1645,9 @@
       },
       {
         "text": "こう",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1661,9 +1669,9 @@
       },
       {
         "text": "環境かんきょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1677,33 +1685,33 @@
       },
       {
         "text": "おけ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "特色とくしょく",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "豊ゆたか",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1717,9 +1725,9 @@
       },
       {
         "text": "とりわけ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1757,9 +1765,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1829,9 +1837,9 @@
       },
       {
         "text": "高たかく",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1877,9 +1885,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1909,9 +1917,9 @@
       },
       {
         "text": "トド",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1925,9 +1933,9 @@
       },
       {
         "text": "クジラ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1965,9 +1973,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1981,17 +1989,17 @@
       },
       {
         "text": "ヒグマ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "シマフクロウ",
-        "w": 132,
+        "w": 136,
         "h": 44,
-        "hitW": 132,
+        "hitW": 136,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2005,9 +2013,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2029,9 +2037,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2045,9 +2053,9 @@
       },
       {
         "text": "から",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2165,9 +2173,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2189,9 +2197,9 @@
       },
       {
         "text": "周辺しゅうへん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2221,9 +2229,9 @@
       },
       {
         "text": "厳きびしい",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2285,9 +2293,9 @@
       },
       {
         "text": "とも",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2301,9 +2309,9 @@
       },
       {
         "text": "立たち入いり",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2333,9 +2341,9 @@
       },
       {
         "text": "いる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2365,9 +2373,9 @@
       },
       {
         "text": "より",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2453,9 +2461,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2485,17 +2493,17 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フレー",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2509,33 +2517,33 @@
       },
       {
         "text": "フォート",
-        "w": 88,
+        "w": 90,
         "h": 44,
-        "hitW": 88,
+        "hitW": 90,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ドーム",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ワジ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ヒタン",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2581,41 +2589,41 @@
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "および",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ナールオイ・フィヨルド",
-        "w": 241,
+        "w": 246,
         "h": 44,
-        "hitW": 241,
+        "hitW": 246,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2645,9 +2653,9 @@
       },
       {
         "text": "および",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2669,17 +2677,17 @@
       },
       {
         "text": "ドンパヤーイェン",
-        "w": 176,
+        "w": 179,
         "h": 44,
-        "hitW": 176,
+        "hitW": 179,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "カオヤイ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2701,9 +2709,9 @@
       },
       {
         "text": "コイバ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2733,9 +2741,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2773,9 +2781,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2861,9 +2869,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2877,9 +2885,9 @@
       },
       {
         "text": "フラワーズ",
-        "w": 110,
+        "w": 112,
         "h": 44,
-        "hitW": 110,
+        "hitW": 112,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2909,17 +2917,17 @@
       },
       {
         "text": "セント",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "キル",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3085,9 +3093,9 @@
       },
       {
         "text": "現状げんじょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3117,9 +3125,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3165,9 +3173,9 @@
       },
       {
         "text": "あたっ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3197,9 +3205,9 @@
       },
       {
         "text": "求もとめる",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3341,9 +3349,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3357,17 +3365,17 @@
       },
       {
         "text": "提出ていしゅつ",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3453,9 +3461,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3477,9 +3485,9 @@
       },
       {
         "text": "受うけ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3509,9 +3517,9 @@
       },
       {
         "text": "行おこない",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3605,9 +3613,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3637,9 +3645,9 @@
       },
       {
         "text": "状況じょうきょう",
-        "w": 60,
+        "w": 61,
         "h": 44,
-        "hitW": 60,
+        "hitW": 61,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3749,9 +3757,9 @@
       },
       {
         "text": "受うける",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3773,9 +3781,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3933,9 +3941,9 @@
       },
       {
         "text": "あげ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3957,9 +3965,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3989,9 +3997,9 @@
       },
       {
         "text": "取とり消けし",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4021,9 +4029,9 @@
       },
       {
         "text": "いる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4045,25 +4053,25 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "から",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "取とり消けさ",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4085,9 +4093,9 @@
       },
       {
         "text": "エクアドル",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4101,17 +4109,17 @@
       },
       {
         "text": "サン",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4133,9 +4141,9 @@
       },
       {
         "text": "マリ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4149,17 +4157,17 @@
       },
       {
         "text": "トンブクトゥ",
-        "w": 132,
+        "w": 136,
         "h": 44,
-        "hitW": 132,
+        "hitW": 136,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "アルバニア",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4173,17 +4181,17 @@
       },
       {
         "text": "ブト",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "リント",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4197,9 +4205,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4245,17 +4253,17 @@
       },
       {
         "text": "まで",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "続つづき",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4301,9 +4309,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4357,9 +4365,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4381,9 +4389,9 @@
       },
       {
         "text": "← 戻るback",
-        "w": 73,
+        "w": 72,
         "h": 44,
-        "hitW": 73,
+        "hitW": 72,
         "hitH": 44,
         "id": "sheet-back"
       },
@@ -4613,9 +4621,9 @@
       },
       {
         "text": "レッスンlessons",
-        "w": 104,
+        "w": 102,
         "h": 46,
-        "hitW": 104,
+        "hitW": 102,
         "hitH": 46,
         "id": "lessons-link"
       },
@@ -4661,11 +4669,11 @@
       },
       {
         "text": "世界自然遺産に7箇所を追加 ",
-        "w": 358,
-        "h": 330,
-        "hitW": 358,
-        "hitH": 330,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -4677,11 +4685,11 @@
       },
       {
         "text": "マリナーズ・イチロー選手 現",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -4693,11 +4701,11 @@
       },
       {
         "text": "JRおおさか東線部分開業JR",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -4709,11 +4717,11 @@
       },
       {
         "text": "信楽高原鐵道列車衝突事故、J",
-        "w": 358,
-        "h": 330,
-        "hitW": 358,
-        "hitH": 330,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -4725,1051 +4733,11 @@
       },
       {
         "text": "ウィキニュース、21年の歴史",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "野ばらThe Wild Ro",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "ごん狐Gon the Fox",
-        "w": 358,
-        "h": 337,
-        "hitW": 358,
-        "hitH": 337,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "やまなしYamanashi ",
-        "w": 358,
-        "h": 356,
-        "hitW": 358,
-        "hitH": 356,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "育児休業Childcare ",
-        "w": 358,
-        "h": 259,
-        "hitW": 358,
-        "hitH": 259,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "育児休業給付金Childca",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "遺族基礎年金Basic su",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "遺族厚生年金Employee",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "医療保険Medical in",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "印鑑登録証明書Seal-re",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "印鑑登録証Seal-regi",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "オーバーステイOversta",
-        "w": 358,
-        "h": 259,
-        "hitW": 358,
-        "hitH": 259,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "大家LandlordInte",
-        "w": 358,
-        "h": 233,
-        "hitW": 358,
-        "hitH": 233,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "介護Long-term ca",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "静かな朝A Quiet Mo",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "雨の日の古本屋The Sec",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "知らない町を歩くWalkin",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "山を歩きながら考えたことTh",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "AI時代の知識と判断Know",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "五箇条の御誓文The Cha",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "方丈記 · 冒頭Hōjōki",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "徒然草 · 序段Tsurez",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "駅で待つ時間Waiting ",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "台所の音Sounds fro",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "となりの部屋の人The Ma",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "引き出しの中の手紙A Let",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "朝の市場The Mornin",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "自転車をなくした日The D",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "川沿いの道The Road ",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "深夜のラジオLate-nig",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "手で書くということOn Wr",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "余白のためのノートA Not",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "雨の日の速度The Spee",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "訳せない言葉についてOn W",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "忘却を前提とした設計Desi",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "都市の匿名性と言語Anony",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "造化三神に出会う朝A Mor",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「中今」を感じる一日A Da",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "世界のはじまりに現れた三柱T",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "姿を隠した神さまThe De",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "『古事記』はどんな本？Wha",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "神さまを「一柱」と数えるわけ",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "伊勢神宮の森を映像で歩くWa",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "天・地・祈りをつなぐ「むすひ",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "一週間、感謝の言葉を唱えてみ",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「助けて」より先に「ありがと",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "三柱の神を一つの働きとして読",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "過去・現在・未来と「中今」P",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「創造神」という言葉はどこま",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "天之御中主神――語られない神",
-        "w": 358,
-        "h": 330,
-        "hitW": 358,
-        "hitH": 330,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "『古事記』は神話か、歴史かT",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "語りから書物へ――神話を編む",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "映像が伝える「むすひ」Mus",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "映像の中で祈りはどう見えるか",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「ありがとうございます」を先",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "体験談をどう受け取るかHow",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "造化三神を宇宙論として読む誘",
-        "w": 358,
-        "h": 302,
-        "hitW": 358,
-        "hitH": 302,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「中今」は時間論になり得るか",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "原初神を「最高神」と呼ぶとき",
-        "w": 358,
-        "h": 330,
-        "hitW": 358,
-        "hitH": 330,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "沈黙する神と不在の神学The",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "『古事記』編纂と権力の物語C",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "神話を「事実か虚構か」で裁か",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "「感じる」映像は神聖さをどう",
-        "w": 358,
-        "h": 310,
-        "hitW": 358,
-        "hitH": 310,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "産霊・自然・反復――伊勢の時",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "奇跡の体験談と認識の責任Mi",
-        "w": 358,
-        "h": 302,
-        "hitW": 358,
-        "hitH": 302,
-        "id": "shelf-item"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "祈りの言葉は誰の現実を変える",
-        "w": 358,
-        "h": 282,
-        "hitW": 358,
-        "hitH": 282,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5781,11 +4749,11 @@
       },
       {
         "text": "サッカー日本代表が背番号発表",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5797,11 +4765,11 @@
       },
       {
         "text": "南丹市児童失踪事件 男児の養",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5813,11 +4781,11 @@
       },
       {
         "text": "南丹市で行方不明の男児の遺体",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5829,11 +4797,11 @@
       },
       {
         "text": "南海 フェリー事業から撤退へ",
-        "w": 358,
-        "h": 259,
-        "hitW": 358,
-        "hitH": 259,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5845,11 +4813,11 @@
       },
       {
         "text": "東京高裁が旧統一教会に解散命",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5861,11 +4829,11 @@
       },
       {
         "text": "韓国の尹前大統領に無期懲役判",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5877,11 +4845,11 @@
       },
       {
         "text": "AiScReam、ルビィちゃ",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5892,12 +4860,12 @@
         "id": "details-toggle"
       },
       {
-        "text": "第2次高市内閣が始動Uppe",
-        "w": 358,
-        "h": 259,
-        "hitW": 358,
-        "hitH": 259,
-        "id": "shelf-item"
+        "text": "第2次高市内閣が始動The ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5909,11 +4877,11 @@
       },
       {
         "text": "クリスティアーノ・ロナウドが",
-        "w": 358,
-        "h": 314,
-        "hitW": 358,
-        "hitH": 314,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 281,
+        "hitW": 328,
+        "hitH": 281,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5925,11 +4893,11 @@
       },
       {
         "text": "京都府警が行方不明になった男",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5941,11 +4909,11 @@
       },
       {
         "text": "中道改革連合新代表選挙 小川",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -5957,11 +4925,1051 @@
       },
       {
         "text": "大谷翔平 史上6人目の40盗",
-        "w": 358,
-        "h": 287,
-        "hitW": 358,
-        "hitH": 287,
-        "id": "shelf-item"
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "野ばらThe Wild Ro",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "ごん狐Gon the Fox",
+        "w": 328,
+        "h": 261,
+        "hitW": 328,
+        "hitH": 261,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "やまなしYamanashi ",
+        "w": 328,
+        "h": 280,
+        "hitW": 328,
+        "hitH": 280,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業Childcare ",
+        "w": 328,
+        "h": 211,
+        "hitW": 328,
+        "hitH": 211,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業給付金Childca",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族基礎年金Basic su",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族厚生年金Employee",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "医療保険Medical in",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証明書Seal-re",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証Seal-regi",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "オーバーステイOversta",
+        "w": 328,
+        "h": 211,
+        "hitW": 328,
+        "hitH": 211,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "大家LandlordInte",
+        "w": 328,
+        "h": 185,
+        "hitW": 328,
+        "hitH": 185,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "介護Long-term ca",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "静かな朝A Quiet Mo",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の古本屋The Sec",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "知らない町を歩くWalkin",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "駅で待つ時間Waiting ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "台所の音Sounds fro",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "となりの部屋の人The Ma",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "引き出しの中の手紙A Let",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "朝の市場The Mornin",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "自転車をなくした日The D",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "川沿いの道The Road ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "深夜のラジオLate-nig",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "造化三神に出会う朝A Mor",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「中今」を感じる一日A Da",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "世界のはじまりに現れた三柱T",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "姿を隠した神さまThe Go",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "『古事記』はどんな本？Wha",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "神さまを「一柱」と数えるわけ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "伊勢神宮の森を映像で歩くWa",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "天・地・祈りをつなぐ「むすひ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "一週間、感謝の言葉を唱えてみ",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「助けて」より先に「ありがと",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "山を歩きながら考えたことTh",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "AI時代の知識と判断Know",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "手で書くということOn Wr",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "余白のためのノートA Not",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の速度The Spee",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "訳せない言葉についてOn W",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "忘却を前提とした設計Desi",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "都市の匿名性と言語Anony",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "三柱の神を一つの働きとして読",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "過去・現在・未来と「中今」P",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「創造神」という言葉はどこま",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "天之御中主神――語られない神",
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "『古事記』は神話か、歴史かT",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "語りから書物へ――神話を編む",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "映像が伝える「むすひ」Mus",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "映像の中で祈りはどう見えるか",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「ありがとうございます」を先",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "体験談をどう受け取るかHow",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "造化三神を宇宙論として読む誘",
+        "w": 328,
+        "h": 226,
+        "hitW": 328,
+        "hitH": 226,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「中今」は時間論になり得るか",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "原初神を「最高神」と呼ぶとき",
+        "w": 328,
+        "h": 254,
+        "hitW": 328,
+        "hitH": 254,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "沈黙する神と不在の神学The",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "『古事記』編纂と権力の物語C",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "神話を「事実か虚構か」で裁か",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "「感じる」映像は神聖さをどう",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "産霊・自然・反復――伊勢の時",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "奇跡の体験談と認識の責任Mi",
+        "w": 328,
+        "h": 226,
+        "hitW": 328,
+        "hitH": 226,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "祈りの言葉は誰の現実を変える",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "五箇条の御誓文The Cha",
+        "w": 328,
+        "h": 234,
+        "hitW": 328,
+        "hitH": 234,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "方丈記 · 冒頭Hōjōki",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "徒然草 · 序段Tsurez",
+        "w": 328,
+        "h": 206,
+        "hitW": 328,
+        "hitH": 206,
+        "id": "shelf-open"
       },
       {
         "text": "▸ details",
@@ -6052,6 +6060,150 @@
       "disagreement": null
     },
     {
+      "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+      "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2025-11-13",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+      "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-04-17",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "南丹市で行方不明の男児の遺体が見つかる",
+      "titleEn": "Body of missing boy found in Nantan, Kyoto",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-04-15",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "南海 フェリー事業から撤退へ",
+      "titleEn": "Nankai to withdraw from its ferry business",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-03-31",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+      "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-03-05",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+      "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-02-19",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "titleEn": "AiScReam: Ruby graduates and two new members join",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-02-17",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "第2次高市内閣が始動",
+      "titleEn": "The second Takaichi cabinet takes office",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-02-18",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+      "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2025-11-14",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+      "titleEn": "Kyoto police search the home of the missing boy",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-04-15",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+      "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2026-02-14",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+      "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "ウィキニュース · 検収前",
+        "2024-08-25",
+        "CC BY 2.5"
+      ],
+      "disagreement": null
+    },
+    {
       "title": "野ばら",
       "titleEn": "The Wild Rose — Ogawa Mimei",
       "level": "Intermediate",
@@ -6094,7 +6246,8 @@
       "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6105,7 +6258,8 @@
       "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6116,7 +6270,8 @@
       "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6127,7 +6282,8 @@
       "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6138,7 +6294,8 @@
       "levelNote": "上級前半 · ~1 in 5 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6149,7 +6306,8 @@
       "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6160,7 +6318,8 @@
       "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6171,7 +6330,8 @@
       "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6182,7 +6342,8 @@
       "levelNote": "中級前半",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6193,7 +6354,8 @@
       "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary"
+        "ISA やさしい日本語 glossary",
+        "用語集 glossary entry"
       ],
       "disagreement": null
     },
@@ -6227,61 +6389,6 @@
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "山を歩きながら考えたこと",
-      "titleEn": "Thoughts While Walking a Mountain",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "随筆 · Bunki",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "AI時代の知識と判断",
-      "titleEn": "Knowledge and Judgment in the Age of AI",
-      "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "随筆 · Bunki",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "五箇条の御誓文",
-      "titleEn": "The Charter Oath (1868)",
-      "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "一次資料 · Historical primary source",
-        "PD + Bunki原作の解説"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "方丈記 · 冒頭",
-      "titleEn": "Hōjōki — the opening",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "古典 · 鴨長明 · 1212",
-        "PD + Bunki原作の解説"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "徒然草 · 序段",
-      "titleEn": "Tsurezuregusa — the opening passage",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "古典 · 吉田兼好 · 14th century",
-        "PD + Bunki原作の解説"
       ],
       "disagreement": null
     },
@@ -6374,6 +6481,138 @@
       "disagreement": null
     },
     {
+      "title": "造化三神に出会う朝",
+      "titleEn": "A Morning Meeting the Three Deities of Creation",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "「中今」を感じる一日",
+      "titleEn": "A Day of Feeling the 'Middle Now'",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "世界のはじまりに現れた三柱",
+      "titleEn": "The Three Pillars at the World's Beginning",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "姿を隠した神さま",
+      "titleEn": "The Gods Who Hid Away",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "『古事記』はどんな本？",
+      "titleEn": "What Kind of Book Is the Kojiki?",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "神さまを「一柱」と数えるわけ",
+      "titleEn": "Why Gods Are Counted in 'Pillars'",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "伊勢神宮の森を映像で歩く",
+      "titleEn": "Walking the Ise Jingū Forest on Film",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "天・地・祈りをつなぐ「むすひ」",
+      "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "一週間、感謝の言葉を唱えてみた",
+      "titleEn": "A Week of Reciting Words of Gratitude",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "「助けて」より先に「ありがとう」？",
+      "titleEn": "'Thank You' Before 'Help Me'?",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki · 検収前",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
       "title": "手で書くということ",
       "titleEn": "On Writing by Hand",
       "level": "Upper intermediate",
@@ -6440,118 +6679,8 @@
       "disagreement": null
     },
     {
-      "title": "造化三神に出会う朝",
-      "titleEn": "A Morning Meeting the Three Deities of Creation",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "「中今」を感じる一日",
-      "titleEn": "A Day of Feeling the 'Middle Now'",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "世界のはじまりに現れた三柱",
-      "titleEn": "The Three Pillars at the World's Beginning",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "姿を隠した神さま",
-      "titleEn": "The Deity Who Hid Away",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "『古事記』はどんな本？",
-      "titleEn": "What Kind of Book Is the Kojiki?",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "神さまを「一柱」と数えるわけ",
-      "titleEn": "Why Gods Are Counted in 'Pillars'",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "伊勢神宮の森を映像で歩く",
-      "titleEn": "Walking the Ise Jingū Forest on Film",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "天・地・祈りをつなぐ「むすひ」",
-      "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "一週間、感謝の言葉を唱えてみた",
-      "titleEn": "A Week of Saying Words of Thanks",
-      "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "「助けて」より先に「ありがとう」？",
-      "titleEn": "'Thank You' Before 'Help Me'?",
-      "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "段階別読み物 · Bunki · 検収前",
-        "Bunki original"
-      ],
-      "disagreement": null
-    },
-    {
       "title": "三柱の神を一つの働きとして読む",
-      "titleEn": "Reading the Three Deities as One Working",
+      "titleEn": "Reading the Three Deities as a Single Working",
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
       "meta": [
@@ -6584,7 +6713,7 @@
     },
     {
       "title": "天之御中主神――語られない神をどう読むか",
-      "titleEn": "Amenominakanushi: Reading the God Who Is Never Told",
+      "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
       "meta": [
@@ -6770,146 +6899,35 @@
       "disagreement": null
     },
     {
-      "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
-      "titleEn": null,
-      "level": "Beginner",
-      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2025-11-13",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-17",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "南丹市で行方不明の男児の遺体が見つかる",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-15",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "南海 フェリー事業から撤退へ",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-03-31",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 3 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-03-05",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-02-19",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
-      "titleEn": null,
-      "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-02-17",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "第2次高市内閣が始動",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-02-18",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
-      "titleEn": null,
-      "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2025-11-14",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
-      "titleEn": null,
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
       "level": "Advanced",
       "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-15",
-        "CC BY 2.5"
+        "一次資料 · Historical primary source",
+        "PD + Bunki原作の解説"
       ],
       "disagreement": null
     },
     {
-      "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
-      "titleEn": null,
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
-        "ウィキニュース · 検収前",
-        "2026-02-14",
-        "CC BY 2.5"
+        "古典 · 鴨長明 · 1212",
+        "PD + Bunki原作の解説"
       ],
       "disagreement": null
     },
     {
-      "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
-      "titleEn": null,
-      "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
-        "ウィキニュース · 検収前",
-        "2024-08-25",
-        "CC BY 2.5"
+        "古典 · 吉田兼好 · 14th century",
+        "PD + Bunki原作の解説"
       ],
       "disagreement": null
     }
@@ -7002,6 +7020,78 @@
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "titleEn": "Wikinews closes the curtain on 21 years",
       "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+      "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+      "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "南丹市で行方不明の男児の遺体が見つかる",
+      "titleEn": "Body of missing boy found in Nantan, Kyoto",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "南海 フェリー事業から撤退へ",
+      "titleEn": "Nankai to withdraw from its ferry business",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+      "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+      "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "titleEn": "AiScReam: Ruby graduates and two new members join",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "第2次高市内閣が始動",
+      "titleEn": "The second Takaichi cabinet takes office",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+      "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+      "titleEn": "Kyoto police search the home of the missing boy",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+      "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+      "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
@@ -7101,36 +7191,6 @@
       "disagreement": null
     },
     {
-      "title": "山を歩きながら考えたこと",
-      "titleEn": "Thoughts While Walking a Mountain",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "AI時代の知識と判断",
-      "titleEn": "Knowledge and Judgment in the Age of AI",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "五箇条の御誓文",
-      "titleEn": "The Charter Oath (1868)",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "方丈記 · 冒頭",
-      "titleEn": "Hōjōki — the opening",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "徒然草 · 序段",
-      "titleEn": "Tsurezuregusa — the opening passage",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
       "title": "駅で待つ時間",
       "titleEn": "Waiting at the Station",
       "level": "Upper beginner初級後半 · ~1 in 4 words beyond the JLPT lists",
@@ -7179,6 +7239,78 @@
       "disagreement": null
     },
     {
+      "title": "造化三神に出会う朝",
+      "titleEn": "A Morning Meeting the Three Deities of Creation",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "「中今」を感じる一日",
+      "titleEn": "A Day of Feeling the 'Middle Now'",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "世界のはじまりに現れた三柱",
+      "titleEn": "The Three Pillars at the World's Beginning",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "姿を隠した神さま",
+      "titleEn": "The Gods Who Hid Away",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "『古事記』はどんな本？",
+      "titleEn": "What Kind of Book Is the Kojiki?",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "神さまを「一柱」と数えるわけ",
+      "titleEn": "Why Gods Are Counted in 'Pillars'",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "伊勢神宮の森を映像で歩く",
+      "titleEn": "Walking the Ise Jingū Forest on Film",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "天・地・祈りをつなぐ「むすひ」",
+      "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "一週間、感謝の言葉を唱えてみた",
+      "titleEn": "A Week of Reciting Words of Gratitude",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "「助けて」より先に「ありがとう」？",
+      "titleEn": "'Thank You' Before 'Help Me'?",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
       "title": "手で書くということ",
       "titleEn": "On Writing by Hand",
       "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
@@ -7215,68 +7347,8 @@
       "disagreement": null
     },
     {
-      "title": "造化三神に出会う朝",
-      "titleEn": "A Morning Meeting the Three Deities of Creation",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "「中今」を感じる一日",
-      "titleEn": "A Day of Feeling the 'Middle Now'",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "世界のはじまりに現れた三柱",
-      "titleEn": "The Three Pillars at the World's Beginning",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "姿を隠した神さま",
-      "titleEn": "The Deity Who Hid Away",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "『古事記』はどんな本？",
-      "titleEn": "What Kind of Book Is the Kojiki?",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "神さまを「一柱」と数えるわけ",
-      "titleEn": "Why Gods Are Counted in 'Pillars'",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "伊勢神宮の森を映像で歩く",
-      "titleEn": "Walking the Ise Jingū Forest on Film",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "天・地・祈りをつなぐ「むすひ」",
-      "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "一週間、感謝の言葉を唱えてみた",
-      "titleEn": "A Week of Saying Words of Thanks",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "「助けて」より先に「ありがとう」？",
-      "titleEn": "'Thank You' Before 'Help Me'?",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
       "title": "三柱の神を一つの働きとして読む",
-      "titleEn": "Reading the Three Deities as One Working",
+      "titleEn": "Reading the Three Deities as a Single Working",
       "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
       "disagreement": null
     },
@@ -7294,7 +7366,7 @@
     },
     {
       "title": "天之御中主神――語られない神をどう読むか",
-      "titleEn": "Amenominakanushi: Reading the God Who Is Never Told",
+      "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
       "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
       "disagreement": null
     },
@@ -7395,75 +7467,21 @@
       "disagreement": null
     },
     {
-      "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
-      "titleEn": null,
-      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "南丹市で行方不明の男児の遺体が見つかる",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "南海 フェリー事業から撤退へ",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 3 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
-      "titleEn": null,
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "第2次高市内閣が始動",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
-      "titleEn": null,
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
-      "disagreement": null
-    },
-    {
-      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
-      "titleEn": null,
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
       "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
-      "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
-      "titleEn": null,
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
-      "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
-      "titleEn": null,
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     }
   ],
@@ -7476,10 +7494,10 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 642,
+  "loadMs": 379,
   "summary": {
-    "total": 116,
-    "failed": 1
+    "total": 159,
+    "failed": 0
   },
   "results": [
     {
@@ -7505,7 +7523,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.6300048828125,\"y\":570.739990234375,\"productive\":true}"
+      "detail": "{\"x\":147.67999267578125,\"y\":570.5900268554688,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7525,17 +7543,47 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 642 ms"
+      "detail": "82 texts, ready in 379 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
-      "pass": false,
+      "pass": true,
       "detail": "82 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
+    },
+    {
+      "name": "the shelf gathers into quiet sections — each category one run, no card outside one",
+      "pass": true,
+      "detail": "6 sections: ニュース · 青空文庫 · やさしい日本語 用語集 · 段階別読み物 · 随筆 · 古典・一次資料 — 82/82 cards housed"
+    },
+    {
+      "name": "glossary rows are labeled 用語集 and stand outside the real-text count",
+      "pass": true,
+      "detail": "10/10 labeled · intro bills 72 texts for 72 non-glossary cards"
     },
     {
       "name": "disagreement fires only where two-plus ordinal signals were measured",
       "pass": true,
       "detail": "0 flagged; 0 articles with >=2 ordinal signals"
+    },
+    {
+      "name": "the cross-referencing glossary entry stands on the shelf",
+      "pass": true,
+      "detail": "shelf index 26"
+    },
+    {
+      "name": "no dead (No.NN) citation survives into the read",
+      "pass": true,
+      "detail": "住すんでいるまちの役所やくしょで印鑑いんかん登録とうろく証明しょうめい書しょ▹をもらうときに使つ…"
+    },
+    {
+      "name": "the in-shelf citation is a live door to its glossary entry",
+      "pass": true,
+      "detail": "doors → yasashii:6"
+    },
+    {
+      "name": "the glossary door opens the entry it names",
+      "pass": true,
+      "detail": "landed on \"印鑑登録証明書\""
     },
     {
       "name": "the raw signals unfold behind 詳細 — separate, never averaged",
@@ -7575,7 +7623,7 @@
     {
       "name": "Phase 1 · ごん狐 stands on the shelf",
       "pass": true,
-      "detail": "shelf index 6"
+      "detail": "shelf index 18"
     },
     {
       "name": "Phase 1 · the story ships full-length — no 520-char excerpt",
@@ -7645,7 +7693,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 431.9 → 431.9px"
+      "detail": "gloss on, glyph bottom 432.1 → 432.1px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -7745,12 +7793,12 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 8 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
       "pass": true,
-      "detail": "scrollY 287 → 287, sheet closed=true"
+      "detail": "scrollY 288 → 288, sheet closed=true"
     },
     {
       "name": "variant A · mcd renders the target both ways",
@@ -7815,7 +7863,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "701 controls checked, including inline token hit regions"
+      "detail": "702 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -7975,7 +8023,32 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786870777349,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786875137391,\"probe\",\"word:石鹸\",1,1]"
+    },
+    {
+      "name": "dojo · a taken card keeps its honest next-due intervals",
+      "pass": true,
+      "detail": "水 → 1 min · 6 min · 10 min · 8 d"
+    },
+    {
+      "name": "dojo · grading the taken card writes the deck — FSRS record, revlog row, one new-card slot",
+      "pass": true,
+      "detail": "{\"srsKeys\":[\"kanji:水\"],\"revlog\":1,\"nnew\":1,\"dojoRows\":0}"
+    },
+    {
+      "name": "dojo · a never-taken card promises no schedule — every seal stamps practice",
+      "pass": true,
+      "detail": "一 → practice · practice · practice · practice"
+    },
+    {
+      "name": "dojo · a drill grade writes evidence only — no FSRS state, no revlog row, no burned slot",
+      "pass": true,
+      "detail": "srs [\"kanji:水\"] · revlog 1 · nnew 1"
+    },
+    {
+      "name": "dojo · the practice row lands in the observation ledger with its room",
+      "pass": true,
+      "detail": "row [1786875141112,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8001,6 +8074,11 @@
       "name": "a common word carries at least 4 example sentences",
       "pass": true,
       "detail": "6 examples · 6 with English"
+    },
+    {
+      "name": "the 用例 eyebrow says that holding a word opens the dictionary",
+      "pass": true,
+      "detail": "eyebrow: \"用例 — ことばは長押しで辞書へexamples — tap a word to climb its ladder; hold it to open the dictionary\""
     },
     {
       "name": "example tokens climb the reader ladder — ふりがな, then English",
@@ -8060,7 +8138,162 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
+      "detail": "“石鹸” · 2 sentence lines · 3 live tokens"
+    },
+    {
+      "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
+      "pass": true,
+      "detail": "{\"taken\":true,\"pressed\":\"true\"}"
+    },
+    {
+      "name": "R2-B · un-memorize removes the active card; revlog and FSRS state stay whole",
+      "pass": true,
+      "detail": "{\"taken\":0,\"revlog\":1,\"srsKept\":true}"
+    },
+    {
+      "name": "R2-B · the deck no longer offers the card — the tray stands honestly empty",
+      "pass": true,
+      "detail": "no review door on an empty deck"
+    },
+    {
+      "name": "R2-B · a re-take resumes the schedule — same card state, no invented history",
+      "pass": true,
+      "detail": "{\"taken\":1,\"revlog\":1,\"reps\":1,\"due\":\"2020-01-01T00:00:00.000Z\"}"
+    },
+    {
+      "name": "R2-B · a list is born on the lists surface; empty and dupe names are told, not swallowed",
+      "pass": true,
+      "detail": "lists=[\"読書\"] · dupe hint \"that name already exists\""
+    },
+    {
+      "name": "R2-B · the new list survives a reload, on the surface and in the envelope",
+      "pass": true,
+      "detail": "[\"読書\"]"
+    },
+    {
+      "name": "R2-B · rename lives where the list lives and persists",
+      "pass": true,
+      "detail": "[\"精読\"]"
+    },
+    {
+      "name": "R2-B · delete arms first, then fires — and never touches the learner history",
+      "pass": true,
+      "detail": "armed={\"still\":1,\"armedBtn\":true} → {\"lists\":0,\"taken\":1,\"revlog\":1,\"srsKept\":true}"
+    },
+    {
+      "name": "R2-B · 覚える waits top-right of the reader, quiet until a word is touched",
+      "pass": true,
+      "detail": "{\"disabled\":true,\"pressed\":\"false\"}"
+    },
+    {
+      "name": "R2-B · touching a word arms the door with that word, in place",
+      "pass": true,
+      "detail": "半島 — \"memorize 半島\""
+    },
+    {
+      "name": "R2-B · capture from the reader top-right lands in S.taken with its sentence ctx",
+      "pass": true,
+      "detail": "{\"p\":\"wikinews:1403\",\"i\":30,\"scope\":\"sent\"}"
+    },
+    {
+      "name": "R2-B · the panel holds the undo, the scope stages, and the lists",
+      "pass": true,
+      "detail": "{\"take\":true,\"scopes\":3,\"lists\":true,\"newList\":true}"
+    },
+    {
+      "name": "R2-B · a mis-tap leaves in one gesture; the revlog length never moves",
+      "pass": true,
+      "detail": "{\"taken\":1,\"revlog\":1}"
+    },
+    {
+      "name": "R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up",
+      "pass": true,
+      "detail": "{\"id\":\"カ所\",\"scope\":\"sent\",\"sealTaken\":true,\"miniUp\":true}"
+    },
+    {
+      "name": "R2-B · the mini lets it go again — reversible where the state shows",
+      "pass": true,
+      "detail": "{\"taken\":1,\"sealTaken\":false}"
+    },
+    {
+      "name": "R2-B · the sentence page seal names the word it captures",
+      "pass": true,
+      "detail": "{\"present\":true,\"label\":\"memorize 半島\"}"
+    },
+    {
+      "name": "R2-B · taking from the sentence page mints the word card, reversibly marked",
+      "pass": true,
+      "detail": "{\"t\":\"word\",\"id\":\"半島\",\"pressed\":\"true\"}"
+    },
+    {
+      "name": "R2-A · fuzz is OFF in the live engine and matches the domain pin",
+      "pass": true,
+      "detail": "engine enable_fuzz=false · pin enableFuzz=false"
+    },
+    {
+      "name": "R2-A · the pin names append-order-monotonic-clamp-v1",
+      "pass": true,
+      "detail": "append-order-monotonic-clamp-v1"
+    },
+    {
+      "name": "R2-A · the per-card scheduler instant clamps up to the anchor, never back",
+      "pass": true,
+      "detail": "{\"behind\":true,\"forward\":true,\"first\":true}"
+    },
+    {
+      "name": "R2-A · real dues come most-overdue first; started fresh after; legacy absent",
+      "pass": true,
+      "detail": "word:電話 → word:手帳 → word:学校 → word:大人"
+    },
+    {
+      "name": "R2-A · the legacy row waits with one quiet 始める and an honest forecast",
+      "pass": true,
+      "detail": "\"復習する — 4 件review now — 4 due\" · forecast \"today 3 · tomorrow 0 · this week 0 · new 1 · not started 1\""
+    },
+    {
+      "name": "R2-A · 始める promotes by hand — a mark in the row, never fabricated FSRS state",
+      "pass": true,
+      "detail": "\"復習する — 5 件review now — 5 due\" · started=true · srs minted=false"
+    },
+    {
+      "name": "R2-A · a backward device clock cannot crash or corrupt grading",
+      "pass": true,
+      "detail": "anchor held at 2026-08-19T10:13:01.617Z; due 2026-08-26T10:13:01.617Z"
+    },
+    {
+      "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
+      "pass": true,
+      "detail": "t=1786875182605 (raw, before the anchor) · elapsed=0"
+    },
+    {
+      "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
+      "pass": true,
+      "detail": "button \"復習する — 28 件review now — 28 due\" · frozen 20 · deferred 8"
+    },
+    {
+      "name": "R2-A · the goodbye screen carries the honest remainder — あと N, quietly",
+      "pass": true,
+      "detail": "\"Session done — 20 cards\" · \"8 more waiting\""
+    },
+    {
+      "name": "R2-A · ペース persists the learner's numbers and holds its bounds",
+      "pass": true,
+      "detail": "stored {\"newPerDay\":0,\"reviewLimit\":10} · minus disabled at 0"
+    },
+    {
+      "name": "R2-A · the chosen pacing survives reboot and rules the queue",
+      "pass": true,
+      "detail": "prefs {\"newPerDay\":0,\"reviewLimit\":10} · 5 due, no fresh admitted"
+    },
+    {
+      "name": "R2-A · the probes leave no console errors",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "the tray never contradicts itself — a closed review door names its when",
+      "pass": true,
+      "detail": "{\"disabled\":true,\"label\":\"復習する — いまは予定なしnothing due right now\",\"forecast\":\"later today 25 · tomorrow 0 · this week 0 · new 3\",\"todayN\":25}"
     }
   ]
 }

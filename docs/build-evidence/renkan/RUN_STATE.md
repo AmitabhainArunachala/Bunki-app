@@ -92,7 +92,71 @@ end-to-end, incl. an independent CDP flick smoke for A1a) and landed serially:
 - T7: optimizer ✅ + revlog reader ✅; R2: monotonic clamp, fuzz-off ADR, bounded
   plan, settings; R3: param round-trip demo on real export.
 
-### Round 2 — READY TO LAUNCH
+### Round 2 — landings complete; battery running (workflow wf_03729f77-e93: 17 agents, 0 errors)
+
+All four builds CONFIRMED and landed serially (worktree bases were `main`/e335ab7,
+so cross-round merges were the lander's ring — resolved semantically, verified
+per landing):
+
+- **R2-B** `78bfaad` — 覚える top-right of every capture-eligible surface;
+  un-memorize (revlog append-only, FSRS state retained); list create/rename/
+  delete on the lists surface. Corridor suite 121→~140s range with A: 151 total.
+- **R2-A** `98c0eab` — fuzz OFF per pin + ADR-003; monotonic clamp
+  (`srsSchedulerInstant`, raw ts stays audit truth); overdueness-ordered dues;
+  bounded Review ≤ learner's limit with あと N; no-debt `started` mark (未着手
+  + 始める); ペース fold (newPerDay 0–50, reviewLimit 5–100) as validated
+  `srsPrefs`. Corridor 151/151 on A+B (committed evidence).
+- **R2-D** `a83b2b9` + convergence commit — the feed loop: `feed_ingest.py`
+  (deterministic, level-balanced tranche from committed archive stock; live
+  fetch degrades honestly), minting through `build_articles.py`, 12 検収前
+  candidates on the shelf with addedAt/titleEn, curation/cull report, TWO
+  consecutive runs committed under `feed/`, `verify-feed.mjs` (27 checks) +
+  `feed_apply_review.py` (idempotent, fail-closed). Convergence: the queue
+  gained kind `legacy` — 30 pre-feed pending originals now queue rows, so
+  `docs/content/feed-review-queue.json` (44 rows) is the ONE operator decision
+  file (OD-2 + OD-3 unified).
+- **R2-C** `83b16c4` — shelf category sections; nested-button a11y repair;
+  用例 hold hint; glossary cross-refs resolved; glossary rows honestly labeled;
+  tray 今日このあと reconciliation. P1-4 CLOSED as source-faithful: the
+  original Wikinews text has no を at 「（北海道）含め」 — the ledger's suspicion
+  was wrong; body untouched, verified against corpus sample.
+- **Fleet** `c17bd76` — 694 archive titleEn (now 682 archive + 12 promoted),
+  lander-verified coverage + fidelity spot-check.
+- **R2-X** `184b258` — apps/app: session budget is the learner's (5–60 chips,
+  plan-integrated, persisted); real lookups mint LookupFrictionLogged (T-07,
+  no grade); e2e 39→41. Independently CONFIRMED.
+- **R2-Y** (drift ring edge fix + first-touch cue, 544d93b): verdict PARTIAL —
+  ring+cue+builders CONFIRMED with teeth, but a hunt-07 (lock-member reveal)
+  regression signal must be reconciled. Sent back to its builder; NOT landed.
+
+HUNT lenses (13 findings, `hunts-round2.json`): headline P1 — tokenizer
+furigana misteaches deity-name readings (神→しん where the name reads 〜のかみ)
+in the flagship 検収前 texts, lander-verified against token data (60/70
+articles carry rubySource:tokenizer). Also: device-Back exits the SPA outside
+the writing room (sentinel exists, one room uses it); galaxy nav-search state
+razed; archive scroll context; keyboard Tab on invisible button; full-render()
+100–200ms long tasks; crumb lies (dojo/galaxy).
+
+Decision sheet grew: OD-11..OD-16 (see DECISION_SHEET.md).
+
+### Round 3 — QUEUE
+
+1. **Furigana truth** (from hunt P1): reading-override lexicon in the mint
+   pipeline for name compounds; re-mint affected token readings; deity-name
+   verifier probe. The 30 検収前 bodies are the priority surface.
+2. **History sentinel everywhere**: generalize the writing room's Back
+   sentinel so device-Back walks the app's own stack (drift dive, sheets,
+   review, archive) instead of exiting; hunt repro steps in hunts-round2.json.
+3. **T-06 reveal-forces-Again** in corridor review (PR70-P0-3 delta) +
+   universal transactional helper sweep (P0-4 delta).
+4. **T7 param round-trip**: export → fsrs-optimize → import params into
+   corridor scheduler (validated store field), demonstrated on a real export.
+5. **Small truths**: archive scroll restore, nav-search state preservation,
+   dojo/galaxy crumb, lesson-list scroll, 'None' date render, difficulty
+   subtitle near-constant fix, keyboard-Tab order at galaxy home.
+6. **R2-Y reconciliation** (in flight with its builder).
+7. Then Wave C: T3 demo walk + rubric re-assessment; Wave E: truth pass,
+   final battery, double-dry HUNT.
 
 Script staged at `<session>/workflows/scripts/renkan-round-2.js`; a fresh session
 re-authors it from this queue: (R2-A) SRS/review integrity: monotonic clamp,
