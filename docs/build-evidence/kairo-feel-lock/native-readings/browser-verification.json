@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T09:14:15.825Z",
+  "completedAt": "2026-08-16T08:57:48.724Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "c6d96dafcd15d2f4636d7bafece2ca17511c90da0e7fcf681927823ef39f9f43",
+    "index": "5e023d8ad7256a2d29a41c8860b83b80831854fda6d59e1c94318b7c6a3a0761",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "784245ad15d1cd186bac00aee03eebbe7b9fd53fd6832afd16e9a38e628029fb",
-    "corridorCss": "4acb2a8d378ae279a44cee9d2bec33b7167b5ef1ece6e81d4adc4a3f8a76496f",
-    "standalone": "265575a7caf5b83184f7f9392c1416c92cab2b5d61321e5a51249b6041446f2d",
+    "corridorJs": "7ffcd4d73cff8585bba8e96dbb3bad36d7a0cca8df17a65e0e001c5115076043",
+    "corridorCss": "0658c94577f7a50a18cbd7543a046fcd3128fedf5293fe98e4e46342607c2a07",
+    "standalone": "0c459ff609f5eeb69b1eeada3b63f5858e667f28dbe9a1cfa76bc7f8e6345926",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -67,23 +67,19 @@
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "4c6c842a5cb8876b266d290914c70b13639ca5b3b709c2da716a03532a41148d"
-      },
-      "biShelf": {
-        "path": "screenshots/shelf-bilingual-titles.png",
-        "sha256": "e73c4ec722b1f0a6c72c3ec35f94403e19ce885f02ab83e5f97ed3a905f79cd9"
+        "sha256": "6debdc5805348228a75b8b15803ecf1e323f39f1c768d41516d2ffaf9ff53d79"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "ff6ed53efdaa94d42b25a33fb194fcd41fa2ca7cb610d6e034b97b6699ffc75c"
+        "sha256": "c53aef699b145c332a32a17a03d68229d51fb6d8fba38ab2a645251650515fc3"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "04521d0171e928cabba9cdc9e9ba651478c1b2a0bfa332acbeaa677ddb27e0ff"
+        "sha256": "e25624cecf6505761e36f39281b3f71bf2150b9948e80c7f0ae4883a9da37168"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "5a7e9d6fe4be2470ee89d6d80ed24fe791aa77d123b9383071deff1973180ec5"
+        "sha256": "8b3be0a50748e4e148fb545c0d4565c5530b20f3cec43dce6af8c933484e24d7"
       }
     }
   },
@@ -120,14 +116,14 @@
         "overflow": 0
       },
       "quick": {
-        "word": "朝",
-        "reading": "あさ",
-        "gloss": "morning"
+        "word": "の",
+        "reading": "",
+        "gloss": "連体・所有"
       },
       "fullEntry": {
-        "headword": "朝",
-        "reading": "あさ",
-        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例\n\n今回\nの\n部分\n開業\nに\nより\n、\nJR"
+        "headword": "の　助詞",
+        "reading": "",
+        "text": "← 戻る\n覚\n✕\nの　助詞\n\n連体・所有\n\nTies two nouns: B of A, A's B, B which is A. Also nominalizes (読むのが好き) and softens questions (行くの？"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -176,7 +172,7 @@
       "fullEntry": {
         "headword": "半",
         "reading": "はん",
-        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\n1\n\nnoun, used as a prefix · noun (common) (futsuumeishi)\n\nhalf\nsemi-\npartial\n2\n\nnoun, use"
+        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\nhalf\nsemi-\npartial\nhalf-past\nodd number\nhan (unit of land area, approx. 595.8 m^2)\n\n語義と用法"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1443,14 +1439,14 @@
         "overflow": 0
       },
       "quick": {
-        "word": "水",
-        "reading": "みず",
-        "gloss": "water (esp. cool or cold)"
+        "word": "が",
+        "reading": "",
+        "gloss": "主格"
       },
       "fullEntry": {
-        "headword": "水",
-        "reading": "みず",
-        "text": "← 戻る\n覚\n✕\n水\n\nみず\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nwater (esp. cool or cold)\n\n辞書内の関連項目\n\n湯\nゆ・1\n›\n2\n\nnoun (common) (fu"
+        "headword": "が　助詞",
+        "reading": "",
+        "text": "← 戻る\n覚\n✕\nが　助詞\n\n主格\n\nPicks out WHICH one — the doer or the thing being described, often new information or the answer to a"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1562,45 +1558,9 @@
   "noise": [],
   "results": [
     {
-      "name": "every primary index row carries a non-empty titleEn",
+      "name": "the one native shelf renders exactly the curated index rows",
       "pass": true,
-      "detail": "70/70",
-      "articleId": null
-    },
-    {
-      "name": "every titleEn names its provenance in titleEnSource",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "検収前 rows carry the AI-authored title marker; approved rows the migrated shelf-map one",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "the index review state still matches the 30 authored 検収前 records, 検収前 named in each sourceLabel",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "every archive row carries a non-empty titleEn with wrapper provenance",
-      "pass": true,
-      "detail": "694/694 · source renkan-ai-2026-08",
-      "articleId": null
-    },
-    {
-      "name": "the code-side TITLES_EN map is gone from corridor.js — titles live in data only",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "the one native shelf contains exactly 70 entries",
-      "pass": true,
-      "detail": "",
+      "detail": "82/82",
       "articleId": null
     },
     {
@@ -1797,36 +1757,6 @@
     },
     {
       "name": "all completion and bookmark state survives localStorage",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "the 日本語のみ chrome renders no English titles",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "every human-review-pending row is visibly 検収前 on the 日本語のみ shelf",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "the bilingual shelf renders all 70 English titles from the records themselves",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "every human-review-pending row stays visibly 検収前 on the bilingual shelf",
-      "pass": true,
-      "detail": "",
-      "articleId": null
-    },
-    {
-      "name": "the bilingual shelf pass added no request, console, or page errors",
       "pass": true,
       "detail": "",
       "articleId": null

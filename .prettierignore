@@ -40,3 +40,11 @@ docs/prototype/verification-report.json
 # Consistency-sweep output — written by verify-drift-consistency.mjs each run
 docs/audits/drift-consistency-report.json
 docs/audits/drift-consistency-shots/
+
+# Feed-loop artifacts — written by prototypes/corridor/tools/feed_ingest.py on
+# every run (and the queue again by feed_apply_review.py). The generator's
+# bytes ARE the format: reformatting them would desync the sha256s recorded in
+# docs/build-evidence/renkan/feed/ run logs. feed-titles-en.json stays
+# prettier-formatted — it is hand-authored, not generated.
+docs/content/feed-curation-report.json
+docs/content/feed-review-queue.json

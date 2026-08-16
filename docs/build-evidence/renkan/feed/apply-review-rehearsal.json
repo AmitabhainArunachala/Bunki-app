@@ -1,0 +1,12 @@
+{
+  "kind": "feed-apply-review-rehearsal",
+  "claim": "feed_apply_review.py was rehearsed against the committed run-2 state with one row of each decided kind, then the state was byte-restored (sha256-verified) so the committed queue remains 100% pending — no decision in this commit is anything but the operator's to make",
+  "rehearsedDecisions": {
+    "wikinews:45208": "mint approved — review flipped to approved in index row + body, 検収前 left the sourceLabel",
+    "wikinews:42478": "mint rejected — shelf row and body removed; archive listing re-inserted at its original position with a light row byte-equal to the original mint; the preserved archive body kept its ORIGINAL bytes (including the live NINJAL pair this environment cannot regenerate)",
+    "wikinews:5991": "cull approved — archive listing and body removed; the committed dataset row in archive.jsonl untouched"
+  },
+  "idempotency": "a second apply run over the same queue reported 'nothing decided — every row pending or already applied' and changed nothing",
+  "gates": "verify-feed.mjs passed 27/27 in the post-apply state, and again 27/27 after the byte-restore",
+  "restoreVerified": "sha256sum -c over index.json, archive-index.json, feed-review-queue.json, feed-curation-report.json, both touched shelf bodies, and both touched archive bodies — 8/8 OK"
+}

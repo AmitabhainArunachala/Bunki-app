@@ -1,0 +1,18 @@
+· shelf band balance: 初級前半=3 初級後半=7 中級前半=16 中級後半=35 上級前半=8 上級後半=7
+· eligible archive stock: 680 candidates (clean, 300–4500 chars)
+    fill 初級後半 (7 on shelf) ← wikinews:45095  2026-02-17  570字
+    fill 上級後半 (7 on shelf) ← wikinews:45098  2026-02-18  480字
+    fill 初級後半 (8 on shelf) ← wikinews:44384  2025-11-14  480字
+    fill 上級前半 (8 on shelf) ← wikinews:45221  2026-04-15  695字
+    fill 上級後半 (8 on shelf) ← wikinews:45089  2026-02-14  863字
+    fill 初級後半 (9 on shelf) ← wikinews:42478  2024-08-25  355字
+· source mode: committed-archive
+    minted   wikinews:45095    570字  jread=5.37 (初級後半)  検収前
+    minted   wikinews:45098    480字  jread=0.70 (上級後半)  検収前
+    minted   wikinews:44384    480字  jread=4.50 (初級後半)  検収前
+    minted   wikinews:45221    695字  jread=1.73 (上級前半)  検収前
+    minted   wikinews:45089    863字  jread=1.16 (上級後半)  検収前
+    minted   wikinews:42478    355字  jread=4.93 (初級後半)  検収前
+· queue: 0/12 minted candidates approved — 検収前 lifts only by operator decision
+· run log → docs/build-evidence/renkan/feed/run-002.json
+· next: node tools/build-standalone.mjs && node tools/verify-feed.mjs

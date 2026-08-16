@@ -4415,6 +4415,750 @@
    ],
    "truncated": false,
    "review": "human-review-pending"
+  },
+  {
+   "id": "wikinews:44381",
+   "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+   "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%97%A5%E6%9C%AC%E4%BB%A3%E8%A1%A8%E3%81%8C%E8%83%8C%E7%95%AA%E5%8F%B7%E7%99%BA%E8%A1%A8%EF%BC%81_%E3%82%AD%E3%83%AA%E3%83%B3%E3%83%81%E3%83%A3%E3%83%AC%E3%83%B3%E3%82%B8%E3%82%AB%E3%83%83%E3%83%97",
+   "date": "2025-11-13",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-44381.json",
+   "chars": 900,
+   "snippet": "サッカー日本代表のキリンチャレンジカップ2025に臨む背番号が11月12日に、発表されました。 サッカー日本代表は、今月14日に",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.796078048780489,
+      "band": "初級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.23529411764705888,
+      "band_vector": {
+       "n5": 0.0784313725490196,
+       "n4": 0.049019607843137254,
+       "n3": 0.08823529411764706,
+       "n2": 0.00980392156862745,
+       "n1": 0.00980392156862745,
+       "oov": 0.7647058823529411
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 102
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "サッカー",
+    "代表",
+    "キリン",
+    "チャレンジ",
+    "カップ",
+    "臨む"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45224",
+   "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+   "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E5%85%90%E7%AB%A5%E5%A4%B1%E8%B8%AA%E4%BA%8B%E4%BB%B6_%E7%94%B7%E5%85%90%E3%81%AE%E9%A4%8A%E7%88%B6%E3%82%92%E6%AD%BB%E4%BD%93%E9%81%BA%E6%A3%84%E3%81%A7%E9%80%AE%E6%8D%95_%E6%AE%BA%E4%BA%BA%E3%82%82%E3%81%BB%E3%81%AE%E3%82%81%E3%81%8B%E3%81%99",
+   "date": "2026-04-17",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45224.json",
+   "chars": 866,
+   "snippet": "南丹市で、3月23日から行方不明となっていた同市立園部小学校の児童だった安達結希（あだち・ゆき）さん（当時11）が遺体となって発",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.6792567693744154,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4337349397590361,
+      "band_vector": {
+       "n5": 0.08433734939759036,
+       "n4": 0.10843373493975904,
+       "n3": 0.13253012048192772,
+       "n2": 0.07228915662650602,
+       "n1": 0.03614457831325301,
+       "oov": 0.5662650602409639
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 249
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "行方",
+    "不明",
+    "なる",
+    "同市",
+    "学校",
+    "児童"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45216",
+   "title": "南丹市で行方不明の男児の遺体が見つかる",
+   "titleEn": "Body of missing boy found in Nantan, Kyoto",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E3%81%A7%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AE%E7%94%B7%E5%85%90%E3%81%AE%E9%81%BA%E4%BD%93%E3%81%8C%E8%A6%8B%E3%81%A4%E3%81%8B%E3%82%8B",
+   "date": "2026-04-15",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45216.json",
+   "chars": 789,
+   "snippet": "京都府警察は、4月13日夕方に京都府南丹市の山林にて発見された、児童の遺体について、3月23日から行方不明となっていた市立園部小",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.5199467680608372,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4934497816593887,
+      "band_vector": {
+       "n5": 0.09606986899563319,
+       "n4": 0.1091703056768559,
+       "n3": 0.14410480349344978,
+       "n2": 0.07423580786026202,
+       "n1": 0.06986899563318777,
+       "oov": 0.5065502183406113
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 229
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "警察",
+    "夕方",
+    "山林",
+    "発見",
+    "児童",
+    "遺体"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45208",
+   "title": "南海 フェリー事業から撤退へ",
+   "titleEn": "Nankai to withdraw from its ferry business",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E6%B5%B7_%E3%83%95%E3%82%A7%E3%83%AA%E3%83%BC%E4%BA%8B%E6%A5%AD%E3%81%8B%E3%82%89%E6%92%A4%E9%80%80%E3%81%B8",
+   "date": "2026-03-31",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45208.json",
+   "chars": 390,
+   "snippet": "南海電気鉄道は3月30日、子会社の南海フェリーが運営する、和歌山港と徳島港を結ぶフェリー事業から撤退すると発表した。1998年の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.1107074380165294,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.4568965517241379,
+      "band_vector": {
+       "n5": 0.06896551724137931,
+       "n4": 0.09482758620689655,
+       "n3": 0.16379310344827586,
+       "n2": 0.034482758620689655,
+       "n1": 0.09482758620689655,
+       "oov": 0.5431034482758621
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 116
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "南海",
+    "電気",
+    "鉄道",
+    "会社",
+    "フェリー",
+    "運営"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45174",
+   "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+   "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E6%9D%B1%E4%BA%AC%E9%AB%98%E8%A3%81%E3%81%8C%E6%97%A7%E7%B5%B1%E4%B8%80%E6%95%99%E4%BC%9A%E3%81%AB%E8%A7%A3%E6%95%A3%E5%91%BD%E4%BB%A4_%E6%95%99%E5%9B%A3%E8%B2%A1%E7%94%A3%E3%81%AE%E6%B8%85%E7%AE%97%E6%89%8B%E7%B6%9A%E3%81%8D%E9%96%8B%E5%A7%8B",
+   "date": "2026-03-05",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45174.json",
+   "chars": 506,
+   "snippet": "世界平和統一家庭連合（旧統一教会）に対する解散命令請求を巡り、東京高等裁判所は3月4日、東京地裁の決定を支持し、教団の解散を命じ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.693510903426791,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.628930817610063,
+      "band_vector": {
+       "n5": 0.031446540880503145,
+       "n4": 0.05660377358490566,
+       "n3": 0.3270440251572327,
+       "n2": 0.10062893081761007,
+       "n1": 0.11320754716981132,
+       "oov": 0.3710691823899371
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 159
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "世界",
+    "平和",
+    "統一",
+    "家庭",
+    "連合",
+    "教会"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45101",
+   "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+   "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E9%9F%93%E5%9B%BD%E3%81%AE%E5%B0%B9%E5%89%8D%E5%A4%A7%E7%B5%B1%E9%A0%98%E3%81%AB%E7%84%A1%E6%9C%9F%E6%87%B2%E5%BD%B9%E5%88%A4%E6%B1%BA_%E5%86%85%E4%B9%B1%E3%81%AE%E9%A6%96%E8%AC%80%E3%81%A7",
+   "date": "2026-02-19",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45101.json",
+   "chars": 539,
+   "snippet": "大韓民国の尹錫悦（ユン・ソンニョル）前大統領が、非常戒厳を宣言するなど国家の秩序を大きく乱す目的で暴動を起こした罪の容疑に対する",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.4718411819021249,
+      "band": "上級後半",
+      "in_scale": false,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.49677419354838714,
+      "band_vector": {
+       "n5": 0.05806451612903226,
+       "n4": 0.05161290322580645,
+       "n3": 0.23225806451612904,
+       "n2": 0.01935483870967742,
+       "n1": 0.13548387096774195,
+       "oov": 0.5032258064516129
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 155
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "民国",
+    "ソンニョル",
+    "大統領",
+    "非常",
+    "戒厳",
+    "宣言"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45095",
+   "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+   "titleEn": "AiScReam: Ruby graduates and two new members join",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/AiScReam%E3%80%81%E3%83%AB%E3%83%93%E3%82%A3%E3%81%A1%E3%82%83%E3%82%93%E5%8D%92%E6%A5%AD%E3%81%A8%E6%96%B0%E3%83%A1%E3%83%B3%E3%83%90%E3%83%BC2%E4%BA%BA%E5%8A%A0%E5%85%A5",
+   "date": "2026-02-17",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45095.json",
+   "chars": 570,
+   "snippet": "2025年にデビュー曲「愛♡スクリ〜ム！」が大ヒットし、同年の新語・流行語大賞にもノミネートされた『ラブライブ！シリーズ』のアイ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.374427350427351,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.3007518796992481,
+      "band_vector": {
+       "n5": 0.07518796992481203,
+       "n4": 0.06766917293233082,
+       "n3": 0.11278195488721804,
+       "n2": 0.015037593984962405,
+       "n1": 0.03007518796992481,
+       "oov": 0.6992481203007519
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 133
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "デビュー",
+    "スクリ",
+    "ヒット",
+    "同年",
+    "新語",
+    "流行"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45098",
+   "title": "第2次高市内閣が始動",
+   "titleEn": "The second Takaichi cabinet takes office",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E7%AC%AC2%E6%AC%A1%E9%AB%98%E5%B8%82%E5%86%85%E9%96%A3%E3%81%8C%E5%A7%8B%E5%8B%95",
+   "date": "2026-02-18",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45098.json",
+   "chars": 480,
+   "snippet": "衆院選を受けて行われた特別国会で、高市早苗氏が第105代内閣総理大臣に選出され第2次高市内閣が始動した。なお第2次高市内閣の閣僚",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.7011796778190824,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5957446808510638,
+      "band_vector": {
+       "n5": 0.02127659574468085,
+       "n4": 0.0425531914893617,
+       "n3": 0.3617021276595745,
+       "n2": 0.0425531914893617,
+       "n1": 0.1276595744680851,
+       "oov": 0.40425531914893614
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 94
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "衆院",
+    "受ける",
+    "行う",
+    "特別",
+    "国会",
+    "内閣"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:44384",
+   "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+   "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%83%8E%E3%83%BB%E3%83%AD%E3%83%8A%E3%82%A6%E3%83%89%E3%81%8C%E5%BC%B7%E7%83%88%E3%82%A8%E3%83%AB%E3%83%9C%E3%83%BC%E3%81%A7%E4%B8%80%E7%99%BA%E9%80%80%E5%A0%B4_W%E6%9D%AF%E3%81%A7%E3%82%82%E5%88%9D%E6%88%A6%E3%81%AF%E5%87%BA%E5%A0%B4%E5%81%9C%E6%AD%A2%E3%81%8B",
+   "date": "2025-11-14",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-44384.json",
+   "chars": 480,
+   "snippet": "日本時間で今日（11月14日）、大失態が起きた。 Yahoo!ニュースによると、ポルトガル代表のエースFWクリスティアーノ・ロナ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.5038426966292135,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.419047619047619,
+      "band_vector": {
+       "n5": 0.0761904761904762,
+       "n4": 0.06666666666666667,
+       "n3": 0.18095238095238095,
+       "n2": 0.02857142857142857,
+       "n1": 0.06666666666666667,
+       "oov": 0.580952380952381
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 105
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "時間",
+    "今日",
+    "失態",
+    "起きる",
+    "Yahoo",
+    "ニュース"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45221",
+   "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+   "titleEn": "Kyoto police search the home of the missing boy",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E4%BA%AC%E9%83%BD%E5%BA%9C%E8%AD%A6%E3%81%8C%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E7%94%B7%E5%85%90%E3%81%AE%E8%87%AA%E5%AE%85%E3%82%92%E5%AE%B6%E5%AE%85%E6%8D%9C%E6%9F%BB",
+   "date": "2026-04-15",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45221.json",
+   "chars": 695,
+   "snippet": "京都府南丹市で4月13日に遺体が発見され、同14日にその身元が、3月23日朝から行方不明となっていた、市立園部小学校に当時通って",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.7250411889596613,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5025380710659899,
+      "band_vector": {
+       "n5": 0.1116751269035533,
+       "n4": 0.15228426395939088,
+       "n3": 0.1116751269035533,
+       "n2": 0.05583756345177665,
+       "n1": 0.07106598984771574,
+       "oov": 0.49746192893401014
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 197
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "遺体",
+    "発見",
+    "その",
+    "身元",
+    "行方",
+    "不明"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45089",
+   "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+   "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E4%B8%AD%E9%81%93%E6%94%B9%E9%9D%A9%E9%80%A3%E5%90%88%E6%96%B0%E4%BB%A3%E8%A1%A8%E9%81%B8%E6%8C%99_%E5%B0%8F%E5%B7%9D%E6%B7%B3%E4%B9%9F%E6%B0%8F%E3%81%8C%E6%96%B0%E4%BB%A3%E8%A1%A8%E3%81%AB",
+   "date": "2026-02-14",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45089.json",
+   "chars": 863,
+   "snippet": "中道改革連合は、2月13日に新しい代表を決める代表選挙を行い、小川淳也氏が、階猛（しな・たけし）氏との一騎打ちを制して新代表に選",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.162212765957447,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5082644628099173,
+      "band_vector": {
+       "n5": 0.045454545454545456,
+       "n4": 0.08677685950413223,
+       "n3": 0.2768595041322314,
+       "n2": 0.045454545454545456,
+       "n1": 0.05371900826446281,
+       "oov": 0.49173553719008267
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 242
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "中道",
+    "改革",
+    "連合",
+    "新しい",
+    "代表",
+    "決める"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:42478",
+   "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+   "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%A4%A7%E8%B0%B7%E7%BF%94%E5%B9%B3_%E5%8F%B2%E4%B8%8A6%E4%BA%BA%E7%9B%AE%E3%81%AE40%E7%9B%97%E5%A1%8140%E6%9C%AC%E5%A1%81%E6%89%93%E9%81%94%E6%88%90",
+   "date": "2024-08-25",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-42478.json",
+   "chars": 355,
+   "snippet": "大リーグ・ドジャースに所属する大谷翔平が、史上6人目となる40本塁打、40盗塁を達成した。大谷は現地時間8月23日、レイズ戦に出",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.926322580645161,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5522388059701493,
+      "band_vector": {
+       "n5": 0.13432835820895522,
+       "n4": 0.22388059701492538,
+       "n3": 0.08955223880597014,
+       "n2": 0.0,
+       "n1": 0.1044776119402985,
+       "oov": 0.44776119402985076
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 67
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "リーグ",
+    "ドジャース",
+    "所属",
+    "する",
+    "史上",
+    "なる"
+   ],
+   "truncated": false
   }
  ]
 }

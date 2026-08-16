@@ -1,0 +1,143 @@
+{
+  "kind": "feed-ingest-run",
+  "run": 2,
+  "asOf": "2026-08-16",
+  "trancheRequested": 6,
+  "sourceMode": {
+    "mode": "committed-archive",
+    "url": "https://dumps.wikimedia.org/jawikinews/latest/jawikinews-latest-pages-articles.xml.bz2",
+    "error": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+    "note": "egress blocked or upstream unreachable — degraded per campaign spec B2 to this operator-runnable script over the committed corpus/datasets/wikinews/archive.jsonl"
+  },
+  "shelfBandCountsBefore": {
+    "初級前半": 3,
+    "初級後半": 7,
+    "中級前半": 16,
+    "中級後半": 35,
+    "上級前半": 8,
+    "上級後半": 7
+  },
+  "eligibleStock": 680,
+  "selectionTrace": [
+    {
+      "band": "初級後半",
+      "bandCountBefore": 7,
+      "picked": "wikinews:45095",
+      "date": "2026-02-17",
+      "chars": 570
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 7,
+      "picked": "wikinews:45098",
+      "date": "2026-02-18",
+      "chars": 480
+    },
+    {
+      "band": "初級後半",
+      "bandCountBefore": 8,
+      "picked": "wikinews:44384",
+      "date": "2025-11-14",
+      "chars": 480
+    },
+    {
+      "band": "上級前半",
+      "bandCountBefore": 8,
+      "picked": "wikinews:45221",
+      "date": "2026-04-15",
+      "chars": 695
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 8,
+      "picked": "wikinews:45089",
+      "date": "2026-02-14",
+      "chars": 863
+    },
+    {
+      "band": "初級後半",
+      "bandCountBefore": 9,
+      "picked": "wikinews:42478",
+      "date": "2024-08-25",
+      "chars": 355
+    }
+  ],
+  "minted": [
+    {
+      "id": "wikinews:45095",
+      "kind": "mint",
+      "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "titleEn": "AiScReam: Ruby graduates and two new members join",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "初級後半 · jread 5.37 · JLPT語彙 30% · 570字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45098",
+      "kind": "mint",
+      "title": "第2次高市内閣が始動",
+      "titleEn": "The second Takaichi cabinet takes office",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 60% · 480字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:44384",
+      "kind": "mint",
+      "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+      "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "初級後半 · jread 4.50 · JLPT語彙 42% · 480字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45221",
+      "kind": "mint",
+      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+      "titleEn": "Kyoto police search the home of the missing boy",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級前半 · jread 1.73 · JLPT語彙 50% · 695字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45089",
+      "kind": "mint",
+      "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+      "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 1.16 · JLPT語彙 51% · 863字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:42478",
+      "kind": "mint",
+      "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+      "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "初級後半 · jread 4.93 · JLPT語彙 55% · 355字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    }
+  ],
+  "cullProposalsQueued": [
+    "wikinews:5991",
+    "wikinews:1483"
+  ],
+  "outputSha256": {
+    "index.json": "5e023d8ad7256a2d29a41c8860b83b80831854fda6d59e1c94318b7c6a3a0761",
+    "archive-index.json": "bf945b550c96d9fef914e7d4c578736ef3e9cbe7ca2704ac54db6676b5a471a1",
+    "feed-review-queue.json": "73d6f012840f0e71374bc167bad6b164e72dcec455654bf1f732dbd89a805482",
+    "feed-curation-report.json": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb"
+  }
+}

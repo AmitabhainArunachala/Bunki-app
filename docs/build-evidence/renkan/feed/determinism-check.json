@@ -1,0 +1,21 @@
+{
+  "kind": "feed-determinism-check",
+  "claim": "feed_ingest.py run 1 was executed twice from the identical repo state (git checkout of data/articles + removal of all uncommitted feed outputs between passes); every output file came back byte-identical",
+  "command": "/home/user/.venv-bunki-corpus/bin/python feed_ingest.py --as-of 2026-08-16",
+  "method": "sha256sum manifest of pass A verified with sha256sum -c against pass B outputs",
+  "verified": [
+    "prototypes/corridor/data/articles/index.json",
+    "prototypes/corridor/data/articles/archive-index.json",
+    "docs/content/feed-review-queue.json",
+    "docs/content/feed-curation-report.json",
+    "docs/build-evidence/renkan/feed/run-001.json",
+    "prototypes/corridor/data/articles/wikinews-44381.json",
+    "prototypes/corridor/data/articles/wikinews-45224.json",
+    "prototypes/corridor/data/articles/wikinews-45216.json",
+    "prototypes/corridor/data/articles/wikinews-45208.json",
+    "prototypes/corridor/data/articles/wikinews-45174.json",
+    "prototypes/corridor/data/articles/wikinews-45101.json"
+  ],
+  "result": "11/11 OK — byte-identical",
+  "note": "the live probe result is recorded in each run log but never feeds selection, so mode changes cannot change the tranche; sha256s of the final artifacts live in run-001.json/run-002.json outputSha256"
+}

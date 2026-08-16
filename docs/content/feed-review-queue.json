@@ -1,0 +1,156 @@
+[
+  {
+    "id": "wikinews:44381",
+    "kind": "mint",
+    "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+    "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "初級前半 · jread 5.80 · JLPT語彙 24% · 900字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45224",
+    "kind": "mint",
+    "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+    "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 0.68 · JLPT語彙 43% · 866字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45216",
+    "kind": "mint",
+    "title": "南丹市で行方不明の男児の遺体が見つかる",
+    "titleEn": "Body of missing boy found in Nantan, Kyoto",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 0.52 · JLPT語彙 49% · 789字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45208",
+    "kind": "mint",
+    "title": "南海 フェリー事業から撤退へ",
+    "titleEn": "Nankai to withdraw from its ferry business",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 1.11 · JLPT語彙 46% · 390字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45174",
+    "kind": "mint",
+    "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+    "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 0.69 · JLPT語彙 63% · 506字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45101",
+    "kind": "mint",
+    "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+    "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 0.47 · JLPT語彙 50% · 539字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:5991",
+    "kind": "cull",
+    "title": "日弁連、共謀罪への問題点を指摘",
+    "titleEn": "",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "empty quote/paren pair — bracketed content was dropped in extraction",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:1483",
+    "kind": "cull",
+    "title": "『ハリー・ポッター』第6巻、英語圏で発売",
+    "titleEn": "",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "dangling particle after 知られる — a linked name was dropped in extraction",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45095",
+    "kind": "mint",
+    "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+    "titleEn": "AiScReam: Ruby graduates and two new members join",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "初級後半 · jread 5.37 · JLPT語彙 30% · 570字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45098",
+    "kind": "mint",
+    "title": "第2次高市内閣が始動",
+    "titleEn": "The second Takaichi cabinet takes office",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 60% · 480字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:44384",
+    "kind": "mint",
+    "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+    "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "初級後半 · jread 4.50 · JLPT語彙 42% · 480字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45221",
+    "kind": "mint",
+    "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+    "titleEn": "Kyoto police search the home of the missing boy",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級前半 · jread 1.73 · JLPT語彙 50% · 695字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:45089",
+    "kind": "mint",
+    "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+    "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "上級後半 · jread 1.16 · JLPT語彙 51% · 863字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  },
+  {
+    "id": "wikinews:42478",
+    "kind": "mint",
+    "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+    "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+    "lane": "news",
+    "licence": "CC BY 2.5",
+    "gradingSummary": "初級後半 · jread 4.93 · JLPT語彙 55% · 355字",
+    "addedAt": "2026-08-16",
+    "decision": "pending"
+  }
+]
