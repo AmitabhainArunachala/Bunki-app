@@ -12628,6 +12628,18 @@ function render() {
   // keeps its existing behaviour (callers set their own scroll, and cards
   // like review want the top of each new face).
   const restoreY = lastRenderedView === S.view && S.view === 'reader' ? window.scrollY : null;
+  // The same rebuild that clamps the scroll also throws focus back to
+  // <body>, so a keyboard walker lost their place on EVERY state-changing
+  // press — a dial, a grade, a capture (E3 round-A, a11y lens). Controls
+  // that name themselves are found again by that name after the rebuild;
+  // the sheet's own focus management still wins where it runs.
+  const focusKey = (() => {
+    const node = document.activeElement;
+    if (!node || node === document.body || !$('#app').contains(node)) return null;
+    if (node.id) return `#${CSS.escape(node.id)}`;
+    const action = node.dataset?.action;
+    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+  })();
   // leaving the galaxy for a ROOM ends the search round-trip: only a walk
   // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
   if (lastRenderedView !== S.view) S.navReturn = false;
@@ -12908,6 +12920,14 @@ function render() {
   safelySyncStoreAlert();
   updateMeasurements();
   if (restoreY != null) window.scrollTo(0, restoreY);
+  // give the keyboard its place back, if the control that had it still
+  // exists under the same name. A sheet or the writing room manages its own
+  // focus and must not be overruled, so this only reaches into #app, and it
+  // never steals focus from whatever the rebuild legitimately moved it to.
+  if (focusKey && document.activeElement === document.body) {
+    const again = $('#app').querySelector(focusKey);
+    if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
+  }
   lastRenderedView = S.view;
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();
