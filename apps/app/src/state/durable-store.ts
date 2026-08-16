@@ -141,11 +141,45 @@ export async function createDurableAppStore(
     });
   };
 
+  /**
+   * The uncertainty dimension, restored and journaled (R4-A, P2-18).
+   *
+   * Read once at open — synchronously, like the snapshot stores backing it —
+   * and handed to the projection so a reload finds the learner's five-way mark
+   * where they left it. Writes go out through the same acknowledge-first
+   * ordering as event journaling, and a writer that throws becomes a warning
+   * rather than a lost acknowledgment: the annotation is an app-local hint
+   * beside the log, and the surfaces already carry the honest fallback sentence
+   * for a dimension that is not there.
+   */
+  const initialUncertainty = (() => {
+    try {
+      return opened.annotations.read();
+    } catch (cause) {
+      console.warn(
+        '[bunki] uncertainty annotations unreadable; marks fall back to log facts',
+        cause,
+      );
+      return new Map<string, never>();
+    }
+  })();
+
   const store = createMemoryAppStore({
     context: options.context,
     durability: durabilityFor(opened.runtimeLabel, opened.snapshotAvailable),
     initialEvents,
     journal,
+    initialUncertainty,
+    uncertaintyJournal: (threadId, annotation) => {
+      try {
+        opened.annotations.write(threadId, annotation);
+      } catch (cause) {
+        console.warn(
+          '[bunki] uncertainty annotation write failed; the mark is session-only',
+          cause,
+        );
+      }
+    },
     ...(options.observer === undefined ? {} : { observer: options.observer }),
     ...(options.elapsedMs === undefined ? {} : { elapsedMs: options.elapsedMs }),
     ...(options.resolveLexemeId === undefined ? {} : { resolveLexemeId: options.resolveLexemeId }),

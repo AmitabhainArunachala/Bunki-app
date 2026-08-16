@@ -79,8 +79,10 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   await expect(app.testId('capture-threads')).toContainText(TARGET);
   // Still on the `keep` rung after the reload, and still offering the gesture
   // that would move it: what survived is the learner's capture, not a promotion
-  // the app invented for them.
-  await expect(app.testId('capture-threads')).toContainText('keep · marked uncertain');
+  // the app invented for them. Since R4-A the *dimension* of the mark survives
+  // too — the annotation side-store restored it, so the row names `reading`
+  // instead of the old "which part was not stored" fallback (P2-18).
+  await expect(app.testId('capture-threads')).toContainText('keep · uncertain: reading');
   await expect(app.promoteButton()).toBeVisible();
 
   expect(await app.persistedEventTypes()).toEqual(['EncounterCaptured', 'ThreadPromotionChanged']);

@@ -235,6 +235,28 @@ export interface MemoryAppStoreOptions {
    * allowed to hold no lexical judgements at all.
    */
   readonly resolveLexemeId?: ((text: string) => string | null) | undefined;
+  /**
+   * Uncertainty dimensions restored from the durable annotation side-store
+   * (R4-A, P2-18), keyed by thread id.
+   *
+   * Applied after the event log is rehydrated, and only to threads the log
+   * actually holds: an annotation whose thread is not in the log is a stale row
+   * and is dropped rather than used to invent a thread. Nothing here upgrades
+   * the log's own facts — `markRecordedInLog` still comes from the events, and
+   * a thread with a restored dimension but no `uncertaintyMark` on any capture
+   * is exactly the post-Keep-mark case the surfaces already describe.
+   */
+  readonly initialUncertainty?: ReadonlyMap<string, UncertaintyAnnotation> | undefined;
+  /**
+   * Called after a command changed a thread's uncertainty annotation (R4-A).
+   *
+   * The same ordering rule as `journal`, for the same reason: the learner's
+   * acknowledgment is rebuilt, notified and returned first; the side-store
+   * write happens after, and a throwing writer is the caller's problem to
+   * report, never a lost acknowledgment. `null` means the mark was cleared.
+   */
+  readonly uncertaintyJournal?:
+    ((threadId: string, annotation: UncertaintyAnnotation | null) => void) | undefined;
 }
 
 export function createMemoryAppStore({
@@ -245,8 +267,19 @@ export function createMemoryAppStore({
   initialEvents,
   journal,
   resolveLexemeId,
+  initialUncertainty,
+  uncertaintyJournal,
 }: MemoryAppStoreOptions): AppStore {
   const events: DomainEvent[] = [];
+  /**
+   * Annotation changes the command being dispatched has made, flushed to
+   * `uncertaintyJournal` after the acknowledgment is out (same ordering rule as
+   * `journal`; see `execute`). An array, not a map: two changes to one thread
+   * in one command do not occur, but replaying them in order would still be
+   * correct if they ever did.
+   */
+  const pendingUncertaintyWrites: { threadId: string; annotation: UncertaintyAnnotation | null }[] =
+    [];
   const threads = new Map<string, StoredThread>();
   /** Insertion order, newest first, for the snapshot's thread list. */
   const threadOrder: string[] = [];
@@ -388,7 +421,17 @@ export function createMemoryAppStore({
 
   function rehydrate(log: readonly DomainEvent[]): void {
     for (const event of log) absorb(event);
-    if (log.length > 0) rebuildSnapshot();
+    // The dimension, restored from the annotation side-store (R4-A, P2-18) —
+    // after the events, so it can only decorate threads the log establishes.
+    // Nothing is invented: a stale row naming an unknown thread is skipped, and
+    // `markRecordedInLog` keeps its event-derived value untouched.
+    if (initialUncertainty !== undefined) {
+      for (const [threadId, annotation] of initialUncertainty) {
+        const thread = threads.get(threadId);
+        if (thread !== undefined) threads.set(threadId, { ...thread, uncertainty: annotation });
+      }
+    }
+    if (log.length > 0 || (initialUncertainty?.size ?? 0) > 0) rebuildSnapshot();
   }
 
   function findThreadByTarget(targetKey: string): StoredThread | undefined {
@@ -471,6 +514,11 @@ export function createMemoryAppStore({
       command.uncertainty === null
         ? (existing?.uncertainty ?? null)
         : { dimension: command.uncertainty, editedAt: event.occurredAt, markedAtCapture: true };
+    // A capture that carried a mark changed the annotation; one that did not
+    // leaves whatever was there. Only the change reaches the side-store.
+    if (command.uncertainty !== null) {
+      pendingUncertaintyWrites.push({ threadId, annotation: uncertainty });
+    }
 
     const marked = command.uncertainty !== null;
     if (existing === undefined) {
@@ -729,12 +777,16 @@ export function createMemoryAppStore({
   }
 
   /**
-   * Edit the app-local uncertainty annotation.
+   * Edit the uncertainty annotation.
    *
    * Emits **no event**, by design: the v1 schema has no family for amending a
    * mark after capture, and inventing one in the app would be a schema change
    * made in the wrong package. The acknowledgment therefore reports an empty
    * event list, which is the honest answer to "what did this write to the log".
+   * Since R4-A (P2-18) the annotation itself is no longer session-only: the
+   * change is journaled to the durable side-store beside the log (see
+   * `uncertaintyJournal`), so the dimension survives a reload while the event
+   * log stays exactly as the frozen schema defines it.
    */
   function applyMarkUncertainty(
     command: Extract<AppCommand, { kind: 'markUncertainty' }>,
@@ -745,17 +797,16 @@ export function createMemoryAppStore({
     }
 
     const acknowledgedAt = context.clock.now();
-    threads.set(command.threadId, {
-      ...thread,
-      uncertainty:
-        command.dimension === null
-          ? null
-          : {
-              dimension: command.dimension,
-              editedAt: acknowledgedAt,
-              markedAtCapture: thread.uncertainty?.markedAtCapture ?? false,
-            },
-    });
+    const annotation: UncertaintyAnnotation | null =
+      command.dimension === null
+        ? null
+        : {
+            dimension: command.dimension,
+            editedAt: acknowledgedAt,
+            markedAtCapture: thread.uncertainty?.markedAtCapture ?? false,
+          };
+    threads.set(command.threadId, { ...thread, uncertainty: annotation });
+    pendingUncertaintyWrites.push({ threadId: command.threadId, annotation });
 
     return {
       threadId: command.threadId,
@@ -1274,6 +1325,8 @@ export function createMemoryAppStore({
       try {
         ack = dispatch(command);
       } catch (cause) {
+        // A failed command changed nothing worth journaling either way.
+        pendingUncertaintyWrites.length = 0;
         // The record notes *that* a command failed and nothing about why: a
         // thrown message can quote a note, an answer, or captured text, and a
         // diagnostic buffer is exactly where that must not end up (§12, §15).
@@ -1295,6 +1348,15 @@ export function createMemoryAppStore({
       // rather than a lost acknowledgment.
       if (journal !== undefined && ack.events.length > 0) {
         journal(ack.events, commandIdempotencyKey(command, ack));
+      }
+      // The annotation side-store, same ordering rule (R4-A, P2-18). Drained
+      // whether or not a journal is wired, so a session-only store does not
+      // accumulate writes it will never deliver.
+      const annotationWrites = pendingUncertaintyWrites.splice(0);
+      if (uncertaintyJournal !== undefined) {
+        for (const write of annotationWrites) {
+          uncertaintyJournal(write.threadId, write.annotation);
+        }
       }
       observer.observe({
         commandKind: kind,

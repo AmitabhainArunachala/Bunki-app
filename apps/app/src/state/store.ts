@@ -110,9 +110,12 @@ export const UNCERTAINTY_LABELS: Readonly<Record<UncertaintyDimension, string>> 
  * rather than inventing an event field the schema does not have (which would be
  * a schema change, and schema changes are ADR-002 amendments, not app edits).
  *
- * Consequence, stated so no screen implies otherwise: the dimension is **not
- * exported and not durable**. It is a W4 coordination item; see
- * `DEFERRED_INTEGRATION`.
+ * Since R4-A (P2-18) the annotation is **durable on this device**: it is
+ * journaled to the annotation side-store inside the persistence seam and
+ * restored on reload, so the mark survives a restart. What it still is not —
+ * stated so no screen implies otherwise — is an event: it never enters the
+ * event log, never replays, and is **not exported**. Widening the schema
+ * remains WP05-D2's ADR-002 decision; see `DEFERRED_INTEGRATION`.
  */
 export interface UncertaintyAnnotation {
   readonly dimension: UncertaintyDimension;
@@ -130,9 +133,12 @@ export interface UncertaintyAnnotation {
  *
  *   - a mark chosen **before** Keep rides on `EncounterCaptured.uncertaintyMark`,
  *     so the *fact* of a mark is in the log and only the dimension is app-local;
- *   - a mark applied **after** Keep writes nothing at all — `markUncertainty`
- *     emits no event, because the v1 schema has no family for amending a mark
- *     (see `MarkUncertaintyCommand`). Fact *and* dimension are lost on export.
+ *   - a mark applied **after** Keep writes no event at all — `markUncertainty`
+ *     emits none, because the v1 schema has no family for amending a mark
+ *     (see `MarkUncertaintyCommand`). Fact *and* dimension are absent from the
+ *     export. Since R4-A both cases keep the dimension durably on this device
+ *     through the annotation side-store; durability changed, exportability did
+ *     not.
  *
  * The wording is derived from the annotation rather than written into a screen
  * so the two screens cannot drift apart, and so the sentence cannot survive a
@@ -148,20 +154,21 @@ export function uncertaintyLogNote(
   options: { readonly kept: boolean; readonly markRecordedInLog?: boolean },
 ): string {
   if (!options.kept) {
-    return 'Keeping this with a mark records in the event log that a mark exists; which dimension you chose is kept on this device only and is not exported (deferred item WP05-D2).';
+    return 'Keeping this with a mark records in the event log that a mark exists; which dimension you chose is stored durably on this device beside the log and is not exported (deferred item WP05-D2).';
   }
   if (uncertainty === null) {
-    // The reload case, told apart from the never-marked case. The log's
-    // `uncertaintyMark` survived and the dimension did not, and a sentence that
-    // reported only the second half would read as "you marked nothing" about a
-    // thread the learner did mark.
+    // The legacy-reload case, told apart from the never-marked case. The log's
+    // `uncertaintyMark` survived; the dimension was chosen before this device
+    // stored dimensions durably (R4-A), so it is genuinely gone — and a
+    // sentence that reported only the second half would read as "you marked
+    // nothing" about a thread the learner did mark.
     return options.markRecordedInLog === true
-      ? 'The event log records that you marked this at capture. Which dimension you chose was only ever on this device, so it did not survive the reload (deferred item WP05-D2).'
+      ? 'The event log records that you marked this at capture. Which dimension you chose was marked before this device stored dimensions durably, so it did not survive the reload (deferred item WP05-D2).'
       : 'A mark added now stays on this device only — the log records a mark only on the captured event, so nothing about it would be exported (deferred item WP05-D2).';
   }
   return uncertainty.markedAtCapture
-    ? 'The event log records that a mark exists; which dimension you chose is kept on this device only and is not exported (deferred item WP05-D2).'
-    : 'This mark was applied after Keep, so it is on this device only — it is not in the event log and will not be exported (deferred item WP05-D2).';
+    ? 'The event log records that a mark exists; which dimension you chose is stored durably on this device only and is not exported (deferred item WP05-D2).'
+    : 'This mark was applied after Keep, so it stays on this device only, durable beside the log — it is not in the event log and will not be exported (deferred item WP05-D2).';
 }
 
 /** What a screen needs to know about one thread. */
@@ -178,13 +185,15 @@ export interface ThreadView {
   /**
    * Whether the *event log* records a mark on this thread's capture (WP-10).
    *
-   * Distinct from `uncertainty`, and the distinction is only visible after a
-   * reload. `EncounterCaptured.uncertaintyMark` is `true | absent` in the frozen
-   * v1 schema, so the log knows a mark exists and never knew which dimension was
-   * chosen (WP05-D2). A rehydrated thread therefore has `uncertainty: null` —
-   * the store will not invent a dimension it was never told — while this stays
-   * `true`, so the surfaces can say "you marked this; which part was not stored"
-   * instead of the flat falsehood "nothing marked uncertain".
+   * Distinct from `uncertainty`. `EncounterCaptured.uncertaintyMark` is
+   * `true | absent` in the frozen v1 schema, so the log knows a mark exists and
+   * never knew which dimension was chosen (WP05-D2). Since R4-A the dimension
+   * itself is restored on reload from the durable annotation side-store, so the
+   * split is visible only for marks made before that store existed (or whose
+   * bytes were lost): such a thread rehydrates with `uncertainty: null` — the
+   * store will not invent a dimension it was never told — while this stays
+   * `true`, so the surfaces can say "you marked this; which part was not
+   * stored" instead of the flat falsehood "nothing marked uncertain".
    */
   readonly markRecordedInLog: boolean;
   readonly capturedAt: string;

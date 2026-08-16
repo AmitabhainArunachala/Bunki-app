@@ -43,15 +43,27 @@ import {
 } from '@bunki/persistence';
 
 import { openPlatformEventStore } from './platform-store.ts';
-import { STORE_NAME, type OpenAppEventStoreOptions, type OpenedAppEventStore } from './shared.ts';
+import {
+  annotationSnapshotKey,
+  STORE_NAME,
+  type OpenAppEventStoreOptions,
+  type OpenedAppEventStore,
+  type UncertaintyAnnotationStore,
+} from './shared.ts';
 
-export { PROVISIONAL_WEB_ADAPTER_NOTICE, RUNTIME_LABEL_DISCLOSURE, STORE_NAME };
+export {
+  annotationSnapshotKey,
+  PROVISIONAL_WEB_ADAPTER_NOTICE,
+  RUNTIME_LABEL_DISCLOSURE,
+  STORE_NAME,
+};
 export type {
   EventStore,
   OpenAppEventStoreOptions,
   OpenedAppEventStore,
   RuntimeLabel,
   SnapshotStore,
+  UncertaintyAnnotationStore,
 };
 
 /**

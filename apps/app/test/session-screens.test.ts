@@ -231,8 +231,11 @@ describe('the app end of the loop stays inside controller §5', () => {
     const source = code(LOOP);
     expect(source).not.toContain('createDomainEvent');
     expect(source).not.toMatch(/type:\s*['"](EncounterCaptured|ReviewGraded|ExposureLogged)['"]/);
-    // Contracts are built through the kernel's named door.
-    expect(source).toContain('createTargetContract');
+    // Contracts are built through the kernel's named door — since R4-A the
+    // same validated pair factory the `activateLearn` command uses (P1-18),
+    // not the generic single-contract wrapper the compatibility mint called.
+    expect(source).toContain('createLearnContractPair');
+    expect(source).not.toContain('createTargetContract');
   });
 
   it('routes every session action through the domain command handler', () => {

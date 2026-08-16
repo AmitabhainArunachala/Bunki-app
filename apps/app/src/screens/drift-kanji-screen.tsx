@@ -16,6 +16,7 @@ import {
   driftKanjiInfo,
   driftWordsUsingKanji,
 } from '../data/drift-lexicon.ts';
+import { KanjiKeepPanel } from './kanji-keep.tsx';
 import { AppButton, RowButton, Section } from '../ui/primitives.tsx';
 import { DriftTierDisclosure } from '../ui/notices.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
@@ -93,6 +94,10 @@ export function DriftKanjiScreen({
           {info.strokeCount} strokes · stroke-order animation is available for seed kanji only
         </Text>
       </View>
+
+      {/* The Drift tier is an encounter surface too (R4-A, P2-18): the same
+          one-tap Keep as the seed page, through the same command handler. */}
+      <KanjiKeepPanel character={info.character} tier="drift" />
 
       {components.length > 0 ? (
         <Section note="KanjiVG decomposition — the shapes inside the shape." title="Components">

@@ -7,7 +7,7 @@
  * whole permission `apps/app` has (controller §5). It does not grade, does not
  * decide what a probe is, does not compute an interval, and does not construct
  * an event — every event in the workspace came out of `@bunki/domain`'s own
- * factories, reached through `applySessionCommand` and `createTargetContract`.
+ * factories, reached through `applySessionCommand` and `createLearnContractPair`.
  *
  * ## Where the log comes from
  *
@@ -52,8 +52,8 @@ import {
   canvasProbeOffer,
   componentIdForTargetKey,
   componentIdOfEncounter,
+  createLearnContractPair,
   createSessionWorkspace,
-  createTargetContract,
   isPromotionActive,
   latestStumble,
   retrievalContractFromEvent,
@@ -69,13 +69,12 @@ import {
 
 import {
   DEFAULT_CANONICAL_TARGET,
-  findLexemeById,
-  findLexemeByHeadword,
   passageForLexeme,
   seedDataset,
   type SeedLexeme,
   type SeedPassage,
 } from '../data/catalog.ts';
+import { learnSpecificationForLexeme, seedEntryForThread } from '../data/learn-specification.ts';
 import { useAppStore } from '../state/app-context.tsx';
 import type { AppStore, ThreadView } from '../state/store.ts';
 import type { PassageMark } from './canvas-passage.ts';
@@ -133,33 +132,22 @@ export const SESSION_INTEGRATION_NOTE =
  */
 export const NO_PROMOTED_TARGET_NOTE = `A sitting is planned over what you have taken up for study, so there is nothing to plan yet. Keep an encounter on the capture screen and then choose “Take it up for study” on it — that is the only thing in this app that promotes a thread, and it has to be you. ${DEFAULT_CANONICAL_TARGET} is the word the seed’s passage is written around, so it is the one that also opens the integration canvas.`;
 
-const readingContractIdFor = (lexeme: SeedLexeme): string => `contract-reading-${lexeme.id}`;
-const meaningContractIdFor = (lexeme: SeedLexeme): string => `contract-meaning-${lexeme.id}`;
-
 /**
- * A human label for **every** contract `contractsFor` mints.
+ * Labels for the contracts that actually exist in the canonical log.
  *
- * Built from the same two id helpers the contracts themselves are built from,
- * in one place, so the map cannot list a contract that is not created or omit
- * one that is. The planner labels a step by looking its contract id up in this
- * map and falling back to the id itself; the fallback is a last resort for an
- * unknown contract, not a rendering strategy, and anything that reaches it is a
- * defect — hence `session-screens.test.ts`'s assertion that no prompt string
- * ever matches an internal id.
+ * Always built from the minted events rather than from a parallel id helper, so
+ * the map cannot list a contract that is not created or omit one that is. The
+ * planner labels a step by looking its contract id up in this map and falling
+ * back to the id itself; the fallback is a last resort for an unknown contract,
+ * not a rendering strategy, and anything that reaches it is a defect — hence
+ * `session-screens.test.ts`'s assertion that no prompt string ever matches an
+ * internal id.
  *
  * The two labels differ because the steps ask different questions of the same
  * word: one asks how it is read, the other what it means. Labelling both
  * "分岐" would be honest but useless — the learner would see two identical
  * prompts and no way to tell which contract they were answering.
  */
-function contractLabelsFor(lexeme: SeedLexeme): ReadonlyMap<string, string> {
-  return new Map([
-    [readingContractIdFor(lexeme), `${lexeme.headword} — reading`],
-    [meaningContractIdFor(lexeme), `${lexeme.headword} — meaning`],
-  ]);
-}
-
-/** Labels for the contracts that actually exist in the canonical log. */
 function contractLabelsForEvents(
   lexeme: SeedLexeme,
   contracts: readonly ContractCreatedEvent[],
@@ -190,10 +178,10 @@ export interface SessionTarget {
    * draws from all of them, and a caller that knows only about the probed one
    * cannot label what the planner picked. That is not hypothetical: both
    * contracts are minted on the same clock tick, so `compareDueContracts` falls
-   * through to its id tiebreak, and `contract-meaning-…` sorts before
-   * `contract-reading-…`. With a one-entry label map the meaning step's label
-   * fell back to `memory.contractId` and the learner was shown a raw internal
-   * id as their recall prompt.
+   * through to its id tiebreak, and the `…:form_to_meaning` id sorts before
+   * `…:orthography_to_reading`. With a one-entry label map the meaning step's
+   * label fell back to `memory.contractId` and the learner was shown a raw
+   * internal id as their recall prompt.
    *
    * Carrying the set here — rather than letting each screen re-derive it — is
    * what keeps the label map and the contracts that actually exist from drifting
@@ -232,107 +220,42 @@ export interface SessionLoop {
 }
 
 /**
- * Build the two contracts for the chosen target.
+ * Mint the Learn pair for a thread that reached a sitting with no contracts at
+ * all — the R4-A migration path for the pre-unification flow (P1-18).
+ *
+ * Until R4-A this was the "compatibility" mint: two `createTargetContract`
+ * calls with hand-built `contract-reading-*` / `contract-meaning-*` ids — a
+ * second contract-creation lineage beside the golden route's validated
+ * `activateLearn` path. Both lineages now converge on the kernel's
+ * `createLearnContractPair`, driven by the same specification builder every
+ * Learn gesture uses (`learnSpecificationForLexeme`), so the ids are the
+ * deterministic `contract:learn:<thread>:<spec>:v<n>:<skill>` shape and both
+ * graders are validated as a pair before either event exists.
  *
  * Two, not one, and that is REQ-DM-05 and T-05 rather than thoroughness:
  * meaning and reading are *distinct* contracts, so a missed reading cannot
- * erase a known meaning. The reading contract is the one the canvas probes,
- * because a cloze in a passage hides a written form and asks for its reading.
+ * erase a known meaning. Both answer sets are read off the seed entry the
+ * learner's capture resolved to, never typed here.
  *
- * Both answer sets are read off the seed entry the learner's capture resolved
- * to, never typed here. That is the same rule the demonstration command follows
- * (`SeedEvidenceDemonstrationCommand`): a screen may *read* the dataset, and may
- * not assert a lexical fact of its own. It also means the contracts now follow
- * whichever word the learner promoted instead of only ever describing 分岐.
+ * This branch is reachable only for threads promoted through the old plain
+ * `promote` flow (or by a non-lexeme fallback) and never sat with — every new
+ * "Take it up for study" or word-page `learn` press dispatches `activateLearn`,
+ * which mints the pair at the gesture. Threads whose durable log already holds
+ * a pair — either shape — never reach here (`durableContractsFor` reads those
+ * through the lineage projection and keeps their ids, and with them their
+ * ancestry). The ids being derived from `(threadId, specification)` is what
+ * makes the second sitting after a reload idempotent: the pair is found
+ * durable, and this mint is skipped rather than re-run.
  */
-function contractsFor(
+function migrationLearnPair(
   context: DomainContext,
-  lexeme: SeedLexeme,
-  componentId: string,
-  established: ReadonlySet<string>,
-): readonly DomainEvent[] {
-  const readingContractId = readingContractIdFor(lexeme);
-  const meaningContractId = meaningContractIdFor(lexeme);
-
-  // Both events pin their `eventId` and `idempotencyKey` to the contract id, so
-  // minting one the log already holds would put two events under one key that
-  // differ in `occurredAt` — the exact `IdempotencyConflictError` shape replay
-  // refuses. That was unreachable while sessions wrote nothing durable; now that
-  // a sitting's contracts are persisted, the second sitting after a reload finds
-  // them already there and must not mint them again (WP-10).
-  const wanted: readonly string[] = [readingContractId, meaningContractId];
-  if (wanted.every((id) => established.has(id))) return [];
-
-  const reading: ContractCreatedEvent = createTargetContract(
+  chosen: ChosenTarget,
+): readonly ContractCreatedEvent[] {
+  return createLearnContractPair(
     context,
-    {
-      contractId: readingContractId,
-      contractVersion: 1,
-      targetComponentId: componentId,
-      skill: 'orthography_to_reading',
-      cueModality: 'text',
-      responseModality: 'text',
-      acceptedAnswers: [lexeme.reading],
-      hintPolicy: { hintsAllowed: true, maxHints: 1 },
-      revealPolicy: { revealAllowed: true, revealIsRecorded: true },
-      promptFamilyVersion: 'pf-wp08.1',
-    },
-    // The event id is pinned, not generated. Two bootstraps of the same store —
-    // a re-render, a StrictMode double invocation — would otherwise produce two
-    // events claiming one key, which is the `IdempotencyConflictError` shape
-    // replay exists to refuse. Pinning it also makes the session's log
-    // byte-reproducible, which the screenshot evidence depends on.
-    { idempotencyKey: `contract:${readingContractId}`, eventId: `ev-${readingContractId}` },
+    chosen.capture,
+    learnSpecificationForLexeme(chosen.lexeme),
   );
-
-  const meaning: ContractCreatedEvent = createTargetContract(
-    context,
-    {
-      contractId: meaningContractId,
-      contractVersion: 1,
-      targetComponentId: componentId,
-      skill: 'form_to_meaning',
-      cueModality: 'text',
-      responseModality: 'text',
-      acceptedAnswers: [...lexeme.senses],
-      hintPolicy: { hintsAllowed: true, maxHints: 1 },
-      revealPolicy: { revealAllowed: true, revealIsRecorded: true },
-      promptFamilyVersion: 'pf-wp08.1',
-    },
-    { idempotencyKey: `contract:${meaningContractId}`, eventId: `ev-${meaningContractId}` },
-  );
-
-  // Filtered rather than short-circuited above, so a log holding one of the pair
-  // (a partial write, an interrupted first sitting) gains the missing one instead
-  // of neither.
-  return [reading, meaning].filter((event) => !established.has(event.contractId));
-}
-
-/** Contract ids a `ContractCreated` in this log has already established. */
-function establishedContractIds(log: readonly DomainEvent[]): ReadonlySet<string> {
-  return new Set(
-    log
-      .filter((event): event is ContractCreatedEvent => event.type === 'ContractCreated')
-      .map((event) => event.contractId),
-  );
-}
-
-/**
- * The seed entry a thread is about, or `null`.
- *
- * `lexemeId` is the app-local link the capture screen recorded. A thread
- * rehydrated from the durable log may have lost it (the event carries the
- * learner's text, not a dictionary row), so the headword is the fallback — the
- * exact match `app-context.tsx` uses for the same reason and with the same
- * reservation: fuzzier matching would attach a session to a *different* word
- * than the one the learner promoted.
- */
-function seedEntryFor(thread: ThreadView): SeedLexeme | null {
-  if (thread.lexemeId !== null) {
-    const byId = findLexemeById(thread.lexemeId);
-    if (byId !== null) return byId;
-  }
-  return findLexemeByHeadword(thread.displayText);
 }
 
 interface ChosenTarget {
@@ -376,7 +299,7 @@ function chooseSessionTarget(
   for (const thread of ordered) {
     if (!isPromotionActive(thread.state.promotion)) continue;
 
-    const lexeme = seedEntryFor(thread);
+    const lexeme = seedEntryForThread(thread);
     if (lexeme === null) continue;
 
     const passage = passageForLexeme(lexeme.id);
@@ -503,38 +426,57 @@ export function bootstrapSessionWorkspace(
     };
   }
 
-  // Compatibility for existing callers that still perform the old explicit
-  // promotion command. The A1 source route never reaches this branch: its Learn
-  // gesture already put the immutable pair in the canonical log, and the
-  // equality asserted below is what makes that distinction falsifiable.
-  const compatibilityContracts =
-    durable.kind === 'absent'
-      ? contractsFor(context, chosen.lexeme, chosen.componentId, establishedContractIds(log))
-      : [];
-  const contracts =
-    durable.kind === 'ready'
-      ? durable.contracts
-      : compatibilityContracts.filter(
-          (event): event is ContractCreatedEvent => event.type === 'ContractCreated',
-        );
+  // The R4-A migration mint (P1-18): a thread with no contracts at all — one
+  // promoted under the pre-unification flow and never sat with — gains its pair
+  // here, through the same validated factory and id derivation every Learn
+  // gesture now uses. Every route that dispatches `activateLearn` (capture
+  // screen, word page, A1 source) never reaches this branch: the gesture
+  // already put the immutable pair in the canonical log, and `durable.kind`
+  // being `ready` is what makes that distinction falsifiable. Minting here
+  // appends nothing — the pair is carried on the sitting's first dispatch, the
+  // learner's own Start (see `persistWorkspaceEvents`).
+  let migrated: readonly ContractCreatedEvent[] = [];
+  if (durable.kind === 'absent') {
+    try {
+      migrated = migrationLearnPair(context, chosen);
+    } catch (cause) {
+      // Fail closed with the kernel's own reason rather than planning a sitting
+      // over contracts that do not exist. A seed entry the pair validator
+      // refuses is a data defect, and a session screen is the wrong place to
+      // paper over one.
+      return {
+        workspace: createSessionWorkspace(log),
+        target: null,
+        error: `The Learn pair for this thread could not be created: ${
+          cause instanceof Error ? cause.message : String(cause)
+        }`,
+      };
+    }
+  }
+  const contracts = durable.kind === 'ready' ? durable.contracts : migrated;
   const readingContractId =
     durable.kind === 'ready'
       ? durable.readingContractId
-      : (contracts.find((contract) => contract.skill === 'orthography_to_reading')?.contractId ??
-        readingContractIdFor(chosen.lexeme));
+      : (migrated.find((contract) => contract.skill === 'orthography_to_reading')?.contractId ??
+        '');
+  if (readingContractId === '') {
+    return {
+      workspace: createSessionWorkspace(log),
+      target: null,
+      error:
+        'The durable Learn pair is incomplete. Reading and meaning must both exist before a sitting can use either.',
+    };
+  }
 
   return {
-    workspace: createSessionWorkspace([...log, ...compatibilityContracts]),
+    workspace: createSessionWorkspace([...log, ...migrated]),
     target: {
       lexeme: chosen.lexeme,
       passage: chosen.passage,
       componentId: chosen.componentId,
       threadId: chosen.thread.state.threadId,
       probeContractId: readingContractId,
-      contractLabels:
-        contracts.length === 0
-          ? contractLabelsFor(chosen.lexeme)
-          : contractLabelsForEvents(chosen.lexeme, contracts),
+      contractLabels: contractLabelsForEvents(chosen.lexeme, contracts),
     },
     error: null,
   };

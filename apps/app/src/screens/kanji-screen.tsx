@@ -47,6 +47,7 @@ import {
 } from '../data/catalog.ts';
 import { parseKanjiVgStrokes, type KanjiStrokeSet } from '../data/kanjivg.ts';
 import { radicalDisplay } from '../data/radical-display.ts';
+import { KanjiKeepPanel } from './kanji-keep.tsx';
 import { useAppSnapshot, useDebugFlags } from '../state/app-context.tsx';
 import { UNCERTAINTY_LABELS } from '../state/store.ts';
 import { useLookup } from '../state/use-lookup.ts';
@@ -297,6 +298,9 @@ export function KanjiScreen({
         )}
       </View>
 
+      {/* ---------------------------------- Keep the encounter (R4-A, P2-18) */}
+      <KanjiKeepPanel character={kanji.character} tier="seed" />
+
       {/* ------------------------------------------------ Layer 1 */}
       <Section
         note="Compounds are the seed words that literally contain this character; nothing is ranked by an invented relevance model."
@@ -378,7 +382,7 @@ export function KanjiScreen({
           {markedThread === undefined
             ? 'Nothing marked uncertain on a thread that uses this character.'
             : markedThread.uncertainty === null
-              ? `You marked ${markedThread.displayText} as uncertain. Which part was never stored, so it did not survive the reload.`
+              ? `You marked ${markedThread.displayText} as uncertain. Which part was marked before this device stored dimensions durably, so it did not survive the reload.`
               : `You marked ${UNCERTAINTY_LABELS[markedThread.uncertainty.dimension]} on ${markedThread.displayText}.`}
         </Text>
 

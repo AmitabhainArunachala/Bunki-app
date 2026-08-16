@@ -303,9 +303,22 @@ describe('the app bootstraps a real closed loop, not a fixture', () => {
 
     const first = bootstrapSessionWorkspace(store, context);
     const second = bootstrapSessionWorkspace(store, context);
-    expect(second.workspace.log.map((event) => event.eventId)).toEqual(
-      first.workspace.log.map((event) => event.eventId),
+    // Identity lives in the contract ids and idempotency keys, deliberately
+    // not in the event ids — the kernel's own learn-contracts suite pins that
+    // a re-mint draws fresh event ids. What a re-render must reproduce is the
+    // *same pair under the same keys*, which is what makes the second copy a
+    // no-op at the persist seam rather than a duplicate.
+    expect(second.workspace.log.map((event) => event.idempotencyKey)).toEqual(
+      first.workspace.log.map((event) => event.idempotencyKey),
     );
+    const contractIdsOf = (log: readonly { type: string }[]): readonly string[] =>
+      log
+        .filter(
+          (event): event is { type: string; contractId: string } =>
+            event.type === 'ContractCreated',
+        )
+        .map((event) => event.contractId);
+    expect(contractIdsOf(second.workspace.log)).toEqual(contractIdsOf(first.workspace.log));
     // …and neither build touched the store, which is the stronger property.
     expect(store.readAll()).toHaveLength(eventsBefore);
   });

@@ -58,6 +58,7 @@ import {
   type SearchResult,
   type SeedLexeme,
 } from '../data/catalog.ts';
+import { seedEntryForThread, seedLearnCommand } from '../data/learn-specification.ts';
 import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
 import { captureLookupCommand, type CaptureLookupTarget } from '../state/lookup-friction.ts';
 import {
@@ -249,11 +250,18 @@ export function CaptureScreen({
    * Take a kept thread up for study — the learner's own hand on the ladder
    * (REQ-DM-09, definition-of-done §3 step 3).
    *
-   * This is the only thing in the app that moves a thread to `learn`, and it is
-   * only ever a press handler. Until the WP-10 repair round the session screen
+   * Only ever a press handler. Until the WP-10 repair round the session screen
    * did it silently on mount, which put a promotion the learner never made into
    * their exportable log; the fix was to delete that and give them the gesture
    * here instead, beside the thread it is about.
+   *
+   * Since R4-A (P1-18) the gesture is `activateLearn` whenever the thread
+   * resolves to a seed entry: the same validated command the A1 source route
+   * dispatches, so the promotion *and* the immutable reading/meaning pair are
+   * minted together through `createLearnContractPair`, under the one
+   * deterministic id lineage. A thread that resolves to no seed entry falls
+   * back to the bare promotion — there is no answer set to grade it against,
+   * so minting a contract for it would be the app asserting a lexical fact.
    *
    * `keep` and `captured` activate no contracts, so nothing in the loop can
    * observe a thread until this is pressed — which is the whole of DL-05's
@@ -261,7 +269,13 @@ export function CaptureScreen({
    */
   const takeUpForStudy = useCallback(
     (threadId: string) => {
-      store.execute({ kind: 'promote', threadId, to: 'learn' });
+      const thread = store.getSnapshot().threadsById[threadId];
+      const entry = thread === undefined ? null : seedEntryForThread(thread);
+      if (entry === null) {
+        store.execute({ kind: 'promote', threadId, to: 'learn' });
+        return;
+      }
+      store.execute(seedLearnCommand(threadId, entry));
     },
     [store],
   );
