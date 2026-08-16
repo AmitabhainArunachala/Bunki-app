@@ -30,3 +30,5 @@ close without operator word are appended below with named rationale.
 | OD-14 | Review-session bound range: 5–100 in steps of 5, default 20 — confirm or adjust | pending | R2-A note |
 | OD-15 | Feed editorial policy: freshest-first surfaced sensitive-news adjacency (a child's death ×2 in one tranche) and informal-register sports quotes — set the editorial bar for auto-selection | pending | R2-D note |
 | OD-16 | wikinews:1483 (dropped name leaves broken grammar): cull, or repair-from-source like 1403? | pending | queue cull row |
+| OD-17 | 産巣日 names: minted 〜むすびのかみ (UniDic); the editorial anchor (神名データベース) prefers classical ムスヒ — one lexicon entry + re-mint on your word (検収前 editorial pass) | pending | R3-A note |
+| OD-18 | Full re-tokenization of the first-40 articles (fresh UniDic differs from ca07-era readings in ~12 bodies, e.g. 七 しち→なな); ripples grading signals + historical receipts | pending | R3-A note |

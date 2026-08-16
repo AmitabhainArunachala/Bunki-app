@@ -7,49 +7,49 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T10:52:04.233Z",
+  "completedAt": "2026-08-16T12:51:13.821Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "016f0fd45b565a450de387c43cb2b112c66da11f79715b40a33d4c8ade1f6e0f",
+    "index": "5d99360f7394dc8a87f751aa27fafcf8e2fa22c07830967547a4e287a6fcf950",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "59200fdebadd6bf49c0681365c90c04fc68d0f64dc982a92344a2a039c415910",
-    "corridorCss": "70224581d7a8304adad32d86914667d03d7d84cac49bad550ea8a99a8d462c6c",
-    "standalone": "49abad257256a74a9376e17a8917bbf6e172dda72c37c00230177b338ba69e11",
+    "corridorJs": "fbf7d3c6ab6d08b9205fadf316de6edf1cf4b74f14ac71d4338ecca210a512bb",
+    "corridorCss": "30ab409c6cbc489f922fe0c76b22c5ffd804007c61be732bc4de56695b064189",
+    "standalone": "b6067a1e7ac50e88d9bc938ad53b4dcb5f23d43e29bfaf2fba84806bfbc74786",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
     "articleFiles": {
-      "bunki-graded-n3-zoka-sanjin-morning": "f421f54482a87a6262cd73ca9ea795cca16f8daac76d055db8e34b64333de758",
-      "bunki-graded-n3-nakaima-diary": "01adbcf8bc9632cb3820ec6ed3ffff52e6ed9c4df6bbb619c7b653c2e79c8bc8",
-      "bunki-graded-n3-world-beginning": "617bbc644ed6aa0fea09b86d71abce227b12f2accfc5d8e68917809a6ea4a8c2",
-      "bunki-graded-n3-hidden-deity": "6bd7b5f9c505acf4ac6ba9c96b8e8ccc62a68e063e122e77f8978a194c2e6c20",
-      "bunki-graded-n3-kojiki-book": "46ebf620e9588ed679e4d6666fd8f2b00408fa531a55f04ddad7ee0989b827df",
-      "bunki-graded-n3-hashira-counter": "284a409df82e712a8479eabaf01bf0f3d8e5a81045362d713a9bf8be0257a354",
-      "bunki-graded-n3-feel-jingu-forest": "4557a7490221c1a6bd73ee7c9b61e40ffcd76242636d4e2449ecbaead97a6133",
-      "bunki-graded-n3-musubi-visual": "4c4db1025ec4ba07dcf38053a86e1827a2238e3d5c79a70866e810d1b3021275",
-      "bunki-graded-n3-gratitude-week": "4c555509751e3b5893fc240cd0ac64d25541a7e932d0be7e6447ef61cfa91fc2",
-      "bunki-graded-n3-thanks-before-help": "487a44f33add8cdd422b9f1d222c846df93d2e9cca138f61c81fe983fc05b823",
-      "bunki-essay-n2-zoka-as-one": "e06c30d63a5d5ec7e36f9ad1a635269afc99bf04e90e23eb8ccfaf6b6189dee8",
-      "bunki-essay-n2-nakaima-time": "f556875e9cc1459f98a91dacf167bd6e3765e4683bddbd54fadf89219a246cd8",
-      "bunki-essay-n2-creator-god": "c5b3db7e78d54cb93c828285e650344e150df008f4397e30b5fbddb521b299f6",
-      "bunki-essay-n2-silent-amenominakanushi": "fa2967d14027024b0037637ba60a94e342b5997dea482cb31edf1ebc53520040",
-      "bunki-essay-n2-kojiki-myth-history": "6aede0b0ec52eef61c4a1d291261f89f1775cb4a79b7223df92ff42ea8331103",
-      "bunki-essay-n2-myth-to-book": "3efadeb2e70aa6a420cf48865130d934c49178477e1ae46b551638297079313a",
-      "bunki-essay-n2-feel-jingu-musubi": "4585c0b9fb4f2d1099fe339fedb0d97489f1ae86af85b1b2bbdce74d1f4a3a15",
-      "bunki-essay-n2-prayer-on-screen": "13f430983baa15d870e6333d8c2969f95844644382667a9d0f0efbd0cf41932d",
-      "bunki-essay-n2-thanks-first": "59986505cf592db2152784592c97cab1421c99bdee7d96eddc6369ca613d68e6",
-      "bunki-essay-n2-testimony-literacy": "50d9641f8a75993e02224015b16709b41d06c524525a0d06bba16983c5b510b4",
-      "bunki-essay-n1-cosmic-analogy": "a383faf1abacba62a44696d10e41b51fd57ca9750852fb32966eafe819478b6b",
-      "bunki-essay-n1-nakaima-time-theory": "43e7f91259b20c164b9cdfeed49a86ffd3f8efeb7ba4c4d3cd54173c5f0078f1",
-      "bunki-essay-n1-first-versus-supreme": "852fc890652d6f3676bf96c3034c2bbbe2653104424bb2e2a25d49070a3717c9",
-      "bunki-essay-n1-silent-god-theology": "b6e1ad0a578d5e8a15ce691bdd0d916fdb9ac1269a47ac46c9ea3856223fc31a",
-      "bunki-essay-n1-kojiki-power": "014ffad952c1bfd5d47a4d1bae9608b8beacf9b9ee04d4de64a6acb597eb7035",
-      "bunki-essay-n1-beyond-fact-fiction": "59c9acfbe3fbf3a7092f94e5cb26d1b7a0e0f48b7bd236b97edf42cb628e4a25",
-      "bunki-essay-n1-sacred-media": "03bcbc7d3f547e3690a980186c52763096c1d19c2d2b191b2d761f75a67694c0",
-      "bunki-essay-n1-ise-time": "e776f8c19fc361ba4bed863c840ab2849bbd22b1462ce9ac267eac76a0c509de",
-      "bunki-essay-n1-miracle-testimony": "9cf270df94c78bc46fa23d9ad58c933db95a7e218ef4e230dcabef61ed141892",
-      "bunki-essay-n1-prayer-reality": "aa7f08d1168dc668f7f042cc4e1a96d112f15d980ccc99dd2fa6cc2b1f29de82"
+      "bunki-graded-n3-zoka-sanjin-morning": "2244652c09e90df04f8bbb7cc25562518bc4d1fd5e696dbdb6983df308d95534",
+      "bunki-graded-n3-nakaima-diary": "46a844df39a350467baebf0c652dfc11c6969645e2758ae64f38a9795769ed20",
+      "bunki-graded-n3-world-beginning": "4257152c997f7a06ba7aef518ebef9c17da973ef59a48602aff7c8072b78a3a8",
+      "bunki-graded-n3-hidden-deity": "352adabd7a3e35a5e5edb8664f2362f40acf15f07687bf100189e304507b8489",
+      "bunki-graded-n3-kojiki-book": "f3c9c1f695c821ffc972b143dc186c13b5fa5e5bde8eafb853895ce40ad10338",
+      "bunki-graded-n3-hashira-counter": "8ae8e8db1897bff639e53061dd97547d5a3ff9009354f93d7af1f2dd8aee3f93",
+      "bunki-graded-n3-feel-jingu-forest": "cdf934cdef1f3f6ec6bfa6a1df01c0c492dc2d46cf42d49b0e39fbf138646dd0",
+      "bunki-graded-n3-musubi-visual": "bc6bea8f30de56f1a6d95dd6f523ab84e809703603d6c536f2bab883f576e89a",
+      "bunki-graded-n3-gratitude-week": "5d13812e477c920640c9e8b903f26d630e2e6532dc6aeb31274ab2211d76490c",
+      "bunki-graded-n3-thanks-before-help": "3fd696b3548bb08c58e64a689d1240805b647efa82153ac350fbd28ed653e810",
+      "bunki-essay-n2-zoka-as-one": "e2a2a7e0b7bb9f08e3c5a5a139a619e1d23929e4524ce436f800a51690e85a71",
+      "bunki-essay-n2-nakaima-time": "20ce0e992a05a4afd9c8664d24a6dde420385c81398e4db32ebaaadd750d5f1b",
+      "bunki-essay-n2-creator-god": "8f01b0f4dd68f35791eb60c7e09003fbaed1cbc173043be5a9c3b71e1220f307",
+      "bunki-essay-n2-silent-amenominakanushi": "fa4cb2497f56f6f5fe3952a328e72358c0dc4330644ac0df15ad2c985ae8461c",
+      "bunki-essay-n2-kojiki-myth-history": "162f54e1076e5f9825988077ddce8cbdf130b8a054c06eb13dfe2f38ff79f3bf",
+      "bunki-essay-n2-myth-to-book": "564cf6d370dd23806f3014ee2eed91abd2ffd5b5675d9d83fab918ccb497bd94",
+      "bunki-essay-n2-feel-jingu-musubi": "59ca1301055ff8c3faa0064f6519b6297d0b9b1a14b237161fdee89e0da9d5c5",
+      "bunki-essay-n2-prayer-on-screen": "a76c2c197c6a37fdddb72e131562a31fc4b1c19de4653a80f76d6b2916c6858b",
+      "bunki-essay-n2-thanks-first": "b0a5ed6363761f8cce0db0e6fd4b4d9faf30029740282b8122a42e2f075ce269",
+      "bunki-essay-n2-testimony-literacy": "f9167f0274191cea51c97c139cd2a1311cfd0650d03cde97d83f083e530db856",
+      "bunki-essay-n1-cosmic-analogy": "487cb1d974c42ba5f18345db86f439b2ade3e94073096399bbc4414c54bed88d",
+      "bunki-essay-n1-nakaima-time-theory": "03c5bc4e3344106bf8861eb43c1fb5bd4194ef15a9c068ceca15e46dc7167d7e",
+      "bunki-essay-n1-first-versus-supreme": "3e377145a5547ea6135a4c9a3c012e224df0a53bf0968bb8b4c456f6847ece12",
+      "bunki-essay-n1-silent-god-theology": "4da0593950777fbf383c09b4e62a7a464318b5fa457a65c375d6e2ea3388b51e",
+      "bunki-essay-n1-kojiki-power": "f651f120fb98aea885f6949fb9ea33656053f305ec0719f2a0c93a9f11033744",
+      "bunki-essay-n1-beyond-fact-fiction": "7418d0cd1b10d99ef9da7290c30e97fff3e358f1cccf652ab82e0788d2d4fe53",
+      "bunki-essay-n1-sacred-media": "c4c59659ce3e6f91675e6fae0f8113026f94e3f1cb3bd6e5f660f51cbd5043d3",
+      "bunki-essay-n1-ise-time": "fd169bfa85f0d02dbaec06d8e22255067ad2b94b7df3cb5b518b4e41950eff57",
+      "bunki-essay-n1-miracle-testimony": "5e9f31406c9ee502dccbdbde94dcd87783210b6706bbc116a67645e45a3d8273",
+      "bunki-essay-n1-prayer-reality": "a9dbfe0d03447ba91727dab309dbb78f9c39bf0741f7357e70bc146d03dfb162"
     }
   },
   "visualReferenceEvidence": {
@@ -57,33 +57,33 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "58ce24c01afad852716e5819753cbf4954d5ffb9ed88b7710a7e5536efbaff4e"
+        "sha256": "bd71305a9fee14130e23d8a45a0d2b7853c1db5b6e9eb7ea03b12c5d1f4332a9"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "fa40c8623b9f732b5b8597738d4a11b86907c51e961f556555c7fa08f2fda4e8"
+        "sha256": "995646977eaf7739a61bbf7dfea6944bd6f04211c433d753f6d3f7aa0f98aacd"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "6dd8ea589a2c66fd5f600d5f1e262060b18e9fffe485b77e99843b54b94630e3"
+        "sha256": "32d3e77b39cc86978a6d9c1ce6c389773d5dc967e0e51a82f975aa4e89de67e1"
       },
       "biShelf": {
         "path": "screenshots/shelf-bilingual-titles.png",
-        "sha256": "a2bf01f08988798b5b3584295bb81d6b7e2c1885d5518d4a15ad2891533519a7"
+        "sha256": "1d4bd9f983d8083fa9dcc7ba3f0e12fa17157a85c5faf3ffe194d6ee3ce247eb"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "7594525fb3d866e2d1318df5b4722b90188e1041ea14f9a795626a8ce238b613"
+        "sha256": "8dd9cf58617d74aa109563c4a8b3bb466e22fec901b78b140f8538d4827f5294"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "33ac8c0ef29c9554e70fc3230366ecfe446846448655f628227750f046806f6b"
+        "sha256": "43e689b9e7735ce922b48b467f6a86dcdc3eba6392b31a7b0e63d7b897dc2307"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "e6dd178403a87438f665f13214ac0c37369fff79bc7243648b8d8a7604d8c6be"
+        "sha256": "91802bd298a44c3799febd697441fda02468a9952d5d5fe4f5c19bd4b062740e"
       }
     }
   },
@@ -120,21 +120,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "の",
-        "reading": "",
-        "gloss": "連体・所有"
+        "word": "朝",
+        "reading": "あさ",
+        "gloss": "morning"
       },
       "fullEntry": {
-        "headword": "の　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nの　助詞\n\n連体・所有\n\nTies two nouns: B of A, A's B, B which is A. Also nominalizes (読むのが好き) and softens questions (行くの？"
+        "headword": "朝",
+        "reading": "あさ",
+        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例 — ことばは長押しで辞書へ\n\n今回\nの\n部"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11083,
-      "returnedShelfY": 11083,
+      "shelfY": 11056,
+      "returnedShelfY": 11056,
       "newNoise": []
     },
     {
@@ -176,14 +176,14 @@
       "fullEntry": {
         "headword": "半",
         "reading": "はん",
-        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\nhalf\nsemi-\npartial\nhalf-past\nodd number\nhan (unit of land area, approx. 595.8 m^2)\n\n語義と用法"
+        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\n1\n\nnoun, used as a prefix · noun (common) (futsuumeishi)\n\nhalf\nsemi-\npartial\n2\n\nnoun, use"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11083,
-      "returnedShelfY": 11083,
+      "shelfY": 11056,
+      "returnedShelfY": 11056,
       "newNoise": []
     },
     {
@@ -231,8 +231,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11269,
-      "returnedShelfY": 11269,
+      "shelfY": 11242,
+      "returnedShelfY": 11242,
       "newNoise": []
     },
     {
@@ -280,8 +280,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11820,
-      "returnedShelfY": 11820,
+      "shelfY": 11793,
+      "returnedShelfY": 11793,
       "newNoise": []
     },
     {
@@ -329,8 +329,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11820,
-      "returnedShelfY": 11820,
+      "shelfY": 11793,
+      "returnedShelfY": 11793,
       "newNoise": []
     },
     {
@@ -378,8 +378,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12006,
-      "returnedShelfY": 12006,
+      "shelfY": 11979,
+      "returnedShelfY": 11979,
       "newNoise": []
     },
     {
@@ -427,8 +427,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12557,
-      "returnedShelfY": 12557,
+      "shelfY": 12530,
+      "returnedShelfY": 12530,
       "newNoise": []
     },
     {
@@ -476,8 +476,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12557,
-      "returnedShelfY": 12557,
+      "shelfY": 12530,
+      "returnedShelfY": 12530,
       "newNoise": []
     },
     {
@@ -525,8 +525,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12744,
-      "returnedShelfY": 12744,
+      "shelfY": 12716,
+      "returnedShelfY": 12716,
       "newNoise": []
     },
     {
@@ -574,8 +574,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13308,
-      "returnedShelfY": 13308,
+      "shelfY": 13281,
+      "returnedShelfY": 13281,
       "newNoise": []
     },
     {
@@ -623,8 +623,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15575,
-      "returnedShelfY": 15575,
+      "shelfY": 15548,
+      "returnedShelfY": 15548,
       "newNoise": []
     },
     {
@@ -672,8 +672,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15575,
-      "returnedShelfY": 15575,
+      "shelfY": 15548,
+      "returnedShelfY": 15548,
       "newNoise": []
     },
     {
@@ -715,14 +715,14 @@
       "fullEntry": {
         "headword": "世界",
         "reading": "せかい",
-        "text": "← 戻る\n覚\n✕\n世界\n\nせかい\n\nnoun\n\nthe world\nsociety\nthe universe\nsphere\ncircle\nworld\n\n語義と用法をひらいています…\n\nJLPT N4\n\nこの語の漢字\n\n世\nGeneratio"
+        "text": "← 戻る\n覚\n✕\n世界\n\nせかい\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nthe world\nsociety\nthe universe\n2\n\nnoun (common) (futsuumeishi)\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15789,
-      "returnedShelfY": 15789,
+      "shelfY": 15761,
+      "returnedShelfY": 15761,
       "newNoise": []
     },
     {
@@ -770,8 +770,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16353,
-      "returnedShelfY": 16353,
+      "shelfY": 16326,
+      "returnedShelfY": 16326,
       "newNoise": []
     },
     {
@@ -819,8 +819,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16353,
-      "returnedShelfY": 16353,
+      "shelfY": 16326,
+      "returnedShelfY": 16326,
       "newNoise": []
     },
     {
@@ -868,8 +868,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16553,
-      "returnedShelfY": 16553,
+      "shelfY": 16526,
+      "returnedShelfY": 16526,
       "newNoise": []
     },
     {
@@ -917,8 +917,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17104,
-      "returnedShelfY": 17104,
+      "shelfY": 17077,
+      "returnedShelfY": 17077,
       "newNoise": []
     },
     {
@@ -966,8 +966,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17104,
-      "returnedShelfY": 17104,
+      "shelfY": 17077,
+      "returnedShelfY": 17077,
       "newNoise": []
     },
     {
@@ -1015,8 +1015,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17318,
-      "returnedShelfY": 17318,
+      "shelfY": 17291,
+      "returnedShelfY": 17291,
       "newNoise": []
     },
     {
@@ -1064,8 +1064,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17869,
-      "returnedShelfY": 17869,
+      "shelfY": 17842,
+      "returnedShelfY": 17842,
       "newNoise": []
     },
     {
@@ -1113,8 +1113,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17869,
-      "returnedShelfY": 17869,
+      "shelfY": 17842,
+      "returnedShelfY": 17842,
       "newNoise": []
     },
     {
@@ -1162,8 +1162,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18055,
-      "returnedShelfY": 18055,
+      "shelfY": 18028,
+      "returnedShelfY": 18028,
       "newNoise": []
     },
     {
@@ -1211,8 +1211,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18620,
-      "returnedShelfY": 18620,
+      "shelfY": 18593,
+      "returnedShelfY": 18593,
       "newNoise": []
     },
     {
@@ -1260,8 +1260,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18620,
-      "returnedShelfY": 18620,
+      "shelfY": 18593,
+      "returnedShelfY": 18593,
       "newNoise": []
     },
     {
@@ -1309,8 +1309,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18820,
-      "returnedShelfY": 18820,
+      "shelfY": 18793,
+      "returnedShelfY": 18793,
       "newNoise": []
     },
     {
@@ -1358,8 +1358,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19385,
-      "returnedShelfY": 19385,
+      "shelfY": 19358,
+      "returnedShelfY": 19358,
       "newNoise": []
     },
     {
@@ -1407,8 +1407,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19385,
-      "returnedShelfY": 19385,
+      "shelfY": 19358,
+      "returnedShelfY": 19358,
       "newNoise": []
     },
     {
@@ -1443,21 +1443,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "が",
-        "reading": "",
-        "gloss": "主格"
+        "word": "水",
+        "reading": "みず",
+        "gloss": "water (esp. cool or cold)"
       },
       "fullEntry": {
-        "headword": "が　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nが　助詞\n\n主格\n\nPicks out WHICH one — the doer or the thing being described, often new information or the answer to a"
+        "headword": "水",
+        "reading": "みず",
+        "text": "← 戻る\n覚\n✕\n水\n\nみず\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nwater (esp. cool or cold)\n\n辞書内の関連項目\n\n湯\nゆ・1\n›\n2\n\nnoun (common) (fu"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19612,
-      "returnedShelfY": 19612,
+      "shelfY": 19585,
+      "returnedShelfY": 19585,
       "newNoise": []
     },
     {
@@ -1505,8 +1505,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 20163,
-      "returnedShelfY": 20163,
+      "shelfY": 20136,
+      "returnedShelfY": 20136,
       "newNoise": []
     },
     {
@@ -1554,8 +1554,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 20163,
-      "returnedShelfY": 20163,
+      "shelfY": 20136,
+      "returnedShelfY": 20136,
       "newNoise": []
     }
   ],
@@ -1595,6 +1595,30 @@
       "name": "the code-side TITLES_EN map is gone from corridor.js — titles live in data only",
       "pass": true,
       "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "no index row or curated body carries a stringified null date",
+      "pass": true,
+      "detail": "82 curated + 682 archive rows clean",
+      "articleId": null
+    },
+    {
+      "name": "野ばら (aozora:051034) records its unknown first-publication date as absence",
+      "pass": true,
+      "detail": "\"\"",
+      "articleId": null
+    },
+    {
+      "name": "every curated jlpt_lexicon coverage equals a reading-aware recompute from its own tokens",
+      "pass": true,
+      "detail": "82 cards agree",
+      "articleId": null
+    },
+    {
+      "name": "the per-card vocab ratio discriminates — ≥6 distinct values, none covering >50% of cards",
+      "pass": true,
+      "detail": "11 distinct 1-in-N values, largest share 26/82",
       "articleId": null
     },
     {

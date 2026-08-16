@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "yearageyearspast one's primeold age",
-        "senses": 5,
+        "gloss": "year",
+        "senses": 3,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 11:26",
+          "2026-08-16 12:58",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 11:31",
+          "2026-08-16 13:03",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 11:35",
+          "2026-08-16 13:07",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 11:25",
+          "2026-08-24 12:57",
           "8.30"
         ]
       ]
@@ -533,9 +533,9 @@
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -565,9 +565,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -581,9 +581,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -653,9 +653,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -669,9 +669,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -733,9 +733,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -749,17 +749,17 @@
       },
       {
         "text": "認みとめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "この",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -781,9 +781,9 @@
       },
       {
         "text": "より",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -885,9 +885,9 @@
       },
       {
         "text": "なる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -941,9 +941,9 @@
       },
       {
         "text": "つぐ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -997,9 +997,9 @@
       },
       {
         "text": "なっ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1069,17 +1069,17 @@
       },
       {
         "text": "あわせ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "はじめて",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1125,9 +1125,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1173,9 +1173,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1205,9 +1205,9 @@
       },
       {
         "text": "中心ちゅうしん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1269,9 +1269,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1325,17 +1325,17 @@
       },
       {
         "text": "マツ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "トドマツ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1365,17 +1365,17 @@
       },
       {
         "text": "ダケカンバ",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ミズナラ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1405,17 +1405,17 @@
       },
       {
         "text": "しげり",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "山頂さんちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1437,9 +1437,9 @@
       },
       {
         "text": "稜線りょうせん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1461,9 +1461,9 @@
       },
       {
         "text": "植物しょくぶつ",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1493,9 +1493,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1525,9 +1525,9 @@
       },
       {
         "text": "流氷りゅうひょう",
-        "w": 60,
+        "w": 61,
         "h": 44,
-        "hitW": 60,
+        "hitW": 61,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1573,9 +1573,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1629,9 +1629,9 @@
       },
       {
         "text": "際さいし",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1645,9 +1645,9 @@
       },
       {
         "text": "こう",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1669,9 +1669,9 @@
       },
       {
         "text": "環境かんきょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1685,33 +1685,33 @@
       },
       {
         "text": "おけ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "特色とくしょく",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "豊ゆたか",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1725,9 +1725,9 @@
       },
       {
         "text": "とりわけ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1765,9 +1765,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1837,9 +1837,9 @@
       },
       {
         "text": "高たかく",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1885,9 +1885,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1917,9 +1917,9 @@
       },
       {
         "text": "トド",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1933,9 +1933,9 @@
       },
       {
         "text": "クジラ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1973,9 +1973,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1989,17 +1989,17 @@
       },
       {
         "text": "ヒグマ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "シマフクロウ",
-        "w": 132,
+        "w": 136,
         "h": 44,
-        "hitW": 132,
+        "hitW": 136,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2013,9 +2013,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2037,9 +2037,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2053,9 +2053,9 @@
       },
       {
         "text": "から",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2173,9 +2173,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2197,9 +2197,9 @@
       },
       {
         "text": "周辺しゅうへん",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2229,9 +2229,9 @@
       },
       {
         "text": "厳きびしい",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2293,9 +2293,9 @@
       },
       {
         "text": "とも",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2309,9 +2309,9 @@
       },
       {
         "text": "立たち入いり",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2341,9 +2341,9 @@
       },
       {
         "text": "いる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2373,9 +2373,9 @@
       },
       {
         "text": "より",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2461,9 +2461,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2493,17 +2493,17 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フレー",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2517,33 +2517,33 @@
       },
       {
         "text": "フォート",
-        "w": 88,
+        "w": 90,
         "h": 44,
-        "hitW": 88,
+        "hitW": 90,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ドーム",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ワジ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ヒタン",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2589,41 +2589,41 @@
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フィヨルド",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "および",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ナールオイ・フィヨルド",
-        "w": 241,
+        "w": 246,
         "h": 44,
-        "hitW": 241,
+        "hitW": 246,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2653,9 +2653,9 @@
       },
       {
         "text": "および",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2677,17 +2677,17 @@
       },
       {
         "text": "ドンパヤーイェン",
-        "w": 176,
+        "w": 179,
         "h": 44,
-        "hitW": 176,
+        "hitW": 179,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "カオヤイ",
-        "w": 89,
+        "w": 91,
         "h": 44,
-        "hitW": 89,
+        "hitW": 91,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2709,9 +2709,9 @@
       },
       {
         "text": "コイバ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2741,9 +2741,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2781,9 +2781,9 @@
       },
       {
         "text": "また",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2869,9 +2869,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2885,9 +2885,9 @@
       },
       {
         "text": "フラワーズ",
-        "w": 110,
+        "w": 112,
         "h": 44,
-        "hitW": 110,
+        "hitW": 112,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2917,17 +2917,17 @@
       },
       {
         "text": "セント",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "キル",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3093,9 +3093,9 @@
       },
       {
         "text": "現状げんじょう",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3125,9 +3125,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3173,9 +3173,9 @@
       },
       {
         "text": "あたっ",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3205,9 +3205,9 @@
       },
       {
         "text": "求もとめる",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3349,9 +3349,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3365,17 +3365,17 @@
       },
       {
         "text": "提出ていしゅつ",
-        "w": 50,
+        "w": 51,
         "h": 44,
-        "hitW": 50,
+        "hitW": 51,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3461,9 +3461,9 @@
       },
       {
         "text": "その",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3485,9 +3485,9 @@
       },
       {
         "text": "受うけ",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3517,9 +3517,9 @@
       },
       {
         "text": "行おこない",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3613,9 +3613,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 48,
+        "w": 49,
         "h": 44,
-        "hitW": 48,
+        "hitW": 49,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3645,9 +3645,9 @@
       },
       {
         "text": "状況じょうきょう",
-        "w": 60,
+        "w": 61,
         "h": 44,
-        "hitW": 60,
+        "hitW": 61,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3757,9 +3757,9 @@
       },
       {
         "text": "受うける",
-        "w": 66,
+        "w": 67,
         "h": 44,
-        "hitW": 66,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3781,9 +3781,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3941,9 +3941,9 @@
       },
       {
         "text": "あげ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3965,9 +3965,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3997,9 +3997,9 @@
       },
       {
         "text": "取とり消けし",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4029,9 +4029,9 @@
       },
       {
         "text": "いる",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4053,25 +4053,25 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "から",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "取とり消けさ",
-        "w": 88,
+        "w": 89,
         "h": 44,
-        "hitW": 88,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4093,9 +4093,9 @@
       },
       {
         "text": "エクアドル",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4109,17 +4109,17 @@
       },
       {
         "text": "サン",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4141,9 +4141,9 @@
       },
       {
         "text": "マリ",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4157,17 +4157,17 @@
       },
       {
         "text": "トンブクトゥ",
-        "w": 132,
+        "w": 136,
         "h": 44,
-        "hitW": 132,
+        "hitW": 136,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "アルバニア",
-        "w": 111,
+        "w": 113,
         "h": 44,
-        "hitW": 111,
+        "hitW": 113,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4181,17 +4181,17 @@
       },
       {
         "text": "ブト",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "リント",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4205,9 +4205,9 @@
       },
       {
         "text": "ある",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4253,17 +4253,17 @@
       },
       {
         "text": "まで",
-        "w": 45,
+        "w": 46,
         "h": 45,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "続つづき",
-        "w": 44,
+        "w": 45,
         "h": 44,
-        "hitW": 44,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4309,9 +4309,9 @@
       },
       {
         "text": "リスト",
-        "w": 67,
+        "w": 68,
         "h": 44,
-        "hitW": 67,
+        "hitW": 68,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4365,9 +4365,9 @@
       },
       {
         "text": "する",
-        "w": 45,
+        "w": 46,
         "h": 44,
-        "hitW": 45,
+        "hitW": 46,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4389,9 +4389,9 @@
       },
       {
         "text": "← 戻るback",
-        "w": 73,
+        "w": 72,
         "h": 44,
-        "hitW": 73,
+        "hitW": 72,
         "hitH": 44,
         "id": "sheet-back"
       },
@@ -4621,9 +4621,9 @@
       },
       {
         "text": "レッスンlessons",
-        "w": 104,
+        "w": 102,
         "h": 46,
-        "hitW": 104,
+        "hitW": 102,
         "hitH": 46,
         "id": "lessons-link"
       },
@@ -4750,9 +4750,9 @@
       {
         "text": "サッカー日本代表が背番号発表",
         "w": 328,
-        "h": 254,
+        "h": 228,
         "hitW": 328,
-        "hitH": 254,
+        "hitH": 228,
         "id": "shelf-open"
       },
       {
@@ -4942,9 +4942,9 @@
       {
         "text": "野ばらThe Wild Ro",
         "w": 328,
-        "h": 234,
+        "h": 206,
         "hitW": 328,
-        "hitH": 234,
+        "hitH": 206,
         "id": "shelf-open"
       },
       {
@@ -6003,7 +6003,7 @@
       "title": "世界自然遺産に7箇所を追加 知床半島も",
       "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース",
         "2005-07-15",
@@ -6015,7 +6015,7 @@
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
       "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース",
         "2006-06-17",
@@ -6027,7 +6027,7 @@
       "title": "JRおおさか東線部分開業",
       "titleEn": "JR Osaka-Higashi Line partially opens",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース",
         "2008-03-15",
@@ -6039,7 +6039,7 @@
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
       "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース",
         "2011-04-28",
@@ -6051,7 +6051,7 @@
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "titleEn": "Wikinews closes the curtain on 21 years",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース",
         "2026-05-03",
@@ -6063,7 +6063,7 @@
       "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
       "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
       "level": "Beginner",
-      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級前半 · most words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2025-11-13",
@@ -6075,7 +6075,7 @@
       "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
       "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-04-17",
@@ -6087,7 +6087,7 @@
       "title": "南丹市で行方不明の男児の遺体が見つかる",
       "titleEn": "Body of missing boy found in Nantan, Kyoto",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-04-15",
@@ -6099,7 +6099,7 @@
       "title": "南海 フェリー事業から撤退へ",
       "titleEn": "Nankai to withdraw from its ferry business",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-03-31",
@@ -6111,7 +6111,7 @@
       "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
       "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-03-05",
@@ -6123,7 +6123,7 @@
       "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
       "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-02-19",
@@ -6135,7 +6135,7 @@
       "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
       "titleEn": "AiScReam: Ruby graduates and two new members join",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-02-17",
@@ -6147,7 +6147,7 @@
       "title": "第2次高市内閣が始動",
       "titleEn": "The second Takaichi cabinet takes office",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-02-18",
@@ -6159,7 +6159,7 @@
       "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
       "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2025-11-14",
@@ -6171,7 +6171,7 @@
       "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
       "titleEn": "Kyoto police search the home of the missing boy",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-04-15",
@@ -6183,7 +6183,7 @@
       "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
       "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
       "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2026-02-14",
@@ -6195,7 +6195,7 @@
       "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
       "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "ウィキニュース · 検収前",
         "2024-08-25",
@@ -6207,10 +6207,9 @@
       "title": "野ばら",
       "titleEn": "The Wild Rose — Ogawa Mimei",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "青空文庫 · 小川未明",
-        "None",
         "PD (著作権フラグ なし) · 新字新仮名"
       ],
       "disagreement": null
@@ -6219,7 +6218,7 @@
       "title": "ごん狐",
       "titleEn": "Gon the Fox — Niimi Nankichi",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "青空文庫 · 新美南吉",
         "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
@@ -6231,7 +6230,7 @@
       "title": "やまなし",
       "titleEn": "Yamanashi — Miyazawa Kenji",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "青空文庫 · 宮沢賢治",
         "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
@@ -6243,7 +6242,7 @@
       "title": "育児休業",
       "titleEn": "Childcare leave",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6255,7 +6254,7 @@
       "title": "育児休業給付金",
       "titleEn": "Childcare-leave benefit",
       "level": "Beginner",
-      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6267,7 +6266,7 @@
       "title": "遺族基礎年金",
       "titleEn": "Basic survivor's pension",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6279,7 +6278,7 @@
       "title": "遺族厚生年金",
       "titleEn": "Employees' survivor's pension",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6291,7 +6290,7 @@
       "title": "医療保険",
       "titleEn": "Medical insurance",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6303,7 +6302,7 @@
       "title": "印鑑登録証明書",
       "titleEn": "Seal-registration certificate",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6315,7 +6314,7 @@
       "title": "印鑑登録証",
       "titleEn": "Seal-registration card",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6327,7 +6326,7 @@
       "title": "オーバーステイ",
       "titleEn": "Overstaying a visa",
       "level": "Beginner",
-      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "初級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6351,7 +6350,7 @@
       "title": "介護",
       "titleEn": "Long-term care",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 19 words beyond JLPT vocab",
       "meta": [
         "やさしい日本語 用語集",
         "ISA やさしい日本語 glossary",
@@ -6363,7 +6362,7 @@
       "title": "静かな朝",
       "titleEn": "A Quiet Morning",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6374,7 +6373,7 @@
       "title": "雨の日の古本屋",
       "titleEn": "The Second-hand Bookshop on a Rainy Day",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 4 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 7 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6385,7 +6384,7 @@
       "title": "知らない町を歩く",
       "titleEn": "Walking an Unknown Town",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6396,7 +6395,7 @@
       "title": "駅で待つ時間",
       "titleEn": "Waiting at the Station",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 7 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6407,7 +6406,7 @@
       "title": "台所の音",
       "titleEn": "Sounds from the Kitchen",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 8 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6418,7 +6417,7 @@
       "title": "となりの部屋の人",
       "titleEn": "The Man in the Next Room",
       "level": "Upper beginner",
-      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "初級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6429,7 +6428,7 @@
       "title": "引き出しの中の手紙",
       "titleEn": "A Letter in the Drawer",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6440,7 +6439,7 @@
       "title": "朝の市場",
       "titleEn": "The Morning Market",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 9 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6451,7 +6450,7 @@
       "title": "自転車をなくした日",
       "titleEn": "The Day I Lost My Bicycle",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 8 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6462,7 +6461,7 @@
       "title": "川沿いの道",
       "titleEn": "The Road Along the River",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 8 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6473,7 +6472,7 @@
       "title": "深夜のラジオ",
       "titleEn": "Late-night Radio",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki",
         "Bunki original"
@@ -6484,7 +6483,7 @@
       "title": "造化三神に出会う朝",
       "titleEn": "A Morning Meeting the Three Deities of Creation",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6495,7 +6494,7 @@
       "title": "「中今」を感じる一日",
       "titleEn": "A Day of Feeling the 'Middle Now'",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6506,7 +6505,7 @@
       "title": "世界のはじまりに現れた三柱",
       "titleEn": "The Three Pillars at the World's Beginning",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6517,7 +6516,7 @@
       "title": "姿を隠した神さま",
       "titleEn": "The Gods Who Hid Away",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6528,7 +6527,7 @@
       "title": "『古事記』はどんな本？",
       "titleEn": "What Kind of Book Is the Kojiki?",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6539,7 +6538,7 @@
       "title": "神さまを「一柱」と数えるわけ",
       "titleEn": "Why Gods Are Counted in 'Pillars'",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6550,7 +6549,7 @@
       "title": "伊勢神宮の森を映像で歩く",
       "titleEn": "Walking the Ise Jingū Forest on Film",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6561,7 +6560,7 @@
       "title": "天・地・祈りをつなぐ「むすひ」",
       "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6572,7 +6571,7 @@
       "title": "一週間、感謝の言葉を唱えてみた",
       "titleEn": "A Week of Reciting Words of Gratitude",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6583,7 +6582,7 @@
       "title": "「助けて」より先に「ありがとう」？",
       "titleEn": "'Thank You' Before 'Help Me'?",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "段階別読み物 · Bunki · 検収前",
         "Bunki original"
@@ -6594,7 +6593,7 @@
       "title": "山を歩きながら考えたこと",
       "titleEn": "Thoughts While Walking a Mountain",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6605,7 +6604,7 @@
       "title": "AI時代の知識と判断",
       "titleEn": "Knowledge and Judgment in the Age of AI",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6616,7 +6615,7 @@
       "title": "手で書くということ",
       "titleEn": "On Writing by Hand",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6627,7 +6626,7 @@
       "title": "余白のためのノート",
       "titleEn": "A Notebook Kept for Its Margins",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6638,7 +6637,7 @@
       "title": "雨の日の速度",
       "titleEn": "The Speed of a Rainy Day",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 7 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6649,7 +6648,7 @@
       "title": "訳せない言葉について",
       "titleEn": "On Words That Resist Translation",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6660,7 +6659,7 @@
       "title": "忘却を前提とした設計",
       "titleEn": "Designing for Forgetting",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6671,7 +6670,7 @@
       "title": "都市の匿名性と言語",
       "titleEn": "Anonymity in the City, and Language",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki",
         "Bunki original"
@@ -6682,7 +6681,7 @@
       "title": "三柱の神を一つの働きとして読む",
       "titleEn": "Reading the Three Deities as a Single Working",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6693,7 +6692,7 @@
       "title": "過去・現在・未来と「中今」",
       "titleEn": "Past, Present, Future — and the 'Middle Now'",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 7 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6704,7 +6703,7 @@
       "title": "「創造神」という言葉はどこまで正しいか",
       "titleEn": "How Far Is 'Creator God' the Right Word?",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6715,7 +6714,7 @@
       "title": "天之御中主神――語られない神をどう読むか",
       "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6726,7 +6725,7 @@
       "title": "『古事記』は神話か、歴史か",
       "titleEn": "The Kojiki: Myth or History?",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6737,7 +6736,7 @@
       "title": "語りから書物へ――神話を編む",
       "titleEn": "From Telling to Text: Compiling a Myth",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6748,7 +6747,7 @@
       "title": "映像が伝える「むすひ」",
       "titleEn": "Musubi as the Camera Tells It",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6759,7 +6758,7 @@
       "title": "映像の中で祈りはどう見えるか",
       "titleEn": "How Prayer Looks on Screen",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6770,7 +6769,7 @@
       "title": "「ありがとうございます」を先に言う心理",
       "titleEn": "The Psychology of Saying Thank You First",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6781,7 +6780,7 @@
       "title": "体験談をどう受け取るか",
       "titleEn": "How to Receive a Personal Testimony",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6792,7 +6791,7 @@
       "title": "造化三神を宇宙論として読む誘惑",
       "titleEn": "The Temptation to Read the Creation Deities as Cosmology",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6803,7 +6802,7 @@
       "title": "「中今」は時間論になり得るか",
       "titleEn": "Can the 'Middle Now' Become a Theory of Time?",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6814,7 +6813,7 @@
       "title": "原初神を「最高神」と呼ぶときの問題",
       "titleEn": "The Problem with Calling a Primordial God 'Supreme'",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6825,7 +6824,7 @@
       "title": "沈黙する神と不在の神学",
       "titleEn": "The Silent God and a Theology of Absence",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6836,7 +6835,7 @@
       "title": "『古事記』編纂と権力の物語",
       "titleEn": "Compiling the Kojiki: A Story of Power",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6847,7 +6846,7 @@
       "title": "神話を「事実か虚構か」で裁かないために",
       "titleEn": "Against Judging Myth as Fact or Fiction",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6858,7 +6857,7 @@
       "title": "「感じる」映像は神聖さをどう構成するか",
       "titleEn": "How 'Feeling' Footage Constructs the Sacred",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6869,7 +6868,7 @@
       "title": "産霊・自然・反復――伊勢の時間",
       "titleEn": "Musubi, Nature, Repetition: Time at Ise",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6880,7 +6879,7 @@
       "title": "奇跡の体験談と認識の責任",
       "titleEn": "Miracle Testimonies and the Responsibility of Knowing",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6891,7 +6890,7 @@
       "title": "祈りの言葉は誰の現実を変えるのか",
       "titleEn": "Whose Reality Do Words of Prayer Change?",
       "level": "Upper intermediate",
-      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
         "随筆 · Bunki · 検収前",
         "Bunki original"
@@ -6902,7 +6901,7 @@
       "title": "五箇条の御誓文",
       "titleEn": "The Charter Oath (1868)",
       "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "上級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "一次資料 · Historical primary source",
         "PD + Bunki原作の解説"
@@ -6913,7 +6912,7 @@
       "title": "方丈記 · 冒頭",
       "titleEn": "Hōjōki — the opening",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
         "古典 · 鴨長明 · 1212",
         "PD + Bunki原作の解説"
@@ -6924,7 +6923,7 @@
       "title": "徒然草 · 序段",
       "titleEn": "Tsurezuregusa — the opening passage",
       "level": "Intermediate",
-      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "levelNote": "中級前半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
         "古典 · 吉田兼好 · 14th century",
         "PD + Bunki原作の解説"
@@ -6995,169 +6994,169 @@
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
       "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
       "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "JRおおさか東線部分開業",
       "titleEn": "JR Osaka-Higashi Line partially opens",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
       "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
       "titleEn": "Wikinews closes the curtain on 21 years",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
       "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
-      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Beginner初級前半 · most words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
       "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "南丹市で行方不明の男児の遺体が見つかる",
       "titleEn": "Body of missing boy found in Nantan, Kyoto",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "南海 フェリー事業から撤退へ",
       "titleEn": "Nankai to withdraw from its ferry business",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
       "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
-      "level": "Upper advanced上級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
       "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
       "titleEn": "AiScReam: Ruby graduates and two new members join",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "第2次高市内閣が始動",
       "titleEn": "The second Takaichi cabinet takes office",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
       "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
       "titleEn": "Kyoto police search the home of the missing boy",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
       "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
-      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper advanced上級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
       "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "野ばら",
       "titleEn": "The Wild Rose — Ogawa Mimei",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "ごん狐",
       "titleEn": "Gon the Fox — Niimi Nankichi",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "やまなし",
       "titleEn": "Yamanashi — Miyazawa Kenji",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "育児休業",
       "titleEn": "Childcare leave",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "育児休業給付金",
       "titleEn": "Childcare-leave benefit",
-      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Beginner初級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "遺族基礎年金",
       "titleEn": "Basic survivor's pension",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "遺族厚生年金",
       "titleEn": "Employees' survivor's pension",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "医療保険",
       "titleEn": "Medical insurance",
-      "level": "Advanced上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "印鑑登録証明書",
       "titleEn": "Seal-registration certificate",
-      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "印鑑登録証",
       "titleEn": "Seal-registration card",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "オーバーステイ",
       "titleEn": "Overstaying a visa",
-      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Beginner初級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
@@ -7169,319 +7168,319 @@
     {
       "title": "介護",
       "titleEn": "Long-term care",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 19 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "静かな朝",
       "titleEn": "A Quiet Morning",
-      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "雨の日の古本屋",
       "titleEn": "The Second-hand Bookshop on a Rainy Day",
-      "level": "Intermediate中級前半 · ~1 in 4 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 7 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "知らない町を歩く",
       "titleEn": "Walking an Unknown Town",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "駅で待つ時間",
       "titleEn": "Waiting at the Station",
-      "level": "Upper beginner初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 7 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "台所の音",
       "titleEn": "Sounds from the Kitchen",
-      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 8 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "となりの部屋の人",
       "titleEn": "The Man in the Next Room",
-      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper beginner初級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "引き出しの中の手紙",
       "titleEn": "A Letter in the Drawer",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "朝の市場",
       "titleEn": "The Morning Market",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 9 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "自転車をなくした日",
       "titleEn": "The Day I Lost My Bicycle",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 8 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "川沿いの道",
       "titleEn": "The Road Along the River",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 8 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "深夜のラジオ",
       "titleEn": "Late-night Radio",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "造化三神に出会う朝",
       "titleEn": "A Morning Meeting the Three Deities of Creation",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「中今」を感じる一日",
       "titleEn": "A Day of Feeling the 'Middle Now'",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "世界のはじまりに現れた三柱",
       "titleEn": "The Three Pillars at the World's Beginning",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "姿を隠した神さま",
       "titleEn": "The Gods Who Hid Away",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "『古事記』はどんな本？",
       "titleEn": "What Kind of Book Is the Kojiki?",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "神さまを「一柱」と数えるわけ",
       "titleEn": "Why Gods Are Counted in 'Pillars'",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "伊勢神宮の森を映像で歩く",
       "titleEn": "Walking the Ise Jingū Forest on Film",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "天・地・祈りをつなぐ「むすひ」",
       "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "一週間、感謝の言葉を唱えてみた",
       "titleEn": "A Week of Reciting Words of Gratitude",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「助けて」より先に「ありがとう」？",
       "titleEn": "'Thank You' Before 'Help Me'?",
-      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "山を歩きながら考えたこと",
       "titleEn": "Thoughts While Walking a Mountain",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "AI時代の知識と判断",
       "titleEn": "Knowledge and Judgment in the Age of AI",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "手で書くということ",
       "titleEn": "On Writing by Hand",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "余白のためのノート",
       "titleEn": "A Notebook Kept for Its Margins",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "雨の日の速度",
       "titleEn": "The Speed of a Rainy Day",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 7 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "訳せない言葉について",
       "titleEn": "On Words That Resist Translation",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "忘却を前提とした設計",
       "titleEn": "Designing for Forgetting",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "都市の匿名性と言語",
       "titleEn": "Anonymity in the City, and Language",
-      "level": "Advanced上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "三柱の神を一つの働きとして読む",
       "titleEn": "Reading the Three Deities as a Single Working",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "過去・現在・未来と「中今」",
       "titleEn": "Past, Present, Future — and the 'Middle Now'",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 7 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「創造神」という言葉はどこまで正しいか",
       "titleEn": "How Far Is 'Creator God' the Right Word?",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "天之御中主神――語られない神をどう読むか",
       "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "『古事記』は神話か、歴史か",
       "titleEn": "The Kojiki: Myth or History?",
-      "level": "Advanced上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "語りから書物へ――神話を編む",
       "titleEn": "From Telling to Text: Compiling a Myth",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "映像が伝える「むすひ」",
       "titleEn": "Musubi as the Camera Tells It",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "映像の中で祈りはどう見えるか",
       "titleEn": "How Prayer Looks on Screen",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「ありがとうございます」を先に言う心理",
       "titleEn": "The Psychology of Saying Thank You First",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "体験談をどう受け取るか",
       "titleEn": "How to Receive a Personal Testimony",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "造化三神を宇宙論として読む誘惑",
       "titleEn": "The Temptation to Read the Creation Deities as Cosmology",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「中今」は時間論になり得るか",
       "titleEn": "Can the 'Middle Now' Become a Theory of Time?",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "原初神を「最高神」と呼ぶときの問題",
       "titleEn": "The Problem with Calling a Primordial God 'Supreme'",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "沈黙する神と不在の神学",
       "titleEn": "The Silent God and a Theology of Absence",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "『古事記』編纂と権力の物語",
       "titleEn": "Compiling the Kojiki: A Story of Power",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "神話を「事実か虚構か」で裁かないために",
       "titleEn": "Against Judging Myth as Fact or Fiction",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "「感じる」映像は神聖さをどう構成するか",
       "titleEn": "How 'Feeling' Footage Constructs the Sacred",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "産霊・自然・反復――伊勢の時間",
       "titleEn": "Musubi, Nature, Repetition: Time at Ise",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 5 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "奇跡の体験談と認識の責任",
       "titleEn": "Miracle Testimonies and the Responsibility of Knowing",
-      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "祈りの言葉は誰の現実を変えるのか",
       "titleEn": "Whose Reality Do Words of Prayer Change?",
-      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "level": "Upper intermediate中級後半 · ~1 in 6 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "五箇条の御誓文",
       "titleEn": "The Charter Oath (1868)",
-      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "方丈記 · 冒頭",
       "titleEn": "Hōjōki — the opening",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
       "title": "徒然草 · 序段",
       "titleEn": "Tsurezuregusa — the opening passage",
-      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond JLPT vocab",
       "disagreement": null
     }
   ],
@@ -7494,9 +7493,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 456,
+  "loadMs": 373,
   "summary": {
-    "total": 169,
+    "total": 190,
     "failed": 0
   },
   "results": [
@@ -7523,7 +7522,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.75999450683594,\"y\":570.4099731445312,\"productive\":true}"
+      "detail": "{\"x\":147.7100067138672,\"y\":570.489990234375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7533,7 +7532,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 88px; mean tether 163 → 163px"
+      "detail": "centre moved 89px; mean tether 118 → 133px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7543,12 +7542,12 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 456 ms"
+      "detail": "82 texts, ready in 373 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "82 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
+      "detail": "82 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab"
     },
     {
       "name": "the shelf gathers into quiet sections — each category one run, no card outside one",
@@ -7743,7 +7742,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 5 senses"
+      "detail": "年: 3 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -8023,7 +8022,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786879599446,\"probe\",\"word:醤油\",1,1]"
+      "detail": "row [1786885127491,\"probe\",\"word:石鹸\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8048,7 +8047,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786879603231,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786885131126,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8059,6 +8058,11 @@
       "name": "an archive article reads like any shelf text — tokens, level, source link",
       "pass": true,
       "detail": "888 tokens · \"ja.wikinews contributors, CC BY 2.5\""
+    },
+    {
+      "name": "the archive read's crumb names its true origin — the archive, not the bare shelf",
+      "pass": true,
+      "detail": "crumb \"bookshelf › archive › 第88回全国高等学校野球選手権大会 出場校/特集\""
     },
     {
       "name": "back returns to the stack, not the shelf",
@@ -8138,7 +8142,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
+      "detail": "“石鹸” · 2 sentence lines · 3 live tokens"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8258,12 +8262,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T11:27:26.022Z; due 2026-08-26T11:27:26.022Z"
+      "detail": "anchor held at 2026-08-19T12:59:32.580Z; due 2026-08-26T12:59:32.580Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786879647128 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786885173508 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8341,9 +8345,109 @@
       "detail": "clean"
     },
     {
+      "name": "R3-E · a stone tap recolours in place — tokens move, the room DOM stands",
+      "pass": true,
+      "detail": "{\"theme\":\"sumi\",\"kept\":\"kept\",\"seal\":\"墨\",\"stored\":\"sumi\"}"
+    },
+    {
+      "name": "R3-E · the way home is the same gesture — 藍 restored, still no rebuild",
+      "pass": true,
+      "detail": "{\"theme\":\"\",\"kept\":\"kept\",\"seal\":\"藍\"}"
+    },
+    {
+      "name": "R3-E · the dojo entered from the galaxy wears a galaxy crumb",
+      "pass": true,
+      "detail": "crumb \"galaxy › focus\""
+    },
+    {
+      "name": "R3-E · and its back door opens the room the crumb names — the galaxy",
+      "pass": true,
+      "detail": "{\"view\":\"drift\",\"layerActive\":true}"
+    },
+    {
+      "name": "R3-E · back from a lesson run restores the learner's place in the list",
+      "pass": true,
+      "detail": "list at 493 → run at 0 → back at 493"
+    },
+    {
       "name": "the tray never contradicts itself — a closed review door names its when",
       "pass": true,
       "detail": "{\"disabled\":true,\"label\":\"復習する — いまは予定なしnothing due right now\",\"forecast\":\"later today 3 · tomorrow 0 · this week 0 · new 0\",\"todayN\":3}"
+    },
+    {
+      "name": "R3-B · device Back from a word sheet walks to the reader, place intact",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"reader\",\"sheet\":false,\"y\":498} (kept 498)"
+    },
+    {
+      "name": "R3-B · a kanji word stands in the field to dive into",
+      "pass": true,
+      "detail": "ふれる触れるto touch, to feel"
+    },
+    {
+      "name": "R3-B · the tap ladder carries into the dive",
+      "pass": true,
+      "detail": "drift-dived after ladder taps"
+    },
+    {
+      "name": "R3-B · device Back from a dive surfaces one level, never leaves the water",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"drift\",\"dived\":false,\"layerActive\":true}"
+    },
+    {
+      "name": "R3-B · Back from an archive article lands on the year list where it was left",
+      "pass": true,
+      "detail": "view=archive y=800 (kept 800)"
+    },
+    {
+      "name": "R3-B · Back from the archive returns to the shelf at its door",
+      "pass": true,
+      "detail": "view=shelf y=25383 (kept 25383)"
+    },
+    {
+      "name": "R3-B · the nav-search session survives the round trip — query, results, focus",
+      "pass": true,
+      "detail": "{\"sameDocument\":true,\"view\":\"drift\",\"sheet\":false,\"q\":\"水\",\"rows\":8,\"focusInSearch\":true} (rows before: 8)"
+    },
+    {
+      "name": "R3-B · the walks leave no console errors",
+      "pass": true,
+      "detail": "clean"
+    },
+    {
+      "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
+      "pass": true,
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T13:00:13.205Z"
+    },
+    {
+      "name": "R3-D · the entry footer says the truth about the weights in force",
+      "pass": true,
+      "detail": "\"if you reviewed this now — FSRS-6 · tuned from your record\""
+    },
+    {
+      "name": "R3-D · a malformed parameter file is refused at the door; the record stands",
+      "pass": true,
+      "detail": "note \"Those parameters could not be read — use a tools/fsrs-optimize.mjs output, unchanged.\" · stored w length 21"
+    },
+    {
+      "name": "R3-D · the graded schedule is the CUSTOM prediction to 8 dp, not the default",
+      "pass": true,
+      "detail": "stored s=24.52184027 ivl=25d · custom s=24.52184027 ivl=25d · default s=24.4728247 ivl=24d"
+    },
+    {
+      "name": "R3-D · an out-of-bounds stored set is ignored — defaults rule, bytes kept, one quiet note",
+      "pass": true,
+      "detail": "{\"custom\":false,\"w20\":0.1542,\"kept\":5,\"notes\":[[\"params\",\"fsrs\",\"bounds\"]]}"
+    },
+    {
+      "name": "R3-D · a thousand boots write one note, not a thousand",
+      "pass": true,
+      "detail": "params notes after a second boot: 1"
+    },
+    {
+      "name": "R3-D · the probes leave no console errors",
+      "pass": true,
+      "detail": "clean"
     }
   ]
 }

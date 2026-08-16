@@ -139,7 +139,47 @@ razed; archive scroll context; keyboard Tab on invisible button; full-render()
 
 Decision sheet grew: OD-11..OD-16 (see DECISION_SHEET.md).
 
-### Round 3 — QUEUE
+### Round 3 — CLOSED (workflow wf_c930a16c-262: 10 agents, 5/5 builds CONFIRMED)
+
+- **R3-A** `d54c37c` — furigana truth: reading-override lexicon (31 entries,
+  provenance header) applied AT TOKENIZATION TIME; the scan found the P1 far
+  worse than the hunt (theonyms shredded, 最高神/唯一神 read wrong, classical
+  都=みやこ wrong in 野ばら AND 方丈記); 303 readings re-minted across 25
+  bodies deterministically (`--remint-readings`, idempotent, refuses ambient
+  drift); checker `check_suspect_readings.py` (0 open rows committed);
+  native-readings 44→50 with a DOM ruby probe; conviction-tested.
+- **R3-B** `e0018d7` — device Back walks the app: the stroke room's sentinel
+  generalized to one history discipline (sheets, dives, review, archive,
+  lessons, tray, AI rooms); nav-search state survives round-trips; archive
+  scroll restored both directions; hidden layers untabbable.
+- **R3-D** `269dfb5` — T7 closes: validated learner FSRS params
+  (fail-closed, obslog note on rejection) drive the scheduler; import door;
+  full loop demonstrated on real-shaped fixture (evidence in
+  `optimizer-roundtrip/`); honest scheduler label.
+- **R3-C** `abedb40` — T-06: declared recall (思い出した/まだ) gates the
+  reveal; まだ forces Again; declaration in obslog (validated kind); P0-4
+  transactional sweep: unchecked learner-root saveStore() callers 19→5
+  (remaining 5 are UI-preference only, documented in the ledger).
+- **R3-E** `d895a16` + `cf2f1d0` — honest signals: JLPT kana-matching fix
+  (the flatlined difficulty subtitle now varies truthfully; regrade-jlpt run
+  across all 764 bodies), date 'None' dies, true crumbs (dojo/archive origin),
+  lesson-list place kept, theme-switch light swap (no full rebuild).
+- Lander integration notes: R3-E vs R3-A data collision resolved by merging
+  the TOOL and regenerating (A's readings + E's signals coexist, marker `rs`
+  verified); callers pin now 5 (take R3-C's ledger THEN re-pin lines).
+- PR70 backlog: ALL items now landed or ADR-004-disposed. T2's parity work is
+  complete pending operator ratification (OD-9).
+- Battery: `battery-round3/SUMMARY.md`.
+
+### Round 4 — READY (final build round; script staged)
+
+R4-A apps/app lineage unification (P1-18) + durable uncertainty/kanji capture
+(P2-18). R4-B lesson disposition (PR70-P0-1: completion stops auto-enrolling;
+explicit choice) + dojo refill honesty (POL-12) + quiz survives reload
+(POL-13). R4-C obslog reader (P2-19: 出会い exposure trail on entry sheets) +
+rest/wake 44px (POL-9). R4-D mock-tests proposal doc (DIR-9 → decision sheet).
+Then Wave C (T3 demo + rubric re-score) and Wave E (E1 battery+screenshots,
+E2 truth pass + manifest v2, E3 double-dry HUNT ×8 lenses ×2).
 
 1. **Furigana truth** (from hunt P1): reading-override lexicon in the mint
    pipeline for name compounds; re-mint affected token readings; deity-name

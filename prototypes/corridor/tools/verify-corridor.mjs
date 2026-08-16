@@ -2845,9 +2845,10 @@ async function main() {
   );
   await page.waitForSelector('#review-start');
   await tap(page, '#review-start');
-  await page.waitForSelector('#reveal');
-  await page.evaluate(`document.querySelector('#reveal')?.click()`);
-  await page.waitForSelector('.grade.g-good');
+  // R3-C landed the declared-recall gate: the reveal rides 思い出した now
+  await page.waitForSelector('#declare-recalled');
+  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+  await page.waitForSelector('.grade-row[data-declared="recalled"] .grade.g-good');
   await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
   await page.waitForTimeout(400);
   const gradedR3D = await page.evaluate(`(() => {
@@ -2882,7 +2883,11 @@ async function main() {
       Math.abs(customR3D.stability - defaultR3D.stability) > 1e-6,
     `stored s=${gradedR3D.rec.stability} ivl=${gradedR3D.rec.scheduled_days}d · custom s=${customR3D.stability} ivl=${customR3D.scheduled_days}d · default s=${defaultR3D.stability} ivl=${defaultR3D.scheduled_days}d`);
   // an out-of-bounds STORED set is ignored fail-closed: the pinned defaults
-  // rule, the bytes are kept verbatim, and one quiet obslog note says why
+  // rule, the bytes are kept verbatim, and one quiet obslog note says why.
+  // Let the debounced obslog writer (R3-C's reveal declaration rides it)
+  // flush first — a direct localStorage seed must not race the pagehide
+  // flush, which rewrites the envelope from live memory.
+  await page.waitForTimeout(1500);
   await page.evaluate(`(() => {
     const key = 'kairo-corridor-v1';
     const e = JSON.parse(localStorage.getItem(key));
