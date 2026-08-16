@@ -4969,13 +4969,24 @@ body.zen .review-example {
   letter-spacing: 0.04em;
   color: var(--faint);
 }
+/* The chosen lens used one fixed near-white on each world's red, which fell
+ * to 2.85:1 where the red is deep (E3 round-A, a11y lens). A world's own
+ * ink/ground pair is its strongest by construction — the seal keeps the red
+ * as its edge, so the chosen lens still reads as the red one. */
+.view-title-en {
+  margin: -2px 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
 .kdx-lens.on {
-  background: var(--red);
+  background: var(--ink);
   border-color: var(--red);
 }
 .kdx-lens.on .l-ja,
 .kdx-lens.on .en-sub {
-  color: #fcfbf6;
+  color: var(--ground);
 }
 .kdx-chosen {
   display: flex;

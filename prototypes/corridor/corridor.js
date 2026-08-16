@@ -3736,7 +3736,12 @@ function renderReader(main) {
     return renderShelf(main);
   }
   main.append(el('p', 'eyebrow', p.sourceLabel));
+  // the reader was the one view in bi mode that dropped the English title —
+  // the handle the learner chose the text by (E3 round-A, reader lens). It
+  // rides BESIDE the heading, the way the shelf card carries it, so the
+  // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
+  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
@@ -4217,8 +4222,21 @@ function renderTray(main) {
       qb.addEventListener('click', async () => {
         qb.disabled = true;
         note.textContent = tx('先生が問題を書いている…', 'the tutor is writing questions…');
+        const askedFrom = S.view;
         try {
           await aiQuizStart();
+          // a reply can arrive ten seconds later, by which time the learner
+          // may be deep in an article: the quiz waits for them where they
+          // asked for it rather than seizing the room they walked to
+          // (E3 round-A, AI lens)
+          if (S.view !== askedFrom) {
+            note.textContent = tx(
+              '小テストの用意ができた。もう一度どうぞ。',
+              'the quiz is ready — press again when you are',
+            );
+            qb.disabled = false;
+            return;
+          }
           S.view = 'aiquiz';
           render();
           window.scrollTo(0, 0);
@@ -5258,6 +5276,10 @@ function renderKanjidex(main) {
   const lensRow = el('div', 'kdx-lenses');
   for (const [id, ja, en] of LENSES) {
     const b = el('button', S.kdx.mode === id ? 'kdx-lens on' : 'kdx-lens');
+    // the selected lens said so only in a class and a colour — and that
+    // colour fell to 2.85:1 in the dark worlds (E3 round-A, a11y lens).
+    // The state is spoken now; the CSS carries the contrast.
+    b.setAttribute('aria-pressed', String(S.kdx.mode === id));
     b.type = 'button';
     b.append(el('span', 'l-ja', ja));
     if (bi()) b.append(el('span', 'en-sub', en));

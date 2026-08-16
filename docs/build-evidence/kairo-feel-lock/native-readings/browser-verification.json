@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T17:16:27.641Z",
+  "completedAt": "2026-08-16T18:05:48.257Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
     "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "35a67f287dbea0966aa291a887e279f639ce060347f1ba601c4840326c4539c9",
-    "corridorCss": "e547872886058539c1f06acb4d413154537600843f36adb68229888ab9add3ba",
-    "standalone": "30fee6cdc64455276c0a4735daad4e000c67efb67a77720f93080279a6e5be81",
+    "corridorJs": "0318fa5d712dc217fdf6b285e3b3c7aaf2221378e93bbf81982a57dd3bc636ad",
+    "corridorCss": "e5ce33ce70c19df8c19285ad6e59a0ba320d7babf6ba835e8e498716f6d53fcb",
+    "standalone": "0a1e1ab1c74f14b14c6828675adce24d2e6f5e7266c8b1e67782d9b32d3b0e89",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -61,7 +61,7 @@
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "995646977eaf7739a61bbf7dfea6944bd6f04211c433d753f6d3f7aa0f98aacd"
+        "sha256": "9100157f3f7eae11fe77a7e0276e4fda2611e7f387b2b2c2c7e99c07ce53fe50"
       }
     },
     "captures": {
