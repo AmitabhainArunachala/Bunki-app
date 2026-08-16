@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "67b09415717340672bfde0d6ec30d73ca06435b4",
+  "head": "bf802b23be92ea8dac98500e4d3e62b82e8eacc1",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -106,7 +106,7 @@
     {
       "name": "entry sheet is a named modal dialog and receives focus",
       "pass": true,
-      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":13}"
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":30}"
     },
     {
       "name": "Tab is contained inside the modal sheet",

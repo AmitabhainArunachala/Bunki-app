@@ -8775,7 +8775,25 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(el('span', 'example-hit', token.s));
       return;
     }
-    const span = el('span', 'tok content sentence-tok' + (isTarget ? ' example-hit' : ''));
+    // A sentence outside the reader is still a sentence: 用例, the 文 page and
+    // the review answer face all ride this ladder, and all three were
+    // pointer-only spans — no tab stop, no name, nothing a screen reader
+    // could reach, while the reader's own tokens are labelled buttons
+    // (E3 round-A, dead-ends lens; CONFIRMED on the head). Same element,
+    // same grammar.
+    const span = el(
+      'button',
+      'tok content sentence-tok' + (isTarget ? ' example-hit' : ''),
+    );
+    span.type = 'button';
+    span.setAttribute('aria-haspopup', 'dialog');
+    span.setAttribute(
+      'aria-label',
+      tx(
+        `${token.s} · 語 · もう一度で戻る、長押しで全項目`,
+        `${token.s} · word · a third activation clears; hold for the full entry`,
+      ),
+    );
     const paint = () => {
       span.textContent = '';
       span.append(
