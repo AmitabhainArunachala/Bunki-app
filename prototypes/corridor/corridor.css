@@ -2277,6 +2277,43 @@ body.v-depth-layered .inline-link {
 .sheet-take + .sheet-close {
   margin-left: 8px;
 }
+
+/* 覚える — the one capture button in the chrome's top-right (directive §3);
+ * taken-state wears the same seal red as everywhere else */
+.chrome button.chrome-take.taken {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* the capture panel the chrome seal opens: the sheet's own instruments
+ * (reversible 覚える, scope stages, list picker) anchored under the corner */
+.capture-panel {
+  position: fixed;
+  z-index: 60;
+  top: calc(56px + env(safe-area-inset-top));
+  right: 8px;
+  width: min(340px, calc(100vw - 16px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
+  padding: 12px 14px;
+  animation: rise 0.16s ease;
+}
+
+.capture-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.capture-word {
+  font-family: var(--serif);
+  font-size: 20px;
+}
 .sheet-close {
   margin-left: auto;
   font: inherit;
@@ -2309,6 +2346,29 @@ body.v-depth-layered .inline-link {
 #mini .mini-word {
   font-family: var(--serif);
   font-size: 20px;
+  padding-right: 48px;
+}
+
+/* 覚 — the capture door rides the mini (directive §3) */
+#mini .mini-take {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font: inherit;
+  font-size: 13px;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+#mini .mini-take.taken {
+  color: var(--red);
+  border-color: var(--red);
 }
 
 #mini .mini-reading {

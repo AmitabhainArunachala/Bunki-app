@@ -7,7 +7,7 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T07:51:14.131Z",
+  "completedAt": "2026-08-16T09:14:15.825Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
@@ -1583,6 +1583,12 @@
       "name": "the index review state still matches the 30 authored 検収前 records, 検収前 named in each sourceLabel",
       "pass": true,
       "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every archive row carries a non-empty titleEn with wrapper provenance",
+      "pass": true,
+      "detail": "694/694 · source renkan-ai-2026-08",
       "articleId": null
     },
     {

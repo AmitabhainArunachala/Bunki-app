@@ -474,6 +474,12 @@ const S = {
   readerPos: {},
   /** tokens whose English gloss is shown beneath (double-tap) */
   glossed: null,
+  /** the reader's current thing for the top-right capture door: the word the
+   * learner last touched in the open article — { id, index, p }. Session-only
+   * by design: the store persists what you took, never what you hovered. */
+  readerTake: null,
+  /** whether the top-right capture panel (scope stages + lists) is open */
+  captureOpen: false,
   /** which shelf cards have their raw signals expanded (詳細) */
   detailsOpen: null,
   sourcesOpen: false,
@@ -2904,7 +2910,7 @@ document.addEventListener(
   true,
 );
 
-function showMini(span, token, onEntry, { focusEntry = false } = {}) {
+function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}) {
   removeMini();
   // the mini owns the moment: any lingering token-actions pill from an
   // earlier focus would double 全項目 beside it
@@ -2918,6 +2924,34 @@ function showMini(span, token, onEntry, { focusEntry = false } = {}) {
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
   mini.append(el('span', 'mini-word', token.b));
+  // 覚 — the capture door rides the mini too (directive §3): one tap takes
+  // the word (with its sentence when held inside an article), one more tap
+  // undoes a mis-take. The seal repaints in place so the mini never blinks.
+  const miniTaken = () => S.taken.some((t) => t.t === 'word' && t.id === token.b);
+  const seal = el('button', 'mini-take', '覚');
+  seal.type = 'button';
+  seal.id = 'mini-take';
+  const paintSeal = () => {
+    const on = miniTaken();
+    seal.classList.toggle('taken', on);
+    seal.setAttribute('aria-pressed', String(on));
+    seal.setAttribute(
+      'aria-label',
+      on ? tx(`「${token.b}」の覚えるをやめる`, `stop memorizing ${token.b}`) : tx(`「${token.b}」を覚える`, `memorize ${token.b}`),
+    );
+  };
+  paintSeal();
+  seal.addEventListener('click', (event) => {
+    event.stopPropagation();
+    toggleTaken(from ? { t: 'word', id: token.b, from, ctxScope: 'sent' } : { t: 'word', id: token.b }, token.b);
+    paintSeal();
+    // the reader's under-ink and the chrome seal follow without a re-render
+    const on = miniTaken();
+    span.classList.toggle('tok-learning', on);
+    if (!on) span.classList.remove('tok-due');
+    syncReaderTakeSeal();
+  });
+  mini.append(seal);
   if (g?.r) mini.append(el('span', 'mini-reading', g.r));
   mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
   mini.append(el('span', 'mini-hint', tx('辞書の全項目へ進める', 'open the complete entry')));
@@ -3126,6 +3160,7 @@ function wireTokenGestures(span, token, index, p) {
   const obsKey = srsKey('word', token.b);
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
+    setReaderTake(token.b, index, p.id);
     // a held finger's release will synthesize one click onto the new sheet —
     // arm the swallow only then (arming on a button click would eat the
     // user's NEXT real tap instead)
@@ -3138,14 +3173,17 @@ function wireTokenGestures(span, token, index, p) {
     );
   };
   const quickLook = (modality = 'pointer', emitAction = false) => {
+    setReaderTake(token.b, index, p.id);
     obsLog('tap', obsKey, 2, p.id);
     if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-token');
     showMini(span, token, (entryModality) => openFull(entryModality, true), {
       focusEntry: modality !== 'pointer',
+      from: { passage: p.id, index },
     });
   };
   const activate = (modality) => {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
+    setReaderTake(token.b, index, p.id);
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
     const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
@@ -6001,6 +6039,13 @@ function commitCapture(node, label, now = Date.now()) {
     from: node.from || null,
     ts: now,
   };
+  // Capture that arrives from inside the reading flow carries the sentence
+  // it was met in (ctxScope rides the node): the top-right door and the mini
+  // take the word AS ENCOUNTERED. The scope stages (語だけ・この文・段落)
+  // stay one tap away to widen or shed it — same ctx record, same validator.
+  if (node.ctxScope && node.from?.passage && node.from.index != null) {
+    item.ctx = { p: node.from.passage, i: Number(node.from.index), scope: node.ctxScope };
+  }
   let deepWord = null;
   // A word taken from the deep tier writes its own compact record into the
   // learner's store: the card must answer on any device, offline, without
@@ -6054,6 +6099,71 @@ function takeButton(node, label) {
   });
   return btn;
 }
+
+/* ------------------------------------------- 覚える top-right (directive §3)
+ * One button in the top-right corner of every capture-eligible surface. The
+ * entry sheets carry their own seal in the sheet bar; the reader's lives in
+ * the chrome and takes the CURRENT THING — the word the learner last touched
+ * in the open article, with the sentence it was met in. Surfaces that show
+ * no capturable thing (the shelf, the tray, the dojo, the galaxy — they are
+ * navigation and curation, not content) honestly carry none, and 書の間
+ * keeps its total quiet: its kanji's seal waits on the sheet beneath. */
+function readerTakeCurrent() {
+  if (S.view !== 'reader' || !S.passageId) return null;
+  const cur = S.readerTake;
+  if (!cur || cur.p !== S.passageId) return null;
+  return cur;
+}
+
+/** The capture node the reader's door commits: the word as encountered —
+ * provenance and the sentence scope travel with it. */
+function readerTakeNode(cur) {
+  return { t: 'word', id: cur.id, from: { passage: cur.p, index: cur.index }, ctxScope: 'sent' };
+}
+
+function readerTakeLabel(cur, takenNow) {
+  if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
+  return takenNow
+    ? tx(`「${cur.id}」を覚えている — ひらいて調整・やめる`, `memorizing ${cur.id} — open to adjust or stop`)
+    : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
+}
+
+/** Remember the word under the learner's finger and repaint the chrome seal
+ * in place — token taps deliberately never trigger a full re-render. */
+function setReaderTake(id, index, passageId) {
+  S.readerTake = { id, index, p: passageId };
+  syncReaderTakeSeal();
+}
+
+function syncReaderTakeSeal() {
+  const btn = document.getElementById('reader-take');
+  if (!btn) return;
+  const cur = readerTakeCurrent();
+  const takenNow = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
+  btn.disabled = !cur;
+  btn.classList.toggle('taken', takenNow);
+  btn.setAttribute('aria-pressed', String(takenNow));
+  btn.setAttribute('aria-expanded', String(!!S.captureOpen));
+  btn.setAttribute('aria-label', readerTakeLabel(cur, takenNow));
+}
+
+/* a tap anywhere outside the capture panel puts it away — the mini's law.
+ * The panel node leaves on the spot (no full render, so the tap underneath
+ * still lands where it was aimed) and the seal repaints in place. */
+document.addEventListener(
+  'pointerdown',
+  (ev) => {
+    if (!S.captureOpen) return;
+    const panel = document.getElementById('capture-panel');
+    const seal = document.getElementById('reader-take');
+    if (panel && !panel.contains(ev.target) && !(seal && seal.contains(ev.target))) {
+      S.captureOpen = false;
+      panel.remove();
+      syncReaderTakeSeal();
+    }
+  },
+  true,
+);
 
 /** After 覚える: the item lands in this month's bucket automatically (the
  * operator's Renzo habit, automated) and can join any named list too. */
@@ -10425,19 +10535,32 @@ function renderSheet(root) {
     bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
   }
   // 覚 top-right on EVERY capturable sheet (operator directive §3: one
-  // button, top right corner, on every screen)
-  if (NODE_KIND[node.t]) {
-    const takenNow = S.taken.some((t) => t.t === node.t && t.id === node.id);
+  // button, top right corner, on every screen). The sentence page captures
+  // the word it is built around — the sentence itself is not a card kind,
+  // and its seal says whose it is. A catalog is a grouping, not a thing,
+  // and honestly carries none.
+  const capNode = NODE_KIND[node.t]
+    ? node
+    : node.t === 'sent' && node.target
+      ? { t: 'word', id: node.target }
+      : null;
+  if (capNode) {
+    const takenNow = S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
     const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
     capture.type = 'button';
     capture.id = 'sheet-take';
     capture.setAttribute('aria-pressed', String(takenNow));
     capture.setAttribute(
       'aria-label',
-      tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize'),
+      capNode === node
+        ? tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize')
+        : tx(
+            takenNow ? `「${capNode.id}」の覚えるをやめる` : `「${capNode.id}」を覚える`,
+            takenNow ? `stop memorizing ${capNode.id}` : `memorize ${capNode.id}`,
+          ),
     );
     capture.addEventListener('click', () => {
-      toggleTaken(node, nodeTitle(node));
+      toggleTaken(capNode, nodeTitle(capNode));
       render();
     });
     bar.append(capture);
@@ -11523,6 +11646,40 @@ function render() {
   }
   chrome.append(langSeg);
 
+  // 覚える — the one capture button, top-right of every capture-eligible
+  // surface (operator directive §3). The reader's takes the current thing:
+  // the word last touched, carrying the sentence it was met in; its panel
+  // holds the scope stages, the lists, and the way back out of a mis-tap.
+  // Entry sheets carry their own seal in the sheet bar; surfaces with no
+  // capturable current thing carry none.
+  if (S.captureOpen && (S.stack.length || !readerTakeCurrent())) S.captureOpen = false;
+  if (S.view === 'reader' && S.passageId) {
+    const cur = readerTakeCurrent();
+    const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
+    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '覚える', 'memorize');
+    capBtn.type = 'button';
+    capBtn.id = 'reader-take';
+    capBtn.disabled = !cur;
+    capBtn.setAttribute('aria-pressed', String(curTaken));
+    capBtn.setAttribute('aria-expanded', String(!!S.captureOpen));
+    capBtn.setAttribute('aria-label', readerTakeLabel(cur, curTaken));
+    capBtn.addEventListener('click', () => {
+      const now = readerTakeCurrent();
+      if (!now) return;
+      if (S.captureOpen) {
+        S.captureOpen = false;
+        render();
+        return;
+      }
+      // first touch takes the word as encountered — sentence and all; the
+      // panel that opens holds the undo, the scope stages, and the lists
+      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id)) toggleTaken(readerTakeNode(now), now.id);
+      S.captureOpen = true;
+      render();
+    });
+    chrome.append(capBtn);
+  }
+
   const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
@@ -11542,6 +11699,32 @@ function render() {
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+
+  // the capture panel — anchored under the chrome's top-right seal. It
+  // reuses the sheet's own instruments verbatim: the reversible 覚える
+  // button, the scope stages (語だけ・この文・段落), and the list picker
+  // with its inline maker — so the door and the deep flow never disagree.
+  if (S.captureOpen) {
+    const cur = readerTakeCurrent();
+    const capNode = readerTakeNode(cur);
+    const panel = el('div', 'capture-panel');
+    panel.id = 'capture-panel';
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`));
+    panel.setAttribute('data-drift-chrome', '');
+    const head = el('div', 'capture-head');
+    head.append(el('span', 'capture-word', cur.id));
+    head.append(el('span', 'pool-tag', tx(NODE_KIND.word[0], NODE_KIND.word[1])));
+    panel.append(head);
+    panel.append(takeButton(capNode, cur.id));
+    renderContextPicker(panel, capNode);
+    renderListPicker(panel, capNode, cur.id);
+    root.append(panel);
+    requestAnimationFrame(() => {
+      const bar = document.querySelector('.chrome');
+      if (bar && panel.isConnected) panel.style.top = `${Math.ceil(bar.getBoundingClientRect().bottom + 8)}px`;
+    });
+  }
 
   const main = el('main');
   root.append(main);

@@ -695,6 +695,38 @@ verified('deep-capture-action-executes-one-boundary', () => {
   assert.equal(context.S.deepWords['安堵'].r, 'あんど');
 });
 
+verified('capture-context-rides-the-guarded-boundary', () => {
+  const context = vm.createContext({
+    S: { taken: [], deepWords: {} },
+    D: { dict: { 海: { r: 'うみ', m: ['sea'] } } },
+    NODE_KIND: { word: ['語', 'word'] },
+    lookup: () => null,
+    commitStorePatch: null,
+  });
+  vm.runInContext(`${captureActionBlock};globalThis.action = commitCapture;`, context);
+  context.commitStorePatch = (patch) => {
+    Object.assign(context.S, patch);
+    return true;
+  };
+  // R2-B: the reader's top-right door and the mini pass ctxScope alongside
+  // provenance — the stored item carries the validator's exact ctx shape
+  assert.equal(
+    context.action({ t: 'word', id: '海', from: { passage: 'p', index: 4 }, ctxScope: 'sent' }, '海', 111),
+    true,
+  );
+  const storedCtx = context.S.taken[0].ctx;
+  assert.equal(storedCtx.p, 'p');
+  assert.equal(storedCtx.i, 4);
+  assert.equal(storedCtx.scope, 'sent');
+  assert.equal(Object.keys(storedCtx).length, 3);
+  assert.equal(context.S.taken[0].from.passage, 'p');
+  // without provenance there is no context to carry — no ctx is minted
+  assert.equal(context.action({ t: 'word', id: '海', ctxScope: 'sent' }, '海', 112), true);
+  assert.equal(Object.hasOwn(context.S.taken[1], 'ctx'), false);
+  // what capture writes, the fail-closed envelope must accept verbatim
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, taken: context.S.taken }), true);
+});
+
 const gradeActionBlock = between('function advanceReviewSession(', '/** Items ready to review:');
 
 function gradeContext() {
@@ -1207,6 +1239,7 @@ console.log(
         'post-setitem-ui-failure-isolation',
         'reader-finish',
         'entry-capture',
+        'entry-capture-context',
         'standard-review-grade',
         'focus-drill-grade',
         'drift-judgment-observation-bridge',

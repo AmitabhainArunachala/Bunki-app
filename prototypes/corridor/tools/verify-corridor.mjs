@@ -1746,6 +1746,238 @@ async function main() {
     `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
   await shoot(page, shotsDir, '18-review-answer-face');
 
+  // -------------- R2-B · capture sovereignty (directive §3 · terminal T7)
+  // 覚える top-right of every capture-eligible surface; capture reversible
+  // everywhere; the revlog append-only through it all; lists born, renamed
+  // and deleted on the lists surface itself.
+  console.log('\n— R2-B · 覚える top-right · reversible capture · list management');
+  // a seeded record: one memorized word with real FSRS state and one revlog
+  // row — un-memorize semantics must be provable against audit history
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    v: 1,
+    taken: [{ t: 'word', id: '学校', label: '学校', kind: '語', kindEn: 'word', from: null, ts: 1755000000000 }],
+    srs: { 'word:学校': { due: '2020-01-01T00:00:00.000Z', last_review: '2019-12-31T00:00:00.000Z', stability: 3, difficulty: 5, elapsed_days: 1, scheduled_days: 1, reps: 1, lapses: 0, learning_steps: 0, state: 2 } },
+    revlog: [[1754000000000, 'word:学校', 3, 0, null, null, null, null, 3, 5, 1, 1200]],
+  }))`);
+  await open('?entry=shelf');
+  await page.fill('#search', '学校');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result^="word:学校"]');
+  await page.waitForSelector('#sheet #sheet-take');
+  const sealBefore = await page.evaluate(`(() => {
+    const b = document.querySelector('#sheet-take');
+    return { taken: b.classList.contains('taken'), pressed: b.getAttribute('aria-pressed') };
+  })()`);
+  check('R2-B · the sheet seal wears taken-state where 覚える was taken',
+    sealBefore.taken && sealBefore.pressed === 'true', JSON.stringify(sealBefore));
+  await tap(page, '#sheet-take');
+  await page.waitForTimeout(300);
+  const afterUntake = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
+             srsKept: Object.prototype.hasOwnProperty.call(e.srs || {}, 'word:学校') };
+  })()`);
+  check('R2-B · un-memorize removes the active card; revlog and FSRS state stay whole',
+    afterUntake.taken === 0 && afterUntake.revlog === 1 && afterUntake.srsKept,
+    JSON.stringify(afterUntake));
+  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.waitForTimeout(200);
+  await tap(page, '#tray');
+  await page.waitForTimeout(200);
+  check('R2-B · the deck no longer offers the card — the tray stands honestly empty',
+    (await page.locator('.sem-empty').count()) === 1 && (await page.locator('#review-start').count()) === 0,
+    'no review door on an empty deck');
+  await tap(page, '#back');
+  await page.waitForTimeout(200);
+  await page.fill('#search', '学校');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result^="word:学校"]');
+  await page.waitForSelector('#sheet #sheet-take');
+  await tap(page, '#sheet-take');
+  await page.waitForTimeout(300);
+  const reTaken = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rec = e.srs?.['word:学校'];
+    return { taken: (e.taken || []).length, revlog: (e.revlog || []).length,
+             reps: rec?.reps ?? null, due: rec?.due ?? null };
+  })()`);
+  check('R2-B · a re-take resumes the schedule — same card state, no invented history',
+    reTaken.taken === 1 && reTaken.revlog === 1 && reTaken.reps === 1 && reTaken.due === '2020-01-01T00:00:00.000Z',
+    JSON.stringify(reTaken));
+
+  // lists are born, renamed and deleted on the lists surface itself
+  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.waitForTimeout(200);
+  await tap(page, '#tray');
+  await page.waitForSelector('#list-maker-field');
+  await page.locator('#list-maker-make').click();
+  await page.waitForTimeout(150);
+  const emptyErr = await page.evaluate(
+    `document.querySelector('#list-maker-field')?.getAttribute('aria-invalid')`,
+  );
+  await page.fill('#list-maker-field', '読書');
+  await page.locator('#list-maker-make').click();
+  await page.waitForTimeout(250);
+  await page.fill('#list-maker-field', '読書');
+  await page.locator('#list-maker-make').click();
+  await page.waitForTimeout(150);
+  const dupeState = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const f = document.querySelector('#list-maker-field');
+    return { lists: Object.keys(e.lists || {}), invalid: f?.getAttribute('aria-invalid'), hint: f?.placeholder ?? '' };
+  })()`);
+  check('R2-B · a list is born on the lists surface; empty and dupe names are told, not swallowed',
+    emptyErr === 'true' && dupeState.lists.length === 1 && dupeState.lists[0] === '読書' && dupeState.invalid === 'true' && dupeState.hint.length > 0,
+    `lists=${JSON.stringify(dupeState.lists)} · dupe hint "${dupeState.hint}"`);
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('.list-op');
+  const persisted = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { lists: Object.keys(e.lists || {}), shown: [...document.querySelectorAll('.list-head')].some((h) => h.textContent.includes('読書')) };
+  })()`);
+  check('R2-B · the new list survives a reload, on the surface and in the envelope',
+    persisted.lists.length === 1 && persisted.lists[0] === '読書' && persisted.shown,
+    JSON.stringify(persisted.lists));
+  await page.locator('.list-op').first().click();
+  await page.waitForSelector('.list-rename .list-maker-field');
+  await page.fill('.list-rename .list-maker-field', '精読');
+  await page.locator('.list-rename .list-maker-make').click();
+  await page.waitForTimeout(250);
+  const renamed = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return Object.keys(e.lists || {});
+  })()`);
+  check('R2-B · rename lives where the list lives and persists',
+    renamed.length === 1 && renamed[0] === '精読', JSON.stringify(renamed));
+  await page.locator('.list-op').nth(1).click();
+  await page.waitForTimeout(150);
+  const armed = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { still: Object.keys(e.lists || {}).length, armedBtn: !!document.querySelector('.list-op.armed') };
+  })()`);
+  await page.locator('.list-op.armed').click();
+  await page.waitForTimeout(250);
+  const deleted = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { lists: Object.keys(e.lists || {}).length, taken: (e.taken || []).length,
+             revlog: (e.revlog || []).length, srsKept: Object.prototype.hasOwnProperty.call(e.srs || {}, 'word:学校') };
+  })()`);
+  check('R2-B · delete arms first, then fires — and never touches the learner history',
+    armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
+    `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
+
+  // the reader's top-right door: quiet until a word is touched, then one
+  // tap takes the current thing with the sentence it was met in
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await settleReader(page);
+  const idleSeal = await page.evaluate(`(() => {
+    const b = document.querySelector('#reader-take');
+    return b ? { disabled: b.disabled, pressed: b.getAttribute('aria-pressed') } : null;
+  })()`);
+  check('R2-B · 覚える waits top-right of the reader, quiet until a word is touched',
+    !!idleSeal && idleSeal.disabled === true && idleSeal.pressed === 'false',
+    JSON.stringify(idleSeal));
+  await tap(page, '#reader .tok.content', 9);
+  await page.waitForTimeout(200);
+  const touched = await page.evaluate(`(() => {
+    const t = document.querySelectorAll('#reader .tok.content')[9];
+    const b = document.querySelector('#reader-take');
+    return { word: t.dataset.word, index: Number(t.dataset.index), sealReady: !b.disabled, label: b.getAttribute('aria-label') };
+  })()`);
+  check('R2-B · touching a word arms the door with that word, in place',
+    touched.sealReady && touched.label.includes(touched.word),
+    `${touched.word} — "${touched.label}"`);
+  const envBefore = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
+  })()`);
+  await tap(page, '#reader-take');
+  await page.waitForSelector('#capture-panel');
+  const captured = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const it = (e.taken || [])[(e.taken || []).length - 1];
+    return { taken: (e.taken || []).length, t: it?.t, id: it?.id, ctx: it?.ctx ?? null };
+  })()`);
+  check('R2-B · capture from the reader top-right lands in S.taken with its sentence ctx',
+    captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
+      captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
+    JSON.stringify(captured.ctx));
+  const panelBits = await page.evaluate(`(() => ({
+    take: !!document.querySelector('#capture-panel #take'),
+    scopes: document.querySelectorAll('#capture-panel [data-ctx-scope]').length,
+    lists: !!document.querySelector('#capture-panel .list-picker'),
+    newList: !!document.querySelector('#capture-panel #new-list'),
+  }))()`);
+  check('R2-B · the panel holds the undo, the scope stages, and the lists',
+    panelBits.take && panelBits.scopes === 3 && panelBits.lists && panelBits.newList,
+    JSON.stringify(panelBits));
+  await shoot(page, shotsDir, '19-capture-sovereignty');
+  await tap(page, '#capture-panel #take');
+  await page.waitForTimeout(250);
+  const undone = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
+  })()`);
+  check('R2-B · a mis-tap leaves in one gesture; the revlog length never moves',
+    undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
+    JSON.stringify(undone));
+
+  // the mini carries the same door, repainting in place — the mini never blinks
+  const miniIx = await page.evaluate(
+    `[...document.querySelectorAll('#reader .tok.content')].findIndex((t, i) => i >= 12 && t.dataset.word !== '学校')`,
+  );
+  await touchAt(page, '#reader .tok.content', miniIx, 700);
+  await page.waitForSelector('#mini #mini-take');
+  const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
+  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await page.waitForTimeout(250);
+  const miniCap = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const it = (e.taken || [])[(e.taken || []).length - 1];
+    const seal = document.querySelector('#mini-take');
+    return { id: it?.id, scope: it?.ctx?.scope ?? null, sealTaken: seal?.classList.contains('taken') ?? null, miniUp: !!document.querySelector('#mini') };
+  })()`);
+  check('R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up',
+    miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent',
+    JSON.stringify(miniCap));
+  await page.evaluate(`document.querySelector('#mini-take')?.click()`);
+  await page.waitForTimeout(250);
+  const miniUndone = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    return { taken: (e.taken || []).length, sealTaken: document.querySelector('#mini-take')?.classList.contains('taken') ?? null };
+  })()`);
+  check('R2-B · the mini lets it go again — reversible where the state shows',
+    miniUndone.taken === envBefore.taken && miniUndone.sealTaken === false,
+    JSON.stringify(miniUndone));
+
+  // the sentence page carries the seal for the word it is built around
+  await open('?entry=shelf');
+  await page.fill('#search', '半島');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result^="word:半島"]');
+  await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
+  await page.waitForTimeout(300);
+  await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
+  await page.waitForSelector('#sheet .sent-reader');
+  const sentSeal = await page.evaluate(`(() => {
+    const b = document.querySelector('#sheet-take');
+    return { present: !!b, label: b?.getAttribute('aria-label') ?? '' };
+  })()`);
+  check('R2-B · the sentence page seal names the word it captures',
+    sentSeal.present && sentSeal.label.includes('半島'), JSON.stringify(sentSeal));
+  await tap(page, '#sheet-take');
+  await page.waitForTimeout(300);
+  const sentCap = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const it = (e.taken || [])[(e.taken || []).length - 1];
+    return { t: it?.t, id: it?.id, pressed: document.querySelector('#sheet-take')?.getAttribute('aria-pressed') };
+  })()`);
+  check('R2-B · taking from the sentence page mints the word card, reversibly marked',
+    sentCap.t === 'word' && sentCap.id === '半島' && sentCap.pressed === 'true',
+    JSON.stringify(sentCap));
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,
