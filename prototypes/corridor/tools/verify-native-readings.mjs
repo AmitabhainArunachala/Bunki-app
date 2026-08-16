@@ -243,6 +243,26 @@ const reviewRows = index.articles.filter((record) => record.review);
           /検収前/.test(rows.get(id)?.sourceLabel ?? ''),
       ),
   );
+  // RENKAN fleet — the archive is bilingual too: every one of the 694 rows
+  // carries a non-empty titleEn, and the wrapper names the provenance.
+  const archive = JSON.parse(
+    readFileSync(resolve(CORRIDOR, 'data/articles/archive-index.json'), 'utf8'),
+  );
+  const archiveMissingEn = archive.articles.filter(
+    (record) => typeof record.titleEn !== 'string' || !record.titleEn.trim(),
+  );
+  check(
+    'every archive row carries a non-empty titleEn with wrapper provenance',
+    archive.articles.length === 694 &&
+      archiveMissingEn.length === 0 &&
+      TITLE_EN_SOURCES.has(archive.titleEnSource),
+    archiveMissingEn.length
+      ? archiveMissingEn
+          .slice(0, 5)
+          .map((record) => record.id)
+          .join(', ')
+      : `${archive.articles.length}/694 · source ${archive.titleEnSource}`,
+  );
   check(
     'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',
     !readFileSync(resolve(CORRIDOR, 'corridor.js'), 'utf8').includes('TITLES_EN'),
