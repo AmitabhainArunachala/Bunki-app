@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-08-15T13:17:38Z",
+  "branch": "agent/reading-r1-domain-20260815-r4",
+  "authorityHeadAtCut": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+  "authorityTree": "8a2636c7a47c1e3ba43c333921b818bed38c405a",
+  "candidateCoordinate": {
+    "expectedCommitCount": 1,
+    "expectedSoleParent": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+    "sealedCommitIdentityRecordedOutOfBand": true
+  },
+  "replaySource": {
+    "branch": "agent/reading-r1-domain-20260815-r3",
+    "head": "a0f3ab973c88e46a8827feab283605706df4eabf",
+    "tree": "530f79913e7eb949295891bd0c5b91613802b99c",
+    "base": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "codeBlobHashesMatch": true
+  },
+  "authorityDeltaAudit": {
+    "from": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "to": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+    "commits": 1,
+    "changedPaths": 17,
+    "overlapsOwnedPaths": false,
+    "result": "SAFE_REPLAY"
+  },
+  "environment": {
+    "command": "npm ci --offline --cache /workspace/scratch/be9f59b4f955/npm-cache",
+    "status": "PASS",
+    "reason": "install the exact lockfile workspace dependency graph before authoritative checks"
+  },
+  "checks": [
+    {
+      "command": "./node_modules/.bin/vitest run packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts packages/persistence/test/contract.web-provisional.test.ts packages/persistence/test/t16-web-restart.test.ts",
+      "status": "PASS",
+      "testFiles": 3,
+      "tests": 29
+    },
+    {
+      "command": "./node_modules/.bin/vitest run packages/persistence/test",
+      "status": "PASS",
+      "testFiles": 11,
+      "tests": 113
+    },
+    {
+      "command": "./node_modules/.bin/vitest run",
+      "status": "PASS",
+      "testFiles": 95,
+      "tests": 1647
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "workspaces": ["app", "ai", "domain", "export", "persistence", "seed"]
+    },
+    {
+      "command": "./node_modules/.bin/eslint packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts",
+      "status": "PASS"
+    },
+    {
+      "command": "./node_modules/.bin/prettier --check packages/persistence/src/web/adapter.ts packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts docs/build-evidence/reading-r1-domain-20260815",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ]
+}

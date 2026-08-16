@@ -66,6 +66,12 @@
     "licence": "Bunki original",
     "attribution": "Bunki original graded texts and essays (WP9b shelf expansion)",
     "url": ""
+   },
+   {
+    "name": "bunki-original-reading-catalog",
+    "licence": "Bunki original",
+    "attribution": "Bunki original text",
+    "url": ""
    }
   ]
  },
@@ -82,7 +88,7 @@
    "date": "2005-07-15",
    "rubySource": "tokenizer",
    "file": "wikinews-1403.json",
-   "chars": 1220,
+   "chars": 1237,
    "snippet": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、ノルウェーのフィヨルドと日本の知床半島（北海道）",
    "grading": {
     "signals": {
@@ -563,9 +569,9 @@
       "band_vector": {
        "n5": 0.14285714285714285,
        "n4": 0.14285714285714285,
-       "n3": 0.0,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n3": 0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.7142857142857143
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -620,8 +626,8 @@
      "jlpt_lexicon": {
       "coverage": 0.3076923076923077,
       "band_vector": {
-       "n5": 0.0,
-       "n4": 0.0,
+       "n5": 0,
+       "n4": 0,
        "n3": 0.07692307692307693,
        "n2": 0.15384615384615385,
        "n1": 0.07692307692307693,
@@ -680,10 +686,10 @@
       "coverage": 0.4666666666666667,
       "band_vector": {
        "n5": 0.26666666666666666,
-       "n4": 0.0,
+       "n4": 0,
        "n3": 0.2,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.5333333333333333
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -739,9 +745,9 @@
       "coverage": 0.4117647058823529,
       "band_vector": {
        "n5": 0.23529411764705882,
-       "n4": 0.0,
+       "n4": 0,
        "n3": 0.058823529411764705,
-       "n2": 0.0,
+       "n2": 0,
        "n1": 0.11764705882352941,
        "oov": 0.5882352941176471
       },
@@ -800,8 +806,8 @@
        "n5": 0.4,
        "n4": 0.1,
        "n3": 0.3,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.2
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -857,10 +863,10 @@
       "coverage": 0.2857142857142857,
       "band_vector": {
        "n5": 0.21428571428571427,
-       "n4": 0.0,
-       "n3": 0.0,
+       "n4": 0,
+       "n3": 0,
        "n2": 0.07142857142857142,
-       "n1": 0.0,
+       "n1": 0,
        "oov": 0.7142857142857143
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -916,7 +922,7 @@
       "coverage": 0.4285714285714286,
       "band_vector": {
        "n5": 0.14285714285714285,
-       "n4": 0.0,
+       "n4": 0,
        "n3": 0.09523809523809523,
        "n2": 0.09523809523809523,
        "n1": 0.09523809523809523,
@@ -974,11 +980,11 @@
      "jlpt_lexicon": {
       "coverage": 0.33333333333333337,
       "band_vector": {
-       "n5": 0.0,
+       "n5": 0,
        "n4": 0.16666666666666666,
        "n3": 0.16666666666666666,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.6666666666666666
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1031,14 +1037,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 1.0,
+      "coverage": 1,
       "band_vector": {
-       "n5": 1.0,
-       "n4": 0.0,
-       "n3": 0.0,
-       "n2": 0.0,
-       "n1": 0.0,
-       "oov": 0.0
+       "n5": 1,
+       "n4": 0,
+       "n3": 0,
+       "n2": 0,
+       "n1": 0,
+       "oov": 0
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 3
@@ -1089,9 +1095,9 @@
       "band_vector": {
        "n5": 0.3157894736842105,
        "n4": 0.15789473684210525,
-       "n3": 0.0,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n3": 0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.5263157894736842
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1211,7 +1217,7 @@
        "n4": 0.10638297872340426,
        "n3": 0.09574468085106383,
        "n2": 0.010638297872340425,
-       "n1": 0.0,
+       "n1": 0,
        "oov": 0.24468085106382978
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1510,7 +1516,7 @@
        "n5": 0.2222222222222222,
        "n4": 0.04938271604938271,
        "n3": 0.09876543209876543,
-       "n2": 0.0,
+       "n2": 0,
        "n1": 0.04938271604938271,
        "oov": 0.5802469135802469
       },
@@ -1630,8 +1636,8 @@
        "n5": 0.6865671641791045,
        "n4": 0.07462686567164178,
        "n3": 0.014925373134328358,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.22388059701492538
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1691,7 +1697,7 @@
        "n4": 0.08196721311475409,
        "n3": 0.03278688524590164,
        "n2": 0.01639344262295082,
-       "n1": 0.0,
+       "n1": 0,
        "oov": 0.3114754098360656
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1749,9 +1755,9 @@
       "band_vector": {
        "n5": 0.5892857142857143,
        "n4": 0.08928571428571429,
-       "n3": 0.0,
-       "n2": 0.0,
-       "n1": 0.0,
+       "n3": 0,
+       "n2": 0,
+       "n1": 0,
        "oov": 0.32142857142857145
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1811,7 +1817,7 @@
        "n4": 0.13253012048192772,
        "n3": 0.024096385542168676,
        "n2": 0.012048192771084338,
-       "n1": 0.0,
+       "n1": 0,
        "oov": 0.3855421686746988
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -1930,7 +1936,7 @@
        "n5": 0.43243243243243246,
        "n4": 0.12162162162162163,
        "n3": 0.04054054054054054,
-       "n2": 0.0,
+       "n2": 0,
        "n1": 0.04054054054054054,
        "oov": 0.36486486486486486
       },
@@ -2111,7 +2117,7 @@
        "n4": 0.25842696629213485,
        "n3": 0.10112359550561797,
        "n2": 0.011235955056179775,
-       "n1": 0.0,
+       "n1": 0,
        "oov": 0.34831460674157305
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -2170,7 +2176,7 @@
        "n5": 0.22131147540983606,
        "n4": 0.11475409836065574,
        "n3": 0.18032786885245902,
-       "n2": 0.0,
+       "n2": 0,
        "n1": 0.02459016393442623,
        "oov": 0.45901639344262296
       },
@@ -2439,6 +2445,1836 @@
     "求める"
    ],
    "truncated": false
+  },
+  {
+   "id": "bunki-graded-n3-zoka-sanjin-morning",
+   "title": "造化三神に出会う朝",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-zoka-sanjin-morning.json",
+   "chars": 1052,
+   "snippet": "朝の図書館で『古事記』を開くと、最初の場面は意外なほど短い。天地が初めて起こった時、高天原に天之御中主神が現れる。続いて、高御産",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.3460916706179855,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6040268456375839,
+      "band_vector": {
+       "n5": 0.2214765100671141,
+       "n4": 0.10067114093959731,
+       "n3": 0.22818791946308725,
+       "n2": 0.02348993288590604,
+       "n1": 0.030201342281879196,
+       "oov": 0.3959731543624161
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 298
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "図書",
+    "古事",
+    "開く",
+    "最初",
+    "場面",
+    "意外"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-nakaima-diary",
+   "title": "「中今」を感じる一日",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-nakaima-diary.json",
+   "chars": 1081,
+   "snippet": "六時半。目が覚めると、すぐにスマートフォンを見た。昨日出した宿題の返事はまだ来ていない。来週の試験も気になる。布団の中で、昨日と",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.6614539443684464,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6801242236024845,
+      "band_vector": {
+       "n5": 0.37267080745341613,
+       "n4": 0.09316770186335403,
+       "n3": 0.17701863354037267,
+       "n2": 0.009316770186335404,
+       "n1": 0.027950310559006212,
+       "oov": 0.3198757763975155
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 322
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "覚める",
+    "すぐ",
+    "スマート",
+    "フォン",
+    "昨日",
+    "出す"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-world-beginning",
+   "title": "世界のはじまりに現れた三柱",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-world-beginning.json",
+   "chars": 1067,
+   "snippet": "『古事記』の物語は、天地の初めから始まる。ただし、そこには大きな音も、光の爆発も、神々の会議も描かれていない。本文が最初に伝える",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.170663808397398,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5835962145110409,
+      "band_vector": {
+       "n5": 0.1608832807570978,
+       "n4": 0.11356466876971609,
+       "n3": 0.2618296529968454,
+       "n2": 0.00946372239747634,
+       "n1": 0.03785488958990536,
+       "oov": 0.416403785488959
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 317
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "古事",
+    "物語",
+    "天地",
+    "初め",
+    "始まる",
+    "ただし"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-hidden-deity",
+   "title": "姿を隠した神さま",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-hidden-deity.json",
+   "chars": 1126,
+   "snippet": "「先生、『古事記』の最初の神さまたちは、どうしてすぐに隠れたんですか。」  放課後の教室で、ユウタが本を持って質問した。先生は該",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.131544668760281,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6028368794326241,
+      "band_vector": {
+       "n5": 0.22695035460992907,
+       "n4": 0.11347517730496454,
+       "n3": 0.22340425531914893,
+       "n2": 0.0070921985815602835,
+       "n1": 0.031914893617021274,
+       "oov": 0.3971631205673759
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 282
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "先生",
+    "古事",
+    "最初",
+    "どう",
+    "すぐ",
+    "隠れる"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-kojiki-book",
+   "title": "『古事記』はどんな本？",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-kojiki-book.json",
+   "chars": 1108,
+   "snippet": "教室の机に、一冊の薄い文庫本が置かれた。表紙には『古事記』とある。先生が「日本で現存する最も古い歴史書です」と言うと、クラスから",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.9432475086434824,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5849056603773585,
+      "band_vector": {
+       "n5": 0.20440251572327045,
+       "n4": 0.11635220125786164,
+       "n3": 0.16037735849056603,
+       "n2": 0.0660377358490566,
+       "n1": 0.03773584905660377,
+       "oov": 0.41509433962264153
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 318
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "教室",
+    "薄い",
+    "文庫",
+    "置く",
+    "表紙",
+    "古事"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-hashira-counter",
+   "title": "神さまを「一柱」と数えるわけ",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-hashira-counter.json",
+   "chars": 1002,
+   "snippet": "日本語では、物によって数え方が変わる。本は一冊、紙は一枚、車は一台、人は一人という。神を数える時には、「柱」という助数詞がよく使",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.1686861644510103,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.575,
+      "band_vector": {
+       "n5": 0.19642857142857142,
+       "n4": 0.10357142857142858,
+       "n3": 0.21071428571428572,
+       "n2": 0.03571428571428571,
+       "n1": 0.02857142857142857,
+       "oov": 0.425
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 280
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "よる",
+    "数える",
+    "変わる",
+    "一人",
+    "いう",
+    "数詞"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-feel-jingu-forest",
+   "title": "伊勢神宮の森を映像で歩く",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-feel-jingu-forest.json",
+   "chars": 1114,
+   "snippet": "画面が開くと、先に届くのは説明ではなく、深い緑の気配である。伊勢神宮の公式映像「神宮を感じる FEEL JINGU『産霊 ダイジ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.3758354533152914,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6647398843930636,
+      "band_vector": {
+       "n5": 0.24566473988439305,
+       "n4": 0.1416184971098266,
+       "n3": 0.18208092485549132,
+       "n2": 0.04335260115606936,
+       "n1": 0.05202312138728324,
+       "oov": 0.3352601156069364
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 346
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "画面",
+    "開く",
+    "届く",
+    "説明",
+    "ない",
+    "深い"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-musubi-visual",
+   "title": "天・地・祈りをつなぐ「むすひ」",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-musubi-visual.json",
+   "chars": 1056,
+   "snippet": "高い木の間から空が見える。地面には影が落ち、水は低い方へ流れていく。人はその間を歩き、手を動かし、祈りの前で姿勢を整える。伊勢神",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.1760665990534136,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6104294478527608,
+      "band_vector": {
+       "n5": 0.1901840490797546,
+       "n4": 0.13803680981595093,
+       "n3": 0.1656441717791411,
+       "n2": 0.046012269938650305,
+       "n1": 0.0705521472392638,
+       "oov": 0.3895705521472393
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 326
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "高い",
+    "木の間",
+    "見える",
+    "地面",
+    "落ちる",
+    "低い"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-gratitude-week",
+   "title": "一週間、感謝の言葉を唱えてみた",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-gratitude-week.json",
+   "chars": 986,
+   "snippet": "これは、日本語を学ぶミナを主人公にした創作日記である。実在する人の体験談ではなく、言葉を唱えた効果を証明する記録でもない。元にな",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.4660567901234565,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6804123711340206,
+      "band_vector": {
+       "n5": 0.24054982817869416,
+       "n4": 0.18900343642611683,
+       "n3": 0.16151202749140894,
+       "n2": 0.037800687285223365,
+       "n1": 0.05154639175257732,
+       "oov": 0.31958762886597936
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 291
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "これ",
+    "学ぶ",
+    "ミナ",
+    "主人",
+    "創作",
+    "日記"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-graded-n3-thanks-before-help",
+   "title": "「助けて」より先に「ありがとう」？",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N3",
+   "lane": "graded",
+   "file": "bunki-graded-n3-thanks-before-help.json",
+   "chars": 1167,
+   "snippet": "「まだ助けてもらっていないのに、先に『ありがとうございます』と言うのは変じゃない？」  放課後の喫茶店で、エリはスマートフォンの",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.879419495213229,
+      "band": "中級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6126984126984127,
+      "band_vector": {
+       "n5": 0.2507936507936508,
+       "n4": 0.14603174603174604,
+       "n3": 0.15873015873015872,
+       "n2": 0.009523809523809525,
+       "n1": 0.047619047619047616,
+       "oov": 0.3873015873015873
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 315
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "まだ",
+    "助ける",
+    "もらう",
+    "ありがとう",
+    "ござる",
+    "言う"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-zoka-as-one",
+   "title": "三柱の神を一つの働きとして読む",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-zoka-as-one.json",
+   "chars": 1184,
+   "snippet": "『古事記』の冒頭には、天地が初めて起こった時、高天原に天之御中主神、高御産巣日神、神産巣日神が現れたと記されている。三柱はいずれ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.7082284775015424,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6088235294117648,
+      "band_vector": {
+       "n5": 0.13823529411764707,
+       "n4": 0.08529411764705883,
+       "n3": 0.2852941176470588,
+       "n2": 0.04411764705882353,
+       "n1": 0.05588235294117647,
+       "oov": 0.3911764705882353
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 340
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "古事",
+    "冒頭",
+    "天地",
+    "初めて",
+    "起こる",
+    "現れる"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-nakaima-time",
+   "title": "過去・現在・未来と「中今」",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-nakaima-time.json",
+   "chars": 1253,
+   "snippet": "昨日の失敗を何度も思い出し、明日の予定を心配しているうちに、目の前の食事が冷めてしまう。そんな経験をすると、「今を生きる」という",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.850028519574801,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6623376623376623,
+      "band_vector": {
+       "n5": 0.19480519480519481,
+       "n4": 0.14025974025974025,
+       "n3": 0.2675324675324675,
+       "n2": 0.015584415584415584,
+       "n1": 0.04415584415584416,
+       "oov": 0.33766233766233766
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 385
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "昨日",
+    "失敗",
+    "思い出す",
+    "明日",
+    "予定",
+    "心配"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-creator-god",
+   "title": "「創造神」という言葉はどこまで正しいか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-creator-god.json",
+   "chars": 1223,
+   "snippet": "「世界を創造した原初の神」と聞くと、多くの人は、意思を持つ一柱の神が何もない所から宇宙を作る場面を想像するだろう。ハテナ見聞録の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.9862138364779884,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.592797783933518,
+      "band_vector": {
+       "n5": 0.1523545706371191,
+       "n4": 0.10526315789473684,
+       "n3": 0.26038781163434904,
+       "n2": 0.024930747922437674,
+       "n1": 0.04986149584487535,
+       "oov": 0.407202216066482
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 361
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "世界",
+    "創造",
+    "原初",
+    "聞く",
+    "多く",
+    "意思"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-silent-amenominakanushi",
+   "title": "天之御中主神――語られない神をどう読むか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-silent-amenominakanushi.json",
+   "chars": 1187,
+   "snippet": "物語の最初に名前を呼ばれながら、すぐに舞台から消える神がいる。『古事記』の天地初発では、天之御中主神は高天原に最初に現れた神とし",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.819868959868959,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6142433234421365,
+      "band_vector": {
+       "n5": 0.1394658753709199,
+       "n4": 0.0712166172106825,
+       "n3": 0.29673590504451036,
+       "n2": 0.03857566765578635,
+       "n1": 0.06824925816023739,
+       "oov": 0.3857566765578635
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 337
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "物語",
+    "最初",
+    "名前",
+    "呼ぶ",
+    "すぐ",
+    "舞台"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-kojiki-myth-history",
+   "title": "『古事記』は神話か、歴史か",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-kojiki-myth-history.json",
+   "chars": 1166,
+   "snippet": "『古事記』について話す時、「神話なのか、歴史なのか」と質問されることがある。二つの箱を机に置き、どちらか一方へ本を入れようとする",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.267706340378199,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6332378223495703,
+      "band_vector": {
+       "n5": 0.1489971346704871,
+       "n4": 0.14040114613180515,
+       "n3": 0.2177650429799427,
+       "n2": 0.0830945558739255,
+       "n1": 0.04297994269340974,
+       "oov": 0.3667621776504298
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 349
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "古事",
+    "つく",
+    "話す",
+    "神話",
+    "歴史",
+    "質問"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-myth-to-book",
+   "title": "語りから書物へ――神話を編む",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-myth-to-book.json",
+   "chars": 1139,
+   "snippet": "もし『古事記』成立のドキュメンタリーを作るなら、最初の画面をどうするだろう。薄暗い部屋で稗田阿礼が物語を語り、太安万侶が一字ずつ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.6135322580645166,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5497076023391814,
+      "band_vector": {
+       "n5": 0.14035087719298245,
+       "n4": 0.0935672514619883,
+       "n3": 0.19883040935672514,
+       "n2": 0.07309941520467836,
+       "n1": 0.043859649122807015,
+       "oov": 0.4502923976608187
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 342
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "もし",
+    "古事",
+    "成立",
+    "ドキュメンタリー",
+    "作る",
+    "最初"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-feel-jingu-musubi",
+   "title": "映像が伝える「むすひ」",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-feel-jingu-musubi.json",
+   "chars": 1223,
+   "snippet": "伊勢神宮の公式映像「産霊 ダイジェスト」は、教室のように用語を定義しない。木々、水、社殿、祈りの所作、手仕事の細部が、音とともに",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.878227941176469,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5958005249343832,
+      "band_vector": {
+       "n5": 0.14698162729658792,
+       "n4": 0.10498687664041995,
+       "n3": 0.2047244094488189,
+       "n2": 0.05774278215223097,
+       "n1": 0.08136482939632546,
+       "oov": 0.4041994750656168
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 381
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "神宮",
+    "公式",
+    "映像",
+    "産霊",
+    "ダイジェスト",
+    "教室"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-prayer-on-screen",
+   "title": "映像の中で祈りはどう見えるか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-prayer-on-screen.json",
+   "chars": 1277,
+   "snippet": "祈りそのものに形はあるだろうか。心の内側だけをカメラは映せない。映せるのは、頭を下げる姿、整えられた場所、運ばれる物、静かに動く",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.9316521739130454,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6784810126582279,
+      "band_vector": {
+       "n5": 0.22025316455696203,
+       "n4": 0.11645569620253164,
+       "n3": 0.1949367088607595,
+       "n2": 0.04810126582278481,
+       "n1": 0.09873417721518987,
+       "oov": 0.32151898734177214
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 395
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "祈り",
+    "その",
+    "もの",
+    "ある",
+    "内側",
+    "カメラ"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-thanks-first",
+   "title": "「ありがとうございます」を先に言う心理",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-thanks-first.json",
+   "chars": 1250,
+   "snippet": "お願いがある場面では、日本語で「すみませんが」と前置きすることがある。それに対して、まだ助けを受けていない段階で「ありがとうござ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.98397257020266,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6132596685082873,
+      "band_vector": {
+       "n5": 0.13535911602209943,
+       "n4": 0.143646408839779,
+       "n3": 0.2541436464088398,
+       "n2": 0.016574585635359115,
+       "n1": 0.06353591160220995,
+       "oov": 0.3867403314917127
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 362
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "願い",
+    "ある",
+    "場面",
+    "すむ",
+    "前置き",
+    "する"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n2-testimony-literacy",
+   "title": "体験談をどう受け取るか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N2",
+   "lane": "essay",
+   "file": "bunki-essay-n2-testimony-literacy.json",
+   "chars": 1226,
+   "snippet": "ある言葉を唱えた後に長く悩んでいた問題が解決した、という体験談を聞いた時、すぐ信じるか、すぐ否定するかの二択に入りやすい。しかし",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.5883694614860264,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6256830601092895,
+      "band_vector": {
+       "n5": 0.1448087431693989,
+       "n4": 0.1448087431693989,
+       "n3": 0.2677595628415301,
+       "n2": 0.01912568306010929,
+       "n1": 0.04918032786885246,
+       "oov": 0.3743169398907104
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 366
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "ある",
+    "言葉",
+    "唱える",
+    "長い",
+    "悩む",
+    "問題"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-cosmic-analogy",
+   "title": "造化三神を宇宙論として読む誘惑",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-cosmic-analogy.json",
+   "chars": 1454,
+   "snippet": "神話の冒頭と宇宙の始まりは、あまりにも似合いのよい組み合わせに見える。『古事記』は天地初発の時、高天原に天之御中主神、高御産巣日",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.5418242038216547,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5496535796766744,
+      "band_vector": {
+       "n5": 0.07852193995381063,
+       "n4": 0.053117782909930716,
+       "n3": 0.2909930715935335,
+       "n2": 0.057736720554272515,
+       "n1": 0.06928406466512702,
+       "oov": 0.4503464203233256
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 433
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "神話",
+    "冒頭",
+    "宇宙",
+    "始まり",
+    "あまり",
+    "似合い"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-nakaima-time-theory",
+   "title": "「中今」は時間論になり得るか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-nakaima-time-theory.json",
+   "chars": 1395,
+   "snippet": "「今を生きよ」という言葉は、簡潔であるほど疑わしくもなる。過去を忘れ、未来の結果を考えず、この瞬間の感覚だけに従えという意味なら",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.6068270760331504,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5976470588235294,
+      "band_vector": {
+       "n5": 0.1623529411764706,
+       "n4": 0.07058823529411765,
+       "n3": 0.27058823529411763,
+       "n2": 0.03764705882352941,
+       "n1": 0.05647058823529412,
+       "oov": 0.4023529411764706
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 425
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "生きる",
+    "いう",
+    "言葉",
+    "簡潔",
+    "ある",
+    "疑わしい"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-first-versus-supreme",
+   "title": "原初神を「最高神」と呼ぶときの問題",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-first-versus-supreme.json",
+   "chars": 1443,
+   "snippet": "物語の最初に現れる者は、物語世界で最も偉いのだろうか。ハテナ見聞録の動画（V2）が「世界を創造した？」という疑問形で造化三神の謎",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.762803311630897,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5813397129186603,
+      "band_vector": {
+       "n5": 0.07655502392344497,
+       "n4": 0.08851674641148326,
+       "n3": 0.2966507177033493,
+       "n2": 0.06220095693779904,
+       "n1": 0.05741626794258373,
+       "oov": 0.41866028708133973
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 418
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "物語",
+    "最初",
+    "現れる",
+    "世界",
+    "最も",
+    "偉い"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-silent-god-theology",
+   "title": "沈黙する神と不在の神学",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-silent-god-theology.json",
+   "chars": 1425,
+   "snippet": "ある神は、名を記された後に何も語られない。その後の『古事記』では、命令もせず、争いにも加わらず、子孫の系譜も語られない。『古事記",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.574768364762173,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5788235294117647,
+      "band_vector": {
+       "n5": 0.09176470588235294,
+       "n4": 0.06588235294117648,
+       "n3": 0.2541176470588235,
+       "n2": 0.05647058823529412,
+       "n1": 0.11058823529411765,
+       "oov": 0.4211764705882353
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 425
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "ある",
+    "記す",
+    "語る",
+    "その",
+    "古事",
+    "命令"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-kojiki-power",
+   "title": "『古事記』編纂と権力の物語",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-kojiki-power.json",
+   "chars": 1404,
+   "snippet": "一冊の古典が「国の物語」になる時、その背後には必ず選択がある。どの系譜をつなぎ、どの異伝を採り、誰の祖先を中心に置き、どの時代で",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.19041114025228,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5741176470588235,
+      "band_vector": {
+       "n5": 0.11294117647058824,
+       "n4": 0.07764705882352942,
+       "n3": 0.2376470588235294,
+       "n2": 0.08,
+       "n1": 0.06588235294117648,
+       "oov": 0.4258823529411765
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 425
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "古典",
+    "物語",
+    "なる",
+    "その",
+    "背後",
+    "必ず"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-beyond-fact-fiction",
+   "title": "神話を「事実か虚構か」で裁かないために",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-beyond-fact-fiction.json",
+   "chars": 1472,
+   "snippet": "神話について語り始めると、しばしば二つの席しか用意されていない。一方は「すべて実際に起きた」という席、他方は「作り話だから価値が",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.6335359848484856,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5919282511210762,
+      "band_vector": {
+       "n5": 0.09417040358744394,
+       "n4": 0.10762331838565023,
+       "n3": 0.24663677130044842,
+       "n2": 0.0515695067264574,
+       "n1": 0.09192825112107623,
+       "oov": 0.4080717488789238
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 446
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "神話",
+    "つく",
+    "語る",
+    "始める",
+    "しばしば",
+    "用意"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-sacred-media",
+   "title": "「感じる」映像は神聖さをどう構成するか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-sacred-media.json",
+   "chars": 1482,
+   "snippet": "神聖さは、カメラにそのまま写る物体ではない。それでも映像は、見る者に「ここは日常と違う」と感じさせることができる。伊勢神宮の公式",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.837975795607351,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.578021978021978,
+      "band_vector": {
+       "n5": 0.11868131868131868,
+       "n4": 0.08791208791208792,
+       "n3": 0.2043956043956044,
+       "n2": 0.06593406593406594,
+       "n1": 0.1010989010989011,
+       "oov": 0.421978021978022
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 455
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "神聖",
+    "カメラ",
+    "その",
+    "まま",
+    "写る",
+    "物体"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-ise-time",
+   "title": "産霊・自然・反復――伊勢の時間",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-ise-time.json",
+   "chars": 1441,
+   "snippet": "水が流れる。枝の間から光が落ちる。白い布が揺れ、木に触れる手が止まり、また動く。伊勢神宮の公式映像（V4）「産霊 ダイジェスト」",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.955759865452457,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.649438202247191,
+      "band_vector": {
+       "n5": 0.19325842696629214,
+       "n4": 0.10786516853932585,
+       "n3": 0.23595505617977527,
+       "n2": 0.04044943820224719,
+       "n1": 0.07191011235955057,
+       "oov": 0.350561797752809
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 445
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "流れる",
+    "落ちる",
+    "白い",
+    "揺れる",
+    "触れる",
+    "止まる"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-miracle-testimony",
+   "title": "奇跡の体験談と認識の責任",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-miracle-testimony.json",
+   "chars": 1427,
+   "snippet": "ある言葉を唱えた後で思いがけない助けがあった、という体験談を前にすると、受け手は二つの極へ引かれやすい。奇跡の証明として受け入れ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 2.8852394854032664,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5519630484988453,
+      "band_vector": {
+       "n5": 0.12702078521939955,
+       "n4": 0.09930715935334873,
+       "n3": 0.19861431870669746,
+       "n2": 0.020785219399538105,
+       "n1": 0.10623556581986143,
+       "oov": 0.44803695150115475
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 433
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "ある",
+    "言葉",
+    "唱える",
+    "思いがける",
+    "助け",
+    "いう"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
+  },
+  {
+   "id": "bunki-essay-n1-prayer-reality",
+   "title": "祈りの言葉は誰の現実を変えるのか",
+   "source": "bunki-original-reading-catalog",
+   "sourceLabel": "随筆 · Bunki · 検収前",
+   "pool": "original",
+   "licence": "Bunki original",
+   "attribution": "Bunki original text",
+   "url": "",
+   "date": "",
+   "rubySource": "tokenizer",
+   "authorLevel": "N1",
+   "lane": "essay",
+   "file": "bunki-essay-n1-prayer-reality.json",
+   "chars": 1460,
+   "snippet": "以下は、異なる立場を考えるために書いた架空の対話である。登場する「信じる人」「研究者」「懐疑する人」は実在の体験者ではなく、複数",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 3.391901925057434,
+      "band": "中級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.665859564164649,
+      "band_vector": {
+       "n5": 0.2324455205811138,
+       "n4": 0.12832929782082325,
+       "n3": 0.2106537530266344,
+       "n2": 0.03631961259079903,
+       "n1": 0.05811138014527845,
+       "oov": 0.3341404358353511
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 413
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate is not committed; the reproducible default build does not download or consult gitignored local grading data",
+     "error": "UnavailableByBuildPolicy"
+    }
+   },
+   "seeds": [
+    "以下",
+    "異なる",
+    "立場",
+    "考える",
+    "ため",
+    "書く"
+   ],
+   "truncated": false,
+   "review": "human-review-pending"
   }
  ]
 }

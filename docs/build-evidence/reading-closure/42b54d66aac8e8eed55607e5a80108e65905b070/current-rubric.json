@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "candidate": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "tree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "scoredAt": "2026-08-15T12:16:46Z",
+  "scale": "0 absent/unverified; 1 source/schema/static fixture; 2 partial happy path/screenshot; 3 physical-phone persisted core; 4 cross-platform/offline/error/a11y; 5 longitudinal category-leading",
+  "dimensions": [
+    { "id": "catalog", "label": "Catalog breadth and level coverage", "weight": 5, "score": 2, "points": 2.0, "evidence": ["corpus-census.json", "artifact-manifest.json"] },
+    { "id": "freshness", "label": "Freshness and publishing cadence", "weight": 8, "score": 0, "points": 0.0, "evidence": ["corpus-census.json", "claim-ledger.jsonl"] },
+    { "id": "discovery", "label": "Discovery, navigation, and search", "weight": 10, "score": 1, "points": 2.0, "evidence": ["control-census.json", "click-ledger.jsonl", "claim-ledger.jsonl"] },
+    { "id": "personalization", "label": "Personalization and rotation", "weight": 7, "score": 0, "points": 0.0, "evidence": ["claim-ledger.jsonl", "control-census.json"] },
+    { "id": "metadata", "label": "Card metadata and presentation", "weight": 5, "score": 2, "points": 2.0, "evidence": ["corpus-census.json", "control-census.json"] },
+    { "id": "reader", "label": "Core reader UX", "weight": 10, "score": 1, "points": 2.0, "evidence": ["claim-ledger.jsonl", "click-ledger.jsonl", "screenshot-index.json"] },
+    { "id": "audio", "label": "Audio and listening", "weight": 10, "score": 0, "points": 0.0, "evidence": ["claim-ledger.jsonl", "control-census.json"] },
+    { "id": "assistance", "label": "Linguistic assistance", "weight": 9, "score": 2, "points": 3.6, "evidence": ["control-census.json", "claim-ledger.jsonl"] },
+    { "id": "capture", "label": "Capture and canonical SRS", "weight": 8, "score": 1, "points": 1.6, "evidence": ["claim-ledger.jsonl", "click-ledger.jsonl"] },
+    { "id": "ai", "label": "Adaptive AI", "weight": 6, "score": 0, "points": 0.0, "evidence": ["claim-ledger.jsonl", "control-census.json"] },
+    { "id": "comprehension", "label": "Comprehension and transfer", "weight": 5, "score": 0, "points": 0.0, "evidence": ["claim-ledger.jsonl", "control-census.json"] },
+    { "id": "sharing", "label": "Sharing, continuity, and discussion", "weight": 3, "score": 0, "points": 0.0, "evidence": ["claim-ledger.jsonl", "control-census.json"] },
+    { "id": "editorial", "label": "Editorial quality, provenance, and rights", "weight": 5, "score": 2, "points": 2.0, "evidence": ["corpus-census.json", "claim-ledger.jsonl"] },
+    { "id": "resilience", "label": "Offline, performance, and accessibility", "weight": 5, "score": 1, "points": 1.0, "evidence": ["checks.json", "screenshot-index.json", "click-ledger.jsonl"] },
+    { "id": "durability", "label": "Durability and engagement", "weight": 4, "score": 1, "points": 0.8, "evidence": ["claim-ledger.jsonl", "checks.json"] }
+  ],
+  "rawTotal": 17.0,
+  "effectiveTotal": 17.0,
+  "familiarScale": 1.7,
+  "operatorLivedScore": 3.0,
+  "hardCaps": [
+    { "id": "reliable-reader", "cap": 30, "active": true, "reason": "Exact-SHA complete physical-device journey is NOT_RUN." },
+    { "id": "article-audio", "cap": 60, "active": true, "reason": "No article audio implementation or rendered evidence exists." },
+    { "id": "freshness-discovery", "cap": 59, "active": true, "reason": "Freshness is 0 and discovery is below 2." }
+  ],
+  "releaseBlocks": [
+    "Nineteen default-visible Bunki originals have no human editorial approval receipt or model-lineage field.",
+    "Corridor learner state and scheduler are separate from @bunki/domain and @bunki/persistence.",
+    "Save failures can leave visible in-memory state ahead of durable state."
+  ],
+  "note": "The score remains the controller's conservative 17/100 after correcting the exact-candidate census from 70 to 40 primary records. No new working-product points were awarded from source inspection."
+}

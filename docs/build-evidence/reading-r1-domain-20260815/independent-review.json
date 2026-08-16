@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-15T13:17:38Z",
+  "replayBranch": "agent/reading-r1-domain-20260815-r4",
+  "freshReviewStatus": "REQUIRED_AFTER_PUBLICATION",
+  "freshReviewResult": null,
+  "historicalOnly": true,
+  "scope": "Prior independent PASS coverage is historical source assurance. It does not approve this ac880-based r4 identity; a fresh read-only remote review is required before harvest.",
+  "historicallyReviewedSource": {
+    "branch": "agent/reading-r1-domain-20260815-r3",
+    "head": "a0f3ab973c88e46a8827feab283605706df4eabf",
+    "tree": "530f79913e7eb949295891bd0c5b91613802b99c",
+    "base": "42b54d66aac8e8eed55607e5a80108e65905b070",
+    "result": "PASS"
+  },
+  "replayCandidate": {
+    "branch": "agent/reading-r1-domain-20260815-r4",
+    "base": "ac880aff052991b230dfdd9b7f39267ae764a05f",
+    "baseTree": "8a2636c7a47c1e3ba43c333921b818bed38c405a",
+    "expectedCommitCount": 1,
+    "result": "NOT_YET_REVIEWED"
+  },
+  "historicallyReproducedChecks": [
+    { "name": "targeted-vitest", "status": "PASS", "files": 3, "tests": 29 },
+    { "name": "persistence-vitest", "status": "PASS", "files": 11, "tests": 113 },
+    { "name": "full-vitest", "status": "PASS", "files": 95, "tests": 1647 },
+    { "name": "workspace-typecheck", "status": "PASS", "workspaces": 6 },
+    { "name": "targeted-eslint-prettier-diff-check", "status": "PASS" }
+  ],
+  "nonBlockingBoundaries": [
+    "The guarantee relies on the documented failure-atomic SnapshotStore.setItem contract; a commit-then-throw injected backend is explicitly nonconforming.",
+    "App optimistic state, Corridor local learner state, migration, UI, and deployment remain out of scope.",
+    "The evidence wording mentions subscribers although EventStore exposes no subscriber surface; behavior is unaffected."
+  ],
+  "blockingFindings": [],
+  "freshReviewRequiredAssertions": [
+    "remote ref equals the sealed r4 commit and has ac880aff052991b230dfdd9b7f39267ae764a05f as its sole parent",
+    "the donor changes only the five owned paths and mechanically preserves the reviewed source code blobs",
+    "failed ordinary append and failed purge preserve durable and live state and remain retryable",
+    "targeted, persistence, full, typecheck, lint, formatting, and diff checks reproduce"
+  ]
+}

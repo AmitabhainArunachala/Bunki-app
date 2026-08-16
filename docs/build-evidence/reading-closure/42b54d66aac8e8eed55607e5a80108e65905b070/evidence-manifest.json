@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "candidate": "42b54d66aac8e8eed55607e5a80108e65905b070",
+  "tree": "6a901fe5bdf99cfd0ac81d94efd366cbd86c322c",
+  "selfExcluded": "evidence-manifest.json",
+  "fileCount": 17,
+  "totalBytes": 425013,
+  "files": [
+    {
+      "path": "artifact-manifest.json",
+      "bytes": 219801,
+      "sha256": "289afa944074ad963808f4bf3c8f7b7f1a080fb0a66a457fdf9680b79b08e187"
+    },
+    {
+      "path": "checks.json",
+      "bytes": 2894,
+      "sha256": "0b1f5e0959aff7b1a0385b5741470c1b2781a3b4e29eebe82aa71261d0490fc6"
+    },
+    {
+      "path": "claim-ledger.jsonl",
+      "bytes": 23567,
+      "sha256": "d5bd62eb9de52870b0b0443831689843025f6b2105d80af3c63d9852cb4613f4"
+    },
+    {
+      "path": "click-ledger.jsonl",
+      "bytes": 91695,
+      "sha256": "30a1649868f75ced74a5c7ad0509cc2e409392262ed147c7ee520fff6fde06ed"
+    },
+    {
+      "path": "control-census.json",
+      "bytes": 61359,
+      "sha256": "122fc32594d790aaae9f0ad444a287078267fdbddeca5ee6ed6ff7709b5ace8c"
+    },
+    {
+      "path": "coordinate.json",
+      "bytes": 1176,
+      "sha256": "bf70a93ac53ef15d8095903d57e5baa44bae304189f236dd94e9bd54af86d5c7"
+    },
+    {
+      "path": "corpus-census.json",
+      "bytes": 3079,
+      "sha256": "52e719721058fdcc1ac743cddae0817013e9547f6fa800be7f113bdfc0a244a9"
+    },
+    {
+      "path": "current-rubric.json",
+      "bytes": 3972,
+      "sha256": "611d7741a9633bb1291ee19919344d580df6356f22b792d0427d4c7e0a1d45b4"
+    },
+    {
+      "path": "deployment-receipt.json",
+      "bytes": 3602,
+      "sha256": "a349ef98b4414a37de1a942a88a06e0dabe2a109951b947825b759306ecb0113"
+    },
+    {
+      "path": "DONE_LADDER.md",
+      "bytes": 2158,
+      "sha256": "4ed46207f84fe5e6b3f70eb905f2de0445475d6631b449e1d235c78b68cf08da"
+    },
+    {
+      "path": "FINAL_STATUS.json",
+      "bytes": 572,
+      "sha256": "ed7e49dc0719c1fb24b219822b8217d7628d257263d87c575f45c894c1b55be0"
+    },
+    {
+      "path": "independent-review-r0-r2.json",
+      "bytes": 1613,
+      "sha256": "da80dd51f97e0446a80214a8c6aae98521b2151d4c8f3f24c9cb1516cb0c85b9"
+    },
+    {
+      "path": "independent-review-r0-r4.json",
+      "bytes": 1966,
+      "sha256": "d9c6418e5b0b1a30e02b9bb6948c4ee4a68139de25e38e181b49a7b07b7044ce"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2948,
+      "sha256": "21c36f8ee70d40b2eee69a88063c812399a64fd076aba38d09107d9b64e19769"
+    },
+    {
+      "path": "RUN_STATE.md",
+      "bytes": 2915,
+      "sha256": "53d676fcc03ba45f8905fab777d9e866ee6b474653356dd478e82890abe84fcb"
+    },
+    {
+      "path": "screenshot-index.json",
+      "bytes": 542,
+      "sha256": "23c4768fbf3faa367de97642db2cd9dc2b52ead932298eb6885d3323e150b55e"
+    },
+    {
+      "path": "TEST_PLAN.md",
+      "bytes": 1154,
+      "sha256": "eea7b4447a1df1734c5a3c4a1b2297997800ee789d1c02b47bff9160e7c96786"
+    }
+  ]
+}

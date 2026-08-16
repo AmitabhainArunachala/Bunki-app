@@ -314,6 +314,7 @@ SOURCES = {
     ],
     "original": [
         {"name": "bunki-v11-reading-catalog", "licence": "Bunki original", "attribution": "Bunki original graded texts and essays", "url": ""},
+        {"name": "bunki-original-reading-catalog", "licence": "Bunki original", "attribution": "Bunki original text", "url": ""},
     ],
 }
 

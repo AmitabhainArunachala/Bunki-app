@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "bunki.reading-campaign-controller-manifest.v1",
+  "campaign": "Bunki Reading Crown Campaign",
+  "observedAtUtc": "2026-08-15T10:35:22Z",
+  "observedAtJst": "2026-08-15T19:35:22+09:00",
+  "repository": "AmitabhainArunachala/Bunki-app",
+  "integrationAuthority": {
+    "branch": "claude/app-vision-next-steps-wei73a",
+    "head": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+    "tree": "ba95db981b91b928fb3580cb2adc073d103ef1b8",
+    "mergeBaseWithMain": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+    "mainHead": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+    "commitUrl": "https://github.com/AmitabhainArunachala/Bunki-app/commit/952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+    "pullRequest": "https://github.com/AmitabhainArunachala/Bunki-app/pull/71",
+    "cleanCheckout": true,
+    "checkoutStatusPorcelain": ""
+  },
+  "controllerPublication": {
+    "branch": "agent/reading-campaign-controller-2026-08-15",
+    "headBeforeManifest": "8a747bc588e4192d1a79958331017f5a230b9539",
+    "treeBeforeManifest": "a516f480dc502d7801da247a592781a74bba49bc",
+    "authorityHeadAtCut": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+    "controllerPath": "docs/prompts/BUNKI_READING_EXCELLENCE_LONG_RUNNING_GOAL_2026-08-15.md",
+    "rubricPath": "docs/operator/BUNKI_READING_EXCELLENCE_RUBRIC_AND_CLOSURE_SPEC_2026-08-15.md",
+    "publicationStatus": "prepared_for_remote_checkpoint"
+  },
+  "liveChecks": [
+    {
+      "name": "corpus-tests",
+      "workflowRunId": 31877807748,
+      "conclusion": "success",
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31877807748"
+    },
+    {
+      "name": "Bunki verified build",
+      "workflowRunId": 31877807760,
+      "conclusion": "success",
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31877807760"
+    },
+    {
+      "name": "CI",
+      "workflowRunId": 31877807749,
+      "conclusion": "success",
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31877807749"
+    },
+    {
+      "name": "pages-app",
+      "workflowRunId": 31877807584,
+      "conclusion": "success",
+      "url": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31877807584"
+    }
+  ],
+  "deployment": {
+    "id": 5919247296,
+    "state": "success",
+    "sourceSha": "952dbc7acc3ce5fc5e0497e854c0df39e41c51ab",
+    "sourceBranch": "claude/app-vision-next-steps-wei73a",
+    "environment": "github-pages",
+    "environmentUrl": "https://amitabhainarunachala.github.io/Bunki-app/",
+    "workflowRun": "https://github.com/AmitabhainArunachala/Bunki-app/actions/runs/31877807584"
+  },
+  "openPullRequests": [
+    { "number": 71, "head": "claude/app-vision-next-steps-wei73a", "base": "main", "draft": true, "role": "sole-current-integration" },
+    { "number": 70, "head": "agent/kairo-one-prototype-2026-08-10", "base": "claude/kairo-feel-lock-2026-08-09", "draft": true, "role": "historical-donor" },
+    { "number": 69, "head": "claude/kairo-bunki-brief-j11dm2", "base": "main", "draft": true, "role": "historical-donor" },
+    { "number": 68, "head": "claude/kairo-feel-lock-2026-08-09", "base": "codex/kairo-full-build-20260808", "draft": true, "role": "historical-donor" },
+    { "number": 67, "head": "codex/kairo-full-build-20260808", "base": "claude/kairo-prototype-phase-1-4hdre6", "draft": true, "role": "historical-donor" },
+    { "number": 65, "head": "claude/kairo-prototype-phase-1-4hdre6", "base": "main", "draft": true, "role": "historical-donor" },
+    { "number": 62, "head": "claude/bunki-app-prototype-2rds5a", "base": "main", "draft": true, "role": "historical-donor" },
+    { "number": 61, "head": "claude/corridor-live-verify", "base": "main", "draft": true, "role": "historical-donor" },
+    { "number": 60, "head": "corpus/00-skeleton-provenance", "base": "main", "draft": true, "role": "historical-donor" },
+    { "number": 31, "head": "claude/drift-coherence-v11", "base": "main", "draft": true, "role": "historical-donor" }
+  ],
+  "initialPathOwnership": [
+    {
+      "owner": "root-coordinator",
+      "mode": "write",
+      "paths": [
+        "docs/build-evidence/reading-campaign/controller-manifest.json",
+        "docs/build-evidence/reading-campaign/RUN_STATE.md"
+      ]
+    },
+    {
+      "owner": "all-subagents",
+      "mode": "read-only",
+      "paths": ["**/*"]
+    }
+  ],
+  "authorityRuling": "No authority conflict found. PR #71 and the binding controller agree that claude/app-vision-next-steps-wei73a is the sole integration line."
+}
