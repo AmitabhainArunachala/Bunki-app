@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T15:56:12.393Z",
+  "completedAt": "2026-08-16T17:16:27.641Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "72935ab9cba43ff87035aa5f127df9318a13e32d0285d51849cc7dc3e766dd26",
+    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "21d5b138f4707ff5bc2445df4ee6c2a4fd369961498e2b6d088fe16bcf2e511b",
-    "corridorCss": "e1844dcdecd5f812975c147b15b13f9d8246769054c69f3d26e29e6fe41e9090",
-    "standalone": "b53c1903eeeee1cf85f4eedc0e050f6f5bc366f9e8bbd663fdf17a9c52ea6dc8",
+    "corridorJs": "35a67f287dbea0966aa291a887e279f639ce060347f1ba601c4840326c4539c9",
+    "corridorCss": "e547872886058539c1f06acb4d413154537600843f36adb68229888ab9add3ba",
+    "standalone": "30fee6cdc64455276c0a4735daad4e000c67efb67a77720f93080279a6e5be81",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -57,7 +57,7 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "bd71305a9fee14130e23d8a45a0d2b7853c1db5b6e9eb7ea03b12c5d1f4332a9"
+        "sha256": "700aa36aef3bf872b3aba974de2505e30cd0d139cb784caaee1b2b71595a3fa6"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
@@ -75,11 +75,11 @@
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "8dd9cf58617d74aa109563c4a8b3bb466e22fec901b78b140f8538d4827f5294"
+        "sha256": "a3a6b772f30bc85c194479da81116c89dad15b263db83bb4a0469c7ad764a3a3"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "43e689b9e7735ce922b48b467f6a86dcdc3eba6392b31a7b0e63d7b897dc2307"
+        "sha256": "276683e691a42429ff26e622e16e4a49aa4d2b8b98c7bd45b3e0cad272ff847a"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",

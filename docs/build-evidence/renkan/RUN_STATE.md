@@ -78,6 +78,45 @@ copyrighted: original-format items vs licensed banks vs generated+人手 review
 E3: `renkan-e3-double-dry.js` (staged) — 8 lenses × 2 rounds, adversarial
 confirmation of every finding, dry twice or it is not done.
 
+
+## E3 round A — the closing gate ran, and it was not dry
+
+The spend limit lifted, so the double-dry HUNT started. Round A's eight
+lenses returned **27 findings**; the round is by definition NOT dry, and the
+campaign's own rule is that a non-dry round becomes work. Eleven fixes landed
+tonight, each with the probe that convicts its absence:
+
+| finding | fix |
+| --- | --- |
+| P1 dojo enrolled captured-but-unstarted rows into FSRS (no-debt hole one step out from A1b) | drills as practice; `E3-A` probe |
+| P2 いま見る hid the answer the learner just asked for | the flag holds for the whole card |
+| P1 rejecting a feed mint restored a pre-override body (R3 lexicon undone) | restore always re-mints; only the unregenerable NINJAL pair carries over |
+| P2 ten glossary rows carried a corpus NAME as their licence | they say 未検証, wear 検収前, and wait on the operator (`rights` queue kind) |
+| P2 the one `pendingVerification` row wore no mark and had no queue row | both, now |
+| (root cause) the body overwrites the index, so index-only marks were invisible | bodies reconciled + an agreement probe |
+| P2 the tray forgot every door but the reader, and opened at the last surface's offset | it carries its origin and lands at its own top |
+| P2 device Back could not see the nav / world stones / capture panel | they dismiss in stacking order before any room moves |
+| P1 every render threw keyboard focus to `<body>` | the control that had focus is found again by name |
+| P1 names written in kanji were dead text (the grader's exclusion was doing the reader's job) | any kanji token with a reading is a door, in its own class |
+| P1 an import left the previous learner's AI conversations underneath | the archive is cleared, and a failure to clear stops the import |
+| P1 筆順の番号 did nothing once the field closed | the numbers answer to their own toggle |
+| P1 Tab wrapped past the room's two fixed corner controls | a rendered box is the honest visibility test |
+| P1 readings shipped truncated while the builder claimed FULL sets | slicing removed; the shipped-data truth stated; OD-21 |
+| P2 the tray's rows were keyboard-dead; four folds had no aria-expanded | both fixed |
+| P2 the ink kept redrawing a still forever | freeze means stop drawing; begin() restarts it |
+| CI: writing-room 36/37 | the probe was sampling mid-fade; it now waits for what it asserts |
+
+Battery after all of it: **16/16** (`battery-e3a/SUMMARY.md`). The corridor
+suite stands at **215**, a11y 46, writing-room 37, drift 52, AI 21, feed 31,
+native-readings 54.
+
+Round A's remaining findings (contrast on two chrome labels, sentence tokens
+outside the reader being keyboard-dead, the radical picker's density, the
+tutor's mid-flight edges, archive furigana coverage) are recorded in the
+workflow journal and typed to the sheet where they are operator-shaped
+(OD-21, OD-22). **Round B has not run**: by the gate's own rule the campaign
+is not dry until two consecutive full-fleet rounds come back empty.
+
 ## Resume instructions
 
 A fresh session needs only this repo: read the campaign spec, then this file,
