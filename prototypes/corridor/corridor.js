@@ -11374,7 +11374,12 @@ function renderStrokePage(root) {
         !item.disabled &&
         !item.closest('[inert]') &&
         item.tabIndex >= 0 &&
-        item.offsetParent !== null &&
+        // offsetParent is null for a POSITION:FIXED element, and both of this
+        // room's corner controls — 筆順の番号 and ゆっくり — are fixed. Using it
+        // as the visibility test dropped them from the trap, so Tab wrapped
+        // past the two controls the operator placed by hand (E3 round-A,
+        // writing-room lens). A rendered box is the honest test.
+        item.getClientRects().length > 0 &&
         getComputedStyle(item).visibility !== 'hidden',
     );
     if (!focusable.length) {

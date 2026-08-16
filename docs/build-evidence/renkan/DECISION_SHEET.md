@@ -37,6 +37,8 @@ what I recommend and why.
 | OD-18 | Full re-tokenization of the first-40 articles (fresh UniDic differs from the ca07-era readings in ~12 bodies)                             | **DEFER** · REMINT             | Ripples grading signals and historical receipts                                                      |
 | OD-19 | **T5**: the closing double-dry HUNT (8 lenses × 2 rounds) never ran — the account hit its monthly spend limit mid-round-4                 | **RUN-IT** · ACCEPT · DEFER    | Only you can raise the limit; the script is staged and one command from done                         |
 | OD-20 | **R4-A** landed with lander-run gates (typecheck, lint, 1710 tests, 44 e2e) but no decorrelated adversarial verify — same spend limit     | **RE-VERIFY** · ACCEPT · REVERT | The campaign's own law says no loop grades its own homework; this one ring is open and I am saying so |
+| OD-21 | Kanji readings ship truncated to three (the builder sliced `[:3]` while its header claimed FULL sets), so the quiet room labels three readings 音読み/訓読み for characters with more — 生 above all. The slicing is fixed; regenerating needs the KANJIDIC2-derived `KANJI_SRC`, which is not in this repo | **REGENERATE** · ACCEPT | E3 round-A, writing-room lens; `prototypes/drift/tools/rebuild_kanji_data.py` |
+| OD-22 | The furigana-truth gate certifies the 82 curated bodies; the 682-article archive was minted before the reading lexicon and is not covered | **SWEEP** · ACCEPT | E3 round-A, reader lens |
 
 ## What I would answer, if the answers were mine
 

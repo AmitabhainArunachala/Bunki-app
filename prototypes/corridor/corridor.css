@@ -3099,9 +3099,12 @@ body.v-depth-layered .stroke-page {
   display: none;
   pointer-events: none;
 }
-body:has(.stroke-page[data-minimal='off'][data-numbers='on']) .stroke-nums-lift,
-body:has(.stroke-page[data-minimal='on'][data-chrome='awake'][data-numbers='on'])
-  .stroke-nums-lift {
+/* The numbers answer to their own toggle, not to the field that holds it.
+ * Gating the lifted layer on data-chrome='awake' meant 筆順の番号 did nothing
+ * the moment the learner closed the field — which is exactly when the room
+ * becomes the plain immersion the numbers are meant to annotate (E3 round-A,
+ * writing-room lens; constitution §6 asks for the toggle, then the quiet). */
+body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   display: block;
 }
 .stroke-nums-lift svg.stroke-canvas {
