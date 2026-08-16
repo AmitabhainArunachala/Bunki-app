@@ -328,6 +328,13 @@ body.ginga #drift-layer #hint {
 body.ginga.drift-dived #drift-layer #hint {
   display: block !important;
 }
+/* the front door's one first-touch cue (POL-1): a visitor whose drift store
+ * carries no cue flag sees the drift's own hint plaque — the layer marks it
+ * "first-cue" until the first successful touch of a word retires the class
+ * and persists the flag in bunki-drift-v1, and this exception dies with it */
+body.ginga #drift-layer #hint.first-cue {
+  display: block !important;
+}
 
 .nav-symbol {
   position: fixed;

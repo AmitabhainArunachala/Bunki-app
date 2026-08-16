@@ -1006,6 +1006,37 @@ function markWalked(wr){
   WALKED.push(wr); wr.walked=true;
   while(WALKED.length>14){const old=WALKED.shift(); old.walked=false;}
 }
+// The ring bends before the glass edge. The bloom ring is pure polar math
+// (118/196px shells), and a 390px glass is narrower than its outer shell:
+// satellites east or west of a planet standing inside the glide band used to
+// land as slivers or fully off the glass (救済 once measured at x=-37). Each
+// frame the ring now measures its own room on the glass and compresses each
+// cramped HALF-AXIS alone — angles, ordering and the roomy side stay exactly
+// as the polar grammar laid them, the cramped side folds in only as far as
+// the glass demands, and a floor keeps the family from ever folding onto its
+// planet. The camera-glide grammar is untouched: this bends the ring's
+// reach, never the camera. RING_RMAX is the outer shell's own ceiling
+// (196+37 of hash salt); the margins clear the chrome a satellite must not
+// be parked under — the level tide on the west (left:0, 44px wide), the
+// fused corridor's top bar band, and the bottom strip with the shelf door.
+const RING_EDGE_W=50, RING_EDGE_E=26, RING_EDGE_TOP=104, RING_EDGE_BOT=140,
+      RING_MIN=48, RING_RMAX=234;
+let bloomRmax=0;   // the held ring's maximal reach in world units, set per bloom
+function ringTarget(ax,ay,ang,r){
+  const wx=Math.cos(ang)*r, wy=Math.sin(ang)*r*0.9;
+  if(!bloomRmax) return {x:ax+wx,y:ay+wy};
+  const cs=Math.cos(cam.rot), sn=Math.sin(cam.rot);
+  const a=w2s(ax,ay);
+  let ox=(wx*cs-wy*sn)*cam.z, oy=(wx*sn+wy*cs)*cam.z;
+  // compress against the whole ring's reach, not this satellite's own, so
+  // one factor folds the cramped side as a body and shell order is kept
+  const ext=bloomRmax*cam.z;
+  ox*=clamp((ox>0?vw()-RING_EDGE_E-a.x:a.x-RING_EDGE_W)/ext,0.08,1);
+  oy*=clamp((oy>0?vh()-RING_EDGE_BOT-a.y:a.y-RING_EDGE_TOP)/ext,0.08,1);
+  const d=Math.hypot(ox,oy);
+  if(d>0&&d<RING_MIN){ox*=RING_MIN/d; oy*=RING_MIN/d;}
+  return s2wl(a.x+ox,a.y+oy);
+}
 function bloomFocus(n){
   clearBloom(n.el?n:undefined);
   bloomBorn=performance.now(); bloomLast=bloomBorn;
@@ -1068,6 +1099,7 @@ function bloomFocus(n){
   cands.sort((a,b)=>b[0]-a[0]);
   const N2=Math.min(14,cands.length);
   if(!N2){focusN=null;return;}
+  bloomRmax=RING_RMAX/cam.z;
   // the constellation centres itself: if its planet sits near an edge (a
   // chain re-centre lands wherever the satellite was), the camera glides
   if(n.wx!=null&&stack.length===0){
@@ -1081,8 +1113,9 @@ function bloomFocus(n){
     const ang=-Math.PI/2+i*TAU/N2+((strHash(wr.e[0])%40)-20)*0.012;
     const r=((i%2?118:196)+(strHash(wr.e[0])%38))/cam.z;
     wr.bAng=ang; wr.bR=r;
-    wr.hx=bx+Math.cos(ang)*r-wr.wx;
-    wr.hy=by+Math.sin(ang)*r*0.9-wr.wy;
+    const bt=ringTarget(bx,by,ang,r);
+    wr.hx=bt.x-wr.wx;
+    wr.hy=bt.y-wr.wy;
     if(wr.node&&!wr.node.gone){
       wr.node.hlDom=true; wr.node.el.classList.add("bsat");
       wr.node.top=Math.max(wr.node.top,0.95);
@@ -1254,6 +1287,7 @@ window.__lockWord=function(w){
   return true;
 };
 function constellationLock(n){
+  cueRetire();   // a held word is a first touch answered, same as a tap
   // the node we are about to make the centre must survive the teardown of
   // the bloom it came from — without this it is marked gone and removed
   // 500ms later, leaving a headless lock (bloomFocus has always done this)
@@ -2043,6 +2077,21 @@ function setHint(txt){
   hintTimer=setTimeout(function(){hint.style.opacity="0";},5000);
 }
 setTimeout(function(){hint.style.opacity="0";},7000);
+// The front door's one first-touch cue. The fused corridor deliberately
+// hides every piece of drift chrome on the 銀河 hero (corridor.css,
+// body.ginga) — which left a brand-new visitor facing dark water with no
+// invitation at all. The drift's own hint carries the cue: the "first-cue"
+// class marks it as the one plaque the front door may keep, and the seen
+// flag lives in the drift's own store (bunki-drift-v1), so the corridor's
+// learner store never hears about it. The first successful touch of a node
+// retires the cue for good; until then it returns, quietly, each fresh
+// visit — and fades on its own after a few breaths either way.
+if(!store.cue) hint.classList.add("first-cue");
+function cueRetire(){
+  if(!hint.classList.contains("first-cue")) return;
+  hint.classList.remove("first-cue");
+  if(!store.cue){store.cue=1;saveStore();}
+}
 
 // ---- radical explainer ----
 const radoc=document.getElementById("radoc");
@@ -2054,6 +2103,7 @@ addEventListener("keydown",e=>{ if(DRIFT_ON&&e.key==="Escape") closeRadoc(); });
 
 // ---- interaction ----
 function tapNode(n){
+  cueRetire();   // a word answered the finger: the first-touch cue has served
   const lvl=stack[stack.length-1];
   if(lvl&&lvl.center===n){ openCard(n); return; }
   if(n.kind==="glyph"){ diveKanji(n); return; }
@@ -2581,8 +2631,9 @@ function drawWorld(){
       const dx3=(fx2-vw()/2)/cam.z, dy3=(fy2-vh()/2)/cam.z;
       const ax=cam.x+dx3*cs3+dy3*sn3, ay=cam.y-dx3*sn3+dy3*cs3;
       for(const wr of FOCUS) if(!wr.lk&&wr.bR){
-        wr.hx=ax+Math.cos(wr.bAng)*wr.bR-wr.wx;
-        wr.hy=ay+Math.sin(wr.bAng)*wr.bR*0.9-wr.wy;
+        const bt=ringTarget(ax,ay,wr.bAng,wr.bR);
+        wr.hx=bt.x-wr.wx;
+        wr.hy=bt.y-wr.wy;
       }
     }
     if(LOCK){
