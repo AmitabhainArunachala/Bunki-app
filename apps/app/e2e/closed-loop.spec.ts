@@ -326,6 +326,10 @@ test('T-17: the whole REQ-PH-01 loop, by clicking, on the exported web app', asy
   expect(await app.persistedEventTypes()).toEqual([
     'EncounterCaptured',
     'ThreadPromotionChanged',
+    // Step 4's "Word page" press is a real lookup, and real lookups now record
+    // friction (T-07; RENKAN R2-X closing ledger P1-17). Grade-free by schema;
+    // its content is pinned in `kernel-honesty.spec.ts`.
+    'LookupFrictionLogged',
     'CandidateAttached',
     'CandidateAcceptedAsNote',
     'ThreadPromotionChanged',

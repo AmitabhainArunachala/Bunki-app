@@ -85,11 +85,18 @@ test('T-11: a hung AI call does not block the capture that was already made', as
 
   await openApp(page, app.origin);
   await keepWord(page, '分岐');
-  const eventsAfterCapture = await durableEventCount(page);
-  expect(eventsAfterCapture).toBeGreaterThan(0);
 
   await v('capture-open-word').click();
   await expect(v('screen-word')).toBeVisible();
+
+  // The baseline is read after the word-page press: that press is a real
+  // lookup and legitimately appends one `LookupFrictionLogged` (T-07, RENKAN
+  // R2-X), which is the learner's gesture and not the AI call's doing. The
+  // poll lets that asynchronous durable append settle (capture + promotion +
+  // lookup = 3), so the comparison below measures the hung request alone.
+  await expect.poll(async () => durableEventCount(page)).toBe(3);
+  const eventsAfterCapture = await durableEventCount(page);
+  expect(eventsAfterCapture).toBeGreaterThan(0);
 
   const askedAt = Date.now();
   await v('candidate-request').click();

@@ -43,7 +43,7 @@
  * renders the store's own durability sentence instead (P0-CAP-15).
  */
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { isPromotionActive } from '@bunki/domain';
@@ -59,6 +59,7 @@ import {
   type SeedLexeme,
 } from '../data/catalog.ts';
 import { useAppSnapshot, useAppStore, useDebugFlags } from '../state/app-context.tsx';
+import { captureLookupCommand, type CaptureLookupTarget } from '../state/lookup-friction.ts';
 import {
   DURABILITY_NOTES,
   UNCERTAINTY_DIMENSIONS,
@@ -154,6 +155,35 @@ export function CaptureScreen({
         : undefined,
   });
 
+  /**
+   * Lookups this presentation has already recorded (T-07, ledger P1-17).
+   *
+   * A real lookup here is the press that opens a full entry — the "Word page"
+   * and "Kanji page" doors, and the rows under "Other matches" — not the
+   * ambient top-answer resolution, which is the app resolving as you type and
+   * carries no gesture. One press records one `LookupFrictionLogged` through
+   * the same store command the golden route uses; the event is grade-free by
+   * schema (ADR-002) and the gate refuses it for FSRS by name, so nothing here
+   * can become review debt.
+   *
+   * The set makes the gesture idempotent per presentation: a double-tap, or
+   * re-opening the same entry from the same search, records once. A new query
+   * clears it (below), and a fresh mount starts empty, so a genuinely new
+   * reach for the same word is a new event — the store never collapses lookups
+   * into one lifetime record.
+   */
+  const recordedLookups = useRef(new Set<string>());
+
+  const recordLookup = useCallback(
+    (target: CaptureLookupTarget): void => {
+      const presentationKey = `${target.targetType}:${target.targetId}`;
+      if (recordedLookups.current.has(presentationKey)) return;
+      recordedLookups.current.add(presentationKey);
+      store.execute(captureLookupCommand(store.readAll(), target));
+    },
+    [store],
+  );
+
   // A new query invalidates the previous acknowledgment: leaving "Kept" on
   // screen while the answer under it changed would attach the confirmation to
   // the wrong word.
@@ -162,6 +192,7 @@ export function CaptureScreen({
     setEnrichment(null);
     setEnriching(false);
     setPendingMark(null);
+    recordedLookups.current.clear();
   }, [query]);
 
   const topResult = state.kind === 'ready' ? state.data[0] : undefined;
@@ -366,18 +397,24 @@ export function CaptureScreen({
             />
             {topResult.kind === 'lexeme' ? (
               <AppButton
-                accessibilityHint="Opens the full word page."
+                accessibilityHint="Opens the full word page. Recorded as lookup friction only — never a grade."
                 accessibilityLabel={`Open the word page for ${topResult.lexeme.headword}`}
                 label="Word page"
-                onPress={() => onOpenWord(topResult.lexeme.id)}
+                onPress={() => {
+                  recordLookup({ targetType: 'lexeme', targetId: topResult.lexeme.id });
+                  onOpenWord(topResult.lexeme.id);
+                }}
                 testID="capture-open-word"
               />
             ) : (
               <AppButton
-                accessibilityHint="Opens the full kanji page."
+                accessibilityHint="Opens the full kanji page. Recorded as lookup friction only — never a grade."
                 accessibilityLabel={`Open the kanji page for ${topResult.kanji.character}`}
                 label="Kanji page"
-                onPress={() => onOpenKanji(topResult.kanji.character)}
+                onPress={() => {
+                  recordLookup({ targetType: 'kanji', targetId: topResult.kanji.id });
+                  onOpenKanji(topResult.kanji.character);
+                }}
                 testID="capture-open-kanji"
               />
             )}
@@ -477,11 +514,15 @@ export function CaptureScreen({
                   : `Kanji ${result.kanji.character}: ${result.kanji.meanings.join(', ')}`
               }
               key={result.kind === 'lexeme' ? result.lexeme.id : result.kanji.id}
-              onPress={() =>
-                result.kind === 'lexeme'
-                  ? onOpenWord(result.lexeme.id)
-                  : onOpenKanji(result.kanji.character)
-              }
+              onPress={() => {
+                if (result.kind === 'lexeme') {
+                  recordLookup({ targetType: 'lexeme', targetId: result.lexeme.id });
+                  onOpenWord(result.lexeme.id);
+                } else {
+                  recordLookup({ targetType: 'kanji', targetId: result.kanji.id });
+                  onOpenKanji(result.kanji.character);
+                }
+              }}
             >
               {result.kind === 'lexeme' ? (
                 <>

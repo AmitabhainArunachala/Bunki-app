@@ -36,8 +36,14 @@ import {
 } from '@bunki/domain';
 
 import { useDebugFlags } from '../state/app-context.tsx';
+import {
+  SESSION_BUDGET_CHOICES,
+  SESSION_BUDGET_MAX_MINUTES,
+  SESSION_BUDGET_MIN_MINUTES,
+  useSessionBudget,
+} from '../state/session-budget.ts';
 import { useLookup } from '../state/use-lookup.ts';
-import { AppButton, Hairline, Section } from '../ui/primitives.tsx';
+import { AppButton, ChipButton, Hairline, Section } from '../ui/primitives.tsx';
 import { EmptyPanel, ErrorPanel, LoadingPanel } from '../ui/screen-state.tsx';
 import { ScreenShell } from '../ui/screen-shell.tsx';
 import { RADIUS, SPACE, TYPE } from '../ui/theme.ts';
@@ -68,7 +74,11 @@ const COMPLETION_WORDING: Readonly<Record<string, string>> = {
 
 export interface SessionScreenProps {
   readonly context: DomainContext;
-  /** Minutes the learner offered. Chosen upstream; the plan never exceeds it. */
+  /**
+   * Pins the budget's starting value (tests, the screenshot harness). Absent in
+   * the app: the budget is the learner's own persisted setting, chosen on this
+   * screen — see `src/state/session-budget.ts` — and the plan never exceeds it.
+   */
   readonly timeBudgetMin?: number | undefined;
   readonly newBudget?: number | undefined;
   readonly onOpenCanvas: (canvasId: string) => void;
@@ -80,7 +90,7 @@ export interface SessionScreenProps {
 
 export function SessionScreen({
   context,
-  timeBudgetMin = 12,
+  timeBudgetMin,
   newBudget = 1,
   onOpenCanvas,
   onOpenRepair,
@@ -93,6 +103,10 @@ export function SessionScreen({
   const [revealed, setRevealed] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showBacklog, setShowBacklog] = useState(false);
+  // The learner's own time budget (P1-16). Held above the view-state branches
+  // so the hook order is stable, and passed down as the number every budget
+  // sentence on this screen renders — one source, no drift.
+  const budget = useSessionBudget(timeBudgetMin);
 
   // The seed resolution goes through the same state machine as every other
   // screen, so loading and error are the real ones, not a stand-in (REQ-UI-09).
@@ -135,6 +149,7 @@ export function SessionScreen({
       loop={loop}
       newBudget={newBudget}
       onBack={onBack}
+      onChooseBudget={budget.chooseMinutes}
       onOpenCanvas={onOpenCanvas}
       onInspectEvidence={onInspectEvidence}
       onOpenRepair={onOpenRepair}
@@ -145,7 +160,7 @@ export function SessionScreen({
       showBacklog={showBacklog}
       target={view.data}
       theme={theme}
-      timeBudgetMin={timeBudgetMin}
+      timeBudgetMin={budget.minutes}
     />
   );
 }
@@ -155,6 +170,8 @@ interface SessionBodyProps {
   readonly target: SessionTarget;
   readonly theme: ReturnType<typeof useTheme>;
   readonly timeBudgetMin: number;
+  /** The learner changing their budget. Applies to the *next* composed plan. */
+  readonly onChooseBudget: (minutes: number) => void;
   readonly newBudget: number;
   readonly revealed: boolean;
   readonly setRevealed: (value: boolean) => void;
@@ -173,6 +190,7 @@ function SessionBody({
   target,
   theme,
   timeBudgetMin,
+  onChooseBudget,
   newBudget,
   revealed,
   setRevealed,
@@ -232,6 +250,37 @@ function SessionBody({
             The sitting will be built from what is due for {target.lexeme.headword} and the passage
             that embeds it.
           </Text>
+          {/* The learner's time budget (REQ-SCH-04: "the time the learner
+              chose"). One tap, like the uncertainty mark; the choice persists
+              on this device and the plan below never exceeds it. */}
+          <View style={styles.budgetBlock} testID="session-budget">
+            {/* No durability sentence here on purpose: the choice persists on
+                web and is session-held on native (see session-budget.ts), and a
+                single claim true on only one platform would be the kind of
+                unqualified promise P0-CAP-15 forbids. */}
+            <Text
+              style={[
+                styles.budgetLabel,
+                { color: theme.color.inkMuted, fontFamily: theme.font.sans },
+              ]}
+            >
+              Minutes for this sitting — yours to set, {String(SESSION_BUDGET_MIN_MINUTES)} to{' '}
+              {String(SESSION_BUDGET_MAX_MINUTES)}.
+            </Text>
+            <View accessibilityRole="radiogroup" style={styles.actions}>
+              {SESSION_BUDGET_CHOICES.map((choice) => (
+                <ChipButton
+                  accessibilityHint="Sets how many minutes the plan may fill. The plan never exceeds the minutes you give it."
+                  accessibilityLabel={`Give this sitting ${String(choice)} minutes`}
+                  key={choice}
+                  label={`${String(choice)} min`}
+                  onPress={() => onChooseBudget(choice)}
+                  selected={choice === timeBudgetMin}
+                  testID={`session-budget-${String(choice)}`}
+                />
+              ))}
+            </View>
+          </View>
           <AppButton
             accessibilityHint="Composes the plan for the chosen budget and opens the session."
             label="Compose the session"
@@ -636,6 +685,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: SPACE.sm,
+  },
+  budgetBlock: {
+    gap: SPACE.sm,
+  },
+  budgetLabel: {
+    fontSize: TYPE.label,
   },
   planRow: {
     alignItems: 'center',
