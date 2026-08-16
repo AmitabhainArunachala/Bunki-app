@@ -1,115 +1,439 @@
 {
-  "schemaVersion": 1,
-  "campaign": "kairo-full-build-20260808",
-  "integrationBranch": "codex/kairo-full-build-20260808",
-  "startingIntegrationSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
-  "currentIntegrationSha": "215638929d431dd753fcac458478e30b0622cb01",
-  "sourcePullRequest": {
-    "number": 65,
-    "branch": "claude/kairo-prototype-phase-1-4hdre6",
-    "baseSha": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
-    "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
-    "observedAt": "2026-08-08T14:29:01Z",
-    "state": "open-draft-clean",
-    "verification": {
-      "remoteChecks": {
-        "corpusPytest": "success",
-        "verifiedBuild": "success",
-        "lintFormatTypecheckTest": "success",
-        "webE2eAccessibilityAdversarial": "success",
-        "deploy": "skipped"
-      },
-      "fourOrphanedDriftClaims": "unverified"
-    }
-  },
+  "schemaVersion": 2,
+  "campaign": "連環 RENKAN — the one-push campaign (docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md)",
+  "integrationBranch": "claude/renkan-one-push-2026-08-16",
+  "startingIntegrationSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+  "currentIntegrationSha": "7c189c24249a9a57441b7645514e49bebfbc0102",
+  "sourcePullRequest": 74,
   "workstreams": [
     {
-      "branch": "codex/kairo-full-build-20260808",
-      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
-      "headSha": "215638929d431dd753fcac458478e30b0622cb01",
-      "dependencies": ["pr:65@e8be255e1ea13a350759198f3e85caf0e239560d"],
-      "capabilityOwner": "lead-integration",
-      "capabilities": ["campaign-integration", "shared-contracts"],
-      "verificationStatus": "domain-552-of-552-and-seed-91-of-91-green-on-integration-head; generated-corridor-baseline-remains-90-of-91-and-must-be-regenerated-after-runtime-fixes",
-      "status": "active"
-    },
-    {
-      "branch": "codex/kairo-a0-drift-hunts-20260808",
-      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
-      "headSha": "d81334321d4e33a99a06be12e75b5758bfb04552",
-      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
-      "capabilityOwner": "a0-drift-hunts",
+      "name": "renkan-integration",
+      "status": "active",
+      "branch": "claude/renkan-one-push-2026-08-16",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "7c189c24249a9a57441b7645514e49bebfbc0102",
+      "capabilityOwner": "campaign lander",
+      "verificationStatus": "battery 16/16 green on this head (docs/build-evidence/renkan/battery-final/SUMMARY.md)",
+      "dependencies": [],
       "capabilities": [
-        "kana-semantic-node-interactivity",
-        "pinch-gesture-identity",
-        "active-pointer-lifecycle",
-        "hub-release-arbitration"
-      ],
-      "verificationStatus": "three-hunts-and-foreign-pointer-half-authoritatively-red; pinch-pair-CDP-sequence-rejected-by-independent-judge-and-being-corrected-before-promotion",
-      "status": "active"
+        "serial integration of every verified donor",
+        "fresh §4 battery per round",
+        "RUN_STATE + manifest per round",
+        "Wave C: exact-SHA end-to-end reader demonstration (85/86 assertions) and the honest rubric re-assessment (28.4/100)",
+        "Wave E: fresh full §4 battery, truth pass, this manifest"
+      ]
     },
     {
-      "branch": "codex/kairo-a0-verifier-20260808",
-      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
-      "headSha": "3cbb975f795562614ee7335bc198bb9acbfea1ac",
-      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
-      "capabilityOwner": "a0-verifier-truthfulness",
+      "name": "r0-corpus-spine",
+      "status": "integrated",
+      "branch": "corpus/00-skeleton-provenance",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "a14dcbdd727bc695b510f1efd5d57256e619c551",
+      "capabilityOwner": "corpus datasets + grader",
+      "verificationStatus": "recon-verified byte-identical subset of main; merge-tree conflict-free",
+      "dependencies": [],
       "capabilities": [
-        "drift-consistency-fail-closed",
-        "a0-ci-gate",
-        "a0-acceptance-evidence"
+        "seven verified datasets",
+        "three-signal grader",
+        "corpus pytest gates (193)"
       ],
-      "verificationStatus": "integrated-as-c26ff01-and-28d3ab6; fail-closed-smoke-15-cases-12-pass-3-runtime-reds-zero-page-errors",
-      "status": "integrated"
+      "integrationCommits": [
+        "a14dcbdd727bc695b510f1efd5d57256e619c551"
+      ]
     },
     {
-      "branch": "codex/kairo-a05-accessibility-20260808",
-      "baseSha": "81d0c12",
-      "headSha": "d3e9ae86668ccac84ddb495103e327251a83c0e2",
-      "dependencies": ["codex/kairo-full-build-20260808@81d0c12"],
-      "capabilityOwner": "a05-accessibility-corridor-contract",
+      "name": "r0-fsrs-optimizer",
+      "status": "integrated",
+      "branch": "codex/fsrs-optimizer-20260812",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "fa78a65e418932fe247bc748a7f373d57e18469b",
+      "capabilityOwner": "SRS engine",
+      "verificationStatus": "lander-verified: 11/11 optimizer tests, typecheck/lint/format green",
+      "dependencies": [],
       "capabilities": [
-        "substrate-neutral-interaction-actions",
-        "corridor-keyboard-and-switch-parity",
-        "dialog-focus-contract",
-        "corridor-reduced-motion",
-        "pages-corridor-packaging"
+        "deterministic personal FSRS optimizer",
+        "reads the real v:1 export envelope"
       ],
-      "verificationStatus": "interaction-contract-integrated-as-5395df9-and-d9f39d9; 61-contract-tests-and-552-full-domain-tests-green; corridor-red-baseline-committed-and-runtime-fix-in-progress",
-      "status": "active"
+      "integrationCommits": [
+        "fa78a65e418932fe247bc748a7f373d57e18469b"
+      ]
     },
     {
-      "branch": "codex/kairo-a1-source-20260809",
-      "baseSha": "d9f39d9c58f026ed18c12a4d75cef25f3a6fcac2",
-      "headSha": "15e9609dfb099054a17d0cddc3812298cc991dae",
+      "name": "r1-drift-bridge",
+      "status": "integrated",
+      "branch": "renkan/wp-a1a-drift-bridge",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "86fa4d343f8584096c94df9289039d6ff28947ca",
+      "capabilityOwner": "learner state",
+      "verificationStatus": "CONFIRMED by independent verify agent (own CDP flick smoke)",
       "dependencies": [
-        "codex/kairo-full-build-20260808@d9f39d9c58f026ed18c12a4d75cef25f3a6fcac2"
+        "renkan-integration"
       ],
-      "capabilityOwner": "a1-golden-source",
       "capabilities": [
-        "rights-clean-source-identity",
-        "utf16-source-anchor",
-        "source-field-provenance"
+        "drift judgments reach the obslog",
+        "ack-gated with rollback",
+        "never mints FSRS state"
       ],
-      "verificationStatus": "integrated-as-2156389; seed-91-of-91-typecheck-lint-format-green; source-body-sha256-and-exact-jibun-span-pinned",
-      "status": "integrated"
+      "integrationCommits": [
+        "db46914b5d902620505f620351dab78357ac1f08"
+      ]
     },
     {
-      "branch": "codex/kairo-a1-domain-20260809",
-      "baseSha": "215638929d431dd753fcac458478e30b0622cb01",
-      "headSha": "215638929d431dd753fcac458478e30b0622cb01",
+      "name": "r1-dojo-practice",
+      "status": "integrated",
+      "branch": "renkan/wp-a1b-dojo-orphans",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "8a02e1f23fdbc28e6049252050a13a86ba6704d1",
+      "capabilityOwner": "learner state",
+      "verificationStatus": "CONFIRMED by independent verify agent",
       "dependencies": [
-        "codex/kairo-full-build-20260808@215638929d431dd753fcac458478e30b0622cb01"
+        "renkan-integration"
       ],
-      "capabilityOwner": "a1-domain-state-contracts",
       "capabilities": [
-        "span-aware-capture",
-        "retrieval-contract-source-lineage",
-        "explicit-learning-activation",
-        "lookup-friction-authority"
+        "drills stamp practice evidence",
+        "no orphaned FSRS state",
+        "no silent new-card burn"
       ],
-      "verificationStatus": "test-first-implementation-in-progress",
-      "status": "active"
+      "integrationCommits": [
+        "f757944d2f4752412c804cbb508fabe9c4cdd830"
+      ]
+    },
+    {
+      "name": "r1-ai-runtime",
+      "status": "integrated",
+      "branch": "renkan/wp-a2-ai-runtime",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "9a81418f11f882546f79b8d398998f06f598314f",
+      "capabilityOwner": "AI surfaces",
+      "verificationStatus": "CONFIRMED by independent verify agent; verify-corridor-ai 20/20 on the final head",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "10s abort on every surface",
+        "provider/model seam",
+        "lossless IndexedDB transcript archive"
+      ],
+      "integrationCommits": [
+        "bdddc289295030d0859b785691629c1bbb4a62a1"
+      ]
+    },
+    {
+      "name": "r1-bilingual-titles",
+      "status": "integrated",
+      "branch": "renkan/wp-b3-titleen",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "fe2a9295bcf4351eefdf639a91fa2c3285c4e58f",
+      "capabilityOwner": "content schema",
+      "verificationStatus": "CONFIRMED by independent verify agent; extended to the archive by the lander",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "titleEn as schema data with provenance",
+        "TITLES_EN map deleted",
+        "682 archive titles"
+      ],
+      "integrationCommits": [
+        "ca14e091a6e93795beb266d4f270e92937ebe24d",
+        "c17bd7621b94789f7f333d8f008200084e1465a4"
+      ]
+    },
+    {
+      "name": "r2-capture-sovereignty",
+      "status": "integrated",
+      "branch": "renkan-r2-b-capture-sovereignty",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "c2d1e4c8eacaf4f8fb7bc856e1fe9968750425b6",
+      "capabilityOwner": "capture",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "覚える top-right of every capture-eligible surface",
+        "un-memorize with append-only revlog",
+        "list create/rename/delete"
+      ],
+      "integrationCommits": [
+        "78bfaad67fa7016734a64e1d881a358d8026b39a"
+      ]
+    },
+    {
+      "name": "r2-scheduler-policy",
+      "status": "integrated",
+      "branch": "renkan/r2a-srs-review-integrity",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "ec69050b96c20a217e5b237e6507f414e9e2dfb1",
+      "capabilityOwner": "SRS engine",
+      "verificationStatus": "CONFIRMED by independent verify agent; ADR-003 accepted",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "fuzz off per the pin",
+        "append-order monotonic clamp",
+        "overdueness ordering",
+        "bounded review",
+        "no-debt legacy migration",
+        "ペース settings"
+      ],
+      "integrationCommits": [
+        "98c0eab16b9f05e8125456024b0c1b9d2ef27d6e"
+      ]
+    },
+    {
+      "name": "r2-feed-loop",
+      "status": "integrated",
+      "branch": "renkan/r2d-feed-loop",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "3f394a72b21e2e29b8760b9b89ddf989573c43a8",
+      "capabilityOwner": "content pipeline",
+      "verificationStatus": "CONFIRMED by independent verify agent; verify-feed 27/27",
+      "dependencies": [
+        "renkan-integration",
+        "r0-corpus-spine"
+      ],
+      "capabilities": [
+        "deterministic ingest",
+        "two consecutive automated runs",
+        "operator review queue",
+        "cull authority",
+        "nothing self-approves"
+      ],
+      "integrationCommits": [
+        "a83b2b9694a4c282488c455187c5ab49d4074d32"
+      ]
+    },
+    {
+      "name": "r2-reader-shelf-truths",
+      "status": "integrated",
+      "branch": "renkan/r2c-reader-shelf-truths",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "88774e592d17c15a5fa653f11da24f3b35620803",
+      "capabilityOwner": "reader",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "shelf category sections",
+        "nested-button a11y repair",
+        "honest glossary labels",
+        "reconciled tray"
+      ],
+      "integrationCommits": [
+        "83b16c47578fe8db3b4b990f9849e8f71ae9ff9e"
+      ]
+    },
+    {
+      "name": "r2-drift-truths",
+      "status": "integrated",
+      "branch": "renkan/r2y-drift-truths",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "bff2c7b3b79bceec3c3b765df8a3bcfd04af5221",
+      "capabilityOwner": "drift",
+      "verificationStatus": "PARTIAL then reconciled: ring/cue/builders CONFIRMED with teeth; hunt-07 re-measured as a staging race and stabilized",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "bloom ring honours the 390px glass",
+        "first-touch cue",
+        "delivery-verified hunt staging"
+      ],
+      "integrationCommits": [
+        "059d72f64869f3af17a8d8204f3a2257bffe6790",
+        "eb8b7f514e07c2cb7f803722d6a1358921c3a080"
+      ]
+    },
+    {
+      "name": "r2-app-kernel",
+      "status": "integrated",
+      "branch": "renkan/r2x-app-kernel",
+      "baseSha": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+      "sourceHeadSha": "0cccfd4fb05cf49f328ab2701792b5e199ede68e",
+      "capabilityOwner": "apps/app kernel",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "session budget is the learner's",
+        "real lookups mint LookupFrictionLogged (T-07)"
+      ],
+      "integrationCommits": [
+        "184b2581e4d1469cb513950a613280e713181747"
+      ]
+    },
+    {
+      "name": "r3-furigana-truth",
+      "status": "integrated",
+      "branch": "renkan-r3a-furigana-truth",
+      "baseSha": "621750c1dea045d607eee675bdda5d3e264eda59",
+      "sourceHeadSha": "4d9948be299d9de349a392bcea27eb33e2e0cd13",
+      "capabilityOwner": "content truth",
+      "verificationStatus": "CONFIRMED by independent verify agent (read the Japanese itself)",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "reading-override lexicon at tokenization time",
+        "303 readings re-minted deterministically",
+        "suspect-reading checker"
+      ],
+      "integrationCommits": [
+        "d54c37cca7236b1a9ba3d9ddf75cdb3660f93bb9"
+      ]
+    },
+    {
+      "name": "r3-history-sentinel",
+      "status": "integrated",
+      "branch": "renkan-r3b-back-walks",
+      "baseSha": "621750c1dea045d607eee675bdda5d3e264eda59",
+      "sourceHeadSha": "cba3c05127716d69685aebeed25edd5d2b9cda38",
+      "capabilityOwner": "navigation",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "device Back walks the app",
+        "nav-search state survives",
+        "archive scroll restored",
+        "no hidden tab stops"
+      ],
+      "integrationCommits": [
+        "e0018d73dec3f0348d5a07a2811008b084ba3713"
+      ]
+    },
+    {
+      "name": "r3-optimizer-roundtrip",
+      "status": "integrated",
+      "branch": "renkan-r3d-fsrs-params",
+      "baseSha": "621750c1dea045d607eee675bdda5d3e264eda59",
+      "sourceHeadSha": "9a4d8e6e3026b5961c01b9d81cd664ec0e78f4e5",
+      "capabilityOwner": "SRS engine",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration",
+        "r0-fsrs-optimizer"
+      ],
+      "capabilities": [
+        "fitted weights drive the scheduler",
+        "fail-closed parameter validation",
+        "demonstrated round-trip"
+      ],
+      "integrationCommits": [
+        "269dfb59e329cc1a8e31a751175ca27d910cd11c"
+      ]
+    },
+    {
+      "name": "r3-declared-recall",
+      "status": "integrated",
+      "branch": "renkan-r3c-declared-recall",
+      "baseSha": "621750c1dea045d607eee675bdda5d3e264eda59",
+      "sourceHeadSha": "6a90c5cf23f34eecdc1ae7e1df8c7c786ec0a9d0",
+      "capabilityOwner": "review honesty",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "T-06 declared recall gates the reveal",
+        "まだ forces Again",
+        "transactional sweep 19→5 unchecked writers"
+      ],
+      "integrationCommits": [
+        "abedb405cf9f865acbca607598d2c00a528c6b8d"
+      ]
+    },
+    {
+      "name": "r3-small-truths",
+      "status": "integrated",
+      "branch": "renkan-r3e",
+      "baseSha": "621750c1dea045d607eee675bdda5d3e264eda59",
+      "sourceHeadSha": "5ef93386ce16d16f0d17e5852537d447c01bc2ba",
+      "capabilityOwner": "reader",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "JLPT signal no longer flatlines",
+        "no stringified None dates",
+        "true crumbs",
+        "kept places"
+      ],
+      "integrationCommits": [
+        "d895a16051dc37861d2287233e904053c0b6fa58"
+      ]
+    },
+    {
+      "name": "r4-lesson-disposition",
+      "status": "integrated",
+      "branch": "renkan-r4-b",
+      "baseSha": "10c440c006bec111617c19279b81ea2e99fc7a67",
+      "sourceHeadSha": "96ae2fd35f905ee975573b39f69cdc67f54602cf",
+      "capabilityOwner": "lessons",
+      "verificationStatus": "CONFIRMED by independent verify agent",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "lessons write evidence; enrolling is the choice",
+        "honest dojo second lap",
+        "quiz survives reload"
+      ],
+      "integrationCommits": [
+        "e04e694fff021cde27b18d89bb7aeace23600787"
+      ]
+    },
+    {
+      "name": "r4-app-lineage",
+      "status": "integrated",
+      "branch": "renkan-r4a-kernel",
+      "baseSha": "10c440c006bec111617c19279b81ea2e99fc7a67",
+      "sourceHeadSha": "32a14f94ab1a7579fd3f3d58c98d8824edd01e49",
+      "capabilityOwner": "apps/app kernel",
+      "verificationStatus": "LANDER-VERIFIED ONLY (typecheck, lint, vitest 1710, e2e 44); adversarial verify blocked by account spend limit — operator decision sheet OD-20",
+      "dependencies": [
+        "renkan-integration"
+      ],
+      "capabilities": [
+        "one Learn contract lineage",
+        "durable uncertainty dimension",
+        "real kanji-page capture"
+      ],
+      "integrationCommits": [
+        "7004ca581388644940fb816f21e8805788dcce0b"
+      ]
+    }
+  ],
+  "notRun": [
+    {
+      "what": "E3 double-dry HUNT (8 lenses x 2 rounds)",
+      "why": "account monthly spend limit reached mid-round-4",
+      "decisionSheet": "OD-19",
+      "script": "staged in the session workflow scripts; brief preserved in RUN_STATE"
+    },
+    {
+      "what": "R4-C obslog reader + tray 44px",
+      "why": "same spend limit; agent never started",
+      "decisionSheet": null,
+      "script": "brief preserved in RUN_STATE"
+    },
+    {
+      "what": "R4-D mock-tests proposal doc",
+      "why": "same spend limit; agent never started",
+      "decisionSheet": null,
+      "script": "brief preserved in RUN_STATE"
+    },
+    {
+      "what": "independent adversarial verify of r4-app-lineage",
+      "why": "same spend limit; lander re-ran every claimed gate instead",
+      "decisionSheet": "OD-20",
+      "script": null
     }
   ]
 }
