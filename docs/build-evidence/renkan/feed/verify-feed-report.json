@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "kind": "feed-gate-verification",
   "artifactHashes": {
-    "index": "72935ab9cba43ff87035aa5f127df9318a13e32d0285d51849cc7dc3e766dd26",
+    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "archiveIndex": "c95615863a47212582c2df40867ad057fa2ee9665e8463af511ee0328bca6995",
     "queue": "e556b419131629b64451b9c740bc7689d4a67caf76108fd400a5b899283e176a",
     "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
     "curationReport": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb",
-    "standalone": "d6e458525e8ab9bbe9bbe743d1be7712531d104d45f36ad1f6524d45c4d59e8c"
+    "standalone": "b53c1903eeeee1cf85f4eedc0e050f6f5bc366f9e8bbd663fdf17a9c52ea6dc8"
   },
   "counts": {
     "curated": 82,
