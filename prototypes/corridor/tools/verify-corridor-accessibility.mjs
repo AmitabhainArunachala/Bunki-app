@@ -144,6 +144,36 @@ async function main() {
     });
     page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
 
+    console.log('\n— shelf cards: parallel doors, never nested controls');
+    await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
+    const shelfStructure = await page.evaluate(`(() => {
+      const cards = [...document.querySelectorAll('.shelf-item')];
+      return {
+        cards: cards.length,
+        nestedInteractive: document.querySelectorAll(
+          'button button, button a, button input, a button, a a',
+        ).length,
+        cardsWithOwnDoor: cards.filter((card) => card.querySelector('button.shelf-open')).length,
+        cardsWithSiblingDetails: cards.filter((card) => {
+          const toggle = card.querySelector('button.details-toggle');
+          return !!toggle && toggle.closest('button') === toggle;
+        }).length,
+      };
+    })()`);
+    check(
+      'no interactive control nests inside another anywhere on the shelf',
+      shelfStructure.cards > 0 && shelfStructure.nestedInteractive === 0,
+      JSON.stringify(shelfStructure),
+    );
+    check(
+      'every card offers its text door and 詳細 as sibling buttons, both reachable',
+      shelfStructure.cardsWithOwnDoor === shelfStructure.cards &&
+        shelfStructure.cardsWithSiblingDetails === shelfStructure.cards,
+      `${shelfStructure.cardsWithOwnDoor}/${shelfStructure.cards} text doors · ` +
+        `${shelfStructure.cardsWithSiblingDetails}/${shelfStructure.cards} sibling toggles`,
+    );
+
     console.log('\n— reader semantics and non-hold alternatives');
     await openReader(page, base);
     const semantics = await page.evaluate(`(() => {

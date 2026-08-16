@@ -2701,11 +2701,17 @@ function renderShelfBody() {
   const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
   main.append(h);
   const curated = D.passages.filter((p) => !String(p.file || '').startsWith('archive/'));
+  // the count tells the truth: a one-sentence glossary definition is not a
+  // real text, so the glossary is billed as itself, beside the readings
+  const glossaryCount = curated.filter((p) => p.source === 'isa-yasashii-glossary').length;
+  const readingCount = curated.length - glossaryCount;
   const sub = el('p', 'shelf-snippet intro');
-  sub.textContent = tx(
-    `${curated.length} 本。触れてひらく。`,
-    `${curated.length} real texts. Tap one to read it.`,
-  );
+  sub.textContent = glossaryCount
+    ? tx(
+        `読み物 ${readingCount} 本と用語集 ${glossaryCount} 項。触れてひらく。`,
+        `${readingCount} real texts, and a ${glossaryCount}-entry glossary. Tap one to read it.`,
+      )
+    : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} real texts. Tap one to read it.`);
   main.append(sub);
 
   // door order is the learner's order, not the build order: the lanes
@@ -2803,53 +2809,18 @@ function renderShelfBody() {
     main.append(aread);
   }
 
+  // one shelf, quiet sections: cards keep the index's own order inside each
+  // section, and sections stand in the order the index first names them —
+  // the categories gather without anything being reshuffled
+  const sections = new Map();
   for (const p of curated) {
-    const item = el('button', 'shelf-item');
-    item.type = 'button';
-    item.dataset.passage = p.id;
-
-    const head = el('div', 'shelf-head');
-    head.append(el('div', 'shelf-title', p.title));
-    // the English title travels with the record (titleEn + titleEnSource in
-    // data/articles/index.json), never in a code-side map
-    if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
-    const lv = levelPhrase(p.grading);
-    const levelLine = el('div', 'level-line');
-    levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-    levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
-    if (p.grading.disagreement.flag) {
-      levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
-    }
-    head.append(levelLine);
-    item.append(head);
-
-    const meta = el('div', 'shelf-meta');
-    meta.append(el('span', null, p.sourceLabel));
-    if (p.date) meta.append(el('span', null, p.date));
-    meta.append(el('span', 'pool-tag', p.licence));
-    // the shelf remembers with you: finished, or open to your bookmark
-    if (S.readDone[p.id]) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
-    else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
-    item.append(meta);
-    item.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
-
-    // the instrument stays one tap away: 詳細 unfolds the raw three signals
-    const details = el('button', 'details-toggle');
-    details.type = 'button';
-    details.dataset.details = p.id;
-    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
-    details.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      (S.detailsOpen ||= new Set());
-      if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
-      else S.detailsOpen.add(p.id);
-      render();
-    });
-    item.append(details);
-    if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
-
-    item.addEventListener('click', () => openPassage(p.id));
-    main.append(item);
+    const sec = shelfSection(p);
+    if (!sections.has(sec.ja)) sections.set(sec.ja, { sec, items: [] });
+    sections.get(sec.ja).items.push(p);
+  }
+  for (const { sec, items } of sections.values()) {
+    main.append(withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline'));
+    for (const p of items) main.append(shelfCard(p));
   }
 
   // the deep stack: the frozen wikinews archive, its own quiet room —
@@ -2883,6 +2854,76 @@ function renderShelfBody() {
   main.append(src);
   if (S.sourcesOpen) main.append(licencePanel());
   return main;
+}
+
+/** The shelf's quiet sections, named from each record's own provenance —
+ * no code-side canon that the data could contradict. */
+function shelfSection(p) {
+  if (p.source === 'ja.wikinews') return { ja: 'ニュース', en: 'news' };
+  if (p.source === 'aozorabunko-clean') return { ja: '青空文庫', en: 'Aozora Bunko' };
+  if (p.source === 'isa-yasashii-glossary') {
+    return { ja: 'やさしい日本語 用語集', en: 'the plain-Japanese glossary — one-line definitions' };
+  }
+  const label = String(p.sourceLabel || '');
+  if (label.startsWith('段階別読み物')) return { ja: '段階別読み物', en: 'graded readings' };
+  if (label.startsWith('随筆')) return { ja: '随筆', en: 'essays' };
+  return { ja: '古典・一次資料', en: 'classics & primary sources' };
+}
+
+/** One shelf card. The card is a small row of PARALLEL controls, never a
+ * button holding a button (invalid HTML that hides the inner toggle from
+ * assistive tech): the text is one whole door, 詳細 its own sibling door. */
+function shelfCard(p) {
+  const item = el('article', 'shelf-item');
+  item.dataset.passage = p.id;
+
+  const open = el('button', 'shelf-open');
+  open.type = 'button';
+  const head = el('div', 'shelf-head');
+  head.append(el('div', 'shelf-title', p.title));
+  // the English title travels with the record (titleEn + titleEnSource in
+  // data/articles/index.json), never in a code-side map
+  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
+  const lv = levelPhrase(p.grading);
+  const levelLine = el('div', 'level-line');
+  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
+  if (p.grading.disagreement.flag) {
+    levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
+  }
+  head.append(levelLine);
+  open.append(head);
+
+  const meta = el('div', 'shelf-meta');
+  meta.append(el('span', null, p.sourceLabel));
+  if (p.date) meta.append(el('span', null, p.date));
+  meta.append(el('span', 'pool-tag', p.licence));
+  // an honest kind on the rows that are not articles
+  if (p.source === 'isa-yasashii-glossary') {
+    meta.append(el('span', 'pool-tag', tx('用語集の項目', '用語集 glossary entry')));
+  }
+  // the shelf remembers with you: finished, or open to your bookmark
+  if (S.readDone[p.id]) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
+  else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
+  open.append(meta);
+  open.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
+  open.addEventListener('click', () => openPassage(p.id));
+  item.append(open);
+
+  // the instrument stays one tap away: 詳細 unfolds the raw three signals
+  const details = el('button', 'details-toggle');
+  details.type = 'button';
+  details.dataset.details = p.id;
+  details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
+  details.addEventListener('click', () => {
+    (S.detailsOpen ||= new Set());
+    if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
+    else S.detailsOpen.add(p.id);
+    render();
+  });
+  item.append(details);
+  if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
+  return item;
 }
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -3309,6 +3350,32 @@ function commitReadDone(articleId, now = Date.now()) {
   return commitStorePatch({ readDone });
 }
 
+/* ------------------------------------------- 用語集の相互参照 (glossary)
+ * The ISA glossary numbers its entries, and its definitions cite each other
+ * by that number — 「印鑑登録証明書(No.6)」. Ten entries stand on this shelf
+ * under the same numbers (yasashii:N); the rest of the glossary does not.
+ * At render time a citation whose target stands here becomes a live door to
+ * that entry; a citation into the missing rest drops its dead number and
+ * keeps the term. The licensed text and tokens are untouched on disk —
+ * this is presentation, not adaptation. */
+function glossaryCrossRefPlan(p) {
+  if (p.source !== 'isa-yasashii-glossary' || !p.tokens) return null;
+  const skip = new Set();
+  const doors = new Map();
+  const toks = p.tokens;
+  for (let i = 0; i + 4 < toks.length; i++) {
+    if (toks[i].s !== '(' && toks[i].s !== '（') continue;
+    if (toks[i + 1]?.s !== 'No' || toks[i + 2]?.s !== '.') continue;
+    if (!/^[0-9]+$/.test(toks[i + 3]?.s || '')) continue;
+    if (toks[i + 4].s !== ')' && toks[i + 4].s !== '）') continue;
+    const target = D.passages.find((x) => x.id === `yasashii:${Number(toks[i + 3].s)}`);
+    for (let k = i; k <= i + 4; k++) skip.add(k);
+    if (target) doors.set(i, target);
+    i += 4;
+  }
+  return skip.size ? { skip, doors } : null;
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -3386,11 +3453,28 @@ function renderReader(main) {
   const learning = new Set();
   for (const t of S.taken) if (t.t === 'word') learning.add(t.id);
   const dueNow = new Date();
+  const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
+    }
+    if (crossRefs) {
+      const refTarget = crossRefs.doors.get(index);
+      if (refTarget) {
+        const refDoor = el('button', 'sent-door glossary-ref', '▹');
+        refDoor.type = 'button';
+        refDoor.dataset.glossaryRef = refTarget.id;
+        refDoor.setAttribute(
+          'aria-label',
+          tx(`用語集「${refTarget.title}」をひらく`, `open the glossary entry ${refTarget.title}`),
+        );
+        refDoor.addEventListener('click', () => openPassage(refTarget.id));
+        if (S.dials.spacing === 2 && group) group.append(refDoor);
+        else reader.append(refDoor);
+      }
+      if (crossRefs.skip.has(index)) continue;
     }
     const particle = !token.c ? PARTICLE_BY_SURFACE[token.s] : null;
     const interactive = !!token.c || !!particle;
@@ -3687,18 +3771,23 @@ function renderTray(main) {
   }
   if (S.taken.length && scheduler) {
     const due = srsDueItems();
+    const f = srsForecast();
+    // the two lines must tell one story: when nothing is due at this moment
+    // but cards still ripen before midnight, the quiet door says "right now"
+    // and the forecast's first bucket says WHEN — never a flat 予定なし
+    // sitting directly above a bare 今日 2
+    const laterToday = !due.length && f.today > 0;
     const btn = biLabel(
       'button',
       due.length ? 'take review-start' : 'take review-start quiet',
-      due.length ? `復習する — ${due.length} 件` : '復習する — 予定なし',
-      due.length ? `review now — ${due.length} due` : 'nothing due yet',
+      due.length ? `復習する — ${due.length} 件` : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
+      due.length ? `review now — ${due.length} due` : laterToday ? 'nothing due right now' : 'nothing due yet',
     );
     btn.type = 'button';
     btn.id = 'review-start';
     btn.disabled = !due.length;
     btn.addEventListener('click', startReview);
     main.append(btn);
-    const f = srsForecast();
     if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
       // 未着手 appears only when no-debt rows exist: the backlog is named,
       // never hidden and never turned into due cards by anyone but the learner
@@ -3709,8 +3798,8 @@ function renderTray(main) {
           'p',
           'srs-forecast',
           tx(
-            `今日 ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
-            `today ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
+            `${laterToday ? '今日このあと' : '今日'} ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
+            `${laterToday ? 'later today' : 'today'} ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
           ),
         ),
       );
@@ -5952,7 +6041,9 @@ function nodeTitle(node) {
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'catalog') return catalogLabel(node.by, node.value);
-  if (node.t === 'sent') return tx('文', 'sentence');
+  // the crumb idiom for a content-shaped node: 日本語 first, english beside
+  // it — never a stray lowercase 'sentence' standing alone mid-crumb
+  if (node.t === 'sent') return tx('文', '文 sentence');
   return '';
 }
 
@@ -7956,10 +8047,12 @@ async function ensureBankExamples(word) {
  * context line — carries the reader's click grammar, and starts BARE:
  * no furigana until it is asked for (operator's law, 2026-08-12 — the
  * sentence is the exercise; readings on request only, whatever the
- * reader's own dial says). First tap ふりがな, second tap the English
- * gloss beneath, third tap the full entry — and after the entry, one
- * more tap folds the word back to plain kanji. Each sentence keeps its
- * own quiet ladder state; taps land in the obslog. */
+ * reader's own dial says). Taps circle exactly as in the reader: first
+ * tap ふりがな, second tap the English gloss beneath, third tap closes
+ * the circle back to plain kanji. The full entry lives on the holds —
+ * a short hold floats the simple definition, a long hold (or a tap on
+ * the mini) opens the entry. Each sentence keeps its own quiet ladder
+ * state; taps land in the obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
@@ -8947,7 +9040,15 @@ function renderWordNode(sheet, node) {
   }
   const examples = findExamples(node.id, 6);
   if (examples.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples — tap a word to climb its ladder', 'en-inline'));
+    // the eyebrow says the whole gesture, in both tongues: the hold that
+    // opens the dictionary was the ladder's unspoken rung (review P2)
+    sheet.append(
+      withEn(
+        el('p', 'eyebrow', '用例 — ことばは長押しで辞書へ'),
+        'examples — tap a word to climb its ladder; hold it to open the dictionary',
+        'en-inline',
+      ),
+    );
     for (const ex of examples) {
       const line = el('div', 'example');
       const text = el('p', 'example-ja');

@@ -422,6 +422,54 @@ async function main() {
   check('every text carries an English title and a learner-readable level',
     shelfData.every((s) => s.titleEn && s.level && /^[A-Za-z]/.test(s.level)),
     `${shelfData.length} texts, e.g. "${shelfData[0]?.titleEn}" — ${shelfData[0]?.level}${shelfData[0]?.levelNote}`);
+
+  // the shelf stands in quiet sections: every card under exactly one
+  // eyebrow, every category one contiguous run — never split across the
+  // shelf in disconnected stretches
+  const sectionProbe = await page.evaluate(`(() => {
+    const kids = [...document.querySelectorAll('#shelf-body > *')];
+    const runs = [];
+    let stray = 0;
+    for (const kid of kids) {
+      if (kid.matches('p.eyebrow.shelf-section')) {
+        runs.push({ header: kid.childNodes[0]?.textContent?.trim() ?? '', items: 0 });
+      } else if (kid.matches('.shelf-item')) {
+        if (!runs.length) stray += 1;
+        else runs[runs.length - 1].items += 1;
+      }
+    }
+    const headers = runs.map((r) => r.header);
+    return {
+      stray,
+      headers,
+      empty: runs.filter((r) => r.items === 0).length,
+      duplicated: headers.length !== new Set(headers).size,
+      grouped: runs.reduce((a, r) => a + r.items, 0),
+    };
+  })()`);
+  check('the shelf gathers into quiet sections — each category one run, no card outside one',
+    sectionProbe.stray === 0 && sectionProbe.headers.length >= 4 &&
+      !sectionProbe.duplicated && sectionProbe.empty === 0 &&
+      sectionProbe.grouped === shelfData.length,
+    `${sectionProbe.headers.length} sections: ${sectionProbe.headers.join(' · ')} — ${sectionProbe.grouped}/${shelfData.length} cards housed`);
+
+  // the glossary is billed as itself: one-line definitions are labeled
+  // 用語集 on the card and are never counted among the "real texts"
+  const glossaryProbe = await page.evaluate(`(() => {
+    const cards = [...document.querySelectorAll('.shelf-item')];
+    const glossary = cards.filter((n) =>
+      (n.querySelector('.shelf-meta')?.textContent ?? '').includes('用語集'));
+    const labeled = glossary.filter((n) =>
+      [...n.querySelectorAll('.shelf-meta .pool-tag')].some((t) => t.textContent.includes('用語集')));
+    const intro = document.querySelector('.shelf-snippet.intro')?.textContent ?? '';
+    return { cards: cards.length, glossary: glossary.length, labeled: labeled.length, intro };
+  })()`);
+  const billedTexts = Number(glossaryProbe.intro.match(/([0-9]+) real texts|読み物 ([0-9]+) 本/)?.slice(1).find(Boolean) ?? NaN);
+  check('glossary rows are labeled 用語集 and stand outside the real-text count',
+    glossaryProbe.glossary > 0 && glossaryProbe.labeled === glossaryProbe.glossary &&
+      billedTexts === glossaryProbe.cards - glossaryProbe.glossary &&
+      /用語集|glossary/.test(glossaryProbe.intro),
+    `${glossaryProbe.labeled}/${glossaryProbe.glossary} labeled · intro bills ${billedTexts} texts for ${glossaryProbe.cards - glossaryProbe.glossary} non-glossary cards`);
   // Disagreement may only fire where >=2 ordinal-capable signals were
   // measured on the displayed text. With the NINJAL pair unavailable to this
   // build environment, zero flags is the honest state — a flag with fewer
@@ -436,6 +484,42 @@ async function main() {
   check('disagreement fires only where two-plus ordinal signals were measured',
     ordinalCapable >= 2 ? flagged >= 0 : flagged === 0,
     `${flagged} flagged; ${ordinalCapable} articles with >=2 ordinal signals`);
+
+  // glossary cross-references resolve or fall silent: a citation whose
+  // target stands on this shelf becomes a live door; one into the missing
+  // rest of the glossary drops its number — no dead "(No.NN)" survives
+  const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証');
+  check('the cross-referencing glossary entry stands on the shelf', inkanIndex >= 0,
+    `shelf index ${inkanIndex}`);
+  await tap(page, '.shelf-item', inkanIndex);
+  await settleReader(page);
+  const refProbe = await page.evaluate(`(() => {
+    const reader = document.getElementById('reader');
+    const doors = [...reader.querySelectorAll('.glossary-ref')];
+    return {
+      text: reader.textContent,
+      doors: doors.length,
+      targets: doors.map((d) => d.dataset.glossaryRef),
+    };
+  })()`);
+  check('no dead (No.NN) citation survives into the read',
+    refProbe.text.length > 0 && !/No\s*\.\s*[0-9]/.test(refProbe.text),
+    `${refProbe.text.replace(/\s+/g, '').slice(0, 48)}…`);
+  check('the in-shelf citation is a live door to its glossary entry',
+    refProbe.doors === 1 && refProbe.targets[0] === 'yasashii:6',
+    `doors → ${refProbe.targets.join(', ') || 'none'}`);
+  await page.evaluate(`document.querySelector('#reader .glossary-ref')?.click()`);
+  await page
+    .waitForFunction(
+      `document.querySelector('h1.view-title')?.textContent === '印鑑登録証明書'`,
+      null,
+      { timeout: 8000 },
+    )
+    .catch(() => {});
+  const refLanded = await page.evaluate(`document.querySelector('h1.view-title')?.textContent ?? ''`);
+  check('the glossary door opens the entry it names', refLanded === '印鑑登録証明書',
+    `landed on "${refLanded}"`);
+  await open('?entry=shelf');
 
   // the raw instrument is one 詳細 tap away, not gone — and it must include
   // the live JLPT-lexicon row plus an HONEST row for the unmeasured NINJAL
@@ -1557,6 +1641,14 @@ async function main() {
   check('a common word carries at least 4 example sentences',
     bankSheet.n >= 4 && bankSheet.en >= 1,
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
+  // the eyebrow teaches the whole gesture: the hold that opens the
+  // dictionary must be said, not left for the reader to discover
+  const exampleEyebrow = await page.evaluate(
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t.includes('用例')) ?? ''`,
+  );
+  check('the 用例 eyebrow says that holding a word opens the dictionary',
+    /長押しで辞書/.test(exampleEyebrow) || /hold it to open the dictionary/.test(exampleEyebrow),
+    `eyebrow: "${exampleEyebrow}"`);
   const ladderProof = await page.evaluate(`(() => {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
@@ -2182,6 +2274,49 @@ async function main() {
   check('R2-A · the probes leave no console errors',
     consoleErrors.length === errsBeforeR2A,
     consoleErrors.slice(errsBeforeR2A).join(' | ') || 'clean');
+
+  // the tray tells one story: park every card a little later TODAY and use
+  // up the new-card room, so nothing is due at this moment — the closed
+  // door must then say "right now" and the forecast must say WHEN, never a
+  // flat 予定なし directly above a bare 今日 N
+  await page.evaluate(`(() => {
+    const key = 'kairo-corridor-v1';
+    const e = JSON.parse(localStorage.getItem(key) || '{}');
+    const now = new Date();
+    const cap = new Date(now);
+    cap.setHours(23, 58, 0, 0);
+    const soon = new Date(now.getTime() + 2 * 3600000);
+    const due = (soon < cap ? soon : new Date(now.getTime() + 90000)).toISOString();
+    for (const rec of Object.values(e.srs || {})) rec.due = due;
+    const p2 = (n) => String(n).padStart(2, '0');
+    const day = now.getFullYear() + '-' + p2(now.getMonth() + 1) + '-' + p2(now.getDate());
+    e.stats = e.stats || {};
+    e.stats[day] = Object.assign({}, e.stats[day], { nnew: 20 });
+    localStorage.setItem(key, JSON.stringify(e));
+  })()`);
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const trayTruth = await page.evaluate(`(() => {
+    const btn = document.querySelector('#review-start');
+    const forecast = document.querySelector('.srs-forecast')?.textContent ?? '';
+    const m = forecast.match(/(?:today|今日)[^0-9]*([0-9]+)/);
+    return {
+      disabled: btn?.disabled ?? false,
+      label: btn?.textContent ?? '',
+      forecast,
+      todayN: m ? Number(m[1]) : 0,
+    };
+  })()`);
+  check('the tray never contradicts itself — a closed review door names its when',
+    trayTruth.disabled &&
+      (trayTruth.todayN === 0
+        ? /予定なし|nothing due yet/.test(trayTruth.label)
+        : /このあと|later today/.test(trayTruth.forecast) &&
+          /いまは予定なし|nothing due right now/.test(trayTruth.label)),
+    JSON.stringify(trayTruth));
+  await shoot(page, shotsDir, '19-tray-later-today');
 
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({

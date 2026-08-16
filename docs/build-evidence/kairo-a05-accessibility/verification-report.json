@@ -1,18 +1,28 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "e8b0ccd95be4ce86df3e81e80d8155838943e494",
-  "chromium": "playwright-default",
+  "head": "67d80732154304015f18dc6bfb8027a9a8c2d06b",
+  "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
   "viewport": {
     "width": 390,
     "height": 844
   },
   "summary": {
-    "total": 42,
-    "passed": 42,
+    "total": 44,
+    "passed": 44,
     "failed": 0
   },
   "results": [
+    {
+      "name": "no interactive control nests inside another anywhere on the shelf",
+      "pass": true,
+      "detail": "{\"cards\":70,\"nestedInteractive\":0,\"cardsWithOwnDoor\":70,\"cardsWithSiblingDetails\":70}"
+    },
+    {
+      "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
+      "pass": true,
+      "detail": "70/70 text doors · 70/70 sibling toggles"
+    },
     {
       "name": "reader words are named native controls on the common target.activate action",
       "pass": true,

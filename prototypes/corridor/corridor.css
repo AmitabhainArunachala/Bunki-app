@@ -186,21 +186,34 @@ h1.view-title {
 }
 
 /* --------------------------------------------------------------- shelf */
+/* a card is an inert wrapper for two SIBLING buttons — the text door and
+ * the 詳細 toggle — never a button nested inside a button */
 .shelf-item {
+  display: block;
+  width: 100%;
+  border-top: 1px solid var(--line-soft);
+  padding: 15px 2px 16px;
+}
+
+.shelf-item:first-of-type {
+  border-top: 0;
+}
+
+.shelf-open {
   display: block;
   width: 100%;
   text-align: left;
   background: transparent;
   border: 0;
-  border-top: 1px solid var(--line-soft);
-  padding: 15px 2px 16px;
+  padding: 0;
   cursor: pointer;
   font: inherit;
   color: inherit;
 }
 
-.shelf-item:first-of-type {
-  border-top: 0;
+/* a quiet section header gathers each category into one run */
+.eyebrow.shelf-section {
+  margin: 30px 2px 4px;
 }
 
 .shelf-title {
