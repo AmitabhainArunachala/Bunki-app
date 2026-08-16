@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 15:10",
+          "2026-08-16 15:22",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 15:15",
+          "2026-08-16 15:27",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 15:19",
+          "2026-08-16 15:31",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 15:09",
+          "2026-08-24 15:21",
           "8.30"
         ]
       ]
@@ -7493,9 +7493,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 504,
+  "loadMs": 527,
   "summary": {
-    "total": 212,
+    "total": 213,
     "failed": 0
   },
   "results": [
@@ -7522,7 +7522,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.6199951171875,\"y\":570.7899780273438,\"productive\":true}"
+      "detail": "{\"x\":148.32000732421875,\"y\":570.1400146484375,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7532,7 +7532,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 89px; mean tether 118 → 133px"
+      "detail": "centre moved 87px; mean tether 118 → 133px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7542,7 +7542,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 504 ms"
+      "detail": "82 texts, ready in 527 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -8022,7 +8022,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786893054328,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786893773382,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8047,7 +8047,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786893058905,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786893777163,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8142,7 +8142,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8262,12 +8262,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T15:11:56.675Z; due 2026-08-26T15:11:56.675Z"
+      "detail": "anchor held at 2026-08-19T15:23:39.550Z; due 2026-08-26T15:23:39.550Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786893118274 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786893820595 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8417,7 +8417,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T15:12:38.843Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T15:24:20.525Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8485,6 +8485,11 @@
       "detail": "clean"
     },
     {
+      "name": "C1 · a sentence with no shelf article shows no door onto nothing",
+      "pass": true,
+      "detail": "no article-backed sentence page reached in this walk — honest absence path"
+    },
+    {
       "name": "R4-B · the lesson lanes keep their breadth — JLPT levels and the 漢検 grades",
       "pass": true,
       "detail": "4 JLPT lanes · 漢検 true"
@@ -8492,7 +8497,7 @@
     {
       "name": "R4-B · lesson completion alone creates ZERO deck rows — the score and the evidence, nothing else",
       "pass": true,
-      "detail": "taken 0 · srs 0 · lessonsDone [\"N5-1\"] · \"2 of 10\""
+      "detail": "taken 0 · srs 0 · lessonsDone [\"N5-1\"] · \"5 of 10\""
     },
     {
       "name": "R4-B · the run's words land as practice-evidence rows, one per word, named by the run",
@@ -8532,7 +8537,7 @@
     {
       "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
       "pass": true,
-      "detail": "row [1786893175612,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+      "detail": "row [1786893879039,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
     },
     {
       "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",

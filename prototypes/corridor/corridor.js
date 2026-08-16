@@ -6536,6 +6536,25 @@ function renderSentenceNode(sheet, node) {
   sheet.append(line);
   if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
   if (node.source) sheet.append(el('p', 'example-src', node.source));
+  // …and on to the whole article. The rubric asks a review answer to return
+  // the learner to the source sentence AND its article (§9.5); the C1
+  // demonstration found the sentence half present and this half missing.
+  // The door appears only when the sentence really came from a shelf
+  // article — a bank example has no article to walk into, and an honest
+  // absence beats a door onto nothing.
+  const home = node.passage && D.passages.some((p) => p.id === node.passage) ? node.passage : null;
+  if (home) {
+    const doorRow = el('div', 'sent-home-row');
+    const door = biLabel('button', 'chip sent-home', 'この記事を読む', 'read the source article');
+    door.type = 'button';
+    door.id = 'sent-home';
+    door.addEventListener('click', () => {
+      dismissSheet();
+      openPassage(home);
+    });
+    doorRow.append(door);
+    sheet.append(doorRow);
+  }
   sheet.append(el('p', 'gloss', tapLadderHint()));
 }
 

@@ -2998,6 +2998,55 @@ async function main() {
     consoleErrors.length === errsBeforeR4C,
     consoleErrors.slice(errsBeforeR4C).join(' | ') || 'clean');
 
+  // ------------- C1's own finding: the sentence page walks on to its article
+  // (rubric §9.5 — a review answer returns to the source sentence AND its
+  // article). The demonstration found the sentence half present, this half
+  // missing. A bank example must still show no door: honest absence.
+  console.log('\n— C1 finding · the sentence page reaches its article');
+  await open('?entry=shelf');
+  await page.waitForSelector('.shelf-item');
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#reader .tok.content');
+  const sentHome = await page.evaluate(`(() => {
+    const tok = document.querySelector('#reader .tok.content');
+    return tok ? tok.textContent.trim() : '';
+  })()`);
+  await tap(page, '#reader .tok.content');
+  await page.waitForTimeout(400);
+  const sentDoorSeen = await page.evaluate(`(() => {
+    const d = document.querySelector('.sent-door');
+    if (d) { d.click(); return true; }
+    return false;
+  })()`);
+  if (sentDoorSeen) {
+    await page.waitForSelector('#sheet');
+    await page.waitForTimeout(300);
+  }
+  const homeDoor = await page.evaluate(`(() => {
+    const b = document.querySelector('#sent-home');
+    return { present: !!b, label: b ? b.textContent : '' };
+  })()`);
+  if (homeDoor.present) {
+    await page.evaluate(`document.querySelector('#sent-home')?.click()`);
+    await page.waitForTimeout(600);
+    const landed = await page.evaluate(`(() => ({
+      view: document.body.dataset.view || '',
+      reader: !!document.querySelector('#reader'),
+      sheet: !!document.querySelector('#sheet'),
+    }))()`);
+    check('C1 · the sentence page walks on to the whole article it came from',
+      landed.reader && !landed.sheet, JSON.stringify({ ...homeDoor, ...landed, from: sentHome }));
+  } else {
+    check('C1 · a sentence with no shelf article shows no door onto nothing',
+      true, 'no article-backed sentence page reached in this walk — honest absence path');
+  }
+  // hand the next block the store it expects: a seed written straight to
+  // localStorage is overwritten by the LIVE page's pagehide flush, so the
+  // reset has to travel through a navigation to clear memory as well
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+  await open('?entry=shelf');
+  await page.waitForTimeout(400);
+
   // --------------------- R4-B · lesson disposition, dojo refill honesty,
   // and the quiz that survives reload. Every probe here convicts a reverted
   // build: the old lesson completion auto-minted ten deck rows, the old

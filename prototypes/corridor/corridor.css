@@ -4448,6 +4448,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border-color: var(--line);
 }
 
+/* the sentence page's way on to its whole article (rubric §9.5) */
+.sent-home-row {
+  margin: 10px 0 2px;
+}
+
 /* 出会い — the observation ledger read back on an entry sheet (P2-19).
  * Quiet by construction: it reports what happened, never what is known. */
 .encounter-trail {
