@@ -2262,6 +2262,9 @@ function renderArchive(main) {
     const list = years.get(y);
     const open = S.archiveYears.has(y);
     const toggle = el('button', 'details-toggle archive-year');
+    // every fold says whether it is open — four of the five did not, so a
+    // screen reader could not tell (E3 round-A, a11y lens)
+    toggle.setAttribute('aria-expanded', String(S.archiveYears.has(y)));
     toggle.type = 'button';
     toggle.dataset.year = y;
     toggle.textContent = `${open ? '▾' : '▸'} ${y} 年 · ${list.length} ${tx('本', '')}`.trim();
@@ -3188,6 +3191,7 @@ function renderShelfBody() {
 
   // sources and licences: present, honest, folded
   const src = el('button', 'details-toggle');
+  src.setAttribute('aria-expanded', String(!!S.sourcesOpen));
   src.type = 'button';
   src.id = 'sources-toggle';
   src.textContent = (S.sourcesOpen ? '▾ ' : '▸ ') + tx('出典と licence', 'sources & licences');
@@ -3258,6 +3262,7 @@ function shelfCard(p) {
 
   // the instrument stays one tap away: 詳細 unfolds the raw three signals
   const details = el('button', 'details-toggle');
+  details.setAttribute('aria-expanded', String(!!S.detailsOpen?.has(p.id)));
   details.type = 'button';
   details.dataset.details = p.id;
   details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
@@ -3740,6 +3745,7 @@ function renderReader(main) {
 
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'details-toggle');
+  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
   dialsToggle.type = 'button';
   dialsToggle.id = 'dials-toggle';
   dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
@@ -4394,7 +4400,15 @@ function renderTray(main) {
       main.append(row);
     }
     for (const item of sec.items) {
+      // the row IS the door to the entry, so it must answer a keyboard the
+      // way every other door does — it was a click-handled div, invisible to
+      // Tab and to a screen reader (E3 round-A, a11y lens). It stays a div
+      // (it CONTAINS the rest/start button; a button inside a button is the
+      // invalid nesting R2-C just repaired on the shelf) and takes the role,
+      // the tab stop, and Enter/Space instead.
       const line = el('div', 'tray-line');
+      line.tabIndex = 0;
+      line.setAttribute('role', 'button');
       line.append(el('span', 'w', item.label));
       // rows stored before the kind fields existed heal at render time
       const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
@@ -4433,7 +4447,16 @@ function renderTray(main) {
         });
         line.append(rest);
       }
-      line.addEventListener('click', () => go({ t: item.t, id: item.id }));
+      const openRow = () => go({ t: item.t, id: item.id });
+      line.setAttribute('aria-label', tx(`${item.label} の全項目`, `${item.label} — full entry`));
+      line.addEventListener('click', openRow);
+      line.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        // the row's own controls keep their keys
+        if (ev.target !== line) return;
+        ev.preventDefault();
+        openRow();
+      });
       main.append(line);
     }
   }
