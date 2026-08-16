@@ -118,6 +118,37 @@ workflow journal and typed to the sheet where they are operator-shaped
 (OD-21, OD-22). **Round B has not run**: by the gate's own rule the campaign
 is not dry until two consecutive full-fleet rounds come back empty.
 
+### E3 round A — the verification pass, and what is still open
+
+All 27 round-A findings went through adversarial confirmation on the live
+head. **6 were CONFIRMED; the rest were refuted** — most of them because the
+night's fixes had already landed on the head the verifier re-tested, which is
+the ring closing exactly as designed.
+
+Four of the six confirmed are fixed and gated: the sentence ladder outside
+the reader (用例, the 文 page, the review answer face) is keyboard- and
+screen-reader-reachable; 字引's chosen lens speaks its state and paints with
+the world's own pair instead of 2.85:1 white-on-deep-red; the tutor's quiz
+waits where it was asked for instead of seizing the room the learner walked
+to; the reader carries its English title again in bi mode.
+
+**Two confirmed findings remain open** for the next session (both P2, both in
+the AI/dictionary surfaces, both with exact anchors in the workflow journal
+`wf_1ccf6598-25f`):
+
+1. Leaving the tutor page mid-question drops the 考え中 and re-arms 送る, so
+   sending again duplicates the question in the durable transcript
+   (`corridor.js` ask() closure — the spinner and disabled state live only on
+   the current render).
+2. Closing a word sheet while the tutor is thinking archives the reply where
+   no surface can read it back (`renderAiTutor`/`renderAiExamples` start from
+   a fresh empty out and never read the archive).
+   — and 字引's radical picker is 211 chips at a 41px pitch, the densest tap
+   grid in the app.
+
+**Round B still has not run.** Two consecutive dry rounds close T5; round A
+was worked, not dry. The next command is the same one: the E3 script.
+
 ## Resume instructions
 
 A fresh session needs only this repo: read the campaign spec, then this file,
