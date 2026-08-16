@@ -58,7 +58,7 @@
    "dispositionNote": "Display dials (kanji/furigana/spacing) are presentation preferences; the session keeps working unpersisted and the alert names any failure."
   },
   {
-   "lineAfterPatch": 12655,
+   "lineAfterPatch": 12732,
    "surface": "lists tray door bookmark",
    "learnerRootsMutatedBeforeUncheckedSave": [
     "readerPos"

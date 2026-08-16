@@ -211,7 +211,7 @@ const MEASURE_FN = `(() => {
     .filter((n) => n.offsetParent !== null)
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('#reader button.tok, button.sent-door') ? getComputedStyle(n, '::before') : null;
+      const expanded = n.matches('#reader button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
       const expandedW = expanded ? parseFloat(expanded.width) : 0;
       const expandedH = expanded ? parseFloat(expanded.height) : 0;
       return {
@@ -2920,6 +2920,83 @@ async function main() {
   check('R3-D · the probes leave no console errors',
     consoleErrors.length === errsBeforeR3D,
     consoleErrors.slice(errsBeforeR3D).join(' | ') || 'clean');
+
+  // ------------------------- R4-C · the observation ledger has a reader,
+  // and the tray's rest control has a whole finger. Both convict a revert:
+  // before R4-C nothing in the app read the obslog back, and the rest pill
+  // was a ~22px target on a row that navigates.
+  console.log('\n— R4-C · 出会い trail · rest/wake target');
+  const errsBeforeR4C = consoleErrors.length;
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    v: 1,
+    taken: [{ t: 'word', id: '学校', label: '学校', ts: 1755000000000, started: 1755000000000 }],
+    srs: {},
+    revlog: [],
+    obslog: [
+      [1754000000000, 'tap', 'word:学校', 1, 'wikinews:1403'],
+      [1754100000000, 'drift', 'word:学校', 3],
+      [1754200000000, 'dojo', 'word:学校', 3, 'due'],
+      [1754300000000, 'probe', 'word:学校', 1, 0],
+      [1754400000000, 'tap', 'word:学校', 3, 'wikinews:1403'],
+      [1754500000000, 'tap', 'word:海', 2, 'wikinews:1403']
+    ],
+  }))`);
+  await open('?entry=shelf');
+  await page.fill('#search', '学校');
+  await page.waitForTimeout(500);
+  await tap(page, '[data-result^="word:学校"]');
+  await page.waitForSelector('#sheet .encounter-trail');
+  const trail = await page.evaluate(`(() => {
+    const box = document.querySelector('#sheet .encounter-trail');
+    return {
+      lines: [...box.querySelectorAll('.trail-line')].map((n) => n.textContent),
+      eyebrow: box.querySelector('.eyebrow')?.textContent ?? '',
+    };
+  })()`);
+  check('R4-C · the trail counts this item’s own encounters, not the ledger’s',
+    /(5回|5 encounters)/.test(trail.lines[0] || '') && /(出会い|encounters)/.test(trail.eyebrow),
+    JSON.stringify(trail.lines));
+  check('R4-C · the last row is said in the learner’s own terms',
+    /(全項目をひらいた|opened the full entry)/.test(trail.lines[1] || ''), trail.lines[1] || '');
+  check('R4-C · practice is counted as evidence and named as evidence, never mastery',
+    /(稽古 2回|2 practice records)/.test(trail.lines[2] || '') &&
+      /(習熟ではない|evidence, not mastery)/.test(trail.lines[2] || ''),
+    trail.lines[2] || 'no practice line');
+  const trailWordsOnly = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return { srs: Object.keys(e.srs || {}).length, revlog: (e.revlog || []).length };
+  })()`);
+  check('R4-C · reading the ledger writes nothing to the deck',
+    trailWordsOnly.srs === 0 && trailWordsOnly.revlog === 0, JSON.stringify(trailWordsOnly));
+  await page.evaluate(`document.querySelector('#sheet-close')?.click()`);
+  await page.waitForTimeout(200);
+  await tap(page, '#tray');
+  await page.waitForSelector('.rest-toggle');
+  const restBox = await page.evaluate(`(() => {
+    const b = document.querySelector('.rest-toggle');
+    const r = b.getBoundingClientRect();
+    const before = getComputedStyle(b, '::before');
+    return { w: Math.round(r.width), h: Math.round(r.height),
+             hitW: Math.round(parseFloat(before.width)), hitH: Math.round(parseFloat(before.height)),
+             cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+  })()`);
+  check('R4-C · the rest pill prints small and takes a whole finger',
+    restBox.hitW >= 44 && restBox.hitH >= 44 && restBox.w < 44,
+    `visual ${restBox.w}×${restBox.h}, hit ${restBox.hitW}×${restBox.hitH}`);
+  // a press at the hit region's edge — outside the printed pill — must rest
+  // the card and must NOT navigate into the entry the row points at
+  const edgeY = restBox.cy + restBox.h / 2 + 6;
+  await page.mouse.click(restBox.cx, edgeY);
+  await page.waitForTimeout(300);
+  const afterEdge = await page.evaluate(`(() => ({
+    suspended: Object.keys(JSON.parse(localStorage.getItem('kairo-corridor-v1')).suspended || {}),
+    sheet: !!document.querySelector('#sheet'),
+  }))()`);
+  check('R4-C · a press at the target’s edge rests the card and never falls through to the row',
+    afterEdge.suspended.length === 1 && afterEdge.sheet === false, JSON.stringify(afterEdge));
+  check('R4-C · the probes leave no console errors',
+    consoleErrors.length === errsBeforeR4C,
+    consoleErrors.slice(errsBeforeR4C).join(' | ') || 'clean');
 
   // --------------------- R4-B · lesson disposition, dojo refill honesty,
   // and the quiz that survives reload. Every probe here convicts a reverted

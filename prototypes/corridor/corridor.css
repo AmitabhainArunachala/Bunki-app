@@ -4421,6 +4421,20 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   padding: 4px 7px;
   cursor: pointer;
   flex: none;
+  /* the printed pill stays small and quiet, but the finger gets its whole
+   * 44px (POL-9): the pseudo-element carries the hit region, and because it
+   * belongs to the button, the row underneath never steals the tap */
+  position: relative;
+}
+
+.rest-toggle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
 }
 
 .rest-toggle.resting {
@@ -4432,6 +4446,25 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .rest-toggle.srs-start {
   color: var(--ink);
   border-color: var(--line);
+}
+
+/* 出会い — the observation ledger read back on an entry sheet (P2-19).
+ * Quiet by construction: it reports what happened, never what is known. */
+.encounter-trail {
+  margin: 18px 0 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.trail-line {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 2px 0;
+}
+
+.trail-line.trail-quiet {
+  color: var(--faint);
 }
 
 /* ペース — the learner's review pacing, folded behind one quiet toggle */

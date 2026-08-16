@@ -11392,6 +11392,82 @@ function renderIdiomNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/** 出会い — the observation ledger, read back at last (P2-19).
+ *
+ * The obslog has been written richly since the first build and read by
+ * nothing but probe dedup. This is its first honest consumer: on an entry
+ * sheet, the item's own encounters, distilled — when it was first met, how
+ * many times, and what the last practice actually said.
+ *
+ * It is EVIDENCE DISPLAY, never a level claim: exposure is not mastery
+ * (constitution §4), so this section states counts and dates and the words
+ * the learner's own actions used. It never computes a knownness, never
+ * colours the item, and never touches FSRS state. When an item has no
+ * history the section is absent rather than showing a hopeful zero. */
+const TRAIL_KINDS = new Set(['tap', 'probe', 'dojo', 'lesson', 'reveal', 'drift']);
+function encounterTrail(key) {
+  const rows = (S.obslog || []).filter((row) => TRAIL_KINDS.has(row[1]) && row[2] === key);
+  if (!rows.length) return null;
+  const last = rows[rows.length - 1];
+  const counts = {};
+  for (const row of rows) counts[row[1]] = (counts[row[1]] || 0) + 1;
+  return { rows, first: rows[0][0], last, counts };
+}
+/** The last row, said in the learner's own terms — never a verdict. */
+function trailLastPhrase(row) {
+  const kind = row[1];
+  const g = row[3];
+  if (kind === 'tap') {
+    if (g === 3) return tx('全項目をひらいた', 'opened the full entry');
+    if (g === 2) return tx('語釈を見た', 'looked at the meaning');
+    return tx('ふりがなを出した', 'revealed the reading');
+  }
+  if (kind === 'drift') return g === 3 ? tx('水で「わかる」', 'flicked as known in the water') : tx('水で「まだ」', 'flicked as not yet in the water');
+  if (kind === 'probe') return g === 3 ? tx('読めた（試し読み）', 'read it right in the probe') : tx('読めなかった（試し読み）', 'missed it in the probe');
+  if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
+  if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
+  if (kind === 'dojo') {
+    const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
+    return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
+  }
+  return tx('出会った', 'met it');
+}
+function renderEncounterTrail(sheet, node) {
+  if (!['word', 'kanji', 'radical', 'idiom'].includes(node.t)) return;
+  const trail = encounterTrail(srsKey(node.t, node.id));
+  if (!trail) return;
+  const box = el('div', 'encounter-trail');
+  box.append(withEn(el('p', 'eyebrow', '出会い'), 'your encounters', 'en-inline'));
+  const day = (t) => new Date(t).toLocaleDateString();
+  const n = trail.rows.length;
+  box.append(
+    el(
+      'p',
+      'trail-line',
+      tx(
+        `初めて ${day(trail.first)} ・ これまで ${n}回`,
+        `first met ${day(trail.first)} · ${n} ${n === 1 ? 'encounter' : 'encounters'} so far`,
+      ),
+    ),
+  );
+  box.append(
+    el('p', 'trail-line', tx(`直近 ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`, `last ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`)),
+  );
+  // the third line only when practice actually happened — a reading tapped
+  // in the reader is assistance, not practice, and must not be dressed as it
+  const practice = (trail.counts.dojo || 0) + (trail.counts.probe || 0) + (trail.counts.lesson || 0);
+  if (practice) {
+    box.append(
+      el(
+        'p',
+        'trail-line trail-quiet',
+        tx(`稽古 ${practice}回（記録であって、習熟ではない）`, `${practice} practice ${practice === 1 ? 'record' : 'records'} — evidence, not mastery`),
+      ),
+    );
+  }
+  sheet.append(box);
+}
+
 function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
   if (!node) return;
@@ -11485,6 +11561,7 @@ function renderSheet(root) {
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
+  renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
   // back no longer teleports a ~2,700px entry to its top (P1, review).
