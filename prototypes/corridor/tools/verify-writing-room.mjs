@@ -202,6 +202,20 @@ async function wake(page) {
     null,
     { timeout: 5_000 },
   );
+  // …and then for the field to have actually ARRIVED. The attribute flips on
+  // the press, but the field fades in over 0.34s, so a slow runner sampled it
+  // mid-fade and read a wake as a failure (CI, 2026-08-16). Waiting for the
+  // settled opacity strengthens the probe rather than softening it: a field
+  // that never appears still fails, now by timeout instead of by luck.
+  await page.waitForFunction(
+    `(() => {
+      const field = document.querySelector('.stroke-awake-field');
+      if (!field) return false;
+      return Number.parseFloat(getComputedStyle(field).opacity || '1') > 0.02;
+    })()`,
+    null,
+    { timeout: 5_000 },
+  );
 }
 
 async function installStrokeTrace(page) {
