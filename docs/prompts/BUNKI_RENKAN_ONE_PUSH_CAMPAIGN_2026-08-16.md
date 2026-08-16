@@ -2,11 +2,11 @@
 
 **Date:** 2026-08-16 · **Author:** Claude (operator-directed) · **Status:** ratified by the operator when a session is pointed at this file.
 
-The operator's instruction, verbatim in intent: *finish the whole app in one long
+The operator's instruction, verbatim in intent: _finish the whole app in one long
 workflow push, using a graph of loops to verify loops; catch every piece of
 dysfunction; max 16 subagents at a time; get the app humming end to end with as
 much integrity, robustness and quality as possible; finish the entire Wayfinder
-goal in one push.*
+goal in one push._
 
 連環 — linked rings. No loop trusts itself; every ring is closed by another ring.
 
@@ -58,16 +58,16 @@ goal in one push.*
 The campaign is DONE when every row below is either CLOSED with bound evidence
 or typed onto the **operator decision sheet** (§5). No third state.
 
-| # | Terminal | Closed means |
-|---|----------|--------------|
-| T1 | Every gate green | The full battery of §4 passes on the campaign head, re-run fresh, reports committed. |
-| T2 | One learner state | The corridor's SRS/obslog/deck state flows through `@bunki/domain` (or a ratified ADR narrows the unification with tests + rollback fixtures). No second learner store anywhere. The PR70 migration backlog is drained or ADR-deferred. |
-| T3 | Reading Crown | The rubric's 30-cap is lifted the only way it can be: an exact-SHA end-to-end reader demonstration. Binding score re-assessed against the rubric with the omissions ledger honest. Target ≥70/100 with zero dishonest line items. |
-| T4 | The feed | The article pipeline of L5 runs end to end: ≥3 licensed sources, grader-scored, provenance-pooled, EN titles as schema data, freshness/rotation, a curation loop with authority to cull weak articles, and a review queue for the operator. A "constant feed" is demonstrated by two consecutive automated ingest runs producing shelf-ready, gate-passing candidates. |
-| T5 | Ledger zero | All 65 full-review findings closed or operator-deferred with named rationale. The dysfunction HUNT loops (§2) have run to dry twice at the end of the campaign — zero fresh confirmed findings in two consecutive full-fleet rounds. |
-| T6 | AI stack honest | Every deployed AI surface routes through `@bunki/ai` (timeout/abort), persists losslessly ("not a word is lost"), and the memory design follows the constitution: AI proposes, learner confirms, FSRS schedules. No third parallel stack. |
-| T7 | SRS complete | Revlog has a reader: the FSRS optimizer donor (`codex/fsrs-optimizer-20260812`) harvested or re-implemented; parameters updatable from real review history; session time budget is the learner's, not a hardcoded 12; capture reversible everywhere. |
-| T8 | Truth pass | README, PR body, and in-app copy state exactly what is real. Campaign integration manifest (schema v2, authored fresh and legitimately this time) passes `verify:integration-manifest` on the campaign branch. |
+| #   | Terminal          | Closed means                                                                                                                                                                                                                                                                                                                                                           |
+| --- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T1  | Every gate green  | The full battery of §4 passes on the campaign head, re-run fresh, reports committed.                                                                                                                                                                                                                                                                                   |
+| T2  | One learner state | The corridor's SRS/obslog/deck state flows through `@bunki/domain` (or a ratified ADR narrows the unification with tests + rollback fixtures). No second learner store anywhere. The PR70 migration backlog is drained or ADR-deferred.                                                                                                                                |
+| T3  | Reading Crown     | The rubric's 30-cap is lifted the only way it can be: an exact-SHA end-to-end reader demonstration. Binding score re-assessed against the rubric with the omissions ledger honest. Target ≥70/100 with zero dishonest line items.                                                                                                                                      |
+| T4  | The feed          | The article pipeline of L5 runs end to end: ≥3 licensed sources, grader-scored, provenance-pooled, EN titles as schema data, freshness/rotation, a curation loop with authority to cull weak articles, and a review queue for the operator. A "constant feed" is demonstrated by two consecutive automated ingest runs producing shelf-ready, gate-passing candidates. |
+| T5  | Ledger zero       | All 65 full-review findings closed or operator-deferred with named rationale. The dysfunction HUNT loops (§2) have run to dry twice at the end of the campaign — zero fresh confirmed findings in two consecutive full-fleet rounds.                                                                                                                                   |
+| T6  | AI stack honest   | Every deployed AI surface routes through `@bunki/ai` (timeout/abort), persists losslessly ("not a word is lost"), and the memory design follows the constitution: AI proposes, learner confirms, FSRS schedules. No third parallel stack.                                                                                                                              |
+| T7  | SRS complete      | Revlog has a reader: the FSRS optimizer donor (`codex/fsrs-optimizer-20260812`) harvested or re-implemented; parameters updatable from real review history; session time budget is the learner's, not a hardcoded 12; capture reversible everywhere.                                                                                                                   |
+| T8  | Truth pass        | README, PR body, and in-app copy state exactly what is real. Campaign integration manifest (schema v2, authored fresh and legitimately this time) passes `verify:integration-manifest` on the campaign branch.                                                                                                                                                         |
 
 ## §2 The loop graph — how the push runs
 
@@ -98,6 +98,7 @@ own homework.
   is the answer to who verifies the META loop.
 
 **Round shape** (repeat until §1 is exhausted):
+
 1. Controller reads RUN_STATE, picks the round's lanes by dependency and debt.
 2. Fan out BUILD + HUNT loops (≤16 live agents; pipeline, don't barrier).
 3. Every build verified; every finding verified; lander integrates serially;
@@ -110,6 +111,7 @@ own homework.
 Dependency order; lanes within a wave run concurrently.
 
 **Wave A — foundation debts**
+
 - **A1 · One learner state (T2).** The deepest debt: the shipped corridor keeps
   its own store while `@bunki/domain` holds the tested kernel. Map: PR70
   reconciliation backlog. Staged: schema migration + event bridge + replay
@@ -124,6 +126,7 @@ Dependency order; lanes within a wave run concurrently.
   silent flag).
 
 **Wave B — the feed (T4)** — runs parallel to Wave A from day one
+
 - **B1 · Corpus spine landing.** The seven verified dataset branches + grader
   (`corpus/00`–`corpus/07`, open PR #60) are the pipeline's engine — land them
   on the campaign branch (stacked-merge repair as PR #60 describes).
@@ -141,6 +144,7 @@ Dependency order; lanes within a wave run concurrently.
   JSON the operator can approve rows in from a phone).
 
 **Wave C — Reading Crown closure (T3)** — after A1 lands, on the feed of B
+
 - **C1 · The exact-SHA end-to-end reader demo** the rubric demands: one SHA,
   one deployed URL, one scripted-and-screenshotted walk from shelf → article →
   lookup → capture → review → return, every step bound to the learner state of
@@ -150,12 +154,14 @@ Dependency order; lanes within a wave run concurrently.
   are licensed assets — operator gate).
 
 **Wave D — full-surface excellence (T5)**
+
 - **D1 · Ledger burn-down.** Every remaining P1/P2/polish from
   `full-review/LEDGER.md`, plus everything the HUNT loops confirm.
 - **D2 · Navigation & composition** (Wayfinder #37, #46, #47): the app's
   surfaces compose as one instrument; dead ends zero.
 
 **Wave E — truth and closure (T1, T8)**
+
 - **E1 · Fresh full battery + screenshot matrix** on the final head.
 - **E2 · Truth pass**: README, PR body, in-app copy, campaign manifest v2,
   final RUN_STATE with typed terminal states.
