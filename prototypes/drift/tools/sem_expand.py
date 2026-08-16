@@ -5,12 +5,13 @@
 #   thm theme · reg register variant · ant antonym
 import json, os
 
-DATA = "/workspace/bunki-app/prototypes/drift/data"
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(os.path.dirname(HERE), "data")
 sem = json.load(open(os.path.join(DATA, "sem.json"), encoding="utf-8"))
 
 NEW = {
 "勉強": [["学習","syn","study, more formal"],["勉強する","col","to study"],["復習","fam","review"],["予習","fam","prep before class"],["試験","thm","the exam it serves"],["宿題","thm","homework"],["努力","thm","the effort in it"],["怠ける","ant","to slack off"],["集中","col","集中して勉強 — study with focus"],["塾","thm","cram school"]],
-"質問": [["問い","syn","a question, plainer"],["疑問","fam","a doubt"],["答え","ant","the answer"],["回答","syn","a formal reply"],["質問する","col","to ask"],["手を挙げる","col","raise your hand to ask"],["先生","thm","who you ask"],["解決","thm","what answers lead to"],["尋ねる","reg","to inquire, formal verb"]],
+"質問": [["問い","syn","a question, plainer"],["疑問","fam","a doubt"],["答え","ant","the answer"],["回答","thm","the formal response a question calls for"],["質問する","col","to ask"],["手を挙げる","col","raise your hand to ask"],["先生","thm","who you ask"],["解決","thm","what answers lead to"],["尋ねる","reg","to inquire, formal verb"]],
 "答え": [["回答","syn","response, formal"],["返事","syn","a reply"],["質問","ant","the question"],["解答","fam","worked answer, math/test"],["正解","fam","the correct answer"],["答える","col","to answer"],["解決","thm","resolution"],["間違い","ant","a wrong answer"]],
 "友達": [["友人","reg","friend, formal"],["親友","fam","best friend"],["仲間","syn","comrade, group member"],["知り合い","syn","acquaintance"],["友情","fam","friendship"],["友達になる","col","to become friends"],["敵","ant","enemy"],["信頼","thm","the trust between them"],["一緒","thm","being together"]],
 "家族": [["家庭","fam","household, home life"],["親","fam","parents"],["兄弟","fam","siblings"],["親戚","syn","relatives"],["家族団らん","col","family togetherness"],["家","thm","the home"],["血縁","thm","blood ties"],["他人","ant","strangers, unrelated people"]],
@@ -33,7 +34,7 @@ NEW = {
 "病気": [["疾患","reg","disease, medical"],["体調不良","syn","feeling unwell"],["健康","ant","health"],["風邪","fam","a cold"],["病院","thm","the hospital"],["病気になる","col","to fall ill"],["治療","thm","treatment"],["症状","thm","symptoms"],["元気","ant","being well"]],
 "天気": [["天候","reg","weather, formal"],["気候","fam","climate"],["晴れ","fam","clear sky"],["雨","fam","rain"],["天気予報","col","weather forecast"],["曇り","fam","cloudy"],["気温","thm","temperature"],["空","thm","the sky"]],
 "空": [["空中","fam","midair"],["天","syn","the heavens"],["青空","fam","blue sky"],["雲","thm","clouds"],["空が晴れる","col","the sky clears"],["宇宙","thm","space beyond"],["星","thm","the stars"],["地","ant","the earth"],["飛ぶ","thm","to fly through it"]],
-"海": [["海洋","reg","the ocean, formal"],["波","fam","waves"],["海岸","fam","the coast"],["山","ant","mountains, its pair"],["海water","col","seawater — see 海水"],["魚","thm","fish"],["泳ぐ","thm","to swim"],["船","thm","boats"],["深海","fam","the deep sea"]],
+"海": [["海洋","reg","the ocean, formal"],["波","fam","waves"],["海岸","fam","the coast"],["山","ant","mountains, its pair"],["海水","col","seawater"],["魚","thm","fish"],["泳ぐ","thm","to swim"],["船","thm","boats"],["深海","fam","the deep sea"]],
 "花": [["草花","fam","flowering plants"],["桜","fam","cherry blossom"],["花見","col","flower viewing"],["咲く","col","花が咲く — to bloom"],["花束","fam","a bouquet"],["庭","thm","the garden"],["香り","thm","fragrance"],["枯れる","ant","to wither"],["春","thm","spring"]],
 "夢": [["理想","syn","an ideal"],["希望","thm","hope"],["悪夢","fam","a nightmare"],["夢を見る","col","to dream"],["夢を叶える","col","fulfill a dream"],["現実","ant","reality"],["目標","thm","a goal"],["将来","thm","the future"],["憧れ","syn","a longing"]],
 "希望": [["望み","syn","a wish"],["願い","syn","a wish/prayer"],["絶望","ant","despair"],["夢","thm","dreams"],["希望を持つ","col","to hold hope"],["期待","fam","expectation"],["未来","thm","the future"],["光","thm","light, as metaphor"]],

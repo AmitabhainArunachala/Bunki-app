@@ -1,0 +1,63 @@
+Verifier probes 1 and 2 — raw console output.
+(Both scripts crashed in a late, non-load-bearing section after printing every
+measurement below, so no JSON was written. Reproduce with probes/probe.mjs and
+probes/probe2.mjs; the crash is a probe bug — FOCUS members without a .w / .el —
+not a defect of the build under test.)
+
+=== probe.mjs ===
+### P1-rest-overlap-thr0.42 :: {"n":29,"worst":0,"badPairs":0}
+### P1-rest-overlap-thr0.02 :: {"n":48,"worst":0.897,"badPairs":13}
+### P2-receded-at-rest :: {"count":14,"sample":[
+  {"w":"単なる","collide":0.1,"op":0.52,"domOp":0.052,"pe":"none","fs":"22px"},
+  {"w":"万一","collide":0.1,"op":0.632,"domOp":0.063,"pe":"none","fs":"30px"},
+  {"w":"武器","collide":0.1,"op":0.35,"domOp":0.035,"pe":"none","fs":"16px"},
+  {"w":"納める","collide":0.1,"op":0.474,"domOp":0.047,"pe":"none","fs":"30px"},
+  {"w":"取り上げる","collide":0.1,"op":0.668,"domOp":0.067,"pe":"none","fs":"22px"},
+  {"w":"印刷","collide":0.1,"op":0.395,"domOp":0.039,"pe":"none","fs":"30px"},
+  {"w":"技師","collide":0.1,"op":0.632,"domOp":0.063,"pe":"none","fs":"30px"},
+  {"w":"件","collide":0.1,"op":0.445,"domOp":0.045,"pe":"none","fs":"22px"}]}
+### P3-receded-word-opacity-over-24s-no-input :: {"word":"単なる","series":[
+  0.052,0.052,0.052,0.052,0.052,0.052,0.052,0.052,0.052,0.052,0.052,0.052]}
+### P3-receded-count-after-24s :: {"count":12,"stillSameSet":12}
+### P4-receded-perceptibility-theme0 :: {"theme":"北斎","ground":[251,250,245],"n":12,"res":[
+  {"w":"単なる","domOp":0.052,"cr":1.075,"dL":0.07052,"rgbDelta":10.04},
+  {"w":"万一","domOp":0.063,"cr":1.102,"dL":0.09275,"rgbDelta":13.92},
+  {"w":"納める","domOp":0.047,"cr":1.068,"dL":0.06388,"rgbDelta":9.07},
+  {"w":"取り上げる","domOp":0.067,"cr":1.099,"dL":0.09027,"rgbDelta":12.93},
+  {"w":"印刷","domOp":0.039,"cr":1.061,"dL":0.05809,"rgbDelta":8.62},
+  {"w":"技師","domOp":0.063,"cr":1.092,"dL":0.08503,"rgbDelta":12.16},
+  {"w":"件","domOp":0.045,"cr":1.065,"dL":0.06122,"rgbDelta":8.69},
+  {"w":"知合い","domOp":0.037,"cr":1.058,"dL":0.05516,"rgbDelta":8.18},
+  {"w":"新鮮","domOp":0.047,"cr":1.072,"dL":0.06734,"rgbDelta":10.76},
+  {"w":"煮える","domOp":0.049,"cr":1.052,"dL":0.04944,"rgbDelta":6.91}]}
+### P4-receded-per-theme :: {
+  "北斎":{"n":12,"minCr":1.052,"maxCr":1.102,"maxRgbDelta":13.92},
+  "墨":{"n":12,"minCr":1.044,"maxCr":1.127,"maxRgbDelta":13.36},
+  "岩絵具":{"n":13,"minCr":1.051,"maxCr":1.103,"maxRgbDelta":12.73},
+  "緑青":{"n":14,"minCr":1.028,"maxCr":1.094,"maxRgbDelta":12.33},
+  "夜":{"n":13,"minCr":1.072,"maxCr":1.15,"maxRgbDelta":11.97}}
+### P5-hint-live-state-per-theme :: computedOpacity "0" in ALL FIVE themes at the
+  moment the v11 harness measures it (the harness forces hint.style.opacity='1').
+### P6-rot-clamp :: {"after3x160":3.142,"after5x160":3.142,"afterNeg4x160":-3.142,"bound":3.142}
+### P7-single-vs-double-tap :: {"messy":{"z":2.6,"rot":2.618},
+  "afterSingleTap":{"z":2.6,"rot":2.618},"afterDoubleTap":{"z":1,"rot":0}}
+### P8-pinch-dive-latch :: {"enteredDive":1,"zBefore":1,"zAfter":1,"stackBefore":1,"stackAfter":0}
+
+=== probe2.mjs ===
+### L1-receded-word-list :: {"count":14,"words":["単なる","万一","武器","納める","取り上げる",
+  "印刷","技師","件","知合い","新鮮","煮える","発行","作品","生やす"]}
+  (the three words the f433edf baseline flagged under chrome — たんなる単な/lvl,
+   とりあげる取/lvl, ぎし技師/brand — are all in this list: still over the chrome,
+   now at 5% opacity)
+### L2-recede-lifts-on-pan :: {"recededBefore":13,"recededAfter":16,"restoredOfOld":13}
+### L3-45s-at-rest-no-input :: words ["知合い","生やす","単なる","万一","取り上げる"]
+  15 samples at 3s intervals:
+  [0.045,0.049,0.052,0.063,0.063] x10
+  [0.045,0.049,0.052,0.063,0.367]   <- single blip, sample 11 of 15
+  [0.045,0.049,0.052,0.063,0.063] x4
+### H1-hint-when-shown (120ms after setHint) :: computedOpacity 0.0533, styleOpacity 1
+### H1-hint-opacity-decay :: ["0.990954","1","1","1","1","0.226656","0","0"]
+  -> the pill does reach and hold opacity 1; the 1.2s CSS fade is the only sub-4.5:1 window
+### H2-hint-contrast measured MID-FADE (element opacity 0.524):
+  北斎 3.22 · 墨 3.15 · 岩絵具 2.99 · 緑青 2.75 · 夜 5.49  (as-rendered)
+  see probe3.json H3-hint-steady-state for the honest steady-state figures

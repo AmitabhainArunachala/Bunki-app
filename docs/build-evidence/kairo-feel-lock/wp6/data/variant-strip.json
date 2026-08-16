@@ -1,0 +1,305 @@
+{
+  "root": "/home/user/Bunki-app/.claude/worktrees/agent-add617906432261fd/prototypes/corridor",
+  "at": "2026-08-09T16:23:42.308Z",
+  "results": [
+    {
+      "name": "strip · row \"ladder\" renders on the 変異 bar",
+      "pass": true,
+      "detail": "2 positions: stage3, stage4"
+    },
+    {
+      "name": "strip · row \"ladder\" is labelled in both languages",
+      "pass": true,
+      "detail": "label \"F 触れの段\" / \"tap ladder\" · positions 三段|3-stage , 四段|4-stage"
+    },
+    {
+      "name": "strip · every \"ladder\" position clears the 44px target",
+      "pass": true,
+      "detail": "stage3 126x44 · stage4 126x44"
+    },
+    {
+      "name": "strip · row \"sattap\" renders on the 変異 bar",
+      "pass": true,
+      "detail": "2 positions: staged, recenter"
+    },
+    {
+      "name": "strip · row \"sattap\" is labelled in both languages",
+      "pass": true,
+      "detail": "label \"G 衛星の触れ\" / \"satellite tap\" · positions 段階|staged , 即中心|instant recenter"
+    },
+    {
+      "name": "strip · every \"sattap\" position clears the 44px target",
+      "pass": true,
+      "detail": "staged 126x44 · recenter 126x44"
+    },
+    {
+      "name": "strip · the shipped position is the one pressed on arrival",
+      "pass": true,
+      "detail": "ladder pressed=stage3 · sattap pressed=staged"
+    },
+    {
+      "name": "strip · the layer arrives holding the same reading",
+      "pass": true,
+      "detail": "{\"ladder\":\"stage3\",\"satTap\":\"staged\"}"
+    },
+    {
+      "name": "strip · row \"ladder\" survives 日本語のみ at full size",
+      "pass": true,
+      "detail": "label \"F 触れの段\" · 三段 126x44 · 四段 126x44"
+    },
+    {
+      "name": "strip · row \"sattap\" survives 日本語のみ at full size",
+      "pass": true,
+      "detail": "label \"G 衛星の触れ\" · 段階 126x44 · 即中心 126x44"
+    },
+    {
+      "name": "fusion · on the shipped position the first tap reads the word and raises its family",
+      "pass": true,
+      "detail": "\"救う\" reading=1 english=0 forefront=true satellites=14"
+    },
+    {
+      "name": "strip · pressing 四段 moves the seam the layer reads",
+      "pass": true,
+      "detail": "{\"ladder\":\"stage4\",\"satTap\":\"staged\"}"
+    },
+    {
+      "name": "fusion · on the other position the first tap raises the family and reads nothing",
+      "pass": true,
+      "detail": "\"救う\" reading=0 english=0 forefront=true satellites=14"
+    },
+    {
+      "name": "strip · both rows can stand off the shipped position at once",
+      "pass": true,
+      "detail": "{\"ladder\":\"stage4\",\"satTap\":\"recenter\"}"
+    },
+    {
+      "name": "strip · switching back leaves the strip on the shipped positions",
+      "pass": true,
+      "detail": "seam={\"ladder\":\"stage3\",\"satTap\":\"staged\"} · pressed stage3/staged"
+    },
+    {
+      "name": "fusion · nothing from the far corner survives the trip home",
+      "pass": true,
+      "detail": "\"救う\" reading=1 english=0 forefront=true satellites=14"
+    },
+    {
+      "name": "strip · a URL that names a position arrives with it pressed and in the layer",
+      "pass": true,
+      "detail": "seam={\"ladder\":\"stage4\",\"satTap\":\"recenter\"} · pressed stage4/recenter"
+    },
+    {
+      "name": "persistence · neither row writes itself into kairo-corridor-v1 (session-only, as every row is)",
+      "pass": true,
+      "detail": "kairo-corridor-v1 keys = (unset) · bunki-drift-v1 keys = (unset)"
+    },
+    {
+      "name": "persistence · a plain reload after standing off the defaults comes back on them",
+      "pass": true,
+      "detail": "seam={\"ladder\":\"stage3\",\"satTap\":\"staged\"} · pressed stage3/staged"
+    },
+    {
+      "name": "zero console/page errors",
+      "pass": true,
+      "detail": "none"
+    }
+  ],
+  "snapshot": {
+    "row-ladder-bi": {
+      "label": "F 触れの段",
+      "labelText": "F 触れの段tap ladder",
+      "labelEn": "tap ladder",
+      "rowHeight": 46,
+      "buttons": [
+        {
+          "id": "stage3",
+          "ja": "三段",
+          "en": "3-stage",
+          "w": 126,
+          "h": 44,
+          "pressed": true,
+          "onScreen": true
+        },
+        {
+          "id": "stage4",
+          "ja": "四段",
+          "en": "4-stage",
+          "w": 126,
+          "h": 44,
+          "pressed": false,
+          "onScreen": true
+        }
+      ]
+    },
+    "row-sattap-bi": {
+      "label": "G 衛星の触れ",
+      "labelText": "G 衛星の触れsatellite tap",
+      "labelEn": "satellite tap",
+      "rowHeight": 46,
+      "buttons": [
+        {
+          "id": "staged",
+          "ja": "段階",
+          "en": "staged",
+          "w": 126,
+          "h": 44,
+          "pressed": true,
+          "onScreen": true
+        },
+        {
+          "id": "recenter",
+          "ja": "即中心",
+          "en": "instant recenter",
+          "w": 126,
+          "h": 44,
+          "pressed": false,
+          "onScreen": true
+        }
+      ]
+    },
+    "seam-on-arrival": {
+      "ladder": "stage3",
+      "satTap": "staged"
+    },
+    "row-ladder-ja": {
+      "label": "F 触れの段",
+      "labelText": "F 触れの段",
+      "labelEn": null,
+      "rowHeight": 46,
+      "buttons": [
+        {
+          "id": "stage3",
+          "ja": "三段",
+          "en": null,
+          "w": 126,
+          "h": 44,
+          "pressed": true,
+          "onScreen": true
+        },
+        {
+          "id": "stage4",
+          "ja": "四段",
+          "en": null,
+          "w": 126,
+          "h": 44,
+          "pressed": false,
+          "onScreen": true
+        }
+      ]
+    },
+    "row-sattap-ja": {
+      "label": "G 衛星の触れ",
+      "labelText": "G 衛星の触れ",
+      "labelEn": null,
+      "rowHeight": 46,
+      "buttons": [
+        {
+          "id": "staged",
+          "ja": "段階",
+          "en": null,
+          "w": 126,
+          "h": 44,
+          "pressed": true,
+          "onScreen": true
+        },
+        {
+          "id": "recenter",
+          "ja": "即中心",
+          "en": null,
+          "w": 126,
+          "h": 44,
+          "pressed": false,
+          "onScreen": true
+        }
+      ]
+    },
+    "fusion-stage3-firsttap": {
+      "w": "救う",
+      "present": true,
+      "reading": 1,
+      "english": 0,
+      "forefront": true,
+      "sats": 14,
+      "cx": 240.1,
+      "cy": 450.5
+    },
+    "seam-after-stage4": {
+      "ladder": "stage4",
+      "satTap": "staged"
+    },
+    "fusion-stage4-firsttap": {
+      "w": "救う",
+      "present": true,
+      "reading": 0,
+      "english": 0,
+      "forefront": true,
+      "sats": 14,
+      "cx": 215.4,
+      "cy": 457.2
+    },
+    "seam-far-corner": {
+      "ladder": "stage4",
+      "satTap": "recenter"
+    },
+    "seam-home": {
+      "ladder": "stage3",
+      "satTap": "staged"
+    },
+    "fusion-home-firsttap": {
+      "w": "救う",
+      "present": true,
+      "reading": 1,
+      "english": 0,
+      "forefront": true,
+      "sats": 14,
+      "cx": 210.5,
+      "cy": 472.2
+    },
+    "seam-from-url": {
+      "seamUrl": {
+        "ladder": "stage4",
+        "satTap": "recenter"
+      },
+      "ladder": [
+        [
+          "stage3",
+          false
+        ],
+        [
+          "stage4",
+          true
+        ]
+      ],
+      "sattap": [
+        [
+          "staged",
+          false
+        ],
+        [
+          "recenter",
+          true
+        ]
+      ]
+    },
+    "stores": {
+      "store": null,
+      "driftStore": null
+    },
+    "after-reload-plain": {
+      "seamPlain": {
+        "ladder": "stage3",
+        "satTap": "staged"
+      },
+      "ladder": [
+        [
+          "stage3",
+          true
+        ],
+        [
+          "stage4",
+          false
+        ]
+      ]
+    }
+  },
+  "errs": []
+}

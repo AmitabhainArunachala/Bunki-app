@@ -272,3 +272,306 @@ python3 -m http.server -d prototypes/corridor 8080   # then http://127.0.0.1:808
   is closer to the reference apps than what the runner shows.
 - The verifier is the contract. If a change breaks the walk, it goes red on the
   specific step, with the DOM state that failed.
+
+---
+
+## 8. Phase 1 — the corpus pipeline revived (2026-08-08)
+
+**Run:** cloud agent, branch `claude/kairo-prototype-phase-1-4hdre6`, base = PR #62
+head (v1.8.2). **Verifier: 82/82 green** (was 71), real Chromium, Noto CJK,
+390×844. Corpus unit tier: **185 passed** from a fresh editable install.
+
+### 8.1 The revival itself
+
+All seven closed PRs (#52–#58) still had living branches. Each was based
+exactly on the merged corpus/00 skeleton, so all seven merged **clean, with
+history and zero conflicts**: wikinews, aozora, SNOW, kanji fact table, JMdict
+idioms, やさしい日本語, and the three-signal grader are now ON this branch —
+nothing rebuilt, nothing lost. The `pyproject.toml` three-way overlap
+(dev-deps / yasashii extra / package-data) merged textually without a single
+conflict marker.
+
+### 8.2 The wall this environment adds — and what was done about it
+
+This runner's egress policy allows **GitHub and package registries, nothing
+else**. Verified by probe: mmsrv.ninjal.ac.jp, dumps.wikimedia.org,
+aozora.gr.jp, huggingface.co, archive.org — all `CONNECT 403`. Two of the
+three shelf signals (語彙カバー率, TMR) need the NINJAL substrate download, so
+in THIS environment they are **unmeasurable**. The previous round's numbers
+were measured on 520-char excerpts; the shelf now shows full texts, so those
+numbers are not true of what is displayed and were **not carried forward**
+(they remain in §1 and in git history).
+
+The law applied: **every signal shown is true of the exact text displayed.**
+
+- `build_articles.py` computes what is computable here (jreadability + a new
+  live lexical signal, below) and records the NINJAL pair as
+  `unavailable` **with the reason string**, never a stale or faked number.
+- The UI renders the pair as 「国語研語彙 — 未測定」 with a dashed, empty
+  track (a bar would be a fake reading). A verifier check enforces
+  "measured or marked 未測定 — never faked".
+- Run the same command where mmsrv.ninjal.ac.jp is reachable and the pair
+  fills in shelf-wide, sha256-pinned as before. One command, no code change.
+
+### 8.3 The JLPT-lexicon signal (new, live, in-repo substrate)
+
+Because "never use jreadability alone" is written into the grader itself, the
+shelf needed a second live signal. The corridor already ships a 6,687-word
+JLPT-tagged lexicon (`prototypes/drift/data/wbig.json`, open-anki-jlpt-decks
+lineage). `jlpt_signal()` computes content-token coverage + an N5–N1/OOV band
+vector against it, base-form matching only (the NINJAL matcher's homophone
+conservatism, kept). Substrate named `open-anki-jlpt-decks/wbig-6687` in every
+emission; the sources panel carries its ShareAlike row; the hint says
+"unofficial list" — never presented as official JLPT.
+
+### 8.4 The shelf: 11 excerpts → 26 full articles, loaded lazily
+
+`build_articles.py` (the Phase-1 batch command) turns every rights-clean text
+into one article JSON: tokens, furigana, paragraph starts, level signals,
+provenance. The corridor boots from a light `index.json` (signals + metadata,
+no tokens), fetches each article file on first open, and quietly prefetches
+the rest. The 520-char excerpt cap is **gone** — ごん狐 ships whole (4,934
+chars, paragraphs intact, verified to its closing sentence). Todai-scale is
+now a data problem: adding an article is adding a file.
+
+On it: 5 wikinews (full), 3 aozora (full), 10 やさしい日本語 entries, and
+**the 8 parked v11 texts** — the Phase 1 definition of done.
+
+### 8.5 Measurement — authored level vs the two live signals (v11 texts)
+
+| text                     | authored | jreadability  | JLPT coverage |
+| ------------------------ | -------- | ------------- | ------------- |
+| 静かな朝                 | N5       | 4.82 初級後半 | 64.6%         |
+| 雨の日の古本屋           | N4       | 4.10 中級前半 | 75.5%         |
+| 知らない町を歩く         | N3       | 3.23 中級後半 | 62.9%         |
+| 山を歩きながら考えたこと | N2       | 2.50 中級後半 | 58.2%         |
+| AI時代の知識と判断       | N1       | 2.00 上級前半 | 56.4%         |
+| 五箇条の御誓文           | N1       | 2.18 上級前半 | 47.8%         |
+| 方丈記 · 冒頭            | N1+      | 3.95 中級前半 | 42.0%         |
+| 徒然草 · 序段            | N1+      | 3.58 中級前半 | 36.5%         |
+
+jreadability tracks the authored ladder **monotonically** across the five
+originals (4.82 → 2.00) — the pipeline and the authoring agree. Then the
+classics break it, in exactly the direction the three-signal design predicts:
+方丈記 reads 中級前半 by sentence shape while its JLPT coverage (42.0%) is the
+worst on the shelf outside 徒然草 — sentence-form easy, lexis hard, register
+invisible to both. One number would have lied; two disagreeing signals tell
+the truth. (This is §1's 野ばら/イチロー case, reproduced on classical text.)
+
+### 8.6 Defects seen with my own eyes, filed honestly
+
+- 七時 renders ruby ななじ (UniDic numeral+counter reading; しちじ is the
+  common clock reading), 私 renders わたくし. Same class as §4's 14日→か,
+  already filed on #43: tokenizer readings for numerals/counters are the weak
+  point; ruby-carrying corpora don't have the problem.
+- News texts show "~1 in 2 words beyond the JLPT lists" — true against a
+  6,687-word learner lexicon (news carries names, geography, institutions),
+  but the phrase reads heavier than the NINJAL "1 in 3". The hint explains
+  the substrate; if the operator finds it noisy, the phrasing is one string.
+- The disagreement flag currently fires nowhere: it needs ≥2 ordinal-capable
+  signals and only jreadability has a published scale here. The verifier now
+  asserts the invariant (flag ⇒ ≥2 ordinals) instead of asserting flags
+  exist. Flags return with the NINJAL pair.
+
+### 8.7 Not attempted, said plainly
+
+SNOW/aozora/wikinews upstream expansion (egress-blocked here), semantic-tier
+growth, grammar-in-reader detection (Phase 5), Drift fusion (Phase 2), any
+scheduler write. The corpus `data/` dir stays gitignored; nothing bulk was
+committed.
+
+---
+
+## 9. Phase 2, first segment — Drift becomes the front door (2026-08-08)
+
+**Verifier: 86/86 green** (+4). Opening the app with no query now lands in the
+real 墨流し universe — the corridor prototype's placeholder "field" is
+superseded by the actual Drift, physics and all.
+
+### 9.1 The fusion mechanism (no fork, no iframe, no seam)
+
+`tools/build-drift-layer.mjs` extracts the red-team-hardened
+`prototypes/drift/drift-artifact.html` (which stays **byte-untouched** as the
+source of truth) into a corridor entry layer at build time:
+
+- CSS scoped under `#drift-layer` (the file has no at-rules; `:root`/`body`
+  rules collapse onto the layer, so drift's `--ink`/`--ground` never collide
+  with the corridor's).
+- The script wrapped and **gated**: 11 exact-string patches, each asserted to
+  match exactly once — if drift's source changes shape, the build fails
+  loudly instead of emitting a silently-broken fusion. The six window-level
+  gesture listeners, both `setInterval`s and the rAF loop all sleep while the
+  layer is hidden (`window.__DRIFT__.show()/hide()` is the whole seam;
+  frame-dt is clamped upstream, so resume is safe).
+- One real id collision found and renamed (`tray` → `drift-tray`; corridor's
+  覚 button owns `#tray`), with counts asserted so a drift rename cannot
+  silently bring the collision back.
+
+### 9.2 The walk segment, verified
+
+Boot → the living universe (64 DOM words adrift over the constellation
+field), **corridor chrome riding above it** — 戻る/EN|日本語/覚 remain one
+navigation fabric. One indigo door (本棚, palette law: 藍 = you can go here)
+→ the 26-article shelf; 戻る → the universe again, exactly where physics
+left it. `?entry=shelf` still boots straight to the shelf; the old
+placeholder survives as `?entry=field`（札の野・旧）. While any other view is
+open the layer is `display:none` and every drift listener early-returns —
+measured zero console errors across the whole 86-check walk.
+
+Occlusion corrections landed after looking at the first screenshot: drift's
+brand, 北斎 theme toggle, counters and hint step inside the visible band
+between corridor chrome and variant strip (presentation only; no physics
+touched).
+
+### 9.3 Honest costs and the next slices
+
+- The layer embeds drift's own copies of wbig/radk/strokes/sem (~0.7 MB;
+  standalone 7.37 → 8.11 MB, artifact cap 16 MB). Dedup path: feed the
+  corridor's richer bundles (2,136 stroke sets vs drift's 114) through the
+  `__DRIFT__` seam — a later slice, after the walk is whole.
+- Next segment: a drifting word's committed card hands off into the
+  corridor's full dictionary entry (word → 覚える → list, without leaving
+  the app) — then the Drift grades and the corridor lists start feeding the
+  same Phase 3 scheduler.
+
+---
+
+## 10. The bloom becomes a constellation you can hold (2026-08-08, operator round)
+
+Operator, on-device: bloom satellites "nearly out of sight," threads faint,
+and dragging the pressed word tore it off its own tethers — the constellation
+stayed anchored to where the word USED to be while the glyph walked away,
+then snapped back on release. Three orders, all landed in drift's source
+(`drift-artifact.html` — the corridor layer regenerates from it):
+
+1. **The relief.** The bloom is now its own layer over the receded field
+   (dim 0.35 → 0.30): the pressed word turns the theme's accent (朱 in 北斎),
+   satellites take 藍 pig2 (pale ultramarine on dark themes) at ~0.95
+   presence, threads are gold at 0.5/1.5px. And the root cause of
+   "nearly out of sight": most satellites existed only as 11px canvas labels
+   — they now **materialize as real DOM words** on bloom (the same cure the
+   red-team applied to the lock) and dissolve back on release.
+2. **The tether.** The constellation re-anchors every frame to the word's
+   LIVE position — drag included. On release the drag **commits to world
+   space** (screen→world through the camera's rotation and zoom), so the
+   word keeps its new place and the family settles around it. Measured:
+   centre dragged 83–111px, mean tether 150→159px, spring-back 5px (wander).
+3. **The clock.** Fade is now 10s of **inactivity**, not a flat 12s timer —
+   any touch resets it. Measured: activity at t=8s kept the bloom alive at
+   t=13s (the old code died at 12s); cleared by 19.5s. A water tap still
+   releases immediately.
+
+Ridden along: the fused layer's theme vars now land on `#drift-layer`
+instead of `document.documentElement` — cycling drift's 夜 theme can no
+longer repaint the corridor's shelf (a latent fusion leak caught in recon).
+
+Verifier 86 → **90**: relief colour-family check (three distinct colours,
+satellite floor scaled to the tapped word's kanji productivity),
+drag-carries-the-constellation-and-sticks, water-tap release. Known niggle,
+filed honestly: ring satellites can overlap each other at similar angles
+(no label collision resolution yet — 飛び出す/出勤 touched in the round's
+screenshot).
+
+---
+
+## 11. The consistency charter's first execution (2026-08-08, operator escalation)
+
+Operator: deep, thorough inconsistency across the drift architecture — words
+that explode or vanish on touch, satellite views only some words produce.
+Standing order ratified into `docs/prompts/DRIFT_CONSISTENCY_CHARTER_2026-08-08.md`:
+an eight-law interaction contract, an empirical sweep, root cause before fix,
+and the sweep as a permanent floor.
+
+**The instrument:** `tools/verify-drift-consistency.mjs` — hermetic
+CDP-touch batteries (fresh boot + virgin store per word) over stratified
+samples, auto-classified against the contract.
+
+**First sweep (16 words × battery): 18 violations, two clusters, both
+root-caused and fixed:**
+
+1. **16/16 words destroyed by a slow drag.** `grade()` fired on a 52px
+   distance threshold with no velocity term — dragging a word anywhere was
+   indistinguishable from judging it. Fix: the judgment is a FLICK
+   (held<330ms OR >0.45px/ms, horizontal); a slow drag now MOVES any free
+   word and commits to world space. Verified both ways: flick grades
+   (済み 1), slow drag moves and survives.
+2. **Dead blooms on small kanji families** (翼・刈る: zero satellites).
+   Fix: the lock's cascading-channel design comes to the tap-bloom —
+   shared kanji, then radical kin, then nearest level neighbours, floor 6;
+   kana-only words bloom their level neighbourhood. 翼 now blooms 14.
+
+**Then the deepest one, found by pressing what the operator pressed:**
+`refreshActive()` recycles any DOM word outside the top-64 priority set
+every 650ms — blind to whether the user is HOLDING it. The lock's camera
+glide reshuffles priorities, so the pressed word itself was culled
+mid-constellation: centre gone → every thread stops drawing → "it just
+disappears," nondeterministically, exactly as reported. Fix: words in an
+open bloom/lock (hl/lk/hlDom/focusN) are pinned against the recycler.
+The lock now assembles and HOLDS: centre in accent, pins large, the whole
+family on visible typed threads.
+
+Ridden along, per charter C7: lock hub lines 0.34→0.55 @1.7px, typed edges
+0.3→0.55 @1.5px, ghosts 0.26→0.5; dive brush passes end at 0.5 (was 0.3);
+whispers 0.18; lock anchor `LOCK.bx/by` tracks the centre's LIVE position
+(the bloom's detach bug had a twin in the lock); lock centre and
+DOM members wear the relief.
+
+**State: sweep 40/40 dry on the covered battery; corridor verifier 90/90.**
+Honest scope: the battery covers tap/gloss/pinch/slow-drag/cancel on free
+words; flick-grades verified by probe. Not yet in the matrix: dive-depth
+gestures, kana-only strata (rare in viewport samples), 夜 theme, soak.
+The charter stays open until the full matrix runs dry.
+
+---
+
+## 12. Zero-quirk round 1 — the chain walk lives (2026-08-08, operator rulings ratified)
+
+Spec: `docs/prompts/DRIFT_ZERO_QUIRK_SPEC_2026-08-08.md`. Operator ratified
+all three questions: staged satellite taps (reveal, then re-centre);
+flick-judgment centre-only while a constellation is open (free field keeps
+the v1 grammar); scope = drift + its doors.
+
+**Failing case first, every fix.** The sweep grew a chain battery
+(sat-flick / sat-tap / sat-recentre) and went red exactly on the operator's
+report. Root causes found and fixed, in order of depth:
+
+1. **`collapseUnfold()` secretly released the constellation.** Folding a
+   text reveal called `clearBloom()` — so ANY tap that folded something
+   razed every materialized satellite, including the one being tapped.
+   That was the "click a satellite and it disappears." Fold and release
+   are now decoupled; the water tap releases explicitly.
+2. **Re-centre hands off, never razes.** `clearBloom(keep)` carries the
+   tapped satellite into the next constellation; a satellite that becomes
+   a planet stays in the field afterwards (nothing the walk touches ever
+   disappears — ruling I3).
+3. **Satellite taps: staged per Q1.** First tap reveals reading + gloss in
+   place; second tap re-centres — 14 new satellites assemble, chainable
+   (生物 › 生け花 › 生きる walked in the demo).
+4. **Flicks per Q2:** satellites can never be graded while a constellation
+   is open (a flick on one just moves it; it glides home). Verified both
+   ways: centre flick grades, satellite flick never.
+5. **Fat-finger forgiveness:** satellites glide, so a tap within 44px of a
+   member counts as tapping it — a near-miss no longer razes the
+   constellation via the water-tap path.
+6. **`pointercancel` fully resets gesture state** (touches, pinch, pn,
+   timers) and a fresh primary touch self-heals any stale entries — the
+   red-team's deferred dangling-state defect, closed.
+7. **Stale reveals folded everywhere:** `unfolded` tracked one node, so
+   words revealed long ago kept `glossed` and a later "first tap" jumped
+   straight to the dive. collapseUnfold now folds every revealed word.
+8. **The constellation centres itself:** a chain re-centre that lands near
+   a screen edge glides the camera to the new planet (the bloom gains the
+   lock's camT courtesy).
+
+**State:** consistency sweep **64/64 dry** (tap · gloss · pinch-survives ·
+slow-drag-moves · sat-flick-protected · sat-reveal · sat-recentre ·
+hermetic cancel+tap), corridor verifier **90/90**, zero pageerrors
+throughout. Harness hardening ridden along: true-water settle (a fixed
+point once hit the shelf door and navigated the app away), clearance-aware
+satellite picking, hermetic cancel case.
+
+**Open on the spec (next execution round):** the 25-hop chain battery needs
+settle-aware aiming (everything glides ~1.5s after a re-centre — true for
+fingers too; consider tightening assembly time); ring-overlap spacing;
+dive-depth gestures; kana strata; 夜 theme; seeded fuzz; soak. The spec
+stays open until the full matrix runs dry twice.

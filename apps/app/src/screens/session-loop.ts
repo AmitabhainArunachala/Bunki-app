@@ -48,6 +48,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
 
 import {
   applySessionCommand,
+  bindRetrievalContract,
   canvasProbeOffer,
   componentIdForTargetKey,
   componentIdOfEncounter,
@@ -158,6 +159,23 @@ function contractLabelsFor(lexeme: SeedLexeme): ReadonlyMap<string, string> {
   ]);
 }
 
+/** Labels for the contracts that actually exist in the canonical log. */
+function contractLabelsForEvents(
+  lexeme: SeedLexeme,
+  contracts: readonly ContractCreatedEvent[],
+): ReadonlyMap<string, string> {
+  return new Map(
+    contracts.map((contract) => [
+      contract.contractId,
+      contract.skill === 'orthography_to_reading'
+        ? `${lexeme.headword} — reading`
+        : contract.skill === 'form_to_meaning'
+          ? `${lexeme.headword} — meaning`
+          : `${lexeme.headword} — ${contract.skill.replace(/_/g, ' ')}`,
+    ]),
+  );
+}
+
 export interface SessionTarget {
   readonly lexeme: SeedLexeme;
   readonly passage: SeedPassage;
@@ -188,6 +206,8 @@ export interface SessionLoopOptions {
   /** Injected so the screenshot harness and tests can pin time and ids. */
   readonly context: DomainContext;
   readonly store?: AppStore | undefined;
+  /** Exact durable thread requested by a source route; newest active when absent. */
+  readonly preferredThreadId?: string | undefined;
   /** Handed every event the session produced, for the WP-10 integration. */
   readonly onEvents?: ((events: readonly DomainEvent[]) => void) | undefined;
 }
@@ -342,8 +362,18 @@ interface ChosenTarget {
 function chooseSessionTarget(
   threads: readonly ThreadView[],
   log: readonly DomainEvent[],
+  preferredThreadId?: string | undefined,
 ): ChosenTarget | null {
-  for (const thread of threads) {
+  const preferred =
+    preferredThreadId === undefined
+      ? []
+      : threads.filter((thread) => thread.state.threadId === preferredThreadId);
+  const ordered = [
+    ...preferred,
+    ...threads.filter((thread) => thread.state.threadId !== preferredThreadId),
+  ];
+
+  for (const thread of ordered) {
     if (!isPromotionActive(thread.state.promotion)) continue;
 
     const lexeme = seedEntryFor(thread);
@@ -367,6 +397,64 @@ function chooseSessionTarget(
     };
   }
   return null;
+}
+
+type DurableContractSelection =
+  | { readonly kind: 'absent' }
+  | {
+      readonly kind: 'ready';
+      readonly contracts: readonly ContractCreatedEvent[];
+      readonly readingContractId: string;
+    }
+  | { readonly kind: 'failed'; readonly message: string };
+
+/**
+ * Read the Learn pair through the domain's source-lineage projection.
+ *
+ * A contract merely sharing a component string is not enough. Every existing
+ * contract for that component must bind to the selected durable thread, and the
+ * two required skills must both be present. Once any contract exists, missing
+ * or ambiguous lineage fails closed rather than falling back to a locally
+ * invented replacement pair.
+ */
+function durableContractsFor(
+  log: readonly DomainEvent[],
+  chosen: ChosenTarget,
+): DurableContractSelection {
+  const contracts = log.filter(
+    (event): event is ContractCreatedEvent =>
+      event.type === 'ContractCreated' && event.targetComponentId === chosen.componentId,
+  );
+  if (contracts.length === 0) return { kind: 'absent' };
+
+  for (const contract of contracts) {
+    const bound = bindRetrievalContract(log, contract.contractId);
+    if (!bound.bound) {
+      return {
+        kind: 'failed',
+        message: `Contract ${contract.contractId} lineage failed closed: ${bound.failure.reason}.`,
+      };
+    }
+    if (bound.value.threadId !== chosen.thread.state.threadId) {
+      return {
+        kind: 'failed',
+        message: `Contract ${contract.contractId} belongs to thread ${bound.value.threadId}, not the requested thread.`,
+      };
+    }
+  }
+
+  const reading = [...contracts]
+    .reverse()
+    .find((contract) => contract.skill === 'orthography_to_reading');
+  const meaning = contracts.some((contract) => contract.skill === 'form_to_meaning');
+  if (reading === undefined || !meaning) {
+    return {
+      kind: 'failed',
+      message:
+        'The durable Learn pair is incomplete. Reading and meaning must both exist before a sitting can use either.',
+    };
+  }
+  return { kind: 'ready', contracts, readingContractId: reading.contractId };
 }
 
 export interface SessionBootstrap {
@@ -393,9 +481,10 @@ export interface SessionBootstrap {
 export function bootstrapSessionWorkspace(
   store: AppStore,
   context: DomainContext,
+  preferredThreadId?: string | undefined,
 ): SessionBootstrap {
   const log = store.readAll();
-  const chosen = chooseSessionTarget(store.getSnapshot().threads, log);
+  const chosen = chooseSessionTarget(store.getSnapshot().threads, log, preferredThreadId);
 
   if (chosen === null) {
     return {
@@ -405,18 +494,47 @@ export function bootstrapSessionWorkspace(
     };
   }
 
+  const durable = durableContractsFor(log, chosen);
+  if (durable.kind === 'failed') {
+    return {
+      workspace: createSessionWorkspace(log),
+      target: null,
+      error: durable.message,
+    };
+  }
+
+  // Compatibility for existing callers that still perform the old explicit
+  // promotion command. The A1 source route never reaches this branch: its Learn
+  // gesture already put the immutable pair in the canonical log, and the
+  // equality asserted below is what makes that distinction falsifiable.
+  const compatibilityContracts =
+    durable.kind === 'absent'
+      ? contractsFor(context, chosen.lexeme, chosen.componentId, establishedContractIds(log))
+      : [];
+  const contracts =
+    durable.kind === 'ready'
+      ? durable.contracts
+      : compatibilityContracts.filter(
+          (event): event is ContractCreatedEvent => event.type === 'ContractCreated',
+        );
+  const readingContractId =
+    durable.kind === 'ready'
+      ? durable.readingContractId
+      : (contracts.find((contract) => contract.skill === 'orthography_to_reading')?.contractId ??
+        readingContractIdFor(chosen.lexeme));
+
   return {
-    workspace: createSessionWorkspace([
-      ...log,
-      ...contractsFor(context, chosen.lexeme, chosen.componentId, establishedContractIds(log)),
-    ]),
+    workspace: createSessionWorkspace([...log, ...compatibilityContracts]),
     target: {
       lexeme: chosen.lexeme,
       passage: chosen.passage,
       componentId: chosen.componentId,
       threadId: chosen.thread.state.threadId,
-      probeContractId: readingContractIdFor(chosen.lexeme),
-      contractLabels: contractLabelsFor(chosen.lexeme),
+      probeContractId: readingContractId,
+      contractLabels:
+        contracts.length === 0
+          ? contractLabelsFor(chosen.lexeme)
+          : contractLabelsForEvents(chosen.lexeme, contracts),
     },
     error: null,
   };
@@ -521,9 +639,11 @@ export const SessionWorkspaceContext = createContext<SessionLoop | null>(null);
 export function useOwnSessionLoop(options: SessionLoopOptions): SessionLoop {
   const contextStore = useAppStore();
   const store = options.store ?? contextStore;
-  const { context, onEvents } = options;
+  const { context, onEvents, preferredThreadId } = options;
 
-  const [initial] = useState<SessionBootstrap>(() => bootstrapSessionWorkspace(store, context));
+  const [initial] = useState<SessionBootstrap>(() =>
+    bootstrapSessionWorkspace(store, context, preferredThreadId),
+  );
   const [state, setState] = useState<SessionWorkspaceState>(initial.workspace);
 
   /**

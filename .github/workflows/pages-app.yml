@@ -1,16 +1,16 @@
 name: pages-app
 
-# Publishes Bunki as ONE app to GitHub Pages. The opening surface — Drift, the
-# living-universe of the whole lexicon — is the site root: open Bunki and you
-# are in the universe. The study screens (capture, session, word, kanji) live
-# beneath it at /app/, and a quiet link carries you in. Server-backed flows stay
-# in their designed local/offline mode; this is the static client build.
+# Publishes ONE app to GitHub Pages: the 回廊 corridor — the comprehensive
+# prototype. Its own front door is the Drift universe; the shelf, reader,
+# dictionary, and memorize loop live behind it. There is no second version:
+# the old standalone-Drift root page and the separate study-app path were
+# retired when the corridor became the whole product (operator direction,
+# 2026-08-10 — "one comprehensive full prototype").
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'apps/app/**'
       - 'prototypes/drift/drift-artifact.html'
       - 'prototypes/corridor/**'
       - '.github/workflows/pages-app.yml'
@@ -36,79 +36,143 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm ci
-
-      # The study app is served under /<repo>/app/, so its web bundle must be
-      # built with that base path or every absolute asset URL 404s. Build-time
-      # mutation only — the committed app.json stays base-less so the e2e suite
-      # keeps serving the app at root.
-      - name: Set Pages base path on the web build
-        working-directory: apps/app
-        env:
-          BASE: ${{ github.event.repository.name }}
-        run: |
-          node -e '
-            const fs = require("fs");
-            const a = JSON.parse(fs.readFileSync("app.json", "utf8"));
-            a.expo.experiments = { ...(a.expo.experiments || {}), baseUrl: "/" + process.env.BASE + "/app" };
-            fs.writeFileSync("app.json", JSON.stringify(a, null, 2));
-            console.log("baseUrl set to /" + process.env.BASE + "/app");
-          '
-
-      - name: Export the web bundle
-        working-directory: apps/app
-        run: npx expo export --platform web
-
       - name: Assemble the Pages site
         run: |
           set -euo pipefail
           # This directory's CONTENTS are served at https://<owner>.github.io/<repo>/,
-          # so index.html must sit at its root — no extra <repo>/ nesting.
+          # so the corridor's index.html sits at the root — the corridor IS the site.
           SITE="$RUNNER_TEMP/site"
-          mkdir -p "$SITE/app" "$SITE/corridor"
+          mkdir -p "$SITE"
 
-          # 回廊 KAIRO — the corridor prototype. A self-contained static surface
-          # at its own path, so nothing above it changes. Deliberately
-          # disposable: it is an instrument for deciding the open Wayfinder
-          # tickets, not a product surface.
+          # a syntax error must never reach the phone
+          node --check prototypes/corridor/corridor.js
+          node --check prototypes/corridor/corridor-ink.js
+          node --check prototypes/corridor/dictionary-worker.js
+
           cp -r prototypes/corridor/index.html \
+                prototypes/corridor/apple-touch-icon.png \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
+                prototypes/corridor/corridor-ink.js \
+                prototypes/corridor/dictionary-worker.js \
+                prototypes/corridor/drift-layer.css \
+                prototypes/corridor/drift-layer.js \
                 prototypes/corridor/data \
                 prototypes/corridor/vendor \
-                "$SITE/corridor"/
+                prototypes/corridor/design \
+                "$SITE"/
 
-          # The study app beneath the opening surface.
-          cp -r apps/app/dist/* "$SITE/app"/
-          # SPA fallback so the app's dynamic routes (/app/kanji/<char>) resolve
-          # on a static host: any unknown path under /app/ boots the app, whose
-          # client router then reads the URL.
-          cp apps/app/dist/index.html "$SITE/app"/404.html
-
-          # The opening surface IS the root. Drift is self-contained; it is
-          # wrapped into a full document with one quiet link into the study app.
-          DRIFT_LINK='<a href="app/" id="to-study" style="position:fixed;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9;font:13px/1 "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;letter-spacing:.12em;color:var(--pig2,#165e83);text-decoration:none;border:1px solid var(--line,rgba(0,0,0,.2));border-radius:999px;padding:7px 13px;background:var(--plaque,rgba(255,255,255,.9))">辞書へ →</a>'
-          {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";</script></head><body>'
-            cat prototypes/drift/drift-artifact.html
-            printf '%s' "$DRIFT_LINK"
-            printf '%s' '</body></html>'
-          } > "$SITE/index.html"
-
-          # GitHub Pages uses ONE site-root 404 for every miss. So this 404
-          # dispatches: a miss under /app/ (a client-side app route refreshed or
-          # deep-linked) boots the study app; every other miss falls into the
-          # universe. The redirect runs in <head> before the Drift body loads,
-          # so Drift never initialises on an app-bound miss.
-          {
-            printf '%s' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><script>window.__BUNKI_APP_BASE="app/";(function(){var p=location.pathname,i=p.indexOf("/app/");if(i>-1){try{sessionStorage.setItem("bunki-deep-link",p+location.search+location.hash)}catch(e){}location.replace(p.slice(0,i)+"/app/")}})();</script></head><body>'
-            cat prototypes/drift/drift-artifact.html
-            printf '%s' "$DRIFT_LINK"
-            printf '%s' '</body></html>'
-          } > "$SITE/404.html"
+          # One app means one landing: any missed path returns to the front door.
+          cp prototypes/corridor/index.html "$SITE/404.html"
 
           echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
+
+      - name: Smoke-test packaged assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory "$SITE_DIR" \
+            >"$RUNNER_TEMP/corridor-smoke.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          # curl, not node fetch: unconsumed keep-alive bodies trip an undici
+          # internal assertion at process exit on some Node lines (seen live:
+          # "assert(!this.paused)" AFTER every path had already printed 200)
+          for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
+                      'corridor-ink.js' 'dictionary-worker.js' \
+                      'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
+                      'data/manifest.json' 'data/articles/index.json' \
+                      'data/articles/archive-index.json' \
+                      'data/share_alike/dict-v2/index.json' \
+                      'data/share_alike/animcjk/index.json' \
+                      'data/share_alike/animcjk/00.json' \
+                      'data/share_alike/dict-v2/00.json' \
+                      'data/share_alike/dict-v2/0f.json'; do
+            code=""
+            for attempt in 1 2 3 4 5; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8765/$path" || true)
+              [ "$code" = "200" ] && break
+              sleep 0.2
+            done
+            if [ "$code" != "200" ]; then
+              echo "FAIL $code /$path" >&2
+              exit 1
+            fi
+            echo "200 /$path"
+          done
+
+          # the deep dictionary the site ships must be the pinned, sharded one
+          python3 - "$SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
+          assert index["schemaVersion"] == 2, "dict-v2 schema"
+          assert index["shardCount"] == 16, "dict-v2 shard count"
+          assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
+          assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"
+          counts = index["sharding"]["entryCounts"]
+          assert len(counts) == 16 and all(c > 0 for c in counts), "dict-v2 entry counts"
+          assert len(index["entries"]) == sum(counts), "dict-v2 index entry total"
+          for shard_id in ("00", "07", "0f"):
+              shard = json.load(open(f"{site}/data/share_alike/dict-v2/{shard_id}.json"))
+              assert shard["sourcePin"] == index["source"]["pin"], f"shard {shard_id} pin"
+              assert len(shard["entries"]) == counts[int(shard_id, 16)], f"shard {shard_id} count"
+          print(f"dict-v2 verified: {len(index['entries'])} entries across 16 shards")
+          PYEOF
+
+          # rights are fail-closed: no shelf item ships without complete,
+          # registry-consistent licence metadata (round-3 review, 2026-08-11 —
+          # this very check would have caught the live CC BY 4.0 mislabel)
+          python3 - "$SITE_DIR" <<'PYEOF'
+          import json, sys
+          site = sys.argv[1]
+          base = f"{site}/data/articles"
+          idx = json.load(open(f"{base}/index.json"))
+          source_by_name = {}
+          for pool, records in idx["sources"].items():
+              for s in records:
+                  for k in ("name", "licence", "attribution"):
+                      assert s.get(k, "").strip(), f"source record missing {k}: {s}"
+                  assert "url" in s, f"source record {s['name']!r} missing url field"
+                  source_by_name[s["name"]] = (pool, s)
+          for a in idx["articles"]:
+              aid = a.get("id", "?")
+              for k in ("pool", "licence", "attribution", "source", "file"):
+                  assert a.get(k, "").strip(), f"{aid}: missing {k}"
+              assert "url" in a, f"{aid}: missing url field"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None, f"{aid}: source {a['source']!r} not in the sources registry"
+              assert pool == a["pool"], f"{aid}: pool {a['pool']!r} != registry pool {pool!r}"
+              if src["url"].strip():
+                  assert a["url"].strip(), f"{aid}: source has a home URL but the item has no per-item url"
+              if a["source"] == "ja.wikinews":
+                  assert a["licence"] == "CC BY 2.5", f"{aid}: ja.wikinews content is CC BY 2.5, labeled {a['licence']!r}"
+                  assert "CC BY 2.5" in a["attribution"], f"{aid}: attribution must state CC BY 2.5"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: body {k!r} disagrees with the index"
+          print(f"rights verified: {len(idx['articles'])} shelf items — licensed, attributed, pooled, linked where a source home exists")
+
+          # the newspaper archive answers to the same law: every item fully
+          # labeled, registry-consistent, body agreeing with its index row
+          arc = json.load(open(f"{base}/archive-index.json"))
+          seen_ids = {a["id"] for a in idx["articles"]}
+          for a in arc["articles"]:
+              aid = a.get("id", "?")
+              assert aid not in seen_ids, f"{aid}: archive duplicates a shelf item"
+              for k in ("pool", "licence", "attribution", "source", "file", "url", "date"):
+                  assert a.get(k, "").strip(), f"{aid}: archive row missing {k}"
+              pool, src = source_by_name.get(a["source"], (None, None))
+              assert src is not None and pool == a["pool"], f"{aid}: archive source/pool not registry-consistent"
+              assert a["licence"] == "CC BY 2.5" and "CC BY 2.5" in a["attribution"], f"{aid}: archive licence must be CC BY 2.5"
+              assert a["file"].startswith("archive/"), f"{aid}: archive body must live under archive/"
+              body = json.load(open(f"{base}/{a['file']}"))
+              for k in ("pool", "licence", "attribution", "url", "source"):
+                  assert body.get(k) == a.get(k), f"{aid}: archive body {k!r} disagrees with its row"
+              assert body.get("tokens"), f"{aid}: archive body carries no tokens"
+          print(f"rights verified: {len(arc['articles'])} archive items — same law, same gate")
+          PYEOF
 
       - name: Upload build as downloadable artifact
         uses: actions/upload-artifact@v4
@@ -116,11 +180,6 @@ jobs:
           name: bunki-app-static
           path: ${{ env.SITE_DIR }}
 
-      # Pages may not be enabled by the workflow token on a private repo
-      # (configure-pages: "Resource not accessible by integration"). Attempt it,
-      # but treat unavailability as a skip, not a failure — the build above is
-      # the verified deliverable either way. Once Pages is enabled in
-      # Settings -> Pages (source: GitHub Actions), this deploys for real.
       - id: cfg
         continue-on-error: true
         uses: actions/configure-pages@v5
@@ -138,17 +197,14 @@ jobs:
         run: |
           if [ "${{ steps.cfg.outcome }}" = "success" ]; then
             {
-              echo "### Pages deployed"
+              echo "### Pages deployed — one app"
               echo ""
-              echo "- Bunki (opens in Drift): ${{ steps.deployment.outputs.page_url }}"
-              echo "- Study app: ${{ steps.deployment.outputs.page_url }}app/"
-              echo "- 回廊 corridor prototype: ${{ steps.deployment.outputs.page_url }}corridor/"
+              echo "- 回廊 KAIRO (opens in the Drift): ${{ steps.deployment.outputs.page_url }}"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             {
               echo "### Pages not enabled on this repository"
               echo ""
               echo "Build succeeded and is attached as the **bunki-app-static** artifact."
-              echo "To get a live URL: Settings -> Pages -> Source: **GitHub Actions**, then re-run."
             } >> "$GITHUB_STEP_SUMMARY"
           fi

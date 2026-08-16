@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "verifier": "verify-corridor-accessibility.mjs",
+  "head": "bcf7f478c6933a55d60643d2efd0c83c710e6380",
+  "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "summary": {
+    "total": 42,
+    "passed": 42,
+    "failed": 0
+  },
+  "results": [
+    {
+      "name": "reader words are named native controls on the common target.activate action",
+      "pass": true,
+      "detail": "{\"words\":344,\"particles\":144,\"nativeButtons\":344,\"named\":344,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
+    },
+    {
+      "name": "inline reader controls retain a real 44px hit region without widening print",
+      "pass": true,
+      "detail": "minimum effective hit dimension 44.0px"
+    },
+    {
+      "name": "focused word exposes quick-look and full-entry non-hold alternatives",
+      "pass": true,
+      "detail": "{\"tokenFocused\":true,\"alternatives\":2,\"hiddenTabStops\":0}"
+    },
+    {
+      "name": "hidden Corridor controls leave the tab order",
+      "pass": true,
+      "detail": "0 hidden tab stop(s)"
+    },
+    {
+      "name": "sequential switch navigation reaches quick look then full entry",
+      "pass": true,
+      "detail": "quickLook.open → entry.open"
+    },
+    {
+      "name": "screen-reader tree exposes named token and non-hold action buttons",
+      "pass": true,
+      "detail": "497 named button(s) in the accessibility tree"
+    },
+    {
+      "name": "pointer action one reveals reading and action two reveals English",
+      "pass": true,
+      "detail": "{\"afterFirst\":{\"lit\":true,\"gloss\":false},\"afterSecond\":{\"lit\":true,\"gloss\":true}}"
+    },
+    {
+      "name": "second-action English preserves the glyph anchor within 2px",
+      "pass": true,
+      "detail": "565.9px → 565.9px"
+    },
+    {
+      "name": "pointer third target.activate closes the circle — plain kanji, no sheet",
+      "pass": true,
+      "detail": "{\"lit\":false,\"gloss\":false,\"sheet\":false}"
+    },
+    {
+      "name": "pointer route emits target.activate envelopes with pointer provenance",
+      "pass": true,
+      "detail": "3 receipt(s)"
+    },
+    {
+      "name": "keyboard/switch-shaped activation walks the same circle — three activations end plain",
+      "pass": true,
+      "detail": "focusable=true sheet=0 state={\"lit\":false,\"gloss\":false}"
+    },
+    {
+      "name": "keyboard route differs only in provenance",
+      "pass": true,
+      "detail": "3 receipt(s)"
+    },
+    {
+      "name": "particle pointer tap stays inert in reading rhythm",
+      "pass": true,
+      "detail": "{\"sheet\":0,\"reveal\":false}"
+    },
+    {
+      "name": "particle exposes a keyboard/switch/screen-reader full-entry alternative",
+      "pass": true,
+      "detail": "direct door=true"
+    },
+    {
+      "name": "entry sheet is a named modal dialog and receives focus",
+      "pass": true,
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":13}"
+    },
+    {
+      "name": "Tab is contained inside the modal sheet",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape dismisses the sheet and returns focus to its invoking token",
+      "pass": true,
+      "detail": "{\"closed\":true,\"returned\":true}"
+    },
+    {
+      "name": "reduced-motion removes Corridor animation and transition motion",
+      "pass": true,
+      "detail": "{\"sheet\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"scrim\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"},\"ruby\":{\"animationName\":\"none\",\"animationDuration\":\"0s\",\"transitionDuration\":\"0s\",\"scrollBehavior\":\"auto\"}}"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the sumi world",
+      "pass": true,
+      "detail": "eyebrow 8.87:1 · pool-tag 8.87:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the sumi world",
+      "pass": true,
+      "detail": "mean -2.01% · rms 2.35% vs ground rgb(237,229,208) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the shu world",
+      "pass": true,
+      "detail": "eyebrow 8.14:1 · pool-tag 8.14:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the shu world",
+      "pass": true,
+      "detail": "mean -1.70% · rms 1.96% vs ground rgb(242,236,219) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the iwa world",
+      "pass": true,
+      "detail": "eyebrow 6.31:1 · pool-tag 6.31:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the iwa world",
+      "pass": true,
+      "detail": "mean -1.99% · rms 2.42% vs ground rgb(210,162,113) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the rokusho world",
+      "pass": true,
+      "detail": "eyebrow 9.78:1 · pool-tag 9.78:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the rokusho world",
+      "pass": true,
+      "detail": "mean 0.26% · rms 0.33% vs ground rgb(34,28,21) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the yoru world",
+      "pass": true,
+      "detail": "eyebrow 8.93:1 · pool-tag 8.93:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the yoru world",
+      "pass": true,
+      "detail": "mean 0.06% · rms 0.23% vs ground rgb(27,36,64) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the hokusai world",
+      "pass": true,
+      "detail": "eyebrow 7.34:1 · pool-tag 7.34:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the hokusai world",
+      "pass": true,
+      "detail": "mean -1.80% · rms 2.16% vs ground rgb(233,223,194) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the akafuji world",
+      "pass": true,
+      "detail": "eyebrow 6.78:1 · pool-tag 6.78:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the akafuji world",
+      "pass": true,
+      "detail": "mean -2.53% · rms 2.78% vs ground rgb(236,215,189) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the nami world",
+      "pass": true,
+      "detail": "eyebrow 7.39:1 · pool-tag 7.39:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the nami world",
+      "pass": true,
+      "detail": "mean 0.15% · rms 0.26% vs ground rgb(24,49,74) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the keyblock world",
+      "pass": true,
+      "detail": "eyebrow 8.39:1 · pool-tag 8.39:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the keyblock world",
+      "pass": true,
+      "detail": "mean -1.80% · rms 2.16% vs ground rgb(233,223,194) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the hakuu world",
+      "pass": true,
+      "detail": "eyebrow 8.37:1 · pool-tag 8.37:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the hakuu world",
+      "pass": true,
+      "detail": "mean -0.01% · rms 0.06% vs ground rgb(42,33,23) over 819200px"
+    },
+    {
+      "name": "quiet sheet labels meet 4.5:1 in the kaku world",
+      "pass": true,
+      "detail": "eyebrow 10.22:1 · pool-tag 10.22:1"
+    },
+    {
+      "name": "living paper stays within ±3% of --ground in the kaku world",
+      "pass": true,
+      "detail": "mean 0.02% · rms 0.05% vs ground rgb(11,22,29) over 819200px"
+    },
+    {
+      "name": "real walk requested no missing Corridor assets",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "real walk emitted no console/page errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "screenshots": [
+    "screenshots/01-reader-focus-alternatives.png",
+    "screenshots/02-named-entry-dialog.png",
+    "screenshots/03-reduced-motion-dialog.png"
+  ]
+}

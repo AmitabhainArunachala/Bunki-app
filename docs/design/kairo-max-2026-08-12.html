@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="data:," />
+    <title>回廊・極 — the whole app at the maximum</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        margin: 0;
+        background: #0d0b07;
+        color: #e6dfd0;
+        font-family: 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: max(22px, env(safe-area-inset-top)) 14px 50px;
+      }
+      h1 {
+        font-weight: normal;
+        font-size: 18px;
+        letter-spacing: 0.4em;
+        margin: 6px 0 2px;
+      }
+      .sub {
+        font-size: 11px;
+        color: #97897a;
+        letter-spacing: 0.1em;
+        margin: 0 0 26px;
+        text-align: center;
+        line-height: 1.9;
+      }
+      .shelf {
+        width: min(94vw, 420px);
+        margin-bottom: 44px;
+      }
+      .screen {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 390 / 780;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow:
+          0 18px 60px rgba(0, 0, 0, 0.65),
+          0 4px 12px rgba(0, 0, 0, 0.5),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+      .screen canvas.ground {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .layer {
+        position: absolute;
+        inset: 0;
+        padding: 26px 22px;
+        display: flex;
+        flex-direction: column;
+      }
+      .label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 12px 2px 0;
+      }
+      .label b {
+        font-weight: normal;
+        font-size: 15px;
+        letter-spacing: 0.24em;
+      }
+      .label span {
+        font-size: 10.5px;
+        color: #8d8577;
+      }
+      .note {
+        font-size: 12px;
+        line-height: 1.85;
+        color: #b3aa99;
+        margin: 5px 2px 0;
+      }
+      footer {
+        font-size: 9.5px;
+        color: #675e51;
+        text-align: center;
+        line-height: 1.9;
+        max-width: 420px;
+      }
+
+      /* ---------- 1 玄関 ---------- */
+      .s1 .layer {
+        align-items: center;
+        justify-content: center;
+      }
+      .s1 .title {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3em;
+        font-size: 64px;
+        color: #d9b25f;
+        text-shadow:
+          0 0 26px rgba(217, 178, 95, 0.35),
+          0 1px 0 rgba(0, 0, 0, 0.7);
+        margin: 0;
+        font-weight: normal;
+        line-height: 1;
+      }
+      .s1 .word {
+        position: absolute;
+        top: 19%;
+        left: 14%;
+        font-size: 21px;
+        color: #c8d2ee;
+        opacity: 0.85;
+        text-shadow: 0 0 14px rgba(120, 150, 230, 0.5);
+      }
+      .s1 .word rt {
+        font-size: 9px;
+        color: #8b98c4;
+      }
+      .s1 .word2 {
+        position: absolute;
+        bottom: 24%;
+        right: 13%;
+        font-size: 15px;
+        color: #9aa6cc;
+        opacity: 0.55;
+        text-shadow: 0 0 10px rgba(120, 150, 230, 0.4);
+      }
+      .s1 .hint {
+        position: absolute;
+        bottom: 7%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 11px;
+        letter-spacing: 0.5em;
+        color: #6f6a58;
+      }
+
+      /* ---------- 2 読む ---------- */
+      .s2 .layer {
+        color: #2b2317;
+      }
+      .s2 .head {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        border-bottom: 1px solid rgba(90, 70, 40, 0.35);
+        padding-bottom: 10px;
+      }
+      .s2 .pool {
+        font-size: 9.5px;
+        letter-spacing: 0.2em;
+        color: #f2ecdc;
+        background: #8a3a26;
+        padding: 3px 8px 2px;
+        border-radius: 2px;
+      }
+      .s2 .date {
+        font-size: 10.5px;
+        color: #7a6a4d;
+        letter-spacing: 0.08em;
+      }
+      .s2 h2 {
+        font-weight: normal;
+        font-size: 19px;
+        line-height: 1.65;
+        letter-spacing: 0.04em;
+        margin: 14px 0 4px;
+      }
+      .s2 .body {
+        font-size: 16.5px;
+        line-height: 2.3;
+        letter-spacing: 0.03em;
+        margin-top: 8px;
+      }
+      .s2 ruby rt {
+        font-size: 8.5px;
+        color: #8a3a26;
+        letter-spacing: 0;
+      }
+      .s2 .tok {
+        border-bottom: 1px dotted rgba(138, 58, 38, 0);
+      }
+      .s2 .glossed {
+        position: relative;
+      }
+      .s2 .glossed .en {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -13px;
+        font-size: 8.5px;
+        color: #5a6f8a;
+        white-space: nowrap;
+        font-family: Georgia, serif;
+        font-style: italic;
+      }
+      .s2 .captured {
+        border-bottom: 1.5px solid rgba(138, 58, 38, 0.55);
+        padding-bottom: 1px;
+      }
+      .s2 .captured::after {
+        content: '◦';
+        color: #8a3a26;
+        font-size: 10px;
+        vertical-align: super;
+        margin-left: 1px;
+      }
+      .s2 .legend {
+        margin-top: auto;
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        font-size: 9.5px;
+        color: #7a6a4d;
+        letter-spacing: 0.12em;
+        border-top: 1px solid rgba(90, 70, 40, 0.25);
+        padding-top: 12px;
+      }
+      .s2 .legend b {
+        font-weight: normal;
+        color: #8a3a26;
+      }
+
+      /* ---------- 3 辞書 ---------- */
+      .s3 .sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 13%;
+        background: linear-gradient(180deg, #17141d, #100e14 30%);
+        border-radius: 20px 20px 0 0;
+        padding: 20px 24px;
+        box-shadow:
+          0 -12px 40px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(217, 178, 95, 0.25);
+      }
+      .s3 .grab {
+        width: 40px;
+        height: 3px;
+        border-radius: 2px;
+        background: #3a3547;
+        margin: 0 auto 14px;
+      }
+      .s3 .back {
+        position: absolute;
+        top: 18px;
+        left: 20px;
+        font-size: 12px;
+        color: #b7a875;
+        letter-spacing: 0.2em;
+      }
+      .s3 .word {
+        font-size: 34px;
+        letter-spacing: 0.1em;
+        color: #f0e9d8;
+        margin: 6px 0 0;
+        font-weight: normal;
+      }
+      .s3 .kana {
+        font-size: 13px;
+        color: #b7a875;
+        letter-spacing: 0.22em;
+        margin-top: 2px;
+      }
+      .s3 .pitch {
+        display: inline-block;
+        border-top: 1.5px solid #d9b25f;
+        border-right: 1.5px solid #d9b25f;
+        padding: 0 2px;
+      }
+      .s3 .rule {
+        height: 1px;
+        background: linear-gradient(90deg, rgba(217, 178, 95, 0.5), rgba(217, 178, 95, 0.06));
+        margin: 14px 0;
+      }
+      .s3 .sense {
+        display: flex;
+        gap: 10px;
+        font-size: 15px;
+        line-height: 1.9;
+        color: #ddd5c2;
+        margin-bottom: 8px;
+      }
+      .s3 .sense .n {
+        color: #8f8570;
+        font-size: 12px;
+        padding-top: 3px;
+      }
+      .s3 .sense.minor {
+        color: #8f8874;
+      }
+      .s3 .chip {
+        display: inline-block;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        color: #d9b25f;
+        border: 1px solid rgba(217, 178, 95, 0.45);
+        border-radius: 2px;
+        padding: 1px 5px;
+        margin-right: 6px;
+        vertical-align: 2px;
+      }
+      .s3 .ex {
+        margin-top: 12px;
+        font-size: 14.5px;
+        line-height: 2.1;
+        color: #c9c0ab;
+      }
+      .s3 .ex .door {
+        color: #d9b25f;
+        margin-left: 8px;
+      }
+      .s3 .exmeta {
+        font-size: 9.5px;
+        color: #6f6a58;
+        letter-spacing: 0.15em;
+        margin-top: 2px;
+      }
+      .s3 .dim {
+        position: absolute;
+        inset: 0;
+        background: rgba(10, 8, 5, 0.55);
+      }
+
+      /* ---------- 4 復習 ---------- */
+      .s4 .layer {
+        align-items: center;
+      }
+      .s4 .enso {
+        font-size: 10px;
+        color: #7a6a4d;
+        letter-spacing: 0.3em;
+        margin-bottom: 6px;
+      }
+      .s4 .cardface {
+        width: 100%;
+        background: linear-gradient(175deg, #f2ead4, #e6d9ba);
+        border-radius: 6px;
+        padding: 24px 22px 20px;
+        color: #2b2317;
+        box-shadow:
+          0 10px 34px rgba(0, 0, 0, 0.55),
+          inset 0 0 0 1px rgba(255, 250, 235, 0.5);
+      }
+      .s4 .w {
+        font-size: 40px;
+        text-align: center;
+        margin: 4px 0 0;
+        font-weight: normal;
+        letter-spacing: 0.06em;
+      }
+      .s4 .r {
+        text-align: center;
+        font-size: 13px;
+        color: #8a3a26;
+        letter-spacing: 0.3em;
+        margin-top: 4px;
+      }
+      .s4 .g {
+        text-align: center;
+        font-size: 12.5px;
+        color: #5a4c33;
+        font-style: italic;
+        font-family: Georgia, serif;
+        margin-top: 8px;
+      }
+      .s4 .exs {
+        margin-top: 16px;
+        border-top: 1px solid rgba(90, 70, 40, 0.3);
+        padding-top: 12px;
+        font-size: 14.5px;
+        line-height: 2.15;
+      }
+      .s4 .exs .en {
+        font-size: 10px;
+        color: #5a6f8a;
+        font-style: italic;
+        font-family: Georgia, serif;
+        margin: -6px 0 6px;
+      }
+      .s4 .scope {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 12px;
+      }
+      .s4 .scope span {
+        font-size: 9.5px;
+        letter-spacing: 0.15em;
+        color: #7a6a4d;
+        border: 1px solid rgba(122, 106, 77, 0.4);
+        padding: 2px 9px;
+        border-radius: 10px;
+      }
+      .s4 .scope .on {
+        color: #f2ecdc;
+        background: #8a3a26;
+        border-color: #8a3a26;
+      }
+      .s4 .grades {
+        display: flex;
+        gap: 12px;
+        margin-top: 22px;
+      }
+      .s4 .seal {
+        width: 56px;
+        height: 56px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        letter-spacing: 0;
+      }
+      .s4 .seal.again {
+        color: #c96a50;
+        border: 2px solid rgba(201, 106, 80, 0.75);
+        background: rgba(201, 106, 80, 0.08);
+      }
+      .s4 .seal.hard {
+        color: #d9c7a8;
+        border: 2px solid rgba(217, 199, 168, 0.4);
+        background: rgba(217, 199, 168, 0.05);
+      }
+      .s4 .seal.good {
+        color: #f6ecd8;
+        background: #a0402a;
+        border: 2px solid #a0402a;
+        box-shadow: 0 4px 14px rgba(160, 64, 42, 0.45);
+      }
+      .s4 .seal.easy {
+        color: #d9b25f;
+        border: 2px solid rgba(217, 178, 95, 0.65);
+        background: rgba(217, 178, 95, 0.07);
+      }
+      .s4 .due {
+        margin-top: auto;
+        font-size: 9.5px;
+        color: #6f6a58;
+        letter-spacing: 0.2em;
+      }
+
+      /* ---------- 5 書の間 ---------- */
+      .s5 .layer {
+        align-items: center;
+        justify-content: center;
+      }
+      .s5 img {
+        width: 86%;
+        border-radius: 4px;
+        box-shadow:
+          0 12px 44px rgba(0, 0, 0, 0.7),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+      .s5 .cap {
+        margin-top: 14px;
+        font-size: 13px;
+        letter-spacing: 0.4em;
+        color: #cfc5ae;
+      }
+      .s5 .cap b {
+        font-weight: normal;
+        color: #d9b25f;
+      }
+      .s5 .hint {
+        position: absolute;
+        bottom: 7%;
+        font-size: 10px;
+        letter-spacing: 0.4em;
+        color: #6f6a58;
+      }
+      .s5 .seal {
+        position: absolute;
+        right: 9%;
+        bottom: 12%;
+        width: 34px;
+        height: 34px;
+        background: rgba(178, 52, 32, 0.9);
+        color: #f0e6d2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>回廊・極</h1>
+    <p class="sub">
+      the whole corridor, pushed to the maximum — five surfaces, one ink<br />a design vision to
+      react to, not yet the shipped app
+    </p>
+
+    <div class="shelf">
+      <div class="screen s1">
+        <canvas class="ground" data-g="night"></canvas>
+        <div class="layer">
+          <p class="word">
+            <ruby>永遠<rt>えいえん</rt></ruby>
+          </p>
+          <p class="word2">薄明</p>
+          <h2 class="title"><span>回</span><span>廊</span></h2>
+          <p class="hint">触れると、ひらく</p>
+        </div>
+      </div>
+      <div class="label"><b>玄関</b><span>the Drift — words adrift in the night sea</span></div>
+      <p class="note">
+        The front door keeps its galaxy, deepened: indigo paper instead of flat black, the title in
+        gold leaf, drifting words carrying faint starlight. Everything below this door shares its
+        palette.
+      </p>
+    </div>
+
+    <div class="shelf">
+      <div class="screen s2">
+        <canvas class="ground" data-g="washi"></canvas>
+        <div class="layer">
+          <div class="head">
+            <span class="pool">新聞</span
+            ><span class="date">二〇二六年八月十二日 · ウィキニュース</span>
+          </div>
+          <h2>
+            首相、経済政策の見直しを<ruby>表明<rt>ひょうめい</rt></ruby>
+          </h2>
+          <p class="body">
+            首相は記者会見で、来年度の経済政策を全面的に見直す方針を明らかにした。専門家は、この決定が市場に与える影響を<span
+              class="tok glossed"
+              >注視<span class="en">watch closely</span></span
+            >しており、野党は臨時国会の召集を求めている。
+          </p>
+          <p class="body">円相場は会見の直後、小幅ながら<span class="captured">反発</span>した。</p>
+          <div class="legend">
+            <span><b>一</b> ふりがな</span><span><b>二</b> 意味</span
+            ><span><b>三</b> 素にもどる</span><span><b>長押し</b> 辞書</span>
+          </div>
+        </div>
+      </div>
+      <div class="label"><b>読む</b><span>the reader on real paper</span></div>
+      <p class="note">
+        Text sits on fibrous washi, not #FFFFFF. The tap circle is unchanged — ふりがな, then
+        meaning, then back to bare — but reading states render as brush-red rubies and small italic
+        undertones, like a tutor's pencil in the margins.
+      </p>
+    </div>
+
+    <div class="shelf">
+      <div class="screen s3">
+        <canvas class="ground" data-g="washi"></canvas>
+        <div class="dim"></div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <span class="back">← 戻る</span>
+          <h2 class="word">半島</h2>
+          <p class="kana"><span class="pitch">はん</span>とう</p>
+          <div class="rule"></div>
+          <div class="sense"><span class="n">一</span><span>peninsula</span></div>
+          <div class="sense minor">
+            <span class="n">二</span
+            ><span
+              ><span class="chip">略</span><span class="chip">語感</span>the (Korean) Peninsula —
+              abbreviation, sensitive usage</span
+            >
+          </div>
+          <div class="rule"></div>
+          <p class="ex">伊豆半島は温泉で有名だ。<span class="door">▹</span></p>
+          <p class="exmeta">用例 六件 · タップで文の読み</p>
+        </div>
+      </div>
+      <div class="label"><b>辞書</b><span>the sheet as night lacquer</span></div>
+      <p class="note">
+        The dictionary rises as a lacquer tray: near-black urushi, gold hairlines, the pitch accent
+        drawn as a real line over the kana. Minor senses carry their honest tags — 略 for
+        abbreviations, 語感 where usage needs care — so 半島 can never read as "Korea" unannounced
+        again. The back button goes back one screen, always.
+      </p>
+    </div>
+
+    <div class="shelf">
+      <div class="screen s4">
+        <canvas class="ground" data-g="night"></canvas>
+        <div class="layer">
+          <p class="enso">保持率 九〇% ・ 今日 十二枚</p>
+          <div class="cardface">
+            <h2 class="w">頷く</h2>
+            <p class="r">うなずく</p>
+            <p class="g">to nod, to bow one's head in assent</p>
+            <div class="exs">
+              <p>彼女は黙って頷いた。</p>
+              <p class="en">She nodded silently.</p>
+              <p>説明を聞いて、彼は深く頷くしかなかった。</p>
+            </div>
+            <div class="scope"><span>単語</span><span class="on">一文</span><span>段落</span></div>
+          </div>
+          <div class="grades">
+            <div class="seal again">再</div>
+            <div class="seal hard">難</div>
+            <div class="seal good">良</div>
+            <div class="seal easy">易</div>
+          </div>
+          <p class="due">次回 · 三日後</p>
+        </div>
+      </div>
+      <div class="label"><b>復習</b><span>grading with seals, not buttons</span></div>
+      <p class="note">
+        The card is a washi sheet on a night desk. Example sentences keep full reader powers — bare
+        by default, tap for ふりがな, meaning, back to bare. The four grades become hanko: vermilion
+        良 pressed solid, 再 waiting in outline, 易 edged in gold. Capture scope (word · sentence ·
+        paragraph) sits on the card itself.
+      </p>
+    </div>
+
+    <div class="shelf">
+      <div class="screen s5">
+        <canvas class="ground" data-g="stone"></canvas>
+        <div class="layer">
+          <img src="kairo-max-ink.png" alt="永 written in living ink" />
+          <p class="cap"><b>永</b> · 五画 · 生きた墨</p>
+          <p class="hint">触れて、もう一度</p>
+          <div class="seal">書</div>
+        </div>
+      </div>
+      <div class="label"><b>書の間</b><span>the writing room</span></div>
+      <p class="note">
+        Stroke order taught by the living-ink engine itself: every kanji you meet can be watched
+        being written — water and pigment flowing on the GPU — then written again with a tap, never
+        the same twice. This still is a real frame from the simulation.
+      </p>
+    </div>
+
+    <footer>
+      回廊・極 — design vision, KAIRO round 2026-08-12 · grounds procedural · ink frame from
+      stroke-art-v4 (WebGL2 fluid simulation)<br />the corridor itself is unchanged until the
+      operator says otherwise
+    </footer>
+
+    <script>
+      function rng(seed) {
+        let s = seed >>> 0;
+        return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+      }
+      const DPR = Math.min(2.5, window.devicePixelRatio || 1);
+      function paint(cv) {
+        const w = cv.clientWidth * DPR,
+          h = cv.clientHeight * DPR;
+        cv.width = w;
+        cv.height = h;
+        const g = cv.getContext('2d');
+        const kind = cv.dataset.g;
+        const r = rng(kind === 'washi' ? 11 : kind === 'night' ? 23 : 37);
+        if (kind === 'washi') {
+          const base = g.createLinearGradient(0, 0, w * 0.9, h);
+          base.addColorStop(0, '#f2ead4');
+          base.addColorStop(0.6, '#eadec0');
+          base.addColorStop(1, '#e0cfa8');
+          g.fillStyle = base;
+          g.fillRect(0, 0, w, h);
+          for (let i = 0; i < 2600; i++) {
+            const x = r() * w,
+              y = r() * h,
+              len = (10 + r() * 70) * DPR;
+            const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5) * 1.0;
+            g.beginPath();
+            g.moveTo(x, y);
+            g.quadraticCurveTo(
+              x + Math.cos(a) * len * 0.5,
+              y + Math.sin(a) * len * 0.5 + (r() - 0.5) * 16 * DPR,
+              x + Math.cos(a) * len,
+              y + Math.sin(a) * len,
+            );
+            g.strokeStyle =
+              r() < 0.8
+                ? `rgba(180,158,116,${0.03 + r() * 0.07})`
+                : `rgba(252,246,228,${0.08 + r() * 0.09})`;
+            g.lineWidth = (0.4 + r() * 0.7) * DPR;
+            g.stroke();
+          }
+          const v = g.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.72);
+          v.addColorStop(0, 'rgba(0,0,0,0)');
+          v.addColorStop(1, 'rgba(90,70,40,0.18)');
+          g.fillStyle = v;
+          g.fillRect(0, 0, w, h);
+        } else if (kind === 'night') {
+          const base = g.createLinearGradient(0, 0, w * 0.7, h);
+          base.addColorStop(0, '#131a30');
+          base.addColorStop(0.55, '#0d1222');
+          base.addColorStop(1, '#080c18');
+          g.fillStyle = base;
+          g.fillRect(0, 0, w, h);
+          for (let i = 0; i < 1600; i++) {
+            const x = r() * w,
+              y = r() * h,
+              len = (8 + r() * 50) * DPR;
+            const a = (r() < 0.5 ? 0 : Math.PI / 2) + (r() - 0.5);
+            g.beginPath();
+            g.moveTo(x, y);
+            g.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len);
+            g.strokeStyle = `rgba(90,110,170,${0.015 + r() * 0.04})`;
+            g.lineWidth = (0.4 + r() * 0.6) * DPR;
+            g.stroke();
+          }
+          for (let i = 0; i < 220; i++) {
+            const b = r();
+            g.fillStyle = `rgba(${(200 + b * 40) | 0},${(205 + b * 30) | 0},${(235 + b * 20) | 0},${0.06 + r() * 0.5})`;
+            g.beginPath();
+            g.arc(r() * w, r() * h, (0.4 + r() * 1.1) * DPR, 0, 7);
+            g.fill();
+          }
+          const neb = g.createRadialGradient(w * 0.7, h * 0.28, 10, w * 0.7, h * 0.28, h * 0.5);
+          neb.addColorStop(0, 'rgba(96,118,214,0.13)');
+          neb.addColorStop(0.6, 'rgba(158,96,170,0.05)');
+          neb.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = neb;
+          g.fillRect(0, 0, w, h);
+        } else {
+          // stone
+          g.fillStyle = '#161310';
+          g.fillRect(0, 0, w, h);
+          for (let i = 0; i < 4200; i++) {
+            const x = r() * w,
+              y = r() * h;
+            const l = 24 + r() * 22;
+            g.fillStyle = `rgba(${l | 0},${(l * 0.96) | 0},${(l * 0.88) | 0},${0.2 + r() * 0.35})`;
+            g.beginPath();
+            g.arc(x, y, (0.7 + r() * 2.6) * DPR, 0, 7);
+            g.fill();
+          }
+          const v = g.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, h * 0.75);
+          v.addColorStop(0, 'rgba(0,0,0,0)');
+          v.addColorStop(1, 'rgba(0,0,0,0.5)');
+          g.fillStyle = v;
+          g.fillRect(0, 0, w, h);
+        }
+      }
+      for (const cv of document.querySelectorAll('canvas.ground')) paint(cv);
+    </script>
+  </body>
+</html>

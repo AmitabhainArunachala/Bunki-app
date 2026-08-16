@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "campaign": "kairo-full-build-20260808",
+  "integrationBranch": "codex/kairo-full-build-20260808",
+  "startingIntegrationSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+  "currentIntegrationSha": "215638929d431dd753fcac458478e30b0622cb01",
+  "sourcePullRequest": {
+    "number": 65,
+    "branch": "claude/kairo-prototype-phase-1-4hdre6",
+    "baseSha": "5e5075dc29eb292f86e6ce0b50decf8bd0bf3ece",
+    "headSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+    "observedAt": "2026-08-08T14:29:01Z",
+    "state": "open-draft-clean",
+    "verification": {
+      "remoteChecks": {
+        "corpusPytest": "success",
+        "verifiedBuild": "success",
+        "lintFormatTypecheckTest": "success",
+        "webE2eAccessibilityAdversarial": "success",
+        "deploy": "skipped"
+      },
+      "fourOrphanedDriftClaims": "unverified"
+    }
+  },
+  "workstreams": [
+    {
+      "branch": "codex/kairo-full-build-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "215638929d431dd753fcac458478e30b0622cb01",
+      "dependencies": ["pr:65@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "lead-integration",
+      "capabilities": ["campaign-integration", "shared-contracts"],
+      "verificationStatus": "domain-552-of-552-and-seed-91-of-91-green-on-integration-head; generated-corridor-baseline-remains-90-of-91-and-must-be-regenerated-after-runtime-fixes",
+      "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a0-drift-hunts-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "d81334321d4e33a99a06be12e75b5758bfb04552",
+      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "a0-drift-hunts",
+      "capabilities": [
+        "kana-semantic-node-interactivity",
+        "pinch-gesture-identity",
+        "active-pointer-lifecycle",
+        "hub-release-arbitration"
+      ],
+      "verificationStatus": "three-hunts-and-foreign-pointer-half-authoritatively-red; pinch-pair-CDP-sequence-rejected-by-independent-judge-and-being-corrected-before-promotion",
+      "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a0-verifier-20260808",
+      "baseSha": "e8be255e1ea13a350759198f3e85caf0e239560d",
+      "headSha": "3cbb975f795562614ee7335bc198bb9acbfea1ac",
+      "dependencies": ["codex/kairo-full-build-20260808@e8be255e1ea13a350759198f3e85caf0e239560d"],
+      "capabilityOwner": "a0-verifier-truthfulness",
+      "capabilities": [
+        "drift-consistency-fail-closed",
+        "a0-ci-gate",
+        "a0-acceptance-evidence"
+      ],
+      "verificationStatus": "integrated-as-c26ff01-and-28d3ab6; fail-closed-smoke-15-cases-12-pass-3-runtime-reds-zero-page-errors",
+      "status": "integrated"
+    },
+    {
+      "branch": "codex/kairo-a05-accessibility-20260808",
+      "baseSha": "81d0c12",
+      "headSha": "d3e9ae86668ccac84ddb495103e327251a83c0e2",
+      "dependencies": ["codex/kairo-full-build-20260808@81d0c12"],
+      "capabilityOwner": "a05-accessibility-corridor-contract",
+      "capabilities": [
+        "substrate-neutral-interaction-actions",
+        "corridor-keyboard-and-switch-parity",
+        "dialog-focus-contract",
+        "corridor-reduced-motion",
+        "pages-corridor-packaging"
+      ],
+      "verificationStatus": "interaction-contract-integrated-as-5395df9-and-d9f39d9; 61-contract-tests-and-552-full-domain-tests-green; corridor-red-baseline-committed-and-runtime-fix-in-progress",
+      "status": "active"
+    },
+    {
+      "branch": "codex/kairo-a1-source-20260809",
+      "baseSha": "d9f39d9c58f026ed18c12a4d75cef25f3a6fcac2",
+      "headSha": "15e9609dfb099054a17d0cddc3812298cc991dae",
+      "dependencies": [
+        "codex/kairo-full-build-20260808@d9f39d9c58f026ed18c12a4d75cef25f3a6fcac2"
+      ],
+      "capabilityOwner": "a1-golden-source",
+      "capabilities": [
+        "rights-clean-source-identity",
+        "utf16-source-anchor",
+        "source-field-provenance"
+      ],
+      "verificationStatus": "integrated-as-2156389; seed-91-of-91-typecheck-lint-format-green; source-body-sha256-and-exact-jibun-span-pinned",
+      "status": "integrated"
+    },
+    {
+      "branch": "codex/kairo-a1-domain-20260809",
+      "baseSha": "215638929d431dd753fcac458478e30b0622cb01",
+      "headSha": "215638929d431dd753fcac458478e30b0622cb01",
+      "dependencies": [
+        "codex/kairo-full-build-20260808@215638929d431dd753fcac458478e30b0622cb01"
+      ],
+      "capabilityOwner": "a1-domain-state-contracts",
+      "capabilities": [
+        "span-aware-capture",
+        "retrieval-contract-source-lineage",
+        "explicit-learning-activation",
+        "lookup-friction-authority"
+      ],
+      "verificationStatus": "test-first-implementation-in-progress",
+      "status": "active"
+    }
+  ]
+}

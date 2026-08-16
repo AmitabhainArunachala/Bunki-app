@@ -1,0 +1,19 @@
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-fixed-1.json
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-fixed-2.json
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-fixed-3.json
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-prefix-1.json
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-prefix-2.json
+21/21 checks passed
+results -> /tmp/claude-0/-home-user-Bunki-app/9e7c9a90-e719-59a3-a8fb-9ae967a15c46/scratchpad/v/v11-V-prefix-3.json
+V-fixed-1      21/21    errors:0 -
+V-fixed-2      21/21    errors:0 -
+V-fixed-3      21/21    errors:0 -
+V-prefix-1     21/21    errors:0 -
+V-prefix-2     21/21    errors:0 -
+V-prefix-3     21/21    errors:0 -
+V11-DONE

@@ -1,0 +1,106 @@
+WP6 verifier — raw suite and hunt log, verifier's own runs.
+
+PRECONDITION: 24fb59c commits NO generated files (correct per the build rules, and
+stated in the commit). prototypes/corridor/drift-layer.js must be rebuilt before any
+fusion suite, or the suite tests the base. Base 1bb7d3c ships a fusion already in sync
+(rebuild -> no diff). Every hunt run below was taken with the fusion rebuilt.
+build-drift-layer reported 12 patches, all asserted unique, no adjustment, every time.
+
+
+=== verify-v11 ===
+at defaults (stage3 + staged):
+  census: 36 words · 5 ghosted · rawWorstOverlap=0.908 · minGhostOp=0.327 minPresentOp=0.327
+  21/21 checks passed.  ERRORS: none.
+
+under stage4 (V_LADDER forced to "stage4" in a source copy):
+  19/21 checks passed.  The two failures, verbatim:
+   FAIL 1-pinch-surface-nobleed: could not enter a dive
+        (stack=0, word=すくう救うto rescue from, to help out of)
+   FAIL 8-unfold-clear-on-lock: tapped A=すくう救うt (unfolded=0), locked B=ごぶさた御無
+        -> unfolded=0, lockOn=true, members=12
+
+  Both are the instrument's hard-coded tap budget, read out of the suite source:
+   · 1-pinch-surface-nobleed taps tapAt(w) then for(i<2) tapAt(focusPoint) = THREE taps,
+     then requires sd.stack >= 1. Four are needed under stage4.
+   · 8-unfold-clear-on-lock taps A ONCE then requires u1 >= 1. Rung 1 of four is
+     forefront+family with nothing read, so unfolded is 0.
+
+
+=== verify-corridor ===
+  91/91 checks passed.
+
+  Falsification of the strengthened strip assertion — row G's LABEL mutated only
+  (row count still 7, ticket count still 4, both invisible to the old count-only test):
+   FAIL the variant strip exposes all four open decisions, the v1.1 depth toggle and
+        the drift tap ladder — 7 rows (cards, difficulty, contrast, entry, depth,
+        ladder, sattap); 4 carry ticket numbers; named rows present: E 奥行 · F 触れの段
+   90/91 checks passed.
+  => genuinely stronger than the bare `stripRows === 5` it replaced. Restored after.
+
+
+=== HUNT (fusion rebuilt both sides) ===
+
+pristine 1bb7d3c:
+  run 1 — 6 fails:
+    flick judgment sticks · release on a hub sun · held finger "no open water" ·
+    corpus-backed semantic member · kana-only semantic fallback · hub release hijack
+  run 2 — 5 fails:
+    flick judgment sticks · release on a hub sun · held finger "no open water" ·
+    corpus-backed semantic member · hub release hijack
+
+WP6 24fb59c at defaults:
+  run 1 — 4 fails:
+    held finger "no open water" · corpus-backed semantic member ·
+    kana-only semantic fallback · hub release hijack
+  run 2 — 5 fails:
+    flick judgment sticks · release on a hub sun · held finger "no open water" ·
+    corpus-backed semantic member · hub release hijack
+
+  Six distinct failure KINDS on pristine. WP6's failures are a SUBSET of those six.
+  NO NEW KIND. WP6 totals (4, 5) are lower than pristine's (6, 5).
+
+  Envelope reconciliation with the verifier's own model from earlier packages:
+   · spawn randomisation decides the hub clause      (WP2 round 3 — shuffle() uses Math.random)
+   · CDP latency vs the app's 330ms flick threshold  (WP7 — measured 415-521ms in the fusion)
+   · hub vs ratified full-presence behaviour         (WP2 round 3)
+  All three are pre-existing and none is WP6's. The historical {0-2} no longer
+  describes this machine; 4-6 does.
+
+
+=== DEFAULT PARITY (probe22, verifier's own) ===
+  Math.random seeded via addInitScript before the page script; recycler stopped
+  (refreshActive -> no-op); node positions pinned; identical gesture script both sides;
+  semantic trace after every gesture.
+
+  5 seeds · 95 traced states.
+  Ladder-relevant fields (stack, depth, ctr, FOCUS, members, unfolded, glossed,
+  lockOn, tray, cardOpen): IDENTICAL in all 95 states, except one divergence that
+  FLIPS DIRECTION between runs (one seed base-blooms and wp6 does not; an earlier run
+  had the reverse) — a missed tap, not behaviour.
+  Remaining diffs: word opacity only, |delta| <= 4 percentage points, with readingOp
+  and glossOp matching exactly in every case — animation phase.
+
+  A first pass WITHOUT stopping the recycler produced diffs in wordCount and
+  whole-field opacity lists at the final state; those were field churn and are
+  recorded here as an instrument artifact, not as evidence.
+
+
+=== NOTHING-DISAPPEARS FLOOR (probe21) ===
+                        at rest    bloom held   back at rest
+  pristine 1bb7d3c       0.327       0.098         0.327
+  WP6 defaults           0.327       0.098         0.327
+  WP6 stage4             0.327       0.098         0.327
+  ghostFloor = 0.327 throughout;  0.098 = ghostFloor x 0.3 = the pre-existing WP2
+  bloom dim (63 words dimmed, FOCUS=14). The floor holds at the new pacing.
+
+
+=== PERSISTENCE (probe23, real corridor strip) ===
+  localStorage keys at defaults ................................ []
+  localStorage keys after standing OFF both defaults ........... []
+  localStorage keys after reload ............................... []
+  strip after reload ........................... ladder:stage3, sattap:staged (defaults)
+  row buttons: all h=44px, aria-pressed toggling, bilingual labels
+    三段3-stage · 四段4-stage · 段階staged · 即中心instant recenter
+  seam in a regenerated fusion: __DRIFT_TAP__ present; render() had already pushed
+    {ladder:"stage3",satTap:"staged"}; .set() moves it to {stage4, recenter}.
+  zero console / page errors.

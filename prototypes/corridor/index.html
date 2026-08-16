@@ -4,15 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%239e2b25'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23fcfbf6' font-family='serif'%3E回%3C/text%3E%3C/svg%3E"
+    />
     <title>回廊 KAIRO — corridor prototype</title>
     <meta
       name="description"
       content="An instrument for deciding, not a product: one continuous corridor over real graded Japanese, with four open Wayfinder decisions rendered as switchable variants."
     />
+    <!-- a real file, not a data URI: iOS requests /apple-touch-icon.png
+         implicitly, and an absent file was the one console 404 on the site -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="stylesheet" href="corridor.css" />
+    <link rel="stylesheet" href="drift-layer.css" />
   </head>
   <body>
     <div id="app"></div>
+    <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
+         the corridor's drift entry view wakes it via window.__DRIFT__ -->
+    <script defer src="drift-layer.js"></script>
     <script type="module" src="corridor.js"></script>
     <noscript>
       <p style="font-family: serif; padding: 24px">

@@ -1,0 +1,63 @@
+{
+  "generated": "by corpus.sources.aozora.build_samples",
+  "index_pin": "109139b8844b29fc5c86caf81db5275b9eaa3386",
+  "clean_revision": "42a9c9c0f1d67e6a5554d9bea4201973dc9b049c",
+  "index": {
+    "csv_rows": 19498,
+    "unique_works": 17836,
+    "usable_works_strict": 10478,
+    "usable_filter": "作品著作権フラグ == 'なし' and 文字遣い種別 == '新字新仮名'",
+    "kana_type_rows": {
+      "その他": 30,
+      "新字新仮名": 12128,
+      "新字旧仮名": 4856,
+      "旧字新仮名": 107,
+      "旧字旧仮名": 2377
+    },
+    "usable_rows": 11215
+  },
+  "anchors": {
+    "小川未明": {
+      "total_works": 619,
+      "usable_works": 619,
+      "kana_types": {
+        "新字新仮名": 619
+      }
+    },
+    "江戸川乱歩": {
+      "total_works": 111,
+      "usable_works": 110,
+      "kana_types": {
+        "新字新仮名": 110,
+        "旧字旧仮名": 1
+      }
+    },
+    "宮沢賢治": {
+      "total_works": 278,
+      "usable_works": 88,
+      "kana_types": {
+        "新字新仮名": 88,
+        "新字旧仮名": 184,
+        "旧字旧仮名": 6
+      }
+    }
+  },
+  "clean_dataset": {
+    "rows": 16951,
+    "usable_records": 10246
+  },
+  "furigana_coverage_subset": {
+    "size": 123,
+    "selection": "fixtures ['051034', '000628', '046605'] + first 30 小川未明 by 作品ID + 90 others seeded random (seed 41)",
+    "all": {
+      "min": 0.0,
+      "p25": 0.0108,
+      "median": 0.063,
+      "p75": 0.9549,
+      "max": 0.9967,
+      "mean": 0.2942
+    },
+    "ogawa_mimei_mean": 0.9772,
+    "non_ogawa_mean": 0.064
+  }
+}

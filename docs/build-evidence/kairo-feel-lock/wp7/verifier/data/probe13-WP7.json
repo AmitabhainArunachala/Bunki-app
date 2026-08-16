@@ -1,0 +1,70 @@
+{
+  "A1-at-rest-3s": {
+    "n": 64,
+    "median": 21.735,
+    "max": 33.324,
+    "perSec": 7.207,
+    "calmStart": 1,
+    "calmEnd": 1
+  },
+  "A2-finger-DOWN-3s": {
+    "word": "救う",
+    "n": 63,
+    "median": 38.28,
+    "max": 38.51,
+    "perSec": 12.685,
+    "calmStart": 0.023,
+    "calmEnd": 0,
+    "calmDecay14frames": [
+      0.4704,
+      0.3479,
+      0.2573,
+      0.2213,
+      0.1637,
+      0.1408,
+      0.1211,
+      0.0895,
+      0.077,
+      0.0662,
+      0.049,
+      0.0421,
+      0.0362,
+      0.0268
+    ],
+    "heldWordDrag": {
+      "dragX": 0,
+      "dragY": 0
+    },
+    "heldWordMovedPx": 38.364,
+    "othersN": 62,
+    "othersMedianPx": 38.28,
+    "othersMaxPx": 38.51
+  },
+  "A3-after-LIFT-3s": {
+    "n": 76,
+    "median": 11.954,
+    "max": 80.308,
+    "perSec": 3.96,
+    "calmStart": 0.8592,
+    "calmEnd": 1
+  },
+  "B-frame-timing-10s": {
+    "frames": 598,
+    "median": 16.7,
+    "p95": 16.8,
+    "p99": 16.8,
+    "max": 33.4,
+    "over20ms": 2,
+    "over50ms": 0
+  },
+  "C-trance-tokens": {
+    "streak": 0,
+    "confetti": 0,
+    "xp": 0,
+    "combo": 0,
+    "leaderboard": 0,
+    "alertfn": 0,
+    "points": 3
+  },
+  "ERRORS": []
+}

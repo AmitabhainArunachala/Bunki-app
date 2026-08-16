@@ -16,24 +16,20 @@
     },
     {
       "step": 3,
-      "name": "tap word",
+      "name": "click grammar + entry",
       "shot": "03-word-panel.png",
       "panel": {
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "year, age",
-        "semRows": [],
-        "semEmpty": "この語には意味近傍がまだ書かれていない。SEM 層は現在 82 語（辞書の約 1.2%）。空白を隠さずに見せている — 拡大は #44。",
-        "kanjiChips": [
-          "過酷",
-          "試練",
-          "逆境",
-          "言葉",
-          "時間",
-          "記憶",
+        "gloss": "yearageyearspast one's primeold age",
+        "senses": 5,
+        "kanjiRows": [
           "年"
-        ]
+        ],
+        "examples": 6,
+        "hasBack": true,
+        "hasClose": true
       }
     },
     {
@@ -120,15 +116,16 @@
         "glyph": "過",
         "meaning": "Overdo",
         "tags": [
-          "12 画",
+          "12 strokes",
           "漢検 6級",
-          "ShareAlike",
-          "ShareAlike プール"
+          "JLPT N2"
         ],
         "sections": [
-          "部品へ",
-          "この字を含む語 — 22 語",
-          "熟語・慣用句 — 2　ShareAlike プール"
+          "部首radical",
+          "筆順stroke order",
+          "部品main components",
+          "よく使う語 — 44 語common compounds",
+          "熟語・慣用句 — 2　idioms and set phrases"
         ]
       }
     },
@@ -139,9 +136,9 @@
       "radicalPage": {
         "node": "radical:咼",
         "glyph": "咼",
-        "name": "（名称は漢検の部首表にない部品）",
+        "name": "(a part with no name in the 漢検 radical table)",
         "family": 5,
-        "heading": "この部品を含む字 — 4 字"
+        "heading": "この部品を含む字 — 4 字kanji that contain this part"
       }
     },
     {
@@ -150,27 +147,27 @@
       "shot": "05-take-and-schedule.png",
       "schedule": [
         [
-          "もう一度",
-          "1 分後",
-          "2026-08-06 22:59",
+          "もう一度again",
+          "in 1 min",
+          "2026-08-16 01:21",
           "0.21"
         ],
         [
-          "難しい",
-          "6 分後",
-          "2026-08-06 23:04",
+          "難しいhard",
+          "in 6 min",
+          "2026-08-16 01:26",
           "1.29"
         ],
         [
-          "ふつう",
-          "10 分後",
-          "2026-08-06 23:08",
+          "ふつうgood",
+          "in 10 min",
+          "2026-08-16 01:30",
           "2.31"
         ],
         [
-          "簡単",
-          "8 日後",
-          "2026-08-14 22:58",
+          "簡単easy",
+          "in 9 d",
+          "2026-08-25 01:20",
           "8.30"
         ]
       ]
@@ -179,8 +176,8 @@
       "step": 6,
       "name": "return",
       "shot": "06-return-to-place.png",
-      "scrollBefore": 420,
-      "scrollAfter": 420
+      "scrollBefore": 287,
+      "scrollAfter": 287
     }
   ],
   "measurements": {
@@ -189,144 +186,130 @@
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 17.22,
+          "contrast": 10.29,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 17.22,
+          "contrast": 12.66,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
-        },
-        {
-          "label": "faint / snippet",
-          "selector": ".shelf-snippet",
-          "contrast": 2.67,
-          "fontSize": 14,
-          "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
-          "label": "faint / signal label",
-          "selector": ".sig-name",
-          "contrast": 2.67,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
-          "label": "chrome breadcrumb (background)",
-          "selector": ".crumb",
-          "contrast": 2.67,
-          "fontSize": 13,
-          "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
-          "label": "eyebrow label",
-          "selector": ".eyebrow",
-          "contrast": 2.67,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.42)"
-        },
-        {
-          "label": "reading body (focused)",
-          "selector": ".reader",
-          "contrast": 17.22,
-          "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 2.67,
-          "fontSize": 15,
-          "color": "rgba(20, 24, 28, 0.42)"
+          "contrast": 2.45,
+          "fontSize": 4.4,
+          "color": "rgba(27, 42, 58, 0.42)"
+        },
+        {
+          "label": "faint / snippet",
+          "selector": ".shelf-snippet",
+          "contrast": 2.28,
+          "fontSize": 14,
+          "color": "rgba(28, 47, 66, 0.42)"
+        },
+        {
+          "label": "chrome breadcrumb (background)",
+          "selector": ".crumb",
+          "contrast": 2.38,
+          "fontSize": 13,
+          "color": "rgba(28, 47, 66, 0.42)"
+        },
+        {
+          "label": "eyebrow label",
+          "selector": ".eyebrow",
+          "contrast": 2.28,
+          "fontSize": 12,
+          "color": "rgba(28, 47, 66, 0.42)"
+        },
+        {
+          "label": "reading body (focused)",
+          "selector": ".reader",
+          "contrast": 12.66,
+          "fontSize": 21,
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.52,
+          "contrast": 5.11,
           "fontSize": 13,
-          "color": "rgb(61, 68, 76)"
+          "color": "rgb(74, 93, 112)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 7.17,
+          "contrast": 5.57,
           "fontSize": 15,
-          "color": "rgb(158, 43, 37)"
+          "color": "rgb(176, 58, 46)"
         }
       ],
       "wcag": [
         {
           "label": "view title",
           "selector": ".view-title",
-          "contrast": 17.22,
+          "contrast": 10.29,
           "fontSize": 22,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "shelf title",
           "selector": ".shelf-title",
-          "contrast": 17.22,
+          "contrast": 12.66,
           "fontSize": 19,
-          "color": "rgb(20, 24, 28)"
-        },
-        {
-          "label": "faint / snippet",
-          "selector": ".shelf-snippet",
-          "contrast": 6.05,
-          "fontSize": 14,
-          "color": "rgba(20, 24, 28, 0.68)"
-        },
-        {
-          "label": "faint / signal label",
-          "selector": ".sig-name",
-          "contrast": 6.05,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.68)"
-        },
-        {
-          "label": "chrome breadcrumb (background)",
-          "selector": ".crumb",
-          "contrast": 6.05,
-          "fontSize": 13,
-          "color": "rgba(20, 24, 28, 0.68)"
-        },
-        {
-          "label": "eyebrow label",
-          "selector": ".eyebrow",
-          "contrast": 6.05,
-          "fontSize": 12,
-          "color": "rgba(20, 24, 28, 0.68)"
-        },
-        {
-          "label": "reading body (focused)",
-          "selector": ".reader",
-          "contrast": 17.22,
-          "fontSize": 21,
-          "color": "rgb(20, 24, 28)"
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "gloss",
           "selector": ".gloss",
-          "contrast": 6.05,
-          "fontSize": 15,
-          "color": "rgba(20, 24, 28, 0.68)"
+          "contrast": 2.45,
+          "fontSize": 4.4,
+          "color": "rgba(27, 42, 58, 0.42)"
+        },
+        {
+          "label": "faint / snippet",
+          "selector": ".shelf-snippet",
+          "contrast": 6.38,
+          "fontSize": 14,
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
+        },
+        {
+          "label": "chrome breadcrumb (background)",
+          "selector": ".crumb",
+          "contrast": 7.34,
+          "fontSize": 13,
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
+        },
+        {
+          "label": "eyebrow label",
+          "selector": ".eyebrow",
+          "contrast": 6.38,
+          "fontSize": 12,
+          "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
+        },
+        {
+          "label": "reading body (focused)",
+          "selector": ".reader",
+          "contrast": 12.66,
+          "fontSize": 21,
+          "color": "rgb(28, 47, 66)"
         },
         {
           "label": "discrimination note",
           "selector": ".sem-note",
-          "contrast": 9.52,
+          "contrast": 5.11,
           "fontSize": 13,
-          "color": "rgb(61, 68, 76)"
+          "color": "rgb(74, 93, 112)"
         },
         {
           "label": "reading, the one red",
           "selector": ".reading",
-          "contrast": 7.17,
+          "contrast": 5.57,
           "fontSize": 15,
-          "color": "rgb(158, 43, 37)"
+          "color": "rgb(176, 58, 46)"
         }
       ]
     },
@@ -334,350 +317,5019 @@
       {
         "label": "reading body (focused)",
         "selector": ".reader",
-        "contrast": 17.22,
+        "contrast": 12.66,
         "fontSize": 21,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(28, 47, 66)"
       },
       {
         "label": "view title",
         "selector": ".view-title",
-        "contrast": 17.22,
+        "contrast": 10.29,
         "fontSize": 22,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(28, 47, 66)"
       },
       {
         "label": "gloss",
         "selector": ".gloss",
-        "contrast": 2.67,
-        "fontSize": 15,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "contrast": 2.45,
+        "fontSize": 4.4,
+        "color": "rgba(27, 42, 58, 0.42)"
       },
       {
         "label": "discrimination note",
         "selector": ".sem-note",
-        "contrast": 9.52,
+        "contrast": 5.11,
         "fontSize": 13,
-        "color": "rgb(61, 68, 76)"
-      },
-      {
-        "label": "faint / signal label",
-        "selector": ".sig-name",
-        "contrast": 2.67,
-        "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "rgb(74, 93, 112)"
       },
       {
         "label": "chrome breadcrumb (background)",
         "selector": ".crumb",
-        "contrast": 2.67,
+        "contrast": 7.34,
         "fontSize": 13,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       },
       {
         "label": "eyebrow label",
         "selector": ".eyebrow",
-        "contrast": 2.67,
+        "contrast": 6.38,
         "fontSize": 12,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       },
       {
         "label": "reading, the one red",
         "selector": ".reading",
-        "contrast": 7.17,
+        "contrast": 5.57,
         "fontSize": 15,
-        "color": "rgb(158, 43, 37)"
+        "color": "rgb(176, 58, 46)"
       },
       {
         "label": "shelf title",
         "selector": ".shelf-title",
-        "contrast": 17.22,
+        "contrast": 12.66,
         "fontSize": 19,
-        "color": "rgb(20, 24, 28)"
+        "color": "rgb(28, 47, 66)"
       },
       {
         "label": "faint / snippet",
         "selector": ".shelf-snippet",
-        "contrast": 2.67,
+        "contrast": 6.38,
         "fontSize": 14,
-        "color": "rgba(20, 24, 28, 0.42)"
+        "color": "color(srgb 0.109804 0.184314 0.258824 / 0.82)"
       }
     ],
     "targets": [
       {
-        "text": "戻る",
+        "text": "戻るback",
         "w": 54,
         "h": 44,
+        "hitW": 54,
+        "hitH": 44,
         "id": "back"
       },
       {
-        "text": "取 0",
-        "w": 53,
+        "text": "藍",
+        "w": 44,
         "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "theme-seal"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 1lists",
+        "w": 52,
+        "h": 44,
+        "hitW": 52,
+        "hitH": 44,
         "id": "tray"
       },
       {
-        "text": "そのまま",
-        "w": 86,
-        "h": 40,
-        "id": ""
+        "text": "▸ text setting",
+        "w": 147,
+        "h": 44,
+        "hitW": 147,
+        "hitH": 44,
+        "id": "dials-toggle"
       },
       {
-        "text": "常用まで",
-        "w": 86,
-        "h": 40,
-        "id": ""
+        "text": "年ねん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
       },
       {
-        "text": "すべて仮名",
-        "w": 86,
-        "h": 40,
-        "id": ""
+        "text": "月がつ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
       },
       {
-        "text": "なし",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "触れて",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "つねに",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "なし",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "語の間",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "文節",
-        "w": 86,
-        "h": 40,
-        "id": ""
-      },
-      {
-        "text": "原典",
+        "text": "共和きょうわ",
         "w": 44,
-        "h": 40,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "開催かいさい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "回かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会議かいぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "フィヨルド",
+        "w": 111,
+        "h": 44,
+        "hitW": 111,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "含ふくめ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "カ所しょ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "また",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "既存きそん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "カ所しょ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "範囲はんい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "拡張かくちょう",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "認みとめ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "この",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "追加ついか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "より",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "数かず",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "複合ふくごう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "なる",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "山地さんち",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "つぐ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "番ばん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "なっ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "内うち",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "文化ぶんか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "複合ふくごう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "あわせ",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "はじめて",
+        "w": 89,
+        "h": 44,
+        "hitW": 89,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "岳たけ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "m",
+        "w": 18,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "含ふくむ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "火山かざん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "層そう",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "中心ちゅうしん",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "形成けいせい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "突つき出で",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "山間さんかん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "部ぶ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "針葉しんよう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "マツ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "トドマツ",
+        "w": 89,
+        "h": 44,
+        "hitW": 89,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "や",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "広葉こうよう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ダケカンバ",
+        "w": 111,
+        "h": 44,
+        "hitW": 111,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ミズナラ",
+        "w": 89,
+        "h": 44,
+        "hitW": 89,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "原生げんせい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "しげり",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "山頂さんちょう",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "部ぶ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "や",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "稜線りょうせん",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "植物しょくぶつ",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "群落ぐんらく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "み",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "また",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "冬季とうき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "流氷りゅうひょう",
+        "w": 60,
+        "h": 44,
+        "hitW": 60,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "み",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "海面かいめん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "凍結とうけつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "する",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "際さいし",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "こう",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "し",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "環境かんきょう",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "おけ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "特色とくしょく",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "豊ゆたか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "生態せいたい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "とりわけ",
+        "w": 89,
+        "h": 44,
+        "hitW": 89,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "絶滅ぜつめつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "危惧きぐ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "種しゅ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "含ふくむ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "生物せいぶつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "種しゅ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "保存ほぞん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "へ",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "意義いぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "高たかく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "評価ひょうか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "生息せいそく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "する",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "動物どうぶつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "トド",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "や",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "クジラ",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "海域かいいき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "生息せいそく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "する",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "哺乳ほにゅう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ヒグマ",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "シマフクロウ",
+        "w": 132,
+        "h": 44,
+        "hitW": 132,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "含ふくむ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "野鳥やちょう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "から",
+        "w": 45,
+        "h": 45,
+        "hitW": 45,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "先さき",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "山岳さんがく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "部ぶ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "海岸かいがん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "部ぶ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "年ねん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "国立こくりつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "公園こうえん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "指定してい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "その",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "後ご",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "岬みさき",
+        "w": 31,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "周辺しゅうへん",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "規制きせい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "厳きびしい",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "特別とくべつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "保護ほご",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地区ちく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "指定してい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "とも",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "立たち入いり",
+        "w": 88,
+        "h": 44,
+        "hitW": 88,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "禁止きんし",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "いる",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "語ご",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "版ばん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "半島はんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "より",
+        "w": 45,
+        "h": 45,
+        "hitW": 45,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "今回こんかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "先さき",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "含ふくめ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "以下いか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "フレー",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "デ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "フォート",
+        "w": 88,
+        "h": 44,
+        "hitW": 88,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ドーム",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ワジ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ヒタン",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "鯨くじら",
+        "w": 31,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "渓谷けいこく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "西にし",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "フィヨルド",
+        "w": 111,
+        "h": 44,
+        "hitW": 111,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ガイ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "フィヨルド",
+        "w": 111,
+        "h": 44,
+        "hitW": 111,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "および",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ナールオイ・フィヨルド",
+        "w": 241,
+        "h": 44,
+        "hitW": 241,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "湾わん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "諸島しょとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "および",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "保護ほご",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地域ちいき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ドンパヤーイェン",
+        "w": 176,
+        "h": 44,
+        "hitW": 176,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "カオヤイ",
+        "w": 89,
+        "h": 44,
+        "hitW": 89,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "森林しんりん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地帯ちたい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "コイバ",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "国立こくりつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "公園こうえん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "その",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "海洋かいよう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "保護ほご",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "特別とくべつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地域ちいき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "また",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "以下いか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "範囲はんい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "拡張かくちょう",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "フラワーズ",
+        "w": 110,
+        "h": 44,
+        "hitW": 110,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "渓谷けいこく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "国立こくりつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "公園こうえん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "セント",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "キル",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ダ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会議かいぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "主催しゅさい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "年ねん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "回かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "開催かいさい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "新規しんき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "や",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "物件ぶっけん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "現状げんじょう",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "評価ひょうか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "行おこなう",
+        "w": 48,
+        "h": 44,
+        "hitW": 48,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "あたっ",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "求もとめる",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地域ちいき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "担当たんとう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "政府せいふ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "機関きかん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "候補こうほ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "地ち",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "推薦すいせん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "し",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "委員いいん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "暫定ざんてい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "リスト",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "提出ていしゅつ",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "する",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "委員いいん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "機関きかん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "現地げんち",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "調査ちょうさ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "依頼いらい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "し",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "その",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "結果けっか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "受うけ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "推薦すいせん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "行おこない",
+        "w": 48,
+        "h": 44,
+        "hitW": 48,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "年ねん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "回かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "開催かいさい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "さ",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会議かいぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "正式せいしき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "行おこなう",
+        "w": 48,
+        "h": 44,
+        "hitW": 48,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "保全ほぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "状況じょうきょう",
+        "w": 60,
+        "h": 44,
+        "hitW": 60,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "年ねん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "報告ほうこく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "し",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "委員いいん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会かい",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "審査しんさ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "受うける",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "必要ひつよう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "が",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "自然しぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "決定けってい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "先立さきだち",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "水曜すいよう",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "日ひ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "に",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会議かいぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "保全ほぜん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "努力どりょく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "成績せいせき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "あげ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "危機きき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "リスト",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "件けん",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "取とり消けし",
+        "w": 88,
+        "h": 44,
+        "hitW": 88,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "決定けってい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "し",
+        "w": 23,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "いる",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "危機きき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "リスト",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "から",
+        "w": 45,
+        "h": 45,
+        "hitW": 45,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "取とり消けさ",
+        "w": 88,
+        "h": 44,
+        "hitW": 88,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "サン",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "ガイ",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "国立こくりつ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "公園こうえん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ブト",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "リント",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "で",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "ある",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "世界せかい",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "会議かいぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "は",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "月がつ",
+        "w": 22,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "まで",
+        "w": 45,
+        "h": 45,
+        "hitW": 45,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "続つづき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "文化ぶんか",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "と",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "危機きき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "遺産いさん",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "リスト",
+        "w": 67,
+        "h": 44,
+        "hitW": 67,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "へ",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "の",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "新規しんき",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "登録とうろく",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "を",
+        "w": 23,
+        "h": 45,
+        "hitW": 44,
+        "hitH": 45,
+        "id": "tok plain particle"
+      },
+      {
+        "text": "審議しんぎ",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "する",
+        "w": 45,
+        "h": 44,
+        "hitW": 45,
+        "hitH": 44,
+        "id": "tok content"
+      },
+      {
+        "text": "読み終えたmark as f",
+        "w": 117,
+        "h": 44,
+        "hitW": 117,
+        "hitH": 44,
+        "id": "read-fin"
+      },
+      {
+        "text": "ja.wikinews co",
+        "w": 228,
+        "h": 44,
+        "hitW": 228,
+        "hitH": 44,
         "id": "inline-link"
       },
       {
-        "text": "厳しいeveryday sy",
+        "text": "← 戻るback",
+        "w": 73,
+        "h": 44,
+        "hitW": 73,
+        "hitH": 44,
+        "id": "sheet-back"
+      },
+      {
+        "text": "覚",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "sheet-take"
+      },
+      {
+        "text": "✕",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "sheet-close"
+      },
+      {
+        "text": "CC BY-SA 4.0",
+        "w": 77,
+        "h": 44,
+        "hitW": 77,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "過Overdo›",
         "w": 358,
+        "h": 61,
+        "hitW": 358,
+        "hitH": 61,
+        "id": "entry-row"
+      },
+      {
+        "text": "酷Cruel›",
+        "w": 358,
+        "h": 61,
+        "hitW": 358,
+        "hitH": 61,
+        "id": "entry-row"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "厳しいeveryday sy",
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "苛酷literary var",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "劣悪wretched con",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "熾烈cutthroat co",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "残酷cruelty to b",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "冷酷cold-hearted",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "酷使to overwork ",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "酷暑punishing he",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "過労overwork; 過労",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "過剰the excess r",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な労働its no.1 ",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な環境deserts, ",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "過酷な運命harsh fat",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "試練the ordeal h",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "逆境adversity, i",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
         "text": "極限extreme limi",
-        "w": 358,
+        "w": 332,
         "h": 50,
+        "hitW": 332,
+        "hitH": 50,
         "id": "sem-row"
       },
       {
-        "text": "過6級",
-        "w": 44,
-        "h": 48,
-        "id": "chip"
-      },
-      {
-        "text": "酷準2級",
-        "w": 51,
-        "h": 48,
-        "id": "chip"
-      },
-      {
-        "text": "取る",
+        "text": "覚えるmemorize",
         "w": 358,
         "h": 48,
+        "hitW": 358,
+        "hitH": 48,
         "id": "take"
       },
       {
-        "text": "変異 ▴",
-        "w": 67,
-        "h": 40,
-        "id": "variants-toggle"
-      },
-      {
-        "text": "戻る",
+        "text": "戻るback",
         "w": 54,
         "h": 44,
+        "hitW": 54,
+        "hitH": 44,
         "id": "back"
       },
       {
-        "text": "取 0",
-        "w": 53,
+        "text": "藍",
+        "w": 44,
         "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "theme-seal"
+      },
+      {
+        "text": "EN",
+        "w": 44,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "日本語",
+        "w": 55,
+        "h": 44,
+        "hitW": 55,
+        "hitH": 44,
+        "id": ""
+      },
+      {
+        "text": "覚 1lists",
+        "w": 52,
+        "h": 44,
+        "hitW": 52,
+        "hitH": 44,
         "id": "tray"
+      },
+      {
+        "text": "級で学ぶJLPT · 漢検 ",
+        "w": 123,
+        "h": 46,
+        "hitW": 123,
+        "hitH": 46,
+        "id": "levels-link"
+      },
+      {
+        "text": "レッスンlessons",
+        "w": 104,
+        "h": 46,
+        "hitW": 104,
+        "hitH": 46,
+        "id": "lessons-link"
+      },
+      {
+        "text": "文法grammar",
+        "w": 88,
+        "h": 46,
+        "hitW": 88,
+        "hitH": 46,
+        "id": "grammar-link"
+      },
+      {
+        "text": "類語synonyms, si",
+        "w": 169,
+        "h": 46,
+        "hitW": 169,
+        "hitH": 46,
+        "id": "thesaurus-link"
+      },
+      {
+        "text": "四字熟語four-chara",
+        "w": 159,
+        "h": 46,
+        "hitW": 159,
+        "hitH": 46,
+        "id": "yoji-link"
+      },
+      {
+        "text": "字引find a kanji",
+        "w": 156,
+        "h": 46,
+        "hitW": 156,
+        "hitH": 46,
+        "id": "kanjidex-link"
+      },
+      {
+        "text": "先生を招くinvite th",
+        "w": 124,
+        "h": 46,
+        "hitW": 124,
+        "hitH": 46,
+        "id": "ai-link"
       },
       {
         "text": "世界自然遺産に7箇所を追加 ",
         "w": 358,
-        "h": 258,
+        "h": 330,
+        "hitW": 358,
+        "hitH": 330,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
       },
       {
         "text": "マリナーズ・イチロー選手 現",
         "w": 358,
-        "h": 289,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
         "id": "shelf-item"
       },
       {
-        "text": "JRおおさか東線部分開業ウィ",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "JRおおさか東線部分開業JR",
         "w": 358,
-        "h": 259,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
       },
       {
         "text": "信楽高原鐵道列車衝突事故、J",
         "w": 358,
-        "h": 286,
+        "h": 330,
+        "hitW": 358,
+        "hitH": 330,
         "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
       },
       {
         "text": "ウィキニュース、21年の歴史",
         "w": 358,
-        "h": 289,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
         "id": "shelf-item"
       },
       {
-        "text": "野ばら青空文庫 · 小川未明",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "野ばらThe Wild Ro",
         "w": 358,
-        "h": 288,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
         "id": "shelf-item"
       },
       {
-        "text": "ごん狐青空文庫 · 新美南吉",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "ごん狐Gon the Fox",
         "w": 358,
-        "h": 316,
+        "h": 337,
+        "hitW": 358,
+        "hitH": 337,
         "id": "shelf-item"
       },
       {
-        "text": "やまなし青空文庫 · 宮沢賢",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "やまなしYamanashi ",
         "w": 358,
-        "h": 316,
+        "h": 356,
+        "hitW": 358,
+        "hitH": 356,
         "id": "shelf-item"
       },
       {
-        "text": "育児休業やさしい日本語 用語",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業Childcare ",
         "w": 358,
-        "h": 266,
+        "h": 259,
+        "hitW": 358,
+        "hitH": 259,
         "id": "shelf-item"
       },
       {
-        "text": "育児休業給付金やさしい日本語",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "育児休業給付金Childca",
         "w": 358,
-        "h": 289,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
         "id": "shelf-item"
       },
       {
-        "text": "遺族基礎年金やさしい日本語 ",
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族基礎年金Basic su",
         "w": 358,
-        "h": 289,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
         "id": "shelf-item"
       },
       {
-        "text": "変異 ▴",
-        "w": 67,
-        "h": 40,
-        "id": "variants-toggle"
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "遺族厚生年金Employee",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "医療保険Medical in",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証明書Seal-re",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "印鑑登録証Seal-regi",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "オーバーステイOversta",
+        "w": 358,
+        "h": 259,
+        "hitW": 358,
+        "hitH": 259,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "大家LandlordInte",
+        "w": 358,
+        "h": 233,
+        "hitW": 358,
+        "hitH": 233,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "介護Long-term ca",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "静かな朝A Quiet Mo",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の古本屋The Sec",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "知らない町を歩くWalkin",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "山を歩きながら考えたことTh",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "AI時代の知識と判断Know",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "五箇条の御誓文The Cha",
+        "w": 358,
+        "h": 310,
+        "hitW": 358,
+        "hitH": 310,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "方丈記 · 冒頭Hōjōki",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "徒然草 · 序段Tsurez",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "駅で待つ時間Waiting ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "台所の音Sounds fro",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "となりの部屋の人The Ma",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "引き出しの中の手紙A Let",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "朝の市場The Mornin",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "自転車をなくした日The D",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "川沿いの道The Road ",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "深夜のラジオLate-nig",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "手で書くということOn Wr",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "余白のためのノートA Not",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "雨の日の速度The Spee",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "訳せない言葉についてOn W",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "忘却を前提とした設計Desi",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "都市の匿名性と言語Anony",
+        "w": 358,
+        "h": 282,
+        "hitW": 358,
+        "hitH": 282,
+        "id": "shelf-item"
+      },
+      {
+        "text": "▸ details",
+        "w": 58,
+        "h": 44,
+        "hitW": 58,
+        "hitH": 44,
+        "id": "details-toggle"
+      },
+      {
+        "text": "新聞アーカイブthe new",
+        "w": 239,
+        "h": 46,
+        "hitW": 239,
+        "hitH": 46,
+        "id": "archive-link"
+      },
+      {
+        "text": "▸ sources & li",
+        "w": 133,
+        "h": 44,
+        "hitW": 133,
+        "hitH": 44,
+        "id": "sources-toggle"
       }
     ],
     "semRowsOnProbePanel": 16
@@ -685,328 +5337,496 @@
   "shelf": [
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
+      "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2005-07-15",
-        "CC BY 4.0",
-        "抜粋",
-        "3つの信号。平均しない。"
-      ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "2.42 上級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "63.7%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "57.0%"
-        }
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2006-06-17",
-        "CC BY 4.0",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "CC BY 2.5"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "4.23 中級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "67.4%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "41.9%"
-        }
-      ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": null
     },
     {
       "title": "JRおおさか東線部分開業",
+      "titleEn": "JR Osaka-Higashi Line partially opens",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2008-03-15",
-        "CC BY 4.0",
-        "抜粋",
-        "3つの信号。平均しない。"
-      ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "1.94 上級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "69.9%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "49.6%"
-        }
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+      "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+      "level": "Upper advanced",
+      "levelNote": "上級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2011-04-28",
-        "CC BY 4.0",
-        "抜粋",
-        "3つの信号。平均しない。"
-      ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "1.32 上級後半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "71.1%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "49.1%"
-        }
+        "CC BY 2.5"
       ],
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
+      "titleEn": "Wikinews closes the curtain on 21 years",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "ウィキニュース",
         "2026-05-03",
-        "CC BY 4.0",
-        "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "CC BY 2.5"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "3.37 中級後半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "67.7%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "48.9%"
-        }
-      ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": null
     },
     {
       "title": "野ばら",
+      "titleEn": "The Wild Rose — Ogawa Mimei",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 小川未明",
         "None",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "4.52 初級後半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "86.9%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "22.1%"
-        }
-      ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": null
     },
     {
       "title": "ごん狐",
+      "titleEn": "Gon the Fox — Niimi Nankichi",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 新美南吉",
         "「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "4.27 中級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "88.8%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "24.8%"
-        }
-      ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": null
     },
     {
       "title": "やまなし",
+      "titleEn": "Yamanashi — Miyazawa Kenji",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "青空文庫 · 宮沢賢治",
         "「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日",
-        "PD (著作権フラグ なし) · 新字新仮名",
-        "抜粋",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "PD (著作権フラグ なし) · 新字新仮名"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "4.80 初級後半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "85.8%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "23.6%"
-        }
-      ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": null
     },
     {
       "title": "育児休業",
+      "titleEn": "Childcare leave",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "4.04 中級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "100.0%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "0.0%"
-        }
-      ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": null
     },
     {
       "title": "育児休業給付金",
+      "titleEn": "Childcare-leave benefit",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 2"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "5.72 初級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "69.2%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "46.2%"
-        }
-      ],
-      "disagreement": "不一致 gap 2"
+      "disagreement": null
     },
     {
       "title": "遺族基礎年金",
+      "titleEn": "Basic survivor's pension",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
       "meta": [
         "やさしい日本語 用語集",
-        "ISA やさしい日本語 glossary",
-        "ルビ原文",
-        "3つの信号。平均しない。",
-        "不一致 gap 1"
+        "ISA やさしい日本語 glossary"
       ],
-      "signals": [
-        {
-          "name": "jreadability",
-          "value": "3.58 中級前半"
-        },
-        {
-          "name": "語彙カバー率",
-          "value": "80.0%"
-        },
-        {
-          "name": "TMR（核）",
-          "value": "20.0%"
-        }
+      "disagreement": null
+    },
+    {
+      "title": "遺族厚生年金",
+      "titleEn": "Employees' survivor's pension",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
       ],
-      "disagreement": "不一致 gap 1"
+      "disagreement": null
+    },
+    {
+      "title": "医療保険",
+      "titleEn": "Medical insurance",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証明書",
+      "titleEn": "Seal-registration certificate",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証",
+      "titleEn": "Seal-registration card",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "オーバーステイ",
+      "titleEn": "Overstaying a visa",
+      "level": "Beginner",
+      "levelNote": "初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "大家",
+      "titleEn": "Landlord",
+      "level": "Intermediate",
+      "levelNote": "中級前半",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "介護",
+      "titleEn": "Long-term care",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "やさしい日本語 用語集",
+        "ISA やさしい日本語 glossary"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "静かな朝",
+      "titleEn": "A Quiet Morning",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の古本屋",
+      "titleEn": "The Second-hand Bookshop on a Rainy Day",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 4 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "知らない町を歩く",
+      "titleEn": "Walking an Unknown Town",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "一次資料 · Historical primary source",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "古典 · 鴨長明 · 1212",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "古典 · 吉田兼好 · 14th century",
+        "PD + Bunki原作の解説"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "駅で待つ時間",
+      "titleEn": "Waiting at the Station",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "台所の音",
+      "titleEn": "Sounds from the Kitchen",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "となりの部屋の人",
+      "titleEn": "The Man in the Next Room",
+      "level": "Upper beginner",
+      "levelNote": "初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "引き出しの中の手紙",
+      "titleEn": "A Letter in the Drawer",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "朝の市場",
+      "titleEn": "The Morning Market",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "自転車をなくした日",
+      "titleEn": "The Day I Lost My Bicycle",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "川沿いの道",
+      "titleEn": "The Road Along the River",
+      "level": "Intermediate",
+      "levelNote": "中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "深夜のラジオ",
+      "titleEn": "Late-night Radio",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "段階別読み物 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "手で書くということ",
+      "titleEn": "On Writing by Hand",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "余白のためのノート",
+      "titleEn": "A Notebook Kept for Its Margins",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の速度",
+      "titleEn": "The Speed of a Rainy Day",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "訳せない言葉について",
+      "titleEn": "On Words That Resist Translation",
+      "level": "Upper intermediate",
+      "levelNote": "中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "忘却を前提とした設計",
+      "titleEn": "Designing for Forgetting",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
+    },
+    {
+      "title": "都市の匿名性と言語",
+      "titleEn": "Anonymity in the City, and Language",
+      "level": "Advanced",
+      "levelNote": "上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "meta": [
+        "随筆 · Bunki",
+        "Bunki original"
+      ],
+      "disagreement": null
     }
   ],
   "caps": {
-    "excerptChars": 520,
     "kanjiWordCap": 60,
     "radicalKanjiCap": 80,
     "idiomCap": 900,
-    "idiomCandidates": 3559,
+    "idiomCandidates": 3932,
     "idiomTotalInSource": 4198
   },
   "dials": {
     "baseline": {
-      "rt": 130,
-      "hiddenRt": 0,
+      "rt": 306,
+      "hiddenRt": 306,
       "spacing": "reader",
-      "text": "2005年ねん7月がつ14日か、南みなみアフリカ共和きょうわ国こくダーバンで開催"
+      "text": "2005\n年ねん\n7\n月がつ\n14日か、南みなみアフリカ\n共和きょうわ\n国こくダ"
     },
     "noFuri": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader",
-      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
     },
     "spaced": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
     },
     "joyo": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、"
+      "text": "2005\n年\n7\n月\n14日、南アフリカ\n共和\n国ダーバンで\n開催\n中の第29\n"
     },
     "allKana": {
       "rt": 0,
       "hiddenRt": 0,
       "spacing": "reader sp-bunsetsu",
-      "text": "2005ねん7がつ14か、みなみあふりかきょうわこくだーばんでかいさいちゅうのだ"
+      "text": "2005\nねん\n7\nがつ\n14か、みなみアフリカ\nきょうわ\nこくダーバンで\nかい"
     }
   },
   "idiomSectionPresent": true,
   "hops": [
     "kanji:過",
-    "word:経過",
+    "word:過ぎる",
     "radical:咼",
     "kanji:過"
   ],
@@ -1026,147 +5846,394 @@
   "graderTable": [
     {
       "title": "世界自然遺産に7箇所を追加 知床半島も",
-      "signals": {
-        "jreadability": "2.42 上級前半",
-        "語彙カバー率": "63.7%",
-        "TMR（核）": "57.0%"
-      },
+      "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
-      "signals": {
-        "jreadability": "4.23 中級前半",
-        "語彙カバー率": "67.4%",
-        "TMR（核）": "41.9%"
-      },
-      "disagreement": "不一致 gap 1"
+      "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "JRおおさか東線部分開業",
-      "signals": {
-        "jreadability": "1.94 上級前半",
-        "語彙カバー率": "69.9%",
-        "TMR（核）": "49.6%"
-      },
+      "titleEn": "JR Osaka-Higashi Line partially opens",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
-      "signals": {
-        "jreadability": "1.32 上級後半",
-        "語彙カバー率": "71.1%",
-        "TMR（核）": "49.1%"
-      },
+      "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+      "level": "Upper advanced上級後半 · ~1 in 2 words beyond the JLPT lists",
       "disagreement": null
     },
     {
       "title": "ウィキニュース、21年の歴史に幕を閉じる",
-      "signals": {
-        "jreadability": "3.37 中級後半",
-        "語彙カバー率": "67.7%",
-        "TMR（核）": "48.9%"
-      },
-      "disagreement": "不一致 gap 1"
+      "titleEn": "Wikinews closes the curtain on 21 years",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "野ばら",
-      "signals": {
-        "jreadability": "4.52 初級後半",
-        "語彙カバー率": "86.9%",
-        "TMR（核）": "22.1%"
-      },
-      "disagreement": "不一致 gap 2"
+      "titleEn": "The Wild Rose — Ogawa Mimei",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "ごん狐",
-      "signals": {
-        "jreadability": "4.27 中級前半",
-        "語彙カバー率": "88.8%",
-        "TMR（核）": "24.8%"
-      },
-      "disagreement": "不一致 gap 1"
+      "titleEn": "Gon the Fox — Niimi Nankichi",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "やまなし",
-      "signals": {
-        "jreadability": "4.80 初級後半",
-        "語彙カバー率": "85.8%",
-        "TMR（核）": "23.6%"
-      },
-      "disagreement": "不一致 gap 2"
+      "titleEn": "Yamanashi — Miyazawa Kenji",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "育児休業",
-      "signals": {
-        "jreadability": "4.04 中級前半",
-        "語彙カバー率": "100.0%",
-        "TMR（核）": "0.0%"
-      },
-      "disagreement": "不一致 gap 1"
+      "titleEn": "Childcare leave",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "育児休業給付金",
-      "signals": {
-        "jreadability": "5.72 初級前半",
-        "語彙カバー率": "69.2%",
-        "TMR（核）": "46.2%"
-      },
-      "disagreement": "不一致 gap 2"
+      "titleEn": "Childcare-leave benefit",
+      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
     },
     {
       "title": "遺族基礎年金",
-      "signals": {
-        "jreadability": "3.58 中級前半",
-        "語彙カバー率": "80.0%",
-        "TMR（核）": "20.0%"
-      },
-      "disagreement": "不一致 gap 1"
+      "titleEn": "Basic survivor's pension",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "遺族厚生年金",
+      "titleEn": "Employees' survivor's pension",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "医療保険",
+      "titleEn": "Medical insurance",
+      "level": "Advanced上級前半 · ~1 in 5 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証明書",
+      "titleEn": "Seal-registration certificate",
+      "level": "Upper beginner初級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "印鑑登録証",
+      "titleEn": "Seal-registration card",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "オーバーステイ",
+      "titleEn": "Overstaying a visa",
+      "level": "Beginner初級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "大家",
+      "titleEn": "Landlord",
+      "level": "Intermediate中級前半",
+      "disagreement": null
+    },
+    {
+      "title": "介護",
+      "titleEn": "Long-term care",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "静かな朝",
+      "titleEn": "A Quiet Morning",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の古本屋",
+      "titleEn": "The Second-hand Bookshop on a Rainy Day",
+      "level": "Intermediate中級前半 · ~1 in 4 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "知らない町を歩く",
+      "titleEn": "Walking an Unknown Town",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "山を歩きながら考えたこと",
+      "titleEn": "Thoughts While Walking a Mountain",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "AI時代の知識と判断",
+      "titleEn": "Knowledge and Judgment in the Age of AI",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "五箇条の御誓文",
+      "titleEn": "The Charter Oath (1868)",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "方丈記 · 冒頭",
+      "titleEn": "Hōjōki — the opening",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "徒然草 · 序段",
+      "titleEn": "Tsurezuregusa — the opening passage",
+      "level": "Intermediate中級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "駅で待つ時間",
+      "titleEn": "Waiting at the Station",
+      "level": "Upper beginner初級後半 · ~1 in 4 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "台所の音",
+      "titleEn": "Sounds from the Kitchen",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "となりの部屋の人",
+      "titleEn": "The Man in the Next Room",
+      "level": "Upper beginner初級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "引き出しの中の手紙",
+      "titleEn": "A Letter in the Drawer",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "朝の市場",
+      "titleEn": "The Morning Market",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "自転車をなくした日",
+      "titleEn": "The Day I Lost My Bicycle",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "川沿いの道",
+      "titleEn": "The Road Along the River",
+      "level": "Intermediate中級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "深夜のラジオ",
+      "titleEn": "Late-night Radio",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "手で書くということ",
+      "titleEn": "On Writing by Hand",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "余白のためのノート",
+      "titleEn": "A Notebook Kept for Its Margins",
+      "level": "Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "雨の日の速度",
+      "titleEn": "The Speed of a Rainy Day",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "訳せない言葉について",
+      "titleEn": "On Words That Resist Translation",
+      "level": "Upper intermediate中級後半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "忘却を前提とした設計",
+      "titleEn": "Designing for Forgetting",
+      "level": "Advanced上級前半 · ~1 in 2 words beyond the JLPT lists",
+      "disagreement": null
+    },
+    {
+      "title": "都市の匿名性と言語",
+      "titleEn": "Anonymity in the City, and Language",
+      "level": "Advanced上級前半 · ~1 in 3 words beyond the JLPT lists",
+      "disagreement": null
     }
   ],
   "counts": {
-    "passages": 11,
-    "words": 7217,
+    "passages": 26,
+    "articleFiles": 26,
+    "words": 7910,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 173,
+  "loadMs": 423,
   "summary": {
-    "total": 38,
-    "failed": 0
+    "total": 116,
+    "failed": 1
   },
   "results": [
     {
+      "name": "銀河 · the app opens into the living galaxy",
+      "pass": true,
+      "detail": "layer active, 64 words adrift"
+    },
+    {
+      "name": "銀河 · the hero rests bare but for the single symbol (no top chrome)",
+      "pass": true,
+      "detail": "symbol present, top chrome receded"
+    },
+    {
+      "name": "Phase 2 · one door from the universe to the shelf",
+      "pass": true,
+      "detail": "40 articles; universe asleep (display none)"
+    },
+    {
+      "name": "Phase 2 · 戻る returns from the shelf to the universe",
+      "pass": true,
+      "detail": "layer active again"
+    },
+    {
+      "name": "Phase 2 · a kanji word stands in the field to bloom",
+      "pass": true,
+      "detail": "{\"x\":147.67999267578125,\"y\":570.5800170898438,\"productive\":true}"
+    },
+    {
+      "name": "bloom · the constellation is its own relief — three colour families",
+      "pass": true,
+      "detail": "centre rgb(235, 97, 1) · 14 satellites rgb(22, 94, 131) (floor 8) · field rgb(110, 135, 166)"
+    },
+    {
+      "name": "bloom · dragging the centre carries the whole constellation — and sticks",
+      "pass": true,
+      "detail": "centre moved 89px; mean tether 163 → 163px"
+    },
+    {
+      "name": "bloom · a water tap releases the constellation",
+      "pass": true,
+      "detail": "relief classes cleared"
+    },
+    {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "11 texts, ready in 173 ms"
+      "detail": "40 texts, ready in 423 ms"
     },
     {
-      "name": "every shelf text shows three signals, not one score",
+      "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "11 texts × 3 signals"
+      "detail": "40 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 2 words beyond the JLPT lists"
     },
     {
-      "name": "disagreement is visible where it fires",
+      "name": "disagreement fires only where two-plus ordinal signals were measured",
       "pass": true,
-      "detail": "8/11 texts flagged"
+      "detail": "0 flagged; 0 articles with >=2 ordinal signals"
+    },
+    {
+      "name": "the raw signals unfold behind 詳細 — separate, never averaged",
+      "pass": true,
+      "detail": "3 signal rows on the opened card: jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair"
+    },
+    {
+      "name": "the JLPT-lexicon signal is live on the opened card",
+      "pass": true,
+      "detail": "jreadabilitysentence ease · JLPT語彙JLPT vocab coverage · 国語研語彙NINJAL pair"
+    },
+    {
+      "name": "the NINJAL pair is either measured or marked 未測定 — never faked",
+      "pass": true,
+      "detail": "国語研語彙NINJAL pair → not measured"
+    },
+    {
+      "name": "Phase 1 · the shelf holds dozens of articles",
+      "pass": true,
+      "detail": "40 articles"
+    },
+    {
+      "name": "Phase 1 · all 8 parked v11 texts stand on the shelf",
+      "pass": true,
+      "detail": "8/8 present"
+    },
+    {
+      "name": "Phase 1 · the index is lean — article bodies live in their own files",
+      "pass": true,
+      "detail": "40 per-article files"
+    },
+    {
+      "name": "Phase 1 · every article carries live signals or an honest absence",
+      "pass": true,
+      "detail": "jreadability + jlpt_lexicon live; NINJAL pair measured or reason recorded"
+    },
+    {
+      "name": "Phase 1 · ごん狐 stands on the shelf",
+      "pass": true,
+      "detail": "shelf index 6"
+    },
+    {
+      "name": "Phase 1 · the story ships full-length — no 520-char excerpt",
+      "pass": true,
+      "detail": "6144 chars rendered"
+    },
+    {
+      "name": "Phase 1 · the story reaches its final line",
+      "pass": true,
+      "detail": "the closing sentence is present"
+    },
+    {
+      "name": "Phase 1 · paragraphs survive into the reader",
+      "pass": true,
+      "detail": "81 paragraph breaks"
+    },
+    {
+      "name": "Phase 1 · a v11 original carries real furigana from the pipeline",
+      "pass": true,
+      "detail": "63 <rt> elements in 静かな朝"
     },
     {
       "name": "the reader shows real Japanese",
       "pass": true,
-      "detail": "900 chars rendered"
+      "detail": "2686 chars rendered"
     },
     {
       "name": "furigana renders as real ruby",
       "pass": true,
-      "detail": "130 <rt> elements"
+      "detail": "306 <rt> elements"
+    },
+    {
+      "name": "the text-settings dials fold away until asked for",
+      "pass": true,
+      "detail": "hidden by default=true, 9 dial options after one tap"
     },
     {
       "name": "dial · furigana alone changes furigana",
       "pass": true,
-      "detail": "rt 130 → 0, spacing class unchanged"
+      "detail": "rt 306 → 0, spacing class unchanged"
     },
     {
       "name": "dial · spacing alone changes spacing",
@@ -1176,27 +6243,77 @@
     {
       "name": "文節 grouping is real",
       "pass": true,
-      "detail": "136 文節 groups"
+      "detail": "350 文節 groups"
     },
     {
       "name": "dial · kanji alone changes the script",
       "pass": true,
-      "detail": "\"2005年ねん7月がつ14日\" → \"2005ねん7がつ14か、み\""
+      "detail": "\"2005\n年ねん\n7\n月がつ\" → \"2005\nねん\n7\nがつ\n1\""
     },
     {
       "name": "furigana can be held back and revealed",
       "pass": true,
-      "detail": "130 ruby present but hidden"
+      "detail": "306 ruby present but hidden"
     },
     {
-      "name": "tapping a word opens a panel with reading + meaning",
+      "name": "grammar · the first tap reveals furigana instantly, opening nothing",
+      "pass": true,
+      "detail": "lit=1, sheet=false"
+    },
+    {
+      "name": "grammar · a second tap sets English beneath — and the word does not move",
+      "pass": true,
+      "detail": "gloss on, glyph bottom 431.9 → 431.9px"
+    },
+    {
+      "name": "grammar · the gloss collides with nothing — on any font, by construction",
+      "pass": true,
+      "detail": "0 overlapping token(s)"
+    },
+    {
+      "name": "grammar · even the longest gloss renders whole — never truncated",
+      "pass": true,
+      "detail": "沿線 → \"places alongside a railway line\""
+    },
+    {
+      "name": "grammar · a third tap closes the circle — plain kanji, no sheet",
+      "pass": true,
+      "detail": "{\"sheet\":\"\",\"rt\":0,\"gloss\":false}"
+    },
+    {
+      "name": "grammar · a long press floats the mini-dictionary",
+      "pass": true,
+      "detail": "遺産 — inheritance"
+    },
+    {
+      "name": "grammar · one tap anywhere else backs out of the mini",
+      "pass": true,
+      "detail": "mini dismissed"
+    },
+    {
+      "name": "grammar · holding opens the full entry",
       "pass": true,
       "detail": "年（とし）"
     },
     {
-      "name": "the panel offers a hop into the kanji",
+      "name": "the sheet carries its own back and close",
       "pass": true,
-      "detail": "7 chips"
+      "detail": "back=true close=true"
+    },
+    {
+      "name": "the entry offers a hop into each kanji",
+      "pass": true,
+      "detail": "年 — 1 row(s)"
+    },
+    {
+      "name": "real usage examples come from the shelf itself",
+      "pass": true,
+      "detail": "6 example(s)"
+    },
+    {
+      "name": "the dictionary carries every sense, most common first",
+      "pass": true,
+      "detail": "年: 5 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -1206,7 +6323,7 @@
     {
       "name": "word → kanji lands on a real kanji page",
       "pass": true,
-      "detail": "過 — Overdo; 12 画 / 漢検 6級 / ShareAlike / ShareAlike プール"
+      "detail": "過 — Overdo; 12 strokes / 漢検 6級 / JLPT N2"
     },
     {
       "name": "the kanji page carries its 漢検級",
@@ -1214,19 +6331,19 @@
       "detail": "漢検 6級"
     },
     {
-      "name": "idioms hang off the kanji page, marked as the ShareAlike pool",
+      "name": "idioms hang off the kanji page (provenance lives in the sources panel)",
       "pass": true,
       "detail": "1 idiom section(s)"
     },
     {
       "name": "kanji → a word that contains it",
       "pass": true,
-      "detail": "word:経過"
+      "detail": "word:過ぎる"
     },
     {
       "name": "kanji → radical lands on a real radical page with a family",
       "pass": true,
-      "detail": "咼（（名称は漢検の部首表にない部品）） この部品を含む字 — 4 字"
+      "detail": "咼（(a part with no name in the 漢検 radical table)） この部品を含む字 — 4 字kanji that contain this part"
     },
     {
       "name": "radical → another kanji that uses it",
@@ -1236,47 +6353,52 @@
     {
       "name": "any node can be taken into study",
       "pass": true,
-      "detail": "tray reads \"取 1\""
+      "detail": "chrome reads \"覚 1lists\""
+    },
+    {
+      "name": "覚える lands the item in this month's list automatically",
+      "pass": true,
+      "detail": "リスト — 2026年8月 に自動追加ずみlists — already in 2026"
     },
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度→1 分後 · 難しい→6 分後 · ふつう→10 分後 · 簡単→8 日後"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
       "pass": true,
-      "detail": "scrollY 420 → 420, sheet closed=true"
+      "detail": "scrollY 287 → 287, sheet closed=true"
     },
     {
       "name": "variant A · mcd renders the target both ways",
       "pass": true,
-      "detail": "MCD — 文脈まるごと、一語だけ空ける — face \"2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　\""
+      "detail": "MCD card — the whole c — face \"2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回　　\""
     },
     {
       "name": "variant A · word renders the target both ways",
       "pass": true,
-      "detail": "単語札 — 表は語だけ（Animecards — face \"世界\""
+      "detail": "Word card — the front  — face \"世界\""
     },
     {
       "name": "variant B · three",
       "pass": true,
-      "detail": "33 signal rows / 0 bands / 0 uncertain markers"
+      "detail": "3 signal rows / 0 bands / 0 uncertain markers (one 詳細 open)"
     },
     {
       "name": "variant B · band",
       "pass": true,
-      "detail": "0 signal rows / 11 bands / 8 uncertain markers"
+      "detail": "0 signal rows / 1 bands / 0 uncertain markers (one 詳細 open)"
     },
     {
       "name": "variant C · the WCAG side actually reaches AA",
       "pass": true,
-      "detail": "faint text: current 2.67:1 → wcag 6.05:1 (AA needs 4.5)"
+      "detail": "faint text: current 2.28:1 → wcag 6.38:1 (AA needs 4.5)"
     },
     {
       "name": "variant C · the current side is honestly below AA (that is the cost being shown)",
       "pass": true,
-      "detail": "2.67:1"
+      "detail": "2.28:1"
     },
     {
       "name": "variant D · field entry",
@@ -1291,7 +6413,7 @@
     {
       "name": "variant D · shelf entry",
       "pass": true,
-      "detail": "11 texts"
+      "detail": "40 texts"
     },
     {
       "name": "focused content dominates the background chrome",
@@ -1301,17 +6423,17 @@
     {
       "name": "discrimination notes are legible (AA)",
       "pass": true,
-      "detail": "9.52:1 at 13px"
+      "detail": "5.11:1 at 13px"
     },
     {
       "name": "body ink clears AAA",
       "pass": true,
-      "detail": "17.22:1"
+      "detail": "10.29:1"
     },
     {
-      "name": "every visible control is at least 40px",
-      "pass": true,
-      "detail": "46 controls checked"
+      "name": "every visible control is at least 44px",
+      "pass": false,
+      "detail": "sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -1324,9 +6446,239 @@
       "detail": "clean"
     },
     {
-      "name": "the variant strip exposes all four open decisions",
+      "name": "the variant strip exposes all four open decisions, the v1.1 depth toggle and the drift tap ladder",
       "pass": true,
-      "detail": "4 rows"
+      "detail": "7 rows (cards, difficulty, contrast, entry, depth, ladder, sattap); 4 carry ticket numbers; named rows present: E 奥行 · F 触れの段 · G 衛星の触れ"
+    },
+    {
+      "name": "v1.1 · navigation is bilingual by default (a learner can steer)",
+      "pass": true,
+      "detail": "back carries \"back\", 覚 carries \"lists\", EN active=true"
+    },
+    {
+      "name": "v1.2 · the language toggle reads exactly EN | 日本語",
+      "pass": true,
+      "detail": "EN=true 日本語=true"
+    },
+    {
+      "name": "v1.1 · 日本語のみ strips the chrome back to immersion mode",
+      "pass": true,
+      "detail": "after toggling: back latin=false, lists latin=false"
+    },
+    {
+      "name": "v1.1 · layered depth and WCAG contrast are the defaults",
+      "pass": true,
+      "detail": "body classes: layered=true, wcag=true"
+    },
+    {
+      "name": "v1.1 · the v1.0 look survives as toggles (flat + fade + 日本語のみ)",
+      "pass": true,
+      "detail": "depth=flat&contrast=current&ui=ja"
+    },
+    {
+      "name": "v1.2 · the grammar dictionary stands (original content, N5/N4 backbone)",
+      "pass": true,
+      "detail": "240 entries in the index"
+    },
+    {
+      "name": "v1.8 · the v11 grammar harvest rides in (#36), N1 included",
+      "pass": true,
+      "detail": "harvested ようになる present; N1 filter chip exists"
+    },
+    {
+      "name": "v1.7 · the grammar index filters by level",
+      "pass": true,
+      "detail": "17 N5 entries of 240"
+    },
+    {
+      "name": "v1.2 · a grammar entry carries formation + examples",
+      "pass": true,
+      "detail": "〜ている: 2 examples"
+    },
+    {
+      "name": "v1.2 · the kanji page draws its stroke order (KanjiVG)",
+      "pass": true,
+      "detail": "6 strokes rendered"
+    },
+    {
+      "name": "v1.2 · the shelf carries no provenance narration (sources fold away)",
+      "pass": true,
+      "detail": "quiet"
+    },
+    {
+      "name": "search · the typed door accepts romaji",
+      "pass": true,
+      "detail": "\"kaisai\" → word:開催"
+    },
+    {
+      "name": "search · the typed door accepts kana",
+      "pass": true,
+      "detail": "\"かいさい\" → word:開催"
+    },
+    {
+      "name": "search · the typed door accepts kanji",
+      "pass": true,
+      "detail": "\"開\" → kanji:開"
+    },
+    {
+      "name": "search · the typed door accepts English",
+      "pass": true,
+      "detail": "\"peninsula\" → word:半島"
+    },
+    {
+      "name": "search · the typed door accepts grammar",
+      "pass": true,
+      "detail": "\"ばかり\" → grammar:bakari"
+    },
+    {
+      "name": "search · the canonical four doors are counted honestly (B4 gap stated)",
+      "pass": true,
+      "detail": "1/4 canonical entry modes present (typed only today; handwriting · radical · SKIP are spec B4)"
+    },
+    {
+      "name": "search · a result opens its full entry",
+      "pass": true,
+      "detail": "word:開催"
+    },
+    {
+      "name": "particles · the search knows は",
+      "pass": true,
+      "detail": "\"wa\" → particle:wa"
+    },
+    {
+      "name": "particles · the reader marks particle tokens as doors",
+      "pass": true,
+      "detail": "144 particle tokens wired"
+    },
+    {
+      "name": "particles · holding a particle opens its page with examples",
+      "pass": true,
+      "detail": "particle:de — で　particle, 2 examples"
+    },
+    {
+      "name": "two taps and a hold — ふりがな, gloss, mini, entry — every rung logged",
+      "pass": true,
+      "detail": "depth 1 → depth 2 → depth 2 → depth 3 (word:開催@wikinews:1403)"
+    },
+    {
+      "name": "rows persist inside the exported envelope with ms timestamps",
+      "pass": true,
+      "detail": "4 rows appended after 25 existing"
+    },
+    {
+      "name": "a tap is friction, never a grade — no FSRS state minted",
+      "pass": true,
+      "detail": "srs[\"word:開催\"] absent"
+    },
+    {
+      "name": "classifier · 音訓混熟 land on the canonical compounds",
+      "pass": true,
+      "detail": "学校/人々/手帳/大人/電話 → 音訓混熟音"
+    },
+    {
+      "name": "pool · thousands of untaken compounds, banded and typed",
+      "pass": true,
+      "detail": "13713 compounds · 13 bands"
+    },
+    {
+      "name": "draw · a batch of 20 spreads bands, no head kanji repeats",
+      "pass": true,
+      "detail": "20 heads · 13 bands"
+    },
+    {
+      "name": "the probe room keeps the zen glass",
+      "pass": true,
+      "detail": "body.zen while a compound is up"
+    },
+    {
+      "name": "a missed probe mints the card and logs one row — never FSRS state",
+      "pass": true,
+      "detail": "row [1786843316199,\"probe\",\"word:屏風\",1,1]"
+    },
+    {
+      "name": "the stack opens: hundreds of articles, year-folded, rights named",
+      "pass": true,
+      "detail": "694 real news articles · 2005–2026 · CC BY 2.5 · the frozen ja.wikinew"
+    },
+    {
+      "name": "an archive article reads like any shelf text — tokens, level, source link",
+      "pass": true,
+      "detail": "888 tokens · \"ja.wikinews contributors, CC BY 2.5\""
+    },
+    {
+      "name": "back returns to the stack, not the shelf",
+      "pass": true,
+      "detail": "archive restored"
+    },
+    {
+      "name": "the single-file build does not embed the stack it cannot carry",
+      "pass": true,
+      "detail": "no articles/archive bundle keys in corridor-standalone.html"
+    },
+    {
+      "name": "a common word carries at least 4 example sentences",
+      "pass": true,
+      "detail": "6 examples · 6 with English"
+    },
+    {
+      "name": "example tokens climb the reader ladder — ふりがな, then English",
+      "pass": true,
+      "detail": "{\"rt\":1,\"gloss\":true}"
+    },
+    {
+      "name": "the sentence opens on its own page — large, every token alive",
+      "pass": true,
+      "detail": "2 live tokens · en=true"
+    },
+    {
+      "name": "戻る from the sentence page returns one step, to the word",
+      "pass": true,
+      "detail": "sheet after back: word:学校"
+    },
+    {
+      "name": "the first sense wins — 半島 glosses peninsula, never Korea",
+      "pass": true,
+      "detail": "inline gloss: \"peninsula\" (real taps on the sentence page)"
+    },
+    {
+      "name": "capture offers 語だけ・この文・段落 and the choice persists",
+      "pass": true,
+      "detail": "{\"p\":\"wikinews:1403\",\"i\":19,\"scope\":\"sent\"}"
+    },
+    {
+      "name": "the bank indexes far beyond the core dictionary",
+      "pass": true,
+      "detail": "40082 indexed forms vs 22934 core targets"
+    },
+    {
+      "name": "the reader boots bare — ふりがな waits for the tap",
+      "pass": true,
+      "detail": "0 shown · 306 waiting"
+    },
+    {
+      "name": "the tap circle closes — ふりがな · gloss · plain kanji again",
+      "pass": true,
+      "detail": "rt=1 → gloss=true → back to rt=0 gloss=false"
+    },
+    {
+      "name": "a short hold floats the simple definition",
+      "pass": true,
+      "detail": "mini: 回"
+    },
+    {
+      "name": "戻る answers the very first tap after an entry opens",
+      "pass": true,
+      "detail": "sheet closed on the immediate back"
+    },
+    {
+      "name": "文字設定 rides the envelope — a chosen dial survives the session",
+      "pass": true,
+      "detail": "stored furigana=2"
+    },
+    {
+      "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
+      "pass": true,
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     }
   ]
 }

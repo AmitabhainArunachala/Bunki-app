@@ -1,0 +1,46 @@
+name: jmdict-simplified
+upstream:
+  - https://github.com/scriptin/jmdict-simplified
+  - https://www.edrdg.org/jmdict/j_jmdict.html
+  - https://www.edrdg.org/wiki/index.php/KANJIDIC_Project
+retrieved: "2026-08-07"
+licence: CC BY-SA 4.0
+licence_url: https://www.edrdg.org/edrdg/licence.html
+pool: share_alike
+attribution: >-
+  This corpus uses the JMdict and KANJIDIC2 dictionary files. These files are
+  the property of the Electronic Dictionary Research and Development Group
+  (EDRDG), and are used in conformance with the Group's licence
+  (CC BY-SA 4.0, https://www.edrdg.org/edrdg/licence.html). JSON conversion
+  by the jmdict-simplified project (scriptin/jmdict-simplified).
+restrictions:
+  - >-
+    UI attribution obligation: EDRDG requires the acknowledgement to reach the
+    end user, e.g. "on each screen display ... at the foot of the screen" —
+    every product screen showing JMdict/KANJIDIC2-derived data must carry the
+    EDRDG acknowledgement and licence link, not just a credits page.
+  - >-
+    Regular updating obligation: the EDRDG licence requires derived
+    distributions to be kept reasonably up to date with upstream releases; a
+    stale snapshot violates the licence. Re-pin PINNED_TAG + sha256s in
+    fetch.py on a regular cadence and regenerate the committed datasets.
+  - >-
+    SKIP codes stripped: KANJIDIC2 query_code type "skip" (Jack Halpern's
+    SKIP system) is CC BY-NC-SA 4.0 inside an otherwise CC BY-SA dataset; NC
+    may not enter this corpus. kanjidic.py whitelists output fields and tests
+    assert no SKIP code survives.
+  - >-
+    ShareAlike boundary: anything merged with this pool ships CC BY-SA 4.0.
+    Keeping this asset out of the proprietary_safe pool is deliberate.
+upstream_pin: "3.6.2+20260803141815"
+artifact_sha256:
+  jmdict-eng-3.6.2+20260803141815.json.zip: 1806d2817215ebe7ded997c8dac4831a3335d83ed12f321ac869a97e745d3a5c
+  kanjidic2-en-3.6.2+20260803141815.json.zip: 5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6
+notes: >-
+  Derived, committed outputs: datasets/jmdict_idioms/idioms.jsonl (full idiom
+  layer — yoji/proverb/id/quote entries, ~4.2k rows; committing the full
+  derived dataset is deliberate, it lives in the share_alike pool) and
+  samples/jmdict/kanjidic_sample.jsonl (100-kanji sample of the SKIP-stripped
+  KANJIDIC2 output; the full per-kanji file is regenerated into data/, never
+  committed). The upstream jlptLevel field is the pre-2010 4-level JLPT
+  scale, renamed jlpt_pre2010_editorial in output.

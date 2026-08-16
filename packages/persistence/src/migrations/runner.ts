@@ -97,9 +97,11 @@ export function assertMigrationSetValid(migrations: readonly Migration[]): void 
 export function appliedMigrations(driver: SqliteDriver): readonly AppliedMigrationRecord[] {
   ensureMigrationsTable(driver);
   return driver
-    .all<{ id: number; name: string; applied_at: string }>(
-      `SELECT id, name, applied_at FROM ${MIGRATIONS_TABLE} ORDER BY id ASC`,
-    )
+    .all<{
+      id: number;
+      name: string;
+      applied_at: string;
+    }>(`SELECT id, name, applied_at FROM ${MIGRATIONS_TABLE} ORDER BY id ASC`)
     .map((row) => ({ id: row.id, name: row.name, appliedAt: row.applied_at }));
 }
 

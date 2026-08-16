@@ -10,22 +10,26 @@
  */
 
 :root {
-  /* washi ground / sumi ink */
-  --ground: #fcfbf6;
-  --ground-2: #f6f4ec;
-  --ink: #14181c;
-  --ink-2: #3d444c;
+  /* Ten-world public standard (operator lock, 2026-08-15), restored from the
+   * living-ink carousel — three families, one law. Default world:
+   * ベロ藍・浪, Hokusai's Prussian blue on woodblock print cream.
+   * docs/design/HASSAI_STANDARD_2026-08-13.md */
+  --ground: #f1e9d3;
+  --ground-2: #e9dfc2;
+  --ink: #1c2f42;
+  --ink-2: #4a5d70;
 
-  /* the one red: 弁柄 bengara ochre. Readings, the live accent, nothing else. */
-  --red: #9e2b25;
-  --red-wash: rgba(158, 43, 37, 0.08);
+  /* the one red: the print's cartouche red. Readings, seals, the live
+   * accent, nothing else. */
+  --red: #b03a2e;
+  --red-wash: rgba(176, 58, 46, 0.08);
 
-  --line: rgba(20, 24, 28, 0.16);
-  --line-soft: rgba(20, 24, 28, 0.08);
+  --line: rgba(28, 47, 66, 0.16);
+  --line-soft: rgba(28, 47, 66, 0.08);
 
   /* Variant C (#47) swaps this pair. See .v-contrast-wcag. */
-  --faint: rgba(20, 24, 28, 0.42); /* depth-by-fade, as Drift ships it */
-  --faint-2: rgba(20, 24, 28, 0.3);
+  --faint: rgba(28, 47, 66, 0.42); /* depth-by-fade, as Drift ships it */
+  --faint-2: rgba(28, 47, 66, 0.3);
 
   --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'Noto Serif CJK JP',
     'Source Han Serif JP', 'Songti SC', serif;
@@ -41,11 +45,11 @@
   --tap: 44px; /* minimum hit target */
 }
 
-/* Variant C: WCAG-compliant contrast. 4.54:1 and 7.06:1 against the washi
- * ground, measured by the verifier — not eyeballed. */
+/* Variant C: lift quiet ink from the active world itself. This preserves the
+ * palette on both paper and night grounds instead of pinning Hokusai blue. */
 .v-contrast-wcag {
-  --faint: rgba(20, 24, 28, 0.68);
-  --faint-2: rgba(20, 24, 28, 0.6);
+  --faint: color-mix(in srgb, var(--ink) 82%, transparent);
+  --faint-2: color-mix(in srgb, var(--ink) 72%, transparent);
 }
 
 * {
@@ -67,11 +71,21 @@ body {
   font-size: var(--t-body);
   line-height: 1.6;
   overscroll-behavior-y: none;
-  /* washi tooth — two very low-amplitude gradients, no external asset */
-  background-image:
-    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.018) 0 1px, transparent 1px),
-    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
-  background-size: 13px 13px, 19px 19px;
+}
+
+/* S1 living paper — the per-world procedural ground grown by corridor.js and
+ * hung here through --paper-url. A fixed layer painted once and composited,
+ * never per-frame; it sits above the flat ground colour (which the canvas
+ * inherits from body) and below every box the app draws. Amplitude law:
+ * the texture's luminance stays within ±3% of --ground, measured by the
+ * accessibility verifier — see paintPaper() in corridor.js. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--paper-url, none) center / cover no-repeat;
 }
 
 #app {
@@ -132,9 +146,25 @@ body {
   font-weight: 400;
 }
 
+/* THE READING MEASURE. A line of 21px mincho wants ~35–40 characters; a
+ * 1280px window gives it 60+, which is not a book, it is a spreadsheet. The
+ * column stops at 820px and centres.
+ *
+ * No media query on purpose: below 820px the max-width is above the viewport
+ * and the auto margins resolve to 0, so every phone and tablet layout is
+ * untouched to the pixel. 野 and 墨流し opt out — they are landscapes, not
+ * columns, and the drift layer beneath them is never in this box. */
 main {
   flex: 1;
   padding: 14px 16px 92px;
+  max-width: 820px;
+  margin-inline: auto;
+}
+
+body[data-view='entry'] main,
+body[data-view='drift'] main {
+  max-width: none;
+  margin-inline: 0;
 }
 
 /* ------------------------------------------------------------- headings */
@@ -235,6 +265,600 @@ h1.view-title {
   background: var(--ink-2);
 }
 
+/* an unmeasured signal keeps the row's shape but shows no reading at all */
+.sig-track-na {
+  background: transparent;
+  border-style: dashed;
+}
+
+/* ------------------------------------------------- the drift entry door
+ * One door out of the universe into the shelf. Sits above the drift layer
+ * (z 15) and beneath the sheets; indigo = "you can go here". */
+.drift-door {
+  position: fixed;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 22;
+  min-height: 44px;
+  min-width: 84px;
+  padding: 10px 18px;
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: #fcfbf6;
+  background: #2e4d6e; /* pinned indigo: the enter-door keeps light text legible in every world */
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(27, 42, 58, 0.28);
+  cursor: pointer;
+}
+.drift-door .en-sub {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------- 銀河 hero nav
+ * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
+ * counters and hint so nothing but the galaxy and the single symbol shows. The
+ * symbol opens a top bar and two corner bubbles; tapping the scrim closes it. */
+body.ginga #drift-layer #brand,
+body.ginga #drift-layer #depth,
+body.ginga #drift-layer #theme,
+body.ginga #drift-layer #drift-tray,
+body.ginga #drift-layer #hint {
+  display: none !important;
+}
+/* inside a dive the water's own return hint (水にふれると戻る) is the way
+ * out — chrome-hiding it left no visible exit (P1, review) */
+body.ginga.drift-dived #drift-layer #hint {
+  display: block !important;
+}
+
+.nav-symbol {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ink, #23303f);
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  border-radius: 999px;
+  box-shadow: 0 3px 14px rgba(20, 26, 34, 0.18);
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 0.3s ease;
+}
+.nav-symbol svg {
+  width: 26px;
+  height: 26px;
+}
+.nav-symbol.open {
+  transform: translateX(-50%) rotate(90deg);
+}
+.nav-symbol:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 24;
+  background: transparent;
+}
+
+/* the ghost world-seal, upper right — super faint until touched, then it wakes
+ * and turns the galaxy to the next nihonga world */
+.ginga-seal {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 16px;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  opacity: 0.2;
+  cursor: pointer;
+  /* long-press opens the world-stones — keep iOS's own hold menus away */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+.ginga-seal:hover,
+.ginga-seal:focus-visible,
+.ginga-seal:active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.ginga-seal:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.ginga-seal.awake {
+  animation: seal-wake 1.6s ease-out;
+}
+@keyframes seal-wake {
+  0% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ginga-seal.awake {
+    animation: none;
+  }
+}
+
+.nav-bar {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 28;
+  width: min(92vw, 460px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(20, 26, 34, 0.22);
+  animation: nav-drop 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.nav-arrows {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+.nav-arrow {
+  width: 34px;
+  height: 38px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink, #23303f);
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.nav-arrow:disabled {
+  color: var(--faint, #a9a293);
+  cursor: default;
+}
+.nav-dojo {
+  flex: none;
+  padding: 8px 12px;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: #fcfbf6;
+  background: #2e4d6e;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  line-height: 1.15;
+}
+.nav-dojo .en-sub {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+
+/* EN⇄日本語 sliding pill */
+.lang-slide {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  padding: 3px;
+  background: color-mix(in srgb, var(--ink, #23303f) 8%, transparent);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+}
+.lang-opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 3px 9px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2, #55606c);
+  transition: color 0.28s ease;
+}
+.lang-knob {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: 34px;
+  background: var(--ground-0, #fff);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(20, 26, 34, 0.22);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.lang-slide[data-lang='ja'] .lang-knob {
+  transform: translateX(34px);
+  width: 48px;
+}
+.lang-slide[data-lang='bi'] .lang-opt.en,
+.lang-slide[data-lang='ja'] .lang-opt.ja {
+  color: var(--ink, #23303f);
+  font-weight: 600;
+}
+
+/* search field inside the bar */
+.nav-search {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.nav-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink, #23303f);
+  background: var(--ground, #fbf8f0);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 10px;
+}
+.nav-search-input:focus {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 1px;
+}
+.nav-search-results {
+  /* anchored to the BAR, not the squeezed input: at 390px the search field
+   * shrinks to ~71px and results rendered one kana per line with glosses
+   * cut to a letter (P1, review) — the panel now spans the full bar */
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 46vh;
+  overflow-y: auto;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(20, 26, 34, 0.22);
+}
+.nav-bar {
+  position: relative;
+}
+.nav-bar .nav-search {
+  position: static; /* the results panel measures against the bar */
+}
+.nav-search-results:empty {
+  display: none;
+}
+.nav-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 11px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line-soft, #ece5d5);
+  cursor: pointer;
+}
+.nav-search-row:last-child {
+  border-bottom: none;
+}
+.nsr-glyph {
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--ink);
+  flex: none;
+}
+.nsr-stack {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.nsr-read {
+  font-size: 12px;
+  color: var(--red, #9e2b25);
+}
+.nsr-gloss {
+  font-size: 12px;
+  color: var(--ink-2, #55606c);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-search-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--faint, #a9a293);
+}
+
+/* the two corner bubbles — 本棚 left, 先生 right */
+.corner-bubble {
+  position: fixed;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  z-index: 28;
+  min-height: 52px;
+  padding: 10px 18px;
+  font-family: var(--serif);
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  color: #fcfbf6;
+  background: #2e4d6e;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(27, 42, 58, 0.3);
+  cursor: pointer;
+  animation: bubble-rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.corner-bubble .en-sub {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+.bubble-shelf {
+  left: 18px;
+}
+.bubble-sensei {
+  right: 18px;
+  background: #6a3b52; /* a warmer pigment for the tutor, distinct from the shelf */
+}
+@keyframes bubble-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------- 集中道場 focus dojo */
+.focus-choices {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+.focus-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 14px 6px;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.focus-chip.on {
+  border-color: var(--ai, #2e4d6e);
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
+  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
+}
+.focus-chip-n {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
+}
+.focus-chip-u {
+  font-size: 11px;
+  color: var(--faint, #a9a293);
+}
+.focus-modes {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0 18px;
+}
+.focus-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px;
+  text-align: left;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.focus-mode.on {
+  border-color: var(--ai, #2e4d6e);
+  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
+  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
+}
+.focus-mode-t {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+.focus-mode-sub {
+  font-size: 12px;
+  color: var(--ink-2, #55606c);
+}
+.focus-start {
+  margin-top: 6px;
+}
+
+/* the countdown strip during a block */
+.focus-hud {
+  position: fixed;
+  top: calc(64px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 26;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px 8px 16px;
+  background: #2e4d6e;
+  color: #fcfbf6;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(27, 42, 58, 0.32);
+}
+.focus-hud.done {
+  background: #6a3b52;
+}
+.focus-hud-left {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.focus-badge {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+.focus-clock-el {
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 600;
+}
+.focus-hud-end {
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #fcfbf6;
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.focus-hud-end .en-sub {
+  display: block;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+/* -------------------------------------------------- category catalogs
+ * A level/count chip is a door: tappable, with a faint underline so it reads
+ * as one. The catalog it opens is an exhaustive kanji grid. */
+.cat-chip {
+  font: inherit;
+  cursor: pointer;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--ai, #2e4d6e) 45%, var(--line));
+  color: var(--ink-2, #55606c);
+}
+.cat-chip:hover {
+  border-style: solid;
+  color: var(--ink);
+}
+.cat-chip:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 10px;
+  margin: 6px 0 20px;
+}
+.cat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px 10px;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.cat-cell:active {
+  background: var(--ground-2, #eee);
+}
+.cat-glyph {
+  font-family: var(--serif);
+  font-size: 30px;
+  line-height: 1;
+}
+.cat-mean {
+  font-size: 11px;
+  color: var(--ink-2, #55606c);
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+/* the stroke page's meta line, now with tappable category doors */
+.stroke-meta-mean {
+  color: var(--ink-2);
+}
+.stroke-meta-link {
+  font: inherit;
+  font-family: var(--serif);
+  letter-spacing: 0.05em;
+  color: var(--ai, var(--ink-2));
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ai, #2e4d6e) 55%, transparent);
+  padding: 0 1px 1px;
+  cursor: pointer;
+}
+.stroke-meta-link:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
 .sig-val {
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
@@ -306,6 +930,17 @@ h1.view-title {
 
 .reader ruby {
   ruby-position: over;
+  /* A reading wider than its word must OVERHANG, not pry the word apart:
+   * the browser default justifies base glyphs to the ruby's width, which
+   * splits 拡張 into 拡 張 mid-word. Center keeps the word whole. */
+  ruby-align: center;
+}
+
+/* paragraph break — the article files carry paragraph starts, the reader
+ * honours them; a block gap, not an indent, so ruby never collides */
+.reader .para-break {
+  display: block;
+  height: 1.05em;
 }
 
 .reader rt {
@@ -326,16 +961,120 @@ h1.view-title {
   cursor: pointer;
   border-radius: 2px;
   padding: 0 0.5px;
+  border: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  /* taps must stay taps on iOS: no double-tap zoom delay, and fewer
+   * pointercancels inside scrollable sheets */
+  touch-action: manipulation;
 }
 
-.tok.content:active,
-.tok.content.lit {
+/* Inline Japanese must keep natural spacing, so one-character tokens cannot
+ * grow a visible 44px box. Their owning button instead carries a real 44px
+ * hit region (the pseudo-element participates in hit testing) while the line
+ * retains print typography. The reader's ~45px line box already houses the
+ * 44px vertical floor without adding leading. */
+button.tok {
+  position: relative;
+  min-height: var(--tap);
+}
+
+button.tok::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
+
+/* All content tokens carry the same baseline box before and after English is
+ * mounted. Changing display type on the second activation moved the glyph by
+ * 3.3px on real Chrome; keeping this box stable makes the anchor invariant. */
+.tok.content {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: baseline;
+  line-height: 1.3;
+}
+
+/* The word is ONE row inside that column. A stem-only ruby (含め → <ruby>含</ruby>
+ * + bare "め") otherwise lands as two SIBLING flex items and the word tears
+ * into stacked rows. The wrapper is inert on .tok.plain — it stays a normal
+ * inline span there and changes no line flow; only inside the flex column does
+ * it become the single word row, holding the column to [word, gloss]. */
+.tok.content > .tok-word {
+  display: block;
+  white-space: nowrap;
+}
+
+.token-door {
+  position: relative;
+  display: inline;
+}
+
+.tok:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+  background: var(--ai-wash, var(--ground-2));
+}
+
+.token-actions {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 85;
+  display: inline-flex;
+  gap: 4px;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 20px));
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ground-0, var(--ground));
+  box-shadow: 0 6px 24px rgba(20, 24, 28, 0.2);
+  transform: translateX(-50%);
+}
+
+.token-actions[hidden] {
+  display: none;
+}
+
+.token-actions button {
+  min-height: var(--tap);
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: var(--ai, var(--ink-2));
+  background: transparent;
+  font: inherit;
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+/* touch feedback is momentary; a revealed word carries no permanent wash —
+ * the furigana itself is the trace (operator round 6: the washes read as
+ * highlighter clutter on a printed page) */
+.tok.content:active {
   background: var(--red-wash);
-  box-shadow: 0 1px 0 var(--red);
 }
 
 .tok.plain {
   cursor: default;
+}
+
+.tok.particle {
+  cursor: pointer;
 }
 
 .reader.sp-word .tok + .tok {
@@ -387,7 +1126,7 @@ h1.view-title {
   font: inherit;
   font-family: var(--serif);
   font-size: var(--t-chrome);
-  min-height: 40px;
+  min-height: var(--tap);
   border: 0;
   border-left: 1px solid var(--line-soft);
   background: transparent;
@@ -407,6 +1146,10 @@ h1.view-title {
 
 /* --------------------------------------------------------------- panel */
 .sheet {
+  /* The sheet wears the WORLD. The spec's always-lacquer constant was
+   * REPEALED by the operator on feel (2026-08-14: "too dark, hard to
+   * read") — the dictionary now rises as the world's raised paper: light
+   * and legible in the day worlds, natively dark in the night worlds. */
   position: fixed;
   left: 0;
   right: 0;
@@ -414,10 +1157,14 @@ h1.view-title {
   z-index: 40;
   max-height: 82vh;
   overflow-y: auto;
-  background: var(--ground);
+  /* the entry keeps the same measure as the text it came from — left/right are
+   * both 0, so the auto margins centre it once max-width binds (≥820px only) */
+  max-width: 820px;
+  margin-inline: auto;
+  background: var(--ground-0, var(--ground));
   border-top: 1px solid var(--line);
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 -14px 40px rgba(20, 24, 28, 0.14);
+  box-shadow: 0 -14px 40px rgba(20, 24, 28, 0.2);
   padding: 8px 16px calc(22px + env(safe-area-inset-bottom));
   transform: translateY(0);
   animation: rise 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -772,7 +1519,7 @@ h1.view-title {
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  min-height: 40px;
+  min-height: var(--tap);
 }
 
 #variants .vbar {
@@ -787,7 +1534,7 @@ h1.view-title {
   border: 1px solid rgba(252, 251, 246, 0.4);
   color: var(--ground);
   border-radius: 2px;
-  min-height: 40px;
+  min-height: var(--tap);
   padding: 0 14px;
   cursor: pointer;
 }
@@ -825,7 +1572,7 @@ h1.view-title {
 #variants .vseg button {
   font: inherit;
   font-size: 11px;
-  min-height: 40px;
+  min-height: var(--tap);
   background: transparent;
   color: var(--ground);
   border: 0;
@@ -934,11 +1681,3485 @@ h1.view-title {
 .inline-link {
   color: var(--red);
   display: inline-block;
-  min-height: 40px;
+  min-height: var(--tap);
   min-width: 44px;
   line-height: 40px;
   padding: 0 8px;
   text-align: center;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+}
+
+/* ==================================================== v1.1 · 2026-08-07 ===
+ * Operator feedback on v1.0, in two strokes:
+ *
+ * 1. Navigation must be readable before the learner can read Japanese.
+ *    The chrome is bilingual by default; 日本語のみ is the opt-in immersion
+ *    mode (the EN button in the chrome, or ?ui=ja). Content stays Japanese.
+ *
+ * 2. More contrast, more depth between layers. 藍 (ai) indigo joins 弁柄
+ *    red so red can go back to meaning exactly two things — readings and
+ *    warnings — while indigo marks "you can go here": tappable words,
+ *    word-chips, signal fills, licence provenance. The layered treatment
+ *    (variant E) separates ground / card / sheet with real elevation.
+ *    WCAG contrast (variant C) becomes the default; the old fade remains
+ *    a toggle so #47 stays decidable by looking.
+ */
+
+:root {
+  --ground-0: #faf6ea; /* raised paper — cards and the sheet */
+  --ai: #2e4d6e; /* 藍 indigo: the "you can go here" colour */
+  --ai-wash: rgba(46, 77, 110, 0.08);
+
+  /* ------------------------------------------------ 八彩 structural constants
+   * (rebuild spec §2). These do NOT follow the active world — they are the
+   * two fixed materials of the house plus the seal grammar. */
+  --gold: #d9b25f; /* 金 — the go-colour of the dark worlds, the sheet's hairlines */
+
+  /* S3 the lacquer sheet — 胡粉・黒漆 in EVERY world. The .sheet rule scopes
+   * the live tokens to these, so everything a sheet contains dresses itself
+   * in lacquer automatically. */
+  --sheet-ground: #171310;
+  --sheet-ground-2: #221c15;
+  --sheet-ground-0: #251e16;
+  --sheet-ink: #f2ecdf;
+  --sheet-ink-2: #cdc3b0;
+  --sheet-red: #e0796b;
+  --sheet-red-wash: rgba(224, 121, 107, 0.14);
+  --sheet-line: rgba(242, 236, 223, 0.2);
+  --sheet-line-soft: rgba(242, 236, 223, 0.1);
+  /* night-lift: quiet print inside the lacquer needs more light than paper */
+  --sheet-faint: rgba(242, 236, 223, 0.7);
+  --sheet-faint-2: rgba(242, 236, 223, 0.56);
+  --sheet-ai: #d9b25f;
+  --sheet-ai-wash: rgba(217, 178, 95, 0.14);
+
+  /* S2 the review card — warm washi (墨・楮紙) on every desk, in every world */
+  --card-ground: #f5efe0;
+  --card-ground-2: #ede5d0;
+  --card-ground-0: #faf6ea;
+  --card-ink: #211e17;
+  --card-ink-2: #4a453a;
+  --card-red: #a02a1e;
+  --card-red-wash: rgba(160, 42, 30, 0.08);
+  --card-line: rgba(33, 30, 23, 0.16);
+  --card-line-soft: rgba(33, 30, 23, 0.08);
+  --card-faint: rgba(33, 30, 23, 0.42);
+  --card-faint-2: rgba(33, 30, 23, 0.3);
+  --card-ai: #2e4d6e;
+  --card-ai-wash: rgba(46, 77, 110, 0.08);
+
+  /* S4 hanko controls — the seal grammar shared by every stamped control */
+  --seal-size: 56px;
+  --seal-radius: 5px;
+  --seal-font: 22px;
+}
+
+/* ------------------------------------------------------ corridor paper worlds
+ * The ten public worlds restored from the carousel (2026-08-15),
+ * carried across the whole corridor. Storage keys stay historical so saved
+ * preferences survive; the VALUES are the standard. Default :root above is
+ * ベロ藍・浪 — Hokusai's Prussian blue on print cream.
+ *   ''        → ベロ藍・浪   Prussian blue on print cream (DEFAULT day)
+ *   sumi      → 墨・楮紙     sumi ink on kōzo washi (kept by name)
+ *   akafuji   → 凱風快晴     Red Fuji — rust on dawn paper
+ *   iwa       → 焦茶・柿渋   burnt umber on persimmon-tannin paper
+ *   rokusho   → 胡粉・黒漆   shell white on black lacquer
+ *   yoru      → 紺紙金泥     sutra gold on indigo
+ *   nami      → 神奈川沖浪裏 foam on the deep sea
+ *   kaku      → 攻殻・燐光   phosphor green on terminal black
+ * Each block re-derives every token for its own ground so backgrounds, ink,
+ * lines, fades, the one action-red and the go-colour shift together; every
+ * dark world lifts its quiet print per the night legibility law. */
+:root[data-theme='sumi'] {
+  --ground: #f5efe0;
+  --ground-2: #ede5d0;
+  --ground-0: #faf6ea;
+  --ink: #211e17;
+  --ink-2: #4a453a;
+  --red: #a02a1e;
+  --red-wash: rgba(160, 42, 30, 0.08);
+  --line: rgba(33, 30, 23, 0.16);
+  --line-soft: rgba(33, 30, 23, 0.08);
+  --faint: rgba(33, 30, 23, 0.42);
+  --faint-2: rgba(33, 30, 23, 0.3);
+  --ai: #2e4d6e;
+  --ai-wash: rgba(46, 77, 110, 0.08);
+}
+:root[data-theme='shu'] {
+  --ground: #f9f5eb;
+  --ground-2: #f2ecdb;
+  --ground-0: #fdfaf2;
+  --ink: #2b2620;
+  --ink-2: #575145;
+  --red: #b02318;
+  --red-wash: rgba(176, 35, 24, 0.08);
+  --line: rgba(43, 38, 32, 0.16);
+  --line-soft: rgba(43, 38, 32, 0.08);
+  --faint: rgba(43, 38, 32, 0.42);
+  --faint-2: rgba(43, 38, 32, 0.3);
+  --ai: #2e4d6e;
+  --ai-wash: rgba(46, 77, 110, 0.08);
+}
+:root[data-theme='akafuji'] {
+  --ground: #f3e3cf;
+  --ground-2: #ecd7bd;
+  --ground-0: #f8ecdc;
+  --ink: #45291a;
+  --ink-2: #7a5540;
+  --red: #a03a20;
+  --red-wash: rgba(160, 58, 32, 0.08);
+  --line: rgba(69, 41, 26, 0.16);
+  --line-soft: rgba(69, 41, 26, 0.08);
+  --faint: rgba(69, 41, 26, 0.44);
+  --faint-2: rgba(69, 41, 26, 0.32);
+  --ai: #2a5d8a;
+  --ai-wash: rgba(42, 93, 138, 0.08);
+}
+:root[data-theme='iwa'] {
+  --ground: #ddb083;
+  --ground-2: #d2a271;
+  --ground-0: #e6bd92;
+  --ink: #2e1a0c;
+  --ink-2: #5a3c22;
+  --red: #7e2410;
+  --red-wash: rgba(126, 36, 16, 0.1);
+  --line: rgba(46, 26, 12, 0.2);
+  --line-soft: rgba(46, 26, 12, 0.1);
+  /* mid-tone tannin ground: quiet print needs more ink than on pale washi */
+  --faint: rgba(46, 26, 12, 0.5);
+  --faint-2: rgba(46, 26, 12, 0.38);
+  --ai: #35496b;
+  --ai-wash: rgba(53, 73, 107, 0.1);
+}
+:root[data-theme='rokusho'] {
+  --ground: #171310;
+  --ground-2: #221c15;
+  --ground-0: #251e16;
+  --ink: #f2ecdf;
+  --ink-2: #cdc3b0;
+  --red: #e0796b;
+  --red-wash: rgba(224, 121, 107, 0.14);
+  --line: rgba(242, 236, 223, 0.2);
+  --line-soft: rgba(242, 236, 223, 0.1);
+  --faint: rgba(242, 236, 223, 0.66);
+  --faint-2: rgba(242, 236, 223, 0.52);
+  --ai: #d9b25f;
+  --ai-wash: rgba(217, 178, 95, 0.14);
+}
+:root[data-theme='yoru'] {
+  --ground: #131a30;
+  --ground-2: #1b2440;
+  --ground-0: #1d2645;
+  --ink: #f4ecd9;
+  --ink-2: #cfc6ae;
+  --red: #ef8079;
+  --red-wash: rgba(239, 128, 121, 0.14);
+  --line: rgba(244, 236, 217, 0.2);
+  --line-soft: rgba(244, 236, 217, 0.1);
+  /* the night ground is dark, so the "quiet" small print needs more light than
+   * it does on the paper worlds or it sinks into the background (operator, on a
+   * real phone) — lifted so labels, units and meta stay legible */
+  --faint: rgba(244, 236, 217, 0.66);
+  --faint-2: rgba(244, 236, 217, 0.52);
+  --ai: #d9b25f;
+  --ai-wash: rgba(217, 178, 95, 0.14);
+}
+:root[data-theme='nami'] {
+  --ground: #11273b;
+  --ground-2: #18314a;
+  --ground-0: #1a3450;
+  --ink: #eae6d8;
+  --ink-2: #b9c4cc;
+  --red: #e08a6e;
+  --red-wash: rgba(224, 138, 110, 0.14);
+  --line: rgba(234, 230, 216, 0.2);
+  --line-soft: rgba(234, 230, 216, 0.1);
+  --faint: rgba(234, 230, 216, 0.66);
+  --faint-2: rgba(234, 230, 216, 0.52);
+  --ai: #8fb3d1;
+  --ai-wash: rgba(143, 179, 209, 0.14);
+}
+:root[data-theme='keyblock'] {
+  --ground: #f2ead6;
+  --ground-2: #e9dfc2;
+  --ground-0: #faf6ea;
+  --ink: #26221c;
+  --ink-2: #544c40;
+  --red: #b03a2e;
+  --red-wash: rgba(176, 58, 46, 0.08);
+  --line: rgba(38, 34, 28, 0.16);
+  --line-soft: rgba(38, 34, 28, 0.08);
+  --faint: rgba(38, 34, 28, 0.42);
+  --faint-2: rgba(38, 34, 28, 0.3);
+  --ai: #2a5d8a;
+  --ai-wash: rgba(42, 93, 138, 0.08);
+}
+:root[data-theme='hakuu'] {
+  --ground: #221b12;
+  --ground-2: #2a2117;
+  --ground-0: #30271b;
+  --ink: #efe5cf;
+  --ink-2: #c4b69c;
+  --red: #e0796b;
+  --red-wash: rgba(224, 121, 107, 0.14);
+  --line: rgba(239, 229, 207, 0.2);
+  --line-soft: rgba(239, 229, 207, 0.1);
+  --faint: rgba(239, 229, 207, 0.66);
+  --faint-2: rgba(239, 229, 207, 0.52);
+  --ai: #d9a93f;
+  --ai-wash: rgba(217, 169, 63, 0.14);
+}
+:root[data-theme='kaku'] {
+  --ground: #050d12;
+  --ground-2: #0b161d;
+  --ground-0: #0d1921;
+  --ink: #d8efe9;
+  --ink-2: #93b5ad;
+  --red: #ff6b4a;
+  --red-wash: rgba(255, 107, 74, 0.14);
+  --line: rgba(216, 239, 233, 0.2);
+  --line-soft: rgba(216, 239, 233, 0.1);
+  --faint: rgba(216, 239, 233, 0.66);
+  --faint-2: rgba(216, 239, 233, 0.52);
+  --ai: #37e8b0;
+  --ai-wash: rgba(55, 232, 176, 0.14);
+}
+
+/* the seal that opens the ten public worlds — a small round chrome control.
+ * A LONG-PRESS opens the world-stones below; the touch-action and callout
+ * guards keep iOS from claiming the hold for its own menus. */
+.theme-seal {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--ground-0);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.theme-seal:active {
+  opacity: 0.6;
+}
+
+/* the ten world-stones — the direct picker. Each stone previews its
+ * own world (inline colours from THEME_UI); the active one is ringed in its
+ * world's red. */
+/* the stones are a transient modal: they must surface above EVERY overlay —
+ * the stroke page rides at z-90 and buried them (operator: "no options to
+ * change colors at all"), so the picker tops the whole stack */
+.world-picker-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: transparent;
+}
+.world-picker {
+  position: fixed;
+  z-index: 121;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 10px;
+  padding: 12px;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(10, 10, 8, 0.32);
+}
+.world-stone {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 999px;
+  border: 2px solid var(--line-soft);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+}
+.world-stone.active {
+  border-color: var(--stone-red, var(--red));
+  box-shadow: 0 0 0 1px var(--stone-red, var(--red));
+}
+
+/* ------------------------------------------------------ bilingual chrome */
+.en-sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  text-transform: lowercase;
+  line-height: 1.3;
+  color: inherit;
+  opacity: 0.62;
+  margin-top: 1px;
+}
+
+button .l-ja {
+  display: block;
+  line-height: 1.25;
+}
+
+.chrome button,
+.seg button,
+#variants .vseg button,
+.take {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.en-inline {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: inherit;
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+.kv dt .en-sub,
+.sched th .en-sub,
+.sched td .en-sub {
+  display: inline;
+  margin-left: 5px;
+}
+
+#lang[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--ground);
+  border-color: var(--ink);
+}
+
+/* the shelf's own introduction is instruction, not a preview — never clamp it */
+.shelf-snippet.intro {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+/* ------------------------------------------------- sheet scrim (tap-out) */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(20, 24, 28, 0.16);
+  animation: scrim-in 0.18s ease;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------- variant E · layered depth */
+body.v-depth-layered {
+  background-color: var(--ground-2);
+}
+
+body.v-depth-layered .chrome {
+  background: color-mix(in srgb, var(--ground-0) 94%, transparent);
+  border-bottom-color: var(--line);
+}
+
+body.v-depth-layered .shelf-item {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 14px 14px 16px;
+  margin: 0 0 12px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered .shelf-item:first-of-type {
+  border-top: 1px solid var(--line-soft);
+}
+
+body.v-depth-layered #reader,
+body.v-depth-layered .dials {
+  background: var(--ground-0);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(20, 24, 28, 0.05),
+    0 5px 16px rgba(20, 24, 28, 0.06);
+}
+
+body.v-depth-layered #reader {
+  padding: 16px 15px;
+  margin-top: 10px;
+}
+
+body.v-depth-layered .sheet {
+  background: var(--ground-0);
+  box-shadow: 0 -18px 56px rgba(20, 24, 28, 0.26);
+}
+
+body.v-depth-layered .scrim {
+  background: rgba(20, 24, 28, 0.3);
+}
+
+body.v-depth-layered .sem-group {
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 10px 12px 4px;
+}
+
+body.v-depth-layered .note {
+  background: var(--ground-2);
+  border-radius: 0 6px 6px 0;
+  padding: 9px 11px 9px 10px;
+}
+
+body.v-depth-layered .card-preview {
+  border-radius: 8px;
+}
+
+body.v-depth-layered .chip {
+  background: var(--ground-0);
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(20, 24, 28, 0.06);
+}
+
+/* node kinds get distinct edges: 弁柄 for kanji, 藍 for words, dashed for
+ * parts, doubled for idioms — so the graph's layers read at a glance */
+body.v-depth-layered .chip.t-kanji {
+  border-top: 2px solid color-mix(in srgb, var(--red) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-word {
+  border-top: 2px solid color-mix(in srgb, var(--ai) 60%, var(--line));
+}
+
+body.v-depth-layered .chip.t-radical {
+  border-style: dashed;
+}
+
+body.v-depth-layered .chip.t-idiom {
+  border-top: 3px double color-mix(in srgb, var(--ink-2) 70%, var(--line));
+}
+
+/* v1.4: the stitch is gone — every content word is tappable, so marking
+ * each one turned the page into proofreading markup (operator, on-device).
+ * The page is clean print; the gesture hint carries the affordance. */
+
+body.v-depth-layered .sig-fill {
+  background: var(--ai);
+}
+
+/* provenance is information, not alarm — indigo, leaving red to warnings */
+body.v-depth-layered .pool-tag.sa {
+  color: var(--ai);
+  border-color: color-mix(in srgb, var(--ai) 65%, var(--line));
+}
+
+body.v-depth-layered .sched th {
+  border-bottom: 2px solid var(--line);
+}
+
+body.v-depth-layered .sched tr:nth-child(even) td {
+  background: var(--ground-2);
+}
+
+body.v-depth-layered .take {
+  box-shadow: 0 2px 8px rgba(20, 24, 28, 0.18);
+}
+
+body.v-depth-layered .inline-link {
+  color: var(--ai);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim {
+    animation: none;
+  }
+}
+
+/* ==================================================== v1.2 · 2026-08-07 ===
+ * Renzo-baseline dictionary surfaces, the click grammar, lists, and the
+ * de-narrated shelf. Operator round 3.
+ */
+
+/* EN | 日本語 — two visible states */
+.lang-seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lang-seg button {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  min-height: var(--tap);
+  min-width: 44px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.lang-seg button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+/* sheet header — the way out lives on the sheet itself */
+.sheet-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.sheet-bar .sheet-back {
+  font: inherit;
+  font-family: var(--serif);
+  font-size: var(--t-chrome);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: var(--tap);
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.sheet-depth {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--t-label);
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 覚 — the capture door, top-right of every capturable sheet; pressed
+ * state wears the seal red */
+.sheet-take {
+  margin-left: auto;
+  font: inherit;
+  font-size: 15px;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+.sheet-take[aria-pressed='true'] {
+  color: var(--red);
+  border-color: var(--red);
+}
+.sheet-take + .sheet-close {
+  margin-left: 8px;
+}
+.sheet-close {
+  margin-left: auto;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+/* the mini dictionary — long-press */
+#mini {
+  position: fixed;
+  z-index: 70;
+  max-width: 280px;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
+  padding: 10px 14px;
+  display: grid;
+  gap: 2px;
+  animation: rise 0.16s ease;
+  cursor: pointer;
+}
+
+#mini .mini-word {
+  font-family: var(--serif);
+  font-size: 20px;
+}
+
+#mini .mini-reading {
+  color: var(--red);
+  font-family: var(--serif);
+  font-size: 13px;
+}
+
+#mini .mini-gloss {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+#mini .mini-hint {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-top: 4px;
+}
+
+#mini .mini-entry {
+  min-height: var(--tap);
+  margin-top: 5px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ai, var(--ink-2));
+  background: transparent;
+  font: inherit;
+  font-family: var(--sans);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* second tap: English beneath the word — IN THE LINE FLOW, so no font's
+ * metrics on any device can ever collide it with the next line. The token
+ * becomes a baseline-aligned column: the word keeps its exact baseline
+ * (inline-flex baseline = first item's baseline) and the line breathes
+ * down a few pixels to make room. */
+.tok.has-en {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: baseline;
+  line-height: 1.3; /* hug the glyphs; the reader's own leading houses the rt */
+}
+
+/* a truncated gloss is a broken gloss — the global rule (operator, morning
+ * round): the compact sense is chosen in JS, the box may overhang ~1.6em a
+ * side, and the text WRAPS to a second line rather than ellipsizing. The
+ * gloss is in the line flow, so extra depth just breathes the line down —
+ * nothing can collide, and the two-line clamp is an unreachable last resort. */
+.tok-en {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  width: 0;
+  min-width: calc(100% + 3.2em);
+  font-family: var(--sans);
+  font-size: 9.5px;
+  line-height: 1.25;
+  color: var(--ai, var(--ink-2));
+  letter-spacing: 0.02em;
+  white-space: normal;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  text-align: center;
+  pointer-events: none;
+  margin-top: -0.3em; /* snug under its own word — the next line's ruby owns the rest of the gap */
+}
+
+.gesture-hint {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin: 8px 2px 0;
+}
+
+/* shelf card header — demarcated from the body */
+.shelf-head {
+  border-left: 3px solid var(--ai, var(--ink-2));
+  padding-left: 10px;
+  margin-bottom: 8px;
+  display: grid;
+  gap: 3px;
+}
+
+.shelf-title-en {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
+}
+
+.level-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 4px;
+}
+
+.level-chip {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ground);
+  background: var(--ai, var(--ink-2));
+  border-radius: 3px;
+  padding: 2px 8px;
+}
+
+.level-note {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.details-toggle {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  background: transparent;
+  border: 0;
+  padding: 6px 2px;
+  min-height: var(--tap);
+  cursor: pointer;
+  display: block;
+}
+
+.grammar-link {
+  font: inherit;
+  font-family: var(--serif);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--ground-0, transparent);
+  min-height: 46px;
+  padding: 4px 18px;
+  margin: 0 0 14px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* dictionary anatomy — senses, rows, examples */
+.headword-alt {
+  font-size: 0.55em;
+  color: var(--ink-2);
+}
+
+.senses .sense-pos {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  margin: 0 0 3px;
+  text-transform: lowercase;
+}
+
+.sense-list {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+.sense-list li::marker {
+  color: var(--red);
+  font-size: 12px;
+}
+
+.entry-rows {
+  display: grid;
+  margin: 0 0 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.entry-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 9px 2px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.row-glyph {
+  font-family: var(--serif);
+  font-size: 26px;
+  min-width: 34px;
+  text-align: center;
+}
+
+.row-main {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.row-go {
+  color: var(--faint);
+  font-size: 18px;
+}
+
+.row-stack {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.row-word {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.row-word .row-reading {
+  font-size: 12px;
+  color: var(--red);
+  margin-left: 8px;
+}
+
+/* levels are metadata, not readings — they stay out of the red */
+.row-word .row-level {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-left: 8px;
+}
+
+.row-gloss {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.example {
+  border-left: 2px solid var(--line);
+  padding-left: 10px;
+  margin: 0 0 10px;
+}
+
+.example-ja {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+.example-hit {
+  color: var(--red);
+  border-bottom: 1.5px solid var(--red);
+}
+
+.example-en {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 2px 0 0;
+}
+
+.example-src {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+.formation {
+  font-family: var(--serif);
+  font-size: 15px;
+  background: var(--ground-2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0 0 12px;
+}
+
+.grammar-note {
+  font-size: 13.5px;
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+
+/* stroke order */
+svg.strokes {
+  width: 132px;
+  height: 132px;
+  background: var(--ground-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  margin: 0 0 14px;
+}
+
+svg.strokes path {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+svg.strokes text {
+  font-size: 8px;
+  fill: var(--red);
+  font-family: var(--sans);
+}
+
+/* lists */
+.list-head {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.chip.on-list {
+  border-color: var(--ai, var(--ink));
+  color: var(--ai, var(--ink));
+  background: var(--ai-wash, transparent);
+}
+
+/* ==================================================== v1.5 · the search ===
+ * One quiet field, four doors: kanji · kana · romaji · English. */
+.search-field {
+  display: block;
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-height: 48px;
+  padding: 0 20px;
+  margin: 2px 0 16px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search-field:focus {
+  border-color: var(--ai, var(--ink-2));
+  box-shadow: 0 0 0 2px var(--ai-wash, transparent);
+}
+
+.search-field::placeholder {
+  color: var(--faint);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+}
+
+/* Reduced motion is a behavioral mode, not a single-animation exception.
+ * Corridor-owned movement and fades become immediate; the separately owned
+ * Drift layer keeps its own reduction contract. */
+@media (prefers-reduced-motion: reduce) {
+  #app *,
+  #app *::before,
+  #app *::after,
+  #mini,
+  #mini * {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+
+  .sheet,
+  .scrim,
+  .field-word,
+  #mini {
+    animation: none !important;
+  }
+}
+
+/* ==================================================== v1.9 · 筆順 =========
+ * Stroke order gets a page, not a thumbnail. A kanji is written, so the
+ * strokes must be seen arriving in order — the sheet's diagram is only the
+ * door to that page.
+ *
+ * Colour law here: NOTHING below names a colour. Ink is --ink, paper is
+ * --ground / --ground-0, the guide is --line, secondary text is --faint, and
+ * 藍 --ai marks the things you can go through or press. 弁柄 --red stays out
+ * entirely: on this page there is no reading to mark and nothing has gone
+ * wrong — a missing stroke order is an absence, not an alarm.
+ */
+
+/* ------------------------------------------------------ the 部首 radical door */
+.rad-door {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ai, var(--ink-2));
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-height: var(--tap);
+  margin: 0 0 14px;
+  cursor: pointer;
+}
+.rad-glyph {
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1;
+  flex: none;
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.rad-glyph .rad-var {
+  font-size: 18px;
+  color: var(--ink-2, var(--faint));
+}
+.rad-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.rad-name {
+  font-size: 16px;
+  color: var(--ink);
+}
+.rad-sub {
+  font-size: var(--t-label);
+  color: var(--faint);
+}
+.rad-door .row-go {
+  color: var(--ai, var(--faint));
+}
+.rad-door:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------- the door */
+/* Just the stroke-order glyph on washi — a framed tile you tap, no words
+ * beside it (operator 2026-08-10). Sized to the character, not stretched
+ * across an empty card; it reads as an intentional painting, not a button. */
+.stroke-door {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0 0 14px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--ground-0, var(--ground));
+}
+
+.stroke-door svg.strokes {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  margin: 0;
+}
+
+.stroke-door-glyph {
+  font-family: var(--serif);
+  font-size: 56px;
+  line-height: 96px;
+  width: 96px;
+  flex: none;
+  text-align: center;
+  color: var(--ink);
+}
+
+.stroke-door:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------- the full-screen page */
+.stroke-page {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--ground);
+  color: var(--ink);
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom));
+}
+
+/* the layered treatment separates ground from card exactly as the shelf does:
+ * the page takes the recessed ground, the writing square the raised paper */
+body.v-depth-layered .stroke-page {
+  background: var(--ground-2);
+}
+
+.stroke-page:focus {
+  outline: none;
+}
+
+.stroke-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  margin-bottom: 4px;
+  background: inherit;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.stroke-back,
+.stroke-close {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 12px;
+  font-family: var(--serif);
+  font-size: var(--t-chrome);
+  color: var(--ink-2);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.stroke-close {
+  font-family: var(--sans);
+  font-size: 15px;
+}
+
+.stroke-back:focus-visible,
+.stroke-close:focus-visible,
+.stroke-btn:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: 2px;
+}
+
+.stroke-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+
+.stroke-title-glyph {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--ink);
+}
+
+.stroke-title-word {
+  font-family: var(--serif);
+  font-size: var(--t-label);
+  letter-spacing: 0.16em;
+  color: var(--faint);
+}
+
+/* ------------------------------------------------------------- the paper */
+.stroke-body {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stroke-stage {
+  flex: none;
+  width: min(100%, 420px);
+  margin: 10px 0 6px;
+}
+
+/* 書の間 — the design's room, in the app (gosai-strokepage.html made real):
+ * the glyph header, then ONE square sheet where the kanji is written in real
+ * fluid ink (corridor-ink.js), the SVG riding above it as the numbers/guide
+ * overlay. data-living on the page decides the dress: 'on' shows the ink and
+ * hides the classic diagram layers; 'off' (no engine) is the classic board;
+ * 'still' is a hand-painted finished sheet for reduced motion. */
+.stroke-khead {
+  width: min(100%, 420px);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 14px 0 0;
+  font-family: var(--serif);
+}
+.stroke-k {
+  font-size: 30px;
+  line-height: 1.2;
+}
+.stroke-k-meta {
+  font-size: 12px;
+  color: var(--ink-2);
+  letter-spacing: 0.2em;
+  margin-left: 10px;
+}
+.stroke-readings {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  line-height: 1.9;
+  color: var(--ink-2);
+}
+.stroke-kun-stem {
+  color: var(--red);
+}
+.stroke-read-row {
+  display: block;
+  max-width: 46vw;
+  overflow-wrap: anywhere;
+}
+.stroke-read-label {
+  margin-right: 0.6em;
+  font-size: 9.5px;
+  opacity: 0.62;
+  letter-spacing: 0.3em;
+}
+.stroke-stage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 6px;
+}
+/* the CANVAS stays in normal flow (an absolutely-positioned software-GL
+ * canvas can drop out of the compositor under a promoted overlay — seen in
+ * the harness); the SVG is the absolute overlay riding above the ink */
+.stroke-stage .ink-sheet {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+/* JS owns marker opacity from the real first-splat clock. CSS only strengthens
+ * the halo while the learner has asked for numbers. */
+.stroke-page[data-numbers='on'] .stroke-num,
+.stroke-nums-lift .stroke-num {
+  stroke-width: 2.4px;
+}
+.stroke-stage svg.stroke-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* A sibling overlay above a live GL canvas can blank that canvas in Safari.
+ * While the engine lives, JS moves the numbered SVG to this body-level fixed
+ * layer and position-syncs it to the writing stage. */
+.stroke-nums-lift {
+  position: fixed;
+  z-index: 95;
+  display: none;
+  pointer-events: none;
+}
+body:has(.stroke-page[data-minimal='off'][data-numbers='on']) .stroke-nums-lift,
+body:has(.stroke-page[data-minimal='on'][data-chrome='awake'][data-numbers='on'])
+  .stroke-nums-lift {
+  display: block;
+}
+.stroke-nums-lift svg.stroke-canvas {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+/* A reduced-motion still uses 2D compositing, so its overlay can stay in the
+ * stage. The live SVG has already moved into the lifted layer. */
+.stroke-page[data-living='still'] .stroke-stage svg.stroke-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  display: none;
+}
+.stroke-page[data-living='still'][data-numbers='on'] .stroke-stage svg.stroke-canvas {
+  display: block;
+}
+.stroke-page[data-living='on'] .stroke-stage {
+  cursor: pointer;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.stroke-page[data-living='on'] .stroke-grid,
+.stroke-page[data-living='still'] .stroke-grid,
+.stroke-nums-lift .stroke-grid,
+.stroke-page[data-living='on'] .stroke-guide,
+.stroke-page[data-living='still'] .stroke-guide,
+.stroke-nums-lift .stroke-guide,
+.stroke-page[data-living='on'] .stroke-bleed,
+.stroke-page[data-living='still'] .stroke-bleed,
+.stroke-nums-lift .stroke-bleed,
+.stroke-page[data-living='on'] .stroke-ink,
+.stroke-page[data-living='still'] .stroke-ink,
+.stroke-nums-lift .stroke-ink {
+  display: none;
+}
+.stroke-page[data-living='on'] .stroke-inks,
+.stroke-page[data-living='still'] .stroke-inks {
+  display: none; /* the ink follows the world here — no separate pigment row */
+}
+.stroke-page[data-living='on'] .stroke-readout,
+.stroke-page[data-living='still'] .stroke-readout {
+  position: absolute; /* the pips carry the count; keep the counter for readers */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.stroke-pips {
+  display: none;
+  gap: 9px;
+  justify-content: center;
+  margin: 14px 0 0;
+}
+.stroke-page[data-living='on'] .stroke-pips,
+.stroke-page[data-living='still'] .stroke-pips {
+  display: flex;
+}
+.stroke-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--red);
+  font-style: normal;
+}
+.stroke-pip.filled {
+  background: var(--red);
+}
+.stroke-hint {
+  display: none;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--faint);
+  margin: 12px 0 0;
+}
+.stroke-page[data-living='on'] .stroke-hint {
+  display: block;
+}
+.stroke-hint .en-sub {
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+
+.stroke-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+}
+
+.stroke-grid line {
+  stroke: var(--line-soft);
+  stroke-width: 0.6;
+  stroke-dasharray: 4 5;
+}
+
+/* where the hand is going — the finished glyph, barely there */
+.stroke-guide path {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the ink itself: dashed to its own measured length, offset walked to zero */
+.stroke-ink path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stroke-num {
+  font-family: var(--sans);
+  font-size: 6px;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--ground-0, var(--ground));
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  opacity: 0;
+  /* Stroke numerals are part of the brush clock, not decorative chrome.
+   * A fade leaves the actually visible body-lifted marker one or more frames
+   * behind data-stroke-shown (and the stroke pips), and lets old markers
+   * linger when a rewrite resets to zero. The first real splat therefore
+   * switches the numeral atomically. */
+  transition: none;
+}
+
+.stroke-page[data-numbers='off'] .stroke-nums {
+  display: none;
+}
+
+/* ------------------------------------------------------- counter + controls */
+.stroke-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 2px 0 10px;
+}
+
+.stroke-count {
+  font-family: var(--serif);
+  font-size: 30px;
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stroke-count-unit {
+  font-size: var(--t-label);
+  letter-spacing: 0.14em;
+  color: var(--faint);
+}
+
+.stroke-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.stroke-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 96px;
+  padding: 6px 16px;
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-2);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.stroke-btn.primary {
+  color: var(--ai, var(--ink));
+  border-color: color-mix(in srgb, var(--ai, var(--ink)) 55%, var(--line));
+}
+
+/* a pressed toggle fills with ink, the way every other segmented control in
+ * the corridor does (.seg, #lang) — 藍 stays reserved for going somewhere */
+.stroke-btn[aria-pressed='true'] {
+  color: var(--ground);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.stroke-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.stroke-meta {
+  font-size: var(--t-label);
+  color: var(--faint);
+  text-align: center;
+  margin: 0;
+}
+
+/* ---------------------------------------- the 448 without a stroke order */
+.stroke-missing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 12px 0 24px;
+}
+
+.stroke-missing-glyph {
+  font-family: var(--serif);
+  font-size: clamp(120px, 46vw, 260px);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.stroke-missing-line {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink-2);
+  margin: 6px 0 0;
+}
+
+.stroke-missing-note {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--faint);
+  max-width: 34em;
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .stroke-stage {
+    width: min(100%, 480px);
+  }
+}
+
+/* ==================================================== v2.0 · 2026-08-10 ===
+ * 筆順 as ink on washi. The stroke room stops being a whiteboard: warm paper
+ * sheet, sumi bleed under every stroke, four pigments to write with, and a
+ * quiet composition. Operator direction: thin, minimal, gentle, artistic.
+ */
+
+.stroke-page {
+  /* the default 墨 is the WORLD's ink — dark sumi on the paper worlds, pale
+   * ink on the night worlds, so the diagram never sinks into its ground
+   * (it was hard-coded #1c1e21 and unreadable on 漆金浪殻) */
+  --stroke-ink: var(--ink);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.016) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.012) 0 1px, transparent 1px),
+    var(--ground);
+  background-size: 13px 13px, 19px 19px, auto;
+}
+
+.stroke-page[data-ink='bengara'] { --stroke-ink: #9e2b25; }
+.stroke-page[data-ink='ai']      { --stroke-ink: #2e4d6e; }
+.stroke-page[data-ink='rokusho'] { --stroke-ink: #3a6a52; }
+
+/* the three named pigments lift on the night grounds — same pigment, lit */
+:root[data-theme='rokusho'] .stroke-page[data-ink='bengara'],
+:root[data-theme='yoru'] .stroke-page[data-ink='bengara'],
+:root[data-theme='nami'] .stroke-page[data-ink='bengara'],
+:root[data-theme='hakuu'] .stroke-page[data-ink='bengara'],
+:root[data-theme='kaku'] .stroke-page[data-ink='bengara'] {
+  --stroke-ink: #c96a50;
+}
+:root[data-theme='rokusho'] .stroke-page[data-ink='ai'],
+:root[data-theme='yoru'] .stroke-page[data-ink='ai'],
+:root[data-theme='nami'] .stroke-page[data-ink='ai'],
+:root[data-theme='hakuu'] .stroke-page[data-ink='ai'],
+:root[data-theme='kaku'] .stroke-page[data-ink='ai'] {
+  --stroke-ink: #8fb3d1;
+}
+:root[data-theme='rokusho'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='yoru'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='nami'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='hakuu'] .stroke-page[data-ink='rokusho'],
+:root[data-theme='kaku'] .stroke-page[data-ink='rokusho'] {
+  --stroke-ink: #7fc0a0;
+}
+
+/* the sheet of paper the hand writes on */
+.stroke-stage {
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255, 253, 246, 0.9), transparent 60%),
+    radial-gradient(90% 120% at 75% 80%, rgba(20, 24, 28, 0.025), transparent 55%),
+    var(--ground-0);
+  border: 1px solid rgba(20, 24, 28, 0.07);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 26px rgba(20, 24, 28, 0.035),
+    0 2px 14px rgba(20, 24, 28, 0.05);
+}
+
+/* the writing guide: a paper crease, not a chart grid */
+.stroke-grid line {
+  stroke: rgba(20, 24, 28, 0.055);
+  stroke-dasharray: none;
+}
+
+/* where the hand is going: a breath of the finished glyph */
+.stroke-guide path {
+  stroke: rgba(20, 24, 28, 0.075);
+}
+
+/* the ink itself — crisp line over its own bleed */
+.stroke-ink path {
+  stroke: var(--stroke-ink);
+}
+
+.stroke-bleed path {
+  fill: none;
+  stroke: var(--stroke-ink);
+  stroke-width: 9.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.13;
+}
+
+.stroke-num {
+  fill: var(--stroke-ink);
+}
+
+.stroke-engine {
+  color: var(--faint-2);
+  letter-spacing: 0.08em;
+}
+
+/* the count: a margin note, not a scoreboard */
+.stroke-readout {
+  font-family: var(--serif);
+}
+
+.stroke-count {
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.stroke-count-unit {
+  font-size: 11px;
+  color: var(--faint);
+  letter-spacing: 0.14em;
+}
+
+/* controls in one quiet register — outline chips, serif, no black slab */
+.stroke-controls button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-family: var(--serif);
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.stroke-controls button.primary {
+  background: transparent;
+  color: var(--ai);
+  border-color: color-mix(in srgb, var(--ai) 55%, var(--line));
+}
+
+.stroke-controls button[aria-pressed='true'] {
+  /* the pressed state writes with the chosen pigment, not a black slab */
+  background: var(--stroke-ink, var(--ink));
+  color: var(--ground-0, var(--ground));
+  border-color: var(--stroke-ink, var(--ink));
+}
+
+/* 顔料 — the four inks */
+.stroke-inks {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.ink-dot {
+  position: relative;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.ink-dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.14);
+}
+
+.ink-dot[data-ink='sumi']::after    { background: var(--ink); }
+.ink-dot[data-ink='bengara']::after { background: #9e2b25; }
+.ink-dot[data-ink='ai']::after      { background: #2e4d6e; }
+.ink-dot[data-ink='rokusho']::after { background: #3a6a52; }
+
+/* the chosen pigment is ringed in the world's red — the same stone language
+ * as the world picker (Z4 wires ink-follows-the-world; the row stays local
+ * until then) */
+.ink-dot[aria-pressed='true']::after {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+.ink-dot:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+}
+
+.stroke-meta {
+  font-family: var(--serif);
+  letter-spacing: 0.05em;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ------------------------------------------------------ 書の間 · quiet mode
+ * The dormant room is an allowlist: living kanji + one faint wake mark.
+ * Waking reveals one purpose-built field—ten worlds, complete readings, and
+ * stroke-order numbers. No legacy title, frame, pips, replay or metadata. */
+.stroke-page[data-minimal='on'] {
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  background-color: var(--ground);
+  background-image: var(--paper-url, none);
+  background-position: center;
+  background-size: cover;
+}
+
+/* The layered variant's earlier background shorthand is intentionally more
+ * specific than the generic page, so restore the grown paper explicitly for
+ * the quiet room. Otherwise the area beyond the glyph sheet is a flat fill. */
+body.v-depth-layered .stroke-page[data-minimal='on'] {
+  background-color: var(--ground-2);
+  background-image: var(--paper-url, none);
+  background-position: center;
+  background-size: cover;
+}
+
+.stroke-page[data-minimal='on'] .stroke-bar,
+.stroke-page[data-minimal='on'] .stroke-khead,
+.stroke-page[data-minimal='on'] .stroke-pips,
+.stroke-page[data-minimal='on'] .stroke-hint,
+.stroke-page[data-minimal='on'] .stroke-readout,
+.stroke-page[data-minimal='on'] .stroke-inks,
+.stroke-page[data-minimal='on'] .stroke-controls,
+.stroke-page[data-minimal='on'] .stroke-meta {
+  display: none;
+}
+
+.stroke-page[data-minimal='on'] .stroke-body {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.stroke-page[data-minimal='on'] .stroke-stage,
+.stroke-page[data-minimal='on'][data-living='on'] .stroke-stage,
+.stroke-page[data-minimal='on'][data-living='still'] .stroke-stage {
+  width: min(94vw, 72dvh, 560px);
+  margin: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Once the field wakes, give its lower control sheet an uncontested zone.
+ * The lifted numeral layer follows this rect in JS, so neither numbers nor
+ * wet ink can paint across the palette/readings controls. */
+.stroke-page[data-minimal='on'][data-chrome='awake'] .stroke-stage {
+  width: min(78vw, 44dvh, 360px);
+  transform: translateY(-20dvh);
+}
+
+.stroke-page[data-minimal='on'] .stroke-stage .stroke-canvas {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.stroke-page[data-minimal='on'] .stroke-grid,
+.stroke-page[data-minimal='on'] .stroke-guide {
+  display: none;
+}
+
+/* The renderer paints an opaque square. Feather its edges into the same grown
+ * paper so the glyph lives on the page rather than on a visible tile. */
+.stroke-page[data-minimal='on'] .stroke-stage .ink-sheet {
+  -webkit-mask-image: radial-gradient(
+    circle closest-side at 50% 50%,
+    #000 0 84%,
+    rgba(0, 0, 0, 0.82) 92%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle closest-side at 50% 50%,
+    #000 0 84%,
+    rgba(0, 0, 0, 0.82) 92%,
+    transparent 100%
+  );
+}
+
+.stroke-page[data-minimal='on'][data-chrome='sleeping'] .stroke-nums {
+  display: none !important;
+}
+
+.stroke-missing-stage {
+  display: grid;
+  place-items: center;
+}
+
+.stroke-page[data-minimal='on'] .stroke-missing-glyph {
+  font-size: min(62vw, 44dvh, 300px);
+}
+
+[data-stroke-chrome] {
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0s;
+}
+
+.stroke-page[data-chrome='sleeping'] [data-stroke-chrome] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+
+.stroke-awake-field {
+  position: absolute;
+  left: 50%;
+  bottom: calc(58px + env(safe-area-inset-bottom));
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: min(370px, calc(100vw - 24px));
+  max-height: min(46dvh, 340px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px;
+  transform: translate(-50%, 0);
+  color: var(--ink);
+  scrollbar-width: none;
+}
+
+.stroke-awake-field::-webkit-scrollbar {
+  display: none;
+}
+
+/* the readings open ELEGANTLY — a slow rise and settle, not a pop */
+.stroke-awake-field {
+  transition:
+    opacity 0.34s ease,
+    transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1),
+    visibility 0s linear 0s;
+}
+.stroke-page[data-chrome='sleeping'] .stroke-awake-field {
+  transform: translate(-50%, 16px);
+  transition:
+    opacity 0.26s ease,
+    transform 0.26s ease,
+    visibility 0s linear 0.26s;
+}
+
+.stroke-palette-field {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.stroke-palette-choice {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 46px;
+  padding: 4px 6px;
+  color: var(--palette-ink);
+  background: var(--palette-ground);
+  border: 1px solid color-mix(in srgb, var(--palette-ink) 28%, transparent);
+  border-radius: 13px;
+  box-shadow: 0 5px 16px color-mix(in srgb, var(--ink) 15%, transparent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stroke-palette-choice[aria-pressed='true'] {
+  border-color: var(--palette-red);
+  box-shadow:
+    0 0 0 2px var(--palette-red),
+    0 7px 20px color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+.stroke-palette-choice:focus-visible {
+  outline: 2px solid var(--palette-red);
+  outline-offset: 2px;
+}
+
+.stroke-palette-seal {
+  font: 18px/1 var(--serif);
+  text-align: center;
+}
+
+.stroke-palette-name {
+  min-width: 0;
+  overflow: hidden;
+  font: 8px/1.25 var(--serif);
+  letter-spacing: 0.02em;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stroke-reading-field {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.stroke-reading-row {
+  min-width: 0;
+  padding: 7px 9px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--ink) 10%, transparent);
+  font-family: var(--serif);
+}
+
+.stroke-reading-label {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--ink-2);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.stroke-reading-label .en-sub {
+  margin: 0;
+  color: var(--faint-2);
+  font: 8px/1 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.stroke-reading-value {
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.stroke-number-choice {
+  min-height: 44px;
+  padding: 7px 16px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ground-0) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 26%, transparent);
+  border-radius: 999px;
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--ink) 10%, transparent);
+  font: 12px/1.2 var(--serif);
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.stroke-number-choice[aria-pressed='true'] {
+  color: var(--ground-0);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.stroke-number-choice:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+}
+
+.stroke-chrome-trigger {
+  position: absolute;
+  right: calc(8px + env(safe-area-inset-right));
+  top: calc(8px + env(safe-area-inset-top));
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font: 19px/1 var(--serif);
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  opacity: 0.36;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.stroke-chrome-trigger:is(:hover, :focus-visible),
+.stroke-page[data-chrome='awake'] .stroke-chrome-trigger {
+  opacity: 0.82;
+}
+
+/* The quiet room's visible back door (operator, 2026-08-15: a learner must
+ * never be trapped behind a history gesture). The bar pares down to one
+ * faint always-live 戻る mirroring the ⋯ trigger; title and seal belong to
+ * the awake field in this mode. */
+.stroke-page[data-minimal='on'] .stroke-bar {
+  position: absolute;
+  left: calc(8px + env(safe-area-inset-left));
+  top: calc(8px + env(safe-area-inset-top));
+  z-index: 7;
+  align-self: auto;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.stroke-page[data-minimal='on'] .stroke-title {
+  display: none;
+}
+/* 四隅の間 — the worlds live on the seal, top right, the same door as every
+ * screen (operator spec: "the ten color choices from the top right, just
+ * like in the normal settings") */
+.stroke-page[data-minimal='on'] #stroke-world-seal {
+  position: fixed;
+  right: calc(8px + env(safe-area-inset-right));
+  top: calc(8px + env(safe-area-inset-top));
+  z-index: 7;
+  opacity: 0.44;
+  transition: opacity 0.22s ease;
+}
+.stroke-page[data-minimal='on'] #stroke-world-seal:is(:hover, :focus-visible),
+.stroke-page[data-minimal='on'][data-chrome='awake'] #stroke-world-seal {
+  opacity: 0.85;
+}
+/* the ensō wake mark yields the top-right corner to the seal and rests
+ * bottom-center, beneath the sheet */
+.stroke-page[data-minimal='on'] .stroke-chrome-trigger {
+  right: auto;
+  top: auto;
+  left: 50%;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+}
+.stroke-chrome-trigger svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+/* numbers bottom-right · speed bottom-left — faint until touched, always
+ * in reach, never crowding the sheet */
+.stroke-corner {
+  position: fixed;
+  z-index: 7;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  opacity: 0.36;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.22s ease;
+}
+.stroke-corner:is(:hover, :focus-visible),
+.stroke-corner[aria-pressed='true'],
+.stroke-page[data-chrome='awake'] .stroke-corner {
+  opacity: 0.82;
+}
+.stroke-corner-br {
+  right: calc(8px + env(safe-area-inset-right));
+}
+.stroke-corner-bl {
+  left: calc(8px + env(safe-area-inset-left));
+}
+.stroke-corner:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: -4px;
+}
+.stroke-page[data-minimal='on'] #strokes-back {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  opacity: 0.36;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.22s ease,
+    background-color 0.22s ease;
+}
+.stroke-page[data-minimal='on'] #strokes-back:is(:hover, :focus-visible),
+.stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
+  opacity: 0.82;
+}
+.stroke-page[data-minimal='on'] #strokes-back:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: -4px;
+  background: color-mix(in srgb, var(--ground-0) 54%, transparent);
+}
+
+.stroke-chrome-trigger:focus-visible {
+  outline: 2px solid var(--ai, var(--ink-2));
+  outline-offset: -4px;
+  background: color-mix(in srgb, var(--ground-0) 54%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-stroke-chrome],
+  .stroke-chrome-trigger,
+  .stroke-num {
+    transition: none;
+  }
+}
+
+@media (max-height: 560px) {
+  .stroke-page[data-minimal='on'] .stroke-stage,
+  .stroke-page[data-minimal='on'][data-living='on'] .stroke-stage,
+  .stroke-page[data-minimal='on'][data-living='still'] .stroke-stage {
+    width: min(82vw, 70dvh, 430px);
+  }
+
+  .stroke-awake-field {
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    max-height: 54dvh;
+  }
+}
+
+/* ------------------------------------------------ review sessions (SRS)
+ * One queue, four honest seals. The face is the second structural constant
+ * (rebuild spec §2 S2): a raised warm-washi card on every desk, in every
+ * world — dark rooms get a lit card, the way a real desk holds real paper.
+ * The grades sit in one row, stamped as hanko, each carrying its real next
+ * interval. */
+.review-face {
+  --ground: var(--card-ground);
+  --ground-2: var(--card-ground-2);
+  --ground-0: var(--card-ground-0);
+  --ink: var(--card-ink);
+  --ink-2: var(--card-ink-2);
+  --red: var(--card-red);
+  --red-wash: var(--card-red-wash);
+  --line: var(--card-line);
+  --line-soft: var(--card-line-soft);
+  --faint: var(--card-faint);
+  --faint-2: var(--card-faint-2);
+  --ai: var(--card-ai);
+  --ai-wash: var(--card-ai-wash);
+  color: var(--ink);
+  background: var(--ground-0);
+  /* S2 raised paper: fine washi tooth + one soft shadow — never a flat rectangle */
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.018) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
+  background-size: 13px 13px, 19px 19px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(10, 10, 8, 0.16);
+  padding: 34px 18px 26px;
+  margin: 10px 0 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-front {
+  font-family: var(--serif);
+  font-size: 44px;
+  line-height: 1.2;
+}
+
+.review-reading {
+  color: var(--red);
+  letter-spacing: 0.18em;
+  font-size: 15px;
+}
+
+.review-sense {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.review-face .chip {
+  margin-top: 8px;
+}
+
+.review-start.quiet {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: var(--line);
+}
+
+.grade-row {
+  display: flex;
+  gap: 8px;
+}
+
+.grade {
+  font: inherit;
+  flex: 1;
+  min-height: 56px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.grade .g-label {
+  font-family: var(--serif);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.grade .g-when {
+  font-size: 11px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.grade.g-again {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.grade.g-good {
+  border-color: var(--ink);
+}
+
+/* S4 hanko — the four grades stamped as seals (rebuild spec §2 S4): 再 waits
+ * in red outline, 難 is quiet, 良 is pressed solid in the world's red, 易 is
+ * edged in gold. The EN sublabels and the honest FSRS intervals stay in the
+ * DOM — suites and screen readers keep selecting again/hard/good/easy. The
+ * probe row keeps the plain .grade box above. */
+.grade.hanko {
+  border: 0;
+  background: transparent;
+  gap: 4px;
+  padding: 2px 0 4px;
+  color: var(--ink);
+}
+
+.grade.hanko .g-seal {
+  width: var(--seal-size);
+  height: var(--seal-size);
+  border-radius: var(--seal-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: var(--seal-font);
+  line-height: 1;
+}
+
+.grade.hanko .g-label {
+  font-size: 11px;
+  color: var(--ink-2);
+  letter-spacing: 0.06em;
+}
+
+.grade.hanko:active .g-seal {
+  transform: translateY(1px);
+}
+
+.grade.hanko.g-again .g-seal {
+  color: var(--red);
+  border: 2px solid color-mix(in srgb, var(--red) 75%, transparent);
+  background: var(--red-wash);
+}
+
+.grade.hanko.g-hard .g-seal {
+  color: var(--ink-2);
+  border: 2px solid var(--line);
+  background: transparent;
+}
+
+.grade.hanko.g-good .g-seal {
+  color: var(--ground-0);
+  border: 2px solid var(--red);
+  background: var(--red);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--red) 45%, transparent);
+}
+
+.grade.hanko.g-easy .g-seal {
+  color: var(--ink);
+  border: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+
+.review-summary {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 14px;
+  flex-wrap: wrap;
+}
+
+.review-undo {
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------- the tutor (AI in-app) */
+.ai-tutor {
+  margin: 14px 0;
+}
+
+.ai-tutor .ai-answer {
+  font-family: Georgia, serif;
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  margin-top: 8px;
+  line-height: 1.55;
+}
+
+.ai-tutor .ai-answer:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------------- lessons */
+.lesson-row .row-glyph {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.lesson-row .row-main {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+
+.lesson-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.lesson-option {
+  font: inherit;
+  font-family: Georgia, serif;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.lesson-option.right {
+  border-color: var(--ink);
+  background: var(--line-soft);
+}
+
+.lesson-option.wrong {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ------------------------------------------------------------ thesaurus
+ * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
+ * followed by sem-rows (shared with the entry sheet's 意味の近く block). */
+.thes-block {
+  margin: 0 0 22px;
+}
+
+.thes-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0 7px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.thes-word {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.thes-reading {
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.thes-gloss {
+  font-size: 13px;
+  color: var(--faint);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thes-rel {
+  font-size: 11px;
+  color: var(--faint);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* -------------------------------------------- the tutor's reading room
+ * 私の読み物 — a generated passage rendered like the reader: serif, wide
+ * leading to house the ruby, dictionary words tappable with a dotted
+ * underline so a finger knows where the doors are. */
+.airead-body {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 2.3;
+  color: var(--ink);
+  margin: 20px 0 8px;
+}
+
+.airead-para {
+  margin: 0 0 14px;
+}
+
+.airead-body rt {
+  font-size: 9px;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+.airead-hit {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-bottom: 1px dotted var(--line);
+}
+
+.airead-note {
+  font-size: 13px;
+  color: var(--faint);
+  margin: 10px 0 0;
+}
+
+.airead-note:empty {
+  display: none;
+}
+
+.airead-meta {
+  font-size: 12px;
+  color: var(--faint);
+  margin: 6px 0 26px;
+}
+
+/* ------------------------------------- the learner model in the text
+ * Words on the memorize list wear a quiet under-ink in the reader; it
+ * deepens when the card is due right now. box-shadow, not border — the
+ * line box must never shift because of what you happen to be learning. */
+.reader .tok.content.tok-learning > .tok-word {
+  box-shadow: 0 2px 0 rgba(158, 43, 37, 0.2);
+}
+
+.reader .tok.content.tok-due > .tok-word {
+  box-shadow: 0 2px 0 rgba(158, 43, 37, 0.48);
+}
+
+/* --------------------------------------------- the reader's bookkeeping
+ * 読了 marks on the shelf and the finish control at an article's end —
+ * quiet ink, never a badge. */
+.read-done {
+  margin: 18px 0 6px;
+}
+
+.read-fin.finished {
+  color: var(--red);
+  border-color: rgba(158, 43, 37, 0.35);
+}
+
+.pool-tag.read-tag {
+  color: var(--red);
+  border-color: rgba(158, 43, 37, 0.3);
+}
+
+/* the synonym cluster woven into search results */
+.search-syn {
+  margin: 18px 0 8px;
+}
+
+.search-syn .search-syn-door {
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------- SRS depth: rest/wake
+ * The forecast line under the review button, and the per-line rest toggle
+ * — small ink, since resting a card is a quiet act, not a feature. */
+.srs-forecast {
+  font-size: 12px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  margin: 6px 0 0;
+}
+
+.rest-toggle {
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--faint);
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 7px;
+  cursor: pointer;
+  flex: none;
+}
+
+.rest-toggle.resting {
+  color: var(--red);
+  border-color: rgba(158, 43, 37, 0.35);
+}
+
+.review-rest {
+  margin-top: 10px;
+}
+
+/* ------------------------------------------------ talking with the tutor
+ * A conversation set in the app's own paper — turns as quiet ink blocks,
+ * the learner's slightly indented and warmed, never chat-bubble plastic. */
+.chat-log {
+  margin: 6px 0 12px;
+}
+
+.chat-turn {
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+}
+
+.chat-turn.me {
+  color: var(--red);
+  padding-left: 14px;
+  border-left: 2px solid rgba(158, 43, 37, 0.35);
+}
+
+.chat-turn.tutor {
+  color: var(--ink);
+}
+
+.chat-turn.thinking {
+  color: var(--faint);
+}
+
+.chat-empty {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.chat-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.chat-row .chat-field {
+  flex: 1;
+  margin: 0;
+}
+
+.chat-row .chat-send {
+  flex: none;
+  width: auto;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.key-head {
+  margin-top: 26px;
+}
+
+/* the tutor's quiz — question card and the one-line why */
+.aiq-q {
+  font-size: 20px;
+  line-height: 1.9;
+}
+
+.aiq-why {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin: 10px 0 4px;
+}
+
+.aiq-start {
+  margin-top: 12px;
+}
+
+/* the cloze face: the shelf's own sentence, with the word's place held */
+.review-cloze {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 2;
+  color: var(--ink);
+  margin: 6px 0 4px;
+}
+
+/* 新聞アーカイブ — light rows for a deep stack; the year folds carry the
+ * weight, each article is one quiet line and a level chip */
+.archive-year {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+.archive-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  padding: 10px 2px;
+  font-family: var(--sans);
+  color: var(--ink);
+  cursor: pointer;
+}
+.archive-row-title {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.archive-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* 読み探査 — the probe keeps the review room's glass; only its own two
+ * lines are new: a shelf sentence under the word, and the quiet exact
+ * meta line (漢検 band · reading type) after the reveal */
+.probe-context {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 2;
+  color: var(--ink-2);
+  margin: 4px 0 0;
+}
+.probe-meta {
+  color: var(--ink-2);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+body.zen .probe-context {
+  font-size: 19px;
+}
+
+/* 文 · the minimum reader — one sentence, large, room for its rt */
+.sent-reader {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 2.3;
+  color: var(--ink);
+  margin: 8px 0 12px;
+}
+.sent-reader-en {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 0 0 6px;
+}
+/* the quiet door on every example line into its own page */
+.sent-door {
+  background: transparent;
+  border: 0;
+  padding: 0 4px;
+  margin-left: 4px;
+  font-size: 14px;
+  color: var(--ai, var(--ink-2));
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+/* the answer face's example lines — quieter than the cloze, still living */
+.review-example {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 2;
+  color: var(--ink-2);
+  margin: 4px 0 0;
+}
+body.zen .review-example {
+  font-size: 17px;
+}
+
+/* the struggling cards on the session summary */
+.leech-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line-soft);
+  padding: 8px 0;
+}
+
+.leech-row .w {
+  font-family: var(--serif);
+  font-size: 18px;
+}
+
+/* the per-list review door on a list heading */
+.list-head .list-review {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 3px 9px;
+}
+
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* carrying the record: the export / import pair at the tray's foot */
+.port-row {
+  display: flex;
+  gap: 8px;
+  margin: 26px 0 0;
+}
+
+/* ------------------------------------------------------- 字引 the finder
+ * Chip rows for strokes and components, a glyph grid for the hits —
+ * dense like a paper index page, but with finger-sized doors. */
+.kdx-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.kdx-chip {
+  min-width: 34px;
+  padding: 5px 8px;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.kdx-chip.kdx-part {
+  font-family: var(--serif);
+  font-size: 17px;
+}
+
+.kdx-chip.on-list {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.kdx-sthead {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  margin: 8px 0 2px;
+}
+
+.kdx-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 20px;
+}
+
+.kdx-glyph {
+  width: 46px;
+  height: 46px;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------- 活用 the table
+ * Conjugation rows: quiet label left, the living form right in serif. */
+.conj-table {
+  margin: 4px 0 14px;
+}
+
+.conj-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 1px solid var(--line-soft);
+  padding: 5px 0;
+}
+
+.conj-label {
+  flex: none;
+  width: 96px;
+  font-size: 12px;
+  color: var(--faint);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.conj-en {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.conj-form {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+}
+
+/* "show all" affordance under a capped list (kanji compounds): a full-width
+ * indigo text row — 藍 says "you can go here" — that reveals the remainder in
+ * place, so the whole dictionary depth is one tap away, never truncated. */
+.more-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  padding: 13px 2px;
+  font-family: var(--sans);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--ai, #2e4d6e);
+  cursor: pointer;
+}
+.more-row:active {
+  opacity: 0.6;
+}
+
+/* AI-generated leveled example sentences (Phase 3, key-gated). Each card is a
+ * sentence with a small JLPT-level chip, its reading, and the English. */
+.ai-examples {
+  margin-top: 8px;
+}
+.ai-ex {
+  border-top: 1px solid var(--line-soft);
+  padding: 9px 0;
+}
+.ai-ex:first-child {
+  border-top: 0;
+}
+.ai-ex-ja {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  line-height: 1.55;
+  margin: 0;
+}
+.ai-ex-lv {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 0 5px;
+  margin-right: 8px;
+  vertical-align: 0.12em;
+}
+.ai-ex-read {
+  font-size: 12px;
+  color: var(--red);
+  margin: 2px 0 0;
+}
+.ai-ex-en {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 2px 0 0;
+}
+.ai-ex-note {
+  font-size: 13px;
+  color: var(--faint);
+  margin: 4px 0 0;
+}
+
+/* ------------------------------------------------------ 字引 kanji finder */
+.kdx-lenses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 14px;
+}
+.kdx-lens {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 7px 12px;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.kdx-lens .l-ja {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink);
+}
+.kdx-lens .en-sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+.kdx-lens.on {
+  background: var(--red);
+  border-color: var(--red);
+}
+.kdx-lens.on .l-ja,
+.kdx-lens.on .en-sub {
+  color: #fcfbf6;
+}
+.kdx-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.kdx-clear {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ai);
+  cursor: pointer;
+}
+.kdx-field {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 4px 0 12px;
+  padding: 11px 14px;
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.kdx-chip.dead {
+  opacity: 0.24;
+  pointer-events: none;
+}
+.kdx-draw {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 10px;
+}
+.kdx-canvas {
+  width: 300px;
+  height: 300px;
+  max-width: 88vw;
+  aspect-ratio: 1 / 1;
+  background: var(--ground-0);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.kdx-draw-ctrl {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+/* --------------------------------------------- the deep dictionary (70k)
+ * Complete JMdict senses on the word sheet, homograph choices, and the
+ * quiet opening/warning lines behind search — harvested from the codex line
+ * and restyled with this app's own variables. */
+.dictionary-opening,
+.dictionary-warning,
+.dictionary-credit {
+  margin: 7px 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+.dictionary-warning {
+  color: var(--red);
+}
+.dictionary-retry {
+  min-height: var(--tap);
+  border: 1px solid var(--indigo);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--indigo);
+  padding: 7px 14px;
+  margin: 0 0 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-credit a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin: -13px 0;
+  color: var(--indigo);
+  text-underline-offset: 3px;
+}
+.dictionary-entry {
+  margin: 0 0 12px;
+}
+.dictionary-homographs {
+  margin: 8px 0 14px;
+  padding: 9px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.dictionary-homograph {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 7px 1px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--indigo);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-homograph:last-child {
+  border-bottom: 0;
+}
+.dictionary-homograph.active {
+  color: var(--ink-2);
+  cursor: default;
+}
+.dictionary-forms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--serif);
+}
+.dictionary-spellings {
+  color: var(--ink);
+  font-size: 16px;
+}
+.dictionary-readings {
+  color: var(--red);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.dictionary-sense {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 7px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.dictionary-sense:last-child {
+  border-bottom: 0;
+}
+.dictionary-sense-number {
+  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 12px;
+  padding-top: 3px;
+}
+.dictionary-sense-body {
+  min-width: 0;
+}
+.dictionary-sense-body .gloss {
+  margin-bottom: 4px;
+}
+.dictionary-glosses {
+  margin: 0 0 5px;
+  padding-left: 18px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.62;
+}
+.dictionary-restriction,
+.dictionary-info {
+  margin: 2px 0 6px;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.dictionary-relations {
+  margin: 8px 0 2px;
+}
+.dictionary-rel-title {
+  margin: 0;
+  color: var(--faint);
+  font-family: var(--serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.dictionary-rel {
+  display: grid;
+  grid-template-columns: minmax(4em, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 7px 1px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--indigo);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.dictionary-rel:last-child {
+  border-bottom: 0;
+}
+.dictionary-rel.muted {
+  color: var(--ink-2);
+  cursor: default;
+}
+.dictionary-rel-word {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.dictionary-rel-note {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--faint);
+  font-size: 12px;
+}
+.dictionary-entry-rule {
+  height: 1px;
+  margin: 4px 0 12px;
+  background: var(--line-soft);
+}
+
+/* the record's health — one quiet line in the tray, never a modal */
+.store-warning,
+.store-nudge {
+  margin: 2px 0 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+.store-warning {
+  color: var(--red);
+}
+.store-warning-live {
+  position: fixed;
+  top: var(--store-alert-top, calc(68px + env(safe-area-inset-top)));
+  left: 50%;
+  z-index: 130;
+  width: min(calc(100% - 24px), 760px);
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+  color: var(--red);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(20, 24, 28, 0.22);
+  pointer-events: none;
+}
+.store-warning-live[hidden] {
+  display: none;
+}
+@media (forced-colors: active) {
+  .store-warning-live {
+    color: CanvasText;
+    background: Canvas;
+    border-color: CanvasText;
+  }
+}
+
+/* ------------------------------------------------------------ 復習 · zen
+ * While a card is up, the glass holds only the card: no bar, no crumb, no
+ * counts. A hairline of progress, one faint way out, one faint …, and the
+ * four honest buttons within the thumb's reach. */
+body.zen main {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 18px calc(20px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+.zen-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  z-index: 5;
+}
+.zen-progress i {
+  display: block;
+  height: 100%;
+  background: var(--faint);
+  opacity: 0.55;
+  transition: width 0.4s ease;
+}
+.zen-exit,
+.zen-more {
+  position: fixed;
+  top: calc(4px + env(safe-area-inset-top));
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  z-index: 6;
+}
+.zen-exit {
+  right: 6px;
+}
+.zen-more {
+  left: 6px;
+  letter-spacing: 0.08em;
+}
+.zen-more.open {
+  opacity: 1;
+  color: var(--ink-2);
+}
+body.zen .review-face {
+  border: 0;
+  padding: 10px 6px;
+  margin: 0;
+  /* zen keeps its stillness, but the card keeps its material: the S2 washi
+   * constant (background + tooth from .review-face) holds in every world —
+   * a session card is real paper even at night */
+  flex: 1;
+  justify-content: center;
+  gap: 14px;
+}
+body.zen .review-front {
+  font-size: 58px;
+  line-height: 1.15;
+}
+body.zen .review-cloze {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 2;
+  margin: 0;
+}
+body.zen .review-reading {
+  font-size: 17px;
+}
+body.zen .review-sense {
+  font-size: 16px;
+  line-height: 1.6;
+}
+body.zen .review-reveal {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 340px;
+}
+body.zen .grade-row {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 380px;
+  /* the four seals stay in reach: on tall answer faces the row landed
+   * below the fold (top 1137 in an 844px viewport) with no scroll cue —
+   * P1, full-instrument review. It now rides the bottom edge on a washi
+   * backing while the face scrolls beneath it. */
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 8px 0 calc(10px + env(safe-area-inset-bottom));
+  background: var(--ground-0, var(--ground));
+  box-shadow: 0 -10px 24px -18px rgba(10, 10, 8, 0.55);
+}
+.zen-more-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0 12px;
+}
+body.zen .variants-bar {
+  display: none;
+}
+/* the dojo's clock becomes a whisper: time and one small door, nothing more */
+body.zen .focus-hud {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: calc(6px + env(safe-area-inset-top)) 54px 0;
+  justify-content: center;
+  gap: 10px;
+}
+body.zen .focus-hud .focus-badge {
+  display: none;
+}
+body.zen .focus-hud-left {
+  color: var(--faint);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+}
+body.zen .focus-hud-end {
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  min-height: var(--tap);
+}
+
+/* the beat between learning steps — a soft count while the next card ripens */
+.zen-wait {
+  gap: 18px;
+}
+.zen-wait-clock {
+  font-family: var(--serif);
+  font-size: 40px;
+  color: var(--ink-2);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+.zen-wait-note {
+  margin: 0;
+  color: var(--faint);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+/* ---- list management (覚える stage 2): inline maker, rename, armed delete */
+.list-maker {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+.list-maker-field {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.list-maker-field[aria-invalid='true'] {
+  border-color: var(--red);
+}
+.list-maker-make {
+  flex: none;
+}
+.list-op {
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: 6px;
+  font: inherit;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.list-op.armed {
+  color: var(--red);
+  border-color: var(--red);
 }

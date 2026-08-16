@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="icon" href="data:," />
+<title>書の間・五彩 — one room, five worlds</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: #0d0b07; color: #e6dfd0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(22px, env(safe-area-inset-top)) 14px 50px; }
+  h1 { font-weight: normal; font-size: 18px; letter-spacing: 0.4em; margin: 6px 0 2px; }
+  .sub { font-size: 11px; color: #97897a; letter-spacing: 0.1em; margin: 0 0 26px; text-align: center; line-height: 1.9; max-width: 430px; }
+  .shelf { width: min(94vw, 420px); margin-bottom: 46px; }
+  .screen { position: relative; width: 100%; aspect-ratio: 390 / 780; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.06); }
+  .screen canvas.ground { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .layer { position: absolute; inset: 0; padding: 24px 22px; display: flex; flex-direction: column; }
+  .label { display: flex; justify-content: space-between; align-items: baseline; margin: 12px 2px 0; }
+  .label b { font-weight: normal; font-size: 15px; letter-spacing: 0.24em; }
+  .label span { font-size: 10.5px; color: #8d8577; }
+  .note { font-size: 12px; line-height: 1.85; color: #b3aa99; margin: 5px 2px 0; }
+  footer { font-size: 9.5px; color: #675e51; text-align: center; line-height: 1.9; max-width: 430px; }
+
+  .chrome-row { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; letter-spacing: 0.2em; }
+  .seal-dot { width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; border: 1px solid currentColor; }
+  .khead { display: flex; align-items: baseline; justify-content: space-between; margin: 18px 2px 0; }
+  .khead .k { font-size: 30px; font-weight: normal; }
+  .khead .readings { font-size: 11px; letter-spacing: 0.18em; text-align: right; line-height: 1.9; }
+  .inkframe { margin: 16px auto 0; width: 100%; border-radius: 6px; overflow: hidden; position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.06); }
+  .inkframe img { display: block; width: 100%; }
+  .pips { display: flex; gap: 9px; justify-content: center; margin-top: 16px; }
+  .pips i { width: 8px; height: 8px; border-radius: 999px; border: 1px solid; font-style: normal; }
+  .hint { text-align: center; font-size: 10px; letter-spacing: 0.4em; margin-top: 14px; }
+  .controls { margin-top: auto; display: flex; gap: 8px; justify-content: center; }
+  .controls span { font-size: 10.5px; letter-spacing: 0.15em; padding: 7px 14px; border: 1px solid; border-radius: 14px; }
+</style>
+</head>
+<body>
+  <h1>書の間・五彩</h1>
+  <p class="sub">ONE room — the kanji stroke page — dressed by each of the five worlds.<br />the chrome follows the world's tokens, and the INK ITSELF follows the world:<br />every 永 below is a real frame from the lattice-Boltzmann engine in that world's pigment.</p>
+
+  <div id="rooms"></div>
+
+  <footer>書の間・五彩 — rebuild spec §3 (stroke page) rendered per world · ink frames are true engine output (stroke-art-iro palettes)<br />in the built room the character writes itself stroke by stroke and rewrites on tap — these stills are its finished sheets</footer>
+
+<script>
+const WORLDS = [
+  { key: 'sumi', seal: '墨', name: '墨・楮紙', en: 'sumi ink on kōzo — the default day',
+    ink: 'ink-sumi.png', ground: 'kozo',
+    g: '#f5efe0', inkC: '#211e17', ink2: '#4a453a', red: '#a02a1e', go: '#2e4d6e',
+    note: 'The room as you\'ll usually meet it: warm kōzo chrome, and the brush writes in real sumi — dry飛白 tears at speed, wet pooling at the stops.' },
+  { key: 'shu', seal: '朱', name: '朱・胡粉', en: 'vermilion on shell white',
+    ink: 'ink-shu.png', ground: 'shell',
+    g: '#f9f5eb', inkC: '#2b2620', ink2: '#575145', red: '#b02318', go: '#2e4d6e',
+    note: 'In the bright world the brush takes 朱墨 — vermilion ink, the ink of teachers\' corrections and temple seals. Same physics, hotter blood.' },
+  { key: 'kaki', seal: '柿', name: '焦茶・柿渋', en: 'burnt umber on persimmon tannin',
+    ink: 'ink-kaki.png', ground: 'kaki',
+    g: '#ddb083', inkC: '#2e1a0c', ink2: '#5a3c22', red: '#7e2410', go: '#35496b',
+    note: 'The mingei room: tannin-clouded paper, and the brush writes in 焦茶 — burnt umber that granulates into the amber ground like an old tool\'s handle.' },
+  { key: 'urushi', seal: '漆', name: '胡粉・黒漆', en: 'shell white on black lacquer',
+    ink: 'ink-gofun.png', ground: 'urushi',
+    g: '#171310', inkC: '#f2ecdf', ink2: '#cdc3b0', red: '#e0796b', go: '#d9b25f',
+    note: 'The dark reading world inverts the brush: 胡粉 shell-white flowing onto polished lacquer — the maki-e craftsman\'s underdrawing, luminous without light.' },
+  { key: 'kon', seal: '金', name: '紺紙金泥', en: 'sutra gold on indigo',
+    ink: 'ink-kindei.png', ground: 'kon',
+    g: '#131a30', inkC: '#f4ecd9', ink2: '#cfc6ae', red: '#ef8079', go: '#d9b25f',
+    note: 'The deep night: the brush takes 金泥 — gold mud, the Heian sutra ink — granulating into the fiber as the water dies, drifting in the pools before it settles.' },
+];
+
+const rooms = document.getElementById('rooms');
+for (const w of WORLDS) {
+  const goLine = `color-mix(in srgb, ${w.go} 55%, transparent)`;
+  const div = document.createElement('div');
+  div.className = 'shelf';
+  div.innerHTML = `
+  <div class="screen" id="r-${w.key}"><canvas class="ground" data-g="${w.ground}"></canvas>
+    <div class="layer" style="color:${w.inkC}">
+      <div class="chrome-row">
+        <span style="color:${w.ink2}">← 戻る</span>
+        <span>書の間</span>
+        <span class="seal-dot">${w.seal}</span>
+      </div>
+      <div class="khead">
+        <span class="k">永 <span style="font-size:12px;color:${w.ink2};letter-spacing:0.2em">五画 · 水部</span></span>
+        <span class="readings" style="color:${w.ink2}">エイ<br /><span style="color:${w.red}">なが</span>い</span>
+      </div>
+      <div class="inkframe"><img src="${w.ink}" alt="永 in ${w.name}" /></div>
+      <div class="pips">
+        ${[0,1,2,3,4].map((i) => `<i style="border-color:${w.red};${i < 5 ? `background:${w.red}` : ''}"></i>`).join('')}
+      </div>
+      <p class="hint" style="color:${w.ink2}">触れて、もう一度 — 二度と同じ書にならない</p>
+      <div class="controls" style="color:${w.ink2}">
+        <span style="border-color:${goLine};color:${w.go}">ゆっくり</span>
+        <span style="border-color:${goLine};color:${w.go}">筆順の番号</span>
+        <span style="border-color:${goLine};color:${w.go}">なぞり書き</span>
+      </div>
+    </div>
+  </div>
+  <div class="label"><b>${w.seal} ${w.name}</b><span>${w.en}</span></div>
+  <p class="note">${w.note}</p>`;
+  rooms.appendChild(div);
+}
+
+/* grounds (same painters as the worlds page) */
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+function paint(cv) {
+  const w = cv.clientWidth * DPR, h = cv.clientHeight * DPR;
+  cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  const kind = cv.dataset.g;
+  const r = rng({ kozo: 11, shell: 17, kaki: 29, urushi: 41, kon: 23 }[kind] || 7);
+  const fibers = (dark, light, n) => {
+    for (let i = 0; i < n; i++) {
+      const x = r()*w, y = r()*h, len = (10 + r()*70) * DPR;
+      const a = (r() < 0.5 ? 0 : Math.PI/2) + (r()-0.5) * 1.0;
+      g.beginPath(); g.moveTo(x, y);
+      g.quadraticCurveTo(x + Math.cos(a)*len*0.5, y + Math.sin(a)*len*0.5 + (r()-0.5)*16*DPR, x + Math.cos(a)*len, y + Math.sin(a)*len);
+      g.strokeStyle = r() < 0.8 ? dark(r) : light(r);
+      g.lineWidth = (0.4 + r()*0.7) * DPR; g.stroke();
+    }
+  };
+  const vignette = (rgba) => {
+    const v = g.createRadialGradient(w/2, h/2, h*0.35, w/2, h/2, h*0.72);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, rgba);
+    g.fillStyle = v; g.fillRect(0, 0, w, h);
+  };
+  if (kind === 'kozo' || kind === 'shell') {
+    const stops = kind === 'kozo' ? ['#f6f0e1', '#efe7d2', '#e5d8ba'] : ['#faf6ec', '#f4eede', '#ebe2cc'];
+    const base = g.createLinearGradient(0, 0, w * 0.9, h);
+    base.addColorStop(0, stops[0]); base.addColorStop(0.6, stops[1]); base.addColorStop(1, stops[2]);
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    fibers((r) => `rgba(180,158,116,${0.03 + r()*0.07})`, (r) => `rgba(252,246,228,${0.08 + r()*0.09})`, 2400);
+    vignette('rgba(90,70,40,0.16)');
+  } else if (kind === 'kaki') {
+    const base = g.createLinearGradient(0, 0, w*0.8, h);
+    base.addColorStop(0, '#e0b587'); base.addColorStop(0.55, '#d5a672'); base.addColorStop(1, '#c2915c');
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 36; i++) {
+      const x = r()*w, y = r()*h, rad = (30 + r()*110)*DPR;
+      const cl = g.createRadialGradient(x, y, 2, x, y, rad);
+      cl.addColorStop(0, r() < 0.55 ? `rgba(130,74,32,${0.07 + r()*0.1})` : `rgba(230,180,120,${0.06 + r()*0.08})`);
+      cl.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = cl; g.beginPath(); g.arc(x, y, rad, 0, 7); g.fill();
+    }
+    fibers((r) => `rgba(120,70,30,${0.03 + r()*0.05})`, (r) => `rgba(240,200,150,${0.04 + r()*0.05})`, 1400);
+    vignette('rgba(70,38,12,0.2)');
+  } else if (kind === 'urushi') {
+    const base = g.createLinearGradient(0, 0, w*0.6, h);
+    base.addColorStop(0, '#1c1713'); base.addColorStop(0.5, '#151110'); base.addColorStop(1, '#0e0b09');
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    const sheen = g.createRadialGradient(w*0.3, h*0.22, 10, w*0.3, h*0.22, h*0.75);
+    sheen.addColorStop(0, 'rgba(90,80,66,0.13)'); sheen.addColorStop(0.5, 'rgba(40,34,28,0.05)'); sheen.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = sheen; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 420; i++) {
+      const x = r()*w, y = r()*h, len = (6 + r()*38) * DPR, a = -0.6 + (r()-0.5)*0.5;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a)*len, y + Math.sin(a)*len);
+      g.strokeStyle = `rgba(70,60,48,${0.03 + r()*0.05})`;
+      g.lineWidth = (0.3 + r()*0.5) * DPR; g.stroke();
+    }
+  } else { // kon
+    const base = g.createLinearGradient(0, 0, w * 0.7, h);
+    base.addColorStop(0, '#161e38'); base.addColorStop(0.55, '#111830'); base.addColorStop(1, '#0b1122');
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    fibers((r) => `rgba(90,110,170,${0.015 + r()*0.04})`, (r) => `rgba(140,160,220,${0.02 + r()*0.04})`, 1400);
+    for (let i = 0; i < 200; i++) {
+      const b = r();
+      g.fillStyle = `rgba(${200+b*40|0},${205+b*30|0},${235+b*20|0},${0.06 + r()*0.45})`;
+      g.beginPath(); g.arc(r()*w, r()*h, (0.4 + r()*1.1)*DPR, 0, 7); g.fill();
+    }
+  }
+}
+for (const cv of document.querySelectorAll('canvas.ground')) paint(cv);
+</script>
+</body>
+</html>

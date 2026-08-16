@@ -1,0 +1,307 @@
+{
+  "北斎": {
+    "recededCount": 15,
+    "frameMaxDelta": 174,
+    "framePctGt8": 10.15,
+    "per": [
+      {
+        "w": "単なる",
+        "op": 0.052,
+        "box": "68x27",
+        "maxChannelDelta": 91,
+        "meanDelta": 12.61,
+        "pctPixelsDelta_gt8": 27.2,
+        "pctPixelsDelta_gt3": 55.2
+      },
+      {
+        "w": "万一",
+        "op": 0.063,
+        "box": "60x35",
+        "maxChannelDelta": 133,
+        "meanDelta": 12.72,
+        "pctPixelsDelta_gt8": 24.3,
+        "pctPixelsDelta_gt3": 43.6
+      },
+      {
+        "w": "武器",
+        "op": 0.035,
+        "box": "32x19",
+        "maxChannelDelta": 38,
+        "meanDelta": 11.27,
+        "pctPixelsDelta_gt8": 49.8,
+        "pctPixelsDelta_gt3": 73.2
+      },
+      {
+        "w": "納める",
+        "op": 0.047,
+        "box": "92x36",
+        "maxChannelDelta": 120,
+        "meanDelta": 12.85,
+        "pctPixelsDelta_gt8": 22.1,
+        "pctPixelsDelta_gt3": 34.3
+      },
+      {
+        "w": "取り上げる",
+        "op": 0.067,
+        "box": "112x25",
+        "maxChannelDelta": 91,
+        "meanDelta": 15.68,
+        "pctPixelsDelta_gt8": 28.6,
+        "pctPixelsDelta_gt3": 55.4
+      },
+      {
+        "w": "印刷",
+        "op": 0.039,
+        "box": "60x35",
+        "maxChannelDelta": 130,
+        "meanDelta": 15.02,
+        "pctPixelsDelta_gt8": 27,
+        "pctPixelsDelta_gt3": 39
+      }
+    ]
+  },
+  "墨": {
+    "recededCount": 14,
+    "frameMaxDelta": 103,
+    "framePctGt8": 7.27,
+    "per": [
+      {
+        "w": "単なる",
+        "op": 0.052,
+        "box": "67x26",
+        "maxChannelDelta": 61,
+        "meanDelta": 10.5,
+        "pctPixelsDelta_gt8": 30.4,
+        "pctPixelsDelta_gt3": 70
+      },
+      {
+        "w": "万一",
+        "op": 0.063,
+        "box": "61x36",
+        "maxChannelDelta": 96,
+        "meanDelta": 12.09,
+        "pctPixelsDelta_gt8": 29.1,
+        "pctPixelsDelta_gt3": 87.2
+      },
+      {
+        "w": "武器",
+        "op": 0.035,
+        "box": "32x19",
+        "maxChannelDelta": 26,
+        "meanDelta": 7.98,
+        "pctPixelsDelta_gt8": 36,
+        "pctPixelsDelta_gt3": 58.2
+      },
+      {
+        "w": "納める",
+        "op": 0.047,
+        "box": "92x36",
+        "maxChannelDelta": 85,
+        "meanDelta": 8.51,
+        "pctPixelsDelta_gt8": 20,
+        "pctPixelsDelta_gt3": 24.6
+      },
+      {
+        "w": "取り上げる",
+        "op": 0.067,
+        "box": "112x27",
+        "maxChannelDelta": 73,
+        "meanDelta": 13.73,
+        "pctPixelsDelta_gt8": 32.7,
+        "pctPixelsDelta_gt3": 67.7
+      },
+      {
+        "w": "印刷",
+        "op": 0.039,
+        "box": "61x36",
+        "maxChannelDelta": 86,
+        "meanDelta": 11.22,
+        "pctPixelsDelta_gt8": 24,
+        "pctPixelsDelta_gt3": 34.3
+      }
+    ]
+  },
+  "岩絵具": {
+    "recededCount": 15,
+    "frameMaxDelta": 124,
+    "framePctGt8": 7.34,
+    "per": [
+      {
+        "w": "単なる",
+        "op": 0.052,
+        "box": "67x26",
+        "maxChannelDelta": 97,
+        "meanDelta": 13.37,
+        "pctPixelsDelta_gt8": 28.8,
+        "pctPixelsDelta_gt3": 52
+      },
+      {
+        "w": "万一",
+        "op": 0.063,
+        "box": "60x35",
+        "maxChannelDelta": 115,
+        "meanDelta": 10.64,
+        "pctPixelsDelta_gt8": 21.5,
+        "pctPixelsDelta_gt3": 40.8
+      },
+      {
+        "w": "武器",
+        "op": 0.035,
+        "box": "32x19",
+        "maxChannelDelta": 28,
+        "meanDelta": 8.48,
+        "pctPixelsDelta_gt8": 43.4,
+        "pctPixelsDelta_gt3": 64.5
+      },
+      {
+        "w": "納める",
+        "op": 0.047,
+        "box": "91x35",
+        "maxChannelDelta": 98,
+        "meanDelta": 10.07,
+        "pctPixelsDelta_gt8": 21.1,
+        "pctPixelsDelta_gt3": 27.8
+      },
+      {
+        "w": "取り上げる",
+        "op": 0.067,
+        "box": "112x27",
+        "maxChannelDelta": 124,
+        "meanDelta": 20.4,
+        "pctPixelsDelta_gt8": 35.4,
+        "pctPixelsDelta_gt3": 53.1
+      },
+      {
+        "w": "印刷",
+        "op": 0.039,
+        "box": "60x35",
+        "maxChannelDelta": 116,
+        "meanDelta": 16.9,
+        "pctPixelsDelta_gt8": 29.4,
+        "pctPixelsDelta_gt3": 40.8
+      }
+    ]
+  },
+  "緑青": {
+    "recededCount": 15,
+    "frameMaxDelta": 112,
+    "framePctGt8": 7.44,
+    "per": [
+      {
+        "w": "単なる",
+        "op": 0.052,
+        "box": "67x26",
+        "maxChannelDelta": 92,
+        "meanDelta": 12.08,
+        "pctPixelsDelta_gt8": 24.4,
+        "pctPixelsDelta_gt3": 49.5
+      },
+      {
+        "w": "万一",
+        "op": 0.063,
+        "box": "60x35",
+        "maxChannelDelta": 112,
+        "meanDelta": 10.75,
+        "pctPixelsDelta_gt8": 19.3,
+        "pctPixelsDelta_gt3": 39.9
+      },
+      {
+        "w": "武器",
+        "op": 0.035,
+        "box": "32x18",
+        "maxChannelDelta": 29,
+        "meanDelta": 8.74,
+        "pctPixelsDelta_gt8": 42,
+        "pctPixelsDelta_gt3": 63.5
+      },
+      {
+        "w": "納める",
+        "op": 0.047,
+        "box": "92x37",
+        "maxChannelDelta": 91,
+        "meanDelta": 10.65,
+        "pctPixelsDelta_gt8": 22.1,
+        "pctPixelsDelta_gt3": 31.8
+      },
+      {
+        "w": "取り上げる",
+        "op": 0.067,
+        "box": "112x28",
+        "maxChannelDelta": 107,
+        "meanDelta": 17.34,
+        "pctPixelsDelta_gt8": 30.2,
+        "pctPixelsDelta_gt3": 50.4
+      },
+      {
+        "w": "印刷",
+        "op": 0.039,
+        "box": "61x36",
+        "maxChannelDelta": 112,
+        "meanDelta": 15.91,
+        "pctPixelsDelta_gt8": 28.1,
+        "pctPixelsDelta_gt3": 39.7
+      }
+    ]
+  },
+  "夜": {
+    "recededCount": 15,
+    "frameMaxDelta": 144,
+    "framePctGt8": 9.52,
+    "per": [
+      {
+        "w": "単なる",
+        "op": 0.052,
+        "box": "68x27",
+        "maxChannelDelta": 79,
+        "meanDelta": 17.14,
+        "pctPixelsDelta_gt8": 45.5,
+        "pctPixelsDelta_gt3": 89.6
+      },
+      {
+        "w": "万一",
+        "op": 0.063,
+        "box": "60x35",
+        "maxChannelDelta": 122,
+        "meanDelta": 15.83,
+        "pctPixelsDelta_gt8": 28.8,
+        "pctPixelsDelta_gt3": 57.3
+      },
+      {
+        "w": "武器",
+        "op": 0.035,
+        "box": "32x18",
+        "maxChannelDelta": 51,
+        "meanDelta": 16.92,
+        "pctPixelsDelta_gt8": 52.8,
+        "pctPixelsDelta_gt3": 69.6
+      },
+      {
+        "w": "納める",
+        "op": 0.047,
+        "box": "92x36",
+        "maxChannelDelta": 140,
+        "meanDelta": 13.91,
+        "pctPixelsDelta_gt8": 21.6,
+        "pctPixelsDelta_gt3": 27.6
+      },
+      {
+        "w": "取り上げる",
+        "op": 0.067,
+        "box": "112x27",
+        "maxChannelDelta": 90,
+        "meanDelta": 17.82,
+        "pctPixelsDelta_gt8": 52.4,
+        "pctPixelsDelta_gt3": 90.7
+      },
+      {
+        "w": "印刷",
+        "op": 0.039,
+        "box": "61x36",
+        "maxChannelDelta": 139,
+        "meanDelta": 19.02,
+        "pctPixelsDelta_gt8": 26.8,
+        "pctPixelsDelta_gt3": 36.6
+      }
+    ]
+  }
+}

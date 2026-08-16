@@ -55,3 +55,15 @@ prototypes/bunki-sites-v11/.sites-runtime/
 # state, never a build input. Scoped to worktrees/ rather than all of .claude/
 # so real project config under .claude/ stays committable.
 .claude/worktrees/
+.venv/
+__pycache__/
+
+# Transient CDP probes written by harness/hunt agents — never committed
+prototypes/corridor/tools/.probe-*.mjs
+prototypes/corridor/tools/.shot-*.mjs
+prototypes/corridor/tools/.demo-*.mjs
+
+# Deno writes a lockfile into the repo root when the design-round WGSL
+# harness runs (Deno+lavapipe verifies the WebGPU engine in stroke-art-v5).
+# The repo has no Deno project; the lockfile is container-tooling residue.
+deno.lock

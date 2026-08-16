@@ -1,0 +1,82 @@
+Round 3 — raw log, verifier's own runs at 49091bd.
+
+METHOD NOTE: verify-drift-hunt drives #drift-layer (the corridor fusion), and
+49091bd does not commit a regenerated layer. build-drift-layer.mjs was run first;
+the built layer was confirmed to carry the new rule
+(grep -c "hubAt(e.clientX,e.clientY)) pn=null" prototypes/corridor/drift-layer.js -> 1)
+and the regenerated files were discarded afterwards.
+
+=== verify-drift-hunt x3 ===
+run 1: ALL HUNT REGRESSIONS GREEN  (0 fails)
+  ok  a release on a hub sun releases the constellation instead of diving
+      hub "見" at (104,296) · held "外出" -> ctr null, depth ""
+  ok  hub release cannot hijack a gesture or leave themed ghost satellites
+      terminal 236px: depth="", centre="外出", sats=14->14, same identities=true;
+      deliberate release ctr="外出"->"null"; second-tap depth="日"; after theme+surface centre="null", sats=0
+
+run 2: 2 HUNT REGRESSION(S) FAILING
+  ok  a release on a hub sun ...  hub "日" at (284,416) · held "外出" -> ctr null, depth ""
+  ok  hub release cannot hijack ...
+  FAIL a corpus-backed semantic member is staged, hit-testable DOM interaction
+  FAIL a kana-only semantic word grows a meaningful same-level fallback constellation
+
+run 3: 2 HUNT REGRESSION(S) FAILING
+  ok  a release on a hub sun ...  hub "日" at (284,416) · held "増加" -> ctr null, depth ""
+  ok  hub release cannot hijack ...
+  FAIL a corpus-backed semantic member is staged, hit-testable DOM interaction
+  FAIL a kana-only semantic word grows a meaningful same-level fallback constellation
+
+HUB CLUSTER: 0 fails in 3 of 3 runs. Totals 0 / 2 / 2, inside {0-2}.
+build-drift-layer: 12 patches, all asserted unique, no adjustment (both rebuilds).
+
+
+=== verify-v11 x1 ===
+census: 36 words · 5 ghosted · rawWorstOverlap=0.909 · minGhostOp=0.327 minPresentOp=0.327
+21/21 checks passed.  ERRORS: none.
+  law-rest-reachable: pointer-events:none on 0; ghosts not under a hub with no
+    reachable point: 0; live tap on ghost "単なる" (op 0.327) ->
+    {"collide":1,"isFocus":true,"hl":false,"unfolded":true};
+    0 ghost(s) standing on a galaxy sun
+  law-zoom-presence: faintest ghost 0.327 vs faintest unarbitrated 0.3266;
+    pointer-events:none on 0; ghosts out of reach with nothing over them: 0;
+    0 yielding to a galaxy sun
+  4-rest-contention:  0 arbitrable · left standing 4 too-quiet-to-win + 1 ghost-over-ghost
+  4-zoom-contention:  0 arbitrable · left standing 3 too-quiet-to-win + 8 ghost-over-ghost
+
+
+=== verifier CDP tap probes (probe9 / probe10) ===
+runtime: ghostFloor=0.327, GHOST_REL defined = false  (constant confirmed deleted)
+
+1  ghost in OPEN WATER promotes
+   万一 seqId 3 at (44,270), op 0.327, collide 0
+   -> isFocus true, unfolded true, op 0.940, collide 1, stack 0        PASS
+
+2a ghost ON A HUB, the door answers
+   刑事 seqId 121 at (44,278), collide 0, hub present
+   -> stack 0 -> 1, depth "" -> "事"; ghost isFocus false, unfolded false   PASS
+
+3  FULL-PRESENCE word on a hub keeps its tap
+   見舞い seqId 79 at (20,162), op 0.710, collide 1
+   -> ctr "見舞い", isFocus true, unfolded true, stack UNCHANGED (no dive)   PASS
+   (this is the run-5 outlier signature, reproduced deliberately)
+
+2b THE ROUND-2 REGRESSION SCENARIO — bloom held, dimmed word on a hub
+   seed tap 流れる -> focus 14, ctr 流れる, lockOn false
+   19 grid points on hubs owned by words painted at/below the floor
+   稼ぐ seqId 70 at (68,506): rendered op 0.111, collide 1, isMember false, isCentre false
+     ^^ arbitration suspended by the bloom: the FLAG says 1, the PIXELS say 0.111.
+        A collide-keyed rule misses exactly this. The rendered-opacity rule does not.
+   -> release: focus 14 -> 0, ctr null, stack 0, depth ""
+      constellation freed; 稼ぐ did NOT eat the release                  PASS
+
+
+=== CONTEND_MAX mutant, rebuilt by the verifier (0.53 -> 0.95) ===
+census: 36 words · 12 ghosted  (vs 5 on the shipped constant)
+19/21 checks passed   [they report 20/21]
+  FAIL law-rest-reachable  ghosts not under a hub with no reachable point: 2
+       知合い op 0.327 onScreenPts 5 openPts 0 · 煮える op 0.327 onScreenPts 25 openPts 0
+  FAIL law-ghost-residual  ghost mean Δ 12.16/7.29/23.94 (max 66/26/74)
+       kept controls mean Δ 16.57/18.98/30.79 — bar ≥50% of quietest kept (16.57)
+Mechanism: winMin = floor/CONTEND_MAX drops 0.616 -> 0.344, so many more words
+qualify to take someone's water; the surplus ghosts end up buried and below the
+residual bar. The constant is falsifiable — on two checks here, not one.
