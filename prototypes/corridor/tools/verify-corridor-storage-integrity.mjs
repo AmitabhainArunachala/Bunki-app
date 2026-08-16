@@ -67,6 +67,7 @@ function state(overrides = {}) {
     aiReadings: [],
     suspended: {},
     aiChat: [],
+    ai: {},
     stats: {},
     readDone: {},
     readerPos: {},
@@ -268,6 +269,7 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
     aiReadings: [{ text: '海へ行く。', lv: 'N5', ts: 10 }],
     suspended: { 'word:波': 10 },
     aiChat: [{ role: 'user', text: '海' }],
+    ai: { baseUrl: 'https://example.invalid', model: 'test-model' },
     stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
     readDone: { article: 10 },
     readerPos: { article: 120 },
@@ -280,6 +282,8 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   assert.equal(storeContext.S.storeReadOnly, false);
   assert.equal(storeContext.S.taken[0].id, '海');
   assert.equal(storeContext.S.srs['word:海'].state, 2);
+  assert.equal(storeContext.S.ai.baseUrl, 'https://example.invalid');
+  assert.equal(storeContext.S.ai.model, 'test-model');
   assert.equal(storeContext.S.storeExtras.futureField.nested[0], 'preserved');
   assert.equal(storeContext.localStorage.writes, 0);
 });
@@ -380,6 +384,9 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['aiChat root', { v: 1, aiChat: {} }],
     ['aiChat nested turn', { v: 1, aiChat: [null] }],
     ['aiChat nested role', { v: 1, aiChat: [{ role: [], text: '' }] }],
+    ['ai root', { v: 1, ai: [] }],
+    ['ai nested baseUrl', { v: 1, ai: { baseUrl: 1 } }],
+    ['ai nested model', { v: 1, ai: { model: '' } }],
     ['stats root', { v: 1, stats: [] }],
     ['stats nested day', { v: 1, stats: { day: [] } }],
     ['stats nested count', { v: 1, stats: { day: { n: 'one' } } }],

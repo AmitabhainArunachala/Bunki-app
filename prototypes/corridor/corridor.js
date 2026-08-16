@@ -532,10 +532,17 @@ const S = {
   /** cards resting outside the review cycle: { 't:id': ts } — Anki's
    * suspend, simplified. The item stays on its list; reviews skip it. */
   suspended: {},
-  /** the conversation with the tutor: [{ role: 'user'|'tutor', text }] */
+  /** the conversation with the tutor: [{ role: 'user'|'tutor', text }] —
+   * the bounded request window; the full transcript lives in the archive */
   aiChat: [],
+  /** provider seam: optional { baseUrl, model } overrides for the AI door.
+   * Empty means the built-in defaults at AI_DEFAULT_*; store-durable so a
+   * future settings surface (or an imported record) can carry the choice. */
+  ai: {},
   /** a running tutor quiz: { qs, ix, picked, correct } — in-memory only */
   aiQuiz: null,
+  /** how many chat turns the log unfolds before 前の会話 — session-only */
+  aiChatShown: null,
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
    * from the first graded card onward; nothing is backfilled or invented */
   stats: {},
@@ -588,6 +595,7 @@ const STORE_KNOWN_KEYS = [
   'aiReadings',
   'suspended',
   'aiChat',
+  'ai',
   'stats',
   'readDone',
   'readerPos',
@@ -781,6 +789,15 @@ function validChatTurn(turn) {
   );
 }
 
+function validAiConfig(config) {
+  return (
+    plainRecord(config) &&
+    optional(config, 'baseUrl', nonEmptyString) &&
+    optional(config, 'model', nonEmptyString) &&
+    safeJsonValue(config)
+  );
+}
+
 function validStats(stats) {
   if (!plainRecord(stats) || !safeJsonValue(stats)) return false;
   return Object.entries(stats).every(([key, value]) => {
@@ -815,6 +832,7 @@ const STORE_ROOT_VALIDATORS = {
   suspended: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
   aiChat: (value) => Array.isArray(value) && value.every(validChatTurn),
+  ai: validAiConfig,
   stats: validStats,
   readDone: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
@@ -963,6 +981,7 @@ function loadStore() {
   if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
   if (plainRecord(s.suspended)) S.suspended = s.suspended;
   if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
+  if (plainRecord(s.ai)) S.ai = s.ai;
   if (plainRecord(s.stats)) S.stats = s.stats;
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
@@ -991,6 +1010,7 @@ function storeEnvelope(state) {
     aiReadings: state.aiReadings.slice(0, 10),
     suspended: state.suspended,
     aiChat: state.aiChat.slice(-24),
+    ai: state.ai || {},
     stats: state.stats,
     readDone: state.readDone,
     readerPos: state.readerPos,
@@ -4171,6 +4191,7 @@ async function aiQuizStart() {
   const raw = await aiAsk(
     'You write a short quiz inside a Japanese-learning app. Output ONLY a JSON array, no prose, no markdown fences. Five items, each exactly {"q": string, "opts": [4 strings], "right": 0-3, "why": string}. Each q is one short Japanese question or cloze sentence (with readings in parentheses for kanji above the learner\'s level) testing one of the given words in context; opts are four plausible answers in Japanese or English; right is the index of the correct one; why is one short English sentence explaining it. Vary the words tested.',
     `Learner level: about JLPT ${aiLevelGuess()}. Words to test: ${words.join('、')}.`,
+    { surface: 'quiz' },
   );
   const qs = aiQuizParse(raw);
   if (!qs) throw new Error('shape');
@@ -4238,14 +4259,62 @@ function renderAiQuiz(main) {
 /* You speak to it — the operator's words. A small conversation with the
  * tutor on its own page: it knows your rough level and answers as a
  * teacher inside this app, not a search engine. The exchange is kept on
- * the device (last 24 turns), like everything else here. */
+ * the device. The visible log renders from the durable archive — the old
+ * 24-turn cap governs only the request window (and the localStorage
+ * fallback), so turn 25 no longer destroys turn 1. */
+const AI_CHAT_PAGE = 40; // turns unfolded per 前の会話 step
+const aiChatLog = { turns: null, loading: false };
+
+/** The log the chat renders: the archive once hydrated, else the store. */
+function aiChatTurns() {
+  return aiChatLog.turns || S.aiChat;
+}
+
+/** Hydrate the session's chat log from the archive, once. On the archive's
+ * first-ever open, what survives of the old capped store seeds it — the
+ * honest floor; turns the cap already destroyed are not backfilled. */
+function aiChatHydrate() {
+  if (aiChatLog.turns || aiChatLog.loading) return;
+  aiChatLog.loading = true;
+  aiLogAll('chat').then((rows) => {
+    aiChatLog.loading = false;
+    if (rows.length) {
+      aiChatLog.turns = rows.map((r) => ({ role: r.role === 'user' ? 'user' : 'tutor', text: r.content }));
+    } else {
+      aiChatLog.turns = S.aiChat.map((t) => ({ role: t.role, text: t.text }));
+      const { model } = aiProvider();
+      for (const t of aiChatLog.turns) {
+        aiLogAppend({ surface: 'chat', role: t.role, content: t.text, model, ts: Date.now() });
+      }
+    }
+    // repaint only when the archive held more than the fallback window was
+    // already showing — a same-length repaint would eat a half-typed draft
+    if (S.view === 'ai' && aiChatLog.turns.length !== S.aiChat.length) render();
+  });
+}
+
 function renderAiChat(main) {
+  aiChatHydrate();
+  const turns = aiChatTurns();
   main.append(withEn(el('p', 'eyebrow', '先生と話す'), 'talk with the tutor', 'en-inline'));
   const log = el('div', 'chat-log');
-  for (const turn of S.aiChat) {
+  // the whole transcript is at hand; the page renders the recent window and
+  // unfolds earlier turns on request instead of re-inking hundreds at once
+  const from = Math.max(0, turns.length - (S.aiChatShown || AI_CHAT_PAGE));
+  if (from > 0) {
+    const earlier = biLabel('button', 'chip chat-earlier', '前の会話', 'show earlier');
+    earlier.type = 'button';
+    earlier.id = 'chat-earlier';
+    earlier.addEventListener('click', () => {
+      S.aiChatShown = (S.aiChatShown || AI_CHAT_PAGE) + AI_CHAT_PAGE;
+      render();
+    });
+    log.append(earlier);
+  }
+  for (const turn of turns.slice(from)) {
     log.append(el('p', turn.role === 'user' ? 'chat-turn me' : 'chat-turn tutor', turn.text));
   }
-  if (!S.aiChat.length) {
+  if (!turns.length) {
     log.append(
       el(
         'p',
@@ -4271,6 +4340,7 @@ function renderAiChat(main) {
     const text = input.value.trim();
     if (!text || send.disabled) return;
     S.aiChat.push({ role: 'user', text });
+    if (aiChatLog.turns) aiChatLog.turns.push({ role: 'user', text });
     saveStore();
     input.value = '';
     send.disabled = true;
@@ -4278,15 +4348,22 @@ function renderAiChat(main) {
     log.append(thinking);
     thinking.scrollIntoView({ block: 'nearest' });
     try {
+      // the REQUEST window stays bounded; the durable archive holds the whole
       const turns = S.aiChat.slice(-8).map((t) => ({ role: t.role === 'user' ? 'user' : 'assistant', content: t.text }));
       const reply = await aiConverse(
         `You are the tutor inside a Japanese-learning app. The learner reads at about JLPT ${aiLevelGuess()}. Answer as a patient teacher in under 130 words of plain text — no headers, no markdown. Use Japanese the learner can read at their level (add readings in parentheses for hard kanji), and English where it helps. If asked something outside Japanese language or study, gently steer back.`,
         turns,
+        { surface: 'chat' },
       );
       S.aiChat.push({ role: 'tutor', text: reply });
+      if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: reply });
       saveStore();
     } catch {
-      S.aiChat.push({ role: 'tutor', text: tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.') });
+      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      S.aiChat.push({ role: 'tutor', text: line });
+      if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: line });
+      // the app's own line rides the archive too, marked as the app's
+      aiLogAppend({ surface: 'chat', role: 'app', content: line, model: aiProvider().model, ts: Date.now() });
     }
     send.disabled = false;
     S.sheetFocus = 'chat-input';
@@ -7775,35 +7852,171 @@ function aiLevelGuess() {
   for (const [l, c] of Object.entries(counts)) if (c > n) { best = l; n = c; }
   return best;
 }
-async function aiConverse(system, messages) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': aiKey(),
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-opus-5',
-      max_tokens: 1024,
-      output_config: { effort: 'low' },
-      system,
-      messages,
-    }),
+/* The provider seam (ledger: "provider lock-in"): endpoint and model are
+ * data with defaults, not code. S.ai carries optional durable { baseUrl,
+ * model } overrides — no UI yet; the validated store key is the contract. */
+const AI_DEFAULT_BASE_URL = 'https://api.anthropic.com';
+const AI_DEFAULT_MODEL = 'claude-opus-5';
+/** One request budget, mirroring packages/ai/src/runtime.ts
+ * DEFAULT_TIMEOUT_MS (controller §9): ten seconds, enforced by aborting the
+ * in-flight request — never by racing a promise and walking away from a
+ * live socket. A stalled request used to leave 考え中… on screen until the
+ * browser gave up the socket; now it takes each caller's quiet failure line. */
+const AI_TIMEOUT_MS = 10000;
+function aiProvider() {
+  const config = plainRecord(S.ai) ? S.ai : {};
+  return {
+    baseUrl: nonEmptyString(config.baseUrl) ? config.baseUrl : AI_DEFAULT_BASE_URL,
+    model: nonEmptyString(config.model) ? config.model : AI_DEFAULT_MODEL,
+  };
+}
+
+/* --------------------------------------------------- AIの記録 (the archive)
+ * "Not a word is lost" (ledger P1): every learner message and every reply,
+ * on every AI surface, lands in an append-only IndexedDB archive — beside
+ * the localStorage envelope, whose quota whole transcripts would eat. The
+ * archive is memory, never authority: nothing here grades, schedules, or
+ * touches FSRS state. And it must never cost a conversation — a failed
+ * write is swallowed and counted (the storage layer's never-block posture),
+ * the call itself proceeds. Rows are
+ * { surface, role: 'user'|'assistant'|'tutor'|'app', content, model, ts,
+ *   contextRef? } — 'app' marks the app's own quiet failure line, 'tutor'
+ * marks turns migrated from the old capped chat store, whose provenance
+ * (reply or failure line) the old shape never recorded. */
+const AI_LOG_DB = 'kairo-ai-log';
+const AI_LOG_TURNS = 'turns';
+let aiLogDbPromise = null;
+let aiLogDropped = 0; // turns the archive could not keep — honesty counter
+
+function aiLogOpen() {
+  if (aiLogDbPromise) return aiLogDbPromise;
+  aiLogDbPromise = new Promise((done) => {
+    try {
+      const req = indexedDB.open(AI_LOG_DB, 1);
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains(AI_LOG_TURNS)) {
+          req.result.createObjectStore(AI_LOG_TURNS, { keyPath: 'id', autoIncrement: true });
+        }
+      };
+      req.onsuccess = () => done(req.result);
+      req.onerror = () => done(null); // private mode etc. — the call goes on
+      req.onblocked = () => done(null);
+    } catch {
+      done(null);
+    }
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const data = await res.json();
+  return aiLogDbPromise;
+}
+
+/** Append one turn. Fire-and-forget on the request path — the returned
+ * promise (true = durably written) exists for the verification suites. */
+async function aiLogAppend(row) {
+  try {
+    const db = await aiLogOpen();
+    if (!db) {
+      aiLogDropped += 1;
+      return false;
+    }
+    return await new Promise((done) => {
+      const t = db.transaction(AI_LOG_TURNS, 'readwrite');
+      t.objectStore(AI_LOG_TURNS).add(row);
+      t.oncomplete = () => done(true);
+      t.onabort = t.onerror = () => {
+        aiLogDropped += 1;
+        done(false);
+      };
+    });
+  } catch {
+    aiLogDropped += 1;
+    return false;
+  }
+}
+
+/** Every archived turn, oldest first — optionally one surface's. */
+async function aiLogAll(surface) {
+  try {
+    const db = await aiLogOpen();
+    if (!db) return [];
+    return await new Promise((done) => {
+      const rows = [];
+      const t = db.transaction(AI_LOG_TURNS, 'readonly');
+      const walk = t.objectStore(AI_LOG_TURNS).openCursor();
+      walk.onsuccess = () => {
+        const cursor = walk.result;
+        if (!cursor) {
+          done(rows);
+          return;
+        }
+        if (!surface || cursor.value.surface === surface) rows.push(cursor.value);
+        cursor.continue();
+      };
+      t.onabort = t.onerror = () => done(rows);
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function aiConverse(system, messages, meta = {}) {
+  const { baseUrl, model } = aiProvider();
+  const surface = meta.surface || 'ai';
+  const ref = meta.ref ? { contextRef: meta.ref } : {};
+  // the outbound delta: everything after the last assistant turn is new ink —
+  // earlier turns were archived when they were first sent or received
+  let newFrom = messages.length;
+  while (newFrom > 0 && messages[newFrom - 1].role !== 'assistant') newFrom -= 1;
+  for (const m of messages.slice(newFrom)) {
+    aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), ...ref });
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+  let data;
+  try {
+    // one budget covers headers AND body — a stalled stream is the same stall
+    const res = await fetch(`${baseUrl}/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': aiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1024,
+        output_config: { effort: 'low' },
+        system,
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    data = await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
   if (data.stop_reason === 'refusal') throw new Error('refusal');
-  return (data.content || [])
+  const reply = (data.content || [])
     .filter((b) => b.type === 'text')
     .map((b) => b.text)
     .join('')
     .trim();
+  aiLogAppend({ surface, role: 'assistant', content: reply, model, ts: Date.now(), ...ref });
+  return reply;
 }
-async function aiAsk(system, prompt) {
-  return aiConverse(system, [{ role: 'user', content: prompt }]);
+async function aiAsk(system, prompt, meta = {}) {
+  return aiConverse(system, [{ role: 'user', content: prompt }], meta);
 }
+
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * read-only access to the archive, the provider seam, and the budget, so
+ * acceptance checks exercise the real code instead of a re-implementation. */
+window.__KAIRO_AI__ = Object.freeze({
+  logAll: (surface) => aiLogAll(surface),
+  dropped: () => aiLogDropped,
+  provider: () => aiProvider(),
+  timeoutMs: AI_TIMEOUT_MS,
+});
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (!aiKey()) return;
@@ -7819,6 +8032,7 @@ function renderAiTutor(sheet, node, rec) {
       out.textContent = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use, pitched to the learner\'s level, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}. Learner level: about JLPT ${aiLevelGuess()}.`,
+        { surface: 'word-tutor', ref: `word:${node.id}` },
       );
     } catch {
       out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
@@ -7852,6 +8066,7 @@ function renderAiExamples(sheet, node, rec) {
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write natural example sentences for the given word across a range of JLPT levels, from N5 up to the word\'s own level, easiest first, 6 to 8 sentences. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. The word's JLPT level: ${wordLv}. Dictionary senses: ${senses || 'none recorded'}.`,
+        { surface: 'examples', ref: `word:${node.id}` },
       );
       out.textContent = '';
       let shown = 0;
@@ -7900,6 +8115,7 @@ function renderAiCoach(main, rv) {
       out.textContent = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Learner level: about JLPT ${aiLevelGuess()}. Session grades:\n${lines.join('\n')}`,
+        { surface: 'coach' },
       );
     } catch {
       out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
@@ -7958,6 +8174,7 @@ function renderAiReading(main) {
       const text = await aiAsk(
         'You write one short Japanese reading passage inside a learning app. Output ONLY the passage: four to six short sentences of natural Japanese. No title, no translation, no romaji, no commentary, no markdown. Keep vocabulary and grammar at or below the JLPT level the user names. Immediately after every word written with kanji, give its reading in hiragana inside full-width parentheses, like 学校（がっこう） or 食べる（たべる）. Use full-width parentheses for readings and for nothing else.',
         `Level: JLPT ${aiLevelGuess()}. A small scene from everyday life, quietly pleasant.${woven.length ? ` If it stays natural, weave in a few of these words the learner is memorizing: ${woven.join('、')}.` : ''}`,
+        { surface: 'reading' },
       );
       // a model may emit a literal backslash-n; never show it as ink.
       // The reading being replaced joins the shelf of earlier ones.
