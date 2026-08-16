@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "kind": "feed-gate-verification",
   "artifactHashes": {
-    "index": "5e023d8ad7256a2d29a41c8860b83b80831854fda6d59e1c94318b7c6a3a0761",
-    "archiveIndex": "bf945b550c96d9fef914e7d4c578736ef3e9cbe7ca2704ac54db6676b5a471a1",
-    "queue": "73d6f012840f0e71374bc167bad6b164e72dcec455654bf1f732dbd89a805482",
+    "index": "016f0fd45b565a450de387c43cb2b112c66da11f79715b40a33d4c8ade1f6e0f",
+    "archiveIndex": "4683c645e35d6c675cd2ab9ecc51b65cee053ae725832d17380988f10ac08d88",
+    "queue": "9bc756201ce505293d4e4f78dca31047b325742db0e2be0d553a0a243ab05369",
     "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
     "curationReport": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb",
-    "standalone": "0c459ff609f5eeb69b1eeada3b63f5858e667f28dbe9a1cfa76bc7f8e6345926"
+    "standalone": "36b3c291bdc11bd49c1c2107177bfe38597e518fbb909cdaac1e90af919b04db"
   },
   "counts": {
     "curated": 82,
     "archive": 682,
-    "queueRows": 14,
+    "queueRows": 44,
     "pendingMints": 12,
     "approvedMints": 0,
     "cullProposals": 2
@@ -21,7 +21,7 @@
     {
       "name": "the review queue is a JSON array",
       "pass": true,
-      "detail": "14 rows"
+      "detail": "44 rows"
     },
     {
       "name": "every queue row carries the full schema (id/kind/title/titleEn/lane/licence/gradingSummary/addedAt/decision)",

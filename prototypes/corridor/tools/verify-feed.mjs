@@ -38,7 +38,7 @@ const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
 
 const PRE_FEED_SHELF = 70; // the curated shelf the feed inherited (40 + recovered 30)
 const TITLE_EN_SOURCE = 'renkan-ai-2026-08';
-const KINDS = new Set(['mint', 'cull']);
+const KINDS = new Set(['mint', 'cull', 'legacy']);
 const DECISIONS = new Set(['pending', 'approved', 'rejected']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const FORBIDDEN_LICENCE = /\bNC\b|\bND\b|Non-?Commercial|No-?Deriv/i;
@@ -92,7 +92,7 @@ for (const row of queue) {
   if (!KINDS.has(row.kind)) problems.push('kind');
   if (!DECISIONS.has(row.decision)) problems.push('decision');
   if (typeof row.title !== 'string' || !row.title) problems.push('title');
-  if (row.kind === 'mint' && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
+  if ((row.kind === 'mint' || row.kind === 'legacy') && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
     problems.push('titleEn');
   if (typeof row.lane !== 'string') problems.push('lane');
   if (typeof row.licence !== 'string') problems.push('licence');
@@ -128,7 +128,7 @@ check(
   `${curated.length} = ${PRE_FEED_SHELF} + ${liveMints.length}`,
 );
 const orphanFeedRows = curated.filter(
-  (row) => row.titleEnSource === TITLE_EN_SOURCE && !mintRows.some((mint) => mint.id === row.id),
+  (row) => row.titleEnSource === TITLE_EN_SOURCE && !queue.some((entry) => entry.id === row.id),
 );
 check('no feed-authored row stands outside the queue — nothing minted without review cover', orphanFeedRows.length === 0, orphanFeedRows.map((row) => row.id).join(', '));
 
@@ -137,7 +137,7 @@ const selfApproved = curated.filter(
   (row) =>
     row.titleEnSource === TITLE_EN_SOURCE &&
     row.review !== 'human-review-pending' &&
-    mintRows.find((mint) => mint.id === row.id)?.decision !== 'approved',
+    queue.find((entry) => entry.id === row.id)?.decision !== 'approved',
 );
 check('nothing self-approves — review lifts only where the queue says approved', selfApproved.length === 0, selfApproved.map((row) => row.id).join(', '));
 const pendingMarks = curated.filter(

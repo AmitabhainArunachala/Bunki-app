@@ -615,8 +615,9 @@ try {
   const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
   check(
     'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
-    reviewRows.length === IDS.length && jaUnmarked.length === 0,
-    jaUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+    reviewRows.length >= IDS.length && jaUnmarked.length === 0,
+    jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
+      `${reviewRows.length} pending rows marked`,
   );
   const biNoiseBefore = noise.length;
   await page.goto(`${base}/index.html?entry=shelf&ui=bi&cachebust=${Date.now()}`, {
