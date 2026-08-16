@@ -20,4 +20,7 @@ close without operator word are appended below with named rationale.
 
 ## Appended during campaign
 
-_(none yet)_
+| #     | Decision                                                       | State   | Proposal doc                         |
+| ----- | -------------------------------------------------------------- | ------- | ------------------------------------ |
+| OD-9  | Ratify ADR-004 (one learner state by contract parity — T2)     | pending | `docs/adr/ADR-004-one-learner-state.md` |
+| OD-10 | Drift in-water grading now blocks when the store is quarantined read-only (constitution-consistent; feel-check the behavior) | pending | RUN_STATE round 1, A1a concern |
