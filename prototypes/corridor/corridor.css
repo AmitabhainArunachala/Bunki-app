@@ -1013,6 +1013,11 @@ button.tok::before {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+  /* the expansion only wins where no real token box is: a negative
+   * layer paints behind every in-flow neighbour, so a centre tap always
+   * belongs to the glyph under the finger (C1 finding), while the space
+   * around the line still hands its taps to the nearest target. */
+  z-index: -1;
 }
 
 /* All content tokens carry the same baseline box before and after English is
