@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 08:16",
+          "2026-08-16 08:17",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 08:21",
+          "2026-08-16 08:22",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 08:25",
+          "2026-08-16 08:26",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 9 d",
-          "2026-08-25 08:15",
+          "in 8 d",
+          "2026-08-24 08:16",
           "8.30"
         ]
       ]
@@ -176,8 +176,8 @@
       "step": 6,
       "name": "return",
       "shot": "06-return-to-place.png",
-      "scrollBefore": 288,
-      "scrollAfter": 288
+      "scrollBefore": 287,
+      "scrollAfter": 287
     }
   ],
   "measurements": {
@@ -382,9 +382,9 @@
       {
         "text": "戻るback",
         "w": 54,
-        "h": 47,
+        "h": 44,
         "hitW": 54,
-        "hitH": 47,
+        "hitH": 44,
         "id": "back"
       },
       {
@@ -405,26 +405,18 @@
       },
       {
         "text": "日本語",
-        "w": 54,
+        "w": 55,
         "h": 44,
-        "hitW": 54,
+        "hitW": 55,
         "hitH": 44,
         "id": ""
       },
       {
-        "text": "覚えるmemorize",
-        "w": 80,
-        "h": 44,
-        "hitW": 80,
-        "hitH": 44,
-        "id": "reader-take"
-      },
-      {
         "text": "覚 1lists",
         "w": 52,
-        "h": 47,
+        "h": 44,
         "hitW": 52,
-        "hitH": 47,
+        "hitH": 44,
         "id": "tray"
       },
       {
@@ -7076,9 +7068,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 642,
+  "loadMs": 679,
   "summary": {
-    "total": 133,
+    "total": 129,
     "failed": 0
   },
   "results": [
@@ -7105,7 +7097,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.75999450683594,\"y\":570.4299926757812,\"productive\":true}"
+      "detail": "{\"x\":148.33999633789062,\"y\":570.1500244140625,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7125,7 +7117,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "70 texts, ready in 642 ms"
+      "detail": "70 texts, ready in 679 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7245,7 +7237,7 @@
     {
       "name": "grammar · a second tap sets English beneath — and the word does not move",
       "pass": true,
-      "detail": "gloss on, glyph bottom 432.1 → 432.1px"
+      "detail": "gloss on, glyph bottom 431.9 → 431.9px"
     },
     {
       "name": "grammar · the gloss collides with nothing — on any font, by construction",
@@ -7345,12 +7337,12 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 8 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
       "pass": true,
-      "detail": "scrollY 288 → 288, sheet closed=true"
+      "detail": "scrollY 287 → 287, sheet closed=true"
     },
     {
       "name": "variant A · mcd renders the target both ways",
@@ -7415,7 +7407,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "678 controls checked, including inline token hit regions"
+      "detail": "677 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -7575,7 +7567,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786868175670,\"probe\",\"word:刺繍\",1,1]"
+      "detail": "row [1786868274999,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -7660,92 +7652,72 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“刺繍” · 2 sentence lines · 5 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
-      "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
+      "name": "R2-A · fuzz is OFF in the live engine and matches the domain pin",
       "pass": true,
-      "detail": "{\"taken\":true,\"pressed\":\"true\"}"
+      "detail": "engine enable_fuzz=false · pin enableFuzz=false"
     },
     {
-      "name": "R2-B · un-memorize removes the active card; revlog and FSRS state stay whole",
+      "name": "R2-A · the pin names append-order-monotonic-clamp-v1",
       "pass": true,
-      "detail": "{\"taken\":0,\"revlog\":1,\"srsKept\":true}"
+      "detail": "append-order-monotonic-clamp-v1"
     },
     {
-      "name": "R2-B · the deck no longer offers the card — the tray stands honestly empty",
+      "name": "R2-A · the per-card scheduler instant clamps up to the anchor, never back",
       "pass": true,
-      "detail": "no review door on an empty deck"
+      "detail": "{\"behind\":true,\"forward\":true,\"first\":true}"
     },
     {
-      "name": "R2-B · a re-take resumes the schedule — same card state, no invented history",
+      "name": "R2-A · real dues come most-overdue first; started fresh after; legacy absent",
       "pass": true,
-      "detail": "{\"taken\":1,\"revlog\":1,\"reps\":1,\"due\":\"2020-01-01T00:00:00.000Z\"}"
+      "detail": "word:電話 → word:手帳 → word:学校 → word:大人"
     },
     {
-      "name": "R2-B · a list is born on the lists surface; empty and dupe names are told, not swallowed",
+      "name": "R2-A · the legacy row waits with one quiet 始める and an honest forecast",
       "pass": true,
-      "detail": "lists=[\"読書\"] · dupe hint \"that name already exists\""
+      "detail": "\"復習する — 4 件review now — 4 due\" · forecast \"today 3 · tomorrow 0 · this week 0 · new 1 · not started 1\""
     },
     {
-      "name": "R2-B · the new list survives a reload, on the surface and in the envelope",
+      "name": "R2-A · 始める promotes by hand — a mark in the row, never fabricated FSRS state",
       "pass": true,
-      "detail": "[\"読書\"]"
+      "detail": "\"復習する — 5 件review now — 5 due\" · started=true · srs minted=false"
     },
     {
-      "name": "R2-B · rename lives where the list lives and persists",
+      "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "[\"精読\"]"
+      "detail": "anchor held at 2026-08-19T08:18:24.164Z; due 2026-08-26T08:18:24.164Z"
     },
     {
-      "name": "R2-B · delete arms first, then fires — and never touches the learner history",
+      "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "armed={\"still\":1,\"armedBtn\":true} → {\"lists\":0,\"taken\":1,\"revlog\":1,\"srsKept\":true}"
+      "detail": "t=1786868305337 (raw, before the anchor) · elapsed=0"
     },
     {
-      "name": "R2-B · 覚える waits top-right of the reader, quiet until a word is touched",
+      "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
       "pass": true,
-      "detail": "{\"disabled\":true,\"pressed\":\"false\"}"
+      "detail": "button \"復習する — 28 件review now — 28 due\" · frozen 20 · deferred 8"
     },
     {
-      "name": "R2-B · touching a word arms the door with that word, in place",
+      "name": "R2-A · the goodbye screen carries the honest remainder — あと N, quietly",
       "pass": true,
-      "detail": "半島 — \"memorize 半島\""
+      "detail": "\"Session done — 20 cards\" · \"8 more waiting\""
     },
     {
-      "name": "R2-B · capture from the reader top-right lands in S.taken with its sentence ctx",
+      "name": "R2-A · ペース persists the learner's numbers and holds its bounds",
       "pass": true,
-      "detail": "{\"p\":\"wikinews:1403\",\"i\":30,\"scope\":\"sent\"}"
+      "detail": "stored {\"newPerDay\":0,\"reviewLimit\":10} · minus disabled at 0"
     },
     {
-      "name": "R2-B · the panel holds the undo, the scope stages, and the lists",
+      "name": "R2-A · the chosen pacing survives reboot and rules the queue",
       "pass": true,
-      "detail": "{\"take\":true,\"scopes\":3,\"lists\":true,\"newList\":true}"
+      "detail": "prefs {\"newPerDay\":0,\"reviewLimit\":10} · 5 due, no fresh admitted"
     },
     {
-      "name": "R2-B · a mis-tap leaves in one gesture; the revlog length never moves",
+      "name": "R2-A · the probes leave no console errors",
       "pass": true,
-      "detail": "{\"taken\":1,\"revlog\":1}"
-    },
-    {
-      "name": "R2-B · the mini takes the word in place — seal inked, sentence ctx stored, mini still up",
-      "pass": true,
-      "detail": "{\"id\":\"カ所\",\"scope\":\"sent\",\"sealTaken\":true,\"miniUp\":true}"
-    },
-    {
-      "name": "R2-B · the mini lets it go again — reversible where the state shows",
-      "pass": true,
-      "detail": "{\"taken\":1,\"sealTaken\":false}"
-    },
-    {
-      "name": "R2-B · the sentence page seal names the word it captures",
-      "pass": true,
-      "detail": "{\"present\":true,\"label\":\"memorize 半島\"}"
-    },
-    {
-      "name": "R2-B · taking from the sentence page mints the word card, reversibly marked",
-      "pass": true,
-      "detail": "{\"t\":\"word\",\"id\":\"半島\",\"pressed\":\"true\"}"
+      "detail": "clean"
     }
   ]
 }

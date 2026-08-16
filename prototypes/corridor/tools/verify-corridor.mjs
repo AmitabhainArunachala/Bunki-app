@@ -1978,6 +1978,211 @@ async function main() {
     sentCap.t === 'word' && sentCap.id === '半島' && sentCap.pressed === 'true',
     JSON.stringify(sentCap));
 
+  // ------------------- R2-A · one scheduler policy, ordered/bounded review,
+  // no-debt legacy migration, and the learner's own pacing (ADR-003)
+  console.log('\n— R2-A · scheduler policy, ordered/bounded review, no-debt legacy');
+  const errsBeforeR2A = consoleErrors.length;
+
+  // (a) fuzz is OFF, per the pin, and the clamp policy is the pin's
+  const policy = await page.evaluate(`window.__KAIRO_SRS__.policy()`);
+  check('R2-A · fuzz is OFF in the live engine and matches the domain pin',
+    policy.enableFuzz === false && policy.pinFuzz === false,
+    `engine enable_fuzz=${policy.enableFuzz} · pin enableFuzz=${policy.pinFuzz}`);
+  check('R2-A · the pin names append-order-monotonic-clamp-v1',
+    policy.reviewTimePolicyId === 'append-order-monotonic-clamp-v1',
+    String(policy.reviewTimePolicyId));
+
+  // (b) the clamp itself, on the real helper
+  const clampProbe = await page.evaluate(`(() => {
+    const T = 1700000000000;
+    const iso = (ms) => new Date(ms).toISOString();
+    const srs = window.__KAIRO_SRS__;
+    return {
+      behind: srs.schedulerInstant(iso(T + 5000), T) === iso(T + 5000),
+      forward: srs.schedulerInstant(iso(T - 5000), T) === iso(T),
+      first: srs.schedulerInstant(null, T) === iso(T),
+    };
+  })()`);
+  check('R2-A · the per-card scheduler instant clamps up to the anchor, never back',
+    clampProbe.behind && clampProbe.forward && clampProbe.first,
+    JSON.stringify(clampProbe));
+
+  // (c) due order + no-debt legacy: three overdue cards seeded out of order,
+  // one started fresh row, one legacy row with no mark and no card
+  await page.evaluate(`(() => {
+    const T = Date.now();
+    const iso = (ms) => new Date(ms).toISOString();
+    const card = (dueMs, lastMs) => ({ due: iso(dueMs), last_review: iso(lastMs), stability: 5, difficulty: 5, elapsed_days: 1, scheduled_days: 3, reps: 2, lapses: 0, learning_steps: 0, state: 2 });
+    const D = 86400000, H = 3600000;
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      taken: [
+        { t: 'word', id: '学校', label: '学校', ts: T - 9e6, started: T - 9e6 },
+        { t: 'word', id: '電話', label: '電話', ts: T - 8e6, started: T - 8e6 },
+        { t: 'word', id: '手帳', label: '手帳', ts: T - 7e6, started: T - 7e6 },
+        { t: 'word', id: '大人', label: '大人', ts: T - 6e6, started: T - 6e6 },
+        { t: 'word', id: '人々', label: '人々', ts: T - 5e6 },
+      ],
+      srs: {
+        'word:学校': card(T - 2 * H, T - D),
+        'word:電話': card(T - 3 * D, T - 4 * D),
+        'word:手帳': card(T - D, T - 2 * D),
+      },
+    }));
+  })()`);
+  await open('?entry=shelf');
+  const dueOrder = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
+  check('R2-A · real dues come most-overdue first; started fresh after; legacy absent',
+    JSON.stringify(dueOrder) === JSON.stringify(['word:電話', 'word:手帳', 'word:学校', 'word:大人']),
+    dueOrder.join(' → '));
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const trayBefore = await page.evaluate(`(() => ({
+    button: document.getElementById('review-start').textContent,
+    start: !!document.querySelector('[data-srs-start="word:人々"]'),
+    forecast: document.querySelector('.srs-forecast')?.textContent ?? '',
+  }))()`);
+  check('R2-A · the legacy row waits with one quiet 始める and an honest forecast',
+    /4/.test(trayBefore.button) && trayBefore.start && /not started 1|未着手 1/.test(trayBefore.forecast),
+    `"${trayBefore.button.trim()}" · forecast "${trayBefore.forecast}"`);
+  await page.locator('[data-srs-start="word:人々"]').click();
+  await page.waitForTimeout(300);
+  const trayAfter = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const row = e.taken.find((t) => t.id === '人々');
+    return {
+      button: document.getElementById('review-start').textContent,
+      started: typeof row.started === 'number',
+      srsMinted: Object.prototype.hasOwnProperty.call(e.srs || {}, 'word:人々'),
+    };
+  })()`);
+  check('R2-A · 始める promotes by hand — a mark in the row, never fabricated FSRS state',
+    /5/.test(trayAfter.button) && trayAfter.started && trayAfter.srsMinted === false,
+    `"${trayAfter.button.trim()}" · started=${trayAfter.started} · srs minted=${trayAfter.srsMinted}`);
+  await shoot(page, shotsDir, '19-r2a-no-debt-start');
+
+  // (d) a backward device clock: the card's anchor sits three days AHEAD of
+  // the wall clock (written when the clock ran fast). Grading must neither
+  // crash (ts-fsrs throws on negative day deltas) nor corrupt the schedule.
+  await page.evaluate(`(() => {
+    const T = Date.now();
+    const iso = (ms) => new Date(ms).toISOString();
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      taken: [{ t: 'word', id: '学校', label: '学校', ts: T, started: T }],
+      srs: {
+        'word:学校': { due: iso(T - 60000), last_review: iso(T + 3 * 86400000), stability: 6, difficulty: 5, elapsed_days: 0, scheduled_days: 3, reps: 3, lapses: 0, learning_steps: 0, state: 2 },
+      },
+    }));
+  })()`);
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const anchorIso = await page.evaluate(
+    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srs['word:学校'].last_review`,
+  );
+  await tap(page, '#review-start');
+  await page.waitForSelector('#reveal');
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade.g-good');
+  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  await page.waitForTimeout(400);
+  const backProbe = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const rec = e.srs['word:学校'];
+    const row = e.revlog[e.revlog.length - 1];
+    return { rec, row, summaryUp: (document.querySelector('.view-title')?.textContent ?? '').length > 0 };
+  })()`);
+  check('R2-A · a backward device clock cannot crash or corrupt grading',
+    backProbe.summaryUp &&
+      Date.parse(backProbe.rec.last_review) === Date.parse(anchorIso) &&
+      Date.parse(backProbe.rec.due) > Date.parse(backProbe.rec.last_review),
+    `anchor held at ${backProbe.rec.last_review}; due ${backProbe.rec.due}`);
+  check('R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed',
+    backProbe.row[1] === 'word:学校' && backProbe.row[2] === 3 &&
+      backProbe.row[0] < Date.parse(anchorIso) && backProbe.row[4] === 0 &&
+      backProbe.row[11] === Date.parse(backProbe.rec.due),
+    `t=${backProbe.row[0]} (raw, before the anchor) · elapsed=${backProbe.row[4]}`);
+
+  // (e) bounded standard review: 25 overdue cards + 3 started fresh rows;
+  // an ordinary sitting freezes 20 and says あと N on the goodbye screen
+  await page.evaluate(`(() => {
+    const T = Date.now();
+    const iso = (ms) => new Date(ms).toISOString();
+    const taken = [];
+    const srs = {};
+    for (let i = 0; i < 25; i++) {
+      const id = 'w' + String(i).padStart(2, '0');
+      taken.push({ t: 'word', id, label: id, ts: T - 1e6, started: T - 1e6 });
+      srs['word:' + id] = { due: iso(T - (i + 1) * 3600000), last_review: iso(T - 5 * 86400000), stability: 8, difficulty: 5, elapsed_days: 4, scheduled_days: 5, reps: 3, lapses: 0, learning_steps: 0, state: 2 };
+    }
+    for (const id of ['f1', 'f2', 'f3']) taken.push({ t: 'word', id, label: id, ts: T - 9e5, started: T - 9e5 });
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken, srs }));
+  })()`);
+  await open('?entry=shelf');
+  await page.waitForSelector('#tray');
+  await tap(page, '#tray');
+  await page.waitForSelector('#review-start');
+  const boundedBtn = await page.locator('#review-start').textContent();
+  await tap(page, '#review-start');
+  await page.waitForSelector('#reveal');
+  const session = await page.evaluate(`window.__KAIRO_SRS__.session()`);
+  check('R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest',
+    /28/.test(boundedBtn) && session.queue === 20 && session.deferred === 8,
+    `button "${boundedBtn.trim()}" · frozen ${session.queue} · deferred ${session.deferred}`);
+  for (let i = 0; i < 20; i++) {
+    await page.waitForSelector('#reveal', { timeout: 8000 });
+    await page.evaluate(`document.querySelector('#reveal')?.click()`);
+    await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
+    await page.evaluate(`document.querySelector('.grade.g-easy')?.click()`);
+    await page.waitForTimeout(120);
+  }
+  const boundedEnd = await page.evaluate(`(() => ({
+    title: document.querySelector('.view-title')?.textContent ?? '',
+    deferredLine: document.querySelector('.review-deferred')?.textContent ?? '',
+  }))()`);
+  check('R2-A · the goodbye screen carries the honest remainder — あと N, quietly',
+    /20/.test(boundedEnd.title) && /8/.test(boundedEnd.deferredLine),
+    `"${boundedEnd.title}" · "${boundedEnd.deferredLine}"`);
+  await shoot(page, shotsDir, '20-r2a-bounded-summary');
+
+  // (f) ペース: the learner's own numbers persist, hold their bounds, and
+  // rule the queue after a full reboot
+  await page.locator('button.take').first().click();
+  await page.waitForSelector('#srs-prefs-toggle');
+  await page.locator('#srs-prefs-toggle').click();
+  await page.waitForSelector('[data-pref-down="reviewLimit"]');
+  for (let i = 0; i < 2; i++) {
+    await page.locator('[data-pref-down="reviewLimit"]').click(); // 20 → 10
+    await page.waitForTimeout(160);
+  }
+  for (let i = 0; i < 4; i++) {
+    await page.locator('[data-pref-down="newPerDay"]').click(); // 20 → 0
+    await page.waitForTimeout(160);
+  }
+  const prefsStored = await page.evaluate(
+    `JSON.parse(localStorage.getItem('kairo-corridor-v1')).srsPrefs`,
+  );
+  const minusDisabled = await page.evaluate(
+    `document.querySelector('[data-pref-down="newPerDay"]').disabled`,
+  );
+  check('R2-A · ペース persists the learner\'s numbers and holds its bounds',
+    prefsStored.reviewLimit === 10 && prefsStored.newPerDay === 0 && minusDisabled === true,
+    `stored ${JSON.stringify(prefsStored)} · minus disabled at 0`);
+  await shoot(page, shotsDir, '21-r2a-pace-settings');
+  await open('?entry=shelf');
+  const prefsAfterReload = await page.evaluate(`window.__KAIRO_SRS__.prefs()`);
+  const dueWithZeroNew = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
+  check('R2-A · the chosen pacing survives reboot and rules the queue',
+    prefsAfterReload.newPerDay === 0 && prefsAfterReload.reviewLimit === 10 &&
+      dueWithZeroNew.length === 5 && !dueWithZeroNew.some((k) => k.startsWith('word:f')),
+    `prefs ${JSON.stringify(prefsAfterReload)} · ${dueWithZeroNew.length} due, no fresh admitted`);
+  check('R2-A · the probes leave no console errors',
+    consoleErrors.length === errsBeforeR2A,
+    consoleErrors.slice(errsBeforeR2A).join(' | ') || 'clean');
+
   // grader signals table for the PR
   report.graderTable = shelfData.map((s) => ({
     title: s.title,

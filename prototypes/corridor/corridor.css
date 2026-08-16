@@ -4357,6 +4357,52 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border-color: rgba(158, 43, 37, 0.35);
 }
 
+/* the no-debt row's one quiet affordance: 始める mints the card by hand */
+.rest-toggle.srs-start {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+/* ペース — the learner's review pacing, folded behind one quiet toggle */
+.srs-prefs {
+  margin: 6px 0 2px;
+}
+
+.srs-pref-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.srs-pref-row .srs-pref-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+}
+
+.srs-pref-val {
+  min-width: 2.5em;
+  text-align: center;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.srs-pref-step {
+  min-width: 34px;
+  text-align: center;
+}
+
+.srs-pref-step[disabled] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.review-deferred {
+  margin: 4px 0 10px;
+}
+
 .review-rest {
   margin-top: 10px;
 }

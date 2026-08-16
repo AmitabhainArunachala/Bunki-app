@@ -468,6 +468,13 @@ const S = {
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
    * from the first graded card onward; nothing is backfilled or invented */
   stats: {},
+  /** the learner's own review pacing (R2-A): how many never-seen cards a day
+   * may introduce, and how many due cards one ordinary sitting holds. Both
+   * are learner-chosen on the lists surface, persisted, and validated
+   * fail-closed like every other root. */
+  srsPrefs: { newPerDay: 20, reviewLimit: 20 },
+  /** whether the quiet ペース row on the lists surface is unfolded */
+  srsPrefsOpen: false,
   /** articles marked finished: { passageId: ts } */
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
@@ -525,6 +532,7 @@ const STORE_KNOWN_KEYS = [
   'aiChat',
   'ai',
   'stats',
+  'srsPrefs',
   'readDone',
   'readerPos',
   'dials',
@@ -606,6 +614,10 @@ function validTakenItem(item) {
     optional(item, 'kind', (value) => typeof value === 'string') &&
     optional(item, 'kindEn', (value) => typeof value === 'string') &&
     optional(item, 'ts', finiteNumber) &&
+    // the explicit promotion mark (R2-A, no-debt migration): when the
+    // learner chose retrieval for this row. Absent on legacy and imported
+    // rows, which stay cardless until 始める is pressed.
+    optional(item, 'started', finiteNumber) &&
     optional(item, 'from', validTakenSource) &&
     optional(item, 'ctx', validTakenContext) &&
     optional(item, 'entrySeq', nonEmptyString) &&
@@ -726,10 +738,35 @@ function validAiConfig(config) {
   );
 }
 
+/** Review pacing the learner may choose (R2-A). The bounds are part of the
+ * envelope's fail-closed contract, so the validator and the ペース surface
+ * read the same numbers and can never drift apart. */
+const NEW_PER_DAY_DEFAULT = 20;
+const NEW_PER_DAY_MAX = 50;
+const REVIEW_LIMIT_DEFAULT = 20;
+const REVIEW_LIMIT_MIN = 5;
+const REVIEW_LIMIT_MAX = 100;
+const validNewPerDay = (value) => Number.isInteger(value) && value >= 0 && value <= NEW_PER_DAY_MAX;
+const validReviewLimit = (value) =>
+  Number.isInteger(value) && value >= REVIEW_LIMIT_MIN && value <= REVIEW_LIMIT_MAX;
+
+function validSrsPrefs(prefs) {
+  return (
+    plainRecord(prefs) &&
+    safeJsonValue(prefs) &&
+    optional(prefs, 'newPerDay', validNewPerDay) &&
+    optional(prefs, 'reviewLimit', validReviewLimit)
+  );
+}
+
 function validStats(stats) {
   if (!plainRecord(stats) || !safeJsonValue(stats)) return false;
   return Object.entries(stats).every(([key, value]) => {
     if (key === 'lastExportTs') return finiteNumber(value);
+    // Legacy field: an earlier build read stats.fuzzOff as an app-level fuzz
+    // override. ADR-003 removed that path — the pin's fuzz-off is the one
+    // policy — but the envelope still admits the boolean so a record written
+    // under that build is never quarantined for carrying it.
     if (key === 'fuzzOff') return typeof value === 'boolean';
     return (
       plainRecord(value) &&
@@ -762,6 +799,7 @@ const STORE_ROOT_VALIDATORS = {
   aiChat: (value) => Array.isArray(value) && value.every(validChatTurn),
   ai: validAiConfig,
   stats: validStats,
+  srsPrefs: validSrsPrefs,
   readDone: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
   readerPos: (value) =>
@@ -911,6 +949,10 @@ function loadStore() {
   if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
   if (plainRecord(s.ai)) S.ai = s.ai;
   if (plainRecord(s.stats)) S.stats = s.stats;
+  if (plainRecord(s.srsPrefs)) {
+    if (validNewPerDay(s.srsPrefs.newPerDay)) S.srsPrefs.newPerDay = s.srsPrefs.newPerDay;
+    if (validReviewLimit(s.srsPrefs.reviewLimit)) S.srsPrefs.reviewLimit = s.srsPrefs.reviewLimit;
+  }
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
   if (plainRecord(s.dials)) {
@@ -940,6 +982,7 @@ function storeEnvelope(state) {
     aiChat: state.aiChat.slice(-24),
     ai: state.ai || {},
     stats: state.stats,
+    srsPrefs: state.srsPrefs || {},
     readDone: state.readDone,
     readerPos: state.readerPos,
     dials: state.dialsUrlOverride ? state.dialsStored : state.dials,
@@ -1149,6 +1192,10 @@ function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
 const D = {};
 let fsrsApi = null;
 let scheduler = null;
+/** The exact generator parameters the scheduler was built with — kept so the
+ * verification suites can read the policy actually in force (fuzz OFF, the
+ * pin's numbers) instead of trusting a comment. */
+let srsParams = null;
 
 /* --------------------------------------------- the deep dictionary (70k)
  * The boot core stays the small compatibility dictionary that powers the
@@ -1894,23 +1941,21 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
-    scheduler = fsrsApi.fsrs(
-      fsrsApi.generatorParameters({
-        w: pin.w,
-        request_retention: pin.requestRetention,
-        maximum_interval: pin.maximumInterval,
-        // Fuzz is ON here by app-level decision (S.stats.fuzzOff = true turns
-        // it off), deliberately diverging from the domain pin's false: it
-        // keeps batch-captured cards from staying due-synchronized for years.
-        // Replay stays deterministic — the engine seeds fuzz from
-        // `${reviewTimeMs}_${reps}_${d*s}`, all of which the review log
-        // records exactly.
-        enable_fuzz: S.stats?.fuzzOff === true ? false : true,
-        enable_short_term: pin.enableShortTerm,
-        learning_steps: pin.learningSteps,
-        relearning_steps: pin.relearningSteps,
-      }),
-    );
+    srsParams = fsrsApi.generatorParameters({
+      w: pin.w,
+      request_retention: pin.requestRetention,
+      maximum_interval: pin.maximumInterval,
+      // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
+      // as the domain pin says. Any randomness inside the scheduler would
+      // let two replays of one log disagree, which is what every evidence
+      // claim rests on. If interval spreading is ever wanted, it belongs in
+      // session planning, where it changes presentation, not memory state.
+      enable_fuzz: pin.enableFuzz,
+      enable_short_term: pin.enableShortTerm,
+      learning_steps: pin.learningSteps,
+      relearning_steps: pin.relearningSteps,
+    });
+    scheduler = fsrsApi.fsrs(srsParams);
   } catch (err) {
     console.warn('FSRS unavailable', err);
   }
@@ -3563,6 +3608,54 @@ function renderEntry(main) {
   main.append(note);
 }
 
+/* ペース — the learner's own review pacing, folded away until asked for (the
+ * dials idiom): how many never-seen cards a day may introduce (0–50) and how
+ * many due cards one ordinary sitting holds (5–100). Persisted as srsPrefs in
+ * the envelope, validated fail-closed like every other root. LEECH_LAPSES
+ * stays a constant — the rest offer is a design law, not a preference. */
+function renderSrsPrefs(main) {
+  const toggle = el('button', 'details-toggle');
+  toggle.type = 'button';
+  toggle.id = 'srs-prefs-toggle';
+  toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
+  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース', 'pacing ペース');
+  toggle.addEventListener('click', () => {
+    S.srsPrefsOpen = !S.srsPrefsOpen;
+    render();
+  });
+  main.append(toggle);
+  if (!S.srsPrefsOpen) return;
+  const rows = el('div', 'srs-prefs');
+  const stepper = (labelJa, labelEn, key, value, min, max, step) => {
+    const row = el('div', 'srs-pref-row');
+    row.append(withEn(el('span', 'srs-pref-name', labelJa), labelEn, 'en-inline'));
+    const commit = (next) => {
+      const clamped = Math.min(max, Math.max(min, next));
+      if (clamped === value) return;
+      if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, [key]: clamped } })) render();
+    };
+    const minus = el('button', 'rest-toggle srs-pref-step', '−');
+    minus.type = 'button';
+    minus.dataset.prefDown = key;
+    minus.disabled = value <= min;
+    minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn}`));
+    minus.addEventListener('click', () => commit(value - step));
+    const val = el('span', 'srs-pref-val', String(value));
+    val.dataset.prefVal = key;
+    const plus = el('button', 'rest-toggle srs-pref-step', '＋');
+    plus.type = 'button';
+    plus.dataset.prefUp = key;
+    plus.disabled = value >= max;
+    plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn}`));
+    plus.addEventListener('click', () => commit(value + step));
+    row.append(minus, val, plus);
+    rows.append(row);
+  };
+  stepper('新規 / 日', 'new cards a day', 'newPerDay', srsNewPerDay(), 0, NEW_PER_DAY_MAX, 5);
+  stepper('一回の枚数', 'cards a sitting', 'reviewLimit', srsReviewLimit(), REVIEW_LIMIT_MIN, REVIEW_LIMIT_MAX, 5);
+  main.append(rows);
+}
+
 function renderTray(main) {
   main.append(withEn(el('p', 'eyebrow', 'リスト'), 'your lists', 'en-inline'));
   main.append(
@@ -3606,14 +3699,18 @@ function renderTray(main) {
     btn.addEventListener('click', startReview);
     main.append(btn);
     const f = srsForecast();
-    if (f.today + f.tomorrow + f.week + f.fresh > 0) {
+    if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
+      // 未着手 appears only when no-debt rows exist: the backlog is named,
+      // never hidden and never turned into due cards by anyone but the learner
+      const unstartedJa = f.unstarted ? ` ・ 未着手 ${f.unstarted}` : '';
+      const unstartedEn = f.unstarted ? ` · not started ${f.unstarted}` : '';
       main.append(
         el(
           'p',
           'srs-forecast',
           tx(
-            `今日 ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}`,
-            `today ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}`,
+            `今日 ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
+            `today ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
           ),
         ),
       );
@@ -3634,6 +3731,7 @@ function renderTray(main) {
         ),
       );
     }
+    renderSrsPrefs(main);
     // one layer of the tutor's testing — absent without a key
     if (aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
       const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'a quiz from the tutor');
@@ -3810,19 +3908,35 @@ function renderTray(main) {
       line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
       if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
       line.append(el('span', 'when', srsWhen(item)));
-      // rest / wake — the card stays on the list, reviews skip it
       const key = srsKey(item.t, item.id);
-      const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
-      rest.type = 'button';
-      rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
-      rest.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        if (S.suspended[key]) delete S.suspended[key];
-        else S.suspended[key] = Date.now();
-        saveStore();
-        render();
-      });
-      line.append(rest);
+      if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
+        // a no-debt row (legacy or imported) wakes by hand: one quiet
+        // affordance in the row itself, and only this press mints the card
+        // into the review cycle — 始める is the explicit promotion
+        const start = el('button', 'rest-toggle srs-start', tx('始める', 'start'));
+        start.type = 'button';
+        start.dataset.srsStart = key;
+        start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
+        start.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const taken = S.taken.map((t) => (t === item ? { ...t, started: Date.now() } : t));
+          if (commitStorePatch({ taken })) render();
+        });
+        line.append(start);
+      } else {
+        // rest / wake — the card stays on the list, reviews skip it
+        const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
+        rest.type = 'button';
+        rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
+        rest.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (S.suspended[key]) delete S.suspended[key];
+          else S.suspended[key] = Date.now();
+          saveStore();
+          render();
+        });
+        line.append(rest);
+      }
       line.addEventListener('click', () => go({ t: item.t, id: item.id }));
       main.append(line);
     }
@@ -3946,7 +4060,7 @@ function renderLane(main, title, en, ids, t) {
     btn.addEventListener('click', () => {
       const kindRow = NODE_KIND[t];
       for (const id of fresh.slice(0, 20))
-        S.taken.push({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now() });
+        S.taken.push({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() });
       saveStore();
       render();
     });
@@ -4095,7 +4209,7 @@ function renderLessons(main) {
           const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
           for (const w of run.words)
             if (!takenSet.has(srsKey(kt, w)))
-              S.taken.push({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now() });
+              S.taken.push({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() });
           saveStore();
           run.phase = 'end';
         }
@@ -6038,6 +6152,10 @@ function commitCapture(node, label, now = Date.now()) {
     kindEn: NODE_KIND[node.t][1],
     from: node.from || null,
     ts: now,
+    // 覚える is the explicit choice to memorize, so the row is started the
+    // moment it is taken. Rows that arrive any other way — import, legacy
+    // stores — carry no mark and wait for the learner's 始める.
+    started: now,
   };
   // Capture that arrives from inside the reading flow carries the sentence
   // it was met in (ctxScope rides the node): the top-right door and the mini
@@ -6337,20 +6455,37 @@ function srsStoredRecord(card) {
     last_review: card.last_review ? card.last_review.toISOString() : undefined,
   };
 }
+/** append-order-monotonic-clamp-v1 — the review-time policy the domain pin
+ * names (data/fsrs-pin.json), now held in this engine too. The per-card
+ * scheduler instant never decreases: a card's stored last_review is its
+ * scheduler anchor (the effective instant of its previous grade), and a wall
+ * clock that has moved behind it is clamped up to that anchor before FSRS
+ * sees it — ts-fsrs throws on a negative day delta, and a backward device
+ * clock must neither crash nor corrupt grading. Raw wall-clock truth is not
+ * rewritten: the revlog row keeps the actual press time as audit truth; only
+ * the instant handed to the scheduler is monotonic. */
+function srsSchedulerInstant(card, now) {
+  return card.last_review && card.last_review.getTime() > now.getTime()
+    ? new Date(card.last_review.getTime())
+    : now;
+}
 /* --------------------------------------------------- the review log
  * Append-only, one compact row per grade, never rewritten. Layout:
  *
  *   [t, key, g, stBefore, elapsed, r, sBefore, dBefore, sAfter, dAfter, ivl, dueAfter]
  *
- *   t        press time, epoch MILLISECONDS (ms precision matters: the
- *            engine's fuzz seed is `${time}_${reps}_${d*s}`, so the exact
- *            timestamp makes every fuzzed interval reproducible on replay)
+ *   t        press time, epoch MILLISECONDS — the RAW device clock, kept as
+ *            audit truth even when it has moved backward; the scheduler's own
+ *            clamped instant is recoverable as max(t, last_review before)
+ *            under append-order-monotonic-clamp-v1
  *   key      "type:id" scheduler key
  *   g        FSRS Rating pressed (1 Again · 2 Hard · 3 Good · 4 Easy);
  *            g = 0 is a revocation (undo): the row is [t, key, 0, revokedIndex]
  *   stBefore card state before (0 New · 1 Learning · 2 Review · 3 Relearning)
- *   elapsed  days since last_review at press (3 dp; null on a first press)
- *   r        engine retrievability at press (4 dp; null without last_review)
+ *   elapsed  days since last_review at the CLAMPED scheduler instant (3 dp;
+ *            null on a first press; never negative — what the engine priced)
+ *   r        engine retrievability at the clamped instant (4 dp; null
+ *            without last_review)
  *   sBefore/dBefore  memory state before (4 dp; null on a first press)
  *   sAfter/dAfter    memory state after
  *   ivl      scheduled_days of the stored result
@@ -6359,14 +6494,14 @@ function srsStoredRecord(card) {
  * This is sufficient for the FSRS optimizer (per-card sequences of
  * (elapsed, rating)), for analytics, and — with the pinned parameters —
  * for full deterministic state reconstruction by replay. */
-function srsReviewLogRow(key, before, after, rating, now) {
+function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
   const rnd = (v, p) => (v == null || !Number.isFinite(v) ? null : Number(v.toFixed(p)));
   let elapsed = null;
   let r = null;
   if (before.last_review) {
-    elapsed = rnd((now.getTime() - before.last_review.getTime()) / 86400000, 3);
+    elapsed = rnd((schedNow.getTime() - before.last_review.getTime()) / 86400000, 3);
     try {
-      r = rnd(scheduler.get_retrievability(before, now, false), 4);
+      r = rnd(scheduler.get_retrievability(before, schedNow, false), 4);
     } catch {
       r = null;
     }
@@ -6410,8 +6545,8 @@ function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
   return true;
 }
 
-function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, day, prevRec }) {
-  const revlog = [...(S.revlog || []), srsReviewLogRow(skey, card, next, rating, now)];
+function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, schedNow, day, prevRec }) {
+  const revlog = [...(S.revlog || []), srsReviewLogRow(skey, card, next, rating, now, schedNow || now)];
   const logIx = revlog.length - 1;
   const srs = { ...S.srs, [skey]: srsStoredRecord(next) };
   const dayStats = { ...(S.stats?.[day] || { n: 0, again: 0 }) };
@@ -6428,12 +6563,18 @@ function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, day
   return true;
 }
 
-/** Items ready to review: real reviews by their due date, then never-seen
- * cards — capped at 20 a DAY (Anki's default pacing), so a long list arrives
- * as days of honest work instead of one avalanche. The count of cards
- * introduced today lives in S.stats[day].nnew, written on a card's first
- * grade and honoured across every session of the day. */
-const NEW_PER_DAY = 20;
+/** Items ready to review: real reviews ordered most-overdue first, then
+ * never-seen cards — capped a DAY (default 20, the learner's own number via
+ * ペース), so a long list arrives as days of honest work instead of one
+ * avalanche. The count of cards introduced today lives in S.stats[day].nnew,
+ * written on a card's first grade and honoured across every session of the
+ * day. */
+const srsNewPerDay = () =>
+  validNewPerDay(S.srsPrefs?.newPerDay) ? S.srsPrefs.newPerDay : NEW_PER_DAY_DEFAULT;
+/** How many due cards one ordinary sitting freezes (PR70-P1-2). The timed
+ * dojo keeps its own refill and never reads this. */
+const srsReviewLimit = () =>
+  validReviewLimit(S.srsPrefs?.reviewLimit) ? S.srsPrefs.reviewLimit : REVIEW_LIMIT_DEFAULT;
 /** How many pool items a dojo refill draws at once — session pacing only,
  * unrelated to the daily new-card cap. */
 const FOCUS_BATCH = 20;
@@ -6453,11 +6594,30 @@ function srsDueItems(now = new Date()) {
     const key = srsKey(item.t, item.id);
     if (S.suspended[key]) continue;
     const rec = S.srs[key];
-    if (!rec) fresh.push(item);
-    else if (new Date(rec.due) <= now) reviews.push(item);
+    if (!rec) {
+      // no-debt migration (PR70-P1-1): a cardless row joins the queue only
+      // when the learner explicitly started it. Legacy and imported rows
+      // carry no `started` mark and wait for 始める — capture, import, and
+      // migration never schedule anything by themselves.
+      if (finiteNumber(item.started)) fresh.push(item);
+    } else if (new Date(rec.due) <= now) {
+      reviews.push(item);
+    }
   }
+  // Most overdue first — the same total order the domain planner uses
+  // (plan.ts compareDueContracts): the earliest due instant wins and the
+  // scheduler key breaks ties, so two loads of one store never disagree.
+  // Never-seen cards keep their capture order and stay after every real due.
+  reviews.sort((a, b) => {
+    const dueA = Date.parse(S.srs[srsKey(a.t, a.id)].due);
+    const dueB = Date.parse(S.srs[srsKey(b.t, b.id)].due);
+    if (dueA !== dueB) return dueA - dueB;
+    const keyA = srsKey(a.t, a.id);
+    const keyB = srsKey(b.t, b.id);
+    return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
+  });
   const introducedToday = S.stats[dayKey(now)]?.nnew || 0;
-  const room = Math.max(0, NEW_PER_DAY - introducedToday);
+  const room = Math.max(0, srsNewPerDay() - introducedToday);
   return [...reviews, ...fresh.slice(0, room)];
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
@@ -6469,7 +6629,8 @@ function startOfDay(d) {
 function srsWhen(item) {
   if (S.suspended[srsKey(item.t, item.id)]) return tx('休み中', 'resting');
   const rec = S.srs[srsKey(item.t, item.id)];
-  if (!rec) return tx('新規', 'new');
+  // an unstarted row tells the truth: it holds no card and owes no review
+  if (!rec) return finiteNumber(item.started) ? tx('新規', 'new') : tx('未着手', 'not started');
   const now = new Date();
   const due = new Date(rec.due);
   const ms = due.getTime() - now.getTime();
@@ -6484,7 +6645,7 @@ function srsWhen(item) {
 /** Anki's stats screen, reduced to one honest line: what today, tomorrow
  * and the coming week actually hold, plus the untouched new cards. */
 function srsForecast(now = new Date()) {
-  const f = { today: 0, tomorrow: 0, week: 0, fresh: 0 };
+  const f = { today: 0, tomorrow: 0, week: 0, fresh: 0, unstarted: 0 };
   const DAY = 86400000;
   // Calendar buckets, the way a person counts: everything due before tonight's
   // midnight is TODAY (a card due in three hours is not 明日), tomorrow is
@@ -6497,7 +6658,8 @@ function srsForecast(now = new Date()) {
     if (S.suspended[key]) continue;
     const rec = S.srs[key];
     if (!rec) {
-      f.fresh += 1;
+      if (finiteNumber(item.started)) f.fresh += 1;
+      else f.unstarted += 1;
       continue;
     }
     const due = new Date(rec.due).getTime();
@@ -6516,11 +6678,40 @@ function startReview(scope) {
     const keys = new Set(scope.map((i) => srsKey(i.t, i.id)));
     queue = queue.filter((i) => keys.has(srsKey(i.t, i.id)));
   }
+  // bounded standard review (PR70-P1-2): an ordinary sitting freezes at most
+  // the learner's own bound — the most overdue cards, since the queue is
+  // already ordered — and the rest is an honest count on the goodbye screen,
+  // never a queue growing behind the glass. The timed dojo keeps its refill.
+  const limit = srsReviewLimit();
+  const deferred = Math.max(0, queue.length - limit);
+  if (deferred) queue = queue.slice(0, limit);
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
+  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
   S.view = 'review';
   render();
 }
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * read-only access to the scheduler policy actually in force, the clamp,
+ * the ordered due queue, and the bounded session — so acceptance checks
+ * exercise the real code instead of a re-implementation. */
+window.__KAIRO_SRS__ = Object.freeze({
+  policy: () => ({
+    enableFuzz: srsParams ? srsParams.enable_fuzz : null,
+    pinFuzz: D.pin?.enableFuzz ?? null,
+    reviewTimePolicyId: D.pin?.reviewTimePolicyId ?? null,
+  }),
+  schedulerInstant: (lastReviewIso, nowMs) =>
+    srsSchedulerInstant(
+      lastReviewIso ? { last_review: new Date(lastReviewIso) } : {},
+      new Date(nowMs),
+    ).toISOString(),
+  dueKeys: () => srsDueItems().map((i) => srsKey(i.t, i.id)),
+  prefs: () => ({ newPerDay: srsNewPerDay(), reviewLimit: srsReviewLimit() }),
+  session: () =>
+    S.review
+      ? { queue: S.review.queue.length, ix: S.review.ix, deferred: S.review.deferred ?? 0 }
+      : null,
+});
 /** The card back, by kind — reading and meaning from the same records the
  * entry sheets read, so the session and the dictionary never disagree. */
 function reviewBack(item) {
@@ -6589,6 +6780,13 @@ function renderReview(main) {
     for (const key of ['again', 'hard', 'good', 'easy'])
       if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
     main.append(sum);
+    // the bounded sitting's honest remainder: what the freeze left for the
+    // next sitting, said quietly, never queued behind the glass
+    if (!S.focus && rv.deferred) {
+      main.append(
+        el('p', 'srs-forecast review-deferred', tx(`あと ${rv.deferred} 件`, `${rv.deferred} more waiting`)),
+      );
+    }
     // the struggling cards, by name (each once) — a rest offered, never imposed
     const leechSeen = new Set();
     const leeches = rv.queue.filter((i) => {
@@ -6803,7 +7001,10 @@ function renderReview(main) {
   }
   const now = new Date();
   const card = srsCardOf(item, now);
-  const result = scheduler.repeat(card, now);
+  // the monotonic clamp (srsSchedulerInstant): the four previews and the
+  // committed grade all price the card at the same never-decreasing instant
+  const schedNow = srsSchedulerInstant(card, now);
+  const result = scheduler.repeat(card, schedNow);
   // 道場の礼 — a focus drill on a card the learner never TOOK is exposure,
   // not deck membership (P0, full-instrument review): grading it must not
   // mint FSRS state the due queue can never surface (srsDueItems walks
@@ -6830,10 +7031,12 @@ function renderReview(main) {
   ];
   for (const [rating, key, ja, sealChar] of grades) {
     const next = result[fsrsApi.Rating[rating]].card;
-    const ms = next.due.getTime() - now.getTime();
+    const ms = next.due.getTime() - schedNow.getTime();
     const when = drillOnly
       ? tx('稽古', 'practice')
-      : next.scheduled_days >= 1 ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`) : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
+      : next.scheduled_days >= 1
+        ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`)
+        : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
     const b = el('button', `grade hanko g-${key}`);
     b.type = 'button';
     b.append(el('span', 'g-seal', sealChar));
@@ -6873,6 +7076,7 @@ function renderReview(main) {
           skey,
           rating: fsrsApi.Rating[rating],
           now,
+          schedNow,
           day,
           prevRec,
         })
@@ -7502,6 +7706,9 @@ function renderProbe(main) {
           kindEn: NODE_KIND.word[1],
           from: null,
           ts: Date.now(),
+          // the learner's own 読めなかった is the choice that mints this
+          // card — the probe told them so before they pressed it
+          started: Date.now(),
         });
         minted = 1;
         pr.minted += 1;

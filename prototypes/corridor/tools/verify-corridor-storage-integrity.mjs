@@ -69,6 +69,7 @@ function state(overrides = {}) {
     aiChat: [],
     ai: {},
     stats: {},
+    srsPrefs: { newPerDay: 20, reviewLimit: 20 },
     readDone: {},
     readerPos: {},
     dials: { kanji: 0, furigana: 1, spacing: 0 },
@@ -231,11 +232,13 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
         id: '海',
         label: '海',
         ts: 10,
+        started: 10,
         from: { passage: 'p', index: 2 },
         ctx: { p: 'p', i: 2, scope: 'sent' },
         entrySeq: '1',
         cueReading: 'うみ',
       },
+      { t: 'word', id: '波', label: '波', ts: 11 },
     ],
     lists: { 海辺: [{ t: 'word', id: '海', label: '海', ts: 10 }] },
     srs: {
@@ -271,6 +274,7 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
     aiChat: [{ role: 'user', text: '海' }],
     ai: { baseUrl: 'https://example.invalid', model: 'test-model' },
     stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
+    srsPrefs: { newPerDay: 35, reviewLimit: 45 },
     readDone: { article: 10 },
     readerPos: { article: 120 },
     dials: { kanji: 0, furigana: 1, spacing: 2 },
@@ -281,9 +285,14 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   storeApi.loadStore();
   assert.equal(storeContext.S.storeReadOnly, false);
   assert.equal(storeContext.S.taken[0].id, '海');
+  assert.equal(storeContext.S.taken[0].started, 10);
+  // a row without the promotion mark hydrates as-is — nothing fabricates one
+  assert.equal(Object.hasOwn(storeContext.S.taken[1], 'started'), false);
   assert.equal(storeContext.S.srs['word:海'].state, 2);
   assert.equal(storeContext.S.ai.baseUrl, 'https://example.invalid');
   assert.equal(storeContext.S.ai.model, 'test-model');
+  assert.equal(storeContext.S.srsPrefs.newPerDay, 35);
+  assert.equal(storeContext.S.srsPrefs.reviewLimit, 45);
   assert.equal(storeContext.S.storeExtras.futureField.nested[0], 'preserved');
   assert.equal(storeContext.localStorage.writes, 0);
 });
@@ -334,6 +343,8 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ],
     ['taken nested entry sequence', { v: 1, taken: [{ t: 'word', id: '海', entrySeq: [] }] }],
     ['taken nested cue reading', { v: 1, taken: [{ t: 'word', id: '海', cueReading: {} }] }],
+    ['taken started mark type', { v: 1, taken: [{ t: 'word', id: '海', started: 'now' }] }],
+    ['taken started mark non-finite', { v: 1, taken: [{ t: 'word', id: '海', started: null }] }],
     ['lists root', { v: 1, lists: [] }],
     ['lists nested collection', { v: 1, lists: { x: {} } }],
     ['lists nested item', { v: 1, lists: { x: [{ t: 'word', id: null }] } }],
@@ -390,6 +401,14 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['stats root', { v: 1, stats: [] }],
     ['stats nested day', { v: 1, stats: { day: [] } }],
     ['stats nested count', { v: 1, stats: { day: { n: 'one' } } }],
+    ['srsPrefs root', { v: 1, srsPrefs: [] }],
+    ['srsPrefs newPerDay type', { v: 1, srsPrefs: { newPerDay: '20' } }],
+    ['srsPrefs newPerDay fractional', { v: 1, srsPrefs: { newPerDay: 12.5 } }],
+    ['srsPrefs newPerDay below range', { v: 1, srsPrefs: { newPerDay: -1 } }],
+    ['srsPrefs newPerDay above range', { v: 1, srsPrefs: { newPerDay: 51 } }],
+    ['srsPrefs reviewLimit type', { v: 1, srsPrefs: { reviewLimit: null } }],
+    ['srsPrefs reviewLimit below range', { v: 1, srsPrefs: { reviewLimit: 4 } }],
+    ['srsPrefs reviewLimit above range', { v: 1, srsPrefs: { reviewLimit: 101 } }],
     ['readDone root', { v: 1, readDone: [] }],
     ['readDone nested timestamp', { v: 1, readDone: { article: 'now' } }],
     ['readerPos root', { v: 1, readerPos: [] }],
@@ -692,6 +711,8 @@ verified('deep-capture-action-executes-one-boundary', () => {
   assert.equal(attempts, 2);
   assert.equal(context.S.taken.length, 1);
   assert.equal(context.S.taken[0].entrySeq, '42');
+  // 覚える is the explicit promotion — the mark rides the capture instant
+  assert.equal(context.S.taken[0].started, 456);
   assert.equal(context.S.deepWords['安堵'].r, 'あんど');
 });
 
@@ -1099,6 +1120,197 @@ verified('drift-standalone-keeps-autonomy-without-a-host', () => {
   assert.equal(context.store.known['海'], 1);
 });
 
+/* ------------------------------------------------ R2-A · scheduler policy,
+ * ordered/bounded review, no-debt migration. These blocks run the REAL
+ * extracted corridor code in vm, never a re-implementation. */
+
+verified('scheduler-clock-clamp-and-raw-audit-truth', () => {
+  const clampBlock = between(
+    'function srsSchedulerInstant(card, now) {',
+    '/* --------------------------------------------------- the review log',
+  );
+  const clampContext = vm.createContext({});
+  vm.runInContext(`${clampBlock}\n;globalThis.__clamp = srsSchedulerInstant;`, clampContext, {
+    filename: 'corridor-clamp-block.js',
+  });
+  const clamp = clampContext.__clamp;
+  const now = new Date('2026-08-16T00:00:00.000Z');
+  // the device clock moved BACKWARD past the card's anchor: clamp up, never crash
+  const anchorAhead = new Date('2026-08-19T00:00:00.000Z');
+  assert.equal(clamp({ last_review: anchorAhead }, now).getTime(), anchorAhead.getTime());
+  // an ordinary forward clock passes through untouched
+  const anchorBehind = new Date('2026-08-10T00:00:00.000Z');
+  assert.strictEqual(clamp({ last_review: anchorBehind }, now), now);
+  // a first grade has no anchor to clamp against
+  assert.strictEqual(clamp({}, now), now);
+
+  // the revlog row keeps the RAW press time while pricing at the clamped instant
+  const logRowBlock = between('function srsReviewLogRow(', 'function advanceReviewSession(');
+  const logContext = vm.createContext({ scheduler: { get_retrievability: () => 0.9 } });
+  vm.runInContext(`${logRowBlock}\n;globalThis.__row = srsReviewLogRow;`, logContext, {
+    filename: 'corridor-logrow-block.js',
+  });
+  const after = {
+    stability: 6,
+    difficulty: 5,
+    scheduled_days: 4,
+    due: new Date(anchorAhead.getTime() + 4 * 86400000),
+    state: 2,
+  };
+  const row = logContext.__row(
+    'word:海',
+    { last_review: anchorAhead, state: 2, stability: 5, difficulty: 5 },
+    after,
+    3,
+    now,
+    clamp({ last_review: anchorAhead }, now),
+  );
+  assert.equal(row[0], now.getTime(), 'row[0] is the raw press time — audit truth');
+  assert.equal(row[4], 0, 'elapsed is measured at the clamp, never negative');
+  assert.equal(row[5], 0.9);
+  assert.equal(row[11], after.due.getTime());
+  // an ordinary forward grade prices real elapsed days
+  const forwardRow = logContext.__row(
+    'word:海',
+    { last_review: anchorBehind, state: 2, stability: 5, difficulty: 5 },
+    after,
+    3,
+    now,
+    now,
+  );
+  assert.equal(forwardRow[0], now.getTime());
+  assert.equal(forwardRow[4], 6);
+});
+
+verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
+  const srsBlock = between(
+    '/** Items ready to review:',
+    '/** Midnight at the start of a date',
+  );
+  const dueContext = vm.createContext({
+    S: {},
+    document: fakeDocument(),
+    localStorage: storage(),
+    tx: (_ja, en) => en,
+    srsKey: (t, id) => `${t}:${id}`,
+    dayKey: () => '2026-08-16',
+  });
+  vm.runInContext(
+    `${persistenceBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewLimit };`,
+    dueContext,
+    { filename: 'corridor-due-block.js' },
+  );
+  const api = dueContext.__srsApi;
+  const now = new Date('2026-08-16T12:00:00.000Z');
+  const iso = (msAgo) => new Date(now.getTime() - msAgo).toISOString();
+  const card = (dueAgoMs) => ({
+    due: iso(dueAgoMs),
+    stability: 5,
+    difficulty: 5,
+    elapsed_days: 1,
+    scheduled_days: 3,
+    reps: 2,
+    lapses: 0,
+    learning_steps: 0,
+    state: 2,
+  });
+  const HOUR = 3600000;
+  const DAY = 86400000;
+  dueContext.S = {
+    taken: [
+      { t: 'word', id: 'recent', started: 1 },
+      { t: 'word', id: 'oldest', started: 1 },
+      { t: 'word', id: 'tieB', started: 1 },
+      { t: 'word', id: 'tieA', started: 1 },
+      { t: 'word', id: 'fresh1', started: 5 },
+      { t: 'word', id: 'legacy' },
+      { t: 'word', id: 'resting', started: 1 },
+      { t: 'word', id: 'fresh2', started: 6 },
+    ],
+    srs: {
+      'word:recent': card(2 * HOUR),
+      'word:oldest': card(3 * DAY),
+      'word:tieB': card(DAY),
+      'word:tieA': card(DAY),
+      'word:resting': card(9 * DAY),
+    },
+    suspended: { 'word:resting': 1 },
+    stats: {},
+    srsPrefs: { newPerDay: 20, reviewLimit: 20 },
+  };
+  // most overdue first, key breaks the tie, started fresh rows after every
+  // real due, the unmarked legacy row NOWHERE — capture is not a schedule
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent', 'fresh1', 'fresh2'],
+  );
+  // the daily cap honours what today already introduced
+  dueContext.S.stats = { '2026-08-16': { nnew: 19 } };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent', 'fresh1'],
+  );
+  // the learner's own zero means no new cards at all
+  dueContext.S.stats = {};
+  dueContext.S.srsPrefs = { newPerDay: 0, reviewLimit: 20 };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent'],
+  );
+  // out-of-range or mistyped prefs fall back to the defaults, never crash
+  dueContext.S.srsPrefs = { newPerDay: 999, reviewLimit: 'ten' };
+  assert.equal(api.srsNewPerDay(), 20);
+  assert.equal(api.srsReviewLimit(), 20);
+  // a clock behind every due date empties the reviews and never throws
+  dueContext.S.srsPrefs = { newPerDay: 20, reviewLimit: 20 };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(new Date('2000-01-01T00:00:00.000Z')), (i) => i.id),
+    ['fresh1', 'fresh2'],
+  );
+});
+
+verified('one-scheduler-policy-fuzz-off-with-the-pin', () => {
+  const pin = JSON.parse(
+    readFileSync(fileURLToPath(new URL('../data/fsrs-pin.json', import.meta.url)), 'utf8'),
+  );
+  assert.equal(pin.enableFuzz, false);
+  assert.equal(pin.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
+  const schedulerInit = between('fsrsApi = window.__TSFSRS__', 'S.ready = true');
+  assert.match(schedulerInit, /enable_fuzz: pin\.enableFuzz/);
+  assert.doesNotMatch(schedulerInit, /fuzzOff/, 'the dead app-level override is gone');
+  // the grade path prices the four previews and the committed grade at the clamp
+  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
+  assert.match(gradeRegion, /srsSchedulerInstant\(card, now\)/);
+  assert.match(gradeRegion, /scheduler\.repeat\(card, schedNow\)/);
+  assert.doesNotMatch(gradeRegion, /scheduler\.repeat\(card, now\)/);
+});
+
+verified('bounded-standard-review-freeze-and-dojo-refill-kept', () => {
+  const startBlock = between('function startReview(scope) {', '/* An instrument handle');
+  assert.match(startBlock, /srsReviewLimit\(\)/);
+  assert.match(startBlock, /queue\.slice\(0, limit\)/);
+  assert.match(startBlock, /deferred/);
+  const refill = between('function refillFocusQueue(rv) {', 'function startFocus(');
+  assert.match(refill, /FOCUS_BATCH/, 'the timed dojo keeps its refill pacing');
+});
+
+verified('every-in-app-mint-carries-the-started-mark', () => {
+  // capture (覚える), lane bulk memorize, lesson completion, probe miss mint
+  assert.match(captureActionBlock, /started: now/);
+  const laneMint = between('const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));', '/* --------------------------------------------------------------- lessons');
+  assert.match(laneMint, /started: Date\.now\(\)/);
+  const lessonMint = between('S.lessonsDone[run.id] =', 'run.phase =');
+  assert.match(lessonMint, /started: Date\.now\(\)/);
+  const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'obsLog(');
+  assert.match(probeMint, /started: Date\.now\(\)/);
+  // and the queue admits a cardless row only through that mark
+  const dueGate = between('function srsDueItems(now = new Date()) {', '/** Midnight at the start of a date');
+  assert.match(dueGate, /finiteNumber\(item\.started\)/);
+  // the import door writes the file verbatim — it must not fabricate the mark
+  const importBlock = between("file.addEventListener('change'", 'port.append(');
+  assert.doesNotMatch(importBlock, /started/);
+});
+
 verified('bounded-handlers-call-executed-actions', () => {
   const finishHandler = between("finBtn.id = 'read-fin';", '  fin.append(finBtn);');
   assert.match(finishHandler, /commitReadDone\(p\.id\)/);
@@ -1247,6 +1459,11 @@ console.log(
         'stable-storage-alert',
         'dynamic-sheet-alert-description',
         'article-load-retry',
+        'scheduler-clock-clamp',
+        'due-queue-order-and-no-debt',
+        'fuzz-off-scheduler-policy',
+        'bounded-standard-review',
+        'started-mark-promotion',
       ],
       residualUnsafeSaveCallers: 19,
       browserAndDevice: 'NOT_RUN',
