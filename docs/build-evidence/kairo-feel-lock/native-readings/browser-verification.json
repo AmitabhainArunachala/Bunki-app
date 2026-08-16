@@ -6,50 +6,50 @@
     "height": 844
   },
   "touchEmulation": true,
-  "browser": "141.0.7390.0",
-  "completedAt": "2026-08-12T07:08:10.691Z",
+  "browser": "141.0.7390.37",
+  "completedAt": "2026-08-16T04:54:17.740Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "0dbe72dad8789af35dc09920d5aaa4eaca126a68fc3a61e46d38490325fa5a67",
+    "index": "4a1dfc10c85ce78db6181349e3397a12a369494ab0d81ec52a938a0807631106",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "0fde87282ac5aac8dd78d98756c8286a7a351bb676583902687d67974f15467c",
-    "corridorCss": "bf0ba159362635e43c4bd5c555753c5a087ea751cfff7453e5b345d46b77caa1",
-    "standalone": "cae8751b697dca6dd29705a45b2696c9da6c379b6a1d8813decd30171576a834",
+    "corridorJs": "7ffcd4d73cff8585bba8e96dbb3bad36d7a0cca8df17a65e0e001c5115076043",
+    "corridorCss": "0658c94577f7a50a18cbd7543a046fcd3128fedf5293fe98e4e46342607c2a07",
+    "standalone": "71f2898d029526c45d6fd3706bc5b36231f10c81b5d615ec8898ba238b022e27",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
     "articleFiles": {
-      "bunki-graded-n3-zoka-sanjin-morning": "0f4f8fc9d2992f9ba7ef4181a1dac50683e0e9440ea3e3efd7aef07b7e295738",
-      "bunki-graded-n3-nakaima-diary": "e8b0a31ca25bf8b42d627993420ecf40882ce885b9872571b833b40ee2befaec",
-      "bunki-graded-n3-world-beginning": "65f7f7b52a6e5e53b25de6e6bdafffd4ae96654a6ae8217d75b07b166619a6ea",
-      "bunki-graded-n3-hidden-deity": "ae39a1cf44a7f5ab2dc96e594a764be84b02b86af92086f271f73df69c056184",
-      "bunki-graded-n3-kojiki-book": "5430c976cc209672cb0ee1a146997d40ed7d60cd4e36e3c76a522acc42b0a35a",
-      "bunki-graded-n3-hashira-counter": "2b05b8f3f95337d99ffdf1dffd0d2ead92181773528b2de0cfa35daadfaea06d",
-      "bunki-graded-n3-feel-jingu-forest": "f0a0df8cfc2d3b9f4335f8f9e4162dbe089b0b1b0dc91928dcbc431dc290c820",
-      "bunki-graded-n3-musubi-visual": "4b929fc68c3a067bd615e319e483f5aa4f17c9b0543bbfa38807744f7289bf2b",
-      "bunki-graded-n3-gratitude-week": "10a3a8a6188e30865a1ae85379c8b2cd838786bef9d7a4b5b581e3cb9f3f6e7e",
-      "bunki-graded-n3-thanks-before-help": "9c0a9137e87dcf0a67b6c57fa5c8238feda9399c91af3c02d2bfc564670c4594",
-      "bunki-essay-n2-zoka-as-one": "274c7a72b8645c6b9ddea3cd87821b28999be89c6bfc6de1bbb80ec979c42752",
-      "bunki-essay-n2-nakaima-time": "c700fe625b45889b6e55b29f208bb854b11f8c86eebe5043820ce0bec114c3bd",
-      "bunki-essay-n2-creator-god": "49dd8e386b9ecd7695a87e10da5990bdeb28fa105a5eaca6a820188e5b2bf9ff",
-      "bunki-essay-n2-silent-amenominakanushi": "57ae60f3d3db8e60fa7185b40fa4ce89908b126baee3b1d8b0a3ba03ff29a3c6",
-      "bunki-essay-n2-kojiki-myth-history": "6247f8411717d4038b05a9f71ba2fb4818b29437ad9b76da3d378dce1bff2e00",
-      "bunki-essay-n2-myth-to-book": "90fb257943d70a907574f74693e88c840a2f9e831c9b0dd03fa084b448157008",
-      "bunki-essay-n2-feel-jingu-musubi": "1da4ec4ca4f468631aa8efd781feda042aaf1fcaaae014691397334a6d36e224",
-      "bunki-essay-n2-prayer-on-screen": "b042421d10a3631d43e393b34d01df6d62ab6d85c563f49a60ccf282c31300e6",
-      "bunki-essay-n2-thanks-first": "4bce3c76d2bddd74476fa667e96887b70510e481830698aebad57f17b5848d98",
-      "bunki-essay-n2-testimony-literacy": "c740ae66867e4c6daea1686616ee2ec09cf5127067ae1cc204d1c5206eb088b7",
-      "bunki-essay-n1-cosmic-analogy": "b29e995d3208776baf709f2c845422e1f8a991ffdc3a16dfc619a75e9a010b93",
-      "bunki-essay-n1-nakaima-time-theory": "388af73da7c25ad47315ed75bd05c53dbe03ea4942d1beca1c2efeb469b554dd",
-      "bunki-essay-n1-first-versus-supreme": "8ea7a65eb814968af0b502109a8ae23c2c3b90dd4d599f5a0d882a67d3907380",
-      "bunki-essay-n1-silent-god-theology": "549ac4907868eeaf18eb2d413f5b67de37e85e2ed2e4cce8bd8b3b30809567c2",
-      "bunki-essay-n1-kojiki-power": "46f20c9886175ff70eb50c190b8db3049a12fba8a84c5d01e16c1df2ec4a3caf",
-      "bunki-essay-n1-beyond-fact-fiction": "7b1280abb5a37759e5290c340270e5067f3c13f104953100f59fec0eb4387d34",
-      "bunki-essay-n1-sacred-media": "06a49d15bc245a3ebd79f9d584764d101cecee9fa352816af166fb45d4e0036a",
-      "bunki-essay-n1-ise-time": "9b5b95c20fad80be8df7f499e10bc74874a3c5426ae5dda707e9664c1c52814e",
-      "bunki-essay-n1-miracle-testimony": "1ecf1e17691dfa1337de9ff43672ae172597da4f6df8fc6952b6d603682235ce",
-      "bunki-essay-n1-prayer-reality": "a3dcf32d18681cadc543dcf4adbe8346895f3f4947a68c147b29e5934f8c64ce"
+      "bunki-graded-n3-zoka-sanjin-morning": "8369a6ad328ee79970dca3c0eee549aea097326c6e344f1b102ab6dbcafc9482",
+      "bunki-graded-n3-nakaima-diary": "83c829da4c1bcc9123ade4f775c612d52fa35939ecd51d321bd8316d313d9ca9",
+      "bunki-graded-n3-world-beginning": "2beeedfe86c44b189fa51a3c703cb7ac481a64d8a6663e83c839cba3f009907e",
+      "bunki-graded-n3-hidden-deity": "1d933dfd1be9d24dbd080a76e6b3d0c08dc4289188b4026dd182aa2c4c43883f",
+      "bunki-graded-n3-kojiki-book": "c99cc83f76df0c30ef2fe14a95c43fed796cfe0df8d70d4e22e6a54354a604eb",
+      "bunki-graded-n3-hashira-counter": "4b280aafd306cb97ad2c68e0bf30ec78a590c9bb53eb37f6bdb31c06ba453997",
+      "bunki-graded-n3-feel-jingu-forest": "bca05136977a31ed453bf968ad207346bc3000f4f9fe6c19a9045011fa513362",
+      "bunki-graded-n3-musubi-visual": "69466a53f8083a92a62b0ea6403f74a5d993a5799bf1ef0b3edced21d5cb3905",
+      "bunki-graded-n3-gratitude-week": "4c555509751e3b5893fc240cd0ac64d25541a7e932d0be7e6447ef61cfa91fc2",
+      "bunki-graded-n3-thanks-before-help": "487a44f33add8cdd422b9f1d222c846df93d2e9cca138f61c81fe983fc05b823",
+      "bunki-essay-n2-zoka-as-one": "a3dd2dc579bf9f0e044859b2f2aadfab3100aff7ba17fe18237bd99f4f816fc5",
+      "bunki-essay-n2-nakaima-time": "ca1e35eb0389d416ec6911d7e10606a9374f60e21f3370d6aa9c501bdce5d1f6",
+      "bunki-essay-n2-creator-god": "c0d4f273e2d5f3c0f4739f50feacdd38e05ad89484acbce65cff48e18449e000",
+      "bunki-essay-n2-silent-amenominakanushi": "a60ca26f3f1dfb1aa6155ed91d479b12e4cfa31b1f57af9d28848031d4a6d1c4",
+      "bunki-essay-n2-kojiki-myth-history": "bc695bea42d708c1a4e714caa78a773d52ad64e546ec608b6ed16e3165a483a1",
+      "bunki-essay-n2-myth-to-book": "4592baff9acc0d6f1e9cda15d28f4b5c57fb353434f877a702bbef0ec669328b",
+      "bunki-essay-n2-feel-jingu-musubi": "4585c0b9fb4f2d1099fe339fedb0d97489f1ae86af85b1b2bbdce74d1f4a3a15",
+      "bunki-essay-n2-prayer-on-screen": "13f430983baa15d870e6333d8c2969f95844644382667a9d0f0efbd0cf41932d",
+      "bunki-essay-n2-thanks-first": "59986505cf592db2152784592c97cab1421c99bdee7d96eddc6369ca613d68e6",
+      "bunki-essay-n2-testimony-literacy": "50d9641f8a75993e02224015b16709b41d06c524525a0d06bba16983c5b510b4",
+      "bunki-essay-n1-cosmic-analogy": "f18ab0ff6528f1387a7a42132bafa8629c34c96f09e9d47ed8c16218ef38cd38",
+      "bunki-essay-n1-nakaima-time-theory": "43e7f91259b20c164b9cdfeed49a86ffd3f8efeb7ba4c4d3cd54173c5f0078f1",
+      "bunki-essay-n1-first-versus-supreme": "1059dcebba1c69c9142607aaf0e6b15554c914aade93c79f4c59c052a732b342",
+      "bunki-essay-n1-silent-god-theology": "4b9310bd263dbeed7822a7226523d85e6f10c5c03f19dc24b115914a2844c22d",
+      "bunki-essay-n1-kojiki-power": "a6995e7d5608635cc458b5997d684f88a5e9f140065c51c520cd58b1f1bb085b",
+      "bunki-essay-n1-beyond-fact-fiction": "91382127437ac078563a30a14017aeae98eee1eb4d5b7337872d811f9beeeb75",
+      "bunki-essay-n1-sacred-media": "03bcbc7d3f547e3690a980186c52763096c1d19c2d2b191b2d761f75a67694c0",
+      "bunki-essay-n1-ise-time": "e776f8c19fc361ba4bed863c840ab2849bbd22b1462ce9ac267eac76a0c509de",
+      "bunki-essay-n1-miracle-testimony": "9cf270df94c78bc46fa23d9ad58c933db95a7e218ef4e230dcabef61ed141892",
+      "bunki-essay-n1-prayer-reality": "aa7f08d1168dc668f7f042cc4e1a96d112f15d980ccc99dd2fa6cc2b1f29de82"
     }
   },
   "visualReferenceEvidence": {
@@ -57,29 +57,29 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "18471b428b9b7ae4ed5b9be396e2cea99eed871ee8620e18371e9d7e5600df22"
+        "sha256": "649cf901ef345485f474f570890c1af223ac285e616be32f8a88c62ae6d20c64"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "3abc7de5484635e9b15c0b04c349083407451f5c99df6a74f97055f74c4ce04f"
+        "sha256": "b41e88eeb9ab0562eab228e5a3984c2f4577d3fc943339cdf70a1fd825c2e12b"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "3ad9e43e75b8e60dabacc3b4f82f2b0cead8111381f5c5b0c70e1e39009e0006"
+        "sha256": "4c6c842a5cb8876b266d290914c70b13639ca5b3b709c2da716a03532a41148d"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "a2e072e4d55cfbccf1df293338e478f6190a63063acc9337342859d8097896af"
+        "sha256": "ff6ed53efdaa94d42b25a33fb194fcd41fa2ca7cb610d6e034b97b6699ffc75c"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "95320c542a000933ff91dae1167d027811fd61cdcb60ce8fcf5f5fd614f740a2"
+        "sha256": "04521d0171e928cabba9cdc9e9ba651478c1b2a0bfa332acbeaa677ddb27e0ff"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "713c6c36abb2dd9244397c9aae1bd47f97411bc29756c44b87dea59fe98e6cd2"
+        "sha256": "5a7e9d6fe4be2470ee89d6d80ed24fe791aa77d123b9383071deff1973180ec5"
       }
     }
   },
@@ -90,14 +90,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "造化三神に出会う朝",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "朝の図書館で『古事記』を開くと、最初の場面は意外なほど短い。天地が初めて起こった時、高天原に天之御中主神が現れる。続いて、高御産",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -106,7 +106,7 @@
       },
       "readerShape": {
         "title": "造化三神に出会う朝",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 703,
         "ruby": 263,
@@ -116,14 +116,14 @@
         "overflow": 0
       },
       "quick": {
-        "word": "の",
-        "reading": "",
-        "gloss": "連体・所有"
+        "word": "朝",
+        "reading": "あさ",
+        "gloss": "morning"
       },
       "fullEntry": {
-        "headword": "の　助詞",
-        "reading": "",
-        "text": "← 戻る\n✕\nの　助詞\n\n連体・所有\n\nTies two nouns: B of A, A's B, B which is A. Also nominalizes (読むのが好き) and softens questions (行くの？)."
+        "headword": "朝",
+        "reading": "あさ",
+        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例\n\n今回\nの\n部分\n開業\nに\nより\n、\nJR"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -139,14 +139,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「中今」を感じる一日",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "六時半。目が覚めると、すぐにスマートフォンを見た。昨日出した宿題の返事はまだ来ていない。来週の試験も気になる。布団の中で、昨日と",
         "level": "中級前半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -155,7 +155,7 @@
       },
       "readerShape": {
         "title": "「中今」を感じる一日",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級前半",
         "tokens": 731,
         "ruby": 281,
@@ -172,7 +172,7 @@
       "fullEntry": {
         "headword": "半",
         "reading": "はん",
-        "text": "← 戻る\n✕\n半\n\nはん\n\nn-pref · noun\n\nhalf\nsemi-\npartial\nhalf-past\nodd number\nhan (unit of land area, approx. 595.8 m^2)\n\n語義と用法をひ"
+        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\n1\n\nnoun, used as a prefix · noun (common) (futsuumeishi)\n\nhalf\nsemi-\npartial\n2\n\nnoun, use"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -188,14 +188,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "世界のはじまりに現れた三柱",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "『古事記』の物語は、天地の初めから始まる。ただし、そこには大きな音も、光の爆発も、神々の会議も描かれていない。本文が最初に伝える",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -204,7 +204,7 @@
       },
       "readerShape": {
         "title": "世界のはじまりに現れた三柱",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 712,
         "ruby": 278,
@@ -221,7 +221,7 @@
       "fullEntry": {
         "headword": "物語",
         "reading": "ものがたり",
-        "text": "← 戻る\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdict "
+        "text": "← 戻る\n覚\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdic"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -237,14 +237,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "姿を隠した神さま",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "「先生、『古事記』の最初の神さまたちは、どうしてすぐに隠れたんですか。」  放課後の教室で、ユウタが本を持って質問した。先生は該",
         "level": "中級前半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -253,7 +253,7 @@
       },
       "readerShape": {
         "title": "姿を隠した神さま",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級前半",
         "tokens": 743,
         "ruby": 214,
@@ -270,7 +270,7 @@
       "fullEntry": {
         "headword": "先生",
         "reading": "せんせい",
-        "text": "← 戻る\n✕\n先生\n\nせんせい\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nteacher\ninstructor\nmaster\n2\n\nnoun (common) (futsuumeishi) · noun"
+        "text": "← 戻る\n覚\n✕\n先生\n\nせんせい\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nteacher\ninstructor\nmaster\n2\n\nnoun (common) (futsuumeishi) · no"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -286,14 +286,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』はどんな本？",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "教室の机に、一冊の薄い文庫本が置かれた。表紙には『古事記』とある。先生が「日本で現存する最も古い歴史書です」と言うと、クラスから",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -302,7 +302,7 @@
       },
       "readerShape": {
         "title": "『古事記』はどんな本？",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 745,
         "ruby": 286,
@@ -319,7 +319,7 @@
       "fullEntry": {
         "headword": "教室",
         "reading": "きょうしつ",
-        "text": "← 戻る\n✕\n教室\n\nきょうしつ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nclassroom\nlecture room\n2\n\nnoun (common) (futsuumeishi)\n\ndepartm"
+        "text": "← 戻る\n覚\n✕\n教室\n\nきょうしつ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nclassroom\nlecture room\n2\n\nnoun (common) (futsuumeishi)\n\ndepar"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -335,14 +335,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "神さまを「一柱」と数えるわけ",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "日本語では、物によって数え方が変わる。本は一冊、紙は一枚、車は一台、人は一人という。神を数える時には、「柱」という助数詞がよく使",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -351,7 +351,7 @@
       },
       "readerShape": {
         "title": "神さまを「一柱」と数えるわけ",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 677,
         "ruby": 253,
@@ -368,7 +368,7 @@
       "fullEntry": {
         "headword": "で　助詞",
         "reading": "",
-        "text": "← 戻る\n✕\nで　助詞\n\n動作場所・手段\n\nWhere an action happens, or the tool it happens BY: 会議はここで開かれる、バスで行く。Also the boundary of a total "
+        "text": "← 戻る\n覚\n✕\nで　助詞\n\n動作場所・手段\n\nWhere an action happens, or the tool it happens BY: 会議はここで開かれる、バスで行く。Also the boundary of a tota"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -384,14 +384,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "伊勢神宮の森を映像で歩く",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "画面が開くと、先に届くのは説明ではなく、深い緑の気配である。伊勢神宮の公式映像「神宮を感じる FEEL JINGU『産霊 ダイジ",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -400,7 +400,7 @@
       },
       "readerShape": {
         "title": "伊勢神宮の森を映像で歩く",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 739,
         "ruby": 280,
@@ -417,7 +417,7 @@
       "fullEntry": {
         "headword": "画面",
         "reading": "がめん",
-        "text": "← 戻る\n✕\n画面\n\nがめん\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nscreen (of a TV, computer, etc.)\n\n2\n\nnoun (common) (futsuumeishi)"
+        "text": "← 戻る\n覚\n✕\n画面\n\nがめん\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nscreen (of a TV, computer, etc.)\n\n2\n\nnoun (common) (futsuumeish"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -433,14 +433,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "天・地・祈りをつなぐ「むすひ」",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "高い木の間から空が見える。地面には影が落ち、水は低い方へ流れていく。人はその間を歩き、手を動かし、祈りの前で姿勢を整える。伊勢神",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -449,7 +449,7 @@
       },
       "readerShape": {
         "title": "天・地・祈りをつなぐ「むすひ」",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 696,
         "ruby": 251,
@@ -466,7 +466,7 @@
       "fullEntry": {
         "headword": "高い",
         "reading": "たかい",
-        "text": "← 戻る\n✕\n高い\n\nたかい\n\n同じ形の 4 項目\n\n高いたかい\nhigh\n›\n高いたかーい\nhigh\n›\n高いたっけー\nhigh\n›\n高いたっかーい\nhigh\n›\n\ni-adjective\n\n高い・高価い・高ーい\nたかい・たかーい・たっけ"
+        "text": "← 戻る\n覚\n✕\n高い\n\nたかい\n\n同じ形の 4 項目\n\n高いたかい\nhigh\n›\n高いたかーい\nhigh\n›\n高いたっけー\nhigh\n›\n高いたっかーい\nhigh\n›\n\ni-adjective\n\n高い・高価い・高ーい\nたかい・たかーい・た"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -482,14 +482,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "一週間、感謝の言葉を唱えてみた",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "これは、日本語を学ぶミナを主人公にした創作日記である。実在する人の体験談ではなく、言葉を唱えた効果を証明する記録でもない。元にな",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -498,7 +498,7 @@
       },
       "readerShape": {
         "title": "一週間、感謝の言葉を唱えてみた",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 648,
         "ruby": 238,
@@ -515,7 +515,7 @@
       "fullEntry": {
         "headword": "これ／此れ",
         "reading": "これ",
-        "text": "← 戻る\n✕\nこれ／此れ\n\nこれ\n\n同じ形の 2 項目\n\nこれこれ\nthis\n›\nこれこれ\nhey\n›\n\npronoun\n\n此れ・是・之・維・惟・此・是れ・之れ\nこれ\n1\n\npronoun · word usually written us"
+        "text": "← 戻る\n覚\n✕\nこれ／此れ\n\nこれ\n\n同じ形の 2 項目\n\nこれこれ\nthis\n›\nこれこれ\nhey\n›\n\npronoun\n\n此れ・是・之・維・惟・此・是れ・之れ\nこれ\n1\n\npronoun · word usually written "
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -531,14 +531,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「助けて」より先に「ありがとう」？",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "「まだ助けてもらっていないのに、先に『ありがとうございます』と言うのは変じゃない？」  放課後の喫茶店で、エリはスマートフォンの",
         "level": "中級前半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -547,7 +547,7 @@
       },
       "readerShape": {
         "title": "「助けて」より先に「ありがとう」？",
-        "source": "段階別読み物 · Bunki",
+        "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級前半",
         "tokens": 766,
         "ruby": 228,
@@ -564,7 +564,7 @@
       "fullEntry": {
         "headword": "まだ／未だ",
         "reading": "まだ",
-        "text": "← 戻る\n✕\nまだ／未だ\n\nまだ\n\nadverb\n\n未だ\nまだ・いまだ\n1\n\nadverb (fukushi) · word usually written using kana alone\n\nstill\nas yet\nonly\n2\n\nad"
+        "text": "← 戻る\n覚\n✕\nまだ／未だ\n\nまだ\n\nadverb\n\n未だ\nまだ・いまだ\n1\n\nadverb (fukushi) · word usually written using kana alone\n\nstill\nas yet\nonly\n2\n\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -580,14 +580,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "三柱の神を一つの働きとして読む",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "『古事記』の冒頭には、天地が初めて起こった時、高天原に天之御中主神、高御産巣日神、神産巣日神が現れたと記されている。三柱はいずれ",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -596,7 +596,7 @@
       },
       "readerShape": {
         "title": "三柱の神を一つの働きとして読む",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 785,
         "ruby": 299,
@@ -613,7 +613,7 @@
       "fullEntry": {
         "headword": "冒頭",
         "reading": "ぼうとう",
-        "text": "← 戻る\n✕\n冒頭\n\nぼうとう\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nbeginning\nopening\nstart\noutset\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJ"
+        "text": "← 戻る\n覚\n✕\n冒頭\n\nぼうとう\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nbeginning\nopening\nstart\noutset\n\nJMdict · EDRDG · CC BY-SA 4.0\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -629,14 +629,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "過去・現在・未来と「中今」",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "昨日の失敗を何度も思い出し、明日の予定を心配しているうちに、目の前の食事が冷めてしまう。そんな経験をすると、「今を生きる」という",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -645,7 +645,7 @@
       },
       "readerShape": {
         "title": "過去・現在・未来と「中今」",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 812,
         "ruby": 306,
@@ -662,7 +662,7 @@
       "fullEntry": {
         "headword": "昨日",
         "reading": "きのう",
-        "text": "← 戻る\n✕\n昨日\n\nきのう\n\n同じ形の 2 項目\n\n昨日きのう\nyesterday\n›\n昨日さくじつ\nyesterday\n›\n\nnoun · adverb\n\n昨日\nきのう・さくじつ\n1\n\nnoun (common) (futsuumeis"
+        "text": "← 戻る\n覚\n✕\n昨日\n\nきのう\n\n同じ形の 2 項目\n\n昨日きのう\nyesterday\n›\n昨日さくじつ\nyesterday\n›\n\nnoun · adverb\n\n昨日\nきのう・さくじつ\n1\n\nnoun (common) (futsuume"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -678,14 +678,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「創造神」という言葉はどこまで正しいか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "「世界を創造した原初の神」と聞くと、多くの人は、意思を持つ一柱の神が何もない所から宇宙を作る場面を想像するだろう。ハテナ見聞録の",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -694,7 +694,7 @@
       },
       "readerShape": {
         "title": "「創造神」という言葉はどこまで正しいか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 795,
         "ruby": 310,
@@ -711,7 +711,7 @@
       "fullEntry": {
         "headword": "世界",
         "reading": "せかい",
-        "text": "← 戻る\n✕\n世界\n\nせかい\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nthe world\nsociety\nthe universe\n2\n\nnoun (common) (futsuumeishi)\n\ns"
+        "text": "← 戻る\n覚\n✕\n世界\n\nせかい\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nthe world\nsociety\nthe universe\n2\n\nnoun (common) (futsuumeishi)\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -727,14 +727,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "天之御中主神――語られない神をどう読むか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "物語の最初に名前を呼ばれながら、すぐに舞台から消える神がいる。『古事記』の天地初発では、天之御中主神は高天原に最初に現れた神とし",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -743,7 +743,7 @@
       },
       "readerShape": {
         "title": "天之御中主神――語られない神をどう読むか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 777,
         "ruby": 281,
@@ -760,7 +760,7 @@
       "fullEntry": {
         "headword": "物語",
         "reading": "ものがたり",
-        "text": "← 戻る\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdict "
+        "text": "← 戻る\n覚\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdic"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -776,14 +776,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』は神話か、歴史か",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "『古事記』について話す時、「神話なのか、歴史なのか」と質問されることがある。二つの箱を机に置き、どちらか一方へ本を入れようとする",
         "level": "上級前半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -792,7 +792,7 @@
       },
       "readerShape": {
         "title": "『古事記』は神話か、歴史か",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "上級前半",
         "tokens": 775,
         "ruby": 307,
@@ -809,7 +809,7 @@
       "fullEntry": {
         "headword": "つく／点く",
         "reading": "つく",
-        "text": "← 戻る\n✕\nつく／点く\n\nつく\n\n同じ形の 6 項目\n\nつくつく\nto be lit (of a lamp, burner, etc.)\n›\nつくつく\nto take (seat, position, course, office, et"
+        "text": "← 戻る\n覚\n✕\nつく／点く\n\nつく\n\n同じ形の 6 項目\n\nつくつく\nto be lit (of a lamp, burner, etc.)\n›\nつくつく\nto take (seat, position, course, office, "
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -825,14 +825,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "語りから書物へ――神話を編む",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "もし『古事記』成立のドキュメンタリーを作るなら、最初の画面をどうするだろう。薄暗い部屋で稗田阿礼が物語を語り、太安万侶が一字ずつ",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -841,7 +841,7 @@
       },
       "readerShape": {
         "title": "語りから書物へ――神話を編む",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 744,
         "ruby": 293,
@@ -858,7 +858,7 @@
       "fullEntry": {
         "headword": "もし／若し",
         "reading": "もし",
-        "text": "← 戻る\n✕\nもし／若し\n\nもし\n\n同じ形の 2 項目\n\nもしもし\nif\n›\nもしもし\nexcuse me! (when calling out to someone)\n›\n\nadverb\n\n1\n\nadverb (fukushi) · wo"
+        "text": "← 戻る\n覚\n✕\nもし／若し\n\nもし\n\n同じ形の 2 項目\n\nもしもし\nif\n›\nもしもし\nexcuse me! (when calling out to someone)\n›\n\nadverb\n\n1\n\nadverb (fukushi) · "
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -874,14 +874,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "映像が伝える「むすひ」",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "伊勢神宮の公式映像「産霊 ダイジェスト」は、教室のように用語を定義しない。木々、水、社殿、祈りの所作、手仕事の細部が、音とともに",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -890,7 +890,7 @@
       },
       "readerShape": {
         "title": "映像が伝える「むすひ」",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 800,
         "ruby": 310,
@@ -907,7 +907,7 @@
       "fullEntry": {
         "headword": "神宮",
         "reading": "じんぐう",
-        "text": "← 戻る\n✕\n神宮\n\nじんぐう\n\nnoun · n-suf\n\n1\n\nnoun (common) (futsuumeishi) · noun, used as a suffix\n\nhigh-status Shinto shrine with "
+        "text": "← 戻る\n覚\n✕\n神宮\n\nじんぐう\n\nnoun · n-suf\n\n1\n\nnoun (common) (futsuumeishi) · noun, used as a suffix\n\nhigh-status Shinto shrine wit"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -923,14 +923,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "映像の中で祈りはどう見えるか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "祈りそのものに形はあるだろうか。心の内側だけをカメラは映せない。映せるのは、頭を下げる姿、整えられた場所、運ばれる物、静かに動く",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -939,7 +939,7 @@
       },
       "readerShape": {
         "title": "映像の中で祈りはどう見えるか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 828,
         "ruby": 323,
@@ -956,7 +956,7 @@
       "fullEntry": {
         "headword": "祈り",
         "reading": "いのり",
-        "text": "← 戻る\n✕\n祈り\n\nいのり\n\nnoun\n\n祈り・祷り\nいのり\n1\n\nnoun (common) (futsuumeishi)\n\nprayer\nsupplication\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJLP"
+        "text": "← 戻る\n覚\n✕\n祈り\n\nいのり\n\nnoun\n\n祈り・祷り\nいのり\n1\n\nnoun (common) (futsuumeishi)\n\nprayer\nsupplication\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJ"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -972,14 +972,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「ありがとうございます」を先に言う心理",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "お願いがある場面では、日本語で「すみませんが」と前置きすることがある。それに対して、まだ助けを受けていない段階で「ありがとうござ",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -988,7 +988,7 @@
       },
       "readerShape": {
         "title": "「ありがとうございます」を先に言う心理",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 791,
         "ruby": 264,
@@ -1005,7 +1005,7 @@
       "fullEntry": {
         "headword": "願い",
         "reading": "ねがい",
-        "text": "← 戻る\n✕\n願い\n\nねがい\n\nnoun\n\n願い・願\nねがい\n1\n\nnoun (common) (futsuumeishi)\n\ndesire\nwish\nhope\n2\n\nnoun (common) (futsuumeishi)\n\nreques"
+        "text": "← 戻る\n覚\n✕\n願い\n\nねがい\n\nnoun\n\n願い・願\nねがい\n1\n\nnoun (common) (futsuumeishi)\n\ndesire\nwish\nhope\n2\n\nnoun (common) (futsuumeishi)\n\nrequ"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1021,14 +1021,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "体験談をどう受け取るか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "ある言葉を唱えた後に長く悩んでいた問題が解決した、という体験談を聞いた時、すぐ信じるか、すぐ否定するかの二択に入りやすい。しかし",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1037,7 +1037,7 @@
       },
       "readerShape": {
         "title": "体験談をどう受け取るか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 815,
         "ruby": 293,
@@ -1054,7 +1054,7 @@
       "fullEntry": {
         "headword": "ある／有る",
         "reading": "ある",
-        "text": "← 戻る\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb w"
+        "text": "← 戻る\n覚\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1070,14 +1070,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "造化三神を宇宙論として読む誘惑",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "神話の冒頭と宇宙の始まりは、あまりにも似合いのよい組み合わせに見える。『古事記』は天地初発の時、高天原に天之御中主神、高御産巣日",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1086,7 +1086,7 @@
       },
       "readerShape": {
         "title": "造化三神を宇宙論として読む誘惑",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 942,
         "ruby": 362,
@@ -1103,7 +1103,7 @@
       "fullEntry": {
         "headword": "神話",
         "reading": "しんわ",
-        "text": "← 戻る\n✕\n神話\n\nしんわ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nmyth\nmythology\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJLPT N2\n\nこの語の漢字\n\n神"
+        "text": "← 戻る\n覚\n✕\n神話\n\nしんわ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nmyth\nmythology\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJLPT N2\n\nこの語の漢字\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1119,14 +1119,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「中今」は時間論になり得るか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "「今を生きよ」という言葉は、簡潔であるほど疑わしくもなる。過去を忘れ、未来の結果を考えず、この瞬間の感覚だけに従えという意味なら",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1135,7 +1135,7 @@
       },
       "readerShape": {
         "title": "「中今」は時間論になり得るか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 922,
         "ruby": 353,
@@ -1152,7 +1152,7 @@
       "fullEntry": {
         "headword": "を　助詞",
         "reading": "",
-        "text": "← 戻る\n✕\nを　助詞\n\n対格\n\nMarks what the action is done TO — and the space moved THROUGH with motion verbs (空を飛ぶ).\n\n用例\n\n本を読む。\n\n公園"
+        "text": "← 戻る\n覚\n✕\nを　助詞\n\n対格\n\nMarks what the action is done TO — and the space moved THROUGH with motion verbs (空を飛ぶ).\n\n用例\n\n本を読む。\n\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1168,14 +1168,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "原初神を「最高神」と呼ぶときの問題",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "物語の最初に現れる者は、物語世界で最も偉いのだろうか。ハテナ見聞録の動画（V2）が「世界を創造した？」という疑問形で造化三神の謎",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1184,7 +1184,7 @@
       },
       "readerShape": {
         "title": "原初神を「最高神」と呼ぶときの問題",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 957,
         "ruby": 381,
@@ -1201,7 +1201,7 @@
       "fullEntry": {
         "headword": "物語",
         "reading": "ものがたり",
-        "text": "← 戻る\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdict "
+        "text": "← 戻る\n覚\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdic"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1217,14 +1217,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "沈黙する神と不在の神学",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "ある神は、名を記された後に何も語られない。その後の『古事記』では、命令もせず、争いにも加わらず、子孫の系譜も語られない。『古事記",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1233,7 +1233,7 @@
       },
       "readerShape": {
         "title": "沈黙する神と不在の神学",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 935,
         "ruby": 342,
@@ -1250,7 +1250,7 @@
       "fullEntry": {
         "headword": "ある／有る",
         "reading": "ある",
-        "text": "← 戻る\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb w"
+        "text": "← 戻る\n覚\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1266,14 +1266,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』編纂と権力の物語",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "一冊の古典が「国の物語」になる時、その背後には必ず選択がある。どの系譜をつなぎ、どの異伝を採り、誰の祖先を中心に置き、どの時代で",
         "level": "上級前半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1282,7 +1282,7 @@
       },
       "readerShape": {
         "title": "『古事記』編纂と権力の物語",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "上級前半",
         "tokens": 942,
         "ruby": 389,
@@ -1299,7 +1299,7 @@
       "fullEntry": {
         "headword": "古典",
         "reading": "こてん",
-        "text": "← 戻る\n✕\n古典\n\nこてん\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nclassic (work, esp. book)\nthe classics\n\nJMdict · EDRDG · CC BY-SA"
+        "text": "← 戻る\n覚\n✕\n古典\n\nこてん\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nclassic (work, esp. book)\nthe classics\n\nJMdict · EDRDG · CC BY-"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1315,14 +1315,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "神話を「事実か虚構か」で裁かないために",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "神話について語り始めると、しばしば二つの席しか用意されていない。一方は「すべて実際に起きた」という席、他方は「作り話だから価値が",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1331,7 +1331,7 @@
       },
       "readerShape": {
         "title": "神話を「事実か虚構か」で裁かないために",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 960,
         "ruby": 364,
@@ -1348,7 +1348,7 @@
       "fullEntry": {
         "headword": "神話",
         "reading": "しんわ",
-        "text": "← 戻る\n✕\n神話\n\nしんわ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nmyth\nmythology\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJLPT N2\n\nこの語の漢字\n\n神"
+        "text": "← 戻る\n覚\n✕\n神話\n\nしんわ\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nmyth\nmythology\n\nJMdict · EDRDG · CC BY-SA 4.0\n\nJLPT N2\n\nこの語の漢字\n"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1364,14 +1364,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「感じる」映像は神聖さをどう構成するか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "神聖さは、カメラにそのまま写る物体ではない。それでも映像は、見る者に「ここは日常と違う」と感じさせることができる。伊勢神宮の公式",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1380,7 +1380,7 @@
       },
       "readerShape": {
         "title": "「感じる」映像は神聖さをどう構成するか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 970,
         "ruby": 366,
@@ -1397,7 +1397,7 @@
       "fullEntry": {
         "headword": "神聖",
         "reading": "しんせい",
-        "text": "← 戻る\n✕\n神聖\n\nしんせい\n\nnoun · na-adjective\n\n1\n\nnoun (common) (futsuumeishi) · adjectival nouns or quasi-adjectives (keiyodoshi"
+        "text": "← 戻る\n覚\n✕\n神聖\n\nしんせい\n\nnoun · na-adjective\n\n1\n\nnoun (common) (futsuumeishi) · adjectival nouns or quasi-adjectives (keiyodos"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1413,14 +1413,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "産霊・自然・反復――伊勢の時間",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "水が流れる。枝の間から光が落ちる。白い布が揺れ、木に触れる手が止まり、また動く。伊勢神宮の公式映像（V4）「産霊 ダイジェスト」",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1429,7 +1429,7 @@
       },
       "readerShape": {
         "title": "産霊・自然・反復――伊勢の時間",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 956,
         "ruby": 380,
@@ -1439,14 +1439,14 @@
         "overflow": 0
       },
       "quick": {
-        "word": "が",
-        "reading": "",
-        "gloss": "主格"
+        "word": "水",
+        "reading": "みず",
+        "gloss": "water (esp. cool or cold)"
       },
       "fullEntry": {
-        "headword": "が　助詞",
-        "reading": "",
-        "text": "← 戻る\n✕\nが　助詞\n\n主格\n\nPicks out WHICH one — the doer or the thing being described, often new information or the answer to a q"
+        "headword": "水",
+        "reading": "みず",
+        "text": "← 戻る\n覚\n✕\n水\n\nみず\n\nnoun\n\n1\n\nnoun (common) (futsuumeishi)\n\nwater (esp. cool or cold)\n\n辞書内の関連項目\n\n湯\nゆ・1\n›\n2\n\nnoun (common) (fu"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1462,14 +1462,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "奇跡の体験談と認識の責任",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "ある言葉を唱えた後で思いがけない助けがあった、という体験談を前にすると、受け手は二つの極へ引かれやすい。奇跡の証明として受け入れ",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1478,7 +1478,7 @@
       },
       "readerShape": {
         "title": "奇跡の体験談と認識の責任",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 940,
         "ruby": 338,
@@ -1495,7 +1495,7 @@
       "fullEntry": {
         "headword": "ある／有る",
         "reading": "ある",
-        "text": "← 戻る\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb w"
+        "text": "← 戻る\n覚\n✕\nある／有る\n\nある\n\n同じ形の 2 項目\n\nあるある\nto be\n›\nあるある\na certain ...\n›\n\ngodan verb · intransitive verb\n\n有る・在る\nある\n1\n\ngodan verb"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -1511,14 +1511,14 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "祈りの言葉は誰の現実を変えるのか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "licence": [
           "Bunki original"
         ],
         "snippet": "以下は、異なる立場を考えるために書いた架空の対話である。登場する「信じる人」「研究者」「懐疑する人」は実在の体験者ではなく、複数",
         "level": "中級後半",
-        "background": "rgb(255, 253, 246)",
-        "border": "1px solid rgba(20, 24, 28, 0.08)",
+        "background": "rgb(250, 246, 234)",
+        "border": "1px solid rgba(28, 47, 66, 0.08)",
         "radius": "8px",
         "titleFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "titleSize": "19px",
@@ -1527,7 +1527,7 @@
       },
       "readerShape": {
         "title": "祈りの言葉は誰の現実を変えるのか",
-        "source": "随筆 · Bunki",
+        "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 971,
         "ruby": 334,
@@ -1544,7 +1544,7 @@
       "fullEntry": {
         "headword": "以下",
         "reading": "いか",
-        "text": "← 戻る\n✕\n以下\n\nいか\n\n同じ形の 2 項目\n\n以下いか\nnot exceeding ...\n›\n以下いげ\nnot exceeding ...\n›\n\nn-suf\n\n以下・已下\nいか・いげ\n1\n\nnoun, used as a suffi"
+        "text": "← 戻る\n覚\n✕\n以下\n\nいか\n\n同じ形の 2 項目\n\n以下いか\nnot exceeding ...\n›\n以下いげ\nnot exceeding ...\n›\n\nn-suf\n\n以下・已下\nいか・いげ\n1\n\nnoun, used as a suf"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
