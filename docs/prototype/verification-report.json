@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "yearageyearspast one's primeold age",
-        "senses": 5,
+        "gloss": "year",
+        "senses": 3,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 05:36",
+          "2026-08-16 06:51",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 05:41",
+          "2026-08-16 06:56",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 05:45",
+          "2026-08-16 07:00",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 10 d",
-          "2026-08-26 05:35",
+          "in 6 d",
+          "2026-08-22 06:50",
           "8.30"
         ]
       ]
@@ -525,9 +525,9 @@
       },
       {
         "text": "フィヨルド",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
@@ -557,9 +557,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -573,9 +573,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -645,9 +645,9 @@
       },
       {
         "text": "また",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -661,9 +661,9 @@
       },
       {
         "text": "カ所しょ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -725,9 +725,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -741,17 +741,17 @@
       },
       {
         "text": "認みとめ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "この",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -773,9 +773,9 @@
       },
       {
         "text": "より",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -877,9 +877,9 @@
       },
       {
         "text": "なる",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -933,9 +933,9 @@
       },
       {
         "text": "つぐ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -989,9 +989,9 @@
       },
       {
         "text": "なっ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1061,17 +1061,17 @@
       },
       {
         "text": "あわせ",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "はじめて",
-        "w": 91,
+        "w": 89,
         "h": 44,
-        "hitW": 91,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1117,9 +1117,9 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1165,9 +1165,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1197,9 +1197,9 @@
       },
       {
         "text": "中心ちゅうしん",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1261,9 +1261,9 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1317,17 +1317,17 @@
       },
       {
         "text": "マツ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "トドマツ",
-        "w": 91,
+        "w": 89,
         "h": 44,
-        "hitW": 91,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1357,17 +1357,17 @@
       },
       {
         "text": "ダケカンバ",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ミズナラ",
-        "w": 91,
+        "w": 89,
         "h": 44,
-        "hitW": 91,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1397,17 +1397,17 @@
       },
       {
         "text": "しげり",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "山頂さんちょう",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1429,9 +1429,9 @@
       },
       {
         "text": "稜線りょうせん",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1453,9 +1453,9 @@
       },
       {
         "text": "植物しょくぶつ",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1485,9 +1485,9 @@
       },
       {
         "text": "また",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1517,9 +1517,9 @@
       },
       {
         "text": "流氷りゅうひょう",
-        "w": 61,
+        "w": 60,
         "h": 44,
-        "hitW": 61,
+        "hitW": 60,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1565,9 +1565,9 @@
       },
       {
         "text": "する",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1621,9 +1621,9 @@
       },
       {
         "text": "際さいし",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1637,9 +1637,9 @@
       },
       {
         "text": "こう",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1661,9 +1661,9 @@
       },
       {
         "text": "環境かんきょう",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1677,33 +1677,33 @@
       },
       {
         "text": "おけ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "特色とくしょく",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "豊ゆたか",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1717,9 +1717,9 @@
       },
       {
         "text": "とりわけ",
-        "w": 91,
+        "w": 89,
         "h": 44,
-        "hitW": 91,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1757,9 +1757,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1829,9 +1829,9 @@
       },
       {
         "text": "高たかく",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1877,9 +1877,9 @@
       },
       {
         "text": "する",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1909,9 +1909,9 @@
       },
       {
         "text": "トド",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1925,9 +1925,9 @@
       },
       {
         "text": "クジラ",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1965,9 +1965,9 @@
       },
       {
         "text": "する",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -1981,17 +1981,17 @@
       },
       {
         "text": "ヒグマ",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "シマフクロウ",
-        "w": 136,
+        "w": 132,
         "h": 44,
-        "hitW": 136,
+        "hitW": 132,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2005,9 +2005,9 @@
       },
       {
         "text": "含ふくむ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2029,9 +2029,9 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2045,9 +2045,9 @@
       },
       {
         "text": "から",
-        "w": 46,
+        "w": 45,
         "h": 45,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2165,9 +2165,9 @@
       },
       {
         "text": "その",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2189,9 +2189,9 @@
       },
       {
         "text": "周辺しゅうへん",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2221,9 +2221,9 @@
       },
       {
         "text": "厳きびしい",
-        "w": 67,
+        "w": 66,
         "h": 44,
-        "hitW": 67,
+        "hitW": 66,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2285,9 +2285,9 @@
       },
       {
         "text": "とも",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2301,9 +2301,9 @@
       },
       {
         "text": "立たち入いり",
-        "w": 89,
+        "w": 88,
         "h": 44,
-        "hitW": 89,
+        "hitW": 88,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2333,9 +2333,9 @@
       },
       {
         "text": "いる",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2365,9 +2365,9 @@
       },
       {
         "text": "より",
-        "w": 46,
+        "w": 45,
         "h": 45,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 45,
         "id": "tok plain particle"
       },
@@ -2453,9 +2453,9 @@
       },
       {
         "text": "含ふくめ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2485,17 +2485,17 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フレー",
-        "w": 67,
+        "w": 66,
         "h": 44,
-        "hitW": 67,
+        "hitW": 66,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2509,33 +2509,33 @@
       },
       {
         "text": "フォート",
-        "w": 90,
+        "w": 88,
         "h": 44,
-        "hitW": 90,
+        "hitW": 88,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ドーム",
-        "w": 67,
+        "w": 66,
         "h": 44,
-        "hitW": 67,
+        "hitW": 66,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ワジ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ヒタン",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2581,41 +2581,41 @@
       },
       {
         "text": "フィヨルド",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "フィヨルド",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "および",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ナールオイ・フィヨルド",
-        "w": 246,
+        "w": 241,
         "h": 44,
-        "hitW": 246,
+        "hitW": 241,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2645,9 +2645,9 @@
       },
       {
         "text": "および",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2669,17 +2669,17 @@
       },
       {
         "text": "ドンパヤーイェン",
-        "w": 179,
+        "w": 176,
         "h": 44,
-        "hitW": 179,
+        "hitW": 176,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "カオヤイ",
-        "w": 91,
+        "w": 89,
         "h": 44,
-        "hitW": 91,
+        "hitW": 89,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2701,9 +2701,9 @@
       },
       {
         "text": "コイバ",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2733,9 +2733,9 @@
       },
       {
         "text": "その",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2773,9 +2773,9 @@
       },
       {
         "text": "また",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2861,9 +2861,9 @@
       },
       {
         "text": "拡張かくちょう",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2877,9 +2877,9 @@
       },
       {
         "text": "フラワーズ",
-        "w": 112,
+        "w": 110,
         "h": 44,
-        "hitW": 112,
+        "hitW": 110,
         "hitH": 44,
         "id": "tok content"
       },
@@ -2909,17 +2909,17 @@
       },
       {
         "text": "セント",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "キル",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3085,9 +3085,9 @@
       },
       {
         "text": "現状げんじょう",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3117,9 +3117,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 49,
+        "w": 48,
         "h": 44,
-        "hitW": 49,
+        "hitW": 48,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3165,9 +3165,9 @@
       },
       {
         "text": "あたっ",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3197,9 +3197,9 @@
       },
       {
         "text": "求もとめる",
-        "w": 67,
+        "w": 66,
         "h": 44,
-        "hitW": 67,
+        "hitW": 66,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3341,9 +3341,9 @@
       },
       {
         "text": "リスト",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3357,17 +3357,17 @@
       },
       {
         "text": "提出ていしゅつ",
-        "w": 51,
+        "w": 50,
         "h": 44,
-        "hitW": 51,
+        "hitW": 50,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "する",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3453,9 +3453,9 @@
       },
       {
         "text": "その",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3477,9 +3477,9 @@
       },
       {
         "text": "受うけ",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3509,9 +3509,9 @@
       },
       {
         "text": "行おこない",
-        "w": 49,
+        "w": 48,
         "h": 44,
-        "hitW": 49,
+        "hitW": 48,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3605,9 +3605,9 @@
       },
       {
         "text": "行おこなう",
-        "w": 49,
+        "w": 48,
         "h": 44,
-        "hitW": 49,
+        "hitW": 48,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3637,9 +3637,9 @@
       },
       {
         "text": "状況じょうきょう",
-        "w": 61,
+        "w": 60,
         "h": 44,
-        "hitW": 61,
+        "hitW": 60,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3749,9 +3749,9 @@
       },
       {
         "text": "受うける",
-        "w": 67,
+        "w": 66,
         "h": 44,
-        "hitW": 67,
+        "hitW": 66,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3773,9 +3773,9 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3933,9 +3933,9 @@
       },
       {
         "text": "あげ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3957,9 +3957,9 @@
       },
       {
         "text": "リスト",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -3989,9 +3989,9 @@
       },
       {
         "text": "取とり消けし",
-        "w": 89,
+        "w": 88,
         "h": 44,
-        "hitW": 89,
+        "hitW": 88,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4021,9 +4021,9 @@
       },
       {
         "text": "いる",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4045,25 +4045,25 @@
       },
       {
         "text": "リスト",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "から",
-        "w": 46,
+        "w": 45,
         "h": 45,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "取とり消けさ",
-        "w": 89,
+        "w": 88,
         "h": 44,
-        "hitW": 89,
+        "hitW": 88,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4085,9 +4085,9 @@
       },
       {
         "text": "エクアドル",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4101,17 +4101,17 @@
       },
       {
         "text": "サン",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "ガイ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4133,9 +4133,9 @@
       },
       {
         "text": "マリ",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4149,17 +4149,17 @@
       },
       {
         "text": "トンブクトゥ",
-        "w": 136,
+        "w": 132,
         "h": 44,
-        "hitW": 136,
+        "hitW": 132,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "アルバニア",
-        "w": 113,
+        "w": 111,
         "h": 44,
-        "hitW": 113,
+        "hitW": 111,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4173,17 +4173,17 @@
       },
       {
         "text": "ブト",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
       {
         "text": "リント",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4197,9 +4197,9 @@
       },
       {
         "text": "ある",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4245,17 +4245,17 @@
       },
       {
         "text": "まで",
-        "w": 46,
+        "w": 45,
         "h": 45,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 45,
         "id": "tok plain particle"
       },
       {
         "text": "続つづき",
-        "w": 45,
+        "w": 44,
         "h": 44,
-        "hitW": 45,
+        "hitW": 44,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4301,9 +4301,9 @@
       },
       {
         "text": "リスト",
-        "w": 68,
+        "w": 67,
         "h": 44,
-        "hitW": 68,
+        "hitW": 67,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4357,9 +4357,9 @@
       },
       {
         "text": "する",
-        "w": 46,
+        "w": 45,
         "h": 44,
-        "hitW": 46,
+        "hitW": 45,
         "hitH": 44,
         "id": "tok content"
       },
@@ -4381,9 +4381,9 @@
       },
       {
         "text": "← 戻るback",
-        "w": 72,
+        "w": 73,
         "h": 44,
-        "hitW": 72,
+        "hitW": 73,
         "hitH": 44,
         "id": "sheet-back"
       },
@@ -4613,9 +4613,9 @@
       },
       {
         "text": "レッスンlessons",
-        "w": 102,
+        "w": 104,
         "h": 46,
-        "hitW": 102,
+        "hitW": 104,
         "hitH": 46,
         "id": "lessons-link"
       },
@@ -7068,9 +7068,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 466,
+  "loadMs": 525,
   "summary": {
-    "total": 116,
+    "total": 121,
     "failed": 0
   },
   "results": [
@@ -7097,7 +7097,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.72000122070312,\"y\":570.47998046875,\"productive\":true}"
+      "detail": "{\"x\":147.3800048828125,\"y\":570.6900024414062,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7117,7 +7117,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "70 texts, ready in 466 ms"
+      "detail": "70 texts, ready in 525 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7287,7 +7287,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 5 senses"
+      "detail": "年: 3 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -7337,7 +7337,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 10 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 6 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -7567,7 +7567,32 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786858602656,\"probe\",\"word:屏風\",1,1]"
+      "detail": "row [1786863104327,\"probe\",\"word:醤油\",1,1]"
+    },
+    {
+      "name": "dojo · a taken card keeps its honest next-due intervals",
+      "pass": true,
+      "detail": "水 → 1 min · 6 min · 10 min · 9 d"
+    },
+    {
+      "name": "dojo · grading the taken card writes the deck — FSRS record, revlog row, one new-card slot",
+      "pass": true,
+      "detail": "{\"srsKeys\":[\"kanji:水\"],\"revlog\":1,\"nnew\":1,\"dojoRows\":0}"
+    },
+    {
+      "name": "dojo · a never-taken card promises no schedule — every seal stamps practice",
+      "pass": true,
+      "detail": "一 → practice · practice · practice · practice"
+    },
+    {
+      "name": "dojo · a drill grade writes evidence only — no FSRS state, no revlog row, no burned slot",
+      "pass": true,
+      "detail": "srs [\"kanji:水\"] · revlog 1 · nnew 1"
+    },
+    {
+      "name": "dojo · the practice row lands in the observation ledger with its room",
+      "pass": true,
+      "detail": "row [1786863107856,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -7652,7 +7677,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     }
   ]
 }

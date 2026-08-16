@@ -730,7 +730,11 @@ function validObservationRow(row) {
   }
   if (row[1] === 'drift') return row.length === 4 && [1, 3].includes(row[3]);
   if (row[1] === 'dojo') {
-    return row.length === 4 && Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
+    // four wide (older rows and undo's revocation), or five with the drill
+    // room's name riding as the trailing mode
+    if (row.length !== 4 && row.length !== 5) return false;
+    if (row.length === 5 && !nonEmptyString(row[4])) return false;
+    return Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
   }
   return false;
 }
@@ -1060,6 +1064,12 @@ function commitStorePatch(patch) {
  *   [t, 'probe', key, g, minted]
  *       a yomi-probe self-grade in the dojo — g 1 read it wrong · 3 read
  *       it right; minted 1 when the miss minted a card, else 0
+ *   [t, 'dojo', key, g, mode?]
+ *       a focus-drill grade on a card the learner never TOOK — practice
+ *       evidence on the FSRS scale (g 1–4; a g 0 row is undo's revocation,
+ *       filed beside the judgment); mode names the drill room ('kanji')
+ *       on rows written since the room was recorded. Evidence only:
+ *       no FSRS state, no revlog row, no daily new-card slot.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -6275,8 +6285,12 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.revealed = false;
 }
 
-function commitDrillGrade({ rv, item, next, key, skey, rating, now }) {
-  const obslog = [...(S.obslog || []), [now.getTime(), 'dojo', skey, rating]];
+function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
+  // practice evidence, never deck state: the row carries the drill room
+  // ('kanji') when the caller names one — see the obslog layout comment
+  const row = [now.getTime(), 'dojo', skey, rating];
+  if (typeof mode === 'string' && mode) row.push(mode);
+  const obslog = [...(S.obslog || []), row];
   if (!commitStorePatch({ obslog })) return false;
   advanceReviewSession(rv, item, next, { key, drill: true });
   return true;
@@ -6676,9 +6690,24 @@ function renderReview(main) {
   const now = new Date();
   const card = srsCardOf(item, now);
   const result = scheduler.repeat(card, now);
+  // 道場の礼 — a focus drill on a card the learner never TOOK is exposure,
+  // not deck membership (P0, full-instrument review): grading it must not
+  // mint FSRS state the due queue can never surface (srsDueItems walks
+  // S.taken only), must not write revlog rows for a card that does not
+  // exist, and must not burn one of the day's new-card slots. The drill
+  // still behaves like a session — short ratings repeat in-session, the
+  // judgment lands in the observation ledger as evidence (the drill room
+  // rides the row), and undo takes it back.
+  const drillOnly =
+    S.focus &&
+    S.srs[srsKey(item.t, item.id)] === undefined &&
+    !S.taken.some((t) => t.t === item.t && t.id === item.id);
   const row = el('div', 'grade-row');
+  if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
-  // honest FSRS interval kept beneath (suites and screen readers select those)
+  // honest FSRS interval kept beneath (suites and screen readers select
+  // those). A drill-only card schedules nothing, so its seals promise no
+  // next-due — each stamps 稽古, practice, and that is the whole truth.
   const grades = [
     ['Again', 'again', 'もう一度', '再'],
     ['Hard', 'hard', '難しい', '難'],
@@ -6688,7 +6717,9 @@ function renderReview(main) {
   for (const [rating, key, ja, sealChar] of grades) {
     const next = result[fsrsApi.Rating[rating]].card;
     const ms = next.due.getTime() - now.getTime();
-    const when = next.scheduled_days >= 1 ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`) : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
+    const when = drillOnly
+      ? tx('稽古', 'practice')
+      : next.scheduled_days >= 1 ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`) : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
     const b = el('button', `grade hanko g-${key}`);
     b.type = 'button';
     b.append(el('span', 'g-seal', sealChar));
@@ -6699,17 +6730,7 @@ function renderReview(main) {
       const skey = srsKey(item.t, item.id);
       const next = result[fsrsApi.Rating[rating]].card;
       const prevRec = S.srs[skey];
-      // 道場の礼 — a focus drill on a card the learner never TOOK is
-      // exposure, not deck membership (P0, full-instrument review): grading
-      // it must not mint FSRS state the due queue can never surface
-      // (srsDueItems walks S.taken only), must not write revlog rows for a
-      // card that does not exist, and must not burn one of the day's
-      // new-card slots. The drill still behaves like a session — short
-      // ratings repeat in-session, the judgment lands in the observation
-      // ledger as evidence, and undo takes it back.
-      const isDrillOnly =
-        S.focus && prevRec === undefined && !S.taken.some((t) => t.t === item.t && t.id === item.id);
-      if (isDrillOnly) {
+      if (drillOnly) {
         if (
           !commitDrillGrade({
             rv,
@@ -6718,6 +6739,7 @@ function renderReview(main) {
             key,
             skey,
             rating: fsrsApi.Rating[rating],
+            mode: S.focus?.mode,
             now,
           })
         ) {

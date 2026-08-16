@@ -1407,6 +1407,104 @@ async function main() {
     `row ${JSON.stringify(probeAfter.last)}`);
   await shoot(page, shotsDir, '15-phaseA-yomi-probe');
 
+  // ------------- Phase A · the dojo drill: practice writes evidence only
+  // 道場の礼 — focusPool('kanji') reaches past the learner's taken cards
+  // into the common deck. Grading a NEVER-taken card must write the
+  // observation ledger alone: no FSRS record the due queue (S.taken-scoped)
+  // could never surface, no revlog row, no burned daily new-card slot — and
+  // the seals must stamp practice, never a next-due promise the scheduler
+  // will not keep. A TAKEN card in the same block keeps the full deck path.
+  // The probe runs on a controlled envelope and hands the learner's own
+  // bytes back untouched when it is done.
+  console.log('\n— Phase A · dojo drill: evidence for practice, the deck for the taken');
+  await page.waitForTimeout(1400); // let the probe row's debounced save land first
+  const dojoSnapshot = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    v: 1,
+    taken: [{ t: 'kanji', id: '水', label: '水', kind: '漢字', kindEn: 'kanji', ts: Date.now() }],
+  }))`);
+  await open('');
+  await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+  await tap(page, '#ginga-symbol');
+  await page.waitForSelector('.nav-dojo');
+  await tap(page, '.nav-dojo');
+  await page.waitForSelector('.focus-mode');
+  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-start').click();
+  await page.waitForSelector('.review-front', { timeout: 20000 });
+  // card 1 · the taken 水 leads the pool — honest intervals, full deck path
+  const dojoTakenFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade-row');
+  const dojoTakenRow = await page.evaluate(`(() => ({
+    practice: document.querySelector('.grade-row').hasAttribute('data-practice'),
+    whens: [...document.querySelectorAll('.grade .g-when')].map((n) => n.textContent),
+  }))()`);
+  check('dojo · a taken card keeps its honest next-due intervals',
+    dojoTakenFront === '水' && dojoTakenRow.practice === false &&
+      dojoTakenRow.whens.length === 4 && dojoTakenRow.whens.every((w) => /\d+ (min|d|分|日)$/.test(w)),
+    `${dojoTakenFront} → ${dojoTakenRow.whens.join(' · ')}`);
+  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  await page.waitForTimeout(400);
+  const dojoDay = `(() => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); })()`;
+  const dojoTakenAfter = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const day = ${dojoDay};
+    return {
+      srsKeys: Object.keys(e.srs || {}),
+      revlog: (e.revlog || []).length,
+      nnew: ((e.stats || {})[day] || {}).nnew || 0,
+      dojoRows: (e.obslog || []).filter((r) => r[1] === 'dojo').length,
+    };
+  })()`);
+  check('dojo · grading the taken card writes the deck — FSRS record, revlog row, one new-card slot',
+    dojoTakenAfter.srsKeys.length === 1 && dojoTakenAfter.srsKeys[0] === 'kanji:水' &&
+      dojoTakenAfter.revlog === 1 && dojoTakenAfter.nnew === 1 && dojoTakenAfter.dojoRows === 0,
+    JSON.stringify(dojoTakenAfter));
+  // card 2 · the pool's first never-taken kanji — the seals stamp practice…
+  await page.waitForSelector('#reveal');
+  const dojoDrillFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  await page.waitForSelector('.grade-row[data-practice]', { timeout: 8000 });
+  const dojoDrillWhens = await page.evaluate(
+    `[...document.querySelectorAll('.grade .g-when')].map((n) => n.textContent)`,
+  );
+  check('dojo · a never-taken card promises no schedule — every seal stamps practice',
+    dojoDrillFront !== '水' && dojoDrillWhens.length === 4 &&
+      dojoDrillWhens.every((w) => w === 'practice' || w === '稽古'),
+    `${dojoDrillFront} → ${dojoDrillWhens.join(' · ')}`);
+  await shoot(page, shotsDir, '15b-dojo-drill-practice');
+  // …and grading it writes evidence only: srs/revlog untouched, the daily
+  // new-card budget unburned, one obslog row naming the drill room
+  await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+  await page.waitForTimeout(400);
+  const dojoDrillAfter = await page.evaluate(`(() => {
+    const e = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const day = ${dojoDay};
+    const rows = (e.obslog || []).filter((r) => r[1] === 'dojo');
+    return {
+      srsKeys: Object.keys(e.srs || {}),
+      revlog: (e.revlog || []).length,
+      nnew: ((e.stats || {})[day] || {}).nnew || 0,
+      last: rows[rows.length - 1] || null,
+    };
+  })()`);
+  check('dojo · a drill grade writes evidence only — no FSRS state, no revlog row, no burned slot',
+    dojoDrillAfter.srsKeys.length === 1 && dojoDrillAfter.srsKeys[0] === 'kanji:水' &&
+      dojoDrillAfter.revlog === 1 && dojoDrillAfter.nnew === 1,
+    `srs ${JSON.stringify(dojoDrillAfter.srsKeys)} · revlog ${dojoDrillAfter.revlog} · nnew ${dojoDrillAfter.nnew}`);
+  check('dojo · the practice row lands in the observation ledger with its room',
+    Array.isArray(dojoDrillAfter.last) && dojoDrillAfter.last[1] === 'dojo' &&
+      dojoDrillAfter.last[2] === 'kanji:' + dojoDrillFront && dojoDrillAfter.last[3] === 3 &&
+      dojoDrillAfter.last[4] === 'kanji',
+    `row ${JSON.stringify(dojoDrillAfter.last)}`);
+  // hand the envelope back exactly as found — this probe leaves no learner state
+  await page.evaluate(`(() => {
+    const snap = ${JSON.stringify(dojoSnapshot)};
+    if (snap === null) localStorage.removeItem('kairo-corridor-v1');
+    else localStorage.setItem('kairo-corridor-v1', snap);
+  })()`);
+
   // -------------------------- the newspaper archive (新聞アーカイブ)
   console.log('\n— the newspaper archive: a deep stack behind one quiet door');
   await open('?entry=shelf');

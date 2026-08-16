@@ -260,6 +260,7 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [11, 'probe', 'word:海', 3, 0],
       [12, 'drift', 'word:海', 1],
       [13, 'dojo', 'word:海', 0],
+      [14, 'dojo', 'kanji:海', 3, 'kanji'],
     ],
     deepWords: { 海: { r: 'うみ', m: ['sea'], jlpt: 'N5', k: ['海'], seq: '1' } },
     lessonsDone: { lesson: { score: 1, total: 1, ts: 10 } },
@@ -361,6 +362,9 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog malformed probe', { v: 1, obslog: [[1, 'probe', 'word:海', 3, 2]] }],
     ['obslog malformed drift judgment', { v: 1, obslog: [[1, 'drift', 'word:海', 2]] }],
     ['obslog malformed drift arity', { v: 1, obslog: [[1, 'drift', 'word:海', 3, 'extra']] }],
+    ['obslog malformed dojo grade', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 9]] }],
+    ['obslog malformed dojo mode', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 42]] }],
+    ['obslog overlong dojo row', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 'kanji', 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -755,6 +759,32 @@ verified('drill-grade-action-failure-and-success', () => {
   assert.equal(rv.done.good, 1);
   assert.equal(rv.history[0].drill, true);
   assert.equal(rv.queue.length, 1);
+  // a modeless call keeps the legacy four-wide row; naming the drill room
+  // rides it as the trailing mode — never FSRS state, never a revlog row
+  // (rows are vm-realm arrays, so compare their serialized bytes)
+  assert.equal(JSON.stringify(context.S.obslog[0]), JSON.stringify([1000, 'dojo', 'word:海', 3]));
+  rv = reviewSession();
+  assert.equal(
+    context.actions.commitDrillGrade({
+      rv,
+      item,
+      next,
+      key: 'good',
+      skey: 'word:海',
+      rating: 3,
+      mode: 'kanji',
+      now: new Date(2000),
+    }),
+    true,
+  );
+  assert.equal(context.S.obslog.length, 2);
+  assert.equal(
+    JSON.stringify(context.S.obslog[1]),
+    JSON.stringify([2000, 'dojo', 'word:海', 3, 'kanji']),
+  );
+  assert.equal(context.S.revlog.length, 0);
+  assert.equal(Object.keys(context.S.srs).length, 0);
+  assert.equal(Object.keys(context.S.stats).length, 0);
 });
 
 verified('standard-grade-action-failure-and-success', () => {
@@ -1048,6 +1078,8 @@ verified('bounded-handlers-call-executed-actions', () => {
   );
   assert.match(gradeHandler, /commitDrillGrade\(/);
   assert.match(gradeHandler, /commitStandardGrade\(/);
+  // the drill's evidence row names its room (P0: practice writes evidence only)
+  assert.match(gradeHandler, /mode: S\.focus\?\.mode/);
   assert.doesNotMatch(gradeHandler, /saveStore\(|obsLog\(|srsStore\(|rv\.history\.push/);
 });
 
