@@ -5205,6 +5205,25 @@ body.zen .review-reveal {
   width: 100%;
   max-width: 340px;
 }
+/* 想起の二道 — the T-06 gate: before anything turns over, the front face
+ * asks "did it come back?". Two quiet doors where the single reveal stood:
+ * まだ stands outlined — an honest miss is never punished by the chrome —
+ * and 思い出した carries the ink. The dojo keeps its single 答えを見る. */
+.declare-row {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  gap: 10px;
+}
+.declare-row .take {
+  flex: 1;
+  margin: 0;
+}
+.declare-row .declare-notyet {
+  background: transparent;
+  color: var(--ink);
+}
 body.zen .grade-row {
   margin: 0 auto;
   width: 100%;

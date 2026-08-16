@@ -447,7 +447,10 @@ const S = {
   storeReadOnly: false,
   storeError: null,
   storeExtras: null,
-  /** a running review session: { queue, ix, revealed, done } — null at rest */
+  /** a running review session: { queue, ix, revealed, declared, done } —
+   * null at rest. declared is the zen room's recall declaration for the
+   * card that is up: 1 思い出した · 0 まだ · null before the card turns
+   * over (kernel law ADR-002 T-06 — see the reveal obslog row) */
   review: null,
   /** a running yomi probe: { queue, ix, revealed, right, missed, minted } —
    * session-only; its evidence lives in the obslog, never in FSRS state */
@@ -693,6 +696,7 @@ function validObservationRow(row) {
     // a stored learner parameter set could not drive the scheduler, and why
     return row.length === 4 && row[2] === 'fsrs' && nonEmptyString(row[3]);
   }
+  if (row[1] === 'reveal') return row.length === 4 && [0, 1].includes(row[3]);
   if (row[1] === 'dojo') {
     // four wide (older rows and undo's revocation), or five with the drill
     // room's name riding as the trailing mode
@@ -1133,6 +1137,14 @@ function commitStorePatch(patch) {
  *       filed beside the judgment); mode names the drill room ('kanji')
  *       on rows written since the room was recorded. Evidence only:
  *       no FSRS state, no revlog row, no daily new-card slot.
+ *   [t, 'reveal', key, declared]
+ *       the zen review room's declared-recall gate (kernel law ADR-002
+ *       T-06): before the answer turns over, the learner declares —
+ *       declared 1 思い出した (recalled; all four grades open) · 0 まだ
+ *       (not yet; Again is the only grade the schedule may record). The
+ *       row is the declaration's evidence; the forcing itself rides the
+ *       session state and the grade commit. The timed dojo keeps its bare
+ *       reveal and stamps 'dojo' practice rows instead.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -1141,6 +1153,12 @@ function obsFlush() {
   if (obsSaveTimer == null) return;
   clearTimeout(obsSaveTimer);
   obsSaveTimer = null;
+  // P0-4 disposition (residual ledger): this flush persists rows already
+  // published to the session ledger — the debounce IS the documented,
+  // bounded (1.2s + pagehide) session-ahead-of-durability window for
+  // burst-arriving observations. A rollback here would DROP evidence;
+  // instead a failed save surfaces the storage alert and the rows stay in
+  // S.obslog for the next flush or envelope write to carry.
   saveStore();
 }
 function obsLog(kind, key, ...detail) {
@@ -2285,6 +2303,9 @@ addEventListener(
       // re-checked at fire time: a sheet may have opened (and zeroed the
       // window scroll) in the 900ms since the scroll that armed this
       if (S.view !== 'reader' || !S.passageId || S.stack.length) return;
+      // P0-4 disposition (residual ledger): readerPos is a reading-position
+      // bookmark — a UI preference, not learner evidence; a lost write costs
+      // one scroll offset, so the direct debounced save stays.
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
     }, 900);
@@ -2373,7 +2394,8 @@ function back() {
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
-    // the bookmark records the exact line being left, not the debounce's guess
+    // the bookmark records the exact line being left, not the debounce's
+    // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
       clearTimeout(readerPosTimer);
       S.readerPos[S.passageId] = Math.round(window.scrollY);
@@ -3157,7 +3179,9 @@ function dialRow(labelJa, labelEn, key, options) {
     b.addEventListener('click', () => {
       S.dials[key] = index;
       S.dialsUrlOverride = false; // a real hand on the dial IS the choice
-      saveStore(); // the chosen setting survives the session
+      // the chosen setting survives the session; dials are display
+      // preferences, not learner evidence (P0-4 residual-ledger disposition)
+      saveStore();
       render();
     });
     seg.append(b);
@@ -4255,10 +4279,12 @@ function renderTray(main) {
         rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
         rest.addEventListener('click', (ev) => {
           ev.stopPropagation();
-          if (S.suspended[key]) delete S.suspended[key];
-          else S.suspended[key] = Date.now();
-          saveStore();
-          render();
+          // rest/wake is deck state: it rides the guarded boundary, so a
+          // failed persist changes nothing (the alert names the failure)
+          const suspended = { ...S.suspended };
+          if (suspended[key]) delete suspended[key];
+          else suspended[key] = Date.now();
+          if (commitStorePatch({ suspended })) render();
         });
         line.append(rest);
       }
@@ -4288,10 +4314,9 @@ function renderPortRow(main) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     // remember when the record last left the device — the tray's quiet backup
-    // reminder counts from here
-    S.stats ||= {};
-    S.stats.lastExportTs = Date.now();
-    saveStore();
+    // reminder counts from here; the copy-then-commit keeps the live stats
+    // untouched when the device cannot save (the export itself already left)
+    commitStorePatch({ stats: { ...(S.stats || {}), lastExportTs: Date.now() } });
   });
   const imp = biLabel('button', 'chip', '読み込む', 'import a record');
   imp.type = 'button';
@@ -4408,10 +4433,15 @@ function renderLane(main, title, en, ids, t) {
     btn.type = 'button';
     btn.addEventListener('click', () => {
       const kindRow = NODE_KIND[t];
-      for (const id of fresh.slice(0, 20))
-        S.taken.push({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() });
-      saveStore();
-      render();
+      // the twenty mint as ONE committed batch — the copy persists before
+      // the live deck sees any of them (P0-4)
+      const taken = [
+        ...S.taken,
+        ...fresh
+          .slice(0, 20)
+          .map((id) => ({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() })),
+      ];
+      if (commitStorePatch({ taken })) render();
     });
     main.append(btn);
   }
@@ -4553,13 +4583,21 @@ function renderLessons(main) {
       btn.addEventListener('click', () => {
         if (run.ix + 1 < run.words.length) { run.ix += 1; run.picked = null; run.choices = null; }
         else {
-          S.lessonsDone[run.id] = { score: run.correct, total: run.words.length, ts: Date.now() };
+          // completion writes the result and the minted words as ONE commit;
+          // a failed persist ends nothing — the run stays, the alert speaks
+          const lessonsDone = { ...S.lessonsDone, [run.id]: { score: run.correct, total: run.words.length, ts: Date.now() } };
           const kt = run.kind || 'word';
           const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
-          for (const w of run.words)
-            if (!takenSet.has(srsKey(kt, w)))
-              S.taken.push({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() });
-          saveStore();
+          const taken = [
+            ...S.taken,
+            ...run.words
+              .filter((w) => !takenSet.has(srsKey(kt, w)))
+              .map((w) => ({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() })),
+          ];
+          if (!commitStorePatch({ lessonsDone, taken })) {
+            render();
+            return;
+          }
           run.phase = 'end';
         }
         render();
@@ -4767,9 +4805,10 @@ function renderAiChat(main) {
   const ask = async () => {
     const text = input.value.trim();
     if (!text || send.disabled) return;
-    S.aiChat.push({ role: 'user', text });
+    // the request-window copy commits BEFORE the turn travels; a device
+    // that cannot save keeps the message in the field, told why by the alert
+    if (!commitStorePatch({ aiChat: [...S.aiChat, { role: 'user', text }] })) return;
     if (aiChatLog.turns) aiChatLog.turns.push({ role: 'user', text });
-    saveStore();
     input.value = '';
     send.disabled = true;
     const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
@@ -4783,12 +4822,14 @@ function renderAiChat(main) {
         turns,
         { surface: 'chat' },
       );
-      S.aiChat.push({ role: 'tutor', text: reply });
+      // if the window's commit fails the reply still stands in the durable
+      // archive and the rendered transcript; only the bounded request
+      // context misses it — the alert names the storage failure
+      commitStorePatch({ aiChat: [...S.aiChat, { role: 'tutor', text: reply }] });
       if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: reply });
-      saveStore();
     } catch {
       const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
-      S.aiChat.push({ role: 'tutor', text: line });
+      commitStorePatch({ aiChat: [...S.aiChat, { role: 'tutor', text: line }] });
       if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: line });
       // the app's own line rides the archive too, marked as the app's
       aiLogAppend({ surface: 'chat', role: 'app', content: line, model: aiProvider().model, ts: Date.now() });
@@ -6662,10 +6703,13 @@ function renderContextPicker(sheet, node) {
     chip.type = 'button';
     chip.dataset.ctxScope = scope ?? 'word';
     chip.addEventListener('click', () => {
-      if (scope === null) delete item.ctx;
-      else item.ctx = { p: from.passage, i: Number(from.index), scope };
-      saveStore();
-      render();
+      // the card's context is deck state: replace the row on a COPY and
+      // commit — the live item never changes on a failed persist
+      const changed = { ...item };
+      if (scope === null) delete changed.ctx;
+      else changed.ctx = { p: from.passage, i: Number(from.index), scope };
+      const taken = S.taken.map((t) => (t === item ? changed : t));
+      if (commitStorePatch({ taken })) render();
     });
     chips.append(chip);
   }
@@ -6688,25 +6732,29 @@ function renderListPicker(sheet, node, label) {
     chip.append(el('span', 'big', name));
     chip.append(el('span', 'sub', `${S.lists[name].length}`));
     chip.addEventListener('click', () => {
-      if (inList)
-        setOwnRecordValue(
-          S.lists,
-          name,
-          S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id)),
-        );
-      else
-        S.lists[name].push({
-          t: node.t,
-          id: node.id,
-          label,
-          // the kind pill was stripped at store time and named-list rows
-          // rendered an empty grey pill (P2, full-instrument review)
-          kind: NODE_KIND[node.t]?.[0],
-          kindEn: NODE_KIND[node.t]?.[1],
-          ts: item.ts,
-        });
-      saveStore();
-      render();
+      // membership rides the same guarded path as list creation below:
+      // prototype-safe writes on a COPY, one commit, no live mutation
+      const next = { ...S.lists };
+      setOwnRecordValue(
+        next,
+        name,
+        inList
+          ? S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id))
+          : [
+              ...S.lists[name],
+              {
+                t: node.t,
+                id: node.id,
+                label,
+                // the kind pill was stripped at store time and named-list rows
+                // rendered an empty grey pill (P2, full-instrument review)
+                kind: NODE_KIND[node.t]?.[0],
+                kindEn: NODE_KIND[node.t]?.[1],
+                ts: item.ts,
+              },
+            ],
+      );
+      if (commitStorePatch({ lists: next })) render();
     });
     chips.append(chip);
   }
@@ -6883,6 +6931,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.done[entry.key] += 1;
   rv.ix += 1;
   rv.revealed = false;
+  // the next card asks its own question — no declaration carries over
+  rv.declared = null;
 }
 
 function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
@@ -7037,7 +7087,7 @@ function startReview(scope) {
   const deferred = Math.max(0, queue.length - limit);
   if (deferred) queue = queue.slice(0, limit);
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
+  S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
   S.view = 'review';
   render();
 }
@@ -7173,9 +7223,9 @@ function renderReview(main) {
         rest.type = 'button';
         rest.dataset.leechRest = item.id;
         rest.addEventListener('click', () => {
-          S.suspended[srsKey(item.t, item.id)] = Date.now();
-          saveStore();
-          render();
+          // a rest is deck state — commit the copy, then show it (P0-4)
+          const suspended = { ...S.suspended, [srsKey(item.t, item.id)]: Date.now() };
+          if (commitStorePatch({ suspended })) render();
         });
         row.append(rest);
         main.append(row);
@@ -7323,11 +7373,17 @@ function renderReview(main) {
     rest2.id = 'review-rest';
     rest2.addEventListener('click', () => {
       const key = srsKey(item.t, item.id);
-      S.suspended[key] = Date.now();
-      saveStore();
+      // the rest commits before the session moves — a failed persist keeps
+      // the card up and the alert speaks (P0-4)
+      const suspended = { ...S.suspended, [key]: Date.now() };
+      if (!commitStorePatch({ suspended })) {
+        render();
+        return;
+      }
       rv.history.push({ key: 'suspend' });
       rv.ix += 1;
       rv.revealed = false;
+      rv.declared = null;
       S.reviewMore = false;
       render();
     });
@@ -7342,20 +7398,52 @@ function renderReview(main) {
   }
 
   if (!rv.revealed) {
-    // the card itself turns over — and the labeled button stays for hands
-    // and readers that want one
-    face.addEventListener('click', () => {
+    if (S.focus) {
+      // the dojo keeps its single turn-over — drilling early is its point,
+      // and a drill-only grade is practice evidence, not a scheduled
+      // review. The declared-recall gate below guards the zen room only.
+      // The card itself turns over — and the labeled button stays for
+      // hands and readers that want one.
+      face.addEventListener('click', () => {
+        rv.revealed = true;
+        render();
+      });
+      const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
+      btn.type = 'button';
+      btn.id = 'reveal';
+      btn.addEventListener('click', () => {
+        rv.revealed = true;
+        render();
+      });
+      main.append(btn);
+      return;
+    }
+    // 想起の二道 — the kernel law (ADR-002 T-06): a learner who saw the
+    // answer before recalling did not recall it. So the front face asks the
+    // only honest question first — did it come back? — and the answer is
+    // what turns the card over: 思い出した opens all four grades; まだ
+    // opens the back for study with Again as the one grade the schedule
+    // will record. There is no bare reveal in this room — the declaration
+    // IS the door. It lands in the observation ledger like the reader's
+    // tap ladder (debounce-persisted); the forcing itself rides rv.declared
+    // in session state and the synchronous grade commit.
+    const declare = (declared) => {
+      rv.declared = declared;
       rv.revealed = true;
+      obsLog('reveal', srsKey(item.t, item.id), declared);
       render();
-    });
-    const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
-    btn.type = 'button';
-    btn.id = 'reveal';
-    btn.addEventListener('click', () => {
-      rv.revealed = true;
-      render();
-    });
-    main.append(btn);
+    };
+    const declRow = el('div', 'declare-row');
+    const notyet = biLabel('button', 'take declare-notyet', 'まだ', 'not yet');
+    notyet.type = 'button';
+    notyet.id = 'declare-notyet';
+    notyet.addEventListener('click', () => declare(0));
+    const recalled = biLabel('button', 'take declare-recalled', '思い出した', 'I recalled it');
+    recalled.type = 'button';
+    recalled.id = 'declare-recalled';
+    recalled.addEventListener('click', () => declare(1));
+    declRow.append(notyet, recalled);
+    main.append(declRow);
     return;
   }
   const now = new Date();
@@ -7388,7 +7476,17 @@ function renderReview(main) {
     ['Good', 'good', 'ふつう', '良'],
     ['Easy', 'easy', '簡単', '易'],
   ];
+  // まだ was declared: the answer was seen before recall, so Again is the
+  // only grade this room may record (T-06). The row holds the one honest
+  // seal instead of three dead promises — and the commit below derives the
+  // rating from the DECLARATION, never from the button, so no later tap
+  // can outrun the law even if a stray node were clicked.
+  const notRecalled = !S.focus && rv.declared === 0;
+  if (!S.focus && rv.declared != null) {
+    row.setAttribute('data-declared', notRecalled ? 'notyet' : 'recalled');
+  }
   for (const [rating, key, ja, sealChar] of grades) {
+    if (notRecalled && rating !== 'Again') continue;
     const next = result[fsrsApi.Rating[rating]].card;
     const ms = next.due.getTime() - schedNow.getTime();
     const when = drillOnly
@@ -7404,7 +7502,11 @@ function renderReview(main) {
     b.addEventListener('click', () => {
       const day = dayKey();
       const skey = srsKey(item.t, item.id);
-      const next = result[fsrsApi.Rating[rating]].card;
+      // T-06 forcing at the commit: after まだ, the declaration names the
+      // grade — whatever was tapped, Again is what the schedule records
+      const effRating = notRecalled ? 'Again' : rating;
+      const effKey = notRecalled ? 'again' : key;
+      const next = result[fsrsApi.Rating[effRating]].card;
       const prevRec = S.srs[skey];
       if (drillOnly) {
         if (
@@ -7412,9 +7514,9 @@ function renderReview(main) {
             rv,
             item,
             next,
-            key,
+            key: effKey,
             skey,
-            rating: fsrsApi.Rating[rating],
+            rating: fsrsApi.Rating[effRating],
             mode: S.focus?.mode,
             now,
           })
@@ -7431,9 +7533,9 @@ function renderReview(main) {
           item,
           card,
           next,
-          key,
+          key: effKey,
           skey,
-          rating: fsrsApi.Rating[rating],
+          rating: fsrsApi.Rating[effRating],
           now,
           schedNow,
           day,
@@ -7510,46 +7612,57 @@ function renderReviewUndo(main, rv) {
   const undo = biLabel('button', 'chip review-undo', 'ひとつ戻す', 'undo last grade');
   undo.type = 'button';
   undo.addEventListener('click', () => {
-    const last = rv.history.pop();
+    const last = rv.history[rv.history.length - 1];
     const prevItem = rv.queue[rv.ix - 1];
-    if (!prevItem) return;
+    if (!last || !prevItem) return;
     const key = srsKey(prevItem.t, prevItem.id);
+    // the take-back is built off-side and committed as ONE envelope; only a
+    // durable undo moves the session back — a failed persist keeps the
+    // grade, the history entry, and the glass exactly as they were (P0-4)
+    const patch = {};
     if (last.key === 'suspend') {
       // a rest is taken back whole: wake the card, no schedule was touched
-      delete S.suspended[key];
+      const suspended = { ...S.suspended };
+      delete suspended[key];
+      patch.suspended = suspended;
     } else if (last.drill) {
       // a dojo drill is taken back from the observation ledger, never from
       // FSRS state — detail 0 files the revocation beside the judgment
-      obsLog('dojo', key, 0);
-      rv.done[last.key] -= 1;
-      if (last.reinserted) {
-        const tail = rv.queue.lastIndexOf(prevItem);
-        if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
-      }
+      patch.obslog = [...(S.obslog || []), [Date.now(), 'dojo', key, 0]];
     } else {
-      if (last.prev === undefined) delete S.srs[key];
-      else S.srs[key] = last.prev;
-      rv.done[last.key] -= 1;
-      const st = last.day && S.stats[last.day];
-      if (st) {
-        st.n = Math.max(0, st.n - 1);
-        if (last.key === 'again') st.again = Math.max(0, st.again - 1);
-        if (last.introduced && st.nnew) st.nnew -= 1;
-      }
+      const srs = { ...S.srs };
+      if (last.prev === undefined) delete srs[key];
+      else srs[key] = last.prev;
+      patch.srs = srs;
       // the log is append-only: an undo never erases the row it takes back —
       // it files a revocation pointing at it, so history stays whole
       if (last.logIx != null) {
-        (S.revlog ||= []).push([Date.now(), key, 0, last.logIx]);
+        patch.revlog = [...(S.revlog || []), [Date.now(), key, 0, last.logIx]];
       }
+      const st = last.day && S.stats?.[last.day];
+      if (st) {
+        const day = { ...st, n: Math.max(0, (st.n || 0) - 1) };
+        if (last.key === 'again') day.again = Math.max(0, (st.again || 0) - 1);
+        if (last.introduced && st.nnew) day.nnew = st.nnew - 1;
+        patch.stats = { ...S.stats, [last.day]: day };
+      }
+    }
+    if (!commitStorePatch(patch)) {
+      render();
+      return;
+    }
+    rv.history.pop();
+    if (last.key !== 'suspend') {
+      rv.done[last.key] -= 1;
       // if this grade re-queued a learning step, remove that pending copy
       if (last.reinserted) {
         const tail = rv.queue.lastIndexOf(prevItem);
         if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
       }
     }
-    saveStore();
     rv.ix -= 1;
     rv.revealed = false;
+    rv.declared = null;
     render();
   });
   main.append(undo);
@@ -7632,7 +7745,7 @@ function startFocus(min, mode) {
   S.focusEmpty = null;
   const first = pool.slice(0, Math.min(pool.length, FOCUS_BATCH));
   S.focus = { min, mode, deadline: Date.now() + min * 60000, ended: false, pool, cursor: first.length };
-  S.review = { queue: first.slice(), ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
+  S.review = { queue: first.slice(), ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
   S.view = 'review';
   startFocusTicker();
   render();
@@ -8056,27 +8169,36 @@ function renderProbe(main) {
     b.addEventListener('click', () => {
       const key = srsKey('word', it.w);
       let minted = 0;
+      const patch = {};
       if (!ok && !S.taken.some((t) => t.t === 'word' && t.id === it.w)) {
-        S.taken.push({
-          t: 'word',
-          id: it.w,
-          label: it.w,
-          kind: NODE_KIND.word[0],
-          kindEn: NODE_KIND.word[1],
-          from: null,
-          ts: Date.now(),
-          // the learner's own 読めなかった is the choice that mints this
-          // card — the probe told them so before they pressed it
-          started: Date.now(),
-        });
+        patch.taken = [
+          ...S.taken,
+          {
+            t: 'word',
+            id: it.w,
+            label: it.w,
+            kind: NODE_KIND.word[0],
+            kindEn: NODE_KIND.word[1],
+            from: null,
+            ts: Date.now(),
+            // the learner's own 読めなかった is the choice that mints this
+            // card — the probe told them so before they pressed it
+            started: Date.now(),
+          },
+        ];
         minted = 1;
-        pr.minted += 1;
       }
-      // the probe is an observation: one obslog row, zero FSRS writes
-      obsLog('probe', key, ok ? 3 : 1, minted);
+      // the probe is an observation: one obslog row, zero FSRS writes. The
+      // mint and its evidence land as ONE commit — a minted card must not
+      // wait on the tap debounce, and a failed persist mints nothing
+      patch.obslog = [...(S.obslog || []), [Date.now(), 'probe', key, ok ? 3 : 1, minted]];
+      if (!commitStorePatch(patch)) {
+        render();
+        return;
+      }
+      if (minted) pr.minted += 1;
       if (ok) pr.right += 1;
       else pr.missed.push(it);
-      saveStore(); // a minted card must not wait on the tap debounce
       pr.ix += 1;
       pr.revealed = false;
       render();
@@ -8790,12 +8912,16 @@ function renderAiReading(main) {
         { surface: 'reading' },
       );
       // a model may emit a literal backslash-n; never show it as ink.
-      // The reading being replaced joins the shelf of earlier ones.
-      if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
-      S.aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
-      saveStore();
-      render();
-      return;
+      // The reading being replaced joins the shelf of earlier ones — built
+      // on copies and committed whole; a device that cannot save shows the
+      // storage alert and re-arms the button (P0-4)
+      const aiReadings = S.aiReading ? [S.aiReading, ...S.aiReadings].slice(0, 10) : S.aiReadings;
+      const aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
+      if (commitStorePatch({ aiReading, aiReadings })) {
+        render();
+        return;
+      }
+      note.textContent = '';
     } catch {
       note.textContent = tx('いまは書けない。あとでもう一度。', 'The tutor could not write just now — try again in a moment.');
     }
@@ -8859,12 +8985,12 @@ function renderAiReading(main) {
       stack.append(el('span', 'row-gloss', new Date(r.ts).toLocaleDateString()));
       row.append(stack, el('span', 'row-go', '›'));
       row.addEventListener('click', () => {
-        // swap: the current reading takes this one's place on the shelf
+        // swap: the current reading takes this one's place on the shelf —
+        // on copies, one commit, nothing moves on a failed persist (P0-4)
         const chosen = S.aiReadings[ix];
-        S.aiReadings.splice(ix, 1);
-        if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
-        S.aiReading = chosen;
-        saveStore();
+        const others = S.aiReadings.filter((_, i) => i !== ix);
+        const aiReadings = S.aiReading ? [S.aiReading, ...others].slice(0, 10) : others;
+        if (!commitStorePatch({ aiReading: chosen, aiReadings })) return;
         keepScroll();
         render();
         window.scrollTo(0, 0);
@@ -12302,6 +12428,8 @@ function render() {
     // article — not the shelf (P2, review: "abandons the article mid-read")
     S.trayFrom = S.view === 'reader' && S.passageId ? 'reader' : null;
     if (S.trayFrom === 'reader') {
+      // readerPos bookmark — UI preference, not learner evidence (P0-4
+      // residual-ledger disposition, same as the reader's own two writers)
       clearTimeout(readerPosTimer);
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();

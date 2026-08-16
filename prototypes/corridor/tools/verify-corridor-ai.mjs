@@ -314,8 +314,9 @@ async function main() {
   await page.click('#review-start');
   for (let i = 0; i < 8; i += 1) {
     if (await page.locator('#ai-coach').count()) break;
-    await page.waitForSelector('#reveal', { timeout: 10000 });
-    await page.click('#reveal');
+    // the zen room asks for the recall declaration first (T-06)
+    await page.waitForSelector('#declare-recalled', { timeout: 10000 });
+    await page.click('#declare-recalled');
     await page.waitForSelector('.grade.g-easy', { timeout: 8000 });
     await page.click('.grade.g-easy');
     await page.waitForTimeout(250);

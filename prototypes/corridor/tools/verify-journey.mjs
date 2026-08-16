@@ -164,7 +164,8 @@ await step('8 tray → review → summary', async () => {
   await shot('08-tray');
   await page.click('#review-start');
   for (let i = 0; i < 60; i++) {
-    const rev = await page.$('#reveal');
+    // the zen room asks for the recall declaration first (T-06)
+    const rev = await page.$('#declare-recalled');
     if (rev) {
       await rev.click();
       await page.waitForTimeout(100);

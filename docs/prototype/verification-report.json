@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 11:27",
+          "2026-08-16 11:26",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 11:32",
+          "2026-08-16 11:31",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 11:36",
+          "2026-08-16 11:35",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-24 11:26",
+          "2026-08-24 11:25",
           "8.30"
         ]
       ]
@@ -7494,9 +7494,9 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 433,
+  "loadMs": 456,
   "summary": {
-    "total": 166,
+    "total": 169,
     "failed": 0
   },
   "results": [
@@ -7523,7 +7523,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.72999572753906,\"y\":570.4299926757812,\"productive\":true}"
+      "detail": "{\"x\":147.75999450683594,\"y\":570.4099731445312,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7543,7 +7543,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 433 ms"
+      "detail": "82 texts, ready in 456 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -8023,7 +8023,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786879683076,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786879599446,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8048,7 +8048,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786879686900,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786879603231,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8138,7 +8138,7 @@
     {
       "name": "the answer face carries living sentences — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8258,12 +8258,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-19T11:28:56.164Z; due 2026-08-26T11:28:56.164Z"
+      "detail": "anchor held at 2026-08-19T11:27:26.022Z; due 2026-08-26T11:27:26.022Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1786879737110 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1786879647128 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8291,44 +8291,59 @@
       "detail": "clean"
     },
     {
-      "name": "the tray never contradicts itself — a closed review door names its when",
+      "name": "R3-C · the zen room offers no bare reveal — only the two declarations",
       "pass": true,
-      "detail": "{\"disabled\":true,\"label\":\"復習する — いまは予定なしnothing due right now\",\"forecast\":\"later today 25 · tomorrow 0 · this week 0 · new 3\",\"todayN\":25}"
+      "detail": "{\"reveal\":false,\"notyet\":true,\"recalled\":true}"
     },
     {
-      "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
+      "name": "R3-C · a tap on the card itself turns nothing over before a declaration",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-16T11:29:05.503Z"
+      "detail": "{\"grades\":0,\"reading\":false,\"stillAsking\":true}"
     },
     {
-      "name": "R3-D · the entry footer says the truth about the weights in force",
+      "name": "R3-C · 思い出した turns the card with all four grades open",
       "pass": true,
-      "detail": "\"if you reviewed this now — FSRS-6 · tuned from your record\""
+      "detail": "{\"grades\":[\"again\",\"hard\",\"good\",\"easy\"],\"reading\":true}"
     },
     {
-      "name": "R3-D · a malformed parameter file is refused at the door; the record stands",
+      "name": "R3-C · after 思い出した the pressed grade commits as itself",
       "pass": true,
-      "detail": "note \"Those parameters could not be read — use a tools/fsrs-optimize.mjs output, unchanged.\" · stored w length 21"
+      "detail": "{\"key\":\"word:学校\",\"rating\":3}"
     },
     {
-      "name": "R3-D · the graded schedule is the CUSTOM prediction to 8 dp, not the default",
+      "name": "R3-C · まだ opens the back for study with Again as the only seal",
       "pass": true,
-      "detail": "stored s=24.52184027 ivl=25d · custom s=24.52184027 ivl=25d · default s=24.4728247 ivl=24d"
+      "detail": "{\"grades\":1,\"again\":true,\"good\":false,\"hard\":false,\"easy\":false,\"reading\":true}"
     },
     {
-      "name": "R3-D · an out-of-bounds stored set is ignored — defaults rule, bytes kept, one quiet note",
+      "name": "R3-C · a failed persist mid-grade moves nothing — card up, revlog whole, alert speaking",
       "pass": true,
-      "detail": "{\"custom\":false,\"w20\":0.1542,\"kept\":5,\"notes\":[[\"params\",\"fsrs\",\"bounds\"]]}"
+      "detail": "{\"cardStillUp\":true,\"revlog\":1,\"alertUp\":true}"
     },
     {
-      "name": "R3-D · a thousand boots write one note, not a thousand",
+      "name": "R3-C · まだ commits Again — the schedule records the declaration, not a wish",
       "pass": true,
-      "detail": "params notes after a second boot: 1"
+      "detail": "{\"key\":\"word:先生\",\"rating\":1,\"state\":3}"
     },
     {
-      "name": "R3-D · the probes leave no console errors",
+      "name": "R3-C · undo restores the card, files a revocation, and asks the question afresh",
+      "pass": true,
+      "detail": "{\"state\":2,\"reps\":3,\"revocation\":true,\"asking\":true}"
+    },
+    {
+      "name": "R3-C · the declarations land in the obslog as [t,reveal,key,1|0] rows",
+      "pass": true,
+      "detail": "[[\"word:学校\",1],[\"word:先生\",0]]"
+    },
+    {
+      "name": "R3-C · the declared-recall probes leave no console errors",
       "pass": true,
       "detail": "clean"
+    },
+    {
+      "name": "the tray never contradicts itself — a closed review door names its when",
+      "pass": true,
+      "detail": "{\"disabled\":true,\"label\":\"復習する — いまは予定なしnothing due right now\",\"forecast\":\"later today 3 · tomorrow 0 · this week 0 · new 0\",\"todayN\":3}"
     }
   ]
 }

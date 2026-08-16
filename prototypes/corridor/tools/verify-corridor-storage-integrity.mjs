@@ -269,6 +269,8 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [13, 'dojo', 'word:海', 0],
       [14, 'dojo', 'kanji:海', 3, 'kanji'],
       [15, 'params', 'fsrs', 'length'],
+      [15, 'reveal', 'word:海', 1],
+      [16, 'reveal', 'word:海', 0],
     ],
     deepWords: { 海: { r: 'うみ', m: ['sea'], jlpt: 'N5', k: ['海'], seq: '1' } },
     lessonsDone: { lesson: { score: 1, total: 1, ts: 10 } },
@@ -394,6 +396,10 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog params off-key', { v: 1, obslog: [[1, 'params', 'other', 'length']] }],
     ['obslog params reason type', { v: 1, obslog: [[1, 'params', 'fsrs', 7]] }],
     ['obslog overlong params row', { v: 1, obslog: [[1, 'params', 'fsrs', 'length', 'extra']] }],
+    ['obslog malformed reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', 2]] }],
+    ['obslog non-integer reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', '1']] }],
+    ['obslog short reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海']] }],
+    ['obslog overlong reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海', 1, 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -1431,10 +1437,17 @@ verified('every-in-app-mint-carries-the-started-mark', () => {
   assert.match(captureActionBlock, /started: now/);
   const laneMint = between('const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));', '/* --------------------------------------------------------------- lessons');
   assert.match(laneMint, /started: Date\.now\(\)/);
-  const lessonMint = between('S.lessonsDone[run.id] =', 'run.phase =');
+  // lesson completion mints on copies and commits once (R3-C sweep)
+  const lessonMint = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
   assert.match(lessonMint, /started: Date\.now\(\)/);
-  const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'obsLog(');
+  assert.match(lessonMint, /commitStorePatch\(\{ lessonsDone, taken \}\)/);
+  assert.doesNotMatch(lessonMint, /S\.taken\.push|saveStore\(/);
+  // the probe's mint now rides the guarded boundary (R3-C sweep): the
+  // started mark is built on the patch copy, never pushed live
+  const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'commitStorePatch(patch)');
   assert.match(probeMint, /started: Date\.now\(\)/);
+  assert.match(probeMint, /patch\.taken = \[/);
+  assert.doesNotMatch(probeMint, /S\.taken\.push|saveStore\(|obsLog\(/);
   // and the queue admits a cardless row only through that mark
   const dueGate = between('function srsDueItems(now = new Date()) {', '/** Midnight at the start of a date');
   assert.match(dueGate, /finiteNumber\(item\.started\)/);
@@ -1464,6 +1477,53 @@ verified('bounded-handlers-call-executed-actions', () => {
   // the drill's evidence row names its room (P0: practice writes evidence only)
   assert.match(gradeHandler, /mode: S\.focus\?\.mode/);
   assert.doesNotMatch(gradeHandler, /saveStore\(|obsLog\(|srsStore\(|rv\.history\.push/);
+
+  // R3-C sweep: every review-room writer that touches learner roots rides
+  // the guarded boundary — undo commits its whole take-back as one patch,
+  // the in-session rest commits before the session moves
+  const undoHandler = between('const last = rv.history[rv.history.length - 1];', 'main.append(undo);');
+  assert.match(undoHandler, /commitStorePatch\(patch\)/);
+  assert.match(undoHandler, /rv\.history\.pop\(\)/);
+  assert.doesNotMatch(undoHandler, /saveStore\(|obsLog\(/);
+  assert.ok(
+    undoHandler.indexOf('commitStorePatch(patch)') < undoHandler.indexOf('rv.history.pop()'),
+    'the session moves back only after the take-back is durable',
+  );
+  const restHandler = between("rest2.addEventListener('click', () => {", 'moreRow.append(rest2);');
+  assert.match(restHandler, /commitStorePatch\(\{ suspended \}\)/);
+  assert.doesNotMatch(restHandler, /saveStore\(/);
+});
+
+verified('declared-recall-gate-forces-again-and-logs-the-declaration', () => {
+  // T-06 (ADR-002): the zen room has NO bare reveal — the only two doors
+  // through the front face are the declaration buttons, the dojo keeps its
+  // own single 答えを見る strictly inside the S.focus branch
+  const frontFace = between('if (!rv.revealed) {', 'const now = new Date();');
+  const focusBranch = betweenIn(frontFace, 'if (S.focus) {', 'const declare = (declared) => {');
+  assert.match(focusBranch, /btn\.id = 'reveal'/);
+  assert.doesNotMatch(
+    frontFace.replace(focusBranch, ''),
+    /id = 'reveal'|revealed = true;\s*\n\s*render/,
+    'outside the dojo branch nothing reveals without a declaration',
+  );
+  assert.match(frontFace, /declare-notyet/);
+  assert.match(frontFace, /declare-recalled/);
+  // the declaration is evidence: one obslog row, [t,'reveal',key,declared]
+  assert.match(frontFace, /obsLog\('reveal', srsKey\(item\.t, item\.id\), declared\)/);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 1]] }), true);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 0]] }), true);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 3]] }), false);
+  // まだ narrows the row to the one honest seal AND forces the rating at
+  // the commit — the declaration, never the button, names the grade
+  const gradeRegion = between('const grades = [', '  main.append(row);');
+  assert.match(gradeRegion, /const notRecalled = !S\.focus && rv\.declared === 0;/);
+  assert.match(gradeRegion, /if \(notRecalled && rating !== 'Again'\) continue;/);
+  assert.match(gradeRegion, /const effRating = notRecalled \? 'Again' : rating;/);
+  assert.match(gradeRegion, /rating: fsrsApi\.Rating\[effRating\]/);
+  assert.doesNotMatch(gradeRegion, /rating: fsrsApi\.Rating\[rating\]/);
+  // a graded card clears the declaration for the next card
+  const advance = between('function advanceReviewSession(', 'function commitDrillGrade(');
+  assert.match(advance, /rv\.declared = null;/);
 });
 
 verified('setitem-try-block-excludes-alert-and-publication-code', () => {
@@ -1528,11 +1588,46 @@ verified('live-sticky-grade-row-is-byte-preserved', () => {
 
 verified('residual-and-direct-bypass-ledger-is-exact', () => {
   const residual = JSON.parse(readFileSync(residualPath, 'utf8'));
-  assert.equal(residual.schemaVersion, 2);
+  // schemaVersion 3 (R3-C, P0-4 sweep): the ledger shrank from 19 to 5 by
+  // CONVERSION, not by relabeling — the 14 learner-state mutating callers
+  // now ride commitStorePatch and are asserted gone below; each remaining
+  // caller carries an explicit disposition.
+  assert.equal(residual.schemaVersion, 3);
   assert.equal(residual.authorityHeadAtCut, BASE);
-  assert.equal(residual.count, 19);
-  assert.equal(residual.callers.length, 19);
+  assert.equal(residual.count, 5);
+  assert.equal(residual.callers.length, 5);
   assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
+  assert.ok(
+    residual.callers.every(
+      (entry) => typeof entry.disposition === 'string' && entry.disposition.startsWith('retained-'),
+    ),
+  );
+  assert.deepEqual(
+    residual.callers.map((entry) => entry.surface),
+    [
+      'observation debounce flush',
+      'reader scroll debounce',
+      'app Back from reader',
+      'reader display dials',
+      'lists tray door bookmark',
+    ],
+  );
+  // no retained caller touches deck, schedule, or evidence-graded roots —
+  // only the debounced observation flush (obslog) and UI preferences
+  const allowedRoots = new Set(['obslog', 'readerPos', 'dials']);
+  for (const entry of residual.callers) {
+    for (const root of entry.learnerRootsMutatedBeforeUncheckedSave) {
+      assert.ok(allowedRoots.has(root), `${entry.surface}: ${root}`);
+    }
+  }
+  assert.equal(residual.sweepP04.converted, 14);
+  assert.equal(residual.sweepP04.convertedSurfaces.length, 14);
+  for (const surface of residual.sweepP04.convertedSurfaces) {
+    assert.ok(
+      !residual.callers.some((entry) => entry.surface === surface),
+      `converted surface must not remain a caller: ${surface}`,
+    );
+  }
 
   const lines = source.split(/\r?\n/);
   const saveLines = lines
@@ -1557,10 +1652,6 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
     })),
     bypasses,
   );
-  const undo = residual.callers.find((entry) => entry.surface === 'review undo');
-  assert.ok(undo.learnerRootsMutatedBeforeUncheckedSave.includes('obslog'));
-  const probe = residual.callers.find((entry) => entry.surface === 'yomi probe grade or mint');
-  assert.deepEqual(probe.learnerRootsMutatedBeforeUncheckedSave, ['taken', 'obslog']);
 });
 
 verified('javascript-syntax', () => {
@@ -1598,8 +1689,10 @@ console.log(
         'started-mark-promotion',
         'learner-fsrs-params-gate',
         'ignored-params-obslog-note',
+        'declared-recall-obslog-row',
+        'transactional-sweep-p04',
       ],
-      residualUnsafeSaveCallers: 19,
+      residualUnsafeSaveCallers: 5,
       browserAndDevice: 'NOT_RUN',
     },
     null,
