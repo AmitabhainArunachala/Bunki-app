@@ -12,11 +12,11 @@ sheet (§5). No third state.
 
 | #   | Terminal          | State                        | Binding                                                                                                                             |
 | --- | ----------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| T1  | Every gate green  | **CLOSED**                   | `battery-final/SUMMARY.md` — fresh full §4 battery on the final head; corridor 190, storage 35, a11y, writing-room 37, drift 52, AI 19, native-readings 50, feed 27, replay, export, e2e 44, corpus pytest 193 |
+| T1  | Every gate green  | **CLOSED**                   | `battery-e3a/SUMMARY.md` — 16/16 on the newest head after the E3 fixes (corridor 215, a11y 46, writing-room 37, storage 35, drift 52, AI 21, native-readings 54, feed 31, replay, export, e2e 44, corpus 193). `battery-final/SUMMARY.md` is the same battery at the campaign's §5 close |
 | T2  | One learner state | **DECISION-SHEET (OD-9)**    | Engineering complete: PR70 backlog drained or ADR-disposed; parity enforced by verifiers. `docs/adr/ADR-004-one-learner-state.md` awaits your ratification — the ADR route §1 itself permits |
 | T3  | Reading Crown     | **DECISION-SHEET (OD-6/7)**  | 30-cap **lifted** by the exact-SHA demo (`reader-demo/10c440c…`, 85/86 assertions). Honest re-score **28.4/100** (`RUBRIC_REASSESSMENT_2026-08-16.md`). ≥70 is unreachable without physical-device evidence (OD-7) and audio (OD-6) — the rubric's own scale caps everything else at 40 |
 | T4  | The feed          | **DECISION-SHEET (OD-3)**    | Loop closed and gated: two consecutive automated runs, grader-scored, pools separated, EN titles as data (82 shelf + 682 archive), cull authority, `verify-feed.mjs` 27/27. 0/N approved **stays 0/N** until you decide — a feed of *approved* material cannot self-close |
-| T5  | Ledger zero       | **DECISION-SHEET (OD-19)**   | 83-finding triage + 13 hunt findings burned down across rounds 1–4; the closing double-dry HUNT (8 lenses × 2) could not run — the account hit its monthly spend limit mid-round-4. Script staged, one command from done |
+| T5  | Ledger zero       | **DECISION-SHEET (OD-19)**   | 83-finding triage + 13 round-2 hunt findings burned down across rounds 1–4. The double-dry gate then RAN: round A's eight lenses found 27 more, of which 11 are fixed and gated tonight (see below). Round A was not dry, so by the gate's own rule the campaign is not done — round B is the next command |
 | T6  | AI stack honest   | **CLOSED (ADR-004 sibling)** | 10s abort on every surface, provider/model seam, lossless IndexedDB archive across all six surfaces, 24-turn destruction gone, `verify-corridor-ai.mjs` 19/19. Literal package import deferred by ADR-004 §sibling with named rationale |
 | T7  | SRS complete      | **CLOSED**                   | Optimizer harvested (11/11), revlog has a reader, fitted params drive the scheduler fail-closed (R3-D, evidence in `optimizer-roundtrip/`), session budget is the learner's (R2-X), capture reversible everywhere (R2-B), fuzz/clock policy unified (ADR-003) |
 | T8  | Truth pass        | **CLOSED**                   | README rewritten to what is real; in-app copy repaired (R2-C/R3-E honest signals, true crumbs); campaign manifest v2 authored fresh and passing `verify:integration-manifest`; this file's terminal states typed |
@@ -56,14 +56,15 @@ rubric re-assessment (C2).
 
 ## Not done, named honestly
 
-- **R4-C** (obslog reader: the 出会い exposure trail on entry sheets; tray
-  rest/wake 44px) and **R4-D** (mock-tests proposal doc) — briefs preserved
-  below; both died unstarted on the account spend limit.
-- **R4-A's independent adversarial verify** — the verify agent died on the
-  same limit. The lander re-ran every gate it claimed (typecheck, lint,
-  vitest 1710/1710, e2e 44/44) but no decorrelated agent refuted it. Typed
-  as OD-20.
-- **E3 double-dry HUNT** — see T5 / OD-19.
+- ~~R4-C, R4-D, R4-A's verify, E3~~ — all four were stopped by the account's
+  monthly spend limit at the §5 close. The limit lifted afterwards and all
+  four were completed: **R4-C** landed (出会い trail + rest/wake 44px),
+  **R4-D**'s proposal is on the sheet, **R4-A** was independently CONFIRMED
+  (the verifier forced the StrictMode double-persist hazard rather than
+  trusting the claim, and found two misleading test comments, now corrected),
+  and **E3 round A** ran — see below.
+- **E3 round B** has not run. Two consecutive dry rounds close T5; one
+  non-dry round has now been worked. OD-19.
 
 ### Preserved briefs (for the next session)
 
