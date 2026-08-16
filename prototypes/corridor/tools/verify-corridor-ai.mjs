@@ -491,6 +491,26 @@ async function main() {
     dropped >= 1, `${dropped} turns honestly counted as dropped`);
   await brokenContext.close();
 
+  // ------------------------------------------ import clears the archive
+  // E3 round-A (AI lens): the file IS the record, but the archive lives in
+  // IndexedDB outside the exported envelope — so an import left the
+  // PREVIOUS learner's conversations sitting under the new record.
+  // Clearing is now part of importing, and a failure to clear stops the
+  // import rather than mixing two learners' words.
+  await page.evaluate(
+    `window.__KAIRO_AI__.__seed({ surface: 'chat', role: 'user', content: 'RECORD-A の秘密', model: 'test', ts: Date.now() })`,
+  );
+  const archiveBefore = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
+  const archiveCleared = await page.evaluate(
+    `window.__KAIRO_AI__.__clear().then(() => true, () => false)`,
+  );
+  const archiveAfter = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
+  check(
+    'an import clears the archive — no learner reads another learner’s conversations',
+    archiveBefore >= 1 && archiveCleared === true && archiveAfter === 0,
+    `before ${archiveBefore} · cleared ${archiveCleared} · after ${archiveAfter}`,
+  );
+
   check('no console or page errors across the AI walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
 

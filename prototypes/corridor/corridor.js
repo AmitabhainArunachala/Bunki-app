@@ -4503,6 +4503,21 @@ function renderPortRow(main) {
         return;
       }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // The file IS the record — so everything the old record owned must go
+      // with it. The AI transcript archive lives in IndexedDB, outside the
+      // exported envelope, and an import left the PREVIOUS learner's
+      // conversations sitting under the new record (E3 round-A, AI lens).
+      // The archive is cleared before the record lands; failing to clear it
+      // is not a reason to import a record on top of someone else's words.
+      try {
+        await clearAiArchive();
+      } catch {
+        portNote.textContent = tx(
+          '前の記録の会話を消せなかった。取り込みは中止した。',
+          "The previous record's conversations could not be cleared, so nothing was imported.",
+        );
+        return;
+      }
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
       location.reload();
     } catch {
@@ -8908,6 +8923,34 @@ function aiLogOpen() {
   return aiLogDbPromise;
 }
 
+/** Empty the archive. Called on IMPORT only: the file is the record, so the
+ * conversations of the record being replaced must not outlive it. Unlike the
+ * append path this one may NOT be swallowed — importing a record on top of
+ * another learner's words is the failure it exists to prevent — so it
+ * rejects, and the import stops. */
+async function clearAiArchive() {
+  const db = await aiLogOpen();
+  if (!db) {
+    // no archive to clear is the same outcome as an empty one — but a
+    // database we cannot open MIGHT hold the old words, so say so
+    if (typeof indexedDB === 'undefined') return true;
+    throw new Error('archive unavailable');
+  }
+  await new Promise((done, fail) => {
+    try {
+      const tx = db.transaction(AI_LOG_TURNS, 'readwrite');
+      tx.objectStore(AI_LOG_TURNS).clear();
+      tx.oncomplete = () => done(true);
+      tx.onerror = () => fail(tx.error || new Error('archive clear failed'));
+      tx.onabort = () => fail(tx.error || new Error('archive clear aborted'));
+    } catch (err) {
+      fail(err);
+    }
+  });
+  aiLogDropped = 0;
+  return true;
+}
+
 /** Append one turn. Fire-and-forget on the request path — the returned
  * promise (true = durably written) exists for the verification suites. */
 async function aiLogAppend(row) {
@@ -9013,6 +9056,9 @@ async function aiAsk(system, prompt, meta = {}) {
  * acceptance checks exercise the real code instead of a re-implementation. */
 window.__KAIRO_AI__ = Object.freeze({
   logAll: (surface) => aiLogAll(surface),
+  // the suites drive the archive's two lifecycle edges directly
+  __seed: (row) => aiLogAppend(row),
+  __clear: () => clearAiArchive(),
   dropped: () => aiLogDropped,
   provider: () => aiProvider(),
   timeoutMs: AI_TIMEOUT_MS,
