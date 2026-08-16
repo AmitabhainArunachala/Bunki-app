@@ -280,6 +280,108 @@ const reviewRows = index.articles.filter((record) => record.review);
     'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',
     !readFileSync(resolve(CORRIDOR, 'corridor.js'), 'utf8').includes('TITLES_EN'),
   );
+
+  // R3-E — provenance dates are real strings or honest absences: a Python
+  // None serialized as the word "None" must never reach a card's meta line
+  // (the 野ばら regression), in either index or in any curated body.
+  const STRINGIFIED_NULLS = new Set(['None', 'null', 'undefined']);
+  const badDates = [];
+  for (const record of index.articles) {
+    if (STRINGIFIED_NULLS.has(String(record.date ?? '').trim())) badDates.push(record.id);
+    const body = JSON.parse(
+      readFileSync(resolve(CORRIDOR, 'data/articles', record.file), 'utf8'),
+    );
+    if (STRINGIFIED_NULLS.has(String(body.date ?? '').trim())) badDates.push(`${record.id} (body)`);
+  }
+  for (const record of archive.articles) {
+    if (STRINGIFIED_NULLS.has(String(record.date ?? '').trim())) badDates.push(record.id);
+  }
+  check(
+    'no index row or curated body carries a stringified null date',
+    badDates.length === 0,
+    badDates.slice(0, 5).join(', ') || `${index.articles.length} curated + ${archive.articles.length} archive rows clean`,
+  );
+  check(
+    '野ばら (aozora:051034) records its unknown first-publication date as absence',
+    rows.get('aozora:051034')?.date === '',
+    JSON.stringify(rows.get('aozora:051034')?.date),
+  );
+
+  // R3-E — the JLPT-lexicon signal is computed with the deck's readings in
+  // reach: kana-written base forms (する, ある, いる — the most common verbs
+  // of the language) must never count as beyond-JLPT just because the deck
+  // writes them 為る/在る/居る. Recompute every curated card's coverage from
+  // its committed tokens with the reading-aware matcher and demand exact
+  // agreement with the stored signal — a reverted matcher (or reverted data)
+  // cannot satisfy both this and the spread probe below.
+  const wbig = JSON.parse(
+    readFileSync(resolve(REPO, 'prototypes/drift/data/wbig.json'), 'utf8'),
+  );
+  const KANA_RE = /^[ぁ-ゖァ-ヺー々〆〤ｦ-ﾟ]+$/u;
+  const kataToHira = (value) =>
+    [...value]
+      .map((ch) => (ch >= 'ァ' && ch <= 'ヶ' ? String.fromCharCode(ch.charCodeAt(0) - 0x60) : ch))
+      .join('');
+  const ortho = new Map();
+  const kana = new Map();
+  for (const [word, reading, , level] of wbig) {
+    if (!Number.isInteger(level)) continue;
+    if (level > (ortho.get(word) ?? 0)) ortho.set(word, level);
+    if (KANA_RE.test(word)) {
+      const key = kataToHira(word);
+      if (level > (kana.get(key) ?? 0)) kana.set(key, level);
+    }
+    if (reading) {
+      const key = kataToHira(String(reading));
+      if (level > (kana.get(key) ?? 0)) kana.set(key, level);
+    }
+  }
+  const coverageOf = (tokens) => {
+    const content = tokens.filter((token) => token.c);
+    if (!content.length) return null;
+    let oov = 0;
+    for (const token of content) {
+      let level = ortho.get(token.b);
+      if (level == null && KANA_RE.test(token.b)) level = kana.get(kataToHira(token.b));
+      if (level == null) oov += 1;
+    }
+    return 1 - oov / content.length;
+  };
+  const disagreeing = [];
+  const oneInCensus = new Map();
+  for (const record of index.articles) {
+    const body = JSON.parse(
+      readFileSync(resolve(CORRIDOR, 'data/articles', record.file), 'utf8'),
+    );
+    const stored = record.grading?.signals?.jlpt_lexicon?.coverage ?? null;
+    const computed = coverageOf(body.tokens);
+    if (
+      (stored == null) !== (computed == null) ||
+      (stored != null && Math.abs(stored - computed) > 1e-9)
+    ) {
+      disagreeing.push(`${record.id} stored=${stored} computed=${computed}`);
+    }
+    if (stored != null) {
+      const label = stored >= 1 ? 'full' : String(Math.round(1 / (1 - stored)));
+      oneInCensus.set(label, (oneInCensus.get(label) ?? 0) + 1);
+    }
+  }
+  check(
+    'every curated jlpt_lexicon coverage equals a reading-aware recompute from its own tokens',
+    disagreeing.length === 0,
+    disagreeing.slice(0, 3).join(' | ') || `${index.articles.length} cards agree`,
+  );
+  // the vocab note must discriminate between cards — the round-2 hunt found
+  // 68 of 69 cards wearing the same "~1 in 2/3" line. Distinct per-card
+  // ratios and no single ratio owning most of the shelf are properties of
+  // the honest matcher; the broken one collapses to {2,3} and fails both.
+  const censusTotal = [...oneInCensus.values()].reduce((sum, v) => sum + v, 0);
+  const censusMax = Math.max(...oneInCensus.values());
+  check(
+    'the per-card vocab ratio discriminates — ≥6 distinct values, none covering >50% of cards',
+    oneInCensus.size >= 6 && censusMax / censusTotal <= 0.5,
+    `${oneInCensus.size} distinct 1-in-N values, largest share ${censusMax}/${censusTotal}`,
+  );
 }
 // The shelf must render EXACTLY the curated index — no extras, none missing.
 // The count itself is data: the feed (R2-D) grows it 検収前-marked and

@@ -1611,6 +1611,15 @@ async function main() {
   check('an archive article reads like any shelf text — tokens, level, source link',
     archiveTok > 40 && /CC BY 2.5/.test(archiveAttr),
     `${archiveTok} tokens · "${archiveAttr}"`);
+  // R3-E crumb truth: the trail names the stack the back door actually
+  // reopens — bookshelf › archive › title, never bookshelf › title
+  const archiveCrumb = await page.evaluate(`document.querySelector('.crumb')?.textContent ?? ''`);
+  const archiveReaderTitle = await page.evaluate(
+    `document.querySelector('.view-title')?.textContent ?? ''`,
+  );
+  check('the archive read\'s crumb names its true origin — the archive, not the bare shelf',
+    /bookshelf › archive › /.test(archiveCrumb) && archiveCrumb.includes(archiveReaderTitle),
+    `crumb "${archiveCrumb.slice(0, 60)}"`);
   await tap(page, '#back');
   await page.waitForSelector('.archive-year');
   check('back returns to the stack, not the shelf', true, 'archive restored');
@@ -2437,6 +2446,104 @@ async function main() {
   check('R3-C · the declared-recall probes leave no console errors',
     consoleErrors.length === errsBeforeR3C,
     consoleErrors.slice(errsBeforeR3C).join(' | ') || 'clean');
+
+  // ------------------- R3-E · small truths: crumbs, lesson scroll, world swap
+  console.log('\n— R3-E · small truths: crumbs, lesson scroll, the world swap');
+
+  // (a) a stone tap recolours the world IN PLACE. The full render() it used
+  // to trigger cost a measured 100-200ms main-thread block per tap; the
+  // scoped swap moves the CSS tokens and the seal glyphs and nothing else.
+  // A reverted build rebuilds <main> and loses the marker set here.
+  await open('?entry=shelf');
+  await page.evaluate(`(document.querySelector('main').dataset.renderProbe = 'kept')`);
+  await page.locator('#theme-seal').click();
+  await page.waitForSelector('.world-picker');
+  await page.locator('.world-stone', { hasText: '墨' }).click();
+  await page.waitForTimeout(250);
+  const sumiSwap = await page.evaluate(`({
+    theme: document.documentElement.getAttribute('data-theme'),
+    kept: document.querySelector('main')?.dataset.renderProbe ?? null,
+    seal: document.querySelector('#theme-seal')?.textContent ?? '',
+    stored: localStorage.getItem('kairo-theme'),
+  })`);
+  check('R3-E · a stone tap recolours in place — tokens move, the room DOM stands',
+    sumiSwap.theme === 'sumi' && sumiSwap.kept === 'kept' &&
+      sumiSwap.seal === '墨' && sumiSwap.stored === 'sumi',
+    JSON.stringify(sumiSwap));
+  await page.locator('#theme-seal').click();
+  await page.waitForSelector('.world-picker');
+  await page.locator('.world-stone', { hasText: '藍' }).click();
+  await page.waitForTimeout(250);
+  const hokusaiSwap = await page.evaluate(`({
+    theme: document.documentElement.getAttribute('data-theme'),
+    kept: document.querySelector('main')?.dataset.renderProbe ?? null,
+    seal: document.querySelector('#theme-seal')?.textContent ?? '',
+  })`);
+  check('R3-E · the way home is the same gesture — 藍 restored, still no rebuild',
+    hokusaiSwap.theme === '' && hokusaiSwap.kept === 'kept' && hokusaiSwap.seal === '藍',
+    JSON.stringify(hokusaiSwap));
+
+  // (b) crumb truth: the dojo is entered from the galaxy and its back walks
+  // galaxy-ward — the crumb must name that origin, never the bookshelf
+  await open('');
+  await page.waitForTimeout(1500);
+  await page.tap('.nav-symbol');
+  await page.waitForTimeout(300);
+  await page.tap('.nav-dojo');
+  await page.waitForTimeout(400);
+  const dojoProbe = await page.evaluate(`({
+    crumb: document.querySelector('.crumb')?.textContent ?? '',
+    view: document.body.dataset.view,
+  })`);
+  check('R3-E · the dojo entered from the galaxy wears a galaxy crumb',
+    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'galaxy › focus',
+    `crumb "${dojoProbe.crumb}"`);
+  await page.tap('#back');
+  await page.waitForTimeout(600);
+  const dojoBack = await page.evaluate(`({
+    view: document.body.dataset.view,
+    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
+  })`);
+  check('R3-E · and its back door opens the room the crumb names — the galaxy',
+    dojoBack.view === 'drift' && dojoBack.layerActive === true,
+    JSON.stringify(dojoBack));
+
+  // (c) back from a lesson run restores the learner's place in the long list
+  await open('?entry=shelf');
+  await page.waitForSelector('#lessons-link');
+  await tap(page, '#lessons-link');
+  await page.waitForSelector('.lesson-row');
+  await page.evaluate(`(() => {
+    window.scrollTo(0, 500);
+    const rows = [...document.querySelectorAll('.lesson-row')];
+    const mid = innerHeight / 2;
+    let best = rows[0];
+    let score = Infinity;
+    for (const row of rows) {
+      const r = row.getBoundingClientRect();
+      const s = Math.abs(r.top + r.height / 2 - mid);
+      if (s < score) { score = s; best = row; }
+    }
+    best.dataset.probeRow = '1';
+  })()`);
+  await page.waitForTimeout(150);
+  // the tap helper recentres its target, nudging the list a few px — record
+  // the scroll at the GESTURE itself, the place the app promises to restore
+  await page.evaluate(`(() => {
+    window.__lessonTapY = null;
+    addEventListener('pointerdown', () => { window.__lessonTapY = window.scrollY; },
+      { once: true, capture: true });
+  })()`);
+  await tap(page, '[data-probe-row="1"]');
+  const lessonListY = await page.evaluate('window.__lessonTapY');
+  await page.waitForSelector('.review-face');
+  const lessonRunTop = await page.evaluate('window.scrollY');
+  await tap(page, '#back');
+  await page.waitForSelector('.lesson-row');
+  const lessonRestoredY = await page.evaluate('window.scrollY');
+  check('R3-E · back from a lesson run restores the learner\'s place in the list',
+    lessonListY >= 400 && lessonRunTop === 0 && Math.abs(lessonRestoredY - lessonListY) <= 4,
+    `list at ${lessonListY} → run at ${lessonRunTop} → back at ${lessonRestoredY}`);
 
   // the tray tells one story: park every card a little later TODAY and use
   // up the new-card room, so nothing is due at this moment — the closed

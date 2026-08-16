@@ -330,6 +330,21 @@ async function main() {
       asleep?.describedBy === 'stroke-exit-description' && Boolean(asleep.exitDescription),
       JSON.stringify({ describedBy: asleep?.describedBy, text: asleep?.exitDescription }),
     );
+    // POL-7 — the quiet room speaks in one faint 戻る: the bilingual chrome's
+    // English sub-caption must not hang beneath it while the room is minimal
+    const quietBackLabel = await page.evaluate(() => {
+      const sub = document.querySelector('#strokes-back .en-sub');
+      return {
+        subPresent: Boolean(sub),
+        subDisplay: sub ? getComputedStyle(sub).display : null,
+        text: document.querySelector('#strokes-back')?.textContent?.trim() ?? '',
+      };
+    });
+    check(
+      'the quiet 戻る sheds its English sub-caption',
+      !quietBackLabel.subPresent || quietBackLabel.subDisplay === 'none',
+      JSON.stringify(quietBackLabel),
+    );
 
     console.log('\n— awake field');
     await wake(page);

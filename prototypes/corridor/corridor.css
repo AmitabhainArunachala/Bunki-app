@@ -3940,6 +3940,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
   opacity: 0.82;
 }
+/* the quiet room speaks in one faint 戻る — the bilingual sub-caption stays
+ * out of the sleeping chrome (POL-7); the ordinary stroke bar keeps it */
+.stroke-page[data-minimal='on'] #strokes-back .en-sub {
+  display: none;
+}
 .stroke-page[data-minimal='on'] #strokes-back:focus-visible {
   outline: 2px solid var(--ai, var(--ink-2));
   outline-offset: -4px;

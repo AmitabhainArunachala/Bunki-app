@@ -53,11 +53,19 @@ function levelPhrase(grading) {
   let vocabNote = '';
   let vocabNoteJa = '';
   if (cov != null && cov < 1) {
-    const oneIn = Math.max(2, Math.round(1 / (1 - cov)));
-    const outside = ninjal != null ? 'the core' : 'the JLPT lists';
+    // the number is THIS card's measured coverage, never a floor or an
+    // average (the #42 law). Below one-in-two the ratio phrasing stops
+    // being true — say plainly that most words fall outside instead.
+    const oneIn = Math.round(1 / (1 - cov));
+    const outside = ninjal != null ? 'the core' : 'JLPT vocab';
     const outsideJa = ninjal != null ? '基本語彙の外' : 'JLPT語彙の外';
-    vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
-    vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
+    if (oneIn < 2) {
+      vocabNote = ` · most words beyond ${outside}`;
+      vocabNoteJa = `・大半が${outsideJa}`;
+    } else {
+      vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
+      vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
+    }
   }
   return { level, ja: band, note: vocabNote, noteJa: vocabNoteJa };
 }
@@ -461,6 +469,10 @@ const S = {
   lessonsDone: {},
   /** a running lesson: { id, lvl, words, ix, phase, ... } — null at rest */
   lessonRun: null,
+  /** where the lessons list was standing when a run began — the way back
+   * out of a lesson puts the learner at the row they left, not the top of
+   * the long N5–N1 list. Session-only, like shelfScroll. */
+  lessonsScroll: 0,
   /** the tutor's custom reading: { text, lv, ts } — persisted; null until asked */
   aiReading: null,
   /** earlier readings, newest first, capped — a shelf, not a stream */
@@ -2381,8 +2393,7 @@ function back() {
     return;
   }
   if (S.view === 'lessons' && S.lessonRun) {
-    S.lessonRun = null;
-    render();
+    endLessonRun();
     return;
   }
   if (S.view === 'archive') {
@@ -3137,7 +3148,9 @@ function shelfCard(p) {
 
   const meta = el('div', 'shelf-meta');
   meta.append(el('span', null, p.sourceLabel));
-  if (p.date) meta.append(el('span', null, p.date));
+  // an absent date stays absent — a stringified null ("None") is data rot,
+  // never provenance, and must not stand in the card's meta line (R3-E)
+  if (p.date && p.date !== 'None') meta.append(el('span', null, p.date));
   meta.append(el('span', 'pool-tag', p.licence));
   // an honest kind on the rows that are not articles
   if (p.source === 'isa-yasashii-glossary') {
@@ -4468,9 +4481,16 @@ function lessonPlan(kind, lvl) {
   return out;
 }
 function startLesson(lesson) {
+  S.lessonsScroll = window.scrollY; // the list keeps the learner's place
   S.lessonRun = { ...lesson, ix: 0, phase: 'learn', correct: 0, picked: null, choices: null };
   render();
   window.scrollTo(0, 0);
+}
+/** Leave a run for the list — restoring the scroll the run began from. */
+function endLessonRun() {
+  S.lessonRun = null;
+  render();
+  window.scrollTo(0, S.lessonsScroll || 0);
 }
 /** The one-line meaning an item is quizzed on, by kind. */
 function lessonGloss(kind, id) {
@@ -4613,10 +4633,7 @@ function renderLessons(main) {
   );
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
   again.type = 'button';
-  again.addEventListener('click', () => {
-    S.lessonRun = null;
-    render();
-  });
+  again.addEventListener('click', endLessonRun);
   main.append(again);
 }
 
@@ -11614,6 +11631,32 @@ function syncDriftTheme() {
     /* drift not mounted yet — render() re-syncs when it first shows */
   }
 }
+/** A world change recolours through what setKairoTheme has already moved —
+ * the data-theme tokens, the grown paper, the drift sync. The ONLY rendered
+ * DOM that bakes the world in is the seal glyphs, so swap those in place
+ * instead of rebuilding the whole room: a full render() cost a measured
+ * 100–200 ms main-thread block per stone tap (console-perf lens, round 2).
+ * The writing room is the one surface that re-inks from its world spec —
+ * while it is open, the full render stays the honest path. */
+function applyWorldSwap() {
+  if (S.strokes) {
+    render();
+    return;
+  }
+  const glyph = THEME_UI[themeIx()].seal;
+  for (const node of document.querySelectorAll('#theme-seal, .ginga-seal')) {
+    node.textContent = glyph;
+  }
+  const ginga = document.querySelector('.ginga-seal');
+  if (ginga) {
+    // play the wake exactly as a rebuild would — and only where the galaxy
+    // seal exists; elsewhere the flag waits for the next 銀河 build
+    ginga.classList.remove('awake');
+    void ginga.offsetWidth;
+    ginga.classList.add('awake');
+    S.sealWake = false;
+  }
+}
 // (the old tap-to-cycle retired 2026-08-14 — the worlds are direct choices;
 // wants the stones one tap away on every screen; see attachWorldPicker)
 
@@ -11993,7 +12036,7 @@ function openWorldPicker(anchor) {
       closeWorldPicker();
       setKairoTheme(t.id);
       S.sealWake = true; // the 銀河 seal plays its wake on a world change
-      render();
+      applyWorldSwap();
     });
     pop.append(b);
   }
@@ -12335,14 +12378,23 @@ function render() {
 
   const crumb = el('div', 'crumb');
   const parts = [];
+  // the crumb names the TRUE origin — the room 戻る actually reopens. The
+  // dojo family (dojo, its probe, its focus blocks) is entered from the
+  // galaxy and its backs walk galaxy-ward, never through the bookshelf.
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
   if (S.view === 'entry') parts.push(tx('野', 'field'));
-  else if (S.view === 'drift') parts.push(tx('銀河', 'galaxy'));
+  else if (S.view === 'drift' || dojoFamily) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
-  if (S.view === 'reader' && passage()) parts.push(passage().title);
+  if (S.view === 'reader' && passage()) {
+    // an archive read names the stack it came from — its back door
+    if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
+    parts.push(passage().title);
+  }
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
-  if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus' : 'review'));
+  if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
+  if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
-  if (S.view === 'probe') parts.push(tx('読み探査', 'yomi probe'));
+  if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読み探査', 'yomi probe'));
   if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
