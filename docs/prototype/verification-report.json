@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 07:40",
+          "2026-08-16 07:44",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 07:45",
+          "2026-08-16 07:49",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 07:49",
+          "2026-08-16 07:53",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 8 d",
-          "2026-08-24 07:39",
+          "in 6 d",
+          "2026-08-22 07:43",
           "8.30"
         ]
       ]
@@ -7068,7 +7068,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 503,
+  "loadMs": 524,
   "summary": {
     "total": 121,
     "failed": 0
@@ -7097,7 +7097,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.6999969482422,\"y\":570.5399780273438,\"productive\":true}"
+      "detail": "{\"x\":147.72999572753906,\"y\":570.4400024414062,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7117,7 +7117,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "70 texts, ready in 503 ms"
+      "detail": "70 texts, ready in 524 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7337,7 +7337,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 8 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 6 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -7567,12 +7567,12 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786866056373,\"probe\",\"word:屏風\",1,1]"
+      "detail": "row [1786866270211,\"probe\",\"word:金屏風\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
       "pass": true,
-      "detail": "水 → 1 min · 6 min · 10 min · 7 d"
+      "detail": "水 → 1 min · 6 min · 10 min · 10 d"
     },
     {
       "name": "dojo · grading the taken card writes the deck — FSRS record, revlog row, one new-card slot",
@@ -7592,7 +7592,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1786866059965,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1786866273737,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",

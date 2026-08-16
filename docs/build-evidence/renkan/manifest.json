@@ -1,0 +1,39 @@
+{
+  "campaign": "docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md",
+  "branch": "claude/renkan-one-push-2026-08-16",
+  "base": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+  "pr": 74,
+  "round": 1,
+  "head": "e8b0ccd95be4ce86df3e81e80d8155838943e494",
+  "rounds": [
+    {
+      "round": 0,
+      "closedAt": "042d87d",
+      "landings": [
+        { "what": "corpus spine (PR #60 ancestry, content no-op)", "sha": "a14dcbd" },
+        { "what": "FSRS optimizer harvest (donor f8c3b03)", "sha": "fa78a65" }
+      ],
+      "battery": "14/14 GREEN (battery-baseline/SUMMARY.md)"
+    },
+    {
+      "round": 1,
+      "workflow": "wf_0c28e955-c23 (13 agents; 5 triage + 4 build + 4 verify)",
+      "landings": [
+        { "wp": "A1a drift judgment bridge", "donor": "86fa4d3", "landed": "db46914", "verdict": "CONFIRMED" },
+        { "wp": "A1b dojo practice obslog", "donor": "8a02e1f", "landed": "f757944", "verdict": "CONFIRMED" },
+        { "wp": "A2 AI runtime honesty", "donor": "9a81418", "landed": "bdddc28", "verdict": "CONFIRMED" },
+        { "wp": "B3 titleEn as data", "donor": "fe2a929", "landed": "ca14e09", "verdict": "CONFIRMED" },
+        { "wp": "standalone regeneration (builder-only)", "landed": "0f3aac3" },
+        { "wp": "sent-door 44px hit region (integration-exposed latent defect)", "landed": "e8b0ccd" }
+      ],
+      "triage": "triage-round1.json — 83 findings: 33 FIXED / 39 OPEN / 11 PARTIAL",
+      "battery": "see battery-round1/SUMMARY.md (fresh full run on e8b0ccd)"
+    }
+  ],
+  "nextCommand": "Launch round 2: Workflow({scriptPath: '<session>/workflows/scripts/renkan-round-2.js'}) — four consolidated builds (SRS/review integrity, capture sovereignty, reader truths, T4 feed), archive-titleEn fleet (6 batches), three HUNT lenses. Then integrate serially, regenerate standalone once, full battery, RUN_STATE. A fresh session without that script re-authors it from RUN_STATE round-2 queue notes.",
+  "environment": {
+    "e2e": "npm run test:e2e:build before test:e2e",
+    "corpusPython": "/home/user/.venv-bunki-corpus/bin/python (unidic-lite needs venv build)",
+    "chromium": "/opt/pw-browsers/chromium"
+  }
+}

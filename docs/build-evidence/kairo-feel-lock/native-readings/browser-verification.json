@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T04:54:17.740Z",
+  "completedAt": "2026-08-16T07:51:14.131Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "4a1dfc10c85ce78db6181349e3397a12a369494ab0d81ec52a938a0807631106",
+    "index": "c6d96dafcd15d2f4636d7bafece2ca17511c90da0e7fcf681927823ef39f9f43",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "7ffcd4d73cff8585bba8e96dbb3bad36d7a0cca8df17a65e0e001c5115076043",
-    "corridorCss": "0658c94577f7a50a18cbd7543a046fcd3128fedf5293fe98e4e46342607c2a07",
-    "standalone": "71f2898d029526c45d6fd3706bc5b36231f10c81b5d615ec8898ba238b022e27",
+    "corridorJs": "784245ad15d1cd186bac00aee03eebbe7b9fd53fd6832afd16e9a38e628029fb",
+    "corridorCss": "4acb2a8d378ae279a44cee9d2bec33b7167b5ef1ece6e81d4adc4a3f8a76496f",
+    "standalone": "265575a7caf5b83184f7f9392c1416c92cab2b5d61321e5a51249b6041446f2d",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -57,17 +57,21 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "649cf901ef345485f474f570890c1af223ac285e616be32f8a88c62ae6d20c64"
+        "sha256": "b6210ca23bd4e21c26d465c4cbdc7b7e5167c87046cf1a6113781a5af04fd9d4"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "b41e88eeb9ab0562eab228e5a3984c2f4577d3fc943339cdf70a1fd825c2e12b"
+        "sha256": "46a17d9c09461057b6f104136c3fee5d244eadbe332910228c04b2a5ad551e54"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
         "sha256": "4c6c842a5cb8876b266d290914c70b13639ca5b3b709c2da716a03532a41148d"
+      },
+      "biShelf": {
+        "path": "screenshots/shelf-bilingual-titles.png",
+        "sha256": "e73c4ec722b1f0a6c72c3ec35f94403e19ce885f02ab83e5f97ed3a905f79cd9"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
@@ -1558,6 +1562,36 @@
   "noise": [],
   "results": [
     {
+      "name": "every primary index row carries a non-empty titleEn",
+      "pass": true,
+      "detail": "70/70",
+      "articleId": null
+    },
+    {
+      "name": "every titleEn names its provenance in titleEnSource",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "検収前 rows carry the AI-authored title marker; approved rows the migrated shelf-map one",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the index review state still matches the 30 authored 検収前 records, 検収前 named in each sourceLabel",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the code-side TITLES_EN map is gone from corridor.js — titles live in data only",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
       "name": "the one native shelf contains exactly 70 entries",
       "pass": true,
       "detail": "",
@@ -1757,6 +1791,36 @@
     },
     {
       "name": "all completion and bookmark state survives localStorage",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the 日本語のみ chrome renders no English titles",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row is visibly 検収前 on the 日本語のみ shelf",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf renders all 70 English titles from the records themselves",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row stays visibly 検収前 on the bilingual shelf",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf pass added no request, console, or page errors",
       "pass": true,
       "detail": "",
       "articleId": null
