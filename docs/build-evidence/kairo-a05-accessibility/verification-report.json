@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "bcf7f478c6933a55d60643d2efd0c83c710e6380",
-  "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+  "head": "22d6d9f3eee013161e19e5ad4dc0dcaa69e5c9e7",
+  "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
