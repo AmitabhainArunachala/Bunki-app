@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "22d6d9f3eee013161e19e5ad4dc0dcaa69e5c9e7",
+  "head": "0f3aac39494c0269842db67c19e6ae65c862dac3",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -16,7 +16,7 @@
     {
       "name": "reader words are named native controls on the common target.activate action",
       "pass": true,
-      "detail": "{\"words\":344,\"particles\":144,\"nativeButtons\":344,\"named\":344,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
+      "detail": "{\"words\":348,\"particles\":144,\"nativeButtons\":348,\"named\":348,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
     },
     {
       "name": "inline reader controls retain a real 44px hit region without widening print",
@@ -41,7 +41,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "497 named button(s) in the accessibility tree"
+      "detail": "501 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",

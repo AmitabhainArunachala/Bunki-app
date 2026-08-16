@@ -210,7 +210,7 @@ const MEASURE_FN = `(() => {
     .filter((n) => n.offsetParent !== null)
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('#reader button.tok') ? getComputedStyle(n, '::before') : null;
+      const expanded = n.matches('#reader button.tok, button.sent-door') ? getComputedStyle(n, '::before') : null;
       const expandedW = expanded ? parseFloat(expanded.width) : 0;
       const expandedH = expanded ? parseFloat(expanded.height) : 0;
       return {

@@ -4455,7 +4455,10 @@ body.zen .probe-context {
   color: var(--ink-2);
   margin: 0 0 6px;
 }
-/* the quiet door on every example line into its own page */
+/* the quiet door on every example line into its own page. Print stays a
+ * 14px glyph; the button carries the real 44px hit region the same way
+ * button.tok does — a centered pseudo-element that participates in hit
+ * testing without widening the line's typography. */
 .sent-door {
   background: transparent;
   border: 0;
@@ -4465,6 +4468,17 @@ body.zen .probe-context {
   color: var(--ai, var(--ink-2));
   cursor: pointer;
   vertical-align: baseline;
+  position: relative;
+}
+
+.sent-door::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
 }
 
 /* the answer face's example lines — quieter than the cloze, still living */
