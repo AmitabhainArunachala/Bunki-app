@@ -571,7 +571,9 @@ function plainRecord(value) {
   return prototype === null || Object.getPrototypeOf(prototype) === null;
 }
 
-const STORE_ITEM_TYPES = new Set(['word', 'kanji', 'radical', 'idiom']);
+// grammar and particles joined the deck in 覚える stage 3 — the store's
+// fail-closed envelope must admit what the capture door now offers
+const STORE_ITEM_TYPES = new Set(['word', 'kanji', 'radical', 'idiom', 'grammar', 'particle']);
 const owns = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const finiteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
 const nonEmptyString = (value) => typeof value === 'string' && value.length > 0;
@@ -5876,6 +5878,11 @@ const NODE_KIND = {
   kanji: ['漢字', 'kanji'],
   radical: ['部品', 'part'],
   idiom: ['熟語', 'idiom'],
+  // 覚える stage 3 (operator directive §3): grammar patterns and particles
+  // can enter the SRS — their card backs read from the same records the
+  // entry sheets read, so the session and the dictionary never disagree
+  grammar: ['文法', 'grammar'],
+  particle: ['助詞', 'particle'],
 };
 
 /** The context a learner chose at capture — resolved fresh from the article
@@ -6369,6 +6376,26 @@ function reviewBack(item) {
   if (item.t === 'idiom') {
     const i = D.idioms[item.id];
     if (i) return { reading: i.r || '', senses: (i.g || []).slice(0, 3) };
+  }
+  if (item.t === 'grammar') {
+    const g = GRAMMARS().find((x) => x.id === item.id);
+    if (g) {
+      const ex = g.ex?.[0];
+      return {
+        reading: g.form || '',
+        senses: [bi() ? g.mEn : g.mJa || g.mEn, ...(ex ? [`${ex.ja} — ${ex.en}`] : [])],
+      };
+    }
+  }
+  if (item.t === 'particle') {
+    const pt = PARTICLES.find((x) => x.id === item.id);
+    if (pt) {
+      const ex = pt.ex?.[0];
+      return {
+        reading: pt.r && pt.r !== pt.p ? pt.r : '',
+        senses: [bi() ? pt.role : pt.roleJa || pt.role, ...(ex ? [`${ex.ja} — ${ex.en}`] : [])],
+      };
+    }
   }
   return { reading: '', senses: [tx('この層に記録がない。', 'No record in this layer.')] };
 }

@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-16 00:12",
+          "2026-08-16 01:21",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-16 00:17",
+          "2026-08-16 01:26",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-16 00:21",
+          "2026-08-16 01:30",
           "2.31"
         ],
         [
           "簡単easy",
-          "in 6 d",
-          "2026-08-22 00:11",
+          "in 9 d",
+          "2026-08-25 01:20",
           "8.30"
         ]
       ]
@@ -4396,6 +4396,54 @@
         "id": "entry-row"
       },
       {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 15,
+        "hitH": 16,
+        "id": "sent-door"
+      },
+      {
         "text": "厳しいeveryday sy",
         "w": 332,
         "h": 50,
@@ -6046,10 +6094,10 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 442,
+  "loadMs": 423,
   "summary": {
     "total": 116,
-    "failed": 0
+    "failed": 1
   },
   "results": [
     {
@@ -6075,7 +6123,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":147.58999633789062,\"y\":570.9500122070312,\"productive\":true}"
+      "detail": "{\"x\":147.67999267578125,\"y\":570.5800170898438,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -6095,7 +6143,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "40 texts, ready in 442 ms"
+      "detail": "40 texts, ready in 423 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -6315,7 +6363,7 @@
     {
       "name": "the schedule preview shows what FSRS-6 would do",
       "pass": true,
-      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 6 d"
+      "detail": "もう一度again→in 1 min · 難しいhard→in 6 min · ふつうgood→in 10 min · 簡単easy→in 9 d"
     },
     {
       "name": "two hops deep, 戻る returns to the reader at the same place",
@@ -6384,8 +6432,8 @@
     },
     {
       "name": "every visible control is at least 44px",
-      "pass": true,
-      "detail": "613 controls checked, including inline token hit regions"
+      "pass": false,
+      "detail": "sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16, sent-door visual 15×16, hit 15×16"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -6545,7 +6593,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1786839157812,\"probe\",\"word:金屏風\",1,1]"
+      "detail": "row [1786843316199,\"probe\",\"word:屏風\",1,1]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",

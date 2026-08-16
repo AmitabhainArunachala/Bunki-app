@@ -7,7 +7,7 @@
   "count": 19,
   "callers": [
     {
-      "lineAfterPatch": 1037,
+      "lineAfterPatch": 1039,
       "surface": "observation debounce flush",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "obslog"
@@ -18,7 +18,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 2120,
+      "lineAfterPatch": 2122,
       "surface": "reader scroll debounce",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -29,7 +29,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 2195,
+      "lineAfterPatch": 2197,
       "surface": "app Back from reader",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -38,7 +38,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 2851,
+      "lineAfterPatch": 2853,
       "surface": "reader display dials",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "dials"
@@ -49,7 +49,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 3786,
+      "lineAfterPatch": 3788,
       "surface": "tray rest or wake",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended"
@@ -58,7 +58,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 3819,
+      "lineAfterPatch": 3821,
       "surface": "export timestamp",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "stats"
@@ -67,7 +67,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 3914,
+      "lineAfterPatch": 3916,
       "surface": "tray bulk memorize",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "taken"
@@ -76,7 +76,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 4063,
+      "lineAfterPatch": 4065,
       "surface": "lesson completion",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "lessonsDone",
@@ -88,7 +88,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 4223,
+      "lineAfterPatch": 4225,
       "surface": "AI chat user message",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiChat"
@@ -100,7 +100,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 4236,
+      "lineAfterPatch": 4238,
       "surface": "AI chat tutor message",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiChat"
@@ -109,7 +109,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6028,
+      "lineAfterPatch": 6035,
       "surface": "capture context scope",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "taken"
@@ -118,7 +118,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6069,
+      "lineAfterPatch": 6076,
       "surface": "manual list membership",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "lists"
@@ -127,7 +127,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6426,
+      "lineAfterPatch": 6453,
       "surface": "summary leech rest",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended"
@@ -136,7 +136,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6576,
+      "lineAfterPatch": 6603,
       "surface": "current review-card rest",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended"
@@ -150,7 +150,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 6785,
+      "lineAfterPatch": 6812,
       "surface": "review undo",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "suspended",
@@ -174,7 +174,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7311,
+      "lineAfterPatch": 7338,
       "surface": "yomi probe grade or mint",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "taken",
@@ -190,7 +190,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7878,
+      "lineAfterPatch": 7905,
       "surface": "AI reading generation",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiReading",
@@ -200,7 +200,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 7949,
+      "lineAfterPatch": 7976,
       "surface": "AI reading history swap",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "aiReading",
@@ -210,7 +210,7 @@
       "saveResultConsumed": false
     },
     {
-      "lineAfterPatch": 11306,
+      "lineAfterPatch": 11333,
       "surface": "lists tray door bookmark",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -223,14 +223,14 @@
   ],
   "directLearnerStoreBypasses": [
     {
-      "lineAfterPatch": 3809,
+      "lineAfterPatch": 3811,
       "surface": "learner-record export",
       "operation": "getItem",
       "keyExpression": "STORE_KEY",
       "risk": "Direct read is outside quarantine and can throw before export feedback."
     },
     {
-      "lineAfterPatch": 3837,
+      "lineAfterPatch": 3839,
       "surface": "learner-record import",
       "operation": "setItem",
       "keyExpression": "STORE_KEY",
