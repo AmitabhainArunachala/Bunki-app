@@ -34,6 +34,9 @@ run corridor-a11y   node prototypes/corridor/tools/verify-corridor-accessibility
 run writing-room    npm run verify:writing-room
 run storage-integ   node prototypes/corridor/tools/verify-corridor-storage-integrity.mjs
 run drift-fast      npm run verify:drift:fast
+if [ -f prototypes/corridor/tools/verify-corridor-ai.mjs ]; then
+  run corridor-ai   node prototypes/corridor/tools/verify-corridor-ai.mjs
+fi
 run native-readings node prototypes/corridor/tools/verify-native-readings.mjs
 run replay          npm run test:replay
 run export          npm run verify:export

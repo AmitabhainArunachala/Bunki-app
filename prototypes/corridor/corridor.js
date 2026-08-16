@@ -32,84 +32,6 @@ function mergeGrammar(harvested) {
   return [...GRAMMAR, ...extra].sort((a, b) => (order[a.lv] ?? 9) - (order[b.lv] ?? 9));
 }
 
-/** English titles for the committed shelf (authored translations of the
- * source titles — the sources themselves are CC BY / PD / glossary text). */
-const TITLES_EN = {
-  'wikinews:1403': 'Seven sites added to the World Natural Heritage list — including Shiretoko',
-  'wikinews:6460': "Mariners' Ichiro reaches 2,500 career hits",
-  'wikinews:12024': 'JR Osaka-Higashi Line partially opens',
-  'wikinews:20090': 'Shigaraki Kōgen Railway crash: court finds JR West 30% at fault',
-  'wikinews:45227': 'Wikinews closes the curtain on 21 years',
-  'aozora:051034': 'The Wild Rose — Ogawa Mimei',
-  'aozora:000628': 'Gon the Fox — Niimi Nankichi',
-  'aozora:046605': 'Yamanashi — Miyazawa Kenji',
-  'yasashii:1': 'Childcare leave',
-  'yasashii:2': 'Childcare-leave benefit',
-  'yasashii:3': "Basic survivor's pension",
-  'yasashii:4': "Employees' survivor's pension",
-  'yasashii:5': 'Medical insurance',
-  'yasashii:6': 'Seal-registration certificate',
-  'yasashii:7': 'Seal-registration card',
-  'yasashii:8': 'Overstaying a visa',
-  'yasashii:9': 'Landlord',
-  'yasashii:10': 'Long-term care',
-  'bunki-graded-n5-morning': 'A Quiet Morning',
-  'bunki-graded-n4-bookshop': 'The Second-hand Bookshop on a Rainy Day',
-  'bunki-graded-n3-town': 'Walking an Unknown Town',
-  'bunki-essay-n2-mountain': 'Thoughts While Walking a Mountain',
-  'bunki-essay-n1-ai': 'Knowledge and Judgment in the Age of AI',
-  // WP9b shelf expansion — 14 further Bunki originals (pool: original)
-  'bunki-graded-n5-station': 'Waiting at the Station',
-  'bunki-graded-n5-kitchen': 'Sounds from the Kitchen',
-  'bunki-graded-n5-neighbour': 'The Man in the Next Room',
-  'bunki-graded-n4-letter': 'A Letter in the Drawer',
-  'bunki-graded-n4-market': 'The Morning Market',
-  'bunki-graded-n4-bicycle': 'The Day I Lost My Bicycle',
-  'bunki-graded-n3-river': 'The Road Along the River',
-  'bunki-graded-n3-radio': 'Late-night Radio',
-  'bunki-essay-n2-handwriting': 'On Writing by Hand',
-  'bunki-essay-n2-notebook': 'A Notebook Kept for Its Margins',
-  'bunki-essay-n2-rain': 'The Speed of a Rainy Day',
-  'bunki-essay-n2-translation': 'On Words That Resist Translation',
-  'bunki-essay-n1-memory': 'Designing for Forgetting',
-  'bunki-essay-n1-city': 'Anonymity in the City, and Language',
-  'real-gokajo': 'The Charter Oath (1868)',
-  'real-hojoki': 'Hōjōki — the opening',
-  'real-tsurezure': 'Tsurezuregusa — the opening passage',
-  // Recovered 30 (codex donor 307a4dd) — authored translations, 検収前:
-  // pending the operator's editorial review like the articles themselves.
-  'bunki-graded-n3-zoka-sanjin-morning': 'A Morning Meeting the Three Deities of Creation',
-  'bunki-graded-n3-nakaima-diary': "A Day of Feeling the 'Middle Now'",
-  'bunki-graded-n3-world-beginning': "The Three Pillars at the World's Beginning",
-  'bunki-graded-n3-hidden-deity': 'The Deity Who Hid Away',
-  'bunki-graded-n3-kojiki-book': 'What Kind of Book Is the Kojiki?',
-  'bunki-graded-n3-hashira-counter': "Why Gods Are Counted in 'Pillars'",
-  'bunki-graded-n3-feel-jingu-forest': 'Walking the Ise Jingū Forest on Film',
-  'bunki-graded-n3-musubi-visual': 'Musubi: Joining Heaven, Earth, and Prayer',
-  'bunki-graded-n3-gratitude-week': 'A Week of Saying Words of Thanks',
-  'bunki-graded-n3-thanks-before-help': "'Thank You' Before 'Help Me'?",
-  'bunki-essay-n2-zoka-as-one': 'Reading the Three Deities as One Working',
-  'bunki-essay-n2-nakaima-time': "Past, Present, Future — and the 'Middle Now'",
-  'bunki-essay-n2-creator-god': "How Far Is 'Creator God' the Right Word?",
-  'bunki-essay-n2-silent-amenominakanushi': 'Amenominakanushi: Reading the God Who Is Never Told',
-  'bunki-essay-n2-kojiki-myth-history': 'The Kojiki: Myth or History?',
-  'bunki-essay-n2-myth-to-book': 'From Telling to Text: Compiling a Myth',
-  'bunki-essay-n2-feel-jingu-musubi': 'Musubi as the Camera Tells It',
-  'bunki-essay-n2-prayer-on-screen': 'How Prayer Looks on Screen',
-  'bunki-essay-n2-thanks-first': 'The Psychology of Saying Thank You First',
-  'bunki-essay-n2-testimony-literacy': 'How to Receive a Personal Testimony',
-  'bunki-essay-n1-cosmic-analogy': 'The Temptation to Read the Creation Deities as Cosmology',
-  'bunki-essay-n1-nakaima-time-theory': "Can the 'Middle Now' Become a Theory of Time?",
-  'bunki-essay-n1-first-versus-supreme': "The Problem with Calling a Primordial God 'Supreme'",
-  'bunki-essay-n1-silent-god-theology': 'The Silent God and a Theology of Absence',
-  'bunki-essay-n1-kojiki-power': 'Compiling the Kojiki: A Story of Power',
-  'bunki-essay-n1-beyond-fact-fiction': 'Against Judging Myth as Fact or Fiction',
-  'bunki-essay-n1-sacred-media': "How 'Feeling' Footage Constructs the Sacred",
-  'bunki-essay-n1-ise-time': 'Musubi, Nature, Repetition: Time at Ise',
-  'bunki-essay-n1-miracle-testimony': 'Miracle Testimonies and the Responsibility of Knowing',
-  'bunki-essay-n1-prayer-reality': 'Whose Reality Do Words of Prayer Change?',
-};
-
 /** Turn the grader's three signals into one sentence a learner can use.
  * The raw signals stay one 詳細 tap away — translated, not discarded. */
 function levelPhrase(grading) {
@@ -2107,6 +2029,9 @@ function renderArchive(main) {
       row.dataset.passage = a.id;
       const head = el('div', 'archive-row-head');
       head.append(el('span', 'archive-row-title', a.title));
+      // archive rows read titleEn from the same schema as the shelf; the
+      // frozen index carries none yet, so this stays silent until it does
+      if (bi() && a.titleEn) head.append(el('span', 'archive-row-title-en', a.titleEn));
       const lv = levelPhrase(a.grading);
       const meta = el('div', 'archive-row-meta');
       meta.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
@@ -2834,7 +2759,9 @@ function renderShelfBody() {
 
     const head = el('div', 'shelf-head');
     head.append(el('div', 'shelf-title', p.title));
-    if (bi() && TITLES_EN[p.id]) head.append(el('div', 'shelf-title-en', TITLES_EN[p.id]));
+    // the English title travels with the record (titleEn + titleEnSource in
+    // data/articles/index.json), never in a code-side map
+    if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
     const lv = levelPhrase(p.grading);
     const levelLine = el('div', 'level-line');
     levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));

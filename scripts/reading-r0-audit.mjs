@@ -265,6 +265,8 @@ const corpusCensus = {
       atMost71: lengths.filter((length) => length <= 71).length,
     },
     runtimeEnglishTitleOverlayCount: runtimeEnglishTitleCount,
+    dataEnglishTitleCount: primary.filter((row) => exists(row.titleEn)).length,
+    dataEnglishTitleSources: group(primary, 'titleEnSource'),
     publicApprovalReceipts: primary.filter(
       (row) => exists(row.approvalState) || exists(row.editorial),
     ).length,

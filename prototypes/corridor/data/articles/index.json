@@ -79,6 +79,8 @@
   {
    "id": "wikinews:1403",
    "title": "世界自然遺産に7箇所を追加 知床半島も",
+   "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -137,6 +139,8 @@
   {
    "id": "wikinews:6460",
    "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+   "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -195,6 +199,8 @@
   {
    "id": "wikinews:12024",
    "title": "JRおおさか東線部分開業",
+   "titleEn": "JR Osaka-Higashi Line partially opens",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -253,6 +259,8 @@
   {
    "id": "wikinews:20090",
    "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+   "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -312,6 +320,8 @@
    "id": "wikinews:45227",
    "pendingVerification": true,
    "title": "ウィキニュース、21年の歴史に幕を閉じる",
+   "titleEn": "Wikinews closes the curtain on 21 years",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -370,6 +380,8 @@
   {
    "id": "aozora:051034",
    "title": "野ばら",
+   "titleEn": "The Wild Rose — Ogawa Mimei",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 小川未明",
    "pool": "proprietary_safe",
@@ -428,6 +440,8 @@
   {
    "id": "aozora:000628",
    "title": "ごん狐",
+   "titleEn": "Gon the Fox — Niimi Nankichi",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 新美南吉",
    "pool": "proprietary_safe",
@@ -486,6 +500,8 @@
   {
    "id": "aozora:046605",
    "title": "やまなし",
+   "titleEn": "Yamanashi — Miyazawa Kenji",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 宮沢賢治",
    "pool": "proprietary_safe",
@@ -544,6 +560,8 @@
   {
    "id": "yasashii:1",
    "title": "育児休業",
+   "titleEn": "Childcare leave",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜育児休業《いくじきゅうぎょう》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -603,6 +621,8 @@
   {
    "id": "yasashii:2",
    "title": "育児休業給付金",
+   "titleEn": "Childcare-leave benefit",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜育児休業給付金《いくじきゅうぎょうきゅうふきん》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -662,6 +682,8 @@
   {
    "id": "yasashii:3",
    "title": "遺族基礎年金",
+   "titleEn": "Basic survivor's pension",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜遺族基礎年金《いぞくきそねんきん》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -721,6 +743,8 @@
   {
    "id": "yasashii:4",
    "title": "遺族厚生年金",
+   "titleEn": "Employees' survivor's pension",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜遺族厚生年金《いぞくこうせいねんきん》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -780,6 +804,8 @@
   {
    "id": "yasashii:5",
    "title": "医療保険",
+   "titleEn": "Medical insurance",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜医療保険《いりょうほけん》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -839,6 +865,8 @@
   {
    "id": "yasashii:6",
    "title": "印鑑登録証明書",
+   "titleEn": "Seal-registration certificate",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜印鑑登録証明書《いんかんとうろくしょうめいしょ》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -898,6 +926,8 @@
   {
    "id": "yasashii:7",
    "title": "印鑑登録証",
+   "titleEn": "Seal-registration card",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜印鑑登録証《いんかんとうろくしょう》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -957,6 +987,8 @@
   {
    "id": "yasashii:8",
    "title": "オーバーステイ",
+   "titleEn": "Overstaying a visa",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "オーバーステイ",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -1016,6 +1048,8 @@
   {
    "id": "yasashii:9",
    "title": "大家",
+   "titleEn": "Landlord",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜大家《おおや》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -1070,6 +1104,8 @@
   {
    "id": "yasashii:10",
    "title": "介護",
+   "titleEn": "Long-term care",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜介護《かいご》",
    "source": "isa-yasashii-glossary",
    "sourceLabel": "やさしい日本語 用語集",
@@ -1129,6 +1165,8 @@
   {
    "id": "bunki-graded-n5-morning",
    "title": "静かな朝",
+   "titleEn": "A Quiet Morning",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1189,6 +1227,8 @@
   {
    "id": "bunki-graded-n4-bookshop",
    "title": "雨の日の古本屋",
+   "titleEn": "The Second-hand Bookshop on a Rainy Day",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1249,6 +1289,8 @@
   {
    "id": "bunki-graded-n3-town",
    "title": "知らない町を歩く",
+   "titleEn": "Walking an Unknown Town",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1309,6 +1351,8 @@
   {
    "id": "bunki-essay-n2-mountain",
    "title": "山を歩きながら考えたこと",
+   "titleEn": "Thoughts While Walking a Mountain",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -1369,6 +1413,8 @@
   {
    "id": "bunki-essay-n1-ai",
    "title": "AI時代の知識と判断",
+   "titleEn": "Knowledge and Judgment in the Age of AI",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -1429,6 +1475,8 @@
   {
    "id": "real-gokajo",
    "title": "五箇条の御誓文",
+   "titleEn": "The Charter Oath (1868)",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "一次資料 · Historical primary source",
    "pool": "proprietary_safe",
@@ -1489,6 +1537,8 @@
   {
    "id": "real-hojoki",
    "title": "方丈記 · 冒頭",
+   "titleEn": "Hōjōki — the opening",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "古典 · 鴨長明 · 1212",
    "pool": "proprietary_safe",
@@ -1549,6 +1599,8 @@
   {
    "id": "real-tsurezure",
    "title": "徒然草 · 序段",
+   "titleEn": "Tsurezuregusa — the opening passage",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "古典 · 吉田兼好 · 14th century",
    "pool": "proprietary_safe",
@@ -1609,6 +1661,8 @@
   {
    "id": "bunki-graded-n5-station",
    "title": "駅で待つ時間",
+   "titleEn": "Waiting at the Station",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1669,6 +1723,8 @@
   {
    "id": "bunki-graded-n5-kitchen",
    "title": "台所の音",
+   "titleEn": "Sounds from the Kitchen",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1729,6 +1785,8 @@
   {
    "id": "bunki-graded-n5-neighbour",
    "title": "となりの部屋の人",
+   "titleEn": "The Man in the Next Room",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1789,6 +1847,8 @@
   {
    "id": "bunki-graded-n4-letter",
    "title": "引き出しの中の手紙",
+   "titleEn": "A Letter in the Drawer",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1849,6 +1909,8 @@
   {
    "id": "bunki-graded-n4-market",
    "title": "朝の市場",
+   "titleEn": "The Morning Market",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1909,6 +1971,8 @@
   {
    "id": "bunki-graded-n4-bicycle",
    "title": "自転車をなくした日",
+   "titleEn": "The Day I Lost My Bicycle",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1969,6 +2033,8 @@
   {
    "id": "bunki-graded-n3-river",
    "title": "川沿いの道",
+   "titleEn": "The Road Along the River",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -2029,6 +2095,8 @@
   {
    "id": "bunki-graded-n3-radio",
    "title": "深夜のラジオ",
+   "titleEn": "Late-night Radio",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -2089,6 +2157,8 @@
   {
    "id": "bunki-essay-n2-handwriting",
    "title": "手で書くということ",
+   "titleEn": "On Writing by Hand",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2149,6 +2219,8 @@
   {
    "id": "bunki-essay-n2-notebook",
    "title": "余白のためのノート",
+   "titleEn": "A Notebook Kept for Its Margins",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2209,6 +2281,8 @@
   {
    "id": "bunki-essay-n2-rain",
    "title": "雨の日の速度",
+   "titleEn": "The Speed of a Rainy Day",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2269,6 +2343,8 @@
   {
    "id": "bunki-essay-n2-translation",
    "title": "訳せない言葉について",
+   "titleEn": "On Words That Resist Translation",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2329,6 +2405,8 @@
   {
    "id": "bunki-essay-n1-memory",
    "title": "忘却を前提とした設計",
+   "titleEn": "Designing for Forgetting",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2389,6 +2467,8 @@
   {
    "id": "bunki-essay-n1-city",
    "title": "都市の匿名性と言語",
+   "titleEn": "Anonymity in the City, and Language",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2449,6 +2529,8 @@
   {
    "id": "bunki-graded-n3-zoka-sanjin-morning",
    "title": "造化三神に出会う朝",
+   "titleEn": "A Morning Meeting the Three Deities of Creation",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2510,6 +2592,8 @@
   {
    "id": "bunki-graded-n3-nakaima-diary",
    "title": "「中今」を感じる一日",
+   "titleEn": "A Day of Feeling the 'Middle Now'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2571,6 +2655,8 @@
   {
    "id": "bunki-graded-n3-world-beginning",
    "title": "世界のはじまりに現れた三柱",
+   "titleEn": "The Three Pillars at the World's Beginning",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2632,6 +2718,8 @@
   {
    "id": "bunki-graded-n3-hidden-deity",
    "title": "姿を隠した神さま",
+   "titleEn": "The Gods Who Hid Away",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2693,6 +2781,8 @@
   {
    "id": "bunki-graded-n3-kojiki-book",
    "title": "『古事記』はどんな本？",
+   "titleEn": "What Kind of Book Is the Kojiki?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2754,6 +2844,8 @@
   {
    "id": "bunki-graded-n3-hashira-counter",
    "title": "神さまを「一柱」と数えるわけ",
+   "titleEn": "Why Gods Are Counted in 'Pillars'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2815,6 +2907,8 @@
   {
    "id": "bunki-graded-n3-feel-jingu-forest",
    "title": "伊勢神宮の森を映像で歩く",
+   "titleEn": "Walking the Ise Jingū Forest on Film",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2876,6 +2970,8 @@
   {
    "id": "bunki-graded-n3-musubi-visual",
    "title": "天・地・祈りをつなぐ「むすひ」",
+   "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2937,6 +3033,8 @@
   {
    "id": "bunki-graded-n3-gratitude-week",
    "title": "一週間、感謝の言葉を唱えてみた",
+   "titleEn": "A Week of Reciting Words of Gratitude",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2998,6 +3096,8 @@
   {
    "id": "bunki-graded-n3-thanks-before-help",
    "title": "「助けて」より先に「ありがとう」？",
+   "titleEn": "'Thank You' Before 'Help Me'?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -3059,6 +3159,8 @@
   {
    "id": "bunki-essay-n2-zoka-as-one",
    "title": "三柱の神を一つの働きとして読む",
+   "titleEn": "Reading the Three Deities as a Single Working",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3120,6 +3222,8 @@
   {
    "id": "bunki-essay-n2-nakaima-time",
    "title": "過去・現在・未来と「中今」",
+   "titleEn": "Past, Present, Future — and the 'Middle Now'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3181,6 +3285,8 @@
   {
    "id": "bunki-essay-n2-creator-god",
    "title": "「創造神」という言葉はどこまで正しいか",
+   "titleEn": "How Far Is 'Creator God' the Right Word?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3242,6 +3348,8 @@
   {
    "id": "bunki-essay-n2-silent-amenominakanushi",
    "title": "天之御中主神――語られない神をどう読むか",
+   "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3303,6 +3411,8 @@
   {
    "id": "bunki-essay-n2-kojiki-myth-history",
    "title": "『古事記』は神話か、歴史か",
+   "titleEn": "The Kojiki: Myth or History?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3364,6 +3474,8 @@
   {
    "id": "bunki-essay-n2-myth-to-book",
    "title": "語りから書物へ――神話を編む",
+   "titleEn": "From Telling to Text: Compiling a Myth",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3425,6 +3537,8 @@
   {
    "id": "bunki-essay-n2-feel-jingu-musubi",
    "title": "映像が伝える「むすひ」",
+   "titleEn": "Musubi as the Camera Tells It",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3486,6 +3600,8 @@
   {
    "id": "bunki-essay-n2-prayer-on-screen",
    "title": "映像の中で祈りはどう見えるか",
+   "titleEn": "How Prayer Looks on Screen",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3547,6 +3663,8 @@
   {
    "id": "bunki-essay-n2-thanks-first",
    "title": "「ありがとうございます」を先に言う心理",
+   "titleEn": "The Psychology of Saying Thank You First",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3608,6 +3726,8 @@
   {
    "id": "bunki-essay-n2-testimony-literacy",
    "title": "体験談をどう受け取るか",
+   "titleEn": "How to Receive a Personal Testimony",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3669,6 +3789,8 @@
   {
    "id": "bunki-essay-n1-cosmic-analogy",
    "title": "造化三神を宇宙論として読む誘惑",
+   "titleEn": "The Temptation to Read the Creation Deities as Cosmology",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3730,6 +3852,8 @@
   {
    "id": "bunki-essay-n1-nakaima-time-theory",
    "title": "「中今」は時間論になり得るか",
+   "titleEn": "Can the 'Middle Now' Become a Theory of Time?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3791,6 +3915,8 @@
   {
    "id": "bunki-essay-n1-first-versus-supreme",
    "title": "原初神を「最高神」と呼ぶときの問題",
+   "titleEn": "The Problem with Calling a Primordial God 'Supreme'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3852,6 +3978,8 @@
   {
    "id": "bunki-essay-n1-silent-god-theology",
    "title": "沈黙する神と不在の神学",
+   "titleEn": "The Silent God and a Theology of Absence",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3913,6 +4041,8 @@
   {
    "id": "bunki-essay-n1-kojiki-power",
    "title": "『古事記』編纂と権力の物語",
+   "titleEn": "Compiling the Kojiki: A Story of Power",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3974,6 +4104,8 @@
   {
    "id": "bunki-essay-n1-beyond-fact-fiction",
    "title": "神話を「事実か虚構か」で裁かないために",
+   "titleEn": "Against Judging Myth as Fact or Fiction",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4035,6 +4167,8 @@
   {
    "id": "bunki-essay-n1-sacred-media",
    "title": "「感じる」映像は神聖さをどう構成するか",
+   "titleEn": "How 'Feeling' Footage Constructs the Sacred",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4096,6 +4230,8 @@
   {
    "id": "bunki-essay-n1-ise-time",
    "title": "産霊・自然・反復――伊勢の時間",
+   "titleEn": "Musubi, Nature, Repetition: Time at Ise",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4157,6 +4293,8 @@
   {
    "id": "bunki-essay-n1-miracle-testimony",
    "title": "奇跡の体験談と認識の責任",
+   "titleEn": "Miracle Testimonies and the Responsibility of Knowing",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4218,6 +4356,8 @@
   {
    "id": "bunki-essay-n1-prayer-reality",
    "title": "祈りの言葉は誰の現実を変えるのか",
+   "titleEn": "Whose Reality Do Words of Prayer Change?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",

@@ -7,6 +7,12 @@
  * completion, bookmark, Back, shelf scroll return, and article-position
  * restoration. No representative-only shortcut and no alternate reader.
  *
+ * B3 (bilingual titles as schema data): every primary index row must carry a
+ * non-empty titleEn with a titleEnSource provenance marker, the code-side
+ * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
+ * must render each English title from the record itself, and every
+ * human-review-pending row must stay visibly 検収前 on the shelf.
+ *
  * Usage:
  *   CHROMIUM_PATH=/path/to/chromium node tools/verify-native-readings.mjs
  *   node tools/verify-native-readings.mjs --shots DIR --report FILE
@@ -201,6 +207,47 @@ mkdirSync(dirname(reportPath), { recursive: true });
 
 const index = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/index.json'), 'utf8'));
 const rows = new Map(index.articles.map((record) => [record.id, record]));
+
+// B3 — the English title is schema data with provenance, not a code-side map
+const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08']);
+const reviewRows = index.articles.filter((record) => record.review);
+{
+  const missingEn = index.articles.filter(
+    (record) => typeof record.titleEn !== 'string' || !record.titleEn.trim(),
+  );
+  check(
+    'every primary index row carries a non-empty titleEn',
+    index.articles.length === 70 && missingEn.length === 0,
+    missingEn.length ? missingEn.map((record) => record.id).join(', ') : '70/70',
+  );
+  const unsourced = index.articles.filter((record) => !TITLE_EN_SOURCES.has(record.titleEnSource));
+  check(
+    'every titleEn names its provenance in titleEnSource',
+    unsourced.length === 0,
+    unsourced.map((record) => record.id).join(', '),
+  );
+  check(
+    '検収前 rows carry the AI-authored title marker; approved rows the migrated shelf-map one',
+    index.articles.every((record) =>
+      record.review
+        ? record.titleEnSource === 'renkan-ai-2026-08'
+        : record.titleEnSource === 'shelf-map-2026',
+    ),
+  );
+  check(
+    'the index review state still matches the 30 authored 検収前 records, 検収前 named in each sourceLabel',
+    reviewRows.length === IDS.length &&
+      IDS.every(
+        (id) =>
+          rows.get(id)?.review === 'human-review-pending' &&
+          /検収前/.test(rows.get(id)?.sourceLabel ?? ''),
+      ),
+  );
+  check(
+    'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',
+    !readFileSync(resolve(CORRIDOR, 'corridor.js'), 'utf8').includes('TITLES_EN'),
+  );
+}
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -511,6 +558,66 @@ try {
     ),
   );
 
+  // B3 — the shelf's English titles come from the record itself, and the
+  // 検収前 marking stays visible in both chrome languages
+  check(
+    'the 日本語のみ chrome renders no English titles',
+    (await page.locator('.shelf-title-en').count()) === 0,
+  );
+  const readShelfCards = () =>
+    page.evaluate(() =>
+      Object.fromEntries(
+        [...document.querySelectorAll('.shelf-item')].map((item) => [
+          item.dataset.passage,
+          {
+            en: item.querySelector('.shelf-title-en')?.textContent ?? null,
+            meta: item.querySelector('.shelf-meta')?.textContent ?? '',
+          },
+        ]),
+      ),
+    );
+  const jaCards = await readShelfCards();
+  const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
+  check(
+    'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
+    reviewRows.length === IDS.length && jaUnmarked.length === 0,
+    jaUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+  );
+  const biNoiseBefore = noise.length;
+  await page.goto(`${base}/index.html?entry=shelf&ui=bi&cachebust=${Date.now()}`, {
+    waitUntil: 'load',
+  });
+  await page.waitForFunction(
+    () =>
+      document.body.dataset.ready === '1' &&
+      document.querySelectorAll('.shelf-item').length === 70,
+    null,
+    { timeout: 30_000 },
+  );
+  const biCards = await readShelfCards();
+  const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
+  check(
+    'the bilingual shelf renders all 70 English titles from the records themselves',
+    wrongEn.length === 0,
+    wrongEn.map((record) => record.id).slice(0, 4).join(', '),
+  );
+  const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
+  check(
+    'every human-review-pending row stays visibly 検収前 on the bilingual shelf',
+    biUnmarked.length === 0,
+    biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+  );
+  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
+  check(
+    'the bilingual shelf pass added no request, console, or page errors',
+    noise.length === biNoiseBefore,
+    noise
+      .slice(biNoiseBefore, biNoiseBefore + 4)
+      .map((entry) => `${entry.kind}: ${entry.text}`)
+      .join(' | '),
+  );
+
   writeFileSync(
     reportPath,
     `${JSON.stringify(
@@ -546,6 +653,10 @@ try {
           },
           captures: {
             shelf: { path: 'screenshots/shelf-first-added.png', sha256: fileSha256(join(shotsDir, 'shelf-first-added.png')) },
+            biShelf: {
+              path: 'screenshots/shelf-bilingual-titles.png',
+              sha256: fileSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
+            },
             n3Reader: {
               path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
               sha256: fileSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),

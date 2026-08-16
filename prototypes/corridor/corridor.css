@@ -4406,6 +4406,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-size: 15px;
   line-height: 1.5;
 }
+.archive-row-title-en {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
+}
 .archive-row-meta {
   display: flex;
   align-items: center;
