@@ -1078,13 +1078,20 @@ function obsLog(kind, key, ...detail) {
 // 分流の橋 — the drift's flick judgments were persisting only to the drift's
 // own store, which nothing in the corridor ever read (P0, full-instrument
 // review). The water now hands each committed judgment to the observation
-// ledger as EXPOSURE evidence: detail 3 = flicked known, 1 = flicked
-// unknown, same scale as the tap ladder. Constitution holds — exposure is
-// not mastery, so this never touches FSRS state or creates a card; it makes
-// the judgment visible to the one learner state (obslog is stored, exported,
-// and read by evidence surfaces).
+// ledger as an APPEND-ONLY EXPOSURE row [t, 'drift', key, j]: j 3 = flicked
+// known, 1 = flicked unknown, the tap ladder's scale. Constitution holds —
+// exposure is not mastery, so this never touches FSRS state, S.taken, or
+// review debt; it makes the judgment visible to the one learner state
+// (obslog is stored, exported, and read by evidence surfaces). Unlike taps,
+// the commit is SYNCHRONOUS — no debounce: the returned ack is true only
+// after the envelope crossed the durability boundary, and the water rolls
+// its own store back on anything else, so the two records never disagree
+// about what the learner said. Drift grades words, kanji glyphs, and
+// particle satellites; each keeps its own modality-true target type.
 window.bunkiDriftJudgment = (kind, key, dir) => {
-  obsLog('drift', srsKey(kind === 'kanji' ? 'kanji' : 'word', key), dir > 0 ? 3 : 1);
+  const t = kind === 'glyph' || kind === 'kanji' ? 'kanji' : kind === 'part' ? 'particle' : 'word';
+  const obslog = [...(S.obslog || []), [Date.now(), 'drift', srsKey(t, key), dir > 0 ? 3 : 1]];
+  return commitStorePatch({ obslog });
 };
 // 分流の岸 — the corridor names its fused chrome so a tap on the torii,
 // seal, nav, bubbles, or any overlay is never read by the water as an

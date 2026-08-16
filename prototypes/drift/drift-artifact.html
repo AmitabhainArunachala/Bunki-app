@@ -1914,6 +1914,11 @@ function grade(n,dir){
   // The record commits before the word departs: if this device cannot keep
   // the judgment, the word stays in the water and the learner is told once.
   const prior={known:store.known[key],unknown:store.unknown[key]};
+  const rollback=()=>{
+    if(prior.known==null) delete store.known[key]; else store.known[key]=prior.known;
+    if(prior.unknown==null) delete store.unknown[key]; else store.unknown[key]=prior.unknown;
+    store.lk=settled; store.lu=gathered;
+  };
   if(dir>0){
     store.known[key]=(store.known[key]||0)+1;
     if(store.unknown[key]) delete store.unknown[key];
@@ -1923,16 +1928,28 @@ function grade(n,dir){
   }
   store.lk=settled+(dir>0?1:0); store.lu=gathered+(dir>0?0:1);
   if(!saveStore()){
-    if(prior.known==null) delete store.known[key]; else store.known[key]=prior.known;
-    if(prior.unknown==null) delete store.unknown[key]; else store.unknown[key]=prior.unknown;
-    store.lk=settled; store.lu=gathered;
+    rollback();
     return;
   }
+  // 分流の橋 — when the corridor hosts this water, a committed judgment must
+  // also reach the app's one learner state as an append-only observation
+  // (exposure evidence, never a card, never FSRS). The host acks true only
+  // once its own record crossed the durability boundary; any other answer —
+  // false, no answer, a throw — rolls this store back too, so the two records
+  // never disagree about what the learner said: the word stays in the water
+  // and the learner is told once. A throwing host still never breaks the
+  // water. Standalone drift has no host hook and keeps its autonomy.
+  if(typeof window.bunkiDriftJudgment==="function"){
+    let ack=false;
+    try{ack=window.bunkiDriftJudgment(n.kind,key,dir)===true;}catch{ack=false;}
+    if(!ack){
+      rollback();
+      saveStore();
+      setHint("この判断は学びの記録に届かなかった。ことばはここに残した");
+      return;
+    }
+  }
   n.gone=true; n.frozen=true;
-  // 分流の橋 — when the corridor hosts this water, every committed judgment
-  // also reaches the app's one learner state (exposure evidence, never a
-  // card). Standalone drift has no host hook and the guard makes it a no-op.
-  try{window.bunkiDriftJudgment&&window.bunkiDriftJudgment(n.kind,key,dir);}catch{/* host hook must never break the water */}
   if(dir>0){settled++;bloom(n);} else {gathered++;sink(n);}
   updateTray();
   if(unfolded===n) unfolded=null;

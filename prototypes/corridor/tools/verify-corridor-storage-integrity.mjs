@@ -18,9 +18,13 @@ const residualPath = fileURLToPath(
     import.meta.url,
   ),
 );
+const driftLayerPath = fileURLToPath(new URL('../drift-layer.js', import.meta.url));
+const driftArtifactPath = fileURLToPath(new URL('../../drift/drift-artifact.html', import.meta.url));
 const source = readFileSync(corridorPath, 'utf8');
 const css = readFileSync(cssPath, 'utf8');
 const driftCss = readFileSync(driftCssPath, 'utf8');
+const driftLayerSource = readFileSync(driftLayerPath, 'utf8');
+const driftArtifactSource = readFileSync(driftArtifactPath, 'utf8');
 const checks = [];
 
 function verified(name, body) {
@@ -33,12 +37,16 @@ async function verifiedAsync(name, body) {
   checks.push(name);
 }
 
-function between(start, end) {
-  const from = source.indexOf(start);
+function betweenIn(text, start, end) {
+  const from = text.indexOf(start);
   assert.notEqual(from, -1, `missing source marker: ${start}`);
-  const to = source.indexOf(end, from);
+  const to = text.indexOf(end, from);
   assert.notEqual(to, -1, `missing source marker: ${end}`);
-  return source.slice(from, to);
+  return text.slice(from, to);
+}
+
+function between(start, end) {
+  return betweenIn(source, start, end);
 }
 
 function state(overrides = {}) {
@@ -351,6 +359,8 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog unknown kind', { v: 1, obslog: [[1, 'unknown', 'word:海', 1]] }],
     ['obslog malformed tap', { v: 1, obslog: [[1, 'tap', 'word:海', 9, 'article']] }],
     ['obslog malformed probe', { v: 1, obslog: [[1, 'probe', 'word:海', 3, 2]] }],
+    ['obslog malformed drift judgment', { v: 1, obslog: [[1, 'drift', 'word:海', 2]] }],
+    ['obslog malformed drift arity', { v: 1, obslog: [[1, 'drift', 'word:海', 3, 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -793,6 +803,233 @@ verified('standard-grade-action-failure-and-success', () => {
   assert.equal(rv.history.length, 1);
 });
 
+/* --------------------------------------------------------- the drift bridge
+ * P0 #1: a Drift flick judgment must reach the one learner state as an
+ * APPEND-ONLY obslog observation — synchronously, so the ack the water
+ * receives is the durability result — and must never mint FSRS state,
+ * S.taken rows, or review debt (exposure is not mastery). When the host
+ * cannot persist the observation, the water rolls its own store back:
+ * the two records never disagree about what the learner said. */
+const observationBlock = between(
+  '/* ------------------------------------------------ the observation log',
+  "addEventListener('pagehide', obsFlush);",
+);
+
+function bridgeContext() {
+  const context = vm.createContext({
+    S: { obslog: [], srs: {}, taken: [], revlog: [], deepWords: {} },
+    window: {},
+    commitStorePatch: null,
+    srsKey: (t, id) => `${t}:${id}`,
+    saveStore: () => true,
+    setTimeout: () => 0,
+    clearTimeout: () => {},
+  });
+  vm.runInContext(observationBlock, context, { filename: 'corridor-observation-block.js' });
+  return context;
+}
+
+verified('drift-judgment-lands-in-obslog-as-one-synchronous-observation', () => {
+  const context = bridgeContext();
+  let attempts = 0;
+  context.commitStorePatch = (patch) => {
+    attempts += 1;
+    Object.assign(context.S, patch);
+    return true;
+  };
+  const before = Date.now();
+  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), true);
+  assert.equal(attempts, 1, 'the ack must ride one synchronous commit, never the tap debounce');
+  assert.equal(context.S.obslog.length, 1);
+  const [ts, kind, key, judgment] = context.S.obslog[0];
+  assert.ok(ts >= before && ts <= Date.now());
+  assert.equal(kind, 'drift');
+  assert.equal(key, 'word:海');
+  assert.equal(judgment, 3);
+  assert.equal(context.window.bunkiDriftJudgment('glyph', '語', -1), true);
+  assert.equal(context.window.bunkiDriftJudgment('part', 'は', -1), true);
+  assert.deepEqual(
+    // JSON-normalized: the rows were minted inside the vm realm
+    JSON.parse(JSON.stringify(context.S.obslog.map((row) => row.slice(1)))),
+    [
+      ['drift', 'word:海', 3],
+      ['drift', 'kanji:語', 1],
+      ['drift', 'particle:は', 1],
+    ],
+  );
+  // every bridged row round-trips the fail-closed envelope validator
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
+    true,
+  );
+  // exposure is not mastery: no FSRS card, no capture row, no review debt
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+  assert.equal(context.S.revlog.length, 0);
+  const bridge = betweenIn(observationBlock, 'window.bunkiDriftJudgment = (kind, key, dir) => {', '};');
+  assert.match(bridge, /return commitStorePatch\(\{ obslog \}\)/);
+  assert.doesNotMatch(bridge, /obsLog\(|setTimeout|srsStore|S\.srs|S\.taken|S\.revlog/);
+});
+
+verified('drift-judgment-persistence-failure-acks-false-and-appends-nothing', () => {
+  const context = bridgeContext();
+  let attempts = 0;
+  context.commitStorePatch = () => {
+    attempts += 1;
+    return false;
+  };
+  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), false);
+  assert.equal(attempts, 1);
+  assert.equal(context.S.obslog.length, 0);
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+});
+
+const driftGradeBlock = betweenIn(driftLayerSource, 'function grade(n,dir){', 'function updateTray(){');
+
+verified('drift-grade-block-ships-byte-identical-to-its-source-of-truth', () => {
+  assert.equal(
+    driftGradeBlock,
+    betweenIn(driftArtifactSource, 'function grade(n,dir){', 'function updateTray(){'),
+  );
+});
+
+function driftGradeContext() {
+  const calls = [];
+  const context = vm.createContext({
+    stack: [],
+    store: { known: {}, unknown: {}, lk: 0, lu: 0 },
+    settled: 0,
+    gathered: 0,
+    unfolded: null,
+    focusN: null,
+    WALKED: [],
+    deck: [],
+    window: {},
+    saveStore: null,
+    setHint: (txt) => calls.push(['hint', txt]),
+    bloom: () => calls.push(['bloom']),
+    sink: () => calls.push(['sink']),
+    updateTray: () => calls.push(['tray']),
+    clearBloom: () => {},
+    removeNode: () => calls.push(['removeNode']),
+    topUp: () => {},
+    surface: () => {},
+    vh: () => 844,
+    performance: { now: () => 0 },
+    setTimeout: () => 0,
+  });
+  vm.runInContext(`${driftGradeBlock}\n;globalThis.grade = grade;`, context, {
+    filename: 'drift-grade-block.js',
+  });
+  return { context, calls };
+}
+
+const driftWord = () => ({
+  kind: 'word',
+  w: '海',
+  r: 'うみ',
+  g: 'sea',
+  st: 'k',
+  p: '',
+  lvl: 3,
+  gone: false,
+  frozen: false,
+  fromW: true,
+  x: 100,
+  y: 100,
+  s: 1,
+  cr: 0,
+  el: { style: {} },
+});
+
+verified('drift-judgment-reaches-the-host-only-after-its-own-commit', () => {
+  const { context, calls } = driftGradeContext();
+  const order = [];
+  context.saveStore = () => {
+    order.push('drift-save');
+    return true;
+  };
+  context.window.bunkiDriftJudgment = (kind, key, dir) => {
+    order.push(`host:${kind}:${key}:${dir}`);
+    return true;
+  };
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.deepEqual(order, ['drift-save', 'host:word:海:1']);
+  assert.equal(n.gone, true);
+  assert.equal(context.store.known['海'], 1);
+  assert.equal(context.settled, 1);
+  assert.ok(calls.some(([call]) => call === 'bloom'));
+});
+
+verified('drift-store-rolls-back-when-the-host-cannot-persist', () => {
+  const failingHosts = [
+    ['acks false', () => false],
+    ['acks nothing', () => undefined],
+    [
+      'throws',
+      () => {
+        throw new Error('host store quarantined');
+      },
+    ],
+  ];
+  for (const [name, failingHost] of failingHosts) {
+    const { context, calls } = driftGradeContext();
+    const saves = [];
+    context.saveStore = () => {
+      saves.push(JSON.parse(JSON.stringify(context.store)));
+      return true;
+    };
+    context.window.bunkiDriftJudgment = failingHost;
+    const n = driftWord();
+    context.grade(n, -1);
+    // the judgment rode the first (pre-ack) save; the rollback save erased it
+    assert.equal(saves.length, 2, name);
+    assert.equal(saves[0].unknown['海'], 1, name);
+    assert.deepEqual(saves[1], { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
+    assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
+    // the word stays in the water, the learner is told once, nothing departs
+    assert.equal(n.gone, false, name);
+    assert.equal(context.gathered, 0, name);
+    assert.equal(calls.filter(([call]) => call === 'hint').length, 1, name);
+    assert.ok(
+      !calls.some(([call]) => ['bloom', 'sink', 'removeNode', 'tray'].includes(call)),
+      name,
+    );
+  }
+});
+
+verified('drift-own-save-failure-never-reaches-the-host', () => {
+  const { context } = driftGradeContext();
+  let hostCalls = 0;
+  context.saveStore = () => false;
+  context.window.bunkiDriftJudgment = () => {
+    hostCalls += 1;
+    return true;
+  };
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.equal(hostCalls, 0);
+  assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 });
+  assert.equal(n.gone, false);
+});
+
+verified('drift-standalone-keeps-autonomy-without-a-host', () => {
+  const { context } = driftGradeContext();
+  let saves = 0;
+  context.saveStore = () => {
+    saves += 1;
+    return true;
+  };
+  // no window.bunkiDriftJudgment — the standalone water grades on its own
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.equal(saves, 1);
+  assert.equal(n.gone, true);
+  assert.equal(context.store.known['海'], 1);
+});
+
 verified('bounded-handlers-call-executed-actions', () => {
   const finishHandler = between("finBtn.id = 'read-fin';", '  fin.append(finBtn);');
   assert.match(finishHandler, /commitReadDone\(p\.id\)/);
@@ -933,6 +1170,8 @@ console.log(
         'entry-capture',
         'standard-review-grade',
         'focus-drill-grade',
+        'drift-judgment-observation-bridge',
+        'drift-host-ack-rollback',
         'stable-storage-alert',
         'dynamic-sheet-alert-description',
         'article-load-retry',
