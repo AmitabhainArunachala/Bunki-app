@@ -239,13 +239,20 @@ const reviewRows = index.articles.filter((record) => record.review);
     unsourced.length === 0,
     unsourced.map((record) => record.id).join(', '),
   );
+  // 検収前 no longer means one thing: the 30 recovered originals and the feed
+  // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
+  // an unverified source text keeps whatever title it already had. The rule
+  // is about who wrote the title, not about who is waiting.
+  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt).map((r) => r.id)]);
+  const wrongMarker = index.articles.filter((record) =>
+    aiTitled.has(record.id)
+      ? record.titleEnSource !== 'renkan-ai-2026-08'
+      : record.titleEnSource !== 'shelf-map-2026',
+  );
   check(
-    '検収前 rows carry the AI-authored title marker; approved rows the migrated shelf-map one',
-    index.articles.every((record) =>
-      record.review
-        ? record.titleEnSource === 'renkan-ai-2026-08'
-        : record.titleEnSource === 'shelf-map-2026',
-    ),
+    'the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest',
+    wrongMarker.length === 0,
+    wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
   );
   check(
     'the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel',

@@ -38,7 +38,7 @@ const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
 
 const PRE_FEED_SHELF = 70; // the curated shelf the feed inherited (40 + recovered 30)
 const TITLE_EN_SOURCE = 'renkan-ai-2026-08';
-const KINDS = new Set(['mint', 'cull', 'legacy']);
+const KINDS = new Set(['mint', 'cull', 'legacy', 'rights']);
 const DECISIONS = new Set(['pending', 'approved', 'rejected']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const FORBIDDEN_LICENCE = /\bNC\b|\bND\b|Non-?Commercial|No-?Deriv/i;
@@ -132,6 +132,63 @@ const orphanFeedRows = curated.filter(
 );
 check('no feed-authored row stands outside the queue — nothing minted without review cover', orphanFeedRows.length === 0, orphanFeedRows.map((row) => row.id).join(', '));
 
+// ----------------------------------------------- rights are never assumed
+// E3 round-A (data-licence lens): ten glossary rows shipped with a corpus
+// NAME in the licence slot. A source whose terms nobody has verified must
+// SAY so and wear 検収前 — inventing plausible terms is the one thing a
+// rights field may never do.
+const UNVERIFIED = /未検証|unverified/;
+const bareName = [...curated, ...archiveIndex.articles].filter(
+  (row) =>
+    !UNVERIFIED.test(row.licence ?? '') &&
+    !/(CC|PD|Public Domain|CC0|Bunki original|著作権)/i.test(row.licence ?? ''),
+);
+check(
+  'no row claims a licence that is not one — an unverified source says unverified',
+  bareName.length === 0,
+  bareName.map((row) => `${row.id}:${row.licence}`).slice(0, 4).join(', '),
+);
+const unverifiedUnmarked = [...curated, ...archiveIndex.articles].filter(
+  (row) => (UNVERIFIED.test(row.licence ?? '') || row.pendingVerification) && !/検収前/.test(row.sourceLabel ?? ''),
+);
+check(
+  'every unverified row wears 検収前 where the learner can see it',
+  unverifiedUnmarked.length === 0,
+  unverifiedUnmarked.map((row) => row.id).slice(0, 4).join(', '),
+);
+const unqueued = curated.filter(
+  (row) => (row.review || row.pendingVerification) && !queue.some((entry) => entry.id === row.id),
+);
+check(
+  'every row awaiting a human has a row the operator can decide',
+  unqueued.length === 0,
+  unqueued.map((row) => row.id).slice(0, 4).join(', '),
+);
+
+// the body is what the reader actually renders (ensureArticle assigns it
+// OVER the index row), so a mark that lives only in the index is a mark the
+// learner never sees — E3 round-A found exactly that. They must agree.
+const bodyDrift = [];
+for (const row of curated) {
+  if (!row.review && !row.pendingVerification) continue;
+  const bodyPath = new URL(`../data/articles/${row.file}`, import.meta.url);
+  let body = null;
+  try {
+    body = JSON.parse(readFileSync(bodyPath, 'utf8'));
+  } catch {
+    bodyDrift.push(`${row.id}:unreadable`);
+    continue;
+  }
+  for (const key of ['sourceLabel', 'review', 'licence']) {
+    if (key in row && body[key] !== row[key]) bodyDrift.push(`${row.id}:${key}`);
+  }
+}
+check(
+  'index and body agree on every provenance mark — the body is what the reader sees',
+  bodyDrift.length === 0,
+  bodyDrift.slice(0, 5).join(', '),
+);
+
 // --------------------------------------------------- nothing self-approves
 const selfApproved = curated.filter(
   (row) =>
@@ -146,11 +203,25 @@ const pendingMarks = curated.filter(
 check('every human-review-pending row is visibly 検収前 in its sourceLabel', pendingMarks.length === 0, pendingMarks.map((row) => row.id).join(', '));
 const pendingFeed = mintRows.filter((row) => row.decision === 'pending').length;
 const pendingShelf = curated.filter((row) => row.review === 'human-review-pending').length;
+// the census now has a third honest category: a row whose SOURCE TERMS are
+// unverified waits for the operator too (E3 round-A), and it says so with
+// its own review reason rather than borrowing the editorial one.
+const pendingRights = curated.filter((row) => row.review === 'rights-review-pending').length;
+const mintIds = new Set(mintRows.map((row) => row.id));
+// neither a recovered original nor a feed mint: a shelf row whose own text
+// is flagged unverified (wikinews:45227 was published the day before the
+// archive froze, so it may not be the final revision)
+const editorialUnverified = curated.filter(
+  (row) =>
+    row.review === 'human-review-pending' &&
+    !recoveredIds.includes(row.id) &&
+    !mintIds.has(row.id),
+).length;
 check(
-  `the 検収前 census is exact: ${recoveredIds.length} recovered originals + pending feed mints`,
-  pendingShelf === recoveredIds.length + pendingFeed &&
+  `the 検収前 census is exact: ${recoveredIds.length} recovered originals + pending feed mints + rights holds`,
+  pendingShelf === recoveredIds.length + pendingFeed + editorialUnverified &&
     recoveredIds.every((id) => curatedById.get(id)?.review === 'human-review-pending'),
-  `${pendingShelf} = ${recoveredIds.length} + ${pendingFeed}`,
+  `${pendingShelf} = ${recoveredIds.length} + ${pendingFeed} + ${editorialUnverified} editorial-unverified · ${pendingRights} rights holds`,
 );
 
 // ----------------------------------------------------- per-candidate schema

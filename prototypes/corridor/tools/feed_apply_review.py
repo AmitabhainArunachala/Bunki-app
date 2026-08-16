@@ -13,6 +13,13 @@ and this command applies exactly what was decided, nothing more:
                     The committed dataset row in archive.jsonl is untouched —
                     datasets are source, artifacts are product.
   cull + rejected   nothing happens; the tombstone stops re-proposing.
+  rights + approved the source's terms have been VERIFIED by the operator:
+                    the queue row's own licence text is copied onto the shelf
+                    row and its body, 検収前 lifts, pendingVerification clears.
+                    Edit the queue row's "licence" first — this command copies
+                    what you wrote; it never invents terms.
+  rights + rejected the material leaves the shelf (index row + body file); the
+                    tombstone stops it being re-proposed.
   legacy + approved the pre-feed 検収前 original is accepted: review flips to
                     approved and 検収前 leaves its sourceLabel (index + body).
   legacy + rejected the original leaves the shelf (index row + body file);
@@ -51,16 +58,16 @@ from feed_ingest import (  # noqa: E402
     page_number,
 )
 
-KINDS = {"mint", "cull", "legacy"}
+KINDS = {"mint", "cull", "legacy", "rights"}
 DECISIONS = {"pending", "approved", "rejected"}
 
 
 def restore_to_archive(candidate_id: str, archive_index: dict, tagger, jlpt_maps) -> bool:
     """A rejected shelf candidate returns to the minted archive: its light
-    index row is rebuilt from the committed dataset through the same machinery
-    that minted it, and its body file — preserved untouched through the
-    promotion precisely because this environment cannot regenerate the NINJAL
-    pair it may carry — is only rewritten if it has gone missing."""
+    index row AND its body are rebuilt from the committed dataset through the
+    same machinery that minted it, so the restored copy carries today's
+    reading lexicon. Only the NINJAL pair — which needs a substrate this
+    environment cannot fetch — is carried across from an older copy."""
     if any(row["id"] == candidate_id for row in archive_index["articles"]):
         return False
     source = next((rec for rec in bc.read_jsonl(ARCHIVE_JSONL) if rec["id"] == candidate_id), None)
@@ -83,15 +90,35 @@ def restore_to_archive(candidate_id: str, archive_index: dict, tagger, jlpt_maps
     }
     tokens, para_starts = ba.tokenise_paragraphs(a["text"], tagger)
     grading = ba.grade_article(a["text"], tokens, tagger, jlpt_maps)
-    if not (ARTICLES / a["file"]).exists():
-        record = dict(a)
-        record["tokens"] = tokens
-        record["paras"] = para_starts
-        record["grading"] = grading
-        record["truncated"] = False
-        (ARTICLES / a["file"]).write_text(
-            json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
-        )
+    # The body is ALWAYS rewritten from a fresh tokenisation. A pre-promotion
+    # copy may still be lying around, and trusting it silently undid the R3
+    # reading lexicon: a rejected 藤田譲瑠チマ came back reading ゆずる with
+    # empty ruby beside it (E3 round-A, data-licence lens). What genuinely
+    # cannot be regenerated here is the NINJAL pair, which needs a substrate
+    # this environment's egress cannot fetch — so that, and only that, is
+    # carried across from the older copy.
+    existing = None
+    if (ARTICLES / a["file"]).exists():
+        try:
+            existing = json.loads((ARTICLES / a["file"]).read_text("utf-8"))
+        except (OSError, ValueError):
+            existing = None
+    if existing:
+        old_signals = (existing.get("grading") or {}).get("signals") or {}
+        new_signals = grading.get("signals") or {}
+        for key in ("lexical_coverage", "tmr"):
+            old = old_signals.get(key)
+            new = new_signals.get(key)
+            if old is not None and (new is None or new.get("unavailable")):
+                new_signals[key] = old
+    record = dict(a)
+    record["tokens"] = tokens
+    record["paras"] = para_starts
+    record["grading"] = grading
+    record["truncated"] = False
+    (ARTICLES / a["file"]).write_text(
+        json.dumps(record, ensure_ascii=False, separators=(",", ":")), "utf-8"
+    )
 
     row = {k: v for k, v in a.items() if k != "text"}
     row["chars"] = len(a["text"])
@@ -136,7 +163,40 @@ def main() -> int:
         rid, kind, decision = row["id"], row["kind"], row["decision"]
         if decision == "pending":
             continue
-        if kind in ("mint", "legacy") and decision == "approved":
+        if kind == "rights" and decision == "approved":
+            target = by_id.get(rid)
+            if target is None or not target.get("review"):
+                continue  # already applied
+            body_path = ARTICLES / target["file"]
+            body = json.loads(body_path.read_text("utf-8"))
+            licence = str(row.get("licence") or "").strip()
+            if not licence or "未検証" in licence:
+                raise SystemExit(
+                    f"{rid}: approved as rights-verified, but the queue row's licence is still "
+                    f"{licence!r} — write the verified terms in the queue row first"
+                )
+            for record in (target, body):
+                record["licence"] = licence
+                record["review"] = None
+                record.pop("review", None)
+                record.pop("pendingVerification", None)
+                record["sourceLabel"] = record["sourceLabel"].replace(" · 検収前", "")
+            if not args.dry_run:
+                body_path.write_text(
+                    json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8"
+                )
+            applied.append(f"rights-verified {rid} — terms {licence}, 検収前 lifted")
+            changed = True
+        elif kind == "rights" and decision == "rejected":
+            target = by_id.get(rid)
+            if target is None:
+                continue  # already applied
+            index["articles"] = [r for r in index["articles"] if r["id"] != rid]
+            if not args.dry_run:
+                (ARTICLES / target["file"]).unlink(missing_ok=True)
+            applied.append(f"rights-rejected {rid} — off the shelf")
+            changed = True
+        elif kind in ("mint", "legacy") and decision == "approved":
             target = by_id.get(rid)
             if target is None:
                 raise SystemExit(f"{rid}: approved in the queue but not on the shelf")

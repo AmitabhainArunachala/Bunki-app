@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "kind": "feed-gate-verification",
   "artifactHashes": {
-    "index": "5d99360f7394dc8a87f751aa27fafcf8e2fa22c07830967547a4e287a6fcf950",
+    "index": "72935ab9cba43ff87035aa5f127df9318a13e32d0285d51849cc7dc3e766dd26",
     "archiveIndex": "c95615863a47212582c2df40867ad057fa2ee9665e8463af511ee0328bca6995",
-    "queue": "9bc756201ce505293d4e4f78dca31047b325742db0e2be0d553a0a243ab05369",
+    "queue": "e556b419131629b64451b9c740bc7689d4a67caf76108fd400a5b899283e176a",
     "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
     "curationReport": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb",
-    "standalone": "bd23233850e79b28c866cdb827f8ece35d4c122f51ed66ba61b8dc82c0919008"
+    "standalone": "d6e458525e8ab9bbe9bbe743d1be7712531d104d45f36ad1f6524d45c4d59e8c"
   },
   "counts": {
     "curated": 82,
     "archive": 682,
-    "queueRows": 44,
+    "queueRows": 55,
     "pendingMints": 12,
     "approvedMints": 0,
     "cullProposals": 2
@@ -21,7 +21,7 @@
     {
       "name": "the review queue is a JSON array",
       "pass": true,
-      "detail": "44 rows"
+      "detail": "55 rows"
     },
     {
       "name": "every queue row carries the full schema (id/kind/title/titleEn/lane/licence/gradingSummary/addedAt/decision)",
@@ -49,6 +49,26 @@
       "detail": ""
     },
     {
+      "name": "no row claims a licence that is not one — an unverified source says unverified",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every unverified row wears 検収前 where the learner can see it",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every row awaiting a human has a row the operator can decide",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "index and body agree on every provenance mark — the body is what the reader sees",
+      "pass": true,
+      "detail": ""
+    },
+    {
       "name": "nothing self-approves — review lifts only where the queue says approved",
       "pass": true,
       "detail": ""
@@ -59,9 +79,9 @@
       "detail": ""
     },
     {
-      "name": "the 検収前 census is exact: 30 recovered originals + pending feed mints",
+      "name": "the 検収前 census is exact: 30 recovered originals + pending feed mints + rights holds",
       "pass": true,
-      "detail": "42 = 30 + 12"
+      "detail": "43 = 30 + 12 + 1 editorial-unverified · 10 rights holds"
     },
     {
       "name": "wikinews:44381 · full candidate schema, pools, LINK-SAFE text, archive hand-off",

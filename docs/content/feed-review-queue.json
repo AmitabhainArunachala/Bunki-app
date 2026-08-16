@@ -482,5 +482,126 @@
   "gradingSummary": "N1 · 1460字",
   "addedAt": "2026-08-15",
   "decision": "pending"
+ },
+ {
+  "id": "yasashii:1",
+  "kind": "rights",
+  "title": "育児休業",
+  "titleEn": "Childcare leave",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "22字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:2",
+  "kind": "rights",
+  "title": "育児休業給付金",
+  "titleEn": "Childcare-leave benefit",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "45字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:3",
+  "kind": "rights",
+  "title": "遺族基礎年金",
+  "titleEn": "Basic survivor's pension",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "46字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:4",
+  "kind": "rights",
+  "title": "遺族厚生年金",
+  "titleEn": "Employees' survivor's pension",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "50字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:5",
+  "kind": "rights",
+  "title": "医療保険",
+  "titleEn": "Medical insurance",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "31字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:6",
+  "kind": "rights",
+  "title": "印鑑登録証明書",
+  "titleEn": "Seal-registration certificate",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "48字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:7",
+  "kind": "rights",
+  "title": "印鑑登録証",
+  "titleEn": "Seal-registration card",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "71字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:8",
+  "kind": "rights",
+  "title": "オーバーステイ",
+  "titleEn": "Overstaying a visa",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "24字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:9",
+  "kind": "rights",
+  "title": "大家",
+  "titleEn": "Landlord",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "6字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "yasashii:10",
+  "kind": "rights",
+  "title": "介護",
+  "titleEn": "Long-term care",
+  "lane": "glossary",
+  "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+  "gradingSummary": "62字 · 利用条件の確認が要る（本文は再配布中）",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
+ },
+ {
+  "id": "wikinews:45227",
+  "kind": "legacy",
+  "title": "ウィキニュース、21年の歴史に幕を閉じる",
+  "titleEn": "Wikinews closes the curtain on 21 years",
+  "lane": "news",
+  "licence": "CC BY 2.5",
+  "gradingSummary": "1304字 · 凍結直前の版 — 最終版か未確認",
+  "addedAt": "2026-08-16",
+  "decision": "pending"
  }
 ]
