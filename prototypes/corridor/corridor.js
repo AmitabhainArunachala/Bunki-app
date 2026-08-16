@@ -7121,6 +7121,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.revealed = false;
   // the next card asks its own question — no declaration carries over
   rv.declared = null;
+  // …and neither does いま見る: the next ripening card gets its own wait
+  rv.showEarly = false;
 }
 
 function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
@@ -7461,7 +7463,11 @@ function renderReview(main) {
         renderReviewWait(main, rv, dueAt(rv.queue[rv.ix]));
         return;
       }
-      rv.showEarly = false;
+      // いま見る holds for the WHOLE card, not for one render. Clearing it as
+      // the front face painted meant the next render — the one the learner's
+      // own 思い出した/まだ triggers — fell back into the countdown and hid
+      // the answer they had just asked for. advanceReviewSession retires the
+      // flag when the card is done.
     }
   }
   const item = rv.queue[rv.ix];
@@ -7655,11 +7661,18 @@ function renderReview(main) {
   // behaves like a session — short ratings repeat in-session, the
   // judgment lands in the observation ledger as evidence (the drill room
   // rides the row), and undo takes it back.
+  // …and the same is true of a row the learner captured but never STARTED.
+  // The no-debt law (PR70-P1-1) says a cardless 覚える row joins the deck only
+  // through its own 始める; srsDueItems honours that, so a dojo grade on such
+  // a row would mint FSRS state the review queue can never surface — the very
+  // orphan this predicate exists to prevent, one step further out. Practice
+  // it, record the evidence, leave the enrolment to the learner.
+  const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
   const drillOnly =
     S.focus &&
     (item.drillPass === true ||
       (S.srs[srsKey(item.t, item.id)] === undefined &&
-        !S.taken.some((t) => t.t === item.t && t.id === item.id)));
+        (!takenRow || !finiteNumber(takenRow.started))));
   const row = el('div', 'grade-row');
   if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and

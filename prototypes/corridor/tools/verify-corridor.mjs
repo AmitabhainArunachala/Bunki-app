@@ -1504,9 +1504,13 @@ async function main() {
   console.log('\n— Phase A · dojo drill: evidence for practice, the deck for the taken');
   await page.waitForTimeout(1400); // let the probe row's debounced save land first
   const dojoSnapshot = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  // an in-app 覚える stamps the no-debt started mark (R2-A); this row is one
+  // of those, which is what earns it the full deck path below. A row without
+  // the mark is a legacy/imported capture and drills as practice instead —
+  // that case is its own probe further down (E3-A).
   await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
     v: 1,
-    taken: [{ t: 'kanji', id: '水', label: '水', kind: '漢字', kindEn: 'kanji', ts: Date.now() }],
+    taken: [{ t: 'kanji', id: '水', label: '水', kind: '漢字', kindEn: 'kanji', ts: Date.now(), started: Date.now() }],
   }))`);
   await open('');
   await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
@@ -3040,6 +3044,52 @@ async function main() {
     check('C1 · a sentence with no shelf article shows no door onto nothing',
       true, 'no article-backed sentence page reached in this walk — honest absence path');
   }
+  // ------------- E3 round-A findings (the closing double-dry earned these)
+  // (1) a captured-but-never-STARTED row drilled in the 漢字だけ block must
+  // stay practice: the no-debt law says only 始める enrols, and srsDueItems
+  // honours it — so a schedule grade here would mint an orphan the review
+  // queue can never surface. Pre-fix this routed to commitStandardGrade.
+  console.log('\n— E3-A · the dojo honours 始める · いま見る holds for the whole card');
+  const errsBeforeE3 = consoleErrors.length;
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+    v: 1,
+    taken: [{ t: 'kanji', id: '海', label: '海', kind: '漢字', kindEn: 'kanji', ts: 1 }],
+    srs: {}, revlog: [], obslog: [], stats: {},
+  }))`);
+  await open('');
+  await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+  await tap(page, '#ginga-symbol');
+  await page.waitForSelector('.nav-dojo');
+  await tap(page, '.nav-dojo');
+  await page.waitForSelector('.focus-mode');
+  await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+  await page.locator('.focus-start').click();
+  await page.waitForSelector('.review-front', { timeout: 20000 });
+  {
+    const e3Front = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+    await page.waitForSelector('#reveal, #declare-recalled', { timeout: 8000 });
+    await page.evaluate(`(document.querySelector('#reveal') || document.querySelector('#declare-recalled'))?.click()`);
+    await page.waitForSelector('.grade-row', { timeout: 8000 });
+    const practiceRow = await page.evaluate(
+      `!!document.querySelector('.grade-row[data-practice]')`,
+    );
+    await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+    await page.waitForTimeout(400);
+    const afterUnstarted = await page.evaluate(`(() => {
+      const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const day = Object.values(e.stats || {}).reduce((a, s) => a + (s.nnew || 0), 0);
+      return { srs: Object.keys(e.srs || {}).length, revlog: (e.revlog || []).length,
+               dojo: (e.obslog || []).filter((r) => r[1] === 'dojo').length, nnew: day };
+    })()`);
+    check('E3-A · a captured-but-unstarted row drills as practice — no card, no revlog, no new-card slot',
+      practiceRow && afterUnstarted.srs === 0 && afterUnstarted.revlog === 0 &&
+        afterUnstarted.dojo >= 1 && afterUnstarted.nnew === 0,
+      JSON.stringify({ front: e3Front, practiceRow, ...afterUnstarted }));
+  }
+  check('E3-A · the probes leave no console errors',
+    consoleErrors.length === errsBeforeE3,
+    consoleErrors.slice(errsBeforeE3).join(' | ') || 'clean');
+
   // hand the next block the store it expects: a seed written straight to
   // localStorage is overwritten by the LIVE page's pagehide flush, so the
   // reset has to travel through a navigation to clear memory as well
