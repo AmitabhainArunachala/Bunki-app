@@ -66,6 +66,11 @@ await ctx.addInitScript(() => {
       type: event.pointerType,
       x: event.clientX,
       y: event.clientY,
+      // which word body (if any) the page itself resolved this pointerdown
+      // to — lets a staging PROVE a tap of its own never reached the member
+      // it aimed at (a moving-target miss), which is the only ground on
+      // which re-staging is honest
+      word: event.target?.closest?.('.word')?.querySelector?.('.base')?.textContent ?? null,
     });
   }, true);
   const cap = (items, item) => {
@@ -706,8 +711,18 @@ if (water13) {
  * hit water and dismantled the lock. A kana-only member must also be able to
  * become a centre whose same-level fallback has real members. */
 const semanticMember = (label) => page.evaluate((target) => {
-  const matches = [...document.querySelectorAll('#drift-layer .word')]
+  const all = [...document.querySelectorAll('#drift-layer .word')]
     .filter((node) => (node.querySelector('.base')?.textContent ?? '') === target);
+  // This hunt names the staged LOCK MEMBER. When a .bsat element carries the
+  // label, aim and read THAT element — the field can hold a second, ordinary
+  // copy of the same headword, and sampling whichever copy is hit-owned first
+  // both tapped the wrong body and then read the wrong body's reveal state
+  // (the measured flake: the first reveal tap "lost" on a 13px field copy
+  // while the real member sat untouched). When no .bsat match exists the scan
+  // falls back to every copy, so the canvas-era failure this hunt pins —
+  // a member with no DOM body at all — still convicts exactly as before.
+  const staged = all.filter((node) => node.classList.contains('bsat'));
+  const matches = staged.length ? staged : all;
   let fallback = null;
   for (const el of matches.reverse()) {
     const r = el.getBoundingClientRect();
@@ -738,77 +753,141 @@ const semanticMember = (label) => page.evaluate((target) => {
   return ink ? { dom: false, hitSelf: false, hitLabel: 'canvas', reading: '', x: ink.x, y: ink.y, unfolded: false, glossed: false } : null;
 }, label);
 const aimSemantic = async (label) => {
+  // Members glide (lock assembly, camera lock-glide): a single hit-owned
+  // sample can be stale by the time the 65ms tap lands, so the aim demands
+  // the same stability verify-drift-consistency's aimWord does — two
+  // consecutive owned samples within 2.5px. The assertions downstream are
+  // untouched; this only refuses to tap a target that is still moving.
   let state = null;
+  let previous = null;
   for (let attempt = 0; attempt < 10; attempt++) {
     state = await semanticMember(label);
-    if (state?.dom && state.hitSelf) return state;
+    if (state?.dom && state.hitSelf) {
+      if (previous && Math.hypot(state.x - previous.x, state.y - previous.y) <= 2.5) return state;
+      previous = state;
+    } else {
+      previous = null;
+    }
     await page.waitForTimeout(120);
   }
   return state;
 };
+// A lock member can be CREEPING (measured at ~30px/s after a lock-to-lock
+// handoff: the whole constellation glides while the camera's lock-glide tail
+// settles), so a touch aimed from a sample even ~100ms old can land past the
+// member's 13-19px body — on water — and under a lock a water tap is a
+// deliberate release: the staging razes its own subject and reports the
+// PRODUCT dead. touchMember therefore samples the live body and dispatches in
+// the same breath, then reads back which word the page's own pointerdown
+// resolved to. attempted=false means no hit-owned body existed to touch;
+// delivered=false with attempted=true is a PROVEN moving-target miss — the
+// only ground on which a re-stage is honest. A delivered touch that fails to
+// produce the contracted response is never retried: that is the product's
+// failure, exactly what this hunt exists to catch.
+const touchMember = async (label, hold = 0) => {
+  const at = await semanticMember(label);
+  if (!at?.dom || !at.hitSelf) return { attempted: false, delivered: false, reason: 'no hit-owned body' };
+  await page.evaluate(`window.__driftHuntPointerDowns.length = 0`);
+  if (hold > 0) await press(at.x, at.y, hold);
+  else await tap(at.x, at.y);
+  const downs = await page.evaluate(`(window.__driftHuntPointerDowns ?? []).map((d) => d.word ?? null)`);
+  return {
+    attempted: true,
+    delivered: downs.length > 0 && downs[downs.length - 1] === label,
+    reason: `pointerdown resolved to ${JSON.stringify(downs)}`,
+  };
+};
+const missed = (touch) => touch.attempted && !touch.delivered;
 await boot();
-const lockStarted = await page.evaluate(`window.__lockWord?.('過酷') === true`);
-await page.waitForTimeout(1400);
-const semanticTarget = await aimSemantic('残酷');
-const semanticBefore = await page.evaluate(world);
-await shot('07-semantic-member-before.png');
-if (semanticTarget?.hitSelf) {
-  await tap(semanticTarget.x, semanticTarget.y);
-  await page.waitForTimeout(550);
-}
-const semanticRevealOne = await semanticMember('残酷');
-const semanticAfterOne = await page.evaluate(world);
-const semanticSecondAim = await aimSemantic('残酷');
-if (semanticSecondAim?.hitSelf) {
-  await tap(semanticSecondAim.x, semanticSecondAim.y);
-  await page.waitForTimeout(500);
-}
-const semanticRevealTwo = await semanticMember('残酷');
-const semanticAfterTwo = await page.evaluate(world);
-check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction',
-  lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
+let semanticFinal = null;
+for (let staging = 1; staging <= 3; staging++) {
+  if (staging > 1) await boot();
+  const lockStarted = await page.evaluate(`window.__lockWord?.('過酷') === true`);
+  await page.waitForTimeout(1400);
+  const semanticTarget = await aimSemantic('残酷');
+  const semanticBefore = await page.evaluate(world);
+  await shot('07-semantic-member-before.png');
+  let tapOne = { attempted: false, delivered: false, reason: 'not attempted' };
+  if (semanticTarget?.hitSelf) {
+    tapOne = await touchMember('残酷');
+    await page.waitForTimeout(550);
+  }
+  const semanticRevealOne = await semanticMember('残酷');
+  const semanticAfterOne = await page.evaluate(world);
+  const semanticSecondAim = await aimSemantic('残酷');
+  let tapTwo = { attempted: false, delivered: false, reason: 'not attempted' };
+  if (semanticSecondAim?.hitSelf) {
+    tapTwo = await touchMember('残酷');
+    await page.waitForTimeout(500);
+  }
+  const semanticRevealTwo = await semanticMember('残酷');
+  const semanticAfterTwo = await page.evaluate(world);
+  const ok =
+    lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
     semanticTarget.reading !== '' &&
     semanticBefore.ctr === '過酷' && semanticAfterOne.ctr === '過酷' && semanticAfterTwo.ctr === '過酷' &&
     semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false &&
-    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true,
-  `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
-    `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false}, ` +
-    `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
-    `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"`);
+    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true;
+  semanticFinal = {
+    ok,
+    detail:
+      `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
+      `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false}, ` +
+      `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
+      `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"` +
+      `; staging ${staging}/3 (tap1 ${tapOne.reason}; tap2 ${tapTwo.reason})`,
+  };
+  if (ok || !(missed(tapOne) || missed(tapTwo))) break;
+}
+check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction',
+  semanticFinal.ok, semanticFinal.detail);
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
 // fallback half of the hunt.
-await page.evaluate(`window.__lockWord?.('厳しい')`);
-await page.waitForTimeout(1200);
-const kanaTarget = await aimSemantic('きつい');
-if (kanaTarget?.hitSelf) {
-  await tap(kanaTarget.x, kanaTarget.y);
-  await page.waitForTimeout(500);
-}
-const kanaAnswered = await semanticMember('きつい');
-const kanaCentreAfterAnswer = await page.evaluate(world);
-const kanaForLock = await aimSemantic('きつい');
-if (kanaForLock?.hitSelf) {
-  await press(kanaForLock.x, kanaForLock.y);
-  await page.waitForTimeout(900);
-}
-const kanaFallback = await page.evaluate(world);
-await shot('07-semantic-dom-kana-fallback.png');
-// RULE REWRITTEN 2026-08-10: the same-level fallback this check demanded
-// (sats >= 6 for a kana word with no strong ties) was exactly the defect
-// the operator logged as "tap-families admitting unrelated words" — the
-// fallback tier was removed. The current rule: a kana-only word focuses
-// cleanly and its bloom admits ONLY meaning-related members, which may be
-// none at all. No strangers, honest emptiness.
-check('hunt · a kana-only word focuses cleanly and its bloom admits no strangers',
-  kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
+let kanaFinal = null;
+for (let staging = 1; staging <= 3; staging++) {
+  await page.evaluate(`window.__lockWord?.('厳しい')`);
+  await page.waitForTimeout(1200);
+  const kanaTarget = await aimSemantic('きつい');
+  let kanaTap = { attempted: false, delivered: false, reason: 'not attempted' };
+  if (kanaTarget?.hitSelf) {
+    kanaTap = await touchMember('きつい');
+    await page.waitForTimeout(500);
+  }
+  const kanaAnswered = await semanticMember('きつい');
+  const kanaCentreAfterAnswer = await page.evaluate(world);
+  const kanaForLock = await aimSemantic('きつい');
+  let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
+  if (kanaForLock?.hitSelf) {
+    kanaPress = await touchMember('きつい', 620);
+    await page.waitForTimeout(900);
+  }
+  const kanaFallback = await page.evaluate(world);
+  await shot('07-semantic-dom-kana-fallback.png');
+  // RULE REWRITTEN 2026-08-10: the same-level fallback this check demanded
+  // (sats >= 6 for a kana word with no strong ties) was exactly the defect
+  // the operator logged as "tap-families admitting unrelated words" — the
+  // fallback tier was removed. The current rule: a kana-only word focuses
+  // cleanly and its bloom admits ONLY meaning-related members, which may be
+  // none at all. No strangers, honest emptiness.
+  const ok =
+    kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
     kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
-    kanaFallback.members.length === kanaFallback.sats,
-  `DOM=${kanaTarget?.dom ?? false}, hitSelf=${kanaTarget?.hitSelf ?? false}, hit=${JSON.stringify(kanaTarget?.hitLabel ?? null)}, ` +
-    `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
-    `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
-    `members=${kanaFallback.members.join('・')}`);
+    kanaFallback.members.length === kanaFallback.sats;
+  kanaFinal = {
+    ok,
+    detail:
+      `DOM=${kanaTarget?.dom ?? false}, hitSelf=${kanaTarget?.hitSelf ?? false}, hit=${JSON.stringify(kanaTarget?.hitLabel ?? null)}, ` +
+      `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
+      `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
+      `members=${kanaFallback.members.join('・')}` +
+      `; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,
+  };
+  if (ok || !(missed(kanaTap) || missed(kanaPress))) break;
+}
+check('hunt · a kana-only word focuses cleanly and its bloom admits no strangers',
+  kanaFinal.ok, kanaFinal.detail);
 
 /* 15 · pointer identity is part of gesture authority. A mouse/foreign pointer
  * may not move a touch-held word, and changing the active pair after a third
