@@ -5125,3 +5125,41 @@ body.zen .focus-hud-end {
   font-size: 14px;
   letter-spacing: 0.06em;
 }
+
+/* ---- list management (覚える stage 2): inline maker, rename, armed delete */
+.list-maker {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+.list-maker-field {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.list-maker-field[aria-invalid='true'] {
+  border-color: var(--red);
+}
+.list-maker-make {
+  flex: none;
+}
+.list-op {
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: 6px;
+  font: inherit;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.list-op.armed {
+  color: var(--red);
+  border-color: var(--red);
+}

@@ -457,9 +457,14 @@ verified('reserved-map-names-round-trip-without-pollution-or-data-loss', () => {
   assert.equal(Object.prototype.bunkiPolluted, pollutionBefore);
   assert.equal(vm.runInContext('Object.prototype.bunkiPolluted', storeContext), vmPollutionBefore);
 
+  // list creation moved to the guarded transactional path (覚える stage 2):
+  // names are still prototype-safe (owns + setOwnRecordValue on the COPY)
+  // and the commit rides commitStorePatch, never a direct S.lists mutation.
   const listProducer = between('function renderListPicker(sheet, node, label) {', 'function schedulePreview() {');
   assert.match(listProducer, /owns\(S\.lists, name\)/);
-  assert.match(listProducer, /setOwnRecordValue\(S\.lists, name,/);
+  assert.match(listProducer, /setOwnRecordValue\(next, name,/);
+  assert.match(listProducer, /commitStorePatch\(\{ lists: next \}\)/);
+  assert.doesNotMatch(listProducer, /setOwnRecordValue\(S\.lists,/);
   assert.doesNotMatch(listProducer, /if \(!name \|\| S\.lists\[name\]\)/);
   assert.doesNotMatch(listProducer, /S\.lists\[name\] = \[/);
 });
@@ -873,8 +878,8 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
   const residual = JSON.parse(readFileSync(residualPath, 'utf8'));
   assert.equal(residual.schemaVersion, 2);
   assert.equal(residual.authorityHeadAtCut, BASE);
-  assert.equal(residual.count, 20);
-  assert.equal(residual.callers.length, 20);
+  assert.equal(residual.count, 19);
+  assert.equal(residual.callers.length, 19);
   assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
 
   const lines = source.split(/\r?\n/);

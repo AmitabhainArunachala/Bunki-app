@@ -3648,6 +3648,39 @@ function renderTray(main) {
     ...Object.entries(S.lists).map(([name, items]) => ({ name, items, manual: true })),
     ...[...buckets.entries()].map(([name, items]) => ({ name, items, manual: false })),
   ];
+  // つくる — a list is born HERE on the lists surface, with a quiet inline
+  // field. window.prompt was the only door, and only from inside an entry
+  // (P2, full-instrument review).
+  const maker = el('div', 'list-maker');
+  const nameField = el('input', 'list-maker-field');
+  nameField.type = 'text';
+  nameField.id = 'list-maker-field';
+  nameField.placeholder = tx('新しいリストの名前', 'name a new list');
+  nameField.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
+  const makeBtn = biLabel('button', 'chip list-maker-make', '＋ 作る', 'create');
+  makeBtn.type = 'button';
+  makeBtn.id = 'list-maker-make';
+  const tryMake = () => {
+    const name = nameField.value.trim();
+    if (!name || owns(S.lists, name)) {
+      nameField.setAttribute('aria-invalid', 'true');
+      nameField.value = '';
+      nameField.placeholder = name
+        ? tx('その名はもうある', 'that name already exists')
+        : tx('名前を入れて', 'give it a name');
+      nameField.focus();
+      return;
+    }
+    const next = { ...S.lists };
+    setOwnRecordValue(next, name, []);
+    if (commitStorePatch({ lists: next })) render();
+  };
+  makeBtn.addEventListener('click', tryMake);
+  nameField.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') tryMake();
+  });
+  maker.append(nameField, makeBtn);
+  main.append(maker);
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   for (const sec of sections) {
     const head = el('p', 'eyebrow list-head');
@@ -3662,7 +3695,76 @@ function renderTray(main) {
       only.addEventListener('click', () => startReview(sec.items));
       head.append(only);
     }
+    if (sec.manual) {
+      // 直す・消す — rename and delete live where the list lives; deleting a
+      // list never touches its items' taken status (the list is curation,
+      // the deck is the deck)
+      const ren = el('button', 'list-op', '✎');
+      ren.type = 'button';
+      ren.setAttribute('aria-label', tx(`「${sec.name}」の名前を変える`, `rename ${sec.name}`));
+      ren.addEventListener('click', () => {
+        S.listRename = S.listRename === sec.name ? null : sec.name;
+        render();
+      });
+      const armed = S.listDeleteArm === sec.name;
+      const del = el('button', armed ? 'list-op armed' : 'list-op', armed ? tx('消す？', 'sure?') : '×');
+      del.type = 'button';
+      del.setAttribute(
+        'aria-label',
+        armed ? tx(`「${sec.name}」を本当に消す`, `really delete ${sec.name}`) : tx(`「${sec.name}」を消す`, `delete ${sec.name}`),
+      );
+      del.addEventListener('click', () => {
+        if (S.listDeleteArm !== sec.name) {
+          S.listDeleteArm = sec.name;
+          render();
+          setTimeout(() => {
+            if (S.listDeleteArm === sec.name) {
+              S.listDeleteArm = null;
+              render();
+            }
+          }, 3200);
+          return;
+        }
+        S.listDeleteArm = null;
+        const next = { ...S.lists };
+        delete next[sec.name];
+        commitStorePatch({ lists: next });
+        render();
+      });
+      head.append(ren, del);
+    }
     main.append(head);
+    if (sec.manual && S.listRename === sec.name) {
+      const row = el('div', 'list-maker list-rename');
+      const field = el('input', 'list-maker-field');
+      field.type = 'text';
+      field.value = sec.name;
+      field.setAttribute('aria-label', tx('新しい名前', 'new name'));
+      const save = biLabel('button', 'chip list-maker-make', '保存', 'save');
+      save.type = 'button';
+      const trySave = () => {
+        const name = field.value.trim();
+        if (!name || (name !== sec.name && owns(S.lists, name))) {
+          field.setAttribute('aria-invalid', 'true');
+          field.focus();
+          return;
+        }
+        const next = {};
+        for (const [k, v] of Object.entries(S.lists)) setOwnRecordValue(next, k === sec.name ? name : k, v);
+        S.listRename = null;
+        if (commitStorePatch({ lists: next })) render();
+      };
+      save.addEventListener('click', trySave);
+      field.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') trySave();
+        if (ev.key === 'Escape') {
+          S.listRename = null;
+          render();
+        }
+      });
+      row.append(field, save);
+      main.append(row);
+    }
     for (const item of sec.items) {
       const line = el('div', 'tray-line');
       line.append(el('span', 'w', item.label));
@@ -5974,13 +6076,42 @@ function renderListPicker(sheet, node, label) {
   add.id = 'new-list';
   add.append(el('span', 'big', tx('＋ 新規リスト', '＋ new list')));
   add.addEventListener('click', () => {
-    const name = window.prompt(tx('リスト名', 'List name'));
-    if (!name || owns(S.lists, name)) return;
-    setOwnRecordValue(S.lists, name, [{ t: node.t, id: node.id, label, ts: item.ts }]);
-    saveStore();
+    S.sheetListMaker = !S.sheetListMaker;
     render();
   });
   chips.append(add);
+  if (S.sheetListMaker) {
+    const row = el('div', 'list-maker');
+    const field = el('input', 'list-maker-field');
+    field.type = 'text';
+    field.placeholder = tx('新しいリストの名前', 'name a new list');
+    field.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
+    const make = biLabel('button', 'chip list-maker-make', '＋ 作る', 'create');
+    make.type = 'button';
+    const tryMake = () => {
+      const name = field.value.trim();
+      if (!name) {
+        field.setAttribute('aria-invalid', 'true');
+        field.focus();
+        return;
+      }
+      const next = { ...S.lists };
+      // an existing name simply receives the item — friendlier than a
+      // silent no-op (P2, review)
+      const items = owns(S.lists, name) ? next[name] : [];
+      if (!items.some((x) => x.t === node.t && x.id === node.id)) {
+        setOwnRecordValue(next, name, [...items, { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts }]);
+      }
+      S.sheetListMaker = false;
+      if (commitStorePatch({ lists: next })) render();
+    };
+    make.addEventListener('click', tryMake);
+    field.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') tryMake();
+    });
+    row.append(field, make);
+    chips.append(row);
+  }
   wrap.append(chips);
   sheet.append(wrap);
 }
