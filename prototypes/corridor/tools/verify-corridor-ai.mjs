@@ -445,6 +445,40 @@ async function main() {
     lastRows[0]?.role === 'user' && lastRows[0]?.content === 'タイムアウトの探査' && lastRows[1]?.role === 'app',
     lastRows.map((r) => r.role).join(' → '));
 
+  // ---------------- E3-A open finding 1 · pending survives leaving the page
+  // The spinner and the sealed 送る must not live in one render's closure:
+  // walking away mid-question and coming back re-armed the door, and a second
+  // send duplicated the question in the durable transcript.
+  const pendingBefore = (await logAll(page, 'chat')).length;
+  await page.fill('#chat-input', '待つあいだに歩く');
+  await page.click('#chat-send');
+  await page.waitForSelector('.chat-turn.thinking', { timeout: 4000 });
+  await page.click('#back');
+  await page.waitForSelector('#ai-link', { timeout: 8000 });
+  await page.click('#ai-link');
+  await page.waitForSelector('#chat-input', { timeout: 8000 });
+  const backOnPage = await page.evaluate(`({
+    thinking: document.querySelectorAll('.chat-turn.thinking').length,
+    sendDisabled: document.querySelector('#chat-send')?.disabled ?? null,
+  })`);
+  check('chat · walking away and back mid-question keeps 考え中 and the sealed 送る',
+    backOnPage.thinking === 1 && backOnPage.sendDisabled === true,
+    JSON.stringify(backOnPage));
+  // the button is sealed; Enter on the field is the vector that bypassed it
+  await page.fill('#chat-input', '二重送信の探査');
+  await page.press('#chat-input', 'Enter');
+  await page.waitForTimeout(600);
+  const pendingDuring = (await logAll(page, 'chat')).length;
+  check('chat · a send while pending is refused — no duplicate lands in the archive',
+    pendingDuring === pendingBefore + 1,
+    `${pendingBefore} rows + the one pending question = ${pendingDuring}`);
+  await page.waitForFunction(
+    () => !document.querySelector('.chat-turn.thinking') &&
+      document.querySelector('#chat-send') && !document.querySelector('#chat-send').disabled,
+    null,
+    { timeout: 15000 },
+  );
+
   const tutorT0 = Date.now();
   await open('?entry=shelf');
   await openWordSheet();
@@ -466,6 +500,28 @@ async function main() {
   check('word tutor · the stalled request takes the same failure path, door reopens',
     tutorButtonFree && tutorElapsed <= 25000,
     `failure line after ${((tutorElapsed) / 1000).toFixed(1)} s including sheet walk`);
+
+  // -------------- E3-A open finding 2 · the archive reads back to its sheet
+  // A reply that arrived after its word sheet closed used to be archived
+  // where no surface could read it: the reopened sheet started from an empty
+  // out. Now the sheet hydrates from the archive — same words, no new call.
+  await page.evaluate(`localStorage.setItem('__ai_stub_mode', 'ok')`);
+  await open('?entry=shelf');
+  await openWordSheet();
+  await page.waitForFunction(
+    () => /stub reply/.test(document.querySelector('#sheet .ai-answer')?.textContent || '') &&
+      document.querySelectorAll('#sheet .ai-ex').length >= 4,
+    null,
+    { timeout: 8000 },
+  );
+  const readBack = await page.evaluate(`({
+    answer: (document.querySelector('#sheet .ai-answer')?.textContent || '').slice(0, 24),
+    examples: document.querySelectorAll('#sheet .ai-ex').length,
+    calls: window.__AI_STUB.calls,
+  })`);
+  check('word sheet · the archived tutor answer and examples read back on reopen — no new request',
+    /stub reply/.test(readBack.answer) && readBack.examples >= 4 && readBack.calls === 0,
+    `"${readBack.answer}" · ${readBack.examples} examples · ${readBack.calls} calls`);
 
   // ------------------------- a broken archive must never break the AI call
   console.log('\n— quarantine posture: archive failure never breaks the call');
