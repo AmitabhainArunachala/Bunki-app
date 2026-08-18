@@ -181,8 +181,8 @@ eight lenses against `ae1d901`. On a four-CPU runner the fleet walks in pairs,
 so the hunt is a multi-hour instrument; it returned **28 findings**, and by the
 gate's own rule a round that finds something is a round WORKED, not passed.
 
-Seventeen are fixed on this branch, each with the probe that convicts its
-absence (`verify-corridor.mjs` **232**, up from 216):
+Nineteen are fixed on this branch, each with the probe that convicts its
+absence (`verify-corridor.mjs` **233**, up from 216; the AI suite **26**):
 
 | finding | fix |
 | --- | --- |
@@ -205,6 +205,9 @@ absence (`verify-corridor.mjs` **232**, up from 216):
 | P1 a second 先生の小テスト silently replaced the quiz the learner was in the middle of, taking their answers | the request in flight is state, not a closure; the room it was asked from is the view AND its depth |
 | P2 any repaint while the tutor was thinking killed 考え中 and the arriving reply painted into a detached node | 考え中 is state; the reply settles where it can be seen, or asks for one more render |
 | P2 the follow-up typed while the tutor thought was destroyed by the reply's own render | the draft rides the render |
+| polish the first device Back after ANY reload did nothing at all — boot stripped the walk sentinel's marker and left its entry standing as a stop nothing could recognise | the marker is adopted, not stripped; measured both ways (`answered:false` → `answered:true`) |
+| polish the tutor's quiz wore a 本棚 › 小テスト crumb while its only door is the lists tray | the crumb names the room 戻る reopens |
+| P2 the galaxy — the DEFAULT entry — held 94–96% of the main thread for as long as the page existed, background included | the loop parks while the document is hidden and restarts when it is not; through the builder, physics and gesture grammar untouched (#46) |
 
 The remaining round-B findings are operator-shaped or content work and are
 typed to the sheet rather than fixed here.

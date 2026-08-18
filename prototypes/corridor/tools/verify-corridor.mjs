@@ -3480,6 +3480,33 @@ async function main() {
       JSON.stringify({ trailAfterGrade, trail: trail.replace(/\\n/g, ' / ').slice(0, 160) }));
   }
 
+  // (13) a reload leaves no inert history stop — the corridor never eats a press
+  {
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.locator('button.shelf-open').first().click();
+    await page.waitForSelector('.reader', { timeout: 20000 });
+    await page.waitForTimeout(300);
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForTimeout(500);
+    const bootView = await page.evaluate(`document.body.dataset.view`);
+    const bootLen = await page.evaluate(`history.length`);
+    await page.goBack();
+    await page.waitForTimeout(600);
+    const afterBack = await page
+      .evaluate(`({ ready: document.body?.dataset?.ready ?? null, view: document.body?.dataset?.view ?? null })`)
+      .catch(() => ({ ready: null, view: null }));
+    // either the press walked the app somewhere or it left it — what it must
+    // never do is land on a stop that does nothing at all
+    const answered = afterBack.ready !== '1' || afterBack.view !== bootView;
+    check('E3-B · the first Back after a reload is answered, not eaten',
+      answered, JSON.stringify({ bootView, bootLen, afterBack }));
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+  }
+
   check('E3-B · the probes leave no console errors',
     consoleErrors.length === errsBeforeE3B,
     consoleErrors.slice(errsBeforeE3B).join(' | ') || 'clean');

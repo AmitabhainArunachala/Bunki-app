@@ -1976,16 +1976,24 @@ function biLabel(tag, cls, ja, en) {
 /* ------------------------------------------------------------------ load */
 async function boot() {
   const params = new URLSearchParams(location.search);
-  // A reload cannot reconstruct the entry sheet until data has booted. Remove
-  // a stale same-document room sentinel now so Back never lands on an inert
-  // history stop; ordinary Forward navigation is handled live by popstate.
+  // A reload cannot reconstruct the entry sheet until data has booted, so the
+  // stroke room's marker goes: it names a room this boot cannot restore.
+  //
+  // The WALK sentinel is different, and stripping it was the bug. The entry
+  // itself survives a reload; deleting only its marker left a live history
+  // stop that nothing could recognise, so the first device Back after any
+  // reload did nothing at all and the second one left the app — in a corridor
+  // whose whole contract is that it never eats a press
+  // (E3 round-B, dead-ends lens). The marker is ADOPTED instead: the first
+  // render's syncWalkSentinel either keeps it armed, because there is
+  // somewhere to walk, or spends it the same quiet way walking home does.
   try {
-    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
+    if (history.state?.bunkiStrokeRoom) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
-      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    if (history.state?.bunkiWalk) walkArmed = true;
     // The corridor owns every scroll restore (reader bookmarks, shelf and
     // archive offsets, sheet stacks). The platform's own traversal guess
     // would land the walk-back sentinel pops on a stale offset and fight
@@ -13228,6 +13236,10 @@ function render() {
     parts.push(passage().title);
   }
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
+  // the quiz and the review summary are entered from the lists tray and
+  // their 戻る reopens it — the crumb said 本棚 › 小テスト and skipped the
+  // room the press actually goes to (E3 round-B, dead-ends lens)
+  if (S.view === 'aiquiz') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
