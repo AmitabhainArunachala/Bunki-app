@@ -31,8 +31,11 @@
    "the archived tutor answer and examples read back on reopen — no new request".
 3. **Radical picker density** — 211 chips at a 41px pitch, the densest tap
    grid in the app. Fix: `.kdx-chip` now keeps the app-wide `--tap` (44px)
-   floor in both axes; convicted by the corridor 44px sweep (215/215, 824
-   controls checked).
+   floor in both axes; convicted by a dedicated kanjidex probe in
+   `verify-corridor.mjs` ("every radical and stroke chip is at least 44px",
+   211 chips measured) — the shelf/panel 44px sweep never enters the kanjidex,
+   so it could not convict this fix on its own. Revert-checked: with the
+   `.kdx-chip` floor removed the probe fails 211/211.
 
 AI verifier: **24/24** (was 21/21; three new convicting probes added, none weakened).
 
