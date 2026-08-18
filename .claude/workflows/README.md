@@ -1,12 +1,18 @@
 # Campaign workflows
 
 Multi-agent instruments that outlive the session that authored them. Each file
-is a self-contained workflow script (`export const meta = {...}` then the body);
-run one by name:
+is a self-contained workflow script (`export const meta = {...}` then the body).
+Run one by its path:
 
 ```
-Workflow({ name: 'renkan-e3-double-dry' })
+Workflow({ scriptPath: '.claude/workflows/renkan-e3-double-dry.js' })
 ```
+
+Not by name. This README first said `{ name: 'renkan-e3-double-dry' }`; the
+first attempt to use it answered `Workflow "renkan-e3-double-dry" not found`,
+because this directory is not the registry the `name` argument resolves
+against. The path form is what actually runs, and an instruction that has been
+executed beats one that reads well.
 
 ## renkan-e3-double-dry
 
@@ -32,7 +38,10 @@ the one failure mode the brief names out loud.
 Name the tree it judges. Pass the head SHA as args:
 
 ```
-Workflow({ name: 'renkan-e3-double-dry', args: { head: '<sha>' } })
+Workflow({
+  scriptPath: '.claude/workflows/renkan-e3-double-dry.js',
+  args: { head: '<sha>' },
+})
 ```
 
 A campaign that fixes what it finds moves the head under its own verifiers.

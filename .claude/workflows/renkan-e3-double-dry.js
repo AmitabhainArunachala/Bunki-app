@@ -12,7 +12,8 @@ export const meta = {
 
 const REPO = '/home/user/Bunki-app';
 /* The head this gate is walking. Pass it as args — `Workflow({ name:
- * 'renkan-e3-double-dry', args: { head: '<sha>' } })` — because a campaign
+ * scriptPath: '.claude/workflows/renkan-e3-double-dry.js', args: { head:
+ * '<sha>' } })` — because a campaign
  * that fixes what it finds MOVES the head under its own verifiers: round B's
  * confirmations all had to caveat that the fix landed mid-verification, which
  * makes a verdict hard to read and wastes the run. Named here, hunters and

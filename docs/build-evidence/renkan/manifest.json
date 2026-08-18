@@ -288,7 +288,7 @@
       "battery": "see battery-final-b/SUMMARY.md"
     }
   ],
-  "nextCommand": "Run the gate again on this head: Workflow({ name: 'renkan-e3-double-dry' }). Two consecutive rounds with zero confirmed findings close T5; rounds A and B were each worked, not dry, so the count stands at zero. On a four-CPU runner the eight lenses walk in pairs — budget hours, not minutes.",
+  "nextCommand": "Run the gate again on the current head: Workflow({ scriptPath: '.claude/workflows/renkan-e3-double-dry.js', args: { head: '<sha>' } }) — by PATH, not by name; { name: ... } resolves against a different registry and answers not found. Two consecutive rounds with zero confirmed findings close T5; rounds A and B were each worked, not dry, so the count stands at zero. On a four-CPU runner the eight lenses walk in pairs — budget hours, not minutes.",
   "environment": {
     "e2e": "npm run test:e2e:build before test:e2e",
     "corpusPython": "/home/user/.venv-bunki-corpus/bin/python (unidic-lite needs venv build)",

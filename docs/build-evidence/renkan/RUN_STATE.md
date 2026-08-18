@@ -212,8 +212,39 @@ absence (`verify-corridor.mjs` **233**, up from 216; the AI suite **26**):
 The remaining round-B findings are operator-shaped or content work and are
 typed to the sheet rather than fixed here.
 
+### The verification pass, in full
+
+The gate's own Verify phase then ran every one of the 28 findings past an
+independent adversarial agent — 37 agents, 3.5 hours, zero errors. **29
+verdicts: 5 CONFIRMED, 24 refuted**, and the refutations are overwhelmingly
+of one kind: *genuine at `ae1d901`, already fixed by round B's own fix*. That
+is the ring closing exactly as designed — the verifier had no idea the fix
+existed and re-derived its absence.
+
+Every one of the five it upheld is accounted for:
+
+| upheld | disposition |
+| --- | --- |
+| the dojo lobby advertises cards はじめる cannot draw | fixed, `3df6ed8` |
+| 漢字だけ ignores ペース and dueness | fixed, `3df6ed8` |
+| undoing a drill INCREASES the 出会い practice count | fixed, `3df6ed8` |
+| AnimCJK's Arphic licence missing from the sources panel | fixed, `3df6ed8` |
+| the 45,276-sentence example bank's cull authority | **OD-23**, the operator's |
+
+Nothing it upheld is unaddressed.
+
 **By the gate's own rule this is a round worked, not a dry round.** The count
 restarts from zero on this head, exactly as it did after round A.
+
+### What the round taught the instrument
+
+Every confirmation carried the same caveat — *the fix landed on HEAD while I
+was verifying*. The verdicts still resolved correctly, but that is luck, not
+design: a campaign that fixes what it finds moves the head under its own
+verifiers. The gate now takes the head as an argument, hunters name the tree
+they walked in their coverage, and verifiers check that commit out into a
+scratch worktree instead of trusting a working tree that is moving
+(`3fed823`). The loop closed on the instrument, not just on the product.
 
 ### T5's standing
 
@@ -229,7 +260,9 @@ then `manifest.json` (exact SHAs), then `DECISION_SHEET.md`. The battery is
 `bash docs/build-evidence/renkan/battery.sh <outdir>`; environment notes are in
 the manifest (`e2e` needs its build first; corpus pytest needs the venv).
 The closing gate is now an instrument in the tree rather than a staged script:
-`Workflow({ name: 'renkan-e3-double-dry' })` — eight lenses, adversarial
-confirmation, dry twice or it is not done (`.claude/workflows/README.md`).
+`Workflow({ scriptPath: '.claude/workflows/renkan-e3-double-dry.js', args: { head: '<sha>' } })`
+— eight lenses, adversarial confirmation, dry twice or it is not done
+(`.claude/workflows/README.md`). By PATH, not by name: `{ name: … }` resolves
+against a different registry and answers *not found*.
 On a small runner the fleet walks in pairs, so a full gate is hours, not
 minutes. Nothing merges to `main` without the operator's explicit word.
