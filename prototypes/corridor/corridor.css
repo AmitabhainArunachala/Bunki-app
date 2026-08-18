@@ -4790,7 +4790,10 @@ body.zen .review-example {
 }
 
 .kdx-chip {
-  min-width: 34px;
+  /* a paper index is dense; a finger is not — every chip keeps the app's
+   * 44px floor even when its glyph is one stroke wide */
+  min-width: var(--tap, 44px);
+  min-height: var(--tap, 44px);
   padding: 5px 8px;
   background: transparent;
   border: 1px solid var(--line-soft);

@@ -43,7 +43,7 @@ run export          npm run verify:export
 run e2e-build       npm run test:e2e:build
 run e2e             npm run test:e2e
 if [ -d corpus/tests ]; then
-  PYBIN=$( [ -x /home/user/.venv-bunki-corpus/bin/python ] && echo /home/user/.venv-bunki-corpus/bin/python || echo python3 )
+  PYBIN=$( [ -x "$HOME/.venv-bunki-corpus/bin/python" ] && echo "$HOME/.venv-bunki-corpus/bin/python" || { [ -x /home/user/.venv-bunki-corpus/bin/python ] && echo /home/user/.venv-bunki-corpus/bin/python || echo python3; } )
   run corpus-pytest bash -c "cd corpus && $PYBIN -m pytest tests -q -m 'not realdata'"
 fi
 echo "" >> "$SUMMARY"

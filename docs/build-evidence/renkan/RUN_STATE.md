@@ -149,6 +149,12 @@ the AI/dictionary surfaces, both with exact anchors in the workflow journal
 **Round B still has not run.** Two consecutive dry rounds close T5; round A
 was worked, not dry. The next command is the same one: the E3 script.
 
+**KAIRO-next addendum (2026-08-17):** both open confirmed findings above and
+the radical-picker density are fixed on `kairo-next-integration-20260817`,
+each with a convicting probe (`verify-corridor-ai.mjs` 24/24, corridor
+215/215). The staged `renkan-e3-double-dry.js` was never committed anywhere;
+OD-19 now carries that fact. See `docs/build-evidence/kairo-next/RUN_STATE.md`.
+
 ## Resume instructions
 
 A fresh session needs only this repo: read the campaign spec, then this file,

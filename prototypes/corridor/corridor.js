@@ -5002,7 +5002,10 @@ function renderAiQuiz(main) {
  * 24-turn cap governs only the request window (and the localStorage
  * fallback), so turn 25 no longer destroys turn 1. */
 const AI_CHAT_PAGE = 40; // turns unfolded per 前の会話 step
-const aiChatLog = { turns: null, loading: false };
+// pending lives beside the log, not in one render's closure: leaving the
+// page mid-question and coming back must show the same 考え中 and the same
+// sealed 送る, or the second send duplicates the question in the archive
+const aiChatLog = { turns: null, loading: false, pending: false };
 
 /** The log the chat renders: the archive once hydrated, else the store. */
 function aiChatTurns() {
@@ -5075,15 +5078,21 @@ function renderAiChat(main) {
   const send = biLabel('button', 'take chat-send', '送る', 'send');
   send.type = 'button';
   send.id = 'chat-send';
+  if (aiChatLog.pending) {
+    send.disabled = true;
+    const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
+    log.append(thinking);
+  }
   const ask = async () => {
     const text = input.value.trim();
-    if (!text || send.disabled) return;
+    if (!text || send.disabled || aiChatLog.pending) return;
     // the request-window copy commits BEFORE the turn travels; a device
     // that cannot save keeps the message in the field, told why by the alert
     if (!commitStorePatch({ aiChat: [...S.aiChat, { role: 'user', text }] })) return;
     if (aiChatLog.turns) aiChatLog.turns.push({ role: 'user', text });
     input.value = '';
     send.disabled = true;
+    aiChatLog.pending = true;
     const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
     log.append(thinking);
     thinking.scrollIntoView({ block: 'nearest' });
@@ -5107,6 +5116,7 @@ function renderAiChat(main) {
       // the app's own line rides the archive too, marked as the app's
       aiLogAppend({ surface: 'chat', role: 'app', content: line, model: aiProvider().model, ts: Date.now() });
     }
+    aiChatLog.pending = false;
     send.disabled = false;
     S.sheetFocus = 'chat-input';
     render();
@@ -9126,6 +9136,17 @@ window.__KAIRO_AI__ = Object.freeze({
   provider: () => aiProvider(),
   timeoutMs: AI_TIMEOUT_MS,
 });
+/** The newest archived reply for one surface and one word — the read-back
+ * seam: an answer that arrived after its sheet closed is not lost, it waits
+ * in the archive and the reopened sheet shows it. */
+async function aiLastReply(surface, ref) {
+  const rows = await aiLogAll(surface);
+  for (let i = rows.length - 1; i >= 0; i -= 1) {
+    if (rows[i].role === 'assistant' && rows[i].contextRef === ref) return rows[i].content;
+  }
+  return null;
+}
+
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (!aiKey()) return;
@@ -9133,6 +9154,9 @@ function renderAiTutor(sheet, node, rec) {
   const btn = biLabel('button', 'chip ai-ask', '先生に聞く', 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
+  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
+    if (prev && !out.textContent) out.textContent = prev;
+  });
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
@@ -9166,6 +9190,28 @@ function renderAiExamples(sheet, node, rec) {
   btn.type = 'button';
   const out = el('div', 'ai-examples');
   const wordLv = rec?.jlpt ? String(rec.jlpt).replace(/^N?/, 'N') : aiLevelGuess();
+  const paint = (raw) => {
+    out.textContent = '';
+    let shown = 0;
+    for (const line of raw.split('\n').map((l) => l.trim()).filter(Boolean)) {
+      const parts = line.split('|').map((s) => s.trim());
+      if (parts.length < 4) continue;
+      const [lv, ja, read, en] = parts;
+      const card = el('div', 'ai-ex');
+      const head = el('p', 'ai-ex-ja');
+      if (/^N[1-5]$/i.test(lv)) head.append(el('span', 'ai-ex-lv', lv.toUpperCase()));
+      head.append(document.createTextNode(ja));
+      card.append(head);
+      if (read) card.append(el('p', 'ai-ex-read', read));
+      if (bi() && en) card.append(el('p', 'ai-ex-en', en));
+      out.append(card);
+      shown += 1;
+    }
+    return shown;
+  };
+  aiLastReply('examples', `word:${node.id}`).then((prev) => {
+    if (prev && !out.childElementCount && !btn.disabled) paint(prev);
+  });
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     out.textContent = '';
@@ -9177,22 +9223,7 @@ function renderAiExamples(sheet, node, rec) {
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. The word's JLPT level: ${wordLv}. Dictionary senses: ${senses || 'none recorded'}.`,
         { surface: 'examples', ref: `word:${node.id}` },
       );
-      out.textContent = '';
-      let shown = 0;
-      for (const line of raw.split('\n').map((l) => l.trim()).filter(Boolean)) {
-        const parts = line.split('|').map((s) => s.trim());
-        if (parts.length < 4) continue;
-        const [lv, ja, read, en] = parts;
-        const card = el('div', 'ai-ex');
-        const head = el('p', 'ai-ex-ja');
-        if (/^N[1-5]$/i.test(lv)) head.append(el('span', 'ai-ex-lv', lv.toUpperCase()));
-        head.append(document.createTextNode(ja));
-        card.append(head);
-        if (read) card.append(el('p', 'ai-ex-read', read));
-        if (bi() && en) card.append(el('p', 'ai-ex-en', en));
-        out.append(card);
-        shown += 1;
-      }
+      const shown = paint(raw);
       if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
     } catch {
       out.textContent = '';

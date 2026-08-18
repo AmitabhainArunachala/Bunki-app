@@ -211,7 +211,7 @@ const MEASURE_FN = `(() => {
     .filter((n) => n.offsetParent !== null)
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('#reader button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
+      const expanded = n.matches('button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
       const expandedW = expanded ? parseFloat(expanded.width) : 0;
       const expandedH = expanded ? parseFloat(expanded.height) : 0;
       return {
@@ -1206,6 +1206,21 @@ async function main() {
     `scrollWidth ${m.docScrollWidth} vs viewport ${m.innerWidth}`);
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
+
+  // the radical picker is the densest tap grid in the app, and the shelf/panel
+  // sweep above never enters the kanjidex — its chips are measured by name
+  await open('?entry=shelf');
+  await tap(page, '#kanjidex-link');
+  await page.waitForSelector('.kdx-row', { timeout: 5000 });
+  const kdx = await page.evaluate(`(() => {
+    const chips = [...document.querySelectorAll('.kdx-chip')].filter((c) => c.offsetParent !== null);
+    const rects = chips.map((c) => c.getBoundingClientRect());
+    const small = rects.filter((r) => r.width < ${MIN_TAP} || r.height < ${MIN_TAP});
+    return { total: chips.length, small: small.length };
+  })()`);
+  check(`kanjidex · every radical and stroke chip is at least ${MIN_TAP}px`,
+    kdx.total > 100 && kdx.small === 0,
+    `${kdx.total} chips measured, ${kdx.small} under ${MIN_TAP}px`);
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
