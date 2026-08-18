@@ -1536,9 +1536,18 @@ async function main() {
   await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
-  // card 1 · the taken 水 leads the pool — honest intervals, full deck path
+  // card 1 · the taken 水 leads the pool — honest intervals, full deck path.
+  // Because that grade is REAL, T-06 applies here too: the declaration is
+  // the door, and there is no bare 答えを見る on this card (E3 round-D). The
+  // never-taken card below is practice and keeps its single turn-over.
   const dojoTakenFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
-  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  const dojoTakenGate = await page.evaluate(`({
+    reveal: !!document.querySelector('#reveal'),
+    declare: !!document.querySelector('#declare-recalled') && !!document.querySelector('#declare-notyet'),
+  })`);
+  check('dojo · a card whose grade is real asks the recall question first — no bare reveal (T-06)',
+    dojoTakenGate.declare && !dojoTakenGate.reveal, JSON.stringify(dojoTakenGate));
+  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
   await page.waitForSelector('.grade-row');
   const dojoTakenRow = await page.evaluate(`(() => ({
     practice: document.querySelector('.grade-row').hasAttribute('data-practice'),
@@ -1565,7 +1574,8 @@ async function main() {
     dojoTakenAfter.srsKeys.length === 1 && dojoTakenAfter.srsKeys[0] === 'kanji:水' &&
       dojoTakenAfter.revlog === 1 && dojoTakenAfter.nnew === 1 && dojoTakenAfter.dojoRows === 0,
     JSON.stringify(dojoTakenAfter));
-  // card 2 · the pool's first never-taken kanji — the seals stamp practice…
+  // card 2 · the pool's first never-taken kanji — practice, so it keeps the
+  // dojo's single turn-over and the seals stamp 稽古
   await page.waitForSelector('#reveal');
   const dojoDrillFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
   await page.evaluate(`document.querySelector('#reveal')?.click()`);
@@ -3677,9 +3687,22 @@ async function main() {
   await page.locator('.focus-mode', { hasText: '覚えるの札' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
+  // The two laps differ in kind, and the FRONT FACE now says so (E3 round-D):
+  // lap one grades for real, so T-06 applies and the declaration is the only
+  // door; lap two is practice, so the dojo keeps its single turn-over.
+  // both cards of the FIRST lap grade for real, so T-06 applies to each: the
+  // declaration is the only door, and there is no bare 答えを見る until the
+  // refill's practice pass (E3 round-D). The lap-two face is asserted at the
+  // 稽古 probe below, where lap two actually begins.
   for (let i = 0; i < 2; i += 1) {
-    await page.waitForSelector('#reveal');
-    await page.evaluate(`document.querySelector('#reveal')?.click()`);
+    await page.waitForSelector('#declare-recalled', { timeout: 20000 });
+    const face = await page.evaluate(`({
+      reveal: !!document.querySelector('#reveal'),
+      declare: !!document.querySelector('#declare-recalled'),
+    })`);
+    check('R4-B · a first-lap card asks the recall question — a real grade has no bare reveal (T-06)',
+      face.declare && !face.reveal, JSON.stringify(face));
+    await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
     await page.waitForSelector('.grade-row');
     if (i === 0) {
       const lap1 = await page.evaluate(`({
@@ -3708,7 +3731,16 @@ async function main() {
     `revlog ${lap1After.revlog} · dojo rows ${lap1After.dojoRows}`);
   await page.waitForSelector('.review-front');
   const lap2Front = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+  // …and HERE the face changes back: a practice pass promises the schedule
+  // nothing, so the dojo keeps its single turn-over and asks no declaration
+  // (E3 round-D — the boundary the law draws)
   await page.waitForSelector('#reveal');
+  const lap2Face = await page.evaluate(`({
+    reveal: !!document.querySelector('#reveal'),
+    declare: !!document.querySelector('#declare-recalled'),
+  })`);
+  check('R4-B · lap two keeps the dojo turn-over — practice asks no recall declaration',
+    lap2Face.reveal && !lap2Face.declare, JSON.stringify(lap2Face));
   await page.evaluate(`document.querySelector('#reveal')?.click()`);
   await page.waitForSelector('.grade-row[data-practice]', { timeout: 8000 });
   const lap2Whens = await page.evaluate(
@@ -3735,7 +3767,15 @@ async function main() {
 
   // (c) POL-13 · the tutor's quiz survives reload: the seeded run stands in
   // the envelope exactly as the app would persist it — no key, no deck, no
-  // network — and the tray's resume door reopens it where it stood
+  // network — and the tray's resume door reopens it where it stood.
+  //
+  // Navigate FIRST, then seed. The lap probes above end with a declaration,
+  // whose obslog row is debounce-persisted, so the live page still holds a
+  // pending write: seeding before the navigation let that page's pagehide
+  // flush land on top and erase the seeded quiz (the same trap this file
+  // names at the E3-A hand-off).
+  await open('?entry=shelf');
+  await page.waitForTimeout(400);
   await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
     v: 1,
     aiQuiz: {

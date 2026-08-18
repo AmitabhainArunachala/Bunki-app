@@ -7536,6 +7536,28 @@ function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
   ];
 }
 
+/* 道場の礼 — is THIS grade practice, or does it touch the schedule?
+ *
+ * A row that has LEFT 覚える is not in the deck at all (round C). Inside a
+ * focus block, a second-lap draw, a kanji-run card the queue would not have
+ * surfaced, and a captured-but-never-STARTED row are all practice (rounds A
+ * and B). Everything else is a real review, and a real review answers to
+ * T-06: the declaration is the door and まだ means Again.
+ *
+ * One predicate, asked in three places — the front face, the seals, and the
+ * commit — because they were disagreeing: the face offered a bare reveal on
+ * cards the commit then scheduled for real. */
+function practiceOnlyGrade(item) {
+  const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
+  return (
+    !takenRow ||
+    (!!S.focus &&
+      (item.drillPass === true ||
+        item.practiceOnly === true ||
+        (S.srs[srsKey(item.t, item.id)] === undefined && !finiteNumber(takenRow.started))))
+  );
+}
+
 function advanceReviewSession(rv, item, next, entry) {
   if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
     rv.queue.push(item);
@@ -8022,12 +8044,22 @@ function renderReview(main) {
   }
 
   if (!rv.revealed) {
-    if (S.focus) {
-      // the dojo keeps its single turn-over — drilling early is its point,
-      // and a drill-only grade is practice evidence, not a scheduled
-      // review. The declared-recall gate below guards the zen room only.
-      // The card itself turns over — and the labeled button stays for
-      // hands and readers that want one.
+    // 想起の二道 applies wherever the SCHEDULE is at stake. The exemption was
+    // keyed on being inside a focus block, and gave its own reason: "a
+    // drill-only grade is practice evidence, not a scheduled review". That
+    // reason is true of a drill pass and false of lap one in 覚えるの札 —
+    // the dojo's DEFAULT mode, where focusPool('due') returns real due cards
+    // and commitStandardGrade writes srs, revlog and stats. So a card due now
+    // went out 34 days on a grade pressed after reading the answer, with
+    // nothing in the durable record to tell it from an honest Easy
+    // (E3 round-D, srs-wiring lens).
+    //
+    // The exemption now follows its own stated reason: a bare turn-over
+    // belongs to PRACTICE. Where the grade is real, the declaration is the
+    // door — in every room.
+    if (practiceOnlyGrade(item)) {
+      // the dojo keeps its single turn-over for practice — drilling early is
+      // its point, and a practice grade promises the schedule nothing.
       const turnOver = () => {
         rv.revealed = true;
         handKeyboardTo('.grade-row .grade');
@@ -8106,13 +8138,7 @@ function renderReview(main) {
   // pushed-forward due date survived a re-take, so the word came back months
   // late (E3 round-C, srs-wiring lens). Deck membership is now the first
   // question, and it is asked in every room, not only the dojo.
-  const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
-  const drillOnly =
-    !takenRow ||
-    (S.focus &&
-      (item.drillPass === true ||
-        item.practiceOnly === true ||
-        (S.srs[srsKey(item.t, item.id)] === undefined && !finiteNumber(takenRow.started))));
+  const drillOnly = practiceOnlyGrade(item);
   const row = el('div', 'grade-row');
   if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
@@ -8130,7 +8156,11 @@ function renderReview(main) {
   // seal instead of three dead promises — and the commit below derives the
   // rating from the DECLARATION, never from the button, so no later tap
   // can outrun the law even if a stray node were clicked.
-  const notRecalled = !S.focus && rv.declared === 0;
+  // …and the forcing itself was switched off inside a focus block for the
+  // same false reason. It follows the schedule now: まだ means Again wherever
+  // a grade is real, and a practice grade needs no forcing because it
+  // promises the schedule nothing (E3 round-D, srs-wiring lens).
+  const notRecalled = !drillOnly && rv.declared === 0;
   if (!S.focus && rv.declared != null) {
     row.setAttribute('data-declared', notRecalled ? 'notyet' : 'recalled');
   }
