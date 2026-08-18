@@ -187,4 +187,8 @@ A fresh session needs only this repo: read the campaign spec, then this file,
 then `manifest.json` (exact SHAs), then `DECISION_SHEET.md`. The battery is
 `bash docs/build-evidence/renkan/battery.sh <outdir>`; environment notes are in
 the manifest (`e2e` needs its build first; corpus pytest needs the venv).
-Nothing merges to `main` without the operator's explicit word.
+The closing gate is now an instrument in the tree rather than a staged script:
+`Workflow({ name: 'renkan-e3-double-dry' })` — eight lenses, adversarial
+confirmation, dry twice or it is not done (`.claude/workflows/README.md`).
+On a small runner the fleet walks in pairs, so a full gate is hours, not
+minutes. Nothing merges to `main` without the operator's explicit word.
