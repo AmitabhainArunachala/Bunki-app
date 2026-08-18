@@ -2118,6 +2118,19 @@ async function boot() {
       // (E3 round-B, data-licence lens). Declared here because a lazily
       // fetched pool has no import to carry it; verify-corridor asserts this
       // block still matches data/share_alike/animcjk/index.json.
+      // …and the tokenizer itself. Every furigana in the app and every
+      // part-of-speech the reader keys on comes from UniDic through fugashi,
+      // and the panel that claims to state everything named neither
+      // (E3 round-D, data-licence lens). It ships as a build-time dependency
+      // rather than a bundled file, which is exactly why nothing carried it
+      // in — and exactly why it had to be written down by hand.
+      {
+        name: 'UniDic (via fugashi) — tokenization and readings',
+        licence: 'BSD-3-Clause / GPL / LGPL (tri-license)',
+        attribution:
+          'UniDic, National Institute for Japanese Language and Linguistics (NINJAL); fugashi/MeCab bindings. Applied at build time — every reading and part-of-speech tag in this prototype passes through it.',
+        url: 'https://clrd.ninjal.ac.jp/unidic/',
+      },
       {
         name: 'AnimCJK stroke graphics',
         licence: 'Arphic Public License',
@@ -6863,6 +6876,10 @@ function renderGrammar(main) {
   for (const lv of levels) {
     const active = (S.grammarLevel || 'all') === lv;
     const chip = el('button', active ? 'chip wide on-list' : 'chip wide');
+    // the same idiom two rooms away already states this — 文法's level filter
+    // said which level it was showing only in a colour
+    // (E3 round-D, a11y lens)
+    chip.setAttribute('aria-pressed', String(active));
     chip.type = 'button';
     chip.dataset.glevel = lv;
     chip.append(el('span', 'big', lv === 'all' ? tx('すべて', 'all') : lv));
@@ -7865,9 +7882,17 @@ function renderReview(main) {
         rest.type = 'button';
         rest.dataset.leechRest = item.id;
         rest.addEventListener('click', () => {
-          // a rest is deck state — commit the copy, then show it (P0-4)
-          const suspended = { ...S.suspended, [srsKey(item.t, item.id)]: Date.now() };
-          if (commitStorePatch({ suspended })) render();
+          // a rest is deck state — commit the copy, then show it (P0-4) — and
+          // it joins the session history like its in-session twin, so ひとつ戻す
+          // wakes THIS card rather than walking back into a sleeping one
+          // (E3 round-D, srs-wiring lens). It moves no cursor: the session is
+          // already over when this row is on the glass.
+          const key = srsKey(item.t, item.id);
+          const suspended = { ...S.suspended, [key]: Date.now() };
+          if (commitStorePatch({ suspended })) {
+            rv.history.push({ key: 'suspend', srsKey: key, summary: true });
+            render();
+          }
         });
         row.append(rest);
         main.append(row);
@@ -8026,7 +8051,7 @@ function renderReview(main) {
         render();
         return;
       }
-      rv.history.push({ key: 'suspend' });
+      rv.history.push({ key: 'suspend', srsKey: key });
       rv.ix += 1;
       rv.revealed = false;
       rv.declared = null;
@@ -8299,6 +8324,12 @@ function renderReviewUndo(main, rv) {
     const prevItem = rv.queue[rv.ix - 1];
     if (!last || !prevItem) return;
     const key = srsKey(prevItem.t, prevItem.id);
+    // a rest names the card it rested. The undo used to derive every key from
+    // the cursor, which is right for a grade and wrong for a 休ませる pressed
+    // on the SUMMARY, where any leech in the list can be rested — so the
+    // take-back woke a different card than the one that went to sleep
+    // (E3 round-D, srs-wiring lens).
+    const restKey = last.srsKey || key;
     // the take-back is built off-side and committed as ONE envelope; only a
     // durable undo moves the session back — a failed persist keeps the
     // grade, the history entry, and the glass exactly as they were (P0-4)
@@ -8306,7 +8337,7 @@ function renderReviewUndo(main, rv) {
     if (last.key === 'suspend') {
       // a rest is taken back whole: wake the card, no schedule was touched
       const suspended = { ...S.suspended };
-      delete suspended[key];
+      delete suspended[restKey];
       patch.suspended = suspended;
     } else if (last.drill) {
       // a dojo drill is taken back from the observation ledger, never from
@@ -8343,7 +8374,8 @@ function renderReviewUndo(main, rv) {
         if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
       }
     }
-    rv.ix -= 1;
+    // …and a rest that never advanced the cursor must not rewind it
+    if (!last.summary) rv.ix -= 1;
     rv.revealed = false;
     rv.declared = null;
     render();

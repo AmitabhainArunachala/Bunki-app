@@ -359,10 +359,35 @@ def main() -> int:
         radical_names[glyph] = entry
         radical_names.setdefault(plain, entry)
 
-    # words: the full wbig lexicon, so word->kanji->word never dead-ends
+    # wbig's glosses are capped at 32 characters and the cut lands MID-WORD:
+    # "bright (in reference to personal", "five days; fifth day of the mont" —
+    # 482 of them, taught as if they were the whole meaning
+    # (E3 round-D, data-licence lens). The corridor already ships the full
+    # JMdict-lineage dictionary in the SAME share_alike pool, so a truncated
+    # gloss is completed from it where it can be; nothing crosses a pool
+    # boundary, and a word the dictionary does not carry keeps what it had.
+    GLOSS_CAP = 32
+    full_glosses: dict[str, str] = {}
+    try:
+        deep = json.loads(
+            (CORRIDOR / "data/share_alike/dict.json").read_text("utf-8")
+        ).get("words", {})
+        for head, rec in deep.items():
+            senses = rec.get("m") or []
+            if isinstance(senses, list) and senses:
+                full_glosses[head] = "; ".join(str(x) for x in senses if x)
+    except FileNotFoundError:
+        pass  # the dictionary is built by its own tool; absence is not fatal
+
     words: dict[str, dict] = {}
+    healed = 0
     for entry in wbig:
         word, reading, gloss, level = entry[0], entry[1], entry[2], entry[3]
+        if len(gloss) >= GLOSS_CAP:
+            better = full_glosses.get(word, "")
+            if len(better) > len(gloss):
+                gloss = better
+                healed += 1
         words.setdefault(
             word,
             {
@@ -373,6 +398,7 @@ def main() -> int:
                 "k": sorted({c for c in word if c in KINFO}),
             },
         )
+    print(f"· glosses completed from the full dictionary: {healed}")
 
     # every word that appears as a content token in the shelf, even if wbig
     # does not carry it — the reader must never open an empty panel

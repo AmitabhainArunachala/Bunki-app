@@ -385,8 +385,10 @@ body.ginga #drift-layer #hint.first-cue {
   top: calc(12px + env(safe-area-inset-top));
   right: 16px;
   z-index: 30;
-  width: 38px;
-  height: 38px;
+  /* 38px on the app's DEFAULT entry, under its own 44px floor
+   * (E3 round-D, a11y lens) */
+  width: var(--tap);
+  height: var(--tap);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -518,6 +520,9 @@ body.ginga #drift-layer #hint.first-cue {
   flex: none;
   display: flex;
   align-items: stretch;
+  /* sized by padding alone, it landed under the app's own 44px floor on the
+   * DEFAULT entry's only navigation bar (E3 round-D, a11y lens) */
+  min-height: var(--tap);
   padding: 3px;
   background: color-mix(in srgb, var(--ink, #23303f) 8%, transparent);
   border: 1px solid var(--line, #cfc7b5);
@@ -566,6 +571,7 @@ body.ginga #drift-layer #hint.first-cue {
 }
 .nav-search-input {
   width: 100%;
+  min-height: var(--tap);
   padding: 8px 10px;
   font: inherit;
   font-size: 14px;
@@ -5044,6 +5050,9 @@ body.zen .review-example {
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
+  /* the one room whose chips were explicitly given the 44px floor left its
+   * own clear and undo at 28px (E3 round-D, a11y lens) */
+  min-height: var(--tap);
   padding: 6px 12px;
   font-family: var(--sans);
   font-size: 12px;
@@ -5339,7 +5348,10 @@ body.zen main {
   font-size: 21px;
   line-height: 1;
   cursor: pointer;
-  opacity: 0.55;
+  /* the ONLY two controls in the room — the way out and its menu — were
+   * --faint at 0.55, under 4.5:1 in every world. A control a learner must
+   * find in order to leave is not decoration (E3 round-D, a11y lens). */
+  opacity: 1;
   z-index: 6;
 }
 .zen-exit {
