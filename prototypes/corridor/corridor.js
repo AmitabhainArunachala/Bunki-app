@@ -3593,9 +3593,13 @@ function tokenAccessibleLabel(token, index) {
 
 /** A name's accessible label. It says what it is and what pressing does —
  * and never implies the 語釈/全項目 a name has no entry to answer with. */
-function namedAccessibleLabel(token, index) {
+function namedAccessibleLabel(token, index, isName = true) {
   const shown = S.dials.furigana === 2 || S.revealed?.has(index);
-  const parts = [token.s || token.b, tx('名前', 'name')];
+  // 名前 only when it IS one. A 接尾辞 or 接頭辞 written in kanji keeps its
+  // door — its reading is worth having — but calling 第 or 中 a proper name
+  // taught the learner something false 818 times per corpus
+  // (E3 round-C, reader lens).
+  const parts = [token.s || token.b, isName ? tx('名前', 'name') : tx('読み', 'reading')];
   if (shown && token.r) parts.push(token.r);
   parts.push(
     shown
@@ -3871,6 +3875,9 @@ function renderReader(main) {
   const dueNow = new Date();
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
+  // set when the token just placed reaches FORWARD for what completes it —
+  // a numeral for its counter, a 接頭辞 for its stem
+  let groupHolds = false;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
@@ -3904,12 +3911,25 @@ function renderReader(main) {
     // always on, a name's whole offer is already on the page, so it stops
     // being a button rather than standing in the tab order promising
     // nothing (E3 round-B, a11y lens).
-    const namedReading =
-      !token.c &&
-      !particle &&
-      !!token.r &&
-      S.dials.furigana !== 2 &&
-      /[一-鿌々〆ヶ]/.test(String(token.s || ''));
+    // What the token IS — asked once, and never of the ふりがな dial. Keying
+    // the 文節 rule below on the interactive form coupled two dials that
+    // share no meaning: turning ふりがな to つねに silently redrew the phrase
+    // boundaries (E3 round-C, reader lens).
+    const pos = String(token.p || '');
+    const suffix = pos === '接尾辞';
+    const prefix = pos === '接頭辞';
+    const kanjiWithReading =
+      !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
+    // …and a name is a NOUN written in kanji. 接尾辞 and 接頭辞 are grammar —
+    // 第, 未, 的, 館, 中, 国 — and the room was announcing 818 of them per
+    // corpus as proper names (E3 round-C, reader lens). They keep their door,
+    // because their reading is worth having; they lose the false title.
+    const properName = kanjiWithReading && !suffix && !prefix;
+    // …and only while there is something for the door to do. With ふりがな
+    // always on, the whole offer is already on the page, so it stops being a
+    // button rather than standing in the tab order promising nothing
+    // (E3 round-B, a11y lens).
+    const namedReading = kanjiWithReading && S.dials.furigana !== 2;
     const interactive = !!token.c || !!particle || namedReading;
     // its own class: a door, but never mistaken for a graded content word —
     // the app and its verifiers both select on .tok.content, and a name with
@@ -3948,7 +3968,7 @@ function renderReader(main) {
       span.dataset.action = 'target.activate';
       span.dataset.targetKind = 'name';
       span.setAttribute('aria-pressed', String(!!(S.revealed && S.revealed.has(index))));
-      span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+      span.setAttribute('aria-label', namedAccessibleLabel(token, index, properName));
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
@@ -3978,20 +3998,26 @@ function renderReader(main) {
         const adapter = wireParticleGestures(span, particle);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
       } else if (namedReading) {
-        wireNamedGestures(span, token, index, p);
+        wireNamedGestures(span, token, index, properName);
       }
       rendered = wrapper;
     }
     if (S.dials.spacing === 2) {
-      // 文節 starts at a content word — and a name IS one, whatever the
-      // grader's 固有名詞 exclusion says. Keyed on token.c alone, the dial
-      // cut names in half and glued one name's tail to the next name's head,
-      // teaching phrase boundaries that are wrong
-      // (E3 round-B, reader-experience lens).
-      if (token.c || namedReading || !group) {
+      // 文節 starts at a content word or a name — never at a 接尾辞, which
+      // belongs to what precedes it, and never leaving a numeral stranded
+      // from its counter. Keyed on token.c alone the dial cut names in half;
+      // keyed on the interactive form it moved with ふりがな; blind to POS it
+      // shattered every date into [2005] [年7] [月14] [日、]
+      // (E3 rounds B and C, reader lens). 2005年 · 7月 · 14日、 now, and
+      // 第29回 and 開催中の hold together as the one phrase each of them is.
+      const numeral = /^[0-9０-９]+$/.test(String(token.s || ''));
+      const opensPhrase = (token.c || properName || numeral) && !suffix && !groupHolds;
+      if (opensPhrase || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
+      // a numeral and a 接頭辞 both reach FORWARD for what completes them
+      groupHolds = numeral || prefix;
       group.append(rendered);
     } else {
       reader.append(rendered);
@@ -4616,8 +4642,17 @@ function renderPortRow(main) {
   const exp = biLabel('button', 'chip', '書き出す', 'export your record');
   exp.type = 'button';
   exp.id = 'export-store';
-  exp.addEventListener('click', () => {
-    const blob = new Blob([localStorage.getItem(STORE_KEY) || '{}'], { type: 'application/json' });
+  exp.addEventListener('click', async () => {
+    // 記録はまるごと — the file is the record, so it carries the AI archive
+    // too. It did not: the archive lives in IndexedDB, outside the envelope,
+    // while the import cleared it unconditionally. So a learner who exported
+    // and imported their own record — the backup the tray nudges them to
+    // make — lost every conversation they had ever had
+    // (E3 round-C, ai-surfaces lens).
+    const record = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+    const archive = await aiLogAll().catch(() => []);
+    if (archive.length) record.aiArchive = archive;
+    const blob = new Blob([JSON.stringify(record)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `kairo-${dayKey()}.json`;
@@ -4681,12 +4716,18 @@ function renderPortRow(main) {
         );
         return;
       }
-      // The file IS the record — so everything the old record owned must go
-      // with it. The AI transcript archive lives in IndexedDB, outside the
-      // exported envelope, and an import left the PREVIOUS learner's
-      // conversations sitting under the new record (E3 round-A, AI lens).
-      // The archive is cleared before the record lands; failing to clear it
-      // is not a reason to import a record on top of someone else's words.
+      // The file IS the record — so everything the old record owned goes with
+      // it, and everything the FILE owns comes with it. The AI archive lives
+      // in IndexedDB, outside the envelope: an import used to leave the
+      // previous learner's conversations under the new record (round A), and
+      // then to destroy conversations the file had never carried (round C).
+      // Both ends are answered here, and the swap is a transaction — the old
+      // words are held in memory until the new ones are safely in, and put
+      // back untouched if anything fails.
+      const incoming = Array.isArray(s.aiArchive) ? s.aiArchive : [];
+      const record = { ...s };
+      delete record.aiArchive; // the archive is not a learner-store root
+      const previous = await aiLogAll().catch(() => null);
       try {
         await clearAiArchive();
       } catch {
@@ -4696,7 +4737,17 @@ function renderPortRow(main) {
         );
         return;
       }
-      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      try {
+        await aiLogRestore(incoming);
+      } catch {
+        if (previous) await aiLogRestore(previous).catch(() => {});
+        portNote.textContent = tx(
+          'この記録の会話を書き戻せなかった。取り込みは中止した — 元の会話はそのまま。',
+          "The conversations in that record could not be written back, so nothing was imported — your own are untouched.",
+        );
+        return;
+      }
+      localStorage.setItem(STORE_KEY, JSON.stringify(record));
       location.reload();
     } catch {
       portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
@@ -6006,14 +6057,14 @@ function renderParticleNode(sheet, node) {
  * label says so rather than opening an empty room. Nothing here writes the
  * learner's store: a name is not an item in any list, so meeting one creates
  * no card, no evidence row and no debt. */
-function wireNamedGestures(span, token, index) {
+function wireNamedGestures(span, token, index, isName = true) {
   const toggle = () => {
     (S.revealed ||= new Set());
     if (S.revealed.has(index)) S.revealed.delete(index);
     else S.revealed.add(index);
     paintTok(span, token, index);
     span.setAttribute('aria-pressed', String(!!S.revealed.has(index)));
-    span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+    span.setAttribute('aria-label', namedAccessibleLabel(token, index, isName));
   };
   span.addEventListener('click', (event) => {
     event.preventDefault();
@@ -7965,13 +8016,22 @@ function renderReview(main) {
   // a row would mint FSRS state the review queue can never surface — the very
   // orphan this predicate exists to prevent, one step further out. Practice
   // it, record the evidence, leave the enrolment to the learner.
+  // …and above both: a row that has LEFT 覚える is not in the deck at all.
+  // The rite keyed on FSRS-state absence and on being inside a focus block,
+  // so it could not see a card the learner un-memorised mid-session — through
+  // ページへ, one chip away from 休ませる. Grading it did all three prohibited
+  // things at once: advanced a schedule, wrote a revlog row, and spent a
+  // new-card slot, for a key srsDueItems can never surface again. Worse, the
+  // pushed-forward due date survived a re-take, so the word came back months
+  // late (E3 round-C, srs-wiring lens). Deck membership is now the first
+  // question, and it is asked in every room, not only the dojo.
   const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
   const drillOnly =
-    S.focus &&
-    (item.drillPass === true ||
-      item.practiceOnly === true ||
-      (S.srs[srsKey(item.t, item.id)] === undefined &&
-        (!takenRow || !finiteNumber(takenRow.started))));
+    !takenRow ||
+    (S.focus &&
+      (item.drillPass === true ||
+        item.practiceOnly === true ||
+        (S.srs[srsKey(item.t, item.id)] === undefined && !finiteNumber(takenRow.started))));
   const row = el('div', 'grade-row');
   if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
@@ -9255,6 +9315,25 @@ async function aiLogAppend(row) {
     aiLogDropped += 1;
     return false;
   }
+}
+
+/** Put a set of archived turns back — the counterpart of clearAiArchive, so
+ * an exported record can carry the learner's conversations home with it.
+ * Rows are appended in file order; a row the store refuses is skipped rather
+ * than failing the whole restore, and the count of what landed is returned. */
+async function aiLogRestore(rows) {
+  if (!Array.isArray(rows) || !rows.length) return 0;
+  const db = await aiLogOpen();
+  if (!db) throw new Error('archive unavailable');
+  let landed = 0;
+  for (const row of rows) {
+    if (!plainRecord(row)) continue;
+    const copy = { ...row };
+    delete copy.id; // the store mints its own key
+    // eslint-disable-next-line no-await-in-loop
+    if (await aiLogAppend(copy)) landed += 1;
+  }
+  return landed;
 }
 
 /** Every archived turn, oldest first — optionally one surface's. */
@@ -12131,7 +12210,7 @@ function renderSheet(root) {
   queueMicrotask(() => {
     const target =
       (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) ||
-      (held && sheet.querySelector(held)) ||
+      (held && focusNodeFor(sheet, held)) ||
       backBtn;
     target.focus({ preventScroll: true });
   });
@@ -12255,6 +12334,20 @@ let focusNextKey = null;
 /* …and the sheet manages its own focus after every rebuild, so the restore
  * above cannot reach it. It gets the same courtesy through its own key. */
 let sheetFocusKey = null;
+/* classes a press FLIPS — excluded from the last-resort focus key, or the
+ * control could never be found again by the very press that moved focus */
+const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
+/** Resolve a focus key back to a node inside `root`, text before position. */
+function focusNodeFor(root, key) {
+  if (!root || !key?.sel) return null;
+  if (key.ix == null && key.text == null) return root.querySelector(key.sel);
+  const all = [...root.querySelectorAll(key.sel)];
+  if (key.text) {
+    const byText = all.find((n) => (n.textContent || '').trim().slice(0, 16) === key.text);
+    if (byText) return byText;
+  }
+  return key.ix == null ? all[0] || null : all[key.ix] || null;
+}
 const handKeyboardTo = (selector) => {
   focusNextKey = selector;
 };
@@ -13147,19 +13240,42 @@ function render() {
   // a named successor wins over the by-name restore, and is spent either way
   const focusNext = focusNextKey;
   focusNextKey = null;
-  const focusedNow = document.activeElement;
+  // …and the two keys are taken here and the NODE is not kept: holding
+  // document.activeElement in this scope pinned the whole previous render's
+  // chrome behind the listener closures declared below, so the detached tree
+  // could never be collected while focus sat on a control
+  // (E3 round-C, performance lens).
   const keyOf = (node) => {
     if (!node || node === document.body) return null;
-    if (node.id) return `#${CSS.escape(node.id)}`;
+    if (node.id) return { sel: `#${CSS.escape(node.id)}` };
     const action = node.dataset?.action;
-    if (action) return `[data-action="${CSS.escape(action)}"]`;
+    if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
     const chip = node.dataset?.chip;
-    return chip ? `[data-chip="${CSS.escape(chip)}"]` : null;
+    if (chip) return { sel: `[data-chip="${CSS.escape(chip)}"]` };
+    // Last resort — a control that names itself in no other way is found by
+    // its SHAPE and its place among siblings of that shape. Filter chips in
+    // 字引, 文法 and the dojo lobby carry no id and no data-action, so every
+    // press of one dropped the keyboard to <body>: 77 Tab presses back into
+    // the radical grid (E3 round-C, a11y lens). State classes are stripped,
+    // because the press that moved the focus is usually the press that
+    // flips them.
+    const cls = [...node.classList].filter((c) => !FOCUS_STATE_CLASSES.has(c));
+    if (!cls.length) return null;
+    const sel = cls.map((c) => `.${CSS.escape(c)}`).join('');
+    const ix = [...$('#app').querySelectorAll(sel)].indexOf(node);
+    if (ix < 0) return null;
+    // its own text first, its place second: pressing a radical chip narrows
+    // the grid, so the index moves out from under the very control that was
+    // pressed — the keyboard landed on 卜 when it had been on 匕
+    return { sel, ix, text: (node.textContent || '').trim().slice(0, 16) };
   };
   // the sheet re-focuses itself after this render, so it needs its own key
-  sheetFocusKey = focusedNow?.closest?.('.sheet') ? keyOf(focusedNow) : null;
+  sheetFocusKey = (() => {
+    const node = document.activeElement;
+    return node?.closest?.('.sheet') ? keyOf(node) : null;
+  })();
   const focusKey = (() => {
-    const node = focusedNow;
+    const node = document.activeElement;
     if (!node || node === document.body || !$('#app').contains(node)) return null;
     return keyOf(node);
   })();
@@ -13463,10 +13579,18 @@ function render() {
   // never steals focus from whatever the rebuild legitimately moved it to.
   // a successor may name several candidates — they are tried in the order
   // WRITTEN, not the order they happen to sit in the document
-  const wanted = focusNext || focusKey;
-  if (wanted && document.activeElement === document.body) {
-    for (const one of String(wanted).split(',')) {
-      const again = $('#app').querySelector(one.trim());
+  if (document.activeElement === document.body) {
+    // a named successor wins, and its candidates are tried in the order
+    // WRITTEN, not the order they happen to sit in the document
+    const candidates = focusNext
+      ? String(focusNext)
+          .split(',')
+          .map((one) => ({ sel: one.trim() }))
+      : focusKey
+        ? [focusKey]
+        : [];
+    for (const key of candidates) {
+      const again = focusNodeFor($('#app'), key);
       if (again && typeof again.focus === 'function') {
         again.focus({ preventScroll: true });
         break;
