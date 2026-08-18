@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-18T09:35:06.311Z",
-  "finishedAt": "2026-08-18T09:37:45.799Z",
+  "startedAt": "2026-08-18T14:36:10.286Z",
+  "finishedAt": "2026-08-18T14:38:49.237Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -24,12 +24,15 @@
     "scope": "bounded PR regression slice",
     "status": "pass",
     "exitCode": 0,
-    "promotionRule": "pass iff every executed case is ok, no page/console/fatal errors occur, and requested sample counts complete"
+    "promotionRule": "pass iff every EXECUTED case is ok, no page/console/fatal errors occur, requested sample counts complete, and the cases the harness could not aim stay within a tenth of the run",
+    "unaimedCap": 5,
+    "unaimedOver": false
   },
   "totals": {
     "total": 52,
     "ok": 52,
     "violations": 0,
+    "unaimed": 0,
     "pageErrors": 0
   },
   "coverage": {
@@ -93,16 +96,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 164.97999572753906,
-          "y": 502.84996032714844,
+          "x": 211.3000030517578,
+          "y": 509.95994567871094,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 73.88000106811523,
-          "y": 550.75,
+          "x": 74.48001384735107,
+          "y": 541.4099731445312,
           "onScreen": true
         }
       },
@@ -527,10 +530,11 @@
       "gesture": "edge-bloom",
       "expected": "left-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(110,562); sats=14",
+      "detail": "anchor=(204,422); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "left-edge"
+      "zone": "left-edge",
+      "settled": true
     },
     {
       "word": "量",
@@ -539,10 +543,11 @@
       "gesture": "edge-bloom",
       "expected": "right-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(226,491); sats=14",
+      "detail": "anchor=(224,491); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "right-edge"
+      "zone": "right-edge",
+      "settled": true
     },
     {
       "word": "万一",
@@ -551,10 +556,11 @@
       "gesture": "edge-bloom",
       "expected": "top-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(133,229); sats=14",
+      "detail": "anchor=(139,239); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "top-edge"
+      "zone": "top-edge",
+      "settled": true
     },
     {
       "word": "外出",
@@ -566,7 +572,8 @@
       "detail": "anchor=(148,573); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "bottom-edge"
+      "zone": "bottom-edge",
+      "settled": true
     },
     {
       "word": "first-touch cue",
@@ -690,8 +697,8 @@
       "seed": 1729,
       "step": 5,
       "coordinates": {
-        "x": 219.92998504638672,
-        "y": 235.89000701904297,
+        "x": 220.14999389648438,
+        "y": 235.8899917602539,
         "satellite": "句読点"
       }
     },
@@ -746,8 +753,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 279.5699996948242,
-        "y": 329.95001220703125,
+        "x": 279.7099914550781,
+        "y": 329.7699890136719,
         "satellite": "議事堂"
       }
     },
@@ -783,8 +790,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 174.9600067138672,
-        "y": 210.1199951171875,
+        "x": 175.30999755859375,
+        "y": 209.8000030517578,
         "satellite": "謎謎"
       }
     },
@@ -801,8 +808,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 204.80999755859375,
-        "y": 284.2900085449219,
+        "x": 205.14999389648438,
+        "y": 283.1700134277344,
         "satellite": "句読点"
       }
     },
@@ -819,10 +826,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 178.49000549316406,
-        "y0": 430.8900146484375,
-        "x1": 208.49000549316406,
-        "y1": 438.8900146484375
+        "x0": 178.52999877929688,
+        "y0": 430.6700134277344,
+        "x1": 208.52999877929688,
+        "y1": 438.6700134277344
       }
     }
   ]

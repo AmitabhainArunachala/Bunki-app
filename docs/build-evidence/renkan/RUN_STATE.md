@@ -288,6 +288,50 @@ exactly what it exists to do:
 
 **Still a round worked, not a dry round.** The count restarts from zero again.
 
+## The drift gate was flipping, and the reason matters
+
+Chasing a red `drift-fast` in the round-C battery turned up something more
+important than the gate itself: **`verify:drift:fast` was nondeterministic**,
+and every "battery 16/16" in this campaign rested on it. Measured on an
+unchanged tree: green, green, red. Then green, red, red, red, green.
+
+The cause was in the harness, not the app. `aimWord` polls for two samples of
+a node within 2.5px, six tries at 120ms — under a second. The galaxy is a
+LIVING field that never fully stops, so under CPU load a node with unlucky
+velocity never settled, and the sweep filed its own failure to aim as
+`detached` / `misfired` — the same words a genuine ownership defect earns. The
+edge-bloom check had the same shape: its settle loop could exhaust without
+converging, and the last sample of a moving field was then judged for
+tap-ownership.
+
+That is worse than a flaky test. It made a real defect and a harness limit
+**indistinguishable**, in both directions: a true finding could be waved off
+as flake, and a phantom could send someone chasing it.
+
+The fix strengthens the gate rather than loosening it. `unaimed` is now a
+third outcome — neither pass nor violation — used only when the field would
+not hold still, with the 2.5px tolerance untouched and the window widened
+(6 → 10 tries, and the bloom settle 8 → 12) so more real settles are found.
+Unaimed cases are counted, printed, and **capped at a tenth of the run**, so
+coverage can never quietly collapse into "nothing to report" while the gate
+still prints `0 violations`. Each case now records whether it converged before
+it was judged.
+
+### And under it, a real defect
+
+With the harness no longer manufacturing false convictions, one finding stands
+up on its own: in the **left-edge bloom the drift overlaps its own
+satellites**, so a word the constellation is offering cannot be tapped —
+`elementFromPoint` at 留める's centre returns 裏返す, with the field SETTLED at
+the moment of measurement. It reproduces on roughly half of runs (3 of 5
+measured), because it depends on which word the zone probe raises.
+
+Bloom layout is `#46` — Drift's physics and gesture grammar are untouched by
+standing order — so it is typed to the operator as **OD-26** rather than
+fixed here, and `drift-fast` stays honestly red about half the time until that
+order is lifted. **No "16/16" claim in this file should be read as a stable
+property of the tree**; it was true of the runs that produced it.
+
 ### T5's standing
 
 The double-dry gate has been re-launched on the merged head. The rule is two
