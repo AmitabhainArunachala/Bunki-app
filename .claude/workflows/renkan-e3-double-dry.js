@@ -98,7 +98,7 @@ const huntPrompt = (
   h,
   round,
 ) => `You are an E3 HUNT agent (lens: ${h.lens}, dry-run round ${round}) for the RENKAN campaign closing gate. Repo ${REPO}, at ${HEAD} — walk that tree and name it in your coverage, so a finding stays readable if the branch moves under you. READ-ONLY (scratchpad only for scripts/screenshots).
-Serve prototypes/corridor locally (python3 -m http.server) and drive it with playwright-core + chromium (/opt/pw-browsers/chromium), 390x844 touch emulation. ${h.brief}
+FIRST, pin your tree: \`git -C ${REPO} worktree add <scratch>/e3-\${lens} ${HEAD.split(' ')[0]}\` and work THAT directory, not ${REPO} itself. The campaign lands fixes on its own branch while you hunt — round C's first attempt had its corridor.js rewritten mid-walk — so a hunter who serves the live repo is measuring a tree that no longer exists by the time anyone reads the finding. Serve YOUR worktree's prototypes/corridor (python3 -m http.server) and drive it with playwright-core + chromium (/opt/pw-browsers/chromium), 390x844 touch emulation. Remove the worktree when you are done. ${h.brief}
 THE BAR IS HIGH: this is the double-dry closing gate. A finding must be REAL, REPRODUCIBLE (exact steps + DOM/console evidence), NEW on this head (check docs/build-evidence/renkan/triage-round1.json, hunts-round2.json, and RUN_STATE.md — re-filing anything known, fixed, deferred-with-rationale, or on the decision sheet is a false positive), and matter to a learner. Cosmetic taste is not a finding. When genuinely dry, return an empty findings array with your coverage statement — an honest empty is the desired terminal state, but NEVER suppress a real defect to look dry.
 Return findings ≤6, severity honest, coverage = what you walked and what you did not reach.`;
 

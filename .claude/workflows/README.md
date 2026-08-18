@@ -44,7 +44,9 @@ Workflow({
 })
 ```
 
-A campaign that fixes what it finds moves the head under its own verifiers.
+A campaign that fixes what it finds moves the head under its own hunters AND
+verifiers. Both now check the named commit out into their own scratch worktree
+and work that; nobody serves the live repository.
 Round B's confirmations all carried the same caveat — _the fix landed while I
 was verifying_ — which makes a verdict hard to read and burns the run. Named,
 hunters and verifiers both work one stated commit, and verifiers check it out
