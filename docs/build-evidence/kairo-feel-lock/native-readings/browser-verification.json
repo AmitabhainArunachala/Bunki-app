@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-18T13:13:33.728Z",
+  "completedAt": "2026-08-18T13:38:32.616Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
     "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "8762f5db5892c781e2575cca3e11721200273b99953330e369865eb7ef89de88",
-    "corridorCss": "afccff429d4f14588a0afb5357f9804d449936cd4e8c9f93ce5a62d565052525",
-    "standalone": "04c21098078273d6c83c55c148dbb7df7b6b58abba754494897e45a18d5adeea",
+    "corridorJs": "14c326dee01318c974e9f7ca98d4b9b8a46dbd6767bdf6d72b7f8881359eb685",
+    "corridorCss": "92a5d316357a98404bb0819e927a52dd671fa6d1f2cdd2812ae233d9950e6b9f",
+    "standalone": "7d97be432d51f56a03511ec78942fd7bdd29e033eadc6c18aa568f5b8f68d865",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -57,33 +57,33 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "700aa36aef3bf872b3aba974de2505e30cd0d139cb784caaee1b2b71595a3fa6"
+        "sha256": "db924991f4b4c60b1f3b07141857d626f8dd2bef9ac689be6828610f1f09e96f"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "7ff69502040852a622dfe851a2b12f90c18ffc3038bf476ab3882f53b18b8c0b"
+        "sha256": "6a7170637a14fb7c895dda2b396f65693c1fc172de5fe3ef58988c3c0c8cbbda"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "2431279eaf1faa695f1460c93ade14f05f31f99846861d0aa6120aab797a4b9b"
+        "sha256": "de4dcb3bd0dae94d5c4e334dab3ae2c10d6629e791fa6f289481434cd96edab9"
       },
       "biShelf": {
         "path": "screenshots/shelf-bilingual-titles.png",
-        "sha256": "7052029a22706853d1b13acbf86f2f1808fc79a2cf16934144844e7d2c642b1f"
+        "sha256": "4448023b2b21a4f1770ac0c97075189665a09aad09bb46f22851085819e4fd61"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "8dd9cf58617d74aa109563c4a8b3bb466e22fec901b78b140f8538d4827f5294"
+        "sha256": "8471c429472e085ef17e2f5a8a6d37a117e1dd57222fd1862529c58974f0cbf1"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "43e689b9e7735ce922b48b467f6a86dcdc3eba6392b31a7b0e63d7b897dc2307"
+        "sha256": "8f34ca4f613b206b4f9a8803e6b1c30bdf77d59aba23914a788497dd3d578e82"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "91802bd298a44c3799febd697441fda02468a9952d5d5fe4f5c19bd4b062740e"
+        "sha256": "af50d0455c8bad1d81f4cdd513c544051bc381d6d86e2ba896a9d853462117e9"
       }
     }
   },

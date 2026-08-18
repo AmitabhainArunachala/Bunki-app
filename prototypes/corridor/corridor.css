@@ -811,10 +811,26 @@ body.ginga #drift-layer #hint.first-cue {
 .cat-chip {
   font: inherit;
   cursor: pointer;
+  /* it is a DOOR — it navigates — so the finger gets a real target. Built
+   * from .pool-tag it inherited a 10px tag's box: 20px tall, 7px apart, 21px
+   * effective, under WCAG 2.5.8's floor and half what the rest of the app
+   * offers (E3 round-C, a11y lens). The printed pill stays small; the hit
+   * region belongs to the button, so neighbouring text never steals the tap. */
+  position: relative;
   border-style: dashed;
   border-color: color-mix(in srgb, var(--ai, #2e4d6e) 45%, var(--line));
   color: var(--ink-2, #55606c);
 }
+.cat-chip::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
+
 .cat-chip:hover {
   border-style: solid;
   color: var(--ink);
@@ -2079,7 +2095,11 @@ button .l-ja {
   margin-left: 5px;
 }
 
-#lang[aria-pressed='true'] {
+/* The sliding pill is a BUTTON and wears the pressed ground itself. The
+ * two-button segment shares the id, and the unscoped rule painted the whole
+ * CONTAINER dark — so the half you are not in sat at 2.01:1 against it, on
+ * every screen in the app (E3 round-C, a11y lens). Only a button takes it. */
+button#lang[aria-pressed='true'] {
   background: var(--ink);
   color: var(--ground);
   border-color: var(--ink);
@@ -2251,7 +2271,11 @@ body.v-depth-layered .inline-link {
   letter-spacing: 0.06em;
   border: 0;
   background: transparent;
-  color: var(--ink-2);
+  /* the half you are NOT in is still a control label, not decoration —
+   * --ink-2 is a body-text tone and left it at 3.07:1 on the chrome's own
+   * ground. Mixed from the world's own pair it stays quiet and reads
+   * (E3 round-C, a11y lens). */
+  color: color-mix(in srgb, var(--ink) 78%, var(--ground));
   min-height: var(--tap);
   min-width: 44px;
   padding: 0 10px;

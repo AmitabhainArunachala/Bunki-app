@@ -399,8 +399,7 @@ const S = {
   archiveScroll: 0,
   stack: [],
   // 銀河 hero: the galaxy rests bare but for one symbol; navOpen reveals the
-  // top bar and the two corner bubbles. fwd holds a single forward step so the
-  // bar's ▸ arrow can undo a back().
+  // top bar and the two corner bubbles.
   navOpen: false,
   /** The 銀河 search session. The bar's input node dies with every render, so
    * the query lives here; navReturn marks a departure THROUGH a result, and
@@ -409,7 +408,6 @@ const S = {
    * symbol) clears both. Session-only, never persisted. */
   navQ: '',
   navReturn: false,
-  fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
    * request (ふりがな タップで), not readings everywhere. */
@@ -4064,7 +4062,12 @@ function renderReader(main) {
   fin.append(finBtn);
   main.append(fin);
 
-  if (p.pendingVerification) {
+  // …and it must appear wherever the MARK does. The block was gated on
+  // pendingVerification, which only 11 of the 53 rows carrying 検収前 in their
+  // source label actually have — so 42 rows (the 30 legacy originals and 12
+  // fresh mints) wore the mark with no reason offered anywhere in the app
+  // (E3 round-C, data-licence lens). A row under review explains itself.
+  if (p.pendingVerification || p.review) {
     // one hardcoded sentence answered for every pending row, so the ten
     // やさしい日本語 glossary entries — whose open question is RIGHTS —
     // explained themselves with a Wikinews archive-freeze story that is
@@ -9589,19 +9592,37 @@ function renderAiCoach(main, rv) {
   btn.type = 'button';
   btn.id = 'ai-coach';
   const out = el('div', 'ai-answer');
-  btn.addEventListener('click', async () => {
+  // round B made 考え中 state on the word sheet and stopped there; the coach
+  // and the reading room kept theirs in a closure, so a repaint killed the
+  // spinner, re-armed the door and lost the arriving reply
+  // (E3 round-C, ai-surfaces lens)
+  const thinking = tx('考え中…', 'thinking…');
+  if (aiPendingOn('coach', 'session')) {
     btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
+    out.textContent = thinking;
+  }
+  btn.addEventListener('click', async () => {
+    if (aiPendingOn('coach', 'session')) return;
+    aiPendingSet('coach', 'session', true);
+    btn.disabled = true;
+    out.textContent = thinking;
     try {
       // history is queue-ordered (grades push sequentially, undo pops)
       const lines = rv.queue.map((item, i) => `${item.label} (${item.t}): ${rv.history[i]?.key || 'ungraded'}`);
-      out.textContent = await aiAsk(
+      const said = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Learner level: about JLPT ${aiLevelGuess()}. Session grades:\n${lines.join('\n')}`,
         { surface: 'coach' },
       );
+      aiPendingSet('coach', 'session', false);
+      aiSettle(out, () => {
+        out.textContent = said;
+      });
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      aiPendingSet('coach', 'session', false);
+      aiSettle(out, () => {
+        out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      });
     }
     btn.disabled = false;
   });
@@ -9649,9 +9670,17 @@ function renderAiReading(main) {
   btn.type = 'button';
   btn.id = 'airead-make';
   const note = el('p', 'airead-note');
-  btn.addEventListener('click', async () => {
+  // …and the reading room, the third surface round B's fix did not reach
+  const writing = tx('先生が書いている…', 'the tutor is writing…');
+  if (aiPendingOn('reading', 'room')) {
     btn.disabled = true;
-    note.textContent = tx('先生が書いている…', 'the tutor is writing…');
+    note.textContent = writing;
+  }
+  btn.addEventListener('click', async () => {
+    if (aiPendingOn('reading', 'room')) return;
+    aiPendingSet('reading', 'room', true);
+    btn.disabled = true;
+    note.textContent = writing;
     try {
       const woven = S.taken.filter((t) => t.t === 'word').slice(-8).map((t) => t.id);
       const text = await aiAsk(
@@ -9665,13 +9694,16 @@ function renderAiReading(main) {
       // storage alert and re-arms the button (P0-4)
       const aiReadings = S.aiReading ? [S.aiReading, ...S.aiReadings].slice(0, 10) : S.aiReadings;
       const aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
+      aiPendingSet('reading', 'room', false);
       if (commitStorePatch({ aiReading, aiReadings })) {
         render();
         return;
       }
       note.textContent = '';
     } catch {
+      aiPendingSet('reading', 'room', false);
       note.textContent = tx('いまは書けない。あとでもう一度。', 'The tutor could not write just now — try again in a moment.');
+      render();
     }
     btn.disabled = false;
   });
@@ -11834,10 +11866,22 @@ function renderStrokePage(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring must also catch focus that is inside the dialog but not
+    // ON the ring. Both rooms open with focus on their own container — it IS
+    // the dialog — which is neither first nor last, so one Shift+Tab walked
+    // straight out to <body>, and Escape, bound to that element, then did
+    // nothing: in the quiet room that is the §6 sleep/exit key, dead
+    // (E3 round-C, writing-room lens).
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -12181,10 +12225,22 @@ function renderSheet(root) {
     }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // …and the ring must also catch focus that is inside the dialog but not
+    // ON the ring. Both rooms open with focus on their own container — it IS
+    // the dialog — which is neither first nor last, so one Shift+Tab walked
+    // straight out to <body>, and Escape, bound to that element, then did
+    // nothing: in the quiet room that is the §6 sleep/exit key, dead
+    // (E3 round-C, writing-room lens).
+    const here = document.activeElement;
+    if (!focusable.includes(here)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && here === first) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && here === last) {
       event.preventDefault();
       first.focus();
     }
@@ -12334,6 +12390,22 @@ let focusNextKey = null;
 /* …and the sheet manages its own focus after every rebuild, so the restore
  * above cannot reach it. It gets the same courtesy through its own key. */
 let sheetFocusKey = null;
+/** What each room is called in a crumb — the tray borrows its origin's. */
+const VIEW_CRUMB = {
+  reader: ['本棚', 'bookshelf'],
+  shelf: ['本棚', 'bookshelf'],
+  archive: ['新聞アーカイブ', 'archive'],
+  levels: ['級', 'levels'],
+  lessons: ['レッスン', 'lessons'],
+  kanjidex: ['字引', 'kanji finder'],
+  grammar: ['文法', 'grammar'],
+  thesaurus: ['類語', 'synonyms'],
+  airead: ['読み物', 'reading'],
+  ai: ['先生', 'tutor'],
+  drift: ['銀河', 'galaxy'],
+  dojo: ['銀河', 'galaxy'],
+};
+const trayFromView = (from) => (from === 'reader' ? 'reader' : plainRecord(from) ? from.view : null);
 /* classes a press FLIPS — excluded from the last-resort focus key, or the
  * control could never be found again by the very press that moved focus */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
@@ -13004,16 +13076,6 @@ function attachWorldPicker(sealBtn) {
 const GINGA_SYMBOL_SVG =
   '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 15.5C20 13 28 13 40 15.5M11.5 21H36.5M16.5 21V37M31.5 21V37" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="8.5" r="1.7" fill="currentColor"/></svg>';
 
-/** One forward step: navForward undoes the most recent navBack. */
-function navForward() {
-  if (!S.fwd) return;
-  const snap = S.fwd;
-  S.fwd = null;
-  S.view = snap.view;
-  S.stack = snap.stack;
-  S.navOpen = false;
-  render();
-}
 function navBackFromGinga() {
   // one walk: back() itself surfaces a dive one level (R3-B), so the arrow
   // and the device Back gesture are the same operation. At the true galaxy
@@ -13181,12 +13243,13 @@ function buildGingaChrome(root) {
   backB.setAttribute('aria-label', tx('もどる', 'back'));
   backB.disabled = !S.stack.length && S.view === 'drift' && !S.driftDepth;
   backB.addEventListener('click', navBackFromGinga);
-  const fwdB = el('button', 'nav-arrow', '›');
-  fwdB.type = 'button';
-  fwdB.setAttribute('aria-label', tx('すすむ', 'forward'));
-  fwdB.disabled = !S.fwd;
-  fwdB.addEventListener('click', navForward);
-  arrows.append(backB, fwdB);
+  // The › arrow was dead chrome: nothing in the app ever assigned S.fwd, so
+  // it was rendered disabled on every screen and could never be pressed
+  // (E3 round-C, dead-ends lens). A real forward step needs a forward stack
+  // that every other navigation invalidates — worth building, but not worth
+  // half-building, and a control that cannot act does not belong in the bar.
+  // The walk back is the one the corridor actually offers.
+  arrows.append(backB);
   bar.append(arrows);
   bar.append(buildLangSlider());
   bar.append(buildNavSearch());
@@ -13343,7 +13406,12 @@ function render() {
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
   const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  // …and the tray is opened from EVERY room, so its root is wherever it was
+  // opened from — it said 本棚 even when 戻る walked back to the reader, the
+  // archive or the levels room (E3 round-C, dead-ends lens).
+  const trayHome = S.view === 'tray' && S.trayFrom ? VIEW_CRUMB[trayFromView(S.trayFrom)] : null;
   if (S.view === 'entry') parts.push(tx('野', 'field'));
+  else if (trayHome) parts.push(tx(trayHome[0], trayHome[1]));
   else if (S.view === 'drift' || dojoFamily) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
@@ -13354,8 +13422,11 @@ function render() {
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   // the quiz and the review summary are entered from the lists tray and
   // their 戻る reopens it — the crumb said 本棚 › 小テスト and skipped the
-  // room the press actually goes to (E3 round-B, dead-ends lens)
-  if (S.view === 'aiquiz') parts.push(tx('リスト', 'lists'));
+  // room the press actually goes to (E3 round-B, dead-ends lens). Round B
+  // wrote that rule and then applied it to the quiz alone: a plain review's
+  // crumb still said 本棚 › 復習 while 戻る opened the tray
+  // (E3 round-C, dead-ends lens).
+  if (S.view === 'aiquiz' || (S.view === 'review' && !S.focus)) parts.push(tx('リスト', 'lists'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
