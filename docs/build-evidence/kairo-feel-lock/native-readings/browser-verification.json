@@ -7,15 +7,15 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-18T08:50:19.819Z",
+  "completedAt": "2026-08-18T09:16:43.686Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
     "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "25c02939579fc9442ba8477f8f3506f77050b9fb106e3f908d46b692a79cdf5a",
+    "corridorJs": "f3338fb5aa6be2fb90ca073aeae5446ea7b8126355a28524fa6fd2b4842e60b2",
     "corridorCss": "afccff429d4f14588a0afb5357f9804d449936cd4e8c9f93ce5a62d565052525",
-    "standalone": "9c8fb276867902758bc50c13ebd8d934afaeb22abd44d28a3d053aea8e060e46",
+    "standalone": "63ed875218a397fc5a2fb5a18b1a8532e498117e560d0db9ceede10b6017f6e0",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -176,7 +176,7 @@
       "fullEntry": {
         "headword": "時",
         "reading": "とき",
-        "text": "← 戻る\n覚\n✕\n時\n\nとき\n\nnoun\n\ntime\nhour\nmoment\noccasion\ncase\nchance\n\n語義と用法をひらいています…\n\nこの語の漢字\n\n時\nTime\n›\n\n用例 — ことばは長押しで辞書へ\n\nイチローは\n試"
+        "text": "← 戻る\n覚\n✕\n時\n\nとき\n\n同じ形の 3 項目\n\n時とき\ntime\n›\n時じ\nhour\n›\n時どき\ntime for ...\n›\n\nnoun\n\n時・刻・秋\nとき\n1\n\nnoun (common) (futsuumeishi)\n\ntime"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,

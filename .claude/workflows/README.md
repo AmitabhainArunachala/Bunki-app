@@ -29,6 +29,18 @@ known, fixed, or operator-deferred item counts as a false positive. An honest
 empty is the desired terminal state; suppressing a real defect to look dry is
 the one failure mode the brief names out loud.
 
+Name the tree it judges. Pass the head SHA as args:
+
+```
+Workflow({ name: 'renkan-e3-double-dry', args: { head: '<sha>' } })
+```
+
+A campaign that fixes what it finds moves the head under its own verifiers.
+Round B's confirmations all carried the same caveat — _the fix landed while I
+was verifying_ — which makes a verdict hard to read and burns the run. Named,
+hunters and verifiers both work one stated commit, and verifiers check it out
+into a scratch worktree instead of trusting a working tree that is moving.
+
 Concurrency follows the host: the fleet is capped at `min(16, cpus - 2)`, so on
 a small runner the eight lenses walk in pairs and a full two-round gate is a
 multi-hour instrument, not a minutes-long one.
