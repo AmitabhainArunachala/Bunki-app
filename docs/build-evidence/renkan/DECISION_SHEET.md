@@ -19,7 +19,7 @@ what I recommend and why.
 | OD-5  | #49 rename BUNKI → KAIRO (one reviewable change, fired on your word)                                        | **FIRE** · FIRE+REPO · HOLD         | `proposals/RENAME_49_BUNKI_TO_KAIRO_PLAN.md` (the corridor is already KAIRO inside) |
 | OD-6  | TTS voices — 澄 / 語 / 話, licensed assets, real money                                                      | **SAMPLES** · NARROW · DEFER        | `proposals/TTS_VOICES_PROPOSAL.md` (costs marked as estimates)                    |
 | OD-7  | Physical-device evidence — on-device runs are yours; everything else ships marked web-verified              | **STANDING**                        | every claim in this campaign is labelled web-verified                             |
-| OD-8  | Merge this branch to `main`                                                                                 | **MERGE** · HOLD                    | PR #74 (draft; 44 landed commits, battery green)                                  |
+| ~~OD-8~~ | **ANSWERED — MERGED.** PR #74 landed on `main` as `ae1d901` on 2026-08-18; post-merge battery 16/16 | — | nothing left for you here |
 
 ## Typed here by the campaign (a §1 terminal that cannot honestly self-close)
 
@@ -42,8 +42,8 @@ what I recommend and why.
 
 ## What I would answer, if the answers were mine
 
-RATIFY (OD-9) and MERGE (OD-8) — the branch is green and nothing in it can
-merge itself. REVIEW the 30 (OD-2) before anything else: they are the only
+MERGE is done (OD-8, 2026-08-18). RATIFY (OD-9) is the one that still gates
+a §1 terminal, and nothing in the branch can ratify itself. REVIEW the 30 (OD-2) before anything else: they are the only
 content on the shelf still wearing 検収前, and lifting that is the single
 highest-value hour you can spend. Then SAMPLES (OD-6), because audio is the
 one gate that keeps the reading score under 60 no matter how good the rest

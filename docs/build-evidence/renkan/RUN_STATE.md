@@ -1,7 +1,7 @@
 # 連環 RENKAN — RUN_STATE (final)
 
 **Campaign:** `docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md`
-**Branch:** `claude/renkan-one-push-2026-08-16` · **PR:** #74 (draft, stays draft)
+**Merged:** PR #74 → `main` @ `ae1d901` (2026-08-18) · follow-up branch: `claude/renkan-round-b-2026-08-18`
 **Base:** `main` @ `e335ab7` (PR #73 merged) · **Rounds run:** 0–4 + Wave C + Wave E
 **Exact SHAs per landing:** `manifest.json` (schema-bound round ledger)
 
@@ -154,6 +154,32 @@ the radical-picker density are fixed on `kairo-next-integration-20260817`,
 each with a convicting probe (`verify-corridor-ai.mjs` 24/24, corridor
 215/215). The staged `renkan-e3-double-dry.js` was never committed anywhere;
 OD-19 now carries that fact. See `docs/build-evidence/kairo-next/RUN_STATE.md`.
+
+## After the merge — 2026-08-18
+
+The operator marked PR #74 ready and **merged it**: `ae1d901` on `main`.
+That answers **OD-8 — MERGE**. The campaign branch is history now; follow-up
+work belongs on a fresh branch cut from `main` (this file's home from here).
+
+`main` also took a parallel integration the same day (**PR #76**,
+`kairo-next-integration-20260817`). Between the two lines, the six confirmed
+E3 round-A findings are now ALL addressed: four were fixed on the campaign
+branch, and the parallel line closed the other two —
+`aiChatLog.pending` survives a render (so leaving the tutor mid-question no
+longer drops the 考え中 or lets a resend duplicate the question) and
+`renderAiTutor` restores the last reply from the archive (so closing a word
+sheet mid-thought no longer throws the answer away). It also gave the
+kanjidex chips their 44px targets.
+
+**Post-merge battery on `ae1d901`: 16/16.** Two integration lines merging
+cleanly is not something to assume — it was measured.
+
+### T5's standing
+
+The double-dry gate has been re-launched on the merged head. The rule is two
+consecutive rounds with zero confirmed findings; round A on the old head was
+worked, not dry, so the count starts again from zero here. Until two clean
+rounds land, T5 stays **DECISION-SHEET (OD-19)** and this file says so.
 
 ## Resume instructions
 
