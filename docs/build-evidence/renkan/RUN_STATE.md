@@ -246,6 +246,48 @@ they walked in their coverage, and verifiers check that commit out into a
 scratch worktree instead of trusting a working tree that is moving
 (`3fed823`). The loop closed on the instrument, not just on the product.
 
+## E3 round C — the first round hunted on a tree that held still
+
+The instrument was fixed twice before this round could mean anything. Naming
+the head fixed the verifiers and left the HUNTERS serving the live repository,
+so the campaign's own landings rewrote the code underneath them mid-walk — the
+first round-C attempt had `corridor.js` change while eight lenses were
+reading it, which makes every finding a measurement of a tree that no longer
+exists. Hunters now check the named commit out into their own scratch
+worktree. Nobody in the gate serves the live repository.
+
+Round C then walked `0f6be67` and returned **18 findings, 17 confirmed** — a
+markedly better round than A or B, and the reason is not prompt wording: both
+ends of the gate holding still on one stated commit is worth more than any
+instruction. **All 17 are now closed**, each with the probe or the measurement
+that convicts it.
+
+Several were consequences of round B's own fixes, which is the gate doing
+exactly what it exists to do:
+
+| finding | fix |
+| --- | --- |
+| P2 a card removed from 覚える mid-session still took a real FSRS grade — schedule advanced, revlog row written, new-card slot spent, and the pushed-forward due date survived a re-take so the word returned months late | deck membership is the rite's FIRST question now, asked in every room and not only the dojo |
+| P2 818 grammatical affixes per corpus announced as proper names — 第, 未, 的, 館, 中, 国 — round B's name-door was blind to part of speech | the tokens carry it: a name is a noun written in kanji; an affix keeps its door and loses the false title |
+| P2 the 文節 rule keyed on the INTERACTIVE form, so phrase boundaries moved with the ふりがな dial — two dials that share no meaning, silently coupled | asked of part of speech instead; measured identical under both dials |
+| P2 分かち＝文節 shattered every date — `[2005] [年7] [月14] [日、]` | `2005年 · 7月 · 14日、`, and 第29回 and 開催中の hold together as the one phrase each is |
+| P1 filter chips in 字引, 文法 and the dojo lobby dropped the keyboard to `<body>` — 77 Tab presses back into the radical grid | a control that names itself no other way is found by its shape and its own TEXT — text before position, because pressing a radical chip narrows the grid and the index moves out from under the very control pressed |
+| P1 the export never carried the AI archive while the import destroyed it — the backup the tray nudges you to make erased every conversation on restore | the file is the record: the export carries it, the import restores it, and the swap is a transaction that puts the old words back if anything fails |
+| P2 every render pinned the previous render's chrome in memory | the focus keys are taken and the node is not kept |
+| P1 one Shift+Tab left both modal dialogs for `<body>` — and in the quiet room that killed Escape, the §6 sleep/exit key, with it | focus inside the dialog but off the ring is caught and returned to it |
+| P2 round B's 考え中-is-state fix skipped the coach and the reading room | all three surfaces hold it the same way |
+| P2 the 10-second failure line vanished on a repaint — a failure is not an assistant turn and never reaches the archive the read-back restores from | the app's own quiet line waits in session state for the next render |
+| P2 round B's crumb rule was applied to the quiz alone: a plain review still said 本棚 › 復習 while 戻る opened the tray, and the tray said 本棚 whichever room it came from | both name their true origin |
+| P2 42 of the 53 rows wearing 検収前 offered no reason anywhere — round B's reason block was gated on `pendingVerification`, which only 11 carry | a row under review explains itself |
+| P2 the unselected half of EN / 日本語 sat at 2.01:1 — an unscoped id rule painted the two-button CONTAINER with the sliding pill's background | scoped to a button, the quiet half derived from the world's own pair: **6.78:1** measured |
+| P2 catalog doors on kanji sheets were 20px pills 7px apart — 21px effective | they are doors, so they get the hit region the app already gives its doors |
+| P2 five chip groups carried their selection only in a CSS class | 部品, 字引's lens, the block lengths and the drill modes all state `aria-pressed` |
+| P2 with no ink engine the ゆっくり corner still reported itself pressed while the writing ran at one speed | the corner follows the engine — gone the moment the ink is not alive |
+| polish the › forward arrow was dead chrome: nothing ever assigned `S.fwd` | a real forward step needs a stack every navigation invalidates — worth building, not worth half-building. The promise is withdrawn rather than faked |
+| P2 the shelf's FIRST card taught 屋久島 = やくとう, and the furigana gate certified it 0 open | one lexicon entry, re-minted through the builder: 屋久島 = やくしま, `rs: "lexicon"`, **305 fixed · 8 accepted · 0 open** |
+
+**Still a round worked, not a dry round.** The count restarts from zero again.
+
 ### T5's standing
 
 The double-dry gate has been re-launched on the merged head. The rule is two

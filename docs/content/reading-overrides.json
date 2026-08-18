@@ -260,6 +260,14 @@
       "readings": ["あらそ", null],
       "kind": "classical",
       "note": "方丈記 「甍を争へる」 — 争(あらそ)へる; UniDic emits the on-reading そう on an unknown-word fallback."
+    },
+    {
+      "word": "屋久島",
+      "reading": "やくしま",
+      "surfaces": ["屋久", "島"],
+      "readings": ["やく", "しま"],
+      "kind": "place-name",
+      "note": "UniDic splits the island name and reads the orphaned 島 with the on-yomi とう (接尾辞), so the shelf's FIRST card taught 屋久やく島とう. The place is やくしま. Every neighbouring place-name in the same sentence — 知床しれとこ半島はんとう, 白神しらかみ山地さんち, 羅臼らうす岳たけ — is already right, so nothing in the surface signalled which one to distrust (E3 round-C, reader lens)."
     }
   ],
   "accepts": [

@@ -501,6 +501,10 @@ const S = {
   /** the chat question half-typed — session-only, so the reply's own render
    * does not throw away what the learner wrote while waiting for it */
   aiChatDraft: '',
+  /** the app's own quiet failure lines by `surface|ref` — session-only. A
+   * failure is not an assistant turn and never reaches the archive, so a
+   * repaint would otherwise replace it with silence. */
+  aiNotes: null,
   /** how many chat turns the log unfolds before 前の会話 — session-only */
   aiChatShown: null,
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
@@ -5488,6 +5492,10 @@ function renderKanjidex(main) {
   const lensRow = el('div', 'kdx-lenses');
   for (const [id, ja, en] of LENSES) {
     const b = el('button', S.kdx.mode === id ? 'kdx-lens on' : 'kdx-lens');
+    // which one is chosen is STATE, not a colour — the tree reported plain
+    // buttons (E3 round-C, a11y lens; the same defect round A fixed on one
+    // control and round B on two more)
+    b.setAttribute('aria-pressed', String(S.kdx.mode === id));
     // the selected lens said so only in a class and a colour — and that
     // colour fell to 2.85:1 in the dark worlds (E3 round-A, a11y lens).
     // The state is spoken now; the CSS carries the contrast.
@@ -5560,8 +5568,10 @@ function renderKdxParts(main) {
   if (S.kdx.parts.length) {
     const chosen = el('div', 'kdx-chosen');
     for (const p of S.kdx.parts) {
+      // the chosen row is a REMOVE control, not a toggle — it says so
       const b = el('button', 'kdx-chip kdx-part on-list', `${p} ✕`);
       b.type = 'button';
+      b.setAttribute('aria-label', tx(`${p} を外す`, `remove ${p}`));
       b.addEventListener('click', () => {
         S.kdx.parts = S.kdx.parts.filter((x) => x !== p);
         render();
@@ -5625,6 +5635,7 @@ function kdxPartGrid(coPresent) {
       const sel = S.kdx.parts.includes(r.c);
       const dead = coPresent && !sel && !coPresent.has(r.c);
       const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
+      b.setAttribute('aria-pressed', String(sel));
       b.type = 'button';
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
@@ -8390,6 +8401,7 @@ function renderFocus(main) {
   S.focusMin = S.focusMin || 20;
   for (const m of FOCUS_MINUTES) {
     const b = el('button', 'focus-chip' + (S.focusMin === m ? ' on' : ''));
+    b.setAttribute('aria-pressed', String(S.focusMin === m));
     b.type = 'button';
     b.append(el('span', 'focus-chip-n', String(m)));
     b.append(el('span', 'focus-chip-u', tx('分', 'min')));
@@ -8428,6 +8440,7 @@ function renderFocus(main) {
   S.focusMode = S.focusMode || 'due';
   for (const [id, ja, en, sub] of modeDefs) {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
+    b.setAttribute('aria-pressed', String(S.focusMode === id));
     b.type = 'button';
     b.append(withEn(el('span', 'focus-mode-t', ja), en, 'en-inline'));
     b.append(el('span', 'focus-mode-sub', sub));
@@ -9460,6 +9473,19 @@ const aiSettle = (box, paint) => {
   if (document.contains(box)) paint();
   else if ($('.sheet')) render();
 };
+/* …and a FAILURE has no archive to be read back from. aiSettle's detached
+ * branch asked for a re-render on the assumption the archive would restore
+ * what was lost — true of a reply, false of the app's own quiet failure
+ * line, which is not an assistant turn and is never archived. So a repaint
+ * during a request that then timed out left the learner with silence and a
+ * re-armed button instead of "could not answer just now"
+ * (E3 round-C, ai-surfaces lens). The line waits here for the next render. */
+const aiNoteSet = (surface, ref, text) => {
+  S.aiNotes ||= {};
+  if (text) S.aiNotes[aiPendingKey(surface, ref)] = text;
+  else delete S.aiNotes[aiPendingKey(surface, ref)];
+};
+const aiNoteFor = (surface, ref) => S.aiNotes?.[aiPendingKey(surface, ref)] || '';
 
 function renderAiTutor(sheet, node, rec) {
   if (!aiKey()) return;
@@ -9472,6 +9498,8 @@ function renderAiTutor(sheet, node, rec) {
   if (aiPendingOn('word-tutor', ref)) {
     btn.disabled = true;
     out.textContent = thinking;
+  } else if (aiNoteFor('word-tutor', ref)) {
+    out.textContent = aiNoteFor('word-tutor', ref);
   } else {
     aiLastReply('word-tutor', ref).then((prev) => {
       if (prev && !out.textContent) out.textContent = prev;
@@ -9480,6 +9508,7 @@ function renderAiTutor(sheet, node, rec) {
   btn.addEventListener('click', async () => {
     if (aiPendingOn('word-tutor', ref)) return;
     aiPendingSet('word-tutor', ref, true);
+    aiNoteSet('word-tutor', ref, '');
     btn.disabled = true;
     out.textContent = thinking;
     try {
@@ -9495,8 +9524,10 @@ function renderAiTutor(sheet, node, rec) {
       });
     } catch {
       aiPendingSet('word-tutor', ref, false);
+      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      aiNoteSet('word-tutor', ref, line);
       aiSettle(out, () => {
-        out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+        out.textContent = line;
       });
     }
     btn.disabled = false;
@@ -9546,6 +9577,8 @@ function renderAiExamples(sheet, node, rec) {
   if (aiPendingOn('examples', exRef)) {
     btn.disabled = true;
     writing();
+  } else if (aiNoteFor('examples', exRef)) {
+    out.append(el('p', 'ai-ex-note', aiNoteFor('examples', exRef)));
   } else {
     aiLastReply('examples', exRef).then((prev) => {
       if (prev && !out.childElementCount && !btn.disabled) paint(prev);
@@ -9554,6 +9587,7 @@ function renderAiExamples(sheet, node, rec) {
   btn.addEventListener('click', async () => {
     if (aiPendingOn('examples', exRef)) return;
     aiPendingSet('examples', exRef, true);
+    aiNoteSet('examples', exRef, '');
     btn.disabled = true;
     writing();
     try {
@@ -9570,9 +9604,11 @@ function renderAiExamples(sheet, node, rec) {
       });
     } catch {
       aiPendingSet('examples', exRef, false);
+      const line = tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.');
+      aiNoteSet('examples', exRef, line);
       aiSettle(out, () => {
         out.textContent = '';
-        out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+        out.append(el('p', 'ai-ex-note', line));
       });
     }
     btn.disabled = false;
@@ -10669,6 +10705,19 @@ function strokeDoor(k) {
 /** One clock for the numbered overlay. The page remembers how many strokes
  * have actually begun even while numbers are switched off, so waking the
  * option never invents a future marker. */
+/* ゆっくり governs the LIVING ink's speed and nothing else — the SVG diagram
+ * the room falls back to carries no speed term at all. Round B removed the
+ * corner under reduced motion and stopped there, so on a device with no
+ * WebGL/WebGPU the control still stood in the corner reporting itself
+ * pressed while the writing ran at exactly one speed
+ * (E3 round-C, writing-room lens). The corner now follows the engine: it is
+ * there while the ink is alive, and gone the moment it is not. */
+function syncSpeedCorner(page) {
+  if (!page) return;
+  const corner = page.querySelector('#stroke-speed');
+  if (corner && page.dataset.living !== 'on') corner.remove();
+}
+
 function syncStrokeNumbers(page, shown = Number(page.dataset.strokeShown || 0)) {
   const markerRoot = inkRoom?.page === page && inkRoom?.lift ? inkRoom.lift : page;
   const markers = [...markerRoot.querySelectorAll('.stroke-num')];
@@ -11382,6 +11431,7 @@ async function mountInkRoom(room2, ch, paths, reduced) {
         if (room.canvas?.isConnected) room.canvas.remove();
         page.dataset.living = 'off';
         page.dataset.inkReady = 'fallback';
+        syncSpeedCorner(page);
         syncStrokeNumbers(page);
       }
     };
@@ -11427,6 +11477,7 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     if (inkRoom === room) {
       page.dataset.living = 'off';
       page.dataset.inkReady = 'fallback';
+      syncSpeedCorner(page);
       canvas.remove(); // no engine and no still — the SVG diagram stands alone
     }
   }

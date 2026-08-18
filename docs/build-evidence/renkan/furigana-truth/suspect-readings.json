@@ -8,11 +8,31 @@
   "tokens": 43540
  },
  "statusCounts": {
-  "lexicon-fixed": 303,
+  "lexicon-fixed": 305,
   "accepted": 8
  },
  "openCount": 0,
  "rows": [
+  {
+   "article": "wikinews:1403",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "屋久",
+   "reading": "やく",
+   "status": "lexicon-fixed",
+   "context": "国内では、屋久島、白神山地に",
+   "note": "屋久島"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 103,
+   "rule": "override-site",
+   "surface": "島",
+   "reading": "しま",
+   "status": "lexicon-fixed",
+   "context": "内では、屋久島、白神山地につぐ",
+   "note": "屋久島"
+  },
   {
    "article": "aozora:051034",
    "token": 42,
