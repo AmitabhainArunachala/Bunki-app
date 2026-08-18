@@ -7,13 +7,13 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-18T14:01:14.742Z",
+  "completedAt": "2026-08-18T17:45:57.422Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
     "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "b6e542c5e0ff5cf6eea1bd09b3cb07a58d6f4dea1a9af077f49e355d057f5e16",
+    "corridorJs": "75d8b6658cb7c00b66f6f2864540619b2c83ab0c49d68f30c8cbf62a06f24098",
     "corridorCss": "92a5d316357a98404bb0819e927a52dd671fa6d1f2cdd2812ae233d9950e6b9f",
     "standalone": "ae87f466f016c1cd91c9cf334bfec56771b4827d1790ec73f5599f4092c0206c",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
@@ -25,10 +25,10 @@
       "bunki-graded-n3-world-beginning": "4257152c997f7a06ba7aef518ebef9c17da973ef59a48602aff7c8072b78a3a8",
       "bunki-graded-n3-hidden-deity": "352adabd7a3e35a5e5edb8664f2362f40acf15f07687bf100189e304507b8489",
       "bunki-graded-n3-kojiki-book": "f3c9c1f695c821ffc972b143dc186c13b5fa5e5bde8eafb853895ce40ad10338",
-      "bunki-graded-n3-hashira-counter": "8ae8e8db1897bff639e53061dd97547d5a3ff9009354f93d7af1f2dd8aee3f93",
+      "bunki-graded-n3-hashira-counter": "55e56b7e8789c92e51bccd74dfc7026808a708958ef9a3eb259a6f8dce64e561",
       "bunki-graded-n3-feel-jingu-forest": "cdf934cdef1f3f6ec6bfa6a1df01c0c492dc2d46cf42d49b0e39fbf138646dd0",
       "bunki-graded-n3-musubi-visual": "bc6bea8f30de56f1a6d95dd6f523ab84e809703603d6c536f2bab883f576e89a",
-      "bunki-graded-n3-gratitude-week": "5d13812e477c920640c9e8b903f26d630e2e6532dc6aeb31274ab2211d76490c",
+      "bunki-graded-n3-gratitude-week": "fe67cc192f9a2b3cfbf17eeea21d692e994e6ef08583fab14282b2643772ff80",
       "bunki-graded-n3-thanks-before-help": "3fd696b3548bb08c58e64a689d1240805b647efa82153ac350fbd28ed653e810",
       "bunki-essay-n2-zoka-as-one": "e2a2a7e0b7bb9f08e3c5a5a139a619e1d23929e4524ce436f800a51690e85a71",
       "bunki-essay-n2-nakaima-time": "20ce0e992a05a4afd9c8664d24a6dde420385c81398e4db32ebaaadd750d5f1b",
@@ -38,7 +38,7 @@
       "bunki-essay-n2-myth-to-book": "564cf6d370dd23806f3014ee2eed91abd2ffd5b5675d9d83fab918ccb497bd94",
       "bunki-essay-n2-feel-jingu-musubi": "59ca1301055ff8c3faa0064f6519b6297d0b9b1a14b237161fdee89e0da9d5c5",
       "bunki-essay-n2-prayer-on-screen": "a76c2c197c6a37fdddb72e131562a31fc4b1c19de4653a80f76d6b2916c6858b",
-      "bunki-essay-n2-thanks-first": "b0a5ed6363761f8cce0db0e6fd4b4d9faf30029740282b8122a42e2f075ce269",
+      "bunki-essay-n2-thanks-first": "623a5823aa329d9d80b0a898070303c212f9dd0eaf8a6828f16b6861d3005176",
       "bunki-essay-n2-testimony-literacy": "f9167f0274191cea51c97c139cd2a1311cfd0650d03cde97d83f083e530db856",
       "bunki-essay-n1-cosmic-analogy": "487cb1d974c42ba5f18345db86f439b2ade3e94073096399bbc4414c54bed88d",
       "bunki-essay-n1-nakaima-time-theory": "03c5bc4e3344106bf8861eb43c1fb5bd4194ef15a9c068ceca15e46dc7167d7e",
@@ -1624,13 +1624,13 @@
     {
       "name": "the reading-override lexicon is committed with provenance and aligned entries",
       "pass": true,
-      "detail": "32 entries · 2 accepts",
+      "detail": "33 entries · 2 accepts",
       "articleId": null
     },
     {
       "name": "every lexicon override site is minted into the curated bodies — no suspect reading left open",
       "pass": true,
-      "detail": "305 lexicon-fixed · 8 accepted across 82 bodies",
+      "detail": "339 lexicon-fixed · 8 accepted across 82 bodies",
       "articleId": null
     },
     {
@@ -1642,7 +1642,7 @@
     {
       "name": "the committed suspect-readings report is empty of unfixed rows and agrees with this recount",
       "pass": true,
-      "detail": "report 305/8/0 vs recount 305/8/0",
+      "detail": "report 339/8/0 vs recount 339/8/0",
       "articleId": null
     },
     {

@@ -2360,7 +2360,28 @@ function invokerKey(node) {
   // the restored results can hand focus back to the row that was left
   if (node.matches?.('.nav-search-row')) return { kind: 'nav-row', ix: node.dataset.ix || '0' };
   if (node.id) return { kind: 'id', id: node.id };
-  return null;
+  // …and every OTHER door into a sheet. Three recognised shapes covered the
+  // reader and the search bar; every list row in the app — 字引's results,
+  // the lists tray, the levels lanes, the thesaurus, the archive — carries
+  // none of them, so closing a sheet opened from a list dropped the keyboard
+  // to <body>: 27 to 45 Tab presses back to the row you were on
+  // (E3 round-D, a11y lens). The same shape-and-text key the render restore
+  // uses answers here too.
+  const shape = focusShapeKey(node);
+  return shape ? { kind: 'shape', ...shape } : null;
+}
+
+/** A control's shape and its own text — the last-resort identity used by both
+ * the render focus restore and the sheet invoker. State classes are stripped:
+ * the press that moved focus is usually the press that flips them. */
+function focusShapeKey(node) {
+  const cls = [...(node.classList || [])].filter((c) => !FOCUS_STATE_CLASSES.has(c));
+  if (!cls.length) return null;
+  const sel = cls.map((c) => `.${CSS.escape(c)}`).join('');
+  const all = [...document.querySelectorAll(sel)];
+  const ix = all.indexOf(node);
+  if (ix < 0) return null;
+  return { sel, ix, text: (node.textContent || '').trim().slice(0, 16) };
 }
 
 function restoreDialogInvoker() {
@@ -2380,6 +2401,8 @@ function restoreDialogInvoker() {
         document.getElementById('nav-search-input');
     } else if (key.kind === 'id') {
       target = document.getElementById(key.id);
+    } else if (key.kind === 'shape') {
+      target = focusNodeFor(document, key);
     }
     target?.focus({ preventScroll: true });
   });
@@ -2439,6 +2462,15 @@ function back() {
   // a learner who opened one and pressed Back left the app entirely with it
   // still on the glass (E3 round-A, dead-ends lens). They dismiss in the
   // order they stack, before any room moves.
+  // …and above all of them, the quick-look mini: a role="dialog" whose only
+  // dismissal was a pointerdown somewhere else. Back walked the ROOM out from
+  // under it and Escape did nothing, in a layer that names itself a dialog
+  // (E3 round-D, dead-ends lens).
+  if (document.getElementById('mini')) {
+    removeMini();
+    syncWalkSentinel();
+    return;
+  }
   if (worldPickerEls) {
     closeWorldPicker();
     return;
@@ -2685,6 +2717,7 @@ let walkConsuming = false;
 function canWalkBack() {
   // the chrome overlays are walkable layers too — the sentinel must stay
   // armed while one is open, or Back would leave the app instead of it
+  if (document.getElementById('mini')) return true;
   if (worldPickerEls || S.captureOpen || S.navOpen) return true;
   if (S.strokes || S.stack.length) return true;
   if (S.view === 'drift') return S.driftDepth > 0;
@@ -3393,6 +3426,24 @@ document.addEventListener(
   },
   true,
 );
+/* …and Escape, which every other dialog in the app answers to */
+document.addEventListener(
+  'keydown',
+  (ev) => {
+    if (ev.key !== 'Escape') return;
+    const mini = document.getElementById('mini');
+    if (!mini) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const opener = mini.dataset.openerIndex
+      ? document.querySelector(`#reader .tok[data-index="${CSS.escape(mini.dataset.openerIndex)}"]`)
+      : null;
+    removeMini();
+    syncWalkSentinel();
+    opener?.focus?.({ preventScroll: true });
+  },
+  true,
+);
 
 function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}) {
   removeMini();
@@ -3407,6 +3458,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
   mini.id = 'mini';
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
+  // the token it was opened from, so Escape can hand the keyboard back to it
+  if (span?.dataset?.index != null) mini.dataset.openerIndex = String(span.dataset.index);
   mini.append(el('span', 'mini-word', token.b));
   // 覚 — the capture door rides the mini too (directive §3): one tap takes
   // the word (with its sentence when held inside an article), one more tap
@@ -3449,6 +3502,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}
   });
   mini.append(entry);
   document.body.append(mini);
+  // a walkable layer: arm the sentinel so device Back dismisses the mini
+  // rather than walking the room out from under it
+  syncWalkSentinel();
   const r = span.getBoundingClientRect();
   const m = mini.getBoundingClientRect();
   const above = r.top > m.height + 70;
@@ -3926,7 +3982,14 @@ function renderReader(main) {
     // 第, 未, 的, 館, 中, 国 — and the room was announcing 818 of them per
     // corpus as proper names (E3 round-C, reader lens). They keep their door,
     // because their reading is worth having; they lose the false title.
-    const properName = kanjiWithReading && !suffix && !prefix;
+    // …and a NUMBER is not a name either. Round C narrowed the rule to
+    // "a noun written in kanji", which is exactly what 一, 十, 百, 三十二 are —
+    // so 383 bare numerals per corpus went on being announced as proper
+    // names after the 818 affixes stopped (E3 round-D, reader lens).
+    const numeral =
+      /^[0-9０-９]+$/.test(String(token.s || '')) ||
+      /^[〇零一二三四五六七八九十百千万億兆]+$/.test(String(token.s || ''));
+    const properName = kanjiWithReading && !suffix && !prefix && !numeral;
     // …and only while there is something for the door to do. With ふりがな
     // always on, the whole offer is already on the page, so it stops being a
     // button rather than standing in the tab order promising nothing
@@ -4012,7 +4075,6 @@ function renderReader(main) {
       // shattered every date into [2005] [年7] [月14] [日、]
       // (E3 rounds B and C, reader lens). 2005年 · 7月 · 14日、 now, and
       // 第29回 and 開催中の hold together as the one phrase each of them is.
-      const numeral = /^[0-9０-９]+$/.test(String(token.s || ''));
       const opensPhrase = (token.c || properName || numeral) && !suffix && !groupHolds;
       if (opensPhrase || !group) {
         group = el('span', 'bunsetsu');
@@ -5582,6 +5644,10 @@ function renderKdxParts(main) {
     clr.type = 'button';
     clr.addEventListener('click', () => {
       S.kdx.parts = [];
+      // clearing the filter destroys this very control — the chosen row goes
+      // with it — so it hands the keyboard forward to the grid it just
+      // reopened, rather than dropping it (E3 round-D, dead-ends lens)
+      handKeyboardTo('#kdx-partfilter, .kdx-chip.kdx-part, .kdx-lens');
       render();
     });
     chosen.append(clr);
@@ -6118,6 +6184,7 @@ function wireParticleGestures(span, particle) {
     });
     mini.append(entry);
     document.body.append(mini);
+    syncWalkSentinel(); // the particle mini is a walkable layer too
     const r = span.getBoundingClientRect();
     const m = mini.getBoundingClientRect();
     const above = r.top > m.height + 70;
@@ -12455,6 +12522,10 @@ const VIEW_CRUMB = {
   ai: ['先生', 'tutor'],
   drift: ['銀河', 'galaxy'],
   dojo: ['銀河', 'galaxy'],
+  yoji: ['四字熟語', 'four-character idioms'],
+  entry: ['野', 'field'],
+  review: ['リスト', 'lists'],
+  archiveYear: ['新聞アーカイブ', 'archive'],
 };
 const trayFromView = (from) => (from === 'reader' ? 'reader' : plainRecord(from) ? from.view : null);
 /* classes a press FLIPS — excluded from the last-resort focus key, or the
@@ -13366,6 +13437,14 @@ function render() {
     if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
     const chip = node.dataset?.chip;
     if (chip) return { sel: `[data-chip="${CSS.escape(chip)}"]` };
+    // …and any other single data-* the control already carries. The chrome's
+    // EN / 日本語 pair has no id, no action and no class of its own — only
+    // data-lang — so it was the one control the net could not key, and every
+    // keyboard press of it dropped focus (E3 round-D, dead-ends lens).
+    for (const [key, value] of Object.entries(node.dataset || {})) {
+      const attr = `data-${key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`;
+      return { sel: `[${attr}="${CSS.escape(String(value))}"]` };
+    }
     // Last resort — a control that names itself in no other way is found by
     // its SHAPE and its place among siblings of that shape. Filter chips in
     // 字引, 文法 and the dojo lobby carry no id and no data-action, so every

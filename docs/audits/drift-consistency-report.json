@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-18T14:36:10.286Z",
-  "finishedAt": "2026-08-18T14:38:49.237Z",
+  "startedAt": "2026-08-18T14:47:16.114Z",
+  "finishedAt": "2026-08-18T14:50:03.577Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -22,16 +22,16 @@
   },
   "gate": {
     "scope": "bounded PR regression slice",
-    "status": "pass",
-    "exitCode": 0,
+    "status": "fail",
+    "exitCode": 1,
     "promotionRule": "pass iff every EXECUTED case is ok, no page/console/fatal errors occur, requested sample counts complete, and the cases the harness could not aim stay within a tenth of the run",
     "unaimedCap": 5,
     "unaimedOver": false
   },
   "totals": {
     "total": 52,
-    "ok": 52,
-    "violations": 0,
+    "ok": 51,
+    "violations": 1,
     "unaimed": 0,
     "pageErrors": 0
   },
@@ -96,16 +96,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 211.3000030517578,
-          "y": 509.95994567871094,
+          "x": 209.97000122070312,
+          "y": 517.6300048828125,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 74.48001384735107,
-          "y": 541.4099731445312,
+          "x": 74.08000469207764,
+          "y": 564.7100219726562,
           "onScreen": true
         }
       },
@@ -173,7 +173,9 @@
   },
   "fatalError": null,
   "pageErrors": [],
-  "clusters": {},
+  "clusters": {
+    "tap-again → dead": 1
+  },
   "cases": [
     {
       "word": "level tide",
@@ -230,9 +232,9 @@
       "theme": "北斎",
       "gesture": "tap-again",
       "expected": "gloss",
-      "outcome": "ok",
-      "detail": "",
-      "shot": null
+      "outcome": "dead",
+      "detail": "no English (op=0.74 pe=\"\" unfolded=false)",
+      "shot": "case-01-tap-again.png"
     },
     {
       "word": "謎",
@@ -543,7 +545,7 @@
       "gesture": "edge-bloom",
       "expected": "right-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(224,491); sats=14",
+      "detail": "anchor=(227,491); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "right-edge",
@@ -556,7 +558,7 @@
       "gesture": "edge-bloom",
       "expected": "top-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(139,239); sats=14",
+      "detail": "anchor=(141,244); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "top-edge",
@@ -569,7 +571,7 @@
       "gesture": "edge-bloom",
       "expected": "bottom-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(148,573); sats=14",
+      "detail": "anchor=(148,574); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "bottom-edge",
@@ -697,8 +699,8 @@
       "seed": 1729,
       "step": 5,
       "coordinates": {
-        "x": 220.14999389648438,
-        "y": 235.8899917602539,
+        "x": 219.79999542236328,
+        "y": 235.89999389648438,
         "satellite": "句読点"
       }
     },
@@ -753,8 +755,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 279.7099914550781,
-        "y": 329.7699890136719,
+        "x": 279.2699890136719,
+        "y": 330.6600036621094,
         "satellite": "議事堂"
       }
     },
@@ -790,8 +792,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 175.30999755859375,
-        "y": 209.8000030517578,
+        "x": 174.50999450683594,
+        "y": 211.32000732421875,
         "satellite": "謎謎"
       }
     },
@@ -808,8 +810,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 205.14999389648438,
-        "y": 283.1700134277344,
+        "x": 204.58999633789062,
+        "y": 285.2099914550781,
         "satellite": "句読点"
       }
     },
@@ -826,10 +828,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 178.52999877929688,
-        "y0": 430.6700134277344,
-        "x1": 208.52999877929688,
-        "y1": 438.6700134277344
+        "x0": 177.9499969482422,
+        "y0": 432.19000244140625,
+        "x1": 207.9499969482422,
+        "y1": 440.19000244140625
       }
     }
   ]
