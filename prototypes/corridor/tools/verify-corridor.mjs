@@ -1536,9 +1536,18 @@ async function main() {
   await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
-  // card 1 · the taken 水 leads the pool — honest intervals, full deck path
+  // card 1 · the taken 水 leads the pool — honest intervals, full deck path.
+  // Because that grade is REAL, T-06 applies here too: the declaration is
+  // the door, and there is no bare 答えを見る on this card (E3 round-D). The
+  // never-taken card below is practice and keeps its single turn-over.
   const dojoTakenFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
-  await page.evaluate(`document.querySelector('#reveal')?.click()`);
+  const dojoTakenGate = await page.evaluate(`({
+    reveal: !!document.querySelector('#reveal'),
+    declare: !!document.querySelector('#declare-recalled') && !!document.querySelector('#declare-notyet'),
+  })`);
+  check('dojo · a card whose grade is real asks the recall question first — no bare reveal (T-06)',
+    dojoTakenGate.declare && !dojoTakenGate.reveal, JSON.stringify(dojoTakenGate));
+  await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
   await page.waitForSelector('.grade-row');
   const dojoTakenRow = await page.evaluate(`(() => ({
     practice: document.querySelector('.grade-row').hasAttribute('data-practice'),
@@ -1565,7 +1574,8 @@ async function main() {
     dojoTakenAfter.srsKeys.length === 1 && dojoTakenAfter.srsKeys[0] === 'kanji:水' &&
       dojoTakenAfter.revlog === 1 && dojoTakenAfter.nnew === 1 && dojoTakenAfter.dojoRows === 0,
     JSON.stringify(dojoTakenAfter));
-  // card 2 · the pool's first never-taken kanji — the seals stamp practice…
+  // card 2 · the pool's first never-taken kanji — practice, so it keeps the
+  // dojo's single turn-over and the seals stamp 稽古
   await page.waitForSelector('#reveal');
   const dojoDrillFront = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
   await page.evaluate(`document.querySelector('#reveal')?.click()`);
@@ -3105,6 +3115,444 @@ async function main() {
     consoleErrors.length === errsBeforeE3,
     consoleErrors.slice(errsBeforeE3).join(' | ') || 'clean');
 
+  // ---------- E3 round-B findings (the closing gate's second command)
+  console.log('\n— E3-B · the dojo draws what it advertises · names are doors · the stones walk back');
+  const errsBeforeE3B = consoleErrors.length;
+
+  // (1) 漢字だけ is a study run, so it must never regrade or mint what the
+  // review queue was not going to surface. Pre-fix a 30-day mature card met
+  // here fell to relearning and a started row minted state past 新規/日 = 0.
+  {
+    const far = new Date(Date.now() + 30 * 86400000).toISOString();
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      srsPrefs: { newPerDay: 0, reviewLimit: 20 },
+      taken: [
+        { t: 'kanji', id: '日', label: '日', kind: '漢字', kindEn: 'kanji', ts: 1, started: 1 },
+        { t: 'kanji', id: '月', label: '月', kind: '漢字', kindEn: 'kanji', ts: 2, started: 2 },
+      ],
+      srs: { 'kanji:日': { due: ${JSON.stringify(far)}, stability: 30, difficulty: 5, elapsed_days: 0,
+        scheduled_days: 30, reps: 4, lapses: 0, state: 2, learning_steps: 0,
+        last_review: ${JSON.stringify(new Date(Date.now() - 86400000).toISOString())} } },
+      revlog: [], obslog: [], stats: {},
+    }))`);
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    const dueNow = await page.evaluate(`window.__KAIRO_SRS__.dueKeys()`);
+    await tap(page, '#ginga-symbol');
+    await page.waitForSelector('.nav-dojo');
+    await tap(page, '.nav-dojo');
+    await page.waitForSelector('.focus-mode');
+    await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+    await page.locator('.focus-start').click();
+    await page.waitForSelector('.review-front', { timeout: 20000 });
+    let practiceEvery = true;
+    for (let card = 0; card < 3; card += 1) {
+      await page.waitForSelector('#reveal, #declare-recalled', { timeout: 8000 });
+      await page.evaluate(`(document.querySelector('#reveal') || document.querySelector('#declare-recalled'))?.click()`);
+      await page.waitForSelector('.grade-row', { timeout: 8000 });
+      if (!(await page.evaluate(`!!document.querySelector('.grade-row[data-practice]')`))) practiceEvery = false;
+      await page.evaluate(`document.querySelector('.grade.g-again')?.click()`);
+      await page.waitForTimeout(250);
+    }
+    const after = await page.evaluate(`(() => {
+      const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      const rec = (e.srs || {})['kanji:日'] || {};
+      return { keys: Object.keys(e.srs || {}).length, state: rec.state, days: rec.scheduled_days,
+               revlog: (e.revlog || []).length,
+               nnew: Object.values(e.stats || {}).reduce((a, s) => a + (s.nnew || 0), 0) };
+    })()`);
+    check('E3-B · the 漢字だけ run schedules nothing the queue would not have drawn — a mature card keeps its 30 days, ペース 0 mints none',
+      dueNow.length === 0 && practiceEvery && after.keys === 1 && after.state === 2 &&
+        after.days === 30 && after.revlog === 0 && after.nnew === 0,
+      JSON.stringify({ dueNow, practiceEvery, ...after }));
+  }
+
+  // (2) the dojo lobby counts what はじめる will actually draw — pre-fix it
+  // read the forecast and advertised cards the block could not open
+  {
+    const soon = new Date();
+    soon.setHours(23, 50, 0, 0);
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1,
+      taken: [{ t: 'kanji', id: '海', label: '海', kind: '漢字', kindEn: 'kanji', ts: 1, started: 1 }],
+      srs: { 'kanji:海': { due: ${JSON.stringify(soon.toISOString())}, stability: 4, difficulty: 5,
+        elapsed_days: 0, scheduled_days: 4, reps: 2, lapses: 0, state: 2, learning_steps: 0,
+        last_review: ${JSON.stringify(new Date(Date.now() - 86400000).toISOString())} } },
+      revlog: [], obslog: [], stats: {},
+    }))`);
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    await tap(page, '#ginga-symbol');
+    await page.waitForSelector('.nav-dojo');
+    await tap(page, '.nav-dojo');
+    await page.waitForSelector('.focus-mode');
+    const lobby = await page.evaluate(`(() => {
+      const mode = document.querySelector('.focus-mode');
+      return { sub: mode?.querySelector('.focus-mode-sub')?.textContent ?? '',
+               due: window.__KAIRO_SRS__.dueKeys().length };
+    })()`);
+    await page.locator('.focus-start').click();
+    await page.waitForTimeout(500);
+    const empty = await page.evaluate(`document.querySelector('.sem-empty')?.textContent ?? ''`);
+    const advertisesNone = /いまは待っていない|nothing waiting right now/.test(lobby.sub);
+    check('E3-B · the dojo lobby counts the POOL, not the forecast — nothing due now says so, and names what ripens tonight',
+      lobby.due === 0 && advertisesNone && /今夜までに 1|1 ripen before tonight/.test(lobby.sub) && !!empty,
+      JSON.stringify({ ...lobby, empty: empty.slice(0, 40) }));
+  }
+
+  // (3) the world stones are a walkable layer: Back closes THEM, and the
+  // room underneath survives to be walked by the next press
+  {
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.locator('button.shelf-open').first().click();
+    await page.waitForSelector('.reader', { timeout: 20000 });
+    await page.evaluate(`window.scrollTo(0, 900)`);
+    await page.waitForTimeout(200);
+    await page.locator('#theme-seal').click();
+    await page.waitForSelector('.world-picker', { timeout: 8000 });
+    await page.goBack();
+    await page.waitForTimeout(400);
+    const afterOne = await page.evaluate(`({
+      picker: !!document.querySelector('.world-picker'),
+      scrim: !!document.querySelector('.world-picker-scrim'),
+      view: document.body.dataset.view,
+      url: location.href.includes('about:blank'),
+    })`);
+    await page.goBack();
+    await page.waitForTimeout(500);
+    const afterTwo = await page.evaluate(`document.body.dataset.view`);
+    check('E3-B · Back closes the stones and leaves the room standing — the second press walks it',
+      !afterOne.picker && !afterOne.scrim && afterOne.view === 'reader' && afterTwo === 'shelf',
+      JSON.stringify({ afterOne, afterTwo }));
+
+    // the front door: the stones must not take the app out with them
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    await page.evaluate(`document.querySelector('#ginga-theme-seal, #theme-seal')?.click()`);
+    await page.waitForSelector('.world-picker', { timeout: 8000 });
+    await page.goBack();
+    await page.waitForTimeout(400);
+    const home = await page.evaluate(`({ gone: !document.querySelector('.world-picker'), ready: document.body.dataset.ready })`);
+    check('E3-B · the stones on the front door close on Back instead of leaving the app',
+      home.gone && home.ready === '1', JSON.stringify(home));
+  }
+
+  // (4) the stones are modal for the keyboard too
+  {
+    const trapped = await page.evaluate(`(() => {
+      const seal = document.querySelector('#ginga-theme-seal, #theme-seal');
+      if (!seal) return { reason: 'no seal' };
+      seal.click();
+      const pop = document.querySelector('.world-picker');
+      if (!pop) return { reason: 'no picker' };
+      const inerted = [...document.body.children].filter((n) => n.hasAttribute('inert')).length;
+      return { modal: pop.getAttribute('aria-modal'), inerted,
+               focusInside: pop.contains(document.activeElement) };
+    })()`);
+    check('E3-B · the stones contain the keyboard — aria-modal, the room beneath inert, focus inside',
+      trapped.modal === 'true' && trapped.inerted >= 1 && trapped.focusInside,
+      JSON.stringify(trapped));
+    await page.evaluate(`document.querySelector('.world-picker-scrim')?.click()`);
+    await page.waitForTimeout(200);
+  }
+
+  // (5) a name written in kanji is a door that says what it is and does it
+  {
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.locator('button.shelf-open').first().click();
+    await page.waitForSelector('.reader', { timeout: 20000 });
+    await settleReader(page);
+    const names = await page.evaluate(`(() => {
+      const all = [...document.querySelectorAll('.tok.named')];
+      return { n: all.length,
+               labelled: all.filter((b) => (b.getAttribute('aria-label') || '').length > 2).length,
+               acting: all.filter((b) => b.dataset.action === 'target.activate').length,
+               pressed: all.filter((b) => b.getAttribute('aria-pressed') !== null).length };
+    })()`);
+    let reveals = null;
+    if (names.n) {
+      reveals = await page.evaluate(`(() => {
+        const b = document.querySelector('.tok.named');
+        const before = { rt: b.querySelectorAll('rt:not(.hidden-rt)').length, pressed: b.getAttribute('aria-pressed') };
+        b.click();
+        const after = { rt: b.querySelectorAll('rt:not(.hidden-rt)').length, pressed: b.getAttribute('aria-pressed') };
+        b.click();
+        const back = { rt: b.querySelectorAll('rt:not(.hidden-rt)').length, pressed: b.getAttribute('aria-pressed') };
+        return { before, after, back };
+      })()`);
+    }
+    check('E3-B · every name-token door carries an accessible name, an action and its pressed state',
+      names.n === 0 || (names.labelled === names.n && names.acting === names.n && names.pressed === names.n),
+      JSON.stringify(names));
+    check('E3-B · pressing a name shows its reading, and pressing again puts it back',
+      names.n === 0 ||
+        (reveals.after.rt > reveals.before.rt && reveals.after.pressed === 'true' &&
+          reveals.back.rt === reveals.before.rt && reveals.back.pressed === 'false'),
+      JSON.stringify(reveals));
+  }
+
+  // (6) the keyboard is handed forward at both review gates
+  {
+    // seeded rather than walked: this probe is about the KEYBOARD, and the
+    // reader's capture panel intercepts the clicks a walk would need
+    const e3bWords = ['学校', '先生', '時間', '毎日'];
+    const e3bCard = {
+      due: new Date(Date.now() - 3600000).toISOString(),
+      stability: 3, difficulty: 5, elapsed_days: 1, scheduled_days: 1,
+      reps: 2, lapses: 0, state: 2, learning_steps: 0,
+      last_review: new Date(Date.now() - 90000000).toISOString(),
+    };
+    const e3bSeed = {
+      v: 1,
+      taken: e3bWords.map((id, i) => ({ t: 'word', id, label: id, kind: '語', kindEn: 'word', ts: i + 1, started: i + 1 })),
+      srs: Object.fromEntries(e3bWords.map((id) => [`word:${id}`, e3bCard])),
+      revlog: [], obslog: [], stats: {},
+    };
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', ${JSON.stringify(JSON.stringify(e3bSeed))})`);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.evaluate(`document.querySelector('#tray')?.click()`);
+    await page.waitForTimeout(400);
+    await page.evaluate(`document.querySelector('#review-start')?.click()`);
+    await page.waitForTimeout(400);
+    const atGate = await page.evaluate(`document.activeElement?.id ?? ''`);
+    await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    await page.waitForTimeout(400);
+    const atGrades = await page.evaluate(`({
+      cls: document.activeElement?.className ?? '',
+      body: document.activeElement === document.body,
+    })`);
+    check('E3-B · the review hands the keyboard forward — the card gate, then the grade stamps',
+      atGate === 'declare-recalled' && !atGrades.body && /grade/.test(atGrades.cls),
+      JSON.stringify({ atGate, ...atGrades }));
+  }
+
+  // (7) a press inside the sheet keeps the keyboard where it was
+  {
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.evaluate(`document.querySelector('#search')?.focus()`);
+    await page.locator('#search').fill('学校');
+    await page.waitForTimeout(500);
+    await page.evaluate(`document.querySelector('[data-result^="word:"]')?.click()`);
+    await page.waitForSelector('.sheet', { timeout: 8000 });
+    const kept = await page.evaluate(`(() => {
+      const take = document.querySelector('#sheet-take');
+      if (!take) return { reason: 'no take' };
+      take.focus();
+      take.click();
+      return { id: document.activeElement?.id ?? '', pressed: document.querySelector('#sheet-take')?.getAttribute('aria-pressed') };
+    })()`);
+    await page.waitForTimeout(300);
+    const settled = await page.evaluate(`document.activeElement?.id ?? ''`);
+    check('E3-B · 覚える inside a sheet keeps the keyboard on itself instead of throwing it to 戻る',
+      settled === 'sheet-take', JSON.stringify({ kept, settled }));
+    const chips = await page.evaluate(`(() => {
+      const rows = [...document.querySelectorAll('.context-picker .chip')];
+      return { n: rows.length, stated: rows.filter((c) => c.getAttribute('aria-pressed') !== null).length,
+               on: rows.filter((c) => c.getAttribute('aria-pressed') === 'true').length };
+    })()`);
+    check('E3-B · the card-context chips state which one is chosen, in the accessibility tree',
+      chips.n === 0 || (chips.stated === chips.n && chips.on === 1), JSON.stringify(chips));
+    await page.evaluate(`document.querySelector('#sheet-back')?.click()`);
+    await page.waitForTimeout(200);
+  }
+
+  // (8) the ペース steppers keep the keyboard, and one row's 44px is its own
+  {
+    await page.evaluate(`document.querySelector('#tray')?.click()`);
+    await page.waitForTimeout(300);
+    const pace = await page.evaluate(`(() => {
+      document.querySelector('#srs-prefs-toggle')?.click();
+      const down = document.querySelector('#pref-down-newPerDay');
+      if (!down) return { reason: 'no stepper' };
+      down.focus();
+      down.click();
+      return { focus: document.activeElement?.id ?? '' };
+    })()`);
+    await page.waitForTimeout(300);
+    const paceAfter = await page.evaluate(`(() => {
+      const down = document.querySelector('#pref-down-newPerDay');
+      const rect = down.getBoundingClientRect();
+      const below = document.elementFromPoint(rect.left + rect.width / 2, rect.bottom + 6);
+      const rows = [...document.querySelectorAll('.srs-pref-row')].map((r) => Math.round(r.getBoundingClientRect().height));
+      return { focus: document.activeElement?.id ?? '',
+               belowIsMine: !!down.contains(below) || below === down,
+               rows };
+    })()`);
+    check('E3-B · a ペース stepper keeps the keyboard, and its 44px belongs to its own row',
+      paceAfter.focus === 'pref-down-newPerDay' && paceAfter.belowIsMine &&
+        paceAfter.rows.every((h) => h >= 44),
+      JSON.stringify({ pace, ...paceAfter }));
+  }
+
+  // (9) 読み込む never destroys a record to find out the replacement is unreadable
+  {
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1, taken: [{ t: 'kanji', id: '空', label: '空', kind: '漢字', kindEn: 'kanji', ts: 7, started: 7 }],
+      srs: {}, revlog: [], obslog: [], stats: {},
+    }))`);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.evaluate(`document.querySelector('#tray')?.click()`);
+    await page.waitForTimeout(300);
+    // the fixture is a throwaway, not evidence — it lives in the OS tmpdir
+    // like the R3-D parameter fixture above, never in the repo
+    const badPath = join(mkdtempSync(join(tmpdir(), 'e3b-bad-')), 'unreadable-record.json');
+    writeFileSync(badPath, JSON.stringify({ v: 2, taken: [] }));
+    await page.setInputFiles('#import-file', badPath);
+    await page.waitForTimeout(600);
+    const survived = await page.evaluate(`(() => {
+      const raw = localStorage.getItem('kairo-corridor-v1');
+      const e = JSON.parse(raw);
+      return { v: e.v, taken: (e.taken || []).length,
+               note: document.querySelector('.airead-note')?.textContent ?? '' };
+    })()`);
+    check('E3-B · an unreadable record is refused BEFORE the learner\'s own is overwritten',
+      survived.v === 1 && survived.taken === 1 && survived.note.length > 0,
+      JSON.stringify(survived));
+  }
+
+  // (10) 検収前 names its own reason instead of borrowing another pool's story
+  {
+    await open('?entry=shelf');
+    await page.waitForTimeout(400);
+    const notes = await page.evaluate(`(async () => {
+      const card = [...document.querySelectorAll('[data-passage]')].find((n) => n.dataset.passage.startsWith('yasashii:'));
+      if (!card) return { reason: 'no yasashii card' };
+      card.querySelector('.shelf-open')?.click();
+      await new Promise((r) => setTimeout(r, 1400));
+      return { notes: [...document.querySelectorAll('main .note')].map((n) => n.textContent) };
+    })()`);
+    const joined = (notes.notes || []).join(' | ');
+    check('E3-B · a rights-pending row explains ITS review, not the wikinews archive freeze',
+      !notes.reason
+        ? /利用条件|terms this source/.test(joined) && !/凍結アーカイブ|archive froze/.test(joined)
+        : true,
+      JSON.stringify(notes).slice(0, 220));
+  }
+
+  // (11) the licence panel states every pool it actually paints from
+  {
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    const licences = await page.evaluate(`(() => {
+      document.querySelector('#sources-toggle')?.click();
+      return document.body.innerText;
+    })()`);
+    check('E3-B · the sources fold names AnimCJK and its Arphic licence — the glyph data the writing room paints',
+      /AnimCJK/.test(licences) && /Arphic/.test(licences),
+      /AnimCJK/.test(licences) ? 'declared' : 'missing');
+  }
+
+  // (12) undoing a drill does not inflate the 出会い trail
+  {
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
+      v: 1, taken: [{ t: 'kanji', id: '学', label: '学', kind: '漢字', kindEn: 'kanji', ts: 1 }],
+      srs: {}, revlog: [], obslog: [], stats: {},
+    }))`);
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    await tap(page, '#ginga-symbol');
+    await page.waitForSelector('.nav-dojo');
+    await tap(page, '.nav-dojo');
+    await page.waitForSelector('.focus-mode');
+    await page.locator('.focus-mode', { hasText: '漢字だけ' }).click();
+    await page.locator('.focus-start').click();
+    await page.waitForSelector('.review-front', { timeout: 20000 });
+    await page.evaluate(`(document.querySelector('#reveal') || document.querySelector('#declare-recalled'))?.click()`);
+    await page.waitForSelector('.grade-row', { timeout: 8000 });
+    await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
+    await page.waitForTimeout(350);
+    const trailAfterGrade = await page.evaluate(`(() => {
+      const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      return (e.obslog || []).filter((r) => r[1] === 'dojo').length;
+    })()`);
+    // ひとつ戻す lives behind the card's もっと row
+    await page.evaluate(`document.querySelector('#zen-more')?.click()`);
+    await page.waitForTimeout(300);
+    await page.evaluate(`document.querySelector('.review-undo')?.click()`);
+    await page.waitForTimeout(450);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.locator('#search').fill('学');
+    await page.waitForTimeout(500);
+    await page.evaluate(`document.querySelector('[data-result="kanji:学"]')?.click()`);
+    await page.waitForSelector('.sheet', { timeout: 8000 });
+    const trail = await page.evaluate(`document.querySelector('.encounter-trail')?.innerText ?? ''`);
+    check('E3-B · taking back a drill does not add a practice record to the 出会い trail',
+      trailAfterGrade === 1 && !/2\\s*(回|practice|encounters)/.test(trail) &&
+        (/取り消した|took back/.test(trail) || !/稽古|practice/.test(trail)),
+      JSON.stringify({ trailAfterGrade, trail: trail.replace(/\\n/g, ' / ').slice(0, 160) }));
+  }
+
+  // (13) a reload leaves no inert history stop — the corridor never eats a press
+  {
+    await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+    await page.locator('button.shelf-open').first().click();
+    await page.waitForSelector('.reader', { timeout: 20000 });
+    await page.waitForTimeout(300);
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.waitForTimeout(500);
+    const bootView = await page.evaluate(`document.body.dataset.view`);
+    const bootLen = await page.evaluate(`history.length`);
+    await page.goBack();
+    await page.waitForTimeout(600);
+    const afterBack = await page
+      .evaluate(`({ ready: document.body?.dataset?.ready ?? null, view: document.body?.dataset?.view ?? null })`)
+      .catch(() => ({ ready: null, view: null }));
+    // either the press walked the app somewhere or it left it — what it must
+    // never do is land on a stop that does nothing at all
+    const answered = afterBack.ready !== '1' || afterBack.view !== bootView;
+    check('E3-B · the first Back after a reload is answered, not eaten',
+      answered, JSON.stringify({ bootView, bootLen, afterBack }));
+    await open('?entry=shelf');
+    await page.waitForTimeout(300);
+  }
+
+  // (14) a page nobody is looking at is a room they have left — the galaxy
+  // held 94-96% of the main thread for as long as the page existed, whether
+  // or not anyone was watching. Driven through the drift's own public seam,
+  // so its physics and gesture grammar stay untouched (#46).
+  {
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    await page.waitForTimeout(1200);
+    const sleep = await page.evaluate(`(() => {
+      const layer = document.getElementById('drift-layer');
+      const awake = !!layer?.classList.contains('active');
+      Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true });
+      Object.defineProperty(document, 'hidden', { get: () => true, configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      return { awake, asleep: !document.getElementById('drift-layer')?.classList.contains('active') };
+    })()`);
+    await page.waitForTimeout(200);
+    const woke = await page.evaluate(`(() => {
+      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+      Object.defineProperty(document, 'hidden', { get: () => false, configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      return !!document.getElementById('drift-layer')?.classList.contains('active');
+    })()`);
+    check('E3-B · the galaxy sleeps when the page is hidden and wakes when it is not',
+      sleep.awake && sleep.asleep && woke, JSON.stringify({ ...sleep, woke }));
+  }
+
+  check('E3-B · the probes leave no console errors',
+    consoleErrors.length === errsBeforeE3B,
+    consoleErrors.slice(errsBeforeE3B).join(' | ') || 'clean');
+
+  // hand the next block a clean store through a navigation, as R4-B expects
+  await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1 }))`);
+  await open('?entry=shelf');
+  await page.waitForTimeout(400);
+
   // hand the next block the store it expects: a seed written straight to
   // localStorage is overwritten by the LIVE page's pagehide flush, so the
   // reset has to travel through a navigation to clear memory as well
@@ -3239,9 +3687,22 @@ async function main() {
   await page.locator('.focus-mode', { hasText: '覚えるの札' }).click();
   await page.locator('.focus-start').click();
   await page.waitForSelector('.review-front', { timeout: 20000 });
+  // The two laps differ in kind, and the FRONT FACE now says so (E3 round-D):
+  // lap one grades for real, so T-06 applies and the declaration is the only
+  // door; lap two is practice, so the dojo keeps its single turn-over.
+  // both cards of the FIRST lap grade for real, so T-06 applies to each: the
+  // declaration is the only door, and there is no bare 答えを見る until the
+  // refill's practice pass (E3 round-D). The lap-two face is asserted at the
+  // 稽古 probe below, where lap two actually begins.
   for (let i = 0; i < 2; i += 1) {
-    await page.waitForSelector('#reveal');
-    await page.evaluate(`document.querySelector('#reveal')?.click()`);
+    await page.waitForSelector('#declare-recalled', { timeout: 20000 });
+    const face = await page.evaluate(`({
+      reveal: !!document.querySelector('#reveal'),
+      declare: !!document.querySelector('#declare-recalled'),
+    })`);
+    check('R4-B · a first-lap card asks the recall question — a real grade has no bare reveal (T-06)',
+      face.declare && !face.reveal, JSON.stringify(face));
+    await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
     await page.waitForSelector('.grade-row');
     if (i === 0) {
       const lap1 = await page.evaluate(`({
@@ -3270,7 +3731,16 @@ async function main() {
     `revlog ${lap1After.revlog} · dojo rows ${lap1After.dojoRows}`);
   await page.waitForSelector('.review-front');
   const lap2Front = await page.evaluate(`document.querySelector('.review-front')?.textContent ?? ''`);
+  // …and HERE the face changes back: a practice pass promises the schedule
+  // nothing, so the dojo keeps its single turn-over and asks no declaration
+  // (E3 round-D — the boundary the law draws)
   await page.waitForSelector('#reveal');
+  const lap2Face = await page.evaluate(`({
+    reveal: !!document.querySelector('#reveal'),
+    declare: !!document.querySelector('#declare-recalled'),
+  })`);
+  check('R4-B · lap two keeps the dojo turn-over — practice asks no recall declaration',
+    lap2Face.reveal && !lap2Face.declare, JSON.stringify(lap2Face));
   await page.evaluate(`document.querySelector('#reveal')?.click()`);
   await page.waitForSelector('.grade-row[data-practice]', { timeout: 8000 });
   const lap2Whens = await page.evaluate(
@@ -3297,7 +3767,15 @@ async function main() {
 
   // (c) POL-13 · the tutor's quiz survives reload: the seeded run stands in
   // the envelope exactly as the app would persist it — no key, no deck, no
-  // network — and the tray's resume door reopens it where it stood
+  // network — and the tray's resume door reopens it where it stood.
+  //
+  // Navigate FIRST, then seed. The lap probes above end with a declaration,
+  // whose obslog row is debounce-persisted, so the live page still holds a
+  // pending write: seeding before the navigation let that page's pagehide
+  // flush land on top and erase the seeded quiz (the same trap this file
+  // names at the E3-A hand-off).
+  await open('?entry=shelf');
+  await page.waitForTimeout(400);
   await page.evaluate(`localStorage.setItem('kairo-corridor-v1', JSON.stringify({
     v: 1,
     aiQuiz: {

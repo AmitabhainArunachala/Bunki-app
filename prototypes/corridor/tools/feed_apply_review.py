@@ -55,6 +55,8 @@ from feed_ingest import (  # noqa: E402
     INDEX_PATH,
     QUEUE_PATH,
     REPO,
+    TITLE_EN_SOURCE,
+    load_titles,
     page_number,
 )
 
@@ -74,6 +76,13 @@ def restore_to_archive(candidate_id: str, archive_index: dict, tagger, jlpt_maps
     if source is None:
         raise SystemExit(f"{candidate_id}: not in {ARCHIVE_JSONL} — cannot restore")
     meta = source.get("meta", {})
+    # The English title travels with the row. A rejected mint used to come
+    # back without one — the single row out of 683 with no titleEn, so the
+    # shelf's `if (bi() && a.titleEn)` silently dropped it in bilingual mode
+    # and that one article read Japanese-only for no reason a learner could
+    # see (E3 round-D, data-licence lens). It is the same map the mint used,
+    # carried across with its provenance rather than re-derived.
+    title_en = load_titles().get(source["id"], "")
     a = {
         "id": source["id"],
         "title": source["title"],
@@ -88,6 +97,9 @@ def restore_to_archive(candidate_id: str, archive_index: dict, tagger, jlpt_maps
         "rubySource": "tokenizer",
         "file": "archive/" + ba.slugify(source["id"]) + ".json",
     }
+    if title_en:
+        a["titleEn"] = title_en
+        a["titleEnSource"] = TITLE_EN_SOURCE
     tokens, para_starts = ba.tokenise_paragraphs(a["text"], tagger)
     grading = ba.grade_article(a["text"], tokens, tagger, jlpt_maps)
     # The body is ALWAYS rewritten from a fresh tokenisation. A pre-promotion

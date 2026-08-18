@@ -1534,9 +1534,26 @@ verified('dojo-refill-second-lap-is-practice', () => {
   // an empty pool refuses the refill
   context.S.focus = { pool: [], cursor: 0 };
   assert.equal(context.__refill({ queue: [] }), false);
-  // and the grade path honours the mark inside the dojo branch alone
+  // and the grade path honours the mark inside the dojo branch alone. The
+  // test now lives in one predicate asked in three places (E3 round-D): the
+  // front face, the seals, and the commit were disagreeing, so the face
+  // offered a bare reveal on cards the commit then scheduled for real.
   const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
-  assert.match(gradeRegion, /S\.focus &&\s*\(item\.drillPass === true \|\|/);
+  assert.match(gradeRegion, /const drillOnly = practiceOnlyGrade\(item\);/);
+  const practiceTest = between('function practiceOnlyGrade(item) {', 'function advanceReviewSession(');
+  // a drill mark only means practice INSIDE a focus block…
+  assert.match(practiceTest, /!!S\.focus &&\s*\(item\.drillPass === true \|\|/);
+  // …and a row that has left 覚える is practice in every room (round C)
+  assert.match(practiceTest, /!takenRow \|\|/);
+
+  // 想起の二道 (ADR-002 T-06) follows the SCHEDULE, not the room. The bare
+  // turn-over belongs to practice; where a grade is real the declaration is
+  // the door, and まだ forces Again. Both were keyed on `S.focus`, which
+  // exempted the dojo's DEFAULT mode — where lap one grades for real
+  // (E3 round-D, srs-wiring lens).
+  // the face and the commit ask the SAME question — they were disagreeing
+  const faceRegion = between('if (!rv.revealed) {', 'const now = new Date();');
+  assert.match(faceRegion, /if \(practiceOnlyGrade\(item\)\) \{/);
 });
 
 verified('every-in-app-mint-carries-the-started-mark', () => {
@@ -1616,16 +1633,30 @@ verified('bounded-handlers-call-executed-actions', () => {
 });
 
 verified('declared-recall-gate-forces-again-and-logs-the-declaration', () => {
-  // T-06 (ADR-002): the zen room has NO bare reveal — the only two doors
-  // through the front face are the declaration buttons, the dojo keeps its
-  // own single 答えを見る strictly inside the S.focus branch
+  // T-06 (ADR-002): a learner who saw the answer before recalling did not
+  // recall it — so wherever a grade touches the SCHEDULE, the declaration is
+  // the only door through the front face. The bare 答えを見る belongs to
+  // PRACTICE alone.
+  //
+  // This gate used to be keyed on `S.focus` — "the dojo keeps its own single
+  // 答えを見る strictly inside the S.focus branch" — and that was measurably
+  // wrong: the dojo's DEFAULT 覚えるの札 mode draws real due cards and
+  // commitStandardGrade writes srs, revlog and stats, so a card due now went
+  // out 34 days on a grade pressed after reading the answer, with nothing in
+  // the durable record to tell it from an honest Easy (E3 round-D,
+  // srs-wiring lens; measured front face reveal-only → four live seals).
+  // The assertion follows the law, not the room.
   const frontFace = between('if (!rv.revealed) {', 'const now = new Date();');
-  const focusBranch = betweenIn(frontFace, 'if (S.focus) {', 'const declare = (declared) => {');
-  assert.match(focusBranch, /btn\.id = 'reveal'/);
+  const practiceBranch = betweenIn(
+    frontFace,
+    'if (practiceOnlyGrade(item)) {',
+    'const declare = (declared) => {',
+  );
+  assert.match(practiceBranch, /btn\.id = 'reveal'/);
   assert.doesNotMatch(
-    frontFace.replace(focusBranch, ''),
+    frontFace.replace(practiceBranch, ''),
     /id = 'reveal'|revealed = true;\s*\n\s*render/,
-    'outside the dojo branch nothing reveals without a declaration',
+    'outside the practice branch nothing reveals without a declaration',
   );
   assert.match(frontFace, /declare-notyet/);
   assert.match(frontFace, /declare-recalled/);
@@ -1637,7 +1668,10 @@ verified('declared-recall-gate-forces-again-and-logs-the-declaration', () => {
   // まだ narrows the row to the one honest seal AND forces the rating at
   // the commit — the declaration, never the button, names the grade
   const gradeRegion = between('const grades = [', '  main.append(row);');
-  assert.match(gradeRegion, /const notRecalled = !S\.focus && rv\.declared === 0;/);
+  // …and the forcing answers to the same law: まだ means Again wherever the
+  // grade is real, and practice needs no forcing because it promises the
+  // schedule nothing
+  assert.match(gradeRegion, /const notRecalled = !drillOnly && rv\.declared === 0;/);
   assert.match(gradeRegion, /if \(notRecalled && rating !== 'Again'\) continue;/);
   assert.match(gradeRegion, /const effRating = notRecalled \? 'Again' : rating;/);
   assert.match(gradeRegion, /rating: fsrsApi\.Rating\[effRating\]/);

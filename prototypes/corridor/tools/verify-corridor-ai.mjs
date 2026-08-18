@@ -308,6 +308,22 @@ async function main() {
   check('quiz · the exchange lands whole in the archive',
     exchangeShape(quizRows, 'quiz', OVERRIDE_MODEL), `${quizRows.length} rows`);
 
+  // E3 round-B · the crumb names the room 戻る actually reopens. It read
+  // 本棚 › 小テスト while the quiz's only door is the lists tray, skipping the
+  // room the press goes to (dead-ends lens).
+  const quizCrumb = await page.evaluate(`document.querySelector('.crumb')?.textContent ?? ''`);
+  check('E3-B · the quiz crumb names the lists tray it came from, not a bookshelf it never touched',
+    /リスト|lists/.test(quizCrumb), JSON.stringify(quizCrumb));
+
+  // E3 round-B · a second request cannot replace a quiz in flight or in play:
+  // the request is state, so the door stays sealed across a full re-render
+  const quizGuard = await page.evaluate(`(() => {
+    const before = document.querySelector('.aiq-q')?.textContent ?? '';
+    return { before, start: !!document.querySelector('#aiq-start') };
+  })()`);
+  check('E3-B · while a quiz stands, the tray offers 続きから — never a second request that would replace it',
+    quizGuard.before.length > 0 && !quizGuard.start, JSON.stringify(quizGuard).slice(0, 120));
+
   // POL-13 · the run itself is durable: reload mid-quiz and the tray offers
   // the way back in — the SAME tutor-written question stands, and the stub
   // counts zero new provider calls (the init script resets it per navigation)

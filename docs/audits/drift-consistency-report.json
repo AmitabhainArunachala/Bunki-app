@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-16T17:11:17.030Z",
-  "finishedAt": "2026-08-16T17:13:38.749Z",
+  "startedAt": "2026-08-18T18:43:30.342Z",
+  "finishedAt": "2026-08-18T18:46:05.393Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -24,12 +24,15 @@
     "scope": "bounded PR regression slice",
     "status": "pass",
     "exitCode": 0,
-    "promotionRule": "pass iff every executed case is ok, no page/console/fatal errors occur, and requested sample counts complete"
+    "promotionRule": "pass iff every EXECUTED case is ok, no page/console/fatal errors occur, requested sample counts complete, and the cases the harness could not aim stay within a tenth of the run",
+    "unaimedCap": 5,
+    "unaimedOver": false
   },
   "totals": {
     "total": 52,
     "ok": 52,
     "violations": 0,
+    "unaimed": 0,
     "pageErrors": 0
   },
   "coverage": {
@@ -93,16 +96,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 211.49000549316406,
-          "y": 497.7099914550781,
+          "x": 232.260009765625,
+          "y": 520.510009765625,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 74.73001384735107,
-          "y": 503.16001892089844,
+          "x": 74.48001480102539,
+          "y": 543.9600219726562,
           "onScreen": true
         }
       },
@@ -521,16 +524,17 @@
       "state": "bloom"
     },
     {
-      "word": "単なる",
-      "kanji": 1,
+      "word": "取り上げる",
+      "kanji": 2,
       "theme": "北斎",
       "gesture": "edge-bloom",
       "expected": "left-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(115,284); sats=13",
+      "detail": "anchor=(133,313); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "left-edge"
+      "zone": "left-edge",
+      "settled": true
     },
     {
       "word": "量",
@@ -539,10 +543,11 @@
       "gesture": "edge-bloom",
       "expected": "right-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(227,491); sats=14",
+      "detail": "anchor=(225,491); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "right-edge"
+      "zone": "right-edge",
+      "settled": true
     },
     {
       "word": "手間",
@@ -551,10 +556,11 @@
       "gesture": "edge-bloom",
       "expected": "top-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(268,243); sats=14",
+      "detail": "anchor=(267,238); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "top-edge"
+      "zone": "top-edge",
+      "settled": true
     },
     {
       "word": "外出",
@@ -566,7 +572,8 @@
       "detail": "anchor=(148,573); sats=14",
       "shot": null,
       "state": "bloom",
-      "zone": "bottom-edge"
+      "zone": "bottom-edge",
+      "settled": true
     },
     {
       "word": "first-touch cue",
@@ -690,8 +697,8 @@
       "seed": 1729,
       "step": 5,
       "coordinates": {
-        "x": 220.77999114990234,
-        "y": 235.92998504638672,
+        "x": 219.63999938964844,
+        "y": 235.75,
         "satellite": "句読点"
       }
     },
@@ -746,8 +753,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 280.1600036621094,
-        "y": 328.8900146484375,
+        "x": 279.35997772216797,
+        "y": 330.1700134277344,
         "satellite": "議事堂"
       }
     },
@@ -783,8 +790,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 176.52000427246094,
-        "y": 207.97000122070312,
+        "x": 174.89999389648438,
+        "y": 210.39999389648438,
         "satellite": "謎謎"
       }
     },
@@ -801,8 +808,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 206.61000061035156,
-        "y": 280.260009765625,
+        "x": 204.75999450683594,
+        "y": 284.5400085449219,
         "satellite": "句読点"
       }
     },
@@ -819,10 +826,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 179.17999267578125,
-        "y0": 428.1000061035156,
-        "x1": 209.17999267578125,
-        "y1": 436.1000061035156
+        "x0": 178.2899932861328,
+        "y0": 431.44000244140625,
+        "x1": 208.2899932861328,
+        "y1": 439.44000244140625
       }
     }
   ]

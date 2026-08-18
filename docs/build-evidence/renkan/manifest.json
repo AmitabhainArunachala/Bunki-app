@@ -1,120 +1,303 @@
 {
- "campaign": "docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md",
- "branch": "claude/renkan-one-push-2026-08-16",
- "base": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
- "pr": 74,
- "round": 2,
- "head": "c5a1e3915efc30f0206ecf051681ba188ee72bf7",
- "rounds": [
-  {
-   "round": 0,
-   "closedAt": "042d87d",
-   "landings": [
+  "campaign": "docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md",
+  "branch": "claude/renkan-round-b-2026-08-18 (follow-up; the campaign branch claude/renkan-one-push-2026-08-16 merged as ae1d901)",
+  "base": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+  "pr": 77,
+  "round": "B",
+  "head": "ea8252a9021d2eaccfff406204f00c686b77f361",
+  "rounds": [
     {
-     "what": "corpus spine (PR #60 ancestry, content no-op)",
-     "sha": "a14dcbd"
+      "round": 0,
+      "closedAt": "042d87d",
+      "landings": [
+        {
+          "what": "corpus spine (PR #60 ancestry, content no-op)",
+          "sha": "a14dcbd"
+        },
+        {
+          "what": "FSRS optimizer harvest (donor f8c3b03)",
+          "sha": "fa78a65"
+        }
+      ],
+      "battery": "14/14 GREEN (battery-baseline/SUMMARY.md)"
     },
     {
-     "what": "FSRS optimizer harvest (donor f8c3b03)",
-     "sha": "fa78a65"
+      "round": 1,
+      "workflow": "wf_0c28e955-c23 (13 agents; 5 triage + 4 build + 4 verify)",
+      "landings": [
+        {
+          "wp": "A1a drift judgment bridge",
+          "donor": "86fa4d3",
+          "landed": "db46914",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "A1b dojo practice obslog",
+          "donor": "8a02e1f",
+          "landed": "f757944",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "A2 AI runtime honesty",
+          "donor": "9a81418",
+          "landed": "bdddc28",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "B3 titleEn as data",
+          "donor": "fe2a929",
+          "landed": "ca14e09",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "standalone regeneration (builder-only)",
+          "landed": "0f3aac3"
+        },
+        {
+          "wp": "sent-door 44px hit region (integration-exposed latent defect)",
+          "landed": "e8b0ccd"
+        }
+      ],
+      "triage": "triage-round1.json — 83 findings: 33 FIXED / 39 OPEN / 11 PARTIAL",
+      "battery": "see battery-round1/SUMMARY.md (fresh full run on e8b0ccd)"
+    },
+    {
+      "round": 2,
+      "workflow": "wf_03729f77-e93 (17 agents: 4 build + 4 verify + 6 fleet + 3 hunt) + direct agents R2-X/R2-Y",
+      "landings": [
+        {
+          "wp": "R2-X app kernel (budget, lookup friction)",
+          "donor": "0cccfd4",
+          "landed": "184b258",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "fleet: 694 archive titleEn",
+          "landed": "c17bd76",
+          "verdict": "lander-verified"
+        },
+        {
+          "wp": "R2-B capture sovereignty",
+          "donor": "c2d1e4c",
+          "landed": "78bfaad",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "R2-A SRS/review integrity + ADR-003",
+          "donor": "ec69050",
+          "landed": "98c0eab",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "R2-D feed loop",
+          "donor": "3f394a7",
+          "landed": "a83b2b9+convergence",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "R2-C reader/shelf truths",
+          "donor": "88774e5",
+          "landed": "83b16c4",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "wp": "R2-Y drift truths",
+          "donor": "544d93b",
+          "landed": null,
+          "verdict": "PARTIAL — back with builder (hunt-07 reconciliation)"
+        }
+      ],
+      "hunts": "hunts-round2.json — 13 findings, furigana P1 lander-confirmed",
+      "battery": "battery-round2/SUMMARY.md — 16/16 green after data-driven count fix"
+    },
+    {
+      "round": 3,
+      "closedAt": "10c440c",
+      "workflow": "wf_c930a16c-262 (5 build worktrees + adversarial verify + serial lander)",
+      "landings": [
+        {
+          "what": "R3-A furigana truth — 303 name readings re-minted under a provenance lexicon",
+          "donor": "4d9948b",
+          "sha": "d54c37c",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R3-B 歩み — device Back walks the app instead of leaving it",
+          "donor": "cba3c05",
+          "sha": "e0018d7",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R3-C 想起の二道 — declared recall gates the reveal (T-06) + the P0-4 transactional sweep (unchecked learner-root writes 19 → 5)",
+          "donor": "6a90c5c",
+          "sha": "abedb40",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R3-D — the optimizer loop closes; fitted FSRS weights drive the corridor fail-closed (T7)",
+          "donor": "9a4d8e6",
+          "sha": "269dfb5",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R3-E small truths — honest signals, true crumbs, kept places",
+          "donor": "5ef9338",
+          "sha": "d895a16",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "standalone regenerated from the round-3 merged sources (builder-only artifact)",
+          "sha": "cf2f1d0"
+        }
+      ],
+      "battery": "16/16 GREEN (battery-round3/SUMMARY.md) · corridor 190/190"
+    },
+    {
+      "round": 4,
+      "closedAt": "7c189c2",
+      "workflow": "wf_f98a4c59-114 (4 build worktrees; R4-C and R4-D deferred by the spend limit, completed after it lifted)",
+      "landings": [
+        {
+          "what": "R4-A kernel — one Learn lineage (P1-18), durable uncertainty, real kanji-page capture (P2-18)",
+          "donor": "32a14f9",
+          "sha": "7004ca5",
+          "verdict": "CONFIRMED (OD-20, independently re-verified at db3a9a9)"
+        },
+        {
+          "what": "R4-B 稽古と選択 — lessons write evidence, enrolling is the learner's choice, the dojo's second lap is practice, the tutor's quiz survives reload",
+          "donor": "96ae2fd",
+          "sha": "e04e694",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R4-C 出会い — the observation ledger gets its first reader; the rest pill takes a whole finger",
+          "donor": "6c4cd3a (worktree)",
+          "sha": "d3bbfe2",
+          "verdict": "CONFIRMED"
+        },
+        {
+          "what": "R4-D — the mock-tests proposal (decision-requested, OD-4/§5)",
+          "donor": "3dd46f8",
+          "sha": "typed to DECISION_SHEET"
+        }
+      ],
+      "battery": "16/16 GREEN (battery-final/SUMMARY.md)"
+    },
+    {
+      "round": "C+E",
+      "closedAt": "7d055a6",
+      "what": "Wave C (the exact-SHA demonstration and the honest re-score) and Wave E (the campaign's own truth pass)",
+      "landings": [
+        {
+          "what": "C1 — exact-SHA end-to-end reader demonstration, 19/20 stages, 85/86 assertions",
+          "sha": "25e227d"
+        },
+        {
+          "what": "C1 findings — a centre tap belongs to the glyph under the finger; the sentence page walks on to its whole article",
+          "sha": "3d86b63, e1f75e8"
+        },
+        {
+          "what": "C2 — rubric re-assessment, 28.4/100 honest, 30-cap lifted, remaining caps named",
+          "sha": "6c4cd3a"
+        },
+        {
+          "what": "E1+E2 — final battery 16/16, RUN_STATE terminal states typed, decision sheet finished",
+          "sha": "7c189c2"
+        },
+        {
+          "what": "E2 — campaign integration manifest v2, authored fresh, verifier-green",
+          "sha": "7d055a6"
+        }
+      ],
+      "battery": "16/16 GREEN (battery-final/SUMMARY.md)"
+    },
+    {
+      "round": "E3-A",
+      "closedAt": "db3a9a9",
+      "workflow": "wf_1ccf6598-25f — the double-dry gate, first command",
+      "what": "Eight lenses on the campaign head: 27 findings, 11 fixed the same night, all 27 adversarially verified (6 CONFIRMED). NOT DRY.",
+      "landings": [
+        {
+          "what": "the dojo honours 始める; いま見る holds for the whole card",
+          "sha": "60622c1"
+        },
+        {
+          "what": "rights and integrity — never claim terms nobody verified",
+          "sha": "1e7b4c3"
+        },
+        {
+          "what": "navigation — the tray remembers its door, and Back sees the overlays",
+          "sha": "1867562"
+        },
+        {
+          "what": "the keyboard keeps its place across a re-render",
+          "sha": "0ed597e"
+        },
+        {
+          "what": "OD-20 close — R4-A independently CONFIRMED; two misleading test comments corrected",
+          "sha": "db3a9a9"
+        }
+      ],
+      "battery": "16/16 GREEN (battery-e3a/SUMMARY.md) · corridor 215"
+    },
+    {
+      "round": "merge",
+      "closedAt": "95633b6",
+      "what": "The operator merged PR #74. main also took the parallel integration PR #76 the same day; the two lines' fixes are complementary and were measured together, not assumed.",
+      "landings": [
+        {
+          "what": "PR #74 → main (answers OD-8 = MERGE)",
+          "sha": "ae1d901"
+        },
+        {
+          "what": "PR #76 → main (kairo-next-integration-20260817)",
+          "sha": "3635d17"
+        },
+        {
+          "what": "post-merge record: OD-8 answered, battery 16/16 on the merged head, gate re-launched",
+          "sha": "95633b6"
+        }
+      ],
+      "battery": "16/16 GREEN (battery-postmerge/SUMMARY.md) on ae1d901"
+    },
+    {
+      "round": "B",
+      "closedAt": "ea8252a",
+      "branch": "claude/renkan-round-b-2026-08-18",
+      "pr": 77,
+      "workflow": "wf_31b5e79a-3b2 — the double-dry gate, second command, on the merged head",
+      "what": "Eight lenses returned 28 findings. NOT DRY: by the gate's own rule the count restarts from zero on the changed head. 19 fixed here, 3 typed to the operator sheet (OD-23/24/25).",
+      "landings": [
+        {
+          "what": "the closing gate becomes an instrument in the tree (.claude/workflows/renkan-e3-double-dry.js) — OD-19's named blocker removed",
+          "sha": "659ac94"
+        },
+        {
+          "what": "resume instructions name the gate command",
+          "sha": "8354f78"
+        },
+        {
+          "what": "round B — 17 findings fixed with convicting probes; corridor 216 → 232",
+          "sha": "3df6ed8"
+        },
+        {
+          "what": "round B, the last two — the eaten press after a reload, and the quiz crumb that pointed elsewhere; corridor 233, AI suite 26",
+          "sha": "ea8252a"
+        }
+      ],
+      "battery": "see battery-final-b/SUMMARY.md"
     }
-   ],
-   "battery": "14/14 GREEN (battery-baseline/SUMMARY.md)"
+  ],
+  "nextCommand": "Run the gate again on the current head: Workflow({ scriptPath: '.claude/workflows/renkan-e3-double-dry.js', args: { head: '<sha>' } }) — by PATH, not by name; { name: ... } resolves against a different registry and answers not found. Two consecutive rounds with zero confirmed findings close T5; rounds A and B were each worked, not dry, so the count stands at zero. On a four-CPU runner the eight lenses walk in pairs — budget hours, not minutes.",
+  "environment": {
+    "e2e": "npm run test:e2e:build before test:e2e",
+    "corpusPython": "/home/user/.venv-bunki-corpus/bin/python (unidic-lite needs venv build)",
+    "chromium": "/opt/pw-browsers/chromium"
   },
-  {
-   "round": 1,
-   "workflow": "wf_0c28e955-c23 (13 agents; 5 triage + 4 build + 4 verify)",
-   "landings": [
-    {
-     "wp": "A1a drift judgment bridge",
-     "donor": "86fa4d3",
-     "landed": "db46914",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "A1b dojo practice obslog",
-     "donor": "8a02e1f",
-     "landed": "f757944",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "A2 AI runtime honesty",
-     "donor": "9a81418",
-     "landed": "bdddc28",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "B3 titleEn as data",
-     "donor": "fe2a929",
-     "landed": "ca14e09",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "standalone regeneration (builder-only)",
-     "landed": "0f3aac3"
-    },
-    {
-     "wp": "sent-door 44px hit region (integration-exposed latent defect)",
-     "landed": "e8b0ccd"
-    }
-   ],
-   "triage": "triage-round1.json — 83 findings: 33 FIXED / 39 OPEN / 11 PARTIAL",
-   "battery": "see battery-round1/SUMMARY.md (fresh full run on e8b0ccd)"
-  },
-  {
-   "round": 2,
-   "workflow": "wf_03729f77-e93 (17 agents: 4 build + 4 verify + 6 fleet + 3 hunt) + direct agents R2-X/R2-Y",
-   "landings": [
-    {
-     "wp": "R2-X app kernel (budget, lookup friction)",
-     "donor": "0cccfd4",
-     "landed": "184b258",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "fleet: 694 archive titleEn",
-     "landed": "c17bd76",
-     "verdict": "lander-verified"
-    },
-    {
-     "wp": "R2-B capture sovereignty",
-     "donor": "c2d1e4c",
-     "landed": "78bfaad",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "R2-A SRS/review integrity + ADR-003",
-     "donor": "ec69050",
-     "landed": "98c0eab",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "R2-D feed loop",
-     "donor": "3f394a7",
-     "landed": "a83b2b9+convergence",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "R2-C reader/shelf truths",
-     "donor": "88774e5",
-     "landed": "83b16c4",
-     "verdict": "CONFIRMED"
-    },
-    {
-     "wp": "R2-Y drift truths",
-     "donor": "544d93b",
-     "landed": null,
-     "verdict": "PARTIAL — back with builder (hunt-07 reconciliation)"
-    }
-   ],
-   "hunts": "hunts-round2.json — 13 findings, furigana P1 lander-confirmed",
-   "battery": "battery-round2/SUMMARY.md — 16/16 green after data-driven count fix"
+  "mergedTo": {
+    "branch": "main",
+    "sha": "ae1d901",
+    "pr": 74,
+    "answers": "OD-8 = MERGE"
   }
- ],
- "nextCommand": "Launch round 3: Workflow({scriptPath: '<session>/workflows/scripts/renkan-round-3.js'}) — furigana truth, history sentinel, T-06 review honesty, optimizer round-trip, small truths. RUN_STATE Round 3 QUEUE section carries the briefs if the script file is gone.",
- "environment": {
-  "e2e": "npm run test:e2e:build before test:e2e",
-  "corpusPython": "/home/user/.venv-bunki-corpus/bin/python (unidic-lite needs venv build)",
-  "chromium": "/opt/pw-browsers/chromium"
- }
 }

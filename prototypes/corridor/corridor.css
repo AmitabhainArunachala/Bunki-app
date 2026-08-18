@@ -385,8 +385,10 @@ body.ginga #drift-layer #hint.first-cue {
   top: calc(12px + env(safe-area-inset-top));
   right: 16px;
   z-index: 30;
-  width: 38px;
-  height: 38px;
+  /* 38px on the app's DEFAULT entry, under its own 44px floor
+   * (E3 round-D, a11y lens) */
+  width: var(--tap);
+  height: var(--tap);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -518,6 +520,9 @@ body.ginga #drift-layer #hint.first-cue {
   flex: none;
   display: flex;
   align-items: stretch;
+  /* sized by padding alone, it landed under the app's own 44px floor on the
+   * DEFAULT entry's only navigation bar (E3 round-D, a11y lens) */
+  min-height: var(--tap);
   padding: 3px;
   background: color-mix(in srgb, var(--ink, #23303f) 8%, transparent);
   border: 1px solid var(--line, #cfc7b5);
@@ -566,6 +571,7 @@ body.ginga #drift-layer #hint.first-cue {
 }
 .nav-search-input {
   width: 100%;
+  min-height: var(--tap);
   padding: 8px 10px;
   font: inherit;
   font-size: 14px;
@@ -811,10 +817,26 @@ body.ginga #drift-layer #hint.first-cue {
 .cat-chip {
   font: inherit;
   cursor: pointer;
+  /* it is a DOOR — it navigates — so the finger gets a real target. Built
+   * from .pool-tag it inherited a 10px tag's box: 20px tall, 7px apart, 21px
+   * effective, under WCAG 2.5.8's floor and half what the rest of the app
+   * offers (E3 round-C, a11y lens). The printed pill stays small; the hit
+   * region belongs to the button, so neighbouring text never steals the tap. */
+  position: relative;
   border-style: dashed;
   border-color: color-mix(in srgb, var(--ai, #2e4d6e) 45%, var(--line));
   color: var(--ink-2, #55606c);
 }
+.cat-chip::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
+
 .cat-chip:hover {
   border-style: solid;
   color: var(--ink);
@@ -2079,7 +2101,11 @@ button .l-ja {
   margin-left: 5px;
 }
 
-#lang[aria-pressed='true'] {
+/* The sliding pill is a BUTTON and wears the pressed ground itself. The
+ * two-button segment shares the id, and the unscoped rule painted the whole
+ * CONTAINER dark — so the half you are not in sat at 2.01:1 against it, on
+ * every screen in the app (E3 round-C, a11y lens). Only a button takes it. */
+button#lang[aria-pressed='true'] {
   background: var(--ink);
   color: var(--ground);
   border-color: var(--ink);
@@ -2251,7 +2277,11 @@ body.v-depth-layered .inline-link {
   letter-spacing: 0.06em;
   border: 0;
   background: transparent;
-  color: var(--ink-2);
+  /* the half you are NOT in is still a control label, not decoration —
+   * --ink-2 is a body-text tone and left it at 3.07:1 on the chrome's own
+   * ground. Mixed from the world's own pair it stays quiet and reads
+   * (E3 round-C, a11y lens). */
+  color: color-mix(in srgb, var(--ink) 78%, var(--ground));
   min-height: var(--tap);
   min-width: 44px;
   padding: 0 10px;
@@ -3896,6 +3926,20 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.44;
   transition: opacity 0.22s ease;
 }
+/* the printed seal stays 34px so the quiet room stays quiet, but the finger
+ * gets the same 44px every other corner control in this room already has —
+ * it was the one door here a thumb could miss (E3 round-B, writing-room
+ * lens). The hit region belongs to the button, so the sheet beneath it
+ * never steals the tap. */
+.stroke-page[data-minimal='on'] #stroke-world-seal::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
 .stroke-page[data-minimal='on'] #stroke-world-seal:is(:hover, :focus-visible),
 .stroke-page[data-minimal='on'][data-chrome='awake'] #stroke-world-seal {
   opacity: 0.85;
@@ -4505,7 +4549,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
+  /* the row must be at least as tall as the hit region its steppers claim.
+   * At a ~33px pitch the two ::before regions overlapped, so a tap under
+   * 新規/日 silently changed 一回の枚数 instead — a claimed 44px that
+   * belongs to the neighbour is worse than no claim (E3 round-B, a11y lens) */
+  min-height: var(--tap);
 }
 
 .srs-pref-row .srs-pref-name {
@@ -5002,6 +5050,9 @@ body.zen .review-example {
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
+  /* the one room whose chips were explicitly given the 44px floor left its
+   * own clear and undo at 28px (E3 round-D, a11y lens) */
+  min-height: var(--tap);
   padding: 6px 12px;
   font-family: var(--sans);
   font-size: 12px;
@@ -5297,7 +5348,10 @@ body.zen main {
   font-size: 21px;
   line-height: 1;
   cursor: pointer;
-  opacity: 0.55;
+  /* the ONLY two controls in the room — the way out and its menu — were
+   * --faint at 0.55, under 4.5:1 in every world. A control a learner must
+   * find in order to leave is not decoration (E3 round-D, a11y lens). */
+  opacity: 1;
   z-index: 6;
 }
 .zen-exit {

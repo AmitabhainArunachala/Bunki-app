@@ -8,9 +8,9 @@
     "law": "three signals, never averaged; disagreement surfaced, never resolved"
   },
   "counts": {
-    "passages": 70,
-    "articleFiles": 70,
-    "words": 8407,
+    "passages": 82,
+    "articleFiles": 82,
+    "words": 8822,
     "kanji": 2582,
     "radicals": 926,
     "idioms": 900,
@@ -20,7 +20,7 @@
     "kanjiWordCap": 60,
     "radicalKanjiCap": 80,
     "idiomCap": 900,
-    "idiomCandidates": 3932,
+    "idiomCandidates": 4070,
     "idiomTotalInSource": 4198
   },
   "pools": {

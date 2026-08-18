@@ -29,6 +29,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 
+const UNAIMED = 'unaimed';
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolve(TOOL_DIR, '..');
 const argv = process.argv.slice(2);
@@ -151,8 +152,20 @@ const pinchAt = async (cx, cy, r0, r1, ms = 320, steps = 8) => {
 
 let currentTheme = '北斎';
 let shotN = 0;
+/* 'unaimed' is neither a pass nor a violation: it means the harness could not
+ * get a safe, still, hit-owned aim at the node before the field moved on. It
+ * was being recorded as `detached`/`misfired` — the same words a genuine
+ * ownership defect earns — which made the gate nondeterministic (measured:
+ * green, green, red on three consecutive runs of an unchanged tree) and, far
+ * worse, made a real defect and a harness limit indistinguishable. It is
+ * counted separately, printed, and CAPPED below, so coverage can never
+ * quietly collapse into "nothing to report". */
+/** A failed aim is only a DEFECT when the node was there and wrong; a field
+ * that would not hold still is the harness reaching its limit, not the app
+ * misbehaving. aimWord names which it was, and this reads that name. */
+const aimOutcome = (aim) => (aim?.reason === 'still moving' ? UNAIMED : 'detached');
 const file = async (word, gesture, expected, outcome, detail, extra = {}) => {
-  const bad = outcome !== 'ok';
+  const bad = outcome !== 'ok' && outcome !== UNAIMED;
   const entry = {
     word: word.w,
     kanji: word.kanji ?? null,
@@ -176,7 +189,7 @@ const file = async (word, gesture, expected, outcome, detail, extra = {}) => {
     }
   }
   cases.push(entry);
-  const mark = bad ? ' !! ' : ' ok ';
+  const mark = bad ? ' !! ' : outcome === UNAIMED ? ' ·· ' : ' ok ';
   console.log(`${mark}${word.w.padEnd(12)} ${gesture.padEnd(18)} ${outcome}${detail ? ' — ' + detail : ''}`);
 };
 
@@ -265,7 +278,13 @@ const wordProbe = (label, requiredClass = null) => `(() => {
 const aimWord = async (label, requiredClass = null, requiredGlossed = null) => {
   let previous = null;
   let last = { exists: false, aimable: false, reason: 'not found' };
-  for (let attempt = 0; attempt < 6; attempt++) {
+  // the galaxy never fully stops — it is a living field — so a settle is two
+  // consecutive samples within 2.5px. Six tries at 120ms was under a second,
+  // and under CPU load a node with unlucky velocity never made it, so the
+  // sweep filed the harness's own failure to aim as a PRODUCT defect
+  // (detached / misfired). Ten tries widens the window without loosening the
+  // tolerance: more real settles found, the same 2.5px demanded.
+  for (let attempt = 0; attempt < 10; attempt++) {
     last = await page.evaluate(`(() => {
       const target = ${JSON.stringify(label)};
       const requiredClass = ${JSON.stringify(requiredClass)};
@@ -572,7 +591,7 @@ for (let round = 0; round < N_WORDS; round++) {
       const trayBeforeFlick = (await page.evaluate(worldProbe)).tray;
       const flickAim = await aimWord(satPick.w, 'bsat');
       if (!flickAim.aimable) {
-        await file(satWord, 'sat-flick', 'no judgment on satellites', 'detached', flickAim.reason);
+        await file(satWord, 'sat-flick', 'no judgment on satellites', aimOutcome(flickAim), flickAim.reason);
         await settle();
         continue;
       }
@@ -709,7 +728,7 @@ if (!chainStartWord) {
         { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
         'chain-hop',
         `hop ${hop}/${CHAIN_HOPS} is owned by the intended live satellite`,
-        'detached',
+        aimOutcome(first),
         first.reason,
         { state: 'bloom', hop },
       );
@@ -737,7 +756,7 @@ if (!chainStartWord) {
         { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
         'chain-hop',
         `hop ${hop}/${CHAIN_HOPS} remains aimable for the second tap`,
-        'detached',
+        aimOutcome(second),
         second.reason,
         { state: 'bloom', hop },
       );
@@ -891,13 +910,16 @@ for (const zone of EDGE_ZONES) {
       await tapAt(pick.x, pick.y);
       await page.waitForTimeout(1700);
       // settle: two consecutive samples with every satellite within 3px
-      let prev = null, cur = null;
-      for (let i = 0; i < 8; i++) {
+      let prev = null, cur = null, settled = false;
+      for (let i = 0; i < 12; i++) {
         cur = await page.evaluate(edgeSatsProbe);
         if (
           prev && cur.centre && prev.centre && cur.sats.length && cur.sats.length === prev.sats.length &&
           cur.sats.every((s, k) => Math.hypot(s.x - prev.sats[k].x, s.y - prev.sats[k].y) <= 3)
-        ) break;
+        ) {
+          settled = true;
+          break;
+        }
         prev = cur;
         await page.waitForTimeout(300);
       }
@@ -905,9 +927,15 @@ for (const zone of EDGE_ZONES) {
         await settle();
         continue; // this word raised no held family — not this probe's verdict
       }
+      // …and the loop above can EXHAUST without converging, in which case `cur`
+      // is one sample of a field still in motion. Asserting tap-ownership on
+      // it convicted the app of overlapping satellites that were simply
+      // mid-flight — the same false conviction aimWord was making
+      // (E3 round-C follow-up, measured green/green/red on an unchanged tree).
       const offView = cur.sats.filter((s) => !s.inView);
       const unowned = cur.sats.filter((s) => s.inView && !s.owned);
       verdict = {
+        settled,
         word: cur.centre.w,
         anchor: `(${cur.centre.x},${cur.centre.y})`,
         sats: cur.sats.length,
@@ -933,11 +961,12 @@ for (const zone of EDGE_ZONES) {
     { w: verdict.word, kanji: (verdict.word.match(/[\u4e00-\u9fff]/g) ?? []).length },
     'edge-bloom',
     `${zone.name}: every satellite centre on the glass and hit-owned at 390x844`,
-    edgeOk ? 'ok' : 'misfired',
+    edgeOk ? 'ok' : verdict.settled ? 'misfired' : UNAIMED,
     `anchor=${verdict.anchor}; sats=${verdict.sats}` +
+      (verdict.settled ? '' : '; field never settled — coverage gap, not a verdict') +
       (verdict.offView.length ? `; offView=${verdict.offView.map((s) => `${s.w}@(${s.x},${s.y})`).join('・')}` : '') +
       (verdict.unowned.length ? `; unowned=${verdict.unowned.map((s) => `${s.w}@(${s.x},${s.y})→${s.under}`).join('・')}` : ''),
-    { state: 'bloom', zone: zone.name },
+    { state: 'bloom', zone: zone.name, settled: verdict.settled },
   );
   await settle();
 }
@@ -1307,7 +1336,15 @@ if (SOAK_MS > 0) {
     (clusters[key] ??= []).push(c);
   }
   const total = cases.length;
-  const bad = cases.filter((c) => c.outcome !== 'ok').length;
+  const bad = cases.filter((c) => c.outcome !== 'ok' && c.outcome !== UNAIMED).length;
+  // A coverage gap is not free. Unaimed cases are the harness admitting it
+  // could not get a still, hit-owned aim before the living field moved on —
+  // honest, but if they pile up the sweep is measuring less and less while
+  // still printing "0 violations". The gate fails when they exceed a tenth
+  // of the run (minimum 2), so silence can never mean absence.
+  const unaimed = cases.filter((c) => c.outcome === UNAIMED).length;
+  const unaimedCap = Math.max(2, Math.floor(cases.length / 10));
+  const unaimedOver = unaimed > unaimedCap;
   const chainViolations = cases.filter((entry) => entry.gesture === 'chain-hop' && entry.outcome !== 'ok').length;
   const fuzzCases = cases.filter((entry) => entry.gesture.startsWith('fuzz-'));
   const fuzzViolations = fuzzCases.filter((entry) => entry.outcome !== 'ok').length;
@@ -1346,11 +1383,20 @@ if (SOAK_MS > 0) {
     },
     gate: {
       scope: MODE === 'fast' ? 'bounded PR regression slice' : 'expanded A0 evidence run (not full acceptance authority)',
-      status: bad === 0 ? 'pass' : 'fail',
-      exitCode: bad === 0 ? 0 : 1,
-      promotionRule: 'pass iff every executed case is ok, no page/console/fatal errors occur, and requested sample counts complete',
+      status: bad === 0 && !unaimedOver ? 'pass' : 'fail',
+      exitCode: bad === 0 && !unaimedOver ? 0 : 1,
+      promotionRule:
+        'pass iff every EXECUTED case is ok, no page/console/fatal errors occur, requested sample counts complete, and the cases the harness could not aim stay within a tenth of the run',
+      unaimedCap,
+      unaimedOver,
     },
-    totals: { total, ok: total - bad, violations: bad, pageErrors: uniquePageErrors.length },
+    totals: {
+      total,
+      ok: total - bad - unaimed,
+      violations: bad,
+      unaimed,
+      pageErrors: uniquePageErrors.length,
+    },
     coverage: {
       matrix: {
         requestedWords: N_WORDS,
@@ -1407,11 +1453,15 @@ if (SOAK_MS > 0) {
     cases,
   };
 
-  console.log(`\n==== sweep: ${total} cases · ${total - bad} ok · ${bad} violations · ${uniquePageErrors.length} page errors ====`);
+  console.log(
+    `\n==== sweep: ${total} cases · ${total - bad - unaimed} ok · ${bad} violations · ${unaimed} unaimed (cap ${unaimedCap})` +
+      ` · ${uniquePageErrors.length} page errors ====`,
+  );
+  if (unaimedOver) console.log(`  !! too many unaimed cases (${unaimed} > ${unaimedCap}) — the sweep measured less than it claims`);
   for (const [key, list] of Object.entries(clusters).sort((a, b) => b[1].length - a[1].length)) {
     console.log(`  ${String(list.length).padStart(3)} × ${key}   e.g. ${list.slice(0, 4).map((c) => c.word).join('・')}`);
   }
   writeFileSync(OUT, JSON.stringify(report, null, 2));
   console.log(`report → ${OUT}\nshots  → ${SHOTS}`);
-  process.exitCode = bad === 0 ? 0 : 1;
+  process.exitCode = bad === 0 && !unaimedOver ? 0 : 1;
 }

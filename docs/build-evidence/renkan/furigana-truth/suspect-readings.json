@@ -8,11 +8,91 @@
   "tokens": 43540
  },
  "statusCounts": {
-  "lexicon-fixed": 303,
+  "lexicon-fixed": 339,
   "accepted": 8
  },
  "openCount": 0,
  "rows": [
+  {
+   "article": "wikinews:1403",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "屋久",
+   "reading": "やく",
+   "status": "lexicon-fixed",
+   "context": "国内では、屋久島、白神山地に",
+   "note": "屋久島"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 103,
+   "rule": "override-site",
+   "surface": "島",
+   "reading": "しま",
+   "status": "lexicon-fixed",
+   "context": "内では、屋久島、白神山地につぐ",
+   "note": "屋久島"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 353,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "れている。（日本語版ウィキペディア「知床",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:1403",
+   "token": 354,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ている。（日本語版ウィキペディア「知床半島",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 426,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "に作成され、日本語版は同年7",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 427,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "作成され、日本語版は同年7月",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 567,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "されている。日本語版において",
+   "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 568,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "れている。日本語版においても",
+   "note": "日本語"
+  },
   {
    "article": "aozora:051034",
    "token": 42,
@@ -22,6 +102,26 @@
    "status": "lexicon-fixed",
    "context": "ました。ここは都から遠い、国境で",
    "note": "都"
+  },
+  {
+   "article": "bunki-graded-n5-morning",
+   "token": 139,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "昨日は分からなかった日本語の言葉を思い出し",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-morning",
+   "token": 140,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "は分からなかった日本語の言葉を思い出しまし",
+   "note": "日本語"
   },
   {
    "article": "real-gokajo",
@@ -54,6 +154,26 @@
    "note": "倦マザラシメン"
   },
   {
+   "article": "real-gokajo",
+   "token": 166,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "原文の表記は現代日本語と異なるが、",
+   "note": "日本語"
+  },
+  {
+   "article": "real-gokajo",
+   "token": 167,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "の表記は現代日本語と異なるが、近代",
+   "note": "日本語"
+  },
+  {
    "article": "real-hojoki",
    "token": 56,
    "rule": "override-site",
@@ -72,6 +192,106 @@
    "status": "lexicon-fixed",
    "context": "を並べ、甍を争へる、高き、卑",
    "note": "争ヘル"
+  },
+  {
+   "article": "bunki-graded-n5-kitchen",
+   "token": 19,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "は隣の部屋で日本語の本を読ん",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-kitchen",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "隣の部屋で日本語の本を読んで",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-neighbour",
+   "token": 41,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ませんでした。日本語が下手でした",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n5-neighbour",
+   "token": 42,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "んでした。日本語が下手でしたから",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n4-letter",
+   "token": 185,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ました。いつか日本語がもっと上手に",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n4-letter",
+   "token": 186,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "た。いつか日本語がもっと上手になっ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-radio",
+   "token": 0,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "日本語を聞く練習と",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-radio",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "日本語を聞く練習とし",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-translation",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "言葉に必ず出会う。日本語で言えば「",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-translation",
+   "token": 21,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "に必ず出会う。日本語で言えば「もったい",
+   "note": "日本語"
   },
   {
    "article": "bunki-graded-n3-zoka-sanjin-morning",
@@ -975,6 +1195,26 @@
   },
   {
    "article": "bunki-graded-n3-hashira-counter",
+   "token": 0,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "日本語では、物",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "日本語では、物に",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
    "token": 54,
    "rule": "override-site",
    "surface": "天之御中主",
@@ -1092,6 +1332,66 @@
    "status": "lexicon-fixed",
    "context": "、高御産巣日神、神産巣日神について「三",
    "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 484,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "は、古い用例や日本語史の研究が",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 485,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "、古い用例や日本語史の研究が必要",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 601,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "助数詞として日本語に定着して",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 602,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "数詞として日本語に定着している",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 665,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えることが、古い日本語を丁寧に学ぶ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 666,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ことが、古い日本語を丁寧に学ぶ方法",
+   "note": "日本語"
   },
   {
    "article": "bunki-graded-n3-feel-jingu-forest",
@@ -1252,6 +1552,46 @@
    "status": "lexicon-fixed",
    "context": "始まったか、造化三神が何をした",
    "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 3,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "これは、日本語を学ぶミナを",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 4,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "これは、日本語を学ぶミナを主人",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 168,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えなかった。新しい日本語の文を練習",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-graded-n3-gratitude-week",
+   "token": 169,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "なかった。新しい日本語の文を練習し",
+   "note": "日本語"
   },
   {
    "article": "bunki-essay-n2-zoka-as-one",
@@ -2082,6 +2422,26 @@
    "status": "lexicon-fixed",
    "context": "が展開され、誦習がどのような行為",
    "note": "誦習"
+  },
+  {
+   "article": "bunki-essay-n2-thanks-first",
+   "token": 8,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ある場面では、日本語で「すみませ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-essay-n2-thanks-first",
+   "token": 9,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "場面では、日本語で「すみません",
+   "note": "日本語"
   },
   {
    "article": "bunki-essay-n1-cosmic-analogy",
