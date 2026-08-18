@@ -41,6 +41,7 @@ import {
   type SeedLexeme,
 } from '../data/catalog.ts';
 import { seedDataset } from '../data/catalog.ts';
+import { seedLearnCommand } from '../data/learn-specification.ts';
 import { CandidatePanel, seededContextFor, useCandidate } from '../candidate/index.ts';
 import {
   useAiRuntime,
@@ -156,6 +157,16 @@ export function WordScreen({
 
   const promote = (to: 'keep' | 'learn' | 'master'): void => {
     if (thread === null) return;
+    // `learn` goes through the validated `activateLearn` path (R4-A, P1-18):
+    // this page exists because the thread resolved to a seed entry, so the
+    // gesture that activates study also mints the immutable reading/meaning
+    // pair through `createLearnContractPair` — the same lineage the capture
+    // screen and the A1 source route use. The other rungs change promotion
+    // only and mint nothing, exactly as before.
+    if (to === 'learn') {
+      store.execute(seedLearnCommand(thread.state.threadId, lexeme));
+      return;
+    }
     store.execute({ kind: 'promote', threadId: thread.state.threadId, to });
   };
 

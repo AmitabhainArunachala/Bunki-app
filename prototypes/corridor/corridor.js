@@ -32,84 +32,6 @@ function mergeGrammar(harvested) {
   return [...GRAMMAR, ...extra].sort((a, b) => (order[a.lv] ?? 9) - (order[b.lv] ?? 9));
 }
 
-/** English titles for the committed shelf (authored translations of the
- * source titles — the sources themselves are CC BY / PD / glossary text). */
-const TITLES_EN = {
-  'wikinews:1403': 'Seven sites added to the World Natural Heritage list — including Shiretoko',
-  'wikinews:6460': "Mariners' Ichiro reaches 2,500 career hits",
-  'wikinews:12024': 'JR Osaka-Higashi Line partially opens',
-  'wikinews:20090': 'Shigaraki Kōgen Railway crash: court finds JR West 30% at fault',
-  'wikinews:45227': 'Wikinews closes the curtain on 21 years',
-  'aozora:051034': 'The Wild Rose — Ogawa Mimei',
-  'aozora:000628': 'Gon the Fox — Niimi Nankichi',
-  'aozora:046605': 'Yamanashi — Miyazawa Kenji',
-  'yasashii:1': 'Childcare leave',
-  'yasashii:2': 'Childcare-leave benefit',
-  'yasashii:3': "Basic survivor's pension",
-  'yasashii:4': "Employees' survivor's pension",
-  'yasashii:5': 'Medical insurance',
-  'yasashii:6': 'Seal-registration certificate',
-  'yasashii:7': 'Seal-registration card',
-  'yasashii:8': 'Overstaying a visa',
-  'yasashii:9': 'Landlord',
-  'yasashii:10': 'Long-term care',
-  'bunki-graded-n5-morning': 'A Quiet Morning',
-  'bunki-graded-n4-bookshop': 'The Second-hand Bookshop on a Rainy Day',
-  'bunki-graded-n3-town': 'Walking an Unknown Town',
-  'bunki-essay-n2-mountain': 'Thoughts While Walking a Mountain',
-  'bunki-essay-n1-ai': 'Knowledge and Judgment in the Age of AI',
-  // WP9b shelf expansion — 14 further Bunki originals (pool: original)
-  'bunki-graded-n5-station': 'Waiting at the Station',
-  'bunki-graded-n5-kitchen': 'Sounds from the Kitchen',
-  'bunki-graded-n5-neighbour': 'The Man in the Next Room',
-  'bunki-graded-n4-letter': 'A Letter in the Drawer',
-  'bunki-graded-n4-market': 'The Morning Market',
-  'bunki-graded-n4-bicycle': 'The Day I Lost My Bicycle',
-  'bunki-graded-n3-river': 'The Road Along the River',
-  'bunki-graded-n3-radio': 'Late-night Radio',
-  'bunki-essay-n2-handwriting': 'On Writing by Hand',
-  'bunki-essay-n2-notebook': 'A Notebook Kept for Its Margins',
-  'bunki-essay-n2-rain': 'The Speed of a Rainy Day',
-  'bunki-essay-n2-translation': 'On Words That Resist Translation',
-  'bunki-essay-n1-memory': 'Designing for Forgetting',
-  'bunki-essay-n1-city': 'Anonymity in the City, and Language',
-  'real-gokajo': 'The Charter Oath (1868)',
-  'real-hojoki': 'Hōjōki — the opening',
-  'real-tsurezure': 'Tsurezuregusa — the opening passage',
-  // Recovered 30 (codex donor 307a4dd) — authored translations, 検収前:
-  // pending the operator's editorial review like the articles themselves.
-  'bunki-graded-n3-zoka-sanjin-morning': 'A Morning Meeting the Three Deities of Creation',
-  'bunki-graded-n3-nakaima-diary': "A Day of Feeling the 'Middle Now'",
-  'bunki-graded-n3-world-beginning': "The Three Pillars at the World's Beginning",
-  'bunki-graded-n3-hidden-deity': 'The Deity Who Hid Away',
-  'bunki-graded-n3-kojiki-book': 'What Kind of Book Is the Kojiki?',
-  'bunki-graded-n3-hashira-counter': "Why Gods Are Counted in 'Pillars'",
-  'bunki-graded-n3-feel-jingu-forest': 'Walking the Ise Jingū Forest on Film',
-  'bunki-graded-n3-musubi-visual': 'Musubi: Joining Heaven, Earth, and Prayer',
-  'bunki-graded-n3-gratitude-week': 'A Week of Saying Words of Thanks',
-  'bunki-graded-n3-thanks-before-help': "'Thank You' Before 'Help Me'?",
-  'bunki-essay-n2-zoka-as-one': 'Reading the Three Deities as One Working',
-  'bunki-essay-n2-nakaima-time': "Past, Present, Future — and the 'Middle Now'",
-  'bunki-essay-n2-creator-god': "How Far Is 'Creator God' the Right Word?",
-  'bunki-essay-n2-silent-amenominakanushi': 'Amenominakanushi: Reading the God Who Is Never Told',
-  'bunki-essay-n2-kojiki-myth-history': 'The Kojiki: Myth or History?',
-  'bunki-essay-n2-myth-to-book': 'From Telling to Text: Compiling a Myth',
-  'bunki-essay-n2-feel-jingu-musubi': 'Musubi as the Camera Tells It',
-  'bunki-essay-n2-prayer-on-screen': 'How Prayer Looks on Screen',
-  'bunki-essay-n2-thanks-first': 'The Psychology of Saying Thank You First',
-  'bunki-essay-n2-testimony-literacy': 'How to Receive a Personal Testimony',
-  'bunki-essay-n1-cosmic-analogy': 'The Temptation to Read the Creation Deities as Cosmology',
-  'bunki-essay-n1-nakaima-time-theory': "Can the 'Middle Now' Become a Theory of Time?",
-  'bunki-essay-n1-first-versus-supreme': "The Problem with Calling a Primordial God 'Supreme'",
-  'bunki-essay-n1-silent-god-theology': 'The Silent God and a Theology of Absence',
-  'bunki-essay-n1-kojiki-power': 'Compiling the Kojiki: A Story of Power',
-  'bunki-essay-n1-beyond-fact-fiction': 'Against Judging Myth as Fact or Fiction',
-  'bunki-essay-n1-sacred-media': "How 'Feeling' Footage Constructs the Sacred",
-  'bunki-essay-n1-ise-time': 'Musubi, Nature, Repetition: Time at Ise',
-  'bunki-essay-n1-miracle-testimony': 'Miracle Testimonies and the Responsibility of Knowing',
-  'bunki-essay-n1-prayer-reality': 'Whose Reality Do Words of Prayer Change?',
-};
-
 /** Turn the grader's three signals into one sentence a learner can use.
  * The raw signals stay one 詳細 tap away — translated, not discarded. */
 function levelPhrase(grading) {
@@ -131,11 +53,19 @@ function levelPhrase(grading) {
   let vocabNote = '';
   let vocabNoteJa = '';
   if (cov != null && cov < 1) {
-    const oneIn = Math.max(2, Math.round(1 / (1 - cov)));
-    const outside = ninjal != null ? 'the core' : 'the JLPT lists';
+    // the number is THIS card's measured coverage, never a floor or an
+    // average (the #42 law). Below one-in-two the ratio phrasing stops
+    // being true — say plainly that most words fall outside instead.
+    const oneIn = Math.round(1 / (1 - cov));
+    const outside = ninjal != null ? 'the core' : 'JLPT vocab';
     const outsideJa = ninjal != null ? '基本語彙の外' : 'JLPT語彙の外';
-    vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
-    vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
+    if (oneIn < 2) {
+      vocabNote = ` · most words beyond ${outside}`;
+      vocabNoteJa = `・大半が${outsideJa}`;
+    } else {
+      vocabNote = ` · ~1 in ${oneIn} words beyond ${outside}`;
+      vocabNoteJa = `・約${oneIn}語に1語が${outsideJa}`;
+    }
   }
   return { level, ja: band, note: vocabNote, noteJa: vocabNoteJa };
 }
@@ -463,11 +393,22 @@ const S = {
    * offset, returning puts it back. Session-only: the store persists what you
    * took, never where you were. */
   shelfScroll: 0,
+  /** The archive's analog of shelfScroll: the year-list offset when you last
+   * walked into an article (or out to the shelf). Session-only, like its
+   * sibling — 93 rows of 2016 keep their place while one of them is read. */
+  archiveScroll: 0,
   stack: [],
   // 銀河 hero: the galaxy rests bare but for one symbol; navOpen reveals the
   // top bar and the two corner bubbles. fwd holds a single forward step so the
   // bar's ▸ arrow can undo a back().
   navOpen: false,
+  /** The 銀河 search session. The bar's input node dies with every render, so
+   * the query lives here; navReturn marks a departure THROUGH a result, and
+   * the walk back (in-app or device Back) reopens the bar — query, results,
+   * and focus on the row you left from. A deliberate dismissal (scrim, the
+   * symbol) clears both. Session-only, never persisted. */
+  navQ: '',
+  navReturn: false,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
@@ -514,7 +455,10 @@ const S = {
   storeReadOnly: false,
   storeError: null,
   storeExtras: null,
-  /** a running review session: { queue, ix, revealed, done } — null at rest */
+  /** a running review session: { queue, ix, revealed, declared, done } —
+   * null at rest. declared is the zen room's recall declaration for the
+   * card that is up: 1 思い出した · 0 まだ · null before the card turns
+   * over (kernel law ADR-002 T-06 — see the reveal obslog row) */
   review: null,
   /** a running yomi probe: { queue, ix, revealed, right, missed, minted } —
    * session-only; its evidence lives in the obslog, never in FSRS state */
@@ -525,6 +469,10 @@ const S = {
   lessonsDone: {},
   /** a running lesson: { id, lvl, words, ix, phase, ... } — null at rest */
   lessonRun: null,
+  /** where the lessons list was standing when a run began — the way back
+   * out of a lesson puts the learner at the row they left, not the top of
+   * the long N5–N1 list. Session-only, like shelfScroll. */
+  lessonsScroll: 0,
   /** the tutor's custom reading: { text, lv, ts } — persisted; null until asked */
   aiReading: null,
   /** earlier readings, newest first, capped — a shelf, not a stream */
@@ -532,19 +480,41 @@ const S = {
   /** cards resting outside the review cycle: { 't:id': ts } — Anki's
    * suspend, simplified. The item stays on its list; reviews skip it. */
   suspended: {},
-  /** the conversation with the tutor: [{ role: 'user'|'tutor', text }] */
+  /** the conversation with the tutor: [{ role: 'user'|'tutor', text }] —
+   * the bounded request window; the full transcript lives in the archive */
   aiChat: [],
-  /** a running tutor quiz: { qs, ix, picked, correct } — in-memory only */
+  /** provider seam: optional { baseUrl, model } overrides for the AI door.
+   * Empty means the built-in defaults at AI_DEFAULT_*; store-durable so a
+   * future settings surface (or an imported record) can carry the choice. */
+  ai: {},
+  /** a running tutor quiz: { qs, ix, picked, correct, ts } — persisted
+   * (POL-13): a mid-quiz reload resumes with the tutor's written questions
+   * intact; null at rest. Closed only by the learner's own door. */
   aiQuiz: null,
+  /** how many chat turns the log unfolds before 前の会話 — session-only */
+  aiChatShown: null,
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
    * from the first graded card onward; nothing is backfilled or invented */
   stats: {},
+  /** the learner's own review pacing (R2-A): how many never-seen cards a day
+   * may introduce, and how many due cards one ordinary sitting holds. Both
+   * are learner-chosen on the lists surface, persisted, and validated
+   * fail-closed like every other root. */
+  srsPrefs: { newPerDay: 20, reviewLimit: 20 },
+  /** whether the quiet ペース row on the lists surface is unfolded */
+  srsPrefsOpen: false,
   /** articles marked finished: { passageId: ts } */
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
   readerPos: {},
   /** tokens whose English gloss is shown beneath (double-tap) */
   glossed: null,
+  /** the reader's current thing for the top-right capture door: the word the
+   * learner last touched in the open article — { id, index, p }. Session-only
+   * by design: the store persists what you took, never what you hovered. */
+  readerTake: null,
+  /** whether the top-right capture panel (scope stages + lists) is open */
+  captureOpen: false,
   /** which shelf cards have their raw signals expanded (詳細) */
   detailsOpen: null,
   sourcesOpen: false,
@@ -588,7 +558,10 @@ const STORE_KNOWN_KEYS = [
   'aiReadings',
   'suspended',
   'aiChat',
+  'ai',
+  'aiQuiz',
   'stats',
+  'srsPrefs',
   'readDone',
   'readerPos',
   'dials',
@@ -670,6 +643,10 @@ function validTakenItem(item) {
     optional(item, 'kind', (value) => typeof value === 'string') &&
     optional(item, 'kindEn', (value) => typeof value === 'string') &&
     optional(item, 'ts', finiteNumber) &&
+    // the explicit promotion mark (R2-A, no-debt migration): when the
+    // learner chose retrieval for this row. Absent on legacy and imported
+    // rows, which stay cardless until 始める is pressed.
+    optional(item, 'started', finiteNumber) &&
     optional(item, 'from', validTakenSource) &&
     optional(item, 'ctx', validTakenContext) &&
     optional(item, 'entrySeq', nonEmptyString) &&
@@ -729,8 +706,23 @@ function validObservationRow(row) {
     return row.length === 5 && [1, 3].includes(row[3]) && [0, 1].includes(row[4]);
   }
   if (row[1] === 'drift') return row.length === 4 && [1, 3].includes(row[3]);
+  if (row[1] === 'params') {
+    // R3-D · the scheduler-parameter note: [t, 'params', 'fsrs', reason] —
+    // a stored learner parameter set could not drive the scheduler, and why
+    return row.length === 4 && row[2] === 'fsrs' && nonEmptyString(row[3]);
+  }
+  if (row[1] === 'reveal') return row.length === 4 && [0, 1].includes(row[3]);
+  if (row[1] === 'lesson') {
+    // PR70-P0-1 · a lesson quiz answer, practice evidence only:
+    // [t, 'lesson', key, g, lessonId] — g 3 answered right · 1 answered wrong
+    return row.length === 5 && [1, 3].includes(row[3]) && nonEmptyString(row[4]);
+  }
   if (row[1] === 'dojo') {
-    return row.length === 4 && Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
+    // four wide (older rows and undo's revocation), or five with the drill
+    // room's name riding as the trailing mode
+    if (row.length !== 4 && row.length !== 5) return false;
+    if (row.length === 5 && !nonEmptyString(row[4])) return false;
+    return Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
   }
   return false;
 }
@@ -777,10 +769,136 @@ function validChatTurn(turn) {
   );
 }
 
+/** One question the tutor wrote — the exact shape aiQuizParse accepts, so a
+ * run the app itself persisted is never quarantined on the next boot. */
+function validAiQuizQuestion(q) {
+  return (
+    plainRecord(q) &&
+    typeof q.q === 'string' &&
+    Array.isArray(q.opts) &&
+    q.opts.length === 4 &&
+    q.opts.every((o) => typeof o === 'string') &&
+    Number.isInteger(q.right) &&
+    q.right >= 0 &&
+    q.right < 4 &&
+    typeof q.why === 'string' &&
+    safeJsonValue(q)
+  );
+}
+
+/** POL-13 · the persisted quiz run: the tutor's written questions plus the
+ * learner's place in them. ix may sit one past the last question — that is
+ * the score screen, kept whole until the learner closes it. */
+function validAiQuizRun(run) {
+  return (
+    plainRecord(run) &&
+    Array.isArray(run.qs) &&
+    run.qs.length >= 3 &&
+    run.qs.length <= 5 &&
+    run.qs.every(validAiQuizQuestion) &&
+    Number.isInteger(run.ix) &&
+    run.ix >= 0 &&
+    run.ix <= run.qs.length &&
+    optional(run, 'picked', (value) => value === null || (Number.isInteger(value) && value >= 0 && value < 4)) &&
+    Number.isInteger(run.correct) &&
+    run.correct >= 0 &&
+    run.correct <= run.qs.length &&
+    optional(run, 'ts', finiteNumber) &&
+    safeJsonValue(run)
+  );
+}
+
+function validAiConfig(config) {
+  return (
+    plainRecord(config) &&
+    optional(config, 'baseUrl', nonEmptyString) &&
+    optional(config, 'model', nonEmptyString) &&
+    safeJsonValue(config)
+  );
+}
+
+/** Review pacing the learner may choose (R2-A). The bounds are part of the
+ * envelope's fail-closed contract, so the validator and the ペース surface
+ * read the same numbers and can never drift apart. */
+const NEW_PER_DAY_DEFAULT = 20;
+const NEW_PER_DAY_MAX = 50;
+const REVIEW_LIMIT_DEFAULT = 20;
+const REVIEW_LIMIT_MIN = 5;
+const REVIEW_LIMIT_MAX = 100;
+const validNewPerDay = (value) => Number.isInteger(value) && value >= 0 && value <= NEW_PER_DAY_MAX;
+const validReviewLimit = (value) =>
+  Number.isInteger(value) && value >= REVIEW_LIMIT_MIN && value <= REVIEW_LIMIT_MAX;
+
+function validSrsPrefs(prefs) {
+  return (
+    plainRecord(prefs) &&
+    safeJsonValue(prefs) &&
+    optional(prefs, 'newPerDay', validNewPerDay) &&
+    optional(prefs, 'reviewLimit', validReviewLimit)
+  );
+}
+
+/** R3-D · the learner's own fitted FSRS-6 weights ride inside srsPrefs as
+ * srsPrefs.fsrs: { w: [...21 numbers], source, basedOnReviews } — written by
+ * the import door from a tools/fsrs-optimize.mjs run. The envelope carries
+ * the field VERBATIM (a newer build's fit must survive a visit from an older
+ * one with not a byte dropped); USE is gated here, fail-closed: anything but
+ * 21 finite numbers inside the vendored scheduler's own clamp ranges is
+ * ignored — the pinned defaults rule and one quiet obslog note says why.
+ * Bounds mirror ts-fsrs@5.4.1 clipParameters, the same table
+ * tools/fsrs-optimize.mjs fits inside (PARAMETER_BOUNDS); the storage
+ * verifier holds the two tables together so they can never drift apart. */
+const FSRS_WEIGHT_BOUNDS = [
+  [0.001, 100],
+  [0.001, 100],
+  [0.001, 100],
+  [0.001, 100],
+  [1, 10],
+  [0.001, 4],
+  [0.001, 4],
+  [0.001, 0.75],
+  [0, 4.5],
+  [0, 0.8],
+  [0.001, 3.5],
+  [0.001, 5],
+  [0.001, 0.25],
+  [0.001, 0.9],
+  [0, 4],
+  [0, 1],
+  [1, 6],
+  [0, 2],
+  [0, 2],
+  [0.01, 0.8],
+  [0.1, 0.8],
+];
+
+/** Why a stored parameter set cannot drive the scheduler — null when it can.
+ * The reason string is the quiet obslog note's payload (never a crash). */
+function srsParamsProblem(field) {
+  if (!plainRecord(field) || !Array.isArray(field.w)) return 'shape';
+  if (field.w.length !== FSRS_WEIGHT_BOUNDS.length) return 'length';
+  for (let i = 0; i < field.w.length; i += 1) {
+    if (!finiteNumber(field.w[i])) return 'not-finite';
+    const [lo, hi] = FSRS_WEIGHT_BOUNDS[i];
+    if (field.w[i] < lo || field.w[i] > hi) return 'bounds';
+  }
+  if (owns(field, 'source') && !nonEmptyString(field.source)) return 'source';
+  if (
+    owns(field, 'basedOnReviews') &&
+    !(Number.isInteger(field.basedOnReviews) && field.basedOnReviews > 0)
+  )
+    return 'basedOnReviews';
+  return null;
+}
+
 function validStats(stats) {
   if (!plainRecord(stats) || !safeJsonValue(stats)) return false;
   return Object.entries(stats).every(([key, value]) => {
     if (key === 'lastExportTs') return finiteNumber(value);
+    // Legacy field: an earlier build read stats.fuzzOff as an app-level fuzz
+    // override. ADR-003 removed that path — the pin's fuzz-off is the one
+    // policy — but the envelope still admits the boolean so a record written
+    // under that build is never quarantined for carrying it.
     if (key === 'fuzzOff') return typeof value === 'boolean';
     return (
       plainRecord(value) &&
@@ -811,7 +929,10 @@ const STORE_ROOT_VALIDATORS = {
   suspended: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
   aiChat: (value) => Array.isArray(value) && value.every(validChatTurn),
+  ai: validAiConfig,
+  aiQuiz: (value) => value === null || validAiQuizRun(value),
   stats: validStats,
+  srsPrefs: validSrsPrefs,
   readDone: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(finiteNumber),
   readerPos: (value) =>
@@ -959,7 +1080,16 @@ function loadStore() {
   if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
   if (plainRecord(s.suspended)) S.suspended = s.suspended;
   if (Array.isArray(s.aiChat)) S.aiChat = s.aiChat;
+  if (plainRecord(s.ai)) S.ai = s.ai;
+  if (plainRecord(s.aiQuiz)) S.aiQuiz = s.aiQuiz;
   if (plainRecord(s.stats)) S.stats = s.stats;
+  if (plainRecord(s.srsPrefs)) {
+    if (validNewPerDay(s.srsPrefs.newPerDay)) S.srsPrefs.newPerDay = s.srsPrefs.newPerDay;
+    if (validReviewLimit(s.srsPrefs.reviewLimit)) S.srsPrefs.reviewLimit = s.srsPrefs.reviewLimit;
+    // the learner's fitted weights ride verbatim — validity is judged where
+    // the scheduler is built (srsParamsProblem), never by dropping bytes here
+    if (owns(s.srsPrefs, 'fsrs')) S.srsPrefs.fsrs = s.srsPrefs.fsrs;
+  }
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
   if (plainRecord(s.dials)) {
@@ -987,7 +1117,10 @@ function storeEnvelope(state) {
     aiReadings: state.aiReadings.slice(0, 10),
     suspended: state.suspended,
     aiChat: state.aiChat.slice(-24),
+    ai: state.ai || {},
+    aiQuiz: state.aiQuiz || null,
     stats: state.stats,
+    srsPrefs: state.srsPrefs || {},
     readDone: state.readDone,
     readerPos: state.readerPos,
     dials: state.dialsUrlOverride ? state.dialsStored : state.dials,
@@ -1060,6 +1193,28 @@ function commitStorePatch(patch) {
  *   [t, 'probe', key, g, minted]
  *       a yomi-probe self-grade in the dojo — g 1 read it wrong · 3 read
  *       it right; minted 1 when the miss minted a card, else 0
+ *   [t, 'dojo', key, g, mode?]
+ *       a focus-drill grade that is practice, not a scheduled review: a
+ *       card the learner never TOOK, or (POL-12) a second-lap pass in a
+ *       timed block over a card whose one honest schedule grade this block
+ *       already recorded. FSRS scale (g 1–4; a g 0 row is undo's
+ *       revocation, filed beside the judgment); mode names the drill room
+ *       ('kanji', 'due') on rows written since the room was recorded.
+ *       Evidence only: no FSRS state, no revlog row, no daily new-card slot.
+ *   [t, 'lesson', key, g, lessonId]
+ *       a lesson quiz answer (PR70-P0-1) — practice evidence from the
+ *       Duolingo-class lane: g 3 answered right · 1 answered wrong;
+ *       lessonId names the run ('N5-1'). Completion writes these rows and
+ *       the score, nothing else — no deck rows, no FSRS state: entering
+ *       覚える is the learner's own explicit choice on the end screen.
+ *   [t, 'reveal', key, declared]
+ *       the zen review room's declared-recall gate (kernel law ADR-002
+ *       T-06): before the answer turns over, the learner declares —
+ *       declared 1 思い出した (recalled; all four grades open) · 0 まだ
+ *       (not yet; Again is the only grade the schedule may record). The
+ *       row is the declaration's evidence; the forcing itself rides the
+ *       session state and the grade commit. The timed dojo keeps its bare
+ *       reveal and stamps 'dojo' practice rows instead.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -1068,6 +1223,12 @@ function obsFlush() {
   if (obsSaveTimer == null) return;
   clearTimeout(obsSaveTimer);
   obsSaveTimer = null;
+  // P0-4 disposition (residual ledger): this flush persists rows already
+  // published to the session ledger — the debounce IS the documented,
+  // bounded (1.2s + pagehide) session-ahead-of-durability window for
+  // burst-arriving observations. A rollback here would DROP evidence;
+  // instead a failed save surfaces the storage alert and the rows stay in
+  // S.obslog for the next flush or envelope write to carry.
   saveStore();
 }
 function obsLog(kind, key, ...detail) {
@@ -1075,16 +1236,36 @@ function obsLog(kind, key, ...detail) {
   clearTimeout(obsSaveTimer);
   obsSaveTimer = setTimeout(obsFlush, 1200);
 }
+/** R3-D · when a stored learner parameter set cannot drive the scheduler,
+ * the pinned defaults rule and ONE quiet append-only row says why:
+ * [t, 'params', 'fsrs', reason]. Deduped against the latest params note so
+ * a thousand boots over the same broken field never write a thousand rows. */
+function noteIgnoredSrsParams(reason) {
+  const rows = S.obslog || [];
+  for (let i = rows.length - 1; i >= 0; i -= 1) {
+    if (rows[i][1] !== 'params') continue;
+    if (rows[i][3] === reason) return;
+    break;
+  }
+  obsLog('params', 'fsrs', reason);
+}
 // 分流の橋 — the drift's flick judgments were persisting only to the drift's
 // own store, which nothing in the corridor ever read (P0, full-instrument
 // review). The water now hands each committed judgment to the observation
-// ledger as EXPOSURE evidence: detail 3 = flicked known, 1 = flicked
-// unknown, same scale as the tap ladder. Constitution holds — exposure is
-// not mastery, so this never touches FSRS state or creates a card; it makes
-// the judgment visible to the one learner state (obslog is stored, exported,
-// and read by evidence surfaces).
+// ledger as an APPEND-ONLY EXPOSURE row [t, 'drift', key, j]: j 3 = flicked
+// known, 1 = flicked unknown, the tap ladder's scale. Constitution holds —
+// exposure is not mastery, so this never touches FSRS state, S.taken, or
+// review debt; it makes the judgment visible to the one learner state
+// (obslog is stored, exported, and read by evidence surfaces). Unlike taps,
+// the commit is SYNCHRONOUS — no debounce: the returned ack is true only
+// after the envelope crossed the durability boundary, and the water rolls
+// its own store back on anything else, so the two records never disagree
+// about what the learner said. Drift grades words, kanji glyphs, and
+// particle satellites; each keeps its own modality-true target type.
 window.bunkiDriftJudgment = (kind, key, dir) => {
-  obsLog('drift', srsKey(kind === 'kanji' ? 'kanji' : 'word', key), dir > 0 ? 3 : 1);
+  const t = kind === 'glyph' || kind === 'kanji' ? 'kanji' : kind === 'part' ? 'particle' : 'word';
+  const obslog = [...(S.obslog || []), [Date.now(), 'drift', srsKey(t, key), dir > 0 ? 3 : 1]];
+  return commitStorePatch({ obslog });
 };
 // 分流の岸 — the corridor names its fused chrome so a tap on the torii,
 // seal, nav, bubbles, or any overlay is never read by the water as an
@@ -1099,6 +1280,10 @@ window.bunkiDriftChrome =
 window.bunkiDriftDepth = (depth) => {
   S.driftDepth = depth;
   document.body.classList.toggle('drift-dived', depth > 0);
+  // diving arms the same-URL Back sentinel (the water renders itself, so the
+  // corridor's render hook never sees the depth change); surfacing home
+  // consumes it — device Back then means leave, as it should
+  syncWalkSentinel();
   if (S.navOpen) render(); // the open nav's back arrow re-arms live
 };
 addEventListener('pagehide', obsFlush);
@@ -1184,6 +1369,15 @@ function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
 const D = {};
 let fsrsApi = null;
 let scheduler = null;
+/** The exact generator parameters the scheduler was built with — kept so the
+ * verification suites can read the policy actually in force (fuzz OFF, the
+ * pin's numbers) instead of trusting a comment. */
+let srsParams = null;
+/** R3-D · non-null when the scheduler was built with the learner's own
+ * fitted weights (srsPrefs.fsrs) instead of the pinned defaults —
+ * { source, basedOnReviews }. The entry footer and the instrument handle
+ * read this so the schedule shown is never passed off as the default's. */
+let srsCustom = null;
 
 /* --------------------------------------------- the deep dictionary (70k)
  * The boot core stays the small compatibility dictionary that powers the
@@ -1774,11 +1968,17 @@ async function boot() {
   // a stale same-document room sentinel now so Back never lands on an inert
   // history stop; ordinary Forward navigation is handled live by popstate.
   try {
-    if (history.state?.bunkiStrokeRoom) {
+    if (history.state?.bunkiStrokeRoom || history.state?.bunkiWalk) {
       const normalized = { ...history.state };
       delete normalized.bunkiStrokeRoom;
+      delete normalized.bunkiWalk;
       history.replaceState(normalized, '', location.href);
     }
+    // The corridor owns every scroll restore (reader bookmarks, shelf and
+    // archive offsets, sheet stacks). The platform's own traversal guess
+    // would land the walk-back sentinel pops on a stale offset and fight
+    // returnScroll — so the guess is switched off for this document.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   } catch {
     /* history may be unavailable in a constrained embedded preview */
   }
@@ -1929,23 +2129,33 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
-    scheduler = fsrsApi.fsrs(
-      fsrsApi.generatorParameters({
-        w: pin.w,
-        request_retention: pin.requestRetention,
-        maximum_interval: pin.maximumInterval,
-        // Fuzz is ON here by app-level decision (S.stats.fuzzOff = true turns
-        // it off), deliberately diverging from the domain pin's false: it
-        // keeps batch-captured cards from staying due-synchronized for years.
-        // Replay stays deterministic — the engine seeds fuzz from
-        // `${reviewTimeMs}_${reps}_${d*s}`, all of which the review log
-        // records exactly.
-        enable_fuzz: S.stats?.fuzzOff === true ? false : true,
-        enable_short_term: pin.enableShortTerm,
-        learning_steps: pin.learningSteps,
-        relearning_steps: pin.relearningSteps,
-      }),
-    );
+    // R3-D · the learner's own fitted weights (srsPrefs.fsrs, written by the
+    // import door from a tools/fsrs-optimize.mjs run) drive the scheduler
+    // when — and only when — they pass the fail-closed gate srsParamsProblem.
+    // Anything else is IGNORED: the pinned defaults rule, nothing crashes,
+    // and one quiet obslog row says why. Everything but the weight vector
+    // stays the pin's (fuzz OFF, retention, steps): one scheduler policy.
+    const fitted = S.srsPrefs?.fsrs;
+    const fittedProblem = fitted === undefined ? 'absent' : srsParamsProblem(fitted);
+    if (fitted !== undefined && fittedProblem) noteIgnoredSrsParams(fittedProblem);
+    srsCustom = fittedProblem
+      ? null
+      : { source: fitted.source ?? null, basedOnReviews: fitted.basedOnReviews ?? null };
+    srsParams = fsrsApi.generatorParameters({
+      w: srsCustom ? fitted.w.slice() : pin.w,
+      request_retention: pin.requestRetention,
+      maximum_interval: pin.maximumInterval,
+      // One scheduler policy in both engines (ADR-003): fuzz is OFF, exactly
+      // as the domain pin says. Any randomness inside the scheduler would
+      // let two replays of one log disagree, which is what every evidence
+      // claim rests on. If interval spreading is ever wanted, it belongs in
+      // session planning, where it changes presentation, not memory state.
+      enable_fuzz: pin.enableFuzz,
+      enable_short_term: pin.enableShortTerm,
+      learning_steps: pin.learningSteps,
+      relearning_steps: pin.relearningSteps,
+    });
+    scheduler = fsrsApi.fsrs(srsParams);
   } catch (err) {
     console.warn('FSRS unavailable', err);
   }
@@ -2052,6 +2262,9 @@ function renderArchive(main) {
     const list = years.get(y);
     const open = S.archiveYears.has(y);
     const toggle = el('button', 'details-toggle archive-year');
+    // every fold says whether it is open — four of the five did not, so a
+    // screen reader could not tell (E3 round-A, a11y lens)
+    toggle.setAttribute('aria-expanded', String(S.archiveYears.has(y)));
     toggle.type = 'button';
     toggle.dataset.year = y;
     toggle.textContent = `${open ? '▾' : '▸'} ${y} 年 · ${list.length} ${tx('本', '')}`.trim();
@@ -2070,6 +2283,9 @@ function renderArchive(main) {
       row.dataset.passage = a.id;
       const head = el('div', 'archive-row-head');
       head.append(el('span', 'archive-row-title', a.title));
+      // archive rows read titleEn from the same schema as the shelf; the
+      // frozen index carries none yet, so this stays silent until it does
+      if (bi() && a.titleEn) head.append(el('span', 'archive-row-title-en', a.titleEn));
       const lv = levelPhrase(a.grading);
       const meta = el('div', 'archive-row-meta');
       meta.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
@@ -2104,6 +2320,9 @@ function invokerKey(node) {
       targetKind: node.dataset.targetKind || 'word',
     };
   }
+  // a 銀河 search row has no id and dies with the bar; its index survives so
+  // the restored results can hand focus back to the row that was left
+  if (node.matches?.('.nav-search-row')) return { kind: 'nav-row', ix: node.dataset.ix || '0' };
   if (node.id) return { kind: 'id', id: node.id };
   return null;
 }
@@ -2118,6 +2337,11 @@ function restoreDialogInvoker() {
       target = document.querySelector(
         `#reader .tok[data-index="${key.index}"][data-target-kind="${key.targetKind}"]`,
       );
+    } else if (key.kind === 'nav-row') {
+      // the deep tier may still be settling; the input is the honest fallback
+      target =
+        document.querySelector(`.nav-search-row[data-ix="${key.ix}"]`) ||
+        document.getElementById('nav-search-input');
     } else if (key.kind === 'id') {
       target = document.getElementById(key.id);
     }
@@ -2130,12 +2354,14 @@ function restoreDialogInvoker() {
 function keepScroll() {
   if (S.view === 'reader') S.readerScroll = window.scrollY;
   else if (S.view === 'shelf') S.shelfScroll = window.scrollY;
+  else if (S.view === 'archive') S.archiveScroll = window.scrollY;
 }
 
 /** Hand the current view back the offset it walked away from. */
 function returnScroll() {
   if (S.view === 'reader') window.scrollTo(0, S.readerScroll);
   else if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
+  else if (S.view === 'archive') window.scrollTo(0, S.archiveScroll);
 }
 
 /* The reader remembers your place per article, surviving reloads — the
@@ -2150,6 +2376,9 @@ addEventListener(
       // re-checked at fire time: a sheet may have opened (and zeroed the
       // window scroll) in the 900ms since the scroll that armed this
       if (S.view !== 'reader' || !S.passageId || S.stack.length) return;
+      // P0-4 disposition (residual ledger): readerPos is a reading-position
+      // bookmark — a UI preference, not learner evidence; a lost write costs
+      // one scroll offset, so the direct debounced save stays.
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
     }, 900);
@@ -2169,6 +2398,26 @@ function go(node, { invoker = null } = {}) {
 }
 
 function back() {
+  // The chrome's own overlays are the topmost layers of all: an open nav,
+  // the world stones, the capture panel. Device Back could not see them, so
+  // a learner who opened one and pressed Back left the app entirely with it
+  // still on the glass (E3 round-A, dead-ends lens). They dismiss in the
+  // order they stack, before any room moves.
+  if (worldPickerEls) {
+    closeWorldPicker();
+    return;
+  }
+  if (S.captureOpen) {
+    S.captureOpen = false;
+    render();
+    return;
+  }
+  if (S.navOpen) {
+    S.navOpen = false;
+    S.navReturn = false;
+    render();
+    return;
+  }
   // 筆順 is the topmost layer when it is open — it leaves before the sheet does
   if (S.strokes) {
     closeStrokePage();
@@ -2176,11 +2425,24 @@ function back() {
   }
   if (S.stack.length) {
     S.stack.pop();
+    if (!S.stack.length) {
+      // a sheet opened from a 銀河 search result closes back INTO the search:
+      // the bar reopens with its query, results, and the row that was left
+      if (S.view === 'drift' && S.navReturn) S.navOpen = true;
+      S.navReturn = false;
+    }
     render();
     if (!S.stack.length) {
       returnScroll();
       restoreDialogInvoker();
     }
+    return;
+  }
+  // inside a drift dive, back means SURFACE one level of the water first —
+  // the same walk whether it arrives from the nav arrow or the device Back
+  if (S.view === 'drift' && S.driftDepth > 0 && window.bunkiDriftSurface) {
+    window.bunkiDriftSurface();
+    render();
     return;
   }
   if (S.view === 'review') {
@@ -2206,23 +2468,27 @@ function back() {
     return;
   }
   if (S.view === 'aiquiz') {
-    S.aiQuiz = null;
+    // POL-13: stepping out mid-quiz discards nothing — the run stays durable
+    // and the tray holds the way back in (and the quiet やめる to let it go)
     S.view = 'tray';
     render();
     return;
   }
   if (S.view === 'lessons' && S.lessonRun) {
-    S.lessonRun = null;
-    render();
+    endLessonRun();
     return;
   }
   if (S.view === 'archive') {
     S.view = 'shelf';
     render();
+    // the shelf gets its place back — its archive door stands ~20,000px deep,
+    // and losing that offset dumped the learner at the top of 70 cards
+    window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
-    // the bookmark records the exact line being left, not the debounce's guess
+    // the bookmark records the exact line being left, not the debounce's
+    // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
       clearTimeout(readerPosTimer);
       S.readerPos[S.passageId] = Math.round(window.scrollY);
@@ -2236,10 +2502,22 @@ function back() {
       window.scrollTo(0, S.readerPos?.[S.passageId] || 0);
       return;
     }
-    // an archive article returns to its stack, not the curated shelf
+    // …and every other room it can be opened from, at the offset it was
+    // opened at
+    if (S.view === 'tray' && plainRecord(S.trayFrom) && S.trayFrom.view) {
+      const home = S.trayFrom;
+      S.trayFrom = null;
+      S.view = home.view;
+      render();
+      window.scrollTo(0, home.scroll || 0);
+      return;
+    }
+    // an archive article returns to its stack, not the curated shelf — and to
+    // the year-list offset it was opened from, not wherever the reading ended
     if (S.view === 'reader' && String(passage()?.file || '').startsWith('archive/')) {
       S.view = 'archive';
       render();
+      window.scrollTo(0, S.archiveScroll);
       return;
     }
     S.view = 'shelf';
@@ -2269,6 +2547,9 @@ function dismissSheet() {
   S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
+  // Escape/scrim from a result's sheet walks back into the search too
+  if (S.view === 'drift' && S.navReturn) S.navOpen = true;
+  S.navReturn = false;
   render();
   returnScroll();
   restoreDialogInvoker();
@@ -2347,16 +2628,95 @@ function closeStrokePage({ fromHistory = false } = {}) {
   finalizeStrokePageClose();
 }
 
-// iPhone Back and the edge-swipe are the quiet room's invisible exit. They
-// restore the existing entry sheet instead of leaving the SPA; Escape remains
-// the keyboard equivalent and no extra visible control is introduced.
+/* ------------------------------------- 歩み — one history discipline (R3-B)
+ * The writing room proved the shape (bunkiStrokeRoom): a same-URL history
+ * entry so the platform Back gesture works the room instead of leaving the
+ * app. This generalizes it to the whole corridor with ONE sentinel, not one
+ * entry per surface: whenever any stacked context stands under the learner —
+ * a sheet stack, a drift dive, the archive, review, any inner room — one
+ * armed entry waits in the history. Device Back pops it, the app performs its
+ * OWN back() (the same walk as 戻る: scroll returned, focus returned), and
+ * the sentinel re-arms while there is anywhere left to walk. Walking home
+ * in-app consumes the standing entry quietly, so from home the very next
+ * Back leaves the app — it never eats a press. The context itself (stack,
+ * scrolls, invokers, the search session) lives in S; the entry carries only
+ * the marker, because a same-document pop never loses the module state. */
+let walkArmed = false;
+let walkConsuming = false;
+
+/** Whether the app's own back() would still move — the mirror of the chrome's
+ * atHome test, plus the layers back() itself handles first. */
+function canWalkBack() {
+  // the chrome overlays are walkable layers too — the sentinel must stay
+  // armed while one is open, or Back would leave the app instead of it
+  if (worldPickerEls || S.captureOpen || S.navOpen) return true;
+  if (S.strokes || S.stack.length) return true;
+  if (S.view === 'drift') return S.driftDepth > 0;
+  if (S.view === 'entry') return false;
+  if (S.view === 'shelf') return S.variants.entry !== 'shelf';
+  return true; // every inner room walks back somewhere
+}
+
+/** Keep exactly one armed sentinel while there is anywhere to walk back to.
+ * Called at the end of every render and on drift depth reports — both idle
+ * no-ops unless the answer to canWalkBack() has actually changed. */
+function syncWalkSentinel() {
+  if (walkConsuming) return;
+  const should = canWalkBack();
+  if (should && !walkArmed) {
+    try {
+      const previous = history.state && typeof history.state === 'object' ? { ...history.state } : {};
+      delete previous.bunkiStrokeRoom;
+      history.pushState({ ...previous, bunkiWalk: { v: 1 } }, '', location.href);
+      walkArmed = true;
+    } catch {
+      /* embedded previews without history keep the plain exit */
+    }
+  } else if (!should && walkArmed) {
+    // the learner walked home in-app — consume the standing entry so the
+    // next platform Back leaves the app instead of being swallowed
+    walkConsuming = true;
+    try {
+      history.back();
+    } catch {
+      walkConsuming = false;
+      walkArmed = false;
+    }
+  }
+}
+
+// iPhone Back and the edge-swipe are the corridor's invisible exit ramp. The
+// stroke room's own sentinel stays the topmost layer's contract; beneath it
+// the walk sentinel turns every device Back into the app's own back() until
+// the stack is empty — only then does Back actually leave.
 addEventListener('popstate', () => {
   if (S.strokes?.historyToken) {
     closeStrokePage({ fromHistory: true });
     return;
   }
   const marker = history.state?.bunkiStrokeRoom;
-  if (marker?.token && marker?.id) openStrokePage(marker.id, { historyEntry: marker });
+  if (marker?.token && marker?.id) {
+    openStrokePage(marker.id, { historyEntry: marker });
+    return;
+  }
+  if (walkConsuming) {
+    // our own quiet consume landed; re-check in case the learner moved on
+    walkConsuming = false;
+    walkArmed = false;
+    syncWalkSentinel();
+    return;
+  }
+  if (walkArmed) {
+    walkArmed = false;
+    if (canWalkBack()) back(); // render() re-arms while there is more to walk
+    return;
+  }
+  // a stale sentinel (Forward, or one left below a reload) — adopt it so the
+  // discipline holds instead of leaving a dead history stop
+  if (history.state?.bunkiWalk) {
+    walkArmed = true;
+    syncWalkSentinel();
+  }
 });
 
 function openPassage(id) {
@@ -2688,11 +3048,17 @@ function renderShelfBody() {
   const h = withEn(el('h1', 'view-title', '本棚'), 'the bookshelf', 'en-inline');
   main.append(h);
   const curated = D.passages.filter((p) => !String(p.file || '').startsWith('archive/'));
+  // the count tells the truth: a one-sentence glossary definition is not a
+  // real text, so the glossary is billed as itself, beside the readings
+  const glossaryCount = curated.filter((p) => p.source === 'isa-yasashii-glossary').length;
+  const readingCount = curated.length - glossaryCount;
   const sub = el('p', 'shelf-snippet intro');
-  sub.textContent = tx(
-    `${curated.length} 本。触れてひらく。`,
-    `${curated.length} real texts. Tap one to read it.`,
-  );
+  sub.textContent = glossaryCount
+    ? tx(
+        `読み物 ${readingCount} 本と用語集 ${glossaryCount} 項。触れてひらく。`,
+        `${readingCount} real texts, and a ${glossaryCount}-entry glossary. Tap one to read it.`,
+      )
+    : tx(`${curated.length} 本。触れてひらく。`, `${curated.length} real texts. Tap one to read it.`);
   main.append(sub);
 
   // door order is the learner's order, not the build order: the lanes
@@ -2790,51 +3156,18 @@ function renderShelfBody() {
     main.append(aread);
   }
 
+  // one shelf, quiet sections: cards keep the index's own order inside each
+  // section, and sections stand in the order the index first names them —
+  // the categories gather without anything being reshuffled
+  const sections = new Map();
   for (const p of curated) {
-    const item = el('button', 'shelf-item');
-    item.type = 'button';
-    item.dataset.passage = p.id;
-
-    const head = el('div', 'shelf-head');
-    head.append(el('div', 'shelf-title', p.title));
-    if (bi() && TITLES_EN[p.id]) head.append(el('div', 'shelf-title-en', TITLES_EN[p.id]));
-    const lv = levelPhrase(p.grading);
-    const levelLine = el('div', 'level-line');
-    levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
-    levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
-    if (p.grading.disagreement.flag) {
-      levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
-    }
-    head.append(levelLine);
-    item.append(head);
-
-    const meta = el('div', 'shelf-meta');
-    meta.append(el('span', null, p.sourceLabel));
-    if (p.date) meta.append(el('span', null, p.date));
-    meta.append(el('span', 'pool-tag', p.licence));
-    // the shelf remembers with you: finished, or open to your bookmark
-    if (S.readDone[p.id]) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
-    else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
-    item.append(meta);
-    item.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
-
-    // the instrument stays one tap away: 詳細 unfolds the raw three signals
-    const details = el('button', 'details-toggle');
-    details.type = 'button';
-    details.dataset.details = p.id;
-    details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
-    details.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      (S.detailsOpen ||= new Set());
-      if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
-      else S.detailsOpen.add(p.id);
-      render();
-    });
-    item.append(details);
-    if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
-
-    item.addEventListener('click', () => openPassage(p.id));
-    main.append(item);
+    const sec = shelfSection(p);
+    if (!sections.has(sec.ja)) sections.set(sec.ja, { sec, items: [] });
+    sections.get(sec.ja).items.push(p);
+  }
+  for (const { sec, items } of sections.values()) {
+    main.append(withEn(el('p', 'eyebrow shelf-section', sec.ja), sec.en, 'en-inline'));
+    for (const p of items) main.append(shelfCard(p));
   }
 
   // the deep stack: the frozen wikinews archive, its own quiet room —
@@ -2858,6 +3191,7 @@ function renderShelfBody() {
 
   // sources and licences: present, honest, folded
   const src = el('button', 'details-toggle');
+  src.setAttribute('aria-expanded', String(!!S.sourcesOpen));
   src.type = 'button';
   src.id = 'sources-toggle';
   src.textContent = (S.sourcesOpen ? '▾ ' : '▸ ') + tx('出典と licence', 'sources & licences');
@@ -2868,6 +3202,79 @@ function renderShelfBody() {
   main.append(src);
   if (S.sourcesOpen) main.append(licencePanel());
   return main;
+}
+
+/** The shelf's quiet sections, named from each record's own provenance —
+ * no code-side canon that the data could contradict. */
+function shelfSection(p) {
+  if (p.source === 'ja.wikinews') return { ja: 'ニュース', en: 'news' };
+  if (p.source === 'aozorabunko-clean') return { ja: '青空文庫', en: 'Aozora Bunko' };
+  if (p.source === 'isa-yasashii-glossary') {
+    return { ja: 'やさしい日本語 用語集', en: 'the plain-Japanese glossary — one-line definitions' };
+  }
+  const label = String(p.sourceLabel || '');
+  if (label.startsWith('段階別読み物')) return { ja: '段階別読み物', en: 'graded readings' };
+  if (label.startsWith('随筆')) return { ja: '随筆', en: 'essays' };
+  return { ja: '古典・一次資料', en: 'classics & primary sources' };
+}
+
+/** One shelf card. The card is a small row of PARALLEL controls, never a
+ * button holding a button (invalid HTML that hides the inner toggle from
+ * assistive tech): the text is one whole door, 詳細 its own sibling door. */
+function shelfCard(p) {
+  const item = el('article', 'shelf-item');
+  item.dataset.passage = p.id;
+
+  const open = el('button', 'shelf-open');
+  open.type = 'button';
+  const head = el('div', 'shelf-head');
+  head.append(el('div', 'shelf-title', p.title));
+  // the English title travels with the record (titleEn + titleEnSource in
+  // data/articles/index.json), never in a code-side map
+  if (bi() && p.titleEn) head.append(el('div', 'shelf-title-en', p.titleEn));
+  const lv = levelPhrase(p.grading);
+  const levelLine = el('div', 'level-line');
+  levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
+  levelLine.append(el('span', 'level-note', bi() ? `${lv.ja}${lv.note}` : lv.noteJa));
+  if (p.grading.disagreement.flag) {
+    levelLine.append(el('span', 'disagree-tag', tx('不一致', 'signals disagree')));
+  }
+  head.append(levelLine);
+  open.append(head);
+
+  const meta = el('div', 'shelf-meta');
+  meta.append(el('span', null, p.sourceLabel));
+  // an absent date stays absent — a stringified null ("None") is data rot,
+  // never provenance, and must not stand in the card's meta line (R3-E)
+  if (p.date && p.date !== 'None') meta.append(el('span', null, p.date));
+  meta.append(el('span', 'pool-tag', p.licence));
+  // an honest kind on the rows that are not articles
+  if (p.source === 'isa-yasashii-glossary') {
+    meta.append(el('span', 'pool-tag', tx('用語集の項目', '用語集 glossary entry')));
+  }
+  // the shelf remembers with you: finished, or open to your bookmark
+  if (S.readDone[p.id]) meta.append(el('span', 'pool-tag read-tag', tx('読了', '読了 finished')));
+  else if ((S.readerPos[p.id] || 0) > 300) meta.append(el('span', 'pool-tag read-tag', tx('途中', '途中 in progress')));
+  open.append(meta);
+  open.append(el('div', 'shelf-snippet', p.snippet ?? (p.text || '').slice(0, 64)));
+  open.addEventListener('click', () => openPassage(p.id));
+  item.append(open);
+
+  // the instrument stays one tap away: 詳細 unfolds the raw three signals
+  const details = el('button', 'details-toggle');
+  details.setAttribute('aria-expanded', String(!!S.detailsOpen?.has(p.id)));
+  details.type = 'button';
+  details.dataset.details = p.id;
+  details.textContent = (S.detailsOpen?.has(p.id) ? '▾ ' : '▸ ') + tx('詳細', 'details');
+  details.addEventListener('click', () => {
+    (S.detailsOpen ||= new Set());
+    if (S.detailsOpen.has(p.id)) S.detailsOpen.delete(p.id);
+    else S.detailsOpen.add(p.id);
+    render();
+  });
+  item.append(details);
+  if (S.detailsOpen?.has(p.id)) item.append(renderSignals(p.grading, { compact: true }));
+  return item;
 }
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -2882,7 +3289,9 @@ function dialRow(labelJa, labelEn, key, options) {
     b.addEventListener('click', () => {
       S.dials[key] = index;
       S.dialsUrlOverride = false; // a real hand on the dial IS the choice
-      saveStore(); // the chosen setting survives the session
+      // the chosen setting survives the session; dials are display
+      // preferences, not learner evidence (P0-4 residual-ledger disposition)
+      saveStore();
       render();
     });
     seg.append(b);
@@ -2940,7 +3349,7 @@ document.addEventListener(
   true,
 );
 
-function showMini(span, token, onEntry, { focusEntry = false } = {}) {
+function showMini(span, token, onEntry, { focusEntry = false, from = null } = {}) {
   removeMini();
   // the mini owns the moment: any lingering token-actions pill from an
   // earlier focus would double 全項目 beside it
@@ -2954,6 +3363,34 @@ function showMini(span, token, onEntry, { focusEntry = false } = {}) {
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
   mini.append(el('span', 'mini-word', token.b));
+  // 覚 — the capture door rides the mini too (directive §3): one tap takes
+  // the word (with its sentence when held inside an article), one more tap
+  // undoes a mis-take. The seal repaints in place so the mini never blinks.
+  const miniTaken = () => S.taken.some((t) => t.t === 'word' && t.id === token.b);
+  const seal = el('button', 'mini-take', '覚');
+  seal.type = 'button';
+  seal.id = 'mini-take';
+  const paintSeal = () => {
+    const on = miniTaken();
+    seal.classList.toggle('taken', on);
+    seal.setAttribute('aria-pressed', String(on));
+    seal.setAttribute(
+      'aria-label',
+      on ? tx(`「${token.b}」の覚えるをやめる`, `stop memorizing ${token.b}`) : tx(`「${token.b}」を覚える`, `memorize ${token.b}`),
+    );
+  };
+  paintSeal();
+  seal.addEventListener('click', (event) => {
+    event.stopPropagation();
+    toggleTaken(from ? { t: 'word', id: token.b, from, ctxScope: 'sent' } : { t: 'word', id: token.b }, token.b);
+    paintSeal();
+    // the reader's under-ink and the chrome seal follow without a re-render
+    const on = miniTaken();
+    span.classList.toggle('tok-learning', on);
+    if (!on) span.classList.remove('tok-due');
+    syncReaderTakeSeal();
+  });
+  mini.append(seal);
   if (g?.r) mini.append(el('span', 'mini-reading', g.r));
   mini.append(el('span', 'mini-gloss', g?.m?.[0] || tx('（語釈なし）', '(no gloss yet)')));
   mini.append(el('span', 'mini-hint', tx('辞書の全項目へ進める', 'open the complete entry')));
@@ -3162,6 +3599,7 @@ function wireTokenGestures(span, token, index, p) {
   const obsKey = srsKey('word', token.b);
   const openFull = (modality = 'pointer', emitAction = true) => {
     removeMini();
+    setReaderTake(token.b, index, p.id);
     // a held finger's release will synthesize one click onto the new sheet —
     // arm the swallow only then (arming on a button click would eat the
     // user's NEXT real tap instead)
@@ -3174,14 +3612,17 @@ function wireTokenGestures(span, token, index, p) {
     );
   };
   const quickLook = (modality = 'pointer', emitAction = false) => {
+    setReaderTake(token.b, index, p.id);
     obsLog('tap', obsKey, 2, p.id);
     if (emitAction) interaction({ kind: 'quickLook.open', target }, modality, 'reader-token');
     showMini(span, token, (entryModality) => openFull(entryModality, true), {
       focusEntry: modality !== 'pointer',
+      from: { passage: p.id, index },
     });
   };
   const activate = (modality) => {
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
+    setReaderTake(token.b, index, p.id);
     (S.revealed ||= new Set());
     (S.glossed ||= new Set());
     const hasReading = S.dials.furigana === 2 || S.revealed.has(index);
@@ -3262,6 +3703,32 @@ function commitReadDone(articleId, now = Date.now()) {
   return commitStorePatch({ readDone });
 }
 
+/* ------------------------------------------- 用語集の相互参照 (glossary)
+ * The ISA glossary numbers its entries, and its definitions cite each other
+ * by that number — 「印鑑登録証明書(No.6)」. Ten entries stand on this shelf
+ * under the same numbers (yasashii:N); the rest of the glossary does not.
+ * At render time a citation whose target stands here becomes a live door to
+ * that entry; a citation into the missing rest drops its dead number and
+ * keeps the term. The licensed text and tokens are untouched on disk —
+ * this is presentation, not adaptation. */
+function glossaryCrossRefPlan(p) {
+  if (p.source !== 'isa-yasashii-glossary' || !p.tokens) return null;
+  const skip = new Set();
+  const doors = new Map();
+  const toks = p.tokens;
+  for (let i = 0; i + 4 < toks.length; i++) {
+    if (toks[i].s !== '(' && toks[i].s !== '（') continue;
+    if (toks[i + 1]?.s !== 'No' || toks[i + 2]?.s !== '.') continue;
+    if (!/^[0-9]+$/.test(toks[i + 3]?.s || '')) continue;
+    if (toks[i + 4].s !== ')' && toks[i + 4].s !== '）') continue;
+    const target = D.passages.find((x) => x.id === `yasashii:${Number(toks[i + 3].s)}`);
+    for (let k = i; k <= i + 4; k++) skip.add(k);
+    if (target) doors.set(i, target);
+    i += 4;
+  }
+  return skip.size ? { skip, doors } : null;
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -3269,7 +3736,12 @@ function renderReader(main) {
     return renderShelf(main);
   }
   main.append(el('p', 'eyebrow', p.sourceLabel));
+  // the reader was the one view in bi mode that dropped the English title —
+  // the handle the learner chose the text by (E3 round-A, reader lens). It
+  // rides BESIDE the heading, the way the shelf card carries it, so the
+  // heading itself still reads as the Japanese title alone.
   main.append(el('h1', 'view-title', p.title));
+  if (bi() && p.titleEn) main.append(el('p', 'view-title-en', p.titleEn));
   const lv = levelPhrase(p.grading);
   const levelLine = el('div', 'level-line');
   levelLine.append(el('span', 'level-chip', bi() ? lv.level : lv.ja));
@@ -3278,6 +3750,7 @@ function renderReader(main) {
 
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'details-toggle');
+  dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
   dialsToggle.type = 'button';
   dialsToggle.id = 'dials-toggle';
   dialsToggle.textContent = (S.dialsOpen ? '▾ ' : '▸ ') + tx('文字設定', 'text settings 文字設定');
@@ -3339,15 +3812,47 @@ function renderReader(main) {
   const learning = new Set();
   for (const t of S.taken) if (t.t === 'word') learning.add(t.id);
   const dueNow = new Date();
+  const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
   for (const [index, token] of p.tokens.entries()) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
     }
+    if (crossRefs) {
+      const refTarget = crossRefs.doors.get(index);
+      if (refTarget) {
+        const refDoor = el('button', 'sent-door glossary-ref', '▹');
+        refDoor.type = 'button';
+        refDoor.dataset.glossaryRef = refTarget.id;
+        refDoor.setAttribute(
+          'aria-label',
+          tx(`用語集「${refTarget.title}」をひらく`, `open the glossary entry ${refTarget.title}`),
+        );
+        refDoor.addEventListener('click', () => openPassage(refTarget.id));
+        if (S.dials.spacing === 2 && group) group.append(refDoor);
+        else reader.append(refDoor);
+      }
+      if (crossRefs.skip.has(index)) continue;
+    }
     const particle = !token.c ? PARTICLE_BY_SURFACE[token.s] : null;
-    const interactive = !!token.c || !!particle;
-    const span = el(interactive ? 'button' : 'span', token.c ? 'tok content' : 'tok plain');
+    // A name is exactly what a learner cannot read. The `c` flag comes from
+    // the GRADER, whose 固有名詞/数詞 exclusion means "do not count this as a
+    // content word" — a readability rule that was doing double duty as the
+    // reader's interactivity law, leaving 知床半島 and 藤田譲瑠チマ as dead
+    // text with no reading, no gloss, no 覚える (E3 round-A, reader lens).
+    // Any token written with kanji that carries a reading is now a door,
+    // whatever the grader thinks of it; punctuation and bare kana are not.
+    const namedReading =
+      !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
+    const interactive = !!token.c || !!particle || namedReading;
+    // its own class: a door, but never mistaken for a graded content word —
+    // the app and its verifiers both select on .tok.content, and a name with
+    // no dictionary entry answering to that name breaks both
+    const span = el(
+      interactive ? 'button' : 'span',
+      token.c ? 'tok content' : namedReading ? 'tok named' : 'tok plain',
+    );
     if (interactive) span.type = 'button';
     span.dataset.index = String(index);
     if (token.c) {
@@ -3561,6 +4066,71 @@ function renderEntry(main) {
   main.append(note);
 }
 
+/* ペース — the learner's own review pacing, folded away until asked for (the
+ * dials idiom): how many never-seen cards a day may introduce (0–50) and how
+ * many due cards one ordinary sitting holds (5–100). Persisted as srsPrefs in
+ * the envelope, validated fail-closed like every other root. LEECH_LAPSES
+ * stays a constant — the rest offer is a design law, not a preference. */
+function renderSrsPrefs(main) {
+  const toggle = el('button', 'details-toggle');
+  toggle.type = 'button';
+  toggle.id = 'srs-prefs-toggle';
+  toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
+  toggle.textContent = (S.srsPrefsOpen ? '▾ ' : '▸ ') + tx('ペース', 'pacing ペース');
+  toggle.addEventListener('click', () => {
+    S.srsPrefsOpen = !S.srsPrefsOpen;
+    render();
+  });
+  main.append(toggle);
+  if (!S.srsPrefsOpen) return;
+  const rows = el('div', 'srs-prefs');
+  const stepper = (labelJa, labelEn, key, value, min, max, step) => {
+    const row = el('div', 'srs-pref-row');
+    row.append(withEn(el('span', 'srs-pref-name', labelJa), labelEn, 'en-inline'));
+    const commit = (next) => {
+      const clamped = Math.min(max, Math.max(min, next));
+      if (clamped === value) return;
+      if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, [key]: clamped } })) render();
+    };
+    const minus = el('button', 'rest-toggle srs-pref-step', '−');
+    minus.type = 'button';
+    minus.dataset.prefDown = key;
+    minus.disabled = value <= min;
+    minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn}`));
+    minus.addEventListener('click', () => commit(value - step));
+    const val = el('span', 'srs-pref-val', String(value));
+    val.dataset.prefVal = key;
+    const plus = el('button', 'rest-toggle srs-pref-step', '＋');
+    plus.type = 'button';
+    plus.dataset.prefUp = key;
+    plus.disabled = value >= max;
+    plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn}`));
+    plus.addEventListener('click', () => commit(value + step));
+    row.append(minus, val, plus);
+    rows.append(row);
+  };
+  stepper('新規 / 日', 'new cards a day', 'newPerDay', srsNewPerDay(), 0, NEW_PER_DAY_MAX, 5);
+  stepper('一回の枚数', 'cards a sitting', 'reviewLimit', srsReviewLimit(), REVIEW_LIMIT_MIN, REVIEW_LIMIT_MAX, 5);
+  // R3-D · when the learner's own fitted weights rule the scheduler, this
+  // fold — the scheduler-preferences surface — names it quietly, with the
+  // honest basis. The raw parameter-set slug stays in exports/debug.
+  if (srsCustom) {
+    rows.append(
+      el(
+        'p',
+        'card-kind',
+        srsCustom.basedOnReviews
+          ? tx(
+              `復習の予定は自分の記録（${srsCustom.basedOnReviews} 回の復習）で調整済み`,
+              `scheduling tuned from your own record (${srsCustom.basedOnReviews} reviews)`,
+            )
+          : tx('復習の予定は自分の記録で調整済み', 'scheduling tuned from your own record'),
+      ),
+    );
+  }
+  main.append(rows);
+}
+
 function renderTray(main) {
   main.append(withEn(el('p', 'eyebrow', 'リスト'), 'your lists', 'en-inline'));
   main.append(
@@ -3592,26 +4162,35 @@ function renderTray(main) {
   }
   if (S.taken.length && scheduler) {
     const due = srsDueItems();
+    const f = srsForecast();
+    // the two lines must tell one story: when nothing is due at this moment
+    // but cards still ripen before midnight, the quiet door says "right now"
+    // and the forecast's first bucket says WHEN — never a flat 予定なし
+    // sitting directly above a bare 今日 2
+    const laterToday = !due.length && f.today > 0;
     const btn = biLabel(
       'button',
       due.length ? 'take review-start' : 'take review-start quiet',
-      due.length ? `復習する — ${due.length} 件` : '復習する — 予定なし',
-      due.length ? `review now — ${due.length} due` : 'nothing due yet',
+      due.length ? `復習する — ${due.length} 件` : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
+      due.length ? `review now — ${due.length} due` : laterToday ? 'nothing due right now' : 'nothing due yet',
     );
     btn.type = 'button';
     btn.id = 'review-start';
     btn.disabled = !due.length;
     btn.addEventListener('click', startReview);
     main.append(btn);
-    const f = srsForecast();
-    if (f.today + f.tomorrow + f.week + f.fresh > 0) {
+    if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
+      // 未着手 appears only when no-debt rows exist: the backlog is named,
+      // never hidden and never turned into due cards by anyone but the learner
+      const unstartedJa = f.unstarted ? ` ・ 未着手 ${f.unstarted}` : '';
+      const unstartedEn = f.unstarted ? ` · not started ${f.unstarted}` : '';
       main.append(
         el(
           'p',
           'srs-forecast',
           tx(
-            `今日 ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}`,
-            `today ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}`,
+            `${laterToday ? '今日このあと' : '今日'} ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
+            `${laterToday ? 'later today' : 'today'} ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
           ),
         ),
       );
@@ -3632,8 +4211,10 @@ function renderTray(main) {
         ),
       );
     }
-    // one layer of the tutor's testing — absent without a key
-    if (aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
+    renderSrsPrefs(main);
+    // one layer of the tutor's testing — absent without a key, and folded
+    // away while an unfinished quiz still holds the room (POL-13)
+    if (!S.aiQuiz && aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
       const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'a quiz from the tutor');
       qb.type = 'button';
       qb.id = 'aiq-start';
@@ -3641,8 +4222,21 @@ function renderTray(main) {
       qb.addEventListener('click', async () => {
         qb.disabled = true;
         note.textContent = tx('先生が問題を書いている…', 'the tutor is writing questions…');
+        const askedFrom = S.view;
         try {
           await aiQuizStart();
+          // a reply can arrive ten seconds later, by which time the learner
+          // may be deep in an article: the quiz waits for them where they
+          // asked for it rather than seizing the room they walked to
+          // (E3 round-A, AI lens)
+          if (S.view !== askedFrom) {
+            note.textContent = tx(
+              '小テストの用意ができた。もう一度どうぞ。',
+              'the quiz is ready — press again when you are',
+            );
+            qb.disabled = false;
+            return;
+          }
           S.view = 'aiquiz';
           render();
           window.scrollTo(0, 0);
@@ -3654,6 +4248,30 @@ function renderTray(main) {
       });
       main.append(qb, note);
     }
+  }
+  // POL-13 · a quiz that was left mid-run survives reload: the way back in
+  // stands here — no new request, the tutor's written questions intact —
+  // with a quiet やめる beside it. No key and no deck are needed to finish
+  // what is already on the device, so the row lives outside every gate.
+  if (S.aiQuiz) {
+    const qrow = el('div', 'aiq-resume-row');
+    const qb = biLabel('button', 'chip aiq-start', '先生の小テスト — 続きから', "resume the tutor's quiz");
+    qb.type = 'button';
+    qb.id = 'aiq-resume';
+    qb.addEventListener('click', () => {
+      S.view = 'aiquiz';
+      render();
+      window.scrollTo(0, 0);
+    });
+    const drop = biLabel('button', 'chip aiq-drop', 'やめる', 'let it go');
+    drop.type = 'button';
+    drop.id = 'aiq-drop';
+    drop.addEventListener('click', () => {
+      aiQuizCommit(null);
+      render();
+    });
+    qrow.append(qb, drop);
+    main.append(qrow);
   }
   if (!S.taken.length) {
     main.append(
@@ -3800,7 +4418,15 @@ function renderTray(main) {
       main.append(row);
     }
     for (const item of sec.items) {
+      // the row IS the door to the entry, so it must answer a keyboard the
+      // way every other door does — it was a click-handled div, invisible to
+      // Tab and to a screen reader (E3 round-A, a11y lens). It stays a div
+      // (it CONTAINS the rest/start button; a button inside a button is the
+      // invalid nesting R2-C just repaired on the shelf) and takes the role,
+      // the tab stop, and Enter/Space instead.
       const line = el('div', 'tray-line');
+      line.tabIndex = 0;
+      line.setAttribute('role', 'button');
       line.append(el('span', 'w', item.label));
       // rows stored before the kind fields existed heal at render time
       const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
@@ -3808,20 +4434,47 @@ function renderTray(main) {
       line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
       if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
       line.append(el('span', 'when', srsWhen(item)));
-      // rest / wake — the card stays on the list, reviews skip it
       const key = srsKey(item.t, item.id);
-      const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
-      rest.type = 'button';
-      rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
-      rest.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        if (S.suspended[key]) delete S.suspended[key];
-        else S.suspended[key] = Date.now();
-        saveStore();
-        render();
+      if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
+        // a no-debt row (legacy or imported) wakes by hand: one quiet
+        // affordance in the row itself, and only this press mints the card
+        // into the review cycle — 始める is the explicit promotion
+        const start = el('button', 'rest-toggle srs-start', tx('始める', 'start'));
+        start.type = 'button';
+        start.dataset.srsStart = key;
+        start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
+        start.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const taken = S.taken.map((t) => (t === item ? { ...t, started: Date.now() } : t));
+          if (commitStorePatch({ taken })) render();
+        });
+        line.append(start);
+      } else {
+        // rest / wake — the card stays on the list, reviews skip it
+        const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
+        rest.type = 'button';
+        rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
+        rest.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          // rest/wake is deck state: it rides the guarded boundary, so a
+          // failed persist changes nothing (the alert names the failure)
+          const suspended = { ...S.suspended };
+          if (suspended[key]) delete suspended[key];
+          else suspended[key] = Date.now();
+          if (commitStorePatch({ suspended })) render();
+        });
+        line.append(rest);
+      }
+      const openRow = () => go({ t: item.t, id: item.id });
+      line.setAttribute('aria-label', tx(`${item.label} の全項目`, `${item.label} — full entry`));
+      line.addEventListener('click', openRow);
+      line.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        // the row's own controls keep their keys
+        if (ev.target !== line) return;
+        ev.preventDefault();
+        openRow();
       });
-      line.append(rest);
-      line.addEventListener('click', () => go({ t: item.t, id: item.id }));
       main.append(line);
     }
   }
@@ -3847,10 +4500,9 @@ function renderPortRow(main) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     // remember when the record last left the device — the tray's quiet backup
-    // reminder counts from here
-    S.stats ||= {};
-    S.stats.lastExportTs = Date.now();
-    saveStore();
+    // reminder counts from here; the copy-then-commit keeps the live stats
+    // untouched when the device cannot save (the export itself already left)
+    commitStorePatch({ stats: { ...(S.stats || {}), lastExportTs: Date.now() } });
   });
   const imp = biLabel('button', 'chip', '読み込む', 'import a record');
   imp.type = 'button';
@@ -3867,7 +4519,46 @@ function renderPortRow(main) {
     if (!f) return;
     try {
       const s = JSON.parse(await f.text());
+      // R3-D · the quiet counterpart door: a parameter file from
+      // tools/fsrs-optimize.mjs (the dry-run report or its candidate pin)
+      // lands as the learner's own scheduler weights — validated fail-closed
+      // by the same gate the boot applies, committed through the guarded
+      // boundary, then the app reboots so the scheduler is rebuilt on what
+      // was accepted. Nothing else in the record is touched.
+      const candidate = plainRecord(s) && plainRecord(s.candidatePin) ? s.candidatePin : s;
+      if (plainRecord(candidate) && owns(candidate, 'w') && !owns(candidate, 'taken')) {
+        const fitted = {
+          w: candidate.w,
+          source: `${nonEmptyString(candidate.parameterSetId) ? candidate.parameterSetId : 'fsrs-optimize'} @ ${new Date().toISOString()}`,
+        };
+        const reviews = s.input?.trainingReviews;
+        if (Number.isInteger(reviews) && reviews > 0) fitted.basedOnReviews = reviews;
+        if (candidate.algorithm !== 'FSRS-6' || srsParamsProblem(fitted)) {
+          portNote.textContent = tx(
+            'このパラメータは読めない。fsrs-optimize の出力をそのまま。',
+            'Those parameters could not be read — use a tools/fsrs-optimize.mjs output, unchanged.',
+          );
+          return;
+        }
+        if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, fsrs: fitted } })) location.reload();
+        return;
+      }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // The file IS the record — so everything the old record owned must go
+      // with it. The AI transcript archive lives in IndexedDB, outside the
+      // exported envelope, and an import left the PREVIOUS learner's
+      // conversations sitting under the new record (E3 round-A, AI lens).
+      // The archive is cleared before the record lands; failing to clear it
+      // is not a reason to import a record on top of someone else's words.
+      try {
+        await clearAiArchive();
+      } catch {
+        portNote.textContent = tx(
+          '前の記録の会話を消せなかった。取り込みは中止した。',
+          "The previous record's conversations could not be cleared, so nothing was imported.",
+        );
+        return;
+      }
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
       location.reload();
     } catch {
@@ -3943,10 +4634,15 @@ function renderLane(main, title, en, ids, t) {
     btn.type = 'button';
     btn.addEventListener('click', () => {
       const kindRow = NODE_KIND[t];
-      for (const id of fresh.slice(0, 20))
-        S.taken.push({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now() });
-      saveStore();
-      render();
+      // the twenty mint as ONE committed batch — the copy persists before
+      // the live deck sees any of them (P0-4)
+      const taken = [
+        ...S.taken,
+        ...fresh
+          .slice(0, 20)
+          .map((id) => ({ t, id, label: id, kind: kindRow[0], kindEn: kindRow[1], from: null, ts: Date.now(), started: Date.now() })),
+      ];
+      if (commitStorePatch({ taken })) render();
     });
     main.append(btn);
   }
@@ -3954,10 +4650,13 @@ function renderLane(main, title, en, ids, t) {
 /* --------------------------------------------------------------- lessons
  * The Duolingo-class lane: small lessons cut from the JLPT word levels and
  * the 漢検 kanji grades the dictionary already carries. Each lesson teaches
- * its items plainly, quizzes them, and on completion the items land in the
- * memorize list — capture that becomes cards without labor, feeding the
- * same FSRS sessions as everything else. One shared learner model; no
- * separate notion of "known". */
+ * its items plainly and quizzes them. Completion writes practice EVIDENCE
+ * only — one obslog row per word, the score in lessonsDone — and the end
+ * screen offers the one explicit door into 覚える, per word or all at once
+ * (PR70-P0-1: exposure is not mastery, and a lesson finishing itself is
+ * not the learner choosing retrieval). No default action: choose nothing
+ * and the deck gains nothing. One shared learner model; no separate
+ * notion of "known". */
 const LESSON_SIZE = 10;
 function lessonLaneIds(kind, lvl) {
   return (kind === 'kanji' ? laneMembers().kanken[lvl] : laneMembers().jlpt[lvl]) || [];
@@ -3973,9 +4672,16 @@ function lessonPlan(kind, lvl) {
   return out;
 }
 function startLesson(lesson) {
+  S.lessonsScroll = window.scrollY; // the list keeps the learner's place
   S.lessonRun = { ...lesson, ix: 0, phase: 'learn', correct: 0, picked: null, choices: null };
   render();
   window.scrollTo(0, 0);
+}
+/** Leave a run for the list — restoring the scroll the run began from. */
+function endLessonRun() {
+  S.lessonRun = null;
+  render();
+  window.scrollTo(0, S.lessonsScroll || 0);
 }
 /** The one-line meaning an item is quizzed on, by kind. */
 function lessonGloss(kind, id) {
@@ -4086,15 +4792,27 @@ function renderLessons(main) {
       btn.type = 'button';
       btn.id = 'lesson-next';
       btn.addEventListener('click', () => {
+        // each answered word leaves its honest mark in the session run —
+        // the completion commit files them all as evidence rows
+        (run.results ||= [])[run.ix] = run.picked === run.choices.right ? 3 : 1;
         if (run.ix + 1 < run.words.length) { run.ix += 1; run.picked = null; run.choices = null; }
         else {
-          S.lessonsDone[run.id] = { score: run.correct, total: run.words.length, ts: Date.now() };
+          // 稽古は記録、入門は選択 (PR70-P0-1): completion writes the score
+          // and one practice-evidence obslog row per word as ONE commit —
+          // zero deck rows, zero FSRS state. The way into 覚える is the
+          // explicit choice on the end screen. A failed persist ends
+          // nothing — the run stays, the alert speaks.
           const kt = run.kind || 'word';
-          const takenSet = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
-          for (const w of run.words)
-            if (!takenSet.has(srsKey(kt, w)))
-              S.taken.push({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now() });
-          saveStore();
+          const now = Date.now();
+          const lessonsDone = { ...S.lessonsDone, [run.id]: { score: run.correct, total: run.words.length, ts: now } };
+          const obslog = [
+            ...(S.obslog || []),
+            ...run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, run.id]),
+          ];
+          if (!commitStorePatch({ lessonsDone, obslog })) {
+            render();
+            return;
+          }
           run.phase = 'end';
         }
         render();
@@ -4103,17 +4821,65 @@ function renderLessons(main) {
     }
     return;
   }
-  // end: the honest score, and where the words went
+  // end: the honest score, the evidence named — and the ONE explicit door
+  // into the deck (PR70-P0-1). Nothing enrolled itself: the run's practice
+  // stands in the observation ledger; 覚える is a quiet choice, per word
+  // or all at once, and choosing nothing adds nothing.
   main.append(el('h1', 'view-title', tx(`${run.correct} / ${run.words.length}`, `${run.correct} of ${run.words.length}`)));
   main.append(
-    el('p', 'gloss', tx('この課の語はぜんぶ「覚える」に入った。復習が育てていく。', 'Every word from this lesson is now in your memorize list — the reviews will grow them from here.')),
+    el(
+      'p',
+      'gloss',
+      tx(
+        '稽古は記録に残った。札にするかどうかは、ここで選ぶ — 選ばなければ、何も増えない。',
+        'The practice is on the record. Whether a word becomes a card is chosen here — choose nothing, and nothing is added.',
+      ),
+    ),
   );
+  const kt = run.kind || 'word';
+  const inDeck = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
+  // an enroll is the learner's explicit promotion: the row carries the
+  // started mark the moment it is chosen (R2-A), one guarded commit each
+  const enrollRow = (w) => ({ t: kt, id: w, label: w, kind: NODE_KIND[kt][0], kindEn: NODE_KIND[kt][1], from: null, ts: Date.now(), started: Date.now() });
+  const list = el('div', 'lesson-enroll');
+  run.words.forEach((w, i) => {
+    const row = el('div', 'lesson-enroll-row');
+    const right = (run.results || [])[i] === 3;
+    row.append(el('span', 'lesson-enroll-mark' + (right ? ' right' : ' wrong'), right ? '○' : '×'));
+    row.append(el('span', 'lesson-enroll-word', w));
+    const have = inDeck.has(srsKey(kt, w));
+    const b = biLabel('button', have ? 'chip lesson-enroll-one on' : 'chip lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
+    b.type = 'button';
+    b.dataset.enroll = w;
+    b.disabled = have;
+    if (!have) {
+      b.addEventListener('click', () => {
+        if (commitStorePatch({ taken: [...S.taken, enrollRow(w)] })) render();
+      });
+    }
+    row.append(b);
+    list.append(row);
+  });
+  main.append(list);
+  const freshWords = run.words.filter((w) => !inDeck.has(srsKey(kt, w)));
+  if (freshWords.length) {
+    const all = biLabel(
+      'button',
+      'chip lesson-enroll-all',
+      `ぜんぶ覚える — ${freshWords.length} 件`,
+      `memorize all ${freshWords.length}`,
+    );
+    all.type = 'button';
+    all.id = 'lesson-enroll-all';
+    all.addEventListener('click', () => {
+      // exactly the not-yet-chosen words, as ONE committed batch (P0-4)
+      if (commitStorePatch({ taken: [...S.taken, ...freshWords.map(enrollRow)] })) render();
+    });
+    main.append(all);
+  }
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
   again.type = 'button';
-  again.addEventListener('click', () => {
-    S.lessonRun = null;
-    render();
-  });
+  again.addEventListener('click', endLessonRun);
   main.append(again);
 }
 
@@ -4123,8 +4889,9 @@ function renderLessons(main) {
  * the app renders and scores them like a lesson quiz. Testing only:
  * nothing here writes to the SRS — FSRS alone schedules. The strict-JSON
  * contract is parsed defensively; a malformed reply degrades to the same
- * quiet one-line failure as every other tutor door. In-memory only: a
- * quiz is an event, not a possession. */
+ * quiet one-line failure as every other tutor door. The RUN is durable
+ * (POL-13): every step commits, so a mid-quiz reload resumes with not a
+ * word of the tutor's lost; only the learner's own door closes it. */
 function aiQuizParse(raw) {
   const m = raw.match(/\[[\s\S]*\]/);
   if (!m) return null;
@@ -4149,15 +4916,23 @@ function aiQuizParse(raw) {
   );
   return ok.length >= 3 ? ok.slice(0, 5) : null;
 }
+/** POL-13 · every quiz step crosses the durability boundary, so a reload
+ * lands back exactly where the learner stood. A device that cannot save
+ * keeps the quiz alive in memory — the storage alert speaks, the learner
+ * still finishes; only durability is lost, never the words. */
+function aiQuizCommit(next) {
+  if (!commitStorePatch({ aiQuiz: next })) S.aiQuiz = next;
+}
 async function aiQuizStart() {
   const words = S.taken.filter((t) => t.t === 'word').slice(-14).map((t) => t.id);
   const raw = await aiAsk(
     'You write a short quiz inside a Japanese-learning app. Output ONLY a JSON array, no prose, no markdown fences. Five items, each exactly {"q": string, "opts": [4 strings], "right": 0-3, "why": string}. Each q is one short Japanese question or cloze sentence (with readings in parentheses for kanji above the learner\'s level) testing one of the given words in context; opts are four plausible answers in Japanese or English; right is the index of the correct one; why is one short English sentence explaining it. Vary the words tested.',
     `Learner level: about JLPT ${aiLevelGuess()}. Words to test: ${words.join('、')}.`,
+    { surface: 'quiz' },
   );
   const qs = aiQuizParse(raw);
   if (!qs) throw new Error('shape');
-  S.aiQuiz = { qs, ix: 0, picked: null, correct: 0 };
+  aiQuizCommit({ qs, ix: 0, picked: null, correct: 0, ts: Date.now() });
 }
 function renderAiQuiz(main) {
   const run = S.aiQuiz;
@@ -4174,8 +4949,10 @@ function renderAiQuiz(main) {
     );
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';
+    out.id = 'aiq-close';
     out.addEventListener('click', () => {
-      S.aiQuiz = null;
+      // the learner's own door is the one thing that lets a quiz go
+      aiQuizCommit(null);
       S.view = 'tray';
       render();
     });
@@ -4196,8 +4973,9 @@ function renderAiQuiz(main) {
       b.disabled = true;
     } else {
       b.addEventListener('click', () => {
-        run.picked = i;
-        if (i === q.right) run.correct += 1;
+        // the pick commits before it shows (POL-13): a reload mid-question
+        // reopens on the same marked answer and the same running score
+        aiQuizCommit({ ...run, picked: i, correct: run.correct + (i === q.right ? 1 : 0) });
         render();
       });
     }
@@ -4210,8 +4988,7 @@ function renderAiQuiz(main) {
     btn.type = 'button';
     btn.id = 'aiq-next';
     btn.addEventListener('click', () => {
-      run.ix += 1;
-      run.picked = null;
+      aiQuizCommit({ ...run, ix: run.ix + 1, picked: null });
       render();
     });
     main.append(btn);
@@ -4221,14 +4998,65 @@ function renderAiQuiz(main) {
 /* You speak to it — the operator's words. A small conversation with the
  * tutor on its own page: it knows your rough level and answers as a
  * teacher inside this app, not a search engine. The exchange is kept on
- * the device (last 24 turns), like everything else here. */
+ * the device. The visible log renders from the durable archive — the old
+ * 24-turn cap governs only the request window (and the localStorage
+ * fallback), so turn 25 no longer destroys turn 1. */
+const AI_CHAT_PAGE = 40; // turns unfolded per 前の会話 step
+// pending lives beside the log, not in one render's closure: leaving the
+// page mid-question and coming back must show the same 考え中 and the same
+// sealed 送る, or the second send duplicates the question in the archive
+const aiChatLog = { turns: null, loading: false, pending: false };
+
+/** The log the chat renders: the archive once hydrated, else the store. */
+function aiChatTurns() {
+  return aiChatLog.turns || S.aiChat;
+}
+
+/** Hydrate the session's chat log from the archive, once. On the archive's
+ * first-ever open, what survives of the old capped store seeds it — the
+ * honest floor; turns the cap already destroyed are not backfilled. */
+function aiChatHydrate() {
+  if (aiChatLog.turns || aiChatLog.loading) return;
+  aiChatLog.loading = true;
+  aiLogAll('chat').then((rows) => {
+    aiChatLog.loading = false;
+    if (rows.length) {
+      aiChatLog.turns = rows.map((r) => ({ role: r.role === 'user' ? 'user' : 'tutor', text: r.content }));
+    } else {
+      aiChatLog.turns = S.aiChat.map((t) => ({ role: t.role, text: t.text }));
+      const { model } = aiProvider();
+      for (const t of aiChatLog.turns) {
+        aiLogAppend({ surface: 'chat', role: t.role, content: t.text, model, ts: Date.now() });
+      }
+    }
+    // repaint only when the archive held more than the fallback window was
+    // already showing — a same-length repaint would eat a half-typed draft
+    if (S.view === 'ai' && aiChatLog.turns.length !== S.aiChat.length) render();
+  });
+}
+
 function renderAiChat(main) {
+  aiChatHydrate();
+  const turns = aiChatTurns();
   main.append(withEn(el('p', 'eyebrow', '先生と話す'), 'talk with the tutor', 'en-inline'));
   const log = el('div', 'chat-log');
-  for (const turn of S.aiChat) {
+  // the whole transcript is at hand; the page renders the recent window and
+  // unfolds earlier turns on request instead of re-inking hundreds at once
+  const from = Math.max(0, turns.length - (S.aiChatShown || AI_CHAT_PAGE));
+  if (from > 0) {
+    const earlier = biLabel('button', 'chip chat-earlier', '前の会話', 'show earlier');
+    earlier.type = 'button';
+    earlier.id = 'chat-earlier';
+    earlier.addEventListener('click', () => {
+      S.aiChatShown = (S.aiChatShown || AI_CHAT_PAGE) + AI_CHAT_PAGE;
+      render();
+    });
+    log.append(earlier);
+  }
+  for (const turn of turns.slice(from)) {
     log.append(el('p', turn.role === 'user' ? 'chat-turn me' : 'chat-turn tutor', turn.text));
   }
-  if (!S.aiChat.length) {
+  if (!turns.length) {
     log.append(
       el(
         'p',
@@ -4250,27 +5078,45 @@ function renderAiChat(main) {
   const send = biLabel('button', 'take chat-send', '送る', 'send');
   send.type = 'button';
   send.id = 'chat-send';
+  if (aiChatLog.pending) {
+    send.disabled = true;
+    const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
+    log.append(thinking);
+  }
   const ask = async () => {
     const text = input.value.trim();
-    if (!text || send.disabled) return;
-    S.aiChat.push({ role: 'user', text });
-    saveStore();
+    if (!text || send.disabled || aiChatLog.pending) return;
+    // the request-window copy commits BEFORE the turn travels; a device
+    // that cannot save keeps the message in the field, told why by the alert
+    if (!commitStorePatch({ aiChat: [...S.aiChat, { role: 'user', text }] })) return;
+    if (aiChatLog.turns) aiChatLog.turns.push({ role: 'user', text });
     input.value = '';
     send.disabled = true;
+    aiChatLog.pending = true;
     const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
     log.append(thinking);
     thinking.scrollIntoView({ block: 'nearest' });
     try {
+      // the REQUEST window stays bounded; the durable archive holds the whole
       const turns = S.aiChat.slice(-8).map((t) => ({ role: t.role === 'user' ? 'user' : 'assistant', content: t.text }));
       const reply = await aiConverse(
         `You are the tutor inside a Japanese-learning app. The learner reads at about JLPT ${aiLevelGuess()}. Answer as a patient teacher in under 130 words of plain text — no headers, no markdown. Use Japanese the learner can read at their level (add readings in parentheses for hard kanji), and English where it helps. If asked something outside Japanese language or study, gently steer back.`,
         turns,
+        { surface: 'chat' },
       );
-      S.aiChat.push({ role: 'tutor', text: reply });
-      saveStore();
+      // if the window's commit fails the reply still stands in the durable
+      // archive and the rendered transcript; only the bounded request
+      // context misses it — the alert names the storage failure
+      commitStorePatch({ aiChat: [...S.aiChat, { role: 'tutor', text: reply }] });
+      if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: reply });
     } catch {
-      S.aiChat.push({ role: 'tutor', text: tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.') });
+      const line = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      commitStorePatch({ aiChat: [...S.aiChat, { role: 'tutor', text: line }] });
+      if (aiChatLog.turns) aiChatLog.turns.push({ role: 'tutor', text: line });
+      // the app's own line rides the archive too, marked as the app's
+      aiLogAppend({ surface: 'chat', role: 'app', content: line, model: aiProvider().model, ts: Date.now() });
     }
+    aiChatLog.pending = false;
     send.disabled = false;
     S.sheetFocus = 'chat-input';
     render();
@@ -4440,6 +5286,10 @@ function renderKanjidex(main) {
   const lensRow = el('div', 'kdx-lenses');
   for (const [id, ja, en] of LENSES) {
     const b = el('button', S.kdx.mode === id ? 'kdx-lens on' : 'kdx-lens');
+    // the selected lens said so only in a class and a colour — and that
+    // colour fell to 2.85:1 in the dark worlds (E3 round-A, a11y lens).
+    // The state is spoken now; the CSS carries the contrast.
+    b.setAttribute('aria-pressed', String(S.kdx.mode === id));
     b.type = 'button';
     b.append(el('span', 'l-ja', ja));
     if (bi()) b.append(el('span', 'en-sub', en));
@@ -5779,7 +6629,9 @@ function nodeTitle(node) {
   if (node.t === 'grammar') return GRAMMARS().find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'particle') return PARTICLES.find((x) => x.id === node.id)?.p || node.id;
   if (node.t === 'catalog') return catalogLabel(node.by, node.value);
-  if (node.t === 'sent') return tx('文', 'sentence');
+  // the crumb idiom for a content-shaped node: 日本語 first, english beside
+  // it — never a stray lowercase 'sentence' standing alone mid-crumb
+  if (node.t === 'sent') return tx('文', '文 sentence');
   return '';
 }
 
@@ -5802,6 +6654,25 @@ function renderSentenceNode(sheet, node) {
   sheet.append(line);
   if (node.en) sheet.append(el('p', 'sent-reader-en', node.en));
   if (node.source) sheet.append(el('p', 'example-src', node.source));
+  // …and on to the whole article. The rubric asks a review answer to return
+  // the learner to the source sentence AND its article (§9.5); the C1
+  // demonstration found the sentence half present and this half missing.
+  // The door appears only when the sentence really came from a shelf
+  // article — a bank example has no article to walk into, and an honest
+  // absence beats a door onto nothing.
+  const home = node.passage && D.passages.some((p) => p.id === node.passage) ? node.passage : null;
+  if (home) {
+    const doorRow = el('div', 'sent-home-row');
+    const door = biLabel('button', 'chip sent-home', 'この記事を読む', 'read the source article');
+    door.type = 'button';
+    door.id = 'sent-home';
+    door.addEventListener('click', () => {
+      dismissSheet();
+      openPassage(home);
+    });
+    doorRow.append(door);
+    sheet.append(doorRow);
+  }
   sheet.append(el('p', 'gloss', tapLadderHint()));
 }
 
@@ -5979,7 +6850,18 @@ function commitCapture(node, label, now = Date.now()) {
     kindEn: NODE_KIND[node.t][1],
     from: node.from || null,
     ts: now,
+    // 覚える is the explicit choice to memorize, so the row is started the
+    // moment it is taken. Rows that arrive any other way — import, legacy
+    // stores — carry no mark and wait for the learner's 始める.
+    started: now,
   };
+  // Capture that arrives from inside the reading flow carries the sentence
+  // it was met in (ctxScope rides the node): the top-right door and the mini
+  // take the word AS ENCOUNTERED. The scope stages (語だけ・この文・段落)
+  // stay one tap away to widen or shed it — same ctx record, same validator.
+  if (node.ctxScope && node.from?.passage && node.from.index != null) {
+    item.ctx = { p: node.from.passage, i: Number(node.from.index), scope: node.ctxScope };
+  }
   let deepWord = null;
   // A word taken from the deep tier writes its own compact record into the
   // learner's store: the card must answer on any device, offline, without
@@ -6034,6 +6916,71 @@ function takeButton(node, label) {
   return btn;
 }
 
+/* ------------------------------------------- 覚える top-right (directive §3)
+ * One button in the top-right corner of every capture-eligible surface. The
+ * entry sheets carry their own seal in the sheet bar; the reader's lives in
+ * the chrome and takes the CURRENT THING — the word the learner last touched
+ * in the open article, with the sentence it was met in. Surfaces that show
+ * no capturable thing (the shelf, the tray, the dojo, the galaxy — they are
+ * navigation and curation, not content) honestly carry none, and 書の間
+ * keeps its total quiet: its kanji's seal waits on the sheet beneath. */
+function readerTakeCurrent() {
+  if (S.view !== 'reader' || !S.passageId) return null;
+  const cur = S.readerTake;
+  if (!cur || cur.p !== S.passageId) return null;
+  return cur;
+}
+
+/** The capture node the reader's door commits: the word as encountered —
+ * provenance and the sentence scope travel with it. */
+function readerTakeNode(cur) {
+  return { t: 'word', id: cur.id, from: { passage: cur.p, index: cur.index }, ctxScope: 'sent' };
+}
+
+function readerTakeLabel(cur, takenNow) {
+  if (!cur) return tx('語に触れると、ここから覚えられる', 'touch a word, then memorize it here');
+  return takenNow
+    ? tx(`「${cur.id}」を覚えている — ひらいて調整・やめる`, `memorizing ${cur.id} — open to adjust or stop`)
+    : tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`);
+}
+
+/** Remember the word under the learner's finger and repaint the chrome seal
+ * in place — token taps deliberately never trigger a full re-render. */
+function setReaderTake(id, index, passageId) {
+  S.readerTake = { id, index, p: passageId };
+  syncReaderTakeSeal();
+}
+
+function syncReaderTakeSeal() {
+  const btn = document.getElementById('reader-take');
+  if (!btn) return;
+  const cur = readerTakeCurrent();
+  const takenNow = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
+  btn.disabled = !cur;
+  btn.classList.toggle('taken', takenNow);
+  btn.setAttribute('aria-pressed', String(takenNow));
+  btn.setAttribute('aria-expanded', String(!!S.captureOpen));
+  btn.setAttribute('aria-label', readerTakeLabel(cur, takenNow));
+}
+
+/* a tap anywhere outside the capture panel puts it away — the mini's law.
+ * The panel node leaves on the spot (no full render, so the tap underneath
+ * still lands where it was aimed) and the seal repaints in place. */
+document.addEventListener(
+  'pointerdown',
+  (ev) => {
+    if (!S.captureOpen) return;
+    const panel = document.getElementById('capture-panel');
+    const seal = document.getElementById('reader-take');
+    if (panel && !panel.contains(ev.target) && !(seal && seal.contains(ev.target))) {
+      S.captureOpen = false;
+      panel.remove();
+      syncReaderTakeSeal();
+    }
+  },
+  true,
+);
+
 /** After 覚える: the item lands in this month's bucket automatically (the
  * operator's Renzo habit, automated) and can join any named list too. */
 /** The capture's context scope — 語だけ, この文, or 段落. Only offered when
@@ -6062,10 +7009,13 @@ function renderContextPicker(sheet, node) {
     chip.type = 'button';
     chip.dataset.ctxScope = scope ?? 'word';
     chip.addEventListener('click', () => {
-      if (scope === null) delete item.ctx;
-      else item.ctx = { p: from.passage, i: Number(from.index), scope };
-      saveStore();
-      render();
+      // the card's context is deck state: replace the row on a COPY and
+      // commit — the live item never changes on a failed persist
+      const changed = { ...item };
+      if (scope === null) delete changed.ctx;
+      else changed.ctx = { p: from.passage, i: Number(from.index), scope };
+      const taken = S.taken.map((t) => (t === item ? changed : t));
+      if (commitStorePatch({ taken })) render();
     });
     chips.append(chip);
   }
@@ -6088,25 +7038,29 @@ function renderListPicker(sheet, node, label) {
     chip.append(el('span', 'big', name));
     chip.append(el('span', 'sub', `${S.lists[name].length}`));
     chip.addEventListener('click', () => {
-      if (inList)
-        setOwnRecordValue(
-          S.lists,
-          name,
-          S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id)),
-        );
-      else
-        S.lists[name].push({
-          t: node.t,
-          id: node.id,
-          label,
-          // the kind pill was stripped at store time and named-list rows
-          // rendered an empty grey pill (P2, full-instrument review)
-          kind: NODE_KIND[node.t]?.[0],
-          kindEn: NODE_KIND[node.t]?.[1],
-          ts: item.ts,
-        });
-      saveStore();
-      render();
+      // membership rides the same guarded path as list creation below:
+      // prototype-safe writes on a COPY, one commit, no live mutation
+      const next = { ...S.lists };
+      setOwnRecordValue(
+        next,
+        name,
+        inList
+          ? S.lists[name].filter((x) => !(x.t === node.t && x.id === node.id))
+          : [
+              ...S.lists[name],
+              {
+                t: node.t,
+                id: node.id,
+                label,
+                // the kind pill was stripped at store time and named-list rows
+                // rendered an empty grey pill (P2, full-instrument review)
+                kind: NODE_KIND[node.t]?.[0],
+                kindEn: NODE_KIND[node.t]?.[1],
+                ts: item.ts,
+              },
+            ],
+      );
+      if (commitStorePatch({ lists: next })) render();
     });
     chips.append(chip);
   }
@@ -6206,20 +7160,37 @@ function srsStoredRecord(card) {
     last_review: card.last_review ? card.last_review.toISOString() : undefined,
   };
 }
+/** append-order-monotonic-clamp-v1 — the review-time policy the domain pin
+ * names (data/fsrs-pin.json), now held in this engine too. The per-card
+ * scheduler instant never decreases: a card's stored last_review is its
+ * scheduler anchor (the effective instant of its previous grade), and a wall
+ * clock that has moved behind it is clamped up to that anchor before FSRS
+ * sees it — ts-fsrs throws on a negative day delta, and a backward device
+ * clock must neither crash nor corrupt grading. Raw wall-clock truth is not
+ * rewritten: the revlog row keeps the actual press time as audit truth; only
+ * the instant handed to the scheduler is monotonic. */
+function srsSchedulerInstant(card, now) {
+  return card.last_review && card.last_review.getTime() > now.getTime()
+    ? new Date(card.last_review.getTime())
+    : now;
+}
 /* --------------------------------------------------- the review log
  * Append-only, one compact row per grade, never rewritten. Layout:
  *
  *   [t, key, g, stBefore, elapsed, r, sBefore, dBefore, sAfter, dAfter, ivl, dueAfter]
  *
- *   t        press time, epoch MILLISECONDS (ms precision matters: the
- *            engine's fuzz seed is `${time}_${reps}_${d*s}`, so the exact
- *            timestamp makes every fuzzed interval reproducible on replay)
+ *   t        press time, epoch MILLISECONDS — the RAW device clock, kept as
+ *            audit truth even when it has moved backward; the scheduler's own
+ *            clamped instant is recoverable as max(t, last_review before)
+ *            under append-order-monotonic-clamp-v1
  *   key      "type:id" scheduler key
  *   g        FSRS Rating pressed (1 Again · 2 Hard · 3 Good · 4 Easy);
  *            g = 0 is a revocation (undo): the row is [t, key, 0, revokedIndex]
  *   stBefore card state before (0 New · 1 Learning · 2 Review · 3 Relearning)
- *   elapsed  days since last_review at press (3 dp; null on a first press)
- *   r        engine retrievability at press (4 dp; null without last_review)
+ *   elapsed  days since last_review at the CLAMPED scheduler instant (3 dp;
+ *            null on a first press; never negative — what the engine priced)
+ *   r        engine retrievability at the clamped instant (4 dp; null
+ *            without last_review)
  *   sBefore/dBefore  memory state before (4 dp; null on a first press)
  *   sAfter/dAfter    memory state after
  *   ivl      scheduled_days of the stored result
@@ -6228,14 +7199,14 @@ function srsStoredRecord(card) {
  * This is sufficient for the FSRS optimizer (per-card sequences of
  * (elapsed, rating)), for analytics, and — with the pinned parameters —
  * for full deterministic state reconstruction by replay. */
-function srsReviewLogRow(key, before, after, rating, now) {
+function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
   const rnd = (v, p) => (v == null || !Number.isFinite(v) ? null : Number(v.toFixed(p)));
   let elapsed = null;
   let r = null;
   if (before.last_review) {
-    elapsed = rnd((now.getTime() - before.last_review.getTime()) / 86400000, 3);
+    elapsed = rnd((schedNow.getTime() - before.last_review.getTime()) / 86400000, 3);
     try {
-      r = rnd(scheduler.get_retrievability(before, now, false), 4);
+      r = rnd(scheduler.get_retrievability(before, schedNow, false), 4);
     } catch {
       r = null;
     }
@@ -6266,17 +7237,25 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.done[entry.key] += 1;
   rv.ix += 1;
   rv.revealed = false;
+  // the next card asks its own question — no declaration carries over
+  rv.declared = null;
+  // …and neither does いま見る: the next ripening card gets its own wait
+  rv.showEarly = false;
 }
 
-function commitDrillGrade({ rv, item, next, key, skey, rating, now }) {
-  const obslog = [...(S.obslog || []), [now.getTime(), 'dojo', skey, rating]];
+function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
+  // practice evidence, never deck state: the row carries the drill room
+  // ('kanji') when the caller names one — see the obslog layout comment
+  const row = [now.getTime(), 'dojo', skey, rating];
+  if (typeof mode === 'string' && mode) row.push(mode);
+  const obslog = [...(S.obslog || []), row];
   if (!commitStorePatch({ obslog })) return false;
   advanceReviewSession(rv, item, next, { key, drill: true });
   return true;
 }
 
-function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, day, prevRec }) {
-  const revlog = [...(S.revlog || []), srsReviewLogRow(skey, card, next, rating, now)];
+function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, schedNow, day, prevRec }) {
+  const revlog = [...(S.revlog || []), srsReviewLogRow(skey, card, next, rating, now, schedNow || now)];
   const logIx = revlog.length - 1;
   const srs = { ...S.srs, [skey]: srsStoredRecord(next) };
   const dayStats = { ...(S.stats?.[day] || { n: 0, again: 0 }) };
@@ -6293,12 +7272,18 @@ function commitStandardGrade({ rv, item, card, next, key, skey, rating, now, day
   return true;
 }
 
-/** Items ready to review: real reviews by their due date, then never-seen
- * cards — capped at 20 a DAY (Anki's default pacing), so a long list arrives
- * as days of honest work instead of one avalanche. The count of cards
- * introduced today lives in S.stats[day].nnew, written on a card's first
- * grade and honoured across every session of the day. */
-const NEW_PER_DAY = 20;
+/** Items ready to review: real reviews ordered most-overdue first, then
+ * never-seen cards — capped a DAY (default 20, the learner's own number via
+ * ペース), so a long list arrives as days of honest work instead of one
+ * avalanche. The count of cards introduced today lives in S.stats[day].nnew,
+ * written on a card's first grade and honoured across every session of the
+ * day. */
+const srsNewPerDay = () =>
+  validNewPerDay(S.srsPrefs?.newPerDay) ? S.srsPrefs.newPerDay : NEW_PER_DAY_DEFAULT;
+/** How many due cards one ordinary sitting freezes (PR70-P1-2). The timed
+ * dojo keeps its own refill and never reads this. */
+const srsReviewLimit = () =>
+  validReviewLimit(S.srsPrefs?.reviewLimit) ? S.srsPrefs.reviewLimit : REVIEW_LIMIT_DEFAULT;
 /** How many pool items a dojo refill draws at once — session pacing only,
  * unrelated to the daily new-card cap. */
 const FOCUS_BATCH = 20;
@@ -6318,11 +7303,30 @@ function srsDueItems(now = new Date()) {
     const key = srsKey(item.t, item.id);
     if (S.suspended[key]) continue;
     const rec = S.srs[key];
-    if (!rec) fresh.push(item);
-    else if (new Date(rec.due) <= now) reviews.push(item);
+    if (!rec) {
+      // no-debt migration (PR70-P1-1): a cardless row joins the queue only
+      // when the learner explicitly started it. Legacy and imported rows
+      // carry no `started` mark and wait for 始める — capture, import, and
+      // migration never schedule anything by themselves.
+      if (finiteNumber(item.started)) fresh.push(item);
+    } else if (new Date(rec.due) <= now) {
+      reviews.push(item);
+    }
   }
+  // Most overdue first — the same total order the domain planner uses
+  // (plan.ts compareDueContracts): the earliest due instant wins and the
+  // scheduler key breaks ties, so two loads of one store never disagree.
+  // Never-seen cards keep their capture order and stay after every real due.
+  reviews.sort((a, b) => {
+    const dueA = Date.parse(S.srs[srsKey(a.t, a.id)].due);
+    const dueB = Date.parse(S.srs[srsKey(b.t, b.id)].due);
+    if (dueA !== dueB) return dueA - dueB;
+    const keyA = srsKey(a.t, a.id);
+    const keyB = srsKey(b.t, b.id);
+    return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
+  });
   const introducedToday = S.stats[dayKey(now)]?.nnew || 0;
-  const room = Math.max(0, NEW_PER_DAY - introducedToday);
+  const room = Math.max(0, srsNewPerDay() - introducedToday);
   return [...reviews, ...fresh.slice(0, room)];
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
@@ -6334,7 +7338,8 @@ function startOfDay(d) {
 function srsWhen(item) {
   if (S.suspended[srsKey(item.t, item.id)]) return tx('休み中', 'resting');
   const rec = S.srs[srsKey(item.t, item.id)];
-  if (!rec) return tx('新規', 'new');
+  // an unstarted row tells the truth: it holds no card and owes no review
+  if (!rec) return finiteNumber(item.started) ? tx('新規', 'new') : tx('未着手', 'not started');
   const now = new Date();
   const due = new Date(rec.due);
   const ms = due.getTime() - now.getTime();
@@ -6349,7 +7354,7 @@ function srsWhen(item) {
 /** Anki's stats screen, reduced to one honest line: what today, tomorrow
  * and the coming week actually hold, plus the untouched new cards. */
 function srsForecast(now = new Date()) {
-  const f = { today: 0, tomorrow: 0, week: 0, fresh: 0 };
+  const f = { today: 0, tomorrow: 0, week: 0, fresh: 0, unstarted: 0 };
   const DAY = 86400000;
   // Calendar buckets, the way a person counts: everything due before tonight's
   // midnight is TODAY (a card due in three hours is not 明日), tomorrow is
@@ -6362,7 +7367,8 @@ function srsForecast(now = new Date()) {
     if (S.suspended[key]) continue;
     const rec = S.srs[key];
     if (!rec) {
-      f.fresh += 1;
+      if (finiteNumber(item.started)) f.fresh += 1;
+      else f.unstarted += 1;
       continue;
     }
     const due = new Date(rec.due).getTime();
@@ -6381,11 +7387,48 @@ function startReview(scope) {
     const keys = new Set(scope.map((i) => srsKey(i.t, i.id)));
     queue = queue.filter((i) => keys.has(srsKey(i.t, i.id)));
   }
+  // bounded standard review (PR70-P1-2): an ordinary sitting freezes at most
+  // the learner's own bound — the most overdue cards, since the queue is
+  // already ordered — and the rest is an honest count on the goodbye screen,
+  // never a queue growing behind the glass. The timed dojo keeps its refill.
+  const limit = srsReviewLimit();
+  const deferred = Math.max(0, queue.length - limit);
+  if (deferred) queue = queue.slice(0, limit);
   if (!queue.length) return;
-  S.review = { queue, ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
+  S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
   S.view = 'review';
   render();
 }
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * read-only access to the scheduler policy actually in force, the clamp,
+ * the ordered due queue, and the bounded session — so acceptance checks
+ * exercise the real code instead of a re-implementation. */
+window.__KAIRO_SRS__ = Object.freeze({
+  policy: () => ({
+    enableFuzz: srsParams ? srsParams.enable_fuzz : null,
+    pinFuzz: D.pin?.enableFuzz ?? null,
+    reviewTimePolicyId: D.pin?.reviewTimePolicyId ?? null,
+  }),
+  // R3-D · the parameter set actually in force: the learner's own fitted
+  // weights when srsPrefs.fsrs passed the gate, the pinned defaults otherwise
+  params: () => ({
+    custom: !!srsCustom,
+    source: srsCustom ? srsCustom.source : null,
+    basedOnReviews: srsCustom ? srsCustom.basedOnReviews : null,
+    w: srsParams ? Array.from(srsParams.w) : null,
+  }),
+  schedulerInstant: (lastReviewIso, nowMs) =>
+    srsSchedulerInstant(
+      lastReviewIso ? { last_review: new Date(lastReviewIso) } : {},
+      new Date(nowMs),
+    ).toISOString(),
+  dueKeys: () => srsDueItems().map((i) => srsKey(i.t, i.id)),
+  prefs: () => ({ newPerDay: srsNewPerDay(), reviewLimit: srsReviewLimit() }),
+  session: () =>
+    S.review
+      ? { queue: S.review.queue.length, ix: S.review.ix, deferred: S.review.deferred ?? 0 }
+      : null,
+});
 /** The card back, by kind — reading and meaning from the same records the
  * entry sheets read, so the session and the dictionary never disagree. */
 function reviewBack(item) {
@@ -6434,7 +7477,10 @@ function reviewBack(item) {
 function renderReview(main) {
   const rv = S.review;
   // a focus block keeps the queue full: when the cards run dry before the
-  // clock, draw the next batch from the pool so drilling never stalls
+  // clock, draw the next lap from the pool so drilling never stalls — and
+  // laps after the first are PRACTICE (POL-12): the schedule already took
+  // its one honest grade per card this block; repeats stamp 稽古 evidence
+  // rows, never a second mutation
   if (rv && S.focus && !S.focus.ended && rv.ix >= rv.queue.length && Date.now() < S.focus.deadline) {
     refillFocusQueue(rv);
   }
@@ -6454,6 +7500,13 @@ function renderReview(main) {
     for (const key of ['again', 'hard', 'good', 'easy'])
       if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
     main.append(sum);
+    // the bounded sitting's honest remainder: what the freeze left for the
+    // next sitting, said quietly, never queued behind the glass
+    if (!S.focus && rv.deferred) {
+      main.append(
+        el('p', 'srs-forecast review-deferred', tx(`あと ${rv.deferred} 件`, `${rv.deferred} more waiting`)),
+      );
+    }
     // the struggling cards, by name (each once) — a rest offered, never imposed
     const leechSeen = new Set();
     const leeches = rv.queue.filter((i) => {
@@ -6481,9 +7534,9 @@ function renderReview(main) {
         rest.type = 'button';
         rest.dataset.leechRest = item.id;
         rest.addEventListener('click', () => {
-          S.suspended[srsKey(item.t, item.id)] = Date.now();
-          saveStore();
-          render();
+          // a rest is deck state — commit the copy, then show it (P0-4)
+          const suspended = { ...S.suspended, [srsKey(item.t, item.id)]: Date.now() };
+          if (commitStorePatch({ suspended })) render();
         });
         row.append(rest);
         main.append(row);
@@ -6528,7 +7581,11 @@ function renderReview(main) {
         renderReviewWait(main, rv, dueAt(rv.queue[rv.ix]));
         return;
       }
-      rv.showEarly = false;
+      // いま見る holds for the WHOLE card, not for one render. Clearing it as
+      // the front face painted meant the next render — the one the learner's
+      // own 思い出した/まだ triggers — fell back into the countdown and hid
+      // the answer they had just asked for. advanceReviewSession retires the
+      // flag when the card is done.
     }
   }
   const item = rv.queue[rv.ix];
@@ -6631,11 +7688,17 @@ function renderReview(main) {
     rest2.id = 'review-rest';
     rest2.addEventListener('click', () => {
       const key = srsKey(item.t, item.id);
-      S.suspended[key] = Date.now();
-      saveStore();
+      // the rest commits before the session moves — a failed persist keeps
+      // the card up and the alert speaks (P0-4)
+      const suspended = { ...S.suspended, [key]: Date.now() };
+      if (!commitStorePatch({ suspended })) {
+        render();
+        return;
+      }
       rv.history.push({ key: 'suspend' });
       rv.ix += 1;
       rv.revealed = false;
+      rv.declared = null;
       S.reviewMore = false;
       render();
     });
@@ -6650,38 +7713,114 @@ function renderReview(main) {
   }
 
   if (!rv.revealed) {
-    // the card itself turns over — and the labeled button stays for hands
-    // and readers that want one
-    face.addEventListener('click', () => {
+    if (S.focus) {
+      // the dojo keeps its single turn-over — drilling early is its point,
+      // and a drill-only grade is practice evidence, not a scheduled
+      // review. The declared-recall gate below guards the zen room only.
+      // The card itself turns over — and the labeled button stays for
+      // hands and readers that want one.
+      face.addEventListener('click', () => {
+        rv.revealed = true;
+        render();
+      });
+      const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
+      btn.type = 'button';
+      btn.id = 'reveal';
+      btn.addEventListener('click', () => {
+        rv.revealed = true;
+        render();
+      });
+      main.append(btn);
+      return;
+    }
+    // 想起の二道 — the kernel law (ADR-002 T-06): a learner who saw the
+    // answer before recalling did not recall it. So the front face asks the
+    // only honest question first — did it come back? — and the answer is
+    // what turns the card over: 思い出した opens all four grades; まだ
+    // opens the back for study with Again as the one grade the schedule
+    // will record. There is no bare reveal in this room — the declaration
+    // IS the door. It lands in the observation ledger like the reader's
+    // tap ladder (debounce-persisted); the forcing itself rides rv.declared
+    // in session state and the synchronous grade commit.
+    const declare = (declared) => {
+      rv.declared = declared;
       rv.revealed = true;
+      obsLog('reveal', srsKey(item.t, item.id), declared);
       render();
-    });
-    const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
-    btn.type = 'button';
-    btn.id = 'reveal';
-    btn.addEventListener('click', () => {
-      rv.revealed = true;
-      render();
-    });
-    main.append(btn);
+    };
+    const declRow = el('div', 'declare-row');
+    const notyet = biLabel('button', 'take declare-notyet', 'まだ', 'not yet');
+    notyet.type = 'button';
+    notyet.id = 'declare-notyet';
+    notyet.addEventListener('click', () => declare(0));
+    const recalled = biLabel('button', 'take declare-recalled', '思い出した', 'I recalled it');
+    recalled.type = 'button';
+    recalled.id = 'declare-recalled';
+    recalled.addEventListener('click', () => declare(1));
+    declRow.append(notyet, recalled);
+    main.append(declRow);
     return;
   }
   const now = new Date();
   const card = srsCardOf(item, now);
-  const result = scheduler.repeat(card, now);
+  // the monotonic clamp (srsSchedulerInstant): the four previews and the
+  // committed grade all price the card at the same never-decreasing instant
+  const schedNow = srsSchedulerInstant(card, now);
+  const result = scheduler.repeat(card, schedNow);
+  // 道場の礼 — a focus drill on a card the learner never TOOK is exposure,
+  // not deck membership (P0, full-instrument review): grading it must not
+  // mint FSRS state the due queue can never surface (srsDueItems walks
+  // S.taken only), must not write revlog rows for a card that does not
+  // exist, and must not burn one of the day's new-card slots. The same
+  // rite covers the refill's second lap (POL-12): a card this block
+  // already graded took its one honest schedule grade — a repeat pass
+  // (item.drillPass, stamped by refillFocusQueue) is practice, never a
+  // same-minute remutation of the long-term schedule. The drill still
+  // behaves like a session — short ratings repeat in-session, the
+  // judgment lands in the observation ledger as evidence (the drill room
+  // rides the row), and undo takes it back.
+  // …and the same is true of a row the learner captured but never STARTED.
+  // The no-debt law (PR70-P1-1) says a cardless 覚える row joins the deck only
+  // through its own 始める; srsDueItems honours that, so a dojo grade on such
+  // a row would mint FSRS state the review queue can never surface — the very
+  // orphan this predicate exists to prevent, one step further out. Practice
+  // it, record the evidence, leave the enrolment to the learner.
+  const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
+  const drillOnly =
+    S.focus &&
+    (item.drillPass === true ||
+      (S.srs[srsKey(item.t, item.id)] === undefined &&
+        (!takenRow || !finiteNumber(takenRow.started))));
   const row = el('div', 'grade-row');
+  if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
-  // honest FSRS interval kept beneath (suites and screen readers select those)
+  // honest FSRS interval kept beneath (suites and screen readers select
+  // those). A drill-only card schedules nothing, so its seals promise no
+  // next-due — each stamps 稽古, practice, and that is the whole truth.
   const grades = [
     ['Again', 'again', 'もう一度', '再'],
     ['Hard', 'hard', '難しい', '難'],
     ['Good', 'good', 'ふつう', '良'],
     ['Easy', 'easy', '簡単', '易'],
   ];
+  // まだ was declared: the answer was seen before recall, so Again is the
+  // only grade this room may record (T-06). The row holds the one honest
+  // seal instead of three dead promises — and the commit below derives the
+  // rating from the DECLARATION, never from the button, so no later tap
+  // can outrun the law even if a stray node were clicked.
+  const notRecalled = !S.focus && rv.declared === 0;
+  if (!S.focus && rv.declared != null) {
+    row.setAttribute('data-declared', notRecalled ? 'notyet' : 'recalled');
+  }
   for (const [rating, key, ja, sealChar] of grades) {
+    if (notRecalled && rating !== 'Again') continue;
     const next = result[fsrsApi.Rating[rating]].card;
-    const ms = next.due.getTime() - now.getTime();
-    const when = next.scheduled_days >= 1 ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`) : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
+    const ms = next.due.getTime() - schedNow.getTime();
+    const when = drillOnly
+      ? tx('稽古', 'practice')
+      : next.scheduled_days >= 1
+        ? tx(`${next.scheduled_days} 日`, `${next.scheduled_days} d`)
+        : tx(`${Math.max(1, Math.round(ms / 60000))} 分`, `${Math.max(1, Math.round(ms / 60000))} min`);
     const b = el('button', `grade hanko g-${key}`);
     b.type = 'button';
     b.append(el('span', 'g-seal', sealChar));
@@ -6690,27 +7829,22 @@ function renderReview(main) {
     b.addEventListener('click', () => {
       const day = dayKey();
       const skey = srsKey(item.t, item.id);
-      const next = result[fsrsApi.Rating[rating]].card;
+      // T-06 forcing at the commit: after まだ, the declaration names the
+      // grade — whatever was tapped, Again is what the schedule records
+      const effRating = notRecalled ? 'Again' : rating;
+      const effKey = notRecalled ? 'again' : key;
+      const next = result[fsrsApi.Rating[effRating]].card;
       const prevRec = S.srs[skey];
-      // 道場の礼 — a focus drill on a card the learner never TOOK is
-      // exposure, not deck membership (P0, full-instrument review): grading
-      // it must not mint FSRS state the due queue can never surface
-      // (srsDueItems walks S.taken only), must not write revlog rows for a
-      // card that does not exist, and must not burn one of the day's
-      // new-card slots. The drill still behaves like a session — short
-      // ratings repeat in-session, the judgment lands in the observation
-      // ledger as evidence, and undo takes it back.
-      const isDrillOnly =
-        S.focus && prevRec === undefined && !S.taken.some((t) => t.t === item.t && t.id === item.id);
-      if (isDrillOnly) {
+      if (drillOnly) {
         if (
           !commitDrillGrade({
             rv,
             item,
             next,
-            key,
+            key: effKey,
             skey,
-            rating: fsrsApi.Rating[rating],
+            rating: fsrsApi.Rating[effRating],
+            mode: S.focus?.mode,
             now,
           })
         ) {
@@ -6726,10 +7860,11 @@ function renderReview(main) {
           item,
           card,
           next,
-          key,
+          key: effKey,
           skey,
-          rating: fsrsApi.Rating[rating],
+          rating: fsrsApi.Rating[effRating],
           now,
+          schedNow,
           day,
           prevRec,
         })
@@ -6804,46 +7939,57 @@ function renderReviewUndo(main, rv) {
   const undo = biLabel('button', 'chip review-undo', 'ひとつ戻す', 'undo last grade');
   undo.type = 'button';
   undo.addEventListener('click', () => {
-    const last = rv.history.pop();
+    const last = rv.history[rv.history.length - 1];
     const prevItem = rv.queue[rv.ix - 1];
-    if (!prevItem) return;
+    if (!last || !prevItem) return;
     const key = srsKey(prevItem.t, prevItem.id);
+    // the take-back is built off-side and committed as ONE envelope; only a
+    // durable undo moves the session back — a failed persist keeps the
+    // grade, the history entry, and the glass exactly as they were (P0-4)
+    const patch = {};
     if (last.key === 'suspend') {
       // a rest is taken back whole: wake the card, no schedule was touched
-      delete S.suspended[key];
+      const suspended = { ...S.suspended };
+      delete suspended[key];
+      patch.suspended = suspended;
     } else if (last.drill) {
       // a dojo drill is taken back from the observation ledger, never from
       // FSRS state — detail 0 files the revocation beside the judgment
-      obsLog('dojo', key, 0);
-      rv.done[last.key] -= 1;
-      if (last.reinserted) {
-        const tail = rv.queue.lastIndexOf(prevItem);
-        if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
-      }
+      patch.obslog = [...(S.obslog || []), [Date.now(), 'dojo', key, 0]];
     } else {
-      if (last.prev === undefined) delete S.srs[key];
-      else S.srs[key] = last.prev;
-      rv.done[last.key] -= 1;
-      const st = last.day && S.stats[last.day];
-      if (st) {
-        st.n = Math.max(0, st.n - 1);
-        if (last.key === 'again') st.again = Math.max(0, st.again - 1);
-        if (last.introduced && st.nnew) st.nnew -= 1;
-      }
+      const srs = { ...S.srs };
+      if (last.prev === undefined) delete srs[key];
+      else srs[key] = last.prev;
+      patch.srs = srs;
       // the log is append-only: an undo never erases the row it takes back —
       // it files a revocation pointing at it, so history stays whole
       if (last.logIx != null) {
-        (S.revlog ||= []).push([Date.now(), key, 0, last.logIx]);
+        patch.revlog = [...(S.revlog || []), [Date.now(), key, 0, last.logIx]];
       }
+      const st = last.day && S.stats?.[last.day];
+      if (st) {
+        const day = { ...st, n: Math.max(0, (st.n || 0) - 1) };
+        if (last.key === 'again') day.again = Math.max(0, (st.again || 0) - 1);
+        if (last.introduced && st.nnew) day.nnew = st.nnew - 1;
+        patch.stats = { ...S.stats, [last.day]: day };
+      }
+    }
+    if (!commitStorePatch(patch)) {
+      render();
+      return;
+    }
+    rv.history.pop();
+    if (last.key !== 'suspend') {
+      rv.done[last.key] -= 1;
       // if this grade re-queued a learning step, remove that pending copy
       if (last.reinserted) {
         const tail = rv.queue.lastIndexOf(prevItem);
         if (tail > rv.ix - 1) rv.queue.splice(tail, 1);
       }
     }
-    saveStore();
     rv.ix -= 1;
     rv.revealed = false;
+    rv.declared = null;
     render();
   });
   main.append(undo);
@@ -6910,7 +8056,13 @@ function refillFocusQueue(rv) {
   const f = S.focus;
   if (!f || !f.pool.length) return false;
   for (let i = 0; i < FOCUS_BATCH; i++) {
-    rv.queue.push(f.pool[f.cursor % f.pool.length]);
+    const item = f.pool[f.cursor % f.pool.length];
+    // 二周目からは稽古 (POL-12): once the cursor has walked the whole pool,
+    // every further draw is a PRACTICE pass — the block's first grade stays
+    // the only one that touched the long-term schedule. The copy marks the
+    // lap, the seals stamp 稽古, and the grade path files a 'dojo' evidence
+    // row instead of regrading a card that is no longer due.
+    rv.queue.push(f.cursor >= f.pool.length ? { ...item, drillPass: true } : item);
     f.cursor += 1;
   }
   return true;
@@ -6926,7 +8078,7 @@ function startFocus(min, mode) {
   S.focusEmpty = null;
   const first = pool.slice(0, Math.min(pool.length, FOCUS_BATCH));
   S.focus = { min, mode, deadline: Date.now() + min * 60000, ended: false, pool, cursor: first.length };
-  S.review = { queue: first.slice(), ix: 0, revealed: false, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
+  S.review = { queue: first.slice(), ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
   S.view = 'review';
   startFocusTicker();
   render();
@@ -6995,7 +8147,9 @@ function renderFocus(main) {
   const due = forecast.today + forecast.fresh;
   const modes = el('div', 'focus-modes');
   const modeDefs = [
-    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている`, `${due} waiting`)],
+    // the sub tells the whole truth (POL-12): the block reviews each waiting
+    // card once; when the clock outlasts the pool, further laps are practice
+    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている ・ 二周目からは稽古`, `${due} waiting · after the first lap, practice`)],
     ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
     ['yomi', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took')],
   ];
@@ -7350,24 +8504,36 @@ function renderProbe(main) {
     b.addEventListener('click', () => {
       const key = srsKey('word', it.w);
       let minted = 0;
+      const patch = {};
       if (!ok && !S.taken.some((t) => t.t === 'word' && t.id === it.w)) {
-        S.taken.push({
-          t: 'word',
-          id: it.w,
-          label: it.w,
-          kind: NODE_KIND.word[0],
-          kindEn: NODE_KIND.word[1],
-          from: null,
-          ts: Date.now(),
-        });
+        patch.taken = [
+          ...S.taken,
+          {
+            t: 'word',
+            id: it.w,
+            label: it.w,
+            kind: NODE_KIND.word[0],
+            kindEn: NODE_KIND.word[1],
+            from: null,
+            ts: Date.now(),
+            // the learner's own 読めなかった is the choice that mints this
+            // card — the probe told them so before they pressed it
+            started: Date.now(),
+          },
+        ];
         minted = 1;
-        pr.minted += 1;
       }
-      // the probe is an observation: one obslog row, zero FSRS writes
-      obsLog('probe', key, ok ? 3 : 1, minted);
+      // the probe is an observation: one obslog row, zero FSRS writes. The
+      // mint and its evidence land as ONE commit — a minted card must not
+      // wait on the tap debounce, and a failed persist mints nothing
+      patch.obslog = [...(S.obslog || []), [Date.now(), 'probe', key, ok ? 3 : 1, minted]];
+      if (!commitStorePatch(patch)) {
+        render();
+        return;
+      }
+      if (minted) pr.minted += 1;
       if (ok) pr.right += 1;
       else pr.missed.push(it);
-      saveStore(); // a minted card must not wait on the tap debounce
       pr.ix += 1;
       pr.revealed = false;
       render();
@@ -7383,8 +8549,16 @@ function renderSchedule(container) {
     withEn(
       // the scheduler is named for the learner; its internal parameter-set
       // slug (bunki-fsrs6-…) is provenance and stays in exports/debug —
-      // it leaked into every entry footer (P2, full-instrument review)
-      el('p', 'card-kind', tx('予定される復習', 'if you reviewed this now') + ' — FSRS-6'),
+      // it leaked into every entry footer (P2, full-instrument review).
+      // When the learner's own fitted weights rule (R3-D), the footer says
+      // so: the schedule shown is never passed off as the default's.
+      el(
+        'p',
+        'card-kind',
+        tx('予定される復習', 'if you reviewed this now') +
+          ' — FSRS-6' +
+          (srsCustom ? tx('・自分の記録で調整済み', ' · tuned from your record') : ''),
+      ),
       null,
     ),
   );
@@ -7606,10 +8780,12 @@ async function ensureBankExamples(word) {
  * context line — carries the reader's click grammar, and starts BARE:
  * no furigana until it is asked for (operator's law, 2026-08-12 — the
  * sentence is the exercise; readings on request only, whatever the
- * reader's own dial says). First tap ふりがな, second tap the English
- * gloss beneath, third tap the full entry — and after the entry, one
- * more tap folds the word back to plain kanji. Each sentence keeps its
- * own quiet ladder state; taps land in the obslog. */
+ * reader's own dial says). Taps circle exactly as in the reader: first
+ * tap ふりがな, second tap the English gloss beneath, third tap closes
+ * the circle back to plain kanji. The full entry lives on the holds —
+ * a short hold floats the simple definition, a long hold (or a tap on
+ * the mini) opens the entry. Each sentence keeps its own quiet ladder
+ * state; taps land in the obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
@@ -7631,7 +8807,25 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(el('span', 'example-hit', token.s));
       return;
     }
-    const span = el('span', 'tok content sentence-tok' + (isTarget ? ' example-hit' : ''));
+    // A sentence outside the reader is still a sentence: 用例, the 文 page and
+    // the review answer face all ride this ladder, and all three were
+    // pointer-only spans — no tab stop, no name, nothing a screen reader
+    // could reach, while the reader's own tokens are labelled buttons
+    // (E3 round-A, dead-ends lens; CONFIRMED on the head). Same element,
+    // same grammar.
+    const span = el(
+      'button',
+      'tok content sentence-tok' + (isTarget ? ' example-hit' : ''),
+    );
+    span.type = 'button';
+    span.setAttribute('aria-haspopup', 'dialog');
+    span.setAttribute(
+      'aria-label',
+      tx(
+        `${token.s} · 語 · もう一度で戻る、長押しで全項目`,
+        `${token.s} · word · a third activation clears; hold for the full entry`,
+      ),
+    );
     const paint = () => {
       span.textContent = '';
       span.append(
@@ -7746,35 +8940,213 @@ function aiLevelGuess() {
   for (const [l, c] of Object.entries(counts)) if (c > n) { best = l; n = c; }
   return best;
 }
-async function aiConverse(system, messages) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': aiKey(),
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-opus-5',
-      max_tokens: 1024,
-      output_config: { effort: 'low' },
-      system,
-      messages,
-    }),
+/* The provider seam (ledger: "provider lock-in"): endpoint and model are
+ * data with defaults, not code. S.ai carries optional durable { baseUrl,
+ * model } overrides — no UI yet; the validated store key is the contract. */
+const AI_DEFAULT_BASE_URL = 'https://api.anthropic.com';
+const AI_DEFAULT_MODEL = 'claude-opus-5';
+/** One request budget, mirroring packages/ai/src/runtime.ts
+ * DEFAULT_TIMEOUT_MS (controller §9): ten seconds, enforced by aborting the
+ * in-flight request — never by racing a promise and walking away from a
+ * live socket. A stalled request used to leave 考え中… on screen until the
+ * browser gave up the socket; now it takes each caller's quiet failure line. */
+const AI_TIMEOUT_MS = 10000;
+function aiProvider() {
+  const config = plainRecord(S.ai) ? S.ai : {};
+  return {
+    baseUrl: nonEmptyString(config.baseUrl) ? config.baseUrl : AI_DEFAULT_BASE_URL,
+    model: nonEmptyString(config.model) ? config.model : AI_DEFAULT_MODEL,
+  };
+}
+
+/* --------------------------------------------------- AIの記録 (the archive)
+ * "Not a word is lost" (ledger P1): every learner message and every reply,
+ * on every AI surface, lands in an append-only IndexedDB archive — beside
+ * the localStorage envelope, whose quota whole transcripts would eat. The
+ * archive is memory, never authority: nothing here grades, schedules, or
+ * touches FSRS state. And it must never cost a conversation — a failed
+ * write is swallowed and counted (the storage layer's never-block posture),
+ * the call itself proceeds. Rows are
+ * { surface, role: 'user'|'assistant'|'tutor'|'app', content, model, ts,
+ *   contextRef? } — 'app' marks the app's own quiet failure line, 'tutor'
+ * marks turns migrated from the old capped chat store, whose provenance
+ * (reply or failure line) the old shape never recorded. */
+const AI_LOG_DB = 'kairo-ai-log';
+const AI_LOG_TURNS = 'turns';
+let aiLogDbPromise = null;
+let aiLogDropped = 0; // turns the archive could not keep — honesty counter
+
+function aiLogOpen() {
+  if (aiLogDbPromise) return aiLogDbPromise;
+  aiLogDbPromise = new Promise((done) => {
+    try {
+      const req = indexedDB.open(AI_LOG_DB, 1);
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains(AI_LOG_TURNS)) {
+          req.result.createObjectStore(AI_LOG_TURNS, { keyPath: 'id', autoIncrement: true });
+        }
+      };
+      req.onsuccess = () => done(req.result);
+      req.onerror = () => done(null); // private mode etc. — the call goes on
+      req.onblocked = () => done(null);
+    } catch {
+      done(null);
+    }
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const data = await res.json();
+  return aiLogDbPromise;
+}
+
+/** Empty the archive. Called on IMPORT only: the file is the record, so the
+ * conversations of the record being replaced must not outlive it. Unlike the
+ * append path this one may NOT be swallowed — importing a record on top of
+ * another learner's words is the failure it exists to prevent — so it
+ * rejects, and the import stops. */
+async function clearAiArchive() {
+  const db = await aiLogOpen();
+  if (!db) {
+    // no archive to clear is the same outcome as an empty one — but a
+    // database we cannot open MIGHT hold the old words, so say so
+    if (typeof indexedDB === 'undefined') return true;
+    throw new Error('archive unavailable');
+  }
+  await new Promise((done, fail) => {
+    try {
+      const tx = db.transaction(AI_LOG_TURNS, 'readwrite');
+      tx.objectStore(AI_LOG_TURNS).clear();
+      tx.oncomplete = () => done(true);
+      tx.onerror = () => fail(tx.error || new Error('archive clear failed'));
+      tx.onabort = () => fail(tx.error || new Error('archive clear aborted'));
+    } catch (err) {
+      fail(err);
+    }
+  });
+  aiLogDropped = 0;
+  return true;
+}
+
+/** Append one turn. Fire-and-forget on the request path — the returned
+ * promise (true = durably written) exists for the verification suites. */
+async function aiLogAppend(row) {
+  try {
+    const db = await aiLogOpen();
+    if (!db) {
+      aiLogDropped += 1;
+      return false;
+    }
+    return await new Promise((done) => {
+      const t = db.transaction(AI_LOG_TURNS, 'readwrite');
+      t.objectStore(AI_LOG_TURNS).add(row);
+      t.oncomplete = () => done(true);
+      t.onabort = t.onerror = () => {
+        aiLogDropped += 1;
+        done(false);
+      };
+    });
+  } catch {
+    aiLogDropped += 1;
+    return false;
+  }
+}
+
+/** Every archived turn, oldest first — optionally one surface's. */
+async function aiLogAll(surface) {
+  try {
+    const db = await aiLogOpen();
+    if (!db) return [];
+    return await new Promise((done) => {
+      const rows = [];
+      const t = db.transaction(AI_LOG_TURNS, 'readonly');
+      const walk = t.objectStore(AI_LOG_TURNS).openCursor();
+      walk.onsuccess = () => {
+        const cursor = walk.result;
+        if (!cursor) {
+          done(rows);
+          return;
+        }
+        if (!surface || cursor.value.surface === surface) rows.push(cursor.value);
+        cursor.continue();
+      };
+      t.onabort = t.onerror = () => done(rows);
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function aiConverse(system, messages, meta = {}) {
+  const { baseUrl, model } = aiProvider();
+  const surface = meta.surface || 'ai';
+  const ref = meta.ref ? { contextRef: meta.ref } : {};
+  // the outbound delta: everything after the last assistant turn is new ink —
+  // earlier turns were archived when they were first sent or received
+  let newFrom = messages.length;
+  while (newFrom > 0 && messages[newFrom - 1].role !== 'assistant') newFrom -= 1;
+  for (const m of messages.slice(newFrom)) {
+    aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), ...ref });
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+  let data;
+  try {
+    // one budget covers headers AND body — a stalled stream is the same stall
+    const res = await fetch(`${baseUrl}/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': aiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1024,
+        output_config: { effort: 'low' },
+        system,
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    data = await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
   if (data.stop_reason === 'refusal') throw new Error('refusal');
-  return (data.content || [])
+  const reply = (data.content || [])
     .filter((b) => b.type === 'text')
     .map((b) => b.text)
     .join('')
     .trim();
+  aiLogAppend({ surface, role: 'assistant', content: reply, model, ts: Date.now(), ...ref });
+  return reply;
 }
-async function aiAsk(system, prompt) {
-  return aiConverse(system, [{ role: 'user', content: prompt }]);
+async function aiAsk(system, prompt, meta = {}) {
+  return aiConverse(system, [{ role: 'user', content: prompt }], meta);
 }
+
+/* An instrument handle for the verification suites (the __KAIRO_* idiom):
+ * read-only access to the archive, the provider seam, and the budget, so
+ * acceptance checks exercise the real code instead of a re-implementation. */
+window.__KAIRO_AI__ = Object.freeze({
+  logAll: (surface) => aiLogAll(surface),
+  // the suites drive the archive's two lifecycle edges directly
+  __seed: (row) => aiLogAppend(row),
+  __clear: () => clearAiArchive(),
+  dropped: () => aiLogDropped,
+  provider: () => aiProvider(),
+  timeoutMs: AI_TIMEOUT_MS,
+});
+/** The newest archived reply for one surface and one word — the read-back
+ * seam: an answer that arrived after its sheet closed is not lost, it waits
+ * in the archive and the reopened sheet shows it. */
+async function aiLastReply(surface, ref) {
+  const rows = await aiLogAll(surface);
+  for (let i = rows.length - 1; i >= 0; i -= 1) {
+    if (rows[i].role === 'assistant' && rows[i].contextRef === ref) return rows[i].content;
+  }
+  return null;
+}
+
 /** The tutor door on a word entry — present only when a key is stored. */
 function renderAiTutor(sheet, node, rec) {
   if (!aiKey()) return;
@@ -7782,6 +9154,9 @@ function renderAiTutor(sheet, node, rec) {
   const btn = biLabel('button', 'chip ai-ask', '先生に聞く', 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
+  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
+    if (prev && !out.textContent) out.textContent = prev;
+  });
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     out.textContent = tx('考え中…', 'thinking…');
@@ -7790,6 +9165,7 @@ function renderAiTutor(sheet, node, rec) {
       out.textContent = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use, pitched to the learner\'s level, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}. Learner level: about JLPT ${aiLevelGuess()}.`,
+        { surface: 'word-tutor', ref: `word:${node.id}` },
       );
     } catch {
       out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
@@ -7814,6 +9190,28 @@ function renderAiExamples(sheet, node, rec) {
   btn.type = 'button';
   const out = el('div', 'ai-examples');
   const wordLv = rec?.jlpt ? String(rec.jlpt).replace(/^N?/, 'N') : aiLevelGuess();
+  const paint = (raw) => {
+    out.textContent = '';
+    let shown = 0;
+    for (const line of raw.split('\n').map((l) => l.trim()).filter(Boolean)) {
+      const parts = line.split('|').map((s) => s.trim());
+      if (parts.length < 4) continue;
+      const [lv, ja, read, en] = parts;
+      const card = el('div', 'ai-ex');
+      const head = el('p', 'ai-ex-ja');
+      if (/^N[1-5]$/i.test(lv)) head.append(el('span', 'ai-ex-lv', lv.toUpperCase()));
+      head.append(document.createTextNode(ja));
+      card.append(head);
+      if (read) card.append(el('p', 'ai-ex-read', read));
+      if (bi() && en) card.append(el('p', 'ai-ex-en', en));
+      out.append(card);
+      shown += 1;
+    }
+    return shown;
+  };
+  aiLastReply('examples', `word:${node.id}`).then((prev) => {
+    if (prev && !out.childElementCount && !btn.disabled) paint(prev);
+  });
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     out.textContent = '';
@@ -7823,23 +9221,9 @@ function renderAiExamples(sheet, node, rec) {
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write natural example sentences for the given word across a range of JLPT levels, from N5 up to the word\'s own level, easiest first, 6 to 8 sentences. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. The word's JLPT level: ${wordLv}. Dictionary senses: ${senses || 'none recorded'}.`,
+        { surface: 'examples', ref: `word:${node.id}` },
       );
-      out.textContent = '';
-      let shown = 0;
-      for (const line of raw.split('\n').map((l) => l.trim()).filter(Boolean)) {
-        const parts = line.split('|').map((s) => s.trim());
-        if (parts.length < 4) continue;
-        const [lv, ja, read, en] = parts;
-        const card = el('div', 'ai-ex');
-        const head = el('p', 'ai-ex-ja');
-        if (/^N[1-5]$/i.test(lv)) head.append(el('span', 'ai-ex-lv', lv.toUpperCase()));
-        head.append(document.createTextNode(ja));
-        card.append(head);
-        if (read) card.append(el('p', 'ai-ex-read', read));
-        if (bi() && en) card.append(el('p', 'ai-ex-en', en));
-        out.append(card);
-        shown += 1;
-      }
+      const shown = paint(raw);
       if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
     } catch {
       out.textContent = '';
@@ -7871,6 +9255,7 @@ function renderAiCoach(main, rv) {
       out.textContent = await aiAsk(
         "You are a Japanese tutor inside a flashcard app, speaking just after a review session. In under 110 words of plain text (no headers, no markdown): one sentence on what the session shows, then name the items graded 'again' or 'hard' that deserve another look, then ONE concrete memory hook for the single hardest item. You only advise — the app's scheduler alone decides when cards return, so never promise timings.",
         `Learner level: about JLPT ${aiLevelGuess()}. Session grades:\n${lines.join('\n')}`,
+        { surface: 'coach' },
       );
     } catch {
       out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
@@ -7929,14 +9314,19 @@ function renderAiReading(main) {
       const text = await aiAsk(
         'You write one short Japanese reading passage inside a learning app. Output ONLY the passage: four to six short sentences of natural Japanese. No title, no translation, no romaji, no commentary, no markdown. Keep vocabulary and grammar at or below the JLPT level the user names. Immediately after every word written with kanji, give its reading in hiragana inside full-width parentheses, like 学校（がっこう） or 食べる（たべる）. Use full-width parentheses for readings and for nothing else.',
         `Level: JLPT ${aiLevelGuess()}. A small scene from everyday life, quietly pleasant.${woven.length ? ` If it stays natural, weave in a few of these words the learner is memorizing: ${woven.join('、')}.` : ''}`,
+        { surface: 'reading' },
       );
       // a model may emit a literal backslash-n; never show it as ink.
-      // The reading being replaced joins the shelf of earlier ones.
-      if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
-      S.aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
-      saveStore();
-      render();
-      return;
+      // The reading being replaced joins the shelf of earlier ones — built
+      // on copies and committed whole; a device that cannot save shows the
+      // storage alert and re-arms the button (P0-4)
+      const aiReadings = S.aiReading ? [S.aiReading, ...S.aiReadings].slice(0, 10) : S.aiReadings;
+      const aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
+      if (commitStorePatch({ aiReading, aiReadings })) {
+        render();
+        return;
+      }
+      note.textContent = '';
     } catch {
       note.textContent = tx('いまは書けない。あとでもう一度。', 'The tutor could not write just now — try again in a moment.');
     }
@@ -8000,12 +9390,12 @@ function renderAiReading(main) {
       stack.append(el('span', 'row-gloss', new Date(r.ts).toLocaleDateString()));
       row.append(stack, el('span', 'row-go', '›'));
       row.addEventListener('click', () => {
-        // swap: the current reading takes this one's place on the shelf
+        // swap: the current reading takes this one's place on the shelf —
+        // on copies, one commit, nothing moves on a failed persist (P0-4)
         const chosen = S.aiReadings[ix];
-        S.aiReadings.splice(ix, 1);
-        if (S.aiReading) S.aiReadings = [S.aiReading, ...S.aiReadings].slice(0, 10);
-        S.aiReading = chosen;
-        saveStore();
+        const others = S.aiReadings.filter((_, i) => i !== ix);
+        const aiReadings = S.aiReading ? [S.aiReading, ...others].slice(0, 10) : others;
+        if (!commitStorePatch({ aiReading: chosen, aiReadings })) return;
         keepScroll();
         render();
         window.scrollTo(0, 0);
@@ -8457,7 +9847,15 @@ function renderWordNode(sheet, node) {
   }
   const examples = findExamples(node.id, 6);
   if (examples.length) {
-    sheet.append(withEn(el('p', 'eyebrow', '用例'), 'examples — tap a word to climb its ladder', 'en-inline'));
+    // the eyebrow says the whole gesture, in both tongues: the hold that
+    // opens the dictionary was the ladder's unspoken rung (review P2)
+    sheet.append(
+      withEn(
+        el('p', 'eyebrow', '用例 — ことばは長押しで辞書へ'),
+        'examples — tap a word to climb its ladder; hold it to open the dictionary',
+        'en-inline',
+      ),
+    );
     for (const ex of examples) {
       const line = el('div', 'example');
       const text = el('p', 'example-ja');
@@ -10070,7 +11468,12 @@ function renderStrokePage(root) {
         !item.disabled &&
         !item.closest('[inert]') &&
         item.tabIndex >= 0 &&
-        item.offsetParent !== null &&
+        // offsetParent is null for a POSITION:FIXED element, and both of this
+        // room's corner controls — 筆順の番号 and ゆっくり — are fixed. Using it
+        // as the visibility test dropped them from the trap, so Tab wrapped
+        // past the two controls the operator placed by hand (E3 round-A,
+        // writing-room lens). A rendered box is the honest test.
+        item.getClientRects().length > 0 &&
         getComputedStyle(item).visibility !== 'hidden',
     );
     if (!focusable.length) {
@@ -10214,6 +11617,82 @@ function renderIdiomNode(sheet, node) {
   renderSchedule(sheet);
 }
 
+/** 出会い — the observation ledger, read back at last (P2-19).
+ *
+ * The obslog has been written richly since the first build and read by
+ * nothing but probe dedup. This is its first honest consumer: on an entry
+ * sheet, the item's own encounters, distilled — when it was first met, how
+ * many times, and what the last practice actually said.
+ *
+ * It is EVIDENCE DISPLAY, never a level claim: exposure is not mastery
+ * (constitution §4), so this section states counts and dates and the words
+ * the learner's own actions used. It never computes a knownness, never
+ * colours the item, and never touches FSRS state. When an item has no
+ * history the section is absent rather than showing a hopeful zero. */
+const TRAIL_KINDS = new Set(['tap', 'probe', 'dojo', 'lesson', 'reveal', 'drift']);
+function encounterTrail(key) {
+  const rows = (S.obslog || []).filter((row) => TRAIL_KINDS.has(row[1]) && row[2] === key);
+  if (!rows.length) return null;
+  const last = rows[rows.length - 1];
+  const counts = {};
+  for (const row of rows) counts[row[1]] = (counts[row[1]] || 0) + 1;
+  return { rows, first: rows[0][0], last, counts };
+}
+/** The last row, said in the learner's own terms — never a verdict. */
+function trailLastPhrase(row) {
+  const kind = row[1];
+  const g = row[3];
+  if (kind === 'tap') {
+    if (g === 3) return tx('全項目をひらいた', 'opened the full entry');
+    if (g === 2) return tx('語釈を見た', 'looked at the meaning');
+    return tx('ふりがなを出した', 'revealed the reading');
+  }
+  if (kind === 'drift') return g === 3 ? tx('水で「わかる」', 'flicked as known in the water') : tx('水で「まだ」', 'flicked as not yet in the water');
+  if (kind === 'probe') return g === 3 ? tx('読めた（試し読み）', 'read it right in the probe') : tx('読めなかった（試し読み）', 'missed it in the probe');
+  if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
+  if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
+  if (kind === 'dojo') {
+    const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
+    return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
+  }
+  return tx('出会った', 'met it');
+}
+function renderEncounterTrail(sheet, node) {
+  if (!['word', 'kanji', 'radical', 'idiom'].includes(node.t)) return;
+  const trail = encounterTrail(srsKey(node.t, node.id));
+  if (!trail) return;
+  const box = el('div', 'encounter-trail');
+  box.append(withEn(el('p', 'eyebrow', '出会い'), 'your encounters', 'en-inline'));
+  const day = (t) => new Date(t).toLocaleDateString();
+  const n = trail.rows.length;
+  box.append(
+    el(
+      'p',
+      'trail-line',
+      tx(
+        `初めて ${day(trail.first)} ・ これまで ${n}回`,
+        `first met ${day(trail.first)} · ${n} ${n === 1 ? 'encounter' : 'encounters'} so far`,
+      ),
+    ),
+  );
+  box.append(
+    el('p', 'trail-line', tx(`直近 ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`, `last ${day(trail.last[0])} — ${trailLastPhrase(trail.last)}`)),
+  );
+  // the third line only when practice actually happened — a reading tapped
+  // in the reader is assistance, not practice, and must not be dressed as it
+  const practice = (trail.counts.dojo || 0) + (trail.counts.probe || 0) + (trail.counts.lesson || 0);
+  if (practice) {
+    box.append(
+      el(
+        'p',
+        'trail-line trail-quiet',
+        tx(`稽古 ${practice}回（記録であって、習熟ではない）`, `${practice} practice ${practice === 1 ? 'record' : 'records'} — evidence, not mastery`),
+      ),
+    );
+  }
+  sheet.append(box);
+}
+
 function renderSheet(root) {
   const node = S.stack[S.stack.length - 1];
   if (!node) return;
@@ -10252,19 +11731,32 @@ function renderSheet(root) {
     bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
   }
   // 覚 top-right on EVERY capturable sheet (operator directive §3: one
-  // button, top right corner, on every screen)
-  if (NODE_KIND[node.t]) {
-    const takenNow = S.taken.some((t) => t.t === node.t && t.id === node.id);
+  // button, top right corner, on every screen). The sentence page captures
+  // the word it is built around — the sentence itself is not a card kind,
+  // and its seal says whose it is. A catalog is a grouping, not a thing,
+  // and honestly carries none.
+  const capNode = NODE_KIND[node.t]
+    ? node
+    : node.t === 'sent' && node.target
+      ? { t: 'word', id: node.target }
+      : null;
+  if (capNode) {
+    const takenNow = S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
     const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', '覚');
     capture.type = 'button';
     capture.id = 'sheet-take';
     capture.setAttribute('aria-pressed', String(takenNow));
     capture.setAttribute(
       'aria-label',
-      tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize'),
+      capNode === node
+        ? tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize')
+        : tx(
+            takenNow ? `「${capNode.id}」の覚えるをやめる` : `「${capNode.id}」を覚える`,
+            takenNow ? `stop memorizing ${capNode.id}` : `memorize ${capNode.id}`,
+          ),
     );
     capture.addEventListener('click', () => {
-      toggleTaken(node, nodeTitle(node));
+      toggleTaken(capNode, nodeTitle(capNode));
       render();
     });
     bar.append(capture);
@@ -10294,6 +11786,7 @@ function renderSheet(root) {
   else if (node.t === 'particle') renderParticleNode(sheet, node);
   else if (node.t === 'catalog') renderCatalogNode(sheet, node);
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
+  renderEncounterTrail(sheet, node);
   // reading position survives the doors: the sheet remembers where each
   // stack entry was scrolled and restores it when that entry returns —
   // back no longer teleports a ~2,700px entry to its top (P1, review).
@@ -10606,6 +12099,32 @@ function syncDriftTheme() {
     }
   } catch {
     /* drift not mounted yet — render() re-syncs when it first shows */
+  }
+}
+/** A world change recolours through what setKairoTheme has already moved —
+ * the data-theme tokens, the grown paper, the drift sync. The ONLY rendered
+ * DOM that bakes the world in is the seal glyphs, so swap those in place
+ * instead of rebuilding the whole room: a full render() cost a measured
+ * 100–200 ms main-thread block per stone tap (console-perf lens, round 2).
+ * The writing room is the one surface that re-inks from its world spec —
+ * while it is open, the full render stays the honest path. */
+function applyWorldSwap() {
+  if (S.strokes) {
+    render();
+    return;
+  }
+  const glyph = THEME_UI[themeIx()].seal;
+  for (const node of document.querySelectorAll('#theme-seal, .ginga-seal')) {
+    node.textContent = glyph;
+  }
+  const ginga = document.querySelector('.ginga-seal');
+  if (ginga) {
+    // play the wake exactly as a rebuild would — and only where the galaxy
+    // seal exists; elsewhere the flag waits for the next 銀河 build
+    ginga.classList.remove('awake');
+    void ginga.offsetWidth;
+    ginga.classList.add('awake');
+    S.sealWake = false;
   }
 }
 // (the old tap-to-cycle retired 2026-08-14 — the worlds are direct choices;
@@ -10987,7 +12506,7 @@ function openWorldPicker(anchor) {
       closeWorldPicker();
       setKairoTheme(t.id);
       S.sealWake = true; // the 銀河 seal plays its wake on a world change
-      render();
+      applyWorldSwap();
     });
     pop.append(b);
   }
@@ -11052,14 +12571,9 @@ function navForward() {
   render();
 }
 function navBackFromGinga() {
-  // inside a drift dive, back means SURFACE one level of the water first
-  if (S.driftDepth > 0 && window.bunkiDriftSurface) {
-    S.navOpen = false;
-    window.bunkiDriftSurface();
-    render();
-    return;
-  }
-  // at the true galaxy home there is nowhere back; the arrow is disabled there.
+  // one walk: back() itself surfaces a dive one level (R3-B), so the arrow
+  // and the device Back gesture are the same operation. At the true galaxy
+  // home there is nowhere back; the arrow is disabled there.
   S.navOpen = false;
   back();
 }
@@ -11096,6 +12610,11 @@ function buildNavSearch() {
   input.setAttribute('aria-label', tx('検索', 'search'));
   const results = el('div', 'nav-search-results');
   const paint = () => {
+    // the deep tier repaints these rows when its worker batch settles; if a
+    // row holds focus at that moment (a restored session, or a keyboard
+    // walk), the rebuild must hand focus back instead of dropping it on body
+    const focusedRow = document.activeElement?.closest?.('.nav-search-row');
+    const focusIx = focusedRow && results.contains(focusedRow) ? focusedRow.dataset.ix : null;
     results.textContent = '';
     const q = input.value.trim();
     if (!q) return;
@@ -11104,23 +12623,33 @@ function buildNavSearch() {
       results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
       return;
     }
-    for (const e of hits) {
+    hits.forEach((e, ix) => {
       const row = el('button', 'nav-search-row');
       row.type = 'button';
+      row.dataset.ix = String(ix);
       row.append(el('span', 'nsr-glyph', e.w));
       const stack = el('span', 'nsr-stack');
       if (e.r) stack.append(el('span', 'nsr-read', e.r));
       if (e.g) stack.append(el('span', 'nsr-gloss', e.g));
       row.append(stack);
       row.addEventListener('click', () => {
+        // leaving THROUGH a result keeps the session: the walk back reopens
+        // the bar with this query, these results, and focus on this row
+        S.navQ = input.value;
+        S.navReturn = true;
         S.navOpen = false;
         go(
           e.seq
             ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
             : { t: e.t, id: e.id },
+          { invoker: row },
         );
       });
       results.append(row);
+    });
+    if (focusIx != null) {
+      const again = results.querySelector(`.nav-search-row[data-ix="${focusIx}"]`);
+      (again || input).focus({ preventScroll: true });
     }
   };
   // The deep tier answers here too: the first touch opens the 70k index, and
@@ -11135,6 +12664,7 @@ function buildNavSearch() {
   };
   input.addEventListener('focus', () => ensureDictionaryIndex().catch(() => {}), { once: true });
   input.addEventListener('input', () => {
+    S.navQ = input.value; // the input node dies with every render; S carries it
     if (input.value.trim()) ensureDictionaryIndex().catch(() => {});
     paint();
   });
@@ -11145,6 +12675,12 @@ function buildNavSearch() {
     }
   });
   wrap.append(input, results);
+  // a surviving session repaints in place — same query, same rows
+  if (S.navQ) {
+    input.value = S.navQ;
+    if (S.navQ.trim()) ensureDictionaryIndex().catch(() => {});
+    paint();
+  }
   return wrap;
 }
 
@@ -11161,6 +12697,11 @@ function buildGingaChrome(root) {
   symbol.innerHTML = GINGA_SYMBOL_SVG;
   symbol.addEventListener('click', () => {
     S.navOpen = !S.navOpen;
+    // closing by hand is a deliberate dismissal — the search session ends
+    if (!S.navOpen) {
+      S.navQ = '';
+      S.navReturn = false;
+    }
     render();
   });
   root.append(symbol);
@@ -11181,6 +12722,9 @@ function buildGingaChrome(root) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => {
     S.navOpen = false;
+    // tapping the water away is a deliberate dismissal too
+    S.navQ = '';
+    S.navReturn = false;
     render();
   });
   root.append(scrim);
@@ -11244,6 +12788,21 @@ function render() {
   // keeps its existing behaviour (callers set their own scroll, and cards
   // like review want the top of each new face).
   const restoreY = lastRenderedView === S.view && S.view === 'reader' ? window.scrollY : null;
+  // The same rebuild that clamps the scroll also throws focus back to
+  // <body>, so a keyboard walker lost their place on EVERY state-changing
+  // press — a dial, a grade, a capture (E3 round-A, a11y lens). Controls
+  // that name themselves are found again by that name after the rebuild;
+  // the sheet's own focus management still wins where it runs.
+  const focusKey = (() => {
+    const node = document.activeElement;
+    if (!node || node === document.body || !$('#app').contains(node)) return null;
+    if (node.id) return `#${CSS.escape(node.id)}`;
+    const action = node.dataset?.action;
+    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+  })();
+  // leaving the galaxy for a ROOM ends the search round-trip: only a walk
+  // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
+  if (lastRenderedView !== S.view) S.navReturn = false;
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -11301,14 +12860,23 @@ function render() {
 
   const crumb = el('div', 'crumb');
   const parts = [];
+  // the crumb names the TRUE origin — the room 戻る actually reopens. The
+  // dojo family (dojo, its probe, its focus blocks) is entered from the
+  // galaxy and its backs walk galaxy-ward, never through the bookshelf.
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
   if (S.view === 'entry') parts.push(tx('野', 'field'));
-  else if (S.view === 'drift') parts.push(tx('銀河', 'galaxy'));
+  else if (S.view === 'drift' || dojoFamily) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
-  if (S.view === 'reader' && passage()) parts.push(passage().title);
+  if (S.view === 'reader' && passage()) {
+    // an archive read names the stack it came from — its back door
+    if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
+    parts.push(passage().title);
+  }
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
-  if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus' : 'review'));
+  if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
+  if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
   if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
-  if (S.view === 'probe') parts.push(tx('読み探査', 'yomi probe'));
+  if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読み探査', 'yomi probe'));
   if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
   if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
@@ -11350,25 +12918,99 @@ function render() {
   }
   chrome.append(langSeg);
 
+  // 覚える — the one capture button, top-right of every capture-eligible
+  // surface (operator directive §3). The reader's takes the current thing:
+  // the word last touched, carrying the sentence it was met in; its panel
+  // holds the scope stages, the lists, and the way back out of a mis-tap.
+  // Entry sheets carry their own seal in the sheet bar; surfaces with no
+  // capturable current thing carry none.
+  if (S.captureOpen && (S.stack.length || !readerTakeCurrent())) S.captureOpen = false;
+  if (S.view === 'reader' && S.passageId) {
+    const cur = readerTakeCurrent();
+    const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
+    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '覚える', 'memorize');
+    capBtn.type = 'button';
+    capBtn.id = 'reader-take';
+    capBtn.disabled = !cur;
+    capBtn.setAttribute('aria-pressed', String(curTaken));
+    capBtn.setAttribute('aria-expanded', String(!!S.captureOpen));
+    capBtn.setAttribute('aria-label', readerTakeLabel(cur, curTaken));
+    capBtn.addEventListener('click', () => {
+      const now = readerTakeCurrent();
+      if (!now) return;
+      if (S.captureOpen) {
+        S.captureOpen = false;
+        render();
+        return;
+      }
+      // first touch takes the word as encountered — sentence and all; the
+      // panel that opens holds the undo, the scope stages, and the lists
+      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id)) toggleTaken(readerTakeNode(now), now.id);
+      S.captureOpen = true;
+      render();
+    });
+    chrome.append(capBtn);
+  }
+
   const trayBtn = biLabel('button', null, `覚 ${S.taken.length}`, 'lists');
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
     keepScroll();
     S.stack = [];
-    // the tray remembers its door: opened mid-article, back returns to the
-    // article — not the shelf (P2, review: "abandons the article mid-read")
-    S.trayFrom = S.view === 'reader' && S.passageId ? 'reader' : null;
+    // the tray remembers its door — WHICHEVER door it was. It is the one
+    // control present in the chrome of every surface, so returning always to
+    // the shelf threw away the archive year-list, the levels room, the
+    // lessons list… every room but the reader (E3 round-A, dead-ends lens).
+    // The origin is the view and its offset, not a single special case.
+    S.trayFrom =
+      S.view === 'reader' && S.passageId
+        ? 'reader'
+        : S.view !== 'tray'
+          ? { view: S.view, scroll: Math.round(window.scrollY) }
+          : null;
     if (S.trayFrom === 'reader') {
+      // readerPos bookmark — UI preference, not learner evidence (P0-4
+      // residual-ledger disposition, same as the reader's own two writers)
       clearTimeout(readerPosTimer);
       S.readerPos[S.passageId] = Math.round(window.scrollY);
       saveStore();
     }
     S.view = 'tray';
     render();
+    // every other room door lands at its own top; the one door present on
+    // EVERY surface did not, so the tray opened at the previous surface's
+    // offset — often past its own end (E3 round-A, dead-ends lens)
+    window.scrollTo(0, 0);
   });
   chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+
+  // the capture panel — anchored under the chrome's top-right seal. It
+  // reuses the sheet's own instruments verbatim: the reversible 覚える
+  // button, the scope stages (語だけ・この文・段落), and the list picker
+  // with its inline maker — so the door and the deep flow never disagree.
+  if (S.captureOpen) {
+    const cur = readerTakeCurrent();
+    const capNode = readerTakeNode(cur);
+    const panel = el('div', 'capture-panel');
+    panel.id = 'capture-panel';
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', tx(`「${cur.id}」を覚える`, `memorize ${cur.id}`));
+    panel.setAttribute('data-drift-chrome', '');
+    const head = el('div', 'capture-head');
+    head.append(el('span', 'capture-word', cur.id));
+    head.append(el('span', 'pool-tag', tx(NODE_KIND.word[0], NODE_KIND.word[1])));
+    panel.append(head);
+    panel.append(takeButton(capNode, cur.id));
+    renderContextPicker(panel, capNode);
+    renderListPicker(panel, capNode, cur.id);
+    root.append(panel);
+    requestAnimationFrame(() => {
+      const bar = document.querySelector('.chrome');
+      if (bar && panel.isConnected) panel.style.top = `${Math.ceil(bar.getBoundingClientRect().bottom + 8)}px`;
+    });
+  }
 
   const main = el('main');
   root.append(main);
@@ -11438,7 +13080,17 @@ function render() {
   safelySyncStoreAlert();
   updateMeasurements();
   if (restoreY != null) window.scrollTo(0, restoreY);
+  // give the keyboard its place back, if the control that had it still
+  // exists under the same name. A sheet or the writing room manages its own
+  // focus and must not be overruled, so this only reaches into #app, and it
+  // never steals focus from whatever the rebuild legitimately moved it to.
+  if (focusKey && document.activeElement === document.body) {
+    const again = $('#app').querySelector(focusKey);
+    if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
+  }
   lastRenderedView = S.view;
+  // every navigation passes through here — keep the Back sentinel honest
+  syncWalkSentinel();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

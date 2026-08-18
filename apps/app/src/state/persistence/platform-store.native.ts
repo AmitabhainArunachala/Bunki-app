@@ -34,7 +34,14 @@ import {
 } from '@bunki/persistence';
 import { openDatabaseSync, type SQLiteBindValue } from 'expo-sqlite';
 
-import { STORE_NAME, type OpenAppEventStoreOptions, type OpenedAppEventStore } from './shared.ts';
+import type { UncertaintyAnnotation } from '../store.ts';
+import {
+  parseStoredAnnotation,
+  STORE_NAME,
+  type OpenAppEventStoreOptions,
+  type OpenedAppEventStore,
+  type UncertaintyAnnotationStore,
+} from './shared.ts';
 
 /**
  * Where the two type vocabularies meet.
@@ -63,10 +70,59 @@ function adaptExpoDatabase(db: ReturnType<typeof openDatabaseSync>): ExpoSQLiteD
   };
 }
 
-export function openPlatformEventStore(options: OpenAppEventStoreOptions): OpenedAppEventStore {
-  const driver = createExpoSqliteDriver(
-    adaptExpoDatabase(openDatabaseSync(`${options.snapshotKey ?? STORE_NAME}.db`)),
+/**
+ * The uncertainty-dimension side-store on device (R4-A, P2-18): one two-column
+ * table in its **own** database file, beside the event store's.
+ *
+ * Its own file rather than a table in `SqliteEventStore`'s database, because
+ * that adapter owns its schema through its migration runner and a foreign table
+ * appearing in its file would be this seam editing another module's contract
+ * from outside. Rows are validated by the same `parseStoredAnnotation` the web
+ * store uses, so a corrupt payload is dropped identically on both platforms.
+ *
+ * **Producing this on the native code path is not evidence of native
+ * behaviour** — the same WP-11 device-run rule the event store states applies
+ * here unchanged (P0-CAP-15).
+ */
+function createNativeAnnotationStore(databaseName: string): UncertaintyAnnotationStore {
+  const db = openDatabaseSync(databaseName);
+  db.execSync(
+    'CREATE TABLE IF NOT EXISTS uncertainty_annotations (thread_id TEXT PRIMARY KEY NOT NULL, payload TEXT NOT NULL)',
   );
+  return {
+    read: () => {
+      const entries = new Map<string, UncertaintyAnnotation>();
+      const rows = db.getAllSync<{ thread_id: string; payload: string }>(
+        'SELECT thread_id, payload FROM uncertainty_annotations',
+        [],
+      );
+      for (const row of rows) {
+        try {
+          const annotation = parseStoredAnnotation(JSON.parse(row.payload));
+          if (annotation !== null) entries.set(row.thread_id, annotation);
+        } catch {
+          // A row that does not parse is dropped, never guessed at — the same
+          // fail-closed rule as the web store.
+        }
+      }
+      return entries;
+    },
+    write: (threadId, annotation) => {
+      if (annotation === null) {
+        db.runSync('DELETE FROM uncertainty_annotations WHERE thread_id = ?', [threadId]);
+        return;
+      }
+      db.runSync(
+        'INSERT OR REPLACE INTO uncertainty_annotations (thread_id, payload) VALUES (?, ?)',
+        [threadId, JSON.stringify(annotation)],
+      );
+    },
+  };
+}
+
+export function openPlatformEventStore(options: OpenAppEventStoreOptions): OpenedAppEventStore {
+  const baseName = options.snapshotKey ?? STORE_NAME;
+  const driver = createExpoSqliteDriver(adaptExpoDatabase(openDatabaseSync(`${baseName}.db`)));
   return {
     store: SqliteEventStore.open(driver, {
       appVersions: options.appVersions,
@@ -74,5 +130,6 @@ export function openPlatformEventStore(options: OpenAppEventStoreOptions): Opene
     }),
     runtimeLabel: driver.label,
     snapshotAvailable: true,
+    annotations: createNativeAnnotationStore(`${baseName}-annotations.db`),
   };
 }

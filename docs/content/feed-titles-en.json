@@ -1,0 +1,18 @@
+{
+  "law": "titles are authored against the article text, never generated at mint time; feed_ingest.py refuses any candidate missing here",
+  "titleEnSource": "renkan-ai-2026-08",
+  "titles": {
+    "wikinews:44381": "Japan football squad numbers announced for the Kirin Challenge Cup",
+    "wikinews:45224": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+    "wikinews:45216": "Body of missing boy found in Nantan, Kyoto",
+    "wikinews:45208": "Nankai to withdraw from its ferry business",
+    "wikinews:45174": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+    "wikinews:45101": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+    "wikinews:45095": "AiScReam: Ruby graduates and two new members join",
+    "wikinews:45098": "The second Takaichi cabinet takes office",
+    "wikinews:44384": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+    "wikinews:45221": "Kyoto police search the home of the missing boy",
+    "wikinews:45089": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+    "wikinews:42478": "Shohei Ohtani becomes the sixth player in history to reach 40–40"
+  }
+}

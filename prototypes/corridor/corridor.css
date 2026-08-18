@@ -186,21 +186,34 @@ h1.view-title {
 }
 
 /* --------------------------------------------------------------- shelf */
+/* a card is an inert wrapper for two SIBLING buttons — the text door and
+ * the 詳細 toggle — never a button nested inside a button */
 .shelf-item {
+  display: block;
+  width: 100%;
+  border-top: 1px solid var(--line-soft);
+  padding: 15px 2px 16px;
+}
+
+.shelf-item:first-of-type {
+  border-top: 0;
+}
+
+.shelf-open {
   display: block;
   width: 100%;
   text-align: left;
   background: transparent;
   border: 0;
-  border-top: 1px solid var(--line-soft);
-  padding: 15px 2px 16px;
+  padding: 0;
   cursor: pointer;
   font: inherit;
   color: inherit;
 }
 
-.shelf-item:first-of-type {
-  border-top: 0;
+/* a quiet section header gathers each category into one run */
+.eyebrow.shelf-section {
+  margin: 30px 2px 4px;
 }
 
 .shelf-title {
@@ -313,6 +326,13 @@ body.ginga #drift-layer #hint {
 /* inside a dive the water's own return hint (水にふれると戻る) is the way
  * out — chrome-hiding it left no visible exit (P1, review) */
 body.ginga.drift-dived #drift-layer #hint {
+  display: block !important;
+}
+/* the front door's one first-touch cue (POL-1): a visitor whose drift store
+ * carries no cue flag sees the drift's own hint plaque — the layer marks it
+ * "first-cue" until the first successful touch of a word retires the class
+ * and persists the flag in bunki-drift-v1, and this exception dies with it */
+body.ginga #drift-layer #hint.first-cue {
   display: block !important;
 }
 
@@ -993,11 +1013,32 @@ button.tok::before {
   width: max(100%, var(--tap));
   height: max(100%, var(--tap));
   transform: translate(-50%, -50%);
+  /* the expansion only wins where no real token box is: a negative
+   * layer paints behind every in-flow neighbour, so a centre tap always
+   * belongs to the glyph under the finger (C1 finding), while the space
+   * around the line still hands its taps to the nearest target. */
+  z-index: -1;
 }
 
 /* All content tokens carry the same baseline box before and after English is
  * mounted. Changing display type on the second activation moved the glyph by
  * 3.3px on real Chrome; keeping this box stable makes the anchor invariant. */
+/* a name written in kanji is a door too (E3 round-A, reader lens): it reads
+ * and ladders like a content word, but wears its own class so nothing —
+ * neither the app nor a verifier — mistakes it for a graded one. */
+.tok.named {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: baseline;
+  line-height: 1.3;
+}
+
+.tok.named > .tok-word {
+  display: block;
+  white-space: nowrap;
+}
+
 .tok.content {
   display: inline-flex;
   flex-direction: column;
@@ -2277,6 +2318,43 @@ body.v-depth-layered .inline-link {
 .sheet-take + .sheet-close {
   margin-left: 8px;
 }
+
+/* 覚える — the one capture button in the chrome's top-right (directive §3);
+ * taken-state wears the same seal red as everywhere else */
+.chrome button.chrome-take.taken {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* the capture panel the chrome seal opens: the sheet's own instruments
+ * (reversible 覚える, scope stages, list picker) anchored under the corner */
+.capture-panel {
+  position: fixed;
+  z-index: 60;
+  top: calc(56px + env(safe-area-inset-top));
+  right: 8px;
+  width: min(340px, calc(100vw - 16px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  background: var(--ground-0, var(--ground));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
+  padding: 12px 14px;
+  animation: rise 0.16s ease;
+}
+
+.capture-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.capture-word {
+  font-family: var(--serif);
+  font-size: 20px;
+}
 .sheet-close {
   margin-left: auto;
   font: inherit;
@@ -2309,6 +2387,29 @@ body.v-depth-layered .inline-link {
 #mini .mini-word {
   font-family: var(--serif);
   font-size: 20px;
+  padding-right: 48px;
+}
+
+/* 覚 — the capture door rides the mini (directive §3) */
+#mini .mini-take {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font: inherit;
+  font-size: 13px;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+#mini .mini-take.taken {
+  color: var(--red);
+  border-color: var(--red);
 }
 
 #mini .mini-reading {
@@ -2998,9 +3099,12 @@ body.v-depth-layered .stroke-page {
   display: none;
   pointer-events: none;
 }
-body:has(.stroke-page[data-minimal='off'][data-numbers='on']) .stroke-nums-lift,
-body:has(.stroke-page[data-minimal='on'][data-chrome='awake'][data-numbers='on'])
-  .stroke-nums-lift {
+/* The numbers answer to their own toggle, not to the field that holds it.
+ * Gating the lifted layer on data-chrome='awake' meant 筆順の番号 did nothing
+ * the moment the learner closed the field — which is exactly when the room
+ * becomes the plain immersion the numbers are meant to annotate (E3 round-A,
+ * writing-room lens; constitution §6 asks for the toggle, then the quiet). */
+body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   display: block;
 }
 .stroke-nums-lift svg.stroke-canvas {
@@ -3860,6 +3964,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .stroke-page[data-minimal='on'][data-chrome='awake'] #strokes-back {
   opacity: 0.82;
 }
+/* the quiet room speaks in one faint 戻る — the bilingual sub-caption stays
+ * out of the sleeping chrome (POL-7); the ordinary stroke bar keeps it */
+.stroke-page[data-minimal='on'] #strokes-back .en-sub {
+  display: none;
+}
 .stroke-page[data-minimal='on'] #strokes-back:focus-visible {
   outline: 2px solid var(--ai, var(--ink-2));
   outline-offset: -4px;
@@ -4131,6 +4240,52 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border-color: var(--red);
 }
 
+/* the end screen's explicit enroll choice (PR70-P0-1): one quiet row per
+ * word — its honest ○/× mark, the word, and the 覚える door */
+.lesson-enroll {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 12px;
+}
+
+.lesson-enroll-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.lesson-enroll-mark {
+  flex: none;
+  width: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.lesson-enroll-mark.wrong {
+  color: var(--red);
+}
+
+.lesson-enroll-word {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 17px;
+}
+
+.lesson-enroll-one {
+  flex: none;
+}
+
+.lesson-enroll-one.on {
+  color: var(--ink-2);
+}
+
+.lesson-enroll-all {
+  margin: 10px 0 4px;
+}
+
 /* ------------------------------------------------------------ thesaurus
  * 類語辞典 — the paper-thesaurus spread. Each cluster is a headword row
  * followed by sem-rows (shared with the entry sheet's 意味の近く block). */
@@ -4290,11 +4445,95 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   padding: 4px 7px;
   cursor: pointer;
   flex: none;
+  /* the printed pill stays small and quiet, but the finger gets its whole
+   * 44px (POL-9): the pseudo-element carries the hit region, and because it
+   * belongs to the button, the row underneath never steals the tap */
+  position: relative;
+}
+
+.rest-toggle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
 }
 
 .rest-toggle.resting {
   color: var(--red);
   border-color: rgba(158, 43, 37, 0.35);
+}
+
+/* the no-debt row's one quiet affordance: 始める mints the card by hand */
+.rest-toggle.srs-start {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+/* the sentence page's way on to its whole article (rubric §9.5) */
+.sent-home-row {
+  margin: 10px 0 2px;
+}
+
+/* 出会い — the observation ledger read back on an entry sheet (P2-19).
+ * Quiet by construction: it reports what happened, never what is known. */
+.encounter-trail {
+  margin: 18px 0 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.trail-line {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 2px 0;
+}
+
+.trail-line.trail-quiet {
+  color: var(--faint);
+}
+
+/* ペース — the learner's review pacing, folded behind one quiet toggle */
+.srs-prefs {
+  margin: 6px 0 2px;
+}
+
+.srs-pref-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.srs-pref-row .srs-pref-name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+}
+
+.srs-pref-val {
+  min-width: 2.5em;
+  text-align: center;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.srs-pref-step {
+  min-width: 34px;
+  text-align: center;
+}
+
+.srs-pref-step[disabled] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.review-deferred {
+  margin: 4px 0 10px;
 }
 
 .review-rest {
@@ -4373,6 +4612,18 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin-top: 12px;
 }
 
+/* POL-13 · the surviving quiz's two doors on the tray: back in, or let go */
+.aiq-resume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.aiq-drop {
+  color: var(--ink-2);
+}
+
 /* the cloze face: the shelf's own sentence, with the word's place held */
 .review-cloze {
   font-family: var(--serif);
@@ -4405,6 +4656,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .archive-row-title {
   font-size: 15px;
   line-height: 1.5;
+}
+.archive-row-title-en {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
 }
 .archive-row-meta {
   display: flex;
@@ -4449,7 +4706,10 @@ body.zen .probe-context {
   color: var(--ink-2);
   margin: 0 0 6px;
 }
-/* the quiet door on every example line into its own page */
+/* the quiet door on every example line into its own page. Print stays a
+ * 14px glyph; the button carries the real 44px hit region the same way
+ * button.tok does — a centered pseudo-element that participates in hit
+ * testing without widening the line's typography. */
 .sent-door {
   background: transparent;
   border: 0;
@@ -4459,6 +4719,17 @@ body.zen .probe-context {
   color: var(--ai, var(--ink-2));
   cursor: pointer;
   vertical-align: baseline;
+  position: relative;
+}
+
+.sent-door::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
 }
 
 /* the answer face's example lines — quieter than the cloze, still living */
@@ -4519,7 +4790,10 @@ body.zen .review-example {
 }
 
 .kdx-chip {
-  min-width: 34px;
+  /* a paper index is dense; a finger is not — every chip keeps the app's
+   * 44px floor even when its glyph is one stroke wide */
+  min-width: var(--tap, 44px);
+  min-height: var(--tap, 44px);
   padding: 5px 8px;
   background: transparent;
   border: 1px solid var(--line-soft);
@@ -4698,13 +4972,24 @@ body.zen .review-example {
   letter-spacing: 0.04em;
   color: var(--faint);
 }
+/* The chosen lens used one fixed near-white on each world's red, which fell
+ * to 2.85:1 where the red is deep (E3 round-A, a11y lens). A world's own
+ * ink/ground pair is its strongest by construction — the seal keeps the red
+ * as its edge, so the chosen lens still reads as the red one. */
+.view-title-en {
+  margin: -2px 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
 .kdx-lens.on {
-  background: var(--red);
+  background: var(--ink);
   border-color: var(--red);
 }
 .kdx-lens.on .l-ja,
 .kdx-lens.on .en-sub {
-  color: #fcfbf6;
+  color: var(--ground);
 }
 .kdx-chosen {
   display: flex;
@@ -5058,6 +5343,25 @@ body.zen .review-reveal {
   margin: 0 auto;
   width: 100%;
   max-width: 340px;
+}
+/* 想起の二道 — the T-06 gate: before anything turns over, the front face
+ * asks "did it come back?". Two quiet doors where the single reveal stood:
+ * まだ stands outlined — an honest miss is never punished by the chrome —
+ * and 思い出した carries the ink. The dojo keeps its single 答えを見る. */
+.declare-row {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  gap: 10px;
+}
+.declare-row .take {
+  flex: 1;
+  margin: 0;
+}
+.declare-row .declare-notyet {
+  background: transparent;
+  color: var(--ink);
 }
 body.zen .grade-row {
   margin: 0 auto;

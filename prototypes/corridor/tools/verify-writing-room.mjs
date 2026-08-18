@@ -202,6 +202,20 @@ async function wake(page) {
     null,
     { timeout: 5_000 },
   );
+  // …and then for the field to have actually ARRIVED. The attribute flips on
+  // the press, but the field fades in over 0.34s, so a slow runner sampled it
+  // mid-fade and read a wake as a failure (CI, 2026-08-16). Waiting for the
+  // settled opacity strengthens the probe rather than softening it: a field
+  // that never appears still fails, now by timeout instead of by luck.
+  await page.waitForFunction(
+    `(() => {
+      const field = document.querySelector('.stroke-awake-field');
+      if (!field) return false;
+      return Number.parseFloat(getComputedStyle(field).opacity || '1') > 0.02;
+    })()`,
+    null,
+    { timeout: 5_000 },
+  );
 }
 
 async function installStrokeTrace(page) {
@@ -329,6 +343,21 @@ async function main() {
       'the dialog names the invisible platform Back exit',
       asleep?.describedBy === 'stroke-exit-description' && Boolean(asleep.exitDescription),
       JSON.stringify({ describedBy: asleep?.describedBy, text: asleep?.exitDescription }),
+    );
+    // POL-7 — the quiet room speaks in one faint 戻る: the bilingual chrome's
+    // English sub-caption must not hang beneath it while the room is minimal
+    const quietBackLabel = await page.evaluate(() => {
+      const sub = document.querySelector('#strokes-back .en-sub');
+      return {
+        subPresent: Boolean(sub),
+        subDisplay: sub ? getComputedStyle(sub).display : null,
+        text: document.querySelector('#strokes-back')?.textContent?.trim() ?? '',
+      };
+    });
+    check(
+      'the quiet 戻る sheds its English sub-caption',
+      !quietBackLabel.subPresent || quietBackLabel.subDisplay === 'none',
+      JSON.stringify(quietBackLabel),
     );
 
     console.log('\n— awake field');

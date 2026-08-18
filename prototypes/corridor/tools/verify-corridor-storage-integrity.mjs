@@ -18,9 +18,16 @@ const residualPath = fileURLToPath(
     import.meta.url,
   ),
 );
+const driftLayerPath = fileURLToPath(new URL('../drift-layer.js', import.meta.url));
+const driftArtifactPath = fileURLToPath(new URL('../../drift/drift-artifact.html', import.meta.url));
 const source = readFileSync(corridorPath, 'utf8');
+const PIN = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../data/fsrs-pin.json', import.meta.url)), 'utf8'),
+);
 const css = readFileSync(cssPath, 'utf8');
 const driftCss = readFileSync(driftCssPath, 'utf8');
+const driftLayerSource = readFileSync(driftLayerPath, 'utf8');
+const driftArtifactSource = readFileSync(driftArtifactPath, 'utf8');
 const checks = [];
 
 function verified(name, body) {
@@ -33,12 +40,16 @@ async function verifiedAsync(name, body) {
   checks.push(name);
 }
 
-function between(start, end) {
-  const from = source.indexOf(start);
+function betweenIn(text, start, end) {
+  const from = text.indexOf(start);
   assert.notEqual(from, -1, `missing source marker: ${start}`);
-  const to = source.indexOf(end, from);
+  const to = text.indexOf(end, from);
   assert.notEqual(to, -1, `missing source marker: ${end}`);
-  return source.slice(from, to);
+  return text.slice(from, to);
+}
+
+function between(start, end) {
+  return betweenIn(source, start, end);
 }
 
 function state(overrides = {}) {
@@ -59,7 +70,10 @@ function state(overrides = {}) {
     aiReadings: [],
     suspended: {},
     aiChat: [],
+    ai: {},
+    aiQuiz: null,
     stats: {},
+    srsPrefs: { newPerDay: 20, reviewLimit: 20 },
     readDone: {},
     readerPos: {},
     dials: { kanji: 0, furigana: 1, spacing: 0 },
@@ -178,7 +192,7 @@ const storeContext = vm.createContext({
   tx: (_ja, en) => en,
 });
 vm.runInContext(
-  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue };`,
+  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };`,
   storeContext,
   { filename: 'corridor-persistence-block.js' },
 );
@@ -222,11 +236,13 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
         id: '海',
         label: '海',
         ts: 10,
+        started: 10,
         from: { passage: 'p', index: 2 },
         ctx: { p: 'p', i: 2, scope: 'sent' },
         entrySeq: '1',
         cueReading: 'うみ',
       },
+      { t: 'word', id: '波', label: '波', ts: 11 },
     ],
     lists: { 海辺: [{ t: 'word', id: '海', label: '海', ts: 10 }] },
     srs: {
@@ -252,6 +268,13 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
       [11, 'probe', 'word:海', 3, 0],
       [12, 'drift', 'word:海', 1],
       [13, 'dojo', 'word:海', 0],
+      [14, 'dojo', 'kanji:海', 3, 'kanji'],
+      [15, 'params', 'fsrs', 'length'],
+      [15, 'reveal', 'word:海', 1],
+      [16, 'reveal', 'word:海', 0],
+      [17, 'lesson', 'word:海', 3, 'N5-1'],
+      [18, 'lesson', 'word:海', 1, 'N5-1'],
+      [19, 'dojo', 'word:海', 3, 'due'],
     ],
     deepWords: { 海: { r: 'うみ', m: ['sea'], jlpt: 'N5', k: ['海'], seq: '1' } },
     lessonsDone: { lesson: { score: 1, total: 1, ts: 10 } },
@@ -259,7 +282,24 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
     aiReadings: [{ text: '海へ行く。', lv: 'N5', ts: 10 }],
     suspended: { 'word:波': 10 },
     aiChat: [{ role: 'user', text: '海' }],
+    ai: { baseUrl: 'https://example.invalid', model: 'test-model' },
+    aiQuiz: {
+      qs: [
+        { q: '問一', opts: ['a', 'b', 'c', 'd'], right: 0, why: 'one' },
+        { q: '問二', opts: ['a', 'b', 'c', 'd'], right: 1, why: 'two' },
+        { q: '問三', opts: ['a', 'b', 'c', 'd'], right: 3, why: 'three' },
+      ],
+      ix: 3,
+      picked: null,
+      correct: 2,
+      ts: 10,
+    },
     stats: { lastExportTs: 10, fuzzOff: false, '2026-08-15': { n: 1, again: 0, nnew: 1 } },
+    srsPrefs: {
+      newPerDay: 35,
+      reviewLimit: 45,
+      fsrs: { w: PIN.w, source: 'bunki-fsrs6-r090-personal-v1 @ 2026-08-16', basedOnReviews: 500 },
+    },
     readDone: { article: 10 },
     readerPos: { article: 120 },
     dials: { kanji: 0, furigana: 1, spacing: 2 },
@@ -270,12 +310,34 @@ verified('complete-valid-envelope-hydrates-only-after-validation', () => {
   storeApi.loadStore();
   assert.equal(storeContext.S.storeReadOnly, false);
   assert.equal(storeContext.S.taken[0].id, '海');
+  assert.equal(storeContext.S.taken[0].started, 10);
+  // a row without the promotion mark hydrates as-is — nothing fabricates one
+  assert.equal(Object.hasOwn(storeContext.S.taken[1], 'started'), false);
   assert.equal(storeContext.S.srs['word:海'].state, 2);
+  assert.equal(storeContext.S.ai.baseUrl, 'https://example.invalid');
+  assert.equal(storeContext.S.ai.model, 'test-model');
+  // POL-13 · a persisted quiz run — the score screen included — hydrates whole
+  assert.equal(storeContext.S.aiQuiz.ix, 3);
+  assert.equal(storeContext.S.aiQuiz.qs.length, 3);
+  assert.equal(storeContext.S.aiQuiz.correct, 2);
+  assert.equal(storeContext.S.srsPrefs.newPerDay, 35);
+  assert.equal(storeContext.S.srsPrefs.reviewLimit, 45);
+  // R3-D · the learner's fitted weights hydrate VERBATIM alongside pacing
+  assert.equal(storeContext.S.srsPrefs.fsrs.w.length, 21);
+  assert.equal(storeContext.S.srsPrefs.fsrs.basedOnReviews, 500);
   assert.equal(storeContext.S.storeExtras.futureField.nested[0], 'preserved');
   assert.equal(storeContext.localStorage.writes, 0);
 });
 
 verified('every-known-root-and-version-shape-fails-closed', () => {
+  const quizQ = () => ({ q: '問', opts: ['a', 'b', 'c', 'd'], right: 0, why: 'w' });
+  const quizRun = (over = {}) => ({
+    qs: [quizQ(), quizQ(), quizQ()],
+    ix: 0,
+    picked: null,
+    correct: 0,
+    ...over,
+  });
   const validCard = {
     due: '2026-08-16T00:00:00.000Z',
     last_review: '2026-08-15T00:00:00.000Z',
@@ -321,6 +383,8 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ],
     ['taken nested entry sequence', { v: 1, taken: [{ t: 'word', id: '海', entrySeq: [] }] }],
     ['taken nested cue reading', { v: 1, taken: [{ t: 'word', id: '海', cueReading: {} }] }],
+    ['taken started mark type', { v: 1, taken: [{ t: 'word', id: '海', started: 'now' }] }],
+    ['taken started mark non-finite', { v: 1, taken: [{ t: 'word', id: '海', started: null }] }],
     ['lists root', { v: 1, lists: [] }],
     ['lists nested collection', { v: 1, lists: { x: {} } }],
     ['lists nested item', { v: 1, lists: { x: [{ t: 'word', id: null }] } }],
@@ -351,6 +415,23 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['obslog unknown kind', { v: 1, obslog: [[1, 'unknown', 'word:海', 1]] }],
     ['obslog malformed tap', { v: 1, obslog: [[1, 'tap', 'word:海', 9, 'article']] }],
     ['obslog malformed probe', { v: 1, obslog: [[1, 'probe', 'word:海', 3, 2]] }],
+    ['obslog malformed drift judgment', { v: 1, obslog: [[1, 'drift', 'word:海', 2]] }],
+    ['obslog malformed drift arity', { v: 1, obslog: [[1, 'drift', 'word:海', 3, 'extra']] }],
+    ['obslog malformed dojo grade', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 9]] }],
+    ['obslog malformed dojo mode', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 42]] }],
+    ['obslog overlong dojo row', { v: 1, obslog: [[1, 'dojo', 'kanji:海', 3, 'kanji', 'extra']] }],
+    ['obslog params off-key', { v: 1, obslog: [[1, 'params', 'other', 'length']] }],
+    ['obslog params reason type', { v: 1, obslog: [[1, 'params', 'fsrs', 7]] }],
+    ['obslog overlong params row', { v: 1, obslog: [[1, 'params', 'fsrs', 'length', 'extra']] }],
+    ['obslog malformed reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', 2]] }],
+    ['obslog non-integer reveal declaration', { v: 1, obslog: [[1, 'reveal', 'word:海', '1']] }],
+    ['obslog short reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海']] }],
+    ['obslog overlong reveal row', { v: 1, obslog: [[1, 'reveal', 'word:海', 1, 'extra']] }],
+    ['obslog malformed lesson grade', { v: 1, obslog: [[1, 'lesson', 'word:海', 2, 'N5-1']] }],
+    ['obslog short lesson row', { v: 1, obslog: [[1, 'lesson', 'word:海', 3]] }],
+    ['obslog lesson id type', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, 42]] }],
+    ['obslog lesson id empty', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, '']] }],
+    ['obslog overlong lesson row', { v: 1, obslog: [[1, 'lesson', 'word:海', 3, 'N5-1', 'extra']] }],
     ['deepWords root', { v: 1, deepWords: [] }],
     ['deepWords nested record', { v: 1, deepWords: { 海: [] } }],
     ['deepWords nested meaning', { v: 1, deepWords: { 海: { m: [1] } } }],
@@ -366,9 +447,46 @@ verified('every-known-root-and-version-shape-fails-closed', () => {
     ['aiChat root', { v: 1, aiChat: {} }],
     ['aiChat nested turn', { v: 1, aiChat: [null] }],
     ['aiChat nested role', { v: 1, aiChat: [{ role: [], text: '' }] }],
+    ['ai root', { v: 1, ai: [] }],
+    ['ai nested baseUrl', { v: 1, ai: { baseUrl: 1 } }],
+    ['ai nested model', { v: 1, ai: { model: '' } }],
+    ['aiQuiz root', { v: 1, aiQuiz: [] }],
+    ['aiQuiz missing questions', { v: 1, aiQuiz: { ix: 0, picked: null, correct: 0 } }],
+    ['aiQuiz too few questions', { v: 1, aiQuiz: quizRun({ qs: [quizQ(), quizQ()] }) }],
+    [
+      'aiQuiz too many questions',
+      { v: 1, aiQuiz: quizRun({ qs: [quizQ(), quizQ(), quizQ(), quizQ(), quizQ(), quizQ()] }) },
+    ],
+    ['aiQuiz question shape', { v: 1, aiQuiz: quizRun({ qs: [null, quizQ(), quizQ()] }) }],
+    [
+      'aiQuiz question option count',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), opts: ['a', 'b', 'c'] }, quizQ(), quizQ()] }) },
+    ],
+    [
+      'aiQuiz question option type',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), opts: [1, 'b', 'c', 'd'] }, quizQ(), quizQ()] }) },
+    ],
+    [
+      'aiQuiz question right index',
+      { v: 1, aiQuiz: quizRun({ qs: [{ ...quizQ(), right: 4 }, quizQ(), quizQ()] }) },
+    ],
+    ['aiQuiz cursor type', { v: 1, aiQuiz: quizRun({ ix: '0' }) }],
+    ['aiQuiz cursor past the end', { v: 1, aiQuiz: quizRun({ ix: 4 }) }],
+    ['aiQuiz picked range', { v: 1, aiQuiz: quizRun({ picked: 4 }) }],
+    ['aiQuiz picked type', { v: 1, aiQuiz: quizRun({ picked: '1' }) }],
+    ['aiQuiz correct range', { v: 1, aiQuiz: quizRun({ correct: 4 }) }],
+    ['aiQuiz timestamp type', { v: 1, aiQuiz: quizRun({ ts: 'now' }) }],
     ['stats root', { v: 1, stats: [] }],
     ['stats nested day', { v: 1, stats: { day: [] } }],
     ['stats nested count', { v: 1, stats: { day: { n: 'one' } } }],
+    ['srsPrefs root', { v: 1, srsPrefs: [] }],
+    ['srsPrefs newPerDay type', { v: 1, srsPrefs: { newPerDay: '20' } }],
+    ['srsPrefs newPerDay fractional', { v: 1, srsPrefs: { newPerDay: 12.5 } }],
+    ['srsPrefs newPerDay below range', { v: 1, srsPrefs: { newPerDay: -1 } }],
+    ['srsPrefs newPerDay above range', { v: 1, srsPrefs: { newPerDay: 51 } }],
+    ['srsPrefs reviewLimit type', { v: 1, srsPrefs: { reviewLimit: null } }],
+    ['srsPrefs reviewLimit below range', { v: 1, srsPrefs: { reviewLimit: 4 } }],
+    ['srsPrefs reviewLimit above range', { v: 1, srsPrefs: { reviewLimit: 101 } }],
     ['readDone root', { v: 1, readDone: [] }],
     ['readDone nested timestamp', { v: 1, readDone: { article: 'now' } }],
     ['readerPos root', { v: 1, readerPos: [] }],
@@ -671,7 +789,41 @@ verified('deep-capture-action-executes-one-boundary', () => {
   assert.equal(attempts, 2);
   assert.equal(context.S.taken.length, 1);
   assert.equal(context.S.taken[0].entrySeq, '42');
+  // 覚える is the explicit promotion — the mark rides the capture instant
+  assert.equal(context.S.taken[0].started, 456);
   assert.equal(context.S.deepWords['安堵'].r, 'あんど');
+});
+
+verified('capture-context-rides-the-guarded-boundary', () => {
+  const context = vm.createContext({
+    S: { taken: [], deepWords: {} },
+    D: { dict: { 海: { r: 'うみ', m: ['sea'] } } },
+    NODE_KIND: { word: ['語', 'word'] },
+    lookup: () => null,
+    commitStorePatch: null,
+  });
+  vm.runInContext(`${captureActionBlock};globalThis.action = commitCapture;`, context);
+  context.commitStorePatch = (patch) => {
+    Object.assign(context.S, patch);
+    return true;
+  };
+  // R2-B: the reader's top-right door and the mini pass ctxScope alongside
+  // provenance — the stored item carries the validator's exact ctx shape
+  assert.equal(
+    context.action({ t: 'word', id: '海', from: { passage: 'p', index: 4 }, ctxScope: 'sent' }, '海', 111),
+    true,
+  );
+  const storedCtx = context.S.taken[0].ctx;
+  assert.equal(storedCtx.p, 'p');
+  assert.equal(storedCtx.i, 4);
+  assert.equal(storedCtx.scope, 'sent');
+  assert.equal(Object.keys(storedCtx).length, 3);
+  assert.equal(context.S.taken[0].from.passage, 'p');
+  // without provenance there is no context to carry — no ctx is minted
+  assert.equal(context.action({ t: 'word', id: '海', ctxScope: 'sent' }, '海', 112), true);
+  assert.equal(Object.hasOwn(context.S.taken[1], 'ctx'), false);
+  // what capture writes, the fail-closed envelope must accept verbatim
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, taken: context.S.taken }), true);
 });
 
 const gradeActionBlock = between('function advanceReviewSession(', '/** Items ready to review:');
@@ -745,6 +897,32 @@ verified('drill-grade-action-failure-and-success', () => {
   assert.equal(rv.done.good, 1);
   assert.equal(rv.history[0].drill, true);
   assert.equal(rv.queue.length, 1);
+  // a modeless call keeps the legacy four-wide row; naming the drill room
+  // rides it as the trailing mode — never FSRS state, never a revlog row
+  // (rows are vm-realm arrays, so compare their serialized bytes)
+  assert.equal(JSON.stringify(context.S.obslog[0]), JSON.stringify([1000, 'dojo', 'word:海', 3]));
+  rv = reviewSession();
+  assert.equal(
+    context.actions.commitDrillGrade({
+      rv,
+      item,
+      next,
+      key: 'good',
+      skey: 'word:海',
+      rating: 3,
+      mode: 'kanji',
+      now: new Date(2000),
+    }),
+    true,
+  );
+  assert.equal(context.S.obslog.length, 2);
+  assert.equal(
+    JSON.stringify(context.S.obslog[1]),
+    JSON.stringify([2000, 'dojo', 'word:海', 3, 'kanji']),
+  );
+  assert.equal(context.S.revlog.length, 0);
+  assert.equal(Object.keys(context.S.srs).length, 0);
+  assert.equal(Object.keys(context.S.stats).length, 0);
 });
 
 verified('standard-grade-action-failure-and-success', () => {
@@ -793,6 +971,612 @@ verified('standard-grade-action-failure-and-success', () => {
   assert.equal(rv.history.length, 1);
 });
 
+/* --------------------------------------------------------- the drift bridge
+ * P0 #1: a Drift flick judgment must reach the one learner state as an
+ * APPEND-ONLY obslog observation — synchronously, so the ack the water
+ * receives is the durability result — and must never mint FSRS state,
+ * S.taken rows, or review debt (exposure is not mastery). When the host
+ * cannot persist the observation, the water rolls its own store back:
+ * the two records never disagree about what the learner said. */
+const observationBlock = between(
+  '/* ------------------------------------------------ the observation log',
+  "addEventListener('pagehide', obsFlush);",
+);
+
+function bridgeContext() {
+  const context = vm.createContext({
+    S: { obslog: [], srs: {}, taken: [], revlog: [], deepWords: {} },
+    window: {},
+    commitStorePatch: null,
+    srsKey: (t, id) => `${t}:${id}`,
+    saveStore: () => true,
+    setTimeout: () => 0,
+    clearTimeout: () => {},
+  });
+  vm.runInContext(observationBlock, context, { filename: 'corridor-observation-block.js' });
+  return context;
+}
+
+verified('drift-judgment-lands-in-obslog-as-one-synchronous-observation', () => {
+  const context = bridgeContext();
+  let attempts = 0;
+  context.commitStorePatch = (patch) => {
+    attempts += 1;
+    Object.assign(context.S, patch);
+    return true;
+  };
+  const before = Date.now();
+  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), true);
+  assert.equal(attempts, 1, 'the ack must ride one synchronous commit, never the tap debounce');
+  assert.equal(context.S.obslog.length, 1);
+  const [ts, kind, key, judgment] = context.S.obslog[0];
+  assert.ok(ts >= before && ts <= Date.now());
+  assert.equal(kind, 'drift');
+  assert.equal(key, 'word:海');
+  assert.equal(judgment, 3);
+  assert.equal(context.window.bunkiDriftJudgment('glyph', '語', -1), true);
+  assert.equal(context.window.bunkiDriftJudgment('part', 'は', -1), true);
+  assert.deepEqual(
+    // JSON-normalized: the rows were minted inside the vm realm
+    JSON.parse(JSON.stringify(context.S.obslog.map((row) => row.slice(1)))),
+    [
+      ['drift', 'word:海', 3],
+      ['drift', 'kanji:語', 1],
+      ['drift', 'particle:は', 1],
+    ],
+  );
+  // every bridged row round-trips the fail-closed envelope validator
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
+    true,
+  );
+  // exposure is not mastery: no FSRS card, no capture row, no review debt
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+  assert.equal(context.S.revlog.length, 0);
+  const bridge = betweenIn(observationBlock, 'window.bunkiDriftJudgment = (kind, key, dir) => {', '};');
+  assert.match(bridge, /return commitStorePatch\(\{ obslog \}\)/);
+  assert.doesNotMatch(bridge, /obsLog\(|setTimeout|srsStore|S\.srs|S\.taken|S\.revlog/);
+});
+
+verified('drift-judgment-persistence-failure-acks-false-and-appends-nothing', () => {
+  const context = bridgeContext();
+  let attempts = 0;
+  context.commitStorePatch = () => {
+    attempts += 1;
+    return false;
+  };
+  assert.equal(context.window.bunkiDriftJudgment('word', '海', 1), false);
+  assert.equal(attempts, 1);
+  assert.equal(context.S.obslog.length, 0);
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+});
+
+const driftGradeBlock = betweenIn(driftLayerSource, 'function grade(n,dir){', 'function updateTray(){');
+
+verified('drift-grade-block-ships-byte-identical-to-its-source-of-truth', () => {
+  assert.equal(
+    driftGradeBlock,
+    betweenIn(driftArtifactSource, 'function grade(n,dir){', 'function updateTray(){'),
+  );
+});
+
+function driftGradeContext() {
+  const calls = [];
+  const context = vm.createContext({
+    stack: [],
+    store: { known: {}, unknown: {}, lk: 0, lu: 0 },
+    settled: 0,
+    gathered: 0,
+    unfolded: null,
+    focusN: null,
+    WALKED: [],
+    deck: [],
+    window: {},
+    saveStore: null,
+    setHint: (txt) => calls.push(['hint', txt]),
+    bloom: () => calls.push(['bloom']),
+    sink: () => calls.push(['sink']),
+    updateTray: () => calls.push(['tray']),
+    clearBloom: () => {},
+    removeNode: () => calls.push(['removeNode']),
+    topUp: () => {},
+    surface: () => {},
+    vh: () => 844,
+    performance: { now: () => 0 },
+    setTimeout: () => 0,
+  });
+  vm.runInContext(`${driftGradeBlock}\n;globalThis.grade = grade;`, context, {
+    filename: 'drift-grade-block.js',
+  });
+  return { context, calls };
+}
+
+const driftWord = () => ({
+  kind: 'word',
+  w: '海',
+  r: 'うみ',
+  g: 'sea',
+  st: 'k',
+  p: '',
+  lvl: 3,
+  gone: false,
+  frozen: false,
+  fromW: true,
+  x: 100,
+  y: 100,
+  s: 1,
+  cr: 0,
+  el: { style: {} },
+});
+
+verified('drift-judgment-reaches-the-host-only-after-its-own-commit', () => {
+  const { context, calls } = driftGradeContext();
+  const order = [];
+  context.saveStore = () => {
+    order.push('drift-save');
+    return true;
+  };
+  context.window.bunkiDriftJudgment = (kind, key, dir) => {
+    order.push(`host:${kind}:${key}:${dir}`);
+    return true;
+  };
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.deepEqual(order, ['drift-save', 'host:word:海:1']);
+  assert.equal(n.gone, true);
+  assert.equal(context.store.known['海'], 1);
+  assert.equal(context.settled, 1);
+  assert.ok(calls.some(([call]) => call === 'bloom'));
+});
+
+verified('drift-store-rolls-back-when-the-host-cannot-persist', () => {
+  const failingHosts = [
+    ['acks false', () => false],
+    ['acks nothing', () => undefined],
+    [
+      'throws',
+      () => {
+        throw new Error('host store quarantined');
+      },
+    ],
+  ];
+  for (const [name, failingHost] of failingHosts) {
+    const { context, calls } = driftGradeContext();
+    const saves = [];
+    context.saveStore = () => {
+      saves.push(JSON.parse(JSON.stringify(context.store)));
+      return true;
+    };
+    context.window.bunkiDriftJudgment = failingHost;
+    const n = driftWord();
+    context.grade(n, -1);
+    // the judgment rode the first (pre-ack) save; the rollback save erased it
+    assert.equal(saves.length, 2, name);
+    assert.equal(saves[0].unknown['海'], 1, name);
+    assert.deepEqual(saves[1], { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
+    assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 }, name);
+    // the word stays in the water, the learner is told once, nothing departs
+    assert.equal(n.gone, false, name);
+    assert.equal(context.gathered, 0, name);
+    assert.equal(calls.filter(([call]) => call === 'hint').length, 1, name);
+    assert.ok(
+      !calls.some(([call]) => ['bloom', 'sink', 'removeNode', 'tray'].includes(call)),
+      name,
+    );
+  }
+});
+
+verified('drift-own-save-failure-never-reaches-the-host', () => {
+  const { context } = driftGradeContext();
+  let hostCalls = 0;
+  context.saveStore = () => false;
+  context.window.bunkiDriftJudgment = () => {
+    hostCalls += 1;
+    return true;
+  };
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.equal(hostCalls, 0);
+  assert.deepEqual(context.store, { known: {}, unknown: {}, lk: 0, lu: 0 });
+  assert.equal(n.gone, false);
+});
+
+verified('drift-standalone-keeps-autonomy-without-a-host', () => {
+  const { context } = driftGradeContext();
+  let saves = 0;
+  context.saveStore = () => {
+    saves += 1;
+    return true;
+  };
+  // no window.bunkiDriftJudgment — the standalone water grades on its own
+  const n = driftWord();
+  context.grade(n, 1);
+  assert.equal(saves, 1);
+  assert.equal(n.gone, true);
+  assert.equal(context.store.known['海'], 1);
+});
+
+/* ------------------------------------------------ R2-A · scheduler policy,
+ * ordered/bounded review, no-debt migration. These blocks run the REAL
+ * extracted corridor code in vm, never a re-implementation. */
+
+verified('scheduler-clock-clamp-and-raw-audit-truth', () => {
+  const clampBlock = between(
+    'function srsSchedulerInstant(card, now) {',
+    '/* --------------------------------------------------- the review log',
+  );
+  const clampContext = vm.createContext({});
+  vm.runInContext(`${clampBlock}\n;globalThis.__clamp = srsSchedulerInstant;`, clampContext, {
+    filename: 'corridor-clamp-block.js',
+  });
+  const clamp = clampContext.__clamp;
+  const now = new Date('2026-08-16T00:00:00.000Z');
+  // the device clock moved BACKWARD past the card's anchor: clamp up, never crash
+  const anchorAhead = new Date('2026-08-19T00:00:00.000Z');
+  assert.equal(clamp({ last_review: anchorAhead }, now).getTime(), anchorAhead.getTime());
+  // an ordinary forward clock passes through untouched
+  const anchorBehind = new Date('2026-08-10T00:00:00.000Z');
+  assert.strictEqual(clamp({ last_review: anchorBehind }, now), now);
+  // a first grade has no anchor to clamp against
+  assert.strictEqual(clamp({}, now), now);
+
+  // the revlog row keeps the RAW press time while pricing at the clamped instant
+  const logRowBlock = between('function srsReviewLogRow(', 'function advanceReviewSession(');
+  const logContext = vm.createContext({ scheduler: { get_retrievability: () => 0.9 } });
+  vm.runInContext(`${logRowBlock}\n;globalThis.__row = srsReviewLogRow;`, logContext, {
+    filename: 'corridor-logrow-block.js',
+  });
+  const after = {
+    stability: 6,
+    difficulty: 5,
+    scheduled_days: 4,
+    due: new Date(anchorAhead.getTime() + 4 * 86400000),
+    state: 2,
+  };
+  const row = logContext.__row(
+    'word:海',
+    { last_review: anchorAhead, state: 2, stability: 5, difficulty: 5 },
+    after,
+    3,
+    now,
+    clamp({ last_review: anchorAhead }, now),
+  );
+  assert.equal(row[0], now.getTime(), 'row[0] is the raw press time — audit truth');
+  assert.equal(row[4], 0, 'elapsed is measured at the clamp, never negative');
+  assert.equal(row[5], 0.9);
+  assert.equal(row[11], after.due.getTime());
+  // an ordinary forward grade prices real elapsed days
+  const forwardRow = logContext.__row(
+    'word:海',
+    { last_review: anchorBehind, state: 2, stability: 5, difficulty: 5 },
+    after,
+    3,
+    now,
+    now,
+  );
+  assert.equal(forwardRow[0], now.getTime());
+  assert.equal(forwardRow[4], 6);
+});
+
+verified('due-queue-overdueness-order-no-debt-and-daily-cap', () => {
+  const srsBlock = between(
+    '/** Items ready to review:',
+    '/** Midnight at the start of a date',
+  );
+  const dueContext = vm.createContext({
+    S: {},
+    document: fakeDocument(),
+    localStorage: storage(),
+    tx: (_ja, en) => en,
+    srsKey: (t, id) => `${t}:${id}`,
+    dayKey: () => '2026-08-16',
+  });
+  vm.runInContext(
+    `${persistenceBlock}\n${srsBlock}\n;globalThis.__srsApi = { srsDueItems, srsNewPerDay, srsReviewLimit };`,
+    dueContext,
+    { filename: 'corridor-due-block.js' },
+  );
+  const api = dueContext.__srsApi;
+  const now = new Date('2026-08-16T12:00:00.000Z');
+  const iso = (msAgo) => new Date(now.getTime() - msAgo).toISOString();
+  const card = (dueAgoMs) => ({
+    due: iso(dueAgoMs),
+    stability: 5,
+    difficulty: 5,
+    elapsed_days: 1,
+    scheduled_days: 3,
+    reps: 2,
+    lapses: 0,
+    learning_steps: 0,
+    state: 2,
+  });
+  const HOUR = 3600000;
+  const DAY = 86400000;
+  dueContext.S = {
+    taken: [
+      { t: 'word', id: 'recent', started: 1 },
+      { t: 'word', id: 'oldest', started: 1 },
+      { t: 'word', id: 'tieB', started: 1 },
+      { t: 'word', id: 'tieA', started: 1 },
+      { t: 'word', id: 'fresh1', started: 5 },
+      { t: 'word', id: 'legacy' },
+      { t: 'word', id: 'resting', started: 1 },
+      { t: 'word', id: 'fresh2', started: 6 },
+    ],
+    srs: {
+      'word:recent': card(2 * HOUR),
+      'word:oldest': card(3 * DAY),
+      'word:tieB': card(DAY),
+      'word:tieA': card(DAY),
+      'word:resting': card(9 * DAY),
+    },
+    suspended: { 'word:resting': 1 },
+    stats: {},
+    srsPrefs: { newPerDay: 20, reviewLimit: 20 },
+  };
+  // most overdue first, key breaks the tie, started fresh rows after every
+  // real due, the unmarked legacy row NOWHERE — capture is not a schedule
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent', 'fresh1', 'fresh2'],
+  );
+  // the daily cap honours what today already introduced
+  dueContext.S.stats = { '2026-08-16': { nnew: 19 } };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent', 'fresh1'],
+  );
+  // the learner's own zero means no new cards at all
+  dueContext.S.stats = {};
+  dueContext.S.srsPrefs = { newPerDay: 0, reviewLimit: 20 };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(now), (i) => i.id),
+    ['oldest', 'tieA', 'tieB', 'recent'],
+  );
+  // out-of-range or mistyped prefs fall back to the defaults, never crash
+  dueContext.S.srsPrefs = { newPerDay: 999, reviewLimit: 'ten' };
+  assert.equal(api.srsNewPerDay(), 20);
+  assert.equal(api.srsReviewLimit(), 20);
+  // a clock behind every due date empties the reviews and never throws
+  dueContext.S.srsPrefs = { newPerDay: 20, reviewLimit: 20 };
+  assert.deepEqual(
+    Array.from(api.srsDueItems(new Date('2000-01-01T00:00:00.000Z')), (i) => i.id),
+    ['fresh1', 'fresh2'],
+  );
+});
+
+verified('one-scheduler-policy-fuzz-off-with-the-pin', () => {
+  const pin = PIN;
+  assert.equal(pin.enableFuzz, false);
+  assert.equal(pin.reviewTimePolicyId, 'append-order-monotonic-clamp-v1');
+  const schedulerInit = between('fsrsApi = window.__TSFSRS__', 'S.ready = true');
+  assert.match(schedulerInit, /enable_fuzz: pin\.enableFuzz/);
+  assert.doesNotMatch(schedulerInit, /fuzzOff/, 'the dead app-level override is gone');
+  // R3-D · the learner's fitted weights enter through the fail-closed gate
+  // and ONLY the weight vector: everything else stays the pin's policy
+  assert.match(schedulerInit, /srsParamsProblem\(fitted\)/);
+  assert.match(schedulerInit, /noteIgnoredSrsParams\(fittedProblem\)/);
+  assert.match(schedulerInit, /w: srsCustom \? fitted\.w\.slice\(\) : pin\.w/);
+  assert.match(schedulerInit, /request_retention: pin\.requestRetention/);
+  // the grade path prices the four previews and the committed grade at the clamp
+  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
+  assert.match(gradeRegion, /srsSchedulerInstant\(card, now\)/);
+  assert.match(gradeRegion, /scheduler\.repeat\(card, schedNow\)/);
+  assert.doesNotMatch(gradeRegion, /scheduler\.repeat\(card, now\)/);
+});
+
+/* ------------------------------------------- R3-D · learner FSRS parameters
+ * The optimizer loop's landing: srsPrefs.fsrs may carry the learner's own
+ * fitted weights, gated fail-closed at the scheduler seam. Wrong length,
+ * non-finite entries, out-of-bounds values — every one of these must be
+ * IGNORED (defaults rule, one quiet obslog note), never a crash and never a
+ * quarantine of the whole record. */
+
+await verifiedAsync('learner-fsrs-params-fail-closed-gate', async () => {
+  const gate = storeApi.srsParamsProblem;
+  const w = () => PIN.w.slice();
+
+  // the vendored scheduler's clamp ranges are the ONE bounds table: the
+  // corridor's copy and the optimizer's PARAMETER_BOUNDS may never drift
+  const optimizer = await import(
+    new URL('../../../tools/fsrs-optimize.mjs', import.meta.url).href
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(storeApi.FSRS_WEIGHT_BOUNDS)),
+    JSON.parse(JSON.stringify(optimizer.PARAMETER_BOUNDS)),
+  );
+
+  // a genuine fitted set passes, with or without its provenance fields
+  assert.equal(gate({ w: w(), source: 'x @ 2026-08-16', basedOnReviews: 500 }), null);
+  assert.equal(gate({ w: w() }), null);
+  // every rejection names its reason — the quiet obslog note's payload
+  assert.equal(gate(undefined), 'shape');
+  assert.equal(gate(null), 'shape');
+  assert.equal(gate([]), 'shape');
+  assert.equal(gate({}), 'shape');
+  assert.equal(gate({ w: 'defaults' }), 'shape');
+  assert.equal(gate({ w: w().slice(0, 20) }), 'length');
+  assert.equal(gate({ w: [...w(), 0.5] }), 'length');
+  const withNaN = w();
+  withNaN[7] = NaN;
+  assert.equal(gate({ w: withNaN }), 'not-finite');
+  const withInf = w();
+  withInf[0] = Infinity;
+  assert.equal(gate({ w: withInf }), 'not-finite');
+  const withString = w();
+  withString[3] = '8.3';
+  assert.equal(gate({ w: withString }), 'not-finite');
+  const below = w();
+  below[4] = 0.5; // w[4] floor is 1
+  assert.equal(gate({ w: below }), 'bounds');
+  const above = w();
+  above[20] = 0.9; // decay ceiling is 0.8
+  assert.equal(gate({ w: above }), 'bounds');
+  assert.equal(gate({ w: w(), source: '' }), 'source');
+  assert.equal(gate({ w: w(), basedOnReviews: 0 }), 'basedOnReviews');
+  assert.equal(gate({ w: w(), basedOnReviews: 1.5 }), 'basedOnReviews');
+
+  // an unusable set NEVER quarantines the record: the envelope carries it
+  // verbatim (load, then save) while the scheduler seam ignores it
+  const shortSet = { w: PIN.w.slice(0, 20), source: 'future-build' };
+  storeContext.S = state();
+  storeContext.localStorage = storage(
+    JSON.stringify({ v: 1, taken: [], srsPrefs: { newPerDay: 10, reviewLimit: 10, fsrs: shortSet } }),
+  );
+  storeApi.loadStore();
+  assert.equal(storeContext.S.storeReadOnly, false);
+  assert.equal(storeContext.S.srsPrefs.newPerDay, 10);
+  assert.deepEqual(JSON.parse(JSON.stringify(storeContext.S.srsPrefs.fsrs)), shortSet);
+  assert.equal(storeApi.saveStore(), true);
+  assert.deepEqual(
+    JSON.parse(storeContext.localStorage.value).srsPrefs.fsrs,
+    shortSet,
+    'not a byte dropped on the round trip',
+  );
+
+  // the import door: a parameter file lands through the SAME gate and the
+  // guarded boundary — never a raw localStorage write, never a started mark
+  const importBlock = between("file.addEventListener('change'", 'port.append(');
+  assert.match(importBlock, /srsParamsProblem\(fitted\)/);
+  assert.match(importBlock, /commitStorePatch\(\{ srsPrefs: \{ \.\.\.S\.srsPrefs, fsrs: fitted \} \}\)/);
+  assert.match(importBlock, /candidatePin/);
+  assert.ok(
+    importBlock.indexOf('srsParamsProblem') < importBlock.indexOf('commitStorePatch'),
+    'validation precedes the commit',
+  );
+});
+
+verified('ignored-params-note-is-one-quiet-deduped-obslog-row', () => {
+  const context = bridgeContext();
+  vm.runInContext('globalThis.__note = noteIgnoredSrsParams;', context);
+  let commits = 0;
+  context.commitStorePatch = (patch) => {
+    commits += 1;
+    Object.assign(context.S, patch);
+    return true;
+  };
+  context.__note('length');
+  context.__note('length');
+  context.__note('length');
+  assert.equal(context.S.obslog.length, 1, 'the same broken field notes once, not per boot');
+  const row = context.S.obslog[0];
+  assert.equal(row[1], 'params');
+  assert.equal(row[2], 'fsrs');
+  assert.equal(row[3], 'length');
+  // a DIFFERENT problem is new evidence and appends
+  context.__note('bounds');
+  assert.equal(context.S.obslog.length, 2);
+  assert.equal(context.S.obslog[1][3], 'bounds');
+  // every note round-trips the fail-closed envelope validator
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: JSON.parse(JSON.stringify(context.S.obslog)) }),
+    true,
+  );
+  // the note is an observation: no FSRS state, no capture, no review debt
+  assert.deepEqual(context.S.srs, {});
+  assert.equal(context.S.taken.length, 0);
+  assert.equal(context.S.revlog.length, 0);
+  assert.equal(commits, 0, 'the note rides the obslog debounce, never its own commit');
+});
+
+verified('bounded-standard-review-freeze-and-dojo-refill-kept', () => {
+  const startBlock = between('function startReview(scope) {', '/* An instrument handle');
+  assert.match(startBlock, /srsReviewLimit\(\)/);
+  assert.match(startBlock, /queue\.slice\(0, limit\)/);
+  assert.match(startBlock, /deferred/);
+  const refill = between('function refillFocusQueue(rv) {', 'function startFocus(');
+  assert.match(refill, /FOCUS_BATCH/, 'the timed dojo keeps its refill pacing');
+  assert.match(refill, /drillPass: true/, 'the second lap is marked practice (POL-12)');
+  assert.match(refill, /f\.cursor >= f\.pool\.length/);
+});
+
+/* ------------------------------------------------ POL-12 · the refill's
+ * second lap. The REAL extracted refill runs in vm: the first walk over the
+ * pool hands out the pool's own rows (they take their one honest schedule
+ * grade), and every draw after the cursor has passed the pool's length is a
+ * COPY marked drillPass — the grade path reads that mark and files practice
+ * evidence instead of remutating a schedule that already moved this block. */
+verified('dojo-refill-second-lap-is-practice', () => {
+  const batchBlock = between(
+    '/** How many pool items a dojo refill draws at once',
+    'const LEECH_LAPSES',
+  );
+  const refillBlock = between('function refillFocusQueue(rv) {', 'function startFocus(');
+  const context = vm.createContext({ S: { focus: null } });
+  vm.runInContext(
+    `${batchBlock}\n${refillBlock}\n;globalThis.__refill = refillFocusQueue;`,
+    context,
+    { filename: 'corridor-refill-block.js' },
+  );
+  const a = { t: 'word', id: '海' };
+  const b = { t: 'word', id: '波' };
+  // a fresh block: the first lap hands out the pool's own rows untouched,
+  // and the wrap that follows in the same batch is already marked practice
+  context.S.focus = { pool: [a, b], cursor: 0 };
+  const rv = { queue: [] };
+  assert.equal(context.__refill(rv), true);
+  assert.equal(rv.queue.length, 20);
+  assert.strictEqual(rv.queue[0], a);
+  assert.strictEqual(rv.queue[1], b);
+  assert.ok(rv.queue.slice(0, 2).every((row) => row.drillPass === undefined));
+  assert.ok(
+    rv.queue.slice(2).every((row) => row.drillPass === true && row !== a && row !== b),
+    'every wrap draw is a marked copy, never the pool row itself',
+  );
+  assert.equal(rv.queue[2].id, '海');
+  assert.equal(rv.queue[3].id, '波');
+  // a later refill in the same block draws practice passes only
+  const rv2 = { queue: [] };
+  assert.equal(context.__refill(rv2), true);
+  assert.ok(rv2.queue.every((row) => row.drillPass === true));
+  // an empty pool refuses the refill
+  context.S.focus = { pool: [], cursor: 0 };
+  assert.equal(context.__refill({ queue: [] }), false);
+  // and the grade path honours the mark inside the dojo branch alone
+  const gradeRegion = between('const card = srsCardOf(item, now);', 'main.append(row);');
+  assert.match(gradeRegion, /S\.focus &&\s*\(item\.drillPass === true \|\|/);
+});
+
+verified('every-in-app-mint-carries-the-started-mark', () => {
+  // capture (覚える), lane bulk memorize, lesson enroll choice, probe miss mint
+  assert.match(captureActionBlock, /started: now/);
+  const laneMint = between('const fresh = ids.filter((id) => !takenSet.has(srsKey(t, id)));', '/* --------------------------------------------------------------- lessons');
+  assert.match(laneMint, /started: Date\.now\(\)/);
+  // lesson completion writes EVIDENCE only (PR70-P0-1): the score and one
+  // obslog row per word ride ONE commit — no deck rows, no promotion mark
+  const lessonFinish = between('const lessonsDone = { ...S.lessonsDone,', 'run.phase =');
+  assert.match(lessonFinish, /commitStorePatch\(\{ lessonsDone, obslog \}\)/);
+  assert.doesNotMatch(lessonFinish, /started|taken|saveStore\(/);
+  assert.equal(
+    storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'lesson', 'word:海', 3, 'N5-1']] }),
+    true,
+  );
+  // …and the end screen's explicit enroll door is where the mark is minted —
+  // per word or all at once, each choice one guarded commit built on copies
+  const lessonEnroll = between('const enrollRow = (w) =>', "'レッスン一覧へ'");
+  assert.match(lessonEnroll, /started: Date\.now\(\)/);
+  assert.match(lessonEnroll, /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, enrollRow\(w\)\] \}\)/);
+  assert.match(
+    lessonEnroll,
+    /commitStorePatch\(\{ taken: \[\.\.\.S\.taken, \.\.\.freshWords\.map\(enrollRow\)\] \}\)/,
+  );
+  assert.doesNotMatch(lessonEnroll, /S\.taken\.push|saveStore\(/);
+  // the probe's mint now rides the guarded boundary (R3-C sweep): the
+  // started mark is built on the patch copy, never pushed live
+  const probeMint = between("if (!ok && !S.taken.some((t) => t.t === 'word'", 'commitStorePatch(patch)');
+  assert.match(probeMint, /started: Date\.now\(\)/);
+  assert.match(probeMint, /patch\.taken = \[/);
+  assert.doesNotMatch(probeMint, /S\.taken\.push|saveStore\(|obsLog\(/);
+  // and the queue admits a cardless row only through that mark
+  const dueGate = between('function srsDueItems(now = new Date()) {', '/** Midnight at the start of a date');
+  assert.match(dueGate, /finiteNumber\(item\.started\)/);
+  // the import door writes the file verbatim — it must not fabricate the mark
+  const importBlock = between("file.addEventListener('change'", 'port.append(');
+  assert.doesNotMatch(importBlock, /started/);
+});
+
 verified('bounded-handlers-call-executed-actions', () => {
   const finishHandler = between("finBtn.id = 'read-fin';", '  fin.append(finBtn);');
   assert.match(finishHandler, /commitReadDone\(p\.id\)/);
@@ -811,7 +1595,56 @@ verified('bounded-handlers-call-executed-actions', () => {
   );
   assert.match(gradeHandler, /commitDrillGrade\(/);
   assert.match(gradeHandler, /commitStandardGrade\(/);
+  // the drill's evidence row names its room (P0: practice writes evidence only)
+  assert.match(gradeHandler, /mode: S\.focus\?\.mode/);
   assert.doesNotMatch(gradeHandler, /saveStore\(|obsLog\(|srsStore\(|rv\.history\.push/);
+
+  // R3-C sweep: every review-room writer that touches learner roots rides
+  // the guarded boundary — undo commits its whole take-back as one patch,
+  // the in-session rest commits before the session moves
+  const undoHandler = between('const last = rv.history[rv.history.length - 1];', 'main.append(undo);');
+  assert.match(undoHandler, /commitStorePatch\(patch\)/);
+  assert.match(undoHandler, /rv\.history\.pop\(\)/);
+  assert.doesNotMatch(undoHandler, /saveStore\(|obsLog\(/);
+  assert.ok(
+    undoHandler.indexOf('commitStorePatch(patch)') < undoHandler.indexOf('rv.history.pop()'),
+    'the session moves back only after the take-back is durable',
+  );
+  const restHandler = between("rest2.addEventListener('click', () => {", 'moreRow.append(rest2);');
+  assert.match(restHandler, /commitStorePatch\(\{ suspended \}\)/);
+  assert.doesNotMatch(restHandler, /saveStore\(/);
+});
+
+verified('declared-recall-gate-forces-again-and-logs-the-declaration', () => {
+  // T-06 (ADR-002): the zen room has NO bare reveal — the only two doors
+  // through the front face are the declaration buttons, the dojo keeps its
+  // own single 答えを見る strictly inside the S.focus branch
+  const frontFace = between('if (!rv.revealed) {', 'const now = new Date();');
+  const focusBranch = betweenIn(frontFace, 'if (S.focus) {', 'const declare = (declared) => {');
+  assert.match(focusBranch, /btn\.id = 'reveal'/);
+  assert.doesNotMatch(
+    frontFace.replace(focusBranch, ''),
+    /id = 'reveal'|revealed = true;\s*\n\s*render/,
+    'outside the dojo branch nothing reveals without a declaration',
+  );
+  assert.match(frontFace, /declare-notyet/);
+  assert.match(frontFace, /declare-recalled/);
+  // the declaration is evidence: one obslog row, [t,'reveal',key,declared]
+  assert.match(frontFace, /obsLog\('reveal', srsKey\(item\.t, item\.id\), declared\)/);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 1]] }), true);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 0]] }), true);
+  assert.equal(storeApi.validStoreEnvelope({ v: 1, obslog: [[1, 'reveal', 'word:海', 3]] }), false);
+  // まだ narrows the row to the one honest seal AND forces the rating at
+  // the commit — the declaration, never the button, names the grade
+  const gradeRegion = between('const grades = [', '  main.append(row);');
+  assert.match(gradeRegion, /const notRecalled = !S\.focus && rv\.declared === 0;/);
+  assert.match(gradeRegion, /if \(notRecalled && rating !== 'Again'\) continue;/);
+  assert.match(gradeRegion, /const effRating = notRecalled \? 'Again' : rating;/);
+  assert.match(gradeRegion, /rating: fsrsApi\.Rating\[effRating\]/);
+  assert.doesNotMatch(gradeRegion, /rating: fsrsApi\.Rating\[rating\]/);
+  // a graded card clears the declaration for the next card
+  const advance = between('function advanceReviewSession(', 'function commitDrillGrade(');
+  assert.match(advance, /rv\.declared = null;/);
 });
 
 verified('setitem-try-block-excludes-alert-and-publication-code', () => {
@@ -876,11 +1709,46 @@ verified('live-sticky-grade-row-is-byte-preserved', () => {
 
 verified('residual-and-direct-bypass-ledger-is-exact', () => {
   const residual = JSON.parse(readFileSync(residualPath, 'utf8'));
-  assert.equal(residual.schemaVersion, 2);
+  // schemaVersion 3 (R3-C, P0-4 sweep): the ledger shrank from 19 to 5 by
+  // CONVERSION, not by relabeling — the 14 learner-state mutating callers
+  // now ride commitStorePatch and are asserted gone below; each remaining
+  // caller carries an explicit disposition.
+  assert.equal(residual.schemaVersion, 3);
   assert.equal(residual.authorityHeadAtCut, BASE);
-  assert.equal(residual.count, 19);
-  assert.equal(residual.callers.length, 19);
+  assert.equal(residual.count, 5);
+  assert.equal(residual.callers.length, 5);
   assert.ok(residual.callers.every((entry) => entry.saveResultConsumed === false));
+  assert.ok(
+    residual.callers.every(
+      (entry) => typeof entry.disposition === 'string' && entry.disposition.startsWith('retained-'),
+    ),
+  );
+  assert.deepEqual(
+    residual.callers.map((entry) => entry.surface),
+    [
+      'observation debounce flush',
+      'reader scroll debounce',
+      'app Back from reader',
+      'reader display dials',
+      'lists tray door bookmark',
+    ],
+  );
+  // no retained caller touches deck, schedule, or evidence-graded roots —
+  // only the debounced observation flush (obslog) and UI preferences
+  const allowedRoots = new Set(['obslog', 'readerPos', 'dials']);
+  for (const entry of residual.callers) {
+    for (const root of entry.learnerRootsMutatedBeforeUncheckedSave) {
+      assert.ok(allowedRoots.has(root), `${entry.surface}: ${root}`);
+    }
+  }
+  assert.equal(residual.sweepP04.converted, 14);
+  assert.equal(residual.sweepP04.convertedSurfaces.length, 14);
+  for (const surface of residual.sweepP04.convertedSurfaces) {
+    assert.ok(
+      !residual.callers.some((entry) => entry.surface === surface),
+      `converted surface must not remain a caller: ${surface}`,
+    );
+  }
 
   const lines = source.split(/\r?\n/);
   const saveLines = lines
@@ -905,10 +1773,6 @@ verified('residual-and-direct-bypass-ledger-is-exact', () => {
     })),
     bypasses,
   );
-  const undo = residual.callers.find((entry) => entry.surface === 'review undo');
-  assert.ok(undo.learnerRootsMutatedBeforeUncheckedSave.includes('obslog'));
-  const probe = residual.callers.find((entry) => entry.surface === 'yomi probe grade or mint');
-  assert.deepEqual(probe.learnerRootsMutatedBeforeUncheckedSave, ['taken', 'obslog']);
 });
 
 verified('javascript-syntax', () => {
@@ -931,13 +1795,28 @@ console.log(
         'post-setitem-ui-failure-isolation',
         'reader-finish',
         'entry-capture',
+        'entry-capture-context',
         'standard-review-grade',
         'focus-drill-grade',
+        'drift-judgment-observation-bridge',
+        'drift-host-ack-rollback',
         'stable-storage-alert',
         'dynamic-sheet-alert-description',
         'article-load-retry',
+        'scheduler-clock-clamp',
+        'due-queue-order-and-no-debt',
+        'fuzz-off-scheduler-policy',
+        'bounded-standard-review',
+        'started-mark-promotion',
+        'learner-fsrs-params-gate',
+        'ignored-params-obslog-note',
+        'declared-recall-obslog-row',
+        'transactional-sweep-p04',
+        'lesson-practice-evidence-and-explicit-enroll',
+        'dojo-second-lap-practice',
+        'persisted-quiz-run',
       ],
-      residualUnsafeSaveCallers: 19,
+      residualUnsafeSaveCallers: 5,
       browserAndDevice: 'NOT_RUN',
     },
     null,

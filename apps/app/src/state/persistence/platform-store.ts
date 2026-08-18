@@ -19,7 +19,13 @@
 
 import { ProvisionalWebEventStore, type SnapshotStore } from '@bunki/persistence';
 
-import { STORE_NAME, type OpenAppEventStoreOptions, type OpenedAppEventStore } from './shared.ts';
+import {
+  annotationSnapshotKey,
+  createSnapshotAnnotationStore,
+  STORE_NAME,
+  type OpenAppEventStoreOptions,
+  type OpenedAppEventStore,
+} from './shared.ts';
 
 /**
  * `globalThis.localStorage`, or an in-memory stand-in when the browser refuses
@@ -65,14 +71,20 @@ export function openPlatformEventStore(options: OpenAppEventStoreOptions): Opene
       ? resolveWebSnapshotStore()
       : { store: options.snapshotStore, available: true };
 
+  const snapshotKey = options.snapshotKey ?? STORE_NAME;
   return {
     store: ProvisionalWebEventStore.open({
       appVersions: options.appVersions,
       clock: options.clock,
-      snapshotKey: options.snapshotKey ?? STORE_NAME,
+      snapshotKey,
       snapshotStore: resolved.store,
     }),
     runtimeLabel: 'web-provisional',
     snapshotAvailable: resolved.available,
+    // Beside the event snapshot, on the same backing, under its own key — so
+    // the uncertainty dimension's durability is exactly the event log's: real
+    // localStorage when the browser grants it, the same honest in-memory
+    // fallback when it does not (P2-18; see `OpenedAppEventStore.annotations`).
+    annotations: createSnapshotAnnotationStore(resolved.store, annotationSnapshotKey(snapshotKey)),
   };
 }

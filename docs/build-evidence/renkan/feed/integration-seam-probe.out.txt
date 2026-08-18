@@ -1,0 +1,20 @@
+ ok   wikinews:44381 · EN title from record + 検収前 — "Japan football squad numbers announced for the Kirin Challenge Cup"
+ ok   wikinews:45224 · EN title from record + 検収前 — "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder"
+ ok   wikinews:45216 · EN title from record + 検収前 — "Body of missing boy found in Nantan, Kyoto"
+ ok   wikinews:45208 · EN title from record + 検収前 — "Nankai to withdraw from its ferry business"
+ ok   wikinews:45174 · EN title from record + 検収前 — "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins"
+ ok   wikinews:45101 · EN title from record + 検収前 — "South Korea's ex-president Yoon gets life sentence for leading an insurrection"
+ ok   wikinews:45095 · EN title from record + 検収前 — "AiScReam: Ruby graduates and two new members join"
+ ok   wikinews:45098 · EN title from record + 検収前 — "The second Takaichi cabinet takes office"
+ ok   wikinews:44384 · EN title from record + 検収前 — "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener"
+ ok   wikinews:45221 · EN title from record + 検収前 — "Kyoto police search the home of the missing boy"
+ ok   wikinews:45089 · EN title from record + 検収前 — "Junya Ogawa elected leader of the Centrist Reform Alliance"
+ ok   wikinews:42478 · EN title from record + 検収前 — "Shohei Ohtani becomes the sixth player in history to reach 40–40"
+FAIL  all 82 shelf cards render titleEn from the record itself
+
+integrated-seam probe: 12/13 passed
+
+# NOTE for the lander: the 13th line fails BY DESIGN on this donor branch —
+# the original 70 index rows carry titleEn only after B3's index.json enrichment
+# (integration branch) merges with the 12 appended feed rows. The 12 feed rows
+# themselves render entirely from record data under the integrated corridor.js.

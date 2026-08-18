@@ -7,6 +7,21 @@
  * completion, bookmark, Back, shelf scroll return, and article-position
  * restoration. No representative-only shortcut and no alternate reader.
  *
+ * B3 (bilingual titles as schema data): every primary index row must carry a
+ * non-empty titleEn with a titleEnSource provenance marker, the code-side
+ * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
+ * must render each English title from the record itself, and every
+ * human-review-pending row must stay visibly 検収前 on the shelf.
+ *
+ * R3-A (furigana truth): the reading-override lexicon
+ * (docs/content/reading-overrides.json) must be minted into every curated
+ * body — the suspect-reading rules are re-run here in JS over all curated
+ * tokens (deity-name 神 reads かみ-family ruby, never an unreviewed しん;
+ * no lexicon site unapplied; no rubyless kanji token; no unreviewed 都(と)
+ * or unknown-word kanji fallback), the committed checker report must agree
+ * with that recount with zero open rows, and the flagship article's DOM must
+ * render the lexicon readings as its actual ruby.
+ *
  * Usage:
  *   CHROMIUM_PATH=/path/to/chromium node tools/verify-native-readings.mjs
  *   node tools/verify-native-readings.mjs --shots DIR --report FILE
@@ -201,6 +216,187 @@ mkdirSync(dirname(reportPath), { recursive: true });
 
 const index = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles/index.json'), 'utf8'));
 const rows = new Map(index.articles.map((record) => [record.id, record]));
+// B3 — the English title is schema data with provenance, not a code-side map.
+// Counts are data (the feed grows the index 検収前-marked); composition is
+// pinned by tools/verify-feed.mjs against the review queue, so these checks
+// hold for EVERY row without hardcoding a census.
+const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08']);
+const reviewRows = index.articles.filter((record) => record.review);
+{
+  const missingEn = index.articles.filter(
+    (record) => typeof record.titleEn !== 'string' || !record.titleEn.trim(),
+  );
+  check(
+    'every primary index row carries a non-empty titleEn',
+    index.articles.length >= 70 && missingEn.length === 0,
+    missingEn.length
+      ? missingEn.map((record) => record.id).join(', ')
+      : `${index.articles.length}/${index.articles.length}`,
+  );
+  const unsourced = index.articles.filter((record) => !TITLE_EN_SOURCES.has(record.titleEnSource));
+  check(
+    'every titleEn names its provenance in titleEnSource',
+    unsourced.length === 0,
+    unsourced.map((record) => record.id).join(', '),
+  );
+  // 検収前 no longer means one thing: the 30 recovered originals and the feed
+  // mints wear AI-authored titles, while a row held for UNVERIFIED RIGHTS or
+  // an unverified source text keeps whatever title it already had. The rule
+  // is about who wrote the title, not about who is waiting.
+  const aiTitled = new Set([...IDS, ...index.articles.filter((r) => r.addedAt).map((r) => r.id)]);
+  const wrongMarker = index.articles.filter((record) =>
+    aiTitled.has(record.id)
+      ? record.titleEnSource !== 'renkan-ai-2026-08'
+      : record.titleEnSource !== 'shelf-map-2026',
+  );
+  check(
+    'the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest',
+    wrongMarker.length === 0,
+    wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
+  );
+  check(
+    'the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel',
+    reviewRows.length >= IDS.length &&
+      IDS.every(
+        (id) =>
+          rows.get(id)?.review === 'human-review-pending' &&
+          /検収前/.test(rows.get(id)?.sourceLabel ?? ''),
+      ),
+  );
+  // RENKAN fleet — the archive is bilingual too: every remaining archive row
+  // carries a non-empty titleEn, and the wrapper names the provenance.
+  const archive = JSON.parse(
+    readFileSync(resolve(CORRIDOR, 'data/articles/archive-index.json'), 'utf8'),
+  );
+  const archiveMissingEn = archive.articles.filter(
+    (record) => typeof record.titleEn !== 'string' || !record.titleEn.trim(),
+  );
+  check(
+    'every archive row carries a non-empty titleEn with wrapper provenance',
+    archive.articles.length > 0 &&
+      archiveMissingEn.length === 0 &&
+      TITLE_EN_SOURCES.has(archive.titleEnSource),
+    archiveMissingEn.length
+      ? archiveMissingEn
+          .slice(0, 5)
+          .map((record) => record.id)
+          .join(', ')
+      : `${archive.articles.length} rows · source ${archive.titleEnSource}`,
+  );
+  check(
+    'the code-side TITLES_EN map is gone from corridor.js — titles live in data only',
+    !readFileSync(resolve(CORRIDOR, 'corridor.js'), 'utf8').includes('TITLES_EN'),
+  );
+
+  // R3-E — provenance dates are real strings or honest absences: a Python
+  // None serialized as the word "None" must never reach a card's meta line
+  // (the 野ばら regression), in either index or in any curated body.
+  const STRINGIFIED_NULLS = new Set(['None', 'null', 'undefined']);
+  const badDates = [];
+  for (const record of index.articles) {
+    if (STRINGIFIED_NULLS.has(String(record.date ?? '').trim())) badDates.push(record.id);
+    const body = JSON.parse(
+      readFileSync(resolve(CORRIDOR, 'data/articles', record.file), 'utf8'),
+    );
+    if (STRINGIFIED_NULLS.has(String(body.date ?? '').trim())) badDates.push(`${record.id} (body)`);
+  }
+  for (const record of archive.articles) {
+    if (STRINGIFIED_NULLS.has(String(record.date ?? '').trim())) badDates.push(record.id);
+  }
+  check(
+    'no index row or curated body carries a stringified null date',
+    badDates.length === 0,
+    badDates.slice(0, 5).join(', ') || `${index.articles.length} curated + ${archive.articles.length} archive rows clean`,
+  );
+  check(
+    '野ばら (aozora:051034) records its unknown first-publication date as absence',
+    rows.get('aozora:051034')?.date === '',
+    JSON.stringify(rows.get('aozora:051034')?.date),
+  );
+
+  // R3-E — the JLPT-lexicon signal is computed with the deck's readings in
+  // reach: kana-written base forms (する, ある, いる — the most common verbs
+  // of the language) must never count as beyond-JLPT just because the deck
+  // writes them 為る/在る/居る. Recompute every curated card's coverage from
+  // its committed tokens with the reading-aware matcher and demand exact
+  // agreement with the stored signal — a reverted matcher (or reverted data)
+  // cannot satisfy both this and the spread probe below.
+  const wbig = JSON.parse(
+    readFileSync(resolve(REPO, 'prototypes/drift/data/wbig.json'), 'utf8'),
+  );
+  const KANA_RE = /^[ぁ-ゖァ-ヺー々〆〤ｦ-ﾟ]+$/u;
+  const kataToHira = (value) =>
+    [...value]
+      .map((ch) => (ch >= 'ァ' && ch <= 'ヶ' ? String.fromCharCode(ch.charCodeAt(0) - 0x60) : ch))
+      .join('');
+  const ortho = new Map();
+  const kana = new Map();
+  for (const [word, reading, , level] of wbig) {
+    if (!Number.isInteger(level)) continue;
+    if (level > (ortho.get(word) ?? 0)) ortho.set(word, level);
+    if (KANA_RE.test(word)) {
+      const key = kataToHira(word);
+      if (level > (kana.get(key) ?? 0)) kana.set(key, level);
+    }
+    if (reading) {
+      const key = kataToHira(String(reading));
+      if (level > (kana.get(key) ?? 0)) kana.set(key, level);
+    }
+  }
+  const coverageOf = (tokens) => {
+    const content = tokens.filter((token) => token.c);
+    if (!content.length) return null;
+    let oov = 0;
+    for (const token of content) {
+      let level = ortho.get(token.b);
+      if (level == null && KANA_RE.test(token.b)) level = kana.get(kataToHira(token.b));
+      if (level == null) oov += 1;
+    }
+    return 1 - oov / content.length;
+  };
+  const disagreeing = [];
+  const oneInCensus = new Map();
+  for (const record of index.articles) {
+    const body = JSON.parse(
+      readFileSync(resolve(CORRIDOR, 'data/articles', record.file), 'utf8'),
+    );
+    const stored = record.grading?.signals?.jlpt_lexicon?.coverage ?? null;
+    const computed = coverageOf(body.tokens);
+    if (
+      (stored == null) !== (computed == null) ||
+      (stored != null && Math.abs(stored - computed) > 1e-9)
+    ) {
+      disagreeing.push(`${record.id} stored=${stored} computed=${computed}`);
+    }
+    if (stored != null) {
+      const label = stored >= 1 ? 'full' : String(Math.round(1 / (1 - stored)));
+      oneInCensus.set(label, (oneInCensus.get(label) ?? 0) + 1);
+    }
+  }
+  check(
+    'every curated jlpt_lexicon coverage equals a reading-aware recompute from its own tokens',
+    disagreeing.length === 0,
+    disagreeing.slice(0, 3).join(' | ') || `${index.articles.length} cards agree`,
+  );
+  // the vocab note must discriminate between cards — the round-2 hunt found
+  // 68 of 69 cards wearing the same "~1 in 2/3" line. Distinct per-card
+  // ratios and no single ratio owning most of the shelf are properties of
+  // the honest matcher; the broken one collapses to {2,3} and fails both.
+  const censusTotal = [...oneInCensus.values()].reduce((sum, v) => sum + v, 0);
+  const censusMax = Math.max(...oneInCensus.values());
+  check(
+    'the per-card vocab ratio discriminates — ≥6 distinct values, none covering >50% of cards',
+    oneInCensus.size >= 6 && censusMax / censusTotal <= 0.5,
+    `${oneInCensus.size} distinct 1-in-N values, largest share ${censusMax}/${censusTotal}`,
+  );
+}
+// The shelf must render EXACTLY the curated index — no extras, none missing.
+// The count itself is data: the feed (R2-D) grows it 検収前-marked and
+// queue-covered, and tools/verify-feed.mjs pins the composition (the
+// inherited 70 plus the review queue's live mints) against the queue file.
+const CURATED_COUNT = index.articles.filter(
+  (record) => !String(record.file || '').startsWith('archive/'),
+).length;
 const bodies = new Map(
   IDS.map((id) => {
     const row = rows.get(id);
@@ -228,6 +424,129 @@ const quickTokenIndex = new Map(
     return [id, preferred];
   }),
 );
+
+// ---------------------------------------------------------------- R3-A
+// Furigana truth: the reading-override lexicon is DATA with provenance, the
+// mint pipeline applies it at tokenization time, and these probes convict a
+// reverted build on the committed bytes alone (no browser needed for this
+// half). The rules mirror tools/check_suspect_readings.py exactly.
+const FLAGSHIP_ID = 'bunki-graded-n3-zoka-sanjin-morning';
+const KANJI_RE = /[㐀-䶵一-鿌豈-﫿]/;
+const LEXICON_PATH = resolve(REPO, 'docs/content/reading-overrides.json');
+const SUSPECT_REPORT_PATH = resolve(
+  REPO,
+  'docs/build-evidence/renkan/furigana-truth/suspect-readings.json',
+);
+const lexicon = JSON.parse(readFileSync(LEXICON_PATH, 'utf8'));
+const curatedBodies = index.articles
+  .filter((row) => !String(row.file || '').startsWith('archive/'))
+  .map((row) => [
+    row.id,
+    JSON.parse(readFileSync(resolve(CORRIDOR, 'data/articles', row.file), 'utf8')),
+  ]);
+const sequenceSites = (tokens, entries) => {
+  const ordered = [...entries].sort((a, b) => b.surfaces.length - a.surfaces.length);
+  const sites = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const entry = ordered.find(
+      (candidate) =>
+        i + candidate.surfaces.length <= tokens.length &&
+        candidate.surfaces.every((surface, j) => tokens[i + j].s === surface),
+    );
+    if (!entry) {
+      i += 1;
+      continue;
+    }
+    sites.push([i, entry]);
+    i += entry.surfaces.length;
+  }
+  return sites;
+};
+{
+  check(
+    'the reading-override lexicon is committed with provenance and aligned entries',
+    lexicon.kind === 'reading-override-lexicon' &&
+      !!lexicon.provenance?.policy &&
+      Array.isArray(lexicon.entries) &&
+      lexicon.entries.length > 0 &&
+      lexicon.entries.every(
+        (entry) =>
+          entry.word &&
+          entry.reading &&
+          Array.isArray(entry.surfaces) &&
+          entry.surfaces.length === entry.readings.length &&
+          !!entry.note,
+      ),
+    `${lexicon.entries?.length ?? 0} entries · ${lexicon.accepts?.length ?? 0} accepts`,
+  );
+
+  const recount = { 'lexicon-fixed': 0, accepted: 0, open: 0 };
+  const openRows = [];
+  let deityKamiSites = 0;
+  let flagshipShin = 0;
+  for (const [id, body] of curatedBodies) {
+    const tokens = body.tokens;
+    const acceptCover = new Set();
+    for (const [start, entry] of sequenceSites(tokens, lexicon.accepts ?? [])) {
+      const ok = entry.readings.every(
+        (reading, j) => reading === null || tokens[start + j].r === reading,
+      );
+      if (ok) for (let j = 0; j < entry.surfaces.length; j += 1) acceptCover.add(start + j);
+    }
+    const tally = (i, rule, resolved) => {
+      recount[resolved] += 1;
+      if (resolved === 'open')
+        openRows.push(`${id} #${i} ${tokens[i].s}(${tokens[i].r}) [${rule}]`);
+    };
+    for (const [start, entry] of sequenceSites(tokens, lexicon.entries)) {
+      entry.readings.forEach((reading, j) => {
+        if (reading === null) return;
+        const token = tokens[start + j];
+        const minted = token.r === reading && token.rs === 'lexicon';
+        tally(start + j, 'override-site', minted ? 'lexicon-fixed' : 'open');
+        if (entry.kind === 'deity-name' && /かみ$/.test(reading) && minted) deityKamiSites += 1;
+      });
+    }
+    tokens.forEach((token, i) => {
+      const covered = token.rs === 'lexicon';
+      const accepted = acceptCover.has(i);
+      const hasKanji = KANJI_RE.test(token.s);
+      if (token.s === '神' && token.r !== 'かみ' && !covered) {
+        tally(i, 'kami-on', accepted ? 'accepted' : 'open');
+        if (id === FLAGSHIP_ID && !accepted) flagshipShin += 1;
+      }
+      if (hasKanji && !token.r && !covered) tally(i, 'empty-ruby', accepted ? 'accepted' : 'open');
+      if (token.s === '都' && token.r === 'と' && !covered)
+        tally(i, 'miyako', accepted ? 'accepted' : 'open');
+      if (token.p === '記号' && hasKanji && !covered)
+        tally(i, 'unk-kanji', accepted ? 'accepted' : 'open');
+    });
+  }
+  check(
+    'every lexicon override site is minted into the curated bodies — no suspect reading left open',
+    recount.open === 0 && recount['lexicon-fixed'] > 0,
+    openRows.slice(0, 4).join(' | ') ||
+      `${recount['lexicon-fixed']} lexicon-fixed · ${recount.accepted} accepted across ${curatedBodies.length} bodies`,
+  );
+  check(
+    'deity names read かみ-family ruby at every minted site; the flagship carries no unreviewed 神(しん)',
+    deityKamiSites >= 90 && flagshipShin === 0,
+    `${deityKamiSites} deity かみ sites · ${flagshipShin} unreviewed しん in ${FLAGSHIP_ID}`,
+  );
+  const suspectReport = JSON.parse(readFileSync(SUSPECT_REPORT_PATH, 'utf8'));
+  const reportCounts = suspectReport.statusCounts ?? {};
+  check(
+    'the committed suspect-readings report is empty of unfixed rows and agrees with this recount',
+    suspectReport.kind === 'suspect-readings-report' &&
+      suspectReport.openCount === 0 &&
+      suspectReport.rows.every((row) => row.status !== 'open') &&
+      (reportCounts['lexicon-fixed'] ?? 0) === recount['lexicon-fixed'] &&
+      (reportCounts.accepted ?? 0) === recount.accepted &&
+      suspectReport.scanned?.articles === curatedBodies.length,
+    `report ${reportCounts['lexicon-fixed'] ?? 0}/${reportCounts.accepted ?? 0}/${suspectReport.openCount} vs recount ${recount['lexicon-fixed']}/${recount.accepted}/${recount.open}`,
+  );
+}
 
 const executablePath = process.env.CHROMIUM_PATH || undefined;
 const { server, base } = await startServer(CORRIDOR);
@@ -269,10 +588,10 @@ try {
     waitUntil: 'load',
   });
   await page.waitForFunction(
-    () =>
+    (expected) =>
       document.body.dataset.ready === '1' &&
-      document.querySelectorAll('.shelf-item').length === 70,
-    null,
+      document.querySelectorAll('.shelf-item').length === expected,
+    CURATED_COUNT,
     { timeout: 30_000 },
   );
   // Minimal CI Chromium images often ship without CJK fonts. These optional
@@ -288,7 +607,11 @@ try {
     await page.evaluate(() => document.fonts.ready);
   }
 
-  check('the one native shelf contains exactly 70 entries', (await page.locator('.shelf-item').count()) === 70);
+  check(
+    'the one native shelf renders exactly the curated index rows',
+    (await page.locator('.shelf-item').count()) === CURATED_COUNT,
+    `${await page.locator('.shelf-item').count()}/${CURATED_COUNT}`,
+  );
   const existingStyle = await page.locator('[data-passage="bunki-graded-n3-river"]').evaluate((node) => {
     const style = getComputedStyle(node);
     const title = getComputedStyle(node.querySelector('.shelf-title'));
@@ -380,6 +703,48 @@ try {
     await touchAt(page, page.locator('[data-dial="furigana:2"]'));
     const settingsChanged =
       (await page.locator('[data-dial="furigana:2"]').getAttribute('aria-pressed')) === 'true';
+
+    // R3-A — the flagship's rendered ruby IS the lexicon reading at every
+    // override site: 神 wears かみ in deity-name positions, しん never.
+    if (id === FLAGSHIP_ID) {
+      const lexiconSites = body.tokens
+        .map((token, i) => ({ token, i }))
+        .filter(({ token }) => token.rs === 'lexicon')
+        .map(({ token, i }) => ({
+          i,
+          surface: token.s,
+          ruby: token.f.filter((pair) => pair.r).map((pair) => pair.r),
+        }));
+      const domRuby = await page.evaluate(
+        (positions) =>
+          positions.map((position) => {
+            const tok = document.querySelectorAll('#reader .tok')[position];
+            return tok ? [...tok.querySelectorAll('rt')].map((rt) => rt.textContent) : null;
+          }),
+        lexiconSites.map((site) => site.i),
+      );
+      const mismatched = lexiconSites.filter(
+        (site, n) => JSON.stringify(domRuby[n]) !== JSON.stringify(site.ruby),
+      );
+      // Name positions are the 神 tokens whose lexicon ruby is かみ (the
+      // reviewed compound 創造神(そうぞうしん) is a term, not a name).
+      const kamiSites = lexiconSites.filter(
+        (site) => site.surface === '神' && site.ruby.join('') === 'かみ',
+      );
+      const kamiWrong = kamiSites.filter((site) => {
+        const rendered = domRuby[lexiconSites.indexOf(site)]?.join('');
+        return rendered !== 'かみ' || rendered === 'しん';
+      });
+      check(
+        'flagship DOM renders the lexicon ruby at every override site — 神 reads かみ in name positions, しん never',
+        lexiconSites.length >= 18 &&
+          kamiSites.length >= 6 &&
+          mismatched.length === 0 &&
+          kamiWrong.length === 0,
+        `${lexiconSites.length} sites (${kamiSites.length} bare 神) · mismatched ${mismatched.length}`,
+        id,
+      );
+    }
 
     const quick = await openQuickLook(page, quickTokenIndex.get(id));
     let fullEntry = null;
@@ -511,6 +876,67 @@ try {
     ),
   );
 
+  // B3 — the shelf's English titles come from the record itself, and the
+  // 検収前 marking stays visible in both chrome languages
+  check(
+    'the 日本語のみ chrome renders no English titles',
+    (await page.locator('.shelf-title-en').count()) === 0,
+  );
+  const readShelfCards = () =>
+    page.evaluate(() =>
+      Object.fromEntries(
+        [...document.querySelectorAll('.shelf-item')].map((item) => [
+          item.dataset.passage,
+          {
+            en: item.querySelector('.shelf-title-en')?.textContent ?? null,
+            meta: item.querySelector('.shelf-meta')?.textContent ?? '',
+          },
+        ]),
+      ),
+    );
+  const jaCards = await readShelfCards();
+  const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
+  check(
+    'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
+    reviewRows.length >= IDS.length && jaUnmarked.length === 0,
+    jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
+      `${reviewRows.length} pending rows marked`,
+  );
+  const biNoiseBefore = noise.length;
+  await page.goto(`${base}/index.html?entry=shelf&ui=bi&cachebust=${Date.now()}`, {
+    waitUntil: 'load',
+  });
+  await page.waitForFunction(
+    (want) =>
+      document.body.dataset.ready === '1' &&
+      document.querySelectorAll('.shelf-item').length === want,
+    CURATED_COUNT,
+    { timeout: 30_000 },
+  );
+  const biCards = await readShelfCards();
+  const wrongEn = index.articles.filter((record) => biCards[record.id]?.en !== record.titleEn);
+  check(
+    'the bilingual shelf renders every English title from the records themselves',
+    wrongEn.length === 0,
+    wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${index.articles.length} titles`,
+  );
+  const biUnmarked = reviewRows.filter((record) => !/検収前/.test(biCards[record.id]?.meta ?? ''));
+  check(
+    'every human-review-pending row stays visibly 検収前 on the bilingual shelf',
+    biUnmarked.length === 0,
+    biUnmarked.map((record) => record.id).slice(0, 4).join(', '),
+  );
+  await page.locator(`[data-passage="${IDS[0]}"]`).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
+  check(
+    'the bilingual shelf pass added no request, console, or page errors',
+    noise.length === biNoiseBefore,
+    noise
+      .slice(biNoiseBefore, biNoiseBefore + 4)
+      .map((entry) => `${entry.kind}: ${entry.text}`)
+      .join(' | '),
+  );
+
   writeFileSync(
     reportPath,
     `${JSON.stringify(
@@ -546,6 +972,10 @@ try {
           },
           captures: {
             shelf: { path: 'screenshots/shelf-first-added.png', sha256: fileSha256(join(shotsDir, 'shelf-first-added.png')) },
+            biShelf: {
+              path: 'screenshots/shelf-bilingual-titles.png',
+              sha256: fileSha256(join(shotsDir, 'shelf-bilingual-titles.png')),
+            },
             n3Reader: {
               path: 'screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png',
               sha256: fileSha256(join(shotsDir, 'bunki-graded-n3-zoka-sanjin-morning-reader.png')),

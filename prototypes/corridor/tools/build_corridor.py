@@ -166,6 +166,68 @@ def ruby_pairs_from_markup(text: str) -> list[dict]:
 # --------------------------------------------------------------------------
 # Tokenisation + grading
 # --------------------------------------------------------------------------
+# The reading-override lexicon (RENKAN R3-A, hunt P1): UniDic guesses name
+# readings statistically and misteaches exactly the compounds the flagship
+# texts introduce (天之御中主神 → 神(しん)). The committed lexicon carries the
+# human-curated readings; it is applied AT TOKENIZATION TIME so every consumer
+# of tokenise() — shelf mint, feed mint, archive mint, verifiers — sees the
+# same truth. Splits stay UniDic's; only r/f change, marked rs:"lexicon".
+READING_OVERRIDES_PATH = REPO / "docs/content/reading-overrides.json"
+_READING_OVERRIDES: list[dict] | None = None
+
+
+def load_reading_overrides() -> list[dict]:
+    """Override entries, longest surface sequence first (deterministic)."""
+    global _READING_OVERRIDES
+    if _READING_OVERRIDES is None:
+        lexicon = json.loads(READING_OVERRIDES_PATH.read_text("utf-8"))
+        entries = list(lexicon["entries"])
+        for entry in entries:
+            if len(entry["surfaces"]) != len(entry["readings"]):
+                raise SystemExit(
+                    f"reading-overrides entry {entry.get('word')!r}: "
+                    "surfaces and readings must align"
+                )
+        _READING_OVERRIDES = sorted(
+            entries, key=lambda e: -len(e["surfaces"])
+        )
+    return _READING_OVERRIDES
+
+
+def apply_reading_overrides(tokens: list[dict]) -> list[dict]:
+    """Patch token readings in place where an override sequence matches.
+
+    Matching is exact adjacent token surfaces, greedy left-to-right,
+    longest entry first. Only r/f are rewritten (split, base, POS and the
+    content flag stay UniDic's); every token whose reading the lexicon
+    prescribes — even when UniDic already agreed — is marked rs:"lexicon".
+    A null reading leaves its token untouched (context guard only).
+    """
+    entries = load_reading_overrides()
+    i = 0
+    while i < len(tokens):
+        matched = None
+        for entry in entries:
+            surfaces = entry["surfaces"]
+            if i + len(surfaces) <= len(tokens) and all(
+                tokens[i + j]["s"] == surfaces[j] for j in range(len(surfaces))
+            ):
+                matched = entry
+                break
+        if matched is None:
+            i += 1
+            continue
+        for j, reading in enumerate(matched["readings"]):
+            if reading is None:
+                continue
+            tok = tokens[i + j]
+            tok["r"] = reading
+            tok["f"] = furigana_pairs(tok["s"], reading)
+            tok["rs"] = "lexicon"
+        i += len(matched["surfaces"])
+    return tokens
+
+
 def tokenise(text: str, tagger) -> list[dict]:
     from corpus.grading._mecab import is_content, is_punct
 
@@ -184,7 +246,7 @@ def tokenise(text: str, tagger) -> list[dict]:
                 "c": bool(is_content(tok)) and not is_punct(tok),
             }
         )
-    return tokens
+    return apply_reading_overrides(tokens)
 
 
 def ruby_spans(markup: str) -> tuple[str, list[tuple[int, int, str]]]:

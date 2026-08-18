@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "kind": "feed-gate-verification",
+  "artifactHashes": {
+    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
+    "archiveIndex": "c95615863a47212582c2df40867ad057fa2ee9665e8463af511ee0328bca6995",
+    "queue": "e556b419131629b64451b9c740bc7689d4a67caf76108fd400a5b899283e176a",
+    "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
+    "curationReport": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb",
+    "standalone": "30fee6cdc64455276c0a4735daad4e000c67efb67a77720f93080279a6e5be81"
+  },
+  "counts": {
+    "curated": 82,
+    "archive": 682,
+    "queueRows": 55,
+    "pendingMints": 12,
+    "approvedMints": 0,
+    "cullProposals": 2
+  },
+  "results": [
+    {
+      "name": "the review queue is a JSON array",
+      "pass": true,
+      "detail": "55 rows"
+    },
+    {
+      "name": "every queue row carries the full schema (id/kind/title/titleEn/lane/licence/gradingSummary/addedAt/decision)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "NC/ND never enters — queue, shelf, and archive licences are all clean",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "share-alike stays confined to its bundles — no article row claims it",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the curated shelf is exactly the inherited 70 plus the queue's live mints",
+      "pass": true,
+      "detail": "82 = 70 + 12"
+    },
+    {
+      "name": "no feed-authored row stands outside the queue — nothing minted without review cover",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no row claims a licence that is not one — an unverified source says unverified",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every unverified row wears 検収前 where the learner can see it",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every row awaiting a human has a row the operator can decide",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "index and body agree on every provenance mark — the body is what the reader sees",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nothing self-approves — review lifts only where the queue says approved",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every human-review-pending row is visibly 検収前 in its sourceLabel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the 検収前 census is exact: 30 recovered originals + pending feed mints + rights holds",
+      "pass": true,
+      "detail": "43 = 30 + 12 + 1 editorial-unverified · 10 rights holds"
+    },
+    {
+      "name": "wikinews:44381 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "369 tokens · 初級前半 · 900字"
+    },
+    {
+      "name": "wikinews:45224 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "595 tokens · 上級後半 · 866字"
+    },
+    {
+      "name": "wikinews:45216 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "526 tokens · 上級後半 · 789字"
+    },
+    {
+      "name": "wikinews:45208 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "242 tokens · 上級後半 · 390字"
+    },
+    {
+      "name": "wikinews:45174 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "321 tokens · 上級後半 · 506字"
+    },
+    {
+      "name": "wikinews:45101 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "361 tokens · 上級後半 · 539字"
+    },
+    {
+      "name": "wikinews:45095 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "325 tokens · 初級後半 · 570字"
+    },
+    {
+      "name": "wikinews:45098 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "269 tokens · 上級後半 · 480字"
+    },
+    {
+      "name": "wikinews:44384 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "267 tokens · 初級後半 · 480字"
+    },
+    {
+      "name": "wikinews:45221 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "471 tokens · 上級前半 · 695字"
+    },
+    {
+      "name": "wikinews:45089 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "564 tokens · 上級後半 · 863字"
+    },
+    {
+      "name": "wikinews:42478 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "pass": true,
+      "detail": "186 tokens · 初級後半 · 355字"
+    },
+    {
+      "name": "the curation report is present, typed, and counts the real artifacts",
+      "pass": true,
+      "detail": "shelf 82/82 · archive 682/682"
+    },
+    {
+      "name": "every pending cull in the queue traces to a report proposal",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nothing proposed for culling has been removed while pending — proposals never act",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no article is listed on both the shelf and the archive",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "the regenerated standalone bundles every live feed candidate (builder-only artifact)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "at least two ingest run logs exist, each recording which source mode ran",
+      "pass": true,
+      "detail": "run-001.json, run-002.json"
+    }
+  ],
+  "failures": []
+}

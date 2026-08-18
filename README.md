@@ -5,16 +5,20 @@ seeded encounter → durable thread → bounded AI candidate explanation → exp
 promotion → one retrieval contract → one contextual reuse → scored probe →
 finite session → inspect and export the evidence.
 
-## Current integrated prototype — 2026-08-15
+## Current integrated prototype — the Corridor
 
-The active KAIRO/Corridor integration lives on
-[`agent/bunki-integrated-prototype-2026-08-15`](https://github.com/AmitabhainArunachala/Bunki-app/tree/agent/bunki-integrated-prototype-2026-08-15),
-based directly on the current PR #71 head. Start with the
+The product prototype is **`prototypes/corridor/`** — one integrated browser
+app (shelf, reader, dictionary, kanji, writing room, SRS, drift, AI surfaces),
+merged to `main` through PRs #71 and #73. Start with the
 [current product constitution](docs/operator/BUNKI_CURRENT_PRODUCT_CONSTITUTION_2026-08-15.md);
 it is the dated front door to the frozen product laws, current visual rulings,
 ten public worlds, and the quiet writing-room contract.
 
-- [Open the current integrated prototype](https://bunki-integrated-prototype.simandharswami1111.chatgpt.site)
+- [Open the deployed corridor](https://amitabhainarunachala.github.io/Bunki-app/)
+  (GitHub Pages, deployed from `main` by `.github/workflows/pages-app.yml`)
+- The 連環 RENKAN campaign (PR #74) drives the app toward its terminal
+  conditions; round-by-round state lives in
+  `docs/build-evidence/renkan/RUN_STATE.md`.
 
 Sites v5 is preserved without modification on
 [`sites/v5-import`](https://github.com/AmitabhainArunachala/Bunki-app/tree/sites/v5-import)
@@ -29,35 +33,28 @@ it is not the current visual or interaction baseline.
 the operator chooses, no dependency or data may constrain that choice beyond the
 share-alike seed data confined to `packages/seed/`.
 
-## Run the complete web app
+## Run the corridor locally
 
-The current interactive product lives in `prototypes/bunki-sites-v11/`. It is the
-same Bunki reader, dictionary, kanji drill-down, sentence mining, SRS, and coach
-source used by the polished public checkpoint—not a screenshot or a reduced mock.
-
-- [Open this PR branch in GitHub Codespaces](https://codespaces.new/AmitabhainArunachala/Bunki-app?quickstart=1&ref=claude/sites-v11-interaction-recovery)
-- [Open the current public checkpoint](https://bunki-living-japanese.amitabha1982.chatgpt.site)
-- [Review the source and verification PR](https://github.com/AmitabhainArunachala/Bunki-app/pull/20)
-
-Codespaces installs the nested app, starts it, forwards port 5173, and opens the
-preview. From a normal clone:
+The corridor is static — serve the directory and open it:
 
 ```bash
-npm run bunki:web:dev
+python3 -m http.server 8000 --directory prototypes/corridor
+# → http://localhost:8000/
 ```
 
-Every PR runs the production build, unit suite, and the real browser acceptance
-suite in mobile Chromium, mobile WebKit, and desktop Chromium. After human merge,
-GitHub Actions can deploy the full Vinext/Cloudflare Worker when the repository
-contains `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets. GitHub Pages
-is retained only as a client-only preview because it cannot run Bunki's article,
-RSS, transcript, AI, or sync routes.
+Its verifier battery (real Chromium) lives in `prototypes/corridor/tools/` and
+runs via `docs/build-evidence/renkan/battery.sh`.
+
+Historical prototypes remain runnable as history, not authority: Sites v11
+(`npm run bunki:web:dev`, source `prototypes/bunki-sites-v11/`) and the
+preserved Sites v5 donor on `sites/v5-import`.
 
 ## Status
 
-The repository now preserves two complementary build tracks: the runnable Bunki
-web product under `prototypes/bunki-sites-v11/`, and the deterministic Phase-0
-core under `apps/` and `packages/`. Product features are real and interactive;
+The repository holds one product prototype and one semantic authority: the
+runnable corridor under `prototypes/corridor/`, and the deterministic Phase-0
+kernel under `apps/` and `packages/` (the corridor is held to the kernel's laws
+by contract parity — see ADR-004). Product features are real and interactive;
 claims about efficacy, retention, or review burden remain outside the evidence
 currently collected (REQ-GATE-03).
 
@@ -117,16 +114,17 @@ npm run format:check  # prettier
 npm run typecheck     # tsc --noEmit in every workspace
 npm run test          # vitest, all workspaces
 
-npm run test:replay   # golden replay        — placeholder until WP-02
-npm run verify:export # export→replay equality — placeholder until WP-03
-npm run test:e2e      # Playwright web flow  — placeholder until WP-10
+npm run test:replay   # golden replay equality (packages/domain)
+npm run verify:export # export→replay equality (packages/export)
+npm run test:e2e:build && npm run test:e2e   # Playwright suite on the exported web bundle
 
-(cd apps/app && npx expo export --platform web)   # build proof
+bash docs/build-evidence/renkan/battery.sh <outdir>   # the full gate battery
 ```
 
-The three placeholder scripts print that they are unimplemented and exit 0. They
-are defined now because the controller's check set names them; they are not
-evidence of anything passing.
+The replay, export, and e2e scripts are real gates (39 e2e specs on the
+exported bundle). The battery additionally runs the corridor verifiers
+(`verify-corridor`, accessibility, writing-room, storage-integrity, drift,
+AI runtime, native readings) and the corpus pytest gates.
 
 ## Runtime honesty
 

@@ -1,0 +1,281 @@
+{
+  "kind": "reading-override-lexicon",
+  "schemaVersion": 1,
+  "law": "Furigana is the corridor's core teaching surface — the ruby must be TRUE before anything else is. UniDic guesses name readings statistically and shreds rare theonyms; this lexicon carries the human-curated readings for the name compounds the curated shelf actually contains. It is applied at tokenization time (build_corridor.tokenise), proven applied by tools/check_suspect_readings.py, and a reverted build is convicted by verify-native-readings.mjs.",
+  "provenance": {
+    "authored": "RENKAN R3-A furigana truth, 2026-08-16 — from hunt P1 (reader-experience lens, docs/build-evidence/renkan/hunts-round2.json) plus the systematic scan in docs/build-evidence/renkan/furigana-truth/suspect-readings.json",
+    "anchors": [
+      "國學院大學 古典文化学事業・神名データベース — アメノミナカヌシ・タカミムスヒ・カミムスヒ ほか (the 30 originals' own editorial fact anchor, docs/content/bunki-originals-zoka-sanjin.editorial.json)",
+      "『古事記』上巻・冒頭 天地初発条 (別天神五柱・宇摩志阿斯訶備比古遅神・天之常立神)",
+      "小学館『日本国語大辞典』/『デジタル大辞泉』 — 創造神(そうぞうしん)・最高神(さいこうしん)・唯一神(ゆいいつしん)・日本書紀(にほんしょき)・誦習(しょうしゅう)・都(みやこ)",
+      "ja.wikinews source articles for the person names 神谷宗幣(かみや・そうへい)・遠藤璃菜(えんどう・りな)・藤田譲瑠チマ(ふじた・ジョエル・チマ)"
+    ],
+    "policy": "Token splits stay UniDic's; ONLY readings are overridden, matched on exact adjacent token-surface sequences. Where a deity or person name carries an unwritten genitive の before its final piece, the の attaches to the NAME piece — the same convention UniDic itself already applies to 天之御中主(あめのみなかぬしの) and 太(おおの) — and a name-final 神 token always reads かみ. Readings are hiragana, matching the token 'r' field. A null reading leaves that token untouched (context guard only)."
+  },
+  "entries": [
+    {
+      "word": "天之御中主神",
+      "reading": "あめのみなかぬしのかみ",
+      "surfaces": ["天之御中主", "神"],
+      "readings": ["あめのみなかぬしの", "かみ"],
+      "kind": "deity-name",
+      "note": "UniDic keeps the name piece right but reads the orphaned 神 as しん (33 of 35 shelf occurrences). The flagship 検収前 texts introduce this deity; ruby must read あめのみなかぬしのかみ end to end."
+    },
+    {
+      "word": "高御産巣日神",
+      "reading": "たかみむすひのかみ",
+      "surfaces": ["高御産巣日", "神"],
+      "readings": ["たかみむすひの", "かみ"],
+      "kind": "deity-name",
+      "note": "UniDic drops the genitive の and reads 神 as しん. The name piece keeps UniDic's たかみむすひ (ひ, per 産巣日=むすひ) and gains the unwritten の."
+    },
+    {
+      "word": "神産巣日神",
+      "reading": "かみむすびのかみ",
+      "surfaces": ["神産巣日", "神"],
+      "readings": ["かみむすびの", "かみ"],
+      "kind": "deity-name",
+      "note": "Name piece keeps UniDic's かみむすび (the common modern rendering; かむむすひ/かみむすひ are attested classical variants) and gains the unwritten genitive の; 神 reads かみ, never しん."
+    },
+    {
+      "word": "宇摩志阿斯訶備比古遅神",
+      "reading": "うましあしかびひこぢのかみ",
+      "surfaces": ["宇摩", "志", "阿", "斯", "訶備", "比", "古", "遅", "神"],
+      "readings": ["うま", "し", "あ", "し", "かび", "ひ", "こ", "ぢの", "かみ"],
+      "kind": "deity-name",
+      "note": "UniDic shreds this theonym into dictionary guesses (斯=ここ, 古=ふる, 遅=おそ, 訶備 rubyless). Per-token readings spell うましあしかびひこぢのかみ exactly."
+    },
+    {
+      "word": "天之常立神",
+      "reading": "あめのとこたちのかみ",
+      "surfaces": ["天", "之", "常", "立神"],
+      "readings": ["あめ", "の", "とこ", "たちのかみ"],
+      "kind": "deity-name",
+      "note": "UniDic reads 天(てん)・常(つね)・立神(たてがみ). The 神 sits inside the token 立神, so that token carries たちのかみ."
+    },
+    {
+      "word": "別天神",
+      "reading": "ことあまつかみ",
+      "surfaces": ["別", "天神"],
+      "readings": ["こと", "あまつかみ"],
+      "kind": "deity-name",
+      "note": "The Kojiki's collective term for the first five deities. UniDic reads it 別(べつ)+天神(てんじん) — Tenjin worship, a different word entirely."
+    },
+    {
+      "word": "伊耶那岐神",
+      "reading": "いざなぎのかみ",
+      "surfaces": ["伊", "耶", "那岐", "神"],
+      "readings": ["い", "ざ", "なぎの", "かみ"],
+      "kind": "deity-name",
+      "note": "Kojiki spelling with 耶. UniDic leaves 耶 rubyless (い◯なぎかみ). Genitive の rides the final name fragment."
+    },
+    {
+      "word": "伊耶那美神",
+      "reading": "いざなみのかみ",
+      "surfaces": ["伊", "耶那", "美神"],
+      "readings": ["い", "ざな", "みのかみ"],
+      "kind": "deity-name",
+      "note": "UniDic reads the final token 美神 as びしん. The 神 sits inside that token, so it carries みのかみ."
+    },
+    {
+      "word": "伊邪那岐神",
+      "reading": "いざなぎのかみ",
+      "surfaces": ["伊邪那岐", "神"],
+      "readings": ["いざなぎの", "かみ"],
+      "kind": "deity-name",
+      "note": "邪-spelling variant; UniDic already reads the name piece いざなぎの but orphans 神 as しん."
+    },
+    {
+      "word": "伊邪那美神",
+      "reading": "いざなみのかみ",
+      "surfaces": ["伊邪那美", "神"],
+      "readings": ["いざなみの", "かみ"],
+      "kind": "deity-name",
+      "note": "邪-spelling variant; UniDic drops the genitive の and reads 神 as しん."
+    },
+    {
+      "word": "少名毘古那神",
+      "reading": "すくなびこなのかみ",
+      "surfaces": ["少", "名", "毘古", "那", "神"],
+      "readings": ["すく", "な", "びこ", "なの", "かみ"],
+      "kind": "deity-name",
+      "note": "UniDic reads 少(しょう)名(めい)…神(しん) — しょうめいひこなしん. Per-token readings spell すくなびこなのかみ."
+    },
+    {
+      "word": "大国主神",
+      "reading": "おおくにぬしのかみ",
+      "surfaces": ["大国", "主神"],
+      "readings": ["おおくに", "ぬしのかみ"],
+      "kind": "deity-name",
+      "note": "UniDic reads 大国(たいこく)+主神(しゅしん). The 神 sits inside the token 主神, so that token carries ぬしのかみ."
+    },
+    {
+      "word": "天照大御神",
+      "reading": "あまてらすおおみかみ",
+      "surfaces": ["天照", "大御神"],
+      "readings": ["あまてらす", "おおみかみ"],
+      "kind": "deity-name",
+      "note": "UniDic truncates 大御神 to おおみか. No genitive here — 大御 is honorific: おおみかみ."
+    },
+    {
+      "word": "高木神",
+      "reading": "たかぎのかみ",
+      "surfaces": ["高木", "神"],
+      "readings": ["たかぎの", "かみ"],
+      "kind": "deity-name",
+      "note": "Alternate name of 高御産巣日神. UniDic reads たかぎ+かみ, dropping the genitive の."
+    },
+    {
+      "word": "葦原中国",
+      "reading": "あしはらのなかつくに",
+      "surfaces": ["葦原", "中国"],
+      "readings": ["あしはらの", "なかつくに"],
+      "kind": "deity-name",
+      "note": "UniDic reads 葦原(よしわら — the Edo district)+中国(ちゅうごく — the country). The mythic realm reads あしはらのなかつくに."
+    },
+    {
+      "word": "造化三神",
+      "reading": "ぞうかさんしん",
+      "surfaces": ["造化", "三神"],
+      "readings": ["ぞうか", "さんしん"],
+      "kind": "theonym-compound",
+      "note": "Where UniDic fuses 三神 into one token it reads it みかみ; the collective term is the on-compound ぞうかさんしん. (The split 造化|三|神 already reads さん+しん correctly — see accepts.)"
+    },
+    {
+      "word": "創造神",
+      "reading": "そうぞうしん",
+      "surfaces": ["創造", "神"],
+      "readings": ["そうぞう", "しん"],
+      "kind": "theonym-compound",
+      "note": "Standard on-compound (大辞泉). UniDic wavers between しん and かみ across the shelf; the term is そうぞうしん."
+    },
+    {
+      "word": "最高神",
+      "reading": "さいこうしん",
+      "surfaces": ["最高", "神"],
+      "readings": ["さいこう", "しん"],
+      "kind": "theonym-compound",
+      "note": "Standard on-compound in religious studies (さいこうしん); UniDic reads かみ here."
+    },
+    {
+      "word": "唯一神",
+      "reading": "ゆいいつしん",
+      "surfaces": ["唯一", "神"],
+      "readings": ["ゆいいつ", "しん"],
+      "kind": "theonym-compound",
+      "note": "Standard on-compound (ゆいいつしん); UniDic reads かみ here."
+    },
+    {
+      "word": "原初神",
+      "reading": "げんしょしん",
+      "surfaces": ["原初", "神"],
+      "readings": ["げんしょ", "しん"],
+      "kind": "theonym-compound",
+      "note": "Not a dictionary headword; reads by regular on-composition parallel to 最高神/創造神, matching the essay's own technical register."
+    },
+    {
+      "word": "稗田阿礼",
+      "reading": "ひえだのあれ",
+      "surfaces": ["稗田", "阿礼"],
+      "readings": ["ひえだの", "あれ"],
+      "kind": "person-name",
+      "note": "UniDic reads ひえた and drops the genitive の. The Kojiki reciter is ひえだのあれ."
+    },
+    {
+      "word": "神谷宗幣",
+      "reading": "かみやそうへい",
+      "surfaces": ["神谷", "宗", "幣"],
+      "readings": ["かみや", "そう", "へい"],
+      "kind": "person-name",
+      "note": "UniDic guesses the given-name token 宗 as たかし; the politician reads かみや・そうへい (wikinews:45098)."
+    },
+    {
+      "word": "遠藤璃菜",
+      "reading": "えんどうりな",
+      "surfaces": ["遠藤", "璃菜"],
+      "readings": ["えんどう", "りな"],
+      "kind": "person-name",
+      "note": "UniDic leaves 璃菜 rubyless; the actress reads えんどう・りな (wikinews:45095)."
+    },
+    {
+      "word": "藤田譲瑠チマ",
+      "reading": "ふじたじょえるちま",
+      "surfaces": ["藤田", "譲", "瑠", "チマ"],
+      "readings": ["ふじた", "じょえ", "る", null],
+      "kind": "person-name",
+      "note": "The footballer reads ふじた・ジョエル・チマ; UniDic reads 譲 as ゆずる and leaves 瑠 rubyless. じょえる is ateji over 譲瑠; the split anchors on 瑠=る, the character's standard reading (wikinews:44381)."
+    },
+    {
+      "word": "日本書紀",
+      "reading": "にほんしょき",
+      "surfaces": ["日本", "書紀"],
+      "readings": ["にほん", "しょき"],
+      "kind": "title",
+      "note": "Scholarly convention reads the chronicle にほんしょき; UniDic emits にっぽん for the 日本 token in this compound."
+    },
+    {
+      "word": "誦習",
+      "reading": "しょうしゅう",
+      "surfaces": ["誦習"],
+      "readings": ["しょうしゅう"],
+      "kind": "term",
+      "note": "The Kojiki-preface term for Are's recitation practice; UniDic leaves it rubyless. 日国: しょうしゅう."
+    },
+    {
+      "word": "都",
+      "reading": "みやこ",
+      "surfaces": ["は", "都", "から"],
+      "readings": [null, "みやこ", null],
+      "kind": "classical",
+      "note": "野ばら (aozora:051034) 「ここは都から遠い…」 — the capital, みやこ; UniDic picked the administrative suffix と. Context-guarded by the surrounding particles; 東京|都(と) tokenizes with 東京 before 都 and never matches."
+    },
+    {
+      "word": "都",
+      "reading": "みやこ",
+      "surfaces": ["しき", "の", "都"],
+      "readings": [null, null, "みやこ"],
+      "kind": "classical",
+      "note": "方丈記 「たましきの都のうちに」 — みやこ; UniDic picked と."
+    },
+    {
+      "word": "遂ケ",
+      "reading": "とげ",
+      "surfaces": ["遂", "ケ"],
+      "readings": ["と", null],
+      "kind": "classical",
+      "note": "五箇条の御誓文 「各其志ヲ遂ケ」 — 遂(と)ケ; UniDic emits the on-reading すい on an unknown-word fallback."
+    },
+    {
+      "word": "倦マザラシメン",
+      "reading": "うまざらしめん",
+      "surfaces": ["倦", "マザラシメン"],
+      "readings": ["う", "まざらしめん"],
+      "kind": "classical",
+      "note": "五箇条の御誓文 「人心ヲシテ倦マザラシメン」 — 倦(う)む; UniDic leaves both tokens rubyless."
+    },
+    {
+      "word": "争ヘル",
+      "reading": "あらそへる",
+      "surfaces": ["争", "へる"],
+      "readings": ["あらそ", null],
+      "kind": "classical",
+      "note": "方丈記 「甍を争へる」 — 争(あらそ)へる; UniDic emits the on-reading そう on an unknown-word fallback."
+    }
+  ],
+  "accepts": [
+    {
+      "word": "造化三神",
+      "reading": "ぞうかさんしん",
+      "surfaces": ["造化", "三", "神"],
+      "readings": ["ぞうか", "さん", "しん"],
+      "note": "Reviewed CORRECT — the collective term is the on-compound ぞうかさんしん, so a 神 token reading しん directly after 造化|三 is right even though the three individual names read かみ. Recorded here so the checker can distinguish it from the name-position しん defects; bytes untouched."
+    },
+    {
+      "word": "東京都",
+      "reading": "とうきょうと",
+      "surfaces": ["東京", "都"],
+      "readings": ["とうきょう", "と"],
+      "note": "Reviewed CORRECT — administrative suffix 都(と) after 東京 (wikinews:45089). Recorded so the checker's 都(と) probe can tell it from the 野ばら/方丈記 defects; bytes untouched."
+    }
+  ]
+}

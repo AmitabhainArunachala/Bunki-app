@@ -358,10 +358,19 @@ test('T3-3: abandoning a request in flight writes nothing to the log', async ({ 
 
   await openApp(page, app.origin);
   await keepWord(page, '分岐');
-  const before = await durableEventTypes(page);
 
   await visibleTestId(page, 'capture-open-word').click();
   await expect(visibleTestId(page, 'screen-word')).toBeVisible();
+  // The baseline is read *after* the word-page press: that press is a real
+  // lookup and legitimately records `LookupFrictionLogged` (T-07, RENKAN R2-X),
+  // so reading it earlier would blame the abandoned request for an event a
+  // deliberate gesture wrote. The poll lets the asynchronous durable append
+  // settle before the baseline is taken.
+  await expect
+    .poll(async () => (await durableEventTypes(page)).includes('LookupFrictionLogged'))
+    .toBe(true);
+  const before = await durableEventTypes(page);
+
   await visibleTestId(page, 'candidate-request').click();
   await expect(visibleTestId(page, 'state-loading')).toBeVisible();
 

@@ -1,0 +1,43 @@
+{
+  "source": "tools/fsrs-optimize.mjs",
+  "algorithm": "FSRS-6",
+  "package": "ts-fsrs",
+  "pinnedVersion": "5.4.1",
+  "parameterSetId": "bunki-fsrs6-r090-personal-v1",
+  "requestRetention": 0.9,
+  "w": [
+    0.212,
+    1.24836437,
+    2.25988973,
+    8.25366566,
+    6.41326326,
+    0.83372358,
+    3.01949274,
+    0.00103483,
+    1.87268329,
+    0.16602688,
+    0.79646303,
+    1.48316041,
+    0.06146947,
+    0.26229356,
+    1.6480874,
+    0.60144909,
+    1.8740441,
+    0.5423983,
+    0.09125285,
+    0.06579356,
+    0.15469166
+  ],
+  "maximumInterval": 36500,
+  "enableFuzz": false,
+  "enableShortTerm": true,
+  "learningSteps": [
+    "1m",
+    "10m"
+  ],
+  "relearningSteps": [
+    "10m"
+  ],
+  "statePrecision": 8,
+  "reviewTimePolicyId": "append-order-monotonic-clamp-v1"
+}

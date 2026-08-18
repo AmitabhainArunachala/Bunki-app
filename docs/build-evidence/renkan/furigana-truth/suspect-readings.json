@@ -1,0 +1,3127 @@
+{
+ "kind": "suspect-readings-report",
+ "schemaVersion": 1,
+ "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
+ "lexicon": "docs/content/reading-overrides.json",
+ "scanned": {
+  "articles": 82,
+  "tokens": 43540
+ },
+ "statusCounts": {
+  "lexicon-fixed": 303,
+  "accepted": 8
+ },
+ "openCount": 0,
+ "rows": [
+  {
+   "article": "aozora:051034",
+   "token": 42,
+   "rule": "override-site",
+   "surface": "都",
+   "reading": "みやこ",
+   "status": "lexicon-fixed",
+   "context": "ました。ここは都から遠い、国境で",
+   "note": "都"
+  },
+  {
+   "article": "real-gokajo",
+   "token": 73,
+   "rule": "override-site",
+   "surface": "遂",
+   "reading": "と",
+   "status": "lexicon-fixed",
+   "context": "迄各其志ヲ遂ケ人心ヲシテ倦",
+   "note": "遂ケ"
+  },
+  {
+   "article": "real-gokajo",
+   "token": 78,
+   "rule": "override-site",
+   "surface": "倦",
+   "reading": "う",
+   "status": "lexicon-fixed",
+   "context": "遂ケ人心ヲシテ倦マザラシメン事ヲ要ス",
+   "note": "倦マザラシメン"
+  },
+  {
+   "article": "real-gokajo",
+   "token": 79,
+   "rule": "override-site",
+   "surface": "マザラシメン",
+   "reading": "まざらしめん",
+   "status": "lexicon-fixed",
+   "context": "ケ人心ヲシテ倦マザラシメン事ヲ要ス。",
+   "note": "倦マザラシメン"
+  },
+  {
+   "article": "real-hojoki",
+   "token": 56,
+   "rule": "override-site",
+   "surface": "都",
+   "reading": "みやこ",
+   "status": "lexicon-fixed",
+   "context": "ごとし。たましきの都のうちに、棟",
+   "note": "都"
+  },
+  {
+   "article": "real-hojoki",
+   "token": 67,
+   "rule": "override-site",
+   "surface": "争",
+   "reading": "あらそ",
+   "status": "lexicon-fixed",
+   "context": "を並べ、甍を争へる、高き、卑",
+   "note": "争ヘル"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 31,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "た時、高天原に天之御中主神が現れる。続い",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 32,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "時、高天原に天之御中主神が現れる。続いて",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 39,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "現れる。続いて、高御産巣日神と神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 40,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。続いて、高御産巣日神と神産巣日神が現れる",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 42,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "て、高御産巣日神と神産巣日神が現れる。三",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 43,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神が現れる。三柱",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 72,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "これが、後に造化三神と呼ばれる神々",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 73,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "が、後に造化三神と呼ばれる神々と",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 101,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "なくてもよい。天之御中主神は、三柱",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "てもよい。天之御中主神は、三柱の",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 117,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "が出る神だ。高御産巣日神と神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 118,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "出る神だ。高御産巣日神と神産巣日神の名",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 120,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "だ。高御産巣日神と神産巣日神の名には",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 121,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。高御産巣日神と神産巣日神の名には、",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 358,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "一方で、光が高御産巣日神そのものだと",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 359,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "で、光が高御産巣日神そのものだと古い",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 398,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "。では、なぜ造化三神という名前が",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 399,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "では、なぜ造化三神という名前が使わ",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 471,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "三柱を一言で創造神と呼んで終わる",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 472,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "柱を一言で創造神と呼んで終わるより",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-graded-n3-zoka-sanjin-morning",
+   "token": 692,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "ことが、造化三神に丁寧に出会う第",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 87,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "動画の作り手は、天之御中主神を「中今",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 88,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "の作り手は、天之御中主神を「中今」",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 111,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "結び付けていた。高御産巣日神を未来から来る",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 112,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ていた。高御産巣日神を未来から来る流れ",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "未来から来る流れ、神産巣日神を過去から続く",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 120,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "から来る流れ、神産巣日神を過去から続く流れ",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 465,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "、天地の初めに天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 466,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "天地の初めに天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 468,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "初めに天之御中主神、高御産巣日神、神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 469,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "に天之御中主神、高御産巣日神、神産巣日神が現れ",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 471,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神が現れ、独神",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 472,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神が現れ、独神と",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 490,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "記される。しかし、天之御中主神が現在を表す",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-nakaima-diary",
+   "token": 491,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "れる。しかし、天之御中主神が現在を表すとも",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 93,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "現れる。その名は天之御中主神である。次",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 94,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。その名は天之御中主神である。次に",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 100,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "である。次に高御産巣日神、その次に",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 101,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ある。次に高御産巣日神、その次に神産巣日",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 106,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、その次に神産巣日神が現れる。この",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 107,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、その次に神産巣日神が現れる。この三",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 176,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "れているが、天之御中主神が命令を出し",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 177,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ているが、天之御中主神が命令を出した",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 191,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "れていない。高御産巣日神と神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 192,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ていない。高御産巣日神と神産巣日神が手",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 194,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "ない。高御産巣日神と神産巣日神が手を動かし",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 195,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。高御産巣日神と神産巣日神が手を動かして",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 292,
+   "rule": "override-site",
+   "surface": "宇摩",
+   "reading": "うま",
+   "status": "lexicon-fixed",
+   "context": "に伸びるものから、宇摩志阿斯訶備比",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 293,
+   "rule": "override-site",
+   "surface": "志",
+   "reading": "し",
+   "status": "lexicon-fixed",
+   "context": "伸びるものから、宇摩志阿斯訶備比古",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 294,
+   "rule": "override-site",
+   "surface": "阿",
+   "reading": "あ",
+   "status": "lexicon-fixed",
+   "context": "ものから、宇摩志阿斯訶備比古遅",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 295,
+   "rule": "override-site",
+   "surface": "斯",
+   "reading": "し",
+   "status": "lexicon-fixed",
+   "context": "から、宇摩志阿斯訶備比古遅神",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 296,
+   "rule": "override-site",
+   "surface": "訶備",
+   "reading": "かび",
+   "status": "lexicon-fixed",
+   "context": "、宇摩志阿斯訶備比古遅神が",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 297,
+   "rule": "override-site",
+   "surface": "比",
+   "reading": "ひ",
+   "status": "lexicon-fixed",
+   "context": "宇摩志阿斯訶備比古遅神が現れる",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 298,
+   "rule": "override-site",
+   "surface": "古",
+   "reading": "こ",
+   "status": "lexicon-fixed",
+   "context": "志阿斯訶備比古遅神が現れる。",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 299,
+   "rule": "override-site",
+   "surface": "遅",
+   "reading": "ぢの",
+   "status": "lexicon-fixed",
+   "context": "阿斯訶備比古遅神が現れる。続い",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 300,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "斯訶備比古遅神が現れる。続いて",
+   "note": "宇摩志阿斯訶備比古遅神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 306,
+   "rule": "override-site",
+   "surface": "天",
+   "reading": "あめ",
+   "status": "lexicon-fixed",
+   "context": "が現れる。続いて天之常立神が現れる",
+   "note": "天之常立神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 307,
+   "rule": "override-site",
+   "surface": "之",
+   "reading": "の",
+   "status": "lexicon-fixed",
+   "context": "現れる。続いて天之常立神が現れる。",
+   "note": "天之常立神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 308,
+   "rule": "override-site",
+   "surface": "常",
+   "reading": "とこ",
+   "status": "lexicon-fixed",
+   "context": "。続いて天之常立神が現れる。この",
+   "note": "天之常立神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 309,
+   "rule": "override-site",
+   "surface": "立神",
+   "reading": "たちのかみ",
+   "status": "lexicon-fixed",
+   "context": "続いて天之常立神が現れる。この二",
+   "note": "天之常立神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 333,
+   "rule": "override-site",
+   "surface": "別",
+   "reading": "こと",
+   "status": "lexicon-fixed",
+   "context": "の五柱は、別天神と呼ばれる。",
+   "note": "別天神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 334,
+   "rule": "override-site",
+   "surface": "天神",
+   "reading": "あまつかみ",
+   "status": "lexicon-fixed",
+   "context": "五柱は、別天神と呼ばれる。さらに",
+   "note": "別天神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 350,
+   "rule": "override-site",
+   "surface": "伊",
+   "reading": "い",
+   "status": "lexicon-fixed",
+   "context": "の神々が現れる。伊耶那岐神と伊",
+   "note": "伊耶那岐神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 351,
+   "rule": "override-site",
+   "surface": "耶",
+   "reading": "ざ",
+   "status": "lexicon-fixed",
+   "context": "神々が現れる。伊耶那岐神と伊耶那",
+   "note": "伊耶那岐神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 352,
+   "rule": "override-site",
+   "surface": "那岐",
+   "reading": "なぎの",
+   "status": "lexicon-fixed",
+   "context": "が現れる。伊耶那岐神と伊耶那美神",
+   "note": "伊耶那岐神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 353,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "現れる。伊耶那岐神と伊耶那美神が",
+   "note": "伊耶那岐神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 355,
+   "rule": "override-site",
+   "surface": "伊",
+   "reading": "い",
+   "status": "lexicon-fixed",
+   "context": "伊耶那岐神と伊耶那美神が島々を",
+   "note": "伊耶那美神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 356,
+   "rule": "override-site",
+   "surface": "耶那",
+   "reading": "ざな",
+   "status": "lexicon-fixed",
+   "context": "耶那岐神と伊耶那美神が島々を生む",
+   "note": "伊耶那美神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 357,
+   "rule": "override-site",
+   "surface": "美神",
+   "reading": "みのかみ",
+   "status": "lexicon-fixed",
+   "context": "那岐神と伊耶那美神が島々を生む国生み",
+   "note": "伊耶那美神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 443,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "」という問いから造化三神の謎を紹介",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 444,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "という問いから造化三神の謎を紹介する",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 471,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "に現れた神を創造神と呼びたくなる",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 472,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "現れた神を創造神と呼びたくなるか",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 527,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "て受け取るとよい。造化三神という呼び名は",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-world-beginning",
+   "token": 528,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "受け取るとよい。造化三神という呼び名は、",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 82,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "ていません。天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 83,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "いません。天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 85,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "ん。天之御中主神、高御産巣日神、神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 86,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。天之御中主神、高御産巣日神、神産巣日神の三",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 88,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神の三柱は",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 89,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神の三柱は、",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 289,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "はありません。天之御中主神は、確かに",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 290,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ありません。天之御中主神は、確かに『",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hidden-deity",
+   "token": 519,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "動画は、造化三神について『世界",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "天照",
+   "reading": "あまてらす",
+   "status": "lexicon-fixed",
+   "context": "の始まり、国生み、天照大御神や須佐之男命、",
+   "note": "天照大御神"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 132,
+   "rule": "override-site",
+   "surface": "大御神",
+   "reading": "おおみかみ",
+   "status": "lexicon-fixed",
+   "context": "始まり、国生み、天照大御神や須佐之男命、大国",
+   "note": "天照大御神"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 137,
+   "rule": "override-site",
+   "surface": "大国",
+   "reading": "おおくに",
+   "status": "lexicon-fixed",
+   "context": "大御神や須佐之男命、大国主神など、神々の",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 138,
+   "rule": "override-site",
+   "surface": "主神",
+   "reading": "ぬしのかみ",
+   "status": "lexicon-fixed",
+   "context": "や須佐之男命、大国主神など、神々の物語",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 227,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "心配した。そして稗田阿礼に伝承を覚え",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-graded-n3-kojiki-book",
+   "token": 228,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "した。そして稗田阿礼に伝承を覚えさせ",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 54,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "がよく使われる。天之御中主神なら一柱、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 55,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "よく使われる。天之御中主神なら一柱、高御産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 60,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "神なら一柱、高御産巣日神と神産巣日神を",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 61,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "なら一柱、高御産巣日神と神産巣日神を加える",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 63,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "柱、高御産巣日神と神産巣日神を加えると三",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 64,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神を加えると三柱",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 157,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "の冒頭にも、天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 158,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "冒頭にも、天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 160,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "も、天之御中主神、高御産巣日神、神産巣日神に",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 161,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、天之御中主神、高御産巣日神、神産巣日神につい",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 163,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神について「",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-hashira-counter",
+   "token": 164,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神について「三",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-feel-jingu-forest",
+   "token": 394,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "考えられている。高御産巣日神と神産巣日神も",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-feel-jingu-forest",
+   "token": 395,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "られている。高御産巣日神と神産巣日神も、",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-feel-jingu-forest",
+   "token": 397,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "いる。高御産巣日神と神産巣日神も、その名",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-feel-jingu-forest",
+   "token": 398,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。高御産巣日神と神産巣日神も、その名を",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 96,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "という音は、高御産巣日神と神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 97,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "いう音は、高御産巣日神と神産巣日神の名",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 99,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "は、高御産巣日神と神産巣日神の名にも",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 100,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神の名にも含ま",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 337,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "はない。空は高御産巣日神、地面は神産巣日",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 338,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ない。空は高御産巣日神、地面は神産巣日神",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 342,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "高御産巣日神、地面は神産巣日神、人は天之御中主",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 343,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "神、地面は神産巣日神、人は天之御中主神",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 347,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "神産巣日神、人は天之御中主神を表す、と",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 348,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "神、人は天之御中主神を表す、と本文",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 549,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "どう始まったか、造化三神が何をし",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-graded-n3-musubi-visual",
+   "token": 550,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "始まったか、造化三神が何をした",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 18,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "た時、高天原に天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 19,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "時、高天原に天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 21,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "高天原に天之御中主神、高御産巣日神、神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 22,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "に天之御中主神、高御産巣日神、神産巣日神が現れ",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 24,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神が現れたと",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 25,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神が現れたと記さ",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 218,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "の神名データベースも、高御産巣日神と神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 219,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "神名データベースも、高御産巣日神と神産巣日神の「",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 221,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "も、高御産巣日神と神産巣日神の「ムスヒ」",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 222,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神の「ムスヒ」は",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 290,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "も見えなくなる。天之御中主神は冒頭以後に",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 291,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "見えなくなる。天之御中主神は冒頭以後に具体",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 308,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "れない。一方、高御産巣日神と神産巣日神は",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 309,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ない。一方、高御産巣日神と神産巣日神は、",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 311,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "一方、高御産巣日神と神産巣日神は、後の",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 312,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神は、後の場面",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 577,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "見えやすい。例えば、高御産巣日神は後の国譲り",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 578,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "やすい。例えば、高御産巣日神は後の国譲りや",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 595,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "名が記され、神産巣日神は大国主神に",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 596,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "が記され、神産巣日神は大国主神に関わる",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 598,
+   "rule": "override-site",
+   "surface": "大国",
+   "reading": "おおくに",
+   "status": "lexicon-fixed",
+   "context": "れ、神産巣日神は大国主神に関わる場面など",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-essay-n2-zoka-as-one",
+   "token": 599,
+   "rule": "override-site",
+   "surface": "主神",
+   "reading": "ぬしのかみ",
+   "status": "lexicon-fixed",
+   "context": "、神産巣日神は大国主神に関わる場面などに",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 57,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "チャンネルの動画は、天之御中主神を語る中で",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 58,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "の動画は、天之御中主神を語る中で「",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 112,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "の段には、天之御中主神が高天原に現れ",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 113,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "段には、天之御中主神が高天原に現れ、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 162,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "・現在・未来を天之御中主神の名に対応",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-nakaima-time",
+   "token": 163,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "現在・未来を天之御中主神の名に対応さ",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 78,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "重要である。「創造神」は分かりやすい",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 79,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "である。「創造神」は分かりやすい言葉",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "た時、高天原に天之御中主神が「成り」",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 120,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "時、高天原に天之御中主神が「成り」、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 128,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "成り」、続いて高御産巣日神と神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 129,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "」、続いて高御産巣日神と神産巣日神が「",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "続いて高御産巣日神と神産巣日神が「成った",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 132,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "て高御産巣日神と神産巣日神が「成った」",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 193,
+   "rule": "override-site",
+   "surface": "伊邪那岐",
+   "reading": "いざなぎの",
+   "status": "lexicon-fixed",
+   "context": "物語は、後に伊邪那岐神と伊邪那美神の",
+   "note": "伊邪那岐神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 194,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "は、後に伊邪那岐神と伊邪那美神の段",
+   "note": "伊邪那岐神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 196,
+   "rule": "override-site",
+   "surface": "伊邪那美",
+   "reading": "いざなみの",
+   "status": "lexicon-fixed",
+   "context": "後に伊邪那岐神と伊邪那美神の段で語ら",
+   "note": "伊邪那美神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 197,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "に伊邪那岐神と伊邪那美神の段で語られる",
+   "note": "伊邪那美神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 207,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "れる。一方、「造化三神」という呼び名",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 208,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "。一方、「造化三神」という呼び名の",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 243,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "解釈を紹介し、高御産巣日神と神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 244,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "を紹介し、高御産巣日神と神産巣日神のムスヒ",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 246,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "し、高御産巣日神と神産巣日神のムスヒを生産",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 247,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神と神産巣日神のムスヒを生産・",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 285,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "を広い意味で「創造神」と呼ぶこと",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 286,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "広い意味で「創造神」と呼ぶことは",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 331,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "。長い説明を「創造神」の三字",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 332,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "長い説明を「創造神」の三字に",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 379,
+   "rule": "override-site",
+   "surface": "唯一",
+   "reading": "ゆいいつ",
+   "status": "lexicon-fixed",
+   "context": "知らないうちに、唯一神、全能、明確",
+   "note": "唯一神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 380,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "ないうちに、唯一神、全能、明確な",
+   "note": "唯一神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 437,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "にも必要だ。天之御中主神が『古事記",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 438,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "も必要だ。天之御中主神が『古事記』",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 548,
+   "rule": "override-site",
+   "surface": "葦原",
+   "reading": "あしはらの",
+   "status": "lexicon-fixed",
+   "context": "まだ形の定まらない葦原中国、後に生まれる",
+   "note": "葦原中国"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 549,
+   "rule": "override-site",
+   "surface": "中国",
+   "reading": "なかつくに",
+   "status": "lexicon-fixed",
+   "context": "形の定まらない葦原中国、後に生まれる島々",
+   "note": "葦原中国"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 601,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "。だから、「創造神」という言葉",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 602,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "だから、「創造神」という言葉を",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 726,
+   "rule": "override-site",
+   "surface": "創造",
+   "reading": "そうぞう",
+   "status": "lexicon-fixed",
+   "context": "を続ける時、「創造神」は結論で",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 727,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "続ける時、「創造神」は結論では",
+   "note": "創造神"
+  },
+  {
+   "article": "bunki-essay-n2-creator-god",
+   "token": 64,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "を付けて造化三神を紹介する。この",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 29,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "天地初発では、天之御中主神は高天原に最初",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 30,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "初発では、天之御中主神は高天原に最初に",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 46,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "て記される。そして高御産巣日神、神産巣日神と",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 47,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "記される。そして高御産巣日神、神産巣日神ととも",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 49,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "。そして高御産巣日神、神産巣日神とともに、",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 50,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "そして高御産巣日神、神産巣日神とともに、独神",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 67,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "たとされる。天之御中主神の具体的な",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 68,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "とされる。天之御中主神の具体的な行為",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 196,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "証ではない。天之御中主神が何を考え",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 197,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ではない。天之御中主神が何を考え、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 375,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "分かれる。また、『日本書紀』の天地開闢",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 376,
+   "rule": "override-site",
+   "surface": "書紀",
+   "reading": "しょき",
+   "status": "lexicon-fixed",
+   "context": "。また、『日本書紀』の天地開闢の",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 685,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "責任も重くなる。天之御中主神の沈黙を、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-silent-amenominakanushi",
+   "token": 686,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "も重くなる。天之御中主神の沈黙を、隠さ",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n2-kojiki-myth-history",
+   "token": 126,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "年成立とし、稗田阿礼が伝承して",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-kojiki-myth-history",
+   "token": 127,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "成立とし、稗田阿礼が伝承してい",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 23,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "だろう。薄暗い部屋で稗田阿礼が物語を語り",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 24,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "。薄暗い部屋で稗田阿礼が物語を語り、",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 113,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "伝える事業を企て、稗田阿礼に帝紀や先代",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 114,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "事業を企て、稗田阿礼に帝紀や先代旧辞",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 121,
+   "rule": "override-site",
+   "surface": "誦習",
+   "reading": "しょうしゅう",
+   "status": "lexicon-fixed",
+   "context": "帝紀や先代旧辞を誦習させた。その",
+   "note": "誦習"
+  },
+  {
+   "article": "bunki-essay-n2-myth-to-book",
+   "token": 268,
+   "rule": "override-site",
+   "surface": "誦習",
+   "reading": "しょうしゅう",
+   "status": "lexicon-fixed",
+   "context": "が展開され、誦習がどのような行為",
+   "note": "誦習"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 31,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "の時、高天原に天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 32,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "時、高天原に天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 34,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "高天原に天之御中主神、高御産巣日神、神産巣日神が",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 35,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "に天之御中主神、高御産巣日神、神産巣日神が成っ",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 37,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神が成ったと",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 38,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神が成ったと記す",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 440,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "ではない。「天之御中主神を宇宙の中心",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 441,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "はない。「天之御中主神を宇宙の中心の",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 645,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "神名解説でも、造化三神の神格や配列",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 646,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "解説でも、造化三神の神格や配列に",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 659,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "の説があり、天之御中主神の職能は明らか",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 660,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "説があり、天之御中主神の職能は明らかに",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 672,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "がたいとされる。高御産巣日神と神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 673,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "とされる。高御産巣日神と神産巣日神の「",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 675,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "れる。高御産巣日神と神産巣日神の「むすひ",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 676,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "。高御産巣日神と神産巣日神の「むすひ」",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 136,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "を重ね、造化三神を宇宙の根源的",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-cosmic-analogy",
+   "token": 840,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "も異なる。造化三神を宇宙論とし",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-nakaima-time-theory",
+   "token": 134,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "定義して造化三神に結び付けたわけで",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-nakaima-time-theory",
+   "token": 519,
+   "rule": "kami-on",
+   "surface": "神",
+   "reading": "しん",
+   "status": "accepted",
+   "context": "を与える。造化三神をこの時間像に",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 40,
+   "rule": "override-site",
+   "surface": "造化",
+   "reading": "ぞうか",
+   "status": "lexicon-fixed",
+   "context": "という疑問形で造化三神の謎を紹介",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 41,
+   "rule": "override-site",
+   "surface": "三神",
+   "reading": "さんしん",
+   "status": "lexicon-fixed",
+   "context": "いう疑問形で造化三神の謎を紹介する",
+   "note": "造化三神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 55,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "者は自然に、天之御中主神を日本神話の",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 56,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "は自然に、天之御中主神を日本神話の頂点",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 125,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "天地初発では、天之御中主神、高御産巣日神、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 126,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "初発では、天之御中主神、高御産巣日神、神産巣日",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 128,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "は、天之御中主神、高御産巣日神、神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 129,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、天之御中主神、高御産巣日神、神産巣日神の順",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "神、高御産巣日神、神産巣日神の順に三",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 132,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、高御産巣日神、神産巣日神の順に三柱",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 151,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "て身を隠す。天之御中主神について具体",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 152,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "身を隠す。天之御中主神について具体的",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 203,
+   "rule": "override-site",
+   "surface": "最高",
+   "reading": "さいこう",
+   "status": "lexicon-fixed",
+   "context": "宇宙を創造した最高神」までを導く",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 204,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "を創造した最高神」までを導くに",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 250,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "ならない。一方、高御産巣日神は後の物語",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 251,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ない。一方、高御産巣日神は後の物語に",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 259,
+   "rule": "override-site",
+   "surface": "高木",
+   "reading": "たかぎの",
+   "status": "lexicon-fixed",
+   "context": "の物語にも、高木神という名で",
+   "note": "高木神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 260,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "物語にも、高木神という名で、",
+   "note": "高木神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 266,
+   "rule": "override-site",
+   "surface": "葦原",
+   "reading": "あしはらの",
+   "status": "lexicon-fixed",
+   "context": "という名で、葦原中国の平定や天孫",
+   "note": "葦原中国"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 267,
+   "rule": "override-site",
+   "surface": "中国",
+   "reading": "なかつくに",
+   "status": "lexicon-fixed",
+   "context": "いう名で、葦原中国の平定や天孫降臨",
+   "note": "葦原中国"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 282,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "場面に関与する。神産巣日神も、大国主神",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 283,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "に関与する。神産巣日神も、大国主神や",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 286,
+   "rule": "override-site",
+   "surface": "大国",
+   "reading": "おおくに",
+   "status": "lexicon-fixed",
+   "context": "。神産巣日神も、大国主神や少名毘古",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 287,
+   "rule": "override-site",
+   "surface": "主神",
+   "reading": "ぬしのかみ",
+   "status": "lexicon-fixed",
+   "context": "神産巣日神も、大国主神や少名毘古那",
+   "note": "大国主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 289,
+   "rule": "override-site",
+   "surface": "少",
+   "reading": "すく",
+   "status": "lexicon-fixed",
+   "context": "も、大国主神や少名毘古那神に",
+   "note": "少名毘古那神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 290,
+   "rule": "override-site",
+   "surface": "名",
+   "reading": "な",
+   "status": "lexicon-fixed",
+   "context": "、大国主神や少名毘古那神に関わる",
+   "note": "少名毘古那神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 291,
+   "rule": "override-site",
+   "surface": "毘古",
+   "reading": "びこ",
+   "status": "lexicon-fixed",
+   "context": "大国主神や少名毘古那神に関わる物語",
+   "note": "少名毘古那神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 292,
+   "rule": "override-site",
+   "surface": "那",
+   "reading": "なの",
+   "status": "lexicon-fixed",
+   "context": "主神や少名毘古那神に関わる物語で",
+   "note": "少名毘古那神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 293,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "や少名毘古那神に関わる物語で働く",
+   "note": "少名毘古那神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 301,
+   "rule": "override-site",
+   "surface": "天照",
+   "reading": "あまてらす",
+   "status": "lexicon-fixed",
+   "context": "物語で働く。さらに天照大御神は皇統との",
+   "note": "天照大御神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 302,
+   "rule": "override-site",
+   "surface": "大御神",
+   "reading": "おおみかみ",
+   "status": "lexicon-fixed",
+   "context": "で働く。さらに天照大御神は皇統との関係",
+   "note": "天照大御神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 361,
+   "rule": "override-site",
+   "surface": "最高",
+   "reading": "さいこう",
+   "status": "lexicon-fixed",
+   "context": "世界である。「最高神」という語",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 362,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "である。「最高神」という語は",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 399,
+   "rule": "override-site",
+   "surface": "唯一",
+   "reading": "ゆいいつ",
+   "status": "lexicon-fixed",
+   "context": "ある。一神教の唯一神、王国の主権",
+   "note": "唯一神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 400,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "。一神教の唯一神、王国の主権者",
+   "note": "唯一神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 500,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "大學の解説は、天之御中主神を「天の",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 501,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "の解説は、天之御中主神を「天の中央",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 537,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "する。また、『日本書紀』の天地開闢",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 538,
+   "rule": "override-site",
+   "surface": "書紀",
+   "reading": "しょき",
+   "status": "lexicon-fixed",
+   "context": "。また、『日本書紀』の天地開闢諸",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 623,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "は、信じる人が天之御中主神を最も大切な",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 624,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "、信じる人が天之御中主神を最も大切な神",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 710,
+   "rule": "override-site",
+   "surface": "最高",
+   "reading": "さいこう",
+   "status": "lexicon-fixed",
+   "context": "古代日本人全体が最高神と認めた」",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 711,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "日本人全体が最高神と認めた」の",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 844,
+   "rule": "override-site",
+   "surface": "原初",
+   "reading": "げんしょ",
+   "status": "lexicon-fixed",
+   "context": "な問いが生まれる。原初神を最高神と",
+   "note": "原初神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 845,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "問いが生まれる。原初神を最高神と呼ぶ",
+   "note": "原初神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 847,
+   "rule": "override-site",
+   "surface": "最高",
+   "reading": "さいこう",
+   "status": "lexicon-fixed",
+   "context": "生まれる。原初神を最高神と呼ぶ前に",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-first-versus-supreme",
+   "token": 848,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "。原初神を最高神と呼ぶ前に、",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 52,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "古事記』冒頭の天之御中主神は、天地初発",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 53,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "記』冒頭の天之御中主神は、天地初発の",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 279,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "描かれないため、天之御中主神は一つの",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 280,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "れないため、天之御中主神は一つの像",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 598,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ではない。『日本書紀』の異伝と",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 599,
+   "rule": "override-site",
+   "surface": "書紀",
+   "reading": "しょき",
+   "status": "lexicon-fixed",
+   "context": "はない。『日本書紀』の異伝と比較",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 751,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "語りを際立たせる。天之御中主神の静止がある",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 752,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "を際立たせる。天之御中主神の静止があるから",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 766,
+   "rule": "override-site",
+   "surface": "高御産巣日",
+   "reading": "たかみむすひの",
+   "status": "lexicon-fixed",
+   "context": "に命令し援助する高御産巣日神や神産巣日神の",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 767,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "命令し援助する高御産巣日神や神産巣日神の動き",
+   "note": "高御産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 769,
+   "rule": "override-site",
+   "surface": "神産巣日",
+   "reading": "かみむすびの",
+   "status": "lexicon-fixed",
+   "context": "援助する高御産巣日神や神産巣日神の動きが見える",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 770,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "する高御産巣日神や神産巣日神の動きが見える、",
+   "note": "神産巣日神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 826,
+   "rule": "override-site",
+   "surface": "天之御中主",
+   "reading": "あめのみなかぬしの",
+   "status": "lexicon-fixed",
+   "context": "なければならない。天之御中主神の沈黙は、",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-silent-god-theology",
+   "token": 827,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "かみ",
+   "status": "lexicon-fixed",
+   "context": "ばならない。天之御中主神の沈黙は、読む",
+   "note": "天之御中主神"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 147,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "の誤りを正し、稗田阿礼に誦習させ",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 148,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "誤りを正し、稗田阿礼に誦習させた",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 150,
+   "rule": "override-site",
+   "surface": "誦習",
+   "reading": "しょうしゅう",
+   "status": "lexicon-fixed",
+   "context": "正し、稗田阿礼に誦習させた。その",
+   "note": "誦習"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 226,
+   "rule": "override-site",
+   "surface": "稗田",
+   "reading": "ひえだの",
+   "status": "lexicon-fixed",
+   "context": "わけではなく、稗田阿礼に関する情報も",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 227,
+   "rule": "override-site",
+   "surface": "阿礼",
+   "reading": "あれ",
+   "status": "lexicon-fixed",
+   "context": "ではなく、稗田阿礼に関する情報も限ら",
+   "note": "稗田阿礼"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 692,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "似ている。『日本書紀』が七二",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-kojiki-power",
+   "token": 693,
+   "rule": "override-site",
+   "surface": "書紀",
+   "reading": "しょき",
+   "status": "lexicon-fixed",
+   "context": "ている。『日本書紀』が七二〇",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-beyond-fact-fiction",
+   "token": 715,
+   "rule": "override-site",
+   "surface": "最高",
+   "reading": "さいこう",
+   "status": "lexicon-fixed",
+   "context": "」「科学」「最高神」といった",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-beyond-fact-fiction",
+   "token": 716,
+   "rule": "override-site",
+   "surface": "神",
+   "reading": "しん",
+   "status": "lexicon-fixed",
+   "context": "「科学」「最高神」といった概念",
+   "note": "最高神"
+  },
+  {
+   "article": "bunki-essay-n1-beyond-fact-fiction",
+   "token": 755,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "ではない。『日本書紀』の異伝、",
+   "note": "日本書紀"
+  },
+  {
+   "article": "bunki-essay-n1-beyond-fact-fiction",
+   "token": 756,
+   "rule": "override-site",
+   "surface": "書紀",
+   "reading": "しょき",
+   "status": "lexicon-fixed",
+   "context": "はない。『日本書紀』の異伝、風土",
+   "note": "日本書紀"
+  },
+  {
+   "article": "wikinews:44381",
+   "token": 195,
+   "rule": "override-site",
+   "surface": "藤田",
+   "reading": "ふじた",
+   "status": "lexicon-fixed",
+   "context": "/プレミアリーグ）7藤田譲瑠チマ（ザン",
+   "note": "藤田譲瑠チマ"
+  },
+  {
+   "article": "wikinews:44381",
+   "token": 196,
+   "rule": "override-site",
+   "surface": "譲",
+   "reading": "じょえ",
+   "status": "lexicon-fixed",
+   "context": "プレミアリーグ）7藤田譲瑠チマ（ザンクト",
+   "note": "藤田譲瑠チマ"
+  },
+  {
+   "article": "wikinews:44381",
+   "token": 197,
+   "rule": "override-site",
+   "surface": "瑠",
+   "reading": "る",
+   "status": "lexicon-fixed",
+   "context": "リーグ）7藤田譲瑠チマ（ザンクト・",
+   "note": "藤田譲瑠チマ"
+  },
+  {
+   "article": "wikinews:45095",
+   "token": 149,
+   "rule": "override-site",
+   "surface": "遠藤",
+   "reading": "えんどう",
+   "status": "lexicon-fixed",
+   "context": "』麻布麻衣役の遠藤璃菜さん。今後は",
+   "note": "遠藤璃菜"
+  },
+  {
+   "article": "wikinews:45095",
+   "token": 150,
+   "rule": "override-site",
+   "surface": "璃菜",
+   "reading": "りな",
+   "status": "lexicon-fixed",
+   "context": "麻布麻衣役の遠藤璃菜さん。今後は4",
+   "note": "遠藤璃菜"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 91,
+   "rule": "override-site",
+   "surface": "神谷",
+   "reading": "かみや",
+   "status": "lexicon-fixed",
+   "context": "民主党)28票神谷宗幣(参政党",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 92,
+   "rule": "override-site",
+   "surface": "宗",
+   "reading": "そう",
+   "status": "lexicon-fixed",
+   "context": "党)28票神谷宗幣(参政党)",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 93,
+   "rule": "override-site",
+   "surface": "幣",
+   "reading": "へい",
+   "status": "lexicon-fixed",
+   "context": ")28票神谷宗幣(参政党)15",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 168,
+   "rule": "override-site",
+   "surface": "神谷",
+   "reading": "かみや",
+   "status": "lexicon-fixed",
+   "context": "民主党)25票神谷宗幣(参政党",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 169,
+   "rule": "override-site",
+   "surface": "宗",
+   "reading": "そう",
+   "status": "lexicon-fixed",
+   "context": "党)25票神谷宗幣(参政党)",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45098",
+   "token": 170,
+   "rule": "override-site",
+   "surface": "幣",
+   "reading": "へい",
+   "status": "lexicon-fixed",
+   "context": ")25票神谷宗幣(参政党)15",
+   "note": "神谷宗幣"
+  },
+  {
+   "article": "wikinews:45089",
+   "token": 93,
+   "rule": "miyako",
+   "surface": "都",
+   "reading": "と",
+   "status": "accepted",
+   "context": "月13日に東京都永田町にある党本部",
+   "note": "東京都"
+  }
+ ]
+}

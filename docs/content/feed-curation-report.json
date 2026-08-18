@@ -1,0 +1,305 @@
+{
+  "kind": "feed-curation-report",
+  "asOf": "2026-08-16",
+  "law": "signals are ranked by the named criteria below, never composited (#42); culling is PROPOSED here and decided only by the operator in docs/content/feed-review-queue.json — never automatic",
+  "criteria": {
+    "droppedText": "LINK-SAFE patterns (the wikinews-1483/1403 lesson): dangling particle after 知られる — a linked name was dropped in extraction / empty quote/paren pair — bracketed content was dropped in extraction",
+    "residualMarkup": "extractor wide-net markers {{, [[, <ref, }}, </, style=, align=, {|",
+    "tooThin": "news text under 300 chars — glossary entries, classical excerpts and graded beginner texts have their own natural lengths and are exempt",
+    "foreignScript": "news text over 20% Latin/Cyrillic letters (watchlist, never a cull ground by itself)",
+    "lowCoverage": "JLPT-lexicon known-token coverage under 35% (substrate open-anki-jlpt-decks/wbig-6687)",
+    "ranking": "most flags first, then fewest chars, then id — no composite score"
+  },
+  "counts": {
+    "shelf": 82,
+    "archive": 682,
+    "flagged": 33,
+    "cullProposals": 2
+  },
+  "cullProposals": [
+    {
+      "id": "wikinews:5991",
+      "where": "archive",
+      "title": "日弁連、共謀罪への問題点を指摘",
+      "reasons": [
+        "empty quote/paren pair — bracketed content was dropped in extraction"
+      ]
+    },
+    {
+      "id": "wikinews:1483",
+      "where": "archive",
+      "title": "『ハリー・ポッター』第6巻、英語圏で発売",
+      "reasons": [
+        "dangling particle after 知られる — a linked name was dropped in extraction"
+      ]
+    }
+  ],
+  "weakest": [
+    {
+      "id": "wikinews:28382",
+      "where": "archive",
+      "title": "FIFA会長選 正式な立候補者出そろう",
+      "band": "中級後半",
+      "jread": 3.419,
+      "jlptCoverage": 0.2742,
+      "chars": 341,
+      "date": "2016-01-27",
+      "flags": [
+        "foreign-script letters 29% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:42929",
+      "where": "archive",
+      "title": "COIAS、新たに小惑星「Quro」と「ホシザキ」 『恋する小惑星』にちなんで命名",
+      "band": "中級前半",
+      "jread": 3.553,
+      "jlptCoverage": 0.3457,
+      "chars": 369,
+      "date": "2024-12-02",
+      "flags": [
+        "foreign-script letters 23% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:43841",
+      "where": "archive",
+      "title": "Perplexityが独自のウェブブラウザCometを公開",
+      "band": "中級前半",
+      "jread": 4.048,
+      "jlptCoverage": 0.2323,
+      "chars": 411,
+      "date": "2025-07-20",
+      "flags": [
+        "foreign-script letters 26% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:28380",
+      "where": "archive",
+      "title": "2016年の「Prix de Cornulier」はScarlet Turgotが勝利",
+      "band": "初級後半",
+      "jread": 4.775,
+      "jlptCoverage": 0.2195,
+      "chars": 425,
+      "date": "2016-01-25",
+      "flags": [
+        "foreign-script letters 50% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:28800",
+      "where": "archive",
+      "title": "プーチン、戦勝記念日でウクライナとジョージア（グルジア）の大統領を讃辞せず",
+      "band": "初級前半",
+      "jread": 5.658,
+      "jlptCoverage": 0.3333,
+      "chars": 557,
+      "date": "2016-05-09",
+      "flags": [
+        "foreign-script letters 40% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:28008",
+      "where": "archive",
+      "title": "ドイツで発掘されたウマ科の化石「Eurohippus messelensis」に関する論文が投稿、子宮が残存した化石としては世界最古",
+      "band": "中級後半",
+      "jread": 3.087,
+      "jlptCoverage": 0.3356,
+      "chars": 653,
+      "date": "2015-11-16",
+      "flags": [
+        "foreign-script letters 35% of the text — weak Japanese-reading stock",
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "yasashii:1",
+      "where": "shelf",
+      "title": "育児休業",
+      "band": "中級前半",
+      "jread": 4.035,
+      "jlptCoverage": 0.2857,
+      "chars": 22,
+      "date": "",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "yasashii:8",
+      "where": "shelf",
+      "title": "オーバーステイ",
+      "band": "初級前半",
+      "jread": 6.316,
+      "jlptCoverage": 0.3333,
+      "chars": 24,
+      "date": "",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "yasashii:2",
+      "where": "shelf",
+      "title": "育児休業給付金",
+      "band": "初級前半",
+      "jread": 5.721,
+      "jlptCoverage": 0.3077,
+      "chars": 45,
+      "date": "",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "yasashii:6",
+      "where": "shelf",
+      "title": "印鑑登録証明書",
+      "band": "初級後半",
+      "jread": 5.262,
+      "jlptCoverage": 0.2857,
+      "chars": 48,
+      "date": "",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:31973",
+      "where": "archive",
+      "title": "読売ジャイアンツ山口俊投手ノーヒットノーラン達成",
+      "band": "中級後半",
+      "jread": 3.331,
+      "jlptCoverage": 0.3077,
+      "chars": 316,
+      "date": "2018-07-27",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:45087",
+      "where": "archive",
+      "title": "日本初のAI VTuberを生み出したShizuku AI、海外資本から資金調達",
+      "band": "中級後半",
+      "jread": 2.748,
+      "jlptCoverage": 0.3372,
+      "chars": 319,
+      "date": "2026-02-13",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:44437",
+      "where": "archive",
+      "title": "【NPB】ソ・杉山一樹がスピードアップ賞初受賞 最多セーブ賞に続き「2冠目」",
+      "band": "中級前半",
+      "jread": 3.61,
+      "jlptCoverage": 0.3368,
+      "chars": 378,
+      "date": "2025-12-03",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:45137",
+      "where": "archive",
+      "title": "防寒具に水着!? 「天然アップルぱい」が自身のSNSでオフショットを公開",
+      "band": "中級前半",
+      "jread": 3.723,
+      "jlptCoverage": 0.3229,
+      "chars": 378,
+      "date": "2026-02-25",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:5541",
+      "where": "archive",
+      "title": "サイクロン「ラリー」、オーストラリア北部に上陸",
+      "band": "中級前半",
+      "jread": 3.706,
+      "jlptCoverage": 0.3465,
+      "chars": 387,
+      "date": "2006-03-23",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:12006",
+      "where": "archive",
+      "title": "全世界規模でウェブサイト改竄が相次ぐ、政府機関やセキュリティベンダーも被害に",
+      "band": "中級後半",
+      "jread": 3.29,
+      "jlptCoverage": 0.2979,
+      "chars": 393,
+      "date": "2008-03-14",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:6460",
+      "where": "shelf",
+      "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "band": "中級前半",
+      "jread": 4.233,
+      "jlptCoverage": 0.3256,
+      "chars": 397,
+      "date": "2006-06-17",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:28016",
+      "where": "archive",
+      "title": "帯広競馬場に「ふなっしー」が訪れ、模擬レースでファンを沸かせる",
+      "band": "中級前半",
+      "jread": 3.515,
+      "jlptCoverage": 0.3048,
+      "chars": 411,
+      "date": "2015-11-28",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:43923",
+      "where": "archive",
+      "title": "ブラジルのシューゲイザーの人気が世界に広まる",
+      "band": "中級後半",
+      "jread": 3.112,
+      "jlptCoverage": 0.3093,
+      "chars": 413,
+      "date": "2025-08-31",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    },
+    {
+      "id": "wikinews:13162",
+      "where": "archive",
+      "title": "ジェフ千葉・クゼ監督解任 開幕以来未勝利の責任問う",
+      "band": "中級前半",
+      "jread": 3.649,
+      "jlptCoverage": 0.3248,
+      "chars": 438,
+      "date": "2008-05-08",
+      "flags": [
+        "JLPT-lexicon coverage under 35% — name/notation-heavy for any band"
+      ]
+    }
+  ]
+}

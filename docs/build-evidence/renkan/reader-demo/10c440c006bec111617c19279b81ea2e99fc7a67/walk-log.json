@@ -1,0 +1,740 @@
+{
+  "campaign": "RENKAN one-push 2026-08-16 · Wave C · C1 reader demonstration",
+  "product": "Bunki corridor prototype (KAIRO) — prototypes/corridor",
+  "coordinate": {
+    "gitSha": "10c440c006bec111617c19279b81ea2e99fc7a67",
+    "gitTree": "115b3a0b813787ca5ee18af715aecf5a54036270",
+    "branch": "claude/renkan-one-push-2026-08-16",
+    "workingTreeClean": true,
+    "workingTreeNote": "clean apart from this evidence dir",
+    "serveMode": "python3 -m http.server 8907 --bind 127.0.0.1 (cwd: prototypes/corridor, static, unmodified tree)",
+    "url": "http://127.0.0.1:8907/index.html?ui=bi&entry=shelf",
+    "browser": "playwright-core chromium (headless), executable /opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    "viewportPrimary": "390x844, deviceScaleFactor 3, mobile emulation with touch (iPhone 12/13/14 class)",
+    "viewportSpotCheck": "320x568, deviceScaleFactor 2, mobile emulation with touch (iPhone SE 1st-gen class)",
+    "learnerState": "cold open — empty localStorage; every later stage builds on the state the walk itself created",
+    "generatedAt": "2026-08-16T13:24:00.321Z"
+  },
+  "honesty": {
+    "webVerifiedOnly": true,
+    "physicalDevice": false,
+    "deployedUrl": false,
+    "audio": "the corridor reader has NO audio implementation (rubric §3.4) — no audio stage exists to walk",
+    "note": "headless Chromium mobile emulation on a local static server; not a physical-iPhone audit and not a deployed-URL receipt"
+  },
+  "fixedChoices": {
+    "flagship": {
+      "id": "bunki-graded-n3-zoka-sanjin-morning",
+      "title": "造化三神に出会う朝",
+      "lane": "段階別読み物 · Bunki · 検収前 (human-review-pending)"
+    },
+    "approved": {
+      "id": "wikinews:1403",
+      "title": "世界自然遺産に7箇所を追加 知床半島も",
+      "lane": "ウィキニュース CC BY 2.5 (approved lane)"
+    },
+    "ladderToken": {
+      "index": 0,
+      "word": "朝"
+    },
+    "captureToken": {
+      "index": 282,
+      "word": "結論"
+    }
+  },
+  "stages": [
+    {
+      "n": 1,
+      "id": "cold-open-shelf",
+      "title": "cold open of the bookshelf at 390×844 (?ui=bi)",
+      "screenshots": [
+        "01-cold-open-shelf-top-390x844.png",
+        "01-cold-open-shelf-graded-section-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "cold open lands on the bookshelf",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "learner state is cold (no taken items, no srs, no revlog)",
+          "status": "PASS",
+          "detail": "store=absent"
+        },
+        {
+          "name": "shelf renders category sections",
+          "status": "PASS",
+          "detail": "sections: ニュースnews | 青空文庫Aozora Bunko | やさしい日本語 用語集the plain-Japanese glossary — one-line definitions | 段階別読み物graded readings | 随筆essays | 古典・一次資料classics & primary sources"
+        },
+        {
+          "name": "段階別読み物 (graded readings) section present",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "ニュース (news) section present",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "EN titles rendered under ?ui=bi",
+          "status": "PASS",
+          "detail": "82 EN titles on 82 cards"
+        },
+        {
+          "name": "every shelf card carries an EN title",
+          "status": "PASS",
+          "detail": "82/82"
+        },
+        {
+          "name": "検収前 (pre-acceptance) marks visible on unapproved cards",
+          "status": "PASS",
+          "detail": "42 cards marked 検収前"
+        },
+        {
+          "name": "shelf intro line",
+          "status": "INFO",
+          "detail": "72 real texts, and a 10-entry glossary. Tap one to read it."
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 2,
+      "id": "open-approved-article",
+      "title": "approved lane: a wikinews article opens with its full body",
+      "screenshots": [
+        "02-open-approved-article-reader-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "reader title matches the index exactly",
+          "status": "PASS",
+          "detail": "h1=\"世界自然遺産に7箇所を追加 知床半島も\""
+        },
+        {
+          "name": "article body loads as interactive tokens",
+          "status": "PASS",
+          "detail": "715 tokens rendered"
+        },
+        {
+          "name": "attribution + licence present at body end",
+          "status": "PASS",
+          "detail": "ja.wikinews contributors, CC BY 2.5"
+        },
+        {
+          "name": "approved lane labeled (no 検収前 mark)",
+          "status": "PASS",
+          "detail": "eyebrow=\"ウィキニュース\""
+        },
+        {
+          "name": "back returns to the shelf at the same scroll position",
+          "status": "PASS",
+          "detail": "before=0px after=0px"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 3,
+      "id": "open-flagship-article",
+      "title": "the flagship 検収前 reading opens (bunki-graded-n3-zoka-sanjin-morning)",
+      "screenshots": [
+        "03-open-flagship-article-reader-top-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "reader title matches the index exactly",
+          "status": "PASS",
+          "detail": "h1=\"造化三神に出会う朝\""
+        },
+        {
+          "name": "検収前 provenance carried into the reader",
+          "status": "PASS",
+          "detail": "eyebrow=\"段階別読み物 · Bunki · 検収前\""
+        },
+        {
+          "name": "full 703-token body rendered",
+          "status": "PASS",
+          "detail": "703 tokens"
+        },
+        {
+          "name": "level line",
+          "status": "INFO",
+          "detail": "Upper intermediate中級後半 · ~1 in 4 words beyond JLPT vocab"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 4,
+      "id": "dial-kanji",
+      "title": "文字設定: the kanji dial (すべて仮名)",
+      "screenshots": [
+        "04-dial-kanji-all-kana-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "dial reflects the choice (aria-pressed)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "図書 renders as kana としょ in all-kana mode",
+          "status": "PASS",
+          "detail": "token 2 = \"としょ\""
+        },
+        {
+          "name": "dial returns — そのまま restores 図書",
+          "status": "PASS",
+          "detail": "token 2 = \"図書としょ\""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 5,
+      "id": "dial-furigana",
+      "title": "文字設定: the furigana dial (つねに)",
+      "screenshots": [
+        "05-dial-furigana-furigana-always-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "ふりがな つねに shows readings across the body",
+          "status": "PASS",
+          "detail": "263 visible rt elements"
+        },
+        {
+          "name": "ふりがな 触れて hides readings until touched",
+          "status": "PASS",
+          "detail": "263 hidden rt elements"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 6,
+      "id": "dial-spacing",
+      "title": "文字設定: the spacing dial (文節 → 語の間 → なし)",
+      "screenshots": [
+        "06-dial-spacing-spacing-bunsetsu-390x844.png",
+        "06-dial-spacing-spacing-words-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "文節 groups the text into phrase units",
+          "status": "PASS",
+          "detail": "299 phrase groups"
+        },
+        {
+          "name": "語の間 word spacing applies",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "なし restores the unspaced text",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 7,
+      "id": "tap-ladder",
+      "title": "the progressive tap ladder on 「朝」: furigana → gloss → plain",
+      "screenshots": [
+        "07-tap-ladder-tap1-furigana-390x844.png",
+        "07-tap-ladder-tap2-gloss-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "before any tap the reading is hidden (ふりがな 触れて)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "FINDING · overlapping 44px hit regions",
+          "status": "INFO",
+          "detail": "the geometric center of narrow token 0「朝」resolves to its DOM-later neighbour (BUTTON.tok plain particle); the tap landed at fx=0.35 instead. Adjacent expanded hit regions overlap and the later token wins — a center-tap on a one-kanji word can fall on the following (inert) particle."
+        },
+        {
+          "name": "tap 1 lifts the furigana",
+          "status": "PASS",
+          "detail": "rt=\"あさ\""
+        },
+        {
+          "name": "tap 2 opens the English gloss beneath",
+          "status": "PASS",
+          "detail": "gloss=\"morning\""
+        },
+        {
+          "name": "tap 3 closes the circle back to plain kanji",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 8,
+      "id": "quick-look",
+      "title": "long-press on 「結論」 floats the mini dictionary",
+      "screenshots": [
+        "08-quick-look-mini-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "the token offers a point a finger can hold",
+          "status": "PASS",
+          "detail": "{\"x\":120.6875,\"y\":422.03125,\"fx\":0.5,\"fy\":0.5,\"centerOwn\":true,\"centerHit\":\"BUTTON.tok content\"}"
+        },
+        {
+          "name": "mini names the held word",
+          "status": "PASS",
+          "detail": "word=\"結論\""
+        },
+        {
+          "name": "mini carries reading + simple definition",
+          "status": "PASS",
+          "detail": "reading=\"けつろん\" gloss=\"conclusion (of an argument, discussion, study, etc.)\""
+        },
+        {
+          "name": "mini carries the 覚 seal and the full-entry door",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 9,
+      "id": "full-entry",
+      "title": "the mini opens into the full dictionary entry",
+      "screenshots": [
+        "09-full-entry-entry-sheet-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "full entry sheet opens for the word",
+          "status": "PASS",
+          "detail": "data-node=\"word:結論\""
+        },
+        {
+          "name": "sheet carries its own 覚 seal (top-right) and 戻る",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "entry shows reading and senses",
+          "status": "PASS",
+          "detail": "reading けつろん present in entry"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 10,
+      "id": "back-restores-context",
+      "title": "戻る returns to the article at the same scroll position",
+      "screenshots": [],
+      "assertions": [
+        {
+          "name": "sheet closed back into the reader",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "scroll position restored (≤20px)",
+          "status": "PASS",
+          "detail": "before=1559px after=1559px"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 11,
+      "id": "capture-top-right",
+      "title": "覚える (top-right) captures the word with its sentence; scope choice offered",
+      "screenshots": [
+        "11-capture-top-right-capture-panel-390x844.png",
+        "11-capture-top-right-capture-scope-para-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "the top-right 覚える door is armed for the touched word",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "capture panel opens under the seal",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "scope stages offered: 語だけ · この文 · 段落ごと",
+          "status": "PASS",
+          "detail": "[{\"scope\":\"word\",\"on\":false},{\"scope\":\"sent\",\"on\":true},{\"scope\":\"para\",\"on\":false}]"
+        },
+        {
+          "name": "この文 (sentence) is the default capture scope",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "S.taken gained the word with its context (ctx {p,i,scope})",
+          "status": "PASS",
+          "detail": "taken={\"t\":\"word\",\"id\":\"結論\",\"label\":\"結論\",\"kind\":\"語\",\"kindEn\":\"word\",\"from\":{\"passage\":\"bunki-graded-n3-zoka-sanjin-morning\",\"index\":282},\"ts\":1786886655350,\"started\":1786886655350,\"ctx\":{\"p\":\"bunki-graded-n3-zoka-sanjin-morning\",\"i\":282,\"scope\":\"sent\"}}"
+        },
+        {
+          "name": "capture is start-marked (no hidden debt semantics)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "scope choice commits — 段落ごと widens the stored ctx",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "scope choice returns — この文 narrows the stored ctx back",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "tap outside closes the panel; the seal shows taken",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "the captured word carries the learning under-ink in the text",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 12,
+      "id": "tray",
+      "title": "the lists tray: one captured item, review offered",
+      "screenshots": [
+        "12-tray-tray-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "tray counts the one captured item",
+          "status": "PASS",
+          "detail": "title=\"Memorizing 1 item\""
+        },
+        {
+          "name": "復習する offers the due session",
+          "status": "PASS",
+          "detail": "復習する — 1 件review now — 1 due"
+        },
+        {
+          "name": "forecast line",
+          "status": "INFO",
+          "detail": "today 0 · tomorrow 0 · this week 0 · new 1"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 13,
+      "id": "review-front",
+      "title": "review opens zen: the captured sentence asks, declaration gates the answer",
+      "screenshots": [
+        "13-review-front-front-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "zen review room (world recedes)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "the card asks inside the captured sentence (cloze)",
+          "status": "PASS",
+          "detail": "ctx {p,i,scope:sent} resolved from the article"
+        },
+        {
+          "name": "the blank holds the word’s place (target hidden before reveal)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "想起の二道: 思い出した / まだ gate the reveal — no bare answer button",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 14,
+      "id": "review-answer",
+      "title": "思い出した turns the card: all four grades open",
+      "screenshots": [
+        "14-review-answer-answer-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "declaration recorded — grade row opens declared=recalled",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "all four honest grades stand (再・難・良・易)",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "answer face: word, reading, senses",
+          "status": "PASS",
+          "detail": "{\"front\":\"結論\",\"reading\":\"けつろん\",\"senses\":2}"
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 15,
+      "id": "review-sentence-door",
+      "title": "the answer face’s ▹ door: what exists, asserted honestly",
+      "screenshots": [
+        "15-review-sentence-door-sentence-page-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "the captured sentence carries its ▹ door on the answer face",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "the door opens the sentence page, naming its source",
+          "status": "PASS",
+          "detail": "source line=\"段階別読み物 · Bunki · 検収前\""
+        },
+        {
+          "name": "a door from the review answer face to the FULL article exists",
+          "status": "FAIL",
+          "detail": "PRODUCT GAP (recorded honestly): the ▹ door opens the sentence on its own page with its source label, but no control walks on to the full article body (rubric §9.5 \"Review answer snapshot returns to the source sentence and article\" — only the sentence half exists)"
+        },
+        {
+          "name": "戻る returns to the review answer face, state intact",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "FAIL"
+    },
+    {
+      "n": 16,
+      "id": "grade-good",
+      "title": "良 (Good) commits: FSRS learning steps honoured, revlog rows written",
+      "screenshots": [
+        "16-grade-good-session-done-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "the first grade wrote its revlog row",
+          "status": "PASS",
+          "detail": "revlog rows: 1"
+        },
+        {
+          "name": "revlog row shape: [ts, key, rating, stBefore, elapsed, r, sBefore, dBefore, sAfter, dAfter, ivl, dueAfter]",
+          "status": "PASS",
+          "detail": "[1786886660316,\"word:結論\",3,0,null,null,null,null,2.3065,2.1181,0,1786887260316]"
+        },
+        {
+          "name": "the row’s instant is real (ts ≈ now, dueAfter > ts)",
+          "status": "PASS",
+          "detail": "ts=1786886660316 dueAfter=1786887260316 (+10min)"
+        },
+        {
+          "name": "learning step honoured",
+          "status": "INFO",
+          "detail": "Good on the new card scheduled a same-session learning step (due +10min); the session pulled the re-inserted pass early (learn-ahead) and the same card asks again — the sitting ends when the card graduates"
+        },
+        {
+          "name": "one revlog row per grade pressed",
+          "status": "PASS",
+          "detail": "2 rows for 2 grades"
+        },
+        {
+          "name": "revlog instants are monotonic and all rows name the card",
+          "status": "PASS",
+          "detail": "1786886660316 → 1786886661299"
+        },
+        {
+          "name": "FSRS card state persisted with a future due",
+          "status": "PASS",
+          "detail": "{\"due\":\"2026-08-18T13:24:21.299Z\",\"stability\":2.3065,\"difficulty\":2.11121424,\"elapsed_days\":0,\"scheduled_days\":2,\"reps\":2,\"lapses\":0,\"learning_steps\":0,\"state\":2,\"last_review\":\"2026-08-16T13:24:21.299"
+        },
+        {
+          "name": "the day’s stats counted the reviews",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "session closes honestly, counting grades pressed",
+          "status": "PASS",
+          "detail": "\"Session done — 2 cards\" after 2 grades"
+        },
+        {
+          "name": "リストへ returns to the tray",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 17,
+      "id": "export-envelope",
+      "title": "書き出す: the record leaves as the v:1 envelope",
+      "screenshots": [
+        "17-export-envelope-port-row-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "envelope version v:1",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "envelope carries the learner-state keys",
+          "status": "PASS",
+          "detail": "keys: v,taken,lists,srs,revlog,obslog,deepWords,lessonsDone,aiReading,aiReadings,suspended,aiChat,ai,stats,srsPrefs,readDone,readerPos,dials"
+        },
+        {
+          "name": "envelope content matches the walk (1 taken · 1 srs card · one revlog row per grade)",
+          "status": "PASS",
+          "detail": "taken=1 srs=1 revlog=2 grades=2"
+        },
+        {
+          "name": "export stamped stats.lastExportTs",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 18,
+      "id": "device-back",
+      "title": "device Back walks the app’s own stack, one level, sentinel-armed",
+      "screenshots": [
+        "18-device-back-back1-reader-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "the history sentinel is armed while there is anywhere to walk",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "Back 1: tray → the article it was opened from (not the shelf)",
+          "status": "PASS",
+          "detail": "crumb=\"bookshelf › 造化三神に出会う朝\""
+        },
+        {
+          "name": "Back 2: reader → shelf",
+          "status": "PASS",
+          "detail": ""
+        },
+        {
+          "name": "shelf scroll context restored after the walk",
+          "status": "PASS",
+          "detail": "left at 13277px, returned to 13277px"
+        },
+        {
+          "name": "at home the sentinel is consumed — the next Back would honestly leave the app",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 19,
+      "id": "reload-resume",
+      "title": "reload mid-article: the bookmark survives, position restored ≤20px",
+      "screenshots": [
+        "19-reload-resume-resumed-390x844.png"
+      ],
+      "assertions": [
+        {
+          "name": "scroll bookmark persisted to the store",
+          "status": "PASS",
+          "detail": "readerPos=1600"
+        },
+        {
+          "name": "reload lands on the front door (view is session state, the bookmark is store state)",
+          "status": "INFO",
+          "detail": "the shelf card now carries the 途中 in-progress mark"
+        },
+        {
+          "name": "the shelf remembers: 途中 (in progress) on the card",
+          "status": "PASS",
+          "detail": "meta=\"段階別読み物 · Bunki · 検収前Bunki original途中 in progress\""
+        },
+        {
+          "name": "reopening restores the exact position (≤20px)",
+          "status": "PASS",
+          "detail": "saved=1600px resumed=1600px"
+        },
+        {
+          "name": "the same sentence is at the top of the glass",
+          "status": "PASS",
+          "detail": "anchor token 220 → resumed token 220"
+        },
+        {
+          "name": "the captured word still carries its under-ink after reload",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "n": 20,
+      "id": "spot-320",
+      "title": "320×568 spot check: shelf and reader hold the small glass",
+      "screenshots": [
+        "20-spot-320-shelf-320x568.png",
+        "20-spot-320-reader-320x568.png"
+      ],
+      "assertions": [
+        {
+          "name": "shelf: no horizontal overflow at 320px",
+          "status": "PASS",
+          "detail": "overflow=0px"
+        },
+        {
+          "name": "reader: no horizontal overflow at 320px",
+          "status": "PASS",
+          "detail": "overflow=0px"
+        },
+        {
+          "name": "reader title correct at 320px",
+          "status": "PASS",
+          "detail": ""
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "console": [],
+  "requestFailures": [],
+  "totals": {
+    "stages": 20,
+    "stagesPass": 19,
+    "stagesFail": 1,
+    "assertions": 86,
+    "assertionsPass": 85,
+    "assertionsFail": 1
+  }
+}

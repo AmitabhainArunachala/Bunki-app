@@ -1,22 +1,42 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "22d6d9f3eee013161e19e5ad4dc0dcaa69e5c9e7",
+  "head": "d07415fdb851763d983905eaf27b44d5e52fbda9",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
   },
   "summary": {
-    "total": 42,
-    "passed": 42,
+    "total": 46,
+    "passed": 46,
     "failed": 0
   },
   "results": [
     {
+      "name": "no interactive control nests inside another anywhere on the shelf",
+      "pass": true,
+      "detail": "{\"cards\":82,\"nestedInteractive\":0,\"cardsWithOwnDoor\":82,\"cardsWithSiblingDetails\":82}"
+    },
+    {
+      "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
+      "pass": true,
+      "detail": "82/82 text doors · 82/82 sibling toggles"
+    },
+    {
+      "name": "hidden layers keep no tabbable control (the invisible 閉じる × discipline)",
+      "pass": true,
+      "detail": "every tab stop is visible"
+    },
+    {
+      "name": "first Tab at the galaxy home lands on a real, visible control",
+      "pass": true,
+      "detail": "{\"id\":\"ginga-symbol\",\"opacity\":1,\"w\":46,\"h\":46}"
+    },
+    {
       "name": "reader words are named native controls on the common target.activate action",
       "pass": true,
-      "detail": "{\"words\":344,\"particles\":144,\"nativeButtons\":344,\"named\":344,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
+      "detail": "{\"words\":348,\"particles\":144,\"nativeButtons\":348,\"named\":348,\"actionKinds\":[\"target.activate\"],\"hitFloor\":44}"
     },
     {
       "name": "inline reader controls retain a real 44px hit region without widening print",
@@ -41,7 +61,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "497 named button(s) in the accessibility tree"
+      "detail": "549 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",
@@ -51,7 +71,7 @@
     {
       "name": "second-action English preserves the glyph anchor within 2px",
       "pass": true,
-      "detail": "565.9px → 565.9px"
+      "detail": "637.5px → 637.5px"
     },
     {
       "name": "pointer third target.activate closes the circle — plain kanji, no sheet",
@@ -86,7 +106,7 @@
     {
       "name": "entry sheet is a named modal dialog and receives focus",
       "pass": true,
-      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":13}"
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":30}"
     },
     {
       "name": "Tab is contained inside the modal sheet",

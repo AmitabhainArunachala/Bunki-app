@@ -111,13 +111,26 @@ def load_jlpt_lexicon() -> tuple[dict, dict]:
             k = bc.kata_to_hira(word)
             if level > kana.get(k, 0):
                 kana[k] = level
+        # the deck writes many everyday words in their dictionary orthography
+        # (為る, 在る, 居る, 沢山) while the tokenizer's base form is the kana
+        # the text actually uses (する, ある, いる, たくさん). A kana-written
+        # token IS the deck's word, so the kana map must index the deck's
+        # readings too — without this, the most common verbs of the language
+        # count as "beyond JLPT" and the coverage signal flatlines near 0.5
+        # on every card (R3-E; hunt lens reader-experience, round 2).
+        if reading:
+            k = bc.kata_to_hira(str(reading))
+            if level > kana.get(k, 0):
+                kana[k] = level
     return ortho, kana
 
 
 def jlpt_signal(tokens: list[dict], ortho: dict, kana: dict) -> dict:
-    """Coverage + band vector over content tokens, base-form matching only
-    (reading-only matches for kanji-written tokens are NOT attempted — the
-    same homophone conservatism as the NINJAL matcher)."""
+    """Coverage + band vector over content tokens, base-form matching only.
+    A kana-WRITTEN base form may match a deck entry by reading (the word on
+    the page is the kana word itself); reading-only matches for kanji-written
+    tokens are NOT attempted — the same homophone conservatism as the NINJAL
+    matcher."""
     content = [t for t in tokens if t["c"]]
     if not content:
         return {
@@ -232,7 +245,9 @@ def collect_articles() -> list[dict]:
                 "licence": "PD (著作権フラグ なし) · 新字新仮名",
                 "attribution": f"青空文庫 {meta.get('author', '')}「{rec['title']}」",
                 "url": meta.get("card_url", ""),
-                "date": str(meta.get("first_published", "")),
+                # first_published may be an honest null — never serialize the
+                # word "None" onto a learner-facing card (R3-E)
+                "date": str(meta.get("first_published") or ""),
                 "rubySource": "tokenizer",
             }
         )
@@ -404,6 +419,145 @@ def build_archive(out: Path) -> int:
     return 0
 
 
+def remint_readings(out: Path) -> int:
+    """Re-mint ONLY token readings for the curated shelf (RENKAN R3-A).
+
+    For every index row whose ruby comes from the tokenizer, the tokens are
+    recomputed through the SAME pinned pipeline (now carrying the committed
+    reading-override lexicon) and written back IFF only readings changed.
+    Everything else — text, split, bases, POS, content flags, paragraph
+    starts, grading, index rows — must come back identical, or the re-mint
+    refuses to touch the file. Deterministic and idempotent; articles with
+    source ruby (rubySource:"markup") are never touched.
+    """
+    from corpus.grading._mecab import get_tagger
+
+    tagger = get_tagger()
+    index = json.loads((out / "index.json").read_text("utf-8"))
+    reminted = 0
+    for row in index["articles"]:
+        if str(row.get("file", "")).startswith("archive/"):
+            continue
+        if row.get("rubySource") != "tokenizer":
+            continue
+        path = out / row["file"]
+        body = json.loads(path.read_text("utf-8"))
+        tokens, paras = tokenise_paragraphs(body["text"], tagger)
+        if paras != body["paras"] or len(tokens) != len(body["tokens"]):
+            raise SystemExit(
+                f"{row['id']}: token stream shape changed — this is not a "
+                "readings-only re-mint; refusing to write"
+            )
+        merged: list[dict] = []
+        changed = 0
+        for fresh, old in zip(tokens, body["tokens"]):
+            if any(fresh[k] != old[k] for k in ("s", "b", "p")):
+                raise SystemExit(
+                    f"{row['id']}: split/base/POS drifted at {old['s']!r} — "
+                    "refusing to write"
+                )
+            # Adopt fresh reading fields ONLY where the override lexicon
+            # spoke (rs:"lexicon"). Everything else keeps its committed
+            # bytes: ambient tokenizer-version drift (七 しち→なな, 何
+            # なに→なん …) and the graded `c` flag are NOT this pass's to
+            # rewrite — a readings re-mint must never smuggle in a broad
+            # re-tokenisation or a grading change.
+            if fresh.get("rs") == "lexicon" and (
+                old.get("r") != fresh["r"]
+                or old.get("f") != fresh["f"]
+                or old.get("rs") != "lexicon"
+            ):
+                tok = {
+                    "s": old["s"],
+                    "b": old["b"],
+                    "p": old["p"],
+                    "r": fresh["r"],
+                    "f": fresh["f"],
+                    "c": old["c"],
+                    "rs": "lexicon",
+                }
+                changed += 1
+            else:
+                tok = old
+            merged.append(tok)
+        if merged == body["tokens"]:
+            continue
+        body["tokens"] = merged
+        path.write_text(
+            json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8"
+        )
+        reminted += 1
+        print(f"    {row['id']:>34}  {changed} token readings re-minted")
+    print(f"· readings re-mint: {reminted} articles touched, bodies otherwise byte-stable")
+
+def regrade_jlpt(out: Path) -> int:
+    """Recompute ONLY grading.signals.jlpt_lexicon on every committed article
+    body (curated shelf + archive) from the tokens already on disk, and carry
+    the fresh signal into the two indexes. Nothing else is re-minted: tokens,
+    furigana, jreadability and the NINJAL pair (which this environment cannot
+    regenerate) ride through untouched. Also normalizes any stringified-None
+    date to an honest absence while each record is open (R3-E)."""
+    jlpt_maps = load_jlpt_lexicon()
+
+    def fix_date(record: dict) -> bool:
+        if record.get("date") == "None":
+            record["date"] = ""
+            return True
+        return False
+
+    def regrade_body(path: Path) -> dict:
+        body = json.loads(path.read_text("utf-8"))
+        body["grading"]["signals"]["jlpt_lexicon"] = jlpt_signal(body["tokens"], *jlpt_maps)
+        fix_date(body)
+        path.write_text(json.dumps(body, ensure_ascii=False, separators=(",", ":")), "utf-8")
+        return body
+
+    index_path = out / "index.json"
+    index = json.loads(index_path.read_text("utf-8"))
+    dates_fixed = 0
+    for row in index["articles"]:
+        body = regrade_body(out / row["file"])
+        # the curated row carries the FULL grading — keep it byte-identical
+        # to the body it summarizes
+        row["grading"] = body["grading"]
+        if fix_date(row):
+            dates_fixed += 1
+    index_path.write_text(json.dumps(index, ensure_ascii=False, indent=1), "utf-8")
+    print(f"· regraded jlpt_lexicon on {len(index['articles'])} curated articles" + (f" · {dates_fixed} stringified-None date(s) cleared" if dates_fixed else ""))
+
+    archive_index_path = out / "archive-index.json"
+    if archive_index_path.exists():
+        archive_index = json.loads(archive_index_path.read_text("utf-8"))
+        listed = set()
+        for row in archive_index["articles"]:
+            listed.add(row["file"])
+            body = regrade_body(out / row["file"])
+            jl = body["grading"]["signals"]["jlpt_lexicon"]
+            row["grading"]["signals"]["jlpt_lexicon"] = {
+                "coverage": jl["coverage"],
+                "substrate": jl.get("substrate"),
+            }
+            fix_date(row)
+        archive_index_path.write_text(
+            json.dumps(archive_index, ensure_ascii=False, separators=(",", ":")), "utf-8"
+        )
+        # bodies preserved through a shelf promotion sit on disk unlisted —
+        # keep them coherent with the same live matcher
+        curated_files = {row["file"] for row in index["articles"]}
+        unlisted = [
+            p
+            for p in sorted((out / "archive").glob("*.json"))
+            if f"archive/{p.name}" not in listed and f"archive/{p.name}" not in curated_files
+        ]
+        for path in unlisted:
+            regrade_body(path)
+        print(
+            f"· regraded jlpt_lexicon on {len(archive_index['articles'])} archive articles"
+            + (f" + {len(unlisted)} unlisted preserved bodies" if unlisted else "")
+        )
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(CORRIDOR / "data" / "articles"))
@@ -412,9 +566,24 @@ def main() -> int:
         action="store_true",
         help="mint the wikinews archive tranche (articles/archive/ + archive-index.json) instead of the curated shelf",
     )
+    ap.add_argument(
+        "--remint-readings",
+        action="store_true",
+        help="re-mint ONLY token readings for curated tokenizer-ruby articles (reading-override lexicon pass); text, splits, grading and index rows stay untouched",
+    )
+    ap.add_argument(
+        "--regrade-jlpt",
+        action="store_true",
+        help="recompute only the jlpt_lexicon signal on every committed body + index row from the tokens already on disk",
+    )
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    if args.remint_readings:
+        return remint_readings(out)
+
+    if args.regrade_jlpt:
+        return regrade_jlpt(out)
     if args.archive:
         return build_archive(out)
 

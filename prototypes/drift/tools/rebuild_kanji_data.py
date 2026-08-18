@@ -10,6 +10,13 @@
 #   - Readings show the FULL on/kun sets (katakana on, kun with okurigana),
 #     so no single archaic kun is presented as the reading. Plus curated
 #     corrections for the named cases (旺 / 頑 / 頒).
+#     NOTE (RENKAN E3, 2026-08-16): this header said FULL while the code
+#     sliced [:3], and the shipped prototypes/corridor/data/share_alike/
+#     kanji.json still carries those three-reading sets — the quiet room
+#     therefore labels three readings 音読み/訓読み for characters that have
+#     more (生 most visibly). The slices are gone from this builder, but
+#     regenerating the data needs the KANJIDIC2-derived KANJI_SRC, which is
+#     not in this repository. Operator decision sheet: OD-21.
 #   - KRAD components from KanjiVG for every lexicon kanji, so
 #     word -> kanji -> radical navigation completes.
 #   - RADK component families preserved (they are "contains this component"
@@ -112,7 +119,11 @@ KINFO, KRAD = {}, {}
 no_reading = []
 for ch in sorted(targets):
     v = kj.get(ch)
-    on = "・".join(kata(r) for r in (v.get("readings_on") or [])[:3]) if v else ""
+    # complete sets, never arbitrarily truncated (constitution §6). The old
+    # [:3] slices were a display convenience that reached the DATA, so the
+    # quiet room labelled three readings 音読み/訓読み for characters that have
+    # many more — 生 above all (E3 round-A, writing-room lens).
+    on = "・".join(kata(r) for r in (v.get("readings_on") or [])) if v else ""
     if ch in KUN_OVERRIDE:
         kun = KUN_OVERRIDE[ch]
     elif v:
@@ -121,7 +132,7 @@ for ch in sorted(targets):
             c = clean_kun(r)
             if c and c not in kept:  # affix-stripping can collapse -す.ぎる and す.ぎる
                 kept.append(c)
-        kun = "・".join(kept[:3])
+        kun = "・".join(kept)
     else:
         kun = ""
     mean = ((v.get("meanings") or [""])[0] if v else "")[:36]

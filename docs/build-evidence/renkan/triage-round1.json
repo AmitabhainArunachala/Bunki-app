@@ -1,0 +1,589 @@
+{
+ "source": "RENKAN round-1 triage (5 lenses) vs head e335ab7+campaign",
+ "total": 83,
+ "findings": [
+  {
+   "id": "P1-12",
+   "title": "?entry=shelf summons the operator debug strip which swallows taps",
+   "status": "FIXED",
+   "evidence": "Commit d6d5c91 'corridor: ?entry=shelf is a front door, not a debug switch' (ancestor of HEAD). Current code prototypes/corridor/corridor.js:1787-1799 iterates VARIANTS keys but explicitly excludes 'entry' from setting anyVariantParam ('if (key !== \"entry\") anyVariantParam = true;'), with an in-code comment citing the three review lanes; the strip is now reachable only via explicit ?variants=1. The same fix is present in the rebuilt corridor-standalone.html (grep for the 'must never summon' comment hits).",
+   "anchors": "prototypes/corridor/corridor.js:1787-1799; commit d6d5c91",
+   "note": "The debug strip itself still exists (renderVariants at corridor.js:10378) but is opt-in only."
+  },
+  {
+   "id": "P1-13",
+   "title": "30 finished Bunki originals stranded on unmerged codex branches, shelf stuck at 40",
+   "status": "FIXED",
+   "evidence": "prototypes/corridor/data/articles/index.json now lists 70 articles (verified by parsing), 30 of them carrying the 検収前 provenance flag; every id has a body file on disk. Landed via commits 1606a1e 'feat: re-land native readings' and 774f1dc 'recovered 30: visible 検収前 provenance flags + authored English titles', merged to main through PR #73 (merge commit e335ab7) — the 'no PR' complaint is also resolved.",
+   "anchors": "prototypes/corridor/data/articles/index.json (70 records); commits 1606a1e, 774f1dc, e335ab7"
+  },
+  {
+   "id": "P1-14",
+   "title": "Standalone single-file build lacks the 30 new articles",
+   "status": "FIXED",
+   "evidence": "Commit 49efa25 'standalone: rebuild after TITLES_EN addition' regenerated prototypes/corridor/corridor-standalone.html. Verified in the current file: all 30 検収前-flagged article ids are present, and a sampled body text snippet (朝の図書館で『古事記』を開くと…) is embedded, confirming bodies — not just index entries — are bundled.",
+   "anchors": "prototypes/corridor/corridor-standalone.html; commit 49efa25"
+  },
+  {
+   "id": "P1-15",
+   "title": "Revlog is written 'for the FSRS optimizer' but nothing reads it",
+   "status": "OPEN",
+   "evidence": "Every S.revlog reference in current corridor.js is load/persist or append: load at 954, persist at 982, grade-row append at 6279-6283 (commitStandardGrade), undo-revocation append at 6835-6836. No optimizer, analytics, forecast, or replay consumer reads the rows anywhere in the repo; the only other revlog code is shape validation in tools/verify-corridor-storage-integrity.mjs (an integrity test, not a consumer). FSRS parameters remain population defaults from the pin.",
+   "anchors": "prototypes/corridor/corridor.js:954, 982, 6279-6283, 6835-6836"
+  },
+  {
+   "id": "P1-16",
+   "title": "Session time budget hardcoded at 12 minutes, no UI for the learner's chosen time",
+   "status": "OPEN",
+   "evidence": "apps/app/src/screens/session-screen.tsx:83 still has 'timeBudgetMin = 12' as the prop default, and the only caller, apps/app/app/(session)/session.tsx (SessionScreen invocation at ~lines 42-55), never passes timeBudgetMin — it only sets newBudget for the guided route. No settings/picker UI for the budget exists anywhere in apps/app.",
+   "anchors": "apps/app/src/screens/session-screen.tsx:83; apps/app/app/(session)/session.tsx:42-55"
+  },
+  {
+   "id": "P1-17",
+   "title": "Lookup-friction channel (T-07) fires only on the scripted golden route",
+   "status": "OPEN",
+   "evidence": "The only dispatcher of the recordLookupFriction command outside store plumbing and tests is still apps/app/src/data/golden-source.ts:193-201 (goldenLookupCommand). Grep over all apps/app/src/**/*.tsx screens finds zero dispatches; the command exists in store.ts:283/452 and memory-store.ts:692/1172 but no real lookup surface calls it, so real learners' lookups still record nothing.",
+   "anchors": "apps/app/src/data/golden-source.ts:193-201; apps/app/src/state/store.ts:283"
+  },
+  {
+   "id": "P1-18",
+   "title": "Two divergent contract-creation lineages (validated activateLearn vs compatibility mint)",
+   "status": "OPEN",
+   "evidence": "bootstrapSessionWorkspace in apps/app/src/screens/session-loop.ts still branches: durableContractsFor (line 497, fed by the activateLearn path that only golden-source.ts:204-211 dispatches) versus the explicitly-labelled 'Compatibility for existing callers' mint at lines 506-527, which calls contractsFor and falls back to readingContractIdFor(lexeme) id shapes ('contract-reading-<lexeme>', line 136) — a different contract-id shape from golden-source's learnContractIdentity(threadId, spec, skill). The code comment concedes 'The A1 source route never reaches this branch', i.e. ordinary sessions still take the unvalidated lineage.",
+   "anchors": "apps/app/src/screens/session-loop.ts:497, 506-527, 136; apps/app/src/data/golden-source.ts:204-222"
+  },
+  {
+   "id": "P1-19",
+   "title": "Corridor enables FSRS fuzz against the domain determinism pin; fuzzOff has no UI or writer",
+   "status": "OPEN",
+   "evidence": "prototypes/corridor/corridor.js:1937-1947 still passes enable_fuzz: S.stats?.fuzzOff === true ? false : true — fuzz ON by default, with an in-code comment acknowledging it 'deliberately diverging from the domain pin's false'. The domain pin remains FSRS_ENABLE_FUZZ = false (packages/domain/src/reducers/fsrs-pin.ts:90). fuzzOff is still only a stored-value validator (corridor.js:784) and a test fixture (tools/verify-corridor-storage-integrity.mjs:262); no UI and no code anywhere writes it.",
+   "anchors": "prototypes/corridor/corridor.js:1937-1947, 784; packages/domain/src/reducers/fsrs-pin.ts:90",
+   "note": "The divergence is now documented as deliberate in a comment (replay stays deterministic via the seeded fuzz), but the ledger's finding — divergence from the pin plus an unreachable opt-out flag — is unchanged in code."
+  },
+  {
+   "id": "P1-20",
+   "title": "AI chat capped at 24 turns; word-tutor / examples / coach / quiz persist nothing",
+   "status": "OPEN",
+   "evidence": "prototypes/corridor/corridor.js:989 still persists 'aiChat: state.aiChat.slice(-24)' — turn 25 destroys turn 1. The tutor quiz is declared 'in-memory only' (comment at line 537). The word-tutor (7785-7790), examples (7823), and coach/reading surfaces (7867-7871, 7929) all write replies to out.textContent only and never call saveStore for the exchange; no archive (no IndexedDB, no ailog) exists in the file.",
+   "anchors": "prototypes/corridor/corridor.js:989, 537, 7787, 7871, 7929"
+  },
+  {
+   "id": "P1-21",
+   "title": "No graph memory: flat {role,text} pairs, no ids/timestamps/metadata/edges; learner model one scalar",
+   "status": "OPEN",
+   "evidence": "S.aiChat is still documented and stored as flat pairs — comment at corridor.js:535 '[{ role: \"user\"|\"tutor\", text }]', and pushes at 4256 and 4269 write exactly {role, text} with no id, timestamp, model metadata, or edges to the vocab/kanji/grammar in scope. The learner model remains the modal-JLPT scalar computed at corridor.js:7740-7747. No graph-memory structure exists anywhere in the repo.",
+   "anchors": "prototypes/corridor/corridor.js:535, 4256, 4269, 7740-7747"
+  },
+  {
+   "id": "P1-22",
+   "title": "Deployed AI calls have no timeout or abort; the engineered 10s-abort runtime serves no traffic",
+   "status": "OPEN",
+   "evidence": "aiConverse at prototypes/corridor/corridor.js:7749-7774 is a bare fetch to api.anthropic.com with no AbortController, no signal, and no timeout — a stalled request still leaves 考え中… (set at 4260, 7787, etc.) until the socket dies. The abort-capable runtime still exists unused in packages/ai/src/runtime.ts (controller at line 134, signal linking at 268); the corridor imports nothing from @bunki/ai.",
+   "anchors": "prototypes/corridor/corridor.js:7749-7774; packages/ai/src/runtime.ts:134"
+  },
+  {
+   "id": "P0-1",
+   "title": "Drift flick judgments dead-end in bunki-drift-v1 store",
+   "status": "FIXED",
+   "evidence": "Commit 02188af (分流の橋 P0, ancestor of HEAD). corridor.js:1086-1088 defines window.bunkiDriftJudgment = (kind,key,dir) => obsLog('drift', srsKey(...), dir>0?3:1); drift-layer.js:1744 calls it after each committed flick grade. obslog is persisted/exported with kairo-corridor-v1 (storeEnvelope, corridor.js:975-983) and obslog row shape validated at corridor.js:731.",
+   "anchors": "prototypes/corridor/corridor.js:1078-1088; prototypes/corridor/drift-layer.js:1744",
+   "note": "Fixed as designed: judgments land in the observation ledger as exposure evidence, deliberately NOT minting FSRS state (constitution: exposure is not mastery). If the campaign expects flicks to reach FSRS directly, that remains unbuilt by intent."
+  },
+  {
+   "id": "P0-2",
+   "title": "Dojo kanji mode mints orphaned FSRS state and burns new-card slots",
+   "status": "FIXED",
+   "evidence": "Commit 6dc03f4 (道場の礼 P0, ancestor of HEAD). corridor.js:6695-6721: grade handler computes isDrillOnly = S.focus && prevRec===undefined && item not in S.taken, and routes to commitDrillGrade (corridor.js:6271-6276) which writes ONLY an obslog row ['dojo', skey, rating] — no S.srs write, no revlog row, no S.stats nnew increment. Non-drill grades still use commitStandardGrade (6278-6294).",
+   "anchors": "prototypes/corridor/corridor.js:6271-6276, 6695-6721"
+  },
+  {
+   "id": "P1-1",
+   "title": "Galaxy chrome taps leak to open-water handler and raze constellation",
+   "status": "FIXED",
+   "evidence": "Commit ac880af (分流の岸 P1, ancestor). corridor.js:1090-1093 exports window.bunkiDriftChrome selector listing every fused ginga element (#ginga-symbol, #ginga-theme-seal, .ginga-seal, .nav-scrim, .nav-bar, .corner-bubble, .world-picker, .world-picker-scrim, #variants, #chrome). drift-layer.js:21 defines hostChrome(t) via closest(); guards at drift-layer.js:2215 (ripple) and 2320 (pointerup/flick handler): if(hostChrome(e.target)) return.",
+   "anchors": "prototypes/corridor/corridor.js:1090-1093; prototypes/corridor/drift-layer.js:21, 2215, 2320"
+  },
+  {
+   "id": "P1-2",
+   "title": "No visible way out of a galaxy dive",
+   "status": "FIXED",
+   "evidence": "Commit 4032235 (深さの橋 P1, ancestor). drift-layer.js:24 reports depth via window.bunkiDriftDepth; corridor.js:1099-1104 sets S.driftDepth and toggles body.drift-dived. corridor.css:313-317: body.ginga.drift-dived #drift-layer #hint { display:block !important } re-reveals the 水にふれると戻る hint. Nav back arrow armed: corridor.js:11194 backB.disabled = !S.stack.length && S.view==='drift' && !S.driftDepth, and navBackFromGinga (11054-11061) surfaces one level via window.bunkiDriftSurface when S.driftDepth > 0.",
+   "anchors": "prototypes/corridor/corridor.js:1096-1104, 11054-11061, 11194; prototypes/corridor/corridor.css:313-317"
+  },
+  {
+   "id": "P1-3",
+   "title": "Galaxy nav search results collapse to 71px input width",
+   "status": "FIXED",
+   "evidence": "Commit 792bb66 (ancestor). corridor.css:561-570: .nav-search-results is now position:absolute anchored to the bar with left:0; right:0 (spans the full bar, comment cites the P1 review finding), max-height 46vh with overflow-y auto. Same commit also fixed the truncated placeholder.",
+   "anchors": "prototypes/corridor/corridor.css:561-584"
+  },
+  {
+   "id": "P1-4",
+   "title": "Shelf corpus wikinews-1403 text corrupted by link-stripping",
+   "status": "PARTIAL",
+   "evidence": "Commit 2c72ab9 (ancestor) restored the three stripped country names: current data/articles/wikinews-1403.json reads 「危機遺産リストから取り消されたのは、エクアドルのサンガイ国立公園、マリのトンブクトゥ、アルバニアのブトリントである。」— the dangling-の defect is gone; index.json chars re-pinned 1220→1237.",
+   "anchors": "prototypes/corridor/data/articles/wikinews-1403.json",
+   "note": "The ledger's second, 'likely lost を' item was NOT repaired: current text still reads 「日本の知床半島（北海道）含め」 (no を before 含め), matching the suspected link-stripping loss. Minor, but the finding is not fully closed."
+  },
+  {
+   "id": "P1-5",
+   "title": "Dictionary homograph rows replace stack top instead of pushing",
+   "status": "FIXED",
+   "evidence": "Commit 952dbc7 (ancestor). corridor.js:8297-8315: homograph choice handler now does S.stack.push({t:'word', id:headForm, seq, reading, from}) — comment states 'a homograph is a DOOR, not a correction: it PUSHES, so ← 戻る returns to the entry the learner was reading'. Also guards by content, not object identity, against async stack-top replacement.",
+   "anchors": "prototypes/corridor/corridor.js:8297-8315"
+  },
+  {
+   "id": "P1-6",
+   "title": "Back from deeper dictionary page rerenders parent at scrollTop 0",
+   "status": "FIXED",
+   "evidence": "Commit 34c0176 (ancestor). corridor.js:10300-10310: sheet scroll is tracked continuously via a passive listener onto the stack-top node (node.sheetScroll = sheet.scrollTop) and restored on return with requestAnimationFrame (10308). Stroke-room round-trips restore via S.sheetScrollRestore (corridor.js:2286-2328, 10339-10342). New pushes still open at top by design (homograph handler resets live.scrollTop = 0).",
+   "anchors": "prototypes/corridor/corridor.js:2286-2328, 10300-10310, 10339-10342"
+  },
+  {
+   "id": "P1-7",
+   "title": "Writing room awake field ignores operator corner anatomy",
+   "status": "FIXED",
+   "evidence": "Commit 7c75643 (四隅の間 L2, ancestor). corridor.js:9086-9089 documents the anatomy: worlds top-right on the seal, numbers bottom-right, speed bottom-left, back top-left, readings underneath the glyph. Implemented: numbersCorner gets classes stroke-corner stroke-corner-br (corridor.js:10045), speedCorner stroke-corner-bl (10048); corridor.css:3836-3841 positions .stroke-corner-br / -bl; world seal is the top-right corner and answers while sleeping (corridor.js:9757-9758); wake mark opens only the readings under the glyph (9090-9103).",
+   "anchors": "prototypes/corridor/corridor.js:9086-9103, 9757-9758, 10042-10048; prototypes/corridor/corridor.css:3815-3842"
+  },
+  {
+   "id": "P1-8",
+   "title": "Hidden legacy S.strokeSlow preference silently applies with no UI",
+   "status": "FIXED",
+   "evidence": "Same commit lineage (7c75643 / 88eb3ad, ancestors). corridor.js:9107-9120: strokeSpeedControl — the visible ゆっくり bottom-left corner control — surfaces the stored preference (aria-pressed reflects S.strokeSlow), toggles it, and live-rewrites the ink (inkRoom.handle.rewrite(strokeRewriteOptions()) where speed = S.strokeSlow ? 0.7 : 1.1, corridor.js:9290). A second slow toggle exists on the non-minimal page at 9953-9956. The preference is now visible and undoable everywhere it applies.",
+   "anchors": "prototypes/corridor/corridor.js:9107-9120, 9290, 9953-9956"
+  },
+  {
+   "id": "P1-9",
+   "title": "覚える never top-right, 2000px deep, absent from most screens",
+   "status": "PARTIAL",
+   "evidence": "Commits 48fd950 (stage 1: top-right on every sheet) and 3e62d90 (stage 3: grammar/particles capturable), both ancestors. corridor.js:10254-10270: every sheet whose node type is in NODE_KIND gets a persistent 覚 button in the sheet top bar (margin-left:auto → top-right, corridor.css:2260-2276), aria-pressed toggle. NODE_KIND (corridor.js:5908-5918) now includes word, kanji, radical, idiom, grammar, particle — grammar/particle capture exists.",
+   "anchors": "prototypes/corridor/corridor.js:5908-5918, 10254-10270; prototypes/corridor/corridor.css:2260-2276",
+   "note": "The core defect (bottom-of-flow, ~2000px deep, sheet-only word/kanji) is fixed: capture is top-right, one tap, on all six capturable sheet types. But the operator directive '覚える on every screen' is still only met at sheet level: the long-press mini (corridor.js:2945-2977), the reader/shelf surfaces, and the stroke room still have no direct capture affordance — the mini path is mini → 全項目 → top-right 覚 (2 extra taps)."
+  },
+  {
+   "id": "P1-10",
+   "title": "Grade hanko row lands below the fold on tall answer faces",
+   "status": "FIXED",
+   "evidence": "Commit 42b54d6 (ancestor). corridor.css:5062-5076: body.zen .grade-row is now position:sticky; bottom:0; z-index:3 with washi background (var(--ground-0)) and top shadow — comment explicitly cites the P1 finding ('top 1137 in an 844px viewport'). The four seals stay in reach while the answer face scrolls beneath.",
+   "anchors": "prototypes/corridor/corridor.css:5062-5076"
+  },
+  {
+   "id": "P1-11",
+   "title": "Capture is a one-way door: no un-memorize, no list delete/rename",
+   "status": "FIXED",
+   "evidence": "Commits 48fd950 ('it swings both ways') and bcf7f47 ('lists are born, renamed, and released'), both ancestors. Un-memorize: toggleTaken (corridor.js:6013-6017) removes the item from S.taken when already taken; takeButton (6019-6035) shows 覚える ✓ — やめる with aria-pressed and toggles; the sheet-bar 覚 button (10266-10269) uses the same toggle with 覚えるをやめる label. Lists: the lists surface has an inline create field with dupe/empty validation feedback (corridor.js:3697-3716, no window.prompt no-op), per-list rename (✎, inline field, 3736-3742 + 3773-3801) and two-tap armed delete (× → 消す？ with 3.2s disarm, 3744-3769) that deletes only curation, never items' taken status.",
+   "anchors": "prototypes/corridor/corridor.js:6013-6035, 10254-10270, 3697-3801"
+  },
+  {
+   "id": "P2-1",
+   "title": "Galaxy → tutor crumb/back (先生 from drift claims 'bookshelf › tutor', back lands on shelf)",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:11225-11233 (sensei bubble sets S.view='ai' with no origin recorded), 11302-11306 (crumb: any non-entry/drift view pushes 本棚 first), 2222-2249 (back(): view 'ai' falls into the shelf branch → S.view='shelf')",
+   "evidence": "The 先生 corner-bubble handler still only does S.view='ai'; the crumb builder still prefixes 本棚 for view 'ai' regardless of where the user came from, and back() for 'ai' still lands on the shelf (S.view='shelf', line 2245). The dojo asymmetry persists: back() from 'dojo' returns to 'drift' (lines 2203-2207). No commit since the ledger touches this path."
+  },
+  {
+   "id": "P2-2",
+   "title": "Galaxy bloom ring ignores 390px viewport; edge satellites clipped/offscreen",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/drift-layer.js:1078-1086 (ring: r=(118|196 + hash%38)/cam.z around the planet, no viewport clamp), 1071-1076 (only mitigation: camera glide, and only when stack.length===0)",
+   "evidence": "Satellite placement is still pure polar math with no screen-bounds clamping; a 196+px radius on a 390px viewport still pushes edge satellites offscreen. drift-layer.js has only three commits since the ledger (02188af, ac880af, 4032235 — P0 judgment bridge, chrome-tap exemption, dive exit); none touch the bloom ring."
+  },
+  {
+   "id": "P2-3",
+   "title": "Galaxy nav search placeholder truncated to 'searc' at 71px",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:11093-11096; corridor.css:561-580",
+   "evidence": "Commit 792bb66 ('galaxy nav: search results span the bar, placeholder fits its field'). The placeholder is now '検索' (fits at any width) with a bilingual aria-label (corridor.js:11095), and .nav-search-results anchors to the full bar (corridor.css:561-580, with an in-code comment citing the review finding)."
+  },
+  {
+   "id": "P2-4",
+   "title": "Reader long-press: release click lands on 全項目 spawning under the finger, skipping the mini",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:3039-3054 (ownPressAt gate: pill only shows on focus not preceded by this token's own pointerdown within 900ms), 2944-2949 (showMini sweeps any lingering pill)",
+   "evidence": "Commits 49f2dd7 and ea347db (final gate) — commit message explicitly cites 'spawned under the lifting finger where the release could land on it (P2 x2, full-instrument review)'. The token-actions pill no longer appears on press-driven focus, so no button materializes under the finger; the mini also removes any visible pill when it opens."
+  },
+  {
+   "id": "P2-5",
+   "title": "Token-actions pill pops over prose after every tap; doubles 全項目 beside the long-press mini",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:3030-3054 (press-recency gate keeps the pill for keyboard/switch/screen-reader focus only), 2944-2949 (mini removes lingering pills)",
+   "evidence": "Same fix pair (49f2dd7 then ea347db). The pill is now keyboard/AT furniture: focus arriving within 900ms of the token's own pointerdown stays quiet, so ordinary taps and long-presses never raise it and 全項目 is never doubled."
+  },
+  {
+   "id": "P2-6",
+   "title": "すべて仮名 dial converts katakana loanwords/proper nouns to hiragana",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:2436-2446 (displayPairs mode 2 converts only kanji-run pairs pair.r ? {t: pair.r} : pair, leaving kana runs as written)",
+   "evidence": "Commit 35596b0: all-kana now converts KANJI runs to their readings and leaves kana runs as written (南アフリカ → みなみアフリカ); in-code comment cites the P2. Commit message records a live proof: katakana kept, zero hiragana leaks, zero kanji remaining."
+  },
+  {
+   "id": "P2-7",
+   "title": "Back from the 覚 lists tray abandons the article mid-read, lands on shelf",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:2231-2238 (back(): tray with S.trayFrom==='reader' returns to the reader at the saved bookmark)",
+   "evidence": "Commit 9d4c035 ('the tray returns to the article'): the tray remembers its door via S.trayFrom, and back restores S.readerPos[S.passageId]. Commit records live proof: reader at 400 → tray → back → reader at 400."
+  },
+  {
+   "id": "P2-8",
+   "title": "Nested buttons: details-toggle <button> inside shelf-item <button>",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:2794 (item = el('button','shelf-item')), 2822-2834 (details = el('button','details-toggle') appended into item at 2834)",
+   "evidence": "The shelf card is still a <button> containing a nested details-toggle <button> — invalid HTML and AT/keyboard-unreachable exactly as filed. No commit since the ledger restructures the shelf item markup (line numbers drifted from 2368-2410 to ~2794-2838, but the structure is unchanged)."
+  },
+  {
+   "id": "P2-9",
+   "title": "Entry footer renders internal scheduler slug 'bunki-fsrs6-r090-defaults-v1' and dev label",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js — grep for 'fsrs6-r090' returns zero hits in the whole file; learner-visible FSRS text is now only 'FSRS-6' (lines 7387, 7421)",
+   "evidence": "Commit 9d4c035: 'entry footers drop the dev slug… The learner sees FSRS-6; the parameter-set provenance stays in exports and debug surfaces.' Live proof in the commit: no 'r090' anywhere in page text."
+  },
+  {
+   "id": "P2-10",
+   "title": "Sheet discoverability: 用例 eyebrow never says hold opens the dictionary; 覚える ✓ silently un-undoable",
+   "status": "PARTIAL",
+   "anchors": "Fixed half: corridor.js:10255-10271 (top-right 覚 toggle with aria-pressed, 'stop memorizing' label), 6013-6031 (toggleTaken/takeButton — capture reversible). Open half: corridor.js:8460 (word-sheet 用例 eyebrow says only 'examples — tap a word to climb its ladder'; no hold mention), 4984 and 5760 (particle/grammar eyebrows say just 'examples')",
+   "evidence": "Commit 48fd950 made capture a reversible top-right toggle on every capturable sheet ('it swings both ways'), fixing the un-undoable half. The discoverability half is untouched: no 用例 eyebrow anywhere mentions that a hold opens the full dictionary entry."
+  },
+  {
+   "id": "P2-11",
+   "title": "World-stone labels: 8px names in the writing room, 神奈川沖浪裏 ellipsizes",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:9085-9105 (strokeAwakeField now carries readings only; worlds moved to the standard top-right world seal), 10942-10990 (world-picker stones: single-glyph seals), corridor.css:1978-1988 (.world-stone: tap-size circle, 17px glyph, no name label)",
+   "evidence": "Commit 7c75643 (四隅の間 L2) rebuilt the writing room to the operator's corner anatomy: the ten worlds now live on the standard world-picker stones (glyph seals with aria labels), so no 8px ellipsizing name labels render. Residual note: the old .stroke-palette-name CSS (font: 8px, ellipsis; corridor.css:3660-3668) and one stale focus-restore query (corridor.js:10098) survive as dead code — nothing constructs .stroke-palette-choice anymore."
+  },
+  {
+   "id": "P2-12",
+   "title": "Named-list rows render an empty grey kind pill (kind/kindEn stripped at store time)",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:6105, 6142 (list items stored with kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1]), 3807-3808 (row renders kindEn || kind || NODE_KIND fallback), 671 (store envelope validates optional kindEn)",
+   "evidence": "Commit 35596b0 (second half): named-list rows now keep kind/kindEn at store time and the renderer has a NODE_KIND fallback for legacy rows, so the pill is never empty."
+  },
+  {
+   "id": "P2-13",
+   "title": "List creation only via window.prompt from inside an entry sheet; silent no-op on dupe/empty",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:3685-3706 (inline list maker on the lists surface, aria-invalid on dupe/empty instead of silent no-op)",
+   "evidence": "Commit bcf7f47 (覚える stage 2): the lists surface carries an inline maker; every named list gets rename and a two-tap armed delete; the entry-sheet picker's ＋ opens the same inline field; giving an existing name adds the item instead of silently doing nothing. In-code comment cites the P2."
+  },
+  {
+   "id": "P2-14",
+   "title": "No 覚える for grammar or particle entries; grammar patterns can never enter the SRS",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:5908-5918 (NODE_KIND now includes grammar and particle), 10255-10271 (top-right 覚 toggle renders for every NODE_KIND kind, i.e. word/kanji/radical/idiom/grammar/particle)",
+   "evidence": "Commit 3e62d90 (覚える stage 3): grammar and particles gained real review-card backs (reading the same GRAMMARS/PARTICLES records the sheets read) and the store envelope admits the two kinds. Live proof in the commit: particle の captured, surfaced in review with a real back."
+  },
+  {
+   "id": "P2-15",
+   "title": "Article schema: 0 of 764 articles carry an English title; no titleEn key",
+   "status": "PARTIAL",
+   "anchors": "prototypes/corridor/data/articles/index.json (70 article records; field set has 'title' only — no titleEn/en key, verified by field census on the current file); corridor.js:37 (TITLES_EN UI map, now 70 entries), 2800 (shelf renders from the map)",
+   "evidence": "The schema gap persists: no titleEn key exists on any of the 70 index records or the 694 archive records — 0 articles carry an English title in data. What changed: commit 774f1dc authored English titles for the 30 recovered originals and joined them to the hardcoded TITLES_EN UI map, so all 70 shelf cards now show English titles — but it is still a UI map, not article data, and the 694 archive articles have no coverage. The bilingual-titles schema/pipeline change the ledger asked for is unwritten."
+  },
+  {
+   "id": "P2-16",
+   "title": "Raw and re-land article branches diverged; integrate from 307a4dd (non-raw) only",
+   "status": "FIXED",
+   "anchors": "Commits 1606a1e ('feat: re-land native readings') and 774f1dc (explicitly 'codex donor 307a4dd'); prototypes/corridor/data/articles/index.json now lists 70 articles on HEAD",
+   "evidence": "The integration was done from the correct branch: 774f1dc's message names 307a4dd as the donor, the 30 bodies are on HEAD, index.json is at 70, and the standalone was rebuilt (49efa25). The instruction this finding encoded has been followed; nothing was taken from the diverged raw branch."
+  },
+  {
+   "id": "P2-17",
+   "title": "NEW_PER_DAY=20 and LEECH_LAPSES=6 are constants with no settings surface",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:6301 (const NEW_PER_DAY = 20), 6308 (const LEECH_LAPSES = 6), 6325 (room computed from the constant)",
+   "evidence": "Both remain hard const declarations; no settings UI, variant, or store field writes them anywhere in the file (only consumers at 6312 and 6325). Line numbers drifted from 5648/5655 to 6301/6308 but the finding is unchanged."
+  },
+  {
+   "id": "P2-18",
+   "title": "apps/app: uncertainty dimension non-durable (WP05-D2); kanji/drift screens have zero store.execute",
+   "status": "OPEN",
+   "anchors": "apps/app/src/state/store.ts:104-166 (UncertaintyAnnotation documented as 'not exported and not durable… W4 coordination item'; uncertaintyLogNote still emits the WP05-D2 deferred-item sentences); apps/app/src/screens/kanji-screen.tsx, drift-kanji-screen.tsx, drift-word-screen.tsx — 0 occurrences of execute in each (capture-screen.tsx has 4)",
+   "evidence": "Both halves stand exactly as filed: the dimension is app-local and lost on export/reload by documented design, and the kanji/drift encounter screens still dispatch nothing into the store — no capture path from those surfaces."
+  },
+  {
+   "id": "P2-19",
+   "title": "Obslog richly written but consumed only by probe dedup; no routing or difficulty signal reads it",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:7123 (the sole read: filters obslog rows with kind 'probe' to dedup probe targets); writers at 1074, 6272-6273, 7366 and ~9 obsLog() call sites",
+   "evidence": "The only consumer of S.obslog in the current tree is still the probe-dedup filter at line 7123. New writers were even added (dojo rows at 6272), but no routing, diagnosis, or difficulty logic reads the log anywhere."
+  },
+  {
+   "id": "P2-20",
+   "title": "Corridor due queue is capture-ordered, not overdueness-ordered; domain planner's sort unused",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:6314-6327 (srsDueItems: iterates S.taken in stored order, returns [...reviews, ...fresh.slice(0, room)] with no sort); packages/domain plan.ts sort still unreferenced by the corridor",
+   "evidence": "srsDueItems still builds reviews/fresh by walking S.taken in capture order and applies no overdueness (or any) sort before returning. The function moved from ~5661 to 6314 but its ordering logic is unchanged."
+  },
+  {
+   "id": "P2-21",
+   "title": "Two FSRS systems: corridor's vendored engine bypasses the domain kernel; learner-record migration unwritten",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:1930-1947 (vendored ./vendor/ts-fsrs.mjs, own scheduler, enable_fuzz defaulting ON deliberately against the domain pin), prototypes/corridor/vendor/ts-fsrs.mjs; no migration code or doc newer than PR70_RECONCILIATION",
+   "evidence": "The corridor still instantiates its own vendored ts-fsrs scheduler with app-level fuzz-on divergence and no evidence gate; grades go straight to S.srs/S.revlog outside packages/domain. The new fsrs optimizer (fa78a65, tools/fsrs-optimize.mjs) reads exported revlogs but does not reconcile the two schedulers, and no corridor→kernel learner-record migration exists in the tree."
+  },
+  {
+   "id": "P2-22",
+   "title": "Two AI stacks: @bunki/ai's envelopes/ceilings/telemetry serve zero deployed traffic",
+   "status": "OPEN",
+   "anchors": ".github/workflows/pages-app.yml:48-63 (deploy copies only prototypes/corridor files — corridor.js/ink/worker/data/vendor/design; nothing from packages/ai or apps/app); prototypes/corridor/corridor.js:7749-7774 (deployed traffic still rides the bare aiConverse fetch); packages/ai/README.md Status section ('no live call has been made')",
+   "evidence": "The deployed site is still the corridor alone, whose AI path bypasses every @bunki/ai invariant (envelopes, ceilings, abort, telemetry). The engineered stack continues to serve zero production traffic."
+  },
+  {
+   "id": "P2-23",
+   "title": "Provider lock-in: deployed AI hardcodes api.anthropic.com + model 'claude-opus-5', no override",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/corridor.js:7750 (fetch('https://api.anthropic.com/v1/messages')), 7759 (model: 'claude-opus-5'), 4302-4303 (key sheet promises 'sent nowhere but api.anthropic.com')",
+   "evidence": "aiConverse still hardcodes both the endpoint and the model id inline with no configuration, override, or provider port; the conflict with the 'no matter the model provider' directive stands."
+  },
+  {
+   "id": "P2-24",
+   "title": "apps/app AI path fallback-only (4 fixture words); live-call gate never exercised",
+   "status": "OPEN",
+   "anchors": "packages/ai/README.md Status section: 'Open (operator gate, controller §22.3 / OD-08): no live call has been made… stays open until the operator provides a key and a budget cap'",
+   "evidence": "The README on the current tree still records the live-call evidence as OPEN, every test drives an injected fetch, and the fallback remains scripted for the fixture words only. No commit since the ledger exercises the gate."
+  },
+  {
+   "id": "P2-25",
+   "title": "Tray messaging (shelf-reader's filing of the ?entry=shelf variants strip — deduped into the P1)",
+   "status": "FIXED",
+   "anchors": "prototypes/corridor/corridor.js:1792-1814 (choosing a front door via ?entry no longer raises the variants strip; strip requires explicit ?variants=1 or a genuine variant param)",
+   "evidence": "This bullet was a dedup pointer to the ?entry=shelf P1, which commit d6d5c91 fixed ('?entry=shelf is a front door, not a debug switch') — verified in the commit: ?entry=shelf → shelf with no strip; ?variants=1 → strip. The shelf-reader lane's underlying complaint is resolved."
+  },
+  {
+   "id": "P2-26",
+   "title": "Glossary cross-refs (promoted from polish): dead '(No.39)'-style cross-references in glossary entries",
+   "status": "OPEN",
+   "anchors": "prototypes/corridor/data/articles/yasashii-2.json (and yasashii-3/4/6/7/8), data/articles/index.json snippets — literal '(No.1)', '(No.39)', '(No.41)', '(No.58)' etc. still present in article text",
+   "evidence": "The yasashii glossary bodies and their index snippets on the current tree still contain the numeric cross-references that resolve to nothing in the app; no commit since the ledger touches the yasashii files."
+  },
+  {
+   "id": "P2-27",
+   "title": "(Count reconciliation — no 27th bullet exists)",
+   "status": "FIXED",
+   "anchors": "docs/build-evidence/full-review/LEDGER.md:45-73",
+   "evidence": "The 'P2 (27)' section contains exactly 26 bullets plus an italic count note explaining the 27th: the ?entry=shelf variants strip was filed at P2 by two lanes and P1 by one, and carried once as the P1. That carried item was fixed by d6d5c91 (verified above under P2-25). There is no distinct 27th P2 defect to triage; recorded here so the assigned numbering closes."
+  },
+  {
+   "id": "POL-1",
+   "title": "Galaxy front door has no first-touch cue",
+   "status": "OPEN",
+   "evidence": "corridor.css:306-317 still hides #drift-layer #hint under body.ginga with display:none !important; the only override is body.ginga.drift-dived (added for the dive-exit P1). drift-layer.js:1525 shows the hint only after the first dive (divedOnce). No one-time front-door cue exists anywhere; no commit since the ledger touches it.",
+   "anchors": "prototypes/corridor/corridor.css:306-317; prototypes/corridor/drift-layer.js:1525"
+  },
+  {
+   "id": "POL-2",
+   "title": "Glossary entries show dead '(No.39)'-style cross-references",
+   "status": "OPEN",
+   "evidence": "grep finds (No.NN) strings in yasashii-2/3/4/6/7/8.json bodies and in index.json snippets; corridor.js has no code that resolves or linkifies the pattern (only JMdict cross-reference rendering at 8248, unrelated).",
+   "anchors": "prototypes/corridor/data/articles/yasashii-2.json (and -3,-4,-6,-7,-8); prototypes/corridor/data/articles/index.json"
+  },
+  {
+   "id": "POL-3",
+   "title": "Shelf ordering splits categories into disconnected runs, no section headers",
+   "status": "OPEN",
+   "evidence": "renderShelf loops flat over curated = D.passages minus archive (corridor.js:2690, loop at 2793) with no section-header element; the 70-entry index interleaves categories in split runs (段階別読み物 appears as runs of 3, 8, and 10; 随筆 as 2, 6, and 20; 検収前 items appended at the end).",
+   "anchors": "prototypes/corridor/corridor.js:2690,2793-2820; prototypes/corridor/data/articles/index.json ordering"
+  },
+  {
+   "id": "POL-4",
+   "title": "Ten one-sentence glossary defs billed as 'real texts'",
+   "status": "OPEN",
+   "evidence": "Shelf subtitle is now dynamic — corridor.js:2692-2695 renders `${curated.length} real texts` = '70 real texts' — but the 10 yasashii 用語集 one-line glossary entries are still counted inside that number (10 'やさしい日本語 用語集' rows in index.json). The framing objection is unchanged, just renumbered 40→70.",
+   "anchors": "prototypes/corridor/corridor.js:2690-2695"
+  },
+  {
+   "id": "POL-5",
+   "title": "Stale 4-stage gesture comment vs shipped 3-stage; lowercase 'sentence' crumb",
+   "status": "OPEN",
+   "evidence": "The header comment above renderSentenceTokens (corridor.js:7604-7612) still describes a 4-stage tap ladder ('First tap ふりがな, second tap the English gloss, third tap the full entry — and after the entry, one more tap folds'), while the shipped cycle() (corridor.js:7658-7674) is 3-stage: furigana → gloss → clear, entry only via hold (inner comment at 7649-7651 says so correctly). The crumb tx('文','sentence') is still lowercase at corridor.js:5782.",
+   "anchors": "prototypes/corridor/corridor.js:7604-7612 vs 7649-7674; corridor.js:5782"
+  },
+  {
+   "id": "POL-6",
+   "title": "Living-ink sheet's feathered edge reads as a pale disc (real-GPU verify)",
+   "status": "OPEN",
+   "evidence": "No commit since the ledger mentions the feathered edge, disc, or paper-tone (git log --grep feather/pale disc/paper-tone: empty); corridor-ink.js/corridor.css contain no 'feather' change. Statically unverifiable — still awaiting the flagged real-GPU check.",
+   "anchors": "prototypes/corridor/corridor-ink.js; ledger item unchanged",
+   "note": "Cannot be closed from code alone; the ledger itself gated it on real-GPU verification."
+  },
+  {
+   "id": "POL-7",
+   "title": "Sleeping-room back button carries an English sub-caption",
+   "status": "OPEN",
+   "evidence": "The writing-room back button is biLabel('button','stroke-back','← 戻る','back') at corridor.js:9731 — biLabel (corridor.js:1763-1768) appends an en-sub span whenever bi() (the default). The quiet-room minimal CSS (corridor.css:3846-3867 for #strokes-back) fades and rounds the button but never hides .en-sub, so the faint 戻る still carries 'back' beneath it.",
+   "anchors": "prototypes/corridor/corridor.js:9731,1763-1768; prototypes/corridor/corridor.css:3846-3867"
+  },
+  {
+   "id": "POL-8",
+   "title": "Tray shows disabled 'nothing due yet' directly above 'today N'",
+   "status": "OPEN",
+   "evidence": "Structure unchanged: the review-start button renders 'nothing due yet' when srsDueItems() is empty (corridor.js:3595-3605) directly above the srsForecast line 'today N …' (3607-3617). The mismatch mechanism persists: srsDueItems counts due <= now (corridor.js:6314-6322) while srsForecast counts everything due before tonight's midnight as today (corridor.js:6351-6373), so a card due in three hours still yields 'nothing due yet' over 'today 1'.",
+   "anchors": "prototypes/corridor/corridor.js:3595-3617,6314-6327,6351-6374"
+  },
+  {
+   "id": "POL-9",
+   "title": "Rest/wake ⏸ is a small target on a row whose whole surface navigates",
+   "status": "OPEN",
+   "evidence": "Tray line still attaches a whole-row click navigating to the entry (corridor.js:3824) with the ⏸/▶ rest-toggle inside it (corridor.js:3813-3823, stopPropagation only); .rest-toggle CSS is padding 4px 7px, font-size 11px with no min-width/min-height 44px (corridor.css:4283-4293) — roughly a 25×21px target.",
+   "anchors": "prototypes/corridor/corridor.js:3811-3825; prototypes/corridor/corridor.css:4283-4293"
+  },
+  {
+   "id": "POL-10",
+   "title": "Article integration includes provenance sidecars, verify tools, evidence dir",
+   "status": "FIXED",
+   "evidence": "On HEAD: docs/content/bunki-originals-zoka-sanjin.jsonl and .editorial.json exist; prototypes/corridor/tools/verify-native-readings.mjs and .py are present (matching the donor branch tool set); evidence dir docs/build-evidence/kairo-feel-lock/native-readings/ exists (MISSION_REPORT, browser-verification.json, first40-baseline.json, screenshots); index.json carries 70 records; the standalone was rebuilt (commit 49efa25) and contains the new ids (zoka-sanjin, 14 bunki-essay-n1 hits in corridor-standalone.html). Landed via PR #73 line (1606a1e, 774f1dc, 49efa25).",
+   "anchors": "docs/content/bunki-originals-zoka-sanjin.jsonl; prototypes/corridor/tools/verify-native-readings.mjs; docs/build-evidence/kairo-feel-lock/native-readings/; commits 1606a1e/774f1dc/49efa25"
+  },
+  {
+   "id": "POL-11",
+   "title": "Drift placement is a hand-set dial; SRS-driven placement is a stub hint",
+   "status": "OPEN",
+   "evidence": "drift-layer.js:1980 still reads setHint(\"実物では、AI評価・SRS・模試から現在地を推定\") inside lvlSet — the 自 stop is still a stub; placement commits only via the manual level dial (lvlSet/tideChange). The new drift bridge (corridor.js:1086-1088) sends judgments OUT to the obslog but nothing feeds SRS state back INTO placement.",
+   "anchors": "prototypes/corridor/drift-layer.js:1971-1982; prototypes/corridor/corridor.js:1086-1088"
+  },
+  {
+   "id": "POL-12",
+   "title": "Dojo 'due' refill regrades the same pool within one block, vs 'session-only' claim",
+   "status": "OPEN",
+   "evidence": "refillFocusQueue (corridor.js:6909-6917) still pushes f.pool[f.cursor % f.pool.length] — wrapping the same due pool — triggered whenever the queue drains before the clock (6438-6441). Due-mode cards are real S.taken cards graded through commitStandardGrade, so a second wrap-around grade mutates the long-term schedule again, while the dojo header comment still claims 'S.focus is session-only; nothing here changes how a card is scheduled' (corridor.js:6857). Note the adjacent P0 (orphan mint) IS fixed: drill-only grades on never-taken cards now route through commitDrillGrade (corridor.js:6695-6720, commit 6dc03f4) — that fix does not cover this refill item.",
+   "anchors": "prototypes/corridor/corridor.js:6857,6909-6917,6438-6441,6695-6720"
+  },
+  {
+   "id": "POL-13",
+   "title": "Tutor context window is 8 turns; mid-quiz refresh discards the quiz",
+   "status": "OPEN",
+   "evidence": "Chat send still maps S.aiChat.slice(-8) into the API turns (corridor.js:4264). S.aiQuiz is not in the persisted-keys list (corridor.js:579-595 — aiChat is, aiQuiz is not), is initialized null (538) and nulled on back (2209), so a refresh mid-quiz discards it.",
+   "anchors": "prototypes/corridor/corridor.js:4264,538,579-595,2209"
+  },
+  {
+   "id": "POL-14",
+   "title": "BYO key in localStorage, browser-direct with dangerous-direct header",
+   "status": "PARTIAL",
+   "evidence": "Unchanged by design: aiConverse still fetches https://api.anthropic.com/v1/messages with 'anthropic-dangerous-direct-browser-access': 'true' (corridor.js:7749-7757) and the key lives in localStorage under kairo-ai-key (7728-7732). The ledger's ask — 'accepted tradeoff, keep visible' — is satisfied: the settings copy still discloses it plainly (corridor.js:4302-4303) and export explicitly never includes the key. Nothing actionable regressed; recorded as accepted-tradeoff-standing.",
+   "anchors": "prototypes/corridor/corridor.js:7728-7757,4302-4303",
+   "note": "PARTIAL = tradeoff intentionally retained; the 'keep visible' condition is met."
+  },
+  {
+   "id": "DIR-1",
+   "title": "Directive: worlds top-right (writing room)",
+   "status": "FIXED",
+   "evidence": "MET. Commit 7c75643 (四隅の間 L2). In minimal mode #stroke-world-seal is position:fixed at top-right (corridor.css:3787-3794, comment cites the operator spec verbatim) and is exempted from the sleeping-inert sweep so it answers while the room sleeps (corridor.js:9754-9760); worlds open via attachWorldPicker on the seal, same door as every screen."
+  },
+  {
+   "id": "DIR-2",
+   "title": "Directive: stroke numbers bottom-right",
+   "status": "FIXED",
+   "evidence": "MET. strokeNumbersControl gets classes stroke-corner stroke-corner-br (corridor.js:10044-10046); .stroke-corner is fixed at the bottom with min 44x44 and .stroke-corner-br pins right (corridor.css:3813-3839); faint (opacity .36) until touched, always tappable (not part of the sleeping data-stroke-chrome sweep)."
+  },
+  {
+   "id": "DIR-3",
+   "title": "Directive: speed bottom-left",
+   "status": "FIXED",
+   "evidence": "MET. strokeSpeedControl (ゆっくり) now exists and is placed stroke-corner-bl (corridor.js:10047-10049, corridor.css:3840-3842); its aria-pressed reflects S.strokeSlow (corridor.js:9107-9119), surfacing the previously hidden legacy slow preference — the companion P1 is fixed too."
+  },
+  {
+   "id": "DIR-4",
+   "title": "Directive: readings underneath",
+   "status": "FIXED",
+   "evidence": "MET. The ensō wake mark opens ONLY the readings, beneath the glyph: strokeAwakeField (corridor.js:9085-9105) builds 音読み/訓読み rows and nothing else; .stroke-awake-field is anchored bottom-center under the sheet (corridor.css:3583-3600) with an elegant rise transition. Correct values, correct anatomy — the ledger's 'wrong anatomy' complaint is resolved."
+  },
+  {
+   "id": "DIR-5",
+   "title": "Directive: 覚える on every screen, top-right",
+   "status": "PARTIAL",
+   "evidence": "Greatly improved by 48fd950/bcf7f47/3e62d90: every capturable sheet now renders a 覚 button in the sheet bar top area on open (corridor.js:10254-10270, comment cites operator directive §3), capture swings both ways (takeButton toggles, corridor.js:6019-6035), grammar and particles are now capturable (NODE_KIND corridor.js:5908-5918), and lists can be created/renamed/released on the lists surface. Still short of 'every screen': the shelf, reader page, long-press mini, catalog, sentence page, and stroke room have no direct capture affordance — capture requires opening the full entry sheet first."
+  },
+  {
+   "id": "DIR-6",
+   "title": "Directive: SRS fully wired",
+   "status": "PARTIAL",
+   "evidence": "Both P0s are fixed: (1) drift flick judgments now reach the one learner state via window.bunkiDriftJudgment → obsLog exposure evidence (corridor.js:1078-1088, commit 02188af; deliberately exposure-not-mastery, never mints FSRS state); (2) dojo drills on never-taken cards route through commitDrillGrade and no longer mint orphaned FSRS state, write revlog rows, or burn new-card slots (corridor.js:6695-6720, commit 6dc03f4). Revlog now has a real consumer: the deterministic personal FSRS optimizer tools/fsrs-optimize.mjs (commit fa78a65) parses 12-field revlog grade rows. Still open: fuzz remains default-on against the domain pin with no UI writer for S.stats.fuzzOff (corridor.js:1937-1943; only a validator at 784), the due queue is still capture-ordered (srsDueItems corridor.js:6314-6327 walks S.taken in order), and the two schedulers (corridor vendored vs domain kernel) remain unreconciled."
+  },
+  {
+   "id": "DIR-7",
+   "title": "Directive: copious articles with JP+EN titles",
+   "status": "PARTIAL",
+   "evidence": "Articles: substantially MET — the 30 stranded originals are landed on HEAD (index.json = 70 records; visible 検収前 provenance flags, commit 774f1dc; standalone rebuilt 49efa25; sidecars+tools+evidence present, see POL-10; wikinews-1403 repaired in 2c72ab9). EN titles: still a UI-layer map, not data — TITLES_EN in corridor.js:37-108 now covers all 70 shelf ids exactly (verified programmatically: 70 keys, 0 shelf ids missing), but 0 of the 70+694 article data records carry any titleEn/en key (verified against index.json), so the 694-article archive shows no English titles and the schema gap stands."
+  },
+  {
+   "id": "DIR-8",
+   "title": "Directive: audio voices",
+   "status": "OPEN",
+   "evidence": "NOT MET. No speechSynthesis, Audio(), <audio>, or TTS feature exists in prototypes/corridor (corridor.js/drift-layer.js: zero hits; the corridor-standalone.html grep hit is a substring inside the embedded kanji data blob, not code). The only other hits are in the abandoned prototypes/bunki-sites-v11 components, not a deployed surface. Nothing has been added since the ledger."
+  },
+  {
+   "id": "DIR-9",
+   "title": "Directive: mock tests",
+   "status": "OPEN",
+   "evidence": "NOT MET. The only reference remains the drift's own stub hint '実物では、AI評価・SRS・模試から現在地を推定' (drift-layer.js:1980). No mock-test feature, screen, or data exists on any current surface; the closest features are still the AI 5-question quiz (aiQuizStart, corridor.js:4152) and the dojo yomi probe."
+  },
+  {
+   "id": "DIR-10",
+   "title": "Directive: AI memory (graph, not-a-word-lost, model-agnostic)",
+   "status": "OPEN",
+   "evidence": "NOT MET. Chat is the only persisted conversation and is still capped: persistence slices S.aiChat to the last 24 turns (corridor.js:989) and the API window to the last 8 (4264); S.aiQuiz is session-only (not in the persisted key list 579-595); word-tutor/examples/coach persist nothing. No graph memory: turns are flat {role,text} with no ids/timestamps/model metadata/entity edges. Provider and model remain hardcoded (api.anthropic.com + 'claude-opus-5', corridor.js:7750/7759) with the dangerous-direct browser header and still no timeout/abort in aiConverse (7749-7773). Learner model is still one scalar — the modal JLPT tag (mostJlpt, corridor.js:7735-7748). Minor nuance: AI custom readings (S.aiReading/aiReadings) are durably persisted, but that does not change the verdict."
+  },
+  {
+   "id": "PR70-P0-1",
+   "title": "Explicit lesson disposition and typed evidence",
+   "status": "OPEN",
+   "evidence": "Lesson completion still auto-enrolls every lesson word into the deck: prototypes/corridor/corridor.js:4091-4097 (finish handler writes S.lessonsDone[run.id] then pushes every not-yet-taken run word into S.taken, followed by bare saveStore()), and 4108-4110 announces 'every word from this lesson is now in your memorize list'. No practice-evidence-only / keep-thread / explicit-learn disposition exists; the only related landed principle is the dojo drill separation at 6703-6722 (道場の礼, commit 6dc03f4), which keeps focus-drill exposure out of the deck but does not touch lessons.",
+   "anchors": "corridor.js:4088-4110 (finish handler — where disposition choices would go), corridor.js:4006-4017 (lessonPlan listing), corridor.js:751-759 (validLessonResult — where typed evidence would be validated), corridor.js:6703-6722 (existing exposure-vs-deck precedent)",
+   "note": "Minor improvement over the ledger snapshot: a takenSet dedup at 4093-4095 prevents duplicate rows, and the default new-card debt is bounded by NEW_PER_DAY=20 (6301). But the donor's no-default-action semantics are entirely absent — enrollment is still the unconditional default."
+  },
+  {
+   "id": "PR70-P0-2",
+   "title": "Review target identity and immutable answer snapshots",
+   "status": "PARTIAL",
+   "evidence": "Landed: deep-tier captures now stamp provenance — corridor.js:5988-5991 stores entrySeq/cueReading on the taken item and 5992-6001 writes a compact deepWords answer snapshot; the store validator admits both fields (675-676); lookup() honors ent_seq and refuses spelling fallback when a seq is given (1131-1178, incl. the homograph comment at 1175-1178). NOT landed: card identity is still spelling-only — srsKey is `${t}:${id}` (6194), toggleTaken dedups by t+id only (6014, 6020), deepWords is keyed by spelling (patch.deepWords[node.id], 6004), and reviewBack renders the answer via lookup(item.id) with NO seq/reading argument (6393), so the stored entrySeq/cueReading provenance is never consulted at answer time. No homograph aggregation, no key/data migration.",
+   "anchors": "corridor.js:6194 (srsKey), 6013-6017 (t+id dedup), 6391-6394 (reviewBack ignores provenance), 5988-6001 (landed provenance capture), 1123-1182 (lookup)",
+   "note": "The explicit key/data migration the handoff called for has not begun; what landed is the provenance substrate it would build on."
+  },
+  {
+   "id": "PR70-P0-3",
+   "title": "Evidence-honest grading and scheduler provenance",
+   "status": "PARTIAL",
+   "evidence": "The persistence half is FIXED: grading is now transactional — commitStandardGrade (corridor.js:6278-6294) builds revlog/srs/stats copies, calls commitStorePatch, and returns false WITHOUT advancing the session when the write fails (advanceReviewSession only runs after a successful commit; grade click handlers at 6723-6739 bail on failure). commitStorePatch (1042-1047) is write-before-publish. The evidence half is OPEN: reveal is still an undeclared flip (6652-6667 sets rv.revealed=true with no 'recalled vs could not recall' declaration), all four grades are enabled after any reveal (6669-6744), and the revlog row layout (6212-6258) carries state/elapsed/retrievability/memory-before-after but no reveal path, latency, contract ID, or submitted-vs-effective grade.",
+   "anchors": "corridor.js:6652-6667 (reveal — where retrieval declaration would go), 6669-6744 (grade row), 6231-6258 (srsReviewLogRow — where provenance columns would be added), 6278-6294 (landed transactional commit)",
+   "note": "The 'advances even when persistence fails' defect cited in the handoff is gone; the forced-Again / provenance-stamping semantics remain unimplemented."
+  },
+  {
+   "id": "PR70-P0-4",
+   "title": "Deep store validation and transactional writes",
+   "status": "PARTIAL",
+   "evidence": "Substantially landed (commit 2b34f11 'preserve reserved learner-store keys' plus 覚える stages 48fd950/bcf7f47, all post-audit on 2026-08-15): corridor.js:597-834 is a deep validator suite (validTakenItem 664-679 rejects taken:[null], validStoredCard 692-702, validReviewRow 704-721, validObservationRow 723-736, validStoreEnvelope 829-834); loadStore quarantines malformed shapes and future major versions read-only with a visible alert (908-973, protectStore 902-906); writeStore validates the exact bytes before setItem and reports quota failure (999-1033); commitStorePatch (1042-1047) is the transactional helper, used by capture (commitCapture 5973-6005), toggle (6013-6017), lists (3710, 3765, 3789, 6145), and grading (6273, 6291). Tests exist: prototypes/corridor/tools/verify-corridor-storage-integrity.mjs probes malformed/future bytes (lines 205-210, 380-391), unknown-key preservation (266-274), read-only suppression (519), quota error (536), and write-before-publish (563). Residual gap: several learner-state paths still mutate live state then call bare saveStore() with the result ignored — lesson finish (4091-4097), card suspend (6484-6485, 6633-6635) — so a failed save on those paths still diverges memory from disk without rollback.",
+   "anchors": "corridor.js:597-834, 908-973, 999-1047 (landed); corridor.js:4091-4097 and 6633-6635 (remaining non-transactional call sites); tools/verify-corridor-storage-integrity.mjs",
+   "note": "The handoff's named defects (shallow validation accepting taken:[null]; capture and grade mutate-then-ignore-failed-save) are all fixed with test coverage. Marked PARTIAL only because the transactional helper is not yet universal."
+  },
+  {
+   "id": "PR70-P1-1",
+   "title": "No-debt legacy list migration",
+   "status": "OPEN",
+   "evidence": "srsDueItems (corridor.js:6314-6327) still treats every S.taken row without an S.srs record as a fresh card and feeds it into the due queue (fresh.slice(0, room)); there is no promotion/migration marker and no 'start learning' gate. The debt is bounded — NEW_PER_DAY=20 (6301) and the introducedToday accounting (6324-6326) pace introduction, and no FSRS state is fabricated (srsCardOf 6195-6201 mints createEmptyCard only at first grade) — but imports/legacy rows still become scheduled work by default.",
+   "anchors": "corridor.js:6314-6327 (srsDueItems — where the promotion marker check goes), 6195-6201 (srsCardOf), 664-679 (validTakenItem — where a marker field would be validated)"
+  },
+  {
+   "id": "PR70-P1-2",
+   "title": "Bounded finite standard review plan",
+   "status": "OPEN",
+   "evidence": "startReview (corridor.js:6378-6388) still freezes the entire srsDueItems() result into rv.queue — all due reviews at once, no 20-ID chunk, no deferred count reported. NEW_PER_DAY caps only never-seen cards, not accumulated due reviews. Timed Focus's refill behavior (refillFocusQueue call at 6436-6440, FOCUS_BATCH=20 at 6304) is the intentional exception to preserve.",
+   "anchors": "corridor.js:6378-6388 (startReview — where chunking and the deferred count go), 6314-6327 (srsDueItems), 6436-6440 (focus refill to leave untouched)"
+  },
+  {
+   "id": "PR70-P1-3",
+   "title": "Drift judgment bridge into the learner observation log",
+   "status": "FIXED",
+   "evidence": "Commit 02188af (分流の橋 P0, 2026-08-15, post-audit, on HEAD). drift-layer.js:1744 hands each committed flick judgment to the host: window.bunkiDriftJudgment(n.kind,key,dir) inside a no-op-safe try/catch. corridor.js:1078-1088 implements the hook, appending an obsLog 'drift' row (detail 3 = flicked known, 1 = flicked unknown) keyed by srsKey — explicitly exposure evidence, never FSRS state or a card, exactly as the backlog item specified ('current-native append-only observation; never turn it directly into an FSRS grade'). The store validator admits the row shape (corridor.js:731) and obslog is persisted/exported in the envelope (804, 983).",
+   "anchors": "corridor.js:1078-1088, 731; drift-layer.js:1744",
+   "note": "The donor's stricter synchronous-persist-or-rollback semantics were not replicated — the obsLog write is debounced (1200 ms, obsFlush on pagehide/hidden at 1104-1107) and drift keeps its own bunki-drift-v1 store regardless — but that is consistent with the current obslog discipline the backlog item asked to extend."
+  },
+  {
+   "id": "PR70-P2-1",
+   "title": "Remove Drift recycler polling after interaction audit",
+   "status": "OPEN",
+   "evidence": "drift-layer.js:2998 still runs `setInterval(function(){if(DRIFT_ON)refreshActive();},650)`; refreshActive is defined at 908 (topUp alias 943) and is otherwise invoked only at 2997 (boot) and via setTimeout at 1995. No camera/phase/viewport-change gating exists; the donor's frame-loop check was never ported. Note drift-layer.js is GENERATED from prototypes/drift/drift-artifact.html (header lines 1-3), so the actual change goes in the drift source/extractor, with drift-layer.js:908-943 and 2997-2998 as the emitted anchors.",
+   "anchors": "drift-layer.js:908-943 (refreshActive — where change-gating goes), 2997-2998 (the 650 ms poll), 1995 (existing timeout call site to audit)"
+  }
+ ]
+}

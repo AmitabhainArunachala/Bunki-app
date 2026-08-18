@@ -86,6 +86,7 @@ const SCREEN_OWNERS: Readonly<Record<string, string>> = {
   'kanji-screen.tsx': 'WP-05',
   'drift-word-screen.tsx': 'one-app convergence (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md)',
   'drift-kanji-screen.tsx': 'one-app convergence (BUNKI_ONE_APP_CONVERGENCE_SPEC_2026-08-06.md)',
+  'kanji-keep.tsx': 'RENKAN R4-A P2-18 (_helper: keep-encounter panel shared by both kanji pages)',
   'evidence-inspector-screen.tsx': 'WP-09',
   'inspector-debug-screen.tsx': 'WP-09',
   'evidence-chain.ts': 'WP-09 (_helper: pure chain projection, not a screen)',

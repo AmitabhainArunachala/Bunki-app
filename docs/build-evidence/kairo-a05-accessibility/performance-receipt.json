@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "kairo-performance-protocol-receipt",
-  "verifiedCodeSha": "a3e2d88c541fb6f50a1482a98255b8ffe503f05e",
+  "verifiedCodeSha": "67d80732154304015f18dc6bfb8027a9a8c2d06b",
   "verdict": "unproven",
   "promotionRule": "A threshold becomes proven only from its declared production profile; local diagnostic numbers have no promotion authority.",
   "targetProfile": {
@@ -64,10 +64,10 @@
   "localDiagnostic": {
     "authority": "diagnostic_only",
     "environment": {
-      "device": "darwin arm64 development host",
-      "os": "darwin",
-      "runtime": "Chrome 151.0.7922.76",
-      "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "device": "linux x64 development host",
+      "os": "linux",
+      "runtime": "Chrome 141.0.7390.37",
+      "executable": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
       "build": "unbundled static source served with cache-control:no-store",
       "viewport": {
         "width": 390,
@@ -77,23 +77,23 @@
       "cache": "new browser context per boot; no-store loopback responses",
       "compression": "none",
       "network": "127.0.0.1 loopback; no shaping",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36"
     },
     "measurements": {
       "bootToReadableShelf": {
         "count": 5,
-        "min": 111,
-        "median": 117.5,
-        "p95": 119.5,
-        "max": 119.5,
+        "min": 670.1,
+        "median": 753.9,
+        "p95": 779.6,
+        "max": 779.6,
         "unit": "ms"
       },
       "warmLookupAnswer": {
         "count": 10,
-        "min": 124.3,
-        "median": 124.5,
-        "p95": 132.8,
-        "max": 132.8,
+        "min": 122.1,
+        "median": 128.1,
+        "p95": 208.6,
+        "max": 208.6,
         "unit": "ms",
         "diagnosticThresholdResult": "diagnostic_only_not_below",
         "productClaim": "unproven"
@@ -110,27 +110,27 @@
   },
   "bytes": {
     "basis": "committed decoded filesystem bytes; local server has no compression",
-    "totalCoreBytes": 7488563,
+    "totalCoreBytes": 8238927,
     "files": [
       {
         "path": "index.html",
-        "bytes": 1408
+        "bytes": 1625
       },
       {
         "path": "corridor.css",
-        "bytes": 36067
+        "bytes": 118504
       },
       {
         "path": "corridor.js",
-        "bytes": 123152
+        "bytes": 571543
       },
       {
         "path": "drift-layer.css",
-        "bytes": 13703
+        "bytes": 14243
       },
       {
         "path": "drift-layer.js",
-        "bytes": 780676
+        "bytes": 829606
       },
       {
         "path": "vendor/ts-fsrs.mjs",
@@ -138,7 +138,7 @@
       },
       {
         "path": "data/articles/index.json",
-        "bytes": 53444
+        "bytes": 147819
       },
       {
         "path": "data/proprietary_safe/kanken.json",
@@ -146,15 +146,15 @@
       },
       {
         "path": "data/proprietary_safe/sem.json",
-        "bytes": 38253
+        "bytes": 38262
       },
       {
         "path": "data/share_alike/kanji.json",
-        "bytes": 490503
+        "bytes": 514757
       },
       {
         "path": "data/share_alike/words.json",
-        "bytes": 736911
+        "bytes": 788122
       },
       {
         "path": "data/share_alike/idioms.json",
@@ -184,33 +184,33 @@
     "browserBootResources": [
       {
         "path": "corridor.css",
-        "transferSize": 36367,
-        "encodedBodySize": 36067,
-        "decodedBodySize": 36067
+        "transferSize": 118804,
+        "encodedBodySize": 118504,
+        "decodedBodySize": 118504
       },
       {
         "path": "drift-layer.css",
-        "transferSize": 14003,
-        "encodedBodySize": 13703,
-        "decodedBodySize": 13703
-      },
-      {
-        "path": "corridor.js",
-        "transferSize": 123452,
-        "encodedBodySize": 123152,
-        "decodedBodySize": 123152
+        "transferSize": 14543,
+        "encodedBodySize": 14243,
+        "decodedBodySize": 14243
       },
       {
         "path": "drift-layer.js",
-        "transferSize": 780976,
-        "encodedBodySize": 780676,
-        "decodedBodySize": 780676
+        "transferSize": 829906,
+        "encodedBodySize": 829606,
+        "decodedBodySize": 829606
+      },
+      {
+        "path": "corridor.js",
+        "transferSize": 571843,
+        "encodedBodySize": 571543,
+        "decodedBodySize": 571543
       },
       {
         "path": "data/articles/index.json",
-        "transferSize": 53744,
-        "encodedBodySize": 53444,
-        "decodedBodySize": 53444
+        "transferSize": 148119,
+        "encodedBodySize": 147819,
+        "decodedBodySize": 147819
       },
       {
         "path": "data/proprietary_safe/kanken.json",
@@ -220,45 +220,21 @@
       },
       {
         "path": "data/proprietary_safe/sem.json",
-        "transferSize": 38553,
-        "encodedBodySize": 38253,
-        "decodedBodySize": 38253
-      },
-      {
-        "path": "data/share_alike/strokes.json",
-        "transferSize": 1970747,
-        "encodedBodySize": 1970447,
-        "decodedBodySize": 1970447
+        "transferSize": 38562,
+        "encodedBodySize": 38262,
+        "decodedBodySize": 38262
       },
       {
         "path": "data/share_alike/kanji.json",
-        "transferSize": 490803,
-        "encodedBodySize": 490503,
-        "decodedBodySize": 490503
-      },
-      {
-        "path": "data/original/grammar-v11.json",
-        "transferSize": 8580,
-        "encodedBodySize": 8280,
-        "decodedBodySize": 8280
+        "transferSize": 515057,
+        "encodedBodySize": 514757,
+        "decodedBodySize": 514757
       },
       {
         "path": "data/share_alike/words.json",
-        "transferSize": 737211,
-        "encodedBodySize": 736911,
-        "decodedBodySize": 736911
-      },
-      {
-        "path": "data/manifest.json",
-        "transferSize": 1204,
-        "encodedBodySize": 904,
-        "decodedBodySize": 904
-      },
-      {
-        "path": "data/fsrs-pin.json",
-        "transferSize": 1021,
-        "encodedBodySize": 721,
-        "decodedBodySize": 721
+        "transferSize": 788422,
+        "encodedBodySize": 788122,
+        "decodedBodySize": 788122
       },
       {
         "path": "data/share_alike/idioms.json",
@@ -273,6 +249,36 @@
         "decodedBodySize": 2890117
       },
       {
+        "path": "data/share_alike/strokes.json",
+        "transferSize": 1970747,
+        "encodedBodySize": 1970447,
+        "decodedBodySize": 1970447
+      },
+      {
+        "path": "data/share_alike/radicals214.json",
+        "transferSize": 21571,
+        "encodedBodySize": 21271,
+        "decodedBodySize": 21271
+      },
+      {
+        "path": "data/original/grammar-v11.json",
+        "transferSize": 8580,
+        "encodedBodySize": 8280,
+        "decodedBodySize": 8280
+      },
+      {
+        "path": "data/manifest.json",
+        "transferSize": 1204,
+        "encodedBodySize": 904,
+        "decodedBodySize": 904
+      },
+      {
+        "path": "data/fsrs-pin.json",
+        "transferSize": 1021,
+        "encodedBodySize": 721,
+        "decodedBodySize": 721
+      },
+      {
         "path": "vendor/ts-fsrs.mjs",
         "transferSize": 60957,
         "encodedBodySize": 60657,
@@ -284,39 +290,42 @@
     "bootResourcePaths": [
       "corridor.css",
       "drift-layer.css",
-      "corridor.js",
       "drift-layer.js",
+      "corridor.js",
       "data/articles/index.json",
       "data/proprietary_safe/kanken.json",
       "data/proprietary_safe/sem.json",
-      "data/share_alike/strokes.json",
       "data/share_alike/kanji.json",
-      "data/original/grammar-v11.json",
       "data/share_alike/words.json",
-      "data/manifest.json",
-      "data/fsrs-pin.json",
       "data/share_alike/idioms.json",
       "data/share_alike/dict.json",
+      "data/share_alike/strokes.json",
+      "data/share_alike/radicals214.json",
+      "data/original/grammar-v11.json",
+      "data/manifest.json",
+      "data/fsrs-pin.json",
       "vendor/ts-fsrs.mjs"
     ],
     "articleBodiesAbsentAtImmediateReady": true,
     "resourcesAfterOpeningFirstArticle": [
       "corridor.css",
       "drift-layer.css",
-      "corridor.js",
       "drift-layer.js",
+      "corridor.js",
       "data/articles/index.json",
       "data/proprietary_safe/kanken.json",
       "data/proprietary_safe/sem.json",
-      "data/share_alike/strokes.json",
       "data/share_alike/kanji.json",
-      "data/original/grammar-v11.json",
       "data/share_alike/words.json",
-      "data/manifest.json",
-      "data/fsrs-pin.json",
       "data/share_alike/idioms.json",
       "data/share_alike/dict.json",
+      "data/share_alike/strokes.json",
+      "data/share_alike/radicals214.json",
+      "data/original/grammar-v11.json",
+      "data/manifest.json",
+      "data/fsrs-pin.json",
       "vendor/ts-fsrs.mjs",
+      "dictionary-worker.js",
       "data/articles/wikinews-1403.json",
       "data/articles/wikinews-6460.json",
       "data/articles/wikinews-12024.json",
@@ -342,19 +351,91 @@
       "data/articles/bunki-essay-n1-ai.json",
       "data/articles/real-gokajo.json",
       "data/articles/real-hojoki.json",
-      "data/articles/real-tsurezure.json"
+      "data/articles/real-tsurezure.json",
+      "data/articles/bunki-graded-n5-station.json",
+      "data/articles/bunki-graded-n5-kitchen.json",
+      "data/articles/bunki-graded-n5-neighbour.json",
+      "data/articles/bunki-graded-n4-letter.json",
+      "data/articles/bunki-graded-n4-market.json",
+      "data/articles/bunki-graded-n4-bicycle.json",
+      "data/articles/bunki-graded-n3-river.json",
+      "data/articles/bunki-graded-n3-radio.json",
+      "data/articles/bunki-essay-n2-handwriting.json",
+      "data/articles/bunki-essay-n2-notebook.json",
+      "data/articles/bunki-essay-n2-rain.json",
+      "data/articles/bunki-essay-n2-translation.json",
+      "data/articles/bunki-essay-n1-memory.json",
+      "data/articles/bunki-essay-n1-city.json",
+      "data/articles/bunki-graded-n3-zoka-sanjin-morning.json",
+      "data/articles/bunki-graded-n3-nakaima-diary.json",
+      "data/articles/bunki-graded-n3-world-beginning.json",
+      "data/articles/bunki-graded-n3-hidden-deity.json",
+      "data/articles/bunki-graded-n3-kojiki-book.json",
+      "data/articles/bunki-graded-n3-hashira-counter.json",
+      "data/articles/bunki-graded-n3-feel-jingu-forest.json",
+      "data/articles/bunki-graded-n3-musubi-visual.json",
+      "data/articles/bunki-graded-n3-gratitude-week.json",
+      "data/articles/bunki-graded-n3-thanks-before-help.json",
+      "data/articles/bunki-essay-n2-zoka-as-one.json",
+      "data/articles/bunki-essay-n2-nakaima-time.json",
+      "data/articles/bunki-essay-n2-creator-god.json",
+      "data/articles/bunki-essay-n2-silent-amenominakanushi.json",
+      "data/articles/bunki-essay-n2-kojiki-myth-history.json",
+      "data/articles/bunki-essay-n2-myth-to-book.json",
+      "data/articles/bunki-essay-n2-feel-jingu-musubi.json",
+      "data/articles/bunki-essay-n2-prayer-on-screen.json",
+      "data/articles/bunki-essay-n2-thanks-first.json",
+      "data/articles/bunki-essay-n2-testimony-literacy.json",
+      "data/articles/bunki-essay-n1-cosmic-analogy.json",
+      "data/articles/bunki-essay-n1-nakaima-time-theory.json"
     ],
     "articleBodiesAfterOpeningFirstArticle": {
-      "count": 26,
+      "count": 62,
       "paths": [
         "data/articles/aozora-000628.json",
         "data/articles/aozora-046605.json",
         "data/articles/aozora-051034.json",
         "data/articles/bunki-essay-n1-ai.json",
+        "data/articles/bunki-essay-n1-city.json",
+        "data/articles/bunki-essay-n1-cosmic-analogy.json",
+        "data/articles/bunki-essay-n1-memory.json",
+        "data/articles/bunki-essay-n1-nakaima-time-theory.json",
+        "data/articles/bunki-essay-n2-creator-god.json",
+        "data/articles/bunki-essay-n2-feel-jingu-musubi.json",
+        "data/articles/bunki-essay-n2-handwriting.json",
+        "data/articles/bunki-essay-n2-kojiki-myth-history.json",
         "data/articles/bunki-essay-n2-mountain.json",
+        "data/articles/bunki-essay-n2-myth-to-book.json",
+        "data/articles/bunki-essay-n2-nakaima-time.json",
+        "data/articles/bunki-essay-n2-notebook.json",
+        "data/articles/bunki-essay-n2-prayer-on-screen.json",
+        "data/articles/bunki-essay-n2-rain.json",
+        "data/articles/bunki-essay-n2-silent-amenominakanushi.json",
+        "data/articles/bunki-essay-n2-testimony-literacy.json",
+        "data/articles/bunki-essay-n2-thanks-first.json",
+        "data/articles/bunki-essay-n2-translation.json",
+        "data/articles/bunki-essay-n2-zoka-as-one.json",
+        "data/articles/bunki-graded-n3-feel-jingu-forest.json",
+        "data/articles/bunki-graded-n3-gratitude-week.json",
+        "data/articles/bunki-graded-n3-hashira-counter.json",
+        "data/articles/bunki-graded-n3-hidden-deity.json",
+        "data/articles/bunki-graded-n3-kojiki-book.json",
+        "data/articles/bunki-graded-n3-musubi-visual.json",
+        "data/articles/bunki-graded-n3-nakaima-diary.json",
+        "data/articles/bunki-graded-n3-radio.json",
+        "data/articles/bunki-graded-n3-river.json",
+        "data/articles/bunki-graded-n3-thanks-before-help.json",
         "data/articles/bunki-graded-n3-town.json",
+        "data/articles/bunki-graded-n3-world-beginning.json",
+        "data/articles/bunki-graded-n3-zoka-sanjin-morning.json",
+        "data/articles/bunki-graded-n4-bicycle.json",
         "data/articles/bunki-graded-n4-bookshop.json",
+        "data/articles/bunki-graded-n4-letter.json",
+        "data/articles/bunki-graded-n4-market.json",
+        "data/articles/bunki-graded-n5-kitchen.json",
         "data/articles/bunki-graded-n5-morning.json",
+        "data/articles/bunki-graded-n5-neighbour.json",
+        "data/articles/bunki-graded-n5-station.json",
         "data/articles/real-gokajo.json",
         "data/articles/real-hojoki.json",
         "data/articles/real-tsurezure.json",
@@ -375,7 +456,7 @@
         "data/articles/yasashii-9.json"
       ]
     },
-    "currentGap": "26 article bodies were fetched by the time one article opened; dictionary, kanji, word, idiom, stroke, grammar, and Drift bundles also remain boot-critical; A4 sharding is not yet achieved"
+    "currentGap": "62 article bodies were fetched by the time one article opened; dictionary, kanji, word, idiom, stroke, grammar, and Drift bundles also remain boot-critical; A4 sharding is not yet achieved"
   },
   "protocolSource": "KAIRO_EXCELLENCE_SPEC_2026-08-08.md §3 P1-P3, §4 rule 8, §5 A0.5/A4"
 }

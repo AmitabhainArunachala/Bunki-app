@@ -94,10 +94,13 @@ const MANUAL_PROVENANCE = {
 /**
  * The learner's own two gestures: Keep, then "Take it up for study".
  *
- * These are the exact commands `capture-screen.tsx` dispatches from its two
- * press handlers. Nothing else in the app produces either one — which is the
- * property the P0 fix installed and the reason this helper lives in the test
- * rather than in the bootstrap.
+ * Since R4-A these are the LEGACY path: a bare promote → learn, which is what
+ * a thread with no resolving seed specification still takes. The capture
+ * screen's own press handlers now dispatch `seedLearnCommand`/`activateLearn`
+ * for any thread that resolves a seed (including this helper's default 分岐),
+ * and that path is pinned by `learn-lineage.test.ts` and the `r4a-kernel`
+ * e2e spec. This suite therefore exercises the migration path deliberately —
+ * both paths must mint through the same validated pair factory.
  */
 function takeUpForStudy(store: AppStore, headword: string = DEFAULT_CANONICAL_TARGET): string {
   const lexeme = findLexemeByHeadword(headword);
@@ -303,9 +306,25 @@ describe('the app bootstraps a real closed loop, not a fixture', () => {
 
     const first = bootstrapSessionWorkspace(store, context);
     const second = bootstrapSessionWorkspace(store, context);
-    expect(second.workspace.log.map((event) => event.eventId)).toEqual(
-      first.workspace.log.map((event) => event.eventId),
+    // Identity lives in the contract ids and idempotency keys, deliberately
+    // not in the event ids. `createLearnContractPair` exposes no eventId
+    // override, so every mint draws `context.ids.nextId('event')` from the
+    // monotonic counter: a second bootstrap necessarily gets fresh ids, by
+    // construction rather than by policy. What a re-render must reproduce is
+    // the *same pair under the same keys*, which is what makes the second
+    // copy a no-op at the persist seam (memory-store dedupes on
+    // idempotencyKey) rather than a duplicate.
+    expect(second.workspace.log.map((event) => event.idempotencyKey)).toEqual(
+      first.workspace.log.map((event) => event.idempotencyKey),
     );
+    const contractIdsOf = (log: readonly { type: string }[]): readonly string[] =>
+      log
+        .filter(
+          (event): event is { type: string; contractId: string } =>
+            event.type === 'ContractCreated',
+        )
+        .map((event) => event.contractId);
+    expect(contractIdsOf(second.workspace.log)).toEqual(contractIdsOf(first.workspace.log));
     // …and neither build touched the store, which is the stronger property.
     expect(store.readAll()).toHaveLength(eventsBefore);
   });

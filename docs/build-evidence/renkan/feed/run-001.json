@@ -1,0 +1,143 @@
+{
+  "kind": "feed-ingest-run",
+  "run": 1,
+  "asOf": "2026-08-16",
+  "trancheRequested": 6,
+  "sourceMode": {
+    "mode": "committed-archive",
+    "url": "https://dumps.wikimedia.org/jawikinews/latest/jawikinews-latest-pages-articles.xml.bz2",
+    "error": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+    "note": "egress blocked or upstream unreachable — degraded per campaign spec B2 to this operator-runnable script over the committed corpus/datasets/wikinews/archive.jsonl"
+  },
+  "shelfBandCountsBefore": {
+    "初級前半": 2,
+    "初級後半": 7,
+    "中級前半": 16,
+    "中級後半": 35,
+    "上級前半": 8,
+    "上級後半": 2
+  },
+  "eligibleStock": 686,
+  "selectionTrace": [
+    {
+      "band": "初級前半",
+      "bandCountBefore": 2,
+      "picked": "wikinews:44381",
+      "date": "2025-11-13",
+      "chars": 900
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 2,
+      "picked": "wikinews:45224",
+      "date": "2026-04-17",
+      "chars": 866
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 3,
+      "picked": "wikinews:45216",
+      "date": "2026-04-15",
+      "chars": 789
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 4,
+      "picked": "wikinews:45208",
+      "date": "2026-03-31",
+      "chars": 390
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 5,
+      "picked": "wikinews:45174",
+      "date": "2026-03-05",
+      "chars": 506
+    },
+    {
+      "band": "上級後半",
+      "bandCountBefore": 6,
+      "picked": "wikinews:45101",
+      "date": "2026-02-19",
+      "chars": 539
+    }
+  ],
+  "minted": [
+    {
+      "id": "wikinews:44381",
+      "kind": "mint",
+      "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+      "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "初級前半 · jread 5.80 · JLPT語彙 24% · 900字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45224",
+      "kind": "mint",
+      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+      "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 0.68 · JLPT語彙 43% · 866字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45216",
+      "kind": "mint",
+      "title": "南丹市で行方不明の男児の遺体が見つかる",
+      "titleEn": "Body of missing boy found in Nantan, Kyoto",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 0.52 · JLPT語彙 49% · 789字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45208",
+      "kind": "mint",
+      "title": "南海 フェリー事業から撤退へ",
+      "titleEn": "Nankai to withdraw from its ferry business",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 1.11 · JLPT語彙 46% · 390字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45174",
+      "kind": "mint",
+      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+      "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 0.69 · JLPT語彙 63% · 506字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    },
+    {
+      "id": "wikinews:45101",
+      "kind": "mint",
+      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+      "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+      "lane": "news",
+      "licence": "CC BY 2.5",
+      "gradingSummary": "上級後半 · jread 0.47 · JLPT語彙 50% · 539字",
+      "addedAt": "2026-08-16",
+      "decision": "pending"
+    }
+  ],
+  "cullProposalsQueued": [
+    "wikinews:5991",
+    "wikinews:1483"
+  ],
+  "outputSha256": {
+    "index.json": "2dfb347ce0f669af6df654eef8b85efc8a50931be4d7788b591756bf63bb7eae",
+    "archive-index.json": "c57a8a488b919924ec297f0918b6b95b4f9a1f75e7440935618e6b432d1a4d96",
+    "feed-review-queue.json": "00ec41a5bb0f655b9e09287ed5682a4887c9f8ffd563640b128b7a3fbf910f39",
+    "feed-curation-report.json": "11b1aa038f5e5773b07a384884f1b0a5fe333c90f006b28b65dbce5a4ffd4227"
+  }
+}

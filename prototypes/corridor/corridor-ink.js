@@ -775,8 +775,10 @@ function startGPU(canvas, spec, device) {
   // slower hand, MORE physics per stroke — richer ink, never poorer.
   // No auto-rewrite: 触れて、もう一度 — the hand writes again on touch.
   let writing = false, writeSpeed = 1, t0 = 0;
+  let looping = false; // the frame loop runs only while there is something to draw
   function begin(opts) {
     try {
+      if (!looping) { looping = true; requestAnimationFrame(frame); }
       writeSpeed = (opts && opts.speed) || 1;
       seed = (Math.random() * 1e9) >>> 0;
       const r = rng(seed);
@@ -805,9 +807,14 @@ function startGPU(canvas, spec, device) {
   function frame(now) {
     if (!alive) return;
     if (dead) { handle.ondead && handle.ondead(); return; }
+    if (!writing) {
+      // FREEZE at finish — see the gl2 path's note
+      try { blit(); } catch { /* the device may be gone; the freeze stands */ }
+      looping = false;
+      return;
+    }
     requestAnimationFrame(frame);
     try {
-      if (!writing) { blit(); return; }
       const vNow = t0 + (now - t0) * writeSpeed;
       const step = writer.advance(vNow);
       if (step.beginStroke !== null) {
@@ -827,7 +834,6 @@ function startGPU(canvas, spec, device) {
     ready: initCheck,
   };
   begin(spec.first);
-  requestAnimationFrame(frame);
   return handle;
 }
 
@@ -975,6 +981,7 @@ function startGL2(canvas, spec) {
   // 原拍 GALLERY LAW — same as the gpu path: wall-clock hand, two sim steps
   // per displayed frame (the gallery's own gl2 rhythm), freeze at finish.
   let writing = false, writeSpeed = 1, t0 = 0;
+  let looping = false; // the frame loop runs only while there is something to draw
   function draw() {
     gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     gl.enableVertexAttribArray(0);
@@ -982,6 +989,7 @@ function startGL2(canvas, spec) {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   function begin(opts) {
+    if (!looping) { looping = true; requestAnimationFrame(frame); }
     writeSpeed = (opts && opts.speed) || 1;
     seed = (Math.random() * 1e9) >>> 0;
     const r = rng(seed);
@@ -1064,8 +1072,17 @@ function startGL2(canvas, spec) {
   }
   function frame(now) {
     if (!alive) return;
+    if (!writing) {
+      // FREEZE at finish (gallery law): the simulation already stops, but the
+      // loop kept re-arming and redrawing an unchanged 800x800 target for as
+      // long as the room stayed open — a phone burning battery on a still
+      // (E3 round-A, performance lens). One last settled frame, then the loop
+      // ends; begin() starts it again for a rewrite or a world change.
+      render();
+      looping = false;
+      return;
+    }
     requestAnimationFrame(frame);
-    if (!writing) { render(); return; }
     const vNow = t0 + (now - t0) * writeSpeed;
     const out = writer.advance(vNow);
     if (out.beginStroke !== null) {
@@ -1088,7 +1105,6 @@ function startGL2(canvas, spec) {
     },
   };
   begin(spec.first);
-  requestAnimationFrame(frame);
   return handle;
 }
 

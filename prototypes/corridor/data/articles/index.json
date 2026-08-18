@@ -17,9 +17,9 @@
    },
    {
     "name": "isa-yasashii-glossary",
-    "licence": "出入国在留管理庁 やさしい日本語 用語集",
+    "licence": "利用条件 未検証（要確認）",
     "attribution": "出入国在留管理庁",
-    "url": ""
+    "url": "https://www.moj.go.jp/isa/"
    },
    {
     "name": "ninjal-kyoiku-kihon-goi",
@@ -79,6 +79,8 @@
   {
    "id": "wikinews:1403",
    "title": "世界自然遺産に7箇所を追加 知床半島も",
+   "titleEn": "Seven sites added to the World Natural Heritage list — including Shiretoko",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -99,17 +101,17 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5174418604651163,
+      "coverage": 0.6752873563218391,
       "band_vector": {
-       "n5": 0.0436046511627907,
-       "n4": 0.11918604651162791,
-       "n3": 0.18895348837209303,
-       "n2": 0.07848837209302326,
-       "n1": 0.0872093023255814,
-       "oov": 0.48255813953488375
+       "n5": 0.09482758620689655,
+       "n4": 0.1235632183908046,
+       "n3": 0.27586206896551724,
+       "n2": 0.08045977011494253,
+       "n1": 0.10057471264367816,
+       "oov": 0.32471264367816094
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 344
+      "n_content_tokens": 348
      }
     },
     "disagreement": {
@@ -137,6 +139,8 @@
   {
    "id": "wikinews:6460",
    "title": "マリナーズ・イチロー選手 現役通算2500安打達成",
+   "titleEn": "Mariners' Ichiro reaches 2,500 career hits",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -157,14 +161,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.32558139534883723,
+      "coverage": 0.5581395348837209,
       "band_vector": {
-       "n5": 0.09302325581395349,
-       "n4": 0.05813953488372093,
-       "n3": 0.11627906976744186,
-       "n2": 0.011627906976744186,
-       "n1": 0.046511627906976744,
-       "oov": 0.6744186046511628
+       "n5": 0.16279069767441862,
+       "n4": 0.10465116279069768,
+       "n3": 0.20930232558139536,
+       "n2": 0.023255813953488372,
+       "n1": 0.05813953488372093,
+       "oov": 0.4418604651162791
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 86
@@ -195,6 +199,8 @@
   {
    "id": "wikinews:12024",
    "title": "JRおおさか東線部分開業",
+   "titleEn": "JR Osaka-Higashi Line partially opens",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -215,14 +221,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5429864253393666,
+      "coverage": 0.7330316742081449,
       "band_vector": {
-       "n5": 0.13122171945701358,
-       "n4": 0.1085972850678733,
-       "n3": 0.14027149321266968,
-       "n2": 0.08597285067873303,
+       "n5": 0.19004524886877827,
+       "n4": 0.15384615384615385,
+       "n3": 0.2171945701357466,
+       "n2": 0.09502262443438914,
        "n1": 0.07692307692307693,
-       "oov": 0.45701357466063347
+       "oov": 0.2669683257918552
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 221
@@ -253,6 +259,8 @@
   {
    "id": "wikinews:20090",
    "title": "信楽高原鐵道列車衝突事故、JR西日本の過失は3割 - 大阪地裁が認定",
+   "titleEn": "Shigaraki Kōgen Railway crash: court finds JR West 30% at fault",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
    "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
@@ -273,14 +281,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5420168067226891,
+      "coverage": 0.7268907563025211,
       "band_vector": {
-       "n5": 0.08403361344537816,
-       "n4": 0.09243697478991597,
-       "n3": 0.23529411764705882,
+       "n5": 0.16806722689075632,
+       "n4": 0.1134453781512605,
+       "n3": 0.31512605042016806,
        "n2": 0.0546218487394958,
        "n1": 0.07563025210084033,
-       "oov": 0.4579831932773109
+       "oov": 0.27310924369747897
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 238
@@ -312,8 +320,10 @@
    "id": "wikinews:45227",
    "pendingVerification": true,
    "title": "ウィキニュース、21年の歴史に幕を閉じる",
+   "titleEn": "Wikinews closes the curtain on 21 years",
+   "titleEnSource": "shelf-map-2026",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース",
+   "sourceLabel": "ウィキニュース · 検収前",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
@@ -332,14 +342,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.47112462006079026,
+      "coverage": 0.6413373860182371,
       "band_vector": {
-       "n5": 0.0790273556231003,
-       "n4": 0.0911854103343465,
-       "n3": 0.21580547112462006,
-       "n2": 0.0243161094224924,
-       "n1": 0.060790273556231005,
-       "oov": 0.5288753799392097
+       "n5": 0.1519756838905775,
+       "n4": 0.1033434650455927,
+       "n3": 0.2917933130699088,
+       "n2": 0.02735562310030395,
+       "n1": 0.0668693009118541,
+       "oov": 0.3586626139817629
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 329
@@ -365,18 +375,21 @@
     "財団",
     "理事"
    ],
-   "truncated": false
+   "truncated": false,
+   "review": "human-review-pending"
   },
   {
    "id": "aozora:051034",
    "title": "野ばら",
+   "titleEn": "The Wild Rose — Ogawa Mimei",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 小川未明",
    "pool": "proprietary_safe",
    "licence": "PD (著作権フラグ なし) · 新字新仮名",
    "attribution": "青空文庫 小川未明「野ばら」",
    "url": "https://www.aozora.gr.jp/cards/001475/card51034.html",
-   "date": "None",
+   "date": "",
    "rubySource": "tokenizer",
    "file": "aozora-051034.json",
    "chars": 2350,
@@ -390,14 +403,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.46365105008077545,
+      "coverage": 0.7673667205169629,
       "band_vector": {
-       "n5": 0.21163166397415187,
-       "n4": 0.07754442649434572,
-       "n3": 0.13893376413570274,
-       "n2": 0.009693053311793215,
-       "n1": 0.025848142164781908,
-       "oov": 0.5363489499192245
+       "n5": 0.345718901453958,
+       "n4": 0.1308562197092084,
+       "n3": 0.22617124394184168,
+       "n2": 0.025848142164781908,
+       "n1": 0.03877221324717286,
+       "oov": 0.23263327948303716
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 619
@@ -428,6 +441,8 @@
   {
    "id": "aozora:000628",
    "title": "ごん狐",
+   "titleEn": "Gon the Fox — Niimi Nankichi",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 新美南吉",
    "pool": "proprietary_safe",
@@ -448,14 +463,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.33362598770851626,
+      "coverage": 0.6479367866549606,
       "band_vector": {
-       "n5": 0.21334503950834066,
-       "n4": 0.05706760316066725,
-       "n3": 0.041264266900790166,
-       "n2": 0.015803336259877086,
-       "n1": 0.006145741878841089,
-       "oov": 0.6663740122914837
+       "n5": 0.3520632133450395,
+       "n4": 0.11501316944688324,
+       "n3": 0.11764705882352941,
+       "n2": 0.03775241439859526,
+       "n1": 0.025460930640913083,
+       "oov": 0.3520632133450395
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 1139
@@ -486,6 +501,8 @@
   {
    "id": "aozora:046605",
    "title": "やまなし",
+   "titleEn": "Yamanashi — Miyazawa Kenji",
+   "titleEnSource": "shelf-map-2026",
    "source": "aozorabunko-clean",
    "sourceLabel": "青空文庫 · 宮沢賢治",
    "pool": "proprietary_safe",
@@ -506,14 +523,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.45765230312035665,
+      "coverage": 0.6909361069836553,
       "band_vector": {
-       "n5": 0.2689450222882615,
-       "n4": 0.0713224368499257,
-       "n3": 0.0861812778603269,
-       "n2": 0.01634472511144131,
-       "n1": 0.014858841010401188,
-       "oov": 0.5423476968796433
+       "n5": 0.3521545319465082,
+       "n4": 0.13670133729569092,
+       "n3": 0.14710252600297177,
+       "n2": 0.03268945022288262,
+       "n1": 0.022288261515601784,
+       "oov": 0.30906389301634474
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 673
@@ -544,11 +561,13 @@
   {
    "id": "yasashii:1",
    "title": "育児休業",
+   "titleEn": "Childcare leave",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜育児休業《いくじきゅうぎょう》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -565,14 +584,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.2857142857142857,
+      "coverage": 0.7142857142857143,
       "band_vector": {
-       "n5": 0.14285714285714285,
-       "n4": 0.14285714285714285,
-       "n3": 0,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.7142857142857143
+       "n5": 0.2857142857142857,
+       "n4": 0.42857142857142855,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.2857142857142857
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 7
@@ -598,16 +617,20 @@
     "こと",
     "できる"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:2",
    "title": "育児休業給付金",
+   "titleEn": "Childcare-leave benefit",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜育児休業給付金《いくじきゅうぎょうきゅうふきん》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -624,14 +647,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.3076923076923077,
+      "coverage": 0.6153846153846154,
       "band_vector": {
-       "n5": 0,
-       "n4": 0,
-       "n3": 0.07692307692307693,
+       "n5": 0.07692307692307693,
+       "n4": 0.15384615384615385,
+       "n3": 0.15384615384615385,
        "n2": 0.15384615384615385,
        "n1": 0.07692307692307693,
-       "oov": 0.6923076923076923
+       "oov": 0.38461538461538464
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 13
@@ -657,16 +680,20 @@
     "あいだ",
     "雇用"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:3",
    "title": "遺族基礎年金",
+   "titleEn": "Basic survivor's pension",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜遺族基礎年金《いぞくきそねんきん》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -683,14 +710,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.4666666666666667,
+      "coverage": 0.6,
       "band_vector": {
-       "n5": 0.26666666666666666,
-       "n4": 0,
+       "n5": 0.3333333333333333,
+       "n4": 0.06666666666666667,
        "n3": 0.2,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.5333333333333333
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.4
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 15
@@ -716,16 +743,20 @@
     "死ぬ",
     "とき"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:4",
    "title": "遺族厚生年金",
+   "titleEn": "Employees' survivor's pension",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜遺族厚生年金《いぞくこうせいねんきん》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -742,14 +773,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.4117647058823529,
+      "coverage": 0.5294117647058824,
       "band_vector": {
-       "n5": 0.23529411764705882,
-       "n4": 0,
+       "n5": 0.29411764705882354,
+       "n4": 0.058823529411764705,
        "n3": 0.058823529411764705,
-       "n2": 0,
+       "n2": 0.0,
        "n1": 0.11764705882352941,
-       "oov": 0.5882352941176471
+       "oov": 0.47058823529411764
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 17
@@ -775,16 +806,20 @@
     "入る",
     "死ぬ"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:5",
    "title": "医療保険",
+   "titleEn": "Medical insurance",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜医療保険《いりょうほけん》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -806,8 +841,8 @@
        "n5": 0.4,
        "n4": 0.1,
        "n3": 0.3,
-       "n2": 0,
-       "n1": 0,
+       "n2": 0.0,
+       "n1": 0.0,
        "oov": 0.2
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
@@ -834,16 +869,20 @@
     "病院",
     "行く"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:6",
    "title": "印鑑登録証明書",
+   "titleEn": "Seal-registration certificate",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜印鑑登録証明書《いんかんとうろくしょうめいしょ》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -860,14 +899,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.2857142857142857,
+      "coverage": 0.5714285714285714,
       "band_vector": {
-       "n5": 0.21428571428571427,
-       "n4": 0,
-       "n3": 0,
+       "n5": 0.42857142857142855,
+       "n4": 0.07142857142857142,
+       "n3": 0.0,
        "n2": 0.07142857142857142,
-       "n1": 0,
-       "oov": 0.7142857142857143
+       "n1": 0.0,
+       "oov": 0.42857142857142855
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 14
@@ -893,16 +932,20 @@
     "書く",
     "ある"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:7",
    "title": "印鑑登録証",
+   "titleEn": "Seal-registration card",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜印鑑登録証《いんかんとうろくしょう》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -919,14 +962,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.4285714285714286,
+      "coverage": 0.6666666666666667,
       "band_vector": {
-       "n5": 0.14285714285714285,
-       "n4": 0,
+       "n5": 0.38095238095238093,
+       "n4": 0.0,
        "n3": 0.09523809523809523,
        "n2": 0.09523809523809523,
        "n1": 0.09523809523809523,
-       "oov": 0.5714285714285714
+       "oov": 0.3333333333333333
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 21
@@ -952,16 +995,20 @@
     "印鑑",
     "登録"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:8",
    "title": "オーバーステイ",
+   "titleEn": "Overstaying a visa",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "オーバーステイ",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -978,14 +1025,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.33333333333333337,
+      "coverage": 0.6666666666666667,
       "band_vector": {
-       "n5": 0,
-       "n4": 0.16666666666666666,
+       "n5": 0.16666666666666666,
+       "n4": 0.3333333333333333,
        "n3": 0.16666666666666666,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.6666666666666666
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.3333333333333333
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 6
@@ -1011,16 +1058,20 @@
     "いる",
     "こと"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:9",
    "title": "大家",
+   "titleEn": "Landlord",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜大家《おおや》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -1037,14 +1088,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 1,
+      "coverage": 1.0,
       "band_vector": {
-       "n5": 1,
-       "n4": 0,
-       "n3": 0,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0
+       "n5": 1.0,
+       "n4": 0.0,
+       "n3": 0.0,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.0
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 3
@@ -1065,16 +1116,20 @@
    "seeds": [
     "貸す"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "yasashii:10",
    "title": "介護",
+   "titleEn": "Long-term care",
+   "titleEnSource": "shelf-map-2026",
    "headwordRuby": "｜介護《かいご》",
    "source": "isa-yasashii-glossary",
-   "sourceLabel": "やさしい日本語 用語集",
+   "sourceLabel": "やさしい日本語 用語集 · 検収前",
    "pool": "proprietary_safe",
-   "licence": "ISA やさしい日本語 glossary",
+   "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
    "url": "",
    "date": "",
@@ -1091,14 +1146,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.4736842105263158,
+      "coverage": 0.9473684210526316,
       "band_vector": {
-       "n5": 0.3157894736842105,
-       "n4": 0.15789473684210525,
-       "n3": 0,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.5263157894736842
+       "n5": 0.42105263157894735,
+       "n4": 0.42105263157894735,
+       "n3": 0.10526315789473684,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.05263157894736842
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 19
@@ -1124,11 +1179,15 @@
     "毎日",
     "生活"
    ],
-   "truncated": false
+   "truncated": false,
+   "pendingVerification": true,
+   "review": "rights-review-pending"
   },
   {
    "id": "bunki-graded-n5-morning",
    "title": "静かな朝",
+   "titleEn": "A Quiet Morning",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1151,14 +1210,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6455696202531646,
+      "coverage": 0.7721518987341772,
       "band_vector": {
-       "n5": 0.5822784810126582,
-       "n4": 0.02531645569620253,
-       "n3": 0.012658227848101266,
+       "n5": 0.6329113924050633,
+       "n4": 0.0759493670886076,
+       "n3": 0.0379746835443038,
        "n2": 0.012658227848101266,
        "n1": 0.012658227848101266,
-       "oov": 0.35443037974683544
+       "oov": 0.22784810126582278
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 79
@@ -1189,6 +1248,8 @@
   {
    "id": "bunki-graded-n4-bookshop",
    "title": "雨の日の古本屋",
+   "titleEn": "The Second-hand Bookshop on a Rainy Day",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1211,14 +1272,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.7553191489361702,
+      "coverage": 0.851063829787234,
       "band_vector": {
-       "n5": 0.5425531914893617,
-       "n4": 0.10638297872340426,
-       "n3": 0.09574468085106383,
+       "n5": 0.5957446808510638,
+       "n4": 0.13829787234042554,
+       "n3": 0.10638297872340426,
        "n2": 0.010638297872340425,
-       "n1": 0,
-       "oov": 0.24468085106382978
+       "n1": 0.0,
+       "oov": 0.14893617021276595
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 94
@@ -1249,6 +1310,8 @@
   {
    "id": "bunki-graded-n3-town",
    "title": "知らない町を歩く",
+   "titleEn": "Walking an Unknown Town",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1271,14 +1334,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6285714285714286,
+      "coverage": 0.819047619047619,
       "band_vector": {
-       "n5": 0.3619047619047619,
-       "n4": 0.1619047619047619,
-       "n3": 0.08571428571428572,
+       "n5": 0.45714285714285713,
+       "n4": 0.20952380952380953,
+       "n3": 0.13333333333333333,
        "n2": 0.009523809523809525,
        "n1": 0.009523809523809525,
-       "oov": 0.37142857142857144
+       "oov": 0.18095238095238095
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 105
@@ -1309,6 +1372,8 @@
   {
    "id": "bunki-essay-n2-mountain",
    "title": "山を歩きながら考えたこと",
+   "titleEn": "Thoughts While Walking a Mountain",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -1331,14 +1396,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.582089552238806,
+      "coverage": 0.7686567164179104,
       "band_vector": {
-       "n5": 0.1865671641791045,
-       "n4": 0.11940298507462686,
-       "n3": 0.23134328358208955,
-       "n2": 0.022388059701492536,
+       "n5": 0.2835820895522388,
+       "n4": 0.14925373134328357,
+       "n3": 0.2835820895522388,
+       "n2": 0.029850746268656716,
        "n1": 0.022388059701492536,
-       "oov": 0.417910447761194
+       "oov": 0.23134328358208955
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 134
@@ -1369,6 +1434,8 @@
   {
    "id": "bunki-essay-n1-ai",
    "title": "AI時代の知識と判断",
+   "titleEn": "Knowledge and Judgment in the Age of AI",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -1391,14 +1458,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5642458100558659,
+      "coverage": 0.7932960893854748,
       "band_vector": {
-       "n5": 0.0893854748603352,
-       "n4": 0.10614525139664804,
-       "n3": 0.26256983240223464,
-       "n2": 0.0446927374301676,
+       "n5": 0.1564245810055866,
+       "n4": 0.18994413407821228,
+       "n3": 0.3240223463687151,
+       "n2": 0.061452513966480445,
        "n1": 0.061452513966480445,
-       "oov": 0.43575418994413406
+       "oov": 0.20670391061452514
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 179
@@ -1429,6 +1496,8 @@
   {
    "id": "real-gokajo",
    "title": "五箇条の御誓文",
+   "titleEn": "The Charter Oath (1868)",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "一次資料 · Historical primary source",
    "pool": "proprietary_safe",
@@ -1451,14 +1520,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.47777777777777775,
+      "coverage": 0.6,
       "band_vector": {
-       "n5": 0.05555555555555555,
-       "n4": 0.07777777777777778,
-       "n3": 0.15555555555555556,
-       "n2": 0.07777777777777778,
+       "n5": 0.07777777777777778,
+       "n4": 0.14444444444444443,
+       "n3": 0.17777777777777778,
+       "n2": 0.08888888888888889,
        "n1": 0.1111111111111111,
-       "oov": 0.5222222222222223
+       "oov": 0.4
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 90
@@ -1489,6 +1558,8 @@
   {
    "id": "real-hojoki",
    "title": "方丈記 · 冒頭",
+   "titleEn": "Hōjōki — the opening",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "古典 · 鴨長明 · 1212",
    "pool": "proprietary_safe",
@@ -1511,14 +1582,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.41975308641975306,
+      "coverage": 0.691358024691358,
       "band_vector": {
-       "n5": 0.2222222222222222,
-       "n4": 0.04938271604938271,
-       "n3": 0.09876543209876543,
-       "n2": 0,
-       "n1": 0.04938271604938271,
-       "oov": 0.5802469135802469
+       "n5": 0.2716049382716049,
+       "n4": 0.12345679012345678,
+       "n3": 0.19753086419753085,
+       "n2": 0.024691358024691357,
+       "n1": 0.07407407407407407,
+       "oov": 0.30864197530864196
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 81
@@ -1549,6 +1620,8 @@
   {
    "id": "real-tsurezure",
    "title": "徒然草 · 序段",
+   "titleEn": "Tsurezuregusa — the opening passage",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-v11-historical",
    "sourceLabel": "古典 · 吉田兼好 · 14th century",
    "pool": "proprietary_safe",
@@ -1571,14 +1644,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.3648648648648649,
+      "coverage": 0.5945945945945945,
       "band_vector": {
-       "n5": 0.13513513513513514,
-       "n4": 0.0945945945945946,
-       "n3": 0.06756756756756757,
+       "n5": 0.22972972972972974,
+       "n4": 0.14864864864864866,
+       "n3": 0.13513513513513514,
        "n2": 0.02702702702702703,
-       "n1": 0.04054054054054054,
-       "oov": 0.6351351351351351
+       "n1": 0.05405405405405406,
+       "oov": 0.40540540540540543
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 74
@@ -1609,6 +1682,8 @@
   {
    "id": "bunki-graded-n5-station",
    "title": "駅で待つ時間",
+   "titleEn": "Waiting at the Station",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1631,14 +1706,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.7761194029850746,
+      "coverage": 0.8656716417910448,
       "band_vector": {
-       "n5": 0.6865671641791045,
+       "n5": 0.7761194029850746,
        "n4": 0.07462686567164178,
        "n3": 0.014925373134328358,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.22388059701492538
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.13432835820895522
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 67
@@ -1669,6 +1744,8 @@
   {
    "id": "bunki-graded-n5-kitchen",
    "title": "台所の音",
+   "titleEn": "Sounds from the Kitchen",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1691,14 +1768,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6885245901639344,
+      "coverage": 0.8688524590163934,
       "band_vector": {
-       "n5": 0.5573770491803278,
-       "n4": 0.08196721311475409,
-       "n3": 0.03278688524590164,
+       "n5": 0.6885245901639344,
+       "n4": 0.09836065573770492,
+       "n3": 0.04918032786885246,
        "n2": 0.01639344262295082,
-       "n1": 0,
-       "oov": 0.3114754098360656
+       "n1": 0.01639344262295082,
+       "oov": 0.13114754098360656
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 61
@@ -1729,6 +1806,8 @@
   {
    "id": "bunki-graded-n5-neighbour",
    "title": "となりの部屋の人",
+   "titleEn": "The Man in the Next Room",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1751,14 +1830,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6785714285714286,
+      "coverage": 0.75,
       "band_vector": {
-       "n5": 0.5892857142857143,
+       "n5": 0.625,
        "n4": 0.08928571428571429,
-       "n3": 0,
-       "n2": 0,
-       "n1": 0,
-       "oov": 0.32142857142857145
+       "n3": 0.03571428571428571,
+       "n2": 0.0,
+       "n1": 0.0,
+       "oov": 0.25
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 56
@@ -1789,6 +1868,8 @@
   {
    "id": "bunki-graded-n4-letter",
    "title": "引き出しの中の手紙",
+   "titleEn": "A Letter in the Drawer",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1811,14 +1892,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6144578313253012,
+      "coverage": 0.8313253012048193,
       "band_vector": {
-       "n5": 0.4457831325301205,
-       "n4": 0.13253012048192772,
-       "n3": 0.024096385542168676,
+       "n5": 0.5903614457831325,
+       "n4": 0.1566265060240964,
+       "n3": 0.07228915662650602,
        "n2": 0.012048192771084338,
-       "n1": 0,
-       "oov": 0.3855421686746988
+       "n1": 0.0,
+       "oov": 0.1686746987951807
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 83
@@ -1849,6 +1930,8 @@
   {
    "id": "bunki-graded-n4-market",
    "title": "朝の市場",
+   "titleEn": "The Morning Market",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1871,14 +1954,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.676056338028169,
+      "coverage": 0.8873239436619719,
       "band_vector": {
-       "n5": 0.5070422535211268,
-       "n4": 0.09859154929577464,
+       "n5": 0.6619718309859155,
+       "n4": 0.14084507042253522,
        "n3": 0.04225352112676056,
-       "n2": 0.014084507042253521,
+       "n2": 0.028169014084507043,
        "n1": 0.014084507042253521,
-       "oov": 0.323943661971831
+       "oov": 0.11267605633802817
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 71
@@ -1909,6 +1992,8 @@
   {
    "id": "bunki-graded-n4-bicycle",
    "title": "自転車をなくした日",
+   "titleEn": "The Day I Lost My Bicycle",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1931,14 +2016,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6351351351351351,
+      "coverage": 0.8783783783783784,
       "band_vector": {
-       "n5": 0.43243243243243246,
-       "n4": 0.12162162162162163,
-       "n3": 0.04054054054054054,
-       "n2": 0,
+       "n5": 0.5675675675675675,
+       "n4": 0.16216216216216217,
+       "n3": 0.10810810810810811,
+       "n2": 0.0,
        "n1": 0.04054054054054054,
-       "oov": 0.36486486486486486
+       "oov": 0.12162162162162163
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 74
@@ -1969,6 +2054,8 @@
   {
    "id": "bunki-graded-n3-river",
    "title": "川沿いの道",
+   "titleEn": "The Road Along the River",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -1991,14 +2078,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6304347826086957,
+      "coverage": 0.8695652173913043,
       "band_vector": {
-       "n5": 0.41304347826086957,
-       "n4": 0.11956521739130435,
-       "n3": 0.05434782608695652,
+       "n5": 0.532608695652174,
+       "n4": 0.20652173913043478,
+       "n3": 0.08695652173913043,
        "n2": 0.03260869565217391,
        "n1": 0.010869565217391304,
-       "oov": 0.3695652173913043
+       "oov": 0.13043478260869565
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 92
@@ -2029,6 +2116,8 @@
   {
    "id": "bunki-graded-n3-radio",
    "title": "深夜のラジオ",
+   "titleEn": "Late-night Radio",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
@@ -2051,14 +2140,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5517241379310345,
+      "coverage": 0.7931034482758621,
       "band_vector": {
-       "n5": 0.1839080459770115,
-       "n4": 0.16091954022988506,
-       "n3": 0.16091954022988506,
-       "n2": 0.022988505747126436,
+       "n5": 0.27586206896551724,
+       "n4": 0.2413793103448276,
+       "n3": 0.21839080459770116,
+       "n2": 0.034482758620689655,
        "n1": 0.022988505747126436,
-       "oov": 0.4482758620689655
+       "oov": 0.20689655172413793
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 87
@@ -2089,6 +2178,8 @@
   {
    "id": "bunki-essay-n2-handwriting",
    "title": "手で書くということ",
+   "titleEn": "On Writing by Hand",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2111,14 +2202,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.651685393258427,
+      "coverage": 0.8314606741573034,
       "band_vector": {
-       "n5": 0.2808988764044944,
-       "n4": 0.25842696629213485,
-       "n3": 0.10112359550561797,
+       "n5": 0.3595505617977528,
+       "n4": 0.3146067415730337,
+       "n3": 0.14606741573033707,
        "n2": 0.011235955056179775,
-       "n1": 0,
-       "oov": 0.34831460674157305
+       "n1": 0.0,
+       "oov": 0.16853932584269662
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 89
@@ -2149,6 +2240,8 @@
   {
    "id": "bunki-essay-n2-notebook",
    "title": "余白のためのノート",
+   "titleEn": "A Notebook Kept for Its Margins",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2171,14 +2264,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.540983606557377,
+      "coverage": 0.7704918032786885,
       "band_vector": {
-       "n5": 0.22131147540983606,
-       "n4": 0.11475409836065574,
-       "n3": 0.18032786885245902,
-       "n2": 0,
+       "n5": 0.3524590163934426,
+       "n4": 0.1557377049180328,
+       "n3": 0.22950819672131148,
+       "n2": 0.00819672131147541,
        "n1": 0.02459016393442623,
-       "oov": 0.45901639344262296
+       "oov": 0.22950819672131148
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 122
@@ -2209,6 +2302,8 @@
   {
    "id": "bunki-essay-n2-rain",
    "title": "雨の日の速度",
+   "titleEn": "The Speed of a Rainy Day",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2231,14 +2326,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6515151515151515,
+      "coverage": 0.8636363636363636,
       "band_vector": {
-       "n5": 0.2196969696969697,
-       "n4": 0.20454545454545456,
-       "n3": 0.1590909090909091,
-       "n2": 0.045454545454545456,
+       "n5": 0.2803030303030303,
+       "n4": 0.2727272727272727,
+       "n3": 0.22727272727272727,
+       "n2": 0.06060606060606061,
        "n1": 0.022727272727272728,
-       "oov": 0.3484848484848485
+       "oov": 0.13636363636363635
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 132
@@ -2269,6 +2364,8 @@
   {
    "id": "bunki-essay-n2-translation",
    "title": "訳せない言葉について",
+   "titleEn": "On Words That Resist Translation",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2291,14 +2388,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.627906976744186,
+      "coverage": 0.8062015503875969,
       "band_vector": {
-       "n5": 0.26356589147286824,
-       "n4": 0.10077519379844961,
-       "n3": 0.20930232558139536,
-       "n2": 0.015503875968992248,
-       "n1": 0.03875968992248062,
-       "oov": 0.37209302325581395
+       "n5": 0.3333333333333333,
+       "n4": 0.12403100775193798,
+       "n3": 0.2713178294573643,
+       "n2": 0.023255813953488372,
+       "n1": 0.05426356589147287,
+       "oov": 0.1937984496124031
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 129
@@ -2329,6 +2426,8 @@
   {
    "id": "bunki-essay-n1-memory",
    "title": "忘却を前提とした設計",
+   "titleEn": "Designing for Forgetting",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2351,14 +2450,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.538860103626943,
+      "coverage": 0.7772020725388601,
       "band_vector": {
-       "n5": 0.10362694300518134,
-       "n4": 0.07772020725388601,
-       "n3": 0.23316062176165803,
-       "n2": 0.046632124352331605,
-       "n1": 0.07772020725388601,
-       "oov": 0.46113989637305697
+       "n5": 0.18652849740932642,
+       "n4": 0.11398963730569948,
+       "n3": 0.33678756476683935,
+       "n2": 0.05699481865284974,
+       "n1": 0.08290155440414508,
+       "oov": 0.22279792746113988
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 193
@@ -2389,6 +2488,8 @@
   {
    "id": "bunki-essay-n1-city",
    "title": "都市の匿名性と言語",
+   "titleEn": "Anonymity in the City, and Language",
+   "titleEnSource": "shelf-map-2026",
    "source": "bunki-wp9b-reading-catalog",
    "sourceLabel": "随筆 · Bunki",
    "pool": "original",
@@ -2411,14 +2512,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6089385474860336,
+      "coverage": 0.7486033519553073,
       "band_vector": {
-       "n5": 0.13966480446927373,
-       "n4": 0.16201117318435754,
-       "n3": 0.20670391061452514,
+       "n5": 0.18994413407821228,
+       "n4": 0.2011173184357542,
+       "n3": 0.2569832402234637,
        "n2": 0.027932960893854747,
        "n1": 0.07262569832402235,
-       "oov": 0.39106145251396646
+       "oov": 0.25139664804469275
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 179
@@ -2449,6 +2550,8 @@
   {
    "id": "bunki-graded-n3-zoka-sanjin-morning",
    "title": "造化三神に出会う朝",
+   "titleEn": "A Morning Meeting the Three Deities of Creation",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2471,14 +2574,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6040268456375839,
+      "coverage": 0.7550335570469798,
       "band_vector": {
-       "n5": 0.2214765100671141,
-       "n4": 0.10067114093959731,
-       "n3": 0.22818791946308725,
-       "n2": 0.02348993288590604,
+       "n5": 0.2785234899328859,
+       "n4": 0.13758389261744966,
+       "n3": 0.2751677852348993,
+       "n2": 0.03355704697986577,
        "n1": 0.030201342281879196,
-       "oov": 0.3959731543624161
+       "oov": 0.24496644295302014
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 298
@@ -2510,6 +2613,8 @@
   {
    "id": "bunki-graded-n3-nakaima-diary",
    "title": "「中今」を感じる一日",
+   "titleEn": "A Day of Feeling the 'Middle Now'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2532,14 +2637,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6801242236024845,
+      "coverage": 0.8105590062111802,
       "band_vector": {
-       "n5": 0.37267080745341613,
-       "n4": 0.09316770186335403,
-       "n3": 0.17701863354037267,
+       "n5": 0.41304347826086957,
+       "n4": 0.13975155279503104,
+       "n3": 0.2204968944099379,
        "n2": 0.009316770186335404,
        "n1": 0.027950310559006212,
-       "oov": 0.3198757763975155
+       "oov": 0.18944099378881987
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 322
@@ -2571,6 +2676,8 @@
   {
    "id": "bunki-graded-n3-world-beginning",
    "title": "世界のはじまりに現れた三柱",
+   "titleEn": "The Three Pillars at the World's Beginning",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2593,14 +2700,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5835962145110409,
+      "coverage": 0.7570977917981072,
       "band_vector": {
-       "n5": 0.1608832807570978,
-       "n4": 0.11356466876971609,
-       "n3": 0.2618296529968454,
-       "n2": 0.00946372239747634,
+       "n5": 0.22712933753943218,
+       "n4": 0.167192429022082,
+       "n3": 0.30914826498422715,
+       "n2": 0.015772870662460567,
        "n1": 0.03785488958990536,
-       "oov": 0.416403785488959
+       "oov": 0.24290220820189273
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 317
@@ -2632,6 +2739,8 @@
   {
    "id": "bunki-graded-n3-hidden-deity",
    "title": "姿を隠した神さま",
+   "titleEn": "The Gods Who Hid Away",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2654,14 +2763,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6028368794326241,
+      "coverage": 0.801418439716312,
       "band_vector": {
-       "n5": 0.22695035460992907,
-       "n4": 0.11347517730496454,
-       "n3": 0.22340425531914893,
-       "n2": 0.0070921985815602835,
-       "n1": 0.031914893617021274,
-       "oov": 0.3971631205673759
+       "n5": 0.28368794326241137,
+       "n4": 0.17375886524822695,
+       "n3": 0.2872340425531915,
+       "n2": 0.01773049645390071,
+       "n1": 0.03900709219858156,
+       "oov": 0.19858156028368795
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 282
@@ -2693,6 +2802,8 @@
   {
    "id": "bunki-graded-n3-kojiki-book",
    "title": "『古事記』はどんな本？",
+   "titleEn": "What Kind of Book Is the Kojiki?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2715,14 +2826,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5849056603773585,
+      "coverage": 0.770440251572327,
       "band_vector": {
-       "n5": 0.20440251572327045,
-       "n4": 0.11635220125786164,
-       "n3": 0.16037735849056603,
-       "n2": 0.0660377358490566,
-       "n1": 0.03773584905660377,
-       "oov": 0.41509433962264153
+       "n5": 0.2610062893081761,
+       "n4": 0.15723270440251572,
+       "n3": 0.24213836477987422,
+       "n2": 0.06918238993710692,
+       "n1": 0.040880503144654086,
+       "oov": 0.22955974842767296
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 318
@@ -2754,6 +2865,8 @@
   {
    "id": "bunki-graded-n3-hashira-counter",
    "title": "神さまを「一柱」と数えるわけ",
+   "titleEn": "Why Gods Are Counted in 'Pillars'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2776,14 +2889,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.575,
+      "coverage": 0.7714285714285715,
       "band_vector": {
-       "n5": 0.19642857142857142,
-       "n4": 0.10357142857142858,
-       "n3": 0.21071428571428572,
-       "n2": 0.03571428571428571,
-       "n1": 0.02857142857142857,
-       "oov": 0.425
+       "n5": 0.26785714285714285,
+       "n4": 0.16428571428571428,
+       "n3": 0.26785714285714285,
+       "n2": 0.039285714285714285,
+       "n1": 0.03214285714285714,
+       "oov": 0.22857142857142856
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 280
@@ -2815,6 +2928,8 @@
   {
    "id": "bunki-graded-n3-feel-jingu-forest",
    "title": "伊勢神宮の森を映像で歩く",
+   "titleEn": "Walking the Ise Jingū Forest on Film",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2837,14 +2952,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6647398843930636,
+      "coverage": 0.8121387283236994,
       "band_vector": {
-       "n5": 0.24566473988439305,
-       "n4": 0.1416184971098266,
-       "n3": 0.18208092485549132,
-       "n2": 0.04335260115606936,
-       "n1": 0.05202312138728324,
-       "oov": 0.3352601156069364
+       "n5": 0.3063583815028902,
+       "n4": 0.17052023121387283,
+       "n3": 0.22832369942196531,
+       "n2": 0.05202312138728324,
+       "n1": 0.05491329479768786,
+       "oov": 0.18786127167630057
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 346
@@ -2876,6 +2991,8 @@
   {
    "id": "bunki-graded-n3-musubi-visual",
    "title": "天・地・祈りをつなぐ「むすひ」",
+   "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2898,14 +3015,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6104294478527608,
+      "coverage": 0.8220858895705522,
       "band_vector": {
-       "n5": 0.1901840490797546,
-       "n4": 0.13803680981595093,
-       "n3": 0.1656441717791411,
-       "n2": 0.046012269938650305,
-       "n1": 0.0705521472392638,
-       "oov": 0.3895705521472393
+       "n5": 0.25766871165644173,
+       "n4": 0.19938650306748465,
+       "n3": 0.23006134969325154,
+       "n2": 0.05828220858895705,
+       "n1": 0.07668711656441718,
+       "oov": 0.17791411042944785
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 326
@@ -2937,6 +3054,8 @@
   {
    "id": "bunki-graded-n3-gratitude-week",
    "title": "一週間、感謝の言葉を唱えてみた",
+   "titleEn": "A Week of Reciting Words of Gratitude",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -2959,14 +3078,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6804123711340206,
+      "coverage": 0.8213058419243986,
       "band_vector": {
-       "n5": 0.24054982817869416,
-       "n4": 0.18900343642611683,
-       "n3": 0.16151202749140894,
+       "n5": 0.26804123711340205,
+       "n4": 0.2508591065292096,
+       "n3": 0.21305841924398625,
        "n2": 0.037800687285223365,
        "n1": 0.05154639175257732,
-       "oov": 0.31958762886597936
+       "oov": 0.17869415807560138
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 291
@@ -2998,6 +3117,8 @@
   {
    "id": "bunki-graded-n3-thanks-before-help",
    "title": "「助けて」より先に「ありがとう」？",
+   "titleEn": "'Thank You' Before 'Help Me'?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "段階別読み物 · Bunki · 検収前",
    "pool": "original",
@@ -3020,14 +3141,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6126984126984127,
+      "coverage": 0.7936507936507937,
       "band_vector": {
-       "n5": 0.2507936507936508,
-       "n4": 0.14603174603174604,
-       "n3": 0.15873015873015872,
-       "n2": 0.009523809523809525,
-       "n1": 0.047619047619047616,
-       "oov": 0.3873015873015873
+       "n5": 0.3047619047619048,
+       "n4": 0.1873015873015873,
+       "n3": 0.21904761904761905,
+       "n2": 0.012698412698412698,
+       "n1": 0.06984126984126984,
+       "oov": 0.20634920634920634
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 315
@@ -3059,6 +3180,8 @@
   {
    "id": "bunki-essay-n2-zoka-as-one",
    "title": "三柱の神を一つの働きとして読む",
+   "titleEn": "Reading the Three Deities as a Single Working",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3081,14 +3204,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6088235294117648,
+      "coverage": 0.7735294117647059,
       "band_vector": {
-       "n5": 0.13823529411764707,
-       "n4": 0.08529411764705883,
-       "n3": 0.2852941176470588,
-       "n2": 0.04411764705882353,
+       "n5": 0.2,
+       "n4": 0.11764705882352941,
+       "n3": 0.34705882352941175,
+       "n2": 0.052941176470588235,
        "n1": 0.05588235294117647,
-       "oov": 0.3911764705882353
+       "oov": 0.22647058823529412
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 340
@@ -3120,6 +3243,8 @@
   {
    "id": "bunki-essay-n2-nakaima-time",
    "title": "過去・現在・未来と「中今」",
+   "titleEn": "Past, Present, Future — and the 'Middle Now'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3142,14 +3267,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6623376623376623,
+      "coverage": 0.8467532467532468,
       "band_vector": {
-       "n5": 0.19480519480519481,
-       "n4": 0.14025974025974025,
-       "n3": 0.2675324675324675,
-       "n2": 0.015584415584415584,
+       "n5": 0.2597402597402597,
+       "n4": 0.18181818181818182,
+       "n3": 0.33506493506493507,
+       "n2": 0.025974025974025976,
        "n1": 0.04415584415584416,
-       "oov": 0.33766233766233766
+       "oov": 0.15324675324675324
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 385
@@ -3181,6 +3306,8 @@
   {
    "id": "bunki-essay-n2-creator-god",
    "title": "「創造神」という言葉はどこまで正しいか",
+   "titleEn": "How Far Is 'Creator God' the Right Word?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3203,14 +3330,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.592797783933518,
+      "coverage": 0.7700831024930748,
       "band_vector": {
-       "n5": 0.1523545706371191,
-       "n4": 0.10526315789473684,
-       "n3": 0.26038781163434904,
-       "n2": 0.024930747922437674,
-       "n1": 0.04986149584487535,
-       "oov": 0.407202216066482
+       "n5": 0.21052631578947367,
+       "n4": 0.12742382271468145,
+       "n3": 0.34349030470914127,
+       "n2": 0.036011080332409975,
+       "n1": 0.05263157894736842,
+       "oov": 0.2299168975069252
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 361
@@ -3242,6 +3369,8 @@
   {
    "id": "bunki-essay-n2-silent-amenominakanushi",
    "title": "天之御中主神――語られない神をどう読むか",
+   "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3264,14 +3393,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6142433234421365,
+      "coverage": 0.8041543026706232,
       "band_vector": {
-       "n5": 0.1394658753709199,
-       "n4": 0.0712166172106825,
-       "n3": 0.29673590504451036,
-       "n2": 0.03857566765578635,
+       "n5": 0.18100890207715134,
+       "n4": 0.12462908011869436,
+       "n3": 0.3857566765578635,
+       "n2": 0.04451038575667656,
        "n1": 0.06824925816023739,
-       "oov": 0.3857566765578635
+       "oov": 0.19584569732937684
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 337
@@ -3303,6 +3432,8 @@
   {
    "id": "bunki-essay-n2-kojiki-myth-history",
    "title": "『古事記』は神話か、歴史か",
+   "titleEn": "The Kojiki: Myth or History?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3325,14 +3456,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6332378223495703,
+      "coverage": 0.8051575931232091,
       "band_vector": {
-       "n5": 0.1489971346704871,
-       "n4": 0.14040114613180515,
-       "n3": 0.2177650429799427,
-       "n2": 0.0830945558739255,
+       "n5": 0.20630372492836677,
+       "n4": 0.16905444126074498,
+       "n3": 0.28653295128939826,
+       "n2": 0.10028653295128939,
        "n1": 0.04297994269340974,
-       "oov": 0.3667621776504298
+       "oov": 0.19484240687679083
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 349
@@ -3364,6 +3495,8 @@
   {
    "id": "bunki-essay-n2-myth-to-book",
    "title": "語りから書物へ――神話を編む",
+   "titleEn": "From Telling to Text: Compiling a Myth",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3386,14 +3519,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5497076023391814,
+      "coverage": 0.7251461988304093,
       "band_vector": {
-       "n5": 0.14035087719298245,
-       "n4": 0.0935672514619883,
-       "n3": 0.19883040935672514,
-       "n2": 0.07309941520467836,
+       "n5": 0.19005847953216373,
+       "n4": 0.1286549707602339,
+       "n3": 0.2777777777777778,
+       "n2": 0.0847953216374269,
        "n1": 0.043859649122807015,
-       "oov": 0.4502923976608187
+       "oov": 0.27485380116959063
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 342
@@ -3425,6 +3558,8 @@
   {
    "id": "bunki-essay-n2-feel-jingu-musubi",
    "title": "映像が伝える「むすひ」",
+   "titleEn": "Musubi as the Camera Tells It",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3447,14 +3582,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5958005249343832,
+      "coverage": 0.7952755905511811,
       "band_vector": {
-       "n5": 0.14698162729658792,
-       "n4": 0.10498687664041995,
-       "n3": 0.2047244094488189,
-       "n2": 0.05774278215223097,
-       "n1": 0.08136482939632546,
-       "oov": 0.4041994750656168
+       "n5": 0.2125984251968504,
+       "n4": 0.15485564304461943,
+       "n3": 0.2755905511811024,
+       "n2": 0.06824146981627296,
+       "n1": 0.08398950131233596,
+       "oov": 0.2047244094488189
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 381
@@ -3486,6 +3621,8 @@
   {
    "id": "bunki-essay-n2-prayer-on-screen",
    "title": "映像の中で祈りはどう見えるか",
+   "titleEn": "How Prayer Looks on Screen",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3508,14 +3645,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6784810126582279,
+      "coverage": 0.8253164556962025,
       "band_vector": {
-       "n5": 0.22025316455696203,
-       "n4": 0.11645569620253164,
-       "n3": 0.1949367088607595,
-       "n2": 0.04810126582278481,
-       "n1": 0.09873417721518987,
-       "oov": 0.32151898734177214
+       "n5": 0.2911392405063291,
+       "n4": 0.1569620253164557,
+       "n3": 0.22531645569620254,
+       "n2": 0.05063291139240506,
+       "n1": 0.10126582278481013,
+       "oov": 0.17468354430379746
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 395
@@ -3547,6 +3684,8 @@
   {
    "id": "bunki-essay-n2-thanks-first",
    "title": "「ありがとうございます」を先に言う心理",
+   "titleEn": "The Psychology of Saying Thank You First",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3569,14 +3708,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6132596685082873,
+      "coverage": 0.8149171270718232,
       "band_vector": {
-       "n5": 0.13535911602209943,
-       "n4": 0.143646408839779,
-       "n3": 0.2541436464088398,
-       "n2": 0.016574585635359115,
+       "n5": 0.22099447513812154,
+       "n4": 0.1850828729281768,
+       "n3": 0.32320441988950277,
+       "n2": 0.022099447513812154,
        "n1": 0.06353591160220995,
-       "oov": 0.3867403314917127
+       "oov": 0.1850828729281768
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 362
@@ -3608,6 +3747,8 @@
   {
    "id": "bunki-essay-n2-testimony-literacy",
    "title": "体験談をどう受け取るか",
+   "titleEn": "How to Receive a Personal Testimony",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3630,14 +3771,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.6256830601092895,
+      "coverage": 0.8306010928961749,
       "band_vector": {
-       "n5": 0.1448087431693989,
-       "n4": 0.1448087431693989,
-       "n3": 0.2677595628415301,
-       "n2": 0.01912568306010929,
+       "n5": 0.23497267759562843,
+       "n4": 0.18579234972677597,
+       "n3": 0.33879781420765026,
+       "n2": 0.02185792349726776,
        "n1": 0.04918032786885246,
-       "oov": 0.3743169398907104
+       "oov": 0.16939890710382513
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 366
@@ -3669,6 +3810,8 @@
   {
    "id": "bunki-essay-n1-cosmic-analogy",
    "title": "造化三神を宇宙論として読む誘惑",
+   "titleEn": "The Temptation to Read the Creation Deities as Cosmology",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3691,14 +3834,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5496535796766744,
+      "coverage": 0.7321016166281755,
       "band_vector": {
-       "n5": 0.07852193995381063,
-       "n4": 0.053117782909930716,
-       "n3": 0.2909930715935335,
-       "n2": 0.057736720554272515,
-       "n1": 0.06928406466512702,
-       "oov": 0.4503464203233256
+       "n5": 0.13394919168591224,
+       "n4": 0.08775981524249422,
+       "n3": 0.37644341801385683,
+       "n2": 0.06235565819861432,
+       "n1": 0.07159353348729793,
+       "oov": 0.2678983833718245
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 433
@@ -3730,6 +3873,8 @@
   {
    "id": "bunki-essay-n1-nakaima-time-theory",
    "title": "「中今」は時間論になり得るか",
+   "titleEn": "Can the 'Middle Now' Become a Theory of Time?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3752,14 +3897,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5976470588235294,
+      "coverage": 0.7764705882352941,
       "band_vector": {
-       "n5": 0.1623529411764706,
-       "n4": 0.07058823529411765,
-       "n3": 0.27058823529411763,
-       "n2": 0.03764705882352941,
-       "n1": 0.05647058823529412,
-       "oov": 0.4023529411764706
+       "n5": 0.20705882352941177,
+       "n4": 0.11764705882352941,
+       "n3": 0.35058823529411764,
+       "n2": 0.042352941176470586,
+       "n1": 0.058823529411764705,
+       "oov": 0.2235294117647059
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 425
@@ -3791,6 +3936,8 @@
   {
    "id": "bunki-essay-n1-first-versus-supreme",
    "title": "原初神を「最高神」と呼ぶときの問題",
+   "titleEn": "The Problem with Calling a Primordial God 'Supreme'",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3813,14 +3960,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5813397129186603,
+      "coverage": 0.7440191387559809,
       "band_vector": {
-       "n5": 0.07655502392344497,
-       "n4": 0.08851674641148326,
-       "n3": 0.2966507177033493,
-       "n2": 0.06220095693779904,
+       "n5": 0.13157894736842105,
+       "n4": 0.11722488038277512,
+       "n3": 0.3684210526315789,
+       "n2": 0.06937799043062201,
        "n1": 0.05741626794258373,
-       "oov": 0.41866028708133973
+       "oov": 0.25598086124401914
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 418
@@ -3852,6 +3999,8 @@
   {
    "id": "bunki-essay-n1-silent-god-theology",
    "title": "沈黙する神と不在の神学",
+   "titleEn": "The Silent God and a Theology of Absence",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3874,14 +4023,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5788235294117647,
+      "coverage": 0.7717647058823529,
       "band_vector": {
-       "n5": 0.09176470588235294,
-       "n4": 0.06588235294117648,
-       "n3": 0.2541176470588235,
-       "n2": 0.05647058823529412,
+       "n5": 0.1623529411764706,
+       "n4": 0.12,
+       "n3": 0.31529411764705884,
+       "n2": 0.06352941176470588,
        "n1": 0.11058823529411765,
-       "oov": 0.4211764705882353
+       "oov": 0.22823529411764706
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 425
@@ -3913,6 +4062,8 @@
   {
    "id": "bunki-essay-n1-kojiki-power",
    "title": "『古事記』編纂と権力の物語",
+   "titleEn": "Compiling the Kojiki: A Story of Power",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3935,14 +4086,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5741176470588235,
+      "coverage": 0.7388235294117647,
       "band_vector": {
-       "n5": 0.11294117647058824,
-       "n4": 0.07764705882352942,
-       "n3": 0.2376470588235294,
-       "n2": 0.08,
+       "n5": 0.15529411764705883,
+       "n4": 0.11764705882352941,
+       "n3": 0.31058823529411766,
+       "n2": 0.08941176470588236,
        "n1": 0.06588235294117648,
-       "oov": 0.4258823529411765
+       "oov": 0.2611764705882353
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 425
@@ -3974,6 +4125,8 @@
   {
    "id": "bunki-essay-n1-beyond-fact-fiction",
    "title": "神話を「事実か虚構か」で裁かないために",
+   "titleEn": "Against Judging Myth as Fact or Fiction",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -3996,14 +4149,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5919282511210762,
+      "coverage": 0.7825112107623319,
       "band_vector": {
-       "n5": 0.09417040358744394,
-       "n4": 0.10762331838565023,
-       "n3": 0.24663677130044842,
-       "n2": 0.0515695067264574,
+       "n5": 0.15695067264573992,
+       "n4": 0.15022421524663676,
+       "n3": 0.31614349775784756,
+       "n2": 0.06726457399103139,
        "n1": 0.09192825112107623,
-       "oov": 0.4080717488789238
+       "oov": 0.21748878923766815
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 446
@@ -4035,6 +4188,8 @@
   {
    "id": "bunki-essay-n1-sacred-media",
    "title": "「感じる」映像は神聖さをどう構成するか",
+   "titleEn": "How 'Feeling' Footage Constructs the Sacred",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4057,14 +4212,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.578021978021978,
+      "coverage": 0.7648351648351648,
       "band_vector": {
-       "n5": 0.11868131868131868,
-       "n4": 0.08791208791208792,
-       "n3": 0.2043956043956044,
-       "n2": 0.06593406593406594,
-       "n1": 0.1010989010989011,
-       "oov": 0.421978021978022
+       "n5": 0.18681318681318682,
+       "n4": 0.11868131868131868,
+       "n3": 0.2813186813186813,
+       "n2": 0.07252747252747253,
+       "n1": 0.1054945054945055,
+       "oov": 0.23516483516483516
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 455
@@ -4096,6 +4251,8 @@
   {
    "id": "bunki-essay-n1-ise-time",
    "title": "産霊・自然・反復――伊勢の時間",
+   "titleEn": "Musubi, Nature, Repetition: Time at Ise",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4118,14 +4275,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.649438202247191,
+      "coverage": 0.7797752808988764,
       "band_vector": {
-       "n5": 0.19325842696629214,
-       "n4": 0.10786516853932585,
-       "n3": 0.23595505617977527,
-       "n2": 0.04044943820224719,
-       "n1": 0.07191011235955057,
-       "oov": 0.350561797752809
+       "n5": 0.24044943820224718,
+       "n4": 0.13258426966292136,
+       "n3": 0.2898876404494382,
+       "n2": 0.04269662921348315,
+       "n1": 0.07415730337078652,
+       "oov": 0.2202247191011236
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 445
@@ -4157,6 +4314,8 @@
   {
    "id": "bunki-essay-n1-miracle-testimony",
    "title": "奇跡の体験談と認識の責任",
+   "titleEn": "Miracle Testimonies and the Responsibility of Knowing",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4179,14 +4338,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.5519630484988453,
+      "coverage": 0.7598152424942264,
       "band_vector": {
-       "n5": 0.12702078521939955,
-       "n4": 0.09930715935334873,
-       "n3": 0.19861431870669746,
-       "n2": 0.020785219399538105,
+       "n5": 0.19630484988452657,
+       "n4": 0.15242494226327943,
+       "n3": 0.27713625866050806,
+       "n2": 0.02771362586605081,
        "n1": 0.10623556581986143,
-       "oov": 0.44803695150115475
+       "oov": 0.24018475750577367
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 433
@@ -4218,6 +4377,8 @@
   {
    "id": "bunki-essay-n1-prayer-reality",
    "title": "祈りの言葉は誰の現実を変えるのか",
+   "titleEn": "Whose Reality Do Words of Prayer Change?",
+   "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
    "sourceLabel": "随筆 · Bunki · 検収前",
    "pool": "original",
@@ -4240,14 +4401,14 @@
       "substrate": "jreadability-1.1.5/unidic-2.1.2"
      },
      "jlpt_lexicon": {
-      "coverage": 0.665859564164649,
+      "coverage": 0.8256658595641646,
       "band_vector": {
-       "n5": 0.2324455205811138,
-       "n4": 0.12832929782082325,
-       "n3": 0.2106537530266344,
-       "n2": 0.03631961259079903,
+       "n5": 0.2736077481840194,
+       "n4": 0.17433414043583534,
+       "n3": 0.27602905569007263,
+       "n2": 0.043583535108958835,
        "n1": 0.05811138014527845,
-       "oov": 0.3341404358353511
+       "oov": 0.17433414043583534
       },
       "substrate": "open-anki-jlpt-decks/wbig-6687",
       "n_content_tokens": 413
@@ -4275,6 +4436,750 @@
    ],
    "truncated": false,
    "review": "human-review-pending"
+  },
+  {
+   "id": "wikinews:44381",
+   "title": "サッカー日本代表が背番号発表！ キリンチャレンジカップ",
+   "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%97%A5%E6%9C%AC%E4%BB%A3%E8%A1%A8%E3%81%8C%E8%83%8C%E7%95%AA%E5%8F%B7%E7%99%BA%E8%A1%A8%EF%BC%81_%E3%82%AD%E3%83%AA%E3%83%B3%E3%83%81%E3%83%A3%E3%83%AC%E3%83%B3%E3%82%B8%E3%82%AB%E3%83%83%E3%83%97",
+   "date": "2025-11-13",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-44381.json",
+   "chars": 900,
+   "snippet": "サッカー日本代表のキリンチャレンジカップ2025に臨む背番号が11月12日に、発表されました。 サッカー日本代表は、今月14日に",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.796078048780489,
+      "band": "初級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.2549019607843137,
+      "band_vector": {
+       "n5": 0.0784313725490196,
+       "n4": 0.058823529411764705,
+       "n3": 0.09803921568627451,
+       "n2": 0.00980392156862745,
+       "n1": 0.00980392156862745,
+       "oov": 0.7450980392156863
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 102
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "サッカー",
+    "代表",
+    "キリン",
+    "チャレンジ",
+    "カップ",
+    "臨む"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45224",
+   "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
+   "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E5%85%90%E7%AB%A5%E5%A4%B1%E8%B8%AA%E4%BA%8B%E4%BB%B6_%E7%94%B7%E5%85%90%E3%81%AE%E9%A4%8A%E7%88%B6%E3%82%92%E6%AD%BB%E4%BD%93%E9%81%BA%E6%A3%84%E3%81%A7%E9%80%AE%E6%8D%95_%E6%AE%BA%E4%BA%BA%E3%82%82%E3%81%BB%E3%81%AE%E3%82%81%E3%81%8B%E3%81%99",
+   "date": "2026-04-17",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45224.json",
+   "chars": 866,
+   "snippet": "南丹市で、3月23日から行方不明となっていた同市立園部小学校の児童だった安達結希（あだち・ゆき）さん（当時11）が遺体となって発",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.6792567693744154,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6907630522088353,
+      "band_vector": {
+       "n5": 0.17670682730923695,
+       "n4": 0.1566265060240964,
+       "n3": 0.24899598393574296,
+       "n2": 0.07228915662650602,
+       "n1": 0.03614457831325301,
+       "oov": 0.3092369477911647
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 249
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "行方",
+    "不明",
+    "なる",
+    "同市",
+    "学校",
+    "児童"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45216",
+   "title": "南丹市で行方不明の男児の遺体が見つかる",
+   "titleEn": "Body of missing boy found in Nantan, Kyoto",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E3%81%A7%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AE%E7%94%B7%E5%85%90%E3%81%AE%E9%81%BA%E4%BD%93%E3%81%8C%E8%A6%8B%E3%81%A4%E3%81%8B%E3%82%8B",
+   "date": "2026-04-15",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45216.json",
+   "chars": 789,
+   "snippet": "京都府警察は、4月13日夕方に京都府南丹市の山林にて発見された、児童の遺体について、3月23日から行方不明となっていた市立園部小",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.5199467680608372,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.74235807860262,
+      "band_vector": {
+       "n5": 0.22707423580786026,
+       "n4": 0.14847161572052403,
+       "n3": 0.22270742358078602,
+       "n2": 0.07423580786026202,
+       "n1": 0.06986899563318777,
+       "oov": 0.2576419213973799
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 229
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "警察",
+    "夕方",
+    "山林",
+    "発見",
+    "児童",
+    "遺体"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45208",
+   "title": "南海 フェリー事業から撤退へ",
+   "titleEn": "Nankai to withdraw from its ferry business",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E6%B5%B7_%E3%83%95%E3%82%A7%E3%83%AA%E3%83%BC%E4%BA%8B%E6%A5%AD%E3%81%8B%E3%82%89%E6%92%A4%E9%80%80%E3%81%B8",
+   "date": "2026-03-31",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45208.json",
+   "chars": 390,
+   "snippet": "南海電気鉄道は3月30日、子会社の南海フェリーが運営する、和歌山港と徳島港を結ぶフェリー事業から撤退すると発表した。1998年の",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.1107074380165294,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7068965517241379,
+      "band_vector": {
+       "n5": 0.16379310344827586,
+       "n4": 0.13793103448275862,
+       "n3": 0.2672413793103448,
+       "n2": 0.034482758620689655,
+       "n1": 0.10344827586206896,
+       "oov": 0.29310344827586204
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 116
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "南海",
+    "電気",
+    "鉄道",
+    "会社",
+    "フェリー",
+    "運営"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45174",
+   "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
+   "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E6%9D%B1%E4%BA%AC%E9%AB%98%E8%A3%81%E3%81%8C%E6%97%A7%E7%B5%B1%E4%B8%80%E6%95%99%E4%BC%9A%E3%81%AB%E8%A7%A3%E6%95%A3%E5%91%BD%E4%BB%A4_%E6%95%99%E5%9B%A3%E8%B2%A1%E7%94%A3%E3%81%AE%E6%B8%85%E7%AE%97%E6%89%8B%E7%B6%9A%E3%81%8D%E9%96%8B%E5%A7%8B",
+   "date": "2026-03-05",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45174.json",
+   "chars": 506,
+   "snippet": "世界平和統一家庭連合（旧統一教会）に対する解散命令請求を巡り、東京高等裁判所は3月4日、東京地裁の決定を支持し、教団の解散を命じ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.693510903426791,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.8050314465408805,
+      "band_vector": {
+       "n5": 0.07547169811320754,
+       "n4": 0.09433962264150944,
+       "n3": 0.41509433962264153,
+       "n2": 0.1069182389937107,
+       "n1": 0.11320754716981132,
+       "oov": 0.1949685534591195
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 159
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "世界",
+    "平和",
+    "統一",
+    "家庭",
+    "連合",
+    "教会"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45101",
+   "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
+   "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E9%9F%93%E5%9B%BD%E3%81%AE%E5%B0%B9%E5%89%8D%E5%A4%A7%E7%B5%B1%E9%A0%98%E3%81%AB%E7%84%A1%E6%9C%9F%E6%87%B2%E5%BD%B9%E5%88%A4%E6%B1%BA_%E5%86%85%E4%B9%B1%E3%81%AE%E9%A6%96%E8%AC%80%E3%81%A7",
+   "date": "2026-02-19",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45101.json",
+   "chars": 539,
+   "snippet": "大韓民国の尹錫悦（ユン・ソンニョル）前大統領が、非常戒厳を宣言するなど国家の秩序を大きく乱す目的で暴動を起こした罪の容疑に対する",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.4718411819021249,
+      "band": "上級後半",
+      "in_scale": false,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6967741935483871,
+      "band_vector": {
+       "n5": 0.10967741935483871,
+       "n4": 0.09032258064516129,
+       "n3": 0.33548387096774196,
+       "n2": 0.025806451612903226,
+       "n1": 0.13548387096774195,
+       "oov": 0.3032258064516129
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 155
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "民国",
+    "ソンニョル",
+    "大統領",
+    "非常",
+    "戒厳",
+    "宣言"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45095",
+   "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+   "titleEn": "AiScReam: Ruby graduates and two new members join",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/AiScReam%E3%80%81%E3%83%AB%E3%83%93%E3%82%A3%E3%81%A1%E3%82%83%E3%82%93%E5%8D%92%E6%A5%AD%E3%81%A8%E6%96%B0%E3%83%A1%E3%83%B3%E3%83%90%E3%83%BC2%E4%BA%BA%E5%8A%A0%E5%85%A5",
+   "date": "2026-02-17",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45095.json",
+   "chars": 570,
+   "snippet": "2025年にデビュー曲「愛♡スクリ〜ム！」が大ヒットし、同年の新語・流行語大賞にもノミネートされた『ラブライブ！シリーズ』のアイ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 5.374427350427351,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5639097744360902,
+      "band_vector": {
+       "n5": 0.14285714285714285,
+       "n4": 0.14285714285714285,
+       "n3": 0.22556390977443608,
+       "n2": 0.022556390977443608,
+       "n1": 0.03007518796992481,
+       "oov": 0.43609022556390975
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 133
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "デビュー",
+    "スクリ",
+    "ヒット",
+    "同年",
+    "新語",
+    "流行"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45098",
+   "title": "第2次高市内閣が始動",
+   "titleEn": "The second Takaichi cabinet takes office",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E7%AC%AC2%E6%AC%A1%E9%AB%98%E5%B8%82%E5%86%85%E9%96%A3%E3%81%8C%E5%A7%8B%E5%8B%95",
+   "date": "2026-02-18",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45098.json",
+   "chars": 480,
+   "snippet": "衆院選を受けて行われた特別国会で、高市早苗氏が第105代内閣総理大臣に選出され第2次高市内閣が始動した。なお第2次高市内閣の閣僚",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 0.7011796778190824,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.648936170212766,
+      "band_vector": {
+       "n5": 0.031914893617021274,
+       "n4": 0.0425531914893617,
+       "n3": 0.40425531914893614,
+       "n2": 0.0425531914893617,
+       "n1": 0.1276595744680851,
+       "oov": 0.35106382978723405
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 94
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "衆院",
+    "受ける",
+    "行う",
+    "特別",
+    "国会",
+    "内閣"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:44384",
+   "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
+   "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%83%8E%E3%83%BB%E3%83%AD%E3%83%8A%E3%82%A6%E3%83%89%E3%81%8C%E5%BC%B7%E7%83%88%E3%82%A8%E3%83%AB%E3%83%9C%E3%83%BC%E3%81%A7%E4%B8%80%E7%99%BA%E9%80%80%E5%A0%B4_W%E6%9D%AF%E3%81%A7%E3%82%82%E5%88%9D%E6%88%A6%E3%81%AF%E5%87%BA%E5%A0%B4%E5%81%9C%E6%AD%A2%E3%81%8B",
+   "date": "2025-11-14",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-44384.json",
+   "chars": 480,
+   "snippet": "日本時間で今日（11月14日）、大失態が起きた。 Yahoo!ニュースによると、ポルトガル代表のエースFWクリスティアーノ・ロナ",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.5038426966292135,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.5333333333333333,
+      "band_vector": {
+       "n5": 0.13333333333333333,
+       "n4": 0.09523809523809523,
+       "n3": 0.20952380952380953,
+       "n2": 0.02857142857142857,
+       "n1": 0.06666666666666667,
+       "oov": 0.4666666666666667
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 105
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "時間",
+    "今日",
+    "失態",
+    "起きる",
+    "Yahoo",
+    "ニュース"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45221",
+   "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
+   "titleEn": "Kyoto police search the home of the missing boy",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E4%BA%AC%E9%83%BD%E5%BA%9C%E8%AD%A6%E3%81%8C%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E7%94%B7%E5%85%90%E3%81%AE%E8%87%AA%E5%AE%85%E3%82%92%E5%AE%B6%E5%AE%85%E6%8D%9C%E6%9F%BB",
+   "date": "2026-04-15",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45221.json",
+   "chars": 695,
+   "snippet": "京都府南丹市で4月13日に遺体が発見され、同14日にその身元が、3月23日朝から行方不明となっていた、市立園部小学校に当時通って",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.7250411889596613,
+      "band": "上級前半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6903553299492386,
+      "band_vector": {
+       "n5": 0.2182741116751269,
+       "n4": 0.17258883248730963,
+       "n3": 0.17258883248730963,
+       "n2": 0.05583756345177665,
+       "n1": 0.07106598984771574,
+       "oov": 0.3096446700507614
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 197
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "遺体",
+    "発見",
+    "その",
+    "身元",
+    "行方",
+    "不明"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:45089",
+   "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
+   "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E4%B8%AD%E9%81%93%E6%94%B9%E9%9D%A9%E9%80%A3%E5%90%88%E6%96%B0%E4%BB%A3%E8%A1%A8%E9%81%B8%E6%8C%99_%E5%B0%8F%E5%B7%9D%E6%B7%B3%E4%B9%9F%E6%B0%8F%E3%81%8C%E6%96%B0%E4%BB%A3%E8%A1%A8%E3%81%AB",
+   "date": "2026-02-14",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-45089.json",
+   "chars": 863,
+   "snippet": "中道改革連合は、2月13日に新しい代表を決める代表選挙を行い、小川淳也氏が、階猛（しな・たけし）氏との一騎打ちを制して新代表に選",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 1.162212765957447,
+      "band": "上級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.7231404958677685,
+      "band_vector": {
+       "n5": 0.128099173553719,
+       "n4": 0.11983471074380166,
+       "n3": 0.371900826446281,
+       "n2": 0.045454545454545456,
+       "n1": 0.05785123966942149,
+       "oov": 0.2768595041322314
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 242
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "中道",
+    "改革",
+    "連合",
+    "新しい",
+    "代表",
+    "決める"
+   ],
+   "truncated": false
+  },
+  {
+   "id": "wikinews:42478",
+   "title": "大谷翔平 史上6人目の40盗塁40本塁打達成",
+   "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
+   "titleEnSource": "renkan-ai-2026-08",
+   "source": "ja.wikinews",
+   "sourceLabel": "ウィキニュース · 検収前",
+   "pool": "proprietary_safe",
+   "licence": "CC BY 2.5",
+   "attribution": "ja.wikinews contributors, CC BY 2.5",
+   "url": "https://ja.wikinews.org/wiki/%E5%A4%A7%E8%B0%B7%E7%BF%94%E5%B9%B3_%E5%8F%B2%E4%B8%8A6%E4%BA%BA%E7%9B%AE%E3%81%AE40%E7%9B%97%E5%A1%8140%E6%9C%AC%E5%A1%81%E6%89%93%E9%81%94%E6%88%90",
+   "date": "2024-08-25",
+   "rubySource": "tokenizer",
+   "review": "human-review-pending",
+   "addedAt": "2026-08-16",
+   "file": "wikinews-42478.json",
+   "chars": 355,
+   "snippet": "大リーグ・ドジャースに所属する大谷翔平が、史上6人目となる40本塁打、40盗塁を達成した。大谷は現地時間8月23日、レイズ戦に出",
+   "grading": {
+    "signals": {
+     "jreadability": {
+      "score": 4.926322580645161,
+      "band": "初級後半",
+      "in_scale": true,
+      "substrate": "jreadability-1.1.5/unidic-2.1.2"
+     },
+     "jlpt_lexicon": {
+      "coverage": 0.6716417910447761,
+      "band_vector": {
+       "n5": 0.13432835820895522,
+       "n4": 0.26865671641791045,
+       "n3": 0.14925373134328357,
+       "n2": 0.014925373134328358,
+       "n1": 0.1044776119402985,
+       "oov": 0.3283582089552239
+      },
+      "substrate": "open-anki-jlpt-decks/wbig-6687",
+      "n_content_tokens": 67
+     }
+    },
+    "disagreement": {
+     "flag": false,
+     "detail": {
+      "reason": "fewer than two ordinal-capable signals in this build"
+     }
+    },
+    "unavailable": {
+     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
+     "error": "URLError"
+    }
+   },
+   "seeds": [
+    "リーグ",
+    "ドジャース",
+    "所属",
+    "する",
+    "史上",
+    "なる"
+   ],
+   "truncated": false
   }
  ]
 }

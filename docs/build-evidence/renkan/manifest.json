@@ -1,0 +1,120 @@
+{
+ "campaign": "docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md",
+ "branch": "claude/renkan-one-push-2026-08-16",
+ "base": "e335ab7aad68caf43747bb9bde4c04c06b1b81b3",
+ "pr": 74,
+ "round": 2,
+ "head": "c5a1e3915efc30f0206ecf051681ba188ee72bf7",
+ "rounds": [
+  {
+   "round": 0,
+   "closedAt": "042d87d",
+   "landings": [
+    {
+     "what": "corpus spine (PR #60 ancestry, content no-op)",
+     "sha": "a14dcbd"
+    },
+    {
+     "what": "FSRS optimizer harvest (donor f8c3b03)",
+     "sha": "fa78a65"
+    }
+   ],
+   "battery": "14/14 GREEN (battery-baseline/SUMMARY.md)"
+  },
+  {
+   "round": 1,
+   "workflow": "wf_0c28e955-c23 (13 agents; 5 triage + 4 build + 4 verify)",
+   "landings": [
+    {
+     "wp": "A1a drift judgment bridge",
+     "donor": "86fa4d3",
+     "landed": "db46914",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "A1b dojo practice obslog",
+     "donor": "8a02e1f",
+     "landed": "f757944",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "A2 AI runtime honesty",
+     "donor": "9a81418",
+     "landed": "bdddc28",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "B3 titleEn as data",
+     "donor": "fe2a929",
+     "landed": "ca14e09",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "standalone regeneration (builder-only)",
+     "landed": "0f3aac3"
+    },
+    {
+     "wp": "sent-door 44px hit region (integration-exposed latent defect)",
+     "landed": "e8b0ccd"
+    }
+   ],
+   "triage": "triage-round1.json — 83 findings: 33 FIXED / 39 OPEN / 11 PARTIAL",
+   "battery": "see battery-round1/SUMMARY.md (fresh full run on e8b0ccd)"
+  },
+  {
+   "round": 2,
+   "workflow": "wf_03729f77-e93 (17 agents: 4 build + 4 verify + 6 fleet + 3 hunt) + direct agents R2-X/R2-Y",
+   "landings": [
+    {
+     "wp": "R2-X app kernel (budget, lookup friction)",
+     "donor": "0cccfd4",
+     "landed": "184b258",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "fleet: 694 archive titleEn",
+     "landed": "c17bd76",
+     "verdict": "lander-verified"
+    },
+    {
+     "wp": "R2-B capture sovereignty",
+     "donor": "c2d1e4c",
+     "landed": "78bfaad",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "R2-A SRS/review integrity + ADR-003",
+     "donor": "ec69050",
+     "landed": "98c0eab",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "R2-D feed loop",
+     "donor": "3f394a7",
+     "landed": "a83b2b9+convergence",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "R2-C reader/shelf truths",
+     "donor": "88774e5",
+     "landed": "83b16c4",
+     "verdict": "CONFIRMED"
+    },
+    {
+     "wp": "R2-Y drift truths",
+     "donor": "544d93b",
+     "landed": null,
+     "verdict": "PARTIAL — back with builder (hunt-07 reconciliation)"
+    }
+   ],
+   "hunts": "hunts-round2.json — 13 findings, furigana P1 lander-confirmed",
+   "battery": "battery-round2/SUMMARY.md — 16/16 green after data-driven count fix"
+  }
+ ],
+ "nextCommand": "Launch round 3: Workflow({scriptPath: '<session>/workflows/scripts/renkan-round-3.js'}) — furigana truth, history sentinel, T-06 review honesty, optimizer round-trip, small truths. RUN_STATE Round 3 QUEUE section carries the briefs if the script file is gone.",
+ "environment": {
+  "e2e": "npm run test:e2e:build before test:e2e",
+  "corpusPython": "/home/user/.venv-bunki-corpus/bin/python (unidic-lite needs venv build)",
+  "chromium": "/opt/pw-browsers/chromium"
+ }
+}

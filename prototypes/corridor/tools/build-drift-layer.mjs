@@ -190,6 +190,28 @@ patch(
   'gate main pointerup',
 );
 
+// 2b · hidden-layer tab discipline: the radical explainer rests at opacity:0
+// + pointer-events:none, which hides it from fingers but NOT from the Tab
+// key — in the fused document its 閉じる × was the drift home's FIRST tab
+// stop, an invisible control before any real one (R3-B hunt). `inert` while
+// closed removes the whole modal from the tab order and the accessibility
+// tree; opening lifts it. Presentation and gestures untouched.
+patch(
+  'const radoc=document.getElementById("radoc");',
+  'const radoc=document.getElementById("radoc");radoc.inert=true;',
+  'radoc rests inert',
+);
+patch(
+  'function openRadoc(){ radoc.classList.add("open"); }',
+  'function openRadoc(){ radoc.inert=false; radoc.classList.add("open"); }',
+  'radoc wakes focusable',
+);
+patch(
+  'function closeRadoc(){ radoc.classList.remove("open"); }',
+  'function closeRadoc(){ radoc.classList.remove("open"); radoc.inert=true; }',
+  'radoc close returns inert',
+);
+
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
 patch(
   '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',

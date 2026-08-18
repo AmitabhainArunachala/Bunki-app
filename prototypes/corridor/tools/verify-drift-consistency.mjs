@@ -803,6 +803,263 @@ for (const theme of ['北斎', '夜']) {
   );
 }
 
+/* --------------------- edge blooms: the ring must honour the 390px glass */
+// P2-2: the bloom ring is polar math wider than a phone. With a planet
+// standing near each edge of the glide band (where the camera deliberately
+// does NOT re-centre), every satellite must keep its whole body on the
+// glass: centre inside the viewport AND the centre point actually owned by
+// that satellite through document.elementFromPoint — on the fused surface
+// this also convicts a satellite parked under the level tide or the
+// corridor's chrome bands, which a bare bounding-box check would excuse.
+const edgeZonePick = (zone) => page.evaluate(`(() => {
+  const z = ${JSON.stringify(zone)};
+  const out = [];
+  for (const el of document.querySelectorAll('#drift-layer .word')) {
+    const base = el.querySelector('.base')?.textContent ?? '';
+    const r = el.getBoundingClientRect();
+    if (!base || !r.width) continue;
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (x < z.x0 || x > z.x1 || y < z.y0 || y > z.y1) continue;
+    if (document.elementFromPoint(x, y)?.closest('.word') !== el) continue;
+    const op = parseFloat(el.style.opacity || '1');
+    if (op < 0.12) continue;
+    out.push({ w: base, x, y, op });
+  }
+  out.sort((a, b) => b.op - a.op);
+  return out.slice(0, 3);
+})()`);
+// a small-step, event-dense pan that ends with the finger at rest: the
+// camera's inertia integrator amplifies sparse synthetic drags, so the pan
+// walks in 60Hz-sized steps and parks before lifting — it only reshuffles
+// which words stand on the glass, it aims at nothing
+const edgeShufflePan = async (dx, dy) => {
+  const x0 = 195, y0 = 480;
+  await touch('touchStart', [[x0, y0]]);
+  const steps = Math.max(8, Math.round(Math.max(Math.abs(dx), Math.abs(dy)) / 4));
+  for (let i = 1; i <= steps; i++) {
+    await page.waitForTimeout(16);
+    await touch('touchMove', [[x0 + (dx * i) / steps, y0 + (dy * i) / steps]]);
+  }
+  for (let i = 0; i < 3; i++) {
+    await page.waitForTimeout(80);
+    await touch('touchMove', [[x0 + dx + (i % 2), y0 + dy]]);
+  }
+  await touch('touchEnd', []);
+  await page.waitForTimeout(900);
+};
+const edgeSatsProbe = `(() => {
+  const c = document.querySelector('#drift-layer .word.bctr');
+  const cr = c ? c.getBoundingClientRect() : null;
+  return {
+    centre: c
+      ? { w: c.querySelector('.base')?.textContent ?? '', x: Math.round(cr.left + cr.width / 2), y: Math.round(cr.top + cr.height / 2) }
+      : null,
+    sats: [...document.querySelectorAll('#drift-layer .word.bsat')].map((el) => {
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const hit = document.elementFromPoint(x, y);
+      const owned = !!hit && (hit === el || el.contains(hit));
+      return {
+        w: el.querySelector('.base')?.textContent ?? '',
+        x: Math.round(x), y: Math.round(y),
+        inView: x >= 0 && x < innerWidth && y >= 0 && y < innerHeight,
+        owned,
+        under: owned ? '' : hit ? (hit.closest('.word')?.querySelector('.base')?.textContent ?? hit.tagName + '#' + hit.id) : 'nothing',
+      };
+    }),
+  };
+})()`;
+// zones sit just INSIDE the glide band (24-76% of x, 26-72% of y): the
+// harsh honest case, because here the camera stays put by design and the
+// old polar ring pushed satellites to x=-93 and under the tide slider
+const EDGE_ZONES = [
+  { name: 'left-edge', x0: 96, x1: 150, y0: 250, y1: 590 },
+  { name: 'right-edge', x0: 240, x1: 294, y0: 250, y1: 590 },
+  { name: 'top-edge', x0: 120, x1: 270, y0: 222, y1: 285 },
+  { name: 'bottom-edge', x0: 120, x1: 270, y0: 545, y1: 605 },
+];
+for (const zone of EDGE_ZONES) {
+  let verdict = null;
+  for (let attempt = 0; attempt < 2 && !verdict; attempt++) {
+    await boot();
+    let picks = [];
+    for (let i = 0; i < 8 && !picks.length; i++) {
+      picks = await edgeZonePick(zone);
+      if (!picks.length) await edgeShufflePan(i % 2 ? 70 : -55, i % 3 ? 45 : -60);
+    }
+    for (const pick of picks) {
+      await tapAt(pick.x, pick.y);
+      await page.waitForTimeout(1700);
+      // settle: two consecutive samples with every satellite within 3px
+      let prev = null, cur = null;
+      for (let i = 0; i < 8; i++) {
+        cur = await page.evaluate(edgeSatsProbe);
+        if (
+          prev && cur.centre && prev.centre && cur.sats.length && cur.sats.length === prev.sats.length &&
+          cur.sats.every((s, k) => Math.hypot(s.x - prev.sats[k].x, s.y - prev.sats[k].y) <= 3)
+        ) break;
+        prev = cur;
+        await page.waitForTimeout(300);
+      }
+      if (!cur.centre || cur.centre.w !== pick.w || !cur.sats.length) {
+        await settle();
+        continue; // this word raised no held family — not this probe's verdict
+      }
+      const offView = cur.sats.filter((s) => !s.inView);
+      const unowned = cur.sats.filter((s) => s.inView && !s.owned);
+      verdict = {
+        word: cur.centre.w,
+        anchor: `(${cur.centre.x},${cur.centre.y})`,
+        sats: cur.sats.length,
+        offView,
+        unowned,
+      };
+      break;
+    }
+  }
+  if (!verdict) {
+    await file(
+      { w: zone.name, kanji: null },
+      'edge-bloom',
+      'a word inside the zone raises a held constellation',
+      'dead',
+      'no zone word opened a bloom across two fresh boots',
+      { state: 'bloom', zone: zone.name },
+    );
+    continue;
+  }
+  const edgeOk = verdict.offView.length === 0 && verdict.unowned.length === 0;
+  await file(
+    { w: verdict.word, kanji: (verdict.word.match(/[\u4e00-\u9fff]/g) ?? []).length },
+    'edge-bloom',
+    `${zone.name}: every satellite centre on the glass and hit-owned at 390x844`,
+    edgeOk ? 'ok' : 'misfired',
+    `anchor=${verdict.anchor}; sats=${verdict.sats}` +
+      (verdict.offView.length ? `; offView=${verdict.offView.map((s) => `${s.w}@(${s.x},${s.y})`).join('・')}` : '') +
+      (verdict.unowned.length ? `; unowned=${verdict.unowned.map((s) => `${s.w}@(${s.x},${s.y})→${s.under}`).join('・')}` : ''),
+    { state: 'bloom', zone: zone.name },
+  );
+  await settle();
+}
+
+/* ----------------------- the front door's one first-touch cue (POL-1) */
+// A fresh visitor at the 銀河 front door must be invited exactly once: the
+// drift's own hint plaque shows until the FIRST successful touch of a word,
+// which persists the seen-flag in the drift's own store (bunki-drift-v1) so
+// a reload never resurrects the cue. This context deliberately carries NO
+// storage-clearing init script — the persistence claim must be real.
+{
+  const cueCtx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const cuePage = await cueCtx.newPage();
+  cuePage.on('pageerror', (e) => pageErrors.push(`cue: ${e.message}`));
+  cuePage.on('console', (m) => m.type() === 'error' && pageErrors.push(`cue: ${m.text()}`));
+  const cueCdp = await cueCtx.newCDPSession(cuePage);
+  const cueTap = async (x, y) => {
+    await cueCdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, radiusX: 5, radiusY: 5, force: 1 }] });
+    await cuePage.waitForTimeout(65);
+    await cueCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  };
+  const cueState = `(() => {
+    const el = document.querySelector('#drift-layer #hint');
+    if (!el) return null;
+    const cs = getComputedStyle(el);
+    let flag = null;
+    try { flag = JSON.parse(localStorage.getItem('bunki-drift-v1') ?? 'null')?.cue ?? null; } catch (error) { flag = 'unreadable'; }
+    return {
+      firstCue: el.classList.contains('first-cue'),
+      display: cs.display,
+      visibility: cs.visibility,
+      opacity: Number(cs.opacity),
+      text: (el.textContent ?? '').trim(),
+      ginga: document.body.classList.contains('ginga'),
+      flag,
+    };
+  })()`;
+  const cueBoot = async () => {
+    await cuePage.goto(`${base}/index.html?entry=drift`);
+    await cuePage.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await cuePage.waitForTimeout(600); // read the cue promptly: it fades on its own after ~7s
+  };
+  const mainPage = page;
+  page = cuePage; // failure screenshots from these cases must show THIS page
+  try {
+    await cueBoot();
+    const fresh = await cuePage.evaluate(cueState);
+    const freshOk =
+      !!fresh && fresh.ginga && fresh.firstCue && fresh.display === 'block' &&
+      fresh.visibility === 'visible' && fresh.opacity >= 0.5 && fresh.text.length > 0 && !fresh.flag;
+    await file(
+      { w: 'first-touch cue', kanji: null },
+      'cue-fresh',
+      'a fresh profile at the 銀河 front door shows the one first-touch cue',
+      freshOk ? 'ok' : 'dead',
+      JSON.stringify(fresh),
+      { state: 'front-door' },
+    );
+    const cuePick = await cuePage.evaluate(`(() => {
+      for (const el of document.querySelectorAll('#drift-layer .word')) {
+        const base = el.querySelector('.base')?.textContent ?? '';
+        const r = el.getBoundingClientRect();
+        if (!base || !r.width) continue;
+        if (r.left < 60 || r.right > 330 || r.top < 180 || r.bottom > 660) continue;
+        const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        if (document.elementFromPoint(x, y)?.closest('.word') !== el) continue;
+        return { w: base, x, y };
+      }
+      return null;
+    })()`);
+    if (!cuePick) {
+      await file(
+        { w: 'first-touch cue', kanji: null },
+        'cue-retire',
+        'a visible word is aimable for the first touch',
+        'detached',
+        'no hit-owned word to tap on the fresh field',
+        { state: 'front-door' },
+      );
+    } else {
+      await cueTap(cuePick.x, cuePick.y);
+      await cuePage.waitForTimeout(900);
+      const touched = await cuePage.evaluate(cueState);
+      const answered = await cuePage.evaluate(`(() => ({
+        bloom: !!document.querySelector('#drift-layer .word.bctr'),
+        unfolded: !!document.querySelector('#drift-layer .word.unfolded'),
+      }))()`);
+      const retireOk =
+        !!touched && !touched.firstCue && touched.display === 'none' &&
+        touched.flag === 1 && (answered.bloom || answered.unfolded);
+      await file(
+        { w: cuePick.w, kanji: (cuePick.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
+        'cue-retire',
+        'the first successful word-touch retires the cue and persists the flag in bunki-drift-v1',
+        retireOk ? 'ok' : 'misfired',
+        `state=${JSON.stringify(touched)}; answered=${JSON.stringify(answered)}`,
+        { state: 'front-door' },
+      );
+      await cueBoot(); // a real reload on the SAME profile — the flag must hold
+      const reloaded = await cuePage.evaluate(cueState);
+      const stayOk =
+        !!reloaded && !reloaded.firstCue && reloaded.display === 'none' && reloaded.flag === 1;
+      await file(
+        { w: 'first-touch cue', kanji: null },
+        'cue-stays-retired',
+        'a reload does not resurrect the cue: the seen-flag survives in the drift store',
+        stayOk ? 'ok' : 'misfired',
+        JSON.stringify(reloaded),
+        { state: 'front-door' },
+      );
+    }
+  } finally {
+    page = mainPage;
+    await cueCtx.close();
+  }
+}
+
 /* --------------------------------------- seeded invariant fuzz (A0 / A3) */
 const makePrng = (seed) => {
   let state = (seed >>> 0) || 0x9e3779b9;
@@ -1099,7 +1356,7 @@ if (SOAK_MS > 0) {
         requestedWords: N_WORDS,
         completedWords: matrixWordsTested,
         encodedGestures,
-        encodedStates: ['surface', 'bloom', 'lock', ...(SOAK_MS ? ['soak'] : [])],
+        encodedStates: ['surface', 'bloom', 'lock', 'front-door', ...(SOAK_MS ? ['soak'] : [])],
         themes: ['北斎', '夜'],
       },
       lexicalInventory: { primaryWords: primaryWords.length, primaryKanaOnly: primaryKana },

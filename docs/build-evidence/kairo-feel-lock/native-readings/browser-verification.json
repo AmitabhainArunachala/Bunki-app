@@ -7,49 +7,49 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T04:54:17.740Z",
+  "completedAt": "2026-08-16T18:05:48.257Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "4a1dfc10c85ce78db6181349e3397a12a369494ab0d81ec52a938a0807631106",
+    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "7ffcd4d73cff8585bba8e96dbb3bad36d7a0cca8df17a65e0e001c5115076043",
-    "corridorCss": "0658c94577f7a50a18cbd7543a046fcd3128fedf5293fe98e4e46342607c2a07",
-    "standalone": "71f2898d029526c45d6fd3706bc5b36231f10c81b5d615ec8898ba238b022e27",
+    "corridorJs": "0318fa5d712dc217fdf6b285e3b3c7aaf2221378e93bbf81982a57dd3bc636ad",
+    "corridorCss": "e5ce33ce70c19df8c19285ad6e59a0ba320d7babf6ba835e8e498716f6d53fcb",
+    "standalone": "0a1e1ab1c74f14b14c6828675adce24d2e6f5e7266c8b1e67782d9b32d3b0e89",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
     "articleFiles": {
-      "bunki-graded-n3-zoka-sanjin-morning": "8369a6ad328ee79970dca3c0eee549aea097326c6e344f1b102ab6dbcafc9482",
-      "bunki-graded-n3-nakaima-diary": "83c829da4c1bcc9123ade4f775c612d52fa35939ecd51d321bd8316d313d9ca9",
-      "bunki-graded-n3-world-beginning": "2beeedfe86c44b189fa51a3c703cb7ac481a64d8a6663e83c839cba3f009907e",
-      "bunki-graded-n3-hidden-deity": "1d933dfd1be9d24dbd080a76e6b3d0c08dc4289188b4026dd182aa2c4c43883f",
-      "bunki-graded-n3-kojiki-book": "c99cc83f76df0c30ef2fe14a95c43fed796cfe0df8d70d4e22e6a54354a604eb",
-      "bunki-graded-n3-hashira-counter": "4b280aafd306cb97ad2c68e0bf30ec78a590c9bb53eb37f6bdb31c06ba453997",
-      "bunki-graded-n3-feel-jingu-forest": "bca05136977a31ed453bf968ad207346bc3000f4f9fe6c19a9045011fa513362",
-      "bunki-graded-n3-musubi-visual": "69466a53f8083a92a62b0ea6403f74a5d993a5799bf1ef0b3edced21d5cb3905",
-      "bunki-graded-n3-gratitude-week": "4c555509751e3b5893fc240cd0ac64d25541a7e932d0be7e6447ef61cfa91fc2",
-      "bunki-graded-n3-thanks-before-help": "487a44f33add8cdd422b9f1d222c846df93d2e9cca138f61c81fe983fc05b823",
-      "bunki-essay-n2-zoka-as-one": "a3dd2dc579bf9f0e044859b2f2aadfab3100aff7ba17fe18237bd99f4f816fc5",
-      "bunki-essay-n2-nakaima-time": "ca1e35eb0389d416ec6911d7e10606a9374f60e21f3370d6aa9c501bdce5d1f6",
-      "bunki-essay-n2-creator-god": "c0d4f273e2d5f3c0f4739f50feacdd38e05ad89484acbce65cff48e18449e000",
-      "bunki-essay-n2-silent-amenominakanushi": "a60ca26f3f1dfb1aa6155ed91d479b12e4cfa31b1f57af9d28848031d4a6d1c4",
-      "bunki-essay-n2-kojiki-myth-history": "bc695bea42d708c1a4e714caa78a773d52ad64e546ec608b6ed16e3165a483a1",
-      "bunki-essay-n2-myth-to-book": "4592baff9acc0d6f1e9cda15d28f4b5c57fb353434f877a702bbef0ec669328b",
-      "bunki-essay-n2-feel-jingu-musubi": "4585c0b9fb4f2d1099fe339fedb0d97489f1ae86af85b1b2bbdce74d1f4a3a15",
-      "bunki-essay-n2-prayer-on-screen": "13f430983baa15d870e6333d8c2969f95844644382667a9d0f0efbd0cf41932d",
-      "bunki-essay-n2-thanks-first": "59986505cf592db2152784592c97cab1421c99bdee7d96eddc6369ca613d68e6",
-      "bunki-essay-n2-testimony-literacy": "50d9641f8a75993e02224015b16709b41d06c524525a0d06bba16983c5b510b4",
-      "bunki-essay-n1-cosmic-analogy": "f18ab0ff6528f1387a7a42132bafa8629c34c96f09e9d47ed8c16218ef38cd38",
-      "bunki-essay-n1-nakaima-time-theory": "43e7f91259b20c164b9cdfeed49a86ffd3f8efeb7ba4c4d3cd54173c5f0078f1",
-      "bunki-essay-n1-first-versus-supreme": "1059dcebba1c69c9142607aaf0e6b15554c914aade93c79f4c59c052a732b342",
-      "bunki-essay-n1-silent-god-theology": "4b9310bd263dbeed7822a7226523d85e6f10c5c03f19dc24b115914a2844c22d",
-      "bunki-essay-n1-kojiki-power": "a6995e7d5608635cc458b5997d684f88a5e9f140065c51c520cd58b1f1bb085b",
-      "bunki-essay-n1-beyond-fact-fiction": "91382127437ac078563a30a14017aeae98eee1eb4d5b7337872d811f9beeeb75",
-      "bunki-essay-n1-sacred-media": "03bcbc7d3f547e3690a980186c52763096c1d19c2d2b191b2d761f75a67694c0",
-      "bunki-essay-n1-ise-time": "e776f8c19fc361ba4bed863c840ab2849bbd22b1462ce9ac267eac76a0c509de",
-      "bunki-essay-n1-miracle-testimony": "9cf270df94c78bc46fa23d9ad58c933db95a7e218ef4e230dcabef61ed141892",
-      "bunki-essay-n1-prayer-reality": "aa7f08d1168dc668f7f042cc4e1a96d112f15d980ccc99dd2fa6cc2b1f29de82"
+      "bunki-graded-n3-zoka-sanjin-morning": "2244652c09e90df04f8bbb7cc25562518bc4d1fd5e696dbdb6983df308d95534",
+      "bunki-graded-n3-nakaima-diary": "46a844df39a350467baebf0c652dfc11c6969645e2758ae64f38a9795769ed20",
+      "bunki-graded-n3-world-beginning": "4257152c997f7a06ba7aef518ebef9c17da973ef59a48602aff7c8072b78a3a8",
+      "bunki-graded-n3-hidden-deity": "352adabd7a3e35a5e5edb8664f2362f40acf15f07687bf100189e304507b8489",
+      "bunki-graded-n3-kojiki-book": "f3c9c1f695c821ffc972b143dc186c13b5fa5e5bde8eafb853895ce40ad10338",
+      "bunki-graded-n3-hashira-counter": "8ae8e8db1897bff639e53061dd97547d5a3ff9009354f93d7af1f2dd8aee3f93",
+      "bunki-graded-n3-feel-jingu-forest": "cdf934cdef1f3f6ec6bfa6a1df01c0c492dc2d46cf42d49b0e39fbf138646dd0",
+      "bunki-graded-n3-musubi-visual": "bc6bea8f30de56f1a6d95dd6f523ab84e809703603d6c536f2bab883f576e89a",
+      "bunki-graded-n3-gratitude-week": "5d13812e477c920640c9e8b903f26d630e2e6532dc6aeb31274ab2211d76490c",
+      "bunki-graded-n3-thanks-before-help": "3fd696b3548bb08c58e64a689d1240805b647efa82153ac350fbd28ed653e810",
+      "bunki-essay-n2-zoka-as-one": "e2a2a7e0b7bb9f08e3c5a5a139a619e1d23929e4524ce436f800a51690e85a71",
+      "bunki-essay-n2-nakaima-time": "20ce0e992a05a4afd9c8664d24a6dde420385c81398e4db32ebaaadd750d5f1b",
+      "bunki-essay-n2-creator-god": "8f01b0f4dd68f35791eb60c7e09003fbaed1cbc173043be5a9c3b71e1220f307",
+      "bunki-essay-n2-silent-amenominakanushi": "fa4cb2497f56f6f5fe3952a328e72358c0dc4330644ac0df15ad2c985ae8461c",
+      "bunki-essay-n2-kojiki-myth-history": "162f54e1076e5f9825988077ddce8cbdf130b8a054c06eb13dfe2f38ff79f3bf",
+      "bunki-essay-n2-myth-to-book": "564cf6d370dd23806f3014ee2eed91abd2ffd5b5675d9d83fab918ccb497bd94",
+      "bunki-essay-n2-feel-jingu-musubi": "59ca1301055ff8c3faa0064f6519b6297d0b9b1a14b237161fdee89e0da9d5c5",
+      "bunki-essay-n2-prayer-on-screen": "a76c2c197c6a37fdddb72e131562a31fc4b1c19de4653a80f76d6b2916c6858b",
+      "bunki-essay-n2-thanks-first": "b0a5ed6363761f8cce0db0e6fd4b4d9faf30029740282b8122a42e2f075ce269",
+      "bunki-essay-n2-testimony-literacy": "f9167f0274191cea51c97c139cd2a1311cfd0650d03cde97d83f083e530db856",
+      "bunki-essay-n1-cosmic-analogy": "487cb1d974c42ba5f18345db86f439b2ade3e94073096399bbc4414c54bed88d",
+      "bunki-essay-n1-nakaima-time-theory": "03c5bc4e3344106bf8861eb43c1fb5bd4194ef15a9c068ceca15e46dc7167d7e",
+      "bunki-essay-n1-first-versus-supreme": "3e377145a5547ea6135a4c9a3c012e224df0a53bf0968bb8b4c456f6847ece12",
+      "bunki-essay-n1-silent-god-theology": "4da0593950777fbf383c09b4e62a7a464318b5fa457a65c375d6e2ea3388b51e",
+      "bunki-essay-n1-kojiki-power": "f651f120fb98aea885f6949fb9ea33656053f305ec0719f2a0c93a9f11033744",
+      "bunki-essay-n1-beyond-fact-fiction": "7418d0cd1b10d99ef9da7290c30e97fff3e358f1cccf652ab82e0788d2d4fe53",
+      "bunki-essay-n1-sacred-media": "c4c59659ce3e6f91675e6fae0f8113026f94e3f1cb3bd6e5f660f51cbd5043d3",
+      "bunki-essay-n1-ise-time": "fd169bfa85f0d02dbaec06d8e22255067ad2b94b7df3cb5b518b4e41950eff57",
+      "bunki-essay-n1-miracle-testimony": "5e9f31406c9ee502dccbdbde94dcd87783210b6706bbc116a67645e45a3d8273",
+      "bunki-essay-n1-prayer-reality": "a9dbfe0d03447ba91727dab309dbb78f9c39bf0741f7357e70bc146d03dfb162"
     }
   },
   "visualReferenceEvidence": {
@@ -57,29 +57,33 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "649cf901ef345485f474f570890c1af223ac285e616be32f8a88c62ae6d20c64"
+        "sha256": "700aa36aef3bf872b3aba974de2505e30cd0d139cb784caaee1b2b71595a3fa6"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "b41e88eeb9ab0562eab228e5a3984c2f4577d3fc943339cdf70a1fd825c2e12b"
+        "sha256": "9100157f3f7eae11fe77a7e0276e4fda2611e7f387b2b2c2c7e99c07ce53fe50"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "4c6c842a5cb8876b266d290914c70b13639ca5b3b709c2da716a03532a41148d"
+        "sha256": "2431279eaf1faa695f1460c93ade14f05f31f99846861d0aa6120aab797a4b9b"
+      },
+      "biShelf": {
+        "path": "screenshots/shelf-bilingual-titles.png",
+        "sha256": "7052029a22706853d1b13acbf86f2f1808fc79a2cf16934144844e7d2c642b1f"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "ff6ed53efdaa94d42b25a33fb194fcd41fa2ca7cb610d6e034b97b6699ffc75c"
+        "sha256": "a3a6b772f30bc85c194479da81116c89dad15b263db83bb4a0469c7ad764a3a3"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "04521d0171e928cabba9cdc9e9ba651478c1b2a0bfa332acbeaa677ddb27e0ff"
+        "sha256": "276683e691a42429ff26e622e16e4a49aa4d2b8b98c7bd45b3e0cad272ff847a"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "5a7e9d6fe4be2470ee89d6d80ed24fe791aa77d123b9383071deff1973180ec5"
+        "sha256": "91802bd298a44c3799febd697441fda02468a9952d5d5fe4f5c19bd4b062740e"
       }
     }
   },
@@ -123,14 +127,14 @@
       "fullEntry": {
         "headword": "朝",
         "reading": "あさ",
-        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例\n\n今回\nの\n部分\n開業\nに\nより\n、\nJR"
+        "text": "← 戻る\n覚\n✕\n朝\n\nあさ\n\nnoun · adverb\n\nmorning\nbreakfast\n\n語義と用法をひらいています…\n\nJLPT N5\n\nこの語の漢字\n\n朝\nMorning\n›\n\n用例 — ことばは長押しで辞書へ\n\n今回\nの\n部"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10105,
-      "returnedShelfY": 10105,
+      "shelfY": 11048,
+      "returnedShelfY": 11048,
       "newNoise": []
     },
     {
@@ -165,21 +169,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "半",
-        "reading": "はん",
-        "gloss": "half"
+        "word": "時",
+        "reading": "とき",
+        "gloss": "time"
       },
       "fullEntry": {
-        "headword": "半",
-        "reading": "はん",
-        "text": "← 戻る\n覚\n✕\n半\n\nはん\n\nn-pref · noun\n\n1\n\nnoun, used as a prefix · noun (common) (futsuumeishi)\n\nhalf\nsemi-\npartial\n2\n\nnoun, use"
+        "headword": "時",
+        "reading": "とき",
+        "text": "← 戻る\n覚\n✕\n時\n\nとき\n\n同じ形の 3 項目\n\n時とき\ntime\n›\n時じ\nhour\n›\n時どき\ntime for ...\n›\n\nnoun\n\n時・刻・秋\nとき\n1\n\nnoun (common) (futsuumeishi)\n\ntime"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10105,
-      "returnedShelfY": 10105,
+      "shelfY": 11048,
+      "returnedShelfY": 11048,
       "newNoise": []
     },
     {
@@ -207,7 +211,7 @@
         "source": "段階別読み物 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 712,
-        "ruby": 278,
+        "ruby": 281,
         "paragraphs": 7,
         "fontFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "lineHeight": "45.15px",
@@ -227,8 +231,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10291,
-      "returnedShelfY": 10291,
+      "shelfY": 11234,
+      "returnedShelfY": 11234,
       "newNoise": []
     },
     {
@@ -276,8 +280,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10842,
-      "returnedShelfY": 10842,
+      "shelfY": 11785,
+      "returnedShelfY": 11785,
       "newNoise": []
     },
     {
@@ -325,8 +329,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 10842,
-      "returnedShelfY": 10842,
+      "shelfY": 11785,
+      "returnedShelfY": 11785,
       "newNoise": []
     },
     {
@@ -361,21 +365,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "で",
-        "reading": "",
-        "gloss": "動作場所・手段"
+        "word": "語",
+        "reading": "ご",
+        "gloss": "word"
       },
       "fullEntry": {
-        "headword": "で　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nで　助詞\n\n動作場所・手段\n\nWhere an action happens, or the tool it happens BY: 会議はここで開かれる、バスで行く。Also the boundary of a tota"
+        "headword": "語",
+        "reading": "ご",
+        "text": "← 戻る\n覚\n✕\n語\n\nご\n\n同じ形の 2 項目\n\n語ご\nword\n›\n語かたり\ntalk\n›\n\nnoun · n-suf · counter\n\n1\n\nnoun (common) (futsuumeishi) · noun, used as"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11028,
-      "returnedShelfY": 11028,
+      "shelfY": 11971,
+      "returnedShelfY": 11971,
       "newNoise": []
     },
     {
@@ -423,8 +427,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11579,
-      "returnedShelfY": 11579,
+      "shelfY": 12522,
+      "returnedShelfY": 12522,
       "newNoise": []
     },
     {
@@ -472,8 +476,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11579,
-      "returnedShelfY": 11579,
+      "shelfY": 12522,
+      "returnedShelfY": 12522,
       "newNoise": []
     },
     {
@@ -521,8 +525,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11765,
-      "returnedShelfY": 11765,
+      "shelfY": 12708,
+      "returnedShelfY": 12708,
       "newNoise": []
     },
     {
@@ -570,8 +574,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12330,
-      "returnedShelfY": 12330,
+      "shelfY": 13273,
+      "returnedShelfY": 13273,
       "newNoise": []
     },
     {
@@ -619,8 +623,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12330,
-      "returnedShelfY": 12330,
+      "shelfY": 15539,
+      "returnedShelfY": 15539,
       "newNoise": []
     },
     {
@@ -668,8 +672,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12530,
-      "returnedShelfY": 12530,
+      "shelfY": 15539,
+      "returnedShelfY": 15539,
       "newNoise": []
     },
     {
@@ -717,8 +721,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13095,
-      "returnedShelfY": 13095,
+      "shelfY": 15753,
+      "returnedShelfY": 15753,
       "newNoise": []
     },
     {
@@ -766,8 +770,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13095,
-      "returnedShelfY": 13095,
+      "shelfY": 16318,
+      "returnedShelfY": 16318,
       "newNoise": []
     },
     {
@@ -815,8 +819,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13322,
-      "returnedShelfY": 13322,
+      "shelfY": 16318,
+      "returnedShelfY": 16318,
       "newNoise": []
     },
     {
@@ -844,7 +848,7 @@
         "source": "随筆 · Bunki · 検収前",
         "level": "中級後半",
         "tokens": 744,
-        "ruby": 293,
+        "ruby": 295,
         "paragraphs": 6,
         "fontFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "lineHeight": "45.15px",
@@ -864,8 +868,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13873,
-      "returnedShelfY": 13873,
+      "shelfY": 16518,
+      "returnedShelfY": 16518,
       "newNoise": []
     },
     {
@@ -913,8 +917,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13873,
-      "returnedShelfY": 13873,
+      "shelfY": 17069,
+      "returnedShelfY": 17069,
       "newNoise": []
     },
     {
@@ -962,8 +966,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14060,
-      "returnedShelfY": 14060,
+      "shelfY": 17069,
+      "returnedShelfY": 17069,
       "newNoise": []
     },
     {
@@ -1011,8 +1015,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14624,
-      "returnedShelfY": 14624,
+      "shelfY": 17283,
+      "returnedShelfY": 17283,
       "newNoise": []
     },
     {
@@ -1060,8 +1064,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14624,
-      "returnedShelfY": 14624,
+      "shelfY": 17834,
+      "returnedShelfY": 17834,
       "newNoise": []
     },
     {
@@ -1109,8 +1113,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 14824,
-      "returnedShelfY": 14824,
+      "shelfY": 17834,
+      "returnedShelfY": 17834,
       "newNoise": []
     },
     {
@@ -1145,21 +1149,21 @@
         "overflow": 0
       },
       "quick": {
-        "word": "を",
-        "reading": "",
-        "gloss": "対格"
+        "word": "今",
+        "reading": "いま",
+        "gloss": "now"
       },
       "fullEntry": {
-        "headword": "を　助詞",
-        "reading": "",
-        "text": "← 戻る\n覚\n✕\nを　助詞\n\n対格\n\nMarks what the action is done TO — and the space moved THROUGH with motion verbs (空を飛ぶ).\n\n用例\n\n本を読む。\n\n"
+        "headword": "今",
+        "reading": "いま",
+        "text": "← 戻る\n覚\n✕\n今\n\nいま\n\n同じ形の 2 項目\n\n今いま\nnow\n›\n今こん\nthe current ...\n›\n\nnoun · no-adjective · adverb\n\n1\n\nnoun (common) (futsuumeishi"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15375,
-      "returnedShelfY": 15375,
+      "shelfY": 18020,
+      "returnedShelfY": 18020,
       "newNoise": []
     },
     {
@@ -1207,8 +1211,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15375,
-      "returnedShelfY": 15375,
+      "shelfY": 18585,
+      "returnedShelfY": 18585,
       "newNoise": []
     },
     {
@@ -1256,8 +1260,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15589,
-      "returnedShelfY": 15589,
+      "shelfY": 18585,
+      "returnedShelfY": 18585,
       "newNoise": []
     },
     {
@@ -1285,7 +1289,7 @@
         "source": "随筆 · Bunki · 検収前",
         "level": "上級前半",
         "tokens": 942,
-        "ruby": 389,
+        "ruby": 390,
         "paragraphs": 6,
         "fontFamily": "\"Hiragino Mincho ProN\", \"Yu Mincho\", \"Noto Serif JP\", \"Noto Serif CJK JP\", \"Source Han Serif JP\", \"Songti SC\", serif",
         "lineHeight": "45.15px",
@@ -1305,8 +1309,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16140,
-      "returnedShelfY": 16140,
+      "shelfY": 18785,
+      "returnedShelfY": 18785,
       "newNoise": []
     },
     {
@@ -1354,8 +1358,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16140,
-      "returnedShelfY": 16140,
+      "shelfY": 19349,
+      "returnedShelfY": 19349,
       "newNoise": []
     },
     {
@@ -1403,8 +1407,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16381,
-      "returnedShelfY": 16381,
+      "shelfY": 19349,
+      "returnedShelfY": 19349,
       "newNoise": []
     },
     {
@@ -1452,8 +1456,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16932,
-      "returnedShelfY": 16932,
+      "shelfY": 19577,
+      "returnedShelfY": 19577,
       "newNoise": []
     },
     {
@@ -1501,8 +1505,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16932,
-      "returnedShelfY": 16932,
+      "shelfY": 20128,
+      "returnedShelfY": 20128,
       "newNoise": []
     },
     {
@@ -1550,18 +1554,108 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17119,
-      "returnedShelfY": 17119,
+      "shelfY": 20128,
+      "returnedShelfY": 20128,
       "newNoise": []
     }
   ],
   "noise": [],
   "results": [
     {
-      "name": "the one native shelf contains exactly 70 entries",
+      "name": "every primary index row carries a non-empty titleEn",
+      "pass": true,
+      "detail": "82/82",
+      "articleId": null
+    },
+    {
+      "name": "every titleEn names its provenance in titleEnSource",
       "pass": true,
       "detail": "",
       "articleId": null
+    },
+    {
+      "name": "the title marker names its author: AI for the recovered and minted rows, the shelf map for the rest",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every archive row carries a non-empty titleEn with wrapper provenance",
+      "pass": true,
+      "detail": "682 rows · source renkan-ai-2026-08",
+      "articleId": null
+    },
+    {
+      "name": "the code-side TITLES_EN map is gone from corridor.js — titles live in data only",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "no index row or curated body carries a stringified null date",
+      "pass": true,
+      "detail": "82 curated + 682 archive rows clean",
+      "articleId": null
+    },
+    {
+      "name": "野ばら (aozora:051034) records its unknown first-publication date as absence",
+      "pass": true,
+      "detail": "\"\"",
+      "articleId": null
+    },
+    {
+      "name": "every curated jlpt_lexicon coverage equals a reading-aware recompute from its own tokens",
+      "pass": true,
+      "detail": "82 cards agree",
+      "articleId": null
+    },
+    {
+      "name": "the per-card vocab ratio discriminates — ≥6 distinct values, none covering >50% of cards",
+      "pass": true,
+      "detail": "11 distinct 1-in-N values, largest share 26/82",
+      "articleId": null
+    },
+    {
+      "name": "the reading-override lexicon is committed with provenance and aligned entries",
+      "pass": true,
+      "detail": "31 entries · 2 accepts",
+      "articleId": null
+    },
+    {
+      "name": "every lexicon override site is minted into the curated bodies — no suspect reading left open",
+      "pass": true,
+      "detail": "303 lexicon-fixed · 8 accepted across 82 bodies",
+      "articleId": null
+    },
+    {
+      "name": "deity names read かみ-family ruby at every minted site; the flagship carries no unreviewed 神(しん)",
+      "pass": true,
+      "detail": "98 deity かみ sites · 0 unreviewed しん in bunki-graded-n3-zoka-sanjin-morning",
+      "articleId": null
+    },
+    {
+      "name": "the committed suspect-readings report is empty of unfixed rows and agrees with this recount",
+      "pass": true,
+      "detail": "report 303/8/0 vs recount 303/8/0",
+      "articleId": null
+    },
+    {
+      "name": "the one native shelf renders exactly the curated index rows",
+      "pass": true,
+      "detail": "82/82",
+      "articleId": null
+    },
+    {
+      "name": "flagship DOM renders the lexicon ruby at every override site — 神 reads かみ in name positions, しん never",
+      "pass": true,
+      "detail": "20 sites (7 bare 神) · mismatched 0",
+      "articleId": "bunki-graded-n3-zoka-sanjin-morning"
     },
     {
       "name": "native shelf/reader/lookup/settings/completion/bookmark contract",
@@ -1578,7 +1672,7 @@
     {
       "name": "native shelf/reader/lookup/settings/completion/bookmark contract",
       "pass": true,
-      "detail": "712 tokens · 278 ruby · 8 paragraphs · bookmark 620→620",
+      "detail": "712 tokens · 281 ruby · 8 paragraphs · bookmark 620→620",
       "articleId": "bunki-graded-n3-world-beginning"
     },
     {
@@ -1656,7 +1750,7 @@
     {
       "name": "native shelf/reader/lookup/settings/completion/bookmark contract",
       "pass": true,
-      "detail": "744 tokens · 293 ruby · 7 paragraphs · bookmark 620→620",
+      "detail": "744 tokens · 295 ruby · 7 paragraphs · bookmark 620→620",
       "articleId": "bunki-essay-n2-myth-to-book"
     },
     {
@@ -1710,7 +1804,7 @@
     {
       "name": "native shelf/reader/lookup/settings/completion/bookmark contract",
       "pass": true,
-      "detail": "942 tokens · 389 ruby · 7 paragraphs · bookmark 620→620",
+      "detail": "942 tokens · 390 ruby · 7 paragraphs · bookmark 620→620",
       "articleId": "bunki-essay-n1-kojiki-power"
     },
     {
@@ -1757,6 +1851,36 @@
     },
     {
       "name": "all completion and bookmark state survives localStorage",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the 日本語のみ chrome renders no English titles",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row is visibly 検収前 on the 日本語のみ shelf",
+      "pass": true,
+      "detail": "53 pending rows marked",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf renders every English title from the records themselves",
+      "pass": true,
+      "detail": "82 titles",
+      "articleId": null
+    },
+    {
+      "name": "every human-review-pending row stays visibly 検収前 on the bilingual shelf",
+      "pass": true,
+      "detail": "",
+      "articleId": null
+    },
+    {
+      "name": "the bilingual shelf pass added no request, console, or page errors",
       "pass": true,
       "detail": "",
       "articleId": null

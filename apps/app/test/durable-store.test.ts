@@ -32,7 +32,11 @@ import {
 } from '@bunki/domain';
 
 import { createDurableAppStore, durabilityFor } from '../src/state/durable-store.ts';
-import { openAppEventStore, type OpenedAppEventStore } from '../src/state/persistence/index.ts';
+import {
+  annotationSnapshotKey,
+  openAppEventStore,
+  type OpenedAppEventStore,
+} from '../src/state/persistence/index.ts';
 import type { CaptureCommand } from '../src/state/store.ts';
 
 const SOURCE = { sourceId: 'manual-entry', kind: 'manual', locator: 'capture-screen' } as const;
@@ -531,14 +535,15 @@ describe('REQ-UI-01 — acknowledge first, persist after', () => {
   });
 });
 
-describe('what a reload honestly cannot restore', () => {
+describe('the uncertainty dimension is durable (R4-A, P2-18)', () => {
   /**
-   * The uncertainty *dimension* was never in the log (WP05-D2: the v1 schema
-   * records `uncertaintyMark: true | absent`). The store must not guess it back,
-   * and must not report the thread as unmarked either — both would be lies, in
-   * opposite directions.
+   * The dimension never enters the event log (WP05-D2: the v1 schema records
+   * `uncertaintyMark: true | absent`), so its durability comes from the
+   * annotation side-store inside the persistence seam. These probes convict a
+   * reverted build directly: without the side-store, every reload below comes
+   * back with `uncertainty: null`.
    */
-  it('keeps the fact of a mark and drops the dimension, saying which', async () => {
+  it('restores a capture-time mark, dimension and all, after a reload', async () => {
     const snapshotStore = newSnapshotStore();
 
     const first = await launch(snapshotStore, 'run1-');
@@ -547,6 +552,93 @@ describe('what a reload honestly cannot restore', () => {
       'reading',
     );
     await first.flush();
+
+    const second = await launch(snapshotStore, 'run2-');
+    const thread = second.store.getSnapshot().threadsById[ack.threadId];
+    expect(thread?.uncertainty?.dimension).toBe('reading');
+    expect(thread?.uncertainty?.markedAtCapture).toBe(true);
+    expect(thread?.markRecordedInLog).toBe(true);
+    // …and the log itself is exactly what the frozen schema allows: the fact of
+    // a mark, never the dimension. Durability did not become an event field.
+    for (const event of second.store.readAll()) {
+      expect(Object.keys(event)).not.toContain('uncertaintyDimension');
+      expect('uncertaintyMark' in event ? event.uncertaintyMark : undefined).not.toBe('reading');
+    }
+  });
+
+  /**
+   * The strongest probe: a post-Keep mark writes **no event at all**, so the
+   * side-store is the only place it can survive. A reverted build has nothing
+   * to restore this from.
+   */
+  it('restores a post-capture mark that no event ever carried', async () => {
+    const snapshotStore = newSnapshotStore();
+
+    const first = await launch(snapshotStore, 'run1-');
+    const ack = first.store.execute(capture('分岐'));
+    first.store.execute({ kind: 'markUncertainty', threadId: ack.threadId, dimension: 'use' });
+    await first.flush();
+
+    const second = await launch(snapshotStore, 'run2-');
+    const thread = second.store.getSnapshot().threadsById[ack.threadId];
+    expect(thread?.uncertainty?.dimension).toBe('use');
+    expect(thread?.uncertainty?.markedAtCapture).toBe(false);
+    expect(thread?.markRecordedInLog).toBe(false);
+    for (const event of second.store.readAll()) {
+      expect('uncertaintyMark' in event).toBe(false);
+    }
+  });
+
+  it('keeps a cleared mark cleared across the reload', async () => {
+    const snapshotStore = newSnapshotStore();
+
+    const first = await launch(snapshotStore, 'run1-');
+    const ack = first.store.execute(capture('分岐', { uncertainty: 'kanji' }));
+    first.store.execute({ kind: 'markUncertainty', threadId: ack.threadId, dimension: null });
+    await first.flush();
+
+    const second = await launch(snapshotStore, 'run2-');
+    const thread = second.store.getSnapshot().threadsById[ack.threadId];
+    expect(thread?.uncertainty).toBeNull();
+    // Clearing cannot retract the mark already on the captured event — appended
+    // history stays — so the honest split is exactly this pair.
+    expect(thread?.markRecordedInLog).toBe(true);
+  });
+
+  /**
+   * The legacy case the honest fallback sentences still exist for: a log whose
+   * marks predate the annotation store (or whose annotation bytes were lost).
+   * The store must not guess the dimension back, and must not report the
+   * thread as unmarked either — both would be lies, in opposite directions.
+   */
+  it('falls back to the fact-without-dimension split when the annotation bytes are gone', async () => {
+    const snapshotStore = newSnapshotStore();
+
+    const first = await launch(snapshotStore, 'run1-');
+    const ack = first.store.execute(capture('分岐', { uncertainty: 'reading' }));
+    await first.flush();
+
+    // Simulate a pre-R4-A log: the event snapshot survives, the annotation
+    // side-store does not.
+    snapshotStore.removeItem(annotationSnapshotKey('test-store'));
+
+    const second = await launch(snapshotStore, 'run2-');
+    const thread = second.store.getSnapshot().threadsById[ack.threadId];
+    expect(thread?.uncertainty).toBeNull();
+    expect(thread?.markRecordedInLog).toBe(true);
+  });
+
+  it('drops a corrupt annotation row instead of inventing a dimension', async () => {
+    const snapshotStore = newSnapshotStore();
+
+    const first = await launch(snapshotStore, 'run1-');
+    const ack = first.store.execute(capture('分岐', { uncertainty: 'reading' }));
+    await first.flush();
+
+    snapshotStore.setItem(
+      annotationSnapshotKey('test-store'),
+      JSON.stringify({ [ack.threadId]: { dimension: 'vibes', editedAt: 1, markedAtCapture: 'y' } }),
+    );
 
     const second = await launch(snapshotStore, 'run2-');
     const thread = second.store.getSnapshot().threadsById[ack.threadId];

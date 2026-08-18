@@ -1,0 +1,142 @@
+{
+  "reportVersion": 1,
+  "input": {
+    "totalRows": 625,
+    "activeGradeRows": 625,
+    "revokedGradeRows": 0,
+    "revocationRows": 0,
+    "cards": 100,
+    "sameDayReviews": 25,
+    "trainingReviews": 500,
+    "leftCensoredCards": 0,
+    "clockClampedReviews": 0
+  },
+  "optimizer": {
+    "algorithm": "deterministic-full-batch-adam-central-difference-v2",
+    "loss": "binary-cross-entropy-plus-fsrs-rs-full-batch-l2",
+    "ratings": "Again=0; Hard/Good/Easy=1",
+    "sameDayPolicy": "state-update-only; excluded from long-term loss and calibration",
+    "leftCensoredPolicy": "condition on logged (S,D), score the first observed long-term outcome, then continue recurrence",
+    "reviewTimePolicy": "per-card append order; preserve raw time and clamp the FSRS instant to the prior effective anchor",
+    "regularizationGamma": 1,
+    "minimumTrainingReviews": 400,
+    "epochs": 90
+  },
+  "before": {
+    "logLoss": 0.42029737,
+    "rmseBins": 0.0476921,
+    "calibration": [
+      {
+        "range": "0.6–0.7",
+        "count": 1,
+        "meanPredicted": 0.671292,
+        "observedRetention": 0,
+        "gap": -0.671292
+      },
+      {
+        "range": "0.7–0.8",
+        "count": 7,
+        "meanPredicted": 0.756513,
+        "observedRetention": 0.571429,
+        "gap": -0.185085
+      },
+      {
+        "range": "0.8–0.9",
+        "count": 396,
+        "meanPredicted": 0.86074,
+        "observedRetention": 0.861111,
+        "gap": 0.000371
+      },
+      {
+        "range": "0.9–1.0",
+        "count": 96,
+        "meanPredicted": 0.91197,
+        "observedRetention": 0.84375,
+        "gap": -0.06822
+      }
+    ]
+  },
+  "after": {
+    "logLoss": 0.41994976,
+    "rmseBins": 0.04721419,
+    "calibration": [
+      {
+        "range": "0.6–0.7",
+        "count": 1,
+        "meanPredicted": 0.670085,
+        "observedRetention": 0,
+        "gap": -0.670085
+      },
+      {
+        "range": "0.7–0.8",
+        "count": 7,
+        "meanPredicted": 0.755155,
+        "observedRetention": 0.571429,
+        "gap": -0.183727
+      },
+      {
+        "range": "0.8–0.9",
+        "count": 396,
+        "meanPredicted": 0.860577,
+        "observedRetention": 0.861111,
+        "gap": 0.000534
+      },
+      {
+        "range": "0.9–1.0",
+        "count": 96,
+        "meanPredicted": 0.910612,
+        "observedRetention": 0.84375,
+        "gap": -0.066862
+      }
+    ]
+  },
+  "delta": {
+    "logLoss": -0.00034761,
+    "rmseBins": -0.0004779
+  },
+  "candidatePin": {
+    "source": "tools/fsrs-optimize.mjs",
+    "algorithm": "FSRS-6",
+    "package": "ts-fsrs",
+    "pinnedVersion": "5.4.1",
+    "parameterSetId": "bunki-fsrs6-r090-personal-v1",
+    "requestRetention": 0.9,
+    "w": [
+      0.212,
+      1.24836437,
+      2.25988973,
+      8.25366566,
+      6.41326326,
+      0.83372358,
+      3.01949274,
+      0.00103483,
+      1.87268329,
+      0.16602688,
+      0.79646303,
+      1.48316041,
+      0.06146947,
+      0.26229356,
+      1.6480874,
+      0.60144909,
+      1.8740441,
+      0.5423983,
+      0.09125285,
+      0.06579356,
+      0.15469166
+    ],
+    "maximumInterval": 36500,
+    "enableFuzz": false,
+    "enableShortTerm": true,
+    "learningSteps": [
+      "1m",
+      "10m"
+    ],
+    "relearningSteps": [
+      "10m"
+    ],
+    "statePrecision": 8,
+    "reviewTimePolicyId": "append-order-monotonic-clamp-v1"
+  },
+  "dryRun": true,
+  "applicationNote": "Candidate only. This tool never changes Bunki data. Review the report, then let the trunk keeper apply and replay-test any accepted pin."
+}
