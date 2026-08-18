@@ -3896,6 +3896,20 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   opacity: 0.44;
   transition: opacity 0.22s ease;
 }
+/* the printed seal stays 34px so the quiet room stays quiet, but the finger
+ * gets the same 44px every other corner control in this room already has —
+ * it was the one door here a thumb could miss (E3 round-B, writing-room
+ * lens). The hit region belongs to the button, so the sheet beneath it
+ * never steals the tap. */
+.stroke-page[data-minimal='on'] #stroke-world-seal::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+}
 .stroke-page[data-minimal='on'] #stroke-world-seal:is(:hover, :focus-visible),
 .stroke-page[data-minimal='on'][data-chrome='awake'] #stroke-world-seal {
   opacity: 0.85;
@@ -4505,7 +4519,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
+  /* the row must be at least as tall as the hit region its steppers claim.
+   * At a ~33px pitch the two ::before regions overlapped, so a tap under
+   * 新規/日 silently changed 一回の枚数 instead — a claimed 44px that
+   * belongs to the neighbour is worse than no claim (E3 round-B, a11y lens) */
+  min-height: var(--tap);
 }
 
 .srs-pref-row .srs-pref-name {

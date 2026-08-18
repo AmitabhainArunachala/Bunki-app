@@ -174,6 +174,44 @@ kanjidex chips their 44px targets.
 **Post-merge battery on `ae1d901`: 16/16.** Two integration lines merging
 cleanly is not something to assume — it was measured.
 
+## E3 round B — the gate ran on the merged head, and it was not dry either
+
+The rebuilt instrument (`.claude/workflows/renkan-e3-double-dry.js`) ran its
+eight lenses against `ae1d901`. On a four-CPU runner the fleet walks in pairs,
+so the hunt is a multi-hour instrument; it returned **28 findings**, and by the
+gate's own rule a round that finds something is a round WORKED, not passed.
+
+Seventeen are fixed on this branch, each with the probe that convicts its
+absence (`verify-corridor.mjs` **232**, up from 216):
+
+| finding | fix |
+| --- | --- |
+| P1 漢字だけ regraded cards the queue never drew — a 30-day mature card fell to relearning, and a started row minted state past 新規/日 = 0 | the study run schedules only what the queue would have drawn at that instant; everything else is 稽古 |
+| P2 the dojo lobby counted the FORECAST and offered cards はじめる could not open ("3 waiting" → "No cards are waiting") | it counts the pool, and names what ripens tonight — the tray's own POL-8 shape |
+| P1 the world stones never touched the walk sentinel: Back left the app from the front door in one press, abandoned an article in two | opening arms it, closing re-arms it; the stones are a walkable layer under the ONE sentinel, not a surface with its own entry |
+| P2 Back over the writing room closed the ROOM and left the stones and their scrim stranded on the glass | popstate dismisses the topmost overlay before any room moves |
+| P2 Tab walked straight out of the stones into the page under the scrim, and Enter there navigated the app | aria-modal, the room beneath inert, and the ring wraps |
+| P2 pressing 覚 while already in the tray erased the tray's remembered door; 戻る then abandoned the article | a press that changes nothing changes nothing |
+| P1 47 name-tokens per article were focusable buttons with no action and no accessible name — round A made them doors and stopped there | a name says what it is, shows its reading, and hides it again; with ふりがな always on it stops being a button at all |
+| P2 分かち＝文節 cut names in half and glued one name's tail to the next name's head | a name starts a 文節, whatever the grader's 固有名詞 exclusion says |
+| P1 the review dropped the keyboard to `<body>` at both gates — 21 tabs to 思い出した, 56 more to the stamps | a press that destroys its own control names its successor, tried in the order written |
+| P2 every in-sheet press threw focus to 戻る and announced nothing | 戻る is where a sheet OPENS, not where every press inside it ends |
+| P2 the card's context scope and its list membership existed only as a CSS class | both state `aria-pressed` |
+| P2 the ペース steppers lost focus on every press, and their 44px regions overlapped so a tap under 新規/日 changed 一回の枚数 | they name themselves; a row is at least as tall as the target it claims |
+| P2 読み込む overwrote the learner's record with bytes the boot validator rejects — the record destroyed, the app read-only and empty | the import gate is the boot gate; nothing is destroyed to discover the replacement is unreadable |
+| P2 undoing a drill INCREASED the 出会い trail's practice count — the revocation row was read as practice | a revocation is not an encounter, and it cancels the row it points at |
+| P2 the ten やさしい日本語 rows explained their 検収前 with a Wikinews archive-freeze story that is false of them | the mark names its own reason — rights, human review, or the freeze |
+| P2 AnimCJK glyph data (Arphic Public License) is fetched and painted while the panel claiming to state everything omitted it | declared in the pool, with the probe that catches it drifting from `animcjk/index.json` |
+| P1 a second 先生の小テスト silently replaced the quiz the learner was in the middle of, taking their answers | the request in flight is state, not a closure; the room it was asked from is the view AND its depth |
+| P2 any repaint while the tutor was thinking killed 考え中 and the arriving reply painted into a detached node | 考え中 is state; the reply settles where it can be seen, or asks for one more render |
+| P2 the follow-up typed while the tutor thought was destroyed by the reply's own render | the draft rides the render |
+
+The remaining round-B findings are operator-shaped or content work and are
+typed to the sheet rather than fixed here.
+
+**By the gate's own rule this is a round worked, not a dry round.** The count
+restarts from zero on this head, exactly as it did after round A.
+
 ### T5's standing
 
 The double-dry gate has been re-launched on the merged head. The rule is two

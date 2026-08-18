@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "generated": "drift-consistency sweep v2",
-  "startedAt": "2026-08-18T05:47:05.766Z",
-  "finishedAt": "2026-08-18T05:49:42.716Z",
+  "startedAt": "2026-08-18T07:25:51.582Z",
+  "finishedAt": "2026-08-18T07:28:30.051Z",
   "sourceSha": null,
   "mode": "fast",
   "configuration": {
@@ -93,16 +93,16 @@
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 233.01000213623047,
-          "y": 512.72998046875,
+          "x": 192.47000122070312,
+          "y": 503.59999084472656,
           "onScreen": true
         },
         "うるさい": {
           "exists": true,
           "interactive": true,
           "satellite": true,
-          "x": 74.58999729156494,
-          "y": 531.4199829101562,
+          "x": 74.64999675750732,
+          "y": 536.4500122070312,
           "onScreen": true
         }
       },
@@ -521,13 +521,13 @@
       "state": "bloom"
     },
     {
-      "word": "単なる",
+      "word": "順",
       "kanji": 1,
       "theme": "北斎",
       "gesture": "edge-bloom",
       "expected": "left-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(119,293); sats=13",
+      "detail": "anchor=(204,422); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "left-edge"
@@ -539,7 +539,7 @@
       "gesture": "edge-bloom",
       "expected": "right-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(225,492); sats=14",
+      "detail": "anchor=(226,491); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "right-edge"
@@ -551,7 +551,7 @@
       "gesture": "edge-bloom",
       "expected": "top-edge: every satellite centre on the glass and hit-owned at 390x844",
       "outcome": "ok",
-      "detail": "anchor=(259,242); sats=14",
+      "detail": "anchor=(271,249); sats=14",
       "shot": null,
       "state": "bloom",
       "zone": "top-edge"
@@ -690,8 +690,8 @@
       "seed": 1729,
       "step": 5,
       "coordinates": {
-        "x": 220.57000732421875,
-        "y": 235.85000610351562,
+        "x": 219.5199966430664,
+        "y": 235.7599868774414,
         "satellite": "句読点"
       }
     },
@@ -746,8 +746,8 @@
       "seed": 1729,
       "step": 8,
       "coordinates": {
-        "x": 280.04998779296875,
-        "y": 329.0199890136719,
+        "x": 279.2200012207031,
+        "y": 330.6300048828125,
         "satellite": "議事堂"
       }
     },
@@ -783,8 +783,8 @@
       "seed": 1729,
       "step": 10,
       "coordinates": {
-        "x": 175.85000610351562,
-        "y": 208.89999389648438,
+        "x": 174.44000244140625,
+        "y": 210.9199981689453,
         "satellite": "謎謎"
       }
     },
@@ -801,8 +801,8 @@
       "seed": 1729,
       "step": 11,
       "coordinates": {
-        "x": 205.52000427246094,
-        "y": 282.0799865722656,
+        "x": 204.5800018310547,
+        "y": 285.20001220703125,
         "satellite": "句読点"
       }
     },
@@ -819,10 +819,10 @@
       "seed": 1729,
       "step": 12,
       "coordinates": {
-        "x0": 178.72999572753906,
-        "y0": 429.92999267578125,
-        "x1": 208.72999572753906,
-        "y1": 437.92999267578125
+        "x0": 178.2100067138672,
+        "y0": 431.760009765625,
+        "x1": 208.2100067138672,
+        "y1": 439.760009765625
       }
     }
   ]

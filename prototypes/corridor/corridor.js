@@ -491,6 +491,18 @@ const S = {
    * (POL-13): a mid-quiz reload resumes with the tutor's written questions
    * intact; null at rest. Closed only by the learner's own door. */
   aiQuiz: null,
+  /** a quiz REQUEST in flight: { view, depth } naming the room it was asked
+   * from — session-only, so a reload never comes back with the door sealed
+   * by a request that no longer exists. Its note lives beside it. */
+  aiQuizPending: null,
+  /** 'ready' | 'failed' | null — what the last request left to say */
+  aiQuizNote: null,
+  /** in-flight AI requests by `surface|ref` — session-only, so 考え中
+   * survives a repaint and a reload never resurrects a dead request */
+  aiPending: null,
+  /** the chat question half-typed — session-only, so the reply's own render
+   * does not throw away what the learner wrote while waiting for it */
+  aiChatDraft: '',
   /** how many chat turns the log unfolds before 前の会話 — session-only */
   aiChatShown: null,
   /** the review trace: { 'YYYY-MM-DD': { n, again } } — history accrues
@@ -2089,6 +2101,20 @@ async function boot() {
       ...idioms.sources,
       ...dict.sources,
       ...strokes.sources,
+      // AnimCJK ships in share_alike/ and its shards are FETCHED, not
+      // imported, so its licence never reached the panel that claims to
+      // state everything — the writing room painted Arphic-licensed glyph
+      // data while the sources fold omitted it entirely
+      // (E3 round-B, data-licence lens). Declared here because a lazily
+      // fetched pool has no import to carry it; verify-corridor asserts this
+      // block still matches data/share_alike/animcjk/index.json.
+      {
+        name: 'AnimCJK stroke graphics',
+        licence: 'Arphic Public License',
+        attribution:
+          'AnimCJK (parsimonhi) — glyphs derived from Arphic PL KaitiM fonts and Makemeahanzi, redistributed under the Arphic Public License',
+        url: 'https://github.com/parsimonhi/animCJK',
+      },
     ],
     original: [...articleIndex.sources.original, ...grammarV11.sources],
   };
@@ -2690,6 +2716,15 @@ function syncWalkSentinel() {
 // the walk sentinel turns every device Back into the app's own back() until
 // the stack is empty — only then does Back actually leave.
 addEventListener('popstate', () => {
+  // the stones are the topmost layer of all — a Back press with them open
+  // belongs to THEM, whatever room stands underneath. Without this the press
+  // closed the writing room and left the stones and their scrim stranded on
+  // the glass over whatever came next (E3 round-B, writing-room lens).
+  if (worldPickerEls && !walkConsuming) {
+    walkArmed = false; // the press spent the standing entry…
+    closeWorldPicker(); // …and closing re-arms it while there is still a walk
+    return;
+  }
   if (S.strokes?.historyToken) {
     closeStrokePage({ fromHistory: true });
     return;
@@ -3548,6 +3583,20 @@ function tokenAccessibleLabel(token, index) {
   return parts.filter(Boolean).join(' · ');
 }
 
+/** A name's accessible label. It says what it is and what pressing does —
+ * and never implies the 語釈/全項目 a name has no entry to answer with. */
+function namedAccessibleLabel(token, index) {
+  const shown = S.dials.furigana === 2 || S.revealed?.has(index);
+  const parts = [token.s || token.b, tx('名前', 'name')];
+  if (shown && token.r) parts.push(token.r);
+  parts.push(
+    shown
+      ? tx('もう一度で読みを隠す。', 'activate again to hide the reading')
+      : tx('読みを表示する。', 'activate to show its reading'),
+  );
+  return parts.filter(Boolean).join(' · ');
+}
+
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
   const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
@@ -3843,8 +3892,16 @@ function renderReader(main) {
     // text with no reading, no gloss, no 覚える (E3 round-A, reader lens).
     // Any token written with kanji that carries a reading is now a door,
     // whatever the grader thinks of it; punctuation and bare kana are not.
+    // …and only while there is something for the door to do. With ふりがな
+    // always on, a name's whole offer is already on the page, so it stops
+    // being a button rather than standing in the tab order promising
+    // nothing (E3 round-B, a11y lens).
     const namedReading =
-      !token.c && !particle && !!token.r && /[一-鿌々〆ヶ]/.test(String(token.s || ''));
+      !token.c &&
+      !particle &&
+      !!token.r &&
+      S.dials.furigana !== 2 &&
+      /[一-鿌々〆ヶ]/.test(String(token.s || ''));
     const interactive = !!token.c || !!particle || namedReading;
     // its own class: a door, but never mistaken for a graded content word —
     // the app and its verifiers both select on .tok.content, and a name with
@@ -3874,6 +3931,16 @@ function renderReader(main) {
         'aria-label',
         tx(`${particle.p}、助詞。通常の操作は何もしない。フォーカスで助詞の項目へ。`, `${particle.p}, particle; ordinary activation is inert; focus for its full entry`),
       );
+    } else if (namedReading) {
+      // round A made names doors and stopped there: 47 focusable buttons in
+      // one article with no action, no name, and no way to reach the reading
+      // they were given (E3 round-B, a11y lens). A name has no dictionary
+      // entry, so it promises none — its whole truth is its READING, and the
+      // door shows it. Two states, not the content word's three.
+      span.dataset.action = 'target.activate';
+      span.dataset.targetKind = 'name';
+      span.setAttribute('aria-pressed', String(!!(S.revealed && S.revealed.has(index))));
+      span.setAttribute('aria-label', namedAccessibleLabel(token, index));
     }
     if (S.revealed && S.revealed.has(index)) span.classList.add('lit');
     span.append(
@@ -3902,11 +3969,18 @@ function renderReader(main) {
       } else if (particle) {
         const adapter = wireParticleGestures(span, particle);
         installTokenAlternatives(wrapper, span, adapter.target, adapter);
+      } else if (namedReading) {
+        wireNamedGestures(span, token, index, p);
       }
       rendered = wrapper;
     }
     if (S.dials.spacing === 2) {
-      if (token.c || !group) {
+      // 文節 starts at a content word — and a name IS one, whatever the
+      // grader's 固有名詞 exclusion says. Keyed on token.c alone, the dial
+      // cut names in half and glued one name's tail to the next name's head,
+      // teaching phrase boundaries that are wrong
+      // (E3 round-B, reader-experience lens).
+      if (token.c || namedReading || !group) {
         group = el('span', 'bunsetsu');
         reader.append(group);
       }
@@ -3957,11 +4031,27 @@ function renderReader(main) {
   main.append(fin);
 
   if (p.pendingVerification) {
+    // one hardcoded sentence answered for every pending row, so the ten
+    // やさしい日本語 glossary entries — whose open question is RIGHTS —
+    // explained themselves with a Wikinews archive-freeze story that is
+    // false of them (E3 round-B, data-licence and reader lenses). The mark
+    // stays 検収前 either way; what changes is that it names its own reason.
     const pv = el('div', 'note');
-    pv.textContent = tx(
-      '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
-      'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
-    );
+    pv.textContent =
+      p.review === 'rights-review-pending'
+        ? tx(
+            '出典の利用条件がまだ確認されていない。検収前。',
+            'The terms this source may be used under are not yet verified. Pending review.',
+          )
+        : p.review === 'human-review-pending'
+          ? tx(
+              '人手による確認がまだ済んでいない。検収前。',
+              'A human review of this text is still pending.',
+            )
+          : tx(
+              '閉鎖前日の記事。凍結アーカイブとの最終版照合はまだ済んでいない。',
+              'Published the day before the archive froze; the final-revision check against the frozen archive is still pending.',
+            );
     main.append(pv);
   }
 
@@ -4092,8 +4182,12 @@ function renderSrsPrefs(main) {
       if (clamped === value) return;
       if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, [key]: clamped } })) render();
     };
+    // named controls: the by-name focus restore after a render can only find
+    // what has a name, and these had none — so every press of a stepper
+    // dropped the keyboard to the document (E3 round-B, a11y lens)
     const minus = el('button', 'rest-toggle srs-pref-step', '−');
     minus.type = 'button';
+    minus.id = `pref-down-${key}`;
     minus.dataset.prefDown = key;
     minus.disabled = value <= min;
     minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn}`));
@@ -4102,6 +4196,7 @@ function renderSrsPrefs(main) {
     val.dataset.prefVal = key;
     const plus = el('button', 'rest-toggle srs-pref-step', '＋');
     plus.type = 'button';
+    plus.id = `pref-up-${key}`;
     plus.dataset.prefUp = key;
     plus.disabled = value >= max;
     plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn}`));
@@ -4219,22 +4314,42 @@ function renderTray(main) {
       qb.type = 'button';
       qb.id = 'aiq-start';
       const note = el('p', 'airead-note');
+      // 願いは一つ — the request in flight is STATE, not a closure. Held only
+      // on the button and its note, it died with the next render: one EN／日本語
+      // press re-armed the door, and a second request overwrote the quiz the
+      // learner was in the middle of, taking their answers with it
+      // (E3 round-B, ai-surfaces lens). Session-only by design — a reload
+      // must never come back with a door sealed by a request that is gone.
+      qb.disabled = !!S.aiQuizPending;
+      note.textContent = S.aiQuizPending
+        ? tx('先生が問題を書いている…', 'the tutor is writing questions…')
+        : S.aiQuizNote === 'ready'
+          ? tx('小テストの用意ができた。', 'the quiz is ready')
+          : S.aiQuizNote === 'failed'
+            ? tx('いまは作れない。あとでもう一度。', 'The tutor could not write a quiz just now — try again in a moment.')
+            : '';
       qb.addEventListener('click', async () => {
+        if (S.aiQuizPending) return;
+        // the room the learner asked from is the VIEW AND ITS DEPTH: an entry
+        // sheet opened from the tray leaves S.view at 'tray', so watching the
+        // view alone let the quiz take the room under an open sheet
+        // (E3 round-B, ai-surfaces lens)
+        S.aiQuizPending = { view: S.view, depth: S.stack.length };
+        S.aiQuizNote = null;
         qb.disabled = true;
         note.textContent = tx('先生が問題を書いている…', 'the tutor is writing questions…');
-        const askedFrom = S.view;
         try {
           await aiQuizStart();
+          const asked = S.aiQuizPending;
+          S.aiQuizPending = null;
           // a reply can arrive ten seconds later, by which time the learner
           // may be deep in an article: the quiz waits for them where they
           // asked for it rather than seizing the room they walked to
-          // (E3 round-A, AI lens)
-          if (S.view !== askedFrom) {
-            note.textContent = tx(
-              '小テストの用意ができた。もう一度どうぞ。',
-              'the quiz is ready — press again when you are',
-            );
-            qb.disabled = false;
+          // (E3 round-A, AI lens). The written quiz is already durable, so
+          // the resume row is the door back into it from anywhere.
+          if (!asked || S.view !== asked.view || S.stack.length !== asked.depth) {
+            S.aiQuizNote = 'ready';
+            render();
             return;
           }
           S.view = 'aiquiz';
@@ -4242,9 +4357,10 @@ function renderTray(main) {
           window.scrollTo(0, 0);
           return;
         } catch {
-          note.textContent = tx('いまは作れない。あとでもう一度。', 'The tutor could not write a quiz just now — try again in a moment.');
+          S.aiQuizPending = null;
+          S.aiQuizNote = 'failed';
         }
-        qb.disabled = false;
+        render();
       });
       main.append(qb, note);
     }
@@ -4543,7 +4659,20 @@ function renderPortRow(main) {
         if (commitStorePatch({ srsPrefs: { ...S.srsPrefs, fsrs: fitted } })) location.reload();
         return;
       }
-      if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // 検める前に消さない — the import gate must be the SAME gate the boot
+      // applies. It checked only that `taken` was an array, so a file the
+      // boot validator rejects (a future `v`, one malformed card) overwrote
+      // a good record and the app came back read-only, holding an empty deck
+      // with the learner's real record already gone
+      // (E3 round-B, srs-wiring lens). Nothing is destroyed to find out that
+      // the replacement is unreadable.
+      if (!validStoreEnvelope(s)) {
+        portNote.textContent = tx(
+          'この記録はこのアプリでは読めない。取り込みは中止した — いまの記録はそのまま。',
+          'This app cannot read that record, so nothing was imported — your current record is untouched.',
+        );
+        return;
+      }
       // The file IS the record — so everything the old record owned must go
       // with it. The AI transcript archive lives in IndexedDB, outside the
       // exported envelope, and an import left the PREVIOUS learner's
@@ -5075,6 +5204,13 @@ function renderAiChat(main) {
   input.id = 'chat-input';
   input.autocomplete = 'off';
   input.placeholder = tx('先生に聞く…', 'ask the tutor…');
+  // a question typed while the tutor was thinking was destroyed the moment
+  // the reply painted — the render rebuilt an empty field and handed focus
+  // back to it (E3 round-B, ai-surfaces lens). The draft rides the render.
+  if (S.aiChatDraft) input.value = S.aiChatDraft;
+  input.addEventListener('input', () => {
+    S.aiChatDraft = input.value;
+  });
   const send = biLabel('button', 'take chat-send', '送る', 'send');
   send.type = 'button';
   send.id = 'chat-send';
@@ -5091,6 +5227,7 @@ function renderAiChat(main) {
     if (!commitStorePatch({ aiChat: [...S.aiChat, { role: 'user', text }] })) return;
     if (aiChatLog.turns) aiChatLog.turns.push({ role: 'user', text });
     input.value = '';
+    S.aiChatDraft = '';
     send.disabled = true;
     aiChatLog.pending = true;
     const thinking = el('p', 'chat-turn tutor thinking', tx('考え中…', 'thinking…'));
@@ -5119,6 +5256,9 @@ function renderAiChat(main) {
     aiChatLog.pending = false;
     send.disabled = false;
     S.sheetFocus = 'chat-input';
+    // whatever was typed while the tutor thought is still in the live field;
+    // carry it into the render that is about to replace that field
+    S.aiChatDraft = input.value;
     render();
     document.getElementById('chat-input')?.focus();
     document.querySelector('.chat-log')?.lastElementChild?.scrollIntoView({ block: 'nearest' });
@@ -5853,6 +5993,26 @@ function renderParticleNode(sheet, node) {
 
 /** Particles keep the reading rhythm: a tap does nothing, a long press
  * floats the mini, holding opens the particle page. */
+/** A name's door: one press shows its reading, the next hides it again.
+ * No mini, no full entry, no 語釈 — a name carries none of those, and the
+ * label says so rather than opening an empty room. Nothing here writes the
+ * learner's store: a name is not an item in any list, so meeting one creates
+ * no card, no evidence row and no debt. */
+function wireNamedGestures(span, token, index) {
+  const toggle = () => {
+    (S.revealed ||= new Set());
+    if (S.revealed.has(index)) S.revealed.delete(index);
+    else S.revealed.add(index);
+    paintTok(span, token, index);
+    span.setAttribute('aria-pressed', String(!!S.revealed.has(index)));
+    span.setAttribute('aria-label', namedAccessibleLabel(token, index));
+  };
+  span.addEventListener('click', (event) => {
+    event.preventDefault();
+    toggle();
+  });
+}
+
 function wireParticleGestures(span, particle) {
   let miniTimer = null;
   let fullTimer = null;
@@ -7007,7 +7167,12 @@ function renderContextPicker(sheet, node) {
     const on = current === scope;
     const chip = biLabel('button', on ? 'chip on-list' : 'chip', ja, en);
     chip.type = 'button';
+    // which scope the card carries lived only in a CSS class, so the
+    // accessibility tree showed three identical buttons and no state at all
+    // — every other toggle in the app sets this (E3 round-B, a11y lens)
+    chip.setAttribute('aria-pressed', String(on));
     chip.dataset.ctxScope = scope ?? 'word';
+    chip.dataset.chip = `ctx-${scope ?? 'word'}`;
     chip.addEventListener('click', () => {
       // the card's context is deck state: replace the row on a COPY and
       // commit — the live item never changes on a failed persist
@@ -7035,6 +7200,9 @@ function renderListPicker(sheet, node, label) {
     const inList = S.lists[name].some((x) => x.t === node.t && x.id === node.id);
     const chip = el('button', inList ? 'chip wide on-list' : 'chip wide');
     chip.type = 'button';
+    // …and the same for which lists the item is in
+    chip.setAttribute('aria-pressed', String(inList));
+    chip.dataset.chip = `list-${name}`;
     chip.append(el('span', 'big', name));
     chip.append(el('span', 'sub', `${S.lists[name].length}`));
     chip.addEventListener('click', () => {
@@ -7397,6 +7565,7 @@ function startReview(scope) {
   if (!queue.length) return;
   S.review = { queue, ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [], deferred };
   S.view = 'review';
+  handKeyboardTo('#declare-recalled, #reveal, #zen-more');
   render();
 }
 /* An instrument handle for the verification suites (the __KAIRO_* idiom):
@@ -7719,17 +7888,16 @@ function renderReview(main) {
       // review. The declared-recall gate below guards the zen room only.
       // The card itself turns over — and the labeled button stays for
       // hands and readers that want one.
-      face.addEventListener('click', () => {
+      const turnOver = () => {
         rv.revealed = true;
+        handKeyboardTo('.grade-row .grade');
         render();
-      });
+      };
+      face.addEventListener('click', turnOver);
       const btn = biLabel('button', 'take review-reveal', '答えを見る', 'show the answer');
       btn.type = 'button';
       btn.id = 'reveal';
-      btn.addEventListener('click', () => {
-        rv.revealed = true;
-        render();
-      });
+      btn.addEventListener('click', turnOver);
       main.append(btn);
       return;
     }
@@ -7746,6 +7914,10 @@ function renderReview(main) {
       rv.declared = declared;
       rv.revealed = true;
       obsLog('reveal', srsKey(item.t, item.id), declared);
+      // まだ leaves Again as the one grade the schedule will record, so that
+      // is where the keyboard lands; 思い出した opens all four and lands on
+      // the first of them.
+      handKeyboardTo(declared ? '.grade-row .grade' : '.grade.g-again');
       render();
     };
     const declRow = el('div', 'declare-row');
@@ -7789,6 +7961,7 @@ function renderReview(main) {
   const drillOnly =
     S.focus &&
     (item.drillPass === true ||
+      item.practiceOnly === true ||
       (S.srs[srsKey(item.t, item.id)] === undefined &&
         (!takenRow || !finiteNumber(takenRow.started))));
   const row = el('div', 'grade-row');
@@ -7827,6 +8000,10 @@ function renderReview(main) {
     b.append(el('span', 'g-label', tx(ja, key)));
     b.append(el('span', 'g-when', when));
     b.addEventListener('click', () => {
+      // the stamp that was just pressed goes with the card it graded, so the
+      // by-name restore cannot find it — the keyboard is handed to whatever
+      // face comes next: a card's own first gate, or the session's summary
+      handKeyboardTo('#declare-recalled, #reveal, #zen-more');
       const day = dayKey();
       const skey = srsKey(item.t, item.id);
       // T-06 forcing at the commit: after まだ, the declaration names the
@@ -8041,13 +8218,23 @@ const focusKanjiItem = (ch) => ({ t: 'kanji', id: ch, label: ch, kind: '漢字',
  * (your taken kanji first, then common kanji easiest-first). */
 function focusPool(mode) {
   if (mode === 'kanji') {
+    // 漢字だけ is a STUDY RUN, not a review queue: it draws in kanji order and
+    // ignores dueness by design, so it must never regrade or mint what the
+    // queue was not going to surface. Pre-fix it did both — a 30-day mature
+    // card met here fell to relearning, and a started row minted FSRS state
+    // straight past the learner's 新規/日 (E3 round-B, srs-wiring lens).
+    // A card the queue WOULD have drawn at this instant still schedules, so
+    // no real work is lost; everything else is practice and stamps 稽古.
+    const dueNow = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
+    const asDrawn = (item) =>
+      dueNow.has(srsKey(item.t, item.id)) ? item : { ...item, practiceOnly: true };
     const seen = new Set();
     const out = [];
-    for (const i of S.taken) if (i.t === 'kanji' && !seen.has(i.id)) (seen.add(i.id), out.push(i));
+    for (const i of S.taken) if (i.t === 'kanji' && !seen.has(i.id)) (seen.add(i.id), out.push(asDrawn(i)));
     const deck = Object.values(D.kanji)
       .filter((k) => D.kmeta?.[k.c]?.jlpt)
       .sort((a, b) => jlptRank(D.kmeta[a.c].jlpt) - jlptRank(D.kmeta[b.c].jlpt) || a.st - b.st);
-    for (const k of deck) if (!seen.has(k.c)) (seen.add(k.c), out.push(focusKanjiItem(k.c)));
+    for (const k of deck) if (!seen.has(k.c)) (seen.add(k.c), out.push(asDrawn(focusKanjiItem(k.c))));
     return out;
   }
   return srsDueItems();
@@ -8081,6 +8268,7 @@ function startFocus(min, mode) {
   S.review = { queue: first.slice(), ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 }, history: [] };
   S.view = 'review';
   startFocusTicker();
+  handKeyboardTo('#declare-recalled, #reveal, #zen-more');
   render();
 }
 
@@ -8143,13 +8331,26 @@ function renderFocus(main) {
   main.append(mins);
 
   main.append(withEn(el('p', 'eyebrow', '何を'), 'what to drill', 'en-inline'));
+  // the lobby counts what はじめる will actually draw. The forecast counts
+  // every card ripening before tonight's midnight and every started-but-new
+  // row; the POOL admits only what is due at this instant, sliced by the
+  // learner's ペース room. Reading the label off the forecast advertised
+  // cards the block could not draw — "3 waiting" and then "No cards are
+  // waiting" (E3 round-B, srs-wiring lens). The tray's two lines were fixed
+  // for exactly this (POL-8); the dojo says it the same way now.
   const forecast = srsForecast();
-  const due = forecast.today + forecast.fresh;
+  const duePool = srsDueItems();
+  const laterToday = !duePool.length && forecast.today > 0;
+  const dueSub = duePool.length
+    ? tx(`${duePool.length} 枚 待っている ・ 二周目からは稽古`, `${duePool.length} waiting · after the first lap, practice`)
+    : laterToday
+      ? tx(`いまは待っていない ・ 今夜までに ${forecast.today}`, `nothing waiting right now · ${forecast.today} ripen before tonight`)
+      : tx('いまは待っていない', 'nothing waiting right now');
   const modes = el('div', 'focus-modes');
   const modeDefs = [
     // the sub tells the whole truth (POL-12): the block reviews each waiting
     // card once; when the clock outlasts the pool, further laps are practice
-    ['due', '覚えるの札', 'your due cards', tx(`${due} 枚 待っている ・ 二周目からは稽古`, `${due} waiting · after the first lap, practice`)],
+    ['due', '覚えるの札', 'your due cards', dueSub],
     ['kanji', '漢字だけ', 'kanji only', tx('やさしい順に', 'easiest first')],
     ['yomi', '読み探査', 'yomi probe', tx('まだ取っていない熟語を測る', 'sound out compounds you never took')],
   ];
@@ -9148,27 +9349,65 @@ async function aiLastReply(surface, ref) {
 }
 
 /** The tutor door on a word entry — present only when a key is stored. */
+/* 考え中 is STATE, not a closure. A sheet's tutor and its examples held
+ * their in-flight mark only on the button and its box, so any repaint while
+ * the tutor was thinking — an EN／日本語 press, a 覚える, a re-render from
+ * anywhere — wiped the spinner, re-armed the door, and left the arriving
+ * reply painting into a node no longer on the page. The learner saw a bare
+ * button and paid for a second request (E3 round-B, ai-surfaces lens).
+ * Session-only: a reload must never resurrect a request that is gone. */
+const aiPendingKey = (surface, ref) => `${surface}|${ref}`;
+const aiPendingOn = (surface, ref) => !!S.aiPending?.[aiPendingKey(surface, ref)];
+const aiPendingSet = (surface, ref, on) => {
+  S.aiPending ||= {};
+  if (on) S.aiPending[aiPendingKey(surface, ref)] = true;
+  else delete S.aiPending[aiPendingKey(surface, ref)];
+};
+/* The reply landed. If the box that asked for it is still on the page, paint
+ * it there; if the surface was rebuilt underneath, ask for one more render so
+ * the archive read-back can put it back where it belongs. */
+const aiSettle = (box, paint) => {
+  if (document.contains(box)) paint();
+  else if ($('.sheet')) render();
+};
+
 function renderAiTutor(sheet, node, rec) {
   if (!aiKey()) return;
   const wrap = el('div', 'ai-tutor');
   const btn = biLabel('button', 'chip ai-ask', '先生に聞く', 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
-  aiLastReply('word-tutor', `word:${node.id}`).then((prev) => {
-    if (prev && !out.textContent) out.textContent = prev;
-  });
-  btn.addEventListener('click', async () => {
+  const ref = `word:${node.id}`;
+  const thinking = tx('考え中…', 'thinking…');
+  if (aiPendingOn('word-tutor', ref)) {
     btn.disabled = true;
-    out.textContent = tx('考え中…', 'thinking…');
+    out.textContent = thinking;
+  } else {
+    aiLastReply('word-tutor', ref).then((prev) => {
+      if (prev && !out.textContent) out.textContent = prev;
+    });
+  }
+  btn.addEventListener('click', async () => {
+    if (aiPendingOn('word-tutor', ref)) return;
+    aiPendingSet('word-tutor', ref, true);
+    btn.disabled = true;
+    out.textContent = thinking;
     try {
       const senses = (rec?.m || []).slice(0, 4).join('; ');
-      out.textContent = await aiAsk(
+      const answer = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. In under 120 words: explain the word\'s nuance and typical use, pitched to the learner\'s level, then give two natural example sentences, each on its own line as: Japanese sentence — reading in kana — English. Plain text only, no headers or markdown.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. Dictionary senses: ${senses || 'none recorded'}. Learner level: about JLPT ${aiLevelGuess()}.`,
-        { surface: 'word-tutor', ref: `word:${node.id}` },
+        { surface: 'word-tutor', ref },
       );
+      aiPendingSet('word-tutor', ref, false);
+      aiSettle(out, () => {
+        out.textContent = answer;
+      });
     } catch {
-      out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      aiPendingSet('word-tutor', ref, false);
+      aiSettle(out, () => {
+        out.textContent = tx('いまは答えられない。あとでもう一度。', 'The tutor could not answer just now — try again in a moment.');
+      });
     }
     btn.disabled = false;
   });
@@ -9209,25 +9448,42 @@ function renderAiExamples(sheet, node, rec) {
     }
     return shown;
   };
-  aiLastReply('examples', `word:${node.id}`).then((prev) => {
-    if (prev && !out.childElementCount && !btn.disabled) paint(prev);
-  });
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
+  const exRef = `word:${node.id}`;
+  const writing = () => {
     out.textContent = '';
     out.append(el('p', 'ai-ex-note', tx('つくっています…', 'writing examples…')));
+  };
+  if (aiPendingOn('examples', exRef)) {
+    btn.disabled = true;
+    writing();
+  } else {
+    aiLastReply('examples', exRef).then((prev) => {
+      if (prev && !out.childElementCount && !btn.disabled) paint(prev);
+    });
+  }
+  btn.addEventListener('click', async () => {
+    if (aiPendingOn('examples', exRef)) return;
+    aiPendingSet('examples', exRef, true);
+    btn.disabled = true;
+    writing();
     try {
       const senses = (rec?.m || []).slice(0, 4).join('; ');
       const raw = await aiAsk(
         'You are a Japanese tutor inside a dictionary app. Write natural example sentences for the given word across a range of JLPT levels, from N5 up to the word\'s own level, easiest first, 6 to 8 sentences. Output ONE sentence per line and nothing else. Each line MUST be exactly: Nx | Japanese sentence | full reading of the sentence in hiragana | English. No numbering, no markdown, no extra commentary.',
         `Word: ${node.id}${rec?.r ? ` (${rec.r})` : ''}. The word's JLPT level: ${wordLv}. Dictionary senses: ${senses || 'none recorded'}.`,
-        { surface: 'examples', ref: `word:${node.id}` },
+        { surface: 'examples', ref: exRef },
       );
-      const shown = paint(raw);
-      if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      aiPendingSet('examples', exRef, false);
+      aiSettle(out, () => {
+        const shown = paint(raw);
+        if (!shown) out.append(el('p', 'ai-ex-note', tx('うまく作れなかった。もう一度どうぞ。', 'Could not format the examples — try once more.')));
+      });
     } catch {
-      out.textContent = '';
-      out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+      aiPendingSet('examples', exRef, false);
+      aiSettle(out, () => {
+        out.textContent = '';
+        out.append(el('p', 'ai-ex-note', tx('いまは作れない。あとでもう一度。', 'The tutor could not write examples just now — try again in a moment.')));
+      });
     }
     btn.disabled = false;
   });
@@ -11442,9 +11698,17 @@ function renderStrokePage(root) {
       const numbersCorner = strokeNumbersControl(page, reduced);
       numbersCorner.classList.add('stroke-corner', 'stroke-corner-br');
       page.append(numbersCorner);
-      const speedCorner = strokeSpeedControl(page);
-      speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
-      page.append(speedCorner);
+      // ゆっくり governs the SPEED OF THE WRITING, and under
+      // prefers-reduced-motion nothing here writes — the room shows a still
+      // hand. The corner was appended anyway, reporting itself pressed while
+      // it could never change a pixel (E3 round-B, writing-room lens). A
+      // control with nothing to control does not belong in the room; the
+      // framed room already makes the same swap for its replay strip.
+      if (!reduced) {
+        const speedCorner = strokeSpeedControl(page);
+        speedCorner.classList.add('stroke-corner', 'stroke-corner-bl');
+        page.append(speedCorner);
+      }
     }
     setStrokeChrome(page, S.strokeChromeAwake);
   }
@@ -11636,7 +11900,17 @@ function encounterTrail(key) {
   const last = rows[rows.length - 1];
   const counts = {};
   for (const row of rows) counts[row[1]] = (counts[row[1]] || 0) + 1;
-  return { rows, first: rows[0][0], last, counts };
+  // ひとつ戻す files a REVOCATION into the same append-only ledger —
+  // ['dojo', key, 0] — because the log never erases what it takes back. The
+  // trail read it as one more practice row, so undoing a drill made the
+  // sheet claim MORE practice than before (E3 round-B, srs-wiring lens).
+  // A revocation is not an encounter, and it cancels the row it points at.
+  const revoked = (counts.dojo && rows.filter((row) => row[1] === 'dojo' && row[3] === 0).length) || 0;
+  const practised = (counts.dojo || 0) - revoked;
+  const cancelled = Math.min(practised, revoked);
+  counts.dojo = Math.max(0, practised - cancelled);
+  const met = Math.max(1, rows.length - revoked - cancelled);
+  return { rows, first: rows[0][0], last, counts, met };
 }
 /** The last row, said in the learner's own terms — never a verdict. */
 function trailLastPhrase(row) {
@@ -11652,6 +11926,8 @@ function trailLastPhrase(row) {
   if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
   if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
   if (kind === 'dojo') {
+    // detail 0 is the revocation ひとつ戻す files, not a grade
+    if (g === 0) return tx('道場の稽古を取り消した', 'took back a dojo practice record');
     const seal = { 1: '再', 2: '難', 3: '良', 4: '易' }[g];
     return seal ? tx(`道場の稽古 — ${seal}`, `practised in the dojo — ${['', 'again', 'hard', 'good', 'easy'][g]}`) : tx('道場の稽古', 'practised in the dojo');
   }
@@ -11664,7 +11940,7 @@ function renderEncounterTrail(sheet, node) {
   const box = el('div', 'encounter-trail');
   box.append(withEn(el('p', 'eyebrow', '出会い'), 'your encounters', 'en-inline'));
   const day = (t) => new Date(t).toLocaleDateString();
-  const n = trail.rows.length;
+  const n = trail.met;
   box.append(
     el(
       'p',
@@ -11837,8 +12113,18 @@ function renderSheet(root) {
   if (S.strokes) return; // the stroke page above owns focus
   const focusId = S.sheetFocus;
   S.sheetFocus = null;
+  // 戻る is where a sheet OPENS, not where every press inside it ends. This
+  // ran unconditionally, so 覚える, a context chip, a list chip — every
+  // in-sheet state change — threw the keyboard to the corner and announced
+  // nothing (E3 round-B, a11y lens). A control that survives its own press
+  // keeps the keyboard; only a genuinely new sheet starts at 戻る.
+  const held = sheetFocusKey;
+  sheetFocusKey = null;
   queueMicrotask(() => {
-    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || backBtn;
+    const target =
+      (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) ||
+      (held && sheet.querySelector(held)) ||
+      backBtn;
     target.focus({ preventScroll: true });
   });
 }
@@ -11951,6 +12237,19 @@ function updateMeasurements() {
 /** The view rendered by the previous render() pass — lets a re-render of
  * the SAME view keep the walker's place (see the restore at the bottom). */
 let lastRenderedView = null;
+/* A control that destroys itself by its own press cannot be found again by
+ * name after the rebuild, so the by-name restore below cannot help it: the
+ * review room's two gates (start, then 思い出した/まだ) dropped the keyboard
+ * to <body> on every card, 21 tabs from the first gate and 56 from the
+ * second (E3 round-B, a11y lens). A press that replaces its own control
+ * names its successor here, and the next render hands the keyboard forward. */
+let focusNextKey = null;
+/* …and the sheet manages its own focus after every rebuild, so the restore
+ * above cannot reach it. It gets the same courtesy through its own key. */
+let sheetFocusKey = null;
+const handKeyboardTo = (selector) => {
+  focusNextKey = selector;
+};
 /* ------------------------------------------------------ corridor paper worlds
  * The restored ten public worlds from the carousel (2026-08-15,
  * "keep 墨・楮紙; default 藍 ベロ藍・浪") — three families, one token law,
@@ -12470,14 +12769,47 @@ let worldPickerOpener = null;
 function worldPickerEsc(e) {
   if (e.key === 'Escape') closeWorldPicker();
 }
+/* The stones are role=dialog over a scrim, but nothing contained the
+ * keyboard: Tab walked straight past them into the page underneath and Enter
+ * there navigated the whole app while the picker floated on
+ * (E3 round-B, dead-ends lens). The sheet's own containment is the pattern —
+ * inert the room beneath, and wrap the ring so it cannot be left by Tab. */
+let worldPickerInerted = [];
+function worldPickerTab(e) {
+  if (e.key !== 'Tab' || !worldPickerEls) return;
+  const stones = [...worldPickerEls[1].querySelectorAll('button')];
+  if (!stones.length) return;
+  const first = stones[0];
+  const last = stones[stones.length - 1];
+  const here = document.activeElement;
+  if (e.shiftKey && (here === first || !worldPickerEls[1].contains(here))) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (here === last || !worldPickerEls[1].contains(here))) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+/* The stones are a walkable layer under the ONE sentinel (歩み) — not a
+ * surface with its own history entry; the writing room's contract is that
+ * rerendering the palette adds none, and it is right. What was missing was
+ * the sync at both ends: opening armed nothing, so Back left the app from
+ * the front door in one press and abandoned an article in two, and closing
+ * never re-armed the entry the press had just spent
+ * (E3 round-B, dead-ends lens). */
 function closeWorldPicker() {
   if (!worldPickerEls) return;
   for (const n of worldPickerEls) n.remove();
   worldPickerEls = null;
   document.removeEventListener('keydown', worldPickerEsc, true);
+  document.removeEventListener('keydown', worldPickerTab, true);
+  // the room beneath comes back to the keyboard and the screen reader
+  for (const n of worldPickerInerted) n.removeAttribute('inert');
+  worldPickerInerted = [];
   // hand focus back to the seal that opened the stones (keyboard walkers)
   if (worldPickerOpener && document.contains(worldPickerOpener)) worldPickerOpener.focus();
   worldPickerOpener = null;
+  syncWalkSentinel();
 }
 function openWorldPicker(anchor) {
   closeWorldPicker();
@@ -12519,7 +12851,18 @@ function openWorldPicker(anchor) {
   pop.style.top = `${Math.round(Math.min(rect.bottom + 8, window.innerHeight - pop.offsetHeight - 8))}px`;
   pop.style.left = `${Math.round(Math.min(Math.max(8, rect.right - pw), window.innerWidth - pw - 8))}px`;
   document.addEventListener('keydown', worldPickerEsc, true);
+  document.addEventListener('keydown', worldPickerTab, true);
+  pop.setAttribute('aria-modal', 'true');
+  // everything that is not the stones or their scrim leaves the tab order
+  // and the accessibility tree for as long as they are open
+  worldPickerInerted = [...document.body.children].filter(
+    (n) => n !== scrim && n !== pop && !n.hasAttribute('inert'),
+  );
+  for (const n of worldPickerInerted) n.setAttribute('inert', '');
   worldPickerEls = [scrim, pop];
+  // the stones are now a walkable layer: arm the standing sentinel if the
+  // surface beneath had none (the front door), and leave it alone if it did
+  syncWalkSentinel();
   (activeStone || pop.firstChild).focus();
 }
 const WORLD_PICKER_HOLD_MS = 480;
@@ -12793,12 +13136,24 @@ function render() {
   // press — a dial, a grade, a capture (E3 round-A, a11y lens). Controls
   // that name themselves are found again by that name after the rebuild;
   // the sheet's own focus management still wins where it runs.
-  const focusKey = (() => {
-    const node = document.activeElement;
-    if (!node || node === document.body || !$('#app').contains(node)) return null;
+  // a named successor wins over the by-name restore, and is spent either way
+  const focusNext = focusNextKey;
+  focusNextKey = null;
+  const focusedNow = document.activeElement;
+  const keyOf = (node) => {
+    if (!node || node === document.body) return null;
     if (node.id) return `#${CSS.escape(node.id)}`;
     const action = node.dataset?.action;
-    return action ? `[data-action="${CSS.escape(action)}"]` : null;
+    if (action) return `[data-action="${CSS.escape(action)}"]`;
+    const chip = node.dataset?.chip;
+    return chip ? `[data-chip="${CSS.escape(chip)}"]` : null;
+  };
+  // the sheet re-focuses itself after this render, so it needs its own key
+  sheetFocusKey = focusedNow?.closest?.('.sheet') ? keyOf(focusedNow) : null;
+  const focusKey = (() => {
+    const node = focusedNow;
+    if (!node || node === document.body || !$('#app').contains(node)) return null;
+    return keyOf(node);
   })();
   // leaving the galaxy for a ROOM ends the search round-trip: only a walk
   // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
@@ -12956,6 +13311,11 @@ function render() {
   trayBtn.type = 'button';
   trayBtn.id = 'tray';
   trayBtn.addEventListener('click', () => {
+    // pressing 覚 while already IN the tray changes nothing — and a press
+    // that changes nothing must not erase where the tray came from. It did,
+    // and 戻る then abandoned the article mid-read and landed on the shelf
+    // (E3 round-B, dead-ends lens).
+    if (S.view === 'tray') return;
     keepScroll();
     S.stack = [];
     // the tray remembers its door — WHICHEVER door it was. It is the one
@@ -12966,9 +13326,7 @@ function render() {
     S.trayFrom =
       S.view === 'reader' && S.passageId
         ? 'reader'
-        : S.view !== 'tray'
-          ? { view: S.view, scroll: Math.round(window.scrollY) }
-          : null;
+        : { view: S.view, scroll: Math.round(window.scrollY) };
     if (S.trayFrom === 'reader') {
       // readerPos bookmark — UI preference, not learner evidence (P0-4
       // residual-ledger disposition, same as the reader's own two writers)
@@ -13084,9 +13442,17 @@ function render() {
   // exists under the same name. A sheet or the writing room manages its own
   // focus and must not be overruled, so this only reaches into #app, and it
   // never steals focus from whatever the rebuild legitimately moved it to.
-  if (focusKey && document.activeElement === document.body) {
-    const again = $('#app').querySelector(focusKey);
-    if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
+  // a successor may name several candidates — they are tried in the order
+  // WRITTEN, not the order they happen to sit in the document
+  const wanted = focusNext || focusKey;
+  if (wanted && document.activeElement === document.body) {
+    for (const one of String(wanted).split(',')) {
+      const again = $('#app').querySelector(one.trim());
+      if (again && typeof again.focus === 'function') {
+        again.focus({ preventScroll: true });
+        break;
+      }
+    }
   }
   lastRenderedView = S.view;
   // every navigation passes through here — keep the Back sentinel honest
