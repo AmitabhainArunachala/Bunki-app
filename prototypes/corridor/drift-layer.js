@@ -3049,7 +3049,7 @@ function frame(t){
   drawWorld();
   drawFx(t,dt);
   drawTrail(t);
-  if(DRIFT_ON&&!document.hidden){requestAnimationFrame(frame);}else{rafOn=false;}
+  if(DRIFT_ON){requestAnimationFrame(frame);}else{rafOn=false;}
 }
 function scheduleCanvasSize(){
   if(resizeFrame) return;
@@ -3065,16 +3065,12 @@ buildWorld();
 refreshActive();
 setInterval(function(){if(DRIFT_ON)refreshActive();},650);
 if(DRIFT_ON){rafOn=true;requestAnimationFrame(frame);}
-document.addEventListener('visibilitychange', () => {
-  // coming back to a living galaxy: the loop restarts where it parked
-  if (!document.hidden && DRIFT_ON && !rafOn) { rafOn = true; requestAnimationFrame(frame); }
-});
 window.__DRIFT__ = {
   show() {
     DRIFT_ON = true;
     document.getElementById('drift-layer').classList.add('active');
     sizeCanvases();
-    if (!rafOn && !document.hidden) { rafOn = true; requestAnimationFrame(frame); }
+    if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
     DRIFT_ON = false;

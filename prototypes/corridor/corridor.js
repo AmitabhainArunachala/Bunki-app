@@ -13402,7 +13402,14 @@ function render() {
   // closing the sheet hands the field back exactly as it was left.
   if (window.__DRIFT__) {
     syncDriftTheme();
-    if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
+    // …and a page nobody is looking at is the same as a room they have left.
+    // The galaxy is the DEFAULT entry, so on the front door its loop held
+    // 94-96% of the main thread for as long as the page existed, backgrounded
+    // or not (E3 round-B, performance lens). This rides the drift's own public
+    // seam — the same show/hide the view switch uses — so its physics and its
+    // gesture grammar are untouched (#46), and sleeping is not forgetting:
+    // the stack, the centre and its satellites are held in the layer's state.
+    if (S.view === 'drift' && !S.stack.length && !document.hidden) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
 
@@ -13470,6 +13477,12 @@ function render() {
   // every navigation passes through here — keep the Back sentinel honest
   syncWalkSentinel();
 }
+
+// coming back to the app wakes the galaxy the same way leaving it slept it:
+// one render, through the seam above. Nothing here reaches into the drift.
+document.addEventListener('visibilitychange', () => {
+  if (document.body?.dataset?.ready === '1') render();
+});
 
 window.addEventListener('DOMContentLoaded', () => {
   boot().catch((err) => {

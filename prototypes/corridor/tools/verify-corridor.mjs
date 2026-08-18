@@ -3507,6 +3507,33 @@ async function main() {
     await page.waitForTimeout(300);
   }
 
+  // (14) a page nobody is looking at is a room they have left — the galaxy
+  // held 94-96% of the main thread for as long as the page existed, whether
+  // or not anyone was watching. Driven through the drift's own public seam,
+  // so its physics and gesture grammar stay untouched (#46).
+  {
+    await open('');
+    await page.waitForSelector('#ginga-symbol', { timeout: 20000 });
+    await page.waitForTimeout(1200);
+    const sleep = await page.evaluate(`(() => {
+      const layer = document.getElementById('drift-layer');
+      const awake = !!layer?.classList.contains('active');
+      Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true });
+      Object.defineProperty(document, 'hidden', { get: () => true, configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      return { awake, asleep: !document.getElementById('drift-layer')?.classList.contains('active') };
+    })()`);
+    await page.waitForTimeout(200);
+    const woke = await page.evaluate(`(() => {
+      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+      Object.defineProperty(document, 'hidden', { get: () => false, configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      return !!document.getElementById('drift-layer')?.classList.contains('active');
+    })()`);
+    check('E3-B · the galaxy sleeps when the page is hidden and wakes when it is not',
+      sleep.awake && sleep.asleep && woke, JSON.stringify({ ...sleep, woke }));
+  }
+
   check('E3-B · the probes leave no console errors',
     consoleErrors.length === errsBeforeE3B,
     consoleErrors.slice(errsBeforeE3B).join(' | ') || 'clean');

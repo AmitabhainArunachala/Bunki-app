@@ -213,16 +213,9 @@ patch(
 );
 
 // 3 · the frame loop parks itself while hidden (dt is clamped, resume is safe)
-// …and while the DOCUMENT is hidden. The gate above sleeps the universe when
-// another corridor view is open, but the galaxy IS the default entry, so on
-// the front door the loop ran at 94-96% of the main thread for as long as the
-// page existed — including with the tab or the app in the background
-// (E3 round-B, performance lens). Physics and gesture grammar are untouched
-// (#46): this only stops DRAWING what nobody can see, and the visibility
-// listener starts it again the moment they can.
 patch(
   '  drawTrail(t);\n  requestAnimationFrame(frame);\n}',
-  '  drawTrail(t);\n  if(DRIFT_ON&&!document.hidden){requestAnimationFrame(frame);}else{rafOn=false;}\n}',
+  '  drawTrail(t);\n  if(DRIFT_ON){requestAnimationFrame(frame);}else{rafOn=false;}\n}',
   'frame loop gate',
 );
 patch(
@@ -240,16 +233,12 @@ patch(
 
 // 4 · the public seam the corridor drives
 js += `
-document.addEventListener('visibilitychange', () => {
-  // coming back to a living galaxy: the loop restarts where it parked
-  if (!document.hidden && DRIFT_ON && !rafOn) { rafOn = true; requestAnimationFrame(frame); }
-});
 window.__DRIFT__ = {
   show() {
     DRIFT_ON = true;
     document.getElementById('drift-layer').classList.add('active');
     sizeCanvases();
-    if (!rafOn && !document.hidden) { rafOn = true; requestAnimationFrame(frame); }
+    if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
     DRIFT_ON = false;
