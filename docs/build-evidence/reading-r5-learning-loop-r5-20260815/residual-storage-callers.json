@@ -45,7 +45,7 @@
       "dispositionNote": "Same bookmark root as the scroll debounce, written at the exact line being left."
     },
     {
-      "lineAfterPatch": 3385,
+      "lineAfterPatch": 3394,
       "surface": "reader display dials",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "dials"
@@ -58,7 +58,7 @@
       "dispositionNote": "Display dials (kanji/furigana/spacing) are presentation preferences; the session keeps working unpersisted and the alert names any failure."
     },
     {
-      "lineAfterPatch": 13726,
+      "lineAfterPatch": 13735,
       "surface": "lists tray door bookmark",
       "learnerRootsMutatedBeforeUncheckedSave": [
         "readerPos"
@@ -94,14 +94,14 @@
   },
   "directLearnerStoreBypasses": [
     {
-      "lineAfterPatch": 4734,
+      "lineAfterPatch": 4743,
       "surface": "learner-record export",
       "operation": "getItem",
       "keyExpression": "STORE_KEY",
       "risk": "Direct read is outside quarantine and can throw before export feedback."
     },
     {
-      "lineAfterPatch": 4832,
+      "lineAfterPatch": 4841,
       "surface": "learner-record import",
       "operation": "setItem",
       "keyExpression": "STORE_KEY",

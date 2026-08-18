@@ -332,6 +332,49 @@ fixed here, and `drift-fast` stays honestly red about half the time until that
 order is lifted. **No "16/16" claim in this file should be read as a stable
 property of the tree**; it was true of the runs that produced it.
 
+## E3 round D — five lenses of eight, and the kernel law was being bypassed
+
+**Coverage first, because it decides what this round can be counted as.**
+Three of the eight lenses — writing-room, ai-surfaces, performance-console —
+**died on API errors mid-walk**. Round D covers 5/8. It cannot be counted as a
+full round and certainly not toward a dry one; the three owe a re-run.
+
+The five that ran returned **17 findings, 16 confirmed, all 16 now closed.**
+
+The one that mattered most: **T-06 had no force in the dojo's default mode.**
+`覚えるの札` is the room's default, its lap one draws real due cards, and
+`commitStandardGrade` writes srs, revlog and stats — yet the front face offered
+only 答えを見る, and the forcing that makes まだ mean Again was switched off
+inside any focus block. Measured on a card due now: 答えを見る, then Easy, and
+it went out **34 days** with a full 12-field revlog row and nothing in the
+durable record to tell it from an honest recall. The exemption's own stated
+reason — "a drill-only grade is practice evidence, not a scheduled review" —
+was true of a drill pass and false of the room it guarded. It follows that
+reason now: one predicate answers in all three places that were disagreeing,
+and two verifier assertions that encoded the superseded rule were corrected
+with four new probes pinning the boundary from both sides (238 checks).
+
+| finding | fix |
+| --- | --- |
+| P2 T-06 exempted the dojo's default mode — a bare reveal on cards the commit then scheduled for real | the declaration is the door wherever a grade is real; the turn-over belongs to practice |
+| P1 the reader taught にっぽんご — 日本 ruby'd にっぽん directly before 語 at 12 sites, including token 0 of an N3 text | one lexicon entry binding the adjacent pair; 0 sites left, checker 339 · 8 · 0 |
+| P1 the quick-look mini was a `role="dialog"` outside the layer discipline — Back walked the ROOM, Escape was dead | it tops the overlay ladder, counts in `canWalkBack`, arms the sentinel, answers Escape |
+| P1 closing a sheet dropped the keyboard everywhere but the reader — 27–45 Tab presses back | every list row can be found again by shape and text |
+| P2 383 bare numerals announced as proper names — round C's rule fixed affixes and left numbers | a number is not a name either |
+| P2 482 English glosses cut mid-word at 32 chars | 379 completed from the full dictionary in the same pool; the rest and the galaxy's copy → **OD-27** |
+| P2 休ませる on the summary never joined the history, so ひとつ戻す woke a different card than the one that slept | both paths record what they rested; the undo trusts that key |
+| P2 the 常用まで dial was inert for most non-jōyō kanji | an unknown kanji is not 常用; measured 倦綸迄 surviving before, replaced after |
+| P2 the sources fold omitted UniDic/fugashi, though every furigana passes through them | named, as AnimCJK was in round B for the same reason |
+| P2 rejecting a feed mint dropped its English title — the one row of 683 without one | the title travels with the row, with its provenance |
+| P2 the EN / 日本語 pair was the one control the focus net could not key | any `data-*` names a control |
+| P2 字引's ぜんぶ消す destroyed its own control and named no successor | it hands the keyboard forward |
+| P2 the crumb map was missing 四字熟語 and the field | both named |
+| P2 文法's level filter said which level only in a colour | `aria-pressed` |
+| P2 the review room's × and … were under 4.5:1 | a control you must find in order to leave is not decoration |
+| P2 + polish four tap targets under the app's own 44px floor, three on the DEFAULT entry's only nav bar | raised |
+
+**Not a dry round, and not a complete one.**
+
 ### T5's standing
 
 The double-dry gate has been re-launched on the merged head. The rule is two

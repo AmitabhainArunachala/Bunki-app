@@ -2844,9 +2844,18 @@ function openPassage(id) {
 const passage = () => D.passages.find((p) => p.id === S.passageId);
 const BEYOND_JOYO = new Set(['準1級', '1級']);
 
+const JOYO_JUDGEABLE = /[\u3400-\u4dbf\u4e00-\u9fff々〆ヶ]/;
 function beyondJoyo(ch) {
+  // kana, numerals and marks are never "beyond" anything — the dial replaces
+  // KANJI a learner at this level would not have met
+  if (!JOYO_JUDGEABLE.test(ch)) return false;
   const k = D.kanken[ch];
-  return !!k && BEYOND_JOYO.has(k.kk);
+  // …and a kanji the 漢検 table does not carry is not 常用. The table holds
+  // 2,453 characters and every common one is in it; 硯, 蟹, 學, 國, 纂, 鐵 are
+  // not. Reading "unknown" as jōyō made the dial inert for precisely the
+  // characters it exists to replace — nothing changed at all in 56 of the 82
+  // texts (E3 round-D, reader lens).
+  return !k || BEYOND_JOYO.has(k.kk);
 }
 
 function rubyNode(pairs, { furigana, revealed }) {
