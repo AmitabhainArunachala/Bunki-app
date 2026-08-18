@@ -7,13 +7,13 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-18T09:16:43.686Z",
+  "completedAt": "2026-08-18T09:40:21.898Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
     "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "f3338fb5aa6be2fb90ca073aeae5446ea7b8126355a28524fa6fd2b4842e60b2",
+    "corridorJs": "51484415677dca2b96a784e72a42e8cdb1acdd95c96fd17cb8dbf9226f06a77b",
     "corridorCss": "afccff429d4f14588a0afb5357f9804d449936cd4e8c9f93ce5a62d565052525",
     "standalone": "63ed875218a397fc5a2fb5a18b1a8532e498117e560d0db9ceede10b6017f6e0",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
@@ -71,7 +71,7 @@
       },
       "biShelf": {
         "path": "screenshots/shelf-bilingual-titles.png",
-        "sha256": "7052029a22706853d1b13acbf86f2f1808fc79a2cf16934144844e7d2c642b1f"
+        "sha256": "ed1c715db2081a66a20f0a4702425b2f3d935ec157f560deb7dfc49e89af010d"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",

@@ -13478,10 +13478,17 @@ function render() {
   syncWalkSentinel();
 }
 
-// coming back to the app wakes the galaxy the same way leaving it slept it:
-// one render, through the seam above. Nothing here reaches into the drift.
+// Coming back to the app wakes the galaxy; leaving it sleeps it. Through the
+// drift's own seam ONLY — never a render(). A full render rebuilds #app, and
+// visibility can flip while a finger (or a probe) is mid-gesture, so waking
+// the galaxy that way tore elements out from under whoever was holding them:
+// drift-fast lost a chain-hop to `detached`, native-readings to `Element is
+// not attached to the DOM`. The verifiers were reporting a real hazard, and
+// the smallest act that does the job is the one that belongs here.
 document.addEventListener('visibilitychange', () => {
-  if (document.body?.dataset?.ready === '1') render();
+  if (!window.__DRIFT__ || document.body?.dataset?.ready !== '1') return;
+  if (document.hidden) window.__DRIFT__.hide();
+  else if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
 });
 
 window.addEventListener('DOMContentLoaded', () => {
