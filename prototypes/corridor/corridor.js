@@ -3740,6 +3740,68 @@ function glossaryCrossRefPlan(p) {
   return skip.size ? { skip, doors } : null;
 }
 
+/* 聞く — the interim voice (operator escalation, 2026-08-19). The judged
+ * voice — PR 五's shootout, pitch-accent verified against the accent
+ * dictionaries — is NOT this. This door reads the article aloud with the
+ * device's own best Japanese voice so listening exists today, and it wears
+ * that truth on its face (仮の声). Word-level audio stays absent until a
+ * judged voice ships: a lone word's pitch teaches, a read-along sentence
+ * carries its own context. Nothing here writes learner state. */
+const readAloud = { on: false, timer: null };
+
+function stopReadAloud() {
+  if (!readAloud.on) return;
+  readAloud.on = false;
+  clearTimeout(readAloud.timer);
+  try {
+    speechSynthesis.cancel();
+  } catch {}
+}
+
+function bestJaVoice() {
+  try {
+    const voices = speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja'));
+    if (!voices.length) return null;
+    const score = (v) => (/(premium|enhanced|siri)/i.test(v.name) ? 2 : 0) + (v.localService ? 1 : 0);
+    return voices.sort((a, b) => score(b) - score(a))[0];
+  } catch {
+    return null;
+  }
+}
+
+/** Speak the passage sentence by sentence — short utterances keep 止める
+ * responsive and survive the platform's long-utterance truncation. */
+function speakPassage(p, onDone) {
+  const text = (p.text || '').replace(/\s+/g, ' ').trim();
+  const sentences = text.match(/[^。！？]+[。！？]?/g) || [];
+  const voice = bestJaVoice();
+  let i = 0;
+  const next = () => {
+    if (!readAloud.on || i >= sentences.length) {
+      if (readAloud.on) {
+        readAloud.on = false;
+        onDone();
+      }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(sentences[i]);
+    u.lang = 'ja-JP';
+    if (voice) u.voice = voice;
+    u.rate = 0.92;
+    u.onend = () => {
+      i += 1;
+      // a breath between sentences, the way a reader breathes
+      readAloud.timer = setTimeout(next, 260);
+    };
+    u.onerror = () => {
+      readAloud.on = false;
+      onDone();
+    };
+    speechSynthesis.speak(u);
+  };
+  next();
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -3795,6 +3857,40 @@ function renderReader(main) {
     );
     main.append(dials);
   }
+
+  // the listen door rides beside the settings fold — one tap to hear the
+  // article, one tap to stop; the voice names itself 仮 (interim) until
+  // the judged voice of PR 五 replaces it
+  const listenRow = el('div', 'listen-row');
+  const listen = biLabel('button', 'chip listen-toggle', readAloud.on ? '止める' : '聞く', readAloud.on ? 'stop' : 'listen');
+  listen.type = 'button';
+  listen.id = 'listen-toggle';
+  listen.setAttribute('aria-pressed', String(readAloud.on));
+  const listenNote = el('span', 'listen-note');
+  listenNote.id = 'listen-note';
+  listenNote.textContent = readAloud.on ? tx('仮の声で読んでいます', 'reading in the interim device voice') : tx('仮の声 — 検収前', 'interim device voice, for now');
+  listen.addEventListener('click', () => {
+    if (readAloud.on) {
+      stopReadAloud();
+      render();
+      return;
+    }
+    if (!('speechSynthesis' in window) || (!speechSynthesis.getVoices().length && !bestJaVoice())) {
+      // voices arrive async on some platforms: one honest retry, then the truth
+      listenNote.textContent = tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet');
+      try {
+        speechSynthesis.getVoices();
+      } catch {}
+      if (!bestJaVoice()) return;
+    }
+    readAloud.on = true;
+    speakPassage(p, () => {
+      if (S.view === 'reader') render();
+    });
+    render();
+  });
+  listenRow.append(listen, listenNote);
+  main.append(listenRow);
 
   const grammarHint = el('p', 'gesture-hint');
   grammarHint.textContent = tapLadderHint();
@@ -13094,6 +13190,9 @@ function render() {
     if (S.view === 'drift' && !S.stack.length) window.__DRIFT__.show();
     else window.__DRIFT__.hide();
   }
+
+  // the interim voice belongs to the reader: leaving the room ends it
+  if (S.view !== 'reader') stopReadAloud();
 
   if (S.view === 'drift') renderDrift(main);
   else if (S.view === 'entry') renderEntry(main);

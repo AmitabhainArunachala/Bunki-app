@@ -2490,6 +2490,25 @@ body.v-depth-layered .inline-link {
   margin: 8px 2px 0;
 }
 
+/* 聞く — the reader's interim voice door: one chip, and the honest label
+ * beside it naming the voice 仮 until PR 五's judged voice replaces it */
+.listen-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+.listen-row .listen-toggle {
+  min-height: var(--tap);
+  min-width: var(--tap);
+}
+.listen-note {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
 /* shelf card header — demarcated from the body */
 .shelf-head {
   border-left: 3px solid var(--ai, var(--ink-2));

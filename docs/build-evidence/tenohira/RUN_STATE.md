@@ -32,3 +32,14 @@ Convicting probes for the fold behavior go into `verify-corridor.mjs`.
   Weekly triage of those notes is §3 of the spec.
 - The E3 double-dry instrument (T5/OD-19) remains unbuilt — it is a standing
   debt, not forgotten.
+
+## Resequencing (operator escalation, 2026-08-19)
+
+The operator asked repeatedly for the voice and for better articles; the
+順路 had them at 五 and 三. Their word outranks the sequence: **聞く (the
+interim reader voice) shipped immediately** on PR 一's branch — the device's
+best Japanese voice, marked 仮の声・検収前 on its face, article read-along
+only (word-level audio stays absent until PR 五's judged voice) — and **the
+feed (PR 三) is the very next work**, before the word page. PR 二 slides to
+third. The judged-voice shootout (PR 五) is unchanged and still the law for
+anything that teaches pitch.

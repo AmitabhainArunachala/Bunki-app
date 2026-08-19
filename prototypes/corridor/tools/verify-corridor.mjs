@@ -1280,6 +1280,28 @@ async function main() {
   check('ひとこと · a reload later the note still stands in the tray', noteBack === true,
     `rendered after reload: ${noteBack}`);
 
+  // ---------------- TENOHIRA · 聞く — the reader's interim voice door
+  // Headless Chromium ships no Japanese voice, so the probe convicts the
+  // door's PRESENCE, its honest 仮の声 label, and the graceful no-voice
+  // path — the sound itself is judged by ears, not by this suite.
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#listen-toggle', { timeout: 15000 });
+  const listenBefore = await page.evaluate(`({
+    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    note: document.querySelector('#listen-note')?.textContent ?? '',
+  })`);
+  await tap(page, '#listen-toggle');
+  await page.waitForTimeout(250);
+  const listenAfter = await page.evaluate(`({
+    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    note: document.querySelector('#listen-note')?.textContent ?? '',
+  })`);
+  check('reader · the 聞く door stands, names its interim voice, and answers a tap honestly',
+    listenBefore.pressed === 'false' && /仮の声|interim device voice/.test(listenBefore.note) &&
+      (listenAfter.pressed === 'true' || /声が見つからない|no Japanese voice/.test(listenAfter.note)),
+    `before ${JSON.stringify(listenBefore)} → after ${JSON.stringify(listenAfter)}`);
+
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
   await open('?entry=shelf&variants=1');
