@@ -62,7 +62,7 @@ operator rules there.
   verdicts), 1 cull approved (Q1 — wikinews:5991), 1 cull left pending
   (OD-16 — wikinews:1483), 30 legacy originals approved (L1), 10 rights
   left pending (R / OD-24), and **wikinews:45227 left pending**: its
-  final-revision caveat is editorial *verification*, not taste — the feed
+  final-revision caveat is editorial _verification_, not taste — the feed
   gate convicted the first attempt to approve it and the rubric yielded,
   the correct outcome. Verification states are never the rubric's to lift.
   Applied by `feed_apply_review.py`; per-row reasons in the queue file.
