@@ -1222,6 +1222,64 @@ async function main() {
     kdx.total > 100 && kdx.small === 0,
     `${kdx.total} chips measured, ${kdx.small} under ${MIN_TAP}px`);
 
+  // ---------------- TENOHIRA PR 一 · the corridor installs to a home screen
+  // The PWA seam is three files and one guard. The files must answer from the
+  // same directory the Pages workflow copies; the registration guard must keep
+  // service workers OUT of these http-driven verification runs (127.0.0.1 is
+  // a secure context, so an unguarded register() WOULD take — the emptiness
+  // of getRegistrations() is what convicts a dropped guard).
+  await open('?entry=shelf');
+  const pwa = await page.evaluate(`(async () => {
+    const manifestLink = document.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? null;
+    let manifest = null;
+    let swText = '';
+    try { manifest = await (await fetch('manifest.webmanifest')).json(); } catch {}
+    try { swText = await (await fetch('sw.js')).text(); } catch {}
+    const regs = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistrations() : [];
+    return {
+      manifestLink,
+      name: manifest?.name ?? '',
+      display: manifest?.display ?? '',
+      icons: (manifest?.icons ?? []).map((i) => i.sizes),
+      swFetches: /addEventListener\\('fetch'/.test(swText),
+      registrations: regs.length,
+    };
+  })()`);
+  check('PWA · the manifest is linked, named 回廊, standalone, and carries real icons',
+    pwa.manifestLink === 'manifest.webmanifest' && pwa.name.includes('回廊') &&
+      pwa.display === 'standalone' && pwa.icons.includes('192x192') && pwa.icons.includes('512x512'),
+    `link=${pwa.manifestLink} · "${pwa.name}" · ${pwa.display} · icons ${pwa.icons.join(',')}`);
+  check('PWA · the worker answers offline duty, and the https guard kept it out of this run',
+    pwa.swFetches && pwa.registrations === 0,
+    `fetch handler ${pwa.swFetches} · ${pwa.registrations} registrations on 127.0.0.1`);
+
+  // ------------------------- TENOHIRA PR 一 · ひとこと — the friction door
+  // The month of real use speaks through the tray: a note commits through the
+  // guarded boundary as an obslog row, survives a reload, and rides the record.
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#note-input', { timeout: 5000 });
+  await page.fill('#note-input', '読み物のふりがなが小さい');
+  await tap(page, '#note-send');
+  await page.waitForTimeout(300);
+  const noteRow = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (s.obslog || []).filter((r) => r[1] === 'note');
+    const last = rows[rows.length - 1] || [];
+    return { count: rows.length, kind: last[1] ?? null, key: last[2] ?? null, text: last[3] ?? null };
+  })()`);
+  check('ひとこと · the note lands in the obslog through the guarded boundary',
+    noteRow.count >= 1 && noteRow.kind === 'note' && noteRow.key === 'op' && noteRow.text === '読み物のふりがなが小さい',
+    JSON.stringify(noteRow));
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#note-input', { timeout: 5000 });
+  const noteBack = await page.evaluate(
+    `[...document.querySelectorAll('.note-log .note-row')].some((n) => n.textContent.includes('読み物のふりがなが小さい'))`,
+  );
+  check('ひとこと · a reload later the note still stands in the tray', noteBack === true,
+    `rendered after reload: ${noteBack}`);
+
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
   await open('?entry=shelf&variants=1');

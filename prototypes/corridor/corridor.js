@@ -724,6 +724,12 @@ function validObservationRow(row) {
     if (row.length === 5 && !nonEmptyString(row[4])) return false;
     return Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
   }
+  if (row[1] === 'note') {
+    // TENOHIRA §3 · ひとこと — the learner's own words to the builder:
+    // [t, 'note', 'op', text]. Friction evidence riding the record; it
+    // names no item, grades nothing, and schedules nothing.
+    return row.length === 4 && row[2] === 'op' && nonEmptyString(row[3]);
+  }
   return false;
 }
 
@@ -1215,6 +1221,11 @@ function commitStorePatch(patch) {
  *       row is the declaration's evidence; the forcing itself rides the
  *       session state and the grade commit. The timed dojo keeps its bare
  *       reveal and stamps 'dojo' practice rows instead.
+ *   [t, 'note', 'op', text]
+ *       ひとこと (TENOHIRA §3) — the learner's own words to the builder,
+ *       written from the tray's friction door. Names no item, grades
+ *       nothing, schedules nothing; it rides the export envelope so the
+ *       month of real use leaves evidence.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -4284,8 +4295,10 @@ function renderTray(main) {
         ),
       ),
     );
-    // a fresh device is exactly where bringing a record back matters most
+    // a fresh device is exactly where bringing a record back matters most —
+    // and where first frictions surface, so the note door stands here too
     renderPortRow(main);
+    renderNoteDoor(main);
     return;
   }
 
@@ -4480,6 +4493,7 @@ function renderTray(main) {
   }
 
   renderPortRow(main);
+  renderNoteDoor(main);
 }
 
 /* The record is yours to carry: one plain JSON file out, the same file
@@ -4567,6 +4581,51 @@ function renderPortRow(main) {
   });
   port.append(exp, imp, file);
   main.append(port, portNote);
+}
+
+/* ひとこと — the friction door (TENOHIRA §3). The month of real use speaks
+ * through here: one small note from the hand holding the phone, kept as an
+ * append-only obslog row that rides the export envelope. Evidence, never a
+ * command: nothing here grades, schedules, or touches learner state. */
+function renderNoteDoor(main) {
+  main.append(withEn(el('p', 'eyebrow key-head', 'ひとこと'), 'a note to the builder', 'en-inline'));
+  const row = el('div', 'chat-row');
+  const input = el('input', 'search-field chat-field');
+  input.type = 'text';
+  input.id = 'note-input';
+  input.autocomplete = 'off';
+  input.placeholder = tx('気づいたことをここに…', 'anything that felt wrong or missing…');
+  const send = biLabel('button', 'take chat-send', '残す', 'keep it');
+  send.type = 'button';
+  send.id = 'note-send';
+  const keep = () => {
+    const text = input.value.trim();
+    if (!text) return;
+    // the note rides the guarded boundary: a failed persist keeps the words
+    // in the field and the storage alert names the failure
+    const obslog = [...(S.obslog || []), [Date.now(), 'note', 'op', text]];
+    if (!commitStorePatch({ obslog })) return;
+    input.value = '';
+    render();
+  };
+  send.addEventListener('click', keep);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') keep();
+  });
+  row.append(input, send);
+  main.append(row);
+  const notes = (S.obslog || []).filter((r) => r[1] === 'note');
+  if (notes.length) {
+    const list = el('div', 'note-log');
+    for (const r of notes.slice(-5).reverse()) {
+      const d = new Date(r[0]);
+      list.append(el('p', 'srs-forecast note-row', `${d.getMonth() + 1}/${d.getDate()} — ${r[3]}`));
+    }
+    if (notes.length > 5) {
+      list.append(el('p', 'srs-forecast', tx(`ほか ${notes.length - 5} 件は記録の中に`, `${notes.length - 5} more ride the record`)));
+    }
+    main.append(list);
+  }
 }
 
 /* --------------------------------------------------- JLPT · 漢検 lanes
