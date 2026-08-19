@@ -5313,18 +5313,30 @@ body.zen main {
 }
 body.zen .review-face {
   border: 0;
-  padding: 10px 6px;
-  margin: 0;
   /* zen keeps its stillness, but the card keeps its material: the S2 washi
    * constant (background + tooth from .review-face) holds in every world —
-   * a session card is real paper even at night */
-  flex: 1;
+   * a session card is real paper even at night. And paper has a SIZE:
+   * the card is a bounded, centred sheet floating on the night, never a
+   * floor-to-ceiling pillar (the operator's first real-phone friction —
+   * TENOHIRA §3, 2026-08-19) */
+  flex: 0 1 auto;
+  width: 100%;
+  max-width: 440px;
+  min-height: min(50vh, 420px);
+  margin: 0 auto;
   justify-content: center;
   gap: 14px;
+  padding: clamp(28px, 6vh, 52px) 22px;
+  border-radius: 12px;
+  box-shadow:
+    0 24px 70px -30px rgba(4, 6, 12, 0.85),
+    0 4px 18px -6px rgba(4, 6, 12, 0.4);
 }
 body.zen .review-front {
-  font-size: 58px;
+  /* grand for 大統領, still on the sheet for a six-glyph compound */
+  font-size: clamp(44px, 13vw, 62px);
   line-height: 1.15;
+  text-wrap: balance;
 }
 body.zen .review-cloze {
   font-family: var(--serif);
@@ -5342,31 +5354,37 @@ body.zen .review-sense {
 body.zen .review-reveal {
   margin: 0 auto;
   width: 100%;
-  max-width: 340px;
+  max-width: 440px;
 }
 /* 想起の二道 — the T-06 gate: before anything turns over, the front face
  * asks "did it come back?". Two quiet doors where the single reveal stood:
  * まだ stands outlined — an honest miss is never punished by the chrome —
  * and 思い出した carries the ink. The dojo keeps its single 答えを見る. */
 .declare-row {
-  margin: 0 auto;
+  /* the two doors breathe below the sheet and match its width; each door
+   * holds its words on one line — 思い出した never breaks mid-thought */
+  margin: 18px auto 0;
   width: 100%;
-  max-width: 340px;
+  max-width: 440px;
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 .declare-row .take {
   flex: 1;
   margin: 0;
+  min-height: 58px;
+  white-space: nowrap;
+  border-radius: 10px;
 }
 .declare-row .declare-notyet {
   background: transparent;
   color: var(--ink);
+  border-color: var(--faint);
 }
 body.zen .grade-row {
   margin: 0 auto;
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
   /* the four seals stay in reach: on tall answer faces the row landed
    * below the fold (top 1137 in an 844px viewport) with no scroll cue —
    * P1, full-instrument review. It now rides the bottom edge on a washi
