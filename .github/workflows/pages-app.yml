@@ -48,9 +48,14 @@ jobs:
           node --check prototypes/corridor/corridor.js
           node --check prototypes/corridor/corridor-ink.js
           node --check prototypes/corridor/dictionary-worker.js
+          node --check prototypes/corridor/sw.js
 
           cp -r prototypes/corridor/index.html \
                 prototypes/corridor/apple-touch-icon.png \
+                prototypes/corridor/manifest.webmanifest \
+                prototypes/corridor/sw.js \
+                prototypes/corridor/icon-192.png \
+                prototypes/corridor/icon-512.png \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
                 prototypes/corridor/corridor-ink.js \
@@ -81,6 +86,7 @@ jobs:
           # "assert(!this.paused)" AFTER every path had already printed 200)
           for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
                       'corridor-ink.js' 'dictionary-worker.js' \
+                      'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
                       'data/manifest.json' 'data/articles/index.json' \
                       'data/articles/archive-index.json' \

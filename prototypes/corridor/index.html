@@ -16,6 +16,11 @@
     <!-- a real file, not a data URI: iOS requests /apple-touch-icon.png
          implicitly, and an absent file was the one console 404 on the site -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <!-- TENOHIRA PR 一: the corridor installs to a real home screen -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#f1e9d3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="stylesheet" href="corridor.css" />
     <link rel="stylesheet" href="drift-layer.css" />
   </head>
@@ -25,6 +30,13 @@
          the corridor's drift entry view wakes it via window.__DRIFT__ -->
     <script defer src="drift-layer.js"></script>
     <script type="module" src="corridor.js"></script>
+    <!-- the https guard is deliberate: the verification suites drive the app
+         over http://127.0.0.1 and must never inherit a worker's cache -->
+    <script>
+      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+      }
+    </script>
     <noscript>
       <p style="font-family: serif; padding: 24px">
         回廊 needs JavaScript — the corridor composes itself from the corpus at run time.
