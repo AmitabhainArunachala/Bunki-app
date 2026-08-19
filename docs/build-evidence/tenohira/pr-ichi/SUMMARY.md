@@ -1,4 +1,4 @@
-# Battery run — claude/bunki-kairo-pr76-review-qa1qnh @ cab5d8a7bab6e156459e8276f5e5a4fbea23aed7
+# Battery run — claude/bunki-kairo-pr76-review-qa1qnh @ d7bd38c632602db01bbda64150c453f4a812cf30
 
 | gate | exit | note |
 | --- | --- | --- |
@@ -6,7 +6,7 @@
 | lint | 0 |  |
 | typecheck | 0 |  |
 | vitest | 0 |  |
-| corridor | 0 | report → /home/user/Bunki-app/docs/prototype/verification-report.json |
+| corridor | 2 | } |
 | corridor-a11y | 0 | report → /home/user/Bunki-app/docs/build-evidence/kairo-a05-accessibility/verification-report.json |
 | writing-room | 0 | 37/37 checks passed |
 | storage-integ | 1 | Node.js v22.22.2 |
@@ -16,7 +16,7 @@
 | replay | 0 |  |
 | export | 0 |  |
 | e2e-build | 0 | Exported: dist |
-| e2e | 0 |   44 passed (1.8m) |
-| corpus-pytest | 0 | 185 passed, 2 skipped, 29 deselected in 1.12s |
+| e2e | 0 |   44 passed (1.6m) |
+| corpus-pytest | 0 | 185 passed, 2 skipped, 29 deselected in 0.39s |
 
-Completed: 2026-08-19T07:06:34Z
+Completed: 2026-08-19T07:25:40Z

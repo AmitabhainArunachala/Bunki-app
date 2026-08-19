@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "cab5d8a7bab6e156459e8276f5e5a4fbea23aed7",
+  "head": "d7bd38c632602db01bbda64150c453f4a812cf30",
   "chromium": "/opt/pw-browsers/chromium",
   "viewport": {
     "width": 390,
@@ -61,7 +61,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "549 named button(s) in the accessibility tree"
+      "detail": "550 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",
@@ -71,7 +71,7 @@
     {
       "name": "second-action English preserves the glyph anchor within 2px",
       "pass": true,
-      "detail": "660.1px → 660.1px"
+      "detail": "714.1px → 714.1px"
     },
     {
       "name": "pointer third target.activate closes the circle — plain kanji, no sheet",

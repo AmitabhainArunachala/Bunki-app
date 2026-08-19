@@ -7,7 +7,7 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-19T07:04:28.821Z",
+  "completedAt": "2026-08-19T07:23:50.795Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
@@ -15,7 +15,7 @@
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
     "corridorJs": "af62b595b3b6f0c4e53600d9a31499012ab921550bf4b7759e6373e103e5f01b",
     "corridorCss": "016ec96dfb97bde915b833dbb43345530b0651852337458d9d1a9af056090af2",
-    "standalone": "3293df511db24980623ffbd06b9dd59fd44d2aa94a32568c93f70e4e01411295",
+    "standalone": "3101522d0f5870c287b2afe52d68765b23a8b95578e58e2cbec8e157122d4ad1",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
@@ -176,7 +176,7 @@
       "fullEntry": {
         "headword": "時",
         "reading": "とき",
-        "text": "← 戻る\n覚\n✕\n時\n\nとき\n\nnoun\n\ntime\nhour\nmoment\noccasion\ncase\nchance\n\n語義と用法をひらいています…\n\nこの語の漢字\n\n時\nTime\n›\n\n用例 — ことばは長押しで辞書へ\n\nイチローは\n試"
+        "text": "← 戻る\n覚\n✕\n時\n\nとき\n\n同じ形の 3 項目\n\n時とき\ntime\n›\n時じ\nhour\n›\n時どき\ntime for ...\n›\n\nnoun\n\n時・刻・秋\nとき\n1\n\nnoun (common) (futsuumeishi)\n\ntime"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
@@ -225,7 +225,7 @@
       "fullEntry": {
         "headword": "物語",
         "reading": "ものがたり",
-        "text": "← 戻る\n覚\n✕\n物語\n\nものがたり\n\nnoun\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\n語義と用法をひらいています…\n\nJLPT N3\n\nこの語の漢字\n\n物\nThing\n›\n語\nWord\n›"
+        "text": "← 戻る\n覚\n✕\n物語\n\nものがたり\n\nnoun\n\n物語・物語り\nものがたり\n1\n\nnoun (common) (futsuumeishi)\n\nstory\ntale\nnarrative\naccount\nfable\nlegend\n\nJMdic"
       },
       "ownFileLoaded": true,
       "intendedPosition": 620,
