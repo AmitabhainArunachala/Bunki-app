@@ -43,3 +43,15 @@ only (word-level audio stays absent until PR 五's judged voice) — and **the
 feed (PR 三) is the very next work**, before the word page. PR 二 slides to
 third. The judged-voice shootout (PR 五) is unchanged and still the law for
 anything that teaches pitch.
+
+## PR 三 (the feed) — first rubric pass, 2026-08-19
+
+`docs/content/feed-approval-rubric.md` (rubric-v1) is live, delegated per
+Decision 4: 7 mints approved (sports/culture/civic within the cap), 5
+rejected (the Nantan child-death case ×3 by rule T1; two court verdicts by
+T2), 1 defect cull applied, 30 authored originals approved out of 検収前.
+Left for the operator: wikinews:1483 (OD-16), the 10 rights rows (OD-24),
+and wikinews:45227 — whose approval the feed gate CONVICTED (its
+final-revision caveat is verification, not taste; the rubric yielded and
+its text now says so). The census check follows the queue with a pairing
+assertion. verify-feed 31/31; the queue file is the per-row audit trail.

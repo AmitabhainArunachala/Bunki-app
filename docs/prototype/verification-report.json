@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-19 07:30",
+          "2026-08-19 08:18",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-19 07:35",
+          "2026-08-19 08:23",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-19 07:39",
+          "2026-08-19 08:27",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-27 07:29",
+          "2026-08-27 08:17",
           "8.30"
         ]
       ]
@@ -4820,6 +4820,118 @@
         "id": "entry-row"
       },
       {
+        "text": "選挙",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "代表",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "選ば",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "こと",
+        "w": 34,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "受け",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "厳粛",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "職責",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "全身",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "全霊",
+        "w": 33,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "もっ",
+        "w": 34,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "引き受け",
+        "w": 66,
+        "h": 44,
+        "hitW": 66,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "まい進",
+        "w": 50,
+        "h": 44,
+        "hitW": 50,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "し",
+        "w": 17,
+        "h": 44,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "tok content sentence-tok"
+      },
+      {
+        "text": "▹",
+        "w": 15,
+        "h": 16,
+        "hitW": 44,
+        "hitH": 44,
+        "id": "sent-door"
+      },
+      {
         "text": "厳しいeveryday sy",
         "w": 332,
         "h": 50,
@@ -5148,75 +5260,11 @@
         "id": "details-toggle"
       },
       {
-        "text": "南丹市児童失踪事件 男児の養",
-        "w": 328,
-        "h": 254,
-        "hitW": 328,
-        "hitH": 254,
-        "id": "shelf-open"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "南丹市で行方不明の男児の遺体",
-        "w": 328,
-        "h": 234,
-        "hitW": 328,
-        "hitH": 234,
-        "id": "shelf-open"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
         "text": "南海 フェリー事業から撤退へ",
         "w": 328,
         "h": 206,
         "hitW": 328,
         "hitH": 206,
-        "id": "shelf-open"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "東京高裁が旧統一教会に解散命",
-        "w": 328,
-        "h": 254,
-        "hitW": 328,
-        "hitH": 254,
-        "id": "shelf-open"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "韓国の尹前大統領に無期懲役判",
-        "w": 328,
-        "h": 254,
-        "hitW": 328,
-        "hitH": 254,
         "id": "shelf-open"
       },
       {
@@ -5265,22 +5313,6 @@
         "h": 281,
         "hitW": 328,
         "hitH": 281,
-        "id": "shelf-open"
-      },
-      {
-        "text": "▸ details",
-        "w": 58,
-        "h": 44,
-        "hitW": 58,
-        "hitH": 44,
-        "id": "details-toggle"
-      },
-      {
-        "text": "京都府警が行方不明になった男",
-        "w": 328,
-        "h": 234,
-        "hitW": 328,
-        "hitH": 234,
         "id": "shelf-open"
       },
       {
@@ -6449,32 +6481,8 @@
       "level": "Beginner",
       "levelNote": "初級前半 · most words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2025-11-13",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
-      "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-17",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "南丹市で行方不明の男児の遺体が見つかる",
-      "titleEn": "Body of missing boy found in Nantan, Kyoto",
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-15",
         "CC BY 2.5"
       ],
       "disagreement": null
@@ -6485,32 +6493,8 @@
       "level": "Upper advanced",
       "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2026-03-31",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
-      "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 5 words beyond JLPT vocab",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-03-05",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
-      "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
-      "level": "Upper advanced",
-      "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-02-19",
         "CC BY 2.5"
       ],
       "disagreement": null
@@ -6521,7 +6505,7 @@
       "level": "Upper beginner",
       "levelNote": "初級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2026-02-17",
         "CC BY 2.5"
       ],
@@ -6533,7 +6517,7 @@
       "level": "Upper advanced",
       "levelNote": "上級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2026-02-18",
         "CC BY 2.5"
       ],
@@ -6545,20 +6529,8 @@
       "level": "Upper beginner",
       "levelNote": "初級後半 · ~1 in 2 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2025-11-14",
-        "CC BY 2.5"
-      ],
-      "disagreement": null
-    },
-    {
-      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
-      "titleEn": "Kyoto police search the home of the missing boy",
-      "level": "Advanced",
-      "levelNote": "上級前半 · ~1 in 3 words beyond JLPT vocab",
-      "meta": [
-        "ウィキニュース · 検収前",
-        "2026-04-15",
         "CC BY 2.5"
       ],
       "disagreement": null
@@ -6569,7 +6541,7 @@
       "level": "Upper advanced",
       "levelNote": "上級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2026-02-14",
         "CC BY 2.5"
       ],
@@ -6581,7 +6553,7 @@
       "level": "Upper beginner",
       "levelNote": "初級後半 · ~1 in 3 words beyond JLPT vocab",
       "meta": [
-        "ウィキニュース · 検収前",
+        "ウィキニュース",
         "2024-08-25",
         "CC BY 2.5"
       ],
@@ -6869,7 +6841,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6880,7 +6852,7 @@
       "level": "Intermediate",
       "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6891,7 +6863,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6902,7 +6874,7 @@
       "level": "Intermediate",
       "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6913,7 +6885,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6924,7 +6896,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6935,7 +6907,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6946,7 +6918,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6957,7 +6929,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -6968,7 +6940,7 @@
       "level": "Intermediate",
       "levelNote": "中級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "段階別読み物 · Bunki · 検収前",
+        "段階別読み物 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7067,7 +7039,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7078,7 +7050,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 7 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7089,7 +7061,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7100,7 +7072,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7111,7 +7083,7 @@
       "level": "Advanced",
       "levelNote": "上級前半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7122,7 +7094,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7133,7 +7105,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7144,7 +7116,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7155,7 +7127,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7166,7 +7138,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7177,7 +7149,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7188,7 +7160,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7199,7 +7171,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7210,7 +7182,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7221,7 +7193,7 @@
       "level": "Advanced",
       "levelNote": "上級前半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7232,7 +7204,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7243,7 +7215,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7254,7 +7226,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 5 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7265,7 +7237,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 4 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7276,7 +7248,7 @@
       "level": "Upper intermediate",
       "levelNote": "中級後半 · ~1 in 6 words beyond JLPT vocab",
       "meta": [
-        "随筆 · Bunki · 検収前",
+        "随筆 · Bunki",
         "Bunki original"
       ],
       "disagreement": null
@@ -7412,32 +7384,8 @@
       "disagreement": null
     },
     {
-      "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
-      "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
-      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
-      "disagreement": null
-    },
-    {
-      "title": "南丹市で行方不明の男児の遺体が見つかる",
-      "titleEn": "Body of missing boy found in Nantan, Kyoto",
-      "level": "Upper advanced上級後半 · ~1 in 4 words beyond JLPT vocab",
-      "disagreement": null
-    },
-    {
       "title": "南海 フェリー事業から撤退へ",
       "titleEn": "Nankai to withdraw from its ferry business",
-      "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
-      "disagreement": null
-    },
-    {
-      "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
-      "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
-      "level": "Upper advanced上級後半 · ~1 in 5 words beyond JLPT vocab",
-      "disagreement": null
-    },
-    {
-      "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
-      "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
       "level": "Upper advanced上級後半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
@@ -7457,12 +7405,6 @@
       "title": "クリスティアーノ・ロナウドが強烈エルボーで一発退場 W杯でも初戦は出場停止か",
       "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
       "level": "Upper beginner初級後半 · ~1 in 2 words beyond JLPT vocab",
-      "disagreement": null
-    },
-    {
-      "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
-      "titleEn": "Kyoto police search the home of the missing boy",
-      "level": "Advanced上級前半 · ~1 in 3 words beyond JLPT vocab",
       "disagreement": null
     },
     {
@@ -7877,7 +7819,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 611,
+  "loadMs": 553,
   "summary": {
     "total": 221,
     "failed": 0
@@ -7896,7 +7838,7 @@
     {
       "name": "Phase 2 · one door from the universe to the shelf",
       "pass": true,
-      "detail": "82 articles; universe asleep (display none)"
+      "detail": "77 articles; universe asleep (display none)"
     },
     {
       "name": "Phase 2 · 戻る returns from the shelf to the universe",
@@ -7906,7 +7848,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.2100067138672,\"y\":570.1900024414062,\"productive\":true}"
+      "detail": "{\"x\":148.27000427246094,\"y\":570.1500244140625,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7926,22 +7868,22 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "82 texts, ready in 611 ms"
+      "detail": "77 texts, ready in 553 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
       "pass": true,
-      "detail": "82 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab"
+      "detail": "77 texts, e.g. \"Seven sites added to the World Natural Heritage list — including Shiretoko\" — Upper intermediate中級後半 · ~1 in 3 words beyond JLPT vocab"
     },
     {
       "name": "the shelf gathers into quiet sections — each category one run, no card outside one",
       "pass": true,
-      "detail": "6 sections: ニュース · 青空文庫 · やさしい日本語 用語集 · 段階別読み物 · 随筆 · 古典・一次資料 — 82/82 cards housed"
+      "detail": "6 sections: ニュース · 青空文庫 · やさしい日本語 用語集 · 段階別読み物 · 随筆 · 古典・一次資料 — 77/77 cards housed"
     },
     {
       "name": "glossary rows are labeled 用語集 and stand outside the real-text count",
       "pass": true,
-      "detail": "10/10 labeled · intro bills 72 texts for 72 non-glossary cards"
+      "detail": "10/10 labeled · intro bills 67 texts for 67 non-glossary cards"
     },
     {
       "name": "disagreement fires only where two-plus ordinal signals were measured",
@@ -7951,7 +7893,7 @@
     {
       "name": "the cross-referencing glossary entry stands on the shelf",
       "pass": true,
-      "detail": "shelf index 26"
+      "detail": "shelf index 21"
     },
     {
       "name": "no dead (No.NN) citation survives into the read",
@@ -7986,7 +7928,7 @@
     {
       "name": "Phase 1 · the shelf holds dozens of articles",
       "pass": true,
-      "detail": "82 articles"
+      "detail": "77 articles"
     },
     {
       "name": "Phase 1 · all 8 parked v11 texts stand on the shelf",
@@ -7996,7 +7938,7 @@
     {
       "name": "Phase 1 · the index is lean — article bodies live in their own files",
       "pass": true,
-      "detail": "82 per-article files"
+      "detail": "77 per-article files"
     },
     {
       "name": "Phase 1 · every article carries live signals or an honest absence",
@@ -8006,7 +7948,7 @@
     {
       "name": "Phase 1 · ごん狐 stands on the shelf",
       "pass": true,
-      "detail": "shelf index 18"
+      "detail": "shelf index 13"
     },
     {
       "name": "Phase 1 · the story ships full-length — no 520-char excerpt",
@@ -8226,7 +8168,7 @@
     {
       "name": "variant D · shelf entry",
       "pass": true,
-      "detail": "82 texts"
+      "detail": "77 texts"
     },
     {
       "name": "focused content dominates the background chrome",
@@ -8246,7 +8188,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "750 controls checked, including inline token hit regions"
+      "detail": "754 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -8436,7 +8378,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1787124671859,\"probe\",\"word:石鹸\",1,1]"
+      "detail": "row [1787127527386,\"probe\",\"word:石鹸\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8461,12 +8403,12 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1787124676729,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1787127532187,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
       "pass": true,
-      "detail": "682 real news articles · 2005–2026 · CC BY 2.5 · the frozen ja.wikinew"
+      "detail": "686 real news articles · 2005–2026 · CC BY 2.5 · the frozen ja.wikinew"
     },
     {
       "name": "an archive article reads like any shelf text — tokens, level, source link",
@@ -8676,12 +8618,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-22T07:32:04.140Z; due 2026-08-29T07:32:04.140Z"
+      "detail": "anchor held at 2026-08-22T08:19:40.747Z; due 2026-08-29T08:19:40.747Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1787124725483 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1787127582025 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8816,7 +8758,7 @@
     {
       "name": "R3-B · Back from the archive returns to the shelf at its door",
       "pass": true,
-      "detail": "view=shelf y=25655 (kept 25655)"
+      "detail": "view=shelf y=23985 (kept 23985)"
     },
     {
       "name": "R3-B · the nav-search session survives the round trip — query, results, focus",
@@ -8831,7 +8773,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-19T07:32:51.211Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-19T08:20:28.022Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8921,7 +8863,7 @@
     {
       "name": "R4-B · lesson completion alone creates ZERO deck rows — the score and the evidence, nothing else",
       "pass": true,
-      "detail": "taken 0 · srs 0 · lessonsDone [\"N5-1\"] · \"2 of 10\""
+      "detail": "taken 0 · srs 0 · lessonsDone [\"N5-1\"] · \"3 of 10\""
     },
     {
       "name": "R4-B · the run's words land as practice-evidence rows, one per word, named by the run",
@@ -8961,7 +8903,7 @@
     {
       "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
       "pass": true,
-      "detail": "row [1787124795994,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+      "detail": "row [1787127653902,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
     },
     {
       "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",

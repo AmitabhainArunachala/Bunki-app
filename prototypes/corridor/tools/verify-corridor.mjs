@@ -1969,6 +1969,12 @@ async function main() {
   await page.waitForTimeout(500);
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
+  // the dictionary's late arrival re-renders the sheet; a tap aimed between
+  // renders finds a detached seal (seen once as "no box for #sheet-take")
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
+    .catch(() => {});
+  await page.waitForTimeout(300);
   const sealBefore = await page.evaluate(`(() => {
     const b = document.querySelector('#sheet-take');
     return { taken: b.classList.contains('taken'), pressed: b.getAttribute('aria-pressed') };

@@ -217,11 +217,24 @@ const editorialUnverified = curated.filter(
     !recoveredIds.includes(row.id) &&
     !mintIds.has(row.id),
 ).length;
+// TENOHIRA Decision 4: the operator delegated legacy/mint approval to the
+// committed rubric (docs/content/feed-approval-rubric.md), so a recovered
+// original may legitimately leave 検収前 — but ONLY where the queue's own
+// row says approved. The census now follows the queue instead of assuming
+// all recovered originals stay pending, and every recovered original's
+// shelf state is paired to its queue decision: a lift with no approved
+// queue row, or a pending row whose 検収前 vanished, still convicts.
+const legacyDecision = (id) => queue.find((entry) => entry.id === id && entry.kind === 'legacy')?.decision ?? 'pending';
+const recoveredPending = recoveredIds.filter((id) => legacyDecision(id) !== 'approved');
+const recoveredPaired = recoveredIds.every((id) =>
+  legacyDecision(id) === 'approved'
+    ? curatedById.get(id)?.review !== 'human-review-pending'
+    : curatedById.get(id)?.review === 'human-review-pending',
+);
 check(
-  `the 検収前 census is exact: ${recoveredIds.length} recovered originals + pending feed mints + rights holds`,
-  pendingShelf === recoveredIds.length + pendingFeed + editorialUnverified &&
-    recoveredIds.every((id) => curatedById.get(id)?.review === 'human-review-pending'),
-  `${pendingShelf} = ${recoveredIds.length} + ${pendingFeed} + ${editorialUnverified} editorial-unverified · ${pendingRights} rights holds`,
+  `the 検収前 census is exact: ${recoveredPending.length} still-pending recovered originals + pending feed mints + rights holds`,
+  pendingShelf === recoveredPending.length + pendingFeed + editorialUnverified && recoveredPaired,
+  `${pendingShelf} = ${recoveredPending.length} + ${pendingFeed} + ${editorialUnverified} editorial-unverified · ${pendingRights} rights holds · queue-paired ${recoveredPaired}`,
 );
 
 // ----------------------------------------------------- per-candidate schema
