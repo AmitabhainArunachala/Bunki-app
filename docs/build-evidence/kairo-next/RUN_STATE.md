@@ -63,3 +63,18 @@ Read the handoff, then this file, then `docs/build-evidence/renkan/RUN_STATE.md`
 and `DECISION_SHEET.md`. Battery: `bash docs/build-evidence/renkan/battery.sh <outdir>`
 (Node 22, Playwright Chromium, `~/.venv-bunki-corpus` for corpus). Nothing
 merges to `main` without the operator's explicit word.
+
+## Post-merge addendum (2026-08-19, independent review + TENOHIRA kickoff)
+
+- **Count correction:** the "corridor now 215/215" above predates commit
+  `88826ff` (the kanjidex probe). On the merged head the corridor suite is
+  **216/216** — independently re-run and confirmed on `612ead1` and again on
+  `main @ ae1d901`.
+- **The handoff this file cites was never committed:** the campaign source of
+  truth named in the header
+  (`docs/handoffs/KAIRO_NEXT_INTEGRATION_HANDOFF_2026-08-17.md`) exists in no
+  tree or commit on any branch — the same failure mode OD-19 records for
+  `renkan-e3-double-dry.js`. Its substance survives in PR #76's description
+  and in the review record; reconstruction waits on the operator supplying
+  the original. Resume via the TENOHIRA campaign instead:
+  `docs/prompts/KAIRO_TENOHIRA_CAMPAIGN_2026-08-19.md`.
