@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "d07415fdb851763d983905eaf27b44d5e52fbda9",
-  "chromium": "playwright-default",
+  "head": "b0e179816cd98631ce31dc2e0d82b1d2dfc6a644",
+  "chromium": "/opt/pw-browsers/chromium",
   "viewport": {
     "width": 390,
     "height": 844
@@ -71,7 +71,7 @@
     {
       "name": "second-action English preserves the glyph anchor within 2px",
       "pass": true,
-      "detail": "637.5px → 637.5px"
+      "detail": "660.1px → 660.1px"
     },
     {
       "name": "pointer third target.activate closes the circle — plain kanji, no sheet",
