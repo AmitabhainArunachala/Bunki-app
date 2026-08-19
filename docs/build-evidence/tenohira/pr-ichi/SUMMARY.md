@@ -1,4 +1,4 @@
-# Battery run — claude/bunki-kairo-pr76-review-qa1qnh @ c7f7589eef1e0aa07d5338128b9464e703141036
+# Battery run — claude/bunki-kairo-pr76-review-qa1qnh @ 4e9e2ef9b119f8ba85e1984697f6a36e3b346bb7
 
 | gate | exit | note |
 | --- | --- | --- |
@@ -12,11 +12,11 @@
 | storage-integ | 0 | } |
 | drift-fast | 0 | shots  → /home/user/Bunki-app/docs/audits/drift-consistency-shots |
 | corridor-ai | 0 | 24/24 checks passed |
-| native-readings | 0 | report → /home/user/Bunki-app/docs/build-evidence/kairo-feel-lock/native-readings/browser-verifica |
+| native-readings | 1 | report → /home/user/Bunki-app/docs/build-evidence/kairo-feel-lock/native-readings/browser-verifica |
 | replay | 0 |  |
 | export | 0 |  |
 | e2e-build | 0 | Exported: dist |
-| e2e | 0 |   44 passed (1.5m) |
-| corpus-pytest | 0 | 185 passed, 2 skipped, 29 deselected in 0.43s |
+| e2e | 0 |   44 passed (1.6m) |
+| corpus-pytest | 0 | 185 passed, 2 skipped, 29 deselected in 0.60s |
 
-Completed: 2026-08-19T07:43:48Z
+Completed: 2026-08-19T08:42:01Z

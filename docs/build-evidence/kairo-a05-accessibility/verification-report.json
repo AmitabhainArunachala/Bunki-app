@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "c7f7589eef1e0aa07d5338128b9464e703141036",
+  "head": "4e9e2ef9b119f8ba85e1984697f6a36e3b346bb7",
   "chromium": "/opt/pw-browsers/chromium",
   "viewport": {
     "width": 390,
@@ -16,12 +16,12 @@
     {
       "name": "no interactive control nests inside another anywhere on the shelf",
       "pass": true,
-      "detail": "{\"cards\":82,\"nestedInteractive\":0,\"cardsWithOwnDoor\":82,\"cardsWithSiblingDetails\":82}"
+      "detail": "{\"cards\":77,\"nestedInteractive\":0,\"cardsWithOwnDoor\":77,\"cardsWithSiblingDetails\":77}"
     },
     {
       "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
       "pass": true,
-      "detail": "82/82 text doors · 82/82 sibling toggles"
+      "detail": "77/77 text doors · 77/77 sibling toggles"
     },
     {
       "name": "hidden layers keep no tabbable control (the invisible 閉じる × discipline)",

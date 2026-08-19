@@ -3,11 +3,11 @@
   "kind": "feed-gate-verification",
   "artifactHashes": {
     "index": "0459ae8284ffa2b446a6f3047ff31a086272cc8fbda3c4426bbcd975fe59850b",
-    "archiveIndex": "a08954a683f291e4c0db5cea9b1cb1e19cdb5ad540f1dc618c1c5a01950f2457",
+    "archiveIndex": "dbffa6606e7b35fcdd2a1e56bc6e5bd816899d1ff481589778f4b20f46d3d445",
     "queue": "733c33a9ce8915b7739a40cf1d53c4902d1edb3f93919983b6fa652e81656925",
     "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
     "curationReport": "b598a6c94ddeb63b3afdc68d265426216f89a6cb38cdc7c9e2dd042cc73d03cb",
-    "standalone": "3101522d0f5870c287b2afe52d68765b23a8b95578e58e2cbec8e157122d4ad1"
+    "standalone": "061bf0420c58010dfa1537cec8e485838dde0ddcecffeb680f901170c8e51650"
   },
   "counts": {
     "curated": 77,

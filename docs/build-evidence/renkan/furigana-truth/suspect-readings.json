@@ -4,8 +4,8 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 82,
-  "tokens": 43540
+  "articles": 77,
+  "tokens": 41266
  },
  "statusCounts": {
   "lexicon-fixed": 303,
