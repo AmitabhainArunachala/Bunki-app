@@ -5723,3 +5723,424 @@ body.zen .focus-hud-end {
   color: var(--red);
   border-color: var(--red);
 }
+
+/* ================================================================== 禅道場 v2
+ * ZEN-DOJO v2 — the operator's 2026-08-20 direction: "1600 Japan on a 2335
+ * device — as futuristic as possible while keeping the zen dojo feel;
+ * minimal with more depth and texture; hypnotic." Built from the nine-lane
+ * research fleet (docs/build-evidence/tenohira/triage-2026-08-20/).
+ * The byte-pinned body.zen .grade-row rule is UNTOUCHED: the bar rethemes
+ * through --ground-0 alone, which that rule already reads. */
+
+body.zen {
+  /* the 1600 pigments (和色大辞典 anchors, WCAG hand-checked) */
+  --urushi-0: #060505; /* deepest lacquer */
+  --urushi-1: #0e0c0a; /* stage */
+  --urushi-2: #17120e; /* stage crown */
+  --washi-2: #f2eddf; /* card paper */
+  --gofun: #ede6d3; /* shell-white on lacquer · 15.7:1 */
+  --sumi-2: #2a2622; /* ink on washi · ~13:1 */
+  --susutake: #6f514c; /* soot bamboo — secondary on washi · 6.1:1 */
+  --bengara: #8f2e14; /* iron-oxide red — reading on washi · 7.0:1 */
+  --akane: #b7282e; /* madder — pressed states · 5.4:1 */
+  --kin: #c9a24b; /* tarnished gold — dark ground only · 8.1:1 */
+  --kin-dim: rgba(201, 162, 75, 0.45);
+  /* the one 2335 hue: light, not pigment — alpha-only, dark ground only */
+  --ai-glow: rgba(61, 155, 194, 0.35);
+  /* the shared breath: 6/min, the HRV-resonance rate */
+  --breath: 10s;
+  --ease-breath: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-ceremony: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-turn: cubic-bezier(0.65, 0, 0.35, 1);
+  /* the pinned bar rule paints var(--ground-0): at night that ground is
+   * lifted lacquer (the card re-scopes its own --ground-0 — no leak) */
+  --ground-0: #14100c;
+  /* the urushi stage: warm black, an andon light pool above the card,
+   * never #000 — warm channel order R>G>B */
+  background-color: var(--urushi-1);
+  background-image:
+    radial-gradient(130% 90% at 50% 26%, rgba(214, 169, 90, 0.05), transparent 55%),
+    radial-gradient(140% 110% at 50% 0%, var(--urushi-2) 0%, var(--urushi-1) 52%, var(--urushi-0) 100%);
+}
+/* the day-world paper canvas rests while the night room stands */
+body.zen::before {
+  opacity: 0;
+}
+/* 青海波 rises from the bottom of the water — stage only, never the card */
+body.zen::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='36'><defs><g id='s'><circle r='36' fill='%230E0C0A'/><g fill='none' stroke='%23C9A24B' stroke-opacity='.09'><circle r='36'/><circle r='28'/><circle r='20'/><circle r='12'/></g></g></defs><use href='%23s' x='0' y='0'/><use href='%23s' x='72' y='0'/><use href='%23s' x='-36' y='18'/><use href='%23s' x='36' y='18'/><use href='%23s' x='108' y='18'/><use href='%23s' x='0' y='36'/><use href='%23s' x='72' y='36'/></svg>");
+  background-size: 72px 36px;
+  -webkit-mask-image: radial-gradient(120% 60% at 50% 100%, #000, transparent 72%);
+  mask-image: radial-gradient(120% 60% at 50% 100%, #000, transparent 72%);
+}
+
+/* ------------------------------------------------ the sheet: washi on urushi */
+body.zen .review-face {
+  color: var(--sumi-2);
+  background-color: var(--washi-2);
+  /* kōzo fibers (anisotropic turbulence) + su-no-me laid lines — the paper
+   * is real; texture alpha ≤6% so the ink never loses contrast */
+  background-image:
+    repeating-linear-gradient(180deg, rgba(58, 46, 32, 0.022) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, rgba(58, 46, 32, 0.012) 0 1px, transparent 1px 34px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.008' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='400' height='400' filter='url(%23w)'/></svg>");
+  /* lacquerware radii stay small; the rim is maki-e gold, one hair wide */
+  border: 0;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 162, 75, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 1px rgba(0, 0, 0, 0.28),
+    0 2px 2px rgba(0, 0, 0, 0.24),
+    0 8px 16px rgba(0, 0, 0, 0.28),
+    0 24px 56px rgba(6, 5, 5, 0.55);
+  gap: 12px;
+}
+
+/* -------------------------------------------------------- the word (honshi) */
+body.zen .review-front {
+  font-family: 'Shippori Mincho B1', var(--serif);
+  font-weight: 800;
+  color: var(--sumi-2);
+  line-height: 1.12;
+  text-wrap: balance;
+  font-synthesis: none;
+}
+body.zen .review-front[data-len='1'],
+body.zen .review-front[data-len='2'] {
+  font-size: 74px;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em; /* re-centres the trailing tracking gap */
+}
+body.zen .review-front[data-len='3'] {
+  font-size: 62px;
+  letter-spacing: 0.18em;
+  padding-left: 0.18em;
+}
+body.zen .review-front[data-len='4'] {
+  font-size: 52px;
+  letter-spacing: 0.1em;
+  padding-left: 0.1em;
+}
+body.zen .review-front[data-len='5'],
+body.zen .review-front[data-len='6'] {
+  font-size: 42px;
+  letter-spacing: 0.05em;
+  padding-left: 0.05em;
+}
+body.zen .review-front[data-len='7'],
+body.zen .review-front[data-len='8'] {
+  font-size: 33px;
+  letter-spacing: 0.02em;
+  font-feature-settings: 'palt' 1;
+}
+
+/* ------------------------------------- the reading: calligraphy, not UI text */
+body.zen .review-reading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+body.zen .review-reading {
+  font-family: 'Yuji Syuku', var(--serif);
+  font-size: 27px;
+  line-height: 1.4;
+  color: var(--bengara);
+  letter-spacing: 0.05em; /* the brush hand carries its own rhythm */
+  text-shadow: 0 0 0.5px currentColor;
+}
+/* 音 — the fifth seal: the card's voice door */
+.say {
+  width: 44px;
+  height: 44px;
+  margin: -10px 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  color: var(--susutake, #6f514c);
+  cursor: pointer;
+  position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms ease;
+}
+.say.is-speaking {
+  color: var(--akane, #b7282e);
+}
+.say.is-speaking::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+/* ------------------------------------------------ one sense decides the grade */
+body.zen .review-sense-primary {
+  font-family: Georgia, serif;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--sumi-2);
+  max-width: 34ch;
+}
+body.zen .review-sense-rest {
+  font-family: Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--susutake);
+  max-width: 36ch;
+}
+body.zen .review-sense-late {
+  font-size: 14px;
+  color: var(--susutake);
+  text-align: left;
+  width: 100%;
+}
+
+/* --------------------------- the kintsugi seam and the fold that holds the rest */
+.kintsugi {
+  width: 100%;
+  height: 12px;
+  margin: 2px 0 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='12'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%238a6d2f'/><stop offset='.45' stop-color='%23f5e7a3'/><stop offset='.55' stop-color='%23d4af37'/><stop offset='1' stop-color='%238a6d2f'/></linearGradient></defs><path d='M0 7 L48 6 L80 3 L112 8 L166 5 L214 9 L258 4 L320 6' stroke='url(%23g)' stroke-width='1.2' fill='none' stroke-linecap='round'/></svg>")
+    center / 100% 12px no-repeat;
+  opacity: 0.75;
+}
+.review-fold {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--susutake, #6f514c);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.review-more {
+  width: 100%;
+  max-height: 38vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* -------------------------------------------- the night bar: seals on lacquer */
+body.zen .grade.hanko {
+  border: 1px solid rgba(201, 162, 75, 0.16);
+  background: color-mix(in srgb, #1a1410 62%, transparent);
+}
+body.zen .grade.hanko:active {
+  background: color-mix(in srgb, #000 30%, transparent);
+}
+body.zen .grade.hanko .g-label {
+  color: var(--gofun);
+}
+body.zen .grade.hanko .g-when {
+  color: #a58a4e; /* solid aged gold — 5.0:1 on the lacquer bar (AA) */
+}
+body.zen .grade.hanko .g-seal {
+  font-family: 'Kaisei Tokumin', var(--serif);
+  font-weight: 800;
+}
+body.zen .grade.hanko.g-again .g-seal {
+  color: #e8604c; /* bengara lifted for the dark ground · 5.6:1 */
+  border: 1.5px solid rgba(232, 96, 76, 0.6);
+  background: transparent;
+}
+body.zen .grade.hanko.g-hard .g-seal {
+  color: var(--gofun);
+  border: 1.5px solid rgba(237, 230, 211, 0.35);
+  background: transparent;
+}
+body.zen .grade.hanko.g-good .g-seal {
+  color: var(--gofun);
+  border: 1.5px solid var(--akane);
+  background: var(--akane);
+  box-shadow: 0 0 14px rgba(183, 40, 46, 0.35);
+}
+body.zen .grade.hanko.g-easy .g-seal {
+  color: var(--kin);
+  border: 1.5px solid var(--kin-dim);
+  background: transparent;
+}
+
+/* the two declarations, gofun and paper on the night */
+body.zen .declare-row .take {
+  border-radius: 10px;
+}
+body.zen .declare-recalled {
+  background: var(--washi-2);
+  color: var(--sumi-2);
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 6px 18px rgba(0, 0, 0, 0.45);
+}
+body.zen .declare-row .declare-notyet {
+  background: transparent;
+  color: var(--gofun);
+  border: 1px solid rgba(237, 230, 211, 0.3);
+}
+
+/* the room's small lights */
+body.zen .zen-exit,
+body.zen .zen-more {
+  color: var(--gofun);
+  opacity: 0.55;
+}
+body.zen .zen-progress i {
+  background: var(--kin);
+  opacity: 0.5;
+  box-shadow: 0 0 8px var(--ai-glow); /* the 2335 hairline: light, not pigment */
+}
+body.zen .focus-hud-left,
+body.zen .focus-hud-end {
+  color: #a58a4e; /* solid aged gold — small text needs the full 4.5:1 */
+}
+body.zen .zen-more-row .chip {
+  color: var(--gofun);
+  border-color: rgba(237, 230, 211, 0.3);
+  background: transparent;
+}
+body.zen .zen-wait-clock {
+  color: var(--gofun);
+}
+body.zen .review-cloze {
+  color: var(--sumi-2);
+}
+body.zen .review-example {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------ the ceremony (motion) */
+@media (prefers-reduced-motion: no-preference) {
+  /* the room breathes as one organism — in LIGHT, never geometry: a
+   * transform breath makes every element inside the card perpetually
+   * unstable to the actionability checks the battery's browser runs, so
+   * the paper holds still and its aura breathes instead (opacity-only,
+   * compositor-safe) */
+  body.zen .review-face {
+    position: relative;
+  }
+  body.zen .review-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      0 28px 68px rgba(6, 5, 5, 0.5),
+      0 0 26px var(--ai-glow);
+    opacity: 0;
+    animation: kairo-breathe-glow var(--breath) var(--ease-breath) infinite;
+    will-change: opacity;
+  }
+  @keyframes kairo-breathe-glow {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  /* the answer condenses out of the paper like ink soaking in — each zone a
+   * beat of the ritual, the reading legible by ~450ms, seals last */
+  body.zen .reveal {
+    animation: kairo-materialize 520ms var(--ease-ceremony) both;
+  }
+  @keyframes kairo-materialize {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+    60% {
+      filter: blur(1.5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+  body.zen .reveal.r-1 {
+    animation-delay: 120ms;
+  }
+  body.zen .reveal.r-2 {
+    animation-delay: 210ms;
+  }
+  body.zen .reveal.r-3 {
+    animation-delay: 300ms;
+  }
+  body.zen .reveal.r-4 {
+    animation-delay: 390ms;
+  }
+  body.zen .grade-row .grade {
+    animation: kairo-materialize 380ms var(--ease-ceremony) both;
+    animation-delay: 480ms;
+  }
+  body.zen .grade-row .grade:nth-child(2) {
+    animation-delay: 540ms;
+  }
+  body.zen .grade-row .grade:nth-child(3) {
+    animation-delay: 600ms;
+  }
+  body.zen .grade-row .grade:nth-child(4) {
+    animation-delay: 660ms;
+  }
+  /* the stamp: one crisp gesture in a slow room */
+  body.zen .grade.hanko:active .g-seal {
+    transform: translateY(1px) scale(0.94);
+  }
+  .say.is-speaking svg {
+    animation: kairo-say-breath 2400ms var(--ease-breath) infinite;
+  }
+  @keyframes kairo-say-breath {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.zen .review-face {
+    animation: none;
+  }
+  body.zen .reveal,
+  body.zen .grade-row .grade {
+    animation: kairo-rm-fade 150ms ease-out both;
+    animation-delay: 0ms;
+    filter: none;
+  }
+  @keyframes kairo-rm-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .say {
+    transition: none;
+  }
+}

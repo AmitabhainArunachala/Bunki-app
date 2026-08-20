@@ -3844,6 +3844,24 @@ function speakPassage(p, onDone) {
   next();
 }
 
+/** 音 — the answer card's voice door. One tap speaks; a retap restarts;
+ * cancel() first so it is always the only voice. State rides two classes,
+ * color-only — no spinner, no motion noise. */
+function speakCardReading(text, btn) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    speechSynthesis.cancel();
+  } catch {}
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  const voice = bestJaVoice();
+  if (voice) u.voice = voice;
+  u.rate = 0.9;
+  u.onstart = () => btn.classList.add('is-speaking');
+  u.onend = u.onerror = () => btn.classList.remove('is-speaking');
+  speechSynthesis.speak(u);
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -7479,6 +7497,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.declared = null;
   // …and neither does いま見る: the next ripening card gets its own wait
   rv.showEarly = false;
+  // the fold closes with the card it opened on
+  rv.moreOpen = false;
 }
 
 function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
@@ -7893,8 +7913,9 @@ function renderReview(main) {
     }
   }
   const face = el('div', 'review-face');
+  const wordLen = String(Math.min(8, [...String(item.label || '')].length || 1));
   if (cloze) {
-    const line = el('p', 'review-cloze');
+    const line = el('p', 'review-cloze' + (rv.revealed ? ' reveal r-0' : ''));
     // the card's sentence carries the reader's full gesture grammar — every
     // word tap-circles, holds float its definition
     renderSentenceTokens(line, cloze.tokens, {
@@ -7904,27 +7925,83 @@ function renderReview(main) {
     });
     if (rv.revealed) line.append(sentenceDoor(cloze, item.id));
     face.append(line);
-    if (rv.revealed) face.append(el('div', 'review-front', item.label));
+    if (rv.revealed) {
+      const front = el('div', 'review-front reveal r-0', item.label);
+      front.dataset.len = wordLen;
+      face.append(front);
+    }
   } else {
-    face.append(el('div', 'review-front', item.label));
+    const front = el('div', 'review-front', item.label);
+    front.dataset.len = wordLen;
+    face.append(front);
   }
   if (rv.revealed) {
     const backc = reviewBack(item);
-    if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
-    for (const s of backc.senses) face.append(el('div', 'review-sense', s));
-    // the answer face carries the word in the wild: up to two real
-    // sentences, every token ladder-live (operator's law — a card never
-    // opens onto zero examples where the corpus holds any)
+    // 読み — the answer line wears the brush hand and carries the 音 door
+    // (operator, 2026-08-20: audio on every answer card; their word
+    // supersedes the word-audio hold until PR 五's judged voice — the door
+    // names itself 仮 in its label). The reading speaks, not the kanji:
+    // kana is deterministic where rare kanji misread.
+    const spoken = backc.reading || item.label;
+    const row = el('div', 'review-reading-row reveal r-1');
+    if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
+    if ('speechSynthesis' in window && spoken) {
+      const say = el('button', 'say');
+      say.type = 'button';
+      say.id = 'card-say';
+      say.setAttribute('aria-label', tx('読み上げ — 仮の声', 'speak the reading (interim device voice)'));
+      say.innerHTML =
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
+      say.addEventListener('click', () => speakCardReading(spoken, say));
+      row.append(say);
+    }
+    if (row.childNodes.length) face.append(row);
+    // 語義 — one sense decides the grade; the next two whisper on one line
+    // (SuperMemo's minimum-information rule; the crowding was four italic
+    // lines competing at once)
+    const senses = backc.senses || [];
+    if (senses.length) {
+      face.append(el('div', 'review-sense review-sense-primary reveal r-2', senses[0]));
+      if (senses.length > 1)
+        face.append(el('div', 'review-sense-rest reveal r-3', senses.slice(1, 3).join(' · ')));
+    }
+    // 例文 — the word in the wild waits one NAMED fold away (operator,
+    // 2026-08-20: the back was crowded and confusing; the sentences are
+    // never absent — the fold counts them, one tap opens them, and the
+    // grade never needs them)
+    let exs = [];
     if (item.t === 'word') {
       const clozeText = cloze ? cloze.tokens.map((t) => t.s).join('') : null;
-      const exs = findExamples(item.id, 3)
+      exs = findExamples(item.id, 3)
         .filter((ex) => ex.tokens.map((t) => t.s).join('') !== clozeText)
         .slice(0, 2);
-      for (const ex of exs) {
-        const line = el('p', 'review-example');
-        renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
-        line.append(sentenceDoor(ex, item.id));
-        face.append(line);
+    }
+    const lateSenses = Math.max(0, senses.length - 3);
+    if (exs.length || lateSenses) {
+      face.append(el('div', 'kintsugi reveal r-3'));
+      const fold = el('button', 'review-fold reveal r-4');
+      fold.type = 'button';
+      fold.id = 'review-fold';
+      fold.setAttribute('aria-expanded', String(!!rv.moreOpen));
+      const parts = [];
+      if (exs.length) parts.push(tx(`例文 ${exs.length}`, `${exs.length} sentence${exs.length === 1 ? '' : 's'}`));
+      if (lateSenses) parts.push(tx(`語義 +${lateSenses}`, `+${lateSenses} more sense${lateSenses === 1 ? '' : 's'}`));
+      fold.textContent = `${rv.moreOpen ? '▾' : '▸'} ${tx('詳しく', 'more')} · ${parts.join(' · ')}`;
+      fold.addEventListener('click', () => {
+        rv.moreOpen = !rv.moreOpen;
+        render();
+      });
+      face.append(fold);
+      if (rv.moreOpen) {
+        const more = el('div', 'review-more');
+        for (const ex of exs) {
+          const line = el('p', 'review-example');
+          renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
+          line.append(sentenceDoor(ex, item.id));
+          more.append(line);
+        }
+        for (const s of senses.slice(3)) more.append(el('div', 'review-sense review-sense-late', s));
+        face.append(more);
       }
     }
   }
@@ -7949,6 +8026,7 @@ function renderReview(main) {
       rv.ix += 1;
       rv.revealed = false;
       rv.declared = null;
+      rv.moreOpen = false;
       S.reviewMore = false;
       render();
     });
@@ -8240,6 +8318,7 @@ function renderReviewUndo(main, rv) {
     rv.ix -= 1;
     rv.revealed = false;
     rv.declared = null;
+    rv.moreOpen = false;
     render();
   });
   main.append(undo);

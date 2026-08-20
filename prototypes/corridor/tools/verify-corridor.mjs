@@ -1926,6 +1926,11 @@ async function main() {
   for (let cardN = 0; cardN < 6; cardN++) {
     await page.waitForSelector('#declare-recalled', { timeout: 10000 });
     await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    // ZEN-DOJO v2 (operator, 2026-08-20: the back decrowded): the word's
+    // sentences wait one NAMED fold away — the probe opens it the way a
+    // thumb would, then demands the same living tokens as ever
+    await page.waitForSelector('.grade', { timeout: 8000 }).catch(() => {});
+    await page.evaluate(`document.querySelector('#review-fold')?.click()`);
     await page
       .waitForFunction(
         () => document.querySelectorAll('.review-example, .review-cloze').length >= 1,
@@ -1937,14 +1942,17 @@ async function main() {
       lines: document.querySelectorAll('.review-example, .review-cloze').length,
       live: document.querySelectorAll('.review-example .sentence-tok, .review-cloze .sentence-tok').length,
       word: document.querySelector('.review-front')?.textContent ?? '',
+      say: !!document.querySelector('#card-say'),
     }))()`);
     if (answerFace.lines >= 1) break;
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
-  check('the answer face carries living sentences — never a bare word where the corpus holds any',
+  check('the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any',
     answerFace.lines >= 1 && answerFace.live >= 1,
     `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
+  check('TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)',
+    answerFace.say === true, `card-say present on “${answerFace.word.trim()}”`);
   await shoot(page, shotsDir, '18-review-answer-face');
   // the walk's recall declarations ride the observation debounce; let it
   // land before the next probe replaces the envelope (same idiom as the

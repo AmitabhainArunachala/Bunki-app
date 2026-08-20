@@ -56,6 +56,8 @@ jobs:
                 prototypes/corridor/sw.js \
                 prototypes/corridor/icon-192.png \
                 prototypes/corridor/icon-512.png \
+                prototypes/corridor/fonts.css \
+                prototypes/corridor/fonts \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
                 prototypes/corridor/corridor-ink.js \
@@ -84,7 +86,7 @@ jobs:
           # curl, not node fetch: unconsumed keep-alive bodies trip an undici
           # internal assertion at process exit on some Node lines (seen live:
           # "assert(!this.paused)" AFTER every path had already printed 200)
-          for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
+          for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
                       'corridor-ink.js' 'dictionary-worker.js' \
                       'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
