@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-20 08:38",
+          "2026-08-20 11:19",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-20 08:43",
+          "2026-08-20 11:24",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-20 08:47",
+          "2026-08-20 11:28",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-28 08:37",
+          "2026-08-28 11:18",
           "8.30"
         ]
       ]
@@ -4820,118 +4820,6 @@
         "id": "entry-row"
       },
       {
-        "text": "選挙",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "代表",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "選ば",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "こと",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "受け",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "厳粛",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "職責",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "全身",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "全霊",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "もっ",
-        "w": 33,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "引き受け",
-        "w": 65,
-        "h": 44,
-        "hitW": 65,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "まい進",
-        "w": 49,
-        "h": 44,
-        "hitW": 49,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "し",
-        "w": 17,
-        "h": 44,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "tok content sentence-tok"
-      },
-      {
-        "text": "▹",
-        "w": 15,
-        "h": 16,
-        "hitW": 44,
-        "hitH": 44,
-        "id": "sent-door"
-      },
-      {
         "text": "厳しいeveryday sy",
         "w": 332,
         "h": 50,
@@ -7819,7 +7707,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 556,
+  "loadMs": 652,
   "summary": {
     "total": 224,
     "failed": 0
@@ -7848,7 +7736,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148.08999633789062,\"y\":570.25,\"productive\":true}"
+      "detail": "{\"x\":148,\"y\":570.280029296875,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7858,7 +7746,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 87px; mean tether 118 → 133px"
+      "detail": "centre moved 88px; mean tether 118 → 133px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7868,7 +7756,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "77 texts, ready in 556 ms"
+      "detail": "77 texts, ready in 652 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -8188,7 +8076,7 @@
     {
       "name": "every visible control is at least 44px",
       "pass": true,
-      "detail": "754 controls checked, including inline token hit regions"
+      "detail": "740 controls checked, including inline token hit regions"
     },
     {
       "name": "the page never scrolls sideways at 390px",
@@ -8378,7 +8266,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1787215114481,\"probe\",\"word:石鹸\",1,1]"
+      "detail": "row [1787224808410,\"probe\",\"word:屏風\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8403,7 +8291,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1787215119428,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1787224813049,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8498,12 +8386,12 @@
     {
       "name": "the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“石鹸” · 2 sentence lines · 3 live tokens"
+      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
     },
     {
       "name": "TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)",
       "pass": true,
-      "detail": "card-say present on “石鹸”"
+      "detail": "card-say present on “遺産”"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8623,12 +8511,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-23T08:39:25.698Z; due 2026-08-30T08:39:25.698Z"
+      "detail": "anchor held at 2026-08-23T11:21:08.628Z; due 2026-08-30T11:21:08.628Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1787215166898 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1787224869692 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8788,7 +8676,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-20T08:40:12.603Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-20T11:21:53.620Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8918,7 +8806,7 @@
     {
       "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
       "pass": true,
-      "detail": "row [1787215237381,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+      "detail": "row [1787224936915,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
     },
     {
       "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",

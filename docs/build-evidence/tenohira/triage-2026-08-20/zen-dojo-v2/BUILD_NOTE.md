@@ -75,3 +75,32 @@ are re-checkable.
   shown. Yuji Syuku ships kana chunks only (the reading is always kana).
 - The world-picker palettes still tint every other room; the zen room
   now keeps its own fixed night materials by design.
+
+## Round: one theme everywhere (operator law, same day)
+
+The operator's word: one world, one scheme, every room — nothing may
+change palette unprompted; verified 何度も何度も with screenshots. Done:
+
+- The dojo night is now each world's own: seven `--zen-*` tokens per
+  theme block (stage-deep/stage/crown/text/accent/red/glow), hand-derived
+  from that world's pigments. The v2 section consumes only vars — zero
+  fixed pigments remain; the card returned fully to the global --card-*
+  washi law. 青海波 became neutral white foam (identical in every night).
+- The sweep instrument caught the operator's exact bug in the act: the
+  body.zen --ground-0 override (placed for the pinned grade-row rule)
+  leaked stage color into dictionary sheets opened from the card, in all
+  ten worlds. Now scoped to the action rows alone; re-swept clean.
+- `tools/verify-theme-consistency.mjs` is permanent: 10 worlds ×
+  (shelf → tray → review front → back → sheet-from-card via the
+  sentence door), computed-color assertions against each world's own
+  tokens, screenshots into this directory. Battery after: corridor
+  224/224 · a11y 46/46 · integrity green · standalone rebuilt.
+
+## Round: the voices land (operator picks, same day)
+
+Roster (operator's ear, from the 11-candidate shootout): 小春音アミ
+PRIMARY · F1 (jvnv) · 四国めたん · ずんだもん · 玄野武宏 — the ≥4-voices
+law holds with a male voice in the room. Batch running: AMI all 8,407
+graded words + all curated sentences; the other four cover N5–N3; every
+word clip passes a g2p reading gate (mismatches re-synthesized from
+kana and marked); AAC 32k mono. Wiring ships when the batch completes.
