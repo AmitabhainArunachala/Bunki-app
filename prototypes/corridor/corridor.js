@@ -3758,7 +3758,13 @@ const readAloud = { on: false, timer: null, failed: false };
 try {
   if ('speechSynthesis' in window) {
     speechSynthesis.getVoices();
-    speechSynthesis.addEventListener?.('voiceschanged', () => speechSynthesis.getVoices());
+    speechSynthesis.addEventListener?.('voiceschanged', () => {
+      speechSynthesis.getVoices();
+      // the list often lands after the reader painted — repaint once so the
+      // voice picker appears without the learner leaving the room (never
+      // mid-read: a re-render would drop the ladder and the running voice)
+      if (S.view === 'reader' && !readAloud.on && !S.stack.length) render();
+    });
   }
 } catch {}
 
@@ -3771,15 +3777,32 @@ function stopReadAloud() {
   } catch {}
 }
 
-function bestJaVoice() {
+/** Device preference only — which installed voice reads aloud. NOT learner
+ * state: it lives beside the store, never inside it, like a display dial
+ * that belongs to the hardware rather than the learner. */
+const VOICE_PREF_KEY = 'kairo-voice-pref-v1';
+
+function jaVoices() {
   try {
-    const voices = speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja'));
-    if (!voices.length) return null;
-    const score = (v) => (/(premium|enhanced|siri)/i.test(v.name) ? 2 : 0) + (v.localService ? 1 : 0);
-    return voices.sort((a, b) => score(b) - score(a))[0];
+    return speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja'));
   } catch {
-    return null;
+    return [];
   }
+}
+
+function bestJaVoice() {
+  const voices = jaVoices();
+  if (!voices.length) return null;
+  // the operator's own pick outranks the guesswork (real-phone escalation,
+  // 2026-08-20: the default compact voice is unbearable — surface the
+  // better voices the device already holds)
+  try {
+    const pref = localStorage.getItem(VOICE_PREF_KEY);
+    const chosen = pref && voices.find((v) => v.voiceURI === pref);
+    if (chosen) return chosen;
+  } catch {}
+  const score = (v) => (/(premium|enhanced|siri|拡張)/i.test(v.name) ? 2 : 0) + (v.localService ? 1 : 0);
+  return [...voices].sort((a, b) => score(b) - score(a))[0];
 }
 
 /** Speak the passage sentence by sentence — short utterances keep 止める
@@ -3914,6 +3937,32 @@ function renderReader(main) {
     render();
   });
   listenRow.append(listen, listenNote);
+  // the device's other Japanese voices, surfaced (operator escalation,
+  // 2026-08-20): the compact default is the worst voice a phone holds —
+  // when better ones are installed, the hand picks; the choice is a device
+  // preference (its own key, never the learner store), and the next
+  // sentence already speaks with it because speakPassage re-resolves
+  const voiceChoices = jaVoices();
+  if (voiceChoices.length > 1) {
+    const pick = document.createElement('select');
+    pick.className = 'listen-voice';
+    pick.id = 'listen-voice';
+    pick.setAttribute('aria-label', tx('読み上げの声を選ぶ', 'choose the reading voice'));
+    const current = bestJaVoice();
+    for (const v of voiceChoices) {
+      const opt = document.createElement('option');
+      opt.value = v.voiceURI;
+      opt.textContent = v.name;
+      if (current && v.voiceURI === current.voiceURI) opt.selected = true;
+      pick.append(opt);
+    }
+    pick.addEventListener('change', () => {
+      try {
+        localStorage.setItem(VOICE_PREF_KEY, pick.value);
+      } catch {}
+    });
+    listenRow.append(pick);
+  }
   main.append(listenRow);
 
   const grammarHint = el('p', 'gesture-hint');
@@ -4465,7 +4514,9 @@ function renderTray(main) {
     if (ev.key === 'Enter') tryMake();
   });
   maker.append(nameField, makeBtn);
-  main.append(maker);
+  // the maker used to stand ABOVE the learner's own words — admin furniture
+  // before the daily object (operator, 2026-08-20). It now waits below the
+  // lists it makes; the sections loop appends it after the last row.
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   for (const sec of sections) {
     const head = el('p', 'eyebrow list-head');
@@ -4560,14 +4611,21 @@ function renderTray(main) {
       const line = el('div', 'tray-line');
       line.tabIndex = 0;
       line.setAttribute('role', 'button');
-      line.append(el('span', 'w', item.label));
-      // rows stored before the kind fields existed heal at render time
-      const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
-      const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
-      line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
-      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
-      line.append(el('span', 'when', srsWhen(item)));
       const key = srsKey(item.t, item.id);
+      line.append(el('span', 'w', item.label));
+      // a words list wearing a [word] chip on every row was chip noise
+      // (operator, 2026-08-20): the kind speaks only when it differs from
+      // the default. Rows stored before the kind fields existed still heal.
+      if (item.t !== 'word') {
+        const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
+        const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
+        line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
+      }
+      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
+      const when = el('span', 'when', srsWhen(item));
+      // red is for NOW — a whole column of red "due" was noise wearing urgency
+      if (dueKeys.has(key)) when.classList.add('due-now');
+      line.append(when);
       if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
         // a no-debt row (legacy or imported) wakes by hand: one quiet
         // affordance in the row itself, and only this press mints the card
@@ -4611,6 +4669,7 @@ function renderTray(main) {
       main.append(line);
     }
   }
+  main.append(maker);
 
   renderPortRow(main);
   renderNoteDoor(main);
@@ -7674,10 +7733,19 @@ function renderReview(main) {
     // would otherwise inflate the goodbye number
     const n = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
     main.append(el('h1', 'view-title', tx(`復習おわり — ${n} 件`, `Session done — ${n} card${n === 1 ? '' : 's'}`)));
+    // the close carries the session's seals, not grey chips: the same
+    // 再難良易 the thumb pressed, each with its count (operator, 2026-08-20:
+    // the ending felt like a scrap pile, not a close)
     const sum = el('div', 'review-summary');
-    const labels = { again: ['もう一度', 'again'], hard: ['難しい', 'hard'], good: ['ふつう', 'good'], easy: ['簡単', 'easy'] };
+    const seals = { again: ['再', 'もう一度', 'again'], hard: ['難', '難しい', 'hard'], good: ['良', 'ふつう', 'good'], easy: ['易', '簡単', 'easy'] };
     for (const key of ['again', 'hard', 'good', 'easy'])
-      if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
+      if (rv.done[key]) {
+        const cell = el('span', `sum-seal g-${key}`);
+        cell.setAttribute('aria-label', `${tx(seals[key][1], seals[key][2])} ${rv.done[key]}`);
+        cell.append(el('span', 'g-seal', seals[key][0]));
+        cell.append(el('span', 'sum-n', String(rv.done[key])));
+        sum.append(cell);
+      }
     main.append(sum);
     // the bounded sitting's honest remainder: what the freeze left for the
     // next sitting, said quietly, never queued behind the glass
@@ -7722,6 +7790,8 @@ function renderReview(main) {
       }
     }
     renderAiCoach(main, rv);
+    // one row of doors: the way on, and the way back one grade
+    const doors = el('div', 'close-doors');
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';
     out.addEventListener('click', () => {
@@ -7729,8 +7799,9 @@ function renderReview(main) {
       S.view = 'tray';
       render();
     });
-    main.append(out);
-    renderReviewUndo(main, rv);
+    doors.append(out);
+    renderReviewUndo(doors, rv);
+    main.append(doors);
     return;
   }
   // A re-inserted learning card may not have ripened yet. The nearest-ripening

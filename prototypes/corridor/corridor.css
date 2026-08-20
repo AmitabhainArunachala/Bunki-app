@@ -616,6 +616,19 @@ body.ginga #drift-layer #hint.first-cue {
   outline: 2px solid var(--ai, #2e4d6e);
   outline-offset: 1px;
 }
+/* the reading-voice picker beside 聞く — device voices, the hand's choice */
+.listen-voice {
+  min-height: 44px;
+  max-width: 46%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink, #23303f);
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 10px;
+}
+
 .search-page {
   max-width: 560px;
   margin: 4px auto 0;
@@ -1755,22 +1768,30 @@ button.tok::before {
 
 .tray-line {
   display: flex;
-  align-items: baseline;
-  gap: 9px;
+  align-items: center;
+  gap: 10px;
   border-top: 1px solid var(--line-soft);
-  padding: 12px 0;
+  padding: 13px 2px;
+  cursor: pointer;
+}
+.tray-line:active {
+  background: color-mix(in srgb, var(--ink, #222) 4%, transparent);
 }
 
 .tray-line .w {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .tray-line .when {
   margin-left: auto;
   font-size: 12px;
-  color: var(--red);
+  color: var(--ink-2);
   font-variant-numeric: tabular-nums;
+}
+/* red is for NOW — the rest of the schedule speaks quietly */
+.tray-line .when.due-now {
+  color: var(--red);
 }
 
 .inline-link {
@@ -2549,6 +2570,7 @@ body.v-depth-layered .inline-link {
 .listen-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* the voice picker joins the row without crushing it */
   gap: 10px;
   margin: 10px 0 0;
 }
@@ -4258,13 +4280,70 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .review-summary {
   display: flex;
-  gap: 8px;
-  margin: 6px 0 14px;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 20px;
   flex-wrap: wrap;
+}
+/* the close wears the session's own seals, each with its count */
+.sum-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.sum-seal .g-seal {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--seal-radius, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1;
+}
+.sum-seal .sum-n {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.sum-seal.g-again .g-seal {
+  color: var(--red);
+  border: 2px solid color-mix(in srgb, var(--red) 75%, transparent);
+  background: var(--red-wash);
+}
+.sum-seal.g-hard .g-seal {
+  color: var(--ink-2);
+  border: 2px solid var(--line);
+}
+.sum-seal.g-good .g-seal {
+  color: var(--ground-0, #fff);
+  border: 2px solid var(--red);
+  background: var(--red);
+}
+.sum-seal.g-easy .g-seal {
+  color: var(--ink);
+  border: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+.close-doors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.close-doors .take {
+  margin: 0;
+  flex: 1;
 }
 
 .review-undo {
   margin-top: 4px;
+}
+.close-doors .review-undo {
+  margin: 0;
+  flex: none;
 }
 
 /* --------------------------------------------------- the tutor (AI in-app) */
@@ -4853,22 +4932,29 @@ body.zen .review-example {
 
 /* the per-list review door on a list heading */
 .list-head .list-review {
+  /* a door, not a label: the filtered deck's one-tap review */
   margin-left: auto;
-  font-size: 11px;
-  padding: 3px 9px;
+  font-size: 12px;
+  padding: 6px 12px;
+  background: var(--ground-0, #fff);
+  border-radius: 999px;
 }
 
 .list-head {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 26px;
 }
 
 /* carrying the record: the export / import pair at the tray's foot */
 .port-row {
+  /* the utility foot: a hairline sets the record-keeping apart from the deck */
   display: flex;
   gap: 8px;
-  margin: 26px 0 0;
+  margin: 30px 0 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 18px;
 }
 
 /* ------------------------------------------------------- 字引 the finder
@@ -5569,10 +5655,14 @@ body.zen .focus-hud-end {
   letter-spacing: 0.06em;
 }
 
-/* ---- list management (覚える stage 2): inline maker, rename, armed delete */
+/* ---- list management (覚える stage 2): inline maker, rename, armed delete.
+ * The maker waits BELOW the learner's own words (operator, 2026-08-20). */
 .list-maker {
   display: flex;
   gap: 8px;
+  margin: 26px 0 0;
+}
+.list-maker.list-rename {
   margin: 10px 0 14px;
 }
 .list-maker-field {

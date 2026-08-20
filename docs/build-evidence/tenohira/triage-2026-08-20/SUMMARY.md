@@ -59,6 +59,42 @@ The five retained direct-save callers shifted lines with these edits;
 `residual-storage-callers.json` repins them — same five surfaces, same
 dispositions, same two export/import bypasses.
 
+## Round two, same day — "SRS is STILL sloppy. Take a look at it."
+
+Walked the whole SRS surface at 390×844 and judged it harshly. The card
+room was fixed in round one; the SURFACE AROUND it was the remaining
+slop, and the operator was right:
+
+- **The lists page led with admin furniture.** The new-list maker stood
+  ABOVE the learner's own words; export/import and the note door crowded
+  the same column. Order now: title → 復習する door → forecast → the
+  words themselves → maker → a hairlined utility foot.
+- **Chip noise.** Every row wore a `[word]` chip on a page that is
+  almost all words — the kind now speaks only when it differs from the
+  default. A full column of red "due now" wore urgency as decoration —
+  red now marks only what is due at this moment; the rest of the
+  schedule speaks in ink.
+- **"just these — 4" looked like a label.** It is the filtered-deck
+  door; it now reads as a button.
+- **The session close was a scrap pile.** Grey chips became the
+  session's own seals with counts (再難良易, the same hanko the thumb
+  pressed); leeches sit behind hairlines; リストへ and ひとつ戻す stand
+  in one doors row.
+
+## The voice, continued (operator: "the absolute worst voice possible")
+
+What round one shipped made the DEVICE voice speak — the compact default
+is genuinely poor. This round adds the voice picker (声 select beside
+聞く when the device holds more than one Japanese voice; the choice is a
+device preference in its own key, `kairo-voice-pref-v1`, never the
+learner store) and prefers enhanced/premium/拡張 voices. The real fix
+remains PR 五 / OD-6: every top-tier candidate (Chirp 3 HD, Azure,
+ElevenLabs) needs the operator's key — no key exists in this
+environment, and the free neural tier (VOICEVOX) could not be fetched
+this session (repo attach requires an approval that was not available).
+Typed to the operator, again, with the cost table already in
+`renkan/proposals/TTS_VOICES_PROPOSAL.md`.
+
 ## Evidence (this head, sequential runs)
 
 - corridor **223/223** · a11y **46/46** · storage-integrity **green** ·
