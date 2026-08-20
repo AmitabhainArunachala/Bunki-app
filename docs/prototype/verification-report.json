@@ -22,8 +22,8 @@
         "node": "word:年",
         "headword": "年",
         "reading": "とし",
-        "gloss": "yearageyearspast one's primeold age",
-        "senses": 5,
+        "gloss": "year",
+        "senses": 3,
         "kanjiRows": [
           "年"
         ],
@@ -149,25 +149,25 @@
         [
           "もう一度again",
           "in 1 min",
-          "2026-08-20 11:19",
+          "2026-08-20 17:21",
           "0.21"
         ],
         [
           "難しいhard",
           "in 6 min",
-          "2026-08-20 11:24",
+          "2026-08-20 17:26",
           "1.29"
         ],
         [
           "ふつうgood",
           "in 10 min",
-          "2026-08-20 11:28",
+          "2026-08-20 17:30",
           "2.31"
         ],
         [
           "簡単easy",
           "in 8 d",
-          "2026-08-28 11:18",
+          "2026-08-28 17:20",
           "8.30"
         ]
       ]
@@ -7707,7 +7707,7 @@
     "idioms": 900,
     "semHeads": 82
   },
-  "loadMs": 652,
+  "loadMs": 491,
   "summary": {
     "total": 224,
     "failed": 0
@@ -7736,7 +7736,7 @@
     {
       "name": "Phase 2 · a kanji word stands in the field to bloom",
       "pass": true,
-      "detail": "{\"x\":148,\"y\":570.280029296875,\"productive\":true}"
+      "detail": "{\"x\":147.69000244140625,\"y\":570.5900268554688,\"productive\":true}"
     },
     {
       "name": "bloom · the constellation is its own relief — three colour families",
@@ -7746,7 +7746,7 @@
     {
       "name": "bloom · dragging the centre carries the whole constellation — and sticks",
       "pass": true,
-      "detail": "centre moved 88px; mean tether 118 → 133px"
+      "detail": "centre moved 89px; mean tether 118 → 133px"
     },
     {
       "name": "bloom · a water tap releases the constellation",
@@ -7756,7 +7756,7 @@
     {
       "name": "the shelf renders real graded texts",
       "pass": true,
-      "detail": "77 texts, ready in 652 ms"
+      "detail": "77 texts, ready in 491 ms"
     },
     {
       "name": "every text carries an English title and a learner-readable level",
@@ -7956,7 +7956,7 @@
     {
       "name": "the dictionary carries every sense, most common first",
       "pass": true,
-      "detail": "年: 5 senses"
+      "detail": "年: 3 senses"
     },
     {
       "name": "semantic neighbours carry their discrimination notes",
@@ -8114,9 +8114,9 @@
       "detail": "rendered after reload: true"
     },
     {
-      "name": "reader · the 聞く door stands, names its interim voice, and answers a tap honestly",
+      "name": "reader · the 聞く door stands, names its voice honestly, and answers a tap",
       "pass": true,
-      "detail": "before {\"pressed\":\"false\",\"note\":\"interim device voice, for now\"} → after {\"pressed\":\"false\",\"note\":\"no Japanese voice on this device yet\"}"
+      "detail": "before {\"pressed\":\"false\",\"note\":\"read by Koharune Ami\"} → after {\"pressed\":\"false\",\"note\":\"no Japanese voice on this device yet\"}"
     },
     {
       "name": "the variant strip exposes all four open decisions, the v1.1 depth toggle and the drift tap ladder",
@@ -8266,7 +8266,7 @@
     {
       "name": "a missed probe mints the card and logs one row — never FSRS state",
       "pass": true,
-      "detail": "row [1787224808410,\"probe\",\"word:屏風\",1,1]"
+      "detail": "row [1787246509404,\"probe\",\"word:醤油\",1,1]"
     },
     {
       "name": "dojo · a taken card keeps its honest next-due intervals",
@@ -8291,7 +8291,7 @@
     {
       "name": "dojo · the practice row lands in the observation ledger with its room",
       "pass": true,
-      "detail": "row [1787224813049,\"dojo\",\"kanji:一\",3,\"kanji\"]"
+      "detail": "row [1787246513988,\"dojo\",\"kanji:一\",3,\"kanji\"]"
     },
     {
       "name": "the stack opens: hundreds of articles, year-folded, rights named",
@@ -8386,12 +8386,12 @@
     {
       "name": "the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any",
       "pass": true,
-      "detail": "“遺産” · 3 sentence lines · 34 live tokens"
+      "detail": "“醤油” · 2 sentence lines · 11 live tokens"
     },
     {
       "name": "TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)",
       "pass": true,
-      "detail": "card-say present on “遺産”"
+      "detail": "card-say present on “醤油”"
     },
     {
       "name": "R2-B · the sheet seal wears taken-state where 覚える was taken",
@@ -8511,12 +8511,12 @@
     {
       "name": "R2-A · a backward device clock cannot crash or corrupt grading",
       "pass": true,
-      "detail": "anchor held at 2026-08-23T11:21:08.628Z; due 2026-08-30T11:21:08.628Z"
+      "detail": "anchor held at 2026-08-23T17:22:37.505Z; due 2026-08-30T17:22:37.505Z"
     },
     {
       "name": "R2-A · the revlog keeps the raw press time and a clamped, non-negative elapsed",
       "pass": true,
-      "detail": "t=1787224869692 (raw, before the anchor) · elapsed=0"
+      "detail": "t=1787246558441 (raw, before the anchor) · elapsed=0"
     },
     {
       "name": "R2-A · an ordinary sitting freezes at most 20 due IDs and counts the rest",
@@ -8676,7 +8676,7 @@
     {
       "name": "R3-D · the 読み込む door installs the optimizer output into the live scheduler",
       "pass": true,
-      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-20T11:21:53.620Z"
+      "detail": "custom=true · basedOnReviews=500 · bunki-fsrs6-r090-personal-v1 @ 2026-08-20T17:23:20.465Z"
     },
     {
       "name": "R3-D · the entry footer says the truth about the weights in force",
@@ -8806,7 +8806,7 @@
     {
       "name": "R4-B · the lap-two grade is evidence only — schedules byte-still, one dojo row naming the due room",
       "pass": true,
-      "detail": "row [1787224936915,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
+      "detail": "row [1787246621926,\"dojo\",\"word:学校\",3,\"due\"] · revlog 2"
     },
     {
       "name": "R4-B · a reload later, the quiz stands where it stood — question two, running score kept",

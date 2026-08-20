@@ -69,6 +69,9 @@ jobs:
                 prototypes/corridor/design \
                 "$SITE"/
 
+          # the recorded voices ride along when the branch carries them
+          if [ -d prototypes/corridor/audio ]; then cp -r prototypes/corridor/audio "$SITE"/; fi
+
           # One app means one landing: any missed path returns to the front door.
           cp prototypes/corridor/index.html "$SITE/404.html"
 

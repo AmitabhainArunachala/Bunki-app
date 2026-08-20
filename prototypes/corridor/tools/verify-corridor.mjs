@@ -1297,8 +1297,9 @@ async function main() {
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
     note: document.querySelector('#listen-note')?.textContent ?? '',
   })`);
-  check('reader · the 聞く door stands, names its interim voice, and answers a tap honestly',
-    listenBefore.pressed === 'false' && /仮の声|interim device voice/.test(listenBefore.note) &&
+  check('reader · the 聞く door stands, names its voice honestly, and answers a tap',
+    listenBefore.pressed === 'false' &&
+      /仮の声|interim device voice|小春音アミ|Koharune Ami/.test(listenBefore.note) &&
       (listenAfter.pressed === 'true' || /声が見つからない|no Japanese voice/.test(listenAfter.note)),
     `before ${JSON.stringify(listenBefore)} → after ${JSON.stringify(listenAfter)}`);
 

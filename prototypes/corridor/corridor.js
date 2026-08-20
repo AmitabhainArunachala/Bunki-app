@@ -3772,6 +3772,7 @@ function stopReadAloud() {
   if (!readAloud.on) return;
   readAloud.on = false;
   clearTimeout(readAloud.timer);
+  stopRecAudio();
   try {
     speechSynthesis.cancel();
   } catch {}
@@ -3808,6 +3809,46 @@ function bestJaVoice() {
 /** Speak the passage sentence by sentence — short utterances keep 止める
  * responsive and survive the platform's long-utterance truncation. */
 function speakPassage(p, onDone) {
+  // the recorded reader first: アミ reads the curated shelf sentence by
+  // sentence from static files; the device voice remains the offline floor
+  ensureRecManifest().then((m) => {
+    const rec = m && m.sentences ? m.sentences[p.id] : null;
+    if (readAloud.on && rec && rec.have && rec.have.length) {
+      let i = 0;
+      const next = () => {
+        if (!readAloud.on || i >= rec.have.length) {
+          if (readAloud.on) {
+            readAloud.on = false;
+            onDone();
+          }
+          return;
+        }
+        const ix = String(rec.have[i]).padStart(3, '0');
+        playRecClip(`audio/s/ami/${p.id.replace(':', '_')}-${ix}.m4a`, null).then((played) => {
+          if (!played) {
+            // a browser without the codec (or a missing file) must not leave
+            // the reader silent: the very first clip failing hands the whole
+            // passage to the device voice; a mid-passage failure stops honestly
+            if (i === 0 && readAloud.on) {
+              speakPassageTts(p, onDone);
+              return;
+            }
+            readAloud.on = false;
+            onDone();
+            return;
+          }
+          i += 1;
+          readAloud.timer = setTimeout(next, 260);
+        });
+      };
+      next();
+      return;
+    }
+    if (readAloud.on) speakPassageTts(p, onDone);
+  });
+}
+
+function speakPassageTts(p, onDone) {
   const text = (p.text || '').replace(/\s+/g, ' ').trim();
   const sentences = text.match(/[^。！？]+[。！？]?/g) || [];
   let i = 0;
@@ -3844,10 +3885,108 @@ function speakPassage(p, onDone) {
   next();
 }
 
-/** 音 — the answer card's voice door. One tap speaks; a retap restarts;
- * cancel() first so it is always the only voice. State rides two classes,
- * color-only — no spinner, no motion noise. */
-function speakCardReading(text, btn) {
+/* ------------------------------------------------ 収録の声 the recorded voice
+ * The operator's roster (2026-08-20, their ear on an 11-candidate
+ * shootout): 小春音アミ PRIMARY · F1 · 四国めたん · ずんだもん · 玄野武宏.
+ * Real neural recordings shipped as static files (audio/manifest.json +
+ * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/) — the device TTS is
+ * demoted to offline fallback. The chosen voice is a device preference in
+ * its own key, never the learner store. Licences ride audio/LICENCES.md. */
+const REC_VOICE_KEY = 'kairo-rec-voice-v1';
+const REC_ROSTER = ['ami', 'f1', 'metan', 'zundamon', 'takehiro'];
+let recManifest; // undefined = not asked · null = absent · object = loaded
+let recManifestWait = null;
+let recAudioEl = null;
+
+function recVoicePref() {
+  try {
+    const v = localStorage.getItem(REC_VOICE_KEY);
+    return REC_ROSTER.includes(v) ? v : 'ami';
+  } catch {
+    return 'ami';
+  }
+}
+
+function ensureRecManifest() {
+  // the flag is stamped into index.html by the audio ship itself: a build
+  // without audio never fetches, so no probe ever sees a 404 in the console
+  // (typeof-guarded: the integrity suite runs this file in a windowless VM)
+  if (typeof window === 'undefined' || !window.__KAIRO_AUDIO__) {
+    recManifest = null;
+    return Promise.resolve(null);
+  }
+  if (recManifest !== undefined) return Promise.resolve(recManifest);
+  if (!recManifestWait) {
+    recManifestWait = fetch('audio/manifest.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((m) => {
+        recManifest = m && m.v ? m : null;
+        return recManifest;
+      });
+  }
+  return recManifestWait;
+}
+
+function stopRecAudio() {
+  if (recAudioEl) {
+    try {
+      recAudioEl.pause();
+    } catch {}
+    recAudioEl = null;
+  }
+}
+// warm the manifest at boot so the reader's first render already knows
+// whether the roster exists (absent → device fallback, quiet)
+if (typeof window !== 'undefined') ensureRecManifest();
+
+/** Play one recorded clip; resolves true when it actually played. */
+function playRecClip(src, btn) {
+  return new Promise((done) => {
+    stopRecAudio();
+    const a = new Audio(src);
+    recAudioEl = a;
+    const off = () => {
+      if (btn) btn.classList.remove('is-speaking');
+      if (recAudioEl === a) recAudioEl = null;
+    };
+    a.onplay = () => btn && btn.classList.add('is-speaking');
+    a.onended = () => {
+      off();
+      done(true);
+    };
+    a.onerror = () => {
+      off();
+      done(false);
+    };
+    a.play().catch(() => {
+      off();
+      done(false);
+    });
+  });
+}
+
+/** 音 — the answer card's voice door. The roster's recorded clip when the
+ * word has one (pref voice → アミ fallback), the device voice only when no
+ * recording exists. One tap speaks; a retap restarts. */
+function speakCardReading(text, btn, word) {
+  ensureRecManifest().then((m) => {
+    const entry = m && word && m.words ? m.words[word] : null;
+    if (entry) {
+      const pref = recVoicePref();
+      const voice = entry.voices.includes(pref) ? pref : entry.voices.includes('ami') ? 'ami' : entry.voices[0];
+      if (voice) {
+        playRecClip(`audio/w/${voice}/${entry.id}.m4a`, btn).then((played) => {
+          if (!played) speakCardReadingTts(text, btn);
+        });
+        return;
+      }
+    }
+    speakCardReadingTts(text, btn);
+  });
+}
+
+function speakCardReadingTts(text, btn) {
   if (!('speechSynthesis' in window) || !text) return;
   try {
     speechSynthesis.cancel();
@@ -3960,26 +4099,54 @@ function renderReader(main) {
   // when better ones are installed, the hand picks; the choice is a device
   // preference (its own key, never the learner store), and the next
   // sentence already speaks with it because speakPassage re-resolves
-  const voiceChoices = jaVoices();
-  if (voiceChoices.length > 1) {
+  if (recManifest) {
+    // the roster: which recorded voice speaks the WORDS (sentences are
+    // always アミ, the primary — the one voice that recorded the shelf)
+    const names = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
     const pick = document.createElement('select');
     pick.className = 'listen-voice';
     pick.id = 'listen-voice';
-    pick.setAttribute('aria-label', tx('読み上げの声を選ぶ', 'choose the reading voice'));
-    const current = bestJaVoice();
-    for (const v of voiceChoices) {
+    pick.setAttribute('aria-label', tx('語の声を選ぶ', 'choose the word voice'));
+    for (const v of REC_ROSTER) {
       const opt = document.createElement('option');
-      opt.value = v.voiceURI;
-      opt.textContent = v.name;
-      if (current && v.voiceURI === current.voiceURI) opt.selected = true;
+      opt.value = v;
+      opt.textContent = names[v] || v;
+      if (v === recVoicePref()) opt.selected = true;
       pick.append(opt);
     }
     pick.addEventListener('change', () => {
       try {
-        localStorage.setItem(VOICE_PREF_KEY, pick.value);
+        localStorage.setItem(REC_VOICE_KEY, pick.value);
       } catch {}
     });
     listenRow.append(pick);
+    // the roster's name never papers over a real failure: after a device
+    // that could play nothing, the honest no-voice note stands
+    if (recManifest.sentences && recManifest.sentences[p.id] && !readAloud.failed) {
+      listenNote.textContent = readAloud.on ? tx('アミが読んでいます', 'Ami is reading') : tx('小春音アミの声', 'read by Koharune Ami');
+    }
+  } else {
+    const voiceChoices = jaVoices();
+    if (voiceChoices.length > 1) {
+      const pick = document.createElement('select');
+      pick.className = 'listen-voice';
+      pick.id = 'listen-voice';
+      pick.setAttribute('aria-label', tx('読み上げの声を選ぶ', 'choose the reading voice'));
+      const current = bestJaVoice();
+      for (const v of voiceChoices) {
+        const opt = document.createElement('option');
+        opt.value = v.voiceURI;
+        opt.textContent = v.name;
+        if (current && v.voiceURI === current.voiceURI) opt.selected = true;
+        pick.append(opt);
+      }
+      pick.addEventListener('change', () => {
+        try {
+          localStorage.setItem(VOICE_PREF_KEY, pick.value);
+        } catch {}
+      });
+      listenRow.append(pick);
+    }
   }
   main.append(listenRow);
 
@@ -7952,7 +8119,7 @@ function renderReview(main) {
       say.setAttribute('aria-label', tx('読み上げ — 仮の声', 'speak the reading (interim device voice)'));
       say.innerHTML =
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
-      say.addEventListener('click', () => speakCardReading(spoken, say));
+      say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
       row.append(say);
     }
     if (row.childNodes.length) face.append(row);
