@@ -9043,7 +9043,22 @@ function renderSentenceTokens(container, tokens, opts = {}) {
   const glossed = new Set();
   tokens.forEach((token, index) => {
     if (!token.c || !token.f?.length) {
-      container.append(document.createTextNode(token.s));
+      // 禁則処理 — a line must never open with a closing mark. WebKit
+      // breaks between an atomic token box (the inline-flex word button)
+      // and the text run after it, so a bare 、 could start a line
+      // (operator's real-phone screenshot, 2026-08-20). A mark that is
+      // nothing but clinging punctuation is glued to the box it follows
+      // inside one no-break span; ordinary text keeps native flow, where
+      // the browser's own kinsoku already holds.
+      const textNode = document.createTextNode(token.s);
+      const prev = container.lastChild;
+      if (prev && prev.nodeType === 1 && /^[、。，．！？」』）〉》〕］｝ー〜…‥・]+$/.test(token.s)) {
+        const glue = el('span', 'kinsoku-glue');
+        container.replaceChild(glue, prev);
+        glue.append(prev, textNode);
+        return;
+      }
+      container.append(textNode);
       return;
     }
     const isTarget = target && token.b === target;

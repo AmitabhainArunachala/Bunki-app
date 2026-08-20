@@ -860,6 +860,9 @@ body.ginga #drift-layer #hint.first-cue {
 .focus-hud-end {
   padding: 6px 14px;
   font-size: 13px;
+  /* the door's word stays on one line: a squeezed 終わる collapsed into a
+   * vertical strand of characters (operator's real phone, 2026-08-20) */
+  white-space: nowrap;
   color: #fcfbf6;
   background: rgba(255, 255, 255, 0.16);
   border: none;
@@ -1127,6 +1130,11 @@ button.tok::before {
 .token-door {
   position: relative;
   display: inline;
+}
+
+/* 禁則処理 — a word box and the closing mark after it wrap as one */
+.kinsoku-glue {
+  white-space: nowrap;
 }
 
 .tok:focus-visible {
@@ -5508,7 +5516,9 @@ body.zen .review-face {
   flex: 0 1 auto;
   width: 100%;
   max-width: 440px;
-  min-height: min(50vh, 420px);
+  /* the paper hugs its word: 50vh left a one-word card floating in a sea
+   * of empty sheet on a tall phone (operator's real phone, 2026-08-20) */
+  min-height: min(36vh, 340px);
   /* block-auto margins centre the sheet in the free space and push the
    * action zone to the bottom edge — the stage's middle zone */
   margin: auto;
@@ -5615,10 +5625,20 @@ body.zen .variants-bar {
 }
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {
+  /* one quiet top line, not a pill floating mid-air: the clock holds the
+   * centre and the way out stands in the right corner — the same corner
+   * as plain review's ×, so the hand already knows it (operator's real
+   * phone, 2026-08-20: the shrink-wrapped pill crushed 終わる into a
+   * vertical strand beside the clock) */
+  top: calc(4px + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  transform: none;
   background: transparent;
   border: 0;
   box-shadow: none;
-  padding: calc(6px + env(safe-area-inset-top)) 54px 0;
+  padding: 0 54px;
+  min-height: var(--tap);
   justify-content: center;
   gap: 10px;
 }
@@ -5629,8 +5649,15 @@ body.zen .focus-hud-left {
   color: var(--faint);
   font-size: 13px;
   letter-spacing: 0.14em;
+  min-height: var(--tap);
+  align-items: center;
 }
 body.zen .focus-hud-end {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
   border: 0;
   background: transparent;
   color: var(--faint);

@@ -95,7 +95,41 @@ this session (repo attach requires an approval that was not available).
 Typed to the operator, again, with the cost table already in
 `renkan/proposals/TTS_VOICES_PROPOSAL.md`.
 
-## Evidence (this head, sequential runs)
+## Round three, same day — the operator's own screenshot
+
+The operator sent the dojo mid-block from their real phone: "It's still
+terrible — are you looking at the screenshots?" Looking closely at THEIR
+frame found three defects the staged shots had missed (rounds one and two
+never staged a RUNNING focus block):
+
+- **終わる crushed into a vertical strand.** The focus HUD is a fixed
+  shrink-wrapped pill; zen stripped its chrome but kept the shrink-wrap,
+  and the end button collapsed to 48px — its label wrapped character by
+  character beside the clock. Measured and reproduced at 430×932. The
+  zen HUD is now one full-width quiet top line: clock centred, 終わる
+  whole (white-space: nowrap, also applied to the base pill) in the
+  right corner — the same corner as plain review's ×.
+- **A line began with 、.** In renderSentenceTokens, content words are
+  atomic inline-flex buttons and punctuation rides as bare text; WebKit
+  breaks between the atom and the text run, so a clinging mark could
+  open a line — 禁則処理 violated on the operator's cloze card. A token
+  that is nothing but clinging punctuation is now glued to the box it
+  follows in one no-break span (`.kinsoku-glue`); ordinary text keeps
+  native flow. Covers 用例, the 文 page, and both review faces; the
+  reader body has its own token path and should be audited for the same
+  break (named, not done here).
+- **A sea of empty paper.** The sheet's min-height (50vh) left one word
+  floating in a huge card on a tall phone; it now hugs its content
+  (min(36vh, 340px)) and still centres on the stage.
+
+Round-three runs: corridor 223/223 · a11y 46/46 · storage-integrity
+green (ledger repinned for the line shifts) · standalone regenerated.
+Honest note: the first corridor run of this round threw once in the
+R3-D import-door probe (`waitForSelector('#import-file')`) before that
+station's checks ran; the immediate rerun passed 223/223 with no code
+change. One rerun, recorded, not hidden.
+
+## Evidence (rounds one and two, sequential runs)
 
 - corridor **223/223** · a11y **46/46** · storage-integrity **green** ·
   drift fast **52/52 · 0 violations** — all on the final bytes (see the
