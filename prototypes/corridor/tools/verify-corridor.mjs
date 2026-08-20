@@ -2840,12 +2840,18 @@ async function main() {
       Math.abs(backToShelf.y - shelfYKept) <= 20,
     `view=${backToShelf.view} y=${backToShelf.y} (kept ${shelfYKept})`);
 
-  // (d) the 銀河 search session survives a result round-trip: query, results,
-  // and focus on the row that was left
+  // (d) the search room (operator, 2026-08-20: search is its own page) —
+  // the bar's door opens it, and the session survives a result round-trip:
+  // query, results, and focus on the row that was left
   await open('');
   await page.waitForTimeout(1600);
   await page.tap('.nav-symbol');
+  await page.waitForSelector('#nav-search-door');
+  await page.tap('#nav-search-door');
   await page.waitForSelector('#nav-search-input');
+  const searchRoom = await page.evaluate(`document.body.dataset.view`);
+  check('R3-B · the bar’s search door opens the search room, a page of its own',
+    searchRoom === 'search', `view=${searchRoom}`);
   await page.locator('#nav-search-input').fill('水');
   await page.waitForSelector('.nav-search-row', { timeout: 10000 });
   const rowsBefore = await page.locator('.nav-search-row').count();
@@ -2860,12 +2866,21 @@ async function main() {
     sheet: !!document.querySelector('#sheet'),
     q: document.getElementById('nav-search-input')?.value ?? null,
     rows: document.querySelectorAll('.nav-search-row').length,
-    focusInSearch: !!document.activeElement?.closest?.('.nav-search'),
+    focusInSearch: !!document.activeElement?.closest?.('.search-page'),
   })`);
-  check('R3-B · the nav-search session survives the round trip — query, results, focus',
-    navRound.sameDocument && navRound.view === 'drift' && !navRound.sheet &&
+  check('R3-B · the search-room session survives the round trip — query, results, focus',
+    navRound.sameDocument && navRound.view === 'search' && !navRound.sheet &&
       navRound.q === '水' && navRound.rows >= 1 && navRound.focusInSearch,
     `${JSON.stringify(navRound)} (rows before: ${rowsBefore})`);
+  // …and Back from the room itself returns to the galaxy its door stands in
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const searchHome = await page.evaluate(`({
+    sameDocument: window.__r3bNav === 1,
+    view: document.body.dataset.view,
+  })`);
+  check('R3-B · Back from the search room lands on the galaxy',
+    searchHome.sameDocument && searchHome.view === 'drift', JSON.stringify(searchHome));
 
   check('R3-B · the walks leave no console errors',
     consoleErrors.length === errsBeforeR3B,

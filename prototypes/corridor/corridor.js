@@ -402,13 +402,15 @@ const S = {
   // top bar and the two corner bubbles. fwd holds a single forward step so the
   // bar's ▸ arrow can undo a back().
   navOpen: false,
-  /** The 銀河 search session. The bar's input node dies with every render, so
-   * the query lives here; navReturn marks a departure THROUGH a result, and
-   * the walk back (in-app or device Back) reopens the bar — query, results,
-   * and focus on the row you left from. A deliberate dismissal (scrim, the
-   * symbol) clears both. Session-only, never persisted. */
+  /** The search session. The room's input node dies with every render, so
+   * the query lives here; a result round-trip returns to the room with the
+   * query, the rows, and the row that was left. Back out of the room ends
+   * the session. Session-only, never persisted. */
   navQ: '',
-  navReturn: false,
+  /** 検索の間 — the search page (operator, 2026-08-20): search is a room of
+   * its own, not a strip squeezed into the bar. searchFrom remembers the
+   * view the door was opened from so Back returns there. Session-only. */
+  searchFrom: null,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
@@ -2425,7 +2427,6 @@ function back() {
   }
   if (S.navOpen) {
     S.navOpen = false;
-    S.navReturn = false;
     render();
     return;
   }
@@ -2436,12 +2437,6 @@ function back() {
   }
   if (S.stack.length) {
     S.stack.pop();
-    if (!S.stack.length) {
-      // a sheet opened from a 銀河 search result closes back INTO the search:
-      // the bar reopens with its query, results, and the row that was left
-      if (S.view === 'drift' && S.navReturn) S.navOpen = true;
-      S.navReturn = false;
-    }
     render();
     if (!S.stack.length) {
       returnScroll();
@@ -2495,6 +2490,17 @@ function back() {
     // the shelf gets its place back — its archive door stands ~20,000px deep,
     // and losing that offset dumped the learner at the top of 70 cards
     window.scrollTo(0, S.shelfScroll);
+    return;
+  }
+  // the search room returns to the view its door was opened from — and
+  // leaving the room is a deliberate dismissal: the session ends with it
+  if (S.view === 'search') {
+    const home = S.searchFrom;
+    S.searchFrom = null;
+    S.navQ = '';
+    S.view = typeof home === 'string' && home && home !== 'search' ? home : 'drift';
+    render();
+    if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
@@ -2558,9 +2564,6 @@ function dismissSheet() {
   S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
-  // Escape/scrim from a result's sheet walks back into the search too
-  if (S.view === 'drift' && S.navReturn) S.navOpen = true;
-  S.navReturn = false;
   render();
   returnScroll();
   restoreDialogInvoker();
@@ -3747,7 +3750,17 @@ function glossaryCrossRefPlan(p) {
  * that truth on its face (仮の声). Word-level audio stays absent until a
  * judged voice ships: a lone word's pitch teaches, a read-along sentence
  * carries its own context. Nothing here writes learner state. */
-const readAloud = { on: false, timer: null };
+const readAloud = { on: false, timer: null, failed: false };
+
+// Warm the voice list at boot: iOS and Android hand it over asynchronously,
+// and a getVoices() call is what starts the delivery — without this the
+// first tap on 聞く sees an empty list and a real phone stays silent.
+try {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.getVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', () => speechSynthesis.getVoices());
+  }
+} catch {}
 
 function stopReadAloud() {
   if (!readAloud.on) return;
@@ -3774,7 +3787,6 @@ function bestJaVoice() {
 function speakPassage(p, onDone) {
   const text = (p.text || '').replace(/\s+/g, ' ').trim();
   const sentences = text.match(/[^。！？]+[。！？]?/g) || [];
-  const voice = bestJaVoice();
   let i = 0;
   const next = () => {
     if (!readAloud.on || i >= sentences.length) {
@@ -3785,7 +3797,11 @@ function speakPassage(p, onDone) {
       return;
     }
     const u = new SpeechSynthesisUtterance(sentences[i]);
+    // lang alone is enough for the platform to pick its Japanese voice; the
+    // explicit pick (re-resolved per sentence, since the list arrives late on
+    // phones) only upgrades it to the best one installed
     u.lang = 'ja-JP';
+    const voice = bestJaVoice();
     if (voice) u.voice = voice;
     u.rate = 0.92;
     u.onend = () => {
@@ -3793,8 +3809,11 @@ function speakPassage(p, onDone) {
       // a breath between sentences, the way a reader breathes
       readAloud.timer = setTimeout(next, 260);
     };
-    u.onerror = () => {
+    u.onerror = (e) => {
+      const wasOn = readAloud.on;
       readAloud.on = false;
+      // cancel() surfaces here on some engines — a stop is not a failure
+      if (wasOn && e?.error !== 'canceled' && e?.error !== 'interrupted') readAloud.failed = true;
       onDone();
     };
     speechSynthesis.speak(u);
@@ -3868,21 +3887,26 @@ function renderReader(main) {
   listen.setAttribute('aria-pressed', String(readAloud.on));
   const listenNote = el('span', 'listen-note');
   listenNote.id = 'listen-note';
-  listenNote.textContent = readAloud.on ? tx('仮の声で読んでいます', 'reading in the interim device voice') : tx('仮の声 — 検収前', 'interim device voice, for now');
+  listenNote.textContent = readAloud.on
+    ? tx('仮の声で読んでいます', 'reading in the interim device voice')
+    : readAloud.failed
+      ? tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet')
+      : tx('仮の声 — 検収前', 'interim device voice, for now');
   listen.addEventListener('click', () => {
     if (readAloud.on) {
       stopReadAloud();
       render();
       return;
     }
-    if (!('speechSynthesis' in window) || (!speechSynthesis.getVoices().length && !bestJaVoice())) {
-      // voices arrive async on some platforms: one honest retry, then the truth
-      listenNote.textContent = tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet');
-      try {
-        speechSynthesis.getVoices();
-      } catch {}
-      if (!bestJaVoice()) return;
+    if (!('speechSynthesis' in window)) {
+      listenNote.textContent = tx('この端末は読み上げに対応していない', 'this device cannot read aloud');
+      return;
     }
+    // An empty getVoices() list is NOT "no voice" — phones deliver the list
+    // asynchronously, and gating on it kept every first tap silent. Speak:
+    // u.lang picks the platform's Japanese voice even before the list lands,
+    // and a genuine failure surfaces through readAloud.failed instead.
+    readAloud.failed = false;
     readAloud.on = true;
     speakPassage(p, () => {
       if (S.view === 'reader') render();
@@ -12750,20 +12774,36 @@ function buildLangSlider() {
   return seg;
 }
 
-/** The search field lives inside the bar; results drop in place, opening the
- * same entry sheets as everywhere. It updates its own results node directly so
- * a keystroke never triggers a full re-render (which would drop focus). */
-function buildNavSearch() {
-  const wrap = el('div', 'nav-search');
-  const input = el('input', 'nav-search-input');
+/** 検索の間 — search as its own room (operator, 2026-08-20). The bar used to
+ * squeeze a field to ~71px and drop results over the galaxy; now the bar
+ * holds a door, and the door opens a full page: one big box, roomy result
+ * rows, the same entry sheets as everywhere. The page updates its own
+ * results node directly so a keystroke never triggers a full re-render
+ * (which would drop focus), and S.navQ carries the session so a result
+ * round-trip returns to the query, the rows, and the row that was left. */
+function openSearchPage() {
+  S.searchFrom = S.view;
+  S.navOpen = false;
+  keepScroll();
+  S.view = 'search';
+  render();
+}
+
+function renderSearchPage(main) {
+  main.append(withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
+  const wrap = el('div', 'search-page');
+  const input = el('input', 'nav-search-input search-page-input');
   input.type = 'search';
   input.id = 'nav-search-input';
-  // the bar squeezes this input to ~71px on a 390px phone — a long
-  // placeholder truncated to "searc" (P2, review); 検索 fits at any width
-  // and the aria-label keeps the bilingual name
-  input.placeholder = '検索';
+  input.placeholder = tx('ことばをさがす', 'kanji · kana · romaji · English');
   input.setAttribute('aria-label', tx('検索', 'search'));
-  const results = el('div', 'nav-search-results');
+  input.autocomplete = 'off';
+  const hint = el(
+    'p',
+    'search-page-hint',
+    tx('漢字・かな・ローマ字・英語 — 四つの戸、一つの箱。', 'One box, four doors — kanji, kana, romaji, or English.'),
+  );
+  const results = el('div', 'search-page-results');
   const paint = () => {
     // the deep tier repaints these rows when its worker batch settles; if a
     // row holds focus at that moment (a restored session, or a keyboard
@@ -12772,8 +12812,9 @@ function buildNavSearch() {
     const focusIx = focusedRow && results.contains(focusedRow) ? focusedRow.dataset.ix : null;
     results.textContent = '';
     const q = input.value.trim();
+    hint.hidden = !!q;
     if (!q) return;
-    const hits = searchResults(q).slice(0, 8);
+    const hits = searchResults(q).slice(0, 24);
     if (!hits.length) {
       results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
       return;
@@ -12788,11 +12829,10 @@ function buildNavSearch() {
       if (e.g) stack.append(el('span', 'nsr-gloss', e.g));
       row.append(stack);
       row.addEventListener('click', () => {
-        // leaving THROUGH a result keeps the session: the walk back reopens
-        // the bar with this query, these results, and focus on this row
+        // leaving THROUGH a result keeps the session: the sheet opens over
+        // this room, and the walk back lands on this query, these rows,
+        // and focus on this row
         S.navQ = input.value;
-        S.navReturn = true;
-        S.navOpen = false;
         go(
           e.seq
             ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
@@ -12829,14 +12869,23 @@ function buildNavSearch() {
       if (first) first.click();
     }
   });
-  wrap.append(input, results);
+  wrap.append(input, hint, results);
   // a surviving session repaints in place — same query, same rows
   if (S.navQ) {
     input.value = S.navQ;
     if (S.navQ.trim()) ensureDictionaryIndex().catch(() => {});
     paint();
   }
-  return wrap;
+  main.append(wrap);
+  // an empty room hands over the pen — but never steals a focus the
+  // re-render's own restore (or the sheet's manager) has already placed
+  if (!S.navQ) {
+    requestAnimationFrame(() => {
+      if (S.view === 'search' && document.activeElement === document.body && document.body.contains(input)) {
+        input.focus({ preventScroll: true });
+      }
+    });
+  }
 }
 
 /** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
@@ -12852,11 +12901,6 @@ function buildGingaChrome(root) {
   symbol.innerHTML = GINGA_SYMBOL_SVG;
   symbol.addEventListener('click', () => {
     S.navOpen = !S.navOpen;
-    // closing by hand is a deliberate dismissal — the search session ends
-    if (!S.navOpen) {
-      S.navQ = '';
-      S.navReturn = false;
-    }
     render();
   });
   root.append(symbol);
@@ -12877,9 +12921,6 @@ function buildGingaChrome(root) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => {
     S.navOpen = false;
-    // tapping the water away is a deliberate dismissal too
-    S.navQ = '';
-    S.navReturn = false;
     render();
   });
   root.append(scrim);
@@ -12900,7 +12941,17 @@ function buildGingaChrome(root) {
   arrows.append(backB, fwdB);
   bar.append(arrows);
   bar.append(buildLangSlider());
-  bar.append(buildNavSearch());
+  // the search door — a field-shaped threshold into the search room, in the
+  // place the squeezed 71px field used to stand (operator, 2026-08-20)
+  const searchDoor = el('button', 'nav-search-door');
+  searchDoor.type = 'button';
+  searchDoor.id = 'nav-search-door';
+  searchDoor.setAttribute('aria-label', tx('検索', 'search'));
+  searchDoor.innerHTML =
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  searchDoor.append(el('span', 'nsd-word', '検索'));
+  searchDoor.addEventListener('click', openSearchPage);
+  bar.append(searchDoor);
   const dojo = biLabel('button', 'nav-dojo', '集中道場', 'focus');
   dojo.type = 'button';
   dojo.addEventListener('click', () => {
@@ -12955,9 +13006,6 @@ function render() {
     const action = node.dataset?.action;
     return action ? `[data-action="${CSS.escape(action)}"]` : null;
   })();
-  // leaving the galaxy for a ROOM ends the search round-trip: only a walk
-  // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
-  if (lastRenderedView !== S.view) S.navReturn = false;
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -13019,14 +13067,18 @@ function render() {
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
   const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  // the search room's door stands in the galaxy bar, and its Back walks
+  // there unless it was opened from the shelf
+  const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
   if (S.view === 'entry') parts.push(tx('野', 'field'));
-  else if (S.view === 'drift' || dojoFamily) parts.push(tx('銀河', 'galaxy'));
+  else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
     // an archive read names the stack it came from — its back door
     if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
     parts.push(passage().title);
   }
+  if (S.view === 'search') parts.push(tx('検索', 'search'));
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -13211,6 +13263,7 @@ function render() {
   else if (S.view === 'kanjidex') renderKanjidex(main);
   else if (S.view === 'yoji') renderYoji(main);
   else if (S.view === 'grammar') renderGrammar(main);
+  else if (S.view === 'search') renderSearchPage(main);
   else renderShelf(main);
 
   renderSheet(root);
