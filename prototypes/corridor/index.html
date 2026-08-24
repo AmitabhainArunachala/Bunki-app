@@ -48,6 +48,46 @@
   </head>
   <body>
     <div id="app"></div>
+    <!--
+      ORTHOGRAPHIC AUTHORITY GATE — operator acceptance, 2026-08-24.
+
+      Bunki is a Japanese-learning instrument. The canonical KanjiVG paths
+      selected by corridor.js define the learner-facing Japanese glyph and its
+      stroke topology/order. AnimCJK is a beautiful rendering corpus, but it
+      can contain regional or historical geometry that is legitimate CJK while
+      being pedagogically wrong for the requested modern Japanese form
+      (observed live: 経 was painted as 經).
+
+      Until a checked equivalence manifest proves a decorative outline has the
+      same Japanese glyph identity and stroke topology, fail closed: make
+      AnimCJK unavailable to the living renderer. corridor.js already falls
+      back to INK.strokesFromKanjiVG(paths), so the same fluid-ink engine still
+      paints the character; only the secondary corpus loses authority to
+      substitute geometry. This is corpus-wide, not an exception for 経.
+    -->
+    <script id="bunki-canonical-japanese-stroke-authority">
+      (() => {
+        const nativeFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+          const raw = typeof input === 'string' ? input : input && input.url;
+          if (raw && /(?:^|\/)data\/share_alike\/animcjk\/[0-9a-f]{2}\.json(?:$|[?#])/i.test(raw)) {
+            return Promise.resolve(
+              new Response('', {
+                status: 404,
+                statusText: 'Bunki canonical Japanese stroke authority',
+              }),
+            );
+          }
+          return nativeFetch(input, init);
+        };
+        Object.defineProperty(window, '__BUNKI_STROKE_AUTHORITY__', {
+          value: 'kanjivg-japanese-canonical',
+          configurable: false,
+          enumerable: false,
+          writable: false,
+        });
+      })();
+    </script>
     <!-- the Drift universe (Phase 2): self-mounts #drift-layer, sleeps until
          the corridor's drift entry view wakes it via window.__DRIFT__ -->
     <script defer src="drift-layer.js"></script>
