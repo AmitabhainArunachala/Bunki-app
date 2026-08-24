@@ -1733,7 +1733,7 @@ async function main() {
   console.log('\n— the example bank: ≥4 sentences, every token a door');
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result="word:学校"]');
   await page.waitForSelector('#sheet');
   await page
@@ -1795,7 +1795,7 @@ async function main() {
   // short minor sense, "Korea", that a shortest-wins gloss once surfaced)
   await open('?entry=shelf');
   await page.fill('#search', '半島');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result="word:半島"]');
   await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
   await page.waitForTimeout(400);
@@ -1975,7 +1975,7 @@ async function main() {
   }))`);
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
   // the dictionary's late arrival re-renders the sheet; a tap aimed between
@@ -2010,7 +2010,7 @@ async function main() {
   await tap(page, '#back');
   await page.waitForTimeout(200);
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
@@ -2175,7 +2175,7 @@ async function main() {
   // the sentence page carries the seal for the word it is built around
   await open('?entry=shelf');
   await page.fill('#search', '半島');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:半島"]');
   await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
   await page.waitForTimeout(300);
@@ -3072,7 +3072,7 @@ async function main() {
   }))`);
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet .encounter-trail');
   const trail = await page.evaluate(`(() => {
