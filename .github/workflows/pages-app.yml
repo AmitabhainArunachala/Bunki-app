@@ -118,7 +118,7 @@ jobs:
           import json, sys
           site = sys.argv[1]
           index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
-          assert index["schemaVersion"] == 2, "dict-v2 schema"
+          assert index["schemaVersion"] == 3, "dict-v2 schema (sense tags, DICT_TAGS_CONTRACT_2026-08-12)"
           assert index["shardCount"] == 16, "dict-v2 shard count"
           assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
           assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"

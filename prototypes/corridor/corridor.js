@@ -1609,7 +1609,11 @@ function validDictionaryRow(row, previousSeq = -1) {
 function installDictionaryIndex(index, { mode = 'main', performanceRecord = null } = {}) {
   const mainEntries = Array.isArray(index?.entries) ? index.entries : null;
   if (
-    index?.schemaVersion !== 2 ||
+    // schema 3 (DICT_TAGS_CONTRACT_2026-08-12): rows keep cells 0–11
+    // byte-semantically and append senseTagRows at cell 12. Mixing schema 2
+    // and 3 is an error, never an implicit fallback — the worker enforces the
+    // same law on its side of the seam.
+    index?.schemaVersion !== 3 ||
     index?.shardCount !== 16 ||
     index?.sharding?.id !== 'fnv1a32-ascii-seq-mask15' ||
     index.sharding.shardCount !== index.shardCount ||
@@ -1857,7 +1861,7 @@ function ensureDictionaryShard(id) {
     .then((shard) => {
       const shardNumber = Number.parseInt(id, 16);
       if (
-        shard?.schemaVersion !== 2 ||
+        shard?.schemaVersion !== 3 ||
         shard?.shard !== shardNumber ||
         shard?.shardCount !== D.dictionaryIndex?.shardCount ||
         shard?.sharding?.id !== D.dictionaryIndex?.sharding?.id ||
