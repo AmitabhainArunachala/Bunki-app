@@ -7,7 +7,7 @@
   },
   "repository": "AmitabhainArunachala/Bunki-app",
   "snapshot_date": "2026-07-29",
-  "controller_status": "ACTIVE",
+  "controller_status": "SUPERSEDED",
   "live_main_sha": "c45af9ccd6aa54a3059200073380214a81b378bf",
   "bootstrap": {
     "pr_15": {
@@ -86,5 +86,10 @@
   ],
   "capability_changes": [],
   "open_human_gate": null,
-  "next_safe_action": "Publish the bounded F03 scheduler-clock migration and tests from fresh main, run focused and full exact-head gates, obtain two independent reviews, and then request human merge."
+  "next_safe_action": "Publish the bounded F03 scheduler-clock migration and tests from fresh main, run focused and full exact-head gates, obtain two independent reviews, and then request human merge.",
+  "superseded": {
+    "date": "2026-08-19",
+    "by": "docs/prompts/KAIRO_TENOHIRA_CAMPAIGN_2026-08-19.md",
+    "note": "Campaign specs (RENKAN, TENOHIRA) replaced the G00 controller; see the ledger addendum."
+  }
 }

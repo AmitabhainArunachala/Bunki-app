@@ -4,7 +4,16 @@
 `docs/goal/BUNKI_END_TO_END_GOAL_STATE.json`  
 **Snapshot date:** 2026-07-29  
 **Repository:** `AmitabhainArunachala/Bunki-app`  
-**State:** `ACTIVE` for F03
+**State:** `SUPERSEDED` (2026-08-19; was `ACTIVE` for F03)
+
+> **Retirement addendum, 2026-08-19 (operator-directed truth pass):** this
+> controller was superseded in practice by the campaign specs — RENKAN
+> (`docs/prompts/BUNKI_RENKAN_ONE_PUSH_CAMPAIGN_2026-08-16.md`, merged as
+> PR #74) and now TENOHIRA
+> (`docs/prompts/KAIRO_TENOHIRA_CAMPAIGN_2026-08-19.md`), which is the
+> repository's operating wayfinder. F03's substance (FSRS clock-skew safety)
+> was delivered inside the campaigns (ADR-003, monotonic clamp). Nothing
+> below this line is edited; it stands as the honest record of July.
 
 ## Plain outcome
 

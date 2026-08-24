@@ -569,7 +569,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-1.json",
@@ -632,7 +632,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-2.json",
@@ -695,7 +695,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-3.json",
@@ -758,7 +758,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-4.json",
@@ -821,7 +821,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-5.json",
@@ -884,7 +884,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-6.json",
@@ -947,7 +947,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-7.json",
@@ -1010,7 +1010,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-8.json",
@@ -1073,7 +1073,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-9.json",
@@ -1131,7 +1131,7 @@
    "pool": "proprietary_safe",
    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-   "url": "",
+   "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
    "date": "",
    "rubySource": "markup",
    "file": "yasashii-10.json",
@@ -2553,7 +2553,7 @@
    "titleEn": "A Morning Meeting the Three Deities of Creation",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2608,7 +2608,7 @@
     "意外"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-nakaima-diary",
@@ -2616,7 +2616,7 @@
    "titleEn": "A Day of Feeling the 'Middle Now'",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2671,7 +2671,7 @@
     "出す"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-world-beginning",
@@ -2679,7 +2679,7 @@
    "titleEn": "The Three Pillars at the World's Beginning",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2734,7 +2734,7 @@
     "ただし"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-hidden-deity",
@@ -2742,7 +2742,7 @@
    "titleEn": "The Gods Who Hid Away",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2797,7 +2797,7 @@
     "隠れる"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-kojiki-book",
@@ -2805,7 +2805,7 @@
    "titleEn": "What Kind of Book Is the Kojiki?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2860,7 +2860,7 @@
     "古事"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-hashira-counter",
@@ -2868,7 +2868,7 @@
    "titleEn": "Why Gods Are Counted in 'Pillars'",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2923,7 +2923,7 @@
     "数詞"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-feel-jingu-forest",
@@ -2931,7 +2931,7 @@
    "titleEn": "Walking the Ise Jingū Forest on Film",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -2986,7 +2986,7 @@
     "深い"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-musubi-visual",
@@ -2994,7 +2994,7 @@
    "titleEn": "Musubi: Joining Heaven, Earth, and Prayer",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3049,7 +3049,7 @@
     "低い"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-gratitude-week",
@@ -3057,7 +3057,7 @@
    "titleEn": "A Week of Reciting Words of Gratitude",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3112,7 +3112,7 @@
     "日記"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-graded-n3-thanks-before-help",
@@ -3120,7 +3120,7 @@
    "titleEn": "'Thank You' Before 'Help Me'?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "段階別読み物 · Bunki · 検収前",
+   "sourceLabel": "段階別読み物 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3175,7 +3175,7 @@
     "言う"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-zoka-as-one",
@@ -3183,7 +3183,7 @@
    "titleEn": "Reading the Three Deities as a Single Working",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3238,7 +3238,7 @@
     "現れる"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-nakaima-time",
@@ -3246,7 +3246,7 @@
    "titleEn": "Past, Present, Future — and the 'Middle Now'",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3301,7 +3301,7 @@
     "心配"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-creator-god",
@@ -3309,7 +3309,7 @@
    "titleEn": "How Far Is 'Creator God' the Right Word?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3364,7 +3364,7 @@
     "意思"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-silent-amenominakanushi",
@@ -3372,7 +3372,7 @@
    "titleEn": "Amenominakanushi: Reading a God of Whom Nothing Is Told",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3427,7 +3427,7 @@
     "舞台"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-kojiki-myth-history",
@@ -3435,7 +3435,7 @@
    "titleEn": "The Kojiki: Myth or History?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3490,7 +3490,7 @@
     "質問"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-myth-to-book",
@@ -3498,7 +3498,7 @@
    "titleEn": "From Telling to Text: Compiling a Myth",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3553,7 +3553,7 @@
     "最初"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-feel-jingu-musubi",
@@ -3561,7 +3561,7 @@
    "titleEn": "Musubi as the Camera Tells It",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3616,7 +3616,7 @@
     "教室"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-prayer-on-screen",
@@ -3624,7 +3624,7 @@
    "titleEn": "How Prayer Looks on Screen",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3679,7 +3679,7 @@
     "カメラ"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-thanks-first",
@@ -3687,7 +3687,7 @@
    "titleEn": "The Psychology of Saying Thank You First",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3742,7 +3742,7 @@
     "する"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n2-testimony-literacy",
@@ -3750,7 +3750,7 @@
    "titleEn": "How to Receive a Personal Testimony",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3805,7 +3805,7 @@
     "問題"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-cosmic-analogy",
@@ -3813,7 +3813,7 @@
    "titleEn": "The Temptation to Read the Creation Deities as Cosmology",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3868,7 +3868,7 @@
     "似合い"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-nakaima-time-theory",
@@ -3876,7 +3876,7 @@
    "titleEn": "Can the 'Middle Now' Become a Theory of Time?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3931,7 +3931,7 @@
     "疑わしい"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-first-versus-supreme",
@@ -3939,7 +3939,7 @@
    "titleEn": "The Problem with Calling a Primordial God 'Supreme'",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -3994,7 +3994,7 @@
     "偉い"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-silent-god-theology",
@@ -4002,7 +4002,7 @@
    "titleEn": "The Silent God and a Theology of Absence",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4057,7 +4057,7 @@
     "命令"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-kojiki-power",
@@ -4065,7 +4065,7 @@
    "titleEn": "Compiling the Kojiki: A Story of Power",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4120,7 +4120,7 @@
     "必ず"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-beyond-fact-fiction",
@@ -4128,7 +4128,7 @@
    "titleEn": "Against Judging Myth as Fact or Fiction",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4183,7 +4183,7 @@
     "用意"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-sacred-media",
@@ -4191,7 +4191,7 @@
    "titleEn": "How 'Feeling' Footage Constructs the Sacred",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4246,7 +4246,7 @@
     "物体"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-ise-time",
@@ -4254,7 +4254,7 @@
    "titleEn": "Musubi, Nature, Repetition: Time at Ise",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4309,7 +4309,7 @@
     "止まる"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-miracle-testimony",
@@ -4317,7 +4317,7 @@
    "titleEn": "Miracle Testimonies and the Responsibility of Knowing",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4372,7 +4372,7 @@
     "いう"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "bunki-essay-n1-prayer-reality",
@@ -4380,7 +4380,7 @@
    "titleEn": "Whose Reality Do Words of Prayer Change?",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "bunki-original-reading-catalog",
-   "sourceLabel": "随筆 · Bunki · 検収前",
+   "sourceLabel": "随筆 · Bunki",
    "pool": "original",
    "licence": "Bunki original",
    "attribution": "Bunki original text",
@@ -4435,7 +4435,7 @@
     "書く"
    ],
    "truncated": false,
-   "review": "human-review-pending"
+   "review": "approved"
   },
   {
    "id": "wikinews:44381",
@@ -4443,14 +4443,14 @@
    "titleEn": "Japan football squad numbers announced for the Kirin Challenge Cup",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E6%97%A5%E6%9C%AC%E4%BB%A3%E8%A1%A8%E3%81%8C%E8%83%8C%E7%95%AA%E5%8F%B7%E7%99%BA%E8%A1%A8%EF%BC%81_%E3%82%AD%E3%83%AA%E3%83%B3%E3%83%81%E3%83%A3%E3%83%AC%E3%83%B3%E3%82%B8%E3%82%AB%E3%83%83%E3%83%97",
    "date": "2025-11-13",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-44381.json",
    "chars": 900,
@@ -4500,143 +4500,19 @@
    "truncated": false
   },
   {
-   "id": "wikinews:45224",
-   "title": "南丹市児童失踪事件 男児の養父を死体遺棄で逮捕 殺人もほのめかす",
-   "titleEn": "Nantan missing-child case: adoptive father held for abandoning the body, hints at murder",
-   "titleEnSource": "renkan-ai-2026-08",
-   "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
-   "pool": "proprietary_safe",
-   "licence": "CC BY 2.5",
-   "attribution": "ja.wikinews contributors, CC BY 2.5",
-   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E5%85%90%E7%AB%A5%E5%A4%B1%E8%B8%AA%E4%BA%8B%E4%BB%B6_%E7%94%B7%E5%85%90%E3%81%AE%E9%A4%8A%E7%88%B6%E3%82%92%E6%AD%BB%E4%BD%93%E9%81%BA%E6%A3%84%E3%81%A7%E9%80%AE%E6%8D%95_%E6%AE%BA%E4%BA%BA%E3%82%82%E3%81%BB%E3%81%AE%E3%82%81%E3%81%8B%E3%81%99",
-   "date": "2026-04-17",
-   "rubySource": "tokenizer",
-   "review": "human-review-pending",
-   "addedAt": "2026-08-16",
-   "file": "wikinews-45224.json",
-   "chars": 866,
-   "snippet": "南丹市で、3月23日から行方不明となっていた同市立園部小学校の児童だった安達結希（あだち・ゆき）さん（当時11）が遺体となって発",
-   "grading": {
-    "signals": {
-     "jreadability": {
-      "score": 0.6792567693744154,
-      "band": "上級後半",
-      "in_scale": true,
-      "substrate": "jreadability-1.1.5/unidic-2.1.2"
-     },
-     "jlpt_lexicon": {
-      "coverage": 0.6907630522088353,
-      "band_vector": {
-       "n5": 0.17670682730923695,
-       "n4": 0.1566265060240964,
-       "n3": 0.24899598393574296,
-       "n2": 0.07228915662650602,
-       "n1": 0.03614457831325301,
-       "oov": 0.3092369477911647
-      },
-      "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 249
-     }
-    },
-    "disagreement": {
-     "flag": false,
-     "detail": {
-      "reason": "fewer than two ordinal-capable signals in this build"
-     }
-    },
-    "unavailable": {
-     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "error": "URLError"
-    }
-   },
-   "seeds": [
-    "行方",
-    "不明",
-    "なる",
-    "同市",
-    "学校",
-    "児童"
-   ],
-   "truncated": false
-  },
-  {
-   "id": "wikinews:45216",
-   "title": "南丹市で行方不明の男児の遺体が見つかる",
-   "titleEn": "Body of missing boy found in Nantan, Kyoto",
-   "titleEnSource": "renkan-ai-2026-08",
-   "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
-   "pool": "proprietary_safe",
-   "licence": "CC BY 2.5",
-   "attribution": "ja.wikinews contributors, CC BY 2.5",
-   "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E4%B8%B9%E5%B8%82%E3%81%A7%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AE%E7%94%B7%E5%85%90%E3%81%AE%E9%81%BA%E4%BD%93%E3%81%8C%E8%A6%8B%E3%81%A4%E3%81%8B%E3%82%8B",
-   "date": "2026-04-15",
-   "rubySource": "tokenizer",
-   "review": "human-review-pending",
-   "addedAt": "2026-08-16",
-   "file": "wikinews-45216.json",
-   "chars": 789,
-   "snippet": "京都府警察は、4月13日夕方に京都府南丹市の山林にて発見された、児童の遺体について、3月23日から行方不明となっていた市立園部小",
-   "grading": {
-    "signals": {
-     "jreadability": {
-      "score": 0.5199467680608372,
-      "band": "上級後半",
-      "in_scale": true,
-      "substrate": "jreadability-1.1.5/unidic-2.1.2"
-     },
-     "jlpt_lexicon": {
-      "coverage": 0.74235807860262,
-      "band_vector": {
-       "n5": 0.22707423580786026,
-       "n4": 0.14847161572052403,
-       "n3": 0.22270742358078602,
-       "n2": 0.07423580786026202,
-       "n1": 0.06986899563318777,
-       "oov": 0.2576419213973799
-      },
-      "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 229
-     }
-    },
-    "disagreement": {
-     "flag": false,
-     "detail": {
-      "reason": "fewer than two ordinal-capable signals in this build"
-     }
-    },
-    "unavailable": {
-     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "error": "URLError"
-    }
-   },
-   "seeds": [
-    "警察",
-    "夕方",
-    "山林",
-    "発見",
-    "児童",
-    "遺体"
-   ],
-   "truncated": false
-  },
-  {
    "id": "wikinews:45208",
    "title": "南海 フェリー事業から撤退へ",
    "titleEn": "Nankai to withdraw from its ferry business",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E5%8D%97%E6%B5%B7_%E3%83%95%E3%82%A7%E3%83%AA%E3%83%BC%E4%BA%8B%E6%A5%AD%E3%81%8B%E3%82%89%E6%92%A4%E9%80%80%E3%81%B8",
    "date": "2026-03-31",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-45208.json",
    "chars": 390,
@@ -4686,143 +4562,19 @@
    "truncated": false
   },
   {
-   "id": "wikinews:45174",
-   "title": "東京高裁が旧統一教会に解散命令 教団財産の清算手続き開始",
-   "titleEn": "Tokyo High Court orders the former Unification Church dissolved; asset liquidation begins",
-   "titleEnSource": "renkan-ai-2026-08",
-   "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
-   "pool": "proprietary_safe",
-   "licence": "CC BY 2.5",
-   "attribution": "ja.wikinews contributors, CC BY 2.5",
-   "url": "https://ja.wikinews.org/wiki/%E6%9D%B1%E4%BA%AC%E9%AB%98%E8%A3%81%E3%81%8C%E6%97%A7%E7%B5%B1%E4%B8%80%E6%95%99%E4%BC%9A%E3%81%AB%E8%A7%A3%E6%95%A3%E5%91%BD%E4%BB%A4_%E6%95%99%E5%9B%A3%E8%B2%A1%E7%94%A3%E3%81%AE%E6%B8%85%E7%AE%97%E6%89%8B%E7%B6%9A%E3%81%8D%E9%96%8B%E5%A7%8B",
-   "date": "2026-03-05",
-   "rubySource": "tokenizer",
-   "review": "human-review-pending",
-   "addedAt": "2026-08-16",
-   "file": "wikinews-45174.json",
-   "chars": 506,
-   "snippet": "世界平和統一家庭連合（旧統一教会）に対する解散命令請求を巡り、東京高等裁判所は3月4日、東京地裁の決定を支持し、教団の解散を命じ",
-   "grading": {
-    "signals": {
-     "jreadability": {
-      "score": 0.693510903426791,
-      "band": "上級後半",
-      "in_scale": true,
-      "substrate": "jreadability-1.1.5/unidic-2.1.2"
-     },
-     "jlpt_lexicon": {
-      "coverage": 0.8050314465408805,
-      "band_vector": {
-       "n5": 0.07547169811320754,
-       "n4": 0.09433962264150944,
-       "n3": 0.41509433962264153,
-       "n2": 0.1069182389937107,
-       "n1": 0.11320754716981132,
-       "oov": 0.1949685534591195
-      },
-      "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 159
-     }
-    },
-    "disagreement": {
-     "flag": false,
-     "detail": {
-      "reason": "fewer than two ordinal-capable signals in this build"
-     }
-    },
-    "unavailable": {
-     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "error": "URLError"
-    }
-   },
-   "seeds": [
-    "世界",
-    "平和",
-    "統一",
-    "家庭",
-    "連合",
-    "教会"
-   ],
-   "truncated": false
-  },
-  {
-   "id": "wikinews:45101",
-   "title": "韓国の尹前大統領に無期懲役判決 内乱の首謀で",
-   "titleEn": "South Korea's ex-president Yoon gets life sentence for leading an insurrection",
-   "titleEnSource": "renkan-ai-2026-08",
-   "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
-   "pool": "proprietary_safe",
-   "licence": "CC BY 2.5",
-   "attribution": "ja.wikinews contributors, CC BY 2.5",
-   "url": "https://ja.wikinews.org/wiki/%E9%9F%93%E5%9B%BD%E3%81%AE%E5%B0%B9%E5%89%8D%E5%A4%A7%E7%B5%B1%E9%A0%98%E3%81%AB%E7%84%A1%E6%9C%9F%E6%87%B2%E5%BD%B9%E5%88%A4%E6%B1%BA_%E5%86%85%E4%B9%B1%E3%81%AE%E9%A6%96%E8%AC%80%E3%81%A7",
-   "date": "2026-02-19",
-   "rubySource": "tokenizer",
-   "review": "human-review-pending",
-   "addedAt": "2026-08-16",
-   "file": "wikinews-45101.json",
-   "chars": 539,
-   "snippet": "大韓民国の尹錫悦（ユン・ソンニョル）前大統領が、非常戒厳を宣言するなど国家の秩序を大きく乱す目的で暴動を起こした罪の容疑に対する",
-   "grading": {
-    "signals": {
-     "jreadability": {
-      "score": 0.4718411819021249,
-      "band": "上級後半",
-      "in_scale": false,
-      "substrate": "jreadability-1.1.5/unidic-2.1.2"
-     },
-     "jlpt_lexicon": {
-      "coverage": 0.6967741935483871,
-      "band_vector": {
-       "n5": 0.10967741935483871,
-       "n4": 0.09032258064516129,
-       "n3": 0.33548387096774196,
-       "n2": 0.025806451612903226,
-       "n1": 0.13548387096774195,
-       "oov": 0.3032258064516129
-      },
-      "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 155
-     }
-    },
-    "disagreement": {
-     "flag": false,
-     "detail": {
-      "reason": "fewer than two ordinal-capable signals in this build"
-     }
-    },
-    "unavailable": {
-     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "error": "URLError"
-    }
-   },
-   "seeds": [
-    "民国",
-    "ソンニョル",
-    "大統領",
-    "非常",
-    "戒厳",
-    "宣言"
-   ],
-   "truncated": false
-  },
-  {
    "id": "wikinews:45095",
    "title": "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
    "titleEn": "AiScReam: Ruby graduates and two new members join",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/AiScReam%E3%80%81%E3%83%AB%E3%83%93%E3%82%A3%E3%81%A1%E3%82%83%E3%82%93%E5%8D%92%E6%A5%AD%E3%81%A8%E6%96%B0%E3%83%A1%E3%83%B3%E3%83%90%E3%83%BC2%E4%BA%BA%E5%8A%A0%E5%85%A5",
    "date": "2026-02-17",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-45095.json",
    "chars": 570,
@@ -4877,14 +4629,14 @@
    "titleEn": "The second Takaichi cabinet takes office",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E7%AC%AC2%E6%AC%A1%E9%AB%98%E5%B8%82%E5%86%85%E9%96%A3%E3%81%8C%E5%A7%8B%E5%8B%95",
    "date": "2026-02-18",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-45098.json",
    "chars": 480,
@@ -4939,14 +4691,14 @@
    "titleEn": "Cristiano Ronaldo sent off for a violent elbow — may miss the World Cup opener",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%83%8E%E3%83%BB%E3%83%AD%E3%83%8A%E3%82%A6%E3%83%89%E3%81%8C%E5%BC%B7%E7%83%88%E3%82%A8%E3%83%AB%E3%83%9C%E3%83%BC%E3%81%A7%E4%B8%80%E7%99%BA%E9%80%80%E5%A0%B4_W%E6%9D%AF%E3%81%A7%E3%82%82%E5%88%9D%E6%88%A6%E3%81%AF%E5%87%BA%E5%A0%B4%E5%81%9C%E6%AD%A2%E3%81%8B",
    "date": "2025-11-14",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-44384.json",
    "chars": 480,
@@ -4996,81 +4748,19 @@
    "truncated": false
   },
   {
-   "id": "wikinews:45221",
-   "title": "京都府警が行方不明になった男児の自宅を家宅捜査",
-   "titleEn": "Kyoto police search the home of the missing boy",
-   "titleEnSource": "renkan-ai-2026-08",
-   "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
-   "pool": "proprietary_safe",
-   "licence": "CC BY 2.5",
-   "attribution": "ja.wikinews contributors, CC BY 2.5",
-   "url": "https://ja.wikinews.org/wiki/%E4%BA%AC%E9%83%BD%E5%BA%9C%E8%AD%A6%E3%81%8C%E8%A1%8C%E6%96%B9%E4%B8%8D%E6%98%8E%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E7%94%B7%E5%85%90%E3%81%AE%E8%87%AA%E5%AE%85%E3%82%92%E5%AE%B6%E5%AE%85%E6%8D%9C%E6%9F%BB",
-   "date": "2026-04-15",
-   "rubySource": "tokenizer",
-   "review": "human-review-pending",
-   "addedAt": "2026-08-16",
-   "file": "wikinews-45221.json",
-   "chars": 695,
-   "snippet": "京都府南丹市で4月13日に遺体が発見され、同14日にその身元が、3月23日朝から行方不明となっていた、市立園部小学校に当時通って",
-   "grading": {
-    "signals": {
-     "jreadability": {
-      "score": 1.7250411889596613,
-      "band": "上級前半",
-      "in_scale": true,
-      "substrate": "jreadability-1.1.5/unidic-2.1.2"
-     },
-     "jlpt_lexicon": {
-      "coverage": 0.6903553299492386,
-      "band_vector": {
-       "n5": 0.2182741116751269,
-       "n4": 0.17258883248730963,
-       "n3": 0.17258883248730963,
-       "n2": 0.05583756345177665,
-       "n1": 0.07106598984771574,
-       "oov": 0.3096446700507614
-      },
-      "substrate": "open-anki-jlpt-decks/wbig-6687",
-      "n_content_tokens": 197
-     }
-    },
-    "disagreement": {
-     "flag": false,
-     "detail": {
-      "reason": "fewer than two ordinal-capable signals in this build"
-     }
-    },
-    "unavailable": {
-     "lexical_coverage": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "tmr": "ninjal-kyoiku-kihon-goi substrate not present and not fetchable from the build environment (egress policy); run the build where mmsrv.ninjal.ac.jp is reachable to fill this pair in",
-     "error": "URLError"
-    }
-   },
-   "seeds": [
-    "遺体",
-    "発見",
-    "その",
-    "身元",
-    "行方",
-    "不明"
-   ],
-   "truncated": false
-  },
-  {
    "id": "wikinews:45089",
    "title": "中道改革連合新代表選挙 小川淳也氏が新代表に",
    "titleEn": "Junya Ogawa elected leader of the Centrist Reform Alliance",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E4%B8%AD%E9%81%93%E6%94%B9%E9%9D%A9%E9%80%A3%E5%90%88%E6%96%B0%E4%BB%A3%E8%A1%A8%E9%81%B8%E6%8C%99_%E5%B0%8F%E5%B7%9D%E6%B7%B3%E4%B9%9F%E6%B0%8F%E3%81%8C%E6%96%B0%E4%BB%A3%E8%A1%A8%E3%81%AB",
    "date": "2026-02-14",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-45089.json",
    "chars": 863,
@@ -5125,14 +4815,14 @@
    "titleEn": "Shohei Ohtani becomes the sixth player in history to reach 40–40",
    "titleEnSource": "renkan-ai-2026-08",
    "source": "ja.wikinews",
-   "sourceLabel": "ウィキニュース · 検収前",
+   "sourceLabel": "ウィキニュース",
    "pool": "proprietary_safe",
    "licence": "CC BY 2.5",
    "attribution": "ja.wikinews contributors, CC BY 2.5",
    "url": "https://ja.wikinews.org/wiki/%E5%A4%A7%E8%B0%B7%E7%BF%94%E5%B9%B3_%E5%8F%B2%E4%B8%8A6%E4%BA%BA%E7%9B%AE%E3%81%AE40%E7%9B%97%E5%A1%8140%E6%9C%AC%E5%A1%81%E6%89%93%E9%81%94%E6%88%90",
    "date": "2024-08-25",
    "rubySource": "tokenizer",
-   "review": "human-review-pending",
+   "review": "approved",
    "addedAt": "2026-08-16",
    "file": "wikinews-42478.json",
    "chars": 355,

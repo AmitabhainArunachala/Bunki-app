@@ -1,0 +1,90 @@
+/* 回廊's service worker (TENOHIRA PR 一): the app installed on a real phone
+ * must open in a tunnel and on a mountain. Two honest rules, nothing clever:
+ *
+ *   - the SHELL (html/css/js — the app itself) goes network-first with a
+ *     cache fallback: online you always get the newest corridor, offline
+ *     you get the last one that ran. No version pinning to go stale.
+ *   - CONTENT (data/, vendor/, design/ — big, effectively immutable shards)
+ *     goes cache-first with a network fill: fetched once, kept, and a shard
+ *     that changes upstream is picked up when the cache is dropped by a
+ *     VERSION bump here.
+ *
+ * The learner's record never passes through here — it lives in
+ * localStorage/IndexedDB, outside HTTP caching entirely. */
+
+const VERSION = 'kairo-v1';
+const SHELL = [
+  '.',
+  'index.html',
+  'corridor.css',
+  'corridor.js',
+  'corridor-ink.js',
+  'dictionary-worker.js',
+  'drift-layer.css',
+  'drift-layer.js',
+  'manifest.webmanifest',
+  'apple-touch-icon.png',
+  'icon-192.png',
+  'icon-512.png',
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(VERSION)
+      .then((cache) => cache.addAll(SHELL))
+      .then(() => self.skipWaiting()),
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return; // the AI key's traffic is never ours
+
+  const isContent = /^\/(data|vendor|design)\//.test(url.pathname) || /\/(data|vendor|design)\//.test(url.pathname);
+
+  if (isContent) {
+    // cache-first: a dictionary shard fetched once is kept
+    event.respondWith(
+      caches.match(request).then(
+        (hit) =>
+          hit ||
+          fetch(request).then((res) => {
+            if (res.ok) {
+              const copy = res.clone();
+              caches.open(VERSION).then((cache) => cache.put(request, copy));
+            }
+            return res;
+          }),
+      ),
+    );
+    return;
+  }
+
+  // shell (and navigations): network-first, offline falls back to the last
+  // corridor that ran — a navigation with no cache row falls back to the door
+  event.respondWith(
+    fetch(request)
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(VERSION).then((cache) => cache.put(request, copy));
+        }
+        return res;
+      })
+      .catch(() =>
+        caches.match(request).then((hit) => hit || (request.mode === 'navigate' ? caches.match('index.html') : Response.error())),
+      ),
+  );
+});

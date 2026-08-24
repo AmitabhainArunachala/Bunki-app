@@ -8,7 +8,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "初級前半 · jread 5.80 · JLPT語彙 24% · 900字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T3 — sports, scarce 初級前半 band"
  },
  {
   "id": "wikinews:45224",
@@ -19,7 +21,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 0.68 · JLPT語彙 43% · 866字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "rejected",
+  "decidedBy": "rubric-v1",
+  "reason": "T1 — grim incident (child death investigation)"
  },
  {
   "id": "wikinews:45216",
@@ -30,7 +34,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 0.52 · JLPT語彙 49% · 789字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "rejected",
+  "decidedBy": "rubric-v1",
+  "reason": "T1 — grim incident (child death investigation)"
  },
  {
   "id": "wikinews:45208",
@@ -41,7 +47,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 1.11 · JLPT語彙 46% · 390字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T3 — transport/business, band variety"
  },
  {
   "id": "wikinews:45174",
@@ -52,7 +60,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 0.69 · JLPT語彙 63% · 506字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "rejected",
+  "decidedBy": "rubric-v1",
+  "reason": "T2 — court/dissolution order, over the litigation cap"
  },
  {
   "id": "wikinews:45101",
@@ -63,7 +73,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 0.47 · JLPT語彙 50% · 539字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "rejected",
+  "decidedBy": "rubric-v1",
+  "reason": "T2 — court verdict, over the litigation cap"
  },
  {
   "id": "wikinews:5991",
@@ -74,7 +86,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "empty quote/paren pair — bracketed content was dropped in extraction",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "Q1 — gate-convicted defect (empty quote pair): "
  },
  {
   "id": "wikinews:1483",
@@ -96,7 +110,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "初級後半 · jread 5.37 · JLPT語彙 30% · 570字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T3 — pop culture, 初級後半"
  },
  {
   "id": "wikinews:45098",
@@ -107,7 +123,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 0.70 · JLPT語彙 60% · 480字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T2 — civic formation, within the cap"
  },
  {
   "id": "wikinews:44384",
@@ -118,7 +136,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "初級後半 · jread 4.50 · JLPT語彙 42% · 480字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T3 — sports, 初級後半"
  },
  {
   "id": "wikinews:45221",
@@ -129,7 +149,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級前半 · jread 1.73 · JLPT語彙 50% · 695字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "rejected",
+  "decidedBy": "rubric-v1",
+  "reason": "T1 — grim incident (child death investigation)"
  },
  {
   "id": "wikinews:45089",
@@ -140,7 +162,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "上級後半 · jread 1.16 · JLPT語彙 51% · 863字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T2 — civic formation, within the cap"
  },
  {
   "id": "wikinews:42478",
@@ -151,7 +175,9 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "初級後半 · jread 4.93 · JLPT語彙 55% · 355字",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "T3 — sports milestone, 初級後半"
  },
  {
   "id": "bunki-graded-n3-zoka-sanjin-morning",
@@ -162,7 +188,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1052字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-nakaima-diary",
@@ -173,7 +201,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1081字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-world-beginning",
@@ -184,7 +214,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1067字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-hidden-deity",
@@ -195,7 +227,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1126字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-kojiki-book",
@@ -206,7 +240,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1108字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-hashira-counter",
@@ -217,7 +253,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1002字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-feel-jingu-forest",
@@ -228,7 +266,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1114字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-musubi-visual",
@@ -239,7 +279,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1056字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-gratitude-week",
@@ -250,7 +292,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 986字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-graded-n3-thanks-before-help",
@@ -261,7 +305,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N3 · 1167字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-zoka-as-one",
@@ -272,7 +318,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1184字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-nakaima-time",
@@ -283,7 +331,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1253字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-creator-god",
@@ -294,7 +344,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1223字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-silent-amenominakanushi",
@@ -305,7 +357,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1187字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-kojiki-myth-history",
@@ -316,7 +370,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1166字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-myth-to-book",
@@ -327,7 +383,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1139字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-feel-jingu-musubi",
@@ -338,7 +396,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1223字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-prayer-on-screen",
@@ -349,7 +409,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1277字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-thanks-first",
@@ -360,7 +422,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1250字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n2-testimony-literacy",
@@ -371,7 +435,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N2 · 1226字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-cosmic-analogy",
@@ -382,7 +448,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1454字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-nakaima-time-theory",
@@ -393,7 +461,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1395字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-first-versus-supreme",
@@ -404,7 +474,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1443字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-silent-god-theology",
@@ -415,7 +487,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1425字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-kojiki-power",
@@ -426,7 +500,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1404字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-beyond-fact-fiction",
@@ -437,7 +513,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1472字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-sacred-media",
@@ -448,7 +526,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1482字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-ise-time",
@@ -459,7 +539,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1441字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-miracle-testimony",
@@ -470,7 +552,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1427字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "bunki-essay-n1-prayer-reality",
@@ -481,7 +565,9 @@
   "licence": "Bunki original",
   "gradingSummary": "N1 · 1460字",
   "addedAt": "2026-08-15",
-  "decision": "pending"
+  "decision": "approved",
+  "decidedBy": "rubric-v1",
+  "reason": "L1 — authored catalog"
  },
  {
   "id": "yasashii:1",
@@ -602,6 +688,7 @@
   "licence": "CC BY 2.5",
   "gradingSummary": "1304字 · 凍結直前の版 — 最終版か未確認",
   "addedAt": "2026-08-16",
-  "decision": "pending"
+  "decision": "pending",
+  "reason": "凍結直前の版 — 最終版か未確認。rubric-v1 note: editorial verification is not taste; stays pending for the operator (like rights)."
  }
 ]

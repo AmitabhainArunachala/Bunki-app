@@ -264,9 +264,12 @@ def collect_articles() -> list[dict]:
                 "source": "isa-yasashii-glossary",
                 "sourceLabel": "やさしい日本語 用語集",
                 "pool": "proprietary_safe",
-                "licence": "ISA やさしい日本語 glossary",
+                # the RENKAN E3 relabel and the Pages provenance gate both hold:
+                # the licence names its open rights question (OD-24), and the
+                # per-item url is the 別冊 PDF every row was parsed from
+                "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
                 "attribution": "出入国在留管理庁「やさしい日本語」用語集",
-                "url": "",
+                "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
                 "date": "",
                 "rubySource": "markup",
             }
@@ -318,7 +321,7 @@ SOURCES = {
     "proprietary_safe": [
         {"name": "ja.wikinews", "licence": "CC BY 2.5", "attribution": "ja.wikinews contributors, CC BY 2.5", "url": "https://ja.wikinews.org/"},
         {"name": "aozorabunko-clean", "licence": "PD (著作権フラグ なし)", "attribution": "青空文庫", "url": "https://www.aozora.gr.jp/"},
-        {"name": "isa-yasashii-glossary", "licence": "出入国在留管理庁 やさしい日本語 用語集", "attribution": "出入国在留管理庁", "url": ""},
+        {"name": "isa-yasashii-glossary", "licence": "利用条件 未検証（要確認）", "attribution": "出入国在留管理庁", "url": "https://www.moj.go.jp/isa/"},
         {"name": "ninjal-kyoiku-kihon-goi", "licence": "CC BY 4.0", "attribution": "国立国語研究所『教育基本語彙の基本的研究―増補改訂版―』(2009)", "url": "https://mmsrv.ninjal.ac.jp/brfvep/"},
         {"name": "snow-t15-t23", "licence": "CC BY 4.0", "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）", "url": "https://www.jnlp.org/GengoHouse/snow/t15"},
         {"name": "tanaka-corpus", "licence": "CC BY 2.0 FR", "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）", "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"},

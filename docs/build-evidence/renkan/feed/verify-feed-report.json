@@ -2,19 +2,19 @@
   "schemaVersion": 1,
   "kind": "feed-gate-verification",
   "artifactHashes": {
-    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
-    "archiveIndex": "c95615863a47212582c2df40867ad057fa2ee9665e8463af511ee0328bca6995",
-    "queue": "e556b419131629b64451b9c740bc7689d4a67caf76108fd400a5b899283e176a",
+    "index": "0459ae8284ffa2b446a6f3047ff31a086272cc8fbda3c4426bbcd975fe59850b",
+    "archiveIndex": "dbffa6606e7b35fcdd2a1e56bc6e5bd816899d1ff481589778f4b20f46d3d445",
+    "queue": "733c33a9ce8915b7739a40cf1d53c4902d1edb3f93919983b6fa652e81656925",
     "titles": "fc9fcfac6919f8c02d409b6d0b93353f70e095bed99de7a63236062c4fc755c2",
-    "curationReport": "07da36b9be4cc764c91c27751742606525cbea22d4a96fbadb41b1a76fdf5fdb",
-    "standalone": "30fee6cdc64455276c0a4735daad4e000c67efb67a77720f93080279a6e5be81"
+    "curationReport": "b598a6c94ddeb63b3afdc68d265426216f89a6cb38cdc7c9e2dd042cc73d03cb",
+    "standalone": "061bf0420c58010dfa1537cec8e485838dde0ddcecffeb680f901170c8e51650"
   },
   "counts": {
-    "curated": 82,
-    "archive": 682,
+    "curated": 77,
+    "archive": 686,
     "queueRows": 55,
-    "pendingMints": 12,
-    "approvedMints": 0,
+    "pendingMints": 0,
+    "approvedMints": 7,
     "cullProposals": 2
   },
   "results": [
@@ -41,7 +41,7 @@
     {
       "name": "the curated shelf is exactly the inherited 70 plus the queue's live mints",
       "pass": true,
-      "detail": "82 = 70 + 12"
+      "detail": "77 = 70 + 7"
     },
     {
       "name": "no feed-authored row stands outside the queue — nothing minted without review cover",
@@ -79,9 +79,9 @@
       "detail": ""
     },
     {
-      "name": "the 検収前 census is exact: 30 recovered originals + pending feed mints + rights holds",
+      "name": "the 検収前 census is exact: 0 still-pending recovered originals + pending feed mints + rights holds",
       "pass": true,
-      "detail": "43 = 30 + 12 + 1 editorial-unverified · 10 rights holds"
+      "detail": "1 = 0 + 0 + 1 editorial-unverified · 10 rights holds · queue-paired true"
     },
     {
       "name": "wikinews:44381 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
@@ -89,14 +89,14 @@
       "detail": "369 tokens · 初級前半 · 900字"
     },
     {
-      "name": "wikinews:45224 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "name": "wikinews:45224 · rejected — off the shelf, restored to the archive",
       "pass": true,
-      "detail": "595 tokens · 上級後半 · 866字"
+      "detail": ""
     },
     {
-      "name": "wikinews:45216 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "name": "wikinews:45216 · rejected — off the shelf, restored to the archive",
       "pass": true,
-      "detail": "526 tokens · 上級後半 · 789字"
+      "detail": ""
     },
     {
       "name": "wikinews:45208 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
@@ -104,14 +104,14 @@
       "detail": "242 tokens · 上級後半 · 390字"
     },
     {
-      "name": "wikinews:45174 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "name": "wikinews:45174 · rejected — off the shelf, restored to the archive",
       "pass": true,
-      "detail": "321 tokens · 上級後半 · 506字"
+      "detail": ""
     },
     {
-      "name": "wikinews:45101 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "name": "wikinews:45101 · rejected — off the shelf, restored to the archive",
       "pass": true,
-      "detail": "361 tokens · 上級後半 · 539字"
+      "detail": ""
     },
     {
       "name": "wikinews:45095 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
@@ -129,9 +129,9 @@
       "detail": "267 tokens · 初級後半 · 480字"
     },
     {
-      "name": "wikinews:45221 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
+      "name": "wikinews:45221 · rejected — off the shelf, restored to the archive",
       "pass": true,
-      "detail": "471 tokens · 上級前半 · 695字"
+      "detail": ""
     },
     {
       "name": "wikinews:45089 · full candidate schema, pools, LINK-SAFE text, archive hand-off",
@@ -146,7 +146,7 @@
     {
       "name": "the curation report is present, typed, and counts the real artifacts",
       "pass": true,
-      "detail": "shelf 82/82 · archive 682/682"
+      "detail": "shelf 77/77 · archive 686/686"
     },
     {
       "name": "every pending cull in the queue traces to a report proposal",

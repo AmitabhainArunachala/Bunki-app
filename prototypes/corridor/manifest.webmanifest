@@ -1,0 +1,15 @@
+{
+  "name": "回廊 KAIRO",
+  "short_name": "回廊",
+  "description": "One continuous corridor over real graded Japanese — reading, capture, and honest review, all on this device.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f1e9d3",
+  "theme_color": "#f1e9d3",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "d07415fdb851763d983905eaf27b44d5e52fbda9",
+  "head": "1dab3ef226529b8fc0e846e7d06b603d01c33c45",
   "chromium": "playwright-default",
   "viewport": {
     "width": 390,
@@ -16,12 +16,12 @@
     {
       "name": "no interactive control nests inside another anywhere on the shelf",
       "pass": true,
-      "detail": "{\"cards\":82,\"nestedInteractive\":0,\"cardsWithOwnDoor\":82,\"cardsWithSiblingDetails\":82}"
+      "detail": "{\"cards\":77,\"nestedInteractive\":0,\"cardsWithOwnDoor\":77,\"cardsWithSiblingDetails\":77}"
     },
     {
       "name": "every card offers its text door and 詳細 as sibling buttons, both reachable",
       "pass": true,
-      "detail": "82/82 text doors · 82/82 sibling toggles"
+      "detail": "77/77 text doors · 77/77 sibling toggles"
     },
     {
       "name": "hidden layers keep no tabbable control (the invisible 閉じる × discipline)",
@@ -61,7 +61,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "549 named button(s) in the accessibility tree"
+      "detail": "550 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",
@@ -71,7 +71,7 @@
     {
       "name": "second-action English preserves the glyph anchor within 2px",
       "pass": true,
-      "detail": "637.5px → 637.5px"
+      "detail": "714.1px → 714.1px"
     },
     {
       "name": "pointer third target.activate closes the circle — plain kanji, no sheet",

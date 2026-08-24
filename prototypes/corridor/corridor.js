@@ -402,13 +402,15 @@ const S = {
   // top bar and the two corner bubbles. fwd holds a single forward step so the
   // bar's ▸ arrow can undo a back().
   navOpen: false,
-  /** The 銀河 search session. The bar's input node dies with every render, so
-   * the query lives here; navReturn marks a departure THROUGH a result, and
-   * the walk back (in-app or device Back) reopens the bar — query, results,
-   * and focus on the row you left from. A deliberate dismissal (scrim, the
-   * symbol) clears both. Session-only, never persisted. */
+  /** The search session. The room's input node dies with every render, so
+   * the query lives here; a result round-trip returns to the room with the
+   * query, the rows, and the row that was left. Back out of the room ends
+   * the session. Session-only, never persisted. */
   navQ: '',
-  navReturn: false,
+  /** 検索の間 — the search page (operator, 2026-08-20): search is a room of
+   * its own, not a strip squeezed into the bar. searchFrom remembers the
+   * view the door was opened from so Back returns there. Session-only. */
+  searchFrom: null,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
    * survive the session, and the baseline is bare kanji with readings on
@@ -723,6 +725,12 @@ function validObservationRow(row) {
     if (row.length !== 4 && row.length !== 5) return false;
     if (row.length === 5 && !nonEmptyString(row[4])) return false;
     return Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4;
+  }
+  if (row[1] === 'note') {
+    // TENOHIRA §3 · ひとこと — the learner's own words to the builder:
+    // [t, 'note', 'op', text]. Friction evidence riding the record; it
+    // names no item, grades nothing, and schedules nothing.
+    return row.length === 4 && row[2] === 'op' && nonEmptyString(row[3]);
   }
   return false;
 }
@@ -1215,6 +1223,11 @@ function commitStorePatch(patch) {
  *       row is the declaration's evidence; the forcing itself rides the
  *       session state and the grade commit. The timed dojo keeps its bare
  *       reveal and stamps 'dojo' practice rows instead.
+ *   [t, 'note', 'op', text]
+ *       ひとこと (TENOHIRA §3) — the learner's own words to the builder,
+ *       written from the tray's friction door. Names no item, grades
+ *       nothing, schedules nothing; it rides the export envelope so the
+ *       month of real use leaves evidence.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -2414,7 +2427,6 @@ function back() {
   }
   if (S.navOpen) {
     S.navOpen = false;
-    S.navReturn = false;
     render();
     return;
   }
@@ -2425,12 +2437,6 @@ function back() {
   }
   if (S.stack.length) {
     S.stack.pop();
-    if (!S.stack.length) {
-      // a sheet opened from a 銀河 search result closes back INTO the search:
-      // the bar reopens with its query, results, and the row that was left
-      if (S.view === 'drift' && S.navReturn) S.navOpen = true;
-      S.navReturn = false;
-    }
     render();
     if (!S.stack.length) {
       returnScroll();
@@ -2484,6 +2490,17 @@ function back() {
     // the shelf gets its place back — its archive door stands ~20,000px deep,
     // and losing that offset dumped the learner at the top of 70 cards
     window.scrollTo(0, S.shelfScroll);
+    return;
+  }
+  // the search room returns to the view its door was opened from — and
+  // leaving the room is a deliberate dismissal: the session ends with it
+  if (S.view === 'search') {
+    const home = S.searchFrom;
+    S.searchFrom = null;
+    S.navQ = '';
+    S.view = typeof home === 'string' && home && home !== 'search' ? home : 'drift';
+    render();
+    if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
     return;
   }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
@@ -2547,9 +2564,6 @@ function dismissSheet() {
   S.sheetFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
-  // Escape/scrim from a result's sheet walks back into the search too
-  if (S.view === 'drift' && S.navReturn) S.navOpen = true;
-  S.navReturn = false;
   render();
   returnScroll();
   restoreDialogInvoker();
@@ -3729,6 +3743,264 @@ function glossaryCrossRefPlan(p) {
   return skip.size ? { skip, doors } : null;
 }
 
+/* 聞く — the interim voice (operator escalation, 2026-08-19). The judged
+ * voice — PR 五's shootout, pitch-accent verified against the accent
+ * dictionaries — is NOT this. This door reads the article aloud with the
+ * device's own best Japanese voice so listening exists today, and it wears
+ * that truth on its face (仮の声). Word-level audio stays absent until a
+ * judged voice ships: a lone word's pitch teaches, a read-along sentence
+ * carries its own context. Nothing here writes learner state. */
+const readAloud = { on: false, timer: null, failed: false };
+
+// Warm the voice list at boot: iOS and Android hand it over asynchronously,
+// and a getVoices() call is what starts the delivery — without this the
+// first tap on 聞く sees an empty list and a real phone stays silent.
+try {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.getVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', () => {
+      speechSynthesis.getVoices();
+      // the list often lands after the reader painted — repaint once so the
+      // voice picker appears without the learner leaving the room (never
+      // mid-read: a re-render would drop the ladder and the running voice)
+      if (S.view === 'reader' && !readAloud.on && !S.stack.length) render();
+    });
+  }
+} catch {}
+
+function stopReadAloud() {
+  if (!readAloud.on) return;
+  readAloud.on = false;
+  clearTimeout(readAloud.timer);
+  stopRecAudio();
+  try {
+    speechSynthesis.cancel();
+  } catch {}
+}
+
+/** Device preference only — which installed voice reads aloud. NOT learner
+ * state: it lives beside the store, never inside it, like a display dial
+ * that belongs to the hardware rather than the learner. */
+const VOICE_PREF_KEY = 'kairo-voice-pref-v1';
+
+function jaVoices() {
+  try {
+    return speechSynthesis.getVoices().filter((v) => (v.lang || '').toLowerCase().startsWith('ja'));
+  } catch {
+    return [];
+  }
+}
+
+function bestJaVoice() {
+  const voices = jaVoices();
+  if (!voices.length) return null;
+  // the operator's own pick outranks the guesswork (real-phone escalation,
+  // 2026-08-20: the default compact voice is unbearable — surface the
+  // better voices the device already holds)
+  try {
+    const pref = localStorage.getItem(VOICE_PREF_KEY);
+    const chosen = pref && voices.find((v) => v.voiceURI === pref);
+    if (chosen) return chosen;
+  } catch {}
+  const score = (v) => (/(premium|enhanced|siri|拡張)/i.test(v.name) ? 2 : 0) + (v.localService ? 1 : 0);
+  return [...voices].sort((a, b) => score(b) - score(a))[0];
+}
+
+/** Speak the passage sentence by sentence — short utterances keep 止める
+ * responsive and survive the platform's long-utterance truncation. */
+function speakPassage(p, onDone) {
+  // the recorded reader first: アミ reads the curated shelf sentence by
+  // sentence from static files; the device voice remains the offline floor
+  ensureRecManifest().then((m) => {
+    const rec = m && m.sentences ? m.sentences[p.id] : null;
+    if (readAloud.on && rec && rec.have && rec.have.length) {
+      let i = 0;
+      const next = () => {
+        if (!readAloud.on || i >= rec.have.length) {
+          if (readAloud.on) {
+            readAloud.on = false;
+            onDone();
+          }
+          return;
+        }
+        const ix = String(rec.have[i]).padStart(3, '0');
+        playRecClip(`audio/s/ami/${p.id.replace(':', '_')}-${ix}.m4a`, null).then((played) => {
+          if (!played) {
+            // a browser without the codec (or a missing file) must not leave
+            // the reader silent: the very first clip failing hands the whole
+            // passage to the device voice; a mid-passage failure stops honestly
+            if (i === 0 && readAloud.on) {
+              speakPassageTts(p, onDone);
+              return;
+            }
+            readAloud.on = false;
+            onDone();
+            return;
+          }
+          i += 1;
+          readAloud.timer = setTimeout(next, 260);
+        });
+      };
+      next();
+      return;
+    }
+    if (readAloud.on) speakPassageTts(p, onDone);
+  });
+}
+
+function speakPassageTts(p, onDone) {
+  const text = (p.text || '').replace(/\s+/g, ' ').trim();
+  const sentences = text.match(/[^。！？]+[。！？]?/g) || [];
+  let i = 0;
+  const next = () => {
+    if (!readAloud.on || i >= sentences.length) {
+      if (readAloud.on) {
+        readAloud.on = false;
+        onDone();
+      }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(sentences[i]);
+    // lang alone is enough for the platform to pick its Japanese voice; the
+    // explicit pick (re-resolved per sentence, since the list arrives late on
+    // phones) only upgrades it to the best one installed
+    u.lang = 'ja-JP';
+    const voice = bestJaVoice();
+    if (voice) u.voice = voice;
+    u.rate = 0.92;
+    u.onend = () => {
+      i += 1;
+      // a breath between sentences, the way a reader breathes
+      readAloud.timer = setTimeout(next, 260);
+    };
+    u.onerror = (e) => {
+      const wasOn = readAloud.on;
+      readAloud.on = false;
+      // cancel() surfaces here on some engines — a stop is not a failure
+      if (wasOn && e?.error !== 'canceled' && e?.error !== 'interrupted') readAloud.failed = true;
+      onDone();
+    };
+    speechSynthesis.speak(u);
+  };
+  next();
+}
+
+/* ------------------------------------------------ 収録の声 the recorded voice
+ * The operator's roster (2026-08-20, their ear on an 11-candidate
+ * shootout): 小春音アミ PRIMARY · F1 · 四国めたん · ずんだもん · 玄野武宏.
+ * Real neural recordings shipped as static files (audio/manifest.json +
+ * audio/w/<voice>/<id>.m4a, sentences in audio/s/ami/) — the device TTS is
+ * demoted to offline fallback. The chosen voice is a device preference in
+ * its own key, never the learner store. Licences ride audio/LICENCES.md. */
+const REC_VOICE_KEY = 'kairo-rec-voice-v1';
+const REC_ROSTER = ['ami', 'f1', 'metan', 'zundamon', 'takehiro'];
+let recManifest; // undefined = not asked · null = absent · object = loaded
+let recManifestWait = null;
+let recAudioEl = null;
+
+function recVoicePref() {
+  try {
+    const v = localStorage.getItem(REC_VOICE_KEY);
+    return REC_ROSTER.includes(v) ? v : 'ami';
+  } catch {
+    return 'ami';
+  }
+}
+
+function ensureRecManifest() {
+  // the flag is stamped into index.html by the audio ship itself: a build
+  // without audio never fetches, so no probe ever sees a 404 in the console
+  // (typeof-guarded: the integrity suite runs this file in a windowless VM)
+  if (typeof window === 'undefined' || !window.__KAIRO_AUDIO__) {
+    recManifest = null;
+    return Promise.resolve(null);
+  }
+  if (recManifest !== undefined) return Promise.resolve(recManifest);
+  if (!recManifestWait) {
+    recManifestWait = fetch('audio/manifest.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((m) => {
+        recManifest = m && m.v ? m : null;
+        return recManifest;
+      });
+  }
+  return recManifestWait;
+}
+
+function stopRecAudio() {
+  if (recAudioEl) {
+    try {
+      recAudioEl.pause();
+    } catch {}
+    recAudioEl = null;
+  }
+}
+// warm the manifest at boot so the reader's first render already knows
+// whether the roster exists (absent → device fallback, quiet)
+if (typeof window !== 'undefined') ensureRecManifest();
+
+/** Play one recorded clip; resolves true when it actually played. */
+function playRecClip(src, btn) {
+  return new Promise((done) => {
+    stopRecAudio();
+    const a = new Audio(src);
+    recAudioEl = a;
+    const off = () => {
+      if (btn) btn.classList.remove('is-speaking');
+      if (recAudioEl === a) recAudioEl = null;
+    };
+    a.onplay = () => btn && btn.classList.add('is-speaking');
+    a.onended = () => {
+      off();
+      done(true);
+    };
+    a.onerror = () => {
+      off();
+      done(false);
+    };
+    a.play().catch(() => {
+      off();
+      done(false);
+    });
+  });
+}
+
+/** 音 — the answer card's voice door. The roster's recorded clip when the
+ * word has one (pref voice → アミ fallback), the device voice only when no
+ * recording exists. One tap speaks; a retap restarts. */
+function speakCardReading(text, btn, word) {
+  ensureRecManifest().then((m) => {
+    const entry = m && word && m.words ? m.words[word] : null;
+    if (entry) {
+      const pref = recVoicePref();
+      const voice = entry.voices.includes(pref) ? pref : entry.voices.includes('ami') ? 'ami' : entry.voices[0];
+      if (voice) {
+        playRecClip(`audio/w/${voice}/${entry.id}.m4a`, btn).then((played) => {
+          if (!played) speakCardReadingTts(text, btn);
+        });
+        return;
+      }
+    }
+    speakCardReadingTts(text, btn);
+  });
+}
+
+function speakCardReadingTts(text, btn) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    speechSynthesis.cancel();
+  } catch {}
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  const voice = bestJaVoice();
+  if (voice) u.voice = voice;
+  u.rate = 0.9;
+  u.onstart = () => btn.classList.add('is-speaking');
+  u.onend = u.onerror = () => btn.classList.remove('is-speaking');
+  speechSynthesis.speak(u);
+}
+
 function renderReader(main) {
   const p = passage();
   if (!p) {
@@ -3784,6 +4056,99 @@ function renderReader(main) {
     );
     main.append(dials);
   }
+
+  // the listen door rides beside the settings fold — one tap to hear the
+  // article, one tap to stop; the voice names itself 仮 (interim) until
+  // the judged voice of PR 五 replaces it
+  const listenRow = el('div', 'listen-row');
+  const listen = biLabel('button', 'chip listen-toggle', readAloud.on ? '止める' : '聞く', readAloud.on ? 'stop' : 'listen');
+  listen.type = 'button';
+  listen.id = 'listen-toggle';
+  listen.setAttribute('aria-pressed', String(readAloud.on));
+  const listenNote = el('span', 'listen-note');
+  listenNote.id = 'listen-note';
+  listenNote.textContent = readAloud.on
+    ? tx('仮の声で読んでいます', 'reading in the interim device voice')
+    : readAloud.failed
+      ? tx('この端末に日本語の声が見つからない', 'no Japanese voice on this device yet')
+      : tx('仮の声 — 検収前', 'interim device voice, for now');
+  listen.addEventListener('click', () => {
+    if (readAloud.on) {
+      stopReadAloud();
+      render();
+      return;
+    }
+    if (!('speechSynthesis' in window)) {
+      listenNote.textContent = tx('この端末は読み上げに対応していない', 'this device cannot read aloud');
+      return;
+    }
+    // An empty getVoices() list is NOT "no voice" — phones deliver the list
+    // asynchronously, and gating on it kept every first tap silent. Speak:
+    // u.lang picks the platform's Japanese voice even before the list lands,
+    // and a genuine failure surfaces through readAloud.failed instead.
+    readAloud.failed = false;
+    readAloud.on = true;
+    speakPassage(p, () => {
+      if (S.view === 'reader') render();
+    });
+    render();
+  });
+  listenRow.append(listen, listenNote);
+  // the device's other Japanese voices, surfaced (operator escalation,
+  // 2026-08-20): the compact default is the worst voice a phone holds —
+  // when better ones are installed, the hand picks; the choice is a device
+  // preference (its own key, never the learner store), and the next
+  // sentence already speaks with it because speakPassage re-resolves
+  if (recManifest) {
+    // the roster: which recorded voice speaks the WORDS (sentences are
+    // always アミ, the primary — the one voice that recorded the shelf)
+    const names = { ami: '小春音アミ', f1: 'F1', metan: '四国めたん', zundamon: 'ずんだもん', takehiro: '玄野武宏' };
+    const pick = document.createElement('select');
+    pick.className = 'listen-voice';
+    pick.id = 'listen-voice';
+    pick.setAttribute('aria-label', tx('語の声を選ぶ', 'choose the word voice'));
+    for (const v of REC_ROSTER) {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = names[v] || v;
+      if (v === recVoicePref()) opt.selected = true;
+      pick.append(opt);
+    }
+    pick.addEventListener('change', () => {
+      try {
+        localStorage.setItem(REC_VOICE_KEY, pick.value);
+      } catch {}
+    });
+    listenRow.append(pick);
+    // the roster's name never papers over a real failure: after a device
+    // that could play nothing, the honest no-voice note stands
+    if (recManifest.sentences && recManifest.sentences[p.id] && !readAloud.failed) {
+      listenNote.textContent = readAloud.on ? tx('アミが読んでいます', 'Ami is reading') : tx('小春音アミの声', 'read by Koharune Ami');
+    }
+  } else {
+    const voiceChoices = jaVoices();
+    if (voiceChoices.length > 1) {
+      const pick = document.createElement('select');
+      pick.className = 'listen-voice';
+      pick.id = 'listen-voice';
+      pick.setAttribute('aria-label', tx('読み上げの声を選ぶ', 'choose the reading voice'));
+      const current = bestJaVoice();
+      for (const v of voiceChoices) {
+        const opt = document.createElement('option');
+        opt.value = v.voiceURI;
+        opt.textContent = v.name;
+        if (current && v.voiceURI === current.voiceURI) opt.selected = true;
+        pick.append(opt);
+      }
+      pick.addEventListener('change', () => {
+        try {
+          localStorage.setItem(VOICE_PREF_KEY, pick.value);
+        } catch {}
+      });
+      listenRow.append(pick);
+    }
+  }
+  main.append(listenRow);
 
   const grammarHint = el('p', 'gesture-hint');
   grammarHint.textContent = tapLadderHint();
@@ -4284,8 +4649,10 @@ function renderTray(main) {
         ),
       ),
     );
-    // a fresh device is exactly where bringing a record back matters most
+    // a fresh device is exactly where bringing a record back matters most —
+    // and where first frictions surface, so the note door stands here too
     renderPortRow(main);
+    renderNoteDoor(main);
     return;
   }
 
@@ -4332,7 +4699,9 @@ function renderTray(main) {
     if (ev.key === 'Enter') tryMake();
   });
   maker.append(nameField, makeBtn);
-  main.append(maker);
+  // the maker used to stand ABOVE the learner's own words — admin furniture
+  // before the daily object (operator, 2026-08-20). It now waits below the
+  // lists it makes; the sections loop appends it after the last row.
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   for (const sec of sections) {
     const head = el('p', 'eyebrow list-head');
@@ -4427,14 +4796,21 @@ function renderTray(main) {
       const line = el('div', 'tray-line');
       line.tabIndex = 0;
       line.setAttribute('role', 'button');
-      line.append(el('span', 'w', item.label));
-      // rows stored before the kind fields existed heal at render time
-      const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
-      const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
-      line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
-      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
-      line.append(el('span', 'when', srsWhen(item)));
       const key = srsKey(item.t, item.id);
+      line.append(el('span', 'w', item.label));
+      // a words list wearing a [word] chip on every row was chip noise
+      // (operator, 2026-08-20): the kind speaks only when it differs from
+      // the default. Rows stored before the kind fields existed still heal.
+      if (item.t !== 'word') {
+        const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
+        const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
+        line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
+      }
+      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
+      const when = el('span', 'when', srsWhen(item));
+      // red is for NOW — a whole column of red "due" was noise wearing urgency
+      if (dueKeys.has(key)) when.classList.add('due-now');
+      line.append(when);
       if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
         // a no-debt row (legacy or imported) wakes by hand: one quiet
         // affordance in the row itself, and only this press mints the card
@@ -4478,8 +4854,10 @@ function renderTray(main) {
       main.append(line);
     }
   }
+  main.append(maker);
 
   renderPortRow(main);
+  renderNoteDoor(main);
 }
 
 /* The record is yours to carry: one plain JSON file out, the same file
@@ -4567,6 +4945,51 @@ function renderPortRow(main) {
   });
   port.append(exp, imp, file);
   main.append(port, portNote);
+}
+
+/* ひとこと — the friction door (TENOHIRA §3). The month of real use speaks
+ * through here: one small note from the hand holding the phone, kept as an
+ * append-only obslog row that rides the export envelope. Evidence, never a
+ * command: nothing here grades, schedules, or touches learner state. */
+function renderNoteDoor(main) {
+  main.append(withEn(el('p', 'eyebrow key-head', 'ひとこと'), 'a note to the builder', 'en-inline'));
+  const row = el('div', 'chat-row');
+  const input = el('input', 'search-field chat-field');
+  input.type = 'text';
+  input.id = 'note-input';
+  input.autocomplete = 'off';
+  input.placeholder = tx('気づいたことをここに…', 'anything that felt wrong or missing…');
+  const send = biLabel('button', 'take chat-send', '残す', 'keep it');
+  send.type = 'button';
+  send.id = 'note-send';
+  const keep = () => {
+    const text = input.value.trim();
+    if (!text) return;
+    // the note rides the guarded boundary: a failed persist keeps the words
+    // in the field and the storage alert names the failure
+    const obslog = [...(S.obslog || []), [Date.now(), 'note', 'op', text]];
+    if (!commitStorePatch({ obslog })) return;
+    input.value = '';
+    render();
+  };
+  send.addEventListener('click', keep);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') keep();
+  });
+  row.append(input, send);
+  main.append(row);
+  const notes = (S.obslog || []).filter((r) => r[1] === 'note');
+  if (notes.length) {
+    const list = el('div', 'note-log');
+    for (const r of notes.slice(-5).reverse()) {
+      const d = new Date(r[0]);
+      list.append(el('p', 'srs-forecast note-row', `${d.getMonth() + 1}/${d.getDate()} — ${r[3]}`));
+    }
+    if (notes.length > 5) {
+      list.append(el('p', 'srs-forecast', tx(`ほか ${notes.length - 5} 件は記録の中に`, `${notes.length - 5} more ride the record`)));
+    }
+    main.append(list);
+  }
 }
 
 /* --------------------------------------------------- JLPT · 漢検 lanes
@@ -7241,6 +7664,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.declared = null;
   // …and neither does いま見る: the next ripening card gets its own wait
   rv.showEarly = false;
+  // the fold closes with the card it opened on
+  rv.moreOpen = false;
 }
 
 function commitDrillGrade({ rv, item, next, key, skey, rating, mode, now }) {
@@ -7495,10 +7920,19 @@ function renderReview(main) {
     // would otherwise inflate the goodbye number
     const n = rv.done.again + rv.done.hard + rv.done.good + rv.done.easy;
     main.append(el('h1', 'view-title', tx(`復習おわり — ${n} 件`, `Session done — ${n} card${n === 1 ? '' : 's'}`)));
+    // the close carries the session's seals, not grey chips: the same
+    // 再難良易 the thumb pressed, each with its count (operator, 2026-08-20:
+    // the ending felt like a scrap pile, not a close)
     const sum = el('div', 'review-summary');
-    const labels = { again: ['もう一度', 'again'], hard: ['難しい', 'hard'], good: ['ふつう', 'good'], easy: ['簡単', 'easy'] };
+    const seals = { again: ['再', 'もう一度', 'again'], hard: ['難', '難しい', 'hard'], good: ['良', 'ふつう', 'good'], easy: ['易', '簡単', 'easy'] };
     for (const key of ['again', 'hard', 'good', 'easy'])
-      if (rv.done[key]) sum.append(el('span', 'pool-tag', `${tx(labels[key][0], labels[key][1])} ${rv.done[key]}`));
+      if (rv.done[key]) {
+        const cell = el('span', `sum-seal g-${key}`);
+        cell.setAttribute('aria-label', `${tx(seals[key][1], seals[key][2])} ${rv.done[key]}`);
+        cell.append(el('span', 'g-seal', seals[key][0]));
+        cell.append(el('span', 'sum-n', String(rv.done[key])));
+        sum.append(cell);
+      }
     main.append(sum);
     // the bounded sitting's honest remainder: what the freeze left for the
     // next sitting, said quietly, never queued behind the glass
@@ -7543,6 +7977,8 @@ function renderReview(main) {
       }
     }
     renderAiCoach(main, rv);
+    // one row of doors: the way on, and the way back one grade
+    const doors = el('div', 'close-doors');
     const out = biLabel('button', 'take', 'リストへ', 'back to lists');
     out.type = 'button';
     out.addEventListener('click', () => {
@@ -7550,8 +7986,9 @@ function renderReview(main) {
       S.view = 'tray';
       render();
     });
-    main.append(out);
-    renderReviewUndo(main, rv);
+    doors.append(out);
+    renderReviewUndo(doors, rv);
+    main.append(doors);
     return;
   }
   // A re-inserted learning card may not have ripened yet. The nearest-ripening
@@ -7643,8 +8080,9 @@ function renderReview(main) {
     }
   }
   const face = el('div', 'review-face');
+  const wordLen = String(Math.min(8, [...String(item.label || '')].length || 1));
   if (cloze) {
-    const line = el('p', 'review-cloze');
+    const line = el('p', 'review-cloze' + (rv.revealed ? ' reveal r-0' : ''));
     // the card's sentence carries the reader's full gesture grammar — every
     // word tap-circles, holds float its definition
     renderSentenceTokens(line, cloze.tokens, {
@@ -7654,27 +8092,83 @@ function renderReview(main) {
     });
     if (rv.revealed) line.append(sentenceDoor(cloze, item.id));
     face.append(line);
-    if (rv.revealed) face.append(el('div', 'review-front', item.label));
+    if (rv.revealed) {
+      const front = el('div', 'review-front reveal r-0', item.label);
+      front.dataset.len = wordLen;
+      face.append(front);
+    }
   } else {
-    face.append(el('div', 'review-front', item.label));
+    const front = el('div', 'review-front', item.label);
+    front.dataset.len = wordLen;
+    face.append(front);
   }
   if (rv.revealed) {
     const backc = reviewBack(item);
-    if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
-    for (const s of backc.senses) face.append(el('div', 'review-sense', s));
-    // the answer face carries the word in the wild: up to two real
-    // sentences, every token ladder-live (operator's law — a card never
-    // opens onto zero examples where the corpus holds any)
+    // 読み — the answer line wears the brush hand and carries the 音 door
+    // (operator, 2026-08-20: audio on every answer card; their word
+    // supersedes the word-audio hold until PR 五's judged voice — the door
+    // names itself 仮 in its label). The reading speaks, not the kanji:
+    // kana is deterministic where rare kanji misread.
+    const spoken = backc.reading || item.label;
+    const row = el('div', 'review-reading-row reveal r-1');
+    if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
+    if ('speechSynthesis' in window && spoken) {
+      const say = el('button', 'say');
+      say.type = 'button';
+      say.id = 'card-say';
+      say.setAttribute('aria-label', tx('読み上げ — 仮の声', 'speak the reading (interim device voice)'));
+      say.innerHTML =
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="serif">音</text></svg>';
+      say.addEventListener('click', () => speakCardReading(spoken, say, item.label));
+      row.append(say);
+    }
+    if (row.childNodes.length) face.append(row);
+    // 語義 — one sense decides the grade; the next two whisper on one line
+    // (SuperMemo's minimum-information rule; the crowding was four italic
+    // lines competing at once)
+    const senses = backc.senses || [];
+    if (senses.length) {
+      face.append(el('div', 'review-sense review-sense-primary reveal r-2', senses[0]));
+      if (senses.length > 1)
+        face.append(el('div', 'review-sense-rest reveal r-3', senses.slice(1, 3).join(' · ')));
+    }
+    // 例文 — the word in the wild waits one NAMED fold away (operator,
+    // 2026-08-20: the back was crowded and confusing; the sentences are
+    // never absent — the fold counts them, one tap opens them, and the
+    // grade never needs them)
+    let exs = [];
     if (item.t === 'word') {
       const clozeText = cloze ? cloze.tokens.map((t) => t.s).join('') : null;
-      const exs = findExamples(item.id, 3)
+      exs = findExamples(item.id, 3)
         .filter((ex) => ex.tokens.map((t) => t.s).join('') !== clozeText)
         .slice(0, 2);
-      for (const ex of exs) {
-        const line = el('p', 'review-example');
-        renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
-        line.append(sentenceDoor(ex, item.id));
-        face.append(line);
+    }
+    const lateSenses = Math.max(0, senses.length - 3);
+    if (exs.length || lateSenses) {
+      face.append(el('div', 'kintsugi reveal r-3'));
+      const fold = el('button', 'review-fold reveal r-4');
+      fold.type = 'button';
+      fold.id = 'review-fold';
+      fold.setAttribute('aria-expanded', String(!!rv.moreOpen));
+      const parts = [];
+      if (exs.length) parts.push(tx(`例文 ${exs.length}`, `${exs.length} sentence${exs.length === 1 ? '' : 's'}`));
+      if (lateSenses) parts.push(tx(`語義 +${lateSenses}`, `+${lateSenses} more sense${lateSenses === 1 ? '' : 's'}`));
+      fold.textContent = `${rv.moreOpen ? '▾' : '▸'} ${tx('詳しく', 'more')} · ${parts.join(' · ')}`;
+      fold.addEventListener('click', () => {
+        rv.moreOpen = !rv.moreOpen;
+        render();
+      });
+      face.append(fold);
+      if (rv.moreOpen) {
+        const more = el('div', 'review-more');
+        for (const ex of exs) {
+          const line = el('p', 'review-example');
+          renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank' });
+          line.append(sentenceDoor(ex, item.id));
+          more.append(line);
+        }
+        for (const s of senses.slice(3)) more.append(el('div', 'review-sense review-sense-late', s));
+        face.append(more);
       }
     }
   }
@@ -7699,6 +8193,7 @@ function renderReview(main) {
       rv.ix += 1;
       rv.revealed = false;
       rv.declared = null;
+      rv.moreOpen = false;
       S.reviewMore = false;
       render();
     });
@@ -7990,6 +8485,7 @@ function renderReviewUndo(main, rv) {
     rv.ix -= 1;
     rv.revealed = false;
     rv.declared = null;
+    rv.moreOpen = false;
     render();
   });
   main.append(undo);
@@ -8793,7 +9289,22 @@ function renderSentenceTokens(container, tokens, opts = {}) {
   const glossed = new Set();
   tokens.forEach((token, index) => {
     if (!token.c || !token.f?.length) {
-      container.append(document.createTextNode(token.s));
+      // 禁則処理 — a line must never open with a closing mark. WebKit
+      // breaks between an atomic token box (the inline-flex word button)
+      // and the text run after it, so a bare 、 could start a line
+      // (operator's real-phone screenshot, 2026-08-20). A mark that is
+      // nothing but clinging punctuation is glued to the box it follows
+      // inside one no-break span; ordinary text keeps native flow, where
+      // the browser's own kinsoku already holds.
+      const textNode = document.createTextNode(token.s);
+      const prev = container.lastChild;
+      if (prev && prev.nodeType === 1 && /^[、。，．！？」』）〉》〕］｝ー〜…‥・]+$/.test(token.s)) {
+        const glue = el('span', 'kinsoku-glue');
+        container.replaceChild(glue, prev);
+        glue.append(prev, textNode);
+        return;
+      }
+      container.append(textNode);
       return;
     }
     const isTarget = target && token.b === target;
@@ -12595,20 +13106,36 @@ function buildLangSlider() {
   return seg;
 }
 
-/** The search field lives inside the bar; results drop in place, opening the
- * same entry sheets as everywhere. It updates its own results node directly so
- * a keystroke never triggers a full re-render (which would drop focus). */
-function buildNavSearch() {
-  const wrap = el('div', 'nav-search');
-  const input = el('input', 'nav-search-input');
+/** 検索の間 — search as its own room (operator, 2026-08-20). The bar used to
+ * squeeze a field to ~71px and drop results over the galaxy; now the bar
+ * holds a door, and the door opens a full page: one big box, roomy result
+ * rows, the same entry sheets as everywhere. The page updates its own
+ * results node directly so a keystroke never triggers a full re-render
+ * (which would drop focus), and S.navQ carries the session so a result
+ * round-trip returns to the query, the rows, and the row that was left. */
+function openSearchPage() {
+  S.searchFrom = S.view;
+  S.navOpen = false;
+  keepScroll();
+  S.view = 'search';
+  render();
+}
+
+function renderSearchPage(main) {
+  main.append(withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
+  const wrap = el('div', 'search-page');
+  const input = el('input', 'nav-search-input search-page-input');
   input.type = 'search';
   input.id = 'nav-search-input';
-  // the bar squeezes this input to ~71px on a 390px phone — a long
-  // placeholder truncated to "searc" (P2, review); 検索 fits at any width
-  // and the aria-label keeps the bilingual name
-  input.placeholder = '検索';
+  input.placeholder = tx('ことばをさがす', 'kanji · kana · romaji · English');
   input.setAttribute('aria-label', tx('検索', 'search'));
-  const results = el('div', 'nav-search-results');
+  input.autocomplete = 'off';
+  const hint = el(
+    'p',
+    'search-page-hint',
+    tx('漢字・かな・ローマ字・英語 — 四つの戸、一つの箱。', 'One box, four doors — kanji, kana, romaji, or English.'),
+  );
+  const results = el('div', 'search-page-results');
   const paint = () => {
     // the deep tier repaints these rows when its worker batch settles; if a
     // row holds focus at that moment (a restored session, or a keyboard
@@ -12617,8 +13144,9 @@ function buildNavSearch() {
     const focusIx = focusedRow && results.contains(focusedRow) ? focusedRow.dataset.ix : null;
     results.textContent = '';
     const q = input.value.trim();
+    hint.hidden = !!q;
     if (!q) return;
-    const hits = searchResults(q).slice(0, 8);
+    const hits = searchResults(q).slice(0, 24);
     if (!hits.length) {
       results.append(el('div', 'nav-search-empty', tx('見つからない。', 'Nothing found.')));
       return;
@@ -12633,11 +13161,10 @@ function buildNavSearch() {
       if (e.g) stack.append(el('span', 'nsr-gloss', e.g));
       row.append(stack);
       row.addEventListener('click', () => {
-        // leaving THROUGH a result keeps the session: the walk back reopens
-        // the bar with this query, these results, and focus on this row
+        // leaving THROUGH a result keeps the session: the sheet opens over
+        // this room, and the walk back lands on this query, these rows,
+        // and focus on this row
         S.navQ = input.value;
-        S.navReturn = true;
-        S.navOpen = false;
         go(
           e.seq
             ? { t: e.t, id: e.id, seq: String(e.seq), reading: e.reading || '', matchedGloss: e.matchedGloss || '' }
@@ -12674,14 +13201,23 @@ function buildNavSearch() {
       if (first) first.click();
     }
   });
-  wrap.append(input, results);
+  wrap.append(input, hint, results);
   // a surviving session repaints in place — same query, same rows
   if (S.navQ) {
     input.value = S.navQ;
     if (S.navQ.trim()) ensureDictionaryIndex().catch(() => {});
     paint();
   }
-  return wrap;
+  main.append(wrap);
+  // an empty room hands over the pen — but never steals a focus the
+  // re-render's own restore (or the sheet's manager) has already placed
+  if (!S.navQ) {
+    requestAnimationFrame(() => {
+      if (S.view === 'search' && document.activeElement === document.body && document.body.contains(input)) {
+        input.focus({ preventScroll: true });
+      }
+    });
+  }
 }
 
 /** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
@@ -12697,11 +13233,6 @@ function buildGingaChrome(root) {
   symbol.innerHTML = GINGA_SYMBOL_SVG;
   symbol.addEventListener('click', () => {
     S.navOpen = !S.navOpen;
-    // closing by hand is a deliberate dismissal — the search session ends
-    if (!S.navOpen) {
-      S.navQ = '';
-      S.navReturn = false;
-    }
     render();
   });
   root.append(symbol);
@@ -12722,9 +13253,6 @@ function buildGingaChrome(root) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => {
     S.navOpen = false;
-    // tapping the water away is a deliberate dismissal too
-    S.navQ = '';
-    S.navReturn = false;
     render();
   });
   root.append(scrim);
@@ -12745,7 +13273,17 @@ function buildGingaChrome(root) {
   arrows.append(backB, fwdB);
   bar.append(arrows);
   bar.append(buildLangSlider());
-  bar.append(buildNavSearch());
+  // the search door — a field-shaped threshold into the search room, in the
+  // place the squeezed 71px field used to stand (operator, 2026-08-20)
+  const searchDoor = el('button', 'nav-search-door');
+  searchDoor.type = 'button';
+  searchDoor.id = 'nav-search-door';
+  searchDoor.setAttribute('aria-label', tx('検索', 'search'));
+  searchDoor.innerHTML =
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  searchDoor.append(el('span', 'nsd-word', '検索'));
+  searchDoor.addEventListener('click', openSearchPage);
+  bar.append(searchDoor);
   const dojo = biLabel('button', 'nav-dojo', '集中道場', 'focus');
   dojo.type = 'button';
   dojo.addEventListener('click', () => {
@@ -12800,9 +13338,6 @@ function render() {
     const action = node.dataset?.action;
     return action ? `[data-action="${CSS.escape(action)}"]` : null;
   })();
-  // leaving the galaxy for a ROOM ends the search round-trip: only a walk
-  // that stays on the drift (sheets keep S.view === 'drift') reopens the bar
-  if (lastRenderedView !== S.view) S.navReturn = false;
   const root = $('#app');
   root.textContent = '';
   document.body.classList.toggle('v-contrast-wcag', S.variants.contrast === 'wcag');
@@ -12864,14 +13399,18 @@ function render() {
   // dojo family (dojo, its probe, its focus blocks) is entered from the
   // galaxy and its backs walk galaxy-ward, never through the bookshelf.
   const dojoFamily = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && S.focus);
+  // the search room's door stands in the galaxy bar, and its Back walks
+  // there unless it was opened from the shelf
+  const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
   if (S.view === 'entry') parts.push(tx('野', 'field'));
-  else if (S.view === 'drift' || dojoFamily) parts.push(tx('銀河', 'galaxy'));
+  else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
   else parts.push(tx('本棚', 'bookshelf'));
   if (S.view === 'reader' && passage()) {
     // an archive read names the stack it came from — its back door
     if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
     parts.push(passage().title);
   }
+  if (S.view === 'search') parts.push(tx('検索', 'search'));
   if (S.view === 'tray') parts.push(tx('リスト', 'lists'));
   if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
   if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
@@ -13036,6 +13575,9 @@ function render() {
     else window.__DRIFT__.hide();
   }
 
+  // the interim voice belongs to the reader: leaving the room ends it
+  if (S.view !== 'reader') stopReadAloud();
+
   if (S.view === 'drift') renderDrift(main);
   else if (S.view === 'entry') renderEntry(main);
   else if (S.view === 'reader') renderReader(main);
@@ -13053,6 +13595,7 @@ function render() {
   else if (S.view === 'kanjidex') renderKanjidex(main);
   else if (S.view === 'yoji') renderYoji(main);
   else if (S.view === 'grammar') renderGrammar(main);
+  else if (S.view === 'search') renderSearchPage(main);
   else renderShelf(main);
 
   renderSheet(root);

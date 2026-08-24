@@ -1222,6 +1222,87 @@ async function main() {
     kdx.total > 100 && kdx.small === 0,
     `${kdx.total} chips measured, ${kdx.small} under ${MIN_TAP}px`);
 
+  // ---------------- TENOHIRA PR 一 · the corridor installs to a home screen
+  // The PWA seam is three files and one guard. The files must answer from the
+  // same directory the Pages workflow copies; the registration guard must keep
+  // service workers OUT of these http-driven verification runs (127.0.0.1 is
+  // a secure context, so an unguarded register() WOULD take — the emptiness
+  // of getRegistrations() is what convicts a dropped guard).
+  await open('?entry=shelf');
+  const pwa = await page.evaluate(`(async () => {
+    const manifestLink = document.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? null;
+    let manifest = null;
+    let swText = '';
+    try { manifest = await (await fetch('manifest.webmanifest')).json(); } catch {}
+    try { swText = await (await fetch('sw.js')).text(); } catch {}
+    const regs = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistrations() : [];
+    return {
+      manifestLink,
+      name: manifest?.name ?? '',
+      display: manifest?.display ?? '',
+      icons: (manifest?.icons ?? []).map((i) => i.sizes),
+      swFetches: /addEventListener\\('fetch'/.test(swText),
+      registrations: regs.length,
+    };
+  })()`);
+  check('PWA · the manifest is linked, named 回廊, standalone, and carries real icons',
+    pwa.manifestLink === 'manifest.webmanifest' && pwa.name.includes('回廊') &&
+      pwa.display === 'standalone' && pwa.icons.includes('192x192') && pwa.icons.includes('512x512'),
+    `link=${pwa.manifestLink} · "${pwa.name}" · ${pwa.display} · icons ${pwa.icons.join(',')}`);
+  check('PWA · the worker answers offline duty, and the https guard kept it out of this run',
+    pwa.swFetches && pwa.registrations === 0,
+    `fetch handler ${pwa.swFetches} · ${pwa.registrations} registrations on 127.0.0.1`);
+
+  // ------------------------- TENOHIRA PR 一 · ひとこと — the friction door
+  // The month of real use speaks through the tray: a note commits through the
+  // guarded boundary as an obslog row, survives a reload, and rides the record.
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#note-input', { timeout: 5000 });
+  await page.fill('#note-input', '読み物のふりがなが小さい');
+  await tap(page, '#note-send');
+  await page.waitForTimeout(300);
+  const noteRow = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1') || '{}');
+    const rows = (s.obslog || []).filter((r) => r[1] === 'note');
+    const last = rows[rows.length - 1] || [];
+    return { count: rows.length, kind: last[1] ?? null, key: last[2] ?? null, text: last[3] ?? null };
+  })()`);
+  check('ひとこと · the note lands in the obslog through the guarded boundary',
+    noteRow.count >= 1 && noteRow.kind === 'note' && noteRow.key === 'op' && noteRow.text === '読み物のふりがなが小さい',
+    JSON.stringify(noteRow));
+  await open('?entry=shelf');
+  await tap(page, '#tray');
+  await page.waitForSelector('#note-input', { timeout: 5000 });
+  const noteBack = await page.evaluate(
+    `[...document.querySelectorAll('.note-log .note-row')].some((n) => n.textContent.includes('読み物のふりがなが小さい'))`,
+  );
+  check('ひとこと · a reload later the note still stands in the tray', noteBack === true,
+    `rendered after reload: ${noteBack}`);
+
+  // ---------------- TENOHIRA · 聞く — the reader's interim voice door
+  // Headless Chromium ships no Japanese voice, so the probe convicts the
+  // door's PRESENCE, its honest 仮の声 label, and the graceful no-voice
+  // path — the sound itself is judged by ears, not by this suite.
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await page.waitForSelector('#listen-toggle', { timeout: 15000 });
+  const listenBefore = await page.evaluate(`({
+    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    note: document.querySelector('#listen-note')?.textContent ?? '',
+  })`);
+  await tap(page, '#listen-toggle');
+  await page.waitForTimeout(250);
+  const listenAfter = await page.evaluate(`({
+    pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
+    note: document.querySelector('#listen-note')?.textContent ?? '',
+  })`);
+  check('reader · the 聞く door stands, names its voice honestly, and answers a tap',
+    listenBefore.pressed === 'false' &&
+      /仮の声|interim device voice|小春音アミ|Koharune Ami/.test(listenBefore.note) &&
+      (listenAfter.pressed === 'true' || /声が見つからない|no Japanese voice/.test(listenAfter.note)),
+    `before ${JSON.stringify(listenBefore)} → after ${JSON.stringify(listenAfter)}`);
+
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)
   await open('?entry=shelf&variants=1');
@@ -1846,6 +1927,11 @@ async function main() {
   for (let cardN = 0; cardN < 6; cardN++) {
     await page.waitForSelector('#declare-recalled', { timeout: 10000 });
     await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    // ZEN-DOJO v2 (operator, 2026-08-20: the back decrowded): the word's
+    // sentences wait one NAMED fold away — the probe opens it the way a
+    // thumb would, then demands the same living tokens as ever
+    await page.waitForSelector('.grade', { timeout: 8000 }).catch(() => {});
+    await page.evaluate(`document.querySelector('#review-fold')?.click()`);
     await page
       .waitForFunction(
         () => document.querySelectorAll('.review-example, .review-cloze').length >= 1,
@@ -1857,14 +1943,17 @@ async function main() {
       lines: document.querySelectorAll('.review-example, .review-cloze').length,
       live: document.querySelectorAll('.review-example .sentence-tok, .review-cloze .sentence-tok').length,
       word: document.querySelector('.review-front')?.textContent ?? '',
+      say: !!document.querySelector('#card-say'),
     }))()`);
     if (answerFace.lines >= 1) break;
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
-  check('the answer face carries living sentences — never a bare word where the corpus holds any',
+  check('the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any',
     answerFace.lines >= 1 && answerFace.live >= 1,
     `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
+  check('TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)',
+    answerFace.say === true, `card-say present on “${answerFace.word.trim()}”`);
   await shoot(page, shotsDir, '18-review-answer-face');
   // the walk's recall declarations ride the observation debounce; let it
   // land before the next probe replaces the envelope (same idiom as the
@@ -1889,6 +1978,12 @@ async function main() {
   await page.waitForTimeout(500);
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
+  // the dictionary's late arrival re-renders the sheet; a tap aimed between
+  // renders finds a detached seal (seen once as "no box for #sheet-take")
+  await page
+    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
+    .catch(() => {});
+  await page.waitForTimeout(300);
   const sealBefore = await page.evaluate(`(() => {
     const b = document.querySelector('#sheet-take');
     return { taken: b.classList.contains('taken'), pressed: b.getAttribute('aria-pressed') };
@@ -2754,12 +2849,18 @@ async function main() {
       Math.abs(backToShelf.y - shelfYKept) <= 20,
     `view=${backToShelf.view} y=${backToShelf.y} (kept ${shelfYKept})`);
 
-  // (d) the 銀河 search session survives a result round-trip: query, results,
-  // and focus on the row that was left
+  // (d) the search room (operator, 2026-08-20: search is its own page) —
+  // the bar's door opens it, and the session survives a result round-trip:
+  // query, results, and focus on the row that was left
   await open('');
   await page.waitForTimeout(1600);
   await page.tap('.nav-symbol');
+  await page.waitForSelector('#nav-search-door');
+  await page.tap('#nav-search-door');
   await page.waitForSelector('#nav-search-input');
+  const searchRoom = await page.evaluate(`document.body.dataset.view`);
+  check('R3-B · the bar’s search door opens the search room, a page of its own',
+    searchRoom === 'search', `view=${searchRoom}`);
   await page.locator('#nav-search-input').fill('水');
   await page.waitForSelector('.nav-search-row', { timeout: 10000 });
   const rowsBefore = await page.locator('.nav-search-row').count();
@@ -2774,12 +2875,21 @@ async function main() {
     sheet: !!document.querySelector('#sheet'),
     q: document.getElementById('nav-search-input')?.value ?? null,
     rows: document.querySelectorAll('.nav-search-row').length,
-    focusInSearch: !!document.activeElement?.closest?.('.nav-search'),
+    focusInSearch: !!document.activeElement?.closest?.('.search-page'),
   })`);
-  check('R3-B · the nav-search session survives the round trip — query, results, focus',
-    navRound.sameDocument && navRound.view === 'drift' && !navRound.sheet &&
+  check('R3-B · the search-room session survives the round trip — query, results, focus',
+    navRound.sameDocument && navRound.view === 'search' && !navRound.sheet &&
       navRound.q === '水' && navRound.rows >= 1 && navRound.focusInSearch,
     `${JSON.stringify(navRound)} (rows before: ${rowsBefore})`);
+  // …and Back from the room itself returns to the galaxy its door stands in
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const searchHome = await page.evaluate(`({
+    sameDocument: window.__r3bNav === 1,
+    view: document.body.dataset.view,
+  })`);
+  check('R3-B · Back from the search room lands on the galaxy',
+    searchHome.sameDocument && searchHome.view === 'drift', JSON.stringify(searchHome));
 
   check('R3-B · the walks leave no console errors',
     consoleErrors.length === errsBeforeR3B,

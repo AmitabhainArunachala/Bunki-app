@@ -221,7 +221,10 @@ const rows = new Map(index.articles.map((record) => [record.id, record]));
 // pinned by tools/verify-feed.mjs against the review queue, so these checks
 // hold for EVERY row without hardcoding a census.
 const TITLE_EN_SOURCES = new Set(['shelf-map-2026', 'renkan-ai-2026-08']);
-const reviewRows = index.articles.filter((record) => record.review);
+// rows still WAITING on a human — an 'approved' review value is a decided
+// row (TENOHIRA Decision 4: the rubric may lift 検収前 where the committed
+// queue says approved), and a decided row no longer wears the mark
+const reviewRows = index.articles.filter((record) => /-pending$/.test(record.review ?? ''));
 {
   const missingEn = index.articles.filter(
     (record) => typeof record.titleEn !== 'string' || !record.titleEn.trim(),
@@ -254,14 +257,23 @@ const reviewRows = index.articles.filter((record) => record.review);
     wrongMarker.length === 0,
     wrongMarker.map((r) => `${r.id}:${r.titleEnSource}`).slice(0, 4).join(', '),
   );
+  // TENOHIRA Decision 4: the committed queue may lift an authored record out
+  // of 検収前. Each of the 30 is paired to its queue row — approved means
+  // review lifted and the mark gone, anything else means still pending AND
+  // still visibly marked. A lift with no approved queue row still convicts.
+  const reviewQueue = JSON.parse(
+    readFileSync(new URL('../../../docs/content/feed-review-queue.json', import.meta.url), 'utf8'),
+  );
+  const legacyDecision = (id) =>
+    reviewQueue.find((entry) => entry.id === id && entry.kind === 'legacy')?.decision ?? 'pending';
   check(
-    'the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel',
-    reviewRows.length >= IDS.length &&
-      IDS.every(
-        (id) =>
-          rows.get(id)?.review === 'human-review-pending' &&
+    'the 30 authored records answer to the queue: approved rows lifted, pending rows still 検収前',
+    IDS.every((id) =>
+      legacyDecision(id) === 'approved'
+        ? rows.get(id)?.review === 'approved' && !/検収前/.test(rows.get(id)?.sourceLabel ?? '')
+        : rows.get(id)?.review === 'human-review-pending' &&
           /検収前/.test(rows.get(id)?.sourceLabel ?? ''),
-      ),
+    ),
   );
   // RENKAN fleet — the archive is bilingual too: every remaining archive row
   // carries a non-empty titleEn, and the wrapper names the provenance.
@@ -898,7 +910,10 @@ try {
   const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
   check(
     'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
-    reviewRows.length >= IDS.length && jaUnmarked.length === 0,
+    // the floor was "all 30 authored rows are still pending" — a
+    // pre-delegation assumption; the queue-pairing check above owns lift
+    // legitimacy, this check owns only the marking of what IS pending
+    reviewRows.length > 0 && jaUnmarked.length === 0,
     jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
       `${reviewRows.length} pending rows marked`,
   );

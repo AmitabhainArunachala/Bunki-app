@@ -7,49 +7,49 @@
   },
   "touchEmulation": true,
   "browser": "141.0.7390.37",
-  "completedAt": "2026-08-16T18:05:48.257Z",
+  "completedAt": "2026-08-19T08:54:57.829Z",
   "artifactHashes": {
     "source": "e7c99e47407d71bbc805774ca649a1dbf84baa5769ad49c9edcda2dd1280a3a8",
     "editorial": "614542a9936eee55238ceea13722953bda4cc851f5a7659a55610c280f5302df",
-    "index": "bf6e3874bf9c6983f0c8a09f1b328831e5e2371e6d0860950a01b373e4874294",
+    "index": "0459ae8284ffa2b446a6f3047ff31a086272cc8fbda3c4426bbcd975fe59850b",
     "manifest": "ce21946267806bf0f567d6ce230e00152a60e167c9d68c39e68a9381daa95033",
-    "corridorJs": "0318fa5d712dc217fdf6b285e3b3c7aaf2221378e93bbf81982a57dd3bc636ad",
-    "corridorCss": "e5ce33ce70c19df8c19285ad6e59a0ba320d7babf6ba835e8e498716f6d53fcb",
-    "standalone": "0a1e1ab1c74f14b14c6828675adce24d2e6f5e7266c8b1e67782d9b32d3b0e89",
+    "corridorJs": "af62b595b3b6f0c4e53600d9a31499012ab921550bf4b7759e6373e103e5f01b",
+    "corridorCss": "016ec96dfb97bde915b833dbb43345530b0651852337458d9d1a9af056090af2",
+    "standalone": "061bf0420c58010dfa1537cec8e485838dde0ddcecffeb680f901170c8e51650",
     "words": "4b96962fc41944e91903cad58e53799dba0c5f9b918ec363038362a16249b012",
     "idioms": "cc2b86d4e7d0b1cb91c289035a1b6f498494dc12e898464914612283e32640b9",
     "sem": "679f7b6e008aa867dc7edec23427343e69c6a0e44334ca9f682507faf2177478",
     "articleFiles": {
-      "bunki-graded-n3-zoka-sanjin-morning": "2244652c09e90df04f8bbb7cc25562518bc4d1fd5e696dbdb6983df308d95534",
-      "bunki-graded-n3-nakaima-diary": "46a844df39a350467baebf0c652dfc11c6969645e2758ae64f38a9795769ed20",
-      "bunki-graded-n3-world-beginning": "4257152c997f7a06ba7aef518ebef9c17da973ef59a48602aff7c8072b78a3a8",
-      "bunki-graded-n3-hidden-deity": "352adabd7a3e35a5e5edb8664f2362f40acf15f07687bf100189e304507b8489",
-      "bunki-graded-n3-kojiki-book": "f3c9c1f695c821ffc972b143dc186c13b5fa5e5bde8eafb853895ce40ad10338",
-      "bunki-graded-n3-hashira-counter": "8ae8e8db1897bff639e53061dd97547d5a3ff9009354f93d7af1f2dd8aee3f93",
-      "bunki-graded-n3-feel-jingu-forest": "cdf934cdef1f3f6ec6bfa6a1df01c0c492dc2d46cf42d49b0e39fbf138646dd0",
-      "bunki-graded-n3-musubi-visual": "bc6bea8f30de56f1a6d95dd6f523ab84e809703603d6c536f2bab883f576e89a",
-      "bunki-graded-n3-gratitude-week": "5d13812e477c920640c9e8b903f26d630e2e6532dc6aeb31274ab2211d76490c",
-      "bunki-graded-n3-thanks-before-help": "3fd696b3548bb08c58e64a689d1240805b647efa82153ac350fbd28ed653e810",
-      "bunki-essay-n2-zoka-as-one": "e2a2a7e0b7bb9f08e3c5a5a139a619e1d23929e4524ce436f800a51690e85a71",
-      "bunki-essay-n2-nakaima-time": "20ce0e992a05a4afd9c8664d24a6dde420385c81398e4db32ebaaadd750d5f1b",
-      "bunki-essay-n2-creator-god": "8f01b0f4dd68f35791eb60c7e09003fbaed1cbc173043be5a9c3b71e1220f307",
-      "bunki-essay-n2-silent-amenominakanushi": "fa4cb2497f56f6f5fe3952a328e72358c0dc4330644ac0df15ad2c985ae8461c",
-      "bunki-essay-n2-kojiki-myth-history": "162f54e1076e5f9825988077ddce8cbdf130b8a054c06eb13dfe2f38ff79f3bf",
-      "bunki-essay-n2-myth-to-book": "564cf6d370dd23806f3014ee2eed91abd2ffd5b5675d9d83fab918ccb497bd94",
-      "bunki-essay-n2-feel-jingu-musubi": "59ca1301055ff8c3faa0064f6519b6297d0b9b1a14b237161fdee89e0da9d5c5",
-      "bunki-essay-n2-prayer-on-screen": "a76c2c197c6a37fdddb72e131562a31fc4b1c19de4653a80f76d6b2916c6858b",
-      "bunki-essay-n2-thanks-first": "b0a5ed6363761f8cce0db0e6fd4b4d9faf30029740282b8122a42e2f075ce269",
-      "bunki-essay-n2-testimony-literacy": "f9167f0274191cea51c97c139cd2a1311cfd0650d03cde97d83f083e530db856",
-      "bunki-essay-n1-cosmic-analogy": "487cb1d974c42ba5f18345db86f439b2ade3e94073096399bbc4414c54bed88d",
-      "bunki-essay-n1-nakaima-time-theory": "03c5bc4e3344106bf8861eb43c1fb5bd4194ef15a9c068ceca15e46dc7167d7e",
-      "bunki-essay-n1-first-versus-supreme": "3e377145a5547ea6135a4c9a3c012e224df0a53bf0968bb8b4c456f6847ece12",
-      "bunki-essay-n1-silent-god-theology": "4da0593950777fbf383c09b4e62a7a464318b5fa457a65c375d6e2ea3388b51e",
-      "bunki-essay-n1-kojiki-power": "f651f120fb98aea885f6949fb9ea33656053f305ec0719f2a0c93a9f11033744",
-      "bunki-essay-n1-beyond-fact-fiction": "7418d0cd1b10d99ef9da7290c30e97fff3e358f1cccf652ab82e0788d2d4fe53",
-      "bunki-essay-n1-sacred-media": "c4c59659ce3e6f91675e6fae0f8113026f94e3f1cb3bd6e5f660f51cbd5043d3",
-      "bunki-essay-n1-ise-time": "fd169bfa85f0d02dbaec06d8e22255067ad2b94b7df3cb5b518b4e41950eff57",
-      "bunki-essay-n1-miracle-testimony": "5e9f31406c9ee502dccbdbde94dcd87783210b6706bbc116a67645e45a3d8273",
-      "bunki-essay-n1-prayer-reality": "a9dbfe0d03447ba91727dab309dbb78f9c39bf0741f7357e70bc146d03dfb162"
+      "bunki-graded-n3-zoka-sanjin-morning": "7673cae386ac5b716565c1d6f3fa4e5b67c2b48b2fba6a194a503112770ec21c",
+      "bunki-graded-n3-nakaima-diary": "f6dddf60553e3d9878ab8d16e6b1a3c9e82667d6da50296b0f9e389102104d8b",
+      "bunki-graded-n3-world-beginning": "a69805f345ca177a926d29f13e5e7d633c56fecc9f76eb144bf07912e467eba5",
+      "bunki-graded-n3-hidden-deity": "b1b8618fb1e5d7703c3ba16ef781c412f42a09d7c5740bab6870f47dc46373dc",
+      "bunki-graded-n3-kojiki-book": "d980d87c781d8611f33f5b362642d63bf49424387e911a94d3f1edb1f040f2f9",
+      "bunki-graded-n3-hashira-counter": "0e60af1dbcd78896e1785d1ab9169b24a895d82cd61f54fe68f70e355f09a070",
+      "bunki-graded-n3-feel-jingu-forest": "ebe40ec761f8a100528233e5e51a0905a1875b5840f722a266555ddb99fc8cf8",
+      "bunki-graded-n3-musubi-visual": "bf50595f2f423557513d3d810d4450fb3c229fa76d977a1ad4c66a2c359ea4a9",
+      "bunki-graded-n3-gratitude-week": "79e0d2d78d995d55c27ff0dc73f5fadb365406967857690b0fa01e823359e8b5",
+      "bunki-graded-n3-thanks-before-help": "aab75d52ae591503f3c4e0960906471671ef3a72cd8d5d2b71ea53bad46a1f3a",
+      "bunki-essay-n2-zoka-as-one": "be406ba9d81674b8eed9ff9e2ed00b40d96324783fe728a6e410fc0249159c40",
+      "bunki-essay-n2-nakaima-time": "c5c6c23814ad012c9a22610f3562a9cfce0cf2774efdcadc82db49d3b75da69c",
+      "bunki-essay-n2-creator-god": "015fca7e049a0ac93c38915667e4bb79f432b6e145168b682ff5c9b617f52714",
+      "bunki-essay-n2-silent-amenominakanushi": "d27a0a8803ca179f5496449ee2aed492f03e1b430464362457a55ae9fd27da74",
+      "bunki-essay-n2-kojiki-myth-history": "a3a9a0605ba11bb4b7912ad6c190fd157e7c8a51059fb471ec0e2778bed97826",
+      "bunki-essay-n2-myth-to-book": "c461812d9fd4893f698c02edcca8c77cba5abb6b6042eb7db2c42ca088eeb96a",
+      "bunki-essay-n2-feel-jingu-musubi": "f03473e1c3ba4e943f98c1c5a0de10dde8242709fbce2b6fdf14f08519c777c0",
+      "bunki-essay-n2-prayer-on-screen": "5db9070778d3eb7624122416d44963ede93f4e82ae1d33248fac0bd289a8825d",
+      "bunki-essay-n2-thanks-first": "06d72d493e7c48922154d3984a45b2fcc2fb5fe26f081136717f971b805dc189",
+      "bunki-essay-n2-testimony-literacy": "7622bd22fa411cd32db82eacbde5adf73fabf51d98aef26dca2f53a84392485a",
+      "bunki-essay-n1-cosmic-analogy": "8ebcf5efd762346d54da055446ed61f69c67e4a981306af33124ae68458e8b4f",
+      "bunki-essay-n1-nakaima-time-theory": "bc2af6bcd54b5ff7acfd107e59d4c7b4d5f8d98284ae85223b8a3e25ca8d8567",
+      "bunki-essay-n1-first-versus-supreme": "4d8b93cf75d7c724257dc6f041e056c40d31126a12709d5caa902366cfc977cc",
+      "bunki-essay-n1-silent-god-theology": "0edf4421c8378c2b35392249b412256f9aa461927bb5799bcad05d1580e1dc18",
+      "bunki-essay-n1-kojiki-power": "ddd5c4e036bd6535597971a82a575d1c5deae61b3bcc733a9ede6bd3826c88fb",
+      "bunki-essay-n1-beyond-fact-fiction": "62198111051339b4ecd754c9aa9d39d10d0529061d88701280a12f46e36f9f92",
+      "bunki-essay-n1-sacred-media": "7327e14f05124ae3986c0bc4636b3f3f3c957a6278f49d54f450ccee0b3f176b",
+      "bunki-essay-n1-ise-time": "6913368cad11e6a2d96cd4211bacbb45f02e01abdf04edf9781f260172bf0c0e",
+      "bunki-essay-n1-miracle-testimony": "9349f316a4833aaf0c401a6d2c503623e1f37ce4de611d944feb8e276679600e",
+      "bunki-essay-n1-prayer-reality": "f92c8c6517129662f9dbcfb1a24379575b989b7f8f456db4c67cb43f7a27192a"
     }
   },
   "visualReferenceEvidence": {
@@ -57,33 +57,33 @@
     "references": {
       "shelf": {
         "path": "docs/prototype/screenshots/14-phase1-shelf-v11.png",
-        "sha256": "700aa36aef3bf872b3aba974de2505e30cd0d139cb784caaee1b2b71595a3fa6"
+        "sha256": "9e5492ea87d563079699e484612b5473fb80ffe8d708c9e048854ea8c160178d"
       },
       "reader": {
         "path": "docs/prototype/screenshots/16-phase1-v11-article.png",
-        "sha256": "9100157f3f7eae11fe77a7e0276e4fda2611e7f387b2b2c2c7e99c07ce53fe50"
+        "sha256": "4b0aa5d5e3ce28862c65948dc6a8bc133d46f88057a49f9d835ed0f40972248d"
       }
     },
     "captures": {
       "shelf": {
         "path": "screenshots/shelf-first-added.png",
-        "sha256": "2431279eaf1faa695f1460c93ade14f05f31f99846861d0aa6120aab797a4b9b"
+        "sha256": "2b97090c2cd7b2c0ee7b894348edf77dde831d7175005525c17669fd0fc4a45e"
       },
       "biShelf": {
         "path": "screenshots/shelf-bilingual-titles.png",
-        "sha256": "7052029a22706853d1b13acbf86f2f1808fc79a2cf16934144844e7d2c642b1f"
+        "sha256": "b095e9100a0942e2fa76d5e35df7edc579c4f12f7319a003958fcd35b9ae73b4"
       },
       "n3Reader": {
         "path": "screenshots/bunki-graded-n3-zoka-sanjin-morning-reader.png",
-        "sha256": "a3a6b772f30bc85c194479da81116c89dad15b263db83bb4a0469c7ad764a3a3"
+        "sha256": "258c374ef3936bbac8f7efc1f050d43641f649ac45b3329e3829f8bfa3980b01"
       },
       "n2Reader": {
         "path": "screenshots/bunki-essay-n2-silent-amenominakanushi-reader.png",
-        "sha256": "276683e691a42429ff26e622e16e4a49aa4d2b8b98c7bd45b3e0cad272ff847a"
+        "sha256": "176202402bffd2f1de3534770f11ba31813e40f06c45eacbcffab4c0077c85a3"
       },
       "n1Reader": {
         "path": "screenshots/bunki-essay-n1-prayer-reality-reader.png",
-        "sha256": "91802bd298a44c3799febd697441fda02468a9952d5d5fe4f5c19bd4b062740e"
+        "sha256": "6a8721ff883a1aa3e3f84e3db0026b5ea5d7f81f80e11890a345863f907c4526"
       }
     }
   },
@@ -94,7 +94,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "造化三神に出会う朝",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -110,7 +110,7 @@
       },
       "readerShape": {
         "title": "造化三神に出会う朝",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 703,
         "ruby": 263,
@@ -133,8 +133,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11048,
-      "returnedShelfY": 11048,
+      "shelfY": 9681,
+      "returnedShelfY": 9681,
       "newNoise": []
     },
     {
@@ -143,7 +143,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「中今」を感じる一日",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -159,7 +159,7 @@
       },
       "readerShape": {
         "title": "「中今」を感じる一日",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級前半",
         "tokens": 731,
         "ruby": 281,
@@ -182,8 +182,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11048,
-      "returnedShelfY": 11048,
+      "shelfY": 9681,
+      "returnedShelfY": 9681,
       "newNoise": []
     },
     {
@@ -192,7 +192,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "世界のはじまりに現れた三柱",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -208,7 +208,7 @@
       },
       "readerShape": {
         "title": "世界のはじまりに現れた三柱",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 712,
         "ruby": 281,
@@ -231,8 +231,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11234,
-      "returnedShelfY": 11234,
+      "shelfY": 9867,
+      "returnedShelfY": 9867,
       "newNoise": []
     },
     {
@@ -241,7 +241,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "姿を隠した神さま",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -257,7 +257,7 @@
       },
       "readerShape": {
         "title": "姿を隠した神さま",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級前半",
         "tokens": 743,
         "ruby": 214,
@@ -280,8 +280,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11785,
-      "returnedShelfY": 11785,
+      "shelfY": 10418,
+      "returnedShelfY": 10418,
       "newNoise": []
     },
     {
@@ -290,7 +290,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』はどんな本？",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -306,7 +306,7 @@
       },
       "readerShape": {
         "title": "『古事記』はどんな本？",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 745,
         "ruby": 286,
@@ -329,8 +329,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11785,
-      "returnedShelfY": 11785,
+      "shelfY": 10418,
+      "returnedShelfY": 10418,
       "newNoise": []
     },
     {
@@ -339,7 +339,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "神さまを「一柱」と数えるわけ",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -355,7 +355,7 @@
       },
       "readerShape": {
         "title": "神さまを「一柱」と数えるわけ",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 677,
         "ruby": 253,
@@ -378,8 +378,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 11971,
-      "returnedShelfY": 11971,
+      "shelfY": 10605,
+      "returnedShelfY": 10605,
       "newNoise": []
     },
     {
@@ -388,7 +388,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "伊勢神宮の森を映像で歩く",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -404,7 +404,7 @@
       },
       "readerShape": {
         "title": "伊勢神宮の森を映像で歩く",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 739,
         "ruby": 280,
@@ -427,8 +427,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12522,
-      "returnedShelfY": 12522,
+      "shelfY": 11156,
+      "returnedShelfY": 11156,
       "newNoise": []
     },
     {
@@ -437,7 +437,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "天・地・祈りをつなぐ「むすひ」",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -453,7 +453,7 @@
       },
       "readerShape": {
         "title": "天・地・祈りをつなぐ「むすひ」",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 696,
         "ruby": 251,
@@ -476,8 +476,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12522,
-      "returnedShelfY": 12522,
+      "shelfY": 11156,
+      "returnedShelfY": 11156,
       "newNoise": []
     },
     {
@@ -486,7 +486,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "一週間、感謝の言葉を唱えてみた",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -502,7 +502,7 @@
       },
       "readerShape": {
         "title": "一週間、感謝の言葉を唱えてみた",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級後半",
         "tokens": 648,
         "ruby": 238,
@@ -525,8 +525,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 12708,
-      "returnedShelfY": 12708,
+      "shelfY": 11342,
+      "returnedShelfY": 11342,
       "newNoise": []
     },
     {
@@ -535,7 +535,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「助けて」より先に「ありがとう」？",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -551,7 +551,7 @@
       },
       "readerShape": {
         "title": "「助けて」より先に「ありがとう」？",
-        "source": "段階別読み物 · Bunki · 検収前",
+        "source": "段階別読み物 · Bunki",
         "level": "中級前半",
         "tokens": 766,
         "ruby": 228,
@@ -574,8 +574,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 13273,
-      "returnedShelfY": 13273,
+      "shelfY": 11907,
+      "returnedShelfY": 11907,
       "newNoise": []
     },
     {
@@ -584,7 +584,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "三柱の神を一つの働きとして読む",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -600,7 +600,7 @@
       },
       "readerShape": {
         "title": "三柱の神を一つの働きとして読む",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 785,
         "ruby": 299,
@@ -623,8 +623,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15539,
-      "returnedShelfY": 15539,
+      "shelfY": 14173,
+      "returnedShelfY": 14173,
       "newNoise": []
     },
     {
@@ -633,7 +633,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "過去・現在・未来と「中今」",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -649,7 +649,7 @@
       },
       "readerShape": {
         "title": "過去・現在・未来と「中今」",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 812,
         "ruby": 306,
@@ -672,8 +672,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15539,
-      "returnedShelfY": 15539,
+      "shelfY": 14173,
+      "returnedShelfY": 14173,
       "newNoise": []
     },
     {
@@ -682,7 +682,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「創造神」という言葉はどこまで正しいか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -698,7 +698,7 @@
       },
       "readerShape": {
         "title": "「創造神」という言葉はどこまで正しいか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 795,
         "ruby": 310,
@@ -721,8 +721,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 15753,
-      "returnedShelfY": 15753,
+      "shelfY": 14387,
+      "returnedShelfY": 14387,
       "newNoise": []
     },
     {
@@ -731,7 +731,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "天之御中主神――語られない神をどう読むか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -747,7 +747,7 @@
       },
       "readerShape": {
         "title": "天之御中主神――語られない神をどう読むか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 777,
         "ruby": 281,
@@ -770,8 +770,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16318,
-      "returnedShelfY": 16318,
+      "shelfY": 14952,
+      "returnedShelfY": 14952,
       "newNoise": []
     },
     {
@@ -780,7 +780,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』は神話か、歴史か",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -796,7 +796,7 @@
       },
       "readerShape": {
         "title": "『古事記』は神話か、歴史か",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "上級前半",
         "tokens": 775,
         "ruby": 307,
@@ -819,8 +819,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16318,
-      "returnedShelfY": 16318,
+      "shelfY": 14952,
+      "returnedShelfY": 14952,
       "newNoise": []
     },
     {
@@ -829,7 +829,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "語りから書物へ――神話を編む",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -845,7 +845,7 @@
       },
       "readerShape": {
         "title": "語りから書物へ――神話を編む",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 744,
         "ruby": 295,
@@ -868,8 +868,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 16518,
-      "returnedShelfY": 16518,
+      "shelfY": 15152,
+      "returnedShelfY": 15152,
       "newNoise": []
     },
     {
@@ -878,7 +878,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "映像が伝える「むすひ」",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -894,7 +894,7 @@
       },
       "readerShape": {
         "title": "映像が伝える「むすひ」",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 800,
         "ruby": 310,
@@ -917,8 +917,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17069,
-      "returnedShelfY": 17069,
+      "shelfY": 15703,
+      "returnedShelfY": 15703,
       "newNoise": []
     },
     {
@@ -927,7 +927,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "映像の中で祈りはどう見えるか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -943,7 +943,7 @@
       },
       "readerShape": {
         "title": "映像の中で祈りはどう見えるか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 828,
         "ruby": 323,
@@ -966,8 +966,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17069,
-      "returnedShelfY": 17069,
+      "shelfY": 15703,
+      "returnedShelfY": 15703,
       "newNoise": []
     },
     {
@@ -976,7 +976,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「ありがとうございます」を先に言う心理",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -992,7 +992,7 @@
       },
       "readerShape": {
         "title": "「ありがとうございます」を先に言う心理",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 791,
         "ruby": 264,
@@ -1015,8 +1015,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17283,
-      "returnedShelfY": 17283,
+      "shelfY": 15916,
+      "returnedShelfY": 15916,
       "newNoise": []
     },
     {
@@ -1025,7 +1025,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "体験談をどう受け取るか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1041,7 +1041,7 @@
       },
       "readerShape": {
         "title": "体験談をどう受け取るか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 815,
         "ruby": 293,
@@ -1064,8 +1064,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17834,
-      "returnedShelfY": 17834,
+      "shelfY": 16467,
+      "returnedShelfY": 16467,
       "newNoise": []
     },
     {
@@ -1074,7 +1074,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "造化三神を宇宙論として読む誘惑",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1090,7 +1090,7 @@
       },
       "readerShape": {
         "title": "造化三神を宇宙論として読む誘惑",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 942,
         "ruby": 362,
@@ -1113,8 +1113,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 17834,
-      "returnedShelfY": 17834,
+      "shelfY": 16467,
+      "returnedShelfY": 16467,
       "newNoise": []
     },
     {
@@ -1123,7 +1123,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「中今」は時間論になり得るか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1139,7 +1139,7 @@
       },
       "readerShape": {
         "title": "「中今」は時間論になり得るか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 922,
         "ruby": 353,
@@ -1162,8 +1162,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18020,
-      "returnedShelfY": 18020,
+      "shelfY": 16654,
+      "returnedShelfY": 16654,
       "newNoise": []
     },
     {
@@ -1172,7 +1172,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "原初神を「最高神」と呼ぶときの問題",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1188,7 +1188,7 @@
       },
       "readerShape": {
         "title": "原初神を「最高神」と呼ぶときの問題",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 957,
         "ruby": 381,
@@ -1211,8 +1211,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18585,
-      "returnedShelfY": 18585,
+      "shelfY": 17218,
+      "returnedShelfY": 17218,
       "newNoise": []
     },
     {
@@ -1221,7 +1221,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "沈黙する神と不在の神学",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1237,7 +1237,7 @@
       },
       "readerShape": {
         "title": "沈黙する神と不在の神学",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 935,
         "ruby": 342,
@@ -1260,8 +1260,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18585,
-      "returnedShelfY": 18585,
+      "shelfY": 17218,
+      "returnedShelfY": 17218,
       "newNoise": []
     },
     {
@@ -1270,7 +1270,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "『古事記』編纂と権力の物語",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1286,7 +1286,7 @@
       },
       "readerShape": {
         "title": "『古事記』編纂と権力の物語",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "上級前半",
         "tokens": 942,
         "ruby": 390,
@@ -1309,8 +1309,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 18785,
-      "returnedShelfY": 18785,
+      "shelfY": 17418,
+      "returnedShelfY": 17418,
       "newNoise": []
     },
     {
@@ -1319,7 +1319,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "神話を「事実か虚構か」で裁かないために",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1335,7 +1335,7 @@
       },
       "readerShape": {
         "title": "神話を「事実か虚構か」で裁かないために",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 960,
         "ruby": 364,
@@ -1358,8 +1358,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19349,
-      "returnedShelfY": 19349,
+      "shelfY": 17983,
+      "returnedShelfY": 17983,
       "newNoise": []
     },
     {
@@ -1368,7 +1368,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "「感じる」映像は神聖さをどう構成するか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1384,7 +1384,7 @@
       },
       "readerShape": {
         "title": "「感じる」映像は神聖さをどう構成するか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 970,
         "ruby": 366,
@@ -1407,8 +1407,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19349,
-      "returnedShelfY": 19349,
+      "shelfY": 17983,
+      "returnedShelfY": 17983,
       "newNoise": []
     },
     {
@@ -1417,7 +1417,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "産霊・自然・反復――伊勢の時間",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1433,7 +1433,7 @@
       },
       "readerShape": {
         "title": "産霊・自然・反復――伊勢の時間",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 956,
         "ruby": 380,
@@ -1456,8 +1456,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 19577,
-      "returnedShelfY": 19577,
+      "shelfY": 18211,
+      "returnedShelfY": 18211,
       "newNoise": []
     },
     {
@@ -1466,7 +1466,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "奇跡の体験談と認識の責任",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1482,7 +1482,7 @@
       },
       "readerShape": {
         "title": "奇跡の体験談と認識の責任",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 940,
         "ruby": 338,
@@ -1505,8 +1505,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 20128,
-      "returnedShelfY": 20128,
+      "shelfY": 18762,
+      "returnedShelfY": 18762,
       "newNoise": []
     },
     {
@@ -1515,7 +1515,7 @@
       "shelfState": {
         "className": "shelf-item",
         "title": "祈りの言葉は誰の現実を変えるのか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "licence": [
           "Bunki original"
         ],
@@ -1531,7 +1531,7 @@
       },
       "readerShape": {
         "title": "祈りの言葉は誰の現実を変えるのか",
-        "source": "随筆 · Bunki · 検収前",
+        "source": "随筆 · Bunki",
         "level": "中級後半",
         "tokens": 971,
         "ruby": 334,
@@ -1554,8 +1554,8 @@
       "intendedPosition": 620,
       "persistedPosition": 620,
       "restoredPosition": 620,
-      "shelfY": 20128,
-      "returnedShelfY": 20128,
+      "shelfY": 18762,
+      "returnedShelfY": 18762,
       "newNoise": []
     }
   ],
@@ -1564,7 +1564,7 @@
     {
       "name": "every primary index row carries a non-empty titleEn",
       "pass": true,
-      "detail": "82/82",
+      "detail": "77/77",
       "articleId": null
     },
     {
@@ -1580,7 +1580,7 @@
       "articleId": null
     },
     {
-      "name": "the 30 authored 検収前 records keep review state, 検収前 named in each sourceLabel",
+      "name": "the 30 authored records answer to the queue: approved rows lifted, pending rows still 検収前",
       "pass": true,
       "detail": "",
       "articleId": null
@@ -1588,7 +1588,7 @@
     {
       "name": "every archive row carries a non-empty titleEn with wrapper provenance",
       "pass": true,
-      "detail": "682 rows · source renkan-ai-2026-08",
+      "detail": "686 rows · source renkan-ai-2026-08",
       "articleId": null
     },
     {
@@ -1600,7 +1600,7 @@
     {
       "name": "no index row or curated body carries a stringified null date",
       "pass": true,
-      "detail": "82 curated + 682 archive rows clean",
+      "detail": "77 curated + 686 archive rows clean",
       "articleId": null
     },
     {
@@ -1612,13 +1612,13 @@
     {
       "name": "every curated jlpt_lexicon coverage equals a reading-aware recompute from its own tokens",
       "pass": true,
-      "detail": "82 cards agree",
+      "detail": "77 cards agree",
       "articleId": null
     },
     {
       "name": "the per-card vocab ratio discriminates — ≥6 distinct values, none covering >50% of cards",
       "pass": true,
-      "detail": "11 distinct 1-in-N values, largest share 26/82",
+      "detail": "11 distinct 1-in-N values, largest share 25/77",
       "articleId": null
     },
     {
@@ -1630,7 +1630,7 @@
     {
       "name": "every lexicon override site is minted into the curated bodies — no suspect reading left open",
       "pass": true,
-      "detail": "303 lexicon-fixed · 8 accepted across 82 bodies",
+      "detail": "303 lexicon-fixed · 8 accepted across 77 bodies",
       "articleId": null
     },
     {
@@ -1648,7 +1648,7 @@
     {
       "name": "the one native shelf renders exactly the curated index rows",
       "pass": true,
-      "detail": "82/82",
+      "detail": "77/77",
       "articleId": null
     },
     {
@@ -1864,13 +1864,13 @@
     {
       "name": "every human-review-pending row is visibly 検収前 on the 日本語のみ shelf",
       "pass": true,
-      "detail": "53 pending rows marked",
+      "detail": "11 pending rows marked",
       "articleId": null
     },
     {
       "name": "the bilingual shelf renders every English title from the records themselves",
       "pass": true,
-      "detail": "82 titles",
+      "detail": "77 titles",
       "articleId": null
     },
     {

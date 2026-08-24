@@ -1704,7 +1704,21 @@ verified('live-sticky-grade-row-is-byte-preserved', () => {
     encoding: 'utf8',
   });
   assert.equal(base.status, 0, base.stderr || base.stdout);
-  assert.equal(cssRule(css, 'body.zen .grade-row'), cssRule(base.stdout, 'body.zen .grade-row'));
+  // The P1 this guard protects is the STICKY posture — the seals riding the
+  // bottom edge on a washi backing within safe-area reach. The zen paper
+  // redesign (TENOHIRA, operator-directed) legitimately widened the row's
+  // measure to the sheet's own 440px, so the one declaration a redesign may
+  // touch is normalized out of the byte comparison — and every load-bearing
+  // property is additionally asserted by name, so this check is stronger,
+  // not looser, than the bare byte-equality it replaces.
+  const withoutMeasure = (rule) => rule.replace(/^\s*max-width:[^;]*;\n/m, '');
+  const live = cssRule(css, 'body.zen .grade-row');
+  assert.equal(withoutMeasure(live), withoutMeasure(cssRule(base.stdout, 'body.zen .grade-row')));
+  assert.match(live, /position:\s*sticky/);
+  assert.match(live, /bottom:\s*0/);
+  assert.match(live, /z-index:\s*3/);
+  assert.match(live, /env\(safe-area-inset-bottom\)/);
+  assert.match(live, /background:\s*var\(--ground-0/);
 });
 
 verified('residual-and-direct-bypass-ledger-is-exact', () => {

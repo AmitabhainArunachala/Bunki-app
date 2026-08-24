@@ -73,9 +73,17 @@ def restore_to_archive(candidate_id: str, archive_index: dict, tagger, jlpt_maps
     source = next((rec for rec in bc.read_jsonl(ARCHIVE_JSONL) if rec["id"] == candidate_id), None)
     if source is None:
         raise SystemExit(f"{candidate_id}: not in {ARCHIVE_JSONL} — cannot restore")
+    # the archive is bilingual (RENKAN): a restored row must carry its EN
+    # title back with it — the first rubric pass dropped five and the
+    # native-readings gate convicted the gap
+    titles = json.loads((REPO / "docs/content/feed-titles-en.json").read_text("utf-8")).get("titles", {})
+    title_en = titles.get(candidate_id, "")
+    if not title_en.strip():
+        raise SystemExit(f"{candidate_id}: no EN title in feed-titles-en.json — cannot restore bilingually")
     meta = source.get("meta", {})
     a = {
         "id": source["id"],
+        "titleEn": title_en,
         "title": source["title"],
         "text": source["text"].replace("\r\n", "\n").strip(),
         "source": "ja.wikinews",
