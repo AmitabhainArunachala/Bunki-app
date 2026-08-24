@@ -688,6 +688,25 @@ async function main() {
       ['hidden', 'lifted'].includes(pendingGate.ink) && ['hidden', 'lifted'].includes(pendingGate.bleed),
       JSON.stringify(pendingGate),
     );
+    // the gate is FULL MOTION ONLY: under reduced motion the classic still
+    // is the mount-time renderer and must stand through the import window
+    // (PR #82 review — the unscoped gate once blanked the reduced room)
+    const reducedPendingGate = await page.evaluate(() => {
+      const room = document.querySelector('#stroke-page');
+      const was = { motion: room.dataset.motion, ready: room.dataset.inkReady };
+      room.dataset.motion = 'reduced';
+      room.dataset.inkReady = 'pending';
+      const ink = room.querySelector('.stroke-ink');
+      const state = ink ? getComputedStyle(ink).visibility : 'lifted';
+      room.dataset.motion = was.motion;
+      room.dataset.inkReady = was.ready;
+      return state;
+    });
+    check(
+      'the reduced-motion still is never hidden by the pending gate',
+      reducedPendingGate === 'visible' || reducedPendingGate === 'lifted',
+      reducedPendingGate,
+    );
     const animcjkRequests = await page.evaluate(
       () =>
         performance

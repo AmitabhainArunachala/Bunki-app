@@ -3340,10 +3340,13 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
  * for the loading interval (the legacy first-paint flash, issue #79). The
  * grid and faint guide are the paper's own furniture and stay; the ink, its
  * bleed, and the numbers wait for the owner: the living sheet, or 'fallback',
- * whose classic write begins the moment it is chosen. */
-.stroke-page[data-ink-ready='pending'] .stroke-bleed,
-.stroke-page[data-ink-ready='pending'] .stroke-ink,
-.stroke-page[data-ink-ready='pending'] .stroke-nums {
+ * whose classic write begins the moment it is chosen. Full motion only:
+ * under reduced motion the classic still IS the mount-time renderer and must
+ * stand immediately — hiding it left the room blank for the import window
+ * (PR #82 review). */
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-bleed,
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-ink,
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-nums {
   visibility: hidden;
 }
 .stroke-page[data-living='on'] .stroke-readout,
