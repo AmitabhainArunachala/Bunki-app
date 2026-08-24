@@ -116,10 +116,39 @@ function dictionaryCoreMatch(form, row) {
   return { compatible, reading, gloss };
 }
 
-function validateRow(row, previousSeq) {
+function validateSenseTagRows(row, vocabulary) {
+  const senses = row[12];
+  if (!Array.isArray(senses) || !senses.length) return false;
+  let nextGloss = 0;
+  for (const sense of senses) {
+    if (
+      !Array.isArray(sense) ||
+      sense.length !== 5 ||
+      sense[0] !== nextGloss ||
+      !Number.isInteger(sense[1]) ||
+      sense[1] < 1 ||
+      !Array.isArray(sense[2]) ||
+      !Array.isArray(sense[3]) ||
+      !Array.isArray(sense[4])
+    ) {
+      return false;
+    }
+    for (const [category, tags] of [
+      ['misc', sense[2]],
+      ['field', sense[3]],
+      ['dialect', sense[4]],
+    ]) {
+      if (tags.some((tag) => typeof vocabulary?.[category]?.[tag] !== 'string')) return false;
+    }
+    nextGloss += sense[1];
+  }
+  return nextGloss === row[6].length;
+}
+
+function validateRow(row, previousSeq, vocabulary) {
   if (
     !Array.isArray(row) ||
-    row.length < 12 ||
+    row.length !== 13 ||
     !/^\d+$/.test(String(row[0])) ||
     !Array.isArray(row[4]) ||
     !Array.isArray(row[5]) ||
@@ -130,6 +159,7 @@ function validateRow(row, previousSeq) {
     !Array.isArray(row[11]) ||
     row[10].length !== row[6].length ||
     row[11].length !== row[5].length ||
+    !validateSenseTagRows(row, vocabulary) ||
     Number(row[0]) <= previousSeq
   ) {
     throw new Error('dictionary index row is malformed');
@@ -164,17 +194,28 @@ async function initialise(indexUrl, coreUrl) {
   ]);
   const index = indexLoad.value;
   if (
-    index?.schemaVersion !== 2 ||
+    index?.schemaVersion !== 3 ||
     index?.shardCount !== 16 ||
     index?.sharding?.id !== 'fnv1a32-ascii-seq-mask15' ||
     index.sharding.shardCount !== index.shardCount ||
+    index?.layout?.indexEntry?.[12] !== 'senseTagRows' ||
+    index?.layout?.senseTagRow?.join(',') !== 'glossStart,glossCount,misc,field,dialect' ||
+    !index?.senseTagVocabulary?.misc ||
+    !index?.senseTagVocabulary?.field ||
+    !index?.senseTagVocabulary?.dialect ||
     !Array.isArray(index.entries) ||
+    coreLoad.value?.schemaVersion !== 3 ||
+    coreLoad.value?.senseTagLayout?.join(',') !==
+      'glossStart,glossCount,misc,field,dialect' ||
+    !coreLoad.value?.senseTags ||
     !coreLoad.value?.words
   ) {
     throw new Error('dictionary worker received an unsupported index');
   }
   let previousSeq = -1;
-  for (const row of index.entries) previousSeq = validateRow(row, previousSeq);
+  for (const row of index.entries) {
+    previousSeq = validateRow(row, previousSeq, index.senseTagVocabulary);
+  }
   dictionaryEntries = index.entries;
   delete index.entries;
   dictionaryMetadata = index;

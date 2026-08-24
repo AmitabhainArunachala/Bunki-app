@@ -5,9 +5,9 @@
  * JMdict-derived vocab entries (all senses, most common first, POS, JLPT) and
  * all 2,136 KanjiVG stroke-path sets ride into the corridor's ShareAlike pool.
  *
- * Usage: node build_dictionary.mjs [--check] [--dict-only]
+ * Usage: node build_dictionary.mjs [--check] [--dict-only] [--output-dir PATH]
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,12 +27,14 @@ function fail(message) {
 }
 
 if (
-  v2.schemaVersion !== 2 ||
+  v2.schemaVersion !== 3 ||
   v2.source?.pin !== EXPECTED_V2_PIN ||
   v2.layout?.indexEntry?.[9] !== 'readingSummaries' ||
-  v2.layout?.readingSummary?.join(',') !== 'displayHeadOr0,primaryGlossOr0'
+  v2.layout?.readingSummary?.join(',') !== 'displayHeadOr0,primaryGlossOr0' ||
+  v2.layout?.indexEntry?.[12] !== 'senseTagRows' ||
+  v2.layout?.senseTagRow?.join(',') !== 'glossStart,glossCount,misc,field,dialect'
 ) {
-  fail('dict-v2 index has an unsupported or unpinned reading-summary schema');
+  fail('dict-v2 index has an unsupported or unpinned sense-honest schema');
 }
 const v2BySeq = new Map(v2.entries.map((row) => [String(row[0]), row]));
 const corrections = [];
@@ -79,10 +81,13 @@ function restrictionCompatibleMeanings(vocabEntry) {
 }
 
 const words = {};
+const senseTags = {};
 for (const v of vocab) {
   // keyed by written form; first entry wins (kotobako is ordered by JMdict
   // entry sequence, which fronts the more common entry)
   if (words[v.word]) continue;
+  const seq = /^vocab_(\d+)$/.exec(v.id)?.[1];
+  const sourceRow = seq ? v2BySeq.get(seq) : null;
   const rec = { r: v.reading, m: restrictionCompatibleMeanings(v) };
   if (v.altWord) rec.alt = v.altWord;
   if (v.pos) rec.p = v.pos;
@@ -97,6 +102,27 @@ for (const v of vocab) {
       .filter((c) => c.length === 1);
   }
   words[v.word] = rec;
+  if (sourceRow && !Array.isArray(sourceRow[12])) {
+    fail(`core word ${v.word} (${v.id}) has malformed schema-v3 source sense rows`);
+  }
+  if (
+    sourceRow &&
+    sourceRow[12].some(
+      (row) =>
+        !Array.isArray(row) ||
+        row.length !== 5 ||
+        !Array.isArray(row[2]) ||
+        !Array.isArray(row[3]) ||
+        !Array.isArray(row[4]),
+    )
+  ) {
+    fail(`core word ${v.word} (${v.id}) has malformed source sense rows`);
+  }
+  if (
+    sourceRow?.[12].some((row) => row[2].length || row[3].length || row[4].length)
+  ) {
+    senseTags[v.word] = sourceRow[12];
+  }
 }
 
 const expectedCorrections = [
@@ -116,6 +142,7 @@ if (
 }
 
 const dict = {
+  schemaVersion: 3,
   pool: 'share_alike',
   sources: [
     {
@@ -126,6 +153,8 @@ const dict = {
       url: 'https://www.edrdg.org/',
     },
   ],
+  senseTagLayout: ['glossStart', 'glossCount', 'misc', 'field', 'dialect'],
+  senseTags,
   words,
 };
 
@@ -153,14 +182,30 @@ const strokesOut = {
   meta: kmeta,
 };
 
-const dictPath = resolve(CORRIDOR, 'data', 'share_alike', 'dict.json');
-const strokesPath = resolve(CORRIDOR, 'data', 'share_alike', 'strokes.json');
 const dictJson = JSON.stringify(dict);
 const strokesJson = JSON.stringify(strokesOut);
-const check = process.argv.includes('--check');
-const dictOnly = process.argv.includes('--dict-only');
-const unknown = process.argv.slice(2).filter((arg) => !['--check', '--dict-only'].includes(arg));
-if (unknown.length) fail(`unknown argument(s): ${unknown.join(', ')}`);
+const options = {
+  check: false,
+  dictOnly: false,
+  outputDir: resolve(CORRIDOR, 'data', 'share_alike'),
+};
+const args = process.argv.slice(2);
+for (let index = 0; index < args.length; index += 1) {
+  const arg = args[index];
+  if (arg === '--check') options.check = true;
+  else if (arg === '--dict-only') options.dictOnly = true;
+  else if (arg === '--output-dir') {
+    if (!args[index + 1]) fail('--output-dir requires a path');
+    options.outputDir = resolve(args[(index += 1)]);
+  } else if (arg.startsWith('--output-dir=')) {
+    options.outputDir = resolve(arg.slice('--output-dir='.length));
+  } else {
+    fail(`unknown argument ${JSON.stringify(arg)}`);
+  }
+}
+const { check, dictOnly } = options;
+const dictPath = resolve(options.outputDir, 'dict.json');
+const strokesPath = resolve(options.outputDir, 'strokes.json');
 
 if (check) {
   if (readFileSync(dictPath, 'utf8') !== dictJson) {
@@ -169,13 +214,18 @@ if (check) {
   if (!dictOnly && readFileSync(strokesPath, 'utf8') !== strokesJson) {
     fail('strokes.json is stale — rerun build_dictionary.mjs');
   }
-  console.log(`dict.json current · ${corrections.length} restriction-compatible corrections`);
+  console.log(
+    `dict.json current · ${corrections.length} restriction-compatible corrections · ` +
+      `${Object.keys(senseTags).length} tagged entries`,
+  );
   process.exit(0);
 }
 
+mkdirSync(options.outputDir, { recursive: true });
 writeFileSync(dictPath, dictJson);
 if (!dictOnly) writeFileSync(strokesPath, strokesJson);
 console.log(
-  `dict.json: ${Object.keys(words).length} words · ${corrections.length} corrected primaries` +
+  `dict.json: ${Object.keys(words).length} words · ${Object.keys(senseTags).length} tagged entries · ` +
+    `${corrections.length} corrected primaries` +
     (dictOnly ? '' : ` · strokes.json: ${Object.keys(strokes).length} kanji`),
 );

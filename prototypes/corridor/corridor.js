@@ -1609,7 +1609,11 @@ function validDictionaryRow(row, previousSeq = -1) {
 function installDictionaryIndex(index, { mode = 'main', performanceRecord = null } = {}) {
   const mainEntries = Array.isArray(index?.entries) ? index.entries : null;
   if (
-    index?.schemaVersion !== 2 ||
+    // schema 3 (DICT_TAGS_CONTRACT_2026-08-12): rows keep cells 0–11
+    // byte-semantically and append senseTagRows at cell 12. Mixing schema 2
+    // and 3 is an error, never an implicit fallback — the worker enforces the
+    // same law on its side of the seam.
+    index?.schemaVersion !== 3 ||
     index?.shardCount !== 16 ||
     index?.sharding?.id !== 'fnv1a32-ascii-seq-mask15' ||
     index.sharding.shardCount !== index.shardCount ||
@@ -1857,7 +1861,7 @@ function ensureDictionaryShard(id) {
     .then((shard) => {
       const shardNumber = Number.parseInt(id, 16);
       if (
-        shard?.schemaVersion !== 2 ||
+        shard?.schemaVersion !== 3 ||
         shard?.shard !== shardNumber ||
         shard?.shardCount !== D.dictionaryIndex?.shardCount ||
         shard?.sharding?.id !== D.dictionaryIndex?.sharding?.id ||
@@ -4807,6 +4811,9 @@ function renderTray(main) {
         line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
       }
       if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
+      // provenance, not authority: the tutor made this row, and saying so is
+      // what keeps its autonomy honest (operator's word, 2026-08-24)
+      if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', '先生 tutor-made')));
       const when = el('span', 'when', srsWhen(item));
       // red is for NOW — a whole column of red "due" was noise wearing urgency
       if (dueKeys.has(key)) when.classList.add('due-now');
@@ -5559,6 +5566,35 @@ function renderAiSetup(main) {
   if (aiKey()) {
     main.append(el('h1', 'view-title', '先生'));
     renderAiChat(main);
+    // 札を頼む — the tutor curates cards on demand (operator's word,
+    // 2026-08-24): it reads the level and the deck, chooses words the deck
+    // does not hold, and the dictionary confirms each before it becomes a
+    // card. The reply line and the made cards both land in the archive.
+    main.append(withEn(el('p', 'eyebrow', '札'), 'cards', 'en-inline'));
+    const fudaNote = el('p', 'airead-note');
+    const fudaBtn = biLabel('button', 'take', '札を頼む', 'ask the tutor for cards');
+    fudaBtn.type = 'button';
+    fudaBtn.id = 'ai-cards-make';
+    fudaBtn.addEventListener('click', async () => {
+      fudaBtn.disabled = true;
+      fudaNote.textContent = tx('先生が選んでいる…', 'the tutor is choosing…');
+      try {
+        const deck = S.taken.filter((t) => t.t === 'word').slice(-40).map((t) => t.id);
+        const line = await aiAsk(
+          'You choose vocabulary cards inside a Japanese-learning app. Output ONLY one line: three to five useful everyday Japanese words in dictionary form, separated by 、. Choose words at the JLPT level the user names that are NOT in the list of words they already study. No romaji, no readings, no translations, no commentary.',
+          `Learner level: about JLPT ${aiLevelGuess()}. Already studying: ${deck.length ? deck.join('、') : 'nothing yet'}.`,
+          { surface: 'cards' },
+        );
+        const made = aiCreateCards(line.split(/[、,\s]+/u), 5);
+        fudaNote.textContent = made.length
+          ? tx(`先生が${made.length}枚作った：${made.join('、')}`, `The tutor made ${made.length} card${made.length === 1 ? '' : 's'}: ${made.join('、')}`)
+          : tx('今回は札にできる語がなかった。もう一度。', 'No usable words this time — ask again.');
+      } catch {
+        fudaNote.textContent = tx('いまは選べない。あとでもう一度。', 'The tutor could not choose just now — try again in a moment.');
+      }
+      fudaBtn.disabled = false;
+    });
+    main.append(fudaBtn, fudaNote);
     main.append(withEn(el('p', 'eyebrow key-head', '鍵'), 'the key', 'en-inline'));
   } else {
     main.append(el('h1', 'view-title', tx('AIを招く', 'Invite the tutor')));
@@ -7278,6 +7314,10 @@ function commitCapture(node, label, now = Date.now()) {
     // stores — carry no mark and wait for the learner's 始める.
     started: now,
   };
+  // The tutor may create cards (operator's word, 2026-08-24). The mark is
+  // provenance for display and triage — it grants no scheduling authority,
+  // and the card swings back out through the same 覚える door as any other.
+  if (node.by === 'sensei') item.by = 'sensei';
   // Capture that arrives from inside the reading flow carries the sentence
   // it was met in (ctxScope rides the node): the top-right door and the mini
   // take the word AS ENCOUNTERED. The scope stages (語だけ・この文・段落)
@@ -9635,6 +9675,45 @@ async function aiAsk(system, prompt, meta = {}) {
   return aiConverse(system, [{ role: 'user', content: prompt }], meta);
 }
 
+/* ------------------------------------------------- 先生の札 (tutor cards)
+ * The operator's word (2026-08-24) amended the old law: the tutor has the
+ * authority to CREATE cards, not merely suggest words. Two honesties bound
+ * that authority. The dictionary confirms every word — a proposal that
+ * resolves in neither the core tier nor the 70k index makes no card, so a
+ * model's invented word can never teach; and the card's reading and gloss
+ * come from the pinned dictionary, never from the model's own text. And
+ * every tutor-made card is an ordinary deck row (by: 'sensei'): the same
+ * 覚える door swings it back out, the same scheduler owns its reviews. */
+function aiCreateCards(words, max = 5) {
+  const made = [];
+  for (const raw of Array.isArray(words) ? words : []) {
+    if (made.length >= max) break;
+    const w = String(raw || '')
+      .trim()
+      .replace(/[。、．，,.\s]+$/u, '');
+    if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) continue;
+    if (S.taken.some((t) => t.t === 'word' && t.id === w)) continue;
+    if (!lookup(w)) continue; // no dictionary truth, no card — fail closed
+    if (!commitCapture({ t: 'word', id: w, from: null, by: 'sensei' }, w)) break;
+    made.push(w);
+  }
+  return made;
+}
+
+/** Candidate card words read straight out of a passage the tutor wrote:
+ * every annotated word the deck does not hold and the dictionary confirms.
+ * The fallback when the tutor's own 札 line is absent or unreadable. */
+function aiPassageCardCandidates(text) {
+  const seen = new Set();
+  const out = [];
+  for (const seg of aiReadingSegments(text)) {
+    if (typeof seg === 'string' || seen.has(seg.base)) continue;
+    seen.add(seg.base);
+    out.push(seg.base);
+  }
+  return out;
+}
+
 /* An instrument handle for the verification suites (the __KAIRO_* idiom):
  * read-only access to the archive, the provider seam, and the budget, so
  * acceptance checks exercise the real code instead of a re-implementation. */
@@ -9823,16 +9902,34 @@ function renderAiReading(main) {
     try {
       const woven = S.taken.filter((t) => t.t === 'word').slice(-8).map((t) => t.id);
       const text = await aiAsk(
-        'You write one short Japanese reading passage inside a learning app. Output ONLY the passage: four to six short sentences of natural Japanese. No title, no translation, no romaji, no commentary, no markdown. Keep vocabulary and grammar at or below the JLPT level the user names. Immediately after every word written with kanji, give its reading in hiragana inside full-width parentheses, like 学校（がっこう） or 食べる（たべる）. Use full-width parentheses for readings and for nothing else.',
+        'You write one short Japanese reading passage inside a learning app. Output the passage: four to six short sentences of natural Japanese. No title, no translation, no romaji, no commentary, no markdown. Keep vocabulary and grammar at or below the JLPT level the user names. Immediately after every word written with kanji, give its reading in hiragana inside full-width parentheses, like 学校（がっこう） or 食べる（たべる）. Use full-width parentheses for readings and for nothing else. Then, on one final line by itself, write 札： followed by the two to four words from your passage most worth memorizing for this learner — words not already in their list — in dictionary form, separated by 、. Nothing else on that line.',
         `Level: JLPT ${aiLevelGuess()}. A small scene from everyday life, quietly pleasant.${woven.length ? ` If it stays natural, weave in a few of these words the learner is memorizing: ${woven.join('、')}.` : ''}`,
         { surface: 'reading' },
       );
       // a model may emit a literal backslash-n; never show it as ink.
+      let passage = text.replace(/\\n/g, '\n');
+      // 札： — the tutor names the cards it chose from its own passage. The
+      // line is instruction to the app, never ink for the reader's eye.
+      let chosen = [];
+      const fuda = passage.match(/(?:^|\n)\s*札[：:]\s*(.+)\s*$/u);
+      if (fuda) {
+        chosen = fuda[1].split(/[、,\s]+/u);
+        passage = passage.slice(0, fuda.index).trimEnd();
+      }
+      // The tutor's cards, made before the reading lands so the reading can
+      // carry the honest list of what was actually created. Absent or
+      // unreadable 札 line → the passage itself is the proposal.
+      const made = aiCreateCards(chosen.length ? chosen : aiPassageCardCandidates(passage), 4);
       // The reading being replaced joins the shelf of earlier ones — built
       // on copies and committed whole; a device that cannot save shows the
       // storage alert and re-arms the button (P0-4)
       const aiReadings = S.aiReading ? [S.aiReading, ...S.aiReadings].slice(0, 10) : S.aiReadings;
-      const aiReading = { text: text.replace(/\\n/g, '\n'), lv: aiLevelGuess(), ts: Date.now() };
+      const aiReading = {
+        text: passage,
+        lv: aiLevelGuess(),
+        ts: Date.now(),
+        ...(made.length ? { made } : {}),
+      };
       if (commitStorePatch({ aiReading, aiReadings })) {
         render();
         return;
@@ -9884,6 +9981,20 @@ function renderAiReading(main) {
         ),
       ),
     );
+    // 先生の札 — the cards the tutor made from this passage, each a door to
+    // its word page, where the same 覚える door removes it again.
+    if (Array.isArray(S.aiReading.made) && S.aiReading.made.length) {
+      const row = el('p', 'airead-made');
+      row.append(withEn(el('span', 'airead-made-head', '先生が札を作った：'), 'cards the tutor made — tap to open', 'en-inline'));
+      for (const w of S.aiReading.made) {
+        const chip = el('button', 'chip airead-made-chip', w);
+        chip.type = 'button';
+        chip.dataset.aireadMade = w;
+        chip.addEventListener('click', () => go({ t: 'word', id: w }));
+        row.append(chip);
+      }
+      main.append(row);
+    }
   }
 
   // the shelf of earlier readings — re-reading at level is the point

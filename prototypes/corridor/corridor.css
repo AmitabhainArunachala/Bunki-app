@@ -4641,6 +4641,25 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 6px 0 26px;
 }
 
+/* 先生の札 — the cards the tutor made from its own passage. Chips are the
+ * existing chip voice; the head is quiet ink, the row wraps on a phone. */
+.airead-made {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -14px 0 26px;
+}
+
+.airead-made-head {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.airead-made-chip {
+  min-height: 44px;
+}
+
 /* ------------------------------------- the learner model in the text
  * Words on the memorize list wear a quiet under-ink in the reader; it
  * deepens when the card is due right now. box-shadow, not border — the
