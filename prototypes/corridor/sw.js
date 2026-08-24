@@ -12,7 +12,8 @@
  * The learner's record never passes through here — it lives in
  * localStorage/IndexedDB, outside HTTP caching entirely. */
 
-const VERSION = 'kairo-v1';
+// v2: dict-v2 went schema 3 (sense tags) — the cache-first shards must drop
+const VERSION = 'kairo-v2';
 const SHELL = [
   '.',
   'index.html',
