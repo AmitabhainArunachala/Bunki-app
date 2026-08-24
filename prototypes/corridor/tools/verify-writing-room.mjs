@@ -612,9 +612,11 @@ async function main() {
       JSON.stringify(rewriteTrace),
     );
 
-    // 衷 is the shipped count-mismatch sentinel: KanjiVG has nine paths while
-    // the living AnimCJK hand has ten. The live marker layer must follow the
-    // hand rather than silently dropping its final number.
+    // 衷 was the shipped count-mismatch sentinel: KanjiVG has nine paths
+    // while AnimCJK's hand painted ten. Under the orthographic-authority
+    // ruling (issue #79 — 経 was painted as 經) the living hand follows
+    // canonical KanjiVG in every dress state, so a ten here means substitute
+    // geometry regained authority.
     await closeWritingRoom(page);
     await openWritingRoom(page, base, '衷');
     await page.waitForFunction(
@@ -628,19 +630,75 @@ async function main() {
       const root = document.querySelector('.stroke-nums-lift') || document;
       return [...root.querySelectorAll('.stroke-num')].at(-1)?.textContent || '';
     });
-    if (mismatch?.living === 'on') {
-      check(
-        'living marker count follows AnimCJK when KanjiVG differs',
-        mismatch.total === 10 && finalMarker === '10',
-        `${mismatch.total} markers; last=${finalMarker}`,
-      );
-    } else {
-      check(
-        'SVG fallback keeps its complete KanjiVG marker set',
-        mismatch?.living === 'off' && mismatch.total === 9 && finalMarker === '9',
-        `${mismatch?.total} markers; last=${finalMarker}`,
-      );
-    }
+    check(
+      'the marker layer follows canonical KanjiVG in every dress state',
+      mismatch?.total === 9 && finalMarker === '9',
+      `living=${mismatch?.living}; ${mismatch?.total} markers; last=${finalMarker}`,
+    );
+
+    console.log('\n— issue #79 · the glyph is whole and no legacy hand writes early');
+    const appSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
+    check(
+      'the classic write is gated to reduced motion at mount — never during pending',
+      appSource.includes('if (paths.length && reduced) startStrokeAnimation(page);') &&
+        !appSource.includes('if (paths.length) startStrokeAnimation(page);'),
+    );
+    check(
+      'no substitute stroke geometry: nothing calls AnimCJK for the renderer',
+      !appSource.includes('animcjkGlyphFor') && !appSource.includes('deriveStrokes('),
+    );
+    const cssSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.css'), 'utf8');
+    // the contract permits decorative page washes (青海波 on body.zen); it
+    // forbids any mask on a rule that reaches the glyph's own layers
+    const maskedGlyphRule = [...cssSource.matchAll(/([^{}]+)\{([^}]*)\}/g)].some(
+      ([, sel, body]) => /(?:ink-sheet|stroke-)/.test(sel) && body.includes('mask-image'),
+    );
+    check('no stroke-room rule masks the glyph — decorative page washes may', !maskedGlyphRule);
+    check(
+      "the pending dress hides the un-dashed classic ink layers",
+      cssSource.includes("[data-ink-ready='pending'] .stroke-bleed") &&
+        cssSource.includes("[data-ink-ready='pending'] .stroke-ink"),
+    );
+    const sheetDress = await page.evaluate(() => {
+      const sheet = document.querySelector('#stroke-page .ink-sheet');
+      if (!sheet) return { mask: 'no-sheet' };
+      const cs = getComputedStyle(sheet);
+      return { mask: cs.maskImage || cs.webkitMaskImage || 'none' };
+    });
+    check(
+      'the living sheet renders unmasked — never a porthole',
+      sheetDress.mask === 'no-sheet' || sheetDress.mask === 'none',
+      JSON.stringify(sheetDress),
+    );
+    const pendingGate = await page.evaluate(() => {
+      const room = document.querySelector('#stroke-page');
+      const was = room.dataset.inkReady;
+      room.dataset.inkReady = 'pending';
+      const ink = room.querySelector('.stroke-ink');
+      const bleed = room.querySelector('.stroke-bleed');
+      const state = {
+        ink: ink ? getComputedStyle(ink).visibility : 'lifted',
+        bleed: bleed ? getComputedStyle(bleed).visibility : 'lifted',
+      };
+      room.dataset.inkReady = was;
+      return state;
+    });
+    check(
+      "forcing the undecided dress hides the classic ink layers in place",
+      ['hidden', 'lifted'].includes(pendingGate.ink) && ['hidden', 'lifted'].includes(pendingGate.bleed),
+      JSON.stringify(pendingGate),
+    );
+    const animcjkRequests = await page.evaluate(
+      () =>
+        performance
+          .getEntriesByType('resource')
+          .filter((entry) => entry.name.includes('/animcjk/')).length,
+    );
+    check(
+      'the whole walk fetched no AnimCJK geometry',
+      animcjkRequests === 0,
+      `${animcjkRequests} requests`,
+    );
 
     console.log('\n— sleep, close, and legacy state');
     await wake(page);

@@ -3335,6 +3335,17 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 .stroke-page[data-living='still'] .stroke-inks {
   display: none; /* the ink follows the world here — no separate pigment row */
 }
+/* Before a renderer owns the stage (living ink still pending) the classic
+ * layers hold no dash state — un-dashed they would paint the finished glyph
+ * for the loading interval (the legacy first-paint flash, issue #79). The
+ * grid and faint guide are the paper's own furniture and stay; the ink, its
+ * bleed, and the numbers wait for the owner: the living sheet, or 'fallback',
+ * whose classic write begins the moment it is chosen. */
+.stroke-page[data-ink-ready='pending'] .stroke-bleed,
+.stroke-page[data-ink-ready='pending'] .stroke-ink,
+.stroke-page[data-ink-ready='pending'] .stroke-nums {
+  visibility: hidden;
+}
 .stroke-page[data-living='on'] .stroke-readout,
 .stroke-page[data-living='still'] .stroke-readout {
   position: absolute; /* the pips carry the count; keep the counter for readers */
@@ -3824,21 +3835,17 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: none;
 }
 
-/* The renderer paints an opaque square. Feather its edges into the same grown
- * paper so the glyph lives on the page rather than on a visible tile. */
+/* The renderer paints an opaque square of washi. It stands as a bounded
+ * sheet — the dojo's own visual language — never behind a mask: the radial
+ * feather that once blended its edges also CROPPED edge-heavy glyphs into a
+ * porthole (滅 at 390×844 — issue #79, operator acceptance). The glyph must
+ * be whole at every frame; the sheet may be seen. The 6px radius rounds only
+ * the sheet's corners, well inside KanjiVG's own glyph padding. */
 .stroke-page[data-minimal='on'] .stroke-stage .ink-sheet {
-  -webkit-mask-image: radial-gradient(
-    circle closest-side at 50% 50%,
-    #000 0 84%,
-    rgba(0, 0, 0, 0.82) 92%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    circle closest-side at 50% 50%,
-    #000 0 84%,
-    rgba(0, 0, 0, 0.82) 92%,
-    transparent 100%
-  );
+  border-radius: 6px;
+  box-shadow:
+    0 18px 44px rgba(10, 12, 16, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .stroke-page[data-minimal='on'][data-chrome='sleeping'] .stroke-nums {

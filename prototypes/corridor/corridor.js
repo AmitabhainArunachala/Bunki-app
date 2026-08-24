@@ -11287,25 +11287,10 @@ let inkModulePromise = null;
 function ensureInkModule() {
   return (inkModulePromise ||= import('./corridor-ink.js'));
 }
-/* AnimCJK true brush outlines (data/share_alike/animcjk, Arphic Public
- * License) — the gallery-quality glyph data, covering 2,581 of the 2,582
- * corridor kanji. Fetched by shard on first need, cached for the session. */
-const animcjkShards = new Map();
-async function animcjkGlyphFor(ch) {
-  try {
-    const sid = (ch.codePointAt(0) % 16).toString(16).padStart(2, '0');
-    if (!animcjkShards.has(sid)) {
-      animcjkShards.set(
-        sid,
-        fetch(`data/share_alike/animcjk/${sid}.json`).then((r) => (r.ok ? r.json() : null)),
-      );
-    }
-    const shard = await animcjkShards.get(sid);
-    return (shard && shard.entries && shard.entries[ch]) || null;
-  } catch {
-    return null;
-  }
-}
+/* AnimCJK (data/share_alike/animcjk, Arphic Public License) stays shipped as
+ * data, but no longer feeds the living renderer — its outlines can carry
+ * non-Japanese glyph geometry (issue #79: 経 painted as 經). See the
+ * orthographic-authority note in mountInkRoom. */
 let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } — one sheet
 const strokeRewriteOptions = () => ({ speed: S.strokeSlow ? 0.7 : 1.1 });
 function stopInkRoom() {
@@ -11540,34 +11525,23 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     [...pips.children].forEach((p, i) => p.classList.toggle('filled', i < upto));
   };
   try {
-    const [INK, glyph] = await Promise.all([ensureInkModule(), animcjkGlyphFor(ch)]);
+    // ORTHOGRAPHIC AUTHORITY (issue #79, operator acceptance 2026-08-24):
+    // KanjiVG is the canonical Japanese glyph and stroke-order authority.
+    // AnimCJK's brush outlines can carry regional or historical geometry that
+    // is legitimate CJK yet pedagogically wrong for the modern Japanese form
+    // (observed live: 経 painted as 經). Until an equivalence manifest proves
+    // an outline shares the Japanese glyph identity and stroke topology, the
+    // living hand fails closed to KanjiVG — the same fluid-ink engine paints,
+    // only the substitute geometry loses authority. The AnimCJK corpus stays
+    // shipped for that future manifest-gated return.
+    const INK = await ensureInkModule();
     if (inkRoom !== room || !document.contains(canvas)) return;
-    // TRUE brush outlines when AnimCJK carries the character (gallery
-    // quality); the KanjiVG-synthesized body only for the rare rest
-    const strokes = glyph ? INK.deriveStrokes(glyph.strokes, glyph.medians) : INK.strokesFromKanjiVG(paths);
+    const strokes = INK.strokesFromKanjiVG(paths);
     const spec = inkSpecFor(INK, strokes);
-    // the stroke pips and number positions follow the glyph actually written
+    // the stroke pips follow the glyph actually written
     if (pips && pips.children.length !== strokes.length) {
       pips.textContent = '';
       for (let i = 0; i < strokes.length; i++) pips.append(el('i', 'stroke-pip'));
-    }
-    if (glyph) {
-      // AnimCJK is the living hand's authority. A small number of glyphs have
-      // a different stroke count from KanjiVG (for example 衷: 10 vs 9), so
-      // rebuild the marker group rather than silently dropping the last
-      // number from the live sequence.
-      const nums = page.querySelector('.stroke-nums');
-      if (nums) {
-        nums.textContent = '';
-        strokes.forEach((stroke, i) => {
-          const marker = document.createElementNS(SVG_NS, 'text');
-          marker.setAttribute('class', 'stroke-num');
-          marker.setAttribute('x', String((stroke.medPts[0][0] * 109) / 1024));
-          marker.setAttribute('y', String((stroke.medPts[0][1] * 109) / 1024));
-          marker.textContent = String(i + 1);
-          nums.append(marker);
-        });
-      }
     }
     if (reduced) {
       // stillness by choice: one finished sheet, hand-painted, no engine
@@ -11630,6 +11604,9 @@ async function mountInkRoom(room2, ch, paths, reduced) {
         page.dataset.living = 'off';
         page.dataset.inkReady = 'fallback';
         syncStrokeNumbers(page);
+        // the classic hand takes the stage it now owns (issue #79: it must
+        // never write before this decision, and must always write after it)
+        startStrokeAnimation(page);
       }
     };
     page.dataset.living = 'on';
@@ -11675,6 +11652,7 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       page.dataset.living = 'off';
       page.dataset.inkReady = 'fallback';
       canvas.remove(); // no engine and no still — the SVG diagram stands alone
+      startStrokeAnimation(page); // the classic hand owns the stage now
     }
   }
 }
@@ -12115,7 +12093,13 @@ function renderStrokePage(root) {
   });
 
   root.append(page);
-  if (paths.length) startStrokeAnimation(page);
+  // The classic hand writes at mount ONLY when it is already the renderer
+  // (reduced motion's instant static walk). Under full motion the room waits
+  // for the living-ink decision: 'pending' resolves to the ink engine or to
+  // 'fallback', and only 'fallback' starts the classic write — the legacy
+  // first-paint flash (issue #79) was this animation running during the
+  // pending window and being painted over.
+  if (paths.length && reduced) startStrokeAnimation(page);
   queueMicrotask(() => {
     const paletteFocus = S.strokePaletteFocus;
     S.strokePaletteFocus = null;
