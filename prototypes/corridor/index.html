@@ -23,6 +23,28 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="stylesheet" href="corridor.css" />
     <link rel="stylesheet" href="drift-layer.css" />
+    <!-- Operator hotfix, issue #79 (2026-08-24).
+         The canonical living-ink renderer loads asynchronously. The legacy SVG
+         fallback used to begin painting during that pending interval, producing
+         the lower-left flash seen on iPhone. Keep fallback available for a real
+         engine failure, but never expose it while the canonical renderer is
+         merely loading. The quiet-room canvas also used a radial mask that
+         literally cropped edge-heavy kanji; the character must be shown whole. -->
+    <style id="stroke-room-operator-fix-79">
+      .stroke-page[data-ink-ready='pending'] .stroke-canvas {
+        visibility: hidden !important;
+      }
+
+      .stroke-page[data-minimal='on'] .stroke-stage .ink-sheet {
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+      }
+
+      .stroke-page .stroke-stage,
+      .stroke-page .ink-sheet {
+        overflow: visible !important;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
