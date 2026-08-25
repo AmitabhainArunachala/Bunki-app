@@ -383,12 +383,22 @@ async function main() {
         ),
       JSON.stringify(awake?.interactive),
     );
+    // Under 没入 the stage IS the screen, so the field necessarily sits on
+    // the paper. What must stay uncontested is where ink and numerals
+    // actually paint: the glyph box — stage centre ± side·glyphFrac/2.
+    const awakeGlyphBox = await page.evaluate(() => {
+      const room = document.querySelector('#stroke-page');
+      const rect = room.querySelector('.stroke-stage').getBoundingClientRect();
+      const frac = Number(room.dataset.glyphFrac || 1);
+      const half = (rect.width * frac) / 2;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      return { top: cy - half, bottom: cy + half, left: cx - half, right: cx + half };
+    });
     check(
-      'the awake control field does not overlap the ink or lifted numerals',
-      !!awake?.stageRect &&
-        !!awake.field?.rect &&
-        awake.stageRect.bottom <= awake.field.rect.top + 1,
-      JSON.stringify({ stage: awake?.stageRect, field: awake?.field?.rect }),
+      'the awake control field does not overlap the glyph or its numerals',
+      !!awake?.field?.rect && awakeGlyphBox.bottom <= awake.field.rect.top + 1,
+      JSON.stringify({ glyph: awakeGlyphBox, field: awake?.field?.rect }),
     );
     await page.locator('#stroke-world-seal').click();
     await page.waitForSelector('.world-picker', { timeout: 8000 });
@@ -644,8 +654,24 @@ async function main() {
         !appSource.includes('if (paths.length) startStrokeAnimation(page);'),
     );
     check(
-      'no substitute stroke geometry: nothing calls AnimCJK for the renderer',
-      !appSource.includes('animcjkGlyphFor') && !appSource.includes('deriveStrokes('),
+      'AnimCJK reaches the renderer only through the equivalence manifest',
+      appSource.includes('animcjkApproved()') &&
+        appSource.includes('animcjk/equivalence.json') &&
+        appSource.indexOf('animcjkApproved()') < appSource.indexOf('animcjkShards.has(sid)'),
+    );
+    const manifest = JSON.parse(
+      readFileSync(resolve(CORRIDOR_DIR, 'data/share_alike/animcjk/equivalence.json'), 'utf8'),
+    );
+    const approvedSet = new Set(manifest.approved);
+    check(
+      'the manifest is law-consistent: 経 and 衷 rejected, the gallery hand returns broadly',
+      !approvedSet.has('経') &&
+        !approvedSet.has('衷') &&
+        approvedSet.has('永') &&
+        approvedSet.has('滅') &&
+        manifest.counts.approved === manifest.approved.length &&
+        manifest.counts.approved > 1500,
+      `${manifest.counts.approved} approved / ${manifest.counts.rejected} rejected of ${manifest.counts.checked}`,
     );
     const cssSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.css'), 'utf8');
     // the contract permits decorative page washes (青海波 on body.zen); it
@@ -707,16 +733,85 @@ async function main() {
       reducedPendingGate === 'visible' || reducedPendingGate === 'lifted',
       reducedPendingGate,
     );
-    const animcjkRequests = await page.evaluate(
-      () =>
-        performance
-          .getEntriesByType('resource')
-          .filter((entry) => entry.name.includes('/animcjk/')).length,
+    // the manifest law, exercised live: an approved character takes the
+    // gallery brush; a rejected one keeps the canonical KanjiVG hand.
+    // (衷 was walked above and its canonical nine already convicted the
+    // count-rejection; 経 convicts the geometry rejection here.)
+    check(
+      '衷 (count-rejected) wrote with the canonical KanjiVG hand',
+      (await page.locator('#stroke-page').getAttribute('data-glyph-source')) === 'kanjivg',
+      `glyphSource=${await page.locator('#stroke-page').getAttribute('data-glyph-source')}`,
+    );
+    await closeWritingRoom(page);
+    await openWritingRoom(page, base, '経');
+    await page.waitForFunction(
+      `(() => { const r=document.querySelector('#stroke-page')?.dataset.inkReady; return r && r !== 'pending'; })()`,
+      null,
+      { timeout: 20_000 },
     );
     check(
-      'the whole walk fetched no AnimCJK geometry',
-      animcjkRequests === 0,
-      `${animcjkRequests} requests`,
+      '経 (geometry-rejected: AnimCJK carries 經) wrote with the canonical hand',
+      (await page.locator('#stroke-page').getAttribute('data-glyph-source')) === 'kanjivg',
+      `glyphSource=${await page.locator('#stroke-page').getAttribute('data-glyph-source')}`,
+    );
+    await closeWritingRoom(page);
+    await openWritingRoom(page, base, '永');
+    await page.waitForFunction(
+      `(() => { const r=document.querySelector('#stroke-page')?.dataset.inkReady; return r && r !== 'pending'; })()`,
+      null,
+      { timeout: 20_000 },
+    );
+    const eiSource = await page.locator('#stroke-page').getAttribute('data-glyph-source');
+    const eiLiving = await page.locator('#stroke-page').getAttribute('data-living');
+    check(
+      '永 (approved) takes the gallery brush when the living ink stands',
+      eiLiving === 'on' || eiLiving === 'still' ? eiSource === 'animcjk' : eiSource === 'kanjivg',
+      `living=${eiLiving}; glyphSource=${eiSource}`,
+    );
+
+    console.log('\n— 没入 · one paper to every edge, the glyph whole at full lattice');
+    const immersion = await page.evaluate(() => {
+      const room = document.querySelector('#stroke-page');
+      const ground = room.querySelector('canvas.ink-ground');
+      const stage = room.querySelector('.stroke-stage').getBoundingClientRect();
+      const g = ground ? ground.getBoundingClientRect() : null;
+      return {
+        vw: window.innerWidth,
+        vh: window.innerHeight,
+        ground: g && {
+          left: g.left,
+          top: g.top,
+          right: g.right,
+          bottom: g.bottom,
+          painted: ground.dataset.painted === 'on',
+          backing: ground.width,
+        },
+        stage: { left: stage.left, top: stage.top, right: stage.right, bottom: stage.bottom, width: stage.width },
+      };
+    });
+    check(
+      'the engine-painted washi runs to every edge of the screen',
+      !!immersion.ground &&
+        immersion.ground.painted &&
+        immersion.ground.left <= 0 &&
+        immersion.ground.top <= 0 &&
+        immersion.ground.right >= immersion.vw &&
+        immersion.ground.bottom >= immersion.vh,
+      JSON.stringify(immersion.ground),
+    );
+    check(
+      'the glyph sheet stands whole on screen at the full lattice — no pre-scale, no trimming',
+      immersion.stage.left >= 0 &&
+        immersion.stage.top >= 0 &&
+        immersion.stage.right <= immersion.vw &&
+        immersion.stage.bottom <= immersion.vh &&
+        immersion.stage.width >= 300,
+      JSON.stringify(immersion.stage),
+    );
+    check(
+      'the room ground carries enough backing for the sheet to be its exact centre crop',
+      immersion.ground.backing >= 1024,
+      `backing=${immersion.ground.backing}`,
     );
 
     console.log('\n— sleep, close, and legacy state');

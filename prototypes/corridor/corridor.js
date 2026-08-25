@@ -11287,10 +11287,55 @@ let inkModulePromise = null;
 function ensureInkModule() {
   return (inkModulePromise ||= import('./corridor-ink.js'));
 }
-/* AnimCJK (data/share_alike/animcjk, Arphic Public License) stays shipped as
- * data, but no longer feeds the living renderer — its outlines can carry
- * non-Japanese glyph geometry (issue #79: 経 painted as 經). See the
- * orthographic-authority note in mountInkRoom. */
+/* AnimCJK true brush outlines (data/share_alike/animcjk, Arphic Public
+ * License) — the gallery-quality glyph corpus, returned to the living hand
+ * on the operator's escalation (2026-08-24, 「もう、美しくない！」) WITHOUT
+ * repealing the orthographic-authority law of issue #79. It paints only
+ * through the equivalence manifest (tools/build-animcjk-equivalence.mjs):
+ * characters proven stroke-by-stroke to be the same Japanese glyph written
+ * in the same order as canonical KanjiVG. 経 keeps the canonical hand
+ * (AnimCJK carries 經 geometry there); 衷 keeps its canonical nine strokes.
+ * A missing or unreadable manifest approves nothing — fail closed. */
+const animcjkShards = new Map();
+let animcjkApprovedPromise = null;
+function animcjkApproved() {
+  animcjkApprovedPromise ||= fetch('data/share_alike/animcjk/equivalence.json')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((m) => new Set(Array.isArray(m?.approved) ? m.approved : []))
+    .catch(() => new Set());
+  return animcjkApprovedPromise;
+}
+async function animcjkGlyphFor(ch) {
+  try {
+    const approved = await animcjkApproved();
+    if (!approved.has(ch)) return null;
+    const sid = (ch.codePointAt(0) % 16).toString(16).padStart(2, '0');
+    if (!animcjkShards.has(sid)) {
+      animcjkShards.set(
+        sid,
+        fetch(`data/share_alike/animcjk/${sid}.json`).then((r) => (r.ok ? r.json() : null)),
+      );
+    }
+    const shard = await animcjkShards.get(sid);
+    return (shard && shard.entries && shard.entries[ch]) || null;
+  } catch {
+    return null;
+  }
+}
+/** Uniformly scale absolute SVG path data about the lattice centre. Both
+ * outline sources emit only absolute M/L/C/Q/Z (verified corpus-wide), whose
+ * every numeric parameter is an absolute coordinate — x and y scale about
+ * the same centre by the same factor, so every number transforms alike. A
+ * path carrying any other command (relative, H/V, arcs) returns null and
+ * the caller keeps the WHOLE glyph unscaled — a half-scaled glyph would
+ * put the sprite clip out of register with its own medians. */
+function scalePathData(d, frac, centre = 512) {
+  if (/[^MLCQZmlcqz0-9.,\s-]/.test(d) || /[mlcqz]/.test(d)) return null;
+  return d.replace(
+    /-?\d*\.?\d+/g,
+    (tok) => String(Math.round((centre + (Number(tok) - centre) * frac) * 10) / 10),
+  );
+}
 let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } — one sheet
 const strokeRewriteOptions = () => ({ speed: S.strokeSlow ? 0.7 : 1.1 });
 function stopInkRoom() {
@@ -11525,19 +11570,69 @@ async function mountInkRoom(room2, ch, paths, reduced) {
     [...pips.children].forEach((p, i) => p.classList.toggle('filled', i < upto));
   };
   try {
-    // ORTHOGRAPHIC AUTHORITY (issue #79, operator acceptance 2026-08-24):
-    // KanjiVG is the canonical Japanese glyph and stroke-order authority.
-    // AnimCJK's brush outlines can carry regional or historical geometry that
-    // is legitimate CJK yet pedagogically wrong for the modern Japanese form
-    // (observed live: 経 painted as 經). Until an equivalence manifest proves
-    // an outline shares the Japanese glyph identity and stroke topology, the
-    // living hand fails closed to KanjiVG — the same fluid-ink engine paints,
-    // only the substitute geometry loses authority. The AnimCJK corpus stays
-    // shipped for that future manifest-gated return.
-    const INK = await ensureInkModule();
+    // ORTHOGRAPHIC AUTHORITY (issue #79) with the beauty returned (operator
+    // escalation, 2026-08-24): the equivalence manifest decides. A character
+    // it approves takes AnimCJK's true brush outlines — the gallery hand;
+    // everything else, 経 and 衷 among them, keeps the canonical KanjiVG
+    // geometry. Both paint through the same fluid-ink engine.
+    const [INK, glyph] = await Promise.all([ensureInkModule(), animcjkGlyphFor(ch)]);
     if (inkRoom !== room || !document.contains(canvas)) return;
-    const strokes = INK.strokesFromKanjiVG(paths);
+    // 没入 — one paper to every edge. The room ground is painted once,
+    // large enough that the sheet's own texture is its exact centre crop:
+    // the fibres under the glyph continue into the surrounding screen with
+    // pixel continuity, so there is no seam to hide and nothing to mask.
+    const roomGround = page.querySelector('canvas.ink-ground');
+    if (roomGround && roomGround.dataset.painted !== 'on') {
+      try {
+        const groundCss = roomGround.getBoundingClientRect().width || 1;
+        const stageCss = stage.getBoundingClientRect().width || 1;
+        const sim = Math.min(2600, Math.max(800, Math.round((1024 * groundCss) / stageCss)));
+        INK.paintStillFor(roomGround, { ...inkSpecFor(INK, []), gl2Sim: sim });
+        roomGround.dataset.painted = 'on';
+      } catch {
+        /* the page's woven paper stands in */
+      }
+    }
+    const strokes = glyph ? INK.deriveStrokes(glyph.strokes, glyph.medians) : INK.strokesFromKanjiVG(paths);
+    // the probe's window: which authority wrote this page
+    page.dataset.glyphSource = glyph ? 'animcjk' : 'kanjivg';
+    // 没入 — in the immersive room the paper is the whole screen and the
+    // glyph is pre-scaled about the lattice centre to stand whole inside
+    // the visible strip. Geometry, path outlines, arc lengths, and the wet
+    // brush (spec.glyphScale) all shrink together, or not at all.
+    let glyphScale = Number(page.dataset.glyphFrac || 1);
+    if (glyphScale > 0 && glyphScale < 1) {
+      const scaledOutlines = strokes.map((s) => scalePathData(s.outline, glyphScale));
+      if (scaledOutlines.every((o) => o !== null)) {
+        const c = 512;
+        strokes.forEach((s, i) => {
+          s.outline = scaledOutlines[i];
+          s.medPts = s.medPts.map(([x, y]) => [c + (x - c) * glyphScale, c + (y - c) * glyphScale]);
+          s.cum = s.cum.map((v) => v * glyphScale);
+          s.L *= glyphScale;
+        });
+      } else {
+        glyphScale = 1;
+      }
+    } else {
+      glyphScale = 1;
+    }
     const spec = inkSpecFor(INK, strokes);
+    spec.glyphScale = glyphScale;
+    if (roomGround && roomGround.dataset.painted === 'on') {
+      // the sheet writes on the exact centre crop of the room's own washi
+      spec.ground = (r, size) => {
+        const crop = document.createElement('canvas');
+        crop.width = crop.height = size;
+        const backing = roomGround.width || 1;
+        const groundCss = roomGround.getBoundingClientRect().width || 1;
+        const stageCss = stage.getBoundingClientRect().width || 1;
+        const sw = Math.max(1, Math.round((stageCss / groundCss) * backing));
+        const s0 = Math.round((backing - sw) / 2);
+        crop.getContext('2d').drawImage(roomGround, s0, s0, sw, sw, 0, 0, size, size);
+        return crop;
+      };
+    }
     // the stroke pips follow the glyph actually written
     if (pips && pips.children.length !== strokes.length) {
       pips.textContent = '';
@@ -11711,6 +11806,13 @@ function renderStrokePage(root) {
   page.dataset.world = themeId();
   page.dataset.minimal = S.strokeMinimal ? 'on' : 'off';
   page.dataset.chrome = S.strokeChromeAwake ? 'awake' : 'sleeping';
+  // 没入 (operator escalation, 2026-08-24): the paper is the whole screen,
+  // but the RESOLUTION belongs to the glyph. Shrinking the glyph inside the
+  // lattice was tried and convicted by eye — fewer lattice cells per stroke
+  // turned the hand soft. So the live sheet keeps the engine's full lattice
+  // at strip size, and mountInkRoom paints .ink-ground — a strokeless still
+  // from the same engine — as the identical washi running to every edge
+  // behind it. One paper, two canvases, no seam, no card, no mask.
   if (S.strokeMinimal) {
     const exitDescription = el(
       'p',
@@ -11814,6 +11916,18 @@ function renderStrokePage(root) {
     svg.setAttribute('class', 'stroke-canvas');
     svg.id = 'stroke-canvas';
     svg.setAttribute('aria-hidden', 'true');
+    // the classic layers ride one group scaled by the same immersion
+    // fraction as the living ink, so fallback and ink stand in one place
+    const sheet = document.createElementNS(SVG_NS, 'g');
+    sheet.setAttribute('class', 'stroke-sheet');
+    {
+      const frac = Number(page.dataset.glyphFrac || 1);
+      if (frac > 0 && frac < 1) {
+        const c = 54.5;
+        sheet.setAttribute('transform', `translate(${c * (1 - frac)} ${c * (1 - frac)}) scale(${frac})`);
+      }
+    }
+    svg.append(sheet);
 
     // 界 — the writing guide: quarters of the square, the way squared paper
     // teaches balance. Drawn from --line, so it fades with the theme.
@@ -11830,7 +11944,7 @@ function renderStrokePage(root) {
       l.setAttribute('y2', String(y2));
       grid.append(l);
     }
-    svg.append(grid);
+    sheet.append(grid);
 
     // the whole glyph, very faint: where the hand is going
     const guide = document.createElementNS(SVG_NS, 'g');
@@ -11840,7 +11954,7 @@ function renderStrokePage(root) {
       p.setAttribute('d', d);
       guide.append(p);
     }
-    svg.append(guide);
+    sheet.append(guide);
 
     // 滲み — the ink's soft bleed into the paper, a wider ghost of each
     // stroke beneath the crisp line. Two passes read as sumi on washi where
@@ -11852,7 +11966,7 @@ function renderStrokePage(root) {
       p.setAttribute('d', d);
       bleed.append(p);
     }
-    svg.append(bleed);
+    sheet.append(bleed);
 
     const ink = document.createElementNS(SVG_NS, 'g');
     ink.setAttribute('class', 'stroke-ink');
@@ -11861,7 +11975,7 @@ function renderStrokePage(root) {
       p.setAttribute('d', d);
       ink.append(p);
     }
-    svg.append(ink);
+    sheet.append(ink);
 
     const nums = document.createElementNS(SVG_NS, 'g');
     nums.setAttribute('class', 'stroke-nums');
@@ -11875,8 +11989,15 @@ function renderStrokePage(root) {
       t.textContent = String(i + 1);
       nums.append(t);
     });
-    svg.append(nums);
+    sheet.append(nums);
     stage.append(svg);
+    if (S.strokeMinimal) {
+      // the room's own washi — painted by the engine once it wakes; until
+      // then the page's woven paper stands behind it unchanged
+      const ground = el('canvas', 'ink-ground');
+      ground.setAttribute('aria-hidden', 'true');
+      body.append(ground);
+    }
     body.append(stage);
 
     // the stroke pips — one dot per stroke, pressed as the hand writes

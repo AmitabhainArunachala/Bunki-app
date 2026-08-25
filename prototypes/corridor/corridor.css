@@ -3807,9 +3807,27 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
     env(safe-area-inset-left);
 }
 
+/* 没入 (operator escalation, 2026-08-24): the paper is the whole screen,
+ * but the RESOLUTION belongs to the glyph. The live sheet keeps the
+ * engine's full lattice on a strip-sized square — every kasure streak
+ * sharp — while .ink-ground, a strokeless still painted by the same
+ * engine, carries the identical washi to every edge of the viewport
+ * behind it. One paper, two canvases, no seam, no card, no mask. Awake
+ * chrome floats over the paper; the sheet never shrinks into a card. */
+.stroke-page[data-minimal='on'] .ink-ground {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: max(100dvw, 100dvh);
+  height: max(100dvw, 100dvh);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .stroke-page[data-minimal='on'] .stroke-stage,
 .stroke-page[data-minimal='on'][data-living='on'] .stroke-stage,
-.stroke-page[data-minimal='on'][data-living='still'] .stroke-stage {
+.stroke-page[data-minimal='on'][data-living='still'] .stroke-stage,
+.stroke-page[data-minimal='on'][data-chrome='awake'] .stroke-stage {
   width: min(94vw, 72dvh, 560px);
   margin: 0;
   overflow: visible;
@@ -3817,14 +3835,8 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-}
-
-/* Once the field wakes, give its lower control sheet an uncontested zone.
- * The lifted numeral layer follows this rect in JS, so neither numbers nor
- * wet ink can paint across the palette/readings controls. */
-.stroke-page[data-minimal='on'][data-chrome='awake'] .stroke-stage {
-  width: min(78vw, 44dvh, 360px);
-  transform: translateY(-20dvh);
+  transform: none;
+  position: relative;
 }
 
 .stroke-page[data-minimal='on'] .stroke-stage .stroke-canvas {
@@ -3838,18 +3850,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: none;
 }
 
-/* The renderer paints an opaque square of washi. It stands as a bounded
- * sheet — the dojo's own visual language — never behind a mask: the radial
- * feather that once blended its edges also CROPPED edge-heavy glyphs into a
- * porthole (滅 at 390×844 — issue #79, operator acceptance). The glyph must
- * be whole at every frame; the sheet may be seen. The 6px radius rounds only
- * the sheet's corners, well inside KanjiVG's own glyph padding. */
-.stroke-page[data-minimal='on'] .stroke-stage .ink-sheet {
-  border-radius: 6px;
-  box-shadow:
-    0 18px 44px rgba(10, 12, 16, 0.32),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
+/* The renderer's washi now IS the room — full-bleed, never behind a mask:
+ * the radial feather that once blended a card's edges also CROPPED
+ * edge-heavy glyphs into a porthole (滅 at 390×844 — issue #79), and the
+ * card itself gave way to the whole screen (没入, 2026-08-24). No dress on
+ * the sheet: no radius, no shadow, no mask — paper to every edge. */
 
 .stroke-page[data-minimal='on'][data-chrome='sleeping'] .stroke-nums {
   display: none !important;

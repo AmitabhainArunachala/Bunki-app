@@ -98,6 +98,7 @@ jobs:
                       'data/share_alike/dict-v2/index.json' \
                       'data/share_alike/animcjk/index.json' \
                       'data/share_alike/animcjk/00.json' \
+                      'data/share_alike/animcjk/equivalence.json' \
                       'data/share_alike/dict-v2/00.json' \
                       'data/share_alike/dict-v2/0f.json'; do
             code=""
