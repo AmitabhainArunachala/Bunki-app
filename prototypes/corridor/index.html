@@ -21,6 +21,21 @@
     <meta name="theme-color" content="#f1e9d3" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- ZEN-DOJO v2 type (operator, 2026-08-20): Shippori Mincho B1 for the
+         card's word (the oldstyle metal-type revival — Android has no system
+         mincho at all), Yuji Syuku (real shodō hand) for the kana reading,
+         and a 4-glyph Kaisei Tokumin micro-subset for the 再難良易 seals.
+         Offline falls back to Hiragino/Yu Mincho — the stacks expect it. -->
+    <!-- SELF-HOSTED (fonts/, OFL 1.1): the corridor makes no runtime
+         network requests — offline, the verifier's box, and the standalone
+         all stay silent; a missing file falls back to Hiragino/Yu Mincho
+         by design, and unicode-range keeps runtime cost to the chunks a
+         card actually shows. -->
+    <link rel="stylesheet" href="fonts.css" />
+    <!-- the recorded roster is aboard: the app may fetch audio/manifest.json -->
+    <script>
+      window.__KAIRO_AUDIO__ = 1;
+    </script>
     <link rel="stylesheet" href="corridor.css" />
     <link rel="stylesheet" href="drift-layer.css" />
     <!-- Operator hotfix, issue #79 (2026-08-24).

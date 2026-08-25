@@ -161,7 +161,11 @@ function initScript(envelopeJson) {
           'N3 | 学校を休むと決めた。 | がっこうをやすむときめた。 | I decided to rest from school.',
         ].join('\\n');
       } else if (system.includes('reading passage')) {
-        text = '朝、学校（がっこう）へ行く。天気（てんき）がいい。先生（せんせい）と話す。友だちと帰る。';
+        // the 札 line drives autonomous card creation: two makeable words,
+        // one the deck already holds (天気), one no dictionary confirms
+        text = '朝、学校（がっこう）へ行く。犬（いぬ）と猫（ねこ）を見た。天気（てんき）がいい。友だちと帰る。\\n札：犬、猫、天気、ゾロメ語';
+      } else if (system.includes('choose vocabulary cards')) {
+        text = '散歩、音楽、天気、ゾロメ語';
       }
       return Promise.resolve({
         ok: true,
@@ -365,6 +369,61 @@ async function main() {
   const readingRows = await waitRows(page, 'reading', 2);
   check('reading room · the exchange lands whole in the archive',
     exchangeShape(readingRows, 'reading', OVERRIDE_MODEL), `${readingRows.length} rows`);
+
+  // ---------------- the tutor's autonomy: cards out of its own passage
+  // (operator's word, 2026-08-24). The 札 line names 犬・猫 (makeable),
+  // 天気 (already in the deck) and ゾロメ語 (no dictionary holds it) —
+  // only the two honest cards may exist, marked by:'sensei', started,
+  // dictionary-confirmed, and the 札 line itself never reaches the eye.
+  const afterReading = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const byId = (id) => s.taken.filter((t) => t.t === 'word' && t.id === id);
+    return {
+      dog: byId('犬'), cat: byId('猫'), weather: byId('天気'),
+      ghost: byId('ゾロメ語'),
+      made: s.aiReading?.made || null,
+      bodyHasFuda: document.querySelector('.airead-body')?.textContent.includes('札：') || false,
+      chips: [...document.querySelectorAll('[data-airead-made]')].map((c) => c.dataset.aireadMade),
+    };
+  })()`);
+  check('reading · the tutor made exactly the two honest cards, provenance-marked',
+    afterReading.dog.length === 1 && afterReading.cat.length === 1 &&
+      afterReading.dog[0].by === 'sensei' && afterReading.cat[0].by === 'sensei' &&
+      Number.isFinite(afterReading.dog[0].started) && Number.isFinite(afterReading.cat[0].started),
+    `犬×${afterReading.dog.length} 猫×${afterReading.cat.length}`);
+  check('reading · a deck word is not duplicated; an unconfirmable word makes no card',
+    afterReading.weather.length === 1 && afterReading.ghost.length === 0,
+    `天気×${afterReading.weather.length} ゾロメ語×${afterReading.ghost.length}`);
+  check('reading · the record carries made:[犬,猫] and the 札 line stays out of the ink',
+    JSON.stringify(afterReading.made) === JSON.stringify(['犬', '猫']) && !afterReading.bodyHasFuda,
+    `made=${JSON.stringify(afterReading.made)}`);
+  check('reading · the made cards stand as doors under the passage',
+    JSON.stringify(afterReading.chips) === JSON.stringify(['犬', '猫']),
+    `chips=${JSON.stringify(afterReading.chips)}`);
+
+  // ---------------------------- the 札を頼む door: curation on demand
+  console.log('\n— the tutor curates cards on demand');
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await page.waitForSelector('#ai-cards-make', { timeout: 8000 });
+  await page.click('#ai-cards-make');
+  await page.waitForFunction(
+    () => /先生が\d+枚作った|The tutor made \d+ card/.test(document.body.textContent),
+    null,
+    { timeout: 8000 },
+  );
+  const afterDoor = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const byId = (id) => s.taken.filter((t) => t.t === 'word' && t.id === id);
+    return { walk: byId('散歩'), music: byId('音楽'), weather: byId('天気'), ghost: byId('ゾロメ語') };
+  })()`);
+  check('札 door · new words become provenance-marked cards; known and unconfirmable do not',
+    afterDoor.walk.length === 1 && afterDoor.walk[0].by === 'sensei' &&
+      afterDoor.music.length === 1 && afterDoor.weather.length === 1 && afterDoor.ghost.length === 0,
+    `散歩×${afterDoor.walk.length} 音楽×${afterDoor.music.length} 天気×${afterDoor.weather.length}`);
+  const cardsRows = await waitRows(page, 'cards', 2);
+  check('札 door · the exchange lands whole in the archive',
+    exchangeShape(cardsRows, 'cards', OVERRIDE_MODEL), `${cardsRows.length} rows`);
 
   // ------------------------- surface 6 · chat, and the end of the 24-turn cap
   console.log('\n— chat: turn 25 destroys nothing');

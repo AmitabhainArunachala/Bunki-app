@@ -1297,8 +1297,9 @@ async function main() {
     pressed: document.querySelector('#listen-toggle')?.getAttribute('aria-pressed') ?? null,
     note: document.querySelector('#listen-note')?.textContent ?? '',
   })`);
-  check('reader · the 聞く door stands, names its interim voice, and answers a tap honestly',
-    listenBefore.pressed === 'false' && /仮の声|interim device voice/.test(listenBefore.note) &&
+  check('reader · the 聞く door stands, names its voice honestly, and answers a tap',
+    listenBefore.pressed === 'false' &&
+      /仮の声|interim device voice|小春音アミ|Koharune Ami/.test(listenBefore.note) &&
       (listenAfter.pressed === 'true' || /声が見つからない|no Japanese voice/.test(listenAfter.note)),
     `before ${JSON.stringify(listenBefore)} → after ${JSON.stringify(listenAfter)}`);
 
@@ -1732,7 +1733,7 @@ async function main() {
   console.log('\n— the example bank: ≥4 sentences, every token a door');
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result="word:学校"]');
   await page.waitForSelector('#sheet');
   await page
@@ -1794,7 +1795,7 @@ async function main() {
   // short minor sense, "Korea", that a shortest-wins gloss once surfaced)
   await open('?entry=shelf');
   await page.fill('#search', '半島');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result="word:半島"]');
   await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
   await page.waitForTimeout(400);
@@ -1926,6 +1927,11 @@ async function main() {
   for (let cardN = 0; cardN < 6; cardN++) {
     await page.waitForSelector('#declare-recalled', { timeout: 10000 });
     await page.evaluate(`document.querySelector('#declare-recalled')?.click()`);
+    // ZEN-DOJO v2 (operator, 2026-08-20: the back decrowded): the word's
+    // sentences wait one NAMED fold away — the probe opens it the way a
+    // thumb would, then demands the same living tokens as ever
+    await page.waitForSelector('.grade', { timeout: 8000 }).catch(() => {});
+    await page.evaluate(`document.querySelector('#review-fold')?.click()`);
     await page
       .waitForFunction(
         () => document.querySelectorAll('.review-example, .review-cloze').length >= 1,
@@ -1937,14 +1943,17 @@ async function main() {
       lines: document.querySelectorAll('.review-example, .review-cloze').length,
       live: document.querySelectorAll('.review-example .sentence-tok, .review-cloze .sentence-tok').length,
       word: document.querySelector('.review-front')?.textContent ?? '',
+      say: !!document.querySelector('#card-say'),
     }))()`);
     if (answerFace.lines >= 1) break;
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
-  check('the answer face carries living sentences — never a bare word where the corpus holds any',
+  check('the answer face carries living sentences behind its named fold — never a bare word where the corpus holds any',
     answerFace.lines >= 1 && answerFace.live >= 1,
     `“${answerFace.word.trim()}” · ${answerFace.lines} sentence lines · ${answerFace.live} live tokens`);
+  check('TENOHIRA v2 · every answer face holds the 音 voice door (operator, 2026-08-20)',
+    answerFace.say === true, `card-say present on “${answerFace.word.trim()}”`);
   await shoot(page, shotsDir, '18-review-answer-face');
   // the walk's recall declarations ride the observation debounce; let it
   // land before the next probe replaces the envelope (same idiom as the
@@ -1966,7 +1975,7 @@ async function main() {
   }))`);
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
   // the dictionary's late arrival re-renders the sheet; a tap aimed between
@@ -2001,7 +2010,7 @@ async function main() {
   await tap(page, '#back');
   await page.waitForTimeout(200);
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet #sheet-take');
   await tap(page, '#sheet-take');
@@ -2166,7 +2175,7 @@ async function main() {
   // the sentence page carries the seal for the word it is built around
   await open('?entry=shelf');
   await page.fill('#search', '半島');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:半島"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:半島"]');
   await page.waitForSelector('#sheet .example .sent-door', { timeout: 15000 });
   await page.waitForTimeout(300);
@@ -2840,12 +2849,18 @@ async function main() {
       Math.abs(backToShelf.y - shelfYKept) <= 20,
     `view=${backToShelf.view} y=${backToShelf.y} (kept ${shelfYKept})`);
 
-  // (d) the 銀河 search session survives a result round-trip: query, results,
-  // and focus on the row that was left
+  // (d) the search room (operator, 2026-08-20: search is its own page) —
+  // the bar's door opens it, and the session survives a result round-trip:
+  // query, results, and focus on the row that was left
   await open('');
   await page.waitForTimeout(1600);
   await page.tap('.nav-symbol');
+  await page.waitForSelector('#nav-search-door');
+  await page.tap('#nav-search-door');
   await page.waitForSelector('#nav-search-input');
+  const searchRoom = await page.evaluate(`document.body.dataset.view`);
+  check('R3-B · the bar’s search door opens the search room, a page of its own',
+    searchRoom === 'search', `view=${searchRoom}`);
   await page.locator('#nav-search-input').fill('水');
   await page.waitForSelector('.nav-search-row', { timeout: 10000 });
   const rowsBefore = await page.locator('.nav-search-row').count();
@@ -2860,12 +2875,21 @@ async function main() {
     sheet: !!document.querySelector('#sheet'),
     q: document.getElementById('nav-search-input')?.value ?? null,
     rows: document.querySelectorAll('.nav-search-row').length,
-    focusInSearch: !!document.activeElement?.closest?.('.nav-search'),
+    focusInSearch: !!document.activeElement?.closest?.('.search-page'),
   })`);
-  check('R3-B · the nav-search session survives the round trip — query, results, focus',
-    navRound.sameDocument && navRound.view === 'drift' && !navRound.sheet &&
+  check('R3-B · the search-room session survives the round trip — query, results, focus',
+    navRound.sameDocument && navRound.view === 'search' && !navRound.sheet &&
       navRound.q === '水' && navRound.rows >= 1 && navRound.focusInSearch,
     `${JSON.stringify(navRound)} (rows before: ${rowsBefore})`);
+  // …and Back from the room itself returns to the galaxy its door stands in
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const searchHome = await page.evaluate(`({
+    sameDocument: window.__r3bNav === 1,
+    view: document.body.dataset.view,
+  })`);
+  check('R3-B · Back from the search room lands on the galaxy',
+    searchHome.sameDocument && searchHome.view === 'drift', JSON.stringify(searchHome));
 
   check('R3-B · the walks leave no console errors',
     consoleErrors.length === errsBeforeR3B,
@@ -3048,7 +3072,7 @@ async function main() {
   }))`);
   await open('?entry=shelf');
   await page.fill('#search', '学校');
-  await page.waitForTimeout(500);
+  await page.waitForSelector('[data-result^="word:学校"]', { timeout: 15000 });
   await tap(page, '[data-result^="word:学校"]');
   await page.waitForSelector('#sheet .encounter-trail');
   const trail = await page.evaluate(`(() => {

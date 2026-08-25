@@ -558,12 +558,50 @@ body.ginga #drift-layer #hint.first-cue {
   font-weight: 600;
 }
 
-/* search field inside the bar */
-.nav-search {
-  position: relative;
+/* the search door inside the bar — a field-shaped threshold that opens the
+ * search room, where the squeezed 71px field used to stand */
+.nav-search-door {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  min-height: 44px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-2, #55606c);
+  background: var(--ground, #fbf8f0);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 10px;
+  cursor: pointer;
 }
+.nav-search-door svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.nav-search-door .nsd-word {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  /* a tight bar keeps the whole door but drops the word — a truncated
+   * 検.. is the old squeezed-field sin again; the glass alone reads, and
+   * the aria-label keeps the name */
+  .nav-search-door {
+    justify-content: center;
+  }
+  .nav-search-door .nsd-word {
+    display: none;
+  }
+}
+.nav-bar {
+  position: relative;
+}
+
+/* 検索の間 — the search room: one big box, roomy rows, its own page */
 .nav-search-input {
   width: 100%;
   padding: 8px 10px;
@@ -578,29 +616,58 @@ body.ginga #drift-layer #hint.first-cue {
   outline: 2px solid var(--ai, #2e4d6e);
   outline-offset: 1px;
 }
-.nav-search-results {
-  /* anchored to the BAR, not the squeezed input: at 390px the search field
-   * shrinks to ~71px and results rendered one kana per line with glosses
-   * cut to a letter (P1, review) — the panel now spans the full bar */
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  max-height: 46vh;
-  overflow-y: auto;
+/* the reading-voice picker beside 聞く — device voices, the hand's choice */
+.listen-voice {
+  min-height: 44px;
+  max-width: 46%;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink, #23303f);
   background: var(--ground-0, #fff);
   border: 1px solid var(--line, #cfc7b5);
-  border-radius: 12px;
-  box-shadow: 0 10px 28px rgba(20, 26, 34, 0.22);
+  border-radius: 10px;
 }
-.nav-bar {
-  position: relative;
+
+.search-page {
+  max-width: 560px;
+  margin: 4px auto 0;
 }
-.nav-bar .nav-search {
-  position: static; /* the results panel measures against the bar */
+.search-page .nav-search-input {
+  font-size: 18px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: var(--ground-0, #fff);
 }
-.nav-search-results:empty {
+.search-page-hint {
+  margin: 10px 2px 0;
+  font-size: 13px;
+  color: var(--faint, #a9a293);
+}
+.search-page-results {
+  margin-top: 14px;
+  background: var(--ground-0, #fff);
+  border: 1px solid var(--line, #cfc7b5);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.search-page-results:empty {
   display: none;
+}
+.search-page-results .nav-search-row {
+  padding: 13px 14px;
+  gap: 12px;
+  min-height: 56px;
+}
+.search-page-results .nsr-glyph {
+  font-size: 23px;
+}
+.search-page-results .nsr-read {
+  font-size: 13px;
+}
+.search-page-results .nsr-gloss {
+  font-size: 13.5px;
+  white-space: normal; /* the room has space — a gloss may finish its thought */
 }
 .nav-search-row {
   display: flex;
@@ -793,6 +860,9 @@ body.ginga #drift-layer #hint.first-cue {
 .focus-hud-end {
   padding: 6px 14px;
   font-size: 13px;
+  /* the door's word stays on one line: a squeezed 終わる collapsed into a
+   * vertical strand of characters (operator's real phone, 2026-08-20) */
+  white-space: nowrap;
   color: #fcfbf6;
   background: rgba(255, 255, 255, 0.16);
   border: none;
@@ -1060,6 +1130,11 @@ button.tok::before {
 .token-door {
   position: relative;
   display: inline;
+}
+
+/* 禁則処理 — a word box and the closing mark after it wrap as one */
+.kinsoku-glue {
+  white-space: nowrap;
 }
 
 .tok:focus-visible {
@@ -1701,22 +1776,30 @@ button.tok::before {
 
 .tray-line {
   display: flex;
-  align-items: baseline;
-  gap: 9px;
+  align-items: center;
+  gap: 10px;
   border-top: 1px solid var(--line-soft);
-  padding: 12px 0;
+  padding: 13px 2px;
+  cursor: pointer;
+}
+.tray-line:active {
+  background: color-mix(in srgb, var(--ink, #222) 4%, transparent);
 }
 
 .tray-line .w {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .tray-line .when {
   margin-left: auto;
   font-size: 12px;
-  color: var(--red);
+  color: var(--ink-2);
   font-variant-numeric: tabular-nums;
+}
+/* red is for NOW — the rest of the schedule speaks quietly */
+.tray-line .when.due-now {
+  color: var(--red);
 }
 
 .inline-link {
@@ -1790,6 +1873,18 @@ button.tok::before {
   --card-ai: #2e4d6e;
   --card-ai-wash: rgba(46, 77, 110, 0.08);
 
+  /* 禅夜 zen-night tokens — each world's dojo is that world's own pigments
+   * deepened to night (operator law, 2026-08-20: one theme everywhere; no
+   * room may change scheme unprompted). Every theme block below re-derives
+   * these seven for its own palette. Default = ベロ藍・浪. */
+  --zen-stage-deep: #0a0f16;
+  --zen-stage: #111927;
+  --zen-stage-crown: #1a2537;
+  --zen-text: #e9e2cf;
+  --zen-accent: #c2a15c;
+  --zen-red: #d97a62;
+  --zen-glow: rgba(127, 168, 204, 0.35);
+
   /* S4 hanko controls — the seal grammar shared by every stamped control */
   --seal-size: 56px;
   --seal-radius: 5px;
@@ -1813,6 +1908,13 @@ button.tok::before {
  * lines, fades, the one action-red and the go-colour shift together; every
  * dark world lifts its quiet print per the night legibility law. */
 :root[data-theme='sumi'] {
+  --zen-stage-deep: #0d0c09;
+  --zen-stage: #14120d;
+  --zen-stage-crown: #1d1a13;
+  --zen-text: #eae4d3;
+  --zen-accent: #b8a37e;
+  --zen-red: #cf6f55;
+  --zen-glow: rgba(176,160,130,0.3);
   --ground: #f5efe0;
   --ground-2: #ede5d0;
   --ground-0: #faf6ea;
@@ -1828,6 +1930,13 @@ button.tok::before {
   --ai-wash: rgba(46, 77, 110, 0.08);
 }
 :root[data-theme='shu'] {
+  --zen-stage-deep: #0f0d0b;
+  --zen-stage: #161310;
+  --zen-stage-crown: #201c17;
+  --zen-text: #f0ebdd;
+  --zen-accent: #c2a15c;
+  --zen-red: #d96a55;
+  --zen-glow: rgba(200,140,110,0.3);
   --ground: #f9f5eb;
   --ground-2: #f2ecdb;
   --ground-0: #fdfaf2;
@@ -1843,6 +1952,13 @@ button.tok::before {
   --ai-wash: rgba(46, 77, 110, 0.08);
 }
 :root[data-theme='akafuji'] {
+  --zen-stage-deep: #120b07;
+  --zen-stage: #1a100a;
+  --zen-stage-crown: #271810;
+  --zen-text: #ecdcc6;
+  --zen-accent: #c99b5a;
+  --zen-red: #d97f56;
+  --zen-glow: rgba(217,127,86,0.3);
   --ground: #f3e3cf;
   --ground-2: #ecd7bd;
   --ground-0: #f8ecdc;
@@ -1858,6 +1974,13 @@ button.tok::before {
   --ai-wash: rgba(42, 93, 138, 0.08);
 }
 :root[data-theme='iwa'] {
+  --zen-stage-deep: #0e0805;
+  --zen-stage: #150c07;
+  --zen-stage-crown: #20120a;
+  --zen-text: #e2c69f;
+  --zen-accent: #c08a4e;
+  --zen-red: #cf6b3f;
+  --zen-glow: rgba(207,107,63,0.3);
   --ground: #ddb083;
   --ground-2: #d2a271;
   --ground-0: #e6bd92;
@@ -1874,6 +1997,13 @@ button.tok::before {
   --ai-wash: rgba(53, 73, 107, 0.1);
 }
 :root[data-theme='rokusho'] {
+  --zen-stage-deep: #0a0807;
+  --zen-stage: #100d0b;
+  --zen-stage-crown: #1a1512;
+  --zen-text: #f2ecdf;
+  --zen-accent: #b8a37e;
+  --zen-red: #e0796b;
+  --zen-glow: rgba(224,121,107,0.3);
   --ground: #171310;
   --ground-2: #221c15;
   --ground-0: #251e16;
@@ -1889,6 +2019,13 @@ button.tok::before {
   --ai-wash: rgba(217, 178, 95, 0.14);
 }
 :root[data-theme='yoru'] {
+  --zen-stage-deep: #090c18;
+  --zen-stage: #0e1322;
+  --zen-stage-crown: #161e35;
+  --zen-text: #f4ecd9;
+  --zen-accent: #d9b96a;
+  --zen-red: #ef8079;
+  --zen-glow: rgba(217,185,106,0.3);
   --ground: #131a30;
   --ground-2: #1b2440;
   --ground-0: #1d2645;
@@ -1907,6 +2044,13 @@ button.tok::before {
   --ai-wash: rgba(217, 178, 95, 0.14);
 }
 :root[data-theme='nami'] {
+  --zen-stage-deep: #081420;
+  --zen-stage: #0c1b2a;
+  --zen-stage-crown: #132639;
+  --zen-text: #eae6d8;
+  --zen-accent: #a9c2d6;
+  --zen-red: #e08a6e;
+  --zen-glow: rgba(140,180,210,0.3);
   --ground: #11273b;
   --ground-2: #18314a;
   --ground-0: #1a3450;
@@ -1922,6 +2066,13 @@ button.tok::before {
   --ai-wash: rgba(143, 179, 209, 0.14);
 }
 :root[data-theme='keyblock'] {
+  --zen-stage-deep: #0d0c0a;
+  --zen-stage: #131110;
+  --zen-stage-crown: #1c1916;
+  --zen-text: #e9e1cc;
+  --zen-accent: #b3a27a;
+  --zen-red: #d97a62;
+  --zen-glow: rgba(170,158,130,0.3);
   --ground: #f2ead6;
   --ground-2: #e9dfc2;
   --ground-0: #faf6ea;
@@ -1937,6 +2088,13 @@ button.tok::before {
   --ai-wash: rgba(42, 93, 138, 0.08);
 }
 :root[data-theme='hakuu'] {
+  --zen-stage-deep: #0b0906;
+  --zen-stage: #100d08;
+  --zen-stage-crown: #181209;
+  --zen-text: #efe5cf;
+  --zen-accent: #e5c05a;
+  --zen-red: #e0796b;
+  --zen-glow: rgba(229,192,90,0.3);
   --ground: #221b12;
   --ground-2: #2a2117;
   --ground-0: #30271b;
@@ -1952,6 +2110,13 @@ button.tok::before {
   --ai-wash: rgba(217, 169, 63, 0.14);
 }
 :root[data-theme='kaku'] {
+  --zen-stage-deep: #02070a;
+  --zen-stage: #050d12;
+  --zen-stage-crown: #0a161e;
+  --zen-text: #d8efe9;
+  --zen-accent: #5fe3c0;
+  --zen-red: #ff6b4a;
+  --zen-glow: rgba(95,227,192,0.35);
   --ground: #050d12;
   --ground-2: #0b161d;
   --ground-0: #0d1921;
@@ -2495,6 +2660,7 @@ body.v-depth-layered .inline-link {
 .listen-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* the voice picker joins the row without crushing it */
   gap: 10px;
   margin: 10px 0 0;
 }
@@ -3169,6 +3335,20 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 .stroke-page[data-living='still'] .stroke-inks {
   display: none; /* the ink follows the world here — no separate pigment row */
 }
+/* Before a renderer owns the stage (living ink still pending) the classic
+ * layers hold no dash state — un-dashed they would paint the finished glyph
+ * for the loading interval (the legacy first-paint flash, issue #79). The
+ * grid and faint guide are the paper's own furniture and stay; the ink, its
+ * bleed, and the numbers wait for the owner: the living sheet, or 'fallback',
+ * whose classic write begins the moment it is chosen. Full motion only:
+ * under reduced motion the classic still IS the mount-time renderer and must
+ * stand immediately — hiding it left the room blank for the import window
+ * (PR #82 review). */
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-bleed,
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-ink,
+.stroke-page[data-motion='full'][data-ink-ready='pending'] .stroke-nums {
+  visibility: hidden;
+}
 .stroke-page[data-living='on'] .stroke-readout,
 .stroke-page[data-living='still'] .stroke-readout {
   position: absolute; /* the pips carry the count; keep the counter for readers */
@@ -3627,9 +3807,27 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
     env(safe-area-inset-left);
 }
 
+/* 没入 (operator escalation, 2026-08-24): the paper is the whole screen,
+ * but the RESOLUTION belongs to the glyph. The live sheet keeps the
+ * engine's full lattice on a strip-sized square — every kasure streak
+ * sharp — while .ink-ground, a strokeless still painted by the same
+ * engine, carries the identical washi to every edge of the viewport
+ * behind it. One paper, two canvases, no seam, no card, no mask. Awake
+ * chrome floats over the paper; the sheet never shrinks into a card. */
+.stroke-page[data-minimal='on'] .ink-ground {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: max(100dvw, 100dvh);
+  height: max(100dvw, 100dvh);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .stroke-page[data-minimal='on'] .stroke-stage,
 .stroke-page[data-minimal='on'][data-living='on'] .stroke-stage,
-.stroke-page[data-minimal='on'][data-living='still'] .stroke-stage {
+.stroke-page[data-minimal='on'][data-living='still'] .stroke-stage,
+.stroke-page[data-minimal='on'][data-chrome='awake'] .stroke-stage {
   width: min(94vw, 72dvh, 560px);
   margin: 0;
   overflow: visible;
@@ -3637,14 +3835,8 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-}
-
-/* Once the field wakes, give its lower control sheet an uncontested zone.
- * The lifted numeral layer follows this rect in JS, so neither numbers nor
- * wet ink can paint across the palette/readings controls. */
-.stroke-page[data-minimal='on'][data-chrome='awake'] .stroke-stage {
-  width: min(78vw, 44dvh, 360px);
-  transform: translateY(-20dvh);
+  transform: none;
+  position: relative;
 }
 
 .stroke-page[data-minimal='on'] .stroke-stage .stroke-canvas {
@@ -3658,22 +3850,11 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: none;
 }
 
-/* The renderer paints an opaque square. Feather its edges into the same grown
- * paper so the glyph lives on the page rather than on a visible tile. */
-.stroke-page[data-minimal='on'] .stroke-stage .ink-sheet {
-  -webkit-mask-image: radial-gradient(
-    circle closest-side at 50% 50%,
-    #000 0 84%,
-    rgba(0, 0, 0, 0.82) 92%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    circle closest-side at 50% 50%,
-    #000 0 84%,
-    rgba(0, 0, 0, 0.82) 92%,
-    transparent 100%
-  );
-}
+/* The renderer's washi now IS the room — full-bleed, never behind a mask:
+ * the radial feather that once blended a card's edges also CROPPED
+ * edge-heavy glyphs into a porthole (滅 at 390×844 — issue #79), and the
+ * card itself gave way to the whole screen (没入, 2026-08-24). No dress on
+ * the sheet: no radius, no shadow, no mask — paper to every edge. */
 
 .stroke-page[data-minimal='on'][data-chrome='sleeping'] .stroke-nums {
   display: none !important;
@@ -4136,11 +4317,19 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
  * DOM — suites and screen readers keep selecting again/hard/good/easy. The
  * probe row keeps the plain .grade box above. */
 .grade.hanko {
-  border: 0;
-  background: transparent;
+  /* four equal cells, not four loose stacks (operator, 2026-08-20: the
+   * grading row felt awkward) — a quiet bounded card per grade, the seal
+   * carrying the meaning, label and honest interval aligned beneath */
+  border: 1px solid var(--line-soft, var(--line));
+  background: color-mix(in srgb, var(--ground-0, #fff) 62%, transparent);
+  border-radius: 12px;
   gap: 4px;
-  padding: 2px 0 4px;
+  padding: 9px 0 8px;
+  min-height: 78px;
   color: var(--ink);
+}
+.grade.hanko:active {
+  background: color-mix(in srgb, var(--ink, #222) 7%, transparent);
 }
 
 .grade.hanko .g-seal {
@@ -4156,9 +4345,13 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .grade.hanko .g-label {
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+}
+.grade.hanko .g-when {
   font-size: 11px;
   color: var(--ink-2);
-  letter-spacing: 0.06em;
 }
 
 .grade.hanko:active .g-seal {
@@ -4192,13 +4385,70 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .review-summary {
   display: flex;
-  gap: 8px;
-  margin: 6px 0 14px;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 20px;
   flex-wrap: wrap;
+}
+/* the close wears the session's own seals, each with its count */
+.sum-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.sum-seal .g-seal {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--seal-radius, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1;
+}
+.sum-seal .sum-n {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.sum-seal.g-again .g-seal {
+  color: var(--red);
+  border: 2px solid color-mix(in srgb, var(--red) 75%, transparent);
+  background: var(--red-wash);
+}
+.sum-seal.g-hard .g-seal {
+  color: var(--ink-2);
+  border: 2px solid var(--line);
+}
+.sum-seal.g-good .g-seal {
+  color: var(--ground-0, #fff);
+  border: 2px solid var(--red);
+  background: var(--red);
+}
+.sum-seal.g-easy .g-seal {
+  color: var(--ink);
+  border: 2px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+.close-doors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.close-doors .take {
+  margin: 0;
+  flex: 1;
 }
 
 .review-undo {
   margin-top: 4px;
+}
+.close-doors .review-undo {
+  margin: 0;
+  flex: none;
 }
 
 /* --------------------------------------------------- the tutor (AI in-app) */
@@ -4404,6 +4654,25 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-size: 12px;
   color: var(--faint);
   margin: 6px 0 26px;
+}
+
+/* 先生の札 — the cards the tutor made from its own passage. Chips are the
+ * existing chip voice; the head is quiet ink, the row wraps on a phone. */
+.airead-made {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -14px 0 26px;
+}
+
+.airead-made-head {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.airead-made-chip {
+  min-height: 44px;
 }
 
 /* ------------------------------------- the learner model in the text
@@ -4760,7 +5029,14 @@ body.zen .probe-context {
   margin: 4px 0 0;
 }
 body.zen .review-example {
-  font-size: 17px;
+  /* the wild sentences are the quiet second voice on the sheet: set apart
+   * by a hairline, reading left-to-right the way a sentence wants to */
+  font-size: 16px;
+  line-height: 1.9;
+  text-align: left;
+  width: 100%;
+  border-top: 1px solid var(--line-soft, var(--line));
+  padding-top: 12px;
 }
 
 /* the struggling cards on the session summary */
@@ -4780,22 +5056,29 @@ body.zen .review-example {
 
 /* the per-list review door on a list heading */
 .list-head .list-review {
+  /* a door, not a label: the filtered deck's one-tap review */
   margin-left: auto;
-  font-size: 11px;
-  padding: 3px 9px;
+  font-size: 12px;
+  padding: 6px 12px;
+  background: var(--ground-0, #fff);
+  border-radius: 999px;
 }
 
 .list-head {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 26px;
 }
 
 /* carrying the record: the export / import pair at the tray's foot */
 .port-row {
+  /* the utility foot: a hairline sets the record-keeping apart from the deck */
   display: flex;
   gap: 8px;
-  margin: 26px 0 0;
+  margin: 30px 0 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 18px;
 }
 
 /* ------------------------------------------------------- 字引 the finder
@@ -5280,11 +5563,19 @@ body.zen .review-example {
  * counts. A hairline of progress, one faint way out, one faint …, and the
  * four honest buttons within the thumb's reach. */
 body.zen main {
+  /* a three-zone stage: hairline above, the sheet floating in the middle,
+   * and ONE action zone riding the bottom edge — the thumb learns a single
+   * place, whether the row holds the two declarations or the four seals
+   * (operator, 2026-08-20: the room felt sloppy — the card and its buttons
+   * rearranged themselves between faces) */
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 60px 18px calc(20px + env(safe-area-inset-bottom));
+  /* main's inline-auto margins shrink it to its content between flex
+   * parents — which made the sheet a content-width pillar on short faces
+   * (one word → one narrow column). The stage claims its full measure. */
+  width: 100%;
+  padding: 60px 18px 0;
   box-sizing: border-box;
 }
 .zen-progress {
@@ -5300,7 +5591,7 @@ body.zen main {
   display: block;
   height: 100%;
   background: var(--faint);
-  opacity: 0.55;
+  opacity: 0.75;
   transition: width 0.4s ease;
 }
 .zen-exit,
@@ -5316,7 +5607,7 @@ body.zen main {
   font-size: 21px;
   line-height: 1;
   cursor: pointer;
-  opacity: 0.55;
+  opacity: 0.7;
   z-index: 6;
 }
 .zen-exit {
@@ -5341,8 +5632,12 @@ body.zen .review-face {
   flex: 0 1 auto;
   width: 100%;
   max-width: 440px;
-  min-height: min(50vh, 420px);
-  margin: 0 auto;
+  /* the paper hugs its word: 50vh left a one-word card floating in a sea
+   * of empty sheet on a tall phone (operator's real phone, 2026-08-20) */
+  min-height: min(36vh, 340px);
+  /* block-auto margins centre the sheet in the free space and push the
+   * action zone to the bottom edge — the stage's middle zone */
+  margin: auto;
   justify-content: center;
   gap: 14px;
   padding: clamp(28px, 6vh, 52px) 22px;
@@ -5364,29 +5659,48 @@ body.zen .review-cloze {
   margin: 0;
 }
 body.zen .review-reading {
-  font-size: 17px;
+  font-size: 18px;
 }
 body.zen .review-sense {
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.55;
+  max-width: 36ch;
 }
 body.zen .review-reveal {
-  margin: 0 auto;
+  /* the dojo's one door rides the same bottom action zone */
+  position: sticky;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 3;
+  margin: 18px auto calc(10px + env(safe-area-inset-bottom));
   width: 100%;
   max-width: 440px;
+  min-height: 58px;
+  border-radius: 10px;
 }
 /* 想起の二道 — the T-06 gate: before anything turns over, the front face
  * asks "did it come back?". Two quiet doors where the single reveal stood:
  * まだ stands outlined — an honest miss is never punished by the chrome —
  * and 思い出した carries the ink. The dojo keeps its single 答えを見る. */
 .declare-row {
-  /* the two doors breathe below the sheet and match its width; each door
-   * holds its words on one line — 思い出した never breaks mid-thought */
+  /* the two doors match the sheet's measure; each door holds its words on
+   * one line — 思い出した never breaks mid-thought */
   margin: 18px auto 0;
   width: 100%;
   max-width: 440px;
   display: flex;
   gap: 12px;
+}
+body.zen .declare-row {
+  /* the declarations stand exactly where the grade seals will stand — one
+   * action zone, one thumb position, the same washi backing (mirrors the
+   * pinned body.zen .grade-row posture without touching it) */
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 0;
+  padding: 8px 0 calc(10px + env(safe-area-inset-bottom));
+  background: var(--ground-0, var(--ground));
+  box-shadow: 0 -10px 24px -18px rgba(10, 10, 8, 0.55);
 }
 .declare-row .take {
   flex: 1;
@@ -5427,10 +5741,20 @@ body.zen .variants-bar {
 }
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {
+  /* one quiet top line, not a pill floating mid-air: the clock holds the
+   * centre and the way out stands in the right corner — the same corner
+   * as plain review's ×, so the hand already knows it (operator's real
+   * phone, 2026-08-20: the shrink-wrapped pill crushed 終わる into a
+   * vertical strand beside the clock) */
+  top: calc(4px + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  transform: none;
   background: transparent;
   border: 0;
   box-shadow: none;
-  padding: calc(6px + env(safe-area-inset-top)) 54px 0;
+  padding: 0 54px;
+  min-height: var(--tap);
   justify-content: center;
   gap: 10px;
 }
@@ -5441,8 +5765,15 @@ body.zen .focus-hud-left {
   color: var(--faint);
   font-size: 13px;
   letter-spacing: 0.14em;
+  min-height: var(--tap);
+  align-items: center;
 }
 body.zen .focus-hud-end {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
   border: 0;
   background: transparent;
   color: var(--faint);
@@ -5467,10 +5798,14 @@ body.zen .focus-hud-end {
   letter-spacing: 0.06em;
 }
 
-/* ---- list management (覚える stage 2): inline maker, rename, armed delete */
+/* ---- list management (覚える stage 2): inline maker, rename, armed delete.
+ * The maker waits BELOW the learner's own words (operator, 2026-08-20). */
 .list-maker {
   display: flex;
   gap: 8px;
+  margin: 26px 0 0;
+}
+.list-maker.list-rename {
   margin: 10px 0 14px;
 }
 .list-maker-field {
@@ -5503,4 +5838,423 @@ body.zen .focus-hud-end {
 .list-op.armed {
   color: var(--red);
   border-color: var(--red);
+}
+
+/* ================================================================== 禅道場 v2
+ * ZEN-DOJO v2 — the operator's 2026-08-20 direction: "1600 Japan on a 2335
+ * device — as futuristic as possible while keeping the zen dojo feel;
+ * minimal with more depth and texture; hypnotic." Built from the nine-lane
+ * research fleet (docs/build-evidence/tenohira/triage-2026-08-20/).
+ * The byte-pinned body.zen .grade-row rule is UNTOUCHED: the bar rethemes
+ * through --ground-0 alone, which that rule already reads. */
+
+body.zen {
+  /* the night is each world's own (operator law 2026-08-20: one theme
+   * everywhere) — the seven --zen-* tokens come from the active theme
+   * block; the card itself stays on the global --card-* washi law */
+  /* the shared breath: 6/min, the HRV-resonance rate */
+  --breath: 10s;
+  --ease-breath: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-ceremony: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-turn: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* the urushi stage: warm black, an andon light pool above the card,
+   * never #000 — warm channel order R>G>B */
+  background-color: var(--zen-stage);
+  background-image:
+    radial-gradient(130% 90% at 50% 26%, color-mix(in srgb, var(--zen-accent) 6%, transparent), transparent 55%),
+    radial-gradient(140% 110% at 50% 0%, var(--zen-stage-crown) 0%, var(--zen-stage) 52%, var(--zen-stage-deep) 100%);
+}
+/* the day-world paper canvas rests while the night room stands */
+body.zen::before {
+  opacity: 0;
+}
+/* 青海波 rises from the bottom of the water — stage only, never the card */
+body.zen::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* 青海波 as neutral foam: white wave-lines at whisper alpha with
+   * near-black occlusion fills — identical in every world's night */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='36'><defs><g id='s'><circle r='36' fill='%23000' fill-opacity='0.35'/><g fill='none' stroke='%23ffffff' stroke-opacity='.055'><circle r='36'/><circle r='28'/><circle r='20'/><circle r='12'/></g></g></defs><use href='%23s' x='0' y='0'/><use href='%23s' x='72' y='0'/><use href='%23s' x='-36' y='18'/><use href='%23s' x='36' y='18'/><use href='%23s' x='108' y='18'/><use href='%23s' x='0' y='36'/><use href='%23s' x='72' y='36'/></svg>");
+  background-size: 72px 36px;
+  -webkit-mask-image: radial-gradient(120% 60% at 50% 100%, #000, transparent 72%);
+  mask-image: radial-gradient(120% 60% at 50% 100%, #000, transparent 72%);
+}
+
+/* ------------------------------------------------ the sheet: washi on urushi */
+body.zen .review-face {
+  color: var(--card-ink);
+  background-color: var(--card-ground-0, var(--card-ground));
+  /* kōzo fibers (anisotropic turbulence) + su-no-me laid lines — the paper
+   * is real; texture alpha ≤6% so the ink never loses contrast */
+  background-image:
+    repeating-linear-gradient(180deg, rgba(58, 46, 32, 0.022) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, rgba(58, 46, 32, 0.012) 0 1px, transparent 1px 34px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.008' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='400' height='400' filter='url(%23w)'/></svg>");
+  /* lacquerware radii stay small; the rim is maki-e gold, one hair wide */
+  border: 0;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--zen-accent) 26%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 1px rgba(0, 0, 0, 0.28),
+    0 2px 2px rgba(0, 0, 0, 0.24),
+    0 8px 16px rgba(0, 0, 0, 0.28),
+    0 24px 56px rgba(6, 5, 5, 0.55);
+  gap: 12px;
+}
+
+/* -------------------------------------------------------- the word (honshi) */
+body.zen .review-front {
+  font-family: 'Shippori Mincho B1', var(--serif);
+  font-weight: 800;
+  color: var(--card-ink);
+  line-height: 1.12;
+  text-wrap: balance;
+  font-synthesis: none;
+}
+body.zen .review-front[data-len='1'],
+body.zen .review-front[data-len='2'] {
+  font-size: 74px;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em; /* re-centres the trailing tracking gap */
+}
+body.zen .review-front[data-len='3'] {
+  font-size: 62px;
+  letter-spacing: 0.18em;
+  padding-left: 0.18em;
+}
+body.zen .review-front[data-len='4'] {
+  font-size: 52px;
+  letter-spacing: 0.1em;
+  padding-left: 0.1em;
+}
+body.zen .review-front[data-len='5'],
+body.zen .review-front[data-len='6'] {
+  font-size: 42px;
+  letter-spacing: 0.05em;
+  padding-left: 0.05em;
+}
+body.zen .review-front[data-len='7'],
+body.zen .review-front[data-len='8'] {
+  font-size: 33px;
+  letter-spacing: 0.02em;
+  font-feature-settings: 'palt' 1;
+}
+
+/* ------------------------------------- the reading: calligraphy, not UI text */
+body.zen .review-reading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+body.zen .review-reading {
+  font-family: 'Yuji Syuku', var(--serif);
+  font-size: 27px;
+  line-height: 1.4;
+  color: var(--card-red);
+  letter-spacing: 0.05em; /* the brush hand carries its own rhythm */
+  text-shadow: 0 0 0.5px currentColor;
+}
+/* 音 — the fifth seal: the card's voice door */
+.say {
+  width: 44px;
+  height: 44px;
+  margin: -10px 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  color: var(--card-ink-2, #6f514c);
+  cursor: pointer;
+  position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms ease;
+}
+.say.is-speaking {
+  color: var(--card-red, #b7282e);
+}
+.say.is-speaking::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+/* ------------------------------------------------ one sense decides the grade */
+body.zen .review-sense-primary {
+  font-family: Georgia, serif;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--card-ink);
+  max-width: 34ch;
+}
+body.zen .review-sense-rest {
+  font-family: Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--card-ink-2);
+  max-width: 36ch;
+}
+body.zen .review-sense-late {
+  font-size: 14px;
+  color: var(--card-ink-2);
+  text-align: left;
+  width: 100%;
+}
+
+/* --------------------------- the kintsugi seam and the fold that holds the rest */
+.kintsugi {
+  width: 100%;
+  height: 12px;
+  margin: 2px 0 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='12'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='%238a6d2f'/><stop offset='.45' stop-color='%23f5e7a3'/><stop offset='.55' stop-color='%23d4af37'/><stop offset='1' stop-color='%238a6d2f'/></linearGradient></defs><path d='M0 7 L48 6 L80 3 L112 8 L166 5 L214 9 L258 4 L320 6' stroke='url(%23g)' stroke-width='1.2' fill='none' stroke-linecap='round'/></svg>")
+    center / 100% 12px no-repeat;
+  opacity: 0.75;
+}
+.review-fold {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--card-ink-2, #6f514c);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.review-more {
+  width: 100%;
+  max-height: 38vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* -------------------------------------------- the night bar: seals on lacquer */
+body.zen .grade.hanko {
+  border: 1px solid color-mix(in srgb, var(--zen-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--zen-stage-crown) 72%, transparent);
+}
+body.zen .grade.hanko:active {
+  background: color-mix(in srgb, #000 30%, transparent);
+}
+body.zen .grade.hanko .g-label {
+  color: var(--zen-text);
+}
+body.zen .grade.hanko .g-when {
+  color: var(--zen-accent);
+}
+body.zen .grade.hanko .g-seal {
+  font-family: 'Kaisei Tokumin', var(--serif);
+  font-weight: 800;
+}
+body.zen .grade.hanko.g-again .g-seal {
+  color: var(--zen-red);
+  border: 1.5px solid color-mix(in srgb, var(--zen-red) 60%, transparent);
+  background: transparent;
+}
+body.zen .grade.hanko.g-hard .g-seal {
+  color: var(--zen-text);
+  border: 1.5px solid color-mix(in srgb, var(--zen-text) 35%, transparent);
+  background: transparent;
+}
+body.zen .grade.hanko.g-good .g-seal {
+  color: var(--zen-stage-deep);
+  border: 1.5px solid var(--zen-red);
+  background: var(--zen-red);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--zen-red) 35%, transparent);
+}
+body.zen .grade.hanko.g-easy .g-seal {
+  color: var(--zen-accent);
+  border: 1.5px solid color-mix(in srgb, var(--zen-accent) 45%, transparent);
+  background: transparent;
+}
+
+/* the pinned bar rule paints var(--ground-0): at night, and ONLY inside
+ * the action rows, that ground is the world's lifted night — scoped here so
+ * a dictionary sheet opened from the card keeps its world paper (the
+ * operator's exact complaint, caught by the theme sweep) */
+body.zen main .grade-row,
+body.zen main .declare-row {
+  --ground-0: var(--zen-stage-crown);
+}
+
+/* the two declarations, gofun and paper on the night */
+body.zen .declare-row .take {
+  border-radius: 10px;
+}
+body.zen .declare-recalled {
+  background: var(--card-ground-0, var(--card-ground));
+  color: var(--card-ink);
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 6px 18px rgba(0, 0, 0, 0.45);
+}
+body.zen .declare-row .declare-notyet {
+  background: transparent;
+  color: var(--zen-text);
+  border: 1px solid color-mix(in srgb, var(--zen-text) 32%, transparent);
+}
+
+/* the room's small lights */
+body.zen .zen-exit,
+body.zen .zen-more {
+  color: var(--zen-text);
+  opacity: 0.55;
+}
+body.zen .zen-progress i {
+  background: var(--zen-accent);
+  opacity: 0.5;
+  box-shadow: 0 0 8px var(--zen-glow); /* the 2335 hairline: light, not pigment */
+}
+body.zen .focus-hud-left,
+body.zen .focus-hud-end {
+  color: var(--zen-accent);
+}
+body.zen .zen-more-row .chip {
+  color: var(--zen-text);
+  border-color: color-mix(in srgb, var(--zen-text) 32%, transparent);
+  background: transparent;
+}
+body.zen .zen-wait-clock {
+  color: var(--zen-text);
+}
+body.zen .review-cloze {
+  color: var(--card-ink);
+}
+body.zen .review-example {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* ------------------------------------------------------ the ceremony (motion) */
+@media (prefers-reduced-motion: no-preference) {
+  /* the room breathes as one organism — in LIGHT, never geometry: a
+   * transform breath makes every element inside the card perpetually
+   * unstable to the actionability checks the battery's browser runs, so
+   * the paper holds still and its aura breathes instead (opacity-only,
+   * compositor-safe) */
+  body.zen .review-face {
+    position: relative;
+  }
+  body.zen .review-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      0 28px 68px rgba(6, 5, 5, 0.5),
+      0 0 26px var(--zen-glow);
+    opacity: 0;
+    animation: kairo-breathe-glow var(--breath) var(--ease-breath) infinite;
+    will-change: opacity;
+  }
+  @keyframes kairo-breathe-glow {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  /* the answer condenses out of the paper like ink soaking in — each zone a
+   * beat of the ritual, the reading legible by ~450ms, seals last */
+  body.zen .reveal {
+    animation: kairo-materialize 520ms var(--ease-ceremony) both;
+  }
+  @keyframes kairo-materialize {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+    60% {
+      filter: blur(1.5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+  body.zen .reveal.r-1 {
+    animation-delay: 120ms;
+  }
+  body.zen .reveal.r-2 {
+    animation-delay: 210ms;
+  }
+  body.zen .reveal.r-3 {
+    animation-delay: 300ms;
+  }
+  body.zen .reveal.r-4 {
+    animation-delay: 390ms;
+  }
+  body.zen .grade-row .grade {
+    animation: kairo-materialize 380ms var(--ease-ceremony) both;
+    animation-delay: 480ms;
+  }
+  body.zen .grade-row .grade:nth-child(2) {
+    animation-delay: 540ms;
+  }
+  body.zen .grade-row .grade:nth-child(3) {
+    animation-delay: 600ms;
+  }
+  body.zen .grade-row .grade:nth-child(4) {
+    animation-delay: 660ms;
+  }
+  /* the stamp: one crisp gesture in a slow room */
+  body.zen .grade.hanko:active .g-seal {
+    transform: translateY(1px) scale(0.94);
+  }
+  .say.is-speaking svg {
+    animation: kairo-say-breath 2400ms var(--ease-breath) infinite;
+  }
+  @keyframes kairo-say-breath {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.zen .review-face {
+    animation: none;
+  }
+  body.zen .reveal,
+  body.zen .grade-row .grade {
+    animation: kairo-rm-fade 150ms ease-out both;
+    animation-delay: 0ms;
+    filter: none;
+  }
+  @keyframes kairo-rm-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .say {
+    transition: none;
+  }
 }

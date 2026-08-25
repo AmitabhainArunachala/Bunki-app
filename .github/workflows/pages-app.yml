@@ -56,6 +56,8 @@ jobs:
                 prototypes/corridor/sw.js \
                 prototypes/corridor/icon-192.png \
                 prototypes/corridor/icon-512.png \
+                prototypes/corridor/fonts.css \
+                prototypes/corridor/fonts \
                 prototypes/corridor/corridor.css \
                 prototypes/corridor/corridor.js \
                 prototypes/corridor/corridor-ink.js \
@@ -66,6 +68,9 @@ jobs:
                 prototypes/corridor/vendor \
                 prototypes/corridor/design \
                 "$SITE"/
+
+          # the recorded voices ride along when the branch carries them
+          if [ -d prototypes/corridor/audio ]; then cp -r prototypes/corridor/audio "$SITE"/; fi
 
           # One app means one landing: any missed path returns to the front door.
           cp prototypes/corridor/index.html "$SITE/404.html"
@@ -84,7 +89,7 @@ jobs:
           # curl, not node fetch: unconsumed keep-alive bodies trip an undici
           # internal assertion at process exit on some Node lines (seen live:
           # "assert(!this.paused)" AFTER every path had already printed 200)
-          for path in '' 'apple-touch-icon.png' 'corridor.css' 'corridor.js' \
+          for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
                       'corridor-ink.js' 'dictionary-worker.js' \
                       'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
@@ -93,6 +98,7 @@ jobs:
                       'data/share_alike/dict-v2/index.json' \
                       'data/share_alike/animcjk/index.json' \
                       'data/share_alike/animcjk/00.json' \
+                      'data/share_alike/animcjk/equivalence.json' \
                       'data/share_alike/dict-v2/00.json' \
                       'data/share_alike/dict-v2/0f.json'; do
             code=""
@@ -113,7 +119,7 @@ jobs:
           import json, sys
           site = sys.argv[1]
           index = json.load(open(f"{site}/data/share_alike/dict-v2/index.json"))
-          assert index["schemaVersion"] == 2, "dict-v2 schema"
+          assert index["schemaVersion"] == 3, "dict-v2 schema (sense tags, DICT_TAGS_CONTRACT_2026-08-12)"
           assert index["shardCount"] == 16, "dict-v2 shard count"
           assert index["sharding"]["id"] == "fnv1a32-ascii-seq-mask15", "dict-v2 shard algorithm"
           assert index["source"]["pin"] == "3.6.2+20260803141815", "dict-v2 source pin"
