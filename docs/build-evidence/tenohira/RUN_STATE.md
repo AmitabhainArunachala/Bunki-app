@@ -55,3 +55,33 @@ and wikinews:45227 — whose approval the feed gate CONVICTED (its
 final-revision caveat is verification, not taste; the rubric yielded and
 its text now says so). The census check follows the queue with a pairing
 assertion. verify-feed 31/31; the queue file is the per-row audit trail.
+
+## 書の間 escalations (operator, 2026-08-24)
+
+Four real-phone escalations landed and closed the same day, all on `main`:
+
+1. **Issue #79** (circular crop, legacy flash) — root-caused in #82: the
+   radial mask deleted, the classic write gated behind the renderer
+   decision, KanjiVG made the canonical glyph authority.
+2. **「もう、美しくない！」** — the fail-closed KanjiVG ruling took the
+   gallery brush from every kanji, and the operator's wife named the loss.
+   The **equivalence manifest** answers both laws at once
+   (`tools/build-animcjk-equivalence.mjs` →
+   `data/share_alike/animcjk/equivalence.json`): 1,947 of 2,134 characters
+   proven stroke-by-stroke equivalent to canonical KanjiVG regain AnimCJK's
+   true brush; 187 (経's 經 body among them, convicted by geometry at equal
+   stroke count; 衷 by count) keep the canonical hand. The metric itself
+   convicts 経 — no hand-curated exception list.
+3. **没入** — "the whole screen, not a square." First attempt shrank the
+   glyph inside the lattice and the hand went soft (fewer cells per
+   stroke); convicted by eye and reverted. The shipped design keeps the
+   glyph at FULL lattice on the strip-sized sheet and paints
+   `.ink-ground` — a strokeless still from the same engine, sized so the
+   sheet's texture is its exact centre crop — to every edge of the screen.
+   One paper, no card, no mask, no resolution loss. A faint tonal shift
+   where the live (WebGPU) sheet meets the 2D-painted ground remains —
+   reads as light on the writing area; named here as open polish, not
+   hidden.
+4. `verify-writing-room` grew to **51 checks**: manifest law (経→kanjivg,
+   永→animcjk, 衷→nine), immersion coverage, glyph-whole-at-full-lattice,
+   and the reduced-motion pending-gate conviction from #82's review.

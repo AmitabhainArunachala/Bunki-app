@@ -64,7 +64,7 @@ function easeFor(type) {
 }
 
 /** The hand — iro's makeWriter with the glyph as a parameter. */
-export function makeWriterFor(strokes) {
+export function makeWriterFor(strokes, glyphScale = 1) {
   let i = -1, t0 = 0, prevT = 0, settleUntil = 0, after = 0, begun = false, done = true;
   return {
     start(now) { i = 0; t0 = now + 600; prevT = 0; settleUntil = 0; after = 0; begun = false; done = false; },
@@ -93,8 +93,12 @@ export function makeWriterFor(strokes) {
           const press = tt < 0.12 ? (0.12 - tt) * 6 : s.type === 'stop' && tt > 0.86 ? (tt - 0.86) * 6 : 0;
           out.splats.push({
             x: p[0], y: p[1],
-            rCore: 62 * (1 + 0.35 * Math.max(slow, press)),
-            rWater: 80 * (1 + 0.9 * Math.max(slow, press)),
+            // the wet brush follows the glyph's scale: a glyph pre-scaled
+            // into a corner of the lattice (the immersive room's inset)
+            // must be written by a proportionally finer hand, or absolute
+            // radii fatten every stroke (没入 escalation, 2026-08-24)
+            rCore: 62 * glyphScale * (1 + 0.35 * Math.max(slow, press)),
+            rWater: 80 * glyphScale * (1 + 0.9 * Math.max(slow, press)),
             wet: 0.0006 + 0.06 * Math.max(slow * 0.5, Math.min(1, press)),
             dry: 0.105,
             press: Math.min(1, press) * 0.6,
@@ -763,7 +767,7 @@ function startGPU(canvas, spec, device) {
     layout: blitPipe.getBindGroupLayout(0),
     entries: [{ binding: 0, resource: engine.frame.createView() }, { binding: 1, resource: blitSamp }] });
   const initCheck = device.popErrorScope().then((e) => { if (e) throw new Error('webgpu validation: ' + e.message); });
-  const writer = makeWriterFor(spec.strokes);
+  const writer = makeWriterFor(spec.strokes, spec.glyphScale || 1);
   // 原拍 GALLERY LAW (parity, hard-won): run the engine EXACTLY as the
   // design gallery ran it. The hand advances on the WALL CLOCK and the
   // lattice steps once per displayed frame — on a 120Hz screen the fluid
@@ -974,7 +978,7 @@ function startGL2(canvas, spec) {
   const groundT = tex(SIM, SIM, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
   const spriteT = tex(SIM, SIM, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
   let cur = 0;
-  const writer = makeWriterFor(spec.strokes);
+  const writer = makeWriterFor(spec.strokes, spec.glyphScale || 1);
   const U = (p, n) => gl.getUniformLocation(p, n);
   // same lifecycle and PACE LAW as the GPU path: fixed simulation density,
   // wall speed via iterations, ゆっくり via speed < 1 (more sim, richer ink)
