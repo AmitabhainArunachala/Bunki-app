@@ -28,12 +28,17 @@ const SHELL = [
   'icon-192.png',
   'icon-512.png',
 ];
+// The corridor cannot BOOT without these three — an install that precaches
+// the shell but not them produces an app icon that opens to nothing in the
+// tunnel it was promised to survive. They stay content-routed (cache-first),
+// this only seeds the cache at install instead of hoping for a first visit.
+const BOOT_DATA = ['data/manifest.json', 'data/fsrs-pin.json', 'data/articles/index.json'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(VERSION)
-      .then((cache) => cache.addAll(SHELL))
+      .then((cache) => cache.addAll(SHELL.concat(BOOT_DATA)))
       .then(() => self.skipWaiting()),
   );
 });
@@ -42,7 +47,10 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      // ours alone: CacheStorage is origin-wide while the worker's scope is
+      // not — on a shared Pages origin, deleting every foreign key would
+      // wipe caches that belong to the neighbours
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('kairo-') && k !== VERSION).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
@@ -64,7 +72,9 @@ self.addEventListener('fetch', (event) => {
           fetch(request).then((res) => {
             if (res.ok) {
               const copy = res.clone();
-              caches.open(VERSION).then((cache) => cache.put(request, copy));
+              // waitUntil: the response returns immediately, but the worker
+              // must stay alive until the shard actually lands in the cache
+              event.waitUntil(caches.open(VERSION).then((cache) => cache.put(request, copy)));
             }
             return res;
           }),
@@ -80,7 +90,7 @@ self.addEventListener('fetch', (event) => {
       .then((res) => {
         if (res.ok) {
           const copy = res.clone();
-          caches.open(VERSION).then((cache) => cache.put(request, copy));
+          event.waitUntil(caches.open(VERSION).then((cache) => cache.put(request, copy)));
         }
         return res;
       })

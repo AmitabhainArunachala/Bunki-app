@@ -2739,6 +2739,10 @@ addEventListener('popstate', () => {
 
 function openPassage(id) {
   keepScroll();
+  // a running 聞く belongs to the passage it was started in: the glossary
+  // cross-ref door and the word sheet's この記事を読む door switch passages
+  // WITHOUT leaving the reader view, so the view-change guard never fires
+  if (S.passageId !== id) stopReadAloud();
   S.passageId = id;
   S.view = 'reader';
   // an article you have visited opens where you left it, like a bookmark

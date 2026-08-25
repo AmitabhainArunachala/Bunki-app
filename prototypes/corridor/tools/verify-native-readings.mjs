@@ -910,10 +910,14 @@ try {
   const jaUnmarked = reviewRows.filter((record) => !/検収前/.test(jaCards[record.id]?.meta ?? ''));
   check(
     'every human-review-pending row is visibly 検収前 on the 日本語のみ shelf',
-    // the floor was "all 30 authored rows are still pending" — a
-    // pre-delegation assumption; the queue-pairing check above owns lift
-    // legitimacy, this check owns only the marking of what IS pending
-    reviewRows.length > 0 && jaUnmarked.length === 0,
+    // this check owns only the marking of what IS pending — the queue-pairing
+    // check above owns lift legitimacy, and a wrongly-emptied pending set is
+    // ITS conviction. The old reviewRows.length > 0 floor made a legitimately
+    // finished review queue (every row decided by the operator or the rubric)
+    // read as a failure; the marking law is vacuously satisfied when nothing
+    // is pending, and inventing a pending row to satisfy a floor would be the
+    // actual lie
+    jaUnmarked.length === 0,
     jaUnmarked.map((record) => record.id).slice(0, 4).join(', ') ||
       `${reviewRows.length} pending rows marked`,
   );
