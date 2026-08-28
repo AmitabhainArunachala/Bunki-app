@@ -12666,6 +12666,12 @@ function renderSheet(root) {
   sheetSearch.innerHTML =
     '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
   sheetSearch.addEventListener('click', () => {
+    // this door leaves THROUGH the search room: there is no invoker to
+    // restore to. Without the null, dismissSheet's restoreDialogInvoker
+    // rAF fires a frame after openSearchPage's synchronous input focus and
+    // hands focus to the stale result row — iOS drops the just-raised
+    // keyboard, and the one-tap-to-type door needs a second tap
+    S.dialogInvoker = null;
     dismissSheet();
     openSearchPage();
   });
