@@ -12675,7 +12675,7 @@ function renderSheet(root) {
   sheetSearch.id = 'sheet-search';
   sheetSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
   sheetSearch.innerHTML =
-    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    SEARCH_SVG;
   sheetSearch.addEventListener('click', () => {
     // this door leaves THROUGH the search room: there is no invoker to
     // restore to. Without the null, dismissSheet's restoreDialogInvoker
@@ -13518,6 +13518,11 @@ function attachWorldPicker(sealBtn) {
 const GINGA_SYMBOL_SVG =
   '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 15.5C20 13 28 13 40 15.5M11.5 21H36.5M16.5 21V37M31.5 21V37" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="8.5" r="1.7" fill="currentColor"/></svg>';
 
+// the magnifier every search door carries — one string, four doors (sheet
+// bar, ginga ghost, nav bar, top chrome)
+const SEARCH_SVG =
+  '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
 /** One forward step: navForward undoes the most recent navBack. */
 function navForward() {
   if (!S.fwd) return;
@@ -13713,7 +13718,7 @@ function buildGingaChrome(root) {
     quick.id = 'ginga-search';
     quick.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
     quick.innerHTML =
-      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+      SEARCH_SVG;
     quick.addEventListener('click', openSearchPage);
     root.append(quick);
   }
@@ -13750,7 +13755,7 @@ function buildGingaChrome(root) {
   searchDoor.id = 'nav-search-door';
   searchDoor.setAttribute('aria-label', tx('検索', 'search'));
   searchDoor.innerHTML =
-    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    SEARCH_SVG;
   searchDoor.append(el('span', 'nsd-word', '検索'));
   searchDoor.addEventListener('click', openSearchPage);
   bar.append(searchDoor);
@@ -13908,7 +13913,7 @@ function render() {
     quickSearch.id = 'chrome-search';
     quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
     quickSearch.innerHTML =
-      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+      SEARCH_SVG;
     quickSearch.addEventListener('click', () => {
       S.stack = [];
       openSearchPage();
