@@ -3,12 +3,12 @@
  *
  * ## What this interface is for
  *
- * WP-03 owns `@bunki/persistence` and is being built in parallel, so `apps/app`
- * cannot import it (and a lint rule enforces that it never does directly — see
- * `eslint.config.mjs` boundary 2). This interface is the seam in between: it
- * mirrors the shape the domain command flow will have when persistence lands,
- * so the screens are written against the real contract now and the swap-in is a
- * constructor change rather than a rewrite.
+ * WP-03 owned `@bunki/persistence` while this seam was written, so `apps/app`
+ * could not import it then (a lint rule enforced that — see `eslint.config.mjs`
+ * boundary 2). WP-10 closed the seam: `./persistence/` is the app's one exempt
+ * door, and `durable-store.ts` is the durable implementation of this contract.
+ * The swap-in stayed a constructor change rather than a rewrite, exactly as
+ * designed here.
  *
  * ## What it deliberately is not
  *
@@ -29,17 +29,18 @@
  * await an enrichment before acknowledging a save. `test/capture-flow.test.ts`
  * asserts the ordering directly.
  *
- * When `@bunki/persistence` replaces the in-memory implementation (W4), the
- * durable append becomes asynchronous. The contract that must survive is this
- * one: acknowledge locally first, persist after, never the reverse. See
- * `DEFERRED_INTEGRATION` in `./deferred.ts`.
+ * With WP-10, `@bunki/persistence` backs the durable implementation
+ * (`./durable-store.ts`), and the durable append became asynchronous exactly as
+ * predicted. The contract that survives is this one: acknowledge locally first,
+ * persist after, never the reverse. See `DEFERRED_INTEGRATION` in
+ * `./deferred.ts`.
  *
  * ## Durability honesty (P0-CAP-15, REQ-GATE-03)
  *
- * The store reports its own durability and the UI renders it. The Phase-0
- * implementation here is `in-memory-session-only`: a reload loses everything.
- * T-01 ("saving is durable, survives reload") belongs to WP-03 and is not
- * claimed by any screen in this work package.
+ * The store reports its own durability and the UI renders it. The in-memory
+ * implementation (`./memory-store.ts`) still reports `in-memory-session-only`:
+ * a reload loses everything. The WP-10 `durable-store.ts` is durable and says
+ * so through the same reporting path.
  */
 
 import type { SUPERSESSION_REASONS } from '@bunki/domain';

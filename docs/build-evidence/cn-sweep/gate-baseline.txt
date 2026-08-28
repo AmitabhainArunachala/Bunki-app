@@ -1,0 +1,236 @@
+=== CN SWEEP GATE BASELINE ===
+date: 2026-08-28T02:57:10Z
+branch: review/cn-sweep-20260828
+head: 9926057b
+node: v22.14.0  npm: 10.9.2
+
+### 1. npm install
+ran earlier: succeeded on 2nd attempt (first attempt ECONNRESET network error); node_modules present
+
+### 2. npm run lint
+
+> bunki@0.0.0 lint
+> eslint .
+
+lint exit: 0
+
+### 3. npm run format:check
+
+> bunki@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+format:check exit: 0
+
+### 4. npm run typecheck
+
+> bunki@0.0.0 typecheck
+> tsc --noEmit && npm run typecheck --workspaces --if-present
+
+
+> @bunki/app@0.0.0 typecheck
+> tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json
+
+
+> @bunki/ai@0.0.0 typecheck
+> tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json
+
+
+> @bunki/domain@0.0.0 typecheck
+> tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json
+
+
+> @bunki/export@0.0.0 typecheck
+> tsc --noEmit
+
+
+> @bunki/persistence@0.0.0 typecheck
+> tsc --noEmit
+
+
+> @bunki/seed@0.0.0 typecheck
+> tsc --noEmit
+
+typecheck exit: 0
+
+### 5. npm run test
+
+> bunki@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.10 /Users/dhyana/worktrees/bunki-cn-sweep
+
+ ✓ apps/app/test/screen-contract.test.ts (49 tests) 143ms
+ ✓ apps/app/test/session-screens.test.ts (26 tests) 6ms
+ ✓ packages/domain/test/replay/determinism.test.ts (26 tests) 23ms
+ ✓ packages/domain/test/session/canvas-req-sch-06.test.ts (21 tests) 13ms
+ ✓ packages/domain/test/session/repair.test.ts (28 tests) 24ms
+ ✓ packages/export/test/ui-hooks.test.ts (24 tests) 15ms
+ ✓ apps/app/test/capture-flow.test.ts (24 tests) 20ms
+ ✓ apps/app/test/a1-domain-state.test.ts (14 tests) 24ms
+ ✓ apps/app/test/adversarial/t2-injection-inert-and-labeled.test.ts (30 tests) 20ms
+ ✓ packages/ai/test/adversarial/t2-hostile-responses.test.ts (57 tests) 27ms
+ ✓ apps/app/test/evidence-inspector.test.ts (35 tests) 56ms
+(node:73895) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ packages/domain/test/session/commands.test.ts (18 tests) 29ms
+ ✓ packages/domain/test/events/provenance.test.ts (16 tests) 16ms
+ ✓ packages/domain/test/evidence/gate.test.ts (28 tests) 12ms
+ ✓ packages/domain/test/events/catalog.test.ts (40 tests) 36ms
+ ✓ apps/app/test/durable-store.test.ts (19 tests) 38ms
+ ✓ apps/app/test/session-canvas.test.ts (37 tests) 45ms
+ ✓ apps/app/test/persist-minted-boundary.test.ts (14 tests) 8ms
+ ✓ apps/app/test/closed-loop-export.test.ts (7 tests) 57ms
+ ✓ packages/export/test/verify-export.test.ts (14 tests) 83ms
+ ✓ packages/domain/test/adversarial/t1-interleaving-properties.test.ts (7 tests) 295ms
+(node:73903) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ packages/seed/test/dataset.test.ts (23 tests) 14ms
+ ✓ packages/persistence/test/adversarial/t1-concurrent-append.test.ts (11 tests) 61ms
+ ✓ packages/seed/test/provenance.test.ts (16 tests) 32ms
+ ✓ packages/domain/test/session/t13-plan-cannot-grow.test.ts (11 tests) 393ms
+     ✓ survives 300 random interleavings of every event family  351ms
+ ✓ packages/domain/test/session/plan.test.ts (31 tests) 29ms
+ ✓ packages/domain/test/adversarial/t1-clock-skew.test.ts (6 tests) 106ms
+ ✓ packages/ai/test/telemetry-and-no-live-calls.test.ts (12 tests) 13ms
+ ✓ apps/app/test/observability-ring.test.ts (16 tests) 9ms
+ ✓ packages/ai/test/t09-adapter-boundary.test.ts (15 tests) 23ms
+(node:73914) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ packages/ai/test/anthropic-provider.test.ts (17 tests) 6ms
+ ✓ apps/app/test/adversarial/t1-concurrent-capture.test.ts (10 tests) 37ms
+ ✓ apps/app/test/candidate-offline-and-timeout.test.ts (5 tests) 13ms
+ ✓ packages/persistence/test/migrations.test.ts (16 tests) 14ms
+ ✓ packages/ai/test/runtime.test.ts (19 tests) 20ms
+ ✓ packages/seed/test/schema.test.ts (23 tests) 13ms
+ ✓ apps/app/test/learn-lineage.test.ts (5 tests) 14ms
+ ✓ packages/domain/test/contracts/thread-link.test.ts (16 tests) 9ms
+ ✓ packages/domain/test/purity/no-ambient-nondeterminism.test.ts (18 tests) 45ms
+ ✓ apps/app/test/candidate-command-flow.test.ts (17 tests) 18ms
+ ✓ packages/domain/test/reducers/memory-state.test.ts (17 tests) 11ms
+ ✓ packages/domain/test/purity/seams-left-empty.test.ts (11 tests) 5ms
+ ✓ apps/app/test/navigation-reachability.test.ts (10 tests) 6ms
+ ✓ packages/seed/test/strokes.test.ts (26 tests) 11ms
+ ✓ apps/app/test/golden-source-flow.test.ts (7 tests) 21ms
+ ✓ packages/domain/test/reducers/thread.test.ts (21 tests) 9ms
+ ✓ apps/app/test/session-budget.test.ts (30 tests) 6ms
+ ✓ packages/domain/test/contracts/bound-retrieval-contract.test.ts (7 tests) 8ms
+ ✓ apps/app/test/candidate-labeling.test.ts (15 tests) 17ms
+ ✓ apps/app/test/export-server.test.ts (20 tests) 45ms
+(node:73946) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ apps/app/test/view-state.test.ts (15 tests) 5ms
+ ✓ packages/persistence/test/deletion.test.ts (8 tests) 23ms
+ ✓ packages/domain/test/interaction/action-contract.test.ts (61 tests) 8ms
+ ✓ packages/domain/test/evidence/mint.test.ts (15 tests) 7ms
+ ✓ packages/domain/test/contracts/retrieval-contract.test.ts (14 tests) 9ms
+ ✓ apps/app/test/ruby-accessibility.test.ts (6 tests) 4ms
+(node:73952) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ apps/app/test/catalog.test.ts (17 tests) 18ms
+ ✓ packages/domain/test/events/fail-closed.test.ts (23 tests) 14ms
+ ✓ packages/persistence/test/t16-web-restart.test.ts (7 tests) 10ms
+ ✓ packages/ai/test/envelope.test.ts (17 tests) 13ms
+ ✓ packages/persistence/test/idempotency.test.ts (8 tests) 9ms
+ ✓ apps/app/test/capture-lookup.test.ts (7 tests) 6ms
+ ✓ apps/app/test/kanji-capture.test.ts (6 tests) 15ms
+ ✓ packages/export/test/envelope.test.ts (15 tests) 13ms
+ ✓ packages/ai/test/fallback.test.ts (12 tests) 7ms
+ ✓ apps/app/test/radical-display.test.ts (17 tests) 5ms
+ ✓ packages/domain/test/events/factories.test.ts (15 tests) 11ms
+ ✓ apps/app/test/provenance-display.test.ts (11 tests) 26ms
+ ✓ packages/domain/test/reducers/fsrs-pin.test.ts (12 tests) 5ms
+ ✓ packages/domain/test/evidence/t02-capture-does-not-activate-fsrs.test.ts (8 tests) 13ms
+ ✓ packages/domain/test/evidence/t06-reveal-before-recall-grades-again.test.ts (6 tests) 14ms
+ ✓ packages/domain/test/contracts/promotion-activation.test.ts (8 tests) 12ms
+ ✓ apps/app/test/furigana.test.ts (13 tests) 4ms
+ ✓ packages/domain/test/contracts/learn-contracts.test.ts (5 tests) 10ms
+(node:73968) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ packages/persistence/test/adversarial/web-snapshot-write-atomicity.test.ts (2 tests) 9ms
+ ✓ apps/app/test/theme-contrast.test.ts (121 tests) 6ms
+ ✓ apps/app/test/stroke-order.test.ts (19 tests) 7ms
+ ✓ packages/ai/test/hash-and-consent.test.ts (15 tests) 4ms
+ ✓ packages/domain/test/replay/golden.test.ts (21 tests) 18ms
+ ✓ packages/domain/test/evidence/t08-exposure-never-reaches-fsrs.test.ts (7 tests) 12ms
+ ✓ packages/domain/test/reducers/promotion.test.ts (17 tests) 7ms
+ ✓ packages/persistence/test/hash.test.ts (16 tests) 8ms
+ ✓ packages/domain/test/primitives.test.ts (21 tests) 6ms
+ ✓ packages/domain/test/replay/clock-skew.test.ts (2 tests) 12ms
+ ✓ apps/app/test/deferred.test.ts (11 tests) 4ms
+ ✓ apps/app/test/touch-targets.test.ts (14 tests) 3ms
+ ✓ packages/domain/test/evidence/t05-missed-reading-does-not-erase-meaning.test.ts (4 tests) 13ms
+ ✓ apps/app/test/candidate-context.test.ts (12 tests) 5ms
+ ✓ packages/persistence/test/expo-binding.test.ts (3 tests) 3ms
+ ✓ packages/domain/test/evidence/t07-lookup-is-friction-not-a-grade.test.ts (5 tests) 11ms
+ ✓ packages/seed/test/scaffold.test.ts (3 tests) 2ms
+ ✓ apps/app/test/drift-lexicon.test.ts (10 tests) 12ms
+(node:73989) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73988) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ packages/domain/test/scaffold.test.ts (2 tests) 1ms
+ ✓ test/boundaries.test.ts (36 tests) 635ms
+     ✓ rejects static platform import  562ms
+ ✓ packages/ai/test/scaffold.test.ts (3 tests) 2ms
+ ✓ packages/persistence/test/scaffold.test.ts (2 tests) 2ms
+ ✓ packages/persistence/test/contract.web-provisional.test.ts (20 tests) 28ms
+ ✓ packages/export/test/scaffold.test.ts (2 tests) 1ms
+ ✓ packages/persistence/test/contract.ci-substitute.test.ts (20 tests) 94ms
+ ✓ tools/fsrs-optimize.test.mjs (11 tests) 1117ms
+     ✓ fits a deterministic 0.85-retention synthetic learner better than defaults  904ms
+
+ Test Files  100 passed (100)
+      Tests  1710 passed (1710)
+   Start at  11:59:05
+   Duration  1.94s (transform 5.09s, setup 0ms, import 16.93s, tests 4.28s, environment 5ms)
+
+test exit: 0
+
+### 6. node --check corridor JS + desktop main.cjs
+OK corridor.js
+OK corridor-ink.js
+OK dictionary-worker.js
+OK sw.js
+OK drift-layer.js
+OK main.cjs
+
+### 8. boundary guard
+$ git diff --name-only $(git merge-base HEAD claude/live-tweaks-20260827)..HEAD -- <forbidden paths> | wc -l
+       0
+(empty output above = guard passes; count 0)
+
+### 7. corridor battery: bash docs/build-evidence/renkan/battery.sh /tmp/cn-sweep-battery-baseline
+ran at 2026-08-28T03:02:56Z; SUMMARY.md verbatim:
+# Battery run — review/cn-sweep-20260828 @ 9926057b2ae8cd0811fb3837516609de6568c662
+
+| gate | exit | note |
+| --- | --- | --- |
+| format-check | 0 | All matched files use Prettier code style! |
+| lint | 0 |  |
+| typecheck | 0 |  |
+| vitest | 0 |  |
+| corridor | 2 | } |
+| corridor-a11y | 2 | } |
+| writing-room | 2 | } |
+| storage-integ | 1 | Node.js v22.14.0 |
+| drift-fast | 1 | Node.js v22.14.0 |
+| corridor-ai | 2 | } |
+| native-readings | 1 | report → /Users/dhyana/worktrees/bunki-cn-sweep/docs/build-evidence/kairo-feel-lock/native-readings/ |
+| replay | 0 |  |
+| export | 0 |  |
+| e2e-build | 0 | Exported: dist |
+| e2e | 1 |   2 passed (2.6s) |
+| corpus-pytest | 2 | 1 skipped, 18 errors in 0.26s |
+
+Completed: 2026-08-28T03:00:20Z
+
+Failure classification (from per-gate logs):
+- corridor, corridor-a11y, writing-room, corridor-ai, e2e: Playwright chromium_headless_shell not installed in this environment (browserType.launch ENOENT). ENVIRONMENT, not code.
+- drift-fast: same Playwright miss PLUS ReferenceError: currentTheme is not defined at tools/verify-drift-consistency.mjs:1293 — REAL BUG in verifier, see FINDINGS.
+- storage-integ: assertion lineAfterPatch [.., 13627] vs live saveStore() lines [.., 13978] — stale residual-storage-callers.json after commit 19a132db — REAL pre-existing failure, see FINDINGS.
+- native-readings: 13/14 browser checks passed; final phase needs Playwright chromium (missing). Partially ENVIRONMENT.
+- corpus-pytest: 18 collection errors (python deps missing in env). ENVIRONMENT.
+- replay, export, e2e-build: pass.

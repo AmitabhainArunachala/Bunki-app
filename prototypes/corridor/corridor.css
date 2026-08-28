@@ -284,34 +284,6 @@ h1.view-title {
   border-style: dashed;
 }
 
-/* ------------------------------------------------- the drift entry door
- * One door out of the universe into the shelf. Sits above the drift layer
- * (z 15) and beneath the sheets; indigo = "you can go here". */
-.drift-door {
-  position: fixed;
-  right: 16px;
-  bottom: calc(76px + env(safe-area-inset-bottom));
-  z-index: 22;
-  min-height: 44px;
-  min-width: 84px;
-  padding: 10px 18px;
-  font-family: var(--serif);
-  font-size: 16px;
-  letter-spacing: 0.1em;
-  color: #fcfbf6;
-  background: #2e4d6e; /* pinned indigo: the enter-door keeps light text legible in every world */
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(27, 42, 58, 0.28);
-  cursor: pointer;
-}
-.drift-door .en-sub {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  opacity: 0.85;
-}
-
 /* ---------------------------------------------------------- 銀河 hero nav
  * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
  * counters and hint so nothing but the galaxy and the single symbol shows. The
@@ -3134,8 +3106,7 @@ body.v-depth-layered .stroke-page {
   border-bottom: 1px solid var(--line-soft);
 }
 
-.stroke-back,
-.stroke-close {
+.stroke-back {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -3152,13 +3123,7 @@ body.v-depth-layered .stroke-page {
   cursor: pointer;
 }
 
-.stroke-close {
-  font-family: var(--sans);
-  font-size: 15px;
-}
-
 .stroke-back:focus-visible,
-.stroke-close:focus-visible,
 .stroke-btn:focus-visible {
   outline: 2px solid var(--ai, var(--ink-2));
   outline-offset: 2px;
@@ -3171,12 +3136,6 @@ body.v-depth-layered .stroke-page {
   align-items: baseline;
   justify-content: center;
   gap: 8px;
-}
-
-.stroke-title-glyph {
-  font-family: var(--serif);
-  font-size: 22px;
-  color: var(--ink);
 }
 
 .stroke-title-word {
@@ -3921,56 +3880,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
     visibility 0s linear 0.26s;
 }
 
-.stroke-palette-field {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.stroke-palette-choice {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  min-height: 46px;
-  padding: 4px 6px;
-  color: var(--palette-ink);
-  background: var(--palette-ground);
-  border: 1px solid color-mix(in srgb, var(--palette-ink) 28%, transparent);
-  border-radius: 13px;
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--ink) 15%, transparent);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.stroke-palette-choice[aria-pressed='true'] {
-  border-color: var(--palette-red);
-  box-shadow:
-    0 0 0 2px var(--palette-red),
-    0 7px 20px color-mix(in srgb, var(--ink) 22%, transparent);
-}
-
-.stroke-palette-choice:focus-visible {
-  outline: 2px solid var(--palette-red);
-  outline-offset: 2px;
-}
-
-.stroke-palette-seal {
-  font: 18px/1 var(--serif);
-  text-align: center;
-}
-
-.stroke-palette-name {
-  min-width: 0;
-  overflow: hidden;
-  font: 8px/1.25 var(--serif);
-  letter-spacing: 0.02em;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .stroke-reading-field {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4010,30 +3919,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   overflow-wrap: anywhere;
   font-size: 13px;
   letter-spacing: 0.08em;
-}
-
-.stroke-number-choice {
-  min-height: 44px;
-  padding: 7px 16px;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--ground-0) 84%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ink) 26%, transparent);
-  border-radius: 999px;
-  box-shadow: 0 5px 18px color-mix(in srgb, var(--ink) 10%, transparent);
-  font: 12px/1.2 var(--serif);
-  letter-spacing: 0.12em;
-  cursor: pointer;
-}
-
-.stroke-number-choice[aria-pressed='true'] {
-  color: var(--ground-0);
-  background: var(--ink);
-  border-color: var(--ink);
-}
-
-.stroke-number-choice:focus-visible {
-  outline: 2px solid var(--ai);
-  outline-offset: 2px;
 }
 
 .stroke-chrome-trigger {
@@ -5736,9 +5621,6 @@ body.zen .grade-row {
   gap: 8px;
   padding: 6px 0 12px;
 }
-body.zen .variants-bar {
-  display: none;
-}
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {
   /* one quiet top line, not a pill floating mid-air: the clock holds the
@@ -6257,4 +6139,185 @@ body.zen .review-example {
   .say {
     transition: none;
   }
+}
+
+/* ---- 2026-08-27 operator live session: quick search · folds · list pages */
+
+/* the search ghost — beside the world seal, the same barely-there skin;
+ * one tap from any room into the search page with the keyboard raised */
+.ginga-search {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 64px;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  opacity: 0.28;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    opacity 0.5s ease,
+    background 0.3s ease;
+}
+.ginga-search svg {
+  width: 17px;
+  height: 17px;
+}
+.ginga-search:hover,
+.ginga-search:focus-visible,
+.ginga-search:active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.ginga-search:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+
+/* the sheet bar's own search door — the fixed chrome goes inert under a
+ * dialog, so the sheet carries the same one-tap threshold */
+.sheet-search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+.sheet-search svg {
+  width: 16px;
+  height: 16px;
+}
+.sheet-search ~ .sheet-take,
+.sheet-search ~ .sheet-close {
+  margin-left: 8px;
+}
+
+/* quiet folds — the list drawer and the study record share one skin */
+.fold-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-family: var(--serif);
+  text-align: left;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  margin: 14px 0 0;
+  cursor: pointer;
+}
+.fold-head .fold-title {
+  letter-spacing: 0.08em;
+  flex: none;
+}
+.fold-head .fold-sub {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+.fold-head .fold-arrow {
+  flex: none;
+  opacity: 0.6;
+}
+.fold-head.open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.fold-head:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.list-picker .fold-head + .eyebrow,
+.study-fold .fold-body {
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 12px 14px;
+  margin: 0;
+}
+.list-picker .fold-head + .eyebrow {
+  padding-bottom: 0;
+  border-bottom: 0;
+  border-radius: 0;
+}
+.list-picker .fold-head ~ .chips {
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 12px 14px;
+  margin-top: 0;
+}
+.study-fact {
+  margin: 4px 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* list pages — the name in the tray is a door, the page carries the export */
+.list-open {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+}
+.list-open-arrow {
+  opacity: 0.55;
+}
+.list-open:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.list-back {
+  margin: 4px 0 12px;
+}
+.list-page-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+/* the top-chrome search door — compact, present on every non-search surface */
+.chrome-search {
+  flex: 0 0 auto;
+  padding: 0;
+}
+.chrome-search svg {
+  width: 17px;
+  height: 17px;
 }
