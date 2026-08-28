@@ -121,8 +121,8 @@ npm run test:e2e:build && npm run test:e2e   # Playwright suite on the exported 
 bash docs/build-evidence/renkan/battery.sh <outdir>   # the full gate battery
 ```
 
-The replay, export, and e2e scripts are real gates (39 e2e specs on the
-exported bundle). The battery additionally runs the corridor verifiers
+The replay, export, and e2e scripts are real gates (44 e2e tests across 12
+specs on the exported bundle). The battery additionally runs the corridor verifiers
 (`verify-corridor`, accessibility, writing-room, storage-integrity, drift,
 AI runtime, native readings) and the corpus pytest gates.
 
