@@ -745,7 +745,7 @@ export function paintStillFor(canvas, spec) {
  * Handle contract (both backends): { kind, ondead, rewrite(), stop() },
  * GPU adds .ready (a promise that rejects on validation failure). */
 function startGPU(canvas, spec, device) {
-  let alive = true, dead = false, done = false, seed = 0;
+  let alive = true, dead = false, seed = 0;
   const N = spec.gpuN;
   device.pushErrorScope('validation');
   const engine = createLBM(device, N, spec.pal);
@@ -936,7 +936,7 @@ function startGL2(canvas, spec) {
   const gl = canvas.getContext('webgl2', { antialias: false, preserveDrawingBuffer: true });
   if (!gl || !gl.getExtension('EXT_color_buffer_float')) throw new Error('no webgl2 float');
   gl.getExtension('OES_texture_float_linear');
-  let alive = true, done = false, seed = 0;
+  let alive = true, seed = 0;
   const SIM = spec.gl2Sim;
   // 1:1 presentation (see the GPU path) — backing = simulation resolution
   canvas.width = canvas.height = SIM;

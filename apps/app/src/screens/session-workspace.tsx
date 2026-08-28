@@ -40,7 +40,7 @@ export interface SessionWorkspaceProviderProps {
   readonly context: DomainContext;
   /** Pins a guided source loop to its exact durable thread. */
   readonly preferredThreadId?: string | undefined;
-  /** Handed every event the session produced, for the WP-10 integration. */
+  /** Handed every event the session produced, for the durable journal (WP-10). */
   readonly onEvents?: ((events: readonly DomainEvent[]) => void) | undefined;
 }
 

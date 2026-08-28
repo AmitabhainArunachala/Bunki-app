@@ -2,6 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -67,9 +68,16 @@ async function walk(directory) {
 }
 
 const corridor = path.join(root, 'prototypes/corridor');
+// must mirror the "Assemble the Pages site" copy list in pages-app.yml —
+// a projection that omits shipped files can never byte-match the artifact
 const fixed = [
   'index.html',
   'apple-touch-icon.png',
+  'manifest.webmanifest',
+  'sw.js',
+  'icon-192.png',
+  'icon-512.png',
+  'fonts.css',
   'corridor.css',
   'corridor.js',
   'corridor-ink.js',
@@ -82,6 +90,9 @@ const deployedSources = [
   ...(await walk(path.join(corridor, 'data'))),
   ...(await walk(path.join(corridor, 'vendor'))),
   ...(await walk(path.join(corridor, 'design'))),
+  ...(await walk(path.join(corridor, 'fonts'))),
+  // the recorded voices ride along when the branch carries them (pages-app.yml)
+  ...(existsSync(path.join(corridor, 'audio')) ? await walk(path.join(corridor, 'audio')) : []),
 ];
 
 const entries = [];

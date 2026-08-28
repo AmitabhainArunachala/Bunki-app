@@ -3074,6 +3074,10 @@ window.__DRIFT__ = {
   },
   hide() {
     DRIFT_ON = false;
+    // a long-press armed before the layer sleeps must not fire into the
+    // dark: pointerup early-returns while !DRIFT_ON, so nothing else
+    // clears the timer and constellationLock would run on a hidden layer
+    clearTimeout(lpTimer);
     document.getElementById('drift-layer').classList.remove('active');
   },
   // the corridor drives the shared nihonga world from its chrome seal; the

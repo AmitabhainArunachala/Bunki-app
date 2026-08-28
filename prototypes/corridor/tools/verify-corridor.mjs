@@ -95,7 +95,16 @@ async function touchAt(page, selector, index, holdMs) {
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
   const cdp = await page.context().newCDPSession(page);
-  const point = { x, y, radiusX: 6, radiusY: 6, force: 1 };
+  // CDP touch coordinates ride the VISUAL viewport, but getClientRects is
+  // layout-space: in isMobile contexts where Chromium parks the visual
+  // viewport below the layout origin (visualViewport.offsetTop, observed
+  // 284px on headless macOS), an uncompensated touch lands offsetTop pixels
+  // BELOW its target. Zero on desktop runners, so the compensation is a
+  // no-op where the suite has always been green.
+  const vvOffset = await page.evaluate(
+    '({ x: window.visualViewport?.offsetLeft || 0, y: window.visualViewport?.offsetTop || 0 })',
+  );
+  const point = { x: x - vvOffset.x, y: y - vvOffset.y, radiusX: 6, radiusY: 6, force: 1 };
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
   if (holdMs) await page.waitForTimeout(holdMs);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
@@ -140,22 +149,30 @@ async function shoot(page, dir, name) {
 
 /** Walk the UI the way a reader does until a word panel with semantic edges is open. */
 async function walkToSemPanel(page, tapFn) {
-  await tapFn(page, '.shelf-item');
-  await settleReader(page);
-  await holdWord(page, '#reader .tok.content');
+  // The sheet's empty-state seed chips are gone (operator, 2026-08-27: the
+  // section says nothing when nothing is written), so the deterministic path
+  // to a word with edges is the paper thesaurus on the shelf — every head
+  // word there is clustered by construction. 時間 when present: its first
+  // kanji 時 is graph-rich. dispatchEvent rather than a CDP touch — this hop
+  // is navigation plumbing (the dial probe sets the precedent), and the
+  // thesaurus list's post-paint settle has landed touches on the wrong row.
+  await tapFn(page, '#thesaurus-link');
+  await page.waitForSelector('.thes-head');
+  await page.evaluate(`(() => {
+    const heads = [...document.querySelectorAll('.thes-head')];
+    const pick =
+      heads.find((h) => h.querySelector('.thes-word').textContent === '時間') ||
+      heads.find((h) => /[\\u4e00-\\u9faf]/.test(h.querySelector('.thes-word').textContent)) ||
+      heads[0];
+    pick.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  })()`);
   await page.waitForSelector('#sheet');
   // the deep tier swaps richer senses into the sheet moments after it opens;
   // wait for that one settle so nothing is aimed at mid-swap
   await page
     .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
     .catch(() => {});
-  await page.waitForTimeout(160);
-  if ((await page.locator('#sheet .sem-row').count()) === 0) {
-    if (await page.locator('#sheet .chip').count()) {
-      await tapFn(page, '#sheet .chip');
-      await page.waitForTimeout(160);
-    }
-  }
+  await page.waitForTimeout(600);
   return page.locator('#sheet .sem-row').count();
 }
 
@@ -860,30 +877,12 @@ async function main() {
   await page.locator('[data-dial="furigana:1"]').dispatchEvent('click').catch(() => {});
   await page.waitForTimeout(120);
 
-  // now the surface that matters: a word that HAS semantic neighbours
+  // now the surface that matters: a word that HAS semantic neighbours.
+  // The sheet's empty-state seed chips are gone (operator, 2026-08-27: the
+  // section says nothing when nothing is written), so the honest path is the
+  // paper thesaurus — every head word there has edges by construction
   await open('?entry=shelf');
-  await tap(page, '.shelf-item');
-  await settleReader(page);
-  await holdWord(page, '#reader .tok.content');
-  await page.waitForSelector('#sheet');
-  // the deep tier swaps richer senses into the sheet moments after it opens;
-  // let that settle so the seed chips are stable before aiming a finger
-  await page
-    .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
-    .catch(() => {});
-  await page.waitForTimeout(160);
-  // from the empty-state seed chips, hop to a word that has edges
-  const seedChip = page.locator('#sheet .chip').first();
-  if (await seedChip.count()) {
-    await tap(page, '#sheet .chip');
-    await page.waitForTimeout(160);
-    // the hopped-to word's sheet gets its own one-time swaps (deep senses,
-    // bank examples) — settle before step 4 walks its rows
-    await page
-      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 6000 })
-      .catch(() => {});
-    await page.waitForTimeout(600);
-  }
+  await walkToSemPanel(page, tap);
   const semPanel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {
@@ -1021,6 +1020,11 @@ async function main() {
   })()`);
   check('覚える lands the item in this month\'s list automatically',
     !!bucket && /\d{4}年\d{1,2}月/.test(bucket), String(bucket).slice(0, 44));
+  // the schedule preview lives one named fold deep since 2026-08-27 —
+  // open 学習の記録 the way a finger does before reading it (aim at the
+  // study fold's own head: the list drawer shares the .fold-head class)
+  await tap(page, '#sheet .study-fold .fold-head');
+  await page.waitForTimeout(160);
   const sched = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('#sheet .sched tr')].slice(1).map((r) =>
       [...r.querySelectorAll('td')].map((td) => td.textContent));
@@ -1076,6 +1080,11 @@ async function main() {
     await tap(page, '.shelf-item');
     await settleReader(page);
     await holdWord(page, '#reader .tok.content', 5);
+    await page.waitForSelector('#sheet');
+    // the card preview rides inside the study fold since 2026-08-27 — open
+    // 学習の記録 first (for MCD the preview appears once the source
+    // article's tokens arrive; the reader has them already)
+    await tap(page, '#sheet .study-fold .fold-head');
     await page.waitForSelector('#sheet .card-preview');
     // two one-time sheet swaps may follow the open (deep senses, bank
     // examples) — let them land before touching located elements
@@ -1172,8 +1181,15 @@ async function main() {
   const shelfProbe = await page.evaluate(MEASURE_FN);
   const semRows = await walkToSemPanel(page, tap);
   const panelProbe = await page.evaluate(MEASURE_FN);
+  // walkToSemPanel arrives via the thesaurus since 2026-08-27, so the sheet
+  // no longer floats over the reader — the reader typography samples need
+  // their own probe on a real reading page
+  await open('?entry=shelf');
+  await tap(page, '.shelf-item');
+  await settleReader(page);
+  const readerProbe = await page.evaluate(MEASURE_FN);
   const mergedText = new Map();
-  for (const row of [...panelProbe.text, ...shelfProbe.text]) {
+  for (const row of [...panelProbe.text, ...shelfProbe.text, ...readerProbe.text]) {
     if (!mergedText.has(row.label)) mergedText.set(row.label, row);
   }
   const m = { ...panelProbe, text: [...mergedText.values()] };
@@ -2124,6 +2140,12 @@ async function main() {
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
+  // the list drawer's contents wait behind its head since 2026-08-27 —
+  // open リストへ the way a finger does before probing what's inside
+  await page.evaluate(
+    `document.querySelector('#capture-panel .list-picker .fold-head')?.click()`,
+  );
+  await page.waitForTimeout(120);
   const panelBits = await page.evaluate(`(() => ({
     take: !!document.querySelector('#capture-panel #take'),
     scopes: document.querySelectorAll('#capture-panel [data-ctx-scope]').length,
@@ -2944,6 +2966,10 @@ async function main() {
   await page.waitForSelector('.tray-line');
   await page.locator('.tray-line').first().click();
   await page.waitForSelector('#sheet');
+  // the FSRS footer lives inside the 学習の記録 fold since 2026-08-27 —
+  // open it before reading (this section already drives by .click())
+  await page.locator('#sheet .study-fold .fold-head').click();
+  await page.waitForTimeout(160);
   const footerR3D = await page.evaluate(
     `[...document.querySelectorAll('#sheet p.card-kind')].map((n) => n.textContent).find((t) => t.includes('FSRS-6')) ?? ''`,
   );

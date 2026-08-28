@@ -10,8 +10,9 @@ requires-python = ">=3.11"
 dependencies = ["pyyaml>=6"]
 
 [project.optional-dependencies]
-# mwparserfromhell sits in dev too: CI installs only [dev] and must run the
-# wikinews unit tier (corpus-tests.yml lives outside corpus/ and is untouched).
+# mwparserfromhell sits in dev too: the wikinews unit tier must also run under
+# a plain [dev] install. (CI installs .[dev,wikinews,aozora,snow,grading] —
+# corpus-tests.yml:24, which lives outside corpus/.)
 dev = ["pytest>=8", "mwparserfromhell>=0.6.6"]
 wikinews = ["mwparserfromhell>=0.6.6"]
 aozora = ["huggingface_hub>=0.23", "pyarrow>=15"]

@@ -17,10 +17,9 @@
  *     captures and their own promotions, so the session plans over a thread they
  *     made rather than one this file manufactured;
  *   - the retrieval contracts for the chosen target, minted here because nothing
- *     in the loop had created one yet. `@bunki/persistence` is not wired into
- *     `apps/app` in this wave (controller §5 lint boundary 2, and the W4
- *     cross-lane rule), so the joined log lives in this hook for now and is
- *     handed back through `onEvents` for the WP-10 integration to append. That
+ *     in the loop had created one yet. The joined log lives in this hook and is
+ *     handed back through `onEvents`; WP-10 closed the loop — the durable store
+ *     appends through `persistMinted` (see `persistWorkspaceEvents` below). That
  *     is a recorded seam, not a hidden one — see `SESSION_INTEGRATION_NOTE`.
  *
  * ## Why the bootstrap writes nothing (WP-10 repair round, P0)
@@ -196,7 +195,7 @@ export interface SessionLoopOptions {
   readonly store?: AppStore | undefined;
   /** Exact durable thread requested by a source route; newest active when absent. */
   readonly preferredThreadId?: string | undefined;
-  /** Handed every event the session produced, for the WP-10 integration. */
+  /** Handed every event the session produced, for the durable journal (WP-10). */
   readonly onEvents?: ((events: readonly DomainEvent[]) => void) | undefined;
 }
 

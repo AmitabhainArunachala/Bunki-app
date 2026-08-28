@@ -80,7 +80,7 @@ jobs:
         run: |
           set -o pipefail
           npm run deploy:worker:built 2>&1 | tee deploy.log
-          deployment_url="$(grep -Eo 'https://[^ ]+\\.workers\\.dev' deploy.log | tail -1 || true)"
+          deployment_url="$(grep -Eo 'https://[^ ]+\.workers\.dev' deploy.log | tail -1 || true)"
           echo "deployment-url=${deployment_url}" >> "${GITHUB_OUTPUT}"
           {
             echo "## Bunki production"
