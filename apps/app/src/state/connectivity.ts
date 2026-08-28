@@ -13,7 +13,7 @@
  *
  * The observer is a plain subscribe/get pair with no React in it, so the state
  * machine is testable without a renderer; `useConnectivity` in
- * `connectivity-context.tsx` is the thin binding.
+ * `app-context.tsx` is the thin binding.
  */
 
 export type ConnectivityStatus = 'online' | 'offline' | 'unknown';
