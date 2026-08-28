@@ -111,7 +111,11 @@ function sendRange(res, file, size, range) {
   let start = m[1] === '' ? NaN : Number(m[1]);
   let end = m[2] === '' ? size - 1 : Number(m[2]);
   if (Number.isNaN(start)) {
-    start = size - Number(m[2]);
+    // Suffix range (bytes=-N): the last N bytes. RFC 7233 §2.1 — when N
+    // exceeds the representation length, the entire representation is used;
+    // clamp instead of letting start go negative (createReadStream throws
+    // ERR_OUT_OF_RANGE on start < 0 and the request dies as a 500).
+    start = Math.max(0, size - Number(m[2]));
     end = size - 1;
   }
   if (Number.isNaN(start) || Number.isNaN(end) || start > end || end >= size) return false;
