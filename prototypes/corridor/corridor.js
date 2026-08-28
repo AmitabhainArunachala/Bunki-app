@@ -4709,7 +4709,21 @@ function renderTray(main) {
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   for (const sec of sections) {
     const head = el('p', 'eyebrow list-head');
-    head.append(document.createTextNode(`${sec.name} — ${sec.items.length}`));
+    // the name is a door: every list, named or monthly, opens to its own
+    // page with its rows, its review, and its export (operator, 2026-08-27)
+    const openList = el('button', 'list-open');
+    openList.type = 'button';
+    openList.setAttribute('aria-label', tx(`「${sec.name}」のページをひらく`, `open the ${sec.name} list page`));
+    openList.append(document.createTextNode(`${sec.name} — ${sec.items.length}`));
+    openList.append(el('span', 'list-open-arrow', '›'));
+    openList.addEventListener('click', () => {
+      S.listOpen = { name: sec.name, manual: sec.manual };
+      keepScroll();
+      S.view = 'list';
+      render();
+      window.scrollTo(0, 0);
+    });
+    head.append(openList);
     if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'named list' : 'auto · monthly'));
     // the filtered deck, one tap wide: review only what is due in this list
     const dueHere = sec.items.filter((i) => dueKeys.has(srsKey(i.t, i.id)));
@@ -4790,81 +4804,174 @@ function renderTray(main) {
       row.append(field, save);
       main.append(row);
     }
-    for (const item of sec.items) {
-      // the row IS the door to the entry, so it must answer a keyboard the
-      // way every other door does — it was a click-handled div, invisible to
-      // Tab and to a screen reader (E3 round-A, a11y lens). It stays a div
-      // (it CONTAINS the rest/start button; a button inside a button is the
-      // invalid nesting R2-C just repaired on the shelf) and takes the role,
-      // the tab stop, and Enter/Space instead.
-      const line = el('div', 'tray-line');
-      line.tabIndex = 0;
-      line.setAttribute('role', 'button');
-      const key = srsKey(item.t, item.id);
-      line.append(el('span', 'w', item.label));
-      // a words list wearing a [word] chip on every row was chip noise
-      // (operator, 2026-08-20): the kind speaks only when it differs from
-      // the default. Rows stored before the kind fields existed still heal.
-      if (item.t !== 'word') {
-        const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
-        const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
-        line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
-      }
-      if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
-      // provenance, not authority: the tutor made this row, and saying so is
-      // what keeps its autonomy honest (operator's word, 2026-08-24)
-      if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', '先生 tutor-made')));
-      const when = el('span', 'when', srsWhen(item));
-      // red is for NOW — a whole column of red "due" was noise wearing urgency
-      if (dueKeys.has(key)) when.classList.add('due-now');
-      line.append(when);
-      if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
-        // a no-debt row (legacy or imported) wakes by hand: one quiet
-        // affordance in the row itself, and only this press mints the card
-        // into the review cycle — 始める is the explicit promotion
-        const start = el('button', 'rest-toggle srs-start', tx('始める', 'start'));
-        start.type = 'button';
-        start.dataset.srsStart = key;
-        start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
-        start.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          const taken = S.taken.map((t) => (t === item ? { ...t, started: Date.now() } : t));
-          if (commitStorePatch({ taken })) render();
-        });
-        line.append(start);
-      } else {
-        // rest / wake — the card stays on the list, reviews skip it
-        const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
-        rest.type = 'button';
-        rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
-        rest.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          // rest/wake is deck state: it rides the guarded boundary, so a
-          // failed persist changes nothing (the alert names the failure)
-          const suspended = { ...S.suspended };
-          if (suspended[key]) delete suspended[key];
-          else suspended[key] = Date.now();
-          if (commitStorePatch({ suspended })) render();
-        });
-        line.append(rest);
-      }
-      const openRow = () => go({ t: item.t, id: item.id });
-      line.setAttribute('aria-label', tx(`${item.label} の全項目`, `${item.label} — full entry`));
-      line.addEventListener('click', openRow);
-      line.addEventListener('keydown', (ev) => {
-        if (ev.key !== 'Enter' && ev.key !== ' ') return;
-        // the row's own controls keep their keys
-        if (ev.target !== line) return;
-        ev.preventDefault();
-        openRow();
-      });
-      main.append(line);
-    }
+    for (const item of sec.items) main.append(trayLine(item, dueKeys));
   }
   main.append(maker);
 
   renderPortRow(main);
   renderNoteDoor(main);
+}
+
+/* One row of the deck, shared by the tray and the list pages. The row IS
+ * the door to the entry, so it must answer a keyboard the way every other
+ * door does — it stays a div (it CONTAINS the rest/start button; a button
+ * inside a button is invalid nesting) and takes the role, the tab stop,
+ * and Enter/Space instead. */
+function trayLine(item, dueKeys) {
+  const line = el('div', 'tray-line');
+  line.tabIndex = 0;
+  line.setAttribute('role', 'button');
+  const key = srsKey(item.t, item.id);
+  line.append(el('span', 'w', item.label));
+  // a words list wearing a [word] chip on every row was chip noise
+  // (operator, 2026-08-20): the kind speaks only when it differs from
+  // the default. Rows stored before the kind fields existed still heal.
+  if (item.t !== 'word') {
+    const kindJa = item.kind || NODE_KIND[item.t]?.[0] || '';
+    const kindEn = item.kindEn || item.kind || NODE_KIND[item.t]?.[1] || '';
+    line.append(el('span', 'pool-tag', tx(kindJa, kindEn)));
+  }
+  if (isLeech(item)) line.append(el('span', 'pool-tag read-tag', tx('苦手', '苦手 struggling')));
+  // provenance, not authority: the tutor made this row, and saying so is
+  // what keeps its autonomy honest (operator's word, 2026-08-24)
+  if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', '先生 tutor-made')));
+  const when = el('span', 'when', srsWhen(item));
+  // red is for NOW — a whole column of red "due" was noise wearing urgency
+  if (dueKeys.has(key)) when.classList.add('due-now');
+  line.append(when);
+  if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
+    // a no-debt row (legacy or imported) wakes by hand: one quiet
+    // affordance in the row itself, and only this press mints the card
+    // into the review cycle — 始める is the explicit promotion
+    const start = el('button', 'rest-toggle srs-start', tx('始める', 'start'));
+    start.type = 'button';
+    start.dataset.srsStart = key;
+    start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
+    start.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // matched by identity ON THE DECK ROW: a named list carries copies,
+      // so the promotion must find the deck row by t/id, not by reference
+      const taken = S.taken.map((t) => (t.t === item.t && t.id === item.id ? { ...t, started: Date.now() } : t));
+      if (commitStorePatch({ taken })) render();
+    });
+    line.append(start);
+  } else {
+    // rest / wake — the card stays on the list, reviews skip it
+    const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '⏸');
+    rest.type = 'button';
+    rest.setAttribute('aria-label', S.suspended[key] ? tx('復習にもどす', 'wake this card') : tx('休ませる', 'rest this card'));
+    rest.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // rest/wake is deck state: it rides the guarded boundary, so a
+      // failed persist changes nothing (the alert names the failure)
+      const suspended = { ...S.suspended };
+      if (suspended[key]) delete suspended[key];
+      else suspended[key] = Date.now();
+      if (commitStorePatch({ suspended })) render();
+    });
+    line.append(rest);
+  }
+  const openRow = () => go({ t: item.t, id: item.id });
+  line.setAttribute('aria-label', tx(`${item.label} の全項目`, `${item.label} — full entry`));
+  line.addEventListener('click', openRow);
+  line.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    // the row's own controls keep their keys
+    if (ev.target !== line) return;
+    ev.preventDefault();
+    openRow();
+  });
+  return line;
+}
+
+/* リストの間 — every list, named or monthly, opens to its own page
+ * (operator, 2026-08-27): the rows, a review door for just this list, and
+ * the list compiled outward as a note (.md download or clipboard). */
+function listReading(item) {
+  if (item.t !== 'word') return '';
+  return D.words[item.id]?.r || S.deepWords?.[item.id]?.r || item.cueReading || '';
+}
+
+function listGloss(item) {
+  if (item.t !== 'word') return '';
+  return D.words[item.id]?.g || S.deepWords?.[item.id]?.m?.[0] || '';
+}
+
+function listToMarkdown(name, items) {
+  const lines = [`# ${name} — 分岐 Bunki`, '', `${items.length} 件 · ${dayKey()}`, ''];
+  for (const item of items) {
+    const r = listReading(item);
+    const g = listGloss(item);
+    const kind = item.t !== 'word' ? `［${item.kind || NODE_KIND[item.t]?.[0] || item.t}］` : '';
+    lines.push(`- ${item.label}${r ? `（${r}）` : ''}${kind}${g ? ` — ${g}` : ''}`);
+  }
+  return lines.join('\n') + '\n';
+}
+
+function renderListPage(main) {
+  const open = S.listOpen;
+  const items = open
+    ? open.manual
+      ? owns(S.lists, open.name)
+        ? S.lists[open.name]
+        : null
+      : S.taken.filter((t) => monthKey(t.ts || 0) === open.name)
+    : null;
+  if (!open || !items) {
+    // the list was deleted (or the door opened blind) — fall home honestly
+    S.view = 'tray';
+    renderTray(main);
+    return;
+  }
+  const back = biLabel('button', 'chip list-back', '← リスト一覧へ', 'all lists');
+  back.type = 'button';
+  back.addEventListener('click', () => {
+    S.view = 'tray';
+    render();
+  });
+  main.append(back);
+  main.append(
+    withEn(el('p', 'eyebrow', open.manual ? 'リスト' : 'リスト — 月別・自動'), open.manual ? 'named list' : 'auto · monthly', 'en-inline'),
+  );
+  main.append(el('h1', 'view-title', `${open.name} — ${items.length} 件`));
+  const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
+  const ops = el('div', 'list-page-ops');
+  const dueHere = items.filter((i) => dueKeys.has(srsKey(i.t, i.id)));
+  if (dueHere.length && scheduler) {
+    const only = el('button', 'chip list-review', tx(`この組だけ復習 — ${dueHere.length}`, `review just these — ${dueHere.length}`));
+    only.type = 'button';
+    only.addEventListener('click', () => startReview(items));
+    ops.append(only);
+  }
+  const note = el('p', 'airead-note');
+  const exp = biLabel('button', 'chip', '書き出す (.md)', 'export as a note');
+  exp.type = 'button';
+  exp.addEventListener('click', () => {
+    const blob = new Blob([listToMarkdown(open.name, items)], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bunki-${open.name}-${dayKey()}.md`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+  ops.append(exp);
+  const copy = biLabel('button', 'chip', 'コピー', 'copy as text');
+  copy.type = 'button';
+  copy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(listToMarkdown(open.name, items));
+      note.textContent = tx('コピーした。', 'Copied.');
+    } catch {
+      note.textContent = tx('コピーできなかった。書き出しをどうぞ。', 'Could not reach the clipboard — the .md export still works.');
+    }
+  });
+  ops.append(copy);
+  main.append(ops, note);
+  if (!items.length) {
+    main.append(el('div', 'sem-empty', tx('このリストはまだ空。', 'This list is still empty.')));
+    return;
+  }
+  for (const item of items) main.append(trayLine(item, dueKeys));
 }
 
 /* The record is yours to carry: one plain JSON file out, the same file
@@ -7374,6 +7481,10 @@ function takeButton(node, label) {
   btn.setAttribute('aria-pressed', String(already));
   btn.addEventListener('click', () => {
     toggleTaken(node, label);
+    // taking opens the list drawer right under the finger — the "where does
+    // it go" choice arrives with the act (operator, 2026-08-27); letting go
+    // closes it
+    S.listMenuFor = already ? null : `${node.t}|${node.id}`;
     render();
   });
   return btn;
@@ -7489,7 +7600,37 @@ function renderContextPicker(sheet, node) {
 function renderListPicker(sheet, node, label) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item) return;
+  const menuKey = `${node.t}|${node.id}`;
+  const open = S.listMenuFor === menuKey;
+  const memberOf = Object.keys(S.lists).filter((n) =>
+    S.lists[n].some((x) => x.t === node.t && x.id === node.id),
+  );
   const wrap = el('div', 'list-picker');
+  // the drawer: taking a word opens it by itself; afterwards this quiet bar
+  // reopens it — where the word lives is one glance, one tap to change
+  const head = el('button', open ? 'fold-head open' : 'fold-head');
+  head.type = 'button';
+  head.setAttribute('aria-expanded', String(open));
+  head.append(el('span', 'fold-title', tx('リストへ', 'lists')));
+  head.append(
+    el(
+      'span',
+      'fold-sub',
+      memberOf.length
+        ? memberOf.join('・')
+        : tx(`${monthKey(item.ts)} に自動追加ずみ`, `auto-filed in ${monthKey(item.ts)}`),
+    ),
+  );
+  head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
+  head.addEventListener('click', () => {
+    S.listMenuFor = open ? null : menuKey;
+    render();
+  });
+  wrap.append(head);
+  if (!open) {
+    sheet.append(wrap);
+    return;
+  }
   wrap.append(
     withEn(el('p', 'eyebrow', `リスト — ${monthKey(item.ts)} に自動追加ずみ`), `lists — already in ${monthKey(item.ts)}`, 'en-inline'),
   );
@@ -9132,6 +9273,78 @@ function renderSchedule(container) {
   container.append(note);
 }
 
+/* 学習の記録 — one quiet fold at the foot of every entry (operator,
+ * 2026-08-27): collapsed it is a single line saying how far this card has
+ * come; open it holds the real history (adds, reviews, lapses, stability,
+ * encounters from the observation ledger), then the FSRS-6 preview table,
+ * then — when a context sentence exists — the card-variant preview. Only
+ * what is actually recorded is shown; nothing is invented. */
+function renderStudyFold(sheet, node, variantTarget) {
+  const key = srsKey(node.t, node.id);
+  const open = S.studyOpen === key;
+  const srs = S.srs[key];
+  const wrap = el('div', 'study-fold');
+  const head = el('button', open ? 'fold-head open' : 'fold-head');
+  head.type = 'button';
+  head.setAttribute('aria-expanded', String(open));
+  head.append(el('span', 'fold-title', tx('学習の記録', 'study progress')));
+  head.append(
+    el(
+      'span',
+      'fold-sub',
+      srs
+        ? tx(`復習 ${srs.reps || 0} 回`, `${srs.reps || 0} review${(srs.reps || 0) === 1 ? '' : 's'}`)
+        : tx('まだ記録なし', 'no history yet'),
+    ),
+  );
+  head.append(el('span', 'fold-arrow', open ? '▾' : '▸'));
+  head.addEventListener('click', () => {
+    S.studyOpen = open ? null : key;
+    render();
+  });
+  wrap.append(head);
+  if (!open) {
+    sheet.append(wrap);
+    return;
+  }
+  const body = el('div', 'fold-body');
+  const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
+  const facts = [];
+  if (item && finiteNumber(item.ts)) {
+    facts.push(tx(`追加 — ${dayKey(new Date(item.ts))}`, `added ${dayKey(new Date(item.ts))}`));
+  }
+  if (srs) {
+    facts.push(
+      tx(`復習 ${srs.reps || 0} 回 ・ もう一度 ${srs.lapses || 0} 回`, `${srs.reps || 0} reviews · ${srs.lapses || 0} lapses`),
+    );
+    if (finiteNumber(srs.stability)) {
+      facts.push(tx(`安定度 ${Number(srs.stability).toFixed(2)}`, `stability ${Number(srs.stability).toFixed(2)}`));
+    }
+    const due = srs.due ? new Date(srs.due) : null;
+    if (due && !Number.isNaN(due.getTime())) {
+      facts.push(tx(`つぎ — ${dayKey(due)}`, `next due ${dayKey(due)}`));
+    }
+  }
+  const enc = (S.obslog || []).filter((r) => r[2] === key);
+  if (enc.length) {
+    const kinds = { drift: 0, dojo: 0, probe: 0 };
+    for (const r of enc) if (r[1] in kinds) kinds[r[1]] += 1;
+    const parts = [];
+    if (kinds.drift) parts.push(tx(`墨流し ${kinds.drift}`, `drift ${kinds.drift}`));
+    if (kinds.dojo) parts.push(tx(`道場 ${kinds.dojo}`, `dojo ${kinds.dojo}`));
+    if (kinds.probe) parts.push(tx(`読みチェック ${kinds.probe}`, `reading checks ${kinds.probe}`));
+    if (parts.length) facts.push(tx('出会い — ', 'met in — ') + parts.join(' ・ '));
+  }
+  if (!facts.length) {
+    facts.push(tx('まだ記録なし — 覚えて、復習が始まると育つ。', 'No history yet — it grows once this card is memorized and reviewed.'));
+  }
+  for (const f of facts) body.append(el('p', 'study-fact', f));
+  renderSchedule(body);
+  if (variantTarget) renderCardVariant(body, variantTarget);
+  wrap.append(body);
+  sheet.append(wrap);
+}
+
 /** Variant A (#38): the SAME target word rendered both ways. */
 function renderCardVariant(container, target) {
   const source = target.from ? D.passages.find((p) => p.id === target.from.passage) : null;
@@ -9150,6 +9363,11 @@ function renderCardVariant(container, target) {
 
   const box = el('div', 'card-preview');
   const kind = S.variants.cards;
+  // An MCD card without a context sentence cannot exist — and SAYING so on
+  // every dictionary-opened word read as a broken feature, not a comparison
+  // (operator, 2026-08-27). No context: the MCD preview simply stays away
+  // (it appears by itself once the source article's tokens arrive).
+  if (kind === 'mcd' && !sentenceTokens) return;
   box.append(
     el(
       'p',
@@ -9162,16 +9380,12 @@ function renderCardVariant(container, target) {
   const face = el('div', 'card-face');
 
   if (kind === 'mcd') {
-    if (sentenceTokens) {
-      for (const token of sentenceTokens) {
-        if (token.b === target.id && token.c) {
-          face.append(el('span', 'cloze', '　　'));
-        } else {
-          face.append(document.createTextNode(token.s));
-        }
+    for (const token of sentenceTokens) {
+      if (token.b === target.id && token.c) {
+        face.append(el('span', 'cloze', '　　'));
+      } else {
+        face.append(document.createTextNode(token.s));
       }
-    } else {
-      face.append(document.createTextNode(`［${target.id}］の文脈がない`));
     }
   } else {
     face.append(el('span', 'target', target.id));
@@ -9191,14 +9405,6 @@ function renderCardVariant(container, target) {
   }
   box.append(back);
 
-  if (!sentence) {
-    const note = el('div', 'note placeholder');
-    note.innerHTML = tx(
-      '<b>仮置き</b> — このノードは本文から開いていないので文脈の文がない。MCD 側は文脈がないと成立しない、というのがこの比較の要点のひとつ。',
-      '<b>placeholder</b> — this node was not opened from a text, so there is no context sentence. That an MCD card cannot exist without context is one of the points of this comparison.',
-    );
-    box.append(note);
-  }
   container.append(box);
 }
 
@@ -10494,7 +10700,10 @@ function renderWordNode(sheet, node) {
   }
   renderAiExamples(sheet, node, rec);
 
-  // the semantic neighbourhood — the single most important surface here
+  // the semantic neighbourhood — the single most important surface here.
+  // When nothing is written yet the section says NOTHING: the old empty
+  // state advertised six unrelated seed words and read as noise on every
+  // unnoted word (operator, 2026-08-27).
   const edges = D.sem[node.id];
   const semWrap = el('div');
   semWrap.append(
@@ -10522,30 +10731,13 @@ function renderWordNode(sheet, node) {
       }
       semWrap.append(block);
     }
-  } else {
-    const empty = el('div', 'sem-empty');
-    empty.textContent = tx(
-      'この語の意味近傍はまだ書かれていない。書かれている語：',
-      'Usage notes for this word are still being written. These words have them:',
-    );
-    semWrap.append(empty);
-    const seeds = Object.keys(D.sem).slice(0, 6);
-    semWrap.append(
-      chipsFor(
-        seeds.map((w) => ({ label: w, sub: tx('書かれている語', 'has notes') })),
-        (item) => go({ t: 'word', id: item.label, from: node.from }),
-        null,
-        'word',
-      ),
-    );
+    sheet.append(semWrap);
   }
-  sheet.append(semWrap);
 
   sheet.append(takeButton(node, label));
   renderContextPicker(sheet, node);
   renderListPicker(sheet, node, label);
-  renderCardVariant(sheet, { id: node.id, from: node.from });
-  renderSchedule(sheet);
+  renderStudyFold(sheet, node, { id: node.id, from: node.from });
 }
 
 /* The MAIN components of a kanji — its official radical and the one or two
@@ -10816,7 +11008,7 @@ function renderKanjiNode(sheet, node) {
 
   sheet.append(takeButton(node, k.c));
   renderListPicker(sheet, node, k.c);
-  renderSchedule(sheet);
+  renderStudyFold(sheet, node, null);
 }
 
 /* ==================================================== 筆順 · stroke order ===
@@ -12313,7 +12505,7 @@ function renderRadicalNode(sheet, node) {
 
   sheet.append(takeButton(node, r.c));
   renderListPicker(sheet, node, r.c);
-  renderSchedule(sheet);
+  renderStudyFold(sheet, node, null);
 }
 
 function renderIdiomNode(sheet, node) {
@@ -12341,7 +12533,7 @@ function renderIdiomNode(sheet, node) {
   );
   sheet.append(takeButton(node, idiom.w));
   renderListPicker(sheet, node, idiom.w);
-  renderSchedule(sheet);
+  renderStudyFold(sheet, node, null);
 }
 
 /** 出会い — the observation ledger, read back at last (P2-19).
@@ -12457,6 +12649,20 @@ function renderSheet(root) {
   if (S.stack.length > 1) {
     bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
   }
+  // the search ghost reaches the sheets too — the layer law makes the fixed
+  // chrome inert under a dialog, so the sheet bar carries its own door
+  // (operator, 2026-08-27: one tap to type, from anywhere)
+  const sheetSearch = el('button', 'sheet-search');
+  sheetSearch.type = 'button';
+  sheetSearch.id = 'sheet-search';
+  sheetSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+  sheetSearch.innerHTML =
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  sheetSearch.addEventListener('click', () => {
+    dismissSheet();
+    openSearchPage();
+  });
+  bar.append(sheetSearch);
   // 覚 top-right on EVERY capturable sheet (operator directive §3: one
   // button, top right corner, on every screen). The sentence page captures
   // the word it is built around — the sentence itself is not a card kind,
@@ -12484,6 +12690,7 @@ function renderSheet(root) {
     );
     capture.addEventListener('click', () => {
       toggleTaken(capNode, nodeTitle(capNode));
+      S.listMenuFor = takenNow ? null : `${capNode.t}|${capNode.id}`;
       render();
     });
     bar.append(capture);
@@ -13335,6 +13542,14 @@ function openSearchPage() {
   keepScroll();
   S.view = 'search';
   render();
+  // Focus SYNCHRONOUSLY, inside the tap's own call stack: iOS only raises
+  // the keyboard for a focus it can trace to the finger. The rAF fallback
+  // below (renderSearchPage) keeps covering restored sessions.
+  const input = document.getElementById('nav-search-input');
+  if (input) {
+    input.focus({ preventScroll: true });
+    input.select();
+  }
 }
 
 function renderSearchPage(main) {
@@ -13463,6 +13678,21 @@ function buildGingaChrome(root) {
   attachWorldPicker(seal);
   root.append(seal);
   if (S.sealWake) S.sealWake = false;
+
+  // the search ghost — one tap from ANY screen into the search room with the
+  // keyboard already raised (operator, 2026-08-27: "I hear a word and need
+  // rapid access"). It stands beside the world seal, same barely-there skin,
+  // and only the search room itself goes without it.
+  if (S.view !== 'search') {
+    const quick = el('button', 'ginga-search');
+    quick.type = 'button';
+    quick.id = 'ginga-search';
+    quick.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+    quick.innerHTML =
+      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    quick.addEventListener('click', openSearchPage);
+    root.append(quick);
+  }
 
   if (!S.navOpen) return;
 
@@ -13646,6 +13876,22 @@ function render() {
   crumb.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : p)).join(' › ');
   chrome.append(crumb);
 
+  // the search door — on EVERY surface, one tap from hearing a word to
+  // typing it (operator, 2026-08-27); only the search room itself omits it
+  if (S.view !== 'search') {
+    const quickSearch = el('button', 'chrome-search');
+    quickSearch.type = 'button';
+    quickSearch.id = 'chrome-search';
+    quickSearch.setAttribute('aria-label', tx('検索 — ことばをさがす', 'search — look up a word'));
+    quickSearch.innerHTML =
+      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    quickSearch.addEventListener('click', () => {
+      S.stack = [];
+      openSearchPage();
+    });
+    chrome.append(quickSearch);
+  }
+
   // EN | 日本語 — two visible states, the active one lit
   const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
   seal.type = 'button';
@@ -13798,6 +14044,7 @@ function render() {
   else if (S.view === 'entry') renderEntry(main);
   else if (S.view === 'reader') renderReader(main);
   else if (S.view === 'tray') renderTray(main);
+  else if (S.view === 'list') renderListPage(main);
   else if (S.view === 'review') renderReview(main);
   else if (S.view === 'probe') renderProbe(main);
   else if (S.view === 'archive') renderArchive(main);

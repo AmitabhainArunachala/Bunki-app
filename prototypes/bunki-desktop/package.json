@@ -1,0 +1,30 @@
+{
+  "name": "bunki-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bunki (分岐) — Mac desktop shell around the bunki-sites-v11 web app.",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "env -u ELECTRON_RUN_AS_NODE electron .",
+    "dist": "electron-builder --mac --dir && node tools/add-launch-shim.cjs release/mac-arm64/Bunki.app && codesign --force --deep --sign - release/mac-arm64/Bunki.app"
+  },
+  "build": {
+    "appId": "app.bunki.desktop",
+    "productName": "Bunki",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.cjs"
+    ],
+    "mac": {
+      "target": "dir",
+      "identity": null,
+      "category": "public.app-category.education"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}

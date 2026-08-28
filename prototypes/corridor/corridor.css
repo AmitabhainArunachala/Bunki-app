@@ -6258,3 +6258,184 @@ body.zen .review-example {
     transition: none;
   }
 }
+
+/* ---- 2026-08-27 operator live session: quick search · folds · list pages */
+
+/* the search ghost — beside the world seal, the same barely-there skin;
+ * one tap from any room into the search page with the keyboard raised */
+.ginga-search {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 64px;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  opacity: 0.28;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    opacity 0.5s ease,
+    background 0.3s ease;
+}
+.ginga-search svg {
+  width: 17px;
+  height: 17px;
+}
+.ginga-search:hover,
+.ginga-search:focus-visible,
+.ginga-search:active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
+  border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+.ginga-search:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+
+/* the sheet bar's own search door — the fixed chrome goes inert under a
+ * dialog, so the sheet carries the same one-tap threshold */
+.sheet-search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  cursor: pointer;
+}
+.sheet-search svg {
+  width: 16px;
+  height: 16px;
+}
+.sheet-search ~ .sheet-take,
+.sheet-search ~ .sheet-close {
+  margin-left: 8px;
+}
+
+/* quiet folds — the list drawer and the study record share one skin */
+.fold-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  font-family: var(--serif);
+  text-align: left;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  margin: 14px 0 0;
+  cursor: pointer;
+}
+.fold-head .fold-title {
+  letter-spacing: 0.08em;
+  flex: none;
+}
+.fold-head .fold-sub {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+.fold-head .fold-arrow {
+  flex: none;
+  opacity: 0.6;
+}
+.fold-head.open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.fold-head:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.list-picker .fold-head + .eyebrow,
+.study-fold .fold-body {
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 12px 14px;
+  margin: 0;
+}
+.list-picker .fold-head + .eyebrow {
+  padding-bottom: 0;
+  border-bottom: 0;
+  border-radius: 0;
+}
+.list-picker .fold-head ~ .chips {
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 12px 14px;
+  margin-top: 0;
+}
+.study-fact {
+  margin: 4px 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* list pages — the name in the tray is a door, the page carries the export */
+.list-open {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+}
+.list-open-arrow {
+  opacity: 0.55;
+}
+.list-open:focus-visible {
+  outline: 2px solid var(--ai, #2e4d6e);
+  outline-offset: 2px;
+}
+.list-back {
+  margin: 4px 0 12px;
+}
+.list-page-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+/* the top-chrome search door — compact, present on every non-search surface */
+.chrome-search {
+  flex: 0 0 auto;
+  padding: 0;
+}
+.chrome-search svg {
+  width: 17px;
+  height: 17px;
+}
