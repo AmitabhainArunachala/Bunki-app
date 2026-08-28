@@ -2,7 +2,7 @@
   "name": "bunki-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Bunki (分岐) — Mac desktop shell around the bunki-sites-v11 web app.",
+  "description": "Bunki (分岐) — Mac desktop shell around the Corridor (掌 TENOHIRA line) PWA.",
   "main": "main.cjs",
   "scripts": {
     "start": "env -u ELECTRON_RUN_AS_NODE electron .",
