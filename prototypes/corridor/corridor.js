@@ -6002,6 +6002,7 @@ function kdxPartGrid(coPresent) {
       const dead = coPresent && !sel && !coPresent.has(r.c);
       const b = el('button', `kdx-chip kdx-part${sel ? ' on-list' : ''}${dead ? ' dead' : ''}`, r.c);
       b.type = 'button';
+      b.dataset.kdxPart = r.c; // the journey verifier's seam (c76edfb4's contract)
       if (r.name) b.setAttribute('aria-label', r.name);
       if (dead) b.disabled = true;
       b.addEventListener('click', () => {
@@ -6024,6 +6025,7 @@ function renderKdxStrokes(main) {
     const on = S.kdx.st === n;
     const b = el('button', on ? 'kdx-chip on-list' : 'kdx-chip', String(n));
     b.type = 'button';
+    b.dataset.kdxSt = String(n); // the journey verifier's seam (c76edfb4's contract)
     b.addEventListener('click', () => {
       S.kdx.st = on ? null : n;
       render();
