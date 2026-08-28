@@ -7733,7 +7733,12 @@ function schedulePreview() {
     const days = next.scheduled_days;
     out[grade.toLowerCase()] = {
       when: days >= 1 ? tx(`${days} 日後`, `in ${days} d`) : tx(`${mins} 分後`, `in ${mins} min`),
-      due: next.due.toISOString().slice(0, 16).replace('T', ' '),
+      due: (() => {
+        // wall-clock, not UTC: toISOString would print a JST learner's
+        // 08:00 review as "23:00" the previous day
+        const p = (n) => String(n).padStart(2, '0');
+        return `${dayKey(next.due)} ${p(next.due.getHours())}:${p(next.due.getMinutes())}`;
+      })(),
       stability: next.stability,
       difficulty: next.difficulty,
     };
