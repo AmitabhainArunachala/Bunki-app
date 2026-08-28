@@ -4940,7 +4940,13 @@ function renderListPage(main) {
   main.append(
     withEn(el('p', 'eyebrow', open.manual ? 'リスト' : 'リスト — 月別・自動'), open.manual ? 'named list' : 'auto · monthly', 'en-inline'),
   );
-  main.append(el('h1', 'view-title', `${open.name} — ${items.length} 件`));
+  main.append(
+    el(
+      'h1',
+      'view-title',
+      tx(`${open.name} — ${items.length} 件`, `${open.name} — ${items.length} item${items.length === 1 ? '' : 's'}`),
+    ),
+  );
   const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
   const ops = el('div', 'list-page-ops');
   const dueHere = items.filter((i) => dueKeys.has(srsKey(i.t, i.id)));
