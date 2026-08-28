@@ -284,34 +284,6 @@ h1.view-title {
   border-style: dashed;
 }
 
-/* ------------------------------------------------- the drift entry door
- * One door out of the universe into the shelf. Sits above the drift layer
- * (z 15) and beneath the sheets; indigo = "you can go here". */
-.drift-door {
-  position: fixed;
-  right: 16px;
-  bottom: calc(76px + env(safe-area-inset-bottom));
-  z-index: 22;
-  min-height: 44px;
-  min-width: 84px;
-  padding: 10px 18px;
-  font-family: var(--serif);
-  font-size: 16px;
-  letter-spacing: 0.1em;
-  color: #fcfbf6;
-  background: #2e4d6e; /* pinned indigo: the enter-door keeps light text legible in every world */
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(27, 42, 58, 0.28);
-  cursor: pointer;
-}
-.drift-door .en-sub {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  opacity: 0.85;
-}
-
 /* ---------------------------------------------------------- 銀河 hero nav
  * The galaxy is the hero. body.ginga hides the drift's own brand, depth crumb,
  * counters and hint so nothing but the galaxy and the single symbol shows. The
@@ -3134,8 +3106,7 @@ body.v-depth-layered .stroke-page {
   border-bottom: 1px solid var(--line-soft);
 }
 
-.stroke-back,
-.stroke-close {
+.stroke-back {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -3152,13 +3123,7 @@ body.v-depth-layered .stroke-page {
   cursor: pointer;
 }
 
-.stroke-close {
-  font-family: var(--sans);
-  font-size: 15px;
-}
-
 .stroke-back:focus-visible,
-.stroke-close:focus-visible,
 .stroke-btn:focus-visible {
   outline: 2px solid var(--ai, var(--ink-2));
   outline-offset: 2px;
@@ -3171,12 +3136,6 @@ body.v-depth-layered .stroke-page {
   align-items: baseline;
   justify-content: center;
   gap: 8px;
-}
-
-.stroke-title-glyph {
-  font-family: var(--serif);
-  font-size: 22px;
-  color: var(--ink);
 }
 
 .stroke-title-word {
@@ -3921,56 +3880,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
     visibility 0s linear 0.26s;
 }
 
-.stroke-palette-field {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.stroke-palette-choice {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  min-height: 46px;
-  padding: 4px 6px;
-  color: var(--palette-ink);
-  background: var(--palette-ground);
-  border: 1px solid color-mix(in srgb, var(--palette-ink) 28%, transparent);
-  border-radius: 13px;
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--ink) 15%, transparent);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.stroke-palette-choice[aria-pressed='true'] {
-  border-color: var(--palette-red);
-  box-shadow:
-    0 0 0 2px var(--palette-red),
-    0 7px 20px color-mix(in srgb, var(--ink) 22%, transparent);
-}
-
-.stroke-palette-choice:focus-visible {
-  outline: 2px solid var(--palette-red);
-  outline-offset: 2px;
-}
-
-.stroke-palette-seal {
-  font: 18px/1 var(--serif);
-  text-align: center;
-}
-
-.stroke-palette-name {
-  min-width: 0;
-  overflow: hidden;
-  font: 8px/1.25 var(--serif);
-  letter-spacing: 0.02em;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .stroke-reading-field {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4010,30 +3919,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   overflow-wrap: anywhere;
   font-size: 13px;
   letter-spacing: 0.08em;
-}
-
-.stroke-number-choice {
-  min-height: 44px;
-  padding: 7px 16px;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--ground-0) 84%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ink) 26%, transparent);
-  border-radius: 999px;
-  box-shadow: 0 5px 18px color-mix(in srgb, var(--ink) 10%, transparent);
-  font: 12px/1.2 var(--serif);
-  letter-spacing: 0.12em;
-  cursor: pointer;
-}
-
-.stroke-number-choice[aria-pressed='true'] {
-  color: var(--ground-0);
-  background: var(--ink);
-  border-color: var(--ink);
-}
-
-.stroke-number-choice:focus-visible {
-  outline: 2px solid var(--ai);
-  outline-offset: 2px;
 }
 
 .stroke-chrome-trigger {
@@ -5735,9 +5620,6 @@ body.zen .grade-row {
   flex-wrap: wrap;
   gap: 8px;
   padding: 6px 0 12px;
-}
-body.zen .variants-bar {
-  display: none;
 }
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {

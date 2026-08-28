@@ -535,7 +535,6 @@ const S = {
    * remains an internal comparison route for the historical framed room. */
   strokeMinimal: true,
   strokeChromeAwake: false,
-  strokePaletteFocus: null,
   /** Sheet scrollTop to put back on the next render (returning from 筆順). */
   sheetScrollRestore: null,
   /** Element id inside the sheet that should take focus on the next render. */
@@ -12432,15 +12431,6 @@ function renderStrokePage(root) {
   // pending window and being painted over.
   if (paths.length && reduced) startStrokeAnimation(page);
   queueMicrotask(() => {
-    const paletteFocus = S.strokePaletteFocus;
-    S.strokePaletteFocus = null;
-    if (S.strokeMinimal && paletteFocus && S.strokeChromeAwake) {
-      const choice = page.querySelector(`.stroke-palette-choice[data-world='${paletteFocus}']`);
-      if (choice) {
-        choice.focus({ preventScroll: true });
-        return;
-      }
-    }
     (S.strokeMinimal ? page : backBtn).focus({ preventScroll: true });
   });
 }
