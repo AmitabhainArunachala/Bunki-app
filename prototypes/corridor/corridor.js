@@ -2507,6 +2507,13 @@ function back() {
     if (S.view === 'shelf') window.scrollTo(0, S.shelfScroll);
     return;
   }
+  // a list page is only reachable from the tray (the リスト name-door), so
+  // 戻る returns there — the same trip the in-page ← リスト一覧へ chip makes
+  if (S.view === 'list') {
+    S.view = 'tray';
+    render();
+    return;
+  }
   if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
