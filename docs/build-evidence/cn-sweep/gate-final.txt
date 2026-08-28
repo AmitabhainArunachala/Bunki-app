@@ -24,3 +24,27 @@ exit=0
 main.cjs ok
 --- boundary guard (must print 0)
        0
+
+### 7. battery (docs/build-evidence/renkan/battery.sh /tmp/cn-sweep-battery-final2)
+RAN for real at gate-final (browser cache present; F-001 baseline limitation lifted). exit=0 overall:
+[battery] format-check -> 0
+[battery] lint -> 0
+[battery] typecheck -> 0
+[battery] vitest -> 0
+[battery] corridor -> 0
+[battery] corridor-a11y -> 0
+[battery] writing-room -> 0
+[battery] storage-integ -> 0
+[battery] drift-fast -> 0
+[battery] corridor-ai -> 0
+[battery] native-readings -> 0
+[battery] replay -> 0
+[battery] export -> 0
+[battery] e2e-build -> 0
+[battery] e2e -> 0
+[battery] corpus-pytest -> 2
+corpus-pytest -> 2 is the pre-existing environmental F-002 (python deps absent in this env; 18 collection errors at baseline).
+verify-corridor detail: 224/224 checks passed (see F-048).
+
+### 8. boundary guard
+printed nothing (0 lines) — see above.

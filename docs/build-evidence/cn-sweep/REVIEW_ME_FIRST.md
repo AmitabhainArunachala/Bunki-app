@@ -3,18 +3,19 @@
 Sweep packet: `docs/handoffs/CN_SWEEP_PACKET_2026-08-28.md`. Ledger: `FINDINGS.md` (same directory).
 
 - **Base sha:** `9926057b` (merge-base with `claude/live-tweaks-20260827`)
-- **Head sha:** see `git log --oneline` — the close-out commit `[F-999]` is the tip; the last code-touching commit is `c97da019`
-- **Total commits on the branch:** 26 (25 findings + this close-out)
+- **Head sha:** see `git log --oneline` — the close-out commit `[F-061]` is the tip; the last code-touching commit is `85a63d3d`
+- **Total commits on the branch:** 29 (27 findings + the reviewer's mid-run staging commit `0eac98d9` + this close-out)
+- **History note:** `0eac98d9` (labeled `[F-999]`) is the reviewer's mid-run staging of this report and `gate-final.txt` as they then stood — drafts written before F-060 and before the final battery. This file supersedes it; the close-out below reflects the final tree.
 
 ## Counts by class × severity
 
 | class | P0 | P1 | P2 | P3 | total |
 | --- | --- | --- | --- | --- | --- |
-| FIX | 0 | 9 | 7 | 5 | 21 |
+| FIX | 0 | 10 | 7 | 5 | 22 |
 | PROP | 0 | 0 | 0 | 0 | 0 |
 | FLAG | 0 | 3 | 16 | 20 | 39 |
 
-(60 ledger rows F-000..F-059; F-000 is the baseline record.)
+(61 ledger rows F-000..F-060; F-000 is the baseline record.)
 
 ## Top 5 riskiest changes
 
@@ -56,9 +57,9 @@ Environment notes: F-001 (Playwright chromium missing at baseline) resolved itse
 | npm run test | exit 0 (1710 tests) | exit 0 (1710 tests) |
 | node --check ×6 | ok | ok |
 | boundary guard | 0 | 0 |
-| storage-integrity | **red** (stale pins) | **PASS, 39 checks** (F-003, F-047) |
+| storage-integrity | **red** (stale pins) | **PASS, 39 checks** (F-003, F-047, F-060) |
 | verify-corridor | not runnable (no browser) | **224/224** (F-048; browser cache appeared) |
-| battery (overall) | browser gates blocked (F-001) | see gate-final.txt battery section |
+| battery (overall) | browser gates blocked (F-001) | **ran for real, exit 0** — every gate 0 except corpus-pytest → 2 (environmental, F-002, unchanged from baseline) |
 
 Gate-final is strictly better than gate-baseline: the two red gates at baseline are green, and the browser battery actually ran.
 
