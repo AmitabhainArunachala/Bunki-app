@@ -1,0 +1,26 @@
+=== gate-final — 2026-08-28T22:28:43+09:00 — 1387b0e5 ===
+--- npm run lint
+> bunki@0.0.0 lint
+> eslint .
+
+exit=0
+--- npm run format:check
+
+Checking formatting...
+All matched files use Prettier code style!
+exit=0
+--- npm run typecheck
+> @bunki/seed@0.0.0 typecheck
+> tsc --noEmit
+
+exit=0
+--- npm run test
+      Tests  1710 passed (1710)
+   Start at  22:29:17
+   Duration  6.33s (transform 21.01s, setup 0ms, import 63.33s, tests 11.56s, environment 8ms)
+
+exit=0
+--- node --check corridor JS + desktop
+main.cjs ok
+--- boundary guard (must print 0)
+       0
