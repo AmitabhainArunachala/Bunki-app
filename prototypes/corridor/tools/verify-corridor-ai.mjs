@@ -147,7 +147,20 @@ function initScript(envelopeJson) {
       window.__AI_STUB.models.push(body.model);
       const system = String(body.system || '');
       let text = 'stub reply ' + window.__AI_STUB.calls;
-      if (system.includes('Output ONLY a JSON array')) {
+      if (system.includes('observations about the LEARNER')) {
+        // 鏡 the miner: two valid observations, one invalid code, one
+        // unconfirmable subject, one untyped and one mistyped subject
+        // (both real deck words) — the durability boundary must keep
+        // exactly the two the law admits
+        text = JSON.stringify([
+          { kind: 'sensei', subject: '天気', subjectType: 'word', polarity: 1, code: 'misread' },
+          { kind: 'sensei', subject: '天気', subjectType: 'word', polarity: 3, code: 'not-a-code' },
+          { kind: 'sensei', subject: 'ゾロメ語', subjectType: 'word', polarity: 1, code: 'sense-miss' },
+          { kind: 'sensei', subject: '時間', polarity: 1, code: 'misread' },
+          { kind: 'sensei', subject: '先生', subjectType: 'reading', polarity: 1, code: 'misread' },
+          { kind: 'confuse', subject: '学校', subjectType: 'word', other: '天気', otherType: 'word' },
+        ]);
+      } else if (system.includes('Output ONLY a JSON array')) {
         text = JSON.stringify([1, 2, 3, 4, 5].map((n) => ({
           q: '問' + n, opts: ['a', 'b', 'c', 'd'], right: 0, why: 'because ' + n,
         })));
@@ -604,7 +617,226 @@ async function main() {
   const dropped = await broken.evaluate('window.__KAIRO_AI__.dropped()');
   check('with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
     dropped >= 1, `${dropped} turns honestly counted as dropped`);
+  const brokenMined = await broken.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return (s.obslog || []).filter((r) => r[1] === 'sensei' || r[1] === 'confuse').length;
+  })()`);
+  check('with the archive gone, no observation is written — a ref must resolve or not exist',
+    brokenMined === 0, `${brokenMined} rows`);
+  // 鏡 (PR #86 review): a backup off a device whose archive will not read
+  // must not pass silence off as emptiness — the record still leaves (the
+  // export is never refused) but carries aiEvidenceIncomplete and warns.
+  const brokenExport = await broken.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    s.obslog = [[Date.now(), 'sensei', 'word:天気', 1, 'misread', 'x-broken-1']];
+    localStorage.setItem('kairo-corridor-v1', JSON.stringify(s));
+    return window.__KAIRO_AI__.exportRecord();
+  })()`);
+  const brokenRecord = JSON.parse(brokenExport.text);
+  check('an unreadable archive marks the export honestly instead of omitting evidence',
+    brokenExport.warning === 'archive-unreadable' &&
+      brokenRecord.aiEvidenceIncomplete === true &&
+      !('aiEvidence' in brokenRecord),
+    `warning ${brokenExport.warning} · marker ${brokenRecord.aiEvidenceIncomplete}`);
   await brokenContext.close();
+
+  // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
+  console.log('\n— 鏡: the sensei mines its own exchanges into the ledger');
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await page.waitForSelector('#chat-input', { timeout: 8000 });
+  await sendChat('天気の言葉を教えて');
+  const mineRows = await waitRows(page, 'mine', 2);
+  check('the mining exchange itself is archived whole under surface mine',
+    exchangeShape(mineRows, 'mine', OVERRIDE_MODEL), `${mineRows.length} rows`);
+  await page.waitForFunction(
+    `(() => {
+      const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      return (s.obslog || []).some((r) => r[1] === 'sensei');
+    })()`,
+    null,
+    { timeout: 8000 },
+  );
+  const mined = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const rows = s.obslog || [];
+    return {
+      sensei: rows.filter((r) => r[1] === 'sensei'),
+      confuse: rows.filter((r) => r[1] === 'confuse'),
+      ghost: rows.filter((r) => String(r[2]).includes('ゾロメ語') || String(r[3]).includes('ゾロメ語')),
+      badCode: rows.filter((r) => r[1] === 'sensei' && r[4] === 'not-a-code'),
+      badType: rows.filter((r) => r[1] === 'sensei' && (String(r[2]).includes('時間') || String(r[2]).includes('先生'))),
+    };
+  })()`);
+  check('a mined observation lands typed: [t, sensei, key, polarity, code, ref]',
+    mined.sensei.length >= 1 &&
+      mined.sensei.every((r) => r.length === 6 && r[2] === 'word:天気' && r[3] === 1 && r[4] === 'misread' && typeof r[5] === 'string' && r[5].length > 0),
+    JSON.stringify(mined.sensei[0]));
+  check('a confusion edge lands typed: [t, confuse, key, otherKey]',
+    mined.confuse.length >= 1 &&
+      mined.confuse.every((r) => r.length === 4 && r[2] === 'word:学校' && r[3] === 'word:天気'),
+    JSON.stringify(mined.confuse[0]));
+  check('an unconfirmable subject and an unknown code write NOTHING — fail closed',
+    mined.ghost.length === 0 && mined.badCode.length === 0,
+    `ghost ${mined.ghost.length} · bad-code ${mined.badCode.length}`);
+  check('a subject without a clear word/kanji type writes NOTHING — no default type',
+    mined.badType.length === 0,
+    `untyped/mistyped subjects kept: ${mined.badType.length}`);
+  // the validator must accept what the miner wrote: a reload replays the
+  // envelope through validStoreEnvelope — quarantine would zero the rows
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  const afterReload = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const rows = s.obslog || [];
+    return {
+      sensei: rows.filter((r) => r[1] === 'sensei').length,
+      confuse: rows.filter((r) => r[1] === 'confuse').length,
+      alert: (() => {
+        const node = document.getElementById('store-alert');
+        return !!(node && !node.hidden && node.textContent);
+      })(),
+    };
+  })()`);
+  check('the envelope validator accepts the mined kinds across a reload — no quarantine',
+    afterReload.sensei >= 1 && afterReload.confuse >= 1 && afterReload.alert === false,
+    JSON.stringify(afterReload));
+  const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
+  check('mine is never mined, and only learner-authored surfaces are minable',
+    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat'])"),
+    'AI_MINABLE_SURFACES pinned to chat — the one door where the learner types');
+  // one exchange, one identity: refs are distinct per exchange and every
+  // one resolves to an archived exchange carrying that xid (PR #86 review)
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await page.waitForSelector('#chat-input', { timeout: 8000 });
+  await sendChat('もう一度、天気の言葉');
+  await waitRows(page, 'mine', 4);
+  const refCheck = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
+    return {
+      total: refs.length,
+      distinct: new Set(refs).size,
+      resolved: refs.filter((ref) => xids.has(ref)).length,
+    };
+  })`);
+  check('every observation names its exact exchange — distinct refs, each resolving in the archive',
+    refCheck.total >= 2 && refCheck.distinct >= 2 && refCheck.resolved === refCheck.total,
+    JSON.stringify(refCheck));
+  // the whole exchange or nothing: mining is gated on every append of the
+  // exchange landing durably, never on the reply alone (PR #86 review)
+  check('mining requires the WHOLE exchange archived — the gate covers every append',
+    minerSource.includes('Promise.all(appended)'),
+    'Promise.all(appended) gate present');
+  // 鏡: evidence rides the export and returns through the real import door
+  const exportResult = await page.evaluate(`window.__KAIRO_AI__.exportRecord()`);
+  const exportedRecord = exportResult.text;
+  const exported = JSON.parse(exportedRecord);
+  const exportRefs = (exported.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+  check('the export carries aiEvidence for every observation ref',
+    exportRefs.length >= 2 &&
+      exportResult.warning === undefined &&
+      !!exported.aiEvidence &&
+      exportRefs.every((ref) => Array.isArray(exported.aiEvidence[ref]) && exported.aiEvidence[ref].length >= 2),
+    `${exportRefs.length} refs, ${Object.keys(exported.aiEvidence || {}).length} evidenced exchanges, warning ${exportResult.warning}`);
+  await page.evaluate(`window.__KAIRO_AI__.__clear()`);
+  // a foreign turn seeded after the clear: the real import door must
+  // replace it — old conversations may not survive under the new record
+  await page.evaluate(
+    `window.__KAIRO_AI__.__seed({ surface: 'chat', role: 'user', content: 'RECORD-A の秘密', model: 'test', ts: Date.now() })`,
+  );
+  // the port row lives in the 覚える tray — the one chrome door on every surface
+  await open('?entry=shelf');
+  await page.click('#tray');
+  await page.waitForSelector('#import-file', { state: 'attached', timeout: 8000 });
+  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.setInputFiles('#import-file', {
+    name: 'kairo-roundtrip.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(exportedRecord, 'utf8'),
+  });
+  // the import door reloads on success — wait for the NEW page, not the old
+  // one's still-true ready flag (the restore loop finishes before reload)
+  await page.waitForFunction(
+    '!window.__PRE_IMPORT_PAGE && document.body.dataset.ready === "1"',
+    null,
+    { timeout: 30000 },
+  );
+  const roundtrip = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
+    return {
+      refs: refs.length,
+      resolved: refs.filter((ref) => xids.has(ref)).length,
+      envelopeCarriesEvidence: 'aiEvidence' in s,
+      foreignSurvived: rows.some((r) => String(r.content).includes('RECORD-A')),
+    };
+  })`);
+  check('after export → import on a cleared archive, every ref resolves again',
+    roundtrip.refs >= 2 && roundtrip.resolved === roundtrip.refs,
+    JSON.stringify(roundtrip));
+  check('aiEvidence rides the file, never the stored envelope',
+    roundtrip.envelopeCarriesEvidence === false,
+    `in envelope: ${roundtrip.envelopeCarriesEvidence}`);
+  check('the import REPLACES the archive in one crossing — no pre-import turn survives it',
+    roundtrip.foreignSurvived === false,
+    `foreign turn survived: ${roundtrip.foreignSurvived}`);
+  // 鏡 (PR #86 review): a record file is foreign bytes — evidence turns are
+  // validated to the exact exported shape, and one malformed turn stops the
+  // import cold: no reload, no store change, the note names the refusal.
+  const tampered = JSON.parse(exportedRecord);
+  tampered.aiEvidence[Object.keys(tampered.aiEvidence)[0]] = [
+    { surface: 'chat', role: 'oracle', content: 'まがいもの', ts: 'yesterday' },
+  ];
+  const storeBefore = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  await page.click('#tray');
+  await page.waitForSelector('#import-file', { state: 'attached', timeout: 8000 });
+  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.setInputFiles('#import-file', {
+    name: 'kairo-tampered.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(tampered), 'utf8'),
+  });
+  await page.waitForFunction(
+    `!!document.querySelector('.port-row + .airead-note') && document.querySelector('.port-row + .airead-note').textContent.length > 0`,
+    null,
+    { timeout: 8000 },
+  );
+  const tamperedOutcome = await page.evaluate(
+    (before) => ({
+      samePage: window.__PRE_IMPORT_PAGE === 1,
+      storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
+      note: document.querySelector('.port-row + .airead-note').textContent,
+    }),
+    storeBefore,
+  );
+  check('malformed imported evidence aborts the import — no reload, store untouched',
+    tamperedOutcome.samePage === true && tamperedOutcome.storeUnchanged === true && tamperedOutcome.note.length > 0,
+    `same page ${tamperedOutcome.samePage} · store unchanged ${tamperedOutcome.storeUnchanged}`);
+  // the abort must lift the seal: a REAL write through the app's own
+  // boundary (the tray's ひとこと door → commitStorePatch → writeStore)
+  // still lands after the refused import
+  await page.fill('#note-input', '封は解けたか');
+  await page.click('#note-send');
+  const unsealed = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return (s.obslog || []).some((r) => r[1] === 'note' && String(r[3]).includes('封は解けたか'));
+  })()`);
+  check('an aborted import leaves the device writable — the next real write lands',
+    unsealed === true, `note row persisted: ${unsealed}`);
+  // the crossing's mechanism, pinned at the source: the seal is set before
+  // the record lands, writeStore and the archive both refuse while sealed,
+  // and the archive swap is the single-transaction aiArchiveReplace
+  check('the import crossing is sealed and atomic at the source',
+    minerSource.includes('let storeSealed = false') &&
+      minerSource.includes('if (storeSealed) return false;') &&
+      minerSource.includes('storeSealed = true;\n      if (!(await aiArchiveReplace(evidence)))') &&
+      minerSource.includes('storeSealed || !kept.every((row) => row === true)') &&
+      minerSource.includes('function aiArchiveReplace'),
+    'storeSealed gate in writeStore/aiLogAppend/miner · aiArchiveReplace single transaction');
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in
