@@ -681,8 +681,8 @@ async function main() {
     JSON.stringify(afterReload));
   const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
   check('mine is never mined, and only learner-authored surfaces are minable',
-    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor'])"),
-    'AI_MINABLE_SURFACES pinned to chat + word-tutor');
+    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat'])"),
+    'AI_MINABLE_SURFACES pinned to chat — the one door where the learner types');
   // one exchange, one identity: refs are distinct per exchange and every
   // one resolves to an archived exchange carrying that xid (PR #86 review)
   await open('?entry=shelf');

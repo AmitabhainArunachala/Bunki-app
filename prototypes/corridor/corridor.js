@@ -9981,12 +9981,14 @@ async function aiAsk(system, prompt, meta = {}) {
  *   - the mining exchange itself is archived whole under surface 'mine' —
  *     not a word of the record is lost, and 'mine' is never mined.
  * Only surfaces where the learner actually WROTE are minable (PR #86
- * review): chat and the word tutor carry learner-typed questions; the
- * reading and quiz generation calls carry app-authored prompts and
- * model-authored text, which must never be labeled learner evidence.
+ * review, twice convicted): today that is chat alone — the one door where
+ * the learner types free text. The word-tutor button, the reading and the
+ * quiz generation calls all send app-authored prompts and receive
+ * model-authored text; none of it may ever be labeled learner evidence.
  * Quiz ANSWERS are graded locally and will land through their own typed
- * rows in a later movement, not through this miner. */
-const AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor']);
+ * rows in a later movement; the placement interview (movement 三) will
+ * add real learner-authored surfaces to this set as they are born. */
+const AI_MINABLE_SURFACES = new Set(['chat']);
 const AI_MINE_MAX_ROWS = 4;
 async function aiMineObservations(fromSurface, learnerInk, reply, xid) {
   if (!aiKey() || !learnerInk) return;
