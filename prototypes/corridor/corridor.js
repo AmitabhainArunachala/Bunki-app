@@ -5023,13 +5023,44 @@ function renderListPage(main) {
  * this store, and exporting must never leak it. Import replaces
  * wholesale (the honest semantic: the file IS the record), then the app
  * reboots clean on the imported state. */
+/** 鏡 (PR #86 review): an observation's evidence must survive the journey.
+ * The export carries, under aiEvidence, the archived exchanges that sensei
+ * rows reference — only those, keyed by xid — so a record imported on any
+ * device still resolves every ref. A store that cannot be parsed exports
+ * as raw bytes verbatim, exactly as before: quarantine export unweakened. */
+async function buildExportRecord() {
+  const raw = localStorage.getItem(STORE_KEY) || '{}';
+  let record;
+  try {
+    record = JSON.parse(raw);
+  } catch {
+    return raw;
+  }
+  if (!plainRecord(record)) return raw;
+  const refs = new Set(
+    (Array.isArray(record.obslog) ? record.obslog : [])
+      .filter((row) => Array.isArray(row) && row[1] === 'sensei')
+      .map((row) => row[5]),
+  );
+  if (!refs.size) return raw;
+  const rows = await aiLogAll();
+  const evidence = {};
+  for (const row of rows) {
+    if (!row.xid || !refs.has(row.xid)) continue;
+    const turns = evidence[row.xid] || setOwnRecordValue(evidence, row.xid, []);
+    turns.push({ surface: row.surface, role: row.role, content: row.content, model: row.model, ts: row.ts });
+  }
+  if (!Object.keys(evidence).length) return raw;
+  setOwnRecordValue(record, 'aiEvidence', evidence);
+  return JSON.stringify(record);
+}
 function renderPortRow(main) {
   const port = el('div', 'port-row');
   const exp = biLabel('button', 'chip', '書き出す', 'export your record');
   exp.type = 'button';
   exp.id = 'export-store';
-  exp.addEventListener('click', () => {
-    const blob = new Blob([localStorage.getItem(STORE_KEY) || '{}'], { type: 'application/json' });
+  exp.addEventListener('click', async () => {
+    const blob = new Blob([await buildExportRecord()], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `kairo-${dayKey()}.json`;
@@ -5095,7 +5126,23 @@ function renderPortRow(main) {
         );
         return;
       }
+      // 鏡: the record's evidence returns with the record. aiEvidence rides
+      // the FILE, never the envelope (the archive is IndexedDB precisely so
+      // conversations don't eat the localStorage quota) — strip it before
+      // the store lands, restore its rows into the fresh archive so every
+      // observation ref resolves on this device too. A row the archive
+      // cannot keep is counted by its honesty counter, as ever.
+      const evidence = plainRecord(s.aiEvidence) ? s.aiEvidence : null;
+      if (evidence) delete s.aiEvidence;
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      if (evidence) {
+        for (const [xid, turns] of Object.entries(evidence)) {
+          if (!Array.isArray(turns)) continue;
+          for (const turn of turns) {
+            if (plainRecord(turn)) await aiLogAppend({ ...turn, xid });
+          }
+        }
+      }
       location.reload();
     } catch {
       portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
@@ -9895,8 +9942,13 @@ async function aiConverse(system, messages, meta = {}) {
   // earlier turns were archived when they were first sent or received
   let newFrom = messages.length;
   while (newFrom > 0 && messages[newFrom - 1].role !== 'assistant') newFrom -= 1;
+  // every append of this exchange is tracked: mining below requires the
+  // WHOLE exchange durably archived, never half of one (PR #86 review)
+  const appended = [];
   for (const m of messages.slice(newFrom)) {
-    aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), xid, ...ref });
+    appended.push(
+      aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), xid, ...ref }),
+    );
   }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
@@ -9931,15 +9983,17 @@ async function aiConverse(system, messages, meta = {}) {
     .map((b) => b.text)
     .join('')
     .trim();
-  const kept = aiLogAppend({
-    surface,
-    role: 'assistant',
-    content: reply,
-    model,
-    ts: Date.now(),
-    xid,
-    ...ref,
-  });
+  appended.push(
+    aiLogAppend({
+      surface,
+      role: 'assistant',
+      content: reply,
+      model,
+      ts: Date.now(),
+      xid,
+      ...ref,
+    }),
+  );
   // 鏡 KAGAMI PR 一 — every minable exchange is read once for learning
   // observations, off the answer's critical path: the learner never waits
   // on the mirror, and a failed mining pass costs nothing but itself.
@@ -9954,7 +10008,8 @@ async function aiConverse(system, messages, meta = {}) {
       .join('\n');
     queueMicrotask(async () => {
       try {
-        if ((await kept) !== true) return;
+        const kept = await Promise.all(appended);
+        if (!kept.every((row) => row === true)) return;
         await aiMineObservations(surface, learnerInk, reply, xid);
       } catch {
         /* the mirror missed one glance — the record itself is untouched */
@@ -10082,6 +10137,7 @@ window.__KAIRO_AI__ = Object.freeze({
   dropped: () => aiLogDropped,
   provider: () => aiProvider(),
   timeoutMs: AI_TIMEOUT_MS,
+  exportRecord: () => buildExportRecord(),
 });
 /** The newest archived reply for one surface and one word — the read-back
  * seam: an answer that arrived after its sheet closed is not lost, it waits

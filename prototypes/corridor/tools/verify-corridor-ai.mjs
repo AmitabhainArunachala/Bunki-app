@@ -703,6 +703,54 @@ async function main() {
   check('every observation names its exact exchange — distinct refs, each resolving in the archive',
     refCheck.total >= 2 && refCheck.distinct >= 2 && refCheck.resolved === refCheck.total,
     JSON.stringify(refCheck));
+  // the whole exchange or nothing: mining is gated on every append of the
+  // exchange landing durably, never on the reply alone (PR #86 review)
+  check('mining requires the WHOLE exchange archived — the gate covers every append',
+    minerSource.includes('Promise.all(appended)'),
+    'Promise.all(appended) gate present');
+  // 鏡: evidence rides the export and returns through the real import door
+  const exportedRecord = await page.evaluate(`window.__KAIRO_AI__.exportRecord()`);
+  const exported = JSON.parse(exportedRecord);
+  const exportRefs = (exported.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+  check('the export carries aiEvidence for every observation ref',
+    exportRefs.length >= 2 &&
+      !!exported.aiEvidence &&
+      exportRefs.every((ref) => Array.isArray(exported.aiEvidence[ref]) && exported.aiEvidence[ref].length >= 2),
+    `${exportRefs.length} refs, ${Object.keys(exported.aiEvidence || {}).length} evidenced exchanges`);
+  await page.evaluate(`window.__KAIRO_AI__.__clear()`);
+  // the port row lives in the 覚える tray — the one chrome door on every surface
+  await open('?entry=shelf');
+  await page.click('#tray');
+  await page.waitForSelector('#import-file', { state: 'attached', timeout: 8000 });
+  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.setInputFiles('#import-file', {
+    name: 'kairo-roundtrip.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(exportedRecord, 'utf8'),
+  });
+  // the import door reloads on success — wait for the NEW page, not the old
+  // one's still-true ready flag (the restore loop finishes before reload)
+  await page.waitForFunction(
+    '!window.__PRE_IMPORT_PAGE && document.body.dataset.ready === "1"',
+    null,
+    { timeout: 30000 },
+  );
+  const roundtrip = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
+    return {
+      refs: refs.length,
+      resolved: refs.filter((ref) => xids.has(ref)).length,
+      envelopeCarriesEvidence: 'aiEvidence' in s,
+    };
+  })`);
+  check('after export → import on a cleared archive, every ref resolves again',
+    roundtrip.refs >= 2 && roundtrip.resolved === roundtrip.refs,
+    JSON.stringify(roundtrip));
+  check('aiEvidence rides the file, never the stored envelope',
+    roundtrip.envelopeCarriesEvidence === false,
+    `in envelope: ${roundtrip.envelopeCarriesEvidence}`);
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in
