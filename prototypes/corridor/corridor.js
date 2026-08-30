@@ -1168,7 +1168,17 @@ function storeEnvelope(state) {
 
 /** localStorage.setItem returning is the synchronous durability boundary.
  * The caller's live learner roots are never published before that boundary. */
+/* 取り込みの錠 — sealed for an import crossing's final steps (PR #86
+ * review): once the incoming file is committed to become the record, no
+ * in-flight writer — the observation miner above all, whose network pass
+ * can outlive the decision — may publish the OLD in-memory state over the
+ * imported one, and no archive append may land pre-import words under the
+ * new record. Only the reboot, or an aborted import, lifts it. */
+let storeSealed = false;
 function writeStore(state) {
+  // sealed: the file is the record now — a quiet refusal, no storage
+  // alert, because nothing is wrong with the device; the reboot is imminent
+  if (storeSealed) return false;
   if (state.storeReadOnly) {
     safelySyncStoreAlert();
     return false;
@@ -5027,32 +5037,59 @@ function renderListPage(main) {
  * The export carries, under aiEvidence, the archived exchanges that sensei
  * rows reference — only those, keyed by xid — so a record imported on any
  * device still resolves every ref. A store that cannot be parsed exports
- * as raw bytes verbatim, exactly as before: quarantine export unweakened. */
+ * as raw bytes verbatim, exactly as before: quarantine export unweakened.
+ * Returns { text, warning? }: the export itself is NEVER refused — the
+ * record is the learner's to carry even off a device whose archive will
+ * not read — but an archive that cannot be read whole may not be passed
+ * off as empty, so the record then carries aiEvidenceIncomplete and the
+ * warning names the loss at the door. */
 async function buildExportRecord() {
   const raw = localStorage.getItem(STORE_KEY) || '{}';
   let record;
   try {
     record = JSON.parse(raw);
   } catch {
-    return raw;
+    return { text: raw };
   }
-  if (!plainRecord(record)) return raw;
+  if (!plainRecord(record)) return { text: raw };
   const refs = new Set(
     (Array.isArray(record.obslog) ? record.obslog : [])
       .filter((row) => Array.isArray(row) && row[1] === 'sensei')
       .map((row) => row[5]),
   );
-  if (!refs.size) return raw;
-  const rows = await aiLogAll();
+  if (!refs.size) return { text: raw };
+  let rows;
+  try {
+    rows = await aiLogAll(undefined, true);
+  } catch {
+    setOwnRecordValue(record, 'aiEvidenceIncomplete', true);
+    return { text: JSON.stringify(record), warning: 'archive-unreadable' };
+  }
   const evidence = {};
   for (const row of rows) {
     if (!row.xid || !refs.has(row.xid)) continue;
     const turns = evidence[row.xid] || setOwnRecordValue(evidence, row.xid, []);
     turns.push({ surface: row.surface, role: row.role, content: row.content, model: row.model, ts: row.ts });
   }
-  if (!Object.keys(evidence).length) return raw;
+  if (!Object.keys(evidence).length) return { text: raw };
   setOwnRecordValue(record, 'aiEvidence', evidence);
-  return JSON.stringify(record);
+  return { text: JSON.stringify(record) };
+}
+/** The exact turn shape the export writes under aiEvidence — and the ONLY
+ * shape the import door restores (PR #86 review): a record file is foreign
+ * bytes, so roles, content and timestamps are checked before any turn may
+ * re-enter the archive as trusted evidence. */
+const AI_EVIDENCE_ROLES = new Set(['user', 'assistant', 'app']);
+function validAiEvidenceTurn(turn) {
+  return (
+    plainRecord(turn) &&
+    nonEmptyString(turn.surface) &&
+    AI_EVIDENCE_ROLES.has(turn.role) &&
+    nonEmptyString(turn.content) &&
+    Number.isInteger(turn.ts) &&
+    turn.ts > 0 &&
+    (turn.model === undefined || nonEmptyString(turn.model))
+  );
 }
 function renderPortRow(main) {
   const port = el('div', 'port-row');
@@ -5060,12 +5097,19 @@ function renderPortRow(main) {
   exp.type = 'button';
   exp.id = 'export-store';
   exp.addEventListener('click', async () => {
-    const blob = new Blob([await buildExportRecord()], { type: 'application/json' });
+    const rec = await buildExportRecord();
+    const blob = new Blob([rec.text], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `kairo-${dayKey()}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    if (rec.warning) {
+      portNote.textContent = tx(
+        '会話の記録が読み切れなかった。記録は証拠なしで出た（中でその旨を名乗る）。',
+        'The conversation archive could not be read whole — the record left without its evidence, and says so inside.',
+      );
+    }
     // remember when the record last left the device — the tray's quiet backup
     // reminder counts from here; the copy-then-commit keeps the live stats
     // untouched when the device cannot save (the export itself already left)
@@ -5111,40 +5155,51 @@ function renderPortRow(main) {
         return;
       }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // 鏡: the record's evidence returns with the record. aiEvidence rides
+      // the FILE, never the envelope (the archive is IndexedDB precisely so
+      // conversations don't eat the localStorage quota). Every turn must
+      // hold the exact shape the export writes (PR #86 review: a record
+      // file is foreign bytes — a malformed role or timestamp may not
+      // become trusted evidence); one bad turn means this is not a record
+      // exported from here, unchanged, and nothing is imported.
+      const evidence = [];
+      if (owns(s, 'aiEvidence')) {
+        if (!plainRecord(s.aiEvidence)) throw new Error('unreadable evidence');
+        for (const [xid, turns] of Object.entries(s.aiEvidence)) {
+          if (!nonEmptyString(xid) || !Array.isArray(turns)) throw new Error('unreadable evidence');
+          for (const turn of turns) {
+            if (!validAiEvidenceTurn(turn)) throw new Error('unreadable evidence');
+            const row = { surface: turn.surface, role: turn.role, content: turn.content, ts: turn.ts, xid };
+            if (nonEmptyString(turn.model)) row.model = turn.model;
+            evidence.push(row);
+          }
+        }
+        delete s.aiEvidence;
+      }
+      if (owns(s, 'aiEvidenceIncomplete')) delete s.aiEvidenceIncomplete;
       // The file IS the record — so everything the old record owned must go
-      // with it. The AI transcript archive lives in IndexedDB, outside the
-      // exported envelope, and an import left the PREVIOUS learner's
-      // conversations sitting under the new record (E3 round-A, AI lens).
-      // The archive is cleared before the record lands; failing to clear it
-      // is not a reason to import a record on top of someone else's words.
-      try {
-        await clearAiArchive();
-      } catch {
+      // with it (E3 round-A: the previous learner's conversations may not
+      // outlive their record), and nothing in flight may write over what
+      // arrives. The crossing is one coordinated operation (PR #86 review,
+      // twice): the store seals first — writeStore and the archive refuse
+      // every late writer, the observation miner above all — then the
+      // archive is replaced in ONE IndexedDB transaction, old conversations
+      // out and this record's evidence in, where an abort leaves the device
+      // exactly as it was and lifts the seal; only then does the record
+      // itself land, and the app reboots on it.
+      storeSealed = true;
+      if (!(await aiArchiveReplace(evidence))) {
+        storeSealed = false;
         portNote.textContent = tx(
-          '前の記録の会話を消せなかった。取り込みは中止した。',
-          "The previous record's conversations could not be cleared, so nothing was imported.",
+          '前の記録の会話を入れ替えられなかった。取り込みは中止した。',
+          "The previous record's conversations could not be replaced, so nothing was imported.",
         );
         return;
       }
-      // 鏡: the record's evidence returns with the record. aiEvidence rides
-      // the FILE, never the envelope (the archive is IndexedDB precisely so
-      // conversations don't eat the localStorage quota) — strip it before
-      // the store lands, restore its rows into the fresh archive so every
-      // observation ref resolves on this device too. A row the archive
-      // cannot keep is counted by its honesty counter, as ever.
-      const evidence = plainRecord(s.aiEvidence) ? s.aiEvidence : null;
-      if (evidence) delete s.aiEvidence;
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
-      if (evidence) {
-        for (const [xid, turns] of Object.entries(evidence)) {
-          if (!Array.isArray(turns)) continue;
-          for (const turn of turns) {
-            if (plainRecord(turn)) await aiLogAppend({ ...turn, xid });
-          }
-        }
-      }
       location.reload();
     } catch {
+      storeSealed = false;
       portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
     }
   });
@@ -9879,9 +9934,39 @@ async function clearAiArchive() {
   return true;
 }
 
+/** Replace the archive wholesale — the old record's conversations out, the
+ * incoming record's evidence in — as ONE transaction (PR #86 review): an
+ * abort leaves the device exactly as it was, so the import can stop
+ * cleanly instead of publishing a record whose evidence half-arrived.
+ * Import-only, like clearAiArchive, with the same stance on a device that
+ * has no IndexedDB at all: no archive can exist there to mix two records,
+ * so the swap succeeds empty. */
+async function aiArchiveReplace(rows) {
+  try {
+    const db = await aiLogOpen();
+    if (!db) return typeof indexedDB === 'undefined';
+    const swapped = await new Promise((done) => {
+      const t = db.transaction(AI_LOG_TURNS, 'readwrite');
+      const turns = t.objectStore(AI_LOG_TURNS);
+      turns.clear();
+      for (const row of rows) turns.add(row);
+      t.oncomplete = () => done(true);
+      t.onabort = t.onerror = () => done(false);
+    });
+    if (swapped) aiLogDropped = 0;
+    return swapped;
+  } catch {
+    return false;
+  }
+}
+
 /** Append one turn. Fire-and-forget on the request path — the returned
  * promise (true = durably written) exists for the verification suites. */
 async function aiLogAppend(row) {
+  // sealed for an import crossing: pre-import words may not land in the
+  // incoming record's archive — a discard by design, not a loss, so the
+  // honesty counter stays untouched
+  if (storeSealed) return false;
   try {
     const db = await aiLogOpen();
     if (!db) {
@@ -9903,12 +9988,18 @@ async function aiLogAppend(row) {
   }
 }
 
-/** Every archived turn, oldest first — optionally one surface's. */
-async function aiLogAll(surface) {
+/** Every archived turn, oldest first — optionally one surface's. strict
+ * (the export path, PR #86 review) refuses to pretend: an archive that
+ * cannot be opened or read to the end throws instead of returning a
+ * partial truth, so a backup never silently claims evidence never was. */
+async function aiLogAll(surface, strict = false) {
   try {
     const db = await aiLogOpen();
-    if (!db) return [];
-    return await new Promise((done) => {
+    if (!db) {
+      if (strict) throw new Error('archive unavailable');
+      return [];
+    }
+    return await new Promise((done, fail) => {
       const rows = [];
       const t = db.transaction(AI_LOG_TURNS, 'readonly');
       const walk = t.objectStore(AI_LOG_TURNS).openCursor();
@@ -9921,9 +10012,13 @@ async function aiLogAll(surface) {
         if (!surface || cursor.value.surface === surface) rows.push(cursor.value);
         cursor.continue();
       };
-      t.onabort = t.onerror = () => done(rows);
+      t.onabort = t.onerror = () => {
+        if (strict) fail(t.error || new Error('archive read failed'));
+        else done(rows);
+      };
     });
-  } catch {
+  } catch (err) {
+    if (strict) throw err;
     return [];
   }
 }
@@ -10009,7 +10104,9 @@ async function aiConverse(system, messages, meta = {}) {
     queueMicrotask(async () => {
       try {
         const kept = await Promise.all(appended);
-        if (!kept.every((row) => row === true)) return;
+        // storeSealed: an import crossing has begun — the record this
+        // exchange belongs to is leaving, so its glance is not taken
+        if (storeSealed || !kept.every((row) => row === true)) return;
         await aiMineObservations(surface, learnerInk, reply, xid);
       } catch {
         /* the mirror missed one glance — the record itself is untouched */
@@ -10063,13 +10160,15 @@ async function aiMineObservations(fromSurface, learnerInk, reply, xid) {
   }
   if (!Array.isArray(found)) return;
   const subjectKey = (raw, type) => {
+    // no default type (PR #86 review): a subject the model did not clearly
+    // type as word or kanji is not evidence — fail closed like the rest
+    if (type !== 'word' && type !== 'kanji') return null;
     const w = String(raw || '').trim();
-    const t = type === 'kanji' ? 'kanji' : 'word';
     if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) return null;
-    if (t === 'kanji' && [...w].length !== 1) return null;
-    const inDeck = S.taken.some((item) => item.t === t && item.id === w);
-    const inDict = t === 'kanji' ? !!D.kanji?.[w] : !!lookup(w);
-    return inDeck || inDict ? srsKey(t, w) : null;
+    if (type === 'kanji' && [...w].length !== 1) return null;
+    const inDeck = S.taken.some((item) => item.t === type && item.id === w);
+    const inDict = type === 'kanji' ? !!D.kanji?.[w] : !!lookup(w);
+    return inDeck || inDict ? srsKey(type, w) : null;
   };
   const now = Date.now();
   const rows = [];
