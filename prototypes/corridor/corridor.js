@@ -9881,16 +9881,22 @@ async function aiLogAll(surface) {
   }
 }
 
+let aiExchangeSerial = 0;
 async function aiConverse(system, messages, meta = {}) {
   const { baseUrl, model } = aiProvider();
   const surface = meta.surface || 'ai';
   const ref = meta.ref ? { contextRef: meta.ref } : {};
+  // one exchange, one identity (PR #86 review): every archived turn of this
+  // call carries the same xid, so an evidence row can name the EXACT
+  // exchange that produced it — contextRef keeps its read-back meaning
+  // (the word a sheet reopens on), xid is the exchange's own name
+  const xid = `x${Date.now().toString(36)}-${(aiExchangeSerial += 1)}`;
   // the outbound delta: everything after the last assistant turn is new ink —
   // earlier turns were archived when they were first sent or received
   let newFrom = messages.length;
   while (newFrom > 0 && messages[newFrom - 1].role !== 'assistant') newFrom -= 1;
   for (const m of messages.slice(newFrom)) {
-    aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), ...ref });
+    aiLogAppend({ surface, role: m.role, content: m.content, model, ts: Date.now(), xid, ...ref });
   }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
@@ -9925,17 +9931,34 @@ async function aiConverse(system, messages, meta = {}) {
     .map((b) => b.text)
     .join('')
     .trim();
-  aiLogAppend({ surface, role: 'assistant', content: reply, model, ts: Date.now(), ...ref });
+  const kept = aiLogAppend({
+    surface,
+    role: 'assistant',
+    content: reply,
+    model,
+    ts: Date.now(),
+    xid,
+    ...ref,
+  });
   // 鏡 KAGAMI PR 一 — every minable exchange is read once for learning
   // observations, off the answer's critical path: the learner never waits
   // on the mirror, and a failed mining pass costs nothing but itself.
+  // Evidence must resolve (PR #86 review): if the archive could not keep
+  // this exchange, no observation may point at it — the honesty counter
+  // already recorded the loss.
   if (AI_MINABLE_SURFACES.has(surface)) {
     const learnerInk = messages
       .slice(newFrom)
+      .filter((m) => m.role === 'user')
       .map((m) => m.content)
       .join('\n');
-    queueMicrotask(() => {
-      aiMineObservations(surface, learnerInk, reply, meta.ref || surface).catch(() => {});
+    queueMicrotask(async () => {
+      try {
+        if ((await kept) !== true) return;
+        await aiMineObservations(surface, learnerInk, reply, xid);
+      } catch {
+        /* the mirror missed one glance — the record itself is untouched */
+      }
     });
   }
   return reply;
@@ -9956,15 +9979,21 @@ async function aiAsk(system, prompt, meta = {}) {
  *     the exchange as their evidence ref; they grade nothing and schedule
  *     nothing, and the model downstream weighs 'observed' below 'measured';
  *   - the mining exchange itself is archived whole under surface 'mine' —
- *     not a word of the record is lost, and 'mine' is never mined. */
-const AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor', 'reading', 'quiz']);
+ *     not a word of the record is lost, and 'mine' is never mined.
+ * Only surfaces where the learner actually WROTE are minable (PR #86
+ * review): chat and the word tutor carry learner-typed questions; the
+ * reading and quiz generation calls carry app-authored prompts and
+ * model-authored text, which must never be labeled learner evidence.
+ * Quiz ANSWERS are graded locally and will land through their own typed
+ * rows in a later movement, not through this miner. */
+const AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor']);
 const AI_MINE_MAX_ROWS = 4;
-async function aiMineObservations(fromSurface, learnerInk, reply, ref) {
+async function aiMineObservations(fromSurface, learnerInk, reply, xid) {
   if (!aiKey() || !learnerInk) return;
   const line = await aiAsk(
     'You read ONE exchange between a Japanese learner and a tutor and extract concrete observations about the LEARNER\'s Japanese. Output ONLY a JSON array (it may be []). Elements: {"kind":"sensei","subject":"<one Japanese word or a single kanji, dictionary form>","subjectType":"word"|"kanji","polarity":1|3,"code":"misread"|"sense-miss"|"particle-drop"|"prod-gap"|"collocation"|"form-miss"} or {"kind":"confuse","subject":"…","subjectType":"word"|"kanji","other":"…","otherType":"word"|"kanji"}. polarity 1 = the learner struggled, 3 = handled it well. Only observations with clear evidence in the exchange; an empty array is a fine answer. No commentary, no markdown.',
     `Learner wrote:\n${learnerInk.slice(0, 1200)}\n\nTutor replied:\n${reply.slice(0, 1200)}`,
-    { surface: 'mine', ref },
+    { surface: 'mine', ref: xid },
   );
   const open = line.indexOf('[');
   const close = line.lastIndexOf(']');
@@ -9992,7 +10021,7 @@ async function aiMineObservations(fromSurface, learnerInk, reply, ref) {
     const key = subjectKey(f.subject, f.subjectType);
     if (!key) continue;
     if (f.kind === 'sensei' && [1, 3].includes(f.polarity) && SENSEI_OBS_CODES.has(f.code)) {
-      rows.push([now, 'sensei', key, f.polarity, f.code, String(ref || fromSurface)]);
+      rows.push([now, 'sensei', key, f.polarity, f.code, xid]);
     } else if (f.kind === 'confuse') {
       const other = subjectKey(f.other, f.otherType);
       if (other && other !== key) rows.push([now, 'confuse', key, other]);

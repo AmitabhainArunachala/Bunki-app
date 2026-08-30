@@ -614,6 +614,12 @@ async function main() {
   const dropped = await broken.evaluate('window.__KAIRO_AI__.dropped()');
   check('with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
     dropped >= 1, `${dropped} turns honestly counted as dropped`);
+  const brokenMined = await broken.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return (s.obslog || []).filter((r) => r[1] === 'sensei' || r[1] === 'confuse').length;
+  })()`);
+  check('with the archive gone, no observation is written — a ref must resolve or not exist',
+    brokenMined === 0, `${brokenMined} rows`);
   await brokenContext.close();
 
   // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
@@ -674,9 +680,29 @@ async function main() {
     afterReload.sensei >= 1 && afterReload.confuse >= 1 && afterReload.alert === false,
     JSON.stringify(afterReload));
   const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check('mine is never mined, and the minable set is exactly the four laws name',
-    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor', 'reading', 'quiz'])"),
-    'AI_MINABLE_SURFACES pinned');
+  check('mine is never mined, and only learner-authored surfaces are minable',
+    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor'])"),
+    'AI_MINABLE_SURFACES pinned to chat + word-tutor');
+  // one exchange, one identity: refs are distinct per exchange and every
+  // one resolves to an archived exchange carrying that xid (PR #86 review)
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await page.waitForSelector('#chat-input', { timeout: 8000 });
+  await sendChat('もう一度、天気の言葉');
+  await waitRows(page, 'mine', 4);
+  const refCheck = await page.evaluate(`window.__KAIRO_AI__.logAll().then((rows) => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const refs = (s.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
+    const xids = new Set(rows.map((r) => r.xid).filter(Boolean));
+    return {
+      total: refs.length,
+      distinct: new Set(refs).size,
+      resolved: refs.filter((ref) => xids.has(ref)).length,
+    };
+  })`);
+  check('every observation names its exact exchange — distinct refs, each resolving in the archive',
+    refCheck.total >= 2 && refCheck.distinct >= 2 && refCheck.resolved === refCheck.total,
+    JSON.stringify(refCheck));
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in
