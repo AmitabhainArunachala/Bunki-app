@@ -147,7 +147,17 @@ function initScript(envelopeJson) {
       window.__AI_STUB.models.push(body.model);
       const system = String(body.system || '');
       let text = 'stub reply ' + window.__AI_STUB.calls;
-      if (system.includes('Output ONLY a JSON array')) {
+      if (system.includes('observations about the LEARNER')) {
+        // 鏡 the miner: two valid observations, one invalid code, one
+        // unconfirmable subject — the durability boundary must keep
+        // exactly the two the law admits
+        text = JSON.stringify([
+          { kind: 'sensei', subject: '天気', subjectType: 'word', polarity: 1, code: 'misread' },
+          { kind: 'sensei', subject: '天気', subjectType: 'word', polarity: 3, code: 'not-a-code' },
+          { kind: 'sensei', subject: 'ゾロメ語', subjectType: 'word', polarity: 1, code: 'sense-miss' },
+          { kind: 'confuse', subject: '学校', subjectType: 'word', other: '天気', otherType: 'word' },
+        ]);
+      } else if (system.includes('Output ONLY a JSON array')) {
         text = JSON.stringify([1, 2, 3, 4, 5].map((n) => ({
           q: '問' + n, opts: ['a', 'b', 'c', 'd'], right: 0, why: 'because ' + n,
         })));
@@ -605,6 +615,68 @@ async function main() {
   check('with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
     dropped >= 1, `${dropped} turns honestly counted as dropped`);
   await brokenContext.close();
+
+  // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
+  console.log('\n— 鏡: the sensei mines its own exchanges into the ledger');
+  await open('?entry=shelf');
+  await page.click('#ai-link');
+  await page.waitForSelector('#chat-input', { timeout: 8000 });
+  await sendChat('天気の言葉を教えて');
+  const mineRows = await waitRows(page, 'mine', 2);
+  check('the mining exchange itself is archived whole under surface mine',
+    exchangeShape(mineRows, 'mine', OVERRIDE_MODEL), `${mineRows.length} rows`);
+  await page.waitForFunction(
+    `(() => {
+      const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+      return (s.obslog || []).some((r) => r[1] === 'sensei');
+    })()`,
+    null,
+    { timeout: 8000 },
+  );
+  const mined = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const rows = s.obslog || [];
+    return {
+      sensei: rows.filter((r) => r[1] === 'sensei'),
+      confuse: rows.filter((r) => r[1] === 'confuse'),
+      ghost: rows.filter((r) => String(r[2]).includes('ゾロメ語') || String(r[3]).includes('ゾロメ語')),
+      badCode: rows.filter((r) => r[1] === 'sensei' && r[4] === 'not-a-code'),
+    };
+  })()`);
+  check('a mined observation lands typed: [t, sensei, key, polarity, code, ref]',
+    mined.sensei.length >= 1 &&
+      mined.sensei.every((r) => r.length === 6 && r[2] === 'word:天気' && r[3] === 1 && r[4] === 'misread' && typeof r[5] === 'string' && r[5].length > 0),
+    JSON.stringify(mined.sensei[0]));
+  check('a confusion edge lands typed: [t, confuse, key, otherKey]',
+    mined.confuse.length >= 1 &&
+      mined.confuse.every((r) => r.length === 4 && r[2] === 'word:学校' && r[3] === 'word:天気'),
+    JSON.stringify(mined.confuse[0]));
+  check('an unconfirmable subject and an unknown code write NOTHING — fail closed',
+    mined.ghost.length === 0 && mined.badCode.length === 0,
+    `ghost ${mined.ghost.length} · bad-code ${mined.badCode.length}`);
+  // the validator must accept what the miner wrote: a reload replays the
+  // envelope through validStoreEnvelope — quarantine would zero the rows
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  const afterReload = await page.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const rows = s.obslog || [];
+    return {
+      sensei: rows.filter((r) => r[1] === 'sensei').length,
+      confuse: rows.filter((r) => r[1] === 'confuse').length,
+      alert: (() => {
+        const node = document.getElementById('store-alert');
+        return !!(node && !node.hidden && node.textContent);
+      })(),
+    };
+  })()`);
+  check('the envelope validator accepts the mined kinds across a reload — no quarantine',
+    afterReload.sensei >= 1 && afterReload.confuse >= 1 && afterReload.alert === false,
+    JSON.stringify(afterReload));
+  const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
+  check('mine is never mined, and the minable set is exactly the four laws name',
+    minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor', 'reading', 'quiz'])"),
+    'AI_MINABLE_SURFACES pinned');
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in

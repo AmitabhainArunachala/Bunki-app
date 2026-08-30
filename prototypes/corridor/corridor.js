@@ -580,6 +580,17 @@ function plainRecord(value) {
 // grammar and particles joined the deck in 覚える stage 3 — the store's
 // fail-closed envelope must admit what the capture door now offers
 const STORE_ITEM_TYPES = new Set(['word', 'kanji', 'radical', 'idiom', 'grammar', 'particle']);
+// 鏡 KAGAMI taxonomy v1 — the pinned slugs a sensei-mined observation may
+// carry. A new code is a schema decision, never an ad-hoc string: the
+// validator refuses anything outside this set at the durability boundary.
+const SENSEI_OBS_CODES = new Set([
+  'misread', // read the wrong reading (歩幅 → あしはば)
+  'sense-miss', // knew the form, chose the wrong sense (によって)
+  'particle-drop', // particle lost in production (時空間〔を〕乗り越える)
+  'prod-gap', // produced wrong what is understood receptively (答えられません)
+  'collocation', // reached for the wrong partner word/kanji (図り知れない)
+  'form-miss', // a grammatical form failed (potential, passive, …)
+]);
 const owns = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const finiteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
 const nonEmptyString = (value) => typeof value === 'string' && value.length > 0;
@@ -730,6 +741,27 @@ function validObservationRow(row) {
     // [t, 'note', 'op', text]. Friction evidence riding the record; it
     // names no item, grades nothing, and schedules nothing.
     return row.length === 4 && row[2] === 'op' && nonEmptyString(row[3]);
+  }
+  if (row[1] === 'sensei') {
+    // 鏡 KAGAMI · an observation mined from one sensei exchange:
+    // [t, 'sensei', key, polarity, code, ref] — polarity 3 handled · 1
+    // struggled; code from SENSEI_OBS_CODES; ref points into the AI
+    // archive (the exact exchange is the evidence). Provenance-weighted
+    // downstream: 'observed' never outranks 'measured'. Evidence only —
+    // grades nothing, schedules nothing (operator amendment, 2026-08-24).
+    return row.length === 6 && [1, 3].includes(row[3]) && SENSEI_OBS_CODES.has(row[4]) && nonEmptyString(row[5]);
+  }
+  if (row[1] === 'confuse') {
+    // 鏡 KAGAMI · a confusion edge between two items the learner's own
+    // language collided (歩↔足): [t, 'confuse', key, otherKey]
+    return row.length === 4 && nonEmptyString(row[3]);
+  }
+  if (row[1] === 'mock') {
+    // 鏡 KAGAMI (reserved for movement 七) · one mock-diagnostic item:
+    // [t, 'mock', key, g, setId] — never a pass prediction, per the R4-D
+    // honesty constraint. Landing the validator early means older builds
+    // carry these rows fail-closed the day the surface exists.
+    return row.length === 5 && Number.isInteger(row[3]) && row[3] >= 0 && row[3] <= 4 && nonEmptyString(row[4]);
   }
   return false;
 }
@@ -9894,10 +9926,79 @@ async function aiConverse(system, messages, meta = {}) {
     .join('')
     .trim();
   aiLogAppend({ surface, role: 'assistant', content: reply, model, ts: Date.now(), ...ref });
+  // 鏡 KAGAMI PR 一 — every minable exchange is read once for learning
+  // observations, off the answer's critical path: the learner never waits
+  // on the mirror, and a failed mining pass costs nothing but itself.
+  if (AI_MINABLE_SURFACES.has(surface)) {
+    const learnerInk = messages
+      .slice(newFrom)
+      .map((m) => m.content)
+      .join('\n');
+    queueMicrotask(() => {
+      aiMineObservations(surface, learnerInk, reply, meta.ref || surface).catch(() => {});
+    });
+  }
   return reply;
 }
 async function aiAsk(system, prompt, meta = {}) {
   return aiConverse(system, [{ role: 'user', content: prompt }], meta);
+}
+
+/* -------------------------------------------------- 鏡 · the ledger's ear
+ * The sensei listens to its own conversations. After each exchange on a
+ * minable surface, one bounded structured call reads the exchange and
+ * extracts typed observations about the LEARNER's Japanese — misreads,
+ * sense misses, dropped particles, receptive/productive gaps, confusion
+ * pairs. Three honesties bound it (campaign law, 2026-08-25):
+ *   - fail closed on subjects: an observation about a word or kanji the
+ *     dictionary cannot confirm and the deck does not hold writes nothing;
+ *   - evidence, never authority: rows land in the append-only obslog with
+ *     the exchange as their evidence ref; they grade nothing and schedule
+ *     nothing, and the model downstream weighs 'observed' below 'measured';
+ *   - the mining exchange itself is archived whole under surface 'mine' —
+ *     not a word of the record is lost, and 'mine' is never mined. */
+const AI_MINABLE_SURFACES = new Set(['chat', 'word-tutor', 'reading', 'quiz']);
+const AI_MINE_MAX_ROWS = 4;
+async function aiMineObservations(fromSurface, learnerInk, reply, ref) {
+  if (!aiKey() || !learnerInk) return;
+  const line = await aiAsk(
+    'You read ONE exchange between a Japanese learner and a tutor and extract concrete observations about the LEARNER\'s Japanese. Output ONLY a JSON array (it may be []). Elements: {"kind":"sensei","subject":"<one Japanese word or a single kanji, dictionary form>","subjectType":"word"|"kanji","polarity":1|3,"code":"misread"|"sense-miss"|"particle-drop"|"prod-gap"|"collocation"|"form-miss"} or {"kind":"confuse","subject":"…","subjectType":"word"|"kanji","other":"…","otherType":"word"|"kanji"}. polarity 1 = the learner struggled, 3 = handled it well. Only observations with clear evidence in the exchange; an empty array is a fine answer. No commentary, no markdown.',
+    `Learner wrote:\n${learnerInk.slice(0, 1200)}\n\nTutor replied:\n${reply.slice(0, 1200)}`,
+    { surface: 'mine', ref },
+  );
+  const open = line.indexOf('[');
+  const close = line.lastIndexOf(']');
+  if (open < 0 || close <= open) return;
+  let found;
+  try {
+    found = JSON.parse(line.slice(open, close + 1));
+  } catch {
+    return;
+  }
+  if (!Array.isArray(found)) return;
+  const subjectKey = (raw, type) => {
+    const w = String(raw || '').trim();
+    const t = type === 'kanji' ? 'kanji' : 'word';
+    if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) return null;
+    if (t === 'kanji' && [...w].length !== 1) return null;
+    const inDeck = S.taken.some((item) => item.t === t && item.id === w);
+    const inDict = t === 'kanji' ? !!D.kanji?.[w] : !!lookup(w);
+    return inDeck || inDict ? srsKey(t, w) : null;
+  };
+  const now = Date.now();
+  const rows = [];
+  for (const f of found) {
+    if (rows.length >= AI_MINE_MAX_ROWS || !plainRecord(f)) continue;
+    const key = subjectKey(f.subject, f.subjectType);
+    if (!key) continue;
+    if (f.kind === 'sensei' && [1, 3].includes(f.polarity) && SENSEI_OBS_CODES.has(f.code)) {
+      rows.push([now, 'sensei', key, f.polarity, f.code, String(ref || fromSurface)]);
+    } else if (f.kind === 'confuse') {
+      const other = subjectKey(f.other, f.otherType);
+      if (other && other !== key) rows.push([now, 'confuse', key, other]);
+    }
+  }
+  if (rows.length) commitStorePatch({ obslog: [...(S.obslog || []), ...rows] });
 }
 
 /* ------------------------------------------------- 先生の札 (tutor cards)
