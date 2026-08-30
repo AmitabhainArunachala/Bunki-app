@@ -112,3 +112,11 @@ Four real-phone escalations landed and closed the same day, all on `main`:
 4. `verify-writing-room` grew to **51 checks**: manifest law (経→kanjivg,
    永→animcjk, 衷→nine), immersion coverage, glyph-whole-at-full-lattice,
    and the reduced-motion pending-gate conviction from #82's review.
+
+## 鏡 KAGAMI opened (2026-08-25)
+
+The learner-model campaign (`docs/prompts/BUNKI_KAGAMI_CAMPAIGN_2026-08-25.md`)
+is now the wayfinder for learning-system work; it absorbs PR 三 (the feed → its
+lens 六) and the R4-D mocks proposal (→ its lens 七, Stage 1 DIAGNOSTIC).
+TENOHIRA's real-use loop continues alongside. Live position:
+`docs/build-evidence/kagami/RUN_STATE.md`.

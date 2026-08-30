@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "verifier": "verify-corridor-accessibility.mjs",
-  "head": "65ca396b9e5ca2dcb4c6e3ca8f4cdfc540fa94ab",
-  "chromium": "/opt/pw-browsers/chromium",
+  "head": "028c7437c8934912ee6eb9606346a28b8d73af27",
+  "chromium": "playwright-default",
   "viewport": {
     "width": 390,
     "height": 844
@@ -61,7 +61,7 @@
     {
       "name": "screen-reader tree exposes named token and non-hold action buttons",
       "pass": true,
-      "detail": "550 named button(s) in the accessibility tree"
+      "detail": "551 named button(s) in the accessibility tree"
     },
     {
       "name": "pointer action one reveals reading and action two reveals English",
@@ -106,7 +106,7 @@
     {
       "name": "entry sheet is a named modal dialog and receives focus",
       "pass": true,
-      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":30}"
+      "detail": "{\"role\":\"dialog\",\"modal\":\"true\",\"name\":\"共和 full entry\",\"focusInside\":true,\"focusables\":26}"
     },
     {
       "name": "Tab is contained inside the modal sheet",
