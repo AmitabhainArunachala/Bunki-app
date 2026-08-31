@@ -200,7 +200,7 @@ const storeContext = vm.createContext({
   },
 });
 vm.runInContext(
-  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, FSRS_WEIGHT_BOUNDS };`,
+  `${persistenceBlock}\n;globalThis.__storeApi = { loadStore, saveStore, commitStorePatch, storeEnvelope, syncStoreAlert, safelySyncStoreAlert, validStoreEnvelope, setOwnRecordValue, srsParamsProblem, crossingId, FSRS_WEIGHT_BOUNDS };`,
   storeContext,
   { filename: 'corridor-persistence-block.js' },
 );
@@ -1728,6 +1728,17 @@ verified('live-sticky-grade-row-is-byte-preserved', () => {
   assert.match(live, /z-index:\s*3/);
   assert.match(live, /env\(safe-area-inset-bottom\)/);
   assert.match(live, /background:\s*var\(--ground-0/);
+});
+
+verified('crossing-names-separate-two-tabs-of-the-same-millisecond', () => {
+  // review round 9: a name from the clock alone collides between tabs that
+  // began together, and one tab's abort would then lift the freeze guarding
+  // the other tab's swap. Minted in a tight loop, every name is its own.
+  const names = new Set();
+  for (let i = 0; i < 500; i += 1) names.add(storeApi.crossingId());
+  assert.equal(names.size, 500);
+  assert.ok([...names].every((name) => /^x[0-9a-z]+-[0-9a-z]+$/.test(name)), 'a crossing name stays beacon-safe');
+  assert.ok([...names].every((name) => !name.endsWith('-aborted')), 'a name may never read as its own abort');
 });
 
 verified('stale-tab-storage-event-freezes-this-context', () => {

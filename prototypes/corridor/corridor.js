@@ -1284,6 +1284,27 @@ function saveStore() {
 // frozen tabs cannot import, so at most one crossing is live among
 // cooperating tabs at a time.
 const CROSSING_KEY = 'kairo-crossing-v1';
+/** A crossing's name must separate two tabs that began in the same
+ * millisecond (review round 9): a clock alone gives them the same name, and
+ * one tab's abort would then lift the freeze guarding the other's swap.
+ * Randomness where the platform offers it, the clock as the ordering half,
+ * Math.random where it does not — the name never needs to be a secret, only
+ * distinct. */
+function crossingId() {
+  let rand = '';
+  try {
+    const source = globalThis.crypto;
+    if (source?.randomUUID) rand = source.randomUUID().replace(/-/g, '').slice(0, 12);
+    else if (source?.getRandomValues) {
+      const bits = source.getRandomValues(new Uint32Array(2));
+      rand = [...bits].map((n) => n.toString(36)).join('');
+    }
+  } catch {
+    /* a locked-down crypto is not a reason to refuse the crossing */
+  }
+  if (!rand) rand = Math.random().toString(36).slice(2, 12);
+  return `x${Date.now().toString(36)}-${rand}`;
+}
 window.addEventListener('storage', (e) => {
   if (e.key === STORE_KEY) {
     // the record itself changed under this tab — permanent, reload only
@@ -5356,7 +5377,7 @@ function renderPortRow(main) {
       // foreign record write.
       storeSealed = true;
       try {
-        crossingMark = `x${Date.now().toString(36)}`;
+        crossingMark = crossingId();
         localStorage.setItem(CROSSING_KEY, crossingMark);
       } catch {
         /* a beacon that cannot write changes nothing this tab does */
@@ -10653,6 +10674,11 @@ async function aiLogAppend(row) {
       aiLogDropped += 1;
       return false;
     }
+    // the door may have closed while this append was opening the database
+    // (review round 9): an append that passed the guard and then awaited
+    // could still start its transaction inside a crossing, to be erased by
+    // the swap or carried into the wrong record by the rollback
+    if (storeSealed || staleTab) return false;
     return await new Promise((done) => {
       const t = db.transaction(AI_LOG_TURNS, 'readwrite');
       t.objectStore(AI_LOG_TURNS).add(row);

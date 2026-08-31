@@ -1134,6 +1134,13 @@ async function main() {
       minerSource.includes('so nothing was imported — nothing was changed') &&
       minerSource.includes('reload before importing') &&
       minerSource.includes('function aiArchiveReplace') &&
+      // round 9: the guard before the await cannot speak for the moment
+      // after it — an append that opened the database inside a crossing
+      // would be erased by the swap or carried off by the rollback
+      minerSource.includes(
+        'if (!db) {\n      aiLogDropped += 1;\n      return false;\n    }\n    // the door may have closed',
+      ) &&
+      minerSource.includes('function crossingId') &&
       sealAt > 0 &&
       sealAt < beaconAt &&
       beaconAt < snapshotAt &&
