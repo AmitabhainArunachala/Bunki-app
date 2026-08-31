@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-05",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 5",
+  "en": "N1 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "real-gokajo",
+    "attribution": "Historical primary source (public domain); framing text Bunki original",
+    "licence": "PD + Bunki原作の解説",
+    "url": "https://www.digital.archives.go.jp/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "保険会社は彼女の【損失】を補償するだろう。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はそん",
+      "そんしつ",
+      "しっちょう",
+      "しっきゃく"
+     ],
+     "right": 1,
+     "why": "【損失】は「そんしつ」。loss",
+     "subject": "word:損失",
+     "sid": 24310
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は批判家【連中】が、彼の過ちならなんでも叩こうと待ち受けていることを承認していた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ちゅうしょう",
+      "ちゅうだん",
+      "ちゅうどく",
+      "れんちゅう"
+     ],
+     "right": 3,
+     "why": "【連中】は「れんちゅう」。colleagues, company",
+     "subject": "word:連中",
+     "sid": 34351
+    },
+    {
+     "type": "kanji-reading",
+     "q": "田崎真珠は経営【陣】の刷新などの大規模な経営再建計画を進めているが、女子サッカー部もその一環として休部を決めたという。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いるい",
+      "じん",
+      "どくじ",
+      "ゆるむ"
+     ],
+     "right": 1,
+     "why": "【陣】は「じん」。battle formation, camp",
+     "subject": "word:陣",
+     "sid": 42205
+    },
+    {
+     "type": "kanji-reading",
+     "q": "景気循環とは好況時と【不況】時が交互に繰り返し起こることである。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ふきょう",
+      "ふふく",
+      "ふちょう",
+      "ふひょう"
+     ],
+     "right": 0,
+     "why": "【不況】は「ふきょう」。recession, depression",
+     "subject": "word:不況",
+     "sid": 32520
+    },
+    {
+     "type": "orthography",
+     "q": "雨が降ると必ず屋根から雨水が【もる】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "愚痴",
+      "漏る",
+      "過疎",
+      "利子"
+     ],
+     "right": 1,
+     "why": "「もる」は【漏る】。to leak, to run out",
+     "subject": "word:漏る",
+     "sid": 23659
+    },
+    {
+     "type": "orthography",
+     "q": "一酸化炭素とは炭素【かごう】物の不完全燃焼で発生する有害物質です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "根気",
+      "日夜",
+      "化合",
+      "保養"
+     ],
+     "right": 2,
+     "why": "「かごう」は【化合】。chemical combination",
+     "subject": "word:化合",
+     "sid": 32824
+    },
+    {
+     "type": "orthography",
+     "q": "弊社の会社案内を【どうふう】いたします。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "会見",
+      "同封",
+      "迅速",
+      "採用"
+     ],
+     "right": 1,
+     "why": "「どうふう」は【同封】。enclosure (e.g., in a letter)",
+     "subject": "word:同封",
+     "sid": 17996
+    },
+    {
+     "type": "context",
+     "q": "現在、アフリカでは、毎年54万人が（　　）で死亡している。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "結核",
+      "行き違い",
+      "特産",
+      "下調べ"
+     ],
+     "right": 0,
+     "why": "結核（けっかく）— tuberculosis",
+     "subject": "word:結核",
+     "sid": 36731
+    },
+    {
+     "type": "context",
+     "q": "だが、10月29日にニュージャージー州へ上陸したハリケーン「サンディ」への対応が、オバマ・ロムニー両者へのイメージを（　　）させた。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "一変",
+      "準急",
+      "正当",
+      "施行"
+     ],
+     "right": 0,
+     "why": "一変（いっぺん）— complete change",
+     "subject": "word:一変",
+     "sid": 42093
+    },
+    {
+     "type": "context",
+     "q": "（　　）と言うと、階段を上がったところにあった赤いオブジェ？\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "既婚",
+      "忠告",
+      "鳥居",
+      "配列"
+     ],
+     "right": 2,
+     "why": "鳥居（とりい）— Shinto shrine archway",
+     "subject": "word:鳥居",
+     "sid": 31531
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "慶応四年三月十四日、明治天皇は新しい国の基本方針として五箇条の御誓文を示した。一、広ク会議ヲ興シ万機公論ニ決スベシ。一、上下心ヲ一ニシテ盛ニ経綸ヲ行フベシ。一、官武一途庶民ニ至ル迄各其志ヲ遂ケ人心ヲシテ倦マザラシメン事ヲ要ス。一、旧来ノ陋習ヲ破リ天地ノ公道ニ基クベシ。一、智識ヲ世界ニ求メ大ニ皇基ヲ振起スベシ。この文書は、政治を公の議論によって進めること、身分を越えて人々が志を実現できるようにすること、古い慣習を改め、世界から知識を求めることを掲げた。",
+    "source": "一次資料 · Historical primary source",
+    "licence": "PD + Bunki原作の解説",
+    "attribution": "Historical primary source (public domain); framing text Bunki original",
+    "url": "https://www.digital.archives.go.jp/",
+    "articleId": "real-gokajo"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "となりの部屋の人",
+      "五箇条の御誓文",
+      "JRおおさか東線部分開業",
+      "映像の中で祈りはどう見えるか"
+     ],
+     "right": 1,
+     "why": "一次資料 · Historical primary source（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n慶応四年三月十四日、明治天皇は新しい国の基本方針として五箇条の御誓文を示した。一、広ク会議ヲ興シ万機公論ニ決スベシ。一、上下心ヲ一ニシテ盛ニ経綸ヲ行フベシ。一、官武一途庶民ニ至ル迄各其志ヲ遂ケ人心ヲシテ倦マザラシメン事ヲ要ス。一、旧来ノ陋習ヲ破リ天地ノ公道ニ基クベシ。一、智識ヲ世界ニ求メ大ニ皇基ヲ振起スベシ。この（　　）は、政治を公の議論によって進めること、身分を越えて人々が志を実現できるようにすること、古い慣習を改め、世界から知識を求めることを掲げた。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "合唱",
+      "文書",
+      "真相",
+      "飽和"
+     ],
+     "right": 1,
+     "why": "本文のとおり「文書（ぶんしょ）」。document, writing",
+     "subject": "word:文書"
+    }
+   ]
+  }
+ ]
+}

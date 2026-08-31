@@ -8,7 +8,8 @@
 | PR  | Movement                                  | State  |
 | --- | ----------------------------------------- | ------ |
 | 一  | 台帳 — ledger taxonomy + sensei-writes    | MERGED (`8504cea4`, #86) |
-| 一補 | 台帳の後始末 — review round 4 aftercare   | **IN BUILD** |
+| 一補 | 台帳の後始末 — review rounds 4–6 aftercare | **IN BUILD** |
+| 七  | 模試 — the mock room + 25 papers          | **IN BUILD** (with 一補) |
 | 二  | 鏡 — the model + mirror page              | queued |
 | 三  | 先生の目 — sensei-reads + placement       | queued |
 | 四  | 潮 — drift 自                             | queued |
@@ -28,6 +29,30 @@ by design; (3) the `aiEvidenceIncomplete` marker rides the envelope through
 import (storeExtras seam), so a declared evidence loss stays declared forever.
 Devin also holds 6 dashboard-only flags ("not posted by settings") — unreadable
 from here; the operator can paste them if they want them addressed.
+
+## 七 模試 — brought forward on the operator's word (2026-08-31)
+
+The campaign typed movement 七 as a Stage-1 diagnostic only, with authored item
+banks (¥1M–6M) left on the decision sheet. The operator's word replaced that:
+**five traditional papers per JLPT level**, plus a scaffold for custom sets
+(gap-filling, 中学歴史-style scenarios, a reading-list test, YouTube recall).
+So the banks were built rather than bought — `tools/build-mock-sets.mjs`
+generates 25 papers / 425 items deterministically from the repo's own
+rights-cleared assets (the graded word list, the 45k attested-sentence bank,
+the CC-licensed shelf), and every right answer is what the corpus actually
+says. No real JLPT item is reproduced; each set ships 検収前.
+
+Built and NOT built, on purpose: 漢字読み · 表記 · 文脈規定 · 文法形式の判断
+(form) · 読解 (主旨 + passage cloze) all ship. **Particle cloze was built and
+removed** — the corpus can prove a particle is unattested after a word, but
+unattested is not ungrammatical (「午後に」/「午後まで」 are both real), and an
+item with two defensible answers is a broken item. Particles wait for a real
+grammar-point bank. Listening waits on the voice decision (TENOHIRA PR 五).
+
+Still to come (模試 PR 二): the custom composer — sets drafted from the
+learner model's weak edges, a scenario prompt, the learner's own read
+articles, or a pasted transcript. It needs 鏡 (movement 二) to know the gaps,
+so the mirror comes first.
 
 ## Notes for the resuming session
 

@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n4-01",
+ "kind": "jlpt",
+ "level": "N4",
+ "title": {
+  "ja": "N4 模擬試験 1",
+  "en": "N4 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:6460",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%83%9E%E3%83%AA%E3%83%8A%E3%83%BC%E3%82%BA%E3%83%BB%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC%E9%81%B8%E6%89%8B_%E7%8F%BE%E5%BD%B9%E9%80%9A%E7%AE%972500%E5%AE%89%E6%89%93%E9%81%94%E6%88%90"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "この【規則】は現状に合わない。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "りよう",
+      "ぼうえき",
+      "どうぐ",
+      "きそく"
+     ],
+     "right": 3,
+     "why": "【規則】は「きそく」。rule, regulation",
+     "subject": "word:規則",
+     "sid": 12596
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【教育】は未来への投資である。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きょうかい",
+      "そだてる",
+      "きょういく",
+      "なくなる"
+     ],
+     "right": 2,
+     "why": "【教育】は「きょういく」。education",
+     "subject": "word:教育",
+     "sid": 15834
+    },
+    {
+     "type": "kanji-reading",
+     "q": "今日は【随分】と楽しそうだね。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "だいぶ",
+      "きぶん",
+      "じゅうぶん",
+      "ずいぶん"
+     ],
+     "right": 3,
+     "why": "【随分】は「ずいぶん」。extremely",
+     "subject": "word:随分",
+     "sid": 15803
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【約束】は守りなさい。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "よやく",
+      "やくそく",
+      "あんしん",
+      "いじょう"
+     ],
+     "right": 1,
+     "why": "【約束】は「やくそく」。arrangement, appointment",
+     "subject": "word:約束",
+     "sid": 2194
+    },
+    {
+     "type": "orthography",
+     "q": "徒歩５分【いない】に着くはずです。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "以内",
+      "通る",
+      "下着",
+      "直る"
+     ],
+     "right": 0,
+     "why": "「いない」は【以内】。within, less (no more) than",
+     "subject": "word:以内",
+     "sid": 16383
+    },
+    {
+     "type": "orthography",
+     "q": "【きぬ】は手触りが柔らかい。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "嘘",
+      "絹",
+      "席",
+      "音"
+     ],
+     "right": 1,
+     "why": "「きぬ」は【絹】。silk",
+     "subject": "word:絹",
+     "sid": 4885
+    },
+    {
+     "type": "orthography",
+     "q": "潮の干満は月と太陽の影響を【うける】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "増える",
+      "植える",
+      "受ける",
+      "調べる"
+     ],
+     "right": 2,
+     "why": "「うける」は【受ける】。to take (an examination, intervi",
+     "subject": "word:受ける",
+     "sid": 25499
+    },
+    {
+     "type": "context",
+     "q": "色っぽい（　　）。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "退院",
+      "程",
+      "女性",
+      "火"
+     ],
+     "right": 2,
+     "why": "女性（じょせい）— woman",
+     "subject": "word:女性",
+     "sid": 624
+    },
+    {
+     "type": "context",
+     "q": "（　　）な旅を。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "受付",
+      "故障",
+      "安全",
+      "乗り物"
+     ],
+     "right": 2,
+     "why": "安全（あんぜん）— safety, security",
+     "subject": "word:安全",
+     "sid": 1045
+    },
+    {
+     "type": "context",
+     "q": "幸運を（　　）よ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "思い出す",
+      "似る",
+      "祈る",
+      "続ける"
+     ],
+     "right": 2,
+     "why": "祈る（いのる）— to pray; to wish",
+     "subject": "word:祈る",
+     "sid": 1429
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "有り金全部（　　）てしまった。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "無くなれ",
+      "無くなる",
+      "無くなり",
+      "無くなっ"
+     ],
+     "right": 3,
+     "why": "辞書形は「無くなる」。この文では「無くなっ」。",
+     "subject": "word:無くなる",
+     "sid": 9631
+    },
+    {
+     "type": "form",
+     "q": "老人は今朝（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "亡くなる",
+      "亡くなっ",
+      "亡くなら",
+      "亡くなり"
+     ],
+     "right": 1,
+     "why": "辞書形は「亡くなる」。この文では「亡くなっ」。",
+     "subject": "word:亡くなる",
+     "sid": 4836
+    },
+    {
+     "type": "form",
+     "q": "２時間以内に（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "戻ろう",
+      "戻ら",
+      "戻り",
+      "戻っ"
+     ],
+     "right": 2,
+     "why": "辞書形は「戻る」。この文では「戻り」。",
+     "subject": "word:戻る",
+     "sid": 7653
+    },
+    {
+     "type": "form",
+     "q": "彼はそれを意図的に（　　）たらしい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "行おう",
+      "行い",
+      "行わ",
+      "行っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「行う」。この文では「行っ」。",
+     "subject": "word:行う",
+     "sid": 22907
+    },
+    {
+     "type": "form",
+     "q": "物価が（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "上がっ",
+      "上がれ",
+      "上がる",
+      "上がら"
+     ],
+     "right": 0,
+     "why": "辞書形は「上がる」。この文では「上がっ」。",
+     "subject": "word:上がる",
+     "sid": 1842
+    },
+    {
+     "type": "form",
+     "q": "行列が学校の側を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "通っ",
+      "通る",
+      "通れ",
+      "通ら"
+     ],
+     "right": 0,
+     "why": "辞書形は「通る」。この文では「通っ」。",
+     "subject": "word:通る",
+     "sid": 15084
+    },
+    {
+     "type": "form",
+     "q": "彼はもろくも誘惑に（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "負けよう",
+      "負ける",
+      "負け",
+      "負けれ"
+     ],
+     "right": 2,
+     "why": "辞書形は「負ける」。この文では「負け」。",
+     "subject": "word:負ける",
+     "sid": 16071
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "サンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー選手が6月7日（UTC-7、日本時間8日）、シアトルで開かれたミネソタツインズとの対戦で現役通算2,500安打を達成した。イチローがこの試合の6回の攻撃で、ツインズのウィリアム・エアー投手からの5球目を打ったセンター前ヒットが、2,500本目の安打となった。",
+    "source": "ウィキニュース",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%83%9E%E3%83%AA%E3%83%8A%E3%83%BC%E3%82%BA%E3%83%BB%E3%82%A4%E3%83%81%E3%83%AD%E3%83%BC%E9%81%B8%E6%89%8B_%E7%8F%BE%E5%BD%B9%E9%80%9A%E7%AE%972500%E5%AE%89%E6%89%93%E9%81%94%E6%88%90",
+    "articleId": "wikinews:6460"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "映像の中で祈りはどう見えるか",
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "引き出しの中の手紙",
+      "天・地・祈りをつなぐ「むすひ」"
+     ],
+     "right": 1,
+     "why": "ウィキニュース（2006-06-17）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\nサンケイスポーツによると、アメリカ大リーグシアトルマリナーズのイチロー選手が6月7日（UTC-7、日本時間8日）、シアトルで開かれたミネソタツインズとの対戦で現役通算2,500安打を（　　）した。イチローがこの試合の6回の攻撃で、ツインズのウィリアム・エアー投手からの5球目を打ったセンター前ヒットが、2,500本目の安打となった。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "嘆く",
+      "達成",
+      "有望",
+      "凶作"
+     ],
+     "right": 1,
+     "why": "本文のとおり「達成（たっせい）」。achievement",
+     "subject": "word:達成"
+    }
+   ]
+  }
+ ]
+}

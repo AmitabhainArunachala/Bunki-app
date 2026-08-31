@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n5-01",
+ "kind": "jlpt",
+ "level": "N5",
+ "title": {
+  "ja": "N5 模擬試験 1",
+  "en": "N5 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:000628",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "予約【番号】は１００３です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いちばん",
+      "こうばん",
+      "ばんごう",
+      "せびろ"
+     ],
+     "right": 2,
+     "why": "【番号】は「ばんごう」。number, series of digits",
+     "subject": "word:番号",
+     "sid": 5375
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼女は色が【黒い】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はやい",
+      "くろい",
+      "うすい",
+      "みじかい"
+     ],
+     "right": 1,
+     "why": "【黒い】は「くろい」。black; dark",
+     "subject": "word:黒い",
+     "sid": 3257
+    },
+    {
+     "type": "kanji-reading",
+     "q": "勘定書を【頼む】よ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "のむ",
+      "よむ",
+      "すむ",
+      "たのむ"
+     ],
+     "right": 3,
+     "why": "【頼む】は「たのむ」。to request, to ask (a favor)",
+     "subject": "word:頼む",
+     "sid": 2880
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【誰】か玄関に来てるよ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "だれ",
+      "てがみ",
+      "まど",
+      "おなか"
+     ],
+     "right": 0,
+     "why": "【誰】は「だれ」。who",
+     "subject": "word:誰",
+     "sid": 10375
+    },
+    {
+     "type": "orthography",
+     "q": "彼は公立【がっこう】で教育を受けた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "建物",
+      "作文",
+      "沢山",
+      "学校"
+     ],
+     "right": 3,
+     "why": "「がっこう」は【学校】。a school",
+     "subject": "word:学校",
+     "sid": 19283
+    },
+    {
+     "type": "orthography",
+     "q": "結婚は重大な【もんだい】だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "電車",
+      "問題",
+      "会社",
+      "今晩"
+     ],
+     "right": 1,
+     "why": "「もんだい」は【問題】。a problem",
+     "subject": "word:問題",
+     "sid": 6996
+    },
+    {
+     "type": "orthography",
+     "q": "星は【そら】高く輝く。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "空",
+      "青",
+      "塩",
+      "角"
+     ],
+     "right": 0,
+     "why": "「そら」は【空】。sky",
+     "subject": "word:空",
+     "sid": 3191
+    },
+    {
+     "type": "context",
+     "q": "電車は（　　）出たところだ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "一番",
+      "丁度",
+      "多分",
+      "余り"
+     ],
+     "right": 1,
+     "why": "丁度（ちょうど）— just, right",
+     "subject": "word:丁度",
+     "sid": 11357
+    },
+    {
+     "type": "context",
+     "q": "今朝は特に（　　）。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "寒い",
+      "暑い",
+      "遅い",
+      "狭い"
+     ],
+     "right": 0,
+     "why": "寒い（さむい）— cold (in reference to weather)",
+     "subject": "word:寒い",
+     "sid": 1683
+    },
+    {
+     "type": "context",
+     "q": "消極的な（　　）は嫌いだ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "男",
+      "休み",
+      "机",
+      "国"
+     ],
+     "right": 0,
+     "why": "男（おとこ）— man, male",
+     "subject": "word:男",
+     "sid": 10106
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "行間を（　　）べきなんだよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "読ん",
+      "読み",
+      "読ま",
+      "読む"
+     ],
+     "right": 3,
+     "why": "辞書形は「読む」。この文では「読む」。",
+     "subject": "word:読む",
+     "sid": 15083
+    },
+    {
+     "type": "form",
+     "q": "彼は独房に（　　）られた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "入れれ",
+      "入れる",
+      "入れ",
+      "入れよう"
+     ],
+     "right": 2,
+     "why": "辞書形は「入れる」。この文では「入れ」。",
+     "subject": "word:入れる",
+     "sid": 11127
+    },
+    {
+     "type": "form",
+     "q": "彼らは昼間だけ（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "働き",
+      "働い",
+      "働く",
+      "働け"
+     ],
+     "right": 0,
+     "why": "辞書形は「働く」。この文では「働き」。",
+     "subject": "word:働く",
+     "sid": 11532
+    },
+    {
+     "type": "form",
+     "q": "この本は（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "重かっ",
+      "重",
+      "重い",
+      "重く"
+     ],
+     "right": 2,
+     "why": "辞書形は「重い」。この文では「重い」。",
+     "subject": "word:重い",
+     "sid": 1185
+    },
+    {
+     "type": "form",
+     "q": "薄い砂糖水を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "作る",
+      "作れ",
+      "作ら",
+      "作っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「作る」。この文では「作っ」。",
+     "subject": "word:作る",
+     "sid": 7356
+    },
+    {
+     "type": "form",
+     "q": "（　　）必要がある。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "洗う",
+      "洗っ",
+      "洗おう",
+      "洗い"
+     ],
+     "right": 0,
+     "why": "辞書形は「洗う」。この文では「洗う」。",
+     "subject": "word:洗う",
+     "sid": 1529
+    },
+    {
+     "type": "form",
+     "q": "ここを（　　）ましょう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "渡れ",
+      "渡っ",
+      "渡ろう",
+      "渡り"
+     ],
+     "right": 3,
+     "why": "辞書形は「渡る」。この文では「渡り」。",
+     "subject": "word:渡る",
+     "sid": 2367
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに小さなお城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
+    "source": "青空文庫 · 新美南吉",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html",
+    "articleId": "aozora:000628"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "朝の市場",
+      "「中今」を感じる一日",
+      "ごん狐",
+      "訳せない言葉について"
+     ],
+     "right": 2,
+     "why": "青空文庫 · 新美南吉（「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに（　　）お城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "忘れる",
+      "小さな",
+      "自動車",
+      "疲れる"
+     ],
+     "right": 1,
+     "why": "本文のとおり「小さな（ちいさな）」。small, little",
+     "subject": "word:小さな"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-04",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 4",
+  "en": "N1 mock paper 4"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "bunki-essay-n1-ai",
+    "attribution": "Bunki original text",
+    "licence": "Bunki original",
+    "url": ""
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "旅は情報【収集】が重要。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "みっしゅう",
+      "しゅうしゅう",
+      "おさまる",
+      "とくしゅう"
+     ],
+     "right": 1,
+     "why": "【収集】は「しゅうしゅう」。gathering up, collection",
+     "subject": "word:収集",
+     "sid": 7275
+    },
+    {
+     "type": "kanji-reading",
+     "q": "中流階級の中には貧困階級に【転落】した人がいます。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "てんらく",
+      "おちこむ",
+      "ぼつらく",
+      "おちば"
+     ],
+     "right": 0,
+     "why": "【転落】は「てんらく」。fall, degradation",
+     "subject": "word:転落",
+     "sid": 31733
+    },
+    {
+     "type": "kanji-reading",
+     "q": "山本容疑者は事件のあと所属事務所の吉本興業を解雇され、一切の芸能活動を中止し、【極楽】とんぼも解散している。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ごくらく",
+      "らっかん",
+      "きゅうきょく",
+      "りょうきょく"
+     ],
+     "right": 0,
+     "why": "【極楽】は「ごくらく」。paradise",
+     "subject": "word:極楽",
+     "sid": 41471
+    },
+    {
+     "type": "kanji-reading",
+     "q": "イチゴは【加工】されてジャムになります。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "こうさく",
+      "かこう",
+      "ちゃっこう",
+      "さいく"
+     ],
+     "right": 1,
+     "why": "【加工】は「かこう」。manufacturing, processing",
+     "subject": "word:加工",
+     "sid": 24260
+    },
+    {
+     "type": "orthography",
+     "q": "これに対しローカライズ作業者達は、ニュースグループや不具合【ついせき】サイトで、作業計画の不備と情報提供の不足に不満を表明している。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "類推",
+      "要請",
+      "民族",
+      "追跡"
+     ],
+     "right": 3,
+     "why": "「ついせき」は【追跡】。pursuit",
+     "subject": "word:追跡",
+     "sid": 41844
+    },
+    {
+     "type": "orthography",
+     "q": "概してエリート達は批判に対して【どんかん】である。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "一連",
+      "許容",
+      "伝来",
+      "鈍感"
+     ],
+     "right": 3,
+     "why": "「どんかん」は【鈍感】。thickheadedness, stolidity",
+     "subject": "word:鈍感",
+     "sid": 26785
+    },
+    {
+     "type": "orthography",
+     "q": "近頃は地震が【ひんぱん】で不気味だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "頻繁",
+      "発育",
+      "会見",
+      "政権"
+     ],
+     "right": 0,
+     "why": "「ひんぱん」は【頻繁】。frequency",
+     "subject": "word:頻繁",
+     "sid": 19531
+    },
+    {
+     "type": "context",
+     "q": "（　　）をお持ちになりましたか。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "青春",
+      "雨具",
+      "指図",
+      "不評"
+     ],
+     "right": 1,
+     "why": "雨具（あまぐ）— rain gear",
+     "subject": "word:雨具",
+     "sid": 19353
+    },
+    {
+     "type": "context",
+     "q": "彼の（　　）は、機密情報は一切漏らしていないと明言した。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "内蔵",
+      "決算",
+      "秘書",
+      "入手"
+     ],
+     "right": 2,
+     "why": "秘書（ひしょ）— (private) secretary",
+     "subject": "word:秘書",
+     "sid": 32311
+    },
+    {
+     "type": "context",
+     "q": "デンマークの新聞がムハンマドを風刺する漫画を掲載したことに対する、イスラム諸国の反発に対応した（　　）という。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "小柄",
+      "年長",
+      "措置",
+      "庶民"
+     ],
+     "right": 2,
+     "why": "措置（そち）— measure, step",
+     "subject": "word:措置",
+     "sid": 40210
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+    "source": "随筆 · Bunki",
+    "licence": "Bunki original",
+    "attribution": "Bunki original text",
+    "url": "",
+    "articleId": "bunki-essay-n1-ai"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "AiScReam、ルビィちゃん卒業と新メンバー2人加入",
+      "川沿いの道",
+      "都市の匿名性と言語",
+      "AI時代の知識と判断"
+     ],
+     "right": 3,
+     "why": "随筆 · Bunki（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは（　　）な問いも生まれにくい。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "精密",
+      "了解",
+      "動員",
+      "質疑"
+     ],
+     "right": 0,
+     "why": "本文のとおり「精密（せいみつ）」。precise, exact",
+     "subject": "word:精密"
+    }
+   ]
+  }
+ ]
+}

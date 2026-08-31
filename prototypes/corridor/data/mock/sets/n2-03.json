@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-03",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 3",
+  "en": "N2 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "bunki-graded-n3-town",
+    "attribution": "Bunki original text",
+    "licence": "Bunki original",
+    "url": ""
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "その【直線】は直角に交わっている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "なかなおり",
+      "だっせん",
+      "ちょくせん",
+      "せんろ"
+     ],
+     "right": 2,
+     "why": "【直線】は「ちょくせん」。straight line",
+     "subject": "word:直線",
+     "sid": 17229
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【鉄橋】が川にかけられた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "してつ",
+      "てっきょう",
+      "てっぽう",
+      "れっとう"
+     ],
+     "right": 1,
+     "why": "【鉄橋】は「てっきょう」。iron bridge",
+     "subject": "word:鉄橋",
+     "sid": 10473
+    },
+    {
+     "type": "kanji-reading",
+     "q": "宇宙には【無数】の天体がある。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かいすう",
+      "ふくすう",
+      "むすう",
+      "むげん"
+     ],
+     "right": 2,
+     "why": "【無数】は「むすう」。countless number, infinite numbe",
+     "subject": "word:無数",
+     "sid": 15980
+    },
+    {
+     "type": "kanji-reading",
+     "q": "その液から溶剤を揮発させる。残るのは、香り成分と植物ワックスの【塊】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しゃれ",
+      "ひょうろん",
+      "えんげき",
+      "かたまり"
+     ],
+     "right": 3,
+     "why": "【塊】は「かたまり」。lump, mass",
+     "subject": "word:塊",
+     "sid": 33398
+    },
+    {
+     "type": "orthography",
+     "q": "【けつあつ】は健康のバロメーターとして重要である。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "血圧",
+      "全般",
+      "実感",
+      "半島"
+     ],
+     "right": 0,
+     "why": "「けつあつ」は【血圧】。blood pressure",
+     "subject": "word:血圧",
+     "sid": 26734
+    },
+    {
+     "type": "orthography",
+     "q": "任期満了前に議会を【かいさん】する唯一の方法は、連邦首相が連邦議会の信任を失うことである。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "解散",
+      "三角",
+      "改造",
+      "国立"
+     ],
+     "right": 0,
+     "why": "「かいさん」は【解散】。breakup, dissolution",
+     "subject": "word:解散",
+     "sid": 39181
+    },
+    {
+     "type": "orthography",
+     "q": "水分は温められると【じょうはつ】する。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "発売",
+      "順序",
+      "蒸発",
+      "勝敗"
+     ],
+     "right": 2,
+     "why": "「じょうはつ」は【蒸発】。evaporation; unexplained disappe",
+     "subject": "word:蒸発",
+     "sid": 13353
+    },
+    {
+     "type": "context",
+     "q": "喫煙による（　　）的な影響の方が分かり易いと思う人もいる。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "能率",
+      "客席",
+      "診断",
+      "短期"
+     ],
+     "right": 3,
+     "why": "短期（たんき）— short term",
+     "subject": "word:短期",
+     "sid": 32351
+    },
+    {
+     "type": "context",
+     "q": "まさかリアルに借金の（　　）だったの？\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "相互",
+      "神話",
+      "初級",
+      "催促"
+     ],
+     "right": 3,
+     "why": "催促（さいそく）— demand, urge (action)",
+     "subject": "word:催促",
+     "sid": 21202
+    },
+    {
+     "type": "context",
+     "q": "（　　）的に予測した歳入見込み額ならお知らせできます。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "統計",
+      "通用",
+      "輸血",
+      "算数"
+     ],
+     "right": 0,
+     "why": "統計（とうけい）— statistics",
+     "subject": "word:統計",
+     "sid": 30663
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
+    "source": "段階別読み物 · Bunki",
+    "licence": "Bunki original",
+    "attribution": "Bunki original text",
+    "url": "",
+    "articleId": "bunki-graded-n3-town"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "遺族基礎年金",
+      "知らない町を歩く",
+      "徒然草 · 序段",
+      "AI時代の知識と判断"
+     ],
+     "right": 1,
+     "why": "段階別読み物 · Bunki（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に（　　）こともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "選考",
+      "迷う",
+      "沿う",
+      "振興"
+     ],
+     "right": 1,
+     "why": "本文のとおり「迷う（まよう）」。to be puzzled, to be perplexed",
+     "subject": "word:迷う"
+    }
+   ]
+  }
+ ]
+}

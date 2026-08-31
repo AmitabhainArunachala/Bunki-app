@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n4-04",
+ "kind": "jlpt",
+ "level": "N4",
+ "title": {
+  "ja": "N4 模擬試験 4",
+  "en": "N4 mock paper 4"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:046605",
+    "attribution": "青空文庫 宮沢賢治「やまなし」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/000081/card46605.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "君は英語の【復習】をしようとしましたか。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ふくしゅう",
+      "たおれる",
+      "しゅうかん",
+      "よしゅう"
+     ],
+     "right": 0,
+     "why": "【復習】は「ふくしゅう」。review (of lessons), revision",
+     "subject": "word:復習",
+     "sid": 27488
+    },
+    {
+     "type": "kanji-reading",
+     "q": "子供は【親】の癖をまねる。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きまる",
+      "しんせつ",
+      "わらう",
+      "おや"
+     ],
+     "right": 3,
+     "why": "【親】は「おや」。a parent",
+     "subject": "word:親",
+     "sid": 10912
+    },
+    {
+     "type": "kanji-reading",
+     "q": "読書は精神を【育てる】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "そだてる",
+      "がんばる",
+      "もどる",
+      "いきる"
+     ],
+     "right": 0,
+     "why": "【育てる】は「そだてる」。to raise (v.t.); to bring up",
+     "subject": "word:育てる",
+     "sid": 4401
+    },
+    {
+     "type": "kanji-reading",
+     "q": "犬は棒の【匂い】を嗅いでいた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "にがい",
+      "におい",
+      "ねむい",
+      "ただしい"
+     ],
+     "right": 1,
+     "why": "【匂い】は「におい」。odor, smell",
+     "subject": "word:匂い",
+     "sid": 22196
+    },
+    {
+     "type": "orthography",
+     "q": "脱水症状を【おこす】のではないかと心配です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "受ける",
+      "止める",
+      "起こす",
+      "下りる"
+     ],
+     "right": 2,
+     "why": "「おこす」は【起こす】。to wake (someone) up",
+     "subject": "word:起こす",
+     "sid": 27929
+    },
+    {
+     "type": "orthography",
+     "q": "床が【ゆれる】のを感じた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "考える",
+      "真面目",
+      "揺れる",
+      "足りる"
+     ],
+     "right": 2,
+     "why": "「ゆれる」は【揺れる】。to shake, to sway",
+     "subject": "word:揺れる",
+     "sid": 10530
+    },
+    {
+     "type": "orthography",
+     "q": "日本は１９９１年、【せかい】最大の政府援助供与国だった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "致す",
+      "包む",
+      "場所",
+      "世界"
+     ],
+     "right": 3,
+     "why": "「せかい」は【世界】。world",
+     "subject": "word:世界",
+     "sid": 30704
+    },
+    {
+     "type": "context",
+     "q": "そのことは（　　）な筋から聞いた。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "確か",
+      "特別",
+      "丁寧",
+      "盛ん"
+     ],
+     "right": 0,
+     "why": "確か（たしか）— if I remember correctly; certain",
+     "subject": "word:確か",
+     "sid": 20146
+    },
+    {
+     "type": "context",
+     "q": "（　　）必要はありません。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "止む",
+      "包む",
+      "飾る",
+      "引っ越す"
+     ],
+     "right": 1,
+     "why": "包む（つつむ）— to wrap, to cover",
+     "subject": "word:包む",
+     "sid": 8122
+    },
+    {
+     "type": "context",
+     "q": "（　　）の方が女性より肌が脂っぽいって本当ですか？\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "医学",
+      "絹",
+      "意見",
+      "男性"
+     ],
+     "right": 3,
+     "why": "男性（だんせい）— man; male",
+     "subject": "word:男性",
+     "sid": 30512
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "コンサートに（　　）でしょうか。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "間に合っ",
+      "間に合う",
+      "間に合わ",
+      "間に合い"
+     ],
+     "right": 1,
+     "why": "辞書形は「間に合う」。この文では「間に合う」。",
+     "subject": "word:間に合う",
+     "sid": 5683
+    },
+    {
+     "type": "form",
+     "q": "彼の帰りは遅いと（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "思え",
+      "思う",
+      "思わ",
+      "思い"
+     ],
+     "right": 1,
+     "why": "辞書形は「思う」。この文では「思う」。",
+     "subject": "word:思う",
+     "sid": 10403
+    },
+    {
+     "type": "form",
+     "q": "人の陰口を叩くのは（　　）ない。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "正しい",
+      "正しかっ",
+      "正しく",
+      "正しけれ"
+     ],
+     "right": 2,
+     "why": "辞書形は「正しい」。この文では「正しく」。",
+     "subject": "word:正しい",
+     "sid": 20272
+    },
+    {
+     "type": "form",
+     "q": "小さいことを大げさに（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "騒が",
+      "騒ぐ",
+      "騒い",
+      "騒ぎ"
+     ],
+     "right": 1,
+     "why": "辞書形は「騒ぐ」。この文では「騒ぐ」。",
+     "subject": "word:騒ぐ",
+     "sid": 9203
+    },
+    {
+     "type": "form",
+     "q": "ベッドを（　　）てください。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "直せ",
+      "直す",
+      "直し",
+      "直さ"
+     ],
+     "right": 2,
+     "why": "辞書形は「直す」。この文では「直し」。",
+     "subject": "word:直す",
+     "sid": 5214
+    },
+    {
+     "type": "form",
+     "q": "彼はバットでボールを（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "打た",
+      "打ち",
+      "打つ",
+      "打っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「打つ」。この文では「打っ」。",
+     "subject": "word:打つ",
+     "sid": 16871
+    },
+    {
+     "type": "form",
+     "q": "３０分間走り（　　）なさい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "続ける",
+      "続けれ",
+      "続けろ",
+      "続け"
+     ],
+     "right": 3,
+     "why": "辞書形は「続ける」。この文では「続け」。",
+     "subject": "word:続ける",
+     "sid": 5246
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "小さな谷川の底を写した二枚の青い幻燈です。一、五月二疋の蟹の子供らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
+    "source": "青空文庫 · 宮沢賢治",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 宮沢賢治「やまなし」",
+    "url": "https://www.aozora.gr.jp/cards/000081/card46605.html",
+    "articleId": "aozora:046605"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "一週間、感謝の言葉を唱えてみた",
+      "やまなし",
+      "徒然草 · 序段",
+      "奇跡の体験談と認識の責任"
+     ],
+     "right": 1,
+     "why": "青空文庫 · 宮沢賢治（「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n小さな谷川の底を（　　）た二枚の青い幻燈です。一、五月二疋の蟹の子供らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "式場",
+      "写し",
+      "加工",
+      "主権"
+     ],
+     "right": 1,
+     "why": "本文のとおり「写し（うつし）」。copy, duplicate",
+     "subject": "word:写し"
+    }
+   ]
+  }
+ ]
+}

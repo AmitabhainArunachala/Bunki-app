@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n3-04",
+ "kind": "jlpt",
+ "level": "N3",
+ "title": {
+  "ja": "N3 模擬試験 4",
+  "en": "N3 mock paper 4"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:051034",
+    "attribution": "青空文庫 小川未明「野ばら」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/001475/card51034.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "パトリシアがそのトーナメントを【組む】でしょう。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かこむ",
+      "つむ",
+      "くむ",
+      "たたむ"
+     ],
+     "right": 2,
+     "why": "【組む】は「くむ」。to put together",
+     "subject": "word:組む",
+     "sid": 14351
+    },
+    {
+     "type": "kanji-reading",
+     "q": "今日は【主に】ホームレスの問題をとりあげます。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "おもに",
+      "おおいに",
+      "しゅふ",
+      "すでに"
+     ],
+     "right": 0,
+     "why": "【主に】は「おもに」。mainly, primarily",
+     "subject": "word:主に",
+     "sid": 22066
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【機械】は多くの人手を省く。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きのう",
+      "ゆうき",
+      "きげん",
+      "きかい"
+     ],
+     "right": 3,
+     "why": "【機械】は「きかい」。machine, machinery",
+     "subject": "word:機械",
+     "sid": 11555
+    },
+    {
+     "type": "kanji-reading",
+     "q": "悪い【癖】はなかなかとれない。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "くせ",
+      "かがく",
+      "きふ",
+      "そで"
+     ],
+     "right": 0,
+     "why": "【癖】は「くせ」。a habit (often a bad habit), pec",
+     "subject": "word:癖",
+     "sid": 9235
+    },
+    {
+     "type": "orthography",
+     "q": "卵がかえる前にひよこの数を【かぞえる】な。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "横切る",
+      "思い出",
+      "悲しむ",
+      "数える"
+     ],
+     "right": 3,
+     "why": "「かぞえる」は【数える】。to count",
+     "subject": "word:数える",
+     "sid": 25789
+    },
+    {
+     "type": "orthography",
+     "q": "赤丸で【かこむ】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "敬意",
+      "囲む",
+      "女史",
+      "現場"
+     ],
+     "right": 1,
+     "why": "「かこむ」は【囲む】。to surround, to encircle",
+     "subject": "word:囲む",
+     "sid": 424
+    },
+    {
+     "type": "orthography",
+     "q": "軍隊の規律は【もじ】通り厳しいものだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "行き",
+      "得る",
+      "貸し",
+      "文字"
+     ],
+     "right": 3,
+     "why": "「もじ」は【文字】。letter (of alphabet), character",
+     "subject": "word:文字",
+     "sid": 21295
+    },
+    {
+     "type": "context",
+     "q": "テルミン：一九二〇年、ロシアの（　　）学者レフ・セルゲイヴィッチ・テルミンが作った世界初の電子楽器。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "裁判",
+      "性質",
+      "物理",
+      "蚊"
+     ],
+     "right": 2,
+     "why": "物理（ぶつり）— physics",
+     "subject": "word:物理",
+     "sid": 33910
+    },
+    {
+     "type": "context",
+     "q": "私のアノラックは（　　）なものでしたが大いに役に立ちました。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "急速",
+      "無事",
+      "自然",
+      "粗末"
+     ],
+     "right": 3,
+     "why": "粗末（そまつ）— humble, miserable",
+     "subject": "word:粗末",
+     "sid": 32054
+    },
+    {
+     "type": "context",
+     "q": "君は彼目当てにして（　　）。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "良い",
+      "臭い",
+      "賢い",
+      "貧しい"
+     ],
+     "right": 0,
+     "why": "良い（よい）— good, nice",
+     "subject": "word:良い",
+     "sid": 14717
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "彼は祖国を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "裏切る",
+      "裏切り",
+      "裏切ら",
+      "裏切っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「裏切る」。この文では「裏切っ」。",
+     "subject": "word:裏切る",
+     "sid": 7199
+    },
+    {
+     "type": "form",
+     "q": "彼女は（　　）ながら、ナイフを振り回しました。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "叫び",
+      "叫ん",
+      "叫ば",
+      "叫ぶ"
+     ],
+     "right": 0,
+     "why": "辞書形は「叫ぶ」。この文では「叫び」。",
+     "subject": "word:叫ぶ",
+     "sid": 24748
+    },
+    {
+     "type": "form",
+     "q": "絶望した彼は自殺を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "図ろう",
+      "図っ",
+      "図り",
+      "図ら"
+     ],
+     "right": 1,
+     "why": "辞書形は「図る」。この文では「図っ」。",
+     "subject": "word:図る",
+     "sid": 19240
+    },
+    {
+     "type": "form",
+     "q": "テーブルを（　　）ば争いはやむ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "広げれ",
+      "広げる",
+      "広げ",
+      "広げよう"
+     ],
+     "right": 0,
+     "why": "辞書形は「広げる」。この文では「広げれ」。",
+     "subject": "word:広げる",
+     "sid": 13693
+    },
+    {
+     "type": "form",
+     "q": "彼に助けを（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "求める",
+      "求めよ",
+      "求め",
+      "求めよう"
+     ],
+     "right": 3,
+     "why": "辞書形は「求める」。この文では「求めよう」。",
+     "subject": "word:求める",
+     "sid": 4495
+    },
+    {
+     "type": "form",
+     "q": "靴の紐を（　　）なさい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "結ん",
+      "結び",
+      "結ぶ",
+      "結ば"
+     ],
+     "right": 1,
+     "why": "辞書形は「結ぶ」。この文では「結び」。",
+     "subject": "word:結ぶ",
+     "sid": 6939
+    },
+    {
+     "type": "form",
+     "q": "最終的な判断は主権者たる国民に（　　）たい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "任せ",
+      "任せろ",
+      "任せよう",
+      "任せる"
+     ],
+     "right": 0,
+     "why": "辞書形は「任せる」。この文では「任せ」。",
+     "subject": "word:任せる",
+     "sid": 35635
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ一人ずつの兵隊が派遣されて、国境を定めた石碑を守っていました。大きな国の兵士は老人でありました。そうして、小さな国の兵士は青年でありました。",
+    "source": "青空文庫 · 小川未明",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 小川未明「野ばら」",
+    "url": "https://www.aozora.gr.jp/cards/001475/card51034.html",
+    "articleId": "aozora:051034"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "『古事記』編纂と権力の物語",
+      "野ばら",
+      "原初神を「最高神」と呼ぶときの問題",
+      "引き出しの中の手紙"
+     ],
+     "right": 1,
+     "why": "青空文庫 · 小川未明（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n大きな国と、それよりはすこし小さな国とが隣り合っていました。当座、その二つの国の間には、なにごとも起こらず平和でありました。ここは都から遠い、国境であります。そこには両方の国から、ただ一人ずつの兵隊が（　　）されて、国境を定めた石碑を守っていました。大きな国の兵士は老人でありました。そうして、小さな国の兵士は青年でありました。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "派遣",
+      "好調",
+      "麻痺",
+      "斡旋"
+     ],
+     "right": 0,
+     "why": "本文のとおり「派遣（はけん）」。dispatch, send",
+     "subject": "word:派遣"
+    }
+   ]
+  }
+ ]
+}

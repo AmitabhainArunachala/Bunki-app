@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-01",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 1",
+  "en": "N1 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:12024",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/JR%E3%81%8A%E3%81%8A%E3%81%95%E3%81%8B%E6%9D%B1%E7%B7%9A%E9%83%A8%E5%88%86%E9%96%8B%E6%A5%AD"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "ジョンケネディが【暗殺】された時、リンデルジョンソンが大統領の任期を引き継いだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あんじ",
+      "あんさつ",
+      "さつじん",
+      "むだづかい"
+     ],
+     "right": 1,
+     "why": "【暗殺】は「あんさつ」。assassination",
+     "subject": "word:暗殺",
+     "sid": 32214
+    },
+    {
+     "type": "kanji-reading",
+     "q": "他人任せはダメ。ライフセーバーではないが、俺自身が【介抱】してあげないと。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しんぼう",
+      "かいほう",
+      "かいご",
+      "だっこ"
+     ],
+     "right": 1,
+     "why": "【介抱】は「かいほう」。nursing, looking after",
+     "subject": "word:介抱",
+     "sid": 33435
+    },
+    {
+     "type": "kanji-reading",
+     "q": "また、午前10時までに、フロリダ半島の先端に【連なる】フロリダキーズ諸島に、ハリケーン注意報が発令された。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ひきずる",
+      "つらなる",
+      "おさまる",
+      "ひきいる"
+     ],
+     "right": 1,
+     "why": "【連なる】は「つらなる」。to extend, to stretch out",
+     "subject": "word:連なる",
+     "sid": 39629
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼の返報は鼻への【強烈】なパンチだった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しいる",
+      "もうれつ",
+      "きょうれつ",
+      "きょうせい"
+     ],
+     "right": 2,
+     "why": "【強烈】は「きょうれつ」。strong, intense",
+     "subject": "word:強烈",
+     "sid": 27549
+    },
+    {
+     "type": "orthography",
+     "q": "【みのがす】ことはありませんよ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "見逃す",
+      "手遅れ",
+      "着飾る",
+      "小切手"
+     ],
+     "right": 0,
+     "why": "「みのがす」は【見逃す】。to miss, to overlook",
+     "subject": "word:見逃す",
+     "sid": 12407
+    },
+    {
+     "type": "orthography",
+     "q": "このタッチは彼女【どくじ】のものだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "悩み",
+      "独自",
+      "審議",
+      "励む"
+     ],
+     "right": 1,
+     "why": "「どくじ」は【独自】。original, peculiar",
+     "subject": "word:独自",
+     "sid": 17673
+    },
+    {
+     "type": "orthography",
+     "q": "テレビ宮崎によると、東国原英夫宮崎県知事の【ぼこう】、都城泉ヶ丘高校も21世紀枠で、出場が決まった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "浜辺",
+      "母校",
+      "自主",
+      "歩み"
+     ],
+     "right": 1,
+     "why": "「ぼこう」は【母校】。alma mater",
+     "subject": "word:母校",
+     "sid": 40393
+    },
+    {
+     "type": "context",
+     "q": "後ろを（　　）な。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "振り返る",
+      "犯す",
+      "授ける",
+      "懲りる"
+     ],
+     "right": 0,
+     "why": "振り返る（ふりかえる）— to turn head, to turn around",
+     "subject": "word:振り返る",
+     "sid": 1985
+    },
+    {
+     "type": "context",
+     "q": "（　　）が彼をとがめた。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "良心",
+      "極端",
+      "内蔵",
+      "つかの間"
+     ],
+     "right": 0,
+     "why": "良心（りょうしん）— conscience",
+     "subject": "word:良心",
+     "sid": 7279
+    },
+    {
+     "type": "context",
+     "q": "私の会社では６０歳が（　　）である。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "定年",
+      "捕獲",
+      "中継",
+      "投資"
+     ],
+     "right": 0,
+     "why": "定年（ていねん）— retirement age",
+     "subject": "word:定年",
+     "sid": 25231
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "この交渉を（　　）たい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "打ち切る",
+      "打ち切ら",
+      "打ち切り",
+      "打ち切っ"
+     ],
+     "right": 2,
+     "why": "辞書形は「打ち切る」。この文では「打ち切り」。",
+     "subject": "word:打ち切る",
+     "sid": 5323
+    },
+    {
+     "type": "form",
+     "q": "ペリーはエメット理論がニュートン物理学とは無関係に構築されたと考えているが、それは（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "誤る",
+      "誤り",
+      "誤れ",
+      "誤っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「誤る」。この文では「誤っ」。",
+     "subject": "word:誤る",
+     "sid": 34553
+    },
+    {
+     "type": "form",
+     "q": "鞭を（　　）と子供は駄目になる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "惜しん",
+      "惜しま",
+      "惜しむ",
+      "惜しみ"
+     ],
+     "right": 2,
+     "why": "辞書形は「惜しむ」。この文では「惜しむ」。",
+     "subject": "word:惜しむ",
+     "sid": 20515
+    },
+    {
+     "type": "form",
+     "q": "病院で不愉快な思いをしている分を（　　）と思って、トムは自分の適量より少し多めにお酒を飲んだ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "取り戻す",
+      "取り戻し",
+      "取り戻さ",
+      "取り戻そう"
+     ],
+     "right": 3,
+     "why": "辞書形は「取り戻す」。この文では「取り戻そう」。",
+     "subject": "word:取り戻す",
+     "sid": 34710
+    },
+    {
+     "type": "form",
+     "q": "ベスは美貌を（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "保ち",
+      "保つ",
+      "保とう",
+      "保っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「保つ」。この文では「保っ」。",
+     "subject": "word:保つ",
+     "sid": 12122
+    },
+    {
+     "type": "form",
+     "q": "その後も更に走り続け、2012年2月11日に301戦目の出走を（　　）、ダイナブロスの保持していた300戦出走記録を更新した。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "果たさ",
+      "果たす",
+      "果たそう",
+      "果たし"
+     ],
+     "right": 3,
+     "why": "辞書形は「果たす」。この文では「果たし」。",
+     "subject": "word:果たす",
+     "sid": 42696
+    },
+    {
+     "type": "form",
+     "q": "時間があまりないので、ファーストフード店に（　　）つもりです。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "立ち寄ろう",
+      "立ち寄る",
+      "立ち寄ら",
+      "立ち寄り"
+     ],
+     "right": 1,
+     "why": "辞書形は「立ち寄る」。この文では「立ち寄る」。",
+     "subject": "word:立ち寄る",
+     "sid": 30940
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "中国新聞によると、JR西日本の新線・おおさか東線のうち、放出～久宝寺間・9.2キロの区間が3月15日から部分開業され、各駅で出発・開業のセレモニーが行われた。このうち、JR長瀬駅では橋下徹大阪府知事や冬柴鉄三国土交通大臣らがテープカットをするなど開業式典が行われた他、基点駅の放出・久宝寺、及び直通快速列車が乗り入れる奈良駅でも出発式があった。朝日新聞によると、JR西日本の関西エリアでの新線開業は1997年のJR東西線以来である。",
+    "source": "ウィキニュース",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/JR%E3%81%8A%E3%81%8A%E3%81%95%E3%81%8B%E6%9D%B1%E7%B7%9A%E9%83%A8%E5%88%86%E9%96%8B%E6%A5%AD",
+    "articleId": "wikinews:12024"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "野ばら",
+      "雨の日の古本屋",
+      "造化三神を宇宙論として読む誘惑",
+      "JRおおさか東線部分開業"
+     ],
+     "right": 3,
+     "why": "ウィキニュース（2008-03-15）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n中国新聞によると、JR西日本の新線・おおさか東線のうち、放出～久宝寺間・9.2キロの区間が3月15日から部分開業され、各駅で出発・開業のセレモニーが行われた。このうち、JR長瀬駅では橋下徹大阪府知事や冬柴鉄三国土交通大臣らがテープカットをするなど開業式典が行われた他、基点駅の放出・久宝寺、（　　）直通快速列車が乗り入れる奈良駅でも出発式があった。朝日新聞によると、JR西日本の関西エリアでの新線開業は1997年のJR東西線以来である。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "及び",
+      "確信",
+      "驚異",
+      "お供"
+     ],
+     "right": 0,
+     "why": "本文のとおり「及び（および）」。and, as well as",
+     "subject": "word:及び"
+    }
+   ]
+  }
+ ]
+}

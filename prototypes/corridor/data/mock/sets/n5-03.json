@@ -1,0 +1,318 @@
+{
+ "schemaVersion": 1,
+ "setId": "n5-03",
+ "kind": "jlpt",
+ "level": "N5",
+ "title": {
+  "ja": "N5 模擬試験 3",
+  "en": "N5 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "社長さんの車種と【色】は？\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いろ",
+      "きいろ",
+      "いろいろ",
+      "ちゃいろ"
+     ],
+     "right": 0,
+     "why": "【色】は「いろ」。color",
+     "subject": "word:色",
+     "sid": 11204
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は先の【細い】鉛筆を使う。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はやい",
+      "ほしい",
+      "おもしろい",
+      "ほそい"
+     ],
+     "right": 3,
+     "why": "【細い】は「ほそい」。thin, slender",
+     "subject": "word:細い",
+     "sid": 15270
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【花瓶】が粉々に割れた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はな",
+      "くだもの",
+      "がくせい",
+      "かびん"
+     ],
+     "right": 3,
+     "why": "【花瓶】は「かびん」。(flower) vase",
+     "subject": "word:花瓶",
+     "sid": 6989
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【兄】はスケートが上手だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いう",
+      "きょうだい",
+      "あける",
+      "あに"
+     ],
+     "right": 3,
+     "why": "【兄】は「あに」。(my) older brother (humble)",
+     "subject": "word:兄",
+     "sid": 7622
+    },
+    {
+     "type": "orthography",
+     "q": "【おおぜい】の人出ですよ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "茶色",
+      "石鹸",
+      "旅行",
+      "大勢"
+     ],
+     "right": 3,
+     "why": "「おおぜい」は【大勢】。great number of people",
+     "subject": "word:大勢",
+     "sid": 3913
+    },
+    {
+     "type": "orthography",
+     "q": "【やさしい】英語で言ってください。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "並べる",
+      "易しい",
+      "明後日",
+      "初めて"
+     ],
+     "right": 1,
+     "why": "「やさしい」は【易しい】。easy, plain",
+     "subject": "word:易しい",
+     "sid": 9392
+    },
+    {
+     "type": "orthography",
+     "q": "芝生に【はいる】な。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "財布",
+      "入る",
+      "家族",
+      "遊ぶ"
+     ],
+     "right": 1,
+     "why": "「はいる」は【入る】。to enter, to contain",
+     "subject": "word:入る",
+     "sid": 1218
+    },
+    {
+     "type": "context",
+     "q": "（　　）お空きですか。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "目",
+      "今晩",
+      "父",
+      "切符"
+     ],
+     "right": 1,
+     "why": "今晩（こんばん）— tonight, this evening",
+     "subject": "word:今晩",
+     "sid": 3617
+    },
+    {
+     "type": "context",
+     "q": "（　　）に答えなさい。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "質問",
+      "旅行",
+      "夕飯",
+      "父"
+     ],
+     "right": 0,
+     "why": "質問（しつもん）— question, inquiry",
+     "subject": "word:質問",
+     "sid": 1955
+    },
+    {
+     "type": "context",
+     "q": "（　　）なら遊びにおいでよ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "黄色",
+      "背",
+      "暇",
+      "鳥"
+     ],
+     "right": 2,
+     "why": "暇（ひま）— free time, leisure",
+     "subject": "word:暇",
+     "sid": 10402
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "地震は明けがたに（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "起き",
+      "起きる",
+      "起きろ",
+      "起きれ"
+     ],
+     "right": 0,
+     "why": "辞書形は「起きる」。この文では「起き」。",
+     "subject": "word:起きる",
+     "sid": 8603
+    },
+    {
+     "type": "form",
+     "q": "小鳥達は楽しそうに（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "歌う",
+      "歌おう",
+      "歌わ",
+      "歌い"
+     ],
+     "right": 0,
+     "why": "辞書形は「歌う」。この文では「歌う」。",
+     "subject": "word:歌う",
+     "sid": 11875
+    },
+    {
+     "type": "form",
+     "q": "（　　）にこいよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "遊び",
+      "遊ぶ",
+      "遊ば",
+      "遊ぼう"
+     ],
+     "right": 0,
+     "why": "辞書形は「遊ぶ」。この文では「遊び」。",
+     "subject": "word:遊ぶ",
+     "sid": 1415
+    },
+    {
+     "type": "form",
+     "q": "風は激しく（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "吹い",
+      "吹か",
+      "吹き",
+      "吹け"
+     ],
+     "right": 0,
+     "why": "辞書形は「吹く」。この文では「吹い」。",
+     "subject": "word:吹く",
+     "sid": 3594
+    },
+    {
+     "type": "form",
+     "q": "（　　）風が吹き込んだ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "冷たい",
+      "冷たかっ",
+      "冷た",
+      "冷たく"
+     ],
+     "right": 0,
+     "why": "辞書形は「冷たい」。この文では「冷たい」。",
+     "subject": "word:冷たい",
+     "sid": 5058
+    },
+    {
+     "type": "form",
+     "q": "指を（　　）ないでよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "切り",
+      "切ら",
+      "切っ",
+      "切る"
+     ],
+     "right": 1,
+     "why": "辞書形は「切る」。この文では「切ら」。",
+     "subject": "word:切る",
+     "sid": 5955
+    },
+    {
+     "type": "form",
+     "q": "私と（　　）で歩きなさい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "並ば",
+      "並ん",
+      "並び",
+      "並ぶ"
+     ],
+     "right": 1,
+     "why": "辞書形は「並ぶ」。この文では「並ん」。",
+     "subject": "word:並ぶ",
+     "sid": 7502
+    }
+   ]
+  }
+ ]
+}

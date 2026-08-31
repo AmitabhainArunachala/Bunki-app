@@ -1,0 +1,324 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-02",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 2",
+  "en": "N2 mock paper 2"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:45227",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "この【区域】に財宝が埋まっているという話だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "くいき",
+      "くぶん",
+      "りゅういき",
+      "くぎる"
+     ],
+     "right": 0,
+     "why": "【区域】は「くいき」。zone, district",
+     "subject": "word:区域",
+     "sid": 28167
+    },
+    {
+     "type": "kanji-reading",
+     "q": "短距離路線の【拡充】を図るという目的で、年末の阪神開催に阪神カップ（芝1400mGII）を新設。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かくちょう",
+      "かくじゅう",
+      "じゅみょう",
+      "しんずる"
+     ],
+     "right": 1,
+     "why": "【拡充】は「かくじゅう」。expansion",
+     "subject": "word:拡充",
+     "sid": 39868
+    },
+    {
+     "type": "kanji-reading",
+     "q": "なお、運転士は「交流と【直流】の切り替えに対する意識が一時的に低下していた」と話しているとのこと。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ちょくりゅう",
+      "ちょくつう",
+      "ちょくぜん",
+      "こうりゅう"
+     ],
+     "right": 0,
+     "why": "【直流】は「ちょくりゅう」。direct current",
+     "subject": "word:直流",
+     "sid": 40894
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は、はっきり【生き生き】と話すのが常だ。彼は、いつもどんな問題も端的に話す。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "てつづき",
+      "いけばな",
+      "いきいき",
+      "うれゆき"
+     ],
+     "right": 2,
+     "why": "【生き生き】は「いきいき」。vividly, lively",
+     "subject": "word:生き生き",
+     "sid": 33986
+    },
+    {
+     "type": "orthography",
+     "q": "また、日本の【じえい】隊も19人の先遣隊が31日、現地に到着した。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "火山",
+      "各地",
+      "倉庫",
+      "自衛"
+     ],
+     "right": 3,
+     "why": "「じえい」は【自衛】。self-defense",
+     "subject": "word:自衛",
+     "sid": 37866
+    },
+    {
+     "type": "orthography",
+     "q": "【かくじ】運転するときは気をつけなければいけない。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "各自",
+      "煉瓦",
+      "目下",
+      "交差"
+     ],
+     "right": 0,
+     "why": "「かくじ」は【各自】。individual, each",
+     "subject": "word:各自",
+     "sid": 28384
+    },
+    {
+     "type": "orthography",
+     "q": "省エネルギーの全国運動が【てんかい】中だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "交替",
+      "展開",
+      "自ら",
+      "素人"
+     ],
+     "right": 1,
+     "why": "「てんかい」は【展開】。develop, expansion (opposite of ",
+     "subject": "word:展開",
+     "sid": 21339
+    },
+    {
+     "type": "context",
+     "q": "私たちは（　　）をうやまうべきだ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "田植え",
+      "祖先",
+      "賞金",
+      "漁業"
+     ],
+     "right": 1,
+     "why": "祖先（そせん）— ancestor(s)",
+     "subject": "word:祖先",
+     "sid": 17262
+    },
+    {
+     "type": "context",
+     "q": "（　　）がはれました。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "材木",
+      "警備",
+      "外科",
+      "小指"
+     ],
+     "right": 3,
+     "why": "小指（こゆび）— little finger",
+     "subject": "word:小指",
+     "sid": 3874
+    },
+    {
+     "type": "context",
+     "q": "彼の友人には医者が二人いる。一人は（　　）医で、もう一人は眼科医だ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "子孫",
+      "海洋",
+      "苦情",
+      "外科"
+     ],
+     "right": 3,
+     "why": "外科（げか）— surgical department",
+     "subject": "word:外科",
+     "sid": 33770
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "そしてまもなくショベルカーがやってきて、ひなぎくの花でいっぱいの丘を（　　）て道路をつくりはじめました。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "掘っ",
+      "掘る",
+      "掘ら",
+      "掘り"
+     ],
+     "right": 0,
+     "why": "辞書形は「掘る」。この文では「掘っ」。",
+     "subject": "word:掘る",
+     "sid": 34570
+    },
+    {
+     "type": "form",
+     "q": "サボったりしたら・・・、内申に（　　）てもおかしくないと思いませんか？\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "響か",
+      "響い",
+      "響き",
+      "響く"
+     ],
+     "right": 1,
+     "why": "辞書形は「響く」。この文では「響い」。",
+     "subject": "word:響く",
+     "sid": 33397
+    },
+    {
+     "type": "form",
+     "q": "めいめいに３枚ずつ（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "配る",
+      "配っ",
+      "配ら",
+      "配り"
+     ],
+     "right": 3,
+     "why": "辞書形は「配る」。この文では「配り」。",
+     "subject": "word:配る",
+     "sid": 13448
+    },
+    {
+     "type": "form",
+     "q": "対策を万全に（　　）たうえで選挙管理委員会は職務を果たした。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "採る",
+      "採り",
+      "採ら",
+      "採っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「採る」。この文では「採っ」。",
+     "subject": "word:採る",
+     "sid": 36769
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "ウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き議論が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの提供を目的に運営されてきた。2025年7月、ウィキメディア財団のタスクフォースはプロジェクトの閉鎖を提言し、公開意見募集が実施された。",
+    "source": "ウィキニュース · 検収前",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B",
+    "articleId": "wikinews:45227"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "ウィキニュース、21年の歴史に幕を閉じる",
+      "『古事記』はどんな本？",
+      "大家",
+      "体験談をどう受け取るか"
+     ],
+     "right": 0,
+     "why": "ウィキニュース · 検収前（2026-05-03）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\nウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き議論が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの提供を目的に運営されてきた。2025年7月、ウィキメディア財団のタスクフォースはプロジェクトの閉鎖を提言し、公開意見（　　）が実施された。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "資料",
+      "募集",
+      "循環",
+      "各々"
+     ],
+     "right": 1,
+     "why": "本文のとおり「募集（ぼしゅう）」。recruitment",
+     "subject": "word:募集"
+    }
+   ]
+  }
+ ]
+}

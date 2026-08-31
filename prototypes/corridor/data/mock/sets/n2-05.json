@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-05",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 5",
+  "en": "N2 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "bunki-essay-n1-ai",
+    "attribution": "Bunki original text",
+    "licence": "Bunki original",
+    "url": ""
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "それを母親に叱られた後、母親がトイレに行った隙に【行方】不明になっていた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ほうがく",
+      "ゆくえ",
+      "やこう",
+      "あけがた"
+     ],
+     "right": 1,
+     "why": "【行方】は「ゆくえ」。one's whereabouts",
+     "subject": "word:行方",
+     "sid": 38741
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【折角】来てくれたのに留守をしていてごめんね。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "せっかく",
+      "ほうがく",
+      "さんかく",
+      "まちかど"
+     ],
+     "right": 0,
+     "why": "【折角】は「せっかく」。with trouble, at great pains",
+     "subject": "word:折角",
+     "sid": 30989
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ジャーン。それじゃ春田くん、もう見てもいいわよ。みんなの【浴衣】、お披露目ねぇ〜。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ゆかた",
+      "いくじ",
+      "にっか",
+      "ころがす"
+     ],
+     "right": 0,
+     "why": "【浴衣】は「ゆかた」。bathrobe, informal summer kimono",
+     "subject": "word:浴衣",
+     "sid": 34014
+    },
+    {
+     "type": "kanji-reading",
+     "q": "イタドリは東アジア【原産】の多年草で、高さ1メートル程度まで成長する。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "げんさん",
+      "げんこう",
+      "さんち",
+      "すいさん"
+     ],
+     "right": 0,
+     "why": "【原産】は「げんさん」。place of origin",
+     "subject": "word:原産",
+     "sid": 37154
+    },
+    {
+     "type": "orthography",
+     "q": "我がチームにお迎えでき、【かんげき】します。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "人造",
+      "包帯",
+      "通用",
+      "感激"
+     ],
+     "right": 3,
+     "why": "「かんげき」は【感激】。deep emotion, impression",
+     "subject": "word:感激",
+     "sid": 24047
+    },
+    {
+     "type": "orthography",
+     "q": "費用を【うけもつ】者に決定権がある。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "受け持つ",
+      "果たして",
+      "仕上がる",
+      "引っ越し"
+     ],
+     "right": 0,
+     "why": "「うけもつ」は【受け持つ】。to take (be in) charge of",
+     "subject": "word:受け持つ",
+     "sid": 20643
+    },
+    {
+     "type": "orthography",
+     "q": "2004年には日本児童【ぶんげい】家協会から児童文化功労者として表彰された。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "解散",
+      "文芸",
+      "短編",
+      "発売"
+     ],
+     "right": 1,
+     "why": "「ぶんげい」は【文芸】。literature, art and literature",
+     "subject": "word:文芸",
+     "sid": 37967
+    },
+    {
+     "type": "context",
+     "q": "（　　）が町への道を封鎖した。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "解散",
+      "前後",
+      "筆記",
+      "兵隊"
+     ],
+     "right": 3,
+     "why": "兵隊（へいたい）— soldier",
+     "subject": "word:兵隊",
+     "sid": 22231
+    },
+    {
+     "type": "context",
+     "q": "なるほど彼は剛速球投手だが、よく（　　）。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "散らかす",
+      "荒れる",
+      "捻る",
+      "恵まれる"
+     ],
+     "right": 1,
+     "why": "荒れる（あれる）— to be stormy, to be rough",
+     "subject": "word:荒れる",
+     "sid": 26662
+    },
+    {
+     "type": "context",
+     "q": "独立行政法人労働政策研究・（　　）機構は、財務圧迫を伝えていた。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "研修",
+      "原理",
+      "年度",
+      "発想"
+     ],
+     "right": 0,
+     "why": "研修（けんしゅう）— training",
+     "subject": "word:研修",
+     "sid": 37104
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+    "source": "随筆 · Bunki",
+    "licence": "Bunki original",
+    "attribution": "Bunki original text",
+    "url": "",
+    "articleId": "bunki-essay-n1-ai"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "天之御中主神――語られない神をどう読むか",
+      "手で書くということ",
+      "AI時代の知識と判断",
+      "雨の日の速度"
+     ],
+     "right": 2,
+     "why": "随筆 · Bunki（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの（　　）に気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "面接",
+      "菓子",
+      "宗教",
+      "違い"
+     ],
+     "right": 3,
+     "why": "本文のとおり「違い（ちがい）」。difference, discrepancy",
+     "subject": "word:違い"
+    }
+   ]
+  }
+ ]
+}
