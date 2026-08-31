@@ -827,16 +827,132 @@ async function main() {
   })()`);
   check('an aborted import leaves the device writable — the next real write lands',
     unsealed === true, `note row persisted: ${unsealed}`);
+  // 一補 (review round 4): the device refuses the record AFTER the archive
+  // swap — the old conversations must come back. A one-shot quota bomb on
+  // the store key fires exactly at the import's setItem; the import aborts,
+  // the store is untouched, and the archive is rolled back to what it held.
+  const archBefore = await page.evaluate(`window.__KAIRO_AI__.logAll().then((r) => r.length)`);
+  const storeBeforeQuota = await page.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  await page.evaluate(`(() => {
+    const proto = Object.getPrototypeOf(localStorage);
+    window.__REAL_SET_ITEM = proto.setItem;
+    window.__QUOTA_BOMB = true;
+    proto.setItem = function (k, v) {
+      if (window.__QUOTA_BOMB && k === 'kairo-corridor-v1') {
+        window.__QUOTA_BOMB = false;
+        throw new DOMException('quota', 'QuotaExceededError');
+      }
+      return window.__REAL_SET_ITEM.call(this, k, v);
+    };
+  })()`);
+  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.setInputFiles('#import-file', {
+    name: 'kairo-quota.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(exportedRecord, 'utf8'),
+  });
+  await page.waitForFunction(
+    `(() => {
+      const n = document.querySelector('.port-row + .airead-note');
+      return !!n && (n.textContent.includes('戻した') || n.textContent.includes('restored'));
+    })()`,
+    null,
+    { timeout: 8000 },
+  );
+  const quotaOutcome = await page.evaluate(
+    (before) =>
+      window.__KAIRO_AI__.logAll().then((rows) => {
+        Object.getPrototypeOf(localStorage).setItem = window.__REAL_SET_ITEM;
+        return {
+          samePage: window.__PRE_IMPORT_PAGE === 1,
+          storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
+          rows: rows.length,
+          hasChatTurn: rows.some((r) => r.surface === 'chat' && r.role === 'user'),
+        };
+      }),
+    storeBeforeQuota,
+  );
+  check('a refused record write rolls the archive back — nothing stranded, nothing lost',
+    quotaOutcome.samePage === true &&
+      quotaOutcome.storeUnchanged === true &&
+      quotaOutcome.rows === archBefore &&
+      quotaOutcome.hasChatTurn === true,
+    `rows ${archBefore} → ${quotaOutcome.rows} · store unchanged ${quotaOutcome.storeUnchanged}`);
+  // 一補 (review round 4): the seal is per-tab, so a second window gets its
+  // own law — the storage event (which fires only in tabs that did NOT
+  // write) marks the watcher stale: alert up, writes refused, reload to
+  // continue. Two live tabs are single-writer, never last-writer-wins.
+  const pageB = await context.newPage();
+  await pageB.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+  await pageB.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  // B stays passive until it is stale — a tray click would itself write a
+  // bookmark and stale A instead; the law under probe is A writes, B freezes
+  await page.fill('#note-input', 'タブAの筆');
+  await page.click('#note-send');
+  await pageB.waitForFunction(
+    `(() => {
+      const n = document.getElementById('store-alert');
+      return !!n && !n.hidden && (n.textContent.includes('別のタブ') || n.textContent.includes('another tab'));
+    })()`,
+    null,
+    { timeout: 8000 },
+  );
+  await pageB.click('#tray');
+  await pageB.waitForSelector('#note-input', { state: 'attached', timeout: 8000 });
+  await pageB.fill('#note-input', 'タブBの筆');
+  await pageB.click('#note-send');
+  await pageB.waitForTimeout(300);
+  const twoTab = await pageB.evaluate(`(() => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    const notes = (s.obslog || []).filter((r) => r[1] === 'note').map((r) => String(r[3]));
+    return { aLanded: notes.some((t) => t.includes('タブA')), bRefused: !notes.some((t) => t.includes('タブB')) };
+  })()`);
+  await pageB.close();
+  check('a stale tab freezes instead of clobbering — the other window’s write stands',
+    twoTab.aLanded === true && twoTab.bRefused === true,
+    JSON.stringify(twoTab));
+  // 一補 (review round 4): a declared evidence loss stays declared — the
+  // aiEvidenceIncomplete marker survives import (via the storeExtras seam),
+  // a real write, and the next export.
+  await page.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await page.setInputFiles('#import-file', {
+    name: 'kairo-incomplete.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(brokenExport.text, 'utf8'),
+  });
+  await page.waitForFunction(
+    '!window.__PRE_IMPORT_PAGE && document.body.dataset.ready === "1"',
+    null,
+    { timeout: 30000 },
+  );
+  await page.click('#tray');
+  await page.waitForSelector('#note-input', { state: 'attached', timeout: 8000 });
+  await page.fill('#note-input', '印は残るか');
+  await page.click('#note-send');
+  const markerRide = await page.evaluate(`window.__KAIRO_AI__.exportRecord().then((rec) => {
+    const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
+    return {
+      inEnvelope: s.aiEvidenceIncomplete === true,
+      inExport: JSON.parse(rec.text).aiEvidenceIncomplete === true,
+      noteLanded: (s.obslog || []).some((r) => r[1] === 'note'),
+    };
+  })`);
+  check('a declared evidence loss stays declared across import, writes, and re-export',
+    markerRide.inEnvelope === true && markerRide.inExport === true && markerRide.noteLanded === true,
+    JSON.stringify(markerRide));
   // the crossing's mechanism, pinned at the source: the seal is set before
-  // the record lands, writeStore and the archive both refuse while sealed,
-  // and the archive swap is the single-transaction aiArchiveReplace
-  check('the import crossing is sealed and atomic at the source',
+  // the record lands, writeStore and the archive refuse while sealed OR
+  // stale, the archive swap is the single-transaction aiArchiveReplace,
+  // and the stale-tab law listens on the storage event
+  check('the import crossing is sealed, atomic, and cross-tab honest at the source',
     minerSource.includes('let storeSealed = false') &&
-      minerSource.includes('if (storeSealed) return false;') &&
+      minerSource.includes('let staleTab = false') &&
+      minerSource.includes('if (storeSealed || staleTab) return false;') &&
       minerSource.includes('storeSealed = true;\n      if (!(await aiArchiveReplace(evidence)))') &&
-      minerSource.includes('storeSealed || !kept.every((row) => row === true)') &&
+      minerSource.includes('storeSealed || staleTab || !kept.every((row) => row === true)') &&
+      minerSource.includes("window.addEventListener('storage'") &&
       minerSource.includes('function aiArchiveReplace'),
-    'storeSealed gate in writeStore/aiLogAppend/miner · aiArchiveReplace single transaction');
+    'storeSealed+staleTab gates in writeStore/aiLogAppend/miner · aiArchiveReplace single transaction · storage listener');
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in

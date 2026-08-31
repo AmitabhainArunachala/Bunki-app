@@ -7,13 +7,27 @@
 
 | PR  | Movement                                  | State  |
 | --- | ----------------------------------------- | ------ |
-| 一  | 台帳 — ledger taxonomy + sensei-writes    | **IN BUILD** |
+| 一  | 台帳 — ledger taxonomy + sensei-writes    | MERGED (`8504cea4`, #86) |
+| 一補 | 台帳の後始末 — review round 4 aftercare   | **IN BUILD** |
 | 二  | 鏡 — the model + mirror page              | queued |
 | 三  | 先生の目 — sensei-reads + placement       | queued |
 | 四  | 潮 — drift 自                             | queued |
 | 五  | 札の文 — multi-sentence cards + mining    | queued |
 | 六  | 棚 — shelf at the band                    | queued |
 | 七  | 模試 — mock Stage 1 DIAGNOSTIC            | queued |
+
+## 一補 — what and why
+
+Devin's fourth review round landed minutes before #86 merged; all three findings
+were confirmed against main and fixed in 一補: (1) a record write the device
+refuses no longer strands a destroyed archive — the crossing holds rollback
+material and puts the conversations back; (2) a stale tab freezes (storage-event
+`staleTab` law: alert up, writes refused, reload to continue) instead of
+clobbering the record another tab wrote — two live tabs are single-writer now,
+by design; (3) the `aiEvidenceIncomplete` marker rides the envelope through
+import (storeExtras seam), so a declared evidence loss stays declared forever.
+Devin also holds 6 dashboard-only flags ("not posted by settings") — unreadable
+from here; the operator can paste them if they want them addressed.
 
 ## Notes for the resuming session
 

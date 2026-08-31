@@ -1173,12 +1173,16 @@ function storeEnvelope(state) {
  * in-flight writer — the observation miner above all, whose network pass
  * can outlive the decision — may publish the OLD in-memory state over the
  * imported one, and no archive append may land pre-import words under the
- * new record. Only the reboot, or an aborted import, lifts it. */
+ * new record. Only the reboot, or an aborted import, lifts it. staleTab is
+ * its permanent sibling (review round 4): another tab wrote the record, so
+ * this tab's memory is history — only a reload ends that. */
 let storeSealed = false;
+let staleTab = false;
 function writeStore(state) {
   // sealed: the file is the record now — a quiet refusal, no storage
-  // alert, because nothing is wrong with the device; the reboot is imminent
-  if (storeSealed) return false;
+  // alert, because nothing is wrong with the device; the reboot is
+  // imminent. stale: the alert is already up with the reason.
+  if (storeSealed || staleTab) return false;
   if (state.storeReadOnly) {
     safelySyncStoreAlert();
     return false;
@@ -1217,6 +1221,28 @@ function writeStore(state) {
 function saveStore() {
   return writeStore(S);
 }
+
+/* 二つの窓はひとつの筆を持てない — the record is one set of bytes under one
+ * key, and the storage event fires only in the tabs that did NOT write.
+ * When another tab writes the record (its own commits, or an import — the
+ * per-tab seal cannot reach across windows, review round 4), THIS tab's
+ * in-memory state is stale and any further write of it would clobber the
+ * newer bytes. So the stale tab takes the same seal the import crossing
+ * uses — writeStore, the archive appends and the miner all refuse — and
+ * says why; a reload boots clean on the current record. Two live tabs are
+ * thereby single-writer by law: the first foreign write freezes the
+ * watcher with a named reason, instead of silent last-writer-wins. */
+window.addEventListener('storage', (e) => {
+  if (e.key !== STORE_KEY || staleTab) return;
+  // its own flag, not storeSealed: an import abort in THIS tab lifts its
+  // own seal, but staleness has no abort — only a reload ends it
+  staleTab = true;
+  S.storeError = tx(
+    '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
+    'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
+  );
+  safelySyncStoreAlert();
+});
 
 /** Persist copied learner roots as one envelope, then make them visible.
  * Patch values must be constructed off-side; mutating a live nested value
@@ -5176,7 +5202,12 @@ function renderPortRow(main) {
         }
         delete s.aiEvidence;
       }
-      if (owns(s, 'aiEvidenceIncomplete')) delete s.aiEvidenceIncomplete;
+      // aiEvidenceIncomplete rides INTO the envelope on purpose (review
+      // round 4): the marker declares an evidence loss that already
+      // happened, and deleting it here would let later exports present
+      // unresolved observations as if nothing was ever lost. The boot's
+      // storeExtras seam carries unknown keys through every future write,
+      // so the declaration is durable.
       // The file IS the record — so everything the old record owned must go
       // with it (E3 round-A: the previous learner's conversations may not
       // outlive their record), and nothing in flight may write over what
@@ -5187,6 +5218,17 @@ function renderPortRow(main) {
       // out and this record's evidence in, where an abort leaves the device
       // exactly as it was and lifts the seal; only then does the record
       // itself land, and the app reboots on it.
+      // Rollback material first (review round 4): if the device refuses
+      // the record AFTER the archive swap, the old conversations must be
+      // able to come back — strict read, so a partial archive is never
+      // mistaken for the whole of one; unreadable means no rollback
+      // exists, and the note will say so if it comes to that.
+      let oldRows = null;
+      try {
+        oldRows = await aiLogAll(undefined, true);
+      } catch {
+        oldRows = null;
+      }
       storeSealed = true;
       if (!(await aiArchiveReplace(evidence))) {
         storeSealed = false;
@@ -5196,7 +5238,23 @@ function renderPortRow(main) {
         );
         return;
       }
-      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      } catch {
+        // the device would not take the record — put the conversations back
+        const restored = oldRows ? await aiArchiveReplace(oldRows) : false;
+        storeSealed = false;
+        portNote.textContent = restored
+          ? tx(
+              '端末に記録を保存できなかった。取り込みは中止し、元の会話は戻した。',
+              'The device could not save the record — nothing was imported, and the original conversations were restored.',
+            )
+          : tx(
+              '端末に記録を保存できなかった。取り込みは中止したが、元の会話は戻せなかった。',
+              'The device could not save the record — nothing was imported, but the original conversations could not be restored.',
+            );
+        return;
+      }
       location.reload();
     } catch {
       storeSealed = false;
@@ -9963,10 +10021,11 @@ async function aiArchiveReplace(rows) {
 /** Append one turn. Fire-and-forget on the request path — the returned
  * promise (true = durably written) exists for the verification suites. */
 async function aiLogAppend(row) {
-  // sealed for an import crossing: pre-import words may not land in the
-  // incoming record's archive — a discard by design, not a loss, so the
-  // honesty counter stays untouched
-  if (storeSealed) return false;
+  // sealed for an import crossing (pre-import words may not land in the
+  // incoming record's archive) or stale behind another tab's record (this
+  // tab's words belong to bytes that no longer stand) — a discard by
+  // design, not a loss, so the honesty counter stays untouched
+  if (storeSealed || staleTab) return false;
   try {
     const db = await aiLogOpen();
     if (!db) {
@@ -10105,8 +10164,9 @@ async function aiConverse(system, messages, meta = {}) {
       try {
         const kept = await Promise.all(appended);
         // storeSealed: an import crossing has begun — the record this
-        // exchange belongs to is leaving, so its glance is not taken
-        if (storeSealed || !kept.every((row) => row === true)) return;
+        // exchange belongs to is leaving. staleTab: it already left,
+        // through another window. Either way its glance is not taken.
+        if (storeSealed || staleTab || !kept.every((row) => row === true)) return;
         await aiMineObservations(surface, learnerInk, reply, xid);
       } catch {
         /* the mirror missed one glance — the record itself is untouched */
