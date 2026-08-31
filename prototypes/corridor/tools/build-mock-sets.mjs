@@ -383,10 +383,15 @@ function passageSection(article, cfg, rng, allTitles) {
     });
   }
   // 内容理解 — a word the passage itself supplies, blanked in place
-  const inText = new Map();
-  for (const ch of text) inText.set(ch, (inText.get(ch) || 0) + 1);
+  // the level ceiling is a RANK comparison, never a raw jlpt one: the graded
+  // list numbers N5 as 5 and N1 as 1, so `jlpt > cfg.jlpt + 1` reads
+  // backwards and admits every harder word in the language (review round 7 —
+  // it shipped 達成 and 写し, both N1, onto N4 papers). One rank above the
+  // paper is the allowance: a reading passage may stretch, not tower.
   const candidates = Object.values(words).filter((w) => {
-    if (!w.jlpt || w.jlpt > cfg.jlpt + 1 || !HAS_KANJI.test(w.w) || w.w.length < 2) return false;
+    if (!w.jlpt || RANK[w.jlpt] > RANK[cfg.jlpt] + 1 || !HAS_KANJI.test(w.w) || w.w.length < 2) {
+      return false;
+    }
     const first = text.indexOf(w.w);
     return first >= 0 && text.indexOf(w.w, first + 1) < 0;
   });

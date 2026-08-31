@@ -37,7 +37,7 @@
     "url": "https://ja.wikinews.org/"
    },
    {
-    "name": "bunki-essay-n1-ai",
+    "name": "bunki-essay-n2-mountain",
     "attribution": "Bunki original text",
     "licence": "Bunki original",
     "url": ""
@@ -55,153 +55,153 @@
    "items": [
     {
      "type": "kanji-reading",
-     "q": "それを母親に叱られた後、母親がトイレに行った隙に【行方】不明になっていた。\n【　】の言葉の読み方は。",
+     "q": "彼は私に【恨み】を抱いた。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "ほうがく",
-      "ゆくえ",
-      "やこう",
-      "あけがた"
+      "うらみ",
+      "ひとやすみ",
+      "あみもの",
+      "うらむ"
      ],
-     "right": 1,
-     "why": "【行方】は「ゆくえ」。one's whereabouts",
-     "subject": "word:行方",
-     "sid": 38741
+     "right": 0,
+     "why": "【恨み】は「うらみ」。resentment",
+     "subject": "word:恨み",
+     "sid": 14641
     },
     {
      "type": "kanji-reading",
-     "q": "【折角】来てくれたのに留守をしていてごめんね。\n【　】の言葉の読み方は。",
+     "q": "【薄暗い】照明の中で、彼女の顔がはっきり見えなかった。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "せっかく",
-      "ほうがく",
-      "さんかく",
-      "まちかど"
+      "おもたい",
+      "たのもしい",
+      "うすぐらい",
+      "ずうずうしい"
      ],
-     "right": 0,
-     "why": "【折角】は「せっかく」。with trouble, at great pains",
-     "subject": "word:折角",
-     "sid": 30989
+     "right": 2,
+     "why": "【薄暗い】は「うすぐらい」。dim, gloomy",
+     "subject": "word:薄暗い",
+     "sid": 30705
     },
     {
      "type": "kanji-reading",
-     "q": "ジャーン。それじゃ春田くん、もう見てもいいわよ。みんなの【浴衣】、お披露目ねぇ〜。\n【　】の言葉の読み方は。",
+     "q": "キーンコーン・・・カーンコーン・・・「うわ、まずい。本【鈴】だ！」\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "ゆかた",
-      "いくじ",
-      "にっか",
-      "ころがす"
+      "ちかう",
+      "かんき",
+      "すず",
+      "ぜんご"
      ],
-     "right": 0,
-     "why": "【浴衣】は「ゆかた」。bathrobe, informal summer kimono",
-     "subject": "word:浴衣",
-     "sid": 34014
+     "right": 2,
+     "why": "【鈴】は「すず」。bell",
+     "subject": "word:鈴",
+     "sid": 33098
     },
     {
      "type": "kanji-reading",
-     "q": "イタドリは東アジア【原産】の多年草で、高さ1メートル程度まで成長する。\n【　】の言葉の読み方は。",
+     "q": "彼は【物置】の中で偶然いくつかの古文書を見つけた。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "げんさん",
-      "げんこう",
-      "さんち",
-      "すいさん"
-     ],
-     "right": 0,
-     "why": "【原産】は「げんさん」。place of origin",
-     "subject": "word:原産",
-     "sid": 37154
-    },
-    {
-     "type": "orthography",
-     "q": "我がチームにお迎えでき、【かんげき】します。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "人造",
-      "包帯",
-      "通用",
-      "感激"
-     ],
-     "right": 3,
-     "why": "「かんげき」は【感激】。deep emotion, impression",
-     "subject": "word:感激",
-     "sid": 24047
-    },
-    {
-     "type": "orthography",
-     "q": "費用を【うけもつ】者に決定権がある。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "受け持つ",
-      "果たして",
-      "仕上がる",
-      "引っ越し"
-     ],
-     "right": 0,
-     "why": "「うけもつ」は【受け持つ】。to take (be in) charge of",
-     "subject": "word:受け持つ",
-     "sid": 20643
-    },
-    {
-     "type": "orthography",
-     "q": "2004年には日本児童【ぶんげい】家協会から児童文化功労者として表彰された。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "解散",
-      "文芸",
-      "短編",
-      "発売"
+      "こうぶつ",
+      "ものおき",
+      "あみもの",
+      "ものがたる"
      ],
      "right": 1,
-     "why": "「ぶんげい」は【文芸】。literature, art and literature",
-     "subject": "word:文芸",
-     "sid": 37967
+     "why": "【物置】は「ものおき」。storage room",
+     "subject": "word:物置",
+     "sid": 31741
     },
     {
-     "type": "context",
-     "q": "（　　）が町への道を封鎖した。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
+     "type": "orthography",
+     "q": "ラマダーンの初日と最終日は多くのイスラム諸国で国家の【しゅくじつ】となっている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "解散",
-      "前後",
-      "筆記",
-      "兵隊"
-     ],
-     "right": 3,
-     "why": "兵隊（へいたい）— soldier",
-     "subject": "word:兵隊",
-     "sid": 22231
-    },
-    {
-     "type": "context",
-     "q": "なるほど彼は剛速球投手だが、よく（　　）。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "散らかす",
-      "荒れる",
-      "捻る",
-      "恵まれる"
+      "率直",
+      "祝日",
+      "消耗",
+      "電力"
      ],
      "right": 1,
-     "why": "荒れる（あれる）— to be stormy, to be rough",
-     "subject": "word:荒れる",
-     "sid": 26662
+     "why": "「しゅくじつ」は【祝日】。national holiday",
+     "subject": "word:祝日",
+     "sid": 37470
+    },
+    {
+     "type": "orthography",
+     "q": "なおこの4試合の生放送は系列のBS日テレで行い、地上波では【しんや】に録画ハイライトで対応する。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "毛糸",
+      "浴衣",
+      "深夜",
+      "毎度"
+     ],
+     "right": 2,
+     "why": "「しんや」は【深夜】。late at night",
+     "subject": "word:深夜",
+     "sid": 39555
+    },
+    {
+     "type": "orthography",
+     "q": "エジソンは【ふくしゃ】の装置を発明した。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "学会",
+      "速達",
+      "複写",
+      "特殊"
+     ],
+     "right": 2,
+     "why": "「ふくしゃ」は【複写】。copy, duplicate",
+     "subject": "word:複写",
+     "sid": 21101
     },
     {
      "type": "context",
-     "q": "独立行政法人労働政策研究・（　　）機構は、財務圧迫を伝えていた。\n（　　）に入るのはどれか。",
+     "q": "日本でも日本物理（　　）などをはじめ記念講演などが企画されている。\n（　　）に入るのはどれか。",
      "qEn": "Which word belongs in the blank?",
      "opts": [
-      "研修",
-      "原理",
-      "年度",
-      "発想"
+      "再三",
+      "鉢",
+      "学会",
+      "実用"
+     ],
+     "right": 2,
+     "why": "学会（がっかい）— academic conference",
+     "subject": "word:学会",
+     "sid": 37107
+    },
+    {
+     "type": "context",
+     "q": "読売新聞によると、川村官房長官は、「実質的には新たな決議と同等の（　　）を有する」と語った。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "虹",
+      "効力",
+      "割引",
+      "脱線"
+     ],
+     "right": 1,
+     "why": "効力（こうりょく）— effect, efficacy",
+     "subject": "word:効力",
+     "sid": 40295
+    },
+    {
+     "type": "context",
+     "q": "間髪を入れず、迅速かつ（　　）な応対、畏れ入ります。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "的確",
+      "真っ白",
+      "率直",
+      "真っ黒"
      ],
      "right": 0,
-     "why": "研修（けんしゅう）— training",
-     "subject": "word:研修",
-     "sid": 37104
+     "why": "的確（てきかく）— precise, accurate",
+     "subject": "word:的確",
+     "sid": 29763
     }
    ]
   },
@@ -213,12 +213,12 @@
    },
    "minutes": 20,
    "passage": {
-    "text": "生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの違いに気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+    "text": "山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
     "source": "随筆 · Bunki",
     "licence": "Bunki original",
     "attribution": "Bunki original text",
     "url": "",
-    "articleId": "bunki-essay-n1-ai"
+    "articleId": "bunki-essay-n2-mountain"
    },
    "items": [
     {
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "天之御中主神――語られない神をどう読むか",
-      "手で書くということ",
-      "AI時代の知識と判断",
-      "雨の日の速度"
+      "山を歩きながら考えたこと",
+      "過去・現在・未来と「中今」",
+      "駅で待つ時間",
+      "神さまを「一柱」と数えるわけ"
      ],
-     "right": 2,
+     "right": 0,
      "why": "随筆 · Bunki（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n生成AIが大量の文章を瞬時に作れるようになったことで、知識を「持っている」ことの意味は変わりつつある。必要な情報を検索し、要約し、別の形式に変換するだけなら、人間がすべてを暗記しておく必然性は以前より小さい。しかし、記憶の価値が失われたわけではない。むしろ、何を疑い、どの（　　）に気づき、どの問いを次に立てるかという判断は、長い時間をかけて内面化された知識に支えられている。文脈を持たない情報は比較できず、比較できない情報からは精密な問いも生まれにくい。",
+     "q": "本文の（　　）に入る言葉はどれか。\n山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の（　　）間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "面接",
-      "菓子",
-      "宗教",
-      "違い"
+      "郵便",
+      "一時",
+      "指揮",
+      "作業"
      ],
-     "right": 3,
-     "why": "本文のとおり「違い（ちがい）」。difference, discrepancy",
-     "subject": "word:違い"
+     "right": 1,
+     "why": "本文のとおり「一時（いちじ）」。for a time, temporarily",
+     "subject": "word:一時"
     }
    ]
   }

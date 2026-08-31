@@ -37,10 +37,10 @@
     "url": "https://ja.wikinews.org/"
    },
    {
-    "name": "bunki-graded-n3-town",
-    "attribution": "Bunki original text",
-    "licence": "Bunki original",
-    "url": ""
+    "name": "yasashii:10",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf"
    }
   ]
  },
@@ -55,153 +55,153 @@
    "items": [
     {
      "type": "kanji-reading",
-     "q": "その【直線】は直角に交わっている。\n【　】の言葉の読み方は。",
+     "q": "命が【縮む】思いをした。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "なかなおり",
-      "だっせん",
-      "ちょくせん",
-      "せんろ"
+      "あっしゅく",
+      "くやむ",
+      "ちぢれる",
+      "ちぢむ"
      ],
-     "right": 2,
-     "why": "【直線】は「ちょくせん」。straight line",
-     "subject": "word:直線",
-     "sid": 17229
+     "right": 3,
+     "why": "【縮む】は「ちぢむ」。to shrink, to be contracted",
+     "subject": "word:縮む",
+     "sid": 10167
     },
     {
      "type": "kanji-reading",
-     "q": "【鉄橋】が川にかけられた。\n【　】の言葉の読み方は。",
+     "q": "【遠足】は雨のため中止になった。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "してつ",
-      "てっきょう",
-      "てっぽう",
-      "れっとう"
+      "えんそく",
+      "あしもと",
+      "たる",
+      "あしあと"
+     ],
+     "right": 0,
+     "why": "【遠足】は「えんそく」。trip, hike",
+     "subject": "word:遠足",
+     "sid": 19589
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【盗難】車は駐車場で発見された。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "とうなん",
+      "へいこう",
+      "さいなん",
+      "ありがたい"
+     ],
+     "right": 0,
+     "why": "【盗難】は「とうなん」。theft, robbery",
+     "subject": "word:盗難",
+     "sid": 22392
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ヒンズー教徒は【寺院】で礼拝をします。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じっせき",
+      "じいん",
+      "わふく",
+      "ふなびん"
      ],
      "right": 1,
-     "why": "【鉄橋】は「てっきょう」。iron bridge",
-     "subject": "word:鉄橋",
-     "sid": 10473
+     "why": "【寺院】は「じいん」。temple",
+     "subject": "word:寺院",
+     "sid": 23813
     },
     {
-     "type": "kanji-reading",
-     "q": "宇宙には【無数】の天体がある。\n【　】の言葉の読み方は。",
-     "qEn": "How is the marked word read?",
+     "type": "orthography",
+     "q": "尾瀬では、近年の観光客減少が目立ってきており、名前をアピールすることで観光客の回帰を目指すのが【ねらい】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "かいすう",
-      "ふくすう",
-      "むすう",
-      "むげん"
+      "加速",
+      "挟む",
+      "狙い",
+      "戸棚"
      ],
      "right": 2,
-     "why": "【無数】は「むすう」。countless number, infinite numbe",
-     "subject": "word:無数",
-     "sid": 15980
-    },
-    {
-     "type": "kanji-reading",
-     "q": "その液から溶剤を揮発させる。残るのは、香り成分と植物ワックスの【塊】。\n【　】の言葉の読み方は。",
-     "qEn": "How is the marked word read?",
-     "opts": [
-      "しゃれ",
-      "ひょうろん",
-      "えんげき",
-      "かたまり"
-     ],
-     "right": 3,
-     "why": "【塊】は「かたまり」。lump, mass",
-     "subject": "word:塊",
-     "sid": 33398
+     "why": "「ねらい」は【狙い】。aim",
+     "subject": "word:狙い",
+     "sid": 40945
     },
     {
      "type": "orthography",
-     "q": "【けつあつ】は健康のバロメーターとして重要である。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "銅像の完成はその【ちょうこく】家に名誉となった。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "血圧",
-      "全般",
-      "実感",
-      "半島"
+      "彫刻",
+      "直前",
+      "全集",
+      "公共"
      ],
      "right": 0,
-     "why": "「けつあつ」は【血圧】。blood pressure",
-     "subject": "word:血圧",
-     "sid": 26734
+     "why": "「ちょうこく」は【彫刻】。carving, engraving",
+     "subject": "word:彫刻",
+     "sid": 27798
     },
     {
      "type": "orthography",
-     "q": "任期満了前に議会を【かいさん】する唯一の方法は、連邦首相が連邦議会の信任を失うことである。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "私は自分でドレスが作れるよう【さいほう】を習っている。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "解散",
-      "三角",
-      "改造",
-      "国立"
+      "裁縫",
+      "足元",
+      "超過",
+      "送別"
      ],
      "right": 0,
-     "why": "「かいさん」は【解散】。breakup, dissolution",
-     "subject": "word:解散",
-     "sid": 39181
+     "why": "「さいほう」は【裁縫】。sewing",
+     "subject": "word:裁縫",
+     "sid": 29682
     },
     {
-     "type": "orthography",
-     "q": "水分は温められると【じょうはつ】する。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
+     "type": "context",
+     "q": "引用した問題ではありませんが、関係代名詞と関係（　　）の使い分けを問う問題がリーディングセクションにはあります。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
      "opts": [
-      "発売",
-      "順序",
-      "蒸発",
-      "勝敗"
+      "編集",
+      "副詞",
+      "肘",
+      "親指"
+     ],
+     "right": 1,
+     "why": "副詞（ふくし）— adverb",
+     "subject": "word:副詞",
+     "sid": 34637
+    },
+    {
+     "type": "context",
+     "q": "その（　　）は１０エーカーの広さだ。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "牧場",
+      "住居",
+      "形式",
+      "農薬"
+     ],
+     "right": 0,
+     "why": "牧場（ぼくじょう）— farm (livestock); pasture land",
+     "subject": "word:牧場",
+     "sid": 20741
+    },
+    {
+     "type": "context",
+     "q": "彼らは（　　）的な推論に興味を持っている。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "私鉄",
+      "会館",
+      "抽象",
+      "肯定"
      ],
      "right": 2,
-     "why": "「じょうはつ」は【蒸発】。evaporation; unexplained disappe",
-     "subject": "word:蒸発",
-     "sid": 13353
-    },
-    {
-     "type": "context",
-     "q": "喫煙による（　　）的な影響の方が分かり易いと思う人もいる。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "能率",
-      "客席",
-      "診断",
-      "短期"
-     ],
-     "right": 3,
-     "why": "短期（たんき）— short term",
-     "subject": "word:短期",
-     "sid": 32351
-    },
-    {
-     "type": "context",
-     "q": "まさかリアルに借金の（　　）だったの？\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "相互",
-      "神話",
-      "初級",
-      "催促"
-     ],
-     "right": 3,
-     "why": "催促（さいそく）— demand, urge (action)",
-     "subject": "word:催促",
-     "sid": 21202
-    },
-    {
-     "type": "context",
-     "q": "（　　）的に予測した歳入見込み額ならお知らせできます。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "統計",
-      "通用",
-      "輸血",
-      "算数"
-     ],
-     "right": 0,
-     "why": "統計（とうけい）— statistics",
-     "subject": "word:統計",
-     "sid": 30663
+     "why": "抽象（ちゅうしょう）— abstract",
+     "subject": "word:抽象",
+     "sid": 28968
     }
    ]
   },
@@ -213,12 +213,12 @@
    },
    "minutes": 20,
    "passage": {
-    "text": "旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
-    "source": "段階別読み物 · Bunki",
-    "licence": "Bunki original",
-    "attribution": "Bunki original text",
-    "url": "",
-    "articleId": "bunki-graded-n3-town"
+    "text": "年をとったり、特別な病気になったりして、毎日の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+    "source": "やさしい日本語 用語集 · 検収前",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
+    "articleId": "yasashii:10"
    },
    "items": [
     {
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "遺族基礎年金",
-      "知らない町を歩く",
-      "徒然草 · 序段",
-      "AI時代の知識と判断"
+      "駅で待つ時間",
+      "「創造神」という言葉はどこまで正しいか",
+      "過去・現在・未来と「中今」",
+      "介護"
      ],
-     "right": 1,
-     "why": "段階別読み物 · Bunki（）の見出し。"
+     "right": 3,
+     "why": "やさしい日本語 用語集 · 検収前（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に（　　）こともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
+     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、毎日の生活（食べること、（　　）に入ることなど）をすることがむずかしい人を手伝うこと。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "選考",
-      "迷う",
-      "沿う",
-      "振興"
+      "地下鉄",
+      "～か月",
+      "二十日",
+      "お風呂"
      ],
-     "right": 1,
-     "why": "本文のとおり「迷う（まよう）」。to be puzzled, to be perplexed",
-     "subject": "word:迷う"
+     "right": 3,
+     "why": "本文のとおり「お風呂（おふろ）」。a bath",
+     "subject": "word:お風呂"
     }
    ]
   }

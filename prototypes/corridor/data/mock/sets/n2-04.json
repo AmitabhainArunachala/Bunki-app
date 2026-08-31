@@ -37,7 +37,7 @@
     "url": "https://ja.wikinews.org/"
    },
    {
-    "name": "bunki-essay-n2-mountain",
+    "name": "bunki-graded-n3-town",
     "attribution": "Bunki original text",
     "licence": "Bunki original",
     "url": ""
@@ -55,153 +55,153 @@
    "items": [
     {
      "type": "kanji-reading",
-     "q": "彼は私に【恨み】を抱いた。\n【　】の言葉の読み方は。",
+     "q": "その【直線】は直角に交わっている。\n【　】の言葉の読み方は。",
      "qEn": "How is the marked word read?",
      "opts": [
-      "うらみ",
-      "ひとやすみ",
-      "あみもの",
-      "うらむ"
+      "なかなおり",
+      "だっせん",
+      "ちょくせん",
+      "せんろ"
+     ],
+     "right": 2,
+     "why": "【直線】は「ちょくせん」。straight line",
+     "subject": "word:直線",
+     "sid": 17229
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【鉄橋】が川にかけられた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "してつ",
+      "てっきょう",
+      "てっぽう",
+      "れっとう"
+     ],
+     "right": 1,
+     "why": "【鉄橋】は「てっきょう」。iron bridge",
+     "subject": "word:鉄橋",
+     "sid": 10473
+    },
+    {
+     "type": "kanji-reading",
+     "q": "宇宙には【無数】の天体がある。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かいすう",
+      "ふくすう",
+      "むすう",
+      "むげん"
+     ],
+     "right": 2,
+     "why": "【無数】は「むすう」。countless number, infinite numbe",
+     "subject": "word:無数",
+     "sid": 15980
+    },
+    {
+     "type": "kanji-reading",
+     "q": "その液から溶剤を揮発させる。残るのは、香り成分と植物ワックスの【塊】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しゃれ",
+      "ひょうろん",
+      "えんげき",
+      "かたまり"
+     ],
+     "right": 3,
+     "why": "【塊】は「かたまり」。lump, mass",
+     "subject": "word:塊",
+     "sid": 33398
+    },
+    {
+     "type": "orthography",
+     "q": "【けつあつ】は健康のバロメーターとして重要である。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "血圧",
+      "全般",
+      "実感",
+      "半島"
      ],
      "right": 0,
-     "why": "【恨み】は「うらみ」。resentment",
-     "subject": "word:恨み",
-     "sid": 14641
-    },
-    {
-     "type": "kanji-reading",
-     "q": "【薄暗い】照明の中で、彼女の顔がはっきり見えなかった。\n【　】の言葉の読み方は。",
-     "qEn": "How is the marked word read?",
-     "opts": [
-      "おもたい",
-      "たのもしい",
-      "うすぐらい",
-      "ずうずうしい"
-     ],
-     "right": 2,
-     "why": "【薄暗い】は「うすぐらい」。dim, gloomy",
-     "subject": "word:薄暗い",
-     "sid": 30705
-    },
-    {
-     "type": "kanji-reading",
-     "q": "キーンコーン・・・カーンコーン・・・「うわ、まずい。本【鈴】だ！」\n【　】の言葉の読み方は。",
-     "qEn": "How is the marked word read?",
-     "opts": [
-      "ちかう",
-      "かんき",
-      "すず",
-      "ぜんご"
-     ],
-     "right": 2,
-     "why": "【鈴】は「すず」。bell",
-     "subject": "word:鈴",
-     "sid": 33098
-    },
-    {
-     "type": "kanji-reading",
-     "q": "彼は【物置】の中で偶然いくつかの古文書を見つけた。\n【　】の言葉の読み方は。",
-     "qEn": "How is the marked word read?",
-     "opts": [
-      "こうぶつ",
-      "ものおき",
-      "あみもの",
-      "ものがたる"
-     ],
-     "right": 1,
-     "why": "【物置】は「ものおき」。storage room",
-     "subject": "word:物置",
-     "sid": 31741
+     "why": "「けつあつ」は【血圧】。blood pressure",
+     "subject": "word:血圧",
+     "sid": 26734
     },
     {
      "type": "orthography",
-     "q": "ラマダーンの初日と最終日は多くのイスラム諸国で国家の【しゅくじつ】となっている。\n【　】の言葉は、漢字でどう書くか。",
+     "q": "任期満了前に議会を【かいさん】する唯一の方法は、連邦首相が連邦議会の信任を失うことである。\n【　】の言葉は、漢字でどう書くか。",
      "qEn": "How is the marked word written in kanji?",
      "opts": [
-      "率直",
-      "祝日",
-      "消耗",
-      "電力"
-     ],
-     "right": 1,
-     "why": "「しゅくじつ」は【祝日】。national holiday",
-     "subject": "word:祝日",
-     "sid": 37470
-    },
-    {
-     "type": "orthography",
-     "q": "なおこの4試合の生放送は系列のBS日テレで行い、地上波では【しんや】に録画ハイライトで対応する。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "毛糸",
-      "浴衣",
-      "深夜",
-      "毎度"
-     ],
-     "right": 2,
-     "why": "「しんや」は【深夜】。late at night",
-     "subject": "word:深夜",
-     "sid": 39555
-    },
-    {
-     "type": "orthography",
-     "q": "エジソンは【ふくしゃ】の装置を発明した。\n【　】の言葉は、漢字でどう書くか。",
-     "qEn": "How is the marked word written in kanji?",
-     "opts": [
-      "学会",
-      "速達",
-      "複写",
-      "特殊"
-     ],
-     "right": 2,
-     "why": "「ふくしゃ」は【複写】。copy, duplicate",
-     "subject": "word:複写",
-     "sid": 21101
-    },
-    {
-     "type": "context",
-     "q": "日本でも日本物理（　　）などをはじめ記念講演などが企画されている。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "再三",
-      "鉢",
-      "学会",
-      "実用"
-     ],
-     "right": 2,
-     "why": "学会（がっかい）— academic conference",
-     "subject": "word:学会",
-     "sid": 37107
-    },
-    {
-     "type": "context",
-     "q": "読売新聞によると、川村官房長官は、「実質的には新たな決議と同等の（　　）を有する」と語った。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "虹",
-      "効力",
-      "割引",
-      "脱線"
-     ],
-     "right": 1,
-     "why": "効力（こうりょく）— effect, efficacy",
-     "subject": "word:効力",
-     "sid": 40295
-    },
-    {
-     "type": "context",
-     "q": "間髪を入れず、迅速かつ（　　）な応対、畏れ入ります。\n（　　）に入るのはどれか。",
-     "qEn": "Which word belongs in the blank?",
-     "opts": [
-      "的確",
-      "真っ白",
-      "率直",
-      "真っ黒"
+      "解散",
+      "三角",
+      "改造",
+      "国立"
      ],
      "right": 0,
-     "why": "的確（てきかく）— precise, accurate",
-     "subject": "word:的確",
-     "sid": 29763
+     "why": "「かいさん」は【解散】。breakup, dissolution",
+     "subject": "word:解散",
+     "sid": 39181
+    },
+    {
+     "type": "orthography",
+     "q": "水分は温められると【じょうはつ】する。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "発売",
+      "順序",
+      "蒸発",
+      "勝敗"
+     ],
+     "right": 2,
+     "why": "「じょうはつ」は【蒸発】。evaporation; unexplained disappe",
+     "subject": "word:蒸発",
+     "sid": 13353
+    },
+    {
+     "type": "context",
+     "q": "喫煙による（　　）的な影響の方が分かり易いと思う人もいる。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "能率",
+      "客席",
+      "診断",
+      "短期"
+     ],
+     "right": 3,
+     "why": "短期（たんき）— short term",
+     "subject": "word:短期",
+     "sid": 32351
+    },
+    {
+     "type": "context",
+     "q": "まさかリアルに借金の（　　）だったの？\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "相互",
+      "神話",
+      "初級",
+      "催促"
+     ],
+     "right": 3,
+     "why": "催促（さいそく）— demand, urge (action)",
+     "subject": "word:催促",
+     "sid": 21202
+    },
+    {
+     "type": "context",
+     "q": "（　　）的に予測した歳入見込み額ならお知らせできます。\n（　　）に入るのはどれか。",
+     "qEn": "Which word belongs in the blank?",
+     "opts": [
+      "統計",
+      "通用",
+      "輸血",
+      "算数"
+     ],
+     "right": 0,
+     "why": "統計（とうけい）— statistics",
+     "subject": "word:統計",
+     "sid": 30663
     }
    ]
   },
@@ -213,12 +213,12 @@
    },
    "minutes": 20,
    "passage": {
-    "text": "山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
-    "source": "随筆 · Bunki",
+    "text": "旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に残る。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
+    "source": "段階別読み物 · Bunki",
     "licence": "Bunki original",
     "attribution": "Bunki original text",
     "url": "",
-    "articleId": "bunki-essay-n2-mountain"
+    "articleId": "bunki-graded-n3-town"
    },
    "items": [
     {
@@ -226,27 +226,27 @@
      "q": "この文章の見出しとして、いちばん合うのはどれか。",
      "qEn": "Which headline best fits this passage?",
      "opts": [
-      "山を歩きながら考えたこと",
-      "過去・現在・未来と「中今」",
-      "駅で待つ時間",
-      "神さまを「一柱」と数えるわけ"
+      "遺族基礎年金",
+      "知らない町を歩く",
+      "徒然草 · 序段",
+      "AI時代の知識と判断"
      ],
-     "right": 0,
-     "why": "随筆 · Bunki（）の見出し。"
+     "right": 1,
+     "why": "段階別読み物 · Bunki（）の見出し。"
     },
     {
      "type": "passage-cloze",
-     "q": "本文の（　　）に入る言葉はどれか。\n山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし（　　）には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
+     "q": "本文の（　　）に入る言葉はどれか。\n旅先の町を歩くとき、私はできるだけ地図を見ないようにしている。もちろん、道に迷うこともある。それでも、予定どおりの道だけを歩くより、偶然見つけた店や神社のほうが長く記憶に（　　）。先月、山の近くの町で古い石段を見つけた。案内板には難しい漢字が多く、最初は半分ほどしか読めなかった。そこで、すべてを調べるのではなく、何度も出てくる言葉だけを選んだ。「参詣」「境内」「霊場」という三つの言葉である。その日の夜、私は三つの言葉を使って短い日記を書いた。",
      "qEn": "Which word belongs in the blank in the passage?",
      "opts": [
-      "恐怖",
-      "特徴",
-      "実際",
-      "監督"
+      "残る",
+      "背中",
+      "放送",
+      "床屋"
      ],
-     "right": 2,
-     "why": "本文のとおり「実際（じっさい）」。in fact; in actuality",
-     "subject": "word:実際"
+     "right": 0,
+     "why": "本文のとおり「残る（のこる）」。to remain (v.i.), to be left",
+     "subject": "word:残る"
     }
    ]
   }

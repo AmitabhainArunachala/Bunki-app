@@ -102,6 +102,11 @@ function verifyPapers() {
 
   const words = readJson(resolve(DATA_DIR, 'share_alike/words.json')).words;
   const kanji = readJson(resolve(DATA_DIR, 'share_alike/kanji.json')).kanji;
+  // N5 is jlpt 5 and N1 is jlpt 1, so "harder" is a SMALLER number: rank
+  // makes the comparison read the way the sentence does
+  const RANK = { 5: 1, 4: 2, 3: 3, 2: 4, 1: 5 };
+  const LEVEL_JLPT = { N5: 5, N4: 4, N3: 3, N2: 2, N1: 1 };
+  const overLevel = [];
   let items = 0;
   let withSubject = 0;
   const problems = [];
@@ -151,6 +156,10 @@ function verifyPapers() {
           const id = item.subject.slice(cut + 1);
           const known = t === 'kanji' ? !!kanji[id] : !!words[id];
           if (!known) problems.push(`${where}: subject ${item.subject} resolves in no dictionary`);
+          const graded = t === 'word' ? words[id]?.jlpt : null;
+          if (graded && RANK[graded] > RANK[LEVEL_JLPT[set.level]] + 1) {
+            overLevel.push(`${where}/${item.type}: ${id} is N${graded} on a ${set.level} paper`);
+          }
         }
         for (const text of [item.q, item.why || '', ...(item.opts || [])]) {
           if (PASS_CLAIMS.some((re) => re.test(text))) claims.push(`${where}: ${text.slice(0, 40)}`);
@@ -161,6 +170,7 @@ function verifyPapers() {
     if (count < 12) problems.push(`${where}: only ${count} items`);
   }
   check('every paper validates: schema, four distinct options, one right answer, rights carried', problems.length === 0, problems.slice(0, 4).join(' | ') || `${items} items`);
+  check('no paper tests vocabulary above its own level (review round 7: the graded list numbers N5 as 5, so a raw comparison reads backwards)', overLevel.length === 0, overLevel.slice(0, 4).join(' | ') || 'every subject within one rank of its paper');
   check('every item subject resolves in the pinned dictionary — the fail-closed law holds in the data', problems.every((p) => !p.includes('resolves in no dictionary')));
   check('most items carry a subject, so a sitting leaves real evidence', withSubject / items > 0.8, `${withSubject}/${items}`);
   check('no shipped string predicts a pass', claims.length === 0, claims.slice(0, 3).join(' | ') || 'clean');
@@ -309,6 +319,29 @@ async function main() {
     };
   })()`);
   check('mock rows and scores cross a reload whole — the validator admits them', survived.rows >= 10 && survived.done === true && survived.quarantined === false, JSON.stringify(survived));
+
+  // review round 7: a failure that re-fires on sight is a loop, not a retry.
+  // With the catalog unreachable the room must ask ONCE, settle, and wait for
+  // the learner's own もう一度 — offline, an unsettled failure would spin the
+  // network for as long as the page is open.
+  const offline = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  let attempts = 0;
+  await offline.route('**/data/mock/index.json', (route) => {
+    attempts += 1;
+    route.abort();
+  });
+  const lonely = await offline.newPage();
+  await lonely.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+  await lonely.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+  await lonely.click('#mock-link');
+  await lonely.waitForSelector('#mock-retry', { timeout: 10000 });
+  const settledAt = attempts;
+  await lonely.waitForTimeout(1500);
+  check('an unreachable catalog settles after one attempt instead of spinning', settledAt === 1 && attempts === settledAt, `${attempts} requests in the first seconds`);
+  await lonely.click('#mock-retry');
+  await lonely.waitForTimeout(600);
+  check('もう一度 is a deliberate second attempt — and only one', attempts === settledAt + 1, `${attempts} after one press`);
+  await offline.close();
 
   check('no console or page errors across the 模試 walk', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | ') || 'clean');
 

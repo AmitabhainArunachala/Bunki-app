@@ -5915,6 +5915,29 @@ function mockCommit(next) {
   if (!commitStorePatch({ mockRun: next })) S.mockRun = next;
 }
 
+/* A load that failed SETTLES (review round 7). The room re-renders on every
+ * failure, so a render that re-fires the request on sight would spin the
+ * network for as long as the page is open — offline, that is a loop, not a
+ * retry. Failure is remembered per key, the automatic attempt stops there,
+ * and 'もう一度' is the learner's own deliberate second try. */
+const mockFailed = (key) => !!D.mockFailed?.has(key);
+function markMockFailed(key) {
+  (D.mockFailed ||= new Set()).add(key);
+  render();
+}
+/** the one door out of a settled failure: forget it, and try once more */
+function retryMockLoad(main, key, start) {
+  const again = biLabel('button', 'chip', 'もう一度', 'try again');
+  again.type = 'button';
+  again.id = 'mock-retry';
+  again.addEventListener('click', () => {
+    D.mockFailed?.delete(key);
+    start();
+    render();
+  });
+  main.append(again);
+}
+
 function renderMock(main) {
   const run = S.mockRun;
   main.append(withEn(el('p', 'eyebrow', '模試'), 'mock papers', 'en-inline'));
@@ -5931,16 +5954,14 @@ function renderMock(main) {
       ),
     );
     if (!D.mock) {
-      ensureMockIndex().then(
-        () => render(),
-        () => {
-          D.mockFailed = true;
-          render();
-        },
-      );
-      main.append(
-        el('p', 'card-kind', D.mockFailed ? tx('模試を読み込めなかった。', 'The papers could not be loaded.') : tx('読み込み中…', 'loading…')),
-      );
+      const start = () => ensureMockIndex().then(() => render(), () => markMockFailed('index'));
+      if (!mockFailed('index')) {
+        start();
+        main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+        return;
+      }
+      main.append(el('p', 'card-kind', tx('模試を読み込めなかった。', 'The papers could not be loaded.')));
+      retryMockLoad(main, 'index', start);
       return;
     }
     for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
@@ -5964,12 +5985,10 @@ function renderMock(main) {
         row.append(mid);
         row.append(el('span', 'row-go', '›'));
         row.addEventListener('click', () => {
+          D.mockFailed?.delete(set.setId);
           ensureMockSet(set.setId).then(
             () => startMock(set.setId, set.level),
-            () => {
-              D.mockFailed = true;
-              render();
-            },
+            () => markMockFailed(set.setId),
           );
         });
         main.append(row);
@@ -5981,14 +6000,14 @@ function renderMock(main) {
   if (!set) {
     // a reload landed mid-paper: the place was kept, the questions come back
     // from their file — the record never carried them
-    ensureMockSet(run.setId).then(
-      () => render(),
-      () => {
-        D.mockFailed = true;
-        render();
-      },
-    );
-    main.append(el('p', 'card-kind', D.mockFailed ? tx('この模試を読み込めなかった。', 'That paper could not be loaded.') : tx('読み込み中…', 'loading…')));
+    const start = () => ensureMockSet(run.setId).then(() => render(), () => markMockFailed(run.setId));
+    if (!mockFailed(run.setId)) {
+      start();
+      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+      return;
+    }
+    main.append(el('p', 'card-kind', tx('この模試を読み込めなかった。', 'That paper could not be loaded.')));
+    retryMockLoad(main, run.setId, start);
     return;
   }
   const flat = mockItems(set);
