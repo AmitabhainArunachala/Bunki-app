@@ -1232,8 +1232,12 @@ function saveStore() {
  * says why; a reload boots clean on the current record. Two live tabs are
  * thereby single-writer by law: the first foreign write freezes the
  * watcher with a named reason, instead of silent last-writer-wins. */
+// the crossing beacon: an importing tab writes this key the moment its
+// crossing seals, so sibling tabs freeze at the START of the swap — before
+// their in-flight appends could land under a record that is being replaced
+const CROSSING_KEY = 'kairo-crossing-v1';
 window.addEventListener('storage', (e) => {
-  if (e.key !== STORE_KEY || staleTab) return;
+  if ((e.key !== STORE_KEY && e.key !== CROSSING_KEY) || staleTab) return;
   // its own flag, not storeSealed: an import abort in THIS tab lifts its
   // own seal, but staleness has no abort — only a reload ends it
   staleTab = true;
@@ -5181,6 +5185,16 @@ function renderPortRow(main) {
         return;
       }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // A stale tab may not import (review round 5): behind another tab's
+      // record, this door's wholesale write would discard that tab's
+      // changes — the single-writer law applies to the crossing too.
+      if (staleTab) {
+        portNote.textContent = tx(
+          '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
+          'The record changed in another tab — reload before importing.',
+        );
+        return;
+      }
       // 鏡: the record's evidence returns with the record. aiEvidence rides
       // the FILE, never the envelope (the archive is IndexedDB precisely so
       // conversations don't eat the localStorage quota). Every turn must
@@ -5218,18 +5232,41 @@ function renderPortRow(main) {
       // out and this record's evidence in, where an abort leaves the device
       // exactly as it was and lifts the seal; only then does the record
       // itself land, and the app reboots on it.
-      // Rollback material first (review round 4): if the device refuses
-      // the record AFTER the archive swap, the old conversations must be
-      // able to come back — strict read, so a partial archive is never
-      // mistaken for the whole of one; unreadable means no rollback
-      // exists, and the note will say so if it comes to that.
+      // The seal comes BEFORE the rollback snapshot (review round 5): a
+      // late append that slipped between snapshot and swap would be lost
+      // by a rollback; sealed first, every same-tab append is refused at
+      // the door and every pre-seal append's transaction lands before the
+      // snapshot's read begins. The crossing is also broadcast on its own
+      // key so other tabs freeze at the START of the crossing, not at its
+      // last write — their storage listener treats the beacon like a
+      // foreign record write.
+      storeSealed = true;
+      try {
+        localStorage.setItem(CROSSING_KEY, String(Date.now()));
+      } catch {
+        /* a beacon that cannot write changes nothing this tab does */
+      }
+      // Rollback material next: if the device refuses the record AFTER the
+      // archive swap, the old conversations must be able to come back —
+      // strict read, so a partial archive is never mistaken for the whole
+      // of one. No rollback material, no crossing (review round 5): an
+      // archive that will not read whole makes the swap a gamble with the
+      // conversations, so the import refuses instead — except where no
+      // IndexedDB exists at all, where there is no archive to gamble.
       let oldRows = null;
       try {
         oldRows = await aiLogAll(undefined, true);
       } catch {
-        oldRows = null;
+        if (typeof indexedDB !== 'undefined') {
+          storeSealed = false;
+          portNote.textContent = tx(
+            '会話の記録が読めないので、取り込みは中止した。何も変えていない。',
+            'The conversation archive could not be read, so nothing was imported — nothing was changed.',
+          );
+          return;
+        }
+        oldRows = [];
       }
-      storeSealed = true;
       if (!(await aiArchiveReplace(evidence))) {
         storeSealed = false;
         portNote.textContent = tx(
@@ -5238,11 +5275,23 @@ function renderPortRow(main) {
         );
         return;
       }
+      // last look before the record lands: staleness that arrived during
+      // the crossing's awaits means another tab wrote — put the
+      // conversations back and stand down rather than clobber it
+      if (staleTab) {
+        await aiArchiveReplace(oldRows);
+        storeSealed = false;
+        portNote.textContent = tx(
+          '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
+          'The record changed in another tab — reload before importing.',
+        );
+        return;
+      }
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify(s));
       } catch {
         // the device would not take the record — put the conversations back
-        const restored = oldRows ? await aiArchiveReplace(oldRows) : false;
+        const restored = await aiArchiveReplace(oldRows);
         storeSealed = false;
         portNote.textContent = restored
           ? tx(

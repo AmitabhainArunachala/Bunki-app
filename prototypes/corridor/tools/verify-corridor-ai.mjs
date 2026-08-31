@@ -907,10 +907,37 @@ async function main() {
     const notes = (s.obslog || []).filter((r) => r[1] === 'note').map((r) => String(r[3]));
     return { aLanded: notes.some((t) => t.includes('タブA')), bRefused: !notes.some((t) => t.includes('タブB')) };
   })()`);
-  await pageB.close();
   check('a stale tab freezes instead of clobbering — the other window’s write stands',
     twoTab.aLanded === true && twoTab.bRefused === true,
     JSON.stringify(twoTab));
+  // 一補 round 5 (Codex P1): the import door is a write like any other —
+  // a stale tab may not carry a record across it either
+  const storeBeforeStaleImport = await pageB.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
+  await pageB.evaluate('window.__PRE_IMPORT_PAGE = 1');
+  await pageB.setInputFiles('#import-file', {
+    name: 'kairo-stale.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(exportedRecord, 'utf8'),
+  });
+  await pageB.waitForFunction(
+    `(() => {
+      const n = document.querySelector('.port-row + .airead-note');
+      return !!n && (n.textContent.includes('再読み込み') || n.textContent.includes('reload before importing'));
+    })()`,
+    null,
+    { timeout: 8000 },
+  );
+  const staleImport = await pageB.evaluate(
+    (before) => ({
+      samePage: window.__PRE_IMPORT_PAGE === 1,
+      storeUnchanged: localStorage.getItem('kairo-corridor-v1') === before,
+    }),
+    storeBeforeStaleImport,
+  );
+  await pageB.close();
+  check('a stale tab may not import — the door refuses before touching anything',
+    staleImport.samePage === true && staleImport.storeUnchanged === true,
+    JSON.stringify(staleImport));
   // 一補 (review round 4): a declared evidence loss stays declared — the
   // aiEvidenceIncomplete marker survives import (via the storeExtras seam),
   // a real write, and the next export.
@@ -940,19 +967,34 @@ async function main() {
   check('a declared evidence loss stays declared across import, writes, and re-export',
     markerRide.inEnvelope === true && markerRide.inExport === true && markerRide.noteLanded === true,
     JSON.stringify(markerRide));
-  // the crossing's mechanism, pinned at the source: the seal is set before
-  // the record lands, writeStore and the archive refuse while sealed OR
-  // stale, the archive swap is the single-transaction aiArchiveReplace,
-  // and the stale-tab law listens on the storage event
+  // the crossing's mechanism, pinned at the source: seal → beacon →
+  // rollback snapshot → swap, in that order (round 5: a snapshot taken
+  // before the seal could miss a late append; a beacon written first
+  // freezes sibling tabs at the START of the crossing); writeStore and
+  // the archive refuse while sealed OR stale; the stale law listens on
+  // both the record key and the beacon; a snapshot that will not read
+  // refuses the crossing; a stale tab cannot import.
+  const sealAt = minerSource.indexOf('storeSealed = true;');
+  const beaconAt = minerSource.indexOf('localStorage.setItem(CROSSING_KEY');
+  // fromIndex: the export path reads the archive strictly too, earlier in
+  // the file — the pin wants the CROSSING's snapshot, after its seal
+  const snapshotAt = minerSource.indexOf('await aiLogAll(undefined, true)', sealAt);
+  const swapAt = minerSource.indexOf('await aiArchiveReplace(evidence)');
   check('the import crossing is sealed, atomic, and cross-tab honest at the source',
     minerSource.includes('let storeSealed = false') &&
       minerSource.includes('let staleTab = false') &&
       minerSource.includes('if (storeSealed || staleTab) return false;') &&
-      minerSource.includes('storeSealed = true;\n      if (!(await aiArchiveReplace(evidence)))') &&
       minerSource.includes('storeSealed || staleTab || !kept.every((row) => row === true)') &&
-      minerSource.includes("window.addEventListener('storage'") &&
-      minerSource.includes('function aiArchiveReplace'),
-    'storeSealed+staleTab gates in writeStore/aiLogAppend/miner · aiArchiveReplace single transaction · storage listener');
+      minerSource.includes('e.key !== STORE_KEY && e.key !== CROSSING_KEY') &&
+      minerSource.includes('await aiArchiveReplace(oldRows)') &&
+      minerSource.includes('so nothing was imported — nothing was changed') &&
+      minerSource.includes('reload before importing') &&
+      minerSource.includes('function aiArchiveReplace') &&
+      sealAt > 0 &&
+      sealAt < beaconAt &&
+      beaconAt < snapshotAt &&
+      snapshotAt < swapAt,
+    `order seal@${sealAt} < beacon@${beaconAt} < snapshot@${snapshotAt} < swap@${swapAt} · gates · listener on both keys`);
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in

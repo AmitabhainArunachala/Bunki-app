@@ -1740,8 +1740,10 @@ verified('stale-tab-storage-event-freezes-this-context', () => {
   // a foreign KEY changes nothing
   windowHandlers.storage({ key: 'kairo-ai-key' });
   assert.equal(storeApi.saveStore(), true);
-  // the record key from another tab: frozen, alert up, writes refused
-  windowHandlers.storage({ key: 'kairo-corridor-v1' });
+  // the crossing beacon from another tab freezes exactly like the record
+  // key does (the live two-page probe drives the record-key path): frozen,
+  // alert up, writes refused
+  windowHandlers.storage({ key: 'kairo-crossing-v1' });
   const writesBefore = storeContext.localStorage.writes;
   assert.equal(storeApi.saveStore(), false);
   assert.equal(storeApi.commitStorePatch({ taken: [] }), false);
