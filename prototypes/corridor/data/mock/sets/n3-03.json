@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n3-03",
+ "kind": "jlpt",
+ "level": "N3",
+ "title": {
+  "ja": "N3 模擬試験 3",
+  "en": "N3 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:45227",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "魔女集会で【悪魔】を召喚する。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "こいびと",
+      "あくま",
+      "あく",
+      "わるくち"
+     ],
+     "right": 1,
+     "why": "【悪魔】は「あくま」。devil, demon",
+     "subject": "word:悪魔",
+     "sid": 12877
+    },
+    {
+     "type": "kanji-reading",
+     "q": "その宇宙【飛行】士は月に降り立つのを見られた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "せんこう",
+      "はっこう",
+      "ひこう",
+      "かんこう"
+     ],
+     "right": 2,
+     "why": "【飛行】は「ひこう」。aviation, flight",
+     "subject": "word:飛行",
+     "sid": 29395
+    },
+    {
+     "type": "kanji-reading",
+     "q": "火に油を【注ぐ】だけだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "そそぐ",
+      "つぐ",
+      "つなぐ",
+      "かせぐ"
+     ],
+     "right": 0,
+     "why": "【注ぐ】は「そそぐ」。to pour (into)",
+     "subject": "word:注ぐ",
+     "sid": 10135
+    },
+    {
+     "type": "kanji-reading",
+     "q": "これは豊能【郡】の地図です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きたい",
+      "くさり",
+      "あと",
+      "ぐん"
+     ],
+     "right": 3,
+     "why": "【郡】は「ぐん」。country, district",
+     "subject": "word:郡",
+     "sid": 12186
+    },
+    {
+     "type": "kanji-reading",
+     "q": "国際通貨基金は同国に対する【新た】な借款も認めませんでした。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あたりまえ",
+      "あらた",
+      "たいした",
+      "あたる"
+     ],
+     "right": 1,
+     "why": "【新た】は「あらた」。new, fresh",
+     "subject": "word:新た",
+     "sid": 32052
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼らは地面に座るか、ラマかアルパカの毛糸でできた【毛布】の上に座る。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きょうふ",
+      "かみのけ",
+      "もうふ",
+      "ぬの"
+     ],
+     "right": 2,
+     "why": "【毛布】は「もうふ」。blanket",
+     "subject": "word:毛布",
+     "sid": 33559
+    },
+    {
+     "type": "orthography",
+     "q": "男女ともテニスに【ゆうしょう】した。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "優勝",
+      "表面",
+      "女優",
+      "永久"
+     ],
+     "right": 0,
+     "why": "「ゆうしょう」は【優勝】。overall victory, championship",
+     "subject": "word:優勝",
+     "sid": 12442
+    },
+    {
+     "type": "orthography",
+     "q": "彼らはその【せいど】を改めた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "笑顔",
+      "制度",
+      "電子",
+      "誘う"
+     ],
+     "right": 1,
+     "why": "「せいど」は【制度】。system, institution",
+     "subject": "word:制度",
+     "sid": 14942
+    },
+    {
+     "type": "orthography",
+     "q": "その大学の【かてい】は自然科学と社会科学から成り立っている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "課程",
+      "刺激",
+      "結果",
+      "刑事"
+     ],
+     "right": 0,
+     "why": "「かてい」は【課程】。course, curriculum",
+     "subject": "word:課程",
+     "sid": 30868
+    },
+    {
+     "type": "orthography",
+     "q": "彼とその【つれ】はいっしょに来ないかと私を誘った。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "連れ",
+      "借り",
+      "刈る",
+      "画家"
+     ],
+     "right": 0,
+     "why": "「つれ」は【連れ】。companion, company",
+     "subject": "word:連れ",
+     "sid": 31152
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "（　　）余地はない。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "疑わ",
+      "疑い",
+      "疑う",
+      "疑っ"
+     ],
+     "right": 2,
+     "why": "辞書形は「疑う」。この文では「疑う」。",
+     "subject": "word:疑う",
+     "sid": 1664
+    },
+    {
+     "type": "form",
+     "q": "これは事実に（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "基づか",
+      "基づい",
+      "基づく",
+      "基づき"
+     ],
+     "right": 1,
+     "why": "辞書形は「基づく」。この文では「基づい」。",
+     "subject": "word:基づく",
+     "sid": 12395
+    },
+    {
+     "type": "form",
+     "q": "重力が物を地球の中心に（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "引っ張る",
+      "引っ張り",
+      "引っ張っ",
+      "引っ張ら"
+     ],
+     "right": 2,
+     "why": "辞書形は「引っ張る」。この文では「引っ張っ」。",
+     "subject": "word:引っ張る",
+     "sid": 26280
+    },
+    {
+     "type": "form",
+     "q": "私はその視察旅行に（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "加わる",
+      "加わっ",
+      "加わり",
+      "加われ"
+     ],
+     "right": 1,
+     "why": "辞書形は「加わる」。この文では「加わっ」。",
+     "subject": "word:加わる",
+     "sid": 16726
+    },
+    {
+     "type": "form",
+     "q": "今我が鎖を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "解い",
+      "解か",
+      "解き",
+      "解く"
+     ],
+     "right": 2,
+     "why": "辞書形は「解く」。この文では「解き」。",
+     "subject": "word:解く",
+     "sid": 3136
+    },
+    {
+     "type": "form",
+     "q": "彼らはドアをぶち（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "破る",
+      "破れ",
+      "破っ",
+      "破ら"
+     ],
+     "right": 2,
+     "why": "辞書形は「破る」。この文では「破っ」。",
+     "subject": "word:破る",
+     "sid": 14770
+    },
+    {
+     "type": "form",
+     "q": "あいつを（　　）てやる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "殺さ",
+      "殺す",
+      "殺し",
+      "殺そう"
+     ],
+     "right": 2,
+     "why": "辞書形は「殺す」。この文では「殺し」。",
+     "subject": "word:殺す",
+     "sid": 4402
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "ウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き議論が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの提供を目的に運営されてきた。",
+    "source": "ウィキニュース · 検収前",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B",
+    "articleId": "wikinews:45227"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "印鑑登録証",
+      "育児休業",
+      "ウィキニュース、21年の歴史に幕を閉じる",
+      "中道改革連合新代表選挙 小川淳也氏が新代表に"
+     ],
+     "right": 2,
+     "why": "ウィキニュース · 検収前（2026-05-03）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\nウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き（　　）が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの提供を目的に運営されてきた。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "鉄道",
+      "禁止",
+      "議論",
+      "読書"
+     ],
+     "right": 2,
+     "why": "本文のとおり「議論（ぎろん）」。argument, discussion",
+     "subject": "word:議論"
+    }
+   ]
+  }
+ ]
+}

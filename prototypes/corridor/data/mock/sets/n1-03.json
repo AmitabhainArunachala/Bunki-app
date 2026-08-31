@@ -1,0 +1,318 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-03",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 3",
+  "en": "N1 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "喘息、【花粉】症、アトピー性皮膚炎といったアレルギー疾患は、ここ20年で先進国を中心に増加している。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かふん",
+      "こなごな",
+      "ひばな",
+      "かだん"
+     ],
+     "right": 0,
+     "why": "【花粉】は「かふん」。pollen",
+     "subject": "word:花粉",
+     "sid": 40417
+    },
+    {
+     "type": "kanji-reading",
+     "q": "言語は【伝達】の手段である。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "でんたつ",
+      "たっせい",
+      "たっしゃ",
+      "でんらい"
+     ],
+     "right": 0,
+     "why": "【伝達】は「でんたつ」。transmission (e.g., news",
+     "subject": "word:伝達",
+     "sid": 11795
+    },
+    {
+     "type": "kanji-reading",
+     "q": "キャプテンはその【判定】に対してレフリーに抗議した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "こてい",
+      "さだまる",
+      "はんてい",
+      "げんてい"
+     ],
+     "right": 2,
+     "why": "【判定】は「はんてい」。judgment, decision",
+     "subject": "word:判定",
+     "sid": 28736
+    },
+    {
+     "type": "kanji-reading",
+     "q": "骨髄バンクは白血病などの血液疾患の患者に対して骨髄液の提供者を募り、患者への【斡旋】を行う公的機関として設置された。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あっせん",
+      "ほいく",
+      "しょうごう",
+      "しょひょう"
+     ],
+     "right": 0,
+     "why": "【斡旋】は「あっせん」。kind offices, mediation",
+     "subject": "word:斡旋",
+     "sid": 42427
+    },
+    {
+     "type": "kanji-reading",
+     "q": "しかし、【近郊】にtotoを取り扱う店がない地域や、利便性などを考慮に入れて、イーバンク銀行（インターネット専用銀行）でtotoのオンライン発売を始める。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "みぢか",
+      "せっちゅう",
+      "きんこう",
+      "きんがん"
+     ],
+     "right": 2,
+     "why": "【近郊】は「きんこう」。suburbs, outskirts",
+     "subject": "word:近郊",
+     "sid": 42784
+    },
+    {
+     "type": "kanji-reading",
+     "q": "読売によると、藤田さん側は、「妻が無断で【印鑑】を押した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "さんがく",
+      "いんかん",
+      "ぶんぎょう",
+      "ちょういん"
+     ],
+     "right": 1,
+     "why": "【印鑑】は「いんかん」。stamp, seal",
+     "subject": "word:印鑑",
+     "sid": 37233
+    },
+    {
+     "type": "orthography",
+     "q": "すなわち、毎日、日の出から日没の間、飲食、喫煙などを一切断ち、暴力や【よくぼう】を抑えてイスラム教の教えをより一層深める。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "勧告",
+      "欲望",
+      "給仕",
+      "国交"
+     ],
+     "right": 1,
+     "why": "「よくぼう」は【欲望】。desire, appetite",
+     "subject": "word:欲望",
+     "sid": 41303
+    },
+    {
+     "type": "orthography",
+     "q": "【しお】を吹いたぞ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "欲",
+      "封",
+      "闇",
+      "潮"
+     ],
+     "right": 3,
+     "why": "「しお」は【潮】。tide",
+     "subject": "word:潮",
+     "sid": 2795
+    },
+    {
+     "type": "orthography",
+     "q": "群衆は【にんしん】中絶に抗議した。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "本館",
+      "回送",
+      "戦闘",
+      "妊娠"
+     ],
+     "right": 3,
+     "why": "「にんしん」は【妊娠】。conception, pregnancy",
+     "subject": "word:妊娠",
+     "sid": 15804
+    },
+    {
+     "type": "orthography",
+     "q": "同記事は患者の症状について「病院関係者の話によると、患者は【はつびょう】後、体がどんどん溶けていったという。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "海流",
+      "発病",
+      "口述",
+      "先着"
+     ],
+     "right": 1,
+     "why": "「はつびょう」は【発病】。attack, to become sick",
+     "subject": "word:発病",
+     "sid": 41403
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "その魚は（　　）ておこう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "生かせ",
+      "生かし",
+      "生かさ",
+      "生かす"
+     ],
+     "right": 1,
+     "why": "辞書形は「生かす」。この文では「生かし」。",
+     "subject": "word:生かす",
+     "sid": 8391
+    },
+    {
+     "type": "form",
+     "q": "この承認は、8日のユリア・ティモシェンコ（前）首相の解任に（　　）もの。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "伴わ",
+      "伴う",
+      "伴い",
+      "伴っ"
+     ],
+     "right": 1,
+     "why": "辞書形は「伴う」。この文では「伴う」。",
+     "subject": "word:伴う",
+     "sid": 37446
+    },
+    {
+     "type": "form",
+     "q": "去年のヒットした音楽は、みんな人気ドラマが（　　）でいる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "絡ま",
+      "絡む",
+      "絡み",
+      "絡ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「絡む」。この文では「絡ん」。",
+     "subject": "word:絡む",
+     "sid": 31475
+    },
+    {
+     "type": "form",
+     "q": "その会社は古い機器類を（　　）ことを決めた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "取り除く",
+      "取り除か",
+      "取り除き",
+      "取り除い"
+     ],
+     "right": 0,
+     "why": "辞書形は「取り除く」。この文では「取り除く」。",
+     "subject": "word:取り除く",
+     "sid": 28407
+    },
+    {
+     "type": "form",
+     "q": "とうとう土壇場に（　　）れた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "追い込ま",
+      "追い込もう",
+      "追い込む",
+      "追い込ん"
+     ],
+     "right": 0,
+     "why": "辞書形は「追い込む」。この文では「追い込ま」。",
+     "subject": "word:追い込む",
+     "sid": 9718
+    },
+    {
+     "type": "form",
+     "q": "橋の建設の入札が（　　）れた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "募っ",
+      "募ら",
+      "募り",
+      "募る"
+     ],
+     "right": 1,
+     "why": "辞書形は「募る」。この文では「募ら」。",
+     "subject": "word:募る",
+     "sid": 19052
+    },
+    {
+     "type": "form",
+     "q": "その「牝馬資源」を活かし、門別競馬場を特徴付ける形でイベント構想・企画が（　　）れたものである。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "練ら",
+      "練っ",
+      "練ろう",
+      "練る"
+     ],
+     "right": 0,
+     "why": "辞書形は「練る」。この文では「練ら」。",
+     "subject": "word:練る",
+     "sid": 39842
+    }
+   ]
+  }
+ ]
+}

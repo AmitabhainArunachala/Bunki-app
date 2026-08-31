@@ -1,0 +1,355 @@
+{
+ "schemaVersion": 1,
+ "setId": "n5-01",
+ "kind": "jlpt",
+ "level": "N5",
+ "title": {
+  "ja": "N5 模擬試験 1",
+  "en": "N5 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:000628",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "予約【番号】は１００３です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いちばん",
+      "こうばん",
+      "ばんごう",
+      "せびろ"
+     ],
+     "right": 2,
+     "why": "【番号】は「ばんごう」。number, series of digits",
+     "subject": "word:番号",
+     "sid": 5375
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼女は色が【黒い】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はやい",
+      "くろい",
+      "うすい",
+      "みじかい"
+     ],
+     "right": 1,
+     "why": "【黒い】は「くろい」。black; dark",
+     "subject": "word:黒い",
+     "sid": 3257
+    },
+    {
+     "type": "kanji-reading",
+     "q": "勘定書を【頼む】よ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "のむ",
+      "よむ",
+      "すむ",
+      "たのむ"
+     ],
+     "right": 3,
+     "why": "【頼む】は「たのむ」。to request, to ask (a favor)",
+     "subject": "word:頼む",
+     "sid": 2880
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【誰】か玄関に来てるよ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "だれ",
+      "てがみ",
+      "まど",
+      "おなか"
+     ],
+     "right": 0,
+     "why": "【誰】は「だれ」。who",
+     "subject": "word:誰",
+     "sid": 10375
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は公立【学校】で教育を受けた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "がくせい",
+      "がっこう",
+      "だいがく",
+      "だんだん"
+     ],
+     "right": 1,
+     "why": "【学校】は「がっこう」。a school",
+     "subject": "word:学校",
+     "sid": 19283
+    },
+    {
+     "type": "kanji-reading",
+     "q": "それは別【問題】だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "もんだい",
+      "とおい",
+      "しゅくだい",
+      "しつもん"
+     ],
+     "right": 0,
+     "why": "【問題】は「もんだい」。a problem",
+     "subject": "word:問題",
+     "sid": 3286
+    },
+    {
+     "type": "orthography",
+     "q": "【そら】が晴れた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "空",
+      "角",
+      "海",
+      "万"
+     ],
+     "right": 0,
+     "why": "「そら」は【空】。sky",
+     "subject": "word:空",
+     "sid": 957
+    },
+    {
+     "type": "orthography",
+     "q": "電車は【ちょうど】出たところだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "写真",
+      "入口",
+      "丁度",
+      "一緒"
+     ],
+     "right": 2,
+     "why": "「ちょうど」は【丁度】。just, right",
+     "subject": "word:丁度",
+     "sid": 11357
+    },
+    {
+     "type": "orthography",
+     "q": "恐ろしく今日は【さむい】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "寒い",
+      "砂糖",
+      "切符",
+      "安い"
+     ],
+     "right": 0,
+     "why": "「さむい」は【寒い】。cold (in reference to weather)",
+     "subject": "word:寒い",
+     "sid": 2321
+    },
+    {
+     "type": "orthography",
+     "q": "消極的な【おとこ】は嫌いだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "男",
+      "魚",
+      "話",
+      "車"
+     ],
+     "right": 0,
+     "why": "「おとこ」は【男】。man, male",
+     "subject": "word:男",
+     "sid": 10106
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "漢字は（　　）のが難しい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "読む",
+      "読み",
+      "読もう",
+      "読ま"
+     ],
+     "right": 0,
+     "why": "辞書形は「読む」。この文では「読む」。",
+     "subject": "word:読む",
+     "sid": 7582
+    },
+    {
+     "type": "form",
+     "q": "家を抵当に（　　）ました。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "入れよう",
+      "入れる",
+      "入れよ",
+      "入れ"
+     ],
+     "right": 3,
+     "why": "辞書形は「入れる」。この文では「入れ」。",
+     "subject": "word:入れる",
+     "sid": 10585
+    },
+    {
+     "type": "form",
+     "q": "彼は病院で（　　）たい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "働け",
+      "働く",
+      "働か",
+      "働き"
+     ],
+     "right": 3,
+     "why": "辞書形は「働く」。この文では「働き」。",
+     "subject": "word:働く",
+     "sid": 6532
+    },
+    {
+     "type": "form",
+     "q": "頭が（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "重",
+      "重く",
+      "重い",
+      "重かっ"
+     ],
+     "right": 2,
+     "why": "辞書形は「重い」。この文では「重い」。",
+     "subject": "word:重い",
+     "sid": 204
+    },
+    {
+     "type": "form",
+     "q": "ガラスは砂から（　　）れる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "作ろう",
+      "作ら",
+      "作れ",
+      "作っ"
+     ],
+     "right": 1,
+     "why": "辞書形は「作る」。この文では「作ら」。",
+     "subject": "word:作る",
+     "sid": 8922
+    },
+    {
+     "type": "form",
+     "q": "食器を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "洗い",
+      "洗おう",
+      "洗う",
+      "洗っ"
+     ],
+     "right": 1,
+     "why": "辞書形は「洗う」。この文では「洗おう」。",
+     "subject": "word:洗う",
+     "sid": 547
+    },
+    {
+     "type": "form",
+     "q": "道を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "渡っ",
+      "渡ろう",
+      "渡る",
+      "渡り"
+     ],
+     "right": 1,
+     "why": "辞書形は「渡る」。この文では「渡ろう」。",
+     "subject": "word:渡る",
+     "sid": 320
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに小さなお城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
+    "source": "青空文庫 · 新美南吉",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html",
+    "articleId": "aozora:000628"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "ごん狐",
+      "JRおおさか東線部分開業",
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "『古事記』は神話か、歴史か"
+     ],
+     "right": 0,
+     "why": "青空文庫 · 新美南吉（「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号）の見出し。"
+    }
+   ]
+  }
+ ]
+}

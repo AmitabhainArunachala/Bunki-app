@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n3-01",
+ "kind": "jlpt",
+ "level": "N3",
+ "title": {
+  "ja": "N3 模擬試験 1",
+  "en": "N3 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:1403",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E4%B8%96%E7%95%8C%E8%87%AA%E7%84%B6%E9%81%BA%E7%94%A3%E3%81%AB7%E7%AE%87%E6%89%80%E3%82%92%E8%BF%BD%E5%8A%A0_%E7%9F%A5%E5%BA%8A%E5%8D%8A%E5%B3%B6%E3%82%82"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "熱がこの化学薬品を無害な【気体】に分解するだろう。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "きたい",
+      "じたい",
+      "きのどく",
+      "たいき"
+     ],
+     "right": 0,
+     "why": "【気体】は「きたい」。vapor, gas",
+     "subject": "word:気体",
+     "sid": 29640
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は自国の【立場】からものを考える。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ばめん",
+      "どくりつ",
+      "しゅつじょう",
+      "たちば"
+     ],
+     "right": 3,
+     "why": "【立場】は「たちば」。standpoint, position",
+     "subject": "word:立場",
+     "sid": 20954
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は無邪気な【振り】をした。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ふり",
+      "はじまり",
+      "あかり",
+      "かざり"
+     ],
+     "right": 0,
+     "why": "【振り】は「ふり」。style, manner",
+     "subject": "word:振り",
+     "sid": 15294
+    },
+    {
+     "type": "kanji-reading",
+     "q": "今の俺を【支える】ものは希望だけ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はえる",
+      "ささえる",
+      "のべる",
+      "よわめる"
+     ],
+     "right": 1,
+     "why": "【支える】は「ささえる」。support, hold",
+     "subject": "word:支える",
+     "sid": 20011
+    },
+    {
+     "type": "kanji-reading",
+     "q": "町には【情報】が氾濫している。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ひょうじょう",
+      "じょう",
+      "じじょう",
+      "じょうほう"
+     ],
+     "right": 3,
+     "why": "【情報】は「じょうほう」。information, (military) intellig",
+     "subject": "word:情報",
+     "sid": 19025
+    },
+    {
+     "type": "kanji-reading",
+     "q": "女の赤ちゃんのご誕生に、さぞお【喜び】のことでしょう。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "のびる",
+      "ふたたび",
+      "よろこび",
+      "とびだす"
+     ],
+     "right": 2,
+     "why": "【喜び】は「よろこび」。joy, pleasure",
+     "subject": "word:喜び",
+     "sid": 30697
+    },
+    {
+     "type": "orthography",
+     "q": "ニューヨークは【きょだい】な都市だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "俳優",
+      "我々",
+      "巨大",
+      "大半"
+     ],
+     "right": 2,
+     "why": "「きょだい」は【巨大】。huge, gigantic",
+     "subject": "word:巨大",
+     "sid": 9366
+    },
+    {
+     "type": "orthography",
+     "q": "彼女は植木鉢に新しい【つち】を入れた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "土",
+      "段",
+      "墨",
+      "種"
+     ],
+     "right": 0,
+     "why": "「つち」は【土】。earth, soil",
+     "subject": "word:土",
+     "sid": 23311
+    },
+    {
+     "type": "orthography",
+     "q": "いかほどの【きんがく】でも結構です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "戦う",
+      "金額",
+      "裁判",
+      "童謡"
+     ],
+     "right": 1,
+     "why": "「きんがく」は【金額】。amount of money",
+     "subject": "word:金額",
+     "sid": 17088
+    },
+    {
+     "type": "orthography",
+     "q": "彼は【はんにん】の人相書きと一致している。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "犯人",
+      "人物",
+      "配達",
+      "独身"
+     ],
+     "right": 0,
+     "why": "「はんにん」は【犯人】。offender, criminal",
+     "subject": "word:犯人",
+     "sid": 25633
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "彼女は悲しみを（　　）て晩年を送った。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "隠し",
+      "隠せ",
+      "隠す",
+      "隠さ"
+     ],
+     "right": 0,
+     "why": "辞書形は「隠す」。この文では「隠し」。",
+     "subject": "word:隠す",
+     "sid": 23779
+    },
+    {
+     "type": "form",
+     "q": "日本は原料を輸入に（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "頼ら",
+      "頼る",
+      "頼っ",
+      "頼れ"
+     ],
+     "right": 2,
+     "why": "辞書形は「頼る」。この文では「頼っ」。",
+     "subject": "word:頼る",
+     "sid": 20323
+    },
+    {
+     "type": "form",
+     "q": "猟犬は鋭い嗅覚で獲物を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "追っ",
+      "追う",
+      "追わ",
+      "追い"
+     ],
+     "right": 1,
+     "why": "辞書形は「追う」。この文では「追う」。",
+     "subject": "word:追う",
+     "sid": 16493
+    },
+    {
+     "type": "form",
+     "q": "ご要望に（　　）て私の写真を同封します。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "従い",
+      "従う",
+      "従わ",
+      "従っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「従う」。この文では「従っ」。",
+     "subject": "word:従う",
+     "sid": 27609
+    },
+    {
+     "type": "form",
+     "q": "窓ガラスを（　　）たいたずら坊主は誰だ？\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "割ろう",
+      "割る",
+      "割り",
+      "割っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「割る」。この文では「割っ」。",
+     "subject": "word:割る",
+     "sid": 24110
+    },
+    {
+     "type": "form",
+     "q": "軍隊はグラント総司令官のもとで南部軍と（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "戦わ",
+      "戦い",
+      "戦っ",
+      "戦う"
+     ],
+     "right": 2,
+     "why": "辞書形は「戦う」。この文では「戦っ」。",
+     "subject": "word:戦う",
+     "sid": 30451
+    },
+    {
+     "type": "form",
+     "q": "彼は羊の毛を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "刈ら",
+      "刈っ",
+      "刈り",
+      "刈る"
+     ],
+     "right": 1,
+     "why": "辞書形は「刈る」。この文では「刈っ」。",
+     "subject": "word:刈る",
+     "sid": 14379
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、ノルウェーのフィヨルドと日本の知床半島（北海道）含め世界7カ所がユネスコの世界自然遺産に登録された。また既存2カ所の自然遺産の登録範囲の拡張が認められた。この追加により、登録された世界遺産の数は、自然遺産160、複合遺産24となる。",
+    "source": "ウィキニュース",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E4%B8%96%E7%95%8C%E8%87%AA%E7%84%B6%E9%81%BA%E7%94%A3%E3%81%AB7%E7%AE%87%E6%89%80%E3%82%92%E8%BF%BD%E5%8A%A0_%E7%9F%A5%E5%BA%8A%E5%8D%8A%E5%B3%B6%E3%82%82",
+    "articleId": "wikinews:1403"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "世界自然遺産に7箇所を追加 知床半島も",
+      "造化三神を宇宙論として読む誘惑",
+      "語りから書物へ――神話を編む",
+      "訳せない言葉について"
+     ],
+     "right": 0,
+     "why": "ウィキニュース（2005-07-15）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n2005年7月14日、南アフリカ共和国ダーバンで開催中の第29回世界遺産会議で、ノルウェーのフィヨルドと日本の知床半島（北海道）含め世界7カ所がユネスコの世界自然遺産に登録された。また既存2カ所の自然遺産の登録範囲の（　　）が認められた。この追加により、登録された世界遺産の数は、自然遺産160、複合遺産24となる。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "拡張",
+      "線路",
+      "消化",
+      "無地"
+     ],
+     "right": 0,
+     "why": "本文のとおり「拡張（かくちょう）」。expansion, extension",
+     "subject": "word:拡張"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,355 @@
+{
+ "schemaVersion": 1,
+ "setId": "n4-03",
+ "kind": "jlpt",
+ "level": "N4",
+ "title": {
+  "ja": "N4 模擬試験 3",
+  "en": "N4 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:000628",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "説得するのは【無理】だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "りゆう",
+      "ちり",
+      "むり",
+      "なくなる"
+     ],
+     "right": 2,
+     "why": "【無理】は「むり」。unreasonable, impossible",
+     "subject": "word:無理",
+     "sid": 7102
+    },
+    {
+     "type": "kanji-reading",
+     "q": "飛行機は大きな【雲】に飲み込まれた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "くも",
+      "うら",
+      "なれる",
+      "すぎる"
+     ],
+     "right": 0,
+     "why": "【雲】は「くも」。cloud",
+     "subject": "word:雲",
+     "sid": 20991
+    },
+    {
+     "type": "kanji-reading",
+     "q": "趣味は昆虫を【集める】ことです。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "うける",
+      "すてる",
+      "くれる",
+      "あつめる"
+     ],
+     "right": 3,
+     "why": "【集める】は「あつめる」。to collect, to gather (v.t.)",
+     "subject": "word:集める",
+     "sid": 13319
+    },
+    {
+     "type": "kanji-reading",
+     "q": "私は朝、トーストに蜂蜜を【塗る】のが好きです。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "よる",
+      "さげる",
+      "つたえる",
+      "ぬる"
+     ],
+     "right": 3,
+     "why": "【塗る】は「ぬる」。to paint, to plaster",
+     "subject": "word:塗る",
+     "sid": 29311
+    },
+    {
+     "type": "kanji-reading",
+     "q": "昨年は【輸入】が輸出を超えた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ゆしゅつ",
+      "にゅういん",
+      "ゆにゅう",
+      "にゅうがく"
+     ],
+     "right": 2,
+     "why": "【輸入】は「ゆにゅう」。import",
+     "subject": "word:輸入",
+     "sid": 15640
+    },
+    {
+     "type": "kanji-reading",
+     "q": "長い【講義】がやっと終わった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ほうそう",
+      "かみ",
+      "こうどう",
+      "こうぎ"
+     ],
+     "right": 3,
+     "why": "【講義】は「こうぎ」。a lecture",
+     "subject": "word:講義",
+     "sid": 9030
+    },
+    {
+     "type": "orthography",
+     "q": "この機械のメカニズムは【ふくざつ】です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "文学",
+      "水道",
+      "複雑",
+      "放送"
+     ],
+     "right": 2,
+     "why": "「ふくざつ」は【複雑】。complexity, complication",
+     "subject": "word:複雑",
+     "sid": 14126
+    },
+    {
+     "type": "orthography",
+     "q": "笹井氏は、京都大学【そつぎょう】後、同大学教授を経て理研に入所。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "卒業",
+      "教育",
+      "入学",
+      "会場"
+     ],
+     "right": 0,
+     "why": "「そつぎょう」は【卒業】。graduation",
+     "subject": "word:卒業",
+     "sid": 36958
+    },
+    {
+     "type": "orthography",
+     "q": "価格はコストと需要で【きまる】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "投げる",
+      "決まる",
+      "真面目",
+      "続ける"
+     ],
+     "right": 1,
+     "why": "「きまる」は【決まる】。to be set; fixed (v.i.)",
+     "subject": "word:決まる",
+     "sid": 13311
+    },
+    {
+     "type": "orthography",
+     "q": "【かない】のパートの仕事で少々余分な金が入る。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "家内",
+      "会話",
+      "送る",
+      "案内"
+     ],
+     "right": 0,
+     "why": "「かない」は【家内】。(one's own) wife",
+     "subject": "word:家内",
+     "sid": 28015
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "彼女はドレスを花で（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "飾り",
+      "飾る",
+      "飾っ",
+      "飾ら"
+     ],
+     "right": 2,
+     "why": "辞書形は「飾る」。この文では「飾っ」。",
+     "subject": "word:飾る",
+     "sid": 15426
+    },
+    {
+     "type": "form",
+     "q": "来年もまた（　　）ましょう。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "集まり",
+      "集まる",
+      "集まっ",
+      "集まろう"
+     ],
+     "right": 0,
+     "why": "辞書形は「集まる」。この文では「集まり」。",
+     "subject": "word:集まる",
+     "sid": 5481
+    },
+    {
+     "type": "form",
+     "q": "その機械は自動的に（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "動く",
+      "動き",
+      "動い",
+      "動か"
+     ],
+     "right": 0,
+     "why": "辞書形は「動く」。この文では「動く」。",
+     "subject": "word:動く",
+     "sid": 11353
+    },
+    {
+     "type": "form",
+     "q": "君に会い損ねて地団駄を（　　）だよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "踏め",
+      "踏む",
+      "踏み",
+      "踏ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「踏む」。この文では「踏ん」。",
+     "subject": "word:踏む",
+     "sid": 23075
+    },
+    {
+     "type": "form",
+     "q": "私は（　　）て階段から転げ落ちた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "滑る",
+      "滑っ",
+      "滑ら",
+      "滑り"
+     ],
+     "right": 1,
+     "why": "辞書形は「滑る」。この文では「滑っ」。",
+     "subject": "word:滑る",
+     "sid": 17301
+    },
+    {
+     "type": "form",
+     "q": "メガネを（　　）ている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "探す",
+      "探し",
+      "探せ",
+      "探さ"
+     ],
+     "right": 1,
+     "why": "辞書形は「探す」。この文では「探し」。",
+     "subject": "word:探す",
+     "sid": 4357
+    },
+    {
+     "type": "form",
+     "q": "あの子を無理に塾に（　　）せるのは反対だね。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "通わ",
+      "通っ",
+      "通う",
+      "通い"
+     ],
+     "right": 0,
+     "why": "辞書形は「通う」。この文では「通わ」。",
+     "subject": "word:通う",
+     "sid": 30097
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "一これは、私が小さいときに、村の茂平というおじいさんからきいたお話です。むかしは、私たちの村のちかくの、中山というところに小さなお城があって、中山さまというおとのさまが、おられたそうです。その中山から、少しはなれた山の中に、「ごん狐」という狐がいました。",
+    "source": "青空文庫 · 新美南吉",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 新美南吉「ごん狐」",
+    "url": "https://www.aozora.gr.jp/cards/000121/card628.html",
+    "articleId": "aozora:000628"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "育児休業給付金",
+      "ごん狐",
+      "原初神を「最高神」と呼ぶときの問題",
+      "神さまを「一柱」と数えるわけ"
+     ],
+     "right": 1,
+     "why": "青空文庫 · 新美南吉（「赤い鳥　復刊第三巻第一号」1932（昭和7）年1月号）の見出し。"
+    }
+   ]
+  }
+ ]
+}

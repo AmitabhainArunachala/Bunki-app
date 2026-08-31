@@ -1,0 +1,421 @@
+{
+ "schemaVersion": 1,
+ "law": "模試は評価であって予定ではない — mock papers are evidence, never a schedule, and never a pass prediction.",
+ "built": "tools/build-mock-sets.mjs",
+ "sets": [
+  {
+   "setId": "n5-01",
+   "kind": "jlpt",
+   "level": "N5",
+   "title": {
+    "ja": "N5 模擬試験 1",
+    "en": "N5 mock paper 1"
+   },
+   "approved": false,
+   "items": 18,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n5-01.json"
+  },
+  {
+   "setId": "n5-02",
+   "kind": "jlpt",
+   "level": "N5",
+   "title": {
+    "ja": "N5 模擬試験 2",
+    "en": "N5 mock paper 2"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n5-02.json"
+  },
+  {
+   "setId": "n5-03",
+   "kind": "jlpt",
+   "level": "N5",
+   "title": {
+    "ja": "N5 模擬試験 3",
+    "en": "N5 mock paper 3"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n5-03.json"
+  },
+  {
+   "setId": "n5-04",
+   "kind": "jlpt",
+   "level": "N5",
+   "title": {
+    "ja": "N5 模擬試験 4",
+    "en": "N5 mock paper 4"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n5-04.json"
+  },
+  {
+   "setId": "n5-05",
+   "kind": "jlpt",
+   "level": "N5",
+   "title": {
+    "ja": "N5 模擬試験 5",
+    "en": "N5 mock paper 5"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n5-05.json"
+  },
+  {
+   "setId": "n4-01",
+   "kind": "jlpt",
+   "level": "N4",
+   "title": {
+    "ja": "N4 模擬試験 1",
+    "en": "N4 mock paper 1"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n4-01.json"
+  },
+  {
+   "setId": "n4-02",
+   "kind": "jlpt",
+   "level": "N4",
+   "title": {
+    "ja": "N4 模擬試験 2",
+    "en": "N4 mock paper 2"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n4-02.json"
+  },
+  {
+   "setId": "n4-03",
+   "kind": "jlpt",
+   "level": "N4",
+   "title": {
+    "ja": "N4 模擬試験 3",
+    "en": "N4 mock paper 3"
+   },
+   "approved": false,
+   "items": 18,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n4-03.json"
+  },
+  {
+   "setId": "n4-04",
+   "kind": "jlpt",
+   "level": "N4",
+   "title": {
+    "ja": "N4 模擬試験 4",
+    "en": "N4 mock paper 4"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n4-04.json"
+  },
+  {
+   "setId": "n4-05",
+   "kind": "jlpt",
+   "level": "N4",
+   "title": {
+    "ja": "N4 模擬試験 5",
+    "en": "N4 mock paper 5"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n4-05.json"
+  },
+  {
+   "setId": "n3-01",
+   "kind": "jlpt",
+   "level": "N3",
+   "title": {
+    "ja": "N3 模擬試験 1",
+    "en": "N3 mock paper 1"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n3-01.json"
+  },
+  {
+   "setId": "n3-02",
+   "kind": "jlpt",
+   "level": "N3",
+   "title": {
+    "ja": "N3 模擬試験 2",
+    "en": "N3 mock paper 2"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n3-02.json"
+  },
+  {
+   "setId": "n3-03",
+   "kind": "jlpt",
+   "level": "N3",
+   "title": {
+    "ja": "N3 模擬試験 3",
+    "en": "N3 mock paper 3"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n3-03.json"
+  },
+  {
+   "setId": "n3-04",
+   "kind": "jlpt",
+   "level": "N3",
+   "title": {
+    "ja": "N3 模擬試験 4",
+    "en": "N3 mock paper 4"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n3-04.json"
+  },
+  {
+   "setId": "n3-05",
+   "kind": "jlpt",
+   "level": "N3",
+   "title": {
+    "ja": "N3 模擬試験 5",
+    "en": "N3 mock paper 5"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n3-05.json"
+  },
+  {
+   "setId": "n2-01",
+   "kind": "jlpt",
+   "level": "N2",
+   "title": {
+    "ja": "N2 模擬試験 1",
+    "en": "N2 mock paper 1"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n2-01.json"
+  },
+  {
+   "setId": "n2-02",
+   "kind": "jlpt",
+   "level": "N2",
+   "title": {
+    "ja": "N2 模擬試験 2",
+    "en": "N2 mock paper 2"
+   },
+   "approved": false,
+   "items": 16,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n2-02.json"
+  },
+  {
+   "setId": "n2-03",
+   "kind": "jlpt",
+   "level": "N2",
+   "title": {
+    "ja": "N2 模擬試験 3",
+    "en": "N2 mock paper 3"
+   },
+   "approved": false,
+   "items": 12,
+   "sections": [
+    "moji-goi",
+    "dokkai"
+   ],
+   "file": "n2-03.json"
+  },
+  {
+   "setId": "n2-04",
+   "kind": "jlpt",
+   "level": "N2",
+   "title": {
+    "ja": "N2 模擬試験 4",
+    "en": "N2 mock paper 4"
+   },
+   "approved": false,
+   "items": 12,
+   "sections": [
+    "moji-goi",
+    "dokkai"
+   ],
+   "file": "n2-04.json"
+  },
+  {
+   "setId": "n2-05",
+   "kind": "jlpt",
+   "level": "N2",
+   "title": {
+    "ja": "N2 模擬試験 5",
+    "en": "N2 mock paper 5"
+   },
+   "approved": false,
+   "items": 12,
+   "sections": [
+    "moji-goi",
+    "dokkai"
+   ],
+   "file": "n2-05.json"
+  },
+  {
+   "setId": "n1-01",
+   "kind": "jlpt",
+   "level": "N1",
+   "title": {
+    "ja": "N1 模擬試験 1",
+    "en": "N1 mock paper 1"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n1-01.json"
+  },
+  {
+   "setId": "n1-02",
+   "kind": "jlpt",
+   "level": "N1",
+   "title": {
+    "ja": "N1 模擬試験 2",
+    "en": "N1 mock paper 2"
+   },
+   "approved": false,
+   "items": 19,
+   "sections": [
+    "moji-goi",
+    "bunpou",
+    "dokkai"
+   ],
+   "file": "n1-02.json"
+  },
+  {
+   "setId": "n1-03",
+   "kind": "jlpt",
+   "level": "N1",
+   "title": {
+    "ja": "N1 模擬試験 3",
+    "en": "N1 mock paper 3"
+   },
+   "approved": false,
+   "items": 17,
+   "sections": [
+    "moji-goi",
+    "bunpou"
+   ],
+   "file": "n1-03.json"
+  },
+  {
+   "setId": "n1-04",
+   "kind": "jlpt",
+   "level": "N1",
+   "title": {
+    "ja": "N1 模擬試験 4",
+    "en": "N1 mock paper 4"
+   },
+   "approved": false,
+   "items": 12,
+   "sections": [
+    "moji-goi",
+    "dokkai"
+   ],
+   "file": "n1-04.json"
+  },
+  {
+   "setId": "n1-05",
+   "kind": "jlpt",
+   "level": "N1",
+   "title": {
+    "ja": "N1 模擬試験 5",
+    "en": "N1 mock paper 5"
+   },
+   "approved": false,
+   "items": 12,
+   "sections": [
+    "moji-goi",
+    "dokkai"
+   ],
+   "file": "n1-05.json"
+  }
+ ]
+}

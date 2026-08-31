@@ -1,0 +1,318 @@
+{
+ "schemaVersion": 1,
+ "setId": "n3-05",
+ "kind": "jlpt",
+ "level": "N3",
+ "title": {
+  "ja": "N3 模擬試験 5",
+  "en": "N3 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "【盾】の両面を見よ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "くさい",
+      "ほとけ",
+      "てきど",
+      "たて"
+     ],
+     "right": 3,
+     "why": "【盾】は「たて」。shield",
+     "subject": "word:盾",
+     "sid": 3176
+    },
+    {
+     "type": "kanji-reading",
+     "q": "6月15日に摘出【手術】が行われるとしている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しゅだん",
+      "しゅじゅつ",
+      "せんしゅ",
+      "げいじゅつ"
+     ],
+     "right": 1,
+     "why": "【手術】は「しゅじゅつ」。surgical operation",
+     "subject": "word:手術",
+     "sid": 35963
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【世間】を甘くみるな！\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "せけん",
+      "よのなか",
+      "せいき",
+      "かんかく"
+     ],
+     "right": 0,
+     "why": "【世間】は「せけん」。world, society",
+     "subject": "word:世間",
+     "sid": 3890
+    },
+    {
+     "type": "kanji-reading",
+     "q": "それ【以来】彼らの消息は不明だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いぜん",
+      "いらい",
+      "みらい",
+      "できごと"
+     ],
+     "right": 1,
+     "why": "【以来】は「いらい」。since, henceforth",
+     "subject": "word:以来",
+     "sid": 19821
+    },
+    {
+     "type": "kanji-reading",
+     "q": "イギリスのロンドンで専業【主婦】を続けていた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しゅふ",
+      "しゅよう",
+      "おもに",
+      "しゅぎ"
+     ],
+     "right": 0,
+     "why": "【主婦】は「しゅふ」。housewife",
+     "subject": "word:主婦",
+     "sid": 35502
+    },
+    {
+     "type": "kanji-reading",
+     "q": "今日の試合は天下分け目の【戦い】だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "たたかい",
+      "いわい",
+      "よい",
+      "たたかう"
+     ],
+     "right": 0,
+     "why": "【戦い】は「たたかい」。battle, fight",
+     "subject": "word:戦い",
+     "sid": 23129
+    },
+    {
+     "type": "orthography",
+     "q": "その大富豪は【まずしい】少年として生涯を始めた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "罰する",
+      "貧しい",
+      "片付く",
+      "命じる"
+     ],
+     "right": 1,
+     "why": "「まずしい」は【貧しい】。poor, needy",
+     "subject": "word:貧しい",
+     "sid": 29389
+    },
+    {
+     "type": "orthography",
+     "q": "悪友は【さける】べきだ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "眺める",
+      "避ける",
+      "対する",
+      "暮らす"
+     ],
+     "right": 1,
+     "why": "「さける」は【避ける】。to avoid (physical contact); to ",
+     "subject": "word:避ける",
+     "sid": 4129
+    },
+    {
+     "type": "orthography",
+     "q": "老婦人は子供たちに【あいじょう】のこもった手を差し伸べた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "農業",
+      "愛情",
+      "特長",
+      "衝突"
+     ],
+     "right": 1,
+     "why": "「あいじょう」は【愛情】。love, affection",
+     "subject": "word:愛情",
+     "sid": 30608
+    },
+    {
+     "type": "orthography",
+     "q": "彼の葉巻から煙の【わ】が空中に漂っていた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "他",
+      "輪",
+      "田",
+      "異"
+     ],
+     "right": 1,
+     "why": "「わ」は【輪】。ring, hoop",
+     "subject": "word:輪",
+     "sid": 30083
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "矢は的に（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "当たっ",
+      "当たら",
+      "当たる",
+      "当たり"
+     ],
+     "right": 0,
+     "why": "辞書形は「当たる」。この文では「当たっ」。",
+     "subject": "word:当たる",
+     "sid": 6139
+    },
+    {
+     "type": "form",
+     "q": "この物質は水と（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "混ざる",
+      "混ざり",
+      "混ざっ",
+      "混ざら"
+     ],
+     "right": 0,
+     "why": "辞書形は「混ざる」。この文では「混ざる」。",
+     "subject": "word:混ざる",
+     "sid": 7735
+    },
+    {
+     "type": "form",
+     "q": "英語を話せる人を（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "雇わ",
+      "雇っ",
+      "雇い",
+      "雇おう"
+     ],
+     "right": 2,
+     "why": "辞書形は「雇う」。この文では「雇い」。",
+     "subject": "word:雇う",
+     "sid": 12244
+    },
+    {
+     "type": "form",
+     "q": "私は鉛筆書きの手紙を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "受け取る",
+      "受け取っ",
+      "受け取ろう",
+      "受け取り"
+     ],
+     "right": 1,
+     "why": "辞書形は「受け取る」。この文では「受け取っ」。",
+     "subject": "word:受け取る",
+     "sid": 20844
+    },
+    {
+     "type": "form",
+     "q": "鳥は卵を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "産ま",
+      "産み",
+      "産む",
+      "産ん"
+     ],
+     "right": 2,
+     "why": "辞書形は「産む」。この文では「産む」。",
+     "subject": "word:産む",
+     "sid": 2798
+    },
+    {
+     "type": "form",
+     "q": "その値段は税金を（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "含む",
+      "含ま",
+      "含ん",
+      "含み"
+     ],
+     "right": 3,
+     "why": "辞書形は「含む」。この文では「含み」。",
+     "subject": "word:含む",
+     "sid": 12478
+    },
+    {
+     "type": "form",
+     "q": "顧客の（　　）方をお話しした。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "扱い",
+      "扱う",
+      "扱っ",
+      "扱わ"
+     ],
+     "right": 0,
+     "why": "辞書形は「扱う」。この文では「扱い」。",
+     "subject": "word:扱う",
+     "sid": 18951
+    }
+   ]
+  }
+ ]
+}

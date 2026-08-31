@@ -94,6 +94,7 @@ jobs:
                       'manifest.webmanifest' 'sw.js' 'icon-192.png' 'icon-512.png' \
                       'drift-layer.css' 'drift-layer.js' 'vendor/ts-fsrs.mjs' \
                       'data/manifest.json' 'data/articles/index.json' \
+                      'data/mock/index.json' 'data/mock/sets/n5-01.json' \
                       'data/articles/archive-index.json' \
                       'data/share_alike/dict-v2/index.json' \
                       'data/share_alike/animcjk/index.json' \
