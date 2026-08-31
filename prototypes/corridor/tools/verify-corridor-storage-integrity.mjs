@@ -1731,19 +1731,18 @@ verified('live-sticky-grade-row-is-byte-preserved', () => {
 });
 
 verified('stale-tab-storage-event-freezes-this-context', () => {
-  // PR 一補 (review round 4): the storage event fires only in tabs that did
-  // NOT write — when another tab writes the record, this context freezes
-  // with the reason up, and no later write can clobber the newer bytes.
+  // PR 一補 (review rounds 4-6): the storage event fires only in tabs that
+  // did NOT write. A crossing beacon freezes the watcher; the beacon's
+  // -aborted mark thaws exactly the freeze it caused (nothing changed); a
+  // record write freezes permanently — reload is the only way back.
   storeContext.S = state();
   storeContext.localStorage = storage();
   assert.equal(storeApi.saveStore(), true);
   // a foreign KEY changes nothing
   windowHandlers.storage({ key: 'kairo-ai-key' });
   assert.equal(storeApi.saveStore(), true);
-  // the crossing beacon from another tab freezes exactly like the record
-  // key does (the live two-page probe drives the record-key path): frozen,
-  // alert up, writes refused
-  windowHandlers.storage({ key: 'kairo-crossing-v1' });
+  // a crossing beacon from another tab: frozen, alert up, writes refused
+  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x1' });
   const writesBefore = storeContext.localStorage.writes;
   assert.equal(storeApi.saveStore(), false);
   assert.equal(storeApi.commitStorePatch({ taken: [] }), false);
@@ -1751,8 +1750,21 @@ verified('stale-tab-storage-event-freezes-this-context', () => {
   assert.match(storeContext.S.storeError, /another tab/);
   const alert = document.getElementById('store-alert');
   assert.equal(alert.hidden, false);
-  // staleness has no unseal — only a reload ends it, so this probe runs
-  // LAST among the write probes: the context stays frozen by design
+  // the crossing stood down without a record change: the freeze lifts,
+  // the alert clears, writes land again
+  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x1-aborted' });
+  assert.equal(storeContext.S.storeError, null);
+  assert.equal(alert.hidden, true);
+  assert.equal(storeApi.saveStore(), true);
+  // the record key from another tab: frozen for good — a later abort mark
+  // walks nothing back, because the record really did change
+  windowHandlers.storage({ key: 'kairo-corridor-v1' });
+  assert.equal(storeApi.saveStore(), false);
+  windowHandlers.storage({ key: 'kairo-crossing-v1', newValue: 'x2-aborted' });
+  assert.equal(storeApi.saveStore(), false);
+  assert.match(storeContext.S.storeError, /another tab/);
+  // record staleness has no unseal — only a reload ends it, so this probe
+  // runs LAST among the write probes: the context stays frozen by design
 });
 
 verified('residual-and-direct-bypass-ledger-is-exact', () => {

@@ -189,8 +189,7 @@ function initScript(envelopeJson) {
   })();`;
 }
 
-const logAll = (page, surface) =>
-  page.evaluate((s) => window.__KAIRO_AI__.logAll(s), surface);
+const logAll = (page, surface) => page.evaluate((s) => window.__KAIRO_AI__.logAll(s), surface);
 
 async function waitRows(page, surface, min, timeout = 8000) {
   const deadline = Date.now() + timeout;
@@ -243,7 +242,9 @@ async function main() {
 
   const settleSheet = async () => {
     await page
-      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
+      .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, {
+        timeout: 8000,
+      })
       .catch(() => {});
     await page.waitForTimeout(400);
   };
@@ -276,11 +277,16 @@ async function main() {
     timeoutMs: window.__KAIRO_AI__.timeoutMs,
     provider: window.__KAIRO_AI__.provider(),
   })`);
-  check('the request budget mirrors packages/ai (10 s)', contract.timeoutMs === 10000,
-    `timeoutMs=${contract.timeoutMs}`);
-  check('S.ai overrides reach the provider seam — store-durable, no UI needed',
+  check(
+    'the request budget mirrors packages/ai (10 s)',
+    contract.timeoutMs === 10000,
+    `timeoutMs=${contract.timeoutMs}`,
+  );
+  check(
+    'S.ai overrides reach the provider seam — store-durable, no UI needed',
     contract.provider.baseUrl === OVERRIDE_BASE_URL && contract.provider.model === OVERRIDE_MODEL,
-    `${contract.provider.baseUrl} · ${contract.provider.model}`);
+    `${contract.provider.baseUrl} · ${contract.provider.model}`,
+  );
 
   // ----------------------------------- surface 1+2 · word tutor and examples
   console.log('\n— word-sheet tutor and graded examples');
@@ -292,27 +298,31 @@ async function main() {
     { timeout: 8000 },
   );
   const tutorRows = await waitRows(page, 'word-tutor', 2);
-  check('word tutor · the exchange lands whole in the archive',
+  check(
+    'word tutor · the exchange lands whole in the archive',
     exchangeShape(tutorRows, 'word-tutor', OVERRIDE_MODEL) &&
       tutorRows.every((r) => r.contextRef === 'word:学校'),
-    `${tutorRows.length} rows, contextRef=${tutorRows[0]?.contextRef}`);
+    `${tutorRows.length} rows, contextRef=${tutorRows[0]?.contextRef}`,
+  );
 
   await page.locator('#sheet .ai-ask', { hasText: '例文をつくる' }).click();
-  await page.waitForFunction(
-    () => document.querySelectorAll('#sheet .ai-ex').length >= 4,
-    null,
-    { timeout: 8000 },
-  );
+  await page.waitForFunction(() => document.querySelectorAll('#sheet .ai-ex').length >= 4, null, {
+    timeout: 8000,
+  });
   const exampleRows = await waitRows(page, 'examples', 2);
-  check('graded examples · the exchange lands whole in the archive',
+  check(
+    'graded examples · the exchange lands whole in the archive',
     exchangeShape(exampleRows, 'examples', OVERRIDE_MODEL) &&
       exampleRows.every((r) => r.contextRef === 'word:学校'),
-    `${exampleRows.length} rows`);
+    `${exampleRows.length} rows`,
+  );
   const stubSeen = await page.evaluate('window.__AI_STUB');
-  check('the request actually used the overridden base URL and model',
+  check(
+    'the request actually used the overridden base URL and model',
     stubSeen.urls.every((u) => u.startsWith(`${OVERRIDE_BASE_URL}/`)) &&
       stubSeen.models.every((m) => m === OVERRIDE_MODEL),
-    `${stubSeen.calls} calls → ${stubSeen.urls[0]} · ${stubSeen.models[0]}`);
+    `${stubSeen.calls} calls → ${stubSeen.urls[0]} · ${stubSeen.models[0]}`,
+  );
 
   // --------------------------------------- surface 3+4 · quiz and the coach
   console.log('\n— the quiz and the post-review coach');
@@ -322,8 +332,11 @@ async function main() {
   await page.click('#aiq-start');
   await page.waitForSelector('.aiq-q', { timeout: 8000 });
   const quizRows = await waitRows(page, 'quiz', 2);
-  check('quiz · the exchange lands whole in the archive',
-    exchangeShape(quizRows, 'quiz', OVERRIDE_MODEL), `${quizRows.length} rows`);
+  check(
+    'quiz · the exchange lands whole in the archive',
+    exchangeShape(quizRows, 'quiz', OVERRIDE_MODEL),
+    `${quizRows.length} rows`,
+  );
 
   // POL-13 · the run itself is durable: reload mid-quiz and the tray offers
   // the way back in — the SAME tutor-written question stands, and the stub
@@ -338,9 +351,11 @@ async function main() {
     q: document.querySelector('.aiq-q')?.textContent ?? '',
     calls: window.__AI_STUB.calls,
   })`);
-  check('quiz · a mid-quiz reload resumes the same written questions — not a word lost, no new request',
+  check(
+    'quiz · a mid-quiz reload resumes the same written questions — not a word lost, no new request',
     quizQBefore.length > 0 && quizResume.q === quizQBefore && quizResume.calls === 0,
-    `"${quizResume.q}" · calls since reload ${quizResume.calls}`);
+    `"${quizResume.q}" · calls since reload ${quizResume.calls}`,
+  );
   // let the run go so the rest of the walk meets the tray it always met
   await page.evaluate(`(() => {
     const e = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
@@ -369,8 +384,11 @@ async function main() {
     { timeout: 8000 },
   );
   const coachRows = await waitRows(page, 'coach', 2);
-  check('coach · the exchange lands whole in the archive',
-    exchangeShape(coachRows, 'coach', OVERRIDE_MODEL), `${coachRows.length} rows`);
+  check(
+    'coach · the exchange lands whole in the archive',
+    exchangeShape(coachRows, 'coach', OVERRIDE_MODEL),
+    `${coachRows.length} rows`,
+  );
 
   // ------------------------------------------- surface 5 · the reading room
   console.log('\n— the custom reading room');
@@ -380,8 +398,11 @@ async function main() {
   await page.click('#airead-make');
   await page.waitForSelector('.airead-body', { timeout: 8000 });
   const readingRows = await waitRows(page, 'reading', 2);
-  check('reading room · the exchange lands whole in the archive',
-    exchangeShape(readingRows, 'reading', OVERRIDE_MODEL), `${readingRows.length} rows`);
+  check(
+    'reading room · the exchange lands whole in the archive',
+    exchangeShape(readingRows, 'reading', OVERRIDE_MODEL),
+    `${readingRows.length} rows`,
+  );
 
   // ---------------- the tutor's autonomy: cards out of its own passage
   // (operator's word, 2026-08-24). The 札 line names 犬・猫 (makeable),
@@ -399,20 +420,31 @@ async function main() {
       chips: [...document.querySelectorAll('[data-airead-made]')].map((c) => c.dataset.aireadMade),
     };
   })()`);
-  check('reading · the tutor made exactly the two honest cards, provenance-marked',
-    afterReading.dog.length === 1 && afterReading.cat.length === 1 &&
-      afterReading.dog[0].by === 'sensei' && afterReading.cat[0].by === 'sensei' &&
-      Number.isFinite(afterReading.dog[0].started) && Number.isFinite(afterReading.cat[0].started),
-    `犬×${afterReading.dog.length} 猫×${afterReading.cat.length}`);
-  check('reading · a deck word is not duplicated; an unconfirmable word makes no card',
+  check(
+    'reading · the tutor made exactly the two honest cards, provenance-marked',
+    afterReading.dog.length === 1 &&
+      afterReading.cat.length === 1 &&
+      afterReading.dog[0].by === 'sensei' &&
+      afterReading.cat[0].by === 'sensei' &&
+      Number.isFinite(afterReading.dog[0].started) &&
+      Number.isFinite(afterReading.cat[0].started),
+    `犬×${afterReading.dog.length} 猫×${afterReading.cat.length}`,
+  );
+  check(
+    'reading · a deck word is not duplicated; an unconfirmable word makes no card',
     afterReading.weather.length === 1 && afterReading.ghost.length === 0,
-    `天気×${afterReading.weather.length} ゾロメ語×${afterReading.ghost.length}`);
-  check('reading · the record carries made:[犬,猫] and the 札 line stays out of the ink',
+    `天気×${afterReading.weather.length} ゾロメ語×${afterReading.ghost.length}`,
+  );
+  check(
+    'reading · the record carries made:[犬,猫] and the 札 line stays out of the ink',
     JSON.stringify(afterReading.made) === JSON.stringify(['犬', '猫']) && !afterReading.bodyHasFuda,
-    `made=${JSON.stringify(afterReading.made)}`);
-  check('reading · the made cards stand as doors under the passage',
+    `made=${JSON.stringify(afterReading.made)}`,
+  );
+  check(
+    'reading · the made cards stand as doors under the passage',
     JSON.stringify(afterReading.chips) === JSON.stringify(['犬', '猫']),
-    `chips=${JSON.stringify(afterReading.chips)}`);
+    `chips=${JSON.stringify(afterReading.chips)}`,
+  );
 
   // ---------------------------- the 札を頼む door: curation on demand
   console.log('\n— the tutor curates cards on demand');
@@ -430,13 +462,21 @@ async function main() {
     const byId = (id) => s.taken.filter((t) => t.t === 'word' && t.id === id);
     return { walk: byId('散歩'), music: byId('音楽'), weather: byId('天気'), ghost: byId('ゾロメ語') };
   })()`);
-  check('札 door · new words become provenance-marked cards; known and unconfirmable do not',
-    afterDoor.walk.length === 1 && afterDoor.walk[0].by === 'sensei' &&
-      afterDoor.music.length === 1 && afterDoor.weather.length === 1 && afterDoor.ghost.length === 0,
-    `散歩×${afterDoor.walk.length} 音楽×${afterDoor.music.length} 天気×${afterDoor.weather.length}`);
+  check(
+    '札 door · new words become provenance-marked cards; known and unconfirmable do not',
+    afterDoor.walk.length === 1 &&
+      afterDoor.walk[0].by === 'sensei' &&
+      afterDoor.music.length === 1 &&
+      afterDoor.weather.length === 1 &&
+      afterDoor.ghost.length === 0,
+    `散歩×${afterDoor.walk.length} 音楽×${afterDoor.music.length} 天気×${afterDoor.weather.length}`,
+  );
   const cardsRows = await waitRows(page, 'cards', 2);
-  check('札 door · the exchange lands whole in the archive',
-    exchangeShape(cardsRows, 'cards', OVERRIDE_MODEL), `${cardsRows.length} rows`);
+  check(
+    '札 door · the exchange lands whole in the archive',
+    exchangeShape(cardsRows, 'cards', OVERRIDE_MODEL),
+    `${cardsRows.length} rows`,
+  );
 
   // ------------------------- surface 6 · chat, and the end of the 24-turn cap
   console.log('\n— chat: turn 25 destroys nothing');
@@ -445,20 +485,27 @@ async function main() {
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat(MARKER);
   const chatFirst = await waitRows(page, 'chat', 2);
-  check('chat · the exchange lands whole in the archive',
+  check(
+    'chat · the exchange lands whole in the archive',
     exchangeShape(chatFirst, 'chat', OVERRIDE_MODEL) && chatFirst[0].content === MARKER,
-    `${chatFirst.length} rows, first="${chatFirst[0]?.content?.slice(0, 24)}"`);
+    `${chatFirst.length} rows, first="${chatFirst[0]?.content?.slice(0, 24)}"`,
+  );
 
   for (let n = 2; n <= 21; n += 1) await sendChat(`メッセージ ${n} 番`);
   const chatAll = await waitRows(page, 'chat', 42);
   const storedWindow = await page.evaluate(
     `JSON.parse(localStorage.getItem('kairo-corridor-v1')).aiChat.length`,
   );
-  check('42 turns later, turn 1 still stands in the archive',
+  check(
+    '42 turns later, turn 1 still stands in the archive',
     chatAll.length >= 42 && chatAll[0].role === 'user' && chatAll[0].content === MARKER,
-    `${chatAll.length} archived turns; first is still the marker`);
-  check('the localStorage request window stays bounded (24) — cap kept, loss gone',
-    storedWindow === 24, `stored aiChat length ${storedWindow}`);
+    `${chatAll.length} archived turns; first is still the marker`,
+  );
+  check(
+    'the localStorage request window stays bounded (24) — cap kept, loss gone',
+    storedWindow === 24,
+    `stored aiChat length ${storedWindow}`,
+  );
   const beforeUnfold = await page.evaluate(`({
     turns: document.querySelectorAll('.chat-turn').length,
     marker: document.body.textContent.includes(${JSON.stringify(MARKER)}),
@@ -470,21 +517,27 @@ async function main() {
     turns: document.querySelectorAll('.chat-turn').length,
     marker: document.body.textContent.includes(${JSON.stringify(MARKER)}),
   })`);
-  check('the log lazy-renders: recent window first, 前の会話 unfolds the rest',
-    beforeUnfold.earlier && !beforeUnfold.marker && afterUnfold.marker && afterUnfold.turns > beforeUnfold.turns,
-    `${beforeUnfold.turns} → ${afterUnfold.turns} turns; marker hidden→shown`);
+  check(
+    'the log lazy-renders: recent window first, 前の会話 unfolds the rest',
+    beforeUnfold.earlier &&
+      !beforeUnfold.marker &&
+      afterUnfold.marker &&
+      afterUnfold.turns > beforeUnfold.turns,
+    `${beforeUnfold.turns} → ${afterUnfold.turns} turns; marker hidden→shown`,
+  );
 
   // a fresh boot renders the history from the archive, not the capped store
   await open('?entry=shelf');
   await page.click('#ai-link');
-  await page.waitForFunction(
-    () => document.querySelectorAll('.chat-turn').length > 24,
-    null,
-    { timeout: 8000 },
-  );
+  await page.waitForFunction(() => document.querySelectorAll('.chat-turn').length > 24, null, {
+    timeout: 8000,
+  });
   const rebootTurns = await page.evaluate(`document.querySelectorAll('.chat-turn').length`);
-  check('after reload the visible history renders from the archive (> the 24 cap)',
-    rebootTurns > 24, `${rebootTurns} turns rendered from the durable transcript`);
+  check(
+    'after reload the visible history renders from the archive (> the 24 cap)',
+    rebootTurns > 24,
+    `${rebootTurns} turns rendered from the durable transcript`,
+  );
 
   // ------------------------------------ transport honesty · the 10 s budget
   console.log('\n— timeout: the stalled provider and the quiet line');
@@ -503,19 +556,27 @@ async function main() {
     thinking: document.querySelectorAll('.chat-turn.thinking').length,
     sendDisabled: document.querySelector('#chat-send')?.disabled ?? null,
   })`);
-  check('chat · a never-answering provider resolves to the quiet line at ~10 s',
+  check(
+    'chat · a never-answering provider resolves to the quiet line at ~10 s',
     thinkingUp === 1 && chatElapsed >= 9000 && chatElapsed <= 13500,
-    `考え中 shown, failure line after ${(chatElapsed / 1000).toFixed(1)} s`);
-  check('chat · no dead 考え中 remains and the door reopens',
+    `考え中 shown, failure line after ${(chatElapsed / 1000).toFixed(1)} s`,
+  );
+  check(
+    'chat · no dead 考え中 remains and the door reopens',
     chatAfterTimeout.thinking === 0 && chatAfterTimeout.sendDisabled === false,
-    JSON.stringify(chatAfterTimeout));
+    JSON.stringify(chatAfterTimeout),
+  );
   // 42 turns stood before the stalled send; its user turn and the app's own
   // line bring the archive to 44 — the reply that never came adds nothing
   const timeoutRows = await waitRows(page, 'chat', 44);
   const lastRows = timeoutRows.slice(-2);
-  check('chat · even the failed exchange is archived — the words, then the app\'s own line',
-    lastRows[0]?.role === 'user' && lastRows[0]?.content === 'タイムアウトの探査' && lastRows[1]?.role === 'app',
-    lastRows.map((r) => r.role).join(' → '));
+  check(
+    "chat · even the failed exchange is archived — the words, then the app's own line",
+    lastRows[0]?.role === 'user' &&
+      lastRows[0]?.content === 'タイムアウトの探査' &&
+      lastRows[1]?.role === 'app',
+    lastRows.map((r) => r.role).join(' → '),
+  );
 
   // ---------------- E3-A open finding 1 · pending survives leaving the page
   // The spinner and the sealed 送る must not live in one render's closure:
@@ -533,20 +594,26 @@ async function main() {
     thinking: document.querySelectorAll('.chat-turn.thinking').length,
     sendDisabled: document.querySelector('#chat-send')?.disabled ?? null,
   })`);
-  check('chat · walking away and back mid-question keeps 考え中 and the sealed 送る',
+  check(
+    'chat · walking away and back mid-question keeps 考え中 and the sealed 送る',
     backOnPage.thinking === 1 && backOnPage.sendDisabled === true,
-    JSON.stringify(backOnPage));
+    JSON.stringify(backOnPage),
+  );
   // the button is sealed; Enter on the field is the vector that bypassed it
   await page.fill('#chat-input', '二重送信の探査');
   await page.press('#chat-input', 'Enter');
   await page.waitForTimeout(600);
   const pendingDuring = (await logAll(page, 'chat')).length;
-  check('chat · a send while pending is refused — no duplicate lands in the archive',
+  check(
+    'chat · a send while pending is refused — no duplicate lands in the archive',
     pendingDuring === pendingBefore + 1,
-    `${pendingBefore} rows + the one pending question = ${pendingDuring}`);
+    `${pendingBefore} rows + the one pending question = ${pendingDuring}`,
+  );
   await page.waitForFunction(
-    () => !document.querySelector('.chat-turn.thinking') &&
-      document.querySelector('#chat-send') && !document.querySelector('#chat-send').disabled,
+    () =>
+      !document.querySelector('.chat-turn.thinking') &&
+      document.querySelector('#chat-send') &&
+      !document.querySelector('#chat-send').disabled,
     null,
     { timeout: 15000 },
   );
@@ -561,7 +628,8 @@ async function main() {
     { timeout: 4000 },
   );
   await page.waitForFunction(
-    () => (document.querySelector('#sheet .ai-answer')?.textContent || '').includes('could not answer'),
+    () =>
+      (document.querySelector('#sheet .ai-answer')?.textContent || '').includes('could not answer'),
     null,
     { timeout: 15000 },
   );
@@ -569,9 +637,11 @@ async function main() {
   const tutorButtonFree = await page.evaluate(
     `[...document.querySelectorAll('#sheet .ai-ask')].every((b) => !b.disabled)`,
   );
-  check('word tutor · the stalled request takes the same failure path, door reopens',
+  check(
+    'word tutor · the stalled request takes the same failure path, door reopens',
     tutorButtonFree && tutorElapsed <= 25000,
-    `failure line after ${((tutorElapsed) / 1000).toFixed(1)} s including sheet walk`);
+    `failure line after ${(tutorElapsed / 1000).toFixed(1)} s including sheet walk`,
+  );
 
   // -------------- E3-A open finding 2 · the archive reads back to its sheet
   // A reply that arrived after its word sheet closed used to be archived
@@ -581,7 +651,8 @@ async function main() {
   await open('?entry=shelf');
   await openWordSheet();
   await page.waitForFunction(
-    () => /stub reply/.test(document.querySelector('#sheet .ai-answer')?.textContent || '') &&
+    () =>
+      /stub reply/.test(document.querySelector('#sheet .ai-answer')?.textContent || '') &&
       document.querySelectorAll('#sheet .ai-ex').length >= 4,
     null,
     { timeout: 8000 },
@@ -591,9 +662,11 @@ async function main() {
     examples: document.querySelectorAll('#sheet .ai-ex').length,
     calls: window.__AI_STUB.calls,
   })`);
-  check('word sheet · the archived tutor answer and examples read back on reopen — no new request',
+  check(
+    'word sheet · the archived tutor answer and examples read back on reopen — no new request',
     /stub reply/.test(readBack.answer) && readBack.examples >= 4 && readBack.calls === 0,
-    `"${readBack.answer}" · ${readBack.examples} examples · ${readBack.calls} calls`);
+    `"${readBack.answer}" · ${readBack.examples} examples · ${readBack.calls} calls`,
+  );
 
   // ------------------------- a broken archive must never break the AI call
   console.log('\n— quarantine posture: archive failure never breaks the call');
@@ -610,19 +683,28 @@ async function main() {
   await broken.fill('#chat-input', '記録が壊れていても');
   await broken.click('#chat-send');
   await broken.waitForFunction(
-    () => /stub reply/.test([...document.querySelectorAll('.chat-turn.tutor')].map((n) => n.textContent).join(' ')),
+    () =>
+      /stub reply/.test(
+        [...document.querySelectorAll('.chat-turn.tutor')].map((n) => n.textContent).join(' '),
+      ),
     null,
     { timeout: 15000 },
   );
   const dropped = await broken.evaluate('window.__KAIRO_AI__.dropped()');
-  check('with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
-    dropped >= 1, `${dropped} turns honestly counted as dropped`);
+  check(
+    'with IndexedDB gone the reply still arrives; the loss is counted, not thrown',
+    dropped >= 1,
+    `${dropped} turns honestly counted as dropped`,
+  );
   const brokenMined = await broken.evaluate(`(() => {
     const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
     return (s.obslog || []).filter((r) => r[1] === 'sensei' || r[1] === 'confuse').length;
   })()`);
-  check('with the archive gone, no observation is written — a ref must resolve or not exist',
-    brokenMined === 0, `${brokenMined} rows`);
+  check(
+    'with the archive gone, no observation is written — a ref must resolve or not exist',
+    brokenMined === 0,
+    `${brokenMined} rows`,
+  );
   // 鏡 (PR #86 review): a backup off a device whose archive will not read
   // must not pass silence off as emptiness — the record still leaves (the
   // export is never refused) but carries aiEvidenceIncomplete and warns.
@@ -633,11 +715,13 @@ async function main() {
     return window.__KAIRO_AI__.exportRecord();
   })()`);
   const brokenRecord = JSON.parse(brokenExport.text);
-  check('an unreadable archive marks the export honestly instead of omitting evidence',
+  check(
+    'an unreadable archive marks the export honestly instead of omitting evidence',
     brokenExport.warning === 'archive-unreadable' &&
       brokenRecord.aiEvidenceIncomplete === true &&
       !('aiEvidence' in brokenRecord),
-    `warning ${brokenExport.warning} · marker ${brokenRecord.aiEvidenceIncomplete}`);
+    `warning ${brokenExport.warning} · marker ${brokenRecord.aiEvidenceIncomplete}`,
+  );
   await brokenContext.close();
 
   // ------------------------- 鏡 KAGAMI PR 一 · the ledger's ear
@@ -647,8 +731,11 @@ async function main() {
   await page.waitForSelector('#chat-input', { timeout: 8000 });
   await sendChat('天気の言葉を教えて');
   const mineRows = await waitRows(page, 'mine', 2);
-  check('the mining exchange itself is archived whole under surface mine',
-    exchangeShape(mineRows, 'mine', OVERRIDE_MODEL), `${mineRows.length} rows`);
+  check(
+    'the mining exchange itself is archived whole under surface mine',
+    exchangeShape(mineRows, 'mine', OVERRIDE_MODEL),
+    `${mineRows.length} rows`,
+  );
   await page.waitForFunction(
     `(() => {
       const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
@@ -668,20 +755,36 @@ async function main() {
       badType: rows.filter((r) => r[1] === 'sensei' && (String(r[2]).includes('時間') || String(r[2]).includes('先生'))),
     };
   })()`);
-  check('a mined observation lands typed: [t, sensei, key, polarity, code, ref]',
+  check(
+    'a mined observation lands typed: [t, sensei, key, polarity, code, ref]',
     mined.sensei.length >= 1 &&
-      mined.sensei.every((r) => r.length === 6 && r[2] === 'word:天気' && r[3] === 1 && r[4] === 'misread' && typeof r[5] === 'string' && r[5].length > 0),
-    JSON.stringify(mined.sensei[0]));
-  check('a confusion edge lands typed: [t, confuse, key, otherKey]',
+      mined.sensei.every(
+        (r) =>
+          r.length === 6 &&
+          r[2] === 'word:天気' &&
+          r[3] === 1 &&
+          r[4] === 'misread' &&
+          typeof r[5] === 'string' &&
+          r[5].length > 0,
+      ),
+    JSON.stringify(mined.sensei[0]),
+  );
+  check(
+    'a confusion edge lands typed: [t, confuse, key, otherKey]',
     mined.confuse.length >= 1 &&
       mined.confuse.every((r) => r.length === 4 && r[2] === 'word:学校' && r[3] === 'word:天気'),
-    JSON.stringify(mined.confuse[0]));
-  check('an unconfirmable subject and an unknown code write NOTHING — fail closed',
+    JSON.stringify(mined.confuse[0]),
+  );
+  check(
+    'an unconfirmable subject and an unknown code write NOTHING — fail closed',
     mined.ghost.length === 0 && mined.badCode.length === 0,
-    `ghost ${mined.ghost.length} · bad-code ${mined.badCode.length}`);
-  check('a subject without a clear word/kanji type writes NOTHING — no default type',
+    `ghost ${mined.ghost.length} · bad-code ${mined.badCode.length}`,
+  );
+  check(
+    'a subject without a clear word/kanji type writes NOTHING — no default type',
     mined.badType.length === 0,
-    `untyped/mistyped subjects kept: ${mined.badType.length}`);
+    `untyped/mistyped subjects kept: ${mined.badType.length}`,
+  );
   // the validator must accept what the miner wrote: a reload replays the
   // envelope through validStoreEnvelope — quarantine would zero the rows
   await page.reload({ waitUntil: 'load' });
@@ -698,13 +801,17 @@ async function main() {
       })(),
     };
   })()`);
-  check('the envelope validator accepts the mined kinds across a reload — no quarantine',
+  check(
+    'the envelope validator accepts the mined kinds across a reload — no quarantine',
     afterReload.sensei >= 1 && afterReload.confuse >= 1 && afterReload.alert === false,
-    JSON.stringify(afterReload));
+    JSON.stringify(afterReload),
+  );
   const minerSource = readFileSync(resolve(CORRIDOR_DIR, 'corridor.js'), 'utf8');
-  check('mine is never mined, and only learner-authored surfaces are minable',
+  check(
+    'mine is never mined, and only learner-authored surfaces are minable',
     minerSource.includes("AI_MINABLE_SURFACES = new Set(['chat'])"),
-    'AI_MINABLE_SURFACES pinned to chat — the one door where the learner types');
+    'AI_MINABLE_SURFACES pinned to chat — the one door where the learner types',
+  );
   // one exchange, one identity: refs are distinct per exchange and every
   // one resolves to an archived exchange carrying that xid (PR #86 review)
   await open('?entry=shelf');
@@ -722,25 +829,33 @@ async function main() {
       resolved: refs.filter((ref) => xids.has(ref)).length,
     };
   })`);
-  check('every observation names its exact exchange — distinct refs, each resolving in the archive',
+  check(
+    'every observation names its exact exchange — distinct refs, each resolving in the archive',
     refCheck.total >= 2 && refCheck.distinct >= 2 && refCheck.resolved === refCheck.total,
-    JSON.stringify(refCheck));
+    JSON.stringify(refCheck),
+  );
   // the whole exchange or nothing: mining is gated on every append of the
   // exchange landing durably, never on the reply alone (PR #86 review)
-  check('mining requires the WHOLE exchange archived — the gate covers every append',
+  check(
+    'mining requires the WHOLE exchange archived — the gate covers every append',
     minerSource.includes('Promise.all(appended)'),
-    'Promise.all(appended) gate present');
+    'Promise.all(appended) gate present',
+  );
   // 鏡: evidence rides the export and returns through the real import door
   const exportResult = await page.evaluate(`window.__KAIRO_AI__.exportRecord()`);
   const exportedRecord = exportResult.text;
   const exported = JSON.parse(exportedRecord);
   const exportRefs = (exported.obslog || []).filter((r) => r[1] === 'sensei').map((r) => r[5]);
-  check('the export carries aiEvidence for every observation ref',
+  check(
+    'the export carries aiEvidence for every observation ref',
     exportRefs.length >= 2 &&
       exportResult.warning === undefined &&
       !!exported.aiEvidence &&
-      exportRefs.every((ref) => Array.isArray(exported.aiEvidence[ref]) && exported.aiEvidence[ref].length >= 2),
-    `${exportRefs.length} refs, ${Object.keys(exported.aiEvidence || {}).length} evidenced exchanges, warning ${exportResult.warning}`);
+      exportRefs.every(
+        (ref) => Array.isArray(exported.aiEvidence[ref]) && exported.aiEvidence[ref].length >= 2,
+      ),
+    `${exportRefs.length} refs, ${Object.keys(exported.aiEvidence || {}).length} evidenced exchanges, warning ${exportResult.warning}`,
+  );
   await page.evaluate(`window.__KAIRO_AI__.__clear()`);
   // a foreign turn seeded after the clear: the real import door must
   // replace it — old conversations may not survive under the new record
@@ -775,15 +890,21 @@ async function main() {
       foreignSurvived: rows.some((r) => String(r.content).includes('RECORD-A')),
     };
   })`);
-  check('after export → import on a cleared archive, every ref resolves again',
+  check(
+    'after export → import on a cleared archive, every ref resolves again',
     roundtrip.refs >= 2 && roundtrip.resolved === roundtrip.refs,
-    JSON.stringify(roundtrip));
-  check('aiEvidence rides the file, never the stored envelope',
+    JSON.stringify(roundtrip),
+  );
+  check(
+    'aiEvidence rides the file, never the stored envelope',
     roundtrip.envelopeCarriesEvidence === false,
-    `in envelope: ${roundtrip.envelopeCarriesEvidence}`);
-  check('the import REPLACES the archive in one crossing — no pre-import turn survives it',
+    `in envelope: ${roundtrip.envelopeCarriesEvidence}`,
+  );
+  check(
+    'the import REPLACES the archive in one crossing — no pre-import turn survives it',
     roundtrip.foreignSurvived === false,
-    `foreign turn survived: ${roundtrip.foreignSurvived}`);
+    `foreign turn survived: ${roundtrip.foreignSurvived}`,
+  );
   // 鏡 (PR #86 review): a record file is foreign bytes — evidence turns are
   // validated to the exact exported shape, and one malformed turn stops the
   // import cold: no reload, no store change, the note names the refusal.
@@ -813,9 +934,13 @@ async function main() {
     }),
     storeBefore,
   );
-  check('malformed imported evidence aborts the import — no reload, store untouched',
-    tamperedOutcome.samePage === true && tamperedOutcome.storeUnchanged === true && tamperedOutcome.note.length > 0,
-    `same page ${tamperedOutcome.samePage} · store unchanged ${tamperedOutcome.storeUnchanged}`);
+  check(
+    'malformed imported evidence aborts the import — no reload, store untouched',
+    tamperedOutcome.samePage === true &&
+      tamperedOutcome.storeUnchanged === true &&
+      tamperedOutcome.note.length > 0,
+    `same page ${tamperedOutcome.samePage} · store unchanged ${tamperedOutcome.storeUnchanged}`,
+  );
   // the abort must lift the seal: a REAL write through the app's own
   // boundary (the tray's ひとこと door → commitStorePatch → writeStore)
   // still lands after the refused import
@@ -825,8 +950,11 @@ async function main() {
     const s = JSON.parse(localStorage.getItem('kairo-corridor-v1'));
     return (s.obslog || []).some((r) => r[1] === 'note' && String(r[3]).includes('封は解けたか'));
   })()`);
-  check('an aborted import leaves the device writable — the next real write lands',
-    unsealed === true, `note row persisted: ${unsealed}`);
+  check(
+    'an aborted import leaves the device writable — the next real write lands',
+    unsealed === true,
+    `note row persisted: ${unsealed}`,
+  );
   // 一補 (review round 4): the device refuses the record AFTER the archive
   // swap — the old conversations must come back. A one-shot quota bomb on
   // the store key fires exactly at the import's setItem; the import aborts,
@@ -872,12 +1000,14 @@ async function main() {
       }),
     storeBeforeQuota,
   );
-  check('a refused record write rolls the archive back — nothing stranded, nothing lost',
+  check(
+    'a refused record write rolls the archive back — nothing stranded, nothing lost',
     quotaOutcome.samePage === true &&
       quotaOutcome.storeUnchanged === true &&
       quotaOutcome.rows === archBefore &&
       quotaOutcome.hasChatTurn === true,
-    `rows ${archBefore} → ${quotaOutcome.rows} · store unchanged ${quotaOutcome.storeUnchanged}`);
+    `rows ${archBefore} → ${quotaOutcome.rows} · store unchanged ${quotaOutcome.storeUnchanged}`,
+  );
   // 一補 (review round 4): the seal is per-tab, so a second window gets its
   // own law — the storage event (which fires only in tabs that did NOT
   // write) marks the watcher stale: alert up, writes refused, reload to
@@ -907,9 +1037,11 @@ async function main() {
     const notes = (s.obslog || []).filter((r) => r[1] === 'note').map((r) => String(r[3]));
     return { aLanded: notes.some((t) => t.includes('タブA')), bRefused: !notes.some((t) => t.includes('タブB')) };
   })()`);
-  check('a stale tab freezes instead of clobbering — the other window’s write stands',
+  check(
+    'a stale tab freezes instead of clobbering — the other window’s write stands',
     twoTab.aLanded === true && twoTab.bRefused === true,
-    JSON.stringify(twoTab));
+    JSON.stringify(twoTab),
+  );
   // 一補 round 5 (Codex P1): the import door is a write like any other —
   // a stale tab may not carry a record across it either
   const storeBeforeStaleImport = await pageB.evaluate(`localStorage.getItem('kairo-corridor-v1')`);
@@ -935,9 +1067,11 @@ async function main() {
     storeBeforeStaleImport,
   );
   await pageB.close();
-  check('a stale tab may not import — the door refuses before touching anything',
+  check(
+    'a stale tab may not import — the door refuses before touching anything',
     staleImport.samePage === true && staleImport.storeUnchanged === true,
-    JSON.stringify(staleImport));
+    JSON.stringify(staleImport),
+  );
   // 一補 (review round 4): a declared evidence loss stays declared — the
   // aiEvidenceIncomplete marker survives import (via the storeExtras seam),
   // a real write, and the next export.
@@ -964,9 +1098,13 @@ async function main() {
       noteLanded: (s.obslog || []).some((r) => r[1] === 'note'),
     };
   })`);
-  check('a declared evidence loss stays declared across import, writes, and re-export',
-    markerRide.inEnvelope === true && markerRide.inExport === true && markerRide.noteLanded === true,
-    JSON.stringify(markerRide));
+  check(
+    'a declared evidence loss stays declared across import, writes, and re-export',
+    markerRide.inEnvelope === true &&
+      markerRide.inExport === true &&
+      markerRide.noteLanded === true,
+    JSON.stringify(markerRide),
+  );
   // the crossing's mechanism, pinned at the source: seal → beacon →
   // rollback snapshot → swap, in that order (round 5: a snapshot taken
   // before the seal could miss a late append; a beacon written first
@@ -975,18 +1113,24 @@ async function main() {
   // both the record key and the beacon; a snapshot that will not read
   // refuses the crossing; a stale tab cannot import.
   const sealAt = minerSource.indexOf('storeSealed = true;');
-  const beaconAt = minerSource.indexOf('localStorage.setItem(CROSSING_KEY');
+  // fromIndex: standDown's -aborted write appears earlier in the handler —
+  // the pin wants the crossing's START beacon, minted right after the seal
+  const beaconAt = minerSource.indexOf('localStorage.setItem(CROSSING_KEY', sealAt);
   // fromIndex: the export path reads the archive strictly too, earlier in
   // the file — the pin wants the CROSSING's snapshot, after its seal
   const snapshotAt = minerSource.indexOf('await aiLogAll(undefined, true)', sealAt);
   const swapAt = minerSource.indexOf('await aiArchiveReplace(evidence)');
-  check('the import crossing is sealed, atomic, and cross-tab honest at the source',
+  check(
+    'the import crossing is sealed, atomic, and cross-tab honest at the source',
     minerSource.includes('let storeSealed = false') &&
       minerSource.includes('let staleTab = false') &&
       minerSource.includes('if (storeSealed || staleTab) return false;') &&
       minerSource.includes('storeSealed || staleTab || !kept.every((row) => row === true)') &&
-      minerSource.includes('e.key !== STORE_KEY && e.key !== CROSSING_KEY') &&
-      minerSource.includes('await aiArchiveReplace(oldRows)') &&
+      minerSource.includes('e.key !== CROSSING_KEY') &&
+      minerSource.includes("endsWith('-aborted')") &&
+      minerSource.includes('`${crossingMark}-aborted`') &&
+      minerSource.includes('const restoredStale = await aiArchiveReplace(oldRows);') &&
+      minerSource.includes('could not be restored — reload') &&
       minerSource.includes('so nothing was imported — nothing was changed') &&
       minerSource.includes('reload before importing') &&
       minerSource.includes('function aiArchiveReplace') &&
@@ -994,7 +1138,8 @@ async function main() {
       sealAt < beaconAt &&
       beaconAt < snapshotAt &&
       snapshotAt < swapAt,
-    `order seal@${sealAt} < beacon@${beaconAt} < snapshot@${snapshotAt} < swap@${swapAt} · gates · listener on both keys`);
+    `order seal@${sealAt} < beacon@${beaconAt} < snapshot@${snapshotAt} < swap@${swapAt} · gates · listener on both keys`,
+  );
 
   // ------------------------------------------ import clears the archive
   // E3 round-A (AI lens): the file IS the record, but the archive lives in
@@ -1016,8 +1161,11 @@ async function main() {
     `before ${archiveBefore} · cleared ${archiveCleared} · after ${archiveAfter}`,
   );
 
-  check('no console or page errors across the AI walk', consoleErrors.length === 0,
-    consoleErrors.slice(0, 3).join(' | ') || 'clean');
+  check(
+    'no console or page errors across the AI walk',
+    consoleErrors.length === 0,
+    consoleErrors.slice(0, 3).join(' | ') || 'clean',
+  );
 
   await browser.close();
   server.close();

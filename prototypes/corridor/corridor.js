@@ -1234,18 +1234,46 @@ function saveStore() {
  * watcher with a named reason, instead of silent last-writer-wins. */
 // the crossing beacon: an importing tab writes this key the moment its
 // crossing seals, so sibling tabs freeze at the START of the swap — before
-// their in-flight appends could land under a record that is being replaced
+// their in-flight appends could land under a record that is being replaced.
+// A crossing that stands down without touching the record writes the same
+// mark with -aborted appended, and ONLY a tab frozen by the beacon thaws on
+// it (review round 6): record staleness is permanent until reload, so the
+// listener upgrades crossing→record but never walks back. No attempt ids:
+// frozen tabs cannot import, so at most one crossing is live among
+// cooperating tabs at a time.
 const CROSSING_KEY = 'kairo-crossing-v1';
 window.addEventListener('storage', (e) => {
-  if ((e.key !== STORE_KEY && e.key !== CROSSING_KEY) || staleTab) return;
-  // its own flag, not storeSealed: an import abort in THIS tab lifts its
-  // own seal, but staleness has no abort — only a reload ends it
-  staleTab = true;
-  S.storeError = tx(
-    '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
-    'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
-  );
-  safelySyncStoreAlert();
+  if (e.key === STORE_KEY) {
+    // the record itself changed under this tab — permanent, reload only
+    if (staleTab !== 'record') {
+      staleTab = 'record';
+      S.storeError = tx(
+        '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
+        'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
+      );
+      safelySyncStoreAlert();
+    }
+    return;
+  }
+  if (e.key !== CROSSING_KEY || staleTab === 'record') return;
+  if (String(e.newValue || '').endsWith('-aborted')) {
+    if (staleTab === 'crossing') {
+      // the crossing stood down without a record change: this tab's memory
+      // is still true, so the freeze it caused lifts with it
+      staleTab = false;
+      S.storeError = null;
+      safelySyncStoreAlert();
+    }
+    return;
+  }
+  if (!staleTab) {
+    staleTab = 'crossing';
+    S.storeError = tx(
+      '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
+      'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
+    );
+    safelySyncStoreAlert();
+  }
 });
 
 /** Persist copied learner roots as one envelope, then make them visible.
@@ -5158,6 +5186,21 @@ function renderPortRow(main) {
   file.addEventListener('change', async () => {
     const f = file.files?.[0];
     if (!f) return;
+    // a crossing that stands down without touching the record says so on
+    // the beacon key (review round 6): sibling tabs frozen by the start
+    // beacon thaw on the -aborted mark, because nothing they knew changed
+    let crossingMark = null;
+    const standDown = () => {
+      storeSealed = false;
+      if (crossingMark) {
+        try {
+          localStorage.setItem(CROSSING_KEY, `${crossingMark}-aborted`);
+        } catch {
+          /* an unheard stand-down leaves siblings frozen — safe, reload thaws */
+        }
+        crossingMark = null;
+      }
+    };
     try {
       const s = JSON.parse(await f.text());
       // R3-D · the quiet counterpart door: a parameter file from
@@ -5242,9 +5285,11 @@ function renderPortRow(main) {
       // foreign record write.
       storeSealed = true;
       try {
-        localStorage.setItem(CROSSING_KEY, String(Date.now()));
+        crossingMark = `x${Date.now().toString(36)}`;
+        localStorage.setItem(CROSSING_KEY, crossingMark);
       } catch {
         /* a beacon that cannot write changes nothing this tab does */
+        crossingMark = null;
       }
       // Rollback material next: if the device refuses the record AFTER the
       // archive swap, the old conversations must be able to come back —
@@ -5258,7 +5303,7 @@ function renderPortRow(main) {
         oldRows = await aiLogAll(undefined, true);
       } catch {
         if (typeof indexedDB !== 'undefined') {
-          storeSealed = false;
+          standDown();
           portNote.textContent = tx(
             '会話の記録が読めないので、取り込みは中止した。何も変えていない。',
             'The conversation archive could not be read, so nothing was imported — nothing was changed.',
@@ -5268,7 +5313,7 @@ function renderPortRow(main) {
         oldRows = [];
       }
       if (!(await aiArchiveReplace(evidence))) {
-        storeSealed = false;
+        standDown();
         portNote.textContent = tx(
           '前の記録の会話を入れ替えられなかった。取り込みは中止した。',
           "The previous record's conversations could not be replaced, so nothing was imported.",
@@ -5277,14 +5322,22 @@ function renderPortRow(main) {
       }
       // last look before the record lands: staleness that arrived during
       // the crossing's awaits means another tab wrote — put the
-      // conversations back and stand down rather than clobber it
+      // conversations back and stand down rather than clobber it. The
+      // rollback's own verdict is handled, not assumed (review round 6):
+      // a rollback that fails leaves the imported evidence in the archive
+      // under the unchanged record, and the note must say that loss.
       if (staleTab) {
-        await aiArchiveReplace(oldRows);
-        storeSealed = false;
-        portNote.textContent = tx(
-          '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
-          'The record changed in another tab — reload before importing.',
-        );
+        const restoredStale = await aiArchiveReplace(oldRows);
+        standDown();
+        portNote.textContent = restoredStale
+          ? tx(
+              '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
+              'The record changed in another tab — reload before importing.',
+            )
+          : tx(
+              '別のタブで記録が変わり、元の会話は戻せなかった。再読み込みを。',
+              'The record changed in another tab, and the original conversations could not be restored — reload.',
+            );
         return;
       }
       try {
@@ -5292,7 +5345,7 @@ function renderPortRow(main) {
       } catch {
         // the device would not take the record — put the conversations back
         const restored = await aiArchiveReplace(oldRows);
-        storeSealed = false;
+        standDown();
         portNote.textContent = restored
           ? tx(
               '端末に記録を保存できなかった。取り込みは中止し、元の会話は戻した。',
@@ -5306,7 +5359,7 @@ function renderPortRow(main) {
       }
       location.reload();
     } catch {
-      storeSealed = false;
+      standDown();
       portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
     }
   });
