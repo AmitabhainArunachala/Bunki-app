@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n5-02",
+ "kind": "jlpt",
+ "level": "N5",
+ "title": {
+  "ja": "N5 模擬試験 2",
+  "en": "N5 mock paper 2"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "aozora:046605",
+    "attribution": "青空文庫 宮沢賢治「やまなし」",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "url": "https://www.aozora.gr.jp/cards/000081/card46605.html"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "一定の【時間】に。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "とけい",
+      "じかん",
+      "かみ",
+      "ときどき"
+     ],
+     "right": 1,
+     "why": "【時間】は「じかん」。time",
+     "subject": "word:時間",
+     "sid": 1255
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼女は口が【軽い】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ふとい",
+      "かるい",
+      "むずかしい",
+      "ひろい"
+     ],
+     "right": 1,
+     "why": "【軽い】は「かるい」。light, non-serious",
+     "subject": "word:軽い",
+     "sid": 2927
+    },
+    {
+     "type": "kanji-reading",
+     "q": "空港にはいつ【着く】の？\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あるく",
+      "つく",
+      "ふく",
+      "なく"
+     ],
+     "right": 1,
+     "why": "【着く】は「つく」。to arrive at, to reach",
+     "subject": "word:着く",
+     "sid": 6579
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【車】が木にぶつかった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ほんとう",
+      "でんしゃ",
+      "くるま",
+      "こうちゃ"
+     ],
+     "right": 2,
+     "why": "【車】は「くるま」。car, vehicle",
+     "subject": "word:車",
+     "sid": 6782
+    },
+    {
+     "type": "kanji-reading",
+     "q": "急に【暗い】空から大粒の雨が降り始めた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あつい",
+      "くらい",
+      "すくない",
+      "さむい"
+     ],
+     "right": 1,
+     "why": "【暗い】は「くらい」。dark, gloomy",
+     "subject": "word:暗い",
+     "sid": 27423
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は【速い】ランナーだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "はやい",
+      "やすい",
+      "あたらしい",
+      "おそい"
+     ],
+     "right": 0,
+     "why": "【速い】は「はやい」。fast, quick",
+     "subject": "word:速い",
+     "sid": 4078
+    },
+    {
+     "type": "orthography",
+     "q": "母はマーケットへ【かいもの】に行きました。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "買い物",
+      "答える",
+      "黄色い",
+      "少ない"
+     ],
+     "right": 0,
+     "why": "「かいもの」は【買い物】。shopping",
+     "subject": "word:買い物",
+     "sid": 21538
+    },
+    {
+     "type": "orthography",
+     "q": "若い人はポップスが【すき】だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "部屋",
+      "地図",
+      "書く",
+      "好き"
+     ],
+     "right": 3,
+     "why": "「すき」は【好き】。liking, fondness",
+     "subject": "word:好き",
+     "sid": 12308
+    },
+    {
+     "type": "orthography",
+     "q": "私は【まいばん】１１時に寝る。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "警官",
+      "毎晩",
+      "茶碗",
+      "本棚"
+     ],
+     "right": 1,
+     "why": "「まいばん」は【毎晩】。every night",
+     "subject": "word:毎晩",
+     "sid": 10950
+    },
+    {
+     "type": "orthography",
+     "q": "人類の【はんぶん】は女性だ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "短い",
+      "沢山",
+      "半分",
+      "有名"
+     ],
+     "right": 2,
+     "why": "「はんぶん」は【半分】。half",
+     "subject": "word:半分",
+     "sid": 7095
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "紙に線を（　　）なさい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "引こう",
+      "引き",
+      "引く",
+      "引い"
+     ],
+     "right": 1,
+     "why": "辞書形は「引く」。この文では「引き」。",
+     "subject": "word:引く",
+     "sid": 7047
+    },
+    {
+     "type": "form",
+     "q": "彼は家を売りに（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "出し",
+      "出さ",
+      "出せ",
+      "出す"
+     ],
+     "right": 0,
+     "why": "辞書形は「出す」。この文では「出し」。",
+     "subject": "word:出す",
+     "sid": 14543
+    },
+    {
+     "type": "form",
+     "q": "父はたばこを（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "吸い",
+      "吸わ",
+      "吸う",
+      "吸っ"
+     ],
+     "right": 2,
+     "why": "辞書形は「吸う」。この文では「吸う」。",
+     "subject": "word:吸う",
+     "sid": 3547
+    },
+    {
+     "type": "form",
+     "q": "明かりを（　　）て。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "消し",
+      "消さ",
+      "消す",
+      "消せ"
+     ],
+     "right": 0,
+     "why": "辞書形は「消す」。この文では「消し」。",
+     "subject": "word:消す",
+     "sid": 1638
+    },
+    {
+     "type": "form",
+     "q": "私達は郊外に（　　）でいる。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "住む",
+      "住め",
+      "住み",
+      "住ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「住む」。この文では「住ん」。",
+     "subject": "word:住む",
+     "sid": 14860
+    },
+    {
+     "type": "form",
+     "q": "周囲には誰も（　　）なかった。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "居",
+      "居ら",
+      "居る",
+      "居り"
+     ],
+     "right": 0,
+     "why": "辞書形は「居る」。この文では「居」。",
+     "subject": "word:居る",
+     "sid": 14871
+    },
+    {
+     "type": "form",
+     "q": "彼は新しい電灯を止めるのに針金を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "使い",
+      "使え",
+      "使っ",
+      "使う"
+     ],
+     "right": 2,
+     "why": "辞書形は「使う」。この文では「使っ」。",
+     "subject": "word:使う",
+     "sid": 27959
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 10,
+   "passage": {
+    "text": "小さな谷川の底を写した二枚の青い幻燈です。一、五月二疋の蟹の子供らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
+    "source": "青空文庫 · 宮沢賢治",
+    "licence": "PD (著作権フラグ なし) · 新字新仮名",
+    "attribution": "青空文庫 宮沢賢治「やまなし」",
+    "url": "https://www.aozora.gr.jp/cards/000081/card46605.html",
+    "articleId": "aozora:046605"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "やまなし",
+      "雨の日の古本屋",
+      "「助けて」より先に「ありがとう」？",
+      "神さまを「一柱」と数えるわけ"
+     ],
+     "right": 0,
+     "why": "青空文庫 · 宮沢賢治（「岩手毎日新聞」岩手毎日新聞社、1923（大正12年）4月8日）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n小さな谷川の底を写した二枚の青い幻燈です。一、五月二疋の蟹の（　　）らが青じろい水の底で話していました。『クラムボンはわらったよ。』『クラムボンはかぷかぷわらったよ。』『クラムボンは跳ねてわらったよ。』『クラムボンはかぷかぷわらったよ。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "切手",
+      "石鹸",
+      "牛乳",
+      "子供"
+     ],
+     "right": 3,
+     "why": "本文のとおり「子供（こども）」。child(ren)",
+     "subject": "word:子供"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,369 @@
+{
+ "schemaVersion": 1,
+ "setId": "n1-01",
+ "kind": "jlpt",
+ "level": "N1",
+ "title": {
+  "ja": "N1 模擬試験 1",
+  "en": "N1 mock paper 1"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:12024",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/JR%E3%81%8A%E3%81%8A%E3%81%95%E3%81%8B%E6%9D%B1%E7%B7%9A%E9%83%A8%E5%88%86%E9%96%8B%E6%A5%AD"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "ジョンケネディが【暗殺】された時、リンデルジョンソンが大統領の任期を引き継いだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あんじ",
+      "あんさつ",
+      "さつじん",
+      "むだづかい"
+     ],
+     "right": 1,
+     "why": "【暗殺】は「あんさつ」。assassination",
+     "subject": "word:暗殺",
+     "sid": 32214
+    },
+    {
+     "type": "kanji-reading",
+     "q": "他人任せはダメ。ライフセーバーではないが、俺自身が【介抱】してあげないと。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しんぼう",
+      "かいほう",
+      "かいご",
+      "だっこ"
+     ],
+     "right": 1,
+     "why": "【介抱】は「かいほう」。nursing, looking after",
+     "subject": "word:介抱",
+     "sid": 33435
+    },
+    {
+     "type": "kanji-reading",
+     "q": "また、午前10時までに、フロリダ半島の先端に【連なる】フロリダキーズ諸島に、ハリケーン注意報が発令された。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ひきずる",
+      "つらなる",
+      "おさまる",
+      "ひきいる"
+     ],
+     "right": 1,
+     "why": "【連なる】は「つらなる」。to extend, to stretch out",
+     "subject": "word:連なる",
+     "sid": 39629
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼の返報は鼻への【強烈】なパンチだった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しいる",
+      "もうれつ",
+      "きょうれつ",
+      "きょうせい"
+     ],
+     "right": 2,
+     "why": "【強烈】は「きょうれつ」。strong, intense",
+     "subject": "word:強烈",
+     "sid": 27549
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【見逃す】ことはありませんよ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "うりだす",
+      "おかす",
+      "みのがす",
+      "でくわす"
+     ],
+     "right": 2,
+     "why": "【見逃す】は「みのがす」。to miss, to overlook",
+     "subject": "word:見逃す",
+     "sid": 12407
+    },
+    {
+     "type": "kanji-reading",
+     "q": "もちろん地域【独自】の病院もあるべきだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じてん",
+      "じが",
+      "どくせん",
+      "どくじ"
+     ],
+     "right": 3,
+     "why": "【独自】は「どくじ」。original, peculiar",
+     "subject": "word:独自",
+     "sid": 21705
+    },
+    {
+     "type": "orthography",
+     "q": "テレビ宮崎によると、東国原英夫宮崎県知事の【ぼこう】、都城泉ヶ丘高校も21世紀枠で、出場が決まった。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "造り",
+      "犯す",
+      "母校",
+      "合議"
+     ],
+     "right": 2,
+     "why": "「ぼこう」は【母校】。alma mater",
+     "subject": "word:母校",
+     "sid": 40393
+    },
+    {
+     "type": "orthography",
+     "q": "後ろを【ふりかえる】な。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "振り返る",
+      "振り出し",
+      "仕入れる",
+      "悩ましい"
+     ],
+     "right": 0,
+     "why": "「ふりかえる」は【振り返る】。to turn head, to turn around",
+     "subject": "word:振り返る",
+     "sid": 1985
+    },
+    {
+     "type": "orthography",
+     "q": "【りょうしん】が彼を苦しめた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "良心",
+      "賠償",
+      "良し",
+      "繁盛"
+     ],
+     "right": 0,
+     "why": "「りょうしん」は【良心】。conscience",
+     "subject": "word:良心",
+     "sid": 7280
+    },
+    {
+     "type": "orthography",
+     "q": "彼は６０歳のとき【ていねん】で会社を辞めた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "共和",
+      "譲歩",
+      "定年",
+      "総合"
+     ],
+     "right": 2,
+     "why": "「ていねん」は【定年】。retirement age",
+     "subject": "word:定年",
+     "sid": 27551
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "ヤム・ブランズは中国政府による調査を行った後でOSIとの取引関係を（　　）たとしている。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "打ち切り",
+      "打ち切っ",
+      "打ち切ら",
+      "打ち切る"
+     ],
+     "right": 1,
+     "why": "辞書形は「打ち切る」。この文では「打ち切っ」。",
+     "subject": "word:打ち切る",
+     "sid": 39793
+    },
+    {
+     "type": "form",
+     "q": "一、（　　）る部下愛にとらわれたり、単なる事務処理に流れて上申することは、神霊の尊厳を冒す実にゆゆしき大事。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "誤れ",
+      "誤っ",
+      "誤り",
+      "誤る"
+     ],
+     "right": 0,
+     "why": "辞書形は「誤る」。この文では「誤れ」。",
+     "subject": "word:誤る",
+     "sid": 40751
+    },
+    {
+     "type": "form",
+     "q": "一文（　　）の百失い。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "惜しん",
+      "惜しま",
+      "惜しみ",
+      "惜しむ"
+     ],
+     "right": 2,
+     "why": "辞書形は「惜しむ」。この文では「惜しみ」。",
+     "subject": "word:惜しむ",
+     "sid": 7101
+    },
+    {
+     "type": "form",
+     "q": "本件に関しての究明や処置を行い、ばんえい競馬の「信用」を（　　）ていくことを米沢市長は宣言した。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "取り戻し",
+      "取り戻さ",
+      "取り戻す",
+      "取り戻そう"
+     ],
+     "right": 0,
+     "why": "辞書形は「取り戻す」。この文では「取り戻し」。",
+     "subject": "word:取り戻す",
+     "sid": 40911
+    },
+    {
+     "type": "form",
+     "q": "各社は偽装の理由を「品質を（　　）ため」と主張している。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "保とう",
+      "保つ",
+      "保た",
+      "保っ"
+     ],
+     "right": 1,
+     "why": "辞書形は「保つ」。この文では「保つ」。",
+     "subject": "word:保つ",
+     "sid": 36691
+    },
+    {
+     "type": "form",
+     "q": "（中略）このままでは…の悔しさを胸に、吉田拓郎は本日より治療に専念し、完全復活を（　　）ます」とファンに対し謝罪している。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "果たし",
+      "果たさ",
+      "果たそう",
+      "果たす"
+     ],
+     "right": 0,
+     "why": "辞書形は「果たす」。この文では「果たし」。",
+     "subject": "word:果たす",
+     "sid": 42840
+    },
+    {
+     "type": "form",
+     "q": "その後、オーストラリアやグアムに（　　）、また、関東南方の海では海上自衛隊の護衛艦「さみだれ」と共同訓練を実施した。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "立ち寄る",
+      "立ち寄っ",
+      "立ち寄ろう",
+      "立ち寄り"
+     ],
+     "right": 3,
+     "why": "辞書形は「立ち寄る」。この文では「立ち寄り」。",
+     "subject": "word:立ち寄る",
+     "sid": 41576
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "中国新聞によると、JR西日本の新線・おおさか東線のうち、放出～久宝寺間・9.2キロの区間が3月15日から部分開業され、各駅で出発・開業のセレモニーが行われた。このうち、JR長瀬駅では橋下徹大阪府知事や冬柴鉄三国土交通大臣らがテープカットをするなど開業式典が行われた他、基点駅の放出・久宝寺、及び直通快速列車が乗り入れる奈良駅でも出発式があった。朝日新聞によると、JR西日本の関西エリアでの新線開業は1997年のJR東西線以来である。",
+    "source": "ウィキニュース",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/JR%E3%81%8A%E3%81%8A%E3%81%95%E3%81%8B%E6%9D%B1%E7%B7%9A%E9%83%A8%E5%88%86%E9%96%8B%E6%A5%AD",
+    "articleId": "wikinews:12024"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "育児休業給付金",
+      "JRおおさか東線部分開業",
+      "造化三神に出会う朝",
+      "一週間、感謝の言葉を唱えてみた"
+     ],
+     "right": 1,
+     "why": "ウィキニュース（2008-03-15）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n中国新聞によると、JR西日本の新線・おおさか東線のうち、放出～久宝寺間・9.2キロの区間が3月15日から部分開業され、各駅で出発・開業のセレモニーが行われた。このうち、JR長瀬駅では橋下徹大阪府知事や冬柴鉄三国土交通（　　）らがテープカットをするなど開業式典が行われた他、基点駅の放出・久宝寺、及び直通快速列車が乗り入れる奈良駅でも出発式があった。朝日新聞によると、JR西日本の関西エリアでの新線開業は1997年のJR東西線以来である。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "大臣",
+      "条件",
+      "主張",
+      "渋滞"
+     ],
+     "right": 0,
+     "why": "本文のとおり「大臣（だいじん）」。cabinet minister",
+     "subject": "word:大臣"
+    }
+   ]
+  }
+ ]
+}

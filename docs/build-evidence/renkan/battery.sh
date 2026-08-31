@@ -37,6 +37,9 @@ run drift-fast      npm run verify:drift:fast
 if [ -f prototypes/corridor/tools/verify-corridor-ai.mjs ]; then
   run corridor-ai   node prototypes/corridor/tools/verify-corridor-ai.mjs
 fi
+if [ -f prototypes/corridor/tools/verify-mock.mjs ]; then
+  run mock          node prototypes/corridor/tools/verify-mock.mjs
+fi
 run native-readings node prototypes/corridor/tools/verify-native-readings.mjs
 run replay          npm run test:replay
 run export          npm run verify:export

@@ -1,0 +1,324 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-02",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 2",
+  "en": "N2 mock paper 2"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "wikinews:45227",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "この【区域】に財宝が埋まっているという話だ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "くいき",
+      "くぶん",
+      "りゅういき",
+      "くぎる"
+     ],
+     "right": 0,
+     "why": "【区域】は「くいき」。zone, district",
+     "subject": "word:区域",
+     "sid": 28167
+    },
+    {
+     "type": "kanji-reading",
+     "q": "短距離路線の【拡充】を図るという目的で、年末の阪神開催に阪神カップ（芝1400mGII）を新設。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かくちょう",
+      "かくじゅう",
+      "じゅみょう",
+      "しんずる"
+     ],
+     "right": 1,
+     "why": "【拡充】は「かくじゅう」。expansion",
+     "subject": "word:拡充",
+     "sid": 39868
+    },
+    {
+     "type": "kanji-reading",
+     "q": "なお、運転士は「交流と【直流】の切り替えに対する意識が一時的に低下していた」と話しているとのこと。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ちょくりゅう",
+      "ちょくつう",
+      "ちょくぜん",
+      "こうりゅう"
+     ],
+     "right": 0,
+     "why": "【直流】は「ちょくりゅう」。direct current",
+     "subject": "word:直流",
+     "sid": 40894
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は、はっきり【生き生き】と話すのが常だ。彼は、いつもどんな問題も端的に話す。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "てつづき",
+      "いけばな",
+      "いきいき",
+      "うれゆき"
+     ],
+     "right": 2,
+     "why": "【生き生き】は「いきいき」。vividly, lively",
+     "subject": "word:生き生き",
+     "sid": 33986
+    },
+    {
+     "type": "kanji-reading",
+     "q": "また、日本の【自衛】隊も19人の先遣隊が31日、現地に到着した。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じたく",
+      "かくじ",
+      "じえい",
+      "みずから"
+     ],
+     "right": 2,
+     "why": "【自衛】は「じえい」。self-defense",
+     "subject": "word:自衛",
+     "sid": 37866
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ウィキの活動は【各自】の身の回りの専門分野に焦点を当ててきたように思います。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じち",
+      "おのおの",
+      "かくじ",
+      "みずから"
+     ],
+     "right": 2,
+     "why": "【各自】は「かくじ」。individual, each",
+     "subject": "word:各自",
+     "sid": 38036
+    },
+    {
+     "type": "orthography",
+     "q": "勝てば７大会連続でワールドカップ出場が決まるポルトガル代表は、序盤に２点を許す【てんかい】に。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "展開",
+      "過剰",
+      "再三",
+      "売買"
+     ],
+     "right": 0,
+     "why": "「てんかい」は【展開】。develop, expansion (opposite of ",
+     "subject": "word:展開",
+     "sid": 38674
+    },
+    {
+     "type": "orthography",
+     "q": "あなたの【そせん】をご存知ですか。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "祖先",
+      "紙幣",
+      "日陰",
+      "美容"
+     ],
+     "right": 0,
+     "why": "「そせん」は【祖先】。ancestor(s)",
+     "subject": "word:祖先",
+     "sid": 16537
+    },
+    {
+     "type": "orthography",
+     "q": "その茎は君の【こゆび】よりやや太い。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "各地",
+      "小指",
+      "通知",
+      "狙う"
+     ],
+     "right": 1,
+     "why": "「こゆび」は【小指】。little finger",
+     "subject": "word:小指",
+     "sid": 20472
+    },
+    {
+     "type": "orthography",
+     "q": "【げか】へ行ってください。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "編む",
+      "外科",
+      "意義",
+      "武士"
+     ],
+     "right": 1,
+     "why": "「げか」は【外科】。surgical department",
+     "subject": "word:外科",
+     "sid": 4957
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "form",
+     "q": "アナグマは深い穴を（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "掘る",
+      "掘り",
+      "掘ら",
+      "掘っ"
+     ],
+     "right": 0,
+     "why": "辞書形は「掘る」。この文では「掘る」。",
+     "subject": "word:掘る",
+     "sid": 8522
+    },
+    {
+     "type": "form",
+     "q": "出席状況が最終の成績に（　　）ます。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "響か",
+      "響い",
+      "響く",
+      "響き"
+     ],
+     "right": 3,
+     "why": "辞書形は「響く」。この文では「響き」。",
+     "subject": "word:響く",
+     "sid": 20866
+    },
+    {
+     "type": "form",
+     "q": "いい手が（　　）れた。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "配っ",
+      "配ら",
+      "配り",
+      "配る"
+     ],
+     "right": 1,
+     "why": "辞書形は「配る」。この文では「配ら」。",
+     "subject": "word:配る",
+     "sid": 6064
+    },
+    {
+     "type": "form",
+     "q": "一方、イタリアのANSA通信は、連立与党で反移民政策を（　　）北部同盟と、ブチュタ氏の間の対立を報道している。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "採る",
+      "採ら",
+      "採り",
+      "採っ"
+     ],
+     "right": 0,
+     "why": "辞書形は「採る」。この文では「採る」。",
+     "subject": "word:採る",
+     "sid": 41007
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "ウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き議論が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの提供を目的に運営されてきた。2025年7月、ウィキメディア財団のタスクフォースはプロジェクトの閉鎖を提言し、公開意見募集が実施された。",
+    "source": "ウィキニュース · 検収前",
+    "licence": "CC BY 2.5",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "url": "https://ja.wikinews.org/wiki/%E3%82%A6%E3%82%A3%E3%82%AD%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%80%8121%E5%B9%B4%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%81%AB%E5%B9%95%E3%82%92%E9%96%89%E3%81%98%E3%82%8B",
+    "articleId": "wikinews:45227"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "第2次高市内閣が始動",
+      "三柱の神を一つの働きとして読む",
+      "ウィキニュース、21年の歴史に幕を閉じる",
+      "印鑑登録証明書"
+     ],
+     "right": 2,
+     "why": "ウィキニュース · 検収前（2026-05-03）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\nウィキニュースプロジェクトは、ウィキメディア財団理事会が3月30日に全言語版の閉鎖を最終決定したことを受け、5月4日に閉鎖される予定である。コンテンツおよびコミュニティの移行先については、ウィキメディアのメタウィキ上で引き続き議論が行われている。ウィキニュースは、ウィキペディア、ウィクショナリー、ウィキメディア・コモンズなどと並ぶ姉妹プロジェクトとして、自由なニュースの（　　）を目的に運営されてきた。2025年7月、ウィキメディア財団のタスクフォースはプロジェクトの閉鎖を提言し、公開意見募集が実施された。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "占領",
+      "念願",
+      "階層",
+      "提供"
+     ],
+     "right": 3,
+     "why": "本文のとおり「提供（ていきょう）」。offer, program sponsoring",
+     "subject": "word:提供"
+    }
+   ]
+  }
+ ]
+}

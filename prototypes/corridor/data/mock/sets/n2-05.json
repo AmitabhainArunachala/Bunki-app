@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-05",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 5",
+  "en": "N2 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "bunki-essay-n2-mountain",
+    "attribution": "Bunki original text",
+    "licence": "Bunki original",
+    "url": ""
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "彼は私に【恨み】を抱いた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "うらみ",
+      "ひとやすみ",
+      "あみもの",
+      "うらむ"
+     ],
+     "right": 0,
+     "why": "【恨み】は「うらみ」。resentment",
+     "subject": "word:恨み",
+     "sid": 14641
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【薄暗い】照明の中で、彼女の顔がはっきり見えなかった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "おもたい",
+      "たのもしい",
+      "うすぐらい",
+      "ずうずうしい"
+     ],
+     "right": 2,
+     "why": "【薄暗い】は「うすぐらい」。dim, gloomy",
+     "subject": "word:薄暗い",
+     "sid": 30705
+    },
+    {
+     "type": "kanji-reading",
+     "q": "キーンコーン・・・カーンコーン・・・「うわ、まずい。本【鈴】だ！」\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ちかう",
+      "かんき",
+      "すず",
+      "ぜんご"
+     ],
+     "right": 2,
+     "why": "【鈴】は「すず」。bell",
+     "subject": "word:鈴",
+     "sid": 33098
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は【物置】の中で偶然いくつかの古文書を見つけた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "こうぶつ",
+      "ものおき",
+      "あみもの",
+      "ものがたる"
+     ],
+     "right": 1,
+     "why": "【物置】は「ものおき」。storage room",
+     "subject": "word:物置",
+     "sid": 31741
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ラマダーンの初日と最終日は多くのイスラム諸国で国家の【祝日】となっている。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "しゅくじつ",
+      "ひあたり",
+      "にちじ",
+      "がんじつ"
+     ],
+     "right": 0,
+     "why": "【祝日】は「しゅくじつ」。national holiday",
+     "subject": "word:祝日",
+     "sid": 37470
+    },
+    {
+     "type": "kanji-reading",
+     "q": "私はよく【深夜】にラジオを聞いたものだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "やかん",
+      "しんや",
+      "えのぐ",
+      "やこう"
+     ],
+     "right": 1,
+     "why": "【深夜】は「しんや」。late at night",
+     "subject": "word:深夜",
+     "sid": 25740
+    },
+    {
+     "type": "orthography",
+     "q": "【ふくしゃ】機の紙を切らしたよ。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "複写",
+      "薬品",
+      "断水",
+      "改正"
+     ],
+     "right": 0,
+     "why": "「ふくしゃ」は【複写】。copy, duplicate",
+     "subject": "word:複写",
+     "sid": 14901
+    },
+    {
+     "type": "orthography",
+     "q": "盛田教授は化学【がっかい】で司会を務めた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "略す",
+      "集会",
+      "学会",
+      "解答"
+     ],
+     "right": 2,
+     "why": "「がっかい」は【学会】。academic conference",
+     "subject": "word:学会",
+     "sid": 23673
+    },
+    {
+     "type": "orthography",
+     "q": "その法律は【こうりょく】が無くなっている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "分量",
+      "効力",
+      "集合",
+      "大小"
+     ],
+     "right": 1,
+     "why": "「こうりょく」は【効力】。effect, efficacy",
+     "subject": "word:効力",
+     "sid": 18039
+    },
+    {
+     "type": "orthography",
+     "q": "間髪を入れず、迅速かつ【てきかく】な応対、畏れ入ります。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "役所",
+      "的確",
+      "看板",
+      "過剰"
+     ],
+     "right": 1,
+     "why": "「てきかく」は【的確】。precise, accurate",
+     "subject": "word:的確",
+     "sid": 29763
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの判断を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
+    "source": "随筆 · Bunki",
+    "licence": "Bunki original",
+    "attribution": "Bunki original text",
+    "url": "",
+    "articleId": "bunki-essay-n2-mountain"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "手で書くということ",
+      "マリナーズ・イチロー選手 現役通算2500安打達成",
+      "山を歩きながら考えたこと",
+      "中道改革連合新代表選挙 小川淳也氏が新代表に"
+     ],
+     "right": 2,
+     "why": "随筆 · Bunki（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n山道を長く歩いていると、考えを言葉にする速度が少しずつ落ちていく。最初の一時間は予定や仕事について考えていたのに、やがて足音と風の音だけが残る。その静けさの中で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。語学の学習にも似たところがある。難しい文章を前にすると、私たちは「理解できたか、できなかったか」という一つの（　　）を下しがちだ。しかし実際には、話題の流れは追えていても語彙の細部が曖昧だったり、漢字は読めても筆者の態度を取り違えていたりする。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "証明",
+      "判断",
+      "生長",
+      "願い"
+     ],
+     "right": 1,
+     "why": "本文のとおり「判断（はんだん）」。judgment, decision",
+     "subject": "word:判断"
+    }
+   ]
+  }
+ ]
+}

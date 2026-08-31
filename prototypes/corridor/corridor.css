@@ -4394,6 +4394,102 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border-color: var(--red);
 }
 
+/* 模試の間 — a paper sits in the same quiet as a lesson quiz. The picked
+ * option is marked but never judged mid-paper: the traditional posture is
+ * that you learn how you did at the end, all at once. */
+.lesson-option.picked {
+  border-color: var(--ink);
+  background: var(--line-soft);
+}
+
+.mock-passage {
+  border-left: 2px solid var(--line);
+  padding: 2px 0 2px 12px;
+  margin: 8px 0 14px;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.mock-passage-text {
+  font-family: var(--serif);
+  line-height: 1.9;
+  margin: 0 0 6px;
+}
+
+.mock-passage-source {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.mock-q {
+  margin: 10px 0 4px;
+}
+
+.mock-q-line {
+  font-family: var(--serif);
+  line-height: 1.9;
+  margin: 0 0 4px;
+}
+
+.mock-nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 6px 0 10px;
+}
+
+.mock-nav .take {
+  flex: 1;
+}
+
+.mock-quiet {
+  display: flex;
+  gap: 10px;
+  margin: 2px 0 18px;
+}
+
+.mock-pending,
+.mock-score {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.mock-review {
+  display: flex;
+  flex-direction: column;
+  margin: 6px 0 14px;
+}
+
+.mock-review-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.mock-review-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mock-review-q {
+  font-family: var(--serif);
+  margin: 0 0 2px;
+  line-height: 1.7;
+}
+
+.mock-review-ans,
+.mock-review-why {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin: 2px 0 0;
+  line-height: 1.6;
+}
+
 /* the end screen's explicit enroll choice (PR70-P0-1): one quiet row per
  * word — its honest ○/× mark, the word, and the 覚える door */
 .lesson-enroll {

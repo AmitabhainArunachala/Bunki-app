@@ -475,6 +475,15 @@ const S = {
    * out of a lesson puts the learner at the row they left, not the top of
    * the long N5–N1 list. Session-only, like shelfScroll. */
   lessonsScroll: 0,
+  /** finished mock papers: { 'n3-01': {score, total, ts} } — the same shape
+   * a finished lesson keeps, and judged by the same validator */
+  mockDone: {},
+  /** a paper being sat: { setId, level, ix, answers, ts } — persisted per
+   * answer, because a paper is long and a reload must not cost the sitting.
+   * Only the learner's PLACE is stored; the questions live in their file. */
+  mockRun: null,
+  /** where the 模試 list was standing when a paper began — session-only */
+  mockScroll: 0,
   /** the tutor's custom reading: { text, lv, ts } — persisted; null until asked */
   aiReading: null,
   /** earlier readings, newest first, capped — a shelf, not a stream */
@@ -555,6 +564,8 @@ const STORE_KNOWN_KEYS = [
   'obslog',
   'deepWords',
   'lessonsDone',
+  'mockDone',
+  'mockRun',
   'aiReading',
   'aiReadings',
   'suspended',
@@ -789,6 +800,29 @@ function validLessonResult(result) {
   );
 }
 
+/** 模試 · a paper being sat. Small by construction: the questions stay in
+ * their own file, so the record carries only the learner's place in them —
+ * ix may sit one past the last item, which is the result screen. */
+function validMockRun(run) {
+  return (
+    plainRecord(run) &&
+    nonEmptyString(run.setId) &&
+    run.setId.length <= 40 &&
+    optional(run, 'level', (value) => typeof value === 'string') &&
+    Number.isInteger(run.ix) &&
+    run.ix >= 0 &&
+    run.ix <= 400 &&
+    Array.isArray(run.answers) &&
+    run.answers.length <= 400 &&
+    run.answers.every(
+      (value) => value == null || (Number.isInteger(value) && value >= 0 && value < 4),
+    ) &&
+    optional(run, 'ts', finiteNumber) &&
+    optional(run, 'done', finiteNumber) &&
+    safeJsonValue(run)
+  );
+}
+
 function validAiReading(reading) {
   return (
     plainRecord(reading) &&
@@ -963,6 +997,10 @@ const STORE_ROOT_VALIDATORS = {
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validDeepWord),
   lessonsDone: (value) =>
     plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validLessonResult),
+  // a finished paper keeps a finished lesson's shape — one validator serves both
+  mockDone: (value) =>
+    plainRecord(value) && safeJsonValue(value) && Object.values(value).every(validLessonResult),
+  mockRun: (value) => value === null || validMockRun(value),
   aiReading: (value) => value === null || validAiReading(value),
   aiReadings: (value) => Array.isArray(value) && value.every(validAiReading),
   suspended: (value) =>
@@ -1115,6 +1153,8 @@ function loadStore() {
   if (Array.isArray(s.obslog)) S.obslog = s.obslog;
   if (plainRecord(s.deepWords)) S.deepWords = s.deepWords;
   if (plainRecord(s.lessonsDone)) S.lessonsDone = s.lessonsDone;
+  if (plainRecord(s.mockDone)) S.mockDone = s.mockDone;
+  if (plainRecord(s.mockRun)) S.mockRun = s.mockRun;
   if (plainRecord(s.aiReading)) S.aiReading = s.aiReading;
   if (Array.isArray(s.aiReadings)) S.aiReadings = s.aiReadings;
   if (plainRecord(s.suspended)) S.suspended = s.suspended;
@@ -1152,6 +1192,8 @@ function storeEnvelope(state) {
     obslog: state.obslog || [],
     deepWords: state.deepWords || {},
     lessonsDone: state.lessonsDone,
+    mockDone: state.mockDone,
+    mockRun: state.mockRun || null,
     aiReading: state.aiReading,
     aiReadings: state.aiReadings.slice(0, 10),
     suspended: state.suspended,
@@ -1173,12 +1215,16 @@ function storeEnvelope(state) {
  * in-flight writer — the observation miner above all, whose network pass
  * can outlive the decision — may publish the OLD in-memory state over the
  * imported one, and no archive append may land pre-import words under the
- * new record. Only the reboot, or an aborted import, lifts it. */
+ * new record. Only the reboot, or an aborted import, lifts it. staleTab is
+ * its permanent sibling (review round 4): another tab wrote the record, so
+ * this tab's memory is history — only a reload ends that. */
 let storeSealed = false;
+let staleTab = false;
 function writeStore(state) {
   // sealed: the file is the record now — a quiet refusal, no storage
-  // alert, because nothing is wrong with the device; the reboot is imminent
-  if (storeSealed) return false;
+  // alert, because nothing is wrong with the device; the reboot is
+  // imminent. stale: the alert is already up with the reason.
+  if (storeSealed || staleTab) return false;
   if (state.storeReadOnly) {
     safelySyncStoreAlert();
     return false;
@@ -1217,6 +1263,85 @@ function writeStore(state) {
 function saveStore() {
   return writeStore(S);
 }
+
+/* 二つの窓はひとつの筆を持てない — the record is one set of bytes under one
+ * key, and the storage event fires only in the tabs that did NOT write.
+ * When another tab writes the record (its own commits, or an import — the
+ * per-tab seal cannot reach across windows, review round 4), THIS tab's
+ * in-memory state is stale and any further write of it would clobber the
+ * newer bytes. So the stale tab takes the same seal the import crossing
+ * uses — writeStore, the archive appends and the miner all refuse — and
+ * says why; a reload boots clean on the current record. Two live tabs are
+ * thereby single-writer by law: the first foreign write freezes the
+ * watcher with a named reason, instead of silent last-writer-wins. */
+// the crossing beacon: an importing tab writes this key the moment its
+// crossing seals, so sibling tabs freeze at the START of the swap — before
+// their in-flight appends could land under a record that is being replaced.
+// A crossing that stands down without touching the record writes the same
+// mark with -aborted appended, and ONLY a tab frozen by the beacon thaws on
+// it (review round 6): record staleness is permanent until reload, so the
+// listener upgrades crossing→record but never walks back. No attempt ids:
+// frozen tabs cannot import, so at most one crossing is live among
+// cooperating tabs at a time.
+const CROSSING_KEY = 'kairo-crossing-v1';
+/** A crossing's name must separate two tabs that began in the same
+ * millisecond (review round 9): a clock alone gives them the same name, and
+ * one tab's abort would then lift the freeze guarding the other's swap.
+ * Randomness where the platform offers it, the clock as the ordering half,
+ * Math.random where it does not — the name never needs to be a secret, only
+ * distinct. */
+function crossingId() {
+  let rand = '';
+  try {
+    const source = globalThis.crypto;
+    if (source?.randomUUID) rand = source.randomUUID().replace(/-/g, '').slice(0, 12);
+    else if (source?.getRandomValues) {
+      const bits = source.getRandomValues(new Uint32Array(2));
+      rand = [...bits].map((n) => n.toString(36)).join('');
+    }
+  } catch {
+    /* a locked-down crypto is not a reason to refuse the crossing */
+  }
+  if (!rand) rand = Math.random().toString(36).slice(2, 12);
+  return `x${Date.now().toString(36)}-${rand}`;
+}
+window.addEventListener('storage', (e) => {
+  if (e.key === STORE_KEY) {
+    // the record itself changed under this tab — permanent, reload only
+    if (staleTab !== 'record') {
+      staleTab = 'record';
+      S.storeError = tx(
+        '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
+        'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
+      );
+      safelySyncStoreAlert();
+    }
+    return;
+  }
+  if (e.key !== CROSSING_KEY || staleTab === 'record') return;
+  const beacon = String(e.newValue || '');
+  if (beacon.endsWith('-aborted')) {
+    // ONLY the crossing that froze this tab may thaw it (review round 8).
+    // Two tabs can both start a crossing before either beacon lands; an
+    // unscoped abort would then let one tab treat the OTHER's stand-down as
+    // permission to commit, pairing its record with an archive still being
+    // swapped. The freeze remembers its author, and answers to no one else.
+    if (staleTab === `crossing:${beacon.slice(0, -'-aborted'.length)}`) {
+      staleTab = false;
+      S.storeError = null;
+      safelySyncStoreAlert();
+    }
+    return;
+  }
+  if (!staleTab) {
+    staleTab = `crossing:${beacon}`;
+    S.storeError = tx(
+      '別のタブで記録が変わった。ここは書かずに守る。再読み込みで続きを。',
+      'The record changed in another tab. This tab stops writing to protect it — reload to continue.',
+    );
+    safelySyncStoreAlert();
+  }
+});
 
 /** Persist copied learner roots as one envelope, then make them visible.
  * Patch values must be constructed off-side; mutating a live nested value
@@ -1269,6 +1394,14 @@ function commitStorePatch(patch) {
  *       written from the tray's friction door. Names no item, grades
  *       nothing, schedules nothing; it rides the export envelope so the
  *       month of real use leaves evidence.
+ *   [t, 'mock', key, g, setId]
+ *       one item of a finished 模試 paper (模試の間) — g 3 answered right ·
+ *       1 answered wrong, on the FSRS scale the validator admits (0–4);
+ *       setId names the paper ('n3-01'). The strongest evidence the ledger
+ *       holds — a sat paper is MEASURED, not observed — and still only
+ *       evidence: no FSRS state, no deck row, no due date moves, and no
+ *       output anywhere claims a JLPT pass. Items whose subject the
+ *       dictionary cannot confirm are scored and shown but write nothing.
  *
  * Taps arrive in bursts mid-reading, so rows persist on a short trailing
  * debounce instead of a full envelope write per tap; pagehide flushes. */
@@ -2529,6 +2662,12 @@ function back() {
     endLessonRun();
     return;
   }
+  // stepping out of a paper keeps it: the run is durable, and the 模試 list
+  // holds the way back in (the sitting resumes at the question left open)
+  if (S.view === 'mock' && S.mockRun) {
+    leaveMockRun();
+    return;
+  }
   if (S.view === 'archive') {
     S.view = 'shelf';
     render();
@@ -2555,7 +2694,7 @@ function back() {
     render();
     return;
   }
-  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
+  if (S.view === 'reader' || S.view === 'tray' || S.view === 'grammar' || S.view === 'levels' || S.view === 'ai' || S.view === 'lessons' || S.view === 'mock' || S.view === 'thesaurus' || S.view === 'airead' || S.view === 'kanjidex' || S.view === 'yoji') {
     // the bookmark records the exact line being left, not the debounce's
     // guess (readerPos is a UI preference — P0-4 residual-ledger disposition)
     if (S.view === 'reader' && S.passageId) {
@@ -3155,6 +3294,17 @@ function renderShelfBody() {
     window.scrollTo(0, 0);
   });
   main.append(les);
+  const mock = el('button', 'grammar-link');
+  mock.type = 'button';
+  mock.id = 'mock-link';
+  mock.append(el('span', 'l-ja', '模試'), el('span', 'en-sub', bi() ? 'mock papers' : ''));
+  mock.addEventListener('click', () => {
+    keepScroll();
+    S.view = 'mock';
+    render();
+    window.scrollTo(0, 0);
+  });
+  main.append(mock);
   const gram = el('button', 'grammar-link');
   gram.type = 'button';
   gram.id = 'grammar-link';
@@ -5132,6 +5282,21 @@ function renderPortRow(main) {
   file.addEventListener('change', async () => {
     const f = file.files?.[0];
     if (!f) return;
+    // a crossing that stands down without touching the record says so on
+    // the beacon key (review round 6): sibling tabs frozen by the start
+    // beacon thaw on the -aborted mark, because nothing they knew changed
+    let crossingMark = null;
+    const standDown = () => {
+      storeSealed = false;
+      if (crossingMark) {
+        try {
+          localStorage.setItem(CROSSING_KEY, `${crossingMark}-aborted`);
+        } catch {
+          /* an unheard stand-down leaves siblings frozen — safe, reload thaws */
+        }
+        crossingMark = null;
+      }
+    };
     try {
       const s = JSON.parse(await f.text());
       // R3-D · the quiet counterpart door: a parameter file from
@@ -5159,6 +5324,16 @@ function renderPortRow(main) {
         return;
       }
       if (!Array.isArray(s.taken)) throw new Error('not a kairo record');
+      // A stale tab may not import (review round 5): behind another tab's
+      // record, this door's wholesale write would discard that tab's
+      // changes — the single-writer law applies to the crossing too.
+      if (staleTab) {
+        portNote.textContent = tx(
+          '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
+          'The record changed in another tab — reload before importing.',
+        );
+        return;
+      }
       // 鏡: the record's evidence returns with the record. aiEvidence rides
       // the FILE, never the envelope (the archive is IndexedDB precisely so
       // conversations don't eat the localStorage quota). Every turn must
@@ -5180,7 +5355,12 @@ function renderPortRow(main) {
         }
         delete s.aiEvidence;
       }
-      if (owns(s, 'aiEvidenceIncomplete')) delete s.aiEvidenceIncomplete;
+      // aiEvidenceIncomplete rides INTO the envelope on purpose (review
+      // round 4): the marker declares an evidence loss that already
+      // happened, and deleting it here would let later exports present
+      // unresolved observations as if nothing was ever lost. The boot's
+      // storeExtras seam carries unknown keys through every future write,
+      // so the declaration is durable.
       // The file IS the record — so everything the old record owned must go
       // with it (E3 round-A: the previous learner's conversations may not
       // outlive their record), and nothing in flight may write over what
@@ -5191,19 +5371,91 @@ function renderPortRow(main) {
       // out and this record's evidence in, where an abort leaves the device
       // exactly as it was and lifts the seal; only then does the record
       // itself land, and the app reboots on it.
+      // The seal comes BEFORE the rollback snapshot (review round 5): a
+      // late append that slipped between snapshot and swap would be lost
+      // by a rollback; sealed first, every same-tab append is refused at
+      // the door and every pre-seal append's transaction lands before the
+      // snapshot's read begins. The crossing is also broadcast on its own
+      // key so other tabs freeze at the START of the crossing, not at its
+      // last write — their storage listener treats the beacon like a
+      // foreign record write.
       storeSealed = true;
+      try {
+        crossingMark = crossingId();
+        localStorage.setItem(CROSSING_KEY, crossingMark);
+      } catch {
+        /* a beacon that cannot write changes nothing this tab does */
+        crossingMark = null;
+      }
+      // Rollback material next: if the device refuses the record AFTER the
+      // archive swap, the old conversations must be able to come back —
+      // strict read, so a partial archive is never mistaken for the whole
+      // of one. No rollback material, no crossing (review round 5): an
+      // archive that will not read whole makes the swap a gamble with the
+      // conversations, so the import refuses instead — except where no
+      // IndexedDB exists at all, where there is no archive to gamble.
+      let oldRows = null;
+      try {
+        oldRows = await aiLogAll(undefined, true);
+      } catch {
+        if (typeof indexedDB !== 'undefined') {
+          standDown();
+          portNote.textContent = tx(
+            '会話の記録が読めないので、取り込みは中止した。何も変えていない。',
+            'The conversation archive could not be read, so nothing was imported — nothing was changed.',
+          );
+          return;
+        }
+        oldRows = [];
+      }
       if (!(await aiArchiveReplace(evidence))) {
-        storeSealed = false;
+        standDown();
         portNote.textContent = tx(
           '前の記録の会話を入れ替えられなかった。取り込みは中止した。',
           "The previous record's conversations could not be replaced, so nothing was imported.",
         );
         return;
       }
-      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      // last look before the record lands: staleness that arrived during
+      // the crossing's awaits means another tab wrote — put the
+      // conversations back and stand down rather than clobber it. The
+      // rollback's own verdict is handled, not assumed (review round 6):
+      // a rollback that fails leaves the imported evidence in the archive
+      // under the unchanged record, and the note must say that loss.
+      if (staleTab) {
+        const restoredStale = await aiArchiveReplace(oldRows);
+        standDown();
+        portNote.textContent = restoredStale
+          ? tx(
+              '別のタブで記録が変わっている。再読み込みしてから取り込みを。',
+              'The record changed in another tab — reload before importing.',
+            )
+          : tx(
+              '別のタブで記録が変わり、元の会話は戻せなかった。再読み込みを。',
+              'The record changed in another tab, and the original conversations could not be restored — reload.',
+            );
+        return;
+      }
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      } catch {
+        // the device would not take the record — put the conversations back
+        const restored = await aiArchiveReplace(oldRows);
+        standDown();
+        portNote.textContent = restored
+          ? tx(
+              '端末に記録を保存できなかった。取り込みは中止し、元の会話は戻した。',
+              'The device could not save the record — nothing was imported, and the original conversations were restored.',
+            )
+          : tx(
+              '端末に記録を保存できなかった。取り込みは中止したが、元の会話は戻せなかった。',
+              'The device could not save the record — nothing was imported, but the original conversations could not be restored.',
+            );
+        return;
+      }
       location.reload();
     } catch {
-      storeSealed = false;
+      standDown();
       portNote.textContent = tx('この形式は読めない。書き出したままの JSON を。', 'That file could not be read — use a record exported from here, unchanged.');
     }
   });
@@ -5568,6 +5820,454 @@ function renderLessons(main) {
   again.type = 'button';
   again.addEventListener('click', endLessonRun);
   main.append(again);
+}
+
+/* ------------------------------------------------------------ 模試の間
+ * The operator's word (2026-08-31): traditional mock papers, five per JLPT
+ * level, and the scaffold for custom ones. Four laws hold this room:
+ *
+ *   1. No real JLPT question is reproduced. Papers are built by
+ *      tools/build-mock-sets.mjs from this repo's own rights-cleared assets
+ *      — the graded word list, the 45k attested-sentence bank, the
+ *      CC-licensed shelf — and every right answer is what the corpus
+ *      actually says. Each set carries its sources; each ships 検収前 until
+ *      the operator approves it.
+ *   2. A paper is EVIDENCE, never a schedule. Sitting one writes typed
+ *      [t,'mock',key,g,setId] rows (the validator has carried them since
+ *      PR 一) and touches no FSRS state, mints no card, moves no due date.
+ *   3. 取り上げる is the learner's own choice. The results screen offers the
+ *      missed words to 覚える — one by one or all at once, through the same
+ *      dictionary-fail-closed door every other minting uses. Choose
+ *      nothing, and nothing is added.
+ *   4. No output ever claims a pass. A score is a score of THIS paper; the
+ *      room says so in as many words. 「N3に受かる」 is not knowable from
+ *      here, and the app will not pretend it is.
+ *
+ * The run is persisted per answer (POL-13's lesson, learned from the tutor
+ * quiz): a paper is long, and a mid-paper reload must not cost the sitting.
+ * Only the learner's place is stored — the questions live in their file. */
+const MOCK_DIR = 'data/mock';
+
+/** the single-file build carries the papers with it (build-standalone.mjs),
+ * so the room opens with no server to fetch from */
+const bundledMock = (key) => window.__CORRIDOR_BUNDLE__?.[key];
+
+function ensureMockIndex() {
+  if (D.mock) return Promise.resolve(D.mock);
+  const packed = bundledMock('mock/index');
+  if (packed) {
+    D.mock = Array.isArray(packed.sets) ? packed.sets : [];
+    return Promise.resolve(D.mock);
+  }
+  if (D.mockLoading) return D.mockLoading;
+  D.mockLoading = fetch(`${MOCK_DIR}/index.json`)
+    .then((res) => {
+      if (!res.ok) throw new Error(`mock index → ${res.status}`);
+      return res.json();
+    })
+    .then((index) => {
+      D.mock = Array.isArray(index.sets) ? index.sets : [];
+      delete D.mockLoading;
+      return D.mock;
+    })
+    .catch((err) => {
+      delete D.mockLoading;
+      throw err;
+    });
+  return D.mockLoading;
+}
+
+function ensureMockSet(setId) {
+  D.mockSets ||= new Map();
+  D.mockSetsLoading ||= new Map();
+  if (D.mockSets.has(setId)) return Promise.resolve(D.mockSets.get(setId));
+  const packed = bundledMock(`mock/sets/${setId}`);
+  if (packed) {
+    D.mockSets.set(setId, packed);
+    return Promise.resolve(packed);
+  }
+  if (D.mockSetsLoading.has(setId)) return D.mockSetsLoading.get(setId);
+  const pending = fetch(`${MOCK_DIR}/sets/${setId}.json`)
+    .then((res) => {
+      if (!res.ok) throw new Error(`mock set ${setId} → ${res.status}`);
+      return res.json();
+    })
+    .then((set) => {
+      D.mockSets.set(setId, set);
+      D.mockSetsLoading.delete(setId);
+      return set;
+    })
+    .catch((err) => {
+      D.mockSetsLoading.delete(setId);
+      throw err;
+    });
+  D.mockSetsLoading.set(setId, pending);
+  return pending;
+}
+
+/** One flat sitting order, each item still knowing the section it came from
+ * (its passage, its name) — the paper's shape without the nesting. */
+function mockItems(set) {
+  const flat = [];
+  for (const section of set.sections || []) {
+    for (const item of section.items || []) flat.push({ section, item });
+  }
+  return flat;
+}
+
+function startMock(setId, level) {
+  S.mockScroll = window.scrollY;
+  const run = { setId, level, ix: 0, answers: [], ts: Date.now() };
+  if (!commitStorePatch({ mockRun: run })) S.mockRun = run;
+  render();
+  window.scrollTo(0, 0);
+}
+
+/** Stepping out of a paper KEEPS it (a paper is long, and 戻る is often the
+ * hand's reflex): the durable run waits, and the 模試 door leads straight
+ * back to the question left open. Only 一覧へ / やめる let a paper go. */
+function leaveMockRun() {
+  S.view = 'shelf';
+  render();
+  window.scrollTo(0, S.shelfScroll || 0);
+}
+
+function dropMockRun() {
+  if (!commitStorePatch({ mockRun: null })) S.mockRun = null;
+  render();
+  window.scrollTo(0, 0);
+}
+
+/** Every step crosses the durability boundary; a device that cannot persist
+ * still finishes the paper in memory (the tutor quiz's own compromise). */
+function mockCommit(next) {
+  if (!commitStorePatch({ mockRun: next })) S.mockRun = next;
+}
+
+/* A load that failed SETTLES (review round 7). The room re-renders on every
+ * failure, so a render that re-fires the request on sight would spin the
+ * network for as long as the page is open — offline, that is a loop, not a
+ * retry. Failure is remembered per key, the automatic attempt stops there,
+ * and 'もう一度' is the learner's own deliberate second try. */
+const mockFailed = (key) => !!D.mockFailed?.has(key);
+function markMockFailed(key) {
+  (D.mockFailed ||= new Set()).add(key);
+  render();
+}
+/** the one door out of a settled failure: forget it, and try once more */
+function retryMockLoad(main, key, start) {
+  const again = biLabel('button', 'chip', 'もう一度', 'try again');
+  again.type = 'button';
+  again.id = 'mock-retry';
+  again.addEventListener('click', () => {
+    D.mockFailed?.delete(key);
+    start();
+    render();
+  });
+  main.append(again);
+}
+
+function renderMock(main) {
+  const run = S.mockRun;
+  main.append(withEn(el('p', 'eyebrow', '模試'), 'mock papers', 'en-inline'));
+  if (!run) {
+    main.append(el('h1', 'view-title', tx('力を測る', 'Take your measure')));
+    main.append(
+      el(
+        'p',
+        'gloss',
+        tx(
+          '本番と同じ形の模擬試験。採点は記録に残るが、予定は変わらない — 合否は、ここでは分からない。',
+          'Mock papers in the real shape. The score is kept as evidence; no schedule moves, and whether you would pass is not knowable from here.',
+        ),
+      ),
+    );
+    if (!D.mock) {
+      const start = () => ensureMockIndex().then(() => render(), () => markMockFailed('index'));
+      if (!mockFailed('index')) {
+        start();
+        main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+        return;
+      }
+      main.append(el('p', 'card-kind', tx('模試を読み込めなかった。', 'The papers could not be loaded.')));
+      retryMockLoad(main, 'index', start);
+      return;
+    }
+    for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
+      const sets = D.mock.filter((s) => s.level === level);
+      if (!sets.length) continue;
+      const done = sets.filter((s) => S.mockDone[s.setId]).length;
+      const head = el('p', 'eyebrow list-head');
+      head.append(document.createTextNode(`${level} — ${done} / ${sets.length}`));
+      if (bi()) head.append(el('span', 'en-inline', `${sets.length} papers`));
+      main.append(head);
+      for (const set of sets) {
+        const row = el('button', 'entry-row mock-row');
+        row.type = 'button';
+        row.dataset.mockSet = set.setId;
+        row.append(el('span', 'row-glyph', String(set.setId.split('-')[1] || '')));
+        const mid = el('span', 'row-main');
+        mid.append(document.createTextNode(`${set.title.ja} — ${set.items} 問`));
+        if (!set.approved) mid.append(el('span', 'mock-pending', '検収前'));
+        const seen = S.mockDone[set.setId];
+        if (seen) mid.append(el('span', 'mock-score', `${seen.score} / ${seen.total}`));
+        row.append(mid);
+        row.append(el('span', 'row-go', '›'));
+        row.addEventListener('click', () => {
+          D.mockFailed?.delete(set.setId);
+          ensureMockSet(set.setId).then(
+            () => startMock(set.setId, set.level),
+            () => markMockFailed(set.setId),
+          );
+        });
+        main.append(row);
+      }
+    }
+    return;
+  }
+  const set = D.mockSets?.get(run.setId);
+  if (!set) {
+    // a reload landed mid-paper: the place was kept, the questions come back
+    // from their file — the record never carried them
+    const start = () => ensureMockSet(run.setId).then(() => render(), () => markMockFailed(run.setId));
+    if (!mockFailed(run.setId)) {
+      start();
+      main.append(el('p', 'card-kind', tx('読み込み中…', 'loading…')));
+      return;
+    }
+    main.append(el('p', 'card-kind', tx('この模試を読み込めなかった。', 'That paper could not be loaded.')));
+    retryMockLoad(main, run.setId, start);
+    return;
+  }
+  const flat = mockItems(set);
+  if (run.ix < flat.length) {
+    renderMockItem(main, set, flat, run);
+    return;
+  }
+  renderMockResult(main, set, flat, run);
+}
+
+/** One question, in the traditional posture: the paper does not tell you as
+ * you go. Answers are recorded, changeable, and marked only at the end. */
+function renderMockItem(main, set, flat, run) {
+  const { section, item } = flat[run.ix];
+  const first = flat.findIndex((f) => f.section === section);
+  const inSection = flat.filter((f) => f.section === section).length;
+  main.append(
+    el(
+      'p',
+      'card-kind',
+      tx(
+        `${set.title.ja} — ${section.title.ja} ${run.ix - first + 1} / ${inSection}（全 ${flat.length} 問）`,
+        `${set.title.en} — ${section.title.en} ${run.ix - first + 1} of ${inSection} (${flat.length} in the paper)`,
+      ),
+    ),
+  );
+  if (section.passage) {
+    const box = el('div', 'mock-passage');
+    box.append(el('p', 'mock-passage-text', section.passage.text));
+    // the licence usually rides inside the attribution string; print it twice
+    // and the credit starts reading like boilerplate instead of a credit
+    const credit = String(section.passage.attribution || '');
+    const licence = String(section.passage.licence || '');
+    box.append(
+      el(
+        'p',
+        'mock-passage-source',
+        `${section.passage.source} — ${credit}${licence && !credit.includes(licence) ? `（${licence}）` : ''}`,
+      ),
+    );
+    main.append(box);
+  }
+  const q = el('div', 'mock-q');
+  for (const line of String(item.q).split('\n')) q.append(el('p', 'mock-q-line', line));
+  main.append(q);
+  const picked = run.answers[run.ix];
+  const list = el('div', 'lesson-options');
+  item.opts.forEach((opt, i) => {
+    const b = el('button', 'lesson-option' + (picked === i ? ' picked' : ''));
+    b.type = 'button';
+    b.dataset.mockOpt = String(i);
+    b.textContent = `${'１２３４'[i] || i + 1}　${opt}`;
+    b.setAttribute('aria-pressed', picked === i ? 'true' : 'false');
+    b.addEventListener('click', () => {
+      const answers = [...run.answers];
+      answers[run.ix] = i;
+      mockCommit({ ...run, answers });
+      render();
+    });
+    list.append(b);
+  });
+  main.append(list);
+  const nav = el('div', 'mock-nav');
+  if (run.ix > 0) {
+    const prev = biLabel('button', 'chip', '前へ', 'previous');
+    prev.type = 'button';
+    prev.id = 'mock-prev';
+    prev.addEventListener('click', () => {
+      mockCommit({ ...run, ix: run.ix - 1 });
+      render();
+      window.scrollTo(0, 0);
+    });
+    nav.append(prev);
+  }
+  const last = run.ix + 1 >= flat.length;
+  const next = biLabel('button', 'take', last ? '採点する' : 'つぎへ', last ? 'grade the paper' : 'next');
+  next.type = 'button';
+  next.id = 'mock-next';
+  next.disabled = picked == null;
+  next.addEventListener('click', () => {
+    if (!last) {
+      mockCommit({ ...run, ix: run.ix + 1 });
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    // 採点は一度の記録 — the finished paper files its evidence as ONE commit:
+    // the score, and one typed row per item whose subject the dictionary
+    // confirms. An item the dictionary cannot confirm is scored and shown,
+    // but writes nothing (the fail-closed law). Zero deck rows, zero FSRS.
+    const now = Date.now();
+    const right = flat.reduce((n, f, i) => n + (run.answers[i] === f.item.right ? 1 : 0), 0);
+    const rows = [];
+    flat.forEach((f, i) => {
+      const subject = mockSubjectKey(f.item.subject);
+      if (!subject) return;
+      rows.push([now, 'mock', subject, run.answers[i] === f.item.right ? 3 : 1, set.setId]);
+    });
+    const mockDone = { ...S.mockDone, [set.setId]: { score: right, total: flat.length, ts: now } };
+    const patch = { mockDone, mockRun: { ...run, ix: flat.length, done: now } };
+    if (rows.length) patch.obslog = [...(S.obslog || []), ...rows];
+    if (!commitStorePatch(patch)) {
+      // a failed persist ends nothing — the paper stands, the alert speaks
+      render();
+      return;
+    }
+    render();
+    window.scrollTo(0, 0);
+  });
+  nav.append(next);
+  main.append(nav);
+  const quiet = el('div', 'mock-quiet');
+  const quit = biLabel('button', 'chip mock-quit', 'あとで', 'later');
+  quit.type = 'button';
+  quit.id = 'mock-quit';
+  quit.addEventListener('click', leaveMockRun);
+  quiet.append(quit);
+  const drop = biLabel('button', 'chip mock-drop', 'やめる', 'let it go');
+  drop.type = 'button';
+  drop.id = 'mock-drop';
+  drop.addEventListener('click', dropMockRun);
+  quiet.append(drop);
+  main.append(quiet);
+}
+
+/** A subject the dictionary confirms, or nothing at all — the same law the
+ * tutor's cards obey (2026-08-24 amendment): no dictionary truth, no row. */
+function mockSubjectKey(subject) {
+  if (!nonEmptyString(subject)) return null;
+  const cut = subject.indexOf(':');
+  if (cut < 1) return null;
+  const t = subject.slice(0, cut);
+  const id = subject.slice(cut + 1);
+  if (!id || !['word', 'kanji'].includes(t)) return null;
+  const known = t === 'kanji' ? !!D.kanji?.[id] : !!lookup(id);
+  if (!known && !S.taken.some((item) => item.t === t && item.id === id)) return null;
+  return srsKey(t, id);
+}
+
+function renderMockResult(main, set, flat, run) {
+  const right = flat.reduce((n, f, i) => n + (run.answers[i] === f.item.right ? 1 : 0), 0);
+  main.append(el('h1', 'view-title', tx(`${right} / ${flat.length}`, `${right} of ${flat.length}`)));
+  const minutes = run.done && run.ts ? Math.max(1, Math.round((run.done - run.ts) / 60000)) : null;
+  const bySection = [];
+  for (const section of set.sections || []) {
+    const items = flat.filter((f) => f.section === section);
+    const got = items.reduce((n, f) => n + (run.answers[flat.indexOf(f)] === f.item.right ? 1 : 0), 0);
+    bySection.push(`${section.title.ja} ${got}/${items.length}`);
+  }
+  main.append(el('p', 'card-kind', bySection.join('　·　') + (minutes ? `　·　${minutes}分` : '')));
+  // the honesty constraint, in as many words: this is a score, not a verdict
+  main.append(
+    el(
+      'p',
+      'gloss',
+      tx(
+        `これは この一枚の点数。${set.level} に受かるかどうかは、ここでは分からない — 本番とは問題も配点も違う。弱かったところは、下から札にできる。`,
+        `This is the score of this one paper. Whether you would pass ${set.level} is not knowable from here — the real exam has other questions and other weighting. What went wrong can become cards below.`,
+      ),
+    ),
+  );
+  const inDeck = new Set(S.taken.map((i) => srsKey(i.t, i.id)));
+  const enrollRow = (t, id) => ({
+    t,
+    id,
+    label: id,
+    kind: NODE_KIND[t][0],
+    kindEn: NODE_KIND[t][1],
+    from: null,
+    ts: Date.now(),
+    started: Date.now(),
+  });
+  const missed = [];
+  const list = el('div', 'mock-review');
+  flat.forEach((f, i) => {
+    const ok = run.answers[i] === f.item.right;
+    const row = el('div', 'mock-review-row' + (ok ? '' : ' wrong'));
+    row.append(el('span', 'lesson-enroll-mark' + (ok ? ' right' : ' wrong'), ok ? '○' : '×'));
+    const body = el('div', 'mock-review-body');
+    body.append(el('p', 'mock-review-q', String(f.item.q).split('\n')[0]));
+    if (!ok) {
+      body.append(
+        el(
+          'p',
+          'mock-review-ans',
+          tx(
+            `正解 ${f.item.opts[f.item.right]}　—　選んだのは ${run.answers[i] == null ? '（無回答）' : f.item.opts[run.answers[i]]}`,
+            `right: ${f.item.opts[f.item.right]} — you chose ${run.answers[i] == null ? '(no answer)' : f.item.opts[run.answers[i]]}`,
+          ),
+        ),
+      );
+    }
+    if (f.item.why) body.append(el('p', 'mock-review-why', f.item.why));
+    row.append(body);
+    const key = mockSubjectKey(f.item.subject);
+    if (!ok && key && !inDeck.has(key)) {
+      const [t, id] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)];
+      missed.push({ t, id, key });
+      const b = biLabel('button', 'chip lesson-enroll-one', '覚える', 'memorize');
+      b.type = 'button';
+      b.dataset.enroll = id;
+      b.addEventListener('click', () => {
+        if (commitStorePatch({ taken: [...S.taken, enrollRow(t, id)] })) render();
+      });
+      row.append(b);
+    }
+    list.append(row);
+  });
+  main.append(list);
+  const fresh = missed.filter(
+    (m, i) => missed.findIndex((o) => o.key === m.key) === i && !inDeck.has(m.key),
+  );
+  if (fresh.length) {
+    const all = biLabel(
+      'button',
+      'chip lesson-enroll-all',
+      `間違えた言葉をぜんぶ覚える — ${fresh.length} 件`,
+      `memorize all ${fresh.length} missed`,
+    );
+    all.type = 'button';
+    all.id = 'mock-enroll-all';
+    all.addEventListener('click', () => {
+      if (commitStorePatch({ taken: [...S.taken, ...fresh.map((m) => enrollRow(m.t, m.id))] })) render();
+    });
+    main.append(all);
+  }
+  const back = biLabel('button', 'take', '模試一覧へ', 'back to the papers');
+  back.type = 'button';
+  back.id = 'mock-done';
+  back.addEventListener('click', dropMockRun);
+  main.append(back);
 }
 
 /* The one place the app asks for a key — once, plainly, stored on-device. */
@@ -9967,16 +10667,22 @@ async function aiArchiveReplace(rows) {
 /** Append one turn. Fire-and-forget on the request path — the returned
  * promise (true = durably written) exists for the verification suites. */
 async function aiLogAppend(row) {
-  // sealed for an import crossing: pre-import words may not land in the
-  // incoming record's archive — a discard by design, not a loss, so the
-  // honesty counter stays untouched
-  if (storeSealed) return false;
+  // sealed for an import crossing (pre-import words may not land in the
+  // incoming record's archive) or stale behind another tab's record (this
+  // tab's words belong to bytes that no longer stand) — a discard by
+  // design, not a loss, so the honesty counter stays untouched
+  if (storeSealed || staleTab) return false;
   try {
     const db = await aiLogOpen();
     if (!db) {
       aiLogDropped += 1;
       return false;
     }
+    // the door may have closed while this append was opening the database
+    // (review round 9): an append that passed the guard and then awaited
+    // could still start its transaction inside a crossing, to be erased by
+    // the swap or carried into the wrong record by the rollback
+    if (storeSealed || staleTab) return false;
     return await new Promise((done) => {
       const t = db.transaction(AI_LOG_TURNS, 'readwrite');
       t.objectStore(AI_LOG_TURNS).add(row);
@@ -10109,8 +10815,9 @@ async function aiConverse(system, messages, meta = {}) {
       try {
         const kept = await Promise.all(appended);
         // storeSealed: an import crossing has begun — the record this
-        // exchange belongs to is leaving, so its glance is not taken
-        if (storeSealed || !kept.every((row) => row === true)) return;
+        // exchange belongs to is leaving. staleTab: it already left,
+        // through another window. Either way its glance is not taken.
+        if (storeSealed || staleTab || !kept.every((row) => row === true)) return;
         await aiMineObservations(surface, learnerInk, reply, xid);
       } catch {
         /* the mirror missed one glance — the record itself is untouched */
@@ -14179,6 +14886,7 @@ function render() {
   if (S.view === 'levels') parts.push(tx('級', 'levels'));
   if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
   if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
+  if (S.view === 'mock') parts.push(tx('模試', 'mock papers'));
   if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
   if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
   if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
@@ -14365,6 +15073,7 @@ function render() {
   else if (S.view === 'levels') renderLevels(main);
   else if (S.view === 'ai') renderAiSetup(main);
   else if (S.view === 'lessons') renderLessons(main);
+  else if (S.view === 'mock') renderMock(main);
   else if (S.view === 'thesaurus') renderThesaurus(main);
   else if (S.view === 'airead') renderAiReading(main);
   else if (S.view === 'kanjidex') renderKanjidex(main);

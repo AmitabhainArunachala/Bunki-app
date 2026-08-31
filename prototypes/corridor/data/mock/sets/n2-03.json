@@ -1,0 +1,254 @@
+{
+ "schemaVersion": 1,
+ "setId": "n2-03",
+ "kind": "jlpt",
+ "level": "N2",
+ "title": {
+  "ja": "N2 模擬試験 3",
+  "en": "N2 mock paper 3"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   },
+   {
+    "name": "yasashii:10",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 25,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "命が【縮む】思いをした。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あっしゅく",
+      "くやむ",
+      "ちぢれる",
+      "ちぢむ"
+     ],
+     "right": 3,
+     "why": "【縮む】は「ちぢむ」。to shrink, to be contracted",
+     "subject": "word:縮む",
+     "sid": 10167
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【遠足】は雨のため中止になった。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "えんそく",
+      "あしもと",
+      "たる",
+      "あしあと"
+     ],
+     "right": 0,
+     "why": "【遠足】は「えんそく」。trip, hike",
+     "subject": "word:遠足",
+     "sid": 19589
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【盗難】車は駐車場で発見された。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "とうなん",
+      "へいこう",
+      "さいなん",
+      "ありがたい"
+     ],
+     "right": 0,
+     "why": "【盗難】は「とうなん」。theft, robbery",
+     "subject": "word:盗難",
+     "sid": 22392
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ヒンズー教徒は【寺院】で礼拝をします。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じっせき",
+      "じいん",
+      "わふく",
+      "ふなびん"
+     ],
+     "right": 1,
+     "why": "【寺院】は「じいん」。temple",
+     "subject": "word:寺院",
+     "sid": 23813
+    },
+    {
+     "type": "kanji-reading",
+     "q": "尾瀬では、近年の観光客減少が目立ってきており、名前をアピールすることで観光客の回帰を目指すのが【狙い】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ねらい",
+      "なつかしい",
+      "すききらい",
+      "わかわかしい"
+     ],
+     "right": 0,
+     "why": "【狙い】は「ねらい」。aim",
+     "subject": "word:狙い",
+     "sid": 40945
+    },
+    {
+     "type": "kanji-reading",
+     "q": "その【彫刻】家は木で仏像を刻んだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ちょうこく",
+      "ほる",
+      "えんげき",
+      "きざむ"
+     ],
+     "right": 0,
+     "why": "【彫刻】は「ちょうこく」。carving, engraving",
+     "subject": "word:彫刻",
+     "sid": 22859
+    },
+    {
+     "type": "orthography",
+     "q": "彼女は【さいほう】が上手です。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "農薬",
+      "裁縫",
+      "文芸",
+      "公式"
+     ],
+     "right": 1,
+     "why": "「さいほう」は【裁縫】。sewing",
+     "subject": "word:裁縫",
+     "sid": 7563
+    },
+    {
+     "type": "orthography",
+     "q": "引用した問題ではありませんが、関係代名詞と関係【ふくし】の使い分けを問う問題がリーディングセクションにはあります。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "白髪",
+      "副詞",
+      "役目",
+      "通路"
+     ],
+     "right": 1,
+     "why": "「ふくし」は【副詞】。adverb",
+     "subject": "word:副詞",
+     "sid": 34637
+    },
+    {
+     "type": "orthography",
+     "q": "「競優【ぼくじょう】」からはタケシバオーやマイネルフロストといった活躍馬を生産した実績がある。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "学級",
+      "牧場",
+      "送料",
+      "月給"
+     ],
+     "right": 1,
+     "why": "「ぼくじょう」は【牧場】。farm (livestock); pasture land",
+     "subject": "word:牧場",
+     "sid": 38940
+    },
+    {
+     "type": "orthography",
+     "q": "彼らは【ちゅうしょう】的な推論に興味を持っている。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "上級",
+      "重量",
+      "抽象",
+      "標準"
+     ],
+     "right": 2,
+     "why": "「ちゅうしょう」は【抽象】。abstract",
+     "subject": "word:抽象",
+     "sid": 28968
+    }
+   ]
+  },
+  {
+   "type": "dokkai",
+   "title": {
+    "ja": "読解",
+    "en": "reading"
+   },
+   "minutes": 20,
+   "passage": {
+    "text": "年をとったり、特別な病気になったりして、毎日の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+    "source": "やさしい日本語 用語集 · 検収前",
+    "licence": "利用条件 未検証 — 出入国在留管理庁 用語集",
+    "attribution": "出入国在留管理庁「やさしい日本語」用語集",
+    "url": "https://www.moj.go.jp/isa/content/930006077.pdf",
+    "articleId": "yasashii:10"
+   },
+   "items": [
+    {
+     "type": "gist",
+     "q": "この文章の見出しとして、いちばん合うのはどれか。",
+     "qEn": "Which headline best fits this passage?",
+     "opts": [
+      "映像が伝える「むすひ」",
+      "沈黙する神と不在の神学",
+      "中道改革連合新代表選挙 小川淳也氏が新代表に",
+      "介護"
+     ],
+     "right": 3,
+     "why": "やさしい日本語 用語集 · 検収前（）の見出し。"
+    },
+    {
+     "type": "passage-cloze",
+     "q": "本文の（　　）に入る言葉はどれか。\n年をとったり、特別な病気になったりして、（　　）の生活（食べること、お風呂に入ることなど）をすることがむずかしい人を手伝うこと。",
+     "qEn": "Which word belongs in the blank in the passage?",
+     "opts": [
+      "晴れ",
+      "英語",
+      "毎日",
+      "地図"
+     ],
+     "right": 2,
+     "why": "本文のとおり「毎日（まいにち）」。every day",
+     "subject": "word:毎日"
+    }
+   ]
+  }
+ ]
+}

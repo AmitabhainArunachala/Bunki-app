@@ -1,0 +1,318 @@
+{
+ "schemaVersion": 1,
+ "setId": "n4-05",
+ "kind": "jlpt",
+ "level": "N4",
+ "title": {
+  "ja": "N4 模擬試験 5",
+  "en": "N4 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "ガラスは【砂】から作られる。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "すな",
+      "すすむ",
+      "おや",
+      "いのる"
+     ],
+     "right": 0,
+     "why": "【砂】は「すな」。sand",
+     "subject": "word:砂",
+     "sid": 8922
+    },
+    {
+     "type": "kanji-reading",
+     "q": "現地では予断を許さない深刻な状況が【続く】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "つづく",
+      "なくなる",
+      "なく",
+      "わく"
+     ],
+     "right": 0,
+     "why": "【続く】は「つづく」。to be continued",
+     "subject": "word:続く",
+     "sid": 35626
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は【運転】が荒い。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "おくれる",
+      "うんどう",
+      "はこぶ",
+      "うんてん"
+     ],
+     "right": 3,
+     "why": "【運転】は「うんてん」。driving",
+     "subject": "word:運転",
+     "sid": 3238
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼が私のところの【部長】です。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "ぶちょう",
+      "こうちょう",
+      "しゃちょう",
+      "かちょう"
+     ],
+     "right": 0,
+     "why": "【部長】は「ぶちょう」。department (division) manager",
+     "subject": "word:部長",
+     "sid": 16045
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【台風】で本土との通信が絶えた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "あいさつ",
+      "いない",
+      "かよう",
+      "たいふう"
+     ],
+     "right": 3,
+     "why": "【台風】は「たいふう」。typhoon",
+     "subject": "word:台風",
+     "sid": 19642
+    },
+    {
+     "type": "kanji-reading",
+     "q": "彼は若い頃惨めな【生活】を送った。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "せいかつ",
+      "ねだん",
+      "いきる",
+      "せいさん"
+     ],
+     "right": 0,
+     "why": "【生活】は「せいかつ」。living, life; to live",
+     "subject": "word:生活",
+     "sid": 22521
+    },
+    {
+     "type": "orthography",
+     "q": "その【ゆびわ】を手放すな。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "用意",
+      "試験",
+      "動く",
+      "指輪"
+     ],
+     "right": 3,
+     "why": "「ゆびわ」は【指輪】。(finger) ring",
+     "subject": "word:指輪",
+     "sid": 4423
+    },
+    {
+     "type": "orthography",
+     "q": "彼はなんでも金本位に【かんがえる】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "贈り物",
+      "止める",
+      "受ける",
+      "考える"
+     ],
+     "right": 3,
+     "why": "「かんがえる」は【考える】。to think (about); to consider",
+     "subject": "word:考える",
+     "sid": 19470
+    },
+    {
+     "type": "orthography",
+     "q": "彼女は世界で【もっとも】優れたバレリーナのひとりです。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "途中",
+      "失礼",
+      "一杯",
+      "最も"
+     ],
+     "right": 3,
+     "why": "「もっとも」は【最も】。most",
+     "subject": "word:最も",
+     "sid": 27052
+    },
+    {
+     "type": "orthography",
+     "q": "もう【たたみ】の上に座るのには慣れました。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "力",
+      "林",
+      "畳",
+      "心"
+     ],
+     "right": 2,
+     "why": "「たたみ」は【畳】。tatami mat (Japanese straw mat)",
+     "subject": "word:畳",
+     "sid": 27288
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "禎子はこれまで６４４羽の鶴を（　　）た。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "折る",
+      "折ら",
+      "折り",
+      "折っ"
+     ],
+     "right": 3,
+     "why": "辞書形は「折る」。この文では「折っ」。",
+     "subject": "word:折る",
+     "sid": 25959
+    },
+    {
+     "type": "form",
+     "q": "（　　）くせに。素直に喜びなよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "嬉しい",
+      "嬉し",
+      "嬉しく",
+      "嬉しかっ"
+     ],
+     "right": 0,
+     "why": "辞書形は「嬉しい」。この文では「嬉しい」。",
+     "subject": "word:嬉しい",
+     "sid": 20165
+    },
+    {
+     "type": "form",
+     "q": "このデザインは私の趣味に（　　）ない。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "合わ",
+      "合っ",
+      "合え",
+      "合う"
+     ],
+     "right": 0,
+     "why": "辞書形は「合う」。この文では「合わ」。",
+     "subject": "word:合う",
+     "sid": 21210
+    },
+    {
+     "type": "form",
+     "q": "ちょっと（　　）てかない？\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "寄れ",
+      "寄る",
+      "寄っ",
+      "寄ろう"
+     ],
+     "right": 2,
+     "why": "辞書形は「寄る」。この文では「寄っ」。",
+     "subject": "word:寄る",
+     "sid": 2515
+    },
+    {
+     "type": "form",
+     "q": "選手はその勝利を（　　）だ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "喜ば",
+      "喜び",
+      "喜ぶ",
+      "喜ん"
+     ],
+     "right": 3,
+     "why": "辞書形は「喜ぶ」。この文では「喜ん」。",
+     "subject": "word:喜ぶ",
+     "sid": 11917
+    },
+    {
+     "type": "form",
+     "q": "彼女は（　　）べきだった。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "謝り",
+      "謝る",
+      "謝っ",
+      "謝ら"
+     ],
+     "right": 1,
+     "why": "辞書形は「謝る」。この文では「謝る」。",
+     "subject": "word:謝る",
+     "sid": 7396
+    },
+    {
+     "type": "form",
+     "q": "塩は（　　）ていない。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "残り",
+      "残っ",
+      "残ら",
+      "残る"
+     ],
+     "right": 1,
+     "why": "辞書形は「残る」。この文では「残っ」。",
+     "subject": "word:残る",
+     "sid": 6221
+    }
+   ]
+  }
+ ]
+}

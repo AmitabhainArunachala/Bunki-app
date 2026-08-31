@@ -1,0 +1,318 @@
+{
+ "schemaVersion": 1,
+ "setId": "n5-05",
+ "kind": "jlpt",
+ "level": "N5",
+ "title": {
+  "ja": "N5 模擬試験 5",
+  "en": "N5 mock paper 5"
+ },
+ "approved": false,
+ "built": "tools/build-mock-sets.mjs — deterministic, from pinned data",
+ "rights": {
+  "note": "本問は本アプリの権利処理済み資料から機械生成した。実際の日本語能力試験の問題は含まない。",
+  "noteEn": "Generated from this app’s own rights-cleared assets. No real JLPT question is reproduced.",
+  "sources": [
+   {
+    "name": "graded word list",
+    "attribution": "JMdict/EDICT, Electronic Dictionary Research and Development Group (CC BY-SA)",
+    "licence": "CC BY 4.0"
+   },
+   {
+    "name": "snow-t15-t23",
+    "attribution": "SNOW T15・T23 やさしい日本語コーパス（長岡技術科学大学 山本研究室）",
+    "licence": "CC BY 4.0",
+    "url": "https://www.jnlp.org/GengoHouse/snow/t15"
+   },
+   {
+    "name": "tanaka-corpus",
+    "attribution": "Tanaka Corpus / Tatoeba Project（EDRDG examples.utf）",
+    "licence": "CC BY 2.0 FR",
+    "url": "https://www.edrdg.org/wiki/index.php/Tanaka_Corpus"
+   },
+   {
+    "name": "ja.wikinews",
+    "attribution": "ja.wikinews contributors, CC BY 2.5",
+    "licence": "CC BY 2.5",
+    "url": "https://ja.wikinews.org/"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "type": "moji-goi",
+   "title": {
+    "ja": "文字・語彙",
+    "en": "script and vocabulary"
+   },
+   "minutes": 20,
+   "items": [
+    {
+     "type": "kanji-reading",
+     "q": "私は【仕事】で疲れ果てた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "だいすき",
+      "はやい",
+      "しごと",
+      "ひと"
+     ],
+     "right": 2,
+     "why": "【仕事】は「しごと」。work, job",
+     "subject": "word:仕事",
+     "sid": 10586
+    },
+    {
+     "type": "kanji-reading",
+     "q": "私は四季の中で夏が【一番】好きだ。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "いちばん",
+      "ばんごう",
+      "いちにち",
+      "ひとり"
+     ],
+     "right": 0,
+     "why": "【一番】は「いちばん」。best (most), first",
+     "subject": "word:一番",
+     "sid": 25056
+    },
+    {
+     "type": "kanji-reading",
+     "q": "人はそれぞれ、意見が【違う】。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "かう",
+      "つかう",
+      "いう",
+      "ちがう"
+     ],
+     "right": 3,
+     "why": "【違う】は「ちがう」。to be different; to differ; wron",
+     "subject": "word:違う",
+     "sid": 12309
+    },
+    {
+     "type": "kanji-reading",
+     "q": "【牛乳】は私の身体に合わない。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "じゅぎょう",
+      "ぎゅうにく",
+      "びょういん",
+      "ぎゅうにゅう"
+     ],
+     "right": 3,
+     "why": "【牛乳】は「ぎゅうにゅう」。milk",
+     "subject": "word:牛乳",
+     "sid": 15591
+    },
+    {
+     "type": "kanji-reading",
+     "q": "雨が【降る】前に洗濯物を取り込もう。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "とまる",
+      "でる",
+      "わたる",
+      "ふる"
+     ],
+     "right": 3,
+     "why": "【降る】は「ふる」。to precipitate, to fall (e.g.",
+     "subject": "word:降る",
+     "sid": 20654
+    },
+    {
+     "type": "kanji-reading",
+     "q": "ドアが【閉まる】の聞こえた。\n【　】の言葉の読み方は。",
+     "qEn": "How is the marked word read?",
+     "opts": [
+      "こまる",
+      "しまる",
+      "あける",
+      "きる"
+     ],
+     "right": 1,
+     "why": "【閉まる】は「しまる」。to close, to be closed",
+     "subject": "word:閉まる",
+     "sid": 8322
+    },
+    {
+     "type": "orthography",
+     "q": "鬼の留守に【せんたく】。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "靴下",
+      "洗濯",
+      "一日",
+      "質問"
+     ],
+     "right": 1,
+     "why": "「せんたく」は【洗濯】。washing, laundry",
+     "subject": "word:洗濯",
+     "sid": 3106
+    },
+    {
+     "type": "orthography",
+     "q": "夏の【よる】は寝苦しい。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "店",
+      "夜",
+      "靴",
+      "山"
+     ],
+     "right": 1,
+     "why": "「よる」は【夜】。evening, night",
+     "subject": "word:夜",
+     "sid": 3560
+    },
+    {
+     "type": "orthography",
+     "q": "【と】はひとりでに開いた。\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "絵",
+      "木",
+      "戸",
+      "手"
+     ],
+     "right": 2,
+     "why": "「と」は【戸】。door (Japanese style)",
+     "subject": "word:戸",
+     "sid": 5085
+    },
+    {
+     "type": "orthography",
+     "q": "この【ふく】に合うかしら？\n【　】の言葉は、漢字でどう書くか。",
+     "qEn": "How is the marked word written in kanji?",
+     "opts": [
+      "雨",
+      "服",
+      "鳥",
+      "空"
+     ],
+     "right": 1,
+     "why": "「ふく」は【服】。clothes",
+     "subject": "word:服",
+     "sid": 4359
+    }
+   ]
+  },
+  {
+   "type": "bunpou",
+   "title": {
+    "ja": "文法",
+    "en": "grammar"
+   },
+   "minutes": 15,
+   "items": [
+    {
+     "type": "form",
+     "q": "封筒に切手を（　　）なさい。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "貼る",
+      "貼っ",
+      "貼ら",
+      "貼り"
+     ],
+     "right": 3,
+     "why": "辞書形は「貼る」。この文では「貼り」。",
+     "subject": "word:貼る",
+     "sid": 8596
+    },
+    {
+     "type": "form",
+     "q": "彼は普通の人より遥かに力が（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "強い",
+      "強",
+      "強く",
+      "強かっ"
+     ],
+     "right": 0,
+     "why": "辞書形は「強い」。この文では「強い」。",
+     "subject": "word:強い",
+     "sid": 25152
+    },
+    {
+     "type": "form",
+     "q": "明確な返事が（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "欲しい",
+      "欲しかっ",
+      "欲しく",
+      "欲し"
+     ],
+     "right": 0,
+     "why": "辞書形は「欲しい」。この文では「欲しい」。",
+     "subject": "word:欲しい",
+     "sid": 4362
+    },
+    {
+     "type": "form",
+     "q": "（　　）ばなあ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "若けれ",
+      "若い",
+      "若かっ",
+      "若く"
+     ],
+     "right": 0,
+     "why": "辞書形は「若い」。この文では「若けれ」。",
+     "subject": "word:若い",
+     "sid": 507
+    },
+    {
+     "type": "form",
+     "q": "蜂は花から花に（　　）。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "飛ん",
+      "飛ぶ",
+      "飛ば",
+      "飛び"
+     ],
+     "right": 1,
+     "why": "辞書形は「飛ぶ」。この文では「飛ぶ」。",
+     "subject": "word:飛ぶ",
+     "sid": 10360
+    },
+    {
+     "type": "form",
+     "q": "伊沢さんを（　　）関係者は「静かで几帳面。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "知ら",
+      "知ろう",
+      "知る",
+      "知っ"
+     ],
+     "right": 2,
+     "why": "辞書形は「知る」。この文では「知る」。",
+     "subject": "word:知る",
+     "sid": 35471
+    },
+    {
+     "type": "form",
+     "q": "主人を（　　）ますよ。\n（　　）に入る形はどれか。",
+     "qEn": "Which form belongs in the blank?",
+     "opts": [
+      "呼べ",
+      "呼ぶ",
+      "呼ん",
+      "呼び"
+     ],
+     "right": 3,
+     "why": "辞書形は「呼ぶ」。この文では「呼び」。",
+     "subject": "word:呼ぶ",
+     "sid": 3466
+    }
+   ]
+  }
+ ]
+}
